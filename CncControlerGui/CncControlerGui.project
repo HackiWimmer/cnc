@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="CncControlerGui" InternalType="GUI" Version="10.0.0">
+  <Description/>
+  <Dependencies/>
+  <VirtualDirectory Name="src">
+    <File Name="main.cpp"/>
+    <File Name="MainFrame.cpp"/>
+    <File Name="wxcrafter.cpp"/>
+    <File Name="wxcrafter_bitmaps.cpp"/>
+    <File Name="CncControl.cpp"/>
+    <File Name="SerialPort.cpp"/>
+    <File Name="SerialEmulatorFile.cpp"/>
+    <File Name="SerialEmulatorSVG.cpp"/>
+    <File Name="SVGFileParser.cpp"/>
+    <File Name="SVGPathHandler.cpp"/>
+    <File Name="SVGCurveLib.cpp"/>
+    <File Name="InterruptThread.cpp"/>
+    <File Name="CncToolCorrection.cpp"/>
+    <File Name="PathGeneratorFrame.cpp"/>
+    <File Name="SerialEmulatorNull.cpp"/>
+    <File Name="CncPathReverser.cpp"/>
+    <File Name="EndSwitchDialog.cpp"/>
+    <File Name="SvgUnitCalculator.cpp"/>
+    <File Name="CncSvgCurveLib.cpp"/>
+    <File Name="CncArduino.cpp"/>
+    <File Name="DataControlModel.cpp"/>
+    <File Name="Codelite/wxPNGAnimation.cpp"/>
+    <File Name="SvgEditPopup.cpp"/>
+    <File Name="CncFileNameService.cpp"/>
+    <VirtualDirectory Name="GCode">
+      <File Name="GCodeFileParser.cpp"/>
+      <File Name="GCodeFileParser.h"/>
+      <File Name="GCodeCommands.h"/>
+      <File Name="GCodePath.h"/>
+      <File Name="GCodeBlock.h"/>
+      <File Name="GCodeCommands.cpp"/>
+      <File Name="GCodeBlock.cpp"/>
+      <File Name="GCodeField.h"/>
+      <File Name="GCodeField.cpp"/>
+    </VirtualDirectory>
+    <File Name="CncToolStateControl.cpp"/>
+    <VirtualDirectory Name="StcLexer ">
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h"/>
+      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd"/>
+      <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="3D">
+      <File Name="CncDrawPane.cpp"/>
+      <File Name="CncDrawPane.h"/>
+      <File Name="CncDrawPaneContext.cpp"/>
+      <File Name="CncDrawPaneContext.h"/>
+      <File Name="CncPoint3D.h"/>
+      <File Name="trackball.h"/>
+      <File Name="trackball.cpp"/>
+    </VirtualDirectory>
+    <File Name="CncControllerTestSuite.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="include">
+    <File Name="MainFrame.h"/>
+    <File Name="wxcrafter.h"/>
+    <File Name="strsafe.h"/>
+    <File Name="CncControl.h"/>
+    <File Name="SerialPort.h"/>
+    <File Name="SerialEmulatorNull.h"/>
+    <File Name="SerialEmulatorFile.h"/>
+    <File Name="SerialEmulatorSVG.h"/>
+    <File Name="SVGFileParser.h"/>
+    <File Name="SVGPathHandler.h"/>
+    <File Name="CncPosition.h"/>
+    <File Name="CncConfig.h"/>
+    <File Name="CommandTemplates.h"/>
+    <File Name="SVGCurveLib.h"/>
+    <File Name="InterruptThread.h"/>
+    <File Name="CncCommon.h"/>
+    <File Name="CncArduino.h"/>
+    <File Name="CncToolCorrection.h"/>
+    <File Name="LinearFunc.h"/>
+    <File Name="PointAbs.h"/>
+    <File Name="PathGeneratorFrame.h"/>
+    <File Name="CncLimitStates.h"/>
+    <File Name="PenHandler.h"/>
+    <File Name="GuiControlSetup.h"/>
+    <File Name="CncPathReverser.h"/>
+    <File Name="CncPathListEntry.h"/>
+    <File Name="DataControlModel.h"/>
+    <File Name="CncPositionMarker.h"/>
+    <File Name="SVGUserAgent.h"/>
+    <File Name="SVGTransformMatrix.h"/>
+    <File Name="EndSwitchDialog.h"/>
+    <File Name="CncWorkingParameters.h"/>
+    <File Name="SVGUserAgentInfo.h"/>
+    <File Name="CncSvgCurveLib.h"/>
+    <File Name="LruFileList.h"/>
+    <File Name="SvgUnitCalculator.h"/>
+    <File Name="Codelite/wxPNGAnimation.h"/>
+    <File Name="SvgEditPopup.h"/>
+    <File Name="CncFileNameService.h"/>
+    <File Name="NotebookInfo.h"/>
+    <File Name="CoordinateSystem.h"/>
+    <File Name="CncToolStateControl.h"/>
+    <File Name="SvgViewBox.h"/>
+    <File Name="CncControllerTestSuite.h"/>
+    <File Name="CncStreamBuffers.h"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="resources">
+    <File Name="win_resources.rc"/>
+    <File Name="wxcrafter.wxcp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="wxcrafter">
+    <VirtualDirectory Name="XRC">
+      <File Name="wxcrafter.xrc"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
+  <VirtualDirectory Name="Config">
+    <File Name="Commands1.txt"/>
+    <File Name="../Todos and known issues.txt"/>
+  </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Settings Type="Executable">
+    <GlobalSettings>
+      <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (i686-posix-dwarf-rev1, Built by MinGW-W64 project) 6.2.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-pg;-g;-O0;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <IncludePath Value="C:\@Development\wxWidgets-3.1.0\src\stc\scintilla\include"/>
+        <IncludePath Value="C:\@Development\wxWidgets-3.1.0\src\stc\scintilla\lexlib"/>
+        <Preprocessor Value="USE_WXCRAFTER"/>
+      </Compiler>
+      <Linker Options="-pg;-mwindows;$(shell wx-config --libs)" Required="yes">
+        <Library Value="libwxmsw31u_stc"/>
+        <Library Value="libwxmsw31u_webview"/>
+        <Library Value="libwxmsw31u_propgrid"/>
+        <Library Value="libwxmsw31u_adv"/>
+        <Library Value="libwxmsw31u_gl"/>
+        <Library Value="opengl32"/>
+        <Library Value="glu32"/>
+      </Linker>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="MinGW ( gcc.exe (i686-posix-dwarf-rev1, Built by MinGW-W64 project) 6.2.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O2;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="APP_USE_SPLASH"/>
+        <Preprocessor Value="USE_WXCRAFTER"/>
+      </Compiler>
+      <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
+        <Library Value="libwxmsw31u_stc"/>
+        <Library Value="libwxmsw31u_webview"/>
+        <Library Value="libwxmsw31u_propgrid"/>
+        <Library Value="libwxmsw31u_adv"/>
+        <Library Value="libwxmsw31u_gl"/>
+        <Library Value="opengl32"/>
+        <Library Value="glu32"/>
+      </Linker>
+      <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="yes" EnableCpp14="yes">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+</CodeLite_Project>

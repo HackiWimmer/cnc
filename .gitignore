@@ -1,0 +1,15 @@
+.codelite/
+CallGraph/
+CnCControl/CncControlerGui/bitmaps/
+CnCControl/CncControlerGui/Release/
+CnCControl/CncControlerGui/Debug/
+CnCControl/CncControlerGui/Resources/*
+CnCControl/CncControlerGui/Doxyfile
+
+*.exe
+*.txt
+*.bat
+*.png
+*.bmp
+*.o
+*.o.d
