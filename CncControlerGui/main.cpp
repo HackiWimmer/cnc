@@ -18,7 +18,6 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 	{ wxCMD_LINE_NONE }
 };
 
-
 ///////////////////////////////////////////////////////////////////
 
 	// redirect std::cout
