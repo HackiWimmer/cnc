@@ -13,3 +13,5 @@ CnCControl/CncControlerGui/Doxyfile
 *.bmp
 *.o
 *.o.d
+*.d
+*.out
