@@ -21,6 +21,8 @@ class wxFileConfig;
 class wxMenu;
 class wxMenuItem;
 
+enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
+
 ////////////////////////////////////////////////////////////////////
 typedef std::vector<wxWindow*> GuiControls;
 
@@ -39,7 +41,8 @@ class MainFrame : public MainFrameBClass {
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 	protected:
-    virtual void clearControllerMsgHistory(wxCommandEvent& event);
+    virtual void cancelRun(wxCommandEvent& event);
+
 		// Interrupt thread handling
 		InterruptThread* pThread;
 		wxCriticalSection pThreadCS;
@@ -56,6 +59,8 @@ class MainFrame : public MainFrameBClass {
 		bool templateFileLoading;
 		bool ignoreDirControlEvents;
 		bool testIsRunning;
+		
+		RunConfirmationInfo  runConfirmationInfo;
 		
 		int traceTimerCounter;
 		
@@ -173,6 +178,8 @@ class MainFrame : public MainFrameBClass {
 		
 		bool isPause() { return svgFileParser != NULL ? svgFileParser->isPause() : false; }
 		
+		bool showConfigSummaryAndConfirmRun();
+		
 		///////////////////////////////////////////////////////////////
 		// control handling
 		void determineCncOutputControls();
@@ -261,6 +268,8 @@ class MainFrame : public MainFrameBClass {
 		
 	protected:
 		// User command
+		virtual void confirmRun(wxCommandEvent& event);
+		virtual void clearControllerMsgHistory(wxCommandEvent& event);
 		virtual void requestControllerPinsFromButton(wxCommandEvent& event);
 		virtual void requestPins(wxCommandEvent& event);
 		virtual void traceTextUpdated(wxCommandEvent& event);

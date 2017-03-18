@@ -5830,6 +5830,86 @@
                         <object class="wxListbook" name="m_notebookConfig">
                           <style>wxLB_DEFAULT|wxBK_DEFAULT</style>
                           <object class="listbookpage">
+                            <label>Summary</label>
+                            <bitmap>bitmaps/16-database.png</bitmap>
+                            <selected>1</selected>
+                            <object class="wxPanel" name="m_panel2601">
+                              <style>wxTAB_TRAVERSAL</style>
+                              <object class="wxFlexGridSizer">
+                                <cols>1</cols>
+                                <rows>4</rows>
+                                <vgap>0</vgap>
+                                <hgap>0</hgap>
+                                <growablecols>0</growablecols>
+                                <growablerows>2</growablerows>
+                                <object class="sizeritem">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>5</border>
+                                  <object class="wxStaticText" name="m_staticText11481">
+                                    <label>Configuration Summary</label>
+                                    <style/>
+                                    <font>
+                                      <size>9</size>
+                                      <style>normal</style>
+                                      <weight>bold</weight>
+                                      <family>swiss</family>
+                                      <underlined>0</underlined>
+                                      <face>Segoe UI</face>
+                                    </font>
+                                  </object>
+                                </object>
+                                <object class="spacer" name="Spacer2621">
+                                  <size>0,8</size>
+                                  <flag>wxALL</flag>
+                                  <option>1</option>
+                                </object>
+                                <object class="sizeritem">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>5</border>
+                                  <object class="unknown" name="m_dvListCtrlConfigSummary">
+                                    <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                  </object>
+                                </object>
+                                <object class="sizeritem" name="flexGridSizer2609">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <option>1</option>
+                                  <object class="wxFlexGridSizer">
+                                    <cols>2</cols>
+                                    <rows>1</rows>
+                                    <vgap>0</vgap>
+                                    <hgap>0</hgap>
+                                    <growablecols>0</growablecols>
+                                    <growablerows>0</growablerows>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxALIGN_RIGHT</flag>
+                                      <border>3</border>
+                                      <object class="wxButton" name="m_btCancelRun">
+                                        <label>Cancel Run</label>
+                                        <style/>
+                                        <enabled>0</enabled>
+                                        <bitmap>bitmaps/16-execute_stop.png</bitmap>
+                                        <bitmapposition>wxLEFT</bitmapposition>
+                                        <default>0</default>
+                                      </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxALIGN_RIGHT</flag>
+                                      <border>3</border>
+                                      <object class="wxButton" name="m_btConfirmRun">
+                                        <label>Confirm Run</label>
+                                        <style/>
+                                        <enabled>0</enabled>
+                                        <bitmap>bitmaps/16-ok.png</bitmap>
+                                        <bitmapposition>wxLEFT</bitmapposition>
+                                        <default>0</default>
+                                      </object>
+                                    </object>
+                                  </object>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                          <object class="listbookpage">
                             <label>CNC Setter</label>
                             <bitmap>bitmaps/16-struct.png</bitmap>
                             <selected>0</selected>
@@ -5926,11 +6006,11 @@
                               <style>wxTAB_TRAVERSAL</style>
                               <object class="wxFlexGridSizer">
                                 <cols>2</cols>
-                                <rows>2</rows>
+                                <rows>3</rows>
                                 <vgap>0</vgap>
                                 <hgap>0</hgap>
                                 <growablecols>0,1</growablecols>
-                                <growablerows>1</growablerows>
+                                <growablerows>2</growablerows>
                                 <object class="sizeritem">
                                   <flag>wxALL</flag>
                                   <border>5</border>
@@ -5962,6 +6042,16 @@
                                       <face>Segoe UI</face>
                                     </font>
                                   </object>
+                                </object>
+                                <object class="spacer" name="Spacer2617">
+                                  <size>0,8</size>
+                                  <flag>wxALL</flag>
+                                  <option>1</option>
+                                </object>
+                                <object class="spacer" name="Spacer2619">
+                                  <size>0,8</size>
+                                  <flag>wxALL</flag>
+                                  <option>1</option>
                                 </object>
                                 <object class="sizeritem">
                                   <flag>wxALL|wxEXPAND</flag>
@@ -6026,6 +6116,10 @@
                                       <object class="wxButton" name="m_btRequestCtlConfig">
                                         <label>Request</label>
                                         <style/>
+                                        <tooltip>
+                                          <![CDATA[Request Controller Configuration]]>
+                                        </tooltip>
+                                        <bitmap>bitmaps/16-debugger_restart.png</bitmap>
                                         <bitmapposition>wxLEFT</bitmapposition>
                                         <default>0</default>
                                       </object>
@@ -6048,6 +6142,9 @@
                             <selected>0</selected>
                             <object class="wxPanel" name="m_controllerPinReport">
                               <style>wxTAB_TRAVERSAL</style>
+                              <tooltip>
+                                <![CDATA[Request Controller Pin Report]]>
+                              </tooltip>
                               <object class="wxFlexGridSizer">
                                 <cols>1</cols>
                                 <rows>2</rows>
@@ -6088,6 +6185,7 @@
                                       <object class="wxButton" name="m_btRequestCtlPins">
                                         <label>Request</label>
                                         <style/>
+                                        <bitmap>bitmaps/16-debugger_restart.png</bitmap>
                                         <bitmapposition>wxLEFT</bitmapposition>
                                         <default>0</default>
                                       </object>
@@ -6146,11 +6244,9 @@
                                     <object class="sizeritem">
                                       <flag>wxALL|wxALIGN_RIGHT</flag>
                                       <border>1</border>
-                                      <minsize>24,24</minsize>
                                       <object class="wxButton" name="m_btClearMsgHistory">
-                                        <label/>
+                                        <label>Clear</label>
                                         <style/>
-                                        <size>24,24</size>
                                         <tooltip>
                                           <![CDATA[Clear the Message Histroy]]>
                                         </tooltip>
@@ -6163,11 +6259,10 @@
                                 </object>
                                 <object class="sizeritem">
                                   <flag>wxALL|wxEXPAND</flag>
-                                  <border>1</border>
+                                  <border>5</border>
                                   <object class="wxTextCtrl" name="m_controllerMsgHistory">
                                     <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE</style>
-                                    <bg>wxSYS_COLOUR_BACKGROUND</bg>
-                                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                    <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                     <font>
                                       <size>10</size>
                                       <style>normal</style>
@@ -6227,6 +6322,10 @@
                                       <object class="wxButton" name="m_btRequestCtlErrorInfo">
                                         <label>Request</label>
                                         <style/>
+                                        <tooltip>
+                                          <![CDATA[Request Controller Error Info]]>
+                                        </tooltip>
+                                        <bitmap>bitmaps/16-debugger_restart.png</bitmap>
                                         <bitmapposition>wxLEFT</bitmapposition>
                                         <default>0</default>
                                       </object>
@@ -8318,11 +8417,5 @@
         </object>
       </object>
     </object>
-  </object>
-  <object class="wxFrame" name="CurentCncConfigBase">
-    <title>Current CNC Configuration</title>
-    <centered>1</centered>
-    <style>wxDEFAULT_FRAME_STYLE</style>
-    <size>500,300</size>
   </object>
 </resource>

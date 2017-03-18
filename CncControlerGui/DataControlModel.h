@@ -43,6 +43,14 @@ class DataControlModel {
 			ret.push_back(_row);
 		}
 		////////////////////////////////////////////////////////////////////////
+		static void addNumParameterValueUnitRow(DcmItemList& ret, const char* parameter, wxVariant value, const char* unit ) {
+			_row.clear();
+			_row.push_back(parameter);
+			_row.push_back(value.GetString());
+			_row.push_back(unit);
+			ret.push_back(_row);
+		}
+		////////////////////////////////////////////////////////////////////////
 		static void addNumKeyValueRow(DcmItemList& ret, unsigned int count, const char* key, wxVariant value) {
 			_row.clear();
 			_row.push_back(wxString::Format(wxT("%i"),(int)count));

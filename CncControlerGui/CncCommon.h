@@ -47,11 +47,12 @@ static const unsigned int OutboundSvgPage 			= 3;
 static const unsigned int OutboundSvgSource			= 4;
 static const unsigned int OutboundSvgTrace			= 5;
 
-static const unsigned int CNCSetterPage 			= 0;
-static const unsigned int CNCPCConfig	 			= 1;
-static const unsigned int CNCControllerConfigPage 	= 2;
-static const unsigned int CNCControllerPinsPage		= 3;
-static const unsigned int CNCControllerMsgHistPage	= 4;
-static const unsigned int CNCControllerErrorPage 	= 5;
+static const unsigned int ConfigSummaryPage 		= 0;
+static const unsigned int CNCSetterPage 			= 1;
+static const unsigned int CNCPCConfig	 			= 2;
+static const unsigned int CNCControllerConfigPage 	= 3;
+static const unsigned int CNCControllerPinsPage		= 4;
+static const unsigned int CNCControllerMsgHistPage	= 5;
+static const unsigned int CNCControllerErrorPage 	= 6;
 
 #endif

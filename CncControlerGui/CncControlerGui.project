@@ -3,13 +3,6 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="main.cpp"/>
-    <File Name="MainFrame.cpp"/>
-    <File Name="wxcrafter.cpp"/>
-    <File Name="wxcrafter_bitmaps.cpp"/>
-    <File Name="InterruptThread.cpp"/>
-    <File Name="DataControlModel.cpp"/>
-    <File Name="Codelite/wxPNGAnimation.cpp"/>
     <VirtualDirectory Name="GCode">
       <File Name="GCodeFileParser.cpp"/>
       <File Name="GCodeFileParser.h"/>
@@ -37,10 +30,6 @@
       <File Name="trackball.h"/>
       <File Name="trackball.cpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="ConfigWnd">
-      <File Name="CurentCncConfig.cpp"/>
-      <File Name="CurentCncConfig.h"/>
-    </VirtualDirectory>
     <VirtualDirectory Name="EndSwitchDlg">
       <File Name="EndSwitchDialog.cpp"/>
       <File Name="EndSwitchDialog.h"/>
@@ -59,7 +48,7 @@
       <File Name="SerialEmulatorSVG.h"/>
       <File Name="SerialPort.h"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="SVG">
+    <VirtualDirectory Name="Svg">
       <File Name="SVGCurveLib.cpp"/>
       <File Name="SvgEditPopup.cpp"/>
       <File Name="SVGFileParser.cpp"/>
@@ -100,23 +89,36 @@
       <File Name="CncToolCorrection.h"/>
       <File Name="CncToolStateControl.h"/>
       <File Name="CncWorkingParameters.h"/>
+      <File Name="CommandTemplates.h"/>
+      <File Name="CoordinateSystem.h"/>
+      <File Name="PointAbs.h"/>
+      <File Name="LinearFunc.h"/>
     </VirtualDirectory>
-  </VirtualDirectory>
-  <VirtualDirectory Name="include">
-    <File Name="MainFrame.h"/>
-    <File Name="wxcrafter.h"/>
-    <File Name="strsafe.h"/>
-    <File Name="CommandTemplates.h"/>
-    <File Name="InterruptThread.h"/>
-    <File Name="LinearFunc.h"/>
-    <File Name="PointAbs.h"/>
-    <File Name="PenHandler.h"/>
-    <File Name="GuiControlSetup.h"/>
-    <File Name="DataControlModel.h"/>
-    <File Name="LruFileList.h"/>
-    <File Name="Codelite/wxPNGAnimation.h"/>
-    <File Name="NotebookInfo.h"/>
-    <File Name="CoordinateSystem.h"/>
+    <VirtualDirectory Name="Codelite">
+      <File Name="Codelite/wxPNGAnimation.cpp"/>
+      <File Name="Codelite/wxPNGAnimation.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="wxCrafter">
+      <File Name="wxcrafter.cpp"/>
+      <File Name="wxcrafter_bitmaps.cpp"/>
+      <File Name="wxcrafter.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Main">
+      <File Name="main.cpp"/>
+      <File Name="MainFrame.cpp"/>
+      <File Name="MainFrame.h"/>
+      <File Name="InterruptThread.h"/>
+      <File Name="InterruptThread.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Common">
+      <File Name="DataControlModel.cpp"/>
+      <File Name="GuiControlSetup.h"/>
+      <File Name="PenHandler.h"/>
+      <File Name="DataControlModel.h"/>
+      <File Name="LruFileList.h"/>
+      <File Name="NotebookInfo.h"/>
+      <File Name="strsafe.h"/>
+    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="win_resources.rc"/>

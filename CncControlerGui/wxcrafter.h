@@ -563,6 +563,13 @@ protected:
     wxPanel* m_cncParameters;
     wxFlexGridSizer* flexGridSizer1076;
     wxListbook* m_notebookConfig;
+    wxPanel* m_panel2601;
+    wxFlexGridSizer* flexGridSizer2603;
+    wxStaticText* m_staticText11481;
+    wxDataViewListCtrl* m_dvListCtrlConfigSummary;
+    wxFlexGridSizer* flexGridSizer2609;
+    wxButton* m_btCancelRun;
+    wxButton* m_btConfirmRun;
     wxPanel* m_cncSetters;
     wxFlexGridSizer* flexGridSizer1142;
     wxStaticText* m_staticText1148;
@@ -911,6 +918,8 @@ protected:
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void outboundBookChanging(wxNotebookEvent& event) { event.Skip(); }
+    virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
     virtual void clearProcessedSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
@@ -1377,6 +1386,11 @@ public:
     wxStaticBitmap* GetRefPosTrafficLight() { return m_refPosTrafficLight; }
     wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
     wxScrolledWindow* GetStatusBar() { return m_statusBar; }
+    wxStaticText* GetStaticText11481() { return m_staticText11481; }
+    wxDataViewListCtrl* GetDvListCtrlConfigSummary() { return m_dvListCtrlConfigSummary; }
+    wxButton* GetBtCancelRun() { return m_btCancelRun; }
+    wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
+    wxPanel* GetPanel2601() { return m_panel2601; }
     wxStaticText* GetStaticText1148() { return m_staticText1148; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
     wxButton* GetButton1473() { return m_button1473; }
@@ -1589,18 +1603,6 @@ public:
     wxButton* GetBtCancle() { return m_btCancle; }
     EndSwitchDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Manual end switch dissolving"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,320), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~EndSwitchDialogBase();
-};
-
-
-class CurentCncConfigBase : public wxFrame
-{
-protected:
-
-protected:
-
-public:
-    CurentCncConfigBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Current CNC Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE);
-    virtual ~CurentCncConfigBase();
 };
 
 

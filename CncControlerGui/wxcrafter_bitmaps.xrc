@@ -25,6 +25,8 @@
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
   <object class="wxBitmap" name="16-cxx-workspace">bitmaps\16-cxx-workspace.png</object>
   <object class="wxBitmap" name="16-cxx-workspace@2x">bitmaps\16-cxx-workspace@2x.png</object>
+  <object class="wxBitmap" name="16-database">bitmaps\16-database.png</object>
+  <object class="wxBitmap" name="16-database@2x">bitmaps\16-database@2x.png</object>
   <object class="wxBitmap" name="16-db-column">bitmaps\16-db-column.png</object>
   <object class="wxBitmap" name="16-db-column@2x">bitmaps\16-db-column@2x.png</object>
   <object class="wxBitmap" name="16-debugger_restart">bitmaps\16-debugger_restart.png</object>
@@ -63,6 +65,8 @@
   <object class="wxBitmap" name="16-member_public@2x">bitmaps\16-member_public@2x.png</object>
   <object class="wxBitmap" name="16-minus">bitmaps\16-minus.png</object>
   <object class="wxBitmap" name="16-minus@2x">bitmaps\16-minus@2x.png</object>
+  <object class="wxBitmap" name="16-ok">bitmaps\16-ok.png</object>
+  <object class="wxBitmap" name="16-ok@2x">bitmaps\16-ok@2x.png</object>
   <object class="wxBitmap" name="16-patch">bitmaps\16-patch.png</object>
   <object class="wxBitmap" name="16-patch@2x">bitmaps\16-patch@2x.png</object>
   <object class="wxBitmap" name="16-plus">bitmaps\16-plus.png</object>

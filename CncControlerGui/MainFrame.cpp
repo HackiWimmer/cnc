@@ -67,6 +67,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , templateFileLoading(false)
 , ignoreDirControlEvents(false)
 , testIsRunning(false)
+, runConfirmationInfo(RunConfirmationInfo::Wait)
 , traceTimerCounter(0)
 , lastPortName(wxT(""))
 , cnc(new CncControl(CncEMU_NULL))
@@ -201,6 +202,8 @@ void MainFrame::install3DPane() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(m_btCancelRun);
+	registerGuiControl(m_btConfirmRun);
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_ctrlTestSelection);
@@ -2778,8 +2781,79 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 		return false;
 	}
  
-	return true;
+	return showConfigSummaryAndConfirmRun();
 }
+///////////////////////////////////////////////////////////////////
+bool MainFrame::showConfigSummaryAndConfirmRun() {
+///////////////////////////////////////////////////////////////////
+	/*if ( wxString(cnc->getSerial()->getClassName()) != "SerialPort" ) {
+		return true;
+	}*/
+	
+	disableControls();
+	disableAllRunControls();
+	m_btCancelRun->Enable(true);
+	m_btConfirmRun->Enable(true);
+	
+	DcmItemList rows;
+	// todo collect config summary
+	DataControlModel::addNumParameterValueUnitRow(rows, "para", 17, "mm"); 
+	
+	m_dvListCtrlConfigSummary->DeleteAllItems();
+	for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
+		m_dvListCtrlConfigSummary->AppendItem(*it);
+	}
+	
+	// select summary page
+	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
+	m_notebookConfig->SetSelection(ConfigSummaryPage);
+	
+	// wait for user feedback
+	runConfirmationInfo = RunConfirmationInfo::Wait;
+	wxDateTime start 	= wxDateTime::UNow();
+	wxDateTime now 		= wxDateTime::UNow();
+	wxColour c1         = wxColor(227, 227, 227);
+	wxColour c2         = wxColor(109, 109, 190);
+	wxString msg		= "Waiting for user feedback. Please confirm to run . . . ";
+	if ( m_btConfirmRun->GetBackgroundColour() == c1 )	m_btConfirmRun->SetBackgroundColour(c2);
+	else												m_btConfirmRun->SetBackgroundColour(c1);
+	cnc::trc.logWarning(msg);
+	
+	while ( runConfirmationInfo == RunConfirmationInfo::Wait ) {
+		dispatch();
+		now = wxDateTime::UNow();
+		wxTimeSpan diff = now - start;
+		if ( diff.GetSeconds() >= 1 ) {
+			start = now;
+			if ( m_btConfirmRun->GetBackgroundColour() == c1 ) {
+				cnc::trc.logWarning(msg);
+				m_btConfirmRun->SetBackgroundColour(c2);
+			} else {
+				cnc::trc.clear();
+				m_btConfirmRun->SetBackgroundColour(c1);
+			}
+		}
+	}
+	
+	cnc::trc.clear();
+	m_btConfirmRun->SetBackgroundColour(c1);
+	enableControls();
+	m_btCancelRun->Enable(false);
+	m_btConfirmRun->Enable(false);
+	
+	return (runConfirmationInfo == RunConfirmationInfo::Confirmed);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::confirmRun(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	runConfirmationInfo = RunConfirmationInfo::Confirmed;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::cancelRun(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	runConfirmationInfo = RunConfirmationInfo::Canceled;
+}
+
 ///////////////////////////////////////////////////////////////////
 void MainFrame::processTemplate() {
 ///////////////////////////////////////////////////////////////////
@@ -5499,6 +5573,4 @@ void MainFrame::fileContentChange(wxStyledTextEvent& event) {
 		}
 	}
 }
-
-
 
