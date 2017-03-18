@@ -90,6 +90,10 @@ MainFrame::MainFrame(wxWindow* parent)
 {
 ///////////////////////////////////////////////////////////////////
 	wxSetDefaultAssertHandler();
+	
+	wxListView* lv = m_templateListBook->wxListbook::GetListView();
+	lv->SetBackgroundColour(wxColour(191,205,219));
+	lv->Select(1);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {

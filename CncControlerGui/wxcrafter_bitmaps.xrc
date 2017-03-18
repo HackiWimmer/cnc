@@ -23,6 +23,8 @@
   <object class="wxBitmap" name="16-console@2x">bitmaps\16-console@2x.png</object>
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
+  <object class="wxBitmap" name="16-cxx-workspace">bitmaps\16-cxx-workspace.png</object>
+  <object class="wxBitmap" name="16-cxx-workspace@2x">bitmaps\16-cxx-workspace@2x.png</object>
   <object class="wxBitmap" name="16-db-column">bitmaps\16-db-column.png</object>
   <object class="wxBitmap" name="16-db-column@2x">bitmaps\16-db-column@2x.png</object>
   <object class="wxBitmap" name="16-debugger_restart">bitmaps\16-debugger_restart.png</object>
@@ -47,6 +49,8 @@
   <object class="wxBitmap" name="16-globals@2x">bitmaps\16-globals@2x.png</object>
   <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>
   <object class="wxBitmap" name="16-gtk@2x">bitmaps\16-gtk@2x.png</object>
+  <object class="wxBitmap" name="16-history">bitmaps\16-history.png</object>
+  <object class="wxBitmap" name="16-history@2x">bitmaps\16-history@2x.png</object>
   <object class="wxBitmap" name="16-home">bitmaps\16-home.png</object>
   <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
   <object class="wxBitmap" name="16-macro">bitmaps\16-macro.png</object>
@@ -91,48 +95,48 @@
   <object class="wxBitmap" name="24-interrupt@2x">bitmaps\24-interrupt@2x.png</object>
   <object class="wxBitmap" name="24-step_in">bitmaps\24-step_in.png</object>
   <object class="wxBitmap" name="24-step_in@2x">bitmaps\24-step_in@2x.png</object>
-  <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\build-animation-sprite.png</object>
-  <object class="wxBitmap" name="BMP_CNC">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\splash.bmp</object>
-  <object class="wxBitmap" name="BMP_CONNECTED">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-connected.png</object>
-  <object class="wxBitmap" name="BMP_CONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-connected@2x.png</object>
-  <object class="wxBitmap" name="BMP_CONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\build-animation-sprite.png</object>
+  <object class="wxBitmap" name="BMP_CNC">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\splash.bmp</object>
+  <object class="wxBitmap" name="BMP_CONNECTED">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-connected.png</object>
+  <object class="wxBitmap" name="BMP_CONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="BMP_CONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="BMP_COORD_BOTTOM_TOP">C:\@Development\ToolbarIcons-full-20101107\png\16\Modern3D\tables\table_sort_asc.png</object>
   <object class="wxBitmap" name="BMP_COORD_TOP_BOTTOM">C:\@Development\ToolbarIcons-full-20101107\png\16\Modern3D\tables\table_sort_desc.png</object>
-  <object class="wxBitmap" name="BMP_DISCONNECTED">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-disconnected.png</object>
-  <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
-  <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
-  <object class="wxBitmap" name="BMP_FINGER16">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-finger.png</object>
-  <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-finger@2x.png</object>
-  <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-finger@2x.png</object>
-  <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\mill.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-file_close.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-file_close@2x.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-file_close@2x.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-cog.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-cog@2x.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-cog@2x.png</object>
-  <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-ok.png</object>
-  <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-ok@2x.png</object>
-  <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-ok@2x.png</object>
-  <object class="wxBitmap" name="BMP_PLAY_3D">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-executable.png</object>
-  <object class="wxBitmap" name="BMP_PLAY_3D@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-executable@2x.png</object>
-  <object class="wxBitmap" name="BMP_PLAY_3D@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-executable@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\24-finger.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\24-finger@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\24-finger@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\24-debugger_start.png</object>
-  <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
-  <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-execute_stop.png</object>
-  <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
-  <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
+  <object class="wxBitmap" name="BMP_DISCONNECTED">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-disconnected.png</object>
+  <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
+  <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
+  <object class="wxBitmap" name="BMP_FINGER16">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-finger.png</object>
+  <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-finger@2x.png</object>
+  <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-finger@2x.png</object>
+  <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\mill.png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-file_close.png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-file_close@2x.png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-file_close@2x.png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-cog.png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-cog@2x.png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-cog@2x.png</object>
+  <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok.png</object>
+  <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok@2x.png</object>
+  <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok@2x.png</object>
+  <object class="wxBitmap" name="BMP_PLAY_3D">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-executable.png</object>
+  <object class="wxBitmap" name="BMP_PLAY_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-executable@2x.png</object>
+  <object class="wxBitmap" name="BMP_PLAY_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-executable@2x.png</object>
+  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-finger.png</object>
+  <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-finger@2x.png</object>
+  <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-finger@2x.png</object>
+  <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-debugger_start.png</object>
+  <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
+  <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
+  <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop.png</object>
+  <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
+  <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_DEFAULT">C:\@Development\ToolbarIcons-full-20101107\png\24\Modern3D\transportation\trafficlights.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_GREEN">C:\@Development\ToolbarIcons-full-20101107\png\24\Modern3D\transportation\trafficlights_green.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_RED">C:\@Development\ToolbarIcons-full-20101107\png\24\Modern3D\transportation\trafficlights_red.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_YELLOW">C:\@Development\ToolbarIcons-full-20101107\png\24\Modern3D\transportation\trafficlights_yellow.png</object>
-  <object class="wxBitmap" name="BMP_WARNING16">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-warning.png</object>
-  <object class="wxBitmap" name="BMP_WARNING16@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-warning@2x.png</object>
-  <object class="wxBitmap" name="BMP_WARNING16@2x">C:\@Development\@Projekte\@c++\CnCControl_V0.6.3\CncControlerGui\bitmaps\16-warning@2x.png</object>
+  <object class="wxBitmap" name="BMP_WARNING16">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-warning.png</object>
+  <object class="wxBitmap" name="BMP_WARNING16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-warning@2x.png</object>
+  <object class="wxBitmap" name="BMP_WARNING16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-warning@2x.png</object>
   <object class="wxBitmap" name="arrow_plain_blue_E">..\..\..\..\ToolbarIcons-full-20101107\png\16\Modern3D\arrows\arrow_plain_blue_E.png</object>
   <object class="wxBitmap" name="arrow_plain_blue_NE_SE_SW_NW">..\..\..\..\ToolbarIcons-full-20101107\png\16\Modern3D\arrows\arrow_plain_blue_NE_SE_SW_NW.png</object>
   <object class="wxBitmap" name="arrow_plain_blue_W">..\..\..\..\ToolbarIcons-full-20101107\png\16\Modern3D\arrows\arrow_plain_blue_W.png</object>

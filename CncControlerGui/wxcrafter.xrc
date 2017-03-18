@@ -4841,9 +4841,9 @@
         <layer>1</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>100,250</bestsize>
-        <maxsize>100,300</maxsize>
-        <minsize>100,40</minsize>
+        <bestsize>100,160</bestsize>
+        <maxsize>100,160</maxsize>
+        <minsize>100,160</minsize>
         <closebtn>1</closebtn>
         <minbtn>1</minbtn>
         <maxbtn>1</maxbtn>
@@ -4859,51 +4859,6 @@
             <hgap>0</hgap>
             <growablecols>1</growablecols>
             <growablerows>0</growablerows>
-            <object class="sizeritem" name="flexGridSizer1636">
-              <flag>wxALL|wxEXPAND</flag>
-              <border>1</border>
-              <option>1</option>
-              <object class="wxFlexGridSizer">
-                <cols>1</cols>
-                <rows>0</rows>
-                <vgap>0</vgap>
-                <hgap>0</hgap>
-                <growablecols/>
-                <growablerows/>
-                <object class="sizeritem">
-                  <flag>wxALL</flag>
-                  <border>2</border>
-                  <minsize>24,24</minsize>
-                  <object class="wxButton" name="m_btDefaultDir">
-                    <label/>
-                    <style/>
-                    <size>24,24</size>
-                    <tooltip>
-                      <![CDATA[Select default directory]]>
-                    </tooltip>
-                    <bitmap stock_id="wxART_UNDO" stock_client="wxART_BUTTON"/>
-                    <bitmapposition>wxLEFT</bitmapposition>
-                    <default>0</default>
-                  </object>
-                </object>
-                <object class="sizeritem">
-                  <flag>wxALL</flag>
-                  <border>2</border>
-                  <minsize>24,24</minsize>
-                  <object class="wxButton" name="m_btCurrentFile">
-                    <label/>
-                    <style/>
-                    <size>24,24</size>
-                    <tooltip>
-                      <![CDATA[Select current file]]>
-                    </tooltip>
-                    <bitmap stock_id="wxART_REDO" stock_client="wxART_BUTTON"/>
-                    <bitmapposition>wxLEFT</bitmapposition>
-                    <default>0</default>
-                  </object>
-                </object>
-              </object>
-            </object>
             <object class="sizeritem" name="flexGridSizer1639">
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
@@ -4914,94 +4869,163 @@
                 <hgap>0</hgap>
                 <growablecols>0</growablecols>
                 <growablerows>0</growablerows>
-                <object class="sizeritem" name="flexGridSizer1645">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <border>1</border>
-                  <object class="wxFlexGridSizer">
-                    <cols>1</cols>
-                    <rows>2</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>0</growablecols>
-                    <growablerows>1</growablerows>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>1</border>
-                      <object class="wxStaticText" name="m_staticText1647">
-                        <label>Default Directory:</label>
-                        <style/>
-                        <font>
-                          <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                          <style>normal</style>
-                          <weight>bold</weight>
-                          <underlined>0</underlined>
-                        </font>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxListbook" name="m_templateListBook">
+                <style>wxBK_DEFAULT</style>
+                <object class="listbookpage">
+                  <label>Standard</label>
+                  <bitmap>bitmaps/16-cxx-workspace.png</bitmap>
+                  <selected>0</selected>
+                  <object class="wxPanel" name="m_panel2596">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <object class="wxFlexGridSizer">
+                      <cols>2</cols>
+                      <rows>1</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>1</growablecols>
+                      <growablerows>0</growablerows>
+                      <object class="sizeritem" name="flexGridSizer1636">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <option>1</option>
+                        <object class="wxFlexGridSizer">
+                          <cols>1</cols>
+                          <rows>0</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols/>
+                          <growablerows/>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>2</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_btDefaultDir">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Select default directory]]>
+                              </tooltip>
+                              <bitmap stock_id="wxART_UNDO" stock_client="wxART_BUTTON"/>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>2</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_btCurrentFile">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Select current file]]>
+                              </tooltip>
+                              <bitmap stock_id="wxART_REDO" stock_client="wxART_BUTTON"/>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                        </object>
                       </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>1</border>
-                      <object class="wxGenericDirCtrl" name="m_dirCtrl">
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Verdana</face>
-                        </font>
-                        <style>wxDIRCTRL_SHOW_FILTERS|wxDIRCTRL_SELECT_FIRST|wxFULL_REPAINT_ON_RESIZE</style>
-                        <defaultfolder>
-                          <![CDATA[]]>
-                        </defaultfolder>
-                        <defaultfilter/>
-                        <filter>
-                          <![CDATA[]]>
-                        </filter>
+                      <object class="sizeritem" name="flexGridSizer1645">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <object class="wxFlexGridSizer">
+                          <cols>1</cols>
+                          <rows>2</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols>0</growablecols>
+                          <growablerows>1</growablerows>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>1</border>
+                            <object class="wxStaticText" name="m_staticText1647">
+                              <label>Standrad Directory:</label>
+                              <style/>
+                              <font>
+                                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                <style>normal</style>
+                                <weight>bold</weight>
+                                <underlined>0</underlined>
+                              </font>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>1</border>
+                            <object class="wxGenericDirCtrl" name="m_dirCtrl">
+                              <font>
+                                <size>8</size>
+                                <style>normal</style>
+                                <weight>normal</weight>
+                                <family>swiss</family>
+                                <underlined>0</underlined>
+                                <face>Verdana</face>
+                              </font>
+                              <style>wxDIRCTRL_SHOW_FILTERS|wxDIRCTRL_SELECT_FIRST|wxFULL_REPAINT_ON_RESIZE</style>
+                              <defaultfolder>
+                                <![CDATA[]]>
+                              </defaultfolder>
+                              <defaultfilter/>
+                              <filter>
+                                <![CDATA[]]>
+                              </filter>
+                            </object>
+                          </object>
+                        </object>
                       </object>
                     </object>
                   </object>
                 </object>
-                <object class="sizeritem" name="flexGridSizer1642">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <border>1</border>
-                  <object class="wxFlexGridSizer">
-                    <cols>1</cols>
-                    <rows>2</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>0</growablecols>
-                    <growablerows>1</growablerows>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>1</border>
-                      <object class="wxStaticText" name="m_staticText1644">
-                        <label>Last recently used Templates:</label>
-                        <style/>
-                        <font>
-                          <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                          <style>normal</style>
-                          <weight>bold</weight>
-                          <underlined>0</underlined>
-                        </font>
+                <object class="listbookpage">
+                  <label>LRU List</label>
+                  <bitmap>bitmaps/16-history.png</bitmap>
+                  <selected>1</selected>
+                  <object class="wxPanel" name="m_lruPanel">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <object class="wxFlexGridSizer">
+                      <cols>1</cols>
+                      <rows>2</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>0</growablecols>
+                      <growablerows>1</growablerows>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <object class="wxStaticText" name="m_staticText1644">
+                          <label>Last recently used Templates:</label>
+                          <style/>
+                          <font>
+                            <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                            <style>normal</style>
+                            <weight>bold</weight>
+                            <underlined>0</underlined>
+                          </font>
+                        </object>
                       </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>1</border>
-                      <object class="wxListBox" name="m_lruList">
-                        <style>wxLB_SINGLE</style>
-                        <size>200,-1</size>
-                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                        <fg>wxSYS_COLOUR_MENU</fg>
-                        <font>
-                          <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <underlined>0</underlined>
-                        </font>
-                        <content/>
-                        <selection>-1</selection>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <object class="wxListBox" name="m_lruList">
+                          <style>wxLB_NEEDED_SB|wxLB_HSCROLL|wxLB_SINGLE|wxHSCROLL</style>
+                          <font>
+                            <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                            <style>normal</style>
+                            <weight>normal</weight>
+                            <underlined>0</underlined>
+                          </font>
+                          <content/>
+                          <selection>-1</selection>
+                        </object>
                       </object>
                     </object>
                   </object>
@@ -5024,9 +5048,9 @@
         <layer>1</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>100,184</bestsize>
-        <maxsize>100,300</maxsize>
-        <minsize>100,40</minsize>
+        <bestsize>100,160</bestsize>
+        <maxsize>100,180</maxsize>
+        <minsize>100,160</minsize>
         <closebtn>1</closebtn>
         <minbtn>1</minbtn>
         <maxbtn>1</maxbtn>
@@ -8294,5 +8318,11 @@
         </object>
       </object>
     </object>
+  </object>
+  <object class="wxFrame" name="CurentCncConfigBase">
+    <title>Current CNC Configuration</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_FRAME_STYLE</style>
+    <size>500,300</size>
   </object>
 </resource>

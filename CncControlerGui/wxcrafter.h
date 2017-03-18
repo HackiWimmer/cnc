@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef CNCCONTROL_V0_6_3_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
-#define CNCCONTROL_V0_6_3_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
+#ifndef CNCCONTROL_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
+#define CNCCONTROL_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -487,13 +487,17 @@ protected:
 
     wxScrolledWindow* m_scrollWinFile;
     wxFlexGridSizer* flexGridSizer1628;
+    wxFlexGridSizer* flexGridSizer1639;
+    wxListbook* m_templateListBook;
+    wxPanel* m_panel2596;
+    wxFlexGridSizer* flexGridSizer2599;
     wxFlexGridSizer* flexGridSizer1636;
     wxButton* m_btDefaultDir;
     wxButton* m_btCurrentFile;
-    wxFlexGridSizer* flexGridSizer1639;
     wxFlexGridSizer* flexGridSizer1645;
     wxStaticText* m_staticText1647;
     wxGenericDirCtrl* m_dirCtrl;
+    wxPanel* m_lruPanel;
     wxFlexGridSizer* flexGridSizer1642;
     wxStaticText* m_staticText1644;
     wxListBox* m_lruList;
@@ -1318,8 +1322,11 @@ public:
     wxButton* GetBtCurrentFile() { return m_btCurrentFile; }
     wxStaticText* GetStaticText1647() { return m_staticText1647; }
     wxGenericDirCtrl* GetDirCtrl() { return m_dirCtrl; }
+    wxPanel* GetPanel2596() { return m_panel2596; }
     wxStaticText* GetStaticText1644() { return m_staticText1644; }
     wxListBox* GetLruList() { return m_lruList; }
+    wxPanel* GetLruPanel() { return m_lruPanel; }
+    wxListbook* GetTemplateListBook() { return m_templateListBook; }
     wxScrolledWindow* GetScrollWinFile() { return m_scrollWinFile; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
@@ -1582,6 +1589,18 @@ public:
     wxButton* GetBtCancle() { return m_btCancle; }
     EndSwitchDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Manual end switch dissolving"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,320), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~EndSwitchDialogBase();
+};
+
+
+class CurentCncConfigBase : public wxFrame
+{
+protected:
+
+protected:
+
+public:
+    CurentCncConfigBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Current CNC Configuration"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE);
+    virtual ~CurentCncConfigBase();
 };
 
 
