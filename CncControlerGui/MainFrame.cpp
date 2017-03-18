@@ -38,7 +38,7 @@
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
 const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
 const char* _programTitel 		= "Woodworking CNC Controller";
-const char* _programVersion 	= "0.6.3";
+const char* _programVersion 	= "0.6.4";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 const char* _configFileName 	= "..\\CncController.ini";
 const char* _lruStoreFileName	= "..\\CncControllerLruStore.ini";
