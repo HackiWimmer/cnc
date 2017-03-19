@@ -7424,36 +7424,6 @@
                           <object class="sizeritem">
                             <flag>wxALL</flag>
                             <minsize>24,24</minsize>
-                            <object class="wxButton" name="m_3D_Front">
-                              <label/>
-                              <style/>
-                              <size>24,24</size>
-                              <tooltip>
-                                <![CDATA[Show from Front]]>
-                              </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_N.png</bitmap>
-                              <bitmapposition>wxLEFT</bitmapposition>
-                              <default>0</default>
-                            </object>
-                          </object>
-                          <object class="sizeritem">
-                            <flag>wxALL</flag>
-                            <minsize>24,24</minsize>
-                            <object class="wxButton" name="m_3D_Rear">
-                              <label/>
-                              <style/>
-                              <size>24,24</size>
-                              <tooltip>
-                                <![CDATA[Show from Rear]]>
-                              </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_S.png</bitmap>
-                              <bitmapposition>wxLEFT</bitmapposition>
-                              <default>0</default>
-                            </object>
-                          </object>
-                          <object class="sizeritem">
-                            <flag>wxALL</flag>
-                            <minsize>24,24</minsize>
                             <object class="wxButton" name="m_3D_Top">
                               <label/>
                               <style/>
@@ -7477,6 +7447,36 @@
                                 <![CDATA[Show from Bottom]]>
                               </tooltip>
                               <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_red_N.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_3D_Front">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Show from Front]]>
+                              </tooltip>
+                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_N.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_3D_Rear">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Show from Rear]]>
+                              </tooltip>
+                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_S.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
@@ -7619,10 +7619,11 @@
                         <flag>wxALL|wxEXPAND</flag>
                         <border>5</border>
                         <object class="wxPanel" name="m_panel2590">
-                          <style>wxTAB_TRAVERSAL</style>
+                          <style/>
+                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
                           <object class="wxFlexGridSizer">
                             <cols>1</cols>
-                            <rows>1</rows>
+                            <rows>3</rows>
                             <vgap>0</vgap>
                             <hgap>0</hgap>
                             <growablecols>0</growablecols>
@@ -7636,6 +7637,94 @@
                                 <tooltip>
                                   <![CDATA[OpenGl Control placeholder]]>
                                 </tooltip>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <border>1</border>
+                              <object class="wxTextCtrl" name="m_trace3D">
+                                <style>wxTE_READONLY|wxBORDER_NONE</style>
+                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <border>1</border>
+                              <object class="wxPanel" name="m_panel2696">
+                                <style>wxTAB_TRAVERSAL|wxBORDER_NONE</style>
+                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                <object class="wxFlexGridSizer">
+                                  <cols>6</cols>
+                                  <rows>1</rows>
+                                  <vgap>0</vgap>
+                                  <hgap>0</hgap>
+                                  <growablecols>1,3,5</growablecols>
+                                  <growablerows/>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxStaticText" name="m_staticText268320">
+                                      <label>X:</label>
+                                      <style/>
+                                      <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxEXPAND|wxALIGN_LEFT</flag>
+                                    <border>1</border>
+                                    <object class="wxSpinCtrl" name="m_spin3DAngelX">
+                                      <style>wxSP_ARROW_KEYS</style>
+                                      <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                      <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                      <value>0</value>
+                                      <min>-360</min>
+                                      <max>360</max>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxStaticText" name="m_staticText268522">
+                                      <label>Y:</label>
+                                      <style/>
+                                      <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxEXPAND</flag>
+                                    <border>1</border>
+                                    <object class="wxSpinCtrl" name="m_spin3DAngelY">
+                                      <style/>
+                                      <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                      <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                      <value>0</value>
+                                      <min>-360</min>
+                                      <max>360</max>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxALIGN_LEFT</flag>
+                                    <border>5</border>
+                                    <object class="wxStaticText" name="m_staticText268118">
+                                      <label>Z:</label>
+                                      <style/>
+                                      <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxEXPAND|wxALIGN_LEFT</flag>
+                                    <border>1</border>
+                                    <object class="wxSpinCtrl" name="m_spin3DAngelZ">
+                                      <style>wxSP_ARROW_KEYS</style>
+                                      <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                      <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                      <value>0</value>
+                                      <min>-360</min>
+                                      <max>360</max>
+                                    </object>
+                                  </object>
+                                </object>
                               </object>
                             </object>
                           </object>

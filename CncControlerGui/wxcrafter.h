@@ -678,10 +678,10 @@ protected:
     wxButton* m_3D_Refreh;
     wxButton* m_3D_Clear;
     wxStaticLine* m_staticLine2348;
-    wxButton* m_3D_Front;
-    wxButton* m_3D_Rear;
     wxButton* m_3D_Top;
     wxButton* m_3D_Bottom;
+    wxButton* m_3D_Front;
+    wxButton* m_3D_Rear;
     wxButton* m_3D_Left;
     wxButton* m_3D_Right4;
     wxButton* m_3D_Perspective;
@@ -694,6 +694,15 @@ protected:
     wxPanel* m_panel2590;
     wxFlexGridSizer* flexGridSizer2360;
     wxPanel* m_drawPane3D;
+    wxTextCtrl* m_trace3D;
+    wxPanel* m_panel2696;
+    wxFlexGridSizer* flexGridSizer267117;
+    wxStaticText* m_staticText268320;
+    wxSpinCtrl* m_spin3DAngelX;
+    wxStaticText* m_staticText268522;
+    wxSpinCtrl* m_spin3DAngelY;
+    wxStaticText* m_staticText268118;
+    wxSpinCtrl* m_spin3DAngelZ;
     wxPanel* m_svgEmuResult;
     wxFlexGridSizer* flexGridSizer585;
     wxFlexGridSizer* flexGridSizer766;
@@ -961,14 +970,20 @@ protected:
     virtual void animate3D(wxCommandEvent& event) { event.Skip(); }
     virtual void refresh3D(wxCommandEvent& event) { event.Skip(); }
     virtual void clear3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromRear3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromRear3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void runOpenGLTest(wxCommandEvent& event) { event.Skip(); }
+    virtual void spin3DAngelX(wxSpinEvent& event) { event.Skip(); }
+    virtual void update3DAngelX(wxCommandEvent& event) { event.Skip(); }
+    virtual void spin3DAngelY(wxSpinEvent& event) { event.Skip(); }
+    virtual void update3DAngelY(wxCommandEvent& event) { event.Skip(); }
+    virtual void spin3DAngelZ(wxSpinEvent& event) { event.Skip(); }
+    virtual void update3DAngelZ(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSource(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuReload(wxCommandEvent& event) { event.Skip(); }
@@ -1491,10 +1506,10 @@ public:
     wxButton* Get3D_Refreh() { return m_3D_Refreh; }
     wxButton* Get3D_Clear() { return m_3D_Clear; }
     wxStaticLine* GetStaticLine2348() { return m_staticLine2348; }
-    wxButton* Get3D_Front() { return m_3D_Front; }
-    wxButton* Get3D_Rear() { return m_3D_Rear; }
     wxButton* Get3D_Top() { return m_3D_Top; }
     wxButton* Get3D_Bottom() { return m_3D_Bottom; }
+    wxButton* Get3D_Front() { return m_3D_Front; }
+    wxButton* Get3D_Rear() { return m_3D_Rear; }
     wxButton* Get3D_Left() { return m_3D_Left; }
     wxButton* Get3D_Right4() { return m_3D_Right4; }
     wxButton* Get3D_Perspective() { return m_3D_Perspective; }
@@ -1505,6 +1520,14 @@ public:
     wxStaticText* GetStaticText2331() { return m_staticText2331; }
     wxStaticText* GetStaticText2333() { return m_staticText2333; }
     wxPanel* GetDrawPane3D() { return m_drawPane3D; }
+    wxTextCtrl* GetTrace3D() { return m_trace3D; }
+    wxStaticText* GetStaticText268320() { return m_staticText268320; }
+    wxSpinCtrl* GetSpin3DAngelX() { return m_spin3DAngelX; }
+    wxStaticText* GetStaticText268522() { return m_staticText268522; }
+    wxSpinCtrl* GetSpin3DAngelY() { return m_spin3DAngelY; }
+    wxStaticText* GetStaticText268118() { return m_staticText268118; }
+    wxSpinCtrl* GetSpin3DAngelZ() { return m_spin3DAngelZ; }
+    wxPanel* GetPanel2696() { return m_panel2696; }
     wxPanel* GetPanel2590() { return m_panel2590; }
     wxPanel* Get3DPane() { return m_3DPane; }
     wxButton* GetSvgEmuOpenFileAsSource() { return m_svgEmuOpenFileAsSource; }
