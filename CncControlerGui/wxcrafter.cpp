@@ -4132,26 +4132,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2311->Add(m_staticLine2348, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_3D_Front = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_3D_Front->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_green_N")), wxLEFT);
-    m_3D_Front->SetBitmapMargins(2,2);
-    #endif
-    m_3D_Front->SetToolTip(_("Show from Front"));
-    
-    flexGridSizer2311->Add(m_3D_Front, 0, wxALL, WXC_FROM_DIP(0));
-    m_3D_Front->SetMinSize(wxSize(24,24));
-    
-    m_3D_Rear = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_3D_Rear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_green_S")), wxLEFT);
-    m_3D_Rear->SetBitmapMargins(2,2);
-    #endif
-    m_3D_Rear->SetToolTip(_("Show from Rear"));
-    
-    flexGridSizer2311->Add(m_3D_Rear, 0, wxALL, WXC_FROM_DIP(0));
-    m_3D_Rear->SetMinSize(wxSize(24,24));
-    
     m_3D_Top = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_3D_Top->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_red_S")), wxLEFT);
@@ -4171,6 +4151,26 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2311->Add(m_3D_Bottom, 0, wxALL, WXC_FROM_DIP(0));
     m_3D_Bottom->SetMinSize(wxSize(24,24));
+    
+    m_3D_Front = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Front->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_green_N")), wxLEFT);
+    m_3D_Front->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Front->SetToolTip(_("Show from Front"));
+    
+    flexGridSizer2311->Add(m_3D_Front, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Front->SetMinSize(wxSize(24,24));
+    
+    m_3D_Rear = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Rear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_green_S")), wxLEFT);
+    m_3D_Rear->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Rear->SetToolTip(_("Show from Rear"));
+    
+    flexGridSizer2311->Add(m_3D_Rear, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Rear->SetMinSize(wxSize(24,24));
     
     m_3D_Left = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -4250,10 +4250,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText2333->SetMinSize(wxSize(24,24));
     
     m_panel2590 = new wxPanel(m_3DPane, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel2590->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     
     flexGridSizer2309->Add(m_panel2590, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer2360 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2360 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2360->SetFlexibleDirection( wxBOTH );
     flexGridSizer2360->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2360->AddGrowableCol(0);
@@ -4265,6 +4266,67 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_drawPane3D->SetToolTip(_("OpenGl Control placeholder"));
     
     flexGridSizer2360->Add(m_drawPane3D, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_trace3D = new wxTextCtrl(m_panel2590, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel2590, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
+    m_trace3D->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_trace3D->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    #if wxVERSION_NUMBER >= 3000
+    m_trace3D->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer2360->Add(m_trace3D, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_panel2696 = new wxPanel(m_panel2590, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel2590, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxBORDER_NONE);
+    m_panel2696->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer2360->Add(m_panel2696, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    flexGridSizer267117 = new wxFlexGridSizer(1, 6, 0, 0);
+    flexGridSizer267117->SetFlexibleDirection( wxBOTH );
+    flexGridSizer267117->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer267117->AddGrowableCol(1);
+    flexGridSizer267117->AddGrowableCol(3);
+    flexGridSizer267117->AddGrowableCol(5);
+    m_panel2696->SetSizer(flexGridSizer267117);
+    
+    m_staticText268320 = new wxStaticText(m_panel2696, wxID_ANY, _("X:"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
+    m_staticText268320->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer267117->Add(m_staticText268320, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_spin3DAngelX = new wxSpinCtrl(m_panel2696, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), wxSP_ARROW_KEYS);
+    m_spin3DAngelX->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_spin3DAngelX->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_spin3DAngelX->SetRange(-360, 360);
+    m_spin3DAngelX->SetValue(0);
+    
+    flexGridSizer267117->Add(m_spin3DAngelX, 0, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(1));
+    
+    m_staticText268522 = new wxStaticText(m_panel2696, wxID_ANY, _("Y:"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
+    m_staticText268522->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer267117->Add(m_staticText268522, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_spin3DAngelY = new wxSpinCtrl(m_panel2696, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), wxSP_ARROW_KEYS);
+    m_spin3DAngelY->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_spin3DAngelY->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_spin3DAngelY->SetRange(-360, 360);
+    m_spin3DAngelY->SetValue(0);
+    
+    flexGridSizer267117->Add(m_spin3DAngelY, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText268118 = new wxStaticText(m_panel2696, wxID_ANY, _("Z:"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
+    m_staticText268118->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer267117->Add(m_staticText268118, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(5));
+    
+    m_spin3DAngelZ = new wxSpinCtrl(m_panel2696, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), wxSP_ARROW_KEYS);
+    m_spin3DAngelZ->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_spin3DAngelZ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_spin3DAngelZ->SetRange(-360, 360);
+    m_spin3DAngelZ->SetValue(0);
+    
+    flexGridSizer267117->Add(m_spin3DAngelZ, 0, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(1));
     
     m_svgEmuResult = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_svgEmuResult->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
@@ -4950,14 +5012,20 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_3D_Animate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::animate3D), NULL, this);
     m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
     m_3D_Clear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
-    m_3D_Front->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
-    m_3D_Rear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRear3D), NULL, this);
     m_3D_Top->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
     m_3D_Bottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
+    m_3D_Front->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
+    m_3D_Rear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRear3D), NULL, this);
     m_3D_Left->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromLeft3D), NULL, this);
     m_3D_Right4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRight3D), NULL, this);
     m_3D_Perspective->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     m_button2345->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::runOpenGLTest), NULL, this);
+    m_spin3DAngelX->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelX), NULL, this);
+    m_spin3DAngelX->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelX), NULL, this);
+    m_spin3DAngelY->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelY), NULL, this);
+    m_spin3DAngelY->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelY), NULL, this);
+    m_spin3DAngelZ->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelZ), NULL, this);
+    m_spin3DAngelZ->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelZ), NULL, this);
     m_svgEmuOpenFileAsSource->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEmuOpenFileAsSource), NULL, this);
     m_svgEmuOpenFileAsSvg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEmuOpenFileAsSvg), NULL, this);
     m_svgEmuReload->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEmuReload), NULL, this);
@@ -5215,14 +5283,20 @@ MainFrameBClass::~MainFrameBClass()
     m_3D_Animate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::animate3D), NULL, this);
     m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
     m_3D_Clear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
-    m_3D_Front->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
-    m_3D_Rear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRear3D), NULL, this);
     m_3D_Top->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
     m_3D_Bottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
+    m_3D_Front->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
+    m_3D_Rear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRear3D), NULL, this);
     m_3D_Left->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromLeft3D), NULL, this);
     m_3D_Right4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRight3D), NULL, this);
     m_3D_Perspective->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     m_button2345->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::runOpenGLTest), NULL, this);
+    m_spin3DAngelX->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelX), NULL, this);
+    m_spin3DAngelX->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelX), NULL, this);
+    m_spin3DAngelY->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelY), NULL, this);
+    m_spin3DAngelY->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelY), NULL, this);
+    m_spin3DAngelZ->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelZ), NULL, this);
+    m_spin3DAngelZ->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelZ), NULL, this);
     m_svgEmuOpenFileAsSource->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEmuOpenFileAsSource), NULL, this);
     m_svgEmuOpenFileAsSvg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEmuOpenFileAsSvg), NULL, this);
     m_svgEmuReload->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEmuReload), NULL, this);

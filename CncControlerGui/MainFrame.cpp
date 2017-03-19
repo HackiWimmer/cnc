@@ -93,11 +93,11 @@ MainFrame::MainFrame(wxWindow* parent)
 , svgFileParser(NULL)
 {
 ///////////////////////////////////////////////////////////////////
+	// detemine assert handler
 	wxSetDefaultAssertHandler();
 	
-	wxListView* lv = m_templateListBook->wxListbook::GetListView();
-	lv->SetBackgroundColour(wxColour(191,205,219));
-	lv->Select(1);
+	// instll galobal key down hook
+	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -132,6 +132,20 @@ MainFrame::~MainFrame() {
 	
 	wxASSERT (cnc);
 	delete cnc;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( drawPane3D && drawPane3D->IsShownOnScreen() ) {
+		// This is necessary to avoid the default notebook key handling
+		if ( drawPane3D->HasFocus() ) {
+			drawPane3D->OnKeyDown(event);
+			event.Skip(false);
+			return;
+		}
+	}
+	
+	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::setRefPostionState(bool state) {
@@ -193,10 +207,14 @@ void MainFrame::install3DPane() {
 	drawPane3D = new CncOpenGLDrawPane(parent, NULL);
 	drawPane3D->SetPosition(m_drawPane3D->GetPosition());
 	drawPane3D->setPlayButton(m_3D_Animate);
+	drawPane3D->setTraceCtrl(m_trace3D);
+	drawPane3D->setSpinCtrls(m_spin3DAngelX, m_spin3DAngelY, m_spin3DAngelZ);
 
 	sizer->Replace(m_drawPane3D, drawPane3D, true);
 	sizer->Layout();
 	std::clog << "Done" << std::endl;
+	
+	//drawPane3D->determineDisplayAngles(-120.0f, 8.0f, 1.0f);
 	
 	// remove the placeholder
 	m_drawPane3D->Destroy();
@@ -624,6 +642,7 @@ void MainFrame::initialize(void) {
 	createStcFileControlPopupMenu();
 	createStcEmuControlPopupMenu();
 	decorateSearchButton();
+	decorateTemplateListBook();
 	switchMonitorButton(true);
 	determineRunMode();
 	registerGuiControls();
@@ -4704,6 +4723,13 @@ void MainFrame::createStcFileControlPopupMenu() {
 	stcFileContentPopupMenu = SvgEditPopup::createMenu(this, m_stcFileContent, stcFileContentPopupMenu);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::decorateTemplateListBook() {
+///////////////////////////////////////////////////////////////////
+	wxListView* lv = m_templateListBook->wxListbook::GetListView();
+	lv->SetBackgroundColour(wxColour(191,205,219));
+	lv->Select(1);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
 ///////////////////////////////////////////////////////////////////
 	wxBitmap bmp = ImageLib16().Bitmap("BMP_OK16");
@@ -5631,4 +5657,45 @@ void MainFrame::fileContentChange(wxStyledTextEvent& event) {
 			 
 		}
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::spin3DAngelX(wxSpinEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setDisplayAngels3D();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::spin3DAngelY(wxSpinEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setDisplayAngels3D();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::spin3DAngelZ(wxSpinEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setDisplayAngels3D();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::update3DAngelX(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setDisplayAngels3D();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::update3DAngelY(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setDisplayAngels3D();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::update3DAngelZ(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	setDisplayAngels3D();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::setDisplayAngels3D() {
+///////////////////////////////////////////////////////////////////
+	if ( drawPane3D == NULL )
+		return;
+		
+	int ax = m_spin3DAngelX->GetValue();
+	int ay = m_spin3DAngelY->GetValue();
+	int az = m_spin3DAngelZ->GetValue();
+	drawPane3D->determineDisplayAngles(ax, ay, az);
 }

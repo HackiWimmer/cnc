@@ -42,6 +42,9 @@ class MainFrame : public MainFrameBClass {
 
 	protected:
  
+		// will be bind to this frame
+		void globalKeyDownHook(wxKeyEvent& event);
+ 
 		// Interrupt thread handling
 		InterruptThread* pThread;
 		wxCriticalSection pThreadCS;
@@ -137,6 +140,7 @@ class MainFrame : public MainFrameBClass {
 		void updateCurveLibResolution();
 		
 		void decorateSearchButton();
+		void decorateTemplateListBook();
 
 		void registerGuiControls();
 		bool initializeCncControl();
@@ -262,11 +266,16 @@ class MainFrame : public MainFrameBClass {
 		
 		void setRefPostionState(bool state);
 		
-		
+		void setDisplayAngels3D();
 		
 	protected:
 		// User command
-
+		virtual void spin3DAngelX(wxSpinEvent& event);
+		virtual void spin3DAngelY(wxSpinEvent& event);
+		virtual void spin3DAngelZ(wxSpinEvent& event);
+		virtual void update3DAngelX(wxCommandEvent& event);
+		virtual void update3DAngelY(wxCommandEvent& event);
+		virtual void update3DAngelZ(wxCommandEvent& event);
 		virtual void nootebookConfigChanged(wxListbookEvent& event);
 		virtual void cancelRun(wxCommandEvent& event);
 		virtual void confirmRun(wxCommandEvent& event);
