@@ -9,6 +9,8 @@
   <object class="wxBitmap" name="16-blocks@2x">bitmaps\16-blocks@2x.png</object>
   <object class="wxBitmap" name="16-case-sensitive">bitmaps\16-case-sensitive.png</object>
   <object class="wxBitmap" name="16-case-sensitive@2x">bitmaps\16-case-sensitive@2x.png</object>
+  <object class="wxBitmap" name="16-checkbox">bitmaps\16-checkbox.png</object>
+  <object class="wxBitmap" name="16-checkbox@2x">bitmaps\16-checkbox@2x.png</object>
   <object class="wxBitmap" name="16-class">bitmaps\16-class.png</object>
   <object class="wxBitmap" name="16-class@2x">bitmaps\16-class@2x.png</object>
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>

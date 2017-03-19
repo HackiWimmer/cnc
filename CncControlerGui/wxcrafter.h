@@ -178,7 +178,6 @@ protected:
     wxListbook* m_listbook2220;
     wxPanel* m_setupWorkPage;
     wxFlexGridSizer* flexGridSizer2218;
-    wxFlexGridSizer* flexGridSizer952;
     wxFlexGridSizer* flexGridSizer961;
     wxStaticText* m_staticText7791;
     wxStaticLine* m_staticLine9572;
@@ -189,9 +188,6 @@ protected:
     wxTextCtrl* m_crossingThickness;
     wxStaticText* m_staticText575;
     wxTextCtrl* m_routerBitDiameter;
-    wxFlexGridSizer* flexGridSizer96131;
-    wxStaticText* m_staticText779142;
-    wxStaticLine* m_staticLine957253;
     wxFlexGridSizer* flexGridSizer1423;
     wxStaticText* m_staticText12374;
     wxTextCtrl* m_replyThreshold;
@@ -203,6 +199,9 @@ protected:
     wxComboBox* m_cbUseProceesdSetterList;
     wxStaticText* m_staticText1475;
     wxComboBox* m_cbClearProceesdSetterList;
+    wxFlexGridSizer* flexGridSizer96131;
+    wxStaticText* m_staticText779142;
+    wxStaticLine* m_staticLine957253;
     wxPanel* m_setupSpeedPage;
     wxFlexGridSizer* flexGridSizer2237;
     wxFlexGridSizer* flexGridSizer96114;
@@ -217,11 +216,19 @@ protected:
     wxComboBox* m_workSpeedXY;
     wxStaticText* m_staticText1019;
     wxComboBox* m_currentSpeedXY;
+    wxFlexGridSizer* flexGridSizer265915;
+    wxButton* m_button266116;
     wxFlexGridSizer* flexGridSizer2241;
-    wxStaticText* m_staticText1213;
-    wxComboBox* m_workSpeedZ;
     wxStaticText* m_staticText1208;
     wxTextCtrl* m_maxZSpeed;
+    wxStaticText* m_staticText92813;
+    wxComboBox* m_flySpeedZ;
+    wxStaticText* m_staticText1213;
+    wxComboBox* m_workSpeedZ;
+    wxStaticText* m_staticText101911;
+    wxComboBox* m_currentSpeedZ;
+    wxFlexGridSizer* flexGridSizer2659;
+    wxButton* m_button2661;
     wxPanel* m_setupDimPage;
     wxFlexGridSizer* flexGridSizer2234;
     wxFlexGridSizer* flexGridSizer9611;
@@ -252,6 +259,15 @@ protected:
     wxStaticText* m_staticText1880;
     wxStaticLine* m_staticLine2226;
     wxTextCtrl* m_envrionmentInfo;
+    wxPanel* m_setupApp;
+    wxFlexGridSizer* flexGridSizer2627;
+    wxFlexGridSizer* flexGridSizer96111;
+    wxStaticText* m_staticText779122;
+    wxStaticLine* m_staticLine957233;
+    wxFlexGridSizer* flexGridSizer2635;
+    wxFlexGridSizer* flexGridSizer96364;
+    wxStaticText* m_staticText12375;
+    wxComboBox* m_cbRunConfirmationMode;
     wxPanel* m_panelTesting;
     wxFlexGridSizer* flexGridSizer2205;
     wxTreebook* m_treebookTest;
@@ -836,9 +852,13 @@ protected:
     virtual void killFocusMaxSpeedXY(wxFocusEvent& event) { event.Skip(); }
     virtual void updateFlySpeedXY(wxCommandEvent& event) { event.Skip(); }
     virtual void updateWorkSpeedXY(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateCurrentSpeed(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateWorkSpeedZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateCurrentSpeedXY(wxCommandEvent& event) { event.Skip(); }
+    virtual void configureXYSpeedWithZValues(wxCommandEvent& event) { event.Skip(); }
     virtual void killFocusMaxSpeedZ(wxFocusEvent& event) { event.Skip(); }
+    virtual void updateFlySpeedZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateWorkSpeedZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateCurrentSpeedZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void configureZSpeedWithXYValues(wxCommandEvent& event) { event.Skip(); }
     virtual void killFocusMaxDimensionX(wxFocusEvent& event) { event.Skip(); }
     virtual void killFocusMaxDimensionY(wxFocusEvent& event) { event.Skip(); }
     virtual void killFocusMaxDimensionZ(wxFocusEvent& event) { event.Skip(); }
@@ -918,6 +938,7 @@ protected:
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void outboundBookChanging(wxNotebookEvent& event) { event.Skip(); }
+    virtual void nootebookConfigChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
     virtual void clearProcessedSetterList(wxCommandEvent& event) { event.Skip(); }
@@ -1095,8 +1116,6 @@ public:
     wxTextCtrl* GetCrossingThickness() { return m_crossingThickness; }
     wxStaticText* GetStaticText575() { return m_staticText575; }
     wxTextCtrl* GetRouterBitDiameter() { return m_routerBitDiameter; }
-    wxStaticText* GetStaticText779142() { return m_staticText779142; }
-    wxStaticLine* GetStaticLine957253() { return m_staticLine957253; }
     wxStaticText* GetStaticText12374() { return m_staticText12374; }
     wxTextCtrl* GetReplyThreshold() { return m_replyThreshold; }
     wxStaticText* GetStaticText1517() { return m_staticText1517; }
@@ -1107,6 +1126,8 @@ public:
     wxComboBox* GetCbUseProceesdSetterList() { return m_cbUseProceesdSetterList; }
     wxStaticText* GetStaticText1475() { return m_staticText1475; }
     wxComboBox* GetCbClearProceesdSetterList() { return m_cbClearProceesdSetterList; }
+    wxStaticText* GetStaticText779142() { return m_staticText779142; }
+    wxStaticLine* GetStaticLine957253() { return m_staticLine957253; }
     wxPanel* GetSetupWorkPage() { return m_setupWorkPage; }
     wxStaticText* GetStaticText779125() { return m_staticText779125; }
     wxStaticLine* GetStaticLine957236() { return m_staticLine957236; }
@@ -1118,10 +1139,16 @@ public:
     wxComboBox* GetWorkSpeedXY() { return m_workSpeedXY; }
     wxStaticText* GetStaticText1019() { return m_staticText1019; }
     wxComboBox* GetCurrentSpeedXY() { return m_currentSpeedXY; }
-    wxStaticText* GetStaticText1213() { return m_staticText1213; }
-    wxComboBox* GetWorkSpeedZ() { return m_workSpeedZ; }
+    wxButton* GetButton266116() { return m_button266116; }
     wxStaticText* GetStaticText1208() { return m_staticText1208; }
     wxTextCtrl* GetMaxZSpeed() { return m_maxZSpeed; }
+    wxStaticText* GetStaticText92813() { return m_staticText92813; }
+    wxComboBox* GetFlySpeedZ() { return m_flySpeedZ; }
+    wxStaticText* GetStaticText1213() { return m_staticText1213; }
+    wxComboBox* GetWorkSpeedZ() { return m_workSpeedZ; }
+    wxStaticText* GetStaticText101911() { return m_staticText101911; }
+    wxComboBox* GetCurrentSpeedZ() { return m_currentSpeedZ; }
+    wxButton* GetButton2661() { return m_button2661; }
     wxPanel* GetSetupSpeedPage() { return m_setupSpeedPage; }
     wxStaticText* GetStaticText77912() { return m_staticText77912; }
     wxStaticLine* GetStaticLine95723() { return m_staticLine95723; }
@@ -1145,6 +1172,11 @@ public:
     wxStaticLine* GetStaticLine2226() { return m_staticLine2226; }
     wxTextCtrl* GetEnvrionmentInfo() { return m_envrionmentInfo; }
     wxPanel* GetSetupEnvPage() { return m_setupEnvPage; }
+    wxStaticText* GetStaticText779122() { return m_staticText779122; }
+    wxStaticLine* GetStaticLine957233() { return m_staticLine957233; }
+    wxStaticText* GetStaticText12375() { return m_staticText12375; }
+    wxComboBox* GetCbRunConfirmationMode() { return m_cbRunConfirmationMode; }
+    wxPanel* GetSetupApp() { return m_setupApp; }
     wxListbook* GetListbook2220() { return m_listbook2220; }
     wxPanel* GetPanelSetup() { return m_panelSetup; }
     wxStaticText* GetStaticText2117() { return m_staticText2117; }

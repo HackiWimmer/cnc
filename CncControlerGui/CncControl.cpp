@@ -743,13 +743,16 @@ void CncControl::changeWorkSpeedXY(CncSpeed s) {
 	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeWorkSpeedZ() {
+void CncControl::changeWorkSpeedZ(CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
+	cncConfig->setActiveSpeedZ(s);
 	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
 	
 	if (guiCtlSetup->speedZ && toolUpdateState == true ) guiCtlSetup->speedZ->SetValue(cncConfig->getSpeedZ());
+
+	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingStart() {

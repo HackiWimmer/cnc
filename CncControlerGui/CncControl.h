@@ -306,7 +306,7 @@ class CncControl {
 		bool processSetterList(std::vector<SetterTuple>& setup);
 		// Change the current work speed parameter
 		void changeWorkSpeedXY(CncSpeed s);
-		void changeWorkSpeedZ();
+		void changeWorkSpeedZ(CncSpeed s);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)

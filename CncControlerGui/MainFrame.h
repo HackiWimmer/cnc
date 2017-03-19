@@ -41,8 +41,7 @@ class MainFrame : public MainFrameBClass {
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 	protected:
-    virtual void cancelRun(wxCommandEvent& event);
-
+ 
 		// Interrupt thread handling
 		InterruptThread* pThread;
 		wxCriticalSection pThreadCS;
@@ -58,7 +57,6 @@ class MainFrame : public MainFrameBClass {
 		bool svgDebugger;
 		bool templateFileLoading;
 		bool ignoreDirControlEvents;
-		bool testIsRunning;
 		
 		RunConfirmationInfo  runConfirmationInfo;
 		
@@ -268,6 +266,9 @@ class MainFrame : public MainFrameBClass {
 		
 	protected:
 		// User command
+
+		virtual void nootebookConfigChanged(wxListbookEvent& event);
+		virtual void cancelRun(wxCommandEvent& event);
 		virtual void confirmRun(wxCommandEvent& event);
 		virtual void clearControllerMsgHistory(wxCommandEvent& event);
 		virtual void requestControllerPinsFromButton(wxCommandEvent& event);
@@ -386,7 +387,11 @@ class MainFrame : public MainFrameBClass {
 		virtual void updateFlySpeedXY(wxCommandEvent& event);
 		virtual void updateWorkSpeedXY(wxCommandEvent& event);
 		virtual void updateWorkSpeedZ(wxCommandEvent& event);
-		virtual void updateCurrentSpeed(wxCommandEvent& event);
+		virtual void configureXYSpeedWithZValues(wxCommandEvent& event);
+		virtual void configureZSpeedWithXYValues(wxCommandEvent& event);
+		virtual void updateCurrentSpeedZ(wxCommandEvent& event);
+		virtual void updateFlySpeedZ(wxCommandEvent& event);
+		virtual void updateCurrentSpeedXY(wxCommandEvent& event);
 		virtual void selectPort(wxCommandEvent& event);
 		virtual void saveEmuOutput(wxCommandEvent& event);
 		virtual void requestVersion(wxCommandEvent& event);

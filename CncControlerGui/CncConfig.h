@@ -16,7 +16,7 @@ class CncConfig {
 		unsigned int stepsX, stepsY, stepsZ;
 		unsigned int multiplierX, multiplierY, multiplierZ;
 		unsigned int maxSpeedXY, maxSpeedZ;
-		unsigned int flySpeedXY, workSpeedXY;
+		unsigned int flySpeedXY, workSpeedXY, flySpeedZ, workSpeedZ;
 		unsigned int speedX, speedY, speedZ;
 		double pitchX, pitchY, pitchZ;
 		double dispFactX, dispFactY, dispFactZ;
@@ -66,7 +66,7 @@ class CncConfig {
 					, stepsX(200), stepsY(200), stepsZ(200)
 					, multiplierX(1), multiplierY(1), multiplierZ(1) 
 					, maxSpeedXY(100), maxSpeedZ(100)
-					, flySpeedXY(100), workSpeedXY(100)
+					, flySpeedXY(100), workSpeedXY(100), flySpeedZ(100), workSpeedZ(100)
 					, speedX(1), speedY(1), speedZ(1)
 					, pitchX(2.0), pitchY(2.0), pitchZ(2.0)
 					, workpieceOffset(5.0)
@@ -99,6 +99,7 @@ class CncConfig {
 					, multiplierX(cc.getMultiplierX()), multiplierY(cc.getMultiplierY()), multiplierZ(cc.getMultiplierZ()) 
 					, maxSpeedXY(cc.getMaxSpeedXY()), maxSpeedZ(cc.getMaxSpeedZ())
 					, flySpeedXY(cc.getFlySpeedXY()), workSpeedXY(cc.getWorkSpeedXY())
+					, flySpeedZ(cc.getFlySpeedZ()), workSpeedZ(cc.getWorkSpeedZ())
 					, speedX(cc.getSpeedX()), speedY(cc.getSpeedY()), speedZ(cc.getSpeedX())
 					, pitchX(cc.getPitchX()), pitchY(cc.getPitchY()), pitchZ(cc.getPitchZ())
 					, workpieceOffset(cc.getWorkpieceOffset())
@@ -157,7 +158,8 @@ class CncConfig {
 			DataControlModel::addKeyValueRow(ret, "Fly speed XY", 			(int)flySpeedXY);
 			DataControlModel::addKeyValueRow(ret, "Work speed XY", 			(int)workSpeedXY);
 			DataControlModel::addKeyValueRow(ret, "Max speed Z", 			(int)maxSpeedZ);
-			DataControlModel::addKeyValueRow(ret, "Work speed Z", 			(int)speedZ);
+			DataControlModel::addKeyValueRow(ret, "Fly speed Z", 			(int)flySpeedZ);
+			DataControlModel::addKeyValueRow(ret, "Work speed Z", 			(int)workSpeedZ);
 		}
 		////////////////////////////////////////////////////////////////////////
 		void getDynamicValues(wxVector<wxVector<wxVariant>>& ret) {
@@ -244,14 +246,27 @@ class CncConfig {
 				case CncSpeedFly:	setSpeedX(getFlySpeedXY());
 									setSpeedY(getFlySpeedXY());
 									break;
+									
 				default:
 									setSpeedX(1);
 									setSpeedY(1);
 			}
 			return *this;
 		}
-		CncConfig& setActiveSpeedZ(unsigned int val) {
-			return setSpeedZ(val);
+		////////////////////////////////////////////////////////////////////////
+		CncConfig& setActiveSpeedZ(CncSpeed s) {
+			switch( s ) {
+				
+				case CncSpeedWork: 	setSpeedZ(getWorkSpeedZ());
+									break;
+									
+				case CncSpeedFly:	setSpeedZ(getFlySpeedZ());
+									break;
+									
+				default:
+									setSpeedZ(1);
+			}
+			return *this;
 		}
 		
 		////////////////////////////////////////////////////////////////////////
@@ -330,6 +345,11 @@ class CncConfig {
 		CncConfig& setFlySpeedXY(int s) { sc(); flySpeedXY = s; return *this; }
 		int getWorkSpeedXY() { return workSpeedXY; }
 		CncConfig& setWorkSpeedXY(int s) { sc(); workSpeedXY = s; return *this; }
+		////////////////////////////////////////////////////////////////////////
+		int getFlySpeedZ() { return flySpeedZ; }
+		CncConfig& setFlySpeedZ(int s) { sc(); flySpeedZ = s; return *this; }
+		int getWorkSpeedZ() { return workSpeedZ; }
+		CncConfig& setWorkSpeedZ(int s) { sc(); workSpeedZ = s; return *this; }
 		////////////////////////////////////////////////////////////////////////
 		unsigned int getSpeedX(void) { return speedX; }
 		unsigned int getSpeedY(void) { return speedY; }

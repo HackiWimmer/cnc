@@ -44,6 +44,10 @@ const char* _configFileName 	= "..\\CncController.ini";
 const char* _lruStoreFileName	= "..\\CncControllerLruStore.ini";
 
 
+// file content change environment
+#define EDIT_TRACKER_MARGIN_ID 1
+#define CL_LINE_MODIFIED_STYLE 200
+#define CL_LINE_SAVED_STYLE 201
 enum {MARGIN_LINE_NUMBERS, MARGIN_FOLD};
 
 wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
@@ -66,7 +70,6 @@ MainFrame::MainFrame(wxWindow* parent)
 , svgDebugger(false)
 , templateFileLoading(false)
 , ignoreDirControlEvents(false)
-, testIsRunning(false)
 , runConfirmationInfo(RunConfirmationInfo::Wait)
 , traceTimerCounter(0)
 , lastPortName(wxT(""))
@@ -202,8 +205,6 @@ void MainFrame::install3DPane() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
-	registerGuiControl(m_btCancelRun);
-	registerGuiControl(m_btConfirmRun);
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_ctrlTestSelection);
@@ -454,10 +455,6 @@ void MainFrame::initTemplateEditStyle() {
 	initTemplateEditStyle(m_stcFileContent, getCurrentTemplateFormat());
 	initTemplateEditStyle(m_stcEmuSource, TplSvg);
 }
-//todo
-#define EDIT_TRACKER_MARGIN_ID 1
-#define CL_LINE_MODIFIED_STYLE 200
-#define CL_LINE_SAVED_STYLE 201
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat format) {
 ///////////////////////////////////////////////////////////////////
@@ -537,7 +534,7 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	//ctl->SetSelForeground(true, wxColour(255,201,14));
 	ctl->SetSelBackground(true, wxColour(83,83,83));
 	
-	// todo
+	// file content marker
 	ctl->StyleSetBackground(CL_LINE_SAVED_STYLE, wxColour(wxT("FOREST GREEN")));
 	ctl->StyleSetBackground(CL_LINE_MODIFIED_STYLE, wxColour(wxT("ORANGE")));
 	
@@ -782,15 +779,19 @@ bool MainFrame::initializeCncControl() {
 
 			// init speed config
 			m_maxXYSpeed->SetValue(wxString() << cncConfig->getMaxSpeedXY());
-			config->Read("CncConfig/FlySpeed",  &cfgStr, "90");
+			config->Read("CncConfig/FlySpeedXY",  &cfgStr, "90");
 			m_flySpeedXY->SetStringSelection(cfgStr);
-			config->Read("CncConfig/WorkSpeed",  &cfgStr, "80");
+			config->Read("CncConfig/WorkSpeedXY",  &cfgStr, "80");
 			m_workSpeedXY->SetStringSelection(cfgStr);
 			
 			m_maxZSpeed->SetValue(wxString() << cncConfig->getMaxSpeedZ());
-			m_workSpeedZ->SetStringSelection("90");
+			config->Read("CncConfig/FlySpeedZ",  &cfgStr, "90");
+			m_flySpeedZ->SetStringSelection(cfgStr);
+			config->Read("CncConfig/WorkSpeedZ",  &cfgStr, "80");
+			m_workSpeedZ->SetStringSelection(cfgStr);
 			
 			m_currentSpeedXY->SetSelection(0);
+			m_currentSpeedZ->SetSelection(0);
 			updateSpeedValues();
 	
 			// init interval
@@ -1514,6 +1515,7 @@ void MainFrame::updateWorkSpeedXY(wxCommandEvent& event) {
 void MainFrame::killFocusMaxSpeedZ(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateSpeedValues();
+	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateWorkSpeedZ(wxCommandEvent& event){
@@ -1521,26 +1523,57 @@ void MainFrame::updateWorkSpeedZ(wxCommandEvent& event){
 	updateSpeedValues();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::updateCurrentSpeed(wxCommandEvent& event) {
+void MainFrame::updateCurrentSpeedXY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	updateSpeedValues();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::updateCurrentSpeedZ(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	updateSpeedValues();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::updateFlySpeedZ(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	updateSpeedValues();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::configureXYSpeedWithZValues(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_flySpeedXY->SetStringSelection(m_flySpeedZ->GetStringSelection());
+	m_workSpeedXY->SetStringSelection(m_workSpeedZ->GetStringSelection());
+	m_currentSpeedXY->SetStringSelection(m_currentSpeedZ->GetStringSelection());
+	updateSpeedValues();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::configureZSpeedWithXYValues(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_flySpeedZ->SetStringSelection(m_flySpeedXY->GetStringSelection());
+	m_workSpeedZ->SetStringSelection(m_workSpeedXY->GetStringSelection());
+	m_currentSpeedZ->SetStringSelection(m_currentSpeedXY->GetStringSelection());
 	updateSpeedValues();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateSpeedValues() {
 ///////////////////////////////////////////////////////////////////
 	wxString maxXY 	= m_maxXYSpeed->GetValue();
-	wxString maxZ 	= m_maxZSpeed->GetValue();
 	wxString flyXY  = m_flySpeedXY->GetStringSelection();
 	wxString workXY = m_workSpeedXY->GetStringSelection();
-	wxString workZ  = m_workSpeedZ->GetStringSelection();
 	wxString selXY  = m_currentSpeedXY->GetStringSelection();
 	
-	long mXY=0, mZ = 0, fXY=0, wXY=0, wZ=0;
-	if ( maxXY.length() > 0 ) 	maxXY.ToLong(&mXY);
-	if ( maxZ.length() > 0 ) 	maxXY.ToLong(&mZ);
-	if ( flyXY.length() > 0 )	flyXY.ToLong(&fXY);
+	wxString maxZ 	= m_maxZSpeed->GetValue();
+	wxString flyZ   = m_flySpeedZ->GetStringSelection();
+	wxString workZ  = m_workSpeedZ->GetStringSelection();
+	wxString selZ   = m_currentSpeedZ->GetStringSelection();
+	
+	long mXY=0, mZ = 0, fXY=0, wXY=0, fZ=0, wZ=0;
+	if ( maxXY.length()  > 0 ) 	maxXY.ToLong(&mXY);
+	if ( flyXY.length()  > 0 )	flyXY.ToLong(&fXY);
 	if ( workXY.length() > 0 )	workXY.ToLong(&wXY);
-	if ( workZ.length() > 0 )	workZ.ToLong(&wZ);
+	
+	if ( maxZ.length()   > 0 ) 	maxXY.ToLong(&mZ);
+	if ( flyZ.length()   > 0 )	flyZ.ToLong(&fZ);
+	if ( workZ.length()  > 0 )	workZ.ToLong(&wZ);
 
 	if ( mXY <= 0 ) mXY = 1;
 	if ( mZ  <= 0 ) mZ  = 1;
@@ -1560,21 +1593,27 @@ void MainFrame::updateSpeedValues() {
 		cnc->getCncConfig()->setWorkSpeedXY(1);
 	}
 
-	if ( wZ != 0 ) {
+	if ( fZ != 0 && wZ != 0 ) {
+		val = cnc->getCncConfig()->getMaxSpeedZ() * fZ/100;
+		cnc->getCncConfig()->setFlySpeedZ((int)val);
+
 		val = cnc->getCncConfig()->getMaxSpeedZ() * wZ/100;
-		cnc->getCncConfig()->setActiveSpeedZ((int)val);
+		cnc->getCncConfig()->setWorkSpeedZ((int)val);
 	} else {
-		cnc->getCncConfig()->setActiveSpeedZ(1);
+		cnc->getCncConfig()->setFlySpeedZ(1);
+		cnc->getCncConfig()->setWorkSpeedZ(1);
 	}
 	
 	if ( cnc->isConnected() ) {
-		cnc->changeWorkSpeedZ();
-		
 		if (selXY.MakeUpper() == "FLY")	cnc->changeWorkSpeedXY(CncSpeedFly);
 		else							cnc->changeWorkSpeedXY(CncSpeedWork);
 		
+		if (selZ.MakeUpper()  == "FLY")	cnc->changeWorkSpeedZ(CncSpeedFly);
+		else							cnc->changeWorkSpeedZ(CncSpeedWork);
+		
 	} else {
 		cnc->getCncConfig()->setActiveSpeedXY(CncSpeedFly);
+		cnc->getCncConfig()->setActiveSpeedZ(CncSpeedFly);
 	}
 
 	cnc->updateCncConfigTrace();
@@ -2786,23 +2825,27 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::showConfigSummaryAndConfirmRun() {
 ///////////////////////////////////////////////////////////////////
-	/*if ( wxString(cnc->getSerial()->getClassName()) != "SerialPort" ) {
-		return true;
-	}*/
+	wxASSERT( cnc );
+	wxString mode = m_cbRunConfirmationMode->GetStringSelection();
+	switch ( (char)mode[0] ) {
+		// alwyays
+		case 'a':	break;
+		// Serial Port only
+		case 'c': 	if ( wxString(cnc->getSerial()->getClassName()) != "SerialPort" )
+						return true;
+		// Never
+		default:	return true;
+	}
 	
+	// check template format
+	if ( getCurrentTemplateFormat() != TplSvg && getCurrentTemplateFormat() != TplGcode )
+		return true;
+	
+	// control handling
 	disableControls();
 	disableAllRunControls();
 	m_btCancelRun->Enable(true);
 	m_btConfirmRun->Enable(true);
-	
-	DcmItemList rows;
-	// todo collect config summary
-	DataControlModel::addNumParameterValueUnitRow(rows, "para", 17, "mm"); 
-	
-	m_dvListCtrlConfigSummary->DeleteAllItems();
-	for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-		m_dvListCtrlConfigSummary->AppendItem(*it);
-	}
 	
 	// select summary page
 	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
@@ -2853,7 +2896,29 @@ void MainFrame::cancelRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	runConfirmationInfo = RunConfirmationInfo::Canceled;
 }
+///////////////////////////////////////////////////////////////////
+void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( cnc == NULL )
+		return;
+		
+	if ( cnc->getCncConfig() == NULL )
+		return;
+		
+	CncConfig* cc = cnc->getCncConfig();
+		
+	DcmItemList rows;
+	DataControlModel::addNumParameterValueUnitRow(rows, "Workpiece thickness", 				wxString::Format("%4.3f", 	cc->getWorkpieceThickness()), 		"mm"); 
+	DataControlModel::addNumParameterValueUnitRow(rows, "Max thickness per crossing", 		wxString::Format("%4.3f", 	cc->getMaxDurationThickness()), 	"mm"); 
+	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed XY", 					wxString::Format("%d", 		cc->getWorkSpeedXY()), 				"rpm"); 
+	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed Z", 					wxString::Format("%d", 		cc->getWorkSpeedZ()), 				"rpm");
+	// ...
 
+	m_dvListCtrlConfigSummary->DeleteAllItems();
+	for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
+		m_dvListCtrlConfigSummary->AppendItem(*it);
+	}
+}
 ///////////////////////////////////////////////////////////////////
 void MainFrame::processTemplate() {
 ///////////////////////////////////////////////////////////////////
@@ -2929,9 +2994,8 @@ void MainFrame::processTemplate() {
 			ret = processManualTemplate();
 			break;
 		case TplTest:
-			testIsRunning = true;
+			cnc->clearDrawControl();
 			ret = processTestTemplate();
-			testIsRunning = false;
 			break;
 		default:
 			; // do nothing
@@ -5223,10 +5287,10 @@ void MainFrame::rcStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
-	if ( testIsRunning == true ) {
+	if ( getCurrentTemplateFormat() == TplTest ) {
 		bool ret = cnc->getSerial()->sendTestSuiteEndFlag();
 		if ( ret == true ) 	cnc::trc.logInfo("Test was stopped");
-		else				cnc::trc.logError("Test sop was failed");
+		else				cnc::trc.logError("Test stop was failed");
 	} else {
 		if ( svgFileParser != NULL )
 			svgFileParser->debugStop();
@@ -5244,14 +5308,11 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::controlerPause(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-
-	//todo
+	//todo curently not tested
 	if ( cnc->getSerial()->isPauseActive() )
 		cnc->processCommand('p', std::clog);
 	else
 		cnc->processCommand('P', std::clog);
-
-
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
@@ -5541,12 +5602,10 @@ void MainFrame::clearControllerMsgHistory(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_controllerMsgHistory->Clear();
 }
-
-
-
-
-//todo
+///////////////////////////////////////////////////////////////////
 void MainFrame::fileContentChange(wxStyledTextEvent& event) {
+///////////////////////////////////////////////////////////////////
+	// todo currently not tested
 	event.Skip();
 	
 	bool isInsert = event.GetModificationType() & wxSTC_MOD_INSERTTEXT;
@@ -5573,4 +5632,3 @@ void MainFrame::fileContentChange(wxStyledTextEvent& event) {
 		}
 	}
 }
-

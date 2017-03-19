@@ -159,6 +159,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////////////
 		void displaySplashImage(MainFrame* mainFrame) {
 		///////////////////////////////////////////////////////////////////
+			return;
 			#ifdef APP_USE_SPLASH
 				wxBitmap bmp;
 				if ( getSplashImage(bmp) ) {
