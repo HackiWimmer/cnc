@@ -25,8 +25,9 @@ CncOpenGLDrawPaneContext::CncOpenGLDrawPaneContext(wxGLCanvas *canvas)
 	// set viewing projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
-
+	//glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
+	glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 1.0f);
+	
 	CncOpenGLDrawPane::CheckGLError();
 }
 /////////////////////////////////////////////////////////////////////

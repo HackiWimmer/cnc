@@ -825,10 +825,6 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 	if ( cncControl->isInterrupted() )
 		return false;
 	
-	/*
-	while ( isCommand == true )
-		cncControl->waitActive(1000);
-	*/
 	wxMutexLocker lock(s_mutexProtectingTheGlobalData);
 	isCommand = true;
 	
@@ -858,7 +854,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			case RET_OK:
 			{
-				cncControl->SerialCallback(1);
+				cncControl->SerialCallback(0);
 				return RET_OK_Handler(sfi, mutliByteStream, pos);
 			}
 			//evaluateResult..........................................
@@ -876,7 +872,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			case RET_SOT:
 			{
-				cncControl->SerialCallback(1);
+				cncControl->SerialCallback(0);
 
 				if ( sfi.retSOTAllowed == false ) {
 					std::cerr << "Multibyte text results are not allowed in the context of command: " << sfi.command << std::endl;
@@ -906,7 +902,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			case RET_SOH:
 			{
-				cncControl->SerialCallback(1);
+				cncControl->SerialCallback(0);
 				
 				if ( sfi.retSOHAllowed == false ) {
 					
@@ -1045,12 +1041,9 @@ bool Serial::RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 		//RET_SOT_Handler..........................................
 		default:
 		{
-			//std::clog << "Fetching multi byte result\n";
 			fetchMultiByteResult(sfi.multiByteResult, sizeof(sfi.multiByteResult)-1);
 			decodeMultiByteResults(sfi.command, sfi.multiByteResult, mutliByteStream);
 			
-			determineCoordinates(sfi.command, pos);
-
 			cncControl->SerialCallback(1);
 			return true;
 		}

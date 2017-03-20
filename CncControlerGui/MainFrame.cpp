@@ -413,12 +413,6 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		m_tmpTraceInfo->Clear();
 	}
 	
-	// 3D view handling
-	if ( cnc )
-		cnc->set3DData();
-		
-	drawPane3D->Refresh();
-	
 	// idle handling
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
 		if ( m_connect->IsEnabled() == false )
@@ -2961,18 +2955,25 @@ void MainFrame::processTemplate() {
 	}
 	
 	if ( m_cbUseProceesdSetterList->GetStringSelection().MakeUpper() == "YES" ) {
-		 guiCtlSetup->processedSetters	= m_dvListCtrlProcessedSetters;
+		 guiCtlSetup->processedSetters = m_dvListCtrlProcessedSetters;
 		 cnc->setGuiControls(guiCtlSetup);
 	} else {
 		m_dvListCtrlProcessedSetters->DeleteAllItems();
-		guiCtlSetup->processedSetters	= NULL;
+		guiCtlSetup->processedSetters = NULL;
 		cnc->setGuiControls(guiCtlSetup);
 	}
 	
 	startAnimationControl();
 
 	// select draw pane
-	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
+	wxString sel = m_cbRunMotionMonitorMode->GetStringSelection();
+	switch ( (char)sel[0] ) {
+		case '3': 	m_outboundNotebook->SetSelection(Outbound3DPage);
+					cnc->setMotionMonitorMode(CncControl::MMM_3D);
+					break;
+		default: 	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
+					cnc->setMotionMonitorMode(CncControl::MMM_2D);
+	}
 	
 	// select template Page
 	if ( m_mainNotebook->GetSelection() != MainManuallyPage && 
@@ -4527,7 +4528,7 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 									break;
 									
 			case Outbound3DPage:	if ( cnc )
-										cnc->set3DData();
+										cnc->set3DData(false);
 									break;
 		}
 	}
@@ -4725,9 +4726,7 @@ void MainFrame::createStcFileControlPopupMenu() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateTemplateListBook() {
 ///////////////////////////////////////////////////////////////////
-	wxListView* lv = m_templateListBook->wxListbook::GetListView();
-	lv->SetBackgroundColour(wxColour(191,205,219));
-	lv->Select(1);
+	m_templateTreeBook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
@@ -5461,7 +5460,7 @@ void MainFrame::animate3D(wxCommandEvent& event) {
 void MainFrame::refresh3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc )
-		cnc->set3DData();
+		cnc->set3DData(false);
 		
 	drawPane3D->Refresh();
 }
@@ -5697,5 +5696,41 @@ void MainFrame::setDisplayAngels3D() {
 	int ax = m_spin3DAngelX->GetValue();
 	int ay = m_spin3DAngelY->GetValue();
 	int az = m_spin3DAngelZ->GetValue();
-	drawPane3D->determineDisplayAngles(ax, ay, az);
+	
+	drawPane3D->setDisplayAngles(ax, ay, az, false);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectedPlane3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( drawPane3D == NULL )
+		return;
+		
+	wxString sel = m_planeSelect3D->GetStringSelection();
+	
+	switch ( (char)sel[0] ) {
+		case 'X':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); break;
+		case 'Y':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_YZ); break;
+		case 'Z':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_ZX); break;
+		default:	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); 
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::show3DPaneHelp(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString msg;
+	msg << "Keyboard support:\n";
+	msg << "Cursor keys + CTRL:\t\t Translates relative to the orgin.\n";
+	msg << "Cursor keys + SHIFT:\t\t Moves the view port center.\n";
+	msg << "Cursor keys:\t\t Rotates the view.\n";
+	msg << "Blank:\t\t\t Rotates the view automatically.\n";
+	msg << "\n";
+	msg << "Mouse (move) support:\n";
+	msg << "Left Button + CTRL:\t\t Translates relative to the orgin.\n";
+	msg << "Left Button + SHIFT:\t\t Moves the view port center.\n";
+	msg << "Left Button\t\t Rotates the view.\n";
+	msg << "Wheel+/-:\t\t\t Scales the view.\n";
+	
+	wxMessageDialog  dlg(this, msg, _T("3D DrawPane Information . . . "), 
+		                    wxOK|wxCENTRE|wxICON_INFORMATION);
+	dlg.ShowModal();
 }

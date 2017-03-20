@@ -68,38 +68,114 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 ////////////////////////////////////////////////////////////
 	public:
 		
-		enum DrawPaneViewType { DPVT_Front, DPVT_Rear, DPVT_Top, DPVT_Bottom, DPVT_Left, DPVT_Right, DPVT_3D };
-		enum DrawPaneOrigin { DPO_TOP_LEFT, DPO_TOP_RIGHT, DPO_BOTTOM_LEFT, DPO_BOTTOM_RIGHT, DPO_CENTER };
+		enum DrawPaneViewType 	{ DPVT_Front, DPVT_Rear, DPVT_Top, DPVT_Bottom, DPVT_Left, DPVT_Right, DPVT_3D };
+		enum DrawPaneOrigin 	{ DPO_TOP_LEFT, DPO_TOP_RIGHT, DPO_BOTTOM_LEFT, DPO_BOTTOM_RIGHT, DPO_CENTER, DPO_CUSTOM};
+		enum DrawPaneSelect 	{ DPS_XY, DPS_YZ, DPS_ZX };
+		
+		///////////////////////////////////////////////////
+		struct ViewPort {
+			float border;
+			float x;
+			float y;
+			int w;
+			int h;
+			
+			///////////////////////////////////////////////
+			ViewPort() {
+				border 	= 0.0f;
+				x = y 	= 0.0f;
+				w = h 	= 1;
+			}
+			
+			///////////////////////////////////////////////
+			friend std::ostream &operator<< (std::ostream &ostr, const ViewPort &a) {
+				ostr << a.x << ',' << a.y << ',' << a.w << ',' << a.h << ':' << a.border;
+				return ostr;
+			}
+		};
+		
+		///////////////////////////////////////////////////
+		struct Translate {
+			float x;
+			float y;
+			float z;
+			
+			///////////////////////////////////////////////
+			Translate() {
+				init();
+			}
+			
+			///////////////////////////////////////////////
+			void init() {
+				x = y = 0.0f;
+				z = -2.0f;
+			}
+			
+			///////////////////////////////////////////////
+			friend std::ostream &operator<< (std::ostream &ostr, const Translate &a) {
+				ostr << a.x << ',' << a.y << ',' << a.z;
+				return ostr;
+			}
+		};
+		
+		///////////////////////////////////////////////////
+		struct Scale {
+			float x;
+			float y;
+			float z;
+			
+			///////////////////////////////////////////////
+			Scale() {
+				init();
+			}
+			
+			///////////////////////////////////////////////
+			void init() {
+				x = y = z = 1.0f;
+			}
+			
+			///////////////////////////////////////////////
+			friend std::ostream &operator<< (std::ostream &ostr, const Scale &a) {
+				ostr << a.x << ',' << a.y << ',' << a.z;
+				return ostr;
+			}
+		};
 
 	private:
 		
 		// globale context
 		static CncOpenGLDrawPaneContext* globalContext;
-		static const unsigned int DEFAULT_SPIN_TIMER_INTERVAL = 150;
+		static const unsigned int DEFAULT_SPIN_TIMER_INTERVAL = 50;
 
 		unsigned int spinTimerInterval;
-		float scaleX, scaleY, scaleZ;
-		int viewPortX, viewPortY;
-		wxTimer spinTimer;
+		ViewPort viewPort;
+		Translate translate;
+		Scale scale;
 		DisplayAngels displayAngels;
+		
+		wxTimer spinTimer;
+		
 		wxButton* playButton;
 		wxTextCtrl* traceCtrl;
 		wxSpinCtrl* spinAngleX;
 		wxSpinCtrl* spinAngleY;
 		wxSpinCtrl* spinAngleZ;
+		
+		DrawPaneSelect planeSelcetion;
+		DrawPaneOrigin currentOrigin;
+
 		DrawPaneData data;
 		CncOpenGLData globalData;
 		
 		void resetProjectionMode();
 		void initializeOpenGL();
-		void rotate();
+		void rotate(bool updateCtrl = true);
 		void spinPaneFromKeyboard(float xSpin, float ySpin);
 
 		void OnPaint(wxPaintEvent& event);
 		void OnMouse(wxMouseEvent& event);
 		void OnSize(wxSizeEvent& event);
 		void OnEraseBackground(wxEraseEvent& event);
-		//void OnKeyDown(wxKeyEvent& event);
 		void OnSpinTimer(wxTimerEvent& event);
 		
 		void stopSpinTimer();
@@ -110,6 +186,14 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		
 		void trace(const wxString& msg);
 		void trace(const std::stringstream& ss) { return trace(ss.str().c_str()); }
+		
+		void rotateByKey(wxKeyEvent& event);
+		void translateByKey(wxKeyEvent& event);
+		void moveViewPortByKey(wxKeyEvent& event);
+		
+		void scaleByMouse(wxMouseEvent& event);
+		void translateByMouse(wxMouseEvent& event);
+		void moveViewPortByMouse(wxMouseEvent& event);
 
 	public:
 		
@@ -125,7 +209,8 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		void displayDataVector();
 
 		// setter
-		void determineDisplayAngles(float ax, float ay, float az);
+		void initDisplayAngles(float ax, float ay, float az);
+		void setDisplayAngles(float ax, float ay, float az, bool updateCtrl = false);
 		void setSpinTimerInterval(const unsigned int i) {
 			spinTimerInterval = i;
 		}
@@ -144,12 +229,16 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		void view3D()		{ view(DPVT_3D);  	 }
 		
 		// predefined origns
-		void setOrigin(DrawPaneOrigin dpo);
-		void setOriginTL() { return setOrigin(DPO_TOP_LEFT); }
-		void setOriginTR() { return setOrigin(DPO_TOP_RIGHT); }
-		void setOriginBL() { return setOrigin(DPO_BOTTOM_LEFT); }
-		void setOriginBR() { return setOrigin(DPO_BOTTOM_RIGHT); }
-		void setOriginCenter() { return setOrigin(DPO_CENTER); }
+		void evaluateViewPort();
+		void setOriginTL() 		{ currentOrigin = DPO_TOP_LEFT; 	return evaluateViewPort(); }
+		void setOriginTR() 		{ currentOrigin = DPO_TOP_RIGHT; 	return evaluateViewPort(); }
+		void setOriginBL() 		{ currentOrigin = DPO_BOTTOM_LEFT; 	return evaluateViewPort(); }
+		void setOriginBR() 		{ currentOrigin = DPO_BOTTOM_RIGHT; return evaluateViewPort(); }
+		void setOriginCenter() 	{ currentOrigin = DPO_CENTER; 		return evaluateViewPort(); }
+		
+		//Plane
+		void setPlaneSelection(const DrawPaneSelect& ps) { planeSelcetion = ps; }
+		const DrawPaneSelect& getplaneSelection() const { return planeSelcetion; }
 		
 		// control
 		void clear3D();

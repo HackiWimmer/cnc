@@ -482,8 +482,8 @@ void SVGPathHandlerCnc::finishWork() {
 	
 	// controller handling
 	cncControl->moveXYToZeroPos();
-	//svg output handling
 	
+	//svg output handling
 	CncDoublePosition::Watermarks xyMax;
 	//currentPos.getWatermarks(xyMax); // sometimes not in mm
 	xyMax = cncControl->getWaterMarksMetric();

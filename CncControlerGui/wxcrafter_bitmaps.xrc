@@ -53,6 +53,8 @@
   <object class="wxBitmap" name="16-globals@2x">bitmaps\16-globals@2x.png</object>
   <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>
   <object class="wxBitmap" name="16-gtk@2x">bitmaps\16-gtk@2x.png</object>
+  <object class="wxBitmap" name="16-help">bitmaps\16-help.png</object>
+  <object class="wxBitmap" name="16-help@2x">bitmaps\16-help@2x.png</object>
   <object class="wxBitmap" name="16-history">bitmaps\16-history.png</object>
   <object class="wxBitmap" name="16-history@2x">bitmaps\16-history@2x.png</object>
   <object class="wxBitmap" name="16-home">bitmaps\16-home.png</object>

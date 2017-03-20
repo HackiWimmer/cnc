@@ -264,6 +264,10 @@ protected:
     wxFlexGridSizer* flexGridSizer96111;
     wxStaticText* m_staticText779122;
     wxStaticLine* m_staticLine957233;
+    wxFlexGridSizer* flexGridSizer26351;
+    wxFlexGridSizer* flexGridSizer963642;
+    wxStaticText* m_staticText123753;
+    wxComboBox* m_cbRunMotionMonitorMode;
     wxFlexGridSizer* flexGridSizer2635;
     wxFlexGridSizer* flexGridSizer96364;
     wxStaticText* m_staticText12375;
@@ -503,9 +507,12 @@ protected:
 
     wxScrolledWindow* m_scrollWinFile;
     wxFlexGridSizer* flexGridSizer1628;
-    wxFlexGridSizer* flexGridSizer1639;
-    wxListbook* m_templateListBook;
-    wxPanel* m_panel2596;
+    wxTreebook* m_templateTreeBook;
+    wxPanel* m_lruPanel;
+    wxFlexGridSizer* flexGridSizer1642;
+    wxStaticText* m_staticText1644;
+    wxListBox* m_lruList;
+    wxPanel* m_stdPanel;
     wxFlexGridSizer* flexGridSizer2599;
     wxFlexGridSizer* flexGridSizer1636;
     wxButton* m_btDefaultDir;
@@ -513,10 +520,6 @@ protected:
     wxFlexGridSizer* flexGridSizer1645;
     wxStaticText* m_staticText1647;
     wxGenericDirCtrl* m_dirCtrl;
-    wxPanel* m_lruPanel;
-    wxFlexGridSizer* flexGridSizer1642;
-    wxStaticText* m_staticText1644;
-    wxListBox* m_lruList;
     wxScrolledWindow* m_scrollWinLogger;
     wxFlexGridSizer* flexGridSizer869;
     wxFlexGridSizer* flexGridSizer1863;
@@ -697,12 +700,14 @@ protected:
     wxTextCtrl* m_trace3D;
     wxPanel* m_panel2696;
     wxFlexGridSizer* flexGridSizer267117;
+    wxComboBox* m_planeSelect3D;
     wxStaticText* m_staticText268320;
     wxSpinCtrl* m_spin3DAngelX;
     wxStaticText* m_staticText268522;
     wxSpinCtrl* m_spin3DAngelY;
     wxStaticText* m_staticText268118;
     wxSpinCtrl* m_spin3DAngelZ;
+    wxButton* m_button2710;
     wxPanel* m_svgEmuResult;
     wxFlexGridSizer* flexGridSizer585;
     wxFlexGridSizer* flexGridSizer766;
@@ -932,13 +937,13 @@ protected:
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
     virtual void leaveEnterFileManagerControl(wxMouseEvent& event) { event.Skip(); }
+    virtual void lruListItemActivated(wxCommandEvent& event) { event.Skip(); }
+    virtual void lruListItemSelected(wxCommandEvent& event) { event.Skip(); }
+    virtual void leaveLruList(wxMouseEvent& event) { event.Skip(); }
     virtual void selectDefaultDirectory(wxCommandEvent& event) { event.Skip(); }
     virtual void selectCurrentFile(wxCommandEvent& event) { event.Skip(); }
     virtual void dirCtrlChanged(wxTreeEvent& event) { event.Skip(); }
     virtual void dirCtrlActivated(wxTreeEvent& event) { event.Skip(); }
-    virtual void lruListItemActivated(wxCommandEvent& event) { event.Skip(); }
-    virtual void lruListItemSelected(wxCommandEvent& event) { event.Skip(); }
-    virtual void leaveLruList(wxMouseEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
@@ -978,12 +983,14 @@ protected:
     virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void runOpenGLTest(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectedPlane3D(wxCommandEvent& event) { event.Skip(); }
     virtual void spin3DAngelX(wxSpinEvent& event) { event.Skip(); }
     virtual void update3DAngelX(wxCommandEvent& event) { event.Skip(); }
     virtual void spin3DAngelY(wxSpinEvent& event) { event.Skip(); }
     virtual void update3DAngelY(wxCommandEvent& event) { event.Skip(); }
     virtual void spin3DAngelZ(wxSpinEvent& event) { event.Skip(); }
     virtual void update3DAngelZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void show3DPaneHelp(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSource(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuReload(wxCommandEvent& event) { event.Skip(); }
@@ -1189,6 +1196,8 @@ public:
     wxPanel* GetSetupEnvPage() { return m_setupEnvPage; }
     wxStaticText* GetStaticText779122() { return m_staticText779122; }
     wxStaticLine* GetStaticLine957233() { return m_staticLine957233; }
+    wxStaticText* GetStaticText123753() { return m_staticText123753; }
+    wxComboBox* GetCbRunMotionMonitorMode() { return m_cbRunMotionMonitorMode; }
     wxStaticText* GetStaticText12375() { return m_staticText12375; }
     wxComboBox* GetCbRunConfirmationMode() { return m_cbRunConfirmationMode; }
     wxPanel* GetSetupApp() { return m_setupApp; }
@@ -1374,15 +1383,15 @@ public:
     wxPanel* GetPanelTemplateContent() { return m_panelTemplateContent; }
     wxNotebook* GetMainNotebook() { return m_mainNotebook; }
     wxScrolledWindow* GetScrollWinMain() { return m_scrollWinMain; }
+    wxStaticText* GetStaticText1644() { return m_staticText1644; }
+    wxListBox* GetLruList() { return m_lruList; }
+    wxPanel* GetLruPanel() { return m_lruPanel; }
     wxButton* GetBtDefaultDir() { return m_btDefaultDir; }
     wxButton* GetBtCurrentFile() { return m_btCurrentFile; }
     wxStaticText* GetStaticText1647() { return m_staticText1647; }
     wxGenericDirCtrl* GetDirCtrl() { return m_dirCtrl; }
-    wxPanel* GetPanel2596() { return m_panel2596; }
-    wxStaticText* GetStaticText1644() { return m_staticText1644; }
-    wxListBox* GetLruList() { return m_lruList; }
-    wxPanel* GetLruPanel() { return m_lruPanel; }
-    wxListbook* GetTemplateListBook() { return m_templateListBook; }
+    wxPanel* GetStdPanel() { return m_stdPanel; }
+    wxTreebook* GetTemplateTreeBook() { return m_templateTreeBook; }
     wxScrolledWindow* GetScrollWinFile() { return m_scrollWinFile; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
@@ -1521,12 +1530,14 @@ public:
     wxStaticText* GetStaticText2333() { return m_staticText2333; }
     wxPanel* GetDrawPane3D() { return m_drawPane3D; }
     wxTextCtrl* GetTrace3D() { return m_trace3D; }
+    wxComboBox* GetPlaneSelect3D() { return m_planeSelect3D; }
     wxStaticText* GetStaticText268320() { return m_staticText268320; }
     wxSpinCtrl* GetSpin3DAngelX() { return m_spin3DAngelX; }
     wxStaticText* GetStaticText268522() { return m_staticText268522; }
     wxSpinCtrl* GetSpin3DAngelY() { return m_spin3DAngelY; }
     wxStaticText* GetStaticText268118() { return m_staticText268118; }
     wxSpinCtrl* GetSpin3DAngelZ() { return m_spin3DAngelZ; }
+    wxButton* GetButton2710() { return m_button2710; }
     wxPanel* GetPanel2696() { return m_panel2696; }
     wxPanel* GetPanel2590() { return m_panel2590; }
     wxPanel* Get3DPane() { return m_3DPane; }
