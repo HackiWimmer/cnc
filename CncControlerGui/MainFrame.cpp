@@ -4725,9 +4725,7 @@ void MainFrame::createStcFileControlPopupMenu() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateTemplateListBook() {
 ///////////////////////////////////////////////////////////////////
-	wxListView* lv = m_templateListBook->wxListbook::GetListView();
-	lv->SetBackgroundColour(wxColour(191,205,219));
-	lv->Select(1);
+	m_templateTreeBook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
@@ -5697,5 +5695,21 @@ void MainFrame::setDisplayAngels3D() {
 	int ax = m_spin3DAngelX->GetValue();
 	int ay = m_spin3DAngelY->GetValue();
 	int az = m_spin3DAngelZ->GetValue();
-	drawPane3D->determineDisplayAngles(ax, ay, az);
+	
+	drawPane3D->setDisplayAngles(ax, ay, az, false);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectedPlane3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( drawPane3D == NULL )
+		return;
+		
+	wxString sel = m_planeSelect3D->GetStringSelection();
+	
+	switch ( (char)sel[0] ) {
+		case 'X':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); break;
+		case 'Y':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_YZ); break;
+		case 'Z':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_ZX); break;
+		default:	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); 
+	}
 }

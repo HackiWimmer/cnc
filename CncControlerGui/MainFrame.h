@@ -41,6 +41,7 @@ class MainFrame : public MainFrameBClass {
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 	protected:
+    virtual void selectedPlane3D(wxCommandEvent& event);
  
 		// will be bind to this frame
 		void globalKeyDownHook(wxKeyEvent& event);
