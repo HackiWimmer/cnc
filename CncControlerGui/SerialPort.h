@@ -107,8 +107,11 @@ struct SvgOriginalPathInfo {
 	wxString useTransformInfo			= "";
 };
 
-class Serial
-{
+class Serial {
+	public:
+		// define long size
+		static const unsigned int LONG_BUF_SIZE = sizeof(int32_t);
+		
 	protected:
 		//Serial com handler
 		HANDLE hSerial;
@@ -130,10 +133,11 @@ class Serial
 		bool traceInfo;
 		// Port name
 		std::string portName;
+		// last fetch result
+		unsigned char lastFetchResult;
 		// Map of valid processed setters
 		std::map<int, int32_t> setterMap;
 		
-		static const unsigned int LONG_BUF_SIZE = sizeof(int32_t);
 		unsigned char buf[LONG_BUF_SIZE];
 		unsigned char moveCommand[MAX_MOVE_CMD_SIZE];
 		
@@ -166,8 +170,6 @@ class Serial
 		inline bool RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
 		// handle receiving binary data from controller
 		inline bool RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		// gets a string represntation of ret
-		inline const char* decodeContollerResult(int ret);
 		// decodes the given fetch result depending cr
 		inline bool decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi);
 		// decodes the give fetch result
@@ -176,6 +178,10 @@ class Serial
 		inline bool decodeLimitInfo(SerialFetchInfo& sfi);
 		inline bool decodePositionInfo(SerialFetchInfo& sfi);
 		
+		void resetLastFetchResult() { lastFetchResult = RET_NULL; }
+		void setLastFetchType(unsigned char ret) { lastFetchResult = ret; }
+		const unsigned char getLastFetchResult() const { return lastFetchResult; }
+		
 	public:
 		//Initialize Serial communication without an acitiv connection 
 		Serial(CncControl* cnc);
@@ -183,8 +189,14 @@ class Serial
 		Serial(const char *portName);
 		//Close the connection
 		virtual ~Serial();
+		// gets a string represntation of ret
+		static const char* decodeContollerResult(int ret);
 		// returns the class name
-		virtual const char* getClassName() { return "SerialPort"; }
+		virtual const char* getClassName() { return "SerialPort"; } 
+		// returns the emulator type
+		virtual bool isEmulator() const { return false; }
+		// return the port type
+		virtual const CncPortType getPortType() const { return CncPORT; }
 		//connect to port
 		virtual bool connect(const char* portName);
 		//Close the connection
@@ -204,8 +216,8 @@ class Serial
 		// returns the port name
 		virtual const char* getPortName() { return portName.c_str(); }
 		// sets info debug mode
-		void setInfoOutput(bool show=true) {traceInfo = show;}
-		bool getInfoOutput() {return traceInfo; }
+		void enableSpyOutput(bool show=true) {traceInfo = show;}
+		bool isSpyOutput() {return traceInfo; }
 		// return the current pause flag
 		bool isPauseActive() { return isPause; }
 		// reurn the current command flag

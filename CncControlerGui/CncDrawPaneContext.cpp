@@ -6,27 +6,27 @@
 
 /////////////////////////////////////////////////////////////////////
 CncOpenGLDrawPaneContext::CncOpenGLDrawPaneContext(wxGLCanvas *canvas)
-/////////////////////////////////////////////////////////////////////	
+/////////////////////////////////////////////////////////////////////
 : wxGLContext(canvas)
+, axises()
 {
 	SetCurrent(*canvas);
-
+	
 	// set up the parameters we want to use
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
 	glEnable(GL_TEXTURE_2D);
-
+	
 	// add slightly more light, the default lighting is rather dark
 	GLfloat ambient[] = { 0.5, 0.5, 0.5, 0.5 };
 	glLightfv(GL_LIGHT0, GL_AMBIENT, ambient);
-
+	
 	// set viewing projection
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	//glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
-	glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 0.5f, 1.0f);
+	glFrustum(-0.5f, 0.5f, -0.5f, 0.5f, 1.0f, 3.0f);
 	
 	CncOpenGLDrawPane::CheckGLError();
 }
@@ -34,76 +34,126 @@ CncOpenGLDrawPaneContext::CncOpenGLDrawPaneContext(wxGLCanvas *canvas)
 CncOpenGLDrawPaneContext::~CncOpenGLDrawPaneContext() {
 /////////////////////////////////////////////////////////////////////
 }
-
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPaneContext::drawX() {
 /////////////////////////////////////////////////////////////////////
-	return;
-	//todo
-	
 	double p[4][2] = {
 		{ 0.0f, 0.0f}, //0
 		{ 1.0f, 1.0f}, //1
+		
 		{ 0.0f, 1.0f}, //2
 		{ 1.0f, 0.0f}, //3
 	};
 	
-	double scale = 0.05;
+	glBegin(GL_LINES);
 	
-    glBegin(GL_LINES);
-    	glColor3f(0.0, 0.0, 1.0); 
-    	
-        glVertex2f(p[0][0] * scale, p[0][1] * scale);
-        glVertex2f(p[1][0] * scale, p[1][1] * scale);
-
-        glVertex2f(p[2][0] * scale, p[2][1] * scale);
-        glVertex2f(p[3][0] * scale, p[3][1] * scale);
-        
-    glEnd();
+		glColor3f(axises.colours.x.Red()/255, axises.colours.x.Green()/255, axises.colours.x.Blue()/255);
+		
+		glVertex3f(p[0][0] * axises.letterScale + axises.length, p[0][1] * axises.letterScale, 0.0f);
+		glVertex3f(p[1][0] * axises.letterScale + axises.length, p[1][1] * axises.letterScale, 0.0f);
+		
+		glVertex3f(p[2][0] * axises.letterScale + axises.length, p[2][1] * axises.letterScale, 0.0f);
+		glVertex3f(p[3][0] * axises.letterScale + axises.length, p[3][1] * axises.letterScale, 0.0f);
+		
+	glEnd();
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPaneContext::drawY() {
 /////////////////////////////////////////////////////////////////////	
-	//todo
+	double p[6][2] = {
+		{ 0.0f, 0.0f}, //0
+		{ 0.5f, 0.5f}, //1
+		
+		{ 0.5f, 0.5f}, //2
+		{ 1.0f, 0.0f}, //3
+		
+		{ 0.5f, 0.5f}, //4
+		{ 0.5f, 1.0f}, //5
+	};
+	
+	glBegin(GL_LINES);
+
+		glColor3f(axises.colours.y.Red()/255, axises.colours.y.Green()/255, axises.colours.y.Blue()/255);
+		
+		glVertex3f(p[0][0] * axises.letterScale, p[0][1] * axises.letterScale + axises.length, 0.0f);
+		glVertex3f(p[1][0] * axises.letterScale, p[1][1] * axises.letterScale + axises.length, 0.0f);
+		
+		glVertex3f(p[2][0] * axises.letterScale, p[2][1] * axises.letterScale + axises.length, 0.0f);
+		glVertex3f(p[3][0] * axises.letterScale, p[3][1] * axises.letterScale + axises.length, 0.0f);
+		
+		glVertex3f(p[4][0] * axises.letterScale, p[4][1] * axises.letterScale + axises.length, 0.0f);
+		glVertex3f(p[5][0] * axises.letterScale, p[5][1] * axises.letterScale + axises.length, 0.0f);
+		
+	glEnd();
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPaneContext::drawZ() {
 /////////////////////////////////////////////////////////////////////	
-	//todo
+	double p[6][2] = {
+		{ 0.0f, 0.0f}, //0
+		{ 1.0f, 0.0f}, //1
+		
+		{ 1.0f, 0.0f}, //2
+		{ 0.0f, 1.0f}, //3
+		
+		{ 0.0f, 1.0f}, //4
+		{ 1.0f, 1.0f}, //5
+	};
+	
+	glBegin(GL_LINES);
+	
+		glColor3f(axises.colours.z.Red()/255, axises.colours.z.Green()/255, axises.colours.z.Blue()/255);
+		
+		glVertex3f(p[0][0] * axises.letterScale, p[0][1] * axises.letterScale, axises.length);
+		glVertex3f(p[1][0] * axises.letterScale, p[1][1] * axises.letterScale, axises.length);
+		
+		glVertex3f(p[2][0] * axises.letterScale, p[2][1] * axises.letterScale, axises.length);
+		glVertex3f(p[3][0] * axises.letterScale, p[3][1] * axises.letterScale, axises.length);
+		
+		glVertex3f(p[4][0] * axises.letterScale, p[4][1] * axises.letterScale, axises.length);
+		glVertex3f(p[5][0] * axises.letterScale, p[5][1] * axises.letterScale, axises.length);
+		
+	glEnd();
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPaneContext::displayCoordinateOrigin() {
 /////////////////////////////////////////////////////////////////////
-	glDisable(GL_LINE_STIPPLE);
 	
-    glBegin(GL_LINES);
-    	glColor3f(1.0, 0.0, 0.0); // red
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.5f, 0.0f, 0.0f);
-    glEnd();
-    drawX();
+	glBegin(GL_LINES);
 
-    glBegin(GL_LINES);			// green
-    	glColor3f(0.0, 1.0, 0.0); 
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.5f, 0.0f);
-    glEnd();
-    drawY();
+		glColor3f(axises.colours.x.Red()/255, axises.colours.x.Green()/255, axises.colours.x.Blue()/255);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(axises.length, 0.0f, 0.0f);
+		
+	glEnd();
+	drawX();
 
-    glBegin(GL_LINES);			// blue
-    	glColor3f(0.0, 0.0, 1.0); 
-        glVertex3f(0.0f, 0.0f, 0.0f);
-        glVertex3f(0.0f, 0.0f, 0.5f);
-    glEnd();
+	glBegin(GL_LINES);
+
+		glColor3f(axises.colours.y.Red()/255, axises.colours.y.Green()/255, axises.colours.y.Blue()/255);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, axises.length, 0.0f);
+	
+	glEnd();
+	drawY();
+
+	glBegin(GL_LINES);
+
+		glColor3f(axises.colours.z.Red()/255, axises.colours.z.Green()/255, axises.colours.z.Blue()/255);
+		glVertex3f(0.0f, 0.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, axises.length);
+	
+	glEnd();
 	drawZ();
-
-    glFlush();
+	
+	glFlush();
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPaneContext::displayDataVector(DrawPaneData& dpd) {
 /////////////////////////////////////////////////////////////////////
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glDisable(GL_LINE_STIPPLE);
 	displayCoordinateOrigin();
 
 	// display given data
@@ -140,4 +190,3 @@ void CncOpenGLDrawPaneContext::displayDataVector(DrawPaneData& dpd) {
     glFlush();
     CncOpenGLDrawPane::CheckGLError();
 }
-

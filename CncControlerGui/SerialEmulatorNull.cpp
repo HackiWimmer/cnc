@@ -90,12 +90,13 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 				  << cncControl->getCurPos().getY() << std::endl;
 	}
 
+	wxString firmWare(wxString::Format("%s", FIRMWARE_VERSION));
 	switch( lastCommand.cmd ) { 
 		case 'm':
 		case 'M':	ret = readMove(buffer, nbByte);
 					break;
 					
-		case 'V': 	ret = readDefault(buffer, nbByte, " Firmaware: <42>\n");
+		case 'V': 	ret = readDefault(buffer, nbByte, firmWare);
 					break;
 					
 		case '?': 	ret = readDefault(buffer, nbByte, "1:0:Not available, because there's no controller connection\n");
@@ -111,11 +112,12 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 					ret = 1;
 					lastCommand.restLastCmd();
 	}
-
+	
+	spyReadData(ret, buffer, nbByte);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::readDefault(void *buffer, unsigned int nbByte,const char* response) {
+int SerialEmulatorNULL::readDefault(void *buffer, unsigned int nbByte, const char* response) {
 ///////////////////////////////////////////////////////////////////
 	int ret = 0;
 	
@@ -209,7 +211,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case 'M':	return writeMoveCmd(b, nbByte);
 		default:	; // Do nothing
 	}
-	
+	spyWriteData(b, nbByte);
 	return true;
 }
 ///////////////////////////////////////////////////////////////////

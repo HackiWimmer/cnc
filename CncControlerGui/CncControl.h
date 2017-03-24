@@ -282,7 +282,7 @@ class CncControl {
 		void simulateZAxisDown() { zAxisDown = true; }
 		// Tool management
 		void switchToolOn();
-		void switchToolOff();
+		void switchToolOff(bool force = false);
 		bool getToolState() { return powerOn; }	
 		// Updates the config trace control
 		void updateCncConfigTrace();

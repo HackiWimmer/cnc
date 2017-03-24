@@ -47,6 +47,8 @@
       <File Name="SerialEmulatorNull.h"/>
       <File Name="SerialEmulatorSVG.h"/>
       <File Name="SerialPort.h"/>
+      <File Name="SerialSpyPort.h"/>
+      <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Svg">
       <File Name="SVGCurveLib.cpp"/>
@@ -93,6 +95,7 @@
       <File Name="CoordinateSystem.h"/>
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
+      <File Name="CncStreamBuffers.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -118,6 +121,11 @@
       <File Name="LruFileList.h"/>
       <File Name="NotebookInfo.h"/>
       <File Name="strsafe.h"/>
+      <File Name="HexDecoder.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Spy">
+      <File Name="CncSpyControl.h"/>
+      <File Name="CncSpyControl.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">

@@ -89,6 +89,8 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
+  <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
+  <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-debugger_restart">bitmaps\24-debugger_restart.png</object>
   <object class="wxBitmap" name="24-debugger_restart@2x">bitmaps\24-debugger_restart@2x.png</object>
   <object class="wxBitmap" name="24-debugger_start">bitmaps\24-debugger_start.png</object>
@@ -116,6 +118,9 @@
   <object class="wxBitmap" name="BMP_FINGER16">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-finger.png</object>
   <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-finger@2x.png</object>
   <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-finger@2x.png</object>
+  <object class="wxBitmap" name="BMP_FROZEN">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-x-close.png</object>
+  <object class="wxBitmap" name="BMP_FROZEN@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-x-close@2x.png</object>
+  <object class="wxBitmap" name="BMP_FROZEN@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\mill.png</object>
   <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-file_close.png</object>
   <object class="wxBitmap" name="BMP_MONITORING_MINIMAL@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-file_close@2x.png</object>
@@ -123,6 +128,9 @@
   <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-cog.png</object>
   <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-cog@2x.png</object>
   <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-cog@2x.png</object>
+  <object class="wxBitmap" name="BMP_NOT_FROZEN">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-find_and_replace.png</object>
+  <object class="wxBitmap" name="BMP_NOT_FROZEN@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-find_and_replace@2x.png</object>
+  <object class="wxBitmap" name="BMP_NOT_FROZEN@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-find_and_replace@2x.png</object>
   <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok@2x.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok@2x.png</object>
@@ -135,6 +143,12 @@
   <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-debugger_start.png</object>
   <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
   <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
+  <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-debugger_stop.png</object>
+  <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-debugger_stop@2x.png</object>
+  <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-debugger_stop@2x.png</object>
+  <object class="wxBitmap" name="BMP_SERIAL_SYP_ON">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok.png</object>
+  <object class="wxBitmap" name="BMP_SERIAL_SYP_ON@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok@2x.png</object>
+  <object class="wxBitmap" name="BMP_SERIAL_SYP_ON@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-ok@2x.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>

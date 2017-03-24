@@ -505,6 +505,17 @@ protected:
     wxWebView* m_svgPreview;
 #endif // wxUSE_WEBVIEW
 
+    wxPanel* m_panelSerialSpy;
+    wxFlexGridSizer* flexGridSizer2726;
+    wxFlexGridSizer* flexGridSizer2730;
+    wxButton* m_enableSerialSpy;
+    wxButton* m_freezeSerialSpy;
+    wxButton* m_clearSerialSpy;
+    wxCheckBox* m_clearSerialSpyOnConnect;
+    wxFlexGridSizer* flexGridSizer2741;
+    wxTextCtrl* m_serialSpy;
+    wxStaticText* m_staticText2751;
+    wxTextCtrl* m_serialSpyDetails;
     wxScrolledWindow* m_scrollWinFile;
     wxFlexGridSizer* flexGridSizer1628;
     wxTreebook* m_templateTreeBook;
@@ -524,6 +535,7 @@ protected:
     wxFlexGridSizer* flexGridSizer869;
     wxFlexGridSizer* flexGridSizer1863;
     wxBitmapButton* m_clearLogger;
+    wxBitmapButton* m_freezeLogger;
     wxBitmapButton* m_copyLogger;
     wxFlexGridSizer* flexGridSizer2520;
     wxTextCtrl* m_logger;
@@ -936,6 +948,9 @@ protected:
     virtual void selectSvgDebuggerInfoDetail(wxDataViewEvent& event) { event.Skip(); }
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
+    virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void freezeSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void leaveEnterFileManagerControl(wxMouseEvent& event) { event.Skip(); }
     virtual void lruListItemActivated(wxCommandEvent& event) { event.Skip(); }
     virtual void lruListItemSelected(wxCommandEvent& event) { event.Skip(); }
@@ -945,6 +960,7 @@ protected:
     virtual void dirCtrlChanged(wxTreeEvent& event) { event.Skip(); }
     virtual void dirCtrlActivated(wxTreeEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
+    virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void disableSlider(wxMouseEvent& event) { event.Skip(); }
@@ -1381,6 +1397,14 @@ public:
     wxPanel* GetPanelTplPreview() { return m_panelTplPreview; }
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetPanelTemplateContent() { return m_panelTemplateContent; }
+    wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
+    wxButton* GetFreezeSerialSpy() { return m_freezeSerialSpy; }
+    wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
+    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
+    wxTextCtrl* GetSerialSpy() { return m_serialSpy; }
+    wxStaticText* GetStaticText2751() { return m_staticText2751; }
+    wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
+    wxPanel* GetPanelSerialSpy() { return m_panelSerialSpy; }
     wxNotebook* GetMainNotebook() { return m_mainNotebook; }
     wxScrolledWindow* GetScrollWinMain() { return m_scrollWinMain; }
     wxStaticText* GetStaticText1644() { return m_staticText1644; }
@@ -1394,6 +1418,7 @@ public:
     wxTreebook* GetTemplateTreeBook() { return m_templateTreeBook; }
     wxScrolledWindow* GetScrollWinFile() { return m_scrollWinFile; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
+    wxBitmapButton* GetFreezeLogger() { return m_freezeLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
     wxTextCtrl* GetLogger() { return m_logger; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }

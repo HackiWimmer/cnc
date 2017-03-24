@@ -11,6 +11,7 @@
 #include "InterruptThread.h"
 #include "CncControl.h"
 #include "CncDrawPane.h"
+#include "CncSpyControl.h"
 #include "codelite/wxPNGAnimation.h"
 
 // declare a new type of event, to be used by our MyThread class:
@@ -37,10 +38,18 @@ class MainFrame : public MainFrameBClass {
 		wxTextCtrl* getLogger() { return m_logger; }
 		wxTextCtrl* getTrace() { return m_tmpTraceInfo; }
 		wxTextCtrl* getCtrlMessageHistory() { return m_controllerMsgHistory; }
+		wxTextCtrl* getCtrlSerialSpy() { return serialSpy; }
+		
+		void install3DPane();
+		void installSypControl();
 		
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 	protected:
+    virtual void enableSerialSpy(wxCommandEvent& event);
+    virtual void clearSerialSpy(wxCommandEvent& event);
+    virtual void freezeSerialSpy(wxCommandEvent& event);
+	virtual void freezeLogger(wxCommandEvent& event);
     virtual void show3DPaneHelp(wxCommandEvent& event);
     virtual void selectedPlane3D(wxCommandEvent& event);
  
@@ -71,6 +80,7 @@ class MainFrame : public MainFrameBClass {
 	
 		CncControl* cnc;
 		CncOpenGLDrawPane* drawPane3D;
+		CncSpyControl* serialSpy;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -226,11 +236,17 @@ class MainFrame : public MainFrameBClass {
 		void disableGuiControls();
 		void enableGuiControls(bool state = true);
 		
-		void install3DPane();
-		
 		void decorateTestSuiteParameters();
 		void enableTestParameter(bool state);
 		void disableTestParameter() { enableTestParameter(false); }
+		
+		void enableSerialSpy(bool state = true);
+		void disableSerialSpy() { enableSerialSpy(false); }
+		void decorateSerialSpy();
+		
+		void freezeSerialSpy(bool state = true); 
+		void unfreezeSerialSpy() { freezeSerialSpy(false); }
+		void clearSerialSpy();
 
 		///////////////////////////////////////////////////////////////
 		// manually control

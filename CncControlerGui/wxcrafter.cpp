@@ -84,7 +84,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText1748->Hide();
     m_auibarMain->AddControl(m_staticText1748);
     
-    m_stepDelay = new wxSlider(m_auibarMain, wxID_ANY, 0, 0, 200, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(200,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
+    m_stepDelay = new wxSlider(m_auibarMain, wxID_ANY, 0, 0, 200, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(140,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
     wxFont m_stepDelayFont(6, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_stepDelay->SetFont(m_stepDelayFont);
     m_stepDelay->SetToolTip(_("Artificially Step Delay"));
@@ -2867,6 +2867,90 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer692->Add(m_svgPreview, 1, wxALL|wxEXPAND, WXC_FROM_DIP(4));
     #endif // wxUSE_WEBVIEW
     
+    m_panelSerialSpy = new wxPanel(m_mainNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_panelSerialSpyImgIndex;
+    m_panelSerialSpyImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));
+    m_mainNotebook->AddPage(m_panelSerialSpy, _("Serial Spy"), false, m_panelSerialSpyImgIndex);
+    
+    flexGridSizer2726 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer2726->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2726->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2726->AddGrowableCol(1);
+    flexGridSizer2726->AddGrowableRow(0);
+    m_panelSerialSpy->SetSizer(flexGridSizer2726);
+    
+    flexGridSizer2730 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer2730->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2730->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer2726->Add(flexGridSizer2730, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_enableSerialSpy = new wxButton(m_panelSerialSpy, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelSerialSpy, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_enableSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-x-close")), wxLEFT);
+    m_enableSerialSpy->SetBitmapMargins(2,2);
+    #endif
+    m_enableSerialSpy->SetToolTip(_("Enable Serial Spy"));
+    
+    flexGridSizer2730->Add(m_enableSerialSpy, 0, wxALL, WXC_FROM_DIP(1));
+    m_enableSerialSpy->SetMinSize(wxSize(24,24));
+    
+    m_freezeSerialSpy = new wxButton(m_panelSerialSpy, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelSerialSpy, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_freezeSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-find_and_replace")), wxLEFT);
+    m_freezeSerialSpy->SetBitmapMargins(2,2);
+    #endif
+    m_freezeSerialSpy->SetToolTip(_("Freeze/Unfreeze Spy"));
+    
+    flexGridSizer2730->Add(m_freezeSerialSpy, 0, wxALL, WXC_FROM_DIP(1));
+    m_freezeSerialSpy->SetMinSize(wxSize(24,24));
+    
+    m_clearSerialSpy = new wxButton(m_panelSerialSpy, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelSerialSpy, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_clearSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_clearSerialSpy->SetBitmapMargins(2,2);
+    #endif
+    m_clearSerialSpy->SetToolTip(_("Clear the Spy Trace"));
+    
+    flexGridSizer2730->Add(m_clearSerialSpy, 0, wxALL, WXC_FROM_DIP(1));
+    m_clearSerialSpy->SetMinSize(wxSize(24,24));
+    
+    m_clearSerialSpyOnConnect = new wxCheckBox(m_panelSerialSpy, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelSerialSpy, wxSize(-1,-1)), 0);
+    m_clearSerialSpyOnConnect->SetValue(true);
+    m_clearSerialSpyOnConnect->SetToolTip(_("Clear on Connect"));
+    
+    flexGridSizer2730->Add(m_clearSerialSpyOnConnect, 0, wxALL, WXC_FROM_DIP(6));
+    
+    flexGridSizer2741 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer2741->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2741->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2741->AddGrowableCol(0);
+    flexGridSizer2741->AddGrowableRow(0);
+    
+    flexGridSizer2726->Add(flexGridSizer2741, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_serialSpy = new wxTextCtrl(m_panelSerialSpy, wxID_ANY, wxT("Only a placeholder;Dont install any events similar the drawPane3D"), wxDefaultPosition, wxDLG_UNIT(m_panelSerialSpy, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
+    wxFont m_serialSpyFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_serialSpy->SetFont(m_serialSpyFont);
+    
+    flexGridSizer2741->Add(m_serialSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText2751 = new wxStaticText(m_panelSerialSpy, wxID_ANY, _("HEX Decode Details:"), wxDefaultPosition, wxDLG_UNIT(m_panelSerialSpy, wxSize(-1,-1)), 0);
+    wxFont m_staticText2751Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_staticText2751Font.SetWeight(wxFONTWEIGHT_BOLD);
+    m_staticText2751->SetFont(m_staticText2751Font);
+    
+    flexGridSizer2741->Add(m_staticText2751, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_serialSpyDetails = new wxTextCtrl(m_panelSerialSpy, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelSerialSpy, wxSize(-1,80)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE);
+    m_serialSpyDetails->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_serialSpyDetails->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_serialSpyDetailsFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_serialSpyDetails->SetFont(m_serialSpyDetailsFont);
+    
+    flexGridSizer2741->Add(m_serialSpyDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_serialSpyDetails->SetMinSize(wxSize(-1,80));
+    
     m_scrollWinFile = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHSCROLL | wxVSCROLL);
     m_scrollWinFile->SetScrollRate(5, 5);
     
@@ -2994,6 +3078,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_clearLogger->SetToolTip(_("Clear Logger Panel"));
     
     flexGridSizer1863->Add(m_clearLogger, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_freezeLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-find_and_replace")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_freezeLogger->SetToolTip(_("Freeze/Unfreeze Logger"));
+    
+    flexGridSizer1863->Add(m_freezeLogger, 0, wxALL, WXC_FROM_DIP(1));
     
     m_copyLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_copyLogger->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
@@ -4713,7 +4802,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_miRqtIdleMessages = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Request Idle Messages"), wxT(""), wxITEM_CHECK);
     m_menuRequestor->Append(m_miRqtIdleMessages);
-    m_miRqtIdleMessages->Check();
     
     m_menuRequestor->AppendSeparator();
     
@@ -5013,6 +5101,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #if wxUSE_WEBVIEW
     
     #endif // wxUSE_WEBVIEW
+    m_enableSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
+    m_freezeSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeSerialSpy), NULL, this);
+    m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
     m_scrollWinFile->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveEnterFileManagerControl), NULL, this);
     m_scrollWinFile->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveEnterFileManagerControl), NULL, this);
     m_staticText1644->Connect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveEnterFileManagerControl), NULL, this);
@@ -5027,6 +5118,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_dirCtrl->Connect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainFrameBClass::dirCtrlChanged), NULL, this);
     m_dirCtrl->Connect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(MainFrameBClass::dirCtrlActivated), NULL, this);
     m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
+    m_freezeLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_tmpTraceInfo->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_speedX->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
@@ -5286,6 +5378,9 @@ MainFrameBClass::~MainFrameBClass()
     #if wxUSE_WEBVIEW
     
     #endif // wxUSE_WEBVIEW
+    m_enableSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
+    m_freezeSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeSerialSpy), NULL, this);
+    m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
     m_scrollWinFile->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveEnterFileManagerControl), NULL, this);
     m_scrollWinFile->Disconnect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveEnterFileManagerControl), NULL, this);
     m_staticText1644->Disconnect(wxEVT_ENTER_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveEnterFileManagerControl), NULL, this);
@@ -5300,6 +5395,7 @@ MainFrameBClass::~MainFrameBClass()
     m_dirCtrl->Disconnect(wxEVT_COMMAND_TREE_SEL_CHANGED, wxTreeEventHandler(MainFrameBClass::dirCtrlChanged), NULL, this);
     m_dirCtrl->Disconnect(wxEVT_COMMAND_TREE_ITEM_ACTIVATED, wxTreeEventHandler(MainFrameBClass::dirCtrlActivated), NULL, this);
     m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
+    m_freezeLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_speedX->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
@@ -6033,6 +6129,106 @@ ImageLib16::ImageLib16()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_STOP_3D@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SERIAL_SYP_ON"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SERIAL_SYP_ON"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SERIAL_SYP_ON@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SERIAL_SYP_ON@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SERIAL_SPY_OFF"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SERIAL_SPY_OFF"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SERIAL_SPY_OFF@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SERIAL_SPY_OFF@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NOT_FROZEN"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NOT_FROZEN"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NOT_FROZEN@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NOT_FROZEN@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_FROZEN"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_FROZEN"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_FROZEN@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_FROZEN@2x"), bmp));
         }
     }
     

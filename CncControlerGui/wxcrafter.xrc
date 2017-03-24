@@ -116,7 +116,7 @@
             <min>0</min>
             <max>200</max>
             <value>0</value>
-            <size>200,-1</size>
+            <size>140,-1</size>
           </object>
           <object class="wxStaticText" name="m_stepDelayValue">
             <label>0 ms</label>
@@ -5102,6 +5102,155 @@
                     </object>
                   </object>
                 </object>
+                <object class="notebookpage">
+                  <label>Serial Spy</label>
+                  <bitmap>bitmaps/16-console.png</bitmap>
+                  <selected>0</selected>
+                  <object class="wxPanel" name="m_panelSerialSpy">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <object class="wxFlexGridSizer">
+                      <cols>2</cols>
+                      <rows>1</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>1</growablecols>
+                      <growablerows>0</growablerows>
+                      <object class="sizeritem" name="flexGridSizer2730">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <option>1</option>
+                        <object class="wxFlexGridSizer">
+                          <cols>1</cols>
+                          <rows>0</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols/>
+                          <growablerows/>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_enableSerialSpy">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Enable Serial Spy]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-x-close.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_freezeSerialSpy">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Freeze/Unfreeze Spy]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-find_and_replace.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_clearSerialSpy">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Clear the Spy Trace]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-clean.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>6</border>
+                            <object class="wxCheckBox" name="m_clearSerialSpyOnConnect">
+                              <tooltip>
+                                <![CDATA[Clear on Connect]]>
+                              </tooltip>
+                              <style/>
+                              <label/>
+                              <checked>1</checked>
+                            </object>
+                          </object>
+                        </object>
+                      </object>
+                      <object class="sizeritem" name="flexGridSizer2741">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <object class="wxFlexGridSizer">
+                          <cols>1</cols>
+                          <rows>3</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols>0</growablecols>
+                          <growablerows>0</growablerows>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>1</border>
+                            <object class="wxTextCtrl" name="m_serialSpy">
+                              <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+                              <font>
+                                <size>10</size>
+                                <style>normal</style>
+                                <weight>normal</weight>
+                                <family>modern</family>
+                                <underlined>0</underlined>
+                                <face>Consolas</face>
+                              </font>
+                              <value>Only a placeholder;Dont install any events similar the drawPane3D</value>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <object class="wxStaticText" name="m_staticText2751">
+                              <label>HEX Decode Details:</label>
+                              <style/>
+                              <font>
+                                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                <style>normal</style>
+                                <weight>bold</weight>
+                                <underlined>0</underlined>
+                              </font>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>1</border>
+                            <minsize>-1,80</minsize>
+                            <object class="wxTextCtrl" name="m_serialSpyDetails">
+                              <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE</style>
+                              <size>-1,80</size>
+                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                              <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                              <font>
+                                <size>10</size>
+                                <style>normal</style>
+                                <weight>normal</weight>
+                                <family>modern</family>
+                                <underlined>0</underlined>
+                                <face>Consolas</face>
+                              </font>
+                            </object>
+                          </object>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                </object>
               </object>
             </object>
           </object>
@@ -5354,6 +5503,18 @@
                     <style>wxBU_AUTODRAW</style>
                     <tooltip>
                       <![CDATA[Clear Logger Panel]]>
+                    </tooltip>
+                    <default>0</default>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>1</border>
+                  <object class="wxBitmapButton" name="m_freezeLogger">
+                    <bitmap>bitmaps/16-find_and_replace.png</bitmap>
+                    <style>wxBU_AUTODRAW</style>
+                    <tooltip>
+                      <![CDATA[Freeze/Unfreeze Logger]]>
                     </tooltip>
                     <default>0</default>
                   </object>
@@ -8367,7 +8528,6 @@
           <accel>
             <![CDATA[]]>
           </accel>
-          <checked>1</checked>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtVersion">

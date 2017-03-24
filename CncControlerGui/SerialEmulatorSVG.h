@@ -141,6 +141,11 @@ class SerialEmulatorSVG : public SerialEmulatorFile {
 		
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulatorSVG"; }
+		// returns the emulator type
+		virtual bool isEmulator() const { return true; }
+		// return the port type
+		virtual const CncPortType getPortType() const { return CncEMU_SVG; }
+		// returns the port name
 		virtual const char* getPortName();
 		//Open file
 		virtual bool connect(const char* fileName);

@@ -9,7 +9,7 @@
 //#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.5\cv.h"
 //#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.6\cv.h"
 //#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.7\cv.h"
-#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.7.2\cv.h"
+#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1\cv.h"
 
 #include <string>
 

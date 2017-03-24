@@ -8,6 +8,7 @@ namespace cnc {
 	extern CncBasicLogStream cex1;
 	extern CncTraceLogStream trc;
 	extern CncMsgLogStream msg;
+	extern CncSerialSpyStream spy;
 }
 
 // make std globally available
@@ -33,6 +34,7 @@ static const unsigned int MainSetupPage 			= 1;
 static const unsigned int MainTestPage 				= 2; 
 static const unsigned int MainManuallyPage 			= 3;
 static const unsigned int MainTemplatePage 			= 4;
+static const unsigned int MainSerialSpy 			= 5;
 
 
 static const unsigned int TemplateContentPage 		= 0; 

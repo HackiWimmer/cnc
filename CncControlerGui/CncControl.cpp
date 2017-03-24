@@ -47,10 +47,12 @@ CncControl::CncControl(CncPortType pt)
 , motionMonitorMode(MMM_2D)
 {
 //////////////////////////////////////////////////////////////////
-	if      ( pt == CncPORT ) 		serialPort = new Serial(this);
+	if      ( pt == CncPORT ) 		serialPort = new SerialSpyPort(this);
 	else if ( pt == CncEMU_NULL )	serialPort = new SerialEmulatorNULL(this);
 	else if ( pt == CncEMU_SVG )	serialPort = new SerialEmulatorSVG(this);
-	else 							serialPort = new Serial(this);
+	else 							serialPort = new SerialSpyPort(this);
+	
+	serialPort->enableSpyOutput();
 	
 	// create default config
 	CncConfig cc;
@@ -282,7 +284,17 @@ void CncControl::setup(bool doReset) {
 		
 		std::cout << "Ready\n";
 	}
-	processCommand("V", std::cout);
+	
+	// Firmware check
+	std::cout << "Firmware:" << std::endl;
+	std::cout << " Available:\t";
+	std::stringstream ss;
+	processCommand("V", ss);
+	std::cout << ss.str() << std::endl;
+	std::cout << " Required:\t" << FIRMWARE_VERSION << std::endl;
+	
+	if ( wxString(FIRMWARE_VERSION) != ss.str().c_str() )
+		cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
 
 	logProcessingEnd();
 }
@@ -511,7 +523,7 @@ void CncControl::interrupt() {
 ///////////////////////////////////////////////////////////////////
 	std::cerr << "CncControl: Interrupted" << std::endl;
 	interruptState = true;
-	switchToolOff();
+	switchToolOff(true);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isInterrupted() {
@@ -953,8 +965,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			break;
 			
 		case CITSetterInfo:
-			if ( getSerial()->getInfoOutput() == true )
-				std::clog << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
+			if ( getSerial()->isSpyOutput() == true )
+				cnc::spy << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
 			break;
 		
 		case CITLimitInfo:
@@ -1663,9 +1675,6 @@ void CncControl::switchToolOn() {
 		return;
 
 	if ( powerOn == false ) { 
-		if ( serialPort->getInfoOutput() )
-			std::cout << " Switch tool on" << std::endl;
-		
 		if ( processSetter(PID_ROUTER_SWITCH, 1) ) {
 			powerOn = true;
 			setToolState();
@@ -1673,15 +1682,12 @@ void CncControl::switchToolOn() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::switchToolOff() {
+void CncControl::switchToolOff(bool force) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return;
 
-	if ( powerOn == true ) {
-		if ( serialPort->getInfoOutput() )
-			std::cout << " Switch tool off" << std::endl;
-		
+	if ( powerOn == true || force == true ) {
 		if ( processSetter(PID_ROUTER_SWITCH, 0) ) {
 			powerOn = false;
 			setToolState();

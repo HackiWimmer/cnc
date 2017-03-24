@@ -382,7 +382,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 	for (CncPathList::iterator it = pathList.list.begin(); it != pathList.list.end(); ++it) {
 		
 		// Artificially waste time
-		Sleep(cncControl->getStepDelay());
+		cncControl->waitActive(cncControl->getStepDelay());
 		
 		CncPathListEntry cpe = *it;
 		cnt++;
