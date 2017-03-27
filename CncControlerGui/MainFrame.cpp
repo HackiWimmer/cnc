@@ -102,6 +102,9 @@ MainFrame::MainFrame(wxWindow* parent)
 	install3DPane();
 	installSypControl();
 	
+	// That is a test
+	int i = 42;
+	
 	// instll galobal key down hook
 	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
 }
