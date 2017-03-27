@@ -84,7 +84,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText1748->Hide();
     m_auibarMain->AddControl(m_staticText1748);
     
-    m_stepDelay = new wxSlider(m_auibarMain, wxID_ANY, 0, 0, 200, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(140,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
+    m_auibarMain->AddTool(wxID_ANY, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-fold")), wxNullBitmap, wxITEM_NORMAL, _("Config Step Delay"), wxT(""), NULL);
+    wxAuiToolBarItem* m_configStepDelay = m_auibarMain->FindToolByIndex(m_auibarMain->GetToolCount()-1);
+    if (m_configStepDelay) {
+        m_configStepDelay->SetHasDropDown(true);
+        m_configStepDelayMenu = new wxMenu;
+        m_miCfgStepDelayMin = new wxMenuItem(m_configStepDelayMenu, wxID_ANY, _("Set Step Delay (MIN)"), wxT(""), wxITEM_RADIO);
+        m_configStepDelayMenu->Append(m_miCfgStepDelayMin);
+        m_miCfgStepDelayMax = new wxMenuItem(m_configStepDelayMenu, wxID_ANY, _("Set Step Delay (MAX)"), wxT(""), wxITEM_RADIO);
+        m_configStepDelayMenu->Append(m_miCfgStepDelayMax);
+        m_miCfgSimulateArduino = new wxMenuItem(m_configStepDelayMenu, wxID_ANY, _("Simulate Arduino"), wxT(""), wxITEM_RADIO);
+        m_configStepDelayMenu->Append(m_miCfgSimulateArduino);
+        
+        m_dropdownMenus.insert(std::make_pair( m_configStepDelay->GetId(), m_configStepDelayMenu) );
+    }
+    
+    m_stepDelay = new wxSlider(m_auibarMain, wxID_ANY, 0, 0, 300, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(140,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
     wxFont m_stepDelayFont(6, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_stepDelay->SetFont(m_stepDelayFont);
     m_stepDelay->SetToolTip(_("Artificially Step Delay"));
@@ -3835,10 +3850,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1042->Add(flexGridSizer1046, 1, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(1));
     
-    m_staticBitmap2401 = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mill")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
-    
-    flexGridSizer1046->Add(m_staticBitmap2401, 0, wxALL, WXC_FROM_DIP(5));
-    
     m_staticText1048 = new wxStaticText(m_outPanel, wxID_ANY, _("Z:"), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0);
     wxFont m_staticText1048Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1048Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -3846,13 +3857,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1046->Add(m_staticText1048, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
     
-    m_zSlider = new wxSlider(m_outPanel, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), wxSL_SELRANGE|wxSL_VERTICAL);
-    m_zSlider->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_MENU));
-    m_zSlider->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE));
-    wxFont m_zSliderFont(6, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_zSlider->SetFont(m_zSliderFont);
+    flexGridSizer1046->Add(0, 9, 1, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizer1046->Add(m_zSlider, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
+    m_zView = new CncZView(m_outPanel, wxID_ANY);
+    flexGridSizer1046->Add(m_zView, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_zView->SetMinSize(wxSize(20,60));
+    
+    flexGridSizer1046->Add(0, 1, 1, wxALL, WXC_FROM_DIP(4));
+    
+    m_staticBitmap2401 = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mill")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer1046->Add(m_staticBitmap2401, 0, wxALL, WXC_FROM_DIP(5));
     
     flexGridSizer742 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer742->SetFlexibleDirection( wxBOTH );
@@ -4975,6 +4990,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_portSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
+    this->Connect(wxID_ANY, wxEVT_COMMAND_AUITOOLBAR_TOOL_DROPDOWN, wxAuiToolBarEventHandler(MainFrameBClass::cfgStepDelayDropDown), NULL, this);
+    this->Connect(m_miCfgStepDelayMin->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMin), NULL, this);
+    this->Connect(m_miCfgStepDelayMax->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMax), NULL, this);
+    this->Connect(m_miCfgSimulateArduino->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayArduino), NULL, this);
     m_stepDelay->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::stepDelayChanged), NULL, this);
     m_stepDelay->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::stepDelayThumbtrack), NULL, this);
     m_rcReset->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcReset), NULL, this);
@@ -5141,7 +5160,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btRequestCtlPins->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btRequestCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
-    m_zSlider->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
     m_cbCurveLibResolution->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_switchCoordType->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchCoordinateSystemType), NULL, this);
     m_switchMonitoing->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
@@ -5252,6 +5270,10 @@ MainFrameBClass::~MainFrameBClass()
     m_portSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
+    this->Disconnect(wxID_ANY, wxEVT_COMMAND_AUITOOLBAR_TOOL_DROPDOWN, wxAuiToolBarEventHandler(MainFrameBClass::cfgStepDelayDropDown), NULL, this);
+    this->Disconnect(m_miCfgStepDelayMin->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMin), NULL, this);
+    this->Disconnect(m_miCfgStepDelayMax->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMax), NULL, this);
+    this->Disconnect(m_miCfgSimulateArduino->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayArduino), NULL, this);
     m_stepDelay->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::stepDelayChanged), NULL, this);
     m_stepDelay->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::stepDelayThumbtrack), NULL, this);
     m_rcReset->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcReset), NULL, this);
@@ -5418,7 +5440,6 @@ MainFrameBClass::~MainFrameBClass()
     m_btRequestCtlPins->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btRequestCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
-    m_zSlider->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
     m_cbCurveLibResolution->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_switchCoordType->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchCoordinateSystemType), NULL, this);
     m_switchMonitoing->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);

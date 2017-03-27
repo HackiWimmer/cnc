@@ -46,6 +46,10 @@ class MainFrame : public MainFrameBClass {
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 	protected:
+    virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event);
+    virtual void cfgStepDelayArduino(wxCommandEvent& event);
+    virtual void cfgStepDelayMax(wxCommandEvent& event);
+    virtual void cfgStepDelayMin(wxCommandEvent& event);
     virtual void enableSerialSpy(wxCommandEvent& event);
     virtual void clearSerialSpy(wxCommandEvent& event);
     virtual void freezeSerialSpy(wxCommandEvent& event);

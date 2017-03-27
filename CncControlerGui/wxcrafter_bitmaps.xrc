@@ -49,6 +49,8 @@
   <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
   <object class="wxBitmap" name="16-find_and_replace">bitmaps\16-find_and_replace.png</object>
   <object class="wxBitmap" name="16-find_and_replace@2x">bitmaps\16-find_and_replace@2x.png</object>
+  <object class="wxBitmap" name="16-fold">bitmaps\16-fold.png</object>
+  <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
   <object class="wxBitmap" name="16-globals">bitmaps\16-globals.png</object>
   <object class="wxBitmap" name="16-globals@2x">bitmaps\16-globals@2x.png</object>
   <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>

@@ -163,11 +163,6 @@ class CncControl {
 		void setValue(wxTextCtrl *ctl, double val);
 		void setValue(wxTextCtrl *ctl, const char* t);
 
-		// Controls the z slider
-		void setZSliderMaxValue(unsigned int max);
-		void setZSliderRange(unsigned int min, unsigned int max);
-		void setZSliderValue(unsigned int val);
-		
 		// Draw pane helper
 		void drawText(wxPaintDC& dc, wxString text, wxPoint pt);
 
@@ -318,7 +313,6 @@ class CncControl {
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
 		void enableStepperMotors(bool s);
 		// Controls the z slider
-		void restoreZSlider();
 		void updateZSlider();
 		// zoom handling
 		void setDrawPaneZoomFactor(double f);

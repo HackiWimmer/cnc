@@ -965,8 +965,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			break;
 			
 		case CITSetterInfo:
-			if ( getSerial()->isSpyOutput() == true )
-				cnc::spy << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
+			//if ( getSerial()->isSpyOutput() == true )
+			//	cnc::spy << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
 			break;
 		
 		case CITLimitInfo:
@@ -1800,46 +1800,15 @@ void CncControl::enableStepperMotors(bool s) {
 		guiCtlSetup->motorState->Check(s);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setZSliderRange(unsigned int min, unsigned int max) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( guiCtlSetup->zSlider == NULL )
-		return;
-
-	guiCtlSetup->zSlider->SetRange(min, max);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::setZSliderMaxValue(unsigned int max) {
-///////////////////////////////////////////////////////////////////
-	setZSliderRange(0, max);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::setZSliderValue(unsigned int val) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( guiCtlSetup->zSlider == NULL )
-		return;
-		
-	guiCtlSetup->zSlider->SetValue(guiCtlSetup->zSlider->GetMax() - val);
-	guiCtlSetup->zSlider->SetLabelText(wxString() << val);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::restoreZSlider() {
-///////////////////////////////////////////////////////////////////
-	double wpt = getCncConfig()->getWorkpieceThickness();
-	double oft = getCncConfig()->getWorkpieceOffset();
-	
-	unsigned int max = (wpt + oft ) * getCncConfig()->getCalculationFactZ();
-	setZSliderMaxValue(max * 100);
-	updateZSlider();
-}
-///////////////////////////////////////////////////////////////////
 void CncControl::updateZSlider() {
 ///////////////////////////////////////////////////////////////////
-	if ( cncConfig->isOnlineUpdateCoordinates() )
-		setZSliderValue(curPos.getZ() * 100);
+	wxASSERT(guiCtlSetup);
+	
+	if ( guiCtlSetup->zView == NULL ) 
+		return;
+		
+	wxASSERT(cncConfig);
+	guiCtlSetup->zView->updateView(curPos.getZ() * cncConfig->getDisplayFactZ(), *cncConfig);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::evaluateLimitState() {

@@ -862,9 +862,6 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 		unsigned char ret = fetchControllerResult(sfi.singleFetchTimeout);
 		setLastFetchType(ret);
 		
-		if (traceInfo) 
-			cnc::spy << "Serial::fetchResult: Command: " << sfi.command << ", Result: " << decodeContollerResult(ret) << std::endl;
-		
 		switch( ret ) {
 			//evaluateResult..........................................
 			case RET_OK:
@@ -977,9 +974,6 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 ///////////////////////////////////////////////////////////////////
 bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
-	if (traceInfo) 
-		cnc::spy << "Serial::RET_OK_Handler: Command: " << sfi.command << ", as integer: " << (int)sfi.command << std::endl;
-
 	switch ( sfi.command ) {
 		//RET_OK_Handler...........................................
 		case 'S':
@@ -1056,9 +1050,6 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 ///////////////////////////////////////////////////////////////////
 bool Serial::RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
-	if (traceInfo) 
-		cnc::spy << "Serial::RET_SOT_Handler: Command: " << sfi.command << ", as integer: " << (int)sfi.command << std::endl;
-
 	switch ( sfi.command ) {
 		//RET_SOT_Handler..........................................
 		default:
@@ -1082,9 +1073,6 @@ bool Serial::RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 ///////////////////////////////////////////////////////////////////
 bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
-	if (traceInfo) 
-		cnc::spy << "Serial::RET_SOH_Handler: Command: " << sfi.command << ", as integer: " << (int)sfi.command << std::endl;
-	
 	// read first byte (content info) after RET_SOH
 	unsigned char cr = fetchControllerResult(sfi.singleFetchTimeout);
 	

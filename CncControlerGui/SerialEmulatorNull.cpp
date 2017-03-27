@@ -195,7 +195,9 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( connected == false )
 		return false;
-
+		
+	spyWriteData(b, nbByte);
+	
 	char* buffer = ((char*)b);
 	lastCommand.cmd = buffer[0];
 	
@@ -211,7 +213,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case 'M':	return writeMoveCmd(b, nbByte);
 		default:	; // Do nothing
 	}
-	spyWriteData(b, nbByte);
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////

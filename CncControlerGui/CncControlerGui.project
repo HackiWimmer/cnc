@@ -127,6 +127,8 @@
       <File Name="CncSpyControl.h"/>
       <File Name="CncSpyControl.cpp"/>
     </VirtualDirectory>
+    <File Name="CnczView.h"/>
+    <File Name="CncZView.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="win_resources.rc"/>

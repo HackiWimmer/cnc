@@ -46,6 +46,7 @@
 #include <wx/dataview.h>
 #include <wx/webview.h>
 #include <wx/dirctrl.h>
+#include "CncZView.h"
 #include <wx/timer.h>
 #include <wx/dialog.h>
 #include <wx/bitmap.h>
@@ -79,6 +80,10 @@ protected:
     wxStaticText* m_staticText752;
     wxComboBox* m_unit;
     wxStaticText* m_staticText1748;
+    wxMenu* m_configStepDelayMenu;
+    wxMenuItem* m_miCfgStepDelayMin;
+    wxMenuItem* m_miCfgStepDelayMax;
+    wxMenuItem* m_miCfgSimulateArduino;
     wxSlider* m_stepDelay;
     wxStaticText* m_stepDelayValue;
     wxBitmapButton* m_rcReset;
@@ -642,9 +647,9 @@ protected:
     wxPanel* m_outPanel;
     wxFlexGridSizer* flexGridSizer1042;
     wxFlexGridSizer* flexGridSizer1046;
-    wxStaticBitmap* m_staticBitmap2401;
     wxStaticText* m_staticText1048;
-    wxSlider* m_zSlider;
+    CncZView* m_zView;
+    wxStaticBitmap* m_staticBitmap2401;
     wxFlexGridSizer* flexGridSizer742;
     wxFlexGridSizer* flexGridSizer768;
     wxFlexGridSizer* flexGridSizer2404;
@@ -826,6 +831,10 @@ protected:
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
+    virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event) { event.Skip(); }
+    virtual void cfgStepDelayMin(wxCommandEvent& event) { event.Skip(); }
+    virtual void cfgStepDelayMax(wxCommandEvent& event) { event.Skip(); }
+    virtual void cfgStepDelayArduino(wxCommandEvent& event) { event.Skip(); }
     virtual void stepDelayChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void stepDelayThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
@@ -1501,9 +1510,9 @@ public:
     wxPanel* GetControllerErrorInfo() { return m_controllerErrorInfo; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
-    wxStaticBitmap* GetStaticBitmap2401() { return m_staticBitmap2401; }
     wxStaticText* GetStaticText1048() { return m_staticText1048; }
-    wxSlider* GetZSlider() { return m_zSlider; }
+    CncZView* GetZView() { return m_zView; }
+    wxStaticBitmap* GetStaticBitmap2401() { return m_staticBitmap2401; }
     wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
     wxStaticText* GetStaticText16032() { return m_staticText16032; }
     wxComboBox* GetCbCurveLibResolution() { return m_cbCurveLibResolution; }

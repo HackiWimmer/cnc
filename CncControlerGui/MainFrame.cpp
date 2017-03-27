@@ -870,7 +870,7 @@ bool MainFrame::initializeCncControl() {
 	cnc->updateCncConfigTrace();
 	
 	// z slider
-	cnc->restoreZSlider();
+	cnc->updateZSlider();
 	
 	// draw pane grid
 	cnc->setShowGridSate(m_gridDrawPane->GetValue());
@@ -948,7 +948,7 @@ void MainFrame::determineCncOutputControls() {
 	guiCtlSetup->controllerErrorInfo= m_dvListCtrlControllerErrorInfo;
 	
 	guiCtlSetup->motorState 		= m_miMotorEnableState;
-	guiCtlSetup->zSlider			= m_zSlider;
+	guiCtlSetup->zView				= m_zView;
 
 	guiCtlSetup->speedX				= m_speedX;
 	guiCtlSetup->speedY				= m_speedY;
@@ -1498,7 +1498,7 @@ void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
 	if ( cnc->getCncConfig()->getWorkpieceThickness() != wpt ) {
 		cnc->getCncConfig()->setWorkpieceThickness(wpt);
 		cnc->updateCncConfigTrace();
-		cnc->restoreZSlider();
+		cnc->updateZSlider();
 		
 		setRefPostionState(false);
 		
@@ -1546,7 +1546,7 @@ void MainFrame::killFocusCrossingThickness(wxFocusEvent& event) {
 	if ( cnc->getCncConfig()->getMaxDurationThickness() != ct ) {
 		cnc->getCncConfig()->setMaxDurationThickness(ct);
 		cnc->updateCncConfigTrace();
-		cnc->restoreZSlider();
+		cnc->updateZSlider();
 	}
 	
 	m_crossings->ChangeValue(wxString() << cnc->getCncConfig()->getDurationCount());
@@ -4633,7 +4633,7 @@ void MainFrame::updateStepDelay() {
 	
 	wxString val;
 	val << m_stepDelay->GetValue();
-	val += " ms";
+	val << " ms";
 	m_stepDelayValue->SetLabel(val);
 }
 ///////////////////////////////////////////////////////////////////
@@ -5898,4 +5898,36 @@ void MainFrame::decorateSerialSpy() {
 	
 	m_enableSerialSpy->Refresh();
 	m_enableSerialSpy->Update();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::cfgStepDelayArduino(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_stepDelay->SetValue(125);
+	updateStepDelay();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::cfgStepDelayMax(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_stepDelay->SetValue(m_stepDelay->GetMax());
+	updateStepDelay();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::cfgStepDelayMin(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_stepDelay->SetValue(0);
+	updateStepDelay();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::cfgStepDelayDropDown(wxAuiToolBarEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( m_miCfgSimulateArduino->IsChecked() )
+		cfgStepDelayArduino(event);
+	
+	if ( m_miCfgStepDelayMin->IsChecked() )
+		cfgStepDelayMin(event);
+		
+	if ( m_miCfgStepDelayMax->IsChecked() )
+		cfgStepDelayMax(event);
+	
+	event.Skip();
 }

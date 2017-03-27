@@ -100,6 +100,43 @@
             <style/>
             <hidden>1</hidden>
           </object>
+          <object class="tool" name="m_configStepDelay">
+            <dropdown>
+              <object class="wxMenu" name="m_configStepDelayMenu">
+                <label>Menu</label>
+                <style/>
+                <object class="wxMenuItem" name="m_miCfgStepDelayMin">
+                  <radio>1</radio>
+                  <label>Set Step Delay (MIN)</label>
+                  <accel>
+                    <![CDATA[]]>
+                  </accel>
+                </object>
+                <object class="wxMenuItem" name="m_miCfgStepDelayMax">
+                  <radio>1</radio>
+                  <label>Set Step Delay (MAX)</label>
+                  <accel>
+                    <![CDATA[]]>
+                  </accel>
+                </object>
+                <object class="wxMenuItem" name="m_miCfgSimulateArduino">
+                  <radio>1</radio>
+                  <label>Simulate Arduino</label>
+                  <accel>
+                    <![CDATA[]]>
+                  </accel>
+                </object>
+              </object>
+            </dropdown>
+            <label>Tool Label</label>
+            <tooltip>
+              <![CDATA[Config Step Delay]]>
+            </tooltip>
+            <longhelp>
+              <![CDATA[]]>
+            </longhelp>
+            <bitmap>bitmaps/16-fold.png</bitmap>
+          </object>
           <object class="wxSlider" name="m_stepDelay">
             <style>wxSL_SELRANGE|wxSL_HORIZONTAL</style>
             <font>
@@ -114,7 +151,7 @@
               <![CDATA[Artificially Step Delay]]>
             </tooltip>
             <min>0</min>
-            <max>200</max>
+            <max>300</max>
             <value>0</value>
             <size>140,-1</size>
           </object>
@@ -6807,13 +6844,6 @@
                           <growablecols>1</growablecols>
                           <growablerows>2</growablerows>
                           <object class="sizeritem">
-                            <flag>wxALL</flag>
-                            <border>5</border>
-                            <object class="wxStaticBitmap" name="m_staticBitmap2401">
-                              <bitmap>bitmaps/mill.png</bitmap>
-                            </object>
-                          </object>
-                          <object class="sizeritem">
                             <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
                             <border>1</border>
                             <object class="wxStaticText" name="m_staticText1048">
@@ -6827,24 +6857,34 @@
                               </font>
                             </object>
                           </object>
+                          <object class="spacer" name="Spacer2753">
+                            <size>0,9</size>
+                            <flag>wxALL</flag>
+                            <border>5</border>
+                            <option>1</option>
+                          </object>
                           <object class="sizeritem">
-                            <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+                            <flag>wxALL|wxEXPAND</flag>
                             <border>1</border>
-                            <object class="wxSlider" name="m_zSlider">
-                              <style>wxSL_SELRANGE|wxSL_VERTICAL</style>
-                              <bg>wxSYS_COLOUR_MENU</bg>
-                              <fg>wxSYS_COLOUR_APPWORKSPACE</fg>
-                              <font>
-                                <size>6</size>
-                                <style>normal</style>
-                                <weight>normal</weight>
-                                <family>swiss</family>
-                                <underlined>0</underlined>
-                                <face>Segoe UI</face>
-                              </font>
-                              <min>0</min>
-                              <max>100</max>
-                              <value>50</value>
+                            <minsize>20,60</minsize>
+                            <object class="wxPanel" name="m_zView">
+                              <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                              <tooltip>
+                                <![CDATA[3424324]]>
+                              </tooltip>
+                            </object>
+                          </object>
+                          <object class="spacer" name="Spacer2755">
+                            <size>0,1</size>
+                            <flag>wxALL</flag>
+                            <border>4</border>
+                            <option>1</option>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>5</border>
+                            <object class="wxStaticBitmap" name="m_staticBitmap2401">
+                              <bitmap>bitmaps/mill.png</bitmap>
                             </object>
                           </object>
                         </object>
