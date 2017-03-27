@@ -4,6 +4,7 @@
 std::string ArduinoPIDs::pids[MAX_PIDS];
 std::string ArduinoPIDs::ret;
 
+//test
 /////////////////////////////////////////////////////////////////////////
 class ArduinoPIDsInitializer {
 	public:
