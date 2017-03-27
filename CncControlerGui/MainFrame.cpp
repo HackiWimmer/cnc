@@ -101,7 +101,7 @@ MainFrame::MainFrame(wxWindow* parent)
 	// do this definitely here later it will causes a crash 
 	install3DPane();
 	installSypControl();
-	
+
 	// instll galobal key down hook
 	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
 }
