@@ -15,11 +15,13 @@ class SerialEmulatorFile : public SerialEmulatorNULL
 	public:
 	
 		//Initialize Serial communication without an acitiv connection 
-		SerialEmulatorFile(CncControl* cnc): SerialEmulatorNULL(cnc) {
+		SerialEmulatorFile(CncControl* cnc)
+		: SerialEmulatorNULL(cnc) {
 			fileFlags = std::ios::out | std::ios::trunc | std::ios::binary;
 		}
 		//Initialize Serial communication with the given COM port
-		SerialEmulatorFile(const char *fileName): SerialEmulatorNULL(fileName) {
+		SerialEmulatorFile(const char *fileName)
+		: SerialEmulatorNULL(fileName) {
 			fileFlags = std::ios::out | std::ios::trunc | std::ios::binary;
 		}
 		virtual ~SerialEmulatorFile() {}

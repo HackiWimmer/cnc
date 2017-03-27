@@ -39,6 +39,7 @@ typedef std::vector<PositionInfo3D> DrawPoints3D;
 struct PointPair {
 	wxPoint lp;
 	wxPoint cp;
+	bool zAxisDown;
 	
 	//////////////////////////////////////////////////////////////////
 	static PointPair& processOffset(PointPair& ret, int x, int y) {
@@ -60,13 +61,14 @@ struct PointPair {
 
 	//////////////////////////////////////////////////////////////////
 	friend std::ostream &operator<< (std::ostream &ostr, const PointPair &a) {
-		ostr << "lp:"<< a.lp.x << "," << a.lp.y << "\t\tcp:" << a.cp.x << "," << a.cp.y << std::endl;
+		ostr << "lp:"<< a.lp.x << "," << a.lp.y << "\t\tcp:" << a.cp.x << "," << a.cp.y << "\tz down:" << a.zAxisDown << std::endl;
 		return ostr;
 	}
 	//////////////////////////////////////////////////////////////////i
 	friend bool operator== (const PointPair &a, const PointPair &b) {
 		return  (   (a.lp == b.lp)
 				 && (a.cp == b.cp)
+				 && (a.zAxisDown == b.zAxisDown)
 				);
 	}
 	//////////////////////////////////////////////////////////////////i
@@ -90,7 +92,9 @@ struct SetterTuple {
 
 ///////////////////////////////////////////////////////////////////
 class CncControl {
-
+	public:
+		enum MontionMoinorMode {MMM_2D, MMM_3D};
+		
 	private:
 		wxString stringTemplate;
 		
@@ -150,6 +154,8 @@ class CncControl {
 		// margin of the draw pane
 		CoordinateSystem drawPaneCoordSystem;
 		unsigned int drawPaneMargin;
+		// determien the preview mode [2D, 3D]
+		MontionMoinorMode motionMonitorMode;
 		// helper
 		double convertToDisplayUnit(int32_t val, double fact);
 		//sets a value into the given text control
@@ -276,7 +282,7 @@ class CncControl {
 		void simulateZAxisDown() { zAxisDown = true; }
 		// Tool management
 		void switchToolOn();
-		void switchToolOff();
+		void switchToolOff(bool force = false);
 		bool getToolState() { return powerOn; }	
 		// Updates the config trace control
 		void updateCncConfigTrace();
@@ -377,9 +383,14 @@ class CncControl {
 		bool meassureZDimension(wxCheckBox* min, wxCheckBox* max, double& result) { return meassureDimension('Z', min, max, result); }
 		
 		// 3D control
-		void set3DData();
+		void set3DData(bool append);
 		
+		// idle handling
 		void sendIdleMessage();
+		
+		// Motion monitor handling
+		void setMotionMonitorMode(const MontionMoinorMode& mmm);
+		const MontionMoinorMode& getMotionMonitorMode() const   { return motionMonitorMode; }
 };
 
 #endif

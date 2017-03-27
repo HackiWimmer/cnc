@@ -42,22 +42,21 @@ CncOpenGLDrawPane::CncOpenGLDrawPane(wxWindow *parent, int *attribList)
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, 
 	         wxFULL_REPAINT_ON_RESIZE)
 , spinTimerInterval(DEFAULT_SPIN_TIMER_INTERVAL)
-, scaleX(1.0f)
-, scaleY(1.0f)
-, scaleZ(1.0f)
-, viewPortX(0)
-, viewPortY(0)
-, spinTimer(this,SpinTimer)
-, displayAngels(0.0, 0.0, 0.0, -120.0, 10.0, 1.0)
+, viewPort()
+, translate()
+, scale()
+, displayAngels(0.0, 0.0, 0.0, -160.0, 10.0, 1.0) 
+, spinTimer(this, SpinTimer)
 , playButton(NULL)
 , traceCtrl(NULL)
 , spinAngleX(NULL)
 , spinAngleY(NULL)
 , spinAngleZ(NULL)
+, planeSelcetion(DPS_XY)
 {
 	trackball(globalData.quat, 0.0f, 0.0f, 0.0f, 0.0f);
 	
-	// select a inital view, this also initializes viewPort*
+	// select a inital view, this also initializes viewPort
 	view3D();
 }
 /////////////////////////////////////////////////////////////////////
@@ -136,7 +135,7 @@ void CncOpenGLDrawPane::clear3D() {
 	
 	if ( IsShown() ) {
 		Refresh();
-		view3D();
+		//view3D();
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -165,6 +164,8 @@ DrawPaneData& CncOpenGLDrawPane::getDataVector() {
 DrawPaneData& CncOpenGLDrawPane::clearDataVector() {
 /////////////////////////////////////////////////////////////////////
 	data.clear();
+	Refresh();
+	
 	return data;
 }
 /////////////////////////////////////////////////////////////////////
@@ -175,7 +176,17 @@ void CncOpenGLDrawPane::displayDataVector() {
 	Update();
 }
 /////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::determineDisplayAngles(float ax, float ay, float az) {
+void CncOpenGLDrawPane::setDisplayAngles(float ax, float ay, float az, bool updateCtrl) {
+/////////////////////////////////////////////////////////////////////
+	displayAngels.setX(ax);
+	displayAngels.setY(ay);
+	displayAngels.setZ(az);
+	
+	rotate(updateCtrl); 
+	Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::initDisplayAngles(float ax, float ay, float az) {
 /////////////////////////////////////////////////////////////////////
 	displayAngels.setX(ax);
 	displayAngels.setY(ay);
@@ -186,23 +197,26 @@ void CncOpenGLDrawPane::determineDisplayAngles(float ax, float ay, float az) {
 	displayAngels.setDefaultZ(az);
 	
 	// initial rotation 
-	rotate();   
+	rotate(true);  
+	Refresh();
 }
 /////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::rotate() {
+void CncOpenGLDrawPane::rotate(bool updateCtrl) {
 /////////////////////////////////////////////////////////////////////
 	glRotatef(displayAngels.getX(), 1.0f, 0.0f, 0.0f);
 	glRotatef(displayAngels.getY(), 0.0f, 1.0f, 0.0f);
 	glRotatef(displayAngels.getZ(), 0.0f, 0.0f, 1.0f);
 	
-	if ( spinAngleX != NULL )
-		spinAngleX->SetValue(displayAngels.getX());
-		
-	if ( spinAngleY != NULL )
-		spinAngleY->SetValue(displayAngels.getY());
-		
-	if ( spinAngleZ != NULL )
-		spinAngleZ->SetValue(displayAngels.getZ());
+	if ( updateCtrl == true ) {
+		if ( spinAngleX != NULL && spinAngleX->GetValue() != (int)displayAngels.getX() )
+			spinAngleX->SetValue(displayAngels.getX());
+			
+		if ( spinAngleY != NULL && spinAngleY->GetValue() != (int)displayAngels.getY() )
+			spinAngleY->SetValue(displayAngels.getY());
+			
+		if ( spinAngleZ != NULL && spinAngleZ->GetValue() != (int)displayAngels.getZ() )
+			spinAngleZ->SetValue(displayAngels.getZ());
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::initializeOpenGL() {
@@ -239,218 +253,6 @@ void CncOpenGLDrawPane::initializeOpenGL() {
 
 	glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
 	glEnable(GL_COLOR_MATERIAL);
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::resetProjectionMode() {
-/////////////////////////////////////////////////////////////////////
-	if ( !IsShownOnScreen() )
-		return;
-
-	// This is normally only necessary if there is more than one wxGLCanvas
-	// or more than one wxGLContext in the application.
-	SetCurrent(*globalContext);
-
-	int w, h;
-	GetClientSize(&w, &h);
-
-	// It's up to the application code to update the OpenGL viewport settings.
-	// In order to avoid extensive context switching, consider doing this in
-	// OnPaint() rather than here, though.
-	glViewport(viewPortX, viewPortY, (GLint) w, (GLint) h);
-
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(20.0f, (GLfloat)w/h, 1.0, 100.0);
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::spinPaneFromKeyboard(float xSpin, float ySpin) {
-/////////////////////////////////////////////////////////////////////
-	displayAngels.incX(xSpin);
-	displayAngels.incY(ySpin);
-	//displayAngels.incZ(zSpin);
-
-	Refresh();
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::OnEraseBackground(wxEraseEvent& WXUNUSED(event)) {
-/////////////////////////////////////////////////////////////////////
-	// Do nothing, to avoid flashing on MSW
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::OnSize(wxSizeEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	// Reset the OpenGL view aspect.
-	// This is OK only because there is only one canvas that uses the context.
-	// See the cube sample for that case that multiple canvases are made current with one context.
-	resetProjectionMode();
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
-/////////////////////////////////////////////////////////////////////
-	// This is required even though dc is not used otherwise.
-	wxPaintDC dc(this);
-
-	// Set the OpenGL viewport according to the client size of this canvas.
-	// This is done here rather than in a wxSizeEvent handler because our
-	// OpenGL rendering context (and thus viewport setting) is used with
-	// multiple canvases: If we updated the viewport in the wxSizeEvent
-	// handler, changing the size of one canvas causes a viewport setting that
-	// is wrong when next another canvas is repainted.
-	const wxSize ClientSize = GetClientSize();
-	glViewport(viewPortX, viewPortY, ClientSize.x, ClientSize.y);
-
-	CncOpenGLDrawPaneContext& dpc = CncOpenGLDrawPane::initGlobalContext(this);
-	SetCurrent(*globalContext);
-		
-	// Initialize the global OpenGl data with the first call of OnPaint
-	if ( globalData.isInitialized() == false ) {
-		initializeOpenGL();
-		resetProjectionMode();
-		globalData.initialize();
-	}   
-
-	// Transformations
-	glLoadIdentity();
-	glTranslatef(0.0f, 0.0f, 0.0f);
-
-	GLfloat m[4][4];
-	build_rotmatrix(m, globalData.quat);
-	glMultMatrixf( &m[0][0] );
-
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glTranslatef(0.0f, 0.0f, -2.0f);
-	glScalef(scaleX, scaleY, scaleZ);
-
-	rotate();
-	dpc.displayDataVector(data);
-		
-	SwapBuffers();
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::OnMouse(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	static int dragging = 0;
-	static float last_x, last_y;
-	
-	this->SetFocusFromKbd();
-
-	// Allow default processing to happen, or else the canvas cannot gain focus
-	// (for key events).
-	event.Skip();
-
-	if ( event.LeftIsDown() ) {
-		
-		if ( event.ControlDown() == true ) {
-			// move origin
-			const wxSize cs = GetClientSize();
-			int originX = cs.GetWidth()/2;
-			int originY = cs.GetHeight()/2;
-			
-			viewPortX = (originX - event.GetX()) * -1;
-			viewPortY = (originY - event.GetY()) * +1;
-			
-			/*
-			std::stringstream ss;
-			ss << " ViewPort: " << viewPortX << ", " << viewPortY;
-			ss << " Mouse Pos: " << event.GetX() << ", "<< event.GetY();
-			ss << " Origin: " << originX << ", "<< originY << std::endl;
-			trace(ss);
-			*/
-			Refresh();
-			
-			event.Skip(false);
-		} else {
-			// rotate 3D objects
-			if ( !dragging ) { 
-				dragging = 1;
-			} else {
-				displayAngels.incX((event.GetX() - last_x) * +1.0);
-				displayAngels.incY((event.GetY() - last_y) * +1.0);
-				Refresh();
-			}
-			
-			last_x = event.GetX();
-			last_y = event.GetY();
-			event.Skip(false);
-		}
-	} else {
-		
-		dragging = 0;
-		event.Skip();
-	} 
-
-	// resize 3D objects
-	int rot = event.GetWheelRotation();
-	if ( rot != 0 ) {
-		scaleX += ( rot > 0 ? 0.1f : -0.1f );
-		scaleY += ( rot > 0 ? 0.1f : -0.1f );
-		scaleZ += ( rot > 0 ? 0.1f : -0.1f );
-		Refresh();
-		
-		event.Skip(false);
-	}
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::OnKeyDown(wxKeyEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( event.ControlDown() == true ) {
-
-		const int dist = 10;
-		int originX = viewPortX;
-		int originY = viewPortY;
-		
-		switch ( event.GetKeyCode() ) {
-			case WXK_RIGHT:
-				viewPortX = originX + dist;
-				break;
-
-			case WXK_LEFT:
-				viewPortX = originX - dist;
-				break;
-
-			case WXK_DOWN:
-				viewPortY = originY - dist;
-				break;
-
-			case WXK_UP:
-				viewPortY = originY + dist;
-				break;
-		}
-		
-		Refresh();
-		
-	} else {
-		
-		float angle = 5.0;
-		switch ( event.GetKeyCode() ) {
-			case WXK_RIGHT:
-				spinPaneFromKeyboard( 0.0, -angle );
-				break;
-
-			case WXK_LEFT:
-				spinPaneFromKeyboard( 0.0, angle );
-				break;
-
-			case WXK_DOWN:
-				spinPaneFromKeyboard( -angle, 0.0 );
-				break;
-
-			case WXK_UP:
-				spinPaneFromKeyboard( angle, 0.0 );
-				break;
-
-			case WXK_SPACE:
-				switchSpinTimer();
-				break;
-				
-			default: ;// do nothing
-		}
-	}
-	event.Skip();
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::startSpinTimer() {
@@ -521,84 +323,382 @@ void CncOpenGLDrawPane::OnSpinTimer(wxTimerEvent& WXUNUSED(event)) {
 	spinPaneFromKeyboard(0.0, 4.0);
 }
 /////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::setOrigin(DrawPaneOrigin dpo) {
+void CncOpenGLDrawPane::OnEraseBackground(wxEraseEvent& WXUNUSED(event)) {
+/////////////////////////////////////////////////////////////////////
+	// Do nothing, to avoid flashing on MSW
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::resetProjectionMode() {
+/////////////////////////////////////////////////////////////////////
+	if ( !IsShownOnScreen() )
+		return;
+
+	// This is normally only necessary if there is more than one wxGLCanvas
+	// or more than one wxGLContext in the application.
+	SetCurrent(*globalContext);
+
+	evaluateViewPort();
+	glViewport(viewPort.x, viewPort.y, (GLint) viewPort.w, (GLint) viewPort.h);
+
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(15.0f, (GLfloat)viewPort.w/viewPort.h, 1.0, 10.0);
+
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::OnSize(wxSizeEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( currentOrigin == DPO_CUSTOM )
+		currentOrigin = DPO_CENTER;
+		
+	resetProjectionMode();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
+/////////////////////////////////////////////////////////////////////
+	// This is required even though dc is not used otherwise.
+	wxPaintDC dc(this);
+
+	evaluateViewPort();
+	glViewport(viewPort.x, viewPort.y, viewPort.w, viewPort.h);
+
+	CncOpenGLDrawPaneContext& dpc = CncOpenGLDrawPane::initGlobalContext(this);
+	SetCurrent(*globalContext);
+		
+	// Initialize the global OpenGl data with the first call of OnPaint
+	if ( globalData.isInitialized() == false ) {
+		initializeOpenGL();
+		resetProjectionMode();
+		globalData.initialize();
+	}   
+
+	GLfloat m[4][4];
+	build_rotmatrix(m, globalData.quat);
+	glMultMatrixf( &m[0][0] );
+
+	// Transformations
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glTranslatef(translate.x, translate.y, translate.z);
+	glScalef(scale.x, scale.y, scale.z);
+
+	std::stringstream ss;
+	ss << "ViewPort: "<< viewPort;
+	ss << "; Translate: " << translate;
+	ss << "; Scale: " << scale;
+	trace(ss);
+
+	rotate(true);
+	dpc.displayDataVector(data);
+		
+	SwapBuffers();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::scaleByMouse(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	int rot = event.GetWheelRotation();
+	
+	const float diff = 0.1f;
+	scale.x += ( rot > 0 ? diff : -diff );
+	scale.y += ( rot > 0 ? diff : -diff );
+	scale.z += ( rot > 0 ? diff : -diff );
+	
+	// check min
+	const float min = 0.1f;
+	scale.x = (scale.x < min ? min : scale.x);
+	scale.y = (scale.y < min ? min : scale.y);
+	scale.z = (scale.z < min ? min : scale.z);
+	
+	// check max
+	const float max = 3.0f;
+	scale.x = (scale.x > max ? max : scale.x);
+	scale.y = (scale.y > max ? max : scale.y);
+	scale.z = (scale.z > max ? max : scale.z);
+	
+	Refresh();
+	event.Skip(false);
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::translateByMouse(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	const wxSize cs = GetClientSize();
-	const int border = 10;
-	int originX = cs.GetWidth()/2;
-	int originY = cs.GetHeight()/2;
+	float originX = (float)(cs.GetWidth()/2);
+	float originY = (float)(cs.GetHeight()/2);
 	
-	switch ( dpo ) {
-		case DPO_TOP_LEFT:		viewPortX = (originX - border)     * -1;
-								viewPortY = (originY - border)     * +1;
+	translate.x = (float)((originX - event.GetX()) / cs.GetWidth())  * -1.0f;
+	translate.y = (float)((originY - event.GetY()) / cs.GetHeight()) * +1.0f;
+	Refresh();
+	
+	event.Skip(false);
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::moveViewPortByMouse(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	const wxSize cs = GetClientSize();
+	int centerX = (float)(cs.GetWidth());
+	
+	currentOrigin = DPO_CUSTOM;
+	
+	viewPort.x = event.GetX() - centerX;
+	viewPort.y = -event.GetY();
+	
+	resetProjectionMode();
+	Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::OnMouse(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	static int dragging = 0;
+	static float last_x, last_y;
+	
+	//activate the keyboard focus for this frame
+	this->SetFocusFromKbd();
+
+	// resize 3D objects
+	int rot = event.GetWheelRotation();
+	if ( rot != 0 ) {
+		scaleByMouse(event);
+	}
+
+	// check left mouse button
+	if ( event.LeftIsDown() == false ) {
+		dragging = 0;
+		event.Skip();
+		return;
+	}
+		
+	// only so something in other modes
+	if ( currentOrigin != DPO_CENTER && currentOrigin != DPO_CUSTOM ) {
+		event.Skip();
+		return;
+	}
+	
+	// do something
+	if ( event.ControlDown() == true ) {
+		translateByMouse(event);
+		
+	} else if ( event.ShiftDown() == true ) {
+		moveViewPortByMouse(event);
+
+	} else {
+		// rotate 3D objects
+		if ( !dragging ) { 
+			dragging = 1;
+		} else {
+			displayAngels.incX((event.GetX() - last_x) * +1.0);
+			displayAngels.incY((event.GetY() - last_y) * +1.0);
+			Refresh();
+		}
+		
+		last_x = event.GetX();
+		last_y = event.GetY();
+		event.Skip(false);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::spinPaneFromKeyboard(float xSpin, float ySpin) {
+/////////////////////////////////////////////////////////////////////
+	displayAngels.incX(xSpin);
+	displayAngels.incY(ySpin);
+	//displayAngels.incZ(zSpin);
+	Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::translateByKey(wxKeyEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	int dist = 2;
+	if ( event.AltDown() == true )
+		dist = 10;
+	
+	const wxSize cs = GetClientSize();
+
+	switch ( event.GetKeyCode() ) {
+		case WXK_RIGHT:
+			translate.x += dist / (float)cs.GetWidth();
+			break;
+
+		case WXK_LEFT:
+			translate.x -= dist / (float)cs.GetWidth();
+			break;
+
+		case WXK_DOWN:
+			translate.y -= dist / (float)cs.GetHeight();
+			break;
+
+		case WXK_UP:
+			translate.y += dist / (float)cs.GetHeight();
+			break;
+	}
+	
+	Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::rotateByKey(wxKeyEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	float angle = 5.0;
+	switch ( event.GetKeyCode() ) {
+		case WXK_RIGHT:
+			spinPaneFromKeyboard( 0.0, -angle );
+			break;
+
+		case WXK_LEFT:
+			spinPaneFromKeyboard( 0.0, angle );
+			break;
+
+		case WXK_DOWN:
+			spinPaneFromKeyboard( -angle, 0.0 );
+			break;
+
+		case WXK_UP:
+			spinPaneFromKeyboard( angle, 0.0 );
+			break;
+
+		case WXK_SPACE:
+			switchSpinTimer();
+			break;
+			
+		default: ;// do nothing
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::moveViewPortByKey(wxKeyEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	int dist = 2;
+	if ( event.AltDown() == true )
+		dist = 10;
+		
+	currentOrigin = DPO_CUSTOM;
+
+	switch ( event.GetKeyCode() ) {
+		case WXK_RIGHT:
+			viewPort.x += dist; 
+			break;
+
+		case WXK_LEFT:
+			viewPort.x -= dist;
+			break;
+
+		case WXK_DOWN:
+			viewPort.y -= dist;
+			break;
+
+		case WXK_UP:
+			viewPort.y += dist;
+			break;
+	}
+	
+	resetProjectionMode();
+	Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::OnKeyDown(wxKeyEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( currentOrigin != DPO_CENTER && currentOrigin != DPO_CUSTOM ) {
+		event.Skip();
+		return;
+	}
+	
+	if ( event.ControlDown() == true ) 		translateByKey(event);
+	else if ( event.ShiftDown() == true ) 	moveViewPortByKey(event);
+	else 									rotateByKey(event);
+
+	event.Skip();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::evaluateViewPort() {
+/////////////////////////////////////////////////////////////////////
+	const wxSize cs = GetClientSize();
+	
+	// set default values
+	viewPort.w 		= cs.GetWidth()  * 2;
+	viewPort.h 		= cs.GetHeight() * 2;
+	viewPort.border = 10.0f;
+	
+	// specialize values
+	switch ( currentOrigin ) {
+
+		case DPO_TOP_LEFT:		viewPort.x 		= (viewPort.w / 2 - viewPort.border) * -1;
+								viewPort.y 		= ( viewPort.border ) * -1;
 								break;
 								
-		case DPO_TOP_RIGHT:		viewPortX = (originX - border)     * +1;
-								viewPortY = (originY - border)     * +1;
+		case DPO_TOP_RIGHT:		viewPort.x 		= viewPort.border * -1;
+								viewPort.y 		= viewPort.border * -1;
 								break;
 								
-		case DPO_BOTTOM_LEFT:	viewPortX = (originX - border) 	   * -1;
-								viewPortY = (originY - border)     * -1;
+		case DPO_BOTTOM_LEFT:	viewPort.x 		= (viewPort.w / 2 - viewPort.border) * -1;
+								viewPort.y 		= (viewPort.h / 2 - viewPort.border) * -1;
 								break;
 								
-		case DPO_BOTTOM_RIGHT:	viewPortX = (originX - border)     * +1;
-								viewPortY = (originY - border)     * -1;
+		case DPO_BOTTOM_RIGHT:	viewPort.x 		= viewPort.border * -1;
+								viewPort.y 		= (viewPort.h / 2 - viewPort.border) * -1;
 								break;
 								
-		default:				viewPortX = 0;
-								viewPortY = 0;
+		case DPO_CUSTOM:		//viewPort.X and viewPort.y is set by mouse or keyboard
+								viewPort.w 		= cs.GetWidth() * 2;
+								viewPort.h 		= cs.GetHeight() * 2;
+								viewPort.border = 0.0f;
+								break;
+		case DPO_CENTER:
+		default:				viewPort.x 		= 0.0f;
+								viewPort.y 		= 0.0f;
+								viewPort.w 		= cs.GetWidth();
+								viewPort.h 		= cs.GetHeight();
+								viewPort.border = 0.0f;
 	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::view(DrawPaneViewType view) {
 /////////////////////////////////////////////////////////////////////
+	// reset translate and scale
+	translate.init();
+	scale.init();
 
 	switch ( view ) {
 		case DPVT_Top:	 	setOriginTL();
 							displayAngels.setX(+180.0f);
-							displayAngels.setY(+0.0f);
-							displayAngels.setZ(+0.0f);
+							displayAngels.setY(+  0.0f);
+							displayAngels.setZ(+  0.0f);
 							break;
 							
 		case DPVT_Bottom: 	setOriginBL();
-							displayAngels.setX(+0.0f);
+							displayAngels.setX(+  0.0f);
 							displayAngels.setY(-360.0f);
-							displayAngels.setZ(+0.0f);
+							displayAngels.setZ(+  0.0f);
 							break;
 
 		case DPVT_Front: 	setOriginBL();
 							displayAngels.setX(-90.0f);
-							displayAngels.setY(+0.0f);
-							displayAngels.setZ(+0.0f);
-							break;	
-							
-		case DPVT_Rear: 	setOriginBR();
-							displayAngels.setX(+90.0f);
-							displayAngels.setY(+180.0f);
-							displayAngels.setZ(+0.0f);
+							displayAngels.setY(+ 0.0f);
+							displayAngels.setZ(+ 0.0f);
 							break;
 							
+		case DPVT_Rear: 	setOriginBR();
+							displayAngels.setX(+ 90.0f);
+							displayAngels.setY(+180.0f);
+							displayAngels.setZ(+  0.0f);
+							break;
 							
 		case DPVT_Left:	 	setOriginBL();
 							displayAngels.setX(-90.0f);
-							displayAngels.setY(+0.0f);
+							displayAngels.setY(+ 0.0f);
 							displayAngels.setZ(-90.0f);
-							break;	
+							break;
 							
 		case DPVT_Right: 	setOriginBR();
-							displayAngels.setX(-90.0f);
-							displayAngels.setY(+0.0f);
+							displayAngels.setX(- 90.0f);
+							displayAngels.setY(+  0.0f);
 							displayAngels.setZ(-270.0f);
-							break;	
+							break;
 
-		case DPVT_3D: 		setOriginCenter();
+		case DPVT_3D:
+		default: 			setOriginCenter();
 							displayAngels.setX(displayAngels.getDefaultX());
 							displayAngels.setY(displayAngels.getDefaultY());
 							displayAngels.setZ(displayAngels.getDefaultZ());
-							break;	
-							
-
-		default: ;//Do nothing
+							break;
 	}
 
 	Refresh();

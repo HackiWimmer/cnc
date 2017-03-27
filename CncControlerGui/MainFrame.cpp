@@ -32,6 +32,7 @@
 #include "GCodeFileParser.h"
 #include "CncArduino.h"
 #include "SvgEditPopup.h"
+#include "HexDecoder.h"
 #include "MainFrame.h"
 
 
@@ -75,6 +76,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , lastPortName(wxT(""))
 , cnc(new CncControl(CncEMU_NULL))
 , drawPane3D(NULL)
+, serialSpy(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(new wxFileConfig(wxT("CncController"), wxEmptyString, _configFileName, _configFileName, wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, _lruStoreFileName, _lruStoreFileName, wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -95,6 +97,10 @@ MainFrame::MainFrame(wxWindow* parent)
 ///////////////////////////////////////////////////////////////////
 	// detemine assert handler
 	wxSetDefaultAssertHandler();
+	
+	// do this definitely here later it will causes a crash 
+	install3DPane();
+	installSypControl();
 	
 	// instll galobal key down hook
 	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
@@ -203,7 +209,7 @@ void MainFrame::install3DPane() {
 		return;
 	}
 	
-	std::clog << "Installing 3D draw pane . . . " << std::endl;
+	std::clog << "Installing 3D draw pane . . . ";
 	drawPane3D = new CncOpenGLDrawPane(parent, NULL);
 	drawPane3D->SetPosition(m_drawPane3D->GetPosition());
 	drawPane3D->setPlayButton(m_3D_Animate);
@@ -218,11 +224,43 @@ void MainFrame::install3DPane() {
 	
 	// remove the placeholder
 	m_drawPane3D->Destroy();
-	delete m_drawPane3D;
+	//delete m_drawPane3D;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::installSypControl() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( m_serialSpy );
+		
+	wxWindow* parent = m_serialSpy->GetParent();
+	wxSizer* sizer   = m_serialSpy->GetContainingSizer();
+	
+	if ( parent == NULL ) {
+		std::cerr << "MainFrame::installSypControl(): Invalid parent pointer." << std::endl;
+		return;
+	}
+	
+	if ( sizer == NULL ) {
+		std::cerr << "MainFrame::installSypControl(): Invalid sizer pointer." << std::endl;
+		return;
+	}
+	
+	std::clog << "Installing Spy Control . . . ";
+	serialSpy = new CncSpyControl(parent, wxID_ANY, m_serialSpyDetails);
+	serialSpy->SetPosition(m_serialSpy->GetPosition());
+
+	sizer->Replace(m_serialSpy, serialSpy, true);
+	sizer->Layout();
+	std::clog << "Done" << std::endl;
+	
+	// remove the placeholder
+	m_serialSpy->Destroy();
+	//delete m_serialSpy;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(m_checkManuallyXY);
+	registerGuiControl(m_checkManuallyZ);
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_ctrlTestSelection);
@@ -253,6 +291,11 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_homeDefintion);
 	registerGuiControl(m_moveHome);
 	registerGuiControl(m_moveXYtoZero);
+	registerGuiControl(m_moveXYZtoZero);
+	registerGuiControl(m_moveZtoZero);
+	registerGuiControl(m_zeroMoveModeXY);
+	registerGuiControl(m_zeroMoveModeXYZ);
+	registerGuiControl(m_zeroMoveModeZ);
 	registerGuiControl(m_setZero);
 	registerGuiControl(m_clearDrawPane);
 	registerGuiControl(m_clearLogger);
@@ -402,8 +445,6 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::serialTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	//std::cout << "serialTimer" << std::endl;
-	
 	// trace info handling
 	if ( m_tmpTraceInfo->GetValue().IsEmpty() ) traceTimerCounter = 0;
 	else 										traceTimerCounter += event.GetInterval();
@@ -412,12 +453,6 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		traceTimerCounter = 0;
 		m_tmpTraceInfo->Clear();
 	}
-	
-	// 3D view handling
-	if ( cnc )
-		cnc->set3DData();
-		
-	drawPane3D->Refresh();
 	
 	// idle handling
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
@@ -630,11 +665,7 @@ void MainFrame::initialize(void) {
 	wxASSERT(m_inputFileName);
 	wxASSERT(m_metricX); wxASSERT(m_metricY); wxASSERT(m_metricZ);
 
-
 	CncFileNameService::init();
-	
-	// do this first
-	install3DPane();
 	
 	lruFileList.setListControl(m_lruList);
 	
@@ -647,20 +678,17 @@ void MainFrame::initialize(void) {
 	determineRunMode();
 	registerGuiControls();
 	enableManuallyControls();
+	initTemplateEditStyle();
 	
 	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
 	decorateTestSuiteParameters();
 	
-	//m_gridDrawPane->SetValue(true);
-
-
-
 	this->SetTitle(wxString(_programTitel) + " " + _programVersion);
+	
+	//todo
+	m_serialSpyDetails->SetDefaultStyle(*wxYELLOW);
 
 	wxString cfgStr;
-	
-	initTemplateEditStyle();
-
 	//Setup CncPORT selector box
 	m_portSelector->Clear();
 	m_portSelector->Append(_portEmulatorNULL);
@@ -744,6 +772,12 @@ void MainFrame::initialize(void) {
 	if ( cfgStr.MakeUpper().Trim() != "TRUE" ) {
 		m_menuBar->Remove(m_menuBar->FindMenu("Test"));
 	}
+	
+	//initilaize debug state
+	config->Read("CncConfig/Debug", &cfgStr, "false"); 
+	if ( cfgStr == "true" ) { m_menuItemDebugSerial->Check(true); }
+	else				    { m_menuItemDebugSerial->Check(false); }
+	decorateSerialSpy();
 	
 	resetMinMaxPositions();
 	initializeLruMenu();
@@ -831,11 +865,6 @@ bool MainFrame::initializeCncControl() {
 	double fact = getDrawPaneFactor();
 	cnc->setDrawPaneZoomFactor(fact);
 	
-	//initilaize debug state
-	config->Read("CncConfig/Debug", &cfgStr, "false"); 
-	if ( cfgStr == "true" ) { cnc->getSerial()->setInfoOutput(true); m_menuItemDebugSerial->Check(true); }
-	else				    { cnc->getSerial()->setInfoOutput(false); m_menuItemDebugSerial->Check(false); }
-
 	//Initialize the postion controls
 	cnc->setZeroPos();
 	cnc->updateCncConfigTrace();
@@ -846,6 +875,10 @@ bool MainFrame::initializeCncControl() {
 	// draw pane grid
 	cnc->setShowGridSate(m_gridDrawPane->GetValue());
 	setCoordinateSystemType();
+	
+	//initilaize debug state
+	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
+	else				    					cnc->getSerial()->enableSpyOutput(false); 
 	
 	isCncControlInitialized = true;
 	return isCncControlInitialized;
@@ -1110,6 +1143,10 @@ bool MainFrame::connectSerialPort() {
 	
 	startAnimationControl();
 	
+	if ( m_clearSerialSpyOnConnect->IsChecked() ) {
+		clearSerialSpy();
+	}
+	
 	bool ret = false;
 	wxString sel = m_portSelector->GetStringSelection();
 	CncConfig cc(*cnc->getCncConfig());
@@ -1153,9 +1190,10 @@ bool MainFrame::connectSerialPort() {
 		m_connect->SetBitmap(bmpC);
 		
 		setRefPostionState(false);
-		if ( wxString(cnc->getSerial()->getClassName()) != "SerialPort" ) {
+		if ( cnc->getSerial()->isEmulator() ) {
 			setRefPostionState(true);
 		}
+		
 	}
 	
 	m_connect->Refresh();
@@ -1276,7 +1314,8 @@ void MainFrame::unfreezeLogger() {
 ///////////////////////////////////////////////////////////////////
 	if ( m_logger->IsFrozen() ) {
 		m_logger->Thaw();
-		m_logger->ShowPosition( m_logger->GetLastPosition()-1);
+		// Trick: This scrolls to the end of content
+		std::cout << '\n';
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1736,6 +1775,7 @@ void MainFrame::defineOnlineDrawing(wxCommandEvent& event) {
 void MainFrame::defineDebugSerial(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateMonitoring();
+	decorateSerialSpy();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateMonitoring() {
@@ -1746,7 +1786,7 @@ void MainFrame::updateMonitoring() {
 	cnc->getCncConfig()->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
 	cnc->getCncConfig()->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
 	cnc->getCncConfig()->setAllowEventHandling(m_menuItemDebugSerial->IsChecked());
-	cnc->getSerial()->setInfoOutput(m_menuItemDebugSerial->IsChecked());
+	cnc->getSerial()->enableSpyOutput(m_menuItemDebugSerial->IsChecked());
 	cnc->setUpdateToolControlsState(m_menuItemToolControls->IsChecked());
 	
 	if ( m_menuItemDisplayUserAgent->IsChecked() == false ) {
@@ -2466,7 +2506,7 @@ bool MainFrame::processControllerTestSuite() {
 		return false;
 	}
 
-	if ( wxString(cnc->getSerial()->getClassName()) != "SerialPort" ) {
+	if ( cnc->getSerial()->isEmulator() == true ) {
 		std::cerr << "No controller connected, nothing will be processed." << std::endl;
 		std::clog << "Test finished (" << CncControllerTestSuite::getTestCaseName(id) << ")" << endl;
 		return false;
@@ -2519,7 +2559,7 @@ bool MainFrame::processTestInterval() {
 	if ( modeX == true ) {
 		wxString xs = m_testDistanceX->GetValue();
 		if ( xs != "" )	xs.ToCDouble(&xd);
-	}
+	} 
 	
 	if ( modeY == true ) {
 		wxString ys = m_testDistanceY->GetValue();
@@ -2529,7 +2569,7 @@ bool MainFrame::processTestInterval() {
 	if ( modeZ == true ) {
 		wxString zs = m_testDistanceZ->GetValue();
 		if ( zs != "" )	zs.ToCDouble(&zd);
-	}
+	} 
 	
 	wxString firstX = m_testFirstX->GetStringSelection();
 	wxString firstY = m_testFirstY->GetStringSelection();
@@ -2544,31 +2584,37 @@ bool MainFrame::processTestInterval() {
 	m_testDurationCounterZ->SetLabel("-");
 	
 	switch ( mode ) {
-		case 'A': 	for( int i=0; i<countX; i++ ) {
-						processTestMove(m_testAxisX, m_testDurationCounterX, i, +xd, 0.0, 0.0);
-						processTestMove(m_testAxisX, m_testDurationCounterX, i, -xd, 0.0, 0.0);
+		case 'A': 	if ( modeX == true ) {
+						for( int i=0; i<countX; i++ ) {
+							processTestMove(m_testAxisX, m_testDurationCounterX, i, +xd, 0.0, 0.0);
+							processTestMove(m_testAxisX, m_testDurationCounterX, i, -xd, 0.0, 0.0);
+						}
 					}
 					
-					for( int i=0; i<countY; i++ ) {
-						processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, +yd, 0.0);
-						processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, -yd, 0.0);
+					if ( modeY == true ) {
+						for( int i=0; i<countY; i++ ) {
+							processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, +yd, 0.0);
+							processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, -yd, 0.0);
+						}
 					}
 					
-					for( int i=0; i<countZ; i++ ) {
-						processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, +zd);
-						processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, -zd);
+					if ( modeZ == true ) {
+						for( int i=0; i<countZ; i++ ) {
+							processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, +zd);
+							processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, -zd);
+						}
 					}
-					
+						
 					break;
 					
 		case 'B': 	for( int i=0; i<countX; i++ ) {
-						processTestMove(m_testAxisX, m_testDurationCounterX, i, +xd, 0.0, 0.0);
-						processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, +yd, 0.0);
-						processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, +zd);
+						if ( modeX == true ) processTestMove(m_testAxisX, m_testDurationCounterX, i, +xd, 0.0, 0.0);
+						if ( modeY == true ) processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, +yd, 0.0);
+						if ( modeZ == true ) processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, +zd);
 						
-						processTestMove(m_testAxisX, m_testDurationCounterX, i, -xd, 0.0, 0.0);
-						processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, -yd, 0.0);
-						processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, -zd);
+						if ( modeX == true ) processTestMove(m_testAxisX, m_testDurationCounterX, i, -xd, 0.0, 0.0);
+						if ( modeY == true ) processTestMove(m_testAxisY, m_testDurationCounterY, i, 0.0, -yd, 0.0);
+						if ( modeZ == true ) processTestMove(m_testAxisZ, m_testDurationCounterZ, i, 0.0, 0.0, -zd);
 					}
 					
 					break;
@@ -2762,6 +2808,10 @@ void MainFrame::selectTestIntervalMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString sel = m_testIntervalMode->GetStringSelection();
 	char mode = sel[0];
+	
+	m_testDurationCounterX->SetLabel("-");
+	m_testDurationCounterY->SetLabel("-");
+	m_testDurationCounterZ->SetLabel("-");
 
 	m_testCountY->Enable(mode == 'A');
 	m_testCountZ->Enable(mode == 'A');
@@ -2850,8 +2900,10 @@ bool MainFrame::showConfigSummaryAndConfirmRun() {
 		// alwyays
 		case 'a':	break;
 		// Serial Port only
-		case 'c': 	if ( wxString(cnc->getSerial()->getClassName()) != "SerialPort" )
+		case 'c': 	if ( cnc->getSerial()->isEmulator() )
 						return true;
+						
+					break;
 		// Never
 		default:	return true;
 	}
@@ -2961,23 +3013,31 @@ void MainFrame::processTemplate() {
 	}
 	
 	if ( m_cbUseProceesdSetterList->GetStringSelection().MakeUpper() == "YES" ) {
-		 guiCtlSetup->processedSetters	= m_dvListCtrlProcessedSetters;
+		 guiCtlSetup->processedSetters = m_dvListCtrlProcessedSetters;
 		 cnc->setGuiControls(guiCtlSetup);
 	} else {
 		m_dvListCtrlProcessedSetters->DeleteAllItems();
-		guiCtlSetup->processedSetters	= NULL;
+		guiCtlSetup->processedSetters = NULL;
 		cnc->setGuiControls(guiCtlSetup);
 	}
 	
 	startAnimationControl();
 
 	// select draw pane
-	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
+	wxString sel = m_cbRunMotionMonitorMode->GetStringSelection();
+	switch ( (char)sel[0] ) {
+		case '3': 	m_outboundNotebook->SetSelection(Outbound3DPage);
+					cnc->setMotionMonitorMode(CncControl::MMM_3D);
+					break;
+		default: 	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
+					cnc->setMotionMonitorMode(CncControl::MMM_2D);
+	}
 	
 	// select template Page
 	if ( m_mainNotebook->GetSelection() != MainManuallyPage && 
 	     m_mainNotebook->GetSelection() != MainTestPage && 
-	     m_mainNotebook->GetSelection() != MainTemplatePage ) {
+	     m_mainNotebook->GetSelection() != MainTemplatePage && 
+	     m_mainNotebook->GetSelection() != MainSerialSpy ) {
 		m_mainNotebook->SetSelection(MainTemplatePage);
 	}
 
@@ -3092,11 +3152,17 @@ bool MainFrame::checkIfTemplateIsModified() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::mainBookPageChanging(wxNotebookEvent& event) {
+///////////////////////////////////////////////////////////////////
+	// currently not in use
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::mainBookPageChanged(wxNotebookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int sel = event.GetSelection();
 	
 	if ( (wxWindow*)event.GetEventObject() == m_mainNotebook ) {
+		enableSerialSpy(sel == MainSerialSpy);
 		
 	} else if ( (wxWindow*)event.GetEventObject() == m_templateNotebook ) {
 		if ( sel == TemplatePreviewPage ) {
@@ -3145,11 +3211,6 @@ void MainFrame::prepareTplPreview(bool force) {
 	} else {
 		std::cerr << "Error creating a temp file: " << tfn.c_str() << std::endl;
 	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::mainBookPageChanging(wxNotebookEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// currently not in use
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::emergencyStop(wxCommandEvent& event) {
@@ -4527,7 +4588,7 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 									break;
 									
 			case Outbound3DPage:	if ( cnc )
-										cnc->set3DData();
+										cnc->set3DData(false);
 									break;
 		}
 	}
@@ -4574,7 +4635,6 @@ void MainFrame::updateStepDelay() {
 	val << m_stepDelay->GetValue();
 	val += " ms";
 	m_stepDelayValue->SetLabel(val);
-
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::stepDelayChanged(wxScrollEvent& event) {
@@ -4725,9 +4785,7 @@ void MainFrame::createStcFileControlPopupMenu() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateTemplateListBook() {
 ///////////////////////////////////////////////////////////////////
-	wxListView* lv = m_templateListBook->wxListbook::GetListView();
-	lv->SetBackgroundColour(wxColour(191,205,219));
-	lv->Select(1);
+	m_templateTreeBook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
@@ -5357,6 +5415,7 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		
 		disableControls();
 		disableAllRunControls();
+		m_testToggleEndSwitch->Enable(false);
 		m_testToggleTool->Enable(true);
 		
 		cnc->switchToolOn();
@@ -5395,13 +5454,21 @@ void MainFrame::testEndSwitchEvaluation(wxCommandEvent& event) {
 		startAnimationControl();
 		while ( m_testToggleEndSwitch->GetValue() == true ) {
 			dispatch();
+			
+			if ( cnc->isInterrupted() ) {
+				m_testToggleEndSwitch->SetValue(false);
+				break;
+			}
+			
 			cnc->evaluateLimitState();
 		}
 		
 		enableControls();
 		stopAnimationControl();
 		
-	} else {
+	} 
+	
+	if ( m_testToggleEndSwitch->GetValue() == false ) {
 		m_testToggleEndSwitch->SetLabel("Start End Switch Evaluation");
 		m_testToggleEndSwitch->SetBackgroundColour(*wxGREEN);
 		m_testToggleEndSwitch->SetForegroundColour(*wxBLACK);
@@ -5461,7 +5528,7 @@ void MainFrame::animate3D(wxCommandEvent& event) {
 void MainFrame::refresh3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc )
-		cnc->set3DData();
+		cnc->set3DData(false);
 		
 	drawPane3D->Refresh();
 }
@@ -5697,5 +5764,138 @@ void MainFrame::setDisplayAngels3D() {
 	int ax = m_spin3DAngelX->GetValue();
 	int ay = m_spin3DAngelY->GetValue();
 	int az = m_spin3DAngelZ->GetValue();
-	drawPane3D->determineDisplayAngles(ax, ay, az);
+	
+	drawPane3D->setDisplayAngles(ax, ay, az, false);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectedPlane3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( drawPane3D == NULL )
+		return;
+		
+	wxString sel = m_planeSelect3D->GetStringSelection();
+	
+	switch ( (char)sel[0] ) {
+		case 'X':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); break;
+		case 'Y':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_YZ); break;
+		case 'Z':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_ZX); break;
+		default:	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); 
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::show3DPaneHelp(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString msg;
+	msg << "Keyboard support:\n";
+	msg << "Cursor keys + CTRL:\t\t Translates relative to the orgin.\n";
+	msg << "Cursor keys + SHIFT:\t\t Moves the view port center.\n";
+	msg << "Cursor keys:\t\t Rotates the view.\n";
+	msg << "Blank:\t\t\t Rotates the view automatically.\n";
+	msg << "\n";
+	msg << "Mouse (move) support:\n";
+	msg << "Left Button + CTRL:\t\t Translates relative to the orgin.\n";
+	msg << "Left Button + SHIFT:\t\t Moves the view port center.\n";
+	msg << "Left Button\t\t Rotates the view.\n";
+	msg << "Wheel+/-:\t\t\t Scales the view.\n";
+	
+	wxMessageDialog  dlg(this, msg, _T("3D DrawPane Information . . . "), 
+		                    wxOK|wxCENTRE|wxICON_INFORMATION);
+	dlg.ShowModal();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::clearSerialSpy() {
+///////////////////////////////////////////////////////////////////
+	serialSpy->Clear();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::clearSerialSpy(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	clearSerialSpy();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::freezeSerialSpy(bool state) {
+///////////////////////////////////////////////////////////////////
+	//set freeze state
+	if ( state == true ) {
+		if ( serialSpy->IsFrozen() == false ) {
+			cnc::spy << "Serial Spy is frozen from now on . . . \n";
+			cnc->waitActive(100);
+			serialSpy->Freeze();
+		}
+	} else {
+		if ( serialSpy->IsFrozen() == true ) {
+			serialSpy->Thaw();
+			cnc::spy << '\n';
+		}
+	}
+	
+	// decorate buttons and menues
+	if ( serialSpy->IsFrozen() == false) {
+		m_freezeSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_NOT_FROZEN")); 
+		m_freezeSerialSpy->SetToolTip("Freeze Serial Spy");
+		m_menuItemDebugSerial->Check(true);
+	} else {
+		m_freezeSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_FROZEN")); 
+		m_freezeSerialSpy->SetToolTip("Unfreeze Serial Spy");
+		m_menuItemDebugSerial->Check(false);
+	}
+	
+	m_freezeSerialSpy->Refresh();
+	m_freezeSerialSpy->Update();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::freezeSerialSpy(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	freezeSerialSpy(serialSpy->IsFrozen() != true );
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::freezeLogger(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( m_logger->IsFrozen() ) {
+		m_freezeLogger->SetBitmap(ImageLib16().Bitmap("BMP_NOT_FROZEN")); 
+		m_freezeLogger->SetToolTip("Freeze Logger");
+		m_logger->Thaw();
+	} else {
+		m_freezeLogger->SetBitmap(ImageLib16().Bitmap("BMP_FROZEN")); 
+		m_freezeLogger->SetToolTip("Unfreeze Logger");
+		m_logger->Freeze();
+	}
+	
+	m_freezeLogger->Refresh();
+	m_freezeLogger->Update();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::enableSerialSpy(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( m_menuItemDebugSerial->IsChecked() ) {
+		m_menuItemDebugSerial->Check(false);
+	} else {
+		m_menuItemDebugSerial->Check(true);
+	}
+	
+	updateMonitoring();
+	decorateSerialSpy();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::enableSerialSpy(bool state) {
+///////////////////////////////////////////////////////////////////
+	m_menuItemDebugSerial->Check(state);
+	updateMonitoring();
+	decorateSerialSpy();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::decorateSerialSpy() {
+///////////////////////////////////////////////////////////////////
+	if ( m_menuItemDebugSerial->IsChecked() ) {
+		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_SERIAL_SYP_ON")); 
+		m_enableSerialSpy->SetToolTip("Disable Serial Spy");
+		cnc::spy.enableMessage(); 
+	} else {
+		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_FROZEN")); 
+		m_enableSerialSpy->SetToolTip("Enable Serial Spy");
+		cnc::spy.disableMessage();
+	}
+	
+	m_enableSerialSpy->Refresh();
+	m_enableSerialSpy->Update();
 }

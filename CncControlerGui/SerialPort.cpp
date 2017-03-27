@@ -18,6 +18,8 @@ Serial::Serial(CncControl* cnc)
 , isPause(false)
 , isCommand(false)
 , traceInfo(true)
+, portName()
+, lastFetchResult(RET_NULL)
 {
 ///////////////////////////////////////////////////////////////////
 	STATIC_CMD_CHAR[1] = '\0';
@@ -29,6 +31,8 @@ Serial::Serial(const char *portName)
 , isPause(false)
 , isCommand(false)
 , traceInfo(true)
+, portName()
+, lastFetchResult(RET_NULL)
 {
 ///////////////////////////////////////////////////////////////////
 	connect(portName);
@@ -484,8 +488,10 @@ bool Serial::processIdle() {
 	cmd[idx++] = 'i';
 	p++;
 	
-	if (traceInfo) 
-		std::cout << "Snd: '" << cmd[0] << " << ";
+	if ( traceInfo ) {
+		cnc::spy.initializeResult();
+		cnc::spy << "Send: '" << cmd[0] << "'\n";
+	}
 		
 	if ( writeData(cmd, idx) ) {
 		// only a dummy here
@@ -533,8 +539,10 @@ bool Serial::processTest(int32_t testId) {
 	memcpy(p, &testId, LONG_BUF_SIZE);
 	idx += LONG_BUF_SIZE;
 	
-	if (traceInfo) 
-		std::cout << "Snd: '" << cmd[0] <<  "[" << testId << "]' << ";
+	if ( traceInfo ) {
+		cnc::spy.initializeResult();
+		cnc::spy << "Send: '" << cmd[0] <<  "[" << testId << "]'\n";
+	}
 		
 	if ( writeData(cmd, idx) ) {
 		// only a dummy here
@@ -585,8 +593,10 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	memcpy(p, &value, LONG_BUF_SIZE);
 	idx += LONG_BUF_SIZE;
 	
-	if (traceInfo) 
-		std::cout << "Snd: '" << cmd[0] << "[" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << value << "]' << ";
+	if ( traceInfo ) {
+		cnc::spy.initializeResult();
+		cnc::spy << "Send: '" << cmd[0] << "[" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << ntohl(value) << "]'\n";
+	}
 		
 	if ( writeData(cmd, idx) ) {
 		// only a dummy here
@@ -634,8 +644,10 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 	cmd[0] = 'G';
 	cmd[1] = pid;
 	
-	if (traceInfo) 
-		std::cout << "Snd: '" << cmd[0] << "[" << ArduinoPIDs::getPIDLabel((pid)) << "]";
+	if ( traceInfo ) {
+		cnc::spy.initializeResult();
+		cnc::spy << "Send: '" << cmd[0] << "[" << ArduinoPIDs::getPIDLabel((pid)) << "]\n";
+	}
 
 	list.clear();
 
@@ -680,15 +692,14 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 	char* p = (char*)cmd;
 	for ( unsigned int i=0; i<strlen(cmd); i++ ) {
 		
-		int code = (unsigned char)cmd[i];
-		
 		if ( writeOnlyMoveCommands == true && isMoveCommand((unsigned char)cmd[i]) == false ) {
 			p++; // important to have always the right index!
 			continue;
 		}
 
 		if ( traceInfo ) {
-			std::cout << "Snd: '" << cmd[i] << "' [" << code << "] << ";
+			cnc::spy.initializeResult();
+			cnc::spy << "Send: '" << cmd[i] << "'\n";
 		}
 
 		if ( writeData(p++, 1) ) {
@@ -779,6 +790,11 @@ bool Serial::processMove(unsigned int size, int32_t values[], bool alreadyRender
 		p   += LONG_BUF_SIZE;
 	}
 	
+	if ( traceInfo ) {
+		cnc::spy.initializeResult();
+		cnc::spy << "Send: '" << moveCommand[0] << "'\n";
+	}
+		
 	if ( writeData(moveCommand, idx) ) {
 		SerialFetchInfo sfi;
 		sfi.command 		= moveCommand[0];
@@ -804,16 +820,13 @@ bool Serial::processMove(unsigned int size, int32_t values[], bool alreadyRender
 const char* Serial::decodeContollerResult(int ret) {
 ///////////////////////////////////////////////////////////////////
 	switch ( ret ) {
+		case RET_NULL:		return "RET_NULL";
 		case RET_OK: 		return "RET_OK";
 		case RET_ERROR:		return "RET_ERROR";
 		case RET_SOT:		return "RET_SOT";
 		case RET_SOH:		return "RET_SOH";
 		case RET_MSG:		return "RET_MSG";
-		default:
-							static wxString s;
-							s = "UNKNOWN(";
-							s += ret;
-							s += ")";
+		default:			static wxString s(wxString::Format("UNKNOWN(%d)", ret));
 							return s.c_str();
 	}
 	
@@ -825,10 +838,6 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 	if ( cncControl->isInterrupted() )
 		return false;
 	
-	/*
-	while ( isCommand == true )
-		cncControl->waitActive(1000);
-	*/
 	wxMutexLocker lock(s_mutexProtectingTheGlobalData);
 	isCommand = true;
 	
@@ -849,16 +858,18 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 	// fetch loop
 	while ( true ) {
 		// read one byte from serial
+		resetLastFetchResult();
 		unsigned char ret = fetchControllerResult(sfi.singleFetchTimeout);
-
+		setLastFetchType(ret);
+		
 		if (traceInfo) 
-			std::clog << "Serial::fetchResult: Command: " << sfi.command << ", Result: " << decodeContollerResult(ret) << std::endl;
+			cnc::spy << "Serial::fetchResult: Command: " << sfi.command << ", Result: " << decodeContollerResult(ret) << std::endl;
 		
 		switch( ret ) {
 			//evaluateResult..........................................
 			case RET_OK:
 			{
-				cncControl->SerialCallback(1);
+				cncControl->SerialCallback(0);
 				return RET_OK_Handler(sfi, mutliByteStream, pos);
 			}
 			//evaluateResult..........................................
@@ -876,7 +887,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			case RET_SOT:
 			{
-				cncControl->SerialCallback(1);
+				cncControl->SerialCallback(0);
 
 				if ( sfi.retSOTAllowed == false ) {
 					std::cerr << "Multibyte text results are not allowed in the context of command: " << sfi.command << std::endl;
@@ -906,7 +917,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			case RET_SOH:
 			{
-				cncControl->SerialCallback(1);
+				cncControl->SerialCallback(0);
 				
 				if ( sfi.retSOHAllowed == false ) {
 					
@@ -952,7 +963,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			default: {
 				
-				std::cerr << "Serial::evaluateResult: Invalid Acknowlege: \n" << sfi.command <<", " << (int)ret << "\n";
+				std::cerr << "Serial::evaluateResult: Invalid Acknowlege: \n" << sfi.command <<", as integer: " << (int)ret << "\n";
 				cncControl->SerialCallback(1);
 				
 				return false;
@@ -967,14 +978,14 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	if (traceInfo) 
-		std::clog << "Serial::RET_OK_Handler: Command: " << sfi.command << ", " << (int)sfi.command << std::endl;
+		cnc::spy << "Serial::RET_OK_Handler: Command: " << sfi.command << ", as integer: " << (int)sfi.command << std::endl;
 
 	switch ( sfi.command ) {
 		//RET_OK_Handler...........................................
 		case 'S':
 		{
 			if (traceInfo) 
-				std::cout << "OK\n";
+				cnc::spy.finalizeOK();
 
 			cncControl->SerialCallback(1);
 			return true;
@@ -985,10 +996,16 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 		{
 			cncControl->SerialCallback(1);
 
-			if ( strcmp(getClassName(), "SerialPort") == 0 ) {
-				std::cerr << "RET_OK isn't valid for class command G\n";
+			if ( isEmulator() == false ) {
+				wxString msg("RET_OK isn't valid for class command G\n");
+				std::cerr << msg;
+				cnc::spy.finalizeERROR(msg);
 				return false;
 			}
+			
+			if (traceInfo)
+				cnc::spy.finalizeOK();
+				
 			return true;
 		}
 		
@@ -998,9 +1015,6 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 		{
 			cncControl->SerialCallback(1);
 
-			if (traceInfo) 
-				std::cout << "OK\n";
-				
 			switch ( sfi.Mc.size ) {
 				case 1:
 					pos.incZ(sfi.Mc.value1);
@@ -1016,6 +1030,9 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 					break;
 			}
 			
+			if (traceInfo) 
+				cnc::spy.finalizeOK();
+				
 			return true;
 		}
 		
@@ -1025,7 +1042,8 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			determineCoordinates(sfi.command, pos);
 			cncControl->SerialCallback(1);
 				
-			if (traceInfo) std::cout << "OK\n";
+			if (traceInfo)
+				cnc::spy.finalizeOK();
 			
 			return true;
 		}
@@ -1039,19 +1057,20 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 bool Serial::RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	if (traceInfo) 
-		std::clog << "Serial::RET_SOT_Handler: Command: " << sfi.command << ", " << (int)sfi.command << std::endl;
+		cnc::spy << "Serial::RET_SOT_Handler: Command: " << sfi.command << ", as integer: " << (int)sfi.command << std::endl;
 
 	switch ( sfi.command ) {
 		//RET_SOT_Handler..........................................
 		default:
 		{
-			//std::clog << "Fetching multi byte result\n";
 			fetchMultiByteResult(sfi.multiByteResult, sizeof(sfi.multiByteResult)-1);
 			decodeMultiByteResults(sfi.command, sfi.multiByteResult, mutliByteStream);
 			
-			determineCoordinates(sfi.command, pos);
-
 			cncControl->SerialCallback(1);
+			
+			if (traceInfo)
+				cnc::spy.finalizeOK();
+				
 			return true;
 		}
 	}
@@ -1064,13 +1083,15 @@ bool Serial::RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	if (traceInfo) 
-		std::clog << "Serial::RET_SOH_Handler: Command: " << sfi.command << ", " << (int)sfi.command << std::endl;
+		cnc::spy << "Serial::RET_SOH_Handler: Command: " << sfi.command << ", as integer: " << (int)sfi.command << std::endl;
 	
 	// read first byte (content info) after RET_SOH
 	unsigned char cr = fetchControllerResult(sfi.singleFetchTimeout);
 	
 	if ( cr == RET_ERROR ) {
-		std::cerr << "Serial::RET_SOH_Handler: Can't read content info" << std::endl;
+		wxString msg("Serial::RET_SOH_Handler: Can't read content info");
+		std::cerr << msg<< std::endl;
+		cnc::spy.finalizeERROR(msg);
 		return false;
 	}
 	
@@ -1145,6 +1166,9 @@ bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 		
 		sfi.Gc.p += LONG_BUF_SIZE;
 	}
+	
+	if (traceInfo)
+		cnc::spy.finalizeOK();
 	
 	return true;
 }

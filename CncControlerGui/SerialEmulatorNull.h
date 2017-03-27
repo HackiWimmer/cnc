@@ -1,7 +1,7 @@
 #ifndef SERIAL_EMULATOR_CLASS
 #define SERIAL_EMULATOR_CLASS
 
-#include "SerialPort.h"
+#include "SerialSpyPort.h"
 #include "CncArduino.h"
 
 struct LastCommand {
@@ -34,7 +34,7 @@ struct LastCommand {
 	
 };
 
-class SerialEmulatorNULL : public Serial
+class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
 		bool writeMoveCmd(void *buffer, unsigned int nbByte);;
@@ -57,13 +57,22 @@ class SerialEmulatorNULL : public Serial
 	
 		//Initialize Serial communication without an acitiv connection 
 		SerialEmulatorNULL(CncControl* cnc)
-		: Serial(cnc)
+		: SerialSpyPort(cnc)
 		{}
 		//Initialize Serial communication with the given COM port
-		SerialEmulatorNULL(const char *portName): Serial(portName) {
-		}
+		SerialEmulatorNULL(const char *portName)
+		: SerialSpyPort(portName) 
+		{}
+		// Destuctor
+		virtual ~SerialEmulatorNULL()
+		{}
+		
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulatorNULL"; }
+		// returns the emulator type
+		virtual bool isEmulator() const { return true; }
+		// return the port type
+		virtual const CncPortType getPortType() const { return CncEMU_NULL; }
 		//Simulate connection
 		virtual bool connect(const char* portName) {
 			connected = true;

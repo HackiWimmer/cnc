@@ -382,7 +382,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 	for (CncPathList::iterator it = pathList.list.begin(); it != pathList.list.end(); ++it) {
 		
 		// Artificially waste time
-		Sleep(cncControl->getStepDelay());
+		cncControl->waitActive(cncControl->getStepDelay());
 		
 		CncPathListEntry cpe = *it;
 		cnt++;
@@ -482,8 +482,8 @@ void SVGPathHandlerCnc::finishWork() {
 	
 	// controller handling
 	cncControl->moveXYToZeroPos();
-	//svg output handling
 	
+	//svg output handling
 	CncDoublePosition::Watermarks xyMax;
 	//currentPos.getWatermarks(xyMax); // sometimes not in mm
 	xyMax = cncControl->getWaterMarksMetric();

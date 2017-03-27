@@ -44,12 +44,15 @@ CncControl::CncControl(CncPortType pt)
 , positionCheck(true)
 , drawControl(NULL)
 , drawPaneMargin(30)
+, motionMonitorMode(MMM_2D)
 {
 //////////////////////////////////////////////////////////////////
-	if      ( pt == CncPORT ) 		serialPort = new Serial(this);
+	if      ( pt == CncPORT ) 		serialPort = new SerialSpyPort(this);
 	else if ( pt == CncEMU_NULL )	serialPort = new SerialEmulatorNULL(this);
 	else if ( pt == CncEMU_SVG )	serialPort = new SerialEmulatorSVG(this);
-	else 							serialPort = new Serial(this);
+	else 							serialPort = new SerialSpyPort(this);
+	
+	serialPort->enableSpyOutput();
 	
 	// create default config
 	CncConfig cc;
@@ -281,7 +284,17 @@ void CncControl::setup(bool doReset) {
 		
 		std::cout << "Ready\n";
 	}
-	processCommand("V", std::cout);
+	
+	// Firmware check
+	std::cout << "Firmware:" << std::endl;
+	std::cout << " Available:\t";
+	std::stringstream ss;
+	processCommand("V", ss);
+	std::cout << ss.str() << std::endl;
+	std::cout << " Required:\t" << FIRMWARE_VERSION << std::endl;
+	
+	if ( wxString(FIRMWARE_VERSION) != ss.str().c_str() )
+		cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
 
 	logProcessingEnd();
 }
@@ -510,7 +523,7 @@ void CncControl::interrupt() {
 ///////////////////////////////////////////////////////////////////
 	std::cerr << "CncControl: Interrupted" << std::endl;
 	interruptState = true;
-	switchToolOff();
+	switchToolOff(true);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isInterrupted() {
@@ -952,8 +965,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			break;
 			
 		case CITSetterInfo:
-			if ( getSerial()->getInfoOutput() == true )
-				std::clog << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
+			if ( getSerial()->isSpyOutput() == true )
+				cnc::spy << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
 			break;
 		
 		case CITLimitInfo:
@@ -996,23 +1009,23 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	p.x = convertToDrawPointX(curPos.getX());
 	p.y = convertToDrawPointY(curPos.getY());
 	
+	// 2D points
 	static PointPair pp;
 	PointPair tmp = pp;
+	pp.zAxisDown = zAxisDown;
 	pp.lp = lastDrawPoint;
 	pp.cp = p;
 	lastDrawPoint = p;
 	
-	//Stores the coordinates for further 3D use
+	// 3D points
 	static PositionInfo3D pi3d;
 	pi3d.lp = lastDrawPoint3D;
 	pi3d.cp = curPos;
 	lastDrawPoint3D = curPos;
 	pi3d.zAxisDown 	= zAxisDown;
-	drawPoints3D.push_back(pi3d);
 	
-	// Stores the coorindates for later drawings
+	// Stores the 2D coordinates for later drawings
 	if ( zAxisDown == true ) {
-		//if ( penHandler.getDurationCounter() == 1 ) {
 		if ( isLastDuration() ) {
 			// avoid duplicate values
 			if ( drawPoints.size() > 0 ) {
@@ -1025,7 +1038,13 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 			}
 		}
 	}
-
+	
+	// Stores the 3D coordinates for later drawings
+	// avoid duplicate values
+	if ( tmp != pp ) {
+		drawPoints3D.push_back(pi3d);
+	}
+	
 	// Online drawing coordinates
 	if ( cncConfig->isOnlineUpdateDrawPane() ) {
 		wxClientDC dc(drawControl);
@@ -1033,7 +1052,11 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 		
 		// avoid duplicate values
 		if ( tmp != pp ) {
-			dc.DrawLine(pp.lp, pp.cp);
+			if ( motionMonitorMode == MMM_2D ) {
+				dc.DrawLine(pp.lp, pp.cp);
+			} else {
+				set3DData(true);
+			}
 		}
 	}
 	
@@ -1652,9 +1675,6 @@ void CncControl::switchToolOn() {
 		return;
 
 	if ( powerOn == false ) { 
-		if ( serialPort->getInfoOutput() )
-			std::cout << " Switch tool on" << std::endl;
-		
 		if ( processSetter(PID_ROUTER_SWITCH, 1) ) {
 			powerOn = true;
 			setToolState();
@@ -1662,15 +1682,12 @@ void CncControl::switchToolOn() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::switchToolOff() {
+void CncControl::switchToolOff(bool force) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return;
 
-	if ( powerOn == true ) {
-		if ( serialPort->getInfoOutput() )
-			std::cout << " Switch tool off" << std::endl;
-		
+	if ( powerOn == true || force == true ) {
 		if ( processSetter(PID_ROUTER_SWITCH, 0) ) {
 			powerOn = false;
 			setToolState();
@@ -2342,7 +2359,7 @@ void CncControl::appendNumKeyValueToControllerErrorInfo(int num, int code, const
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::set3DData() {
+void CncControl::set3DData(bool append) {
 ///////////////////////////////////////////////////////////////////
 	if ( guiCtlSetup == NULL || guiCtlSetup->drawPane3D == NULL )
 		return;
@@ -2351,10 +2368,19 @@ void CncControl::set3DData() {
 	double fy = cncConfig->getMaxDimensionY() * cncConfig->getCalculationFactY();
 	double fz = cncConfig->getMaxDimensionZ() * cncConfig->getCalculationFactZ();
 	
-	DrawPaneData& dpd = guiCtlSetup->drawPane3D->clearDataVector();
-	DoublePointPair3D pp;
+	unsigned int offset = 0;
+	DrawPaneData& dpd = guiCtlSetup->drawPane3D->getDataVector();
+	if ( append == false ) {
+		// clear the 3D vector
+		guiCtlSetup->drawPane3D->clearDataVector();
+	} else {
+		// determine offset for append operation
+		if ( dpd.size() != 0 )
+			offset = dpd.size();
+	}
 	
-	for (DrawPoints3D::iterator it = drawPoints3D.begin(); it != drawPoints3D.end(); ++it) {
+	DoublePointPair3D pp;
+	for (DrawPoints3D::iterator it = drawPoints3D.begin() + offset; it != drawPoints3D.end(); ++it) {
 		PositionInfo3D pi3d = *it;
 		
 		if ( pi3d.zAxisDown == true ) {
@@ -2364,10 +2390,25 @@ void CncControl::set3DData() {
 			pp.setDrawColour(*wxYELLOW);
 			pp.setLineStyle(wxDOT);
 		}
-		
 		dpd.push_back(pp.set(pi3d.lp.getX() / fx, pi3d.lp.getY() / fy, pi3d.lp.getZ() / fz,
-							 pi3d.cp.getX() / fx, pi3d.cp.getY() / fy, pi3d.cp.getZ() / fz));  
+							 pi3d.cp.getX() / fx, pi3d.cp.getY() / fy, pi3d.cp.getZ() / fz)); 
 	}
+	
+	if ( append == true ) {
+		//cnc::trc.logInfo(wxString::Format("%d, %d", (int)dpd.size(), (int)drawPoints3D.size()));
+		guiCtlSetup->drawPane3D->Refresh();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::setMotionMonitorMode(const MontionMoinorMode& mmm) {
+///////////////////////////////////////////////////////////////////
+	motionMonitorMode = mmm; 
+	
+	if ( guiCtlSetup == NULL || guiCtlSetup->drawPane3D == NULL )
+		return;
+		
+	if ( motionMonitorMode == MMM_3D )
+		guiCtlSetup->drawPane3D->viewTop();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::sendIdleMessage() {

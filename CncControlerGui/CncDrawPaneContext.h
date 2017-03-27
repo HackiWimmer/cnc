@@ -99,12 +99,43 @@ class CncOpenGLDrawPaneContext : public wxGLContext {
 	                           
 	
 	private:
+		
+		struct Axises {
+
+			struct Colours {
+				wxColour x;
+				wxColour y;
+				wxColour z;
+				
+				/////////////////////////////////////////////
+				Colours() 
+				: x(255, 0, 0)
+				, y(0, 255, 0)
+				, z(0, 0, 255)
+				{
+				}
+			};
+
+			Colours colours;
+			float length;
+			float letterScale;
+
+			/////////////////////////////////////////////////
+			Axises() 
+			: colours()
+			, length(0.25f)
+			, letterScale(0.01f)
+			{
+			}
+		};
+
+		Axises axises;
+
 		void displayCoordinateOrigin();
 		
 		void drawX();
 		void drawY();
 		void drawZ();
-
 };
 
 #endif

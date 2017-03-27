@@ -44,7 +44,12 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 	CncCmsgBuf*  psbufCmsg;
 	std::streambuf *sbOldCmsg;
 
+	// redirect cnc::trc
+	CncCspyBuf*  psbufCspy;
+	std::streambuf *sbOldCspy;
+	
 	namespace cnc {
+		CncSerialSpyStream spy;
 		CncMsgLogStream msg;
 		CncTraceLogStream trc;
 		CncBasicLogStream cex1;
@@ -85,6 +90,12 @@ void installStreamRedirection(MainFrame* mainFrame) {
 	sbOldCmsg = cnc::msg.rdbuf();
 	((iostream*)&cnc::msg)->rdbuf(psbufCmsg);
 	cnc::msg.setLogStreamBuffer(psbufCmsg);
+	
+	// redirect serial spy buffer
+	psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
+	sbOldCspy = cnc::spy.rdbuf();
+	((iostream*)&cnc::spy)->rdbuf(psbufCspy);
+	cnc::spy.setLogStreamBuffer(psbufCspy);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -97,6 +108,7 @@ void resetStreamRedirection() {
 	((iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
 	((iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
 	((iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
+	((iostream*)&cnc::spy)->rdbuf(sbOldCspy);
 	
 	// delete stream buffers
 	delete psbufCout;
@@ -105,6 +117,7 @@ void resetStreamRedirection() {
 	delete psbufCex1;
 	delete psbufCtrc;
 	delete psbufCmsg;
+	delete psbufCspy;
 }
 
 ///////////////////////////////////////////////////////////////////
