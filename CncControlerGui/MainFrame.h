@@ -45,17 +45,13 @@ class MainFrame : public MainFrameBClass {
 		
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
-	protected:
-    virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event);
-    virtual void cfgStepDelayArduino(wxCommandEvent& event);
-    virtual void cfgStepDelayMax(wxCommandEvent& event);
-    virtual void cfgStepDelayMin(wxCommandEvent& event);
-    virtual void enableSerialSpy(wxCommandEvent& event);
-    virtual void clearSerialSpy(wxCommandEvent& event);
-    virtual void freezeSerialSpy(wxCommandEvent& event);
-	virtual void freezeLogger(wxCommandEvent& event);
-    virtual void show3DPaneHelp(wxCommandEvent& event);
-    virtual void selectedPlane3D(wxCommandEvent& event);
+protected:
+	virtual void requestErrorCount(wxCommandEvent& event);
+    virtual void paintXAxisMarkerBottom(wxPaintEvent& event);
+    virtual void paintXAxisMarkerTop(wxPaintEvent& event);
+    virtual void paintYAxisMarker(wxPaintEvent& event);
+    virtual void paintDrawPaneWindow(wxPaintEvent& event);
+    virtual void UpdateLogger(wxCommandEvent& event);
  
 		// will be bind to this frame
 		void globalKeyDownHook(wxKeyEvent& event);
@@ -107,6 +103,8 @@ class MainFrame : public MainFrameBClass {
 		wxMenu* stcFileContentPopupMenu;
 		wxMenu* stcEmuContentPopupMenu;
 		SVGFileParser* svgFileParser;
+		
+		wxTimer perspectiveTimer;
 		
 		GuiControls	guiControls;
 		
@@ -170,6 +168,8 @@ class MainFrame : public MainFrameBClass {
 		void createStcFileControlPopupMenu();
 		void createStcEmuControlPopupMenu();
 		
+		int showSetReferencePositionDlg(wxString msg);
+		
 		///////////////////////////////////////////////////////////////
 		// search handling
 		int getSvgEditSearchFlags();
@@ -198,6 +198,9 @@ class MainFrame : public MainFrameBClass {
 		
 		bool showConfigSummaryAndConfirmRun();
 		
+		void collectSummary();
+		void updateCncConfigTrace();
+		
 		///////////////////////////////////////////////////////////////
 		// control handling
 		void determineCncOutputControls();
@@ -220,6 +223,16 @@ class MainFrame : public MainFrameBClass {
 		void toggleAuiPane(wxWindow* pane, wxMenuItem* menu);
 		void showAuiPane(wxWindow* pane, wxMenuItem* menu);
 		void hideAuiPane(wxWindow* pane, wxMenuItem* menu);
+		
+		void toggleAuiPane(const wxString& name);
+		void showAuiPane(const wxString& name);
+		void hideAuiPane(const wxString& name);
+		
+		void hideAllAuiPanes();
+		void viewAllAuiPanes();
+		
+		wxWindow* getAUIPaneByName(const wxString& name);
+		wxMenuItem* getAUIMenuByName(const wxString& name);
 		
 		void startAnimationControl();
 		void stopAnimationControl();
@@ -292,6 +305,19 @@ class MainFrame : public MainFrameBClass {
 		
 	protected:
 		// User command
+		virtual void perspectiveDefault(wxCommandEvent& event);
+		virtual void perspectiveRun(wxCommandEvent& event);
+		virtual void perspectiveTemplate(wxCommandEvent& event);
+		virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event);
+		virtual void cfgStepDelayArduino(wxCommandEvent& event);
+		virtual void cfgStepDelayMax(wxCommandEvent& event);
+		virtual void cfgStepDelayMin(wxCommandEvent& event);
+		virtual void enableSerialSpy(wxCommandEvent& event);
+		virtual void clearSerialSpy(wxCommandEvent& event);
+		virtual void freezeSerialSpy(wxCommandEvent& event);
+		virtual void freezeLogger(wxCommandEvent& event);
+		virtual void show3DPaneHelp(wxCommandEvent& event);
+		virtual void selectedPlane3D(wxCommandEvent& event);
 		virtual void spin3DAngelX(wxSpinEvent& event);
 		virtual void spin3DAngelY(wxSpinEvent& event);
 		virtual void spin3DAngelZ(wxSpinEvent& event);
@@ -538,7 +564,7 @@ class MainFrame : public MainFrameBClass {
 		virtual void OnClose(wxCloseEvent& event);
 		virtual void OnThreadUpdate(wxThreadEvent& event) {}
 		virtual void OnThreadCompletion(wxThreadEvent& event) {}
-		
+		virtual void OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event));
 		wxDECLARE_EVENT_TABLE();
 };
 

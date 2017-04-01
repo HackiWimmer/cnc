@@ -43,6 +43,8 @@ const char* _programVersion 	= "0.6.4";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 const char* _configFileName 	= "..\\CncController.ini";
 const char* _lruStoreFileName	= "..\\CncControllerLruStore.ini";
+const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
+	
 
 
 // file content change environment
@@ -55,7 +57,7 @@ wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 	EVT_CLOSE(MainFrame::OnClose)
     EVT_THREAD(wxEVT_COMMAND_MYTHREAD_UPDATE, MainFrame::OnThreadUpdate)
     EVT_THREAD(wxEVT_COMMAND_MYTHREAD_COMPLETED, MainFrame::OnThreadCompletion)
-	//EVT_AUI_PANE_CLOSE(MainFrame::closeAuiPane)
+	EVT_TIMER(SpinTimer, MainFrame::OnPerspectiveTimer)
 wxEND_EVENT_TABLE()
 
 wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_COMPLETED, wxThreadEvent);
@@ -93,6 +95,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , stcFileContentPopupMenu(NULL)
 , stcEmuContentPopupMenu(NULL)
 , svgFileParser(NULL)
+, perspectiveTimer(this, wxID_HIGHEST + 1)
 {
 ///////////////////////////////////////////////////////////////////
 	// detemine assert handler
@@ -363,7 +366,8 @@ void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayNotification(const char type, wxString title, wxString message, unsigned int timeout) {
 ///////////////////////////////////////////////////////////////////
-	wxGenericNotificationMessage* dlg = new wxGenericNotificationMessage(title, message, this);
+	wxSharedPtr<wxNotificationMessageBase> dlg;
+	dlg = new wxGenericNotificationMessage(title, message, this);
 	switch ( type ) {
 		case 'E':	dlg->SetFlags(wxICON_ERROR); break;
 		case 'W':	dlg->SetFlags(wxICON_WARNING); break;
@@ -371,32 +375,35 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 	}
 	
 	dlg->Show(timeout);
+	// important to free the shared Pointer!
+	dlg.reset();
 }
 
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+
+	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("Outbound");
+	pi.Float();
+	GetAuimgrMain()->Update();
 	
-	wxGenericNotificationMessage* dlg = new wxGenericNotificationMessage("hallo","mssdadadsadsadsadasd",this);
-	dlg->SetFlags(wxICON_WARNING);
-	dlg->Show(5);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
-	cnc::cex1.setTextAttr(wxTextAttr(*wxYELLOW));
-	cnc::cex1 << "Hallo" << std::endl;
+	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("Outbound");
+	clog << GetAuimgrMain()->SavePaneInfo(pi) << endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
 	
-	cnc::cex1.setTextAttr(wxTextAttr(*wxGREEN));
-	cnc::cex1 << "Hallo" << std::endl;
+	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("Outbound");
+	cnc::cex1 << GetAuimgrMain()->SavePerspective() << endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -418,6 +425,7 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menues
+	m_miToolbar->Check(m_auibarMain->IsShown());
 	m_miViewTemplateManager->Check(m_scrollWinFile->IsShown());
 	m_miViewLogger->Check(m_scrollWinLogger->IsShown());
 	m_miViewMonitor->Check(m_scrollOutbound->IsShown());
@@ -441,6 +449,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		processTemplate();
 	}
 	
+	// don't works well
+	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::serialTimer(wxTimerEvent& event) {
@@ -685,9 +695,6 @@ void MainFrame::initialize(void) {
 	
 	this->SetTitle(wxString(_programTitel) + " " + _programVersion);
 	
-	//todo
-	m_serialSpyDetails->SetDefaultStyle(*wxYELLOW);
-
 	wxString cfgStr;
 	//Setup CncPORT selector box
 	m_portSelector->Clear();
@@ -867,7 +874,7 @@ bool MainFrame::initializeCncControl() {
 	
 	//Initialize the postion controls
 	cnc->setZeroPos();
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	
 	// z slider
 	cnc->updateZSlider();
@@ -1143,6 +1150,8 @@ bool MainFrame::connectSerialPort() {
 	
 	startAnimationControl();
 	
+	m_serialTimer->Stop();
+	
 	if ( m_clearSerialSpyOnConnect->IsChecked() ) {
 		clearSerialSpy();
 	}
@@ -1150,13 +1159,14 @@ bool MainFrame::connectSerialPort() {
 	bool ret = false;
 	wxString sel = m_portSelector->GetStringSelection();
 	CncConfig cc(*cnc->getCncConfig());
+	cnc->setDrawControl(NULL);
 	
 	delete cnc;
 	wxString cs;
 	
-	cnc->setDrawControl(NULL);
+	disableControls();
+	disableAllRunControls();
 	hideSVGEmuResult();
-	enableMenuItem(m_miSaveEmuOutput, false);
 	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
@@ -1177,14 +1187,13 @@ bool MainFrame::connectSerialPort() {
 	}
 
 	initializeCncControl();
-	disableControls();
 	lastPortName = "";
 	
 	if ( (ret = cnc->connect(cs)) == true )  {
 		cnc->setDrawControl(m_drawPane);
 		setCoordinateSystemType();
 		cnc->setup();
-		cnc->updateCncConfigTrace();
+		updateCncConfigTrace();
 		lastPortName = sel;
 		stopAnimationControl();
 		m_connect->SetBitmap(bmpC);
@@ -1194,6 +1203,7 @@ bool MainFrame::connectSerialPort() {
 			setRefPostionState(true);
 		}
 		
+		m_serialTimer->Start();
 	}
 	
 	m_connect->Refresh();
@@ -1315,7 +1325,7 @@ void MainFrame::unfreezeLogger() {
 	if ( m_logger->IsFrozen() ) {
 		m_logger->Thaw();
 		// Trick: This scrolls to the end of content
-		std::cout << '\n';
+		std::cout << ' ';
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1388,7 +1398,7 @@ void MainFrame::killFocusMaxDimensionX(wxFocusEvent& event) {
 	else					rbd = 0.0;
 	
 	cnc->getCncConfig()->setMaxDimensionX(rbd);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	
 	event.Skip(true);
 }
@@ -1404,7 +1414,7 @@ void MainFrame::killFocusMaxDimensionY(wxFocusEvent& event) {
 	else					rbd = 0.0;
 	
 	cnc->getCncConfig()->setMaxDimensionY(rbd);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	
 	event.Skip(true);
 }
@@ -1420,7 +1430,7 @@ void MainFrame::killFocusMaxDimensionZ(wxFocusEvent& event) {
 	else					rbd = 0.0;
 	
 	cnc->getCncConfig()->setMaxDimensionZ(rbd);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	
 	event.Skip(true);
 }
@@ -1436,7 +1446,7 @@ void MainFrame::killFocusRouterDiameter(wxFocusEvent& event) {
 	else					rbd = 0.0;
 
 	cnc->getCncConfig()->setRouterBitDiameter(rbd);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	
 	event.Skip(true);
 }
@@ -1451,7 +1461,7 @@ void MainFrame::killFocusReplyThreshold(wxFocusEvent& event) {
 	
 	cnc->getCncConfig()->setRelyThreshold(v);
 	cnc->setup(false);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	
 	event.Skip(true);
 }
@@ -1464,7 +1474,7 @@ void MainFrame::updateReverseStepSignX(wxCommandEvent& event) {
 	else							cnc->getCncConfig()->setStepSignX(+1);
 	
 	cnc->setup(false);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateReverseStepSignY(wxCommandEvent& event) {
@@ -1475,14 +1485,47 @@ void MainFrame::updateReverseStepSignY(wxCommandEvent& event) {
 	else							cnc->getCncConfig()->setStepSignY(+1);
 	
 	cnc->setup(false);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateInclWpt(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc && cnc->getCncConfig());
 	cnc->getCncConfig()->setReferenceIncludesWpt(m_includingWpt->IsChecked());
+	updateCncConfigTrace();
+}
+///////////////////////////////////////////////////////////////////
+int  MainFrame::showSetReferencePositionDlg(wxString msg) {
+///////////////////////////////////////////////////////////////////
+	wxMessageDialog dlg(this, msg, _T("Action required  . . . "), 
+				wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
+	dlg.SetYesNoCancelLabels("Set with workpiece thickness ", "Set without workpiece thieckness", "Do it later . . . ");
+	
+	int ret = dlg.ShowModal();
+	switch ( ret ) {
+		case  wxID_YES:  	m_includingWpt->SetValue(true);
+							m_mainNotebook->SetSelection(MainReferencePage);
+							setZero();
+							break;
+							
+		case  wxID_NO:		m_includingWpt->SetValue(false);
+							m_mainNotebook->SetSelection(MainReferencePage);
+							setZero();
+							break;
+							
+		default:			m_crossingThickness->SetFocus(); 
+							//do nothing
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::updateCncConfigTrace() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cnc);
 	cnc->updateCncConfigTrace();
+	cnc->updateZSlider();
+	collectSummary();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
@@ -1497,34 +1540,14 @@ void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
 	
 	if ( cnc->getCncConfig()->getWorkpieceThickness() != wpt ) {
 		cnc->getCncConfig()->setWorkpieceThickness(wpt);
-		cnc->updateCncConfigTrace();
-		cnc->updateZSlider();
-		
+		updateCncConfigTrace();
 		setRefPostionState(false);
 		
 		wxString msg("A workpiece thickness change requires a redefinition of the CNC reference position.\n\n");
 		msg << "This have to be done before the next CNC run.\n\n";
 		msg << "The set function below can be used to set it directly.";
 		
-		wxMessageDialog dlg(this, msg, _T("Action required  . . . "), 
-					wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
-		dlg.SetYesNoCancelLabels("Set with workpiece thickness ", "Set without workpiece thieckness", "Do it later . . . ");
-		
-		int ret = dlg.ShowModal();
-		switch ( ret ) {
-			case  wxID_YES:  	m_includingWpt->SetValue(true);
-								m_mainNotebook->SetSelection(MainReferencePage);
-								setZero();
-								break;
-								
-			case  wxID_NO:		m_includingWpt->SetValue(false);
-								m_mainNotebook->SetSelection(MainReferencePage);
-								setZero();
-								break;
-								
-			default:			m_crossingThickness->SetFocus(); 
-								//do nothing
-		}
+		showSetReferencePositionDlg(msg);
 	}
 	
 	m_crossings->ChangeValue(wxString() << cnc->getCncConfig()->getDurationCount());
@@ -1545,8 +1568,7 @@ void MainFrame::killFocusCrossingThickness(wxFocusEvent& event) {
 	
 	if ( cnc->getCncConfig()->getMaxDurationThickness() != ct ) {
 		cnc->getCncConfig()->setMaxDurationThickness(ct);
-		cnc->updateCncConfigTrace();
-		cnc->updateZSlider();
+		updateCncConfigTrace();
 	}
 	
 	m_crossings->ChangeValue(wxString() << cnc->getCncConfig()->getDurationCount());
@@ -1674,7 +1696,7 @@ void MainFrame::updateSpeedValues() {
 		cnc->getCncConfig()->setActiveSpeedZ(CncSpeedFly);
 	}
 
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	
 	m_speedX->SetRange(0, cnc->getCncConfig()->getMaxSpeedXY());
 	m_speedY->SetRange(0, cnc->getCncConfig()->getMaxSpeedXY());
@@ -2058,6 +2080,8 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 		if ( !openFile() ) {
 			m_inputFileName->SetValue(ov);
 			m_inputFileName->SetHint(oh);
+		} else {
+			prepareTplPreview(true);
 		}
 	}
 	
@@ -2087,6 +2111,8 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 	if ( !openFile() ) {
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
+	} else {
+		prepareTplPreview(true);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2095,7 +2121,6 @@ void MainFrame::reloadTemplate(wxCommandEvent& event) {
 	if ( !openFile() ) {
 		std::cerr << "Error while reloding template: " << m_inputFileName->GetValue().c_str() << std::endl;
 	}
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::reloadTemplateFromButton(wxCommandEvent& event) {
@@ -2850,12 +2875,10 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 			msg << "How to fix it:\n";
 			msg << "Please use the \"Set Current Position to Zero\" functionality on the \"References\" tab.";
 			
-			wxMessageDialog dlg(this, msg, _T("CNC Reference Position check . . . "), 
-								wxOK|wxCENTRE|wxICON_ERROR);
-		
-			dlg.ShowModal();
-			
+			showAuiPane("MainView");
 			m_mainNotebook->SetSelection(MainReferencePage);
+			
+			showSetReferencePositionDlg(msg);
 			
 			return false;
 		}
@@ -2968,7 +2991,7 @@ void MainFrame::cancelRun(wxCommandEvent& event) {
 	runConfirmationInfo = RunConfirmationInfo::Canceled;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
+void MainFrame::collectSummary() {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc == NULL )
 		return;
@@ -2977,17 +3000,44 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 		return;
 		
 	CncConfig* cc = cnc->getCncConfig();
-		
+	
 	DcmItemList rows;
-	DataControlModel::addNumParameterValueUnitRow(rows, "Workpiece thickness", 				wxString::Format("%4.3f", 	cc->getWorkpieceThickness()), 		"mm"); 
-	DataControlModel::addNumParameterValueUnitRow(rows, "Max thickness per crossing", 		wxString::Format("%4.3f", 	cc->getMaxDurationThickness()), 	"mm"); 
-	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed XY", 					wxString::Format("%d", 		cc->getWorkSpeedXY()), 				"rpm"); 
-	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed Z", 					wxString::Format("%d", 		cc->getWorkSpeedZ()), 				"rpm");
+	DataControlModel::addNumParameterValueUnitRow(rows, "Workpiece thickness", 				wxString::Format(" %4.3f", 	cc->getWorkpieceThickness()), 		" mm"); 
+	DataControlModel::addNumParameterValueUnitRow(rows, "Max thickness per crossing", 		wxString::Format(" %4.3f", 	cc->getMaxDurationThickness()), 	" mm"); 
+	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed XY", 					wxString::Format(" %d", 	cc->getWorkSpeedXY()), 				" rpm"); 
+	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed Z", 					wxString::Format(" %d", 	cc->getWorkSpeedZ()), 				" rpm");
 	// ...
 
 	m_dvListCtrlConfigSummary->DeleteAllItems();
 	for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
 		m_dvListCtrlConfigSummary->AppendItem(*it);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
+///////////////////////////////////////////////////////////////////
+	unsigned int sel = event.GetSelection();
+	if ( (wxWindow*)event.GetEventObject() == m_notebookConfig ) {
+		
+		wxCommandEvent dummyEvent;
+		
+		switch ( sel ) {
+			case ConfigSummaryPage:
+					collectSummary();
+					break;
+					
+			case CNCControllerPinsPage:
+					requestControllerPinsFromButton(dummyEvent);
+					break;
+					
+			case CNCControllerConfigPage:
+					requestControllerConfigFromButton(dummyEvent);
+					break;
+					
+			case CNCControllerErrorPage:
+					requestControllerErrorInfoFromButton(dummyEvent);
+					break;
+		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -3005,6 +3055,8 @@ void MainFrame::processTemplate() {
 			return;
 	}
 	
+	showAuiPane("Outbound");
+		
 	if ( checkIfRunCanBeProcessed() == false )
 		return;
 		 
@@ -3045,7 +3097,7 @@ void MainFrame::processTemplate() {
 	updateStepDelay();
 	disableControls();
 	resetMinMaxPositions();
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	cnc->getCncConfig()->setAllowEventHandling(true);
 	cnc->processCommand("r", std::cout);
 	cnc->logProcessingStart();
@@ -3058,12 +3110,14 @@ void MainFrame::processTemplate() {
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
+			cnc->resetZSlider();
 			ret = processSVGTemplate();
 			break;
 		case TplGcode:
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
+			cnc->resetZSlider();
 			ret = processGCodeTemplate();
 			break;
 		case TplText:
@@ -3074,19 +3128,31 @@ void MainFrame::processTemplate() {
 			break;
 		case TplTest:
 			cnc->clearDrawControl();
+			cnc->resetZSlider();
 			ret = processTestTemplate();
 			break;
 		default:
 			; // do nothing
 	}
 	
+	// Check positions
 	setMinMaxPositions();
 	if ( cnc->validatePositions() == false ) {
-		if ( cnc->isInterrupted() == false) {
+		if ( cnc->isInterrupted() == false ) {
 			std::cerr << "Validate positions failed" << std::endl;
 			std::cerr << "PC pos        : " << cnc->getCurPos() << std::endl;
 			std::cerr << "Controller pos: " << cnc->getControllerPos() << std::endl;
 			setRefPostionState(false);
+		}
+	}
+	
+	// Check error count
+	int32_t cnt = -1;
+	if ( (cnt = cnc->getControllerErrorCount() ) != 0 ) {
+		if ( cnc->isInterrupted() == false ) {
+			wxString msg("Controller Error Count: ");
+			msg << cnt;
+			displayNotification('E', "Controller Error Check", msg, 5);
 		}
 	}
 	
@@ -3450,6 +3516,15 @@ void MainFrame::requestControllerErrorInfoFromButton(wxCommandEvent& event) {
 	requestErrorInfo(event);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::requestErrorCount(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cnc);
+	int32_t cnt = cnc->getControllerErrorCount();
+	std::stringstream ss;
+	ss << "Current controller error count: " << cnt;
+	cnc::trc.logInfoMessage(ss.str().c_str());
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::requestCurrentPos(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -3457,7 +3532,6 @@ void MainFrame::requestCurrentPos(wxCommandEvent& event) {
 	std::stringstream ss;
 	ss << "Current controller position: " << pos;
 	cnc::trc.logInfoMessage(ss.str().c_str());
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestCurrentLimitState(wxCommandEvent& event) {
@@ -4294,7 +4368,7 @@ void MainFrame::updateCurveLibResolution() {
 	}
 	
 	cnc->getCncConfig()->setCurveLibResolution(v);
-	cnc->updateCncConfigTrace();
+	updateCncConfigTrace();
 	CncSvgCurveLib::setResolution((float)v);
 }
 ///////////////////////////////////////////////////////////////////
@@ -4453,6 +4527,7 @@ void MainFrame::highlightTplPreview(bool state) {
 	m_svgPreview->Refresh();
 	m_panelTplPreview->Refresh();
 }
+
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleAuiPane(wxWindow* pane, wxMenuItem* menu) {
 ///////////////////////////////////////////////////////////////////
@@ -4496,6 +4571,77 @@ void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu) {
 	GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
+wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
+///////////////////////////////////////////////////////////////////
+	if      ( name == "ToolBar" ) 			return m_auibarMain;
+	else if ( name == "MainView")			return m_scrollWinMain;
+	else if ( name == "Logger")				return m_scrollWinLogger;
+	else if ( name == "Outbound")			return m_scrollOutbound;
+	else if ( name == "TemplateManager")	return m_scrollWinFile;
+	else if ( name == "StatusBar")			return m_statusBar;
+
+	return NULL;
+}
+///////////////////////////////////////////////////////////////////
+wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
+///////////////////////////////////////////////////////////////////
+	if      ( name == "ToolBar" ) 			return m_miToolbar;
+	else if ( name == "MainView")			return m_miViewMainView;
+	else if ( name == "Logger")				return m_miViewLogger;
+	else if ( name == "Outbound")			return m_miViewMonitor;
+	else if ( name == "TemplateManager")	return m_miViewTemplateManager;
+
+	return NULL;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::toggleAuiPane(const wxString& name) {
+///////////////////////////////////////////////////////////////////
+	wxWindow* w = getAUIPaneByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	wxMenuItem* m = getAUIMenuByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	
+	toggleAuiPane(w, m);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::showAuiPane(const wxString& name) {
+///////////////////////////////////////////////////////////////////
+	wxWindow* w = getAUIPaneByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	wxMenuItem* m = getAUIMenuByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	
+	showAuiPane(w, m);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::hideAuiPane(const wxString& name) {
+///////////////////////////////////////////////////////////////////
+	wxWindow* w = getAUIPaneByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	wxMenuItem* m = getAUIMenuByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	
+	hideAuiPane(w, m);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::viewToolbar(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	toggleAuiPane(m_auibarMain, m_miToolbar);
@@ -4503,22 +4649,44 @@ void MainFrame::viewToolbar(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewMainView(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane(m_scrollWinMain, m_miViewMainView);
+	toggleAuiPane("MainView");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewTemplateManager(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane(m_scrollWinFile, m_miViewTemplateManager);
+	toggleAuiPane("TemplateManager");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane(m_scrollWinLogger, m_miViewLogger);
+	toggleAuiPane("Logger");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane(m_scrollOutbound, m_miViewMonitor);
+	toggleAuiPane("Outbound");
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::perspectiveDefault(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	viewAllAuiPanes();
+	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::perspectiveRun(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	hideAllAuiPanes();
+	showAuiPane("ToolBar");
+	showAuiPane("Outbound");
+	showAuiPane("Logger");
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::perspectiveTemplate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	hideAllAuiPanes();
+	showAuiPane("ToolBar");
+	showAuiPane("MainView");
+	showAuiPane("Logger");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
@@ -4532,13 +4700,22 @@ void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 	else if ( evt.pane->window == m_scrollWinMain )
 		m_miViewMainView->Check(!m_scrollWinMain->IsShown());
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
+/////////////////////////////////////////////////////////////////////
+	if ( perspectiveTimer.IsRunning() == true )
+		perspectiveTimer.Stop();
+		
+	showAuiPane("ToolBar");
+	//GetAuimgrMain()->Update();
+}
 ///////////////////////////////////////////////////////////////////
 void MainFrame::maximizeAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip(true);
 	
-	GetAuimgrMain()->GetPane(m_auibarMain).Show();
-	GetAuimgrMain()->Update();
+	if ( event.pane->window == m_scrollOutbound || event.pane->window == m_scrollWinMain )
+		perspectiveTimer.Start(20);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::restoreAuiPane(wxAuiManagerEvent& event) {
@@ -4554,13 +4731,23 @@ void MainFrame::renderAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::hideAllAuiPanes(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	hideAllAuiPanes();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::viewAllAuiPanes(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	viewAllAuiPanes();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::hideAllAuiPanes() {
+///////////////////////////////////////////////////////////////////
 	hideAuiPane(m_scrollWinFile,   m_miViewTemplateManager);
 	hideAuiPane(m_scrollWinLogger, m_miViewLogger);
 	hideAuiPane(m_scrollOutbound,  m_miViewMonitor);
 	hideAuiPane(m_scrollWinMain,   m_miViewMainView);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::viewAllAuiPanes(wxCommandEvent& event) {
+void MainFrame::viewAllAuiPanes() {
 ///////////////////////////////////////////////////////////////////
 	showAuiPane(m_auibarMain,      m_miToolbar);
 	showAuiPane(m_scrollWinFile,   m_miViewTemplateManager);
@@ -4591,7 +4778,7 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 										cnc->set3DData(false);
 									break;
 		}
-	}
+	} 
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::outboundBookChanging(wxNotebookEvent& event) {
@@ -4639,11 +4826,13 @@ void MainFrame::updateStepDelay() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::stepDelayChanged(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	m_miCfgCustom->Check();
 	updateStepDelay();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::stepDelayThumbtrack(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	m_miCfgCustom->Check();
 	updateStepDelay();
 }
 ///////////////////////////////////////////////////////////////////
@@ -5930,4 +6119,40 @@ void MainFrame::cfgStepDelayDropDown(wxAuiToolBarEvent& event) {
 		cfgStepDelayMax(event);
 	
 	event.Skip();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::UpdateLogger(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( m_showLoggerOnDemand->IsChecked() == false )
+		return;
+	
+	if ( m_logger->IsShownOnScreen() == false )
+		showAuiPane("Logger");
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
+///////////////////////////////////////////////////////////////////
+
+
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::paintXAxisMarkerBottom(wxPaintEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxPaintDC dc(m_xAxisMarkerBottom);
+	if ( cnc )
+		cnc->drawXMarkerBottom(dc);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::paintXAxisMarkerTop(wxPaintEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxPaintDC dc(m_xAxisMarkerTop);
+	if ( cnc )
+		cnc->drawXMarkerTop(dc);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::paintYAxisMarker(wxPaintEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxPaintDC dc(m_yAxisMarker);
+	if ( cnc )
+		cnc->drawYMarker(dc);
 }

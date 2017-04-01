@@ -96,6 +96,9 @@
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
       <File Name="CncStreamBuffers.cpp"/>
+      <File Name="CncZView.cpp"/>
+      <File Name="CnczView.h"/>
+      <File Name="CncCommon.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -127,8 +130,6 @@
       <File Name="CncSpyControl.h"/>
       <File Name="CncSpyControl.cpp"/>
     </VirtualDirectory>
-    <File Name="CnczView.h"/>
-    <File Name="CncZView.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="win_resources.rc"/>

@@ -47,9 +47,10 @@ bool SerialEmulatorNULL::evaluateLimitStates(std::vector<int32_t>& ret) {
 bool SerialEmulatorNULL::processGetter(unsigned char pid, std::vector<int32_t>& ret) {
 ///////////////////////////////////////////////////////////////////
 	switch ( pid ) {
-		case PID_XYZ_POS:	return evaluatePositions(ret);
-		case PID_LIMIT:		return evaluateLimitStates(ret);
-		default:			std::cerr << "SerialEmulatorNULL::processGetter: Invalid getter pid: " << pid << std::endl;
+		case PID_XYZ_POS:		return evaluatePositions(ret);
+		case PID_LIMIT:			return evaluateLimitStates(ret);
+		case PID_ERROR_COUNT:	ret.push_back(0); return true;
+		default:				std::cerr << "SerialEmulatorNULL::processGetter: Invalid getter pid: " << pid << std::endl;
 	}
 	return false;
 }

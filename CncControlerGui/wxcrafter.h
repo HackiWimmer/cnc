@@ -84,6 +84,7 @@ protected:
     wxMenuItem* m_miCfgStepDelayMin;
     wxMenuItem* m_miCfgStepDelayMax;
     wxMenuItem* m_miCfgSimulateArduino;
+    wxMenuItem* m_miCfgCustom;
     wxSlider* m_stepDelay;
     wxStaticText* m_stepDelayValue;
     wxBitmapButton* m_rcReset;
@@ -542,6 +543,7 @@ protected:
     wxBitmapButton* m_clearLogger;
     wxBitmapButton* m_freezeLogger;
     wxBitmapButton* m_copyLogger;
+    wxCheckBox* m_showLoggerOnDemand;
     wxFlexGridSizer* flexGridSizer2520;
     wxTextCtrl* m_logger;
     wxTextCtrl* m_tmpTraceInfo;
@@ -770,6 +772,10 @@ protected:
     wxMenuItem* m_sep201;
     wxMenuItem* m_miExit;
     wxMenu* m_menuView;
+    wxMenuItem* m_miPerspectiveDefault;
+    wxMenuItem* m_miPerspectiveRun;
+    wxMenuItem* m_miPerspectiveTemplate;
+    wxMenuItem* m_menuItem2771;
     wxMenuItem* m_miToolbar;
     wxMenuItem* m_miViewMainView;
     wxMenuItem* m_miViewTemplateManager;
@@ -796,6 +802,7 @@ protected:
     wxMenuItem* m_miRqtVersion;
     wxMenuItem* m_miRqtConfig;
     wxMenuItem* m_miRqtPins;
+    wxMenuItem* m_menuErrorCount;
     wxMenuItem* m_miRqtErrorInfo;
     wxMenuItem* m_menuItem1187;
     wxMenuItem* m_miMotorEnableState;
@@ -971,6 +978,7 @@ protected:
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
+    virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void disableSlider(wxMouseEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
@@ -993,9 +1001,13 @@ protected:
     virtual void clearDrawPane(wxCommandEvent& event) { event.Skip(); }
     virtual void zoomDrawPane(wxCommandEvent& event) { event.Skip(); }
     virtual void changeUpdateInterval(wxCommandEvent& event) { event.Skip(); }
+    virtual void paintDrawPaneWindow(wxPaintEvent& event) { event.Skip(); }
+    virtual void paintYAxisMarker(wxPaintEvent& event) { event.Skip(); }
+    virtual void paintXAxisMarkerTop(wxPaintEvent& event) { event.Skip(); }
     virtual void onPaintDrawPane(wxPaintEvent& event) { event.Skip(); }
     virtual void onMotionDrawPane(wxMouseEvent& event) { event.Skip(); }
     virtual void onLeaveDrawPane(wxMouseEvent& event) { event.Skip(); }
+    virtual void paintXAxisMarkerBottom(wxPaintEvent& event) { event.Skip(); }
     virtual void selectGridPosUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void animate3D(wxCommandEvent& event) { event.Skip(); }
     virtual void refresh3D(wxCommandEvent& event) { event.Skip(); }
@@ -1039,6 +1051,9 @@ protected:
     virtual void saveEmuOutput(wxCommandEvent& event) { event.Skip(); }
     virtual void reinit(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
+    virtual void perspectiveDefault(wxCommandEvent& event) { event.Skip(); }
+    virtual void perspectiveRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void perspectiveTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void viewToolbar(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void viewTemplateManager(wxCommandEvent& event) { event.Skip(); }
@@ -1057,6 +1072,7 @@ protected:
     virtual void requestVersion(wxCommandEvent& event) { event.Skip(); }
     virtual void requestConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void requestPins(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestErrorCount(wxCommandEvent& event) { event.Skip(); }
     virtual void requestErrorInfo(wxCommandEvent& event) { event.Skip(); }
     virtual void requestEnableStepperMotors(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
@@ -1429,6 +1445,7 @@ public:
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetFreezeLogger() { return m_freezeLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
+    wxCheckBox* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
     wxTextCtrl* GetLogger() { return m_logger; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
     wxStaticText* GetStaticText1136() { return m_staticText1136; }

@@ -838,7 +838,8 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 	if ( cncControl->isInterrupted() )
 		return false;
 	
-	wxMutexLocker lock(s_mutexProtectingTheGlobalData);
+	//todo
+	//wxMutexLocker lock(s_mutexProtectingTheGlobalData);
 	isCommand = true;
 	
 	bool ret = false;

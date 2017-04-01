@@ -19,7 +19,7 @@
       <gradient-type>wxAUI_GRADIENT_NONE</gradient-type>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[Toolbar]]>
         </name>
         <caption>
           <![CDATA[Main]]>
@@ -71,6 +71,7 @@
           </object>
           <object class="wxComboBox" name="m_unit">
             <style>wxCB_SORT|wxCB_READONLY</style>
+            <bg>wxSYS_COLOUR_BTNFACE</bg>
             <font>
               <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
               <style>normal</style>
@@ -122,6 +123,13 @@
                 <object class="wxMenuItem" name="m_miCfgSimulateArduino">
                   <radio>1</radio>
                   <label>Simulate Arduino</label>
+                  <accel>
+                    <![CDATA[]]>
+                  </accel>
+                </object>
+                <object class="wxMenuItem" name="m_miCfgCustom">
+                  <radio>1</radio>
+                  <label>Custom value</label>
                   <accel>
                     <![CDATA[]]>
                   </accel>
@@ -307,7 +315,7 @@
       </object>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[MainView]]>
         </name>
         <caption>
           <![CDATA[CNC Main View]]>
@@ -5295,7 +5303,7 @@
       </object>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[TemplateManager]]>
         </name>
         <caption>
           <![CDATA[CNC Template Manager]]>
@@ -5307,7 +5315,7 @@
         <row>0</row>
         <position>0</position>
         <bestsize>100,160</bestsize>
-        <maxsize>100,160</maxsize>
+        <maxsize>100,800</maxsize>
         <minsize>100,160</minsize>
         <closebtn>1</closebtn>
         <minbtn>1</minbtn>
@@ -5363,11 +5371,15 @@
                         <border>1</border>
                         <object class="wxListBox" name="m_lruList">
                           <style>wxLB_NEEDED_SB|wxLB_HSCROLL|wxLB_SINGLE|wxHSCROLL</style>
+                          <bg>wxSYS_COLOUR_BACKGROUND</bg>
+                          <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
                           <font>
-                            <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                            <size>10</size>
                             <style>normal</style>
                             <weight>normal</weight>
+                            <family>modern</family>
                             <underlined>0</underlined>
+                            <face>Consolas</face>
                           </font>
                           <content/>
                           <selection>-1</selection>
@@ -5494,7 +5506,7 @@
       </object>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[Logger]]>
         </name>
         <caption>
           <![CDATA[CNC Logger]]>
@@ -5506,7 +5518,7 @@
         <row>0</row>
         <position>0</position>
         <bestsize>100,160</bestsize>
-        <maxsize>100,180</maxsize>
+        <maxsize>100,800</maxsize>
         <minsize>100,160</minsize>
         <closebtn>1</closebtn>
         <minbtn>1</minbtn>
@@ -5567,6 +5579,18 @@
                       <![CDATA[Copy Logger Panel]]>
                     </tooltip>
                     <default>0</default>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxCheckBox" name="m_showLoggerOnDemand">
+                    <tooltip>
+                      <![CDATA[Show on demand]]>
+                    </tooltip>
+                    <style/>
+                    <label/>
+                    <checked>1</checked>
                   </object>
                 </object>
               </object>
@@ -5846,7 +5870,7 @@
       </object>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[StatusBar]]>
         </name>
         <caption>
           <![CDATA[]]>
@@ -6244,7 +6268,7 @@
       </object>
       <object class="wxAuiPaneInfo">
         <name>
-          <![CDATA[]]>
+          <![CDATA[Outbound]]>
         </name>
         <caption>
           <![CDATA[CNC Monitor]]>
@@ -6847,8 +6871,9 @@
                             <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
                             <border>1</border>
                             <object class="wxStaticText" name="m_staticText1048">
-                              <label>Z:</label>
-                              <style/>
+                              <label>Z
+Axis</label>
+                              <style>wxALIGN_CENTRE</style>
                               <font>
                                 <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
                                 <style>normal</style>
@@ -6858,15 +6883,13 @@
                             </object>
                           </object>
                           <object class="spacer" name="Spacer2753">
-                            <size>0,9</size>
+                            <size>0,4</size>
                             <flag>wxALL</flag>
-                            <border>5</border>
                             <option>1</option>
                           </object>
                           <object class="sizeritem">
                             <flag>wxALL|wxEXPAND</flag>
                             <border>1</border>
-                            <minsize>20,60</minsize>
                             <object class="wxPanel" name="m_zView">
                               <bg>wxSYS_COLOUR_BTNTEXT</bg>
                               <tooltip>
@@ -8437,6 +8460,25 @@
       <object class="wxMenu" name="m_menuView">
         <label>View</label>
         <style/>
+        <object class="wxMenuItem" name="m_miPerspectiveDefault">
+          <label>Perspective - Default</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_miPerspectiveRun">
+          <label>Perspective - Run</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_miPerspectiveTemplate">
+          <label>Perspective - Template</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="m_miToolbar">
           <checkable>1</checkable>
           <label>CNC Toolbar</label>
@@ -8568,6 +8610,7 @@
           <accel>
             <![CDATA[]]>
           </accel>
+          <checked>1</checked>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtVersion">
@@ -8584,6 +8627,12 @@
         </object>
         <object class="wxMenuItem" name="m_miRqtPins">
           <label>Pin Report</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_menuErrorCount">
+          <label>Error Count</label>
           <accel>
             <![CDATA[]]>
           </accel>

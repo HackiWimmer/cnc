@@ -73,8 +73,6 @@ void ArduinoPIDs::init() {
 	pids[PID_ENABLE_STEPPERS]      = "Stepper enable state";
 	pids[PID_AVG_STEP_DURRATION]   = "AVG Step duration [ms]";
 
-	pids[PID_VERSION]              = "Firmware Version";
-	
 	pids[PID_TEST_SUITE]           = "Controller Test Suite";
 	pids[PID_TEST_VALUE1]          = "Parmeter1";
 	pids[PID_TEST_VALUE2]          = "Parmeter2";
@@ -84,6 +82,8 @@ void ArduinoPIDs::init() {
 	
 	pids[PID_TEST_INTERRUPT]       = "Test Interrupt Flag";
 	
+	pids[PID_ERROR_COUNT]          = "Error Count";
+	pids[PID_VERSION]              = "Firmware Version";
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {

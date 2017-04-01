@@ -45,7 +45,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auibarMain = new wxAuiToolBar(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxAUI_TB_PLAIN_BACKGROUND|wxAUI_TB_DEFAULT_STYLE|wxAUI_TB_NO_AUTORESIZE);
     m_auibarMain->SetToolBitmapSize(wxSize(16,16));
     
-    m_auimgrMain->AddPane(m_auibarMain, wxAuiPaneInfo().Caption(_("Main")).Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).BestSize(40,40).MinSize(40,40).MaxSize(40,40).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgrMain->AddPane(m_auibarMain, wxAuiPaneInfo().Name(wxT("Toolbar")).Caption(_("Main")).Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).BestSize(40,40).MinSize(40,40).MaxSize(40,40).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
     m_staticText1842 = new wxStaticText(m_auibarMain, wxID_ANY, _("Port:"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     m_auibarMain->AddControl(m_staticText1842);
@@ -68,6 +68,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_unitArr.Add(wxT("mm"));
     m_unitArr.Add(wxT("steps"));
     m_unit = new wxComboBox(m_auibarMain, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), m_unitArr, wxCB_SORT|wxCB_READONLY);
+    m_unit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     wxFont m_unitFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_unit->SetFont(m_unitFont);
     m_unit->SetToolTip(_("Select the Display Unit"));
@@ -95,6 +96,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
         m_configStepDelayMenu->Append(m_miCfgStepDelayMax);
         m_miCfgSimulateArduino = new wxMenuItem(m_configStepDelayMenu, wxID_ANY, _("Simulate Arduino"), wxT(""), wxITEM_RADIO);
         m_configStepDelayMenu->Append(m_miCfgSimulateArduino);
+        m_miCfgCustom = new wxMenuItem(m_configStepDelayMenu, wxID_ANY, _("Custom value"), wxT(""), wxITEM_RADIO);
+        m_configStepDelayMenu->Append(m_miCfgCustom);
         
         m_dropdownMenus.insert(std::make_pair( m_configStepDelay->GetId(), m_configStepDelayMenu) );
     }
@@ -187,7 +190,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_scrollWinMain->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     m_scrollWinMain->SetScrollRate(5, 5);
     
-    m_auimgrMain->AddPane(m_scrollWinMain, wxAuiPaneInfo().Caption(_("CNC Main View")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(800,800).MinSize(10,10).MaxSize(800,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_scrollWinMain, wxAuiPaneInfo().Name(wxT("MainView")).Caption(_("CNC Main View")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(800,800).MinSize(10,10).MaxSize(800,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     flexGridSizer434 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer434->SetFlexibleDirection( wxBOTH );
@@ -2969,7 +2972,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_scrollWinFile = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHSCROLL | wxVSCROLL);
     m_scrollWinFile->SetScrollRate(5, 5);
     
-    m_auimgrMain->AddPane(m_scrollWinFile, wxAuiPaneInfo().Caption(_("CNC Template Manager")).Direction(wxAUI_DOCK_BOTTOM).Layer(1).Row(0).Position(0).BestSize(100,160).MinSize(100,160).MaxSize(100,160).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_scrollWinFile, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("CNC Template Manager")).Direction(wxAUI_DOCK_BOTTOM).Layer(1).Row(0).Position(0).BestSize(100,160).MinSize(100,160).MaxSize(100,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     flexGridSizer1628 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer1628->SetFlexibleDirection( wxBOTH );
@@ -3006,7 +3009,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     wxArrayString m_lruListArr;
     m_lruList = new wxListBox(m_lruPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_lruPanel, wxSize(-1,-1)), m_lruListArr, wxLB_NEEDED_SB|wxLB_HSCROLL|wxLB_SINGLE|wxHSCROLL);
-    wxFont m_lruListFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_lruList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BACKGROUND));
+    m_lruList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
+    wxFont m_lruListFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_lruList->SetFont(m_lruListFont);
     
     flexGridSizer1642->Add(m_lruList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
@@ -3074,7 +3079,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_scrollWinLogger = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHSCROLL | wxVSCROLL);
     m_scrollWinLogger->SetScrollRate(5, 5);
     
-    m_auimgrMain->AddPane(m_scrollWinLogger, wxAuiPaneInfo().Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(1).Row(0).Position(0).BestSize(100,160).MinSize(100,160).MaxSize(100,180).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_scrollWinLogger, wxAuiPaneInfo().Name(wxT("Logger")).Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(1).Row(0).Position(0).BestSize(100,160).MinSize(100,160).MaxSize(100,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     flexGridSizer869 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer869->SetFlexibleDirection( wxBOTH );
@@ -3104,6 +3109,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_copyLogger->SetToolTip(_("Copy Logger Panel"));
     
     flexGridSizer1863->Add(m_copyLogger, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_showLoggerOnDemand = new wxCheckBox(m_scrollWinLogger, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0);
+    m_showLoggerOnDemand->SetValue(true);
+    m_showLoggerOnDemand->SetToolTip(_("Show on demand"));
+    
+    flexGridSizer1863->Add(m_showLoggerOnDemand, 0, wxALL, WXC_FROM_DIP(5));
     
     flexGridSizer2520 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer2520->SetFlexibleDirection( wxBOTH );
@@ -3235,7 +3246,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_statusBar->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
     m_statusBar->SetScrollRate(5, 5);
     
-    m_auimgrMain->AddPane(m_statusBar, wxAuiPaneInfo().Direction(wxAUI_DOCK_BOTTOM).Layer(2).Row(0).Position(0).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgrMain->AddPane(m_statusBar, wxAuiPaneInfo().Name(wxT("StatusBar")).Direction(wxAUI_DOCK_BOTTOM).Layer(2).Row(0).Position(0).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
     flexGridSizer436 = new wxFlexGridSizer(1, 36, 0, 0);
     flexGridSizer436->SetFlexibleDirection( wxBOTH );
@@ -3468,7 +3479,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_scrollOutbound->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     m_scrollOutbound->SetScrollRate(5, 5);
     
-    m_auimgrMain->AddPane(m_scrollOutbound, wxAuiPaneInfo().Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(1).Row(0).Position(0).BestSize(800,800).MinSize(10,10).MaxSize(800,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_scrollOutbound, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(1).Row(0).Position(0).BestSize(800,800).MinSize(10,10).MaxSize(800,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     m_auimgrMain->Update();
     
     flexGridSizer649 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -3850,18 +3861,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1042->Add(flexGridSizer1046, 1, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(1));
     
-    m_staticText1048 = new wxStaticText(m_outPanel, wxID_ANY, _("Z:"), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0);
+    m_staticText1048 = new wxStaticText(m_outPanel, wxID_ANY, _("Z\nAxis"), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), wxALIGN_CENTRE);
     wxFont m_staticText1048Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1048Font.SetWeight(wxFONTWEIGHT_BOLD);
     m_staticText1048->SetFont(m_staticText1048Font);
     
     flexGridSizer1046->Add(m_staticText1048, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
     
-    flexGridSizer1046->Add(0, 9, 1, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer1046->Add(0, 4, 1, wxALL, WXC_FROM_DIP(0));
     
     m_zView = new CncZView(m_outPanel, wxID_ANY);
     flexGridSizer1046->Add(m_zView, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_zView->SetMinSize(wxSize(20,60));
     
     flexGridSizer1046->Add(0, 1, 1, wxALL, WXC_FROM_DIP(4));
     
@@ -4749,6 +4759,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuView = new wxMenu();
     m_menuBar->Append(m_menuView, _("View"));
     
+    m_miPerspectiveDefault = new wxMenuItem(m_menuView, wxID_ANY, _("Perspective - Default"), wxT(""), wxITEM_NORMAL);
+    m_menuView->Append(m_miPerspectiveDefault);
+    
+    m_miPerspectiveRun = new wxMenuItem(m_menuView, wxID_ANY, _("Perspective - Run"), wxT(""), wxITEM_NORMAL);
+    m_menuView->Append(m_miPerspectiveRun);
+    
+    m_miPerspectiveTemplate = new wxMenuItem(m_menuView, wxID_ANY, _("Perspective - Template"), wxT(""), wxITEM_NORMAL);
+    m_menuView->Append(m_miPerspectiveTemplate);
+    
+    m_menuView->AppendSeparator();
+    
     m_miToolbar = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Toolbar"), wxT(""), wxITEM_CHECK);
     m_menuView->Append(m_miToolbar);
     
@@ -4817,6 +4838,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_miRqtIdleMessages = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Request Idle Messages"), wxT(""), wxITEM_CHECK);
     m_menuRequestor->Append(m_miRqtIdleMessages);
+    m_miRqtIdleMessages->Check();
     
     m_menuRequestor->AppendSeparator();
     
@@ -4828,6 +4850,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_miRqtPins = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Pin Report"), wxT(""), wxITEM_NORMAL);
     m_menuRequestor->Append(m_miRqtPins);
+    
+    m_menuErrorCount = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Error Count"), wxT(""), wxITEM_NORMAL);
+    m_menuRequestor->Append(m_menuErrorCount);
     
     m_miRqtErrorInfo = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Error Info"), wxT(""), wxITEM_NORMAL);
     m_menuRequestor->Append(m_miRqtErrorInfo);
@@ -5139,6 +5164,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
     m_freezeLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
+    m_logger->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_tmpTraceInfo->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_speedX->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
     m_speedY->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
@@ -5168,9 +5194,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_clearDrawPane->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearDrawPane), NULL, this);
     m_cbDrawZoomFactor->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::zoomDrawPane), NULL, this);
     m_cbUpdateInterval->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::changeUpdateInterval), NULL, this);
+    m_drawPaneWindow->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintDrawPaneWindow), NULL, this);
+    m_yAxisMarker->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintYAxisMarker), NULL, this);
+    m_xAxisMarkerTop->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintXAxisMarkerTop), NULL, this);
     m_drawPane->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintDrawPane), NULL, this);
     m_drawPane->Connect(wxEVT_MOTION, wxMouseEventHandler(MainFrameBClass::onMotionDrawPane), NULL, this);
     m_drawPane->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::onLeaveDrawPane), NULL, this);
+    m_xAxisMarkerBottom->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintXAxisMarkerBottom), NULL, this);
     m_gridPosUnit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectGridPosUnit), NULL, this);
     m_3D_Animate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::animate3D), NULL, this);
     m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
@@ -5220,6 +5250,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miSaveEmuOutput->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveEmuOutput), NULL, this);
     this->Connect(m_miReinit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reinit), NULL, this);
     this->Connect(m_miExit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnExit), NULL, this);
+    this->Connect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveDefault), NULL, this);
+    this->Connect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveRun), NULL, this);
+    this->Connect(m_miPerspectiveTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveTemplate), NULL, this);
     this->Connect(m_miToolbar->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewToolbar), NULL, this);
     this->Connect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Connect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
@@ -5238,6 +5271,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miRqtVersion->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestVersion), NULL, this);
     this->Connect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Connect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
+    this->Connect(m_menuErrorCount->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorCount), NULL, this);
     this->Connect(m_miRqtErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorInfo), NULL, this);
     this->Connect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Connect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
@@ -5419,6 +5453,7 @@ MainFrameBClass::~MainFrameBClass()
     m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
     m_freezeLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
+    m_logger->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_speedX->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
     m_speedY->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::disableSlider), NULL, this);
@@ -5448,9 +5483,13 @@ MainFrameBClass::~MainFrameBClass()
     m_clearDrawPane->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearDrawPane), NULL, this);
     m_cbDrawZoomFactor->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::zoomDrawPane), NULL, this);
     m_cbUpdateInterval->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::changeUpdateInterval), NULL, this);
+    m_drawPaneWindow->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintDrawPaneWindow), NULL, this);
+    m_yAxisMarker->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintYAxisMarker), NULL, this);
+    m_xAxisMarkerTop->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintXAxisMarkerTop), NULL, this);
     m_drawPane->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintDrawPane), NULL, this);
     m_drawPane->Disconnect(wxEVT_MOTION, wxMouseEventHandler(MainFrameBClass::onMotionDrawPane), NULL, this);
     m_drawPane->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::onLeaveDrawPane), NULL, this);
+    m_xAxisMarkerBottom->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::paintXAxisMarkerBottom), NULL, this);
     m_gridPosUnit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectGridPosUnit), NULL, this);
     m_3D_Animate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::animate3D), NULL, this);
     m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
@@ -5500,6 +5539,9 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miSaveEmuOutput->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveEmuOutput), NULL, this);
     this->Disconnect(m_miReinit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reinit), NULL, this);
     this->Disconnect(m_miExit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnExit), NULL, this);
+    this->Disconnect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveDefault), NULL, this);
+    this->Disconnect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveRun), NULL, this);
+    this->Disconnect(m_miPerspectiveTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveTemplate), NULL, this);
     this->Disconnect(m_miToolbar->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewToolbar), NULL, this);
     this->Disconnect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Disconnect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
@@ -5518,6 +5560,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miRqtVersion->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestVersion), NULL, this);
     this->Disconnect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Disconnect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
+    this->Disconnect(m_menuErrorCount->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorCount), NULL, this);
     this->Disconnect(m_miRqtErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorInfo), NULL, this);
     this->Disconnect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Disconnect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);

@@ -814,14 +814,15 @@ void CncControl::forceDisplayPositions() {
 	logProcessingEnd(true);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::waitActive(unsigned int milliseconds) {
+void CncControl::waitActive(unsigned int milliseconds, bool once) {
 ///////////////////////////////////////////////////////////////////
 	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
 	if ( milliseconds == 0 ) {
-		while (evtLoop->Pending()) {
-			evtLoop->Dispatch();
+		if ( once == true ) {
+			while (evtLoop->Pending()) {
+				evtLoop->Dispatch();
+			}
 		}
-		
 		return;
 	}
 	
@@ -923,6 +924,16 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
+	
+	/*
+	 * todo
+	// Event handling, enables the interrrpt functionality
+	if ( cncConfig->isAllowEventHandling() ) {
+		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
+		while (evtLoop->Pending())
+			evtLoop->Dispatch();
+	}
+	*/
 	
 	switch ( ci.infoType ) {
 		case CITHeartbeat:
@@ -1047,12 +1058,11 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	
 	// Online drawing coordinates
 	if ( cncConfig->isOnlineUpdateDrawPane() ) {
-		wxClientDC dc(drawControl);
-		dc.SetPen(penHandler.getCurrentPen(zAxisDown));
-		
 		// avoid duplicate values
 		if ( tmp != pp ) {
 			if ( motionMonitorMode == MMM_2D ) {
+				wxClientDC dc(drawControl);
+				dc.SetPen(penHandler.getCurrentPen(zAxisDown));
 				dc.DrawLine(pp.lp, pp.cp);
 			} else {
 				set3DData(true);
@@ -1695,6 +1705,25 @@ void CncControl::switchToolOff(bool force) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+const int32_t CncControl::getControllerErrorCount() {
+///////////////////////////////////////////////////////////////////
+	std::vector<int32_t> list;
+
+	if ( isInterrupted() == false )
+		getSerial()->processGetter(PID_ERROR_COUNT, list);
+		
+	if ( list.size() != 1 ){
+		if ( isInterrupted() == false ) {
+			std::cerr << "CncControl::getControllerErrorCount: Unable to evaluate error count:" << std::endl;
+			std::cerr << " Received value count: " << list.size() << std::endl;
+		}
+		
+		return -1;
+	}
+
+	return list.at(0);
+}
+///////////////////////////////////////////////////////////////////
 const CncLongPosition CncControl::getControllerPos() {
 ///////////////////////////////////////////////////////////////////
 	std::vector<int32_t> list;
@@ -1798,6 +1827,17 @@ void CncControl::enableStepperMotors(bool s) {
 	
 	if ( guiCtlSetup->motorState )
 		guiCtlSetup->motorState->Check(s);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::resetZSlider() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(guiCtlSetup);
+	
+	if ( guiCtlSetup->zView == NULL ) 
+		return;
+		
+	wxASSERT(cncConfig);
+	guiCtlSetup->zView->resetAll();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateZSlider() {
@@ -2389,4 +2429,21 @@ void CncControl::sendIdleMessage() {
 		return;
 	
 	getSerial()->processIdle();
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::drawXMarkerBottom(wxDC& dc) {
+///////////////////////////////////////////////////////////////////
+	if ( posMarker.getXMarkerTyp() == XMarkerBottom )
+		posMarker.drawPosX(dc);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::drawXMarkerTop(wxDC& dc) {
+///////////////////////////////////////////////////////////////////
+	if ( posMarker.getXMarkerTyp() == XMarkerTop )
+		posMarker.drawPosX(dc);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::drawYMarker(wxDC& dc) {
+///////////////////////////////////////////////////////////////////
+	posMarker.drawPosY(dc);
 }

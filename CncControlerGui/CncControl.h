@@ -233,7 +233,7 @@ class CncControl {
 		// Callback fromS Serial with a controller message
 		bool SerialMessageCallback(const ControllerMsgInfo& cmi);
 		// wait an dispath events
-		void waitActive(unsigned int milliseconds);
+		void waitActive(unsigned int milliseconds, bool once = true);
 		//interrupt the processing
 		void interrupt();
 		void resetInterrupt();
@@ -294,6 +294,8 @@ class CncControl {
 		const CncDoublePosition getMaxPositionsMetric();
 		const CncLongPosition::Watermarks getWaterMarks();
 		const CncDoublePosition::Watermarks getWaterMarksMetric();
+		// query the current error count
+		const int32_t getControllerErrorCount();
 		// query the current controller position
 		const CncLongPosition getControllerPos();
 		// query the current controller limit state
@@ -313,6 +315,7 @@ class CncControl {
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
 		void enableStepperMotors(bool s);
 		// Controls the z slider
+		void resetZSlider();
 		void updateZSlider();
 		// zoom handling
 		void setDrawPaneZoomFactor(double f);
@@ -385,6 +388,11 @@ class CncControl {
 		// Motion monitor handling
 		void setMotionMonitorMode(const MontionMoinorMode& mmm);
 		const MontionMoinorMode& getMotionMonitorMode() const   { return motionMonitorMode; }
+		
+		// Marker repaint
+		void drawXMarkerBottom(wxDC& dc);
+		void drawXMarkerTop(wxDC& dc);
+		void drawYMarker(wxDC& dc);
 };
 
 #endif

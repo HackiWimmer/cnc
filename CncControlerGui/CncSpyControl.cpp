@@ -21,6 +21,11 @@ CncSpyControl::CncSpyControl(wxWindow *parent, wxWindowID id, wxTextCtrl* dc)
 	SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
 	wxFont m_serialSpyFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 	SetFont(m_serialSpyFont);
+	
+	detailCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+	detailCtrl->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+	detailCtrl->SetDefaultStyle(*wxYELLOW);
+	detailCtrl->SetFont(m_serialSpyFont);
 }
 ///////////////////////////////////////////////////////////////////
 CncSpyControl::~CncSpyControl() {
@@ -52,7 +57,7 @@ void CncSpyControl::AppendText(const wxChar & c) {
 ///////////////////////////////////////////////////////////////////
 	sytleChanged = false;
 	
-	
+	// todo libuv
 	
 	wxTextCtrl::AppendText(c);
 }

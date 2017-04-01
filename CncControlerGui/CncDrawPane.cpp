@@ -97,7 +97,7 @@ void CncOpenGLDrawPane::runOpenGLTest() {
 		}
 	}
 	
-	Refresh();
+	Refresh(false);
 	view3D();
 	
 	startSpinTimer();
@@ -134,7 +134,7 @@ void CncOpenGLDrawPane::clear3D() {
 	stopSpinTimer();
 	
 	if ( IsShown() ) {
-		Refresh();
+		Refresh(false);
 		//view3D();
 	}
 }
@@ -164,7 +164,7 @@ DrawPaneData& CncOpenGLDrawPane::getDataVector() {
 DrawPaneData& CncOpenGLDrawPane::clearDataVector() {
 /////////////////////////////////////////////////////////////////////
 	data.clear();
-	Refresh();
+	Refresh(false);
 	
 	return data;
 }
@@ -172,7 +172,7 @@ DrawPaneData& CncOpenGLDrawPane::clearDataVector() {
 void CncOpenGLDrawPane::displayDataVector() {
 /////////////////////////////////////////////////////////////////////
 	//Releaes the repaining
-	Refresh();
+	Refresh(false);
 	Update();
 }
 /////////////////////////////////////////////////////////////////////
@@ -183,7 +183,7 @@ void CncOpenGLDrawPane::setDisplayAngles(float ax, float ay, float az, bool upda
 	displayAngels.setZ(az);
 	
 	rotate(updateCtrl); 
-	Refresh();
+	Refresh(false);
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::initDisplayAngles(float ax, float ay, float az) {
@@ -198,7 +198,7 @@ void CncOpenGLDrawPane::initDisplayAngles(float ax, float ay, float az) {
 	
 	// initial rotation 
 	rotate(true);  
-	Refresh();
+	Refresh(false);
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::rotate(bool updateCtrl) {
@@ -418,7 +418,7 @@ void CncOpenGLDrawPane::scaleByMouse(wxMouseEvent& event) {
 	scale.y = (scale.y > max ? max : scale.y);
 	scale.z = (scale.z > max ? max : scale.z);
 	
-	Refresh();
+	Refresh(false);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
@@ -430,7 +430,7 @@ void CncOpenGLDrawPane::translateByMouse(wxMouseEvent& event) {
 	
 	translate.x = (float)((originX - event.GetX()) / cs.GetWidth())  * -1.0f;
 	translate.y = (float)((originY - event.GetY()) / cs.GetHeight()) * +1.0f;
-	Refresh();
+	Refresh(false);
 	
 	event.Skip(false);
 }
@@ -446,7 +446,7 @@ void CncOpenGLDrawPane::moveViewPortByMouse(wxMouseEvent& event) {
 	viewPort.y = -event.GetY();
 	
 	resetProjectionMode();
-	Refresh();
+	Refresh(false);
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::OnMouse(wxMouseEvent& event) {
@@ -490,7 +490,7 @@ void CncOpenGLDrawPane::OnMouse(wxMouseEvent& event) {
 		} else {
 			displayAngels.incX((event.GetX() - last_x) * +1.0);
 			displayAngels.incY((event.GetY() - last_y) * +1.0);
-			Refresh();
+			Refresh(false);
 		}
 		
 		last_x = event.GetX();
@@ -504,7 +504,7 @@ void CncOpenGLDrawPane::spinPaneFromKeyboard(float xSpin, float ySpin) {
 	displayAngels.incX(xSpin);
 	displayAngels.incY(ySpin);
 	//displayAngels.incZ(zSpin);
-	Refresh();
+	Refresh(false);
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::translateByKey(wxKeyEvent& event) {
@@ -533,7 +533,7 @@ void CncOpenGLDrawPane::translateByKey(wxKeyEvent& event) {
 			break;
 	}
 	
-	Refresh();
+	Refresh(false);
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::rotateByKey(wxKeyEvent& event) {
@@ -591,7 +591,7 @@ void CncOpenGLDrawPane::moveViewPortByKey(wxKeyEvent& event) {
 	}
 	
 	resetProjectionMode();
-	Refresh();
+	Refresh(false);
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::OnKeyDown(wxKeyEvent& event) {
@@ -701,5 +701,5 @@ void CncOpenGLDrawPane::view(DrawPaneViewType view) {
 							break;
 	}
 
-	Refresh();
+	Refresh(false);
 }

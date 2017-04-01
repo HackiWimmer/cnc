@@ -1,6 +1,9 @@
 #ifndef CNC_COMMON_INCLUDES
 #define CNC_COMMON_INCLUDES
 
+#include <cmath>
+#include <limits>
+
 #include "CncStreamBuffers.h"
 
 // make essiential global variables available
@@ -9,6 +12,8 @@ namespace cnc {
 	extern CncTraceLogStream trc;
 	extern CncMsgLogStream msg;
 	extern CncSerialSpyStream spy;
+	
+	bool dblCompare( double a, double b, double eps = std::numeric_limits<double>::epsilon());
 }
 
 // make std globally available
