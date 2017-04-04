@@ -25,7 +25,7 @@ void SerialSpyPort::spyReadData(int prevRet, void *buffer, unsigned int nbByte) 
 		if ( prevRet <= 0 )
 			return;
 
-		cnc::spy << "Serial::<< " <<  wxString::Format("{0x%02X} ", getLastFetchResult()) << "0x[ ";
+		cnc::spy << wxString::Format("Serial::<< {0x%02X} 0x[ ", getLastFetchResult());
 		const unsigned char* b = (const unsigned char*) buffer;
 		for ( int i=0; i<prevRet; i++ ) {
 			cnc::spy << wxString::Format("%02X ", b[i]);

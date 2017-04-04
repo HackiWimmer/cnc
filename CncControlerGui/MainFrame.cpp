@@ -45,8 +45,6 @@ const char* _configFileName 	= "..\\CncController.ini";
 const char* _lruStoreFileName	= "..\\CncControllerLruStore.ini";
 const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
 	
-
-
 // file content change environment
 #define EDIT_TRACKER_MARGIN_ID 1
 #define CL_LINE_MODIFIED_STYLE 200
@@ -789,6 +787,7 @@ void MainFrame::initialize(void) {
 	resetMinMaxPositions();
 	initializeLruMenu();
 	initializeCncControl();
+	initializePreconfiguredSpeedSetups();
 	
 	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
 	m_notebookConfig->SetSelection(CNCSetterPage);
@@ -824,6 +823,9 @@ bool MainFrame::initializeCncControl() {
 		config->Read("CncConfig/PitchX", &cfgDouble, 2.0); cncConfig->setPitchX(cfgDouble);
 		config->Read("CncConfig/PitchY", &cfgDouble, 2.0); cncConfig->setPitchY(cfgDouble);
 		config->Read("CncConfig/PitchZ", &cfgDouble, 2.0); cncConfig->setPitchZ(cfgDouble);
+		config->Read("CncConfig/PulsWidthOffsetX", &cfgLong, 100); cncConfig->setPulsWidthOffsetX(cfgLong);
+		config->Read("CncConfig/PulsWidthOffsetY", &cfgLong, 100); cncConfig->setPulsWidthOffsetY(cfgLong);
+		config->Read("CncConfig/PulsWidthOffsetZ", &cfgLong, 100); cncConfig->setPulsWidthOffsetZ(cfgLong);
 		
 		if ( isCncControlInitialized == false ) {
 
@@ -921,6 +923,71 @@ bool MainFrame::initializeLruMenu() {
 	}
 
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::initializePreconfiguredSpeedSetups() {
+///////////////////////////////////////////////////////////////////
+	//todo flex path
+	wxString fn("..\\Database\\PreconfiguredSpeedSetups.ini");
+	wxFileConfig cfg(wxT("CncController"), wxEmptyString, fn, fn, wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
+	
+	m_cbPreconfiguredSpeedSetups->Clear();
+	
+	wxString str;
+	long dummy, cfgLong;
+	
+	// all groups...
+	bool bCont = cfg.GetFirstGroup(str, dummy);
+	while ( bCont ) {
+		wxString item(str);
+		item << ": [";
+		cfg.Read(str + "/FlySpeedXY", &cfgLong, 10); item << cfgLong; item << ", ";
+		cfg.Read(str + "/FlySpeedZ", &cfgLong, 10); item << cfgLong; item << ", ";
+		cfg.Read(str + "/WorkSpeedXY", &cfgLong, 10); item << cfgLong; item << ", ";
+		cfg.Read(str + "/WorkSpeedZ", &cfgLong, 10); item << cfgLong; item << "]";
+		
+		m_cbPreconfiguredSpeedSetups->Append(item);
+		bCont = cfg.GetNextGroup(str, dummy);
+	}
+	
+	if ( m_cbPreconfiguredSpeedSetups->GetCount() > 0 ) {
+		m_cbPreconfiguredSpeedSetups->Select(0);
+		wxCommandEvent dummyEvent;
+		selectPreconfiguredSpeedSetups(dummyEvent);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectPreconfiguredSpeedSetups(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString item = m_cbPreconfiguredSpeedSetups->GetStringSelection();
+	int p1 = wxNOT_FOUND, p2 = wxNOT_FOUND;
+	if ( (p1 = item.Find("[")) != wxNOT_FOUND ) {
+		if ( (p2 = item.Find("]")) != wxNOT_FOUND && p2 >= p1 + 2) {
+			item = item.SubString(p1 + 1, p2 - 1);
+			
+			wxStringTokenizer tokenizer(item, ",");
+			unsigned int cnt = 0;
+			while ( tokenizer.HasMoreTokens() ) {
+				wxString token = tokenizer.GetNextToken();
+				token.Trim(true).Trim(false);
+				cnt++;
+				
+				switch ( cnt ) {
+					case 1:		m_flySpeedXY->SetStringSelection(token);
+								break;
+					case 2:		m_flySpeedZ->SetStringSelection(token);
+								break;
+					case 3:		m_workSpeedXY->SetStringSelection(token);
+								break;
+					case 4:		m_workSpeedZ->SetStringSelection(token);
+								break;
+					default: 	std::cerr << "MainFrame::selectPreconfiguredSpeedSetups: Invalid token count: " << cnt << std::endl;
+				}
+			}
+			
+			updateSpeedValues();
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::determineCncOutputControls() {
@@ -1495,7 +1562,7 @@ void MainFrame::updateInclWpt(wxCommandEvent& event) {
 	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
-int  MainFrame::showSetReferencePositionDlg(wxString msg) {
+int MainFrame::showSetReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
 	wxMessageDialog dlg(this, msg, _T("Action required  . . . "), 
 				wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
@@ -2866,6 +2933,10 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
+	// select summary page
+	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
+	m_notebookConfig->SetSelection(ConfigSummaryPage);
+	
 	if ( isZeroReferenceValid == false ) {
 		
 		TemplateFormat tf = getCurrentTemplateFormat();
@@ -2878,9 +2949,10 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 			showAuiPane("MainView");
 			m_mainNotebook->SetSelection(MainReferencePage);
 			
-			showSetReferencePositionDlg(msg);
-			
-			return false;
+			int ret = showSetReferencePositionDlg(msg);
+			// means reference postion isn't set
+			if ( ret != wxID_YES && ret != wxID_NO)
+				return false;
 		}
 	}
 
@@ -3016,6 +3088,14 @@ void MainFrame::collectSummary() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// check if currentla a run is active and return if so to avoid 
+	// a controller request during this mode
+	bool runActive = !m_rcRun->IsEnabled();
+
+	m_dvListCtrlControllerConfig->DeleteAllItems();
+	m_dvListCtrlControllerPins->DeleteAllItems();
+	m_dvListCtrlControllerErrorInfo->DeleteAllItems();
+	
 	unsigned int sel = event.GetSelection();
 	if ( (wxWindow*)event.GetEventObject() == m_notebookConfig ) {
 		
@@ -3027,14 +3107,26 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 					break;
 					
 			case CNCControllerPinsPage:
+					if ( runActive == true ) {
+						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
+						return;
+					}
 					requestControllerPinsFromButton(dummyEvent);
 					break;
 					
 			case CNCControllerConfigPage:
+					if ( runActive == true ) {
+						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
+						return;
+					}
 					requestControllerConfigFromButton(dummyEvent);
 					break;
 					
 			case CNCControllerErrorPage:
+					if ( runActive == true ) {
+						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
+						return;
+					}
 					requestControllerErrorInfoFromButton(dummyEvent);
 					break;
 		}
@@ -6132,8 +6224,7 @@ void MainFrame::UpdateLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
-
-
+	// do nothing
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::paintXAxisMarkerBottom(wxPaintEvent& event) {
@@ -6156,3 +6247,4 @@ void MainFrame::paintYAxisMarker(wxPaintEvent& event) {
 	if ( cnc )
 		cnc->drawYMarker(dc);
 }
+

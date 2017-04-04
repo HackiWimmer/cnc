@@ -18,6 +18,7 @@ class CncConfig {
 		unsigned int maxSpeedXY, maxSpeedZ;
 		unsigned int flySpeedXY, workSpeedXY, flySpeedZ, workSpeedZ;
 		unsigned int speedX, speedY, speedZ;
+		unsigned int pulsWidthOffsetX, pulsWidthOffsetY, pulsWidthOffsetZ;
 		double pitchX, pitchY, pitchZ;
 		double dispFactX, dispFactY, dispFactZ;
 		double calcFactX, calcFactY, calcFactZ;
@@ -68,6 +69,7 @@ class CncConfig {
 					, maxSpeedXY(100), maxSpeedZ(100)
 					, flySpeedXY(100), workSpeedXY(100), flySpeedZ(100), workSpeedZ(100)
 					, speedX(1), speedY(1), speedZ(1)
+					, pulsWidthOffsetX(100), pulsWidthOffsetY(100), pulsWidthOffsetZ(100)
 					, pitchX(2.0), pitchY(2.0), pitchZ(2.0)
 					, workpieceOffset(5.0)
 					, maxDurationThickness(2.0)
@@ -101,6 +103,7 @@ class CncConfig {
 					, flySpeedXY(cc.getFlySpeedXY()), workSpeedXY(cc.getWorkSpeedXY())
 					, flySpeedZ(cc.getFlySpeedZ()), workSpeedZ(cc.getWorkSpeedZ())
 					, speedX(cc.getSpeedX()), speedY(cc.getSpeedY()), speedZ(cc.getSpeedX())
+					, pulsWidthOffsetX(cc.getPulsWidthOffsetX()), pulsWidthOffsetY(cc.getPulsWidthOffsetY()), pulsWidthOffsetZ(cc.getPulsWidthOffsetZ())
 					, pitchX(cc.getPitchX()), pitchY(cc.getPitchY()), pitchZ(cc.getPitchZ())
 					, workpieceOffset(cc.getWorkpieceOffset())
 					, maxDurationThickness(cc.getMaxDurationThickness())
@@ -148,6 +151,9 @@ class CncConfig {
 			DataControlModel::addKeyValueRow(ret, "Steps (x)", 				(int)stepsX);
 			DataControlModel::addKeyValueRow(ret, "Steps (y)", 				(int)stepsY);
 			DataControlModel::addKeyValueRow(ret, "Steps (z)", 				(int)stepsZ);
+			DataControlModel::addKeyValueRow(ret, "Puls width offset (x)", 	(int)pulsWidthOffsetX);
+			DataControlModel::addKeyValueRow(ret, "Puls width offset (y)", 	(int)pulsWidthOffsetY);
+			DataControlModel::addKeyValueRow(ret, "Puls width offset (z)", 	(int)pulsWidthOffsetZ);
 			DataControlModel::addKeyValueRow(ret, "Pitch (x)", 				pitchX);
 			DataControlModel::addKeyValueRow(ret, "Pitch (y)", 				pitchY);
 			DataControlModel::addKeyValueRow(ret, "Pitch (z)",				pitchZ);
@@ -328,6 +334,13 @@ class CncConfig {
 		unsigned int getStepsX(void) { return stepsX; }
 		unsigned int getStepsY(void) { return stepsY; }
 		unsigned int getStepsZ(void) { return stepsZ; }
+		////////////////////////////////////////////////////////////////////////
+		CncConfig& setPulsWidthOffsetX(unsigned int v) { sc(); pulsWidthOffsetX = v; return *this; }
+		CncConfig& setPulsWidthOffsetY(unsigned int v) { sc(); pulsWidthOffsetY = v; return *this; }
+		CncConfig& setPulsWidthOffsetZ(unsigned int v) { sc(); pulsWidthOffsetZ = v; return *this; }
+		unsigned int getPulsWidthOffsetX(void) { return pulsWidthOffsetX; }
+		unsigned int getPulsWidthOffsetY(void) { return pulsWidthOffsetY; }
+		unsigned int getPulsWidthOffsetZ(void) { return pulsWidthOffsetZ; }
 		////////////////////////////////////////////////////////////////////////
 		CncConfig& setPitchX(double val) { sc(); pitchX = val; calculateFactors(); return *this; }
 		CncConfig& setPitchY(double val) { sc(); pitchY = val; calculateFactors(); return *this; }

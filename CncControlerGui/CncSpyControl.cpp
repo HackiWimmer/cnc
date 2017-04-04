@@ -126,12 +126,14 @@ void CncSpyControl::OnKeyDown(wxKeyEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void CncSpyControl::OnMouse(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxTextCoord col;
-	wxTextCoord row;
-	
-	if ( HitTest(event.GetPosition(), &col, &row) != wxTE_HT_UNKNOWN ) {
-		wxString line = GetLineText(row);
-		decodeSerialSpyLine(line);
+	if ( event.LeftDown() ) {
+		wxTextCoord col;
+		wxTextCoord row;
+		
+		if ( HitTest(event.GetPosition(), &col, &row) != wxTE_HT_UNKNOWN ) {
+			wxString line = GetLineText(row);
+			decodeSerialSpyLine(line);
+		}
 	}
 	
 	event.Skip();

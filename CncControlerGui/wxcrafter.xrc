@@ -1579,6 +1579,49 @@
                                     </object>
                                   </object>
                                 </object>
+                                <object class="sizeritem" name="flexGridSizer2793">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>5</border>
+                                  <option>1</option>
+                                  <object class="wxFlexGridSizer">
+                                    <cols>1</cols>
+                                    <rows>0</rows>
+                                    <vgap>0</vgap>
+                                    <hgap>0</hgap>
+                                    <growablecols>0</growablecols>
+                                    <growablerows/>
+                                    <object class="sizeritem">
+                                      <flag>wxALL</flag>
+                                      <border>5</border>
+                                      <object class="wxStaticText" name="m_staticText2798">
+                                        <label>Preconfigured Speed Setups:</label>
+                                        <style/>
+                                        <font>
+                                          <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                          <style>normal</style>
+                                          <weight>bold</weight>
+                                          <underlined>0</underlined>
+                                        </font>
+                                      </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <border>5</border>
+                                      <object class="wxComboBox" name="m_cbPreconfiguredSpeedSetups">
+                                        <style>wxCB_READONLY</style>
+                                        <selection>-1</selection>
+                                        <content/>
+                                      </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <border>2</border>
+                                      <object class="wxStaticLine" name="m_staticLine9572361">
+                                        <style>wxLI_HORIZONTAL</style>
+                                      </object>
+                                    </object>
+                                  </object>
+                                </object>
                                 <object class="sizeritem" name="flexGridSizer1387">
                                   <flag>wxALL|wxEXPAND</flag>
                                   <border>5</border>
@@ -1622,7 +1665,7 @@
                                       <border>2</border>
                                       <minsize>100,-1</minsize>
                                       <object class="wxComboBox" name="m_flySpeedXY">
-                                        <style>wxCB_READONLY</style>
+                                        <style>wxCB_SIMPLE|wxCB_READONLY</style>
                                         <size>100,-1</size>
                                         <selection>-1</selection>
                                         <content>
@@ -1765,6 +1808,7 @@
                                 </object>
                                 <object class="sizeritem" name="flexGridSizer265915">
                                   <flag>wxALL|wxEXPAND</flag>
+                                  <border>5</border>
                                   <option>1</option>
                                   <object class="wxFlexGridSizer">
                                     <cols>1</cols>
@@ -1776,9 +1820,11 @@
                                     <object class="sizeritem">
                                       <flag>wxALL|wxALIGN_RIGHT</flag>
                                       <border>2</border>
+                                      <minsize>-1,24</minsize>
                                       <object class="wxButton" name="m_button266116">
                                         <label>Configure XY axis with Z values</label>
                                         <style/>
+                                        <size>-1,24</size>
                                         <bitmap>bitmaps/16-file_save.png</bitmap>
                                         <bitmapposition>wxLEFT</bitmapposition>
                                         <default>0</default>
@@ -1978,6 +2024,7 @@
                                 </object>
                                 <object class="sizeritem" name="flexGridSizer2659">
                                   <flag>wxALL|wxEXPAND</flag>
+                                  <border>5</border>
                                   <option>1</option>
                                   <object class="wxFlexGridSizer">
                                     <cols>1</cols>
@@ -1989,9 +2036,11 @@
                                     <object class="sizeritem">
                                       <flag>wxALL|wxALIGN_RIGHT</flag>
                                       <border>2</border>
+                                      <minsize>-1,24</minsize>
                                       <object class="wxButton" name="m_button2661">
                                         <label>Configure Z axis with XY values</label>
                                         <style/>
+                                        <size>-1,24</size>
                                         <bitmap>bitmaps/16-file_save.png</bitmap>
                                         <bitmapposition>wxLEFT</bitmapposition>
                                         <default>0</default>

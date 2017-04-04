@@ -866,6 +866,29 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer96114->Add(m_staticLine957236, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
+    flexGridSizer2793 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer2793->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2793->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2793->AddGrowableCol(0);
+    
+    flexGridSizer2237->Add(flexGridSizer2793, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText2798 = new wxStaticText(m_setupSpeedPage, wxID_ANY, _("Preconfigured Speed Setups:"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(-1,-1)), 0);
+    wxFont m_staticText2798Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_staticText2798Font.SetWeight(wxFONTWEIGHT_BOLD);
+    m_staticText2798->SetFont(m_staticText2798Font);
+    
+    flexGridSizer2793->Add(m_staticText2798, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_cbPreconfiguredSpeedSetupsArr;
+    m_cbPreconfiguredSpeedSetups = new wxComboBox(m_setupSpeedPage, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(-1,-1)), m_cbPreconfiguredSpeedSetupsArr, wxCB_READONLY);
+    
+    flexGridSizer2793->Add(m_cbPreconfiguredSpeedSetups, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticLine9572361 = new wxStaticLine(m_setupSpeedPage, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer2793->Add(m_staticLine9572361, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
     flexGridSizer1387 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1387->SetFlexibleDirection( wxBOTH );
     flexGridSizer1387->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -906,7 +929,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_flySpeedXYArr.Add(wxT("1"));
     m_flySpeedXYArr.Add(wxT("0.5"));
     m_flySpeedXYArr.Add(wxT("0.1"));
-    m_flySpeedXY = new wxComboBox(m_setupSpeedPage, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(100,-1)), m_flySpeedXYArr, wxCB_READONLY);
+    m_flySpeedXY = new wxComboBox(m_setupSpeedPage, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(100,-1)), m_flySpeedXYArr, wxCB_SIMPLE|wxCB_READONLY);
     
     flexGridSizer1387->Add(m_flySpeedXY, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_flySpeedXY->SetMinSize(wxSize(100,-1));
@@ -956,15 +979,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer265915->AddGrowableCol(0);
     flexGridSizer265915->AddGrowableRow(0);
     
-    flexGridSizer2237->Add(flexGridSizer265915, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer2237->Add(flexGridSizer265915, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_button266116 = new wxButton(m_setupSpeedPage, wxID_ANY, _("Configure XY axis with Z values"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(-1,-1)), 0);
+    m_button266116 = new wxButton(m_setupSpeedPage, wxID_ANY, _("Configure XY axis with Z values"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(-1,24)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_button266116->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save")), wxLEFT);
     m_button266116->SetBitmapMargins(2,2);
     #endif
     
     flexGridSizer265915->Add(m_button266116, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
+    m_button266116->SetMinSize(wxSize(-1,24));
     
     flexGridSizer2237->Add(0, 20, 1, wxALL, WXC_FROM_DIP(5));
     
@@ -1058,15 +1082,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2659->AddGrowableCol(0);
     flexGridSizer2659->AddGrowableRow(0);
     
-    flexGridSizer2237->Add(flexGridSizer2659, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer2237->Add(flexGridSizer2659, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_button2661 = new wxButton(m_setupSpeedPage, wxID_ANY, _("Configure Z axis with XY values"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(-1,-1)), 0);
+    m_button2661 = new wxButton(m_setupSpeedPage, wxID_ANY, _("Configure Z axis with XY values"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedPage, wxSize(-1,24)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_button2661->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save")), wxLEFT);
     m_button2661->SetBitmapMargins(2,2);
     #endif
     
     flexGridSizer2659->Add(m_button2661, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
+    m_button2661->SetMinSize(wxSize(-1,24));
     
     m_setupDimPage = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupDimPageImgIndex;
@@ -5069,6 +5094,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_replyThreshold->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::killFocusReplyThreshold), NULL, this);
     m_cbStepSignX->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateReverseStepSignX), NULL, this);
     m_cbStepSignY->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateReverseStepSignY), NULL, this);
+    m_cbPreconfiguredSpeedSetups->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPreconfiguredSpeedSetups), NULL, this);
     m_maxXYSpeed->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::killFocusMaxSpeedXY), NULL, this);
     m_flySpeedXY->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateFlySpeedXY), NULL, this);
     m_workSpeedXY->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateWorkSpeedXY), NULL, this);
@@ -5358,6 +5384,7 @@ MainFrameBClass::~MainFrameBClass()
     m_replyThreshold->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::killFocusReplyThreshold), NULL, this);
     m_cbStepSignX->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateReverseStepSignX), NULL, this);
     m_cbStepSignY->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateReverseStepSignY), NULL, this);
+    m_cbPreconfiguredSpeedSetups->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPreconfiguredSpeedSetups), NULL, this);
     m_maxXYSpeed->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::killFocusMaxSpeedXY), NULL, this);
     m_flySpeedXY->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateFlySpeedXY), NULL, this);
     m_workSpeedXY->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateWorkSpeedXY), NULL, this);

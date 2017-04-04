@@ -1,17 +1,29 @@
 #ifndef CNC_ARDUINO_INCLUDES
 #define CNC_ARDUINO_INCLUDES
 
-//todo determine arduino include file
-//#include "C:\Users\Papa\Desktop\CNC\StepperControl\StepperControl_1\cv.h"
-//#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.1\cv.h"
-//#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.2\cv.h"
-//#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.3\cv.h"
-//#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.5\cv.h"
-//#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.6\cv.h"
-//#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1_V0.7\cv.h"
+#include <string>
 #include "C:\@Development\@Projekte\@StepperControl\StepperControl_1\cv.h"
 
-#include <string>
+///////////////////////////////////////////////////////////////////////////////////////////
+class ArduinoCMDs {
+	public:
+		static std::string cmds[MAX_CMDS];
+		static std::string ret;
+		
+		/////////////////////////////////////////////////////////////////////////
+		ArduinoCMDs() {
+		}
+		
+		/////////////////////////////////////////////////////////////////////////
+		~ArduinoCMDs() {
+		} 
+		
+		/////////////////////////////////////////////////////////////////////////
+		static void init();
+		
+		/////////////////////////////////////////////////////////////////////////
+		static const char* getCMDLabel(unsigned int id);
+};
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 class ArduinoPIDs {

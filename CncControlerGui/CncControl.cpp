@@ -266,6 +266,10 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_SPEED_X, cncConfig->getSpeedX()));
 	setup.push_back(SetterTuple(PID_SPEED_Y, cncConfig->getSpeedY()));
 	setup.push_back(SetterTuple(PID_SPEED_Z, cncConfig->getSpeedZ()));
+	
+	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_X, cncConfig->getPulsWidthOffsetX()));
+	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_Y, cncConfig->getPulsWidthOffsetY()));
+	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_Z, cncConfig->getPulsWidthOffsetZ()));
 
 	setup.push_back(SetterTuple(PID_STEP_MULTIPLIER_X, cncConfig->getMultiplierX()));
 	setup.push_back(SetterTuple(PID_STEP_MULTIPLIER_Y, cncConfig->getMultiplierY()));
@@ -883,7 +887,6 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 	if ( (p1 = msg.Find("{[")) != wxNOT_FOUND ) {
 		if ( (p2 = msg.Find("]}")) != wxNOT_FOUND && p2 >= p1 + 2) {
 			wxString idStr = msg.SubString(p1+2, p2-1);
-			cout << idStr << endl;
 			long id;
 			idStr.ToLong(&id);
 			wxString errorCode = ArduinoErrorCodes::getECLabel(id);
@@ -1464,7 +1467,7 @@ bool CncControl::moveLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered)
 
 	if ( renderMode == CncRenderAtController )
 		return serialPort->processMoveXY(x1, y1, false, curPos);
-
+		
 	if ( alreadyRendered == true )
 		return serialPort->processMoveXY(x1, y1, alreadyRendered, curPos);
 

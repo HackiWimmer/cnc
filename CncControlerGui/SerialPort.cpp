@@ -490,7 +490,7 @@ bool Serial::processIdle() {
 	
 	if ( traceInfo ) {
 		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << cmd[0] << "'\n";
+		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
 	}
 		
 	if ( writeData(cmd, idx) ) {
@@ -541,7 +541,7 @@ bool Serial::processTest(int32_t testId) {
 	
 	if ( traceInfo ) {
 		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << cmd[0] <<  "[" << testId << "]'\n";
+		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
 	}
 		
 	if ( writeData(cmd, idx) ) {
@@ -595,7 +595,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	
 	if ( traceInfo ) {
 		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << cmd[0] << "[" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << ntohl(value) << "]'\n";
+		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << ntohl(value) << "]\n";
 	}
 		
 	if ( writeData(cmd, idx) ) {
@@ -646,7 +646,7 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 	
 	if ( traceInfo ) {
 		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << cmd[0] << "[" << ArduinoPIDs::getPIDLabel((pid)) << "]\n";
+		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((pid)) << "]\n";
 	}
 
 	list.clear();
@@ -699,7 +699,7 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 
 		if ( traceInfo ) {
 			cnc::spy.initializeResult();
-			cnc::spy << "Send: '" << cmd[i] << "'\n";
+			cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
 		}
 
 		if ( writeData(p++, 1) ) {
@@ -737,7 +737,7 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 bool Serial::processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = 1;
-	int32_t values[3];
+	static int32_t values[3];
 	values[0] = z1;
 	values[1] = 0;
 	values[2] = 0;
@@ -748,7 +748,7 @@ bool Serial::processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos
 bool Serial::processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = 2;
-	int32_t values[3];
+	static int32_t values[3];
 	values[0] = x1;
 	values[1] = y1;
 	values[2] = 0;
@@ -759,7 +759,7 @@ bool Serial::processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLong
 bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = 3;
-	int32_t values[3];
+	static int32_t values[3];
 	values[0] = x1;
 	values[1] = y1;
 	values[2] = z1;
@@ -792,7 +792,7 @@ bool Serial::processMove(unsigned int size, int32_t values[], bool alreadyRender
 	
 	if ( traceInfo ) {
 		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << moveCommand[0] << "'\n";
+		cnc::spy << "Send: '" << moveCommand[0] << "' [" << ArduinoCMDs::getCMDLabel(moveCommand[0]) << "]\n";
 	}
 		
 	if ( writeData(moveCommand, idx) ) {

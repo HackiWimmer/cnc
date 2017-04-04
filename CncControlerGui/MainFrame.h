@@ -46,6 +46,7 @@ class MainFrame : public MainFrameBClass {
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 protected:
+    virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event);
 	virtual void requestErrorCount(wxCommandEvent& event);
     virtual void paintXAxisMarkerBottom(wxPaintEvent& event);
     virtual void paintXAxisMarkerTop(wxPaintEvent& event);
@@ -169,6 +170,8 @@ protected:
 		void createStcEmuControlPopupMenu();
 		
 		int showSetReferencePositionDlg(wxString msg);
+		
+		void initializePreconfiguredSpeedSetups();
 		
 		///////////////////////////////////////////////////////////////
 		// search handling

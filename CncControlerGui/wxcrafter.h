@@ -213,6 +213,10 @@ protected:
     wxFlexGridSizer* flexGridSizer96114;
     wxStaticText* m_staticText779125;
     wxStaticLine* m_staticLine957236;
+    wxFlexGridSizer* flexGridSizer2793;
+    wxStaticText* m_staticText2798;
+    wxComboBox* m_cbPreconfiguredSpeedSetups;
+    wxStaticLine* m_staticLine9572361;
     wxFlexGridSizer* flexGridSizer1387;
     wxStaticText* m_staticText924;
     wxTextCtrl* m_maxXYSpeed;
@@ -891,6 +895,7 @@ protected:
     virtual void killFocusReplyThreshold(wxFocusEvent& event) { event.Skip(); }
     virtual void updateReverseStepSignX(wxCommandEvent& event) { event.Skip(); }
     virtual void updateReverseStepSignY(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event) { event.Skip(); }
     virtual void killFocusMaxSpeedXY(wxFocusEvent& event) { event.Skip(); }
     virtual void updateFlySpeedXY(wxCommandEvent& event) { event.Skip(); }
     virtual void updateWorkSpeedXY(wxCommandEvent& event) { event.Skip(); }
@@ -1194,6 +1199,9 @@ public:
     wxPanel* GetSetupWorkPage() { return m_setupWorkPage; }
     wxStaticText* GetStaticText779125() { return m_staticText779125; }
     wxStaticLine* GetStaticLine957236() { return m_staticLine957236; }
+    wxStaticText* GetStaticText2798() { return m_staticText2798; }
+    wxComboBox* GetCbPreconfiguredSpeedSetups() { return m_cbPreconfiguredSpeedSetups; }
+    wxStaticLine* GetStaticLine9572361() { return m_staticLine9572361; }
     wxStaticText* GetStaticText924() { return m_staticText924; }
     wxTextCtrl* GetMaxXYSpeed() { return m_maxXYSpeed; }
     wxStaticText* GetStaticText928() { return m_staticText928; }
