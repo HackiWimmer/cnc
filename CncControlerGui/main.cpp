@@ -5,6 +5,7 @@
 #include <wx/splash.h>
 #include <wx/dcmemory.h>
 #include <wx/cmdline.h>
+#include "CncFileNameService.h"
 #include "CncStreamBuffers.h"
 #include "MainFrame.h"
 
@@ -243,6 +244,9 @@ class MainApp : public wxApp {
 			wxImage::AddHandler( new wxPNGHandler );
 			wxImage::AddHandler( new wxJPEGHandler );
 			wxInitAllImageHandlers();
+			
+			// init file and dir names
+			CncFileNameService::init();
 			
 			// build and decorate the main frame
 			MainFrame *mainFrame = new MainFrame(NULL);

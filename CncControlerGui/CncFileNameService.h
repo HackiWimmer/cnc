@@ -12,15 +12,25 @@ class CncFileNameService {
 		static wxString _executablePath;
 		static wxString _homeDirectory;
 		static wxString _tempDirectory;
+		static wxString _configDir;
+		
+		static wxString _configFileName;
+		static wxString _lruFileName;
+		static wxString _preconfiguredSpeedConfigFileName;
 		
 		static void deleteFile(wxString fn);
 	
 	public:
 		static void init();
 		static void trace(std::ostream& os);
-		static wxString& getExecutableDir() 					{ return _executablePath; }
-		static wxString& getHomeDir() 							{ return _homeDirectory; }
-		static wxString& getTempDir() 							{ return _tempDirectory; }
+		static const wxString& getConfigFileName()				{ _ret = _configDir + _configFileName; return _ret; }
+		static const wxString& getLruFileName()					{ _ret = _configDir + _lruFileName; return _ret; }
+		static const wxString& getSpeedConfigFileName()			{ _ret = _configDir + _preconfiguredSpeedConfigFileName; return _ret; }
+		
+		static const wxString& getExecutableDir() 				{ return _executablePath; }
+		static const wxString& getHomeDir() 					{ return _homeDirectory; }
+		static const wxString& getTempDir() 					{ return _tempDirectory; }
+		static const wxString& getConfigDir()					{ return _configDir; }
 		
 		static const char* getTempFileName(TemplateFormat f);
 		static const char* getCncTemplatePreviewFileName(TemplateFormat f);

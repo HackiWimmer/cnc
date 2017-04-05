@@ -15,7 +15,6 @@ class ArduinoCMDsInitializer {
 /////////////////////////////////////////////////////////////////////////
 void ArduinoCMDs::init() {
 /////////////////////////////////////////////////////////////////////////
-	
 	for (int i=0; i<MAX_CMDS -1;i++){
 		std::string s("Unknown Command: ");
 		s += std::to_string(i);
@@ -54,11 +53,13 @@ void ArduinoCMDs::init() {
 	cmds[CMD_PRINT_VERSION]         = "Pull Version";
 	cmds[CMD_PRINT_PIN_REPORT]      = "Pull PIN Report";
 	cmds[CMD_PRINT_ERRORINFO]       = "Pull Error Info";
+	
+	cmds[CMD_ENABLE_PROBE_MODE]     = "Push Enable Probe Mode";
+	cmds[CMD_DISABLE_PROBE_MODE]    = "Push Disable Probe Mode";
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoCMDs::getCMDLabel(unsigned int id) {
 /////////////////////////////////////////////////////////////////////////
-
 	if ( id >= 0 && id < MAX_CMDS )
 		return cmds[id].c_str();
 
@@ -83,7 +84,6 @@ class ArduinoPIDsInitializer {
 /////////////////////////////////////////////////////////////////////////
 void ArduinoPIDs::init() {
 /////////////////////////////////////////////////////////////////////////
-	
 	for (int i=0; i<MAX_PIDS -1;i++){
 		std::string s("Unknown PID: ");
 		s += std::to_string(i);
@@ -121,6 +121,7 @@ void ArduinoPIDs::init() {
 	pids[PID_POS_REPLY_THRESHOLD]             = "Position reply threshold";
 	pids[PID_POS_REPLY_COUNTER]               = "Position pelay counter";
 	pids[PID_MIN_ENABLE_PULSE_WIDTH]          = "Stepper Driver Enbable Pulse Width";
+	pids[PID_PROBE_MODE]                      = "Probe Mode";
 
 	pids[PID_XYZ_POS]                         = "XYZ Pos";
 	pids[PID_XY_POS]                          = "XY Pos";
@@ -165,7 +166,6 @@ void ArduinoPIDs::init() {
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {
 /////////////////////////////////////////////////////////////////////////
-
 	if ( id >= 0 && id < MAX_PIDS )
 		return pids[id].c_str();
 
@@ -244,7 +244,6 @@ class ArduinoPinsInitializer {
 /////////////////////////////////////////////////////////////////////////
 void ArduinoDigitalPins::init() {
 /////////////////////////////////////////////////////////////////////////
-	
 	for (int i=0; i<MAX_PINS -1;i++){
 		std::string s("Unknown PIN: ");
 		s += std::to_string(i);

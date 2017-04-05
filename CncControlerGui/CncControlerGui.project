@@ -99,6 +99,8 @@
       <File Name="CncZView.cpp"/>
       <File Name="CnczView.h"/>
       <File Name="CncCommon.cpp"/>
+      <File Name="CncSpeedView.h"/>
+      <File Name="CncSpeedView.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>

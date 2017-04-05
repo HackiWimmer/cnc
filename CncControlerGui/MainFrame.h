@@ -172,6 +172,7 @@ protected:
 		int showSetReferencePositionDlg(wxString msg);
 		
 		void initializePreconfiguredSpeedSetups();
+		void performSpeedValueConfig(wxComboBox* cb, const wxString& item);
 		
 		///////////////////////////////////////////////////////////////
 		// search handling

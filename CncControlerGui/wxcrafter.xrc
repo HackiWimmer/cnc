@@ -1608,7 +1608,13 @@
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>5</border>
                                       <object class="wxComboBox" name="m_cbPreconfiguredSpeedSetups">
-                                        <style>wxCB_READONLY</style>
+                                        <style>wxCB_SORT|wxCB_READONLY</style>
+                                        <font>
+                                          <sysfont>wxSYS_ANSI_FIXED_FONT</sysfont>
+                                          <style>normal</style>
+                                          <weight>bold</weight>
+                                          <underlined>0</underlined>
+                                        </font>
                                         <selection>-1</selection>
                                         <content/>
                                       </object>
@@ -1636,7 +1642,7 @@
                                     <object class="sizeritem">
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>5</border>
-                                      <object class="wxStaticText" name="m_staticText924">
+                                      <object class="wxStaticText" name="m_staticText9241">
                                         <label>Max XY Speed [rpm]</label>
                                         <style/>
                                         <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
@@ -1654,7 +1660,7 @@
                                     <object class="sizeritem">
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>5</border>
-                                      <object class="wxStaticText" name="m_staticText928">
+                                      <object class="wxStaticText" name="m_staticText924">
                                         <label>Fly Speed XY [%]</label>
                                         <style/>
                                         <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
@@ -1665,7 +1671,7 @@
                                       <border>2</border>
                                       <minsize>100,-1</minsize>
                                       <object class="wxComboBox" name="m_flySpeedXY">
-                                        <style>wxCB_SIMPLE|wxCB_READONLY</style>
+                                        <style>wxCB_READONLY</style>
                                         <size>100,-1</size>
                                         <selection>-1</selection>
                                         <content>
@@ -2320,6 +2326,19 @@
                                         </content>
                                       </object>
                                     </object>
+                                  </object>
+                                </object>
+                                <object class="sizeritem" name="flexGridSizer1134">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>1</border>
+                                  <option>1</option>
+                                  <object class="wxFlexGridSizer">
+                                    <cols>2</cols>
+                                    <rows>3</rows>
+                                    <vgap>0</vgap>
+                                    <hgap>0</hgap>
+                                    <growablecols>1</growablecols>
+                                    <growablerows/>
                                   </object>
                                 </object>
                               </object>
@@ -5384,14 +5403,12 @@
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <border>5</border>
-              <object class="wxTreebook" name="m_templateTreeBook">
-                <style>wxBK_DEFAULT</style>
-                <object class="treebookpage">
-                  <label>LRU</label>
+              <object class="wxListbook" name="m_templateListbook">
+                <style>wxLB_DEFAULT|wxBK_DEFAULT</style>
+                <object class="listbookpage">
+                  <label>Recently used</label>
                   <bitmap>bitmaps/16-history.png</bitmap>
                   <selected>1</selected>
-                  <depth>0</depth>
-                  <expanded>1</expanded>
                   <object class="wxPanel" name="m_lruPanel">
                     <style>wxTAB_TRAVERSAL</style>
                     <object class="wxFlexGridSizer">
@@ -5437,12 +5454,10 @@
                     </object>
                   </object>
                 </object>
-                <object class="treebookpage">
-                  <label>STD</label>
+                <object class="listbookpage">
+                  <label>Workarea</label>
                   <bitmap>bitmaps/16-cxx-workspace.png</bitmap>
                   <selected>0</selected>
-                  <depth>0</depth>
-                  <expanded>1</expanded>
                   <object class="wxPanel" name="m_stdPanel">
                     <style>wxTAB_TRAVERSAL</style>
                     <object class="wxFlexGridSizer">
@@ -5578,7 +5593,7 @@
           <style/>
           <scrollrate>5,5</scrollrate>
           <object class="wxFlexGridSizer">
-            <cols>3</cols>
+            <cols>4</cols>
             <rows>1</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
@@ -5698,25 +5713,27 @@
                 </object>
               </object>
             </object>
-            <object class="sizeritem" name="flexGridSizer1106">
-              <flag>wxALL|wxEXPAND</flag>
-              <border>5</border>
+            <object class="sizeritem" name="flexGridSizer2801">
+              <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+              <border>1</border>
               <option>1</option>
               <object class="wxFlexGridSizer">
                 <cols>1</cols>
-                <rows>4</rows>
+                <rows>2</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
                 <growablecols/>
-                <growablerows/>
+                <growablerows>1</growablerows>
                 <object class="sizeritem">
-                  <flag>wxALL</flag>
+                  <flag>wxALL|wxEXPAND</flag>
                   <border>1</border>
-                  <object class="wxStaticText" name="m_staticText1136">
-                    <label>Current Values:</label>
-                    <style/>
+                  <object class="wxStaticText" name="m_staticText2805">
+                    <label>Current Speed:</label>
+                    <style>wxALIGN_CENTRE</style>
+                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                     <font>
-                      <size>9</size>
+                      <size>7</size>
                       <style>normal</style>
                       <weight>bold</weight>
                       <family>swiss</family>
@@ -5727,189 +5744,11 @@
                 </object>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>
-                  <border>5</border>
-                  <object class="wxStaticLine" name="m_staticLine1138">
-                    <style>wxLI_HORIZONTAL</style>
-                  </object>
-                </object>
-                <object class="sizeritem" name="flexGridSizer1132">
-                  <flag>wxALL|wxEXPAND</flag>
                   <border>1</border>
-                  <option>1</option>
-                  <object class="wxFlexGridSizer">
-                    <cols>4</cols>
-                    <rows>1</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>1,3</growablecols>
-                    <growablerows/>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText1128">
-                        <label>Crossing:</label>
-                        <style/>
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
-                      <border>5</border>
-                      <minsize>25,18</minsize>
-                      <object class="wxTextCtrl" name="m_passingCount">
-                        <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
-                        <size>25,18</size>
-                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
-                        <tooltip>
-                          <![CDATA[Crossings]]>
-                        </tooltip>
-                        <value>0</value>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText1966">
-                        <label>from</label>
-                        <style/>
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxALIGN_RIGHT</flag>
-                      <border>5</border>
-                      <minsize>25,18</minsize>
-                      <object class="wxTextCtrl" name="m_crossings">
-                        <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
-                        <size>25,18</size>
-                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
-                        <value>1</value>
-                      </object>
-                    </object>
-                  </object>
-                </object>
-                <object class="sizeritem" name="flexGridSizer1134">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <border>1</border>
-                  <option>1</option>
-                  <object class="wxFlexGridSizer">
-                    <cols>2</cols>
-                    <rows>3</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols>1</growablecols>
-                    <growablerows/>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText1114">
-                        <label>Speed X :</label>
-                        <style/>
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>1</border>
-                      <object class="wxSlider" name="m_speedX">
-                        <style>wxSL_HORIZONTAL|wxBORDER_SUNKEN</style>
-                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                        <min>0</min>
-                        <max>100</max>
-                        <value>50</value>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText1116">
-                        <label>Speed Y :</label>
-                        <style/>
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>1</border>
-                      <object class="wxSlider" name="m_speedY">
-                        <style>wxSL_HORIZONTAL|wxBORDER_SUNKEN</style>
-                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                        <min>0</min>
-                        <max>100</max>
-                        <value>50</value>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText1118">
-                        <label>Speed Z :</label>
-                        <style/>
-                        <font>
-                          <size>8</size>
-                          <style>normal</style>
-                          <weight>normal</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL|wxEXPAND</flag>
-                      <border>1</border>
-                      <object class="wxSlider" name="m_speedZ">
-                        <style>wxSL_HORIZONTAL|wxBORDER_SUNKEN</style>
-                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                        <min>0</min>
-                        <max>100</max>
-                        <value>50</value>
-                      </object>
-                    </object>
+                  <minsize>80,-1</minsize>
+                  <object class="wxPanel" name="m_speedView">
+                    <size>80,-1</size>
+                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
                   </object>
                 </object>
               </object>
@@ -7335,7 +7174,7 @@ Axis</label>
                             <border>1</border>
                             <option>1</option>
                             <object class="wxFlexGridSizer">
-                              <cols>3</cols>
+                              <cols>4</cols>
                               <rows>1</rows>
                               <vgap>0</vgap>
                               <hgap>0</hgap>
@@ -7491,6 +7330,91 @@ Axis</label>
                                       <tooltip>
                                         <![CDATA[Grid Position Y as Unit]]>
                                       </tooltip>
+                                    </object>
+                                  </object>
+                                </object>
+                              </object>
+                              <object class="sizeritem" name="flexGridSizer2803">
+                                <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL|wxALIGN_CENTER_VERTICAL</flag>
+                                <option>1</option>
+                                <object class="wxFlexGridSizer">
+                                  <cols>4</cols>
+                                  <rows>0</rows>
+                                  <vgap>0</vgap>
+                                  <hgap>0</hgap>
+                                  <growablecols/>
+                                  <growablerows/>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <border>1</border>
+                                    <object class="wxStaticText" name="m_staticText1128">
+                                      <label>Crossing:</label>
+                                      <style/>
+                                      <font>
+                                        <size>8</size>
+                                        <style>normal</style>
+                                        <weight>normal</weight>
+                                        <family>swiss</family>
+                                        <underlined>0</underlined>
+                                        <face>Segoe UI</face>
+                                      </font>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxALIGN_RIGHT</flag>
+                                    <border>1</border>
+                                    <minsize>25,14</minsize>
+                                    <object class="wxTextCtrl" name="m_crossings">
+                                      <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
+                                      <size>25,14</size>
+                                      <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                      <font>
+                                        <size>8</size>
+                                        <style>normal</style>
+                                        <weight>normal</weight>
+                                        <family>swiss</family>
+                                        <underlined>0</underlined>
+                                        <face>Segoe UI</face>
+                                      </font>
+                                      <value>1</value>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <border>1</border>
+                                    <object class="wxStaticText" name="m_staticText1966">
+                                      <label>from</label>
+                                      <style/>
+                                      <font>
+                                        <size>8</size>
+                                        <style>normal</style>
+                                        <weight>normal</weight>
+                                        <family>swiss</family>
+                                        <underlined>0</underlined>
+                                        <face>Segoe UI</face>
+                                      </font>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+                                    <border>1</border>
+                                    <minsize>25,14</minsize>
+                                    <object class="wxTextCtrl" name="m_passingCount">
+                                      <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
+                                      <size>25,14</size>
+                                      <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                      <font>
+                                        <size>8</size>
+                                        <style>normal</style>
+                                        <weight>normal</weight>
+                                        <family>swiss</family>
+                                        <underlined>0</underlined>
+                                        <face>Segoe UI</face>
+                                      </font>
+                                      <tooltip>
+                                        <![CDATA[Crossings]]>
+                                      </tooltip>
+                                      <value>0</value>
                                     </object>
                                   </object>
                                 </object>
@@ -7885,7 +7809,7 @@ Axis</label>
                               <label>X:</label>
                               <style>wxALIGN_CENTRE</style>
                               <size>24,24</size>
-                              <fg>#FF0000</fg>
+                              <fg>#7F0000</fg>
                               <font>
                                 <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
                                 <style>normal</style>

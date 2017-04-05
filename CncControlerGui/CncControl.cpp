@@ -754,8 +754,8 @@ void CncControl::changeWorkSpeedXY(CncSpeed s) {
 	processSetter(PID_SPEED_X, cncConfig->getSpeedX());
 	processSetter(PID_SPEED_Y, cncConfig->getSpeedY());
 	
-	if (guiCtlSetup->speedX && toolUpdateState == true ) guiCtlSetup->speedX->SetValue(cncConfig->getSpeedX());
-	if (guiCtlSetup->speedY && toolUpdateState == true ) guiCtlSetup->speedY->SetValue(cncConfig->getSpeedY());
+	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedX(cncConfig->getSpeedX());
+	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedY(cncConfig->getSpeedY());
 
 	updateCncConfigTrace();
 }
@@ -767,7 +767,7 @@ void CncControl::changeWorkSpeedZ(CncSpeed s) {
 	cncConfig->setActiveSpeedZ(s);
 	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
 	
-	if (guiCtlSetup->speedZ && toolUpdateState == true ) guiCtlSetup->speedZ->SetValue(cncConfig->getSpeedZ());
+	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedZ(cncConfig->getSpeedZ());
 
 	updateCncConfigTrace();
 }
@@ -928,15 +928,12 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	/*
-	 * todo
 	// Event handling, enables the interrrpt functionality
 	if ( cncConfig->isAllowEventHandling() ) {
 		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
 		while (evtLoop->Pending())
 			evtLoop->Dispatch();
 	}
-	*/
 	
 	switch ( ci.infoType ) {
 		case CITHeartbeat:

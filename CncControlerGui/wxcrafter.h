@@ -46,6 +46,7 @@
 #include <wx/dataview.h>
 #include <wx/webview.h>
 #include <wx/dirctrl.h>
+#include "CncSpeedView.h"
 #include "CncZView.h"
 #include <wx/timer.h>
 #include <wx/dialog.h>
@@ -218,9 +219,9 @@ protected:
     wxComboBox* m_cbPreconfiguredSpeedSetups;
     wxStaticLine* m_staticLine9572361;
     wxFlexGridSizer* flexGridSizer1387;
-    wxStaticText* m_staticText924;
+    wxStaticText* m_staticText9241;
     wxTextCtrl* m_maxXYSpeed;
-    wxStaticText* m_staticText928;
+    wxStaticText* m_staticText924;
     wxComboBox* m_flySpeedXY;
     wxStaticText* m_staticText932;
     wxComboBox* m_workSpeedXY;
@@ -263,6 +264,7 @@ protected:
     wxComboBox* m_cbSvgIncludeOriginalPath;
     wxStaticText* m_staticText126111;
     wxComboBox* m_cbSvgFirstCrossing;
+    wxFlexGridSizer* flexGridSizer1134;
     wxPanel* m_setupEnvPage;
     wxFlexGridSizer* flexGridSizer2232;
     wxFlexGridSizer* flexGridSizer1873;
@@ -528,7 +530,7 @@ protected:
     wxTextCtrl* m_serialSpyDetails;
     wxScrolledWindow* m_scrollWinFile;
     wxFlexGridSizer* flexGridSizer1628;
-    wxTreebook* m_templateTreeBook;
+    wxListbook* m_templateListbook;
     wxPanel* m_lruPanel;
     wxFlexGridSizer* flexGridSizer1642;
     wxStaticText* m_staticText1644;
@@ -551,21 +553,9 @@ protected:
     wxFlexGridSizer* flexGridSizer2520;
     wxTextCtrl* m_logger;
     wxTextCtrl* m_tmpTraceInfo;
-    wxFlexGridSizer* flexGridSizer1106;
-    wxStaticText* m_staticText1136;
-    wxStaticLine* m_staticLine1138;
-    wxFlexGridSizer* flexGridSizer1132;
-    wxStaticText* m_staticText1128;
-    wxTextCtrl* m_passingCount;
-    wxStaticText* m_staticText1966;
-    wxTextCtrl* m_crossings;
-    wxFlexGridSizer* flexGridSizer1134;
-    wxStaticText* m_staticText1114;
-    wxSlider* m_speedX;
-    wxStaticText* m_staticText1116;
-    wxSlider* m_speedY;
-    wxStaticText* m_staticText1118;
-    wxSlider* m_speedZ;
+    wxFlexGridSizer* flexGridSizer2801;
+    wxStaticText* m_staticText2805;
+    CncSpeedView* m_speedView;
     wxScrolledWindow* m_statusBar;
     wxFlexGridSizer* flexGridSizer436;
     wxStaticText* m_staticText3952;
@@ -688,6 +678,11 @@ protected:
     wxTextCtrl* m_drawPainPositionX;
     wxStaticText* m_staticText19431;
     wxTextCtrl* m_drawPainPositionY;
+    wxFlexGridSizer* flexGridSizer2803;
+    wxStaticText* m_staticText1128;
+    wxTextCtrl* m_crossings;
+    wxStaticText* m_staticText1966;
+    wxTextCtrl* m_passingCount;
     wxFlexGridSizer* flexGridSizer1698;
     wxStaticText* m_staticText1696;
     wxStaticText* m_minPosX;
@@ -985,7 +980,6 @@ protected:
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
-    virtual void disableSlider(wxMouseEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
@@ -1202,9 +1196,9 @@ public:
     wxStaticText* GetStaticText2798() { return m_staticText2798; }
     wxComboBox* GetCbPreconfiguredSpeedSetups() { return m_cbPreconfiguredSpeedSetups; }
     wxStaticLine* GetStaticLine9572361() { return m_staticLine9572361; }
-    wxStaticText* GetStaticText924() { return m_staticText924; }
+    wxStaticText* GetStaticText9241() { return m_staticText9241; }
     wxTextCtrl* GetMaxXYSpeed() { return m_maxXYSpeed; }
-    wxStaticText* GetStaticText928() { return m_staticText928; }
+    wxStaticText* GetStaticText924() { return m_staticText924; }
     wxComboBox* GetFlySpeedXY() { return m_flySpeedXY; }
     wxStaticText* GetStaticText932() { return m_staticText932; }
     wxComboBox* GetWorkSpeedXY() { return m_workSpeedXY; }
@@ -1448,7 +1442,7 @@ public:
     wxStaticText* GetStaticText1647() { return m_staticText1647; }
     wxGenericDirCtrl* GetDirCtrl() { return m_dirCtrl; }
     wxPanel* GetStdPanel() { return m_stdPanel; }
-    wxTreebook* GetTemplateTreeBook() { return m_templateTreeBook; }
+    wxListbook* GetTemplateListbook() { return m_templateListbook; }
     wxScrolledWindow* GetScrollWinFile() { return m_scrollWinFile; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetFreezeLogger() { return m_freezeLogger; }
@@ -1456,18 +1450,8 @@ public:
     wxCheckBox* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
     wxTextCtrl* GetLogger() { return m_logger; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
-    wxStaticText* GetStaticText1136() { return m_staticText1136; }
-    wxStaticLine* GetStaticLine1138() { return m_staticLine1138; }
-    wxStaticText* GetStaticText1128() { return m_staticText1128; }
-    wxTextCtrl* GetPassingCount() { return m_passingCount; }
-    wxStaticText* GetStaticText1966() { return m_staticText1966; }
-    wxTextCtrl* GetCrossings() { return m_crossings; }
-    wxStaticText* GetStaticText1114() { return m_staticText1114; }
-    wxSlider* GetSpeedX() { return m_speedX; }
-    wxStaticText* GetStaticText1116() { return m_staticText1116; }
-    wxSlider* GetSpeedY() { return m_speedY; }
-    wxStaticText* GetStaticText1118() { return m_staticText1118; }
-    wxSlider* GetSpeedZ() { return m_speedZ; }
+    wxStaticText* GetStaticText2805() { return m_staticText2805; }
+    CncSpeedView* GetSpeedView() { return m_speedView; }
     wxScrolledWindow* GetScrollWinLogger() { return m_scrollWinLogger; }
     wxStaticText* GetStaticText3952() { return m_staticText3952; }
     wxTextCtrl* GetCmdCount() { return m_cmdCount; }
@@ -1561,6 +1545,10 @@ public:
     wxTextCtrl* GetDrawPainPositionX() { return m_drawPainPositionX; }
     wxStaticText* GetStaticText19431() { return m_staticText19431; }
     wxTextCtrl* GetDrawPainPositionY() { return m_drawPainPositionY; }
+    wxStaticText* GetStaticText1128() { return m_staticText1128; }
+    wxTextCtrl* GetCrossings() { return m_crossings; }
+    wxStaticText* GetStaticText1966() { return m_staticText1966; }
+    wxTextCtrl* GetPassingCount() { return m_passingCount; }
     wxStaticText* GetStaticText1696() { return m_staticText1696; }
     wxStaticText* GetMinPosX() { return m_minPosX; }
     wxStaticText* GetMinPosY() { return m_minPosY; }

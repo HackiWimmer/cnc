@@ -10,6 +10,7 @@ class wxSlider;
 class wxDataViewListCtrl;
 class CncOpenGLDrawPane;
 class CncZView;
+class CncSpeedView;
 class MainFrame;
 
 struct GuiControlSetup {
@@ -43,10 +44,7 @@ struct GuiControlSetup {
 	wxMenuItem* motorState		= NULL;
 	
 	CncZView* zView				= NULL;
-	
-	wxSlider* speedX			= NULL;
-	wxSlider* speedY			= NULL;
-	wxSlider* speedZ			= NULL;
+	CncSpeedView* speedView     = NULL;
 	
 	wxPanel* xAxisMarkerTop		= NULL;
 	wxPanel* xAxisMarkerBottom	= NULL;

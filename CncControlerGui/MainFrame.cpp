@@ -35,14 +35,11 @@
 #include "HexDecoder.h"
 #include "MainFrame.h"
 
-
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
 const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
 const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _programVersion 	= "0.6.4";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
-const char* _configFileName 	= "..\\CncController.ini";
-const char* _lruStoreFileName	= "..\\CncControllerLruStore.ini";
 const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
 	
 // file content change environment
@@ -78,8 +75,8 @@ MainFrame::MainFrame(wxWindow* parent)
 , drawPane3D(NULL)
 , serialSpy(NULL)
 , guiCtlSetup(new GuiControlSetup())
-, config(new wxFileConfig(wxT("CncController"), wxEmptyString, _configFileName, _configFileName, wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
-, lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, _lruStoreFileName, _lruStoreFileName, wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
+, config(new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
+, lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , pathGenerator(new PathGeneratorFrame(this))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
@@ -673,8 +670,6 @@ void MainFrame::initialize(void) {
 	wxASSERT(m_inputFileName);
 	wxASSERT(m_metricX); wxASSERT(m_metricY); wxASSERT(m_metricZ);
 
-	CncFileNameService::init();
-	
 	lruFileList.setListControl(m_lruList);
 	
 	createAnimationControl();
@@ -927,8 +922,7 @@ bool MainFrame::initializeLruMenu() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initializePreconfiguredSpeedSetups() {
 ///////////////////////////////////////////////////////////////////
-	//todo flex path
-	wxString fn("..\\Database\\PreconfiguredSpeedSetups.ini");
+	wxString fn(CncFileNameService::getSpeedConfigFileName());
 	wxFileConfig cfg(wxT("CncController"), wxEmptyString, fn, fn, wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
 	
 	m_cbPreconfiguredSpeedSetups->Clear();
@@ -938,9 +932,14 @@ void MainFrame::initializePreconfiguredSpeedSetups() {
 	
 	// all groups...
 	bool bCont = cfg.GetFirstGroup(str, dummy);
+	unsigned int cnt = 0;
 	while ( bCont ) {
-		wxString item(str);
-		item << ": [";
+		cnt++;
+		wxString item(wxString::Format("%03d: ", cnt));
+		item << str;
+		item << wxString(' ', 50 - str.Length());
+		
+		item << "[";
 		cfg.Read(str + "/FlySpeedXY", &cfgLong, 10); item << cfgLong; item << ", ";
 		cfg.Read(str + "/FlySpeedZ", &cfgLong, 10); item << cfgLong; item << ", ";
 		cfg.Read(str + "/WorkSpeedXY", &cfgLong, 10); item << cfgLong; item << ", ";
@@ -955,6 +954,23 @@ void MainFrame::initializePreconfiguredSpeedSetups() {
 		wxCommandEvent dummyEvent;
 		selectPreconfiguredSpeedSetups(dummyEvent);
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::performSpeedValueConfig(wxComboBox* cb, const wxString& item) {
+///////////////////////////////////////////////////////////////////
+	if ( cb == NULL )
+		return;
+		
+	long test;
+	item.ToLong(&test);
+	if ( test < 0 || test > 100 )
+		return;
+	
+	if ( cb->FindString(item, true) == wxNOT_FOUND ) {
+		cb->Append(item);
+	} 
+	
+	cb->SetStringSelection(item);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectPreconfiguredSpeedSetups(wxCommandEvent& event) {
@@ -973,13 +989,13 @@ void MainFrame::selectPreconfiguredSpeedSetups(wxCommandEvent& event) {
 				cnt++;
 				
 				switch ( cnt ) {
-					case 1:		m_flySpeedXY->SetStringSelection(token);
+					case 1:		performSpeedValueConfig(m_flySpeedXY, token);
 								break;
-					case 2:		m_flySpeedZ->SetStringSelection(token);
+					case 2:		performSpeedValueConfig(m_flySpeedZ, token);
 								break;
-					case 3:		m_workSpeedXY->SetStringSelection(token);
+					case 3:		performSpeedValueConfig(m_workSpeedXY, token);
 								break;
-					case 4:		m_workSpeedZ->SetStringSelection(token);
+					case 4:		performSpeedValueConfig(m_workSpeedZ, token);
 								break;
 					default: 	std::cerr << "MainFrame::selectPreconfiguredSpeedSetups: Invalid token count: " << cnt << std::endl;
 				}
@@ -1023,10 +1039,7 @@ void MainFrame::determineCncOutputControls() {
 	
 	guiCtlSetup->motorState 		= m_miMotorEnableState;
 	guiCtlSetup->zView				= m_zView;
-
-	guiCtlSetup->speedX				= m_speedX;
-	guiCtlSetup->speedY				= m_speedY;
-	guiCtlSetup->speedZ				= m_speedZ;
+	guiCtlSetup->speedView			= m_speedView;
 	
 	guiCtlSetup->xMinLimit 			= m_xMinLimit;
 	guiCtlSetup->xMaxLimit 			= m_xMaxLimit;
@@ -1765,14 +1778,24 @@ void MainFrame::updateSpeedValues() {
 
 	updateCncConfigTrace();
 	
+	/*
 	m_speedX->SetRange(0, cnc->getCncConfig()->getMaxSpeedXY());
 	m_speedY->SetRange(0, cnc->getCncConfig()->getMaxSpeedXY());
 	m_speedZ->SetRange(0, cnc->getCncConfig()->getMaxSpeedZ());
+	 * */
+	m_speedView->setMaxSpeedX(cnc->getCncConfig()->getMaxSpeedXY());
+	m_speedView->setMaxSpeedY(cnc->getCncConfig()->getMaxSpeedXY());
+	m_speedView->setMaxSpeedZ(cnc->getCncConfig()->getMaxSpeedZ());
 
 	if ( m_menuItemToolControls->IsChecked() == true ) {
+		/*
 		m_speedX->SetValue(cnc->getCncConfig()->getSpeedX());
 		m_speedY->SetValue(cnc->getCncConfig()->getSpeedY());
 		m_speedZ->SetValue(cnc->getCncConfig()->getSpeedZ());
+		*/
+		m_speedView->setCurrentSpeedX(cnc->getCncConfig()->getSpeedX());
+		m_speedView->setCurrentSpeedY(cnc->getCncConfig()->getSpeedY());
+		m_speedView->setCurrentSpeedZ(cnc->getCncConfig()->getSpeedZ());
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -3984,7 +4007,7 @@ void MainFrame::openConfigurationFile(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString cmd;
 	config->Read("TemplateEditor/ExternalTool", &cmd, wxT("notepad "));
-	openFileExtern(cmd, _configFileName);
+	openFileExtern(cmd, CncFileNameService::getConfigFileName());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openExternalEditor(wxCommandEvent& event) {
@@ -4804,10 +4827,12 @@ void MainFrame::OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::maximizeAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	event.Skip(true);
+
 	
 	if ( event.pane->window == m_scrollOutbound || event.pane->window == m_scrollWinMain )
 		perspectiveTimer.Start(20);
+		
+	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::restoreAuiPane(wxAuiManagerEvent& event) {
@@ -5066,7 +5091,7 @@ void MainFrame::createStcFileControlPopupMenu() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateTemplateListBook() {
 ///////////////////////////////////////////////////////////////////
-	m_templateTreeBook->SetSelection(0);
+	m_templateListbook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
