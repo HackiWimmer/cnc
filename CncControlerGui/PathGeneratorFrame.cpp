@@ -6,12 +6,15 @@
 #include <wx/valnum.h>
 #include <wx/stdpaths.h>
 #include "CncCommon.h"
+#include "SvgUnitCalculator.h"
+#include "SvgPathGenerator.h"
 #include "PathGeneratorFrame.h"
 
 const char* PD_Preview_fileName			= "PathGeneratorPreview.svg";
 const unsigned int PG_Page_Polygon 		= 0;
 const unsigned int PG_Page_Knob 		= 1;
 const unsigned int PG_Page_Gear 		= 2;
+const unsigned int PG_Page_PocketWhole	= 3;
 
 ///////////////////////////////////////////////////////////////////
 PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent)
@@ -21,6 +24,7 @@ PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent)
 , errorText("")
 {
 ///////////////////////////////////////////////////////////////////
+	setupPathSelector();
 	initControls();
 }
 ///////////////////////////////////////////////////////////////////
@@ -50,8 +54,19 @@ void PathGeneratorFrame::copyPath(wxCommandEvent& event) {
 	m_generatedPath->SetSelection(0,0);
 }
 ///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::setupPathSelector() {
+///////////////////////////////////////////////////////////////////
+	m_pgPathSelector->Append("001 - Polygon");
+	m_pgPathSelector->Append("002 - Knob");
+	m_pgPathSelector->Append("003 - Gear");
+	m_pgPathSelector->Append("004 - Poket Whole");
+	//...
+}
+///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::initControls() {
 ///////////////////////////////////////////////////////////////////
+	
+	
 	wxFloatingPointValidator<float> val1(3, NULL,wxNUM_VAL_DEFAULT );
 	val1.SetRange(1, 500);
 	m_polygonRadius->SetValidator(val1);
@@ -67,7 +82,109 @@ void PathGeneratorFrame::initControls() {
 	wxIntegerValidator<unsigned long> val4;
 	val4.SetRange(2, 100);
 	m_polygonSections->SetValidator(val4);
+	
+	//todo
+	
+	//m_pgParameterMgr->Append()
+	
+	m_pgProp01->SetLabel("adadsdad");
+	m_pgProp01->SetValidator(val3);
+	wxVariant null("");
+	m_pgProp01->SetLabel("");
+	m_pgProp01->SetValue("");
+	
+	//m_pgProp01->S StringToValue(null);
+	m_pgProp01->Enable(false);
+	m_pgProp02->SetHelpString("adaddweewewqweqwqewqewqewwqeewqew\nqeqeqweqweqwe");
 
+}
+///////////////////////////////////////////////////////////////////
+int PathGeneratorFrame::getPathSelection() {
+///////////////////////////////////////////////////////////////////
+	wxString item = m_pgPathSelector->GetStringSelection();
+	wxString idStr = item.SubString(0,3);
+	long id;
+	idStr.ToLong(&id);
+	
+	if ( id >= 0 && id <= 999 )
+		return id;
+	
+	return -1;
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::selectPathSelector(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	errorText.clear();
+	
+	switch ( getPathSelection() ) {
+		
+		case 1:		setupPolygon();
+					updatePreview();
+					break;
+		// todo
+					
+		default:	errorText = "No path generator defined for this selection. Nothing will be generated";
+					setPath("");
+					updatePreview();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::clearParameter(wxPGProperty* p) {
+///////////////////////////////////////////////////////////////////
+	if ( p == NULL )
+		return;
+		
+	p->SetLabel("");
+	p->Enable(false);
+	p->SetHelpString("");
+	p->Hide(true);
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::clearParameters() {
+///////////////////////////////////////////////////////////////////
+	clearParameter(m_pgProp01);
+	clearParameter(m_pgProp02);
+	clearParameter(m_pgProp03);
+	clearParameter(m_pgProp04);
+	clearParameter(m_pgProp05);
+	clearParameter(m_pgProp06);
+	clearParameter(m_pgProp07);
+	clearParameter(m_pgProp08);
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::setupPolygon() {
+///////////////////////////////////////////////////////////////////
+	clearParameters();
+	
+	wxFloatingPointValidator<float> val1(3, NULL,wxNUM_VAL_DEFAULT );
+	val1.SetRange(1, 400);
+	
+	wxIntegerValidator<unsigned long> val2;
+	val2.SetRange(2, 100);
+
+	m_pgProp01->Hide(false);
+	m_pgProp01->SetLabel("Radius [mm]");
+	m_pgProp01->SetValidator(val1);
+	m_pgProp01->Enable(true);
+	m_pgProp01->SetHelpString("Radius . . . .");
+	m_pgProp01->SetValue(10.000);
+	
+	m_pgProp02->Hide(false);
+	m_pgProp02->SetLabel("Count [number]");
+	m_pgProp02->SetValidator(val2);
+	m_pgProp02->Enable(true);
+	m_pgProp02->SetHelpString("Corner count . . . .");
+	m_pgProp02->SetValue(4);
+}
+
+
+
+
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::clearView(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_generatedPath->Clear();
+	updatePreview();
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::generatePath(wxCommandEvent& event) {
@@ -82,11 +199,23 @@ void PathGeneratorFrame::generatePath(wxCommandEvent& event) {
 				generateKnob();
 				updatePreview();
 				break;
+		case PG_Page_PocketWhole:
+				generatePocketWhole();
+				updatePreview();
+				break;
 		default:
 				errorText = "No path generator defined for this selection. Nothing will be generated";
 				setPath("");
 				updatePreview();
 	}
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::setPath(wxString path) {
+///////////////////////////////////////////////////////////////////
+	wxString value("<path d=\"");
+	value += path;
+	value += "\"  stroke=\"black\" fill=\"none\" stroke-width=\"1.0\"/>";
+	m_generatedPath->SetValue(value);
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::updatePreview() {
@@ -246,10 +375,27 @@ void PathGeneratorFrame::generateKnob() {
 	setPath(p);
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::setPath(wxString path) {
+void PathGeneratorFrame::generatePocketWhole() {
 ///////////////////////////////////////////////////////////////////
-	wxString value("<path d=\"");
-	value += path;
-	value += "\"  stroke=\"black\" fill=\"none\" stroke-width=\"1.0\"/>";
-	m_generatedPath->SetValue(value);
+
+	SvgPathGroup spg(mm);
+	//SvgPathString sps;
+	//SvgPathFragment spf;
+	
+	//spg.pGen().add(spg.fGen().ellipticalArg(25.0));
+	
+	spg.pGen().addPocketWhole(4.0, 40.0, 40.0);
+	
+	spg.add(spg.pGen().get());
+	spg.translate(100.0);
+	//spg.scale(1.5);
+	
+	
+	if ( spg.hasError() ) {
+		errorText = spg.getErrorInfo();
+	} else {
+		m_generatedPath->SetValue(spg.get());
+	}
+
 }
+

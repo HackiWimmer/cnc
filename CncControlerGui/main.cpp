@@ -173,27 +173,30 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////////////
 		void displaySplashImage(MainFrame* mainFrame) {
 		///////////////////////////////////////////////////////////////////
-			return;
+//			return;
 			#ifdef APP_USE_SPLASH
 				wxBitmap bmp;
+				wxBitmap b;
 				if ( getSplashImage(bmp) ) {
 					
 					{
 						wxMemoryDC mdc(bmp);
-						mdc.SetFont(wxFontInfo(18).FaceName("Helvetica").Italic().Bold());
-						mdc.SetTextForeground(wxColor(0,174,239));
-						mdc.DrawText(_programVersion, {350,100});
+						mdc.SetFont(wxFontInfo(18).FaceName("Helvetica").Bold());
+						mdc.SetTextForeground(wxColor(255,255,255));
+						mdc.DrawText(_programVersion, {50,235});
 						
+						/*
 						mdc.SetFont(wxFontInfo(9).FaceName("Helvetica").Italic().Bold());
 						mdc.SetTextForeground(wxColor(0,174,239));
 						mdc.DrawText(_copyRight, {12,338});
+						*/
 						
 						bmp = mdc.GetAsBitmap();
 					}
 					
 					new wxSplashScreen( bmp,
 										wxSPLASH_CENTRE_ON_SCREEN|wxSPLASH_TIMEOUT,
-										2400, mainFrame, wxID_ANY, wxDefaultPosition, wxDefaultSize,
+										3400, mainFrame, wxID_ANY, wxDefaultPosition, wxDefaultSize,
 										wxSIMPLE_BORDER|wxSTAY_ON_TOP);
 				}
 			#endif

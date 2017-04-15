@@ -50,7 +50,15 @@ bool SerialEmulatorNULL::processGetter(unsigned char pid, std::vector<int32_t>& 
 		case PID_XYZ_POS:		return evaluatePositions(ret);
 		case PID_LIMIT:			return evaluateLimitStates(ret);
 		case PID_ERROR_COUNT:	ret.push_back(0); return true;
-		default:				std::cerr << "SerialEmulatorNULL::processGetter: Invalid getter pid: " << pid << std::endl;
+		default:				
+								SetterMap::iterator it;
+								it = setterMap.find((int)pid);
+								
+								if ( it != setterMap.end() ) {
+									ret.push_back((*it).second);
+								} else {
+									std::cerr << "SerialEmulatorNULL::processGetter: Invalid getter pid: " << pid << std::endl;
+								}
 	}
 	return false;
 }
@@ -80,6 +88,20 @@ void SerialEmulatorNULL::getCurrentMoveCmdValues(int32_t &x, int32_t &y, int32_t
 	z = cncControl->getCurPos().getZ() + lastCommand.Mc.lastMoveZ;
 }
 ///////////////////////////////////////////////////////////////////
+const char* SerialEmulatorNULL::getConfiguration(wxString& ret) {
+///////////////////////////////////////////////////////////////////
+	ret.clear();
+	ret << wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection");
+	
+	SetterMap::iterator it;
+	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
+		if ( it->first >= PID_PITCH && it->first <= PID_PITCH_Z)	ret << wxString::Format(" %d:%.2lf\n", it->first, (double)(it->second/1000));
+		else														ret << wxString::Format(" %d:%d\n",    it->first, it->second);
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	int ret = 0;
@@ -92,6 +114,7 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 	}
 
 	wxString firmWare(wxString::Format("%s", FIRMWARE_VERSION));
+	wxString retStr;
 	switch( lastCommand.cmd ) { 
 		case 'm':
 		case 'M':	ret = readMove(buffer, nbByte);
@@ -103,7 +126,7 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 		case '?': 	ret = readDefault(buffer, nbByte, "1:0:Not available, because there's no controller connection\n");
 					break;
 					
-		case 'c': 	ret = readDefault(buffer, nbByte, "0: Not available, because there's no controller connection\n");
+		case 'c': 	ret = readDefault(buffer, nbByte, getConfiguration(retStr));
 					break;
 					
 		case 'Q': 	ret = readDefault(buffer, nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel for more details
@@ -239,6 +262,7 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 		ci.setterValue = val;
 		cncControl->SerialControllerCallback(ci);
 		
+		setterMap[(int)id] = val;
 		return true;
 	}
 
@@ -322,7 +346,9 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 		}
 	}
 	
-	bool ret = writeMoveCmd(x, y, z, b, nbByte);
+	// todo
+	bool ret = renderMove(x, y, z, b, nbByte);
+	//bool ret = writeMoveCmd(x, y, z, b, nbByte);
 	
 	// check for end state switches
 	CncLimitStates ls;
@@ -336,8 +362,125 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::renderMove(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	if ( lastCommand.cmd != 'M' ) {
+		return writeMoveCmd(x, y, z, buffer, nbByte);
+	}
+	
+	// render here
+	int i, dx, dy, dz, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
+	int pointA[3], pointB[3];
+
+	pointA[0] = 0;
+	pointA[1] = 0;
+	pointA[2] = 0;
+	
+	pointB[0] = 0;
+	pointB[1] = 0;
+	pointB[2] = 0;
+	
+	dx = x;
+	dy = y;
+	dz = z;
+	
+	x_inc = (dx < 0) ? -1 : 1;
+	l = abs(dx);
+	
+	y_inc = (dy < 0) ? -1 : 1;
+	m = abs(dy);
+	
+	z_inc = (dz < 0) ? -1 : 1;
+	n = abs(dz);
+	
+	dx2 = l << 1;
+	dy2 = m << 1;
+	dz2 = n << 1;
+
+	if ((l >= m) && (l >= n)) {
+		err_1 = dy2 - l;
+		err_2 = dz2 - l;
+		for (i = 0; i < l; i++) {
+			
+			//output
+			if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+				return false;
+		
+			for (int j=0; j<3; j++ )
+				pointB[j] = pointA[j];
+			
+			if (err_1 > 0) {
+				pointA[1] += y_inc;
+				err_1 -= dx2;
+			}
+			if (err_2 > 0) {
+				pointA[2] += z_inc;
+				err_2 -= dx2;
+			}
+			err_1 += dy2;
+			err_2 += dz2;
+			pointA[0] += x_inc;
+		}
+	} else if ((m >= l) && (m >= n)) {
+		err_1 = dx2 - m;
+		err_2 = dz2 - m;
+		for (i = 0; i < m; i++) {
+			
+			//output
+			if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+				return false;
+		
+			for (int j=0; j<3; j++ )
+				pointB[j] = pointA[j];
+				
+			if (err_1 > 0) {
+				pointA[0] += x_inc;
+				err_1 -= dy2;
+			}
+			if (err_2 > 0) {
+				pointA[2] += z_inc;
+				err_2 -= dy2;
+			}
+			err_1 += dx2;
+			err_2 += dz2;
+			pointA[1] += y_inc;
+		}
+	} else {
+		err_1 = dy2 - n;
+		err_2 = dx2 - n;
+		for (i = 0; i < n; i++) {
+			
+			//output
+			if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+				return false;
+		
+			for (int j=0; j<3; j++ )
+				pointB[j] = pointA[j];
+				
+			if (err_1 > 0) {
+				pointA[1] += y_inc;
+				err_1 -= dz2;
+			}
+			if (err_2 > 0) {
+				pointA[0] += x_inc;
+				err_2 -= dz2;
+			}
+			err_1 += dy2;
+			err_2 += dx2;
+			pointA[2] += z_inc;
+		}
+	}
+	
+	//output
+	if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+		return false;
+		
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	// inheried classes do the work here
 	return true;
 }
 

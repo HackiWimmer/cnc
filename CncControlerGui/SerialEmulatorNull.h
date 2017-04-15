@@ -34,15 +34,22 @@ struct LastCommand {
 	
 };
 
+typedef std::map<int, int32_t> SetterMap;
+
 class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
-		bool writeMoveCmd(void *buffer, unsigned int nbByte);;
+		bool writeMoveCmd(void *buffer, unsigned int nbByte);
+		
+		SetterMap setterMap;
 	
 	protected:
 		LastCommand lastCommand;
 		
+		const char* getConfiguration(wxString& ret);
+		
 		virtual bool writeSetter(void *buffer, unsigned int nbByte);
+		bool renderMove(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte);
 		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte);
 		
 		virtual int readDefault(void *buffer, unsigned int nbByte, const char* response);
@@ -58,7 +65,9 @@ class SerialEmulatorNULL : public SerialSpyPort
 		//Initialize Serial communication without an acitiv connection 
 		SerialEmulatorNULL(CncControl* cnc)
 		: SerialSpyPort(cnc)
-		{}
+		{
+			setterMap.clear();
+		}
 		//Initialize Serial communication with the given COM port
 		SerialEmulatorNULL(const char *portName)
 		: SerialSpyPort(portName) 

@@ -8730,177 +8730,339 @@ Axis</label>
     <title>Path Generator</title>
     <centered>1</centered>
     <style>wxDEFAULT_FRAME_STYLE</style>
-    <size>500,300</size>
+    <size>-1,700</size>
+    <bg>wxSYS_COLOUR_3DLIGHT</bg>
     <object class="wxFlexGridSizer">
-      <minsize>500,300</minsize>
-      <cols>1</cols>
-      <rows>3</rows>
+      <minsize>-1,700</minsize>
+      <cols>2</cols>
+      <rows>1</rows>
       <vgap>0</vgap>
       <hgap>0</hgap>
       <growablecols>0</growablecols>
-      <growablerows>2</growablerows>
+      <growablerows>0</growablerows>
       <object class="sizeritem" name="flexGridSizer973">
         <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
         <option>1</option>
         <object class="wxFlexGridSizer">
-          <cols>2</cols>
-          <rows>1</rows>
+          <cols>1</cols>
+          <rows>3</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols>0</growablecols>
-          <growablerows>0</growablerows>
+          <growablerows>2</growablerows>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
-            <border>1</border>
-            <minsize>-1,100</minsize>
-            <object class="wxNotebook" name="m_pgNotebook">
-              <size>-1,100</size>
-              <style>wxBK_DEFAULT</style>
-              <object class="notebookpage">
-                <label>Polygon</label>
-                <selected>0</selected>
-                <object class="wxPanel" name="m_panelPolygon">
-                  <style>wxTAB_TRAVERSAL</style>
-                  <object class="wxFlexGridSizer">
-                    <cols>10</cols>
-                    <rows>2</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols/>
-                    <growablerows/>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText1002">
-                        <label>Radius [mm]:</label>
-                        <style/>
+            <border>5</border>
+            <object class="wxComboBox" name="m_pgPathSelector">
+              <style>wxCB_SORT|wxCB_READONLY</style>
+              <tooltip>
+                <![CDATA[Path Selector]]>
+              </tooltip>
+              <selection>-1</selection>
+              <content/>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxSplitterWindow" name="m_splitter2960">
+              <style>wxSP_3D</style>
+              <gravity>0.7</gravity>
+              <minsize>10</minsize>
+              <sashpos>0</sashpos>
+              <orientation>vertical</orientation>
+              <object class="wxPanel" name="m_splitterPage2964">
+                <style>wxTAB_TRAVERSAL</style>
+                <object class="wxFlexGridSizer">
+                  <cols>1</cols>
+                  <rows>1</rows>
+                  <vgap>0</vgap>
+                  <hgap>0</hgap>
+                  <growablecols>0</growablecols>
+                  <growablerows>0</growablerows>
+                  <object class="sizeritem">
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>1</border>
+                    <object class="wxNotebook" name="m_pgNotebook">
+                      <style>wxBK_DEFAULT</style>
+                      <object class="notebookpage">
+                        <label>Polygon</label>
+                        <selected>0</selected>
+                        <object class="wxPanel" name="m_panelPolygon">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxFlexGridSizer">
+                            <cols>10</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols/>
+                            <growablerows/>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxStaticText" name="m_staticText1002">
+                                <label>Radius [mm]:</label>
+                                <style/>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxTextCtrl" name="m_polygonRadius">
+                                <style>wxTE_RIGHT</style>
+                                <size>60,-1</size>
+                                <value>80</value>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxStaticText" name="m_staticText1004">
+                                <label>Section count [mm]:</label>
+                                <style/>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxTextCtrl" name="m_polygonSections">
+                                <style>wxTE_RIGHT</style>
+                                <size>40,-1</size>
+                                <value>4</value>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
                       </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxTextCtrl" name="m_polygonRadius">
-                        <style>wxTE_RIGHT</style>
-                        <size>60,-1</size>
-                        <value>80</value>
+                      <object class="notebookpage">
+                        <label>Knob</label>
+                        <selected>0</selected>
+                        <object class="wxPanel" name="m_panelKnob">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxFlexGridSizer">
+                            <cols>10</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols/>
+                            <growablerows/>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxStaticText" name="m_staticText10022">
+                                <label>Radius [mm]:</label>
+                                <style/>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxTextCtrl" name="m_knobRadius">
+                                <style>wxTE_RIGHT</style>
+                                <size>60,-1</size>
+                                <value>80</value>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxStaticText" name="m_staticText10044">
+                                <label>Section count [mm]:</label>
+                                <style/>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxTextCtrl" name="m_knobSections">
+                                <style>wxTE_RIGHT</style>
+                                <size>40,-1</size>
+                                <value>4</value>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
                       </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText1004">
-                        <label>Section count [mm]:</label>
-                        <style/>
+                      <object class="notebookpage">
+                        <label>Gear</label>
+                        <selected>0</selected>
+                        <object class="wxPanel" name="m_panelGear">
+                          <style>wxTAB_TRAVERSAL</style>
+                        </object>
                       </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxTextCtrl" name="m_polygonSections">
-                        <style>wxTE_RIGHT</style>
-                        <size>40,-1</size>
-                        <value>4</value>
+                      <object class="notebookpage">
+                        <label>Pocket Whole</label>
+                        <selected>0</selected>
+                        <object class="wxPanel" name="m_panel2930">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>1</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>0</growablerows>
+                          </object>
+                        </object>
                       </object>
                     </object>
                   </object>
-                </object>
-              </object>
-              <object class="notebookpage">
-                <label>Knob</label>
-                <selected>0</selected>
-                <object class="wxPanel" name="m_panelKnob">
-                  <style>wxTAB_TRAVERSAL</style>
-                  <object class="wxFlexGridSizer">
-                    <cols>10</cols>
-                    <rows>2</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols/>
-                    <growablerows/>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText10022">
-                        <label>Radius [mm]:</label>
-                        <style/>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxTextCtrl" name="m_knobRadius">
-                        <style>wxTE_RIGHT</style>
-                        <size>60,-1</size>
-                        <value>80</value>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText10044">
-                        <label>Section count [mm]:</label>
-                        <style/>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <border>5</border>
-                      <object class="wxTextCtrl" name="m_knobSections">
-                        <style>wxTE_RIGHT</style>
-                        <size>40,-1</size>
-                        <value>4</value>
-                      </object>
-                    </object>
-                  </object>
-                </object>
-              </object>
-              <object class="notebookpage">
-                <label>Gear</label>
-                <selected>0</selected>
-                <object class="wxPanel" name="m_panelGear">
-                  <style>wxTAB_TRAVERSAL</style>
                 </object>
               </object>
             </object>
           </object>
-          <object class="sizeritem" name="flexGridSizer986">
+          <object class="sizeritem" name="flexGridSizer2825">
             <flag>wxALL|wxEXPAND</flag>
             <border>1</border>
             <option>1</option>
             <object class="wxFlexGridSizer">
               <cols>1</cols>
-              <rows>3</rows>
+              <rows>1</rows>
               <vgap>0</vgap>
               <hgap>0</hgap>
-              <growablecols/>
-              <growablerows/>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
               <object class="sizeritem">
-                <flag>wxALL</flag>
+                <flag>wxALL|wxEXPAND</flag>
+                <object class="wxSplitterWindow" name="m_splitter2932">
+                  <style>wxSP_3D</style>
+                  <gravity>0.8</gravity>
+                  <minsize>10</minsize>
+                  <sashpos>0</sashpos>
+                  <orientation>horizontal</orientation>
+                  <object class="wxPanel" name="m_splitterPage2936">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <object class="wxFlexGridSizer">
+                      <cols>1</cols>
+                      <rows>1</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>0</growablecols>
+                      <growablerows>0</growablerows>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <option>1</option>
+                        <object class="unknown" name="m_pgPreview"/>
+                      </object>
+                    </object>
+                  </object>
+                  <object class="wxPanel" name="m_splitterPage2940">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <object class="wxFlexGridSizer">
+                      <cols>1</cols>
+                      <rows>1</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>0</growablecols>
+                      <growablerows>0</growablerows>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <object class="wxTextCtrl" name="m_generatedPath">
+                          <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                          <fg>wxSYS_COLOUR_INFOBK</fg>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer986">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>1</border>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>2</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem" name="flexGridSizer2972">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>1</border>
+            <option>1</option>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>1</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>1</border>
+                <minsize>220,-1</minsize>
+                <object class="unknown" name="m_pgParameterMgr">
+                  <size>220,-1</size>
+                  <font>
+                    <size>8</size>
+                    <style>normal</style>
+                    <weight>normal</weight>
+                    <family>swiss</family>
+                    <underlined>0</underlined>
+                    <face>Segoe UI</face>
+                  </font>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem" name="flexGridSizer2874">
+            <flag>wxALL|wxEXPAND|wxALIGN_BOTTOM</flag>
+            <border>1</border>
+            <object class="wxFlexGridSizer">
+              <cols>2</cols>
+              <rows>2</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0,1</growablecols>
+              <growablerows>0,1</growablerows>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
                 <border>1</border>
                 <object class="wxButton" name="m_btPGGenerate">
                   <label>Generate</label>
                   <style/>
+                  <bitmap>bitmaps/16-cog.png</bitmap>
                   <bitmapposition>wxLEFT</bitmapposition>
                   <default>1</default>
                 </object>
               </object>
               <object class="sizeritem">
-                <flag>wxALL</flag>
+                <flag>wxALL|wxEXPAND</flag>
                 <border>1</border>
-                <object class="wxButton" name="m_btPGCopy">
-                  <label>Copy</label>
+                <object class="wxButton" name="m_btPGClear">
+                  <label>Clear</label>
                   <style/>
+                  <bitmap>bitmaps/16-clean.png</bitmap>
                   <bitmapposition>wxLEFT</bitmapposition>
                   <default>0</default>
                 </object>
               </object>
               <object class="sizeritem">
-                <flag>wxALL</flag>
+                <flag>wxALL|wxEXPAND</flag>
+                <border>1</border>
+                <object class="wxButton" name="m_btPGCopy">
+                  <label>Copy</label>
+                  <style/>
+                  <bitmap>bitmaps/16-copy.png</bitmap>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND|wxALIGN_BOTTOM</flag>
                 <border>1</border>
                 <object class="wxButton" name="m_btPGClose">
                   <label>Close</label>
                   <style/>
+                  <bitmap>bitmaps/16-file_close.png</bitmap>
                   <bitmapposition>wxLEFT</bitmapposition>
                   <default>0</default>
                 </object>
@@ -8908,19 +9070,6 @@ Axis</label>
             </object>
           </object>
         </object>
-      </object>
-      <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
-        <object class="wxTextCtrl" name="m_generatedPath">
-          <style>wxTE_READONLY</style>
-        </object>
-      </object>
-      <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
-        <option>1</option>
-        <object class="unknown" name="m_pgPreview"/>
       </object>
     </object>
   </object>

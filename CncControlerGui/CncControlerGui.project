@@ -65,6 +65,8 @@
       <File Name="SVGUserAgent.h"/>
       <File Name="SVGUserAgentInfo.h"/>
       <File Name="SvgViewBox.h"/>
+      <File Name="SvgPathGenerator.h"/>
+      <File Name="SvgPathGenerator.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <File Name="CncArduino.cpp"/>

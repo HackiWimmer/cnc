@@ -5625,25 +5625,46 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
         bBitmapLoaded = true;
     }
     
-    flexGridSizer980 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer980 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer980->SetFlexibleDirection( wxBOTH );
     flexGridSizer980->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer980->AddGrowableCol(0);
-    flexGridSizer980->AddGrowableRow(2);
+    flexGridSizer980->AddGrowableRow(0);
     this->SetSizer(flexGridSizer980);
     
-    flexGridSizer973 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer973 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer973->SetFlexibleDirection( wxBOTH );
     flexGridSizer973->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer973->AddGrowableCol(0);
-    flexGridSizer973->AddGrowableRow(0);
+    flexGridSizer973->AddGrowableRow(2);
     
-    flexGridSizer980->Add(flexGridSizer973, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer980->Add(flexGridSizer973, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_pgNotebook = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,100)), wxBK_DEFAULT);
+    wxArrayString m_pgPathSelectorArr;
+    m_pgPathSelector = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_pgPathSelectorArr, wxCB_SORT|wxCB_READONLY);
+    m_pgPathSelector->SetToolTip(_("Path Selector"));
+    
+    flexGridSizer973->Add(m_pgPathSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_splitter2960 = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxSP_3D);
+    m_splitter2960->SetSashGravity(0.7);
+    m_splitter2960->SetMinimumPaneSize(10);
+    
+    flexGridSizer973->Add(m_splitter2960, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_splitterPage2964 = new wxPanel(m_splitter2960, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter2960, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer2970 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2970->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2970->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2970->AddGrowableCol(0);
+    flexGridSizer2970->AddGrowableRow(0);
+    m_splitterPage2964->SetSizer(flexGridSizer2970);
+    
+    m_pgNotebook = new wxNotebook(m_splitterPage2964, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage2964, wxSize(-1,-1)), wxBK_DEFAULT);
     m_pgNotebook->SetName(wxT("m_pgNotebook"));
     
-    flexGridSizer973->Add(m_pgNotebook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer2970->Add(m_pgNotebook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_panelPolygon = new wxPanel(m_pgNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_pgNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_pgNotebook->AddPage(m_panelPolygon, _("Polygon"), false);
@@ -5707,40 +5728,226 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     m_panelGear = new wxPanel(m_pgNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_pgNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_pgNotebook->AddPage(m_panelGear, _("Gear"), false);
-    m_pgNotebook->SetMinSize(wxSize(-1,100));
     
-    flexGridSizer986 = new wxFlexGridSizer(3, 1, 0, 0);
+    m_panel2930 = new wxPanel(m_pgNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_pgNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_pgNotebook->AddPage(m_panel2930, _("Pocket Whole"), false);
+    
+    flexGridSizer2978 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2978->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2978->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2978->AddGrowableCol(0);
+    flexGridSizer2978->AddGrowableRow(0);
+    m_panel2930->SetSizer(flexGridSizer2978);
+    
+    flexGridSizer2825 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2825->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2825->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2825->AddGrowableCol(0);
+    flexGridSizer2825->AddGrowableRow(0);
+    
+    flexGridSizer973->Add(flexGridSizer2825, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_splitter2932 = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxSP_3D);
+    m_splitter2932->SetSashGravity(0.8);
+    m_splitter2932->SetMinimumPaneSize(10);
+    
+    flexGridSizer2825->Add(m_splitter2932, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPage2936 = new wxPanel(m_splitter2932, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter2932, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer2942 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2942->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2942->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2942->AddGrowableCol(0);
+    flexGridSizer2942->AddGrowableRow(0);
+    m_splitterPage2936->SetSizer(flexGridSizer2942);
+    
+    #if wxUSE_WEBVIEW
+    m_pgPreview = wxWebView::New(m_splitterPage2936, wxID_ANY, _("about:blank"), wxDefaultPosition, wxDLG_UNIT(m_splitterPage2936, wxSize(-1,-1)), wxWebViewBackendDefault, 0);
+    
+    flexGridSizer2942->Add(m_pgPreview, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    #endif // wxUSE_WEBVIEW
+    
+    m_splitterPage2940 = new wxPanel(m_splitter2932, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter2932, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter2932->SplitHorizontally(m_splitterPage2936, m_splitterPage2940, 0);
+    
+    flexGridSizer2944 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2944->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2944->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2944->AddGrowableCol(0);
+    flexGridSizer2944->AddGrowableRow(0);
+    m_splitterPage2940->SetSizer(flexGridSizer2944);
+    
+    m_generatedPath = new wxTextCtrl(m_splitterPage2940, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage2940, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
+    m_generatedPath->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_generatedPath->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+    
+    flexGridSizer2944->Add(m_generatedPath, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    flexGridSizer986 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer986->SetFlexibleDirection( wxBOTH );
     flexGridSizer986->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer986->AddGrowableCol(0);
+    flexGridSizer986->AddGrowableRow(0);
     
-    flexGridSizer973->Add(flexGridSizer986, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer980->Add(flexGridSizer986, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    flexGridSizer2972 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2972->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2972->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2972->AddGrowableCol(0);
+    flexGridSizer2972->AddGrowableRow(0);
+    
+    flexGridSizer986->Add(flexGridSizer2972, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxArrayString m_pgParameterMgrArr;
+    wxUnusedVar(m_pgParameterMgrArr);
+    wxArrayInt m_pgParameterMgrIntArr;
+    wxUnusedVar(m_pgParameterMgrIntArr);
+    m_pgParameterMgr = new wxPropertyGridManager(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(220,-1)), wxPG_DESCRIPTION|wxPG_LIMITED_EDITING|wxPG_HIDE_MARGIN|wxPG_TOOLTIPS|wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED);
+    wxFont m_pgParameterMgrFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_pgParameterMgr->SetFont(m_pgParameterMgrFont);
+    
+    flexGridSizer2972->Add(m_pgParameterMgr, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_pgCatCommon = m_pgParameterMgr->Append(  new wxPropertyCategory( _("Common Parameters:") ) );
+    m_pgCatCommon->SetHelpString(wxT(""));
+    
+    m_pgPropToolDiameter = m_pgParameterMgr->Append(  new wxFloatProperty( _("Tool Diameter [mm]"), wxPG_LABEL, 3.125) );
+    m_pgPropToolDiameter->SetHelpString(wxT(""));
+    
+    m_pgParameterMgrArr.Clear();
+    m_pgParameterMgrIntArr.Clear();
+    m_pgParameterMgrArr.Add(_("none"));
+    m_pgParameterMgrArr.Add(_("inner"));
+    m_pgParameterMgrArr.Add(_("outer"));
+    m_pgProp3047 = m_pgParameterMgr->Append(  new wxEnumProperty( _("Tool Correction"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
+    m_pgProp3047->SetHelpString(wxT(""));
+    m_pgProp3047->SetEditor( wxT("ComboBox") );
+    
+    m_pgCatPath = m_pgParameterMgr->Append(  new wxPropertyCategory( _("Path Parameters:") ) );
+    m_pgCatPath->SetHelpString(wxT(""));
+    
+    m_pgProp01 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 01"), wxPG_LABEL, 0) );
+    m_pgProp01->SetHelpString(wxT(""));
+    m_pgProp01->SetEditor( wxT("TextCtrl") );
+    
+    m_pgProp02 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 02"), wxPG_LABEL, 0) );
+    m_pgProp02->SetHelpString(wxT(""));
+    m_pgProp02->SetEditor( wxT("TextCtrl") );
+    
+    m_pgProp03 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 03"), wxPG_LABEL, 0) );
+    m_pgProp03->SetHelpString(wxT(""));
+    m_pgProp03->SetEditor( wxT("TextCtrl") );
+    
+    m_pgProp04 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 04"), wxPG_LABEL, 0) );
+    m_pgProp04->SetHelpString(wxT(""));
+    m_pgProp04->SetEditor( wxT("TextCtrl") );
+    
+    m_pgProp05 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 05"), wxPG_LABEL, 0) );
+    m_pgProp05->SetHelpString(wxT(""));
+    m_pgProp05->SetEditor( wxT("TextCtrl") );
+    
+    m_pgProp06 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 06"), wxPG_LABEL, 0) );
+    m_pgProp06->SetHelpString(wxT(""));
+    m_pgProp06->SetEditor( wxT("TextCtrl") );
+    
+    m_pgProp07 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 07"), wxPG_LABEL, 0) );
+    m_pgProp07->SetHelpString(wxT(""));
+    m_pgProp07->SetEditor( wxT("TextCtrl") );
+    
+    m_pgProp08 = m_pgParameterMgr->Append(  new wxFloatProperty( _("PARA 08"), wxPG_LABEL, 0) );
+    m_pgProp08->SetHelpString(wxT(""));
+    m_pgProp08->SetEditor( wxT("TextCtrl") );
+    
+    m_pgCatTransform = m_pgParameterMgr->Append(  new wxPropertyCategory( _("Transform") ) );
+    m_pgCatTransform->SetHelpString(wxT(""));
+    
+    m_pgCatTranslate = m_pgParameterMgr->AppendIn( m_pgCatTransform,  new wxPropertyCategory( _("Translate") ) );
+    m_pgCatTranslate->SetHelpString(wxT(""));
+    
+    m_pgPropTranslateX = m_pgParameterMgr->AppendIn( m_pgCatTranslate,  new wxFloatProperty( _("X [mm]"), wxPG_LABEL, 0) );
+    m_pgPropTranslateX->SetHelpString(wxT(""));
+    m_pgPropTranslateX->SetEditor( wxT("TextCtrl") );
+    
+    m_pgPropTranslateY = m_pgParameterMgr->AppendIn( m_pgCatTranslate,  new wxFloatProperty( _("Y [mm]"), wxPG_LABEL, 0) );
+    m_pgPropTranslateY->SetHelpString(wxT(""));
+    m_pgPropTranslateY->SetEditor( wxT("TextCtrl") );
+    
+    m_pgCatScale = m_pgParameterMgr->AppendIn( m_pgCatTransform,  new wxPropertyCategory( _("Scale") ) );
+    m_pgCatScale->SetHelpString(wxT(""));
+    
+    m_pgPropScaleX = m_pgParameterMgr->AppendIn( m_pgCatScale,  new wxFloatProperty( _("X [factor]"), wxPG_LABEL, 1) );
+    m_pgPropScaleX->SetHelpString(wxT(""));
+    m_pgPropScaleX->SetEditor( wxT("TextCtrl") );
+    
+    m_pgPropScaleY = m_pgParameterMgr->AppendIn( m_pgCatScale,  new wxFloatProperty( _("Y [factor]"), wxPG_LABEL, 1) );
+    m_pgPropScaleY->SetHelpString(wxT(""));
+    m_pgPropScaleY->SetEditor( wxT("TextCtrl") );
+    
+    m_pgCatRotate = m_pgParameterMgr->AppendIn( m_pgCatTransform,  new wxPropertyCategory( _("Rotate") ) );
+    m_pgCatRotate->SetHelpString(wxT(""));
+    
+    m_pgPropRotateAngle = m_pgParameterMgr->AppendIn( m_pgCatRotate,  new wxFloatProperty( _("Angle [grad]"), wxPG_LABEL, 0) );
+    m_pgPropRotateAngle->SetHelpString(wxT(""));
+    m_pgPropRotateAngle->SetEditor( wxT("TextCtrl") );
+    
+    m_pgCatSkrew = m_pgParameterMgr->AppendIn( m_pgCatTransform,  new wxPropertyCategory( _("Skrew") ) );
+    m_pgCatSkrew->SetHelpString(wxT(""));
+    
+    m_pgPropSkrewX = m_pgParameterMgr->AppendIn( m_pgCatSkrew,  new wxFloatProperty( _("X [???]"), wxPG_LABEL, 1) );
+    m_pgPropSkrewX->SetHelpString(wxT(""));
+    m_pgPropSkrewX->SetEditor( wxT("TextCtrl") );
+    
+    m_pgPropSkrewY = m_pgParameterMgr->AppendIn( m_pgCatSkrew,  new wxFloatProperty( _("Y [???]"), wxPG_LABEL, 1) );
+    m_pgPropSkrewY->SetHelpString(wxT(""));
+    m_pgPropSkrewY->SetEditor( wxT("TextCtrl") );
+    m_pgParameterMgr->SetMinSize(wxSize(220,-1));
+    
+    flexGridSizer2874 = new wxFlexGridSizer(2, 2, 0, 0);
+    flexGridSizer2874->SetFlexibleDirection( wxBOTH );
+    flexGridSizer2874->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer2874->AddGrowableCol(0);
+    flexGridSizer2874->AddGrowableCol(1);
+    flexGridSizer2874->AddGrowableRow(0);
+    flexGridSizer2874->AddGrowableRow(1);
+    
+    flexGridSizer986->Add(flexGridSizer2874, 0, wxALL|wxEXPAND|wxALIGN_BOTTOM, WXC_FROM_DIP(1));
     
     m_btPGGenerate = new wxButton(this, wxID_ANY, _("Generate"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     m_btPGGenerate->SetDefault();
-    
-    flexGridSizer986->Add(m_btPGGenerate, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_btPGCopy = new wxButton(this, wxID_ANY, _("Copy"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    flexGridSizer986->Add(m_btPGCopy, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_btPGClose = new wxButton(this, wxID_ANY, _("Close"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    flexGridSizer986->Add(m_btPGClose, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_generatedPath = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_READONLY);
-    #if wxVERSION_NUMBER >= 3000
-    m_generatedPath->SetHint(wxT(""));
+    #if wxVERSION_NUMBER >= 2904
+    m_btPGGenerate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-cog")), wxLEFT);
+    m_btPGGenerate->SetBitmapMargins(2,2);
     #endif
     
-    flexGridSizer980->Add(m_generatedPath, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer2874->Add(m_btPGGenerate, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    #if wxUSE_WEBVIEW
-    m_pgPreview = wxWebView::New(this, wxID_ANY, _("about:blank"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxWebViewBackendDefault, 0);
+    m_btPGClear = new wxButton(this, wxID_ANY, _("Clear"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btPGClear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_btPGClear->SetBitmapMargins(2,2);
+    #endif
     
-    flexGridSizer980->Add(m_pgPreview, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    #endif // wxUSE_WEBVIEW
+    flexGridSizer2874->Add(m_btPGClear, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
+    m_btPGCopy = new wxButton(this, wxID_ANY, _("Copy"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btPGCopy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxLEFT);
+    m_btPGCopy->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer2874->Add(m_btPGCopy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btPGClose = new wxButton(this, wxID_ANY, _("Close"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btPGClose->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_close")), wxLEFT);
+    m_btPGClose->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer2874->Add(m_btPGClose, 0, wxALL|wxEXPAND|wxALIGN_BOTTOM, WXC_FROM_DIP(1));
+    
+    SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     
     #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(m_pgNotebook)){
@@ -5751,8 +5958,8 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     #endif
     
     SetName(wxT("PathGeneratorFrameBase"));
-    SetMinClientSize(wxSize(500,300));
-    SetSize(500,300);
+    SetMinClientSize(wxSize(-1,700));
+    SetSize(-1,700);
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -5770,24 +5977,28 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
 #endif
     // Connect events
     this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(PathGeneratorFrameBase::onCloseWindow), NULL, this);
-    m_btPGGenerate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::generatePath), NULL, this);
-    m_btPGCopy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::copyPath), NULL, this);
-    m_btPGClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::onCloseWindowFromButton), NULL, this);
+    m_pgPathSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(PathGeneratorFrameBase::selectPathSelector), NULL, this);
     #if wxUSE_WEBVIEW
     
     #endif // wxUSE_WEBVIEW
+    m_btPGGenerate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::generatePath), NULL, this);
+    m_btPGClear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::clearView), NULL, this);
+    m_btPGCopy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::copyPath), NULL, this);
+    m_btPGClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::onCloseWindowFromButton), NULL, this);
     
 }
 
 PathGeneratorFrameBase::~PathGeneratorFrameBase()
 {
     this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(PathGeneratorFrameBase::onCloseWindow), NULL, this);
-    m_btPGGenerate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::generatePath), NULL, this);
-    m_btPGCopy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::copyPath), NULL, this);
-    m_btPGClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::onCloseWindowFromButton), NULL, this);
+    m_pgPathSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(PathGeneratorFrameBase::selectPathSelector), NULL, this);
     #if wxUSE_WEBVIEW
     
     #endif // wxUSE_WEBVIEW
+    m_btPGGenerate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::generatePath), NULL, this);
+    m_btPGClear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::clearView), NULL, this);
+    m_btPGCopy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::copyPath), NULL, this);
+    m_btPGClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::onCloseWindowFromButton), NULL, this);
     
 }
 

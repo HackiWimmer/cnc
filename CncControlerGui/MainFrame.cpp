@@ -446,6 +446,10 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	
 	// don't works well
 	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
+	
+	//todo
+	wxCommandEvent dummy;
+	openSVGPathGenerator(dummy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::serialTimer(wxTimerEvent& event) {

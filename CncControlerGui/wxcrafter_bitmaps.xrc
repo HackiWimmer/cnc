@@ -43,6 +43,8 @@
   <object class="wxBitmap" name="16-executable@2x">bitmaps\16-executable@2x.png</object>
   <object class="wxBitmap" name="16-execute_stop">bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="16-execute_stop@2x">bitmaps\16-execute_stop@2x.png</object>
+  <object class="wxBitmap" name="16-file_close">bitmaps\16-file_close.png</object>
+  <object class="wxBitmap" name="16-file_close@2x">bitmaps\16-file_close@2x.png</object>
   <object class="wxBitmap" name="16-file_reload">bitmaps\16-file_reload.png</object>
   <object class="wxBitmap" name="16-file_reload@2x">bitmaps\16-file_reload@2x.png</object>
   <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>

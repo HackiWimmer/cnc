@@ -949,11 +949,11 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			if ( cncConfig->isOnlineUpdateCoordinates() ) {
 				curCtlPos = ci.controllerPos;
 				//todo update interval
-				if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
+				//if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
 					setValue(guiCtlSetup->xAxisCtl, convertToDisplayUnit(ci.controllerPos.getX(), cncConfig->getDisplayFactX()));
 					setValue(guiCtlSetup->yAxisCtl, convertToDisplayUnit(ci.controllerPos.getY(), cncConfig->getDisplayFactY()));
 					setValue(guiCtlSetup->zAxisCtl, convertToDisplayUnit(ci.controllerPos.getZ(), cncConfig->getDisplayFactZ()));
-				}
+				//}
 			}
 			// Online drawing coordinates
 			if ( cncConfig->isOnlineUpdateDrawPane() ) {
@@ -1465,6 +1465,7 @@ bool CncControl::moveLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered)
 	if ( renderMode == CncRenderAtController )
 		return serialPort->processMoveXY(x1, y1, false, curPos);
 		
+/*
 	if ( alreadyRendered == true )
 		return serialPort->processMoveXY(x1, y1, alreadyRendered, curPos);
 
@@ -1472,7 +1473,7 @@ bool CncControl::moveLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered)
 	int32_t x0 = 0, y0 = 0;
 	int32_t dx =  abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
 	int32_t dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-	int32_t err = dx + dy, e2; /* error value e_xy */
+	int32_t err = dx + dy, e2; // error value e_xy 
 
 	int32_t xOld = x0, yOld = y0;
 	while( true ) {
@@ -1487,12 +1488,15 @@ bool CncControl::moveLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered)
 			
 		e2 = 2*err;
 		if (e2 > dy) 
-			{ err += dy; x0 += sx; } /* e_xy+e_x > 0 */
+			{ err += dy; x0 += sx; } // e_xy+e_x > 0 
 		if (e2 < dx) 
-			{ err += dx; y0 += sy; } /* e_xy+e_y < 0 */
+			{ err += dx; y0 += sy; } // e_xy+e_y < 0 
 	}
 
 	return true;
+	*/
+	
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
@@ -1511,6 +1515,7 @@ bool CncControl::moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alr
 		return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curPos);
 	}
 
+/*
 	if ( alreadyRendered == true )
 		return serialPort->processMoveXYZ(x1, y1, z1, false, curPos);
 		
@@ -1518,17 +1523,17 @@ bool CncControl::moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alr
 	int i, dx, dy, dz, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
 	int pointA[3], pointB[3];
 
-	pointA[0] = 0; //x1; 
-	pointA[1] = 0; //y1;
-	pointA[2] = 0; //z1;
+	pointA[0] = 0;
+	pointA[1] = 0;
+	pointA[2] = 0;
 	
 	pointB[0] = 0;
 	pointB[1] = 0;
 	pointB[2] = 0;
 	
-	dx = x1; //x2 - x1;
-	dy = y1; //y2 - y1;
-	dz = z1; //z2 - z1;
+	dx = x1;
+	dy = y1;
+	dz = z1;
 	
 	x_inc = (dx < 0) ? -1 : 1;
 	l = abs(dx);
@@ -1620,8 +1625,10 @@ bool CncControl::moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alr
 	//output
 	if ( serialPort->processMoveXYZ(pointB[0] - pointA[0], pointB[1] - pointA[1], pointB[2] - pointA[2], true, curPos) == false )
 		return false;
-		
-	return true;
+	
+	 return true;
+*/
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveLinearMetricXY(double x1, double y1, bool alreadyRendered) {
@@ -1903,7 +1910,7 @@ bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox*
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
 	
-	double maxSteps 	= -450.0; // mm
+	double maxSteps 	= (axis != 'Z' ? -450.0 : -100.0); // mm
 	bool ret 			= false;
 	long minPos 		= 0l;
 	long maxPos 		= 0l;
