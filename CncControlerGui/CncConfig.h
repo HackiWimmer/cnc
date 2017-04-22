@@ -29,6 +29,7 @@ class CncConfig {
 		double workpieceOffset;
 		double maxDurationThickness;
 		double workpieceThickness;
+		double currentZDepth;
 		double maxZDistance;
 		bool referenceIncludesWpt;
 
@@ -74,6 +75,7 @@ class CncConfig {
 					, workpieceOffset(5.0)
 					, maxDurationThickness(2.0)
 					, workpieceThickness(0.0)
+					, currentZDepth(0.0)
 					, maxZDistance(50.0)
 					, referenceIncludesWpt(false)
 					, routerBitDiameter(0.0)
@@ -108,6 +110,7 @@ class CncConfig {
 					, workpieceOffset(cc.getWorkpieceOffset())
 					, maxDurationThickness(cc.getMaxDurationThickness())
 					, workpieceThickness(cc.getWorkpieceThickness())
+					, currentZDepth(cc.getCurrentZDepth())
 					, maxZDistance(cc.getMaxZDistance())
 					, referenceIncludesWpt(cc.getReferenceIncludesWpt())
 					, routerBitDiameter(cc.getRouterBitDiameter())
@@ -198,8 +201,6 @@ class CncConfig {
 			}
 		}
 		////////////////////////////////////////////////////////////////////////
-		bool getReferenceIncludesWpt() { return referenceIncludesWpt; }
-		CncConfig& setReferenceIncludesWpt(bool b) { sc(); referenceIncludesWpt = b; return *this; }
 		void initZAxisValues() {
 			// example:
 			// workpieceOffset		= 1.0;
@@ -212,9 +213,9 @@ class CncConfig {
 
 			durationCount = 0;
 			if ( maxDurationThickness > 0 ) {
-				durationCount = workpieceThickness/maxDurationThickness;					// --> 3
+				durationCount = currentZDepth/maxDurationThickness;					// --> 3
 				if ( durationCount > 0 ) {
-					double rest = workpieceThickness - (durationCount * maxDurationThickness);	//--> 0.4
+					double rest = currentZDepth - (durationCount * maxDurationThickness);	//--> 0.4
 					
 					if ( durationCount < maxDurations ) {
 						for (unsigned int i=0; i<maxDurations; i++ ) {
@@ -232,7 +233,7 @@ class CncConfig {
 						std::cerr << "CncConfig: maxDurations reached: " << durationCount << std::endl;
 					}
 				} else {
-					// no workpieceThickness
+					// no currentZDepth
 					// set durationCount = 1 to path around one time for plotting;
 					durationCount = 1;
 					durationSteps[0] = 0.0;
@@ -388,18 +389,36 @@ class CncConfig {
 		double				getWorkpieceOffset()		{ return workpieceOffset; }
 		double				getMaxDurationThickness()	{ return maxDurationThickness; }
 		double				getWorkpieceThickness()		{ return workpieceThickness; }
+		bool 				getReferenceIncludesWpt() 	{ return referenceIncludesWpt; }
+		double				getCurrentZDepth()			{ return currentZDepth; }
 		double				getMaxZDistance()			{ return maxZDistance; }
 		void				setMaxZDistance(double d)	{ maxZDistance = d; }
 		double				getCurZDistance() 			{ return workpieceThickness + workpieceOffset; }
 		////////////////////////////////////////////////////////////////////////
+		CncConfig& setReferenceIncludesWpt(bool b) { sc(); referenceIncludesWpt = b; return *this; }
 		double setWorkpieceThickness(double wpt) {
 			sc();
 			if ( wpt < 0 ) 
 				wpt = 0;
 
-			workpieceThickness = wpt;
+			workpieceThickness 	= wpt;
+			currentZDepth		= wpt;
 			initZAxisValues();
 			return wpt;
+		}
+		////////////////////////////////////////////////////////////////////////
+		double setCurrentZDepth(double dpt) {
+			// dpt is interpreted as abs value
+			currentZDepth = dpt;
+			
+			if ( currentZDepth > workpieceThickness )
+				currentZDepth = workpieceThickness;
+				
+			if ( currentZDepth < 0.0 )
+				currentZDepth = 0.0;
+			
+			initZAxisValues();
+			return currentZDepth;
 		}
 		////////////////////////////////////////////////////////////////////////
 		double setMaxDurationThickness(double mdt) {

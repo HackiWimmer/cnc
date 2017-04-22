@@ -149,6 +149,7 @@ class SVGFileParser {
 	
 		/////////////////////////////////////////////////////////////////////
 		CncControl* cncControl;
+		bool cncNodeBreak;
 		SVGPathHandlerCnc* pathHandler;
 		SVGUserAgent svgUserAgent;
 		wxString fileName;

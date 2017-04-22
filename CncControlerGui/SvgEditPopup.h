@@ -10,7 +10,9 @@ enum {
 	STC_PM_UNCOMMENT,
 	STC_PM_SELECT_NODE,
 	STC_PM_SELECT_NODE_BLOCK,
-	STC_PM_CNC,
+	STC_PM_CNC_PARAM_BLOCK,
+	STC_PM_CNC_BREAK_BLOCK,
+	STC_PM_CNC_PAUSE_BLOCK,
 	STC_PM_CIRCLE,
 	STC_PM_ELLIPSE,
 	STC_PM_LINE,
@@ -33,11 +35,17 @@ enum {
 class SvgNodeTemplates {
 	private:
 		static wxString _ret;
-		
+		 
 	public:
+	
+		static const char* CncParameterBlockNodeName;
+		static const char* CncBreakBlockNodeName;
+		static const char* CncPauseBlockNodeName;
 
 		static const char* getSamplesAsString();
-		static const char* getCNCTemplate();
+		static const char* getCncParameterBlock();
+		static const char* getCncBreakBlock();
+		static const char* getCncPauseBlock();
 		static const char* getCircleTemplate();
 		static const char* getEllipseTemplate();
 		static const char* getRectTemplate();

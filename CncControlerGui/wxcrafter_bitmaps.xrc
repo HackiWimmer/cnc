@@ -93,8 +93,6 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
-  <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
-  <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-debugger_restart">bitmaps\24-debugger_restart.png</object>
   <object class="wxBitmap" name="24-debugger_restart@2x">bitmaps\24-debugger_restart@2x.png</object>
   <object class="wxBitmap" name="24-debugger_start">bitmaps\24-debugger_start.png</object>

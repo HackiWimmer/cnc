@@ -18,10 +18,10 @@ class DataControlModel {
 		~DataControlModel() {}
 		
 		////////////////////////////////////////////////////////////////////////
-		static void addKeyCheckValueRow(DcmItemList& ret, int key, wxVariant value) {
+		static void addKeyCheckValueRow(DcmItemList& ret, int key, bool check, wxVariant value) {
 			_row.clear();
 			_row.push_back(wxString::Format(wxT("%i"),key));
-			_row.push_back(true);
+			_row.push_back(check);
 			_row.push_back(value.GetString());
 			ret.push_back(_row);
 		}

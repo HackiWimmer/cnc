@@ -180,6 +180,15 @@ struct SVGUserAgentInfo {
 			
 			return styleInfotring.c_str();
 		}
+		
+		/////////////////////////////////////////////////////////
+		bool shouldProceed() {
+			// if 'display:none' is configured don't spool this path
+			if ( wxString(getStyleInfoAsString()).Find("display:none") == wxNOT_FOUND )
+				return true;
+			return false;
+		}
+		
 		/////////////////////////////////////////////////////////
 		void getPathDetails(DcmItemList& rows) {
 			DataControlModel::addKeyValueRow(rows, "Path", originalPath);

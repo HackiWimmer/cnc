@@ -10,11 +10,13 @@ class CncSpyControl : public wxTextCtrl {
 		wxTextCtrl* detailCtrl;
 	
 		void OnMouse(wxMouseEvent& event);
-		void decodeSerialSpyLine(const wxString& line);
+		void decodeSerialSpyLine(const wxString& line, bool displayInfo = true);
 				
 	public:
 		CncSpyControl(wxWindow *parent, wxWindowID id, wxTextCtrl* dc);
 		virtual ~CncSpyControl();
+		
+		void addMarker(const wxString& mt);
 		
 		virtual bool SetDefaultStyle(const wxTextAttr &style);
 		virtual void AppendText(const wxString & text);

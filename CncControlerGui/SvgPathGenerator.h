@@ -75,6 +75,7 @@ class SvgPathString : public SvgGeneratorBase {
 	protected:
 		SVGUnit inputUnit;
 		wxString pathStr;
+		wxColour pathColour;
 		SvgPathFragment generator;
 		
 		void initPath();
@@ -96,6 +97,11 @@ class SvgPathString : public SvgGeneratorBase {
 		
 		////////////////////////////////////////////////////////////////////////////
 		SvgPathFragment& fGen() { return generator; }
+		
+		////////////////////////////////////////////////////////////////////////////
+		void setColour(const wxColour& c) {
+			pathColour = c;
+		}
 		
 		////////////////////////////////////////////////////////////////////////////
 		void add(const wxString& pf);
@@ -159,6 +165,13 @@ class SvgPathGroup : public SvgGeneratorBase {
 		////////////////////////////////////////////////////////////////////////////
 		void scale(double xy);
 		void scale(double x, double y);
+		
+		////////////////////////////////////////////////////////////////////////////
+		void rotate(double a, double x, double y);
+		
+		////////////////////////////////////////////////////////////////////////////
+		void skewX(double x);
+		void skewY(double y);
 		
 		////////////////////////////////////////////////////////////////////////////
 		virtual bool hasError() { return (SvgGeneratorBase::hasError() || fGen().hasError() || pGen().hasError()); }

@@ -3,6 +3,10 @@
 wxString SvgNodeTemplates::_ret;
 unsigned int SvgEditPopup::_idOffset = 0;
 
+const char* SvgNodeTemplates::CncParameterBlockNodeName		= "CncParameterBlock";
+const char* SvgNodeTemplates::CncBreakBlockNodeName			= "CncBreak";
+const char* SvgNodeTemplates::CncPauseBlockNodeName			= "CncPause";
+
 //////////////////////////////////////////////////////////
 const char* SvgNodeTemplates::getSamplesAsString() {
 //////////////////////////////////////////////////////////
@@ -25,13 +29,26 @@ const char* SvgNodeTemplates::getSamplesAsString() {
 	return _ret.c_str();
 }
 //////////////////////////////////////////////////////////
-const char* SvgNodeTemplates::getCNCTemplate() {
+const char* SvgNodeTemplates::getCncParameterBlock() {
 //////////////////////////////////////////////////////////
 	_ret.clear();
-	_ret = "<CNC reverse=\"no\" correction=\"none\"/>";
+	_ret  = wxString::Format("<%s\n depth=\"z-0.0\"\n reverse=\"no\"\n correction=\"none\"/>\n", SvgNodeTemplates::CncParameterBlockNodeName);
 	return _ret.c_str();
 }
-
+//////////////////////////////////////////////////////////
+const char* SvgNodeTemplates::getCncBreakBlock() {
+//////////////////////////////////////////////////////////
+	_ret.clear();
+	_ret  = wxString::Format("<%s/>\n", SvgNodeTemplates::CncBreakBlockNodeName);
+	return _ret.c_str();
+}
+//////////////////////////////////////////////////////////
+const char* SvgNodeTemplates::getCncPauseBlock() {
+//////////////////////////////////////////////////////////
+	_ret.clear();
+	_ret  = wxString::Format("<%s/>\n", SvgNodeTemplates::CncPauseBlockNodeName);
+	return _ret.c_str();
+}
 //////////////////////////////////////////////////////////
 const char* SvgNodeTemplates::getCircleTemplate() {
 //////////////////////////////////////////////////////////
@@ -122,18 +139,29 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 	popup->Append(idOffset + STC_PM_SELECT_NODE,			wxT("Select current SVG Node"));
 	popup->Append(idOffset + STC_PM_SELECT_NODE_BLOCK,		wxT("Select current SVG Block"));
 	popup->AppendSeparator();
-	popup->Append(idOffset + STC_PM_CNC, 					wxT("Insert CNC Node"));
-	popup->Append(idOffset + STC_PM_CIRCLE, 				wxT("Insert Circle Node"));
-	popup->Append(idOffset + STC_PM_ELLIPSE, 				wxT("Insert Ellipse Node"));
-	popup->Append(idOffset + STC_PM_LINE, 					wxT("Insert Line Node"));
-	popup->Append(idOffset + STC_PM_POLYGON, 				wxT("Insert Polygon Node"));
-	popup->Append(idOffset + STC_PM_POLYLINE, 				wxT("Insert Polyline Node"));
-	popup->Append(idOffset + STC_PM_RECT, 					wxT("Insert Rect Node"));
-	popup->Append(idOffset + STC_PM_PATH, 					wxT("Insert Path Node"));
-	popup->AppendSeparator();
-	popup->Append(idOffset + STC_PM_PATH_ELLIPTICALARC, 	wxT("Insert EllipticalARC pattern"));
-	popup->Append(idOffset + STC_PM_PATH_QUADRATICBEZIER, 	wxT("Insert QuadraticBezier pattern"));
-	popup->Append(idOffset + STC_PM_PATH_CUBICBEZIER, 		wxT("Insert CubicBezier pattern"));
+	
+	wxMenu* cncMenu = new wxMenu("CNC Pattern");
+	popup->AppendSubMenu(cncMenu, "CNC Pattern . . .");
+	
+		cncMenu->Append(idOffset + STC_PM_CNC_PARAM_BLOCK, 		wxT("Insert CncParameterBlock"));
+		cncMenu->Append(idOffset + STC_PM_CNC_BREAK_BLOCK, 		wxT("Insert CncBreak"));
+		cncMenu->Append(idOffset + STC_PM_CNC_PAUSE_BLOCK, 		wxT("Insert CncPause"));
+	
+	wxMenu* svgMenu = new wxMenu("SVG Pattern");
+	popup->AppendSubMenu(svgMenu, "SVG Pattern . . .");
+	
+		svgMenu->Append(idOffset + STC_PM_CIRCLE, 				wxT("Insert Circle Node"));
+		svgMenu->Append(idOffset + STC_PM_ELLIPSE, 				wxT("Insert Ellipse Node"));
+		svgMenu->Append(idOffset + STC_PM_LINE, 				wxT("Insert Line Node"));
+		svgMenu->Append(idOffset + STC_PM_POLYGON, 				wxT("Insert Polygon Node"));
+		svgMenu->Append(idOffset + STC_PM_POLYLINE, 			wxT("Insert Polyline Node"));
+		svgMenu->Append(idOffset + STC_PM_RECT, 				wxT("Insert Rect Node"));
+		svgMenu->Append(idOffset + STC_PM_PATH, 				wxT("Insert Path Node"));
+		svgMenu->AppendSeparator();
+		svgMenu->Append(idOffset + STC_PM_PATH_ELLIPTICALARC, 	wxT("Insert EllipticalARC Pattern"));
+		svgMenu->Append(idOffset + STC_PM_PATH_QUADRATICBEZIER, wxT("Insert QuadraticBezier Pattern"));
+		svgMenu->Append(idOffset + STC_PM_PATH_CUBICBEZIER, 	wxT("Insert CubicBezier Pattern"));
+		
 	popup->AppendSeparator();
 	popup->Append(idOffset + STC_PM_COPY, 					wxT("Copy"));
 	popup->Append(idOffset + STC_PM_PASTE, 					wxT("Paste"));
@@ -150,8 +178,24 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 	 [](wxCommandEvent& event) {
 			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
 			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCNCTemplate());
-	 }, idOffset + STC_PM_CNC, wxID_ANY, ctl);
+			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCncParameterBlock());
+	 }, idOffset + STC_PM_CNC_PARAM_BLOCK, wxID_ANY, ctl);
+	 
+	//............................................
+	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [](wxCommandEvent& event) {
+			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
+			wxASSERT(ctl);
+			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCncBreakBlock());
+	 }, idOffset + STC_PM_CNC_BREAK_BLOCK, wxID_ANY, ctl);
+	 
+	//............................................
+	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [](wxCommandEvent& event) {
+			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
+			wxASSERT(ctl);
+			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCncPauseBlock());
+	 }, idOffset + STC_PM_CNC_PAUSE_BLOCK, wxID_ANY, ctl);
 
 	//............................................
 	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,

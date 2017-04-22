@@ -103,6 +103,14 @@ class CncCmsgBuf : public LoggerStreamBuf {
 };
 
 ///////////////////////////////////////////////////////////////////
+class CncCpgtBuf : public LoggerStreamBuf {
+	public:
+		CncCpgtBuf(wxTextCtrl* c) 
+		: LoggerStreamBuf(c, LoggerStreamBuf::defaultAttr) {}
+		virtual ~CncCpgtBuf() {}
+};
+
+///////////////////////////////////////////////////////////////////
 class CncCspyBuf : public LoggerStreamBuf {
 	
 	public:
@@ -304,6 +312,35 @@ class CncMsgLogStream : public CncTraceLogStream {
 };
 
 ///////////////////////////////////////////////////////////////////
+class CncPGTLogStream : public CncMsgLogStream {
+	
+	protected:
+		///////////////////////////////////////////////////////////
+		virtual void logMessage(const char* m) {
+			if ( m == NULL )
+				return;
+				
+			if ( getTextControl() != NULL )
+				getTextControl()->AppendText(m);
+		}
+		
+	public:
+		///////////////////////////////////////////////////////////
+		CncPGTLogStream() 
+		: CncMsgLogStream()
+		{}
+
+		///////////////////////////////////////////////////////////
+		CncPGTLogStream(const CncPGTLogStream& cmb) 
+		: CncMsgLogStream()
+		{}
+
+		///////////////////////////////////////////////////////////
+		virtual ~CncPGTLogStream() 
+		{}
+};
+
+///////////////////////////////////////////////////////////////////
 class CncSerialSpyStream : public CncTraceLogStream {
 	
 	protected:
@@ -328,6 +365,7 @@ class CncSerialSpyStream : public CncTraceLogStream {
 	public:
 	
 		static const char* hLine;
+		static const char* mLine;
 		///////////////////////////////////////////////////////////
 		CncSerialSpyStream() 
 		: CncTraceLogStream()
@@ -347,6 +385,15 @@ class CncSerialSpyStream : public CncTraceLogStream {
 			wxColour c = getTextColour();
 			blue();
 			logTime(true);
+			setTextColour(c);
+		}
+		///////////////////////////////////////////////////////////
+		void addMarker(const wxString& mt) {
+			wxColour c = getTextColour();
+			red();
+			(*this) <<  CncSerialSpyStream::mLine;
+			(*this) << ":: " << mt << "\n";
+			(*this) <<  CncSerialSpyStream::mLine;
 			setTextColour(c);
 		}
 		

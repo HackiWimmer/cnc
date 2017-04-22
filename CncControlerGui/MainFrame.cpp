@@ -22,6 +22,7 @@
 #include <wx/datstrm.h>
 #include <wx/txtstrm.h>
 #include <wx/vscroll.h>
+#include <wx/textdlg.h>
 #include "SerialPort.h"
 #include "CncPosition.h"
 #include "SvgUnitCalculator.h"
@@ -99,7 +100,7 @@ MainFrame::MainFrame(wxWindow* parent)
 	// do this definitely here later it will causes a crash 
 	install3DPane();
 	installSypControl();
-
+	
 	// instll galobal key down hook
 	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
 }
@@ -420,11 +421,13 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menues
+	hideAuiPane("Spy");
 	m_miToolbar->Check(m_auibarMain->IsShown());
 	m_miViewTemplateManager->Check(m_scrollWinFile->IsShown());
 	m_miViewLogger->Check(m_scrollWinLogger->IsShown());
 	m_miViewMonitor->Check(m_scrollOutbound->IsShown());
 	m_miViewMainView->Check(m_scrollWinMain->IsShown());
+	m_miViewSpy->Check(m_scrollSpy->IsShown());
 	
 	// Show environment information
 	std::ostream stream(m_envrionmentInfo);
@@ -1782,21 +1785,11 @@ void MainFrame::updateSpeedValues() {
 
 	updateCncConfigTrace();
 	
-	/*
-	m_speedX->SetRange(0, cnc->getCncConfig()->getMaxSpeedXY());
-	m_speedY->SetRange(0, cnc->getCncConfig()->getMaxSpeedXY());
-	m_speedZ->SetRange(0, cnc->getCncConfig()->getMaxSpeedZ());
-	 * */
 	m_speedView->setMaxSpeedX(cnc->getCncConfig()->getMaxSpeedXY());
 	m_speedView->setMaxSpeedY(cnc->getCncConfig()->getMaxSpeedXY());
 	m_speedView->setMaxSpeedZ(cnc->getCncConfig()->getMaxSpeedZ());
 
 	if ( m_menuItemToolControls->IsChecked() == true ) {
-		/*
-		m_speedX->SetValue(cnc->getCncConfig()->getSpeedX());
-		m_speedY->SetValue(cnc->getCncConfig()->getSpeedY());
-		m_speedZ->SetValue(cnc->getCncConfig()->getSpeedZ());
-		*/
 		m_speedView->setCurrentSpeedX(cnc->getCncConfig()->getSpeedX());
 		m_speedView->setCurrentSpeedY(cnc->getCncConfig()->getSpeedY());
 		m_speedView->setCurrentSpeedZ(cnc->getCncConfig()->getSpeedZ());
@@ -2571,11 +2564,9 @@ bool MainFrame::processManualTemplate() {
 		// transform to mm
 		if ( m_unit->GetValue() == "steps" ) 
 			zd *= cnc->getCncConfig()->getDisplayFactX();
-
-		double moveZ = zd;
-		
+			
 		//cnc->initNextDuration(); will be done by manualSimpleMoveMetric
-		cnc->manualSimpleMoveMetric(0.0, 0.0, moveZ);
+		cnc->manualSimpleMoveMetric(0.0, 0.0, zd);
 		cnc->resetDurationCounter();
 	}
 	
@@ -3207,8 +3198,7 @@ void MainFrame::processTemplate() {
 	// select template Page
 	if ( m_mainNotebook->GetSelection() != MainManuallyPage && 
 	     m_mainNotebook->GetSelection() != MainTestPage && 
-	     m_mainNotebook->GetSelection() != MainTemplatePage && 
-	     m_mainNotebook->GetSelection() != MainSerialSpy ) {
+	     m_mainNotebook->GetSelection() != MainTemplatePage ) {
 		m_mainNotebook->SetSelection(MainTemplatePage);
 	}
 
@@ -3347,8 +3337,7 @@ void MainFrame::mainBookPageChanged(wxNotebookEvent& event) {
 	unsigned int sel = event.GetSelection();
 	
 	if ( (wxWindow*)event.GetEventObject() == m_mainNotebook ) {
-		enableSerialSpy(sel == MainSerialSpy);
-		
+		// do nothing 
 	} else if ( (wxWindow*)event.GetEventObject() == m_templateNotebook ) {
 		if ( sel == TemplatePreviewPage ) {
 			prepareTplPreview();
@@ -3779,6 +3768,23 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 			
 		m_svgEditSearch->SetFocus();
 		return;
+		
+	} else if ( c == 'G' && ctlKey == true ) {
+		wxTextEntryDialog dlg(this, "Line Number:", "Go to line . . .", "");
+		dlg.SetMaxLength(32);
+		dlg.SetTextValidator(wxFILTER_NUMERIC);
+		if ( dlg.ShowModal() == wxID_OK  ) {
+			wxString s = dlg.GetValue();
+			s.Trim(true).Trim(false);
+			if ( s.IsEmpty() == false ) {
+				long ln;
+				s.ToLong(&ln);
+				if ( ln >= 0 && ln <= m_stcFileContent->GetNumberOfLines() )
+					m_stcFileContent->GotoLine(ln-1);
+				else
+					std::clog << "Template Source: Invalid line numer: " << ln << std::endl;
+			}
+		}
 	}
 	
 	event.Skip(true);
@@ -4669,6 +4675,15 @@ void MainFrame::showAuiPane(wxWindow* pane, wxMenuItem* menu) {
 		
 	GetAuimgrMain()->GetPane(pane).Show();
 	
+	if ( pane == getAUIPaneByName("Spy") ) {
+		enableSerialSpy(true);
+		GetAuimgrMain()->GetPane(pane).Floatable(true);
+		GetAuimgrMain()->GetPane(pane).Float();
+		GetAuimgrMain()->GetPane(pane).FloatingSize(600,500);
+		
+		GetAuimgrMain()->Update();
+	}
+	
 	if ( menu != NULL )
 		menu->Check(true);
 		
@@ -4684,6 +4699,9 @@ void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu) {
 	GetAuimgrMain()->GetPane(pane).DestroyOnClose(false);
 	pane->Close(true);
 	
+	if ( pane == getAUIPaneByName("Spy") )
+		enableSerialSpy(false);
+	
 	if ( menu != NULL )
 		menu->Check(false);
 		
@@ -4698,6 +4716,7 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "Outbound")			return m_scrollOutbound;
 	else if ( name == "TemplateManager")	return m_scrollWinFile;
 	else if ( name == "StatusBar")			return m_statusBar;
+	else if ( name == "Spy")				return m_scrollSpy;
 
 	return NULL;
 }
@@ -4709,6 +4728,7 @@ wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 	else if ( name == "Logger")				return m_miViewLogger;
 	else if ( name == "Outbound")			return m_miViewMonitor;
 	else if ( name == "TemplateManager")	return m_miViewTemplateManager;
+	else if ( name == "Spy")				return m_miViewSpy;
 
 	return NULL;
 }
@@ -4786,6 +4806,11 @@ void MainFrame::viewMonitor(wxCommandEvent& event) {
 	toggleAuiPane("Outbound");
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::viewSpy(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	toggleAuiPane("Spy");
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::perspectiveDefault(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	viewAllAuiPanes();
@@ -4818,6 +4843,10 @@ void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 		m_miViewMonitor->Check(!m_scrollOutbound->IsShown());
 	else if ( evt.pane->window == m_scrollWinMain )
 		m_miViewMainView->Check(!m_scrollWinMain->IsShown());
+	else if ( evt.pane->window == m_scrollSpy ) {
+		m_miViewSpy->Check(!m_scrollSpy->IsShown());
+		enableSerialSpy(false);
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
@@ -4831,8 +4860,6 @@ void MainFrame::OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::maximizeAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-
-	
 	if ( event.pane->window == m_scrollOutbound || event.pane->window == m_scrollWinMain )
 		perspectiveTimer.Start(20);
 		
@@ -4866,6 +4893,7 @@ void MainFrame::hideAllAuiPanes() {
 	hideAuiPane(m_scrollWinLogger, m_miViewLogger);
 	hideAuiPane(m_scrollOutbound,  m_miViewMonitor);
 	hideAuiPane(m_scrollWinMain,   m_miViewMainView);
+	hideAuiPane(m_scrollSpy,       m_miViewSpy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewAllAuiPanes() {
@@ -4875,6 +4903,7 @@ void MainFrame::viewAllAuiPanes() {
 	showAuiPane(m_scrollWinLogger, m_miViewLogger);
 	showAuiPane(m_scrollOutbound,  m_miViewMonitor);
 	showAuiPane(m_scrollWinMain,   m_miViewMainView);
+	showAuiPane(m_scrollSpy,       m_miViewSpy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableSlider(wxMouseEvent& event) {
@@ -6123,40 +6152,13 @@ void MainFrame::clearSerialSpy(wxCommandEvent& event) {
 	clearSerialSpy();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::freezeSerialSpy(bool state) {
+void MainFrame::markSerialSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	//set freeze state
-	if ( state == true ) {
-		if ( serialSpy->IsFrozen() == false ) {
-			cnc::spy << "Serial Spy is frozen from now on . . . \n";
-			cnc->waitActive(100);
-			serialSpy->Freeze();
-		}
-	} else {
-		if ( serialSpy->IsFrozen() == true ) {
-			serialSpy->Thaw();
-			cnc::spy << '\n';
-		}
-	}
-	
-	// decorate buttons and menues
-	if ( serialSpy->IsFrozen() == false) {
-		m_freezeSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_NOT_FROZEN")); 
-		m_freezeSerialSpy->SetToolTip("Freeze Serial Spy");
-		m_menuItemDebugSerial->Check(true);
-	} else {
-		m_freezeSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_FROZEN")); 
-		m_freezeSerialSpy->SetToolTip("Unfreeze Serial Spy");
-		m_menuItemDebugSerial->Check(false);
-	}
-	
-	m_freezeSerialSpy->Refresh();
-	m_freezeSerialSpy->Update();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::freezeSerialSpy(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	freezeSerialSpy(serialSpy->IsFrozen() != true );
+	wxString defaultValue(wxString::Format("Marker::%06d", serialSpy->GetNumberOfLines()));
+	wxTextEntryDialog dlg(this, "Marker Label:", "Add Spy Marker . . .", defaultValue);
+	dlg.SetMaxLength(64);
+	dlg.ShowModal();
+	serialSpy->addMarker(dlg.GetValue());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::freezeLogger(wxCommandEvent& event) {
@@ -6197,11 +6199,11 @@ void MainFrame::enableSerialSpy(bool state) {
 void MainFrame::decorateSerialSpy() {
 ///////////////////////////////////////////////////////////////////
 	if ( m_menuItemDebugSerial->IsChecked() ) {
-		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_SERIAL_SYP_ON")); 
+		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_CONNECTED")); 
 		m_enableSerialSpy->SetToolTip("Disable Serial Spy");
 		cnc::spy.enableMessage(); 
 	} else {
-		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_FROZEN")); 
+		m_enableSerialSpy->SetBitmap(ImageLib16().Bitmap("BMP_DISCONNECTED")); 
 		m_enableSerialSpy->SetToolTip("Enable Serial Spy");
 		cnc::spy.disableMessage();
 	}
@@ -6276,4 +6278,5 @@ void MainFrame::paintYAxisMarker(wxPaintEvent& event) {
 	if ( cnc )
 		cnc->drawYMarker(dc);
 }
+
 

@@ -9,6 +9,7 @@
 #include <wx/stc/stc.h>
 #include <wx/webview.h>
 #include <wx/filename.h>
+#include "SvgEditPopup.h"
 #include "SvgUnitCalculator.h"
 #include "CncFileNameService.h"
 #include "CncControl.h"
@@ -18,6 +19,7 @@
 //////////////////////////////////////////////////////////////////
 SVGFileParser::SVGFileParser(const char* fn, CncControl* cnc) 
 : cncControl(cnc)
+, cncNodeBreak(false)
 , pathHandler(new SVGPathHandlerCnc(cnc))
 , fileName(fn)
 , svgTraceControl(NULL)
@@ -900,9 +902,7 @@ bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) {
 //////////////////////////////////////////////////////////////////
-	// if 'display:none' is configured don't spool this path
-	//clog << wxString(uai.getStyleInfoAsString()) << endl;
-	if ( wxString(uai.getStyleInfoAsString()).Find("display:none") != wxNOT_FOUND )
+	if ( uai.shouldProceed() == false )
 		return true;
 	
 	SvgOriginalPathInfo sopi;
@@ -993,6 +993,7 @@ bool SVGFileParser::preprocess() {
 	
 	// main entry point foor evaluateing all XML nodes
 	wxXmlNode *child = doc.GetRoot()->GetChildren();
+	cncNodeBreak = false;
 	bool ret = processXMLNode(child);
 	
 	// reset the soure editor selection 
@@ -1012,14 +1013,22 @@ bool SVGFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
-	while ( child ) {
+	while ( child && cncNodeBreak == false) {
 		pathHandler->getCncWorkingParameters().currentLineNumber = child->GetLineNumber();
 		selectSourceControl(child->GetLineNumber() - 1);
 
-		if ( child->GetName().Upper() == "CNC" ) {
+		if ( child->GetName() == SvgNodeTemplates::CncParameterBlockNodeName ) {
 			if ( evaluateCncParameters(child) == false )
 				return false;
 				
+		} else if (child->GetName() == SvgNodeTemplates::CncBreakBlockNodeName ) {
+			cncNodeBreak = true;
+			std::clog << SvgNodeTemplates::CncBreakBlockNodeName << " detected at line number: " << child->GetLineNumber() << std::endl;
+			
+		} else if (child->GetName() == SvgNodeTemplates::CncPauseBlockNodeName ) {
+			//todo
+			std::clog << SvgNodeTemplates::CncPauseBlockNodeName << " isn't currently implemented. Line number: " << child->GetLineNumber() << std::endl;
+			
 		} else if (child->GetName().Upper() == "SYMBOL" ) {
 			wxString a = child->GetAttribute("id", "");
 			svgUserAgent.addID(a, child->GetName().c_str());
@@ -1106,6 +1115,10 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			UseDirective ud;
 			evaluateUse(child->GetAttributes(), ud.attributes);
 			udv.push_back(svgUserAgent.evaluateUseDirective(ud));
+			
+		} else if (child->GetName().Upper() == "CNC") {
+			//todo
+			std::clog << "Obsolete Node. <CNC> isn't longer implemented. Line number: " << child->GetLineNumber() << std::endl;
 		}
 
 		// recursion call to get the complete depth
@@ -1278,6 +1291,7 @@ bool SVGFileParser::processPathCommand(wxString para) {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
+	wxASSERT(cncControl && cncControl->getCncConfig());
 	CncWorkingParameters& cwp = pathHandler->getCncWorkingParameters();
 	
 	wxString attr = child->GetAttribute("reverse", "no");
@@ -1285,7 +1299,10 @@ bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
 	
 	attr = child->GetAttribute("correction", "none");
 	cwp.setCorrectionType(attr);
-
+	
+	attr = child->GetAttribute("depth", wxString::Format("Z%lf", 0.0));
+	cwp.setCurrentZDepth(attr);
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////

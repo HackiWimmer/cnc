@@ -150,6 +150,12 @@ void ArduinoPIDs::init() {
 	pids[PID_SDRV_PULS_WITDH_OFFSET_X]        = "Stepper Driver Puls Width Offset X Axis";
 	pids[PID_SDRV_PULS_WITDH_OFFSET_Y]        = "Stepper Driver Puls Width Offset Y Axis";
 	pids[PID_SDRV_PULS_WITDH_OFFSET_Z]        = "Stepper Driver Puls Width Offset Z Axis";
+	
+	pids[PID_CURRENT_STEP_PULS_WIDTH_LOW]     = "Current Step Puls Width Low";
+	pids[PID_CURRENT_STEP_PULS_WIDTH_HIGH]    = "Current Step Puls Width High";
+	pids[PID_CURRENT_DIR_PULS_WIDTH]          = "Current Dir Puls Width";
+	
+	pids[PID_SWITCH_MOVE_MODE_STATE]          = "Move Mode Control State";
 
 	pids[PID_TEST_SUITE]                      = "Test Suite";
 	pids[PID_TEST_VALUE1]                     = "Parmeter1";

@@ -255,6 +255,31 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	pathList.isCorrected = false;
 	pathList.list.clear();
 	
+	// Z depth management
+	wxASSERT( cncControl && cncControl->getCncConfig() );
+	CncConfig* cc = cncControl->getCncConfig();
+	double zDepth = -currentCncParameters.getCurrentZDepth();
+	
+	if ( currentCncParameters.isCurrentZDepthAbs() == true ) {
+		zDepth = cc->getWorkpieceThickness() - currentCncParameters.getCurrentZDepth();
+		
+		if ( zDepth > cc->getWorkpieceThickness() )
+			zDepth = cc->getWorkpieceThickness();
+	} else {
+		
+		if ( zDepth < 0.0 )
+			zDepth = 0.0;
+	}
+
+	if ( cnc::dblCompare(cc->setCurrentZDepth(zDepth), zDepth) == false ) {
+		if ( cc->getWorkpieceThickness() != 0 ) {
+			std::cerr << "SVGPathHandlerCnc::initNextPath: error while setting Z depth: ";
+			std::cerr << currentCncParameters.getCurrentZDepthMode() << ( currentCncParameters.isCurrentZDepthAbs() ? zDepth : -zDepth);
+			std::cerr << ", Wpt: " << cc->getWorkpieceThickness() << std::endl;
+		}
+		//return false;
+	}
+
 	return true;
 }
 //////////////////////////////////////////////////////////////////

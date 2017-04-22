@@ -5,22 +5,19 @@
 #include <wx/textentry.h>
 #include <wx/valnum.h>
 #include <wx/stdpaths.h>
-#include "CncCommon.h"
-#include "SvgUnitCalculator.h"
-#include "SvgPathGenerator.h"
 #include "PathGeneratorFrame.h"
 
 const char* PD_Preview_fileName			= "PathGeneratorPreview.svg";
-const unsigned int PG_Page_Polygon 		= 0;
-const unsigned int PG_Page_Knob 		= 1;
-const unsigned int PG_Page_Gear 		= 2;
-const unsigned int PG_Page_PocketWhole	= 3;
 
 ///////////////////////////////////////////////////////////////////
 PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent)
 : PathGeneratorFrameBase(parent)
 , previewHeight(1500)
 , previewWidth(1500)
+, viewBoxX(0)
+, viewBoxY(0)
+, viewBoxW(0)
+, viewBoxH(0)
 , errorText("")
 {
 ///////////////////////////////////////////////////////////////////
@@ -56,47 +53,90 @@ void PathGeneratorFrame::copyPath(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::setupPathSelector() {
 ///////////////////////////////////////////////////////////////////
-	m_pgPathSelector->Append("001 - Polygon");
-	m_pgPathSelector->Append("002 - Knob");
-	m_pgPathSelector->Append("003 - Gear");
-	m_pgPathSelector->Append("004 - Poket Whole");
+	
+	pathGeneratorStore.registerPathGenerator(new xyz());
+	pathGeneratorStore.registerPathGenerator(new abc());
+	pathGeneratorStore.registerPathGenerator(new pgRoundPoketWhole());
 	//...
+	
+	
+	// Init path selector
+	pathGeneratorStore.setupSelector(m_pgPathSelector);
+	m_pgPathSelector->SetSelection(0);
+	wxCommandEvent dummy;
+	selectPathSelector(dummy);
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::initControls() {
 ///////////////////////////////////////////////////////////////////
+	wxFloatingPointValidator<float> validator(3, NULL, wxNUM_VAL_DEFAULT );
 	
+	validator.SetPrecision(3);
+	validator.SetRange(1, 30);
+	m_pgPropToolDiameter->SetValidator(validator);
 	
-	wxFloatingPointValidator<float> val1(3, NULL,wxNUM_VAL_DEFAULT );
-	val1.SetRange(1, 500);
-	m_polygonRadius->SetValidator(val1);
-
-	wxIntegerValidator<unsigned long> val2;
-	val2.SetRange(2, 100);
-	m_polygonSections->SetValidator(val2);
-
-	wxFloatingPointValidator<float> val3(3, NULL,wxNUM_VAL_DEFAULT );
-	val3.SetRange(1, 500);
-	m_knobRadius->SetValidator(val3);
-
-	wxIntegerValidator<unsigned long> val4;
-	val4.SetRange(2, 100);
-	m_polygonSections->SetValidator(val4);
+	validator.SetPrecision(3);
+	validator.SetRange(-400, 400);
+	m_pgPropTranslateX->SetValidator(validator);
+	m_pgPropTranslateY->SetValidator(validator);
 	
-	//todo
+	validator.SetPrecision(1);
+	validator.SetRange(0, 10);
+	m_pgPropScaleX->SetValidator(validator);
+	m_pgPropScaleY->SetValidator(validator);
 	
-	//m_pgParameterMgr->Append()
+	validator.SetPrecision(1);
+	validator.SetRange(-360, 360);
+	m_pgPropRotateA->SetValidator(validator);
+	validator.SetPrecision(3);
+	validator.SetRange(-400, 400);
+	m_pgPropRotateX->SetValidator(validator);
+	m_pgPropRotateY->SetValidator(validator);
 	
-	m_pgProp01->SetLabel("adadsdad");
-	m_pgProp01->SetValidator(val3);
-	wxVariant null("");
-	m_pgProp01->SetLabel("");
-	m_pgProp01->SetValue("");
+	validator.SetPrecision(1);
+	validator.SetRange(-360, 360);
+	m_pgPropSkewX->SetValidator(validator);
+	m_pgPropSkewY->SetValidator(validator);
 	
-	//m_pgProp01->S StringToValue(null);
-	m_pgProp01->Enable(false);
-	m_pgProp02->SetHelpString("adaddweewewqweqwqewqewqewwqeewqew\nqeqeqweqweqwe");
-
+	validator.SetPrecision(0);
+	validator.SetRange(0, 1500);
+	m_svgW->SetValidator(validator);
+	m_svgH->SetValidator(validator);
+	m_svgW->SetValue(wxString::Format("%d", previewWidth));
+	m_svgH->SetValue(wxString::Format("%d", previewHeight));
+	
+	validator.SetPrecision(0);
+	validator.SetRange(0, 1500);
+	m_vieBoxX->SetValidator(validator);
+	m_vieBoxY->SetValidator(validator);
+	m_vieBoxW->SetValidator(validator);
+	m_vieBoxH->SetValidator(validator);
+	m_vieBoxX->SetValue(wxString::Format("%d", viewBoxX));
+	m_vieBoxY->SetValue(wxString::Format("%d", viewBoxY));
+	m_vieBoxW->SetValue(wxString::Format("%d", viewBoxW));
+	m_vieBoxH->SetValue(wxString::Format("%d", viewBoxH));
+	
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::updateSvgValues(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString w  = m_svgW->GetValue();
+	wxString h  = m_svgH->GetValue();
+	
+	wxString vx = m_vieBoxX->GetValue();
+	wxString vy = m_vieBoxY->GetValue();
+	wxString vw = m_vieBoxW->GetValue();
+	wxString vh = m_vieBoxH->GetValue();
+	
+	w.ToLong(&previewWidth);
+	h.ToLong(&previewHeight);
+	
+	vx.ToLong(&viewBoxX);
+	vy.ToLong(&viewBoxY);
+	vw.ToLong(&viewBoxW);
+	vh.ToLong(&viewBoxH);
+	
+	updatePreview();
 }
 ///////////////////////////////////////////////////////////////////
 int PathGeneratorFrame::getPathSelection() {
@@ -114,19 +154,22 @@ int PathGeneratorFrame::getPathSelection() {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::selectPathSelector(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	errorText.clear();
+	clearParameters();
+	m_generatedPath->Clear();
 	
-	switch ( getPathSelection() ) {
-		
-		case 1:		setupPolygon();
-					updatePreview();
-					break;
-		// todo
-					
-		default:	errorText = "No path generator defined for this selection. Nothing will be generated";
-					setPath("");
-					updatePreview();
+	int id = getPathSelection();
+	if ( id >= 0 ) {
+		pathGeneratorStore.setupParameter(id, 0, m_pgProp01);
+		pathGeneratorStore.setupParameter(id, 1, m_pgProp02);
+		pathGeneratorStore.setupParameter(id, 2, m_pgProp03);
+		pathGeneratorStore.setupParameter(id, 3, m_pgProp04);
+		pathGeneratorStore.setupParameter(id, 4, m_pgProp05);
+		pathGeneratorStore.setupParameter(id, 5, m_pgProp06);
+		pathGeneratorStore.setupParameter(id, 6, m_pgProp07);
+		pathGeneratorStore.setupParameter(id, 7, m_pgProp08);
 	}
+	
+	updatePreview();
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::clearParameter(wxPGProperty* p) {
@@ -152,35 +195,6 @@ void PathGeneratorFrame::clearParameters() {
 	clearParameter(m_pgProp08);
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::setupPolygon() {
-///////////////////////////////////////////////////////////////////
-	clearParameters();
-	
-	wxFloatingPointValidator<float> val1(3, NULL,wxNUM_VAL_DEFAULT );
-	val1.SetRange(1, 400);
-	
-	wxIntegerValidator<unsigned long> val2;
-	val2.SetRange(2, 100);
-
-	m_pgProp01->Hide(false);
-	m_pgProp01->SetLabel("Radius [mm]");
-	m_pgProp01->SetValidator(val1);
-	m_pgProp01->Enable(true);
-	m_pgProp01->SetHelpString("Radius . . . .");
-	m_pgProp01->SetValue(10.000);
-	
-	m_pgProp02->Hide(false);
-	m_pgProp02->SetLabel("Count [number]");
-	m_pgProp02->SetValidator(val2);
-	m_pgProp02->Enable(true);
-	m_pgProp02->SetHelpString("Corner count . . . .");
-	m_pgProp02->SetValue(4);
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::clearView(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_generatedPath->Clear();
@@ -189,29 +203,43 @@ void PathGeneratorFrame::clearView(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::generatePath(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	unsigned int sel = m_pgNotebook->GetSelection();
-	switch (sel) {
-		case PG_Page_Polygon:
-				generatePolygon();
-				updatePreview();
-				break;
-		case PG_Page_Knob:
-				generateKnob();
-				updatePreview();
-				break;
-		case PG_Page_PocketWhole:
-				generatePocketWhole();
-				updatePreview();
-				break;
-		default:
-				errorText = "No path generator defined for this selection. Nothing will be generated";
-				setPath("");
-				updatePreview();
+	int id = getPathSelection();
+	if ( id >= 0 ) {
+		
+		PathGenertorBase::CommonValues cv;
+		cv.toolDiameter = m_pgPropToolDiameter->GetValue();
+		cv.pathColour	= ((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
+		pathGeneratorStore.setCommonValues(id, cv);
+		
+		PathGenertorBase::TransformValues tv;
+		tv.translateX 	= m_pgPropTranslateX->GetValue();
+		tv.translateY 	= m_pgPropTranslateY->GetValue();
+		tv.scaleX		= m_pgPropScaleX->GetValue();
+		tv.scaleY		= m_pgPropScaleY->GetValue();
+		tv.rotateA		= m_pgPropRotateA->GetValue();
+		tv.rotateX		= m_pgPropRotateX->GetValue();
+		tv.rotateY		= m_pgPropRotateY->GetValue();
+		tv.skewX		= m_pgPropSkewX->GetValue();
+		tv.skewY		= m_pgPropSkewY->GetValue();
+		pathGeneratorStore.setTransformValues(id, tv);
+		
+		pathGeneratorStore.setParameterValue(id, 0, m_pgProp01);
+		pathGeneratorStore.setParameterValue(id, 1, m_pgProp02);
+		pathGeneratorStore.setParameterValue(id, 2, m_pgProp03);
+		pathGeneratorStore.setParameterValue(id, 3, m_pgProp04);
+		pathGeneratorStore.setParameterValue(id, 4, m_pgProp05);
+		pathGeneratorStore.setParameterValue(id, 5, m_pgProp06);
+		pathGeneratorStore.setParameterValue(id, 6, m_pgProp07);
+		pathGeneratorStore.setParameterValue(id, 7, m_pgProp08);
 	}
+	
+	m_generatedPath->SetValue(pathGeneratorStore.generatePath(getPathSelection()));
+	updatePreview();
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::setPath(wxString path) {
 ///////////////////////////////////////////////////////////////////
+	//obsolete
 	wxString value("<path d=\"");
 	value += path;
 	value += "\"  stroke=\"black\" fill=\"none\" stroke-width=\"1.0\"/>";
@@ -234,9 +262,9 @@ void PathGeneratorFrame::updatePreview() {
 		fs << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"" << std::endl;
 		fs << "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">" << std::endl;
 		fs << "<svg xmlns=\"http://www.w3.org/2000/svg\" "; 
-		fs << "width=\"" << previewWidth << "\" "; 
-		fs << "height=\"" << previewHeight << "\" ";
-		//fs << "viewBox=\"0 0 " << width * zoomFact << " " <<  height * zoomFact << "\" ";
+		fs << "width=\"" << previewWidth << "mm\" "; 
+		fs << "height=\"" << previewHeight << "mm\" ";
+		fs << "viewBox=\"" << viewBoxX << " " <<  viewBoxY << " " << viewBoxW << " " <<  viewBoxH << "\" ";
 		fs << "xmlns:xlink=\"http://www.w3.org/1999/xlink\">" << std::endl;
 		fs << "<title>SVG Path Generator</title>" << std::endl;
 		fs << "<desc>Preview</desc>" << std::endl;
@@ -259,6 +287,16 @@ void PathGeneratorFrame::updatePreview() {
 
 	m_pgPreview->LoadURL(pfn);
 }
+
+
+
+
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////
 bool PathGeneratorFrame::generateSymetricCirclePoints(std::vector<wxRealPoint>& pl, 
                                                       double xOffset, double yOffset, 
@@ -293,10 +331,10 @@ void PathGeneratorFrame::generatePolygon() {
 	double radius = 0;
 	long sections = 1;
 	
-	val = m_polygonRadius->GetValue();
+	val = "10.0";//m_polygonRadius->GetValue();
 	if ( val.length() > 0 ) val.ToDouble(&radius);
 
-	val = m_polygonSections->GetValue();
+	val = "5";//m_polygonSections->GetValue();
 	if ( val.length() > 0 ) val.ToLong(&sections);
 	
 	double xOffset = + 15;
@@ -334,10 +372,10 @@ void PathGeneratorFrame::generateKnob() {
 	double radius = 100;
 	long sections = 8;
 
-	val = m_knobRadius->GetValue();
+	val = "10.00";//m_knobRadius->GetValue();
 	if ( val.length() > 0 ) val.ToDouble(&radius);
 
-	val = m_knobSections->GetValue();
+	val = "10";//m_knobSections->GetValue();
 	if ( val.length() > 0 ) val.ToLong(&sections);
 	
 	double xOffset = radius + 25;

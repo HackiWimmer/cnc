@@ -45,31 +45,47 @@ bool CncSpyControl::SetDefaultStyle(const wxTextAttr &style) {
 	return wxTextCtrl::SetDefaultStyle(style);
 }
 ///////////////////////////////////////////////////////////////////
+void CncSpyControl::addMarker(const wxString& mt) {
+///////////////////////////////////////////////////////////////////
+	cnc::spy.addMarker(mt);
+}
+///////////////////////////////////////////////////////////////////
 void CncSpyControl::AppendText(const wxString & text) {
 ///////////////////////////////////////////////////////////////////
 	sytleChanged = false;
-	
-	
 	wxTextCtrl::AppendText(text);
+	
+	if ( text.length() > 0 && text[0] == '\n' ) {
+		decodeSerialSpyLine(GetLineText(GetNumberOfLines() - 2), false);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncSpyControl::AppendText(const wxChar & c) {
 ///////////////////////////////////////////////////////////////////
 	sytleChanged = false;
 	
-	// todo libuv
-	
 	wxTextCtrl::AppendText(c);
+	if ( c == '\n' ) {
+		decodeSerialSpyLine(GetLineText(GetNumberOfLines() - 2));
+	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncSpyControl::decodeSerialSpyLine(const wxString& line) {
+void CncSpyControl::decodeSerialSpyLine(const wxString& line, bool displayInfo) {
 ///////////////////////////////////////////////////////////////////
 	detailCtrl->Clear();
-	detailCtrl->AppendText(line);
-	detailCtrl->AppendText("\n");
+	
+	if ( IsFrozen() )
+		return;
+	
+	if ( displayInfo == true ) {
+		detailCtrl->AppendText(line);
+		detailCtrl->AppendText("\n");
+	}
 	
 	if ( line.Find("0x[") == wxNOT_FOUND ) {
-		detailCtrl->AppendText("Nothing more to decode . . .\n");
+		if ( displayInfo == true )
+			detailCtrl->AppendText("Nothing more to decode . . .\n");
+			
 		return;
 	}
 	

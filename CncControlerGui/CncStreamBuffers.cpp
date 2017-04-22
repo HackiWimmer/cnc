@@ -2,9 +2,8 @@
 
 wxTextAttr LoggerStreamBuf::defaultAttr = wxTextAttr(wxColour(195,195,195));
 wxTextAttr CncCspyBuf::lineNumberAttr = wxTextAttr(wxColour(205,201,15));
-const char* CncSerialSpyStream::hLine	= "-----------------------------------------------------------------------------------------\n";
-
-
+const char* CncSerialSpyStream::hLine	= "----------------------------------------------\n";
+const char* CncSerialSpyStream::mLine	= "***********************************************\n";
 
 ///////////////////////////////////////////////////////////
 int CncCspyBuf::overflow (int c) {

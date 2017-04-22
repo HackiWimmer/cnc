@@ -38,6 +38,7 @@ class MainFrame : public MainFrameBClass {
 		wxTextCtrl* getLogger() { return m_logger; }
 		wxTextCtrl* getTrace() { return m_tmpTraceInfo; }
 		wxTextCtrl* getCtrlMessageHistory() { return m_controllerMsgHistory; }
+		wxTextCtrl* getCtrlPathGeneratorTrace() { return pathGenerator->getPathTrace(); }
 		wxTextCtrl* getCtrlSerialSpy() { return serialSpy; }
 		
 		void install3DPane();
@@ -46,6 +47,8 @@ class MainFrame : public MainFrameBClass {
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 protected:
+    virtual void markSerialSpy(wxCommandEvent& event);
+    virtual void viewSpy(wxCommandEvent& event);
     virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event);
 	virtual void requestErrorCount(wxCommandEvent& event);
     virtual void paintXAxisMarkerBottom(wxPaintEvent& event);
@@ -265,8 +268,6 @@ protected:
 		void disableSerialSpy() { enableSerialSpy(false); }
 		void decorateSerialSpy();
 		
-		void freezeSerialSpy(bool state = true); 
-		void unfreezeSerialSpy() { freezeSerialSpy(false); }
 		void clearSerialSpy();
 
 		///////////////////////////////////////////////////////////////
@@ -318,7 +319,6 @@ protected:
 		virtual void cfgStepDelayMin(wxCommandEvent& event);
 		virtual void enableSerialSpy(wxCommandEvent& event);
 		virtual void clearSerialSpy(wxCommandEvent& event);
-		virtual void freezeSerialSpy(wxCommandEvent& event);
 		virtual void freezeLogger(wxCommandEvent& event);
 		virtual void show3DPaneHelp(wxCommandEvent& event);
 		virtual void selectedPlane3D(wxCommandEvent& event);

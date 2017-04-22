@@ -37,6 +37,10 @@
     <VirtualDirectory Name="PathGenWnd">
       <File Name="PathGeneratorFrame.h"/>
       <File Name="PathGeneratorFrame.cpp"/>
+      <File Name="SvgPathGenerator.cpp"/>
+      <File Name="SvgPathGenerator.h"/>
+      <File Name="PathGeneratorBase.h"/>
+      <File Name="PathGenerators.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
       <File Name="SerialEmulatorFile.cpp"/>
@@ -65,8 +69,6 @@
       <File Name="SVGUserAgent.h"/>
       <File Name="SVGUserAgentInfo.h"/>
       <File Name="SvgViewBox.h"/>
-      <File Name="SvgPathGenerator.h"/>
-      <File Name="SvgPathGenerator.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <File Name="CncArduino.cpp"/>

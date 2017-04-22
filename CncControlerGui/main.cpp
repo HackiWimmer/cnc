@@ -44,6 +44,10 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 	// redirect cnc::trc
 	CncCmsgBuf*  psbufCmsg;
 	std::streambuf *sbOldCmsg;
+	
+	// redirect cnc::pgt
+	CncCpgtBuf*  psbufCpgt;
+	std::streambuf *sbOldCpgt;
 
 	// redirect cnc::trc
 	CncCspyBuf*  psbufCspy;
@@ -54,6 +58,10 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 		CncMsgLogStream msg;
 		CncTraceLogStream trc;
 		CncBasicLogStream cex1;
+		
+		namespace pg {
+			CncPGTLogStream trc;
+		}
 	};
 	
 ///////////////////////////////////////////////////////////////////
@@ -92,6 +100,12 @@ void installStreamRedirection(MainFrame* mainFrame) {
 	((iostream*)&cnc::msg)->rdbuf(psbufCmsg);
 	cnc::msg.setLogStreamBuffer(psbufCmsg);
 	
+	// redirect Path generator ctrace buffer
+	psbufCpgt = new CncCpgtBuf(mainFrame->getCtrlPathGeneratorTrace());
+	sbOldCpgt = cnc::pg::trc.rdbuf();
+	((iostream*)&cnc::pg::trc)->rdbuf(psbufCpgt);
+	cnc::pg::trc.setLogStreamBuffer(psbufCpgt);
+	
 	// redirect serial spy buffer
 	psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
 	sbOldCspy = cnc::spy.rdbuf();
@@ -109,6 +123,7 @@ void resetStreamRedirection() {
 	((iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
 	((iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
 	((iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
+	((iostream*)&cnc::pg::trc)->rdbuf(sbOldCpgt);
 	((iostream*)&cnc::spy)->rdbuf(sbOldCspy);
 	
 	// delete stream buffers
@@ -118,6 +133,7 @@ void resetStreamRedirection() {
 	delete psbufCex1;
 	delete psbufCtrc;
 	delete psbufCmsg;
+	delete psbufCpgt;
 	delete psbufCspy;
 }
 
@@ -186,6 +202,7 @@ class MainApp : public wxApp {
 						mdc.DrawText(_programVersion, {50,235});
 						
 						/*
+						//todo
 						mdc.SetFont(wxFontInfo(9).FaceName("Helvetica").Italic().Bold());
 						mdc.SetTextForeground(wxColor(0,174,239));
 						mdc.DrawText(_copyRight, {12,338});

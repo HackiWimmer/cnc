@@ -155,7 +155,7 @@ class SVGUserAgent{
 					val << elementId;
 				}
 				
-				DataControlModel::addKeyCheckValueRow(rows, (int)sua.lineNumber, val);
+				DataControlModel::addKeyCheckValueRow(rows, (int)sua.lineNumber, sua.shouldProceed(), val);
 				for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
 					oCtl.inboundPathList->AppendItem(*it);
 				}

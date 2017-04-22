@@ -751,6 +751,8 @@ void CncControl::changeWorkSpeedXY(CncSpeed s) {
 	wxASSERT(guiCtlSetup);
 	
 	cncConfig->setActiveSpeedXY(s);
+	//todo
+	//processSetter(PID_SWITCH_MOVE_MODE_STATE, (s == CncSpeedWork));
 	processSetter(PID_SPEED_X, cncConfig->getSpeedX());
 	processSetter(PID_SPEED_Y, cncConfig->getSpeedY());
 	
@@ -765,6 +767,7 @@ void CncControl::changeWorkSpeedZ(CncSpeed s) {
 	wxASSERT(guiCtlSetup);
 	
 	cncConfig->setActiveSpeedZ(s);
+	//processSetter(PID_SWITCH_MOVE_MODE_STATE, (s == CncSpeedWork));
 	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
 	
 	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedZ(cncConfig->getSpeedZ());

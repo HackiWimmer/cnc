@@ -13,6 +13,11 @@ namespace cnc {
 	extern CncMsgLogStream msg;
 	extern CncSerialSpyStream spy;
 	
+	namespace pg {
+		extern CncPGTLogStream trc;
+	}
+	
+	
 	bool dblCompare( double a, double b, double eps = std::numeric_limits<double>::epsilon());
 }
 
@@ -39,8 +44,6 @@ static const unsigned int MainSetupPage 			= 1;
 static const unsigned int MainTestPage 				= 2; 
 static const unsigned int MainManuallyPage 			= 3;
 static const unsigned int MainTemplatePage 			= 4;
-static const unsigned int MainSerialSpy 			= 5;
-
 
 static const unsigned int TemplateContentPage 		= 0; 
 static const unsigned int TemplateUserAgentPage 	= 1;
