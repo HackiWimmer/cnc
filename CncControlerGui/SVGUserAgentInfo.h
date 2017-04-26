@@ -57,8 +57,11 @@ struct SVGUserAgentInfo {
 		
 	public:
 	
+		enum NodeType { NT_UNDEFINED, NT_PATH, NT_CNC_PARAM };
+	
 		unsigned int lineNumber = UNDEFINED_LINE_NUMBER;
-		wxString nodeType;
+		NodeType nodeType = NT_UNDEFINED;
+		wxString nodeName;
 		wxString originalPath;
 		
 		CncWorkingParameters workingParameters;
@@ -125,37 +128,39 @@ struct SVGUserAgentInfo {
 			wxString value;
 			
 			DataControlModel::addKeyValueRow(rows, "Line Number", 	(int)lineNumber);
-			DataControlModel::addKeyValueRow(rows, "Node", 			nodeType);
+			DataControlModel::addKeyValueRow(rows, "Node", 			nodeName);
 			
-			value.clear();
-			for (DoubleStringMap::iterator it=attributes.begin(); it!=attributes.end(); ++it) {
-				value += it->first;
-				value += "=";
-				value += it->second;
-				value += " ";
-			}
-			DataControlModel::addKeyValueRow(rows, "Attributes", value);
-
 			workingParameters.getParameterList(rows);
-	
-			value.clear();
-			DataControlModel::addKeyValueRow(rows, "IDs", (int)ids.size());
-			for (DoubleStringMap::iterator it=ids.begin(); it!=ids.end(); ++it) {
-				value  = it->second;
-				value += "(";
-				value += it->first;
-				value += ")   ";
-				DataControlModel::addKeyValueRow(rows, "  id", value);
-			}
-			
-			DataControlModel::addKeyValueRow(rows, "transform", (int)transformList.size());
-			for (TransformVector::iterator it=transformList.begin(); it!=transformList.end(); ++it) {
-				DataControlModel::addKeyValueRow(rows, "  cmd", *it);
-			}
-			
-			DataControlModel::addKeyValueRow(rows, "style", (int)styleList.size());
-			for (StyleVector::iterator it=styleList.begin(); it!=styleList.end(); ++it) {
-				DataControlModel::addKeyValueRow(rows, "  style", *it);
+						
+			if ( nodeType == NT_PATH ) {
+				value.clear();
+				for (DoubleStringMap::iterator it=attributes.begin(); it!=attributes.end(); ++it) {
+					value += it->first;
+					value += "=";
+					value += it->second;
+					value += " ";
+				}
+				DataControlModel::addKeyValueRow(rows, "Attributes", value);
+
+				value.clear();
+				DataControlModel::addKeyValueRow(rows, "IDs", (int)ids.size());
+				for (DoubleStringMap::iterator it=ids.begin(); it!=ids.end(); ++it) {
+					value  = it->second;
+					value += "(";
+					value += it->first;
+					value += ")   ";
+					DataControlModel::addKeyValueRow(rows, "  id", value);
+				}
+				
+				DataControlModel::addKeyValueRow(rows, "transform", (int)transformList.size());
+				for (TransformVector::iterator it=transformList.begin(); it!=transformList.end(); ++it) {
+					DataControlModel::addKeyValueRow(rows, "  cmd", *it);
+				}
+				
+				DataControlModel::addKeyValueRow(rows, "style", (int)styleList.size());
+				for (StyleVector::iterator it=styleList.begin(); it!=styleList.end(); ++it) {
+					DataControlModel::addKeyValueRow(rows, "  style", *it);
+				}
 			}
 		}
 		
@@ -191,6 +196,9 @@ struct SVGUserAgentInfo {
 		
 		/////////////////////////////////////////////////////////
 		void getPathDetails(DcmItemList& rows) {
+			if ( nodeType != NT_PATH ) 
+				return;
+				
 			DataControlModel::addKeyValueRow(rows, "Path", originalPath);
 			for ( PathInfoVector::iterator it=pathInfoList.begin(); it!=pathInfoList.end(); ++it ) {
 				PathInfo pi = *it;

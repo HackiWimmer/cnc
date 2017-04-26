@@ -254,7 +254,6 @@ class CncControl {
 		void clearDrawControl();
 		void updateDrawControl();
 		void reconstructDrawControl(int oldCorrectionY, long oldNpX, long oldNpY);
-		void reconstructDrawControl(double fact, double factOld);
 		void redrawDrawPane(double fact); // Only for WM_PAINT event
 		wxPoint& convertToCoordiateSystem(wxPoint& in);
 		unsigned int traceDrawPane(wxTextCtrl* ctl);
@@ -390,9 +389,9 @@ class CncControl {
 		const MontionMoinorMode& getMotionMonitorMode() const   { return motionMonitorMode; }
 		
 		// Marker repaint
-		void drawXMarkerBottom(wxDC& dc);
-		void drawXMarkerTop(wxDC& dc);
-		void drawYMarker(wxDC& dc);
+		void drawXMarkerBottom(wxDC& dc, double zoom);
+		void drawXMarkerTop(wxDC& dc, double zoom);
+		void drawYMarker(wxDC& dc, double zoom);
 };
 
 #endif

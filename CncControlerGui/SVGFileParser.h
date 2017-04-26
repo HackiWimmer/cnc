@@ -209,6 +209,7 @@ class SVGFileParser {
 		void appendDebugValueDetail(DcmItemList& rows);
 		void appendDebugValuesToTrace(wxDataViewListCtrl* ctl, wxXmlNode* node);
 
+		void initXMLNode(wxXmlNode *child);
 		void debugXMLNode(wxXmlNode *child);
 		void debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString);
 		

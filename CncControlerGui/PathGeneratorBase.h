@@ -1,46 +1,156 @@
 #ifndef PATH_GENERATOR_BASE_H
 #define PATH_GENERATOR_BASE_H
 
+#include <map>
 #include <wx/string.h>
+#include <wx/propgrid/manager.h>
 #include <wx/valnum.h>
-#include "SvgPathGenerator.h"
+#include "SvgPathGroup.h"
 
-#define DEFAULT_PARAMETER_VALUE  0.0;
+#define DEFAULT_PARAMETER_VALUE_TYPE 		""
+#define DEFAULT_PARAMETER_NUM_VALUE 		0.0
+#define DEFAULT_PARAMETER_ENUM_VALUE		0
+#define DEFAULT_PARAMETER_STRING_VALUE		_T("")
 
-class PathGenertorBase {
+typedef std::map<wxString, wxString> CncParameterBlockMap;
+class PathGeneratorBase {
 	
 	public:
 		///////////////////////////////////////////////////////////////////
 		struct ParameterInfo {
 			wxString label			= "";
 			wxString help			= "";
+			wxString propertyType 	= DEFAULT_PARAMETER_VALUE_TYPE;
 			
+			wxVariant value;
+			
+			// num members
 			double minRange			= 0;
 			double maxRange			= 0;
 			unsigned int precision	= 0;
 			
-			double value			= DEFAULT_PARAMETER_VALUE;
+			// string members
+			unsigned int maxLength	= -1;
+			
+			// enum members
+			wxArrayString enumItems;
 			
 			///////////////////////////////////////////////////////////////
-			void setup(const wxString& l, double v, double min, double max, double prec) {
+			int setupParameter(const wxString& index, const wxString& name, const wxString& type, const wxString& val) {
+				long i; index.ToLong(&i);
+				if ( i < 0 )
+					return i;
+					
+				label			= name;
+				propertyType 	= type;
+				value 			= val;
+				return i;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setupNum(const wxString& l, double v, double min, double max, double prec) {
+				propertyType = wxPG_VARIANT_TYPE_DOUBLE;
+				
 				label 		= l;
 				value 		= v;
 				minRange 	= min;
 				maxRange 	= max;
 				precision 	= prec;
+				
+				help.clear();
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setupString(const wxString& l, const wxString& v, unsigned int ml = -1) {
+				propertyType = wxPG_VARIANT_TYPE_STRING;
+				
+				label 		= l;
+				value		= v;
+				maxLength	= ml;
+				
+				help.clear();
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setupBool(const wxString& l, bool v) {
+				propertyType = wxPG_VARIANT_TYPE_BOOL;
+				
+				label 		= l;
+				value		= v;
+
+				help.clear();
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setupEnum(const wxString& l, wxString items, long v) {
+				propertyType = wxPG_VARIANT_TYPE_LIST;
+				
+				label 		= l;
+				value		= v;
+				
+				enumItems.clear();
+				wxStringTokenizer tokenizer(items, ";");
+				while ( tokenizer.HasMoreTokens() ) {
+					wxString token = tokenizer.GetNextToken();
+					enumItems.Add(token);
+				}
+
+				help.clear();
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setupEnum(const wxString& l, wxArrayString items, long v) {
+				propertyType = wxPG_VARIANT_TYPE_LIST;
+				
+				label 		= l;
+				value		= v;
+				enumItems	= items;
+
+				help.clear();
+			}
+			
+			///////////////////////////////////////////////////////////////
+			const wxString& getValueAsString() {
+				static wxString s;
+				
+				if ( propertyType == wxPG_VARIANT_TYPE_LIST ) {
+					s = wxString::Format("%s", enumItems.Item(value.GetLong()));
+				} else {
+					s = value.GetString();
+				}
+				
+				return s;
 			}
 		};
 		
 		typedef std::map<unsigned int, ParameterInfo> ParameterMap;
 		
 		///////////////////////////////////////////////////////////////////
-		struct CommonValues  {
-			double toolDiameter = 0.0;
-			wxColour pathColour = wxColour(0,0,0);
+		struct CommonValues {
+			bool canToolCorrection 	= true;
+			bool canToolDiameter	= true;
+			bool canPathColour		= true;
+			
+			bool toolCorrection 	= true;
+			double toolDiameter 	= 3.125;
+			wxColour pathColour 	= wxColour(0,0,0);
+			
+			bool configBlock		= true;
+			bool referenceCross 	= true;
+			bool xmlPattern			= true;
+			
+			///////////////////////////////////////////////////////////////
+			void copyCanValues(const CommonValues& from) {
+				canToolCorrection 	= from.canToolCorrection;
+				canToolDiameter		= from.canToolDiameter;
+				canPathColour		= from.canPathColour;
+			}
 		};
 		
 		///////////////////////////////////////////////////////////////////
 		struct TransformValues {
+			bool autoMode			= true;
+			
 			double translateX		= 0.0;
 			double translateY		= 0.0;
 			
@@ -51,27 +161,196 @@ class PathGenertorBase {
 			double rotateX			= 0.0;
 			double rotateY			= 0.0;
 			
-			double skewX			= 1.0;
-			double skewY			= 1.0;
+			double skewX			= 0.0;
+			double skewY			= 0.0;
+			
+			///////////////////////////////////////////////////////////////
+			void copyCanValues(const TransformValues& from) {
+				// currently nothing to do
+			}
 		};
 		
 		///////////////////////////////////////////////////////////////////
-		PathGenertorBase() 
-		: name("")
+		struct CncParameterValues  {
+			bool canReverse			= true;
+			bool canCorrect			= true;
+			
+			bool include			= true;
+			
+			int zDepthMode 			= 0;
+			double zDepth			= 0.0;
+			bool reverse 			= false;
+			int correct 			= 0;
+			
+			///////////////////////////////////////////////////////////////
+			void copyCanValues(const CncParameterValues& from) {
+				canReverse			= from.canReverse;
+				canCorrect			= from.canCorrect;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			const char getModeAsChar() {
+				if ( zDepthMode == 1 )
+					return 'Z';
+					
+				return 'z';
+			}
+			
+			///////////////////////////////////////////////////////////////
+			const char* getCorrectAsString() {
+				switch ( correct ) {
+					case 0: return "none";
+					case 1: return "inner";
+					case 2: return "outer";
+				}
+				return "none";
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setCorrection(const wxString& c) {
+				if 		( c == "inner" )	correct = 1;
+				else if ( c == "outer")		correct = 2;
+				else						correct = 0;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			double getDepth() {
+				if ( zDepthMode == 1 ) {
+					return abs(zDepth);
+				} else {
+					if ( zDepth >= 0.0 )
+						return -zDepth;
+				}
+					
+				return zDepth;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setDepth(const wxString& d) {
+				if ( (char)d[0] == 'Z' )	zDepthMode = 1;
+				else						zDepthMode = 0;
+				
+				wxString v = d.SubString(1, d.length() - 1);
+				v.ToDouble(&zDepth);
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setReverse(const wxString& r) {
+				reverse = (r == "yes" ? true : false ); 
+			}
+		};
+		
+		///////////////////////////////////////////////////////////////////
+		struct XmlPatternResult {
+			ParameterMap pMap;
+			CommonValues commonValues;
+			TransformValues transformValues;
+			CncParameterValues cncParameterValues;
+			
+			wxString checkSum	= _T("");
+			wxString tplName	= _T("");
+			wxString errorInfo 	= _T("");
+			
+			///////////////////////////////////////////////////////////////
+			void reset() {
+				pMap.clear();
+				checkSum.clear();
+				errorInfo.clear();
+				tplName.clear();
+			}
+			
+			///////////////////////////////////////////////////////////////
+			bool setToolDiameter(double d) {
+				if ( d <= 0.0 )
+					return false;
+				
+				commonValues.toolDiameter = d;
+				return true;
+			}
+		};
+		
+		///////////////////////////////////////////////////////////////////
+		PathGeneratorBase() 
+		: errorInfo("")
+		, xmlPattern("")
+		, selectorIndex(-1)
+		, name("")
+		, centerPoint(DBL_MAX, DBL_MAX)
 		{
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		virtual ~PathGenertorBase() {
+		virtual ~PathGeneratorBase() {
 		}
 		
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters() = 0;
-		virtual const wxString& generate() = 0;
+		
+		///////////////////////////////////////////////////////////////////
+		void setSelectorIndex(int index) {
+			selectorIndex = index;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const int getSelectorIndex() const {
+			return selectorIndex;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		long long getCheckSum() {
+			long long ret = std::hash<std::string>{}((const char*)(getName().c_str()));
+			
+			wxASSERT(parameterMap.size());
+			for (ParameterMap::reverse_iterator it=parameterMap.rbegin(); it!=parameterMap.rend(); ++it) {
+				wxString s(it->second.propertyType);
+				ret += (it->first * std::hash<std::string>{}((const char*)(s.c_str())));
+			}
+			
+			return ret%LONG_LONG_MAX;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		wxString getCheckSumAsString() {
+			static wxString s;
+			s = wxString::Format("%llu", getCheckSum());
+			return s;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const wxString& generatePath();
+		const wxString& generatePath(double toolDiameter, const ParameterMap& pMap);
+		
+		///////////////////////////////////////////////////////////////////
+		wxXmlNode* evaluateCncPattern(double toolDiameter, const ParameterMap& pMap);
+		
+		///////////////////////////////////////////////////////////////////
+		unsigned int getParameterCount() {
+			return parameterMap.size();
+		}
 		
 		///////////////////////////////////////////////////////////////////
 		const wxString& getName() {
 			return name;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void resetErrorInfo() {
+			errorInfo.Clear();
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		bool hasErrorInfo() {
+			return ( errorInfo.IsEmpty() == false );
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const wxString& getErrorInfo() {
+			return errorInfo;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const CommonValues& getCommonValues() {
+			return commonValues;
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -80,8 +359,30 @@ class PathGenertorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
+		const TransformValues& getTransformValues() {
+			return transformValues;
+		}
+		
+		///////////////////////////////////////////////////////////////////
 		void setTransformValues(const TransformValues& tv) {
 			transformValues = tv;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const CncParameterValues& getCncParameterValues() {
+			return cncParameterValues;
+		}
+
+		///////////////////////////////////////////////////////////////////
+		void setCncParameterValues(const CncParameterValues& cv) {
+			cncParameterValues = cv;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setParameterValue(unsigned int idx, const wxVariant v) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL )
+				pi->value = v;
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -92,12 +393,76 @@ class PathGenertorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		double getParameterValue(unsigned int idx) {
+		void setParameterValue(unsigned int idx, const wxString& v) {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
-				return pi->value;
+				pi->value = v;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setParameterValue(unsigned int idx, bool v) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL )
+				pi->value = v;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setParameterValue(unsigned int idx, long v) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL )
+				pi->value = v;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const char* getParameterType(unsigned int idx) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL ) {
+				return pi->value.GetType();
+			}
 			
-			return DEFAULT_PARAMETER_VALUE;
+			return DEFAULT_PARAMETER_VALUE_TYPE;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const wxVariant& getParameterValue(unsigned int idx) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL ) {
+				return pi->value;
+			}
+			
+			defaultValue = 0.0;
+			return defaultValue;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		double getParameterNumValue(unsigned int idx) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL ) {
+				if ( pi->propertyType == wxPG_VARIANT_TYPE_DOUBLE )
+					return pi->value.GetDouble();
+			}
+			
+			return DEFAULT_PARAMETER_NUM_VALUE;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		long getParameterEnumValue(unsigned int idx) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL ) {
+				return pi->value.GetLong();
+			}
+			
+			return DEFAULT_PARAMETER_ENUM_VALUE;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const wxString getParameterStringValue(unsigned int idx) {
+			ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi != NULL ) {
+				return pi->value.GetString();
+			}
+			
+			return DEFAULT_PARAMETER_STRING_VALUE;
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -110,15 +475,79 @@ class PathGenertorBase {
 			return NULL;
 		}
 		
-	protected:
-		wxString name;
-		ParameterMap parameterMap;
-		CommonValues commonValues;
+		///////////////////////////////////////////////////////////////////
+		bool isReferencePointDefined() {
+			return ( centerPoint.x != DBL_MAX && centerPoint.y != DBL_MAX);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const wxRealPoint& getReferencePoint() {
+			return centerPoint;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void clearParameters() {
+			parameterMap.clear();
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		static bool decodeXmlPattern(const wxString& pattern, XmlPatternResult& result);
+		
+		///////////////////////////////////////////////////////////////////
+		static const wxString& maskXmlPattern(wxString& pattern);
+		static const wxString& demaskXmlPattern(wxString& pattern);
+		
+	private:
+	
+		wxVariant defaultValue;
+		wxString errorInfo;
+		wxString xmlPattern;
 		TransformValues transformValues;
 		
 		///////////////////////////////////////////////////////////////////
-		void setupParameter(unsigned int idx, const ParameterInfo& pi) {
-			parameterMap[idx] = pi;
+		const wxString& fillConfigBlock(wxString& fragment) {
+			wxString cb;
+			getConfigBlock(cb);
+			
+			fragment.Replace(SvgGeneratorBase::svgConfigPlaceholderBlock, cb, true);
+			return fragment;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void generatePathIntern(SvgPathGroup& spg);
+		
+		///////////////////////////////////////////////////////////////////
+		const wxString& getConfigBlock(wxString& block);
+		
+	protected:
+		
+		int selectorIndex;
+		wxString name;
+		wxRealPoint centerPoint;
+		ParameterMap parameterMap;
+		CommonValues commonValues;
+		CncParameterValues cncParameterValues;
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool generate(SvgPathGroup& spg, double toolDiameter) = 0;
+		virtual bool setReferencePoint(SvgPathGroup& spg) = 0;
+		
+		///////////////////////////////////////////////////////////////////
+		void addErrorInfo(const wxString& ei) {
+			if ( ei.IsEmpty() == false ) {
+				errorInfo << ei;
+				errorInfo << "\n";
+			}
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setTranslateX(double val) { if ( transformValues.autoMode == true ) transformValues.translateX = val; }
+		void setTranslateY(double val) { if ( transformValues.autoMode == true ) transformValues.translateY = val; }
+		// todo ... more tranform values
+		
+		///////////////////////////////////////////////////////////////////
+		void setupParameter(const ParameterInfo& pi) {
+			parameterMap[parameterMap.size()] = pi;
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -129,6 +558,50 @@ class PathGenertorBase {
 			spg.skewX(transformValues.skewX);
 			spg.skewY(transformValues.skewY);
 		}
+		
+		///////////////////////////////////////////////////////////////////
+		void createCncParameterBlock(SvgPathGroup& spg);
+		
+		///////////////////////////////////////////////////////////////////
+		const CncParameterBlockMap& getCncParameterBlock(CncParameterBlockMap& cpm);
+		
+		///////////////////////////////////////////////////////////////////
+		void determineReferencePoint(SvgPathGroup& spg, const wxRealPoint& p) {
+			determineReferencePoint(spg, p.x, p.y);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void determineReferencePoint(SvgPathGroup& spg, double x, double y) {
+			centerPoint.x = x;
+			centerPoint.y = y;
+			
+			spg.setReferencePoint(centerPoint);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setupCCReferencePoint(PathGeneratorBase::ParameterInfo& pi) {
+			wxArrayString items;
+			items.Add("center/center");
+			setupReferencePoint(pi, items, 0);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setupReferencePoint(PathGeneratorBase::ParameterInfo& pi, const wxString& items, long value=0) {
+			pi.setupEnum("Reference Point(x/y)", items, value);
+			pi.help = "Determine the reference point as basis for further transformations.";
+			setupParameter(pi);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setupReferencePoint(PathGeneratorBase::ParameterInfo& pi, const wxArrayString& items, long value=0) {
+			pi.setupEnum("Reference Point(x/y)", items, value);
+			pi.help = "Determine the reference point as basis for further transformations.";
+			setupParameter(pi);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void encodeXmlPattern(const SvgPathGroup& spg);
+		const wxString& getXmlPattern() { return xmlPattern; }
 		
 };
 

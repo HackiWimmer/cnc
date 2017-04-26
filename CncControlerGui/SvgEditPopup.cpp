@@ -1,8 +1,9 @@
 #include "SvgEditPopup.h"
 
-wxString SvgNodeTemplates::_ret;
-unsigned int SvgEditPopup::_idOffset = 0;
+#define svgPathGenItemString								"PGen - Insert last SVG pattern"
+unsigned int SvgEditPopup::_idOffset 						= 0;
 
+wxString SvgNodeTemplates::_ret								= _T("");
 const char* SvgNodeTemplates::CncParameterBlockNodeName		= "CncParameterBlock";
 const char* SvgNodeTemplates::CncBreakBlockNodeName			= "CncBreak";
 const char* SvgNodeTemplates::CncPauseBlockNodeName			= "CncPause";
@@ -120,7 +121,23 @@ const char* SvgNodeTemplates::getCubicBezierPattern() {
 	return _ret.c_str();
 }
 //////////////////////////////////////////////////////////
-wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu* popup) {
+void SvgEditPopup::enablePathGeneratorMenuItem(wxMenu* menu) {
+//////////////////////////////////////////////////////////
+	if ( menu == NULL )
+		return;
+
+	int id = menu->FindItem(svgPathGenItemString);
+	if ( id == wxNOT_FOUND )
+		return;
+		
+	wxMenuItem* item = menu->FindItem(id);
+	if ( item == NULL )
+		return;
+		
+	item->Enable(PathGeneratorFrame::getCurrentGeneratedPath().IsEmpty() == false );
+}
+//////////////////////////////////////////////////////////
+wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu* popup, bool extended) {
 //////////////////////////////////////////////////////////
 	if ( frame == NULL )
 		return NULL;
@@ -139,6 +156,13 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 	popup->Append(idOffset + STC_PM_SELECT_NODE,			wxT("Select current SVG Node"));
 	popup->Append(idOffset + STC_PM_SELECT_NODE_BLOCK,		wxT("Select current SVG Block"));
 	popup->AppendSeparator();
+	
+	if ( extended == true ) {
+		popup->Append(idOffset + STC_PM_PGEN_INSERT_CURRENT_SVG_FRAGMENT,	wxT(svgPathGenItemString));
+		popup->Append(idOffset + STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK,	wxT("PGen - ReGenerate current SVG Pattern"));
+		popup->Append(idOffset + STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK,	wxT("PGen - Open Editor with current SVG Pattern"));
+		popup->AppendSeparator();
+	}
 	
 	wxMenu* cncMenu = new wxMenu("CNC Pattern");
 	popup->AppendSubMenu(cncMenu, "CNC Pattern . . .");
@@ -365,16 +389,101 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 			selectCurrentSvgNodeBlock(ctl);
 	 }, idOffset + STC_PM_SELECT_NODE_BLOCK, wxID_ANY, ctl);
 	 
+	 
+	//............................................
+	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [](wxCommandEvent& event) {
+			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
+			wxASSERT(ctl);
+			ctl->ReplaceSelection(PathGeneratorFrame::getCurrentGeneratedPath());
+			
+	 }, idOffset + STC_PM_PGEN_INSERT_CURRENT_SVG_FRAGMENT, wxID_ANY, ctl);
+	 
+	//............................................
+	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [frame](wxCommandEvent& event) {
+			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
+			wxASSERT(ctl);
+			
+			if ( hasSelection(ctl) == false )
+				selectCurrentSvgNodeBlock(ctl);
+				
+			wxString node(ctl->GetSelectedText());
+			frame->regenerateCurrentSvgNodeFromPopup(ctl, node);
+			
+	 }, idOffset + STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
+	 
+	//............................................
+	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [frame](wxCommandEvent& event) {
+			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
+			wxASSERT(ctl);
+			
+			if ( hasSelection(ctl) == false )
+				selectCurrentSvgNodeBlock(ctl);
+				
+			wxString node(ctl->GetSelectedText());
+			frame->openPathGenWithCurrentSvgNodeFromPopup(ctl, node);
+			
+	 }, idOffset + STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
+	 
 	return popup;
 }
 //////////////////////////////////////////////////////////
-void SvgEditPopup::commentCurrentSvgNode(wxStyledTextCtrl* ctl) {
+bool SvgEditPopup::searchCurrentNode(wxStyledTextCtrl* ctl, EditSearchParam& parameter) {
 //////////////////////////////////////////////////////////
 	if ( ctl == NULL )
-		return;
+		return false;
 		
 	int cp = ctl->GetCurrentPos();
 		
+	parameter.out.startPos	= -1;
+	parameter.out.EndPos	= -1;
+	
+	// find left <
+	ctl->SearchAnchor();
+	int ret = ctl->SearchPrev(0, parameter.in.searchStart);
+	if ( ret != wxNOT_FOUND ) {
+		parameter.out.startPos = ret;
+		
+		// find right >
+		ctl->SearchAnchor();
+		ret = ctl->SearchNext(0, parameter.in.searchEnd);
+		if ( ret != wxNOT_FOUND ) {
+			parameter.out.EndPos = ret;
+			return true;
+		}
+	}
+	
+	cnc::trc.logError(wxString::Format("Cant find '%s' and/or '%s'!", parameter.in.searchStart, parameter.in.searchEnd));
+	ctl->SetCurrentPos(cp);
+	return false;
+}
+//////////////////////////////////////////////////////////
+bool SvgEditPopup::getCurrentSvgNode(wxStyledTextCtrl* ctl, wxString& node) {
+//////////////////////////////////////////////////////////
+	if ( ctl == NULL )
+		return false;
+		
+	EditSearchParam esp;
+	esp.in.searchStart.assign("<");
+	esp.in.searchEnd.assign(">");
+	
+	if ( searchCurrentNode(ctl, esp) == true ) {
+		node.assign(ctl->GetTextRange(esp.out.startPos, esp.out.EndPos));
+		return true;
+	}
+	
+	node.clear();
+	return false;
+}
+//////////////////////////////////////////////////////////
+bool SvgEditPopup::commentCurrentSvgNode(wxStyledTextCtrl* ctl) {
+//////////////////////////////////////////////////////////
+	if ( ctl == NULL )
+		return false;
+		
+	int cp = ctl->GetCurrentPos();
 	int leftPos  = -1;
 	
 	// find left <
@@ -384,8 +493,9 @@ void SvgEditPopup::commentCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		ret++;
 		wxString check = ctl->GetTextRange(ret, ret + 1);
 		if ( check == "!" ) {
+			cnc::trc.logError("Current node is already commented!");
 			ctl->SetCurrentPos(cp);
-			return;
+			return false;
 		}
 		
 		leftPos = ret;
@@ -396,19 +506,21 @@ void SvgEditPopup::commentCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		if ( ret != wxNOT_FOUND ) {
 			ctl->InsertText(ret, "--");
 			ctl->InsertText(leftPos, "!--");
-			return;
+			return true;
 		}
 	}
+	
+	cnc::trc.logError("Cant find '<' and/or '>'!");
 	ctl->SetCurrentPos(cp);
+	return false;
 }
 //////////////////////////////////////////////////////////
-void SvgEditPopup::uncommentCurrentSvgNode(wxStyledTextCtrl* ctl) {
+bool SvgEditPopup::uncommentCurrentSvgNode(wxStyledTextCtrl* ctl) {
 //////////////////////////////////////////////////////////
 	if ( ctl == NULL )
-		return;
+		return false;
 
 	int cp = ctl->GetCurrentPos();
-	
 	int leftPos  = -1;
 	
 	// find left <
@@ -418,8 +530,9 @@ void SvgEditPopup::uncommentCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		ret++;
 		wxString check = ctl->GetTextRange(ret, ret + 1);
 		if ( check != "!" ) {
+			cnc::trc.logError("Current node isn't commented!");
 			ctl->SetCurrentPos(cp);
-			return;
+			return false;
 		}
 		
 		leftPos = ret;
@@ -430,19 +543,21 @@ void SvgEditPopup::uncommentCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		if ( ret != wxNOT_FOUND ) {
 			ctl->Remove(ret-2, ret);
 			ctl->Remove(leftPos, leftPos + 3);
-			return;
+			return true;
 		}
 	}
+	
+	cnc::trc.logError("Cant find '<' and/or '>'!");
 	ctl->SetCurrentPos(cp);
+	return false;
 }
 //////////////////////////////////////////////////////////
-void SvgEditPopup::selectCurrentSvgNode(wxStyledTextCtrl* ctl) {
+bool SvgEditPopup::selectCurrentSvgNode(wxStyledTextCtrl* ctl) {
 //////////////////////////////////////////////////////////
 	if ( ctl == NULL )
-		return;
+		return false;
 		
 	int cp = ctl->GetCurrentPos();
-		
 	int leftPos  = -1;
 	
 	// find left <
@@ -456,72 +571,86 @@ void SvgEditPopup::selectCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		int ret = ctl->SearchNext(0, ">");
 		if ( ret != wxNOT_FOUND ) {
 			ctl->SetSelection(leftPos, ret + 1);
-			return;
+			return true;
 		}
 	}
+	
+	cnc::trc.logError("Cant find '<' and/or '>'!");
 	ctl->SetCurrentPos(cp);
+	return false;
 }
 //////////////////////////////////////////////////////////
-void SvgEditPopup::selectCurrentSvgNodeBlock(wxStyledTextCtrl* ctl) {
+bool SvgEditPopup::selectCurrentSvgNodeBlock(wxStyledTextCtrl* ctl) {
 //////////////////////////////////////////////////////////
 	if ( ctl == NULL )
-		return;
+		return false;
 		
 	int cp = ctl->GetCurrentPos();
-		
-	int leftPos  = -1;
 	
-	// find left <
-	ctl->SearchAnchor();
-	int ret = ctl->SearchPrev(0, "<");
+	// find left prev '<' - open node
+	int ret = wxNOT_FOUND;
+	do {
+		ctl->SearchAnchor();
+		ret = ctl->SearchPrev(0, "<");
+		
+	// skip "</"
+	} while ( ret != wxNOT_FOUND && ctl->GetTextRange(ret + 1, ret + 2) == "/" );
+	
 	if ( ret == wxNOT_FOUND ) {
+		cnc::trc.logError("No XML start tag '<' available");
 		ctl->SetCurrentPos(cp);
-		return;
+		return false;
 	}
-		
-	leftPos = ret;
-		
-	// find rightnode name end 
+	
+	// start pos of the svg block to select	
+	int leftPos = ret;
+	
+	// determine node name
 	ctl->SetCurrentPos(leftPos);
 	wxString c;
 	do {
-		c = ctl->GetTextRange(ret, ret + 1);
+		c.assign(ctl->GetTextRange(ret, ret + 1));
 		ret++;
-	} while ( c.IsEmpty() == false && c[0] != ' ' && c[0] != '\t' && c[0] != '\r' && c[0] != '\n');
+		
+	// step ret++ until one of the follwing charachters is found	
+	} while ( c.IsEmpty() == false && c[0] != '>' && c[0] != ' ' && c[0] != '\t' && c[0] != '\r' && c[0] != '\n');
 	
 	// store node name
-	wxString nodeName = ctl->GetTextRange(leftPos + 1, ret - 1);
+	wxString nodeName(ctl->GetTextRange(leftPos + 1, ret - 1));
 	
-	// search right >
+	// search next right '>'
 	ctl->SetCurrentPos(leftPos);
 	ctl->SearchAnchor();
+	
 	ret = ctl->SearchNext(0, ">");
 	if ( ret == wxNOT_FOUND ) {
+		cnc::trc.logError("Generally no XML end tag '>' available");
 		ctl->SetCurrentPos(cp);
-		return;
+		return false;
 	}
 	
 	// check if current node is closed by itself
-	wxString check = ctl->GetTextRange(ret - 1, ret);
-	
+	wxString check(ctl->GetTextRange(ret - 1, ret));
 	if ( check == "/" ) {
+		// Success! Select text and return
 		ctl->SetSelection(leftPos, ret + 1);
-		return;
+		return true;
 	}
 	
-	// search </nodeName>
-	wxString search("</");
-	search += nodeName;
-	search += ">";
-	std::clog << search << std::endl;
+	// now search </nodename>
+	wxString search(wxString::Format("</%s>", nodeName));
 	
 	ctl->SetCurrentPos(leftPos);
 	ctl->SearchAnchor();
+
 	ret = ctl->SearchNext(0, search);
 	if ( ret == wxNOT_FOUND ) {
+		cnc::trc.logError(wxString::Format("Generally no %s tag available", search));
 		ctl->SetCurrentPos(cp);
-		return;
+		return false;
 	}
 
+	// Success! Select text and return
 	ctl->SetSelection(leftPos, ret + search.length());
+	return true;
 }

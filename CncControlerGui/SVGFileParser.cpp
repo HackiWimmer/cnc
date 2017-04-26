@@ -670,11 +670,16 @@ void SVGFileParser::debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrS
 	debugXMLAttribute(attribute->GetNext(), attrString);
 }
 //////////////////////////////////////////////////////////////////
-void SVGFileParser::debugXMLNode(wxXmlNode *child) {
+void SVGFileParser::initXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
 	wxXmlAttribute* attr = child->GetAttributes();
 	svgUserAgent.setNodeType(child->GetName());
 	svgUserAgent.addXMLAttributes(attr);
+}
+//////////////////////////////////////////////////////////////////
+void SVGFileParser::debugXMLNode(wxXmlNode *child) {
+//////////////////////////////////////////////////////////////////
+	initXMLNode(child);
 	
 	if ( runInfo.getCurrentDebugState() == false )
 		return;
@@ -685,7 +690,7 @@ void SVGFileParser::debugXMLNode(wxXmlNode *child) {
 	appendDebugValueBase("Node", child->GetName());
 	
 	wxString content;
-	attr = child->GetAttributes();
+	wxXmlAttribute* attr = child->GetAttributes();
 	debugXMLAttribute(attr, content);
 	appendDebugValueBase("Attributes", content);
 }
@@ -784,7 +789,7 @@ bool SVGFileParser::spool() {
 		
 		if ( performPath(uai) == false ) {
 			std::cerr << "SVGFileParser::performPath: Failed" << std::endl;
-			std::cerr << "Line number: " << uai.lineNumber << ", Node Type: " << uai.nodeType << std::endl;
+			std::cerr << "Line number: " << uai.lineNumber << ", Node Type: " << uai.nodeName << std::endl;
 			return false;
 		}
 		
@@ -1021,13 +1026,22 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			if ( evaluateCncParameters(child) == false )
 				return false;
 				
+			debugXMLNode(child);
+			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
+				
 		} else if (child->GetName() == SvgNodeTemplates::CncBreakBlockNodeName ) {
 			cncNodeBreak = true;
 			std::clog << SvgNodeTemplates::CncBreakBlockNodeName << " detected at line number: " << child->GetLineNumber() << std::endl;
 			
+			debugXMLNode(child);
+			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
+			
 		} else if (child->GetName() == SvgNodeTemplates::CncPauseBlockNodeName ) {
 			//todo
 			std::clog << SvgNodeTemplates::CncPauseBlockNodeName << " isn't currently implemented. Line number: " << child->GetLineNumber() << std::endl;
+			
+			debugXMLNode(child);
+			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
 			
 		} else if (child->GetName().Upper() == "SYMBOL" ) {
 			wxString a = child->GetAttribute("id", "");

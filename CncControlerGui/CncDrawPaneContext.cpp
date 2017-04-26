@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "wx/glcanvas.h"
+#include "CncCommon.h"
 #include "CncDrawPane.h"
 #include "CncDrawPaneContext.h"
 
@@ -33,6 +34,58 @@ CncOpenGLDrawPaneContext::CncOpenGLDrawPaneContext(wxGLCanvas *canvas)
 /////////////////////////////////////////////////////////////////////
 CncOpenGLDrawPaneContext::~CncOpenGLDrawPaneContext() {
 /////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPaneContext::drawZeroPlane() {
+/////////////////////////////////////////////////////////////////////
+	if ( workpieceInfo.drawZeroPlane == false )
+		return;
+		
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	
+	GLfloat c = (GLfloat)128/255;
+	glColor4f(c, c, c, 0.3);
+
+	glBegin(GL_POLYGON);
+		glVertex3f(0.0, 0.0, 0.0);
+		glVertex3f(0.5, 0.0, 0.0);
+		glVertex3f(0.5, 0.5, 0.0);
+		glVertex3f(0.0, 0.5, 0.0);
+	glEnd();
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPaneContext::drawWorkpieceSurface() {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc::dblCompare(workpieceInfo.thickness, 0.0) == true )
+		return;
+		
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		
+	if ( workpieceInfo.drawWorkpieceSurface == true ) {
+		GLfloat c = (GLfloat)64/255;
+		glColor4f(c, c, c, 0.3);
+
+		glBegin(GL_POLYGON);
+			glVertex3f(0.0, 0.0, workpieceInfo.thickness);
+			glVertex3f(0.5, 0.0, workpieceInfo.thickness);
+			glVertex3f(0.5, 0.5, workpieceInfo.thickness);
+			glVertex3f(0.0, 0.5, workpieceInfo.thickness);
+		glEnd();
+	}
+	
+	if ( workpieceInfo.drawWorkpieceOffset == true ) {
+		GLfloat c = (GLfloat)32/255;
+		glColor4f(c, c, c, 0.3);
+
+		glBegin(GL_POLYGON);
+			glVertex3f(0.0, 0.0, workpieceInfo.thickness + workpieceInfo.offset);
+			glVertex3f(0.5, 0.0, workpieceInfo.thickness + workpieceInfo.offset);
+			glVertex3f(0.5, 0.5, workpieceInfo.thickness + workpieceInfo.offset);
+			glVertex3f(0.0, 0.5, workpieceInfo.thickness + workpieceInfo.offset);
+		glEnd();
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPaneContext::drawX() {
@@ -186,6 +239,9 @@ void CncOpenGLDrawPaneContext::displayDataVector(DrawPaneData& dpd) {
 				glEnd();
 			}
 	}
+	
+	drawZeroPlane();
+	drawWorkpieceSurface();
 
     glFlush();
     CncOpenGLDrawPane::CheckGLError();

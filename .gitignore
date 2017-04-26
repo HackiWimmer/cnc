@@ -6,6 +6,7 @@ CnCControl/CncControlerGui/Debug/
 CnCControl/CncControlerGui/Resources/*
 CnCControl/CncControlerGui/Doxyfile
 
+
 *.exe
 *.txt
 *.bat

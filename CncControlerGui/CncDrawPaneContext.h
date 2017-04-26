@@ -9,6 +9,7 @@ struct DisplayAngels {
 ////////////////////////////////////////////////////////////
 
 	private:
+		
 		int angleX;
 		int angleY;
 		int angleZ;
@@ -85,7 +86,8 @@ struct DisplayAngels {
 };
 
 typedef std::vector<DoublePointPair3D> DrawPaneData;
-	
+
+
 ////////////////////////////////////////////////////////////
 class CncOpenGLDrawPaneContext : public wxGLContext {
 ////////////////////////////////////////////////////////////
@@ -93,12 +95,24 @@ class CncOpenGLDrawPaneContext : public wxGLContext {
 	public:
 	    CncOpenGLDrawPaneContext(wxGLCanvas *canvas);
 	    ~CncOpenGLDrawPaneContext();
+		
+		struct WorkpieceInfo {
+			bool drawZeroPlane			= true;
+			bool drawWorkpieceSurface	= true;
+			bool drawWorkpieceOffset	= true;
+			
+			double thickness 			= 0.0;
+			double offset 				= 0.0;
+		};
 	
-	    // render the data 
-	    void displayDataVector(DrawPaneData& dpd);
-	                           
+		// render the data 
+		void displayDataVector(DrawPaneData& dpd);
+		
+		///////////////////////////////////////////////////////
+		void setWorkpieceInfo(const WorkpieceInfo& wi) { workpieceInfo = wi; }
 	
 	private:
+		WorkpieceInfo workpieceInfo;
 		
 		struct Axises {
 
@@ -136,6 +150,9 @@ class CncOpenGLDrawPaneContext : public wxGLContext {
 		void drawX();
 		void drawY();
 		void drawZ();
+		
+		void drawZeroPlane();
+		void drawWorkpieceSurface();
 };
 
 #endif

@@ -2,6 +2,7 @@
 #define CNC_COMMON_INCLUDES
 
 #include <cmath>
+#include <cfloat>
 #include <limits>
 
 #include "CncStreamBuffers.h"

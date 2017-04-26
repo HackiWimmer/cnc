@@ -147,6 +147,7 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		static CncOpenGLDrawPaneContext* globalContext;
 		static const unsigned int DEFAULT_SPIN_TIMER_INTERVAL = 50;
 
+		CncOpenGLDrawPaneContext::WorkpieceInfo workpieceInfo;
 		unsigned int spinTimerInterval;
 		ViewPort viewPort;
 		Translate translate;
@@ -204,6 +205,8 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		// current data vector
 		DrawPaneData& getDataVector();
 		DrawPaneData& clearDataVector();
+		
+		void setWorkpieceInfo(const CncOpenGLDrawPaneContext::WorkpieceInfo& wi);
 		
 		// repaining
 		void displayDataVector();

@@ -265,6 +265,8 @@ class MainApp : public wxApp {
 			wxImage::AddHandler( new wxJPEGHandler );
 			wxInitAllImageHandlers();
 			
+			wxValidator::SuppressBellOnError(true);
+			
 			// init file and dir names
 			CncFileNameService::init();
 			

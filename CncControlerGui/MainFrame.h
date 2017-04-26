@@ -31,32 +31,36 @@ typedef std::vector<wxWindow*> GuiControls;
 class MainFrame : public MainFrameBClass {
 	
 	public:
+		//////////////////////////////////////////////////////////////////////////////////
 		MainFrame(wxWindow* parent);
 		virtual ~MainFrame();
 		
+		//////////////////////////////////////////////////////////////////////////////////
 		void initialize(void);
+		
+		//////////////////////////////////////////////////////////////////////////////////
+		// global trace controls
 		wxTextCtrl* getLogger() { return m_logger; }
 		wxTextCtrl* getTrace() { return m_tmpTraceInfo; }
 		wxTextCtrl* getCtrlMessageHistory() { return m_controllerMsgHistory; }
 		wxTextCtrl* getCtrlPathGeneratorTrace() { return pathGenerator->getPathTrace(); }
 		wxTextCtrl* getCtrlSerialSpy() { return serialSpy; }
 		
+		//////////////////////////////////////////////////////////////////////////////////
+		// setup
 		void install3DPane();
 		void installSypControl();
 		
+		//////////////////////////////////////////////////////////////////////////////////
+		// svg edit popup callbacks
+		void regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
+		void openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
+		
+		//////////////////////////////////////////////////////////////////////////////////
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
-protected:
-    virtual void markSerialSpy(wxCommandEvent& event);
-    virtual void viewSpy(wxCommandEvent& event);
-    virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event);
-	virtual void requestErrorCount(wxCommandEvent& event);
-    virtual void paintXAxisMarkerBottom(wxPaintEvent& event);
-    virtual void paintXAxisMarkerTop(wxPaintEvent& event);
-    virtual void paintYAxisMarker(wxPaintEvent& event);
-    virtual void paintDrawPaneWindow(wxPaintEvent& event);
-    virtual void UpdateLogger(wxCommandEvent& event);
- 
+	protected:
+   
 		// will be bind to this frame
 		void globalKeyDownHook(wxKeyEvent& event);
  
@@ -64,7 +68,6 @@ protected:
 		InterruptThread* pThread;
 		wxCriticalSection pThreadCS;
 		friend class InterruptThread;
-		
 		
 	private:
 		// Member variables
@@ -113,6 +116,11 @@ protected:
 		GuiControls	guiControls;
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
+		
+		///////////////////////////////////////////////////////////////
+		// Path Generator
+		void displayPGenErrorInfo(const wxString& errorInfo);
+		bool verifyPathGenertorNode(wxXmlDocument& xmlDoc, const wxString& node, wxString& errorInfo);
 		
 		///////////////////////////////////////////////////////////////
 		// File handling
@@ -308,8 +316,26 @@ protected:
 		
 		void setDisplayAngels3D();
 		
+		void decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl);
+		
 	protected:
 		// User command
+		virtual void emuContentDClick(wxMouseEvent& event);
+		virtual void fileContentDClick(wxMouseEvent& event);
+		virtual void changeDrawPaneZoom(wxCommandEvent& event);
+		virtual void onMouseWheelDrawPane(wxMouseEvent& event);
+		virtual void onKeyDownDrawPane(wxKeyEvent& event);
+		virtual void update3DDrawOptions(wxCommandEvent& event);
+		virtual void viewSpeed(wxCommandEvent& event);
+		virtual void markSerialSpy(wxCommandEvent& event);
+		virtual void viewSpy(wxCommandEvent& event);
+		virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event);
+		virtual void requestErrorCount(wxCommandEvent& event);
+		virtual void paintXAxisMarkerBottom(wxPaintEvent& event);
+		virtual void paintXAxisMarkerTop(wxPaintEvent& event);
+		virtual void paintYAxisMarker(wxPaintEvent& event);
+		virtual void paintDrawPaneWindow(wxPaintEvent& event);
+		virtual void UpdateLogger(wxCommandEvent& event);
 		virtual void perspectiveDefault(wxCommandEvent& event);
 		virtual void perspectiveRun(wxCommandEvent& event);
 		virtual void perspectiveTemplate(wxCommandEvent& event);
@@ -467,7 +493,6 @@ protected:
 		virtual void keyDownZ(wxKeyEvent& event);
 		virtual void keyDownXY(wxKeyEvent& event);
 		virtual void clearDrawPane(wxCommandEvent& event);
-		virtual void zoomDrawPane(wxCommandEvent& event);
 		virtual void changeUpdateInterval(wxCommandEvent& event);
 		virtual void emergencyStop(wxCommandEvent& event);
 		virtual void defineDebugSerial(wxCommandEvent& event);

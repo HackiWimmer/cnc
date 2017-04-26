@@ -6,6 +6,7 @@ class wxStaticText;
 class wxStaticBitmap;
 class wxWindow;
 class wxPanel;
+class wxCheckBox;
 class wxSlider;
 class wxDataViewListCtrl;
 class CncOpenGLDrawPane;
@@ -57,6 +58,10 @@ struct GuiControlSetup {
 	wxDataViewListCtrl* controllerConfig		= NULL;
 	wxDataViewListCtrl* controllerPinReport		= NULL;
 	wxDataViewListCtrl* controllerErrorInfo		= NULL;
+	
+	wxCheckBox* cb3DDrawZeroPlane				= NULL;
+	wxCheckBox* cb3DDrawWorkpieceSurfacePlane	= NULL;
+	wxCheckBox* cb3DDrawWorkpieceOffset			= NULL;
 
 };
 

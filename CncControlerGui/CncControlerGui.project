@@ -37,10 +37,25 @@
     <VirtualDirectory Name="PathGenWnd">
       <File Name="PathGeneratorFrame.h"/>
       <File Name="PathGeneratorFrame.cpp"/>
-      <File Name="SvgPathGenerator.cpp"/>
-      <File Name="SvgPathGenerator.h"/>
-      <File Name="PathGeneratorBase.h"/>
-      <File Name="PathGenerators.h"/>
+      <VirtualDirectory Name="Generators">
+        <VirtualDirectory Name="Dedicated Generators">
+          <File Name="PathGenerators.h"/>
+          <File Name="PathGeneratorBase.h"/>
+          <File Name="PathGeneratorBase.cpp"/>
+        </VirtualDirectory>
+        <File Name="SvgPathGroup.cpp"/>
+        <File Name="SvgPathString.cpp"/>
+        <File Name="SvgPathFragment.cpp"/>
+        <File Name="SvgGeneratorBase.cpp"/>
+        <File Name="SvgGeneratorBase.h"/>
+        <File Name="SvgPathFragment.h"/>
+        <File Name="SvgPathGroup.h"/>
+        <File Name="SvgPathString.h"/>
+      </VirtualDirectory>
+      <File Name="PgPropertyHelpInfos.cpp"/>
+      <File Name="PathGeneratorStore.h"/>
+      <File Name="PathGeneratorStore.cpp"/>
+      <File Name="CncPatternDefinitions.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
       <File Name="SerialEmulatorFile.cpp"/>

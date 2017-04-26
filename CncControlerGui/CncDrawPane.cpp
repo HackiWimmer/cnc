@@ -24,12 +24,12 @@ CncOpenGLDrawPaneContext* CncOpenGLDrawPane::globalContext = NULL;
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncOpenGLDrawPane, wxGLCanvas)
-    EVT_PAINT(CncOpenGLDrawPane::OnPaint)
-    EVT_MOUSE_EVENTS(CncOpenGLDrawPane::OnMouse)
-    EVT_SIZE(CncOpenGLDrawPane::OnSize)
+	EVT_PAINT(CncOpenGLDrawPane::OnPaint)
+	EVT_MOUSE_EVENTS(CncOpenGLDrawPane::OnMouse)
+	EVT_SIZE(CncOpenGLDrawPane::OnSize)
 	EVT_ERASE_BACKGROUND(CncOpenGLDrawPane::OnEraseBackground)
-    EVT_KEY_DOWN(CncOpenGLDrawPane::OnKeyDown)
-    EVT_TIMER(SpinTimer, CncOpenGLDrawPane::OnSpinTimer)
+	EVT_KEY_DOWN(CncOpenGLDrawPane::OnKeyDown)
+	EVT_TIMER(SpinTimer, CncOpenGLDrawPane::OnSpinTimer)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////////////
@@ -71,6 +71,11 @@ void CncOpenGLDrawPane::trace(const wxString& msg) {
 	} else {
 		std::cout << msg << endl;
 	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::setWorkpieceInfo(const CncOpenGLDrawPaneContext::WorkpieceInfo& wi) {
+/////////////////////////////////////////////////////////////////////
+	workpieceInfo = wi;
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::runOpenGLTest() {
@@ -367,6 +372,8 @@ void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
 
 	CncOpenGLDrawPaneContext& dpc = CncOpenGLDrawPane::initGlobalContext(this);
 	SetCurrent(*globalContext);
+	
+	dpc.setWorkpieceInfo(workpieceInfo);
 		
 	// Initialize the global OpenGl data with the first call of OnPaint
 	if ( globalData.isInitialized() == false ) {

@@ -47,39 +47,47 @@ public:
 			return xMarkerType;
 		}
 		//////////////////////////////////////////////////////////////
-		void setPosition(wxPoint p) {
+		void setPosition(wxPoint p, double zoom) {
 			if ( xMarkerTop == NULL || xMarkerBottom == NULL || yMarker == NULL )
 				return;
 				
 			position = p;
-				
+			
 			wxClientDC xDc((xMarkerType == XMarkerTop ? xMarkerTop : xMarkerBottom));
 			wxClientDC yDc(yMarker);
 			
-			drawPosX(xDc);
-			drawPosY(yDc);
+			drawPosX(xDc, zoom);
+			drawPosY(yDc, zoom);
 		}
 		//////////////////////////////////////////////////////////////
-		void drawPosX(wxDC& xDc) {
+		void drawPosX(wxDC& xDc, double zoom) {
 			xDc.SetPen(*wxBLACK_PEN);
 			xDc.SetBrush(*wxBLACK_BRUSH);
 			
 			xDc.Clear();
+			xDc.SetUserScale(zoom, zoom);
+			int x = xDc.LogicalToDeviceX(position.x);
+			xDc.SetUserScale(1.0, 1.0);
+			
 			if ( xMarkerType == XMarkerTop ) {
-				wxPoint xP[3] = {{position.x - 2, 0}, {position.x + 2, 0}, {position.x, 5}};
+				wxPoint xP[3] = {{x - 2, 0}, {x + 2, 0}, {x, 5}};
 				xDc.DrawPolygon(3, xP);
 			} else {
-				wxPoint xP[3] = {{position.x - 2, 5}, {position.x + 2, 5}, {position.x, 0}};
+				wxPoint xP[3] = {{x - 2, 5}, {x + 2, 5}, {x, 0}};
 				xDc.DrawPolygon(3, xP);
 			}
 		}
 		//////////////////////////////////////////////////////////////
-		void drawPosY(wxDC& yDc) {
+		void drawPosY(wxDC& yDc, double zoom) {
 			yDc.SetPen(*wxBLACK_PEN);
 			yDc.SetBrush(*wxBLACK_BRUSH);
 			
 			yDc.Clear();
-			wxPoint yP[3] = {{0, position.y - 2}, {0, position.y + 2}, {5, position.y}};
+			yDc.SetUserScale(zoom, zoom);
+			int y = yDc.LogicalToDeviceY(position.y);
+			yDc.SetUserScale(1.0, 1.0);
+			
+			wxPoint yP[3] = {{0, y - 2}, {0, y + 2}, {5, y}};
 			yDc.DrawPolygon(3, yP, 0, yOffset);
 		}
 };

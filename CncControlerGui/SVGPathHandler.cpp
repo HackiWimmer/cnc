@@ -39,7 +39,7 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 		
 	if ( toolRadius > 0 ) {
 		std::clog << "SVGPathHandlerCnc::processLinearMove" << std::endl;
-		std::clog << " Tool path corretion will be activated" << std::endl;
+		std::clog << " Tool path correction will be activated" << std::endl;
 		std::clog << " Tool radius: " << toolRadius << std::endl;
 	}
 	

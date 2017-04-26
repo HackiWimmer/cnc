@@ -13,6 +13,10 @@ enum {
 	STC_PM_CNC_PARAM_BLOCK,
 	STC_PM_CNC_BREAK_BLOCK,
 	STC_PM_CNC_PAUSE_BLOCK,
+	STC_PM_PGEN_TOOL_UPDATE_MODE,
+	STC_PM_PGEN_INSERT_CURRENT_SVG_FRAGMENT,
+	STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK,
+	STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK,
 	STC_PM_CIRCLE,
 	STC_PM_ELLIPSE,
 	STC_PM_LINE,
@@ -60,23 +64,57 @@ class SvgNodeTemplates {
 	
 class SvgEditPopup {
 	
-private:
+	private:
 	
 		static unsigned int _idOffset;
-	
+		
+		///////////////////////////////////////////////////////////////////
 		static unsigned int getNextIdOffset() {
 			_idOffset += 100;
 			return _idOffset;
 		}
 		
-	public:
-
-		static wxMenu* createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu* popup);
+		///////////////////////////////////////////////////////////////////
+		static bool hasSelection(wxStyledTextCtrl* ctl) {
+			if ( ctl == NULL )
+				return false;
+				
+			long s, e;
+			ctl->GetSelection(&s, &e);
+			return (e != s);
+		}
 		
-		static void commentCurrentSvgNode(wxStyledTextCtrl* ctl);
-		static void uncommentCurrentSvgNode(wxStyledTextCtrl* ctl);
-		static void selectCurrentSvgNode(wxStyledTextCtrl* ctl);
-		static void selectCurrentSvgNodeBlock(wxStyledTextCtrl* ctl);
+	public:
+		
+		///////////////////////////////////////////////////////////////////
+		struct EditSearchParam {
+			struct In {
+				wxString searchStart;
+				wxString searchEnd;
+			} in;
+			
+			struct Out {
+				int startPos;
+				int EndPos;
+			} out;
+			
+		};
+
+		///////////////////////////////////////////////////////////////////
+		static wxMenu* createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu* popup, bool extended);
+		
+		///////////////////////////////////////////////////////////////////
+		static bool searchCurrentNode(wxStyledTextCtrl* ctl, EditSearchParam& parameter);
+		static bool getCurrentSvgNode(wxStyledTextCtrl* ctl, wxString& node);
+		
+		///////////////////////////////////////////////////////////////////
+		static bool commentCurrentSvgNode(wxStyledTextCtrl* ctl);
+		static bool uncommentCurrentSvgNode(wxStyledTextCtrl* ctl);
+		static bool selectCurrentSvgNode(wxStyledTextCtrl* ctl);
+		static bool selectCurrentSvgNodeBlock(wxStyledTextCtrl* ctl);
+		
+		///////////////////////////////////////////////////////////////////
+		static void enablePathGeneratorMenuItem(wxMenu* menu);
 
 };
 

@@ -25,6 +25,7 @@
 #include <wx/textdlg.h>
 #include "SerialPort.h"
 #include "CncPosition.h"
+#include "CncPatternDefinitions.h"
 #include "SvgUnitCalculator.h"
 #include "EndSwitchDialog.h"
 #include "CncFileNameService.h"
@@ -39,7 +40,7 @@
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
 const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
 const char* _programTitel 		= "Woodworking CNC Controller";
-const char* _programVersion 	= "0.6.4";
+const char* _programVersion 	= "0.6.5";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
 	
@@ -78,7 +79,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , guiCtlSetup(new GuiControlSetup())
 , config(new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
-, pathGenerator(new PathGeneratorFrame(this))
+, pathGenerator(new PathGeneratorFrame(this, m_stcFileContent))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
 , lruFileList(LruFileList(8))
@@ -258,6 +259,7 @@ void MainFrame::installSypControl() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(m_btPathGenerator);
 	registerGuiControl(m_checkManuallyXY);
 	registerGuiControl(m_checkManuallyZ);
 	registerGuiControl(m_testToggleTool);
@@ -298,7 +300,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_setZero);
 	registerGuiControl(m_clearDrawPane);
 	registerGuiControl(m_clearLogger);
-	registerGuiControl(m_cbDrawZoomFactor);
 	registerGuiControl(m_cbUpdateInterval);
 	registerGuiControl(m_svgEmuOpenFileAsSvg);
 	registerGuiControl(m_svgEmuOpenFileAsSource);
@@ -428,6 +429,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	m_miViewMonitor->Check(m_scrollOutbound->IsShown());
 	m_miViewMainView->Check(m_scrollWinMain->IsShown());
 	m_miViewSpy->Check(m_scrollSpy->IsShown());
+	m_miViewSpeed->Check(m_panelSpeed->IsShown());
 	
 	// Show environment information
 	std::ostream stream(m_envrionmentInfo);
@@ -726,12 +728,12 @@ void MainFrame::initialize(void) {
 	m_maxYDimension->SetValidator(val4);
 	m_maxZDimension->SetValidator(val4);
 	
-	wxFloatingPointValidator<float> val5(0, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	wxFloatingPointValidator<float> val5(0, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val5.SetRange(1, 1000);
 	m_maxXYSpeed->SetValidator(val5);
 	m_maxZSpeed->SetValidator(val5);
 	
-	wxFloatingPointValidator<float> val6(1, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	wxFloatingPointValidator<float> val6(1, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val2.SetRange(0.0, 4.0);
 	m_crossingThickness->SetValidator(val2);
 	
@@ -739,8 +741,8 @@ void MainFrame::initialize(void) {
 	val7.SetRange(1, 4000);
 	m_replyThreshold->SetValidator(val7);
 	
-	wxFloatingPointValidator<float> val8(3, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	val7.SetRange(0, 100.0);
+	wxFloatingPointValidator<float> val8(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	val8.SetRange(0, 100.0);
 	m_testDistanceX->SetValidator(val8);
 	m_testDistanceY->SetValidator(val8);
 	m_testDistanceZ->SetValidator(val8);
@@ -751,6 +753,16 @@ void MainFrame::initialize(void) {
 	m_ctrlTestParam3->SetValidator(val9); 
 	m_ctrlTestParam4->SetValidator(val9);
 	m_ctrlTestParam5->SetValidator(val9);
+	
+	// draw
+	double zoomStep 	= 0.1;
+	double defaultZoom 	= 1.0;
+	m_cbDrawPaneZoom->Clear();
+	for (double i = zoomStep; i <= 10.0; i +=zoomStep) 
+		m_cbDrawPaneZoom->Append(wxString::Format("%.1lf", i));
+
+	m_cbDrawPaneZoom->SetStringSelection(wxString::Format("%.1lf", defaultZoom));
+	cnc->setDrawPaneZoomFactor(defaultZoom);
 
 	wxString comment("");
 	comment << "+/-x:           cursor right/left\n";
@@ -1058,6 +1070,10 @@ void MainFrame::determineCncOutputControls() {
 	guiCtlSetup->xAxisMarkerTop		= m_xAxisMarkerTop;
 	guiCtlSetup->xAxisMarkerBottom	= m_xAxisMarkerBottom;
 	guiCtlSetup->yAxisMarker		= m_yAxisMarker;
+	
+	guiCtlSetup->cb3DDrawZeroPlane 				= m_cb3DDrawZeroPlane;
+	guiCtlSetup->cb3DDrawWorkpieceSurfacePlane	= m_cb3DDrawWorkpieceSurfacePlane;
+	guiCtlSetup->cb3DDrawWorkpieceOffset		= m_cb3DDrawWorkpieceOffset;
 	
 	cnc->setGuiControls(guiCtlSetup);
 }
@@ -1798,10 +1814,8 @@ void MainFrame::updateSpeedValues() {
 ///////////////////////////////////////////////////////////////////
 double MainFrame::getDrawPaneFactor() {
 ///////////////////////////////////////////////////////////////////
-	double fact = 1.0;
-	wxString val = m_cbDrawZoomFactor->GetStringSelection();
-	val.ToDouble(&fact);
-	return fact;
+	wxASSERT(cnc && cnc->getCncConfig());
+	return cnc->getCncConfig()->getDrawPaneZoomFactor();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onPaintDrawPane(wxPaintEvent& event) {
@@ -3401,19 +3415,6 @@ void MainFrame::clearDrawPane(wxCommandEvent& event){
 	cnc->clearDrawControl();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::zoomDrawPane(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
-	
-	double fact = getDrawPaneFactor(), factOld = 1.0;
-	factOld = cnc->getCncConfig()->getDrawPaneZoomFactor();
-	
-	cnc->setDrawPaneZoomFactor(fact);
-	cnc->reconstructDrawControl(fact, factOld);
-	
-	setCoordinateSystemType();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::changeUpdateInterval(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -3719,6 +3720,11 @@ void MainFrame::onMotionDrawPane(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
+	if ( event.ControlDown() == true ) {
+		event.Skip();
+		return;
+	}
+	
 	double fact = getDrawPaneFactor();
 	wxPoint p(event.GetPosition().x, event.GetPosition().y);
 	cnc->convertToCoordiateSystem(p);
@@ -3806,6 +3812,9 @@ void MainFrame::fileContentLeftDown(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip(true);
 	updateFileContentPosition();
+	
+	wxASSERT(pathGenerator);
+	pathGenerator->updateEditControlCanReplaceState(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateFileContentPosition() {
@@ -3835,13 +3844,7 @@ void MainFrame::updateFileContentPosition() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openSVGPathGenerator(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( pathGenerator->IsShown() == false ) {
-		pathGenerator->Show();
-	} else {
-		pathGenerator->Raise();
-	}
-	
-	pathGenerator->Iconize(false);
+	pathGenerator->Show(!pathGenerator->IsShown());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestEnableStepperMotors(wxCommandEvent& event) {
@@ -4717,6 +4720,7 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "TemplateManager")	return m_scrollWinFile;
 	else if ( name == "StatusBar")			return m_statusBar;
 	else if ( name == "Spy")				return m_scrollSpy;
+	else if ( name == "Speed")				return m_panelSpeed;
 
 	return NULL;
 }
@@ -4729,6 +4733,7 @@ wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 	else if ( name == "Outbound")			return m_miViewMonitor;
 	else if ( name == "TemplateManager")	return m_miViewTemplateManager;
 	else if ( name == "Spy")				return m_miViewSpy;
+	else if ( name == "Speed")				return m_miViewSpeed;
 
 	return NULL;
 }
@@ -4809,6 +4814,11 @@ void MainFrame::viewMonitor(wxCommandEvent& event) {
 void MainFrame::viewSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	toggleAuiPane("Spy");
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::viewSpeed(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	toggleAuiPane("Speed");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::perspectiveDefault(wxCommandEvent& event) {
@@ -4894,6 +4904,7 @@ void MainFrame::hideAllAuiPanes() {
 	hideAuiPane(m_scrollOutbound,  m_miViewMonitor);
 	hideAuiPane(m_scrollWinMain,   m_miViewMainView);
 	hideAuiPane(m_scrollSpy,       m_miViewSpy);
+	hideAuiPane(m_panelSpeed,      m_miViewSpeed);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewAllAuiPanes() {
@@ -4904,6 +4915,7 @@ void MainFrame::viewAllAuiPanes() {
 	showAuiPane(m_scrollOutbound,  m_miViewMonitor);
 	showAuiPane(m_scrollWinMain,   m_miViewMainView);
 	showAuiPane(m_scrollSpy,       m_miViewSpy);
+	showAuiPane(m_panelSpeed,      m_miViewSpeed);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableSlider(wxMouseEvent& event) {
@@ -5085,8 +5097,10 @@ void MainFrame::fileContentRightDown(wxMouseEvent& event) {
 	}
 	
 	// Show popupmenu at position
-	if ( stcFileContentPopupMenu != NULL )
+	if ( stcFileContentPopupMenu != NULL ) {
+		SvgEditPopup::enablePathGeneratorMenuItem(stcFileContentPopupMenu);
 		m_stcFileContent->PopupMenu(stcFileContentPopupMenu, point);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::emuContentRightDown(wxMouseEvent& event) {
@@ -5102,8 +5116,10 @@ void MainFrame::emuContentRightDown(wxMouseEvent& event) {
 	}
 	
 	// Show popupmenu at position
-	if ( stcEmuContentPopupMenu != NULL )
+	if ( stcEmuContentPopupMenu != NULL ) {
+		SvgEditPopup::enablePathGeneratorMenuItem(stcEmuContentPopupMenu);
 		m_stcEmuSource->PopupMenu(stcEmuContentPopupMenu, point);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::createStcEmuControlPopupMenu() {
@@ -5111,7 +5127,7 @@ void MainFrame::createStcEmuControlPopupMenu() {
 	if ( stcEmuContentPopupMenu != NULL )
 		return;
 
-	stcEmuContentPopupMenu = SvgEditPopup::createMenu(this, m_stcEmuSource, stcEmuContentPopupMenu);
+	stcEmuContentPopupMenu = SvgEditPopup::createMenu(this, m_stcEmuSource, stcEmuContentPopupMenu, false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::createStcFileControlPopupMenu() {
@@ -5119,12 +5135,12 @@ void MainFrame::createStcFileControlPopupMenu() {
 	if ( stcFileContentPopupMenu != NULL )
 		return;
 
-	stcFileContentPopupMenu = SvgEditPopup::createMenu(this, m_stcFileContent, stcFileContentPopupMenu);
+	stcFileContentPopupMenu = SvgEditPopup::createMenu(this, m_stcFileContent, stcFileContentPopupMenu, true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateTemplateListBook() {
 ///////////////////////////////////////////////////////////////////
-	m_templateListbook->SetSelection(0);
+	m_templateToolbook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
@@ -6261,22 +6277,247 @@ void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
 void MainFrame::paintXAxisMarkerBottom(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxPaintDC dc(m_xAxisMarkerBottom);
-	if ( cnc )
-		cnc->drawXMarkerBottom(dc);
+	if ( cnc ) {
+		cnc->drawXMarkerBottom(dc, cnc->getCncConfig()->getDrawPaneZoomFactor());
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::paintXAxisMarkerTop(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxPaintDC dc(m_xAxisMarkerTop);
-	if ( cnc )
-		cnc->drawXMarkerTop(dc);
+	if ( cnc ) {
+		cnc->drawXMarkerTop(dc, cnc->getCncConfig()->getDrawPaneZoomFactor());
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::paintYAxisMarker(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxPaintDC dc(m_yAxisMarker);
-	if ( cnc )
-		cnc->drawYMarker(dc);
+	if ( cnc ) {
+		cnc->drawYMarker(dc, cnc->getCncConfig()->getDrawPaneZoomFactor());
+	}
 }
+///////////////////////////////////////////////////////////////////
+void MainFrame::update3DDrawOptions(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	updateCncConfigTrace();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onKeyDownDrawPane(wxKeyEvent& event) {
+///////////////////////////////////////////////////////////////////
+	event.Skip(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onMouseWheelDrawPane(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( event.ControlDown() == true ) {
+		
+		double diff = 0.1;
+		double newFact = getDrawPaneFactor() + (event.GetWheelRotation() > 0 ? diff : -diff );
+		if ( newFact < diff )
+			newFact = diff;
+			
+		if ( newFact > 10.0 )
+			newFact = 10.0;
+		
+		cnc->setDrawPaneZoomFactor(newFact);
+		m_drawPane->Refresh();
+		m_cbDrawPaneZoom->SetStringSelection(wxString::Format("%.1lf", cnc->getCncConfig()->getDrawPaneZoomFactor()));
+		
+		setCoordinateSystemType();
+		
+		event.Skip(false);
+		return;
+	}
 
+	event.Skip(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::changeDrawPaneZoom(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	double zoom;
+	m_cbDrawPaneZoom->GetStringSelection().ToDouble(&zoom);
+	
+	cnc->setDrawPaneZoomFactor(zoom);
+	m_drawPane->Refresh();
+	
+	setCoordinateSystemType();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::displayPGenErrorInfo(const wxString& errorInfo) {
+///////////////////////////////////////////////////////////////////
+	wxMessageDialog dlg(this, "Path generation failed!", "Path Generator Error Message", wxOK|wxICON_ERROR);
+ 	dlg.SetExtendedMessage(errorInfo);
+	dlg.ShowModal();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node) {
+///////////////////////////////////////////////////////////////////
+	if ( pathGenerator == NULL )
+		return;
+	
+	wxXmlDocument xmlDoc;
+	wxString errorInfo;
+	
+	// check
+	if ( verifyPathGenertorNode(xmlDoc, node, errorInfo) == false ) {
+		displayPGenErrorInfo(errorInfo);
+		return;
+	}
+	
+	wxXmlNode* root = xmlDoc.GetRoot();
+	wxASSERT(root);
+	
+	// setup
+	wxASSERT(pathGenerator);
+	if ( pathGenerator->IsShown() == false ) 
+		pathGenerator->Show();
+	
+	//process
+	wxASSERT( cnc && cnc->getCncConfig() );
+	PathGeneratorStore::RegenerateParameter rp;
+	rp.in.editControl  = ctl;
+	rp.in.toolDiameter = cnc->getCncConfig()->getRouterBitDiameter();
+	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
+	
+	if ( pathGenerator->regenerateSvgBlock(rp) == false ) {
+		displayPGenErrorInfo(rp.out.errorInfo);
+		return;
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node) {
+///////////////////////////////////////////////////////////////////
+	if ( ctl == NULL )
+		return;
+		
+	wxXmlDocument xmlDoc;
+	wxString errorInfo;
+	
+	// check
+	if ( verifyPathGenertorNode(xmlDoc, node, errorInfo) == false ) {
+		displayPGenErrorInfo(errorInfo);
+		return;
+	}
+	
+	wxXmlNode* root = xmlDoc.GetRoot();
+	wxASSERT(root);
+	
+	// setup
+	wxASSERT( cnc && cnc->getCncConfig() );
+	PathGeneratorStore::RegenerateParameter rp;
+	rp.in.editControl  = ctl;
+	rp.in.toolDiameter = cnc->getCncConfig()->getRouterBitDiameter();
+	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
+	
+	// process
+	PathGeneratorStore store;
+	if ( store.regenerateSvgBlock(rp) == false ) {
+		displayPGenErrorInfo(rp.out.errorInfo);
+		return;
+	}
+	
+	// Replace select text
+	ctl->ReplaceSelection(rp.out.resultigSvgFragment);
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::verifyPathGenertorNode(wxXmlDocument& xmlDoc, const wxString& node, wxString& errorInfo) {
+///////////////////////////////////////////////////////////////////
+	if ( node.IsEmpty() == true ) {
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Empty node received, nothing will be done!\n";
+		return false;
+	}
+	
+	if ( node.Find(CncPatternRootName) == wxNOT_FOUND ) {
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Current SVG block didn't contain a CncPattern, nothing will be done!\n";
+		return false;
+	}
+	
+	wxStringInputStream xmlStream(node);
+	if ( xmlDoc.Load(xmlStream) == false ) {
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Cant create an XML document from received node!\n";
+		errorInfo << "Please check the selection.\n";
+		errorInfo << "Nothing will be done!\n";
+		return false;
+	}
+	
+	wxXmlNode* root = xmlDoc.GetRoot();
+	if ( root == NULL ) {
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Cant evaluate a root node.\n";
+		errorInfo << "Please check the selection.\n";
+		errorInfo << "Nothing will be done!\n";
+		return false;
+	}
+	
+	if ( root->GetName() != "g" ) {
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Selected svg fragment didn't start with a <g> element.\n";
+		errorInfo << "Please check the selection.\n";
+		errorInfo << "Nothing will be done!\n";
+		return false;
+	}
+	
+	if ( root->HasAttribute(CncPatternRootName) == false ) {
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Current <g> element didn't contain a " << CncPatternRootName << ".\n";
+		errorInfo << "Please check the selection.\n";
+		errorInfo << "Nothing will be done!\n";
+		return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl) {
+///////////////////////////////////////////////////////////////////
+	if ( event.CmdDown() == false ) {
+		event.Skip(true);
+		return;
+	}
+	
+	if ( ctl == NULL ) {
+		event.Skip(true);
+		return;
+	}
 
+	int prevCp = ctl->GetCurrentPos();
+	int curPos = prevCp;
+	
+	// find left numeric fence
+	char c = (char)ctl->GetCharAt(curPos);
+	while ( isdigit(c) != 0 || c == '.' || c == ',' || c == ' ' || c == '+' || c == '-' )
+		c = (char)ctl->GetCharAt(curPos--);
+	
+	int start = curPos + 2;
+	curPos = prevCp;
+	
+	// find right numeric fence
+	c = (char)ctl->GetCharAt(curPos--);
+	while ( isdigit(c) != 0 || c == '.' || c == ',' || c == ' ' || c == '+' || c == '-' )
+		c = (char)ctl->GetCharAt(curPos++);
+	
+	int end = curPos - 1;
+	
+	// check is something numeric is found
+	if ( start >= end ) {
+		event.Skip(true);
+		return;
+	}
+		
+	// process
+	event.Skip(false);
+	ctl->SetSelection(start, end);
+	
+	// todo
+	cout << start << ", " << end << ": " << ctl->GetTextRange(start, end) << " - "<< ctl->GetStyleAt(start) << endl;
+	
+	
+
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::fileContentDClick(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
+	decodeSvgFragment(event, m_stcFileContent);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::emuContentDClick(wxMouseEvent& event) {
+	decodeSvgFragment(event, m_stcEmuSource);
+}

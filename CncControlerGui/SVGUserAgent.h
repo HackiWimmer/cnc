@@ -26,7 +26,7 @@ class SVGUserAgent{
 	private:
 		SVGUnit unit;
 		CncXYDoubleDimension dimension;
-		wxString nodeType;
+		wxString nodeName;
 		wxString elementId;
 		
 		SVGUserAgentInfo defaultUserAgent;
@@ -132,13 +132,14 @@ class SVGUserAgent{
 		bool initNextPath(CncWorkingParameters& cwp, const wxString& origPath) {
 			SVGUserAgentInfo sua;
 			sua.lineNumber 			= cwp.currentLineNumber;
-			sua.nodeType 			= nodeType;
+			sua.nodeName 			= nodeName;
+			sua.nodeType			= SVGUserAgentInfo::NT_PATH;
 			sua.originalPath		= origPath;
 			sua.workingParameters 	= cwp;
 			
 			// move the following list
 			sua.attributes.swap(collectedAttributes);
-			// copy  the following lists
+			// copy the following lists
 			sua.ids				= collectedIds;
 			sua.transformList 	= collectedTransforms;
 			sua.styleList		= collectedStyles;
@@ -148,7 +149,7 @@ class SVGUserAgent{
 			// add inbound path to user agent list
 			if ( oCtl.inboundPathList != NULL ) {
 				DcmItemList rows;
-				wxString val(sua.nodeType);
+				wxString val(sua.nodeName);
 				
 				if ( elementId.IsEmpty() == false ) {
 					val << ",  id = ";
@@ -164,8 +165,35 @@ class SVGUserAgent{
 		}
 		
 		/////////////////////////////////////////////////////////
+		bool initNextCncNode(CncWorkingParameters& cwp) {
+			SVGUserAgentInfo sua;
+			sua.lineNumber 			= cwp.currentLineNumber;
+			sua.nodeName 			= nodeName;
+			sua.nodeType			= SVGUserAgentInfo::NT_CNC_PARAM;
+			sua.originalPath		= "";
+			sua.workingParameters 	= cwp;
+			
+			// copy the following lists
+			sua.styleList		= collectedStyles;
+			
+			userAgent.push_back(sua);
+			
+			// add inbound path to user agent list
+			if ( oCtl.inboundPathList != NULL ) {
+				DcmItemList rows;
+				wxString val(sua.nodeName);
+				
+				DataControlModel::addKeyCheckValueRow(rows, (int)sua.lineNumber, sua.shouldProceed(), val);
+				for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
+					oCtl.inboundPathList->AppendItem(*it);
+				}
+			}
+			return true;
+		}
+		
+		/////////////////////////////////////////////////////////
 		bool setNodeType(const wxString& t) {
-			nodeType = t;
+			nodeName = t;
 			return true;
 		}
 
@@ -329,7 +357,7 @@ class SVGUserAgent{
 				wxXmlNode* n = new wxXmlNode();
 				n->SetName("UserAgentInfo");
 				n->SetType( wxXML_ELEMENT_NODE);
-				n->AddAttribute("type", uai.nodeType);
+				n->AddAttribute("type", uai.nodeName);
 				n->AddAttribute("line", wxString() << uai.lineNumber);
 				
 				tr->AddChild(n);
