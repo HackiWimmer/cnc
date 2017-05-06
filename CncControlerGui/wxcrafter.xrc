@@ -488,7 +488,7 @@
                                   </object>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
-                                    <border>5</border>
+                                    <border>2</border>
                                     <object class="wxStaticText" name="m_staticText825">
                                       <label/>
                                       <style/>
@@ -496,7 +496,7 @@
                                   </object>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
-                                    <border>5</border>
+                                    <border>2</border>
                                     <object class="wxStaticText" name="m_staticText827">
                                       <label/>
                                       <style/>
@@ -512,7 +512,7 @@
                                   </object>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
-                                    <border>5</border>
+                                    <border>2</border>
                                     <object class="wxStaticText" name="m_staticText832">
                                       <label/>
                                       <style/>
@@ -520,7 +520,7 @@
                                   </object>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
-                                    <border>5</border>
+                                    <border>2</border>
                                     <object class="wxStaticText" name="m_staticText834">
                                       <label/>
                                       <style/>
@@ -657,7 +657,6 @@
                                   </object>
                                   <object class="sizeritem" name="flexGridSizer1165">
                                     <flag>wxALL|wxEXPAND</flag>
-                                    <border>5</border>
                                     <option>1</option>
                                     <object class="wxFlexGridSizer">
                                       <cols>2</cols>
@@ -683,7 +682,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL</flag>
-                                        <border>5</border>
+                                        <border>1</border>
                                         <object class="wxStaticText" name="m_staticText1173">
                                           <label/>
                                           <style/>
@@ -691,7 +690,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL</flag>
-                                        <border>5</border>
+                                        <border>2</border>
                                         <object class="wxComboBox" name="m_homeDefintion">
                                           <style>wxCB_READONLY</style>
                                           <selection>0</selection>
@@ -713,7 +712,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxALIGN_RIGHT</flag>
-                                        <border>5</border>
+                                        <border>2</border>
                                         <minsize>110,-1</minsize>
                                         <object class="wxButton" name="m_moveHome">
                                           <label>Move to Home</label>
@@ -726,14 +725,14 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxEXPAND</flag>
-                                        <border>6</border>
+                                        <border>4</border>
                                         <object class="wxStaticLine" name="m_staticLine2177">
                                           <style>wxLI_HORIZONTAL</style>
                                         </object>
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxEXPAND</flag>
-                                        <border>6</border>
+                                        <border>4</border>
                                         <object class="wxStaticLine" name="m_staticLine2179">
                                           <style>wxLI_HORIZONTAL</style>
                                         </object>
@@ -759,7 +758,7 @@
                                           </object>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxALIGN_RIGHT</flag>
-                                            <border>5</border>
+                                            <border>2</border>
                                             <object class="wxComboBox" name="m_zeroMoveModeXY">
                                               <style>wxCB_READONLY</style>
                                               <tooltip>
@@ -780,7 +779,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxALIGN_RIGHT</flag>
-                                        <border>5</border>
+                                        <border>2</border>
                                         <minsize>110,-1</minsize>
                                         <object class="wxButton" name="m_moveXYtoZero">
                                           <label>Move XY to Zero</label>
@@ -812,7 +811,7 @@
                                           </object>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxALIGN_RIGHT</flag>
-                                            <border>5</border>
+                                            <border>2</border>
                                             <object class="wxComboBox" name="m_zeroMoveModeXYZ">
                                               <style>wxCB_READONLY</style>
                                               <tooltip>
@@ -836,7 +835,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxALIGN_RIGHT</flag>
-                                        <border>5</border>
+                                        <border>2</border>
                                         <minsize>110,-1</minsize>
                                         <object class="wxButton" name="m_moveXYZtoZero">
                                           <label>Move XYZ to Zero</label>
@@ -868,7 +867,7 @@
                                           </object>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxALIGN_RIGHT</flag>
-                                            <border>5</border>
+                                            <border>2</border>
                                             <object class="wxComboBox" name="m_zeroMoveModeZ">
                                               <style>wxCB_READONLY</style>
                                               <tooltip>
@@ -886,7 +885,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxALIGN_RIGHT</flag>
-                                        <border>5</border>
+                                        <border>2</border>
                                         <minsize>110,-1</minsize>
                                         <object class="wxButton" name="m_moveZtoZero">
                                           <label>Move Z to Zero</label>
@@ -928,7 +927,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL|wxEXPAND</flag>
-                                        <border>5</border>
+                                        <border>1</border>
                                         <object class="wxStaticText" name="m_staticText11772">
                                           <label/>
                                           <style/>
@@ -1089,7 +1088,7 @@
                                       </object>
                                       <object class="sizeritem">
                                         <flag>wxALL</flag>
-                                        <border>5</border>
+                                        <border>1</border>
                                         <object class="wxStaticText" name="m_staticText1177">
                                           <label/>
                                           <style/>
@@ -6709,22 +6708,36 @@ Axis</label>
                           <object class="sizeritem">
                             <flag>wxALL|wxEXPAND</flag>
                             <border>1</border>
+                            <minsize>32,-1</minsize>
                             <object class="wxPanel" name="m_zView">
+                              <size>32,-1</size>
                               <bg>wxSYS_COLOUR_BTNTEXT</bg>
                               <tooltip>
                                 <![CDATA[3424324]]>
                               </tooltip>
                             </object>
                           </object>
-                          <object class="spacer" name="Spacer2755">
-                            <size>0,1</size>
-                            <flag>wxALL</flag>
-                            <border>4</border>
-                            <option>1</option>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+                            <object class="wxStaticText" name="m_infoToolDiameter">
+                              <label>0.0</label>
+                              <style/>
+                              <font>
+                                <size>7</size>
+                                <style>normal</style>
+                                <weight>normal</weight>
+                                <family>swiss</family>
+                                <underlined>0</underlined>
+                                <face>Segoe UI</face>
+                              </font>
+                              <tooltip>
+                                <![CDATA[Tool Diameter [mm]]]>
+                              </tooltip>
+                            </object>
                           </object>
                           <object class="sizeritem">
-                            <flag>wxALL</flag>
-                            <border>5</border>
+                            <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+                            <border>1</border>
                             <object class="wxStaticBitmap" name="m_staticBitmap2401">
                               <bitmap>bitmaps/mill.png</bitmap>
                             </object>
@@ -8570,6 +8583,235 @@ Axis</label>
           </object>
         </object>
       </object>
+      <object class="wxAuiPaneInfo">
+        <name>
+          <![CDATA[UnitCalculator]]>
+        </name>
+        <caption>
+          <![CDATA[]]>
+        </caption>
+        <caption-visible>0</caption-visible>
+        <resizable>0</resizable>
+        <direction>wxAUI_DOCK_BOTTOM</direction>
+        <layer>0</layer>
+        <row>1</row>
+        <position>1</position>
+        <bestsize>100,24</bestsize>
+        <maxsize>100,24</maxsize>
+        <minsize>100,24</minsize>
+        <closebtn>1</closebtn>
+        <minbtn>0</minbtn>
+        <maxbtn>0</maxbtn>
+        <pinbtn>1</pinbtn>
+        <toolbar-pane>0</toolbar-pane>
+        <object class="wxPanel" name="m_svgUnitCalulator">
+          <style>wxTAB_TRAVERSAL</style>
+          <font>
+            <size>8</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <family>swiss</family>
+            <underlined>0</underlined>
+            <face>Segoe UI</face>
+          </font>
+          <object class="wxFlexGridSizer">
+            <cols>7</cols>
+            <rows>1</rows>
+            <vgap>0</vgap>
+            <hgap>0</hgap>
+            <growablecols>4</growablecols>
+            <growablerows>0</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>5</border>
+              <object class="wxStaticText" name="m_staticText3261">
+                <label>From</label>
+                <style/>
+                <tooltip>
+                  <![CDATA[SVG Unit Calculator]]>
+                </tooltip>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>2</border>
+              <minsize>-1,20</minsize>
+              <object class="wxComboBox" name="m_cbUCUnitFrom">
+                <style>wxCB_READONLY</style>
+                <size>-1,20</size>
+                <font>
+                  <size>8</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <family>swiss</family>
+                  <underlined>0</underlined>
+                  <face>Segoe UI</face>
+                </font>
+                <tooltip>
+                  <![CDATA[SVG Unit Calculator - Unit from]]>
+                </tooltip>
+                <selection>0</selection>
+                <content>
+                  <item>
+                    <![CDATA[px]]>
+                  </item>
+                  <item>
+                    <![CDATA[pc]]>
+                  </item>
+                  <item>
+                    <![CDATA[pt]]>
+                  </item>
+                  <item>
+                    <![CDATA[mm]]>
+                  </item>
+                  <item>
+                    <![CDATA[cm]]>
+                  </item>
+                  <item>
+                    <![CDATA[m]]>
+                  </item>
+                  <item>
+                    <![CDATA[in]]>
+                  </item>
+                  <item>
+                    <![CDATA[ft]]>
+                  </item>
+                </content>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>5</border>
+              <object class="wxStaticText" name="m_staticText3259">
+                <label>to</label>
+                <style/>
+                <font>
+                  <size>8</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <family>swiss</family>
+                  <underlined>0</underlined>
+                  <face>Segoe UI</face>
+                </font>
+                <tooltip>
+                  <![CDATA[SVG Unit Calculator]]>
+                </tooltip>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>2</border>
+              <object class="wxComboBox" name="m_cbUCUnitTo">
+                <style>wxCB_READONLY</style>
+                <size>-1,20</size>
+                <font>
+                  <size>8</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <family>swiss</family>
+                  <underlined>0</underlined>
+                  <face>Segoe UI</face>
+                </font>
+                <tooltip>
+                  <![CDATA[SVG Unit Calculator - Unit To]]>
+                </tooltip>
+                <selection>3</selection>
+                <content>
+                  <item>
+                    <![CDATA[px]]>
+                  </item>
+                  <item>
+                    <![CDATA[pc]]>
+                  </item>
+                  <item>
+                    <![CDATA[pt]]>
+                  </item>
+                  <item>
+                    <![CDATA[mm]]>
+                  </item>
+                  <item>
+                    <![CDATA[cm]]>
+                  </item>
+                  <item>
+                    <![CDATA[m]]>
+                  </item>
+                  <item>
+                    <![CDATA[in]]>
+                  </item>
+                  <item>
+                    <![CDATA[ft]]>
+                  </item>
+                </content>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizer3266">
+              <flag>wxALL|wxEXPAND</flag>
+              <object class="wxFlexGridSizer">
+                <cols>2</cols>
+                <rows>1</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0,1</growablecols>
+                <growablerows/>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>2</border>
+                  <minsize>-1,20</minsize>
+                  <object class="wxTextCtrl" name="m_cbUCValueFrom">
+                    <style/>
+                    <size>-1,20</size>
+                    <font>
+                      <size>8</size>
+                      <style>normal</style>
+                      <weight>normal</weight>
+                      <family>swiss</family>
+                      <underlined>0</underlined>
+                      <face>Segoe UI</face>
+                    </font>
+                    <tooltip>
+                      <![CDATA[SVG Unit Calculator - Value From]]>
+                    </tooltip>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>2</border>
+                  <object class="wxTextCtrl" name="m_cbUCValueTo">
+                    <style>wxTE_READONLY</style>
+                    <font>
+                      <size>8</size>
+                      <style>normal</style>
+                      <weight>normal</weight>
+                      <family>swiss</family>
+                      <underlined>0</underlined>
+                      <face>Segoe UI</face>
+                    </font>
+                    <tooltip>
+                      <![CDATA[SVG Unit Calculator - Value to]]>
+                    </tooltip>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>2</border>
+              <minsize>20,20</minsize>
+              <object class="wxButton" name="m_btUCClose">
+                <label/>
+                <style/>
+                <size>20,20</size>
+                <tooltip>
+                  <![CDATA[SVG Unit Calculator - Close]]>
+                </tooltip>
+                <bitmap>bitmaps/16-x-close.png</bitmap>
+                <bitmapposition>wxLEFT</bitmapposition>
+                <default>0</default>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
     </object>
     <object class="wxMenuBar" name="m_menuBar">
       <style>wxMB_DOCKABLE</style>
@@ -8694,6 +8936,13 @@ Axis</label>
         <object class="wxMenuItem" name="m_miViewSpeed">
           <checkable>1</checkable>
           <label>CNC Speed Config</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_miViewUnitCalculator">
+          <checkable>1</checkable>
+          <label>SVG UnitCaluclator</label>
           <accel>
             <![CDATA[]]>
           </accel>

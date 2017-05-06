@@ -430,6 +430,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	m_miViewMainView->Check(m_scrollWinMain->IsShown());
 	m_miViewSpy->Check(m_scrollSpy->IsShown());
 	m_miViewSpeed->Check(m_panelSpeed->IsShown());
+	m_miViewUnitCalculator->Check(m_svgUnitCalulator->IsShown());
 	
 	// Show environment information
 	std::ostream stream(m_envrionmentInfo);
@@ -718,7 +719,7 @@ void MainFrame::initialize(void) {
 	val2.SetRange(0, 50.0);
 	m_workpieceThickness->SetValidator(val2);
 
-	wxFloatingPointValidator<float> val3(1, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	wxFloatingPointValidator<float> val3(3, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val3.SetRange(0, 10.0);
 	m_routerBitDiameter->SetValidator(val3);
 	
@@ -753,6 +754,10 @@ void MainFrame::initialize(void) {
 	m_ctrlTestParam3->SetValidator(val9); 
 	m_ctrlTestParam4->SetValidator(val9);
 	m_ctrlTestParam5->SetValidator(val9);
+	
+	wxTextValidator tVal(wxFILTER_NUMERIC);
+	tVal.SetCharIncludes(", ");
+	m_cbUCValueFrom->SetValidator(tVal);
 	
 	// draw
 	double zoomStep 	= 0.1;
@@ -1562,9 +1567,11 @@ void MainFrame::killFocusReplyThreshold(wxFocusEvent& event) {
 	long v = 0;
 	rt.ToLong(&v);
 	
-	cnc->getCncConfig()->setRelyThreshold(v);
-	cnc->setup(false);
-	updateCncConfigTrace();
+	if ( (unsigned long)v != cnc->getCncConfig()->getRelyThreshold() ) {
+		cnc->getCncConfig()->setRelyThreshold(v);
+		cnc->setup(false);
+		updateCncConfigTrace();
+	}
 	
 	event.Skip(true);
 }
@@ -1625,10 +1632,12 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
+	wxASSERT(cnc && cnc->getCncConfig());
 	cnc->updateCncConfigTrace();
 	cnc->updateZSlider();
 	collectSummary();
+	
+	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", cnc->getCncConfig()->getRouterBitDiameter()));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
@@ -3106,6 +3115,7 @@ void MainFrame::collectSummary() {
 	CncConfig* cc = cnc->getCncConfig();
 	
 	DcmItemList rows;
+	DataControlModel::addNumParameterValueUnitRow(rows, "Tool Diameter",					wxString::Format(" %.3f", 	cc->getRouterBitDiameter()), 		" mm"); 
 	DataControlModel::addNumParameterValueUnitRow(rows, "Workpiece thickness", 				wxString::Format(" %4.3f", 	cc->getWorkpieceThickness()), 		" mm"); 
 	DataControlModel::addNumParameterValueUnitRow(rows, "Max thickness per crossing", 		wxString::Format(" %4.3f", 	cc->getMaxDurationThickness()), 	" mm"); 
 	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed XY", 					wxString::Format(" %d", 	cc->getWorkSpeedXY()), 				" rpm"); 
@@ -4721,6 +4731,7 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "StatusBar")			return m_statusBar;
 	else if ( name == "Spy")				return m_scrollSpy;
 	else if ( name == "Speed")				return m_panelSpeed;
+	else if ( name == "UnitCalculator")		return m_svgUnitCalulator;
 
 	return NULL;
 }
@@ -4734,6 +4745,7 @@ wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 	else if ( name == "TemplateManager")	return m_miViewTemplateManager;
 	else if ( name == "Spy")				return m_miViewSpy;
 	else if ( name == "Speed")				return m_miViewSpeed;
+	else if ( name == "UnitCalculator")		return m_miViewUnitCalculator;
 
 	return NULL;
 }
@@ -4821,6 +4833,11 @@ void MainFrame::viewSpeed(wxCommandEvent& event) {
 	toggleAuiPane("Speed");
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::viewUnitCalculator(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	toggleAuiPane("UnitCalculator");
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::perspectiveDefault(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	viewAllAuiPanes();
@@ -4847,15 +4864,23 @@ void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 ///////////////////////////////////////////////////////////////////
 	if ( evt.pane->window == m_scrollWinFile )
 		m_miViewTemplateManager->Check(!m_scrollWinFile->IsShown());
+		
 	else if ( evt.pane->window == m_scrollWinLogger )
 		m_miViewLogger->Check(!m_scrollWinLogger->IsShown());
+		
 	else if ( evt.pane->window == m_scrollOutbound )
 		m_miViewMonitor->Check(!m_scrollOutbound->IsShown());
+		
 	else if ( evt.pane->window == m_scrollWinMain )
 		m_miViewMainView->Check(!m_scrollWinMain->IsShown());
+		
 	else if ( evt.pane->window == m_scrollSpy ) {
 		m_miViewSpy->Check(!m_scrollSpy->IsShown());
 		enableSerialSpy(false);
+		
+	} else if ( evt.pane->window == m_panelSpeed ) {
+		m_miViewSpeed->Check(!m_panelSpeed->IsShown());
+		
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -4905,6 +4930,7 @@ void MainFrame::hideAllAuiPanes() {
 	hideAuiPane(m_scrollWinMain,   m_miViewMainView);
 	hideAuiPane(m_scrollSpy,       m_miViewSpy);
 	hideAuiPane(m_panelSpeed,      m_miViewSpeed);
+	hideAuiPane(m_svgUnitCalulator,m_miViewUnitCalculator);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewAllAuiPanes() {
@@ -4916,6 +4942,7 @@ void MainFrame::viewAllAuiPanes() {
 	showAuiPane(m_scrollWinMain,   m_miViewMainView);
 	showAuiPane(m_scrollSpy,       m_miViewSpy);
 	showAuiPane(m_panelSpeed,      m_miViewSpeed);
+	showAuiPane(m_svgUnitCalulator,m_miViewUnitCalculator);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableSlider(wxMouseEvent& event) {
@@ -6505,12 +6532,10 @@ void MainFrame::decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl) {
 	// process
 	event.Skip(false);
 	ctl->SetSelection(start, end);
+	m_cbUCValueFrom->SetValue(ctl->GetTextRange(start, end));
 	
 	// todo
-	cout << start << ", " << end << ": " << ctl->GetTextRange(start, end) << " - "<< ctl->GetStyleAt(start) << endl;
-	
-	
-
+	// cout << start << ", " << end << ": " << ctl->GetTextRange(start, end) << " - "<< ctl->GetStyleAt(start) << endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::fileContentDClick(wxMouseEvent& event) {
@@ -6519,5 +6544,48 @@ void MainFrame::fileContentDClick(wxMouseEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::emuContentDClick(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
 	decodeSvgFragment(event, m_stcEmuSource);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::closeUnitCalculator(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	hideAuiPane("UnitCalculator");
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectUCUnitFrom(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectUCChangeFrom(event);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectUCUnitTo(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectUCChangeFrom(event);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	SVGUnit from 	= SvgUnitCalculator::determineUnit(m_cbUCUnitFrom->GetStringSelection());
+	SVGUnit to		= SvgUnitCalculator::determineUnit(m_cbUCUnitTo->GetStringSelection());
+	wxString line	= m_cbUCValueFrom->GetValue();
+	
+	m_cbUCValueTo->Clear();
+	
+	if ( line.IsEmpty() == true )
+		return;
+	
+	wxStringTokenizer tokenizer(line, " \t,");
+	while ( tokenizer.HasMoreTokens() ) {
+		wxString token = tokenizer.GetNextToken();
+		if ( token.IsEmpty() )
+			continue;
+		
+		double vFrom, vTo;
+		token.ToDouble(&vFrom);
+		
+		vTo = SvgUnitCalculator::convertUnit2Unit(from, to, vFrom);
+		
+		m_cbUCValueTo->AppendText(wxString::Format("%.3lf", vTo));
+		m_cbUCValueTo->AppendText(wxString(tokenizer.GetLastDelimiter()));
+	}
 }

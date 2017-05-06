@@ -292,11 +292,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_staticText825 = new wxStaticText(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
-    flexGridSizer547->Add(m_staticText825, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer547->Add(m_staticText825, 0, wxALL, WXC_FROM_DIP(2));
     
     m_staticText827 = new wxStaticText(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
-    flexGridSizer547->Add(m_staticText827, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer547->Add(m_staticText827, 0, wxALL, WXC_FROM_DIP(2));
     
     m_staticText631 = new wxStaticText(m_panelReference, wxID_ANY, _("+z"), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
@@ -304,11 +304,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_staticText832 = new wxStaticText(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
-    flexGridSizer547->Add(m_staticText832, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer547->Add(m_staticText832, 0, wxALL, WXC_FROM_DIP(2));
     
     m_staticText834 = new wxStaticText(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
-    flexGridSizer547->Add(m_staticText834, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer547->Add(m_staticText834, 0, wxALL, WXC_FROM_DIP(2));
     
     m_spinButtonZ = new wxSpinButton(m_panelReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), wxSP_VERTICAL);
     m_spinButtonZ->SetRange(0, 100);
@@ -381,7 +381,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1165->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1165->AddGrowableCol(0);
     
-    flexGridSizer1152->Add(flexGridSizer1165, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer1152->Add(flexGridSizer1165, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_staticText1171 = new wxStaticText(m_panelReference, wxID_ANY, _("Home:"), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     m_staticText1171->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
@@ -393,7 +393,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_staticText1173 = new wxStaticText(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
-    flexGridSizer1165->Add(m_staticText1173, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_staticText1173, 0, wxALL, WXC_FROM_DIP(1));
     
     wxArrayString m_homeDefintionArr;
     m_homeDefintionArr.Add(wxT("a) X(min), Y(min), Z(Top)"));
@@ -403,21 +403,21 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_homeDefintion = new wxComboBox(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), m_homeDefintionArr, wxCB_READONLY);
     m_homeDefintion->SetSelection(0);
     
-    flexGridSizer1165->Add(m_homeDefintion, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_homeDefintion, 0, wxALL, WXC_FROM_DIP(2));
     
     m_moveHome = new wxButton(m_panelReference, wxID_ANY, _("Move to Home"), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(110,-1)), 0);
     m_moveHome->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
-    flexGridSizer1165->Add(m_moveHome, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_moveHome, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveHome->SetMinSize(wxSize(110,-1));
     
     m_staticLine2177 = new wxStaticLine(m_panelReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
-    flexGridSizer1165->Add(m_staticLine2177, 0, wxALL|wxEXPAND, WXC_FROM_DIP(6));
+    flexGridSizer1165->Add(m_staticLine2177, 0, wxALL|wxEXPAND, WXC_FROM_DIP(4));
     
     m_staticLine2179 = new wxStaticLine(m_panelReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
-    flexGridSizer1165->Add(m_staticLine2179, 0, wxALL|wxEXPAND, WXC_FROM_DIP(6));
+    flexGridSizer1165->Add(m_staticLine2179, 0, wxALL|wxEXPAND, WXC_FROM_DIP(4));
     
     flexGridSizer2180 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2180->SetFlexibleDirection( wxBOTH );
@@ -439,12 +439,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zeroMoveModeXY->SetToolTip(_("1D: Each axis moves separatly\n2D: X and Y moves simultaneously"));
     m_zeroMoveModeXY->SetSelection(0);
     
-    flexGridSizer2180->Add(m_zeroMoveModeXY, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer2180->Add(m_zeroMoveModeXY, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
     m_moveXYtoZero = new wxButton(m_panelReference, wxID_ANY, _("Move XY to Zero"), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(110,-1)), 0);
     m_moveXYtoZero->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
-    flexGridSizer1165->Add(m_moveXYtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_moveXYtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveXYtoZero->SetMinSize(wxSize(110,-1));
     
     flexGridSizer218027 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -468,12 +468,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zeroMoveModeXYZ->SetToolTip(_("1D: Each axis moves separatly\n2D: Z moves separatly as well as X and Y moves simultaneously\n3D: X, Y and Z moves simultaneously"));
     m_zeroMoveModeXYZ->SetSelection(0);
     
-    flexGridSizer218027->Add(m_zeroMoveModeXYZ, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer218027->Add(m_zeroMoveModeXYZ, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
     m_moveXYZtoZero = new wxButton(m_panelReference, wxID_ANY, _("Move XYZ to Zero"), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(110,-1)), 0);
     m_moveXYZtoZero->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
-    flexGridSizer1165->Add(m_moveXYZtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_moveXYZtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveXYZtoZero->SetMinSize(wxSize(110,-1));
     
     flexGridSizer21802730 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -495,12 +495,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zeroMoveModeZ->SetToolTip(_("1D: Each axis moves separatly"));
     m_zeroMoveModeZ->SetSelection(0);
     
-    flexGridSizer21802730->Add(m_zeroMoveModeZ, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer21802730->Add(m_zeroMoveModeZ, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
     m_moveZtoZero = new wxButton(m_panelReference, wxID_ANY, _("Move Z to Zero"), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(110,-1)), 0);
     m_moveZtoZero->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
-    flexGridSizer1165->Add(m_moveZtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_moveZtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveZtoZero->SetMinSize(wxSize(110,-1));
     
     m_staticLine2191 = new wxStaticLine(m_panelReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
@@ -521,7 +521,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_staticText11772 = new wxStaticText(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
-    flexGridSizer1165->Add(m_staticText11772, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_staticText11772, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     flexGridSizer2439 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2439->SetFlexibleDirection( wxBOTH );
@@ -601,7 +601,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_staticText1177 = new wxStaticText(m_panelReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelReference, wxSize(-1,-1)), 0);
     
-    flexGridSizer1165->Add(m_staticText1177, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer1165->Add(m_staticText1177, 0, wxALL, WXC_FROM_DIP(1));
     
     flexGridSizer2434 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2434->SetFlexibleDirection( wxBOTH );
@@ -3796,12 +3796,18 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_zView = new CncZView(m_outPanel, wxID_ANY);
     flexGridSizer1046->Add(m_zView, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_zView->SetMinSize(wxSize(32,-1));
     
-    flexGridSizer1046->Add(0, 1, 1, wxALL, WXC_FROM_DIP(4));
+    m_infoToolDiameter = new wxStaticText(m_outPanel, wxID_ANY, _("0.0"), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0);
+    wxFont m_infoToolDiameterFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_infoToolDiameter->SetFont(m_infoToolDiameterFont);
+    m_infoToolDiameter->SetToolTip(_("Tool Diameter [mm]"));
+    
+    flexGridSizer1046->Add(m_infoToolDiameter, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(0));
     
     m_staticBitmap2401 = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mill")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
     
-    flexGridSizer1046->Add(m_staticBitmap2401, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer1046->Add(m_staticBitmap2401, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
     
     flexGridSizer742 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer742->SetFlexibleDirection( wxBOTH );
@@ -4741,7 +4747,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_scrollSpy->SetScrollRate(5, 5);
     
     m_auimgrMain->AddPane(m_scrollSpy, wxAuiPaneInfo().Name(wxT("Spy")).Caption(_("CNC Spy")).Direction(wxAUI_DOCK_RIGHT).Layer(0).Row(0).Position(0).BestSize(10,10).MinSize(10,10).MaxSize(10,10).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
-    m_auimgrMain->Update();
     
     flexGridSizer27261 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer27261->SetFlexibleDirection( wxBOTH );
@@ -4822,6 +4827,106 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer27417->Add(m_serialSpyDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     m_serialSpyDetails->SetMinSize(wxSize(-1,80));
     
+    m_svgUnitCalulator = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    wxFont m_svgUnitCalulatorFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_svgUnitCalulator->SetFont(m_svgUnitCalulatorFont);
+    
+    m_auimgrMain->AddPane(m_svgUnitCalulator, wxAuiPaneInfo().Name(wxT("UnitCalculator")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,24).MinSize(100,24).MaxSize(100,24).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(true).MinimizeButton(false).PinButton(true));
+    m_auimgrMain->Update();
+    
+    flexGridSizer3251 = new wxFlexGridSizer(1, 7, 0, 0);
+    flexGridSizer3251->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3251->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3251->AddGrowableCol(4);
+    flexGridSizer3251->AddGrowableRow(0);
+    m_svgUnitCalulator->SetSizer(flexGridSizer3251);
+    
+    m_staticText3261 = new wxStaticText(m_svgUnitCalulator, wxID_ANY, _("From"), wxDefaultPosition, wxDLG_UNIT(m_svgUnitCalulator, wxSize(-1,-1)), 0);
+    m_staticText3261->SetToolTip(_("SVG Unit Calculator"));
+    
+    flexGridSizer3251->Add(m_staticText3261, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_cbUCUnitFromArr;
+    m_cbUCUnitFromArr.Add(wxT("px"));
+    m_cbUCUnitFromArr.Add(wxT("pc"));
+    m_cbUCUnitFromArr.Add(wxT("pt"));
+    m_cbUCUnitFromArr.Add(wxT("mm"));
+    m_cbUCUnitFromArr.Add(wxT("cm"));
+    m_cbUCUnitFromArr.Add(wxT("m"));
+    m_cbUCUnitFromArr.Add(wxT("in"));
+    m_cbUCUnitFromArr.Add(wxT("ft"));
+    m_cbUCUnitFrom = new wxComboBox(m_svgUnitCalulator, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_svgUnitCalulator, wxSize(-1,20)), m_cbUCUnitFromArr, wxCB_READONLY);
+    wxFont m_cbUCUnitFromFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_cbUCUnitFrom->SetFont(m_cbUCUnitFromFont);
+    m_cbUCUnitFrom->SetToolTip(_("SVG Unit Calculator - Unit from"));
+    m_cbUCUnitFrom->SetSelection(0);
+    
+    flexGridSizer3251->Add(m_cbUCUnitFrom, 0, wxALL, WXC_FROM_DIP(2));
+    m_cbUCUnitFrom->SetMinSize(wxSize(-1,20));
+    
+    m_staticText3259 = new wxStaticText(m_svgUnitCalulator, wxID_ANY, _("to"), wxDefaultPosition, wxDLG_UNIT(m_svgUnitCalulator, wxSize(-1,-1)), 0);
+    wxFont m_staticText3259Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText3259->SetFont(m_staticText3259Font);
+    m_staticText3259->SetToolTip(_("SVG Unit Calculator"));
+    
+    flexGridSizer3251->Add(m_staticText3259, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_cbUCUnitToArr;
+    m_cbUCUnitToArr.Add(wxT("px"));
+    m_cbUCUnitToArr.Add(wxT("pc"));
+    m_cbUCUnitToArr.Add(wxT("pt"));
+    m_cbUCUnitToArr.Add(wxT("mm"));
+    m_cbUCUnitToArr.Add(wxT("cm"));
+    m_cbUCUnitToArr.Add(wxT("m"));
+    m_cbUCUnitToArr.Add(wxT("in"));
+    m_cbUCUnitToArr.Add(wxT("ft"));
+    m_cbUCUnitTo = new wxComboBox(m_svgUnitCalulator, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_svgUnitCalulator, wxSize(-1,20)), m_cbUCUnitToArr, wxCB_READONLY);
+    wxFont m_cbUCUnitToFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_cbUCUnitTo->SetFont(m_cbUCUnitToFont);
+    m_cbUCUnitTo->SetToolTip(_("SVG Unit Calculator - Unit To"));
+    m_cbUCUnitTo->SetSelection(3);
+    
+    flexGridSizer3251->Add(m_cbUCUnitTo, 0, wxALL, WXC_FROM_DIP(2));
+    
+    flexGridSizer3266 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer3266->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3266->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3266->AddGrowableCol(0);
+    flexGridSizer3266->AddGrowableCol(1);
+    
+    flexGridSizer3251->Add(flexGridSizer3266, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_cbUCValueFrom = new wxTextCtrl(m_svgUnitCalulator, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_svgUnitCalulator, wxSize(-1,20)), 0);
+    wxFont m_cbUCValueFromFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_cbUCValueFrom->SetFont(m_cbUCValueFromFont);
+    m_cbUCValueFrom->SetToolTip(_("SVG Unit Calculator - Value From"));
+    #if wxVERSION_NUMBER >= 3000
+    m_cbUCValueFrom->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer3266->Add(m_cbUCValueFrom, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    m_cbUCValueFrom->SetMinSize(wxSize(-1,20));
+    
+    m_cbUCValueTo = new wxTextCtrl(m_svgUnitCalulator, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_svgUnitCalulator, wxSize(-1,-1)), wxTE_READONLY);
+    wxFont m_cbUCValueToFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_cbUCValueTo->SetFont(m_cbUCValueToFont);
+    m_cbUCValueTo->SetToolTip(_("SVG Unit Calculator - Value to"));
+    #if wxVERSION_NUMBER >= 3000
+    m_cbUCValueTo->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer3266->Add(m_cbUCValueTo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_btUCClose = new wxButton(m_svgUnitCalulator, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_svgUnitCalulator, wxSize(20,20)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btUCClose->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-x-close")), wxLEFT);
+    m_btUCClose->SetBitmapMargins(2,2);
+    #endif
+    m_btUCClose->SetToolTip(_("SVG Unit Calculator - Close"));
+    
+    flexGridSizer3251->Add(m_btUCClose, 0, wxALL, WXC_FROM_DIP(2));
+    m_btUCClose->SetMinSize(wxSize(20,20));
+    
     m_menuBar = new wxMenuBar(wxMB_DOCKABLE);
     this->SetMenuBar(m_menuBar);
     
@@ -4890,6 +4995,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_miViewSpeed = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Speed Config"), wxT(""), wxITEM_CHECK);
     m_menuView->Append(m_miViewSpeed);
+    
+    m_miViewUnitCalculator = new wxMenuItem(m_menuView, wxID_ANY, _("SVG UnitCaluclator"), wxT(""), wxITEM_CHECK);
+    m_menuView->Append(m_miViewUnitCalculator);
     
     m_menuView->AppendSeparator();
     
@@ -5360,6 +5468,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_enableSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
+    m_cbUCUnitFrom->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
+    m_cbUCUnitTo->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
+    m_cbUCValueFrom->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);
+    m_btUCClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
     this->Connect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Connect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Connect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);
@@ -5378,6 +5490,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
     this->Connect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
     this->Connect(m_miViewSpeed->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpeed), NULL, this);
+    this->Connect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Connect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Connect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
     this->Connect(m_menuItemUpdCoors->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineUpdateCoordinates), NULL, this);
@@ -5657,6 +5770,10 @@ MainFrameBClass::~MainFrameBClass()
     m_enableSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
+    m_cbUCUnitFrom->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
+    m_cbUCUnitTo->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
+    m_cbUCValueFrom->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);
+    m_btUCClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
     this->Disconnect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Disconnect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Disconnect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);
@@ -5675,6 +5792,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
     this->Disconnect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
     this->Disconnect(m_miViewSpeed->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpeed), NULL, this);
+    this->Disconnect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Disconnect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Disconnect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
     this->Disconnect(m_menuItemUpdCoors->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineUpdateCoordinates), NULL, this);

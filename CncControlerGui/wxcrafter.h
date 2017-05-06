@@ -647,6 +647,7 @@ protected:
     wxFlexGridSizer* flexGridSizer1046;
     wxStaticText* m_staticText1048;
     CncZView* m_zView;
+    wxStaticText* m_infoToolDiameter;
     wxStaticBitmap* m_staticBitmap2401;
     wxFlexGridSizer* flexGridSizer742;
     wxFlexGridSizer* flexGridSizer768;
@@ -779,6 +780,16 @@ protected:
     wxTextCtrl* m_serialSpy;
     wxStaticText* m_staticText27519;
     wxTextCtrl* m_serialSpyDetails;
+    wxPanel* m_svgUnitCalulator;
+    wxFlexGridSizer* flexGridSizer3251;
+    wxStaticText* m_staticText3261;
+    wxComboBox* m_cbUCUnitFrom;
+    wxStaticText* m_staticText3259;
+    wxComboBox* m_cbUCUnitTo;
+    wxFlexGridSizer* flexGridSizer3266;
+    wxTextCtrl* m_cbUCValueFrom;
+    wxTextCtrl* m_cbUCValueTo;
+    wxButton* m_btUCClose;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
     wxMenuItem* m_miNewTemplate;
@@ -803,6 +814,7 @@ protected:
     wxMenuItem* m_miViewMonitor;
     wxMenuItem* m_miViewSpy;
     wxMenuItem* m_miViewSpeed;
+    wxMenuItem* m_miViewUnitCalculator;
     wxMenuItem* m_menuItem1665;
     wxMenuItem* m_miViewAll;
     wxMenuItem* m_miHideAll;
@@ -1071,6 +1083,10 @@ protected:
     virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectUCUnitTo(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectUCChangeFrom(wxCommandEvent& event) { event.Skip(); }
+    virtual void closeUnitCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
@@ -1089,6 +1105,7 @@ protected:
     virtual void viewMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpeed(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewUnitCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void viewAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
     virtual void hideAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
     virtual void defineUpdateCoordinates(wxCommandEvent& event) { event.Skip(); }
@@ -1550,6 +1567,7 @@ public:
     wxPanel* GetCncParameters() { return m_cncParameters; }
     wxStaticText* GetStaticText1048() { return m_staticText1048; }
     CncZView* GetZView() { return m_zView; }
+    wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
     wxStaticBitmap* GetStaticBitmap2401() { return m_staticBitmap2401; }
     wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
     wxStaticText* GetStaticText16032() { return m_staticText16032; }
@@ -1651,6 +1669,14 @@ public:
     wxStaticText* GetStaticText27519() { return m_staticText27519; }
     wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
     wxScrolledWindow* GetScrollSpy() { return m_scrollSpy; }
+    wxStaticText* GetStaticText3261() { return m_staticText3261; }
+    wxComboBox* GetCbUCUnitFrom() { return m_cbUCUnitFrom; }
+    wxStaticText* GetStaticText3259() { return m_staticText3259; }
+    wxComboBox* GetCbUCUnitTo() { return m_cbUCUnitTo; }
+    wxTextCtrl* GetCbUCValueFrom() { return m_cbUCValueFrom; }
+    wxTextCtrl* GetCbUCValueTo() { return m_cbUCValueTo; }
+    wxButton* GetBtUCClose() { return m_btUCClose; }
+    wxPanel* GetSvgUnitCalulator() { return m_svgUnitCalulator; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }

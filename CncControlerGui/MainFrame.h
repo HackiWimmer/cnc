@@ -60,6 +60,9 @@ class MainFrame : public MainFrameBClass {
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
 
 	protected:
+    virtual void selectUCChangeFrom(wxCommandEvent& event);
+    virtual void selectUCUnitFrom(wxCommandEvent& event);
+    virtual void selectUCUnitTo(wxCommandEvent& event);
    
 		// will be bind to this frame
 		void globalKeyDownHook(wxKeyEvent& event);
@@ -320,6 +323,7 @@ class MainFrame : public MainFrameBClass {
 		
 	protected:
 		// User command
+		virtual void closeUnitCalculator(wxCommandEvent& event);
 		virtual void emuContentDClick(wxMouseEvent& event);
 		virtual void fileContentDClick(wxMouseEvent& event);
 		virtual void changeDrawPaneZoom(wxCommandEvent& event);
@@ -327,6 +331,7 @@ class MainFrame : public MainFrameBClass {
 		virtual void onKeyDownDrawPane(wxKeyEvent& event);
 		virtual void update3DDrawOptions(wxCommandEvent& event);
 		virtual void viewSpeed(wxCommandEvent& event);
+		virtual void viewUnitCalculator(wxCommandEvent& event);
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
 		virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event);

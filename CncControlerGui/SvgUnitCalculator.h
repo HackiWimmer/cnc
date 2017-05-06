@@ -68,6 +68,13 @@ class SvgUnitCalculator {
 		}
 		
 		/////////////////////////////////////////////////////////////////////
+		static double convertUnit2Unit(const SVGUnit& from, const SVGUnit& to, double& value) {
+			_returnValue = convertUnit2MM(from, value);
+			_returnValue = convertMM2Unit(to,   value);
+			return _returnValue;
+		}
+		
+		/////////////////////////////////////////////////////////////////////
 		static double calculateUnit2MM(const SVGUnit& from, double value) {
 			convertUnit2MM(from, _returnValue);
 			return _returnValue;

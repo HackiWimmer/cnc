@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 3247,
+  "m_objCounter": 3270,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -3672,7 +3672,7 @@
                       }, {
                        "m_type": 4405,
                        "proportion": 0,
-                       "border": 5,
+                       "border": 2,
                        "gbSpan": "1,1",
                        "gbPosition": "0,0",
                        "m_styles": [],
@@ -3747,7 +3747,7 @@
                       }, {
                        "m_type": 4405,
                        "proportion": 0,
-                       "border": 5,
+                       "border": 2,
                        "gbSpan": "1,1",
                        "gbPosition": "0,0",
                        "m_styles": [],
@@ -3897,7 +3897,7 @@
                       }, {
                        "m_type": 4405,
                        "proportion": 0,
-                       "border": 5,
+                       "border": 2,
                        "gbSpan": "1,1",
                        "gbPosition": "0,0",
                        "m_styles": [],
@@ -3972,7 +3972,7 @@
                       }, {
                        "m_type": 4405,
                        "proportion": 0,
-                       "border": 5,
+                       "border": 2,
                        "gbSpan": "1,1",
                        "gbPosition": "0,0",
                        "m_styles": [],
@@ -4877,7 +4877,7 @@
                       }, {
                        "m_type": 4403,
                        "proportion": 1,
-                       "border": 5,
+                       "border": 0,
                        "gbSpan": "1,1",
                        "gbPosition": "0,0",
                        "m_styles": [],
@@ -4998,7 +4998,7 @@
                         }, {
                          "m_type": 4405,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 1,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": [],
@@ -5073,7 +5073,7 @@
                         }, {
                          "m_type": 4410,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 2,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": ["wxCB_READONLY"],
@@ -5156,7 +5156,7 @@
                         }, {
                          "m_type": 4400,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 2,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": [],
@@ -5251,7 +5251,7 @@
                         }, {
                          "m_type": 4418,
                          "proportion": 0,
-                         "border": 6,
+                         "border": 4,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": ["wxLI_HORIZONTAL"],
@@ -5318,7 +5318,7 @@
                         }, {
                          "m_type": 4418,
                          "proportion": 0,
-                         "border": 6,
+                         "border": 4,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": ["wxLI_HORIZONTAL"],
@@ -5506,7 +5506,7 @@
                           }, {
                            "m_type": 4410,
                            "proportion": 0,
-                           "border": 5,
+                           "border": 2,
                            "gbSpan": "1,1",
                            "gbPosition": "0,0",
                            "m_styles": ["wxCB_READONLY"],
@@ -5590,7 +5590,7 @@
                         }, {
                          "m_type": 4400,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 2,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": [],
@@ -5806,7 +5806,7 @@
                           }, {
                            "m_type": 4410,
                            "proportion": 0,
-                           "border": 5,
+                           "border": 2,
                            "gbSpan": "1,1",
                            "gbPosition": "0,0",
                            "m_styles": ["wxCB_READONLY"],
@@ -5890,7 +5890,7 @@
                         }, {
                          "m_type": 4400,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 2,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": [],
@@ -6106,7 +6106,7 @@
                           }, {
                            "m_type": 4410,
                            "proportion": 0,
-                           "border": 5,
+                           "border": 2,
                            "gbSpan": "1,1",
                            "gbPosition": "0,0",
                            "m_styles": ["wxCB_READONLY"],
@@ -6190,7 +6190,7 @@
                         }, {
                          "m_type": 4400,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 2,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": [],
@@ -6494,7 +6494,7 @@
                         }, {
                          "m_type": 4405,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 1,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": [],
@@ -7442,7 +7442,7 @@
                         }, {
                          "m_type": 4405,
                          "proportion": 0,
-                         "border": 5,
+                         "border": 1,
                          "gbSpan": "1,1",
                          "gbPosition": "0,0",
                          "m_styles": [],
@@ -43021,11 +43021,11 @@
                     }, {
                      "type": "string",
                      "m_label": "Size:",
-                     "m_value": "-1,-1"
+                     "m_value": "32,-1"
                     }, {
                      "type": "string",
                      "m_label": "Minimum Size:",
-                     "m_value": "-1,-1"
+                     "m_value": "32,-1"
                     }, {
                      "type": "string",
                      "m_label": "Name:",
@@ -43075,32 +43075,88 @@
                    "m_children": [],
                    "m_templInfoName": "CncZView"
                   }, {
-                   "m_type": 4454,
-                   "proportion": 1,
-                   "border": 4,
+                   "m_type": 4405,
+                   "proportion": 0,
+                   "border": 0,
                    "gbSpan": "1,1",
                    "gbPosition": "0,0",
                    "m_styles": [],
-                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL"],
                    "m_properties": [{
-                     "type": "string",
-                     "m_label": "Name:",
-                     "m_value": "Spacer2755"
+                     "type": "winid",
+                     "m_label": "ID:",
+                     "m_winid": "wxID_ANY"
                     }, {
                      "type": "string",
                      "m_label": "Size:",
-                     "m_value": "0,1"
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Minimum Size:",
+                     "m_value": "-1,-1"
+                    }, {
+                     "type": "string",
+                     "m_label": "Name:",
+                     "m_value": "m_infoToolDiameter"
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Tooltip:",
+                     "m_value": "Tool Diameter [mm]"
+                    }, {
+                     "type": "colour",
+                     "m_label": "Bg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "colour",
+                     "m_label": "Fg Colour:",
+                     "colour": "<Default>"
+                    }, {
+                     "type": "font",
+                     "m_label": "Font:",
+                     "m_value": "7,normal, normal, swiss, 0, Segoe UI"
+                    }, {
+                     "type": "bool",
+                     "m_label": "Hidden",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Disabled",
+                     "m_value": false
+                    }, {
+                     "type": "bool",
+                     "m_label": "Focused",
+                     "m_value": false
+                    }, {
+                     "type": "string",
+                     "m_label": "Class Name:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Include File:",
+                     "m_value": ""
+                    }, {
+                     "type": "string",
+                     "m_label": "Style:",
+                     "m_value": ""
+                    }, {
+                     "type": "multi-string",
+                     "m_label": "Label:",
+                     "m_value": "0.0"
+                    }, {
+                     "type": "string",
+                     "m_label": "Wrap:",
+                     "m_value": "-1"
                     }],
                    "m_events": [],
                    "m_children": []
                   }, {
                    "m_type": 4409,
                    "proportion": 0,
-                   "border": 5,
+                   "border": 1,
                    "gbSpan": "1,1",
                    "gbPosition": "0,0",
                    "m_styles": [],
-                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER_HORIZONTAL"],
                    "m_properties": [{
                      "type": "winid",
                      "m_label": "ID:",
@@ -52724,6 +52780,791 @@
             }]
           }]
         }]
+      }, {
+       "m_type": 4408,
+       "proportion": 0,
+       "border": 5,
+       "gbSpan": "1,1",
+       "gbPosition": "0,0",
+       "m_styles": ["wxTAB_TRAVERSAL"],
+       "wxAuiPaneInfo": {
+        "m_name": "UnitCalculator",
+        "m_caption": "",
+        "m_dockDirection": "wxAUI_DOCK_BOTTOM",
+        "m_layer": 0,
+        "m_row": 1,
+        "m_position": 0,
+        "m_bestSize": "100,24",
+        "m_minSize": "100,24",
+        "m_maxSize": "100,24",
+        "m_resizable": false,
+        "m_captionVisible": false,
+        "m_closeButton": true,
+        "m_minButton": false,
+        "m_maxButton": false,
+        "m_pinButton": true,
+        "m_toolbarPane": false
+       },
+       "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+       "m_properties": [{
+         "type": "winid",
+         "m_label": "ID:",
+         "m_winid": "wxID_ANY"
+        }, {
+         "type": "string",
+         "m_label": "Size:",
+         "m_value": "-1,-1"
+        }, {
+         "type": "string",
+         "m_label": "Minimum Size:",
+         "m_value": "-1,-1"
+        }, {
+         "type": "string",
+         "m_label": "Name:",
+         "m_value": "m_svgUnitCalulator"
+        }, {
+         "type": "multi-string",
+         "m_label": "Tooltip:",
+         "m_value": ""
+        }, {
+         "type": "colour",
+         "m_label": "Bg Colour:",
+         "colour": "<Default>"
+        }, {
+         "type": "colour",
+         "m_label": "Fg Colour:",
+         "colour": "<Default>"
+        }, {
+         "type": "font",
+         "m_label": "Font:",
+         "m_value": "8,normal, normal, swiss, 0, Segoe UI"
+        }, {
+         "type": "bool",
+         "m_label": "Hidden",
+         "m_value": false
+        }, {
+         "type": "bool",
+         "m_label": "Disabled",
+         "m_value": false
+        }, {
+         "type": "bool",
+         "m_label": "Focused",
+         "m_value": false
+        }, {
+         "type": "string",
+         "m_label": "Class Name:",
+         "m_value": ""
+        }, {
+         "type": "string",
+         "m_label": "Include File:",
+         "m_value": ""
+        }, {
+         "type": "string",
+         "m_label": "Style:",
+         "m_value": ""
+        }],
+       "m_events": [],
+       "m_children": [{
+         "m_type": 4403,
+         "proportion": 1,
+         "border": 5,
+         "gbSpan": "1,1",
+         "gbPosition": "0,0",
+         "m_styles": [],
+         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+         "m_properties": [{
+           "type": "string",
+           "m_label": "Minimum Size:",
+           "m_value": "-1,-1"
+          }, {
+           "type": "string",
+           "m_label": "Name:",
+           "m_value": "flexGridSizer3251"
+          }, {
+           "type": "string",
+           "m_label": "Style:",
+           "m_value": ""
+          }, {
+           "type": "string",
+           "m_label": "# Columns:",
+           "m_value": "7"
+          }, {
+           "type": "string",
+           "m_label": "# Rows:",
+           "m_value": "1"
+          }, {
+           "type": "string",
+           "m_label": "Growable columns:",
+           "m_value": "4"
+          }, {
+           "type": "string",
+           "m_label": "Growable rows:",
+           "m_value": "0"
+          }, {
+           "type": "string",
+           "m_label": "Horizontal gap:",
+           "m_value": "0"
+          }, {
+           "type": "string",
+           "m_label": "Vertical gap:",
+           "m_value": "0"
+          }],
+         "m_events": [],
+         "m_children": [{
+           "m_type": 4405,
+           "proportion": 0,
+           "border": 5,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": [],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+           "m_properties": [{
+             "type": "winid",
+             "m_label": "ID:",
+             "m_winid": "wxID_ANY"
+            }, {
+             "type": "string",
+             "m_label": "Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "m_staticText3261"
+            }, {
+             "type": "multi-string",
+             "m_label": "Tooltip:",
+             "m_value": "SVG Unit Calculator"
+            }, {
+             "type": "colour",
+             "m_label": "Bg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "colour",
+             "m_label": "Fg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "font",
+             "m_label": "Font:",
+             "m_value": ""
+            }, {
+             "type": "bool",
+             "m_label": "Hidden",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Disabled",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Focused",
+             "m_value": false
+            }, {
+             "type": "string",
+             "m_label": "Class Name:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Include File:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Style:",
+             "m_value": ""
+            }, {
+             "type": "multi-string",
+             "m_label": "Label:",
+             "m_value": "From"
+            }, {
+             "type": "string",
+             "m_label": "Wrap:",
+             "m_value": "-1"
+            }],
+           "m_events": [],
+           "m_children": []
+          }, {
+           "m_type": 4410,
+           "proportion": 0,
+           "border": 2,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": ["wxCB_READONLY"],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+           "m_properties": [{
+             "type": "winid",
+             "m_label": "ID:",
+             "m_winid": "wxID_ANY"
+            }, {
+             "type": "string",
+             "m_label": "Size:",
+             "m_value": "-1,20"
+            }, {
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,20"
+            }, {
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "m_cbUCUnitFrom"
+            }, {
+             "type": "multi-string",
+             "m_label": "Tooltip:",
+             "m_value": "SVG Unit Calculator - Unit from"
+            }, {
+             "type": "colour",
+             "m_label": "Bg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "colour",
+             "m_label": "Fg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "font",
+             "m_label": "Font:",
+             "m_value": "8,normal, normal, swiss, 0, Segoe UI"
+            }, {
+             "type": "bool",
+             "m_label": "Hidden",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Disabled",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Focused",
+             "m_value": false
+            }, {
+             "type": "string",
+             "m_label": "Class Name:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Include File:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Style:",
+             "m_value": ""
+            }, {
+             "type": "multi-string",
+             "m_label": "ComboBox Choices:",
+             "m_value": "px\\npc\\npt\\nmm\\ncm\\nm\\nin\\nft"
+            }, {
+             "type": "string",
+             "m_label": "Text Hint",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Selection:",
+             "m_value": "0"
+            }, {
+             "type": "string",
+             "m_label": "Value:",
+             "m_value": ""
+            }],
+           "m_events": [{
+             "m_eventName": "wxEVT_COMMAND_COMBOBOX_SELECTED",
+             "m_eventClass": "wxCommandEvent",
+             "m_eventHandler": "wxCommandEventHandler",
+             "m_functionNameAndSignature": "selectUCUnitFrom(wxCommandEvent& event)",
+             "m_description": "Process a wxEVT_COMMAND_COMBOBOX_SELECTED event, when an item on the list is selected. Note that calling GetValue returns the new value of selection.",
+             "m_noBody": false
+            }],
+           "m_children": []
+          }, {
+           "m_type": 4405,
+           "proportion": 0,
+           "border": 5,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": [],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+           "m_properties": [{
+             "type": "winid",
+             "m_label": "ID:",
+             "m_winid": "wxID_ANY"
+            }, {
+             "type": "string",
+             "m_label": "Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "m_staticText3259"
+            }, {
+             "type": "multi-string",
+             "m_label": "Tooltip:",
+             "m_value": "SVG Unit Calculator"
+            }, {
+             "type": "colour",
+             "m_label": "Bg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "colour",
+             "m_label": "Fg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "font",
+             "m_label": "Font:",
+             "m_value": "8,normal, normal, swiss, 0, Segoe UI"
+            }, {
+             "type": "bool",
+             "m_label": "Hidden",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Disabled",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Focused",
+             "m_value": false
+            }, {
+             "type": "string",
+             "m_label": "Class Name:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Include File:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Style:",
+             "m_value": ""
+            }, {
+             "type": "multi-string",
+             "m_label": "Label:",
+             "m_value": "to"
+            }, {
+             "type": "string",
+             "m_label": "Wrap:",
+             "m_value": "-1"
+            }],
+           "m_events": [],
+           "m_children": []
+          }, {
+           "m_type": 4410,
+           "proportion": 0,
+           "border": 2,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": ["wxCB_READONLY"],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+           "m_properties": [{
+             "type": "winid",
+             "m_label": "ID:",
+             "m_winid": "wxID_ANY"
+            }, {
+             "type": "string",
+             "m_label": "Size:",
+             "m_value": "-1,20"
+            }, {
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "m_cbUCUnitTo"
+            }, {
+             "type": "multi-string",
+             "m_label": "Tooltip:",
+             "m_value": "SVG Unit Calculator - Unit To"
+            }, {
+             "type": "colour",
+             "m_label": "Bg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "colour",
+             "m_label": "Fg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "font",
+             "m_label": "Font:",
+             "m_value": "8,normal, normal, swiss, 0, Segoe UI"
+            }, {
+             "type": "bool",
+             "m_label": "Hidden",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Disabled",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Focused",
+             "m_value": false
+            }, {
+             "type": "string",
+             "m_label": "Class Name:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Include File:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Style:",
+             "m_value": ""
+            }, {
+             "type": "multi-string",
+             "m_label": "ComboBox Choices:",
+             "m_value": "px\\npc\\npt\\nmm\\ncm\\nm\\nin\\nft"
+            }, {
+             "type": "string",
+             "m_label": "Text Hint",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Selection:",
+             "m_value": "3"
+            }, {
+             "type": "string",
+             "m_label": "Value:",
+             "m_value": ""
+            }],
+           "m_events": [{
+             "m_eventName": "wxEVT_COMMAND_COMBOBOX_SELECTED",
+             "m_eventClass": "wxCommandEvent",
+             "m_eventHandler": "wxCommandEventHandler",
+             "m_functionNameAndSignature": "selectUCUnitTo(wxCommandEvent& event)",
+             "m_description": "Process a wxEVT_COMMAND_COMBOBOX_SELECTED event, when an item on the list is selected. Note that calling GetValue returns the new value of selection.",
+             "m_noBody": false
+            }],
+           "m_children": []
+          }, {
+           "m_type": 4403,
+           "proportion": 0,
+           "border": 0,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": [],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+           "m_properties": [{
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "-1,-1"
+            }, {
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "flexGridSizer3266"
+            }, {
+             "type": "string",
+             "m_label": "Style:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "# Columns:",
+             "m_value": "2"
+            }, {
+             "type": "string",
+             "m_label": "# Rows:",
+             "m_value": "1"
+            }, {
+             "type": "string",
+             "m_label": "Growable columns:",
+             "m_value": "0,1"
+            }, {
+             "type": "string",
+             "m_label": "Growable rows:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Horizontal gap:",
+             "m_value": "0"
+            }, {
+             "type": "string",
+             "m_label": "Vertical gap:",
+             "m_value": "0"
+            }],
+           "m_events": [],
+           "m_children": [{
+             "m_type": 4406,
+             "proportion": 0,
+             "border": 2,
+             "gbSpan": "1,1",
+             "gbPosition": "0,0",
+             "m_styles": [],
+             "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+             "m_properties": [{
+               "type": "winid",
+               "m_label": "ID:",
+               "m_winid": "wxID_ANY"
+              }, {
+               "type": "string",
+               "m_label": "Size:",
+               "m_value": "-1,20"
+              }, {
+               "type": "string",
+               "m_label": "Minimum Size:",
+               "m_value": "-1,20"
+              }, {
+               "type": "string",
+               "m_label": "Name:",
+               "m_value": "m_cbUCValueFrom"
+              }, {
+               "type": "multi-string",
+               "m_label": "Tooltip:",
+               "m_value": "SVG Unit Calculator - Value From"
+              }, {
+               "type": "colour",
+               "m_label": "Bg Colour:",
+               "colour": "<Default>"
+              }, {
+               "type": "colour",
+               "m_label": "Fg Colour:",
+               "colour": "<Default>"
+              }, {
+               "type": "font",
+               "m_label": "Font:",
+               "m_value": "8,normal, normal, swiss, 0, Segoe UI"
+              }, {
+               "type": "bool",
+               "m_label": "Hidden",
+               "m_value": false
+              }, {
+               "type": "bool",
+               "m_label": "Disabled",
+               "m_value": false
+              }, {
+               "type": "bool",
+               "m_label": "Focused",
+               "m_value": false
+              }, {
+               "type": "string",
+               "m_label": "Class Name:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Include File:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Style:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Value:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Text Hint",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Max Length:",
+               "m_value": "0"
+              }, {
+               "type": "bool",
+               "m_label": "Auto Complete Directories:",
+               "m_value": false
+              }, {
+               "type": "bool",
+               "m_label": "Auto Complete Files:",
+               "m_value": false
+              }],
+             "m_events": [{
+               "m_eventName": "wxEVT_COMMAND_TEXT_UPDATED",
+               "m_eventClass": "wxCommandEvent",
+               "m_eventHandler": "wxCommandEventHandler",
+               "m_functionNameAndSignature": "selectUCChangeFrom(wxCommandEvent& event)",
+               "m_description": "Respond to a wxEVT_COMMAND_TEXT_UPDATED event, generated when the text changes.\nNotice that this event will be sent when the text controls contents changes\n - whether this is due to user input or comes from the program itself\n(for example, if SetValue() is called); see ChangeValue() for a function which does not send this event.",
+               "m_noBody": false
+              }],
+             "m_children": []
+            }, {
+             "m_type": 4406,
+             "proportion": 0,
+             "border": 2,
+             "gbSpan": "1,1",
+             "gbPosition": "0,0",
+             "m_styles": ["wxTE_READONLY"],
+             "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
+             "m_properties": [{
+               "type": "winid",
+               "m_label": "ID:",
+               "m_winid": "wxID_ANY"
+              }, {
+               "type": "string",
+               "m_label": "Size:",
+               "m_value": "-1,-1"
+              }, {
+               "type": "string",
+               "m_label": "Minimum Size:",
+               "m_value": "-1,-1"
+              }, {
+               "type": "string",
+               "m_label": "Name:",
+               "m_value": "m_cbUCValueTo"
+              }, {
+               "type": "multi-string",
+               "m_label": "Tooltip:",
+               "m_value": "SVG Unit Calculator - Value to"
+              }, {
+               "type": "colour",
+               "m_label": "Bg Colour:",
+               "colour": "<Default>"
+              }, {
+               "type": "colour",
+               "m_label": "Fg Colour:",
+               "colour": "<Default>"
+              }, {
+               "type": "font",
+               "m_label": "Font:",
+               "m_value": "8,normal, normal, swiss, 0, Segoe UI"
+              }, {
+               "type": "bool",
+               "m_label": "Hidden",
+               "m_value": false
+              }, {
+               "type": "bool",
+               "m_label": "Disabled",
+               "m_value": false
+              }, {
+               "type": "bool",
+               "m_label": "Focused",
+               "m_value": false
+              }, {
+               "type": "string",
+               "m_label": "Class Name:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Include File:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Style:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Value:",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Text Hint",
+               "m_value": ""
+              }, {
+               "type": "string",
+               "m_label": "Max Length:",
+               "m_value": "0"
+              }, {
+               "type": "bool",
+               "m_label": "Auto Complete Directories:",
+               "m_value": false
+              }, {
+               "type": "bool",
+               "m_label": "Auto Complete Files:",
+               "m_value": false
+              }],
+             "m_events": [],
+             "m_children": []
+            }]
+          }, {
+           "m_type": 4400,
+           "proportion": 0,
+           "border": 2,
+           "gbSpan": "1,1",
+           "gbPosition": "0,0",
+           "m_styles": [],
+           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+           "m_properties": [{
+             "type": "winid",
+             "m_label": "ID:",
+             "m_winid": "wxID_ANY"
+            }, {
+             "type": "string",
+             "m_label": "Size:",
+             "m_value": "20,20"
+            }, {
+             "type": "string",
+             "m_label": "Minimum Size:",
+             "m_value": "20,20"
+            }, {
+             "type": "string",
+             "m_label": "Name:",
+             "m_value": "m_btUCClose"
+            }, {
+             "type": "multi-string",
+             "m_label": "Tooltip:",
+             "m_value": "SVG Unit Calculator - Close"
+            }, {
+             "type": "colour",
+             "m_label": "Bg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "colour",
+             "m_label": "Fg Colour:",
+             "colour": "<Default>"
+            }, {
+             "type": "font",
+             "m_label": "Font:",
+             "m_value": ""
+            }, {
+             "type": "bool",
+             "m_label": "Hidden",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Disabled",
+             "m_value": false
+            }, {
+             "type": "bool",
+             "m_label": "Focused",
+             "m_value": false
+            }, {
+             "type": "string",
+             "m_label": "Class Name:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Include File:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Style:",
+             "m_value": ""
+            }, {
+             "type": "string",
+             "m_label": "Label:",
+             "m_value": ""
+            }, {
+             "type": "bool",
+             "m_label": "Default Button",
+             "m_value": false
+            }, {
+             "type": "bitmapPicker",
+             "m_label": "Bitmap File:",
+             "m_path": "bitmaps/16-x-close.png"
+            }, {
+             "type": "choice",
+             "m_label": "Direction",
+             "m_selection": 0,
+             "m_options": ["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+            }, {
+             "type": "string",
+             "m_label": "Margins:",
+             "m_value": "2,2"
+            }],
+           "m_events": [{
+             "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
+             "m_eventClass": "wxCommandEvent",
+             "m_eventHandler": "wxCommandEventHandler",
+             "m_functionNameAndSignature": "closeUnitCalculator(wxCommandEvent& event)",
+             "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+             "m_noBody": false
+            }],
+           "m_children": []
+          }]
+        }]
       }]
     }, {
      "m_type": 4457,
@@ -53874,6 +54715,57 @@
            "m_eventClass": "wxCommandEvent",
            "m_eventHandler": "wxCommandEventHandler",
            "m_functionNameAndSignature": "viewSpeed(wxCommandEvent& event)",
+           "m_description": "Menu item has been clicked",
+           "m_noBody": false
+          }],
+         "m_children": []
+        }, {
+         "m_type": 4459,
+         "proportion": 0,
+         "border": 5,
+         "gbSpan": "1,1",
+         "gbPosition": "0,0",
+         "m_styles": [],
+         "m_sizerFlags": [],
+         "m_properties": [{
+           "type": "winid",
+           "m_label": "ID:",
+           "m_winid": "wxID_ANY"
+          }, {
+           "type": "string",
+           "m_label": "Name:",
+           "m_value": "m_miViewUnitCalculator"
+          }, {
+           "type": "string",
+           "m_label": "Label:",
+           "m_value": "SVG UnitCaluclator"
+          }, {
+           "type": "string",
+           "m_label": "Shortcut:",
+           "m_value": ""
+          }, {
+           "type": "string",
+           "m_label": "Help String:",
+           "m_value": ""
+          }, {
+           "type": "bitmapPicker",
+           "m_label": "Bitmap File:",
+           "m_path": ""
+          }, {
+           "type": "choice",
+           "m_label": "Kind:",
+           "m_selection": 1,
+           "m_options": ["normal", "checkable", "radio", "separator"]
+          }, {
+           "type": "bool",
+           "m_label": "Checked",
+           "m_value": false
+          }],
+         "m_events": [{
+           "m_eventName": "wxEVT_COMMAND_MENU_SELECTED",
+           "m_eventClass": "wxCommandEvent",
+           "m_eventHandler": "wxCommandEventHandler",
+           "m_functionNameAndSignature": "viewUnitCalculator(wxCommandEvent& event)",
            "m_description": "Menu item has been clicked",
            "m_noBody": false
           }],
