@@ -7030,10 +7030,13 @@ Axis</label>
                                     <hgap>0</hgap>
                                     <growablecols>0</growablecols>
                                     <growablerows>1</growablerows>
-                                    <object class="spacer" name="Spacer3174">
-                                      <size>0,5</size>
+                                    <object class="sizeritem">
                                       <flag>wxALL</flag>
-                                      <option>1</option>
+                                      <object class="wxPanel" name="m_panel3281">
+                                        <style>wxTAB_TRAVERSAL</style>
+                                        <size>5,5</size>
+                                        <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                                      </object>
                                     </object>
                                     <object class="sizeritem">
                                       <flag>wxALL|wxEXPAND</flag>
@@ -7044,10 +7047,13 @@ Axis</label>
                                         <bg>wxSYS_COLOUR_ACTIVEBORDER</bg>
                                       </object>
                                     </object>
-                                    <object class="spacer" name="Spacer3177">
-                                      <size>0,5</size>
+                                    <object class="sizeritem">
                                       <flag>wxALL</flag>
-                                      <option>1</option>
+                                      <object class="wxPanel" name="m_panel32812">
+                                        <style>wxTAB_TRAVERSAL</style>
+                                        <size>5,5</size>
+                                        <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                                      </object>
                                     </object>
                                   </object>
                                 </object>

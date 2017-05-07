@@ -264,8 +264,11 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 			zDepth = cc->getWorkpieceThickness();
 	} else {
 		
-		if ( zDepth < 0.0 )
+		if ( zDepth < 0.0 ) {
+			cout << "xx: " <<zDepth<<endl;
 			zDepth = 0.0;
+			
+		}
 	}
 
 	if ( cnc::dblCompare(cc->setCurrentZDepth(zDepth), zDepth) == false ) {

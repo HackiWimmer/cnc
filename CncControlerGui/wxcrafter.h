@@ -666,7 +666,9 @@ protected:
     wxScrolledWindow* m_drawPaneWindow;
     wxFlexGridSizer* flexGridSizer885;
     wxFlexGridSizer* flexGridSizer3175;
+    wxPanel* m_panel3281;
     wxPanel* m_yAxisMarker;
+    wxPanel* m_panel32812;
     wxFlexGridSizer* flexGridSizer1416;
     wxPanel* m_xAxisMarkerTop;
     wxPanel* m_drawPane;
@@ -1581,7 +1583,9 @@ public:
     wxButton* GetClearDrawPane() { return m_clearDrawPane; }
     wxStaticText* GetStaticText1054() { return m_staticText1054; }
     wxComboBox* GetCbUpdateInterval() { return m_cbUpdateInterval; }
+    wxPanel* GetPanel3281() { return m_panel3281; }
     wxPanel* GetYAxisMarker() { return m_yAxisMarker; }
+    wxPanel* GetPanel32812() { return m_panel32812; }
     wxPanel* GetXAxisMarkerTop() { return m_xAxisMarkerTop; }
     wxPanel* GetDrawPane() { return m_drawPane; }
     wxPanel* GetXAxisMarkerBottom() { return m_xAxisMarkerBottom; }

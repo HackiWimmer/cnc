@@ -205,7 +205,7 @@ class CncConfig {
 			// example:
 			// workpieceOffset		= 1.0;
 			// maxDurationThickness	= 2.0;
-			// workpieceThickness	= 6.4;
+			// currentZDepth		= 6.4;
 			
 			for (unsigned int i=0; i<maxDurations; i++ ) {
 				durationSteps[i] = 0.0;
@@ -213,8 +213,8 @@ class CncConfig {
 
 			durationCount = 0;
 			if ( maxDurationThickness > 0 ) {
-				durationCount = currentZDepth/maxDurationThickness;					// --> 3
-				if ( durationCount > 0 ) {
+				durationCount = currentZDepth/maxDurationThickness;							// --> 3
+				if ( durationCount >= 1 ) {
 					double rest = currentZDepth - (durationCount * maxDurationThickness);	//--> 0.4
 					
 					if ( durationCount < maxDurations ) {
@@ -226,17 +226,19 @@ class CncConfig {
 						}
 
 						if ( rest > 0 ) {
-							durationSteps[durationCount] = rest;					// --> add 0.4
-							durationCount++;										// --> 3 + 1 = 4 durations (3 * 2mm + 1 * 0.4mm )
+							durationSteps[durationCount] = rest;							// --> add 0.4
+							durationCount++;												// --> 3 + 1 = 4 durations (3 * 2mm + 1 * 0.4mm )
 						}
 					} else {
 						std::cerr << "CncConfig: maxDurations reached: " << durationCount << std::endl;
 					}
 				} else {
-					// no currentZDepth
-					// set durationCount = 1 to path around one time for plotting;
+					// currentZDepth/maxDurationThickness < 1
 					durationCount = 1;
-					durationSteps[0] = 0.0;
+					
+					wxASSERT(currentZDepth < maxDurationThickness);
+					if ( currentZDepth >= 0.0 )	durationSteps[0] = currentZDepth;
+					else 						durationSteps[0] = 0.0;
 				}
 			} else {
 				std::cerr << "CncConfig: Invalid maxDurationThickness: " << maxDurationThickness << std::endl;
@@ -408,12 +410,14 @@ class CncConfig {
 		}
 		////////////////////////////////////////////////////////////////////////
 		double setCurrentZDepth(double dpt) {
-			// dpt is interpreted as abs value
+			sc();
+			
 			currentZDepth = dpt;
 			
 			if ( currentZDepth > workpieceThickness )
 				currentZDepth = workpieceThickness;
 				
+			// dpt is interpreted as abs value
 			if ( currentZDepth < 0.0 )
 				currentZDepth = 0.0;
 			

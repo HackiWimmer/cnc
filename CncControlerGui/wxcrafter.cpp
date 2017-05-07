@@ -3957,7 +3957,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer885->Add(flexGridSizer3175, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    flexGridSizer3175->Add(0, 5, 1, wxALL, WXC_FROM_DIP(0));
+    m_panel3281 = new wxPanel(m_drawPaneWindow, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_drawPaneWindow, wxSize(5,5)), wxTAB_TRAVERSAL);
+    m_panel3281->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer3175->Add(m_panel3281, 0, wxALL, WXC_FROM_DIP(0));
     
     m_yAxisMarker = new wxPanel(m_drawPaneWindow, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_drawPaneWindow, wxSize(5,-1)), wxTAB_TRAVERSAL);
     m_yAxisMarker->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVEBORDER));
@@ -3965,7 +3968,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3175->Add(m_yAxisMarker, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     m_yAxisMarker->SetMinSize(wxSize(5,-1));
     
-    flexGridSizer3175->Add(0, 5, 1, wxALL, WXC_FROM_DIP(0));
+    m_panel32812 = new wxPanel(m_drawPaneWindow, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_drawPaneWindow, wxSize(5,5)), wxTAB_TRAVERSAL);
+    m_panel32812->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer3175->Add(m_panel32812, 0, wxALL, WXC_FROM_DIP(0));
     
     flexGridSizer1416 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1416->SetFlexibleDirection( wxBOTH );
