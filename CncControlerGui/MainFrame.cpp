@@ -102,12 +102,23 @@ MainFrame::MainFrame(wxWindow* parent)
 	install3DPane();
 	installSypControl();
 	
-	// instll galobal key down hook
+	// bind global key down hook
 	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
 ///////////////////////////////////////////////////////////////////
+	// stop the serial timer and wait interval to finish the work behind
+	m_serialTimer->Stop();
+	if ( cnc != NULL )
+		cnc->waitActive(m_serialTimer->GetInterval());
+	
+	// unbind global key down hook
+	this->Unbind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
+	
+	// todo
+	//this->Unbind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent& event) {});
+
 	wxASSERT(lruStore);
 	lruFileList.save(lruStore);
 	lruStore->Flush();
@@ -152,6 +163,34 @@ void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 	}
 	
 	event.Skip(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
+///////////////////////////////////////////////////////////////////
+	// overides the from wxcrafter generted method
+
+	event.Skip();
+	
+	if (event.IsDropDownClicked()) {
+		wxAuiToolBar* toolbar = wxDynamicCast(event.GetEventObject(), wxAuiToolBar);
+	
+		if (toolbar) {
+			wxAuiToolBarItem* item = toolbar->FindTool(event.GetId());
+			if (item) {
+				std::map<int, wxMenu*>::iterator iter = m_dropdownMenus.find(item->GetId());
+				if (iter != m_dropdownMenus.end()) {
+					event.Skip(false);
+					wxPoint pt = event.GetItemRect().GetBottomLeft();
+					pt.y++;
+					
+					// dont use the toolbar event handler because this will generate a crash will cnc::waitActive is in action!
+					//toolbar->PopupMenu(iter->second, pt);
+					this->PopupMenu(iter->second, pt);
+					
+				}
+			}
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::setRefPostionState(bool state) {
@@ -454,11 +493,12 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
 	
 	//todo
-	wxCommandEvent dummy;
-	openSVGPathGenerator(dummy);
+	//wxCommandEvent dummy;
+	//openSVGPathGenerator(dummy);
+	
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::serialTimer(wxTimerEvent& event) {
+void MainFrame::traceTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// trace info handling
 	if ( m_tmpTraceInfo->GetValue().IsEmpty() ) traceTimerCounter = 0;
@@ -468,7 +508,10 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		traceTimerCounter = 0;
 		m_tmpTraceInfo->Clear();
 	}
-	
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::serialTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
 	// idle handling
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
 		if ( m_connect->IsEnabled() == false )
@@ -480,7 +523,9 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		if ( cnc->isConnected() == false )
 			return;
 			
+		m_serialTimer->Stop();
 		cnc->sendIdleMessage();
+		m_serialTimer->Start();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -609,7 +654,10 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	// Set specific styles
 	switch ( format ) {
 		case TplSvg:
+
+#ifndef DEBUG
 			ctl->SetLexer(wxSTC_LEX_HTML);
+#endif
 			
 			// setup highlight colours
 			ctl->StyleSetForeground(wxSTC_H_DOUBLESTRING,		wxColour(255, 	205, 	139));
@@ -6283,7 +6331,7 @@ void MainFrame::cfgStepDelayDropDown(wxAuiToolBarEvent& event) {
 		
 	if ( m_miCfgStepDelayMax->IsChecked() )
 		cfgStepDelayMax(event);
-	
+
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
@@ -6376,6 +6424,13 @@ void MainFrame::displayPGenErrorInfo(const wxString& errorInfo) {
 	wxMessageDialog dlg(this, "Path generation failed!", "Path Generator Error Message", wxOK|wxICON_ERROR);
  	dlg.SetExtendedMessage(errorInfo);
 	dlg.ShowModal();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openPathGen() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(pathGenerator);
+	if ( pathGenerator->IsShown() == false ) 
+		pathGenerator->Show();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node) {
@@ -6589,3 +6644,4 @@ void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
 		m_cbUCValueTo->AppendText(wxString(tokenizer.GetLastDelimiter()));
 	}
 }
+

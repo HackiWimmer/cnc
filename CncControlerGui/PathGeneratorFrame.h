@@ -77,7 +77,6 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		virtual void relaceEditControlSelection(wxCommandEvent& event);
 		virtual void onSize(wxSizeEvent& event);
 		virtual void toogleSize(wxCommandEvent& event);
- 		virtual void onStartupTimer(wxTimerEvent& event);
 		virtual void propertyChanged(wxPropertyGridEvent& event);
 		virtual void selectPathSelector(wxCommandEvent& event);
 		virtual void clearView(wxCommandEvent& event);
@@ -89,6 +88,9 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 	public:
 		PathGeneratorFrame(wxWindow* parent, wxStyledTextCtrl* tplEditor);
 		virtual ~PathGeneratorFrame();
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool Show(bool show=true);
 		
 		///////////////////////////////////////////////////////////////////
 		void updateEditControlCanReplaceState(bool state) {

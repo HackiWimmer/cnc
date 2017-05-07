@@ -801,11 +801,10 @@ void CncControl::forceDisplayPositions() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::waitActive(unsigned int milliseconds, bool once) {
 ///////////////////////////////////////////////////////////////////
-	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
 	if ( milliseconds == 0 ) {
 		if ( once == true ) {
-			while (evtLoop->Pending()) {
-				evtLoop->Dispatch();
+			while (wxEventLoopBase::GetActive()->Pending()) {
+				wxEventLoopBase::GetActive()->Dispatch();
 			}
 		}
 		return;
@@ -815,10 +814,10 @@ void CncControl::waitActive(unsigned int milliseconds, bool once) {
 	wxDateTime e = wxDateTime::UNow();
 	
 	while ( wxTimeSpan(e - s).GetMilliseconds() < milliseconds ) {
-		while (evtLoop->Pending()) {
-			evtLoop->Dispatch();
-			e = wxDateTime::UNow();
+		while (wxEventLoopBase::GetActive()->Pending()) {
+			wxEventLoopBase::GetActive()->Dispatch();
 			
+			e = wxDateTime::UNow();
 			if ( wxTimeSpan(e - s).GetMilliseconds() < milliseconds )
 				break;
 		}
@@ -878,7 +877,6 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 			msg.Replace(replace, errorCode);
 		}
 	}
-	
 	
 	if ( guiCtlSetup->mainWnd != NULL )
 		guiCtlSetup->mainWnd->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
@@ -1004,9 +1002,10 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	// 2D points
 	static PointPair pp;
 	PointPair tmp = pp;
-	pp.zAxisDown = zAxisDown;
-	pp.lp = lastDrawPoint;
-	pp.cp = p;
+	pp.zAxisDown  = zAxisDown;
+	pp.lp         = lastDrawPoint;
+	pp.cp         = p;
+	pp.pen        = penHandler.getCurrentPen(zAxisDown);
 	lastDrawPoint = p;
 	
 	// 3D points
@@ -1252,9 +1251,8 @@ void CncControl::redrawDrawPane(double fact) {
 
 	// curve
 	if ( /*getCncConfig()->isOnlineUpdateDrawPane() ==*/ true ) {
-		dc.SetPen(penHandler.getCurrentPen(true));
-		
 		for (DrawPoints::iterator it = drawPoints.begin(); it != drawPoints.end(); ++it) {
+			dc.SetPen(it->pen);
 			dc.DrawLine((*it).lp, (*it).cp);
 		}
 	}
@@ -2441,9 +2439,11 @@ void CncControl::sendIdleMessage() {
 	if ( getSerial() == NULL )
 		return;
 		
-	if ( getSerial()->isCommandActive() == true )
+	if ( getSerial()->isCommandActive() == true ) {
 		return;
+	}
 	
+	//clog <<  wxDateTime::UNow().FormatTime() << " - idle,  delay:" << getStepDelay() << endl;
 	getSerial()->processIdle();
 }
 ///////////////////////////////////////////////////////////////////

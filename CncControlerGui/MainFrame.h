@@ -53,16 +53,18 @@ class MainFrame : public MainFrameBClass {
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// svg edit popup callbacks
+		void openPathGen();
 		void regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
 		void openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);
+		
+		//////////////////////////////////////////////////////////////////////////////////
+		virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
 
 	protected:
-    virtual void selectUCChangeFrom(wxCommandEvent& event);
-    virtual void selectUCUnitFrom(wxCommandEvent& event);
-    virtual void selectUCUnitTo(wxCommandEvent& event);
+
    
 		// will be bind to this frame
 		void globalKeyDownHook(wxKeyEvent& event);
@@ -323,6 +325,10 @@ class MainFrame : public MainFrameBClass {
 		
 	protected:
 		// User command
+		virtual void traceTimer(wxTimerEvent& event);
+		virtual void selectUCChangeFrom(wxCommandEvent& event);
+		virtual void selectUCUnitFrom(wxCommandEvent& event);
+		virtual void selectUCUnitTo(wxCommandEvent& event);
 		virtual void closeUnitCalculator(wxCommandEvent& event);
 		virtual void emuContentDClick(wxMouseEvent& event);
 		virtual void fileContentDClick(wxMouseEvent& event);

@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 3270,
+  "m_objCounter": 3279,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -56905,6 +56905,40 @@
        "m_noBody": false
       }],
      "m_children": []
+    }, {
+     "m_type": 4483,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "m_traceTimer"
+      }, {
+       "type": "integer",
+       "m_label": "Interval",
+       "m_value": 500
+      }, {
+       "type": "bool",
+       "m_label": "Start the timer",
+       "m_value": true
+      }, {
+       "type": "bool",
+       "m_label": "One Shot Timer",
+       "m_value": false
+      }],
+     "m_events": [{
+       "m_eventName": "wxEVT_TIMER",
+       "m_eventClass": "wxTimerEvent",
+       "m_eventHandler": "wxTimerEventHandler",
+       "m_functionNameAndSignature": "traceTimer(wxTimerEvent& event)",
+       "m_description": "Process a timer event",
+       "m_noBody": false
+      }],
+     "m_children": []
     }]
   }, {
    "m_type": 4402,
@@ -62003,40 +62037,6 @@
           }]
         }]
       }]
-    }, {
-     "m_type": 4483,
-     "proportion": 0,
-     "border": 5,
-     "gbSpan": "1,1",
-     "gbPosition": "0,0",
-     "m_styles": [],
-     "m_sizerFlags": [],
-     "m_properties": [{
-       "type": "string",
-       "m_label": "Name:",
-       "m_value": "m_timer3212"
-      }, {
-       "type": "integer",
-       "m_label": "Interval",
-       "m_value": 500
-      }, {
-       "type": "bool",
-       "m_label": "Start the timer",
-       "m_value": true
-      }, {
-       "type": "bool",
-       "m_label": "One Shot Timer",
-       "m_value": true
-      }],
-     "m_events": [{
-       "m_eventName": "wxEVT_TIMER",
-       "m_eventClass": "wxTimerEvent",
-       "m_eventHandler": "wxTimerEventHandler",
-       "m_functionNameAndSignature": "onStartupTimer(wxTimerEvent& event)",
-       "m_description": "Process a timer event",
-       "m_noBody": false
-      }],
-     "m_children": []
     }]
   }, {
    "m_type": 4421,

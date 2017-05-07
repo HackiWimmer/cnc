@@ -41,6 +41,8 @@ struct CncWorkingParameters {
 			
 			flag = flag.SubString(1, flag.Length()-1);
 			flag.ToDouble(&currentZDepth);
+			
+			//clog << "z depth" << currentZDepthMode << currentZDepth << endl;
 		}
 		
 		///////////////////////////////////////////////////////////

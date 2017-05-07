@@ -39,6 +39,7 @@ typedef std::vector<PositionInfo3D> DrawPoints3D;
 struct PointPair {
 	wxPoint lp;
 	wxPoint cp;
+	wxPen pen = {255,255,255};
 	bool zAxisDown;
 	
 	//////////////////////////////////////////////////////////////////

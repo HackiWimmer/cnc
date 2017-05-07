@@ -7,8 +7,6 @@ unsigned int SvgUnitCalculator::_DPI				= _DPI_DEFAULT;
 const char* SvgUnitCalculator::_unknown 			= "unknown";
 SVGReferenceUnit SvgUnitCalculator::_referenceUnit	= MM;
 
-double SvgUnitCalculator::_returnValue 				= 1;
-
 double SvgUnitCalculator::_DPI_FACT_NULL			= 0.0;
 double SvgUnitCalculator::_DPI_FACT_PX				= _DPI_FACT_NULL;
 double SvgUnitCalculator::_DPI_FACT_PT				= _DPI_FACT_NULL;

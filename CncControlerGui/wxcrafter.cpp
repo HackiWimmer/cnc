@@ -5139,6 +5139,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_serialTimer = new wxTimer;
     m_serialTimer->Start(500, false);
     
+    m_traceTimer = new wxTimer;
+    m_traceTimer->Start(500, false);
+    
     
     #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(m_mainNotebook)){
@@ -5523,6 +5526,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_menuItem309->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnAbout), NULL, this);
     m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::startupTimer), NULL, this);
     m_serialTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::serialTimer), NULL, this);
+    m_traceTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::traceTimer), NULL, this);
     
     this->Connect(wxID_ANY, wxEVT_COMMAND_AUITOOLBAR_TOOL_DROPDOWN, wxAuiToolBarEventHandler(MainFrameBClass::ShowAuiToolMenu), NULL, this);
 }
@@ -5825,6 +5829,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_menuItem309->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnAbout), NULL, this);
     m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::startupTimer), NULL, this);
     m_serialTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::serialTimer), NULL, this);
+    m_traceTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::traceTimer), NULL, this);
     
     m_auimgrMain->UnInit();
     delete m_auimgrMain;
@@ -5840,6 +5845,9 @@ MainFrameBClass::~MainFrameBClass()
 
     m_serialTimer->Stop();
     wxDELETE( m_serialTimer );
+
+    m_traceTimer->Stop();
+    wxDELETE( m_traceTimer );
 
     this->Disconnect(wxID_ANY, wxEVT_COMMAND_AUITOOLBAR_TOOL_DROPDOWN, wxAuiToolBarEventHandler(MainFrameBClass::ShowAuiToolMenu), NULL, this);
 }
@@ -6246,9 +6254,6 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgPropSkewY->SetHelpString(wxT(""));
     m_pgPropSkewY->SetEditor( wxT("TextCtrl") );
     
-    m_timer3212 = new wxTimer;
-    m_timer3212->Start(500, true);
-    
     SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
     
     #if wxVERSION_NUMBER >= 2900
@@ -6291,7 +6296,6 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_btPGMinimize->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::toogleSize), NULL, this);
     m_btPGClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::onCloseWindowFromButton), NULL, this);
     m_pgParameterMgr->Connect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(PathGeneratorFrameBase::propertyChanged), NULL, this);
-    m_timer3212->Connect(wxEVT_TIMER, wxTimerEventHandler(PathGeneratorFrameBase::onStartupTimer), NULL, this);
     
 }
 
@@ -6311,11 +6315,7 @@ PathGeneratorFrameBase::~PathGeneratorFrameBase()
     m_btPGMinimize->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::toogleSize), NULL, this);
     m_btPGClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::onCloseWindowFromButton), NULL, this);
     m_pgParameterMgr->Disconnect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(PathGeneratorFrameBase::propertyChanged), NULL, this);
-    m_timer3212->Disconnect(wxEVT_TIMER, wxTimerEventHandler(PathGeneratorFrameBase::onStartupTimer), NULL, this);
     
-    m_timer3212->Stop();
-    wxDELETE( m_timer3212 );
-
 }
 
 EndSwitchDialogBase::EndSwitchDialogBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)

@@ -1,7 +1,7 @@
 #include "SvgEditPopup.h"
 
 #define svgPathGenItemString								"PGen - Insert last SVG pattern"
-unsigned int SvgEditPopup::_idOffset 						= 0;
+unsigned int SvgEditPopup::_idOffset 						= wxID_HIGHEST;
 
 wxString SvgNodeTemplates::_ret								= _T("");
 const char* SvgNodeTemplates::CncParameterBlockNodeName		= "CncParameterBlock";
@@ -158,6 +158,7 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 	popup->AppendSeparator();
 	
 	if ( extended == true ) {
+		popup->Append(idOffset + STC_PM_PGEN_OPEN, 							wxT("PGen - Open Editor"));
 		popup->Append(idOffset + STC_PM_PGEN_INSERT_CURRENT_SVG_FRAGMENT,	wxT(svgPathGenItemString));
 		popup->Append(idOffset + STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK,	wxT("PGen - ReGenerate current SVG Pattern"));
 		popup->Append(idOffset + STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK,	wxT("PGen - Open Editor with current SVG Pattern"));
@@ -197,6 +198,9 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 	popup->Append(idOffset + STC_PM_CUT, 					wxT("Cut"));
 	popup->Append(idOffset + STC_PM_DELETE, 				wxT("Delete"));
 	
+	
+//return popup;
+
 	//............................................
 	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
@@ -412,6 +416,16 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 			frame->regenerateCurrentSvgNodeFromPopup(ctl, node);
 			
 	 }, idOffset + STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
+	 
+	//............................................
+	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [frame](wxCommandEvent& event) {
+			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
+			wxASSERT(ctl);
+			
+			frame->openPathGen();
+			
+	 }, idOffset + STC_PM_PGEN_OPEN, wxID_ANY, ctl);
 	 
 	//............................................
 	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,

@@ -37,11 +37,8 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 	if ( toolRadius < 0 )
 		toolRadius *= (-1.0);
 		
-	if ( toolRadius > 0 ) {
-		std::clog << "SVGPathHandlerCnc::processLinearMove" << std::endl;
-		std::clog << " Tool path correction will be activated" << std::endl;
-		std::clog << " Tool radius: " << toolRadius << std::endl;
-	}
+	if ( toolRadius > 0 )
+		cnc::trc.logInfoMessage(wxString::Format("Tool path correction will be activated: Radius: %.3lf", toolRadius));
 	
 	curveLibResolution = (float)(cncControl->getCncConfig()->getCurveLibResolution());
 	

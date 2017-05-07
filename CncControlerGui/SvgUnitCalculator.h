@@ -12,7 +12,6 @@ class SvgUnitCalculator {
 	
 	private:
 		static SVGReferenceUnit	_referenceUnit;
-		static double 			_returnValue;
 		static const char*		_unknown;
 	
 		// dpi = 90 is defined by the most SVG tools like inkscape,
@@ -69,15 +68,9 @@ class SvgUnitCalculator {
 		
 		/////////////////////////////////////////////////////////////////////
 		static double convertUnit2Unit(const SVGUnit& from, const SVGUnit& to, double& value) {
-			_returnValue = convertUnit2MM(from, value);
-			_returnValue = convertMM2Unit(to,   value);
-			return _returnValue;
-		}
-		
-		/////////////////////////////////////////////////////////////////////
-		static double calculateUnit2MM(const SVGUnit& from, double value) {
-			convertUnit2MM(from, _returnValue);
-			return _returnValue;
+			convertUnit2MM(from, value);
+			convertMM2Unit(to,   value);
+			return value;
 		}
 		
 		/////////////////////////////////////////////////////////////////////
@@ -87,21 +80,9 @@ class SvgUnitCalculator {
 		}
 		
 		/////////////////////////////////////////////////////////////////////
-		static double calculateMM2Unit(const SVGUnit& from, double value) {
-			convertMM2Unit(from, _returnValue);
-			return _returnValue;
-		}
-		
-		/////////////////////////////////////////////////////////////////////
 		static double convertMM2Unit(const SVGUnit& from, double& value) {
 			value *= getFactorMM2Input(from);
 			return value;
-		}
-		
-		/////////////////////////////////////////////////////////////////////
-		static double calculateReferenceUnit2MM(double value) {
-			convertReferenceUnit2MM(_returnValue);
-			return _returnValue;
 		}
 		
 		/////////////////////////////////////////////////////////////////////

@@ -15,7 +15,7 @@ extern const char* _copyRight;
 ///////////////////////////////////////////////////////////////////
 static const wxCmdLineEntryDesc cmdLineDesc[] = {
 ///////////////////////////////////////////////////////////////////
-    { wxCMD_LINE_OPTION, "g", "dbg", "Start CncController in debug mode", wxCMD_LINE_VAL_STRING, wxCMD_LINE_PARAM_OPTIONAL },
+    { wxCMD_LINE_SWITCH , "g", "dbg", "Start CncController in debug mode", wxCMD_LINE_VAL_NONE , wxCMD_LINE_PARAM_OPTIONAL },
 	{ wxCMD_LINE_NONE }
 };
 
@@ -241,8 +241,10 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		bool getCmdLineParameter(const char* param) {
 		///////////////////////////////////////////////////////////
-			wxString value;
-			return getCmdLineParameter(param, value);
+			if( parser.Found(param) )
+				return true;
+				
+			return false;
 		}
 		
 		///////////////////////////////////////////////////////////

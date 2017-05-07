@@ -35,12 +35,20 @@ PathGeneratorFrame::~PathGeneratorFrame() {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::onStartupTimer(wxTimerEvent& event) {
+bool PathGeneratorFrame::Show(bool show) {
 ///////////////////////////////////////////////////////////////////
-	setupPathSelector();
+	bool ret = PathGeneratorFrameBase::Show(show);
 	
-	wxCommandEvent dummy;
-	selectPathSelector(dummy);
+	if ( show == true ) {
+		if ( m_pgPathSelector->GetSelection() < 0 ) {
+			setupPathSelector();
+			
+			wxCommandEvent dummy;
+			selectPathSelector(dummy);
+		}
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::closeWindow() {

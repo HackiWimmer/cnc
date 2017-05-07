@@ -862,6 +862,7 @@ protected:
     wxMenuItem* m_menuItem309;
     wxTimer* m_startupTimer;
     wxTimer* m_serialTimer;
+    wxTimer* m_traceTimer;
 
 protected:
     virtual void activateMainWindow(wxActivateEvent& event) { event.Skip(); }
@@ -1137,6 +1138,7 @@ protected:
     virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
     virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
     virtual void serialTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void traceTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText1842() { return m_staticText1842; }
@@ -1681,6 +1683,7 @@ public:
     wxMenuBar* GetMenuBar() { return m_menuBar; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }
     wxTimer* GetSerialTimer() { return m_serialTimer; }
+    wxTimer* GetTraceTimer() { return m_traceTimer; }
     MainFrameBClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1000,700), long style = wxDEFAULT_FRAME_STYLE);
     virtual ~MainFrameBClass();
 };
@@ -1766,7 +1769,6 @@ protected:
     wxPGProperty* m_pgCatSkrew;
     wxPGProperty* m_pgPropSkewX;
     wxPGProperty* m_pgPropSkewY;
-    wxTimer* m_timer3212;
 
 protected:
     virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
@@ -1782,7 +1784,6 @@ protected:
     virtual void toogleSize(wxCommandEvent& event) { event.Skip(); }
     virtual void onCloseWindowFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void propertyChanged(wxPropertyGridEvent& event) { event.Skip(); }
-    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText3095() { return m_staticText3095; }
@@ -1806,7 +1807,6 @@ public:
     wxPropertyGridManager* GetPgParameterMgr() { return m_pgParameterMgr; }
     wxPanel* GetSplitterPage3193() { return m_splitterPage3193; }
     wxSplitterWindow* GetSplitter3185() { return m_splitter3185; }
-    wxTimer* GetTimer3212() { return m_timer3212; }
     PathGeneratorFrameBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SVG Path Generator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,750), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
     virtual ~PathGeneratorFrameBase();
 };
