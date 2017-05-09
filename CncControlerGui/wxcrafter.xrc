@@ -7032,6 +7032,7 @@ Axis</label>
                                     <growablerows>1</growablerows>
                                     <object class="sizeritem">
                                       <flag>wxALL</flag>
+                                      <minsize>5,5</minsize>
                                       <object class="wxPanel" name="m_panel3281">
                                         <style>wxTAB_TRAVERSAL</style>
                                         <size>5,5</size>
@@ -7049,6 +7050,7 @@ Axis</label>
                                     </object>
                                     <object class="sizeritem">
                                       <flag>wxALL</flag>
+                                      <minsize>5,5</minsize>
                                       <object class="wxPanel" name="m_panel32812">
                                         <style>wxTAB_TRAVERSAL</style>
                                         <size>5,5</size>
@@ -7570,7 +7572,7 @@ Axis</label>
                   </object>
                 </object>
                 <object class="notebookpage">
-                  <label>3D View</label>
+                  <label>3D Motion View</label>
                   <bitmap>bitmaps/16-gtk.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_3DPane">
@@ -9207,13 +9209,14 @@ Axis</label>
       <growablerows>0</growablerows>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>
-        <object class="wxSplitterWindow" name="m_splitter3185">
+        <border>5</border>
+        <object class="wxSplitterWindow" name="m_mainSplitter">
           <style>wxSP_3D</style>
-          <gravity>0.65</gravity>
-          <minsize>10</minsize>
+          <gravity>0.15</gravity>
+          <minsize>24</minsize>
           <sashpos>0</sashpos>
           <orientation>vertical</orientation>
-          <object class="wxPanel" name="m_splitterPage3189">
+          <object class="wxPanel" name="m_leftMainSplitterPage">
             <style>wxTAB_TRAVERSAL</style>
             <object class="wxFlexGridSizer">
               <cols>1</cols>
@@ -9221,83 +9224,146 @@ Axis</label>
               <vgap>0</vgap>
               <hgap>0</hgap>
               <growablecols>0</growablecols>
-              <growablerows>1</growablerows>
-              <object class="sizeritem" name="flexGridSizer3093">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>1</border>
+              <growablerows>2</growablerows>
+              <object class="sizeritem" name="flexGridSizer3315">
+                <flag>wxALL|wxEXPAND|wxALIGN_LEFT</flag>
+                <option>1</option>
                 <object class="wxFlexGridSizer">
-                  <cols>2</cols>
+                  <cols>3</cols>
                   <rows>1</rows>
                   <vgap>0</vgap>
                   <hgap>0</hgap>
                   <growablecols>1</growablecols>
-                  <growablerows>0</growablerows>
+                  <growablerows/>
                   <object class="sizeritem">
                     <flag>wxALL</flag>
-                    <border>5</border>
-                    <object class="wxStaticText" name="m_staticText3095">
-                      <label>Path Template:</label>
+                    <border>1</border>
+                    <minsize>24,24</minsize>
+                    <object class="wxButton" name="m_btPGMinimizeTree">
+                      <label/>
                       <style/>
-                      <font>
-                        <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <underlined>0</underlined>
-                      </font>
+                      <size>24,24</size>
+                      <tooltip>
+                        <![CDATA[Minimize Tree]]>
+                      </tooltip>
+                      <bitmap>bitmaps/16-minus.png</bitmap>
+                      <bitmapposition>wxLEFT</bitmapposition>
+                      <default>0</default>
                     </object>
                   </object>
                   <object class="sizeritem">
                     <flag>wxALL|wxEXPAND</flag>
-                    <border>1</border>
-                    <object class="wxComboBox" name="m_pgPathSelector">
-                      <style>wxCB_SORT|wxCB_READONLY</style>
+                    <border>2</border>
+                    <minsize>-1,22</minsize>
+                    <object class="wxTextCtrl" name="m_treeSearchText">
+                      <style>wxTE_MULTILINE</style>
+                      <size>-1,22</size>
                       <tooltip>
-                        <![CDATA[Path Selector]]>
+                        <![CDATA[Search First in Tree]]>
                       </tooltip>
-                      <selection>-1</selection>
-                      <content/>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>1</border>
+                    <minsize>24,24</minsize>
+                    <object class="wxButton" name="m_btSearchTree">
+                      <label/>
+                      <style/>
+                      <size>24,24</size>
+                      <tooltip>
+                        <![CDATA[Search Next in Tree]]>
+                      </tooltip>
+                      <bitmap>bitmaps/16-cscope.png</bitmap>
+                      <bitmapposition>wxLEFT</bitmapposition>
+                      <default>0</default>
                     </object>
                   </object>
                 </object>
               </object>
-              <object class="sizeritem" name="flexGridSizer2825">
+              <object class="spacer" name="Spacer3319">
+                <size>0,3</size>
+                <flag>wxALL</flag>
+                <option>1</option>
+              </object>
+              <object class="sizeritem">
                 <flag>wxALL|wxEXPAND</flag>
                 <border>1</border>
-                <option>1</option>
-                <object class="wxFlexGridSizer">
-                  <cols>1</cols>
-                  <rows>1</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols>0</growablecols>
-                  <growablerows>0</growablerows>
-                  <object class="sizeritem">
-                    <flag>wxALL|wxEXPAND</flag>
-                    <object class="wxSplitterWindow" name="m_splitter2932">
-                      <style>wxSP_3D</style>
-                      <gravity>0.7</gravity>
-                      <minsize>10</minsize>
-                      <sashpos>0</sashpos>
-                      <orientation>horizontal</orientation>
-                      <object class="wxPanel" name="m_splitterPage2936">
-                        <style>wxTAB_TRAVERSAL</style>
+                <object class="wxTreeCtrl" name="m_templateTree">
+                  <style>wxTR_DEFAULT_STYLE</style>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="wxPanel" name="m_rightMainSplitterPage">
+            <style>wxTAB_TRAVERSAL</style>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>1</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <object class="wxSplitterWindow" name="m_splitter3185">
+                  <style>wxSP_3D</style>
+                  <gravity>0.65</gravity>
+                  <minsize>6</minsize>
+                  <sashpos>0</sashpos>
+                  <orientation>vertical</orientation>
+                  <object class="wxPanel" name="m_splitterPage3189">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <object class="wxFlexGridSizer">
+                      <cols>1</cols>
+                      <rows>3</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>0</growablecols>
+                      <growablerows>1</growablerows>
+                      <object class="sizeritem" name="flexGridSizer3093">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
                         <object class="wxFlexGridSizer">
-                          <cols>1</cols>
+                          <cols>2</cols>
                           <rows>1</rows>
                           <vgap>0</vgap>
                           <hgap>0</hgap>
-                          <growablecols>0</growablecols>
+                          <growablecols>1</growablecols>
                           <growablerows>0</growablerows>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>5</border>
+                            <object class="wxStaticText" name="m_staticText3095">
+                              <label>Path Template:</label>
+                              <style/>
+                              <font>
+                                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                <style>normal</style>
+                                <weight>bold</weight>
+                                <underlined>0</underlined>
+                              </font>
+                            </object>
+                          </object>
                           <object class="sizeritem">
                             <flag>wxALL|wxEXPAND</flag>
                             <border>1</border>
-                            <option>1</option>
-                            <object class="unknown" name="m_pgPreview"/>
+                            <object class="wxComboBox" name="m_pgPathSelector">
+                              <style>wxCB_SORT|wxCB_READONLY</style>
+                              <tooltip>
+                                <![CDATA[Path Selector]]>
+                              </tooltip>
+                              <enabled>0</enabled>
+                              <selection>-1</selection>
+                              <content/>
+                            </object>
                           </object>
                         </object>
                       </object>
-                      <object class="wxPanel" name="m_splitterPage2940">
-                        <style>wxTAB_TRAVERSAL</style>
+                      <object class="sizeritem" name="flexGridSizer2825">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <option>1</option>
                         <object class="wxFlexGridSizer">
                           <cols>1</cols>
                           <rows>1</rows>
@@ -9307,54 +9373,193 @@ Axis</label>
                           <growablerows>0</growablerows>
                           <object class="sizeritem">
                             <flag>wxALL|wxEXPAND</flag>
-                            <border>1</border>
-                            <object class="wxToolbook" name="m_toolbook3227">
-                              <style>wxTBK_BUTTONBAR|wxBK_LEFT</style>
-                              <object class="toolbookpage">
-                                <label>Preview</label>
-                                <bitmap>bitmaps/16-fold.png</bitmap>
-                                <selected>1</selected>
-                                <object class="wxPanel" name="m_panel3229">
-                                  <style>wxTAB_TRAVERSAL</style>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>1</cols>
-                                    <rows>1</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>0</growablecols>
-                                    <growablerows>0</growablerows>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>1</border>
-                                      <object class="wxTextCtrl" name="m_generatedPreview">
-                                        <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
-                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                        <fg>wxSYS_COLOUR_INFOBK</fg>
+                            <object class="wxSplitterWindow" name="m_splitter2932">
+                              <style>wxSP_3D</style>
+                              <gravity>0.7</gravity>
+                              <minsize>10</minsize>
+                              <sashpos>0</sashpos>
+                              <orientation>horizontal</orientation>
+                              <object class="wxPanel" name="m_splitterPage2936">
+                                <style>wxTAB_TRAVERSAL</style>
+                                <object class="wxFlexGridSizer">
+                                  <cols>1</cols>
+                                  <rows>1</rows>
+                                  <vgap>0</vgap>
+                                  <hgap>0</hgap>
+                                  <growablecols>0</growablecols>
+                                  <growablerows>0</growablerows>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxEXPAND</flag>
+                                    <object class="wxNotebook" name="m_pgMainBook">
+                                      <style>wxBK_DEFAULT</style>
+                                      <object class="notebookpage">
+                                        <label>Template Preview</label>
+                                        <selected>0</selected>
+                                        <object class="wxPanel" name="m_pgPreviewPage">
+                                          <style>wxTAB_TRAVERSAL</style>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>1</cols>
+                                            <rows>1</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols>0</growablecols>
+                                            <growablerows>0</growablerows>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>1</border>
+                                              <option>1</option>
+                                              <object class="unknown" name="m_pgPreview"/>
+                                            </object>
+                                          </object>
+                                        </object>
+                                      </object>
+                                      <object class="notebookpage">
+                                        <label>Additional Info</label>
+                                        <selected>0</selected>
+                                        <object class="wxPanel" name="m_pgAdditionalInfoPage">
+                                          <style>wxTAB_TRAVERSAL</style>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>1</cols>
+                                            <rows>1</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols>0</growablecols>
+                                            <growablerows>0</growablerows>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>5</border>
+                                              <object class="wxTextCtrl" name="m_additionalInfo">
+                                                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL</style>
+                                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                                <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                                <font>
+                                                  <size>10</size>
+                                                  <style>normal</style>
+                                                  <weight>normal</weight>
+                                                  <family>modern</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Consolas</face>
+                                                </font>
+                                              </object>
+                                            </object>
+                                          </object>
+                                        </object>
                                       </object>
                                     </object>
                                   </object>
                                 </object>
                               </object>
-                              <object class="toolbookpage">
-                                <label>Result</label>
-                                <bitmap>bitmaps/16-globals.png</bitmap>
-                                <selected>0</selected>
-                                <object class="wxPanel" name="m_panel3231">
-                                  <style>wxTAB_TRAVERSAL</style>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>1</cols>
-                                    <rows>1</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>0</growablecols>
-                                    <growablerows>0</growablerows>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>1</border>
-                                      <object class="wxTextCtrl" name="m_generatedResult">
-                                        <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
-                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                        <fg>wxSYS_COLOUR_INACTIVECAPTION</fg>
+                              <object class="wxPanel" name="m_splitterPage2940">
+                                <style>wxTAB_TRAVERSAL</style>
+                                <object class="wxFlexGridSizer">
+                                  <cols>1</cols>
+                                  <rows>1</rows>
+                                  <vgap>0</vgap>
+                                  <hgap>0</hgap>
+                                  <growablecols>0</growablecols>
+                                  <growablerows>0</growablerows>
+                                  <object class="sizeritem">
+                                    <flag>wxALL|wxEXPAND</flag>
+                                    <border>1</border>
+                                    <object class="wxToolbook" name="m_tbOutput">
+                                      <style>wxTBK_BUTTONBAR|wxBK_LEFT</style>
+                                      <object class="toolbookpage">
+                                        <label>Preview</label>
+                                        <bitmap>bitmaps/16-fold.png</bitmap>
+                                        <selected>1</selected>
+                                        <object class="wxPanel" name="m_panelPreview">
+                                          <style>wxTAB_TRAVERSAL</style>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>1</cols>
+                                            <rows>1</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols>0</growablecols>
+                                            <growablerows>0</growablerows>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>1</border>
+                                              <object class="wxTextCtrl" name="m_generatedPreview">
+                                                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+                                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                                <fg>wxSYS_COLOUR_INFOBK</fg>
+                                                <font>
+                                                  <size>10</size>
+                                                  <style>normal</style>
+                                                  <weight>normal</weight>
+                                                  <family>modern</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Consolas</face>
+                                                </font>
+                                              </object>
+                                            </object>
+                                          </object>
+                                        </object>
+                                      </object>
+                                      <object class="toolbookpage">
+                                        <label>Result</label>
+                                        <bitmap>bitmaps/16-globals.png</bitmap>
+                                        <selected>0</selected>
+                                        <object class="wxPanel" name="m_panelResult">
+                                          <style>wxTAB_TRAVERSAL</style>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>1</cols>
+                                            <rows>1</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols>0</growablecols>
+                                            <growablerows>0</growablerows>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>1</border>
+                                              <object class="wxTextCtrl" name="m_generatedResult">
+                                                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+                                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                                <fg>wxSYS_COLOUR_INACTIVECAPTION</fg>
+                                                <font>
+                                                  <size>10</size>
+                                                  <style>normal</style>
+                                                  <weight>normal</weight>
+                                                  <family>modern</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Consolas</face>
+                                                </font>
+                                              </object>
+                                            </object>
+                                          </object>
+                                        </object>
+                                      </object>
+                                      <object class="toolbookpage">
+                                        <label>Info</label>
+                                        <bitmap>bitmaps/16-info.png</bitmap>
+                                        <selected>0</selected>
+                                        <object class="wxPanel" name="m_panelInfo">
+                                          <style>wxTAB_TRAVERSAL</style>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>1</cols>
+                                            <rows>1</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols>0</growablecols>
+                                            <growablerows>0</growablerows>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>1</border>
+                                              <object class="wxTextCtrl" name="m_processInfo">
+                                                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE</style>
+                                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                                <font>
+                                                  <size>10</size>
+                                                  <style>normal</style>
+                                                  <weight>normal</weight>
+                                                  <family>modern</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Consolas</face>
+                                                </font>
+                                              </object>
+                                            </object>
+                                          </object>
+                                        </object>
                                       </object>
                                     </object>
                                   </object>
@@ -9366,161 +9571,182 @@ Axis</label>
                       </object>
                     </object>
                   </object>
-                </object>
-              </object>
-            </object>
-          </object>
-          <object class="wxPanel" name="m_splitterPage3193">
-            <style>wxTAB_TRAVERSAL</style>
-            <object class="wxFlexGridSizer">
-              <cols>1</cols>
-              <rows>2</rows>
-              <vgap>0</vgap>
-              <hgap>0</hgap>
-              <growablecols>0</growablecols>
-              <growablerows>1</growablerows>
-              <object class="sizeritem" name="flexGridSizer2874">
-                <flag>wxALL|wxEXPAND|wxALIGN_BOTTOM</flag>
-                <border>1</border>
-                <object class="wxFlexGridSizer">
-                  <cols>5</cols>
-                  <rows>1</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols>3</growablecols>
-                  <growablerows>0</growablerows>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <minsize>24,24</minsize>
-                    <object class="wxButton" name="m_btPGGenerate">
-                      <label/>
-                      <style/>
-                      <size>24,24</size>
-                      <tooltip>
-                        <![CDATA[Generate]]>
-                      </tooltip>
-                      <bitmap>bitmaps/16-cog.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>1</default>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <minsize>24,24</minsize>
-                    <object class="wxButton" name="m_btPGClear">
-                      <label/>
-                      <style/>
-                      <size>24,24</size>
-                      <tooltip>
-                        <![CDATA[Clear]]>
-                      </tooltip>
-                      <bitmap>bitmaps/16-clean.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>0</default>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <minsize>24,24</minsize>
-                    <object class="wxButton" name="m_btPGReplaceEdit">
-                      <label/>
-                      <style/>
-                      <size>24,24</size>
-                      <tooltip>
-                        <![CDATA[Replace at Edit Control]]>
-                      </tooltip>
-                      <bitmap>bitmaps/16-marker.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>0</default>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <minsize>24,24</minsize>
-                    <object class="wxButton" name="m_btPGCopy">
-                      <label/>
-                      <style/>
-                      <size>24,24</size>
-                      <tooltip>
-                        <![CDATA[Copy]]>
-                      </tooltip>
-                      <bitmap>bitmaps/16-copy.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>0</default>
-                    </object>
-                  </object>
-                  <object class="sizeritem" name="flexGridSizer3225">
-                    <flag>wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
+                  <object class="wxPanel" name="m_splitterPage3193">
+                    <style>wxTAB_TRAVERSAL</style>
                     <object class="wxFlexGridSizer">
-                      <cols>2</cols>
-                      <rows>0</rows>
+                      <cols>1</cols>
+                      <rows>2</rows>
                       <vgap>0</vgap>
                       <hgap>0</hgap>
-                      <growablecols/>
-                      <growablerows/>
-                      <object class="sizeritem">
-                        <flag>wxALL|wxALIGN_BOTTOM</flag>
+                      <growablecols>0</growablecols>
+                      <growablerows>1</growablerows>
+                      <object class="sizeritem" name="flexGridSizer2874">
+                        <flag>wxALL|wxEXPAND|wxALIGN_BOTTOM</flag>
                         <border>1</border>
-                        <minsize>24,24</minsize>
-                        <object class="wxButton" name="m_btPGMinimize">
-                          <label/>
-                          <style/>
-                          <size>24,24</size>
-                          <tooltip>
-                            <![CDATA[Toggle Size]]>
-                          </tooltip>
-                          <bitmap>bitmaps/16-minus.png</bitmap>
-                          <bitmapposition>wxLEFT</bitmapposition>
-                          <default>0</default>
+                        <object class="wxFlexGridSizer">
+                          <cols>5</cols>
+                          <rows>1</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols>3</growablecols>
+                          <growablerows>0</growablerows>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_btPGGenerate">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Generate]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-cog.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_btPGClear">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Clear]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-clean.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_btPGReplaceEdit">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Replace at Edit Control]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-marker.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_btPGCopy">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Copy]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-copy.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem" name="flexGridSizer3225">
+                            <flag>wxALL|wxALIGN_RIGHT|wxALIGN_BOTTOM</flag>
+                            <object class="wxFlexGridSizer">
+                              <cols>2</cols>
+                              <rows>0</rows>
+                              <vgap>0</vgap>
+                              <hgap>0</hgap>
+                              <growablecols/>
+                              <growablerows/>
+                              <object class="sizeritem">
+                                <flag>wxALL|wxALIGN_BOTTOM</flag>
+                                <border>1</border>
+                                <minsize>24,24</minsize>
+                                <object class="wxButton" name="m_btPGMinimize">
+                                  <label/>
+                                  <style/>
+                                  <size>24,24</size>
+                                  <tooltip>
+                                    <![CDATA[Toggle Size]]>
+                                  </tooltip>
+                                  <bitmap>bitmaps/16-minus.png</bitmap>
+                                  <bitmapposition>wxLEFT</bitmapposition>
+                                  <default>0</default>
+                                </object>
+                              </object>
+                              <object class="sizeritem">
+                                <flag>wxALL|wxALIGN_BOTTOM</flag>
+                                <border>1</border>
+                                <minsize>24,24</minsize>
+                                <object class="wxButton" name="m_btPGClose">
+                                  <label/>
+                                  <style/>
+                                  <size>24,24</size>
+                                  <tooltip>
+                                    <![CDATA[Close]]>
+                                  </tooltip>
+                                  <bitmap>bitmaps/16-file_close.png</bitmap>
+                                  <bitmapposition>wxLEFT</bitmapposition>
+                                  <default>0</default>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
                         </object>
                       </object>
-                      <object class="sizeritem">
-                        <flag>wxALL|wxALIGN_BOTTOM</flag>
+                      <object class="sizeritem" name="flexGridSizer2972">
+                        <flag>wxALL|wxEXPAND</flag>
                         <border>1</border>
-                        <minsize>24,24</minsize>
-                        <object class="wxButton" name="m_btPGClose">
-                          <label/>
-                          <style/>
-                          <size>24,24</size>
-                          <tooltip>
-                            <![CDATA[Close]]>
-                          </tooltip>
-                          <bitmap>bitmaps/16-file_close.png</bitmap>
-                          <bitmapposition>wxLEFT</bitmapposition>
-                          <default>0</default>
+                        <option>1</option>
+                        <object class="wxFlexGridSizer">
+                          <cols>1</cols>
+                          <rows>2</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols>0</growablecols>
+                          <growablerows>0</growablerows>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>1</border>
+                            <object class="unknown" name="m_pgParameterMgr">
+                              <font>
+                                <size>8</size>
+                                <style>normal</style>
+                                <weight>normal</weight>
+                                <family>swiss</family>
+                                <underlined>0</underlined>
+                                <face>Segoe UI</face>
+                              </font>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxALIGN_RIGHT</flag>
+                            <border>1</border>
+                            <object class="wxCheckBox" name="m_autoGenerate">
+                              <fg>#004080</fg>
+                              <font>
+                                <size>8</size>
+                                <style>normal</style>
+                                <weight>bold</weight>
+                                <family>swiss</family>
+                                <underlined>0</underlined>
+                                <face>Segoe UI</face>
+                              </font>
+                              <tooltip>
+                                <![CDATA[Regenerate the template automatically if a any parameter was changed]]>
+                              </tooltip>
+                              <style/>
+                              <label>Auto Generate</label>
+                              <checked>1</checked>
+                            </object>
+                          </object>
                         </object>
                       </object>
-                    </object>
-                  </object>
-                </object>
-              </object>
-              <object class="sizeritem" name="flexGridSizer2972">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>1</border>
-                <option>1</option>
-                <object class="wxFlexGridSizer">
-                  <cols>1</cols>
-                  <rows>1</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols>0</growablecols>
-                  <growablerows>0</growablerows>
-                  <object class="sizeritem">
-                    <flag>wxALL|wxEXPAND</flag>
-                    <border>1</border>
-                    <object class="unknown" name="m_pgParameterMgr">
-                      <font>
-                        <size>8</size>
-                        <style>normal</style>
-                        <weight>normal</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
                     </object>
                   </object>
                 </object>

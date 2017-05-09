@@ -10,8 +10,13 @@
 class PathGeneratorFrame : public PathGeneratorFrameBase
 {
 	private:
-		const int minSizeHeight	= 70;
+		const int minSizeHeight	= 74;
 		int prevSizeHeight;
+		
+		int leftSplitterWidth;
+		bool leftSplitterMinimized;
+		
+		bool hasErrorInfo;
 		
 		wxStyledTextCtrl* templateEditor;
 		
@@ -23,16 +28,32 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		long viewBoxW;
 		long viewBoxH;
 		
+		int lastSearchIndex;
+		
+		TreeIndex treeIndex;
 		PathGeneratorStore pathGeneratorStore;
 		
 		static wxString globaGeneratedPath;
+		
+		///////////////////////////////////////////////////////////////////
+		void selectProcessInfo();
+		void selectPreview();
+		void selectResult();
+		
+		///////////////////////////////////////////////////////////////////
+		void clearProcessInfo();
+		void appendInfoMessage(const wxString& m);
+		void appendWarningMessage(const wxString& m);
+		void appendErrorMessage(const wxString& m);
 		
 		///////////////////////////////////////////////////////////////////
 		void initControls();
 		void closeWindow();
 		void updatePreview();
 		int getPathSelection();
+		int getPathSelection(const wxString& item);
 		void decorateSizeButton();
+		void decorateTreeSizeButton();
 		void enableControls(bool state);
 		void setupPathSelector();
 		void displayGrid(std::fstream& fs);
@@ -54,25 +75,37 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		void updateCncParameterValues(const PathGeneratorBase::CncParameterValues& cpv);
 		
 		///////////////////////////////////////////////////////////////////
+		void evaluateValues();
 		void evaluateCommonValues(int id);
 		void evaluateSvgParameterValues(int id);
 		void evaluateCncParameterValues(int id);
 		void evaluatePathParameterValues(int id);
 		
 		///////////////////////////////////////////////////////////////////
+		wxTreeItemId searchFirstTreeItem(wxTreeItemId parent, const wxString& label, bool fullMatch = true);
+		
+		///////////////////////////////////////////////////////////////////
+		int searchAndSelectFirstTreeItem(const wxString& search = _T(""));
+		int searchAndSelectNextTreeItem(const wxString& search = _T(""));
+		int searchAndSelectTreeItem(const wxString& search, const int startIndex, bool fullMatch=true, const unsigned int minCharMatchCount=3);
+		
+		///////////////////////////////////////////////////////////////////
 		void generatePath();
-		
-		
-		
-		
-		// obsolete
-									bool generateSymetricCirclePoints(std::vector<wxRealPoint>& pl, double xOffset, double yOffset, double sections, double radius);
-									void generatePolygon();
-									void generateKnob();
-									void setPath(wxString path);
 		
 	protected:
 
+		// user events
+		 virtual void checkAutoGenerate(wxCommandEvent& event);
+		virtual void pgMainBookChanged(wxNotebookEvent& event);
+		virtual void propertyChanging(wxPropertyGridEvent& event);
+		virtual void keyDownTreeSearch(wxKeyEvent& event);
+		virtual void onMaximize(wxMaximizeEvent& event);
+		virtual void treeSearch(wxCommandEvent& event);
+		virtual void updateTreeSearch(wxCommandEvent& event);
+		virtual void mainShashPositionChanged( wxSplitterEvent& event);
+		virtual void mainShashPositionChanging( wxSplitterEvent& event);
+		virtual void toogleTreeSize(wxCommandEvent& event);
+		virtual void selectTemplateTree(wxTreeEvent& event);
 		virtual void onActivate(wxActivateEvent& event);
 		virtual void relaceEditControlSelection(wxCommandEvent& event);
 		virtual void onSize(wxSizeEvent& event);

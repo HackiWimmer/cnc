@@ -3,13 +3,32 @@
 
 #include <wx/string.h>
 #include <wx/combobox.h>
+#include <wx/treectrl.h>
 #include <wx/stc/stc.h>
+#include "PathGeneratorBase.h"
 #include "CncCommon.h"
-#include "PathGenerators.h"
+
 
 ///////////////////////////////////////////////////////////////////////////
+struct TreeItemInfo {
+	enum Type {TIT_Unkonwn, TIT_TEMPLATE, TIT_PARENT};
+	
+	Type			itemType 	= TIT_Unkonwn;
+	wxString 		itemName	= "";
+	wxTreeItemId 	itemId;		// invalid
+	
+	//////////////////////////////////////////////////////////////////////
+	TreeItemInfo(Type t, const wxString& n, wxTreeItemId id) {
+		itemType = t;
+		itemName = n;
+		itemId   = id;
+	}
+};
+
+typedef std::vector<TreeItemInfo> TreeIndex;
 typedef std::map<unsigned int, PathGeneratorBase*> GeneratorMap;
 typedef std::map<wxString, unsigned int> IndexMap;
+
 class PathGeneratorStore {
 	
 	private:
@@ -17,13 +36,109 @@ class PathGeneratorStore {
 		IndexMap indexMap;
 		
 		///////////////////////////////////////////////////////////////////
-		wxPGProperty* createProperty(const wxString& type) {
-			if 		( type == wxPG_VARIANT_TYPE_BOOL )		return new wxBoolProperty();
-			else if ( type == wxPG_VARIANT_TYPE_LIST )		return new wxEnumProperty();
-			else 											return new wxStringProperty();
+		wxPGProperty* createProperty(const PathGeneratorBase::ParameterInfo& pi) {
+			if ( pi.propertyType == wxPG_VARIANT_TYPE_BOOL ) {
+				return new wxBoolProperty();
+				
+			} else if ( pi.propertyType == wxPG_VARIANT_TYPE_LIST ) {
+				return new wxEnumProperty();
+				
+			} else if ( pi.propertyType == wxPG_VARIANT_TYPE_STRING ) {
+				if ( pi.withButton == true ) 	return new wxLongStringProperty();
+				else							return new wxStringProperty();
+				
+			} else {
+				return new wxStringProperty();
+				
+			}
 			
 			wxASSERT(NULL);
 			return NULL;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		wxTreeItemId appendTreeItem(wxTreeCtrl* tree, TreeIndex& treeIndex, const wxString& name, const wxString& treePath) {
+			wxTreeItemId invalid;
+			wxTreeItemIdValue cookie;
+			
+			if ( tree == NULL )
+				// return an invalid item id
+				return invalid;
+			
+			// no tree path available --> add item to root
+			if ( treePath.IsEmpty() ) {
+				wxTreeItemId prev 	 = tree->GetRootItem().GetID();
+				wxTreeItemId current = tree->GetFirstChild(prev, cookie);
+				
+				while ( current ) {
+					if ( tree->ItemHasChildren(current) == true ) {
+						// register index and return the new item id
+						wxTreeItemId newId = tree->InsertItem(tree->GetRootItem(), prev, name, 3);
+						TreeItemInfo tii(TreeItemInfo::Type::TIT_TEMPLATE, name, newId);
+						treeIndex.push_back(tii);
+						return newId;
+					}
+					
+					prev = current;
+					current = tree->GetNextChild(prev, cookie).GetID();
+				}
+				
+				// register index and return the new item id
+				wxTreeItemId newId = tree->AppendItem(tree->GetRootItem(), name, 3);
+				TreeItemInfo tii(TreeItemInfo::Type::TIT_TEMPLATE, name, newId);
+				treeIndex.push_back(tii);
+				return newId;
+			}
+			
+			// set parent to root
+			wxTreeItemId parent = tree->GetRootItem();
+			
+			// break down the given tree path
+			wxStringTokenizer tokenizer(treePath, "\\");
+			while ( tokenizer.HasMoreTokens() ) {
+				wxString token = tokenizer.GetNextToken();
+				
+				bool found = false;
+				wxTreeItemId id =  tree->GetFirstChild(parent, cookie).GetID();
+				//  over all parent childreen
+				while ( id ) {
+					if ( tree->GetItemText(id) == token ) {
+						// add only of no more tokens are available
+						if ( tokenizer.HasMoreTokens() == false ) {
+							// redirect parent
+							parent = tree->AppendItem(id, name, 3);
+							TreeItemInfo tii(TreeItemInfo::Type::TIT_TEMPLATE, token, parent);
+							treeIndex.push_back(tii);
+						}
+						
+						found = true;
+						break;
+					}
+					
+					id = tree->GetNextChild(parent, cookie).GetID();
+				}
+				
+				// if the current tree token (parent) doesn't exits
+				if ( found == false ) {
+					id = tree->AppendItem(parent, token, 1, 2);
+					tree->SetItemBold(id);
+					TreeItemInfo tii(TreeItemInfo::Type::TIT_PARENT, token, id);
+					treeIndex.push_back(tii);
+					
+					// add only of no more tokens are available
+					if ( tokenizer.HasMoreTokens() == false ) {
+						id = tree->AppendItem(id, name, 3);
+						TreeItemInfo tii(TreeItemInfo::Type::TIT_TEMPLATE, name, id);
+						treeIndex.push_back(tii);
+					}
+					
+					// redirect parent
+					parent = id;
+				}
+			}
+			
+			// return the new item id
+			return parent;
 		}
 		
 	public:
@@ -42,26 +157,8 @@ class PathGeneratorStore {
 		};
 		
 		///////////////////////////////////////////////////////////////////
-		PathGeneratorStore() {
-			registerPathGenerator(new PGenPoint());
-			registerPathGenerator(new PGenLine());
-			registerPathGenerator(new PGenLongWhole());
-			registerPathGenerator(new PGenRoundPoketWhole());
-			//...
-			registerPathGenerator(new PGenTest());
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual ~PathGeneratorStore() {
-			// delete all items
-			for (GeneratorMap::iterator it=generatorMap.begin(); it!=generatorMap.end(); ++it) {
-				PathGeneratorBase* pgb = it->second;
-				if ( pgb != NULL ) {
-					delete pgb;
-					it->second = NULL;
-				}
-			}
-		}
+		PathGeneratorStore();
+		virtual ~PathGeneratorStore();
 		
 		///////////////////////////////////////////////////////////////////
 		int getGenertorCount() {
@@ -105,10 +202,42 @@ class PathGeneratorStore {
 			for (GeneratorMap::iterator it=generatorMap.begin(); it!=generatorMap.end(); ++it) {
 				PathGeneratorBase* pgb = it->second;
 				if ( pgb != NULL ) {
-					wxString item(wxString::Format("%03d - %s", it->first, pgb->getName()));
+					wxString item;
+					if ( pgb->getTreePath().IsEmpty())	item.assign(wxString::Format("%03d - %s", it->first, pgb->getName()));
+					else								item.assign(wxString::Format("%03d - %s\\%s", it->first, pgb->getTreePath(), pgb->getName()));
 					pgb->setSelectorIndex(selector->Append(item));
 				}
 			}
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void setupSelectorTree(wxTreeCtrl* tree, TreeIndex& treeIndex, wxImageList* imageList) {
+			if ( tree == NULL )
+				return;
+				
+			treeIndex.clear();
+				
+			tree->DeleteAllItems();
+			tree->AssignImageList(imageList);
+			tree->AddRoot("Templates:", 0);
+			tree->SetItemBold(tree->GetRootItem());
+			
+			for (GeneratorMap::iterator it=generatorMap.begin(); it!=generatorMap.end(); ++it) {
+				PathGeneratorBase* pgb = it->second;
+				if ( pgb != NULL ) {
+					wxString name(wxString::Format("%03d - %s", it->first, pgb->getName()));
+					wxTreeItemId newItem = appendTreeItem(tree, treeIndex, name, pgb->getTreePath());
+					
+					// register tree index
+					if ( newItem ) {
+						/*
+						pgb->setSelectorIndex(treeIndex.size());
+						 * */
+					}
+				}
+			}
+			
+			tree->ExpandAll();
 		}
 		
 		///////////////////////////////////////////////////////////////////

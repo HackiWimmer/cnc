@@ -3,6 +3,7 @@
 
 #include <map>
 #include <wx/string.h>
+#include <wx/textctrl.h>
 #include <wx/propgrid/manager.h>
 #include <wx/valnum.h>
 #include "SvgPathGroup.h"
@@ -30,6 +31,7 @@ class PathGeneratorBase {
 			unsigned int precision	= 0;
 			
 			// string members
+			bool withButton			= false;
 			unsigned int maxLength	= -1;
 			
 			// enum members
@@ -61,11 +63,12 @@ class PathGeneratorBase {
 			}
 			
 			///////////////////////////////////////////////////////////////
-			void setupString(const wxString& l, const wxString& v, unsigned int ml = -1) {
+			void setupString(const wxString& l, const wxString& v, bool wb = false, unsigned int ml = -1) {
 				propertyType = wxPG_VARIANT_TYPE_STRING;
 				
 				label 		= l;
 				value		= v;
+				withButton	= wb;
 				maxLength	= ml;
 				
 				help.clear();
@@ -130,6 +133,7 @@ class PathGeneratorBase {
 			bool canToolCorrection 	= true;
 			bool canToolDiameter	= true;
 			bool canPathColour		= true;
+			bool canPathOutputMode	= false;
 			
 			bool toolCorrection 	= true;
 			double toolDiameter 	= 3.125;
@@ -144,6 +148,7 @@ class PathGeneratorBase {
 				canToolCorrection 	= from.canToolCorrection;
 				canToolDiameter		= from.canToolDiameter;
 				canPathColour		= from.canPathColour;
+				canPathOutputMode	= from.canPathOutputMode;
 			}
 		};
 		
@@ -275,6 +280,7 @@ class PathGeneratorBase {
 		, xmlPattern("")
 		, selectorIndex(-1)
 		, name("")
+		, treePath("")
 		, centerPoint(DBL_MAX, DBL_MAX)
 		{
 		}
@@ -284,7 +290,25 @@ class PathGeneratorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
+		enum ChangeCategory {CC_UNKNOWN_CAT, CC_COMMON_CAT, CC_GRID_CAT, CC_TPL_CAT, CC_CNC_CAT, CC_SVG_CAT};
+		
+		///////////////////////////////////////////////////////////////////
 		virtual void initParameters() = 0;
+		
+		///////////////////////////////////////////////////////////////////
+		virtual void getInternalInformation(wxTextCtrl* ctl) {
+			wxASSERT(ctl);
+				
+			ctl->Clear();
+			ctl->SetDefaultStyle(wxTextAttr(*wxWHITE));
+			ctl->AppendText("No further information available . . .");
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool parameterChanging(PathGeneratorBase::ChangeCategory cc, int paraIdxInCat, const wxVariant& value) { return true; }
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool parameterChanged(PathGeneratorBase::ChangeCategory cc, int paraIdxInCat, const wxVariant& value) { return true; }
 		
 		///////////////////////////////////////////////////////////////////
 		void setSelectorIndex(int index) {
@@ -383,6 +407,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
+				
+			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %s", idx, v.GetString()));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -390,6 +416,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
+				
+			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %lf", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -397,6 +425,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
+				
+			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %s", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -404,6 +434,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
+				
+			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %d", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -411,6 +443,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
+				
+			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %ld", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -420,6 +454,7 @@ class PathGeneratorBase {
 				return pi->value.GetType();
 			}
 			
+			addErrorInfo(wxString::Format("getParameterType(): Invalid index: %u", idx));
 			return DEFAULT_PARAMETER_VALUE_TYPE;
 		}
 		
@@ -430,6 +465,7 @@ class PathGeneratorBase {
 				return pi->value;
 			}
 			
+			addErrorInfo(wxString::Format("getParameterType(): Invalid index: %u", idx));
 			defaultValue = 0.0;
 			return defaultValue;
 		}
@@ -442,6 +478,7 @@ class PathGeneratorBase {
 					return pi->value.GetDouble();
 			}
 			
+			addErrorInfo(wxString::Format("getParameterType(): Invalid index: %u", idx));
 			return DEFAULT_PARAMETER_NUM_VALUE;
 		}
 		
@@ -452,6 +489,7 @@ class PathGeneratorBase {
 				return pi->value.GetLong();
 			}
 			
+			addErrorInfo(wxString::Format("getParameterType(): Invalid index: %u", idx));
 			return DEFAULT_PARAMETER_ENUM_VALUE;
 		}
 		
@@ -462,6 +500,7 @@ class PathGeneratorBase {
 				return pi->value.GetString();
 			}
 			
+			addErrorInfo(wxString::Format("getParameterType(): Invalid index: %u", idx));
 			return DEFAULT_PARAMETER_STRING_VALUE;
 		}
 		
@@ -472,6 +511,7 @@ class PathGeneratorBase {
 			if ( it != parameterMap.end() )
 				return &it->second;
 				
+			addErrorInfo(wxString::Format("getParameterType(): Invalid index: %u", idx));
 			return NULL;
 		}
 		
@@ -496,6 +536,11 @@ class PathGeneratorBase {
 		///////////////////////////////////////////////////////////////////
 		static const wxString& maskXmlPattern(wxString& pattern);
 		static const wxString& demaskXmlPattern(wxString& pattern);
+		
+		///////////////////////////////////////////////////////////////////
+		const wxString& getTreePath() const {
+			return treePath;
+		}
 		
 	private:
 	
@@ -523,10 +568,16 @@ class PathGeneratorBase {
 		
 		int selectorIndex;
 		wxString name;
+		wxString treePath;
 		wxRealPoint centerPoint;
 		ParameterMap parameterMap;
 		CommonValues commonValues;
 		CncParameterValues cncParameterValues;
+		
+		///////////////////////////////////////////////////////////////////
+		inline double cv(SVGUnit u, double v) {
+			return SvgPathFragment::convertToDouble(u, v);
+		}
 		
 		///////////////////////////////////////////////////////////////////
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) = 0;
@@ -546,8 +597,9 @@ class PathGeneratorBase {
 		// todo ... more tranform values
 		
 		///////////////////////////////////////////////////////////////////
-		void setupParameter(const ParameterInfo& pi) {
+		unsigned int setupParameter(const ParameterInfo& pi) {
 			parameterMap[parameterMap.size()] = pi;
+			return parameterMap.size() - 1;
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -579,24 +631,38 @@ class PathGeneratorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void setupCCReferencePoint(PathGeneratorBase::ParameterInfo& pi) {
+		unsigned int setupInlayMode(PathGeneratorBase::ParameterInfo& pi, const wxString& items, long value=0) {
+			pi.setupEnum("Inlay Mode", items, value);
+			pi.help = "Determines the fill mode.";
+			return setupParameter(pi);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		unsigned int setupCCReferencePoint(PathGeneratorBase::ParameterInfo& pi) {
 			wxArrayString items;
 			items.Add("center/center");
-			setupReferencePoint(pi, items, 0);
+			return setupReferencePoint(pi, items, 0);
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void setupReferencePoint(PathGeneratorBase::ParameterInfo& pi, const wxString& items, long value=0) {
-			pi.setupEnum("Reference Point(x/y)", items, value);
-			pi.help = "Determine the reference point as basis for further transformations.";
-			setupParameter(pi);
+		unsigned int setupTLReferencePoint(PathGeneratorBase::ParameterInfo& pi) {
+			wxArrayString items;
+			items.Add("top/left");
+			return setupReferencePoint(pi, items, 0);
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void setupReferencePoint(PathGeneratorBase::ParameterInfo& pi, const wxArrayString& items, long value=0) {
+		unsigned int setupReferencePoint(PathGeneratorBase::ParameterInfo& pi, const wxString& items, long value=0) {
 			pi.setupEnum("Reference Point(x/y)", items, value);
-			pi.help = "Determine the reference point as basis for further transformations.";
-			setupParameter(pi);
+			pi.help = "Determines the reference point as basis for further transformations.";
+			return setupParameter(pi);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		unsigned int setupReferencePoint(PathGeneratorBase::ParameterInfo& pi, const wxArrayString& items, long value=0) {
+			pi.setupEnum("Reference Point(x/y)", items, value);
+			pi.help = "Determines the reference point as basis for further transformations.";
+			return setupParameter(pi);
 		}
 		
 		///////////////////////////////////////////////////////////////////

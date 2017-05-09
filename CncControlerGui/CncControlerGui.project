@@ -84,6 +84,8 @@
       <File Name="SVGUserAgent.h"/>
       <File Name="SVGUserAgentInfo.h"/>
       <File Name="SvgViewBox.h"/>
+      <File Name="SVGElementConverter.h"/>
+      <File Name="SVGElementConverter.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <File Name="CncArduino.cpp"/>
@@ -167,13 +169,30 @@
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
+  <VirtualDirectory Name="Arduino">
+    <File Name="../../../@StepperControl/StepperControl_1/CncController.h" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncController.ino" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.h" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.ino" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.h" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.ino" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.h" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.ino" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CommonValues.h" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/cv.h" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.h" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Release"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
         <IncludePath Value="."/>
+        <IncludePath Value="C:\@Development\boost\include\boost-1_64"/>
       </Compiler>
       <Linker Options="">
         <LibraryPath Value="."/>
+        <LibraryPath Value="C:\@Development\boost\lib"/>
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
@@ -278,19 +297,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="Arduino">
-    <File Name="../../../@StepperControl/StepperControl_1/CncController.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncController.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonValues.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/cv.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Release"/>
-  </VirtualDirectory>
 </CodeLite_Project>

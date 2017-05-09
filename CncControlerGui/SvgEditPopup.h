@@ -67,6 +67,7 @@ class SvgEditPopup {
 	
 	private:
 	
+		static MainFrame*	_mainFrame;
 		static unsigned int _idOffset;
 		
 		///////////////////////////////////////////////////////////////////
@@ -85,6 +86,9 @@ class SvgEditPopup {
 			return (e != s);
 		}
 		
+		///////////////////////////////////////////////////////////////////
+		static void overAllMenuItems(wxMenu* m);
+		
 	public:
 		
 		///////////////////////////////////////////////////////////////////
@@ -102,7 +106,13 @@ class SvgEditPopup {
 		};
 
 		///////////////////////////////////////////////////////////////////
-		static wxMenu* createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu* popup, bool extended);
+		static void setMainFrame(MainFrame* frame) {
+			_mainFrame = frame;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		static wxMenu* createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool extended);
+		static void destroyMenu(wxMenu* popup);
 		
 		///////////////////////////////////////////////////////////////////
 		static bool searchCurrentNode(wxStyledTextCtrl* ctl, EditSearchParam& parameter);

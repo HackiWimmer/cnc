@@ -1,7 +1,63 @@
 #ifndef SVG_PATH_FRAGMENT_H
 #define SVG_PATH_FRAGMENT_H
 
+#include "SvgTransformMatrix.h"
 #include "SvgGeneratorBase.h"
+
+////////////////////////////////////////////////////////////////////////////////////
+class PolygonDataPoint {
+	
+	private:
+		wxRealPoint	origPoint;
+		wxRealPoint currPoint;
+	
+	public:
+		///////////////////////////////////////////////////////////////////////////
+		PolygonDataPoint(const wxRealPoint& p) {
+			origPoint = p;
+			currPoint = p;
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		PolygonDataPoint(const PolygonDataPoint& pdp) {
+			origPoint = pdp.getOriginalPoint();
+			currPoint = pdp.getTransformedPoint();
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		friend std::ostream &operator<< (std::ostream &ostr, const PolygonDataPoint &a) {
+			ostr << a.getOriginalPoint().x << ", " << a.getOriginalPoint().y;
+			ostr << " | ";
+			ostr << a.getTransformedPoint().x << ", " << a.getTransformedPoint().y;
+			return ostr;
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		const wxRealPoint& getOriginalPoint() const 	{ return origPoint; }
+		const wxRealPoint& getTransformedPoint() const 	{ return currPoint; }
+		
+		///////////////////////////////////////////////////////////////////////////
+		void setOriginalPoint(const wxRealPoint& p) {
+			origPoint = currPoint = p;
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		void setTransformedPoint(const wxRealPoint& p) {
+			currPoint = p;
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		void transform(SVGTransformer& t) {
+			currPoint = t.transform(origPoint.x, origPoint.y);
+		}
+		
+		///////////////////////////////////////////////////////////////////////////
+		void transformAgain(SVGTransformer& t) {
+			currPoint = t.transform(currPoint.x, currPoint.y);
+		}
+};
+
+typedef std::vector<PolygonDataPoint> PathFragmentPolygonData;
 
 ////////////////////////////////////////////////////////////////////////////////////
 class SvgPathFragment : public SvgGeneratorBase {
@@ -64,7 +120,11 @@ class SvgPathFragment : public SvgGeneratorBase {
 		const wxString& addPoint(double x, double y);
 		
 		////////////////////////////////////////////////////////////////////////////
+		const wxString& addPolygon(const PathFragmentPolygonData& pd);
+		
+		////////////////////////////////////////////////////////////////////////////
 		const wxString& addLine(double td, double x1, double y1, double x2, double y2, bool correctRadius);
+		
 };
 
 #endif

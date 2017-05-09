@@ -302,4 +302,83 @@ class SVGTransformMatrix {
 
 };
 
+/////////////////////////////////////////////////////////////////
+class SVGTransformer {
+	
+	protected:
+		SVGTransformMatrix matrix;
+		SVGTransformMatrix helper;
+		
+	public:
+		/////////////////////////////////////////////////////////
+		SVGTransformer()
+		: matrix()
+		{
+		}
+		
+		/////////////////////////////////////////////////////////
+		void transformPoint(wxRealPoint& p) { transformPoint(p.x, p.y); }
+		void transformPoint(double& x, double& y) {
+			matrix.transform(x, y);
+		}
+		
+		/////////////////////////////////////////////////////////
+		const wxRealPoint& transform(const wxRealPoint& p) { return transform(p.x, p.y); }
+		const wxRealPoint& transform(double x, double y) {
+			return matrix.transform(x, y);
+		}
+		
+		/////////////////////////////////////////////////////////
+		void applyUnchanged() { 
+			matrix.unchanged(); 
+		}
+		
+		/////////////////////////////////////////////////////////
+		void applyTranslate(double xy) { applyTranslate(xy, xy); }
+		void applyTranslate(double x, double y) {
+			helper.unchanged();
+			helper.translate(x, y);
+			matrix.multiply(helper);
+		}
+		
+		/////////////////////////////////////////////////////////
+		void applyScale(double xy) { applyScale(xy, xy); }
+		void applyScale(double x, double y) {
+			helper.unchanged();
+			helper.scale(x, y);
+			matrix.multiply(helper);
+		}
+		
+		/////////////////////////////////////////////////////////
+		void applyRotate(double a) { applyRotate(a, 0.0, 0.0); }
+		void applyRotate(double a, double xy) { applyRotate(a, xy, xy); }
+		void applyRotate(double a, double x, double y) {
+			helper.unchanged();
+			helper.rotate(a, x, y);
+			matrix.multiply(helper);
+		}
+		
+		/////////////////////////////////////////////////////////
+		void applySkewX(double a) {
+			helper.unchanged();
+			helper.skewX(a);
+			matrix.multiply(helper);
+		}
+		
+		/////////////////////////////////////////////////////////
+		void applySkewY(double a) {
+			helper.unchanged();
+			helper.skewX(a);
+			matrix.multiply(helper);
+		}
+		
+		/////////////////////////////////////////////////////////
+		void applyMatrix(double a, double b, double c, double d, double e, double f) {
+			helper.unchanged();
+			helper.matrix(a, b, c, d, e, f);
+			matrix.multiply(helper);
+		}
+		
+};
+
 #endif

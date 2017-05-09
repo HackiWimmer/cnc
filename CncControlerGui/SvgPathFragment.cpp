@@ -56,7 +56,6 @@ const wxString& SvgPathFragment::ellipticalArg(double r) {
 const wxString& SvgPathFragment::ellipticalArg(double rx, double ry) {
 ////////////////////////////////////////////////////////////////////////////
 	static wxString s;
-	
 	s.assign(wxString::Format(" a %s,%s  0 0 1 %s,0 a %s,%s 0 0 1 -%s,0", 
 	                           printf(rx), 
 							   printf(ry), 
@@ -125,4 +124,18 @@ const wxString& SvgPathFragment::addSquareRect(double td, double width, double h
 const wxString& SvgPathFragment::addRoundRect(double td, double width, double height, bool correctRadius) {
 ////////////////////////////////////////////////////////////////////////////
 	return addRect(td, width, height, td/2, td/2, correctRadius);;
+}
+////////////////////////////////////////////////////////////////////////////
+const wxString& SvgPathFragment::addPolygon(const PathFragmentPolygonData& pd) {
+////////////////////////////////////////////////////////////////////////////
+	static wxString s;
+	wxString points;
+	
+	for (PathFragmentPolygonData::const_iterator it = pd.begin(); it != pd.end(); ++it) {
+		points.append(wxString::Format(" %.3lf,%.3lf", SvgPathFragment::convertToDouble(mm, it->getTransformedPoint().x), 
+		                                               SvgPathFragment::convertToDouble(mm, it->getTransformedPoint().y)));
+	}
+	
+	s.assign(wxString::Format("<polygon points=\"%s\" %s/>\n", points, getDefaultSvgElementEnd()));
+	return s;
 }

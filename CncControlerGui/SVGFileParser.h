@@ -171,15 +171,6 @@ class SVGFileParser {
 
 		SVGUnit determineUnit (wxString uw, wxString uh);
 
-		//<circle>, <ellipse>, <line>, <polygon>, <polyline>, <rect>
-		bool convertCircleToPathData(wxXmlNode* child, wxString ret); 
-		bool convertEllipseToPathData(wxXmlNode* child, wxString ret); 
-		bool convertLineToPathData(wxXmlNode* child, wxString ret); 
-		bool convertPolygonToPathData(wxXmlNode* child, wxString ret); 
-		bool convertPolylineToPathData(wxXmlNode* child, wxString ret); 
-		bool convertRectToPathData(wxXmlNode* child, wxString ret); 
-
-		wxString& evaluatePolyPoints(wxString points, wxString& path);
 		inline int getCommandParaCount(char c);
 		
 		bool processXMLNode(wxXmlNode *child);

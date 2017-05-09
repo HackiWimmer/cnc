@@ -51,6 +51,7 @@
 #include "CncZView.h"
 #include <wx/timer.h>
 #include <wx/splitter.h>
+#include <wx/treectrl.h>
 #include <wx/propgrid/manager.h>
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
@@ -1697,6 +1698,16 @@ class PathGeneratorFrameBase : public wxFrame
 {
 protected:
     wxFlexGridSizer* flexGridSizer980;
+    wxSplitterWindow* m_mainSplitter;
+    wxPanel* m_leftMainSplitterPage;
+    wxFlexGridSizer* flexGridSizer3302;
+    wxFlexGridSizer* flexGridSizer3315;
+    wxButton* m_btPGMinimizeTree;
+    wxTextCtrl* m_treeSearchText;
+    wxButton* m_btSearchTree;
+    wxTreeCtrl* m_templateTree;
+    wxPanel* m_rightMainSplitterPage;
+    wxFlexGridSizer* flexGridSizer3296;
     wxSplitterWindow* m_splitter3185;
     wxPanel* m_splitterPage3189;
     wxFlexGridSizer* flexGridSizer973;
@@ -1707,19 +1718,28 @@ protected:
     wxSplitterWindow* m_splitter2932;
     wxPanel* m_splitterPage2936;
     wxFlexGridSizer* flexGridSizer2942;
+    wxNotebook* m_pgMainBook;
+    wxPanel* m_pgPreviewPage;
+    wxFlexGridSizer* flexGridSizer3332;
 #if wxUSE_WEBVIEW
     wxWebView* m_pgPreview;
 #endif // wxUSE_WEBVIEW
 
+    wxPanel* m_pgAdditionalInfoPage;
+    wxFlexGridSizer* flexGridSizer3336;
+    wxTextCtrl* m_additionalInfo;
     wxPanel* m_splitterPage2940;
     wxFlexGridSizer* flexGridSizer2944;
-    wxToolbook* m_toolbook3227;
-    wxPanel* m_panel3229;
+    wxToolbook* m_tbOutput;
+    wxPanel* m_panelPreview;
     wxFlexGridSizer* flexGridSizer3233;
     wxTextCtrl* m_generatedPreview;
-    wxPanel* m_panel3231;
+    wxPanel* m_panelResult;
     wxFlexGridSizer* flexGridSizer3235;
     wxTextCtrl* m_generatedResult;
+    wxPanel* m_panelInfo;
+    wxFlexGridSizer* flexGridSizer3286;
+    wxTextCtrl* m_processInfo;
     wxPanel* m_splitterPage3193;
     wxFlexGridSizer* flexGridSizer986;
     wxFlexGridSizer* flexGridSizer2874;
@@ -1737,6 +1757,7 @@ protected:
     wxPGProperty* m_pgPropCorrection;
     wxPGProperty* m_pgPropPathColour;
     wxPGProperty* m_pgPropConfigBlock;
+    wxPGProperty* m_pgPropOutputMode;
     wxPGProperty* m_pgCatPath;
     wxPGProperty* m_pgProp01;
     wxPGProperty* m_pgCatGrid;
@@ -1773,12 +1794,22 @@ protected:
     wxPGProperty* m_pgCatSkrew;
     wxPGProperty* m_pgPropSkewX;
     wxPGProperty* m_pgPropSkewY;
+    wxCheckBox* m_autoGenerate;
 
 protected:
     virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
     virtual void onSize(wxSizeEvent& event) { event.Skip(); }
     virtual void onActivate(wxActivateEvent& event) { event.Skip(); }
+    virtual void onMaximize(wxMaximizeEvent& event) { event.Skip(); }
+    virtual void mainShashPositionChanged( wxSplitterEvent& event) { event.Skip(); }
+    virtual void mainShashPositionChanging( wxSplitterEvent& event) { event.Skip(); }
+    virtual void toogleTreeSize(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateTreeSearch(wxCommandEvent& event) { event.Skip(); }
+    virtual void keyDownTreeSearch(wxKeyEvent& event) { event.Skip(); }
+    virtual void treeSearch(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectTemplateTree(wxTreeEvent& event) { event.Skip(); }
     virtual void selectPathSelector(wxCommandEvent& event) { event.Skip(); }
+    virtual void pgMainBookChanged(wxNotebookEvent& event) { event.Skip(); }
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
     virtual void generatePath(wxCommandEvent& event) { event.Skip(); }
@@ -1788,17 +1819,30 @@ protected:
     virtual void toogleSize(wxCommandEvent& event) { event.Skip(); }
     virtual void onCloseWindowFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void propertyChanged(wxPropertyGridEvent& event) { event.Skip(); }
+    virtual void propertyChanging(wxPropertyGridEvent& event) { event.Skip(); }
+    virtual void checkAutoGenerate(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxButton* GetBtPGMinimizeTree() { return m_btPGMinimizeTree; }
+    wxTextCtrl* GetTreeSearchText() { return m_treeSearchText; }
+    wxButton* GetBtSearchTree() { return m_btSearchTree; }
+    wxTreeCtrl* GetTemplateTree() { return m_templateTree; }
+    wxPanel* GetLeftMainSplitterPage() { return m_leftMainSplitterPage; }
     wxStaticText* GetStaticText3095() { return m_staticText3095; }
     wxComboBox* GetPgPathSelector() { return m_pgPathSelector; }
     wxWebView* GetPgPreview() { return m_pgPreview; }
+    wxPanel* GetPgPreviewPage() { return m_pgPreviewPage; }
+    wxTextCtrl* GetAdditionalInfo() { return m_additionalInfo; }
+    wxPanel* GetPgAdditionalInfoPage() { return m_pgAdditionalInfoPage; }
+    wxNotebook* GetPgMainBook() { return m_pgMainBook; }
     wxPanel* GetSplitterPage2936() { return m_splitterPage2936; }
     wxTextCtrl* GetGeneratedPreview() { return m_generatedPreview; }
-    wxPanel* GetPanel3229() { return m_panel3229; }
+    wxPanel* GetPanelPreview() { return m_panelPreview; }
     wxTextCtrl* GetGeneratedResult() { return m_generatedResult; }
-    wxPanel* GetPanel3231() { return m_panel3231; }
-    wxToolbook* GetToolbook3227() { return m_toolbook3227; }
+    wxPanel* GetPanelResult() { return m_panelResult; }
+    wxTextCtrl* GetProcessInfo() { return m_processInfo; }
+    wxPanel* GetPanelInfo() { return m_panelInfo; }
+    wxToolbook* GetTbOutput() { return m_tbOutput; }
     wxPanel* GetSplitterPage2940() { return m_splitterPage2940; }
     wxSplitterWindow* GetSplitter2932() { return m_splitter2932; }
     wxPanel* GetSplitterPage3189() { return m_splitterPage3189; }
@@ -1809,8 +1853,11 @@ public:
     wxButton* GetBtPGMinimize() { return m_btPGMinimize; }
     wxButton* GetBtPGClose() { return m_btPGClose; }
     wxPropertyGridManager* GetPgParameterMgr() { return m_pgParameterMgr; }
+    wxCheckBox* GetAutoGenerate() { return m_autoGenerate; }
     wxPanel* GetSplitterPage3193() { return m_splitterPage3193; }
     wxSplitterWindow* GetSplitter3185() { return m_splitter3185; }
+    wxPanel* GetRightMainSplitterPage() { return m_rightMainSplitterPage; }
+    wxSplitterWindow* GetMainSplitter() { return m_mainSplitter; }
     PathGeneratorFrameBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SVG Path Generator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,750), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
     virtual ~PathGeneratorFrameBase();
 };

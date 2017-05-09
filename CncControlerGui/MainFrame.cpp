@@ -40,7 +40,7 @@
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
 const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
 const char* _programTitel 		= "Woodworking CNC Controller";
-const char* _programVersion 	= "0.6.5";
+const char* _programVersion 	= "0.6.6";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
 	
@@ -102,6 +102,9 @@ MainFrame::MainFrame(wxWindow* parent)
 	install3DPane();
 	installSypControl();
 	
+	// define the popup parent frame
+	SvgEditPopup::setMainFrame(this);
+	
 	// bind global key down hook
 	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
 }
@@ -141,12 +144,9 @@ MainFrame::~MainFrame() {
 	wxASSERT(templateNbInfo);
 	delete templateNbInfo;
 	
-	wxASSERT(stcFileContentPopupMenu);
-	delete stcFileContentPopupMenu;
-	
-	wxASSERT(stcEmuContentPopupMenu);
-	delete stcEmuContentPopupMenu;
-	
+	SvgEditPopup::destroyMenu(stcFileContentPopupMenu);
+	SvgEditPopup::destroyMenu(stcEmuContentPopupMenu);
+
 	wxASSERT (cnc);
 	delete cnc;
 }
@@ -493,8 +493,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
 	
 	//todo
-	//wxCommandEvent dummy;
-	//openSVGPathGenerator(dummy);
+	wxCommandEvent dummy;
+	openSVGPathGenerator(dummy);
 	
 }
 ///////////////////////////////////////////////////////////////////
@@ -5202,7 +5202,7 @@ void MainFrame::createStcEmuControlPopupMenu() {
 	if ( stcEmuContentPopupMenu != NULL )
 		return;
 
-	stcEmuContentPopupMenu = SvgEditPopup::createMenu(this, m_stcEmuSource, stcEmuContentPopupMenu, false);
+	stcEmuContentPopupMenu = SvgEditPopup::createMenu(m_stcEmuSource, stcEmuContentPopupMenu, false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::createStcFileControlPopupMenu() {
@@ -5210,7 +5210,7 @@ void MainFrame::createStcFileControlPopupMenu() {
 	if ( stcFileContentPopupMenu != NULL )
 		return;
 
-	stcFileContentPopupMenu = SvgEditPopup::createMenu(this, m_stcFileContent, stcFileContentPopupMenu, true);
+	stcFileContentPopupMenu = SvgEditPopup::createMenu(m_stcFileContent, stcFileContentPopupMenu, true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateTemplateListBook() {

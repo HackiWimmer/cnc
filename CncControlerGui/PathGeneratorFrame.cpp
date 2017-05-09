@@ -14,6 +14,9 @@ wxString PathGeneratorFrame::globaGeneratedPath		= _T("");
 PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent, wxStyledTextCtrl* tplEditor)
 : PathGeneratorFrameBase(parent)
 , prevSizeHeight(-1)
+, leftSplitterWidth(m_mainSplitter->GetSashPosition())
+, leftSplitterMinimized(false)
+, hasErrorInfo(false)
 , templateEditor(tplEditor)
 , previewHeight(1500)
 , previewWidth(1500)
@@ -21,6 +24,7 @@ PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent, wxStyledTextCtrl* tplEd
 , viewBoxY(0)
 , viewBoxW(0)
 , viewBoxH(0)
+, lastSearchIndex(-1)
 {
 ///////////////////////////////////////////////////////////////////
 	globaGeneratedPath.clear();
@@ -28,11 +32,62 @@ PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent, wxStyledTextCtrl* tplEd
 	
 	SetMinSize(wxSize(-1, minSizeHeight));
 	SetSize(wxSize(-1, -1));
+	m_pgMainBook->SetSelection(0);
 	decorateSizeButton();
+	decorateTreeSizeButton();
 }
 ///////////////////////////////////////////////////////////////////
 PathGeneratorFrame::~PathGeneratorFrame() {
 ///////////////////////////////////////////////////////////////////
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::selectPreview() {
+///////////////////////////////////////////////////////////////////
+	m_tbOutput->SetSelection(0);
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::selectResult() {
+///////////////////////////////////////////////////////////////////
+	m_tbOutput->SetSelection(1);
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::selectProcessInfo() {
+///////////////////////////////////////////////////////////////////
+	m_tbOutput->SetSelection(2);
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::clearProcessInfo() {
+///////////////////////////////////////////////////////////////////
+	hasErrorInfo = false;
+	m_processInfo->Clear();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::appendInfoMessage(const wxString& m) {
+///////////////////////////////////////////////////////////////////
+	m_processInfo->SetDefaultStyle(wxColour(201,201,201));
+	m_processInfo->AppendText(m);
+	
+	if ( m.Last() != '\n')
+		m_processInfo->AppendText('\n');
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::appendWarningMessage(const wxString& m) {
+///////////////////////////////////////////////////////////////////
+	m_processInfo->SetDefaultStyle(wxColour(255,201,15));
+	m_processInfo->AppendText(m);
+	
+	if ( m.Last() != '\n')
+		m_processInfo->AppendText('\n');
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::appendErrorMessage(const wxString& m) {
+///////////////////////////////////////////////////////////////////
+	hasErrorInfo = true;
+	m_processInfo->SetDefaultStyle(wxColour(255,128,128));
+	m_processInfo->AppendText(m);
+	
+	if ( m.Last() != '\n')
+		m_processInfo->AppendText('\n');
 }
 ///////////////////////////////////////////////////////////////////
 bool PathGeneratorFrame::Show(bool show) {
@@ -77,8 +132,21 @@ void PathGeneratorFrame::setupPathSelector() {
 ///////////////////////////////////////////////////////////////////
 	// Init path selector
 	pathGeneratorStore.setupSelector(m_pgPathSelector);
-	if ( pathGeneratorStore.getGenertorCount() > 0 )
+	
+	// the image list will be deletet by the tree control (m_templateTree)
+	wxImageList* imageList = new wxImageList(16, 16);
+	imageList->Add(ImageLib16().Bitmap("BMP_TEMPLATE_ROOT"));
+	imageList->Add(ImageLib16().Bitmap("BMP_TEMPLATE_FOLDER_OPEN"));
+	imageList->Add(ImageLib16().Bitmap("BMP_TEMPLATE_FOLDER_CLOSE"));
+	imageList->Add(ImageLib16().Bitmap("BMP_TEMPLATE"));
+
+	pathGeneratorStore.setupSelectorTree(m_templateTree, treeIndex, imageList);
+	
+	if ( pathGeneratorStore.getGenertorCount() > 0 ) {
 		m_pgPathSelector->SetSelection(0);
+		wxString item = m_pgPathSelector->GetStringSelection().SubString(0,2);
+		searchAndSelectFirstTreeItem(item);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::enableControls(bool state){
@@ -90,6 +158,7 @@ void PathGeneratorFrame::enableControls(bool state){
 	
 	state == true ? m_generatedPreview->Thaw() : m_generatedPreview->Freeze();
 	state == true ? m_generatedResult->Thaw() : m_generatedResult->Freeze();
+	state == true ? wxSetCursor(wxNullCursor): wxSetCursor(wxCURSOR_WAIT);
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::initControls() {
@@ -176,9 +245,8 @@ void PathGeneratorFrame::initControls() {
 	setHelpInfos();
 }
 ///////////////////////////////////////////////////////////////////
-int PathGeneratorFrame::getPathSelection() {
+int PathGeneratorFrame::getPathSelection(const wxString& item) {
 ///////////////////////////////////////////////////////////////////
-	wxString item = m_pgPathSelector->GetStringSelection();
 	wxString idStr = item.SubString(0,3);
 	long id;
 	idStr.ToLong(&id);
@@ -189,12 +257,32 @@ int PathGeneratorFrame::getPathSelection() {
 	return -1;
 }
 ///////////////////////////////////////////////////////////////////
+int PathGeneratorFrame::getPathSelection() {
+///////////////////////////////////////////////////////////////////
+	wxString item = m_pgPathSelector->GetStringSelection();
+	return getPathSelection(item);
+}
+///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::selectPathSelector(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	selectPathSelector(getPathSelection());
 	
+	evaluateValues();
 	generatePath();
 	updatePreview();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::selectTemplateTree(wxTreeEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxTreeItemId item = event.GetItem();
+	int idx = getPathSelection(m_templateTree->GetItemText(item));
+	if ( idx >= 0 && idx < pathGeneratorStore.getGenertorCount() ) {
+		selectPathSelector(idx);
+	
+		evaluateValues();
+		generatePath();
+		updatePreview();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::selectPathSelector(int id) {
@@ -270,26 +358,79 @@ void PathGeneratorFrame::toogleSize(wxCommandEvent& event) {
 	decorateSizeButton();
 }
 ///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::toogleTreeSize(wxCommandEvent& event) {
+	if ( m_mainSplitter->GetSashPosition() > m_mainSplitter->GetMinimumPaneSize() ) {
+		int pos = m_mainSplitter->GetSashPosition();
+		m_mainSplitter->SetSashPosition(m_mainSplitter->GetMinimumPaneSize());
+		leftSplitterWidth = pos;
+		leftSplitterMinimized = true;
+	} else {
+		m_mainSplitter->SetSashPosition(leftSplitterWidth);
+		leftSplitterMinimized = false;
+	}
+	
+	decorateTreeSizeButton();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::mainShashPositionChanged(wxSplitterEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//leftSplitterWidth = m_mainSplitter->GetSashPosition();
+	decorateTreeSizeButton();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::mainShashPositionChanging(wxSplitterEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//leftSplitterMinimized = (m_mainSplitter->GetSashPosition() == m_mainSplitter->GetMinimumPaneSize());
+}
+///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::decorateSizeButton() {
 ///////////////////////////////////////////////////////////////////
-	if ( GetSize().GetHeight() > minSizeHeight )	m_btPGMinimize->SetBitmap(ImageLib16().Bitmap("BMP_MINUS"));
-	else											m_btPGMinimize->SetBitmap(ImageLib16().Bitmap("BMP_PLUS"));
+	if ( GetSize().GetHeight() > minSizeHeight )
+		m_btPGMinimize->SetBitmap(ImageLib16().Bitmap("BMP_MINUS"));
+	else											
+		m_btPGMinimize->SetBitmap(ImageLib16().Bitmap("BMP_PLUS"));
 		
 	m_btPGMinimize->Refresh();
 	m_btPGMinimize->Update();
 }
 ///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::decorateTreeSizeButton() {
+///////////////////////////////////////////////////////////////////
+	if ( m_mainSplitter->GetSashPosition() > m_mainSplitter->GetMinimumPaneSize() )
+		m_btPGMinimizeTree->SetBitmap(ImageLib16().Bitmap("BMP_MINUS"));
+	else
+		m_btPGMinimizeTree->SetBitmap(ImageLib16().Bitmap("BMP_PLUS"));
+		
+	m_btPGMinimizeTree->Refresh();
+	m_btPGMinimizeTree->Update();
+}
+///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::onSize(wxSizeEvent& event) {
 ///////////////////////////////////////////////////////////////////
+cout << "onSize"<< endl;
+	if ( leftSplitterMinimized == true )
+		m_mainSplitter->SetSashPosition(m_mainSplitter->GetMinimumPaneSize());
+		
 	decorateSizeButton();
+	decorateTreeSizeButton();
 	event.Skip(true);
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::onMaximize(wxMaximizeEvent& event) {
+///////////////////////////////////////////////////////////////////
+cout << "onMaximize"<< endl;
+	
+	//if ( leftSplitterMinimized == true )
+		m_mainSplitter->SetSashPosition(m_mainSplitter->GetMinimumPaneSize());
+		
+	decorateSizeButton();
+	decorateTreeSizeButton();
+	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 bool PathGeneratorFrame::regenerateSvgBlock(PathGeneratorStore::RegenerateParameter & rp) {
 ///////////////////////////////////////////////////////////////////
 	rp.out.errorInfo.clear();
-	
-	
 	
 	PathGeneratorBase::XmlPatternResult result;
 	if ( PathGeneratorBase::decodeXmlPattern(rp.in.cncPattern, result) == false ) {
@@ -315,6 +456,7 @@ bool PathGeneratorFrame::regenerateSvgBlock(PathGeneratorStore::RegenerateParame
 	updateCncParameterValues(result.cncParameterValues);
 	updateTransformValues(result.transformValues);
 	
+	evaluateValues();
 	generatePath();
 	updatePreview();
 	
@@ -323,21 +465,31 @@ bool PathGeneratorFrame::regenerateSvgBlock(PathGeneratorStore::RegenerateParame
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::generatePath(wxCommandEvent& event) {
+void PathGeneratorFrame::evaluateValues() {
 ///////////////////////////////////////////////////////////////////
-	generatePath();
-}
-///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::generatePath() {
-///////////////////////////////////////////////////////////////////
-	enableControls(false);
-		
 	int id = getPathSelection();
 	if ( id >= 0 ) {
 		evaluateCommonValues(id);
 		evaluateSvgParameterValues(id);
 		evaluateCncParameterValues(id);
 		evaluatePathParameterValues(id);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::generatePath(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	evaluateValues();
+	generatePath();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::generatePath() {
+///////////////////////////////////////////////////////////////////
+	enableControls(false);
+	clearProcessInfo();
+	m_pgMainBook->SetSelection(0);
+
+	int id = getPathSelection();
+	if ( id >= 0 ) {
 
 		// generate path
 		cnc::pg::trc.clear();
@@ -362,10 +514,8 @@ void PathGeneratorFrame::generatePath() {
 		cnc::pg::trc.blue();
 		cnc::pg::trc << preview;
 
-		if ( pathGeneratorStore.hasErrorInfo(id) == true ) {
-			cnc::pg::trc.red();
-			cnc::pg::trc << wxString::Format("\n<--\nError info:\n%s-->\n", pathGeneratorStore.getErrorInfo(id));
-		}
+		if ( pathGeneratorStore.hasErrorInfo(id) == true )
+			appendErrorMessage(pathGeneratorStore.getErrorInfo(id));
 
 		// update transform values
 		if ( m_pgPropTransformMode->GetValue().GetBool() == true )
@@ -373,9 +523,11 @@ void PathGeneratorFrame::generatePath() {
 			
 	} else {
 		clearView();
-		cnc::pg::trc.red();
-		cnc::pg::trc << wxString::Format("\n<--\nError info:\n%s%d-->\n", "PathGeneratorFrame::generatePath: Invalid id: ", id);
+		appendErrorMessage(wxString::Format("PathGeneratorFrame::generatePath: Invalid id: %d\n", id));
 	}
+	
+	if ( hasErrorInfo == true )	selectProcessInfo();
+	else						selectPreview();
 	
 	updatePreview();
 	enableControls(true);
@@ -536,6 +688,7 @@ void PathGeneratorFrame::setupCommonValues(const PathGeneratorBase::CommonValues
 	setupProperty(m_pgPropCorrection, cv.canToolCorrection, cv.canToolCorrection);
 	setupProperty(m_pgPropToolDiameter, cv.canToolDiameter, cv.toolDiameter);
 	setupProperty(m_pgPropPathColour, cv.canPathColour);
+	setupProperty(m_pgPropOutputMode, cv.canPathOutputMode);
 	
 	if ( cv.canPathColour == true )
 		((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour = cv.pathColour;
@@ -547,9 +700,77 @@ void PathGeneratorFrame::setupCncParameterValues(const PathGeneratorBase::CncPar
 	setupProperty(m_pgPropCncReversePath, cpv.canReverse, cpv.reverse);
 }
 ///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::checkAutoGenerate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( m_autoGenerate->IsChecked() == true )
+		generatePath();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::propertyChanging(wxPropertyGridEvent& event) {
+///////////////////////////////////////////////////////////////////
+	PathGeneratorBase::ChangeCategory cc = PathGeneratorBase::ChangeCategory::CC_UNKNOWN_CAT;
+	
+	wxPGProperty* cat = event.GetProperty();
+	while ( cat != NULL ) {
+		if      ( cat == m_pgCatCommon ) 	{ cc = PathGeneratorBase::ChangeCategory::CC_COMMON_CAT; 	break; }
+		else if ( cat == m_pgCatPath )		{ cc = PathGeneratorBase::ChangeCategory::CC_TPL_CAT; 		break; }
+		else if ( cat == m_pgCatGrid )		{ cc = PathGeneratorBase::ChangeCategory::CC_GRID_CAT; 		break; }
+		else if ( cat == m_pgCatCncBlock )	{ cc = PathGeneratorBase::ChangeCategory::CC_CNC_CAT; 		break; }
+		else if ( cat == m_pgCatSvg )		{ cc = PathGeneratorBase::ChangeCategory::CC_SVG_CAT; 		break; }
+		
+		cat = cat->GetParent();
+	}
+	
+	int id = getPathSelection();
+	if ( id >= 0 ) {
+		PathGeneratorBase* pGen = pathGeneratorStore.getPathGenerator(id);
+		if ( pGen != NULL ) {
+			
+			evaluateValues();
+			
+			int indexAtCat = -1;
+			if ( cat != NULL )
+				indexAtCat = cat->Index(event.GetProperty());
+			
+			if ( pGen->parameterChanging(cc, indexAtCat, event.GetValue()) == false )
+				event.Veto();
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::propertyChanged(wxPropertyGridEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	generatePath();
+	if ( m_autoGenerate->IsChecked() == false )
+		return;
+
+	PathGeneratorBase::ChangeCategory cc = PathGeneratorBase::ChangeCategory::CC_UNKNOWN_CAT;
+	
+	wxPGProperty* cat = event.GetProperty();
+	while ( cat != NULL ) {
+		if      ( cat == m_pgCatCommon ) 	{ cc = PathGeneratorBase::ChangeCategory::CC_COMMON_CAT; 	break; }
+		else if ( cat == m_pgCatPath )		{ cc = PathGeneratorBase::ChangeCategory::CC_TPL_CAT; 		break; }
+		else if ( cat == m_pgCatGrid )		{ cc = PathGeneratorBase::ChangeCategory::CC_GRID_CAT; 		break; }
+		else if ( cat == m_pgCatCncBlock )	{ cc = PathGeneratorBase::ChangeCategory::CC_CNC_CAT; 		break; }
+		else if ( cat == m_pgCatSvg )		{ cc = PathGeneratorBase::ChangeCategory::CC_SVG_CAT; 		break; }
+		
+		cat = cat->GetParent();
+	}
+	
+	int id = getPathSelection();
+	if ( id >= 0 ) {
+		PathGeneratorBase* pGen = pathGeneratorStore.getPathGenerator(id);
+		if ( pGen != NULL ) {
+			
+			evaluateValues();
+			
+			int indexAtCat = -1;
+			if ( cat != NULL )
+				indexAtCat = cat->Index(event.GetProperty());
+				
+			if ( pGen->parameterChanged(cc, indexAtCat, event.GetValue()) == true )
+				generatePath();
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::displayGrid(std::fstream& fs){
@@ -615,139 +836,136 @@ void PathGeneratorFrame::updatePreview() {
 
 	m_pgPreview->LoadURL(pfn);
 }
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::setPath(wxString path) {
+wxTreeItemId PathGeneratorFrame::searchFirstTreeItem(wxTreeItemId parent, const wxString& label, bool fullMatch) {
 ///////////////////////////////////////////////////////////////////
-/*
-	//obsolete
-	std::clog << "Obsolete function PathGeneratorFrame::setPath"<< std::endl;
-	wxString value("<path d=\"");
-	value += path;
-	value += "\"  stroke=\"black\" fill=\"none\" stroke-width=\"1.0\"/>";
-	m_generatedPath->SetValue(value);
-	 * */
-}
-
-
-///////////////////////////////////////////////////////////////////
-bool PathGeneratorFrame::generateSymetricCirclePoints(std::vector<wxRealPoint>& pl, 
-                                                      double xOffset, double yOffset, 
-													  double sections, double radius) {
-///////////////////////////////////////////////////////////////////
-	// todo check parameter
-	pl.clear();
-
-	double steps = 360.0/(sections);
-
-	for (double i=0; i<=360; i+=steps ) {
-		double x = cos(i*PI/180) * radius;
-		double y = sin(i*PI/180) * radius;
+	wxTreeItemId invalid;
+	if ( !parent )
+		return invalid;
 		
-		x += xOffset;
-		y += yOffset;
+	if ( label.length() < 3 )
+		return invalid;
 		
-		x = round(x * 1000.0) / 1000.0;
-		y = round(y * 1000.0) / 1000.0;
+	wxTreeItemIdValue cookie;
+	wxTreeItemId current = m_templateTree->GetFirstChild(parent, cookie);
+	
+	while ( current ) {
+		if ( m_templateTree->ItemHasChildren(current) == true ) {
+			// recusive call
+			wxTreeItemId found = searchFirstTreeItem(current, label);
+			if ( found )
+				return found;
 				
-		pl.push_back({x,y});
+		} else {
+			if ( fullMatch == true ) {
+				if ( m_templateTree->GetItemText(current) == label ) {
+					return current;
+				}
+			} else {
+				if ( m_templateTree->GetItemText(current).Find(label) != wxNOT_FOUND ) {
+					return current;
+				}
+			}
+		}
+		
+		current = m_templateTree->GetNextChild(parent, cookie);
 	}
 	
-	return true;
+	return invalid;
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::generatePolygon() {
+int PathGeneratorFrame::searchAndSelectTreeItem(const wxString& search, const int startIndex, bool fullMatch, const unsigned int minCharMatchCount) {
 ///////////////////////////////////////////////////////////////////
-	wxString val;
-	double radius = 0;
-	long sections = 1;
+	int ret = -1;
 	
-	val = "10.0";//m_polygonRadius->GetValue();
-	if ( val.length() > 0 ) val.ToDouble(&radius);
+	if ( search.length() < minCharMatchCount )
+		return -1;
+	
+	// over all template tree items
+	int cnt = 0;
+	wxString s(search);
+	for (TreeIndex::iterator it=treeIndex.begin(); it!=treeIndex.end(); ++it) {
+		if ( cnt > startIndex ) {
+			TreeItemInfo tii = *it;
+			
+			if ( tii.itemName.MakeUpper().Find(s.MakeUpper()) != wxNOT_FOUND ) {
+				m_templateTree->SelectItem(tii.itemId);
+				m_templateTree->EnsureVisible(tii.itemId);
+				
+				ret = cnt;
+				break;
+			}
+		}
+		
+		cnt++;
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+int PathGeneratorFrame::searchAndSelectFirstTreeItem(const wxString& search) {
+///////////////////////////////////////////////////////////////////
+	m_templateTree->SelectItem(m_templateTree->GetRootItem().GetID());
+	m_templateTree->EnsureVisible(m_templateTree->GetRootItem().GetID());
+	
+	wxString s;
+	search.IsEmpty() ? s.assign(m_treeSearchText->GetValue()) : s.assign(search);
 
-	val = "5";//m_polygonSections->GetValue();
-	if ( val.length() > 0 ) val.ToLong(&sections);
+	lastSearchIndex = searchAndSelectTreeItem(s, -1, false, 3);
 	
-	double xOffset = + 15;
-	double yOffset = radius + 15;
-	std::vector<wxRealPoint> pl;
-	
-	if ( generateSymetricCirclePoints(pl, xOffset, yOffset, sections, radius) == false )
+	return lastSearchIndex;
+}
+///////////////////////////////////////////////////////////////////
+int PathGeneratorFrame::searchAndSelectNextTreeItem(const wxString& search) {
+///////////////////////////////////////////////////////////////////
+	wxString s;
+	search.IsEmpty() ? s.assign(m_treeSearchText->GetValue()) : s.assign(search);
+
+	lastSearchIndex = searchAndSelectTreeItem(s, lastSearchIndex, false, 3);
+	// to start once more on top
+	if ( lastSearchIndex < 0 )
+		lastSearchIndex = searchAndSelectTreeItem(s, -1, false, 3);
+		
+	return lastSearchIndex;
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::keyDownTreeSearch(wxKeyEvent& event) {
+///////////////////////////////////////////////////////////////////
+	int c = event.GetKeyCode();
+	if ( c == WXK_RETURN || c == WXK_NUMPAD_ENTER ) {
+		searchAndSelectNextTreeItem();
+		
+		event.Skip(false);
 		return;
-	
-	wxString p("M ");
-	std::vector<wxRealPoint>::iterator it = pl.begin();
-	wxRealPoint p1 = *it; ++it;
-	wxRealPoint p2;
-
-	p << p1.x; p << " "; p << p1.y;
-	for ( ; it != pl.end(); ++it) {
-		p2 = *it;
-		
-		double dx = p1.x - p2.x;
-		double dy = p1.y - p2.y;
-		p << " l ";
-		p << dx; p << " "; p << dy;
-		
-		p1 = p2;
 	}
 	
-	setPath(p);
+	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::generateKnob() {
+void PathGeneratorFrame::treeSearch(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString val;
-	double radius = 100;
-	long sections = 8;
-
-	val = "10.00";//m_knobRadius->GetValue();
-	if ( val.length() > 0 ) val.ToDouble(&radius);
-
-	val = "10";//m_knobSections->GetValue();
-	if ( val.length() > 0 ) val.ToLong(&sections);
+	searchAndSelectNextTreeItem();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::updateTreeSearch(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	searchAndSelectFirstTreeItem();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::pgMainBookChanged(wxNotebookEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//const unsigned int preview 	= 0;
+	const unsigned int info 	= 1;
 	
-	double xOffset = radius + 25;
-	double yOffset = radius + 25;
-	std::vector<wxRealPoint> pl;
+	unsigned int sel = event.GetSelection();
 	
-	if ( generateSymetricCirclePoints(pl, xOffset, yOffset, sections, radius) == false )
-		return;
-
-	std::vector<wxRealPoint>::iterator it = pl.begin();
-	wxRealPoint p1 = *it; ++it;
-	wxRealPoint p2;
-
-	wxString p("M ");
-	p << p1.x; p << " "; p << p1.y;
-	for ( ; it != pl.end(); ++it) {
-		p2 = *it;
-		
-		double dx = p1.x - p2.x;
-		double dy = p1.y - p2.y;
-		double dh = sqrt(dx*dx + dy*dy);
-		
-		p << "M "; p << p1.x; p << " "; p << p1.y;
-		
-		p << " A"; p << dh/2; p << " "; p << dh/2; 
-		
-		if ( std::distance(pl.begin(), it)%2  == 0 ) p << " 0 1 0 ";
-		else										 p << " 0 1 1 ";
-
-		p << p2.x; p << " "; p << p2.y; p << " ";
-
-		p1 = p2;
+	if ( sel == info ) {
+		int id = getPathSelection();
+		if ( id >= 0 ) {
+			PathGeneratorBase* pGen = pathGeneratorStore.getPathGenerator(id);
+			if ( pGen != NULL ) {
+				pGen->getInternalInformation(m_additionalInfo);
+			}
+		}
 	}
-	
-	setPath(p);
 }
-
-
-

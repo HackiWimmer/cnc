@@ -25,6 +25,8 @@
   <object class="wxBitmap" name="16-console@2x">bitmaps\16-console@2x.png</object>
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
+  <object class="wxBitmap" name="16-cscope">bitmaps\16-cscope.png</object>
+  <object class="wxBitmap" name="16-cscope@2x">bitmaps\16-cscope@2x.png</object>
   <object class="wxBitmap" name="16-cxx-workspace">bitmaps\16-cxx-workspace.png</object>
   <object class="wxBitmap" name="16-cxx-workspace@2x">bitmaps\16-cxx-workspace@2x.png</object>
   <object class="wxBitmap" name="16-database">bitmaps\16-database.png</object>
@@ -63,6 +65,8 @@
   <object class="wxBitmap" name="16-history@2x">bitmaps\16-history@2x.png</object>
   <object class="wxBitmap" name="16-home">bitmaps\16-home.png</object>
   <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
+  <object class="wxBitmap" name="16-info">bitmaps\16-info.png</object>
+  <object class="wxBitmap" name="16-info@2x">bitmaps\16-info@2x.png</object>
   <object class="wxBitmap" name="16-macro">bitmaps\16-macro.png</object>
   <object class="wxBitmap" name="16-macro@2x">bitmaps\16-macro@2x.png</object>
   <object class="wxBitmap" name="16-marker">bitmaps\16-marker.png</object>
@@ -162,6 +166,18 @@
   <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-globals.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-globals@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-globals@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_FOLDER_CLOSE">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-project.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_FOLDER_CLOSE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-project@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_FOLDER_CLOSE@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-project@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_FOLDER_OPEN">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-project.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_FOLDER_OPEN@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-project@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_FOLDER_OPEN@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-project@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_ROOT">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-database.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_ROOT@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-database@2x.png</object>
+  <object class="wxBitmap" name="BMP_TEMPLATE_ROOT@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-database@2x.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_DEFAULT">C:\@Development\ToolbarIcons-full-20101107\png\24\Modern3D\transportation\trafficlights.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_GREEN">C:\@Development\ToolbarIcons-full-20101107\png\24\Modern3D\transportation\trafficlights_green.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_RED">C:\@Development\ToolbarIcons-full-20101107\png\24\Modern3D\transportation\trafficlights_red.png</object>

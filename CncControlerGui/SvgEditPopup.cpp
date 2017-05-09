@@ -1,6 +1,7 @@
 #include "SvgEditPopup.h"
 
 #define svgPathGenItemString								"PGen - Insert last SVG pattern"
+MainFrame* SvgEditPopup::_mainFrame							= NULL;
 unsigned int SvgEditPopup::_idOffset 						= wxID_HIGHEST;
 
 wxString SvgNodeTemplates::_ret								= _T("");
@@ -137,8 +138,41 @@ void SvgEditPopup::enablePathGeneratorMenuItem(wxMenu* menu) {
 	item->Enable(PathGeneratorFrame::getCurrentGeneratedPath().IsEmpty() == false );
 }
 //////////////////////////////////////////////////////////
-wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu* popup, bool extended) {
+void SvgEditPopup::overAllMenuItems(wxMenu* menu) {
 //////////////////////////////////////////////////////////
+	if ( menu == NULL )
+		return;
+		
+	wxMenuItemList mil = menu->GetMenuItems(); 
+	mil.GetFirst();
+	
+	for (wxMenuItemList::iterator iter = mil.begin(); iter != mil.end(); ++iter) {
+		wxMenuItem* mi = *iter;
+		if ( mi == NULL )
+			continue;
+		
+		wxMenu* m = mi->GetSubMenu ();
+		if ( m != NULL ) {
+			overAllMenuItems(m);
+		} else {
+			//clog << mi->GetItemLabelText() << endl;
+		}
+	}
+}
+//////////////////////////////////////////////////////////
+void SvgEditPopup::destroyMenu(wxMenu* popup) {
+//////////////////////////////////////////////////////////
+	if ( popup == NULL )
+		return;
+		
+	overAllMenuItems(popup);
+	delete popup;
+}
+//////////////////////////////////////////////////////////
+wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool extended) {
+//////////////////////////////////////////////////////////
+	MainFrame* frame = _mainFrame;
+	
 	if ( frame == NULL )
 		return NULL;
 		
@@ -198,8 +232,6 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 	popup->Append(idOffset + STC_PM_CUT, 					wxT("Cut"));
 	popup->Append(idOffset + STC_PM_DELETE, 				wxT("Delete"));
 	
-	
-//return popup;
 
 	//............................................
 	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
@@ -405,39 +437,42 @@ wxMenu* SvgEditPopup::createMenu(MainFrame* frame, wxStyledTextCtrl* ctl, wxMenu
 	 
 	//............................................
 	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [frame](wxCommandEvent& event) {
+	 [](wxCommandEvent& event) {
 			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
 			wxASSERT(ctl);
+			wxASSERT(SvgEditPopup::_mainFrame);
 			
 			if ( hasSelection(ctl) == false )
 				selectCurrentSvgNodeBlock(ctl);
 				
 			wxString node(ctl->GetSelectedText());
-			frame->regenerateCurrentSvgNodeFromPopup(ctl, node);
+			SvgEditPopup::_mainFrame->regenerateCurrentSvgNodeFromPopup(ctl, node);
 			
 	 }, idOffset + STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
 	 
 	//............................................
 	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [frame](wxCommandEvent& event) {
+	 [](wxCommandEvent& event) {
 			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
 			wxASSERT(ctl);
+			wxASSERT(SvgEditPopup::_mainFrame);
 			
-			frame->openPathGen();
+			SvgEditPopup::_mainFrame->openPathGen();
 			
 	 }, idOffset + STC_PM_PGEN_OPEN, wxID_ANY, ctl);
 	 
 	//............................................
 	frame->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [frame](wxCommandEvent& event) {
+	 [](wxCommandEvent& event) {
 			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
 			wxASSERT(ctl);
+			wxASSERT(SvgEditPopup::_mainFrame);
 			
 			if ( hasSelection(ctl) == false )
 				selectCurrentSvgNodeBlock(ctl);
 				
 			wxString node(ctl->GetSelectedText());
-			frame->openPathGenWithCurrentSvgNodeFromPopup(ctl, node);
+			SvgEditPopup::_mainFrame->openPathGenWithCurrentSvgNodeFromPopup(ctl, node);
 			
 	 }, idOffset + STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
 	 

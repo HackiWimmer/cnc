@@ -1,5 +1,29 @@
+#include "PathGenerators.h"
 #include "PathGeneratorStore.h"
 
+///////////////////////////////////////////////////////////////////
+PathGeneratorStore::PathGeneratorStore() {
+	registerPathGenerator(new PGenPoint());
+	registerPathGenerator(new PGenLine());
+	registerPathGenerator(new PGenLongWhole());
+	registerPathGenerator(new PGenRoundPoketWhole());
+	registerPathGenerator(new PGenFreehandPolygon());
+	registerPathGenerator(new PGenRegularRadiusPolygon());
+	registerPathGenerator(new PGenericPath());
+	//...
+	registerPathGenerator(new PGenTest());
+}
+///////////////////////////////////////////////////////////////////
+PathGeneratorStore::~PathGeneratorStore() {
+	// delete all items
+	for (GeneratorMap::iterator it=generatorMap.begin(); it!=generatorMap.end(); ++it) {
+		PathGeneratorBase* pgb = it->second;
+		if ( pgb != NULL ) {
+			delete pgb;
+			it->second = NULL;
+		}
+	}
+}
 ///////////////////////////////////////////////////////////////////
 bool PathGeneratorStore::regenerateSvgBlock(RegenerateParameter& rp) {
 ///////////////////////////////////////////////////////////////////
@@ -54,7 +78,7 @@ void PathGeneratorStore::setupParameter(unsigned int id, wxPGProperty* parent) {
 			PathGeneratorBase::ParameterInfo* pi = pgb->getParameterInfo(i);
 			if ( pi != NULL ) {
 				
-				wxPGProperty* newProp = parent->AppendChild(createProperty(pi->propertyType));;
+				wxPGProperty* newProp = parent->AppendChild(createProperty(*pi));
 				newProp->Hide(false);
 				newProp->Enable(true);
 				newProp->SetLabel(pi->label);
@@ -70,7 +94,7 @@ void PathGeneratorStore::setupParameter(unsigned int id, wxPGProperty* parent) {
 					wxVariant defaultValue(0);
 					newProp->SetDefaultValue(defaultValue);
 					newProp->SetValidator(validator);
-					newProp->SetValue(wxString::Format("%.3lf", pi->value.GetDouble()));
+					newProp->SetValue(wxString::Format(format, pi->value.GetDouble()));
 					
 				} else if ( pi->propertyType == wxPG_VARIANT_TYPE_LIST ) {
 					wxPGChoices items(pi->enumItems);
@@ -82,8 +106,12 @@ void PathGeneratorStore::setupParameter(unsigned int id, wxPGProperty* parent) {
 						newProp->SetValue(pi->value);
 					}
 					
+				} else if ( pi->propertyType == wxPG_VARIANT_TYPE_STRING ) {
+					newProp->SetValueFromString(pi->value.GetString());
+					
 				} else {
 					newProp->SetValue(pi->value);
+					
 				}
 			}
 		}

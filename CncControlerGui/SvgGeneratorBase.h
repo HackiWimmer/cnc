@@ -46,11 +46,11 @@ class SvgGeneratorBase {
 	public:
 	
 		////////////////////////////////////////////////////////////////////////////
-		static wxString svgCommentStart;
-		static wxString svgCommentEnd;
-		static wxString svgCommentPlaceholderStart;
-		static wxString svgCommentPlaceholderEnd;
-		static wxString svgConfigPlaceholderBlock;
+		static const wxString svgCommentStart;
+		static const wxString svgCommentEnd;
+		static const wxString svgCommentPlaceholderStart;
+		static const wxString svgCommentPlaceholderEnd;
+		static const wxString svgConfigPlaceholderBlock;
 		
 		////////////////////////////////////////////////////////////////////////////
 		static const wxString& finalizeSvgFragment(wxString& fragment, bool preview) {
