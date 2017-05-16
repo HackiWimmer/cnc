@@ -21,7 +21,12 @@ namespace cnc {
 	
 	bool dblCompare( double a, double b, double eps = std::numeric_limits<double>::epsilon());
 	bool dblCompareNull( double a, double eps = std::numeric_limits<double>::epsilon());
+	
 }
+
+// common ostream operators
+std::ostream& operator<<(std::ostream& os, const wxPoint& p);
+std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 
 // make std globally available
 using namespace std;

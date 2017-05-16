@@ -1,22 +1,13 @@
-#ifndef SVG_PATH_HANDLER_H
-#define SVG_PATH_HANDLER_H
+#ifndef SVG_PATH_HANDLER_BASE_H
+#define SVG_PATH_HANDLER_BASE_H
 
 #include <vector>
+#include <wx/variant.h>
 #include <wx/gdicmn.h>
 #include <wx/string.h>
 #include "CncSvgCurveLib.h"
-#include "SerialPort.h"
 #include "CncPosition.h"
-#include "SVGTransformMatrix.h"
-#include "CncToolCorrection.h"
-#include "CncWorkingParameters.h"
-#include "CncCommon.h"
-
-
-class CncControl;
-class wxDataViewListCtrl;
-
-enum SvgPhProcessMode {SvgPhController, SvgPhDebug};
+#include "CncPathListEntry.h"
 
 //////////////////////////////////////////////////////////////////
 struct CncPathListInfo {
@@ -42,10 +33,11 @@ struct CncPathListInfo {
 };
 
 //////////////////////////////////////////////////////////////////
-class SVGPathHandlerCnc {
+class SVGPathHandlerBase {
 //////////////////////////////////////////////////////////////////
+
+	protected:
 	
-	private:
 		class LastControlPoint {
 			private:	
 				SVGCurveLib::PointGeneric<> lastQuadraticBezierControlPoint;
@@ -106,37 +98,31 @@ class SVGPathHandlerCnc {
 				}
 		};
 
-	private:
-	
-		SVGUnit 			unit;
-		CncControl* 		cncControl;
-		SvgPhProcessMode 	processMode;
-		SvgOriginalPathInfo origPathInfo;
-		double 				toolRadius;
-		float 				curveLibResolution;
 		bool 				firstPath;
 		bool 				newPath;
-		bool 				initialized;
-		bool 				debugState;
-		double 				width, height;
-		wxString 			viewBox;
 		CncDoublePosition	startPos;
 		CncDoublePosition	currentPos;
-		wxDataViewListCtrl* debuggerControlDetail;
-		
-		LastControlPoint lastControlPoint;
+		float 				curveLibResolution;
+		LastControlPoint 	lastControlPoint;
 		CncPathListInfo pathList;
-		SVGTransformMatrix currentSvgTransformMatrix;
-		CncWorkingParameters currentCncParameters;
 		
+		// trace functions
+		void traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p);
+		void traceFunctionCall(const char* fn);
+		void traceCurrentPosition();
+		void tracePositions(const char* prefix);
+		void traceFirstMove(double moveX, double moveY);
 		
-		// store CncPathList
-		bool processLinearMove(bool alreadyRendered);
-		// curvel ib helper
-		inline bool processCurveLibPoint(SVGCurveLib::PointGeneric<> p);
+		// curvel lib helper
+		virtual bool processCurveLibPoint(SVGCurveLib::PointGeneric<> p);
 		
-		// spool path to cnc control
-		bool moveLinearXY(double x, double y, bool alreadyRendered);
+		// processor
+		virtual bool processLinearMove(bool alreadyRendered);
+		
+		// debug functions
+		virtual void appendDebugValueDetail(const char* key, wxVariant value);
+		virtual void appendDebugValueDetail(CncPathListEntry& cpe);
+		virtual void debugCurrentPosition();
 		
 		//render functions
 		bool processMove(char c, unsigned int count, double values[]);
@@ -149,62 +135,23 @@ class SVGPathHandlerCnc {
 		bool processQuadraticBezierSmooth(char c, unsigned int count, double values[]);
 		bool processCubicBezier(char c, unsigned int count, double values[]);
 		bool processCubicBezierSmooth(char c, unsigned int count, double values[]);
-
-		// path handling
-		bool beginCurrentPath();
-		bool repeatCurrentPath();
-		inline bool spoolCurrentPathWrapper(bool firstRun);
-		bool spoolCurrentPath(bool firstRun);
-		bool closeCurrentPath();
 		
-		// trace functions
-		inline void traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p);
-		inline void traceCurrentPosition();
-		inline void tracePositions(const char* prefix);
-		inline void traceFirstMove(double moveX, double moveY);
-		inline void traceFunctionCall(const char* fn);
+		virtual bool isInitialized();
 		
-		// debug functions
-		inline void appendDebugValueDetail(const char* key, wxVariant value);
-		inline void appendDebugValueDetail(CncPathListEntry& cpe);
-		inline void debugCurrentPosition();
-
+		// controller helper
+		virtual void simulateZAxisUp();
+		virtual void simulateZAxisDown();
+		
 	public:
-		SVGPathHandlerCnc(CncControl* cnc);
-		virtual ~SVGPathHandlerCnc();
+		SVGPathHandlerBase();
+		virtual ~SVGPathHandlerBase();
 		
-		// Getter and setter
 		void setCurveLibResolution(float res) { curveLibResolution = res; }
-		void setMaxDimensions(SVGUnit u, double width, double height);
-		void setViewBox(const wxString& vb);
-		
-		SVGUnit getSVGUnit() { return unit; }
-		double getW() { return width; }
-		double getH() { return height; }
-		const char* getViewBox() { return viewBox.c_str(); }
-
-		SVGTransformMatrix& getSvgTransformMatrix() { return currentSvgTransformMatrix; }
-
-		CncWorkingParameters& getCncWorkingParameters();
-		void setCncWorkingParameters(CncWorkingParameters& cwp);
-		
-		void setProcessMode(SvgPhProcessMode pm);
-		const SvgPhProcessMode getProcessMode() { return processMode; }
-		
-		void setDebugState(bool state) { debugState = state; }
-		void setDebuggerControl(wxDataViewListCtrl* dcd) { debuggerControlDetail = dcd; }
-		
-		// path handling
-		void prepareWork();
-		bool initNextPath(const SvgOriginalPathInfo& sopi);
-		bool finishCurrentPath();
-		bool runCurrentPath();
-		void finishWork();
 		
 		// processing
 		void debugProcess(char c, unsigned int count, double values[]);
 		bool process(char c, unsigned int count, double values[]);
-		
+	
 };
 
 #endif

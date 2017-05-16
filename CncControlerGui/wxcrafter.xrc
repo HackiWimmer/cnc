@@ -9325,26 +9325,12 @@ Axis</label>
                         <flag>wxALL|wxEXPAND</flag>
                         <border>1</border>
                         <object class="wxFlexGridSizer">
-                          <cols>2</cols>
+                          <cols>1</cols>
                           <rows>1</rows>
                           <vgap>0</vgap>
                           <hgap>0</hgap>
-                          <growablecols>1</growablecols>
+                          <growablecols>0</growablecols>
                           <growablerows>0</growablerows>
-                          <object class="sizeritem">
-                            <flag>wxALL</flag>
-                            <border>5</border>
-                            <object class="wxStaticText" name="m_staticText3095">
-                              <label>Path Template:</label>
-                              <style/>
-                              <font>
-                                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                                <style>normal</style>
-                                <weight>bold</weight>
-                                <underlined>0</underlined>
-                              </font>
-                            </object>
-                          </object>
                           <object class="sizeritem">
                             <flag>wxALL|wxEXPAND</flag>
                             <border>1</border>
@@ -9353,6 +9339,7 @@ Axis</label>
                               <tooltip>
                                 <![CDATA[Path Selector]]>
                               </tooltip>
+                              <hidden>1</hidden>
                               <enabled>0</enabled>
                               <selection>-1</selection>
                               <content/>

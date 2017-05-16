@@ -5976,24 +5976,18 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer973->AddGrowableRow(1);
     m_splitterPage3189->SetSizer(flexGridSizer973);
     
-    flexGridSizer3093 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer3093 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3093->SetFlexibleDirection( wxBOTH );
     flexGridSizer3093->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3093->AddGrowableCol(1);
+    flexGridSizer3093->AddGrowableCol(0);
     flexGridSizer3093->AddGrowableRow(0);
     
     flexGridSizer973->Add(flexGridSizer3093, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_staticText3095 = new wxStaticText(m_splitterPage3189, wxID_ANY, _("Path Template:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPage3189, wxSize(-1,-1)), 0);
-    wxFont m_staticText3095Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText3095Font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_staticText3095->SetFont(m_staticText3095Font);
-    
-    flexGridSizer3093->Add(m_staticText3095, 0, wxALL, WXC_FROM_DIP(5));
-    
     wxArrayString m_pgPathSelectorArr;
     m_pgPathSelector = new wxComboBox(m_splitterPage3189, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage3189, wxSize(-1,-1)), m_pgPathSelectorArr, wxCB_SORT|wxCB_READONLY);
     m_pgPathSelector->SetToolTip(_("Path Selector"));
+    m_pgPathSelector->Hide();
     m_pgPathSelector->Enable(false);
     
     flexGridSizer3093->Add(m_pgPathSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));

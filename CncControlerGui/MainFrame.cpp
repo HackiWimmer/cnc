@@ -30,7 +30,7 @@
 #include "EndSwitchDialog.h"
 #include "CncFileNameService.h"
 #include "CncControllerTestSuite.h"
-#include "SVGPathHandler.h"
+#include "SVGPathHandlerCnc.h"
 #include "GCodeFileParser.h"
 #include "CncArduino.h"
 #include "SvgEditPopup.h"
@@ -493,9 +493,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
 	
 	//todo
-	wxCommandEvent dummy;
-	openSVGPathGenerator(dummy);
-	
+	//wxCommandEvent dummy;
+	//openSVGPathGenerator(dummy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceTimer(wxTimerEvent& event) {

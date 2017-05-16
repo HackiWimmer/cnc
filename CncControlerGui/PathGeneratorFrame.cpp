@@ -265,11 +265,11 @@ int PathGeneratorFrame::getPathSelection() {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::selectPathSelector(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	selectPathSelector(getPathSelection());
-	
-	evaluateValues();
-	generatePath();
-	updatePreview();
+	if ( m_pgPathSelector->IsEnabled() ) {
+		selectPathSelector(getPathSelection());
+		evaluateValues();
+		generatePath();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::selectTemplateTree(wxTreeEvent& event) {
@@ -281,7 +281,6 @@ void PathGeneratorFrame::selectTemplateTree(wxTreeEvent& event) {
 	
 		evaluateValues();
 		generatePath();
-		updatePreview();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -458,7 +457,6 @@ bool PathGeneratorFrame::regenerateSvgBlock(PathGeneratorStore::RegenerateParame
 	
 	evaluateValues();
 	generatePath();
-	updatePreview();
 	
 	//todo replace selection
 	
@@ -505,7 +503,9 @@ void PathGeneratorFrame::generatePath() {
 		SvgGeneratorBase::finalizeSvgFragment(result, false);
 		
 		// update result
-		m_generatedResult->SetValue(result);
+		m_generatedResult->Clear();
+		m_generatedResult->SetDefaultStyle(*wxWHITE);
+		m_generatedResult->AppendText(result);
 		
 		// update global Value
 		globaGeneratedPath = result;

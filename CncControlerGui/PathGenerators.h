@@ -371,6 +371,8 @@ class PGenPolygon : public PathGeneratorBase {
 			// data points
 			std::stringstream ss;
 			ss << "Polyon::Data::Points: generic format\n";
+			ss << "Original (x,y)        | Last Transformed (x,y)\n";
+			
 			for (PathFragmentPolygonData::iterator it = polygonData.begin(); it != polygonData.end(); ++it) {
 				ss << *it << "\n";
 			}
@@ -383,8 +385,8 @@ class PGenPolygon : public PathGeneratorBase {
 			ctl->AppendText("\n\n");
 			
 			// min max positons
-			ctl->AppendText(wxString::Format("Polyon::Data::Min: %.3lf, %.3lf\n", getMinPosition().x, getMinPosition().y));
-			ctl->AppendText(wxString::Format("Polyon::Data::Max: %.3lf, %.3lf\n", getMaxPosition().x, getMaxPosition().y));
+			ctl->AppendText(wxString::Format("Polyon::Data::Min (x,y): %10.3lf, %10.3lf\n", getMinPosition().x, getMinPosition().y));
+			ctl->AppendText(wxString::Format("Polyon::Data::Max (x,y): %10.3lf, %10.3lf\n", getMaxPosition().x, getMaxPosition().y));
 			
 			// final line feed
 			ctl->AppendText("\n");
@@ -536,6 +538,10 @@ class PGenPolygon : public PathGeneratorBase {
 				cp.x = (cnc::dblCompare(p.x(), 0.0, 0.001) == true ? 0.0 : p.x());
 				cp.y = (cnc::dblCompare(p.y(), 0.0, 0.001) == true ? 0.0 : p.y());
 			}
+			catch (boost::geometry::centroid_exception e) {
+				addErrorInfo("determineCentroid(): Error while determine centroid");
+				addErrorInfo(e.what());
+			}
 			catch (...) {
 				addErrorInfo("determineCentroid(): Error while determine centroid");
 			}
@@ -543,25 +549,10 @@ class PGenPolygon : public PathGeneratorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void addPolygon(SvgPathGroup& spg, bool inlay=false) {
-			spg.add(spg.fGen().addPolygon(polygonData));
-			
-			if ( inlay == true ) {
-				// todo factor + loop
-				for ( int i=0; i<5; i++ ) {
-					wxRealPoint cp;
-					determineCentroid(cp);
-					
-					SVGTransformer t;
-					t.applyScale(0.8);
-					
-					if ( i == 0 )	transformPolygon(t);
-					else			transformPolygonAgain(t);
-					
-					spg.add(spg.fGen().addPolygon(polygonData));
-				}
-			}
-		}
+		void addPolygon(SvgPathGroup& spg, bool inlay=false);
+		
+		///////////////////////////////////////////////////////////////////
+		void correctPolygon(SvgPathGroup& spg, double value, bool once);
 		
 		///////////////////////////////////////////////////////////////////
 		void clearPolygonData() {
@@ -705,7 +696,7 @@ class PGenRegularRadiusPolygon : public PGenPolygon {
 			
 			// calculate polygon data points
 			double steps  = 360.0 / getParameterNumValue(IDX_SECTIONS);
-			double radius = (commonValues.toolCorrection == true ? getParameterNumValue(IDX_RADIUS) - commonValues.toolDiameter/2 : getParameterNumValue(1));
+			double radius = getParameterNumValue(IDX_RADIUS);
 
 			for (double i=0; i<360; i+=steps ) {
 				double x = cos(i*PI/180) * radius;

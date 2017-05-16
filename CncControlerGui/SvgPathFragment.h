@@ -26,9 +26,11 @@ class PolygonDataPoint {
 		
 		///////////////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const PolygonDataPoint &a) {
-			ostr << a.getOriginalPoint().x << ", " << a.getOriginalPoint().y;
+			ostr << wxString::Format("%10.3lf,", a.getOriginalPoint().x);
+			ostr << wxString::Format("%10.3lf",  a.getOriginalPoint().y);
 			ostr << " | ";
-			ostr << a.getTransformedPoint().x << ", " << a.getTransformedPoint().y;
+			ostr << wxString::Format("%10.3lf,",a.getTransformedPoint().x);
+			ostr << wxString::Format("%10.3lf", a.getTransformedPoint().y);
 			return ostr;
 		}
 		

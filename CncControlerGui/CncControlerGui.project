@@ -42,6 +42,7 @@
           <File Name="PathGenerators.h"/>
           <File Name="PathGeneratorBase.h"/>
           <File Name="PathGeneratorBase.cpp"/>
+          <File Name="PathGenerators.cpp"/>
         </VirtualDirectory>
         <File Name="SvgPathGroup.cpp"/>
         <File Name="SvgPathString.cpp"/>
@@ -73,12 +74,10 @@
       <File Name="SVGCurveLib.cpp"/>
       <File Name="SvgEditPopup.cpp"/>
       <File Name="SVGFileParser.cpp"/>
-      <File Name="SVGPathHandler.cpp"/>
       <File Name="SvgUnitCalculator.cpp"/>
       <File Name="SVGCurveLib.h"/>
       <File Name="SvgEditPopup.h"/>
       <File Name="SVGFileParser.h"/>
-      <File Name="SVGPathHandler.h"/>
       <File Name="SVGTransformMatrix.h"/>
       <File Name="SvgUnitCalculator.h"/>
       <File Name="SVGUserAgent.h"/>
@@ -86,6 +85,10 @@
       <File Name="SvgViewBox.h"/>
       <File Name="SVGElementConverter.h"/>
       <File Name="SVGElementConverter.cpp"/>
+      <File Name="SVGPathHandlerCnc.h"/>
+      <File Name="SVGPathHandlerCnc.cpp"/>
+      <File Name="SVGPathHandlerBase.h"/>
+      <File Name="SVGPathHandlerBase.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <File Name="CncArduino.cpp"/>

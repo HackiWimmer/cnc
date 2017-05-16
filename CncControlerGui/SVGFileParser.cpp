@@ -14,7 +14,7 @@
 #include "SvgUnitCalculator.h"
 #include "CncFileNameService.h"
 #include "CncControl.h"
-#include "SVGPathHandler.h"
+#include "SVGPathHandlerCnc.h"
 #include "SVGFileParser.h"
 
 //////////////////////////////////////////////////////////////////

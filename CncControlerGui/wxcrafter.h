@@ -1712,7 +1712,6 @@ protected:
     wxPanel* m_splitterPage3189;
     wxFlexGridSizer* flexGridSizer973;
     wxFlexGridSizer* flexGridSizer3093;
-    wxStaticText* m_staticText3095;
     wxComboBox* m_pgPathSelector;
     wxFlexGridSizer* flexGridSizer2825;
     wxSplitterWindow* m_splitter2932;
@@ -1828,7 +1827,6 @@ public:
     wxButton* GetBtSearchTree() { return m_btSearchTree; }
     wxTreeCtrl* GetTemplateTree() { return m_templateTree; }
     wxPanel* GetLeftMainSplitterPage() { return m_leftMainSplitterPage; }
-    wxStaticText* GetStaticText3095() { return m_staticText3095; }
     wxComboBox* GetPgPathSelector() { return m_pgPathSelector; }
     wxWebView* GetPgPreview() { return m_pgPreview; }
     wxPanel* GetPgPreviewPage() { return m_pgPreviewPage; }
