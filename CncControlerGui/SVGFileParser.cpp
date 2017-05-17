@@ -19,7 +19,8 @@
 
 //////////////////////////////////////////////////////////////////
 SVGFileParser::SVGFileParser(const char* fn, CncControl* cnc) 
-: cncControl(cnc)
+: SVGNodeParser()
+, cncControl(cnc)
 , cncNodeBreak(false)
 , pathHandler(new SVGPathHandlerCnc(cnc))
 , fileName(fn)
@@ -38,6 +39,12 @@ SVGFileParser::~SVGFileParser() {
 	delete pathHandler;
 }
 //////////////////////////////////////////////////////////////////
+void SVGFileParser::setPathHandler(SVGPathHandlerBase* ph) {
+//////////////////////////////////////////////////////////////////
+	std::cerr << "SVGFileParser::setPathHandler: Invalid call, this class didn't support this method!" << endl;
+	std::cerr << "Nothig will be set." << endl;
+}
+//////////////////////////////////////////////////////////////////
 void SVGFileParser::createSvgTraceRoot() {
 //////////////////////////////////////////////////////////////////
 	wxXmlNode* root = svgTrace.DetachRoot();
@@ -47,44 +54,15 @@ void SVGFileParser::createSvgTraceRoot() {
 	root = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, "Root");
 	svgTrace.SetRoot(root);
 }
-///////////////////////////////////////////////////////////////////////
-inline int SVGFileParser::getCommandParaCount(char c) {
-/*
- Folgende Buchstaben bzw. Pfadverläufe sind möglich:
-
-    moveto: M, m - Startpunkt (das Aufsetzen des imaginären Stiftes)
-    lineto: L, l und H, h und V, v - eine gerade Linie
-    closepath: Z, z - eine Pfad schließen
-    cubic Bézier curve: C, c und S, s - eine kubische Bézier-Kurve
-    quadratic Bézier curve: Q, q und T, t - eine quadratische Bézier-Kurve
-    elliptical arc curve: A, a - einen elliptischen Bogen
-*/
-	int ret = -1;
-	switch ( c ) {
-		case 'z':
-		case 'Z': ret = 0; break;
-		case 'h':
-		case 'H':
-		case 'v':
-		case 'V': ret = 1; break;
-		case 'm':
-		case 'M':
-		case 'l':
-		case 'L':
-		case 't': 
-		case 'T': ret = 2; break;
-		case 'q':
-		case 'Q':
-		case 's':
-		case 'S': ret = 4; break;
-		case 'c':
-		case 'C': ret = 6; break;
-		case 'a':
-		case 'A': ret = 7; break;
-
-		default: ret = -1;
-	} 
-	return ret;
+//////////////////////////////////////////////////////////////////
+long SVGFileParser::getCurrentLineNumber() {
+//////////////////////////////////////////////////////////////////
+	return pathHandler->getCncWorkingParameters().currentLineNumber;
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) {
+//////////////////////////////////////////////////////////////////
+	return svgUserAgent.addPathElement(c, count, values);
 }
 //////////////////////////////////////////////////////////////////
 SVGUnit SVGFileParser::determineUnit (wxString uw, wxString uh) {
@@ -242,6 +220,11 @@ void SVGFileParser::freezeDebugControls(bool freeze) {
 			debugControls.debuggerControlDetail->Update();
 		}
 	}
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::shouldStop() {
+//////////////////////////////////////////////////////////////////
+	return runInfo.getStopFlag();
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::evaluateDebugState(bool force) {
@@ -974,130 +957,9 @@ void SVGFileParser::evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm)
 	evaluateUse(attribute->GetNext(), dsm);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::evaluatePath(wxString data) {
+void SVGFileParser::initNextPath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
-	appendDebugValueBase("Resulting Path", data);
 	svgUserAgent.initNextPath(pathHandler->getCncWorkingParameters(), data);
-	
-	int sPos = -1;
-	wxString token;
-	for (unsigned int i=0; i<data.Length(); i++ ) {
-		
-		if ( data[i] == '-' || data[i] == '+' || data[i] == 'e' || data[i] == 'E' ) 
-			continue;
-			
-		if ( isalpha(data[i]) && sPos < 0 ) {
-			sPos = i;
-		} else if ( isalpha(data[i]) ) {
-			token = data.SubString(sPos, i - 1);
-			if ( processPathCommand(token) == false )
-				return false;
-				
-			sPos = i;
-		} 
-		
-		if ( i == data.Length() - 1 ) {
-			token = data.SubString(sPos, i);
-			if ( processPathCommand(token) == false )
-				return false;
-		}
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::processPathCommand(wxString para) {
-//////////////////////////////////////////////////////////////////
-	if ( para.Length() == 0 )
-		return true;
-
-	clearDebugControlPath();
-	appendDebugValuePath("Path Fragment", para);
-	//std::clog << para.c_str() << std::endl;
-	
-	double values[MAX_PARAMETER_VALUES];
-	
-	wxString token;
-	char c 						= '\0';
-	unsigned int sPos 			= 0;
-	unsigned int valueCounter 	= 0;
-	unsigned int commandCounter = 0;
-	int parameterCount 			= -1;
-
-	para.Trim(true).Trim(false);
-	for (unsigned int i=sPos; i<para.Length(); i++) {
-		
-		if ( i == 0 ) {
-			c = para[0].GetValue();
-			sPos++;
-			if ( (parameterCount = getCommandParaCount(c) ) < 0 ) {
-				std::cerr << "Not known command: " << c << std::endl;
-				std::cerr << "Current line numer: " << pathHandler->getCncWorkingParameters().currentLineNumber << std::endl;
-				break;
-			}
-		} else {
-			if ( para[i] == ' ' || para[i] == ',' || para[i] == '-' || para[i] == '+' ) {
-				// handle exponential presentation
-				if ( (para[i] == '-' || para[i] == '+') && ( para[i-1] == 'e' || para[i-1] == 'E') ) 
-					continue;
-				
-				if ( i != sPos ) {
-					token = para.SubString(sPos, i - 1);
-					token.ToDouble(&values[valueCounter++]);
-					appendDebugValuePath("token", token);
-
-					if ( valueCounter == MAX_PARAMETER_VALUES ) {
-						std::cerr << "Max parameters count reached for: " << para.c_str() << std::endl;
-						return false;
-					}
-				}
-				if ( para[i] == '-'|| para[i] == '+' )	sPos = i;
-				else									sPos = i + 1;
-				
-			} else if ( i == para.Length() - 1 ) {
-				token = para.SubString(sPos, i);
-				token.ToDouble(&values[valueCounter++]);
-				appendDebugValuePath("token", token);
-			}
-		}
-		
-		if ( (int)valueCounter ==  parameterCount ) {
-			commandCounter++;
-			if ( commandCounter == 2 && ( c == 'm' || c == 'M' ) ) {
-				// M - 1 = L or m - 1 = l
-				c = c - 1;
-			}
-			
-			bool ret = svgUserAgent.addPathElement(c, valueCounter, values);
-			evaluateDebugState();
-			
-			if ( runInfo.getStopFlag() == true )
-				return false;
-			
-			if ( ret == false )
-				return false;
-
-			valueCounter = 0;
-		} 
-	}
-	
-	bool ret = true;
-	if ( valueCounter != 0 ) {
-		std::cerr << "SVGFileParser:" << std::endl;
-		std::cerr << "Parameters count error in: " << para.c_str() << std::endl;
-		std::cerr << "Defined parameter count: " << parameterCount << "; Current value count: " << valueCounter << std::endl;
-		std::cerr << "Current line numer: " << pathHandler->getCncWorkingParameters().currentLineNumber << std::endl;
-		std::cerr << "Stored value list: " << std::endl;
-
-		for (unsigned int i=0; i<valueCounter; i++) {
-			std::cerr << "[" << i << "]=" << values[i] << "\t";
-		}	
-		std::cerr << std::endl;
-		
-		ret = false;
-	}
-	
-	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {

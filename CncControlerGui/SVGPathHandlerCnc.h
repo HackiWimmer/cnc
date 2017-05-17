@@ -3,7 +3,6 @@
 
 #include "SVGPathHandlerBase.h"
 #include "SerialPort.h"
-#include "SVGTransformMatrix.h"
 #include "CncToolCorrection.h"
 #include "CncWorkingParameters.h"
 #include "CncCommon.h"
@@ -30,8 +29,6 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		double 				width, height;
 		wxString 			viewBox;
 		wxDataViewListCtrl* debuggerControlDetail;
-		
-		SVGTransformMatrix currentSvgTransformMatrix;
 		CncWorkingParameters currentCncParameters;
 		
 		// spool path to cnc control
@@ -46,8 +43,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		
 	protected:
 	
-		// store CncPathList
-		virtual bool processLinearMove(bool alreadyRendered);
+		virtual bool shouldConvertRefToMM() const { return true; }
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
@@ -59,6 +55,8 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		// controller helper
 		virtual void simulateZAxisUp();
 		virtual void simulateZAxisDown();
+		virtual bool isZAxisUp();
+		virtual bool isZAxisDown();
 
 	public:
 		SVGPathHandlerCnc(CncControl* cnc);
@@ -73,8 +71,6 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		double getH() { return height; }
 		const char* getViewBox() { return viewBox.c_str(); }
 
-		SVGTransformMatrix& getSvgTransformMatrix() { return currentSvgTransformMatrix; }
-
 		CncWorkingParameters& getCncWorkingParameters();
 		void setCncWorkingParameters(CncWorkingParameters& cwp);
 		
@@ -85,11 +81,12 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		void setDebuggerControl(wxDataViewListCtrl* dcd) { debuggerControlDetail = dcd; }
 		
 		// path handling
-		void prepareWork();
-		bool initNextPath(const SvgOriginalPathInfo& sopi);
-		bool finishCurrentPath();
-		bool runCurrentPath();
-		void finishWork();
+		virtual void prepareWork();
+		virtual bool initNextPath();
+		virtual bool initNextPath(const SvgOriginalPathInfo& sopi);
+		virtual bool finishCurrentPath();
+		virtual bool runCurrentPath();
+		virtual void finishWork();
 		
 };
 

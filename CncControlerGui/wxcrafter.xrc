@@ -9157,26 +9157,33 @@ Axis</label>
       <object class="wxMenu" name="m_menuTest">
         <label>Test</label>
         <style/>
+        <object class="wxMenuItem" name="m_miUnitTestFramework">
+          <label>Unit Test Framework . . .</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="m_miTest1">
-          <label>Test 1</label>
+          <label>Test Function 1</label>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miTest2">
-          <label>Test 2</label>
+          <label>Test Function 2</label>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miTest3">
-          <label>Test 3</label>
+          <label>Test Function 3</label>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miTest4">
-          <label>Test 4</label>
+          <label>Test Function 4</label>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -9738,6 +9745,172 @@ Axis</label>
                   </object>
                 </object>
               </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxDialog" name="UnitTestsBase">
+    <title>CNC Controller Unit Tests . . .</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+    <size>800,600</size>
+    <object class="wxFlexGridSizer">
+      <minsize>800,300</minsize>
+      <cols>1</cols>
+      <rows>3</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>1</growablerows>
+      <object class="sizeritem" name="flexGridSizer3355">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>1</border>
+        <object class="wxFlexGridSizer">
+          <cols>5</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>1</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxStaticText" name="m_staticText3357">
+              <label>Tests:</label>
+              <style/>
+              <font>
+                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                <style>normal</style>
+                <weight>bold</weight>
+                <underlined>0</underlined>
+              </font>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>1</border>
+            <object class="wxComboBox" name="m_unitTestSelector">
+              <style>wxCB_READONLY</style>
+              <selection>-1</selection>
+              <content/>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <minsize>-1,28</minsize>
+            <object class="wxButton" name="m_btUnitTestClear">
+              <label>Clear</label>
+              <style/>
+              <size>-1,28</size>
+              <bitmap>bitmaps/16-clean.png</bitmap>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT</flag>
+            <minsize>-1,28</minsize>
+            <object class="wxButton" name="m_btUnitTestRun">
+              <label>Run . . .</label>
+              <style/>
+              <size>-1,28</size>
+              <fg>#004080</fg>
+              <font>
+                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                <style>normal</style>
+                <weight>bold</weight>
+                <underlined>0</underlined>
+              </font>
+              <bitmap>bitmaps/16-dll.png</bitmap>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>1</border>
+        <object class="wxTextCtrl" name="m_testResultStream">
+          <style>wxTE_RICH2|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+          <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+          <font>
+            <size>10</size>
+            <style>normal</style>
+            <weight>normal</weight>
+            <family>modern</family>
+            <underlined>0</underlined>
+            <face>Consolas</face>
+          </font>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer3370">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>1</border>
+        <object class="wxFlexGridSizer">
+          <cols>3</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>1</border>
+            <minsize>-1,20</minsize>
+            <object class="wxStaticText" name="m_unitTestStatus">
+              <label/>
+              <style/>
+              <size>-1,20</size>
+              <font>
+                <size>10</size>
+                <style>normal</style>
+                <weight>normal</weight>
+                <family>modern</family>
+                <underlined>0</underlined>
+                <face>Consolas</face>
+              </font>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxCheckBox" name="m_unitTestFreezeOutput">
+              <fg>#004080</fg>
+              <font>
+                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                <style>normal</style>
+                <weight>bold</weight>
+                <underlined>0</underlined>
+              </font>
+              <tooltip>
+                <![CDATA[Freeze output while running]]>
+              </tooltip>
+              <style/>
+              <label>Freeze</label>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxCheckBox" name="m_unitTestAutoRun">
+              <fg>#004080</fg>
+              <font>
+                <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                <style>normal</style>
+                <weight>bold</weight>
+                <underlined>0</underlined>
+              </font>
+              <tooltip>
+                <![CDATA[Run directly on select a test]]>
+              </tooltip>
+              <style/>
+              <label>Auto Run</label>
+              <checked>1</checked>
             </object>
           </object>
         </object>

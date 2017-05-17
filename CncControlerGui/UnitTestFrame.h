@@ -1,0 +1,35 @@
+#ifndef UNITTESTS_H
+#define UNITTESTS_H
+
+#include "Tests/Test_Base.h"
+#include "StdStreamRedirector.h"
+#include "wxcrafter.h"
+
+//////////////////////////////////////////////////////////////////
+class UnitTests : public UnitTestsBase {
+	
+	public:
+		UnitTests(wxWindow* parent, int initialTestIdx=-1, bool autoRun=false);
+		virtual ~UnitTests();
+		
+		void runTest();
+		void callbackFromTest(FrameworkCallbackInfo& fci);
+		
+	protected:
+		virtual void onShow(wxShowEvent& event);
+		virtual void runTest(wxCommandEvent& event);
+		virtual void selectTest(wxCommandEvent& event);
+		virtual void onStartupTimer(wxTimerEvent& event);
+		virtual void clearView(wxCommandEvent& event);
+		
+	private:
+		TestStore testStore;
+		
+		int initialTestIdx;
+		bool autorun;
+		StdStreamRedirector* redirector;
+		
+		void enableControls(bool state);
+		
+};
+#endif // UNITTESTS_H

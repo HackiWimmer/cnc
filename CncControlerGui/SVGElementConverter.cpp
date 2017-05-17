@@ -1,6 +1,7 @@
 #include "SVGElementConverter.h"
 
-wxXmlNode* SVGElementConverter::_xmlNode = NULL;
+wxXmlNode* SVGElementConverter::_xmlNode 	= NULL;
+wxString SVGElementConverter::_errorInfo 	= _T("");
 
 /////////////////////////////////////////////////////////////////////////
 class SVGElementConverterInitializer {

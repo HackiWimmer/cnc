@@ -21,48 +21,48 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 
 ///////////////////////////////////////////////////////////////////
 
-	// redirect std::cout
-	CncCoutBuf*  psbufCout;
-	std::streambuf *sbOldCout;
+// redirect std::cout
+CncCoutBuf*  psbufCout;
+std::streambuf *sbOldCout;
 
-	// redirect std::clog
-	CncClogBuf*  psbufClog;
-	std::streambuf *sbOldClog;
+// redirect std::clog
+CncClogBuf*  psbufClog;
+std::streambuf *sbOldClog;
 
-	// redirect std::cerr
-	CncCerrBuf*  psbufCerr; 
-	std::streambuf *sbOldCerr;
+// redirect std::cerr
+CncCerrBuf*  psbufCerr; 
+std::streambuf *sbOldCerr;
 
-	// redirect cnc::cex1
-	CncCex1Buf*  psbufCex1;
-	std::streambuf *sbOldCex1;
-	
-	// redirect cnc::trc
-	CncCtrcBuf*  psbufCtrc;
-	std::streambuf *sbOldCtrc;
-	
-	// redirect cnc::trc
-	CncCmsgBuf*  psbufCmsg;
-	std::streambuf *sbOldCmsg;
-	
-	// redirect cnc::pgt
-	CncCpgtBuf*  psbufCpgt;
-	std::streambuf *sbOldCpgt;
+// redirect cnc::cex1
+CncCex1Buf*  psbufCex1;
+std::streambuf *sbOldCex1;
 
-	// redirect cnc::trc
-	CncCspyBuf*  psbufCspy;
-	std::streambuf *sbOldCspy;
+// redirect cnc::trc
+CncCtrcBuf*  psbufCtrc;
+std::streambuf *sbOldCtrc;
+
+// redirect cnc::trc
+CncCmsgBuf*  psbufCmsg;
+std::streambuf *sbOldCmsg;
+
+// redirect cnc::pgt
+CncCpgtBuf*  psbufCpgt;
+std::streambuf *sbOldCpgt;
+
+// redirect cnc::trc
+CncCspyBuf*  psbufCspy;
+std::streambuf *sbOldCspy;
+
+namespace cnc {
+	CncSerialSpyStream spy;
+	CncMsgLogStream msg;
+	CncTraceLogStream trc;
+	CncBasicLogStream cex1;
 	
-	namespace cnc {
-		CncSerialSpyStream spy;
-		CncMsgLogStream msg;
-		CncTraceLogStream trc;
-		CncBasicLogStream cex1;
-		
-		namespace pg {
-			CncPGTLogStream trc;
-		}
-	};
+	namespace pg {
+		CncPGTLogStream trc;
+	}
+};
 	
 ///////////////////////////////////////////////////////////////////
 void installStreamRedirection(MainFrame* mainFrame) {

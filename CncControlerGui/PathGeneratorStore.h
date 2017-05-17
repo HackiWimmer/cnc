@@ -226,14 +226,7 @@ class PathGeneratorStore {
 				PathGeneratorBase* pgb = it->second;
 				if ( pgb != NULL ) {
 					wxString name(wxString::Format("%03d - %s", it->first, pgb->getName()));
-					wxTreeItemId newItem = appendTreeItem(tree, treeIndex, name, pgb->getTreePath());
-					
-					// register tree index
-					if ( newItem ) {
-						/*
-						pgb->setSelectorIndex(treeIndex.size());
-						 * */
-					}
+					appendTreeItem(tree, treeIndex, name, pgb->getTreePath());
 				}
 			}
 			

@@ -2,6 +2,7 @@
 #define SVG_FILE_PARSER_H
 
 #include <iostream>
+#include "SVGNodeParser.h"
 #include "SVGPathHandlerCnc.h" 
 #include "SVGTransformMatrix.h"
 #include "SVGUserAgent.h"
@@ -15,7 +16,8 @@ class wxXmlAttribute;
 class wxMenuItem;
 class wxDataViewListCtrl;
 
-class SVGFileParser {
+/////////////////////////////////////////////////////////////////////////////
+class SVGFileParser : public SVGNodeParser {
 	
 	public:
 		/////////////////////////////////////////////////////////////////////
@@ -171,11 +173,10 @@ class SVGFileParser {
 
 		SVGUnit determineUnit (wxString uw, wxString uh);
 
-		inline int getCommandParaCount(char c);
+		virtual long getCurrentLineNumber();
+		virtual bool addPathElement(char c, unsigned int count, double values[]);
 		
 		bool processXMLNode(wxXmlNode *child);
-		bool processPathCommand(wxString para);
-		bool evaluatePath(wxString data);
 		bool evaluateCncParameters(wxXmlNode *child);
 		void evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm);
 
@@ -183,22 +184,28 @@ class SVGFileParser {
 		bool process();
 		bool spool();
 		
-		void evaluateDebugState(bool force = false);
+		virtual void evaluateDebugState(bool force = false);
+		virtual bool shouldStop();
 		bool checkIfBreakpointIsActive();
 		void initNextRunPhase(SvgRunInfo::SvgRunPhase p);
 		void freezeDebugControls(bool freeze);
 		void clearDebugControlBase();
-		void clearDebugControlPath();
+		
 		void clearDebugControlDetail();
 		void appendDebugValue(wxDataViewListCtrl* ctl, const char* key, wxVariant value);
 		void appendDebugValue(wxDataViewListCtrl* ctl, DcmItemList& rows);
-		void appendDebugValueBase(const char* key, wxVariant value);
-		void appendDebugValuePath(const char* key, wxVariant value);
 		void appendDebugValueDetail(const char* key, wxVariant value);
+		
+		virtual void clearDebugControlPath();
+		virtual void appendDebugValuePath(const char* key, wxVariant value);
+		virtual void appendDebugValueBase(const char* key, wxVariant value);
+		
 		void appendDebugValueBase(DcmItemList& rows);
 		void appendDebugValuePath(DcmItemList& rows);
 		void appendDebugValueDetail(DcmItemList& rows);
 		void appendDebugValuesToTrace(wxDataViewListCtrl* ctl, wxXmlNode* node);
+		
+		virtual void initNextPath(const wxString& data);
 
 		void initXMLNode(wxXmlNode *child);
 		void debugXMLNode(wxXmlNode *child);
@@ -224,6 +231,7 @@ class SVGFileParser {
 		virtual ~SVGFileParser();
 		
 		virtual bool createPreview(const wxString& resultingFileName, bool withErrorInfo);
+		virtual void setPathHandler(SVGPathHandlerBase* ph);
 		
 		SVGPathHandlerCnc* getPathHandler() { return pathHandler; }
 		

@@ -127,46 +127,6 @@ bool SVGPathHandlerCnc::moveLinearXY(double x, double y, bool alreadyRendered) {
 	return cncControl->moveLinearMetricXY(x, y, alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::processLinearMove(bool alreadyRendered) {
-//////////////////////////////////////////////////////////////////
-	double newPosAbsX = currentPos.getX();
-	double newPosAbsY = currentPos.getY();
-	
-	// first perform the transformations . . .
-	currentSvgTransformMatrix.transform(newPosAbsX, newPosAbsY);
-
-	//  . . . then convert the input unit to mm . . .newPosAbsX = 
-	newPosAbsX = SvgUnitCalculator::convertReferenceUnit2MM(newPosAbsX);
-	newPosAbsY = SvgUnitCalculator::convertReferenceUnit2MM(newPosAbsY);
-
-	// . . . furthermore determine the relative move parameters . . .
-	double moveX = newPosAbsX - pathList.prevPosAbs.x;
-	double moveY = newPosAbsY - pathList.prevPosAbs.y;
-	
-	// . . . and last but not least store the move command.
-	CncPathListEntry cpe;
-	cpe.zAxisDown 			= cncControl->isZAxisDown();
-	cpe.move.x				= moveX;
-	cpe.move.y				= moveY;
-	cpe.alreadyRendered 	= alreadyRendered;
-	
-	// correct the start position
-	if ( pathList.list.size() == 0 ) {
-		pathList.startPos.x  = newPosAbsX;
-		pathList.startPos.y  = newPosAbsY;
-		pathList.firstMove.x = moveX;
-		pathList.firstMove.y = moveY;
-	}
-	
-	// store position
-	pathList.prevPosAbs.x = newPosAbsX;
-	pathList.prevPosAbs.y = newPosAbsY;
-	pathList.list.push_back(cpe);
-	appendDebugValueDetail(cpe);
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
 inline void SVGPathHandlerCnc::appendDebugValueDetail(CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	if ( debugState == false )
@@ -175,14 +135,19 @@ inline void SVGPathHandlerCnc::appendDebugValueDetail(CncPathListEntry& cpe) {
 	appendDebugValueDetail((wxString("Point ") << pathList.list.size()), cpe.getPointAsString());
 }
 //////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::initNextPath() {
+//////////////////////////////////////////////////////////////////
+	SvgOriginalPathInfo sopi;
+	return initNextPath(sopi);
+}
+//////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 //////////////////////////////////////////////////////////////////
 	traceFunctionCall("initNextPath");
 	newPath 			= true;
 	origPathInfo	 	= sopi;
 	
-	pathList.isCorrected = false;
-	pathList.list.clear();
+	pathList.reset();
 	
 	// Z depth management
 	wxASSERT( cncControl && cncControl->getCncConfig() );
@@ -417,6 +382,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 void SVGPathHandlerCnc::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	traceFunctionCall("prepareWork");
+	SVGPathHandlerBase::prepareWork();
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
@@ -431,6 +397,7 @@ void SVGPathHandlerCnc::prepareWork() {
 void SVGPathHandlerCnc::finishWork() {
 //////////////////////////////////////////////////////////////////
 	traceFunctionCall("finishWork");
+	SVGPathHandlerBase::finishWork();
 	
 	cncControl->switchToolOff();
 	
@@ -452,4 +419,14 @@ void SVGPathHandlerCnc::simulateZAxisUp() {
 void SVGPathHandlerCnc::simulateZAxisDown() {
 //////////////////////////////////////////////////////////////////
 	cncControl->simulateZAxisDown();
+}
+//////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::isZAxisUp() {
+//////////////////////////////////////////////////////////////////
+	return cncControl->isZAxisUp();
+}
+//////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::isZAxisDown() {
+//////////////////////////////////////////////////////////////////
+	return cncControl->isZAxisDown();
 }

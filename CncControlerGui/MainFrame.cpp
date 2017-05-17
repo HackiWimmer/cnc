@@ -35,6 +35,7 @@
 #include "CncArduino.h"
 #include "SvgEditPopup.h"
 #include "HexDecoder.h"
+#include "UnitTestFrame.h"
 #include "MainFrame.h"
 
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
@@ -419,19 +420,16 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-
-	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("Outbound");
-	pi.Float();
-	GetAuimgrMain()->Update();
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
-	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("Outbound");
-	clog << GetAuimgrMain()->SavePaneInfo(pi) << endl;
+	cout << "testFunction2"<< endl;
+	clog << "testFunction2"<< endl;
+	cerr << "testFunction2"<< endl;
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -558,7 +556,7 @@ void MainFrame::OnClose(wxCloseEvent& event) {
 void MainFrame::dispatch() {
 ///////////////////////////////////////////////////////////////////
 	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-	while (evtLoop->Pending())
+	while (evtLoop->Pending() )
 		evtLoop->Dispatch();
 }
 ///////////////////////////////////////////////////////////////////
@@ -6643,4 +6641,9 @@ void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
 		m_cbUCValueTo->AppendText(wxString(tokenizer.GetLastDelimiter()));
 	}
 }
-
+///////////////////////////////////////////////////////////////////
+void MainFrame::unitTestFramework(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	UnitTests test(this, 0, true);
+	test.ShowModal();
+}

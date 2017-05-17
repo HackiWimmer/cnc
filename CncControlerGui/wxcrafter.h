@@ -857,6 +857,8 @@ protected:
     wxMenuItem* m_miCalculator;
     wxMenuItem* m_miPyCam;
     wxMenu* m_menuTest;
+    wxMenuItem* m_miUnitTestFramework;
+    wxMenuItem* m_menuItem3361;
     wxMenuItem* m_miTest1;
     wxMenuItem* m_miTest2;
     wxMenuItem* m_miTest3;
@@ -1134,6 +1136,7 @@ protected:
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void openPyCam(wxCommandEvent& event) { event.Skip(); }
+    virtual void unitTestFramework(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction1(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction2(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction3(wxCommandEvent& event) { event.Skip(); }
@@ -1859,6 +1862,43 @@ public:
     wxSplitterWindow* GetMainSplitter() { return m_mainSplitter; }
     PathGeneratorFrameBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SVG Path Generator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,750), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
     virtual ~PathGeneratorFrameBase();
+};
+
+
+class UnitTestsBase : public wxDialog
+{
+protected:
+    wxFlexGridSizer* flexGridSizer3344;
+    wxFlexGridSizer* flexGridSizer3355;
+    wxStaticText* m_staticText3357;
+    wxComboBox* m_unitTestSelector;
+    wxButton* m_btUnitTestClear;
+    wxButton* m_btUnitTestRun;
+    wxTextCtrl* m_testResultStream;
+    wxFlexGridSizer* flexGridSizer3370;
+    wxStaticText* m_unitTestStatus;
+    wxCheckBox* m_unitTestFreezeOutput;
+    wxCheckBox* m_unitTestAutoRun;
+    wxTimer* m_unitTestStartupTimer;
+
+protected:
+    virtual void onShow(wxShowEvent& event) { event.Skip(); }
+    virtual void selectTest(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearView(wxCommandEvent& event) { event.Skip(); }
+    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText3357() { return m_staticText3357; }
+    wxComboBox* GetUnitTestSelector() { return m_unitTestSelector; }
+    wxButton* GetBtUnitTestClear() { return m_btUnitTestClear; }
+    wxButton* GetBtUnitTestRun() { return m_btUnitTestRun; }
+    wxTextCtrl* GetTestResultStream() { return m_testResultStream; }
+    wxStaticText* GetUnitTestStatus() { return m_unitTestStatus; }
+    wxCheckBox* GetUnitTestFreezeOutput() { return m_unitTestFreezeOutput; }
+    wxCheckBox* GetUnitTestAutoRun() { return m_unitTestAutoRun; }
+    wxTimer* GetUnitTestStartupTimer() { return m_unitTestStartupTimer; }
+    UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    virtual ~UnitTestsBase();
 };
 
 

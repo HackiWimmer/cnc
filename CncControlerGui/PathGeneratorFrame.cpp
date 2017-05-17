@@ -150,7 +150,7 @@ void PathGeneratorFrame::setupPathSelector() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorFrame::enableControls(bool state){
+void PathGeneratorFrame::enableControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 	m_btPGGenerate->Enable(state);
 	m_btPGClear->Enable(state);

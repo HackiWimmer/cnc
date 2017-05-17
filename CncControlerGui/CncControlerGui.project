@@ -71,24 +71,33 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Svg">
-      <File Name="SVGCurveLib.cpp"/>
-      <File Name="SvgEditPopup.cpp"/>
-      <File Name="SVGFileParser.cpp"/>
-      <File Name="SvgUnitCalculator.cpp"/>
-      <File Name="SVGCurveLib.h"/>
-      <File Name="SvgEditPopup.h"/>
-      <File Name="SVGFileParser.h"/>
-      <File Name="SVGTransformMatrix.h"/>
-      <File Name="SvgUnitCalculator.h"/>
-      <File Name="SVGUserAgent.h"/>
-      <File Name="SVGUserAgentInfo.h"/>
-      <File Name="SvgViewBox.h"/>
-      <File Name="SVGElementConverter.h"/>
-      <File Name="SVGElementConverter.cpp"/>
-      <File Name="SVGPathHandlerCnc.h"/>
-      <File Name="SVGPathHandlerCnc.cpp"/>
-      <File Name="SVGPathHandlerBase.h"/>
-      <File Name="SVGPathHandlerBase.cpp"/>
+      <VirtualDirectory Name="PathHandler">
+        <File Name="SVGPathHandlerBase.cpp"/>
+        <File Name="SVGPathHandlerCnc.cpp"/>
+        <File Name="SVGPathHandlerBase.h"/>
+        <File Name="SVGPathHandlerCnc.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Parser">
+        <File Name="SVGFileParser.cpp"/>
+        <File Name="SVGFileParser.h"/>
+        <File Name="SVGNodeParser.h"/>
+        <File Name="SVGNodeParser.cpp"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Utils">
+        <File Name="SVGCurveLib.cpp"/>
+        <File Name="SVGCurveLib.h"/>
+        <File Name="SvgEditPopup.cpp"/>
+        <File Name="SvgEditPopup.h"/>
+        <File Name="SVGElementConverter.cpp"/>
+        <File Name="SVGElementConverter.h"/>
+        <File Name="SVGTransformMatrix.h"/>
+        <File Name="SvgUnitCalculator.cpp"/>
+        <File Name="SvgUnitCalculator.h"/>
+        <File Name="SVGUserAgent.h"/>
+        <File Name="SVGUserAgentInfo.h"/>
+        <File Name="SvgViewBox.h"/>
+        <File Name="SVGPathAssistant.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <File Name="CncArduino.cpp"/>
@@ -141,6 +150,7 @@
       <File Name="MainFrame.h"/>
       <File Name="InterruptThread.h"/>
       <File Name="InterruptThread.cpp"/>
+      <File Name="StdStreamRedirector.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
       <File Name="DataControlModel.cpp"/>
@@ -300,4 +310,15 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="UnitTests">
+    <VirtualDirectory Name="Tests">
+      <File Name="Tests/Test_Base.h"/>
+      <File Name="Tests/Test_SVGNodeParser.h"/>
+      <File Name="Tests/Test_SVGPathAssistant.h"/>
+      <File Name="Tests/Test_Base.cpp"/>
+      <File Name="Tests/Test_FrameworkCallback.h"/>
+    </VirtualDirectory>
+    <File Name="UnitTestFrame.cpp"/>
+    <File Name="UnitTestFrame.h"/>
+  </VirtualDirectory>
 </CodeLite_Project>

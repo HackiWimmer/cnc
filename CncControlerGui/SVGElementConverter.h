@@ -1,15 +1,21 @@
 #ifndef SVG_ELEMENT_CONVERTER_H
 #define SVG_ELEMENT_CONVERTER_H
 
+#include <map>
+#include <wx/log.h>
 #include <wx/string.h>
 #include <wx/tokenzr.h>
+#include <wx/sstream.h>
 #include <wx/xml/xml.h>
+
+typedef std::map<wxString, wxString> SvgNodeAttributeMap;
 
 //////////////////////////////////////////////////////////////////////////
 class SVGElementConverter {
 	
 	private:
-		static wxXmlNode* 		_xmlNode;
+		static wxXmlNode* _xmlNode;
+		static wxString   _errorInfo;
 		
 	public:
 		
@@ -22,6 +28,16 @@ class SVGElementConverter {
 		static void cleanUp() {
 			if ( _xmlNode != NULL )
 				delete _xmlNode;
+		}
+		
+		//////////////////////////////////////////////////////////////////
+		static const wxString& getErrorInfo() {
+			return _errorInfo;
+		}
+		
+		//////////////////////////////////////////////////////////////////
+		static void resetErrorInfo() {
+			_errorInfo.clear();
 		}
 		
 		//////////////////////////////////////////////////////////////////
@@ -44,6 +60,9 @@ class SVGElementConverter {
 			
 		//////////////////////////////////////////////////////////////////
 		static bool convertCircleToPathData(wxXmlNode* child, wxString& ret) {
+			if ( child == NULL )
+				return false;
+
 			// <circle cx="10" cy="10" r="5" fill="red" stroke="blue" stroke-width="10"  />
 			// --> M 5,10 a 5,5 0 1,0 10,0 a 5,5 0 1,0 -10,0
 			wxString cx = child->GetAttribute("cx", "");
@@ -86,6 +105,9 @@ class SVGElementConverter {
 		
 		//////////////////////////////////////////////////////////////////
 		static bool convertEllipseToPathData(wxXmlNode* child, wxString& ret) {
+			if ( child == NULL )
+				return false;
+
 			// <ellipse cx="10" cy="10" rx="5" ry="4" fill="red" stroke="blue" stroke-width="10"  />
 			// --> M 5,10 a 5,4 0 1,0 10,0 a 5,4 0 1,0 -10,0
 			wxString cx = child->GetAttribute("cx", "");
@@ -129,6 +151,9 @@ class SVGElementConverter {
 		
 		//////////////////////////////////////////////////////////////////
 		static bool convertLineToPathData(wxXmlNode* child, wxString& ret) {
+			if ( child == NULL )
+				return false;
+
 			 // <line x1="100" y1="300" x2="300" y2="100" stroke-width="5"  />
 			wxString path("M ");
 			wxString x1 = child->GetAttribute("x1", "");
@@ -175,6 +200,9 @@ class SVGElementConverter {
 		
 		//////////////////////////////////////////////////////////////////
 		static bool convertPolygonToPathData(wxXmlNode* child, wxString& ret) {
+			if ( child == NULL )
+				return false;
+
 			//polygone fill="none" stroke="blue" stroke-width="10" 
 			//	points="10,10
 			//			15,15
@@ -199,6 +227,9 @@ class SVGElementConverter {
 		
 		//////////////////////////////////////////////////////////////////
 		static bool convertPolylineToPathData(wxXmlNode* child, wxString& ret) {
+			if ( child == NULL )
+				return false;
+
 			//polyline fill="none" stroke="blue" stroke-width="10" 
 			//	points="10,10
 			//			15,15
@@ -229,7 +260,9 @@ class SVGElementConverter {
 		
 		//////////////////////////////////////////////////////////////////
 		static bool convertRectToPathData(wxXmlNode* child, wxString& ret) {
-		//////////////////////////////////////////////////////////////////
+			if ( child == NULL )
+				return false;
+				
 			//<rect x="1" y="1" width="1198" height="398" fill="none" stroke="blue" stroke-width="2"/>
 			/*
 			Let rx and ry be length values.
@@ -302,6 +335,79 @@ class SVGElementConverter {
 			return true;
 		}
 		
+		//////////////////////////////////////////////////////////////////
+		static bool convertNodeToPathData(wxXmlNode* child, wxString& ret, SvgNodeAttributeMap& aMap) {
+			if ( child == NULL ) {
+				_errorInfo.append("The given node is NULL\n");
+				return false;
+			}
+			
+			// recycle map
+			aMap.clear();
+			
+			// add element name
+			aMap["SVG Element"] = child->GetName();
+			
+			// collect attributes
+			wxXmlAttribute* attributes = child->GetAttributes();
+			while ( attributes ) {
+				aMap[attributes->GetName()] = attributes->GetValue();
+				attributes = attributes->GetNext();
+			}
+			
+			// perform ret
+			if ( child->GetName().Upper() == "PATH" ) {
+				ret.assign(child->GetAttribute("d", ""));
+				if ( ret.IsEmpty() ) {
+					_errorInfo.append("Cant find the attribute 'd' or it is empty\n");
+					return false;
+				}
+				
+				return true;
+				
+			} else if ( child->GetName().Upper() == "CIRCLE" ) {
+				return convertCircleToPathData(child, ret);
+				
+			} else if ( child->GetName().Upper() == "ELLIPSE" ) {
+				return convertEllipseToPathData(child, ret);
+				
+			} else if ( child->GetName().Upper() == "LINE" ) {
+				return convertLineToPathData(child, ret);
+				
+			} else if ( child->GetName().Upper() == "POLYGON" ) {
+				return convertPolygonToPathData(child, ret);
+				
+			} else if ( child->GetName().Upper() == "POLYLINE" ) {
+				return convertPolylineToPathData(child, ret);
+				
+			} else if ( child->GetName().Upper() == "RECT" ) {
+				return convertRectToPathData(child, ret);
+				
+			}
+			
+			_errorInfo.append(wxString::Format("Not supported element type: %s\n", child->GetName()));
+			return false;
+		}
+		
+		//////////////////////////////////////////////////////////////////
+		static bool convertNodeToPathData(const wxString& node, wxString& ret, SvgNodeAttributeMap& aMap) {
+			wxXmlDocument xmlDoc;
+			wxStringInputStream xmlStream(node);
+			wxLogNull dummyToSuppressXmlDocErrorMessages;
+			if ( xmlDoc.Load(xmlStream) == false ) {
+				_errorInfo.append("XmlDocument.Load failed\n");
+				return false;
+				
+			}
+			
+			wxXmlNode* root = xmlDoc.GetRoot();
+			if ( root == NULL ) {
+				_errorInfo.append("XmlDocument.GetRoot is NULL\n");
+				return false;
+			}
+			
+			return convertNodeToPathData(root, ret, aMap);
+		}
 };
 
 #endif

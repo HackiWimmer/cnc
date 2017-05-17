@@ -64,6 +64,7 @@ class MainFrame : public MainFrameBClass {
 		virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
 
 	protected:
+    virtual void unitTestFramework(wxCommandEvent& event);
 
    
 		// will be bind to this frame

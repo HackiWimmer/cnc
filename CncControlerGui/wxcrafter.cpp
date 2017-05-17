@@ -5123,16 +5123,21 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuTest = new wxMenu();
     m_menuBar->Append(m_menuTest, _("Test"));
     
-    m_miTest1 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test 1"), wxT(""), wxITEM_NORMAL);
+    m_miUnitTestFramework = new wxMenuItem(m_menuTest, wxID_ANY, _("Unit Test Framework . . ."), wxT(""), wxITEM_NORMAL);
+    m_menuTest->Append(m_miUnitTestFramework);
+    
+    m_menuTest->AppendSeparator();
+    
+    m_miTest1 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 1"), wxT(""), wxITEM_NORMAL);
     m_menuTest->Append(m_miTest1);
     
-    m_miTest2 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test 2"), wxT(""), wxITEM_NORMAL);
+    m_miTest2 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 2"), wxT(""), wxITEM_NORMAL);
     m_menuTest->Append(m_miTest2);
     
-    m_miTest3 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test 3"), wxT(""), wxITEM_NORMAL);
+    m_miTest3 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 3"), wxT(""), wxITEM_NORMAL);
     m_menuTest->Append(m_miTest3);
     
-    m_miTest4 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test 4"), wxT(""), wxITEM_NORMAL);
+    m_miTest4 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 4"), wxT(""), wxITEM_NORMAL);
     m_menuTest->Append(m_miTest4);
     
     m_menuAbout = new wxMenu();
@@ -5527,6 +5532,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
     this->Connect(m_miCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openCalculator), NULL, this);
     this->Connect(m_miPyCam->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPyCam), NULL, this);
+    this->Connect(m_miUnitTestFramework->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::unitTestFramework), NULL, this);
     this->Connect(m_miTest1->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction1), NULL, this);
     this->Connect(m_miTest2->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction2), NULL, this);
     this->Connect(m_miTest3->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction3), NULL, this);
@@ -5830,6 +5836,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
     this->Disconnect(m_miCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openCalculator), NULL, this);
     this->Disconnect(m_miPyCam->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openPyCam), NULL, this);
+    this->Disconnect(m_miUnitTestFramework->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::unitTestFramework), NULL, this);
     this->Disconnect(m_miTest1->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction1), NULL, this);
     this->Disconnect(m_miTest2->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction2), NULL, this);
     this->Disconnect(m_miTest3->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction3), NULL, this);
@@ -6486,6 +6493,149 @@ PathGeneratorFrameBase::~PathGeneratorFrameBase()
     m_pgParameterMgr->Disconnect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(PathGeneratorFrameBase::propertyChanging), NULL, this);
     m_autoGenerate->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::checkAutoGenerate), NULL, this);
     
+}
+
+UnitTestsBase::UnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    flexGridSizer3344 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer3344->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3344->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3344->AddGrowableCol(0);
+    flexGridSizer3344->AddGrowableRow(1);
+    this->SetSizer(flexGridSizer3344);
+    
+    flexGridSizer3355 = new wxFlexGridSizer(1, 5, 0, 0);
+    flexGridSizer3355->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3355->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3355->AddGrowableCol(1);
+    flexGridSizer3355->AddGrowableRow(0);
+    
+    flexGridSizer3344->Add(flexGridSizer3355, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText3357 = new wxStaticText(this, wxID_ANY, _("Tests:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText3357Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_staticText3357Font.SetWeight(wxFONTWEIGHT_BOLD);
+    m_staticText3357->SetFont(m_staticText3357Font);
+    
+    flexGridSizer3355->Add(m_staticText3357, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_unitTestSelectorArr;
+    m_unitTestSelector = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_unitTestSelectorArr, wxCB_READONLY);
+    
+    flexGridSizer3355->Add(m_unitTestSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btUnitTestClear = new wxButton(this, wxID_ANY, _("Clear"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,28)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btUnitTestClear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_btUnitTestClear->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer3355->Add(m_btUnitTestClear, 0, wxALL, WXC_FROM_DIP(0));
+    m_btUnitTestClear->SetMinSize(wxSize(-1,28));
+    
+    m_btUnitTestRun = new wxButton(this, wxID_ANY, _("Run . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,28)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btUnitTestRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-dll")), wxLEFT);
+    m_btUnitTestRun->SetBitmapMargins(2,2);
+    #endif
+    m_btUnitTestRun->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
+    wxFont m_btUnitTestRunFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_btUnitTestRunFont.SetWeight(wxFONTWEIGHT_BOLD);
+    m_btUnitTestRun->SetFont(m_btUnitTestRunFont);
+    
+    flexGridSizer3355->Add(m_btUnitTestRun, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    m_btUnitTestRun->SetMinSize(wxSize(-1,28));
+    
+    m_testResultStream = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RICH2|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
+    m_testResultStream->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_testResultStream->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_testResultStreamFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_testResultStream->SetFont(m_testResultStreamFont);
+    
+    flexGridSizer3344->Add(m_testResultStream, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    flexGridSizer3370 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer3370->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3370->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3370->AddGrowableCol(0);
+    flexGridSizer3370->AddGrowableRow(0);
+    
+    flexGridSizer3344->Add(flexGridSizer3370, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_unitTestStatus = new wxStaticText(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), 0);
+    wxFont m_unitTestStatusFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_unitTestStatus->SetFont(m_unitTestStatusFont);
+    
+    flexGridSizer3370->Add(m_unitTestStatus, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_unitTestStatus->SetMinSize(wxSize(-1,20));
+    
+    m_unitTestFreezeOutput = new wxCheckBox(this, wxID_ANY, _("Freeze"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_unitTestFreezeOutput->SetValue(false);
+    m_unitTestFreezeOutput->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
+    wxFont m_unitTestFreezeOutputFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_unitTestFreezeOutputFont.SetWeight(wxFONTWEIGHT_BOLD);
+    m_unitTestFreezeOutput->SetFont(m_unitTestFreezeOutputFont);
+    m_unitTestFreezeOutput->SetToolTip(_("Freeze output while running"));
+    
+    flexGridSizer3370->Add(m_unitTestFreezeOutput, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_unitTestAutoRun = new wxCheckBox(this, wxID_ANY, _("Auto Run"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_unitTestAutoRun->SetValue(true);
+    m_unitTestAutoRun->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
+    wxFont m_unitTestAutoRunFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    m_unitTestAutoRunFont.SetWeight(wxFONTWEIGHT_BOLD);
+    m_unitTestAutoRun->SetFont(m_unitTestAutoRunFont);
+    m_unitTestAutoRun->SetToolTip(_("Run directly on select a test"));
+    
+    flexGridSizer3370->Add(m_unitTestAutoRun, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_unitTestStartupTimer = new wxTimer;
+    m_unitTestStartupTimer->Start(300, true);
+    
+    SetName(wxT("UnitTestsBase"));
+    SetMinClientSize(wxSize(800,300));
+    SetSize(800,600);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(UnitTestsBase::onShow), NULL, this);
+    m_unitTestSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(UnitTestsBase::selectTest), NULL, this);
+    m_btUnitTestClear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTestsBase::clearView), NULL, this);
+    m_unitTestStartupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(UnitTestsBase::onStartupTimer), NULL, this);
+    
+}
+
+UnitTestsBase::~UnitTestsBase()
+{
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(UnitTestsBase::onShow), NULL, this);
+    m_unitTestSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(UnitTestsBase::selectTest), NULL, this);
+    m_btUnitTestClear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTestsBase::clearView), NULL, this);
+    m_unitTestStartupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(UnitTestsBase::onStartupTimer), NULL, this);
+    
+    m_unitTestStartupTimer->Stop();
+    wxDELETE( m_unitTestStartupTimer );
+
 }
 
 EndSwitchDialogBase::EndSwitchDialogBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)

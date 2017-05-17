@@ -6,6 +6,7 @@
 #include <limits>
 
 #include "CncStreamBuffers.h"
+#include "StdStreamRedirector.h"
 
 // make essiential global variables available
 namespace cnc {
