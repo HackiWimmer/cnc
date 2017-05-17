@@ -133,11 +133,13 @@ class PathGeneratorBase {
 			bool canToolCorrection 	= true;
 			bool canToolDiameter	= true;
 			bool canPathColour		= true;
-			bool canPathOutputMode	= false;
+			bool canPathOutputType	= false;
 			
 			bool toolCorrection 	= true;
 			double toolDiameter 	= 3.125;
 			wxColour pathColour 	= wxColour(0,0,0);
+			
+			int outputType			= 0;
 			
 			bool configBlock		= true;
 			bool referenceCross 	= true;
@@ -148,7 +150,23 @@ class PathGeneratorBase {
 				canToolCorrection 	= from.canToolCorrection;
 				canToolDiameter		= from.canToolDiameter;
 				canPathColour		= from.canPathColour;
-				canPathOutputMode	= from.canPathOutputMode;
+				canPathOutputType	= from.canPathOutputType;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setOutputType(const wxString& t) {
+				if 		( t == "Path" )		outputType = 0;
+				else if ( t == "Element")	outputType = 1;
+				else						outputType = 0;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			const char* getOutputTypeAsString() {
+				switch ( outputType ) {
+					case 0: return "Path";
+					case 1: return "Element";
+				}
+				return "Path";
 			}
 		};
 		

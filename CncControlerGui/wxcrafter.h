@@ -1756,7 +1756,7 @@ protected:
     wxPGProperty* m_pgPropCorrection;
     wxPGProperty* m_pgPropPathColour;
     wxPGProperty* m_pgPropConfigBlock;
-    wxPGProperty* m_pgPropOutputMode;
+    wxPGProperty* m_pgPropOutputType;
     wxPGProperty* m_pgCatPath;
     wxPGProperty* m_pgProp01;
     wxPGProperty* m_pgCatGrid;
@@ -1800,6 +1800,7 @@ protected:
     virtual void onSize(wxSizeEvent& event) { event.Skip(); }
     virtual void onActivate(wxActivateEvent& event) { event.Skip(); }
     virtual void onMaximize(wxMaximizeEvent& event) { event.Skip(); }
+    virtual void onShow(wxShowEvent& event) { event.Skip(); }
     virtual void mainShashPositionChanged( wxSplitterEvent& event) { event.Skip(); }
     virtual void mainShashPositionChanging( wxSplitterEvent& event) { event.Skip(); }
     virtual void toogleTreeSize(wxCommandEvent& event) { event.Skip(); }

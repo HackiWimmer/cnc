@@ -95,7 +95,8 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 	protected:
 
 		// user events
-		 virtual void checkAutoGenerate(wxCommandEvent& event);
+		virtual void onShow(wxShowEvent& event);
+		virtual void checkAutoGenerate(wxCommandEvent& event);
 		virtual void pgMainBookChanged(wxNotebookEvent& event);
 		virtual void propertyChanging(wxPropertyGridEvent& event);
 		virtual void keyDownTreeSearch(wxKeyEvent& event);

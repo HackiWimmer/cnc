@@ -330,9 +330,6 @@ class PGenRoundPoketWhole : public PathGeneratorBase {
 		}
 };
 
-
-
-
 ///////////////////////////////////////////////////////////////////////////
 class PGenPolygon : public PathGeneratorBase {
 	
@@ -357,217 +354,64 @@ class PGenPolygon : public PathGeneratorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		unsigned int getDataPointCount() const {
-			return polygonData.size();
-		}
+		unsigned int getDataPointCount() const { return polygonData.size(); }
 		
 		///////////////////////////////////////////////////////////////////
-		virtual void getInternalInformation(wxTextCtrl* ctl) {
-			wxASSERT(ctl);
-			
-			ctl->Clear();
-			ctl->SetDefaultStyle(wxTextAttr(*wxWHITE));
-			
-			// data points
-			std::stringstream ss;
-			ss << "Polyon::Data::Points: generic format\n";
-			ss << "Original (x,y)        | Last Transformed (x,y)\n";
-			
-			for (PathFragmentPolygonData::iterator it = polygonData.begin(); it != polygonData.end(); ++it) {
-				ss << *it << "\n";
-			}
-			
-			// data points wkt style
-			ctl->AppendText(ss.str().c_str());
-			ctl->AppendText("\nPolyon::Data::Points wkt format:\n");
-			wxString wkt;
-			ctl->AppendText(getDataPointsAsWktString(wkt));
-			ctl->AppendText("\n\n");
-			
-			// min max positons
-			ctl->AppendText(wxString::Format("Polyon::Data::Min (x,y): %10.3lf, %10.3lf\n", getMinPosition().x, getMinPosition().y));
-			ctl->AppendText(wxString::Format("Polyon::Data::Max (x,y): %10.3lf, %10.3lf\n", getMaxPosition().x, getMaxPosition().y));
-			
-			// final line feed
-			ctl->AppendText("\n");
-		}
+		virtual void getInternalInformation(wxTextCtrl* ctl);
 		
 		///////////////////////////////////////////////////////////////////
-		const char* getDataPointsAsWktString(wxString& ret) {
-			ret.assign("POLYGON((");
-			
-			unsigned int cnt = 0;
-			PathFragmentPolygonData::iterator it;
-			for ( it = polygonData.begin(); it != polygonData.end(); ++it ) {
-				if ( cnt == 0 )	ret.Append(wxString::Format("%.3lf %.3lf", it->getTransformedPoint().x, it->getTransformedPoint().y));
-				else			ret.Append(wxString::Format(",%.3lf %.3lf", it->getTransformedPoint().x, it->getTransformedPoint().y));
-				cnt++;
-			}
-			
-			// append first point at the end too
-			it = polygonData.begin();
-			ret.Append(wxString::Format(",%.3lf %.3lf", it->getTransformedPoint().x, it->getTransformedPoint().y));
-			
-			ret.Append("))");
-			return ret;
-		}
+		const char* getDataPointsAsWktString(wxString& ret);
 		
 		///////////////////////////////////////////////////////////////////
-		bool centerPolygon() {
-			wxRealPoint cp;
-			determineCentroid(cp);
-			
-			if ( cnc::dblCompareNull(cp.x) == true && cnc::dblCompareNull(cp.x) == true )
-				return true;
-				
-			for (PathFragmentPolygonData::iterator it = polygonData.begin(); it != polygonData.end(); ++it) {
-				wxRealPoint op(it->getOriginalPoint());
-				wxRealPoint np = op - cp;
-				
-				changeDataPoint(it, np);
-			}
-			
-			return true;
-		}
+		bool centerPolygon();
 		
 		///////////////////////////////////////////////////////////////////
-		const wxRealPoint& getPolygonDataPoint(unsigned index) {
-			if ( index > polygonData.size() -1 ) {
-				addErrorInfo(wxString::Format("getPolygonDataPoint(): Invalid index: %d, current count: %d", index, polygonData.size()));
-				static wxRealPoint p;
-				return p;
-			}
-			
-			return polygonData.at(index).getTransformedPoint();
-		}
+		const wxRealPoint& getPolygonDataPoint(unsigned index);
 		
 		///////////////////////////////////////////////////////////////////
-		const wxRealPoint& getFirstPolygonDataPoint() {
-			return getPolygonDataPoint(0);
-		}
+		const wxRealPoint& getFirstPolygonDataPoint() { return getPolygonDataPoint(0); }
 		
 		///////////////////////////////////////////////////////////////////
-		const wxRealPoint& getSecondPolygonDataPoint() {
-			return getPolygonDataPoint(1);
-		}
+		const wxRealPoint& getSecondPolygonDataPoint() { return getPolygonDataPoint(1); }
 		
 		///////////////////////////////////////////////////////////////////
-		const wxRealPoint& getLastPolygonDataPoint() {
-			return getPolygonDataPoint(polygonData.size() - 1);
-		}
+		const wxRealPoint& getLastPolygonDataPoint() { return getPolygonDataPoint(polygonData.size() - 1); }
 		
 		///////////////////////////////////////////////////////////////////
-		int fillPolygonData(const wxString& data) {
-			polygonData.clear();
-			
-			wxString d(data);
-			d.Replace("\\n", ";", true);
-			d.Replace("\\t", "",  true);
-			
-			wxStringTokenizer lineTokenizer(d, ";");
-			while ( lineTokenizer.HasMoreTokens() ) {
-				wxString token = lineTokenizer.GetNextToken();
-				
-				if ( token.Matches("*,*") == true ) {
-					wxStringTokenizer pointTokenizer(token, ",");
-					wxString xv = pointTokenizer.GetNextToken();
-					wxString yv = pointTokenizer.GetNextToken();
-					
-					wxRealPoint p;
-					xv.ToDouble(&p.x);
-					yv.ToDouble(&p.y);
-					appendPolygonPoint(p);
-				}
-			}
-			
-			return polygonData.size();
-		}
+		int fillPolygonData(const wxString& data);
 		
 		///////////////////////////////////////////////////////////////////
-		void appendPolygonPoint(const wxRealPoint& p) {
-			if ( polygonData.size() == 0 ) {
-				pMin = p;
-				pMax = p;
-			} else {
-				if ( p.x < pMin.x ) pMin.x = p.x;
-				if ( p.y < pMin.y ) pMin.y = p.y;
-				if ( p.x > pMax.x ) pMax.x = p.x;
-				if ( p.y > pMax.y ) pMax.y = p.y;
-			}
-			
-			polygonData.push_back(p);
-		}
+		void appendPolygonPoint(const wxRealPoint& p);
 		
 		///////////////////////////////////////////////////////////////////
-		void changeDataPoint(PathFragmentPolygonData::iterator it, const wxRealPoint& p) {
-			if ( p.x < pMin.x ) pMin.x = p.x;
-			if ( p.y < pMin.y ) pMin.y = p.y;
-			if ( p.x > pMax.x ) pMax.x = p.x;
-			if ( p.y > pMax.y ) pMax.y = p.y;
-						
-			it->setOriginalPoint(p);
-		}
+		void changeDataPoint(PathFragmentPolygonData::iterator it, const wxRealPoint& p);
 		
 		///////////////////////////////////////////////////////////////////
-		void transformPolygon(SVGTransformer& t) {
-			for (PathFragmentPolygonData::iterator it = polygonData.begin(); it != polygonData.end(); ++it) {
-				it->transform(t);
-			}
-		}
+		void transformPolygon(SVGTransformer& t);
 		
 		///////////////////////////////////////////////////////////////////
-		void transformPolygonAgain(SVGTransformer& t) {
-			for (PathFragmentPolygonData::iterator it = polygonData.begin(); it != polygonData.end(); ++it) {
-				it->transformAgain(t);
-			}
-		}
+		void transformPolygonAgain(SVGTransformer& t);
 		
 		///////////////////////////////////////////////////////////////////
-		const wxRealPoint& determineCentroid(wxRealPoint& cp) {
-			try {
-				typedef boost::geometry::model::d2::point_xy<double> point_type;
-				typedef boost::geometry::model::polygon<point_type> polygon_type;
-
-				polygon_type poly;
-				wxString wkt;
-				boost::geometry::read_wkt(getDataPointsAsWktString(wkt), poly);
-
-				point_type p(0.0, 0.0);
-				boost::geometry::centroid(poly, p);
-				
-				cp.x = (cnc::dblCompare(p.x(), 0.0, 0.001) == true ? 0.0 : p.x());
-				cp.y = (cnc::dblCompare(p.y(), 0.0, 0.001) == true ? 0.0 : p.y());
-			}
-			catch (boost::geometry::centroid_exception e) {
-				addErrorInfo("determineCentroid(): Error while determine centroid");
-				addErrorInfo(e.what());
-			}
-			catch (...) {
-				addErrorInfo("determineCentroid(): Error while determine centroid");
-			}
-			return cp;
-		}
+		const wxRealPoint& determineCentroid(wxRealPoint& cp);
 		
 		///////////////////////////////////////////////////////////////////
 		void addPolygon(SvgPathGroup& spg, bool inlay=false);
 		
 		///////////////////////////////////////////////////////////////////
-		void correctPolygon(SvgPathGroup& spg, double value, bool once);
+		void correctPolygon(SvgPathGroup& spg, double value, bool once, PathFragmentPolygonData& result);
 		
 		///////////////////////////////////////////////////////////////////
-		void clearPolygonData() {
-			polygonData.clear();
-		}
+		void spoolPolygon(SvgPathGroup& spg, const PathFragmentPolygonData& dataPoints);
 		
 		///////////////////////////////////////////////////////////////////
-		const wxRealPoint& getMinPosition() const {
-			return pMin;
-		}
+		void clearPolygonData() { polygonData.clear(); }
 		
 		///////////////////////////////////////////////////////////////////
-		const wxRealPoint& getMaxPosition() const {
-			return pMax;
-		}
+		const wxRealPoint& getMinPosition() const { return pMin; }
+		
+		///////////////////////////////////////////////////////////////////
+		const wxRealPoint& getMaxPosition() const { return pMax; }
 		
 	public:
 };
@@ -595,6 +439,8 @@ class PGenFreehandPolygon : public PGenPolygon {
 		virtual void initParameters()  {
 			name		= "Freehand";
 			treePath 	= "Polygon";
+			
+			commonValues.canPathOutputType = true;
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupString("Data [mm]", "10.0,10.0\\n10.0,100.0\\n55.0,55.0", true);
@@ -653,6 +499,8 @@ class PGenRegularRadiusPolygon : public PGenPolygon {
 		virtual void initParameters()  {
 			name 		= "Regular - Radius";
 			treePath 	= "Polygon";
+			
+			commonValues.canPathOutputType = true;
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupNum("Sections", 6, 1, 100, 0);

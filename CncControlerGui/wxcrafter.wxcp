@@ -57179,6 +57179,13 @@
      "m_functionNameAndSignature": "onMaximize(wxMaximizeEvent& event)",
      "m_description": "Process a wxEVT_MAXIMIZE event",
      "m_noBody": false
+    }, {
+     "m_eventName": "wxEVT_SHOW",
+     "m_eventClass": "wxShowEvent",
+     "m_eventHandler": "wxShowEventHandler",
+     "m_functionNameAndSignature": "onShow(wxShowEvent& event)",
+     "m_description": "Process a wxEVT_SHOW event",
+     "m_noBody": false
     }],
    "m_children": [{
      "m_type": 4403,
@@ -57298,7 +57305,7 @@
         }, {
          "type": "string",
          "m_label": "Sash Gravity:",
-         "m_value": "0.15"
+         "m_value": "0.9"
         }, {
          "type": "string",
          "m_label": "Minimum Pane Size:",
@@ -61128,7 +61135,7 @@
                          "m_properties": [{
                            "type": "string",
                            "m_label": "Name:",
-                           "m_value": "m_pgPropOutputMode"
+                           "m_value": "m_pgPropOutputType"
                           }, {
                            "type": "string",
                            "m_label": "Label:",
@@ -61166,7 +61173,7 @@
                           }, {
                            "type": "bool",
                            "m_label": "Bool Value",
-                           "m_value": true
+                           "m_value": false
                           }, {
                            "type": "string",
                            "m_label": "Wildcard",

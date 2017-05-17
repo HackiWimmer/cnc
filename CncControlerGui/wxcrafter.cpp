@@ -5898,7 +5898,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     this->SetSizer(flexGridSizer980);
     
     m_mainSplitter = new wxSplitterWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxSP_3D);
-    m_mainSplitter->SetSashGravity(0.15);
+    m_mainSplitter->SetSashGravity(0.2);
     m_mainSplitter->SetMinimumPaneSize(24);
     
     flexGridSizer980->Add(m_mainSplitter, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
@@ -6252,8 +6252,8 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgParameterMgrIntArr.Clear();
     m_pgParameterMgrArr.Add(_("Path"));
     m_pgParameterMgrArr.Add(_("Element"));
-    m_pgPropOutputMode = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Output Type"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
-    m_pgPropOutputMode->SetHelpString(wxT(""));
+    m_pgPropOutputType = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Output Type"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
+    m_pgPropOutputType->SetHelpString(wxT(""));
     
     m_pgCatPath = m_pgParameterMgr->Append(  new wxPropertyCategory( _("Path Template Parameters") ) );
     m_pgCatPath->SetHelpString(wxT(""));
@@ -6432,6 +6432,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     this->Connect(wxEVT_SIZE, wxSizeEventHandler(PathGeneratorFrameBase::onSize), NULL, this);
     this->Connect(wxEVT_ACTIVATE, wxActivateEventHandler(PathGeneratorFrameBase::onActivate), NULL, this);
     this->Connect(wxEVT_MAXIMIZE, wxMaximizeEventHandler(PathGeneratorFrameBase::onMaximize), NULL, this);
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(PathGeneratorFrameBase::onShow), NULL, this);
     m_mainSplitter->Connect(wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED,  wxSplitterEventHandler(PathGeneratorFrameBase::mainShashPositionChanged), NULL, this);
     m_mainSplitter->Connect(wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGING,  wxSplitterEventHandler(PathGeneratorFrameBase::mainShashPositionChanging), NULL, this);
     m_btPGMinimizeTree->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::toogleTreeSize), NULL, this);
@@ -6462,6 +6463,7 @@ PathGeneratorFrameBase::~PathGeneratorFrameBase()
     this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(PathGeneratorFrameBase::onSize), NULL, this);
     this->Disconnect(wxEVT_ACTIVATE, wxActivateEventHandler(PathGeneratorFrameBase::onActivate), NULL, this);
     this->Disconnect(wxEVT_MAXIMIZE, wxMaximizeEventHandler(PathGeneratorFrameBase::onMaximize), NULL, this);
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(PathGeneratorFrameBase::onShow), NULL, this);
     m_mainSplitter->Disconnect(wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGED,  wxSplitterEventHandler(PathGeneratorFrameBase::mainShashPositionChanged), NULL, this);
     m_mainSplitter->Disconnect(wxEVT_COMMAND_SPLITTER_SASH_POS_CHANGING,  wxSplitterEventHandler(PathGeneratorFrameBase::mainShashPositionChanging), NULL, this);
     m_btPGMinimizeTree->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::toogleTreeSize), NULL, this);

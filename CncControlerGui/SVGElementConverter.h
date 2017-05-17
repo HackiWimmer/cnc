@@ -168,7 +168,7 @@ class SVGElementConverter {
 		//////////////////////////////////////////////////////////////////
 		static bool convertPolygonToPathData(wxString& points, wxString& ret) {
 			wxXmlNode* n = getNewSvgElementNode("polygon");
-			n->AddAttribute("x1", points);
+			n->AddAttribute("points", points);
 		
 			return convertPolygonToPathData(n, ret);
 		}

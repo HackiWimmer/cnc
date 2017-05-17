@@ -31,7 +31,8 @@ PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent, wxStyledTextCtrl* tplEd
 	initControls();
 	
 	SetMinSize(wxSize(-1, minSizeHeight));
-	SetSize(wxSize(-1, -1));
+	SetSize(wxSize(900, 600));
+	
 	m_pgMainBook->SetSelection(0);
 	decorateSizeButton();
 	decorateTreeSizeButton();
@@ -406,7 +407,6 @@ void PathGeneratorFrame::decorateTreeSizeButton() {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::onSize(wxSizeEvent& event) {
 ///////////////////////////////////////////////////////////////////
-cout << "onSize"<< endl;
 	if ( leftSplitterMinimized == true )
 		m_mainSplitter->SetSashPosition(m_mainSplitter->GetMinimumPaneSize());
 		
@@ -415,11 +415,14 @@ cout << "onSize"<< endl;
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::onShow(wxShowEvent& event) {
+///////////////////////////////////////////////////////////////////
+	// currently nothing to do
+}
+///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::onMaximize(wxMaximizeEvent& event) {
 ///////////////////////////////////////////////////////////////////
-cout << "onMaximize"<< endl;
-	
-	//if ( leftSplitterMinimized == true )
+	if ( leftSplitterMinimized == true )
 		m_mainSplitter->SetSashPosition(m_mainSplitter->GetMinimumPaneSize());
 		
 	decorateSizeButton();
@@ -540,6 +543,7 @@ void PathGeneratorFrame::updateCommonValues(const PathGeneratorBase::CommonValue
 	//((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
 	m_pgPropConfigBlock->SetValue(cv.configBlock);
 	m_pgPropRefCross->SetValue(cv.referenceCross);
+	m_pgPropOutputType->SetValue(cv.outputType);
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::evaluateCommonValues(int id) {
@@ -550,6 +554,7 @@ void PathGeneratorFrame::evaluateCommonValues(int id) {
 	cv.pathColour		= ((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
 	cv.configBlock		= m_pgPropConfigBlock->GetValue().GetBool();
 	cv.referenceCross	= m_pgPropRefCross->GetValue().GetBool();
+	cv.outputType		= m_pgPropOutputType->GetValue().GetInteger();
 	
 	pathGeneratorStore.setCommonValues(id, cv);
 }
@@ -688,7 +693,7 @@ void PathGeneratorFrame::setupCommonValues(const PathGeneratorBase::CommonValues
 	setupProperty(m_pgPropCorrection, cv.canToolCorrection, cv.canToolCorrection);
 	setupProperty(m_pgPropToolDiameter, cv.canToolDiameter, cv.toolDiameter);
 	setupProperty(m_pgPropPathColour, cv.canPathColour);
-	setupProperty(m_pgPropOutputMode, cv.canPathOutputMode);
+	setupProperty(m_pgPropOutputType, cv.canPathOutputType);
 	
 	if ( cv.canPathColour == true )
 		((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour = cv.pathColour;

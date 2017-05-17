@@ -132,6 +132,9 @@ const wxString& SvgPathFragment::addPolygon(const PathFragmentPolygonData& pd) {
 	wxString points;
 	
 	for (PathFragmentPolygonData::const_iterator it = pd.begin(); it != pd.end(); ++it) {
+		if ( cnc::dblCompareNull(it->getTransformedPoint().x) && cnc::dblCompareNull(it->getTransformedPoint().y) )
+			continue;
+			
 		points.append(wxString::Format(" %.3lf,%.3lf", SvgPathFragment::convertToDouble(mm, it->getTransformedPoint().x), 
 		                                               SvgPathFragment::convertToDouble(mm, it->getTransformedPoint().y)));
 	}

@@ -9212,7 +9212,7 @@ Axis</label>
         <border>5</border>
         <object class="wxSplitterWindow" name="m_mainSplitter">
           <style>wxSP_3D</style>
-          <gravity>0.15</gravity>
+          <gravity>0.2</gravity>
           <minsize>24</minsize>
           <sashpos>0</sashpos>
           <orientation>vertical</orientation>
