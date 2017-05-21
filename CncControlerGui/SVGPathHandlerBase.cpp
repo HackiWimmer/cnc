@@ -16,8 +16,6 @@ SVGPathHandlerBase::SVGPathHandlerBase()
 , totalLength(0.0)
 {
 //////////////////////////////////////////////////////////////////
-	//preallocate memory
-	pathList.list.reserve(1000 * 1000);
 }
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerBase::~SVGPathHandlerBase() {
@@ -25,9 +23,9 @@ SVGPathHandlerBase::~SVGPathHandlerBase() {
 	
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::setPathList(const CncPathListInfo& newPathList) {
-	pathList.reset();
-	pathList = newPathList;
+void SVGPathHandlerBase::setPathList(const CncPathListManager& newPathList) {
+	pathListMgr.reset();
+	pathListMgr = newPathList;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::isInitialized() {
@@ -40,7 +38,7 @@ void SVGPathHandlerBase::appendDebugValueDetail(const char* key, wxVariant value
 	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::appendDebugValueDetail(CncPathListEntry& cpe) {
+void SVGPathHandlerBase::appendDebugValueDetail(const CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	// currently nothing to do
 }
@@ -81,18 +79,18 @@ void SVGPathHandlerBase::tracePositions(const char* prefix) {
 	
 	std::cout << "tracePositions(" << prefix << ")" << std::endl;
 	
-	if ( pathList.list.size() > 0 ) {
-		CncPathList::iterator it = pathList.list.begin();
+	if ( pathListMgr.getPathListSize() > 0 ) {
+		CncPathList::iterator it = pathListMgr.begin();
 		std::cout << " PL.First.Pos  : " << (*it).move.x << "," << (*it).move.y << std::endl;
-		it = pathList.list.end()-1;
+		it = pathListMgr.end()-1;
 		std::cout << " PL.Last.Pos   : " << (*it).move.x << "," << (*it).move.y << std::endl;
 	} else {
 		std::cout << " PL.First.Pos  : empty" << std::endl;
 		std::cout << " PL.Last.Pos   : empty" << std::endl;
 	}
-	std::cout << " PL.firstPath  : " << pathList.firstPath << std::endl;
-	std::cout << " PL.Start Pos  : " << pathList.startPos.x << "," << pathList.startPos.y << std::endl;
-	std::cout << " PL.First Move : " << pathList.firstMove.x << "," << pathList.firstMove.y << std::endl;
+	std::cout << " PL.firstPath  : " << pathListMgr.getFirstPathFlag() << std::endl;
+	std::cout << " PL.Start Pos  : " << pathListMgr.getStartPos().x << "," << pathListMgr.getStartPos().y << std::endl;
+	std::cout << " PL.First Move : " << pathListMgr.getFirstMove().x << "," << pathListMgr.getFirstMove().y << std::endl;
 
 	std::cout << " StartPos      : " << startPos.getX()   << "," << startPos.getY()   << std::endl;
 	std::cout << " CurrentPos    : " << currentPos.getX() << "," << currentPos.getY() << std::endl;
@@ -122,22 +120,22 @@ bool SVGPathHandlerBase::processMove(char c, unsigned int count, double values[]
 		startPos.setY(values[1]);
 				
 		if ( firstPath == true ) {
-			pathList.firstPath = true;
+			pathListMgr.setFirstPathFlag();
 
 			//the first move is always absolute!
 			moveX = startPos.getX();
 			moveY = startPos.getY();
 			firstPath = false;
 		} else {
-			pathList.firstPath = false;
+			pathListMgr.setFirstPathFlag(false);
 
 			//the first move is always absolute 
 			//but the current position have to be considered!
 			moveX = values[0] - currentPos.getX();
 			moveY = values[1] - currentPos.getY();
 		}
-		pathList.startPos  = {startPos.getX(), startPos.getY()};
-		pathList.firstMove = {moveX, moveY};
+		pathListMgr.setStartPos({startPos.getX(), startPos.getY()});
+		pathListMgr.setFirstMove({moveX, moveY});
 		
 		tracePositions("processMove");
 		traceFirstMove(moveX, moveY);
@@ -557,7 +555,7 @@ void SVGPathHandlerBase::prepareWork() {
 bool SVGPathHandlerBase::initNextPath() {
 //////////////////////////////////////////////////////////////////
 	newPath = true;
-	pathList.reset();
+	pathListMgr.reset();
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -585,38 +583,15 @@ bool SVGPathHandlerBase::processLinearMove(bool alreadyRendered) {
 	
 	// first perform the transformations . . .
 	currentSvgTransformMatrix.transform(newPosAbsX, newPosAbsY);
-
+	
 	//  . . . then convert the input unit to mm . . .newPosAbsX
 	if ( shouldConvertRefToMM() == true ) {
 		newPosAbsX = SvgUnitCalculator::convertReferenceUnit2MM(newPosAbsX);
 		newPosAbsY = SvgUnitCalculator::convertReferenceUnit2MM(newPosAbsY);
 	}
-
-	// . . . furthermore determine the relative move parameters . . .
-	double moveX = newPosAbsX - pathList.prevPosAbs.x;
-	double moveY = newPosAbsY - pathList.prevPosAbs.y;
 	
-	// . . . and last but not least store the move command.
-	CncPathListEntry cpe;
-	cpe.zAxisDown 			= isZAxisDown();
-	cpe.move.x				= moveX;
-	cpe.move.y				= moveY;
-	cpe.abs.x				= newPosAbsX;
-	cpe.abs.y				= newPosAbsY;
-	cpe.alreadyRendered 	= alreadyRendered;
-	
-	// correct the start position
-	if ( pathList.list.size() == 0 ) {
-		pathList.startPos.x  = newPosAbsX;
-		pathList.startPos.y  = newPosAbsY;
-		pathList.firstMove.x = moveX;
-		pathList.firstMove.y = moveY;
-	}
-	
-	// store position
-	pathList.prevPosAbs.x = newPosAbsX;
-	pathList.prevPosAbs.y = newPosAbsY;
-	pathList.appendEntry(cpe);
+	// append
+	const CncPathListEntry cpe = pathListMgr.calculateAndAddEntry(newPosAbsX, newPosAbsY, alreadyRendered, isZAxisDown());
 	appendDebugValueDetail(cpe);
 	
 	return true;
@@ -624,7 +599,7 @@ bool SVGPathHandlerBase::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 double SVGPathHandlerBase::getCurrentPathLength() {
 //////////////////////////////////////////////////////////////////
-	return pathList.xyLength;
+	return pathListMgr.getXYLength();
 }
 //////////////////////////////////////////////////////////////////
 double SVGPathHandlerBase::getTotalLength() {
@@ -634,9 +609,9 @@ double SVGPathHandlerBase::getTotalLength() {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::isPathClosed() {
 //////////////////////////////////////////////////////////////////
-	if ( pathList.list.size() > 0 ) {
-		CncPathList::iterator itFirst = pathList.list.begin(); 
-		CncPathList::iterator itLast  = pathList.list.end() - 1;
+	if ( pathListMgr.getPathListSize() > 0 ) {
+		CncPathList::iterator itFirst = pathListMgr.begin(); 
+		CncPathList::iterator itLast  = pathListMgr.end() - 1;
 		
 		//clog << (*itFirst).abs << endl;
 		//clog << (*itLast).abs << endl;
@@ -651,7 +626,7 @@ bool SVGPathHandlerBase::isPathClosed() {
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerBase::WktTypeInfo SVGPathHandlerBase::getWktType() {
 //////////////////////////////////////////////////////////////////
-	switch ( pathList.list.size() ) {
+	switch ( pathListMgr.getPathListSize() ) {
 		case 0:			return WKT_EMPTY;
 		case 1:			return WKT_POINT;
 		default:
@@ -668,7 +643,7 @@ const wxString& SVGPathHandlerBase::getWktTypeAsString() {
 //////////////////////////////////////////////////////////////////
 	static wxString s;
 	switch ( getWktType() ) {
-		case WKT_EMPTY:			s.assign(""); 			break;
+		case WKT_EMPTY:			s.assign("EMPTY"); 		break;
 		case WKT_POINT:			s.assign("POINT"); 		break;
 		case WKT_POLYGON:		s.assign("POLYGON"); 	break;
 		case WKT_LINESTRING:	s.assign("LINESTRING"); break;
@@ -681,16 +656,16 @@ const wxString& SVGPathHandlerBase::getWktTypeAsString() {
 const char* SVGPathHandlerBase::getAsSvgPathRepresentation(const wxString& style) {
 //////////////////////////////////////////////////////////////////
 	static wxString s;
-	if ( pathList.list.size() == 0 ) {
+	if ( pathListMgr.getPathListSize() == 0 ) {
 		s.assign("<!-- no data available -->");
 		return s.c_str();
 	}
 	
 	s.assign("<path d=\"M");
-	wxString x((pathList.list.size() > 1 ? " L" : ""));
+	wxString x((pathListMgr.getPathListSize() > 1 ? " L" : ""));
 		
 	unsigned int cnt = 0;
-	for (CncPathList::iterator it = pathList.list.begin(); it != pathList.list.end(); ++it) {
+	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
 		if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", (*it).abs.x, (*it).abs.y, x));
 		else			s.append(wxString::Format(" %.3lf,%.3lf",  (*it).abs.x, (*it).abs.y));
 		cnt++;
@@ -709,11 +684,11 @@ const char* SVGPathHandlerBase::getAsWktRepresentation() {
 //////////////////////////////////////////////////////////////////
 	static wxString s;
 	
-	if ( pathList.list.size() == 0 ) {
+	if ( pathListMgr.getPathListSize() == 0 ) {
 		s.assign("");
 		
-	} else if ( pathList.list.size() == 1 ) {
-		CncPathList::iterator itFirst = pathList.list.begin();
+	} else if ( pathListMgr.getPathListSize() == 1 ) {
+		CncPathList::iterator itFirst = pathListMgr.begin();
 		s.assign(wxString::Format("POINT(%.3lf %.3lf)", (*itFirst).abs.x, (*itFirst).abs.y));
 		
 	} else {
@@ -721,7 +696,7 @@ const char* SVGPathHandlerBase::getAsWktRepresentation() {
 		else 					s.assign("LINESTRING(");
 		
 		unsigned int cnt = 0;
-		for (CncPathList::iterator it = pathList.list.begin(); it != pathList.list.end(); ++it) {
+		for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
 			if ( cnt == 0 ) s.append(wxString::Format("%.3lf %.3lf", (*it).abs.x, (*it).abs.y));
 			else			s.append(wxString::Format(",%.3lf %.3lf", (*it).abs.x, (*it).abs.y));
 			cnt++;
@@ -784,6 +759,30 @@ bool SVGPathHandlerBase::getCentroid(wxRealPoint& centroid) {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::reversePath() {
 //////////////////////////////////////////////////////////////////
+	if ( pathListMgr.getPathListSize() < 2 )
+		return true;
+	
+	CncPathListEntry first = *(pathListMgr.begin());
+	
+	// reverse relativ move steps
+	for (auto it = pathListMgr.begin() + 1; it != pathListMgr.end(); ++it) {
+		(*it).move.x *= -1;
+		(*it).move.y *= -1;
+	}
+	
+	// append las entry, after reverse it will be first again
+	pathListMgr.calculateAndAddEntry(pathListMgr.getPathList().back().abs, true, false);
+	
+	// reverse list
+	std::reverse(pathListMgr.begin(), pathListMgr.end());
+	
+	// remove old first entry
+	pathListMgr.eraseEntryAndRecalcuate(pathListMgr.end());
+	
+	return true;
+	
+/*
+ * //todo
 	try {
 		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
 		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
@@ -795,30 +794,40 @@ bool SVGPathHandlerBase::reversePath() {
 		using boost::geometry::get;
 		
 		switch ( getWktType() ) {
+			case WKT_EMPTY: 
 			case WKT_POINT:			// nothing should happen
 									return true;
 									
 			case WKT_POLYGON:		boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
 									boost::geometry::reverse(polygonType);
 									
-									pathList.reset();
+									pathListMgr.reset();
 									for(auto it = boost::begin(boost::geometry::exterior_ring(polygonType)); it != boost::end(boost::geometry::exterior_ring(polygonType)); ++it)
-										pathList.calculateAndEntry({get<0>(*it), get<1>(*it)});
+										pathListMgr.calculateAndAddEntry({get<0>(*it), get<1>(*it)});
 										
 									break;
 									
 			case WKT_LINESTRING:	boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
 									boost::geometry::reverse(linestringType);
 									
-									pathList.reset();
+									pathListMgr.reset();
 									for(auto it = boost::begin(linestringType); it != boost::end(linestringType); ++it)
-										pathList.calculateAndEntry({get<0>(*it), get<1>(*it)});
+										pathListMgr.calculateAndAddEntry({get<0>(*it), get<1>(*it)});
 										
 									break;
 									
 			default:				std::cerr << "reversePath(): Unknown wkt type: " << getWktTypeAsString() << endl;
 									return false;
 			
+		}
+		
+		// correct the start posistion
+		if ( pathListMgr.getFirstPathFlag() == true ) {
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.setStartPos( {(*it).move.x, (*it).move.y});
+		} else {
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
 		}
 		
 	}
@@ -834,10 +843,13 @@ bool SVGPathHandlerBase::reversePath() {
 	}
 	
 	return true;
+*/
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::centerPath() {
 //////////////////////////////////////////////////////////////////
+
+//todo
 	try {
 		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
 		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
@@ -860,17 +872,17 @@ bool SVGPathHandlerBase::centerPath() {
 									
 			case WKT_POLYGON:		boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
 									
-									pathList.reset();
+									pathListMgr.reset();
 									for(auto it = boost::begin(boost::geometry::exterior_ring(polygonType)); it != boost::end(boost::geometry::exterior_ring(polygonType)); ++it)
-										pathList.calculateAndEntry(cp - wxRealPoint(get<0>(*it), get<1>(*it)));
+										pathListMgr.calculateAndAddEntry(cp - wxRealPoint(get<0>(*it), get<1>(*it)));
 										
 									break;
 									
 			case WKT_LINESTRING:	boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
 									
-									pathList.reset();
+									pathListMgr.reset();
 									for(auto it = boost::begin(linestringType); it != boost::end(linestringType); ++it)
-										pathList.calculateAndEntry(cp - wxRealPoint(get<0>(*it), get<1>(*it)));
+										pathListMgr.calculateAndAddEntry(cp - wxRealPoint(get<0>(*it), get<1>(*it)));
 										
 									break;
 									
@@ -897,7 +909,7 @@ bool SVGPathHandlerBase::centerPath() {
 void SVGPathHandlerBase::tracePathList(std::ostream &ostr) {
 //////////////////////////////////////////////////////////////////
 	unsigned int cnt = 0;
-	for (CncPathList::iterator it = pathList.list.begin(); it != pathList.list.end(); ++it) {
+	for (auto it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
 		ostr << wxString::Format("%04d | ", cnt ) << it->getPointAsString() << std::endl;
 		cnt++;
 	}

@@ -127,12 +127,12 @@ bool SVGPathHandlerCnc::moveLinearXY(double x, double y, bool alreadyRendered) {
 	return cncControl->moveLinearMetricXY(x, y, alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////
-inline void SVGPathHandlerCnc::appendDebugValueDetail(CncPathListEntry& cpe) {
+inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	if ( debugState == false )
 		return;
 
-	appendDebugValueDetail((wxString("Point ") << pathList.list.size()), cpe.getPointAsString());
+	appendDebugValueDetail((wxString("Point ") << pathListMgr.getPathListSize()), cpe.getPointAsString());
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::initNextPath() {
@@ -147,7 +147,7 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	newPath 			= true;
 	origPathInfo	 	= sopi;
 	
-	pathList.reset();
+	SVGPathHandlerBase::initNextPath();
 	
 	// Z depth management
 	wxASSERT( cncControl && cncControl->getCncConfig() );
@@ -162,9 +162,8 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	} else {
 		
 		if ( zDepth < 0.0 ) {
-			cout << "xx: " <<zDepth<<endl;
+			std::cout << "xx: " << zDepth << std::endl;
 			zDepth = 0.0;
-			
 		}
 	}
 
@@ -184,40 +183,47 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	traceFunctionCall("finsihCurrentPath");
 	
+	SVGPathHandlerBase::finishCurrentPath();
+	
 	// if the tool radius > 0 the path have to be tool corrected
 	if ( toolRadius > 0 ) {
 		CncToolCorrection tc(toolRadius, currentCncParameters.getCorrectionType());
-		if ( tc.process(pathList.list) == false ) 
+		if ( tc.process(pathListMgr.getPathListtoModify()) == false ) 
 			return false;
 			
-		pathList.isCorrected = (tc.getType() != CncCT_Center);
+		pathListMgr.setCorretedFlag(tc.getType() != CncCT_Center);
 		tracePositions("Corrected before");
 		
 		// correct the start posistion
-		if ( pathList.firstPath == 	true ) {
-			CncPathList::iterator it = pathList.list.begin();
-			pathList.startPos = {(*it).move.x, (*it).move.y};
+		if ( pathListMgr.getFirstPathFlag() == true ) {
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.setStartPos({(*it).move.x, (*it).move.y});
 		} else {
-			CncPathList::iterator it = pathList.list.begin();
-			pathList.startPos -= pathList.firstMove - (*it).move;
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
 		}
 		
 		tracePositions("Corrected after");
 	}
 	
-	// Reverse Path
+	// reverse path
 	if ( currentCncParameters.getReverseFlag() == true ) {
+		if ( reversePath() == false )
+			return false;
+		/*
+		//todo
 		CncPathReverser pr;
-		pathList.list = pr.reversePath(pathList.list);
+		pathListMgr.setPathList(pr.reversePath(pathListMgr.getPathListtoModify()));
 		
 		// correct the start posistion
-		if ( pathList.firstPath == 	true ) {
-			CncPathList::iterator it = pathList.list.begin();
-			pathList.startPos = {(*it).move.x, (*it).move.y};
+		if ( pathListMgr.getFirstPathFlag() == true ) {
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.setStartPos( {(*it).move.x, (*it).move.y});
 		} else {
-			CncPathList::iterator it = pathList.list.begin();
-			pathList.startPos -= pathList.firstMove - (*it).move;
-		}	
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
+		}
+		*/
 	}
 
 	return true;
@@ -301,8 +307,8 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 	traceFunctionCall("spoolCurrentPath");
 	
 	unsigned int cnt = 0;
-	for (CncPathList::iterator it = pathList.list.begin(); it != pathList.list.end(); ++it) {
-		
+	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
+
 		CncPathListEntry cpe = *it;
 		cnt++;
 		
@@ -327,8 +333,8 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 		double moveY = cpe.move.y;
 		bool firstListEntry = false;
 
-		if ( std::distance(pathList.list.begin(), it) == 0 ) {
-			tracePositions("spoolCurrentPath std::distance(pathList.list.begin(), it)");
+		if ( std::distance(pathListMgr.begin(), it) == 0 ) {
+			tracePositions("spoolCurrentPath std::distance(pathList.begin(), it)");
 			firstListEntry = true;
 
 			if ( firstRun == true ) {
@@ -340,8 +346,8 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 				startPos.setY(cncControl->getStartPosMetric().getY());
 			}
 
-			moveX = pathList.startPos.x - currentPos.getX();
-			moveY = pathList.startPos.y - currentPos.getY();
+			moveX = pathListMgr.getStartPos().x - currentPos.getX();
+			moveY = pathListMgr.getStartPos().y - currentPos.getY();
 
 			traceFirstMove(moveX, moveY);
 		}
@@ -364,12 +370,12 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 		}
 		
 		// pure svg handling
-		if ( std::distance(pathList.list.begin(), it) == 0 ) {
+		if ( std::distance(pathListMgr.begin(), it) == 0 ) {
 			// this have to be defently done after the fist move above
 			// otherwise this move will be also recorded by the svg out file and
 			// serial->beginPath has a step to much
-			double sx = pathList.startPos.x;
-			double sy = pathList.startPos.y;
+			double sx = pathListMgr.getStartPos().x;
+			double sy = pathListMgr.getStartPos().y;
 			cncControl->getSerial()->beginPath(sx, sy);
 		}
 		//todo evaluateDebugState

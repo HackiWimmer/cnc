@@ -22,7 +22,7 @@ class CncToolCorrection {
 	
 	protected:
 
-		std::vector<CncPathListEntry> iList;
+		CncPathList iList;
 		CncToolCorretionType type;
 		double radius;
 		int radiusDir;
@@ -88,15 +88,15 @@ class CncToolCorrection {
 		// stores some informations filled be evaluate path
 		PathParameter pathParameter;
 		// debugs the complete list
-		void debugList(std::vector<CncPathListEntry> list);
+		void debugList(const CncPathList& list);
 		// print out the point dripple
 		void debugPoints(const char* prefix, CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3);
 		// handle one point path
-		bool processBorehole(std::vector<CncPathListEntry>& olist);
+		bool processBorehole(CncPathList& olist);
 		// handle two point path
-		bool processSimpleSlot(std::vector<CncPathListEntry>& olist);
+		bool processSimpleSlot(CncPathList& olist);
 		// processes pathes with 3 to n element
-		bool processPath(std::vector<CncPathListEntry>& olist); 
+		bool processPath(CncPathList& olist); 
 		// compact the inputpath
 		void compactPath();
 		// evaluate the input path
@@ -109,9 +109,9 @@ class CncToolCorrection {
 		CncDirection getCncDirection(SubPathDirection d1, SubPathDirection d2);
 		
 		//the follwing functions are used to step through the path
-		bool pathBegin(CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3, std::vector<CncPathListEntry>& olist);
-		bool pathNext(CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3, std::vector<CncPathListEntry>& olist);
-		bool pathClose(CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3, std::vector<CncPathListEntry>& olist);
+		bool pathBegin(CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3, CncPathList& olist);
+		bool pathNext(CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3, CncPathList& olist);
+		bool pathClose(CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3, CncPathList& olist);
 		
 	public:
 		// construcor
@@ -121,7 +121,7 @@ class CncToolCorrection {
 		// return the resultiong path correction
 		const CncToolCorretionType getType() { return type; }
 		// process the given path
-		bool process(std::vector<CncPathListEntry>& oList);
+		bool process(CncPathList& oList);
 };
 
 #endif

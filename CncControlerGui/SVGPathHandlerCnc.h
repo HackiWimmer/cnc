@@ -47,7 +47,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
-		virtual void appendDebugValueDetail(CncPathListEntry& cpe);
+		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
 		virtual void debugCurrentPosition();
 		
 		virtual bool isInitialized();

@@ -188,10 +188,15 @@ struct SVGUserAgentInfo {
 		
 		/////////////////////////////////////////////////////////
 		bool shouldProceed() {
+			if ( nodeType == NT_CNC_PARAM )
+				return false;
+				
 			// if 'display:none' is configured don't spool this path
-			if ( wxString(getStyleInfoAsString()).Find("display:none") == wxNOT_FOUND )
-				return true;
-			return false;
+			// != wxNOT_FOUND == FOUND
+			if ( wxString(getStyleInfoAsString()).Find("display:none") != wxNOT_FOUND )
+				return false;
+				
+			return true;
 		}
 		
 		/////////////////////////////////////////////////////////

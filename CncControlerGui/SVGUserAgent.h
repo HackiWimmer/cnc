@@ -304,9 +304,9 @@ class SVGUserAgent{
 					
 				sua.pathInfoList.push_back(pi);
 				updateCurrentUserAgent(sua);
-				
 				return true;
 			}
+			
 			return false;
 		}
 		

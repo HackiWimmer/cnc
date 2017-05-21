@@ -63,9 +63,9 @@ class TEST_SVG_PATH_ASSISTANT : public TEST_BASE {
 			
 			PARAGRAPH();
 			std::clog << "Set a path list" << std::endl;
-			CncPathListInfo pli;
+			CncPathListManager pli;
 			for (unsigned int i=0; i<10; i++)
-				pli.calculateAndEntry({i*10.0, i*10.0});
+				pli.calculateAndAddEntry({i*10.0, i*10.0});
 				
 			pa.setPathList(pli);
 			trace(pa);

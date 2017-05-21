@@ -51,7 +51,7 @@ class CncPathListEntry{
 		}
 		
 		//////////////////////////////////////////////////////////////////i
-		wxString& getPointAsString() {
+		wxString& getPointAsString() const {
 			static wxString s;
 			s.assign(wxString::Format("abs: %10.3lf, %10.3lf | rel: %10.3lf, %10.3lf | len: %10.3lf", 
 			                          abs.x, abs.y, move.x, move.y, xyDistance));

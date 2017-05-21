@@ -19,10 +19,11 @@ CncToolCorrection::~CncToolCorrection() {
 ///////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////
-void CncToolCorrection::debugList(std::vector<CncPathListEntry> list) {
+void CncToolCorrection::debugList(const CncPathList& list) {
+///////////////////////////////////////////////////////
 	PointAbs pa;
 	unsigned int counter = 0;
-	for (std::vector<CncPathListEntry>::iterator it = list.begin(); it != list.end(); ++it) {
+	for (CncPathList::const_iterator it = list.begin(); it != list.end(); ++it) {
 		CncPathListEntry cpe = *it;
 		
 		std::cout << "(" << cpe.move.x << "," << cpe.move.y << ")" ;
@@ -212,7 +213,7 @@ SubPathDirection CncToolCorrection::determinePathDirection(wxRealPoint P1, wxRea
 	return FC_Unknown;
 }
 ///////////////////////////////////////////////////////
-bool CncToolCorrection::process(std::vector<CncPathListEntry>& oList) {
+bool CncToolCorrection::process(CncPathList& oList) {
 ///////////////////////////////////////////////////////
 	if ( type == CncCT_None )
 		return true;
@@ -226,7 +227,7 @@ bool CncToolCorrection::process(std::vector<CncPathListEntry>& oList) {
 	compactPath();
 		
 	switch ( iList.size() ) {
-		case 0:		std::cerr << "Invalid size: "<< iList.size() << std::endl;
+		case 0:		std::cerr << "CncToolCorrection::process: Invalid size: "<< iList.size() << std::endl;
 					return false;
 		// borehole
 		case 1:		return processBorehole(oList);
@@ -247,7 +248,7 @@ void CncToolCorrection::debugPoints(const char* prefix, CncPathListEntry P1, Cnc
 						 << std::endl;
 }
 ///////////////////////////////////////////////////////
-bool CncToolCorrection::processBorehole(std::vector<CncPathListEntry>& olist) {
+bool CncToolCorrection::processBorehole(CncPathList& olist) {
 ///////////////////////////////////////////////////////
 	// one point path
 	wxASSERT(iList.size() == 1);
@@ -260,7 +261,7 @@ bool CncToolCorrection::processBorehole(std::vector<CncPathListEntry>& olist) {
 	return true;
 }
 ///////////////////////////////////////////////////////
-bool CncToolCorrection::processSimpleSlot(std::vector<CncPathListEntry>& olist) {
+bool CncToolCorrection::processSimpleSlot(CncPathList& olist) {
 ///////////////////////////////////////////////////////
 	// two point path
 	wxASSERT(iList.size() == 2);
@@ -269,7 +270,7 @@ bool CncToolCorrection::processSimpleSlot(std::vector<CncPathListEntry>& olist) 
 	type = CncCT_Center;
 	
 	// always absolute coordinates
-	std::vector<CncPathListEntry>::iterator it = iList.begin();
+	CncPathList::iterator it = iList.begin();
 	CncPathListEntry cpeStart, cpeEnd;
 	wxRealPoint sp = cpeStart.move; 
 	
@@ -334,7 +335,7 @@ bool CncToolCorrection::processSimpleSlot(std::vector<CncPathListEntry>& olist) 
 	return true;
 }
 ///////////////////////////////////////////////////////
-bool CncToolCorrection::processPath(std::vector<CncPathListEntry>& olist) {
+bool CncToolCorrection::processPath(CncPathList& olist) {
 ///////////////////////////////////////////////////////
 	if ( pathParameter.isClosed() == false ) {
 		std::clog << "CncToolCorrection::processPath" << std::endl;
@@ -349,7 +350,7 @@ bool CncToolCorrection::processPath(std::vector<CncPathListEntry>& olist) {
 	wxASSERT(olist.size() == 0);
 	
 	CncPathListEntry p1, p2, p3, P1, P2, P3, Pl;
-	std::vector<CncPathListEntry>::iterator it = iList.begin();
+	CncPathList::iterator it = iList.begin();
 	p1 = *it++;
 	p2 = *it++;
 	p3 = *it++;
@@ -394,7 +395,7 @@ bool CncToolCorrection::processPath(std::vector<CncPathListEntry>& olist) {
 bool CncToolCorrection::pathBegin(CncPathListEntry P1, 
 								  CncPathListEntry P2, 
 								  CncPathListEntry P3, 
-								  std::vector<CncPathListEntry>& olist) {
+								  CncPathList& olist) {
 ///////////////////////////////////////////////////////
 	//debugPoints("pathBegin", P1, P2, P3);
 	return pathNext(P1, P2, P3, olist);
@@ -403,7 +404,7 @@ bool CncToolCorrection::pathBegin(CncPathListEntry P1,
 bool CncToolCorrection::pathNext(CncPathListEntry P1, 
 								 CncPathListEntry P2, 
 								 CncPathListEntry P3, 
-								 std::vector<CncPathListEntry>& olist) {
+								 CncPathList& olist) {
 ///////////////////////////////////////////////////////
 	//debugPoints("pathNext ", P1, P2, P3);
 
@@ -455,14 +456,14 @@ bool CncToolCorrection::pathNext(CncPathListEntry P1,
 bool CncToolCorrection::pathClose(CncPathListEntry P1, 
 								  CncPathListEntry P2, 
 								  CncPathListEntry P3, 
-								  std::vector<CncPathListEntry>& olist) {
+								  CncPathList& olist) {
 ///////////////////////////////////////////////////////
 	//debugPoints("pathClose", P1, P2, P3);
 	bool ret = pathNext(P1, P2, P3, olist);
 	
 	if ( ret == true) {
 		if ( olist.size() > 0 ) {
-			std::vector<CncPathListEntry>::iterator it = olist.begin();
+			CncPathList::iterator it = olist.begin();
 			CncPathListEntry back = olist.back();
 			// The first point of a path has never zAxisDown = true;
 			// So, if we reconstruct the firt point we have to consider that
@@ -499,14 +500,14 @@ void CncToolCorrection::compactPath() {
 	//e. g. *---->*----->*----->*  ==> *------------------->*
 	bool debug = false;
 	
-	std::vector<CncPathListEntry> tmpList;
+	CncPathList tmpList;
 	tmpList.swap(iList);
 	iList.clear();
 	
 	LinearFunc fc;
 	LinearFunc fp;
 
-	std::vector<CncPathListEntry>::iterator it = tmpList.begin();
+	CncPathList::iterator it = tmpList.begin();
 	wxRealPoint p2, P1, P2;
 	
 	CncPathListEntry cpe = *it;
@@ -555,7 +556,7 @@ void CncToolCorrection::compactPath() {
 	
 	// only for debuging
 	if ( debug ) {
-		for (std::vector<CncPathListEntry>::iterator it = iList.begin(); it != iList.end(); ++it) {
+		for (CncPathList::iterator it = iList.begin(); it != iList.end(); ++it) {
 			CncPathListEntry cpe = *it;
 			std::clog << "compact::list: "<< cpe.move.x << "," << cpe.move.y << ", Z, rendered: " << cpe.zAxisDown << "," << cpe.alreadyRendered << std::endl;
 		}
@@ -572,7 +573,7 @@ void CncToolCorrection::evaluatePath() {
 	
 	pathParameter.reset();
 	
-	std::vector<CncPathListEntry>::iterator it = iList.begin();
+	CncPathList::iterator it = iList.begin();
 	for ( ; it != iList.end(); ++it) {
 		if ( first == true ) {
 			absX = (*it).move.x;

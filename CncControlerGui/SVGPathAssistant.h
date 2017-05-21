@@ -29,10 +29,10 @@ class SVGPathAssistant {
 		}
 		
 		////////////////////////////////////////////////////////////
-		void setPathList(const CncPathListInfo& newPathList) { pathHandler.setPathList(newPathList); }
+		void setPathList(const CncPathListManager& newPathList) { pathHandler.setPathList(newPathList); }
 		
 		////////////////////////////////////////////////////////////
-		const CncPathListInfo& getPathList() { return pathHandler.getPathList(); }
+		const CncPathListManager& getPathList() { return pathHandler.getPathList(); }
 		
 		////////////////////////////////////////////////////////////
 		unsigned int getDataPointCount() const { return pathHandler.getDataPointCount(); }

@@ -4,6 +4,7 @@
 #include <wx/choicdlg.h>
 #include "Tests/Test_FrameworkCallback.h"
 #include "Tests/Test_SVGNodeParser.h"
+#include "Tests/Test_CncPathListManager.h"
 #include "Tests/Test_SVGPathAssistant.h"
 #include "UnitTestFrame.h"
 
@@ -19,6 +20,7 @@ UnitTests::UnitTests(wxWindow* parent, int iti, bool ar)
 	
 	// install tests
 	testStore.push_back(new TEST_FRAMEWORK_CALLBACK(this));
+	testStore.push_back(new TEST_CNC_PATH_LIST_MANAGER(this));
 	testStore.push_back(new TEST_SVG_NODE_PARSER(this));
 	testStore.push_back(new TEST_SVG_PATH_ASSISTANT(this));
 	// ...

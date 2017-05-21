@@ -11,88 +11,228 @@
 #include "CncPathListEntry.h"
 
 //////////////////////////////////////////////////////////////////
-struct CncPathListInfo {
+class CncPathListManager {
 //////////////////////////////////////////////////////////////////
-	// Path postion (CncPathListEntry) entries
-	CncPathList list;
 	
-	// aditional information
-	bool firstPath;
-	bool isCorrected;
+	protected:
 	
-	wxRealPoint startPos; 		// absolute start position of the path
-	wxRealPoint firstMove; 		// relative x, y values for the first move
-	double xyLength;
-	
-	// helper for external usage
-	wxRealPoint prevPosAbs; 	// contains absolote coordinates of the previous(list.size() - 1) position
-	
-	//////////////////////////////////////////////////////////////
-	CncPathListInfo() {
-		reset();
-	}
-	
-	//////////////////////////////////////////////////////////////
-	~CncPathListInfo() {
-		reset();
-	}
-	
-	//////////////////////////////////////////////////////////////
-	friend std::ostream &operator<< (std::ostream &ostr, const CncPathListInfo &a) {
-		ostr << "CncPathListInfo entries: " << a.list.size() << std::endl;
-		ostr << " Start Pos:   " 			<< a.startPos 	<< std::endl;
-		return ostr;
-	}
-	
-	//////////////////////////////////////////////////////////////
-	void reset() {
-		firstPath   	= false;
-		isCorrected 	= false;
+		// Path postion (CncPathListEntry) entries
+		CncPathList list;
 		
-		startPos		= {0, 0}; 
-		firstMove		= {0, 0};
-		prevPosAbs 		= {0, 0};
+		bool isFirstPath;			// stores if this path is the first path info
+		bool isCorrected;			// stores if this path is corrected
 		
-		xyLength		= 0.0;
+		wxRealPoint startPos; 		// absolute start position of the path
+		wxRealPoint firstMove; 		// relative x, y values for the first move
 		
-		list.clear();
-	}
-	
-	//////////////////////////////////////////////////////////////
-	void appendEntry(CncPathListEntry& cpe) {
-		// additionally calculate length and distance
-		if ( list.size() > 0 ) {
-			xyLength += sqrt(pow(cpe.move.x, 2) + pow(cpe.move.y, 2));
-			cpe.xyDistance = xyLength;
+		double minPosX;
+		double minPosY;
+		double maxPosX;
+		double maxPosY;
+		
+		double xyLength;
+		
+		//////////////////////////////////////////////////////////////
+		void appendEntry(CncPathListEntry& cpe) {
+			// additionally calculate length and distance
+			if ( list.size() > 0 ) {
+				xyLength += sqrt(pow(cpe.move.x, 2) + pow(cpe.move.y, 2));
+				cpe.xyDistance = xyLength;
+			}
+			
+			// addionally determine fences
+			minPosX = std::min(minPosX, cpe.abs.x);
+			minPosY = std::min(minPosY, cpe.abs.y);
+			maxPosX = std::max(maxPosX, cpe.abs.x);
+			maxPosY = std::max(maxPosY, cpe.abs.y);
+			
+			// store
+			list.push_back(cpe);
 		}
 		
-		// store
-		list.push_back(cpe);
-	}
-	
-	//////////////////////////////////////////////////////////////
-	void calculateAndEntry(const wxRealPoint& newAbsPoint) {
-		CncPathListEntry cpe;
-		cpe.abs.x = newAbsPoint.x;
-		cpe.abs.y = newAbsPoint.y;
+	public:
+		
+		//////////////////////////////////////////////////////////////
+		CncPathListManager() {
+			//preallocate memory
+			list.reserve(1000 * 1000);
+			
+			reset();
+		}
+		
+		//////////////////////////////////////////////////////////////
+		~CncPathListManager() {
+			reset();
+		}
+		
+		//////////////////////////////////////////////////////////////
+		CncPathList& getPathListtoModify() { return list; }
+		const CncPathList& getPathList() const { return list; }
+		void setPathList(const CncPathList& pl) { list = pl; }
+		
+		//////////////////////////////////////////////////////////////
+		unsigned int getPathListSize() const { return list.size(); }
+		
+		//////////////////////////////////////////////////////////////
+		bool getFirstPathFlag() const { return isFirstPath; }
+		void setFirstPathFlag(bool state=true) { isFirstPath = state; }
+		
+		//////////////////////////////////////////////////////////////
+		bool isPathCorrected() const { return isCorrected; }
+		void setCorretedFlag(bool state=true) { isCorrected = state; }
+		
+		//////////////////////////////////////////////////////////////
+		double getXYLength() const { return xyLength; }
+		
+		//////////////////////////////////////////////////////////////
+		double getMinPosX() const { return minPosX; }
+		double getMinPosY() const { return minPosY; }
+		double getMaxPosX() const { return maxPosX; }
+		double getMaxPosY() const { return maxPosY; }
+		
+		//////////////////////////////////////////////////////////////
+		const wxRealPoint& getStartPos() const { return startPos; }
+		void setStartPos(const wxRealPoint& sp) { startPos = sp; }
+		void incStartPos(const wxRealPoint& incSp) { startPos -= incSp; }
+		
+		//////////////////////////////////////////////////////////////
+		const wxRealPoint& getFirstMove() const { return firstMove; }
+		void setFirstMove(const wxRealPoint& fm) { firstMove = fm; }
+		
+		//////////////////////////////////////////////////////////////
+		const CncPathList::iterator begin() { return list.begin(); }
+		const CncPathList::iterator end()   { return list.end(); }
+		
+		//////////////////////////////////////////////////////////////
+		friend std::ostream &operator<< (std::ostream &ostr, const CncPathListManager &a) {
+			ostr << "CncPathListInfo entries : " << a.list.size() << std::endl;
+			ostr << " is correded            : " << a.isPathCorrected() << std::endl;
+			ostr << " is first path          : " << a.getFirstPathFlag() << std::endl;
+			ostr << " xy length              : " << cnc::dblFormat(a.getXYLength()) << std::endl;
+			ostr << " minPos (x,y)           : " << cnc::dblFormat(a.getMinPosX()) << "," << cnc::dblFormat(a.getMinPosY()) << std::endl;
+			ostr << " maxPos (X,Y)           : " << cnc::dblFormat(a.getMaxPosX()) << "," << cnc::dblFormat(a.getMaxPosY()) << std::endl;
+			ostr << " startPos               : " << a.getStartPos() << std::endl;
+			ostr << " first move             : " << a.getFirstMove() << std::endl;
+			
+			ostr << " path list:" << std::endl;
+			for ( auto it=a.getPathList().begin(); it!=a.getPathList().end(); ++it )
+				ostr << it->getPointAsString() << endl;
+			
+			return ostr;
+		}
+		
+		//////////////////////////////////////////////////////////////
+		void reset() {
+			isFirstPath   	= false;
+			isCorrected 	= false;
+			
+			startPos		= {0, 0}; 
+			firstMove		= {0, 0};
+			
+			minPosX			= DBL_MAX;
+			minPosY			= DBL_MAX;
+			maxPosX			= DBL_MIN;
+			maxPosY			= DBL_MIN;
+			
+			xyLength		= 0.0;
+			
+			list.clear();
+		}
+		
+		//////////////////////////////////////////////////////////////
+		const CncPathListEntry& calculateAndAddEntry(double newAbsPosX, 
+		                                             double newAbsPosY,
+		                                             bool alreadyRendered=false, 
+		                                             bool zAxisDown= false) {
+			CncPathListEntry cpe;
+			cpe.zAxisDown		= zAxisDown;
+			cpe.alreadyRendered	= alreadyRendered;
+			cpe.abs.x 			= newAbsPosX;
+			cpe.abs.y 			= newAbsPosY;
 
-		// calculate
-		if ( list.size() == 0 ) {
-			cpe.move.x = newAbsPoint.x;
-			cpe.move.y = newAbsPoint.y;
+			// calculate
+			if ( list.size() == 0 ) {
+				cpe.move.x = newAbsPosX;
+				cpe.move.y = newAbsPosY;
+				
+				startPos  = {newAbsPosX, newAbsPosY};
+				firstMove = {cpe.move.x, cpe.move.y};
+				
+			} else {
+				cpe.move.x = newAbsPosX - list.back().abs.x;
+				cpe.move.y = newAbsPosY - list.back().abs.y;
+			}
 			
-			startPos  = newAbsPoint;
-			firstMove = cpe.move;
-			
-		} else {
-			cpe.move.x = newAbsPoint.x - list.back().abs.x;
-			cpe.move.y = newAbsPoint.y - list.back().abs.y;
+			// append
+			appendEntry(cpe);
+			return list.back();
 		}
 		
-		// append
-		appendEntry(cpe);
-	}
-	
+		//////////////////////////////////////////////////////////////
+		const CncPathListEntry& calculateAndAddEntry(const wxRealPoint& newAbsPoint, 
+		                                             bool alreadyRendered=false, 
+		                                             bool zAxisDown= false) {
+			
+			return calculateAndAddEntry(newAbsPoint.x, newAbsPoint.y, alreadyRendered, zAxisDown);
+		}
+		
+		//////////////////////////////////////////////////////////////
+		bool eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase) {
+			if ( itToErase < begin() )
+				return false;
+
+			if ( itToErase >= end() )
+				return false;
+				
+			// store entry 
+			CncPathListEntry entry = *itToErase;
+			
+			// check first position
+			bool first = false;
+			if ( itToErase == begin() )
+				first = true;
+			
+			// remove entry
+			if ( list.erase(itToErase) == end() )
+				return false;
+			
+			// redetermine additional values
+			if ( first == true ) {
+				startPos 					= begin()->abs;
+				firstMove					= begin()->move;
+				begin()->alreadyRendered 	= true;
+				begin()->zAxisDown 			= false;
+			}
+			
+			// recalculate min or max on demand
+			if ( entry.abs.x == minPosX || entry.abs.y == minPosY || entry.abs.x == maxPosX || entry.abs.y == maxPosY ) {
+				for ( auto it=begin(); it !=end(); ++it ) {
+					minPosX = std::min(minPosX, it->abs.x);
+					minPosY = std::min(minPosY, it->abs.y);
+					maxPosX = std::max(maxPosX, it->abs.x);
+					maxPosY = std::max(maxPosY, it->abs.y);
+				}
+			} 
+			
+			// recalculate length
+			if ( first == false ) {
+				xyLength -= sqrt(pow(entry.move.x, 2) + pow(entry.move.y, 2));
+			} else {
+				xyLength = 0.0;
+				unsigned int cnt = 0;
+				for ( auto it=begin(); it !=end(); ++it ) {
+					if ( cnt > 0 ) {
+						xyLength += sqrt(pow(it->move.x, 2) + pow(it->move.y, 2));
+						it->xyDistance = xyLength;
+					} else {
+						it->xyDistance = 0.0;
+					}
+					cnt++;
+				}
+			}
+			
+			return true;
+		}
 };
 
 //////////////////////////////////////////////////////////////////
@@ -169,7 +309,7 @@ class SVGPathHandlerBase {
 		float 				curveLibResolution;
 		double				totalLength;
 		LastControlPoint 	lastControlPoint;
-		CncPathListInfo 	pathList;
+		CncPathListManager 	pathListMgr;
 		SVGTransformMatrix currentSvgTransformMatrix;
 		
 		// trace functions
@@ -188,7 +328,7 @@ class SVGPathHandlerBase {
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
-		virtual void appendDebugValueDetail(CncPathListEntry& cpe);
+		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
 		virtual void debugCurrentPosition();
 		
 		//render functions
@@ -220,12 +360,12 @@ class SVGPathHandlerBase {
 		
 		// setter
 		void setCurveLibResolution(float res) { curveLibResolution = res; }
-		void setPathList(const CncPathListInfo& newPathList);
+		void setPathList(const CncPathListManager& newPathList);
 		
 		// getter
 		SVGTransformMatrix& getSvgTransformMatrix() { return currentSvgTransformMatrix; }
-		unsigned int getDataPointCount() const { return pathList.list.size(); }
-		const CncPathListInfo& getPathList() { return pathList; }
+		unsigned int getDataPointCount() const { return pathListMgr.getPathListSize(); }
+		const CncPathListManager& getPathList() { return pathListMgr; }
 		
 		// processing
 		void debugProcess(char c, unsigned int count, double values[]);

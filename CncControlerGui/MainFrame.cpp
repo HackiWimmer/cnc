@@ -6644,6 +6644,6 @@ void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::unitTestFramework(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	UnitTests test(this, 0, true);
+	UnitTests test(this, 1, true);
 	test.ShowModal();
 }

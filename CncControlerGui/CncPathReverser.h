@@ -10,7 +10,7 @@ class CncPathReverser {
 		CncPathReverser() {}
 		~CncPathReverser() {}
 		
-		std::vector<CncPathListEntry>& reversePath(std::vector<CncPathListEntry>& list);
+		CncPathList& reversePath(CncPathList& list);
 };
 
 #endif

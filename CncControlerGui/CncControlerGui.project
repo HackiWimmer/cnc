@@ -317,6 +317,7 @@
       <File Name="Tests/Test_SVGPathAssistant.h"/>
       <File Name="Tests/Test_Base.cpp"/>
       <File Name="Tests/Test_FrameworkCallback.h"/>
+      <File Name="Tests/Test_CncPathListManager.h"/>
     </VirtualDirectory>
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
