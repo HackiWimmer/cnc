@@ -507,7 +507,7 @@ class PGenRegularRadiusPolygon : public PGenPolygon {
 			pi.help = "Count of data points to connect on radius. Only values even values > 3 are valid. Exception value == 3";
 			IDX_SECTIONS = setupParameter(pi); 
 			
-			pi.setupNum("Radius [mm]", 40.0, 5.0, 500.0, 3);
+			pi.setupNum("Radius [mm]", 40.0, 1.0, 500.0, 3);
 			pi.help = "Radius on which the data points take place.";
 			IDX_RADIUS = setupParameter(pi); 
 			

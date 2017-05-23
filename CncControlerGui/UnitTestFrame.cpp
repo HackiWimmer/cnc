@@ -27,7 +27,7 @@ UnitTests::UnitTests(wxWindow* parent, int iti, bool ar)
 
 	unsigned int cnt = 0;
 	for (auto it = testStore.begin(); it != testStore.end(); ++it) {
-		wxString item(wxString::Format("[%04d] %s", cnt, (*it)->name()));
+		wxString item(wxString::Format("[%04d] %s", cnt, UnitTests::formatName((*it)->name())));
 		m_unitTestSelector->Append(item);
 		cnt++;
 	}
@@ -45,6 +45,19 @@ UnitTests::~UnitTests() {
 	
 	// do this definitly here, for more information please see UnitTests::enableControls()
 	m_btUnitTestRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(runTest), NULL, this);
+}
+/////////////////////////////////////////////////////////////////////////////
+const wxString& UnitTests::formatName(const wxString name) {
+/////////////////////////////////////////////////////////////////////////////
+	static wxString s;
+	
+	s.clear();
+	wxStringTokenizer st(name, "_");
+	while ( st.HasMoreTokens() ) {
+		s.append( st.GetNextToken().MakeCapitalized() );
+	}
+	
+	return s;
 }
 /////////////////////////////////////////////////////////////////////////////
 void UnitTests::runTest(wxCommandEvent& event) {

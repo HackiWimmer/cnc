@@ -6601,7 +6601,7 @@ UnitTestsBase::UnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& ti
     m_unitTestStartupTimer->Start(300, true);
     
     SetName(wxT("UnitTestsBase"));
-    SetMinClientSize(wxSize(800,300));
+    SetMinClientSize(wxSize(300,300));
     SetSize(800,600);
     if (GetSizer()) {
          GetSizer()->Fit(this);

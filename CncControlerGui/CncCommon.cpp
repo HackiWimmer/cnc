@@ -11,10 +11,24 @@ bool cnc::dblCompareNull( double a, double eps) {
 	return cnc::dblCompare(a, 0.0, eps);
 }
 //////////////////////////////////////////////////////////////
-const wxString& cnc::dblFormat(double d) {
+const wxString& cnc::dblFormat1(double d1) {
 //////////////////////////////////////////////////////////////
 	static wxString s;
-	s.assign(wxString::Format("%10.3lf", d));
+	s.assign(wxString::Format("%10.3lf", d1));
+	return s;
+}
+//////////////////////////////////////////////////////////////
+const wxString& cnc::dblFormat2(double d1, double d2, const wxString& delimiter) {
+//////////////////////////////////////////////////////////////
+	static wxString s;
+	s.assign(wxString::Format("%10.3lf%s%10.3lf", d1, delimiter, d2));
+	return s;
+}
+//////////////////////////////////////////////////////////////
+const wxString& cnc::dblFormat3(double d1, double d2, double d3, const wxString& delimiter) {
+//////////////////////////////////////////////////////////////
+	static wxString s;
+	s.assign(wxString::Format("%10.3lf%s%10.3lf%s%10.3lf", d1, delimiter, d2, delimiter, d3));
 	return s;
 }
 //////////////////////////////////////////////////////////////

@@ -15,6 +15,8 @@ class UnitTests : public UnitTestsBase {
 		void runTest();
 		void callbackFromTest(FrameworkCallbackInfo& fci);
 		
+		static const wxString& formatName(const wxString name);
+		
 	protected:
 		virtual void onShow(wxShowEvent& event);
 		virtual void runTest(wxCommandEvent& event);

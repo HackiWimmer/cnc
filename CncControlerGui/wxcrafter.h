@@ -1897,7 +1897,7 @@ public:
     wxCheckBox* GetUnitTestFreezeOutput() { return m_unitTestFreezeOutput; }
     wxCheckBox* GetUnitTestAutoRun() { return m_unitTestAutoRun; }
     wxTimer* GetUnitTestStartupTimer() { return m_unitTestStartupTimer; }
-    UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
     virtual ~UnitTestsBase();
 };
 

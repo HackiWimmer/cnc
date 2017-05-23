@@ -9754,10 +9754,10 @@ Axis</label>
   <object class="wxDialog" name="UnitTestsBase">
     <title>CNC Controller Unit Tests . . .</title>
     <centered>1</centered>
-    <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+    <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX</style>
     <size>800,600</size>
     <object class="wxFlexGridSizer">
-      <minsize>800,300</minsize>
+      <minsize>300,300</minsize>
       <cols>1</cols>
       <rows>3</rows>
       <vgap>0</vgap>

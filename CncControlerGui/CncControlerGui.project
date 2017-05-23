@@ -104,7 +104,6 @@
       <File Name="CncControl.cpp"/>
       <File Name="CncControllerTestSuite.cpp"/>
       <File Name="CncFileNameService.cpp"/>
-      <File Name="CncPathReverser.cpp"/>
       <File Name="CncSvgCurveLib.cpp"/>
       <File Name="CncToolCorrection.cpp"/>
       <File Name="CncToolStateControl.cpp"/>
@@ -116,7 +115,6 @@
       <File Name="CncFileNameService.h"/>
       <File Name="CncLimitStates.h"/>
       <File Name="CncPathListEntry.h"/>
-      <File Name="CncPathReverser.h"/>
       <File Name="CncPosition.h"/>
       <File Name="CncPositionMarker.h"/>
       <File Name="CncStreamBuffers.h"/>

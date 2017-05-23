@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 3374,
+  "m_objCounter": 3375,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -63723,7 +63723,7 @@
    "border": 5,
    "gbSpan": "1,1",
    "gbPosition": "0,0",
-   "m_styles": ["wxDEFAULT_DIALOG_STYLE", "wxRESIZE_BORDER"],
+   "m_styles": ["wxDEFAULT_DIALOG_STYLE", "wxRESIZE_BORDER", "wxMAXIMIZE_BOX", "wxSYSTEM_MENU", "wxCLOSE_BOX"],
    "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
    "m_properties": [{
      "type": "string",
@@ -63732,7 +63732,7 @@
     }, {
      "type": "string",
      "m_label": "Minimum Size:",
-     "m_value": "800,300"
+     "m_value": "300,300"
     }, {
      "type": "string",
      "m_label": "Name:",

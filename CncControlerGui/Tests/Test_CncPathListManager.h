@@ -71,6 +71,14 @@ class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {
 				
 			clog << plm << endl;
 			
+			PARAGRAPH();
+			size = plm.getPathListSize();
+			clog << "reverse path: " << plm.reversePath() << endl;
+			if ( plm.getPathListSize() != size )
+				cerr << "Somthing is lost . . ." << endl;
+				
+			clog << plm << endl;
+			
 			return true;
 		}
 };

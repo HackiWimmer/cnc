@@ -22,7 +22,9 @@ namespace cnc {
 	
 	bool dblCompare(double a, double b, double eps = std::numeric_limits<double>::epsilon());
 	bool dblCompareNull(double a, double eps = std::numeric_limits<double>::epsilon());
-	const wxString& dblFormat(double d);
+	const wxString& dblFormat1(double d);
+	const wxString& dblFormat2(double d1, double d2, const wxString& delimiter = _T(","));
+	const wxString& dblFormat3(double d1, double d2, double d3, const wxString& delimiter = _T(","));
 	
 }
 

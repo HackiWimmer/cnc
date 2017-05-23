@@ -709,6 +709,68 @@ const char* SVGPathHandlerBase::getAsWktRepresentation() {
 	return s.c_str();
 }
 //////////////////////////////////////////////////////////////////
+bool SVGPathHandlerBase::overAllBoostWktEntriesSample() {
+//////////////////////////////////////////////////////////////////
+	try {
+		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
+		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
+		typedef boost::geometry::model::linestring<point_type> 	linestring_type;
+		
+		polygon_type 	polygonType;
+		linestring_type	linestringType;
+		
+		using boost::geometry::get;
+		
+		switch ( getWktType() ) {
+			case WKT_EMPTY: 
+			case WKT_POINT:			// nothing should happen
+									return true;
+									
+			case WKT_POLYGON:		boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
+									boost::geometry::reverse(polygonType);
+									
+									for(auto it = boost::begin(boost::geometry::exterior_ring(polygonType)); it != boost::end(boost::geometry::exterior_ring(polygonType)); ++it)
+										std::clog << get<0>(*it) << ", " <<  get<1>(*it) << std::endl;
+										
+									break;
+									
+			case WKT_LINESTRING:	boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
+									boost::geometry::reverse(linestringType);
+									
+									for(auto it = boost::begin(linestringType); it != boost::end(linestringType); ++it)
+										std::clog << get<0>(*it) << ", " <<  get<1>(*it) << std::endl;
+										
+									break;
+									
+			default:				std::cerr << "reversePath(): Unknown wkt type: " << getWktTypeAsString() << endl;
+									return false;
+			
+		}
+		
+		// correct the start posistion
+		if ( pathListMgr.getFirstPathFlag() == true ) {
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.setStartPos( {(*it).move.x, (*it).move.y});
+		} else {
+			CncPathList::iterator it = pathListMgr.begin();
+			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
+		}
+		
+	}
+	catch (boost::geometry::centroid_exception e) {
+		std::cerr << "reversePath(): Error while reverse path\n";
+		std::cerr << e.what();
+		std::cerr << std::endl;
+		return false;
+	}
+	catch (...) {
+		std::cerr << "reversePath(): Unknown Error while reverse path\n";
+		return false;
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::getCentroid(wxRealPoint& centroid) {
 //////////////////////////////////////////////////////////////////
 	try {
@@ -759,97 +821,13 @@ bool SVGPathHandlerBase::getCentroid(wxRealPoint& centroid) {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::reversePath() {
 //////////////////////////////////////////////////////////////////
-	if ( pathListMgr.getPathListSize() < 2 )
-		return true;
-	
-	CncPathListEntry first = *(pathListMgr.begin());
-	
-	// reverse relativ move steps
-	for (auto it = pathListMgr.begin() + 1; it != pathListMgr.end(); ++it) {
-		(*it).move.x *= -1;
-		(*it).move.y *= -1;
-	}
-	
-	// append las entry, after reverse it will be first again
-	pathListMgr.calculateAndAddEntry(pathListMgr.getPathList().back().abs, true, false);
-	
-	// reverse list
-	std::reverse(pathListMgr.begin(), pathListMgr.end());
-	
-	// remove old first entry
-	pathListMgr.eraseEntryAndRecalcuate(pathListMgr.end());
-	
-	return true;
-	
-/*
- * //todo
-	try {
-		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
-		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
-		typedef boost::geometry::model::linestring<point_type> 	linestring_type;
-		
-		polygon_type 	polygonType;
-		linestring_type	linestringType;
-		
-		using boost::geometry::get;
-		
-		switch ( getWktType() ) {
-			case WKT_EMPTY: 
-			case WKT_POINT:			// nothing should happen
-									return true;
-									
-			case WKT_POLYGON:		boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
-									boost::geometry::reverse(polygonType);
-									
-									pathListMgr.reset();
-									for(auto it = boost::begin(boost::geometry::exterior_ring(polygonType)); it != boost::end(boost::geometry::exterior_ring(polygonType)); ++it)
-										pathListMgr.calculateAndAddEntry({get<0>(*it), get<1>(*it)});
-										
-									break;
-									
-			case WKT_LINESTRING:	boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
-									boost::geometry::reverse(linestringType);
-									
-									pathListMgr.reset();
-									for(auto it = boost::begin(linestringType); it != boost::end(linestringType); ++it)
-										pathListMgr.calculateAndAddEntry({get<0>(*it), get<1>(*it)});
-										
-									break;
-									
-			default:				std::cerr << "reversePath(): Unknown wkt type: " << getWktTypeAsString() << endl;
-									return false;
-			
-		}
-		
-		// correct the start posistion
-		if ( pathListMgr.getFirstPathFlag() == true ) {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.setStartPos( {(*it).move.x, (*it).move.y});
-		} else {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
-		}
-		
-	}
-	catch (boost::geometry::centroid_exception e) {
-		std::cerr << "reversePath(): Error while reverse path\n";
-		std::cerr << e.what();
-		std::cerr << std::endl;
-		return false;
-	}
-	catch (...) {
-		std::cerr << "reversePath(): Unknown Error while reverse path\n";
-		return false;
-	}
-	
-	return true;
-*/
+	return pathListMgr.reversePath();
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::centerPath() {
 //////////////////////////////////////////////////////////////////
 
-//todo
+//todo replace boost 
 	try {
 		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
 		typedef boost::geometry::model::polygon<point_type> 	polygon_type;

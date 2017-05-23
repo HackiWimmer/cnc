@@ -7,7 +7,6 @@
 #include "CncControl.h"
 #include "SvgUnitCalculator.h"
 #include "CncToolCorrection.h"
-#include "CncPathReverser.h"
 #include "SVGPathHandlerCnc.h"
 
 //////////////////////////////////////////////////////////////////
@@ -208,22 +207,8 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 	
 	// reverse path
 	if ( currentCncParameters.getReverseFlag() == true ) {
-		if ( reversePath() == false )
+		if ( pathListMgr.reversePath() == false )
 			return false;
-		/*
-		//todo
-		CncPathReverser pr;
-		pathListMgr.setPathList(pr.reversePath(pathListMgr.getPathListtoModify()));
-		
-		// correct the start posistion
-		if ( pathListMgr.getFirstPathFlag() == true ) {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.setStartPos( {(*it).move.x, (*it).move.y});
-		} else {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
-		}
-		*/
 	}
 
 	return true;

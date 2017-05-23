@@ -108,16 +108,16 @@ class CncPathListManager {
 			ostr << "CncPathListInfo entries : " << a.list.size() << std::endl;
 			ostr << " is correded            : " << a.isPathCorrected() << std::endl;
 			ostr << " is first path          : " << a.getFirstPathFlag() << std::endl;
-			ostr << " xy length              : " << cnc::dblFormat(a.getXYLength()) << std::endl;
-			ostr << " minPos (x,y)           : " << cnc::dblFormat(a.getMinPosX()) << "," << cnc::dblFormat(a.getMinPosY()) << std::endl;
-			ostr << " maxPos (X,Y)           : " << cnc::dblFormat(a.getMaxPosX()) << "," << cnc::dblFormat(a.getMaxPosY()) << std::endl;
+			ostr << " xy length              : " << cnc::dblFormat1(a.getXYLength()) << std::endl;
+			ostr << " minPos (x,y)           : " << cnc::dblFormat2(a.getMinPosX(), a.getMinPosY()) << std::endl;
+			ostr << " maxPos (X,Y)           : " << cnc::dblFormat2(a.getMaxPosX(), a.getMaxPosY()) << std::endl;
 			ostr << " startPos               : " << a.getStartPos() << std::endl;
 			ostr << " first move             : " << a.getFirstMove() << std::endl;
 			
 			ostr << " path list:" << std::endl;
 			for ( auto it=a.getPathList().begin(); it!=a.getPathList().end(); ++it )
-				ostr << it->getPointAsString() << endl;
-			
+				ostr << it->getPointAsString() <<  " | zDown: " << it->zAxisDown <<  " | rendered: " << it->alreadyRendered << endl;
+
 			return ostr;
 		}
 		
@@ -129,14 +129,74 @@ class CncPathListManager {
 			startPos		= {0, 0}; 
 			firstMove		= {0, 0};
 			
-			minPosX			= DBL_MAX;
-			minPosY			= DBL_MAX;
-			maxPosX			= DBL_MIN;
-			maxPosY			= DBL_MIN;
+			resetMinMax();
 			
 			xyLength		= 0.0;
 			
 			list.clear();
+		}
+		
+		//////////////////////////////////////////////////////////////
+		void resetMinMax() {
+			minPosX			= DBL_MAX;
+			minPosY			= DBL_MAX;
+			maxPosX			= DBL_MIN;
+			maxPosY			= DBL_MIN;
+		}
+		
+		//////////////////////////////////////////////////////////////
+		bool reversePath() {
+			// empty or sinle point, nothing should happen
+			if ( getPathListSize() < 2 )
+				return true;
+			
+			CncPathListEntry first = *(begin());
+			
+			// update first entry and append it, after reverse it will be first again
+			first.move.x = list.back().abs.x;
+			first.move.y = list.back().abs.y;
+			first.alreadyRendered = true;
+			first.zAxisDown = false;
+			list.push_back(first);
+			
+			// remove old first entry
+			list.erase(list.begin());
+			
+			// reverse list
+			std::reverse(list.begin(), list.end());
+			
+			// reset length - will be recalculate in next loop
+			xyLength = 0.0;
+			
+			// over all entries 
+			unsigned int cnt = 0;
+			for (CncPathList::iterator it = list.begin(); it != list.end(); ++it) {
+				// recalculate distance
+				if ( cnt > 0 ) {
+					xyLength += sqrt(pow(it->move.x, 2) + pow(it->move.y, 2));
+					it->xyDistance = xyLength;
+					
+					// reverse relativ move steps
+					(*it).move.x *= -1;
+					(*it).move.y *= -1;
+					
+				} else {
+					it->xyDistance = 0.0;
+				}
+				
+				cnt++;
+			}
+			
+			// correct the start posistion
+			if ( getFirstPathFlag() == true ) {
+				CncPathList::iterator it = begin();
+				setStartPos( {(*it).move.x, (*it).move.y});
+			} else {
+				CncPathList::iterator it = begin();
+				incStartPos(getFirstMove() - (*it).move);
+			}
+			
+			return true;
 		}
 		
 		//////////////////////////////////////////////////////////////
@@ -205,7 +265,10 @@ class CncPathListManager {
 			}
 			
 			// recalculate min or max on demand
-			if ( entry.abs.x == minPosX || entry.abs.y == minPosY || entry.abs.x == maxPosX || entry.abs.y == maxPosY ) {
+			if ( cnc::dblCompare(entry.abs.x, minPosX) || cnc::dblCompare(entry.abs.y, minPosY) || 
+			     cnc::dblCompare(entry.abs.x, maxPosX) || cnc::dblCompare(entry.abs.y, maxPosY) ) {
+					 
+				resetMinMax();
 				for ( auto it=begin(); it !=end(); ++it ) {
 					minPosX = std::min(minPosX, it->abs.x);
 					minPosY = std::min(minPosY, it->abs.y);
@@ -215,20 +278,16 @@ class CncPathListManager {
 			} 
 			
 			// recalculate length
-			if ( first == false ) {
-				xyLength -= sqrt(pow(entry.move.x, 2) + pow(entry.move.y, 2));
-			} else {
-				xyLength = 0.0;
-				unsigned int cnt = 0;
-				for ( auto it=begin(); it !=end(); ++it ) {
-					if ( cnt > 0 ) {
-						xyLength += sqrt(pow(it->move.x, 2) + pow(it->move.y, 2));
-						it->xyDistance = xyLength;
-					} else {
-						it->xyDistance = 0.0;
-					}
-					cnt++;
+			xyLength = 0.0;
+			unsigned int cnt = 0;
+			for ( auto it=begin(); it !=end(); ++it ) {
+				if ( cnt > 0 ) {
+					xyLength += sqrt(pow(it->move.x, 2) + pow(it->move.y, 2));
+					it->xyDistance = xyLength;
+				} else {
+					it->xyDistance = 0.0;
 				}
+				cnt++;
 			}
 			
 			return true;
@@ -344,6 +403,9 @@ class SVGPathHandlerBase {
 		bool processCubicBezierSmooth(char c, unsigned int count, double values[]);
 		
 		virtual bool isInitialized();
+		
+		// demo function
+		bool overAllBoostWktEntriesSample();
 		
 		// controller helper
 		virtual void simulateZAxisUp() 		{}
