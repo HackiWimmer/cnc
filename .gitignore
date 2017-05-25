@@ -5,6 +5,7 @@ CnCControl/CncControlerGui/Release/
 CnCControl/CncControlerGui/Debug/
 CnCControl/CncControlerGui/Resources/*
 CnCControl/CncControlerGui/Doxyfile
+CncControlerGui/html/*
 
 
 *.svg
@@ -13,6 +14,7 @@ CnCControl/CncControlerGui/Doxyfile
 *.bat
 *.png
 *.bmp
+*.html
 *.o
 *.o.d
 *.d
