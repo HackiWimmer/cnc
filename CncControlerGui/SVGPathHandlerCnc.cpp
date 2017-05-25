@@ -142,7 +142,7 @@ bool SVGPathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("initNextPath");
+	TRACE_FUNCTION_CALL("initNextPath");
 	newPath 			= true;
 	origPathInfo	 	= sopi;
 	
@@ -180,7 +180,7 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::finishCurrentPath() {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("finsihCurrentPath");
+	TRACE_FUNCTION_CALL("finsihCurrentPath");
 	
 	SVGPathHandlerBase::finishCurrentPath();
 	
@@ -191,18 +191,20 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 			return false;
 			
 		pathListMgr.setCorretedFlag(tc.getType() != CncCT_Center);
-		tracePositions("Corrected before");
+		TRACE_POSITIONS("Corrected before");
 		
 		// correct the start posistion
+		/*
+		 * todo
 		if ( pathListMgr.getFirstPathFlag() == true ) {
 			CncPathList::iterator it = pathListMgr.begin();
 			pathListMgr.setStartPos({(*it).move.x, (*it).move.y});
 		} else {
 			CncPathList::iterator it = pathListMgr.begin();
 			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
-		}
+		}*/
 		
-		tracePositions("Corrected after");
+		TRACE_POSITIONS("Corrected after");
 	}
 	
 	// reverse path
@@ -216,7 +218,7 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::runCurrentPath() {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("runCurrentPath");
+	TRACE_FUNCTION_CALL("runCurrentPath");
 
 	bool ret = true;
 	
@@ -238,7 +240,7 @@ bool SVGPathHandlerCnc::runCurrentPath() {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::repeatCurrentPath() {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("repeatCurrentPath");
+	TRACE_FUNCTION_CALL("repeatCurrentPath");
 
 	if ( beginCurrentPath() == false )
 		return false;
@@ -255,14 +257,14 @@ bool SVGPathHandlerCnc::repeatCurrentPath() {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::beginCurrentPath() {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("beginCurrentPath");
+	TRACE_FUNCTION_CALL("beginCurrentPath");
 	cncControl->initNextDuration();
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::closeCurrentPath() {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("closeCurrentPath");
+	TRACE_FUNCTION_CALL("closeCurrentPath");
 	
 	if ( cncControl->isLastDuration() ) {
 		if ( cncControl->isZAxisDown() == true ) {
@@ -289,7 +291,7 @@ inline bool SVGPathHandlerCnc::spoolCurrentPathWrapper(bool firstRun) {
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("spoolCurrentPath");
+	TRACE_FUNCTION_CALL("spoolCurrentPath");
 	
 	unsigned int cnt = 0;
 	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
@@ -319,7 +321,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 		bool firstListEntry = false;
 
 		if ( std::distance(pathListMgr.begin(), it) == 0 ) {
-			tracePositions("spoolCurrentPath std::distance(pathList.begin(), it)");
+			TRACE_POSITIONS("spoolCurrentPath std::distance(pathList.begin(), it)");
 			firstListEntry = true;
 
 			if ( firstRun == true ) {
@@ -334,7 +336,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 			moveX = pathListMgr.getStartPos().x - currentPos.getX();
 			moveY = pathListMgr.getStartPos().y - currentPos.getY();
 
-			traceFirstMove(moveX, moveY);
+			TRACE_FIRST_MOVE(moveX, moveY);
 		}
 		
 		currentPos.incX(moveX);
@@ -372,7 +374,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::prepareWork() {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("prepareWork");
+	TRACE_FUNCTION_CALL("prepareWork");
 	SVGPathHandlerBase::prepareWork();
 	
 	currentPos.resetWatermarks();
@@ -387,7 +389,7 @@ void SVGPathHandlerCnc::prepareWork() {
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::finishWork() {
 //////////////////////////////////////////////////////////////////
-	traceFunctionCall("finishWork");
+	TRACE_FUNCTION_CALL("finishWork");
 	SVGPathHandlerBase::finishWork();
 	
 	cncControl->switchToolOff();

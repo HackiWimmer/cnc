@@ -156,6 +156,8 @@ void ArduinoPIDs::init() {
 	pids[PID_CURRENT_DIR_PULS_WIDTH]          = "Current Dir Puls Width";
 	
 	pids[PID_SWITCH_MOVE_MODE_STATE]          = "Move Mode Control State";
+	pids[PID_SWITCH_MOVE_MODE_STATE_2D]       = "Move Mode Control State 2D";
+	pids[PID_SWITCH_MOVE_MODE_STATE_3D]       = "Move Mode Control State 3D";
 
 	pids[PID_TEST_SUITE]                      = "Test Suite";
 	pids[PID_TEST_VALUE1]                     = "Parmeter1";

@@ -1,8 +1,4 @@
 #include <iostream>
-#include <list>
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
 #include "SVGCurveLib.h"
 #include "SVGPathHandlerBase.h"
 
@@ -57,16 +53,11 @@ void SVGPathHandlerBase::traceCurveLibPoint(const char* prefix, SVGCurveLib::Poi
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerBase::traceFunctionCall(const char* fn) {
 //////////////////////////////////////////////////////////////////
-	if ( false ) {
-		std::cout << "SVGPathHandlerBase::" << fn << std::endl;
-	}
+	std::cout << "SVGPathHandlerBase::" << fn << std::endl;
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerBase::traceFirstMove(double moveX, double moveY) {
 //////////////////////////////////////////////////////////////////
-	if ( true )
-		return;
-	
 	std::cout << "traceFirstMove(...)" << std::endl;
 	std::cout << " Move Abs: " << currentPos.getX() + moveX << "," << currentPos.getY() + moveY << std::endl;
 	std::cout << " Move Rel: " << moveX << "," << moveY << std::endl;
@@ -74,9 +65,6 @@ void SVGPathHandlerBase::traceFirstMove(double moveX, double moveY) {
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerBase::tracePositions(const char* prefix) {
 //////////////////////////////////////////////////////////////////
-	if ( true )
-		return;
-	
 	std::cout << "tracePositions(" << prefix << ")" << std::endl;
 	
 	if ( pathListMgr.getPathListSize() > 0 ) {
@@ -90,17 +78,14 @@ void SVGPathHandlerBase::tracePositions(const char* prefix) {
 	}
 	std::cout << " PL.firstPath  : " << pathListMgr.getFirstPathFlag() << std::endl;
 	std::cout << " PL.Start Pos  : " << pathListMgr.getStartPos().x << "," << pathListMgr.getStartPos().y << std::endl;
-	std::cout << " PL.First Move : " << pathListMgr.getFirstMove().x << "," << pathListMgr.getFirstMove().y << std::endl;
 
 	std::cout << " StartPos      : " << startPos.getX()   << "," << startPos.getY()   << std::endl;
 	std::cout << " CurrentPos    : " << currentPos.getX() << "," << currentPos.getY() << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-inline void SVGPathHandlerBase::traceCurrentPosition() {
+void SVGPathHandlerBase::traceCurrentPosition() {
 //////////////////////////////////////////////////////////////////
-	if ( true ) {
-		std::clog << "CurrentPos: " << currentPos.getX() << "," << currentPos.getY() << std::endl;
-	}
+	std::clog << "CurrentPos: " << currentPos.getX() << "," << currentPos.getY() << std::endl;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::processMove(char c, unsigned int count, double values[]) {
@@ -113,33 +98,22 @@ bool SVGPathHandlerBase::processMove(char c, unsigned int count, double values[]
 	
 	bool ret = false;
 	
-	double moveX = 0, moveY = 0;
 	if ( newPath == true ) {
 		
 		startPos.setX(values[0]);
 		startPos.setY(values[1]);
+		
+		// first of all give the path list manager a reference from where we are coming 
+		pathListMgr.setReferencePos({currentPos.getX(), currentPos.getY()});
 				
 		if ( firstPath == true ) {
-			pathListMgr.setFirstPathFlag();
-
-			//the first move is always absolute!
-			moveX = startPos.getX();
-			moveY = startPos.getY();
+			pathListMgr.setFirstPathFlag(true);
 			firstPath = false;
 		} else {
 			pathListMgr.setFirstPathFlag(false);
-
-			//the first move is always absolute 
-			//but the current position have to be considered!
-			moveX = values[0] - currentPos.getX();
-			moveY = values[1] - currentPos.getY();
 		}
-		pathListMgr.setStartPos({startPos.getX(), startPos.getY()});
-		pathListMgr.setFirstMove({moveX, moveY});
-		
-		tracePositions("processMove");
-		traceFirstMove(moveX, moveY);
-		
+
+		//the first move is always absolute!
 		currentPos.setX(startPos.getX());
 		currentPos.setY(startPos.getY());
 
@@ -150,6 +124,7 @@ bool SVGPathHandlerBase::processMove(char c, unsigned int count, double values[]
 		newPath = false;
 		
 	} else {
+		double moveX = 0, moveY = 0;
 		if ( c == 'M' ) {
 			moveX = values[0] - currentPos.getX();
 			moveY = values[1] - currentPos.getY();
@@ -164,7 +139,7 @@ bool SVGPathHandlerBase::processMove(char c, unsigned int count, double values[]
 		startPos.setY(currentPos.getY());
 		
 		ret = true;
-		if ( moveX != 0.0 || moveY != 0.0 ) {
+		if ( cnc::dblCompareNull(moveX) == false || cnc::dblCompareNull(moveY) == false ) {
 			simulateZAxisUp();
 			ret = processLinearMove(false);
 			simulateZAxisDown();
@@ -593,293 +568,6 @@ bool SVGPathHandlerBase::processLinearMove(bool alreadyRendered) {
 	// append
 	const CncPathListEntry cpe = pathListMgr.calculateAndAddEntry(newPosAbsX, newPosAbsY, alreadyRendered, isZAxisDown());
 	appendDebugValueDetail(cpe);
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-double SVGPathHandlerBase::getCurrentPathLength() {
-//////////////////////////////////////////////////////////////////
-	return pathListMgr.getXYLength();
-}
-//////////////////////////////////////////////////////////////////
-double SVGPathHandlerBase::getTotalLength() {
-//////////////////////////////////////////////////////////////////
-	return totalLength;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::isPathClosed() {
-//////////////////////////////////////////////////////////////////
-	if ( pathListMgr.getPathListSize() > 0 ) {
-		CncPathList::iterator itFirst = pathListMgr.begin(); 
-		CncPathList::iterator itLast  = pathListMgr.end() - 1;
-		
-		//clog << (*itFirst).abs << endl;
-		//clog << (*itLast).abs << endl;
-	
-		return ( cnc::dblCompare((*itFirst).abs.x, (*itLast).abs.x) && 
-		         cnc::dblCompare((*itFirst).abs.y, (*itLast).abs.y)
-		       ); 
-	}
-	
-	return false;
-}
-//////////////////////////////////////////////////////////////////
-SVGPathHandlerBase::WktTypeInfo SVGPathHandlerBase::getWktType() {
-//////////////////////////////////////////////////////////////////
-	switch ( pathListMgr.getPathListSize() ) {
-		case 0:			return WKT_EMPTY;
-		case 1:			return WKT_POINT;
-		default:
-						if ( isPathClosed() )	return WKT_POLYGON;
-						else 					return WKT_LINESTRING;
-	}
-	
-	// should not appear
-	wxASSERT(NULL);
-	return WKT_UNKNOWN;
-}
-//////////////////////////////////////////////////////////////////
-const wxString& SVGPathHandlerBase::getWktTypeAsString() {
-//////////////////////////////////////////////////////////////////
-	static wxString s;
-	switch ( getWktType() ) {
-		case WKT_EMPTY:			s.assign("EMPTY"); 		break;
-		case WKT_POINT:			s.assign("POINT"); 		break;
-		case WKT_POLYGON:		s.assign("POLYGON"); 	break;
-		case WKT_LINESTRING:	s.assign("LINESTRING"); break;
-		default:				s.assign("UNKNOWN"); 	break;
-	}
-	
-	return s;
-}
-//////////////////////////////////////////////////////////////////
-const char* SVGPathHandlerBase::getAsSvgPathRepresentation(const wxString& style) {
-//////////////////////////////////////////////////////////////////
-	static wxString s;
-	if ( pathListMgr.getPathListSize() == 0 ) {
-		s.assign("<!-- no data available -->");
-		return s.c_str();
-	}
-	
-	s.assign("<path d=\"M");
-	wxString x((pathListMgr.getPathListSize() > 1 ? " L" : ""));
-		
-	unsigned int cnt = 0;
-	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
-		if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", (*it).abs.x, (*it).abs.y, x));
-		else			s.append(wxString::Format(" %.3lf,%.3lf",  (*it).abs.x, (*it).abs.y));
-		cnt++;
-	}
-	
-	s.append("\" ");
-	
-	if ( style.IsEmpty() == false ) 
-		s.append(style);
-	
-	s.append("/>");
-	return s.c_str();
-}
-//////////////////////////////////////////////////////////////////
-const char* SVGPathHandlerBase::getAsWktRepresentation() {
-//////////////////////////////////////////////////////////////////
-	static wxString s;
-	
-	if ( pathListMgr.getPathListSize() == 0 ) {
-		s.assign("");
-		
-	} else if ( pathListMgr.getPathListSize() == 1 ) {
-		CncPathList::iterator itFirst = pathListMgr.begin();
-		s.assign(wxString::Format("POINT(%.3lf %.3lf)", (*itFirst).abs.x, (*itFirst).abs.y));
-		
-	} else {
-		if ( isPathClosed() )	s.assign("POLYGON((");
-		else 					s.assign("LINESTRING(");
-		
-		unsigned int cnt = 0;
-		for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
-			if ( cnt == 0 ) s.append(wxString::Format("%.3lf %.3lf", (*it).abs.x, (*it).abs.y));
-			else			s.append(wxString::Format(",%.3lf %.3lf", (*it).abs.x, (*it).abs.y));
-			cnt++;
-		}
-		
-		if ( isPathClosed() )	s.append("))");
-		else					s.append(")");
-	}
-	
-	return s.c_str();
-}
-//////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::overAllBoostWktEntriesSample() {
-//////////////////////////////////////////////////////////////////
-	try {
-		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
-		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
-		typedef boost::geometry::model::linestring<point_type> 	linestring_type;
-		
-		polygon_type 	polygonType;
-		linestring_type	linestringType;
-		
-		using boost::geometry::get;
-		
-		switch ( getWktType() ) {
-			case WKT_EMPTY: 
-			case WKT_POINT:			// nothing should happen
-									return true;
-									
-			case WKT_POLYGON:		boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
-									boost::geometry::reverse(polygonType);
-									
-									for(auto it = boost::begin(boost::geometry::exterior_ring(polygonType)); it != boost::end(boost::geometry::exterior_ring(polygonType)); ++it)
-										std::clog << get<0>(*it) << ", " <<  get<1>(*it) << std::endl;
-										
-									break;
-									
-			case WKT_LINESTRING:	boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
-									boost::geometry::reverse(linestringType);
-									
-									for(auto it = boost::begin(linestringType); it != boost::end(linestringType); ++it)
-										std::clog << get<0>(*it) << ", " <<  get<1>(*it) << std::endl;
-										
-									break;
-									
-			default:				std::cerr << "reversePath(): Unknown wkt type: " << getWktTypeAsString() << endl;
-									return false;
-			
-		}
-		
-		// correct the start posistion
-		if ( pathListMgr.getFirstPathFlag() == true ) {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.setStartPos( {(*it).move.x, (*it).move.y});
-		} else {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
-		}
-		
-	}
-	catch (boost::geometry::centroid_exception e) {
-		std::cerr << "reversePath(): Error while reverse path\n";
-		std::cerr << e.what();
-		std::cerr << std::endl;
-		return false;
-	}
-	catch (...) {
-		std::cerr << "reversePath(): Unknown Error while reverse path\n";
-		return false;
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::getCentroid(wxRealPoint& centroid) {
-//////////////////////////////////////////////////////////////////
-	try {
-		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
-		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
-		typedef boost::geometry::model::linestring<point_type> 	linestring_type;
-		
-		point_type p(0.0, 0.0);
-		
-		point_type		pointType;
-		polygon_type 	polygonType;
-		linestring_type	linestringType;
-		
-		switch ( getWktType() ) {
-			case WKT_POINT:			boost::geometry::read_wkt(getAsWktRepresentation(), pointType);
-									boost::geometry::centroid(pointType, p);
-									break;
-									
-			case WKT_POLYGON:		boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
-									boost::geometry::centroid(polygonType, p);
-									break;
-									
-			case WKT_LINESTRING:	boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
-									boost::geometry::centroid(linestringType, p);
-									break;
-									
-			default:				std::cerr << "determineCentroid(): Unknown wkt type: " << getWktTypeAsString() << endl;
-									return false;
-			
-		}
-		
-		centroid.x = (cnc::dblCompare(p.x(), 0.0, 0.001) == true ? 0.0 : p.x());
-		centroid.y = (cnc::dblCompare(p.y(), 0.0, 0.001) == true ? 0.0 : p.y());
-	}
-	catch (boost::geometry::centroid_exception e) {
-		std::cerr << "determineCentroid(): Error while determine centroid\n";
-		std::cerr << e.what();
-		std::cerr << std::endl;
-		return false;
-	}
-	catch (...) {
-		std::cerr << "determineCentroid(): Unknown Error while determine centroid\n";
-		return false;
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::reversePath() {
-//////////////////////////////////////////////////////////////////
-	return pathListMgr.reversePath();
-}
-//////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::centerPath() {
-//////////////////////////////////////////////////////////////////
-
-//todo replace boost 
-	try {
-		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
-		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
-		typedef boost::geometry::model::linestring<point_type> 	linestring_type;
-		
-		polygon_type 	polygonType;
-		linestring_type	linestringType;
-		
-		using boost::geometry::get;
-		
-		wxRealPoint cp;
-		if ( getCentroid(cp) == false ) {
-			std::cerr << "centerPath(): Error while determining centriod: " << endl;
-			return false;
-		}
-		
-		switch ( getWktType() ) {
-			case WKT_POINT:			// nothing should happen
-									return true;
-									
-			case WKT_POLYGON:		boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
-									
-									pathListMgr.reset();
-									for(auto it = boost::begin(boost::geometry::exterior_ring(polygonType)); it != boost::end(boost::geometry::exterior_ring(polygonType)); ++it)
-										pathListMgr.calculateAndAddEntry(cp - wxRealPoint(get<0>(*it), get<1>(*it)));
-										
-									break;
-									
-			case WKT_LINESTRING:	boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
-									
-									pathListMgr.reset();
-									for(auto it = boost::begin(linestringType); it != boost::end(linestringType); ++it)
-										pathListMgr.calculateAndAddEntry(cp - wxRealPoint(get<0>(*it), get<1>(*it)));
-										
-									break;
-									
-			default:				std::cerr << "centerPath(): Unknown wkt type: " << getWktTypeAsString() << endl;
-									return false;
-			
-		}
-		
-	}
-	catch (boost::geometry::centroid_exception e) {
-		std::cerr << "centerPath(): Error while center path\n";
-		std::cerr << e.what();
-		std::cerr << std::endl;
-		return false;
-	}
-	catch (...) {
-		std::cerr << "centerPath(): Unknown Error while center path\n";
-		return false;
-	}
 	
 	return true;
 }

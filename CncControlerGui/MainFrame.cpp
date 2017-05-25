@@ -3258,10 +3258,10 @@ void MainFrame::processTemplate() {
 	wxString sel = m_cbRunMotionMonitorMode->GetStringSelection();
 	switch ( (char)sel[0] ) {
 		case '3': 	m_outboundNotebook->SetSelection(Outbound3DPage);
-					cnc->setMotionMonitorMode(CncControl::MMM_3D);
+					cnc->setMotionMonitorMode(CncControl::DM_3D);
 					break;
 		default: 	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
-					cnc->setMotionMonitorMode(CncControl::MMM_2D);
+					cnc->setMotionMonitorMode(CncControl::DM_2D);
 	}
 	
 	// select template Page

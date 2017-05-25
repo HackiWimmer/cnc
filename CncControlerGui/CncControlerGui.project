@@ -132,6 +132,8 @@
       <File Name="CncCommon.cpp"/>
       <File Name="CncSpeedView.h"/>
       <File Name="CncSpeedView.cpp"/>
+      <File Name="CncPathListManager.h"/>
+      <File Name="CncPathListManager.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>

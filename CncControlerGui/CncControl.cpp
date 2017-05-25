@@ -44,7 +44,8 @@ CncControl::CncControl(CncPortType pt)
 , positionCheck(true)
 , drawControl(NULL)
 , drawPaneMargin(30)
-, motionMonitorMode(MMM_2D)
+, motionMonitorMode(DM_2D)
+, speedMonitorMode(DM_2D)
 {
 //////////////////////////////////////////////////////////////////
 	if      ( pt == CncPORT ) 		serialPort = new SerialSpyPort(this);
@@ -729,8 +730,8 @@ void CncControl::changeWorkSpeedXY(CncSpeed s) {
 	wxASSERT(guiCtlSetup);
 	
 	cncConfig->setActiveSpeedXY(s);
-	//todo
-	//processSetter(PID_SWITCH_MOVE_MODE_STATE, (s == CncSpeedWork));
+	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
+	processSetter(mmm, (s == CncSpeedWork));
 	processSetter(PID_SPEED_X, cncConfig->getSpeedX());
 	processSetter(PID_SPEED_Y, cncConfig->getSpeedY());
 	
@@ -745,7 +746,8 @@ void CncControl::changeWorkSpeedZ(CncSpeed s) {
 	wxASSERT(guiCtlSetup);
 	
 	cncConfig->setActiveSpeedZ(s);
-	//processSetter(PID_SWITCH_MOVE_MODE_STATE, (s == CncSpeedWork));
+	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
+	processSetter(mmm, (s == CncSpeedWork));
 	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
 	
 	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedZ(cncConfig->getSpeedZ());
@@ -1040,7 +1042,7 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	if ( cncConfig->isOnlineUpdateDrawPane() ) {
 		// avoid duplicate values
 		if ( tmp != pp ) {
-			if ( motionMonitorMode == MMM_2D ) {
+			if ( motionMonitorMode == DM_2D ) {
 				wxClientDC dc(drawControl);
 				double z = cncConfig->getDrawPaneZoomFactor();
 				dc.SetUserScale(z,z);
@@ -2423,14 +2425,14 @@ void CncControl::set3DData(bool append) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setMotionMonitorMode(const MontionMoinorMode& mmm) {
+void CncControl::setMotionMonitorMode(const DimensionMode& mmm) {
 ///////////////////////////////////////////////////////////////////
 	motionMonitorMode = mmm; 
 	
 	if ( guiCtlSetup == NULL || guiCtlSetup->drawPane3D == NULL )
 		return;
 		
-	if ( motionMonitorMode == MMM_3D )
+	if ( motionMonitorMode == DM_3D )
 		guiCtlSetup->drawPane3D->viewTop();
 }
 ///////////////////////////////////////////////////////////////////

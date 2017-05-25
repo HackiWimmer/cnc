@@ -65,7 +65,7 @@ class SVGPathAssistant {
 		const wxString& getWktTypeAsString() { return pathHandler.getWktTypeAsString(); }
 		
 		////////////////////////////////////////////////////////////
-		SVGPathHandlerBase::WktTypeInfo getWktType() { return pathHandler.getWktType(); }
+		CncPathListManager::WktTypeInfo getWktType() { return pathHandler.getWktType(); }
 		
 		////////////////////////////////////////////////////////////
 		bool reversePath() { return pathHandler.reversePath(); }

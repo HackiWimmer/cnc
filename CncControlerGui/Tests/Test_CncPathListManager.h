@@ -25,12 +25,23 @@ class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {
 			CncPathListManager plm;
 			unsigned int size = 0;
 			
+			// set the previous postion
+			wxRealPoint prevPos(5.0, 5.0);
+			/*
+			// set start position
+			plm.setStartPos({10.0, 15.0});
+			
+			// calculate first move
+			plm.setFirstMove({plm.getStartPos().x - prevPos.x, plm.getStartPos().y - prevPos.y});
+			*/
+			// setup path points
 			for ( unsigned int i=0; i<10; i++ )
-				plm.calculateAndAddEntry({i*10.0, i*20.0}, true, (i!=0));
+				plm.calculateAndAddEntry({plm.getStartPos().x + i*10.0, plm.getStartPos().y + i*20.0}, true, (i!=0));
 			
 			// trace initial behaviour
 			clog << plm << endl;
 			
+			/*
 			PARAGRAPH();
 			size = plm.getPathListSize();
 			clog << "Erase first entry - result: " << plm.eraseEntryAndRecalcuate(plm.begin()) << endl;
@@ -74,6 +85,15 @@ class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {
 			PARAGRAPH();
 			size = plm.getPathListSize();
 			clog << "reverse path: " << plm.reversePath() << endl;
+			if ( plm.getPathListSize() != size )
+				cerr << "Somthing is lost . . ." << endl;
+				
+			clog << plm << endl;
+			*/
+		
+			PARAGRAPH();
+			size = plm.getPathListSize();
+			clog << "center path: " << plm.centerPath() << endl;
 			if ( plm.getPathListSize() != size )
 				cerr << "Somthing is lost . . ." << endl;
 				

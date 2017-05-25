@@ -94,7 +94,7 @@ struct SetterTuple {
 ///////////////////////////////////////////////////////////////////
 class CncControl {
 	public:
-		enum MontionMoinorMode {MMM_2D, MMM_3D};
+		enum DimensionMode {DM_2D, DM_3D};
 		
 	private:
 		wxString stringTemplate;
@@ -155,8 +155,10 @@ class CncControl {
 		// margin of the draw pane
 		CoordinateSystem drawPaneCoordSystem;
 		unsigned int drawPaneMargin;
-		// determien the preview mode [2D, 3D]
-		MontionMoinorMode motionMonitorMode;
+		// determine the preview mode [2D, 3D]
+		DimensionMode motionMonitorMode;
+		// determine the speed mode [2D, 3D]
+		DimensionMode speedMonitorMode;
 		// helper
 		double convertToDisplayUnit(int32_t val, double fact);
 		//sets a value into the given text control
@@ -194,6 +196,7 @@ class CncControl {
 		long convertDoubleToCtrlLong(unsigned char 	id, double d);
 		
 	public:
+		
 		CncControl(CncPortType pt);
 		virtual ~CncControl();
 		//Get the current port type
@@ -386,8 +389,12 @@ class CncControl {
 		void sendIdleMessage();
 		
 		// Motion monitor handling
-		void setMotionMonitorMode(const MontionMoinorMode& mmm);
-		const MontionMoinorMode& getMotionMonitorMode() const   { return motionMonitorMode; }
+		void setMotionMonitorMode(const DimensionMode& mmm);
+		const DimensionMode& getMotionMonitorMode() const   { return motionMonitorMode; }
+		
+		// Speed monitor handling
+		void setSpeedControlMode(const DimensionMode& spm) { speedMonitorMode = spm; }
+		const DimensionMode& getSpeedControlMode() const   { return speedMonitorMode; }
 		
 		// Marker repaint
 		void drawXMarkerBottom(wxDC& dc, double zoom);
