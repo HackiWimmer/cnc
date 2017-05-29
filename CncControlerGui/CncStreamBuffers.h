@@ -312,35 +312,6 @@ class CncMsgLogStream : public CncTraceLogStream {
 };
 
 ///////////////////////////////////////////////////////////////////
-class CncPGTLogStream : public CncMsgLogStream {
-	
-	protected:
-		///////////////////////////////////////////////////////////
-		virtual void logMessage(const char* m) {
-			if ( m == NULL )
-				return;
-				
-			if ( getTextControl() != NULL )
-				getTextControl()->AppendText(m);
-		}
-		
-	public:
-		///////////////////////////////////////////////////////////
-		CncPGTLogStream() 
-		: CncMsgLogStream()
-		{}
-
-		///////////////////////////////////////////////////////////
-		CncPGTLogStream(const CncPGTLogStream& cmb) 
-		: CncMsgLogStream()
-		{}
-
-		///////////////////////////////////////////////////////////
-		virtual ~CncPGTLogStream() 
-		{}
-};
-
-///////////////////////////////////////////////////////////////////
 class CncSerialSpyStream : public CncTraceLogStream {
 	
 	protected:

@@ -1756,10 +1756,10 @@ protected:
     wxPropertyGridManager* m_pgParameterMgr;
     wxPGProperty* m_pgCatCommon;
     wxPGProperty* m_pgPropToolDiameter;
-    wxPGProperty* m_pgPropCorrection;
+    wxPGProperty* m_pgPropCorrectionMode;
+    wxPGProperty* m_pgPropCorrectionCornerType;
     wxPGProperty* m_pgPropPathColour;
     wxPGProperty* m_pgPropConfigBlock;
-    wxPGProperty* m_pgPropOutputType;
     wxPGProperty* m_pgCatPath;
     wxPGProperty* m_pgProp01;
     wxPGProperty* m_pgCatGrid;

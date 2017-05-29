@@ -11,7 +11,7 @@ void PathGeneratorFrame::setHelpInfos() {
 	
 	m_pgCatCommon->SetHelpString("Common template parameters");
 	m_pgPropToolDiameter->SetHelpString("Determine the used tool diameter.");
-	m_pgPropCorrection->SetHelpString("Will be considered by the dedicated template generator to correct length values if it makes sence. If false no correction takes place.");
+	//m_pgPropCorrection->SetHelpString("Will be considered by the dedicated template generator to correct length values if it makes sence. If false no correction takes place.");
 	m_pgPropPathColour->SetHelpString("Determine the path colour to use.");
 	
 	m_pgPropCncInclude->SetHelpString("Determine if a <CncParameterBlock/> will be included.");

@@ -8,10 +8,13 @@ PathGeneratorStore::PathGeneratorStore() {
 	registerPathGenerator(new PGenLongWhole());
 	registerPathGenerator(new PGenRoundPoketWhole());
 	registerPathGenerator(new PGenFreehandPolygon());
+	registerPathGenerator(new PGenRectanglePolygon());
+	registerPathGenerator(new PGenEllipticalArcPolygon());
 	registerPathGenerator(new PGenRegularRadiusPolygon());
 	registerPathGenerator(new PGenericPath());
+	
 	//...
-	registerPathGenerator(new PGenTest());
+	//registerPathGenerator(new PGenTest());
 }
 ///////////////////////////////////////////////////////////////////
 PathGeneratorStore::~PathGeneratorStore() {

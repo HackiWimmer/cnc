@@ -126,12 +126,13 @@ const wxString& SvgPathFragment::addRoundRect(double td, double width, double he
 	return addRect(td, width, height, td/2, td/2, correctRadius);;
 }
 ////////////////////////////////////////////////////////////////////////////
-const wxString& SvgPathFragment::addPolygon(const PathFragmentPolygonData& pd) {
+const wxString& SvgPathFragment::addPolygon(const CncPolygonPoints& pd) {
 ////////////////////////////////////////////////////////////////////////////
 	static wxString s;
 	wxString points;
+	/*
 	
-	for (PathFragmentPolygonData::const_iterator it = pd.begin(); it != pd.end(); ++it) {
+	for (auto it = pd.begin(); it != pd.end(); ++it) {
 		if ( cnc::dblCompareNull(it->getTransformedPoint().x) && cnc::dblCompareNull(it->getTransformedPoint().y) )
 			continue;
 			
@@ -140,5 +141,7 @@ const wxString& SvgPathFragment::addPolygon(const PathFragmentPolygonData& pd) {
 	}
 	
 	s.assign(wxString::Format("<polygon points=\"%s\" %s/>\n", points, getDefaultSvgElementEnd()));
+	 * 
+	*/
 	return s;
 }

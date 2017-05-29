@@ -485,6 +485,8 @@ void PathGeneratorFrame::generatePath(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::generatePath() {
 ///////////////////////////////////////////////////////////////////
+	StdStreamRedirector redirector(m_processInfo);
+	
 	enableControls(false);
 	clearProcessInfo();
 	m_pgMainBook->SetSelection(0);
@@ -493,12 +495,10 @@ void PathGeneratorFrame::generatePath() {
 	if ( id >= 0 ) {
 
 		// generate path
-		cnc::pg::trc.clear();
 		pathGeneratorStore.resetErrorInfo(id);
-
-		// prepare preview and result
 		wxString svgFragment(pathGeneratorStore.generatePath(id));
 		
+		// prepare preview and result
 		wxString preview(svgFragment);
 		wxString result(svgFragment);
 		
@@ -510,13 +510,14 @@ void PathGeneratorFrame::generatePath() {
 		m_generatedResult->SetDefaultStyle(*wxWHITE);
 		m_generatedResult->AppendText(result);
 		
+		// update preview
+		m_generatedPreview->Clear();
+		m_generatedPreview->SetDefaultStyle(wxColour(0,128,192));
+		m_generatedPreview->AppendText(preview);
+		
 		// update global Value
 		globaGeneratedPath = result;
 		
-		// update preview
-		cnc::pg::trc.blue();
-		cnc::pg::trc << preview;
-
 		if ( pathGeneratorStore.hasErrorInfo(id) == true )
 			appendErrorMessage(pathGeneratorStore.getErrorInfo(id));
 
@@ -538,23 +539,23 @@ void PathGeneratorFrame::generatePath() {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::updateCommonValues(const PathGeneratorBase::CommonValues& cv) {
 ///////////////////////////////////////////////////////////////////
-	m_pgPropCorrection->SetValue(cv.toolCorrection);
+	m_pgPropCorrectionMode->SetValue(cv.toolCorrectionMode);
+	m_pgPropCorrectionCornerType->SetValue(cv.toolCorrectionCorners);
 	m_pgPropToolDiameter->SetValue(cv.toolDiameter);
 	//((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
 	m_pgPropConfigBlock->SetValue(cv.configBlock);
 	m_pgPropRefCross->SetValue(cv.referenceCross);
-	m_pgPropOutputType->SetValue(cv.outputType);
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::evaluateCommonValues(int id) {
 ///////////////////////////////////////////////////////////////////
 	PathGeneratorBase::CommonValues cv;
-	cv.toolCorrection	= m_pgPropCorrection->GetValue().GetBool();
-	cv.toolDiameter 	= m_pgPropToolDiameter->GetValue();
-	cv.pathColour		= ((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
-	cv.configBlock		= m_pgPropConfigBlock->GetValue().GetBool();
-	cv.referenceCross	= m_pgPropRefCross->GetValue().GetBool();
-	cv.outputType		= m_pgPropOutputType->GetValue().GetInteger();
+	cv.toolCorrectionMode		= m_pgPropCorrectionMode->GetValue().GetInteger();
+	cv.toolCorrectionCorners	= m_pgPropCorrectionCornerType->GetValue().GetInteger();
+	cv.toolDiameter 			= m_pgPropToolDiameter->GetValue();
+	cv.pathColour				= ((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
+	cv.configBlock				= m_pgPropConfigBlock->GetValue().GetBool();
+	cv.referenceCross			= m_pgPropRefCross->GetValue().GetBool();
 	
 	pathGeneratorStore.setCommonValues(id, cv);
 }
@@ -690,10 +691,10 @@ void PathGeneratorFrame::setupProperty(wxPGProperty* property, bool show, wxVari
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::setupCommonValues(const PathGeneratorBase::CommonValues& cv) {
 ///////////////////////////////////////////////////////////////////
-	setupProperty(m_pgPropCorrection, cv.canToolCorrection, cv.canToolCorrection);
+	setupProperty(m_pgPropCorrectionMode, cv.canToolCorrection, cv.toolCorrectionMode);
+	setupProperty(m_pgPropCorrectionCornerType, cv.canToolCorrection, cv.toolCorrectionCorners);
 	setupProperty(m_pgPropToolDiameter, cv.canToolDiameter, cv.toolDiameter);
 	setupProperty(m_pgPropPathColour, cv.canPathColour);
-	setupProperty(m_pgPropOutputType, cv.canPathOutputType);
 	
 	if ( cv.canPathColour == true )
 		((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour = cv.pathColour;

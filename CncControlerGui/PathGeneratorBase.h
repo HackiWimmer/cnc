@@ -130,43 +130,88 @@ class PathGeneratorBase {
 		
 		///////////////////////////////////////////////////////////////////
 		struct CommonValues {
-			bool canToolCorrection 	= true;
-			bool canToolDiameter	= true;
-			bool canPathColour		= true;
-			bool canPathOutputType	= false;
 			
-			bool toolCorrection 	= true;
-			double toolDiameter 	= 3.125;
-			wxColour pathColour 	= wxColour(0,0,0);
+			//todo remove this obsolete value
+			bool toolCorrection = false;
 			
-			int outputType			= 0;
+			bool canToolCorrection 		= true;
+			bool canToolDiameter		= true;
+			bool canPathColour			= true;
 			
-			bool configBlock		= true;
-			bool referenceCross 	= true;
-			bool xmlPattern			= true;
+			int toolCorrectionMode		= 0;
+			int toolCorrectionCorners 	= 0;
+			
+			double toolDiameter 		= 3.125;
+			wxColour pathColour 		= wxColour(0,0,0);
+			
+			bool configBlock			= true;
+			bool referenceCross 		= true;
+			bool xmlPattern				= true;
 			
 			///////////////////////////////////////////////////////////////
 			void copyCanValues(const CommonValues& from) {
 				canToolCorrection 	= from.canToolCorrection;
 				canToolDiameter		= from.canToolDiameter;
 				canPathColour		= from.canPathColour;
-				canPathOutputType	= from.canPathOutputType;
 			}
 			
 			///////////////////////////////////////////////////////////////
-			void setOutputType(const wxString& t) {
-				if 		( t == "Path" )		outputType = 0;
-				else if ( t == "Element")	outputType = 1;
-				else						outputType = 0;
+			void setCorrectionMode(const wxString& t) {
+				if 		( t == "none" )		toolCorrectionMode = CncCT_None;
+				else if ( t == "inner")		toolCorrectionMode = CncCT_Inner;
+				else if ( t == "outer")		toolCorrectionMode = CncCT_Outer;
+				else if ( t == "center")	toolCorrectionMode = CncCT_Center;
+				else						toolCorrectionMode = CncCT_None;
 			}
 			
 			///////////////////////////////////////////////////////////////
-			const char* getOutputTypeAsString() {
-				switch ( outputType ) {
-					case 0: return "Path";
-					case 1: return "Element";
+			CncToolCorretionType getCorrectionType() {
+				switch ( toolCorrectionMode ) {
+					case CncCT_None: 	return CncCT_None;
+					case CncCT_Inner: 	return CncCT_Inner;
+					case CncCT_Outer: 	return CncCT_Outer;
+					case CncCT_Center:	return CncCT_Center;
 				}
-				return "Path";
+				return CncCT_None;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			const char* getCorrectionTypeAsString() {
+				switch ( toolCorrectionMode ) {
+					case CncCT_None: 	return "none";
+					case CncCT_Inner: 	return "inner";
+					case CncCT_Outer: 	return "outer";
+					case CncCT_Center: 	return "center";
+				}
+				return "none";
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setCornerType(const wxString& t) {
+				if 		( t == "round" )	toolCorrectionCorners = CncCCT_Round;
+				else if ( t == "square")	toolCorrectionCorners = CncCCT_Square;
+				else if ( t == "miter")		toolCorrectionCorners = CncCCT_Miter;
+				else						toolCorrectionCorners = CncCCT_Round;
+			}
+
+			///////////////////////////////////////////////////////////////
+			CncClipperCornerType getCornerType() {
+				switch ( toolCorrectionCorners ) {
+					case CncCCT_Round: 	return CncCCT_Round;
+					case CncCCT_Square:	return CncCCT_Square;
+					case CncCCT_Miter: 	return CncCCT_Miter;
+				}
+				return CncCCT_Round;
+			}
+			 
+			///////////////////////////////////////////////////////////////
+			const char* getCornerTypeAsString() {
+				switch ( toolCorrectionMode ) {
+					case CncCCT_Round: 	return "round";
+					case CncCCT_Square: return "square";
+					case CncCCT_Miter: 	return "miter";
+				}
+				return "round";
 			}
 		};
 		

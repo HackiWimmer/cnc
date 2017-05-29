@@ -261,6 +261,8 @@ bool SVGPathHandlerBase::processARC(char c, unsigned int count, double values[])
 		appendDebugValueDetail("CurveLibResAuto", 	ci.increment);
 		appendDebugValueDetail("CurveLength", 		ci.length);
 		
+		clog << ci.increment<< endl;
+		
 		// First process the curve
 		for( float t=0; t<1; t+=ci.increment ) {
 			if ( processCurveLibPoint(lc.PointOnLinearCurve(t)) == false )

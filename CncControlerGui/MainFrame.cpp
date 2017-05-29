@@ -491,8 +491,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
 	
 	//todo
-	//wxCommandEvent dummy;
-	//openSVGPathGenerator(dummy);
+	wxCommandEvent dummy;
+	openSVGPathGenerator(dummy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceTimer(wxTimerEvent& event) {
@@ -3786,7 +3786,7 @@ void MainFrame::onMotionDrawPane(wxMouseEvent& event) {
 	
 	wxString sel = m_gridPosUnit->GetStringSelection();
 	SVGUnit unit = SvgUnitCalculator::determineUnit(sel);
-
+	
 	{
 		wxString s;
 		s << p.x / fact * SvgUnitCalculator::getFactorPx2Unit(unit);
@@ -6644,6 +6644,6 @@ void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::unitTestFramework(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	UnitTests test(this, 1, true);
+	UnitTests test(this, 0, true);
 	test.ShowModal();
 }

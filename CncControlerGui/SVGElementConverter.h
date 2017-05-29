@@ -246,7 +246,7 @@ class SVGElementConverter {
 		}
 		
 		//////////////////////////////////////////////////////////////////
-		static bool convertLineToPathData(double x, double y, double w, double h,  double rx, double ry, wxString& ret) {
+		static bool convertRectToPathData(double x, double y, double w, double h,  double rx, double ry, wxString& ret) {
 			wxXmlNode* n = getNewSvgElementNode("line");
 			n->AddAttribute("x",      wxString::Format("%lf", x));
 			n->AddAttribute("y",      wxString::Format("%lf", y));
@@ -255,7 +255,7 @@ class SVGElementConverter {
 			n->AddAttribute("rx",     wxString::Format("%lf", rx));
 			n->AddAttribute("ry",     wxString::Format("%lf", ry));
 			
-			return convertLineToPathData(n, ret);
+			return convertRectToPathData(n, ret);
 		}
 		
 		//////////////////////////////////////////////////////////////////

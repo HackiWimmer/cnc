@@ -6245,8 +6245,21 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgPropToolDiameter = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxStringProperty( _("Tool Diameter [mm]"), wxPG_LABEL, _("3.125")) );
     m_pgPropToolDiameter->SetHelpString(wxT(""));
     
-    m_pgPropCorrection = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxBoolProperty( _("Tool Correction"), wxPG_LABEL, 1) );
-    m_pgPropCorrection->SetHelpString(wxT(""));
+    m_pgParameterMgrArr.Clear();
+    m_pgParameterMgrIntArr.Clear();
+    m_pgParameterMgrArr.Add(_("none"));
+    m_pgParameterMgrArr.Add(_("inner"));
+    m_pgParameterMgrArr.Add(_("outer"));
+    m_pgPropCorrectionMode = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Tool Correction"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
+    m_pgPropCorrectionMode->SetHelpString(wxT(""));
+    
+    m_pgParameterMgrArr.Clear();
+    m_pgParameterMgrIntArr.Clear();
+    m_pgParameterMgrArr.Add(_("round"));
+    m_pgParameterMgrArr.Add(_("square"));
+    m_pgParameterMgrArr.Add(_("miter"));
+    m_pgPropCorrectionCornerType = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Tool Corection Corners"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
+    m_pgPropCorrectionCornerType->SetHelpString(wxT(""));
     
     m_pgPropPathColour = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxSystemColourProperty( _("Colour"), wxPG_LABEL, wxColour(wxT("rgb(0,0,0)"))) );
     m_pgPropPathColour->SetHelpString(wxT(""));
@@ -6254,13 +6267,6 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     m_pgPropConfigBlock = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxBoolProperty( _("Config Block"), wxPG_LABEL, 1) );
     m_pgPropConfigBlock->SetHelpString(wxT(""));
-    
-    m_pgParameterMgrArr.Clear();
-    m_pgParameterMgrIntArr.Clear();
-    m_pgParameterMgrArr.Add(_("Path"));
-    m_pgParameterMgrArr.Add(_("Element"));
-    m_pgPropOutputType = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Output Type"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
-    m_pgPropOutputType->SetHelpString(wxT(""));
     
     m_pgCatPath = m_pgParameterMgr->Append(  new wxPropertyCategory( _("Path Template Parameters") ) );
     m_pgCatPath->SetHelpString(wxT(""));

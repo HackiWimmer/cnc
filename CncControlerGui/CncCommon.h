@@ -15,11 +15,6 @@ namespace cnc {
 	extern CncMsgLogStream msg;
 	extern CncSerialSpyStream spy;
 	
-	namespace pg {
-		extern CncPGTLogStream trc;
-	}
-	
-	
 	bool dblCompare(double a, double b, double eps = std::numeric_limits<double>::epsilon());
 	bool dblCompareNull(double a, double eps = std::numeric_limits<double>::epsilon());
 	const wxString& dblFormat1(double d);
@@ -39,14 +34,17 @@ using namespace std;
 static const float PI = 3.14159265;
 static const int MAX_PARAMETER_VALUES = 10;
 
-enum CncUnit {CncSteps, CncMetric};
-enum CncDirection {CncUndefDir, CncClockwise, CncAnticlockwise};
-enum CncSpeed {CncSpeedWork, CncSpeedFly};
-enum CncPortType {CncPORT, CncEMU_NULL, CncEMU_SVG};
-enum CncRenderMode {CncRenderAtPC, CncRenderAtController };
-enum CncToolCorretionType {CncCT_None, CncCT_Center, CncCT_Inner, CncCT_Outer};
-enum TemplateFormat {TplUnknown, TplSvg, TplText, TplGcode, TplManual, TplTest};
-enum CncDimensions {CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3};
+enum CncUnit 					{ CncSteps, CncMetric };
+enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
+enum CncSpeed 					{ CncSpeedWork, CncSpeedFly };
+enum CncPortType 				{ CncPORT, CncEMU_NULL, CncEMU_SVG };
+enum CncRenderMode 				{ CncRenderAtPC, CncRenderAtController };
+enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
+enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
+enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4};
+enum TemplateFormat 			{ TplUnknown, TplSvg, TplText, TplGcode, TplManual, TplTest };
+enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3};
+
 
 static const int UNDEFINED_LINE_NUMBER 				= -1;
 

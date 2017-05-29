@@ -134,6 +134,8 @@
       <File Name="CncSpeedView.cpp"/>
       <File Name="CncPathListManager.h"/>
       <File Name="CncPathListManager.cpp"/>
+      <File Name="CncClipperWrapper.h"/>
+      <File Name="CncClipperWrapper.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -165,6 +167,10 @@
     <VirtualDirectory Name="Spy">
       <File Name="CncSpyControl.h"/>
       <File Name="CncSpyControl.cpp"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Clipper">
+      <File Name="Clipper/clipper.cpp"/>
+      <File Name="Clipper/clipper.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
@@ -318,6 +324,7 @@
       <File Name="Tests/Test_Base.cpp"/>
       <File Name="Tests/Test_FrameworkCallback.h"/>
       <File Name="Tests/Test_CncPathListManager.h"/>
+      <File Name="Tests/Test_CncClipperWrapper.h"/>
     </VirtualDirectory>
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>

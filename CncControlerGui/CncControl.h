@@ -255,6 +255,7 @@ class CncControl {
 		void setDrawControl(wxWindow* dc) { drawControl = dc; }
 		void setCoordinateSystemType(CoordinateSytemType t);
 		//handle draw control
+		unsigned int getDrawPaneMargin() { return drawPaneMargin; }
 		void clearDrawControl();
 		void updateDrawControl();
 		void reconstructDrawControl(int oldCorrectionY, long oldNpX, long oldNpY);
