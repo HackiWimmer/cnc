@@ -6,6 +6,7 @@
 #include <wx/textctrl.h>
 #include <wx/propgrid/manager.h>
 #include <wx/valnum.h>
+#include "SvgUnitCalculator.h"
 #include "SvgPathGroup.h"
 
 #define DEFAULT_PARAMETER_VALUE_TYPE 		""
@@ -135,6 +136,7 @@ class PathGeneratorBase {
 			bool toolCorrection = false;
 			
 			bool canToolCorrection 		= true;
+			bool canJointType			= true;
 			bool canToolDiameter		= true;
 			bool canPathColour			= true;
 			
@@ -151,6 +153,7 @@ class PathGeneratorBase {
 			///////////////////////////////////////////////////////////////
 			void copyCanValues(const CommonValues& from) {
 				canToolCorrection 	= from.canToolCorrection;
+				canJointType		= from.canJointType;
 				canToolDiameter		= from.canToolDiameter;
 				canPathColour		= from.canPathColour;
 			}
@@ -335,6 +338,7 @@ class PathGeneratorBase {
 				commonValues.toolDiameter = d;
 				return true;
 			}
+			
 		};
 		
 		///////////////////////////////////////////////////////////////////
@@ -342,6 +346,7 @@ class PathGeneratorBase {
 		: errorInfo("")
 		, xmlPattern("")
 		, selectorIndex(-1)
+		, inputUnit(mm)
 		, name("")
 		, treePath("")
 		, centerPoint(DBL_MAX, DBL_MAX)
@@ -630,6 +635,7 @@ class PathGeneratorBase {
 	protected:
 		
 		int selectorIndex;
+		SVGUnit inputUnit;
 		wxString name;
 		wxString treePath;
 		wxRealPoint centerPoint;
@@ -641,6 +647,10 @@ class PathGeneratorBase {
 		inline double cv(SVGUnit u, double v) {
 			return SvgPathFragment::convertToDouble(u, v);
 		}
+		
+		///////////////////////////////////////////////////////////////
+		void setInputUnit(SVGUnit u) { inputUnit = u; }
+		SVGUnit getInputUnit() const { return inputUnit; }
 		
 		///////////////////////////////////////////////////////////////////
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) = 0;

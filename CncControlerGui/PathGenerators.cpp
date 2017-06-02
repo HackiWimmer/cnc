@@ -110,11 +110,37 @@ const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp) {
 	return cp;
 }
 ///////////////////////////////////////////////////////////////////
+void PGenPolygon::addPolyLine(SvgPathGroup& spg) {
+///////////////////////////////////////////////////////////////////
+	double offset = 0.0;
+	
+	switch ( commonValues.getCorrectionType() ) {
+		case CncCT_Inner:	offset = -commonValues.toolDiameter/2; break;
+		case CncCT_Outer:	offset = +commonValues.toolDiameter/2; break;
+		default:			offset = 0.0; break;
+	}
+	
+	// todo coorrection
+	/*
+	CncClipperWrapper cw;
+	CncPolygonPoints polygonToSpool;
+ 
+	// first perform tool correction offset
+	CncPolygons results;
+	cw.offsetPath(polygonData, results, offset, commonValues.getCornerType(), CncCETOpenSquare); 
+	
+	if ( results.size() > 0 )	results.getPolygonPoints(0, polygonToSpool);
+	else						return;
+	
+	spoolPolygon(spg, polygonToSpool);
+	*/
+	spoolPolygon(spg, polygonData);
+}
+///////////////////////////////////////////////////////////////////
 void PGenPolygon::addPolygon(SvgPathGroup& spg, bool inlay) {
 ///////////////////////////////////////////////////////////////////
 	double offset = 0.0;
 	
-	//enum CncToolCorretionType { CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 	switch ( commonValues.getCorrectionType() ) {
 		case CncCT_Inner:	offset = -commonValues.toolDiameter/2; break;
 		case CncCT_Outer:	offset = +commonValues.toolDiameter/2; break;
@@ -161,6 +187,6 @@ void PGenPolygon::addPolygon(SvgPathGroup& spg, bool inlay) {
 ///////////////////////////////////////////////////////////////////
 void PGenPolygon::spoolPolygon(SvgPathGroup& spg, const CncPolygonPoints& dataPoints) {
 ///////////////////////////////////////////////////////////////////
-	spg.pGen().add(dataPoints.getAsSvgPathRepresentation(mm, false, ""));
+	spg.pGen().add(dataPoints.getAsSvgPathRepresentation(getInputUnit(), false, ""));
 	spg.add(spg.pGen().get());
 }

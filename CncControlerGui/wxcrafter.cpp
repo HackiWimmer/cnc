@@ -6255,11 +6255,11 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     m_pgParameterMgrArr.Clear();
     m_pgParameterMgrIntArr.Clear();
-    m_pgParameterMgrArr.Add(_("round"));
-    m_pgParameterMgrArr.Add(_("square"));
-    m_pgParameterMgrArr.Add(_("miter"));
-    m_pgPropCorrectionCornerType = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Tool Corection Corners"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
-    m_pgPropCorrectionCornerType->SetHelpString(wxT(""));
+    m_pgParameterMgrArr.Add(_("Round"));
+    m_pgParameterMgrArr.Add(_("Square"));
+    m_pgParameterMgrArr.Add(_("Miter"));
+    m_pgPropCorrectionJointType = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Tool Correction Joint Type"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
+    m_pgPropCorrectionJointType->SetHelpString(wxT(""));
     
     m_pgPropPathColour = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxSystemColourProperty( _("Colour"), wxPG_LABEL, wxColour(wxT("rgb(0,0,0)"))) );
     m_pgPropPathColour->SetHelpString(wxT(""));

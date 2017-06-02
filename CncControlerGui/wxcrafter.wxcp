@@ -61104,7 +61104,7 @@
                           }, {
                            "type": "string",
                            "m_label": "Label:",
-                           "m_value": "Tool Corection Corners"
+                           "m_value": "Tool Correction Joint Type"
                           }, {
                            "type": "multi-string",
                            "m_label": "Tooltip:",

@@ -540,7 +540,7 @@ void PathGeneratorFrame::generatePath() {
 void PathGeneratorFrame::updateCommonValues(const PathGeneratorBase::CommonValues& cv) {
 ///////////////////////////////////////////////////////////////////
 	m_pgPropCorrectionMode->SetValue(cv.toolCorrectionMode);
-	m_pgPropCorrectionCornerType->SetValue(cv.toolCorrectionCorners);
+	m_pgPropCorrectionJointType->SetValue(cv.toolCorrectionCorners);
 	m_pgPropToolDiameter->SetValue(cv.toolDiameter);
 	//((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
 	m_pgPropConfigBlock->SetValue(cv.configBlock);
@@ -551,7 +551,7 @@ void PathGeneratorFrame::evaluateCommonValues(int id) {
 ///////////////////////////////////////////////////////////////////
 	PathGeneratorBase::CommonValues cv;
 	cv.toolCorrectionMode		= m_pgPropCorrectionMode->GetValue().GetInteger();
-	cv.toolCorrectionCorners	= m_pgPropCorrectionCornerType->GetValue().GetInteger();
+	cv.toolCorrectionCorners	= m_pgPropCorrectionJointType->GetValue().GetInteger();
 	cv.toolDiameter 			= m_pgPropToolDiameter->GetValue();
 	cv.pathColour				= ((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
 	cv.configBlock				= m_pgPropConfigBlock->GetValue().GetBool();
@@ -692,7 +692,7 @@ void PathGeneratorFrame::setupProperty(wxPGProperty* property, bool show, wxVari
 void PathGeneratorFrame::setupCommonValues(const PathGeneratorBase::CommonValues& cv) {
 ///////////////////////////////////////////////////////////////////
 	setupProperty(m_pgPropCorrectionMode, cv.canToolCorrection, cv.toolCorrectionMode);
-	setupProperty(m_pgPropCorrectionCornerType, cv.canToolCorrection, cv.toolCorrectionCorners);
+	setupProperty(m_pgPropCorrectionJointType, cv.canJointType, cv.toolCorrectionCorners);
 	setupProperty(m_pgPropToolDiameter, cv.canToolDiameter, cv.toolDiameter);
 	setupProperty(m_pgPropPathColour, cv.canPathColour);
 	

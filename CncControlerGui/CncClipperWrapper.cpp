@@ -173,13 +173,24 @@ const char* CncPolygonPoints::getAsSvgPathRepresentation(SVGUnit inputUnit, bool
 		
 	unsigned int cnt = 0;
 	double pxFactor = SvgUnitCalculator::getFactorMM2Unit(inputUnit);
+	cout << pxFactor<< endl;
 	
 	for (auto it = begin(); it != end(); ++it) {
-		if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
-		                                                           SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->Y)), 
-																   x));
-		else			s.append(wxString::Format(" %.3lf,%.3lf",  SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
-		                                                           SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->Y))));
+		
+		if ( inputUnit == px ) {
+			if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", CncPolygonPoints::convertToDouble(it->X), 
+																	   CncPolygonPoints::convertToDouble(it->Y), 
+																	   x));
+			else			s.append(wxString::Format(" %.3lf,%.3lf",  CncPolygonPoints::convertToDouble(it->X), 
+		                                                               CncPolygonPoints::convertToDouble(it->Y)));
+		} else {
+			if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
+																	   SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->Y)), 
+																	   x));
+			else			s.append(wxString::Format(" %.3lf,%.3lf",  SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
+		                                                               SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->Y))));
+		}
+		
 		cnt++;
 	}
 	
@@ -210,7 +221,10 @@ bool CncPolygons::getPolygonPoints(unsigned int idx, CncPolygonPoints& ret) {
 ///////////////////////////////////////////////////////////////////
 	ret.clear();
 	
-	if ( idx > size() - 1 )
+	if ( size() == 0 )
+		return false;
+	
+	if ( idx > size() -1 )
 		return false;
 		
 	// creates a copy!
