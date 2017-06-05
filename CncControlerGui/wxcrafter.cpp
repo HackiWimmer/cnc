@@ -6055,12 +6055,34 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_splitterPage2940 = new wxPanel(m_splitter2932, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter2932, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_splitter2932->SplitHorizontally(m_splitterPage2936, m_splitterPage2940, 0);
     
-    flexGridSizer2944 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer2944 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer2944->SetFlexibleDirection( wxBOTH );
     flexGridSizer2944->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2944->AddGrowableCol(0);
-    flexGridSizer2944->AddGrowableRow(0);
+    flexGridSizer2944->AddGrowableRow(1);
     m_splitterPage2940->SetSizer(flexGridSizer2944);
+    
+    flexGridSizer3385 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer3385->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3385->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer2944->Add(flexGridSizer3385, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_staticText3389 = new wxStaticText(m_splitterPage2940, wxID_ANY, _("Display mode:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPage2940, wxSize(-1,-1)), 0);
+    wxFont m_staticText3389Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText3389->SetFont(m_staticText3389Font);
+    
+    flexGridSizer3385->Add(m_staticText3389, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_cbDisplayModeArr;
+    m_cbDisplayModeArr.Add(wxT("Preview"));
+    m_cbDisplayModeArr.Add(wxT("Result"));
+    m_cbDisplayMode = new wxComboBox(m_splitterPage2940, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage2940, wxSize(-1,-1)), m_cbDisplayModeArr, wxCB_READONLY);
+    wxFont m_cbDisplayModeFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_cbDisplayMode->SetFont(m_cbDisplayModeFont);
+    m_cbDisplayMode->SetSelection(0);
+    
+    flexGridSizer3385->Add(m_cbDisplayMode, 0, wxALL, WXC_FROM_DIP(1));
     
     m_tbOutput = new wxToolbook(m_splitterPage2940, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage2940, wxSize(-1,-1)), wxTBK_BUTTONBAR|wxBK_LEFT);
     m_tbOutput->SetName(wxT("m_tbOutput"));
@@ -6294,6 +6316,9 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgPropRefCross = m_pgParameterMgr->AppendIn( m_pgCatGrid,  new wxBoolProperty( _("Reference Cross"), wxPG_LABEL, 1) );
     m_pgPropRefCross->SetHelpString(wxT(""));
     
+    m_pgPropGridHelpConstructs = m_pgParameterMgr->AppendIn( m_pgCatGrid,  new wxBoolProperty( _("Help Constructs"), wxPG_LABEL, 1) );
+    m_pgPropGridHelpConstructs->SetHelpString(wxT(""));
+    
     m_pgPropGridDisplay = m_pgParameterMgr->AppendIn( m_pgCatGrid,  new wxBoolProperty( _("Display Grid"), wxPG_LABEL, 1) );
     m_pgPropGridDisplay->SetHelpString(wxT(""));
     
@@ -6413,7 +6438,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_autoGenerate = new wxCheckBox(m_splitterPage3193, wxID_ANY, _("Auto Generate"), wxDefaultPosition, wxDLG_UNIT(m_splitterPage3193, wxSize(-1,-1)), 0);
     m_autoGenerate->SetValue(true);
     m_autoGenerate->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
-    wxFont m_autoGenerateFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    wxFont m_autoGenerateFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_autoGenerate->SetFont(m_autoGenerateFont);
     m_autoGenerate->SetToolTip(_("Regenerate the template automatically if a any parameter was changed"));
     
@@ -6472,6 +6497,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     #if wxUSE_WEBVIEW
     
     #endif // wxUSE_WEBVIEW
+    m_cbDisplayMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(PathGeneratorFrameBase::selectDisplayMode), NULL, this);
     m_btPGGenerate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::generatePath), NULL, this);
     m_btPGClear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::clearView), NULL, this);
     m_btPGReplaceEdit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::relaceEditControlSelection), NULL, this);
@@ -6503,6 +6529,7 @@ PathGeneratorFrameBase::~PathGeneratorFrameBase()
     #if wxUSE_WEBVIEW
     
     #endif // wxUSE_WEBVIEW
+    m_cbDisplayMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(PathGeneratorFrameBase::selectDisplayMode), NULL, this);
     m_btPGGenerate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::generatePath), NULL, this);
     m_btPGClear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::clearView), NULL, this);
     m_btPGReplaceEdit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(PathGeneratorFrameBase::relaceEditControlSelection), NULL, this);

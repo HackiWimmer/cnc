@@ -16,8 +16,6 @@ float CncConfig::getCurveLibResolution() {
 void CncConfig::setCurveLibResolution(double v) { 
 ////////////////////////////////////////////////////////////////////////
 	CncSvgCurveLib::setResolution((float)v); 
-	
-	clog << "setCurveLibResolution " << CncSvgCurveLib::getResolution() << endl,
 	updateCurveLibResolutionSelector();
 }
 ////////////////////////////////////////////////////////////////////////

@@ -188,7 +188,6 @@ const char* CncPolygonPoints::getAsSvgPathRepresentation(SVGUnit inputUnit, bool
 		
 	unsigned int cnt = 0;
 	double pxFactor = SvgUnitCalculator::getFactorMM2Unit(inputUnit);
-	cout << pxFactor<< endl;
 	
 	for (auto it = begin(); it != end(); ++it) {
 		

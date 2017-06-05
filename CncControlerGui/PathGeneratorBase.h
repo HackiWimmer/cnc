@@ -425,7 +425,7 @@ class PathGeneratorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		const wxString& generatePath();
+		const wxString& generatePath(bool helpConstructs=false);
 		const wxString& generatePath(double toolDiameter, const ParameterMap& pMap);
 		
 		///////////////////////////////////////////////////////////////////
@@ -644,7 +644,7 @@ class PathGeneratorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void generatePathIntern(SvgPathGroup& spg);
+		void generatePathIntern(SvgPathGroup& spg, bool helpConstructs=false);
 		
 		///////////////////////////////////////////////////////////////////
 		const wxString& getConfigBlock(wxString& block);
@@ -664,6 +664,14 @@ class PathGeneratorBase {
 		inline double cv(SVGUnit u, double v) {
 			return SvgPathFragment::convertToDouble(u, v);
 		}
+		
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			// overwride this function to display also help contructs
+		}
+		
+		///////////////////////////////////////////////////////////////
+		void addHelpContructPath(SvgPathGroup& spg, const wxString path);
 		
 		///////////////////////////////////////////////////////////////
 		void setInputUnit(SVGUnit u) { inputUnit = u; }

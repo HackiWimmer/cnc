@@ -1732,6 +1732,9 @@ protected:
     wxTextCtrl* m_additionalInfo;
     wxPanel* m_splitterPage2940;
     wxFlexGridSizer* flexGridSizer2944;
+    wxFlexGridSizer* flexGridSizer3385;
+    wxStaticText* m_staticText3389;
+    wxComboBox* m_cbDisplayMode;
     wxToolbook* m_tbOutput;
     wxPanel* m_panelPreview;
     wxFlexGridSizer* flexGridSizer3233;
@@ -1765,6 +1768,7 @@ protected:
     wxPGProperty* m_pgProp01;
     wxPGProperty* m_pgCatGrid;
     wxPGProperty* m_pgPropRefCross;
+    wxPGProperty* m_pgPropGridHelpConstructs;
     wxPGProperty* m_pgPropGridDisplay;
     wxPGProperty* m_pgPropGridSize;
     wxPGProperty* m_pgCatCncBlock;
@@ -1816,6 +1820,7 @@ protected:
     virtual void pgMainBookChanged(wxNotebookEvent& event) { event.Skip(); }
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
+    virtual void selectDisplayMode(wxCommandEvent& event) { event.Skip(); }
     virtual void generatePath(wxCommandEvent& event) { event.Skip(); }
     virtual void clearView(wxCommandEvent& event) { event.Skip(); }
     virtual void relaceEditControlSelection(wxCommandEvent& event) { event.Skip(); }
@@ -1839,6 +1844,8 @@ public:
     wxPanel* GetPgAdditionalInfoPage() { return m_pgAdditionalInfoPage; }
     wxNotebook* GetPgMainBook() { return m_pgMainBook; }
     wxPanel* GetSplitterPage2936() { return m_splitterPage2936; }
+    wxStaticText* GetStaticText3389() { return m_staticText3389; }
+    wxComboBox* GetCbDisplayMode() { return m_cbDisplayMode; }
     wxTextCtrl* GetGeneratedPreview() { return m_generatedPreview; }
     wxPanel* GetPanelPreview() { return m_panelPreview; }
     wxTextCtrl* GetGeneratedResult() { return m_generatedResult; }

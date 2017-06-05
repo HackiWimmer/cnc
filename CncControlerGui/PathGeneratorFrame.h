@@ -93,6 +93,7 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		void generatePath();
 		
 	protected:
+    virtual void selectDisplayMode(wxCommandEvent& event);
 
 		// user events
 		virtual void onShow(wxShowEvent& event);

@@ -5,13 +5,22 @@
 #include "PathGeneratorBase.h"
 
 ///////////////////////////////////////////////////////////////////
-const wxString& PathGeneratorBase::generatePath() {
+void PathGeneratorBase::addHelpContructPath(SvgPathGroup& spg, const wxString path) {
+///////////////////////////////////////////////////////////////////
+	wxString p(path);
+	p.Prepend(wxString::Format("<!-- Help Constructs -->\n <%spath d=\"", SvgGeneratorBase::svgCommentPlaceholderStart));
+	p.Append(wxString::Format("\"\n   style=\"fill:none;stroke:gray;stroke-width:1px;stroke-dasharray:2,1\"/%s>\n", SvgGeneratorBase::svgCommentPlaceholderEnd));
+	
+	spg.add(p);
+}
+///////////////////////////////////////////////////////////////////
+const wxString& PathGeneratorBase::generatePath(bool helpConstructs) {
 ///////////////////////////////////////////////////////////////////
 	static wxString s;
 
 	// determine result
 	SvgPathGroup spg(mm);
-	generatePathIntern(spg);
+	generatePathIntern(spg, helpConstructs);
 	s.assign(spg.get());
 	
 	// config block
@@ -49,11 +58,11 @@ const wxString& PathGeneratorBase::generatePath(double toolDiameter, const Param
 wxXmlNode* PathGeneratorBase::evaluateCncPattern(double toolDiameter, const ParameterMap& pMap) {
 ///////////////////////////////////////////////////////////////////
 	static wxXmlNode* root;
-//todo
+	//todo
 	return root;
 }
 ///////////////////////////////////////////////////////////////////
-void PathGeneratorBase::generatePathIntern(SvgPathGroup& spg) {
+void PathGeneratorBase::generatePathIntern(SvgPathGroup& spg, bool helpConstructs) {
 ///////////////////////////////////////////////////////////////////
 	spg.setIncludeReferenceCross(commonValues.referenceCross);
 	
@@ -68,12 +77,14 @@ void PathGeneratorBase::generatePathIntern(SvgPathGroup& spg) {
 	// generate path 
 	if ( generate(spg, commonValues.toolDiameter) == false )
 		addErrorInfo("PathGenertor::generate() failed");
+		
+	if ( helpConstructs == true )
+		generateHelpConstructs(spg);
 	
 	// transform group
 	transform(spg);
 	
 	if ( commonValues.xmlPattern == true ) {
-		//todo
 		encodeXmlPattern(spg);
 		wxString p(xmlPattern);
 		spg.setXmlPattern(maskXmlPattern(p));

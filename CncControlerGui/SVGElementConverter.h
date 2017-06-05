@@ -7,6 +7,7 @@
 #include <wx/tokenzr.h>
 #include <wx/sstream.h>
 #include <wx/xml/xml.h>
+#include "CncClipperWrapper.h"
 
 typedef std::map<wxString, wxString> SvgNodeAttributeMap;
 
@@ -191,6 +192,20 @@ class SVGElementConverter {
 		} 
 		
 		//////////////////////////////////////////////////////////////////
+		static bool convertPolygonToPathData(const CncPolygonPoints& points, SVGUnit inputUnit, wxString& ret) {
+			wxString dp;
+			for ( auto it=points.begin(); it!=points.end(); ++it ) {
+				wxRealPoint p(CncPolygonPoints::convertToRealPoint(*it));
+				
+				dp.append(wxString::Format("%.3f,%.3f ", 
+				                           SvgUnitCalculator::convertUnit2Unit(inputUnit, px, p.x), 
+				                           SvgUnitCalculator::convertUnit2Unit(inputUnit, px, p.y)));
+			}
+			
+			return convertPolygonToPathData(dp, ret);
+		}
+		
+		//////////////////////////////////////////////////////////////////
 		static bool convertPolygonToPathData(wxString& points, wxString& ret) {
 			wxXmlNode* n = getNewSvgElementNode("polygon");
 			n->AddAttribute("points", points);
@@ -203,24 +218,32 @@ class SVGElementConverter {
 			if ( child == NULL )
 				return false;
 
-			//polygone fill="none" stroke="blue" stroke-width="10" 
-			//	points="10,10
-			//			15,15
-			//			20,10
 			wxString path("M ");
 			wxString points = child->GetAttribute("points", "");
 			SVGElementConverter::evaluatePolyPoints(points, path);
 			path << "z";
 
-			//std::cerr << path.c_str() << std::endl;
 			ret.assign(path);
 			return true;
 		}
 		
 		//////////////////////////////////////////////////////////////////
+		static bool convertPolylineToPathData(const CncPolygonPoints& points, SVGUnit inputUnit, wxString& ret) {
+			wxString dp;
+			for ( auto it=points.begin(); it!=points.end(); ++it ) {
+				wxRealPoint p(CncPolygonPoints::convertToRealPoint(*it));
+				
+				dp.append(wxString::Format("%.3f,%.3f ", 
+				                           SvgUnitCalculator::convertUnit2Unit(inputUnit, px, p.x), 
+				                           SvgUnitCalculator::convertUnit2Unit(inputUnit, px, p.y)));
+			}
+			
+			return convertPolylineToPathData(dp, ret);
+		}
+		//////////////////////////////////////////////////////////////////
 		static bool convertPolylineToPathData(wxString& points, wxString& ret) {
 			wxXmlNode* n = getNewSvgElementNode("polyline");
-			n->AddAttribute("x1", points);
+			n->AddAttribute("points", points);
 		
 			return convertPolylineToPathData(n, ret);
 		}
@@ -230,17 +253,10 @@ class SVGElementConverter {
 			if ( child == NULL )
 				return false;
 
-			//polyline fill="none" stroke="blue" stroke-width="10" 
-			//	points="10,10
-			//			15,15
-			//			20,10
-			//			25,15"
-		 
 			wxString path("M ");
 			wxString points = child->GetAttribute("points", "");
 			SVGElementConverter::evaluatePolyPoints(points, path);
 			
-			//std::cerr << path.c_str() << std::endl;
 			ret.assign(path);
 			return true;
 		}

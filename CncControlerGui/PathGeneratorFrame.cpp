@@ -496,7 +496,8 @@ void PathGeneratorFrame::generatePath() {
 
 		// generate path
 		pathGeneratorStore.resetErrorInfo(id);
-		wxString svgFragment(pathGeneratorStore.generatePath(id));
+		bool helpConstructs = m_pgPropGridHelpConstructs->GetValue().GetBool();
+		wxString svgFragment(pathGeneratorStore.generatePath(id, helpConstructs));
 		
 		// prepare preview and result
 		wxString preview(svgFragment);
@@ -844,7 +845,10 @@ void PathGeneratorFrame::updatePreview() {
 		
 		displayGrid(fs);
 		
-		fs << m_generatedPreview->GetValue() << std::endl;
+		if ( m_cbDisplayMode->GetStringSelection().Upper() == "PREVIEW" )
+			fs << m_generatedPreview->GetValue() << std::endl;
+		else
+			fs << m_generatedResult->GetValue() << std::endl;
 		
 		fs << "</svg>" << std::endl;
 		fs.close();
@@ -988,4 +992,9 @@ void PathGeneratorFrame::pgMainBookChanged(wxNotebookEvent& event) {
 			}
 		}
 	}
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::selectDisplayMode(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	updatePreview();
 }

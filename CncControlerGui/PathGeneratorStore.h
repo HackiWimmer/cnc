@@ -314,13 +314,13 @@ class PathGeneratorStore {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		const wxString& generatePath(unsigned int id) {
+		const wxString& generatePath(unsigned int id, bool helpConstructs = false) {
 			static wxString s;
 			s = "";
 			
 			PathGeneratorBase* pgb = getPathGenerator(id);
 			if ( pgb != NULL )
-				s = pgb->generatePath();
+				s = pgb->generatePath(helpConstructs);
 				
 			return s;
 		}

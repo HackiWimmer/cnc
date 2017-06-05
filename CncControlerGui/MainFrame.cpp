@@ -6577,9 +6577,6 @@ void MainFrame::decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl) {
 	event.Skip(false);
 	ctl->SetSelection(start, end);
 	m_cbUCValueFrom->SetValue(ctl->GetTextRange(start, end));
-	
-	// todo
-	// cout << start << ", " << end << ": " << ctl->GetTextRange(start, end) << " - "<< ctl->GetStyleAt(start) << endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::fileContentDClick(wxMouseEvent& event) {

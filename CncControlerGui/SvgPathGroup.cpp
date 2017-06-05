@@ -95,14 +95,14 @@ void SvgPathGroup::addReferenceCross(wxString& ps) {
 	double x = 0.0; 
 	double y = 0.0; 
 	
-	ps << "<!-- Reference cross -->\n";
+	ps << " <!-- Reference cross -->\n";
 	// horizontal
-	ps << wxString::Format(" <%sline x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"#%02X%02X%02X\" fill=\"none\" stroke-width=\"1\"/%s>\n", 
+	ps << wxString::Format("  <%sline x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"#%02X%02X%02X\" fill=\"none\" stroke-width=\"1\"/%s>\n", 
 						   SvgGeneratorBase::svgCommentPlaceholderStart, 
 						   x - l, y, x + l, y, colour.Red(), colour.Green(), colour.Blue(),
 						   SvgGeneratorBase::svgCommentPlaceholderEnd);
 	// vertical
-	ps << wxString::Format(" <%sline x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"#%02X%02X%02X\" fill=\"none\" stroke-width=\"1\"/%s>", 
+	ps << wxString::Format("  <%sline x1=\"%lf\" y1=\"%lf\" x2=\"%lf\" y2=\"%lf\" stroke=\"#%02X%02X%02X\" fill=\"none\" stroke-width=\"1\"/%s>", 
 						   SvgGeneratorBase::svgCommentPlaceholderStart,
 						   x, y - l, x, y + l, colour.Red(), colour.Green(), colour.Blue(), 
 						   SvgGeneratorBase::svgCommentPlaceholderEnd);

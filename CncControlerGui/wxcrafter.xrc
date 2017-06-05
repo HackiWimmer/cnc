@@ -9420,11 +9420,63 @@ Axis</label>
                                 <style>wxTAB_TRAVERSAL</style>
                                 <object class="wxFlexGridSizer">
                                   <cols>1</cols>
-                                  <rows>1</rows>
+                                  <rows>2</rows>
                                   <vgap>0</vgap>
                                   <hgap>0</hgap>
                                   <growablecols>0</growablecols>
-                                  <growablerows>0</growablerows>
+                                  <growablerows>1</growablerows>
+                                  <object class="sizeritem" name="flexGridSizer3385">
+                                    <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                                    <option>1</option>
+                                    <object class="wxFlexGridSizer">
+                                      <cols>2</cols>
+                                      <rows>0</rows>
+                                      <vgap>0</vgap>
+                                      <hgap>0</hgap>
+                                      <growablecols/>
+                                      <growablerows/>
+                                      <object class="sizeritem">
+                                        <flag>wxALL</flag>
+                                        <border>5</border>
+                                        <object class="wxStaticText" name="m_staticText3389">
+                                          <label>Display mode:</label>
+                                          <style/>
+                                          <font>
+                                            <size>7</size>
+                                            <style>normal</style>
+                                            <weight>bold</weight>
+                                            <family>swiss</family>
+                                            <underlined>0</underlined>
+                                            <face>Segoe UI</face>
+                                          </font>
+                                        </object>
+                                      </object>
+                                      <object class="sizeritem">
+                                        <flag>wxALL</flag>
+                                        <border>1</border>
+                                        <object class="wxComboBox" name="m_cbDisplayMode">
+                                          <style>wxCB_READONLY</style>
+                                          <font>
+                                            <size>7</size>
+                                            <style>normal</style>
+                                            <weight>bold</weight>
+                                            <family>swiss</family>
+                                            <underlined>0</underlined>
+                                            <face>Segoe UI</face>
+                                          </font>
+                                          <selection>0</selection>
+                                          <content>
+                                            <item>
+                                              <![CDATA[Preview]]>
+                                            </item>
+                                            <item>
+                                              <![CDATA[Result]]>
+                                            </item>
+                                          </content>
+                                        </object>
+                                      </object>
+                                    </object>
+                                  </object>
                                   <object class="sizeritem">
                                     <flag>wxALL|wxEXPAND</flag>
                                     <border>1</border>
@@ -9697,7 +9749,7 @@ Axis</label>
                             <object class="wxCheckBox" name="m_autoGenerate">
                               <fg>#004080</fg>
                               <font>
-                                <size>8</size>
+                                <size>7</size>
                                 <style>normal</style>
                                 <weight>bold</weight>
                                 <family>swiss</family>

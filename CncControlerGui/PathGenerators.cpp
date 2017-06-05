@@ -56,10 +56,11 @@ const wxRealPoint& PGenPolygon::getPolygonDataPoint(unsigned index) {
 	
 	return CncPolygonPoints::convertToRealPoint(polygonData.at(index));
 }
+
 ///////////////////////////////////////////////////////////////////
-int PGenPolygon::fillPolygonData(const wxString& data) {
+int PGenPolygon::fillPolygonData(CncPolygonPoints& toFill, const wxString& data) {
 ///////////////////////////////////////////////////////////////////
-	polygonData.clear();
+	toFill.clear();
 	
 	wxString d(data);
 	d.Replace("\\n", ";", true);
@@ -77,11 +78,16 @@ int PGenPolygon::fillPolygonData(const wxString& data) {
 			wxRealPoint p;
 			xv.ToDouble(&p.x);
 			yv.ToDouble(&p.y);
-			polygonData.append(p);
+			toFill.append(p);
 		}
 	}
 	
-	return polygonData.size();
+	return toFill.size();
+}
+///////////////////////////////////////////////////////////////////
+int PGenPolygon::fillPolygonData(const wxString& data) {
+///////////////////////////////////////////////////////////////////
+	return fillPolygonData(polygonData, data);
 }
 ///////////////////////////////////////////////////////////////////
 const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp) {

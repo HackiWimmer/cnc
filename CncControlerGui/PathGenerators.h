@@ -151,6 +151,7 @@ class PGenPolygon : public PathGeneratorBase {
 		const wxRealPoint& getLastPolygonDataPoint() { return getPolygonDataPoint(polygonData.size() - 1); }
 		
 		void clearPolygonData() { polygonData.clear(); }
+		int fillPolygonData(CncPolygonPoints& toFill, const wxString& data);
 		int fillPolygonData(const wxString& data);
 		void addPolygon(SvgPathGroup& spg, bool inlay=false);
 		void addPolyLine(SvgPathGroup& spg);
@@ -164,6 +165,14 @@ class PGenFreehandPolygon : public PGenPolygon {
 		unsigned int IDX_DATA;
 		unsigned int IDX_INLAY;
 		unsigned int IDX_REFPOINT;
+		CncPolygonPoints origPolygonData;
+		
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			wxString path;
+			SVGElementConverter::convertPolygonToPathData(origPolygonData, mm, path);
+			addHelpContructPath(spg, path);
+		}
 		
 	public:
 	
@@ -184,7 +193,7 @@ class PGenFreehandPolygon : public PGenPolygon {
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupString("Data [mm]", "10.0,10.0\\n10.0,100.0\\n55.0,55.0", true);
-			IDX_DATA= setupParameter(pi);
+			IDX_DATA = setupParameter(pi);
 
 			IDX_INLAY = setupInlayMode(pi, "Path;Whole", 0);
 			IDX_REFPOINT = setupTLReferencePoint(pi);
@@ -200,13 +209,14 @@ class PGenFreehandPolygon : public PGenPolygon {
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
 			clearPolygonData();
 			
-			fillPolygonData(getParameterStringValue(0));
+			fillPolygonData(getParameterStringValue(IDX_DATA));
 			if ( getDataPointCount() < 3 ) {
 				addErrorInfo(wxString::Format("generate(): Not enough data points available: Current count: %d", getDataPointCount()));
 				return false;
 			}
 			
 			centerPolygon();
+			origPolygonData = polygonData;
 			addPolygon(spg, (getParameterEnumValue(IDX_INLAY) == 1));
 
 			setTranslateX(abs(getMinPosition().x) + 5.0);
@@ -222,6 +232,26 @@ class PGenRegularRadiusPolygon : public PGenPolygon {
 		unsigned int IDX_RADIUS;
 		unsigned int IDX_INLAY;
 		unsigned int IDX_REFPOINT;
+		
+	protected:
+	
+		///////////////////////////////////////////////////////////////
+		virtual double getRadius() {
+			return getParameterNumValue(IDX_RADIUS);
+		}
+		
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			double radius = getRadius();
+			
+			wxString path;
+			SVGElementConverter::convertCircleToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x), 
+			                                             SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
+			                                             SvgUnitCalculator::convertMM2ReferenceUnit(radius), 
+			                                             path);
+			
+			addHelpContructPath(spg, path);
+		}
 	
 	public:
 		///////////////////////////////////////////////////////////////////
@@ -311,6 +341,18 @@ class PGenRegularDiameterPolygon : public PGenRegularRadiusPolygon {
 		unsigned int IDX_INLAY;
 		unsigned int IDX_REFPOINT;
 		
+	protected:
+	
+		///////////////////////////////////////////////////////////////
+		virtual double getRadius() {
+			double diameter = getParameterNumValue(IDX_DIAMETER);
+			int sections 	= getParameterNumValue(IDX_SECTIONS);
+			double alpha  	= 360.0 / sections / 2;
+			double b      	= tan(alpha*PI/180) * diameter / 2;
+			
+			return sqrt(pow(diameter/2, 2) + pow(b, 2));
+		}
+		
 	public:
 		///////////////////////////////////////////////////////////////////
 		PGenRegularDiameterPolygon() 
@@ -347,12 +389,8 @@ class PGenRegularDiameterPolygon : public PGenRegularRadiusPolygon {
 			clearPolygonData();
 			
 			int sections 	= getParameterNumValue(IDX_SECTIONS);
-			double diameter = getParameterNumValue(IDX_DIAMETER);
-			
 			double steps  	= 360.0 / sections;
-			double alpha  	= 360.0 / sections / 2;
-			double b      	= tan(alpha*PI/180) * diameter / 2;
-			double radius 	= sqrt(pow(diameter/2, 2) + pow(b, 2));
+			double radius   = getRadius();
 		
 			for (double i=0; i<360; i+=steps ) {
 				double x = cos(i*PI/180) * radius;
@@ -426,6 +464,20 @@ class PGenEllipticalArcPolygon : public PGenSvgElementPolygon {
 		unsigned int IDX_REFPOINT;
 		unsigned int IDX_INLAY;
 		
+	protected:
+		
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			wxString path;
+			SVGElementConverter::convertEllipseToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_RADIUS_X)), 
+														  SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_RADIUS_Y)), 
+			                                              path);
+			
+			addHelpContructPath(spg, path);
+		}
+		
 	public:
 		///////////////////////////////////////////////////////////////////
 		PGenEllipticalArcPolygon() 
@@ -492,6 +544,30 @@ class PGenRectanglePolygon : public PGenSvgElementPolygon {
 		unsigned int IDX_CORNER_STYLE;
 		unsigned int IDX_REFPOINT;
 		unsigned int IDX_INLAY;
+		
+	protected:
+		
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			wxString path;
+			
+			// square corners
+			double rx = 0.0, ry = 0.0;
+			if ( getParameterEnumValue(IDX_CORNER_STYLE) == 0 ) {
+				//round corners
+				rx = ry = commonValues.toolDiameter/2;
+			}
+			
+			SVGElementConverter::convertRectToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x), 
+			                                           SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
+			                                           SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_WIDTH)), 
+			                                           SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_HEIGHT)), 
+			                                           rx,
+			                                           ry,
+			                                           path);
+			
+			addHelpContructPath(spg, path);
+		}
 		
 	public:
 		///////////////////////////////////////////////////////////////////
@@ -657,7 +733,17 @@ class PGenSimpleLine : public PGenPolygon {
 		unsigned int IDX_X2;
 		unsigned int IDX_Y2;
 		unsigned int IDX_REFPOINT;
+		CncPolygonPoints origPolygonData;
 	
+	protected:
+	
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			wxString path;
+			SVGElementConverter::convertPolylineToPathData(origPolygonData, mm, path);
+			addHelpContructPath(spg, path);
+		}
+		
 	public:
 		///////////////////////////////////////////////////////////////////
 		PGenSimpleLine() 
@@ -711,6 +797,8 @@ class PGenSimpleLine : public PGenPolygon {
 			
 			polygonData.append(getParameterNumValue(IDX_X1), getParameterNumValue(IDX_Y1));
 			polygonData.append(getParameterNumValue(IDX_X2), getParameterNumValue(IDX_Y2));
+			origPolygonData = polygonData;
+			
 			addPolyLine(spg);
 			
 			setTranslateX(abs(getMinPosition().x) + 5.0);
@@ -725,6 +813,16 @@ class PGenFreehandPolyline : public PGenPolygon {
 	private:
 		unsigned int IDX_DATA;
 		unsigned int IDX_REFPOINT;
+		CncPolygonPoints origPolygonData;
+		
+	protected:
+	
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			wxString path;
+			SVGElementConverter::convertPolylineToPathData(origPolygonData, mm, path);
+			addHelpContructPath(spg, path);
+		}
 		
 	public:
 	
@@ -761,7 +859,8 @@ class PGenFreehandPolyline : public PGenPolygon {
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
 			clearPolygonData();
 			
-			fillPolygonData(getParameterStringValue(0));
+			fillPolygonData(getParameterStringValue(IDX_DATA));
+			origPolygonData = polygonData;
 			addPolyLine(spg);
 
 			setTranslateX(abs(getMinPosition().x) + 5.0);
