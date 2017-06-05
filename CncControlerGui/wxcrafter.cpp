@@ -3850,7 +3850,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizerOutPanel->Add(m_staticText16032, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     wxArrayString m_cbCurveLibResolutionArr;
-    m_cbCurveLibResolutionArr.Add(wxT("<AUTOMATIC>"));
     m_cbCurveLibResolutionArr.Add(wxT("0.001"));
     m_cbCurveLibResolutionArr.Add(wxT("0.002"));
     m_cbCurveLibResolutionArr.Add(wxT("0.003"));
@@ -3869,14 +3868,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cbCurveLibResolutionArr.Add(wxT("0.080"));
     m_cbCurveLibResolutionArr.Add(wxT("0.090"));
     m_cbCurveLibResolutionArr.Add(wxT("0.100"));
-    m_cbCurveLibResolutionArr.Add(wxT("0.200"));
-    m_cbCurveLibResolutionArr.Add(wxT("0.300"));
-    m_cbCurveLibResolutionArr.Add(wxT("0.400"));
-    m_cbCurveLibResolutionArr.Add(wxT("0.500"));
-    m_cbCurveLibResolutionArr.Add(wxT("0.600"));
-    m_cbCurveLibResolutionArr.Add(wxT("0.700"));
-    m_cbCurveLibResolutionArr.Add(wxT("0.900"));
-    m_cbCurveLibResolutionArr.Add(wxT("1.000"));
     m_cbCurveLibResolution = new wxComboBox(m_outPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(100,-1)), m_cbCurveLibResolutionArr, wxCB_READONLY);
     
     flexGridSizerOutPanel->Add(m_cbCurveLibResolution, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
@@ -6260,6 +6251,29 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgParameterMgrArr.Add(_("Miter"));
     m_pgPropCorrectionJointType = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Tool Correction Joint Type"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
     m_pgPropCorrectionJointType->SetHelpString(wxT(""));
+    
+    m_pgParameterMgrArr.Clear();
+    m_pgParameterMgrIntArr.Clear();
+    m_pgParameterMgrArr.Add(_("0.001"));
+    m_pgParameterMgrArr.Add(_("0.002"));
+    m_pgParameterMgrArr.Add(_("0.003"));
+    m_pgParameterMgrArr.Add(_("0.004"));
+    m_pgParameterMgrArr.Add(_("0.005"));
+    m_pgParameterMgrArr.Add(_("0.006"));
+    m_pgParameterMgrArr.Add(_("0.007"));
+    m_pgParameterMgrArr.Add(_("0.008"));
+    m_pgParameterMgrArr.Add(_("0.009"));
+    m_pgParameterMgrArr.Add(_("0.010"));
+    m_pgParameterMgrArr.Add(_("0.020"));
+    m_pgParameterMgrArr.Add(_("0.030"));
+    m_pgParameterMgrArr.Add(_("0.050"));
+    m_pgParameterMgrArr.Add(_("0.060"));
+    m_pgParameterMgrArr.Add(_("0.070"));
+    m_pgParameterMgrArr.Add(_("0.080"));
+    m_pgParameterMgrArr.Add(_("0.090"));
+    m_pgParameterMgrArr.Add(_("0.100"));
+    m_pgPropCLResolution = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxEnumProperty( _("Curve Lib Resolution"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
+    m_pgPropCLResolution->SetHelpString(wxT(""));
     
     m_pgPropPathColour = m_pgParameterMgr->AppendIn( m_pgCatCommon,  new wxSystemColourProperty( _("Colour"), wxPG_LABEL, wxColour(wxT("rgb(0,0,0)"))) );
     m_pgPropPathColour->SetHelpString(wxT(""));

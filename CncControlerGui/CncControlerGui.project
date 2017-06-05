@@ -136,6 +136,7 @@
       <File Name="CncPathListManager.cpp"/>
       <File Name="CncClipperWrapper.h"/>
       <File Name="CncClipperWrapper.cpp"/>
+      <File Name="CncConfig.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>

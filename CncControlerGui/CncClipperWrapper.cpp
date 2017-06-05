@@ -6,6 +6,13 @@ const unsigned int CncPolygonPoints::doubleToIntFactor = 1000;
 IntPoint CncPolygonPoints::glbTempIntPointRetVal;
 wxRealPoint CncPolygonPoints::gblTmpRealPointRetVal;
 
+
+inline cInt Round(double val)
+{
+  if ((val < 0)) return static_cast<cInt>(val - 0.5); 
+  else return static_cast<cInt>(val + 0.5);
+}
+
 ///////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////
@@ -120,6 +127,14 @@ void CncPolygonPoints::append(const ClipperLib::Path& p) {
 	
 	if ( *p.begin() != *(p.end() - 1) )
 		append(*p.begin());
+}
+///////////////////////////////////////////////////////////////////
+bool CncPolygonPoints::remove(iterator position) {
+///////////////////////////////////////////////////////////////////
+	iterator ret = erase(position);
+	evaluateAdditionalValues();
+	
+	return (ret != end());
 }
 ///////////////////////////////////////////////////////////////////
 bool CncPolygonPoints::isPolygonClosed() {
@@ -245,6 +260,119 @@ CncClipperWrapper::CncClipperWrapper() {
 CncClipperWrapper::~CncClipperWrapper() {
 ///////////////////////////////////////////////////////////////////
 	
+}
+///////////////////////////////////////////////////////////////////
+double CncClipperWrapper::correctEndPoint(IntPoint& p1, const IntPoint& p2, double offset) {
+///////////////////////////////////////////////////////////////////
+	if ( p1 == p2 )
+		return 0.0;
+		
+	cInt dx = p2.X - p1.X;
+	cInt dy = p2.Y - p1.Y;
+	
+	double length = sqrt(pow(dx, 2) + pow(dy, 2));
+
+	if ( length < abs(offset * CncPolygonPoints::doubleToIntFactor) ) {
+		return length;
+	}
+	
+	// determine direction
+	int mx = dx >= 0 ? +1 : -1;
+	int my = dy >= 0 ? +1 : -1; 
+	
+	// special case: pure vertical correction
+	if ( p1.X == p2.X ) {
+		p1.Y -= (offset * CncPolygonPoints::doubleToIntFactor * my);
+		
+	// spcial case: pure horizontal correction
+	} else if ( p1.Y == p2.Y ) {
+		p1.X -= (offset * CncPolygonPoints::doubleToIntFactor * mx);
+		
+	// xy corrction
+	} else {
+		wxASSERT(dy != 0);
+		double m = Round((1.0 * dx)/dy);
+		p1.X -= (Round(sin(m)) * offset * mx * CncPolygonPoints::doubleToIntFactor);
+		p1.Y -= (Round(cos(m)) * offset * my * CncPolygonPoints::doubleToIntFactor);
+	}
+	
+	return offset;
+}
+///////////////////////////////////////////////////////////////////
+bool CncClipperWrapper::correctEndPoints(CncPolygonPoints& in, double offset) {
+///////////////////////////////////////////////////////////////////
+	// nothing to do
+	if ( cnc::dblCompareNull(offset) == true )
+		return true;
+		
+	bool ret            = false;
+	bool beginCorrected = false;
+	bool endCorrected   = false;
+	
+	double beginOffset  = offset;
+	double endOffset    = offset;
+	
+	unsigned int cnt    = 0;
+	
+	// on demand over several points
+	do {
+		cnt++;
+		
+		// check durations - safty
+		if ( cnt > 1000 ) {
+			std::cerr << "CncClipperWrapper::correctEndPoints: Too mutch durations: " << cnt << endl;
+			ret = false;
+			break;
+		}
+		
+		// check CncPolygonPoints size - safty
+		if ( in.size() < 2 ) {
+			std::cerr << "CncClipperWrapper::correctEndPoints: Invalid size: " << in.size() << ". Duration: " << cnt << endl;
+			ret = false;
+			break;
+		}
+		
+		// evaluate the tow first points at the begin 
+		IntPoint p1 = *(in.begin());
+		IntPoint p2 = *(in.begin() + 1);
+		
+		// correct the begin position
+		if ( beginCorrected == false ) {
+			beginOffset = correctEndPoint(p1, p2, beginOffset);
+			
+			if ( cnc::dblCompare(beginOffset, offset) == true) {
+				*(in.begin()) = p1;
+				beginCorrected = true;
+			} else {
+				in.remove(in.begin());
+			}
+		}
+		
+		// evaluate the two last points at the end
+		IntPoint p3 = *(in.end() - 1);
+		IntPoint p4 = *(in.end() - 2);
+		
+		// correct the end position
+		if ( endCorrected == false ) {
+			endOffset = correctEndPoint(p3, p4, endOffset);
+			
+			if ( cnc::dblCompare(endOffset, offset) == true) {
+				*(in.end() -1) = p3;
+				endCorrected = true;
+			} else {
+				in.remove(in.end() -1);
+			}
+		}
+		
+		// successful end/break
+		if ( beginCorrected == true && endCorrected == true ) {
+			ret = true;
+			break;
+		}
+		
+	} while ( true );
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncClipperWrapper::offsetPath(const CncPolygonPoints& in, CncPolygons& out, double offset, 

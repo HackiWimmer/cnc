@@ -94,14 +94,10 @@ const wxString& SvgPathFragment::addLine(double td, double x1, double y1, double
 ////////////////////////////////////////////////////////////////////////////
 const wxString& SvgPathFragment::addRect(double td, double width, double height, double rx, double ry, bool correctRadius) {
 ////////////////////////////////////////////////////////////////////////////
-
-	//todo add error check
-	//todo add inner pathes
-
 	double w = width  - ( correctRadius == true ? td : 0.0 );
 	double h = height - ( correctRadius == true ? td : 0.0 );
-	double x = referencePoint.x + ( correctRadius == true ? td/2 : 0.0 );
-	double y = referencePoint.y + ( correctRadius == true ? td/2 : 0.0 );
+	double x = 0.0;
+	double y = 0.0;
 	
 	static wxString s;
 	s.assign(wxString::Format("<rect x=\"%lf\" y=\"%lf\" width=\"%lf\" height=\"%lf\" rx=\"%lf\" ry=\"%lf\" %s\n />\n", 
@@ -125,23 +121,4 @@ const wxString& SvgPathFragment::addRoundRect(double td, double width, double he
 ////////////////////////////////////////////////////////////////////////////
 	return addRect(td, width, height, td/2, td/2, correctRadius);;
 }
-////////////////////////////////////////////////////////////////////////////
-const wxString& SvgPathFragment::addPolygon(const CncPolygonPoints& pd) {
-////////////////////////////////////////////////////////////////////////////
-	static wxString s;
-	wxString points;
-	/*
-	
-	for (auto it = pd.begin(); it != pd.end(); ++it) {
-		if ( cnc::dblCompareNull(it->getTransformedPoint().x) && cnc::dblCompareNull(it->getTransformedPoint().y) )
-			continue;
-			
-		points.append(wxString::Format(" %.3lf,%.3lf", SvgPathFragment::convertToDouble(mm, it->getTransformedPoint().x), 
-		                                               SvgPathFragment::convertToDouble(mm, it->getTransformedPoint().y)));
-	}
-	
-	s.assign(wxString::Format("<polygon points=\"%s\" %s/>\n", points, getDefaultSvgElementEnd()));
-	 * 
-	*/
-	return s;
-}
+

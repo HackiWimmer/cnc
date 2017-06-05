@@ -120,219 +120,6 @@ class PGenTest : public PathGeneratorBase {
 };
 
 ///////////////////////////////////////////////////////////////////////////
-class PGenPoint : public PathGeneratorBase {
-	
-	public:
-		///////////////////////////////////////////////////////////////////
-		PGenPoint() : PathGeneratorBase() {}
-		virtual ~PGenPoint() {}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual void initParameters()  {
-			name = "Point";
-			
-			commonValues.canToolCorrection 	= false;
-			commonValues.canToolDiameter	= false;
-			
-			cncParameterValues.canCorrect	= false;
-			cncParameterValues.canReverse	= false;
-			
-			PathGeneratorBase::ParameterInfo pi;
-			pi.setupNum("Point X [mm]", 20.0, 1.0, 400.0, 3);
-			pi.help = "Determine X coordinate.";
-			setupParameter(pi); 		// id = 0
-
-			pi.setupNum("Point Y [mm]", 20.0, 1.0, 400.0, 3);
-			pi.help = "Determine Y coordinate.";
-			setupParameter(pi); 		// id = 1
-			
-			setupCCReferencePoint(pi); 	// id = 2
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool setReferencePoint(SvgPathGroup& spg) {
-			determineReferencePoint(spg, 0.0, 0.0);
-			return true;
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
-			spg.add(spg.fGen().addPoint(getParameterNumValue(0), getParameterNumValue(1)));
-			
-			setTranslateX(getParameterNumValue(0) + 5.0);
-			setTranslateY(getParameterNumValue(1) + 5.0);
-			
-			return spg.isOK();
-		}
-};
-
-///////////////////////////////////////////////////////////////////////////
-class PGenLine : public PathGeneratorBase {
-	
-	public:
-		///////////////////////////////////////////////////////////////////
-		PGenLine() : PathGeneratorBase() {}
-		virtual ~PGenLine() {}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual void initParameters()  {
-			name = "Line";
-			
-			cncParameterValues.canCorrect	= false;
-			
-			PathGeneratorBase::ParameterInfo pi;
-			pi.setupNum("X1 [mm]", 0.0, 1.0, 400.0, 3);
-			pi.help = "Determine X1 coordinate.";
-			setupParameter(pi); // id = 0
-
-			pi.setupNum("Y1 [mm]", 0.0, 1.0, 400.0, 3);
-			pi.help = "Determine Y1 coordinate.";
-			setupParameter(pi); // id = 1
-			
-			pi.setupNum("X2 [mm]", 40.0, 1.0, 400.0, 3);
-			pi.help = "Determine X2 coordinate.";
-			setupParameter(pi); // id = 2
-
-			pi.setupNum("Y2 [mm]", 40.0, 1.0, 400.0, 3);
-			pi.help = "Determine Y2 coordinate.";
-			setupParameter(pi); // id = 3
-			
-			//todo add ref point
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool setReferencePoint(SvgPathGroup& spg) {
-			determineReferencePoint(spg, 0.0, 0.0);
-			return true;
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
-			spg.add(spg.fGen().addLine(toolDiameter, getParameterNumValue(0), getParameterNumValue(1), 
-			                                         getParameterNumValue(2), getParameterNumValue(3),
-													 commonValues.toolCorrection));
-			
-			setTranslateX(getParameterNumValue(0) + 5.0);
-			setTranslateY(getParameterNumValue(1) + 5.0);
-			
-			return spg.isOK();
-		}
-};
-
-///////////////////////////////////////////////////////////////////////////
-class PGenLongWhole : public PathGeneratorBase {
-	
-	public:
-		///////////////////////////////////////////////////////////////////
-		PGenLongWhole() : PathGeneratorBase() {}
-		virtual ~PGenLongWhole() {}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual void initParameters() {
-			name = "Long Whole";
-			
-			cncParameterValues.canCorrect	= false;
-			
-			PathGeneratorBase::ParameterInfo pi;
-			pi.setupNum("Width [mm]", 40.0, 1.0, 400.0, 3);
-			pi.help = "Determine long whole width (x axis).";
-			setupParameter(pi); // id = 0
-			
-			pi.setupNum("Height [mm]", 10.0, 1.0, 400.0, 3);
-			pi.help = "Determine long whole height (y axis).";
-			setupParameter(pi); // id = 1
-			
-			pi.setupEnum("Corners Style", "round;square", 0);
-			pi.help = "Determine corner style.";
-			setupParameter(pi); // id = 2
-			
-			setupReferencePoint(pi, "center/center;left/center;left/top;left/bottom", 1); // id = 3
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool setReferencePoint(SvgPathGroup& spg) {
-			switch ( getParameterEnumValue(3) ) {
-				// center/center
-				case 0: 	determineReferencePoint(spg, -getParameterNumValue(0)/2, -getParameterNumValue(1)/2);
-							break;
-				// left/center
-				case 1: 	determineReferencePoint(spg, 0.0, -getParameterNumValue(1)/2);
-							break;
-				// left/top
-				case 2:		determineReferencePoint(spg, 0.0, 0.0);
-							break;
-				// left bootom
-				case 3:		determineReferencePoint(spg, 0.0, -getParameterNumValue(1));
-							break;
-							
-				default:	addErrorInfo(wxString::Format("setReferencePoint: invalid enum: %d", getParameterEnumValue(3)));
-							return false;
-			}
-			
-			return true;
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
-			
-			if ( getParameterEnumValue(2) == 0 )
-				spg.add(spg.fGen().addRoundRect(toolDiameter, getParameterNumValue(0), getParameterNumValue(1), commonValues.toolCorrection));
-			else 
-				spg.add(spg.fGen().addSquareRect(toolDiameter, getParameterNumValue(0), getParameterNumValue(1), commonValues.toolCorrection));
-
-			setTranslateX(getParameterNumValue(0) + 5.0);
-			setTranslateY(getParameterNumValue(1) + 5.0);
-
-			return spg.isOK();
-		}
-};
-
-///////////////////////////////////////////////////////////////////////////
-class PGenRoundPoketWhole : public PathGeneratorBase {
-	
-	public:
-		///////////////////////////////////////////////////////////////////
-		PGenRoundPoketWhole() : PathGeneratorBase() {}
-		virtual ~PGenRoundPoketWhole() {}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual void initParameters() {
-			name = "Poket Whole - Elliptical";
-			
-			cncParameterValues.canCorrect	= false;
-			
-			PathGeneratorBase::ParameterInfo pi;
-			pi.setupNum("Radius X [mm]", 40.0, 1.0, 400.0, 3);
-			pi.help = "Determine the x radius parameter of the elliptical arg.";
-			setupParameter(pi); 		// id = 0
-			
-			pi.setupNum("Radius Y [mm]", 40.0, 1.0, 400.0, 3);
-			pi.help = "Determine the y radius parameter of the elliptical arg.";
-			setupParameter(pi); 		// id = 1
-			
-			setupCCReferencePoint(pi);	// id = 2
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool setReferencePoint(SvgPathGroup& spg) {
-			determineReferencePoint(spg, 0.0, 0.0);
-			return true;
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
-			
-			spg.pGen().addPocketWhole(toolDiameter, getParameterNumValue(0), getParameterNumValue(1), commonValues.toolCorrection);
-			spg.add(spg.pGen().get());
-			
-			setTranslateX(getParameterNumValue(0) + 5.0);
-			setTranslateY(getParameterNumValue(1) + 5.0);
-
-			return spg.isOK();
-		}
-};
-
-///////////////////////////////////////////////////////////////////////////
 class PGenPolygon : public PathGeneratorBase {
 	
 	protected:
@@ -609,6 +396,8 @@ class PGenSvgElementPolygon : public PGenPolygon {
 			clearPolygonData();
 			
 			SVGPathAssistant pa;
+			pa.setCurveLibResolution(commonValues.curveLibResolution);
+			
 			if ( pa.processSvgNode(getElementAsSvgPath()) == false ) {
 				addErrorInfo("processSvgNode failed");
 				return false;
@@ -737,12 +526,29 @@ class PGenRectanglePolygon : public PGenSvgElementPolygon {
 			IDX_CORNER_STYLE = setupParameter(pi);
 			
 			IDX_INLAY = setupInlayMode(pi, "Path;Whole", 0);
-			IDX_REFPOINT = setupCCReferencePoint(pi);
+			IDX_REFPOINT = setupReferencePoint(pi, "center/center;left/center;left/top;left/bottom", 1);
 		}
 		
 		///////////////////////////////////////////////////////////////////
 		virtual bool setReferencePoint(SvgPathGroup& spg) {
-			determineReferencePoint(spg, 0.0, 0.0);
+			switch ( getParameterEnumValue(IDX_REFPOINT) ) {
+				// center/center
+				case 0: 	determineReferencePoint(spg, -getParameterNumValue(IDX_WIDTH)/2, -getParameterNumValue(IDX_HEIGHT)/2);
+							break;
+				// left/center
+				case 1: 	determineReferencePoint(spg, 0.0, -getParameterNumValue(IDX_HEIGHT)/2);
+							break;
+				// left/top
+				case 2:		determineReferencePoint(spg, 0.0, 0.0);
+							break;
+				// left bootom
+				case 3:		determineReferencePoint(spg, 0.0, -getParameterNumValue(IDX_HEIGHT));
+							break;
+							
+				default:	addErrorInfo(wxString::Format("setReferencePoint: invalid enum: %d", getParameterEnumValue(IDX_REFPOINT)));
+							return false;
+			}
+			
 			return true;
 		}
 		
@@ -756,14 +562,22 @@ class PGenRectanglePolygon : public PGenSvgElementPolygon {
 			static wxString rect;
 			rect.clear();
 			
-			// square
+			// square corners
 			double rx = 0.0, ry = 0.0;
 			if ( getParameterEnumValue(IDX_CORNER_STYLE) == 0 ) {
-				//round
+				//round corners
 				rx = ry = commonValues.toolDiameter/2;
 			}
 			
-			SVGElementConverter::convertRectToPathData(0.0, 0.0, 
+			// ref point
+			double x = 0.0, y = 0.0;
+			if ( isReferencePointDefined() ) {
+				x = getReferencePoint().x;
+				y = getReferencePoint().y;
+			}
+			
+			SVGElementConverter::convertRectToPathData(x, 
+			                                           y, 
 			                                           getParameterNumValue(IDX_WIDTH), 
 			                                           getParameterNumValue(IDX_HEIGHT), 
 			                                           rx,
@@ -798,17 +612,16 @@ class PGenSimplePoint : public PGenPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Simple Point";
-			treePath 	= "Polyline";
-			
+
 			commonValues.canJointType = false;
 			
 			PathGeneratorBase::ParameterInfo pi;
 			
-			pi.setupNum("X [mm]", 20.0, 1.0, 500.0, 3);
+			pi.setupNum("X [mm]", 10.0, 0.0, 500.0, 3);
 			pi.help = "Position X";
 			IDX_X = setupParameter(pi); 
 			
-			pi.setupNum("Y [mm]", 30.0, 1.0, 500.0, 3);
+			pi.setupNum("Y [mm]", 15.0, 0.0, 500.0, 3);
 			pi.help = "Position Y";
 			IDX_Y = setupParameter(pi); 
 			
@@ -867,23 +680,23 @@ class PGenSimpleLine : public PGenPolygon {
 			
 			PathGeneratorBase::ParameterInfo pi;
 			
-			pi.setupNum("X1 [mm]", 10.0, 1.0, 500.0, 3);
+			pi.setupNum("X1 [mm]", 0.0, 0.0, 500.0, 3);
 			pi.help = "Start position X";
 			IDX_X1 = setupParameter(pi); 
 			
-			pi.setupNum("Y1 [mm]", 20.0, 1.0, 500.0, 3);
+			pi.setupNum("Y1 [mm]", 0.0, 0.0, 500.0, 3);
 			pi.help = "Start position Y";
 			IDX_Y1 = setupParameter(pi); 
 
-			pi.setupNum("X2 [mm]", 60.0, 1.0, 500.0, 3);
+			pi.setupNum("X2 [mm]", 60.0, 0.0, 500.0, 3);
 			pi.help = "End position X";
 			IDX_X2 = setupParameter(pi); 
 			
-			pi.setupNum("Y2 [mm]", 70.0, 1.0, 500.0, 3);
+			pi.setupNum("Y2 [mm]", 70.0, 0.0, 500.0, 3);
 			pi.help = "End position Y";
 			IDX_Y2 = setupParameter(pi); 
 			
-			IDX_REFPOINT = setupCCReferencePoint(pi);
+			IDX_REFPOINT = setupReferencePoint(pi,"start");
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -932,10 +745,10 @@ class PGenFreehandPolyline : public PGenPolygon {
 			commonValues.canJointType = false;
 			
 			PathGeneratorBase::ParameterInfo pi;
-			pi.setupString("Data [mm]", "10.0,10.0\\n10.0,100.0\\n55.0,55.0\\n95.0,95.0", true);
+			pi.setupString("Data [mm]", "0.0,0.0\\n10.0,100.0\\n55.0,55.0\\n95.0,95.0", true);
 			IDX_DATA= setupParameter(pi);
 			
-			IDX_REFPOINT = setupTLReferencePoint(pi);
+			IDX_REFPOINT = setupReferencePoint(pi,"start");
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -1011,19 +824,6 @@ class PGenericPath : public PGenSvgElementPolygon {
 			path.Append("\"/>");
 			
 			return path;
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool generateXXX(SvgPathGroup& spg, double toolDiameter) {
-			
-			// ...
-			spg.pGen().addPath(getParameterStringValue(IDX_DATA));
-			spg.add(spg.pGen().get());
-			
-			setTranslateX(40.0);
-			setTranslateY(40.0);
-			
-			return spg.isOK();
 		}
 };
 

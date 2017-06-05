@@ -139,12 +139,15 @@ class PathGeneratorBase {
 			bool canJointType			= true;
 			bool canToolDiameter		= true;
 			bool canPathColour			= true;
+			bool canCurveLibResolution	= true;
 			
 			int toolCorrectionMode		= 0;
 			int toolCorrectionCorners 	= 0;
 			
 			double toolDiameter 		= 3.125;
 			wxColour pathColour 		= wxColour(0,0,0);
+			
+			float curveLibResolution	= 0.009;
 			
 			bool configBlock			= true;
 			bool referenceCross 		= true;
@@ -156,6 +159,19 @@ class PathGeneratorBase {
 				canJointType		= from.canJointType;
 				canToolDiameter		= from.canToolDiameter;
 				canPathColour		= from.canPathColour;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			void setCurveLibResolution(const wxString& res) {
+				double v;
+				if ( res.ToDouble(&v) )
+					curveLibResolution = (float)v;
+			}
+			
+			///////////////////////////////////////////////////////////////
+			const wxString& getCurveLibResolutionAsString(wxString& ret) const {
+				ret.assign(wxString::Format("%.3f", curveLibResolution));
+				return ret;
 			}
 			
 			///////////////////////////////////////////////////////////////
@@ -585,7 +601,8 @@ class PathGeneratorBase {
 		
 		///////////////////////////////////////////////////////////////////
 		bool isReferencePointDefined() {
-			return ( centerPoint.x != DBL_MAX && centerPoint.y != DBL_MAX);
+			return ( cnc::dblCompare(centerPoint.x, DBL_MAX) == false && 
+			         cnc::dblCompare(centerPoint.y, DBL_MAX) == false);
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -699,8 +716,6 @@ class PathGeneratorBase {
 		void determineReferencePoint(SvgPathGroup& spg, double x, double y) {
 			centerPoint.x = x;
 			centerPoint.y = y;
-			
-			spg.setReferencePoint(centerPoint);
 		}
 		
 		///////////////////////////////////////////////////////////////////

@@ -120,20 +120,8 @@ void PGenPolygon::addPolyLine(SvgPathGroup& spg) {
 		default:			offset = 0.0; break;
 	}
 	
-	// todo coorrection
-	/*
 	CncClipperWrapper cw;
-	CncPolygonPoints polygonToSpool;
- 
-	// first perform tool correction offset
-	CncPolygons results;
-	cw.offsetPath(polygonData, results, offset, commonValues.getCornerType(), CncCETOpenSquare); 
-	
-	if ( results.size() > 0 )	results.getPolygonPoints(0, polygonToSpool);
-	else						return;
-	
-	spoolPolygon(spg, polygonToSpool);
-	*/
+	cw.correctEndPoints(polygonData, offset);
 	spoolPolygon(spg, polygonData);
 }
 ///////////////////////////////////////////////////////////////////

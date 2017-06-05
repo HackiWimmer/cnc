@@ -32,11 +32,6 @@ class SvgPathFragment : public SvgGeneratorBase {
 		}
 		
 		////////////////////////////////////////////////////////////////////////////
-		virtual void setReferencePoint(const wxRealPoint& p) {
-			SvgGeneratorBase::setReferencePoint(p);
-		}
-		
-		////////////////////////////////////////////////////////////////////////////
 		virtual void setXmlPattern(const wxString& pattern) {
 			SvgGeneratorBase::setXmlPattern(pattern);
 		}
@@ -64,9 +59,6 @@ class SvgPathFragment : public SvgGeneratorBase {
 		
 		////////////////////////////////////////////////////////////////////////////
 		const wxString& addPoint(double x, double y);
-		
-		////////////////////////////////////////////////////////////////////////////
-		const wxString& addPolygon(const CncPolygonPoints& pd);
 		
 		////////////////////////////////////////////////////////////////////////////
 		const wxString& addLine(double td, double x1, double y1, double x2, double y2, bool correctRadius);

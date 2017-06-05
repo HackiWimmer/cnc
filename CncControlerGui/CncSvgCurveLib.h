@@ -45,7 +45,6 @@ struct CurveInfo {
 		void init() {
 			increment 	= -1.0f;
 			length		= 0.0f;
-			
 		}
 };
 
@@ -54,12 +53,11 @@ class CncSvgCurveLib : public SVGCurveLib {
 	
 	private:
 		static float tIncrement;
-		
 		static CurveInfo _curveInfoResult;
 		
 	public:
 		// default constant
-		static const float autoIncrement;
+		static const float defaultIncrement;
 		
 		// global flag how to use the SvgCurveLib
 		static bool useCncSvgCurveLib;
@@ -70,9 +68,14 @@ class CncSvgCurveLib : public SVGCurveLib {
 		static CubicBezierParameter CP;
 		
 		/////////////////////////////////////////////////////////////////////////
+		static float getResolution() {
+			return tIncrement;
+		}
+		
+		/////////////////////////////////////////////////////////////////////////
 		static void setResolution(float t) {
 			if ( t > 0 && t < 1 )	tIncrement = t;
-			else					tIncrement = autoIncrement;
+			else					tIncrement = defaultIncrement;
 		}
 		
 		/////////////////////////////////////////////////////////////////////////

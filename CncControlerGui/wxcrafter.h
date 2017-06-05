@@ -1758,6 +1758,7 @@ protected:
     wxPGProperty* m_pgPropToolDiameter;
     wxPGProperty* m_pgPropCorrectionMode;
     wxPGProperty* m_pgPropCorrectionJointType;
+    wxPGProperty* m_pgPropCLResolution;
     wxPGProperty* m_pgPropPathColour;
     wxPGProperty* m_pgPropConfigBlock;
     wxPGProperty* m_pgCatPath;

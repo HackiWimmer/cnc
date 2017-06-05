@@ -42,6 +42,8 @@ class CncPolygonPoints : public ClipperLib::Path {
 		void append(int x, int y);
 		void append(const ClipperLib::Path& p);
 		
+		bool remove(iterator position);
+		
 		bool isPolygonClosed();
 		void closePolygon();
 		
@@ -86,19 +88,20 @@ class CncPolygons : public ClipperLib::Paths {
 		
 		bool getPolygonPoints(unsigned int idx, CncPolygonPoints& ret);
 		
-		
-
-		
-		
-		
 };
 
 /////////////////////////////////////////////////////////////////////////////
 class CncClipperWrapper {
 	
+	protected:
+		double correctEndPoint(IntPoint& p1, const IntPoint& p2, double offset);
+		 
 	public:
 		CncClipperWrapper();
 		virtual ~CncClipperWrapper();
+		
+		////////////////////////////////////////////////////////////////////////
+		bool correctEndPoints(CncPolygonPoints& in, double offset);
 		
 		////////////////////////////////////////////////////////////////////////
 		bool offsetPath(const CncPolygonPoints& in, CncPolygons& out, double offset, 

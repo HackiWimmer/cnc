@@ -6815,9 +6815,6 @@ Axis</label>
                                       <selection>-1</selection>
                                       <content>
                                         <item>
-                                          <![CDATA[<AUTOMATIC>]]>
-                                        </item>
-                                        <item>
                                           <![CDATA[0.001]]>
                                         </item>
                                         <item>
@@ -6870,30 +6867,6 @@ Axis</label>
                                         </item>
                                         <item>
                                           <![CDATA[0.100]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[0.200]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[0.300]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[0.400]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[0.500]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[0.600]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[0.700]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[0.900]]>
-                                        </item>
-                                        <item>
-                                          <![CDATA[1.000]]>
                                         </item>
                                       </content>
                                     </object>

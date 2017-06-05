@@ -545,6 +545,11 @@ void PathGeneratorFrame::updateCommonValues(const PathGeneratorBase::CommonValue
 	//((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
 	m_pgPropConfigBlock->SetValue(cv.configBlock);
 	m_pgPropRefCross->SetValue(cv.referenceCross);
+	
+	wxPGChoices choices = m_pgPropCLResolution->GetChoices();
+	wxString label;
+	int sel = choices.Index(cv.getCurveLibResolutionAsString(label));
+	m_pgPropCLResolution->SetValue(sel);
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::evaluateCommonValues(int id) {
@@ -556,6 +561,10 @@ void PathGeneratorFrame::evaluateCommonValues(int id) {
 	cv.pathColour				= ((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour;
 	cv.configBlock				= m_pgPropConfigBlock->GetValue().GetBool();
 	cv.referenceCross			= m_pgPropRefCross->GetValue().GetBool();
+	
+	wxPGChoices choices = m_pgPropCLResolution->GetChoices();
+	wxString clr = choices.GetLabel(m_pgPropCLResolution->GetValue().GetInteger());
+	cv.setCurveLibResolution(clr);
 	
 	pathGeneratorStore.setCommonValues(id, cv);
 }
@@ -695,6 +704,11 @@ void PathGeneratorFrame::setupCommonValues(const PathGeneratorBase::CommonValues
 	setupProperty(m_pgPropCorrectionJointType, cv.canJointType, cv.toolCorrectionCorners);
 	setupProperty(m_pgPropToolDiameter, cv.canToolDiameter, cv.toolDiameter);
 	setupProperty(m_pgPropPathColour, cv.canPathColour);
+	
+	wxPGChoices choices = m_pgPropCLResolution->GetChoices();
+	wxString label;
+	int sel = choices.Index(cv.getCurveLibResolutionAsString(label));
+	setupProperty(m_pgPropCLResolution, cv.canCurveLibResolution, sel);
 	
 	if ( cv.canPathColour == true )
 		((wxSystemColourProperty*)m_pgPropPathColour)->GetVal().m_colour = cv.pathColour;

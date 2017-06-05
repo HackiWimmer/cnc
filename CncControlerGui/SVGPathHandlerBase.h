@@ -103,7 +103,6 @@ class SVGPathHandlerBase {
 		bool 				newPath;
 		CncDoublePosition	startPos;
 		CncDoublePosition	currentPos;
-		float 				curveLibResolution;
 		double				totalLength;
 		LastControlPoint 	lastControlPoint;
 		CncPathListManager 	pathListMgr;
@@ -154,7 +153,7 @@ class SVGPathHandlerBase {
 		virtual ~SVGPathHandlerBase();
 		
 		// setter
-		void setCurveLibResolution(float res) { curveLibResolution = res; }
+		void setCurveLibResolution(float res);
 		void setPathList(const CncPathListManager& newPathList);
 		
 		// getter

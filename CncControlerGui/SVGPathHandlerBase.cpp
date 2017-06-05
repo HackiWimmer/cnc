@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SVGCurveLib.h"
+#include "CncConfig.h"
 #include "SVGPathHandlerBase.h"
 
 //////////////////////////////////////////////////////////////////
@@ -8,7 +9,6 @@ SVGPathHandlerBase::SVGPathHandlerBase()
 , newPath(false)
 , startPos({0.0, 0.0, 0.0})
 , currentPos({0.0, 0.0, 0.0})
-, curveLibResolution(0.09)
 , totalLength(0.0)
 {
 //////////////////////////////////////////////////////////////////
@@ -16,7 +16,11 @@ SVGPathHandlerBase::SVGPathHandlerBase()
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerBase::~SVGPathHandlerBase() {
 //////////////////////////////////////////////////////////////////
-	
+}
+//////////////////////////////////////////////////////////////////
+void SVGPathHandlerBase::setCurveLibResolution(float res) { 
+//////////////////////////////////////////////////////////////////
+	CncConfig::setCurveLibResolution(res); 
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerBase::setPathList(const CncPathListManager& newPathList) {
@@ -261,8 +265,6 @@ bool SVGPathHandlerBase::processARC(char c, unsigned int count, double values[])
 		appendDebugValueDetail("CurveLibResAuto", 	ci.increment);
 		appendDebugValueDetail("CurveLength", 		ci.length);
 		
-		clog << ci.increment<< endl;
-		
 		// First process the curve
 		for( float t=0; t<1; t+=ci.increment ) {
 			if ( processCurveLibPoint(lc.PointOnLinearCurve(t)) == false )
@@ -274,8 +276,8 @@ bool SVGPathHandlerBase::processARC(char c, unsigned int count, double values[])
 
 	} else {
 		// First process the curve
-		appendDebugValueDetail("CurceLibRes", curveLibResolution);
-		for (float t=0; t<1; t+=curveLibResolution ) {
+		appendDebugValueDetail("CurceLibRes", CncConfig::getCurveLibResolution());
+		for (float t=0; t<1; t+=CncConfig::getCurveLibResolution() ) {
 			if ( processCurveLibPoint(SVGCurveLib::PointOnEllipticalArc(p0, values[0], values[1], values[2], (bool)values[3], (bool)values[4], p1, t).point) == false )
 				return false;
 		}
@@ -330,8 +332,8 @@ bool SVGPathHandlerBase::processQuadraticBezier(char c, unsigned int count, doub
 			
 	} else {
 		// First process the curve
-		appendDebugValueDetail("CurveLibRes", curveLibResolution);
-		for (float t=0; t<1; t+=curveLibResolution ) {
+		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibResolution());
+		for (float t=0; t<1; t+=CncConfig::getCurveLibResolution() ) {
 			if ( processCurveLibPoint(SVGCurveLib::PointOnQuadraticBezierCurve(p0, p1, p2, t)) == false )
 				return false;
 		}
@@ -393,8 +395,8 @@ bool SVGPathHandlerBase::processCubicBezier(char c, unsigned int count, double v
 			
 	} else {
 		// First process the curve
-		appendDebugValueDetail("CurveLibRes", curveLibResolution);
-		for (float t=0; t<1; t+=curveLibResolution ) {
+		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibResolution());
+		for (float t=0; t<1; t+=CncConfig::getCurveLibResolution() ) {
 			if ( processCurveLibPoint(SVGCurveLib::PointOnCubicBezierCurve(p0, p1, p2, p3, t)) == false )
 				return false;
 		}

@@ -857,9 +857,8 @@ void MainFrame::initialize(void) {
 	m_notebookConfig->SetSelection(CNCSetterPage);
 	
 	// curve lib resulotion
-	if ( CncSvgCurveLib::useCncSvgCurveLib == true ) 	m_cbCurveLibResolution->SetStringSelection("<AUTOMATIC>");
-	else 												m_cbCurveLibResolution->SetStringSelection("0.090");
-	updateCurveLibResolution();
+	CncConfig::gblCurveLibSelector = m_cbCurveLibResolution;
+	CncConfig::setCurveLibResolution(CncSvgCurveLib::defaultIncrement);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeCncControl() {
@@ -4540,19 +4539,12 @@ void MainFrame::updateCurveLibResolution(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateCurveLibResolution() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc && cnc->getCncConfig() );
-	
 	wxString sel = m_cbCurveLibResolution->GetStringSelection();
 	double v = 1.0;
-	if ( sel.Upper() == "<AUTOMATIC>") {
-		v = CncSvgCurveLib::autoIncrement;
-	} else {
-		sel.ToDouble(&v);
-	}
+	sel.ToDouble(&v);
 	
-	cnc->getCncConfig()->setCurveLibResolution(v);
+	CncConfig::setCurveLibResolution(v);
 	updateCncConfigTrace();
-	CncSvgCurveLib::setResolution((float)v);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {

@@ -2,6 +2,7 @@
 #define SVG_PATH_ASSISTANT_H
 
 #include "SVGPathHandlerBase.h"
+#include "CncConfig.h"
 #include "SVGNodeParser.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -11,14 +12,16 @@ class SVGPathAssistant {
 		
 		SVGNodeParser parser;
 		SVGPathHandlerBase pathHandler;
+		float prevCurveLibResoluton;
 		
 	public:
 		////////////////////////////////////////////////////////////
 		SVGPathAssistant()
 		: parser()
 		, pathHandler()
+		, prevCurveLibResoluton(CncConfig::getCurveLibResolution())
 		{
-			pathHandler.setCurveLibResolution(0.009);
+			pathHandler.setCurveLibResolution(CncConfig::getDefaultCurveLibResolution());
 			pathHandler.prepareWork();
 			
 			parser.setPathHandler(&pathHandler);
@@ -26,7 +29,10 @@ class SVGPathAssistant {
 		
 		////////////////////////////////////////////////////////////
 		~SVGPathAssistant() {
+			CncConfig::setCurveLibResolution(prevCurveLibResoluton);
 		}
+		
+		void setCurveLibResolution(float res) { pathHandler.setCurveLibResolution(res); }
 		
 		void setPathList(const CncPathListManager& newPathList) { pathHandler.setPathList(newPathList); }
 		const CncPathListManager& getPathList() { return pathHandler.getPathList(); }

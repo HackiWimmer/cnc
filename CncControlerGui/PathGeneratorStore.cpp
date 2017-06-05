@@ -3,12 +3,6 @@
 
 ///////////////////////////////////////////////////////////////////
 PathGeneratorStore::PathGeneratorStore() {
-	registerPathGenerator(new PGenPoint());
-	registerPathGenerator(new PGenLine());
-	registerPathGenerator(new PGenLongWhole());
-	registerPathGenerator(new PGenRoundPoketWhole());
-	
-	
 	
 	registerPathGenerator(new PGenSimplePoint());
 	registerPathGenerator(new PGenSimpleLine());

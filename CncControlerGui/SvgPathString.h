@@ -36,12 +36,6 @@ class SvgPathString : public SvgGeneratorBase {
 		}
 		
 		////////////////////////////////////////////////////////////////////////////
-		virtual void setReferencePoint(const wxRealPoint& p) {
-			SvgGeneratorBase::setReferencePoint(p);
-			fGen().setReferencePoint(p);
-		}
-		
-		////////////////////////////////////////////////////////////////////////////
 		virtual void setXmlPattern(const wxString& pattern) {
 			SvgGeneratorBase::setXmlPattern(pattern);
 			fGen().setXmlPattern(pattern);

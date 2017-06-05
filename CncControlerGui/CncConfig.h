@@ -3,7 +3,9 @@
 
 #include <iostream>
 #include <wx/vector.h>
+#include <wx/combobox.h>
 #include "DataControlModel.h"
+#include "CncSvgCurveLib.h"
 #include "CncCommon.h"
 
 class CncConfig {
@@ -46,8 +48,6 @@ class CncConfig {
 		
 		int stepSignX;
 		int stepSignY;
-		
-		double curveLibResolution;
 
 		////////////////////////////////////////////////////////////////////////
 		void sc() { changed = true; }
@@ -59,76 +59,79 @@ class CncConfig {
 		CncConfig& setSpeedZ(unsigned int val) { sc(); speedZ= val; return *this; }
 		
 	public:
+		
+		static wxComboBox* gblCurveLibSelector;
+		
 		////////////////////////////////////////////////////////////////////////
-		CncConfig() : changed(true)
-					, unit(CncSteps)
-					, maxDimensionsX(0.0)
-					, maxDimensionsY(0.0)
-					, maxDimensionsZ(0.0)
-					, stepsX(200), stepsY(200), stepsZ(200)
-					, multiplierX(1), multiplierY(1), multiplierZ(1) 
-					, maxSpeedXY(100), maxSpeedZ(100)
-					, flySpeedXY(100), workSpeedXY(100), flySpeedZ(100), workSpeedZ(100)
-					, speedX(1), speedY(1), speedZ(1)
-					, pulsWidthOffsetX(100), pulsWidthOffsetY(100), pulsWidthOffsetZ(100)
-					, pitchX(2.0), pitchY(2.0), pitchZ(2.0)
-					, workpieceOffset(5.0)
-					, maxDurationThickness(2.0)
-					, workpieceThickness(0.0)
-					, currentZDepth(0.0)
-					, maxZDistance(50.0)
-					, referenceIncludesWpt(false)
-					, routerBitDiameter(0.0)
-					, drawPaneZoomFactor(1)
-					, onlineUpdateCoordinates(true)
-					, onlineUpdateDrawPane(true)
-					, allowEventHandling(true)
-					, updateInterval(100)
-					, replyThreshold(100)
-					, stepSignX(1)
-					, stepSignY(1)
-					, curveLibResolution(0.09)
+		CncConfig() 
+		: changed(true)
+		, unit(CncSteps)
+		, maxDimensionsX(0.0)
+		, maxDimensionsY(0.0)
+		, maxDimensionsZ(0.0)
+		, stepsX(200), stepsY(200), stepsZ(200)
+		, multiplierX(1), multiplierY(1), multiplierZ(1) 
+		, maxSpeedXY(100), maxSpeedZ(100)
+		, flySpeedXY(100), workSpeedXY(100), flySpeedZ(100), workSpeedZ(100)
+		, speedX(1), speedY(1), speedZ(1)
+		, pulsWidthOffsetX(100), pulsWidthOffsetY(100), pulsWidthOffsetZ(100)
+		, pitchX(2.0), pitchY(2.0), pitchZ(2.0)
+		, workpieceOffset(5.0)
+		, maxDurationThickness(2.0)
+		, workpieceThickness(0.0)
+		, currentZDepth(0.0)
+		, maxZDistance(50.0)
+		, referenceIncludesWpt(false)
+		, routerBitDiameter(0.0)
+		, drawPaneZoomFactor(1)
+		, onlineUpdateCoordinates(true)
+		, onlineUpdateDrawPane(true)
+		, allowEventHandling(true)
+		, updateInterval(100)
+		, replyThreshold(100)
+		, stepSignX(1)
+		, stepSignY(1)
 		{
 			calculateFactors();
 			initZAxisValues();
 		}
 		
 		CncConfig(CncConfig& cc) 
-					: changed(true)
-					, unit(cc.getUnit())
-					, maxDimensionsX(cc.getMaxDimensionX())
-					, maxDimensionsY(cc.getMaxDimensionY())
-					, maxDimensionsZ(cc.getMaxDimensionZ())
-					, stepsX(cc.getStepsX()), stepsY(cc.getStepsY()), stepsZ(cc.getStepsX())
-					, multiplierX(cc.getMultiplierX()), multiplierY(cc.getMultiplierY()), multiplierZ(cc.getMultiplierZ()) 
-					, maxSpeedXY(cc.getMaxSpeedXY()), maxSpeedZ(cc.getMaxSpeedZ())
-					, flySpeedXY(cc.getFlySpeedXY()), workSpeedXY(cc.getWorkSpeedXY())
-					, flySpeedZ(cc.getFlySpeedZ()), workSpeedZ(cc.getWorkSpeedZ())
-					, speedX(cc.getSpeedX()), speedY(cc.getSpeedY()), speedZ(cc.getSpeedX())
-					, pulsWidthOffsetX(cc.getPulsWidthOffsetX()), pulsWidthOffsetY(cc.getPulsWidthOffsetY()), pulsWidthOffsetZ(cc.getPulsWidthOffsetZ())
-					, pitchX(cc.getPitchX()), pitchY(cc.getPitchY()), pitchZ(cc.getPitchZ())
-					, workpieceOffset(cc.getWorkpieceOffset())
-					, maxDurationThickness(cc.getMaxDurationThickness())
-					, workpieceThickness(cc.getWorkpieceThickness())
-					, currentZDepth(cc.getCurrentZDepth())
-					, maxZDistance(cc.getMaxZDistance())
-					, referenceIncludesWpt(cc.getReferenceIncludesWpt())
-					, routerBitDiameter(cc.getRouterBitDiameter())
-					, drawPaneZoomFactor(cc.getDrawPaneZoomFactor())
-					, onlineUpdateCoordinates(cc.isOnlineUpdateCoordinates())
-					, onlineUpdateDrawPane(cc.isOnlineUpdateDrawPane())
-					, allowEventHandling(cc.isAllowEventHandling())
-					, updateInterval(cc.getUpdateInterval())
-					, replyThreshold(cc.getRelyThreshold())
-					, stepSignX(cc.getStepSignX())
-					, stepSignY(cc.getStepSignY())
-					, curveLibResolution(cc.getCurveLibResolution())
+		: changed(true)
+		, unit(cc.getUnit())
+		, maxDimensionsX(cc.getMaxDimensionX())
+		, maxDimensionsY(cc.getMaxDimensionY())
+		, maxDimensionsZ(cc.getMaxDimensionZ())
+		, stepsX(cc.getStepsX()), stepsY(cc.getStepsY()), stepsZ(cc.getStepsX())
+		, multiplierX(cc.getMultiplierX()), multiplierY(cc.getMultiplierY()), multiplierZ(cc.getMultiplierZ()) 
+		, maxSpeedXY(cc.getMaxSpeedXY()), maxSpeedZ(cc.getMaxSpeedZ())
+		, flySpeedXY(cc.getFlySpeedXY()), workSpeedXY(cc.getWorkSpeedXY())
+		, flySpeedZ(cc.getFlySpeedZ()), workSpeedZ(cc.getWorkSpeedZ())
+		, speedX(cc.getSpeedX()), speedY(cc.getSpeedY()), speedZ(cc.getSpeedX())
+		, pulsWidthOffsetX(cc.getPulsWidthOffsetX()), pulsWidthOffsetY(cc.getPulsWidthOffsetY()), pulsWidthOffsetZ(cc.getPulsWidthOffsetZ())
+		, pitchX(cc.getPitchX()), pitchY(cc.getPitchY()), pitchZ(cc.getPitchZ())
+		, workpieceOffset(cc.getWorkpieceOffset())
+		, maxDurationThickness(cc.getMaxDurationThickness())
+		, workpieceThickness(cc.getWorkpieceThickness())
+		, currentZDepth(cc.getCurrentZDepth())
+		, maxZDistance(cc.getMaxZDistance())
+		, referenceIncludesWpt(cc.getReferenceIncludesWpt())
+		, routerBitDiameter(cc.getRouterBitDiameter())
+		, drawPaneZoomFactor(cc.getDrawPaneZoomFactor())
+		, onlineUpdateCoordinates(cc.isOnlineUpdateCoordinates())
+		, onlineUpdateDrawPane(cc.isOnlineUpdateDrawPane())
+		, allowEventHandling(cc.isAllowEventHandling())
+		, updateInterval(cc.getUpdateInterval())
+		, replyThreshold(cc.getRelyThreshold())
+		, stepSignX(cc.getStepSignX())
+		, stepSignY(cc.getStepSignY())
 		{
 			calculateFactors();
 			initZAxisValues();
 		}
 		////////////////////////////////////////////////////////////////////////
 		virtual ~CncConfig() {}
+		
 		////////////////////////////////////////////////////////////////////////
 		void calculateFactors() {
 			dispFactX = 0.0 + (pitchX/stepsX);
@@ -173,7 +176,7 @@ class CncConfig {
 		////////////////////////////////////////////////////////////////////////
 		void getDynamicValues(wxVector<wxVector<wxVariant>>& ret) {
 			DataControlModel::addKeyValueRow(ret, "Tool diameter", 				routerBitDiameter);
-			DataControlModel::addKeyValueRow(ret, "Curve lib resolution", 		(double)getCurveLibResolution());
+			DataControlModel::addKeyValueRow(ret, "Curve lib resolution", 		(double)CncConfig::getCurveLibResolution());
 			DataControlModel::addKeyValueRow(ret, "Current Speed (x)", 			(int)speedX);
 			DataControlModel::addKeyValueRow(ret, "Current Speed (y)", 			(int)speedY);
 			DataControlModel::addKeyValueRow(ret, "Current Speed (z)", 			(int)speedZ);
@@ -279,8 +282,10 @@ class CncConfig {
 		}
 		
 		////////////////////////////////////////////////////////////////////////
-		double getCurveLibResolution() { return curveLibResolution; }
-		CncConfig& setCurveLibResolution(double v) { sc(); curveLibResolution = v; return * this; }
+		static float getDefaultCurveLibResolution();
+		static float getCurveLibResolution();
+		static void setCurveLibResolution(double v);
+		static void updateCurveLibResolutionSelector();
 		
 		////////////////////////////////////////////////////////////////////////
 		double convertX(CncUnit oldUnit, CncUnit newUnit, double value) {
