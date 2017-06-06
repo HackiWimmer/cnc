@@ -13,7 +13,9 @@ PathGeneratorStore::PathGeneratorStore() {
 	registerPathGenerator(new PGenRegularRadiusPolygon());
 	registerPathGenerator(new PGenRegularDiameterPolygon());
 	registerPathGenerator(new PGenFreehandPolygon());
+	registerPathGenerator(new PGenRotaryKnob());
 	registerPathGenerator(new PGenericPath());
+	registerPathGenerator(new PGenericElement());
 	
 	//...
 	//registerPathGenerator(new PGenTest());

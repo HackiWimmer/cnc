@@ -120,12 +120,18 @@ void PGenPolygon::addPolyLine(SvgPathGroup& spg) {
 ///////////////////////////////////////////////////////////////////
 	double offset = 0.0;
 	
+	// determine offset
 	switch ( commonValues.getCorrectionType() ) {
 		case CncCT_Inner:	offset = -commonValues.toolDiameter/2; break;
 		case CncCT_Outer:	offset = +commonValues.toolDiameter/2; break;
 		default:			offset = 0.0; break;
 	}
 	
+	// consider input unit
+	if ( inputUnit != mm )
+		offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+	
+	// perform offset
 	CncClipperWrapper cw;
 	cw.correctEndPoints(polygonData, offset);
 	spoolPolygon(spg, polygonData);
@@ -135,12 +141,17 @@ void PGenPolygon::addPolygon(SvgPathGroup& spg, bool inlay) {
 ///////////////////////////////////////////////////////////////////
 	double offset = 0.0;
 	
+	// determine offset
 	switch ( commonValues.getCorrectionType() ) {
 		case CncCT_Inner:	offset = -commonValues.toolDiameter/2; break;
 		case CncCT_Outer:	offset = +commonValues.toolDiameter/2; break;
 		default:			offset = 0.0; break;
 	}
 	
+	// consider input unit
+	if ( inputUnit != mm )
+		offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+		
 	CncClipperWrapper cw;
 	CncPolygonPoints polygonToSpool;
  
@@ -160,7 +171,13 @@ void PGenPolygon::addPolygon(SvgPathGroup& spg, bool inlay) {
 		while ( true ) {
 			// offset
 			CncPolygons results;
-			if ( cw.offsetPath(reference, results, -commonValues.toolDiameter * cnt, commonValues.getCornerType()) == false) { 
+			
+			offset = -commonValues.toolDiameter;
+			// consider input unit
+			if ( inputUnit != mm )
+				offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+				
+			if ( cw.offsetPath(reference, results, offset * cnt, commonValues.getCornerType()) == false) { 
 				std::cerr << "PGenPolygon::addPolygon: failed" << std::endl;
 				return;
 			}

@@ -175,8 +175,7 @@ class PathGeneratorStore {
 		///////////////////////////////////////////////////////////////////
 		void initPathGenerator(PathGeneratorBase* pgb) {
 			wxASSERT(pgb);
-			pgb->clearParameters();
-			pgb->initParameters();
+			pgb->initParametersIntern();
 		}
 		
 		///////////////////////////////////////////////////////////////////

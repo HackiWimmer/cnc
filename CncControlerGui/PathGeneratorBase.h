@@ -377,7 +377,10 @@ class PathGeneratorBase {
 		enum ChangeCategory {CC_UNKNOWN_CAT, CC_COMMON_CAT, CC_GRID_CAT, CC_TPL_CAT, CC_CNC_CAT, CC_SVG_CAT};
 		
 		///////////////////////////////////////////////////////////////////
-		virtual void initParameters() = 0;
+		void initParametersIntern() {
+			if ( parameterMap.size() == 0 )
+				initParameters();
+		}
 		
 		///////////////////////////////////////////////////////////////////
 		virtual void getInternalInformation(wxTextCtrl* ctl) {
@@ -659,6 +662,9 @@ class PathGeneratorBase {
 		ParameterMap parameterMap;
 		CommonValues commonValues;
 		CncParameterValues cncParameterValues;
+		
+		///////////////////////////////////////////////////////////////////
+		virtual void initParameters() = 0;
 		
 		///////////////////////////////////////////////////////////////////
 		inline double cv(SVGUnit u, double v) {
