@@ -140,10 +140,11 @@ void PathGeneratorFrame::setupPathSelector() {
 	imageList->Add(ImageLib16().Bitmap("BMP_TEMPLATE_FOLDER_OPEN"));
 	imageList->Add(ImageLib16().Bitmap("BMP_TEMPLATE_FOLDER_CLOSE"));
 	imageList->Add(ImageLib16().Bitmap("BMP_TEMPLATE"));
+	imageList->Add(ImageLib16().Bitmap("BMP_PRE_DEF_PARA_SET"));
 
 	pathGeneratorStore.setupSelectorTree(m_templateTree, treeIndex, imageList);
 	
-	if ( pathGeneratorStore.getGenertorCount() > 0 ) {
+	if ( pathGeneratorStore.getGeneratorCount() > 0 ) {
 		m_pgPathSelector->SetSelection(0);
 		wxString item = m_pgPathSelector->GetStringSelection().SubString(0,2);
 		searchAndSelectFirstTreeItem(item);
@@ -276,12 +277,60 @@ void PathGeneratorFrame::selectPathSelector(wxCommandEvent& event) {
 void PathGeneratorFrame::selectTemplateTree(wxTreeEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxTreeItemId item = event.GetItem();
-	int idx = getPathSelection(m_templateTree->GetItemText(item));
-	if ( idx >= 0 && idx < pathGeneratorStore.getGenertorCount() ) {
-		selectPathSelector(idx);
+	wxString name(m_templateTree->GetItemText(item));
 	
+	// first determine id a pre def set is selected
+	bool preDefParaSet = false;
+	if ( name.StartsWith(PRE_DEF_MARKER) ) {
+		// redirect selected item to items parent
+		item = m_templateTree->GetItemParent(item);
+		m_templateTree->SelectItem(item);
+		preDefParaSet = true;
+	}
+	
+	// select path generator
+	int idx = getPathSelection(m_templateTree->GetItemText(item));
+	if ( idx >= 0 && idx < pathGeneratorStore.getGeneratorCount() ) {
+		selectPathSelector(idx);
+		
+		// update parameter value with predefined setup
+		if ( preDefParaSet == true )
+			setupPreDefinfedValues(idx, name);
+
+		// generate path
 		evaluateValues();
 		generatePath();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::setupPreDefinfedValues(int id, const wxString& name) {
+///////////////////////////////////////////////////////////////////
+	if ( id < 0 || id > pathGeneratorStore.getGeneratorCount() - 1 )
+		return;
+	
+	// get path generator
+	PathGeneratorBase* pgb = pathGeneratorStore.getPathGenerator(id);
+	wxASSERT(pgb);
+	
+	wxString n(name.substr(wxString(PRE_DEF_MARKER).length(), name.length()));
+	
+	// Restore
+	if ( n == PRE_DEF_DEFAULT_ITEM ) {
+		pgb->clearParameters();
+		selectPathSelector(id);
+		return;
+	}
+	
+	PathGeneratorBase::PreDefParameterMap map;
+	pgb->getPreDefinedParameterSetup(n, map);
+	
+	// over all pre defined parameter values
+	for ( auto it=map.begin(); it!=map.end(); ++it) {
+		wxPGProperty* prop = m_pgCatPath->Item(it->first);
+		if ( prop != NULL ) {
+			if ( pgb->setPropertyValue(prop, it->second) == false )
+				std::cerr << "PathGeneratorFrame::setupPreDefinfedValues: setPropertyValue failed! Index: " << it->first << ", Value: " << it->second.GetString() << endl;
+		}
 	}
 }
 ///////////////////////////////////////////////////////////////////

@@ -1020,6 +1020,7 @@ class PGenericElement : public PGenSvgElementPolygon {
 class PGenRotaryKnob : public PGenericPath {
 	
 	private:
+		unsigned int IDX_KNOB_FORM;
 		unsigned int IDX_SECTIONS;
 		unsigned int IDX_KNOB_DIAMETER;
 		unsigned int IDX_SHAFT_DIAMETER;
@@ -1027,7 +1028,6 @@ class PGenRotaryKnob : public PGenericPath {
 		unsigned int IDX_INLAY;
 		unsigned int IDX_REFPOINT;
 		
-	
 	protected:
 		
 		///////////////////////////////////////////////////////////////
@@ -1053,6 +1053,10 @@ class PGenRotaryKnob : public PGenericPath {
 			treePath 	= "Polygon [mm]";
 			
 			PathGeneratorBase::ParameterInfo pi;
+			pi.setupEnum("Knob Form", "concave;convex", 0);
+			pi.help = "Determines the knob type.";
+			IDX_KNOB_FORM = setupParameter(pi); 
+
 			pi.setupNum("Sections", 12, 1, 100, 0);
 			pi.help = "Count of data points to connect on diameter. Only values even values > 3 are valid";
 			IDX_SECTIONS = setupParameter(pi); 
@@ -1071,6 +1075,31 @@ class PGenRotaryKnob : public PGenericPath {
 			
 			IDX_INLAY = setupInlayMode(pi, "Path;Whole", 0);
 			IDX_REFPOINT = setupCCReferencePoint(pi);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual void initPreDefinedParameterSetups() {
+			PreDefParameterMap map;
+			map[IDX_KNOB_FORM] 			= wxVariant(0);
+			map[IDX_SECTIONS] 			= wxVariant(6);
+			map[IDX_KNOB_DIAMETER] 		= wxVariant(50);
+			map[IDX_SHAFT_DIAMETER] 	= wxVariant(10);
+			map[IDX_SHAFT_TYPE] 		= wxVariant(0);
+			map[IDX_INLAY] 				= wxVariant(0);
+			map[IDX_REFPOINT] 			= wxVariant(0);
+			
+			addPreDefinedParameterSetup("Knob Pattern A", map);
+			
+			map.clear();
+			map[IDX_KNOB_FORM] 			= wxVariant(0);
+			map[IDX_SECTIONS] 			= wxVariant(12);
+			map[IDX_KNOB_DIAMETER] 		= wxVariant(50);
+			map[IDX_SHAFT_DIAMETER] 	= wxVariant(10);
+			map[IDX_SHAFT_TYPE] 		= wxVariant(0);
+			map[IDX_INLAY] 				= wxVariant(0);
+			map[IDX_REFPOINT] 			= wxVariant(0);
+			
+			addPreDefinedParameterSetup("Knob Pattern B", map);
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -1094,6 +1123,8 @@ class PGenRotaryKnob : public PGenericPath {
 			double steps  			= 360.0 / sections;
 			double radius			= getParameterNumValue(IDX_KNOB_DIAMETER) / 2.0;
 			
+			int xxxx = getParameterEnumValue(IDX_KNOB_FORM);
+			
 			// store initial move
 			path.append(wxString::Format("M%lf,0 ", SvgUnitCalculator::convertMM2ReferenceUnit(-radius)));
 			
@@ -1105,17 +1136,15 @@ class PGenRotaryKnob : public PGenericPath {
 				x = round(x * 1000.0) / 1000.0;
 				y = round(y * 1000.0) / 1000.0;
 				
-				
-				//clog << wxString::Format("%2d: %10.3lf %10.3lf", i, x, y ) << endl;
-				
 				if ( i%2==0 ) {
-					path.append(wxString::Format("A %lf %lf 0 0 1 %lf,%lf ", SvgUnitCalculator::convertMM2ReferenceUnit(radius*2),
-																			 SvgUnitCalculator::convertMM2ReferenceUnit(radius*2),
+					path.append(wxString::Format("A %lf %lf 0 0 1 %lf,%lf ", SvgUnitCalculator::convertMM2ReferenceUnit(radius * 2),
+																			 SvgUnitCalculator::convertMM2ReferenceUnit(radius * 2),
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-x),
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-y)));
 				} else {
-					path.append(wxString::Format("A %lf %lf 0 0 0 %lf,%lf ", SvgUnitCalculator::convertMM2ReferenceUnit(radius * 2),
-																			 SvgUnitCalculator::convertMM2ReferenceUnit(radius * 2),
+					path.append(wxString::Format("A %lf %lf 0 0 %d %lf,%lf ", SvgUnitCalculator::convertMM2ReferenceUnit(radius ),
+																			 SvgUnitCalculator::convertMM2ReferenceUnit(radius ),
+																			 xxxx,
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-x),
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-y)));
 																			  
@@ -1123,19 +1152,6 @@ class PGenRotaryKnob : public PGenericPath {
 				pos += steps;
 			}
 			
-			wxString shaft("M0,0 ");
-			if ( getParameterEnumValue(IDX_SHAFT_TYPE) == 0 ) {
-				shaft.Append("L0,0 ");
-			} else {
-				wxString whole;
-				SVGElementConverter::convertCircleToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x),
-															 SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
-															 SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_SHAFT_DIAMETER) / 2.0),
-															 whole);
-				shaft.Append(whole);
-			}
-			
-			path.Append(shaft);
 			path.Append("\"/>");
 			return path;
 		}
@@ -1144,6 +1160,7 @@ class PGenRotaryKnob : public PGenericPath {
 		///////////////////////////////////////////////////////////////////
 		PGenRotaryKnob() 
 		: PGenericPath()
+		, IDX_KNOB_FORM(INT_MAX)
 		, IDX_SECTIONS(INT_MAX)
 		, IDX_KNOB_DIAMETER(INT_MAX)
 		, IDX_SHAFT_DIAMETER(INT_MAX)
@@ -1169,6 +1186,33 @@ class PGenRotaryKnob : public PGenericPath {
 			}
 			
 			return true; 
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
+			bool ret = PGenSvgElementPolygon::generate(spg, toolDiameter);
+			
+			clog << toolDiameter << ", " << getParameterNumValue(IDX_SHAFT_DIAMETER) << endl;
+			
+			
+			// additional genarete the shaft
+			wxString shaft("M0,0 ");
+			if ( getParameterEnumValue(IDX_SHAFT_TYPE) == 0 || toolDiameter > getParameterNumValue(IDX_SHAFT_DIAMETER) ) {
+				shaft.Append("L0,0 ");
+				
+			} else {
+				wxString whole;
+				SVGElementConverter::convertCircleToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x),
+															 SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
+															 SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_SHAFT_DIAMETER) / 2.0 - toolDiameter / 2.0),
+															 whole);
+				shaft.Append(whole);
+			}
+			
+			spg.pGen().add(shaft);
+			spg.add(spg.pGen().get());
+			
+			return ret;
 		}
 };
 

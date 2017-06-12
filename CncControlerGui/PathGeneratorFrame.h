@@ -82,6 +82,9 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		void evaluatePathParameterValues(int id);
 		
 		///////////////////////////////////////////////////////////////////
+		void setupPreDefinfedValues(int id, const wxString& name);
+		
+		///////////////////////////////////////////////////////////////////
 		wxTreeItemId searchFirstTreeItem(wxTreeItemId parent, const wxString& label, bool fullMatch = true);
 		
 		///////////////////////////////////////////////////////////////////
@@ -93,9 +96,9 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		void generatePath();
 		
 	protected:
-    virtual void selectDisplayMode(wxCommandEvent& event);
 
 		// user events
+		virtual void selectDisplayMode(wxCommandEvent& event);
 		virtual void onShow(wxShowEvent& event);
 		virtual void checkAutoGenerate(wxCommandEvent& event);
 		virtual void pgMainBookChanged(wxNotebookEvent& event);
@@ -121,6 +124,7 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		virtual void generatePath(wxCommandEvent& event);
 		
 	public:
+	
 		PathGeneratorFrame(wxWindow* parent, wxStyledTextCtrl* tplEditor);
 		virtual ~PathGeneratorFrame();
 		

@@ -128,6 +128,8 @@ class PathGeneratorBase {
 		};
 		
 		typedef std::map<unsigned int, ParameterInfo> ParameterMap;
+		typedef std::map<unsigned int, wxVariant> PreDefParameterMap;
+		typedef std::map<wxString, PreDefParameterMap> PreDefParameterSetup;
 		
 		///////////////////////////////////////////////////////////////////
 		struct CommonValues {
@@ -378,8 +380,10 @@ class PathGeneratorBase {
 		
 		///////////////////////////////////////////////////////////////////
 		void initParametersIntern() {
-			if ( parameterMap.size() == 0 )
+			if ( parameterMap.size() == 0 ) {
 				initParameters();
+				initPreDefinedParameterSetups();
+			}
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -490,12 +494,48 @@ class PathGeneratorBase {
 		}
 		
 		///////////////////////////////////////////////////////////////////
+		bool setPropertyValue(wxPGProperty* property, const wxVariant v) {
+			if ( property == NULL )
+				return false;
+			
+			unsigned int idx = property->GetIndexInParent();
+			PathGeneratorBase::ParameterInfo* pi = getParameterInfo(idx);
+			if ( pi == NULL )
+				return false;
+				
+			// specialize and set value
+			if ( pi->propertyType  == wxPG_VARIANT_TYPE_DOUBLE ) {
+				wxString format("%."); format << pi->precision; format << "lf";
+				property->SetValue(wxString::Format(format, v.GetDouble()));
+				
+			} else if ( pi->propertyType == wxPG_VARIANT_TYPE_LIST ) {
+				wxPGChoices items(property->GetChoices());
+				unsigned int item = v.GetInteger();
+				
+				if ( item > items.GetCount() -1 ) {
+					std::cerr << wxString::Format("PathGeneratorBase::setPropertyValue: Can't set enum value. Given item index: %d. Parameter: %s", item, property->GetLabel()) << std::endl;
+				} else {
+					property->SetValue(v);
+				}
+				
+			} else if ( pi->propertyType  == wxPG_VARIANT_TYPE_STRING ) {
+				property->SetValueFromString(v.GetString());
+				
+			} else {
+				property->SetValue(v);
+				
+			}
+				
+			return true;
+		}
+		
+		///////////////////////////////////////////////////////////////////
 		void setParameterValue(unsigned int idx, const wxVariant v) {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
-				
-			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %s", idx, v.GetString()));
+			else
+				addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %s", idx, v.GetString()));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -503,8 +543,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
-				
-			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %lf", idx, v));
+			else
+				addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %lf", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -512,8 +552,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
-				
-			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %s", idx, v));
+			else
+				addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %s", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -521,8 +561,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
-				
-			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %d", idx, v));
+			else
+				addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %d", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -530,8 +570,8 @@ class PathGeneratorBase {
 			ParameterInfo* pi = getParameterInfo(idx);
 			if ( pi != NULL )
 				pi->value = v;
-				
-			addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %ld", idx, v));
+			else
+				addErrorInfo(wxString::Format("setParameterValue(): Invalid index: %u, value %ld", idx, v));
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -630,6 +670,36 @@ class PathGeneratorBase {
 			return treePath;
 		}
 		
+		///////////////////////////////////////////////////////////////////
+		bool hasPreDefinedParameterSetups() const {
+			return (preDefParameterSetup.size() > 0);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		void addPreDefinedParameterSetup(const wxString& name, const PreDefParameterMap& map) {
+			preDefParameterSetup[name] = map;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const PreDefParameterMap& getPreDefinedParameterSetup(const wxString& name, PreDefParameterMap& map) {
+			map.clear();
+			
+			auto it = preDefParameterSetup.find(name);
+			if ( it != preDefParameterSetup.end() )
+				map = it->second;
+			
+			return map;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		const wxArrayString& getPreDefinedParameterSetNames(wxArrayString& ret) {
+			for ( auto it=preDefParameterSetup.begin(); it!=preDefParameterSetup.end(); ++it ) {
+				ret.Add(it->first);
+			}
+			
+			return ret;
+		}
+		
 	private:
 	
 		wxVariant defaultValue;
@@ -662,9 +732,14 @@ class PathGeneratorBase {
 		ParameterMap parameterMap;
 		CommonValues commonValues;
 		CncParameterValues cncParameterValues;
+		PreDefParameterSetup preDefParameterSetup;
 		
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters() = 0;
+		
+		///////////////////////////////////////////////////////////////////
+		virtual void initPreDefinedParameterSetups() {
+		}
 		
 		///////////////////////////////////////////////////////////////////
 		inline double cv(SVGUnit u, double v) {
@@ -698,7 +773,7 @@ class PathGeneratorBase {
 		///////////////////////////////////////////////////////////////////
 		void setTranslateX(double val) { if ( transformValues.autoMode == true ) transformValues.translateX = val; }
 		void setTranslateY(double val) { if ( transformValues.autoMode == true ) transformValues.translateY = val; }
-		// todo ... more tranform values
+		// todo ... more transform values
 		
 		///////////////////////////////////////////////////////////////////
 		unsigned int setupParameter(const ParameterInfo& pi) {

@@ -7337,6 +7337,31 @@ ImageLib16::ImageLib16()
         }
     }
     
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PRE_DEF_PARA_SET"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PRE_DEF_PARA_SET"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PRE_DEF_PARA_SET@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PRE_DEF_PARA_SET@2x"), bmp));
+        }
+    }
+    
 }
 
 ImageLib16::~ImageLib16()

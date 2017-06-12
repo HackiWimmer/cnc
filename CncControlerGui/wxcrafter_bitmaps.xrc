@@ -151,6 +151,9 @@
   <object class="wxBitmap" name="BMP_PLUS">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-plus.png</object>
   <object class="wxBitmap" name="BMP_PLUS@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-plus@2x.png</object>
   <object class="wxBitmap" name="BMP_PLUS@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-plus@2x.png</object>
+  <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-typedef.png</object>
+  <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-typedef@2x.png</object>
+  <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\16-typedef@2x.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-finger.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-finger@2x.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\@c++\CnCControl\CncControlerGui\bitmaps\24-finger@2x.png</object>
