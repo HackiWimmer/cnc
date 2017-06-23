@@ -2,6 +2,24 @@
 #include "PathGenerators.h"
 
 ///////////////////////////////////////////////////////////////////
+CncPolygonPoints& PGenPolygon::getPolygonData(unsigned int polygonIndex) {
+///////////////////////////////////////////////////////////////////
+	// should not occur - only safty
+	if ( polygonDataList.size() == 0 )
+		appendNextPolygonPoints();
+	
+	// generate polygon points up to the given index
+	if ( polygonIndex > polygonDataList.size() - 1 ) {
+		unsigned int currentSize = polygonDataList.size();
+		for ( unsigned int i=0; i<polygonIndex + 1 - currentSize; i++ ) {
+			appendNextPolygonPoints();
+		}
+	}
+	
+	return polygonDataList.at(polygonIndex);
+}
+
+///////////////////////////////////////////////////////////////////
 void PGenPolygon::getInternalInformation(wxTextCtrl* ctl) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(ctl);
@@ -9,52 +27,57 @@ void PGenPolygon::getInternalInformation(wxTextCtrl* ctl) {
 	ctl->Clear();
 	ctl->SetDefaultStyle(wxTextAttr(*wxWHITE));
 	
-	// data points
-	std::stringstream ss;
-	ss << polygonData << std::endl;
-	
-	// data points wkt style
-	ctl->AppendText(ss.str().c_str());
+	for ( auto it=polygonDataList.begin(); it!=polygonDataList.end(); ++it) {
+		// data points
+		std::stringstream ss;
+		ss << *it << std::endl;
+		
+		// data points wkt style
+		ctl->AppendText(ss.str().c_str());
 
-	// final line feed
-	ctl->AppendText("\n");
+		// final line feed
+		ctl->AppendText("\n");
+	}
 }
 ///////////////////////////////////////////////////////////////////
-const char* PGenPolygon::getDataPointsAsWktString(wxString& ret) {
+const char* PGenPolygon::getDataPointsAsWktString(wxString& ret, unsigned int polygonIndex) {
 ///////////////////////////////////////////////////////////////////
-	ret.assign(polygonData.getDataPointsAsWktString(ret));
+	CncPolygonPoints cpp(getPolygonData(polygonIndex));
+	ret.assign(cpp.getDataPointsAsWktString(ret));
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool PGenPolygon::centerPolygon() {
+bool PGenPolygon::centerPolygon(unsigned int polygonIndex) {
 ///////////////////////////////////////////////////////////////////
 	wxRealPoint cp;
 	determineCentroid(cp);
 	
 	if ( cnc::dblCompareNull(cp.x) == true && cnc::dblCompareNull(cp.x) == true )
 		return true;
-		
-	for (auto it = polygonData.begin(); it != polygonData.end(); ++it) {
+	
+	CncPolygonPoints cpp(getPolygonData(polygonIndex));
+	for (auto it = cpp.begin(); it != cpp.end(); ++it) {
 		wxRealPoint op(CncPolygonPoints::convertToRealPoint(*it));
 		wxRealPoint np = op - cp;
 		
 		*it = CncPolygonPoints::convertToIntPoint(np);
 	}
 	
-	polygonData.evaluateAdditionalValues();
+	cpp.evaluateAdditionalValues();
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-const wxRealPoint& PGenPolygon::getPolygonDataPoint(unsigned index) {
+const wxRealPoint& PGenPolygon::getPolygonDataPoint(unsigned int polygonIndex, unsigned pointIndex) {
 ///////////////////////////////////////////////////////////////////
-	if ( index > polygonData.size() -1 ) {
-		addErrorInfo(wxString::Format("getPolygonDataPoint(): Invalid index: %d, current count: %d", index, polygonData.size()));
+	CncPolygonPoints cpp(getPolygonData(polygonIndex));
+	if ( pointIndex > cpp.size() -1 ) {
+		addErrorInfo(wxString::Format("getPolygonDataPoint(): Invalid index: %d, current count: %d", pointIndex, getPolygonData().size()));
 		static wxRealPoint p;
 		return p;
 	}
 	
-	return CncPolygonPoints::convertToRealPoint(polygonData.at(index));
+	return CncPolygonPoints::convertToRealPoint(getPolygonData().at(pointIndex));
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -85,12 +108,12 @@ int PGenPolygon::fillPolygonData(CncPolygonPoints& toFill, const wxString& data)
 	return toFill.size();
 }
 ///////////////////////////////////////////////////////////////////
-int PGenPolygon::fillPolygonData(const wxString& data) {
+int PGenPolygon::fillPolygonData(unsigned int polygonIndex, const wxString& data) {
 ///////////////////////////////////////////////////////////////////
-	return fillPolygonData(polygonData, data);
+	return fillPolygonData(getPolygonData(polygonIndex), data);
 }
 ///////////////////////////////////////////////////////////////////
-const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp) {
+const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp, unsigned int polygonIndex) {
 ///////////////////////////////////////////////////////////////////
 	try {
 		typedef boost::geometry::model::d2::point_xy<double> point_type;
@@ -98,7 +121,7 @@ const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp) {
 
 		polygon_type poly;
 		wxString wkt;
-		boost::geometry::read_wkt(getDataPointsAsWktString(wkt), poly);
+		boost::geometry::read_wkt(getDataPointsAsWktString(wkt, polygonIndex), poly);
 
 		point_type p(0.0, 0.0);
 		boost::geometry::centroid(poly, p);
@@ -116,7 +139,7 @@ const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp) {
 	return cp;
 }
 ///////////////////////////////////////////////////////////////////
-void PGenPolygon::addPolyLine(SvgPathGroup& spg) {
+void PGenPolygon::addPolyLine(unsigned int polylineIndex, SvgPathGroup& spg) {
 ///////////////////////////////////////////////////////////////////
 	double offset = 0.0;
 	
@@ -133,11 +156,12 @@ void PGenPolygon::addPolyLine(SvgPathGroup& spg) {
 	
 	// perform offset
 	CncClipperWrapper cw;
-	cw.correctEndPoints(polygonData, offset);
-	spoolPolygon(spg, polygonData);
+	CncPolygonPoints cpp(getPolygonData(polylineIndex));
+	cw.correctEndPoints(cpp, offset);
+	spoolPolygon(spg, cpp);
 }
 ///////////////////////////////////////////////////////////////////
-void PGenPolygon::addPolygon(SvgPathGroup& spg, bool inlay) {
+void PGenPolygon::addPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool inlay) {
 ///////////////////////////////////////////////////////////////////
 	double offset = 0.0;
 	
@@ -157,7 +181,8 @@ void PGenPolygon::addPolygon(SvgPathGroup& spg, bool inlay) {
  
 	// first perform tool correction offset
 	CncPolygons results;
-	cw.offsetPath(polygonData, results, offset, commonValues.getCornerType()); 
+	CncPolygonPoints cpp(getPolygonData(polygonIndex));
+	cw.offsetPath(cpp, results, offset, commonValues.getCornerType()); 
 	results.getPolygonPoints(0, polygonToSpool);
 	
 	polygonToSpool.closePolygon();

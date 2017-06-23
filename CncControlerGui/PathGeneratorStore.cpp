@@ -14,11 +14,11 @@ PathGeneratorStore::PathGeneratorStore() {
 	registerPathGenerator(new PGenRegularDiameterPolygon());
 	registerPathGenerator(new PGenFreehandPolygon());
 	registerPathGenerator(new PGenRotaryKnob());
+	registerPathGenerator(new PGenEllipticalRing());
 	registerPathGenerator(new PGenericPath());
 	registerPathGenerator(new PGenericElement());
 	
 	//...
-	//registerPathGenerator(new PGenTest());
 }
 ///////////////////////////////////////////////////////////////////
 PathGeneratorStore::~PathGeneratorStore() {
@@ -138,15 +138,20 @@ void PathGeneratorStore::setupSelectorTree(wxTreeCtrl* tree, TreeIndex& treeInde
 			
 			//append pre defined setups
 			if ( pgb->hasPreDefinedParameterSetups() ) {
+				wxTreeItemId preDefParent;
+				wxColour colour(112,146,190);
 				// append default
-				tree->AppendItem(newItem, wxString::Format("%s%s", PRE_DEF_MARKER, PRE_DEF_DEFAULT_ITEM), 4);
+				preDefParent = tree->AppendItem(newItem, wxString::Format("%s%s", PRE_DEF_MARKER, PRE_DEF_DEFAULT_ITEM), 4);
+				tree->SetItemTextColour(preDefParent, colour);
 				
 				// append configured setups
 				wxArrayString sa;
 				
 				pgb->getPreDefinedParameterSetNames(sa);
-				for ( unsigned int i=0; i<sa.GetCount(); i++ )
-					tree->AppendItem(newItem, wxString::Format("%s%s", PRE_DEF_MARKER, sa[i]), 4);
+				for ( unsigned int i=0; i<sa.GetCount(); i++ ) {
+					preDefParent = tree->AppendItem(newItem, wxString::Format("%s%s", PRE_DEF_MARKER, sa[i]), 4);
+					tree->SetItemTextColour(preDefParent, colour);
+				}
 			}
 		}
 	}

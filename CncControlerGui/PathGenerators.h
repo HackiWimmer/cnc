@@ -65,98 +65,57 @@ class PGenSample : public PathGeneratorBase {
 		}
 };
 
-///////////////////////////////////////////////////////////////////////////
-class PGenTest : public PathGeneratorBase {
-	
-	protected:
-		///////////////////////////////////////////////////////////////////
-		virtual void initParameters()  {
-			name 		= "PGenTest";
-			treePath 	= "Sample\\Categorie 1\\ next";
-			
-			PathGeneratorBase::ParameterInfo pi;
-			pi.setupNum("Radius [mm]", 70.0, 1.0, 400.0, 3);
-			setupParameter(pi);
-			
-			pi.setupBool("bool", true);
-			setupParameter(pi);
-			
-			wxArrayString items;
-			items.Add("first");
-			items.Add("second");
-			pi.setupEnum("enum", items, 1);
-			setupParameter(pi);
-			
-			setupCCReferencePoint(pi);
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool setReferencePoint(SvgPathGroup& spg) {
-			determineReferencePoint(spg, 0.0, 0.0);
-			return true;
-		}
-	
-	public:
-		///////////////////////////////////////////////////////////////////
-		PGenTest() : PathGeneratorBase() {}
-		virtual ~PGenTest() {}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool parameterChanged(PathGeneratorBase::ChangeCategory cc, int paraIdxInCat, const wxVariant& value) { 
-			// implement this method only if a parameter change notification should be handled
-			clog << cc << endl;
-			// return false if the path shouldn't generated 
-			return true; 
-		}
-		
-		///////////////////////////////////////////////////////////////////
-		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
-			spg.pGen().add("PGenTest");
-			spg.add(spg.pGen().get());
-
-			setTranslateX(0.0);
-			setTranslateY(0.0);
-			
-			return spg.isOK();
-		}
-};
-
+typedef std::vector<CncPolygonPoints> PolygonList;
 ///////////////////////////////////////////////////////////////////////////
 class PGenPolygon : public PathGeneratorBase {
-	
+	private:
+		PolygonList polygonDataList;
+		
 	protected:
-		CncPolygonPoints polygonData;
-	
+		
 		///////////////////////////////////////////////////////////////////
 		PGenPolygon() 
 		: PathGeneratorBase()
 		{
+			// initialize default polygon points - index = 0
+			appendNextPolygonPoints();
 		}
 		
 		///////////////////////////////////////////////////////////////////
 		virtual ~PGenPolygon() {
-			polygonData.clear();
+			for ( auto it=polygonDataList.begin(); it!=polygonDataList.end(); ++it)
+				it->clear();
 		}
 		
-		unsigned int getDataPointCount() const { return polygonData.size(); }
+		///////////////////////////////////////////////////////////////////
+		unsigned int appendNextPolygonPoints() {
+			CncPolygonPoints defaultPolygonPoints;
+			polygonDataList.push_back(defaultPolygonPoints);
+			
+			return polygonDataList.size() - 1;
+		}
+		
+		CncPolygonPoints& getPolygonData(unsigned int polygonIndex=0);
+		
+		unsigned int getDataPointCount(unsigned int polygonIndex=0) { return getPolygonData(polygonIndex).size(); }
 		virtual void getInternalInformation(wxTextCtrl* ctl);
-		const char* getDataPointsAsWktString(wxString& ret);
-		const wxRealPoint& getMinPosition() const { return polygonData.getMinRealPos(); }
-		const wxRealPoint& getMaxPosition() const { return  polygonData.getMaxRealPos(); }
+		const char* getDataPointsAsWktString(wxString& ret, unsigned int polygonIndex=0);
+		const wxRealPoint& getMinPosition(unsigned int polygonIndex=0) { return getPolygonData(polygonIndex).getMinRealPos(); }
+		const wxRealPoint& getMaxPosition(unsigned int polygonIndex=0) { return getPolygonData(polygonIndex).getMaxRealPos(); }
 		
-		bool centerPolygon();
-		const wxRealPoint& determineCentroid(wxRealPoint& cp);
+		bool centerPolygon(unsigned int polygonIndex=0);
+		const wxRealPoint& determineCentroid(wxRealPoint& cp, unsigned int polygonIndex=0);
 		
-		const wxRealPoint& getPolygonDataPoint(unsigned index);
-		const wxRealPoint& getFirstPolygonDataPoint() { return getPolygonDataPoint(0); }
-		const wxRealPoint& getSecondPolygonDataPoint() { return getPolygonDataPoint(1); }
-		const wxRealPoint& getLastPolygonDataPoint() { return getPolygonDataPoint(polygonData.size() - 1); }
+		const wxRealPoint& getPolygonDataPoint(unsigned int polygonIndex, unsigned pointIndex);
+		const wxRealPoint& getFirstPolygonDataPoint(unsigned int polygonIndex=0) { return getPolygonDataPoint(polygonIndex, 0); }
+		const wxRealPoint& getSecondPolygonDataPoint(unsigned int polygonIndex=0) { return getPolygonDataPoint(polygonIndex, 1); }
+		const wxRealPoint& getLastPolygonDataPoint(unsigned int polygonIndex=0) { return getPolygonDataPoint(polygonIndex, getPolygonData(polygonIndex).size() - 1); }
 		
-		void clearPolygonData() { polygonData.clear(); }
+		void clearPolygonData(unsigned int polygonIndex=0) { getPolygonData(polygonIndex).clear(); }
 		int fillPolygonData(CncPolygonPoints& toFill, const wxString& data);
-		int fillPolygonData(const wxString& data);
-		void addPolygon(SvgPathGroup& spg, bool inlay=false);
-		void addPolyLine(SvgPathGroup& spg);
+		int fillPolygonData(unsigned int polygonIndex, const wxString& data);
+		void addPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool inlay=false);
+		void addPolyLine(unsigned int polylineIndex, SvgPathGroup& spg);
 		
 		void spoolPolygon(SvgPathGroup& spg, const CncPolygonPoints& dataPoints);
 };
@@ -180,7 +139,7 @@ class PGenFreehandPolygon : public PGenPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name		= "Freehand";
-			treePath 	= "Polygon [mm]";
+			treePath 	= "Polygons [mm]";
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupString("Data [mm]", "10.0,10.0\\n10.0,100.0\\n55.0,55.0", true);
@@ -213,15 +172,15 @@ class PGenFreehandPolygon : public PGenPolygon {
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
 			clearPolygonData();
 			
-			fillPolygonData(getParameterStringValue(IDX_DATA));
+			fillPolygonData(0, getParameterStringValue(IDX_DATA));
 			if ( getDataPointCount() < 3 ) {
 				addErrorInfo(wxString::Format("generate(): Not enough data points available: Current count: %d", getDataPointCount()));
 				return false;
 			}
 			
 			centerPolygon();
-			origPolygonData = polygonData;
-			addPolygon(spg, (getParameterEnumValue(IDX_INLAY) == 1));
+			origPolygonData = getPolygonData(0);
+			addPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
 
 			setTranslateX(abs(getMinPosition().x) + 5.0);
 			setTranslateY(abs(getMinPosition().y) + 5.0);
@@ -260,7 +219,7 @@ class PGenRegularRadiusPolygon : public PGenPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Regular - Points based on Radius";
-			treePath 	= "Polygon [mm]";
+			treePath 	= "Polygons [mm]";
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupNum("Sections", 6, 1, 100, 0);
@@ -325,10 +284,10 @@ class PGenRegularRadiusPolygon : public PGenPolygon {
 				x = round(x * 1000.0) / 1000.0;
 				y = round(y * 1000.0) / 1000.0;
 						
-				polygonData.append(x, y);
+				getPolygonData(0).append(x, y);
 			}
 			
-			addPolygon(spg, (getParameterEnumValue(IDX_INLAY) == 1));
+			addPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
 			
 			setTranslateX(getParameterNumValue(IDX_RADIUS) + 5.0);
 			setTranslateY(getParameterNumValue(IDX_RADIUS) + 5.0);
@@ -360,7 +319,7 @@ class PGenRegularDiameterPolygon : public PGenRegularRadiusPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Regular - Points based on Diameter";
-			treePath 	= "Polygon [mm]";
+			treePath 	= "Polygons [mm]";
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupNum("Sections", 6, 1, 100, 0);
@@ -403,10 +362,10 @@ class PGenRegularDiameterPolygon : public PGenRegularRadiusPolygon {
 				x = round(x * 1000.0) / 1000.0;
 				y = round(y * 1000.0) / 1000.0;
 						
-				polygonData.append(x, y);
+				getPolygonData(0).append(x, y);
 			}
 			
-			addPolygon(spg, (getParameterEnumValue(IDX_INLAY) == 1));
+			addPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
 			
 			setTranslateX(getParameterNumValue(IDX_DIAMETER) / 2 + 5.0);
 			setTranslateY(getParameterNumValue(IDX_DIAMETER) / 2 + 5.0);
@@ -417,14 +376,17 @@ class PGenRegularDiameterPolygon : public PGenRegularRadiusPolygon {
 
 ///////////////////////////////////////////////////////////////////////////
 class PGenSvgElementPolygon : public PGenPolygon {
-	
+	private:
+		unsigned int elementCount;
+		PolygonList origPoligonList;
+		
 	protected:
 		wxRealPoint centroid;
-		CncPolygonPoints origPolygonData;
 		
 		///////////////////////////////////////////////////////////////////
 		PGenSvgElementPolygon() 
-		: PGenPolygon() 
+		: PGenPolygon()
+		, elementCount(1)
 		, centroid(0.0, 0.0)
 		{}
 		
@@ -432,31 +394,46 @@ class PGenSvgElementPolygon : public PGenPolygon {
 		virtual ~PGenSvgElementPolygon() {}
 		
 		///////////////////////////////////////////////////////////////////
-		virtual const wxString& getElementAsSvgPath() = 0;
+		virtual const wxString& getElementAsSvgPath(unsigned int elementIndex) = 0;
 		virtual double getXOffset() = 0;
 		virtual double getYOffset() = 0;
 		virtual bool getInlayMode() = 0;
+		virtual unsigned int getElementCount() { return 1; }
+		
+		///////////////////////////////////////////////////////////////////
+		const CncPolygonPoints& getOriginalPolygon(unsigned int idx=0) {
+			static CncPolygonPoints defaultPolygon;
+			
+			if ( idx > origPoligonList.size() -1 ) 
+				return defaultPolygon;
+				
+			return origPoligonList.at(idx);
+		}
 		
 		///////////////////////////////////////////////////////////////////
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
-			clearPolygonData();
+			origPoligonList.clear();
 			
-			SVGPathAssistant pa;
-			pa.setCurveLibResolution(commonValues.curveLibResolution);
-			
-			if ( pa.processSvgNode(getElementAsSvgPath()) == false ) {
-				addErrorInfo("processSvgNode failed");
-				return false;
-			}
-			
-			CncPathListManager plm = pa.getPathList();
-			for ( auto it=plm.begin(); it!=plm.end(); ++it )
-				polygonData.append(CncPolygonPoints::convertToIntPoint(it->abs));
+			for ( unsigned int i=0; i<getElementCount(); i++) {
+				clearPolygonData(i);
 				
-			plm.getCentroid(centroid);
-			
-			origPolygonData = polygonData;
-			addPolygon(spg, getInlayMode());
+				SVGPathAssistant pa;
+				pa.setCurveLibResolution(commonValues.curveLibResolution);
+				
+				if ( pa.processSvgNode(getElementAsSvgPath(i)) == false ) {
+					addErrorInfo("processSvgNode failed");
+					return false;
+				}
+				
+				CncPathListManager plm = pa.getPathList();
+				for ( auto it=plm.begin(); it!=plm.end(); ++it )
+					getPolygonData(i).append(CncPolygonPoints::convertToIntPoint(it->abs));
+					
+				plm.getCentroid(centroid);
+				
+				origPoligonList.push_back(getPolygonData(i));
+				addPolygon(i, spg, getInlayMode());
+			}
 			
 			setTranslateX(getXOffset());
 			setTranslateY(getYOffset());
@@ -490,7 +467,7 @@ class PGenEllipticalArcPolygon : public PGenSvgElementPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Circle/Elliptical ARC";
-			treePath 	= "Polygon [mm]";
+			treePath 	= "Polygons [mm]";
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupNum("Radius X [mm]", 30.0, 1.0, 400.0, 3);
@@ -517,7 +494,7 @@ class PGenEllipticalArcPolygon : public PGenSvgElementPolygon {
 		virtual bool getInlayMode() { return (getParameterEnumValue(IDX_INLAY) == 1); }
 		
 		///////////////////////////////////////////////////////////////////
-		virtual const wxString& getElementAsSvgPath() {
+		virtual const wxString& getElementAsSvgPath(unsigned int elementIndex) {
 			static wxString ellipse;
 			ellipse.clear();
 			SVGElementConverter::convertEllipseToPathData(0.0, 0.0, 
@@ -581,7 +558,7 @@ class PGenRectanglePolygon : public PGenSvgElementPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Rectangle";
-			treePath 	= "Polygon [mm]";
+			treePath 	= "Polygons [mm]";
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupNum("Width [mm]", 40.0, 1.0, 400.0, 3);
@@ -629,7 +606,7 @@ class PGenRectanglePolygon : public PGenSvgElementPolygon {
 		virtual bool getInlayMode() { return (getParameterEnumValue(IDX_INLAY) == 1); }
 		
 		///////////////////////////////////////////////////////////////////
-		virtual const wxString& getElementAsSvgPath() {
+		virtual const wxString& getElementAsSvgPath(unsigned int elementIndex) {
 			static wxString rect;
 			rect.clear();
 			
@@ -725,9 +702,9 @@ class PGenSimplePoint : public PGenPolygon {
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
 			clearPolygonData();
 			
-			polygonData.append(getParameterNumValue(IDX_X), getParameterNumValue(IDX_Y));
-			polygonData.append(getParameterNumValue(IDX_X), getParameterNumValue(IDX_Y));
-			addPolyLine(spg);
+			getPolygonData().append(getParameterNumValue(IDX_X), getParameterNumValue(IDX_Y));
+			getPolygonData().append(getParameterNumValue(IDX_X), getParameterNumValue(IDX_Y));
+			addPolyLine(0, spg);
 			
 			setTranslateX(getParameterNumValue(IDX_X) + 5.0);
 			setTranslateY(getParameterNumValue(IDX_Y) + 5.0);
@@ -758,7 +735,7 @@ class PGenSimpleLine : public PGenPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Simple Line";
-			treePath 	= "Polyline [mm]";
+			treePath 	= "Polylines [mm]";
 			
 			commonValues.canJointType = false;
 			
@@ -807,11 +784,11 @@ class PGenSimpleLine : public PGenPolygon {
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
 			clearPolygonData();
 			
-			polygonData.append(getParameterNumValue(IDX_X1), getParameterNumValue(IDX_Y1));
-			polygonData.append(getParameterNumValue(IDX_X2), getParameterNumValue(IDX_Y2));
-			origPolygonData = polygonData;
+			getPolygonData().append(getParameterNumValue(IDX_X1), getParameterNumValue(IDX_Y1));
+			getPolygonData().append(getParameterNumValue(IDX_X2), getParameterNumValue(IDX_Y2));
+			origPolygonData = getPolygonData();
 			
-			addPolyLine(spg);
+			addPolyLine(0, spg);
 			
 			setTranslateX(abs(getMinPosition().x) + 5.0);
 			setTranslateY(abs(getMinPosition().y) + 5.0);
@@ -839,7 +816,7 @@ class PGenFreehandPolyline : public PGenPolygon {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name		= "Freehand";
-			treePath 	= "Polyline [mm]";
+			treePath 	= "Polylines [mm]";
 			
 			commonValues.canJointType = false;
 			
@@ -872,9 +849,10 @@ class PGenFreehandPolyline : public PGenPolygon {
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
 			clearPolygonData();
 			
-			fillPolygonData(getParameterStringValue(IDX_DATA));
-			origPolygonData = polygonData;
-			addPolyLine(spg);
+			const unsigned int polygonIndex = 0;
+			fillPolygonData(polygonIndex, getParameterStringValue(IDX_DATA));
+			origPolygonData = getPolygonData(polygonIndex);
+			addPolyLine(polygonIndex, spg);
 
 			setTranslateX(abs(getMinPosition().x) + 5.0);
 			setTranslateY(abs(getMinPosition().y) + 5.0);
@@ -895,7 +873,7 @@ class PGenericPath : public PGenSvgElementPolygon {
 		///////////////////////////////////////////////////////////////
 		virtual void generateHelpConstructs(SvgPathGroup& spg) {
 			wxString path;
-			SVGElementConverter::convertPolylineToPathData(origPolygonData, px, path);
+			SVGElementConverter::convertPolylineToPathData(getOriginalPolygon(), px, path);
 			addHelpContructPath(spg, path);
 		}
 		
@@ -915,8 +893,8 @@ class PGenericPath : public PGenSvgElementPolygon {
 		///////////////////////////////////////////////////////////////////
 		//virtual double getXOffset() { return + 5.0; }
 		//virtual double getYOffset() { return + 5.0; }
-		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(polygonData.getMinRealPos().x)) + 5.0; }
-		virtual double getYOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(polygonData.getMinRealPos().y)) + 5.0; }
+		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().x)) + 5.0; }
+		virtual double getYOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().y)) + 5.0; }
 		virtual bool getInlayMode() { return (getParameterEnumValue(IDX_INLAY) == 1); }
 		
 		///////////////////////////////////////////////////////////////////
@@ -926,7 +904,7 @@ class PGenericPath : public PGenSvgElementPolygon {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		virtual const wxString& getElementAsSvgPath() {
+		virtual const wxString& getElementAsSvgPath(unsigned int elementIndex) {
 			static wxString path;
 			path.assign(getParameterStringValue(IDX_DATA));
 		
@@ -965,7 +943,7 @@ class PGenericElement : public PGenSvgElementPolygon {
 		///////////////////////////////////////////////////////////////
 		virtual void generateHelpConstructs(SvgPathGroup& spg) {
 			wxString path;
-			SVGElementConverter::convertPolylineToPathData(origPolygonData, px, path);
+			SVGElementConverter::convertPolylineToPathData(getOriginalPolygon(), px, path);
 			addHelpContructPath(spg, path);
 		}
 		
@@ -983,8 +961,8 @@ class PGenericElement : public PGenSvgElementPolygon {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(polygonData.getMinRealPos().x)) + 5.0; }
-		virtual double getYOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(polygonData.getMinRealPos().y)) + 5.0; }
+		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().x)) + 5.0; }
+		virtual double getYOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().y)) + 5.0; }
 		virtual bool getInlayMode() { return (getParameterEnumValue(IDX_INLAY) == 1); }
 		
 		///////////////////////////////////////////////////////////////////
@@ -994,7 +972,7 @@ class PGenericElement : public PGenSvgElementPolygon {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		virtual const wxString& getElementAsSvgPath() {
+		virtual const wxString& getElementAsSvgPath(unsigned int elementIndex) {
 			static wxString path;
 			path.assign(getParameterStringValue(IDX_DATA));
 			return path;
@@ -1022,6 +1000,7 @@ class PGenRotaryKnob : public PGenericPath {
 	private:
 		unsigned int IDX_KNOB_FORM;
 		unsigned int IDX_SECTIONS;
+		unsigned int IDX_DEPTH;
 		unsigned int IDX_KNOB_DIAMETER;
 		unsigned int IDX_SHAFT_DIAMETER;
 		unsigned int IDX_SHAFT_TYPE;
@@ -1035,7 +1014,7 @@ class PGenRotaryKnob : public PGenericPath {
 			wxString path;
 			
 			// original envelope
-			SVGElementConverter::convertPolylineToPathData(origPolygonData, px, path);
+			SVGElementConverter::convertPolylineToPathData(getOriginalPolygon(), px, path);
 			addHelpContructPath(spg, path);
 			
 			// help circle
@@ -1050,7 +1029,7 @@ class PGenRotaryKnob : public PGenericPath {
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Rotray Knob";
-			treePath 	= "Polygon [mm]";
+			treePath 	= "Advanced Polygons [mm]";
 			
 			PathGeneratorBase::ParameterInfo pi;
 			pi.setupEnum("Knob Form", "concave;convex", 0);
@@ -1065,7 +1044,11 @@ class PGenRotaryKnob : public PGenericPath {
 			pi.help = "Diameter of the shaft whole. A value of 0.0 means no shaft and negative values . . .";
 			IDX_KNOB_DIAMETER = setupParameter(pi); 
 			
-			pi.setupEnum("Shaft Type", "Pre-drilled (tool diameter);Whole (shaft diameter)", 0);
+			pi.setupNum("Depth", 2, 0, 10, 1);
+			pi.help = "Depth of the grid troughes";
+			IDX_DEPTH = setupParameter(pi); 
+			
+			pi.setupEnum("Shaft Type", "Pre-drilled (tool diameter);Whole (shaft diameter);No shaft", 0);
 			pi.help = "Determines shaft type.";
 			IDX_SHAFT_TYPE = setupParameter(pi); 
 			
@@ -1082,6 +1065,7 @@ class PGenRotaryKnob : public PGenericPath {
 			PreDefParameterMap map;
 			map[IDX_KNOB_FORM] 			= wxVariant(0);
 			map[IDX_SECTIONS] 			= wxVariant(6);
+			map[IDX_DEPTH]				= wxVariant(1.5);
 			map[IDX_KNOB_DIAMETER] 		= wxVariant(50);
 			map[IDX_SHAFT_DIAMETER] 	= wxVariant(10);
 			map[IDX_SHAFT_TYPE] 		= wxVariant(0);
@@ -1092,10 +1076,11 @@ class PGenRotaryKnob : public PGenericPath {
 			
 			map.clear();
 			map[IDX_KNOB_FORM] 			= wxVariant(0);
-			map[IDX_SECTIONS] 			= wxVariant(12);
+			map[IDX_SECTIONS] 			= wxVariant(10);
+			map[IDX_DEPTH]				= wxVariant(0.9);
 			map[IDX_KNOB_DIAMETER] 		= wxVariant(50);
 			map[IDX_SHAFT_DIAMETER] 	= wxVariant(10);
-			map[IDX_SHAFT_TYPE] 		= wxVariant(0);
+			map[IDX_SHAFT_TYPE] 		= wxVariant(1);
 			map[IDX_INLAY] 				= wxVariant(0);
 			map[IDX_REFPOINT] 			= wxVariant(0);
 			
@@ -1103,8 +1088,8 @@ class PGenRotaryKnob : public PGenericPath {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(polygonData.getMinRealPos().x)) + 5.0; }
-		virtual double getYOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(polygonData.getMinRealPos().y)) + 5.0; }
+		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().x)) + 5.0; }
+		virtual double getYOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().y)) + 5.0; }
 		virtual bool getInlayMode() { return (getParameterEnumValue(IDX_INLAY) == 1); }
 		
 		///////////////////////////////////////////////////////////////////
@@ -1114,7 +1099,7 @@ class PGenRotaryKnob : public PGenericPath {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		virtual const wxString& getElementAsSvgPath() {
+		virtual const wxString& getElementAsSvgPath(unsigned int elementIndex) {
 			static wxString path;
 			path.assign("<path d=\"");
 			 
@@ -1123,7 +1108,7 @@ class PGenRotaryKnob : public PGenericPath {
 			double steps  			= 360.0 / sections;
 			double radius			= getParameterNumValue(IDX_KNOB_DIAMETER) / 2.0;
 			
-			int xxxx = getParameterEnumValue(IDX_KNOB_FORM);
+			int form = getParameterEnumValue(IDX_KNOB_FORM);
 			
 			// store initial move
 			path.append(wxString::Format("M%lf,0 ", SvgUnitCalculator::convertMM2ReferenceUnit(-radius)));
@@ -1142,9 +1127,9 @@ class PGenRotaryKnob : public PGenericPath {
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-x),
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-y)));
 				} else {
-					path.append(wxString::Format("A %lf %lf 0 0 %d %lf,%lf ", SvgUnitCalculator::convertMM2ReferenceUnit(radius ),
-																			 SvgUnitCalculator::convertMM2ReferenceUnit(radius ),
-																			 xxxx,
+					path.append(wxString::Format("A %lf %lf 0 0 %d %lf,%lf ", SvgUnitCalculator::convertMM2ReferenceUnit(radius * getParameterNumValue(IDX_DEPTH)),
+																			 SvgUnitCalculator::convertMM2ReferenceUnit(radius * getParameterNumValue(IDX_DEPTH)),
+																			 form,
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-x),
 																			 SvgUnitCalculator::convertMM2ReferenceUnit(-y)));
 																			  
@@ -1162,6 +1147,7 @@ class PGenRotaryKnob : public PGenericPath {
 		: PGenericPath()
 		, IDX_KNOB_FORM(INT_MAX)
 		, IDX_SECTIONS(INT_MAX)
+		, IDX_DEPTH(INT_MAX)
 		, IDX_KNOB_DIAMETER(INT_MAX)
 		, IDX_SHAFT_DIAMETER(INT_MAX)
 		, IDX_SHAFT_TYPE(INT_MAX)
@@ -1192,28 +1178,147 @@ class PGenRotaryKnob : public PGenericPath {
 		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
 			bool ret = PGenSvgElementPolygon::generate(spg, toolDiameter);
 			
-			clog << toolDiameter << ", " << getParameterNumValue(IDX_SHAFT_DIAMETER) << endl;
-			
-			
 			// additional genarete the shaft
-			wxString shaft("M0,0 ");
-			if ( getParameterEnumValue(IDX_SHAFT_TYPE) == 0 || toolDiameter > getParameterNumValue(IDX_SHAFT_DIAMETER) ) {
-				shaft.Append("L0,0 ");
+			if ( getParameterEnumValue(IDX_SHAFT_TYPE) != 2 ) {
+				wxString shaft("M0,0 ");
+				if ( getParameterEnumValue(IDX_SHAFT_TYPE) == 0 || toolDiameter > getParameterNumValue(IDX_SHAFT_DIAMETER) ) {
+					shaft.Append("L0,0 ");
+					
+				} else {
+					wxString whole;
+					SVGElementConverter::convertCircleToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x),
+																 SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
+																 SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_SHAFT_DIAMETER) / 2.0 - toolDiameter / 2.0),
+																 whole);
+					shaft.Append(whole);
+				}
 				
-			} else {
-				wxString whole;
-				SVGElementConverter::convertCircleToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x),
-															 SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
-															 SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_SHAFT_DIAMETER) / 2.0 - toolDiameter / 2.0),
-															 whole);
-				shaft.Append(whole);
+				spg.pGen().add(shaft);
+				spg.add(spg.pGen().get());
 			}
-			
-			spg.pGen().add(shaft);
-			spg.add(spg.pGen().get());
 			
 			return ret;
 		}
+};
+
+///////////////////////////////////////////////////////////////////////////
+class PGenEllipticalRing : public PGenSvgElementPolygon {
+	private:
+		unsigned int IDX_OUTER_RADIUS_X;
+		unsigned int IDX_OUTER_RADIUS_Y;
+		unsigned int IDX_INNER_RADIUS_X;
+		unsigned int IDX_INNER_RADIUS_Y;
+		unsigned int IDX_REFPOINT;
+		unsigned int IDX_INLAY;
+		
+	protected:
+		
+		///////////////////////////////////////////////////////////////
+		virtual void generateHelpConstructs(SvgPathGroup& spg) {
+			wxString path;
+			// outer
+			SVGElementConverter::convertEllipseToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_OUTER_RADIUS_X)), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_OUTER_RADIUS_Y)), 
+			                                              path);
+			
+			addHelpContructPath(spg, path);
+			
+			// inner
+			path.clear();
+			SVGElementConverter::convertEllipseToPathData(SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().x), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getReferencePoint().y), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_INNER_RADIUS_X)), 
+			                                              SvgUnitCalculator::convertMM2ReferenceUnit(getParameterNumValue(IDX_INNER_RADIUS_Y)), 
+			                                              path);
+			
+			addHelpContructPath(spg, path);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual void initParameters()  {
+			name 		= "Circle/Elliptical Ring";
+			treePath 	= "Advanced Polygons [mm]";
+			
+			PathGeneratorBase::ParameterInfo pi;
+			pi.setupNum("Outer Radius X [mm]", 30.0, 1.0, 400.0, 3);
+			pi.help = "Determine the outer x radius parameter of the elliptical arg.";
+			IDX_OUTER_RADIUS_X = setupParameter(pi);
+			
+			pi.setupNum("Outer Radius Y [mm]", 30.0, 1.0, 400.0, 3);
+			pi.help = "Determine the outer y radius parameter of the elliptical arg.";
+			IDX_OUTER_RADIUS_Y = setupParameter(pi); 
+			
+			pi.setupNum("Inner Radius X [mm]", 15.0, 1.0, 400.0, 3);
+			pi.help = "Determine the inner x radius parameter of the elliptical arg.";
+			IDX_INNER_RADIUS_X = setupParameter(pi);
+			
+			pi.setupNum("Inner Radius Y [mm]", 15.0, 1.0, 400.0, 3);
+			pi.help = "Determine the inner y radius parameter of the elliptical arg.";
+			IDX_INNER_RADIUS_Y = setupParameter(pi); 
+			
+			IDX_INLAY = setupInlayMode(pi, "Path;Whole", 0);
+			IDX_REFPOINT = setupCCReferencePoint(pi);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual unsigned int getElementCount() { return 2; }
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool setReferencePoint(SvgPathGroup& spg) {
+			determineReferencePoint(spg, 0.0, 0.0);
+			return true;
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual double getXOffset() { return getParameterNumValue(IDX_OUTER_RADIUS_X) + 5.0; }
+		virtual double getYOffset() { return getParameterNumValue(IDX_OUTER_RADIUS_Y) + 5.0; }
+		virtual bool getInlayMode() { return (getParameterEnumValue(IDX_INLAY) == 1); }
+		
+		///////////////////////////////////////////////////////////////////
+		virtual const wxString& getElementAsSvgPath(unsigned int elementIndex) {
+			static wxString ellipse;
+			ellipse.clear();
+			
+			switch (elementIndex) {
+				// outer
+				case 0:	SVGElementConverter::convertEllipseToPathData(0.0, 0.0, 
+																	  getParameterNumValue(IDX_OUTER_RADIUS_X), 
+																	  getParameterNumValue(IDX_OUTER_RADIUS_Y), 
+																	  ellipse);
+						ellipse.Prepend("<path d=\"");
+						ellipse.Append("\"/>");
+						break;
+						
+				// inner
+				case 1:	SVGElementConverter::convertEllipseToPathData(0.0, 0.0, 
+																	  getParameterNumValue(IDX_INNER_RADIUS_X), 
+																	  getParameterNumValue(IDX_INNER_RADIUS_Y), 
+																	  ellipse);
+						ellipse.Prepend("<path d=\"");
+						ellipse.Append("\"/>");
+						break;
+			}
+			
+			return ellipse;
+		}
+		
+	public:
+		///////////////////////////////////////////////////////////////////
+		PGenEllipticalRing() 
+		: PGenSvgElementPolygon() 
+		, IDX_OUTER_RADIUS_X(INT_MAX)
+		, IDX_OUTER_RADIUS_Y(INT_MAX)
+		, IDX_INNER_RADIUS_X(INT_MAX)
+		, IDX_INNER_RADIUS_Y(INT_MAX)
+		, IDX_REFPOINT(INT_MAX)
+		, IDX_INLAY(INT_MAX)
+		{}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual ~PGenEllipticalRing() {}
+		
 };
 
 #endif
