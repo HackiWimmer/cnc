@@ -39,19 +39,35 @@
       <File Name="PathGeneratorFrame.cpp"/>
       <VirtualDirectory Name="Generators">
         <VirtualDirectory Name="Dedicated Generators">
-          <File Name="PathGenerators.h"/>
           <File Name="PathGeneratorBase.h"/>
           <File Name="PathGeneratorBase.cpp"/>
-          <File Name="PathGenerators.cpp"/>
+          <File Name="PathGenerators/PGenEllipticalArcPolygon.h"/>
+          <File Name="PathGenerators/PGenEllipticalRing.h"/>
+          <File Name="PathGenerators/PGenFreehandPolygon.h"/>
+          <File Name="PathGenerators/PGenFreehandPolyline.h"/>
+          <File Name="PathGenerators/PGenGenericElement.h"/>
+          <File Name="PathGenerators/PGenGenericPath.h"/>
+          <File Name="PathGenerators/PGenPolygon.cpp"/>
+          <File Name="PathGenerators/PGenPolygon.h"/>
+          <File Name="PathGenerators/PGenRectanglePolygon.h"/>
+          <File Name="PathGenerators/PGenRegularDiameterPolygon.h"/>
+          <File Name="PathGenerators/PGenRegularRadiusPolygon.h"/>
+          <File Name="PathGenerators/PGenRotaryKnob.h"/>
+          <File Name="PathGenerators/PGenSample.h"/>
+          <File Name="PathGenerators/PGenSimpleLine.h"/>
+          <File Name="PathGenerators/PGenSimplePoint.h"/>
+          <File Name="PathGenerators/PGenSvgElementPolygon.h"/>
         </VirtualDirectory>
-        <File Name="SvgPathGroup.cpp"/>
-        <File Name="SvgPathString.cpp"/>
-        <File Name="SvgPathFragment.cpp"/>
-        <File Name="SvgGeneratorBase.cpp"/>
-        <File Name="SvgGeneratorBase.h"/>
-        <File Name="SvgPathFragment.h"/>
-        <File Name="SvgPathGroup.h"/>
-        <File Name="SvgPathString.h"/>
+        <VirtualDirectory Name="SvgPathUtils">
+          <File Name="SvgGeneratorBase.cpp"/>
+          <File Name="SvgGeneratorBase.h"/>
+          <File Name="SvgPathFragment.cpp"/>
+          <File Name="SvgPathFragment.h"/>
+          <File Name="SvgPathGroup.cpp"/>
+          <File Name="SvgPathGroup.h"/>
+          <File Name="SvgPathString.cpp"/>
+          <File Name="SvgPathString.h"/>
+        </VirtualDirectory>
       </VirtualDirectory>
       <File Name="PgPropertyHelpInfos.cpp"/>
       <File Name="PathGeneratorStore.h"/>

@@ -1,5 +1,17 @@
-#include "PathGenerators.h"
 #include "PathGeneratorStore.h"
+
+#include "PathGenerators/PGenRegularDiameterPolygon.h"
+#include "PathGenerators/PGenRegularRadiusPolygon.h"
+#include "PathGenerators/PGenEllipticalArcPolygon.h"
+#include "PathGenerators/PGenRectanglePolygon.h"
+#include "PathGenerators/PGenFreehandPolygon.h"
+#include "PathGenerators/PGenSimplePoint.h"
+#include "PathGenerators/PGenSimpleLine.h"
+#include "PathGenerators/PGenFreehandPolyline.h"
+#include "PathGenerators/PGenGenericPath.h"
+#include "PathGenerators/PGenGenericElement.h"
+#include "PathGenerators/PGenRotaryKnob.h"
+#include "PathGenerators/PGenEllipticalRing.h"
 
 ///////////////////////////////////////////////////////////////////
 PathGeneratorStore::PathGeneratorStore() {
@@ -15,8 +27,8 @@ PathGeneratorStore::PathGeneratorStore() {
 	registerPathGenerator(new PGenFreehandPolygon());
 	registerPathGenerator(new PGenRotaryKnob());
 	registerPathGenerator(new PGenEllipticalRing());
-	registerPathGenerator(new PGenericPath());
-	registerPathGenerator(new PGenericElement());
+	registerPathGenerator(new PGenGenericPath());
+	registerPathGenerator(new PGenGenericElement());
 	
 	//...
 }

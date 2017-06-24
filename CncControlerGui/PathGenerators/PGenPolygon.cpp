@@ -1,6 +1,14 @@
-#include "SVGElementConverter.h"
-#include "PathGenerators.h"
+#include <list>
+#include <boost/geometry.hpp>
+#include <boost/geometry/geometries/point_xy.hpp>
+#include <boost/geometry/geometries/polygon.hpp>
+#include "PathGenerators/PGenPolygon.h"
 
+///////////////////////////////////////////////////////////////////
+const CncPolygonPoints& PGenPolygon::getPolygonDataConst(unsigned int polygonIndex) {
+///////////////////////////////////////////////////////////////////
+	return (const CncPolygonPoints&)getPolygonData(polygonIndex);
+}
 ///////////////////////////////////////////////////////////////////
 CncPolygonPoints& PGenPolygon::getPolygonData(unsigned int polygonIndex) {
 ///////////////////////////////////////////////////////////////////
@@ -42,8 +50,7 @@ void PGenPolygon::getInternalInformation(wxTextCtrl* ctl) {
 ///////////////////////////////////////////////////////////////////
 const char* PGenPolygon::getDataPointsAsWktString(wxString& ret, unsigned int polygonIndex) {
 ///////////////////////////////////////////////////////////////////
-	CncPolygonPoints cpp(getPolygonData(polygonIndex));
-	ret.assign(cpp.getDataPointsAsWktString(ret));
+	ret.assign(getPolygonData(polygonIndex).getDataPointsAsWktString(ret));
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -55,23 +62,21 @@ bool PGenPolygon::centerPolygon(unsigned int polygonIndex) {
 	if ( cnc::dblCompareNull(cp.x) == true && cnc::dblCompareNull(cp.x) == true )
 		return true;
 	
-	CncPolygonPoints cpp(getPolygonData(polygonIndex));
-	for (auto it = cpp.begin(); it != cpp.end(); ++it) {
+	for (auto it = getPolygonData(polygonIndex).begin(); it != getPolygonData(polygonIndex).end(); ++it) {
 		wxRealPoint op(CncPolygonPoints::convertToRealPoint(*it));
 		wxRealPoint np = op - cp;
 		
 		*it = CncPolygonPoints::convertToIntPoint(np);
 	}
 	
-	cpp.evaluateAdditionalValues();
+	getPolygonData(polygonIndex).evaluateAdditionalValues();
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
 const wxRealPoint& PGenPolygon::getPolygonDataPoint(unsigned int polygonIndex, unsigned pointIndex) {
 ///////////////////////////////////////////////////////////////////
-	CncPolygonPoints cpp(getPolygonData(polygonIndex));
-	if ( pointIndex > cpp.size() -1 ) {
+	if ( pointIndex > getPolygonData(polygonIndex).size() -1 ) {
 		addErrorInfo(wxString::Format("getPolygonDataPoint(): Invalid index: %d, current count: %d", pointIndex, getPolygonData().size()));
 		static wxRealPoint p;
 		return p;
@@ -156,9 +161,8 @@ void PGenPolygon::addPolyLine(unsigned int polylineIndex, SvgPathGroup& spg) {
 	
 	// perform offset
 	CncClipperWrapper cw;
-	CncPolygonPoints cpp(getPolygonData(polylineIndex));
-	cw.correctEndPoints(cpp, offset);
-	spoolPolygon(spg, cpp);
+	cw.correctEndPoints(getPolygonData(polylineIndex), offset);
+	spoolPolygon(spg, getPolygonData(polylineIndex));
 }
 ///////////////////////////////////////////////////////////////////
 void PGenPolygon::addPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool inlay) {
@@ -181,8 +185,7 @@ void PGenPolygon::addPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool 
  
 	// first perform tool correction offset
 	CncPolygons results;
-	CncPolygonPoints cpp(getPolygonData(polygonIndex));
-	cw.offsetPath(cpp, results, offset, commonValues.getCornerType()); 
+	cw.offsetPath(getPolygonData(polygonIndex), results, offset, commonValues.getCornerType()); 
 	results.getPolygonPoints(0, polygonToSpool);
 	
 	polygonToSpool.closePolygon();
