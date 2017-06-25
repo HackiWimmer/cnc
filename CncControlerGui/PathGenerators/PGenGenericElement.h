@@ -34,6 +34,33 @@ class PGenGenericElement : public PGenSvgElementPolygon {
 		}
 		
 		///////////////////////////////////////////////////////////////////
+		virtual void initPreDefinedParameterSetups() {
+			PreDefParameterMap map;
+			map[IDX_DATA] 			=  wxVariant("<line x1=\"100\" y1=\"0\" x2=\"200\" y2=\"0\"/>");
+			addPreDefinedParameterSetup("Line", map);
+			
+			map.clear();
+			map[IDX_DATA] 			= wxVariant("<rect x=\"50\" y=\"50\" width=\"100\" height=\"100\"/>");
+			addPreDefinedParameterSetup("Regtangle", map);
+			
+			map.clear();
+			map[IDX_DATA] 			= wxVariant("<circle cx=\"50\" cy=\"40\" r=\"20\" />");
+			addPreDefinedParameterSetup("Circle", map);
+			
+			map.clear();
+			map[IDX_DATA] 			= wxVariant("<ellipse cx=\"50\" cy=\"50\" rx=\"40\" ry=\"30\" />");
+			addPreDefinedParameterSetup("Ellipse", map);
+			
+			map.clear();
+			map[IDX_DATA] 			= wxVariant("<polyline points=\"100,100 150,150 200,100 250,150\"/>");
+			addPreDefinedParameterSetup("Polyline", map);
+			
+			map.clear();
+			map[IDX_DATA] 			= wxVariant("<polygon points=\"100 100 150 150 200 100\"/>");
+			addPreDefinedParameterSetup("Polygon", map);
+		}
+		
+		///////////////////////////////////////////////////////////////////
 		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().x)) + 5.0; }
 		virtual double getYOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().y)) + 5.0; }
 		virtual bool getInlayMode() { return (getParameterEnumValue(IDX_INLAY) == 1); }

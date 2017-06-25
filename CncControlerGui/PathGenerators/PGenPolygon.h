@@ -3,11 +3,22 @@
 
 #include "PathGeneratorBase.h"
 
-typedef std::vector<CncPolygonPoints> PolygonList;
 ///////////////////////////////////////////////////////////////////////////
 class PGenPolygon : public PathGeneratorBase {
 	private:
 		PolygonList polygonDataList;
+		
+		void inlayPolygonOld(SvgPathGroup& spg, CncPolygonPoints& polygon, unsigned int callDepth);
+		
+		bool inlayPolygonA(SvgPathGroup& spg, 
+						   CncPolygonPoints& polygonInData, 
+						   CncPolygonPoints& polygonToSpool, 
+						   unsigned int callDepth);
+						   
+		bool inlayPolygonB(SvgPathGroup& spg, 
+						   CncPolygonPoints& polygonInData, 
+						   CncPolygonPoints& polygonToSpool, 
+						   unsigned int callDepth);
 		
 	protected:
 		
@@ -33,6 +44,13 @@ class PGenPolygon : public PathGeneratorBase {
 			return polygonDataList.size() - 1;
 		}
 		
+		virtual bool isHole(unsigned int polygonIndex=0) { return false; }
+		
+		unsigned int getPolygonCount() { return polygonDataList.size(); }
+		const PolygonList& getPolygonList() { return polygonDataList; }
+		double getToolCorrectionOffset(unsigned int polygonIndex=0);
+		int appendHoles(PolygonList& pl);
+		
 		CncPolygonPoints& getPolygonData(unsigned int polygonIndex=0);
 		const CncPolygonPoints& getPolygonDataConst(unsigned int polygonIndex=0);
 		
@@ -53,10 +71,11 @@ class PGenPolygon : public PathGeneratorBase {
 		void clearPolygonData(unsigned int polygonIndex=0) { getPolygonData(polygonIndex).clear(); }
 		int fillPolygonData(CncPolygonPoints& toFill, const wxString& data);
 		int fillPolygonData(unsigned int polygonIndex, const wxString& data);
-		void addPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool inlay=false);
-		void addPolyLine(unsigned int polylineIndex, SvgPathGroup& spg);
-		
+		void drawPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool inlay=false);
+		void drawPolyLine(unsigned int polylineIndex, SvgPathGroup& spg);
 		void spoolPolygon(SvgPathGroup& spg, const CncPolygonPoints& dataPoints);
+		
+		int performToolCorrection(unsigned int polygonIndex, CncPolygons& results);
 };
 
 #endif

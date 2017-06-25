@@ -94,10 +94,12 @@ wxTreeItemId PathGeneratorStore::appendTreeItem(wxTreeCtrl* tree, TreeIndex& tre
 			if ( tree->GetItemText(id) == token ) {
 				// add only of no more tokens are available
 				if ( tokenizer.HasMoreTokens() == false ) {
-					// redirect parent
-					parent = tree->AppendItem(id, name, 3);
-					TreeItemInfo tii(TreeItemInfo::Type::TIT_TEMPLATE, token, parent);
+					id = tree->AppendItem(id, name, 3);
+					TreeItemInfo tii(TreeItemInfo::Type::TIT_TEMPLATE, name, id);
 					treeIndex.push_back(tii);
+					
+					// redirect parent
+					parent = id;
 				}
 				
 				found = true;
@@ -153,16 +155,22 @@ void PathGeneratorStore::setupSelectorTree(wxTreeCtrl* tree, TreeIndex& treeInde
 				wxTreeItemId preDefParent;
 				wxColour colour(112,146,190);
 				// append default
-				preDefParent = tree->AppendItem(newItem, wxString::Format("%s%s", PRE_DEF_MARKER, PRE_DEF_DEFAULT_ITEM), 4);
+				wxString name(wxString::Format("%s%s", PRE_DEF_MARKER, PRE_DEF_DEFAULT_ITEM));
+				preDefParent = tree->AppendItem(newItem, name, 4);
 				tree->SetItemTextColour(preDefParent, colour);
+				TreeItemInfo tii(TreeItemInfo::Type::TIT_PRE_DEF_PARA_SET, name, preDefParent);
+				treeIndex.push_back(tii);
 				
 				// append configured setups
 				wxArrayString sa;
 				
 				pgb->getPreDefinedParameterSetNames(sa);
 				for ( unsigned int i=0; i<sa.GetCount(); i++ ) {
-					preDefParent = tree->AppendItem(newItem, wxString::Format("%s%s", PRE_DEF_MARKER, sa[i]), 4);
+					wxString name(wxString::Format("%s%s", PRE_DEF_MARKER, sa[i]));
+					preDefParent = tree->AppendItem(newItem, name, 4);
 					tree->SetItemTextColour(preDefParent, colour);
+					TreeItemInfo tii(TreeItemInfo::Type::TIT_PRE_DEF_PARA_SET, name, preDefParent);
+					treeIndex.push_back(tii);
 				}
 			}
 		}

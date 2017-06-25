@@ -144,88 +144,399 @@ const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp, unsigned int 
 	return cp;
 }
 ///////////////////////////////////////////////////////////////////
-void PGenPolygon::addPolyLine(unsigned int polylineIndex, SvgPathGroup& spg) {
+int PGenPolygon::appendHoles(PolygonList& pl) {
 ///////////////////////////////////////////////////////////////////
-	double offset = 0.0;
-	
-	// determine offset
-	switch ( commonValues.getCorrectionType() ) {
-		case CncCT_Inner:	offset = -commonValues.toolDiameter/2; break;
-		case CncCT_Outer:	offset = +commonValues.toolDiameter/2; break;
-		default:			offset = 0.0; break;
-	}
-	
-	// consider input unit
-	if ( inputUnit != mm )
-		offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
-	
-	// perform offset
-	CncClipperWrapper cw;
-	cw.correctEndPoints(getPolygonData(polylineIndex), offset);
-	spoolPolygon(spg, getPolygonData(polylineIndex));
-}
-///////////////////////////////////////////////////////////////////
-void PGenPolygon::addPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool inlay) {
-///////////////////////////////////////////////////////////////////
-	double offset = 0.0;
-	
-	// determine offset
-	switch ( commonValues.getCorrectionType() ) {
-		case CncCT_Inner:	offset = -commonValues.toolDiameter/2; break;
-		case CncCT_Outer:	offset = +commonValues.toolDiameter/2; break;
-		default:			offset = 0.0; break;
-	}
-	
-	// consider input unit
-	if ( inputUnit != mm )
-		offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
-		
-	CncClipperWrapper cw;
-	CncPolygonPoints polygonToSpool;
- 
-	// first perform tool correction offset
-	CncPolygons results;
-	cw.offsetPath(getPolygonData(polygonIndex), results, offset, commonValues.getCornerType()); 
-	results.getPolygonPoints(0, polygonToSpool);
-	
-	polygonToSpool.closePolygon();
-	
-	// perform inlay
-	if ( inlay == true ) {
-
-		CncPolygonPoints reference = polygonToSpool;
-		
-		unsigned int cnt = 1;
-		while ( true ) {
-			// offset
-			CncPolygons results;
-			
-			offset = -commonValues.toolDiameter;
-			// consider input unit
-			if ( inputUnit != mm )
-				offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+	if ( pl.size() == 0 )
+		return 0;
 				
-			if ( cw.offsetPath(reference, results, offset * cnt, commonValues.getCornerType()) == false) { 
-				std::cerr << "PGenPolygon::addPolygon: failed" << std::endl;
-				return;
+	// determine the outer direction
+	CncDirection outerDir = pl[0].getOrientation();
+	
+	int ret = 0;
+	for ( unsigned int i=0; i<getPolygonCount(); i++) {
+		if ( isHole(i) ) {
+			CncPolygons results;
+			performToolCorrection(i, results);
+			
+			// over all results
+			for ( auto it=results.begin(); it !=results.end(); ++it ) {
+				CncPolygonPoints pp = *it;
+			
+				// check and perform orientation, always reverse due to the outer dir 
+				if ( pp.getOrientation() == outerDir )
+					pp.reverseOrientation();
+					
+				// finaly close the polygon - on demand
+				pp.closePolygon();
+				pl.push_back(pp);
 			}
 			
-			// nothing more to do
-			if ( results.size() == 0 )
-				break;
-			
-			// append
-			polygonToSpool.append(results[0]);
-			cnt++;
+			// return the amount of added holes
+			ret  += results.size(); 
 		}
 	}
 	
-	spoolPolygon(spg, polygonToSpool);
+	return ret;
 }
+///////////////////////////////////////////////////////////////////
+double PGenPolygon::getToolCorrectionOffset(unsigned int polygonIndex) { 
+///////////////////////////////////////////////////////////////////
+	double fact = ( isHole(polygonIndex) ? -1.0 : 1.0 );
+	return fact * commonValues.toolDiameter/2; 
+}
+///////////////////////////////////////////////////////////////////
+int PGenPolygon::performToolCorrection(unsigned int polygonIndex, CncPolygons& results) {
+///////////////////////////////////////////////////////////////////
+	double offset = 0.0;
+	
+	// determine offset
+	switch ( commonValues.getCorrectionType() ) {
+		case CncCT_Inner:	offset = -getToolCorrectionOffset(polygonIndex); break;
+		case CncCT_Outer:	offset = +getToolCorrectionOffset(polygonIndex); break;
+		default:			offset = 0.0; break;
+	}
+	
+	// consider input unit
+	if ( inputUnit != mm )
+		offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+		
+	// perform tool correction offset
+	CncPolygonPoints pp(getPolygonData(polygonIndex));
+	if ( pp.isPolygonClosed() ) {
+		
+		if ( cnc::dblCompareNull(offset) == false ) {
+			CncClipperWrapper cw;
+			cw.offsetPath(pp, results, offset, commonValues.getCornerType()); 
+		} else {
+			results.push_back(pp);
+		}
+		
+	} else {
+		CncClipperWrapper cw;
+		if ( cnc::dblCompareNull(offset) == false )
+			cw.correctEndPoints(pp, offset);
+			
+		results.push_back(pp);
+	}
+	
+	return results.size();
+}
+///////////////////////////////////////////////////////////////////
+void PGenPolygon::drawPolyLine(unsigned int polylineIndex, SvgPathGroup& spg) {
+///////////////////////////////////////////////////////////////////
+	// first perform tool correction offset
+	CncPolygons results;
+	performToolCorrection(polylineIndex, results);
+
+	// over all results
+	for ( auto it=results.begin(); it !=results.end(); ++it )
+		spoolPolygon(spg, *it);
+}
+///////////////////////////////////////////////////////////////////
+void PGenPolygon::drawPolygon(unsigned int polygonIndex, SvgPathGroup& spg, bool inlay) {
+///////////////////////////////////////////////////////////////////
+	// first perform tool correction offset
+	CncPolygons results;
+	performToolCorrection(polygonIndex, results);
+	
+	// over all results
+	for ( auto it=results.begin(); it !=results.end(); ++it ) {
+		CncPolygonPoints polygon = *it;
+		polygon.closePolygon();
+
+		// perform inlay
+		if ( inlay == true && isHole(polygonIndex) == false ) {
+			CncPolygonPoints polygonToSpool;
+			if ( inlayPolygonB(spg, polygon, polygonToSpool, 1) == false ) {
+				addErrorInfo("PGenPolygon::drawPolygon: inlayPolygon failed");
+			}
+		} else {
+			spoolPolygon(spg, polygon);
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
+bool PGenPolygon::inlayPolygonA(SvgPathGroup& spg, 
+							    CncPolygonPoints& polygonInData, 
+							    CncPolygonPoints& polygonToSpool, 
+							    unsigned int callDepth) {
+///////////////////////////////////////////////////////////////////
+	static const int maxCallDepth = 32;
+	
+	CncClipperWrapper cw;
+	
+	// first spool the given polygon
+	polygonInData.closePolygon();
+	clog << "D:"<< wxString(polygonInData.getAsSvgPathRepresentation(mm, false)).SubString(0,40) << endl;
+	spoolPolygon(spg, polygonInData);
+	
+	// prepare the path input incl. the corresponding holes
+	PolygonList pl;
+	pl.push_back(polygonInData);
+	appendHoles(pl);
+		
+	// determine offset
+	double offset = -commonValues.toolDiameter;
+	// consider input unit
+	if ( inputUnit != mm )
+		offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+		
+	// perform the offseting
+	CncPolygons results;
+	if ( cw.offsetPath(pl, results, offset, commonValues.getCornerType()) == false) { 
+		addErrorInfo("PGenPolygon::inlayPolygon: offset path failed");
+		return false;
+	}
+	
+	clog << callDepth << ":" << endl;
+	results.trace(clog);
+	
+	// generate the output 
+	if ( results.size() == 0 ) {
+		clog << "0:"<< wxString(polygonToSpool.getAsSvgPathRepresentation(mm, false)).SubString(0,40) << endl;
+		spoolPolygon(spg, polygonToSpool);
+		return true;
+	}
+	
+	
+	
+	// append the result and inlay again (recusive call)
+	if ( results.size() == 1 ) {
+		// append
+		CncPolygonPoints pp(results[0]);
+		pp.closePolygon();
+		polygonToSpool.append(pp);
+		
+		// check
+		if ( ++callDepth > maxCallDepth ) {
+			addErrorInfo("PGenPolygon::inlayPolygon: Max call depth reached (type B)");
+			return false;
+		}
+		
+		// recursive call
+		bool ret = inlayPolygonA(spg, pp, polygonToSpool, callDepth);
+		callDepth--;
+		
+		if  ( ret == false ) {
+			addErrorInfo("PGenPolygon::inlayPolygon: Recursive call type A of inlayPolygon failed");
+			return false;
+		}
+		
+		return true;
+	// start a new inlay procedure for each new polygon
+	} else {
+		//results.removeHoles();
+		
+		for ( auto it=results.begin(); it !=results.end(); ++it ) {
+			CncPolygonPoints pp = *it;
+			
+			/*
+			if ( pp.getOrientationAsBool() == false )
+				continue;
+			*/
+			
+			
+			pp.closePolygon();
+			
+			CncPolygonPoints newPolygonToSpool;
+			
+			// check
+			if ( ++callDepth > maxCallDepth ) {
+				addErrorInfo("PGenPolygon::inlayPolygon: Max call depth reached (type B)");
+				return false;
+			}
+
+			// recursive call
+			bool ret = inlayPolygonA(spg, pp, newPolygonToSpool, callDepth);
+			--callDepth;
+			
+			if  ( ret == false ) {
+				addErrorInfo("PGenPolygon::inlayPolygon: Recursive call type B of inlayPolygon failed");
+				return false;
+			}
+		}
+		
+		return true;
+	}
+	
+	return true;
+}
+
+
+///////////////////////////////////////////////////////////////////
+bool PGenPolygon::inlayPolygonB(SvgPathGroup& spg, 
+							    CncPolygonPoints& polygonInData, 
+							    CncPolygonPoints& polygonToSpool, 
+							    unsigned int callDepth) {
+///////////////////////////////////////////////////////////////////
+	static const int maxCallDepth = 32;
+	
+	CncClipperWrapper cw;
+	
+	// first spool the given polygon
+	polygonInData.closePolygon();
+	spoolPolygon(spg, polygonInData);
+	
+	// prepare the path input incl. the corresponding holes
+	PolygonList pl;
+	pl.push_back(polygonInData);
+	appendHoles(pl);
+		
+	// until the polygon is filled with paths
+	unsigned int cnt = 1;
+	while ( true ) {
+		// offset
+		double offset = -commonValues.toolDiameter;
+		// consider input unit
+		if ( inputUnit != mm )
+			offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+			
+		//perform the offseting
+		CncPolygons results;
+		if ( cw.offsetPath(pl, results, offset * cnt, commonValues.getCornerType()) == false) { 
+			addErrorInfo("PGenPolygon::inlayPolygon: failed");
+			return false;
+		}
+		
+		wxString xxx(' ', callDepth);
+		clog << xxx << callDepth << " duration count: " << cnt << "; result size: "<< results.size() << endl;
+		
+		MessageBoxA(0, wxString::Format("%d", results.getOuterCount()),"",0);
+		
+		// nothing more to do
+		if ( results.getOuterCount() == 0 )
+			break;
+		
+		if ( results.getOuterCount() == 1 ) {
+			// append
+			CncPolygonPoints pp(results[0]);
+			pp.closePolygon();
+			polygonToSpool.append(pp);
+			
+		} else {
+			
+			/*
+			
+			// recursive call 
+			for ( auto it=results.begin(); it !=results.end(); ++it ) {
+				CncPolygonPoints pp = *it;
+				pp.closePolygon();
+				++callDepth;
+				
+				//safty 
+				if ( callDepth > maxCallDepth ) {
+					std::cerr << "PGenPolygon::inlayPolygon: failed: Max call depth reached!" << std::endl;
+					break;
+				}
+	
+				inlayPolygonOld(spg, pp, callDepth);
+				--callDepth;
+			}
+			
+			break;
+			 */
+		}
+		
+		cnt++;
+		
+	}
+	
+	spoolPolygon(spg, polygonToSpool);
+	
+	return true;
+}
+
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////
 void PGenPolygon::spoolPolygon(SvgPathGroup& spg, const CncPolygonPoints& dataPoints) {
 ///////////////////////////////////////////////////////////////////
 	spg.pGen().add(dataPoints.getAsSvgPathRepresentation(getInputUnit(), false, ""));
 	spg.add(spg.pGen().get());
+}
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////
+void PGenPolygon::inlayPolygonOld(SvgPathGroup& spg, CncPolygonPoints& polygon, unsigned int callDepth) {
+///////////////////////////////////////////////////////////////////
+	static const int maxCallDepth = 32;
+	
+	CncClipperWrapper cw;
+	
+	// first spool the given polygon
+	polygon.closePolygon();
+	spoolPolygon(spg, polygon);
+	
+	// prepare the path input incl. the corresponding holes
+	PolygonList pl;
+	pl.push_back(polygon);
+	appendHoles(pl);
+		
+	// create ....
+	CncPolygonPoints polygonToSpool;
+		
+	// until the polygon is filled with pathes
+	unsigned int cnt = 1;
+	while ( true ) {
+		// offset
+		double offset = -commonValues.toolDiameter;
+		// consider input unit
+		if ( inputUnit != mm )
+			offset = SvgUnitCalculator::convertUnit2Unit(mm, inputUnit, offset);
+			
+		//perform the offseting
+		CncPolygons results;
+		if ( cw.offsetPath(pl, results, offset * cnt, commonValues.getCornerType()) == false) { 
+			std::cerr << "PGenPolygon::inlayPolygon: failed" << std::endl;
+			return;
+		}
+		
+		wxString xxx(' ', callDepth);
+		clog << xxx << callDepth << " duration count: " << cnt << "; result size: "<< results.size() << endl;
+		
+		// nothing more to do
+		if ( results.size() == 0 )
+			break;
+		
+		if ( results.size() == 1 ) {
+			// append
+			CncPolygonPoints pp(results[0]);
+			pp.closePolygon();
+			polygonToSpool.append(pp);
+			
+		} else {
+			// recursive call 
+			for ( auto it=results.begin(); it !=results.end(); ++it ) {
+				CncPolygonPoints pp = *it;
+				pp.closePolygon();
+				++callDepth;
+				
+				//safty 
+				if ( callDepth > maxCallDepth ) {
+					std::cerr << "PGenPolygon::inlayPolygon: failed: Max call depth reached!" << std::endl;
+					break;
+				}
+	
+				inlayPolygonOld(spg, pp, callDepth);
+				--callDepth;
+			}
+			
+			break;
+		}
+		
+		cnt++;
+		
+	}
+	
+	spoolPolygon(spg, polygonToSpool);
 }

@@ -34,6 +34,17 @@ class PGenGenericPath : public PGenSvgElementPolygon {
 		}
 		
 		///////////////////////////////////////////////////////////////////
+		virtual void initPreDefinedParameterSetups() {
+			PreDefParameterMap map;
+			map[IDX_DATA] 			=  wxVariant("M100,200 C100,100 250,100 250,200 S400,300 400,200");
+			addPreDefinedParameterSetup("Cubic Bezier", map);
+			
+			map.clear();
+			map[IDX_DATA] 			= wxVariant("M400,400 Q400,50 600,300 T100,300");
+			addPreDefinedParameterSetup("Quadratic Bezier", map);
+		}
+		
+		///////////////////////////////////////////////////////////////////
 		//virtual double getXOffset() { return + 5.0; }
 		//virtual double getYOffset() { return + 5.0; }
 		virtual double getXOffset() { return SvgUnitCalculator::convertReferenceUnit2MM(abs(getPolygonData().getMinRealPos().x)) + 5.0; }

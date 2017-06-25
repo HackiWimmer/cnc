@@ -64,7 +64,7 @@ class PGenFreehandPolygon : public PGenPolygon {
 			
 			centerPolygon();
 			origPolygonData = getPolygonData(0);
-			addPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
+			drawPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
 
 			setTranslateX(abs(getMinPosition().x) + 5.0);
 			setTranslateY(abs(getMinPosition().y) + 5.0);

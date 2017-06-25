@@ -46,6 +46,29 @@ CncPolygonPoints::~CncPolygonPoints() {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
+CncDirection CncPolygonPoints::getOrientation() {
+///////////////////////////////////////////////////////////////////
+	if ( Orientation(*this) == true )	return CncClockwise;
+	else 								return CncAnticlockwise; 
+	
+	return CncUndefDir;
+}
+///////////////////////////////////////////////////////////////////
+CncDirection CncPolygonPoints::setOrientation(CncDirection dir) {
+///////////////////////////////////////////////////////////////////
+	if ( dir != CncUndefDir ) {
+		if ( getOrientation() != dir )
+			reverseOrientation();
+	}
+	
+	return getOrientation();
+}
+///////////////////////////////////////////////////////////////////
+void CncPolygonPoints::reverseOrientation() { 
+///////////////////////////////////////////////////////////////////
+	ReversePath(*this); 
+}
+///////////////////////////////////////////////////////////////////
 double CncPolygonPoints::convertToDouble(const cInt& v) {
 ///////////////////////////////////////////////////////////////////
 	return ((double)v/doubleToIntFactor);
@@ -177,7 +200,7 @@ const char* CncPolygonPoints::getAsSvgPathRepresentation(SVGUnit inputUnit, bool
 	s.Alloc(1024 * 4);
 	
 	if ( size() == 0 ) {
-		s.assign("<!-- no data available -->");
+		s.assign("");
 		return s.c_str();
 	}
 	
@@ -192,16 +215,16 @@ const char* CncPolygonPoints::getAsSvgPathRepresentation(SVGUnit inputUnit, bool
 	for (auto it = begin(); it != end(); ++it) {
 		
 		if ( inputUnit == px ) {
-			if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", CncPolygonPoints::convertToDouble(it->X), 
+			if ( cnt == 0 ) s.append(wxString::Format("%.6lf,%.6lf%s", CncPolygonPoints::convertToDouble(it->X), 
 																	   CncPolygonPoints::convertToDouble(it->Y), 
 																	   x));
-			else			s.append(wxString::Format(" %.3lf,%.3lf",  CncPolygonPoints::convertToDouble(it->X), 
+			else			s.append(wxString::Format(" %.6lf,%.6lf",  CncPolygonPoints::convertToDouble(it->X), 
 		                                                               CncPolygonPoints::convertToDouble(it->Y)));
 		} else {
-			if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
+			if ( cnt == 0 ) s.append(wxString::Format("%.6lf,%.6lf%s", SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
 																	   SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->Y)), 
 																	   x));
-			else			s.append(wxString::Format(" %.3lf,%.3lf",  SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
+			else			s.append(wxString::Format(" %.6lf,%.6lf",  SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->X)), 
 		                                                               SvgUnitCalculator::convertMM2ReferenceUnit(pxFactor * CncPolygonPoints::convertToDouble(it->Y))));
 		}
 		
@@ -223,13 +246,77 @@ const char* CncPolygonPoints::getAsSvgPathRepresentation(SVGUnit inputUnit, bool
 
 
 ///////////////////////////////////////////////////////////////////
-CncPolygons::CncPolygons() {
+CncPolygons::CncPolygons() 
+: ClipperLib::Paths()
+{
 ///////////////////////////////////////////////////////////////////
+	// nothing more todo
+}
+///////////////////////////////////////////////////////////////////
+CncPolygons::CncPolygons(const CncPolygons& ps) 
+: ClipperLib::Paths(ps)
+{
+///////////////////////////////////////////////////////////////////
+	// nothing more todo
+}
+///////////////////////////////////////////////////////////////////
+CncPolygons::CncPolygons(const PolygonList& pl) 
+: ClipperLib::Paths()
+{
+///////////////////////////////////////////////////////////////////
+	for ( auto it=pl.begin(); it!=pl.end(); ++it) {
+		CncPolygonPoints pp = *it;
+		push_back(pp);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 CncPolygons::~CncPolygons() {
 ///////////////////////////////////////////////////////////////////
+	// nothing todo
 }
+///////////////////////////////////////////////////////////////////
+unsigned int CncPolygons::getTotalCount() {
+///////////////////////////////////////////////////////////////////
+	return size();
+}
+///////////////////////////////////////////////////////////////////
+unsigned int CncPolygons::getOuterCount() {
+///////////////////////////////////////////////////////////////////
+	if ( size() == 0 )
+		return 0;
+	
+	bool dir = Orientation(*begin());
+	unsigned int ret = 0;
+
+	for ( auto it=begin(); it!=end(); ++it) {
+		if ( Orientation(*it) == dir )
+			ret++;
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+unsigned int CncPolygons::getHoleCount() {
+///////////////////////////////////////////////////////////////////
+	if ( size() == 0 )
+		return 0;
+
+	bool dir = Orientation(*begin());
+	unsigned int ret = 0;
+
+	for ( auto it=begin(); it!=end(); ++it) {
+		if ( Orientation(*it) != dir )
+			ret++;
+	}
+	
+	return ret;
+}
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////
 bool CncPolygons::getPolygonPoints(unsigned int idx, CncPolygonPoints& ret) {
 ///////////////////////////////////////////////////////////////////
@@ -246,8 +333,6 @@ bool CncPolygons::getPolygonPoints(unsigned int idx, CncPolygonPoints& ret) {
 		
 	return true;
 }
-
-
 
 
 ///////////////////////////////////////////////////////////////////
@@ -378,9 +463,23 @@ bool CncClipperWrapper::offsetPath(const CncPolygonPoints& in, CncPolygons& out,
                                   CncClipperCornerType joinType, 
 								  CncClipperEndType endType) {
 ///////////////////////////////////////////////////////////////////
+	PolygonList list;
+	list.push_back(in);
+	
+	return offsetPath(list, out, offset, joinType, endType);
+}
+///////////////////////////////////////////////////////////////////
+bool CncClipperWrapper::offsetPath(const PolygonList& inList, CncPolygons& out, double offset, 
+				                   CncClipperCornerType joinType, 
+				                   CncClipperEndType endType) {
+///////////////////////////////////////////////////////////////////
 	try {
 		ClipperOffset co;
-		co.AddPath(in, convertCornerType(joinType), convertEndType(endType));
+		for ( auto it=inList.begin(); it!=inList.end(); ++it) {
+			CncPolygonPoints pp = *it;
+			co.AddPath(pp, convertCornerType(joinType), convertEndType(endType));
+		}
+		
 		co.Execute(out, offset * CncPolygonPoints::doubleToIntFactor);
 		
 	} catch (std::runtime_error e ) {

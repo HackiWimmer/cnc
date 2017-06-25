@@ -1727,11 +1727,22 @@ protected:
     wxWebView* m_pgPreview;
 #endif // wxUSE_WEBVIEW
 
+    wxPanel* m_pgAdditionalCodePage;
+    wxFlexGridSizer* flexGridSizer3414;
+    wxTextCtrl* m_aditionalCode;
     wxPanel* m_pgAdditionalInfoPage;
     wxFlexGridSizer* flexGridSizer3336;
     wxTextCtrl* m_additionalInfo;
     wxPanel* m_splitterPage2940;
     wxFlexGridSizer* flexGridSizer2944;
+    wxFlexGridSizer* flexGridSizer3395;
+    wxStaticText* m_staticText3401;
+    wxFlexGridSizer* flexGridSizer3406;
+    wxTextCtrl* m_currentTemplate;
+    wxFlexGridSizer* flexGridSizer33851;
+    wxStaticText* m_staticText33892;
+    wxComboBox* m_cbEditMode;
+    wxButton* m_updatePreview;
     wxFlexGridSizer* flexGridSizer3385;
     wxStaticText* m_staticText3389;
     wxComboBox* m_cbDisplayMode;
@@ -1752,6 +1763,7 @@ protected:
     wxButton* m_btPGClear;
     wxButton* m_btPGReplaceEdit;
     wxButton* m_btPGCopy;
+    wxButton* m_btPGSave;
     wxFlexGridSizer* flexGridSizer3225;
     wxButton* m_btPGMinimize;
     wxButton* m_btPGClose;
@@ -1820,11 +1832,14 @@ protected:
     virtual void pgMainBookChanged(wxNotebookEvent& event) { event.Skip(); }
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
+    virtual void selectEditMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void updatePreview(wxCommandEvent& event) { event.Skip(); }
     virtual void selectDisplayMode(wxCommandEvent& event) { event.Skip(); }
     virtual void generatePath(wxCommandEvent& event) { event.Skip(); }
     virtual void clearView(wxCommandEvent& event) { event.Skip(); }
     virtual void relaceEditControlSelection(wxCommandEvent& event) { event.Skip(); }
     virtual void copyPath(wxCommandEvent& event) { event.Skip(); }
+    virtual void saveTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void toogleSize(wxCommandEvent& event) { event.Skip(); }
     virtual void onCloseWindowFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void propertyChanged(wxPropertyGridEvent& event) { event.Skip(); }
@@ -1840,10 +1855,17 @@ public:
     wxComboBox* GetPgPathSelector() { return m_pgPathSelector; }
     wxWebView* GetPgPreview() { return m_pgPreview; }
     wxPanel* GetPgPreviewPage() { return m_pgPreviewPage; }
+    wxTextCtrl* GetAditionalCode() { return m_aditionalCode; }
+    wxPanel* GetPgAdditionalCodePage() { return m_pgAdditionalCodePage; }
     wxTextCtrl* GetAdditionalInfo() { return m_additionalInfo; }
     wxPanel* GetPgAdditionalInfoPage() { return m_pgAdditionalInfoPage; }
     wxNotebook* GetPgMainBook() { return m_pgMainBook; }
     wxPanel* GetSplitterPage2936() { return m_splitterPage2936; }
+    wxStaticText* GetStaticText3401() { return m_staticText3401; }
+    wxTextCtrl* GetCurrentTemplate() { return m_currentTemplate; }
+    wxStaticText* GetStaticText33892() { return m_staticText33892; }
+    wxComboBox* GetCbEditMode() { return m_cbEditMode; }
+    wxButton* GetUpdatePreview() { return m_updatePreview; }
     wxStaticText* GetStaticText3389() { return m_staticText3389; }
     wxComboBox* GetCbDisplayMode() { return m_cbDisplayMode; }
     wxTextCtrl* GetGeneratedPreview() { return m_generatedPreview; }
@@ -1860,6 +1882,7 @@ public:
     wxButton* GetBtPGClear() { return m_btPGClear; }
     wxButton* GetBtPGReplaceEdit() { return m_btPGReplaceEdit; }
     wxButton* GetBtPGCopy() { return m_btPGCopy; }
+    wxButton* GetBtPGSave() { return m_btPGSave; }
     wxButton* GetBtPGMinimize() { return m_btPGMinimize; }
     wxButton* GetBtPGClose() { return m_btPGClose; }
     wxPropertyGridManager* GetPgParameterMgr() { return m_pgParameterMgr; }

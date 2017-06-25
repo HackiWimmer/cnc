@@ -46,7 +46,6 @@ class SvgPathString : public SvgGeneratorBase {
 		
 		////////////////////////////////////////////////////////////////////////////
 		void add(const wxString& pf);
-		bool addPocketWhole(double td, double rx, double ry, bool correctRadius);
 		
 		////////////////////////////////////////////////////////////////////////////
 		bool addPath(const wxString& p);

@@ -58,7 +58,7 @@ class PGenFreehandPolyline : public PGenPolygon {
 			const unsigned int polygonIndex = 0;
 			fillPolygonData(polygonIndex, getParameterStringValue(IDX_DATA));
 			origPolygonData = getPolygonData(polygonIndex);
-			addPolyLine(polygonIndex, spg);
+			drawPolyLine(polygonIndex, spg);
 
 			setTranslateX(abs(getMinPosition().x) + 5.0);
 			setTranslateY(abs(getMinPosition().y) + 5.0);

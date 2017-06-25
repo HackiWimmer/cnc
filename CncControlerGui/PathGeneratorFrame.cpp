@@ -30,12 +30,18 @@ PathGeneratorFrame::PathGeneratorFrame(wxWindow* parent, wxStyledTextCtrl* tplEd
 	globaGeneratedPath.clear();
 	initControls();
 	
+	m_mainSplitter->SetSashPosition(200);
+	leftSplitterWidth = m_mainSplitter->GetSashPosition();
+	
 	SetMinSize(wxSize(-1, minSizeHeight));
 	SetSize(wxSize(900, 600));
 	
 	m_pgMainBook->SetSelection(0);
 	decorateSizeButton();
 	decorateTreeSizeButton();
+	
+	m_generatedPreview->SetEditable(false);
+	m_updatePreview->Enable(false);
 }
 ///////////////////////////////////////////////////////////////////
 PathGeneratorFrame::~PathGeneratorFrame() {
@@ -156,6 +162,7 @@ void PathGeneratorFrame::enableControls(bool state) {
 	m_btPGGenerate->Enable(state);
 	m_btPGClear->Enable(state);
 	m_btPGCopy->Enable(state);
+	m_btPGSave->Enable(state);
 	m_btPGClose->Enable(state);
 	
 	state == true ? m_generatedPreview->Thaw() : m_generatedPreview->Freeze();
@@ -178,7 +185,8 @@ void PathGeneratorFrame::initControls() {
 	m_pgParameterMgr->GetGrid()->DedicateKey(WXK_DOWN);
 	
 	m_pgParameterMgr->GetGrid()->ResetColours();
-	m_pgParameterMgr->GetGrid()->SetCaptionBackgroundColour(wxColour(255,255,128));
+	m_pgParameterMgr->GetGrid()->SetCaptionBackgroundColour(wxColour(112,146,190));
+	m_pgParameterMgr->GetGrid()->SetCaptionTextColour(wxColour(255,255,255));
 	m_pgParameterMgr->GetGrid()->SetCellBackgroundColour(wxColour(255,255,255));
 	
 	wxFloatingPointValidator<float> validator(3, NULL, wxNUM_VAL_DEFAULT);
@@ -348,6 +356,11 @@ void PathGeneratorFrame::selectPathSelector(int id) {
 		setupCommonValues(pathGeneratorStore.getCommonValues(id));
 		setupCncParameterValues(pathGeneratorStore.getCncParameterValues(id));
 		pathGeneratorStore.setupParameter(id, m_pgCatPath);
+		
+		if ( pathGeneratorStore.getPathGenerator(id) != NULL )
+			m_currentTemplate->SetValue(pathGeneratorStore.getPathGenerator(id)->getName());
+		else
+			m_currentTemplate->SetValue("Unknown!");
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -534,57 +547,78 @@ void PathGeneratorFrame::generatePath(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::generatePath() {
 ///////////////////////////////////////////////////////////////////
-	StdStreamRedirector redirector(m_processInfo);
-	
-	enableControls(false);
-	clearProcessInfo();
-	m_pgMainBook->SetSelection(0);
+	try {
+		StdStreamRedirector redirector(m_processInfo);
+		
+		enableControls(false);
+		clearProcessInfo();
+		m_pgMainBook->SetSelection(0);
 
-	int id = getPathSelection();
-	if ( id >= 0 ) {
+		int id = getPathSelection();
+		if ( id >= 0 ) {
 
-		// generate path
-		pathGeneratorStore.resetErrorInfo(id);
-		bool helpConstructs = m_pgPropGridHelpConstructs->GetValue().GetBool();
-		wxString svgFragment(pathGeneratorStore.generatePath(id, helpConstructs));
-		
-		// prepare preview and result
-		wxString preview(svgFragment);
-		wxString result(svgFragment);
-		
-		SvgGeneratorBase::finalizeSvgFragment(preview, true);
-		SvgGeneratorBase::finalizeSvgFragment(result, false);
-		
-		// update result
-		m_generatedResult->Clear();
-		m_generatedResult->SetDefaultStyle(*wxWHITE);
-		m_generatedResult->AppendText(result);
-		
-		// update preview
-		m_generatedPreview->Clear();
-		m_generatedPreview->SetDefaultStyle(wxColour(0,128,192));
-		m_generatedPreview->AppendText(preview);
-		
-		// update global Value
-		globaGeneratedPath = result;
-		
-		if ( pathGeneratorStore.hasErrorInfo(id) == true )
-			appendErrorMessage(pathGeneratorStore.getErrorInfo(id));
-
-		// update transform values
-		if ( m_pgPropTransformMode->GetValue().GetBool() == true )
-			updateTransformValues(pathGeneratorStore.getTransformValues(id));
+			// generate path
+			pathGeneratorStore.resetErrorInfo(id);
+			bool helpConstructs = m_pgPropGridHelpConstructs->GetValue().GetBool();
+			wxString svgFragment(pathGeneratorStore.generatePath(id, helpConstructs));
 			
-	} else {
-		clearView();
-		appendErrorMessage(wxString::Format("PathGeneratorFrame::generatePath: Invalid id: %d\n", id));
+			// prepare preview and result
+			wxString preview(svgFragment);
+			wxString result(svgFragment);
+			
+			SvgGeneratorBase::finalizeSvgFragment(preview, true);
+			SvgGeneratorBase::finalizeSvgFragment(result, false);
+			
+			// update result
+			m_generatedResult->Clear();
+			m_generatedResult->SetDefaultStyle(*wxLIGHT_GREY);
+			m_generatedResult->AppendText(result);
+			
+			// update preview
+			m_generatedPreview->Clear();
+			m_generatedPreview->SetDefaultStyle(wxColour(0,128,192));
+			m_generatedPreview->AppendText(preview);
+			
+			// update global Value
+			globaGeneratedPath = result;
+			
+			if ( pathGeneratorStore.hasErrorInfo(id) == true )
+				appendErrorMessage(pathGeneratorStore.getErrorInfo(id));
+
+			// update transform values
+			if ( m_pgPropTransformMode->GetValue().GetBool() == true )
+				updateTransformValues(pathGeneratorStore.getTransformValues(id));
+				
+		} else {
+			clearView();
+			appendErrorMessage(wxString::Format("PathGeneratorFrame::generatePath: Invalid id: %d\n", id));
+		}
+		
+		if ( hasErrorInfo == true )	selectProcessInfo();
+		else						selectPreview();
+		
+		updatePreview();
+		enableControls(true);
+		
+	} catch (std::runtime_error& e) {
+		appendErrorMessage("An runtime_error caught.");
+		appendErrorMessage(e.what());
+		selectProcessInfo();
+		
+	} catch (std::logic_error& e) {
+		appendErrorMessage("An logic_error caught.");
+		appendErrorMessage(e.what());
+		selectProcessInfo();
+		
+	} catch (std::exception& e) {
+		appendErrorMessage("An exception caught.");
+		appendErrorMessage(e.what());
+		selectProcessInfo();
+		
+	} catch ( ... ) {
+		appendErrorMessage("An unhandel excetion caught.");
+		selectProcessInfo();
 	}
-	
-	if ( hasErrorInfo == true )	selectProcessInfo();
-	else						selectPreview();
-	
-	updatePreview();
-	enableControls(true);
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::updateCommonValues(const PathGeneratorBase::CommonValues& cv) {
@@ -957,12 +991,14 @@ int PathGeneratorFrame::searchAndSelectTreeItem(const wxString& search, const in
 	// over all template tree items
 	int cnt = 0;
 	wxString s(search);
+	s.MakeUpper();
 	for (TreeIndex::iterator it=treeIndex.begin(); it!=treeIndex.end(); ++it) {
 		if ( cnt > startIndex ) {
 			TreeItemInfo tii = *it;
 			
-			if ( tii.itemName.MakeUpper().Find(s.MakeUpper()) != wxNOT_FOUND ) {
+			if ( tii.itemName.MakeUpper().Find(s) != wxNOT_FOUND ) {
 				m_templateTree->SelectItem(tii.itemId);
+				m_templateTree->SetFocusedItem(tii.itemId);
 				m_templateTree->EnsureVisible(tii.itemId);
 				
 				ret = cnt;
@@ -1046,4 +1082,58 @@ void PathGeneratorFrame::pgMainBookChanged(wxNotebookEvent& event) {
 void PathGeneratorFrame::selectDisplayMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updatePreview();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::selectEditMode(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	int sel = m_cbEditMode->GetSelection();
+	m_generatedPreview->SetEditable(sel != 0);
+	m_updatePreview->Enable(sel != 0);
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::updatePreview(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	updatePreview();
+}
+///////////////////////////////////////////////////////////////////
+void PathGeneratorFrame::saveTemplate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString name("asasd.xml");
+	
+	//todo
+	wxString path("C:\\temp\\");
+	path.append("PredefinedTemplates");
+	path.append(wxFileName::GetPathSeparators());
+	path.append(name);
+	
+	//wxFileName fn(path);
+	
+	wxXmlDocument xmlDoc;
+	wxXmlNode* root = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, "TemplateParameter");
+	xmlDoc.SetRoot(root);
+	
+	wxPropertyGrid* grid = m_pgParameterMgr->GetGrid();
+	wxPGProperty* pathProp = grid->GetFirstChild(m_pgCatPath);
+	if ( pathProp != NULL ) {
+		
+		// over all path properties
+		wxPropertyGridIterator it = grid->GetIterator(wxPG_ITERATE_DEFAULT, pathProp);
+		wxPGProperty* prop = NULL;
+		
+		unsigned int cnt = 0;
+		while ( (prop = it.GetProperty()) != NULL && grid->GetPropertyCategory(prop) == m_pgCatPath) {
+			wxXmlNode* param = new wxXmlNode (root, wxXML_ELEMENT_NODE, "Parameter");
+			param->AddAttribute("idx",   wxString::Format("%d", cnt++));
+			param->AddAttribute("name",  prop->GetLabel());
+			param->AddAttribute("type",  "todo");
+			param->AddAttribute("value", prop->GetValueAsString());
+			
+			it.Next();
+		}
+	}
+	
+	wxXmlNode* tName = new wxXmlNode (root, wxXML_ELEMENT_NODE, "TemplateName");
+	tName->AddAttribute("name", "todo");
+	
+	xmlDoc.Save(path);
 }

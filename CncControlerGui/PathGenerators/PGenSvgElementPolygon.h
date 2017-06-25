@@ -61,7 +61,7 @@ class PGenSvgElementPolygon : public PGenPolygon {
 				plm.getCentroid(centroid);
 				
 				origPoligonList.push_back(getPolygonData(i));
-				addPolygon(i, spg, getInlayMode());
+				drawPolygon(i, spg, getInlayMode());
 			}
 			
 			setTranslateX(getXOffset());

@@ -145,7 +145,7 @@ const char* CncPathListManager::getAsSvgPathRepresentation(const wxString& style
 //////////////////////////////////////////////////////////////////
 	static wxString s;
 	if ( getPathListSize() == 0 ) {
-		s.assign("<!-- no data available -->");
+		s.assign("");
 		return s.c_str();
 	}
 	

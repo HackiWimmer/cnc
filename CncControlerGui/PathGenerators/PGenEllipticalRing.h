@@ -39,6 +39,20 @@ class PGenEllipticalRing : public PGenSvgElementPolygon {
 		}
 		
 		///////////////////////////////////////////////////////////////////
+		virtual bool isHole(unsigned int elementIndex=0) { 
+			switch (elementIndex) {
+				// outer
+				case 0:	return false;
+						
+				// inner
+				case 1:	return true;
+			}
+			
+			//default, should never appear here
+			return PGenPolygon::isHole(elementIndex); 
+		}
+		
+		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
 			name 		= "Circle/Elliptical Ring";
 			treePath 	= "Advanced Polygons [mm]";
@@ -120,6 +134,55 @@ class PGenEllipticalRing : public PGenSvgElementPolygon {
 		
 		///////////////////////////////////////////////////////////////////
 		virtual ~PGenEllipticalRing() {}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool parameterChanging(PathGeneratorBase::ChangeCategory cc, int paraIdxInCat, const wxVariant& value) { 
+			if ( cc == PathGeneratorBase::ChangeCategory::CC_TPL_CAT ) {
+				double ox = getParameterNumValue(IDX_OUTER_RADIUS_X);
+				double oy = getParameterNumValue(IDX_OUTER_RADIUS_Y);
+				double ix = getParameterNumValue(IDX_INNER_RADIUS_X);
+				double iy = getParameterNumValue(IDX_INNER_RADIUS_Y);
+				
+				if      ( paraIdxInCat == (int)IDX_OUTER_RADIUS_X ) ox = value.GetDouble();
+				else if ( paraIdxInCat == (int)IDX_OUTER_RADIUS_Y ) oy = value.GetDouble();
+				else if ( paraIdxInCat == (int)IDX_INNER_RADIUS_X ) ix = value.GetDouble();
+				else if ( paraIdxInCat == (int)IDX_INNER_RADIUS_Y ) iy = value.GetDouble();
+				
+				if      ( ox <= ix ) return false;
+				else if ( oy <= iy ) return false;
+			}
+			
+			return true; 
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		virtual bool generate(SvgPathGroup& spg, double toolDiameter) {
+			
+			for ( unsigned int i=0; i<getElementCount(); i++) {
+				clearPolygonData(i);
+				
+				SVGPathAssistant pa;
+				pa.setCurveLibResolution(commonValues.curveLibResolution);
+				
+				if ( pa.processSvgNode(getElementAsSvgPath(i)) == false ) {
+					addErrorInfo("processSvgNode failed");
+					return false;
+				}
+				
+				CncPathListManager plm = pa.getPathList();
+				for ( auto it=plm.begin(); it!=plm.end(); ++it )
+					getPolygonData(i).append(CncPolygonPoints::convertToIntPoint(it->abs));
+					
+				plm.getCentroid(centroid);
+				
+				drawPolygon(i, spg, getInlayMode());
+			}
+			
+			setTranslateX(getXOffset());
+			setTranslateY(getYOffset());
+			
+			return spg.isOK();
+		}
 		
 };
 

@@ -8,7 +8,7 @@
 #include "PathGeneratorBase.h"
 #include "CncCommon.h"
 
-#define PRE_DEF_MARKER          "& "
+#define PRE_DEF_MARKER          "# "
 #define PRE_DEF_DEFAULT_ITEM    "Default Setup . . ."
 
 ///////////////////////////////////////////////////////////////////////////

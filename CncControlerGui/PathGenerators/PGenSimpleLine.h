@@ -78,7 +78,7 @@ class PGenSimpleLine : public PGenPolygon {
 			getPolygonData().append(getParameterNumValue(IDX_X2), getParameterNumValue(IDX_Y2));
 			origPolygonData = getPolygonData();
 			
-			addPolyLine(0, spg);
+			drawPolyLine(0, spg);
 			
 			setTranslateX(abs(getMinPosition().x) + 5.0);
 			setTranslateY(abs(getMinPosition().y) + 5.0);

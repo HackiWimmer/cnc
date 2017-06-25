@@ -1,6 +1,7 @@
 #ifndef CNC_CLIPPER_WRAPPER
 #define CNC_CLIPPER_WRAPPER
 
+#include "CncCommon.h"
 #include "Clipper/clipper.hpp"
 #include "SvgUnitCalculator.h"
 #include "CncPathListManager.h"
@@ -34,6 +35,11 @@ class CncPolygonPoints : public ClipperLib::Path {
 		CncPolygonPoints(const CncPolygonPoints& p);
 		CncPolygonPoints(const ClipperLib::Path& p);
 		virtual ~CncPolygonPoints();
+		
+		bool getOrientationAsBool() { return Orientation(*this); }
+		CncDirection getOrientation(); 
+		CncDirection setOrientation(CncDirection dir);
+		void reverseOrientation(); 
 		
 		void append(const wxRealPoint& p);
 		void append(double x, double y);
@@ -78,16 +84,70 @@ class CncPolygonPoints : public ClipperLib::Path {
 		}
 		
 };
+typedef std::vector<CncPolygonPoints> PolygonList;
 
 /////////////////////////////////////////////////////////////////////////////
 class CncPolygons : public ClipperLib::Paths {
 	
 	public:
 		CncPolygons();
+		CncPolygons(const CncPolygons& ps);
+		CncPolygons(const PolygonList& pl);
+		
 		virtual ~CncPolygons();
 		
+		unsigned int getTotalCount();
+		unsigned int getOuterCount();
+		unsigned int getHoleCount();
+		
+		
+		/*
+		//////////////////////////////////////////////////////////////////
+		CncPolygonPoints& operator[](std::size_t idx) { 
+			return (*this)[idx]; 
+		}*/
+		
+		//////////////////////////////////////////////////////////////////
 		bool getPolygonPoints(unsigned int idx, CncPolygonPoints& ret);
 		
+		//////////////////////////////////////////////////////////////////
+		int removeHoles() {
+			if ( size() <= 1 )
+				return 0;
+				
+			bool outerDir = Orientation(*begin());
+			for ( auto it=end()-1; it!=begin(); --it) {
+				if ( Orientation(*it) != outerDir )
+					erase(it);
+			}
+			
+			return size();
+		}
+		
+		//////////////////////////////////////////////////////////////////
+		friend std::ostream &operator<< (std::ostream &ostr, const CncPolygons &a) {
+			for ( auto it=a.begin(); it!=a.end(); ++it ) {
+				CncPolygonPoints pp = *it;
+				ostr << pp;
+			}
+			
+			return ostr;
+		}
+		
+		//////////////////////////////////////////////////////////////////
+		void trace(std::ostream &ostr) {
+			ostr << "CncPolygons::size: " << size() << "\n";
+			
+			unsigned int cnt = 0;
+			for ( auto it=begin(); it!=end(); ++it ) {
+				CncPolygonPoints pp = *it;
+				ostr << " ptr  [" << cnt << "]:" << &(*it) << "\n";
+				ostr << " size [" << cnt << "]:" << pp.size() << "\n";
+				ostr << " dir  [" << cnt << "]:" << Orientation(pp) << "\n";
+				
+				cnt++;
+			}
+		}
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -105,6 +165,11 @@ class CncClipperWrapper {
 		
 		////////////////////////////////////////////////////////////////////////
 		bool offsetPath(const CncPolygonPoints& in, CncPolygons& out, double offset, 
+		                CncClipperCornerType joinType=CncCCT_Round, 
+						CncClipperEndType endType=CncCET_ClosedPolygon);
+						
+		////////////////////////////////////////////////////////////////////////
+		bool offsetPath(const PolygonList& inList, CncPolygons& out, double offset, 
 		                CncClipperCornerType joinType=CncCCT_Round, 
 						CncClipperEndType endType=CncCET_ClosedPolygon);
 						

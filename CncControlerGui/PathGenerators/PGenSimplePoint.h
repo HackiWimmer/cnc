@@ -54,7 +54,7 @@ class PGenSimplePoint : public PGenPolygon {
 			
 			getPolygonData().append(getParameterNumValue(IDX_X), getParameterNumValue(IDX_Y));
 			getPolygonData().append(getParameterNumValue(IDX_X), getParameterNumValue(IDX_Y));
-			addPolyLine(0, spg);
+			drawPolyLine(0, spg);
 			
 			setTranslateX(getParameterNumValue(IDX_X) + 5.0);
 			setTranslateY(getParameterNumValue(IDX_Y) + 5.0);

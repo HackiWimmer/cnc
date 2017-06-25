@@ -72,7 +72,7 @@ class PGenRegularDiameterPolygon : public PGenRegularRadiusPolygon {
 				getPolygonData(0).append(x, y);
 			}
 			
-			addPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
+			drawPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
 			
 			setTranslateX(getParameterNumValue(IDX_DIAMETER) / 2 + 5.0);
 			setTranslateY(getParameterNumValue(IDX_DIAMETER) / 2 + 5.0);

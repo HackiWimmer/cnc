@@ -96,8 +96,12 @@ class PathGeneratorFrame : public PathGeneratorFrameBase
 		void generatePath();
 		
 	protected:
+    virtual void saveTemplate(wxCommandEvent& event);
+   
 
 		// user events
+		virtual void updatePreview(wxCommandEvent& event);
+		virtual void selectEditMode(wxCommandEvent& event);
 		virtual void selectDisplayMode(wxCommandEvent& event);
 		virtual void onShow(wxShowEvent& event);
 		virtual void checkAutoGenerate(wxCommandEvent& event);

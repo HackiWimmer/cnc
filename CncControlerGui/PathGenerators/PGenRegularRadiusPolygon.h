@@ -103,7 +103,7 @@ class PGenRegularRadiusPolygon : public PGenPolygon {
 				getPolygonData(0).append(x, y);
 			}
 			
-			addPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
+			drawPolygon(0, spg, (getParameterEnumValue(IDX_INLAY) == 1));
 			
 			setTranslateX(getParameterNumValue(IDX_RADIUS) + 5.0);
 			setTranslateY(getParameterNumValue(IDX_RADIUS) + 5.0);

@@ -85,6 +85,8 @@
   <object class="wxBitmap" name="16-plus@2x">bitmaps\16-plus@2x.png</object>
   <object class="wxBitmap" name="16-regular-expression">bitmaps\16-regular-expression.png</object>
   <object class="wxBitmap" name="16-regular-expression@2x">bitmaps\16-regular-expression@2x.png</object>
+  <object class="wxBitmap" name="16-show_current_line">bitmaps\16-show_current_line.png</object>
+  <object class="wxBitmap" name="16-show_current_line@2x">bitmaps\16-show_current_line@2x.png</object>
   <object class="wxBitmap" name="16-struct">bitmaps\16-struct.png</object>
   <object class="wxBitmap" name="16-struct@2x">bitmaps\16-struct@2x.png</object>
   <object class="wxBitmap" name="16-text_selection">bitmaps\16-text_selection.png</object>
