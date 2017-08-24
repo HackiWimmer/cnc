@@ -170,7 +170,9 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 			std::cerr << currentCncParameters.getCurrentZDepthMode() << ( currentCncParameters.isCurrentZDepthAbs() ? zDepth : -zDepth);
 			std::cerr << ", Wpt: " << cc->getWorkpieceThickness() << std::endl;
 		} else {
-			std::clog << "Warning: ZDept operation [" << currentCncParameters.getCurrentZDepthMode() << ( currentCncParameters.isCurrentZDepthAbs() ? zDepth : -zDepth) << "] ignored because the current workpiece thickness is 0.0 mm" << std::endl;
+			std::clog << "Warning: ZDept operation [" << currentCncParameters.getCurrentZDepthMode();
+			std::clog << ( currentCncParameters.isCurrentZDepthAbs() ? zDepth : -zDepth);
+			std::clog << "] ignored because the current workpiece thickness is 0.0 mm" << std::endl;
 		}
 		//return false;
 	}

@@ -3767,7 +3767,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Info"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_outPanel = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_outPanelImgIndex;
-    m_outPanelImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-text_selection")));
+    m_outPanelImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));
     m_outboundNotebook->AddPage(m_outPanel, _("Motion Monitor"), false, m_outPanelImgIndex);
     
     flexGridSizer1042 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -3826,11 +3826,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer742->Add(flexGridSizer768, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer2404 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer2404 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2404->SetFlexibleDirection( wxBOTH );
     flexGridSizer2404->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
     flexGridSizer768->Add(flexGridSizer2404, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(0));
+    
+    m_lableWorkpieceThickness = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("train_delete")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
+    m_lableWorkpieceThickness->SetToolTip(_("Workpiece thickness 0.000 mm"));
+    
+    flexGridSizer2404->Add(m_lableWorkpieceThickness, 0, wxALL, WXC_FROM_DIP(5));
     
     m_toolStateTrafficLight = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("trafficlights")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
     m_toolStateTrafficLight->SetToolTip(_("Tool State"));
@@ -7481,6 +7486,32 @@ ImageLib16::ImageLib16()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_PRE_DEF_PARA_SET@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NO_WPT"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NO_WPT"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_WPT"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_WPT"), bmp));
         }
     }
     

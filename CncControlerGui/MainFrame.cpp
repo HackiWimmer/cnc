@@ -1687,12 +1687,19 @@ void MainFrame::updateCncConfigTrace() {
 void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc && cnc->getCncConfig());
-	wxASSERT(m_workpieceThickness);
 	
 	wxString val = m_workpieceThickness->GetValue();
 	double wpt;
 	if ( val.length() > 0 )	val.ToDouble(&wpt);
 	else					wpt = 0.0;
+	
+	if ( cnc::dblCompareNull(wpt) == true )
+		m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_NO_WPT"));
+	else 
+		m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_WPT"));
+		
+	m_lableWorkpieceThickness->SetToolTip(wxString::Format("Workpiece thickness: %.3lf mm", wpt));
+	m_lableWorkpieceThickness->Refresh();
 	
 	if ( cnc->getCncConfig()->getWorkpieceThickness() != wpt ) {
 		cnc->getCncConfig()->setWorkpieceThickness(wpt);

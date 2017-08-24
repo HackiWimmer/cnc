@@ -653,6 +653,7 @@ protected:
     wxFlexGridSizer* flexGridSizer742;
     wxFlexGridSizer* flexGridSizer768;
     wxFlexGridSizer* flexGridSizer2404;
+    wxStaticBitmap* m_lableWorkpieceThickness;
     wxStaticBitmap* m_toolStateTrafficLight;
     wxFlexGridSizer* flexGridSizerOutPanel;
     wxStaticText* m_staticText16032;
@@ -1577,6 +1578,7 @@ public:
     CncZView* GetZView() { return m_zView; }
     wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
     wxStaticBitmap* GetStaticBitmap2401() { return m_staticBitmap2401; }
+    wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
     wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
     wxStaticText* GetStaticText16032() { return m_staticText16032; }
     wxComboBox* GetCbCurveLibResolution() { return m_cbCurveLibResolution; }

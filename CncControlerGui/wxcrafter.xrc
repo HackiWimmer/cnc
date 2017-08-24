@@ -6663,7 +6663,7 @@
                 </object>
                 <object class="notebookpage">
                   <label>Motion Monitor</label>
-                  <bitmap>bitmaps/16-text_selection.png</bitmap>
+                  <bitmap>bitmaps/16-console.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_outPanel">
                     <style/>
@@ -6770,11 +6770,21 @@ Axis</label>
                                 <flag>wxALL|wxALIGN_LEFT</flag>
                                 <object class="wxFlexGridSizer">
                                   <cols>2</cols>
-                                  <rows>0</rows>
+                                  <rows>1</rows>
                                   <vgap>0</vgap>
                                   <hgap>0</hgap>
                                   <growablecols/>
                                   <growablerows/>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <border>5</border>
+                                    <object class="wxStaticBitmap" name="m_lableWorkpieceThickness">
+                                      <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/transportation/train_delete.png</bitmap>
+                                      <tooltip>
+                                        <![CDATA[Workpiece thickness 0.000 mm]]>
+                                      </tooltip>
+                                    </object>
+                                  </object>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
                                     <border>2</border>
