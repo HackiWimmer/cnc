@@ -12,8 +12,6 @@ CncControlerGui/html/*
 *.exe
 *.txt
 *.bat
-*.png
-*.bmp
 *.html
 *.o
 *.o.d
