@@ -492,7 +492,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	
 	//todo
 	wxCommandEvent dummy;
-	openSVGPathGenerator(dummy);
+	//openSVGPathGenerator(dummy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceTimer(wxTimerEvent& event) {
@@ -701,13 +701,12 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 			ctl->StyleSetForeground (wxSTC_GCODE_COMMENT,		clComment);
 			ctl->StyleSetForeground (wxSTC_GCODE_COMMENT_LINE,	clComment);
 			ctl->StyleSetForeground (wxSTC_GCODE_DIRECTIVE,		clComment);
-			
+
 			font = (ctl->StyleGetFont(wxSTC_GCODE_IDENTIFIER)).Bold();
 			ctl->StyleSetFont(wxSTC_GCODE_IDENTIFIER, font);
 			
 			font = (ctl->StyleGetFont(wxSTC_GCODE_PARAM)).Bold();
 			ctl->StyleSetFont(wxSTC_GCODE_PARAM, font);
-
 			break;
 			
 		case TplText:
@@ -3489,6 +3488,9 @@ void MainFrame::changeUpdateInterval(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::keyDownXY(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_moveXYAxisCtl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownXY), NULL, this);
+	
 	wxASSERT(cnc);
 	int c = event.GetKeyCode();
 	switch ( c ) {
@@ -3507,16 +3509,28 @@ void MainFrame::keyDownXY(wxKeyEvent& event) {
 							
 		default:		event.Skip(false);
 	}
+	
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_moveXYAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownXY), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::keyDownZ(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_moveZAxisCtl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownZ), NULL, this);
+	
 	wxASSERT(cnc);
 	int c = event.GetKeyCode();
 	switch ( c ) {
-		case WXK_DOWN:		navigateZ(CncAnticlockwise); 	break;
-		case WXK_UP:		navigateZ(CncClockwise); 		break;
-		case WXK_SPACE:		m_moveXYAxisCtl->SetFocus();	break;
+		case WXK_DOWN:		navigateZ(CncAnticlockwise);
+							break;
+							
+		case WXK_UP:		navigateZ(CncClockwise);
+							break;
+							
+		case WXK_SPACE:		m_moveXYAxisCtl->SetFocus();
+							break;
 		
 		case WXK_RETURN: 	
 							if ( GetAsyncKeyState(VK_CONTROL) != 0 ) 	m_includingWpt->SetValue(true);
@@ -3525,44 +3539,90 @@ void MainFrame::keyDownZ(wxKeyEvent& event) {
 							event.Skip(false);
 							break;
 							
-		default:		event.Skip(false);
+		default:			event.Skip(false);
 	}
+	
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_moveZAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownZ), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mvSpinDownX(wxSpinEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_spinButtonX->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownX), NULL, this);
+
 	wxASSERT(cnc);
 	navigateX(CncAnticlockwise);
+	
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_spinButtonX->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownX), NULL, this);
 } 
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mvSpinUpX(wxSpinEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_spinButtonX->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpX), NULL, this);
+
 	wxASSERT(cnc);
 	navigateX(CncClockwise);
+	
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_spinButtonX->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpX), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mvSpinDownY(wxSpinEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_spinButtonY->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownY), NULL, this);
+
 	wxASSERT(cnc);
 	navigateY(CncAnticlockwise);
+	
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_spinButtonY->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownY), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mvSpinUpY(wxSpinEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_spinButtonY->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpY), NULL, this);
+
 	wxASSERT(cnc);
 	navigateY(CncClockwise);
+	
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_spinButtonY->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpY), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mvSpinDownZ(wxSpinEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_spinButtonZ->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownZ), NULL, this);
+
 	wxASSERT(cnc);
 	navigateZ(CncAnticlockwise);
+	
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_spinButtonZ->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownZ), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mvSpinUpZ(wxSpinEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	// disconnect this event handler to avoid the processing of buffered events
+	m_spinButtonZ->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpZ), NULL, this);
+
 	wxASSERT(cnc);
 	navigateZ(CncClockwise);
+
+	// clear bufferd events and reconnect this event handler
+	dispatch();
+	m_spinButtonZ->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpZ), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::navigateX(CncDirection d) {

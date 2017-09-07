@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="CncConrollerGui" InternalType="GUI" Version="10.0.0">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
+    </Plugin>
+  </Plugins>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
@@ -15,11 +20,12 @@
       <File Name="GCodeField.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="StcLexer ">
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release"/>
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h"/>
-      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd"/>
-      <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h"/>
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Debug;Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd" ExcludeProjConfig="Debug;Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h" ExcludeProjConfig="Debug;Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release"/>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
       <File Name="CncDrawPane.cpp"/>
@@ -220,6 +226,19 @@
     <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Release"/>
     <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Release"/>
   </VirtualDirectory>
+  <VirtualDirectory Name="UnitTests">
+    <VirtualDirectory Name="Tests">
+      <File Name="Tests/Test_Base.h"/>
+      <File Name="Tests/Test_SVGNodeParser.h"/>
+      <File Name="Tests/Test_SVGPathAssistant.h"/>
+      <File Name="Tests/Test_Base.cpp"/>
+      <File Name="Tests/Test_FrameworkCallback.h"/>
+      <File Name="Tests/Test_CncPathListManager.h"/>
+      <File Name="Tests/Test_CncClipperWrapper.h"/>
+    </VirtualDirectory>
+    <File Name="UnitTestFrame.cpp"/>
+    <File Name="UnitTestFrame.h"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -232,11 +251,11 @@
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (i686-posix-dwarf-rev1, Built by MinGW-W64 project) 6.2.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Debug" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-pg;-g;-O0;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\wxWidgets-3.1.0\src\stc\scintilla\include"/>
-        <IncludePath Value="C:\@Development\wxWidgets-3.1.0\src\stc\scintilla\lexlib"/>
         <Preprocessor Value="USE_WXCRAFTER"/>
       </Compiler>
       <Linker Options="-pg;-mwindows;$(shell wx-config --libs)" Required="yes">
@@ -249,7 +268,7 @@
         <Library Value="glu32"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags)" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -282,9 +301,10 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="MinGW ( gcc.exe (i686-posix-dwarf-rev1, Built by MinGW-W64 project) 6.2.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-O2;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="USE_WXCRAFTER"/>
@@ -333,17 +353,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="UnitTests">
-    <VirtualDirectory Name="Tests">
-      <File Name="Tests/Test_Base.h"/>
-      <File Name="Tests/Test_SVGNodeParser.h"/>
-      <File Name="Tests/Test_SVGPathAssistant.h"/>
-      <File Name="Tests/Test_Base.cpp"/>
-      <File Name="Tests/Test_FrameworkCallback.h"/>
-      <File Name="Tests/Test_CncPathListManager.h"/>
-      <File Name="Tests/Test_CncClipperWrapper.h"/>
-    </VirtualDirectory>
-    <File Name="UnitTestFrame.cpp"/>
-    <File Name="UnitTestFrame.h"/>
-  </VirtualDirectory>
 </CodeLite_Project>

@@ -2428,16 +2428,16 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "Resources/arrow_plain_red_E.png"
+           "m_path": "bitmaps/error.png"
           }, {
            "type": "choice",
            "m_label": "Direction",
-           "m_selection": 0,
+           "m_selection": 1,
            "m_options": ["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
           }, {
            "type": "string",
            "m_label": "Margins:",
-           "m_value": "0,0"
+           "m_value": "10,2"
           }],
          "m_events": [{
            "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
@@ -3399,14 +3399,14 @@
                          "m_eventName": "wxEVT_SPIN_UP",
                          "m_eventClass": "wxSpinEvent",
                          "m_eventHandler": "wxSpinEventHandler",
-                         "m_functionNameAndSignature": "mvSpinDownY(wxSpinEvent& event)",
+                         "m_functionNameAndSignature": "mvSpinUpY(wxSpinEvent& event)",
                          "m_description": "Generated when left/up arrow is pressed.",
                          "m_noBody": false
                         }, {
                          "m_eventName": "wxEVT_SPIN_DOWN",
                          "m_eventClass": "wxSpinEvent",
                          "m_eventHandler": "wxSpinEventHandler",
-                         "m_functionNameAndSignature": "mvSpinUpY(wxSpinEvent& event)",
+                         "m_functionNameAndSignature": "mvSpinDownY(wxSpinEvent& event)",
                          "m_description": "Generated when right/down arrow is pressed.",
                          "m_noBody": false
                         }],
@@ -8235,7 +8235,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-cog.png"
+               "m_path": "bitmaps/settings.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -10503,7 +10503,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/graph_bars.png"
+                     "m_path": "bitmaps/git-settings.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -12893,7 +12893,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_blue_NE_SE_SW_NW.png"
+                     "m_path": "bitmaps/resize.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -29393,7 +29393,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png"
+                     "m_path": "bitmaps/book_blue.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -30708,7 +30708,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png"
+                     "m_path": "bitmaps/book_green.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -31779,7 +31779,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png"
+                     "m_path": "bitmaps/book_red.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -33068,7 +33068,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png"
+                     "m_path": "bitmaps/book_blue.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -38055,7 +38055,7 @@
           }, {
            "m_type": 4409,
            "proportion": 0,
-           "border": 0,
+           "border": 3,
            "gbSpan": "1,1",
            "gbPosition": "0,0",
            "m_styles": [],
@@ -43156,7 +43156,7 @@
                    "gbSpan": "1,1",
                    "gbPosition": "0,0",
                    "m_styles": [],
-                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_CENTER_HORIZONTAL"],
+                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND", "wxALIGN_CENTER_HORIZONTAL"],
                    "m_properties": [{
                      "type": "winid",
                      "m_label": "ID:",
@@ -43426,14 +43426,14 @@
                         }, {
                          "type": "bitmapPicker",
                          "m_label": "Bitmap File:",
-                         "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/transportation/train_delete.png"
+                         "m_path": "bitmaps/abb-import.png"
                         }],
                        "m_events": [],
                        "m_children": []
                       }, {
                        "m_type": 4409,
                        "proportion": 1,
-                       "border": 2,
+                       "border": 5,
                        "gbSpan": "1,1",
                        "gbPosition": "0,0",
                        "m_styles": [],
@@ -43497,7 +43497,7 @@
                         }, {
                          "type": "bitmapPicker",
                          "m_label": "Bitmap File:",
-                         "m_path": "../../../../ToolbarIcons-full-20101107/png/24/Modern3D/transportation/trafficlights.png"
+                         "m_path": "bitmaps/Icons/circle_red16.ico"
                         }],
                        "m_events": [],
                        "m_children": []
@@ -47461,7 +47461,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_red_S.png"
+                     "m_path": "bitmaps/arrow-up.png"
                     }, {
                      "type": "choice",
                      "m_label": "Direction",
@@ -47556,7 +47556,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_red_N.png"
+                     "m_path": "bitmaps/git-arrow-down.png"
                     }, {
                      "type": "choice",
                      "m_label": "Direction",
@@ -47651,7 +47651,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_N.png"
+                     "m_path": ""
                     }, {
                      "type": "choice",
                      "m_label": "Direction",
@@ -47746,7 +47746,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_S.png"
+                     "m_path": ""
                     }, {
                      "type": "choice",
                      "m_label": "Direction",
@@ -47841,7 +47841,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_blue_E.png"
+                     "m_path": "bitmaps/back-16.png"
                     }, {
                      "type": "choice",
                      "m_label": "Direction",
@@ -47936,7 +47936,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_blue_W.png"
+                     "m_path": "bitmaps/next-16.png"
                     }, {
                      "type": "choice",
                      "m_label": "Direction",
@@ -67291,7 +67291,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/tables/table_sort_asc.png"
+       "m_path": "bitmaps/git-pull.png"
       }],
      "m_events": [],
      "m_children": []
@@ -67310,7 +67310,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/tables/table_sort_desc.png"
+       "m_path": "bitmaps/git-push.png"
       }],
      "m_events": [],
      "m_children": []
@@ -67614,7 +67614,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/transportation/train_delete.png"
+       "m_path": "bitmaps/abb-import.png"
       }],
      "m_events": [],
      "m_children": []
@@ -67633,7 +67633,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/16/Modern3D/transportation/train_add.png"
+       "m_path": "bitmaps/abb-export.png"
       }],
      "m_events": [],
      "m_children": []
@@ -67687,7 +67687,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/24/Modern3D/transportation/trafficlights_green.png"
+       "m_path": "bitmaps/Icons/circle_green16.ico"
       }],
      "m_events": [],
      "m_children": []
@@ -67706,7 +67706,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/24/Modern3D/transportation/trafficlights_red.png"
+       "m_path": "bitmaps/Icons/circle_red16.ico"
       }],
      "m_events": [],
      "m_children": []
@@ -67725,7 +67725,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/24/Modern3D/transportation/trafficlights_yellow.png"
+       "m_path": "bitmaps/Icons/circle_yellow16.ico"
       }],
      "m_events": [],
      "m_children": []
@@ -67744,7 +67744,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "../../../../ToolbarIcons-full-20101107/png/24/Modern3D/transportation/trafficlights.png"
+       "m_path": "bitmaps/Icons/circle_grey16.ico"
       }],
      "m_events": [],
      "m_children": []

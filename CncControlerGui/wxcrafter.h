@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef CNCCONTROL_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
-#define CNCCONTROL_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
+#ifndef _GUICONTROLLER_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
+#define _GUICONTROLLER_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>
@@ -111,15 +111,10 @@ protected:
     wxBitmapButton* m_controlerPause;
     wxButton* m_btnEmergenyStop;
     wxScrolledWindow* m_scrollWinMain;
-    wxFlexGridSizer* flexGridSizer434;
     wxNotebook* m_mainNotebook;
     wxPanel* m_panelReference;
-    wxFlexGridSizer* flexGridSizer1885;
-    wxFlexGridSizer* flexGridSizer1393;
-    wxFlexGridSizer* flexGridSizer777;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
-    wxFlexGridSizer* flexGridSizer547;
     wxStaticText* m_staticText821;
     wxSpinButton* m_spinButtonX;
     wxStaticText* m_staticText63169;
@@ -136,29 +131,22 @@ protected:
     wxTextCtrl* m_moveZAxisCtl;
     wxStaticText* m_staticText830;
     wxStaticText* m_staticText836;
-    wxFlexGridSizer* flexGridSizer1390;
     wxCheckBox* m_includingWpt;
     wxButton* m_setZero;
-    wxFlexGridSizer* flexGridSizer1163;
-    wxFlexGridSizer* flexGridSizer1152;
     wxStaticText* m_staticText1156;
     wxStaticLine* m_staticLine1158;
-    wxFlexGridSizer* flexGridSizer1165;
     wxStaticText* m_staticText1171;
     wxStaticText* m_staticText1173;
     wxComboBox* m_homeDefintion;
     wxButton* m_moveHome;
     wxStaticLine* m_staticLine2177;
     wxStaticLine* m_staticLine2179;
-    wxFlexGridSizer* flexGridSizer2180;
     wxStaticText* m_staticText2182;
     wxComboBox* m_zeroMoveModeXY;
     wxButton* m_moveXYtoZero;
-    wxFlexGridSizer* flexGridSizer218027;
     wxStaticText* m_staticText218228;
     wxComboBox* m_zeroMoveModeXYZ;
     wxButton* m_moveXYZtoZero;
-    wxFlexGridSizer* flexGridSizer21802730;
     wxStaticText* m_staticText21822831;
     wxComboBox* m_zeroMoveModeZ;
     wxButton* m_moveZtoZero;
@@ -166,11 +154,9 @@ protected:
     wxStaticLine* m_staticLine2193;
     wxStaticText* m_staticText1177233;
     wxStaticText* m_staticText11772;
-    wxFlexGridSizer* flexGridSizer2439;
     wxButton* m_xToMax;
     wxButton* m_xToMid;
     wxButton* m_xToMin;
-    wxFlexGridSizer* flexGridSizer2440;
     wxButton* m_yToMax;
     wxButton* m_yToMid;
     wxButton* m_yToMin;
@@ -178,35 +164,27 @@ protected:
     wxStaticLine* m_staticLine2197;
     wxStaticText* m_staticText1175;
     wxStaticText* m_staticText1177;
-    wxFlexGridSizer* flexGridSizer2434;
     wxButton* m_zToMax;
     wxButton* m_zToMid;
     wxButton* m_zToMin;
-    wxFlexGridSizer* flexGridSizer2435;
     wxButton* m_zToTop;
     wxStaticText* m_staticText2438;
     wxButton* m_zToBottom;
     wxPanel* m_panelSetup;
-    wxFlexGridSizer* flexGridSizer1884;
     wxListbook* m_listbook2220;
     wxPanel* m_setupWorkPage;
-    wxFlexGridSizer* flexGridSizer2218;
-    wxFlexGridSizer* flexGridSizer961;
     wxStaticText* m_staticText7791;
     wxStaticLine* m_staticLine9572;
-    wxFlexGridSizer* flexGridSizer963;
     wxStaticText* m_staticText569;
     wxTextCtrl* m_workpieceThickness;
     wxStaticText* m_staticText1289;
     wxTextCtrl* m_crossingThickness;
     wxStaticLine* m_staticLine3109;
-    wxFlexGridSizer* flexGridSizer3107;
     wxStaticText* m_staticText57510;
     wxComboBox* m_cbToolType;
     wxStaticText* m_staticText575;
     wxTextCtrl* m_routerBitDiameter;
     wxStaticLine* m_staticLine3111;
-    wxFlexGridSizer* flexGridSizer1423;
     wxStaticText* m_staticText12374;
     wxTextCtrl* m_replyThreshold;
     wxStaticText* m_staticText1517;
@@ -218,15 +196,11 @@ protected:
     wxStaticText* m_staticText1475;
     wxComboBox* m_cbClearProceesdSetterList;
     wxPanel* m_setupSpeedPage;
-    wxFlexGridSizer* flexGridSizer2237;
-    wxFlexGridSizer* flexGridSizer96114;
     wxStaticText* m_staticText779125;
     wxStaticLine* m_staticLine957236;
-    wxFlexGridSizer* flexGridSizer2793;
     wxStaticText* m_staticText2798;
     wxComboBox* m_cbPreconfiguredSpeedSetups;
     wxStaticLine* m_staticLine9572361;
-    wxFlexGridSizer* flexGridSizer1387;
     wxStaticText* m_staticText9241;
     wxTextCtrl* m_maxXYSpeed;
     wxStaticText* m_staticText924;
@@ -235,10 +209,8 @@ protected:
     wxComboBox* m_workSpeedXY;
     wxStaticText* m_staticText1019;
     wxComboBox* m_currentSpeedXY;
-    wxFlexGridSizer* flexGridSizer265915;
     wxButton* m_button266116;
     wxStaticLine* m_staticLine3113;
-    wxFlexGridSizer* flexGridSizer2241;
     wxStaticText* m_staticText1208;
     wxTextCtrl* m_maxZSpeed;
     wxStaticText* m_staticText92813;
@@ -247,14 +219,10 @@ protected:
     wxComboBox* m_workSpeedZ;
     wxStaticText* m_staticText101911;
     wxComboBox* m_currentSpeedZ;
-    wxFlexGridSizer* flexGridSizer2659;
     wxButton* m_button2661;
     wxPanel* m_setupDimPage;
-    wxFlexGridSizer* flexGridSizer2234;
-    wxFlexGridSizer* flexGridSizer9611;
     wxStaticText* m_staticText77912;
     wxStaticLine* m_staticLine95723;
-    wxFlexGridSizer* flexGridSizer1380;
     wxStaticText* m_staticText854;
     wxTextCtrl* m_maxXDimension;
     wxStaticText* m_staticText856;
@@ -262,47 +230,31 @@ protected:
     wxStaticText* m_staticText85611;
     wxTextCtrl* m_maxZDimension;
     wxPanel* m_setupSVGPage;
-    wxFlexGridSizer* flexGridSizer2229;
-    wxFlexGridSizer* flexGridSizer9613;
     wxStaticText* m_staticText77914;
     wxStaticLine* m_staticLine95725;
-    wxFlexGridSizer* flexGridSizer9636;
     wxStaticText* m_staticText1237;
     wxComboBox* m_cbSvgZoom;
     wxStaticText* m_staticText1261;
     wxComboBox* m_cbSvgIncludeOriginalPath;
     wxStaticText* m_staticText126111;
     wxComboBox* m_cbSvgFirstCrossing;
-    wxFlexGridSizer* flexGridSizer1134;
     wxPanel* m_setupEnvPage;
-    wxFlexGridSizer* flexGridSizer2232;
-    wxFlexGridSizer* flexGridSizer1873;
     wxStaticText* m_staticText1880;
     wxStaticLine* m_staticLine2226;
     wxTextCtrl* m_envrionmentInfo;
     wxPanel* m_setupApp;
-    wxFlexGridSizer* flexGridSizer2627;
-    wxFlexGridSizer* flexGridSizer96111;
     wxStaticText* m_staticText779122;
     wxStaticLine* m_staticLine957233;
-    wxFlexGridSizer* flexGridSizer26351;
-    wxFlexGridSizer* flexGridSizer963642;
     wxStaticText* m_staticText123753;
     wxComboBox* m_cbRunMotionMonitorMode;
-    wxFlexGridSizer* flexGridSizer2635;
-    wxFlexGridSizer* flexGridSizer96364;
     wxStaticText* m_staticText12375;
     wxComboBox* m_cbRunConfirmationMode;
     wxPanel* m_panelTesting;
-    wxFlexGridSizer* flexGridSizer2205;
     wxTreebook* m_treebookTest;
     wxPanel* m_testIntervalPage;
-    wxFlexGridSizer* flexGridSizer2089;
-    wxFlexGridSizer* flexGridSizer2157;
     wxStaticText* m_staticText2117;
     wxStaticLine* m_staticLine2253;
     wxComboBox* m_testIntervalMode;
-    wxFlexGridSizer* flexGridSizer2103;
     wxStaticText* m_staticText2105;
     wxStaticText* m_staticText2107;
     wxStaticText* m_staticText2109;
@@ -310,7 +262,6 @@ protected:
     wxStaticText* m_staticText2115;
     wxStaticText* m_staticText2165;
     wxStaticLine* m_staticLine2111;
-    wxFlexGridSizer* flexGridSizer2091;
     wxStaticText* m_testAxisX;
     wxSpinCtrl* m_testCountX;
     wxTextCtrl* m_testDistanceX;
@@ -319,7 +270,6 @@ protected:
     wxStaticText* m_staticText2151;
     wxCheckBox* m_testModeX;
     wxStaticText* m_testDurationCounterX;
-    wxFlexGridSizer* flexGridSizer209111;
     wxStaticText* m_testAxisY;
     wxSpinCtrl* m_testCountY;
     wxTextCtrl* m_testDistanceY;
@@ -328,7 +278,6 @@ protected:
     wxStaticText* m_staticText215123;
     wxCheckBox* m_testModeY;
     wxStaticText* m_testDurationCounterY;
-    wxFlexGridSizer* flexGridSizer20911117;
     wxStaticText* m_testAxisZ;
     wxSpinCtrl* m_testCountZ;
     wxTextCtrl* m_testDistanceZ;
@@ -338,11 +287,8 @@ protected:
     wxCheckBox* m_testModeZ;
     wxStaticText* m_testDurationCounterZ;
     wxPanel* m_testDimensions;
-    wxFlexGridSizer* flexGridSizer2319;
-    wxFlexGridSizer* flexGridSizer21573;
     wxStaticText* m_staticText21174;
     wxStaticLine* m_staticLine22535;
-    wxFlexGridSizer* flexGridSizer2375;
     wxStaticText* m_staticText2377;
     wxStaticText* m_staticText2418;
     wxStaticText* m_staticText2381;
@@ -350,7 +296,6 @@ protected:
     wxStaticText* m_staticText2383;
     wxCheckBox* m_testDimTakeOverAndSave;
     wxStaticLine* m_staticLine2385;
-    wxFlexGridSizer* flexGridSizer2363;
     wxStaticText* m_testDimAxisX;
     wxCheckBox* m_testDimModeX;
     wxCheckBox* m_testDimMinX;
@@ -359,7 +304,6 @@ protected:
     wxStaticText* m_staticText2431;
     wxCheckBox* m_testDimResultStateX;
     wxButton* m_testDimTakeX;
-    wxFlexGridSizer* flexGridSizer23631;
     wxStaticText* m_testDimAxisY;
     wxCheckBox* m_testDimModeY;
     wxCheckBox* m_testDimMinY;
@@ -368,7 +312,6 @@ protected:
     wxStaticText* m_testDimUnitX6;
     wxCheckBox* m_testDimResultStateY;
     wxButton* m_testDimTakeY;
-    wxFlexGridSizer* flexGridSizer23637;
     wxStaticText* m_testDimAxisZ;
     wxCheckBox* m_testDimModeZ;
     wxCheckBox* m_testDimMinZ;
@@ -380,34 +323,22 @@ protected:
     wxStaticLine* m_staticLine2429;
     wxButton* m_testDimTakeAll;
     wxPanel* m_testLimitPage;
-    wxFlexGridSizer* flexGridSizer2249;
-    wxFlexGridSizer* flexGridSizer21571;
     wxStaticText* m_staticText21172;
     wxStaticLine* m_staticLine22533;
-    wxFlexGridSizer* flexGridSizer2269;
     wxToggleButton* m_testToggleEndSwitch;
     wxPanel* m_testToolPage;
-    wxFlexGridSizer* flexGridSizer2251;
-    wxFlexGridSizer* flexGridSizer215715;
     wxStaticText* m_staticText211726;
     wxStaticLine* m_staticLine225337;
-    wxFlexGridSizer* flexGridSizer2275;
     wxToggleButton* m_testToggleTool;
     wxPanel* m_ctrlTestSuite;
-    wxFlexGridSizer* flexGridSizer24722;
-    wxFlexGridSizer* flexGridSizer21573253;
-    wxFlexGridSizer* flexGridSizer25094;
     wxStaticText* m_staticText21174365;
     wxTextCtrl* m_ctrlTestSelectedId;
     wxStaticLine* m_staticLine22535477;
-    wxFlexGridSizer* flexGridSizer24808;
     wxStaticText* m_staticText25139;
     wxScrolledWindow* m_scrollWin2571;
-    wxFlexGridSizer* flexGridSizer2573;
     wxListBox* m_ctrlTestSelection;
     wxStaticText* m_staticText251911;
     wxTextCtrl* m_ctrlTestDescription;
-    wxFlexGridSizer* flexGridSizer248413;
     wxStaticText* m_staticText2486121314;
     wxTextCtrl* m_ctrlTestParam1;
     wxStaticText* m_staticText24861216;
@@ -419,20 +350,12 @@ protected:
     wxStaticText* m_staticText248622;
     wxTextCtrl* m_ctrlTestParam5;
     wxPanel* m_panelManually;
-    wxFlexGridSizer* flexGridSizer862;
-    wxFlexGridSizer* flexGridSizer418;
-    wxFlexGridSizer* flexGridSizer1169;
-    wxFlexGridSizer* flexGridSizer2081;
     wxCheckBox* m_checkManuallyXY;
     wxStaticText* m_staticText1160;
     wxStaticLine* m_staticLine1162;
-    wxFlexGridSizer* flexGridSizer1522;
     wxRadioBox* m_mmRadioCoordinates;
-    wxFlexGridSizer* flexGridSizer1523;
     wxStaticText* m_staticText799;
     wxComboBox* m_metricZ;
-    wxFlexGridSizer* flexGridSizer1590;
-    wxFlexGridSizer* flexGridSizer7893;
     wxStaticText* m_staticText793;
     wxButton* m_minManuallyXSlider;
     wxTextCtrl* m_metricX;
@@ -441,8 +364,6 @@ protected:
     wxButton* m_signManuallyXSlider;
     wxStaticText* m_mmUnitX;
     wxSlider* m_xManuallySlider;
-    wxFlexGridSizer* flexGridSizer1591;
-    wxFlexGridSizer* flexGridSizer7894;
     wxStaticText* m_staticText797;
     wxButton* m_minManuallyYSlider;
     wxTextCtrl* m_metricY;
@@ -453,11 +374,8 @@ protected:
     wxSlider* m_yManuallySlider;
     wxStaticText* m_staticText2073;
     wxStaticLine* m_staticLine2047;
-    wxFlexGridSizer* flexGridSizer2078;
     wxCheckBox* m_checkManuallyZ;
     wxStaticText* m_staticText2075;
-    wxFlexGridSizer* flexGridSizer15911;
-    wxFlexGridSizer* flexGridSizer78942;
     wxStaticText* m_staticText7973;
     wxButton* m_minManuallyZSlider;
     wxTextCtrl* m_metricZEdit;
@@ -467,8 +385,6 @@ protected:
     wxStaticText* m_mmUnitZ;
     wxSlider* m_zManuallySlider;
     wxPanel* m_panelTemplateContent;
-    wxFlexGridSizer* flexGridSizer706;
-    wxFlexGridSizer* flexGridSizer1368;
     wxButton* m_openSourceExtern;
     wxButton* m_openSvgExtern;
     wxButton* m_btPathGenerator;
@@ -478,9 +394,7 @@ protected:
     wxBitmapToggleButton* m_previewErrorInfo;
     wxNotebook* m_templateNotebook;
     wxPanel* m_panelTplEdit;
-    wxFlexGridSizer* flexGridSizer1294;
     wxStyledTextCtrl* m_stcFileContent;
-    wxFlexGridSizer* flexGridSizer1809;
     wxBitmapToggleButton* m_tbCaseSensitive;
     wxBitmapToggleButton* m_tbWholeWord;
     wxBitmapToggleButton* m_tbRegEx;
@@ -489,78 +403,57 @@ protected:
     wxComboBox* m_svgEditSearch;
     wxButton* m_svgEditFind;
     wxButton* m_svgEditFindPrev;
-    wxFlexGridSizer* flexGridSizer713;
     wxStaticText* m_filePosition;
     wxTextCtrl* m_svgEditStatus;
     wxStaticText* m_editMode;
     wxPanel* m_panelTplUserAgent;
-    wxFlexGridSizer* flexGridSizer1506;
-    wxFlexGridSizer* flexGridSizer1488;
-    wxFlexGridSizer* flexGridSizer1490;
     wxStaticText* m_staticText1498;
     wxDataViewListCtrl* m_dvListCtrlSvgUAInboundPathList;
     wxStaticText* m_staticText14983;
     wxDataViewListCtrl* m_dvListCtrlSvgUAUseDirective;
-    wxFlexGridSizer* flexGridSizer1492;
     wxStaticText* m_staticText1500;
     wxDataViewListCtrl* m_dvListCtrlSvgUADetailInfo;
     wxTextCtrl* m_selectedUAInfo;
     wxPanel* m_panelTplDebugger;
-    wxFlexGridSizer* flexGridSizer1338;
-    wxFlexGridSizer* flexGridSizer1565;
     wxStaticText* m_staticText1370;
     wxStaticText* m_staticText1571;
     wxStaticText* m_debugPhase;
     wxDataViewListCtrl* m_dvListCtrlSvgDebuggerInfoBase;
-    wxFlexGridSizer* flexGridSizer1362;
     wxStaticText* m_staticText1372;
     wxStaticText* m_staticText1374;
     wxDataViewListCtrl* m_dvListCtrlSvgDebuggerInfoPath;
     wxDataViewListCtrl* m_dvListCtrlSvgDebuggerInfoDetail;
-    wxFlexGridSizer* flexGridSizer1354;
     wxTextCtrl* m_svgDebuggerKey;
     wxTextCtrl* m_svgDebuggerValue;
     wxPanel* m_panelTplPreview;
-    wxFlexGridSizer* flexGridSizer692;
     wxStaticText* m_svgFilePreviewHint;
 #if wxUSE_WEBVIEW
     wxWebView* m_svgPreview;
 #endif // wxUSE_WEBVIEW
 
     wxPanel* m_panelSpeed;
-    wxFlexGridSizer* flexGridSizer28011;
     wxStaticText* m_staticText28052;
     CncSpeedView* m_speedView;
     wxScrolledWindow* m_scrollWinFile;
-    wxFlexGridSizer* flexGridSizer1628;
     wxToolbook* m_templateToolbook;
     wxPanel* m_lruPanel;
-    wxFlexGridSizer* flexGridSizer1642;
     wxStaticText* m_staticText1644;
     wxListBox* m_lruList;
     wxPanel* m_stdPanel;
-    wxFlexGridSizer* flexGridSizer2599;
-    wxFlexGridSizer* flexGridSizer1636;
     wxButton* m_btDefaultDir;
     wxButton* m_btCurrentFile;
-    wxFlexGridSizer* flexGridSizer1645;
     wxStaticText* m_staticText1647;
     wxGenericDirCtrl* m_dirCtrl;
     wxScrolledWindow* m_scrollWinLogger;
-    wxFlexGridSizer* flexGridSizer869;
     wxToolbook* m_loggerToolbook;
     wxPanel* m_panel3157;
-    wxFlexGridSizer* flexGridSizer3158;
-    wxFlexGridSizer* flexGridSizer1863;
     wxBitmapButton* m_clearLogger;
     wxBitmapButton* m_freezeLogger;
     wxBitmapButton* m_copyLogger;
     wxCheckBox* m_showLoggerOnDemand;
-    wxFlexGridSizer* flexGridSizer2520;
     wxTextCtrl* m_logger;
     wxTextCtrl* m_tmpTraceInfo;
     wxScrolledWindow* m_statusBar;
-    wxFlexGridSizer* flexGridSizer436;
     wxStaticText* m_staticText3952;
     wxTextCtrl* m_cmdCount;
     wxStaticText* m_staticText395;
@@ -593,69 +486,48 @@ protected:
     wxStaticBitmap* m_refPosTrafficLight;
     wxStaticLine* m_staticLine6023412;
     wxScrolledWindow* m_scrollOutbound;
-    wxFlexGridSizer* flexGridSizer649;
     wxNotebook* m_outboundNotebook;
     wxPanel* m_cncParameters;
-    wxFlexGridSizer* flexGridSizer1076;
     wxListbook* m_notebookConfig;
     wxPanel* m_panel2601;
-    wxFlexGridSizer* flexGridSizer2603;
     wxStaticText* m_staticText11481;
     wxDataViewListCtrl* m_dvListCtrlConfigSummary;
-    wxFlexGridSizer* flexGridSizer2609;
     wxButton* m_btCancelRun;
     wxButton* m_btConfirmRun;
     wxPanel* m_cncSetters;
-    wxFlexGridSizer* flexGridSizer1142;
     wxStaticText* m_staticText1148;
-    wxFlexGridSizer* flexGridSizer1471;
     wxStaticText* m_staticText1150;
     wxButton* m_button1473;
     wxDataViewListCtrl* m_dvListCtrlLastSetters;
     wxDataViewListCtrl* m_dvListCtrlProcessedSetters;
     wxPanel* m_cncConfiguration;
-    wxFlexGridSizer* flexGridSizer901;
     wxStaticText* m_staticText1283;
     wxStaticText* m_staticText1281;
     wxDataViewListCtrl* m_dvListCtrlStatic;
     wxDataViewListCtrl* m_dvListCtrlDynamic;
     wxPanel* m_controllerConfiguration;
-    wxFlexGridSizer* flexGridSizer1306;
-    wxFlexGridSizer* flexGridSizer1311;
     wxStaticText* m_staticText12831;
     wxButton* m_btRequestCtlConfig;
     wxDataViewListCtrl* m_dvListCtrlControllerConfig;
     wxPanel* m_controllerPinReport;
-    wxFlexGridSizer* flexGridSizer13061;
-    wxFlexGridSizer* flexGridSizer13112;
     wxStaticText* m_staticText128313;
     wxButton* m_btRequestCtlPins;
     wxDataViewListCtrl* m_dvListCtrlControllerPins;
     wxPanel* m_conrollerMessages;
-    wxFlexGridSizer* flexGridSizer2577;
-    wxFlexGridSizer* flexGridSizer2586;
     wxStaticText* m_staticText1283132;
     wxButton* m_btClearMsgHistory;
     wxTextCtrl* m_controllerMsgHistory;
     wxPanel* m_controllerErrorInfo;
-    wxFlexGridSizer* flexGridSizer13062;
-    wxFlexGridSizer* flexGridSizer13113;
     wxStaticText* m_staticText128314;
     wxButton* m_btRequestCtlErrorInfo;
     wxDataViewListCtrl* m_dvListCtrlControllerErrorInfo;
     wxPanel* m_outPanel;
-    wxFlexGridSizer* flexGridSizer1042;
-    wxFlexGridSizer* flexGridSizer1046;
     wxStaticText* m_staticText1048;
     CncZView* m_zView;
     wxStaticText* m_infoToolDiameter;
     wxStaticBitmap* m_staticBitmap2401;
-    wxFlexGridSizer* flexGridSizer742;
-    wxFlexGridSizer* flexGridSizer768;
-    wxFlexGridSizer* flexGridSizer2404;
     wxStaticBitmap* m_lableWorkpieceThickness;
     wxStaticBitmap* m_toolStateTrafficLight;
-    wxFlexGridSizer* flexGridSizerOutPanel;
     wxStaticText* m_staticText16032;
     wxComboBox* m_cbCurveLibResolution;
     wxBitmapToggleButton* m_switchCoordType;
@@ -666,33 +538,24 @@ protected:
     wxStaticText* m_staticText1054;
     wxComboBox* m_cbUpdateInterval;
     wxScrolledWindow* m_drawPaneWindow;
-    wxFlexGridSizer* flexGridSizer885;
-    wxFlexGridSizer* flexGridSizer3175;
     wxPanel* m_panel3281;
     wxPanel* m_yAxisMarker;
     wxPanel* m_panel32812;
-    wxFlexGridSizer* flexGridSizer1416;
     wxPanel* m_xAxisMarkerTop;
     wxPanel* m_drawPane;
     wxPanel* m_xAxisMarkerBottom;
-    wxFlexGridSizer* flexGridSizer936;
-    wxFlexGridSizer* flexGridSizer1948;
     wxStaticText* m_staticText1950;
     wxComboBox* m_gridPosUnit;
-    wxFlexGridSizer* flexGridSizer3167;
     wxStaticText* m_staticText3169;
     wxComboBox* m_cbDrawPaneZoom;
-    wxFlexGridSizer* flexGridSizer1909;
     wxStaticText* m_staticText1943;
     wxTextCtrl* m_drawPainPositionX;
     wxStaticText* m_staticText19431;
     wxTextCtrl* m_drawPainPositionY;
-    wxFlexGridSizer* flexGridSizer2803;
     wxStaticText* m_staticText1128;
     wxTextCtrl* m_crossings;
     wxStaticText* m_staticText1966;
     wxTextCtrl* m_passingCount;
-    wxFlexGridSizer* flexGridSizer1698;
     wxStaticText* m_staticText1696;
     wxStaticText* m_minPosX;
     wxStaticText* m_minPosY;
@@ -702,8 +565,6 @@ protected:
     wxStaticText* m_maxPosY;
     wxStaticText* m_maxPosZ;
     wxPanel* m_3DPane;
-    wxFlexGridSizer* flexGridSizer2309;
-    wxFlexGridSizer* flexGridSizer2311;
     wxButton* m_3D_Animate;
     wxButton* m_3D_Refreh;
     wxButton* m_3D_Clear;
@@ -722,12 +583,9 @@ protected:
     wxStaticText* m_staticText2331;
     wxStaticText* m_staticText2333;
     wxPanel* m_panel2590;
-    wxFlexGridSizer* flexGridSizer2360;
     wxPanel* m_drawPane3D;
     wxTextCtrl* m_trace3D;
     wxPanel* m_panel2696;
-    wxFlexGridSizer* flexGridSizer267117;
-    wxFlexGridSizer* flexGridSizer3131;
     wxStaticText* m_staticText3133;
     wxCheckBox* m_cb3DDrawZeroPlane;
     wxCheckBox* m_cb3DDrawWorkpieceSurfacePlane;
@@ -742,8 +600,6 @@ protected:
     wxSpinCtrl* m_spin3DAngelZ;
     wxButton* m_button2710;
     wxPanel* m_svgEmuResult;
-    wxFlexGridSizer* flexGridSizer585;
-    wxFlexGridSizer* flexGridSizer766;
     wxButton* m_svgEmuOpenFileAsSource;
     wxButton* m_svgEmuOpenFileAsSvg;
     wxButton* m_svgEmuReload;
@@ -758,39 +614,29 @@ protected:
 #endif // wxUSE_WEBVIEW
 
     wxPanel* m_svgEmuSource;
-    wxFlexGridSizer* flexGridSizer1891;
-    wxFlexGridSizer* flexGridSizer1899;
     wxBitmapToggleButton* m_svgEmuToggleWordWrap;
     wxStyledTextCtrl* m_stcEmuSource;
     wxPanel* m_svgTracePreview;
-    wxFlexGridSizer* flexGridSizer1720;
-    wxFlexGridSizer* flexGridSizer1858;
     wxBitmapButton* m_openXmlTraceAsText;
     wxBitmapButton* m_openXmlTrace;
     wxBitmapButton* m_copySvgTrace;
-    wxFlexGridSizer* flexGridSizer1723;
 #if wxUSE_WEBVIEW
     wxWebView* m_svgTrace;
 #endif // wxUSE_WEBVIEW
 
     wxScrolledWindow* m_scrollSpy;
-    wxFlexGridSizer* flexGridSizer27261;
-    wxFlexGridSizer* flexGridSizer27302;
     wxButton* m_enableSerialSpy;
     wxButton* m_MarkSerialSpy;
     wxButton* m_clearSerialSpy;
     wxCheckBox* m_clearSerialSpyOnConnect;
-    wxFlexGridSizer* flexGridSizer27417;
     wxTextCtrl* m_serialSpy;
     wxStaticText* m_staticText27519;
     wxTextCtrl* m_serialSpyDetails;
     wxPanel* m_svgUnitCalulator;
-    wxFlexGridSizer* flexGridSizer3251;
     wxStaticText* m_staticText3261;
     wxComboBox* m_cbUCUnitFrom;
     wxStaticText* m_staticText3259;
     wxComboBox* m_cbUCUnitTo;
-    wxFlexGridSizer* flexGridSizer3266;
     wxTextCtrl* m_cbUCValueFrom;
     wxTextCtrl* m_cbUCValueTo;
     wxButton* m_btUCClose;
@@ -899,8 +745,8 @@ protected:
     virtual void mainBookPageChanging(wxNotebookEvent& event) { event.Skip(); }
     virtual void mvSpinUpX(wxSpinEvent& event) { event.Skip(); }
     virtual void mvSpinDownX(wxSpinEvent& event) { event.Skip(); }
-    virtual void mvSpinDownY(wxSpinEvent& event) { event.Skip(); }
     virtual void mvSpinUpY(wxSpinEvent& event) { event.Skip(); }
+    virtual void mvSpinDownY(wxSpinEvent& event) { event.Skip(); }
     virtual void keyDownXY(wxKeyEvent& event) { event.Skip(); }
     virtual void setFocusMoveXYAxis(wxFocusEvent& event) { event.Skip(); }
     virtual void killFocusMoveXYAxis(wxFocusEvent& event) { event.Skip(); }
@@ -1702,74 +1548,51 @@ public:
 class PathGeneratorFrameBase : public wxFrame
 {
 protected:
-    wxFlexGridSizer* flexGridSizer980;
     wxSplitterWindow* m_mainSplitter;
     wxPanel* m_leftMainSplitterPage;
-    wxFlexGridSizer* flexGridSizer3302;
-    wxFlexGridSizer* flexGridSizer3315;
     wxButton* m_btPGMinimizeTree;
     wxTextCtrl* m_treeSearchText;
     wxButton* m_btSearchTree;
     wxTreeCtrl* m_templateTree;
     wxPanel* m_rightMainSplitterPage;
-    wxFlexGridSizer* flexGridSizer3296;
     wxSplitterWindow* m_splitter3185;
     wxPanel* m_splitterPage3189;
-    wxFlexGridSizer* flexGridSizer973;
-    wxFlexGridSizer* flexGridSizer3093;
     wxComboBox* m_pgPathSelector;
-    wxFlexGridSizer* flexGridSizer2825;
     wxSplitterWindow* m_splitter2932;
     wxPanel* m_splitterPage2936;
-    wxFlexGridSizer* flexGridSizer2942;
     wxNotebook* m_pgMainBook;
     wxPanel* m_pgPreviewPage;
-    wxFlexGridSizer* flexGridSizer3332;
 #if wxUSE_WEBVIEW
     wxWebView* m_pgPreview;
 #endif // wxUSE_WEBVIEW
 
     wxPanel* m_pgAdditionalCodePage;
-    wxFlexGridSizer* flexGridSizer3414;
     wxTextCtrl* m_aditionalCode;
     wxPanel* m_pgAdditionalInfoPage;
-    wxFlexGridSizer* flexGridSizer3336;
     wxTextCtrl* m_additionalInfo;
     wxPanel* m_splitterPage2940;
-    wxFlexGridSizer* flexGridSizer2944;
-    wxFlexGridSizer* flexGridSizer3395;
     wxStaticText* m_staticText3401;
-    wxFlexGridSizer* flexGridSizer3406;
     wxTextCtrl* m_currentTemplate;
-    wxFlexGridSizer* flexGridSizer33851;
     wxStaticText* m_staticText33892;
     wxComboBox* m_cbEditMode;
     wxButton* m_updatePreview;
-    wxFlexGridSizer* flexGridSizer3385;
     wxStaticText* m_staticText3389;
     wxComboBox* m_cbDisplayMode;
     wxToolbook* m_tbOutput;
     wxPanel* m_panelPreview;
-    wxFlexGridSizer* flexGridSizer3233;
     wxTextCtrl* m_generatedPreview;
     wxPanel* m_panelResult;
-    wxFlexGridSizer* flexGridSizer3235;
     wxTextCtrl* m_generatedResult;
     wxPanel* m_panelInfo;
-    wxFlexGridSizer* flexGridSizer3286;
     wxTextCtrl* m_processInfo;
     wxPanel* m_splitterPage3193;
-    wxFlexGridSizer* flexGridSizer986;
-    wxFlexGridSizer* flexGridSizer2874;
     wxButton* m_btPGGenerate;
     wxButton* m_btPGClear;
     wxButton* m_btPGReplaceEdit;
     wxButton* m_btPGCopy;
     wxButton* m_btPGSave;
-    wxFlexGridSizer* flexGridSizer3225;
     wxButton* m_btPGMinimize;
     wxButton* m_btPGClose;
-    wxFlexGridSizer* flexGridSizer2972;
     wxPropertyGridManager* m_pgParameterMgr;
     wxPGProperty* m_pgCatCommon;
     wxPGProperty* m_pgPropToolDiameter;
@@ -1901,14 +1724,11 @@ public:
 class UnitTestsBase : public wxDialog
 {
 protected:
-    wxFlexGridSizer* flexGridSizer3344;
-    wxFlexGridSizer* flexGridSizer3355;
     wxStaticText* m_staticText3357;
     wxComboBox* m_unitTestSelector;
     wxButton* m_btUnitTestClear;
     wxButton* m_btUnitTestRun;
     wxTextCtrl* m_testResultStream;
-    wxFlexGridSizer* flexGridSizer3370;
     wxStaticText* m_unitTestStatus;
     wxCheckBox* m_unitTestFreezeOutput;
     wxCheckBox* m_unitTestAutoRun;
@@ -1938,18 +1758,14 @@ public:
 class EndSwitchDialogBase : public wxDialog
 {
 protected:
-    wxFlexGridSizer* flexGridSizer1529;
-    wxFlexGridSizer* flexGridSizer1531;
     wxTextCtrl* m_limitInfo;
     wxStaticText* m_staticText1547;
-    wxFlexGridSizer* flexGridSizer1533;
     wxRadioBox* m_XAxisEndSwitchBox;
     wxRadioBox* m_YAxisEndSwitchBox;
     wxRadioBox* m_ZAxisEndSwitchBox;
     wxButton* m_btDissolveX;
     wxButton* m_btDissolveY;
     wxButton* m_btDissolveZ;
-    wxFlexGridSizer* flexGridSizer1535;
     wxButton* m_btCancle;
 
 protected:

@@ -29,7 +29,9 @@ class NotebookInfo {
 				pi.lable = notebook->GetPageText(i);
 				unsigned int idx = notebook->GetPageImage(i);
 				if ( idx > 0 ) {
-					pi.logo = notebook->GetImageList()->GetIcon(idx);
+					wxImageList* il = notebook->GetImageList();
+					if ( il != NULL ) 
+						pi.logo = il->GetIcon(idx);
 				}
 				pageInfoList.push_back(pi);
 			}

@@ -6,7 +6,7 @@
     <style>wxDEFAULT_FRAME_STYLE</style>
     <size>1000,700</size>
     <object class="wxAuiManager">
-      <flags>271</flags>
+      <style>wxAUI_MGR_LIVE_RESIZE|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_ALLOW_ACTIVE_PANE|wxAUI_MGR_ALLOW_FLOATING</style>
       <sashsize>3</sashsize>
       <pane-border-size>-1</pane-border-size>
       <sash-colour/>
@@ -17,27 +17,27 @@
       <caption-text-colour>wxSYS_COLOUR_BTNHIGHLIGHT</caption-text-colour>
       <inactive-caption-text-colour>wxSYS_COLOUR_BTNHIGHLIGHT</inactive-caption-text-colour>
       <gradient-type>wxAUI_GRADIENT_NONE</gradient-type>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[Toolbar]]>
-        </name>
-        <caption>
-          <![CDATA[Main]]>
-        </caption>
-        <caption-visible>0</caption-visible>
+      <object class="wxAuiPaneInfo" name="Toolbar">
+        <caption>Main</caption>
+        <caption_visible>0</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>0</resizable>
-        <direction>wxAUI_DOCK_TOP</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>40,40</best_size>
+        <max_size>40,40</max_size>
+        <min_size>40,40</min_size>
+        <top>1</top>
         <layer>0</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>40,40</bestsize>
-        <maxsize>40,40</maxsize>
-        <minsize>40,40</minsize>
-        <closebtn>0</closebtn>
-        <minbtn>0</minbtn>
-        <maxbtn>0</maxbtn>
-        <pinbtn>0</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>0</close_button>
+        <minimize_button>0</minimize_button>
+        <maximize_button>0</maximize_button>
+        <pin_button>0</pin_button>
         <object class="wxAuiToolBar" name="m_auibarMain">
           <style>wxAUI_TB_PLAIN_BACKGROUND|wxAUI_TB_DEFAULT_STYLE|wxAUI_TB_NO_AUTORESIZE</style>
           <bg/>
@@ -307,33 +307,33 @@
             <tooltip>
               <![CDATA[Interrupt the CNC Controller]]>
             </tooltip>
-            <bitmap>Resources/arrow_plain_red_E.png</bitmap>
-            <bitmapposition>wxLEFT</bitmapposition>
+            <bitmap>bitmaps/error.png</bitmap>
+            <bitmapposition>wxRIGHT</bitmapposition>
             <default>0</default>
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[MainView]]>
-        </name>
-        <caption>
-          <![CDATA[CNC Main View]]>
-        </caption>
-        <caption-visible>1</caption-visible>
+      <object class="wxAuiPaneInfo" name="MainView">
+        <caption>CNC Main View</caption>
+        <caption_visible>1</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>1</resizable>
-        <direction>wxAUI_DOCK_CENTER</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>800,800</best_size>
+        <max_size>800,800</max_size>
+        <min_size>10,10</min_size>
+        <centre>1</centre>
         <layer>0</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>800,800</bestsize>
-        <maxsize>800,800</maxsize>
-        <minsize>10,10</minsize>
-        <closebtn>1</closebtn>
-        <minbtn>1</minbtn>
-        <maxbtn>1</maxbtn>
-        <pinbtn>1</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>1</close_button>
+        <minimize_button>1</minimize_button>
+        <maximize_button>1</maximize_button>
+        <pin_button>1</pin_button>
         <object class="wxScrolledWindow" name="m_scrollWinMain">
           <bg>wxSYS_COLOUR_BTNFACE</bg>
           <style/>
@@ -1224,7 +1224,7 @@
                 </object>
                 <object class="notebookpage">
                   <label>Setup</label>
-                  <bitmap>bitmaps/16-cog.png</bitmap>
+                  <bitmap>bitmaps/settings.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panelSetup">
                     <style>wxTAB_TRAVERSAL</style>
@@ -1547,7 +1547,7 @@
                           </object>
                           <object class="listbookpage">
                             <label>Speed</label>
-                            <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/graph_bars.png</bitmap>
+                            <bitmap>bitmaps/git-settings.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupSpeedPage">
                               <style>wxTAB_TRAVERSAL</style>
@@ -2081,7 +2081,7 @@
                           </object>
                           <object class="listbookpage">
                             <label>Dimensions</label>
-                            <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_blue_NE_SE_SW_NW.png</bitmap>
+                            <bitmap>bitmaps/resize.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupDimPage">
                               <style>wxTAB_TRAVERSAL</style>
@@ -4742,7 +4742,7 @@
                           <bg>wxSYS_COLOUR_BTNFACE</bg>
                           <object class="notebookpage">
                             <label>Source</label>
-                            <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png</bitmap>
+                            <bitmap>bitmaps/book_blue.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_panelTplEdit">
                               <style>wxTAB_TRAVERSAL</style>
@@ -4918,7 +4918,7 @@
                           </object>
                           <object class="notebookpage">
                             <label>UserAgent</label>
-                            <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png</bitmap>
+                            <bitmap>bitmaps/book_green.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_panelTplUserAgent">
                               <style>wxTAB_TRAVERSAL</style>
@@ -5043,7 +5043,7 @@
                           </object>
                           <object class="notebookpage">
                             <label>Debugger</label>
-                            <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png</bitmap>
+                            <bitmap>bitmaps/book_red.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_panelTplDebugger">
                               <style>wxTAB_TRAVERSAL</style>
@@ -5212,7 +5212,7 @@
                           </object>
                           <object class="notebookpage">
                             <label>Preview</label>
-                            <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/geometry/rectangle_blue.png</bitmap>
+                            <bitmap>bitmaps/book_blue.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_panelTplPreview">
                               <style>wxTAB_TRAVERSAL</style>
@@ -5258,27 +5258,27 @@
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[Speed]]>
-        </name>
-        <caption>
-          <![CDATA[Speed]]>
-        </caption>
-        <caption-visible>1</caption-visible>
+      <object class="wxAuiPaneInfo" name="Speed">
+        <caption>Speed</caption>
+        <caption_visible>1</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>0</resizable>
-        <direction>wxAUI_DOCK_BOTTOM</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>80,-1</best_size>
+        <max_size>-1,-1</max_size>
+        <min_size>-1,-1</min_size>
+        <bottom>1</bottom>
         <layer>1</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>80,-1</bestsize>
-        <maxsize>-1,-1</maxsize>
-        <minsize>-1,-1</minsize>
-        <closebtn>1</closebtn>
-        <minbtn>1</minbtn>
-        <maxbtn>1</maxbtn>
-        <pinbtn>1</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>1</close_button>
+        <minimize_button>1</minimize_button>
+        <maximize_button>1</maximize_button>
+        <pin_button>1</pin_button>
         <object class="wxPanel" name="m_panelSpeed">
           <style>wxTAB_TRAVERSAL</style>
           <object class="wxFlexGridSizer">
@@ -5316,27 +5316,27 @@
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[TemplateManager]]>
-        </name>
-        <caption>
-          <![CDATA[CNC Template Manager]]>
-        </caption>
-        <caption-visible>1</caption-visible>
+      <object class="wxAuiPaneInfo" name="TemplateManager">
+        <caption>CNC Template Manager</caption>
+        <caption_visible>1</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>1</resizable>
-        <direction>wxAUI_DOCK_BOTTOM</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>100,160</best_size>
+        <max_size>100,800</max_size>
+        <min_size>100,160</min_size>
+        <bottom>1</bottom>
         <layer>1</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>100,160</bestsize>
-        <maxsize>100,800</maxsize>
-        <minsize>100,160</minsize>
-        <closebtn>1</closebtn>
-        <minbtn>1</minbtn>
-        <maxbtn>1</maxbtn>
-        <pinbtn>1</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>1</close_button>
+        <minimize_button>1</minimize_button>
+        <maximize_button>1</maximize_button>
+        <pin_button>1</pin_button>
         <object class="wxScrolledWindow" name="m_scrollWinFile">
           <style/>
           <scrollrate>5,5</scrollrate>
@@ -5515,27 +5515,27 @@
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[Logger]]>
-        </name>
-        <caption>
-          <![CDATA[CNC Logger]]>
-        </caption>
-        <caption-visible>1</caption-visible>
+      <object class="wxAuiPaneInfo" name="Logger">
+        <caption>CNC Logger</caption>
+        <caption_visible>1</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>1</resizable>
-        <direction>wxAUI_DOCK_BOTTOM</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>100,160</best_size>
+        <max_size>100,800</max_size>
+        <min_size>100,160</min_size>
+        <bottom>1</bottom>
         <layer>1</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>100,160</bestsize>
-        <maxsize>100,800</maxsize>
-        <minsize>100,160</minsize>
-        <closebtn>1</closebtn>
-        <minbtn>1</minbtn>
-        <maxbtn>1</maxbtn>
-        <pinbtn>1</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>1</close_button>
+        <minimize_button>1</minimize_button>
+        <maximize_button>1</maximize_button>
+        <pin_button>1</pin_button>
         <object class="wxScrolledWindow" name="m_scrollWinLogger">
           <style/>
           <scrollrate>5,5</scrollrate>
@@ -5686,27 +5686,27 @@
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[StatusBar]]>
-        </name>
-        <caption>
-          <![CDATA[]]>
-        </caption>
-        <caption-visible>0</caption-visible>
+      <object class="wxAuiPaneInfo" name="StatusBar">
+        <caption/>
+        <caption_visible>0</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>1</resizable>
-        <direction>wxAUI_DOCK_BOTTOM</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>-1,-1</best_size>
+        <max_size>-1,-1</max_size>
+        <min_size>-1,-1</min_size>
+        <bottom>1</bottom>
         <layer>2</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>-1,-1</bestsize>
-        <maxsize>-1,-1</maxsize>
-        <minsize>-1,-1</minsize>
-        <closebtn>0</closebtn>
-        <minbtn>0</minbtn>
-        <maxbtn>0</maxbtn>
-        <pinbtn>0</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>0</close_button>
+        <minimize_button>0</minimize_button>
+        <maximize_button>0</maximize_button>
+        <pin_button>0</pin_button>
         <object class="wxScrolledWindow" name="m_statusBar">
           <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
           <style>wxBORDER_NONE</style>
@@ -6069,6 +6069,7 @@
             </object>
             <object class="sizeritem">
               <flag>wxALL</flag>
+              <border>3</border>
               <minsize>30,-1</minsize>
               <object class="wxStaticBitmap" name="m_refPosTrafficLight">
                 <size>30,-1</size>
@@ -6084,27 +6085,27 @@
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[Outbound]]>
-        </name>
-        <caption>
-          <![CDATA[CNC Monitor]]>
-        </caption>
-        <caption-visible>1</caption-visible>
+      <object class="wxAuiPaneInfo" name="Outbound">
+        <caption>CNC Monitor</caption>
+        <caption_visible>1</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>1</resizable>
-        <direction>wxAUI_DOCK_CENTER</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>800,800</best_size>
+        <max_size>800,800</max_size>
+        <min_size>10,10</min_size>
+        <centre>1</centre>
         <layer>1</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>800,800</bestsize>
-        <maxsize>800,800</maxsize>
-        <minsize>10,10</minsize>
-        <closebtn>1</closebtn>
-        <minbtn>1</minbtn>
-        <maxbtn>1</maxbtn>
-        <pinbtn>1</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>1</close_button>
+        <minimize_button>1</minimize_button>
+        <maximize_button>1</maximize_button>
+        <pin_button>1</pin_button>
         <object class="wxScrolledWindow" name="m_scrollOutbound">
           <bg>wxSYS_COLOUR_BTNFACE</bg>
           <style>wxHSCROLL|wxVSCROLL</style>
@@ -6736,7 +6737,7 @@ Axis</label>
                             </object>
                           </object>
                           <object class="sizeritem">
-                            <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+                            <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
                             <border>1</border>
                             <object class="wxStaticBitmap" name="m_staticBitmap2401">
                               <bitmap>bitmaps/mill.png</bitmap>
@@ -6779,7 +6780,7 @@ Axis</label>
                                     <flag>wxALL</flag>
                                     <border>5</border>
                                     <object class="wxStaticBitmap" name="m_lableWorkpieceThickness">
-                                      <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/transportation/train_delete.png</bitmap>
+                                      <bitmap>bitmaps/abb-import.png</bitmap>
                                       <tooltip>
                                         <![CDATA[Workpiece thickness 0.000 mm]]>
                                       </tooltip>
@@ -6787,10 +6788,10 @@ Axis</label>
                                   </object>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
-                                    <border>2</border>
+                                    <border>5</border>
                                     <option>1</option>
                                     <object class="wxStaticBitmap" name="m_toolStateTrafficLight">
-                                      <bitmap>../../../../ToolbarIcons-full-20101107/png/24/Modern3D/transportation/trafficlights.png</bitmap>
+                                      <bitmap>bitmaps/Icons/circle_red16.ico</bitmap>
                                       <tooltip>
                                         <![CDATA[Tool State]]>
                                       </tooltip>
@@ -7640,7 +7641,7 @@ Axis</label>
                               <tooltip>
                                 <![CDATA[Show from Top]]>
                               </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_red_S.png</bitmap>
+                              <bitmap>bitmaps/arrow-up.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
@@ -7655,7 +7656,7 @@ Axis</label>
                               <tooltip>
                                 <![CDATA[Show from Bottom]]>
                               </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_red_N.png</bitmap>
+                              <bitmap>bitmaps/git-arrow-down.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
@@ -7670,7 +7671,6 @@ Axis</label>
                               <tooltip>
                                 <![CDATA[Show from Front]]>
                               </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_N.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
@@ -7685,7 +7685,6 @@ Axis</label>
                               <tooltip>
                                 <![CDATA[Show from Rear]]>
                               </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_green_S.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
@@ -7700,7 +7699,7 @@ Axis</label>
                               <tooltip>
                                 <![CDATA[Show from Left]]>
                               </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_blue_E.png</bitmap>
+                              <bitmap>bitmaps/back-16.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
@@ -7715,7 +7714,7 @@ Axis</label>
                               <tooltip>
                                 <![CDATA[Show from Right]]>
                               </tooltip>
-                              <bitmap>../../../../ToolbarIcons-full-20101107/png/16/Modern3D/arrows/arrow_plain_blue_W.png</bitmap>
+                              <bitmap>bitmaps/next-16.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
@@ -8407,27 +8406,27 @@ Axis</label>
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[Spy]]>
-        </name>
-        <caption>
-          <![CDATA[CNC Spy]]>
-        </caption>
-        <caption-visible>1</caption-visible>
+      <object class="wxAuiPaneInfo" name="Spy">
+        <caption>CNC Spy</caption>
+        <caption_visible>1</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>1</resizable>
-        <direction>wxAUI_DOCK_RIGHT</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>10,10</best_size>
+        <max_size>10,10</max_size>
+        <min_size>10,10</min_size>
+        <right>1</right>
         <layer>0</layer>
         <row>0</row>
         <position>0</position>
-        <bestsize>10,10</bestsize>
-        <maxsize>10,10</maxsize>
-        <minsize>10,10</minsize>
-        <closebtn>1</closebtn>
-        <minbtn>1</minbtn>
-        <maxbtn>1</maxbtn>
-        <pinbtn>1</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <close_button>1</close_button>
+        <minimize_button>1</minimize_button>
+        <maximize_button>1</maximize_button>
+        <pin_button>1</pin_button>
         <object class="wxScrolledWindow" name="m_scrollSpy">
           <style>wxTRANSPARENT_WINDOW|wxHSCROLL|wxVSCROLL</style>
           <scrollrate>5,5</scrollrate>
@@ -8574,27 +8573,27 @@ Axis</label>
           </object>
         </object>
       </object>
-      <object class="wxAuiPaneInfo">
-        <name>
-          <![CDATA[UnitCalculator]]>
-        </name>
-        <caption>
-          <![CDATA[]]>
-        </caption>
-        <caption-visible>0</caption-visible>
+      <object class="wxAuiPaneInfo" name="UnitCalculator">
+        <caption/>
+        <caption_visible>0</caption_visible>
+        <top_dockable>1</top_dockable>
+        <left_dockable>1</left_dockable>
+        <bottom_dockable>1</bottom_dockable>
+        <right_dockable>1</right_dockable>
         <resizable>0</resizable>
-        <direction>wxAUI_DOCK_BOTTOM</direction>
+        <movable>1</movable>
+        <floatable>1</floatable>
+        <best_size>100,24</best_size>
+        <max_size>100,24</max_size>
+        <min_size>100,24</min_size>
+        <bottom>1</bottom>
         <layer>0</layer>
         <row>1</row>
-        <position>1</position>
-        <bestsize>100,24</bestsize>
-        <maxsize>100,24</maxsize>
-        <minsize>100,24</minsize>
-        <closebtn>1</closebtn>
-        <minbtn>0</minbtn>
-        <maxbtn>0</maxbtn>
-        <pinbtn>1</pinbtn>
-        <toolbar-pane>0</toolbar-pane>
+        <position>0</position>
+        <close_button>1</close_button>
+        <minimize_button>0</minimize_button>
+        <maximize_button>0</maximize_button>
+        <pin_button>1</pin_button>
         <object class="wxPanel" name="m_svgUnitCalulator">
           <style>wxTAB_TRAVERSAL</style>
           <font>

@@ -177,8 +177,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_btnEmergenyStop = new wxButton(m_auibarMain, wxID_ANY, _("Emergency Stop [ESC]"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_btnEmergenyStop->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_red_E")), wxLEFT);
-    m_btnEmergenyStop->SetBitmapMargins(0,0);
+    m_btnEmergenyStop->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("error")), wxRIGHT);
+    m_btnEmergenyStop->SetBitmapMargins(10,2);
     #endif
     m_btnEmergenyStop->SetBackgroundColour(wxColour(wxT("rgb(128,64,64)")));
     m_btnEmergenyStop->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
@@ -192,7 +192,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_scrollWinMain, wxAuiPaneInfo().Name(wxT("MainView")).Caption(_("CNC Main View")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(800,800).MinSize(10,10).MaxSize(800,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
-    flexGridSizer434 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer434 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer434->SetFlexibleDirection( wxBOTH );
     flexGridSizer434->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer434->AddGrowableCol(0);
@@ -212,14 +212,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panelReferenceImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-macro")));
     m_mainNotebook->AddPage(m_panelReference, _("References"), false, m_panelReferenceImgIndex);
     
-    flexGridSizer1885 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1885 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer1885->SetFlexibleDirection( wxBOTH );
     flexGridSizer1885->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1885->AddGrowableCol(0);
     flexGridSizer1885->AddGrowableRow(0);
     m_panelReference->SetSizer(flexGridSizer1885);
     
-    flexGridSizer1393 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1393 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer1393->SetFlexibleDirection( wxBOTH );
     flexGridSizer1393->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1393->AddGrowableCol(0);
@@ -228,7 +228,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1885->Add(flexGridSizer1393, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer777 = new wxFlexGridSizer(9, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer777 = new wxFlexGridSizer(9, 1, 0, 0);
     flexGridSizer777->SetFlexibleDirection( wxBOTH );
     flexGridSizer777->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer777->AddGrowableCol(0);
@@ -246,7 +246,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer777->Add(m_staticLine783, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer547 = new wxFlexGridSizer(18, 3, 1, 0);
+    wxFlexGridSizer* flexGridSizer547 = new wxFlexGridSizer(18, 3, 1, 0);
     flexGridSizer547->SetFlexibleDirection( wxBOTH );
     flexGridSizer547->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer547->AddGrowableCol(1);
@@ -333,7 +333,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer547->Add(m_staticText836, 0, wxALL, WXC_FROM_DIP(0));
     m_staticText836->SetMinSize(wxSize(-1,1));
     
-    flexGridSizer1390 = new wxFlexGridSizer(0, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer1390 = new wxFlexGridSizer(0, 3, 0, 0);
     flexGridSizer1390->SetFlexibleDirection( wxBOTH );
     flexGridSizer1390->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -352,14 +352,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1390->Add(10, 0, 1, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizer1163 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1163 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1163->SetFlexibleDirection( wxBOTH );
     flexGridSizer1163->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1163->AddGrowableCol(0);
     
     flexGridSizer1393->Add(flexGridSizer1163, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    flexGridSizer1152 = new wxFlexGridSizer(9, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1152 = new wxFlexGridSizer(9, 1, 0, 0);
     flexGridSizer1152->SetFlexibleDirection( wxBOTH );
     flexGridSizer1152->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1152->AddGrowableCol(0);
@@ -376,7 +376,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1152->Add(m_staticLine1158, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer1165 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1165 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1165->SetFlexibleDirection( wxBOTH );
     flexGridSizer1165->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1165->AddGrowableCol(0);
@@ -419,7 +419,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(m_staticLine2179, 0, wxALL|wxEXPAND, WXC_FROM_DIP(4));
     
-    flexGridSizer2180 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2180 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2180->SetFlexibleDirection( wxBOTH );
     flexGridSizer2180->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2180->AddGrowableCol(0);
@@ -447,7 +447,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1165->Add(m_moveXYtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveXYtoZero->SetMinSize(wxSize(110,-1));
     
-    flexGridSizer218027 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer218027 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer218027->SetFlexibleDirection( wxBOTH );
     flexGridSizer218027->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer218027->AddGrowableCol(0);
@@ -476,7 +476,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1165->Add(m_moveXYZtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveXYZtoZero->SetMinSize(wxSize(110,-1));
     
-    flexGridSizer21802730 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer21802730 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer21802730->SetFlexibleDirection( wxBOTH );
     flexGridSizer21802730->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer21802730->AddGrowableCol(0);
@@ -523,7 +523,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(m_staticText11772, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer2439 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2439 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2439->SetFlexibleDirection( wxBOTH );
     flexGridSizer2439->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -553,7 +553,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2439->Add(m_xToMin, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(3));
     m_xToMin->SetMinSize(wxSize(140,-1));
     
-    flexGridSizer2440 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2440 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2440->SetFlexibleDirection( wxBOTH );
     flexGridSizer2440->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -603,7 +603,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(m_staticText1177, 0, wxALL, WXC_FROM_DIP(1));
     
-    flexGridSizer2434 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2434 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2434->SetFlexibleDirection( wxBOTH );
     flexGridSizer2434->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -633,7 +633,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2434->Add(m_zToMin, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(3));
     m_zToMin->SetMinSize(wxSize(140,-1));
     
-    flexGridSizer2435 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2435 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2435->SetFlexibleDirection( wxBOTH );
     flexGridSizer2435->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -662,10 +662,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelSetup = new wxPanel(m_mainNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelSetupImgIndex;
-    m_panelSetupImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-cog")));
+    m_panelSetupImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("settings")));
     m_mainNotebook->AddPage(m_panelSetup, _("Setup"), false, m_panelSetupImgIndex);
     
-    flexGridSizer1884 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1884 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer1884->SetFlexibleDirection( wxBOTH );
     flexGridSizer1884->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1884->AddGrowableCol(0);
@@ -684,13 +684,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_setupWorkPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-tools")));
     m_listbook2220->AddPage(m_setupWorkPage, _("Working"), false, m_setupWorkPageImgIndex);
     
-    flexGridSizer2218 = new wxFlexGridSizer(8, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2218 = new wxFlexGridSizer(8, 1, 0, 0);
     flexGridSizer2218->SetFlexibleDirection( wxBOTH );
     flexGridSizer2218->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2218->AddGrowableCol(0);
     m_setupWorkPage->SetSizer(flexGridSizer2218);
     
-    flexGridSizer961 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer961 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer961->SetFlexibleDirection( wxBOTH );
     flexGridSizer961->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer961->AddGrowableCol(0);
@@ -707,7 +707,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer961->Add(m_staticLine9572, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer963 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer963 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer963->SetFlexibleDirection( wxBOTH );
     flexGridSizer963->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer963->AddGrowableCol(0);
@@ -742,7 +742,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2218->Add(m_staticLine3109, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer3107 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer3107 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer3107->SetFlexibleDirection( wxBOTH );
     flexGridSizer3107->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3107->AddGrowableCol(0);
@@ -778,7 +778,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2218->Add(m_staticLine3111, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    flexGridSizer1423 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1423 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1423->SetFlexibleDirection( wxBOTH );
     flexGridSizer1423->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1423->AddGrowableCol(0);
@@ -851,16 +851,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_setupSpeedPage = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupSpeedPageImgIndex;
-    m_setupSpeedPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("graph_bars")));
+    m_setupSpeedPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("git-settings")));
     m_listbook2220->AddPage(m_setupSpeedPage, _("Speed"), false, m_setupSpeedPageImgIndex);
     
-    flexGridSizer2237 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2237 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2237->SetFlexibleDirection( wxBOTH );
     flexGridSizer2237->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2237->AddGrowableCol(0);
     m_setupSpeedPage->SetSizer(flexGridSizer2237);
     
-    flexGridSizer96114 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer96114 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer96114->SetFlexibleDirection( wxBOTH );
     flexGridSizer96114->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer96114->AddGrowableCol(0);
@@ -877,7 +877,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer96114->Add(m_staticLine957236, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer2793 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2793 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2793->SetFlexibleDirection( wxBOTH );
     flexGridSizer2793->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2793->AddGrowableCol(0);
@@ -910,7 +910,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2793->Add(m_staticLine9572361, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer1387 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1387 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1387->SetFlexibleDirection( wxBOTH );
     flexGridSizer1387->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1387->AddGrowableCol(0);
@@ -994,7 +994,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1387->Add(m_currentSpeedXY, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_currentSpeedXY->SetMinSize(wxSize(100,-1));
     
-    flexGridSizer265915 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer265915 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer265915->SetFlexibleDirection( wxBOTH );
     flexGridSizer265915->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer265915->AddGrowableCol(0);
@@ -1017,7 +1017,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2237->Add(m_staticLine3113, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer2241 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2241 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer2241->SetFlexibleDirection( wxBOTH );
     flexGridSizer2241->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2241->AddGrowableCol(0);
@@ -1101,7 +1101,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2241->Add(m_currentSpeedZ, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_currentSpeedZ->SetMinSize(wxSize(100,-1));
     
-    flexGridSizer2659 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2659 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2659->SetFlexibleDirection( wxBOTH );
     flexGridSizer2659->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2659->AddGrowableCol(0);
@@ -1120,16 +1120,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_setupDimPage = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupDimPageImgIndex;
-    m_setupDimPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_blue_NE_SE_SW_NW")));
+    m_setupDimPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("resize")));
     m_listbook2220->AddPage(m_setupDimPage, _("Dimensions"), false, m_setupDimPageImgIndex);
     
-    flexGridSizer2234 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2234 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2234->SetFlexibleDirection( wxBOTH );
     flexGridSizer2234->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2234->AddGrowableCol(0);
     m_setupDimPage->SetSizer(flexGridSizer2234);
     
-    flexGridSizer9611 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9611 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer9611->SetFlexibleDirection( wxBOTH );
     flexGridSizer9611->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9611->AddGrowableCol(0);
@@ -1146,7 +1146,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer9611->Add(m_staticLine95723, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer1380 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1380 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1380->SetFlexibleDirection( wxBOTH );
     flexGridSizer1380->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1380->AddGrowableCol(0);
@@ -1197,13 +1197,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_setupSVGPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-blocks")));
     m_listbook2220->AddPage(m_setupSVGPage, _("SVG"), false, m_setupSVGPageImgIndex);
     
-    flexGridSizer2229 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2229 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2229->SetFlexibleDirection( wxBOTH );
     flexGridSizer2229->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2229->AddGrowableCol(0);
     m_setupSVGPage->SetSizer(flexGridSizer2229);
     
-    flexGridSizer9613 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer9613 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer9613->SetFlexibleDirection( wxBOTH );
     flexGridSizer9613->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9613->AddGrowableCol(0);
@@ -1220,7 +1220,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer9613->Add(m_staticLine95725, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer9636 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer9636 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer9636->SetFlexibleDirection( wxBOTH );
     flexGridSizer9636->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer9636->AddGrowableCol(0);
@@ -1270,7 +1270,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer9636->Add(m_cbSvgFirstCrossing, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    flexGridSizer1134 = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1134 = new wxFlexGridSizer(3, 2, 0, 0);
     flexGridSizer1134->SetFlexibleDirection( wxBOTH );
     flexGridSizer1134->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1134->AddGrowableCol(1);
@@ -1282,14 +1282,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_setupEnvPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));
     m_listbook2220->AddPage(m_setupEnvPage, _("Envrionment"), false, m_setupEnvPageImgIndex);
     
-    flexGridSizer2232 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2232 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2232->SetFlexibleDirection( wxBOTH );
     flexGridSizer2232->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2232->AddGrowableCol(0);
     flexGridSizer2232->AddGrowableRow(0);
     m_setupEnvPage->SetSizer(flexGridSizer2232);
     
-    flexGridSizer1873 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1873 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1873->SetFlexibleDirection( wxBOTH );
     flexGridSizer1873->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1873->AddGrowableCol(0);
@@ -1320,13 +1320,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_setupAppImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-checkbox")));
     m_listbook2220->AddPage(m_setupApp, _("Application"), false, m_setupAppImgIndex);
     
-    flexGridSizer2627 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2627 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2627->SetFlexibleDirection( wxBOTH );
     flexGridSizer2627->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2627->AddGrowableCol(0);
     m_setupApp->SetSizer(flexGridSizer2627);
     
-    flexGridSizer96111 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer96111 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer96111->SetFlexibleDirection( wxBOTH );
     flexGridSizer96111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer96111->AddGrowableCol(0);
@@ -1343,14 +1343,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer96111->Add(m_staticLine957233, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer26351 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer26351 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer26351->SetFlexibleDirection( wxBOTH );
     flexGridSizer26351->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer26351->AddGrowableCol(0);
     
     flexGridSizer2627->Add(flexGridSizer26351, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    flexGridSizer963642 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer963642 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer963642->SetFlexibleDirection( wxBOTH );
     flexGridSizer963642->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer963642->AddGrowableCol(0);
@@ -1370,14 +1370,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer963642->Add(m_cbRunMotionMonitorMode, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    flexGridSizer2635 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2635 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2635->SetFlexibleDirection( wxBOTH );
     flexGridSizer2635->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2635->AddGrowableCol(0);
     
     flexGridSizer2627->Add(flexGridSizer2635, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    flexGridSizer96364 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer96364 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer96364->SetFlexibleDirection( wxBOTH );
     flexGridSizer96364->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer96364->AddGrowableCol(0);
@@ -1403,7 +1403,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panelTestingImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
     m_mainNotebook->AddPage(m_panelTesting, _("Test Suite"), false, m_panelTestingImgIndex);
     
-    flexGridSizer2205 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2205 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2205->SetFlexibleDirection( wxBOTH );
     flexGridSizer2205->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2205->AddGrowableCol(0);
@@ -1422,13 +1422,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_testIntervalPageImgIndex = m_treebookTest_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
     m_treebookTest->AddPage(m_testIntervalPage, _("Interval"), false, m_testIntervalPageImgIndex);
     
-    flexGridSizer2089 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2089 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2089->SetFlexibleDirection( wxBOTH );
     flexGridSizer2089->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2089->AddGrowableCol(0);
     m_testIntervalPage->SetSizer(flexGridSizer2089);
     
-    flexGridSizer2157 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2157 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2157->SetFlexibleDirection( wxBOTH );
     flexGridSizer2157->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2157->AddGrowableCol(0);
@@ -1454,7 +1454,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2157->Add(m_testIntervalMode, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer2103 = new wxFlexGridSizer(0, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer2103 = new wxFlexGridSizer(0, 10, 0, 0);
     flexGridSizer2103->SetFlexibleDirection( wxBOTH );
     flexGridSizer2103->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -1493,7 +1493,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2089->Add(m_staticLine2111, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer2091 = new wxFlexGridSizer(0, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer2091 = new wxFlexGridSizer(0, 10, 0, 0);
     flexGridSizer2091->SetFlexibleDirection( wxBOTH );
     flexGridSizer2091->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -1549,7 +1549,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2091->Add(m_testDurationCounterX, 0, wxALL, WXC_FROM_DIP(5));
     m_testDurationCounterX->SetMinSize(wxSize(40,-1));
     
-    flexGridSizer209111 = new wxFlexGridSizer(0, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer209111 = new wxFlexGridSizer(0, 10, 0, 0);
     flexGridSizer209111->SetFlexibleDirection( wxBOTH );
     flexGridSizer209111->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -1605,7 +1605,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer209111->Add(m_testDurationCounterY, 0, wxALL, WXC_FROM_DIP(5));
     m_testDurationCounterY->SetMinSize(wxSize(40,-1));
     
-    flexGridSizer20911117 = new wxFlexGridSizer(0, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer20911117 = new wxFlexGridSizer(0, 10, 0, 0);
     flexGridSizer20911117->SetFlexibleDirection( wxBOTH );
     flexGridSizer20911117->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -1666,13 +1666,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_testDimensionsImgIndex = m_treebookTest_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
     m_treebookTest->AddPage(m_testDimensions, _("Dimensions"), false, m_testDimensionsImgIndex);
     
-    flexGridSizer2319 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2319 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2319->SetFlexibleDirection( wxBOTH );
     flexGridSizer2319->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2319->AddGrowableCol(0);
     m_testDimensions->SetSizer(flexGridSizer2319);
     
-    flexGridSizer21573 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer21573 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer21573->SetFlexibleDirection( wxBOTH );
     flexGridSizer21573->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer21573->AddGrowableCol(0);
@@ -1689,7 +1689,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer21573->Add(m_staticLine22535, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer2375 = new wxFlexGridSizer(0, 6, 0, 0);
+    wxFlexGridSizer* flexGridSizer2375 = new wxFlexGridSizer(0, 6, 0, 0);
     flexGridSizer2375->SetFlexibleDirection( wxBOTH );
     flexGridSizer2375->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2375->AddGrowableCol(5);
@@ -1729,7 +1729,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2319->Add(m_staticLine2385, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer2363 = new wxFlexGridSizer(0, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer2363 = new wxFlexGridSizer(0, 10, 0, 0);
     flexGridSizer2363->SetFlexibleDirection( wxBOTH );
     flexGridSizer2363->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2363->AddGrowableCol(7);
@@ -1787,7 +1787,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2363->Add(m_testDimTakeX, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    flexGridSizer23631 = new wxFlexGridSizer(0, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer23631 = new wxFlexGridSizer(0, 10, 0, 0);
     flexGridSizer23631->SetFlexibleDirection( wxBOTH );
     flexGridSizer23631->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer23631->AddGrowableCol(7);
@@ -1845,7 +1845,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer23631->Add(m_testDimTakeY, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    flexGridSizer23637 = new wxFlexGridSizer(0, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer23637 = new wxFlexGridSizer(0, 10, 0, 0);
     flexGridSizer23637->SetFlexibleDirection( wxBOTH );
     flexGridSizer23637->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer23637->AddGrowableCol(7);
@@ -1919,14 +1919,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_testLimitPageImgIndex = m_treebookTest_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
     m_treebookTest->AddPage(m_testLimitPage, _("Limit"), false, m_testLimitPageImgIndex);
     
-    flexGridSizer2249 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2249 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2249->SetFlexibleDirection( wxBOTH );
     flexGridSizer2249->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2249->AddGrowableCol(0);
     flexGridSizer2249->AddGrowableRow(1);
     m_testLimitPage->SetSizer(flexGridSizer2249);
     
-    flexGridSizer21571 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer21571 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer21571->SetFlexibleDirection( wxBOTH );
     flexGridSizer21571->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer21571->AddGrowableCol(0);
@@ -1943,7 +1943,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer21571->Add(m_staticLine22533, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer2269 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2269 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2269->SetFlexibleDirection( wxBOTH );
     flexGridSizer2269->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2269->AddGrowableCol(0);
@@ -1965,14 +1965,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_testToolPageImgIndex = m_treebookTest_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
     m_treebookTest->AddPage(m_testToolPage, _("Tool"), false, m_testToolPageImgIndex);
     
-    flexGridSizer2251 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2251 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer2251->SetFlexibleDirection( wxBOTH );
     flexGridSizer2251->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2251->AddGrowableCol(0);
     flexGridSizer2251->AddGrowableRow(1);
     m_testToolPage->SetSizer(flexGridSizer2251);
     
-    flexGridSizer215715 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer215715 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer215715->SetFlexibleDirection( wxBOTH );
     flexGridSizer215715->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer215715->AddGrowableCol(0);
@@ -1989,7 +1989,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer215715->Add(m_staticLine225337, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer2275 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2275 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2275->SetFlexibleDirection( wxBOTH );
     flexGridSizer2275->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2275->AddGrowableCol(0);
@@ -2011,20 +2011,20 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_ctrlTestSuiteImgIndex = m_treebookTest_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-class")));
     m_treebookTest->AddPage(m_ctrlTestSuite, _("Ctrl Test Suite"), false, m_ctrlTestSuiteImgIndex);
     
-    flexGridSizer24722 = new wxFlexGridSizer(10, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer24722 = new wxFlexGridSizer(10, 1, 0, 0);
     flexGridSizer24722->SetFlexibleDirection( wxBOTH );
     flexGridSizer24722->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer24722->AddGrowableCol(0);
     m_ctrlTestSuite->SetSizer(flexGridSizer24722);
     
-    flexGridSizer21573253 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer21573253 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer21573253->SetFlexibleDirection( wxBOTH );
     flexGridSizer21573253->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer21573253->AddGrowableCol(0);
     
     flexGridSizer24722->Add(flexGridSizer21573253, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer25094 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer25094 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer25094->SetFlexibleDirection( wxBOTH );
     flexGridSizer25094->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer25094->AddGrowableCol(1);
@@ -2049,7 +2049,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer21573253->Add(m_staticLine22535477, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer24808 = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer24808 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer24808->SetFlexibleDirection( wxBOTH );
     flexGridSizer24808->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer24808->AddGrowableCol(0);
@@ -2069,7 +2069,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer24808->Add(m_scrollWin2571, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    flexGridSizer2573 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2573 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2573->SetFlexibleDirection( wxBOTH );
     flexGridSizer2573->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2573->AddGrowableCol(0);
@@ -2099,7 +2099,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer24808->Add(m_ctrlTestDescription, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     m_ctrlTestDescription->SetMinSize(wxSize(-1,100));
     
-    flexGridSizer248413 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer248413 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer248413->SetFlexibleDirection( wxBOTH );
     flexGridSizer248413->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer248413->AddGrowableCol(0);
@@ -2171,7 +2171,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panelManuallyImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-dll")));
     m_mainNotebook->AddPage(m_panelManually, _("Manually Control"), false, m_panelManuallyImgIndex);
     
-    flexGridSizer862 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer862 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer862->SetFlexibleDirection( wxBOTH );
     flexGridSizer862->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer862->AddGrowableCol(0);
@@ -2179,21 +2179,21 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer862->AddGrowableRow(0);
     m_panelManually->SetSizer(flexGridSizer862);
     
-    flexGridSizer418 = new wxFlexGridSizer(10, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer418 = new wxFlexGridSizer(10, 1, 0, 0);
     flexGridSizer418->SetFlexibleDirection( wxBOTH );
     flexGridSizer418->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer418->AddGrowableCol(0);
     
     flexGridSizer862->Add(flexGridSizer418, 1, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer1169 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1169 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1169->SetFlexibleDirection( wxBOTH );
     flexGridSizer1169->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1169->AddGrowableCol(0);
     
     flexGridSizer418->Add(flexGridSizer1169, 1, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    flexGridSizer2081 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2081 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer2081->SetFlexibleDirection( wxBOTH );
     flexGridSizer2081->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -2214,7 +2214,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1169->Add(m_staticLine1162, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer1522 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1522 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1522->SetFlexibleDirection( wxBOTH );
     flexGridSizer1522->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1522->AddGrowableCol(1);
@@ -2229,7 +2229,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1522->Add(m_mmRadioCoordinates, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer1523 = new wxFlexGridSizer(0, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer1523 = new wxFlexGridSizer(0, 3, 0, 0);
     flexGridSizer1523->SetFlexibleDirection( wxBOTH );
     flexGridSizer1523->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -2250,7 +2250,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1523->Add(42, 0, 1, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizer1590 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1590 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1590->SetFlexibleDirection( wxBOTH );
     flexGridSizer1590->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1590->AddGrowableCol(0);
@@ -2259,7 +2259,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1169->Add(flexGridSizer1590, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer7893 = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* flexGridSizer7893 = new wxFlexGridSizer(1, 7, 0, 0);
     flexGridSizer7893->SetFlexibleDirection( wxBOTH );
     flexGridSizer7893->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer7893->AddGrowableCol(2);
@@ -2323,7 +2323,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1590->Add(m_xManuallySlider, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer1591 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1591 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1591->SetFlexibleDirection( wxBOTH );
     flexGridSizer1591->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1591->AddGrowableCol(0);
@@ -2332,7 +2332,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1169->Add(flexGridSizer1591, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer7894 = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* flexGridSizer7894 = new wxFlexGridSizer(1, 7, 0, 0);
     flexGridSizer7894->SetFlexibleDirection( wxBOTH );
     flexGridSizer7894->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer7894->AddGrowableCol(2);
@@ -2405,7 +2405,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1169->Add(m_staticLine2047, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer2078 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2078 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer2078->SetFlexibleDirection( wxBOTH );
     flexGridSizer2078->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -2422,7 +2422,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2078->Add(m_staticText2075, 0, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizer15911 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer15911 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer15911->SetFlexibleDirection( wxBOTH );
     flexGridSizer15911->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer15911->AddGrowableCol(0);
@@ -2431,7 +2431,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1169->Add(flexGridSizer15911, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer78942 = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* flexGridSizer78942 = new wxFlexGridSizer(1, 7, 0, 0);
     flexGridSizer78942->SetFlexibleDirection( wxBOTH );
     flexGridSizer78942->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer78942->AddGrowableCol(2);
@@ -2500,14 +2500,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panelTemplateContentImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-enumerator")));
     m_mainNotebook->AddPage(m_panelTemplateContent, _("Template Control"), false, m_panelTemplateContentImgIndex);
     
-    flexGridSizer706 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer706 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer706->SetFlexibleDirection( wxBOTH );
     flexGridSizer706->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer706->AddGrowableCol(1);
     flexGridSizer706->AddGrowableRow(0);
     m_panelTemplateContent->SetSizer(flexGridSizer706);
     
-    flexGridSizer1368 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1368 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1368->SetFlexibleDirection( wxBOTH );
     flexGridSizer1368->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1368->SetMinSize(28,-1);
@@ -2589,10 +2589,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTplEdit = new wxPanel(m_templateNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_templateNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTplEditImgIndex;
-    m_panelTplEditImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("rectangle_blue")));
+    m_panelTplEditImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_blue")));
     m_templateNotebook->AddPage(m_panelTplEdit, _("Source"), false, m_panelTplEditImgIndex);
     
-    flexGridSizer1294 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1294 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1294->SetFlexibleDirection( wxBOTH );
     flexGridSizer1294->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1294->AddGrowableCol(0);
@@ -2638,7 +2638,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1294->Add(m_stcFileContent, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer1809 = new wxFlexGridSizer(0, 8, 0, 0);
+    wxFlexGridSizer* flexGridSizer1809 = new wxFlexGridSizer(0, 8, 0, 0);
     flexGridSizer1809->SetFlexibleDirection( wxBOTH );
     flexGridSizer1809->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1809->AddGrowableCol(5);
@@ -2697,7 +2697,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1809->Add(m_svgEditFindPrev, 0, wxALL, WXC_FROM_DIP(1));
     
-    flexGridSizer713 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer713 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer713->SetFlexibleDirection( wxBOTH );
     flexGridSizer713->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer713->AddGrowableCol(1);
@@ -2725,17 +2725,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTplUserAgent = new wxPanel(m_templateNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_templateNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTplUserAgentImgIndex;
-    m_panelTplUserAgentImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("rectangle_blue")));
+    m_panelTplUserAgentImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_green")));
     m_templateNotebook->AddPage(m_panelTplUserAgent, _("UserAgent"), false, m_panelTplUserAgentImgIndex);
     
-    flexGridSizer1506 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1506 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer1506->SetFlexibleDirection( wxBOTH );
     flexGridSizer1506->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1506->AddGrowableCol(0);
     flexGridSizer1506->AddGrowableRow(0);
     m_panelTplUserAgent->SetSizer(flexGridSizer1506);
     
-    flexGridSizer1488 = new wxFlexGridSizer(2, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer1488 = new wxFlexGridSizer(2, 3, 0, 0);
     flexGridSizer1488->SetFlexibleDirection( wxBOTH );
     flexGridSizer1488->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1488->AddGrowableCol(0);
@@ -2746,7 +2746,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1506->Add(flexGridSizer1488, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    flexGridSizer1490 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1490 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1490->SetFlexibleDirection( wxBOTH );
     flexGridSizer1490->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1490->AddGrowableCol(0);
@@ -2784,7 +2784,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_dvListCtrlSvgUAUseDirective->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_dvListCtrlSvgUAUseDirective->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    flexGridSizer1492 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1492 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1492->SetFlexibleDirection( wxBOTH );
     flexGridSizer1492->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1492->AddGrowableCol(0);
@@ -2816,10 +2816,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTplDebugger = new wxPanel(m_templateNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_templateNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTplDebuggerImgIndex;
-    m_panelTplDebuggerImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("rectangle_blue")));
+    m_panelTplDebuggerImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_red")));
     m_templateNotebook->AddPage(m_panelTplDebugger, _("Debugger"), false, m_panelTplDebuggerImgIndex);
     
-    flexGridSizer1338 = new wxFlexGridSizer(5, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1338 = new wxFlexGridSizer(5, 1, 0, 0);
     flexGridSizer1338->SetFlexibleDirection( wxBOTH );
     flexGridSizer1338->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1338->AddGrowableCol(0);
@@ -2827,7 +2827,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1338->AddGrowableRow(2);
     m_panelTplDebugger->SetSizer(flexGridSizer1338);
     
-    flexGridSizer1565 = new wxFlexGridSizer(0, 4, 0, 0);
+    wxFlexGridSizer* flexGridSizer1565 = new wxFlexGridSizer(0, 4, 0, 0);
     flexGridSizer1565->SetFlexibleDirection( wxBOTH );
     flexGridSizer1565->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1565->AddGrowableCol(3);
@@ -2860,7 +2860,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_dvListCtrlSvgDebuggerInfoBase->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(100), wxALIGN_LEFT);
     m_dvListCtrlSvgDebuggerInfoBase->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    flexGridSizer1362 = new wxFlexGridSizer(2, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1362 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer1362->SetFlexibleDirection( wxBOTH );
     flexGridSizer1362->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1362->AddGrowableCol(0);
@@ -2899,7 +2899,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_dvListCtrlSvgDebuggerInfoDetail->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(100), wxALIGN_LEFT);
     m_dvListCtrlSvgDebuggerInfoDetail->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    flexGridSizer1354 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1354 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer1354->SetFlexibleDirection( wxBOTH );
     flexGridSizer1354->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1354->AddGrowableCol(1);
@@ -2927,10 +2927,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTplPreview = new wxPanel(m_templateNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_templateNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTplPreviewImgIndex;
-    m_panelTplPreviewImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("rectangle_blue")));
+    m_panelTplPreviewImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_blue")));
     m_templateNotebook->AddPage(m_panelTplPreview, _("Preview"), false, m_panelTplPreviewImgIndex);
     
-    flexGridSizer692 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer692 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer692->SetFlexibleDirection( wxBOTH );
     flexGridSizer692->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer692->AddGrowableCol(0);
@@ -2956,7 +2956,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_panelSpeed, wxAuiPaneInfo().Name(wxT("Speed")).Caption(_("Speed")).Direction(wxAUI_DOCK_BOTTOM).Layer(1).Row(0).Position(0).BestSize(80,-1).Fixed().CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
-    flexGridSizer28011 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer28011 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer28011->SetFlexibleDirection( wxBOTH );
     flexGridSizer28011->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer28011->AddGrowableCol(0);
@@ -2979,7 +2979,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_scrollWinFile, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("CNC Template Manager")).Direction(wxAUI_DOCK_BOTTOM).Layer(1).Row(0).Position(0).BestSize(100,160).MinSize(100,160).MaxSize(100,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
-    flexGridSizer1628 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1628 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer1628->SetFlexibleDirection( wxBOTH );
     flexGridSizer1628->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1628->AddGrowableCol(0);
@@ -2998,7 +2998,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_lruPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-history")));
     m_templateToolbook->AddPage(m_lruPanel, _("Recently"), true, m_lruPanelImgIndex);
     
-    flexGridSizer1642 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1642 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer1642->SetFlexibleDirection( wxBOTH );
     flexGridSizer1642->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1642->AddGrowableCol(0);
@@ -3026,14 +3026,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_stdPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-cxx-workspace")));
     m_templateToolbook->AddPage(m_stdPanel, _("Workarea"), false, m_stdPanelImgIndex);
     
-    flexGridSizer2599 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2599 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2599->SetFlexibleDirection( wxBOTH );
     flexGridSizer2599->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2599->AddGrowableCol(1);
     flexGridSizer2599->AddGrowableRow(0);
     m_stdPanel->SetSizer(flexGridSizer2599);
     
-    flexGridSizer1636 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1636 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1636->SetFlexibleDirection( wxBOTH );
     flexGridSizer1636->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -3059,7 +3059,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1636->Add(m_btCurrentFile, 0, wxALL, WXC_FROM_DIP(2));
     m_btCurrentFile->SetMinSize(wxSize(24,24));
     
-    flexGridSizer1645 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1645 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer1645->SetFlexibleDirection( wxBOTH );
     flexGridSizer1645->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1645->AddGrowableCol(0);
@@ -3086,7 +3086,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_scrollWinLogger, wxAuiPaneInfo().Name(wxT("Logger")).Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(1).Row(0).Position(0).BestSize(100,160).MinSize(100,160).MaxSize(100,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
-    flexGridSizer869 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer869 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer869->SetFlexibleDirection( wxBOTH );
     flexGridSizer869->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer869->AddGrowableCol(0);
@@ -3105,14 +3105,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panel3157ImgIndex = m_loggerToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database")));
     m_loggerToolbook->AddPage(m_panel3157, _("CNC Log"), false, m_panel3157ImgIndex);
     
-    flexGridSizer3158 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer3158 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer3158->SetFlexibleDirection( wxBOTH );
     flexGridSizer3158->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3158->AddGrowableCol(1);
     flexGridSizer3158->AddGrowableRow(0);
     m_panel3157->SetSizer(flexGridSizer3158);
     
-    flexGridSizer1863 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1863 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1863->SetFlexibleDirection( wxBOTH );
     flexGridSizer1863->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -3140,7 +3140,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1863->Add(m_showLoggerOnDemand, 0, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizer2520 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2520 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer2520->SetFlexibleDirection( wxBOTH );
     flexGridSizer2520->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2520->AddGrowableCol(0);
@@ -3173,7 +3173,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_statusBar, wxAuiPaneInfo().Name(wxT("StatusBar")).Direction(wxAUI_DOCK_BOTTOM).Layer(2).Row(0).Position(0).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
-    flexGridSizer436 = new wxFlexGridSizer(1, 36, 0, 0);
+    wxFlexGridSizer* flexGridSizer436 = new wxFlexGridSizer(1, 36, 0, 0);
     flexGridSizer436->SetFlexibleDirection( wxBOTH );
     flexGridSizer436->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer436->AddGrowableRow(1);
@@ -3393,7 +3393,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_refPosTrafficLight = new wxStaticBitmap(m_statusBar, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(30,-1)), 0 );
     
-    flexGridSizer436->Add(m_refPosTrafficLight, 0, wxALL, WXC_FROM_DIP(0));
+    flexGridSizer436->Add(m_refPosTrafficLight, 0, wxALL, WXC_FROM_DIP(3));
     m_refPosTrafficLight->SetMinSize(wxSize(30,-1));
     
     m_staticLine6023412 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
@@ -3406,7 +3406,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_scrollOutbound, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(1).Row(0).Position(0).BestSize(800,800).MinSize(10,10).MaxSize(800,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
-    flexGridSizer649 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer649 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer649->SetFlexibleDirection( wxBOTH );
     flexGridSizer649->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer649->AddGrowableCol(0);
@@ -3426,7 +3426,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cncParametersImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-class")));
     m_outboundNotebook->AddPage(m_cncParameters, _("CNC Values"), false, m_cncParametersImgIndex);
     
-    flexGridSizer1076 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1076 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer1076->SetFlexibleDirection( wxBOTH );
     flexGridSizer1076->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1076->AddGrowableCol(0);
@@ -3446,7 +3446,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panel2601ImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database")));
     m_notebookConfig->AddPage(m_panel2601, _("Summary"), true, m_panel2601ImgIndex);
     
-    flexGridSizer2603 = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2603 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer2603->SetFlexibleDirection( wxBOTH );
     flexGridSizer2603->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2603->AddGrowableCol(0);
@@ -3469,7 +3469,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_dvListCtrlConfigSummary->AppendTextColumn(_("Parameter"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(200), wxALIGN_LEFT);
     m_dvListCtrlConfigSummary->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(120), wxALIGN_RIGHT);
     m_dvListCtrlConfigSummary->AppendTextColumn(_("Unit"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    flexGridSizer2609 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2609 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2609->SetFlexibleDirection( wxBOTH );
     flexGridSizer2609->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2609->AddGrowableCol(0);
@@ -3500,7 +3500,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cncSettersImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));
     m_notebookConfig->AddPage(m_cncSetters, _("CNC Setter"), false, m_cncSettersImgIndex);
     
-    flexGridSizer1142 = new wxFlexGridSizer(2, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1142 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer1142->SetFlexibleDirection( wxBOTH );
     flexGridSizer1142->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1142->AddGrowableCol(0);
@@ -3514,7 +3514,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1142->Add(m_staticText1148, 0, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizer1471 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1471 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1471->SetFlexibleDirection( wxBOTH );
     flexGridSizer1471->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1471->AddGrowableCol(1);
@@ -3557,7 +3557,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cncConfigurationImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-member_protected")));
     m_notebookConfig->AddPage(m_cncConfiguration, _("PC Config"), false, m_cncConfigurationImgIndex);
     
-    flexGridSizer901 = new wxFlexGridSizer(3, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer901 = new wxFlexGridSizer(3, 2, 0, 0);
     flexGridSizer901->SetFlexibleDirection( wxBOTH );
     flexGridSizer901->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer901->AddGrowableCol(0);
@@ -3600,14 +3600,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_controllerConfigurationImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-member_public")));
     m_notebookConfig->AddPage(m_controllerConfiguration, _("Ctrl Config"), false, m_controllerConfigurationImgIndex);
     
-    flexGridSizer1306 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1306 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer1306->SetFlexibleDirection( wxBOTH );
     flexGridSizer1306->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1306->AddGrowableCol(0);
     flexGridSizer1306->AddGrowableRow(1);
     m_controllerConfiguration->SetSizer(flexGridSizer1306);
     
-    flexGridSizer1311 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1311 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer1311->SetFlexibleDirection( wxBOTH );
     flexGridSizer1311->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1311->AddGrowableCol(0);
@@ -3643,14 +3643,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_controllerPinReportImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-ToolPin")));
     m_notebookConfig->AddPage(m_controllerPinReport, _("Ctrl Pin Report"), false, m_controllerPinReportImgIndex);
     
-    flexGridSizer13061 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer13061 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer13061->SetFlexibleDirection( wxBOTH );
     flexGridSizer13061->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer13061->AddGrowableCol(0);
     flexGridSizer13061->AddGrowableRow(1);
     m_controllerPinReport->SetSizer(flexGridSizer13061);
     
-    flexGridSizer13112 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer13112 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer13112->SetFlexibleDirection( wxBOTH );
     flexGridSizer13112->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer13112->AddGrowableCol(0);
@@ -3686,14 +3686,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_conrollerMessagesImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-archive")));
     m_notebookConfig->AddPage(m_conrollerMessages, _("Ctrl Messages"), false, m_conrollerMessagesImgIndex);
     
-    flexGridSizer2577 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2577 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer2577->SetFlexibleDirection( wxBOTH );
     flexGridSizer2577->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2577->AddGrowableCol(0);
     flexGridSizer2577->AddGrowableRow(1);
     m_conrollerMessages->SetSizer(flexGridSizer2577);
     
-    flexGridSizer2586 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2586 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2586->SetFlexibleDirection( wxBOTH );
     flexGridSizer2586->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2586->AddGrowableCol(0);
@@ -3727,14 +3727,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_controllerErrorInfoImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-patch")));
     m_notebookConfig->AddPage(m_controllerErrorInfo, _("Ctrl Error Info"), false, m_controllerErrorInfoImgIndex);
     
-    flexGridSizer13062 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer13062 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer13062->SetFlexibleDirection( wxBOTH );
     flexGridSizer13062->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer13062->AddGrowableCol(0);
     flexGridSizer13062->AddGrowableRow(1);
     m_controllerErrorInfo->SetSizer(flexGridSizer13062);
     
-    flexGridSizer13113 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer13113 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer13113->SetFlexibleDirection( wxBOTH );
     flexGridSizer13113->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer13113->AddGrowableCol(0);
@@ -3770,14 +3770,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_outPanelImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));
     m_outboundNotebook->AddPage(m_outPanel, _("Motion Monitor"), false, m_outPanelImgIndex);
     
-    flexGridSizer1042 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1042 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer1042->SetFlexibleDirection( wxBOTH );
     flexGridSizer1042->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1042->AddGrowableCol(1);
     flexGridSizer1042->AddGrowableRow(0);
     m_outPanel->SetSizer(flexGridSizer1042);
     
-    flexGridSizer1046 = new wxFlexGridSizer(6, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1046 = new wxFlexGridSizer(6, 1, 0, 0);
     flexGridSizer1046->SetFlexibleDirection( wxBOTH );
     flexGridSizer1046->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1046->AddGrowableCol(1);
@@ -3807,9 +3807,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_staticBitmap2401 = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mill")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
     
-    flexGridSizer1046->Add(m_staticBitmap2401, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
+    flexGridSizer1046->Add(m_staticBitmap2401, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
     
-    flexGridSizer742 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer742 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer742->SetFlexibleDirection( wxBOTH );
     flexGridSizer742->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer742->AddGrowableCol(0);
@@ -3817,7 +3817,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1042->Add(flexGridSizer742, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer768 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer768 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer768->SetFlexibleDirection( wxBOTH );
     flexGridSizer768->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer768->AddGrowableCol(0);
@@ -3826,23 +3826,23 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer742->Add(flexGridSizer768, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer2404 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2404 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2404->SetFlexibleDirection( wxBOTH );
     flexGridSizer2404->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
     flexGridSizer768->Add(flexGridSizer2404, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(0));
     
-    m_lableWorkpieceThickness = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("train_delete")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
+    m_lableWorkpieceThickness = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("abb-import")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
     m_lableWorkpieceThickness->SetToolTip(_("Workpiece thickness 0.000 mm"));
     
     flexGridSizer2404->Add(m_lableWorkpieceThickness, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_toolStateTrafficLight = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("trafficlights")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
+    m_toolStateTrafficLight = new wxStaticBitmap(m_outPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("circle_red16")), wxDefaultPosition, wxDLG_UNIT(m_outPanel, wxSize(-1,-1)), 0 );
     m_toolStateTrafficLight->SetToolTip(_("Tool State"));
     
-    flexGridSizer2404->Add(m_toolStateTrafficLight, 1, wxALL, WXC_FROM_DIP(2));
+    flexGridSizer2404->Add(m_toolStateTrafficLight, 1, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizerOutPanel = new wxFlexGridSizer(0, 12, 0, 0);
+    wxFlexGridSizer* flexGridSizerOutPanel = new wxFlexGridSizer(0, 12, 0, 0);
     flexGridSizerOutPanel->SetFlexibleDirection( wxBOTH );
     flexGridSizerOutPanel->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizerOutPanel->AddGrowableCol(0);
@@ -3938,14 +3938,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer742->Add(m_drawPaneWindow, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer885 = new wxFlexGridSizer(2, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer885 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer885->SetFlexibleDirection( wxBOTH );
     flexGridSizer885->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer885->AddGrowableCol(1);
     flexGridSizer885->AddGrowableRow(1);
     m_drawPaneWindow->SetSizer(flexGridSizer885);
     
-    flexGridSizer3175 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3175 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer3175->SetFlexibleDirection( wxBOTH );
     flexGridSizer3175->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3175->AddGrowableCol(0);
@@ -3971,7 +3971,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3175->Add(m_panel32812, 0, wxALL, WXC_FROM_DIP(0));
     m_panel32812->SetMinSize(wxSize(5,5));
     
-    flexGridSizer1416 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1416 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1416->SetFlexibleDirection( wxBOTH );
     flexGridSizer1416->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -3995,7 +3995,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1416->Add(m_xAxisMarkerBottom, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     m_xAxisMarkerBottom->SetMinSize(wxSize(-1,5));
     
-    flexGridSizer936 = new wxFlexGridSizer(1, 5, 0, 0);
+    wxFlexGridSizer* flexGridSizer936 = new wxFlexGridSizer(1, 5, 0, 0);
     flexGridSizer936->SetFlexibleDirection( wxBOTH );
     flexGridSizer936->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer936->AddGrowableCol(3);
@@ -4003,7 +4003,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer742->Add(flexGridSizer936, 1, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(1));
     
-    flexGridSizer1948 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1948 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer1948->SetFlexibleDirection( wxBOTH );
     flexGridSizer1948->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4031,7 +4031,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1948->Add(m_gridPosUnit, 0, wxALL, WXC_FROM_DIP(0));
     m_gridPosUnit->SetMinSize(wxSize(-1,20));
     
-    flexGridSizer3167 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3167 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer3167->SetFlexibleDirection( wxBOTH );
     flexGridSizer3167->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4055,7 +4055,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3167->Add(m_cbDrawPaneZoom, 0, wxALL, WXC_FROM_DIP(0));
     m_cbDrawPaneZoom->SetMinSize(wxSize(-1,20));
     
-    flexGridSizer1909 = new wxFlexGridSizer(2, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1909 = new wxFlexGridSizer(2, 2, 0, 0);
     flexGridSizer1909->SetFlexibleDirection( wxBOTH );
     flexGridSizer1909->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4097,7 +4097,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1909->Add(m_drawPainPositionY, 0, wxALL, WXC_FROM_DIP(1));
     m_drawPainPositionY->SetMinSize(wxSize(60,14));
     
-    flexGridSizer2803 = new wxFlexGridSizer(0, 4, 0, 0);
+    wxFlexGridSizer* flexGridSizer2803 = new wxFlexGridSizer(0, 4, 0, 0);
     flexGridSizer2803->SetFlexibleDirection( wxBOTH );
     flexGridSizer2803->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4138,7 +4138,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2803->Add(m_passingCount, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(1));
     m_passingCount->SetMinSize(wxSize(25,14));
     
-    flexGridSizer1698 = new wxFlexGridSizer(2, 4, 0, 0);
+    wxFlexGridSizer* flexGridSizer1698 = new wxFlexGridSizer(2, 4, 0, 0);
     flexGridSizer1698->SetFlexibleDirection( wxBOTH );
     flexGridSizer1698->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4209,14 +4209,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_3DPaneImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")));
     m_outboundNotebook->AddPage(m_3DPane, _("3D Motion View"), false, m_3DPaneImgIndex);
     
-    flexGridSizer2309 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer2309 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2309->SetFlexibleDirection( wxBOTH );
     flexGridSizer2309->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2309->AddGrowableCol(1);
     flexGridSizer2309->AddGrowableRow(0);
     m_3DPane->SetSizer(flexGridSizer2309);
     
-    flexGridSizer2311 = new wxFlexGridSizer(30, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2311 = new wxFlexGridSizer(30, 1, 0, 0);
     flexGridSizer2311->SetFlexibleDirection( wxBOTH );
     flexGridSizer2311->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2311->AddGrowableCol(0);
@@ -4259,7 +4259,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_3D_Top = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_3D_Top->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_red_S")), wxLEFT);
+    m_3D_Top->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow-up")), wxLEFT);
     m_3D_Top->SetBitmapMargins(2,2);
     #endif
     m_3D_Top->SetToolTip(_("Show from Top"));
@@ -4269,7 +4269,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_3D_Bottom = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_3D_Bottom->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_red_N")), wxLEFT);
+    m_3D_Bottom->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-arrow-down")), wxLEFT);
     m_3D_Bottom->SetBitmapMargins(2,2);
     #endif
     m_3D_Bottom->SetToolTip(_("Show from Bottom"));
@@ -4278,20 +4278,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_3D_Bottom->SetMinSize(wxSize(24,24));
     
     m_3D_Front = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_3D_Front->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_green_N")), wxLEFT);
-    m_3D_Front->SetBitmapMargins(2,2);
-    #endif
     m_3D_Front->SetToolTip(_("Show from Front"));
     
     flexGridSizer2311->Add(m_3D_Front, 0, wxALL, WXC_FROM_DIP(0));
     m_3D_Front->SetMinSize(wxSize(24,24));
     
     m_3D_Rear = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_3D_Rear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_green_S")), wxLEFT);
-    m_3D_Rear->SetBitmapMargins(2,2);
-    #endif
     m_3D_Rear->SetToolTip(_("Show from Rear"));
     
     flexGridSizer2311->Add(m_3D_Rear, 0, wxALL, WXC_FROM_DIP(0));
@@ -4299,7 +4291,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_3D_Left = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_3D_Left->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_blue_E")), wxLEFT);
+    m_3D_Left->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("back-16")), wxLEFT);
     m_3D_Left->SetBitmapMargins(2,2);
     #endif
     m_3D_Left->SetToolTip(_("Show from Left"));
@@ -4309,7 +4301,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_3D_Right4 = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_3D_Right4->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("arrow_plain_blue_W")), wxLEFT);
+    m_3D_Right4->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("next-16")), wxLEFT);
     m_3D_Right4->SetBitmapMargins(2,2);
     #endif
     m_3D_Right4->SetToolTip(_("Show from Right"));
@@ -4379,7 +4371,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2309->Add(m_panel2590, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer2360 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2360 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer2360->SetFlexibleDirection( wxBOTH );
     flexGridSizer2360->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2360->AddGrowableCol(0);
@@ -4406,12 +4398,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2360->Add(m_panel2696, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
-    flexGridSizer267117 = new wxFlexGridSizer(1, 20, 0, 0);
+    wxFlexGridSizer* flexGridSizer267117 = new wxFlexGridSizer(1, 20, 0, 0);
     flexGridSizer267117->SetFlexibleDirection( wxBOTH );
     flexGridSizer267117->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     m_panel2696->SetSizer(flexGridSizer267117);
     
-    flexGridSizer3131 = new wxFlexGridSizer(0, 4, 0, 0);
+    wxFlexGridSizer* flexGridSizer3131 = new wxFlexGridSizer(0, 4, 0, 0);
     flexGridSizer3131->SetFlexibleDirection( wxBOTH );
     flexGridSizer3131->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4524,14 +4516,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_svgEmuResultImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));
     m_outboundNotebook->AddPage(m_svgEmuResult, _("SVG Output"), false, m_svgEmuResultImgIndex);
     
-    flexGridSizer585 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer585 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer585->SetFlexibleDirection( wxBOTH );
     flexGridSizer585->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer585->AddGrowableCol(1);
     flexGridSizer585->AddGrowableRow(0);
     m_svgEmuResult->SetSizer(flexGridSizer585);
     
-    flexGridSizer766 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer766 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer766->SetFlexibleDirection( wxBOTH );
     flexGridSizer766->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4640,14 +4632,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_svgEmuSourceImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));
     m_outboundNotebook->AddPage(m_svgEmuSource, _("SVG Source"), false, m_svgEmuSourceImgIndex);
     
-    flexGridSizer1891 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1891 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1891->SetFlexibleDirection( wxBOTH );
     flexGridSizer1891->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1891->AddGrowableCol(1);
     flexGridSizer1891->AddGrowableRow(0);
     m_svgEmuSource->SetSizer(flexGridSizer1891);
     
-    flexGridSizer1899 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1899 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1899->SetFlexibleDirection( wxBOTH );
     flexGridSizer1899->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4704,14 +4696,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_svgTracePreviewImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));
     m_outboundNotebook->AddPage(m_svgTracePreview, _("SVG Trace"), false, m_svgTracePreviewImgIndex);
     
-    flexGridSizer1720 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1720 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1720->SetFlexibleDirection( wxBOTH );
     flexGridSizer1720->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1720->AddGrowableCol(1);
     flexGridSizer1720->AddGrowableRow(0);
     m_svgTracePreview->SetSizer(flexGridSizer1720);
     
-    flexGridSizer1858 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1858 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1858->SetFlexibleDirection( wxBOTH );
     flexGridSizer1858->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4733,7 +4725,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1858->Add(m_copySvgTrace, 0, wxALL, WXC_FROM_DIP(1));
     
-    flexGridSizer1723 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1723 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer1723->SetFlexibleDirection( wxBOTH );
     flexGridSizer1723->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1723->AddGrowableCol(0);
@@ -4752,14 +4744,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auimgrMain->AddPane(m_scrollSpy, wxAuiPaneInfo().Name(wxT("Spy")).Caption(_("CNC Spy")).Direction(wxAUI_DOCK_RIGHT).Layer(0).Row(0).Position(0).BestSize(10,10).MinSize(10,10).MaxSize(10,10).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
-    flexGridSizer27261 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer27261 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer27261->SetFlexibleDirection( wxBOTH );
     flexGridSizer27261->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer27261->AddGrowableCol(1);
     flexGridSizer27261->AddGrowableRow(0);
     m_scrollSpy->SetSizer(flexGridSizer27261);
     
-    flexGridSizer27302 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer27302 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer27302->SetFlexibleDirection( wxBOTH );
     flexGridSizer27302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -4801,7 +4793,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer27302->Add(m_clearSerialSpyOnConnect, 0, wxALL, WXC_FROM_DIP(6));
     
-    flexGridSizer27417 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer27417 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer27417->SetFlexibleDirection( wxBOTH );
     flexGridSizer27417->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer27417->AddGrowableCol(0);
@@ -4838,7 +4830,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auimgrMain->AddPane(m_svgUnitCalulator, wxAuiPaneInfo().Name(wxT("UnitCalculator")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,24).MinSize(100,24).MaxSize(100,24).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(true).MinimizeButton(false).PinButton(true));
     m_auimgrMain->Update();
     
-    flexGridSizer3251 = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* flexGridSizer3251 = new wxFlexGridSizer(1, 7, 0, 0);
     flexGridSizer3251->SetFlexibleDirection( wxBOTH );
     flexGridSizer3251->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3251->AddGrowableCol(4);
@@ -4892,7 +4884,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer3251->Add(m_cbUCUnitTo, 0, wxALL, WXC_FROM_DIP(2));
     
-    flexGridSizer3266 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer3266 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer3266->SetFlexibleDirection( wxBOTH );
     flexGridSizer3266->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3266->AddGrowableCol(0);
@@ -5268,8 +5260,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_mainNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::mainBookPageChanging), NULL, this);
     m_spinButtonX->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrameBClass::mvSpinUpX), NULL, this);
     m_spinButtonX->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrameBClass::mvSpinDownX), NULL, this);
-    m_spinButtonY->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrameBClass::mvSpinDownY), NULL, this);
-    m_spinButtonY->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrameBClass::mvSpinUpY), NULL, this);
+    m_spinButtonY->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrameBClass::mvSpinUpY), NULL, this);
+    m_spinButtonY->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrameBClass::mvSpinDownY), NULL, this);
     m_moveXYAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownXY), NULL, this);
     m_moveXYAxisCtl->Connect(wxEVT_SET_FOCUS, wxFocusEventHandler(MainFrameBClass::setFocusMoveXYAxis), NULL, this);
     m_moveXYAxisCtl->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::killFocusMoveXYAxis), NULL, this);
@@ -5572,8 +5564,8 @@ MainFrameBClass::~MainFrameBClass()
     m_mainNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::mainBookPageChanging), NULL, this);
     m_spinButtonX->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrameBClass::mvSpinUpX), NULL, this);
     m_spinButtonX->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrameBClass::mvSpinDownX), NULL, this);
-    m_spinButtonY->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrameBClass::mvSpinDownY), NULL, this);
-    m_spinButtonY->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrameBClass::mvSpinUpY), NULL, this);
+    m_spinButtonY->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrameBClass::mvSpinUpY), NULL, this);
+    m_spinButtonY->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrameBClass::mvSpinDownY), NULL, this);
     m_moveXYAxisCtl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownXY), NULL, this);
     m_moveXYAxisCtl->Disconnect(wxEVT_SET_FOCUS, wxFocusEventHandler(MainFrameBClass::setFocusMoveXYAxis), NULL, this);
     m_moveXYAxisCtl->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::killFocusMoveXYAxis), NULL, this);
@@ -5893,7 +5885,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
         bBitmapLoaded = true;
     }
     
-    flexGridSizer980 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer980 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer980->SetFlexibleDirection( wxBOTH );
     flexGridSizer980->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer980->AddGrowableCol(0);
@@ -5908,14 +5900,14 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     m_leftMainSplitterPage = new wxPanel(m_mainSplitter, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainSplitter, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    flexGridSizer3302 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3302 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer3302->SetFlexibleDirection( wxBOTH );
     flexGridSizer3302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3302->AddGrowableCol(0);
     flexGridSizer3302->AddGrowableRow(2);
     m_leftMainSplitterPage->SetSizer(flexGridSizer3302);
     
-    flexGridSizer3315 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer3315 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer3315->SetFlexibleDirection( wxBOTH );
     flexGridSizer3315->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3315->AddGrowableCol(1);
@@ -5958,7 +5950,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_rightMainSplitterPage = new wxPanel(m_mainSplitter, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainSplitter, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainSplitter->SplitVertically(m_leftMainSplitterPage, m_rightMainSplitterPage, 0);
     
-    flexGridSizer3296 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3296 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3296->SetFlexibleDirection( wxBOTH );
     flexGridSizer3296->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3296->AddGrowableCol(0);
@@ -5973,14 +5965,14 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     m_splitterPage3189 = new wxPanel(m_splitter3185, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter3185, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    flexGridSizer973 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer973 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer973->SetFlexibleDirection( wxBOTH );
     flexGridSizer973->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer973->AddGrowableCol(0);
     flexGridSizer973->AddGrowableRow(1);
     m_splitterPage3189->SetSizer(flexGridSizer973);
     
-    flexGridSizer3093 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3093 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3093->SetFlexibleDirection( wxBOTH );
     flexGridSizer3093->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3093->AddGrowableCol(0);
@@ -5996,7 +5988,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer3093->Add(m_pgPathSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer2825 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2825 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2825->SetFlexibleDirection( wxBOTH );
     flexGridSizer2825->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2825->AddGrowableCol(0);
@@ -6012,7 +6004,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     m_splitterPage2936 = new wxPanel(m_splitter2932, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter2932, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    flexGridSizer2942 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2942 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2942->SetFlexibleDirection( wxBOTH );
     flexGridSizer2942->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2942->AddGrowableCol(0);
@@ -6031,7 +6023,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgPreviewPageImgIndex = m_pgMainBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")));
     m_pgMainBook->AddPage(m_pgPreviewPage, _("Preview"), false, m_pgPreviewPageImgIndex);
     
-    flexGridSizer3332 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3332 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3332->SetFlexibleDirection( wxBOTH );
     flexGridSizer3332->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3332->AddGrowableCol(0);
@@ -6049,7 +6041,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgAdditionalCodePageImgIndex = m_pgMainBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-archive")));
     m_pgMainBook->AddPage(m_pgAdditionalCodePage, _("Additional Code"), false, m_pgAdditionalCodePageImgIndex);
     
-    flexGridSizer3414 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3414 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3414->SetFlexibleDirection( wxBOTH );
     flexGridSizer3414->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3414->AddGrowableCol(0);
@@ -6069,7 +6061,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgAdditionalInfoPageImgIndex = m_pgMainBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-info")));
     m_pgMainBook->AddPage(m_pgAdditionalInfoPage, _("Build Info"), false, m_pgAdditionalInfoPageImgIndex);
     
-    flexGridSizer3336 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3336 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3336->SetFlexibleDirection( wxBOTH );
     flexGridSizer3336->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3336->AddGrowableCol(0);
@@ -6088,14 +6080,14 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_splitterPage2940->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_splitter2932->SplitHorizontally(m_splitterPage2936, m_splitterPage2940, 0);
     
-    flexGridSizer2944 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2944 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer2944->SetFlexibleDirection( wxBOTH );
     flexGridSizer2944->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2944->AddGrowableCol(0);
     flexGridSizer2944->AddGrowableRow(1);
     m_splitterPage2940->SetSizer(flexGridSizer2944);
     
-    flexGridSizer3395 = new wxFlexGridSizer(0, 5, 0, 0);
+    wxFlexGridSizer* flexGridSizer3395 = new wxFlexGridSizer(0, 5, 0, 0);
     flexGridSizer3395->SetFlexibleDirection( wxBOTH );
     flexGridSizer3395->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3395->AddGrowableCol(2);
@@ -6111,7 +6103,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer3395->Add(2, 0, 1, wxALL, WXC_FROM_DIP(0));
     
-    flexGridSizer3406 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3406 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer3406->SetFlexibleDirection( wxBOTH );
     flexGridSizer3406->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3406->AddGrowableCol(0);
@@ -6135,7 +6127,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer3406->Add(0, 2, 1, wxALL, WXC_FROM_DIP(0));
     
-    flexGridSizer33851 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer33851 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer33851->SetFlexibleDirection( wxBOTH );
     flexGridSizer33851->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -6168,7 +6160,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer33851->Add(m_updatePreview, 0, wxALL, WXC_FROM_DIP(0));
     m_updatePreview->SetMinSize(wxSize(22,22));
     
-    flexGridSizer3385 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer3385 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer3385->SetFlexibleDirection( wxBOTH );
     flexGridSizer3385->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -6205,7 +6197,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_panelPreviewImgIndex = m_tbOutput_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-fold")));
     m_tbOutput->AddPage(m_panelPreview, _("Preview"), true, m_panelPreviewImgIndex);
     
-    flexGridSizer3233 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3233 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3233->SetFlexibleDirection( wxBOTH );
     flexGridSizer3233->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3233->AddGrowableCol(0);
@@ -6226,7 +6218,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_panelResultImgIndex = m_tbOutput_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-globals")));
     m_tbOutput->AddPage(m_panelResult, _("Result"), false, m_panelResultImgIndex);
     
-    flexGridSizer3235 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3235 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3235->SetFlexibleDirection( wxBOTH );
     flexGridSizer3235->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3235->AddGrowableCol(0);
@@ -6247,7 +6239,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_panelInfoImgIndex = m_tbOutput_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-info")));
     m_tbOutput->AddPage(m_panelInfo, _("Info"), false, m_panelInfoImgIndex);
     
-    flexGridSizer3286 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3286 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3286->SetFlexibleDirection( wxBOTH );
     flexGridSizer3286->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3286->AddGrowableCol(0);
@@ -6264,14 +6256,14 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_splitterPage3193 = new wxPanel(m_splitter3185, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter3185, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_splitter3185->SplitVertically(m_splitterPage3189, m_splitterPage3193, 0);
     
-    flexGridSizer986 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer986 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer986->SetFlexibleDirection( wxBOTH );
     flexGridSizer986->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer986->AddGrowableCol(0);
     flexGridSizer986->AddGrowableRow(1);
     m_splitterPage3193->SetSizer(flexGridSizer986);
     
-    flexGridSizer2874 = new wxFlexGridSizer(1, 6, 0, 0);
+    wxFlexGridSizer* flexGridSizer2874 = new wxFlexGridSizer(1, 6, 0, 0);
     flexGridSizer2874->SetFlexibleDirection( wxBOTH );
     flexGridSizer2874->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2874->AddGrowableCol(4);
@@ -6329,7 +6321,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer2874->Add(m_btPGSave, 0, wxALL, WXC_FROM_DIP(1));
     m_btPGSave->SetMinSize(wxSize(24,24));
     
-    flexGridSizer3225 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer3225 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer3225->SetFlexibleDirection( wxBOTH );
     flexGridSizer3225->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -6355,7 +6347,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer3225->Add(m_btPGClose, 0, wxALL|wxALIGN_BOTTOM, WXC_FROM_DIP(1));
     m_btPGClose->SetMinSize(wxSize(24,24));
     
-    flexGridSizer2972 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2972 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer2972->SetFlexibleDirection( wxBOTH );
     flexGridSizer2972->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2972->AddGrowableCol(0);
@@ -6679,14 +6671,14 @@ UnitTestsBase::UnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& ti
         bBitmapLoaded = true;
     }
     
-    flexGridSizer3344 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3344 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer3344->SetFlexibleDirection( wxBOTH );
     flexGridSizer3344->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3344->AddGrowableCol(0);
     flexGridSizer3344->AddGrowableRow(1);
     this->SetSizer(flexGridSizer3344);
     
-    flexGridSizer3355 = new wxFlexGridSizer(1, 5, 0, 0);
+    wxFlexGridSizer* flexGridSizer3355 = new wxFlexGridSizer(1, 5, 0, 0);
     flexGridSizer3355->SetFlexibleDirection( wxBOTH );
     flexGridSizer3355->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3355->AddGrowableCol(1);
@@ -6736,7 +6728,7 @@ UnitTestsBase::UnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& ti
     
     flexGridSizer3344->Add(m_testResultStream, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    flexGridSizer3370 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer3370 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer3370->SetFlexibleDirection( wxBOTH );
     flexGridSizer3370->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3370->AddGrowableCol(0);
@@ -6822,12 +6814,12 @@ EndSwitchDialogBase::EndSwitchDialogBase(wxWindow* parent, wxWindowID id, const 
         bBitmapLoaded = true;
     }
     
-    flexGridSizer1529 = new wxFlexGridSizer(0, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1529 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1529->SetFlexibleDirection( wxBOTH );
     flexGridSizer1529->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     this->SetSizer(flexGridSizer1529);
     
-    flexGridSizer1531 = new wxFlexGridSizer(4, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1531 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer1531->SetFlexibleDirection( wxBOTH );
     flexGridSizer1531->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1531->AddGrowableCol(0);
@@ -6848,7 +6840,7 @@ EndSwitchDialogBase::EndSwitchDialogBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer1531->Add(m_staticText1547, 0, wxALL, WXC_FROM_DIP(5));
     
-    flexGridSizer1533 = new wxFlexGridSizer(2, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer1533 = new wxFlexGridSizer(2, 3, 0, 0);
     flexGridSizer1533->SetFlexibleDirection( wxBOTH );
     flexGridSizer1533->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1533->AddGrowableCol(0);
@@ -6894,7 +6886,7 @@ EndSwitchDialogBase::EndSwitchDialogBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer1533->Add(m_btDissolveZ, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    flexGridSizer1535 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1535 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1535->SetFlexibleDirection( wxBOTH );
     flexGridSizer1535->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -7651,19 +7643,6 @@ ImageLibBig::ImageLibBig()
         wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
         wxC9ED9InitBitmapResources();
         bBitmapLoaded = true;
-    }
-    
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_CNC"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_CNC"), bmp));
-        }
     }
     
     {
