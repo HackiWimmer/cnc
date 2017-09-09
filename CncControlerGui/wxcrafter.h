@@ -4,8 +4,8 @@
 // Do not modify this file by hand!
 //////////////////////////////////////////////////////////////////////
 
-#ifndef _GUICONTROLLER_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
-#define _GUICONTROLLER_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
+#ifndef _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
+#define _CNCGUICONTROLLER_CNCCONTROLERGUI_WXCRAFTER_BASE_CLASSES_H
 
 #include <wx/settings.h>
 #include <wx/xrc/xmlres.h>

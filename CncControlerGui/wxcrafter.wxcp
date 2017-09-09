@@ -122,23 +122,23 @@
     }, {
      "type": "bitmapPicker",
      "m_label": "Bitmap File (16x16)  :",
-     "m_path": "Resources/png/16/Modern3D/weapons/shield_blue.png"
+     "m_path": "bitmaps/icon_16x16.png"
     }, {
      "type": "bitmapPicker",
      "m_label": "Bitmap File (32x32)  :",
-     "m_path": ""
+     "m_path": "bitmaps/icon_32x32.png"
     }, {
      "type": "bitmapPicker",
      "m_label": "Bitmap File (64x64)  :",
-     "m_path": ""
+     "m_path": "bitmaps/icon_32x32@2x.png"
     }, {
      "type": "bitmapPicker",
      "m_label": "Bitmap File (128x128):",
-     "m_path": ""
+     "m_path": "bitmaps/icon_128x128.png"
     }, {
      "type": "bitmapPicker",
      "m_label": "Bitmap File (256x256):",
-     "m_path": ""
+     "m_path": "bitmaps/icon_256x256.png"
     }],
    "m_events": [{
      "m_eventName": "wxEVT_ACTIVATE",
