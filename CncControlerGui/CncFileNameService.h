@@ -8,6 +8,8 @@
 class CncFileNameService {
 	
 	private:
+	
+		static wxString _appTempDir;
 		static wxString _ret;
 		static wxString _executablePath;
 		static wxString _homeDirectory;

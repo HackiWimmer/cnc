@@ -2,13 +2,13 @@
 <CodeLite_Workspace Name="CnCControl" Database="" Version="10.0.0">
   <Project Name="CncConrollerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
-      <Environment/>
-      <Project Name="CncConrollerGui" ConfigName="Debug"/>
-    </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Release"/>
+    </WorkspaceConfiguration>
+    <WorkspaceConfiguration Name="Debug" Selected="no">
+      <Environment/>
+      <Project Name="CncConrollerGui" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

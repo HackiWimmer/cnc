@@ -148,6 +148,9 @@ class MainFrame : public MainFrameBClass {
 		const char* getErrorHtmlPage(const wxString& errorInfo);
 		
 		TemplateFormat getCurrentTemplateFormat(const char* fn = NULL);
+		const wxString& getCurrentTemplateFileName();
+		const wxString& getCurrentTemplatePathFileName();
+		
 		
 		bool checkIfTemplateIsModified();
 		

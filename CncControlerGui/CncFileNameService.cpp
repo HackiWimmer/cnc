@@ -8,6 +8,8 @@ wxString CncFileNameService::_configFileName("CncController.ini");
 wxString CncFileNameService::_lruFileName("CncControllerLruStore.ini");
 wxString CncFileNameService::_preconfiguredSpeedConfigFileName(wxString("Database") + wxFileName::GetPathSeparator() + "PreconfiguredSpeedSetups.ini");
 
+wxString CncFileNameService::_appTempDir("CncGuiController-TempFiles");
+
 wxString CncFileNameService::_ret(wxT(""));
 wxString CncFileNameService::_executablePath(wxT(""));
 wxString CncFileNameService::_homeDirectory(wxT(""));
@@ -26,7 +28,10 @@ void CncFileNameService::init() {
 	_executablePath += f.GetPath(wxPATH_GET_SEPARATOR);
 	
 	_homeDirectory = wxFileName::GetHomeDir() + wxFileName::GetPathSeparator();
-	_tempDirectory = wxFileName::GetTempDir() + wxFileName::GetPathSeparator();
+	_tempDirectory = wxFileName::GetTempDir() + wxFileName::GetPathSeparator() + _appTempDir + wxFileName::GetPathSeparator();
+	
+	if ( wxFileName::DirExists(_tempDirectory) == false )
+		wxFileName::Mkdir(_tempDirectory); 
 	
 	wxFileName cfg(_executablePath + _configFileName);
 	if ( cfg.Exists( ) )	_configDir = _executablePath;
@@ -59,23 +64,16 @@ void CncFileNameService::deleteFile(wxString fn) {
 ///////////////////////////////////////////////////////////////////
 const char* CncFileNameService::getTempFileName(TemplateFormat f) {
 ///////////////////////////////////////////////////////////////////
-	switch ( f ) {
-		case TplSvg:	_ret = wxFileName::CreateTempFileName("CTF") + ".svg";
-						return _ret;
-						
-		default:  		_ret = wxFileName::CreateTempFileName("CTF") + ".txt";
-						return _ret;
-		
-		//{TplUnknown, TplSvg, TplText, TplGcode, TplManual};
-	}
-	
-	return "";
+	_ret = wxFileName::CreateTempFileName(_tempDirectory + "CTF");
+	return _ret;
 }
 ///////////////////////////////////////////////////////////////////
 const char* CncFileNameService::getCncTemplatePreviewFileName(TemplateFormat f) { 
 ///////////////////////////////////////////////////////////////////
 	switch ( f ) {
-		case TplSvg:	_ret = _tempDirectory + "CncTemplatePreview.svg";
+		case TplSvg:
+		case TplGcode:
+						_ret = _tempDirectory + "CncTemplatePreview.svg";
 						return _ret;
 						
 		default:  		_ret = _tempDirectory + "CncTemplatePreview.txt";

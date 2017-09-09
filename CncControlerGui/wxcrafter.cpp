@@ -2968,13 +2968,30 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_svgFilePreviewHintFont.SetWeight(wxFONTWEIGHT_BOLD);
     m_svgFilePreviewHint->SetFont(m_svgFilePreviewHintFont);
     
-    flexGridSizer692->Add(m_svgFilePreviewHint, 0, wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT, WXC_FROM_DIP(3));
+    flexGridSizer692->Add(m_svgFilePreviewHint, 0, wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer3423 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer3423->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3423->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3423->AddGrowableCol(0);
+    flexGridSizer3423->AddGrowableRow(0);
+    
+    flexGridSizer692->Add(flexGridSizer3423, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     #if wxUSE_WEBVIEW
     m_svgPreview = wxWebView::New(m_panelTplPreview, wxID_ANY, _("about:blank"), wxDefaultPosition, wxDLG_UNIT(m_panelTplPreview, wxSize(-1,-1)), wxWebViewBackendDefault, wxFULL_REPAINT_ON_RESIZE);
     
-    flexGridSizer692->Add(m_svgPreview, 1, wxALL|wxEXPAND, WXC_FROM_DIP(4));
+    flexGridSizer3423->Add(m_svgPreview, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     #endif // wxUSE_WEBVIEW
+    
+    m_svgPreviewFileName = new wxTextCtrl(m_panelTplPreview, wxID_ANY, wxT("?????"), wxDefaultPosition, wxDLG_UNIT(m_panelTplPreview, wxSize(-1,-1)), wxTE_READONLY|wxTAB_TRAVERSAL|wxBORDER_NONE);
+    wxFont m_svgPreviewFileNameFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_svgPreviewFileName->SetFont(m_svgPreviewFileNameFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_svgPreviewFileName->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer3423->Add(m_svgPreviewFileName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelSpeed = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -5908,6 +5925,16 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
         wxC9ED9InitBitmapResources();
         bBitmapLoaded = true;
     }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("16-archive"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
     
     wxFlexGridSizer* flexGridSizer980 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer980->SetFlexibleDirection( wxBOTH );

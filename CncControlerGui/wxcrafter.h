@@ -431,6 +431,7 @@ protected:
     wxWebView* m_svgPreview;
 #endif // wxUSE_WEBVIEW
 
+    wxTextCtrl* m_svgPreviewFileName;
     wxPanel* m_panelSpeed;
     wxStaticText* m_staticText28052;
     CncSpeedView* m_speedView;
@@ -1327,6 +1328,7 @@ public:
     wxPanel* GetPanelTplDebugger() { return m_panelTplDebugger; }
     wxStaticText* GetSvgFilePreviewHint() { return m_svgFilePreviewHint; }
     wxWebView* GetSvgPreview() { return m_svgPreview; }
+    wxTextCtrl* GetSvgPreviewFileName() { return m_svgPreviewFileName; }
     wxPanel* GetPanelTplPreview() { return m_panelTplPreview; }
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetPanelTemplateContent() { return m_panelTemplateContent; }

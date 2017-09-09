@@ -65,7 +65,7 @@ bool GCodeFileParser::createPreview(const wxString& resultingFileName, bool with
 		CncDoublePosition xy;
 		curPxPos.getMaxWatermarks(xy);
 		//todo remove clog
-		std::clog << xy << std::endl;
+		//std::clog << xy << std::endl;
 		
 		preview.flush();
 		preview.close();

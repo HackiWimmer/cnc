@@ -5225,7 +5225,6 @@
                                 <growablerows>1</growablerows>
                                 <object class="sizeritem">
                                   <flag>wxALL|wxEXPAND|wxALIGN_CENTER|wxALIGN_LEFT</flag>
-                                  <border>3</border>
                                   <object class="wxStaticText" name="m_svgFilePreviewHint">
                                     <label>CNC File Manger Preview . . .</label>
                                     <style>wxALIGN_CENTRE</style>
@@ -5239,11 +5238,37 @@
                                     </font>
                                   </object>
                                 </object>
-                                <object class="sizeritem">
+                                <object class="sizeritem" name="flexGridSizer3423">
                                   <flag>wxALL|wxEXPAND</flag>
-                                  <border>4</border>
                                   <option>1</option>
-                                  <object class="unknown" name="m_svgPreview"/>
+                                  <object class="wxFlexGridSizer">
+                                    <cols>1</cols>
+                                    <rows>2</rows>
+                                    <vgap>0</vgap>
+                                    <hgap>0</hgap>
+                                    <growablecols>0</growablecols>
+                                    <growablerows>0</growablerows>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <option>1</option>
+                                      <object class="unknown" name="m_svgPreview"/>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <object class="wxTextCtrl" name="m_svgPreviewFileName">
+                                        <style>wxTE_READONLY|wxTAB_TRAVERSAL|wxBORDER_NONE</style>
+                                        <font>
+                                          <size>7</size>
+                                          <style>normal</style>
+                                          <weight>normal</weight>
+                                          <family>swiss</family>
+                                          <underlined>0</underlined>
+                                          <face>Segoe UI</face>
+                                        </font>
+                                        <value>?????</value>
+                                      </object>
+                                    </object>
+                                  </object>
                                 </object>
                               </object>
                             </object>

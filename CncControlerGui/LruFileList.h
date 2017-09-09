@@ -73,14 +73,23 @@ class LruFileList {
 				return;
 			}
 			
-			for ( LruList::iterator it=lruList.begin(); it!=lruList.end(); ++it) {
-				if ( *it == f ) {
-					lruList.erase(it);
-					
-					if ( lruList.size() == 0 )
-						break;
-					
-					it = lruList.begin();
+			if ( lruList.size() > 0 ) {
+				// is it already the first entry
+				if ( *lruList.begin() == f ) {
+					updateListControl();
+					return;
+				}
+				
+				// search if entry already exists
+				for ( LruList::iterator it=lruList.begin(); it!=lruList.end(); ++it) {
+					if ( *it == f ) {
+						lruList.erase(it);
+						if ( lruList.size() == 0 )
+							break;
+						
+						// restart
+						it = lruList.begin();
+					} 
 				}
 			}
 			

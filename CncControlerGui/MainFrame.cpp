@@ -103,6 +103,8 @@ MainFrame::MainFrame(wxWindow* parent)
 	install3DPane();
 	installSypControl();
 	
+	//m_templateNotebook->SetSelection(TemplatePreviewPage);
+	
 	// define the popup parent frame
 	SvgEditPopup::setMainFrame(this);
 	
@@ -740,7 +742,11 @@ void MainFrame::initialize(void) {
 	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
 	decorateTestSuiteParameters();
 	
-	this->SetTitle(wxString(_programTitel) + " " + _programVersion);
+#ifdef DEBUG
+	this->SetTitle(wxString(_programTitel) + " " + _programVersion + "  -- [DEBUG Version]");
+#else
+	this->SetTitle(wxString(_programTitel) + " " + _programVersion + "  -- [RELEASE Version]");
+#endif
 	
 	wxString cfgStr;
 	//Setup CncPORT selector box
@@ -970,10 +976,10 @@ bool MainFrame::initializeLruMenu() {
 	if ( fn.Exists() ) {
 		m_inputFileName->SetValue(fn.GetFullName());
 		m_inputFileName->SetHint(fn.GetFullPath());
-		m_dirCtrl->SetPath(m_inputFileName->GetHint());
-		m_dirCtrl->ExpandPath(m_inputFileName->GetHint());
+		
 		openFile();
 		prepareTplPreview();
+		introduceCurrentFile();
 	} else {
 		config->Read("DefaultTemplate/DefaultDir", &cfgStr, wxT(""));
 		m_dirCtrl->SetPath(cfgStr);
@@ -2040,7 +2046,7 @@ TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 		return TplTest;
 		
 	wxFileName fn;
-	if ( fileName == NULL )	fn.Assign(m_inputFileName->GetHint());
+	if ( fileName == NULL )	fn.Assign(getCurrentTemplatePathFileName());
 	else					fn.Assign(fileName);
 	
 	wxString ext(fn.GetExt());
@@ -2051,6 +2057,20 @@ TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 	else if ( ext == "TXT") 	return TplText;
 
 	return TplUnknown;
+}
+///////////////////////////////////////////////////////////////////
+const wxString& MainFrame::getCurrentTemplateFileName() {
+///////////////////////////////////////////////////////////////////
+	static wxString ret;
+	ret.assign(m_inputFileName->GetValue());
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+const wxString& MainFrame::getCurrentTemplatePathFileName() {
+///////////////////////////////////////////////////////////////////
+	static wxString ret;
+	ret.assign(m_inputFileName->GetHint());
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showTplPreview(bool show) {
@@ -2142,7 +2162,7 @@ bool MainFrame::openFile(int pageToSelect) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::introduceCurrentFile() {
 ///////////////////////////////////////////////////////////////////
-	lruFileList.addFile(m_inputFileName->GetHint());
+	lruFileList.addFile(getCurrentTemplatePathFileName());
 	
 	ignoreDirControlEvents = true;
 	{
@@ -2158,8 +2178,8 @@ void MainFrame::introduceCurrentFile() {
 			m_dirCtrl->GetFilterListCtrl()->Select(m_dirCtrl->GetFilterIndex());
 			
 		m_dirCtrl->ReCreateTree();
-		m_dirCtrl->SetPath(m_inputFileName->GetHint());
-		m_dirCtrl->ExpandPath(m_inputFileName->GetHint());
+		m_dirCtrl->SetPath(getCurrentTemplatePathFileName());
+		m_dirCtrl->ExpandPath(getCurrentTemplatePathFileName());
 	}
 	ignoreDirControlEvents = false;
 	highlightTplPreview(false);
@@ -2169,7 +2189,7 @@ bool MainFrame::openTextFile() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(m_inputFileName);
 	
-	wxFileInputStream input(m_inputFileName->GetHint());
+	wxFileInputStream input(getCurrentTemplatePathFileName());
 	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
 	
 	if ( input.IsOk() ) {
@@ -2180,10 +2200,11 @@ bool MainFrame::openTextFile() {
 			m_stcFileContent->AppendText(line);
 			m_stcFileContent->AppendText(_T("\r\n"));
 		}
+		
 		return true;
 	}
 	
-	std::cerr << "Error while opne file: " << m_inputFileName->GetHint().c_str() << std::endl;
+	std::cerr << "Error while opne file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -2191,7 +2212,7 @@ void MainFrame::prepareNewTemplateFile() {
 ///////////////////////////////////////////////////////////////////
 	m_stcFileContent->ClearAll();
 	
-	wxFileName fn(m_inputFileName->GetValue());
+	wxFileName fn(getCurrentTemplateFileName());
 	
 	if ( fn.GetExt().MakeUpper() == "SVG") {
 		m_stcFileContent->AppendText("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\r\n");
@@ -2226,8 +2247,8 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
         return; 
 
-	wxString ov = m_inputFileName->GetValue();
-	wxString oh = m_inputFileName->GetHint();
+	wxString ov = getCurrentTemplateFileName();
+	wxString oh = getCurrentTemplatePathFileName();
 
 	m_inputFileName->SetValue(newFileDialog.GetFilename());
 	m_inputFileName->SetHint(newFileDialog.GetPath());
@@ -2263,8 +2284,8 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 	if ( openFileDialog.ShowModal() == wxID_CANCEL ) 
         return; 
 
-	wxString ov = m_inputFileName->GetValue();
-	wxString oh = m_inputFileName->GetHint();
+	wxString ov = getCurrentTemplateFileName();
+	wxString oh = getCurrentTemplatePathFileName();
 
 	m_inputFileName->SetValue(openFileDialog.GetFilename());
 	m_inputFileName->SetHint(openFileDialog.GetPath());
@@ -2280,14 +2301,14 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 void MainFrame::reloadTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( !openFile() ) {
-		std::cerr << "Error while reloding template: " << m_inputFileName->GetValue().c_str() << std::endl;
+		std::cerr << "Error while reloding template: " << getCurrentTemplateFileName().c_str() << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::reloadTemplateFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( !openFile(TemplateContentPage) ) {
-		std::cerr << "Error while reloding template: " << m_inputFileName->GetValue().c_str() << std::endl;
+		std::cerr << "Error while reloding template: " << getCurrentTemplateFileName().c_str() << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2297,7 +2318,7 @@ void MainFrame::openTemplateSourceExtern(wxCommandEvent& event) {
 		
 	wxString cmd;
 	config->Read("TemplateEditor/ExternalTool", &cmd, wxT("notepad"));
-	openFileExtern(cmd, m_inputFileName->GetHint());
+	openFileExtern(cmd, getCurrentTemplatePathFileName());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplateSvgExtern(wxCommandEvent& event) {
@@ -2308,21 +2329,21 @@ void MainFrame::openTemplateSvgExtern(wxCommandEvent& event) {
 		case TplSvg:
 					saveFile();
 					config->Read("App/SVGFileEditor", &cmd, wxT("notepad"));
-					openFileExtern(cmd, m_inputFileName->GetHint());
+					openFileExtern(cmd, getCurrentTemplatePathFileName());
 					break;
 		case TplGcode:
 					saveFile();
 					config->Read("App/GCodeFileEditor", &cmd, wxT("notepad"));
-					openFileExtern(cmd, m_inputFileName->GetHint());
+					openFileExtern(cmd, getCurrentTemplatePathFileName());
 					break;
 		default:
-					std::clog << "No external editor availiable for current file: " << m_inputFileName->GetHint().c_str() << std::endl;
+					std::clog << "No external editor availiable for current file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::evaluateTemplateModificationTimeStamp() {
 ///////////////////////////////////////////////////////////////////
-	wxString fn(m_inputFileName->GetHint());
+	wxString fn(getCurrentTemplatePathFileName());
 	wxFileName tplFile(fn);
 	
 	if ( tplFile.Exists() == false )
@@ -2345,7 +2366,7 @@ void MainFrame::evaluateSvgEmuModificationTimeStamp() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activateMainWindow(wxActivateEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString fn(m_inputFileName->GetHint());
+	wxString fn(getCurrentTemplatePathFileName());
 	wxFileName tplFile(fn);
 	
 	if ( tplFile.Exists() == true ) {
@@ -2406,7 +2427,7 @@ bool MainFrame::saveTextFile() {
 	wxASSERT(m_inputFileName);
 	wxASSERT(m_stcFileContent);
 	
-	wxTextFile file(m_inputFileName->GetHint());
+	wxTextFile file(getCurrentTemplatePathFileName());
 	if ( !file.Exists() )
 		file.Create();
 		
@@ -2423,7 +2444,7 @@ bool MainFrame::saveTextFile() {
 		
 		return true;
 	} else {
-		std::cerr << "Cant save file: " << m_inputFileName->GetHint().c_str() << std::endl;
+		std::cerr << "Cant save file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
 	}
 	
 	return false;
@@ -2445,7 +2466,7 @@ void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 	
 	wxFileDialog saveFileDialog(this, 
 	                            _("Save Template File"), 
-								m_inputFileName->GetHint(), 
+								getCurrentTemplatePathFileName(), 
 								"",
 								"SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode|Text Files (*.txt)|*.txt",  
 								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
@@ -2453,8 +2474,8 @@ void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 	if (saveFileDialog.ShowModal() == wxID_CANCEL) 
 		return;
 
-	wxString ov = m_inputFileName->GetValue();
-	wxString oh = m_inputFileName->GetHint();
+	wxString ov = getCurrentTemplateFileName();
+	wxString oh = getCurrentTemplatePathFileName();
 	
 	m_inputFileName->SetValue(saveFileDialog.GetFilename());
 	m_inputFileName->SetHint(saveFileDialog.GetPath());
@@ -2519,7 +2540,7 @@ bool MainFrame::processSVGTemplate() {
 	if ( svgFileParser != NULL )
 		delete svgFileParser;
 		
-	svgFileParser = new SVGFileParser(m_inputFileName->GetHint().c_str(), cnc);
+	svgFileParser = new SVGFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -2528,7 +2549,7 @@ bool MainFrame::processGCodeTemplate() {
 	if ( svgFileParser != NULL )
 		delete svgFileParser;
 
-	svgFileParser = new GCodeFileParser(m_inputFileName->GetHint().c_str(), cnc);
+	svgFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3383,9 +3404,8 @@ void MainFrame::setMinMaxPositions() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::checkIfTemplateIsModified() {
 ///////////////////////////////////////////////////////////////////
-	wxString msg("The template file was modified.\n");
-	msg += "Save it?";
-
+	wxString msg(wxString::Format("The current template file\n\n '%s'\n\nwas modified. Save it?", getCurrentTemplatePathFileName()));
+	
 	if ( m_stcFileContent->IsModified() == true ) {
 		wxMessageDialog dlg(this, msg, _T("Save template . . . "), 
 		                    wxYES|wxNO|wxCANCEL|wxICON_QUESTION|wxCENTRE);
@@ -3433,13 +3453,13 @@ void MainFrame::prepareTplPreview(bool force) {
 		lastTemplateFileNameForPreview.clear();
 
 	// check if a preview update is necessary
-	if ( lastTemplateFileNameForPreview == m_inputFileName->GetHint() && m_stcFileContent->GetModify() == false)
+	if ( lastTemplateFileNameForPreview == getCurrentTemplatePathFileName() && m_stcFileContent->GetModify() == false)
 		return;
 		
-	//clog << "prepareTplPreview" << std::endl;
-	lastTemplateFileNameForPreview = m_inputFileName->GetHint();
+	lastTemplateFileNameForPreview = getCurrentTemplatePathFileName();
 
 	wxString tfn(CncFileNameService::getTempFileName(getCurrentTemplateFormat()));
+	
 	wxTextFile file(tfn);
 	if ( !file.Exists() )
 		file.Create();
@@ -3805,7 +3825,7 @@ void MainFrame::saveEmuOutput(wxCommandEvent& event) {
 
 	wxFileDialog saveFileDialog(this, 
 	                            _("Save Emulator Output as Template"), 
-								m_inputFileName->GetHint(), 
+								getCurrentTemplatePathFileName(), 
 								"",
 								filePattern,
 								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
@@ -4620,8 +4640,17 @@ void MainFrame::updateCurveLibResolution() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
 ///////////////////////////////////////////////////////////////////
+	
+	wxString yyy("\"C:\\Program Files\\Notepad++\\notepad++\" \"");
+	yyy += fn;
+	yyy += "\"";
+	//wxExecute(yyy);
+	//return;
+	
+	wxString url;
+	
 	if ( fn.IsEmpty() ) {
-		m_svgPreview->LoadURL(getBlankHtmlPage());
+		url.assign(getBlankHtmlPage());
 	} else {
 		wxString tmpPreview;
 		startAnimationControl();
@@ -4635,7 +4664,7 @@ void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
 			
 		} else if ( format == TplGcode) {
 			GCodeFileParser fp(fn, cnc);
-			tmpPreview = CncFileNameService::getCncTemplatePreviewFileName(TplSvg);
+			tmpPreview = CncFileNameService::getCncTemplatePreviewFileName(TplGcode);
 			fp.createPreview(tmpPreview, errorInfo);
 			
 		} else {
@@ -4644,9 +4673,11 @@ void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
 			wxCopyFile(fn, tmpPreview);
 		}
 		
-		m_svgPreview->LoadURL(tmpPreview);
+		url.assign(tmpPreview);
 	}
 	
+	m_svgPreviewFileName->SetValue(fn);
+	m_svgPreview->LoadURL(url);
 	m_svgPreview->Update();
 	stopAnimationControl();
 }
@@ -4715,8 +4746,8 @@ void MainFrame::leaveLruList(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectCurrentFile(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_dirCtrl->SetPath(m_inputFileName->GetHint());
-	m_dirCtrl->ExpandPath(m_inputFileName->GetHint());
+	m_dirCtrl->SetPath(getCurrentTemplatePathFileName());
+	m_dirCtrl->ExpandPath(getCurrentTemplatePathFileName());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectDefaultDirectory(wxCommandEvent& event) {

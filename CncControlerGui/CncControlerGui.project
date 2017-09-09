@@ -256,6 +256,7 @@
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\wxWidgets-3.1.0\src\stc\scintilla\include"/>
+        <Preprocessor Value="DEBUG"/>
         <Preprocessor Value="USE_WXCRAFTER"/>
       </Compiler>
       <Linker Options="-pg;-mwindows;$(shell wx-config --libs)" Required="yes">
