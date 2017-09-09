@@ -76,6 +76,10 @@ class LruFileList {
 			for ( LruList::iterator it=lruList.begin(); it!=lruList.end(); ++it) {
 				if ( *it == f ) {
 					lruList.erase(it);
+					
+					if ( lruList.size() == 0 )
+						break;
+					
 					it = lruList.begin();
 				}
 			}
@@ -94,7 +98,7 @@ class LruFileList {
 			lruList.clear();
 			
 			wxString str;
-			for ( unsigned int i=1; i<=size; i++) {
+			for ( unsigned int i=1; i<=size; i++ ) {
 				wxString item(lruSection);
 				item << "/";
 				item << lruPrefix;

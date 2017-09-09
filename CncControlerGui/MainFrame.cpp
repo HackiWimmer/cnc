@@ -983,7 +983,7 @@ bool MainFrame::initializeLruMenu() {
 				
 		return false; 
 	}
-
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -2134,6 +2134,7 @@ bool MainFrame::openFile(int pageToSelect) {
 		
 		introduceCurrentFile();
 	}
+	
 	updateFileContentPosition();
 	templateFileLoading = false;
 	return ret;
