@@ -203,7 +203,7 @@ void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
 					pt.y++;
 					
 					// dont use the toolbar event handler because this will generate a crash will cnc::waitActive is in action!
-					//toolbar->PopupMenu(iter->second, pt);
+					// toolbar->PopupMenu(iter->second, pt);
 					this->PopupMenu(iter->second, pt);
 					
 				}
@@ -1567,9 +1567,6 @@ void MainFrame::enableRunControls(bool state) {
 	
 	//todo
 	m_rcReset->Enable(		isPause() == false 		&& state);
-	
-	
-	
 	
 	m_rcPause->Enable(		svgDebugger == false 	&& !state);
 	m_rcNextStep->Enable(	svgDebugger == true 	&& !state);

@@ -259,7 +259,7 @@
             <bitmap>bitmaps/16-cog.png</bitmap>
           </object>
           <object class="wxBitmapButton" name="m_rcRun">
-            <bitmap>bitmaps/24-debugger_start.png</bitmap>
+            <bitmap>bitmaps/diff-copy-left-to-right2.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Run or Debug]]>

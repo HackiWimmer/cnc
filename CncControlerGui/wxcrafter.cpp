@@ -136,7 +136,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
         m_dropdownMenus.insert(std::make_pair( m_RcConfig->GetId(), m_rcConfigMenu) );
     }
     
-    m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-debugger_start")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("diff-copy-left-to-right2")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_rcRun->SetToolTip(_("Run or Debug"));
     m_auibarMain->AddControl(m_rcRun);
     
@@ -7610,18 +7610,6 @@ ImageLib24::ImageLib24()
             m_bitmaps.insert(std::make_pair(wxT("BMP_RUN_RELEASE"), bmp));
         }
     }
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_RUN_RELEASE@2x"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_RUN_RELEASE@2x"), bmp));
-        }
-    }
     
     {
         wxBitmap bmp;
@@ -7633,18 +7621,6 @@ ImageLib24::ImageLib24()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_RUN_DEBUG"), bmp));
-        }
-    }
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_RUN_DEBUG@2x"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_RUN_DEBUG@2x"), bmp));
         }
     }
     

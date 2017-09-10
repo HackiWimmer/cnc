@@ -99,8 +99,6 @@
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-debugger_restart">bitmaps\24-debugger_restart.png</object>
   <object class="wxBitmap" name="24-debugger_restart@2x">bitmaps\24-debugger_restart@2x.png</object>
-  <object class="wxBitmap" name="24-debugger_start">bitmaps\24-debugger_start.png</object>
-  <object class="wxBitmap" name="24-debugger_start@2x">bitmaps\24-debugger_start@2x.png</object>
   <object class="wxBitmap" name="24-down">bitmaps\24-down.png</object>
   <object class="wxBitmap" name="24-down@2x">bitmaps\24-down@2x.png</object>
   <object class="wxBitmap" name="24-execute_stop">bitmaps\24-execute_stop.png</object>
@@ -189,12 +187,8 @@
   <object class="wxBitmap" name="BMP_PS_UNKNOWN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-finger.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-finger@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-finger@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-debugger_start.png</object>
-  <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_RELEASE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-debugger_start@2x.png</object>
+  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\diff-copy-file-left-to-right1.png</object>
+  <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\diff-copy-left-to-right2.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop@2x.png</object>
@@ -232,6 +226,7 @@
   <object class="wxBitmap" name="book_red">bitmaps\book_red.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
+  <object class="wxBitmap" name="diff-copy-left-to-right2">bitmaps\diff-copy-left-to-right2.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="git-arrow-down">bitmaps\git-arrow-down.png</object>
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>

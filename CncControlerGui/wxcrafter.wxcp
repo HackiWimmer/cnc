@@ -1904,7 +1904,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/24-debugger_start.png"
+           "m_path": "bitmaps/diff-copy-left-to-right2.png"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -67975,7 +67975,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/24-debugger_start.png"
+       "m_path": "bitmaps/diff-copy-left-to-right2.png"
       }],
      "m_events": [],
      "m_children": []
@@ -67994,7 +67994,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/24-finger.png"
+       "m_path": "bitmaps/diff-copy-file-left-to-right1.png"
       }],
      "m_events": [],
      "m_children": []
