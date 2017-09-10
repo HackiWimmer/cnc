@@ -258,8 +258,6 @@ class MainApp : public wxApp {
 			
 			// build and decorate the main frame
 			MainFrame *mainFrame = new MainFrame(NULL);
-			wxIcon icon("MAINICON");
-			//mainFrame->SetIcon(icon);
 			
 			// command line handling
 			if ( initializeCmdLine() == false )

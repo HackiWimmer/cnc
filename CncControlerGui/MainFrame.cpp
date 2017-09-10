@@ -40,16 +40,23 @@
 #include "UnitTestFrame.h"
 #include "MainFrame.h"
 
+// special includes for WindowPoc handling. 
+//They have to be at the end of the list to avoid compilation errors
 #include <windows.h>
 #include <dbt.h>
 
+// global strings
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
 const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
 const char* _programTitel 		= "Woodworking CNC Controller";
-const char* _programVersion 	= "0.7.1";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
-	
+#ifdef DEBUG
+const char* _programVersion 	= "0.7.5.d";
+#else
+const char* _programVersion 	= "0.7.5.r";
+#endif
+
 // file content change environment
 #define EDIT_TRACKER_MARGIN_ID 1
 #define CL_LINE_MODIFIED_STYLE 200
@@ -104,6 +111,9 @@ MainFrame::MainFrame(wxWindow* parent)
 ///////////////////////////////////////////////////////////////////
 	// detemine assert handler
 	wxSetDefaultAssertHandler();
+	
+	// decocate application
+	setIcons();
 	
 	// do this definitely here later it will causes a crash 
 	install3DPane();
@@ -852,6 +862,31 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( m_portSelector->FindString(lastPortName) != wxNOT_FOUND )
 		m_portSelector->SetStringSelection(lastPortName);
 }
+
+///////////////////////////////////////////////////////////////////
+void MainFrame::setIcons() {
+///////////////////////////////////////////////////////////////////
+	// Set icon(s) to the application/dialog
+	wxIconBundle app_icons;
+
+#ifdef DEBUG
+	wxString iconTyp("D");
+#else
+	wxString iconTyp("R");
+#endif
+	
+	int sizes[] = {16, 32, 64, 128, 256};
+
+	for ( unsigned int i=0; i<sizeof(sizes)/sizeof(int); i++) {
+		wxBitmap iconBmp = ImageLibAppIcons().Bitmap(wxString::Format("BMP_APP_%s%d", iconTyp, sizes[i]));
+		wxIcon icn;
+		icn.CopyFromBitmap(iconBmp);
+		app_icons.AddIcon( icn );
+	}
+	
+	if ( app_icons.GetIconCount() > 0 )
+		SetIcons( app_icons );
+}
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
@@ -875,12 +910,9 @@ void MainFrame::initialize(void) {
 	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
 	decorateTestSuiteParameters();
 	
-#ifdef DEBUG
-	this->SetTitle(wxString(_programTitel) + " " + _programVersion + "  -- [DEBUG Version]");
-#else
-	this->SetTitle(wxString(_programTitel) + " " + _programVersion + "  -- [RELEASE Version]");
-#endif
-	
+
+	this->SetTitle(wxString(_programTitel) + " " + _programVersion);
+
 	wxString cfgStr;
 	// setup cnc port selector box
 	decoratePortSelector();

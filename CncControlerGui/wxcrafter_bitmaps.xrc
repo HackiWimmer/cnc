@@ -112,6 +112,36 @@
   <object class="wxBitmap" name="24-step_in">bitmaps\24-step_in.png</object>
   <object class="wxBitmap" name="24-step_in@2x">bitmaps\24-step_in@2x.png</object>
   <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\build-animation-sprite.png</object>
+  <object class="wxBitmap" name="BMP_APP_D128">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo-root.png</object>
+  <object class="wxBitmap" name="BMP_APP_D128@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D128@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-codelite-logo-root.png</object>
+  <object class="wxBitmap" name="BMP_APP_D16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D256">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\256-codelite-logo-root.png</object>
+  <object class="wxBitmap" name="BMP_APP_D256@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\256-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D256@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\256-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D32">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\32-codelite-logo-root.png</object>
+  <object class="wxBitmap" name="BMP_APP_D32@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\32-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D32@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\32-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D64">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo-root.png</object>
+  <object class="wxBitmap" name="BMP_APP_D64@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_D64@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo-root@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R128">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo.png</object>
+  <object class="wxBitmap" name="BMP_APP_R128@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R128@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-codelite-logo.png</object>
+  <object class="wxBitmap" name="BMP_APP_R16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R256">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\256-codelite-logo.png</object>
+  <object class="wxBitmap" name="BMP_APP_R256@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\256-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R256@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\256-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R32">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\32-codelite-logo.png</object>
+  <object class="wxBitmap" name="BMP_APP_R32@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\32-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R32@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\32-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R64">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo.png</object>
+  <object class="wxBitmap" name="BMP_APP_R64@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo@2x.png</object>
+  <object class="wxBitmap" name="BMP_APP_R64@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\64-codelite-logo@2x.png</object>
   <object class="wxBitmap" name="BMP_CNC">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\splash.bmp</object>
   <object class="wxBitmap" name="BMP_CONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="BMP_CONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-connected@2x.png</object>
@@ -205,15 +235,6 @@
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="git-arrow-down">bitmaps\git-arrow-down.png</object>
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>
-  <object class="wxBitmap" name="icon_128x128">bitmaps\icon_128x128.png</object>
-  <object class="wxBitmap" name="icon_128x128@2x">bitmaps\icon_128x128@2x.png</object>
-  <object class="wxBitmap" name="icon_16x16">bitmaps\icon_16x16.png</object>
-  <object class="wxBitmap" name="icon_16x16@2x">bitmaps\icon_16x16@2x.png</object>
-  <object class="wxBitmap" name="icon_256x256">bitmaps\icon_256x256.png</object>
-  <object class="wxBitmap" name="icon_256x256@2x">bitmaps\icon_256x256@2x.png</object>
-  <object class="wxBitmap" name="icon_32x32">bitmaps\icon_32x32.png</object>
-  <object class="wxBitmap" name="icon_32x32@2x">bitmaps\icon_32x32@2x.png</object>
-  <object class="wxBitmap" name="icon_32x32@2x">bitmaps\icon_32x32@2x.png</object>
   <object class="wxBitmap" name="mill">bitmaps\mill.png</object>
   <object class="wxBitmap" name="next-16">bitmaps\next-16.png</object>
   <object class="wxBitmap" name="resize">bitmaps\resize.png</object>

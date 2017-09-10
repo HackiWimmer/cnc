@@ -128,6 +128,8 @@ class MainFrame : public MainFrameBClass {
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
 		
+		void setIcons();
+		
 		///////////////////////////////////////////////////////////////
 		// Path Generator
 		void displayPGenErrorInfo(const wxString& errorInfo);

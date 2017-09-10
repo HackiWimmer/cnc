@@ -1,8 +1,11 @@
-MAINICON ICON "MAINICON.ico"
+
+  
+#ifdef DEBUG 
+MAINICON ICON "APP_ICON_D.ico"
+#else
+MAINICON ICON "APP_ICON_R.ico"
+#endif
+
 
 #include "wx/msw/wx.rc"
-#ifdef WIN64
-1 24 "wx/msw/amd64.manifest"
-#else
-1 24 "wx/msw/wx.manifest"
-#endif
+
