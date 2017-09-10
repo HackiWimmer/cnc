@@ -47,14 +47,29 @@
             <label>Port:</label>
             <style/>
           </object>
-          <object class="wxComboBox" name="m_portSelector">
-            <style>wxCB_READONLY|wxCB_DROPDOWN</style>
-            <size>100,-1</size>
+          <object class="wxBitmapButton" name="m_searchConnections">
+            <bitmap>bitmaps/database_refresh.png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <tooltip>
+              <![CDATA[Update COM ports]]>
+            </tooltip>
+            <default>0</default>
+          </object>
+          <object class="wxBitmapComboBox" name="m_portSelector">
+            <style>wxCB_READONLY</style>
+            <size>120,-1</size>
+            <font>
+              <size>9</size>
+              <style>normal</style>
+              <weight>normal</weight>
+              <family>default</family>
+              <underlined>0</underlined>
+              <face>Segoe UI</face>
+            </font>
             <tooltip>
               <![CDATA[Select the Serial Port]]>
             </tooltip>
             <selection>-1</selection>
-            <content/>
           </object>
           <object class="wxBitmapButton" name="m_connect">
             <bitmap>bitmaps/16-connected.png</bitmap>
@@ -73,10 +88,12 @@
             <style>wxCB_SORT|wxCB_READONLY</style>
             <bg>wxSYS_COLOUR_BTNFACE</bg>
             <font>
-              <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+              <size>8</size>
               <style>normal</style>
               <weight>normal</weight>
+              <family>swiss</family>
               <underlined>0</underlined>
+              <face>Segoe UI</face>
             </font>
             <tooltip>
               <![CDATA[Select the Display Unit]]>
@@ -5428,7 +5445,7 @@
                 </object>
                 <object class="toolbookpage">
                   <label>Workarea</label>
-                  <bitmap>bitmaps/16-cxx-workspace.png</bitmap>
+                  <bitmap>bitmaps/virtual-folder.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_stdPanel">
                     <style>wxTAB_TRAVERSAL</style>

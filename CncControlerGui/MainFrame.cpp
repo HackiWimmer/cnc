@@ -2,6 +2,7 @@
 #include <sstream>
 #include <fstream>
 #include <math.h>
+
 #include <wx/datetime.h>
 #include <wx/debug.h>
 #include <wx/msgdlg.h>
@@ -25,6 +26,7 @@
 #include <wx/textdlg.h>
 #include "SerialPort.h"
 #include "CncPosition.h"
+#include "CncUsbPortScanner.h"
 #include "CncPatternDefinitions.h"
 #include "SvgUnitCalculator.h"
 #include "EndSwitchDialog.h"
@@ -37,6 +39,9 @@
 #include "HexDecoder.h"
 #include "UnitTestFrame.h"
 #include "MainFrame.h"
+
+#include <windows.h>
+#include <dbt.h>
 
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
 const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
@@ -74,6 +79,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , runConfirmationInfo(RunConfirmationInfo::Wait)
 , traceTimerCounter(0)
 , lastPortName(wxT(""))
+, defaultPortName(wxT(""))
 , cnc(new CncControl(CncEMU_NULL))
 , drawPane3D(NULL)
 , serialSpy(NULL)
@@ -431,7 +437,6 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 	cout << "testFunction2"<< endl;
 	clog << "testFunction2"<< endl;
 	cerr << "testFunction2"<< endl;
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -720,6 +725,134 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	}	
 }
 ///////////////////////////////////////////////////////////////////
+WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) {
+///////////////////////////////////////////////////////////////////
+	wxString portName("Undefined");
+	if ( message == WM_DEVICECHANGE) {
+		PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)lParam;
+		
+		// logging
+		switch ( wParam ) {
+			case DBT_DEVICEARRIVAL:			if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
+												PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
+												wxString n(pPort->dbcp_name);
+												portName.assign(n);
+											}
+											
+											std::clog << "A new COM device was detected on port: " << portName << std::endl;
+											break;
+											
+			case DBT_DEVICEREMOVECOMPLETE:	if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
+												PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
+												wxString n(pPort->dbcp_name);
+												portName.assign(n);
+											}
+											
+											std::clog << "The COM device was removed from port: " << portName << std::endl;
+											break;
+											
+			default: ;
+		}
+	}
+	
+	// do all the default stuff here first
+	WXLRESULT ret = wxFrame::MSWWindowProc ( message, wParam, lParam );
+	
+	// do some more actions 
+	if ( message == WM_DEVICECHANGE) {
+		// update port selector
+		if ( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE)
+			decoratePortSelector();
+		
+		switch ( wParam ) {
+			// ask for connect - on demand . . . 
+			case DBT_DEVICEARRIVAL:	{
+				if ( isProcessing() == false ) {
+					wxString msg("Should a connection established to port: ");
+					msg.append(portName);
+					wxMessageDialog dlg(this, msg, _T("New connection available. Try to connect  . . . "), wxYES|wxNO|wxCENTRE|wxICON_QUESTION);
+					if ( dlg.ShowModal() == wxID_YES ) {
+						m_portSelector->SetStringSelection(portName);
+						connectSerialPort();
+					}
+				}
+			}
+			break;
+			
+			// check if current com connection is effected
+			case DBT_DEVICEREMOVECOMPLETE:	{
+				// check if the current connection is effected
+				if ( lastPortName == portName )
+					if ( cnc && cnc->isConnected() ) {
+						cnc->interrupt();
+						cnc->getSerial()->disconnect();
+						lastPortName.clear();
+						cnc::trc.logWarning("Connection broken . . ."); 
+					}
+				break;
+			}
+			default: ;
+		}
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::searchAvailiablePorts(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	disableControls();
+	decoratePortSelector(GetAsyncKeyState(VK_CONTROL) != 0);
+	enableControls();
+	
+	if ( m_portSelector->FindString(lastPortName) == wxNOT_FOUND ) {
+		m_portSelector->Popup();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::decoratePortSelector(bool list) {
+///////////////////////////////////////////////////////////////////
+	m_portSelector->Clear();
+	// add default ports
+	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
+	if ( lastPortName == _portEmulatorSVG )		m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
+	// add com ports
+	int pStart 	= 0;
+	int pEnd 	= 256;
+	
+	if ( list == true ) {
+		pStart 	= 1;
+		pEnd 	= 11;
+	}
+	
+	for (int i=pStart; i<pEnd; i++) {
+		int ret = CncUsbPortScanner::isComPortAvailable(i);
+		wxString pn(wxString::Format("COM%d", i));
+		
+		switch ( ret ) {
+			case 0:		if ( cnc && cnc->isConnected() && lastPortName == pn )
+							m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+						else
+							m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_ACCESS_DENIED"));
+							
+						break;
+			case 1:
+						m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+						break;
+						
+			default: 	if ( list == true )
+							m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_UNKNOWN"));
+		}
+	}
+	
+	// select the last port, if availiable
+	if ( m_portSelector->FindString(lastPortName) != wxNOT_FOUND )
+		m_portSelector->SetStringSelection(lastPortName);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(m_portSelector);
@@ -749,19 +882,14 @@ void MainFrame::initialize(void) {
 #endif
 	
 	wxString cfgStr;
-	//Setup CncPORT selector box
-	m_portSelector->Clear();
-	m_portSelector->Append(_portEmulatorNULL);
-	m_portSelector->Append(_portEmulatorSVG);
-	for (int i=1; i<11; i++) {
-		wxString item("COM");
-		item << i;
-		m_portSelector->Append(item);
-	}
+	// setup cnc port selector box
+	decoratePortSelector();
 	
 	config->Read("COMConfig/DefaultPort", &cfgStr, wxString(_portEmulatorNULL));
 	m_portSelector->SetStringSelection(cfgStr);
+	defaultPortName.assign(cfgStr);
 
+	// decorate dir control
 	m_dirCtrl->SetFilter("SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode|Text Files (*.txt)|*.txt"); 
 	m_dirCtrl->SetFilterIndex(0);
 
@@ -1363,6 +1491,7 @@ bool MainFrame::connectSerialPort() {
 		m_serialTimer->Start();
 	}
 	
+	decoratePortSelector();
 	m_connect->Refresh();
 	m_connect->Update();
 	stopAnimationControl();
@@ -6738,3 +6867,4 @@ void MainFrame::unitTestFramework(wxCommandEvent& event) {
 	UnitTests test(this, 0, true);
 	test.ShowModal();
 }
+

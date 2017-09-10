@@ -21,10 +21,11 @@
 #include <map>
 #include <wx/menu.h>
 #include <wx/stattext.h>
+#include <wx/bmpbuttn.h>
+#include <wx/bmpcbox.h>
+#include <wx/toolbar.h>
 #include <wx/combobox.h>
 #include <wx/arrstr.h>
-#include <wx/bmpbuttn.h>
-#include <wx/toolbar.h>
 #include <wx/slider.h>
 #include <wx/button.h>
 #include <wx/scrolwin.h>
@@ -82,7 +83,8 @@ protected:
     wxAuiToolBar* m_auibarMain;
     std::map<int, wxMenu*> m_dropdownMenus;
     wxStaticText* m_staticText1842;
-    wxComboBox* m_portSelector;
+    wxBitmapButton* m_searchConnections;
+    wxBitmapComboBox* m_portSelector;
     wxBitmapButton* m_connect;
     wxStaticText* m_staticText752;
     wxComboBox* m_unit;
@@ -723,6 +725,7 @@ protected:
     virtual void maximizeAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void restoreAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void renderAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
+    virtual void searchAvailiablePorts(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
@@ -996,7 +999,8 @@ protected:
 
 public:
     wxStaticText* GetStaticText1842() { return m_staticText1842; }
-    wxComboBox* GetPortSelector() { return m_portSelector; }
+    wxBitmapButton* GetSearchConnections() { return m_searchConnections; }
+    wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
     wxBitmapButton* GetConnect() { return m_connect; }
     wxStaticText* GetStaticText752() { return m_staticText752; }
     wxComboBox* GetUnit() { return m_unit; }
@@ -1878,6 +1882,35 @@ public:
     }
 
     virtual ~ImageLibBig();
+};
+
+
+class ImageLibPortSelector : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibPortSelector();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibPortSelector();
 };
 
 #endif

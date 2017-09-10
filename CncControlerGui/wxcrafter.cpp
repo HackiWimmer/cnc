@@ -74,9 +74,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText1842 = new wxStaticText(m_auibarMain, wxID_ANY, _("Port:"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     m_auibarMain->AddControl(m_staticText1842);
     
-    wxArrayString m_portSelectorArr;
-    m_portSelector = new wxComboBox(m_auibarMain, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(100,-1)), m_portSelectorArr, wxCB_READONLY|wxCB_DROPDOWN);
-    m_portSelector->SetToolTip(_("Select the Serial Port"));
+    m_searchConnections = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("database_refresh")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_searchConnections->SetToolTip(_("Update COM ports"));
+    m_auibarMain->AddControl(m_searchConnections);
+    
+    m_portSelector = new wxBitmapComboBox(m_auibarMain, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(120,-1)), wxArrayString(), wxCB_READONLY);
     m_auibarMain->AddControl(m_portSelector);
     
     m_connect = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
@@ -93,7 +95,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_unitArr.Add(wxT("steps"));
     m_unit = new wxComboBox(m_auibarMain, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), m_unitArr, wxCB_SORT|wxCB_READONLY);
     m_unit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    wxFont m_unitFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
+    wxFont m_unitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_unit->SetFont(m_unitFont);
     m_unit->SetToolTip(_("Select the Display Unit"));
     m_unit->SetSelection(0);
@@ -3064,7 +3066,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_stdPanel = new wxPanel(m_templateToolbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_templateToolbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_stdPanelImgIndex;
-    m_stdPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-cxx-workspace")));
+    m_stdPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("virtual-folder")));
     m_templateToolbook->AddPage(m_stdPanel, _("Workarea"), false, m_stdPanelImgIndex);
     
     wxFlexGridSizer* flexGridSizer2599 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -5277,6 +5279,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auimgrMain->Connect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_RENDER, wxAuiManagerEventHandler(MainFrameBClass::renderAuiPane), NULL, this);
+    m_searchConnections->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
@@ -5581,6 +5584,7 @@ MainFrameBClass::~MainFrameBClass()
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_RENDER, wxAuiManagerEventHandler(MainFrameBClass::renderAuiPane), NULL, this);
+    m_searchConnections->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
@@ -7725,5 +7729,87 @@ ImageLibBig::ImageLibBig()
 }
 
 ImageLibBig::~ImageLibBig()
+{
+}
+
+ImageLibPortSelector::ImageLibPortSelector()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PS_CONNECTED"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PS_CONNECTED"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PS_ACCESS_DENIED"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PS_ACCESS_DENIED"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PS_UNKNOWN"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PS_UNKNOWN"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PS_UNKNOWN@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PS_UNKNOWN@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PS_AVAILABLE"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PS_AVAILABLE"), bmp));
+        }
+    }
+    
+}
+
+ImageLibPortSelector::~ImageLibPortSelector()
 {
 }

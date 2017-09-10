@@ -195,6 +195,8 @@
       <File Name="Clipper/clipper.cpp"/>
       <File Name="Clipper/clipper.hpp"/>
     </VirtualDirectory>
+    <File Name="CncUsbPortScanner.h"/>
+    <File Name="CncUsbPortScanner.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="win_resources.rc"/>

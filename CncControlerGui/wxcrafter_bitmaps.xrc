@@ -27,8 +27,6 @@
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
   <object class="wxBitmap" name="16-cscope">bitmaps\16-cscope.png</object>
   <object class="wxBitmap" name="16-cscope@2x">bitmaps\16-cscope@2x.png</object>
-  <object class="wxBitmap" name="16-cxx-workspace">bitmaps\16-cxx-workspace.png</object>
-  <object class="wxBitmap" name="16-cxx-workspace@2x">bitmaps\16-cxx-workspace@2x.png</object>
   <object class="wxBitmap" name="16-database">bitmaps\16-database.png</object>
   <object class="wxBitmap" name="16-database@2x">bitmaps\16-database@2x.png</object>
   <object class="wxBitmap" name="16-db-column">bitmaps\16-db-column.png</object>
@@ -155,6 +153,12 @@
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef.png</object>
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef@2x.png</object>
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef@2x.png</object>
+  <object class="wxBitmap" name="BMP_PS_ACCESS_DENIED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\conflict.png</object>
+  <object class="wxBitmap" name="BMP_PS_AVAILABLE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\replcae-16.png</object>
+  <object class="wxBitmap" name="BMP_PS_CONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\connect.png</object>
+  <object class="wxBitmap" name="BMP_PS_UNKNOWN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
+  <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
+  <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-finger.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-finger@2x.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\24-finger@2x.png</object>
@@ -197,6 +201,7 @@
   <object class="wxBitmap" name="book_green">bitmaps\book_green.png</object>
   <object class="wxBitmap" name="book_red">bitmaps\book_red.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
+  <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="git-arrow-down">bitmaps\git-arrow-down.png</object>
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>
@@ -213,4 +218,5 @@
   <object class="wxBitmap" name="next-16">bitmaps\next-16.png</object>
   <object class="wxBitmap" name="resize">bitmaps\resize.png</object>
   <object class="wxBitmap" name="settings">bitmaps\settings.png</object>
+  <object class="wxBitmap" name="virtual-folder">bitmaps\virtual-folder.png</object>
 </resource>

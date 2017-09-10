@@ -111,7 +111,12 @@ class SVGFileParser : public SVGNodeParser {
 					
 					setCurrentDebugState(debugMode[runPhase]);
 				}
+				
+				///////////////////////////////////////////////////////////////
 				SvgRunPhase getCurrentRunPhase() { return runPhase; }
+				
+				///////////////////////////////////////////////////////////////
+				bool isProcessing() { return runPhase != Svg_RP_Unknown;};
 				
 				///////////////////////////////////////////////////////////////
 				void setCurrentDebugState(bool s) { state = s; }
@@ -240,6 +245,7 @@ class SVGFileParser : public SVGNodeParser {
 		
 		bool pause();
 		bool isPause() { return runInfo.getPauseFlag(); }
+		bool isProcessing() { return runInfo.isProcessing(); }
 		
 		// Debug handling
 		void debugNextPath();

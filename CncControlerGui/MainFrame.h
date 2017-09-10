@@ -2,6 +2,7 @@
 #define MAINFRAME_H
 
 #include "wxcrafter.h"
+#include <wx/wx.h>
 #include <wx/notifmsg.h>
 #include <wx/generic/notifmsg.h>
 #include "NotebookInfo.h"
@@ -62,8 +63,11 @@ class MainFrame : public MainFrameBClass {
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
+		
+		virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
 
 	protected:
+    virtual void searchAvailiablePorts(wxCommandEvent& event);
     virtual void unitTestFramework(wxCommandEvent& event);
 
    
@@ -90,6 +94,7 @@ class MainFrame : public MainFrameBClass {
 		int traceTimerCounter;
 		
 		wxString lastPortName;
+		wxString defaultPortName;
 	
 		CncControl* cnc;
 		CncOpenGLDrawPane* drawPane3D;
@@ -219,6 +224,7 @@ class MainFrame : public MainFrameBClass {
 		void determineRunMode();
 		
 		bool isPause() { return svgFileParser != NULL ? svgFileParser->isPause() : false; }
+		bool isProcessing() { return svgFileParser != NULL ? svgFileParser->isProcessing() : false; }
 		
 		bool showConfigSummaryAndConfirmRun();
 		
@@ -227,6 +233,8 @@ class MainFrame : public MainFrameBClass {
 		
 		///////////////////////////////////////////////////////////////
 		// control handling
+		void decoratePortSelector(bool list=false);
+		
 		void determineCncOutputControls();
 		
 		void decorateRunButton();
