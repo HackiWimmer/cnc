@@ -159,6 +159,8 @@
       <File Name="CncClipperWrapper.h"/>
       <File Name="CncClipperWrapper.cpp"/>
       <File Name="CncConfig.cpp"/>
+      <File Name="CncUsbPortScanner.cpp"/>
+      <File Name="CncUsbPortScanner.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -195,8 +197,6 @@
       <File Name="Clipper/clipper.cpp"/>
       <File Name="Clipper/clipper.hpp"/>
     </VirtualDirectory>
-    <File Name="CncUsbPortScanner.h"/>
-    <File Name="CncUsbPortScanner.cpp"/>
   </VirtualDirectory>
   <VirtualDirectory Name="resources">
     <File Name="wxcrafter.wxcp"/>
@@ -211,8 +211,6 @@
     <File Name="Commands1.txt"/>
     <File Name="../Todos and known issues.txt"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="Arduino">
     <File Name="../../../@StepperControl/StepperControl_1/CncController.h" ExcludeProjConfig="Release"/>
     <File Name="../../../@StepperControl/StepperControl_1/CncController.ino" ExcludeProjConfig="Release"/>
@@ -241,6 +239,8 @@
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -254,7 +254,7 @@
       <ResourceCompiler Options=""/>
     </GlobalSettings>
     <Configuration Name="Debug" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-pg;-g;-O0;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-pg;-g;-O0;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\wxWidgets-3.1.0\src\stc\scintilla\include"/>
@@ -305,7 +305,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O2;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O2;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-Ofast;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-Ofast;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <Preprocessor Value="NDEBUG"/>

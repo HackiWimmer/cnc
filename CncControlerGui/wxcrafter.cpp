@@ -113,30 +113,33 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddSeparator();
     
-    m_auibarMain->AddTool(wxID_ANY, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("16-cog")), wxNullBitmap, wxITEM_NORMAL, _("Run Config"), wxT(""), NULL);
+    m_auibarMain->AddTool(wxID_ANY, _("Tool Label"), wxXmlResource::Get()->LoadBitmap(wxT("bug (2)")), wxNullBitmap, wxITEM_NORMAL, _("Run Config"), wxT(""), NULL);
     wxAuiToolBarItem* m_RcConfig = m_auibarMain->FindToolByIndex(m_auibarMain->GetToolCount()-1);
     if (m_RcConfig) {
         m_RcConfig->SetHasDropDown(true);
         m_rcConfigMenu = new wxMenu;
-        m_miRcRun = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Run"), wxT(""), wxITEM_RADIO);
+        m_miRcRun = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Mode - Run"), wxT(""), wxITEM_RADIO);
+        m_miRcRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("cube_green")));
         m_rcConfigMenu->Append(m_miRcRun);
-        m_miRcDebug = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Debug"), wxT(""), wxITEM_RADIO);
+        m_miRcDebug = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Mode - Debug"), wxT(""), wxITEM_RADIO);
+        m_miRcDebug->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("bug-go")));
         m_rcConfigMenu->Append(m_miRcDebug);
         m_rcConfigMenu->AppendSeparator();
-        m_miRcPreprocessing = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Preprocessing"), wxT(""), wxITEM_CHECK);
+        m_miRcPreprocessing = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Debug Area - Preprocessing"), wxT(""), wxITEM_CHECK);
+        m_miRcPreprocessing->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("bookmark-new-list")));
         m_rcConfigMenu->Append(m_miRcPreprocessing);
-        m_miRcPreprocessing->Check();
-        m_miRcUserAgent = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("UserAgent"), wxT(""), wxITEM_CHECK);
+        m_miRcUserAgent = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Debug Area - UserAgent"), wxT(""), wxITEM_CHECK);
+        m_miRcUserAgent->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("bookmark-new-list")));
         m_rcConfigMenu->Append(m_miRcUserAgent);
-        m_miRcUserAgent->Check();
-        m_miRcSpooling = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Spooling"), wxT(""), wxITEM_CHECK);
+        m_miRcSpooling = new wxMenuItem(m_rcConfigMenu, wxID_ANY, _("Debug Area - Spooling"), wxT(""), wxITEM_CHECK);
+        m_miRcSpooling->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("bookmark-new-list")));
         m_rcConfigMenu->Append(m_miRcSpooling);
         m_miRcSpooling->Check();
         
         m_dropdownMenus.insert(std::make_pair( m_RcConfig->GetId(), m_rcConfigMenu) );
     }
     
-    m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("diff-copy-left-to-right2")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("runRelease")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_rcRun->SetToolTip(_("Run or Debug"));
     m_auibarMain->AddControl(m_rcRun);
     
@@ -201,7 +204,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelReference = new wxPanel(m_mainNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelReferenceImgIndex;
-    m_panelReferenceImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-macro")));
+    m_panelReferenceImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("php-project-settings")));
     m_mainNotebook->AddPage(m_panelReference, _("References"), false, m_panelReferenceImgIndex);
     
     wxFlexGridSizer* flexGridSizer1885 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -654,7 +657,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelSetup = new wxPanel(m_mainNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelSetupImgIndex;
-    m_panelSetupImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("settings")));
+    m_panelSetupImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("setting_tools")));
     m_mainNotebook->AddPage(m_panelSetup, _("Setup"), false, m_panelSetupImgIndex);
     
     wxFlexGridSizer* flexGridSizer1884 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -673,7 +676,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_setupWorkPage = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupWorkPageImgIndex;
-    m_setupWorkPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-tools")));
+    m_setupWorkPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("setting_tools")));
     m_listbook2220->AddPage(m_setupWorkPage, _("Working"), false, m_setupWorkPageImgIndex);
     
     wxFlexGridSizer* flexGridSizer2218 = new wxFlexGridSizer(8, 1, 0, 0);
@@ -1186,7 +1189,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_setupSVGPage = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupSVGPageImgIndex;
-    m_setupSVGPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-blocks")));
+    m_setupSVGPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-mime-xml")));
     m_listbook2220->AddPage(m_setupSVGPage, _("SVG"), false, m_setupSVGPageImgIndex);
     
     wxFlexGridSizer* flexGridSizer2229 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -1271,7 +1274,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_setupEnvPage = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupEnvPageImgIndex;
-    m_setupEnvPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));
+    m_setupEnvPageImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("system-settings")));
     m_listbook2220->AddPage(m_setupEnvPage, _("Envrionment"), false, m_setupEnvPageImgIndex);
     
     wxFlexGridSizer* flexGridSizer2232 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -1309,7 +1312,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_setupApp = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupAppImgIndex;
-    m_setupAppImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-checkbox")));
+    m_setupAppImgIndex = m_listbook2220_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("application-side-boxes")));
     m_listbook2220->AddPage(m_setupApp, _("Application"), false, m_setupAppImgIndex);
     
     wxFlexGridSizer* flexGridSizer2627 = new wxFlexGridSizer(0, 1, 0, 0);
@@ -1392,7 +1395,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTesting = new wxPanel(m_mainNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTestingImgIndex;
-    m_panelTestingImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-typedef")));
+    m_panelTestingImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("tools-report-bug1")));
     m_mainNotebook->AddPage(m_panelTesting, _("Test Suite"), false, m_panelTestingImgIndex);
     
     wxFlexGridSizer* flexGridSizer2205 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -2160,7 +2163,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelManually = new wxPanel(m_mainNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelManuallyImgIndex;
-    m_panelManuallyImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-dll")));
+    m_panelManuallyImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("media-repeat-blue")));
     m_mainNotebook->AddPage(m_panelManually, _("Manually Control"), false, m_panelManuallyImgIndex);
     
     wxFlexGridSizer* flexGridSizer862 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -2489,7 +2492,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTemplateContent = new wxPanel(m_mainNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTemplateContentImgIndex;
-    m_panelTemplateContentImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-enumerator")));
+    m_panelTemplateContentImgIndex = m_mainNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-mime-xml")));
     m_mainNotebook->AddPage(m_panelTemplateContent, _("Template Control"), false, m_panelTemplateContentImgIndex);
     
     wxFlexGridSizer* flexGridSizer706 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -3004,7 +3007,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_lruPanel = new wxPanel(m_templateToolbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_templateToolbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_lruPanelImgIndex;
-    m_lruPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-history")));
+    m_lruPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("document-open-recent")));
     m_templateToolbook->AddPage(m_lruPanel, _("Recently"), true, m_lruPanelImgIndex);
     
     wxFlexGridSizer* flexGridSizer1642 = new wxFlexGridSizer(2, 1, 0, 0);
@@ -3032,7 +3035,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_stdPanel = new wxPanel(m_templateToolbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_templateToolbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_stdPanelImgIndex;
-    m_stdPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("virtual-folder")));
+    m_stdPanelImgIndex = m_templateToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("folder-txt")));
     m_templateToolbook->AddPage(m_stdPanel, _("Workarea"), false, m_stdPanelImgIndex);
     
     wxFlexGridSizer* flexGridSizer2599 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -3111,7 +3114,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panel3157 = new wxPanel(m_loggerToolbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerToolbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panel3157ImgIndex;
-    m_panel3157ImgIndex = m_loggerToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-database")));
+    m_panel3157ImgIndex = m_loggerToolbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("page_white_database")));
     m_loggerToolbook->AddPage(m_panel3157, _("CNC Log"), false, m_panel3157ImgIndex);
     
     wxFlexGridSizer* flexGridSizer3158 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -3432,7 +3435,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_cncParameters = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_cncParametersImgIndex;
-    m_cncParametersImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-class")));
+    m_cncParametersImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("brick-go1")));
     m_outboundNotebook->AddPage(m_cncParameters, _("CNC Values"), false, m_cncParametersImgIndex);
     
     wxFlexGridSizer* flexGridSizer1076 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -3776,7 +3779,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Info"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_outPanel = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_outPanelImgIndex;
-    m_outPanelImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));
+    m_outPanelImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("start-here")));
     m_outboundNotebook->AddPage(m_outPanel, _("Motion Monitor"), false, m_outPanelImgIndex);
     
     wxFlexGridSizer* flexGridSizer1042 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -4215,7 +4218,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_3DPane = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_3DPaneImgIndex;
-    m_3DPaneImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")));
+    m_3DPaneImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("package-x-generic1")));
     m_outboundNotebook->AddPage(m_3DPane, _("3D Motion View"), false, m_3DPaneImgIndex);
     
     wxFlexGridSizer* flexGridSizer2309 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -4522,7 +4525,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_svgEmuResult = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_svgEmuResult->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     int m_svgEmuResultImgIndex;
-    m_svgEmuResultImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));
+    m_svgEmuResultImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("layer-novisible")));
     m_outboundNotebook->AddPage(m_svgEmuResult, _("SVG Output"), false, m_svgEmuResultImgIndex);
     
     wxFlexGridSizer* flexGridSizer585 = new wxFlexGridSizer(1, 2, 0, 0);
@@ -4638,7 +4641,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_svgEmuSource = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_svgEmuSourceImgIndex;
-    m_svgEmuSourceImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));
+    m_svgEmuSourceImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("script-code")));
     m_outboundNotebook->AddPage(m_svgEmuSource, _("SVG Source"), false, m_svgEmuSourceImgIndex);
     
     wxFlexGridSizer* flexGridSizer1891 = new wxFlexGridSizer(0, 2, 0, 0);
@@ -4702,7 +4705,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_svgTracePreview = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_svgTracePreviewImgIndex;
-    m_svgTracePreviewImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-struct")));
+    m_svgTracePreviewImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("toggle_log-2")));
     m_outboundNotebook->AddPage(m_svgTracePreview, _("SVG Trace"), false, m_svgTracePreviewImgIndex);
     
     wxFlexGridSizer* flexGridSizer1720 = new wxFlexGridSizer(0, 2, 0, 0);

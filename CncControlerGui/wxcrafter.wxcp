@@ -1523,7 +1523,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/16-cog.png"
+           "m_path": "bitmaps/bug (2).png"
           }, {
            "type": "filePicker",
            "m_label": "Disabled-Bitmap File",
@@ -1576,7 +1576,7 @@
               }, {
                "type": "string",
                "m_label": "Label:",
-               "m_value": "Run"
+               "m_value": "Mode - Run"
               }, {
                "type": "string",
                "m_label": "Shortcut:",
@@ -1588,7 +1588,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": ""
+               "m_path": "bitmaps/cube_green.png"
               }, {
                "type": "choice",
                "m_label": "Kind:",
@@ -1627,7 +1627,7 @@
               }, {
                "type": "string",
                "m_label": "Label:",
-               "m_value": "Debug"
+               "m_value": "Mode - Debug"
               }, {
                "type": "string",
                "m_label": "Shortcut:",
@@ -1639,7 +1639,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": ""
+               "m_path": "bitmaps/bug-go.png"
               }, {
                "type": "choice",
                "m_label": "Kind:",
@@ -1722,7 +1722,7 @@
               }, {
                "type": "string",
                "m_label": "Label:",
-               "m_value": "Preprocessing"
+               "m_value": "Debug Area - Preprocessing"
               }, {
                "type": "string",
                "m_label": "Shortcut:",
@@ -1734,7 +1734,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": ""
+               "m_path": "bitmaps/bookmark-new-list.png"
               }, {
                "type": "choice",
                "m_label": "Kind:",
@@ -1743,7 +1743,7 @@
               }, {
                "type": "bool",
                "m_label": "Checked",
-               "m_value": true
+               "m_value": false
               }],
              "m_events": [],
              "m_children": []
@@ -1766,7 +1766,7 @@
               }, {
                "type": "string",
                "m_label": "Label:",
-               "m_value": "UserAgent"
+               "m_value": "Debug Area - UserAgent"
               }, {
                "type": "string",
                "m_label": "Shortcut:",
@@ -1778,7 +1778,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": ""
+               "m_path": "bitmaps/bookmark-new-list.png"
               }, {
                "type": "choice",
                "m_label": "Kind:",
@@ -1787,7 +1787,7 @@
               }, {
                "type": "bool",
                "m_label": "Checked",
-               "m_value": true
+               "m_value": false
               }],
              "m_events": [],
              "m_children": []
@@ -1810,7 +1810,7 @@
               }, {
                "type": "string",
                "m_label": "Label:",
-               "m_value": "Spooling"
+               "m_value": "Debug Area - Spooling"
               }, {
                "type": "string",
                "m_label": "Shortcut:",
@@ -1822,7 +1822,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": ""
+               "m_path": "bitmaps/bookmark-new-list.png"
               }, {
                "type": "choice",
                "m_label": "Kind:",
@@ -1904,7 +1904,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/diff-copy-left-to-right2.png"
+           "m_path": "bitmaps/Icons/runRelease.ico"
           }, {
            "type": "bool",
            "m_label": "Default Button",
@@ -2816,7 +2816,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-macro.png"
+               "m_path": "bitmaps/php-project-settings.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -8313,7 +8313,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/settings.png"
+               "m_path": "bitmaps/setting_tools.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -8507,7 +8507,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "bitmaps/16-tools.png"
+                     "m_path": "bitmaps/setting_tools.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -13844,7 +13844,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "bitmaps/16-blocks.png"
+                     "m_path": "bitmaps/16-mime-xml.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -14731,7 +14731,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "bitmaps/16-console.png"
+                     "m_path": "bitmaps/system-settings.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -15137,7 +15137,7 @@
                     }, {
                      "type": "bitmapPicker",
                      "m_label": "Bitmap File:",
-                     "m_path": "bitmaps/16-checkbox.png"
+                     "m_path": "bitmaps/application-side-boxes.png"
                     }, {
                      "type": "bool",
                      "m_label": "Selected",
@@ -15963,7 +15963,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-typedef.png"
+               "m_path": "bitmaps/tools-report-bug1.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -24963,7 +24963,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-dll.png"
+               "m_path": "bitmaps/media-repeat-blue.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -28591,7 +28591,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-enumerator.png"
+               "m_path": "bitmaps/16-mime-xml.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -34055,7 +34055,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-history.png"
+               "m_path": "bitmaps/document-open-recent.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -34370,7 +34370,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/virtual-folder.png"
+               "m_path": "bitmaps/folder-txt.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -35177,7 +35177,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-database.png"
+               "m_path": "bitmaps/page_white_database.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -38693,7 +38693,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-class.png"
+               "m_path": "bitmaps/brick-go1.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -43021,7 +43021,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-console.png"
+               "m_path": "bitmaps/start-here.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -47143,7 +47143,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-gtk.png"
+               "m_path": "bitmaps/package-x-generic1.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -50316,7 +50316,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-struct.png"
+               "m_path": "bitmaps/layer-novisible.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -51444,7 +51444,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-struct.png"
+               "m_path": "bitmaps/script-code.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -51843,7 +51843,7 @@
               }, {
                "type": "bitmapPicker",
                "m_label": "Bitmap File:",
-               "m_path": "bitmaps/16-struct.png"
+               "m_path": "bitmaps/toggle_log-2.png"
               }, {
                "type": "bool",
                "m_label": "Selected",
@@ -67975,7 +67975,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/diff-copy-left-to-right2.png"
+       "m_path": "bitmaps/Icons/runRelease.ico"
       }],
      "m_events": [],
      "m_children": []
@@ -67994,7 +67994,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/diff-copy-file-left-to-right1.png"
+       "m_path": "bitmaps/Icons/runDebug.ico"
       }],
      "m_events": [],
      "m_children": []

@@ -210,14 +210,16 @@
                 <style/>
                 <object class="wxMenuItem" name="m_miRcRun">
                   <radio>1</radio>
-                  <label>Run</label>
+                  <label>Mode - Run</label>
+                  <bitmap>bitmaps/cube_green.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
                 </object>
                 <object class="wxMenuItem" name="m_miRcDebug">
                   <radio>1</radio>
-                  <label>Debug</label>
+                  <label>Mode - Debug</label>
+                  <bitmap>bitmaps/bug-go.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
@@ -225,23 +227,24 @@
                 <object class="separator"/>
                 <object class="wxMenuItem" name="m_miRcPreprocessing">
                   <checkable>1</checkable>
-                  <label>Preprocessing</label>
+                  <label>Debug Area - Preprocessing</label>
+                  <bitmap>bitmaps/bookmark-new-list.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
-                  <checked>1</checked>
                 </object>
                 <object class="wxMenuItem" name="m_miRcUserAgent">
                   <checkable>1</checkable>
-                  <label>UserAgent</label>
+                  <label>Debug Area - UserAgent</label>
+                  <bitmap>bitmaps/bookmark-new-list.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
-                  <checked>1</checked>
                 </object>
                 <object class="wxMenuItem" name="m_miRcSpooling">
                   <checkable>1</checkable>
-                  <label>Spooling</label>
+                  <label>Debug Area - Spooling</label>
+                  <bitmap>bitmaps/bookmark-new-list.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
@@ -256,10 +259,10 @@
             <longhelp>
               <![CDATA[]]>
             </longhelp>
-            <bitmap>bitmaps/16-cog.png</bitmap>
+            <bitmap>bitmaps/bug (2).png</bitmap>
           </object>
           <object class="wxBitmapButton" name="m_rcRun">
-            <bitmap>bitmaps/diff-copy-left-to-right2.png</bitmap>
+            <bitmap>bitmaps/Icons/runRelease.ico</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Run or Debug]]>
@@ -370,7 +373,7 @@
                 <bg>wxSYS_COLOUR_BTNFACE</bg>
                 <object class="notebookpage">
                   <label>References</label>
-                  <bitmap>bitmaps/16-macro.png</bitmap>
+                  <bitmap>bitmaps/php-project-settings.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panelReference">
                     <style>wxTAB_TRAVERSAL</style>
@@ -1241,7 +1244,7 @@
                 </object>
                 <object class="notebookpage">
                   <label>Setup</label>
-                  <bitmap>bitmaps/settings.png</bitmap>
+                  <bitmap>bitmaps/setting_tools.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panelSetup">
                     <style>wxTAB_TRAVERSAL</style>
@@ -1259,7 +1262,7 @@
                           <style>wxLB_DEFAULT|wxBK_DEFAULT</style>
                           <object class="listbookpage">
                             <label>Working</label>
-                            <bitmap>bitmaps/16-tools.png</bitmap>
+                            <bitmap>bitmaps/setting_tools.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupWorkPage">
                               <style>wxTAB_TRAVERSAL</style>
@@ -2217,7 +2220,7 @@
                           </object>
                           <object class="listbookpage">
                             <label>SVG</label>
-                            <bitmap>bitmaps/16-blocks.png</bitmap>
+                            <bitmap>bitmaps/16-mime-xml.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupSVGPage">
                               <style>wxTAB_TRAVERSAL</style>
@@ -2385,7 +2388,7 @@
                           </object>
                           <object class="listbookpage">
                             <label>Envrionment</label>
-                            <bitmap>bitmaps/16-console.png</bitmap>
+                            <bitmap>bitmaps/system-settings.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupEnvPage">
                               <style>wxTAB_TRAVERSAL</style>
@@ -2454,7 +2457,7 @@
                           </object>
                           <object class="listbookpage">
                             <label>Application</label>
-                            <bitmap>bitmaps/16-checkbox.png</bitmap>
+                            <bitmap>bitmaps/application-side-boxes.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupApp">
                               <style>wxTAB_TRAVERSAL</style>
@@ -2615,7 +2618,7 @@
                 </object>
                 <object class="notebookpage">
                   <label>Test Suite</label>
-                  <bitmap>bitmaps/16-typedef.png</bitmap>
+                  <bitmap>bitmaps/tools-report-bug1.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panelTesting">
                     <style>wxTAB_TRAVERSAL</style>
@@ -3973,7 +3976,7 @@
                 </object>
                 <object class="notebookpage">
                   <label>Manually Control</label>
-                  <bitmap>bitmaps/16-dll.png</bitmap>
+                  <bitmap>bitmaps/media-repeat-blue.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panelManually">
                     <style>wxTAB_TRAVERSAL</style>
@@ -4619,7 +4622,7 @@
                 </object>
                 <object class="notebookpage">
                   <label>Template Control</label>
-                  <bitmap>bitmaps/16-enumerator.png</bitmap>
+                  <bitmap>bitmaps/16-mime-xml.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panelTemplateContent">
                     <style>wxTAB_TRAVERSAL</style>
@@ -5396,7 +5399,7 @@
                 <style>wxBK_RIGHT</style>
                 <object class="toolbookpage">
                   <label>Recently</label>
-                  <bitmap>bitmaps/16-history.png</bitmap>
+                  <bitmap>bitmaps/document-open-recent.png</bitmap>
                   <selected>1</selected>
                   <object class="wxPanel" name="m_lruPanel">
                     <style>wxTAB_TRAVERSAL</style>
@@ -5445,7 +5448,7 @@
                 </object>
                 <object class="toolbookpage">
                   <label>Workarea</label>
-                  <bitmap>bitmaps/virtual-folder.png</bitmap>
+                  <bitmap>bitmaps/folder-txt.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_stdPanel">
                     <style>wxTAB_TRAVERSAL</style>
@@ -5595,7 +5598,7 @@
                 <style>wxTBK_BUTTONBAR|wxBK_RIGHT</style>
                 <object class="toolbookpage">
                   <label>CNC Log</label>
-                  <bitmap>bitmaps/16-database.png</bitmap>
+                  <bitmap>bitmaps/page_white_database.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panel3157">
                     <style>wxTAB_TRAVERSAL</style>
@@ -6167,7 +6170,7 @@
                 <bg>wxSYS_COLOUR_BTNFACE</bg>
                 <object class="notebookpage">
                   <label>CNC Values</label>
-                  <bitmap>bitmaps/16-class.png</bitmap>
+                  <bitmap>bitmaps/brick-go1.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_cncParameters">
                     <style/>
@@ -6706,7 +6709,7 @@
                 </object>
                 <object class="notebookpage">
                   <label>Motion Monitor</label>
-                  <bitmap>bitmaps/16-console.png</bitmap>
+                  <bitmap>bitmaps/start-here.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_outPanel">
                     <style/>
@@ -7599,7 +7602,7 @@ Axis</label>
                 </object>
                 <object class="notebookpage">
                   <label>3D Motion View</label>
-                  <bitmap>bitmaps/16-gtk.png</bitmap>
+                  <bitmap>bitmaps/package-x-generic1.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_3DPane">
                     <style>wxTAB_TRAVERSAL</style>
@@ -8130,7 +8133,7 @@ Axis</label>
                 </object>
                 <object class="notebookpage">
                   <label>SVG Output</label>
-                  <bitmap>bitmaps/16-struct.png</bitmap>
+                  <bitmap>bitmaps/layer-novisible.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_svgEmuResult">
                     <style/>
@@ -8312,7 +8315,7 @@ Axis</label>
                 </object>
                 <object class="notebookpage">
                   <label>SVG Source</label>
-                  <bitmap>bitmaps/16-struct.png</bitmap>
+                  <bitmap>bitmaps/script-code.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_svgEmuSource">
                     <style>wxTAB_TRAVERSAL</style>
@@ -8362,7 +8365,7 @@ Axis</label>
                 </object>
                 <object class="notebookpage">
                   <label>SVG Trace</label>
-                  <bitmap>bitmaps/16-struct.png</bitmap>
+                  <bitmap>bitmaps/toggle_log-2.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_svgTracePreview">
                     <style/>

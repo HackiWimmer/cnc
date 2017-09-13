@@ -771,7 +771,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 	// do some more actions 
 	if ( message == WM_DEVICECHANGE) {
 		// update port selector
-		if ( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE)
+		if ( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE )
 			decoratePortSelector();
 		
 		switch ( wParam ) {
@@ -797,7 +797,13 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 						cnc->interrupt();
 						cnc->getSerial()->disconnect();
 						lastPortName.clear();
+						std::cerr << "Connection brocken" << std::endl;
 						cnc::trc.logWarning("Connection broken . . ."); 
+						
+						/*
+						m_portSelector->SetStringSelection(defaultPortName);
+						connectSerialPort();
+						*/
 					}
 				break;
 			}
@@ -821,6 +827,7 @@ void MainFrame::searchAvailiablePorts(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decoratePortSelector(bool list) {
 ///////////////////////////////////////////////////////////////////
+	startAnimationControl();
 	m_portSelector->Clear();
 	// add default ports
 	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
@@ -861,6 +868,8 @@ void MainFrame::decoratePortSelector(bool list) {
 	// select the last port, if availiable
 	if ( m_portSelector->FindString(lastPortName) != wxNOT_FOUND )
 		m_portSelector->SetStringSelection(lastPortName);
+		
+	stopAnimationControl();
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -1563,7 +1572,7 @@ void MainFrame::enableRunControls(bool state) {
 		m_rcStop->Enable(true);
 		m_btnEmergenyStop->Enable(true);
 	}
-	
+
 	
 	//todo
 	m_rcReset->Enable(		isPause() == false 		&& state);
@@ -4798,19 +4807,12 @@ void MainFrame::updateCurveLibResolution() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
 ///////////////////////////////////////////////////////////////////
-	
-	wxString yyy("\"C:\\Program Files\\Notepad++\\notepad++\" \"");
-	yyy += fn;
-	yyy += "\"";
-	//wxExecute(yyy);
-	//return;
-	
 	wxString url;
+	wxString tmpPreview("Default html page");
 	
 	if ( fn.IsEmpty() ) {
 		url.assign(getBlankHtmlPage());
 	} else {
-		wxString tmpPreview;
 		startAnimationControl();
 		
 		bool errorInfo = m_previewErrorInfo->GetValue();
@@ -4834,7 +4836,7 @@ void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
 		url.assign(tmpPreview);
 	}
 	
-	m_svgPreviewFileName->SetValue(fn);
+	m_svgPreviewFileName->SetValue(wxString::Format("%s | %s", fn, tmpPreview));
 	m_svgPreview->LoadURL(url);
 	m_svgPreview->Update();
 	stopAnimationControl();
@@ -5991,6 +5993,10 @@ void MainFrame::determineRunMode() {
 	}
 
 	decorateRunButton();
+	
+	m_miRcPreprocessing->Enable(svgDebugger == true);
+	m_miRcUserAgent->Enable(svgDebugger == true);
+	m_miRcSpooling->Enable(svgDebugger == true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcSelectRunMode(wxCommandEvent& event) {
@@ -6519,11 +6525,7 @@ void MainFrame::freezeLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableSerialSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_menuItemDebugSerial->IsChecked() ) {
-		m_menuItemDebugSerial->Check(false);
-	} else {
-		m_menuItemDebugSerial->Check(true);
-	}
+	m_menuItemDebugSerial->Check(!m_menuItemDebugSerial->IsChecked());
 	
 	updateMonitoring();
 	decorateSerialSpy();

@@ -1670,7 +1670,7 @@ bool CncControl::moveMetricZ(double z) {
 void CncControl::setToolState(bool defaultStyle) {
 ///////////////////////////////////////////////////////////////////
 	if ( defaultStyle == true ) {
-		toolState.setState(CncToolStateControl::neutral);
+		toolState.setState(CncToolStateControl::red);
 	} else {
 		if ( toolUpdateState == true ) {
 			if ( powerOn == true ) {

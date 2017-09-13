@@ -5,12 +5,8 @@
   <object class="wxBitmap" name="16-ToolPin@2x">bitmaps\16-ToolPin@2x.png</object>
   <object class="wxBitmap" name="16-archive">bitmaps\16-archive.png</object>
   <object class="wxBitmap" name="16-archive@2x">bitmaps\16-archive@2x.png</object>
-  <object class="wxBitmap" name="16-blocks">bitmaps\16-blocks.png</object>
-  <object class="wxBitmap" name="16-blocks@2x">bitmaps\16-blocks@2x.png</object>
   <object class="wxBitmap" name="16-case-sensitive">bitmaps\16-case-sensitive.png</object>
   <object class="wxBitmap" name="16-case-sensitive@2x">bitmaps\16-case-sensitive@2x.png</object>
-  <object class="wxBitmap" name="16-checkbox">bitmaps\16-checkbox.png</object>
-  <object class="wxBitmap" name="16-checkbox@2x">bitmaps\16-checkbox@2x.png</object>
   <object class="wxBitmap" name="16-class">bitmaps\16-class.png</object>
   <object class="wxBitmap" name="16-class@2x">bitmaps\16-class@2x.png</object>
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
@@ -21,8 +17,6 @@
   <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
-  <object class="wxBitmap" name="16-console">bitmaps\16-console.png</object>
-  <object class="wxBitmap" name="16-console@2x">bitmaps\16-console@2x.png</object>
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
   <object class="wxBitmap" name="16-cscope">bitmaps\16-cscope.png</object>
@@ -35,8 +29,6 @@
   <object class="wxBitmap" name="16-debugger_restart@2x">bitmaps\16-debugger_restart@2x.png</object>
   <object class="wxBitmap" name="16-dll">bitmaps\16-dll.png</object>
   <object class="wxBitmap" name="16-dll@2x">bitmaps\16-dll@2x.png</object>
-  <object class="wxBitmap" name="16-enumerator">bitmaps\16-enumerator.png</object>
-  <object class="wxBitmap" name="16-enumerator@2x">bitmaps\16-enumerator@2x.png</object>
   <object class="wxBitmap" name="16-error">bitmaps\16-error.png</object>
   <object class="wxBitmap" name="16-error@2x">bitmaps\16-error@2x.png</object>
   <object class="wxBitmap" name="16-executable">bitmaps\16-executable.png</object>
@@ -59,20 +51,18 @@
   <object class="wxBitmap" name="16-gtk@2x">bitmaps\16-gtk@2x.png</object>
   <object class="wxBitmap" name="16-help">bitmaps\16-help.png</object>
   <object class="wxBitmap" name="16-help@2x">bitmaps\16-help@2x.png</object>
-  <object class="wxBitmap" name="16-history">bitmaps\16-history.png</object>
-  <object class="wxBitmap" name="16-history@2x">bitmaps\16-history@2x.png</object>
   <object class="wxBitmap" name="16-home">bitmaps\16-home.png</object>
   <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
   <object class="wxBitmap" name="16-info">bitmaps\16-info.png</object>
   <object class="wxBitmap" name="16-info@2x">bitmaps\16-info@2x.png</object>
-  <object class="wxBitmap" name="16-macro">bitmaps\16-macro.png</object>
-  <object class="wxBitmap" name="16-macro@2x">bitmaps\16-macro@2x.png</object>
   <object class="wxBitmap" name="16-marker">bitmaps\16-marker.png</object>
   <object class="wxBitmap" name="16-marker@2x">bitmaps\16-marker@2x.png</object>
   <object class="wxBitmap" name="16-member_protected">bitmaps\16-member_protected.png</object>
   <object class="wxBitmap" name="16-member_protected@2x">bitmaps\16-member_protected@2x.png</object>
   <object class="wxBitmap" name="16-member_public">bitmaps\16-member_public.png</object>
   <object class="wxBitmap" name="16-member_public@2x">bitmaps\16-member_public@2x.png</object>
+  <object class="wxBitmap" name="16-mime-xml">bitmaps\16-mime-xml.png</object>
+  <object class="wxBitmap" name="16-mime-xml@2x">bitmaps\16-mime-xml@2x.png</object>
   <object class="wxBitmap" name="16-minus">bitmaps\16-minus.png</object>
   <object class="wxBitmap" name="16-minus@2x">bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="16-ok">bitmaps\16-ok.png</object>
@@ -87,8 +77,6 @@
   <object class="wxBitmap" name="16-show_current_line@2x">bitmaps\16-show_current_line@2x.png</object>
   <object class="wxBitmap" name="16-struct">bitmaps\16-struct.png</object>
   <object class="wxBitmap" name="16-struct@2x">bitmaps\16-struct@2x.png</object>
-  <object class="wxBitmap" name="16-tools">bitmaps\16-tools.png</object>
-  <object class="wxBitmap" name="16-tools@2x">bitmaps\16-tools@2x.png</object>
   <object class="wxBitmap" name="16-typedef">bitmaps\16-typedef.png</object>
   <object class="wxBitmap" name="16-typedef@2x">bitmaps\16-typedef@2x.png</object>
   <object class="wxBitmap" name="16-whole-word">bitmaps\16-whole-word.png</object>
@@ -187,8 +175,8 @@
   <object class="wxBitmap" name="BMP_PS_UNKNOWN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
-  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\diff-copy-file-left-to-right1.png</object>
-  <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\diff-copy-left-to-right2.png</object>
+  <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\runDebug.ico</object>
+  <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\runRelease.ico</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop@2x.png</object>
@@ -219,20 +207,37 @@
   <object class="wxBitmap" name="BMP_WARNING16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-warning@2x.png</object>
   <object class="wxBitmap" name="BMP_WPT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\abb-export.png</object>
   <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
+  <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
   <object class="wxBitmap" name="arrow-up">bitmaps\arrow-up.png</object>
   <object class="wxBitmap" name="back-16">bitmaps\back-16.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="book_green">bitmaps\book_green.png</object>
   <object class="wxBitmap" name="book_red">bitmaps\book_red.png</object>
+  <object class="wxBitmap" name="bookmark-new-list">bitmaps\bookmark-new-list.png</object>
+  <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
+  <object class="wxBitmap" name="bug (2)">bitmaps\bug (2).png</object>
+  <object class="wxBitmap" name="bug-go">bitmaps\bug-go.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
+  <object class="wxBitmap" name="cube_green">bitmaps\cube_green.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
-  <object class="wxBitmap" name="diff-copy-left-to-right2">bitmaps\diff-copy-left-to-right2.png</object>
+  <object class="wxBitmap" name="document-open-recent">bitmaps\document-open-recent.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
+  <object class="wxBitmap" name="folder-txt">bitmaps\folder-txt.png</object>
   <object class="wxBitmap" name="git-arrow-down">bitmaps\git-arrow-down.png</object>
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>
+  <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
+  <object class="wxBitmap" name="media-repeat-blue">bitmaps\media-repeat-blue.png</object>
   <object class="wxBitmap" name="mill">bitmaps\mill.png</object>
   <object class="wxBitmap" name="next-16">bitmaps\next-16.png</object>
+  <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
+  <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
+  <object class="wxBitmap" name="php-project-settings">bitmaps\php-project-settings.png</object>
   <object class="wxBitmap" name="resize">bitmaps\resize.png</object>
-  <object class="wxBitmap" name="settings">bitmaps\settings.png</object>
-  <object class="wxBitmap" name="virtual-folder">bitmaps\virtual-folder.png</object>
+  <object class="wxBitmap" name="runRelease">bitmaps\Icons\runRelease.ico</object>
+  <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
+  <object class="wxBitmap" name="setting_tools">bitmaps\setting_tools.png</object>
+  <object class="wxBitmap" name="start-here">bitmaps\start-here.png</object>
+  <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
+  <object class="wxBitmap" name="toggle_log-2">bitmaps\toggle_log-2.png</object>
+  <object class="wxBitmap" name="tools-report-bug1">bitmaps\tools-report-bug1.png</object>
 </resource>
