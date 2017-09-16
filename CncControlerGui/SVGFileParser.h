@@ -240,8 +240,8 @@ class SVGFileParser : public SVGNodeParser {
 		
 		SVGPathHandlerCnc* getPathHandler() { return pathHandler; }
 		
-		bool processRelease();
-		bool processDebug();
+		virtual bool processRelease();
+		virtual bool processDebug();
 		
 		bool pause();
 		bool isPause() { return runInfo.getPauseFlag(); }

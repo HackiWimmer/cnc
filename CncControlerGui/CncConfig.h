@@ -36,7 +36,6 @@ class CncConfig {
 		bool referenceIncludesWpt;
 
 		double routerBitDiameter;
-		double drawPaneZoomFactor;
 		
 		// tracing/monitoring options
 		bool onlineUpdateCoordinates;
@@ -83,7 +82,6 @@ class CncConfig {
 		, maxZDistance(50.0)
 		, referenceIncludesWpt(false)
 		, routerBitDiameter(0.0)
-		, drawPaneZoomFactor(1)
 		, onlineUpdateCoordinates(true)
 		, onlineUpdateDrawPane(true)
 		, allowEventHandling(true)
@@ -117,7 +115,6 @@ class CncConfig {
 		, maxZDistance(cc.getMaxZDistance())
 		, referenceIncludesWpt(cc.getReferenceIncludesWpt())
 		, routerBitDiameter(cc.getRouterBitDiameter())
-		, drawPaneZoomFactor(cc.getDrawPaneZoomFactor())
 		, onlineUpdateCoordinates(cc.isOnlineUpdateCoordinates())
 		, onlineUpdateDrawPane(cc.isOnlineUpdateDrawPane())
 		, allowEventHandling(cc.isAllowEventHandling())
@@ -482,9 +479,6 @@ class CncConfig {
 		int getUpdateInterval() { return updateInterval; }
 		CncConfig& setUpdateInterval(int i) { sc(); updateInterval=i; return *this; }
 		
-		////////////////////////////////////////////////////////////////////////
-		double getDrawPaneZoomFactor() { return drawPaneZoomFactor; }
-		CncConfig& setDrawPaneZoomFactor(double f) { sc(); drawPaneZoomFactor = f; return *this; }
 };
 
 #endif

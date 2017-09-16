@@ -116,12 +116,6 @@ void SerialEmulatorSVG::streamSvgBody(std::fstream& fs) {
 		
 		// modify with resepect to current coorinate system
 		wxString rs("1"), rt("0");
-		if ( svgOutputParameters.coordSystemType == CST_NULL_Y_IS_BOTTOM ) {
-			const unsigned int offset = 5;
-			rs 	= "-1";
-			rt 	= wxString::Format("%f", -(xyWatermarksAsPx.yMax + offset));
-		}
-
 		while ( getline (pfs, line) ) {
 			wxString l(line);
 			// replace placeholders

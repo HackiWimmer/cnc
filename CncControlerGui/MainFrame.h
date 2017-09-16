@@ -67,8 +67,7 @@ class MainFrame : public MainFrameBClass {
 		virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
 
 	protected:
-    virtual void searchAvailiablePorts(wxCommandEvent& event);
-    virtual void unitTestFramework(wxCommandEvent& event);
+
 
    
 		// will be bind to this frame
@@ -148,8 +147,8 @@ class MainFrame : public MainFrameBClass {
 		void highlightTplPreview(bool state);
 		const char* getSvgEmuFileName(wxString& ret);
 		
-		bool openFileExtern(wxString& tool, const char* file);
-		bool openFileExtern(wxString& tool, wxString& file);
+		bool openFileExtern(const wxString& tool, const char* file);
+		bool openFileExtern(const wxString& tool, wxString& file);
 		
 		const char* getBlankHtmlPage();
 		const char* getErrorHtmlPage(const wxString& errorInfo);
@@ -263,7 +262,7 @@ class MainFrame : public MainFrameBClass {
 		void hideAuiPane(const wxString& name);
 		
 		void hideAllAuiPanes();
-		void viewAllAuiPanes();
+		void viewAllAuiPanes(bool withSpy=false);
 		
 		wxWindow* getAUIPaneByName(const wxString& name);
 		wxMenuItem* getAUIMenuByName(const wxString& name);
@@ -296,6 +295,8 @@ class MainFrame : public MainFrameBClass {
 		void decorateSerialSpy();
 		
 		void clearSerialSpy();
+		
+		void activate3DPerspectiveButton(wxButton* bt);
 
 		///////////////////////////////////////////////////////////////
 		// manually control
@@ -306,10 +307,6 @@ class MainFrame : public MainFrameBClass {
 		///////////////////////////////////////////////////////////////
 		// misc
 				
-		CoordinateSytemType getCoordinateSytemType();
-		void setCoordinateSystemType();
-		double getDrawPaneFactor();
-		
 		void dispatch();
 		
 		void setZero();
@@ -339,6 +336,11 @@ class MainFrame : public MainFrameBClass {
 		
 	protected:
 		// User command
+		virtual void viewStatusbar(wxCommandEvent& event);
+		virtual void openPrevFile1(wxCommandEvent& event);
+		virtual void openPrevFile2(wxCommandEvent& event);
+		virtual void searchAvailiablePorts(wxCommandEvent& event);
+		virtual void unitTestFramework(wxCommandEvent& event);
 		virtual void traceTimer(wxTimerEvent& event);
 		virtual void selectUCChangeFrom(wxCommandEvent& event);
 		virtual void selectUCUnitFrom(wxCommandEvent& event);
@@ -346,9 +348,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void closeUnitCalculator(wxCommandEvent& event);
 		virtual void emuContentDClick(wxMouseEvent& event);
 		virtual void fileContentDClick(wxMouseEvent& event);
-		virtual void changeDrawPaneZoom(wxCommandEvent& event);
-		virtual void onMouseWheelDrawPane(wxMouseEvent& event);
-		virtual void onKeyDownDrawPane(wxKeyEvent& event);
 		virtual void update3DDrawOptions(wxCommandEvent& event);
 		virtual void viewSpeed(wxCommandEvent& event);
 		virtual void viewUnitCalculator(wxCommandEvent& event);
@@ -356,9 +355,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void viewSpy(wxCommandEvent& event);
 		virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event);
 		virtual void requestErrorCount(wxCommandEvent& event);
-		virtual void paintXAxisMarkerBottom(wxPaintEvent& event);
-		virtual void paintXAxisMarkerTop(wxPaintEvent& event);
-		virtual void paintYAxisMarker(wxPaintEvent& event);
 		virtual void paintDrawPaneWindow(wxPaintEvent& event);
 		virtual void UpdateLogger(wxCommandEvent& event);
 		virtual void perspectiveDefault(wxCommandEvent& event);
@@ -372,7 +368,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void clearSerialSpy(wxCommandEvent& event);
 		virtual void freezeLogger(wxCommandEvent& event);
 		virtual void show3DPaneHelp(wxCommandEvent& event);
-		virtual void selectedPlane3D(wxCommandEvent& event);
 		virtual void spin3DAngelX(wxSpinEvent& event);
 		virtual void spin3DAngelY(wxSpinEvent& event);
 		virtual void spin3DAngelZ(wxSpinEvent& event);
@@ -397,8 +392,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void testDimTakeOverX(wxCommandEvent& event);
 		virtual void testDimTakeOverY(wxCommandEvent& event);
 		virtual void testDimTakeOverZ(wxCommandEvent& event);
-		virtual void thumbRelease3D(wxScrollWinEvent& event);
-		virtual void thumbtrack3D(wxScrollWinEvent& event);
 		virtual void refresh3D(wxCommandEvent& event);
 		virtual void animate3D(wxCommandEvent& event);
 		virtual void clear3D(wxCommandEvent& event);
@@ -436,13 +429,10 @@ class MainFrame : public MainFrameBClass {
 		virtual void rcStop(wxCommandEvent& event);
 		virtual void switchMonitoring(wxCommandEvent& event);
 		virtual void fileContentChange(wxStyledTextEvent& event);
-		virtual void switchCoordinateSystemTypeSvgOut(wxCommandEvent& event);
 		virtual void viewToolbar(wxCommandEvent& event);
 		virtual void renderAuiPane(wxAuiManagerEvent& event);
 		virtual void restoreAuiPane(wxAuiManagerEvent& event);
 		virtual void maximizeAuiPane(wxAuiManagerEvent& event);
-		virtual void selectGridPosUnit(wxCommandEvent& event);
-		virtual void switchCoordinateSystemType(wxCommandEvent& event);
 		virtual void fileContentKeyUp(wxKeyEvent& event);
 		virtual void saveTemplateFromButton(wxCommandEvent& event);
 		virtual void marginClickEmuSource(wxStyledTextEvent& event);
@@ -455,8 +445,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void OpenXmlTrace(wxCommandEvent& event);
 		virtual void openXMLTraceAsText(wxCommandEvent& event);
 		virtual void closeAuiPane(wxAuiManagerEvent& evt);
-		virtual void gridDrawPane(wxCommandEvent& event);
-		virtual void traceDrawPane(wxCommandEvent& event);
 		virtual void svgEmuZoomHome(wxCommandEvent& event);
 		virtual void svgEmuZoomMinus(wxCommandEvent& event);
 		virtual void svgEmuZoomPlus(wxCommandEvent& event);
@@ -494,8 +482,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void fileContentLeftDown(wxMouseEvent& event);
 		virtual void fileContentKeyDown(wxKeyEvent& event);
 		virtual void svgEmuClear(wxCommandEvent& event);
-		virtual void onLeaveDrawPane(wxMouseEvent& event);
-		virtual void onMotionDrawPane(wxMouseEvent& event);
 		virtual void updateFlySpeedXY(wxCommandEvent& event);
 		virtual void updateWorkSpeedXY(wxCommandEvent& event);
 		virtual void updateWorkSpeedZ(wxCommandEvent& event);
@@ -517,7 +503,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void requestEnableStepperMotors(wxCommandEvent& event);
 		virtual void keyDownZ(wxKeyEvent& event);
 		virtual void keyDownXY(wxKeyEvent& event);
-		virtual void clearDrawPane(wxCommandEvent& event);
 		virtual void changeUpdateInterval(wxCommandEvent& event);
 		virtual void emergencyStop(wxCommandEvent& event);
 		virtual void defineDebugSerial(wxCommandEvent& event);
@@ -536,7 +521,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void defineUpdateCoordinates(wxCommandEvent& event);
 		virtual void defineAllowEvents(wxCommandEvent& event);
 		virtual void defineOnlineDrawing(wxCommandEvent& event);
-		virtual void onPaintDrawPane(wxPaintEvent& event);
 		virtual void mvSpinDownY(wxSpinEvent& event);
 		virtual void mvSpinDownZ(wxSpinEvent& event);
 		virtual void mvSpinUpZ(wxSpinEvent& event);

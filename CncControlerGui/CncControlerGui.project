@@ -138,14 +138,12 @@
       <File Name="CncLimitStates.h"/>
       <File Name="CncPathListEntry.h"/>
       <File Name="CncPosition.h"/>
-      <File Name="CncPositionMarker.h"/>
       <File Name="CncStreamBuffers.h"/>
       <File Name="CncSvgCurveLib.h"/>
       <File Name="CncToolCorrection.h"/>
       <File Name="CncToolStateControl.h"/>
       <File Name="CncWorkingParameters.h"/>
       <File Name="CommandTemplates.h"/>
-      <File Name="CoordinateSystem.h"/>
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
       <File Name="CncStreamBuffers.cpp"/>
@@ -257,11 +255,12 @@
       <Compiler Options="-pg;-g;-O0;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
-        <IncludePath Value="C:\@Development\wxWidgets-3.1.0\src\stc\scintilla\include"/>
+        <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="DEBUG"/>
         <Preprocessor Value="USE_WXCRAFTER"/>
       </Compiler>
       <Linker Options="-pg;-mwindows;$(shell wx-config --libs)" Required="yes">
+        <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
@@ -269,6 +268,7 @@
         <Library Value="libwxmsw31u_gl"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
+        <Library Value="libfreeglut"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -308,11 +308,13 @@
       <Compiler Options="-Ofast;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-Ofast;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
+        <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="USE_WXCRAFTER"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
+        <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
@@ -320,6 +322,7 @@
         <Library Value="libwxmsw31u_gl"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
+        <Library Value="libfreeglut"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D NDEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>

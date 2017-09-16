@@ -91,6 +91,10 @@ class GCodeFileParser : public SVGFileParser {
 		
 		// overridden from SVGFileParser
 		virtual bool createPreview(const wxString& resultingFileName, bool withErrorInfo);
+		
+		
+		virtual bool processRelease();
+		virtual bool processDebug();
 };
 
 #endif

@@ -11,8 +11,6 @@
   <object class="wxBitmap" name="16-class@2x">bitmaps\16-class@2x.png</object>
   <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
   <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
-  <object class="wxBitmap" name="16-cmake">bitmaps\16-cmake.png</object>
-  <object class="wxBitmap" name="16-cmake@2x">bitmaps\16-cmake@2x.png</object>
   <object class="wxBitmap" name="16-cog">bitmaps\16-cog.png</object>
   <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
@@ -23,8 +21,6 @@
   <object class="wxBitmap" name="16-cscope@2x">bitmaps\16-cscope@2x.png</object>
   <object class="wxBitmap" name="16-database">bitmaps\16-database.png</object>
   <object class="wxBitmap" name="16-database@2x">bitmaps\16-database@2x.png</object>
-  <object class="wxBitmap" name="16-db-column">bitmaps\16-db-column.png</object>
-  <object class="wxBitmap" name="16-db-column@2x">bitmaps\16-db-column@2x.png</object>
   <object class="wxBitmap" name="16-debugger_restart">bitmaps\16-debugger_restart.png</object>
   <object class="wxBitmap" name="16-debugger_restart@2x">bitmaps\16-debugger_restart@2x.png</object>
   <object class="wxBitmap" name="16-dll">bitmaps\16-dll.png</object>
@@ -206,10 +202,18 @@
   <object class="wxBitmap" name="BMP_WARNING16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-warning@2x.png</object>
   <object class="wxBitmap" name="BMP_WARNING16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-warning@2x.png</object>
   <object class="wxBitmap" name="BMP_WPT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\abb-export.png</object>
+  <object class="wxBitmap" name="ViewButtom">bitmaps\ViewButtom.png</object>
+  <object class="wxBitmap" name="ViewDown">bitmaps\ViewDown.png</object>
+  <object class="wxBitmap" name="ViewFront">bitmaps\ViewFront.png</object>
+  <object class="wxBitmap" name="ViewIso1">bitmaps\ViewIso1.png</object>
+  <object class="wxBitmap" name="ViewIso2">bitmaps\ViewIso2.png</object>
+  <object class="wxBitmap" name="ViewIso3">bitmaps\ViewIso3.png</object>
+  <object class="wxBitmap" name="ViewIso4">bitmaps\ViewIso4.png</object>
+  <object class="wxBitmap" name="ViewLeft">bitmaps\ViewLeft.png</object>
+  <object class="wxBitmap" name="ViewRight">bitmaps\ViewRight.png</object>
+  <object class="wxBitmap" name="ViewUp">bitmaps\ViewUp.png</object>
   <object class="wxBitmap" name="abb-import">bitmaps\abb-import.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
-  <object class="wxBitmap" name="arrow-up">bitmaps\arrow-up.png</object>
-  <object class="wxBitmap" name="back-16">bitmaps\back-16.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="book_green">bitmaps\book_green.png</object>
   <object class="wxBitmap" name="book_red">bitmaps\book_red.png</object>
@@ -223,12 +227,10 @@
   <object class="wxBitmap" name="document-open-recent">bitmaps\document-open-recent.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="folder-txt">bitmaps\folder-txt.png</object>
-  <object class="wxBitmap" name="git-arrow-down">bitmaps\git-arrow-down.png</object>
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>
   <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
   <object class="wxBitmap" name="media-repeat-blue">bitmaps\media-repeat-blue.png</object>
   <object class="wxBitmap" name="mill">bitmaps\mill.png</object>
-  <object class="wxBitmap" name="next-16">bitmaps\next-16.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
   <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
   <object class="wxBitmap" name="php-project-settings">bitmaps\php-project-settings.png</object>
@@ -236,7 +238,6 @@
   <object class="wxBitmap" name="runRelease">bitmaps\Icons\runRelease.ico</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="setting_tools">bitmaps\setting_tools.png</object>
-  <object class="wxBitmap" name="start-here">bitmaps\start-here.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="toggle_log-2">bitmaps\toggle_log-2.png</object>
   <object class="wxBitmap" name="tools-report-bug1">bitmaps\tools-report-bug1.png</object>

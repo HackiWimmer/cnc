@@ -198,6 +198,28 @@ void GCodeFileParser::setDefaultParameters() {
 	programEnd = false;
 }
 //////////////////////////////////////////////////////////////////
+bool GCodeFileParser::processRelease() {
+//////////////////////////////////////////////////////////////////
+
+	//todo
+	return SVGFileParser::processRelease();
+
+	
+	cncControl->moveLinearMetricXYZ(10, 10, 10, false);
+	//MessageBoxA(0,"","",0);
+
+
+
+	return true;
+	
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParser::processDebug() {
+//////////////////////////////////////////////////////////////////
+	//todo
+	return SVGFileParser::processDebug();
+}
+//////////////////////////////////////////////////////////////////
 bool GCodeFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 	setDefaultParameters();
@@ -494,6 +516,9 @@ void GCodeFileParser::processSvgPath() {
 	if ( previewMode == true ) {
 		preview << "<path d=\"";
 		preview << svgPath.getPath();
+		
+// todo
+//clog << svgPath.getPath() << endl;
 		preview << "\"";
 		preview << " fill=\"none\" stroke=\"black\" stroke-width=\"1.0\"";
 		preview << " transform=\"scale(0.5)\""; //todo mirrow svg
@@ -506,6 +531,10 @@ void GCodeFileParser::processSvgPath() {
 bool GCodeFileParser::processRapidLinearMove(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	updateCurrentPxPosition(gcb);
+	
+			//todo
+			if ( gcb.hasZ() )
+				//clog << gcb.block << endl;
 	
 	if ( svgPath.available() ) {
 		if ( svgPath.hasLinearMove() ) {

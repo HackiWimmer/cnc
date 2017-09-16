@@ -117,10 +117,10 @@ template<class T> class CncPointPair3D {
 		CncPoint3D<T> p1;
 		CncPoint3D<T> p2;
 		
-		const wxColour defaultDrawColour = *wxWHITE;
+		wxColour defaultDrawColour = *wxWHITE;
 		wxColour drawColor;
 		
-		const int defaultLineStyle = wxSOLID;
+		int defaultLineStyle = wxSOLID;
 		int lineStyle;
 	
 	public:
@@ -135,7 +135,7 @@ template<class T> class CncPointPair3D {
 			p2.reint();
 		}
 		///////////////////////////////////////////////////////
-		CncPointPair3D (const CncPointPair3D& from) 
+		CncPointPair3D (const CncPointPair3D<T>& from) 
 		///////////////////////////////////////////////////////
 		: drawColor(from.getDrawColour())
 		, lineStyle(from.getLineStyle())
@@ -237,5 +237,7 @@ typedef CncPointPair3D<int> 		IntPointPair3D;
 typedef CncPointPair3D<long> 		LongPointPair3D;
 typedef CncPointPair3D<double> 		DoublePointPair3D;
 typedef CncPointPair3D<float> 		FloatPointPair3D;
+
+typedef std::vector<DoublePointPair3D> DrawPaneData;
 
 #endif

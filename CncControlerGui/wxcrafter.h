@@ -247,8 +247,6 @@ protected:
     wxPanel* m_setupApp;
     wxStaticText* m_staticText779122;
     wxStaticLine* m_staticLine957233;
-    wxStaticText* m_staticText123753;
-    wxComboBox* m_cbRunMotionMonitorMode;
     wxStaticText* m_staticText12375;
     wxComboBox* m_cbRunConfirmationMode;
     wxPanel* m_panelTesting;
@@ -433,7 +431,10 @@ protected:
     wxWebView* m_svgPreview;
 #endif // wxUSE_WEBVIEW
 
-    wxTextCtrl* m_svgPreviewFileName;
+    wxButton* m_openPrevFile1;
+    wxTextCtrl* m_svgPreviewFileName1;
+    wxButton* m_openPrevFile2;
+    wxTextCtrl* m_svgPreviewFileName2;
     wxPanel* m_panelSpeed;
     wxStaticText* m_staticText28052;
     CncSpeedView* m_speedView;
@@ -524,68 +525,23 @@ protected:
     wxStaticText* m_staticText128314;
     wxButton* m_btRequestCtlErrorInfo;
     wxDataViewListCtrl* m_dvListCtrlControllerErrorInfo;
-    wxPanel* m_outPanel;
-    wxStaticText* m_staticText1048;
+    wxPanel* m_3DPane;
+    wxStaticText* m_staticText10481;
     CncZView* m_zView;
     wxStaticText* m_infoToolDiameter;
-    wxStaticBitmap* m_staticBitmap2401;
+    wxStaticBitmap* m_staticBitmap3490;
     wxStaticBitmap* m_lableWorkpieceThickness;
     wxStaticBitmap* m_toolStateTrafficLight;
-    wxStaticText* m_staticText16032;
-    wxComboBox* m_cbCurveLibResolution;
-    wxBitmapToggleButton* m_switchCoordType;
     wxBitmapToggleButton* m_switchMonitoing;
-    wxBitmapToggleButton* m_gridDrawPane;
-    wxButton* m_traceDrawPane;
-    wxButton* m_clearDrawPane;
-    wxStaticText* m_staticText1054;
-    wxComboBox* m_cbUpdateInterval;
-    wxScrolledWindow* m_drawPaneWindow;
-    wxPanel* m_panel3281;
-    wxPanel* m_yAxisMarker;
-    wxPanel* m_panel32812;
-    wxPanel* m_xAxisMarkerTop;
-    wxPanel* m_drawPane;
-    wxPanel* m_xAxisMarkerBottom;
-    wxStaticText* m_staticText1950;
-    wxComboBox* m_gridPosUnit;
-    wxStaticText* m_staticText3169;
-    wxComboBox* m_cbDrawPaneZoom;
-    wxStaticText* m_staticText1943;
-    wxTextCtrl* m_drawPainPositionX;
-    wxStaticText* m_staticText19431;
-    wxTextCtrl* m_drawPainPositionY;
-    wxStaticText* m_staticText1128;
-    wxTextCtrl* m_crossings;
-    wxStaticText* m_staticText1966;
-    wxTextCtrl* m_passingCount;
-    wxStaticText* m_staticText1696;
-    wxStaticText* m_minPosX;
-    wxStaticText* m_minPosY;
-    wxStaticText* m_minPosZ;
-    wxStaticText* m_staticText1694;
-    wxStaticText* m_maxPosX;
-    wxStaticText* m_maxPosY;
-    wxStaticText* m_maxPosZ;
-    wxPanel* m_3DPane;
+    wxStaticLine* m_staticLine3525;
     wxButton* m_3D_Animate;
     wxButton* m_3D_Refreh;
     wxButton* m_3D_Clear;
-    wxStaticLine* m_staticLine2348;
-    wxButton* m_3D_Top;
-    wxButton* m_3D_Bottom;
-    wxButton* m_3D_Front;
-    wxButton* m_3D_Rear;
-    wxButton* m_3D_Left;
-    wxButton* m_3D_Right4;
-    wxButton* m_3D_Perspective;
-    wxStaticLine* m_staticLine2341;
-    wxButton* m_button2345;
-    wxStaticLine* m_staticLine2343;
-    wxStaticText* m_staticText2329;
-    wxStaticText* m_staticText2331;
-    wxStaticText* m_staticText2333;
-    wxPanel* m_panel2590;
+    wxStaticText* m_staticText16032;
+    wxComboBox* m_cbCurveLibResolution;
+    wxStaticText* m_staticText10543;
+    wxComboBox* m_cbUpdateInterval;
+    wxPanel* m_3DOutboundControl;
     wxPanel* m_drawPane3D;
     wxTextCtrl* m_trace3D;
     wxPanel* m_panel2696;
@@ -594,20 +550,45 @@ protected:
     wxCheckBox* m_cb3DDrawWorkpieceSurfacePlane;
     wxCheckBox* m_cb3DDrawWorkpieceOffset;
     wxStaticLine* m_staticLine3129;
-    wxComboBox* m_planeSelect3D;
     wxStaticText* m_staticText268320;
     wxSpinCtrl* m_spin3DAngelX;
     wxStaticText* m_staticText268522;
     wxSpinCtrl* m_spin3DAngelY;
     wxStaticText* m_staticText268118;
     wxSpinCtrl* m_spin3DAngelZ;
-    wxButton* m_button2710;
+    wxButton* m_bt3DHelp;
+    wxButton* m_3D_Top;
+    wxButton* m_3D_Bottom;
+    wxButton* m_3D_Front;
+    wxButton* m_3D_Rear;
+    wxButton* m_3D_Left;
+    wxButton* m_3D_Right;
+    wxStaticLine* m_staticLine3483;
+    wxButton* m_3D_Perspective1;
+    wxButton* m_3D_Perspective2;
+    wxButton* m_3D_Perspective3;
+    wxButton* m_3D_Perspective4;
+    wxStaticLine* m_staticLine2341;
+    wxStaticText* m_staticText2329;
+    wxStaticText* m_staticText2331;
+    wxStaticText* m_staticText2333;
+    wxStaticText* m_staticText1128;
+    wxTextCtrl* m_crossings;
+    wxStaticText* m_staticText1966;
+    wxTextCtrl* m_passingCount;
+    wxStaticText* m_staticText16966;
+    wxStaticText* m_minPosX;
+    wxStaticText* m_minPosY;
+    wxStaticText* m_minPosZ;
+    wxStaticText* m_staticText169410;
+    wxStaticText* m_maxPosX;
+    wxStaticText* m_maxPosY;
+    wxStaticText* m_maxPosZ;
     wxPanel* m_svgEmuResult;
     wxButton* m_svgEmuOpenFileAsSource;
     wxButton* m_svgEmuOpenFileAsSvg;
     wxButton* m_svgEmuReload;
     wxButton* m_svgEmuClear;
-    wxBitmapToggleButton* m_switchCoordTypeSvgOut;
     wxButton* m_svgEmuToggleOrigPath;
     wxButton* m_svgEmuZoomHome;
     wxButton* m_svgEmuZoomMinus;
@@ -661,6 +642,7 @@ protected:
     wxMenuItem* m_miPerspectiveTemplate;
     wxMenuItem* m_menuItem2771;
     wxMenuItem* m_miToolbar;
+    wxMenuItem* m_miViewStatusbar;
     wxMenuItem* m_miViewMainView;
     wxMenuItem* m_miViewTemplateManager;
     wxMenuItem* m_miViewLogger;
@@ -858,6 +840,8 @@ protected:
     virtual void selectSvgDebuggerInfoDetail(wxDataViewEvent& event) { event.Skip(); }
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
+    virtual void openPrevFile1(wxCommandEvent& event) { event.Skip(); }
+    virtual void openPrevFile2(wxCommandEvent& event) { event.Skip(); }
     virtual void leaveEnterFileManagerControl(wxMouseEvent& event) { event.Skip(); }
     virtual void lruListItemActivated(wxCommandEvent& event) { event.Skip(); }
     virtual void lruListItemSelected(wxCommandEvent& event) { event.Skip(); }
@@ -883,37 +867,13 @@ protected:
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateCurveLibResolution(wxCommandEvent& event) { event.Skip(); }
-    virtual void switchCoordinateSystemType(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
-    virtual void gridDrawPane(wxCommandEvent& event) { event.Skip(); }
-    virtual void traceDrawPane(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearDrawPane(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeUpdateInterval(wxCommandEvent& event) { event.Skip(); }
-    virtual void paintDrawPaneWindow(wxPaintEvent& event) { event.Skip(); }
-    virtual void paintYAxisMarker(wxPaintEvent& event) { event.Skip(); }
-    virtual void paintXAxisMarkerTop(wxPaintEvent& event) { event.Skip(); }
-    virtual void onPaintDrawPane(wxPaintEvent& event) { event.Skip(); }
-    virtual void onMotionDrawPane(wxMouseEvent& event) { event.Skip(); }
-    virtual void onLeaveDrawPane(wxMouseEvent& event) { event.Skip(); }
-    virtual void onKeyDownDrawPane(wxKeyEvent& event) { event.Skip(); }
-    virtual void onMouseWheelDrawPane(wxMouseEvent& event) { event.Skip(); }
-    virtual void paintXAxisMarkerBottom(wxPaintEvent& event) { event.Skip(); }
-    virtual void selectGridPosUnit(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeDrawPaneZoom(wxCommandEvent& event) { event.Skip(); }
     virtual void animate3D(wxCommandEvent& event) { event.Skip(); }
     virtual void refresh3D(wxCommandEvent& event) { event.Skip(); }
     virtual void clear3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromRear3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void show3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void runOpenGLTest(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateCurveLibResolution(wxCommandEvent& event) { event.Skip(); }
+    virtual void changeUpdateInterval(wxCommandEvent& event) { event.Skip(); }
     virtual void update3DDrawOptions(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectedPlane3D(wxCommandEvent& event) { event.Skip(); }
     virtual void spin3DAngelX(wxSpinEvent& event) { event.Skip(); }
     virtual void update3DAngelX(wxCommandEvent& event) { event.Skip(); }
     virtual void spin3DAngelY(wxSpinEvent& event) { event.Skip(); }
@@ -921,11 +881,17 @@ protected:
     virtual void spin3DAngelZ(wxSpinEvent& event) { event.Skip(); }
     virtual void update3DAngelZ(wxCommandEvent& event) { event.Skip(); }
     virtual void show3DPaneHelp(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromRear3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSource(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuReload(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuClear(wxCommandEvent& event) { event.Skip(); }
-    virtual void switchCoordinateSystemTypeSvgOut(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuToogleOriginalPath(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuZoomHome(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuZoomMinus(wxCommandEvent& event) { event.Skip(); }
@@ -956,6 +922,7 @@ protected:
     virtual void perspectiveRun(wxCommandEvent& event) { event.Skip(); }
     virtual void perspectiveTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void viewToolbar(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewStatusbar(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void viewTemplateManager(wxCommandEvent& event) { event.Skip(); }
     virtual void viewLogger(wxCommandEvent& event) { event.Skip(); }
@@ -1149,8 +1116,6 @@ public:
     wxPanel* GetSetupEnvPage() { return m_setupEnvPage; }
     wxStaticText* GetStaticText779122() { return m_staticText779122; }
     wxStaticLine* GetStaticLine957233() { return m_staticLine957233; }
-    wxStaticText* GetStaticText123753() { return m_staticText123753; }
-    wxComboBox* GetCbRunMotionMonitorMode() { return m_cbRunMotionMonitorMode; }
     wxStaticText* GetStaticText12375() { return m_staticText12375; }
     wxComboBox* GetCbRunConfirmationMode() { return m_cbRunConfirmationMode; }
     wxPanel* GetSetupApp() { return m_setupApp; }
@@ -1332,7 +1297,10 @@ public:
     wxPanel* GetPanelTplDebugger() { return m_panelTplDebugger; }
     wxStaticText* GetSvgFilePreviewHint() { return m_svgFilePreviewHint; }
     wxWebView* GetSvgPreview() { return m_svgPreview; }
-    wxTextCtrl* GetSvgPreviewFileName() { return m_svgPreviewFileName; }
+    wxButton* GetOpenPrevFile1() { return m_openPrevFile1; }
+    wxTextCtrl* GetSvgPreviewFileName1() { return m_svgPreviewFileName1; }
+    wxButton* GetOpenPrevFile2() { return m_openPrevFile2; }
+    wxTextCtrl* GetSvgPreviewFileName2() { return m_svgPreviewFileName2; }
     wxPanel* GetPanelTplPreview() { return m_panelTplPreview; }
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetPanelTemplateContent() { return m_panelTemplateContent; }
@@ -1426,66 +1394,21 @@ public:
     wxPanel* GetControllerErrorInfo() { return m_controllerErrorInfo; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
-    wxStaticText* GetStaticText1048() { return m_staticText1048; }
+    wxStaticText* GetStaticText10481() { return m_staticText10481; }
     CncZView* GetZView() { return m_zView; }
     wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
-    wxStaticBitmap* GetStaticBitmap2401() { return m_staticBitmap2401; }
+    wxStaticBitmap* GetStaticBitmap3490() { return m_staticBitmap3490; }
     wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
     wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
-    wxStaticText* GetStaticText16032() { return m_staticText16032; }
-    wxComboBox* GetCbCurveLibResolution() { return m_cbCurveLibResolution; }
-    wxBitmapToggleButton* GetSwitchCoordType() { return m_switchCoordType; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
-    wxBitmapToggleButton* GetGridDrawPane() { return m_gridDrawPane; }
-    wxButton* GetTraceDrawPane() { return m_traceDrawPane; }
-    wxButton* GetClearDrawPane() { return m_clearDrawPane; }
-    wxStaticText* GetStaticText1054() { return m_staticText1054; }
-    wxComboBox* GetCbUpdateInterval() { return m_cbUpdateInterval; }
-    wxPanel* GetPanel3281() { return m_panel3281; }
-    wxPanel* GetYAxisMarker() { return m_yAxisMarker; }
-    wxPanel* GetPanel32812() { return m_panel32812; }
-    wxPanel* GetXAxisMarkerTop() { return m_xAxisMarkerTop; }
-    wxPanel* GetDrawPane() { return m_drawPane; }
-    wxPanel* GetXAxisMarkerBottom() { return m_xAxisMarkerBottom; }
-    wxScrolledWindow* GetDrawPaneWindow() { return m_drawPaneWindow; }
-    wxStaticText* GetStaticText1950() { return m_staticText1950; }
-    wxComboBox* GetGridPosUnit() { return m_gridPosUnit; }
-    wxStaticText* GetStaticText3169() { return m_staticText3169; }
-    wxComboBox* GetCbDrawPaneZoom() { return m_cbDrawPaneZoom; }
-    wxStaticText* GetStaticText1943() { return m_staticText1943; }
-    wxTextCtrl* GetDrawPainPositionX() { return m_drawPainPositionX; }
-    wxStaticText* GetStaticText19431() { return m_staticText19431; }
-    wxTextCtrl* GetDrawPainPositionY() { return m_drawPainPositionY; }
-    wxStaticText* GetStaticText1128() { return m_staticText1128; }
-    wxTextCtrl* GetCrossings() { return m_crossings; }
-    wxStaticText* GetStaticText1966() { return m_staticText1966; }
-    wxTextCtrl* GetPassingCount() { return m_passingCount; }
-    wxStaticText* GetStaticText1696() { return m_staticText1696; }
-    wxStaticText* GetMinPosX() { return m_minPosX; }
-    wxStaticText* GetMinPosY() { return m_minPosY; }
-    wxStaticText* GetMinPosZ() { return m_minPosZ; }
-    wxStaticText* GetStaticText1694() { return m_staticText1694; }
-    wxStaticText* GetMaxPosX() { return m_maxPosX; }
-    wxStaticText* GetMaxPosY() { return m_maxPosY; }
-    wxStaticText* GetMaxPosZ() { return m_maxPosZ; }
-    wxPanel* GetOutPanel() { return m_outPanel; }
+    wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
     wxButton* Get3D_Animate() { return m_3D_Animate; }
     wxButton* Get3D_Refreh() { return m_3D_Refreh; }
     wxButton* Get3D_Clear() { return m_3D_Clear; }
-    wxStaticLine* GetStaticLine2348() { return m_staticLine2348; }
-    wxButton* Get3D_Top() { return m_3D_Top; }
-    wxButton* Get3D_Bottom() { return m_3D_Bottom; }
-    wxButton* Get3D_Front() { return m_3D_Front; }
-    wxButton* Get3D_Rear() { return m_3D_Rear; }
-    wxButton* Get3D_Left() { return m_3D_Left; }
-    wxButton* Get3D_Right4() { return m_3D_Right4; }
-    wxButton* Get3D_Perspective() { return m_3D_Perspective; }
-    wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
-    wxButton* GetButton2345() { return m_button2345; }
-    wxStaticLine* GetStaticLine2343() { return m_staticLine2343; }
-    wxStaticText* GetStaticText2329() { return m_staticText2329; }
-    wxStaticText* GetStaticText2331() { return m_staticText2331; }
-    wxStaticText* GetStaticText2333() { return m_staticText2333; }
+    wxStaticText* GetStaticText16032() { return m_staticText16032; }
+    wxComboBox* GetCbCurveLibResolution() { return m_cbCurveLibResolution; }
+    wxStaticText* GetStaticText10543() { return m_staticText10543; }
+    wxComboBox* GetCbUpdateInterval() { return m_cbUpdateInterval; }
     wxPanel* GetDrawPane3D() { return m_drawPane3D; }
     wxTextCtrl* GetTrace3D() { return m_trace3D; }
     wxStaticText* GetStaticText3133() { return m_staticText3133; }
@@ -1493,22 +1416,47 @@ public:
     wxCheckBox* GetCb3DDrawWorkpieceSurfacePlane() { return m_cb3DDrawWorkpieceSurfacePlane; }
     wxCheckBox* GetCb3DDrawWorkpieceOffset() { return m_cb3DDrawWorkpieceOffset; }
     wxStaticLine* GetStaticLine3129() { return m_staticLine3129; }
-    wxComboBox* GetPlaneSelect3D() { return m_planeSelect3D; }
     wxStaticText* GetStaticText268320() { return m_staticText268320; }
     wxSpinCtrl* GetSpin3DAngelX() { return m_spin3DAngelX; }
     wxStaticText* GetStaticText268522() { return m_staticText268522; }
     wxSpinCtrl* GetSpin3DAngelY() { return m_spin3DAngelY; }
     wxStaticText* GetStaticText268118() { return m_staticText268118; }
     wxSpinCtrl* GetSpin3DAngelZ() { return m_spin3DAngelZ; }
-    wxButton* GetButton2710() { return m_button2710; }
+    wxButton* GetBt3DHelp() { return m_bt3DHelp; }
     wxPanel* GetPanel2696() { return m_panel2696; }
-    wxPanel* GetPanel2590() { return m_panel2590; }
+    wxPanel* Get3DOutboundControl() { return m_3DOutboundControl; }
+    wxButton* Get3D_Top() { return m_3D_Top; }
+    wxButton* Get3D_Bottom() { return m_3D_Bottom; }
+    wxButton* Get3D_Front() { return m_3D_Front; }
+    wxButton* Get3D_Rear() { return m_3D_Rear; }
+    wxButton* Get3D_Left() { return m_3D_Left; }
+    wxButton* Get3D_Right() { return m_3D_Right; }
+    wxStaticLine* GetStaticLine3483() { return m_staticLine3483; }
+    wxButton* Get3D_Perspective1() { return m_3D_Perspective1; }
+    wxButton* Get3D_Perspective2() { return m_3D_Perspective2; }
+    wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
+    wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
+    wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
+    wxStaticText* GetStaticText2329() { return m_staticText2329; }
+    wxStaticText* GetStaticText2331() { return m_staticText2331; }
+    wxStaticText* GetStaticText2333() { return m_staticText2333; }
+    wxStaticText* GetStaticText1128() { return m_staticText1128; }
+    wxTextCtrl* GetCrossings() { return m_crossings; }
+    wxStaticText* GetStaticText1966() { return m_staticText1966; }
+    wxTextCtrl* GetPassingCount() { return m_passingCount; }
+    wxStaticText* GetStaticText16966() { return m_staticText16966; }
+    wxStaticText* GetMinPosX() { return m_minPosX; }
+    wxStaticText* GetMinPosY() { return m_minPosY; }
+    wxStaticText* GetMinPosZ() { return m_minPosZ; }
+    wxStaticText* GetStaticText169410() { return m_staticText169410; }
+    wxStaticText* GetMaxPosX() { return m_maxPosX; }
+    wxStaticText* GetMaxPosY() { return m_maxPosY; }
+    wxStaticText* GetMaxPosZ() { return m_maxPosZ; }
     wxPanel* Get3DPane() { return m_3DPane; }
     wxButton* GetSvgEmuOpenFileAsSource() { return m_svgEmuOpenFileAsSource; }
     wxButton* GetSvgEmuOpenFileAsSvg() { return m_svgEmuOpenFileAsSvg; }
     wxButton* GetSvgEmuReload() { return m_svgEmuReload; }
     wxButton* GetSvgEmuClear() { return m_svgEmuClear; }
-    wxBitmapToggleButton* GetSwitchCoordTypeSvgOut() { return m_switchCoordTypeSvgOut; }
     wxButton* GetSvgEmuToggleOrigPath() { return m_svgEmuToggleOrigPath; }
     wxButton* GetSvgEmuZoomHome() { return m_svgEmuZoomHome; }
     wxButton* GetSvgEmuZoomMinus() { return m_svgEmuZoomMinus; }

@@ -29,7 +29,6 @@ CncControl::CncControl(CncPortType pt)
 , startPos(0,0,0)
 , curPos(0,0,0)
 , controllerPos(0,0,0)
-, lastDrawPoint(0,0)
 , lastDrawPoint3D(0,0,0)
 , renderMode(CncRenderAtController)
 , durationCounter(0)
@@ -37,14 +36,11 @@ CncControl::CncControl(CncPortType pt)
 , powerOn(false)
 , zAxisDown(false)
 , toolUpdateState(true)
-, showGrid(true)
 , stepDelay(0)
 , guiCtlSetup(NULL)
 , commandCounter(0)
 , positionCheck(true)
-, drawControl(NULL)
 , drawPaneMargin(30)
-, motionMonitorMode(DM_2D)
 , speedMonitorMode(DM_2D)
 {
 //////////////////////////////////////////////////////////////////
@@ -59,15 +55,8 @@ CncControl::CncControl(CncPortType pt)
 	CncConfig cc;
 	updateCncConfig(cc);
 	
-	// init coord systam
-	drawPaneCoordSystem.setup(CST_NULL_Y_IS_TOP, drawPaneMargin, drawPaneMargin);
-	
 	// init pen handler
 	penHandler.reset();
-	
-	//preallocate memory
-	drawPoints.reserve(1000 * 1000);
-	drawPoints3D.reserve(1000 * 1000);
 }
 ///////////////////////////////////////////////////////////////////
 CncControl::~CncControl() {
@@ -165,17 +154,6 @@ void CncControl::updateCncConfig(CncConfig& cc) {
 		delete cncConfig;
 	
 	cncConfig = new CncConfig(cc); 
-	
-	updateDrawPointFactors();
-}
-//////////////////////////////////////////////////////////////////
-void CncControl::setDrawPaneZoomFactor(double f) {
-///////////////////////////////////////////////////////////////////
-	cncConfig->setDrawPaneZoomFactor(f);
-	
-	posMarker.setPosition({curPos.getX() + (int)drawPaneMargin, curPos.getY() + (int)drawPaneMargin}, cncConfig->getDrawPaneZoomFactor());
-	updateDrawPointFactors();
-	initLastDrawPoint();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processSetter(unsigned char id, int32_t value) {
@@ -283,7 +261,7 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, cncConfig->getRelyThreshold()));
 	
 	if ( processSetterList(setup) ) {
-		changeWorkSpeedXY(CncSpeedFly);
+		changeWorkSpeedXY(CncSpeedFly, true);
 		
 		// reset error info
 		processCommand("r", std::cerr);
@@ -375,11 +353,7 @@ bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool already
 ///////////////////////////////////////////////////////////////////
 void CncControl::clearDrawControl() {
 ///////////////////////////////////////////////////////////////////	
-	drawPoints.clear();
 	penHandler.reset();
-	updateDrawControl();
-	
-	drawPoints3D.clear();
 	
 	if ( guiCtlSetup != NULL && guiCtlSetup->drawPane3D != NULL )
 		guiCtlSetup->drawPane3D->clear3D();
@@ -387,33 +361,7 @@ void CncControl::clearDrawControl() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateDrawControl() {
 ///////////////////////////////////////////////////////////////////
-	if ( drawControl ) {
-		drawControl->Refresh();
-	}
-	
-	if ( guiCtlSetup != NULL && guiCtlSetup->drawPane3D != NULL )
-		guiCtlSetup->drawPane3D->Refresh();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::reconstructDrawControl(int oldCorrectionY, long oldNpX, long oldNpY) {
-///////////////////////////////////////////////////////////////////
-	for (DrawPoints::iterator it = drawPoints.begin(); it != drawPoints.end(); ++it) {
-		(*it).lp.x -= oldNpX;
-		(*it).cp.x -= oldNpX;
-		(*it).lp.x += drawPaneCoordSystem.getNpX();
-		(*it).cp.x += drawPaneCoordSystem.getNpX();
-		
-		(*it).lp.y -= oldNpY;
-		(*it).lp.y *= oldCorrectionY;
-		(*it).lp.y *= drawPaneCoordSystem.getCorrectionY();
-		(*it).lp.y += drawPaneCoordSystem.getNpY();
-		
-		(*it).cp.y -= oldNpY;
-		(*it).cp.y *= oldCorrectionY;
-		(*it).cp.y *= drawPaneCoordSystem.getCorrectionY();
-		(*it).cp.y += drawPaneCoordSystem.getNpY();
-	}
-	updateDrawControl();
+	updatePreview3D(true); 
 }
 ///////////////////////////////////////////////////////////////////
 inline void CncControl::setValue(wxTextCtrl *ctl, int32_t val) {
@@ -441,7 +389,6 @@ void CncControl::setGuiControls(GuiControlSetup* gcs) {
 ///////////////////////////////////////////////////////////////////
 	assert(gcs);
 	guiCtlSetup = gcs;
-	posMarker.setMarkerControls(guiCtlSetup->xAxisMarkerTop, guiCtlSetup->xAxisMarkerBottom, guiCtlSetup->yAxisMarker);
 	toolState.setControl(guiCtlSetup->toolState);
 	setToolState(true);
 }
@@ -493,8 +440,6 @@ void CncControl::setZeroPos() {
 	setZeroPosX();
 	setZeroPosY();
 	setZeroPosZ();
-	
-	posMarker.setPosition({curPos.getX() + (int)drawPaneMargin, curPos.getY() + (int)drawPaneMargin}, cncConfig->getDrawPaneZoomFactor());
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setStartPos() {
@@ -714,9 +659,6 @@ bool CncControl::moveDownZ() {
 		updateZSlider();
 		changeWorkSpeedXY(CncSpeedWork);
 		
-		lastDrawPoint.x = convertToDrawPointX(curPos.getX());
-		lastDrawPoint.y = convertToDrawPointY(curPos.getY());
-		
 		lastDrawPoint3D.setX(curPos.getX());
 		lastDrawPoint3D.setY(curPos.getY());
 		lastDrawPoint3D.setZ(curPos.getZ());
@@ -725,7 +667,7 @@ bool CncControl::moveDownZ() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeWorkSpeedXY(CncSpeed s) {
+void CncControl::changeWorkSpeedXY(CncSpeed s, bool force) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
@@ -738,10 +680,11 @@ void CncControl::changeWorkSpeedXY(CncSpeed s) {
 	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedX(cncConfig->getSpeedX());
 	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedY(cncConfig->getSpeedY());
 
-	updateCncConfigTrace();
+	if ( force == true )
+		updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeWorkSpeedZ(CncSpeed s) {
+void CncControl::changeWorkSpeedZ(CncSpeed s, bool force) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
@@ -752,7 +695,8 @@ void CncControl::changeWorkSpeedZ(CncSpeed s) {
 	
 	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedZ(cncConfig->getSpeedZ());
 
-	updateCncConfigTrace();
+	if ( force == true )
+		updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingStart() {
@@ -936,16 +880,6 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 					setValue(guiCtlSetup->zAxisCtl, convertToDisplayUnit(ci.controllerPos.getZ(), cncConfig->getDisplayFactZ()));
 				//}
 			}
-			// Online drawing coordinates
-			if ( cncConfig->isOnlineUpdateDrawPane() ) {
-				wxClientDC dc(drawControl);
-				dc.SetPen(penHandler.getCurrentPen(false));
-
-				static wxPoint p;
-				p.x = convertToDrawPointX(ci.controllerPos.getX());
-				p.y = convertToDrawPointY(ci.controllerPos.getY());
-				posMarker.setPosition(p, cncConfig->getDrawPaneZoomFactor());
-			}
 			
 			// pause hanling
 			if ( ci.isPause == true ) {
@@ -987,72 +921,48 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	// Evalutate the command counter
 	commandCounter += cmcCount;
 	
-	// Event handling, enables the interrrpt functionality
+	// Event handling, enables the interrupt functionallity
 	if ( cncConfig->isAllowEventHandling() ) {
 		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
 		while (evtLoop->Pending())
 			evtLoop->Dispatch();
 	}
 
+	// position out of configured range?
 	if ( validateCurrentPostion() == false )
 		interrupt();
 
-	static wxPoint p;
-	p.x = convertToDrawPointX(curPos.getX());
-	p.y = convertToDrawPointY(curPos.getY());
-	
-	// 2D points
-	static PointPair pp;
-	PointPair tmp = pp;
-	pp.zAxisDown  = zAxisDown;
-	pp.lp         = lastDrawPoint;
-	pp.cp         = p;
-	pp.pen        = penHandler.getCurrentPen(zAxisDown);
-	lastDrawPoint = p;
-	
-	// 3D points
-	static PositionInfo3D pi3d;
-	pi3d.lp = lastDrawPoint3D;
-	pi3d.cp = curPos;
-	lastDrawPoint3D = curPos;
-	pi3d.zAxisDown 	= zAxisDown;
-	
-	// Stores the 2D coordinates for later drawings
-	if ( zAxisDown == true ) {
-		if ( isLastDuration() ) {
-			// avoid duplicate values
-			if ( drawPoints.size() > 0 ) {
-				PointPair lpp = drawPoints.back();
-				if ( lpp != pp ) {
-					drawPoints.push_back(pp);
-				}
-			} else {
-				drawPoints.push_back(pp);
-			}
-		}
-	}
-	
 	// Stores the 3D coordinates for later drawings
+	static DoublePointPair3D pp3d;
+
 	// avoid duplicate values
-	if ( tmp != pp ) {
-		drawPoints3D.push_back(pi3d);
-	}
-	
-	// Online drawing coordinates
-	if ( cncConfig->isOnlineUpdateDrawPane() ) {
-		// avoid duplicate values
-		if ( tmp != pp ) {
-			if ( motionMonitorMode == DM_2D ) {
-				wxClientDC dc(drawControl);
-				double z = cncConfig->getDrawPaneZoomFactor();
-				dc.SetUserScale(z,z);
-								
-				dc.SetPen(penHandler.getCurrentPen(zAxisDown));
-				dc.DrawLine(pp.lp, pp.cp);
-			} else {
-				set3DData(true);
-			}
+	if ( lastDrawPoint3D != curPos ) {
+		double fx = cncConfig->getMaxDimensionX() * cncConfig->getCalculationFactX();
+		double fy = cncConfig->getMaxDimensionY() * cncConfig->getCalculationFactY();
+		double fz = cncConfig->getMaxDimensionZ() * cncConfig->getCalculationFactZ();
+		
+		pp3d.set(lastDrawPoint3D.getX() / fx, 
+				 lastDrawPoint3D.getY() / fy, 
+				 lastDrawPoint3D.getZ() / fz,
+				 curPos.getX() / fx, 
+				 curPos.getY() / fy, 
+				 curPos.getZ() / fz);
+		
+		if ( zAxisDown == true ) {
+			//pp3d.setDefaultToDrawColour();
+			pp3d.setDrawColour(penHandler.getCurrentPen(zAxisDown).GetColour());
+			pp3d.setDefaultToLineStyle();
+		} else {
+			pp3d.setDrawColour(*wxYELLOW);
+			//pp3d.setLineStyle(wxDOT); // todo - impl as an option
+			pp3d.setLineStyle(wxTRANSPARENT);
 		}
+		
+		// update data
+		if ( guiCtlSetup != NULL && guiCtlSetup->drawPane3D != NULL )
+			guiCtlSetup->drawPane3D->appendDataVector(pp3d);
+	
+		updatePreview3D(false);
 	}
 	
 	// Display coordinates
@@ -1061,279 +971,27 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 			setValue(guiCtlSetup->xAxis, convertToDisplayUnit(curPos.getX(), cncConfig->getDisplayFactX()));
 			setValue(guiCtlSetup->yAxis, convertToDisplayUnit(curPos.getY(), cncConfig->getDisplayFactY()));
 			setValue(guiCtlSetup->zAxis, convertToDisplayUnit(curPos.getZ(), cncConfig->getDisplayFactZ()));
-		
+			
 			logProcessingCurrent();
 		}
-	}
 	
-	updateZSlider();
+		updateZSlider();
+	}
 	
 	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
 		std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
 		interrupt();
 	}
+	
+	// store current as previous
+	lastDrawPoint3D = curPos;
 		
 	return !isInterrupted();
 }
 ///////////////////////////////////////////////////////////////////
-wxPoint& CncControl::convertToCoordiateSystem(wxPoint& in) {
-///////////////////////////////////////////////////////////////////
-	in.x -= drawPaneCoordSystem.getNpX();
-	in.y -= drawPaneCoordSystem.getNpY();
-	
-	if ( drawPaneCoordSystem.getType() == CST_NULL_Y_IS_BOTTOM )
-		in.y *= -1;
-
-	return in;
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::setCoordinateSystemType(CoordinateSytemType t) {
-///////////////////////////////////////////////////////////////////
-	// store old key values
-	int oldCorrectionY 	= drawPaneCoordSystem.getCorrectionY();
-	long oldNpX 		= drawPaneCoordSystem.getNpX();
-	long oldNpY 		= drawPaneCoordSystem.getNpY();
-	
-	// init new coordinate system type
-	unsigned int nullX = drawPaneMargin;
-	unsigned int nullY = drawPaneMargin;
-	
-	posMarker.setXMarkerTyp(XMarkerTop);
-	
-	if ( drawControl != NULL ) {
-		// correct Y Null value
-		if ( t == CST_NULL_Y_IS_BOTTOM) {
-			nullY = drawControl->GetSize().GetHeight() - drawPaneMargin;
-			posMarker.setXMarkerTyp(XMarkerBottom);
-		}
-		
-		// transform to zoom
-		wxClientDC dc(drawControl);
-		double zoom = getCncConfig()->getDrawPaneZoomFactor();
-		dc.SetUserScale(zoom, zoom);
-		nullX = dc.DeviceToLogicalX(nullX);
-		nullY = dc.DeviceToLogicalY(nullY);
-		
-	}
-	
-	drawPaneCoordSystem.setup(t, nullX, nullY);
-	updateDrawPointFactors();
-	initLastDrawPoint();
-		
-	// reconstruct draw points for the new coordinate system
-	reconstructDrawControl(oldCorrectionY, oldNpX, oldNpY);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::updateDrawPointFactors() {
-///////////////////////////////////////////////////////////////////
-	drawPaneCoordSystem.setFactorX(1.0/cncConfig->getCalculationFactX() * 1/SvgUnitCalculator::getFactorReferenceUnit2MM());
-	drawPaneCoordSystem.setFactorY(1.0/cncConfig->getCalculationFactY() * 1/SvgUnitCalculator::getFactorReferenceUnit2MM());
-}
-///////////////////////////////////////////////////////////////////
 void CncControl::initLastDrawPoint() {
 ///////////////////////////////////////////////////////////////////
-	lastDrawPoint.x = drawPaneCoordSystem.getNpX();
-	lastDrawPoint.y = drawPaneCoordSystem.getNpY();
-	
 	lastDrawPoint3D.setXYZ(0, 0, 0);
-}
-///////////////////////////////////////////////////////////////////
-long CncControl::convertToDrawPointX(long val) {
-///////////////////////////////////////////////////////////////////
-	return drawPaneCoordSystem.getNpX() + val * drawPaneCoordSystem.getFactorX();
-}
-///////////////////////////////////////////////////////////////////
-long CncControl::convertToDrawPointY(long val) {
-///////////////////////////////////////////////////////////////////
-	return drawPaneCoordSystem.getNpY() + val * drawPaneCoordSystem.getCorrectionY() * drawPaneCoordSystem.getFactorY();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::drawText(wxPaintDC& dc, wxString text, wxPoint pt) {
-///////////////////////////////////////////////////////////////////
-	wxFont font(7, wxFONTFAMILY_SWISS, wxNORMAL, wxBOLD);
-	dc.SetFont(font);
-	dc.SetBackgroundMode(wxTRANSPARENT);
-	dc.SetTextForeground(*wxWHITE);
-	dc.SetTextBackground(*wxBLACK);
-	dc.DrawText(text, pt);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::drawOrigin(wxPaintDC& dc) {
-///////////////////////////////////////////////////////////////////
-	if ( drawControl == NULL )
-		return;
-	
-	const int length = 80;
-	wxPoint n = {(int)drawPaneCoordSystem.getNpX(), 			(int)drawPaneCoordSystem.getNpY()};
-	wxPoint x = {(int)drawPaneCoordSystem.getNpX() + length, 	(int)drawPaneCoordSystem.getNpY()};
-	wxPoint y = {(int)drawPaneCoordSystem.getNpX(),				(int)drawPaneCoordSystem.getNpY() + length };
-	
-	if ( drawPaneCoordSystem.getType() == CST_NULL_Y_IS_BOTTOM )
-		y.y = (int)drawPaneCoordSystem.getNpY() - length;
- 
-	dc.SetPen(penHandler.getGridPenDefault());
-	
-	// line + arrow X axis
-	int al = -5;
-	int ab = 2;
-	dc.DrawLine(n, x);
-	dc.DrawLine(wxPoint(x.x + al, x.y - ab), x);
-	dc.DrawLine(wxPoint(x.x + al, x.y + ab), x);
-	
-	// line + arrow Y axis
-	if ( drawPaneCoordSystem.getType() == CST_NULL_Y_IS_BOTTOM )
-		al *= -1;
-		
-	dc.DrawLine(n, y);
-	dc.DrawLine(y, wxPoint(y.x - ab, y.y + al));
-	dc.DrawLine(y, wxPoint(y.x + ab, y.y + al));
-	
-	// draw lables
-	int offset = 9;
-	if ( drawPaneCoordSystem.getType() == CST_NULL_Y_IS_TOP ) {
-		drawText(dc, wxString("0"), {n.x - offset, 	n.y - 8});
-		drawText(dc, wxString("X"), {x.x - offset, 	x.y - 12});
-		drawText(dc, wxString("Y"), {y.x - offset, 	y.y - 8});
-	} else {
-		drawText(dc, wxString("0"), {n.x - offset, 	n.y});
-		drawText(dc, wxString("X"), {x.x - offset, 	x.y + 2});
-		drawText(dc, wxString("Y"), {y.x - offset, 	y.y});
-	}
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::drawGrid(wxPaintDC& dc, double fact) {
-///////////////////////////////////////////////////////////////////
-	if ( drawControl == NULL )
-		return;
-	
-	if ( showGrid == false )
-		return;
-
-	unsigned int division = 10 * fact;
-	unsigned int w = drawControl->GetSize().GetWidth()  - drawPaneMargin;
-	unsigned int h = drawControl->GetSize().GetHeight() - drawPaneMargin;
-	unsigned int cnt = 0;
-	
-	// vertical
-	for (unsigned int i=drawPaneMargin; i<w; i+=division, cnt++) {
-		if (      cnt%10 == 0 ) dc.SetPen(penHandler.getGridPen100());
-		else if ( cnt%5  == 0 )	dc.SetPen(penHandler.getGridPen050());
-		else 					dc.SetPen(penHandler.getGridPen010());
-		dc.DrawLine(wxPoint(i, drawPaneMargin), wxPoint(i, h));
-	}
-	
-	// horizontal
-	cnt = 0;
-	unsigned int start = (drawPaneCoordSystem.getType() == CST_NULL_Y_IS_TOP) ? drawPaneMargin : 0;
-	unsigned int end   = (drawPaneCoordSystem.getType() == CST_NULL_Y_IS_TOP) ? h : h - drawPaneMargin;
-	
-	for (unsigned int i=start; i<end; i+=division, cnt++ ) {
-		if (      cnt%10 == 0 ) dc.SetPen(penHandler.getGridPen100());
-		else if ( cnt%5  == 0 )	dc.SetPen(penHandler.getGridPen050());
-		else 					dc.SetPen(penHandler.getGridPen010());
-		
-		if ( drawPaneCoordSystem.getType() == CST_NULL_Y_IS_TOP )
-			dc.DrawLine(wxPoint(drawPaneMargin, i), wxPoint(w, i));
-		else
-			dc.DrawLine(wxPoint(drawPaneMargin, drawPaneCoordSystem.getNpY() - i), wxPoint(w, drawPaneCoordSystem.getNpY() - i));
-	}
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::redrawDrawPane(double fact) {
-///////////////////////////////////////////////////////////////////
-	if ( drawControl == NULL )
-		return;
-
-	wxPaintDC dc(drawControl);
-	double z = cncConfig->getDrawPaneZoomFactor();
-	dc.SetUserScale(z,z);
-
-	// grid
-	drawGrid(dc, fact);
-
-	// curve
-	if ( /*getCncConfig()->isOnlineUpdateDrawPane() ==*/ true ) {
-		for (DrawPoints::iterator it = drawPoints.begin(); it != drawPoints.end(); ++it) {
-			dc.SetPen(it->pen);
-			dc.DrawLine((*it).lp, (*it).cp);
-		}
-	}
-	
-	// coordinate system
-	drawOrigin(dc);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::traceDrawPaneIntern(wxTextCtrl* ctl, std::ostream& os) {
-///////////////////////////////////////////////////////////////////
-	// trace curve
-	double fx = 1;//cncConfig->getCalculationFactX();
-	double fy = 1;//cncConfig->getCalculationFactY();
-
-	if ( ctl != NULL ) {
-		ctl->Update();
-		ctl->Freeze();
-	}
-	
-	if ( isInterrupted() ) 
-		resetInterrupt();
-		
-	unsigned int i=0;
-	for (DrawPoints::iterator it = drawPoints.begin(); it != drawPoints.end(); ++it) {
-		PointPair pp = *it;
-		os << "  " << wxString::Format(wxT("%05d"),i) << "\t" << PointPair::processFactor(PointPair::processOffset(pp, drawPaneMargin, -drawPaneMargin), fx, fy);
-		
-		if ( ++i%50 == 0 ) {
-			if ( ctl != NULL ) {
-				ctl->Thaw();
-				ctl->Update();
-				ctl->ShowPosition(ctl->GetLastPosition()-1);
-				waitActive(0);
-				ctl->Freeze();
-			}
-		}
-		
-		if ( isInterrupted() ) {
-			os << "The trace is not complete because it was interrupted!" << std::endl;
-			break;
-		}
-	}
-	
-	if ( ctl != NULL ) {
-		if ( ctl->IsFrozen() )
-			ctl->Thaw();
-			
-		ctl->Update();
-	} 
-}
-///////////////////////////////////////////////////////////////////
-unsigned int CncControl::traceDrawPane(wxTextCtrl* ctl) {
-///////////////////////////////////////////////////////////////////
-	if ( ctl == NULL ) {
-		std::fstream pfs;
-		pfs.open(CncFileNameService::getCncDrawPaneTraceFileName(), std::ios::out | std::ios::trunc);
-		
-		if ( pfs.is_open() == false ) {
-			std::cerr << "CncControl::traceDrawPane: Open file failed: " << CncFileNameService::getCncDrawPaneTraceFileName() << std::endl;
-			return 0;
-		}
-		
-		std::clog << "::Trace draw points: Vector size: " << drawPoints.size() << std::endl;
-
-		if ( drawPoints.size() > 0 ) {
-			pfs       << "::Trace draw points: Vector size: " << drawPoints.size() << std::endl;
-			std::clog << " Full trace will be written to: " << CncFileNameService::getCncDrawPaneTraceFileName() << std::endl;
-			
-			traceDrawPaneIntern(ctl, pfs);
-		}
-		
-		pfs.flush();
-		pfs.close();
-		
-	} else {
-		traceDrawPaneIntern(ctl, std::clog);
-	}
-	
-	return drawPoints.size();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simpleMoveXYToZeroPos(CncDimensions dim) {
@@ -1511,119 +1169,6 @@ bool CncControl::moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alr
 		return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curPos);
 	}
 
-/*
-	if ( alreadyRendered == true )
-		return serialPort->processMoveXYZ(x1, y1, z1, false, curPos);
-		
-	// render here
-	int i, dx, dy, dz, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
-	int pointA[3], pointB[3];
-
-	pointA[0] = 0;
-	pointA[1] = 0;
-	pointA[2] = 0;
-	
-	pointB[0] = 0;
-	pointB[1] = 0;
-	pointB[2] = 0;
-	
-	dx = x1;
-	dy = y1;
-	dz = z1;
-	
-	x_inc = (dx < 0) ? -1 : 1;
-	l = abs(dx);
-	
-	y_inc = (dy < 0) ? -1 : 1;
-	m = abs(dy);
-	
-	z_inc = (dz < 0) ? -1 : 1;
-	n = abs(dz);
-	
-	dx2 = l << 1;
-	dy2 = m << 1;
-	dz2 = n << 1;
-
-	if ((l >= m) && (l >= n)) {
-		err_1 = dy2 - l;
-		err_2 = dz2 - l;
-		for (i = 0; i < l; i++) {
-			
-			//output
-			if ( serialPort->processMoveXYZ(pointB[0] - pointA[0], pointB[1] - pointA[1], pointB[2] - pointA[2], true, curPos) == false )
-				return false;
-		
-			for (int j=0; j<3; j++ )
-				pointB[j] = pointA[j];
-			
-			if (err_1 > 0) {
-				pointA[1] += y_inc;
-				err_1 -= dx2;
-			}
-			if (err_2 > 0) {
-				pointA[2] += z_inc;
-				err_2 -= dx2;
-			}
-			err_1 += dy2;
-			err_2 += dz2;
-			pointA[0] += x_inc;
-		}
-	} else if ((m >= l) && (m >= n)) {
-		err_1 = dx2 - m;
-		err_2 = dz2 - m;
-		for (i = 0; i < m; i++) {
-			
-			//output
-			if ( serialPort->processMoveXYZ(pointB[0] - pointA[0], pointB[1] - pointA[1], pointB[2] - pointA[2], true, curPos) == false )
-				return false;
-		
-			for (int j=0; j<3; j++ )
-				pointB[j] = pointA[j];
-				
-			if (err_1 > 0) {
-				pointA[0] += x_inc;
-				err_1 -= dy2;
-			}
-			if (err_2 > 0) {
-				pointA[2] += z_inc;
-				err_2 -= dy2;
-			}
-			err_1 += dx2;
-			err_2 += dz2;
-			pointA[1] += y_inc;
-		}
-	} else {
-		err_1 = dy2 - n;
-		err_2 = dx2 - n;
-		for (i = 0; i < n; i++) {
-			
-			//output
-			if ( serialPort->processMoveXYZ(pointB[0] - pointA[0], pointB[1] - pointA[1], pointB[2] - pointA[2], true, curPos) == false )
-				return false;
-		
-			for (int j=0; j<3; j++ )
-				pointB[j] = pointA[j];
-				
-			if (err_1 > 0) {
-				pointA[1] += y_inc;
-				err_1 -= dz2;
-			}
-			if (err_2 > 0) {
-				pointA[0] += x_inc;
-				err_2 -= dz2;
-			}
-			err_1 += dy2;
-			err_2 += dx2;
-			pointA[2] += z_inc;
-		}
-	}
-	
-	//output
-	if ( serialPort->processMoveXYZ(pointB[0] - pointA[0], pointB[1] - pointA[1], pointB[2] - pointA[2], true, curPos) == false )
-		return false;
-	
-	 return true;
-*/
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1781,6 +1326,9 @@ void CncControl::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
+	if ( cncConfig->isModified() == false )
+		return;
+	
 	if ( guiCtlSetup->drawPane3D != NULL ) {
 		CncOpenGLDrawPaneContext::WorkpieceInfo wi;
 		wi.offset    = cncConfig->getWorkpieceThickness() / cncConfig->getMaxDimensionZ();
@@ -1791,33 +1339,30 @@ void CncControl::updateCncConfigTrace() {
 		wi.drawWorkpieceOffset	= guiCtlSetup->cb3DDrawWorkpieceOffset ? guiCtlSetup->cb3DDrawWorkpieceOffset->IsChecked() : false;
 		
 		guiCtlSetup->drawPane3D->setWorkpieceInfo(wi);
-		guiCtlSetup->drawPane3D->Refresh();
 	}
 	
-	if ( cncConfig->isModified() ) {
-		wxVector<wxVector<wxVariant>> rows;
-		if ( guiCtlSetup->staticCncConfig ) {
-			cncConfig->getStaticValues(rows);
-			guiCtlSetup->staticCncConfig->Freeze();
-			guiCtlSetup->staticCncConfig->DeleteAllItems();
-			for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-				wxVector<wxVariant> row = *it;
-				guiCtlSetup->staticCncConfig->AppendItem(row);
-			}
-			guiCtlSetup->staticCncConfig->Thaw();
+	wxVector<wxVector<wxVariant>> rows;
+	if ( guiCtlSetup->staticCncConfig ) {
+		cncConfig->getStaticValues(rows);
+		guiCtlSetup->staticCncConfig->Freeze();
+		guiCtlSetup->staticCncConfig->DeleteAllItems();
+		for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
+			wxVector<wxVariant> row = *it;
+			guiCtlSetup->staticCncConfig->AppendItem(row);
 		}
-		
-		rows.clear();
-		if ( guiCtlSetup->dynamicCncConfig ) {
-			cncConfig->getDynamicValues(rows);
-			guiCtlSetup->dynamicCncConfig->Freeze();
-			guiCtlSetup->dynamicCncConfig->DeleteAllItems();
-			for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-				wxVector<wxVariant> row = *it;
-				guiCtlSetup->dynamicCncConfig->AppendItem(row);
-			}
-			guiCtlSetup->dynamicCncConfig->Thaw();
+		guiCtlSetup->staticCncConfig->Thaw();
+	}
+	
+	rows.clear();
+	if ( guiCtlSetup->dynamicCncConfig ) {
+		cncConfig->getDynamicValues(rows);
+		guiCtlSetup->dynamicCncConfig->Freeze();
+		guiCtlSetup->dynamicCncConfig->DeleteAllItems();
+		for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
+			wxVector<wxVariant> row = *it;
+			guiCtlSetup->dynamicCncConfig->AppendItem(row);
 		}
+		guiCtlSetup->dynamicCncConfig->Thaw();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2384,56 +1929,22 @@ void CncControl::appendNumKeyValueToControllerErrorInfo(int num, int code, const
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::set3DData(bool append) {
+void CncControl::updatePreview3D(bool force) {
 ///////////////////////////////////////////////////////////////////
 	if ( guiCtlSetup == NULL || guiCtlSetup->drawPane3D == NULL )
 		return;
 		
-	double fx = cncConfig->getMaxDimensionX() * cncConfig->getCalculationFactX();
-	double fy = cncConfig->getMaxDimensionY() * cncConfig->getCalculationFactY();
-	double fz = cncConfig->getMaxDimensionZ() * cncConfig->getCalculationFactZ();
-	
-	unsigned int offset = 0;
-	DrawPaneData& dpd = guiCtlSetup->drawPane3D->getDataVector();
-	if ( append == false ) {
-		// clear the 3D vector
-		guiCtlSetup->drawPane3D->clearDataVector();
-	} else {
-		// determine offset for append operation
-		if ( dpd.size() != 0 )
-			offset = dpd.size();
+	if ( force == true ) {
+		guiCtlSetup->drawPane3D->displayDataVector();
+		return;
 	}
 	
-	DoublePointPair3D pp;
-	for (DrawPoints3D::iterator it = drawPoints3D.begin() + offset; it != drawPoints3D.end(); ++it) {
-		PositionInfo3D pi3d = *it;
-		
-		if ( pi3d.zAxisDown == true ) {
-			pp.setDefaultToDrawColour();
-			pp.setDefaultToLineStyle();
-		} else {
-			pp.setDrawColour(*wxYELLOW);
-			pp.setLineStyle(wxDOT);
+	// Online drawing coordinates
+	if ( cncConfig->isOnlineUpdateDrawPane() ) {
+		if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
+			guiCtlSetup->drawPane3D->displayDataVector();
 		}
-		dpd.push_back(pp.set(pi3d.lp.getX() / fx, pi3d.lp.getY() / fy, pi3d.lp.getZ() / fz,
-							 pi3d.cp.getX() / fx, pi3d.cp.getY() / fy, pi3d.cp.getZ() / fz)); 
 	}
-	
-	if ( append == true ) {
-		//cnc::trc.logInfo(wxString::Format("%d, %d", (int)dpd.size(), (int)drawPoints3D.size()));
-		guiCtlSetup->drawPane3D->Refresh();
-	}
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::setMotionMonitorMode(const DimensionMode& mmm) {
-///////////////////////////////////////////////////////////////////
-	motionMonitorMode = mmm; 
-	
-	if ( guiCtlSetup == NULL || guiCtlSetup->drawPane3D == NULL )
-		return;
-		
-	if ( motionMonitorMode == DM_3D )
-		guiCtlSetup->drawPane3D->viewTop();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::sendIdleMessage() {
@@ -2447,21 +1958,4 @@ void CncControl::sendIdleMessage() {
 	
 	//clog <<  wxDateTime::UNow().FormatTime() << " - idle,  delay:" << getStepDelay() << endl;
 	getSerial()->processIdle();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::drawXMarkerBottom(wxDC& dc, double zoom) {
-///////////////////////////////////////////////////////////////////
-	if ( posMarker.getXMarkerTyp() == XMarkerBottom )
-		posMarker.drawPosX(dc, zoom);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::drawXMarkerTop(wxDC& dc, double zoom) {
-///////////////////////////////////////////////////////////////////
-	if ( posMarker.getXMarkerTyp() == XMarkerTop )
-		posMarker.drawPosX(dc, zoom);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::drawYMarker(wxDC& dc, double zoom) {
-///////////////////////////////////////////////////////////////////
-	posMarker.drawPosY(dc, zoom);
 }

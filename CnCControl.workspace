@@ -6,7 +6,7 @@
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Debug"/>
     </WorkspaceConfiguration>

@@ -51,6 +51,11 @@ class GCodePath {
 		}
 		/////////////////////////////////////////////////////
 		bool addGCB_AsLinearMove(CncDoublePosition& curPxPos, GCodeBlock& gcb) {
+			
+			//todo
+			if ( gcb.hasZ() )
+				//clog << gcb.block << endl;
+			
 			if ( gcb.hasOneOf_XY() == false )
 				return true;
 				

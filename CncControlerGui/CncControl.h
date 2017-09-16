@@ -15,14 +15,13 @@
 #include "CommandTemplates.h"
 #include "CncToolStateControl.h"
 #include "CncCommon.h"
-#include "CncPositionMarker.h"
 #include "PenHandler.h"
 #include "GuiControlSetup.h"
 #include "CncConfig.h"
 #include "SerialPort.h"
 #include "CncLimitStates.h"
-#include "CoordinateSystem.h"
 #include "CncPosition.h"
+#include "CncPoint3D.h"
 
 const double endSwitchStepBackMertic = 2.5;
 
@@ -116,7 +115,6 @@ class CncControl {
 		// Stores the lateset requested control positions
 		CncLongPosition controllerPos;
 		// Stores the previous draw point
-		wxPoint lastDrawPoint;
 		CncLongPosition lastDrawPoint3D;
 		// Render mode
 		CncRenderMode renderMode;
@@ -130,8 +128,6 @@ class CncControl {
 		bool zAxisDown;
 		// flag for updating tools
 		bool toolUpdateState;
-		// flag for showing drawPane grid
-		bool showGrid;
 		// Artificially Step Delay
 		unsigned int stepDelay;
 		// output controls
@@ -144,20 +140,11 @@ class CncControl {
 		int32_t commandCounter;
 		// Flag to indicatate if a positions check aplies
 		bool positionCheck;
-		// Draw control
-		wxWindow* drawControl;
-		DrawPoints drawPoints;
-		// 3D draw control
-		DrawPoints3D drawPoints3D;
 		// Pen handler
 		PenHandler penHandler;
-		CncPositionMarker posMarker;
 		// margin of the draw pane
-		CoordinateSystem drawPaneCoordSystem;
 		unsigned int drawPaneMargin;
-		// determine the preview mode [2D, 3D]
-		DimensionMode motionMonitorMode;
-		// determine the speed mode [2D, 3D]
+		// determine the speed mode 
 		DimensionMode speedMonitorMode;
 		// helper
 		double convertToDisplayUnit(int32_t val, double fact);
@@ -165,9 +152,6 @@ class CncControl {
 		void setValue(wxTextCtrl *ctl, int32_t val);
 		void setValue(wxTextCtrl *ctl, double val);
 		void setValue(wxTextCtrl *ctl, const char* t);
-
-		// Draw pane helper
-		void drawText(wxPaintDC& dc, wxString text, wxPoint pt);
 
 		// Tool management
 		void setToolState(bool defaultStyle = false);
@@ -182,15 +166,7 @@ class CncControl {
 		void reconfigureSimpleMove(bool correctPositions);
 		
 		// draw point conversion
-		void updateDrawPointFactors();
 		void initLastDrawPoint();
-		inline long convertToDrawPointX(long val);
-		inline long convertToDrawPointY(long val);
-		
-		void drawGrid(wxPaintDC& dc, double fact); // Only for WM_PAINT event
-		void drawOrigin(wxPaintDC& dc); // Only for WM_PAINT event
-		
-		void traceDrawPaneIntern(wxTextCtrl* ctl, std::ostream& os);
 		
 		// secial convesion to transfer a double as long
 		long convertDoubleToCtrlLong(unsigned char 	id, double d);
@@ -252,16 +228,10 @@ class CncControl {
 		void logProcessingEnd(bool valuesOnly = false);
 		// Sets the output controls for cooridinate infos
 		void setGuiControls(GuiControlSetup* guiCtlSetup);
-		void setDrawControl(wxWindow* dc) { drawControl = dc; }
-		void setCoordinateSystemType(CoordinateSytemType t);
 		//handle draw control
 		unsigned int getDrawPaneMargin() { return drawPaneMargin; }
 		void clearDrawControl();
 		void updateDrawControl();
-		void reconstructDrawControl(int oldCorrectionY, long oldNpX, long oldNpY);
-		void redrawDrawPane(double fact); // Only for WM_PAINT event
-		wxPoint& convertToCoordiateSystem(wxPoint& in);
-		unsigned int traceDrawPane(wxTextCtrl* ctl);
 		// Duration management
 		unsigned int getDurationCount();
 		unsigned int getDurationCounter();
@@ -312,8 +282,8 @@ class CncControl {
 		bool processSetter(unsigned char id, int32_t value);
 		bool processSetterList(std::vector<SetterTuple>& setup);
 		// Change the current work speed parameter
-		void changeWorkSpeedXY(CncSpeed s);
-		void changeWorkSpeedZ(CncSpeed s);
+		void changeWorkSpeedXY(CncSpeed s, bool force=false);
+		void changeWorkSpeedZ(CncSpeed s, bool force=false);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
@@ -321,8 +291,6 @@ class CncControl {
 		// Controls the z slider
 		void resetZSlider();
 		void updateZSlider();
-		// zoom handling
-		void setDrawPaneZoomFactor(double f);
 		//Limit management
 		wxString& getLimitInfoString(wxString& ret);
 		void evaluateLimitState();
@@ -372,7 +340,6 @@ class CncControl {
 		void appendNumKeyValueToControllerErrorInfo(const char* desc, int pin, int type, int mode, int value);
 		
 		void setUpdateToolControlsState(bool state) { toolUpdateState = state; }
-		void setShowGridSate(bool show) { showGrid = show; updateDrawControl(); }
 		
 		void setStepDelay(unsigned int d) { stepDelay = d; }
 		unsigned int getStepDelay() { return stepDelay; }
@@ -384,23 +351,15 @@ class CncControl {
 		bool meassureZDimension(wxCheckBox* min, wxCheckBox* max, double& result) { return meassureDimension('Z', min, max, result); }
 		
 		// 3D control
-		void set3DData(bool append);
+		void updatePreview3D(bool force=false);
 		
 		// idle handling
 		void sendIdleMessage();
-		
-		// Motion monitor handling
-		void setMotionMonitorMode(const DimensionMode& mmm);
-		const DimensionMode& getMotionMonitorMode() const   { return motionMonitorMode; }
 		
 		// Speed monitor handling
 		void setSpeedControlMode(const DimensionMode& spm) { speedMonitorMode = spm; }
 		const DimensionMode& getSpeedControlMode() const   { return speedMonitorMode; }
 		
-		// Marker repaint
-		void drawXMarkerBottom(wxDC& dc, double zoom);
-		void drawXMarkerTop(wxDC& dc, double zoom);
-		void drawYMarker(wxDC& dc, double zoom);
 };
 
 #endif

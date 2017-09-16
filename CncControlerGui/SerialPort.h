@@ -7,7 +7,6 @@
 #include <windows.h>
 #include <vector> 
 #include <map>
-#include "CoordinateSystem.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "SvgUnitCalculator.h"
@@ -98,7 +97,6 @@ struct SvgOutputParameters  {
 	double 				zoomFactor 			= 1.0;
 	bool 				copyOrigPath 		= true;
 	bool 				onlyFirstCrossing 	= true;
-	CoordinateSytemType coordSystemType 	= CST_NULL_Y_IS_TOP;
 };
 
 struct SvgOriginalPathInfo {

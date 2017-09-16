@@ -52,9 +52,9 @@ const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
 #ifdef DEBUG
-const char* _programVersion 	= "0.7.5.d";
+const char* _programVersion 	= "0.8.0.d";
 #else
-const char* _programVersion 	= "0.7.5.r";
+const char* _programVersion 	= "0.8.0.r";
 #endif
 
 // file content change environment
@@ -273,12 +273,12 @@ void MainFrame::install3DPane() {
 	drawPane3D->setPlayButton(m_3D_Animate);
 	drawPane3D->setTraceCtrl(m_trace3D);
 	drawPane3D->setSpinCtrls(m_spin3DAngelX, m_spin3DAngelY, m_spin3DAngelZ);
+	drawPane3D->view3D();
+	activate3DPerspectiveButton(m_3D_Perspective1);
 
 	sizer->Replace(m_drawPane3D, drawPane3D, true);
 	sizer->Layout();
 	std::clog << "Done" << std::endl;
-	
-	//drawPane3D->determineDisplayAngles(-120.0f, 8.0f, 1.0f);
 	
 	// remove the placeholder
 	m_drawPane3D->Destroy();
@@ -356,7 +356,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_zeroMoveModeXYZ);
 	registerGuiControl(m_zeroMoveModeZ);
 	registerGuiControl(m_setZero);
-	registerGuiControl(m_clearDrawPane);
 	registerGuiControl(m_clearLogger);
 	registerGuiControl(m_cbUpdateInterval);
 	registerGuiControl(m_svgEmuOpenFileAsSvg);
@@ -380,9 +379,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btRequestCtlErrorInfo);
 	registerGuiControl(m_lruList);
 	registerGuiControl(m_dirCtrl);
-	registerGuiControl(m_gridDrawPane);
-	registerGuiControl(m_traceDrawPane);
-	registerGuiControl(m_clearDrawPane);
 	registerGuiControl(m_openXmlTraceAsText);
 	registerGuiControl(m_openXmlTrace);
 	registerGuiControl(m_svgEmuResult);
@@ -398,8 +394,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btSvgToggleWordWrap);
 	registerGuiControl(m_svgEmuToggleWordWrap);
 	registerGuiControl(m_svgEmuToggleOrigPath);
-	registerGuiControl(m_switchCoordType);
-	registerGuiControl(m_switchCoordTypeSvgOut);
 	registerGuiControl(m_switchMonitoing);
 	registerGuiControl(m_previewErrorInfo);
 	registerGuiControl(m_saveTemplate);
@@ -478,6 +472,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	// Setup AUI Windows menues
 	hideAuiPane("Spy");
 	m_miToolbar->Check(m_auibarMain->IsShown());
+	m_miViewStatusbar->Check(m_statusBar->IsShown());
 	m_miViewTemplateManager->Check(m_scrollWinFile->IsShown());
 	m_miViewLogger->Check(m_scrollWinLogger->IsShown());
 	m_miViewMonitor->Check(m_scrollOutbound->IsShown());
@@ -919,10 +914,10 @@ void MainFrame::initialize(void) {
 	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
 	decorateTestSuiteParameters();
 	
-
 	this->SetTitle(wxString(_programTitel) + " " + _programVersion);
-
+	
 	wxString cfgStr;
+	
 	// setup cnc port selector box
 	decoratePortSelector();
 	
@@ -978,16 +973,6 @@ void MainFrame::initialize(void) {
 	tVal.SetCharIncludes(", ");
 	m_cbUCValueFrom->SetValidator(tVal);
 	
-	// draw
-	double zoomStep 	= 0.1;
-	double defaultZoom 	= 1.0;
-	m_cbDrawPaneZoom->Clear();
-	for (double i = zoomStep; i <= 10.0; i +=zoomStep) 
-		m_cbDrawPaneZoom->Append(wxString::Format("%.1lf", i));
-
-	m_cbDrawPaneZoom->SetStringSelection(wxString::Format("%.1lf", defaultZoom));
-	cnc->setDrawPaneZoomFactor(defaultZoom);
-
 	wxString comment("");
 	comment << "+/-x:           cursor right/left\n";
 	comment << "+/-y:           cursor down/up\n";
@@ -1027,7 +1012,7 @@ void MainFrame::initialize(void) {
 	initializeCncControl();
 	initializePreconfiguredSpeedSetups();
 	
-	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
+	m_outboundNotebook->SetSelection(Outbound3DPage);
 	m_notebookConfig->SetSelection(CNCSetterPage);
 	
 	// curve lib resulotion
@@ -1107,20 +1092,12 @@ bool MainFrame::initializeCncControl() {
 		}
 	}
 	
-	// init zoom factor
-	double fact = getDrawPaneFactor();
-	cnc->setDrawPaneZoomFactor(fact);
-	
 	//Initialize the postion controls
 	cnc->setZeroPos();
 	updateCncConfigTrace();
 	
 	// z slider
 	cnc->updateZSlider();
-	
-	// draw pane grid
-	cnc->setShowGridSate(m_gridDrawPane->GetValue());
-	setCoordinateSystemType();
 	
 	//initilaize debug state
 	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
@@ -1289,10 +1266,6 @@ void MainFrame::determineCncOutputControls() {
 	guiCtlSetup->yMaxLimit 			= m_yMaxLimit;
 	guiCtlSetup->zMinLimit 			= m_zMinLimit;
 	guiCtlSetup->zMaxLimit 			= m_zMaxLimit;
-	
-	guiCtlSetup->xAxisMarkerTop		= m_xAxisMarkerTop;
-	guiCtlSetup->xAxisMarkerBottom	= m_xAxisMarkerBottom;
-	guiCtlSetup->yAxisMarker		= m_yAxisMarker;
 	
 	guiCtlSetup->cb3DDrawZeroPlane 				= m_cb3DDrawZeroPlane;
 	guiCtlSetup->cb3DDrawWorkpieceSurfacePlane	= m_cb3DDrawWorkpieceSurfacePlane;
@@ -1485,7 +1458,6 @@ bool MainFrame::connectSerialPort() {
 	bool ret = false;
 	wxString sel = m_portSelector->GetStringSelection();
 	CncConfig cc(*cnc->getCncConfig());
-	cnc->setDrawControl(NULL);
 	
 	delete cnc;
 	wxString cs;
@@ -1516,8 +1488,6 @@ bool MainFrame::connectSerialPort() {
 	lastPortName = "";
 	
 	if ( (ret = cnc->connect(cs)) == true )  {
-		cnc->setDrawControl(m_drawPane);
-		setCoordinateSystemType();
 		cnc->setup();
 		updateCncConfigTrace();
 		lastPortName = sel;
@@ -2020,11 +1990,11 @@ void MainFrame::updateSpeedValues() {
 	}
 	
 	if ( cnc->isConnected() ) {
-		if (selXY.MakeUpper() == "FLY")	cnc->changeWorkSpeedXY(CncSpeedFly);
-		else							cnc->changeWorkSpeedXY(CncSpeedWork);
+		if (selXY.MakeUpper() == "FLY")	cnc->changeWorkSpeedXY(CncSpeedFly, true);
+		else							cnc->changeWorkSpeedXY(CncSpeedWork, true);
 		
-		if (selZ.MakeUpper()  == "FLY")	cnc->changeWorkSpeedZ(CncSpeedFly);
-		else							cnc->changeWorkSpeedZ(CncSpeedWork);
+		if (selZ.MakeUpper()  == "FLY")	cnc->changeWorkSpeedZ(CncSpeedFly, true);
+		else							cnc->changeWorkSpeedZ(CncSpeedWork, true);
 		
 	} else {
 		cnc->getCncConfig()->setActiveSpeedXY(CncSpeedFly);
@@ -2042,18 +2012,6 @@ void MainFrame::updateSpeedValues() {
 		m_speedView->setCurrentSpeedY(cnc->getCncConfig()->getSpeedY());
 		m_speedView->setCurrentSpeedZ(cnc->getCncConfig()->getSpeedZ());
 	}
-}
-///////////////////////////////////////////////////////////////////
-double MainFrame::getDrawPaneFactor() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
-	return cnc->getCncConfig()->getDrawPaneZoomFactor();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::onPaintDrawPane(wxPaintEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	cnc->redrawDrawPane(getDrawPaneFactor());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::defineMinMonitoring(wxCommandEvent& event) {
@@ -2311,10 +2269,6 @@ bool MainFrame::openFile(int pageToSelect) {
 		
 		if ( svgFileParser != NULL )
 			svgFileParser->clearControls();
-		
-		m_switchCoordType->SetValue(getCurrentTemplateFormat() != TplGcode);
-		m_switchCoordTypeSvgOut->SetValue(getCurrentTemplateFormat() != TplGcode);
-		setCoordinateSystemType();
 		
 		cnc->clearDrawControl();
 		cnc->getSerial()->clearSVG();
@@ -3449,15 +3403,8 @@ void MainFrame::processTemplate() {
 	startAnimationControl();
 
 	// select draw pane
-	wxString sel = m_cbRunMotionMonitorMode->GetStringSelection();
-	switch ( (char)sel[0] ) {
-		case '3': 	m_outboundNotebook->SetSelection(Outbound3DPage);
-					cnc->setMotionMonitorMode(CncControl::DM_3D);
-					break;
-		default: 	m_outboundNotebook->SetSelection(OutboundMotionMonitorPage);
-					cnc->setMotionMonitorMode(CncControl::DM_2D);
-	}
-	
+	m_outboundNotebook->SetSelection(Outbound3DPage);
+		
 	// select template Page
 	if ( m_mainNotebook->GetSelection() != MainManuallyPage && 
 	     m_mainNotebook->GetSelection() != MainTestPage && 
@@ -3465,7 +3412,6 @@ void MainFrame::processTemplate() {
 		m_mainNotebook->SetSelection(MainTemplatePage);
 	}
 
-	setCoordinateSystemType();
 	updateStepDelay();
 	disableControls();
 	resetMinMaxPositions();
@@ -3557,8 +3503,8 @@ void MainFrame::setMinMaxPositions() {
 	CncDoublePosition min = cnc->getMinPositionsMetric();
 	CncDoublePosition max = cnc->getMaxPositionsMetric();
 	
-	wxString sel = m_gridPosUnit->GetStringSelection();
-	SVGUnit unit = SvgUnitCalculator::determineUnit(sel);
+	SVGUnit unit = mm;
+	//todo display unit in tab page
 
 	m_minPosX->SetLabel(wxString::Format(wxT("%4.4f"), min.getX() * SvgUnitCalculator::getFactorMM2Unit(unit)));
 	m_minPosY->SetLabel(wxString::Format(wxT("%4.4f"), min.getY() * SvgUnitCalculator::getFactorMM2Unit(unit)));
@@ -3655,12 +3601,6 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 	std::cerr << "Emergency Stop detected" << std::endl;
 	cnc->interrupt();
 	setRefPostionState(false);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::clearDrawPane(wxCommandEvent& event){
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	cnc->clearDrawControl();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::changeUpdateInterval(wxCommandEvent& event) {
@@ -4025,40 +3965,6 @@ void MainFrame::saveEmuOutput(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onMotionDrawPane(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	
-	if ( event.ControlDown() == true ) {
-		event.Skip();
-		return;
-	}
-	
-	double fact = getDrawPaneFactor();
-	wxPoint p(event.GetPosition().x, event.GetPosition().y);
-	cnc->convertToCoordiateSystem(p);
-	
-	wxString sel = m_gridPosUnit->GetStringSelection();
-	SVGUnit unit = SvgUnitCalculator::determineUnit(sel);
-	
-	{
-		wxString s;
-		s << p.x / fact * SvgUnitCalculator::getFactorPx2Unit(unit);
-		m_drawPainPositionX->SetValue(s);
-	}
-	{
-		wxString s;
-		s << p.y / fact * SvgUnitCalculator::getFactorPx2Unit(unit);
-		m_drawPainPositionY->SetValue(s);
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::onLeaveDrawPane(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_drawPainPositionX->SetValue(_T(""));
-	m_drawPainPositionY->SetValue(_T(""));
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::svgEmuClear(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc && cnc->getSerial());
@@ -4324,7 +4230,6 @@ SvgOutputParameters& MainFrame::evaluteSvgOutputParameters(SvgOutputParameters& 
 	if (sel.MakeUpper() == "YES" ) 	sop.onlyFirstCrossing = true;
 	else							sop.onlyFirstCrossing = false;
 	
-	sop.coordSystemType = getCoordinateSytemType();
 	return sop;
 }
 ///////////////////////////////////////////////////////////////////
@@ -4836,7 +4741,8 @@ void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
 		url.assign(tmpPreview);
 	}
 	
-	m_svgPreviewFileName->SetValue(wxString::Format("%s | %s", fn, tmpPreview));
+	m_svgPreviewFileName1->SetValue(fn);
+	m_svgPreviewFileName2->SetValue(tmpPreview);
 	m_svgPreview->LoadURL(url);
 	m_svgPreview->Update();
 	stopAnimationControl();
@@ -4923,18 +4829,22 @@ void MainFrame::selectDefaultDirectory(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemActivated(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	int sel = m_lruList->GetSelection();
-	openFileFromFileManager(wxString(lruFileList.getFileName(sel)));
-	
-	//Not necessary will be already released by openFileFromFileManager
-	//prepareTplPreview();
-	//highlightSvgPreview(false);
+	if ( m_lruList->GetStringSelection().length() > 0 ) {
+		int sel = m_lruList->GetSelection();
+		openFileFromFileManager(wxString(lruFileList.getFileName(sel)));
+
+		//Not necessary will be already released by openFileFromFileManager
+		//prepareTplPreview();
+		//highlightSvgPreview(false);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemSelected(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	int sel = m_lruList->GetSelection();
-	updateSvgPreview(wxString(lruFileList.getFileName(sel)));
+	if ( m_lruList->GetStringSelection().length() > 0 ) {
+		int sel = m_lruList->GetSelection();
+		updateSvgPreview(wxString(lruFileList.getFileName(sel)));
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::leaveEnterFileManagerControl(wxMouseEvent& event) {
@@ -4990,6 +4900,7 @@ void MainFrame::showAuiPane(wxWindow* pane, wxMenuItem* menu) {
 	if ( pane == getAUIPaneByName("Spy") ) {
 		enableSerialSpy(true);
 		GetAuimgrMain()->GetPane(pane).Floatable(true);
+		GetAuimgrMain()->GetPane(pane).Dockable(false);
 		GetAuimgrMain()->GetPane(pane).Float();
 		GetAuimgrMain()->GetPane(pane).FloatingSize(600,500);
 		
@@ -5038,6 +4949,7 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 ///////////////////////////////////////////////////////////////////
 	if      ( name == "ToolBar" ) 			return m_miToolbar;
+	else if ( name == "StatusBar")			return m_miViewStatusbar;
 	else if ( name == "MainView")			return m_miViewMainView;
 	else if ( name == "Logger")				return m_miViewLogger;
 	else if ( name == "Outbound")			return m_miViewMonitor;
@@ -5102,6 +5014,11 @@ void MainFrame::viewToolbar(wxCommandEvent& event) {
 	toggleAuiPane(m_auibarMain, m_miToolbar);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::viewStatusbar(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	toggleAuiPane("StatusBar");
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::viewMainView(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	toggleAuiPane("MainView");
@@ -5149,6 +5066,7 @@ void MainFrame::perspectiveRun(wxCommandEvent& event) {
 	showAuiPane("ToolBar");
 	showAuiPane("Outbound");
 	showAuiPane("Logger");
+	showAuiPane("StatusBar");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::perspectiveTemplate(wxCommandEvent& event) {
@@ -5157,25 +5075,32 @@ void MainFrame::perspectiveTemplate(wxCommandEvent& event) {
 	showAuiPane("ToolBar");
 	showAuiPane("MainView");
 	showAuiPane("Logger");
+	showAuiPane("StatusBar");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 ///////////////////////////////////////////////////////////////////
-	if ( evt.pane->window == m_scrollWinFile )
+	if ( evt.pane->window == m_scrollWinFile ) {
 		m_miViewTemplateManager->Check(!m_scrollWinFile->IsShown());
 		
-	else if ( evt.pane->window == m_scrollWinLogger )
+	} else if ( evt.pane->window == m_scrollWinLogger ) {
 		m_miViewLogger->Check(!m_scrollWinLogger->IsShown());
 		
-	else if ( evt.pane->window == m_scrollOutbound )
+	} else if ( evt.pane->window == m_scrollOutbound ) {
 		m_miViewMonitor->Check(!m_scrollOutbound->IsShown());
 		
-	else if ( evt.pane->window == m_scrollWinMain )
+	} else if ( evt.pane->window == m_scrollWinMain ) {
 		m_miViewMainView->Check(!m_scrollWinMain->IsShown());
 		
-	else if ( evt.pane->window == m_scrollSpy ) {
+	} else if ( evt.pane->window == m_scrollSpy ) {
 		m_miViewSpy->Check(!m_scrollSpy->IsShown());
 		enableSerialSpy(false);
+		
+	} else if ( evt.pane->window == m_panelSpeed ) {
+		m_miViewSpeed->Check(!m_panelSpeed->IsShown());
+		
+	} else if ( evt.pane->window == m_statusBar ) {
+		m_miViewStatusbar->Check(!m_statusBar->IsShown());
 		
 	} else if ( evt.pane->window == m_panelSpeed ) {
 		m_miViewSpeed->Check(!m_panelSpeed->IsShown());
@@ -5188,7 +5113,12 @@ void MainFrame::OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
 	if ( perspectiveTimer.IsRunning() == true )
 		perspectiveTimer.Stop();
 		
-	showAuiPane("ToolBar");
+	if ( m_miToolbar->IsChecked() )
+		showAuiPane("ToolBar");
+		
+	if ( m_miViewStatusbar->IsChecked() )
+		showAuiPane("StatusBar");
+		
 	//GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
@@ -5223,6 +5153,8 @@ void MainFrame::viewAllAuiPanes(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::hideAllAuiPanes() {
 ///////////////////////////////////////////////////////////////////
+	hideAuiPane(m_auibarMain,      m_miToolbar);
+	hideAuiPane(m_statusBar,       m_miViewStatusbar);
 	hideAuiPane(m_scrollWinFile,   m_miViewTemplateManager);
 	hideAuiPane(m_scrollWinLogger, m_miViewLogger);
 	hideAuiPane(m_scrollOutbound,  m_miViewMonitor);
@@ -5232,16 +5164,19 @@ void MainFrame::hideAllAuiPanes() {
 	hideAuiPane(m_svgUnitCalulator,m_miViewUnitCalculator);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::viewAllAuiPanes() {
+void MainFrame::viewAllAuiPanes(bool withSpy) {
 ///////////////////////////////////////////////////////////////////
 	showAuiPane(m_auibarMain,      m_miToolbar);
+	showAuiPane(m_statusBar,       m_miViewStatusbar);
 	showAuiPane(m_scrollWinFile,   m_miViewTemplateManager);
 	showAuiPane(m_scrollWinLogger, m_miViewLogger);
 	showAuiPane(m_scrollOutbound,  m_miViewMonitor);
 	showAuiPane(m_scrollWinMain,   m_miViewMainView);
-	showAuiPane(m_scrollSpy,       m_miViewSpy);
 	showAuiPane(m_panelSpeed,      m_miViewSpeed);
 	showAuiPane(m_svgUnitCalulator,m_miViewUnitCalculator);
+	
+	if ( withSpy )
+		showAuiPane(m_scrollSpy,       m_miViewSpy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableSlider(wxMouseEvent& event) {
@@ -5263,7 +5198,7 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 									break;
 									
 			case Outbound3DPage:	if ( cnc )
-										cnc->set3DData(false);
+										cnc->updatePreview3D();
 									break;
 		}
 	} 
@@ -5702,35 +5637,6 @@ void MainFrame::svgEmuZoomHome(wxCommandEvent& event) {
 	clog << "Currently not supported" << endl;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::gridDrawPane(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	cnc->setShowGridSate(m_gridDrawPane->GetValue());
-	
-	wxColor color(227,227,227);
-	if ( m_gridDrawPane->GetValue() )
-		color.Set(191,205,219);
-		
-	m_gridDrawPane->SetBackgroundColour(color);
-	m_gridDrawPane->Update();
-	m_gridDrawPane->Refresh();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::traceDrawPane(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	disableControls();
-	
-	//cnc->traceDrawPane(m_logger);
-	if ( cnc->traceDrawPane(NULL) > 0 ) {
-		wxString cmd, traceFile(CncFileNameService::getCncDrawPaneTraceFileName());
-		config->Read("TemplateEditor/ExternalTool", &cmd, wxT("notepad "));
-		openFileExtern(cmd, traceFile);
-	}
-
-	enableControls();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::OpenXmlTrace(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( svgFileParser == NULL )
@@ -5765,13 +5671,13 @@ void MainFrame::copySvgTrace(wxCommandEvent& event) {
 	m_svgTrace->ClearSelection();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::openFileExtern(wxString& tool, const char* file) {
+bool MainFrame::openFileExtern(const wxString& tool, const char* file) {
 ///////////////////////////////////////////////////////////////////
 	wxString f(file);
 	return openFileExtern(tool, f);
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::openFileExtern(wxString& tool, wxString& file) {
+bool MainFrame::openFileExtern(const wxString& tool, wxString& file) {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
 	
@@ -5830,55 +5736,6 @@ void MainFrame::marginClickEmuSource(wxStyledTextEvent& event) {
 			m_stcEmuSource->ToggleFold(lineClick);
 		}
 	}
-}
-///////////////////////////////////////////////////////////////////
-CoordinateSytemType MainFrame::getCoordinateSytemType() {
-///////////////////////////////////////////////////////////////////
-	if ( m_switchCoordType->GetValue() == true )
-		 return CST_NULL_Y_IS_TOP;
-		 
-	return CST_NULL_Y_IS_BOTTOM;
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::setCoordinateSystemType() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	cnc->setCoordinateSystemType(getCoordinateSytemType());
-	
-	SvgOutputParameters sop;
-	cnc->getSerial()->setSVGOutputParameters(evaluteSvgOutputParameters(sop));
-	cnc->getSerial()->rebuildSVG();
-	refreshSvgEmuFile();
-	
-	if ( getCoordinateSytemType() == CST_NULL_Y_IS_TOP ) {
-		m_switchCoordType->SetBitmap(ImageLib16().Bitmap("BMP_COORD_TOP_BOTTOM"));
-		m_switchCoordTypeSvgOut->SetBitmap(ImageLib16().Bitmap("BMP_COORD_TOP_BOTTOM"));
-		m_drawPaneWindow->ScrollPages(-100);
-	} else {
-		m_switchCoordType->SetBitmap(ImageLib16().Bitmap("BMP_COORD_BOTTOM_TOP"));
-		m_switchCoordTypeSvgOut->SetBitmap(ImageLib16().Bitmap("BMP_COORD_BOTTOM_TOP"));
-		m_drawPaneWindow->ScrollPages(+100);
-	}
-
-	m_switchCoordType->Refresh();
-	m_switchCoordTypeSvgOut->Refresh();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::switchCoordinateSystemType(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setCoordinateSystemType();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::switchCoordinateSystemTypeSvgOut(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// trick to handle switchCoordinateSystemType() from different buttons
-	m_switchCoordType->SetValue(m_switchCoordTypeSvgOut->GetValue());
-	switchCoordinateSystemType(event);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectGridPosUnit(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setMinMaxPositions();
 }
 ///////////////////////////////////////////////////////////////////
 const char* MainFrame::getBlankHtmlPage() {
@@ -6160,39 +6017,84 @@ void MainFrame::testEndSwitchEvaluation(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
+///////////////////////////////////////////////////////////////////
+	static wxColour active(171, 171, 171);
+	static wxColour inactive(240, 240, 240);
+
+	m_3D_Top->SetBackgroundColour(inactive);
+	m_3D_Bottom->SetBackgroundColour(inactive);
+	m_3D_Front->SetBackgroundColour(inactive);
+	m_3D_Rear->SetBackgroundColour(inactive);
+	m_3D_Left->SetBackgroundColour(inactive);
+	m_3D_Right->SetBackgroundColour(inactive);
+	m_3D_Perspective1->SetBackgroundColour(inactive);
+	m_3D_Perspective2->SetBackgroundColour(inactive);
+	m_3D_Perspective3->SetBackgroundColour(inactive);
+	m_3D_Perspective4->SetBackgroundColour(inactive);
+	
+	if ( bt != NULL ) {
+		bt->SetBackgroundColour(active);
+	}
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::showFromFront3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
 	drawPane3D->viewFront();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromRear3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
 	drawPane3D->viewRear();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromTop3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
 	drawPane3D->viewTop();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromBottom3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
 	drawPane3D->viewBottom();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromLeft3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
 	drawPane3D->viewLeft();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromRight3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
 	drawPane3D->viewRight();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::show3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	drawPane3D->view3D();
+	wxButton* bt = (wxButton*)event.GetEventObject();
+
+	if ( bt == m_3D_Perspective1 ) {
+		activate3DPerspectiveButton(bt);
+		drawPane3D->view3DIso1();
+		
+	} else if ( bt == m_3D_Perspective2 ) {
+		activate3DPerspectiveButton(bt);
+		drawPane3D->view3DIso2();
+		
+	} else if ( bt == m_3D_Perspective3 ) {
+		activate3DPerspectiveButton(bt);
+		drawPane3D->view3DIso3();
+		
+	} else if ( bt == m_3D_Perspective4 ) {
+		activate3DPerspectiveButton(bt);
+		drawPane3D->view3DIso4();
+		
+	} 
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::runOpenGLTest(wxCommandEvent& event) {
@@ -6213,21 +6115,7 @@ void MainFrame::animate3D(wxCommandEvent& event) {
 void MainFrame::refresh3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc )
-		cnc->set3DData(false);
-		
-	drawPane3D->Refresh();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::thumbtrack3D(wxScrollWinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	drawPane3D->Refresh();
-	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::thumbRelease3D(wxScrollWinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	event.Skip();
-	drawPane3D->Refresh();
+		cnc->updatePreview3D();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableTestParameter(bool state) {
@@ -6453,21 +6341,6 @@ void MainFrame::setDisplayAngels3D() {
 	drawPane3D->setDisplayAngles(ax, ay, az, false);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::selectedPlane3D(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( drawPane3D == NULL )
-		return;
-		
-	wxString sel = m_planeSelect3D->GetStringSelection();
-	
-	switch ( (char)sel[0] ) {
-		case 'X':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); break;
-		case 'Y':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_YZ); break;
-		case 'Z':	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_ZX); break;
-		default:	drawPane3D->setPlaneSelection(CncOpenGLDrawPane::DPS_XY); 
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::show3DPaneHelp(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString msg;
@@ -6600,74 +6473,9 @@ void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
 	// do nothing
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::paintXAxisMarkerBottom(wxPaintEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxPaintDC dc(m_xAxisMarkerBottom);
-	if ( cnc ) {
-		cnc->drawXMarkerBottom(dc, cnc->getCncConfig()->getDrawPaneZoomFactor());
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::paintXAxisMarkerTop(wxPaintEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxPaintDC dc(m_xAxisMarkerTop);
-	if ( cnc ) {
-		cnc->drawXMarkerTop(dc, cnc->getCncConfig()->getDrawPaneZoomFactor());
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::paintYAxisMarker(wxPaintEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxPaintDC dc(m_yAxisMarker);
-	if ( cnc ) {
-		cnc->drawYMarker(dc, cnc->getCncConfig()->getDrawPaneZoomFactor());
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::update3DDrawOptions(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateCncConfigTrace();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::onKeyDownDrawPane(wxKeyEvent& event) {
-///////////////////////////////////////////////////////////////////
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::onMouseWheelDrawPane(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( event.ControlDown() == true ) {
-		
-		double diff = 0.1;
-		double newFact = getDrawPaneFactor() + (event.GetWheelRotation() > 0 ? diff : -diff );
-		if ( newFact < diff )
-			newFact = diff;
-			
-		if ( newFact > 10.0 )
-			newFact = 10.0;
-		
-		cnc->setDrawPaneZoomFactor(newFact);
-		m_drawPane->Refresh();
-		m_cbDrawPaneZoom->SetStringSelection(wxString::Format("%.1lf", cnc->getCncConfig()->getDrawPaneZoomFactor()));
-		
-		setCoordinateSystemType();
-		
-		event.Skip(false);
-		return;
-	}
-
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::changeDrawPaneZoom(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	double zoom;
-	m_cbDrawPaneZoom->GetStringSelection().ToDouble(&zoom);
-	
-	cnc->setDrawPaneZoomFactor(zoom);
-	m_drawPane->Refresh();
-	
-	setCoordinateSystemType();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayPGenErrorInfo(const wxString& errorInfo) {
@@ -6897,5 +6705,17 @@ void MainFrame::unitTestFramework(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	UnitTests test(this, 0, true);
 	test.ShowModal();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openPrevFile1(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString fn(m_svgPreviewFileName1->GetValue());
+	openFileExtern(wxT("notepad"), fn);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openPrevFile2(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString fn(m_svgPreviewFileName2->GetValue());
+	openFileExtern(wxT("notepad"), fn);
 }
 

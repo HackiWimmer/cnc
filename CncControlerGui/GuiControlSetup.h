@@ -47,10 +47,6 @@ struct GuiControlSetup {
 	CncZView* zView				= NULL;
 	CncSpeedView* speedView     = NULL;
 	
-	wxPanel* xAxisMarkerTop		= NULL;
-	wxPanel* xAxisMarkerBottom	= NULL;
-	wxPanel* yAxisMarker		= NULL;
-
 	wxDataViewListCtrl* staticCncConfig 		= NULL;
 	wxDataViewListCtrl* dynamicCncConfig 		= NULL;
 	wxDataViewListCtrl* setterValues			= NULL;
