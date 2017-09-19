@@ -24,6 +24,7 @@ class CncConfig {
 		double pitchX, pitchY, pitchZ;
 		double dispFactX, dispFactY, dispFactZ;
 		double calcFactX, calcFactY, calcFactZ;
+		float dispFactX3D, dispFactY3D, dispFactZ3D;
 
 		static const unsigned int maxDurations = 32;
 		unsigned int durationCount;
@@ -75,6 +76,9 @@ class CncConfig {
 		, speedX(1), speedY(1), speedZ(1)
 		, pulsWidthOffsetX(100), pulsWidthOffsetY(100), pulsWidthOffsetZ(100)
 		, pitchX(2.0), pitchY(2.0), pitchZ(2.0)
+		, dispFactX(1.0), dispFactY(1.0), dispFactZ(1.0)
+		, calcFactX(1.0), calcFactY(1.0), calcFactZ(1.0)
+		, dispFactX3D(1.0), dispFactY3D(1.0), dispFactZ3D(1.0)
 		, workpieceOffset(5.0)
 		, maxDurationThickness(2.0)
 		, workpieceThickness(0.0)
@@ -108,6 +112,9 @@ class CncConfig {
 		, speedX(cc.getSpeedX()), speedY(cc.getSpeedY()), speedZ(cc.getSpeedX())
 		, pulsWidthOffsetX(cc.getPulsWidthOffsetX()), pulsWidthOffsetY(cc.getPulsWidthOffsetY()), pulsWidthOffsetZ(cc.getPulsWidthOffsetZ())
 		, pitchX(cc.getPitchX()), pitchY(cc.getPitchY()), pitchZ(cc.getPitchZ())
+		, dispFactX(cc.getDisplayFactX()), dispFactY(cc.getDisplayFactY()), dispFactZ(cc.getDisplayFactZ())
+		, calcFactX(cc.getCalculationFactX()), calcFactY(cc.getCalculationFactY()), calcFactZ(cc.getCalculationFactZ())
+		, dispFactX3D(cc.getDispFactX3D()), dispFactY3D(cc.getDispFactY3D()), dispFactZ3D(cc.getDispFactZ3D())
 		, workpieceOffset(cc.getWorkpieceOffset())
 		, maxDurationThickness(cc.getMaxDurationThickness())
 		, workpieceThickness(cc.getWorkpieceThickness())
@@ -138,6 +145,10 @@ class CncConfig {
 			calcFactX = 0.0 + (stepsX/pitchX);
 			calcFactY = 0.0 + (stepsY/pitchY);
 			calcFactZ = 0.0 + (stepsZ/pitchZ);
+			
+			dispFactX3D = 1.0 * maxDimensionsX * calcFactX;
+			dispFactY3D = 1.0 * maxDimensionsY * calcFactY;
+			dispFactZ3D = 1.0 * maxDimensionsZ * calcFactZ;
 		}
 		////////////////////////////////////////////////////////////////////////
 		const bool isModified() { return changed; }
@@ -327,11 +338,11 @@ class CncConfig {
 		CncConfig& setUnit(CncUnit u) { sc(); unit = u; return *this;}
 		////////////////////////////////////////////////////////////////////////
 		const double getMaxDimensionX() { return maxDimensionsX; }
-		CncConfig& setMaxDimensionX(double val) { sc(); maxDimensionsX = val; return *this; }
+		CncConfig& setMaxDimensionX(double val) { sc(); maxDimensionsX = val; calculateFactors(); return *this; }
 		const double getMaxDimensionY() { return maxDimensionsY; }
-		CncConfig& setMaxDimensionY(double val) { sc(); maxDimensionsY = val; return *this; }
+		CncConfig& setMaxDimensionY(double val) { sc(); maxDimensionsY = val; calculateFactors(); return *this; }
 		const double getMaxDimensionZ() { return maxDimensionsZ; }
-		CncConfig& setMaxDimensionZ(double val) { sc(); maxDimensionsZ = val; return *this; }
+		CncConfig& setMaxDimensionZ(double val) { sc(); maxDimensionsZ = val; calculateFactors(); return *this; }
 		////////////////////////////////////////////////////////////////////////
 		CncConfig& setStepsX(unsigned int v) { sc(); stepsX = v; calculateFactors(); return *this; }
 		CncConfig& setStepsY(unsigned int v) { sc(); stepsY = v; calculateFactors(); return *this; }
@@ -387,6 +398,10 @@ class CncConfig {
 		double getCalculationFactX(void) { return calcFactX; }
 		double getCalculationFactY(void) { return calcFactY; }
 		double getCalculationFactZ(void) { return calcFactZ; }
+		////////////////////////////////////////////////////////////////////////
+		double getDispFactX3D(void) { return dispFactX3D; }
+		double getDispFactY3D(void) { return dispFactY3D; }
+		double getDispFactZ3D(void) { return dispFactZ3D; }
 		////////////////////////////////////////////////////////////////////////
 		const unsigned int	getMaxDurations() 			{ return maxDurations; }
 		unsigned int		getDurationCount() 			{ return durationCount; }

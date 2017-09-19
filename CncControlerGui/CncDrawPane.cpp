@@ -1,40 +1,45 @@
 #include <iostream>
-
 #include <wx/dcclient.h>
 #include <wx/app.h> 
-
-#ifdef USE_WXCRAFTER
-	#include "wxcrafter.h"
-#endif
 
 #ifdef __DARWIN__
     #include <OpenGL/glu.h>
 	#include <OpenGL/glut.h>
+	#include <OpenGL/freeglut.h>
 #else
     #include <GL/glu.h>
 	#include <GL/glut.h>
+	#include <GL/freeglut.h>
 #endif
 
 #include "trackball.h"
+#include "wxcrafter.h"
 #include "CncCommon.h"
 #include "CncDrawPane.h"
 
+// ----------------------------------------------------------------------------
+// CncOpenGLDrawPaneContext
+// ----------------------------------------------------------------------------
 CncOpenGLDrawPaneContext* CncOpenGLDrawPane::globalContext = NULL;
 class GlobalContextManager {
 	public:
+		//////////////////////////////////////////////////////
 		GlobalContextManager() {
-			
+			// init glut lib
+			int   argc = 1;
+			char* argv[1] = { wxString("CncOpenGLDrawPane").char_str() };
+			glutInit(&argc, argv);
 		}
+		//////////////////////////////////////////////////////
 		~GlobalContextManager() {
 			CncOpenGLDrawPane::destroyGlobalContext();
 		}
 		
-}; GlobalContextManager gcm;
+}; GlobalContextManager _gcm;
 
 // ----------------------------------------------------------------------------
 // CncOpenGLDrawPane Event Table
 // ----------------------------------------------------------------------------
-
 wxBEGIN_EVENT_TABLE(CncOpenGLDrawPane, wxGLCanvas)
 	EVT_PAINT(CncOpenGLDrawPane::OnPaint)
 	EVT_MOUSE_EVENTS(CncOpenGLDrawPane::OnMouse)
@@ -53,6 +58,7 @@ CncOpenGLDrawPane::CncOpenGLDrawPane(wxWindow *parent, int *attribList)
 // viewport settings.
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, 
 	         wxFULL_REPAINT_ON_RESIZE)
+, cncConfig(NULL)
 , spinTimerInterval(DEFAULT_SPIN_TIMER_INTERVAL)
 , currentViewType(DPVT_3D_ISO1)
 , viewPort()
@@ -73,11 +79,6 @@ CncOpenGLDrawPane::CncOpenGLDrawPane(wxWindow *parent, int *attribList)
 	
 	// select a inital view, this also initializes viewPort
 	view(currentViewType);
-	
-	// init glut
-	char *myargv [1]; int myargc = 1;
-	myargv[0] = strdup("CncOpenGLDrawPane");
-	glutInit(&myargc, myargv);
 }
 /////////////////////////////////////////////////////////////////////
 CncOpenGLDrawPane::~CncOpenGLDrawPane() {
@@ -94,13 +95,15 @@ void CncOpenGLDrawPane::trace(const wxString& msg) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::setWorkpieceInfo(const CncOpenGLDrawPaneContext::WorkpieceInfo& wi) {
+void CncOpenGLDrawPane::setCncConfig(CncConfig* conf) {
 /////////////////////////////////////////////////////////////////////
-	
-	//todo
-	workpieceInfo = wi;
-	
-			//guiCtlSetup->drawPane3D->Refresh();
+	cncConfig = conf;
+}
+/////////////////////////////////////////////////////////////////////
+void CncOpenGLDrawPane::setDisplayInfo(const CncOpenGLDrawPaneContext::DisplayOptions3D& di) {
+/////////////////////////////////////////////////////////////////////
+	displayInfo = di;
+	Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::runOpenGLTest() {
@@ -172,7 +175,7 @@ void CncOpenGLDrawPane::animate3D() {
 	switchSpinTimer();
 }
 /////////////////////////////////////////////////////////////////////
-CncOpenGLDrawPaneContext& CncOpenGLDrawPane::initGlobalContext(wxGLCanvas *canvas) {
+CncOpenGLDrawPaneContext& CncOpenGLDrawPane::initGlobalContext(wxGLCanvas *canvas, CncConfig* conf) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT( canvas != NULL );
 
@@ -181,6 +184,8 @@ CncOpenGLDrawPaneContext& CncOpenGLDrawPane::initGlobalContext(wxGLCanvas *canva
 		CncOpenGLDrawPane::globalContext = new CncOpenGLDrawPaneContext(canvas);
 
 	globalContext->SetCurrent(*canvas);
+	globalContext->setCncConfig(conf);
+	
 	return *globalContext;
 }
 /////////////////////////////////////////////////////////////////////
@@ -367,6 +372,9 @@ void CncOpenGLDrawPane::resetProjectionMode() {
 /////////////////////////////////////////////////////////////////////
 	if ( !IsShownOnScreen() )
 		return;
+		
+	if ( globalContext == NULL )
+		return;
 
 	// This is normally only necessary if there is more than one wxGLCanvas
 	// or more than one wxGLContext in the application.
@@ -386,10 +394,11 @@ void CncOpenGLDrawPane::resetProjectionMode() {
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::OnSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( currentOrigin == DPO_CUSTOM )
+	/*if ( currentOrigin == DPO_CUSTOM )
 		currentOrigin = DPO_CENTER;
 		
 	resetProjectionMode();
+	 * */
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
@@ -400,10 +409,10 @@ void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
 	evaluateViewPort();
 	glViewport(viewPort.x, viewPort.y, viewPort.w, viewPort.h);
 
-	CncOpenGLDrawPaneContext& dpc = CncOpenGLDrawPane::initGlobalContext(this);
+	CncOpenGLDrawPaneContext& dpc = CncOpenGLDrawPane::initGlobalContext(this, cncConfig);
 	SetCurrent(*globalContext);
 	
-	dpc.setWorkpieceInfo(workpieceInfo);
+	dpc.setDisplayInfo(displayInfo);
 		
 	// Initialize the global OpenGl data with the first call of OnPaint
 	if ( globalData.isInitialized() == false ) {
@@ -421,7 +430,9 @@ void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
 	glLoadIdentity();
 	glTranslatef(translate.x, translate.y, translate.z);
 	glScalef(scale.x, scale.y, scale.z);
+	//glScalef(1.0,1.0,1.0);
 	
+	// todo
 	if ( false ) {
 		std::stringstream ss;
 		ss << "ViewPort: "<< viewPort;
@@ -432,7 +443,7 @@ void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
 	
 	rotate(true);
 	
-	dpc.displayDataVector(data, currentViewType);
+	dpc.displayDataVector(data, currentViewType, GetClientSize());
 	
 	SwapBuffers();
 }

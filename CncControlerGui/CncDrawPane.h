@@ -7,6 +7,7 @@
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
+#include "CncConfig.h"
 #include "CncDrawPaneContext.h"
 
 #if !wxUSE_GLCANVAS
@@ -150,7 +151,8 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		static CncOpenGLDrawPaneContext* globalContext;
 		static const unsigned int DEFAULT_SPIN_TIMER_INTERVAL = 50;
 
-		CncOpenGLDrawPaneContext::WorkpieceInfo workpieceInfo;
+		CncOpenGLDrawPaneContext::DisplayOptions3D displayInfo;
+		CncConfig* cncConfig;
 		unsigned int spinTimerInterval;
 		DrawPaneViewType currentViewType;
 		ViewPort viewPort;
@@ -168,6 +170,10 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		
 		DrawPaneOrigin currentOrigin;
 
+		float refFactorX;
+		float refFactorY;
+		float refFactorZ;
+		
 		DrawPaneData data;
 		CncOpenGLData globalData;
 		
@@ -215,10 +221,11 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		void displayDataVector();
 
 		// setter
-		void setWorkpieceInfo(const CncOpenGLDrawPaneContext::WorkpieceInfo& wi);
+		void setDisplayInfo(const CncOpenGLDrawPaneContext::DisplayOptions3D& wi);
 		void initDisplayAngles(float ax, float ay, float az);
 		void setDisplayAngles(float ax, float ay, float az, bool updateCtrl = false);
 		void setSpinTimerInterval(const unsigned int i) { spinTimerInterval = i; }
+		void setCncConfig(CncConfig* conf);
 		
 		// test
 		void runOpenGLTest();
@@ -258,7 +265,7 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		static void CheckGLError();
 
 		// global context
-		static CncOpenGLDrawPaneContext& initGlobalContext(wxGLCanvas *canvas);
+		static CncOpenGLDrawPaneContext& initGlobalContext(wxGLCanvas *canvas, CncConfig* conf);
 		
 		// is used from global kex down hook
 		void OnKeyDown(wxKeyEvent& event);

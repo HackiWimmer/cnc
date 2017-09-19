@@ -32,8 +32,6 @@ struct PositionInfo3D {
 	bool zAxisDown = false;
 };
 
-typedef std::vector<PositionInfo3D> DrawPoints3D;
-
 ///////////////////////////////////////////////////////////////////
 struct PointPair {
 	wxPoint lp;

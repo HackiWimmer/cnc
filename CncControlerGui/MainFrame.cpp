@@ -1437,9 +1437,7 @@ void MainFrame::selectPort(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::connectSerialPort() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(m_portSelector);
 	wxASSERT(cnc);
-	
 	wxBitmap bmpC = ImageLib16().Bitmap("BMP_CONNECTED");
 	wxBitmap bmpD = ImageLib16().Bitmap("BMP_DISCONNECTED");
 	
@@ -1451,12 +1449,11 @@ bool MainFrame::connectSerialPort() {
 	
 	m_serialTimer->Stop();
 	
-	if ( m_clearSerialSpyOnConnect->IsChecked() ) {
+	if ( m_clearSerialSpyOnConnect->IsChecked() )
 		clearSerialSpy();
-	}
 	
 	bool ret = false;
-	wxString sel = m_portSelector->GetStringSelection();
+	wxString sel(m_portSelector->GetStringSelection());
 	CncConfig cc(*cnc->getCncConfig());
 	
 	delete cnc;
@@ -1469,37 +1466,34 @@ bool MainFrame::connectSerialPort() {
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		cnc->updateCncConfig(cc);
-		cs = "NULL";
+		cs.assign("NULL");
+		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
 		cnc->updateCncConfig(cc);
 		wxString val;
-		cs = CncFileNameService::getCncOutboundSvgFileName();
+		cs.assign(CncFileNameService::getCncOutboundSvgFileName());
 		showSVGEmuResult();
 		enableMenuItem(m_miSaveEmuOutput, true);
+		
 	} else {
 		cnc = new CncControl(CncPORT);
 		cnc->updateCncConfig(cc);
-		cs = "\\\\.\\";
-		cs += sel;
+		cs.assign("\\\\.\\");
+		cs.append(sel);
 	}
 
 	initializeCncControl();
-	lastPortName = "";
+	lastPortName.clear();
 	
 	if ( (ret = cnc->connect(cs)) == true )  {
 		cnc->setup();
+		cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 		updateCncConfigTrace();
-		lastPortName = sel;
-		stopAnimationControl();
+		lastPortName.assign(sel);
 		m_connect->SetBitmap(bmpC);
-		
-		setRefPostionState(false);
-		if ( cnc->getSerial()->isEmulator() ) {
-			setRefPostionState(true);
-		}
-		
 		m_serialTimer->Start();
+		drawPane3D->setCncConfig(cnc->getCncConfig());
 	}
 	
 	decoratePortSelector();
@@ -1819,6 +1813,7 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 void MainFrame::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc && cnc->getCncConfig());
+	
 	cnc->updateCncConfigTrace();
 	cnc->updateZSlider();
 	collectSummary();
@@ -6475,7 +6470,15 @@ void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::update3DDrawOptions(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	updateCncConfigTrace();
+	if ( guiCtlSetup->drawPane3D != NULL ) {
+		CncOpenGLDrawPaneContext::DisplayOptions3D di;
+
+		di.drawZeroPlane 		= guiCtlSetup->cb3DDrawZeroPlane ? guiCtlSetup->cb3DDrawZeroPlane->IsChecked() : false;
+		di.drawWorkpieceSurface = guiCtlSetup->cb3DDrawWorkpieceSurfacePlane ? guiCtlSetup->cb3DDrawWorkpieceSurfacePlane->IsChecked() : false;
+		di.drawWorkpieceOffset	= guiCtlSetup->cb3DDrawWorkpieceOffset ? guiCtlSetup->cb3DDrawWorkpieceOffset->IsChecked() : false;
+		
+		guiCtlSetup->drawPane3D->setDisplayInfo(di);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayPGenErrorInfo(const wxString& errorInfo) {

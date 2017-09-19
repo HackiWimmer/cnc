@@ -5,6 +5,9 @@ CncControlerGui/Debug/**
 CncControlerGui/Resources/**
 CncControlerGui/Doxyfile/**
 
+FreeGlutWorkspace/Release/**
+FreeGlutWorkspace/Debug/**
+
 #*.exe
 #*.txt
 #*.bat

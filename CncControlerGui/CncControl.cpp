@@ -937,17 +937,10 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 
 	// avoid duplicate values
 	if ( lastDrawPoint3D != curPos ) {
-		double fx = cncConfig->getMaxDimensionX() * cncConfig->getCalculationFactX();
-		double fy = cncConfig->getMaxDimensionY() * cncConfig->getCalculationFactY();
-		double fz = cncConfig->getMaxDimensionZ() * cncConfig->getCalculationFactZ();
-		
-		pp3d.set(lastDrawPoint3D.getX() / fx, 
-				 lastDrawPoint3D.getY() / fy, 
-				 lastDrawPoint3D.getZ() / fz,
-				 curPos.getX() / fx, 
-				 curPos.getY() / fy, 
-				 curPos.getZ() / fz);
-		
+
+		pp3d.set(lastDrawPoint3D.getX(), lastDrawPoint3D.getY(), lastDrawPoint3D.getZ(),
+				 curPos.getX(), curPos.getY(), curPos.getZ());
+				 
 		if ( zAxisDown == true ) {
 			//pp3d.setDefaultToDrawColour();
 			pp3d.setDrawColour(penHandler.getCurrentPen(zAxisDown).GetColour());
@@ -1328,18 +1321,6 @@ void CncControl::updateCncConfigTrace() {
 	
 	if ( cncConfig->isModified() == false )
 		return;
-	
-	if ( guiCtlSetup->drawPane3D != NULL ) {
-		CncOpenGLDrawPaneContext::WorkpieceInfo wi;
-		wi.offset    = cncConfig->getWorkpieceThickness() / cncConfig->getMaxDimensionZ();
-		wi.thickness = cncConfig->getWorkpieceThickness() / cncConfig->getMaxDimensionZ();
-		
-		wi.drawZeroPlane 		= guiCtlSetup->cb3DDrawZeroPlane ? guiCtlSetup->cb3DDrawZeroPlane->IsChecked() : false;
-		wi.drawWorkpieceSurface = guiCtlSetup->cb3DDrawWorkpieceSurfacePlane ? guiCtlSetup->cb3DDrawWorkpieceSurfacePlane->IsChecked() : false;
-		wi.drawWorkpieceOffset	= guiCtlSetup->cb3DDrawWorkpieceOffset ? guiCtlSetup->cb3DDrawWorkpieceOffset->IsChecked() : false;
-		
-		guiCtlSetup->drawPane3D->setWorkpieceInfo(wi);
-	}
 	
 	wxVector<wxVector<wxVariant>> rows;
 	if ( guiCtlSetup->staticCncConfig ) {
