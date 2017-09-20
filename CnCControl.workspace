@@ -8,7 +8,7 @@
       <Project Name="CncConrollerGui" ConfigName="Release"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Debug"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Debug"/>

@@ -35,6 +35,14 @@
       <File Name="CncPoint3D.h"/>
       <File Name="trackball.h"/>
       <File Name="trackball.cpp"/>
+      <File Name="3D/GLCncPathData.h"/>
+      <File Name="3D/GLContextBase.cpp"/>
+      <File Name="3D/GLContextBase.h"/>
+      <File Name="3D/GLContextCncPath.cpp"/>
+      <File Name="3D/GLContextCncPath.h"/>
+      <File Name="3D/GLContextTestCube.cpp"/>
+      <File Name="3D/GLContextTestCube.h"/>
+      <File Name="3D/GLViewPort.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="EndSwitchDlg">
       <File Name="EndSwitchDialog.cpp"/>
