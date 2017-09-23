@@ -1,7 +1,7 @@
 #ifndef OPENGL_CONTEXT_TEST_CUBE_H
 #define OPENGL_CONTEXT_TEST_CUBE_H
 
-#include "3D/GLContextBase.h"
+#include "3D/GLContextPathBase.h"
 
 /////////////////////////////////////////////////////////////////
 class OpenGLContextTestCube : public OpenGLContextCncPathBase {
@@ -15,7 +15,7 @@ class OpenGLContextTestCube : public OpenGLContextCncPathBase {
 	protected:
 		virtual void initContext();
 		virtual void determineProjection(int w, int h);
-		virtual void displayContext();
+		virtual void determineModel();
 		virtual GLViewPort* createViewPort();
 };
 

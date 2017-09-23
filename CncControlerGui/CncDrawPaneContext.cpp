@@ -159,6 +159,7 @@ void CncOpenGLDrawPaneContext::drawZeroPlane() {
 		glVertex3f(10.0, 10.0, 0.0);
 		glVertex3f( 0.0, 10.0, 0.0);
 	glEnd();
+
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPaneContext::drawWorkpieceSurface() {

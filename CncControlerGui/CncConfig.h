@@ -5,8 +5,12 @@
 #include <wx/vector.h>
 #include <wx/combobox.h>
 #include "DataControlModel.h"
-#include "CncSvgCurveLib.h"
+
 #include "CncCommon.h"
+
+#ifndef _USE_WX_DUMMY_CANVAS 
+	#include "CncSvgCurveLib.h"
+#endif
 
 class CncConfig {
 	private:

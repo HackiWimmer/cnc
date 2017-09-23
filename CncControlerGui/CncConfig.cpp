@@ -1,5 +1,7 @@
 #include "CncConfig.h"
 
+#ifndef _USE_WX_DUMMY_CANVAS 
+
 wxComboBox* CncConfig::gblCurveLibSelector = NULL;
 
 ////////////////////////////////////////////////////////////////////////
@@ -26,3 +28,5 @@ void CncConfig::updateCurveLibResolutionSelector() {
 		CncConfig::gblCurveLibSelector->SetStringSelection(label);
 	}
 }
+
+#endif

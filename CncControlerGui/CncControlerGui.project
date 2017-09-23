@@ -28,21 +28,31 @@
       <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release"/>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
-      <File Name="CncDrawPane.cpp"/>
-      <File Name="CncDrawPane.h"/>
-      <File Name="CncDrawPaneContext.cpp"/>
-      <File Name="CncDrawPaneContext.h"/>
-      <File Name="CncPoint3D.h"/>
       <File Name="trackball.h"/>
       <File Name="trackball.cpp"/>
-      <File Name="3D/GLCncPathData.h"/>
-      <File Name="3D/GLContextBase.cpp"/>
-      <File Name="3D/GLContextBase.h"/>
-      <File Name="3D/GLContextCncPath.cpp"/>
-      <File Name="3D/GLContextCncPath.h"/>
-      <File Name="3D/GLContextTestCube.cpp"/>
-      <File Name="3D/GLContextTestCube.h"/>
-      <File Name="3D/GLViewPort.h"/>
+      <VirtualDirectory Name="Base">
+        <File Name="3D/GLContextBase.cpp"/>
+        <File Name="3D/GLContextBase.h"/>
+        <File Name="3D/GLContextPathBase.cpp"/>
+        <File Name="3D/GLContextPathBase.h"/>
+        <File Name="3D/GLCncPathData.h"/>
+        <File Name="3D/GLViewPort.h"/>
+        <File Name="3D/GLViewPort.cpp"/>
+        <File Name="3D/GLModelHelper.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Impl">
+        <File Name="3D/GLContextCncPath.cpp"/>
+        <File Name="3D/GLContextCncPath.h"/>
+        <File Name="3D/GLContextTestCube.cpp"/>
+        <File Name="3D/GLContextTestCube.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Old">
+        <File Name="CncDrawPane.cpp"/>
+        <File Name="CncDrawPane.h"/>
+        <File Name="CncDrawPaneContext.cpp"/>
+        <File Name="CncDrawPaneContext.h"/>
+        <File Name="CncPoint3D.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="EndSwitchDlg">
       <File Name="EndSwitchDialog.cpp"/>

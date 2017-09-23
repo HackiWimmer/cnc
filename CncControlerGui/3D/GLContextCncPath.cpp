@@ -16,39 +16,33 @@ OpenGLContextCncPath::OpenGLContextCncPath(wxGLCanvas* canvas)
 : OpenGLContextCncPathBase(canvas)
 {
 /////////////////////////////////////////////////////////////////
-	// do nothing here
+	// do something here on demand
 }
 /////////////////////////////////////////////////////////////////
 OpenGLContextCncPath::~OpenGLContextCncPath() {
 /////////////////////////////////////////////////////////////////
-	// do nothing here
+	// do something here on demand
 }
 /////////////////////////////////////////////////////////////////
 GLViewPort* OpenGLContextCncPath::createViewPort() {
 /////////////////////////////////////////////////////////////////
+	// determine the destort type
 	return new GLViewPort(GLViewPort::VPT_Undistored);
 }
 /////////////////////////////////////////////////////////////////
 void OpenGLContextCncPath::initContext() {
 /////////////////////////////////////////////////////////////////
 	// do context specific initalization here
-	
 }
 /////////////////////////////////////////////////////////////////
 void OpenGLContextCncPath::determineProjection(int w, int h) {
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity ();
-	glFrustum (-1.0, 1.0, -1.0, 1.0, 1.5, 20.0);
-	glMatrixMode (GL_MODELVIEW);
+/////////////////////////////////////////////////////////////////
+	OpenGLContextBase::determineProjection(w, h);
 }
 /////////////////////////////////////////////////////////////////
-void OpenGLContextCncPath::displayContext() {
+void OpenGLContextCncPath::determineModel() {
 /////////////////////////////////////////////////////////////////
-	glColor3f (1.0, 1.0, 1.0);
-	glLoadIdentity ();             /* clear the matrix */
-		   /* viewing transformation  */
-	gluLookAt (0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-	glScalef (1.0, 2.0, 1.0);      /* modeling transformation */ 
-	glutWireCube (1.0);
+	// draw the scene
+	 OpenGLContextCncPathBase::determineModel();
 }
 

@@ -8,17 +8,29 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="main.cpp"/>
+    <File Name="main.cpp" ExcludeProjConfig=""/>
     <File Name="Sample1.cpp" ExcludeProjConfig="Debug;Release"/>
-    <File Name="../CncControlerGui/3D/GLCncPathData.h"/>
-    <File Name="../CncControlerGui/3D/GLContextBase.cpp"/>
-    <File Name="../CncControlerGui/3D/GLContextBase.h"/>
-    <File Name="../CncControlerGui/3D/GLContextCncPath.cpp"/>
-    <File Name="../CncControlerGui/3D/GLContextCncPath.h"/>
-    <File Name="../CncControlerGui/3D/GLContextTestCube.cpp"/>
-    <File Name="../CncControlerGui/3D/GLContextTestCube.h"/>
-    <File Name="../CncControlerGui/3D/GLViewPort.h"/>
     <File Name="wxDummyCanvas.h"/>
+    <File Name="../CncControlerGui/CncConfig.cpp"/>
+    <File Name="../CncControlerGui/CncConfig.h"/>
+    <VirtualDirectory Name="Impl">
+      <File Name="../CncControlerGui/3D/GLContextCncPath.cpp"/>
+      <File Name="../CncControlerGui/3D/GLContextCncPath.h"/>
+      <File Name="../CncControlerGui/3D/GLContextTestCube.cpp"/>
+      <File Name="../CncControlerGui/3D/GLContextTestCube.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Base">
+      <File Name="../CncControlerGui/3D/GLCncPathData.h"/>
+      <File Name="../CncControlerGui/3D/GLContextBase.cpp"/>
+      <File Name="../CncControlerGui/3D/GLContextBase.h"/>
+      <File Name="../CncControlerGui/3D/GLContextPathBase.cpp"/>
+      <File Name="../CncControlerGui/3D/GLContextPathBase.h"/>
+      <File Name="../CncControlerGui/3D/GLViewPort.h"/>
+      <File Name="../CncControlerGui/3D/GLViewPort.cpp"/>
+      <File Name="../CncControlerGui/3D/GLModelHelper.h"/>
+    </VirtualDirectory>
+    <File Name="Sample2.cpp" ExcludeProjConfig="Release"/>
+    <File Name="global.cpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

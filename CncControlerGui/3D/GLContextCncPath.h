@@ -1,7 +1,7 @@
 #ifndef OPENGL_CONTEXT_CNC_PATH_H
 #define OPENGL_CONTEXT_CNC_PATH_H
 
-#include "3D/GLContextBase.h"
+#include "3D/GLContextPathBase.h"
 
 /////////////////////////////////////////////////////////////////
 class OpenGLContextCncPath : public OpenGLContextCncPathBase {
@@ -15,7 +15,7 @@ class OpenGLContextCncPath : public OpenGLContextCncPathBase {
 	protected:
 		virtual void initContext();
 		virtual void determineProjection(int w, int h);
-		virtual void displayContext();
+		virtual void determineModel();
 		virtual GLViewPort* createViewPort();
 };
 

@@ -1,16 +1,29 @@
 #ifndef OPENGL_CONTEXTBASE_H
 #define OPENGL_CONTEXTBASE_H
 
-//#include <wx/wx.h>
 #include <wx/colour.h>
 
 #include "3D/GLViewPort.h"
 #include "3D/GLCncPathData.h"
+#include "3D/GLModelHelper.h"
+#include "CncConfig.h"
 
 #ifdef _USE_WX_DUMMY_CANVAS 
 	#include "wxDummyCanvas.h"
 #else
 	#include <wx/glcanvas.h>
+#endif
+
+#ifdef _USE_WX_DUMMY_CANVAS 
+	namespace OGL_DEBUG {
+		extern void debugInfo(const char* context, const char* function, const char* message);
+		extern void debugError(const char* context, const char* function, const char* message);
+	}
+#else
+	namespace OGL_DEBUG {
+		void debugInfo(const char* context, const char* function, const char* message);
+		void debugError(const char* context, const char* function, const char* message);
+	}
 #endif
 
 /////////////////////////////////////////////////////////////////
@@ -20,104 +33,120 @@ class OpenGLContextBase : public wxGLContext {
 		OpenGLContextBase(wxGLCanvas* canvas);
 		virtual ~OpenGLContextBase();
 		
+		enum ViewType { VT_2D = 100, VT_3D = 200 };
+		enum ViewMode {	V2D_TOP 		= VT_2D, 
+						V2D_BOTTOM, 
+						V2D_LEFT, 
+						V2D_RIGHT, 
+						V2D_FRONT, 
+						V2D_REAR,
+						
+						V3D_ISO1 		= VT_3D, 
+						V3D_ISO2, 
+						V3D_ISO3, 
+						V3D_ISO4, 
+					};
+		
 		// public context interface 
 		virtual const char* getContextName() = 0;
 		virtual void keyboardHandler(unsigned char c);
 		
 		void init();
 		void display();
-		void reshape(int w, int h);
+		void reshape(int w, int h, int x=0, int y=0);
+		void reshapeViewMode(int w, int h);
+		
+		//smoothing
+		void enableSmoothing(bool enable=true);
+		void disableSmoothing() { enableSmoothing(false); }
+		bool isSmoothingEnabled();
+		
+		// viewPort
+		void centerViewport();
+		
+		// view mode
+		void setViewMode(OpenGLContextBase::ViewMode m);
+		OpenGLContextBase::ViewMode getViewMode() { return viewMode; }
+		
+		bool isViewMode2D() { return isViewMode2D(viewMode); }
+		bool isViewMode3D() { return isViewMode3D(viewMode); }
+		bool isViewMode2D(OpenGLContextBase::ViewMode m) { return (m >= V2D_TOP && m < V3D_ISO1); }
+		bool isViewMode3D(OpenGLContextBase::ViewMode m) { return (m >= V3D_ISO1); }
+		
+		OpenGLContextBase::ViewType getViewType() { return getViewType(viewMode); }
+		OpenGLContextBase::ViewType getViewType(OpenGLContextBase::ViewMode m) {
+			if ( isViewMode2D(m) )
+				return ViewType::VT_2D;
+				
+			return ViewType::VT_3D;
+		}
+
+		GLViewPort::PreDefPos convertViewMode(OpenGLContextBase::ViewMode m);
+		
+		// model scale
+		void decScale() { modelScale.decScale(); display(); }
+		void incScale() { modelScale.incScale(); display(); }
+		
+		// model rotate
+		void resetAngles() { modelRotate.reset(); }
+		void restoreDefaultAngles() { modelRotate.restoreDefaults(); }
+		
+		void decAngle()  { modelRotate.decAngle();  display(); }
+		void decAngleX() { modelRotate.decAngleX(); display(); }
+		void decAngleY() { modelRotate.decAngleY(); display(); }
+		void decAngleZ() { modelRotate.decAngleZ(); display(); }
+		
+		void incAngle()  { modelRotate.incAngle();  display(); }
+		void incAngleX() { modelRotate.incAngleX(); display(); }
+		void incAngleY() { modelRotate.incAngleY(); display(); }
+		void incAngleZ() { modelRotate.incAngleZ(); display(); }
+		
+		// error
+		void checkGLError();
 		
 	protected:
-
 		////////////////////////////////////////////////////
 		class CoordOrginInfo {
 			public:
 				struct Colours {
-					wxColour x;
-					wxColour y;
-					wxColour z;
+					wxColour x, y, z;
 					
-					/////////////////////////////////////////////
 					Colours() 
-					: x(255, 0, 0)
-					, y(0, 255, 0)
-					, z(0, 0, 255)
+					: x(255, 0, 0), y(0, 255, 0), z(0, 0, 255)
 					{}
 				};
 			
 				Colours colours;
 				float length;
 
-				/////////////////////////////////////////////////
 				CoordOrginInfo() 
-				: colours()
-				, length(0.25f)
+				: colours(), length(0.25f)
 				{}
 		};
 
-		bool 			initialized;
-		CoordOrginInfo 	coordOriginInfo;
-		GLViewPort*		viewPort;
+		bool 				initialized;
+		bool				drawViewPortBounderies;
+		ViewMode			viewMode;
+		CoordOrginInfo 		coordOriginInfo;
+		GLViewPort*			viewPort;
+		GLI::ModelScale 	modelScale;
+		GLI::ModelRotate	modelRotate;
 		
-		virtual void displayCoordinateOrigin();
-		virtual void determineViewPort(int w, int h);
+		virtual void determineCoordinateOrigin();
+		virtual void determineViewPort(int w, int h, int x=0, int y=0);
 		
 		// protected context interface
 		virtual void initContext() = 0;
-		virtual void determineProjection(int w, int h) = 0;
-		virtual void displayContext() = 0;
 		virtual GLViewPort* createViewPort() = 0;
-};
-
-/////////////////////////////////////////////////////////////////
-class OpenGLContextCncPathBase : public OpenGLContextBase {
-	
-	public:
-		/////////////////////////////////////////////////////////
-		OpenGLContextCncPathBase(wxGLCanvas* canvas)
-		: OpenGLContextBase(canvas)
-		, cncPath()
-		{
-			cncPath.reserve(1024 * 1024);
-		}
 		
-		/////////////////////////////////////////////////////////
-		virtual ~OpenGLContextCncPathBase() {
-			clearData();
-		}
+		virtual void determineProjection(int w, int h);
+		virtual void determineCameraPosition();
+		virtual void determineModel();
 		
-		/////////////////////////////////////////////////////////
-		void clearData() {
-			cncPath.clear();
-		}
-		
-		/////////////////////////////////////////////////////////
-		const GLCncPath& getData() {
-			return cncPath;
-		}
-		
-		/////////////////////////////////////////////////////////
-		void traceData(std::ostream out) {
-			out << "Size: " << cncPath.size() << std::endl;
-			for( GLCncPath::iterator it = cncPath.begin(); it < cncPath.end(); it++ ) {
-				out << ' ' << it->x << ',' << it->y << ',' << it->z << std::endl;
-			}
-		}
-		
-		/////////////////////////////////////////////////////////
-		void appendData(const GLCncPathVertices& cpv) {
-			cncPath.push_back(cpv);
-		}
-		
-		/////////////////////////////////////////////////////////
-		void appendData(const GLCncPath& cp) {
-			if ( cp.size() > 0 )	cncPath.assign(cp.begin(), cp.end() - 1);
-			else 					clearData();
-		}
-		
-	protected:
-		GLCncPath	cncPath;
+		void renderBitmapString(float x, float y, float z, void* font, const char* string);
+		 
+	private:
+		void determineViewPortBounderies();
 };
 
 #endif

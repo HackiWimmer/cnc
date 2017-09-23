@@ -1,15 +1,20 @@
 #ifndef GL_VIEW_PORT_H
 #define GL_VIEW_PORT_H
 
+#include <iostream>
+#include "wx/string.h"
+
 class GLViewPort {
 
 	public:
 		enum DistortType {VPT_Distored, VPT_Undistored};
-		enum OrigPosType {VPOP_TopLeft, VPOP_TopRight, VPOP_BottomLeft, VPOP_BottomRight, VPOP_Center, VPOP_Custom};
+		enum OrigPosType {VPOP_Center, VPOP_Custom};
+		enum PreDefPos   {VPDP_TopLeft, VPDP_TopRight, VPDP_BottomLeft, VPDP_BottomRight, VPDP_Center};
 
 		////////////////////////////////////////////////////
 		GLViewPort(GLViewPort::DistortType type)
 		: x(0), y(0), w(0), h(0), n(0)
+		, factor(2)
 		, distortType(type)
 		, origPosType(OrigPosType::VPOP_Center)
 		{}
@@ -17,12 +22,29 @@ class GLViewPort {
 		////////////////////////////////////////////////////
 		~GLViewPort() {
 		}
+		
+		/////////////////////////////////////////////////////////
+		void trace(std::ostream& out) {
+			out << wxString::Format("Viewport:") << std::endl;
+			out << wxString::Format(" x, y, w, h, n: %d, %d, %d, %d, %d", x, y, w, h, n) << std::endl;
+			out << wxString::Format(" Destort Type   : %s", getDistortTypeAsString()) << std::endl;
+			out << wxString::Format(" Origin Pos     : %s", getOriginPosTypeAsString()) << std::endl;
+			out << wxString::Format(" Aspect         : %f", getAspect()) << std::endl;
+			out << wxString::Format(" Factor         : %d", getFactor()) << std::endl;
+		}
 
 		////////////////////////////////////////////////////
 		int getX() { return x; }
 		int getY() { return y; }
 		int getW() { return w; }
 		int getH() { return h; }
+		
+		////////////////////////////////////////////////////
+		int getFactor() { return factor; }
+		float getDisplayFactor() { return 1.0/factor; }
+		
+		////////////////////////////////////////////////////
+		float getAspect() { return 1.0f * getNormalizedSizeW()/getNormalizedSizeH(); }
 
 		////////////////////////////////////////////////////
 		int getNormalizedSizeW() {
@@ -42,69 +64,50 @@ class GLViewPort {
 
 		////////////////////////////////////////////////////
 		GLViewPort::DistortType getDistortType() { return distortType; }
+		const char* getDistortTypeAsString() {
+			switch ( distortType ) {
+				case VPT_Distored: 		return "Distored";
+				case VPT_Undistored: 	return "Undistored";
+			}
+			return "???";
+		}
+		void centerViewport() { origPosType = VPOP_Center; }
 
 		////////////////////////////////////////////////////
-		GLViewPort::OrigPosType getOrigPosType() { return origPosType; }
-		void setOrigPosType(GLViewPort::OrigPosType opt) { origPosType = opt; }
-
+		GLViewPort::OrigPosType getOriginPosType() { return origPosType; }
+		const char* getOriginPosTypeAsString() {
+			switch ( origPosType ) {
+				case VPOP_Custom: 	return "Custom";
+				case VPOP_Center: 	return "Center";
+			}
+			return "???";
+		}
+		
+		void resetCustomOrigPosType() { origPosType = VPOP_Center; }
+		
+		////////////////////////////////////////////////////
+		void getPreDefCoordinatesXY(GLViewPort::PreDefPos pdp,
+									int wndSizeW,
+									int wndSizeH,
+									int& x, 
+									int& y);
+		
 		////////////////////////////////////////////////////
 		void evaluate(int wndSizeW,
 					  int wndSizeH,
 					  int custPosX=0,
-					  int custPosY=0) {
-
-			switch ( origPosType ) {
-
-				case VPOP_Custom: 		x = (custPosX == 0 ? getX() : custPosX );
-										y = (custPosY == 0 ? getY() : custPosY );
-										w = wndSizeW * 2;
-										h = wndSizeH * 2;
-										break;
-				
-				case VPOP_Center:
-				default: 				x = 0;
-										y = 0;
-										w = wndSizeW;
-										h = wndSizeH;
-										break;
-/*
-				case VPOP_TopLeft: 		x = -1 * (wndSizeW / 2 - margin);
-										y = -1 * (margin);
-										w = wndSizeW - 2 * margin;
-										h = wndSizeH - 2 * margin;;
-										break;
-
-				case VPOP_TopRight: 	x = -1 * (margin);
-										y = -1 * (margin);
-										w = wndSizeW - 2 * margin;
-										h = wndSizeH - 2 * margin;;
-										break;
-
-				case VPOP_BottomLeft: 	x = -1 * (wndSizeW / 2 - margin);
-										y = -1 * (wndSizeH / 2 - margin);
-										w = wndSizeW - 2 * margin;
-										h = wndSizeH - 2 * margin;;
-										break;
-
-				case VPOP_BottomRight: 	x = -1 * (margin);
-										y = -1 * (wndSizeH / 2 - margin);
-										w = wndSizeW - 2 * margin;
-										h = wndSizeH - 2 * margin;;
-										break;
-*/
-			}
-
-			// determine the normalized size
-			w > h ? n = h : n = w;
-		}
+					  int custPosY=0);
 
 	private:
 
 		static const unsigned int margin = 10;
 
 		int x, y, w, h, n;
+		int factor;
 		GLViewPort::DistortType distortType;
 		GLViewPort::OrigPosType origPosType;
+		
+		void setOrigPosType(GLViewPort::OrigPosType opt) { origPosType = opt; }
 
 };
 
