@@ -2,7 +2,7 @@
 <CodeLite_Project Name="CncConrollerGui" InternalType="GUI" Version="10.0.0">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
+      <![CDATA[00030001N0005Debug0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
     </Plugin>
   </Plugins>
   <Description/>
@@ -20,16 +20,14 @@
       <File Name="GCodeField.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="StcLexer ">
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release"/>
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Debug;Release"/>
-      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd" ExcludeProjConfig="Debug;Release"/>
-      <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h" ExcludeProjConfig="Debug;Release"/>
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release"/>
-      <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release;release2"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Debug;Release;release2"/>
+      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd" ExcludeProjConfig="Debug;Release;release2"/>
+      <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h" ExcludeProjConfig="Debug;Release;release2"/>
+      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release;release2"/>
+      <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;release2"/>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
-      <File Name="trackball.h"/>
-      <File Name="trackball.cpp"/>
       <VirtualDirectory Name="Base">
         <File Name="3D/GLContextBase.cpp"/>
         <File Name="3D/GLContextBase.h"/>
@@ -38,7 +36,8 @@
         <File Name="3D/GLCncPathData.h"/>
         <File Name="3D/GLViewPort.h"/>
         <File Name="3D/GLViewPort.cpp"/>
-        <File Name="3D/GLModelHelper.h"/>
+        <File Name="3D/GLHelperCamera.h"/>
+        <File Name="3D/GLHelperModel.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Impl">
         <File Name="3D/GLContextCncPath.cpp"/>
@@ -47,12 +46,18 @@
         <File Name="3D/GLContextTestCube.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Old">
-        <File Name="CncDrawPane.cpp"/>
-        <File Name="CncDrawPane.h"/>
-        <File Name="CncDrawPaneContext.cpp"/>
-        <File Name="CncDrawPaneContext.h"/>
-        <File Name="CncPoint3D.h"/>
+        <File Name="CncDrawPane.cpp" ExcludeProjConfig="Debug;Release;release2"/>
+        <File Name="CncDrawPane.h" ExcludeProjConfig="Debug;Release;release2"/>
+        <File Name="CncDrawPaneContext.cpp" ExcludeProjConfig="Debug;Release;release2"/>
+        <File Name="CncDrawPaneContext.h" ExcludeProjConfig="Debug;Release;release2"/>
+        <File Name="CncPoint3D.h" ExcludeProjConfig="Debug;Release;release2"/>
+        <File Name="trackball.cpp" ExcludeProjConfig="Debug;release2"/>
+        <File Name="trackball.h" ExcludeProjConfig="Debug;release2"/>
       </VirtualDirectory>
+      <File Name="CncMotionMonitor.h"/>
+      <File Name="CncMotionMonitor.cpp"/>
+      <File Name="GL3DOptions.cpp"/>
+      <File Name="GL3DOptions.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="EndSwitchDlg">
       <File Name="EndSwitchDialog.cpp"/>
@@ -214,7 +219,7 @@
       <File Name="Clipper/clipper.hpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
-  <VirtualDirectory Name="resources">
+  <VirtualDirectory Name="Resources">
     <File Name="wxcrafter.wxcp"/>
     <File Name="win_resources.rc"/>
   </VirtualDirectory>
@@ -255,6 +260,8 @@
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -273,7 +280,6 @@
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="DEBUG"/>
-        <Preprocessor Value="USE_WXCRAFTER"/>
       </Compiler>
       <Linker Options="-pg;-mwindows;$(shell wx-config --libs)" Required="yes">
         <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
@@ -297,7 +303,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
+      <PreBuild>
+        <Command Enabled="yes">rem gcc -E -dM CncControl.cpp</Command>
+      </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
         <RebuildCommand/>
@@ -321,13 +329,12 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-Ofast;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-Ofast;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O3;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
-        <Preprocessor Value="USE_WXCRAFTER"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
         <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
@@ -374,7 +381,59 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
+    <Configuration Name="release2" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O3;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <IncludePath Value="C:\@Development\boost_1_65_0"/>
+        <IncludePath Value="C:\@Development\freeglut\include"/>
+        <Preprocessor Value="NDEBUG"/>
+      </Compiler>
+      <Linker Options="-mwindows;$(shell wx-config --libs)" Required="yes">
+        <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
+        <Library Value="libwxmsw31u_stc"/>
+        <Library Value="libwxmsw31u_webview"/>
+        <Library Value="libwxmsw31u_propgrid"/>
+        <Library Value="libwxmsw31u_adv"/>
+        <Library Value="libwxmsw31u_gl"/>
+        <Library Value="opengl32"/>
+        <Library Value="glu32"/>
+        <Library Value="libfreeglut"/>
+      </Linker>
+      <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release3" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild>
+        <Command Enabled="yes">rem gcc -E -dM CncControl.cpp</Command>
+      </PreBuild>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

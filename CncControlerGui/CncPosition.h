@@ -114,18 +114,17 @@ class CncPosition {
 		, zMax(z)
 		{}
 		////////////////////////////////////////////////////////////////
-		CncPosition(const CncPosition& cp) {
-			xPos = cp.getX();
-			yPos = cp.getY();
-			zPos = cp.getZ();
-			
-			xMin = getXMin();
-			yMin = getYMin();
-			zMin = getZMin();
-			xMax = getXMax();
-			yMax = getYMax();
-			zMax = getZMax();
-		}
+		CncPosition(const CncPosition& cp)
+		: xPos(cp.getX())
+		, yPos(cp.getY())
+		, zPos(cp.getZ())
+		, xMin(cp.getXMin())
+		, xMax(cp.getXMax())
+		, yMin(cp.getYMin())
+		, yMax(cp.getYMax())
+		, zMin(cp.getZMin())
+		, zMax(cp.getZMax())
+		{}
 		////////////////////////////////////////////////////////////////
 		virtual ~CncPosition() {
 		}

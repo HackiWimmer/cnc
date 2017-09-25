@@ -16,9 +16,9 @@
 /////////////////////////////////////////////////////////////////
 // global vars
 /////////////////////////////////////////////////////////////////
-OpenGLContextCncPathBase* currentContext 	= NULL;
-OpenGLContextCncPathBase* context0 			= NULL;
-OpenGLContextCncPathBase* context1 			= NULL;
+GLContextCncPathBase* currentContext 	= NULL;
+GLContextCncPathBase* context0 			= NULL;
+GLContextCncPathBase* context1 			= NULL;
 
 void display();
 void reshape(int w, int h);
@@ -40,11 +40,11 @@ void fillDataVector() {
 	currentContext->clearPathData();
 	
 	GLI::GLCncPathVertices vertice;
-	currentContext->appendPathData(vertice.set(0, 0, 0));
-	currentContext->appendPathData(vertice.set(1, 0, 0));
-	currentContext->appendPathData(vertice.set(1, 1, 0));
-	currentContext->appendPathData(vertice.set(0, 1, 0));
-	currentContext->appendPathData(vertice.set(0, 0, 0));
+	currentContext->appendPathData(vertice.set(0.0f, 0.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(1.0f, 0.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(1.0f, 1.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(0.0f, 1.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(0.0f, 0.0f, 0.0f));
 }
 
 /////////////////////////////////////////////////////////////////
@@ -65,7 +65,6 @@ void switchContext(int id)
 	if ( currentContext != NULL ) {
 		std::clog << "main::Context switched to: " << currentContext->getContextName() << " ["<< id  << "]" << std::endl;
 		
-		currentContext->setViewMode(OpenGLContextBase::V2D_TOP);
 		currentContext->reshapeViewMode(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
 		display();
 	} else {
@@ -81,18 +80,19 @@ void setViewMode(unsigned char c) {
 	
 	std::clog << "main::switch view mode to: ";
 	switch ( c ) {
-		case '1': currentContext->setViewMode(OpenGLContextBase::V2D_TOP); 		std::clog << c; break;
-		case '2': currentContext->setViewMode(OpenGLContextBase::V2D_BOTTOM); 	std::clog << c; break;
-		case '3': currentContext->setViewMode(OpenGLContextBase::V2D_LEFT); 	std::clog << c; break;
-		case '4': currentContext->setViewMode(OpenGLContextBase::V2D_RIGHT); 	std::clog << c; break;
-		case '5': currentContext->setViewMode(OpenGLContextBase::V2D_FRONT); 	std::clog << c; break;
-		case '6': currentContext->setViewMode(OpenGLContextBase::V2D_REAR); 	std::clog << c; break;
-		case '7': currentContext->setViewMode(OpenGLContextBase::V3D_ISO1); 	std::clog << c; break;
-		case '8': currentContext->setViewMode(OpenGLContextBase::V3D_ISO2); 	std::clog << c; break;
-		case '9': currentContext->setViewMode(OpenGLContextBase::V3D_ISO3); 	std::clog << c; break;
-		case '0': currentContext->setViewMode(OpenGLContextBase::V3D_ISO4); 	std::clog << c; break;
+		case '1': currentContext->setViewMode(GLContextBase::V2D_TOP); 		std::clog << c; break;
+		case '2': currentContext->setViewMode(GLContextBase::V2D_BOTTOM); 	std::clog << c; break;
+		case '3': currentContext->setViewMode(GLContextBase::V2D_LEFT); 	std::clog << c; break;
+		case '4': currentContext->setViewMode(GLContextBase::V2D_RIGHT); 	std::clog << c; break;
+		case '5': currentContext->setViewMode(GLContextBase::V2D_FRONT); 	std::clog << c; break;
+		case '6': currentContext->setViewMode(GLContextBase::V2D_REAR); 	std::clog << c; break;
+		case '7': currentContext->setViewMode(GLContextBase::V3D_ISO1); 	std::clog << c; break;
+		case '8': currentContext->setViewMode(GLContextBase::V3D_ISO2); 	std::clog << c; break;
+		case '9': currentContext->setViewMode(GLContextBase::V3D_ISO3); 	std::clog << c; break;
+		case '0': currentContext->setViewMode(GLContextBase::V3D_ISO4); 	std::clog << c; break;
 		default: 	std::clog << '?' << " It still stay unchanged";
 	}
+	std::clog << " --> " << currentContext->getViewModeAsString();
 	std::clog << std::endl;
 	
 	currentContext->reshapeViewMode(glutGet(GLUT_WINDOW_WIDTH), glutGet(GLUT_WINDOW_HEIGHT));
@@ -119,7 +119,7 @@ void resetRotation() {
 	if ( currentContext == NULL )
 		return;
 		
-	currentContext->resetAngles();
+	currentContext->getModelRotation().reset2DDefaults();
 	display();
 }
 /////////////////////////////////////////////////////////////////
@@ -128,10 +128,10 @@ void switchDrawType() {
 	if ( currentContext == NULL )
 		return;
 		
-	if ( currentContext->getDrawType() == OpenGLContextCncPathBase::DT_POINTS )
-		currentContext->setDrawType(OpenGLContextCncPathBase::DT_LINE_STRIP);
+	if ( currentContext->getDrawType() == GLContextCncPathBase::DT_POINTS )
+		currentContext->setDrawType(GLContextCncPathBase::DT_LINE_STRIP);
 	else 
-		currentContext->setDrawType(OpenGLContextCncPathBase::DT_POINTS);
+		currentContext->setDrawType(GLContextCncPathBase::DT_POINTS);
 		
 	display();
 }
@@ -142,16 +142,15 @@ void init()
 {
 	std::clog << "main::init()" << std::endl;
 	
-	glClearColor (0.0, 0.0, 0.0, 0.0);
-	glShadeModel (GL_FLAT);
+	GLContextBase::globalInit();
 	
-	context0 = new OpenGLContextTestCube(NULL);
-	context1 = new OpenGLContextCncPath(NULL);
+	context0 = new GLContextTestCube(NULL);
+	context1 = new GLContextCncPath(NULL);
 	
 	context0->init();
 	context1->init();
 	
-	switchContext(1);
+	switchContext(0);
 }
 
 /////////////////////////////////////////////////////////////////
@@ -201,6 +200,29 @@ void reshape(int w, int h)
 }
 
 /////////////////////////////////////////////////////////////////
+void rotateXYPlaneZTop() {
+/////////////////////////////////////////////////////////////////
+	if ( currentContext == NULL )
+		return;
+		
+	currentContext->setViewMode(GLContextBase::ViewMode::V2D_CAM_ROT_XY_ZTOP);
+	currentContext->reshapeViewMode();
+	
+	int start = currentContext->getCameraPosition().getCurXYPlaneEyeAngle();
+	
+	int step = 5;
+	float radius = currentContext->getCameraPosition().getCurXYPlaneEyeRadius();
+	
+	for ( int i=start; i<=360+start; i+=step ) {
+
+		currentContext->getCameraPosition().rotateXYPlanTopZ_3D(i, radius, currentContext->getCameraPosition().getEyeZ());
+		
+		display();
+		Sleep(100);
+	}
+}
+
+/////////////////////////////////////////////////////////////////
 void keyboard(unsigned char c, int x, int y)
 /////////////////////////////////////////////////////////////////
 {
@@ -237,6 +259,9 @@ void keyboard(unsigned char c, int x, int y)
 		case 'd':	switchDrawType();
 					break;
 					
+		case 'q':	rotateXYPlaneZTop();
+					break;
+					
 		case ' ':	headline();
 					break;
 					
@@ -269,10 +294,10 @@ void special(int key, int x, int y) {
 	}
 	
 	switch ( key ) {
-		case GLUT_KEY_LEFT: 	currentContext->incAngle(); break;
-		case GLUT_KEY_UP:		currentContext->incAngle(); break;
-		case GLUT_KEY_RIGHT:	currentContext->decAngle(); break;
-		case GLUT_KEY_DOWN:		currentContext->decAngle(); break;
+		case GLUT_KEY_LEFT: 	currentContext->getModelRotation().incAngle(); break;
+		case GLUT_KEY_UP:		currentContext->getModelRotation().incAngle(); break;
+		case GLUT_KEY_RIGHT:	currentContext->getModelRotation().decAngle(); break;
+		case GLUT_KEY_DOWN:		currentContext->getModelRotation().decAngle(); break;
 	}
 }
 
@@ -291,11 +316,11 @@ void mouse(int button, int state, int x, int y)
 	
 	switch ( button ) {
 		case BT_WHELL_DOWN: 	if ( state == BT_DOWN )
-									currentContext->decScale();
+									currentContext->getModelScale().decScale();
 								break;
 								
 		case BT_WHEEL_UP: 		if ( state == BT_DOWN )	
-									currentContext->incScale();
+									currentContext->getModelScale().incScale();
 								break;
 								
 		case BT_LEFT:			if ( state == BT_DOWN ) {

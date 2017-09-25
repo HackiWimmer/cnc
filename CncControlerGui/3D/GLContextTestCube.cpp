@@ -12,38 +12,46 @@
 #endif
 
 /////////////////////////////////////////////////////////////////
-OpenGLContextTestCube::OpenGLContextTestCube(wxGLCanvas* canvas) 
-: OpenGLContextCncPathBase(canvas)
+GLContextTestCube::GLContextTestCube(wxGLCanvas* canvas) 
+: GLContextCncPathBase(canvas)
 {
 /////////////////////////////////////////////////////////////////
 	// do something here on demand
 }
 /////////////////////////////////////////////////////////////////
-OpenGLContextTestCube::~OpenGLContextTestCube() {
+GLContextTestCube::~GLContextTestCube() {
 /////////////////////////////////////////////////////////////////
 	// do something here on demand
 }
 /////////////////////////////////////////////////////////////////
-GLViewPort* OpenGLContextTestCube::createViewPort() {
+GLViewPort* GLContextTestCube::createViewPort() {
 /////////////////////////////////////////////////////////////////
 	// determine the destort type
 	return new GLViewPort(GLViewPort::VPT_Distored);
 }
 /////////////////////////////////////////////////////////////////
-void OpenGLContextTestCube::initContext() {
+void GLContextTestCube::initContext() {
 /////////////////////////////////////////////////////////////////
 	// do context specific initalization here
+	setViewMode(GLContextBase::V3D_ISO1);
 }
 /////////////////////////////////////////////////////////////////
-void OpenGLContextTestCube::determineProjection(int w, int h) {
-	OpenGLContextBase::determineProjection(w, h);
+void GLContextTestCube::determineProjection(int w, int h) {
+	GLContextBase::determineProjection(w, h);
 }
 /////////////////////////////////////////////////////////////////
-void OpenGLContextTestCube::determineModel() {
+void GLContextTestCube::determineModel() {
 /////////////////////////////////////////////////////////////////
 	glMatrixMode(GL_MODELVIEW);
 
 	// draw the scene
 	glColor3f (1.0, 1.0, 1.0);
 	glutWireCube (1.0);
+	
+	glPushMatrix();
+		glColor3f (1.0, 0.0, 0.0);
+		glTranslatef(0.3f, 0.3f, 0.3f);
+		glutWireCube (0.3);
+	glPopMatrix();
+	
 }

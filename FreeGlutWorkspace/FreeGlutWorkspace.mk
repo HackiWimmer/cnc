@@ -2,18 +2,18 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Release
+## Debug
 ProjectName            :=FreeGlutWorkspace
-ConfigurationName      :=Release
+ConfigurationName      :=Debug
 WorkspacePath          :=C:/@Development/@Projekte/c++/CNCGuiController
 ProjectPath            :=C:/@Development/@Projekte/c++/CNCGuiController/FreeGlutWorkspace
-IntermediateDirectory  :=./Release
+IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=23/09/2017
+Date                   :=30/09/2017
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -shared -fPIC
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=$(PreprocessorSwitch)NDEBUG $(PreprocessorSwitch)_USE_WX_DUMMY_CANVAS 
+Preprocessors          :=$(PreprocessorSwitch)_USE_WX_DUMMY_CANVAS 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:\@Developm
 AR       := C:/@Development/Compilers/TDM-GCC-64/bin/ar.exe rcu
 CXX      := C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 CC       := C:/@Development/Compilers/TDM-GCC-64/bin/gcc.exe
-CXXFLAGS := -Wno-deprecated-declarations -Ofast -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
-CFLAGS   :=  -Ofast -Wall $(Preprocessors)
+CXXFLAGS := -Wno-deprecated-declarations -g -O0 -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
+CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/@Development/Compilers/TDM-GCC-64/bin/as.exe
 
@@ -64,7 +64,7 @@ AS       := C:/@Development/Compilers/TDM-GCC-64/bin/as.exe
 CodeLiteDir:=C:\Program Files\CodeLite
 WXWIN:=C:\@Development\wxWidgets-3.1.0
 WXCFG:=gcc_dll\mswu
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(ObjectSuffix) $(IntermediateDirectory)/global.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(ObjectSuffix) 
 
 
 
@@ -83,11 +83,11 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 MakeIntermediateDirs:
-	@$(MakeDirCommand) "./Release"
+	@$(MakeDirCommand) "./Debug"
 
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Release"
+	@$(MakeDirCommand) "./Debug"
 
 PreBuild:
 
@@ -102,22 +102,6 @@ $(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
 
 $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.cpp$(PreprocessSuffix) main.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(ObjectSuffix): ../CncControlerGui/CncConfig.cpp $(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncConfig.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(DependSuffix): ../CncControlerGui/CncConfig.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(DependSuffix) -MM ../CncControlerGui/CncConfig.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(PreprocessSuffix): ../CncControlerGui/CncConfig.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_CncConfig.cpp$(PreprocessSuffix) ../CncControlerGui/CncConfig.cpp
-
-$(IntermediateDirectory)/global.cpp$(ObjectSuffix): global.cpp $(IntermediateDirectory)/global.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/FreeGlutWorkspace/global.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/global.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/global.cpp$(DependSuffix): global.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/global.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/global.cpp$(DependSuffix) -MM global.cpp
-
-$(IntermediateDirectory)/global.cpp$(PreprocessSuffix): global.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/global.cpp$(PreprocessSuffix) global.cpp
 
 $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix): ../CncControlerGui/3D/GLContextCncPath.cpp $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLContextCncPath.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix) $(IncludePath)
@@ -165,6 +149,6 @@ $(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(PreprocessSuffix)
 ## Clean
 ##
 clean:
-	$(RM) -r ./Release/
+	$(RM) -r ./Debug/
 
 

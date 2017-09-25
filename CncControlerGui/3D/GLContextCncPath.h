@@ -4,13 +4,13 @@
 #include "3D/GLContextPathBase.h"
 
 /////////////////////////////////////////////////////////////////
-class OpenGLContextCncPath : public OpenGLContextCncPathBase {
+class GLContextCncPath : public GLContextCncPathBase {
 	
 	public:
-		OpenGLContextCncPath(wxGLCanvas* canvas);
-		virtual ~OpenGLContextCncPath();
+		GLContextCncPath(wxGLCanvas* canvas);
+		virtual ~GLContextCncPath();
 		
-		virtual const char* getContextName() { return "OpenGLDrawPaneContextCncPath"; };
+		virtual const char* getContextName() { return "OpenGLContextCncPath"; };
 		
 	protected:
 		virtual void initContext();

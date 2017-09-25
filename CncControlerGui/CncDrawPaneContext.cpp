@@ -373,7 +373,7 @@ void CncOpenGLDrawPaneContext::displayDataVector(DrawPaneData& dpd, DrawPaneView
 	}
 	
 	// for testing only
-	if ( true ) {
+	if ( false ) {
 		testGL(curSize);
 		return;
 	}

@@ -64,6 +64,10 @@ void GLViewPort::evaluate(int wndSizeW,
 	int prevX = x;
 	int prevY = y;
 	
+	// store real window size
+	windowWidth  = wndSizeW;
+	windowHeigth = wndSizeH;
+	
 	// calc new values
 	w = wndSizeW * factor;
 	h = wndSizeH * factor;

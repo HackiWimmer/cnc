@@ -26,9 +26,11 @@ class GlobalContextManager {
 		//////////////////////////////////////////////////////
 		GlobalContextManager() {
 			// init glut lib
+			/*
 			int   argc = 1;
 			char* argv[1] = { wxString("CncOpenGLDrawPane").char_str() };
 			glutInit(&argc, argv);
+			 * */
 		}
 		//////////////////////////////////////////////////////
 		~GlobalContextManager() {

@@ -8,6 +8,12 @@
 #include "CncStreamBuffers.h"
 #include "StdStreamRedirector.h"
 
+// control ids
+enum {
+	PERSPECTIVE_TIMER 		= wxID_HIGHEST + 1,
+	MM_CAMERA_ROTATION_TIMER 	= wxID_HIGHEST + 2
+};
+
 // make essiential global variables available
 namespace cnc {
 	extern CncBasicLogStream cex1;

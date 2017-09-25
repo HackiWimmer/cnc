@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <sstream>
 #include <cfloat>
@@ -12,7 +13,7 @@
 #include "SerialEmulatorNULL.h"
 #include "SerialEmulatorFile.h"
 #include "SerialEmulatorSVG.h"
-#include "CncDrawPane.h"
+#include "CncMotionMonitor.h"
 #include "CncCommon.h"
 #include "CncControl.h"
 #include "CncFileNameService.h"
@@ -29,7 +30,6 @@ CncControl::CncControl(CncPortType pt)
 , startPos(0,0,0)
 , curPos(0,0,0)
 , controllerPos(0,0,0)
-, lastDrawPoint3D(0,0,0)
 , renderMode(CncRenderAtController)
 , durationCounter(0)
 , interruptState(false)
@@ -174,32 +174,32 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 	} else {
 		DcmItemList rows;
 
-		if ( guiCtlSetup->setterValues != NULL ) {
-			guiCtlSetup->setterValues->Freeze();
-			guiCtlSetup->setterValues->DeleteAllItems();
+		if ( IS_GUI_CTL_VALID(setterValues) ) {
+			GET_GUI_CTL(setterValues)->Freeze();
+			GET_GUI_CTL(setterValues)->DeleteAllItems();
 			
 			std::map<int, int32_t> smap = serialPort->getSetterMap();
 			for (auto& x: smap) {
 				DataControlModel::addKeyValueRow(rows, ArduinoPIDs::getPIDLabel(x.first), x.second);
 			}
 			for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-				guiCtlSetup->setterValues->AppendItem(*it);
+				GET_GUI_CTL(setterValues)->AppendItem(*it);
 			}
-			guiCtlSetup->setterValues->Thaw();
+			GET_GUI_CTL(setterValues)->Thaw();
 		}
 		
 		rows.clear();
-		if ( guiCtlSetup->processedSetters != NULL ) {
-			guiCtlSetup->processedSetters->Freeze();
-			DataControlModel::addNumKeyValueRow(rows, guiCtlSetup->processedSetters->GetItemCount() + 1, ArduinoPIDs::getPIDLabel((int)id), value);
+		if ( IS_GUI_CTL_VALID(processedSetters) ) {
+			GET_GUI_CTL(processedSetters)->Freeze();
+			DataControlModel::addNumKeyValueRow(rows, GET_GUI_CTL(processedSetters)->GetItemCount() + 1, ArduinoPIDs::getPIDLabel((int)id), value);
 			
 			for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-				guiCtlSetup->processedSetters->AppendItem(*it);
+				GET_GUI_CTL(processedSetters)->AppendItem(*it);
 			}
 			
 			int itemCount = guiCtlSetup->processedSetters->GetItemCount();
-			guiCtlSetup->processedSetters->EnsureVisible(guiCtlSetup->processedSetters->RowToItem(itemCount - 1));
-			guiCtlSetup->processedSetters->Thaw();
+			GET_GUI_CTL(processedSetters)->EnsureVisible(guiCtlSetup->processedSetters->RowToItem(itemCount - 1));
+			GET_GUI_CTL(processedSetters)->Thaw();
  		}
 	}
 
@@ -355,8 +355,8 @@ void CncControl::clearDrawControl() {
 ///////////////////////////////////////////////////////////////////	
 	penHandler.reset();
 	
-	if ( guiCtlSetup != NULL && guiCtlSetup->drawPane3D != NULL )
-		guiCtlSetup->drawPane3D->clear3D();
+	if ( IS_GUI_CTL_VALID(motionMonitor) )
+		GET_GUI_CTL(motionMonitor)->clear();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateDrawControl() {
@@ -389,7 +389,7 @@ void CncControl::setGuiControls(GuiControlSetup* gcs) {
 ///////////////////////////////////////////////////////////////////
 	assert(gcs);
 	guiCtlSetup = gcs;
-	toolState.setControl(guiCtlSetup->toolState);
+	toolState.setControl(GET_GUI_CTL(toolState));
 	setToolState(true);
 }
 ///////////////////////////////////////////////////////////////////
@@ -400,7 +400,7 @@ void CncControl::setZeroPosX() {
 	curPos.setX(0);
 	zeroPos.setX(0);
 	startPos.setX(0);
-	setValue(guiCtlSetup->xAxis, curPos.getX() * getCncConfig()->getDisplayFactX());
+	setValue(GET_GUI_CTL(xAxis), curPos.getX() * getCncConfig()->getDisplayFactX());
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosY() {
@@ -410,7 +410,7 @@ void CncControl::setZeroPosY() {
 	curPos.setY(0);
 	zeroPos.setY(0);
 	startPos.setY(0);
-	setValue(guiCtlSetup->yAxis, curPos.getY() * getCncConfig()->getDisplayFactY());
+	setValue(GET_GUI_CTL(yAxis), curPos.getY() * getCncConfig()->getDisplayFactY());
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosZ() {
@@ -432,7 +432,7 @@ void CncControl::setZeroPosZ() {
 		}
 	}
 
-	setValue(guiCtlSetup->zAxis, curPos.getZ() * getCncConfig()->getDisplayFactZ());
+	setValue(GET_GUI_CTL(zAxis), curPos.getZ() * getCncConfig()->getDisplayFactZ());
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos() {
@@ -495,9 +495,9 @@ bool CncControl::reset() {
 	setZeroPos();
 	
 	CncLongPosition cp = getControllerPos();
-	setValue(guiCtlSetup->xAxisCtl, cp.getX() * getCncConfig()->getDisplayFactX());
-	setValue(guiCtlSetup->yAxisCtl, cp.getY() * getCncConfig()->getDisplayFactY());
-	setValue(guiCtlSetup->zAxisCtl, cp.getZ() * getCncConfig()->getDisplayFactZ());
+	setValue(GET_GUI_CTL(xAxisCtl), cp.getX() * getCncConfig()->getDisplayFactX());
+	setValue(GET_GUI_CTL(yAxisCtl), cp.getY() * getCncConfig()->getDisplayFactY());
+	setValue(GET_GUI_CTL(zAxisCtl), cp.getZ() * getCncConfig()->getDisplayFactZ());
 	
 	evaluateLimitState();
 	
@@ -524,8 +524,8 @@ void CncControl::resetDurationCounter() {
 	durationCounter = 0;
 	penHandler.reset();
 	
-	if ( guiCtlSetup->passingTrace && toolUpdateState == true )
-		guiCtlSetup->passingTrace->SetValue(wxString() << durationCounter);
+	if ( GET_GUI_CTL(passingTrace) && toolUpdateState == true )
+		GET_GUI_CTL(passingTrace)->SetValue(wxString() << durationCounter);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::initNextDuration() {
@@ -537,8 +537,8 @@ void CncControl::initNextDuration() {
 	
 	durationCounter++;
 	
-	if ( guiCtlSetup->passingTrace && toolUpdateState == true )
-		guiCtlSetup->passingTrace->SetValue(wxString() << durationCounter);
+	if ( GET_GUI_CTL(passingTrace) && toolUpdateState == true )
+		GET_GUI_CTL(passingTrace)->SetValue(wxString() << durationCounter);
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncControl::getDurationCounter() {
@@ -658,10 +658,6 @@ bool CncControl::moveDownZ() {
 		zAxisDown = true;
 		updateZSlider();
 		changeWorkSpeedXY(CncSpeedWork);
-		
-		lastDrawPoint3D.setX(curPos.getX());
-		lastDrawPoint3D.setY(curPos.getY());
-		lastDrawPoint3D.setZ(curPos.getZ());
 	}
 	
 	return ret;
@@ -677,8 +673,8 @@ void CncControl::changeWorkSpeedXY(CncSpeed s, bool force) {
 	processSetter(PID_SPEED_X, cncConfig->getSpeedX());
 	processSetter(PID_SPEED_Y, cncConfig->getSpeedY());
 	
-	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedX(cncConfig->getSpeedX());
-	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedY(cncConfig->getSpeedY());
+	if (GET_GUI_CTL(speedView) && toolUpdateState == true ) GET_GUI_CTL(speedView)->setCurrentSpeedX(cncConfig->getSpeedX());
+	if (GET_GUI_CTL(speedView) && toolUpdateState == true ) GET_GUI_CTL(speedView)->setCurrentSpeedY(cncConfig->getSpeedY());
 
 	if ( force == true )
 		updateCncConfigTrace();
@@ -693,7 +689,7 @@ void CncControl::changeWorkSpeedZ(CncSpeed s, bool force) {
 	processSetter(mmm, (s == CncSpeedWork));
 	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
 	
-	if (guiCtlSetup->speedView && toolUpdateState == true ) guiCtlSetup->speedView->setCurrentSpeedZ(cncConfig->getSpeedZ());
+	if ( GET_GUI_CTL(speedView) && toolUpdateState == true ) GET_GUI_CTL(speedView)->setCurrentSpeedZ(cncConfig->getSpeedZ());
 
 	if ( force == true )
 		updateCncConfigTrace();
@@ -703,8 +699,8 @@ void CncControl::logProcessingStart() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	setValue(guiCtlSetup->cmdDuration, "0");
-	setValue(guiCtlSetup->cmdCount, "0");
+	setValue(GET_GUI_CTL(cmdDuration), "0");
+	setValue(GET_GUI_CTL(cmdCount), "0");
 	
 	ftime(&startTime);
 	commandCounter=0;
@@ -718,21 +714,21 @@ void CncControl::logProcessingCurrent() {
 	
 	int t_diff = (int) (1000.0 * (endTime.time - startTime.time) + (endTime.millitm - startTime.millitm));  
 
-	setValue(guiCtlSetup->cmdDuration, t_diff);
-	setValue(guiCtlSetup->cmdCount, commandCounter);
+	setValue(GET_GUI_CTL(cmdDuration), t_diff);
+	setValue(GET_GUI_CTL(cmdCount), commandCounter);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingEnd(bool valuesOnly) {
 	wxASSERT(guiCtlSetup);
 	
 	// final set to compensate commandCounter%100
-	setValue(guiCtlSetup->xAxis, convertToDisplayUnit(curPos.getX(), cncConfig->getDisplayFactX()));
-	setValue(guiCtlSetup->yAxis, convertToDisplayUnit(curPos.getY(), cncConfig->getDisplayFactY()));
-	setValue(guiCtlSetup->zAxis, convertToDisplayUnit(curPos.getZ(), cncConfig->getDisplayFactZ()));
+	setValue(GET_GUI_CTL(xAxis), convertToDisplayUnit(curPos.getX(), cncConfig->getDisplayFactX()));
+	setValue(GET_GUI_CTL(yAxis), convertToDisplayUnit(curPos.getY(), cncConfig->getDisplayFactY()));
+	setValue(GET_GUI_CTL(zAxis), convertToDisplayUnit(curPos.getZ(), cncConfig->getDisplayFactZ()));
 	
-	setValue(guiCtlSetup->xAxisCtl, convertToDisplayUnit(curCtlPos.getX(), cncConfig->getDisplayFactX()));
-	setValue(guiCtlSetup->yAxisCtl, convertToDisplayUnit(curCtlPos.getY(), cncConfig->getDisplayFactY()));
-	setValue(guiCtlSetup->zAxisCtl, convertToDisplayUnit(curCtlPos.getZ(), cncConfig->getDisplayFactZ()));
+	setValue(GET_GUI_CTL(xAxisCtl), convertToDisplayUnit(curCtlPos.getX(), cncConfig->getDisplayFactX()));
+	setValue(GET_GUI_CTL(yAxisCtl), convertToDisplayUnit(curCtlPos.getY(), cncConfig->getDisplayFactY()));
+	setValue(GET_GUI_CTL(zAxisCtl), convertToDisplayUnit(curCtlPos.getZ(), cncConfig->getDisplayFactZ()));
 
 	updateZSlider();
 	
@@ -776,7 +772,8 @@ bool CncControl::validateCurrentPostion() {
 ///////////////////////////////////////////////////////////////////
 	if ( positionCheck == false )
 		return true;
-
+		
+	// todo - performance - wxRealPoint, switch to predef values, etc
 	wxPoint p(curPos.getX()/cncConfig->getCalculationFactX(), curPos.getY()/cncConfig->getCalculationFactY());
 
 	if ( p.x >= cncConfig->getMaxDimensionX() || p.y >= cncConfig->getMaxDimensionY() ) {
@@ -824,8 +821,8 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 		}
 	}
 	
-	if ( guiCtlSetup->mainWnd != NULL )
-		guiCtlSetup->mainWnd->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
+	if ( GET_GUI_CTL(mainWnd) != NULL )
+		GET_GUI_CTL(mainWnd)->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
 	
 	switch ( type ) {
 		
@@ -875,9 +872,9 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				curCtlPos = ci.controllerPos;
 				//todo update interval
 				//if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
-					setValue(guiCtlSetup->xAxisCtl, convertToDisplayUnit(ci.controllerPos.getX(), cncConfig->getDisplayFactX()));
-					setValue(guiCtlSetup->yAxisCtl, convertToDisplayUnit(ci.controllerPos.getY(), cncConfig->getDisplayFactY()));
-					setValue(guiCtlSetup->zAxisCtl, convertToDisplayUnit(ci.controllerPos.getZ(), cncConfig->getDisplayFactZ()));
+					setValue(GET_GUI_CTL(xAxisCtl), convertToDisplayUnit(ci.controllerPos.getX(), cncConfig->getDisplayFactX()));
+					setValue(GET_GUI_CTL(yAxisCtl), convertToDisplayUnit(ci.controllerPos.getY(), cncConfig->getDisplayFactY()));
+					setValue(GET_GUI_CTL(zAxisCtl), convertToDisplayUnit(ci.controllerPos.getZ(), cncConfig->getDisplayFactZ()));
 				//}
 			}
 			
@@ -932,38 +929,23 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	if ( validateCurrentPostion() == false )
 		interrupt();
 
-	// Stores the 3D coordinates for later drawings
-	static DoublePointPair3D pp3d;
-
-	// avoid duplicate values
-	if ( lastDrawPoint3D != curPos ) {
-
-		pp3d.set(lastDrawPoint3D.getX(), lastDrawPoint3D.getY(), lastDrawPoint3D.getZ(),
-				 curPos.getX(), curPos.getY(), curPos.getZ());
-				 
-		if ( zAxisDown == true ) {
-			//pp3d.setDefaultToDrawColour();
-			pp3d.setDrawColour(penHandler.getCurrentPen(zAxisDown).GetColour());
-			pp3d.setDefaultToLineStyle();
-		} else {
-			pp3d.setDrawColour(*wxYELLOW);
-			//pp3d.setLineStyle(wxDOT); // todo - impl as an option
-			pp3d.setLineStyle(wxTRANSPARENT);
-		}
-		
-		// update data
-		if ( guiCtlSetup != NULL && guiCtlSetup->drawPane3D != NULL )
-			guiCtlSetup->drawPane3D->appendDataVector(pp3d);
+	// motion monitor
+	static CncMotionMonitor::VerticeData vd;
+	// todo . . . remove zAxisDown and penHandler
+	if ( zAxisDown == true )	vd.setWorkVertice(curPos);
+	else						vd.setFlyVertice(curPos);
 	
+	if ( IS_GUI_CTL_VALID(motionMonitor) ) {
+		GET_GUI_CTL(motionMonitor)->appendVertice(vd);
 		updatePreview3D(false);
 	}
-	
+
 	// Display coordinates
 	if ( cncConfig->isOnlineUpdateCoordinates() ) {
 		if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
-			setValue(guiCtlSetup->xAxis, convertToDisplayUnit(curPos.getX(), cncConfig->getDisplayFactX()));
-			setValue(guiCtlSetup->yAxis, convertToDisplayUnit(curPos.getY(), cncConfig->getDisplayFactY()));
-			setValue(guiCtlSetup->zAxis, convertToDisplayUnit(curPos.getZ(), cncConfig->getDisplayFactZ()));
+			setValue(GET_GUI_CTL(xAxis), convertToDisplayUnit(curPos.getX(), cncConfig->getDisplayFactX()));
+			setValue(GET_GUI_CTL(yAxis), convertToDisplayUnit(curPos.getY(), cncConfig->getDisplayFactY()));
+			setValue(GET_GUI_CTL(zAxis), convertToDisplayUnit(curPos.getZ(), cncConfig->getDisplayFactZ()));
 			
 			logProcessingCurrent();
 		}
@@ -976,15 +958,7 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 		interrupt();
 	}
 	
-	// store current as previous
-	lastDrawPoint3D = curPos;
-		
 	return !isInterrupted();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::initLastDrawPoint() {
-///////////////////////////////////////////////////////////////////
-	lastDrawPoint3D.setXYZ(0, 0, 0);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simpleMoveXYToZeroPos(CncDimensions dim) {
@@ -1325,25 +1299,25 @@ void CncControl::updateCncConfigTrace() {
 	wxVector<wxVector<wxVariant>> rows;
 	if ( guiCtlSetup->staticCncConfig ) {
 		cncConfig->getStaticValues(rows);
-		guiCtlSetup->staticCncConfig->Freeze();
-		guiCtlSetup->staticCncConfig->DeleteAllItems();
+		GET_GUI_CTL(staticCncConfig)->Freeze();
+		GET_GUI_CTL(staticCncConfig)->DeleteAllItems();
 		for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
 			wxVector<wxVariant> row = *it;
-			guiCtlSetup->staticCncConfig->AppendItem(row);
+			GET_GUI_CTL(staticCncConfig)->AppendItem(row);
 		}
-		guiCtlSetup->staticCncConfig->Thaw();
+		GET_GUI_CTL(staticCncConfig)->Thaw();
 	}
 	
 	rows.clear();
-	if ( guiCtlSetup->dynamicCncConfig ) {
+	if ( GET_GUI_CTL(dynamicCncConfig) ) {
 		cncConfig->getDynamicValues(rows);
-		guiCtlSetup->dynamicCncConfig->Freeze();
-		guiCtlSetup->dynamicCncConfig->DeleteAllItems();
+		GET_GUI_CTL(dynamicCncConfig)->Freeze();
+		GET_GUI_CTL(dynamicCncConfig)->DeleteAllItems();
 		for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
 			wxVector<wxVariant> row = *it;
-			guiCtlSetup->dynamicCncConfig->AppendItem(row);
+			GET_GUI_CTL(dynamicCncConfig)->AppendItem(row);
 		}
-		guiCtlSetup->dynamicCncConfig->Thaw();
+		GET_GUI_CTL(dynamicCncConfig)->Thaw();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1367,8 +1341,8 @@ void CncControl::enableStepperMotors(bool s) {
 		return;
 	}
 	
-	if ( guiCtlSetup->motorState )
-		guiCtlSetup->motorState->Check(s);
+	if ( GET_GUI_CTL(motorState) )
+		GET_GUI_CTL(motorState)->Check(s);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::resetZSlider() {
@@ -1378,8 +1352,7 @@ void CncControl::resetZSlider() {
 	if ( guiCtlSetup->zView == NULL ) 
 		return;
 		
-	wxASSERT(cncConfig);
-	guiCtlSetup->zView->resetAll();
+	GET_GUI_CTL(zView)->resetAll();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateZSlider() {
@@ -1390,7 +1363,7 @@ void CncControl::updateZSlider() {
 		return;
 		
 	wxASSERT(cncConfig);
-	guiCtlSetup->zView->updateView(curPos.getZ() * cncConfig->getDisplayFactZ(), *cncConfig);
+	GET_GUI_CTL(zView)->updateView(curPos.getZ() * cncConfig->getDisplayFactZ(), *cncConfig);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::evaluateLimitState() {
@@ -1412,12 +1385,12 @@ void CncControl::evaluateLimitState(long x, long y, long z) {
 	limitStates.setYLimit(y);
 	limitStates.setZLimit(z);
 	
-	displayLimitState(guiCtlSetup->xMinLimit, limitStates.getXMinLimit());
-	displayLimitState(guiCtlSetup->xMaxLimit, limitStates.getXMaxLimit());
-	displayLimitState(guiCtlSetup->yMinLimit, limitStates.getYMinLimit());
-	displayLimitState(guiCtlSetup->yMaxLimit, limitStates.getYMaxLimit());
-	displayLimitState(guiCtlSetup->zMinLimit, limitStates.getZMinLimit());
-	displayLimitState(guiCtlSetup->zMaxLimit, limitStates.getZMaxLimit());
+	displayLimitState(GET_GUI_CTL(xMinLimit), limitStates.getXMinLimit());
+	displayLimitState(GET_GUI_CTL(xMaxLimit), limitStates.getXMaxLimit());
+	displayLimitState(GET_GUI_CTL(yMinLimit), limitStates.getYMinLimit());
+	displayLimitState(GET_GUI_CTL(yMaxLimit), limitStates.getYMaxLimit());
+	displayLimitState(GET_GUI_CTL(zMinLimit), limitStates.getZMinLimit());
+	displayLimitState(GET_GUI_CTL(zMaxLimit), limitStates.getZMaxLimit());
 	
 	limitStates.displayLimitState();
 }
@@ -1821,7 +1794,7 @@ bool CncControl::hasControllerConfigControl() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	return ( guiCtlSetup->controllerConfig != NULL );
+	return ( GET_GUI_CTL(controllerConfig) != NULL );
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::clearControllerConfigControl() {
@@ -1829,7 +1802,7 @@ void CncControl::clearControllerConfigControl() {
 	wxASSERT(guiCtlSetup);
 	
 	if ( hasControllerConfigControl() ) 
-		guiCtlSetup->controllerConfig->DeleteAllItems();
+		GET_GUI_CTL(controllerConfig)->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value) {
@@ -1840,11 +1813,11 @@ void CncControl::appendPidKeyValueToControllerConfig(int pid, const char* key, c
 		DcmItemList rows;
 
 		DataControlModel::addNumKeyValueRow(rows, pid, key, value);
-		guiCtlSetup->controllerConfig->Freeze();
+		GET_GUI_CTL(controllerConfig)->Freeze();
 		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-			guiCtlSetup->controllerConfig->AppendItem(*it);
+			GET_GUI_CTL(controllerConfig)->AppendItem(*it);
 		}
-		guiCtlSetup->controllerConfig->Thaw();
+		GET_GUI_CTL(controllerConfig)->Thaw();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1852,14 +1825,14 @@ bool CncControl::hasControllerPinControl() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	return ( guiCtlSetup->controllerPinReport != NULL );
+	return ( GET_GUI_CTL(controllerPinReport) != NULL );
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::hasControllerErrorControl() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	return ( guiCtlSetup->controllerErrorInfo != NULL );
+	return ( GET_GUI_CTL(controllerErrorInfo) != NULL );
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::clearControllerPinControl() {
@@ -1867,7 +1840,7 @@ void CncControl::clearControllerPinControl() {
 	wxASSERT(guiCtlSetup);
 	
 	if ( hasControllerErrorControl() )
-		guiCtlSetup->controllerPinReport->DeleteAllItems();
+		GET_GUI_CTL(controllerPinReport)->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::clearControllerErrorControl() {
@@ -1875,7 +1848,7 @@ void CncControl::clearControllerErrorControl() {
 	wxASSERT(guiCtlSetup);
 	
 	if ( hasControllerErrorControl() ) 
-		guiCtlSetup->controllerErrorInfo->DeleteAllItems();
+		GET_GUI_CTL(controllerErrorInfo)->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::appendNumKeyValueToControllerErrorInfo(const char* desc, int pin, int type, int mode, int value) {
@@ -1886,11 +1859,11 @@ void CncControl::appendNumKeyValueToControllerErrorInfo(const char* desc, int pi
 		DcmItemList rows;
 
 		DataControlModel::addPinReportRow(rows, desc, pin, type, mode, value);
-		guiCtlSetup->controllerPinReport->Freeze();
+		GET_GUI_CTL(controllerPinReport)->Freeze();
 		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-			guiCtlSetup->controllerPinReport->AppendItem(*it);
+			GET_GUI_CTL(controllerPinReport)->AppendItem(*it);
 		}
-		guiCtlSetup->controllerPinReport->Thaw();
+		GET_GUI_CTL(controllerPinReport)->Thaw();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1904,26 +1877,26 @@ void CncControl::appendNumKeyValueToControllerErrorInfo(int num, int code, const
 		DataControlModel::addNumKeyValueRow(rows, num, code, key, value);
 		guiCtlSetup->controllerErrorInfo->Freeze();
 		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-			guiCtlSetup->controllerErrorInfo->AppendItem(*it);
+			GET_GUI_CTL(controllerErrorInfo)->AppendItem(*it);
 		}
-		guiCtlSetup->controllerErrorInfo->Thaw();
+		GET_GUI_CTL(controllerErrorInfo)->Thaw();
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::updatePreview3D(bool force) {
 ///////////////////////////////////////////////////////////////////
-	if ( guiCtlSetup == NULL || guiCtlSetup->drawPane3D == NULL )
+	if ( IS_GUI_CTL_NOT_VALID(motionMonitor) )
 		return;
 		
 	if ( force == true ) {
-		guiCtlSetup->drawPane3D->displayDataVector();
+		GET_GUI_CTL(motionMonitor)->display();
 		return;
 	}
 	
 	// Online drawing coordinates
 	if ( cncConfig->isOnlineUpdateDrawPane() ) {
 		if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
-			guiCtlSetup->drawPane3D->displayDataVector();
+			GET_GUI_CTL(motionMonitor)->display();
 		}
 	}
 }

@@ -65,9 +65,9 @@ enum {MARGIN_LINE_NUMBERS, MARGIN_FOLD};
 
 wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 	EVT_CLOSE(MainFrame::OnClose)
-    EVT_THREAD(wxEVT_COMMAND_MYTHREAD_UPDATE, MainFrame::OnThreadUpdate)
-    EVT_THREAD(wxEVT_COMMAND_MYTHREAD_COMPLETED, MainFrame::OnThreadCompletion)
-	EVT_TIMER(SpinTimer, MainFrame::OnPerspectiveTimer)
+	EVT_THREAD(wxEVT_COMMAND_MYTHREAD_UPDATE, MainFrame::OnThreadUpdate)
+	EVT_THREAD(wxEVT_COMMAND_MYTHREAD_COMPLETED, MainFrame::OnThreadCompletion)
+	EVT_TIMER(PERSPECTIVE_TIMER, MainFrame::OnPerspectiveTimer)
 wxEND_EVENT_TABLE()
 
 wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_COMPLETED, wxThreadEvent);
@@ -88,7 +88,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , lastPortName(wxT(""))
 , defaultPortName(wxT(""))
 , cnc(new CncControl(CncEMU_NULL))
-, drawPane3D(NULL)
+, motionMonitor(NULL)
 , serialSpy(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -172,10 +172,10 @@ MainFrame::~MainFrame() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( drawPane3D && drawPane3D->IsShownOnScreen() ) {
+	if ( motionMonitor && motionMonitor->IsShownOnScreen() ) {
 		// This is necessary to avoid the default notebook key handling
-		if ( drawPane3D->HasFocus() ) {
-			drawPane3D->OnKeyDown(event);
+		if ( motionMonitor->HasFocus() ) {
+			motionMonitor->onKeyDown(event);
 			event.Skip(false);
 			return;
 		}
@@ -268,15 +268,20 @@ void MainFrame::install3DPane() {
 	}
 	
 	std::clog << "Installing 3D draw pane . . . ";
-	drawPane3D = new CncOpenGLDrawPane(parent, NULL);
-	drawPane3D->SetPosition(m_drawPane3D->GetPosition());
-	drawPane3D->setPlayButton(m_3D_Animate);
-	drawPane3D->setTraceCtrl(m_trace3D);
-	drawPane3D->setSpinCtrls(m_spin3DAngelX, m_spin3DAngelY, m_spin3DAngelZ);
-	drawPane3D->view3D();
+	motionMonitor = new CncMotionMonitor(parent, NULL);
+	motionMonitor->SetPosition(m_drawPane3D->GetPosition());
+	
+	/*
+	 * todo
+	motionMonitor->setPlayButton(m_3D_Animate);
+	motionMonitor->setTraceCtrl(m_trace3D);
+	motionMonitor->setSpinCtrls(m_spin3DAngelX, m_spin3DAngelY, m_spin3DAngelZ);
+	motionMonitor->view3D();
+	*/
+	
 	activate3DPerspectiveButton(m_3D_Perspective1);
 
-	sizer->Replace(m_drawPane3D, drawPane3D, true);
+	sizer->Replace(m_drawPane3D, motionMonitor, true);
 	sizer->Layout();
 	std::clog << "Done" << std::endl;
 	
@@ -492,11 +497,12 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	if ( cfgStr == "true")
 		connectSerialPort();
 	
-	// Auto prpcess ?
+	// Auto process ?
 	config->Read("App/AutoProcess", &cfgStr, wxT("false"));
-	if ( cfgStr == "true") {
+	if ( cfgStr == "true" ) {
 		defineMinMonitoring();
 		processTemplate();
+		defineNormalMonitoring();
 	}
 	
 	// don't works well
@@ -1231,7 +1237,7 @@ void MainFrame::determineCncOutputControls() {
 	
 	guiCtlSetup->mainWnd			= this;
 	
-	guiCtlSetup->drawPane3D			= drawPane3D;
+	guiCtlSetup->motionMonitor			= motionMonitor;
 	
 	guiCtlSetup->xAxis 				= m_xAxis;
 	guiCtlSetup->yAxis 				= m_yAxis;
@@ -1266,10 +1272,6 @@ void MainFrame::determineCncOutputControls() {
 	guiCtlSetup->yMaxLimit 			= m_yMaxLimit;
 	guiCtlSetup->zMinLimit 			= m_zMinLimit;
 	guiCtlSetup->zMaxLimit 			= m_zMaxLimit;
-	
-	guiCtlSetup->cb3DDrawZeroPlane 				= m_cb3DDrawZeroPlane;
-	guiCtlSetup->cb3DDrawWorkpieceSurfacePlane	= m_cb3DDrawWorkpieceSurfacePlane;
-	guiCtlSetup->cb3DDrawWorkpieceOffset		= m_cb3DDrawWorkpieceOffset;
 	
 	cnc->setGuiControls(guiCtlSetup);
 }
@@ -1463,6 +1465,8 @@ bool MainFrame::connectSerialPort() {
 	disableAllRunControls();
 	hideSVGEmuResult();
 	
+	m_miRqtIdleMessages->Check(false);
+	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		cnc->updateCncConfig(cc);
@@ -1481,6 +1485,7 @@ bool MainFrame::connectSerialPort() {
 		cnc->updateCncConfig(cc);
 		cs.assign("\\\\.\\");
 		cs.append(sel);
+		m_miRqtIdleMessages->Check(true);
 	}
 
 	initializeCncControl();
@@ -1493,7 +1498,7 @@ bool MainFrame::connectSerialPort() {
 		lastPortName.assign(sel);
 		m_connect->SetBitmap(bmpC);
 		m_serialTimer->Start();
-		drawPane3D->setCncConfig(cnc->getCncConfig());
+		motionMonitor->setCncConfig(*cnc->getCncConfig());
 	}
 	
 	decoratePortSelector();
@@ -3406,6 +3411,8 @@ void MainFrame::processTemplate() {
 	     m_mainNotebook->GetSelection() != MainTemplatePage ) {
 		m_mainNotebook->SetSelection(MainTemplatePage);
 	}
+	
+	motionMonitor->pushProcessMode();
 
 	updateStepDelay();
 	disableControls();
@@ -3416,6 +3423,7 @@ void MainFrame::processTemplate() {
 	cnc->logProcessingStart();
 	cnc->enableStepperMotors(true);
 	freezeLogger();
+	
 
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
@@ -3471,6 +3479,8 @@ void MainFrame::processTemplate() {
 	
 	cnc->enableStepperMotors(false);
 	cnc->logProcessingEnd();
+	
+	motionMonitor->popProcessMode();
 	
 	if ( ret )
 		cnc->updateDrawControl();
@@ -6036,37 +6046,37 @@ void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 void MainFrame::showFromFront3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	drawPane3D->viewFront();
+	motionMonitor->viewFront();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromRear3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	drawPane3D->viewRear();
+	motionMonitor->viewRear();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromTop3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	drawPane3D->viewTop();
+	motionMonitor->viewTop();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromBottom3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	drawPane3D->viewBottom();
+	motionMonitor->viewBottom();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromLeft3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	drawPane3D->viewLeft();
+	motionMonitor->viewLeft();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::showFromRight3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
-	drawPane3D->viewRight();
+	motionMonitor->viewRight();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::show3D(wxCommandEvent& event) {
@@ -6075,42 +6085,43 @@ void MainFrame::show3D(wxCommandEvent& event) {
 
 	if ( bt == m_3D_Perspective1 ) {
 		activate3DPerspectiveButton(bt);
-		drawPane3D->view3DIso1();
+		motionMonitor->viewIso1();
 		
 	} else if ( bt == m_3D_Perspective2 ) {
 		activate3DPerspectiveButton(bt);
-		drawPane3D->view3DIso2();
+		motionMonitor->viewIso2();
 		
 	} else if ( bt == m_3D_Perspective3 ) {
 		activate3DPerspectiveButton(bt);
-		drawPane3D->view3DIso3();
+		motionMonitor->viewIso3();
 		
 	} else if ( bt == m_3D_Perspective4 ) {
 		activate3DPerspectiveButton(bt);
-		drawPane3D->view3DIso4();
+		motionMonitor->viewIso4();
 		
 	} 
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::runOpenGLTest(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	drawPane3D->runOpenGLTest();
+	//todo
+	//motionMonitor->runOpenGLTest();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clear3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	drawPane3D->clear3D();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::animate3D(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	drawPane3D->animate3D();
+	motionMonitor->clear();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::refresh3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc )
 		cnc->updatePreview3D();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openMotionMonitorOptionDlg(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	motionMonitor->showOptionDialog();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableTestParameter(bool state) {
@@ -6294,68 +6305,6 @@ void MainFrame::fileContentChange(wxStyledTextEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::spin3DAngelX(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setDisplayAngels3D();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::spin3DAngelY(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setDisplayAngels3D();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::spin3DAngelZ(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setDisplayAngels3D();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::update3DAngelX(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setDisplayAngels3D();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::update3DAngelY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setDisplayAngels3D();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::update3DAngelZ(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setDisplayAngels3D();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::setDisplayAngels3D() {
-///////////////////////////////////////////////////////////////////
-	if ( drawPane3D == NULL )
-		return;
-		
-	int ax = m_spin3DAngelX->GetValue();
-	int ay = m_spin3DAngelY->GetValue();
-	int az = m_spin3DAngelZ->GetValue();
-	
-	drawPane3D->setDisplayAngles(ax, ay, az, false);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::show3DPaneHelp(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString msg;
-	msg << "Keyboard support:\n";
-	msg << "Cursor keys + CTRL:\t\t Translates relative to the orgin.\n";
-	msg << "Cursor keys + SHIFT:\t\t Moves the view port center.\n";
-	msg << "Cursor keys:\t\t Rotates the view.\n";
-	msg << "Blank:\t\t\t Rotates the view automatically.\n";
-	msg << "\n";
-	msg << "Mouse (move) support:\n";
-	msg << "Left Button + CTRL:\t\t Translates relative to the orgin.\n";
-	msg << "Left Button + SHIFT:\t\t Moves the view port center.\n";
-	msg << "Left Button\t\t Rotates the view.\n";
-	msg << "Wheel+/-:\t\t\t Scales the view.\n";
-	
-	wxMessageDialog  dlg(this, msg, _T("3D DrawPane Information . . . "), 
-		                    wxOK|wxCENTRE|wxICON_INFORMATION);
-	dlg.ShowModal();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::clearSerialSpy() {
 ///////////////////////////////////////////////////////////////////
 	serialSpy->Clear();
@@ -6466,19 +6415,6 @@ void MainFrame::UpdateLogger(wxCommandEvent& event) {
 void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// do nothing
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::update3DDrawOptions(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( guiCtlSetup->drawPane3D != NULL ) {
-		CncOpenGLDrawPaneContext::DisplayOptions3D di;
-
-		di.drawZeroPlane 		= guiCtlSetup->cb3DDrawZeroPlane ? guiCtlSetup->cb3DDrawZeroPlane->IsChecked() : false;
-		di.drawWorkpieceSurface = guiCtlSetup->cb3DDrawWorkpieceSurfacePlane ? guiCtlSetup->cb3DDrawWorkpieceSurfacePlane->IsChecked() : false;
-		di.drawWorkpieceOffset	= guiCtlSetup->cb3DDrawWorkpieceOffset ? guiCtlSetup->cb3DDrawWorkpieceOffset->IsChecked() : false;
-		
-		guiCtlSetup->drawPane3D->setDisplayInfo(di);
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayPGenErrorInfo(const wxString& errorInfo) {

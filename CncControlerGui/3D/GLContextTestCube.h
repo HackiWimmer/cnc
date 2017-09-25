@@ -4,11 +4,11 @@
 #include "3D/GLContextPathBase.h"
 
 /////////////////////////////////////////////////////////////////
-class OpenGLContextTestCube : public OpenGLContextCncPathBase {
+class GLContextTestCube : public GLContextCncPathBase {
 	
 	public:
-		OpenGLContextTestCube(wxGLCanvas* canvas);
-		virtual ~OpenGLContextTestCube();
+		GLContextTestCube(wxGLCanvas* canvas);
+		virtual ~GLContextTestCube();
 		
 		virtual const char* getContextName() { return "OpenGLDrawPaneContextTestCube"; };
 		
@@ -16,6 +16,7 @@ class OpenGLContextTestCube : public OpenGLContextCncPathBase {
 		virtual void initContext();
 		virtual void determineProjection(int w, int h);
 		virtual void determineModel();
+		virtual void markCurrentPosition() {}
 		virtual GLViewPort* createViewPort();
 };
 

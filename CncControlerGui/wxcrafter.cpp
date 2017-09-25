@@ -3885,22 +3885,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer3497->Add(m_staticLine3525, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_3D_Animate = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
+    m_motionMonitorOptionDlg = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_3D_Animate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-executable")), wxLEFT);
-    m_3D_Animate->SetBitmapMargins(2,2);
+    m_motionMonitorOptionDlg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-executable")), wxLEFT);
+    m_motionMonitorOptionDlg->SetBitmapMargins(2,2);
     #endif
-    m_3D_Animate->SetToolTip(_("Animate 3D View"));
+    m_motionMonitorOptionDlg->SetToolTip(_("Option Dialog"));
     
-    flexGridSizer3497->Add(m_3D_Animate, 0, wxALL, WXC_FROM_DIP(0));
-    m_3D_Animate->SetMinSize(wxSize(24,24));
+    flexGridSizer3497->Add(m_motionMonitorOptionDlg, 0, wxALL, WXC_FROM_DIP(0));
+    m_motionMonitorOptionDlg->SetMinSize(wxSize(24,24));
     
     m_3D_Refreh = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_3D_Refreh->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_restart")), wxLEFT);
     m_3D_Refreh->SetBitmapMargins(2,2);
     #endif
-    m_3D_Refreh->SetToolTip(_("Refresh 3D View"));
+    m_3D_Refreh->SetToolTip(_("Refresh Motion Monitor"));
     
     flexGridSizer3497->Add(m_3D_Refreh, 0, wxALL, WXC_FROM_DIP(0));
     m_3D_Refreh->SetMinSize(wxSize(24,24));
@@ -3910,7 +3910,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_3D_Clear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
     m_3D_Clear->SetBitmapMargins(2,2);
     #endif
-    m_3D_Clear->SetToolTip(_("Clear 3D View"));
+    m_3D_Clear->SetToolTip(_("Clear Motion Monitor"));
     
     flexGridSizer3497->Add(m_3D_Clear, 0, wxALL, WXC_FROM_DIP(0));
     m_3D_Clear->SetMinSize(wxSize(24,24));
@@ -3938,7 +3938,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cbCurveLibResolutionArr.Add(wxT("0.080"));
     m_cbCurveLibResolutionArr.Add(wxT("0.090"));
     m_cbCurveLibResolutionArr.Add(wxT("0.100"));
-    m_cbCurveLibResolution = new wxComboBox(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(100,-1)), m_cbCurveLibResolutionArr, wxCB_READONLY);
+    m_cbCurveLibResolution = new wxComboBox(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(45,-1)), m_cbCurveLibResolutionArr, wxCB_READONLY);
     
     flexGridSizer3497->Add(m_cbCurveLibResolution, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
@@ -3970,7 +3970,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2309->Add(m_3DOutboundControl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer2360 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2360 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer2360->SetFlexibleDirection( wxBOTH );
     flexGridSizer2360->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2360->AddGrowableCol(0);
@@ -3982,119 +3982,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_drawPane3D->SetToolTip(_("OpenGl Control placeholder"));
     
     flexGridSizer2360->Add(m_drawPane3D, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_trace3D = new wxTextCtrl(m_3DOutboundControl, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DOutboundControl, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
-    m_trace3D->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_trace3D->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    #if wxVERSION_NUMBER >= 3000
-    m_trace3D->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer2360->Add(m_trace3D, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_panel2696 = new wxPanel(m_3DOutboundControl, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DOutboundControl, wxSize(-1,24)), wxTAB_TRAVERSAL|wxBORDER_NONE);
-    m_panel2696->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    
-    flexGridSizer2360->Add(m_panel2696, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer267117 = new wxFlexGridSizer(1, 20, 0, 0);
-    flexGridSizer267117->SetFlexibleDirection( wxBOTH );
-    flexGridSizer267117->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    m_panel2696->SetSizer(flexGridSizer267117);
-    
-    wxFlexGridSizer* flexGridSizer3131 = new wxFlexGridSizer(0, 4, 0, 0);
-    flexGridSizer3131->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3131->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer267117->Add(flexGridSizer3131, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(1));
-    
-    m_staticText3133 = new wxStaticText(m_panel2696, wxID_ANY, _("Options:"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
-    m_staticText3133->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer3131->Add(m_staticText3133, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_cb3DDrawZeroPlane = new wxCheckBox(m_panel2696, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
-    m_cb3DDrawZeroPlane->SetValue(true);
-    m_cb3DDrawZeroPlane->SetToolTip(_("Draw Zero Plane"));
-    
-    flexGridSizer3131->Add(m_cb3DDrawZeroPlane, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(1));
-    
-    m_cb3DDrawWorkpieceSurfacePlane = new wxCheckBox(m_panel2696, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
-    m_cb3DDrawWorkpieceSurfacePlane->SetValue(true);
-    m_cb3DDrawWorkpieceSurfacePlane->SetToolTip(_("Draw Workpiece Surface Plane"));
-    
-    flexGridSizer3131->Add(m_cb3DDrawWorkpieceSurfacePlane, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(1));
-    
-    m_cb3DDrawWorkpieceOffset = new wxCheckBox(m_panel2696, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
-    m_cb3DDrawWorkpieceOffset->SetValue(true);
-    m_cb3DDrawWorkpieceOffset->SetToolTip(_("Draw Workpiece Offset Plane"));
-    
-    flexGridSizer3131->Add(m_cb3DDrawWorkpieceOffset, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(1));
-    
-    m_staticLine3129 = new wxStaticLine(m_panel2696, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), wxLI_VERTICAL);
-    
-    flexGridSizer267117->Add(m_staticLine3129, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_staticText268320 = new wxStaticText(m_panel2696, wxID_ANY, _("X:"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
-    m_staticText268320->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer267117->Add(m_staticText268320, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_spin3DAngelX = new wxSpinCtrl(m_panel2696, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(60,20)), wxSP_ARROW_KEYS);
-    m_spin3DAngelX->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_spin3DAngelX->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_spin3DAngelXFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_spin3DAngelX->SetFont(m_spin3DAngelXFont);
-    m_spin3DAngelX->SetRange(-360, 360);
-    m_spin3DAngelX->SetValue(0);
-    
-    flexGridSizer267117->Add(m_spin3DAngelX, 0, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(1));
-    m_spin3DAngelX->SetMinSize(wxSize(60,20));
-    
-    m_staticText268522 = new wxStaticText(m_panel2696, wxID_ANY, _("Y:"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
-    m_staticText268522->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer267117->Add(m_staticText268522, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_spin3DAngelY = new wxSpinCtrl(m_panel2696, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(60,20)), wxSP_ARROW_KEYS);
-    m_spin3DAngelY->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_spin3DAngelY->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_spin3DAngelYFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_spin3DAngelY->SetFont(m_spin3DAngelYFont);
-    m_spin3DAngelY->SetRange(-360, 360);
-    m_spin3DAngelY->SetValue(0);
-    
-    flexGridSizer267117->Add(m_spin3DAngelY, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    m_spin3DAngelY->SetMinSize(wxSize(60,20));
-    
-    m_staticText268118 = new wxStaticText(m_panel2696, wxID_ANY, _("Z:"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(-1,-1)), 0);
-    m_staticText268118->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    
-    flexGridSizer267117->Add(m_staticText268118, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(5));
-    
-    m_spin3DAngelZ = new wxSpinCtrl(m_panel2696, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(60,20)), wxSP_ARROW_KEYS);
-    m_spin3DAngelZ->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_spin3DAngelZ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_spin3DAngelZFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_spin3DAngelZ->SetFont(m_spin3DAngelZFont);
-    m_spin3DAngelZ->SetRange(-360, 360);
-    m_spin3DAngelZ->SetValue(0);
-    
-    flexGridSizer267117->Add(m_spin3DAngelZ, 0, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(1));
-    m_spin3DAngelZ->SetMinSize(wxSize(60,20));
-    
-    m_bt3DHelp = new wxButton(m_panel2696, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel2696, wxSize(20,20)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_bt3DHelp->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-help")), wxLEFT);
-    m_bt3DHelp->SetBitmapMargins(2,2);
-    #endif
-    m_bt3DHelp->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_bt3DHelp->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_bt3DHelp->SetToolTip(_("Displays some helpful information"));
-    
-    flexGridSizer267117->Add(m_bt3DHelp, 0, wxALL, WXC_FROM_DIP(2));
-    m_bt3DHelp->SetMinSize(wxSize(20,20));
-    m_panel2696->SetMinSize(wxSize(-1,24));
     
     wxFlexGridSizer* flexGridSizer2311 = new wxFlexGridSizer(30, 1, 0, 0);
     flexGridSizer2311->SetFlexibleDirection( wxBOTH );
@@ -4210,33 +4097,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticLine2341 = new wxStaticLine(m_3DPane, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer2311->Add(m_staticLine2341, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_staticText2329 = new wxStaticText(m_3DPane, wxID_ANY, _("X:"), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), wxALIGN_CENTRE);
-    m_staticText2329->SetForegroundColour(wxColour(wxT("rgb(127,0,0)")));
-    wxFont m_staticText2329Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText2329Font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_staticText2329->SetFont(m_staticText2329Font);
-    
-    flexGridSizer2311->Add(m_staticText2329, 0, wxALL, WXC_FROM_DIP(1));
-    m_staticText2329->SetMinSize(wxSize(24,24));
-    
-    m_staticText2331 = new wxStaticText(m_3DPane, wxID_ANY, _("Y:"), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), wxALIGN_CENTRE);
-    m_staticText2331->SetForegroundColour(wxColour(wxT("rgb(0,128,0)")));
-    wxFont m_staticText2331Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText2331Font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_staticText2331->SetFont(m_staticText2331Font);
-    
-    flexGridSizer2311->Add(m_staticText2331, 0, wxALL, WXC_FROM_DIP(1));
-    m_staticText2331->SetMinSize(wxSize(24,24));
-    
-    m_staticText2333 = new wxStaticText(m_3DPane, wxID_ANY, _("Z:"), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), wxALIGN_CENTRE);
-    m_staticText2333->SetForegroundColour(wxColour(wxT("rgb(0,64,128)")));
-    wxFont m_staticText2333Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText2333Font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_staticText2333->SetFont(m_staticText2333Font);
-    
-    flexGridSizer2311->Add(m_staticText2333, 0, wxALL, WXC_FROM_DIP(1));
-    m_staticText2333->SetMinSize(wxSize(24,24));
     
     wxFlexGridSizer* flexGridSizer3499 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer3499->SetFlexibleDirection( wxBOTH );
@@ -5248,21 +5108,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btRequestCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
     m_switchMonitoing->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
-    m_3D_Animate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::animate3D), NULL, this);
+    m_motionMonitorOptionDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openMotionMonitorOptionDlg), NULL, this);
     m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
     m_3D_Clear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
     m_cbCurveLibResolution->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_cbUpdateInterval->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::changeUpdateInterval), NULL, this);
-    m_cb3DDrawZeroPlane->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::update3DDrawOptions), NULL, this);
-    m_cb3DDrawWorkpieceSurfacePlane->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::update3DDrawOptions), NULL, this);
-    m_cb3DDrawWorkpieceOffset->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::update3DDrawOptions), NULL, this);
-    m_spin3DAngelX->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelX), NULL, this);
-    m_spin3DAngelX->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelX), NULL, this);
-    m_spin3DAngelY->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelY), NULL, this);
-    m_spin3DAngelY->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelY), NULL, this);
-    m_spin3DAngelZ->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelZ), NULL, this);
-    m_spin3DAngelZ->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelZ), NULL, this);
-    m_bt3DHelp->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3DPaneHelp), NULL, this);
     m_3D_Top->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
     m_3D_Bottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
     m_3D_Front->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
@@ -5541,21 +5391,11 @@ MainFrameBClass::~MainFrameBClass()
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btRequestCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
     m_switchMonitoing->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
-    m_3D_Animate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::animate3D), NULL, this);
+    m_motionMonitorOptionDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openMotionMonitorOptionDlg), NULL, this);
     m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
     m_3D_Clear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
     m_cbCurveLibResolution->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_cbUpdateInterval->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::changeUpdateInterval), NULL, this);
-    m_cb3DDrawZeroPlane->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::update3DDrawOptions), NULL, this);
-    m_cb3DDrawWorkpieceSurfacePlane->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::update3DDrawOptions), NULL, this);
-    m_cb3DDrawWorkpieceOffset->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::update3DDrawOptions), NULL, this);
-    m_spin3DAngelX->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelX), NULL, this);
-    m_spin3DAngelX->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelX), NULL, this);
-    m_spin3DAngelY->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelY), NULL, this);
-    m_spin3DAngelY->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelY), NULL, this);
-    m_spin3DAngelZ->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::spin3DAngelZ), NULL, this);
-    m_spin3DAngelZ->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::update3DAngelZ), NULL, this);
-    m_bt3DHelp->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3DPaneHelp), NULL, this);
     m_3D_Top->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
     m_3D_Bottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
     m_3D_Front->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
@@ -6752,6 +6592,387 @@ EndSwitchDialogBase::~EndSwitchDialogBase()
     m_btDissolveY->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EndSwitchDialogBase::dissolveY), NULL, this);
     m_btDissolveZ->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EndSwitchDialogBase::dissolveZ), NULL, this);
     m_btCancle->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(EndSwitchDialogBase::cancle), NULL, this);
+    
+}
+
+GL3DOptionsBase::GL3DOptionsBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxFrame(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer3541 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer3541->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3541->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3541->AddGrowableCol(0);
+    flexGridSizer3541->AddGrowableRow(0);
+    flexGridSizer3541->AddGrowableRow(1);
+    flexGridSizer3541->AddGrowableRow(2);
+    this->SetSizer(flexGridSizer3541);
+    
+    m_collPaneOptions = new wxCollapsiblePane(this, wxID_ANY, _("Options"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxCP_DEFAULT_STYLE);
+    
+    flexGridSizer3541->Add(m_collPaneOptions, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer3649 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer3649->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3649->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3649->AddGrowableCol(0);
+    flexGridSizer3649->AddGrowableRow(0);
+    m_collPaneOptions->GetPane()->SetSizer(flexGridSizer3649);
+    
+    wxArrayString m_pgMgr3543Arr;
+    wxUnusedVar(m_pgMgr3543Arr);
+    wxArrayInt m_pgMgr3543IntArr;
+    wxUnusedVar(m_pgMgr3543IntArr);
+    m_pgMgr3543 = new wxPropertyGridManager(m_collPaneOptions->GetPane(), wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_collPaneOptions->GetPane(), wxSize(-1,-1)), wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED);
+    
+    flexGridSizer3649->Add(m_pgMgr3543, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_pgCatDisplayOptions = m_pgMgr3543->Append(  new wxPropertyCategory( _("Display Options") ) );
+    m_pgCatDisplayOptions->SetHelpString(wxT(""));
+    
+    m_pgMgr3543Arr.Clear();
+    m_pgMgr3543IntArr.Clear();
+    m_pgMgr3543Arr.Add(_("Points"));
+    m_pgMgr3543Arr.Add(_("Lines"));
+    m_pgMgr3543Arr.Add(_("LineStrips"));
+    m_pgPropDrawType = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxEnumProperty( _("Draw Type"), wxPG_LABEL, m_pgMgr3543Arr, m_pgMgr3543IntArr, 1) );
+    m_pgPropDrawType->SetHelpString(wxT(""));
+    m_pgPropDrawType->SetEditor( wxT("Choice") );
+    
+    m_pgPropDrawFlyPath = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxBoolProperty( _("Draw Fly Path"), wxPG_LABEL, 1) );
+    m_pgPropDrawFlyPath->SetHelpString(wxT(""));
+    m_pgPropDrawFlyPath->SetEditor( wxT("CheckBox") );
+    
+    m_pgPropPositionMarker = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxBoolProperty( _("Draw Position Marker"), wxPG_LABEL, 1) );
+    m_pgPropPositionMarker->SetHelpString(wxT(""));
+    m_pgPropPositionMarker->SetEditor( wxT("CheckBox") );
+    
+    m_pgPropWorkColour = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxSystemColourProperty( _("Work Colour")) );
+    m_pgPropWorkColour->SetValueToUnspecified();
+    m_pgPropWorkColour->SetHelpString(wxT(""));
+    m_pgPropWorkColour->SetEditor( wxT("TextCtrlAndButton") );
+    
+    m_pgPropFlyColour = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxSystemColourProperty( _("Fly Colour")) );
+    m_pgPropFlyColour->SetValueToUnspecified();
+    m_pgPropFlyColour->SetHelpString(wxT(""));
+    m_pgPropFlyColour->SetEditor( wxT("TextCtrlAndButton") );
+    
+    m_pgPropZoom = m_pgMgr3543->AppendIn( m_pgCatDisplayOptions,  new wxFloatProperty( _("Zoom"), wxPG_LABEL, 2.0) );
+    m_pgPropZoom->SetHelpString(wxT(""));
+    m_pgPropZoom->SetEditor( wxT("SpinCtrl") );
+    
+    m_pgCatBoundBox = m_pgMgr3543->Append(  new wxPropertyCategory( _("Bound Box") ) );
+    m_pgCatBoundBox->SetHelpString(wxT(""));
+    
+    m_pgPropDrawBoundBox = m_pgMgr3543->AppendIn( m_pgCatBoundBox,  new wxBoolProperty( _("Draw Bound Box"), wxPG_LABEL, 1) );
+    m_pgPropDrawBoundBox->SetHelpString(wxT(""));
+    m_pgPropDrawBoundBox->SetEditor( wxT("CheckBox") );
+    
+    m_pgPropBoundBoxColour = m_pgMgr3543->AppendIn( m_pgCatBoundBox,  new wxSystemColourProperty( _("Colour")) );
+    m_pgPropBoundBoxColour->SetValueToUnspecified();
+    m_pgPropBoundBoxColour->SetHelpString(wxT(""));
+    m_pgPropBoundBoxColour->SetEditor( wxT("TextCtrlAndButton") );
+    
+    m_pgCatRenderOptions = m_pgMgr3543->Append(  new wxPropertyCategory( _("Render Options") ) );
+    m_pgCatRenderOptions->SetHelpString(wxT(""));
+    
+    m_pgPropSmoothing = m_pgMgr3543->AppendIn( m_pgCatRenderOptions,  new wxBoolProperty( _("Smoothing"), wxPG_LABEL, 1) );
+    m_pgPropSmoothing->SetHelpString(wxT(""));
+    m_pgPropSmoothing->SetEditor( wxT("CheckBox") );
+    m_pgPropSmoothing->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+    wxFlexGridSizer* flexGridSizer3653 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer3653->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3653->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer3649->Add(flexGridSizer3653, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(4));
+    
+    m_cbAutoUpdate = new wxCheckBox(m_collPaneOptions->GetPane(), wxID_ANY, _(" Auto Update"), wxDefaultPosition, wxDLG_UNIT(m_collPaneOptions->GetPane(), wxSize(-1,-1)), 0);
+    m_cbAutoUpdate->SetValue(true);
+    wxFont m_cbAutoUpdateFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_cbAutoUpdate->SetFont(m_cbAutoUpdateFont);
+    m_cbAutoUpdate->Enable(false);
+    
+    flexGridSizer3653->Add(m_cbAutoUpdate, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_collPaneCameraRotation = new wxCollapsiblePane(this, wxID_ANY, _("XY Pane Rotation (Z Top)"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxCP_DEFAULT_STYLE|wxFULL_REPAINT_ON_RESIZE);
+    
+    flexGridSizer3541->Add(m_collPaneCameraRotation, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer3570 = new wxFlexGridSizer(1, 6, 0, 0);
+    flexGridSizer3570->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3570->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3570->AddGrowableCol(0);
+    flexGridSizer3570->AddGrowableRow(0);
+    m_collPaneCameraRotation->GetPane()->SetSizer(flexGridSizer3570);
+    
+    m_sliderCameraRotation = new wxSlider(m_collPaneCameraRotation->GetPane(), wxID_ANY, 0, -360, 360, wxDefaultPosition, wxDLG_UNIT(m_collPaneCameraRotation->GetPane(), wxSize(-1,-1)), wxSL_LABELS|wxSL_HORIZONTAL);
+    wxFont m_sliderCameraRotationFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_sliderCameraRotation->SetFont(m_sliderCameraRotationFont);
+    
+    flexGridSizer3570->Add(m_sliderCameraRotation, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer3678 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer3678->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3678->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer3570->Add(flexGridSizer3678, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer3679 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer3679->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3679->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer3678->Add(flexGridSizer3679, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_btResetCameraPos = new wxBitmapButton(m_collPaneCameraRotation->GetPane(), wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("tools-equalizer-blue")), wxDefaultPosition, wxDLG_UNIT(m_collPaneCameraRotation->GetPane(), wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btResetCameraPos->SetToolTip(_("Reset"));
+    
+    flexGridSizer3679->Add(m_btResetCameraPos, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_btCameraRotionClockwise = new wxBitmapToggleButton(m_collPaneCameraRotation->GetPane(), wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-rotate-clockwise")), wxDefaultPosition, wxDLG_UNIT(m_collPaneCameraRotation->GetPane(), wxSize(24,24)), 0);
+    m_btCameraRotionClockwise->SetToolTip(_("Auto Rotate Clockwise"));
+    m_btCameraRotionClockwise->SetValue(false);
+    
+    flexGridSizer3679->Add(m_btCameraRotionClockwise, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCameraRotionClockwise->SetMinSize(wxSize(24,24));
+    
+    m_btCameraRotionAnticlockwise = new wxBitmapToggleButton(m_collPaneCameraRotation->GetPane(), wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-rotate-anticlockwise")), wxDefaultPosition, wxDLG_UNIT(m_collPaneCameraRotation->GetPane(), wxSize(24,24)), 0);
+    m_btCameraRotionAnticlockwise->SetToolTip(_("Auto Rotate Counterclockwise"));
+    m_btCameraRotionAnticlockwise->SetValue(false);
+    
+    flexGridSizer3679->Add(m_btCameraRotionAnticlockwise, 0, wxALL, WXC_FROM_DIP(1));
+    m_btCameraRotionAnticlockwise->SetMinSize(wxSize(24,24));
+    
+    wxFlexGridSizer* flexGridSizer3682 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer3682->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3682->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer3678->Add(flexGridSizer3682, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText3684 = new wxStaticText(m_collPaneCameraRotation->GetPane(), wxID_ANY, _("Speed"), wxDefaultPosition, wxDLG_UNIT(m_collPaneCameraRotation->GetPane(), wxSize(-1,-1)), 0);
+    wxFont m_staticText3684Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText3684->SetFont(m_staticText3684Font);
+    
+    flexGridSizer3682->Add(m_staticText3684, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_sliderCameraRotationSpeed = new wxSlider(m_collPaneCameraRotation->GetPane(), wxID_ANY, 10, 50, 500, wxDefaultPosition, wxDLG_UNIT(m_collPaneCameraRotation->GetPane(), wxSize(46,-1)), wxSL_INVERSE|wxSL_HORIZONTAL);
+    
+    flexGridSizer3682->Add(m_sliderCameraRotationSpeed, 0, wxALL, WXC_FROM_DIP(0));
+    m_sliderCameraRotationSpeed->SetMinSize(wxSize(46,-1));
+    
+    flexGridSizer3570->Add(3, 0, 1, wxALL, WXC_FROM_DIP(1));
+    m_collPaneCameraRotation->SetMinSize(wxSize(300,-1));
+    
+    m_collPaneModelRotation = new wxCollapsiblePane(this, wxID_ANY, _("Model Rotation:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxCP_DEFAULT_STYLE);
+    
+    flexGridSizer3541->Add(m_collPaneModelRotation, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer3580 = new wxFlexGridSizer(1, 8, 0, 0);
+    flexGridSizer3580->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3580->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    m_collPaneModelRotation->GetPane()->SetSizer(flexGridSizer3580);
+    
+    wxFlexGridSizer* flexGridSizer36288 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer36288->SetFlexibleDirection( wxBOTH );
+    flexGridSizer36288->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer36288->AddGrowableCol(0);
+    flexGridSizer36288->AddGrowableRow(0);
+    
+    flexGridSizer3580->Add(flexGridSizer36288, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_sliderModelRotationX = new wxSlider(m_collPaneModelRotation->GetPane(), wxID_ANY, 0, -360, 360, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxSL_LABELS|wxSL_VERTICAL);
+    wxFont m_sliderModelRotationXFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_sliderModelRotationX->SetFont(m_sliderModelRotationXFont);
+    
+    flexGridSizer36288->Add(m_sliderModelRotationX, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_btModelRotationResetX = new wxButton(m_collPaneModelRotation->GetPane(), wxID_ANY, _("X"), wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(50,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btModelRotationResetX->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("tools-equalizer-blue")), wxLEFT);
+    m_btModelRotationResetX->SetBitmapMargins(2,2);
+    #endif
+    m_btModelRotationResetX->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_btModelRotationResetXFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btModelRotationResetX->SetFont(m_btModelRotationResetXFont);
+    
+    flexGridSizer36288->Add(m_btModelRotationResetX, 0, wxALL, WXC_FROM_DIP(5));
+    m_btModelRotationResetX->SetMinSize(wxSize(50,-1));
+    
+    m_staticLine364118 = new wxStaticLine(m_collPaneModelRotation->GetPane(), wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer3580->Add(m_staticLine364118, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer36281114 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer36281114->SetFlexibleDirection( wxBOTH );
+    flexGridSizer36281114->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer36281114->AddGrowableCol(0);
+    flexGridSizer36281114->AddGrowableRow(0);
+    
+    flexGridSizer3580->Add(flexGridSizer36281114, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_sliderModelRotationY = new wxSlider(m_collPaneModelRotation->GetPane(), wxID_ANY, 0, -360, 360, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxSL_LABELS|wxSL_VERTICAL);
+    wxFont m_sliderModelRotationYFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_sliderModelRotationY->SetFont(m_sliderModelRotationYFont);
+    
+    flexGridSizer36281114->Add(m_sliderModelRotationY, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_btModelRotationResetY = new wxButton(m_collPaneModelRotation->GetPane(), wxID_ANY, _("Y"), wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(50,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btModelRotationResetY->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("tools-equalizer-blue")), wxLEFT);
+    m_btModelRotationResetY->SetBitmapMargins(2,2);
+    #endif
+    m_btModelRotationResetY->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_btModelRotationResetYFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btModelRotationResetY->SetFont(m_btModelRotationResetYFont);
+    m_btModelRotationResetY->SetToolTip(_("Reset"));
+    
+    flexGridSizer36281114->Add(m_btModelRotationResetY, 0, wxALL, WXC_FROM_DIP(5));
+    m_btModelRotationResetY->SetMinSize(wxSize(50,-1));
+    
+    m_staticLine3641 = new wxStaticLine(m_collPaneModelRotation->GetPane(), wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer3580->Add(m_staticLine3641, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer362811 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer362811->SetFlexibleDirection( wxBOTH );
+    flexGridSizer362811->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer362811->AddGrowableCol(0);
+    flexGridSizer362811->AddGrowableRow(0);
+    
+    flexGridSizer3580->Add(flexGridSizer362811, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_sliderModelRotationZ = new wxSlider(m_collPaneModelRotation->GetPane(), wxID_ANY, 0, -360, 360, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxSL_LABELS|wxSL_VERTICAL);
+    wxFont m_sliderModelRotationZFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_sliderModelRotationZ->SetFont(m_sliderModelRotationZFont);
+    
+    flexGridSizer362811->Add(m_sliderModelRotationZ, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_btModelRotationResetZ = new wxButton(m_collPaneModelRotation->GetPane(), wxID_ANY, _("Z"), wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(50,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btModelRotationResetZ->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("tools-equalizer-blue")), wxLEFT);
+    m_btModelRotationResetZ->SetBitmapMargins(2,2);
+    #endif
+    m_btModelRotationResetZ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_btModelRotationResetZFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btModelRotationResetZ->SetFont(m_btModelRotationResetZFont);
+    m_btModelRotationResetZ->SetToolTip(_("Reset"));
+    
+    flexGridSizer362811->Add(m_btModelRotationResetZ, 0, wxALL, WXC_FROM_DIP(5));
+    m_btModelRotationResetZ->SetMinSize(wxSize(50,-1));
+    
+    m_staticLine36411719 = new wxStaticLine(m_collPaneModelRotation->GetPane(), wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer3580->Add(m_staticLine36411719, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer3628 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer3628->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3628->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3628->AddGrowableCol(0);
+    flexGridSizer3628->AddGrowableRow(0);
+    
+    flexGridSizer3580->Add(flexGridSizer3628, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_sliderModelRotationXYZ = new wxSlider(m_collPaneModelRotation->GetPane(), wxID_ANY, 0, -360, 360, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxSL_LABELS|wxSL_VERTICAL);
+    wxFont m_sliderModelRotationXYZFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_sliderModelRotationXYZ->SetFont(m_sliderModelRotationXYZFont);
+    
+    flexGridSizer3628->Add(m_sliderModelRotationXYZ, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_btModelRotationResetXYZ = new wxButton(m_collPaneModelRotation->GetPane(), wxID_ANY, _("XYZ"), wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(50,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btModelRotationResetXYZ->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("tools-equalizer-blue")), wxLEFT);
+    m_btModelRotationResetXYZ->SetBitmapMargins(2,2);
+    #endif
+    m_btModelRotationResetXYZ->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_btModelRotationResetXYZFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btModelRotationResetXYZ->SetFont(m_btModelRotationResetXYZFont);
+    m_btModelRotationResetXYZ->SetToolTip(_("Reset"));
+    
+    flexGridSizer3628->Add(m_btModelRotationResetXYZ, 0, wxALL, WXC_FROM_DIP(5));
+    m_btModelRotationResetXYZ->SetMinSize(wxSize(50,-1));
+    
+    m_staticLine364117 = new wxStaticLine(m_collPaneModelRotation->GetPane(), wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_collPaneModelRotation->GetPane(), wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer3580->Add(m_staticLine364117, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    m_collPaneModelRotation->SetMinSize(wxSize(300,-1));
+    
+    SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    SetName(wxT("GL3DOptionsBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(GL3DOptionsBase::onCloseWindow), NULL, this);
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(GL3DOptionsBase::onShowWindow), NULL, this);
+    this->Connect(wxEVT_ACTIVATE, wxActivateEventHandler(GL3DOptionsBase::onActivate), NULL, this);
+    m_pgMgr3543->Connect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(GL3DOptionsBase::propertyChanged), NULL, this);
+    m_pgMgr3543->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(GL3DOptionsBase::propertyChanging), NULL, this);
+    m_sliderCameraRotation->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::cameraRotationChanged), NULL, this);
+    m_sliderCameraRotation->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::cameraRotationChanged), NULL, this);
+    m_btResetCameraPos->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetCameraPostion), NULL, this);
+    m_btCameraRotionClockwise->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::autoCameraRotationClockwise), NULL, this);
+    m_btCameraRotionAnticlockwise->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::autoCameraRotationAnticlockwise), NULL, this);
+    m_sliderCameraRotationSpeed->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::cameraRotationSpeedChanged), NULL, this);
+    m_sliderCameraRotationSpeed->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::cameraRotationSpeedChanged), NULL, this);
+    m_sliderModelRotationX->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationXChanged), NULL, this);
+    m_sliderModelRotationX->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationXChanged), NULL, this);
+    m_btModelRotationResetX->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationX), NULL, this);
+    m_sliderModelRotationY->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationYChanged), NULL, this);
+    m_sliderModelRotationY->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationYChanged), NULL, this);
+    m_btModelRotationResetY->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationY), NULL, this);
+    m_sliderModelRotationZ->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationZChanged), NULL, this);
+    m_sliderModelRotationZ->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationZChanged), NULL, this);
+    m_btModelRotationResetZ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationZ), NULL, this);
+    m_sliderModelRotationXYZ->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationXYZChanged), NULL, this);
+    m_sliderModelRotationXYZ->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationXYZChanged), NULL, this);
+    m_btModelRotationResetXYZ->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationXYZ), NULL, this);
+    
+}
+
+GL3DOptionsBase::~GL3DOptionsBase()
+{
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(GL3DOptionsBase::onCloseWindow), NULL, this);
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(GL3DOptionsBase::onShowWindow), NULL, this);
+    this->Disconnect(wxEVT_ACTIVATE, wxActivateEventHandler(GL3DOptionsBase::onActivate), NULL, this);
+    m_pgMgr3543->Disconnect(wxEVT_PG_CHANGED, wxPropertyGridEventHandler(GL3DOptionsBase::propertyChanged), NULL, this);
+    m_pgMgr3543->Disconnect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(GL3DOptionsBase::propertyChanging), NULL, this);
+    m_sliderCameraRotation->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::cameraRotationChanged), NULL, this);
+    m_sliderCameraRotation->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::cameraRotationChanged), NULL, this);
+    m_btResetCameraPos->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetCameraPostion), NULL, this);
+    m_btCameraRotionClockwise->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::autoCameraRotationClockwise), NULL, this);
+    m_btCameraRotionAnticlockwise->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::autoCameraRotationAnticlockwise), NULL, this);
+    m_sliderCameraRotationSpeed->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::cameraRotationSpeedChanged), NULL, this);
+    m_sliderCameraRotationSpeed->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::cameraRotationSpeedChanged), NULL, this);
+    m_sliderModelRotationX->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationXChanged), NULL, this);
+    m_sliderModelRotationX->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationXChanged), NULL, this);
+    m_btModelRotationResetX->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationX), NULL, this);
+    m_sliderModelRotationY->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationYChanged), NULL, this);
+    m_sliderModelRotationY->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationYChanged), NULL, this);
+    m_btModelRotationResetY->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationY), NULL, this);
+    m_sliderModelRotationZ->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationZChanged), NULL, this);
+    m_sliderModelRotationZ->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationZChanged), NULL, this);
+    m_btModelRotationResetZ->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationZ), NULL, this);
+    m_sliderModelRotationXYZ->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(GL3DOptionsBase::modelRotationXYZChanged), NULL, this);
+    m_sliderModelRotationXYZ->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(GL3DOptionsBase::modelRotationXYZChanged), NULL, this);
+    m_btModelRotationResetXYZ->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(GL3DOptionsBase::resetModelRotationXYZ), NULL, this);
     
 }
 

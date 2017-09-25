@@ -26,75 +26,23 @@
 const double endSwitchStepBackMertic = 2.5;
 
 ///////////////////////////////////////////////////////////////////
-struct PositionInfo3D {
-	CncLongPosition lp;
-	CncLongPosition cp;
-	bool zAxisDown = false;
-};
-
-///////////////////////////////////////////////////////////////////
-struct PointPair {
-	wxPoint lp;
-	wxPoint cp;
-	wxPen pen = {255,255,255};
-	bool zAxisDown;
-	
-	//////////////////////////////////////////////////////////////////
-	static PointPair& processOffset(PointPair& ret, int x, int y) {
-		ret.lp.x += x;
-		ret.lp.y += y;
-		ret.cp.x += x;
-		ret.cp.y += y;
-		return ret;
-	}
-	
-	//////////////////////////////////////////////////////////////////
-	static PointPair& processFactor(PointPair& ret, double x, double y) {
-		ret.lp.x *= x;
-		ret.lp.y *= y;
-		ret.cp.x *= x;
-		ret.cp.y *= y;
-		return ret;
-	}
-
-	//////////////////////////////////////////////////////////////////
-	friend std::ostream &operator<< (std::ostream &ostr, const PointPair &a) {
-		ostr << "lp:"<< a.lp.x << "," << a.lp.y << "\t\tcp:" << a.cp.x << "," << a.cp.y << "\tz down:" << a.zAxisDown << std::endl;
-		return ostr;
-	}
-	//////////////////////////////////////////////////////////////////i
-	friend bool operator== (const PointPair &a, const PointPair &b) {
-		return  (   (a.lp == b.lp)
-				 && (a.cp == b.cp)
-				 && (a.zAxisDown == b.zAxisDown)
-				);
-	}
-	//////////////////////////////////////////////////////////////////i
-	friend bool operator!= (const PointPair &a, const PointPair &b) {
-		return (!operator== (a, b));
-	}
-};
-
-typedef std::vector<PointPair> DrawPoints;
-
-///////////////////////////////////////////////////////////////////
-struct SetterTuple {
-	unsigned char 	id;
-	int32_t			value;
-	
-	SetterTuple(unsigned char i, int32_t v)
-	: id(i)
-	, value(v)
-	{}
-};
-
-///////////////////////////////////////////////////////////////////
 class CncControl {
 	public:
 		enum DimensionMode {DM_2D, DM_3D};
 		
 	private:
 		wxString stringTemplate;
+		
+		///////////////////////////////////////////////////////////////////
+		struct SetterTuple {
+			unsigned char 	id;
+			int32_t			value;
+			
+			SetterTuple(unsigned char i, int32_t v)
+			: id(i)
+			, value(v)
+			{}
+		};
 		
 	protected:
 		CncPortType portType;
@@ -112,8 +60,6 @@ class CncControl {
 		CncLongPosition curCtlPos;
 		// Stores the lateset requested control positions
 		CncLongPosition controllerPos;
-		// Stores the previous draw point
-		CncLongPosition lastDrawPoint3D;
 		// Render mode
 		CncRenderMode renderMode;
 		// Duration counter
@@ -130,6 +76,9 @@ class CncControl {
 		unsigned int stepDelay;
 		// output controls
 		GuiControlSetup* guiCtlSetup;
+		#define GET_GUI_CTL(ctl)           (guiCtlSetup->ctl)
+		#define IS_GUI_CTL_VALID(ctl)      (guiCtlSetup != NULL && guiCtlSetup->ctl != NULL)
+		#define IS_GUI_CTL_NOT_VALID(ctl)  (guiCtlSetup == NULL || guiCtlSetup->ctl == NULL)
 		// Tool state handling
 		CncToolStateControl toolState;
 		//measurements variables
@@ -162,9 +111,6 @@ class CncControl {
 		//simple move
 		bool prepareSimpleMove(bool enaleEventHandling = true);
 		void reconfigureSimpleMove(bool correctPositions);
-		
-		// draw point conversion
-		void initLastDrawPoint();
 		
 		// secial convesion to transfer a double as long
 		long convertDoubleToCtrlLong(unsigned char 	id, double d);

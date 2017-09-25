@@ -16,6 +16,7 @@ class CncConfig {
 	private:
 		bool changed;
 		CncUnit unit;
+		double maxDimensions;
 		double maxDimensionsX;
 		double maxDimensionsY;
 		double maxDimensionsZ;
@@ -150,9 +151,10 @@ class CncConfig {
 			calcFactY = 0.0 + (stepsY/pitchY);
 			calcFactZ = 0.0 + (stepsZ/pitchZ);
 			
-			dispFactX3D = 1.0 * maxDimensionsX * calcFactX;
-			dispFactY3D = 1.0 * maxDimensionsY * calcFactY;
-			dispFactZ3D = 1.0 * maxDimensionsZ * calcFactZ;
+			maxDimensions = std::max(std::max(maxDimensionsX, maxDimensionsY), maxDimensionsZ);
+			dispFactX3D = 1.0 * maxDimensions * calcFactX;
+			dispFactY3D = 1.0 * maxDimensions * calcFactY;
+			dispFactZ3D = 1.0 * maxDimensions * calcFactZ;
 		}
 		////////////////////////////////////////////////////////////////////////
 		const bool isModified() { return changed; }
@@ -341,6 +343,8 @@ class CncConfig {
 		CncUnit getUnit(void) { return unit; }
 		CncConfig& setUnit(CncUnit u) { sc(); unit = u; return *this;}
 		////////////////////////////////////////////////////////////////////////
+		const double getMaxDimension() { return maxDimensions; }
+		
 		const double getMaxDimensionX() { return maxDimensionsX; }
 		CncConfig& setMaxDimensionX(double val) { sc(); maxDimensionsX = val; calculateFactors(); return *this; }
 		const double getMaxDimensionY() { return maxDimensionsY; }

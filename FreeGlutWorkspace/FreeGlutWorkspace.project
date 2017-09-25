@@ -11,8 +11,6 @@
     <File Name="main.cpp" ExcludeProjConfig=""/>
     <File Name="Sample1.cpp" ExcludeProjConfig="Debug;Release"/>
     <File Name="wxDummyCanvas.h"/>
-    <File Name="../CncControlerGui/CncConfig.cpp"/>
-    <File Name="../CncControlerGui/CncConfig.h"/>
     <VirtualDirectory Name="Impl">
       <File Name="../CncControlerGui/3D/GLContextCncPath.cpp"/>
       <File Name="../CncControlerGui/3D/GLContextCncPath.h"/>
@@ -27,10 +25,10 @@
       <File Name="../CncControlerGui/3D/GLContextPathBase.h"/>
       <File Name="../CncControlerGui/3D/GLViewPort.h"/>
       <File Name="../CncControlerGui/3D/GLViewPort.cpp"/>
-      <File Name="../CncControlerGui/3D/GLModelHelper.h"/>
+      <File Name="../CncControlerGui/3D/GLHelperCamera.h"/>
+      <File Name="../CncControlerGui/3D/GLHelperModel.h"/>
     </VirtualDirectory>
-    <File Name="Sample2.cpp" ExcludeProjConfig="Release"/>
-    <File Name="global.cpp"/>
+    <File Name="Sample2.cpp" ExcludeProjConfig="Debug;Release"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

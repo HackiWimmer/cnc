@@ -14,7 +14,8 @@ class GLViewPort {
 		////////////////////////////////////////////////////
 		GLViewPort(GLViewPort::DistortType type)
 		: x(0), y(0), w(0), h(0), n(0)
-		, factor(2)
+		, windowWidth(0), windowHeigth(0)
+		, factor(8)
 		, distortType(type)
 		, origPosType(OrigPosType::VPOP_Center)
 		{}
@@ -47,10 +48,13 @@ class GLViewPort {
 		float getAspect() { return 1.0f * getNormalizedSizeW()/getNormalizedSizeH(); }
 
 		////////////////////////////////////////////////////
+		int getCurrentWindowWidth() { return windowWidth; }
+		int getCurrentWindowHeigth() { return windowHeigth; }
+		
+		////////////////////////////////////////////////////
 		int getNormalizedSizeW() {
 			if ( distortType == GLViewPort::VPT_Undistored )
 				return n;
-
 			return w;
 		}
 
@@ -58,7 +62,6 @@ class GLViewPort {
 		int getNormalizedSizeH() {
 			if ( distortType == GLViewPort::VPT_Undistored )
 				return n;
-
 			return h;
 		}
 
@@ -103,6 +106,7 @@ class GLViewPort {
 		static const unsigned int margin = 10;
 
 		int x, y, w, h, n;
+		int windowWidth, windowHeigth;
 		int factor;
 		GLViewPort::DistortType distortType;
 		GLViewPort::OrigPosType origPosType;

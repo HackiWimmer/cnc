@@ -523,7 +523,7 @@ void SVGFileParser::initNextRunPhase(SvgRunInfo::SvgRunPhase p) {
 bool SVGFileParser::process() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
-
+	
 	initNextRunPhase(SvgRunInfo::Svg_RP_Preprocesser);
 	clearDebugControlBase();
 	bool ret = preprocess();
