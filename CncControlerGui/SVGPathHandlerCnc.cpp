@@ -11,7 +11,7 @@
 
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc) 
-: SVGPathHandlerBase()
+: PathHandlerBase()
 , unit(px)
 , cncControl(cnc)
 , processMode(SvgPhController)
@@ -144,7 +144,7 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	newPath 			= true;
 	origPathInfo	 	= sopi;
 	
-	SVGPathHandlerBase::initNextPath();
+	PathHandlerBase::initNextPath();
 	
 	// Z depth management
 	wxASSERT( cncControl && cncControl->getCncConfig() );
@@ -184,7 +184,7 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("finsihCurrentPath");
 	
-	SVGPathHandlerBase::finishCurrentPath();
+	PathHandlerBase::finishCurrentPath();
 	
 	// if the tool radius > 0 the path have to be tool corrected
 	if ( toolRadius > 0 ) {
@@ -377,7 +377,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 void SVGPathHandlerCnc::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("prepareWork");
-	SVGPathHandlerBase::prepareWork();
+	PathHandlerBase::prepareWork();
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
@@ -392,7 +392,7 @@ void SVGPathHandlerCnc::prepareWork() {
 void SVGPathHandlerCnc::finishWork() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("finishWork");
-	SVGPathHandlerBase::finishWork();
+	PathHandlerBase::finishWork();
 	
 	cncControl->switchToolOff();
 	

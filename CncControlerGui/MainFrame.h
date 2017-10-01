@@ -7,7 +7,7 @@
 #include <wx/generic/notifmsg.h>
 #include "NotebookInfo.h"
 #include "LruFileList.h"
-#include "SVGFileParser.h"
+#include "FileParser.h"
 #include "PathGeneratorFrame.h"
 #include "InterruptThread.h"
 #include "CncControl.h"
@@ -380,7 +380,7 @@ class MainFrame : public MainFrameBClass {
 		wxPNGAnimation* pngAnimation;
 		wxMenu* stcFileContentPopupMenu;
 		wxMenu* stcEmuContentPopupMenu;
-		SVGFileParser* svgFileParser;
+		FileParser* inboundFileParser;
 		
 		wxTimer perspectiveTimer;
 		
@@ -485,8 +485,8 @@ class MainFrame : public MainFrameBClass {
 		
 		void determineRunMode();
 		
-		bool isPause() { return svgFileParser != NULL ? svgFileParser->isPause() : false; }
-		bool isProcessing() { return svgFileParser != NULL ? svgFileParser->isProcessing() : false; }
+		bool isPause() { return inboundFileParser != NULL ? inboundFileParser->isPause() : false; }
+		bool isProcessing() { return inboundFileParser != NULL ? inboundFileParser->isProcessing() : false; }
 		
 		bool showConfigSummaryAndConfirmRun();
 		

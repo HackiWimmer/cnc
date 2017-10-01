@@ -33,7 +33,7 @@
 #endif
 
 //////////////////////////////////////////////////////////////////
-class SVGPathHandlerBase {
+class PathHandlerBase {
 //////////////////////////////////////////////////////////////////
 
 	protected:
@@ -106,7 +106,7 @@ class SVGPathHandlerBase {
 		double				totalLength;
 		LastControlPoint 	lastControlPoint;
 		CncPathListManager 	pathListMgr;
-		SVGTransformMatrix currentSvgTransformMatrix;
+		SVGTransformMatrix  currentSvgTransformMatrix;
 		
 		// trace functions
 		void traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p);
@@ -149,8 +149,8 @@ class SVGPathHandlerBase {
 		
 	public:
 	
-		SVGPathHandlerBase();
-		virtual ~SVGPathHandlerBase();
+		PathHandlerBase();
+		virtual ~PathHandlerBase();
 		
 		// setter
 		void setCurveLibResolution(float res);

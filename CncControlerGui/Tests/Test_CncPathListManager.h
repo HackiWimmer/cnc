@@ -2,7 +2,7 @@
 #define TEST_CNC_PATH_LIST_MANAGER_H
 
 #include "Test_Base.h"
-#include "SVGPathHandlerBase.h"
+#include "PathHandlerBase.h"
 
 ////////////////////////////////////////////////////////////////////////////
 class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {

@@ -3,14 +3,14 @@
 
 #include <wx/variant.h>
 #include "CncPathListEntry.h"
-#include "SVGPathHandlerBase.h"
+#include "PathHandlerBase.h"
 
 /////////////////////////////////////////////////////////////////////////////
 class SVGNodeParser {
 	
 	protected:
 	
-		SVGPathHandlerBase* pathHandler;
+		PathHandlerBase* pathHandler;
 		
 		bool evaluatePath(const wxString& data);
 		bool processPathCommand(const wxString& para);
@@ -36,7 +36,7 @@ class SVGNodeParser {
 		virtual ~SVGNodeParser();
 		
 		////////////////////////////////////////////////////////////////////
-		virtual void setPathHandler(SVGPathHandlerBase* ph) { pathHandler = ph; }
+		virtual void setPathHandler(PathHandlerBase* ph) { pathHandler = ph; }
 		
 		////////////////////////////////////////////////////////////////////
 		bool processSvgNode(const wxString& node);

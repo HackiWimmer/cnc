@@ -7,7 +7,7 @@
 #include "GCodeFileParser.h"
 
 //////////////////////////////////////////////////////////////////
-GCodeFileParser::GCodeFileParser(const char* fn, CncControl* cnc) 
+GCodeFileParser::GCodeFileParser(const wxString& fn, CncControl* cnc) 
 : SVGFileParser(fn, cnc)
 , currentBlockNode(NULL)
 , programEnd(false)
@@ -200,24 +200,30 @@ void GCodeFileParser::setDefaultParameters() {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processRelease() {
 //////////////////////////////////////////////////////////////////
-
-	//todo
 	return SVGFileParser::processRelease();
-
-	
-	cncControl->moveLinearMetricXYZ(10, 10, 10, false);
-	//MessageBoxA(0,"","",0);
-
-
-
-	return true;
-	
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processDebug() {
 //////////////////////////////////////////////////////////////////
-	//todo
 	return SVGFileParser::processDebug();
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParser::process() {
+//////////////////////////////////////////////////////////////////
+	// todo
+	if ( true )
+		return SVGFileParser::process();
+	
+	{ // test
+		cncControl->moveLinearMetricXYZ(100, 100, 40, false);
+		cncControl->moveLinearMetricXYZ(-20, -40, 0, false);
+		
+		cncControl->moveLinearMetricXYZ(-80, -60, -40, false);
+		
+		//cncControl->reset();
+	}
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::preprocess() {

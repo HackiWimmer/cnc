@@ -7,17 +7,22 @@
   </Plugins>
   <Description/>
   <Dependencies/>
-  <VirtualDirectory Name="src">
-    <VirtualDirectory Name="GCode">
-      <File Name="GCodeFileParser.cpp"/>
-      <File Name="GCodeFileParser.h"/>
-      <File Name="GCodeCommands.h"/>
-      <File Name="GCodePath.h"/>
-      <File Name="GCodeBlock.h"/>
-      <File Name="GCodeCommands.cpp"/>
-      <File Name="GCodeBlock.cpp"/>
-      <File Name="GCodeField.h"/>
-      <File Name="GCodeField.cpp"/>
+  <VirtualDirectory Name="Source">
+    <VirtualDirectory Name="Inbound - GCode">
+      <VirtualDirectory Name="Parser">
+        <File Name="GCodeFileParser.cpp"/>
+        <File Name="GCodeFileParser.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Utils">
+        <File Name="GCodeBlock.cpp"/>
+        <File Name="GCodeBlock.h"/>
+        <File Name="GCodeCommands.cpp"/>
+        <File Name="GCodeCommands.h"/>
+        <File Name="GCodeField.cpp"/>
+        <File Name="GCodeField.h"/>
+        <File Name="GCodePath.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="PathHandler"/>
     </VirtualDirectory>
     <VirtualDirectory Name="StcLexer ">
       <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release;release2"/>
@@ -63,7 +68,7 @@
       <File Name="EndSwitchDialog.cpp"/>
       <File Name="EndSwitchDialog.h"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="PathGenWnd">
+    <VirtualDirectory Name="PathGen">
       <File Name="PathGeneratorFrame.h"/>
       <File Name="PathGeneratorFrame.cpp"/>
       <VirtualDirectory Name="Generators">
@@ -114,35 +119,6 @@
       <File Name="SerialPort.h"/>
       <File Name="SerialSpyPort.h"/>
       <File Name="SerialSpyPort.cpp"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="Svg">
-      <VirtualDirectory Name="PathHandler">
-        <File Name="SVGPathHandlerBase.cpp"/>
-        <File Name="SVGPathHandlerCnc.cpp"/>
-        <File Name="SVGPathHandlerBase.h"/>
-        <File Name="SVGPathHandlerCnc.h"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="Parser">
-        <File Name="SVGFileParser.cpp"/>
-        <File Name="SVGFileParser.h"/>
-        <File Name="SVGNodeParser.h"/>
-        <File Name="SVGNodeParser.cpp"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="Utils">
-        <File Name="SVGCurveLib.cpp"/>
-        <File Name="SVGCurveLib.h"/>
-        <File Name="SvgEditPopup.cpp"/>
-        <File Name="SvgEditPopup.h"/>
-        <File Name="SVGElementConverter.cpp"/>
-        <File Name="SVGElementConverter.h"/>
-        <File Name="SVGTransformMatrix.h"/>
-        <File Name="SvgUnitCalculator.cpp"/>
-        <File Name="SvgUnitCalculator.h"/>
-        <File Name="SVGUserAgent.h"/>
-        <File Name="SVGUserAgentInfo.h"/>
-        <File Name="SvgViewBox.h"/>
-        <File Name="SVGPathAssistant.h"/>
-      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <File Name="CncArduino.cpp"/>
@@ -214,9 +190,45 @@
       <File Name="CncSpyControl.h"/>
       <File Name="CncSpyControl.cpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="Clipper">
-      <File Name="Clipper/clipper.cpp"/>
-      <File Name="Clipper/clipper.hpp"/>
+    <VirtualDirectory Name="Inbound - Base">
+      <VirtualDirectory Name="Parser">
+        <File Name="FileParser.h"/>
+        <File Name="FileParser.cpp"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="PathHandler">
+        <File Name="PathHandlerBase.h"/>
+        <File Name="PathHandlerBase.cpp"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Utils">
+        <File Name="FileParserRunInfo.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Inbound - SVG">
+      <VirtualDirectory Name="Parser">
+        <File Name="SVGFileParser.cpp"/>
+        <File Name="SVGFileParser.h"/>
+        <File Name="SVGNodeParser.cpp"/>
+        <File Name="SVGNodeParser.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="PathHandler">
+        <File Name="SVGPathHandlerCnc.cpp"/>
+        <File Name="SVGPathHandlerCnc.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Utils">
+        <File Name="SVGCurveLib.cpp"/>
+        <File Name="SVGCurveLib.h"/>
+        <File Name="SvgEditPopup.cpp"/>
+        <File Name="SvgEditPopup.h"/>
+        <File Name="SVGElementConverter.cpp"/>
+        <File Name="SVGElementConverter.h"/>
+        <File Name="SVGPathAssistant.h"/>
+        <File Name="SVGTransformMatrix.h"/>
+        <File Name="SvgUnitCalculator.cpp"/>
+        <File Name="SvgUnitCalculator.h"/>
+        <File Name="SVGUserAgent.h"/>
+        <File Name="SVGUserAgentInfo.h"/>
+        <File Name="SvgViewBox.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
@@ -436,4 +448,8 @@
       </Completion>
     </Configuration>
   </Settings>
+  <VirtualDirectory Name="Clipper">
+    <File Name="Clipper/clipper.cpp"/>
+    <File Name="Clipper/clipper.hpp"/>
+  </VirtualDirectory>
 </CodeLite_Project>

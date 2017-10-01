@@ -1,7 +1,7 @@
 #ifndef SVG_PATH_ASSISTANT_H
 #define SVG_PATH_ASSISTANT_H
 
-#include "SVGPathHandlerBase.h"
+#include "PathHandlerBase.h"
 #include "CncConfig.h"
 #include "SVGNodeParser.h"
 
@@ -11,7 +11,7 @@ class SVGPathAssistant {
 	protected:
 		
 		SVGNodeParser parser;
-		SVGPathHandlerBase pathHandler;
+		PathHandlerBase pathHandler;
 		float prevCurveLibResoluton;
 		
 	public:

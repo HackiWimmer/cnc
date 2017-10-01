@@ -84,9 +84,10 @@ class GCodeFileParser : public SVGFileParser {
 		
 		// overridden from SVGFileParser
 		virtual bool preprocess();
+		virtual bool process();
 
 	public:
-		GCodeFileParser(const char* fn, CncControl* cnc);
+		GCodeFileParser(const wxString& fn, CncControl* cnc);
 		virtual ~GCodeFileParser();
 		
 		// overridden from SVGFileParser

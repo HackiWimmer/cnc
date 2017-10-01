@@ -1,7 +1,7 @@
 #ifndef SVG_PATH_HANDLER_CNC_H
 #define SVG_PATH_HANDLER_CNC_H
 
-#include "SVGPathHandlerBase.h"
+#include "PathHandlerBase.h"
 #include "SerialPort.h"
 #include "CncToolCorrection.h"
 #include "CncWorkingParameters.h"
@@ -14,7 +14,7 @@ class wxDataViewListCtrl;
 enum SvgPhProcessMode {SvgPhController, SvgPhDebug};
 
 //////////////////////////////////////////////////////////////////
-class SVGPathHandlerCnc : public SVGPathHandlerBase {
+class SVGPathHandlerCnc : public PathHandlerBase {
 //////////////////////////////////////////////////////////////////
 
 	private:

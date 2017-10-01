@@ -105,7 +105,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , pngAnimation(NULL)
 , stcFileContentPopupMenu(NULL)
 , stcEmuContentPopupMenu(NULL)
-, svgFileParser(NULL)
+, inboundFileParser(NULL)
 , perspectiveTimer(this, wxID_HIGHEST + 1)
 {
 ///////////////////////////////////////////////////////////////////
@@ -560,8 +560,8 @@ void MainFrame::OnClose(wxCloseEvent& event) {
 				return;
 			}
 			
-			if ( svgFileParser != NULL )
-				svgFileParser->debugStop();
+			if ( inboundFileParser != NULL )
+				inboundFileParser->debugStop();
 		} else {
 			cnc::trc.logWarning("Can't close the application due to an active run session");
 			return;
@@ -2267,8 +2267,8 @@ bool MainFrame::openFile(int pageToSelect) {
 		m_stcFileContent->DiscardEdits();
 		m_stcFileContent->EmptyUndoBuffer();
 		
-		if ( svgFileParser != NULL )
-			svgFileParser->clearControls();
+		if ( inboundFileParser != NULL )
+			inboundFileParser->clearControls();
 		
 		cnc->clearDrawControl();
 		cnc->getSerial()->clearSVG();
@@ -2621,19 +2621,19 @@ bool MainFrame::processVirtualTemplate() {
 	SvgOutputParameters sop;
 	cnc->getSerial()->setSVGOutputParameters(evaluteSvgOutputParameters(sop));
 
-	SVGUserAgentOutputControls oc;
+	FileParser::UserAgentOutputControls oc;
 	oc.detailInfo 		= m_dvListCtrlSvgUADetailInfo;
 	oc.inboundPathList 	= m_dvListCtrlSvgUAInboundPathList;
 	oc.useDirectiveList = m_dvListCtrlSvgUAUseDirective;
 	
 	if ( m_menuItemDisplayUserAgent->IsChecked() == true )
-		svgFileParser->setUserAgentControls(oc);
+		inboundFileParser->setUserAgentControls(oc);
 		
-	svgFileParser->setSvgTraceControl(m_svgTrace);
-	svgFileParser->setSvgSoureControl(m_stcFileContent);
+	inboundFileParser->setInboundTraceControl(m_svgTrace);
+	inboundFileParser->setInboundSourceControl(m_stcFileContent);
 
 	if ( svgDebugger == true ) {
-		SVGFileParser::SvgDebugControls sdc;
+		SVGFileParser::DebugControls sdc;
 		sdc.debuggerControlBase 	= m_dvListCtrlSvgDebuggerInfoBase;
 		sdc.debuggerControlPath		= m_dvListCtrlSvgDebuggerInfoPath;
 		sdc.debuggerControlDetail	= m_dvListCtrlSvgDebuggerInfoDetail;
@@ -2642,13 +2642,13 @@ bool MainFrame::processVirtualTemplate() {
 		sdc.debugSpooling			= m_miRcSpooling;
 		sdc.debugPhase				= m_debugPhase;
 		
-		svgFileParser->setDebuggerControls(sdc);
+		inboundFileParser->setDebuggerControls(sdc);
 		
-		ret = svgFileParser->processDebug();
+		ret = inboundFileParser->processDebug();
 		clearDebugControls();
 
 	} else {
-		ret = svgFileParser->processRelease();
+		ret = inboundFileParser->processRelease();
 	}
 	
 	refreshSvgEmuFile();
@@ -2658,19 +2658,19 @@ bool MainFrame::processVirtualTemplate() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processSVGTemplate() {
 ///////////////////////////////////////////////////////////////////
-	if ( svgFileParser != NULL )
-		delete svgFileParser;
+	if ( inboundFileParser != NULL )
+		delete inboundFileParser;
 		
-	svgFileParser = new SVGFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
+	inboundFileParser = new SVGFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processGCodeTemplate() {
 ///////////////////////////////////////////////////////////////////
-	if ( svgFileParser != NULL )
-		delete svgFileParser;
+	if ( inboundFileParser != NULL )
+		delete inboundFileParser;
 
-	svgFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
+	inboundFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -4627,15 +4627,15 @@ void MainFrame::selectUAInboundPathList(wxDataViewEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( m_dvListCtrlSvgUAInboundPathList->HasSelection() ) {
 		int sel = m_dvListCtrlSvgUAInboundPathList->GetSelectedRow();
-		if ( svgFileParser != NULL ) {
+		if ( inboundFileParser != NULL ) {
 			m_dvListCtrlSvgUADetailInfo->DeleteAllItems();
-			svgFileParser->displayUserAgentDetailInfo(sel);
+			inboundFileParser->displayUserAgentDetailInfo(sel);
 			m_dvListCtrlSvgUADetailInfo->Refresh();
 			m_dvListCtrlSvgUADetailInfo->Update();
 			
 			wxVariant val;
 			m_dvListCtrlSvgUAInboundPathList->GetValue(val, sel, 0);
-			svgFileParser->selectSourceControl(m_stcFileContent, val.GetInteger() - 1);
+			inboundFileParser->selectSourceControl(m_stcFileContent, val.GetInteger() - 1);
 		}
 	}
 	
@@ -5195,8 +5195,8 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 	
 	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 		switch ( sel ) {
-			case OutboundSvgTrace:	if  (svgFileParser != NULL )
-										svgFileParser->displayCollectedTrace(); 
+			case OutboundSvgTrace:	if  (inboundFileParser != NULL )
+										inboundFileParser->displayCollectedTrace(); 
 									break;
 									
 			case OutboundSvgPage: 	m_svgEmuToggleOrigPath->Enable( m_cbSvgIncludeOriginalPath->GetStringSelection().Upper() == "YES" );
@@ -5644,7 +5644,7 @@ void MainFrame::svgEmuZoomHome(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::OpenXmlTrace(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( svgFileParser == NULL )
+	if ( inboundFileParser == NULL )
 		return;
 		
 	wxString cmd, xmlFile(CncFileNameService::getCncOutboundTraceFileName());
@@ -5654,7 +5654,7 @@ void MainFrame::OpenXmlTrace(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openXMLTraceAsText(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( svgFileParser == NULL )
+	if ( inboundFileParser == NULL )
 		return;
 
 	wxString cmd, xmlFile(CncFileNameService::getCncOutboundTraceFileName());
@@ -5880,9 +5880,9 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcPause(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
- 	if ( svgFileParser != NULL ) {
-		svgFileParser->pause();
-		enableRunControls(svgFileParser->isPause());
+ 	if ( inboundFileParser != NULL ) {
+		inboundFileParser->pause();
+		enableRunControls(inboundFileParser->isPause());
 	}
 	
 	decorateRunButton();
@@ -5890,8 +5890,8 @@ void MainFrame::rcPause(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcNextPath(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( svgFileParser != NULL )
-		svgFileParser->debugNextPath();
+	if ( inboundFileParser != NULL )
+		inboundFileParser->debugNextPath();
 		
 	m_svgDebuggerKey->Clear();
 	m_svgDebuggerValue->Clear();
@@ -5899,16 +5899,16 @@ void MainFrame::rcNextPath(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcNextStep(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( svgFileParser != NULL )
-		svgFileParser->debugNextStep();
+	if ( inboundFileParser != NULL )
+		inboundFileParser->debugNextStep();
 		
 	clearDebugControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcFinish(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( svgFileParser != NULL )
-		svgFileParser->debugFinish();
+	if ( inboundFileParser != NULL )
+		inboundFileParser->debugFinish();
 		
 	m_svgDebuggerKey->Clear();
 	m_svgDebuggerValue->Clear();
@@ -5923,8 +5923,8 @@ void MainFrame::rcStop(wxCommandEvent& event) {
 		if ( ret == true ) 	cnc::trc.logInfo("Test was stopped");
 		else				cnc::trc.logError("Test stop was failed");
 	} else {
-		if ( svgFileParser != NULL )
-			svgFileParser->debugStop();
+		if ( inboundFileParser != NULL )
+			inboundFileParser->debugStop();
 		 
 		clearDebugControls();
 		cnc::trc.logInfo("Debug session was stopped");

@@ -11,7 +11,7 @@
 #include "DataControlModel.h"
 #include "CncPosition.h"
 
-struct SVGUserAgentOutputControls {
+struct SvgUserAgentOutputControls {
 	wxDataViewListCtrl* inboundPathList 	= NULL;
 	wxDataViewListCtrl* useDirectiveList	= NULL;
 	wxDataViewListCtrl* detailInfo			= NULL;
@@ -39,7 +39,7 @@ class SVGUserAgent{
 		
 		UseDirectiveVector useInfo;
 		
-		SVGUserAgentOutputControls oCtl;
+		SvgUserAgentOutputControls oCtl;
 		
 		/////////////////////////////////////////////////////////
 		SVGUserAgentInfo& getCurentUserAgent() {
@@ -105,7 +105,7 @@ class SVGUserAgent{
 		}
 		
 		/////////////////////////////////////////////////////////
-		void setOutputControls(SVGUserAgentOutputControls& oc) {
+		void setOutputControls(SvgUserAgentOutputControls& oc) {
 			oCtl.inboundPathList 	= oc.inboundPathList;
 			oCtl.useDirectiveList	= oc.useDirectiveList;
 			oCtl.detailInfo			= oc.detailInfo;

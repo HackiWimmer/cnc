@@ -2,7 +2,7 @@
 #define TEST_CNC_CLIPPER_WRAPPER_H
 
 #include "Test_Base.h"
-#include "SVGPathHandlerBase.h"
+#include "PathHandlerBase.h"
 #include "CncClipperWrapper.h"
 
 ////////////////////////////////////////////////////////////////////////////

@@ -3,7 +3,7 @@
 
 #include "Test_Base.h"
 #include "SVGNodeParser.h"
-#include "SVGPathHandlerBase.h"
+#include "PathHandlerBase.h"
 
 ////////////////////////////////////////////////////////////////////////////
 class TEST_SVG_NODE_PARSER : public TEST_BASE {
@@ -25,7 +25,7 @@ class TEST_SVG_NODE_PARSER : public TEST_BASE {
 		////////////////////////////////////////////////////////////////////
 		virtual bool runTest() {
 			
-			SVGPathHandlerBase phb;
+			PathHandlerBase phb;
 			phb.setCurveLibResolution(0.05);
 			phb.prepareWork();
 			
@@ -49,13 +49,13 @@ class TEST_SVG_NODE_PARSER : public TEST_BASE {
 		}
 		
 		////////////////////////////////////////////////////////////////////
-		void process(SVGNodeParser& sp, SVGPathHandlerBase& phb, const char* n) {
+		void process(SVGNodeParser& sp, PathHandlerBase& phb, const char* n) {
 			sp.processSvgNode(n);
 			process(sp, phb);
 		}
 		
 		////////////////////////////////////////////////////////////////////
-		void process(SVGNodeParser& sp, SVGPathHandlerBase& phb) {
+		void process(SVGNodeParser& sp, PathHandlerBase& phb) {
 			phb.reversePath();
 			phb.centerPath();
 			

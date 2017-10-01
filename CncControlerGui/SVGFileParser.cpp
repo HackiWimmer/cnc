@@ -18,17 +18,15 @@
 #include "SVGFileParser.h"
 
 //////////////////////////////////////////////////////////////////
-SVGFileParser::SVGFileParser(const char* fn, CncControl* cnc) 
+SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc) 
 : SVGNodeParser()
-, cncControl(cnc)
+, FileParser(fn, cnc)
 , cncNodeBreak(false)
 , pathHandler(new SVGPathHandlerCnc(cnc))
-, fileName(fn)
-, svgTraceControl(NULL)
 , debugBase(NULL)
 , debugPath(NULL)
 , debugDetail(NULL)
-, svgSourceControl(NULL)
+
 {
 //////////////////////////////////////////////////////////////////
 	createSvgTraceRoot();
@@ -39,7 +37,7 @@ SVGFileParser::~SVGFileParser() {
 	delete pathHandler;
 }
 //////////////////////////////////////////////////////////////////
-void SVGFileParser::setPathHandler(SVGPathHandlerBase* ph) {
+void SVGFileParser::setPathHandler(PathHandlerBase* ph) {
 //////////////////////////////////////////////////////////////////
 	std::cerr << "SVGFileParser::setPathHandler: Invalid call, this class didn't support this method!" << endl;
 	std::cerr << "Nothig will be set." << endl;
@@ -134,48 +132,27 @@ bool SVGFileParser::setSVGViewBox(wxString vb) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void SVGFileParser::debugNextPath() {
+void SVGFileParser::broadcastDebugState(bool state) {
 //////////////////////////////////////////////////////////////////
-	CncWorkingParameters cwp = pathHandler->getCncWorkingParameters();
-	runInfo.setLastLineNumber(cwp.currentLineNumber);
-	runInfo.setNextFlag(true);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::debugNextStep() {
-//////////////////////////////////////////////////////////////////
-	if ( runInfo.getCurrentDebugState() == true )
-		runInfo.setNextFlag(true);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::debugStop() {
-//////////////////////////////////////////////////////////////////
-	runInfo.setCurrentDebugState(false);
-	runInfo.setStopFlag(true);
-	pathHandler->setDebugState(false);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::debugFinish() {
-//////////////////////////////////////////////////////////////////
-	runInfo.setCurrentDebugState(false);
 	pathHandler->setDebugState(false);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::checkIfBreakpointIsActive() {
 //////////////////////////////////////////////////////////////////
 	//evaluate if current processing phase should be debugged
-	if ( runInfo.getCurrentRunPhase() == SvgRunInfo::Svg_RP_Preprocesser && 
+	if ( runInfo.getCurrentRunPhase() == FileParserRunInfo::RP_Preprocesser && 
 		 debugControls.debugPreprocessing != NULL && 
 		 debugControls.debugPreprocessing->IsChecked() == false )
 		return false;
 		
 	//evaluate if current processing phase should be debugged
-	if ( runInfo.getCurrentRunPhase() == SvgRunInfo::Svg_RP_UserAgent && 
+	if ( runInfo.getCurrentRunPhase() == FileParserRunInfo::RP_UserAgent && 
 		 debugControls.debugUserAgent != NULL && 
 		 debugControls.debugUserAgent->IsChecked() == false )
 		return false;
 		
 	//evaluate if current processing phase should be debugged
-	if ( runInfo.getCurrentRunPhase() == SvgRunInfo::Svg_RP_Spool && 
+	if ( runInfo.getCurrentRunPhase() == FileParserRunInfo::RP_Spool && 
 		 debugControls.debugSpooling != NULL && 
 		 debugControls.debugSpooling->IsChecked() == false )
 		return false;
@@ -486,30 +463,7 @@ bool SVGFileParser::createPreview(const wxString& resultingFileName, bool withEr
 	return wxCopyFile(fileName, resultingFileName);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::pause() {
-//////////////////////////////////////////////////////////////////
-	runInfo.setPauseFlag(!runInfo.getPauseFlag());
-	return runInfo.getPauseFlag();
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::processRelease() {
-//////////////////////////////////////////////////////////////////
-	runInfo.releaseAllPhases();
-	
-	displayCollectedTrace(true);
-	return process();
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::processDebug() {
-//////////////////////////////////////////////////////////////////
-	runInfo.debugAllPhases();
-
-	displayCollectedTrace(true);
-	evaluateDebugState(true);
-	return process();
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::initNextRunPhase(SvgRunInfo::SvgRunPhase p) {
+void SVGFileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
 //////////////////////////////////////////////////////////////////
 	runInfo.setCurrentRunPhase(p);
 	pathHandler->setDebugState(runInfo.getCurrentDebugState());
@@ -524,22 +478,22 @@ bool SVGFileParser::process() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
-	initNextRunPhase(SvgRunInfo::Svg_RP_Preprocesser);
+	initNextRunPhase(FileParserRunInfo::RP_Preprocesser);
 	clearDebugControlBase();
 	bool ret = preprocess();
 	
 	if ( runInfo.processMore() && ret == true ) {
-		initNextRunPhase(SvgRunInfo::Svg_RP_UserAgent);
+		initNextRunPhase(FileParserRunInfo::RP_UserAgent);
 		svgUserAgent.expand();
 		clearDebugControlBase();
 		
 		if ( runInfo.processMore() ) {
-			initNextRunPhase(SvgRunInfo::Svg_RP_Spool);
+			initNextRunPhase(FileParserRunInfo::RP_Spool);
 			ret = spool();
 		}
 	} 
 	
-	initNextRunPhase(SvgRunInfo::Svg_RP_Unknown);
+	initNextRunPhase(FileParserRunInfo::RP_Unknown);
 	freezeDebugControls(false);
 	displayCollectedTrace();
 
@@ -724,27 +678,6 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 		return false;
 		
 	return true;
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::selectSourceControl(wxStyledTextCtrl* ctl, unsigned long pos) {
-//////////////////////////////////////////////////////////////////
-	if ( ctl == NULL ) 
-		return;
-		
-	ctl->GotoLine(pos);
-	
-	if ( pos == 0 ) {
-		ctl->SetSelectionStart(0);
-		ctl->SetSelectionEnd(0);
-	} else {
-		ctl->SetSelectionStart(ctl->GetCurrentPos());
-		ctl->SetSelectionEnd(ctl->GetLineEndPosition(pos));
-	}
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::selectSourceControl(unsigned long pos) {
-//////////////////////////////////////////////////////////////////
-	selectSourceControl(svgSourceControl, pos);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::preprocess() {
@@ -996,7 +929,7 @@ bool SVGFileParser::collectUserAgentTrace() {
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::displayCollectedTrace(bool blank) {
 //////////////////////////////////////////////////////////////////
-	if ( svgTraceControl == NULL )
+	if ( inboundTraceControl == NULL )
 		return;
 
 	// create a temp file
@@ -1022,10 +955,10 @@ void SVGFileParser::displayCollectedTrace(bool blank) {
 	// Write the output 
 	svgTrace.Save(tfn); 
 	
-	if ( svgTraceControl->IsShownOnScreen() == true ) {
-		svgTraceControl->SetZoomType(wxWEBVIEW_ZOOM_TYPE_TEXT);
-		svgTraceControl->SetZoom(wxWEBVIEW_ZOOM_TINY);
-		svgTraceControl->LoadURL(tfn);
-		svgTraceControl->Update();
+	if ( inboundTraceControl->IsShownOnScreen() == true ) {
+		inboundTraceControl->SetZoomType(wxWEBVIEW_ZOOM_TYPE_TEXT);
+		inboundTraceControl->SetZoom(wxWEBVIEW_ZOOM_TINY);
+		inboundTraceControl->LoadURL(tfn);
+		inboundTraceControl->Update();
 	}
 }

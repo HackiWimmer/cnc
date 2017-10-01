@@ -1,10 +1,10 @@
 #include <iostream>
 #include "SVGCurveLib.h"
 #include "CncConfig.h"
-#include "SVGPathHandlerBase.h"
+#include "PathHandlerBase.h"
 
 //////////////////////////////////////////////////////////////////
-SVGPathHandlerBase::SVGPathHandlerBase() 
+PathHandlerBase::PathHandlerBase() 
 : firstPath(true)
 , newPath(false)
 , startPos({0.0, 0.0, 0.0})
@@ -14,60 +14,60 @@ SVGPathHandlerBase::SVGPathHandlerBase()
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-SVGPathHandlerBase::~SVGPathHandlerBase() {
+PathHandlerBase::~PathHandlerBase() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::setCurveLibResolution(float res) { 
+void PathHandlerBase::setCurveLibResolution(float res) { 
 //////////////////////////////////////////////////////////////////
 	CncConfig::setCurveLibResolution(res); 
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::setPathList(const CncPathListManager& newPathList) {
+void PathHandlerBase::setPathList(const CncPathListManager& newPathList) {
 	pathListMgr.reset();
 	pathListMgr = newPathList;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::isInitialized() {
+bool PathHandlerBase::isInitialized() {
 //////////////////////////////////////////////////////////////////
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::appendDebugValueDetail(const char* key, wxVariant value) {
+void PathHandlerBase::appendDebugValueDetail(const char* key, wxVariant value) {
 //////////////////////////////////////////////////////////////////
 	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::appendDebugValueDetail(const CncPathListEntry& cpe) {
+void PathHandlerBase::appendDebugValueDetail(const CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::debugCurrentPosition() {
+void PathHandlerBase::debugCurrentPosition() {
 //////////////////////////////////////////////////////////////////
 	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p) {
+void PathHandlerBase::traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p) {
 //////////////////////////////////////////////////////////////////
 	if ( true ) {
 		std::clog << prefix << ":" << p.x << "," << p.y << std::endl;
 	}
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::traceFunctionCall(const char* fn) {
+void PathHandlerBase::traceFunctionCall(const char* fn) {
 //////////////////////////////////////////////////////////////////
 	std::cout << "SVGPathHandlerBase::" << fn << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::traceFirstMove(double moveX, double moveY) {
+void PathHandlerBase::traceFirstMove(double moveX, double moveY) {
 //////////////////////////////////////////////////////////////////
 	std::cout << "traceFirstMove(...)" << std::endl;
 	std::cout << " Move Abs: " << currentPos.getX() + moveX << "," << currentPos.getY() + moveY << std::endl;
 	std::cout << " Move Rel: " << moveX << "," << moveY << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::tracePositions(const char* prefix) {
+void PathHandlerBase::tracePositions(const char* prefix) {
 //////////////////////////////////////////////////////////////////
 	std::cout << "tracePositions(" << prefix << ")" << std::endl;
 	
@@ -87,12 +87,12 @@ void SVGPathHandlerBase::tracePositions(const char* prefix) {
 	std::cout << " CurrentPos    : " << currentPos.getX() << "," << currentPos.getY() << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::traceCurrentPosition() {
+void PathHandlerBase::traceCurrentPosition() {
 //////////////////////////////////////////////////////////////////
 	std::clog << "CurrentPos: " << currentPos.getX() << "," << currentPos.getY() << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processMove(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
 		std::cerr << "SVGPathHandlerCnc::processMove: Invalid command count: " << count << std::endl;
@@ -153,7 +153,7 @@ bool SVGPathHandlerBase::processMove(char c, unsigned int count, double values[]
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processClose(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 0 ) {
 		std::cerr << "SVGPathHandlerBase::processClose: Invalid command count: " << count << std::endl;
@@ -174,7 +174,7 @@ bool SVGPathHandlerBase::processClose(char c, unsigned int count, double values[
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processLine(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
 		std::cerr << "SVGPathHandlerBase::processLine: Invalid command count: " << count << std::endl;
@@ -197,7 +197,7 @@ bool SVGPathHandlerBase::processLine(char c, unsigned int count, double values[]
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processHLine(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
 		std::cerr << "SVGPathHandlerBase::processHLine: Invalid command count: " << count << std::endl;
@@ -211,7 +211,7 @@ bool SVGPathHandlerBase::processHLine(char c, unsigned int count, double values[
 	return processLine(cmd, count + 1, values);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processVLine(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processVLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
 		std::cerr << "SVGPathHandlerBase::processVLine: Invalid command count: " << count << std::endl;
@@ -225,7 +225,7 @@ bool SVGPathHandlerBase::processVLine(char c, unsigned int count, double values[
 	return processLine(cmd, count + 1, values);
 }
 //////////////////////////////////////////////////////////////////
-inline bool SVGPathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p) {
+inline bool PathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p) {
 //////////////////////////////////////////////////////////////////
 	currentPos.setX(p.x);
 	currentPos.setY(p.y);
@@ -236,7 +236,7 @@ inline bool SVGPathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<>
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processARC(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 7 ) {
 		std::cerr << "SVGPathHandlerBase::processARC: Invalid command count: " << count << std::endl;
@@ -289,7 +289,7 @@ bool SVGPathHandlerBase::processARC(char c, unsigned int count, double values[])
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processQuadraticBezier(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 4 ) {
 		std::cerr << "SVGPathHandlerBase::processQuadraticBezier: Invalid command count: " << count << std::endl;
@@ -349,7 +349,7 @@ bool SVGPathHandlerBase::processQuadraticBezier(char c, unsigned int count, doub
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processCubicBezier(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 6 ) {
 		std::cerr << "SVGPathHandlerBase::processCubicBezier: Invalid command count: " << count << std::endl;
@@ -412,7 +412,7 @@ bool SVGPathHandlerBase::processCubicBezier(char c, unsigned int count, double v
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
 		std::cerr << "SVGPathHandlerBase::processQuadraticBezierSmooth: Invalid command count: " << count << std::endl;
@@ -435,7 +435,7 @@ bool SVGPathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count
 	return process(c, 4, values);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 4 ) {
 		std::cerr << "SVGPathHandlerBase::processCubicBezierSmooth: Invalid command count: " << count << std::endl;
@@ -460,7 +460,7 @@ bool SVGPathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, do
 	return process(c, 6, values);
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::debugProcess(char c, unsigned int count, double values[]) {
+void PathHandlerBase::debugProcess(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	std::cout << " pcmd: " << c << "(" << count << ") ";
 	
@@ -470,7 +470,7 @@ void SVGPathHandlerBase::debugProcess(char c, unsigned int count, double values[
 	std::cout << "cp(" << currentPos.getX() << ", " << currentPos.getY() << ")" << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::process(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::process(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( isInitialized() == false ) {
 		std::cerr << "SVGPathHandlerBase not initialized "<< std::endl;
@@ -526,36 +526,36 @@ bool SVGPathHandlerBase::process(char c, unsigned int count, double values[]) {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::prepareWork() {
+void PathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
 	totalLength = 0.0;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::initNextPath() {
+bool PathHandlerBase::initNextPath() {
 //////////////////////////////////////////////////////////////////
 	newPath = true;
 	pathListMgr.reset();
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::finishCurrentPath() {
+bool PathHandlerBase::finishCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	totalLength += getCurrentPathLength();
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::runCurrentPath() {
+bool PathHandlerBase::runCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	// currently nothing to do;
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::finishWork() {
+void PathHandlerBase::finishWork() {
 //////////////////////////////////////////////////////////////////
 	// currently nothing to do;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGPathHandlerBase::processLinearMove(bool alreadyRendered) {
+bool PathHandlerBase::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 	double newPosAbsX = currentPos.getX();
 	double newPosAbsY = currentPos.getY();
@@ -576,7 +576,7 @@ bool SVGPathHandlerBase::processLinearMove(bool alreadyRendered) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerBase::tracePathList(std::ostream &ostr) {
+void PathHandlerBase::tracePathList(std::ostream &ostr) {
 //////////////////////////////////////////////////////////////////
 	unsigned int cnt = 0;
 	for (auto it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
