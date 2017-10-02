@@ -384,8 +384,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btRequestCtlErrorInfo);
 	registerGuiControl(m_lruList);
 	registerGuiControl(m_dirCtrl);
-	registerGuiControl(m_openXmlTraceAsText);
-	registerGuiControl(m_openXmlTrace);
 	registerGuiControl(m_svgEmuResult);
 	registerGuiControl(m_svgEmuOpenFileAsSvg);
 	registerGuiControl(m_svgEmuReload);
@@ -395,7 +393,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_svgEmuZoomMinus);
 	registerGuiControl(m_svgEmuZoomPlus);
 	registerGuiControl(m_copyLogger);
-	registerGuiControl(m_copySvgTrace);
 	registerGuiControl(m_btSvgToggleWordWrap);
 	registerGuiControl(m_svgEmuToggleWordWrap);
 	registerGuiControl(m_svgEmuToggleOrigPath);
@@ -1409,9 +1406,6 @@ void MainFrame::showSVGEmuResult(bool show) {
 		if (m_outboundNotebook->FindPage(m_svgEmuSource) != wxNOT_FOUND )
 			m_outboundNotebook->RemovePage(m_outboundNotebook->FindPage(m_svgEmuSource));
 
-		if (m_outboundNotebook->FindPage(m_svgTracePreview) != wxNOT_FOUND )
-			m_outboundNotebook->RemovePage(m_outboundNotebook->FindPage(m_svgTracePreview));
-			
 	} else {
 
 		if (m_outboundNotebook->FindPage(m_svgEmuResult) == wxNOT_FOUND ) {
@@ -1424,10 +1418,6 @@ void MainFrame::showSVGEmuResult(bool show) {
 			outboundNbInfo->decorate(OutboundSvgSource);
 		}
 		
-		if (m_outboundNotebook->FindPage(m_svgTracePreview) == wxNOT_FOUND ) {
-			m_outboundNotebook->InsertPage(OutboundSvgTrace, m_svgTracePreview,  "", false);
-			outboundNbInfo->decorate(OutboundSvgTrace);
-		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2629,7 +2619,6 @@ bool MainFrame::processVirtualTemplate() {
 	if ( m_menuItemDisplayUserAgent->IsChecked() == true )
 		inboundFileParser->setUserAgentControls(oc);
 		
-	inboundFileParser->setInboundTraceControl(m_svgTrace);
 	inboundFileParser->setInboundSourceControl(m_stcFileContent);
 
 	if ( svgDebugger == true ) {
@@ -5195,10 +5184,6 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 	
 	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 		switch ( sel ) {
-			case OutboundSvgTrace:	if  (inboundFileParser != NULL )
-										inboundFileParser->displayCollectedTrace(); 
-									break;
-									
 			case OutboundSvgPage: 	m_svgEmuToggleOrigPath->Enable( m_cbSvgIncludeOriginalPath->GetStringSelection().Upper() == "YES" );
 									break;
 									
@@ -5642,38 +5627,11 @@ void MainFrame::svgEmuZoomHome(wxCommandEvent& event) {
 	clog << "Currently not supported" << endl;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::OpenXmlTrace(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( inboundFileParser == NULL )
-		return;
-		
-	wxString cmd, xmlFile(CncFileNameService::getCncOutboundTraceFileName());
-	config->Read("EmulatorSVG/XMLFileViewer", &cmd, wxT("explorer "));
-	openFileExtern(cmd, xmlFile);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::openXMLTraceAsText(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( inboundFileParser == NULL )
-		return;
-
-	wxString cmd, xmlFile(CncFileNameService::getCncOutboundTraceFileName());
-	config->Read("TemplateEditor/ExternalTool", &cmd, wxT("notepad "));
-	openFileExtern(cmd, xmlFile);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::copyLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_logger->SelectAll();
 	m_logger->Copy();
 	m_logger->SelectNone();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::copySvgTrace(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_svgTrace->SelectAll();
-	m_svgTrace->Copy();
-	m_svgTrace->ClearSelection();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openFileExtern(const wxString& tool, const char* file) {

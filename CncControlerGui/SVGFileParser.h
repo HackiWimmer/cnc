@@ -102,7 +102,6 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		SVGPathHandlerCnc* getPathHandler() { return pathHandler; }
 		
 		virtual void broadcastDebugState(bool state);
-		virtual void displayCollectedTrace(bool blank = false);
 		
 		virtual void clearControls();
 		

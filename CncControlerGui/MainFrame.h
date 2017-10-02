@@ -129,10 +129,7 @@ class MainFrame : public MainFrameBClass {
 		virtual void emuContentRightDown(wxMouseEvent& event);
 		virtual void toggleEmuWordWrapMode(wxCommandEvent& event);
 		virtual void toggleTemplateWordWrapMode(wxCommandEvent& event);
-		virtual void copySvgTrace(wxCommandEvent& event);
 		virtual void copyLogger(wxCommandEvent& event);
-		virtual void OpenXmlTrace(wxCommandEvent& event);
-		virtual void openXMLTraceAsText(wxCommandEvent& event);
 		virtual void closeAuiPane(wxAuiManagerEvent& evt);
 		virtual void svgEmuZoomHome(wxCommandEvent& event);
 		virtual void svgEmuZoomMinus(wxCommandEvent& event);

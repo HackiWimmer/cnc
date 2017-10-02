@@ -239,7 +239,6 @@
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="setting_tools">bitmaps\setting_tools.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
-  <object class="wxBitmap" name="toggle_log-2">bitmaps\toggle_log-2.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="tools-report-bug1">bitmaps\tools-report-bug1.png</object>
 </resource>

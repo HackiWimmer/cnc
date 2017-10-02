@@ -36,8 +36,6 @@ class FileParser {
 		virtual bool processDebug();
 		virtual bool processRelease();
 		
-		virtual void displayCollectedTrace(bool blank=false) = 0;
-
 		virtual void setUserAgentControls(UserAgentOutputControls& oc) {}
 		virtual void displayUserAgentDetailInfo(unsigned int pos) {}
 		virtual void clearControls() {}
@@ -52,7 +50,6 @@ class FileParser {
 		void debugFinish();
 		
 		void setInboundSourceControl(wxStyledTextCtrl* stc) { inboundSourceControl = stc; }
-		void setInboundTraceControl(wxWebView* wv)          { inboundTraceControl = wv; }
 		
 		void selectSourceControl(wxStyledTextCtrl* ctl, unsigned long pos);
 		void setDebuggerControls(DebugControls& dc);
@@ -63,7 +60,6 @@ class FileParser {
 		FileParserRunInfo runInfo;
 
 		DebugControls debugControls;
-		wxWebView* inboundTraceControl;
 		wxStyledTextCtrl* inboundSourceControl;
 		
 		virtual bool process() = 0;

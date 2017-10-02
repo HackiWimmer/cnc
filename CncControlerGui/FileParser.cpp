@@ -8,7 +8,6 @@ FileParser::FileParser(const wxString& fn, CncControl* cnc)
 , fileName(fn)
 , runInfo()
 , debugControls()
-, inboundTraceControl(NULL)
 , inboundSourceControl(NULL)
 {
 ////////////////////////////////////////////////////////////////////////////
@@ -21,16 +20,12 @@ FileParser::~FileParser() {
 bool FileParser::processRelease() {
 ////////////////////////////////////////////////////////////////////////////
 	runInfo.releaseAllPhases();
-	
-	displayCollectedTrace(true);
 	return process();
 }
 ////////////////////////////////////////////////////////////////////////////
 bool FileParser::processDebug() {
 ////////////////////////////////////////////////////////////////////////////
 	runInfo.debugAllPhases();
-
-	displayCollectedTrace(true);
 	evaluateDebugState(true);
 	return process();
 }

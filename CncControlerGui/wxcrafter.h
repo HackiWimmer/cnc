@@ -584,14 +584,6 @@ protected:
     wxPanel* m_svgEmuSource;
     wxBitmapToggleButton* m_svgEmuToggleWordWrap;
     wxStyledTextCtrl* m_stcEmuSource;
-    wxPanel* m_svgTracePreview;
-    wxBitmapButton* m_openXmlTraceAsText;
-    wxBitmapButton* m_openXmlTrace;
-    wxBitmapButton* m_copySvgTrace;
-#if wxUSE_WEBVIEW
-    wxWebView* m_svgTrace;
-#endif // wxUSE_WEBVIEW
-
     wxScrolledWindow* m_scrollSpy;
     wxButton* m_enableSerialSpy;
     wxButton* m_MarkSerialSpy;
@@ -876,9 +868,6 @@ protected:
     virtual void emuContentRightDown(wxMouseEvent& event) { event.Skip(); }
     virtual void marginClickEmuSource(wxStyledTextEvent& event) { event.Skip(); }
     virtual void emuContentDClick(wxMouseEvent& event) { event.Skip(); }
-    virtual void openXMLTraceAsText(wxCommandEvent& event) { event.Skip(); }
-    virtual void OpenXmlTrace(wxCommandEvent& event) { event.Skip(); }
-    virtual void copySvgTrace(wxCommandEvent& event) { event.Skip(); }
     virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
@@ -1425,11 +1414,6 @@ public:
     wxBitmapToggleButton* GetSvgEmuToggleWordWrap() { return m_svgEmuToggleWordWrap; }
     wxStyledTextCtrl* GetStcEmuSource() { return m_stcEmuSource; }
     wxPanel* GetSvgEmuSource() { return m_svgEmuSource; }
-    wxBitmapButton* GetOpenXmlTraceAsText() { return m_openXmlTraceAsText; }
-    wxBitmapButton* GetOpenXmlTrace() { return m_openXmlTrace; }
-    wxBitmapButton* GetCopySvgTrace() { return m_copySvgTrace; }
-    wxWebView* GetSvgTrace() { return m_svgTrace; }
-    wxPanel* GetSvgTracePreview() { return m_svgTracePreview; }
     wxNotebook* GetOutboundNotebook() { return m_outboundNotebook; }
     wxScrolledWindow* GetScrollOutbound() { return m_scrollOutbound; }
     wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }

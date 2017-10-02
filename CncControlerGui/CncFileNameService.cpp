@@ -45,7 +45,6 @@ void CncFileNameService::trace(std::ostream& os) {
 	os << " Config Dir                 : " << CncFileNameService::getConfigDir() << std::endl;
 	os << " Home Dir                   : " << CncFileNameService::getHomeDir() << std::endl;
 	os << " Temp Dir                   : " << CncFileNameService::getTempDir() << std::endl;
-	os << " Outbound Trace Filename    : " << CncFileNameService::getCncOutboundTraceFileName() << std::endl;
 	os << " Outbound SVG Filename      : " << CncFileNameService::getCncOutboundSvgFileName() << std::endl;
 	os << " Outbound Temp Filename     : " << CncFileNameService::getCncOutboundTempFileName() << std::endl;
 	os << " Template Preview Filename  : " << CncFileNameService::getCncTemplatePreviewFileName(TplSvg) << std::endl;

@@ -235,7 +235,6 @@ void SVGFileParser::evaluateDebugState(bool force) {
 		CncWorkingParameters cwp = pathHandler->getCncWorkingParameters();
 
 		freezeDebugControls(false);
-		displayCollectedTrace();
 		//loop while next debug step should be appear (user event)
 		while ( runInfo.getNextFlag() == false ) {
 			while ( evtLoop->Pending() )
@@ -495,7 +494,6 @@ bool SVGFileParser::process() {
 	
 	initNextRunPhase(FileParserRunInfo::RP_Unknown);
 	freezeDebugControls(false);
-	displayCollectedTrace();
 
 	return ret;
 }
@@ -925,40 +923,4 @@ bool SVGFileParser::collectUserAgentTrace() {
 	svgUserAgent.evaluateTraceInfo(tr);
 	
 	return true;
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::displayCollectedTrace(bool blank) {
-//////////////////////////////////////////////////////////////////
-	if ( inboundTraceControl == NULL )
-		return;
-
-	// create a temp file
-	wxString tfn(CncFileNameService::getCncOutboundTraceFileName());
-	
-	if ( blank == true ) {
-		
-		createSvgTraceRoot();
-		
-		wxXmlNode* n = new wxXmlNode (svgTrace.GetRoot(), wxXML_ELEMENT_NODE, "Trace");
-		n->AddAttribute("mode", "Empty");
-		
-	} else {
-	
-		if ( runInfo.getCurrentDebugMode() == false ) {
-			createSvgTraceRoot();
-			
-			wxXmlNode* n = new wxXmlNode (svgTrace.GetRoot(), wxXML_ELEMENT_NODE, "Trace");
-			n->AddAttribute("mode", runInfo.getDebugModeAsString());
-		}
-	}
-	
-	// Write the output 
-	svgTrace.Save(tfn); 
-	
-	if ( inboundTraceControl->IsShownOnScreen() == true ) {
-		inboundTraceControl->SetZoomType(wxWEBVIEW_ZOOM_TYPE_TEXT);
-		inboundTraceControl->SetZoom(wxWEBVIEW_ZOOM_TINY);
-		inboundTraceControl->LoadURL(tfn);
-		inboundTraceControl->Update();
-	}
 }

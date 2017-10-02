@@ -4385,54 +4385,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1891->Add(m_stcEmuSource, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_svgTracePreview = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_svgTracePreviewImgIndex;
-    m_svgTracePreviewImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("toggle_log-2")));
-    m_outboundNotebook->AddPage(m_svgTracePreview, _("SVG Trace"), false, m_svgTracePreviewImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer1720 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer1720->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1720->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer1720->AddGrowableCol(1);
-    flexGridSizer1720->AddGrowableRow(0);
-    m_svgTracePreview->SetSizer(flexGridSizer1720);
-    
-    wxFlexGridSizer* flexGridSizer1858 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer1858->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1858->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer1720->Add(flexGridSizer1858, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_openXmlTraceAsText = new wxBitmapButton(m_svgTracePreview, wxID_ANY, wxArtProvider::GetBitmap(wxART_FILE_OPEN, wxART_BUTTON, wxDefaultSize), wxDefaultPosition, wxDLG_UNIT(m_svgTracePreview, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_openXmlTraceAsText->SetToolTip(_("Open XML Extern as Text"));
-    
-    flexGridSizer1858->Add(m_openXmlTraceAsText, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_openXmlTrace = new wxBitmapButton(m_svgTracePreview, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-globals")), wxDefaultPosition, wxDLG_UNIT(m_svgTracePreview, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_openXmlTrace->SetToolTip(_("Open XML Extern"));
-    
-    flexGridSizer1858->Add(m_openXmlTrace, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_copySvgTrace = new wxBitmapButton(m_svgTracePreview, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition, wxDLG_UNIT(m_svgTracePreview, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_copySvgTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    m_copySvgTrace->SetToolTip(_("Copy the SVG  Trace"));
-    
-    flexGridSizer1858->Add(m_copySvgTrace, 0, wxALL, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer1723 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer1723->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1723->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer1723->AddGrowableCol(0);
-    flexGridSizer1723->AddGrowableRow(0);
-    
-    flexGridSizer1720->Add(flexGridSizer1723, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    #if wxUSE_WEBVIEW
-    m_svgTrace = wxWebView::New(m_svgTracePreview, wxID_ANY, _("about:blank"), wxDefaultPosition, wxDLG_UNIT(m_svgTracePreview, wxSize(-1,-1)), wxWebViewBackendDefault, 0);
-    
-    flexGridSizer1723->Add(m_svgTrace, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    #endif // wxUSE_WEBVIEW
-    
     m_scrollSpy = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTRANSPARENT_WINDOW|wxHSCROLL|wxVSCROLL);
     m_scrollSpy->SetScrollRate(5, 5);
     
@@ -5138,12 +5090,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_stcEmuSource->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainFrameBClass::emuContentRightDown), NULL, this);
     m_stcEmuSource->Connect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(MainFrameBClass::marginClickEmuSource), NULL, this);
     m_stcEmuSource->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::emuContentDClick), NULL, this);
-    m_openXmlTraceAsText->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openXMLTraceAsText), NULL, this);
-    m_openXmlTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::OpenXmlTrace), NULL, this);
-    m_copySvgTrace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copySvgTrace), NULL, this);
-    #if wxUSE_WEBVIEW
-    
-    #endif // wxUSE_WEBVIEW
     m_enableSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
@@ -5421,12 +5367,6 @@ MainFrameBClass::~MainFrameBClass()
     m_stcEmuSource->Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainFrameBClass::emuContentRightDown), NULL, this);
     m_stcEmuSource->Disconnect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(MainFrameBClass::marginClickEmuSource), NULL, this);
     m_stcEmuSource->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::emuContentDClick), NULL, this);
-    m_openXmlTraceAsText->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openXMLTraceAsText), NULL, this);
-    m_openXmlTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::OpenXmlTrace), NULL, this);
-    m_copySvgTrace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copySvgTrace), NULL, this);
-    #if wxUSE_WEBVIEW
-    
-    #endif // wxUSE_WEBVIEW
     m_enableSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);

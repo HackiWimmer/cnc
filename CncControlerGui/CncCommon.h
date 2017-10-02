@@ -69,7 +69,6 @@ static const unsigned int OutboundCNCValuesPage 	= 0;
 static const unsigned int Outbound3DPage 			= 1;
 static const unsigned int OutboundSvgPage 			= 2;
 static const unsigned int OutboundSvgSource			= 3;
-static const unsigned int OutboundSvgTrace			= 4;
 
 static const unsigned int ConfigSummaryPage 		= 0;
 static const unsigned int CNCSetterPage 			= 1;
