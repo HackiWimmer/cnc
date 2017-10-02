@@ -565,7 +565,7 @@ bool CncControl::moveZToBottom() {
 	
 	bool ret = true;
 	if ( prepareSimpleMove() == true ) {
-		if ( moveMetricZ(moveZ) == false ) {
+		if ( moveRelMetricZ(moveZ) == false ) {
 			std::cerr << "CncControl: Move Z to bottom error"<< std::endl;
 			ret = false;
 		}
@@ -586,7 +586,7 @@ bool CncControl::moveZToTop() {
 	
 	bool ret = true;
 	if ( prepareSimpleMove() == true ) {
-		if ( moveMetricZ(moveZ) == false ) {
+		if ( moveRelMetricZ(moveZ) == false ) {
 			std::cerr << "CncControl: Move Z to top error"<< std::endl;
 			ret = false;
 		}
@@ -623,7 +623,7 @@ bool CncControl::moveUpZ() {
 		return false;
 	}
 	
-	bool ret = moveMetricZ(moveZ);
+	bool ret = moveRelMetricZ(moveZ);
 	if ( ret ) {
 		zAxisDown = false;
 		updateZSlider();
@@ -653,7 +653,7 @@ bool CncControl::moveDownZ() {
 		std::clog << " duration:  "	<< getDurationCounter() << std::endl;
 	}
 	
-	bool ret = moveMetricZ(moveZ);
+	bool ret = moveRelMetricZ(moveZ);
 	if ( ret ) {
 		zAxisDown = true;
 		updateZSlider();
@@ -871,11 +871,11 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			if ( cncConfig->isOnlineUpdateCoordinates() ) {
 				curCtlPos = ci.controllerPos;
 				//todo update interval
-				//if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
+				if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
 					setValue(GET_GUI_CTL(xAxisCtl), convertToDisplayUnit(ci.controllerPos.getX(), cncConfig->getDisplayFactX()));
 					setValue(GET_GUI_CTL(yAxisCtl), convertToDisplayUnit(ci.controllerPos.getY(), cncConfig->getDisplayFactY()));
 					setValue(GET_GUI_CTL(zAxisCtl), convertToDisplayUnit(ci.controllerPos.getZ(), cncConfig->getDisplayFactZ()));
-				//}
+				}
 			}
 			
 			// pause hanling
@@ -1000,13 +1000,13 @@ bool CncControl::moveXYToZeroPos(CncDimensions dim) {
 		moveY = zeroPos.getY() - curPos.getY();
 		
 		if ( dim == CncDimension2D ) {
-			ret = moveLinearStepsXY(moveX, moveY, false);
+			ret = moveRelLinearStepsXY(moveX, moveY, false);
 			
 		} else {
-			if ( moveLinearStepsXY(moveX, 0, false) == false ) 
+			if ( moveRelLinearStepsXY(moveX, 0, false) == false ) 
 				return false;
 				
-			if ( moveLinearStepsXY(0, moveY, false) == false )
+			if ( moveRelLinearStepsXY(0, moveY, false) == false )
 				return false;
 		}
 	}
@@ -1023,23 +1023,23 @@ bool CncControl::moveXYZToZeroPos(CncDimensions dim) {
 		moveZ = zeroPos.getZ() - curPos.getZ();
 		
 		if ( dim == CncDimension3D ) {
-			ret = moveLinearStepsXYZ(moveX, moveY, moveZ, false);
+			ret = moveRelLinearStepsXYZ(moveX, moveY, moveZ, false);
 			
 		} else if ( dim == CncDimension2D ) {
-			if ( moveLinearStepsXYZ(0, 0, moveZ, false) == false ) 
+			if ( moveRelLinearStepsXYZ(0, 0, moveZ, false) == false ) 
 				return false;
 				
-			if ( moveLinearStepsXYZ(moveX, moveY, 0, false) == false ) 
+			if ( moveRelLinearStepsXYZ(moveX, moveY, 0, false) == false ) 
 				return false;
 			
 		} else {
-			if ( moveLinearStepsXYZ(moveX, 0, 0, false) == false ) 
+			if ( moveRelLinearStepsXYZ(moveX, 0, 0, false) == false ) 
 				return false;
 				
-			if ( moveLinearStepsXYZ(0, moveY, 0, false) == false ) 
+			if ( moveRelLinearStepsXYZ(0, moveY, 0, false) == false ) 
 				return false;
 				
-			if ( moveLinearStepsXYZ(0, 0, moveZ, false) == false ) 
+			if ( moveRelLinearStepsXYZ(0, 0, moveZ, false) == false ) 
 				return false;
 		}
 	}
@@ -1052,7 +1052,7 @@ bool CncControl::moveZToZeroPos() {
 	if ( curPos != zeroPos ) {
 		int32_t moveZ=0;
 		moveZ = zeroPos.getZ() - curPos.getZ();
-		ret = moveLinearStepsXYZ(0, 0, moveZ, false);
+		ret = moveRelLinearStepsXYZ(0, 0, moveZ, false);
 	}
 	return ret;
 }
@@ -1064,12 +1064,20 @@ bool CncControl::moveToStartPos() {
 		int32_t moveX=0, moveY=0;
 		moveX = startPos.getX() - curPos.getX(); 
 		moveY = startPos.getY() - curPos.getY();
-		moveLinearStepsXY(moveX, moveY, false);
+		moveRelLinearStepsXY(moveX, moveY, false);
 	}
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::moveLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered) {
+bool CncControl::moveRelStepsZ(int32_t z) {
+///////////////////////////////////////////////////////////////////
+	if ( z == 0 )
+		return true;
+	// z moves are always linear, as a consequence alreadyRendered can be true
+	return serialPort->processMoveZ(z, true, curPos);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	//avoid empty steps
 	if ( x1 == 0 && y1 == 0 )
@@ -1086,41 +1094,10 @@ bool CncControl::moveLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered)
 	if ( renderMode == CncRenderAtController )
 		return serialPort->processMoveXY(x1, y1, false, curPos);
 		
-/*
-	if ( alreadyRendered == true )
-		return serialPort->processMoveXY(x1, y1, alreadyRendered, curPos);
-
-	// render here
-	int32_t x0 = 0, y0 = 0;
-	int32_t dx =  abs(x1 - x0), sx = x0 < x1 ? 1 : -1;
-	int32_t dy = -abs(y1 - y0), sy = y0 < y1 ? 1 : -1;
-	int32_t err = dx + dy, e2; // error value e_xy 
-
-	int32_t xOld = x0, yOld = y0;
-	while( true ) {
-		//std::cout << xOld - x0 << ", " << yOld - y0 << std::endl;
-		if ( serialPort->processMoveXY(xOld - x0, yOld - y0, true, curPos) == false )
-			return false;
-			
-		xOld = x0; yOld = y0;
-		
-		if ( x0 == x1 && y0 == y1 ) 
-			break;
-			
-		e2 = 2*err;
-		if (e2 > dy) 
-			{ err += dy; x0 += sx; } // e_xy+e_x > 0 
-		if (e2 < dx) 
-			{ err += dx; y0 += sy; } // e_xy+e_y < 0 
-	}
-
-	return true;
-	*/
-	
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
+bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	long sum = x1 + y1 + z1;
 	
@@ -1139,44 +1116,68 @@ bool CncControl::moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alr
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::moveLinearMetricXY(double x1, double y1, bool alreadyRendered) {
+bool CncControl::moveRelMetricZ(double z) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cncConfig);
+	double sZ = z * cncConfig->getCalculationFactZ();
+	
+	return moveRelStepsZ((int32_t)round(sZ));
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveRelLinearMetricXY(double x1, double y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
 	double sX1 = x1 * cncConfig->getCalculationFactX();
 	double sY1 = y1 * cncConfig->getCalculationFactY();
 	
-	return moveLinearStepsXY((int32_t)round(sX1), 
-	                         (int32_t)round(sY1),
-							 alreadyRendered);
+	return moveRelLinearStepsXY((int32_t)round(sX1), 
+	                            (int32_t)round(sY1),
+	                            alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::moveLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
+bool CncControl::moveRelLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
 	double sX1 = x1 * cncConfig->getCalculationFactX();
 	double sY1 = y1 * cncConfig->getCalculationFactY();
 	double sZ1 = z1 * cncConfig->getCalculationFactZ();
 	
-	return moveLinearStepsXYZ((int32_t)round(sX1), 
-	                          (int32_t)round(sY1),
-							  (int32_t)round(sZ1),
-							  alreadyRendered);
+	return moveRelLinearStepsXYZ((int32_t)round(sX1), 
+	                             (int32_t)round(sY1),
+	                             (int32_t)round(sZ1),
+	                             alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::moveStepsZ(int32_t z) {
-///////////////////////////////////////////////////////////////////
-	if ( z == 0 )
-		return true;
-	// z moves are always linear, as a consequence alreadyRendered can be true
-	return serialPort->processMoveZ(z, true, curPos);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveMetricZ(double z) {
+bool CncControl::moveAbsMetricZ(double z) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
 	double sZ = z * cncConfig->getCalculationFactZ();
 	
-	return moveStepsZ((int32_t)round(sZ));
+	return moveRelStepsZ( (int32_t)round(sZ) - curPos.getZ() );
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendered) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cncConfig);
+	double sX1 = x1 * cncConfig->getCalculationFactX();
+	double sY1 = y1 * cncConfig->getCalculationFactY();
+	
+	return moveRelLinearStepsXY((int32_t)round(sX1) - curPos.getX(), 
+	                            (int32_t)round(sY1) - curPos.getY(),
+	                            alreadyRendered);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cncConfig);
+	double sX1 = x1 * cncConfig->getCalculationFactX();
+	double sY1 = y1 * cncConfig->getCalculationFactY();
+	double sZ1 = z1 * cncConfig->getCalculationFactZ();
+	
+	return moveRelLinearStepsXYZ((int32_t)round(sX1) - curPos.getX(),
+	                             (int32_t)round(sY1) - curPos.getY(),
+	                             (int32_t)round(sZ1) - curPos.getZ(),
+	                             alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setToolState(bool defaultStyle) {
@@ -1431,17 +1432,17 @@ bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox*
 		
 		// move to min position
 		switch ( axis ) {
-			case 'X': 	ret = moveLinearMetricXY(maxSteps, 0.0, true);
+			case 'X': 	ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
 						if ( ret ) 
 							minPos = curCtlPos.getX();
 						break;
 						
-			case 'Y': 	ret = moveLinearMetricXY(0.0, maxSteps, true);
+			case 'Y': 	ret = moveRelLinearMetricXY(0.0, maxSteps, true);
 						if ( ret ) 
 							minPos = curCtlPos.getY();
 						break;
 						
-			case 'Z': 	ret = moveMetricZ(maxSteps);
+			case 'Z': 	ret = moveRelMetricZ(maxSteps);
 						if ( ret ) 
 							minPos = curCtlPos.getZ();
 						break;
@@ -1453,17 +1454,17 @@ bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox*
 			maxSteps *= -1;
 			
 			switch ( axis ) {
-				case 'X': 	ret = moveLinearMetricXY(maxSteps, 0.0, true);
+				case 'X': 	ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
 							if ( ret ) 
 								maxPos = curCtlPos.getX();
 							break;
 							
-				case 'Y': 	ret = moveLinearMetricXY(0.0, maxSteps, true);
+				case 'Y': 	ret = moveRelLinearMetricXY(0.0, maxSteps, true);
 							if ( ret ) 
 								maxPos = curCtlPos.getY();
 							break;
 							
-				case 'Z': 	ret = moveMetricZ(maxSteps);
+				case 'Z': 	ret = moveRelMetricZ(maxSteps);
 							if ( ret ) 
 								maxPos = curCtlPos.getZ();
 							break;
@@ -1475,13 +1476,13 @@ bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox*
 			if ( max ) max->SetValue(true);
 			
 			switch ( axis ) {
-				case 'X': 	ret = moveLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
+				case 'X': 	ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
 							break;
 							
-				case 'Y': 	ret = moveLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
+				case 'Y': 	ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
 							break;
 							
-				case 'Z': 	ret = moveMetricZ(-endSwitchStepBackMertic);
+				case 'Z': 	ret = moveRelMetricZ(-endSwitchStepBackMertic);
 							break;
 			}
 		}
@@ -1515,9 +1516,9 @@ bool CncControl::moveXToMinLimit() {
 	double maxSteps = getCncConfig()->getMaxDimensionX() * (-1);
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveLinearMetricXY(maxSteps, 0.0, true);
+		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
 		if (ret)
-			ret = moveLinearMetricXY(+endSwitchStepBackMertic, 0.0, true);
+			ret = moveRelLinearMetricXY(+endSwitchStepBackMertic, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1532,9 +1533,9 @@ bool CncControl::moveXToMaxLimit() {
 	double maxSteps = getCncConfig()->getMaxDimensionX();
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveLinearMetricXY(maxSteps, 0.0, true);
+		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
 		if (ret)
-			ret = moveLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
+			ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1549,9 +1550,9 @@ bool CncControl::moveYToMinLimit() {
 	double maxSteps = getCncConfig()->getMaxDimensionY() * (-1);
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveLinearMetricXY(0.0, maxSteps, true);
+		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
 		if (ret)
-			ret = moveLinearMetricXY(0.0, +endSwitchStepBackMertic, true);
+			ret = moveRelLinearMetricXY(0.0, +endSwitchStepBackMertic, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1566,9 +1567,9 @@ bool CncControl::moveYToMaxLimit() {
 	double maxSteps = getCncConfig()->getMaxDimensionY();
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveLinearMetricXY(0.0, maxSteps, true);
+		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
 		if (ret)
-			ret = moveLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
+			ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1582,9 +1583,9 @@ bool CncControl::moveZToMinLimit() {
 	double maxSteps = getCncConfig()->getMaxDimensionZ() * (-1);
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveMetricZ(maxSteps);
+		ret = moveRelMetricZ(maxSteps);
 		if (ret)
-			ret = moveMetricZ(+endSwitchStepBackMertic);
+			ret = moveRelMetricZ(+endSwitchStepBackMertic);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1598,9 +1599,9 @@ bool CncControl::moveZToMaxLimit() {
 	double maxSteps = getCncConfig()->getMaxDimensionZ();
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveMetricZ(maxSteps);
+		ret = moveRelMetricZ(maxSteps);
 		if (ret)
-			ret = moveMetricZ(-endSwitchStepBackMertic);
+			ret = moveRelMetricZ(-endSwitchStepBackMertic);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1613,9 +1614,9 @@ bool CncControl::moveXToMid() {
 	bool ret = false;
 
 	if ( prepareSimpleMove() == true ) {
-		ret = moveLinearMetricXY(maxSteps, 0.0, true);
+		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
 		if ( ret )
-			ret = moveLinearMetricXY(-maxSteps/2, 0.0, true);
+			ret = moveRelLinearMetricXY(-maxSteps/2, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1628,9 +1629,9 @@ bool CncControl::moveYToMid() {
 
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveLinearMetricXY(0.0, maxSteps, true);
+		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
 		if ( ret )
-			ret = moveLinearMetricXY(0.0, -maxSteps/2, true);
+			ret = moveRelLinearMetricXY(0.0, -maxSteps/2, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1643,9 +1644,9 @@ bool CncControl::moveZToMid() {
 
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveMetricZ(maxSteps);
+		ret = moveRelMetricZ(maxSteps);
 		if ( ret )
-			ret = moveMetricZ(-maxSteps/2);
+			ret = moveRelMetricZ(-maxSteps/2);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1678,23 +1679,23 @@ bool CncControl::manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alr
 	if ( x != 0 || y != 0 ) {
 		ret = false;
 		if ( prepareSimpleMove(false) == true ) {
-			ret = moveLinearStepsXY(x, y, alreadyRendered );
+			ret = moveRelLinearStepsXY(x, y, alreadyRendered );
 			if ( limitStates.hasLimit() ) {
 				
 				if ( x != 0 ) {
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMinLimit() )
-						ret = moveLinearMetricXY(+endSwitchStepBackMertic, 0.0, false);
+						ret = moveRelLinearMetricXY(+endSwitchStepBackMertic, 0.0, false);
 						
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMaxLimit() )
-						ret = moveLinearMetricXY(-endSwitchStepBackMertic, 0.0, false);
+						ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, false);
 				}
 				
 				if ( y != 0 ) {
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMinLimit() )
-						ret = moveLinearMetricXY(0.0, +endSwitchStepBackMertic, false);
+						ret = moveRelLinearMetricXY(0.0, +endSwitchStepBackMertic, false);
 						
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMaxLimit() )
-						ret = moveLinearMetricXY(0.0, -endSwitchStepBackMertic, false);
+						ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, false);
 				}
 			}
 				
@@ -1705,14 +1706,14 @@ bool CncControl::manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alr
 	if ( z != 0 ) {
 		ret = false;
 		if ( prepareSimpleMove(false) == true ) {
-			ret = moveStepsZ(z);
+			ret = moveRelStepsZ(z);
 			if ( ret && limitStates.hasLimit() ) {
 				
 				if ( limitStates.isZLimitStateValid() && limitStates.getZMinLimit() )
-					ret = moveMetricZ(+endSwitchStepBackMertic);
+					ret = moveRelMetricZ(+endSwitchStepBackMertic);
 					
 				if ( limitStates.isZLimitStateValid() && limitStates.getZMaxLimit() )
-					ret = moveMetricZ(-endSwitchStepBackMertic);
+					ret = moveRelMetricZ(-endSwitchStepBackMertic);
 			}
 				
 			reconfigureSimpleMove(ret);
@@ -1729,32 +1730,32 @@ bool CncControl::manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool a
 	if ( x != 0 || y != 0 || z != 0 ) {
 		ret = false;
 		if ( prepareSimpleMove(false) == true ) {
-			ret = moveLinearStepsXYZ(x, y, z, alreadyRendered );
+			ret = moveRelLinearStepsXYZ(x, y, z, alreadyRendered );
 			
 			if ( limitStates.hasLimit() ) {
 				
 				if ( x != 0 ) {
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMinLimit() )
-						ret = moveLinearMetricXYZ(+endSwitchStepBackMertic, 0.0, 0.0, false);
+						ret = moveRelLinearMetricXYZ(+endSwitchStepBackMertic, 0.0, 0.0, false);
 						
 					if ( limitStates.isXLimitStateValid() && limitStates.getXMaxLimit() )
-						ret = moveLinearMetricXYZ(-endSwitchStepBackMertic, 0.0, 0.0, false);
+						ret = moveRelLinearMetricXYZ(-endSwitchStepBackMertic, 0.0, 0.0, false);
 				}
 				
 				if ( y != 0 ) {
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMinLimit() )
-						ret = moveLinearMetricXYZ(0.0, +endSwitchStepBackMertic, 0.0,false);
+						ret = moveRelLinearMetricXYZ(0.0, +endSwitchStepBackMertic, 0.0,false);
 						
 					if ( limitStates.isYLimitStateValid() && limitStates.getYMaxLimit() )
-						ret = moveLinearMetricXYZ(0.0, -endSwitchStepBackMertic, 0.0, false);
+						ret = moveRelLinearMetricXYZ(0.0, -endSwitchStepBackMertic, 0.0, false);
 				}
 				
 				if ( z != 0 ) {
 					if ( limitStates.isZLimitStateValid() && limitStates.getZMinLimit() )
-						ret = moveLinearMetricXYZ(0.0, 0.0, +endSwitchStepBackMertic, false);
+						ret = moveRelLinearMetricXYZ(0.0, 0.0, +endSwitchStepBackMertic, false);
 						
 					if ( limitStates.isZLimitStateValid() && limitStates.getZMaxLimit() )
-						ret = moveLinearMetricXYZ(0.0, 0.0, -endSwitchStepBackMertic, false);
+						ret = moveRelLinearMetricXYZ(0.0, 0.0, -endSwitchStepBackMertic, false);
 				}
 			}
 				

@@ -276,7 +276,7 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 
 	} else {
 		// First process the curve
-		appendDebugValueDetail("CurceLibRes", CncConfig::getCurveLibResolution());
+		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibResolution());
 		for (float t=0; t<1; t+=CncConfig::getCurveLibResolution() ) {
 			if ( processCurveLibPoint(SVGCurveLib::PointOnEllipticalArc(p0, values[0], values[1], values[2], (bool)values[3], (bool)values[4], p1, t).point) == false )
 				return false;

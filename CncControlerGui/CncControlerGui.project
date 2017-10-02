@@ -10,8 +10,10 @@
   <VirtualDirectory Name="Source">
     <VirtualDirectory Name="Inbound - GCode">
       <VirtualDirectory Name="Parser">
-        <File Name="GCodeFileParser.cpp"/>
-        <File Name="GCodeFileParser.h"/>
+        <File Name="GCodeFileParserOld.h"/>
+        <File Name="GCodeFileParserOld.cpp"/>
+        <File Name="GCodeFileParser.h" ExcludeProjConfig=""/>
+        <File Name="GCodeFileParser.cpp" ExcludeProjConfig=""/>
       </VirtualDirectory>
       <VirtualDirectory Name="Utils">
         <File Name="GCodeBlock.cpp"/>
@@ -22,7 +24,10 @@
         <File Name="GCodeField.h"/>
         <File Name="GCodePath.h"/>
       </VirtualDirectory>
-      <VirtualDirectory Name="PathHandler"/>
+      <VirtualDirectory Name="PathHandler">
+        <File Name="GCodePathHandlerCnc.h"/>
+        <File Name="GCodePathHandlerCnc.cpp"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="StcLexer ">
       <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release;release2"/>
@@ -49,15 +54,6 @@
         <File Name="3D/GLContextCncPath.h"/>
         <File Name="3D/GLContextTestCube.cpp"/>
         <File Name="3D/GLContextTestCube.h"/>
-      </VirtualDirectory>
-      <VirtualDirectory Name="Old">
-        <File Name="CncDrawPane.cpp" ExcludeProjConfig="Debug;Release;release2"/>
-        <File Name="CncDrawPane.h" ExcludeProjConfig="Debug;Release;release2"/>
-        <File Name="CncDrawPaneContext.cpp" ExcludeProjConfig="Debug;Release;release2"/>
-        <File Name="CncDrawPaneContext.h" ExcludeProjConfig="Debug;Release;release2"/>
-        <File Name="CncPoint3D.h" ExcludeProjConfig="Debug;Release;release2"/>
-        <File Name="trackball.cpp" ExcludeProjConfig="Debug;release2"/>
-        <File Name="trackball.h" ExcludeProjConfig="Debug;release2"/>
       </VirtualDirectory>
       <File Name="CncMotionMonitor.h"/>
       <File Name="CncMotionMonitor.cpp"/>

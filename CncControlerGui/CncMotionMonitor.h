@@ -75,13 +75,6 @@ class CncMotionMonitor : public wxGLCanvas {
 			wxColour workColour		= *wxWHITE;
 			
 			// fill more flags here if neccessary
-			
-			void loadFlags() {
-				
-			}
-			void saveFlags() {
-				
-			}
 		};
 
 		// constructor
@@ -125,9 +118,6 @@ class CncMotionMonitor : public wxGLCanvas {
 		// getFlags().positionMarker 	= false;
 		// getFlags().smoothing			= true;
 		CncMotionMonitor::Flags& getFlags() { return flags; }
-		
-		void loadFlags();
-		void saveFlags();
 		
 		void pushProcessMode();
 		void popProcessMode();

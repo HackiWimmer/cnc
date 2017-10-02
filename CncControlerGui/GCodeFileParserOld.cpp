@@ -4,24 +4,100 @@
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
 #include <wx/stc/stc.h>
-#include "GCodeFileParser.h"
+#include "GCodeFileParserOld.h"
 
 //////////////////////////////////////////////////////////////////
-GCodeFileParser::GCodeFileParser(const wxString& fn, CncControl* cnc) 
-: FileParser(fn, cnc)
-, pathHandler(new GCodePathHandlerCnc(cnc))
-, currentLineNumber(0)
+GCodeFileParserOld::GCodeFileParserOld(const wxString& fn, CncControl* cnc) 
+: SVGFileParser(fn, cnc)
+, currentBlockNode(NULL)
 , programEnd(false)
+, previewMode(false)
 , resumeOnError(true)
+, curPxPos({0, 0, 0})
 {
 //////////////////////////////////////////////////////////////////
+	
 }
 //////////////////////////////////////////////////////////////////
-GCodeFileParser::~GCodeFileParser() {
+GCodeFileParserOld::~GCodeFileParserOld() {
 //////////////////////////////////////////////////////////////////
+	if ( currentBlockNode != NULL )
+		delete currentBlockNode;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayMessage(const wxString& msg, int type) {
+void GCodeFileParserOld::streamErrorInfo() {
+//////////////////////////////////////////////////////////////////
+	if ( userMessages.size() == 0 )
+		return;
+		
+	unsigned int x = 20, y = 20;
+	preview << "<text x=\"" << x << "\" y=\"" << y << "\" style=\"fill:black;font-weight:bold;\">Processing information:" << std::endl;
+	
+	for ( UserMessages::iterator it = userMessages.begin(); it != userMessages.end(); ++it ) {
+		y += 15;
+		std::stringstream ss;
+		ss << "<tspan x=\"" << x << "\" y=\"" << y << "\" style=\"fill:%s;font-weight:normal;\">" << (*it).msg.c_str() << "</tspan>" << std::endl;
+		
+		switch ( (*it).type ) {
+			case wxICON_ERROR:		preview << wxString::Format(ss.str().c_str(), "red"); break;
+			case wxICON_WARNING:	preview << wxString::Format(ss.str().c_str(), "blue"); break;
+			default:				preview << wxString::Format(ss.str().c_str(), "black"); break;
+		}
+	}
+	
+	preview << "</text>";
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParserOld::createPreview(const wxString& resultingFileName, bool withErrorInfo) {
+//////////////////////////////////////////////////////////////////
+	bool ret = false;
+	previewMode = true;
+	
+	preview.open(resultingFileName, std::ios::out | std::ios::trunc);
+	if ( preview.is_open() ) {
+		
+		startPreview();
+		preprocess();
+		if ( withErrorInfo == true )
+			streamErrorInfo();
+		endPreview();
+		
+		CncDoublePosition xy;
+		curPxPos.getMaxWatermarks(xy);
+		//todo remove clog
+		//std::clog << xy << std::endl;
+		
+		preview.flush();
+		preview.close();
+		ret = true;
+	}
+	
+	previewMode = false;
+	return ret;
+}
+//////////////////////////////////////////////////////////////////
+void GCodeFileParserOld::startPreview() {
+//////////////////////////////////////////////////////////////////
+	preview << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>" << std::endl;
+	preview << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"" << std::endl;
+	preview << "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">" << std::endl;
+	preview << "<svg xmlns=\"http://www.w3.org/2000/svg\" "; 
+	preview << "width=\""  << wxString::Format("%f%s",getDefaultWidth(), getDefaultUnit()) << "\" "; 
+	preview << "height=\"" << wxString::Format("%f%s",getDefaultHeight(), getDefaultUnit()) << "\" ";
+	preview << "xmlns:xlink=\"http://www.w3.org/1999/xlink\"";
+	preview << ">" << std::endl;
+	preview.flush();
+	
+	userMessages.clear();
+}
+//////////////////////////////////////////////////////////////////
+void GCodeFileParserOld::endPreview() {
+//////////////////////////////////////////////////////////////////
+	preview << "</svg>"; 
+	preview.flush();
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParserOld::displayMessage(const wxString& msg, int type) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << msg;
@@ -29,90 +105,107 @@ bool GCodeFileParser::displayMessage(const wxString& msg, int type) {
 	return displayMessage(ss, type);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
+bool GCodeFileParserOld::displayMessage(std::stringstream& ss, int type) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream msg;
-	msg << wxString::Format("[%04d]: ", currentLineNumber);
+	msg << wxString::Format("[%04d]: ", pathHandler->getCncWorkingParameters().currentLineNumber);
 	msg << ss.str();
 	
-	switch ( type ) {
-		case wxICON_ERROR:		std::cerr << msg.str() << ", GCode program will be stopped." << std::endl; break;
-		case wxICON_WARNING:	std::clog << msg.str() << ", GCode program will be continued." << std::endl; break;
-		default:				std::cout << msg.str() << std::endl; break;
+	if ( previewMode == false ) {
+		switch ( type ) {
+			case wxICON_ERROR:		std::cerr << msg.str() << ", GCode program will be stopped." << std::endl; break;
+			case wxICON_WARNING:	std::clog << msg.str() << ", GCode program will be continued." << std::endl; break;
+			default:				std::cout << msg.str() << std::endl; break;
+		}
+	} else {
+		GCodeFileParserMsgInfo mi;
+		mi.msg 	= msg.str();
+		mi.type	= type;
+		userMessages.push_back(mi);
 	}
 	
 	return (resumeOnError == true );
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnhandledBlockCommand(GCodeBlock& gcb) {
+bool GCodeFileParserOld::displayUnhandledBlockCommand(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not handled GCode command: " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber);
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnsupportedBlockCommand(const GCodeField& field) {
+bool GCodeFileParserOld::displayUnsupportedBlockCommand(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported GCode block command: " << field;
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnhandledParameter(const GCodeField& field) {
+bool GCodeFileParserOld::displayUnhandledParameter(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported GCode parameter: " << field.getCmd();
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayToolChangeDetected(const GCodeField& field) {
+bool GCodeFileParserOld::displayToolChangeDetected(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported tool change: " << field;
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-void GCodeFileParser::setDefaultParameters() {
+template<typename T> inline void GCodeFileParserOld::appendBlockAttribute(const char* key, T value, const char* format) {
 //////////////////////////////////////////////////////////////////
+	if ( currentBlockNode == NULL )
+		return;
+	
+	if ( value != INVALID_GCODE_FIELD_VALUE )
+		currentBlockNode->AddAttribute(key, wxString::Format(format, value));
+}
+//////////////////////////////////////////////////////////////////
+wxXmlAttribute* GCodeFileParserOld::getAttributes(GCodeBlock& gcb) {
+//////////////////////////////////////////////////////////////////
+	if ( currentBlockNode == NULL )
+		return NULL;
+	
+	appendBlockAttribute("@X", 		gcb.x, "%6.3f");
+	appendBlockAttribute("@Y", 		gcb.y, "%6.3f");
+	appendBlockAttribute("@Z",		gcb.z, "%6.3f");
+	appendBlockAttribute("I", 		gcb.i, "%6.3f");
+	appendBlockAttribute("J", 		gcb.j, "%6.3f");
+	appendBlockAttribute("E", 		gcb.e, "%6.3f");
+	appendBlockAttribute("F", 		(long)gcb.f, "%d");
+	
+	currentBlockNode->AddAttribute("Unit", wxString::Format("%s", SvgUnitCalculator::getUnitAsStr(gcb.unit)));
+
+	return currentBlockNode->GetAttributes();
+}
+//////////////////////////////////////////////////////////////////
+void GCodeFileParserOld::createXmlBlockNode() {
+//////////////////////////////////////////////////////////////////
+	if ( currentBlockNode != NULL )
+		delete currentBlockNode;
+		
+	currentBlockNode = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, "GCodeBlock");
+}
+//////////////////////////////////////////////////////////////////
+void GCodeFileParserOld::setDefaultParameters() {
+//////////////////////////////////////////////////////////////////
+	wxString w(wxString::Format("%f%s",getDefaultWidth(), getDefaultUnit()));
+	wxString h(wxString::Format("%f%s",getDefaultHeight(), getDefaultUnit()));
+	setSVGWH(w, h);
 	programEnd = false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::process() {
-//////////////////////////////////////////////////////////////////
-	wxASSERT(pathHandler);
-	
-	// todo
-	pathHandler->prepareWork();
-	
-	bool ret = preprocess();
-	
-	pathHandler->finishWork();
-	
-	return ret;
-	
-	
-	
-	
-	{ // test
-		cncControl->moveRelLinearMetricXYZ(100, 100, 40, false);
-		cncControl->moveRelLinearMetricXYZ(-20, -40, 0, false);
-		
-		cncControl->moveRelLinearMetricXYZ(-80, -60, -40, false);
-		
-		//cncControl->reset();
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool GCodeFileParser::preprocess() {
+bool GCodeFileParserOld::preprocess() {
 //////////////////////////////////////////////////////////////////
 	setDefaultParameters();
 
 	wxFileInputStream input(fileName);
 	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
 	
-	currentLineNumber = 0;
+	pathHandler->getCncWorkingParameters().currentLineNumber = 0;
 	GCodeBlock gcb;
 	
 	if ( input.IsOk() ) {
@@ -120,12 +213,12 @@ bool GCodeFileParser::preprocess() {
 			wxString line = text.ReadLine();
 			line.Trim(false).Trim(true);
 			
-			currentLineNumber++;
+			pathHandler->getCncWorkingParameters().currentLineNumber++;
 			
 			if ( line.IsEmpty() == false ) {
 				if ( processBlock(line, gcb) == false ) {
 					std::cerr << "GCodeFileParser::preprocess(): Failed " <<std::endl;
-					std::cerr << " Line number: " << currentLineNumber << std::endl;
+					std::cerr << " Line number: " << pathHandler->getCncWorkingParameters().currentLineNumber << std::endl;
 					return false;
 				}
 			}
@@ -139,11 +232,12 @@ bool GCodeFileParser::preprocess() {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
+bool GCodeFileParserOld::processBlock(wxString& block, GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( GCodeBlock::removeComments(block, gcb.openComment) < 1 )
 		return true;
 	
+	createXmlBlockNode();
 	gcb.reInit();
 	gcb.block = block;
 	
@@ -172,7 +266,7 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 	return performBlock(gcb);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
+bool GCodeFileParserOld::processField(const GCodeField& field, GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( GCodeCommands::isBlockCommand(field.getCmd()) ) {
 		if ( GCodeCommands::isRegistered(field) == true ) {
@@ -225,7 +319,7 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
+bool GCodeFileParserOld::performBlock(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( gcb.isValid() == false && gcb.hasMoveCmd() == true ) {
 		gcb.copyPrevCmdToCmd();
@@ -236,11 +330,14 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 			std::cerr << "GCodeFileParser::processBlock: Invalid GCode block:" << std::endl;
 			std::cerr << " Command:     " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber) << std::endl;
 			std::cerr << " Block:       " << gcb  << std::endl;
-			std::cerr << " Line number: " << currentLineNumber << std::endl;
+			std::cerr << " Line number: " << pathHandler->getCncWorkingParameters().currentLineNumber << std::endl;
 		} 
 		
 		return true;
 	}
+	
+	svgUserAgent.setNodeType(gcb.nodeName);
+	svgUserAgent.addXMLAttributes(getAttributes(gcb));
 	
 	//gcb.trace(std::clog);
 	
@@ -254,27 +351,25 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processG(GCodeBlock& gcb) {
+bool GCodeFileParserOld::processG(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
-	wxASSERT(pathHandler);
-	
 	switch ( gcb.cmdNumber ) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 0: 	// GC_G: Rapid Linear Move
 		{
-			return pathHandler->processRapidLinearMove(gcb);
+			return processRapidLinearMove(gcb);
 		} //....................................................
 		case 1: 	// GC_G: Linear Move
 		{
-			return pathHandler->processLinearMove(gcb);
+			return processLinearMove(gcb);
 		} //....................................................
 		case 2:		// GC_G: Controlled Arc Move Clockwise
 		{
-			return pathHandler->processArcMove(gcb, false);
+			return processArcMove(gcb, false);
 		} //....................................................
 		case 3: 	// GC_G: Controlled Arc Move Counter Clockwise
 		{
-			return pathHandler->processArcMove(gcb, true);
+			return processArcMove(gcb, true);
 		}
 		//....................................................
 		case 20:	// GC_G: Set Units To Inches
@@ -304,7 +399,8 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		} //....................................................
 		case 28: 	// GC_G: Move To Origin:
 		{
-			return pathHandler->moveToOrigin(gcb);
+			// todo inplement GCode: Move To Origin:
+			return evaluatePath("M 0 0");
 		} //....................................................
 		case 90: 	// GC_G: Absolute Positioning:
 		{
@@ -348,7 +444,7 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processM(GCodeBlock& gcb) {
+bool GCodeFileParserOld::processM(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	switch ( gcb.cmdNumber ) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -385,8 +481,59 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 
 	return false;
 }
-
-
-
-
-
+//////////////////////////////////////////////////////////////////
+void GCodeFileParserOld::updateCurrentPxPosition(GCodeBlock& gcb) {
+//////////////////////////////////////////////////////////////////
+	if ( gcb.hasX() ) curPxPos.incX(gcb.getXMoveRelativePx(curPxPos));
+	if ( gcb.hasY() ) curPxPos.incY(gcb.getYMoveRelativePx(curPxPos));
+	if ( gcb.hasZ() ) curPxPos.incZ(gcb.getZMoveRelativePx(curPxPos));
+}
+//////////////////////////////////////////////////////////////////
+void GCodeFileParserOld::processSvgPath() {
+//////////////////////////////////////////////////////////////////
+	if ( previewMode == true ) {
+		preview << "<path d=\"";
+		preview << svgPath.getPath();
+		
+// todo
+//clog << svgPath.getPath() << endl;
+		preview << "\"";
+		preview << " fill=\"none\" stroke=\"black\" stroke-width=\"1.0\"";
+		preview << " transform=\"scale(0.5)\""; //todo mirrow svg
+		preview << "/>" << std::endl;
+	} else {
+		evaluatePath(svgPath.getPath());
+	}
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParserOld::processRapidLinearMove(GCodeBlock& gcb) {
+//////////////////////////////////////////////////////////////////
+	updateCurrentPxPosition(gcb);
+	
+			//todo
+			if ( gcb.hasZ() )
+				//clog << gcb.block << endl;
+	
+	if ( svgPath.available() ) {
+		if ( svgPath.hasLinearMove() ) {
+			processSvgPath();
+			svgPath.initNextPath();
+		}
+	}
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParserOld::processLinearMove(GCodeBlock& gcb) {
+//////////////////////////////////////////////////////////////////
+	bool ret = svgPath.addGCB_AsLinearMove(curPxPos, gcb);
+	updateCurrentPxPosition(gcb);
+	return ret;
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParserOld::processArcMove(GCodeBlock& gcb, bool sweep) {
+//////////////////////////////////////////////////////////////////
+	bool ret = svgPath.addGCB_AsArcMove(curPxPos, gcb, sweep);
+	updateCurrentPxPosition(gcb);
+	return ret;
+}

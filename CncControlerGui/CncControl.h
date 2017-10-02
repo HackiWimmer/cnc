@@ -21,7 +21,6 @@
 #include "SerialPort.h"
 #include "CncLimitStates.h"
 #include "CncPosition.h"
-#include "CncPoint3D.h"
 
 const double endSwitchStepBackMertic = 2.5;
 
@@ -144,12 +143,18 @@ class CncControl {
 		// Start positioning
 		void setStartPos();
 		// Move from current position
-		bool moveStepsZ(int32_t z);
-		bool moveMetricZ(double z);
-		bool moveLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered);
-		bool moveLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
-		bool moveLinearMetricXY(double x1, double y1, bool alreadyRendered);
-		bool moveLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
+		bool moveRelStepsZ(int32_t z);
+		bool moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered);
+		bool moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
+		
+		bool moveRelMetricZ(double z);
+		bool moveRelLinearMetricXY(double x1, double y1, bool alreadyRendered);
+		bool moveRelLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
+		
+		bool moveAbsMetricZ(double z);
+		bool moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendered);
+		bool moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
+		
 		// Callback from Serial
 		bool SerialCallback(int32_t cmdCount);
 		// Callback from Serial with controller content

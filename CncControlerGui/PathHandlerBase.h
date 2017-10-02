@@ -120,7 +120,7 @@ class PathHandlerBase {
 		
 		// store CncPathList
 		virtual bool shouldConvertRefToMM() const { return false; }
-		bool processLinearMove(bool alreadyRendered);
+		virtual bool processLinearMove(bool alreadyRendered);
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);

@@ -121,7 +121,7 @@ void SVGPathHandlerCnc::setViewBox(const wxString& vb) {
 bool SVGPathHandlerCnc::moveLinearXY(double x, double y, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 	// unit is always converted to mm before
-	return cncControl->moveLinearMetricXY(x, y, alreadyRendered);
+	return cncControl->moveRelLinearMetricXY(x, y, alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////
 inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncPathListEntry& cpe) {

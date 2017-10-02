@@ -20,12 +20,8 @@ class wxDataViewListCtrl;
 /////////////////////////////////////////////////////////////////////////////
 class SVGFileParser : public SVGNodeParser, public FileParser {
 	
-
-	
 	protected:
-
 	
-		/////////////////////////////////////////////////////////////////////
 		bool cncNodeBreak;
 		SVGPathHandlerCnc* pathHandler;
 		SVGUserAgent svgUserAgent;

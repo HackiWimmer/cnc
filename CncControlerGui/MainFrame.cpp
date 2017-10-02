@@ -34,6 +34,7 @@
 #include "CncControllerTestSuite.h"
 #include "SVGPathHandlerCnc.h"
 #include "GCodeFileParser.h"
+#include "GCodeFileParserOld.h"
 #include "CncArduino.h"
 #include "SvgEditPopup.h"
 #include "HexDecoder.h"
@@ -4722,7 +4723,7 @@ void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
 			fp.createPreview(tmpPreview, errorInfo);
 			
 		} else if ( format == TplGcode) {
-			GCodeFileParser fp(fn, cnc);
+			GCodeFileParserOld fp(fn, cnc);
 			tmpPreview = CncFileNameService::getCncTemplatePreviewFileName(TplGcode);
 			fp.createPreview(tmpPreview, errorInfo);
 			

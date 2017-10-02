@@ -64,9 +64,9 @@ class FileParser {
 		
 		virtual bool process() = 0;
 		
-		virtual void evaluateDebugState(bool force = false) = 0;
-		virtual void broadcastDebugState(bool state) = 0;
-		virtual void broadcastDebugControls(DebugControls& dc) = 0;
+		virtual void evaluateDebugState(bool force = false) {}
+		virtual void broadcastDebugState(bool state) {}
+		virtual void broadcastDebugControls(DebugControls& dc) {}
 		
 		void selectSourceControl(unsigned long pos);
 };
