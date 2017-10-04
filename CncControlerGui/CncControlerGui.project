@@ -54,11 +54,15 @@
         <File Name="3D/GLContextCncPath.h"/>
         <File Name="3D/GLContextTestCube.cpp"/>
         <File Name="3D/GLContextTestCube.h"/>
+        <File Name="3D/GLContextGCodePreview.h"/>
+        <File Name="3D/GLContextGCodePreview.cpp"/>
       </VirtualDirectory>
       <File Name="CncMotionMonitor.h"/>
       <File Name="CncMotionMonitor.cpp"/>
       <File Name="GL3DOptions.cpp"/>
       <File Name="GL3DOptions.h"/>
+      <File Name="3D/CncGCodePreview.h"/>
+      <File Name="CncGCodePreview.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="EndSwitchDlg">
       <File Name="EndSwitchDialog.cpp"/>
@@ -154,6 +158,10 @@
       <File Name="CncConfig.cpp"/>
       <File Name="CncUsbPortScanner.cpp"/>
       <File Name="CncUsbPortScanner.h"/>
+      <File Name="CncFilePreview.cpp"/>
+      <File Name="CncFilePreview.h"/>
+      <File Name="CncFilePreviewWnd.cpp"/>
+      <File Name="CncFilePreviewWnd.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -168,9 +176,9 @@
       <File Name="main.cpp"/>
       <File Name="MainFrame.cpp"/>
       <File Name="MainFrame.h"/>
-      <File Name="InterruptThread.h"/>
-      <File Name="InterruptThread.cpp"/>
       <File Name="StdStreamRedirector.h"/>
+      <File Name="UpdateManagerThread.h"/>
+      <File Name="UpdateManagerThread.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
       <File Name="DataControlModel.cpp"/>
@@ -270,6 +278,10 @@
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>
+  <VirtualDirectory Name="Clipper">
+    <File Name="Clipper/clipper.cpp"/>
+    <File Name="Clipper/clipper.hpp"/>
+  </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -408,7 +420,7 @@
         <Library Value="libfreeglut"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release3" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>
@@ -444,8 +456,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <VirtualDirectory Name="Clipper">
-    <File Name="Clipper/clipper.cpp"/>
-    <File Name="Clipper/clipper.hpp"/>
-  </VirtualDirectory>
 </CodeLite_Project>

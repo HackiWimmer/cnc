@@ -16,6 +16,7 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 , cncControl(cnc)
 , processMode(SvgPhController)
 , toolRadius(0.0)
+, zAxisDown(false)
 , initialized(false)
 , debugState(false)
 , width(0.0)
@@ -269,8 +270,8 @@ bool SVGPathHandlerCnc::closeCurrentPath() {
 	TRACE_FUNCTION_CALL("closeCurrentPath");
 	
 	if ( cncControl->isLastDuration() ) {
-		if ( cncControl->isZAxisDown() == true ) {
-			if ( cncControl->moveUpZ() == false )
+		if ( isZAxisDown() == true ) {
+			if ( moveUpZ() == false )
 				return false;
 		}
 	}
@@ -301,8 +302,8 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 		CncPathListEntry cpe = *it;
 		cnt++;
 		
-		if ( cpe.zAxisDown == false && cncControl->isZAxisDown() == true ) {
-			if ( cncControl->moveUpZ() == false )
+		if ( cpe.zAxisDown == false && isZAxisDown() == true ) {
+			if ( moveUpZ() == false )
 					return false;
 					/* todo
 			if ( cncControl->getDurationCounter() == 1 ) {
@@ -313,8 +314,8 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 				cncControl->simulateZAxisUp();
 			}*/
 
-		} else if ( cpe.zAxisDown == true && cncControl->isZAxisUp() == true ) {
-			if ( cncControl->moveDownZ() == false )
+		} else if ( cpe.zAxisDown == true && isZAxisUp() == true ) {
+			if ( moveDownZ() == false )
 				return false;
 		}
 		
@@ -351,7 +352,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 			if ( moveLinearXY(0, moveY, cpe.alreadyRendered) == false )
 				return false;
 		} else {
-			if ( cncControl->isZAxisUp() == true )
+			if ( isZAxisUp() == true )
 				cncControl->getSerial()->beginSubPath(moveX, moveY);
 				
 			if ( moveLinearXY(moveX, moveY, cpe.alreadyRendered) == false )
@@ -385,8 +386,8 @@ void SVGPathHandlerCnc::prepareWork() {
 	//svg output handling
 	cncControl->getSerial()->beginSVG(getSVGUnit(), getW(), getH(), getViewBox());
 	// controller handling
-	if ( cncControl->isZAxisDown() == true )
-		cncControl->moveUpZ();
+	if ( isZAxisDown() == true )
+		moveUpZ();
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::finishWork() {
@@ -408,20 +409,83 @@ void SVGPathHandlerCnc::finishWork() {
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::simulateZAxisUp() {
 //////////////////////////////////////////////////////////////////
-	cncControl->simulateZAxisUp();
+	zAxisDown = false;
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::simulateZAxisDown() {
 //////////////////////////////////////////////////////////////////
-	cncControl->simulateZAxisDown();
+	zAxisDown = true;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::isZAxisUp() {
 //////////////////////////////////////////////////////////////////
-	return cncControl->isZAxisUp();
+	return !zAxisDown;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::isZAxisDown() {
 //////////////////////////////////////////////////////////////////
-	return cncControl->isZAxisDown();
+	return zAxisDown;
+}
+///////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::moveUpZ() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cncControl->getCncConfig());
+	//std::cout << "CncControl::moveUpZ()" << std::endl;
+	
+	double dist = cncControl->getCncConfig()->getCurZDistance();
+	double curZPos = cncControl->getCurPos().getZ() * cncControl->getCncConfig()->getDisplayFactZ(); // we need it as mm
+	double moveZ = 0.0;
+	
+	if ( curZPos != dist ) {
+		moveZ = dist - curZPos;
+		// correct round deviations
+		if ( moveZ < 0.00001 )
+			moveZ = 0.0;
+	}
+	
+	if ( (curZPos + moveZ) > cncControl->getCncConfig()->getMaxZDistance() ) {
+		std::cerr << "CncControl::moveUpZ error:" << std::endl;
+		std::cerr << "Z(abs): " << curZPos + moveZ << std::endl;
+		std::cerr << "Z(cur): " << curZPos << std::endl;
+		std::cerr << "Z(mv):  " << moveZ << std::endl;
+		std::cerr << "Z(max): " << cncControl->getCncConfig()->getMaxZDistance() << std::endl;
+		return false;
+	}
+	
+	bool ret = cncControl->moveRelMetricZ(moveZ);
+	if ( ret ) {
+		zAxisDown = false;
+		cncControl->changeWorkSpeedXY(CncSpeedRapid);
+	} else {
+		std::cerr << "CncControl::moveUpZ() error: " << moveZ << ", " << curZPos << ", " << dist << std::endl;
+	}
+
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::moveDownZ() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cncControl->getCncConfig());
+	//std::cout << "CncControl::moveDownZ()" << std::endl;
+
+	double curZPos = cncControl->getCurPos().getZ() * cncControl->getCncConfig()->getDisplayFactZ(); // we need it as mm
+	double newZPos = cncControl->getCncConfig()->getDurationPositionAbs(cncControl->getDurationCounter());
+	double moveZ   = (curZPos - newZPos) * (-1);
+
+	if ( false ) {
+		std::clog << "moveDownZ:  " << std::endl;
+		std::clog << " zAxisDown  " << zAxisDown << std::endl;
+		std::clog << " curZPos:   " << curZPos << std::endl;
+		std::clog << " newZPos:   " << newZPos << std::endl;
+		std::clog << " moveZ:     "	<< moveZ << std::endl;
+		std::clog << " duration:  "	<< cncControl->getDurationCounter() << std::endl;
+	}
+	
+	bool ret = cncControl->moveRelMetricZ(moveZ);
+	if ( ret ) {
+		zAxisDown = true;
+		cncControl->changeWorkSpeedXY(CncSpeedWork);
+	}
+	
+	return ret;
 }

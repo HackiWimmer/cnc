@@ -24,6 +24,7 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		SvgPhProcessMode 	processMode;
 		SvgOriginalPathInfo origPathInfo;
 		double 				toolRadius;
+		bool 				zAxisDown;
 		bool 				initialized;
 		bool 				debugState;
 		double 				width, height;
@@ -52,11 +53,13 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		
 		virtual bool isInitialized();
 		
-		// controller helper
+		// z axis management
 		virtual void simulateZAxisUp();
 		virtual void simulateZAxisDown();
 		virtual bool isZAxisUp();
 		virtual bool isZAxisDown();
+		bool moveUpZ();
+		bool moveDownZ();
 
 	public:
 		SVGPathHandlerCnc(CncControl* cnc);

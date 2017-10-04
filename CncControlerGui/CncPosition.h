@@ -10,25 +10,25 @@ class CncXYDimension {
 	protected:
 		T width, height;
 		
-public:
-		CncXYDimension() 
+	public:
+		CncXYDimension<T>() 
 		: width(0)
 		, height(0)
 		{}
-		CncXYDimension(T w, T h) 
+		CncXYDimension<T>(T w, T h) 
 		: width(w)
 		, height(h)
 		{}
-		CncXYDimension(const CncXYDimension& cd) 
+		CncXYDimension<T>(const CncXYDimension<T>& cd) 
 		: width(cd.getW())
 		, height(cd.getH())
 		{}		
-		virtual ~CncXYDimension() {}
+		virtual ~CncXYDimension<T>() {}
 		
 		T getW() const { return width; }
 		T getH() const { return height; }
 		
-		friend std::ostream &operator<< (std::ostream &ostr, const CncXYDimension &a) {
+		friend std::ostream &operator<< (std::ostream &ostr, const CncXYDimension<T> &a) {
 			ostr << a.getW() << ',' << a.getH();
 			return ostr;
 		}
@@ -46,17 +46,17 @@ class CncZDimension {
 		T zDim;
 		
 	public:
-		CncZDimension()
+		CncZDimension<T>()
 		: zDim(0)
 		{}		
-		CncZDimension(T z)
+		CncZDimension<T>(T z)
 		: zDim(z)
 		{}
-		virtual ~CncZDimension() {}
+		virtual ~CncZDimension<T>() {}
 		
 		T getZ() const { return zDim; }
 		
-		friend std::ostream &operator<< (std::ostream &ostr, const CncZDimension &a) {
+		friend std::ostream &operator<< (std::ostream &ostr, const CncZDimension<T> &a) {
 			ostr << a.getZ();
 			return ostr;
 		}		
@@ -70,6 +70,22 @@ typedef CncZDimension<double> CncZDoubleDimension;
 template <typename T> 
 class CncPosition {
 	
+	public:
+	
+		////////////////////////////////////////////////////////////////////////////////////////////
+		struct Watermarks {
+			public:
+				T xMin = 0, xMax = 0;
+				T yMin = 0, yMax = 0;
+				T zMin = 0, zMax = 0;
+				
+				void reset() {
+					xMin = xMax = 0;
+					yMin = yMax = 0;
+					zMin = zMax = 0;
+				}
+		};
+		
 	protected:
 		T xPos, yPos, zPos;
 		T xMin, xMax;
@@ -88,9 +104,21 @@ class CncPosition {
 			if ( zPos > zMax ) zMax = zPos;
 		}
 		
+		////////////////////////////////////////////////////////////////
+		inline void setWatermarks(const Watermarks& wm) {
+			xMin = wm.xMin;
+			xMax = wm.xMax;
+			
+			yMin = wm.yMin;
+			yMax = wm.yMax;
+
+			zMin = wm.zMin;
+			zMax = wm.zMax;
+		}
+		
 	public:
 		////////////////////////////////////////////////////////////////
-		CncPosition()
+		CncPosition<T>()
 		: xPos(0)
 		, yPos(0)
 		, zPos(0)
@@ -102,7 +130,7 @@ class CncPosition {
 		, zMax(0)
 		{}
 		////////////////////////////////////////////////////////////////
-		CncPosition(T x, T y, T z)
+		CncPosition<T>(T x, T y, T z)
 		: xPos(x)
 		, yPos(y)
 		, zPos(z)
@@ -114,7 +142,7 @@ class CncPosition {
 		, zMax(z)
 		{}
 		////////////////////////////////////////////////////////////////
-		CncPosition(const CncPosition& cp)
+		CncPosition<T>(const CncPosition& cp)
 		: xPos(cp.getX())
 		, yPos(cp.getY())
 		, zPos(cp.getZ())
@@ -126,21 +154,8 @@ class CncPosition {
 		, zMax(cp.getZMax())
 		{}
 		////////////////////////////////////////////////////////////////
-		virtual ~CncPosition() {
+		virtual ~CncPosition<T>() {
 		}
-		////////////////////////////////////////////////////////////////////////////////////////////
-		struct Watermarks {
-			public:
-				T xMin = 0, xMax = 0;
-				T yMin = 0, yMax = 0;
-				T zMin = 0, zMax = 0;
-				
-				void reset() {
-					xMin = xMax = 0;
-					yMin = yMax = 0;
-					zMin = zMax = 0;
-				}
-		};
 		////////////////////////////////////////////////////////////////
 		void getWatermarks(Watermarks& wm) {
 			wm.xMin = xMin;
@@ -181,10 +196,18 @@ class CncPosition {
 		T setY(T y) { yPos = y; return yPos; }
 		T setZ(T z) { zPos = z; return zPos; }
 		////////////////////////////////////////////////////////////////
-		CncPosition setXYZ(T x, T y, T z) {
+		const CncPosition<T>& setXYZ(T x, T y, T z) {
 			xPos = x;
 			yPos = y;
 			zPos = z;
+			evaluateWatermarks();
+			return *this;
+		} 
+		////////////////////////////////////////////////////////////////
+		const CncPosition<T>& set(const CncPosition<T>& p) {
+			xPos = p.getX();
+			yPos = p.getY();
+			zPos = p.getZ();
 			evaluateWatermarks();
 			return *this;
 		} 
@@ -193,7 +216,7 @@ class CncPosition {
 		T zeroY() { yPos = 0; evaluateWatermarks(); return yPos; }
 		T zeroZ() { zPos = 0; evaluateWatermarks(); return zPos; }
 		////////////////////////////////////////////////////////////////
-		CncPosition zeroXYZ() {
+		const CncPosition<T>& zeroXYZ() {
 			xPos = 0;
 			yPos = 0;
 			zPos = 0;
@@ -209,7 +232,7 @@ class CncPosition {
 		T decY(T y) { yPos -= y; evaluateWatermarks(); return yPos; }
 		T decZ(T z) { zPos -= z; evaluateWatermarks(); return zPos; }
 		////////////////////////////////////////////////////////////////
-		friend std::ostream &operator<< (std::ostream &ostr, const CncPosition &a) {
+		friend std::ostream &operator<< (std::ostream &ostr, const CncPosition<T> &a) {
 			ostr << a.getX() << ", " << a.getY() << ", " << a.getZ();
 			return ostr;
 		}
@@ -219,19 +242,19 @@ class CncPosition {
 			return ostr;
 		}
 		////////////////////////////////////////////////////////////////
-		friend bool operator== (const CncPosition &a, const CncPosition &b) {
+		friend bool operator== (const CncPosition<T> &a, const CncPosition<T> &b) {
 			return (    (a.getX() == b.getX())
 					 && (a.getY() == b.getY())
 					 && (a.getZ() == b.getZ())
 					);
 		}
 		////////////////////////////////////////////////////////////////
-		friend bool operator!= (const CncPosition &a, const CncPosition &b) {
+		friend bool operator!= (const CncPosition<T> &a, const CncPosition<T> &b) {
 			return (!operator== (a, b));
 		}
 		////////////////////////////////////////////////////////////////
-		friend CncPosition operator+ (const CncPosition &a, const CncPosition &b) {
-			CncPosition c(a);
+		friend CncPosition<T> operator+ (const CncPosition<T> &a, const CncPosition<T> &b) {
+			CncPosition<T> c(a);
 
 			c.setX(c.getX() + b.getX());
 			c.setY(c.getY() + b.getY());
@@ -240,8 +263,8 @@ class CncPosition {
 			return c;
 		}
 		////////////////////////////////////////////////////////////////
-		friend CncPosition operator- (const CncPosition &a, const CncPosition &b) {
-			CncPosition c(a);
+		friend CncPosition<T> operator- (const CncPosition<T> &a, const CncPosition<T> &b) {
+			CncPosition<T> c(a);
 
 			c.setX(c.getX() - b.getX());
 			c.setY(c.getY() - b.getY());
@@ -250,7 +273,7 @@ class CncPosition {
 			return c;
 		}
 		////////////////////////////////////////////////////////////////
-		CncPosition operator+= (const CncPosition &a) {
+		const CncPosition<T>& operator+= (const CncPosition &a) {
 			xPos += a.getX();
 			yPos += a.getY();
 			zPos += a.getZ();
@@ -258,7 +281,7 @@ class CncPosition {
 			return *this;
 		}
 		////////////////////////////////////////////////////////////////
-		CncPosition operator-= (const CncPosition &a) {
+		const CncPosition<T>& operator-= (const CncPosition &a) {
 			xPos -= a.getX();
 			yPos -= a.getY();
 			zPos -= a.getZ();
@@ -266,7 +289,7 @@ class CncPosition {
 			return *this;
 		}
 		////////////////////////////////////////////////////////////////
-		CncPosition operator++ () {
+		const CncPosition<T>& operator++ () {
 			xPos++;
 			yPos++;
 			zPos++;
@@ -274,7 +297,7 @@ class CncPosition {
 			return *this;
 		}
 		////////////////////////////////////////////////////////////////
-		CncPosition operator-- () {
+		const CncPosition<T>& operator-- () {
 			xPos--;
 			yPos--;
 			zPos--;
@@ -282,7 +305,7 @@ class CncPosition {
 			return *this;
 		}
 		////////////////////////////////////////////////////////////////
-		CncPosition operator++ (int size) {
+		const CncPosition<T>& operator++ (int size) {
 			xPos += size;
 			yPos += size;
 			zPos += size;
@@ -290,7 +313,7 @@ class CncPosition {
 			return *this;
 		}
 		////////////////////////////////////////////////////////////////
-		CncPosition operator-- (int size) {
+		const CncPosition<T>& operator-- (int size) {
 			xPos -= size;
 			yPos -= size;
 			zPos -= size;

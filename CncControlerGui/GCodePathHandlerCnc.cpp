@@ -63,22 +63,27 @@ bool GCodePathHandlerCnc::processRapidLinearMove(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
+	
+	cncControl->changeWorkSpeedXY(CncSpeedRapid);
 				
 	updateCurrentPosition(gcb);
-	if ( processLinearMove(false) ) 
-		return true;
-	
-	return false;
+	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::processLinearMove(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
-	//todo - differ rapid vs. non rapid
-	return processRapidLinearMove(gcb);
+	if ( gcb.hasOneOf_XYZ() == false )
+		return true;
+	
+	cncControl->changeWorkSpeedXY(CncSpeedWork);
+	
+	updateCurrentPosition(gcb);
+	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::processArcMove(GCodeBlock& gcb, bool sweep) {
 //////////////////////////////////////////////////////////////////
+	cncControl->changeWorkSpeedXY(CncSpeedWork);
 	
 	double r  = sqrt(pow(gcb.i, 2) + pow(gcb.j, 2)); // todo relative vs. absolute
 	double ex = gcb.x;

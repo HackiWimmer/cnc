@@ -67,8 +67,6 @@ class CncControl {
 		bool interruptState;
 		// power state
 		bool powerOn;
-		// Z Axis state
-		bool zAxisDown;
 		// flag for updating tools
 		bool toolUpdateState;
 		// Artificially Step Delay
@@ -78,6 +76,7 @@ class CncControl {
 		#define GET_GUI_CTL(ctl)           (guiCtlSetup->ctl)
 		#define IS_GUI_CTL_VALID(ctl)      (guiCtlSetup != NULL && guiCtlSetup->ctl != NULL)
 		#define IS_GUI_CTL_NOT_VALID(ctl)  (guiCtlSetup == NULL || guiCtlSetup->ctl == NULL)
+		#define GET_UPD_THREAD             (GET_GUI_CTL(mainFrame)->getUpdateManagerThread())
 		// Tool state handling
 		CncToolStateControl toolState;
 		//measurements variables
@@ -92,8 +91,6 @@ class CncControl {
 		unsigned int drawPaneMargin;
 		// determine the speed mode 
 		DimensionMode speedMonitorMode;
-		// helper
-		double convertToDisplayUnit(int32_t val, double fact);
 		//sets a value into the given text control
 		void setValue(wxTextCtrl *ctl, int32_t val);
 		void setValue(wxTextCtrl *ctl, double val);
@@ -190,14 +187,9 @@ class CncControl {
 		bool isFirstDuration();
 		bool isLastDuration();
 		// Z axis management
-		bool moveUpZ();
-		bool moveDownZ();
 		bool moveZToTop();
 		bool moveZToBottom();
-		bool isZAxisUp()         { return !zAxisDown; }
-		bool isZAxisDown()       { return zAxisDown; }
-		void simulateZAxisUp()   { zAxisDown = false; }
-		void simulateZAxisDown() { zAxisDown = true; }
+		
 		// Tool management
 		void switchToolOn();
 		void switchToolOff(bool force = false);
@@ -231,15 +223,12 @@ class CncControl {
 		bool processSetter(unsigned char id, int32_t value);
 		bool processSetterList(std::vector<SetterTuple>& setup);
 		// Change the current work speed parameter
-		void changeWorkSpeedXY(CncSpeed s, bool force=false);
-		void changeWorkSpeedZ(CncSpeed s, bool force=false);
+		void changeWorkSpeedXY(CncSpeed s);
+		void changeWorkSpeedZ(CncSpeed s);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
 		void enableStepperMotors(bool s);
-		// Controls the z slider
-		void resetZSlider();
-		void updateZSlider();
 		//Limit management
 		wxString& getLimitInfoString(wxString& ret);
 		void evaluateLimitState();

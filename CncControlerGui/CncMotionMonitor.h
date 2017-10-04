@@ -5,8 +5,11 @@
 #include <wx/timer.h>
 
 #include "CncPosition.h"
+#include "CncCommon.h"
 #include "CncConfig.h"
 #include "3D/GLContextPathBase.h"
+
+wxDECLARE_EVENT(wxEVT_MOTION_MONITOR_TIMER, wxTimerEvent);
 
 class GL3DOptions;
 
@@ -39,7 +42,26 @@ class CncMotionMonitor : public wxGLCanvas {
 				const GLI::GLCncPathVertices::CncMode getMode() const { return mode; }
 
 				//////////////////////////////////////////////
-				void setFlyVertice(const CncLongPosition& cp) {
+				void setVertice(CncSpeed speedType, const CncLongPosition& cp) {
+					switch ( speedType ) {
+						case CncSpeedWork: 	setWorkVertice(cp);
+											break;
+											
+						case CncSpeedRapid: setRapidVertice(cp);
+											break;
+					}
+				}
+
+			protected:
+
+				//CncLongPosition pos;
+				long _x;
+				long _y;
+				long _z;
+				GLI::GLCncPathVertices::CncMode mode;
+				
+				//////////////////////////////////////////////
+				void setRapidVertice(const CncLongPosition& cp) {
 					_x = cp.getX();
 					_y = cp.getY();
 					_z = cp.getZ();
@@ -55,14 +77,6 @@ class CncMotionMonitor : public wxGLCanvas {
 					
 					mode = GLI::GLCncPathVertices::CncMode::CM_WORK;
 				}
-
-			protected:
-
-				//CncLongPosition pos;
-				long _x;
-				long _y;
-				long _z;
-				GLI::GLCncPathVertices::CncMode mode;
 
 		};
 		

@@ -134,7 +134,7 @@ class Serial {
 		// last fetch result
 		unsigned char lastFetchResult;
 		// Map of valid processed setters
-		std::map<int, int32_t> setterMap;
+		//std::map<int, int32_t> setterMap;
 		
 		unsigned char buf[LONG_BUF_SIZE];
 		unsigned char moveCommand[MAX_MOVE_CMD_SIZE];
@@ -248,9 +248,6 @@ class Serial {
 		virtual void clearSVG() {}
 		virtual void rebuildSVG() {}
 		virtual void writeOrigPath(const SvgOriginalPathInfo& sopi) {}
-		
-		//Setter handling
-		const std::map<int, int32_t>& getSetterMap() { return setterMap; }
 		
 		// sends the Test Suite end flag 't'
 		bool sendTestSuiteEndFlag();

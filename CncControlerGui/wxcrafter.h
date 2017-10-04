@@ -24,8 +24,6 @@
 #include <wx/bmpbuttn.h>
 #include <wx/bmpcbox.h>
 #include <wx/toolbar.h>
-#include <wx/combobox.h>
-#include <wx/arrstr.h>
 #include <wx/slider.h>
 #include <wx/button.h>
 #include <wx/scrolwin.h>
@@ -36,7 +34,12 @@
 #include <wx/spinbutt.h>
 #include <wx/textctrl.h>
 #include <wx/checkbox.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
 #include <wx/listbook.h>
+#include <wx/propgrid/manager.h>
+#include <wx/propgrid/property.h>
+#include <wx/propgrid/advprops.h>
 #include <wx/treebook.h>
 #include <wx/spinctrl.h>
 #include <wx/tglbtn.h>
@@ -47,17 +50,16 @@
 #include <wx/dataview.h>
 #include <wx/webview.h>
 #include "CncSpeedView.h"
-#include <wx/toolbook.h>
+#include <wx/listctrl.h>
 #include <wx/dirctrl.h>
+#include <wx/toolbook.h>
 #include "CncZView.h"
 #include <wx/timer.h>
 #include <wx/splitter.h>
 #include <wx/treectrl.h>
-#include <wx/propgrid/manager.h>
-#include <wx/propgrid/property.h>
-#include <wx/propgrid/advprops.h>
-#include <wx/dialog.h>
+#include <wx/simplebook.h>
 #include <wx/collpane.h>
+#include <wx/dialog.h>
 #include <wx/bitmap.h>
 #include <wx/icon.h>
 #if wxVERSION_NUMBER >= 2900
@@ -87,8 +89,6 @@ protected:
     wxBitmapButton* m_searchConnections;
     wxBitmapComboBox* m_portSelector;
     wxBitmapButton* m_connect;
-    wxStaticText* m_staticText752;
-    wxComboBox* m_unit;
     wxStaticText* m_staticText1748;
     wxMenu* m_configStepDelayMenu;
     wxMenuItem* m_miCfgStepDelayMin;
@@ -175,6 +175,37 @@ protected:
     wxButton* m_zToBottom;
     wxPanel* m_panelSetup;
     wxListbook* m_listbook2220;
+    wxPanel* m_setupConfigPage;
+    wxPropertyGridManager* m_pgMgrSetup;
+    wxPGProperty* m_pgCatWorking;
+    wxPGProperty* m_pgProp3746;
+    wxPGProperty* m_pgProp3748;
+    wxPGProperty* m_pgCatSpeed;
+    wxPGProperty* m_pgPropPredefSpeedConfig;
+    wxPGProperty* m_pgCatXYSpeed;
+    wxPGProperty* m_pgPropMaxSpeedXY;
+    wxPGProperty* m_pgPropDefWorkSpeedXY;
+    wxPGProperty* m_pgPropDefRapidSpeedXY;
+    wxPGProperty* m_pgPropDefSpeedModeXY;
+    wxPGProperty* m_pgCatZSpeed;
+    wxPGProperty* m_pgPropMaxSpeedZ;
+    wxPGProperty* m_pgPropDefWorkSpeedZ;
+    wxPGProperty* m_pgPropDefRapidSpeedZ;
+    wxPGProperty* m_pgPropDefSpeedModeZ;
+    wxPGProperty* m_pgCatDimension;
+    wxPGProperty* m_pgPropMaxDimX;
+    wxPGProperty* m_pgPropMaxDimY;
+    wxPGProperty* m_pgPropMaxDimZ;
+    wxPGProperty* m_pgCatSvg;
+    wxPGProperty* m_pgCatGCode;
+    wxPGProperty* m_pgCatApplication;
+    wxPGProperty* m_pgPropRunConfirmationMode;
+    wxPGProperty* m_pgProp3750;
+    wxPGProperty* m_pgProp3752;
+    wxPanel* m_setupEnvPage;
+    wxStaticText* m_staticText1880;
+    wxStaticLine* m_staticLine2226;
+    wxTextCtrl* m_envrionmentInfo;
     wxPanel* m_setupWorkPage;
     wxStaticText* m_staticText7791;
     wxStaticLine* m_staticLine9572;
@@ -241,10 +272,6 @@ protected:
     wxComboBox* m_cbSvgIncludeOriginalPath;
     wxStaticText* m_staticText126111;
     wxComboBox* m_cbSvgFirstCrossing;
-    wxPanel* m_setupEnvPage;
-    wxStaticText* m_staticText1880;
-    wxStaticLine* m_staticLine2226;
-    wxTextCtrl* m_envrionmentInfo;
     wxPanel* m_setupApp;
     wxStaticText* m_staticText779122;
     wxStaticLine* m_staticLine957233;
@@ -355,8 +382,6 @@ protected:
     wxStaticText* m_staticText1160;
     wxStaticLine* m_staticLine1162;
     wxRadioBox* m_mmRadioCoordinates;
-    wxStaticText* m_staticText799;
-    wxComboBox* m_metricZ;
     wxStaticText* m_staticText793;
     wxButton* m_minManuallyXSlider;
     wxTextCtrl* m_metricX;
@@ -379,7 +404,7 @@ protected:
     wxStaticText* m_staticText2075;
     wxStaticText* m_staticText7973;
     wxButton* m_minManuallyZSlider;
-    wxTextCtrl* m_metricZEdit;
+    wxTextCtrl* m_metricZ;
     wxButton* m_maxManuallyZSlider;
     wxButton* m_zeroManuallyZSlider;
     wxButton* m_signManuallyZSlider;
@@ -440,15 +465,11 @@ protected:
     wxStaticText* m_staticText28052;
     CncSpeedView* m_speedView;
     wxScrolledWindow* m_scrollWinFile;
-    wxToolbook* m_templateToolbook;
-    wxPanel* m_lruPanel;
-    wxStaticText* m_staticText1644;
-    wxListBox* m_lruList;
-    wxPanel* m_stdPanel;
-    wxButton* m_btDefaultDir;
-    wxButton* m_btCurrentFile;
+    wxListCtrl* m_lruList;
     wxStaticText* m_staticText1647;
     wxGenericDirCtrl* m_dirCtrl;
+    wxButton* m_btDefaultDir;
+    wxButton* m_btCurrentFile;
     wxScrolledWindow* m_scrollWinLogger;
     wxToolbook* m_loggerToolbook;
     wxPanel* m_panel3157;
@@ -478,6 +499,7 @@ protected:
     wxStaticText* LableZ;
     wxTextCtrl* m_zAxis;
     wxTextCtrl* m_zAxisCtl;
+    wxComboBox* m_unit;
     wxStaticLine* m_staticLine60234;
     wxStaticText* m_staticText1196;
     wxStaticText* m_xMinLimit;
@@ -500,10 +522,7 @@ protected:
     wxButton* m_btCancelRun;
     wxButton* m_btConfirmRun;
     wxPanel* m_cncSetters;
-    wxStaticText* m_staticText1148;
     wxStaticText* m_staticText1150;
-    wxButton* m_button1473;
-    wxDataViewListCtrl* m_dvListCtrlLastSetters;
     wxDataViewListCtrl* m_dvListCtrlProcessedSetters;
     wxPanel* m_cncConfiguration;
     wxStaticText* m_staticText1283;
@@ -686,7 +705,6 @@ protected:
     virtual void searchAvailiablePorts(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event) { event.Skip(); }
     virtual void cfgStepDelayMin(wxCommandEvent& event) { event.Skip(); }
     virtual void cfgStepDelayMax(wxCommandEvent& event) { event.Skip(); }
@@ -819,26 +837,25 @@ protected:
     virtual void openPrevFile1(wxCommandEvent& event) { event.Skip(); }
     virtual void openPrevFile2(wxCommandEvent& event) { event.Skip(); }
     virtual void leaveEnterFileManagerControl(wxMouseEvent& event) { event.Skip(); }
-    virtual void lruListItemActivated(wxCommandEvent& event) { event.Skip(); }
-    virtual void lruListItemSelected(wxCommandEvent& event) { event.Skip(); }
-    virtual void leaveLruList(wxMouseEvent& event) { event.Skip(); }
-    virtual void selectDefaultDirectory(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectCurrentFile(wxCommandEvent& event) { event.Skip(); }
+    virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
+    virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
     virtual void dirCtrlChanged(wxTreeEvent& event) { event.Skip(); }
     virtual void dirCtrlActivated(wxTreeEvent& event) { event.Skip(); }
+    virtual void selectDefaultDirectory(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectCurrentFile(wxCommandEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
+    virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void outboundBookChanging(wxNotebookEvent& event) { event.Skip(); }
     virtual void nootebookConfigChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearProcessedSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
@@ -934,8 +951,6 @@ public:
     wxBitmapButton* GetSearchConnections() { return m_searchConnections; }
     wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
     wxBitmapButton* GetConnect() { return m_connect; }
-    wxStaticText* GetStaticText752() { return m_staticText752; }
-    wxComboBox* GetUnit() { return m_unit; }
     wxStaticText* GetStaticText1748() { return m_staticText1748; }
     wxSlider* GetStepDelay() { return m_stepDelay; }
     wxStaticText* GetStepDelayValue() { return m_stepDelayValue; }
@@ -1009,6 +1024,12 @@ public:
     wxStaticText* GetStaticText2438() { return m_staticText2438; }
     wxButton* GetZToBottom() { return m_zToBottom; }
     wxPanel* GetPanelReference() { return m_panelReference; }
+    wxPropertyGridManager* GetPgMgrSetup() { return m_pgMgrSetup; }
+    wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
+    wxStaticText* GetStaticText1880() { return m_staticText1880; }
+    wxStaticLine* GetStaticLine2226() { return m_staticLine2226; }
+    wxTextCtrl* GetEnvrionmentInfo() { return m_envrionmentInfo; }
+    wxPanel* GetSetupEnvPage() { return m_setupEnvPage; }
     wxStaticText* GetStaticText7791() { return m_staticText7791; }
     wxStaticLine* GetStaticLine9572() { return m_staticLine9572; }
     wxStaticText* GetStaticText569() { return m_staticText569; }
@@ -1075,10 +1096,6 @@ public:
     wxStaticText* GetStaticText126111() { return m_staticText126111; }
     wxComboBox* GetCbSvgFirstCrossing() { return m_cbSvgFirstCrossing; }
     wxPanel* GetSetupSVGPage() { return m_setupSVGPage; }
-    wxStaticText* GetStaticText1880() { return m_staticText1880; }
-    wxStaticLine* GetStaticLine2226() { return m_staticLine2226; }
-    wxTextCtrl* GetEnvrionmentInfo() { return m_envrionmentInfo; }
-    wxPanel* GetSetupEnvPage() { return m_setupEnvPage; }
     wxStaticText* GetStaticText779122() { return m_staticText779122; }
     wxStaticLine* GetStaticLine957233() { return m_staticLine957233; }
     wxStaticText* GetStaticText12375() { return m_staticText12375; }
@@ -1190,8 +1207,6 @@ public:
     wxStaticText* GetStaticText1160() { return m_staticText1160; }
     wxStaticLine* GetStaticLine1162() { return m_staticLine1162; }
     wxRadioBox* GetMmRadioCoordinates() { return m_mmRadioCoordinates; }
-    wxStaticText* GetStaticText799() { return m_staticText799; }
-    wxComboBox* GetMetricZ() { return m_metricZ; }
     wxStaticText* GetStaticText793() { return m_staticText793; }
     wxButton* GetMinManuallyXSlider() { return m_minManuallyXSlider; }
     wxTextCtrl* GetMetricX() { return m_metricX; }
@@ -1214,7 +1229,7 @@ public:
     wxStaticText* GetStaticText2075() { return m_staticText2075; }
     wxStaticText* GetStaticText7973() { return m_staticText7973; }
     wxButton* GetMinManuallyZSlider() { return m_minManuallyZSlider; }
-    wxTextCtrl* GetMetricZEdit() { return m_metricZEdit; }
+    wxTextCtrl* GetMetricZ() { return m_metricZ; }
     wxButton* GetMaxManuallyZSlider() { return m_maxManuallyZSlider; }
     wxButton* GetZeroManuallyZSlider() { return m_zeroManuallyZSlider; }
     wxButton* GetSignManuallyZSlider() { return m_signManuallyZSlider; }
@@ -1274,15 +1289,11 @@ public:
     wxStaticText* GetStaticText28052() { return m_staticText28052; }
     CncSpeedView* GetSpeedView() { return m_speedView; }
     wxPanel* GetPanelSpeed() { return m_panelSpeed; }
-    wxStaticText* GetStaticText1644() { return m_staticText1644; }
-    wxListBox* GetLruList() { return m_lruList; }
-    wxPanel* GetLruPanel() { return m_lruPanel; }
-    wxButton* GetBtDefaultDir() { return m_btDefaultDir; }
-    wxButton* GetBtCurrentFile() { return m_btCurrentFile; }
+    wxListCtrl* GetLruList() { return m_lruList; }
     wxStaticText* GetStaticText1647() { return m_staticText1647; }
     wxGenericDirCtrl* GetDirCtrl() { return m_dirCtrl; }
-    wxPanel* GetStdPanel() { return m_stdPanel; }
-    wxToolbook* GetTemplateToolbook() { return m_templateToolbook; }
+    wxButton* GetBtDefaultDir() { return m_btDefaultDir; }
+    wxButton* GetBtCurrentFile() { return m_btCurrentFile; }
     wxScrolledWindow* GetScrollWinFile() { return m_scrollWinFile; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetFreezeLogger() { return m_freezeLogger; }
@@ -1312,6 +1323,7 @@ public:
     wxStaticText* GetLableZ() { return LableZ; }
     wxTextCtrl* GetZAxis() { return m_zAxis; }
     wxTextCtrl* GetZAxisCtl() { return m_zAxisCtl; }
+    wxComboBox* GetUnit() { return m_unit; }
     wxStaticLine* GetStaticLine60234() { return m_staticLine60234; }
     wxStaticText* GetStaticText1196() { return m_staticText1196; }
     wxStaticText* GetXMinLimit() { return m_xMinLimit; }
@@ -1330,10 +1342,7 @@ public:
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetPanel2601() { return m_panel2601; }
-    wxStaticText* GetStaticText1148() { return m_staticText1148; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
-    wxButton* GetButton1473() { return m_button1473; }
-    wxDataViewListCtrl* GetDvListCtrlLastSetters() { return m_dvListCtrlLastSetters; }
     wxDataViewListCtrl* GetDvListCtrlProcessedSetters() { return m_dvListCtrlProcessedSetters; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
     wxStaticText* GetStaticText1283() { return m_staticText1283; }
@@ -1618,74 +1627,49 @@ public:
 };
 
 
-class UnitTestsBase : public wxDialog
+class CncFilePreviewBase : public wxPanel
 {
 protected:
-    wxStaticText* m_staticText3357;
-    wxComboBox* m_unitTestSelector;
-    wxButton* m_btUnitTestClear;
-    wxButton* m_btUnitTestRun;
-    wxTextCtrl* m_testResultStream;
-    wxStaticText* m_unitTestStatus;
-    wxCheckBox* m_unitTestFreezeOutput;
-    wxCheckBox* m_unitTestAutoRun;
-    wxTimer* m_unitTestStartupTimer;
+    wxSimplebook* m_previewBook;
+    wxPanel* m_panel3764;
+#if wxUSE_WEBVIEW
+    wxWebView* m_svgPreview;
+#endif // wxUSE_WEBVIEW
+
+    wxPanel* m_panel3766;
+    wxPanel* m_gcodePreviewPlaceholder;
 
 protected:
-    virtual void onShow(wxShowEvent& event) { event.Skip(); }
-    virtual void selectTest(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearView(wxCommandEvent& event) { event.Skip(); }
-    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
+    #if wxUSE_WEBVIEW
+    #endif // wxUSE_WEBVIEW
 
 public:
-    wxStaticText* GetStaticText3357() { return m_staticText3357; }
-    wxComboBox* GetUnitTestSelector() { return m_unitTestSelector; }
-    wxButton* GetBtUnitTestClear() { return m_btUnitTestClear; }
-    wxButton* GetBtUnitTestRun() { return m_btUnitTestRun; }
-    wxTextCtrl* GetTestResultStream() { return m_testResultStream; }
-    wxStaticText* GetUnitTestStatus() { return m_unitTestStatus; }
-    wxCheckBox* GetUnitTestFreezeOutput() { return m_unitTestFreezeOutput; }
-    wxCheckBox* GetUnitTestAutoRun() { return m_unitTestAutoRun; }
-    wxTimer* GetUnitTestStartupTimer() { return m_unitTestStartupTimer; }
-    UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
-    virtual ~UnitTestsBase();
+    wxWebView* GetSvgPreview() { return m_svgPreview; }
+    wxPanel* GetPanel3764() { return m_panel3764; }
+    wxPanel* GetGcodePreviewPlaceholder() { return m_gcodePreviewPlaceholder; }
+    wxPanel* GetPanel3766() { return m_panel3766; }
+    wxSimplebook* GetPreviewBook() { return m_previewBook; }
+    CncFilePreviewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncFilePreviewBase();
 };
 
 
-class EndSwitchDialogBase : public wxDialog
+class CncFilePreviewWndBase : public wxFrame
 {
 protected:
-    wxTextCtrl* m_limitInfo;
-    wxStaticText* m_staticText1547;
-    wxRadioBox* m_XAxisEndSwitchBox;
-    wxRadioBox* m_YAxisEndSwitchBox;
-    wxRadioBox* m_ZAxisEndSwitchBox;
-    wxButton* m_btDissolveX;
-    wxButton* m_btDissolveY;
-    wxButton* m_btDissolveZ;
-    wxButton* m_btCancle;
+    wxTextCtrl* m_previewFileName;
+    wxTextCtrl* m_previewFileType;
+    wxPanel* m_previewPlaceHolder;
 
 protected:
-    virtual void selectX(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectY(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void dissolveX(wxCommandEvent& event) { event.Skip(); }
-    virtual void dissolveY(wxCommandEvent& event) { event.Skip(); }
-    virtual void dissolveZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void cancle(wxCommandEvent& event) { event.Skip(); }
+    virtual void onClose(wxCloseEvent& event) { event.Skip(); }
 
 public:
-    wxTextCtrl* GetLimitInfo() { return m_limitInfo; }
-    wxStaticText* GetStaticText1547() { return m_staticText1547; }
-    wxRadioBox* GetXAxisEndSwitchBox() { return m_XAxisEndSwitchBox; }
-    wxRadioBox* GetYAxisEndSwitchBox() { return m_YAxisEndSwitchBox; }
-    wxRadioBox* GetZAxisEndSwitchBox() { return m_ZAxisEndSwitchBox; }
-    wxButton* GetBtDissolveX() { return m_btDissolveX; }
-    wxButton* GetBtDissolveY() { return m_btDissolveY; }
-    wxButton* GetBtDissolveZ() { return m_btDissolveZ; }
-    wxButton* GetBtCancle() { return m_btCancle; }
-    EndSwitchDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Manual end switch dissolving"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,320), long style = wxDEFAULT_DIALOG_STYLE);
-    virtual ~EndSwitchDialogBase();
+    wxTextCtrl* GetPreviewFileName() { return m_previewFileName; }
+    wxTextCtrl* GetPreviewFileType() { return m_previewFileType; }
+    wxPanel* GetPreviewPlaceHolder() { return m_previewPlaceHolder; }
+    CncFilePreviewWndBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc File Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
+    virtual ~CncFilePreviewWndBase();
 };
 
 
@@ -1774,6 +1758,77 @@ public:
     wxCollapsiblePane* GetCollPaneModelRotation() { return m_collPaneModelRotation; }
     GL3DOptionsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("3D Options"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP);
     virtual ~GL3DOptionsBase();
+};
+
+
+class UnitTestsBase : public wxDialog
+{
+protected:
+    wxStaticText* m_staticText3357;
+    wxComboBox* m_unitTestSelector;
+    wxButton* m_btUnitTestClear;
+    wxButton* m_btUnitTestRun;
+    wxTextCtrl* m_testResultStream;
+    wxStaticText* m_unitTestStatus;
+    wxCheckBox* m_unitTestFreezeOutput;
+    wxCheckBox* m_unitTestAutoRun;
+    wxTimer* m_unitTestStartupTimer;
+
+protected:
+    virtual void onShow(wxShowEvent& event) { event.Skip(); }
+    virtual void selectTest(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearView(wxCommandEvent& event) { event.Skip(); }
+    virtual void onStartupTimer(wxTimerEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText3357() { return m_staticText3357; }
+    wxComboBox* GetUnitTestSelector() { return m_unitTestSelector; }
+    wxButton* GetBtUnitTestClear() { return m_btUnitTestClear; }
+    wxButton* GetBtUnitTestRun() { return m_btUnitTestRun; }
+    wxTextCtrl* GetTestResultStream() { return m_testResultStream; }
+    wxStaticText* GetUnitTestStatus() { return m_unitTestStatus; }
+    wxCheckBox* GetUnitTestFreezeOutput() { return m_unitTestFreezeOutput; }
+    wxCheckBox* GetUnitTestAutoRun() { return m_unitTestAutoRun; }
+    wxTimer* GetUnitTestStartupTimer() { return m_unitTestStartupTimer; }
+    UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
+    virtual ~UnitTestsBase();
+};
+
+
+class EndSwitchDialogBase : public wxDialog
+{
+protected:
+    wxTextCtrl* m_limitInfo;
+    wxStaticText* m_staticText1547;
+    wxRadioBox* m_XAxisEndSwitchBox;
+    wxRadioBox* m_YAxisEndSwitchBox;
+    wxRadioBox* m_ZAxisEndSwitchBox;
+    wxButton* m_btDissolveX;
+    wxButton* m_btDissolveY;
+    wxButton* m_btDissolveZ;
+    wxButton* m_btCancle;
+
+protected:
+    virtual void selectX(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectY(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void dissolveX(wxCommandEvent& event) { event.Skip(); }
+    virtual void dissolveY(wxCommandEvent& event) { event.Skip(); }
+    virtual void dissolveZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void cancle(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxTextCtrl* GetLimitInfo() { return m_limitInfo; }
+    wxStaticText* GetStaticText1547() { return m_staticText1547; }
+    wxRadioBox* GetXAxisEndSwitchBox() { return m_XAxisEndSwitchBox; }
+    wxRadioBox* GetYAxisEndSwitchBox() { return m_YAxisEndSwitchBox; }
+    wxRadioBox* GetZAxisEndSwitchBox() { return m_ZAxisEndSwitchBox; }
+    wxButton* GetBtDissolveX() { return m_btDissolveX; }
+    wxButton* GetBtDissolveY() { return m_btDissolveY; }
+    wxButton* GetBtDissolveZ() { return m_btDissolveZ; }
+    wxButton* GetBtCancle() { return m_btCancle; }
+    EndSwitchDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Manual end switch dissolving"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,320), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~EndSwitchDialogBase();
 };
 
 

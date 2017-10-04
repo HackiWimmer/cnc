@@ -9,21 +9,23 @@
 #include "LruFileList.h"
 #include "FileParser.h"
 #include "PathGeneratorFrame.h"
-#include "InterruptThread.h"
+#include "UpdateManagerThread.h"
 #include "CncControl.h"
 #include "CncMotionMonitor.h"
 #include "CncSpyControl.h"
 #include "codelite/wxPNGAnimation.h"
 
-// declare a new type of event, to be used by our MyThread class:
-wxDECLARE_EVENT(wxEVT_COMMAND_MYTHREAD_COMPLETED, wxThreadEvent);
-wxDECLARE_EVENT(wxEVT_COMMAND_MYTHREAD_UPDATE, wxThreadEvent);
-
 class wxFileConfig;
+class CncFilePreviewWnd;
 class wxMenu;
 class wxMenuItem;
 
 enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
+
+wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxThreadEvent);
+wxDECLARE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
+wxDECLARE_EVENT(wxEVT_XXX, wxCommandEvent);
 
 ////////////////////////////////////////////////////////////////////
 typedef std::vector<wxWindow*> GuiControls;
@@ -33,6 +35,8 @@ class MainFrame : public MainFrameBClass {
 
 	// User command
 	protected:
+		virtual void lruListItemActivated(wxListEvent& event);
+		virtual void lruListItemSelected(wxListEvent& event);
 		virtual void openMotionMonitorOptionDlg(wxCommandEvent& event);
 		virtual void viewStatusbar(wxCommandEvent& event);
 		virtual void openPrevFile1(wxCommandEvent& event);
@@ -231,7 +235,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void clearLogger(wxCommandEvent& event);
 		virtual void connect(wxCommandEvent& event);
 		virtual void reinit(wxCommandEvent& event);
-		virtual void clearProcessedSetterList(wxCommandEvent& event);
 		virtual void selectUAInboundPathList(wxDataViewEvent& event);
 		virtual void selectUAUseDirectiveList(wxDataViewEvent& event);
 		virtual void selectUADetailInfo(wxDataViewEvent& event);
@@ -264,8 +267,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void selectCurrentFile(wxCommandEvent& event);
 		virtual void selectDefaultDirectory(wxCommandEvent& event);
 		virtual void leaveLruList(wxMouseEvent& event);
-		virtual void lruListItemActivated(wxCommandEvent& event);
-		virtual void lruListItemSelected(wxCommandEvent& event);
 		virtual void leaveEnterFileManagerControl(wxMouseEvent& event);
 		virtual void viewMainView(wxCommandEvent& event);
 		virtual void viewTemplateManager(wxCommandEvent& event);
@@ -285,10 +286,12 @@ class MainFrame : public MainFrameBClass {
 		virtual void selectSvgDebuggerInfoDetail(wxDataViewEvent& event);
 		virtual void OnExit(wxCommandEvent& event);
 		virtual void OnAbout(wxCommandEvent& event);
-		virtual void OnClose(wxCloseEvent& event);
-		virtual void OnThreadUpdate(wxThreadEvent& event) {}
-		virtual void OnThreadCompletion(wxThreadEvent& event) {}
-		virtual void OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event));
+		virtual void onClose(wxCloseEvent& event);
+		
+		void onThreadUpdate(wxThreadEvent& event);
+		void onThreadCompletion(wxThreadEvent& event);
+		void onPerspectiveTimer(wxTimerEvent& WXUNUSED(event));
+		
 		wxDECLARE_EVENT_TABLE();
 		
 	public:
@@ -306,6 +309,8 @@ class MainFrame : public MainFrameBClass {
 		wxTextCtrl* getCtrlMessageHistory() { return m_controllerMsgHistory; }
 		wxTextCtrl* getCtrlPathGeneratorTrace() { return pathGenerator->getPathTrace(); }
 		wxTextCtrl* getCtrlSerialSpy() { return serialSpy; }
+		
+		UpdateManagerThread* getUpdateManagerThread() { return updateManagerThread; }
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
@@ -332,9 +337,28 @@ class MainFrame : public MainFrameBClass {
 		void globalKeyDownHook(wxKeyEvent& event);
  
 		// Interrupt thread handling
-		InterruptThread* pThread;
+		UpdateManagerThread* updateManagerThread;
 		wxCriticalSection pThreadCS;
-		friend class InterruptThread;
+		
+		wxTextCtrl* getAppPosControlX() { return m_xAxis; }
+		wxTextCtrl* getCtlPosControlX() { return m_xAxisCtl; }
+		wxTextCtrl* getAppPosControlY() { return m_yAxis; }
+		wxTextCtrl* getCtlPosControlY() { return m_yAxisCtl; }
+		wxTextCtrl* getAppPosControlZ() { return m_zAxis; }
+		wxTextCtrl* getCtlPosControlZ() { return m_zAxisCtl; }
+		
+		wxTextCtrl* getCmdCounterControl()  { return m_cmdCount; }
+		wxTextCtrl* getCmdDurationControl() { return m_cmdDuration; }
+		
+		wxDataViewListCtrl* getStaticCncConfigControl()  { return m_dvListCtrlStatic; }
+		wxDataViewListCtrl* getDynamicCncConfigControl() { return m_dvListCtrlDynamic; } 
+		
+		wxDataViewListCtrl* getProcessedSetterControl() { return m_dvListCtrlProcessedSetters; }
+		
+		CncZView* getZView() { return m_zView; }
+		CncSpeedView* getSpeedView() { return m_speedView; }
+		
+		friend class UpdateManagerThread;
 		
 	private:
 		// Member variables
@@ -355,6 +379,7 @@ class MainFrame : public MainFrameBClass {
 	
 		CncControl* cnc;
 		CncMotionMonitor* motionMonitor;
+		CncFilePreviewWnd* filePreviewWnd;
 		CncSpyControl* serialSpy;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
@@ -439,10 +464,10 @@ class MainFrame : public MainFrameBClass {
 		void updateCurveLibResolution();
 		
 		void decorateSearchButton();
-		void decorateTemplateListBook();
 
 		void registerGuiControls();
 		bool initializeCncControl();
+		void initializeUpdateManagerThread();
 		bool initializeLruMenu();
 		void initTemplateEditStyle();
 		void initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat format);
@@ -473,7 +498,6 @@ class MainFrame : public MainFrameBClass {
 		void processTemplate();
 		bool processSVGTemplate();
 		bool processGCodeTemplate();
-		bool processTextTemplate();
 		bool processManualTemplate();
 		bool processTestTemplate();
 		bool processTestInterval();

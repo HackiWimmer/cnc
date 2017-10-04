@@ -8,12 +8,6 @@
 #include "CncStreamBuffers.h"
 #include "StdStreamRedirector.h"
 
-// control ids
-enum {
-	PERSPECTIVE_TIMER 		= wxID_HIGHEST + 1,
-	MM_CAMERA_ROTATION_TIMER 	= wxID_HIGHEST + 2
-};
-
 // make essiential global variables available
 namespace cnc {
 	extern CncBasicLogStream cex1;
@@ -42,13 +36,13 @@ static const int MAX_PARAMETER_VALUES = 10;
 
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
-enum CncSpeed 					{ CncSpeedWork, CncSpeedFly };
+enum CncSpeed 					{ CncSpeedWork, CncSpeedRapid };
 enum CncPortType 				{ CncPORT, CncEMU_NULL, CncEMU_SVG };
 enum CncRenderMode 				{ CncRenderAtPC, CncRenderAtController };
 enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
 enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4};
-enum TemplateFormat 			{ TplUnknown, TplSvg, TplText, TplGcode, TplManual, TplTest };
+enum TemplateFormat 			{ TplUnknown, TplSvg, TplGcode, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3};
 
 

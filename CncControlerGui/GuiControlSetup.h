@@ -16,20 +16,9 @@ class MainFrame;
 
 struct GuiControlSetup {
 	
-	MainFrame* mainWnd				= NULL;
+	MainFrame* mainFrame			= NULL;
 	
 	CncMotionMonitor* motionMonitor	= NULL;
-	
-	wxTextCtrl* xAxis 				= NULL; 
-	wxTextCtrl* yAxis 				= NULL;
-	wxTextCtrl* zAxis 				= NULL;
-	
-	wxTextCtrl* xAxisCtl			= NULL; 
-	wxTextCtrl* yAxisCtl			= NULL;
-	wxTextCtrl* zAxisCtl			= NULL;
-	
-	wxTextCtrl* cmdCount 			= NULL;
-	wxTextCtrl* cmdDuration			= NULL;
 	
 	wxTextCtrl* passingTrace		= NULL;
 	
@@ -44,13 +33,6 @@ struct GuiControlSetup {
 	
 	wxMenuItem* motorState			= NULL;
 	
-	CncZView* zView					= NULL;
-	CncSpeedView* speedView     	= NULL;
-	
-	wxDataViewListCtrl* staticCncConfig 		= NULL;
-	wxDataViewListCtrl* dynamicCncConfig 		= NULL;
-	wxDataViewListCtrl* setterValues			= NULL;
-	wxDataViewListCtrl* processedSetters		= NULL;
 	wxDataViewListCtrl* controllerConfig		= NULL;
 	wxDataViewListCtrl* controllerPinReport		= NULL;
 	wxDataViewListCtrl* controllerErrorInfo		= NULL;

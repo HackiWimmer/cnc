@@ -4,7 +4,8 @@
 #include <vector>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
-#include <wx/listbox.h>
+#include <wx/listctrl.h>
+#include <wx/imaglist.h>
 #include <wx/string.h>
 
 typedef std::vector<wxFileName> LruList;
@@ -15,18 +16,33 @@ class LruFileList {
 		const char* lruPrefix= "LRU_FILE_";
 		unsigned int size;
 		wxString ret;
-		wxListBox* listControl;
+		wxListCtrl* listControl;
 		LruList lruList;
+		wxImageList* imageList;
 		
 		////////////////////////////////////////////////////////////////
 		void updateListControl() {
 			if ( listControl == NULL )
 				return;
-			
-			listControl->Clear();
-			for ( LruList::iterator it=lruList.begin(); it!=lruList.end(); ++it) {
-				listControl->Append((*it).GetFullName());
+				
+			// ensure the exact one coloum!
+			// and setup the control
+			if ( listControl->GetColumnCount() != 1 ) {
+				listControl->DeleteAllColumns();
+				listControl->AppendColumn("Last recently used:", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
+				
+				imageList->RemoveAll();
+				imageList->Add(ImageLib16().Bitmap("BMP_LRU_FILE"));
+				
+				listControl->SetImageList(imageList, wxIMAGE_LIST_SMALL);
+				
+				listControl->SetSingleStyle(wxLC_HRULES | wxLC_VRULES, true);
 			}
+			listControl->SetColumnWidth(0, wxLIST_AUTOSIZE_USEHEADER);
+			
+			listControl->DeleteAllItems();
+			for ( LruList::iterator it=lruList.begin(); it!=lruList.end(); ++it)
+				listControl->InsertItem(listControl->GetItemCount(), (*it).GetFullName(), 0);
 			
 			listControl->Refresh();
 			listControl->Update();
@@ -37,16 +53,20 @@ class LruFileList {
 		LruFileList(unsigned int s)
 		: size(s ? s : 5)
 		, listControl(NULL)
+		, imageList(new wxImageList(16, 16, true))
 		{
 			
 		}
 		
+		////////////////////////////////////////////////////////////////
 		~LruFileList() {
 			lruList.clear();
+			listControl->DeleteAllItems();
+			delete imageList;
 		}
 		
 		////////////////////////////////////////////////////////////////
-		void setListControl(wxListBox* lc) {
+		void setListControl(wxListCtrl* lc) {
 			listControl = lc;
 		}
 		

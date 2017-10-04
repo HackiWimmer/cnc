@@ -40,13 +40,15 @@ class GlutLibInitManager {
 // ----------------------------------------------------------------------------
 // CncMotionMonitor Event Table
 // ----------------------------------------------------------------------------
+wxDEFINE_EVENT(wxEVT_MONTION_MONITOR_TIMER, wxTimerEvent);
+
 wxBEGIN_EVENT_TABLE(CncMotionMonitor, wxGLCanvas)
 	EVT_PAINT(CncMotionMonitor::onPaint)
 	EVT_SIZE(CncMotionMonitor::onSize)
 	EVT_ERASE_BACKGROUND(CncMotionMonitor::onEraseBackground)
 	EVT_MOUSE_EVENTS(CncMotionMonitor::onMouse)
 	EVT_KEY_DOWN(CncMotionMonitor::onKeyDown)
-	EVT_TIMER(MM_CAMERA_ROTATION_TIMER, CncMotionMonitor::onCameraRotationTimer)
+	EVT_TIMER(wxEVT_MONTION_MONITOR_TIMER, CncMotionMonitor::onCameraRotationTimer)
 wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////
@@ -57,7 +59,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , monitor(new GLContextCncPath(this))
 , testCube(new GLContextTestCube(this))
 , optionDlg(new GL3DOptions(this))
-, cameraRotationTimer(this, MM_CAMERA_ROTATION_TIMER)
+, cameraRotationTimer(this, wxEVT_MONTION_MONITOR_TIMER)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
 , zoom(2.0f)
@@ -108,7 +110,7 @@ void CncMotionMonitor::reconstruct() {
 	GLI::GLCncPath tmpPath, curPath = monitor->getPathData();
 	// copy the current path
 	tmpPath.swap(curPath);
-	// clear the real monitor path data - kepp in mind curPath is only a local copy
+	// clear the real monitor path data - keep in mind curPath is only a local copy
 	monitor->clearPathData();
 	
 	// reconstruct

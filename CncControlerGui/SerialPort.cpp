@@ -36,7 +36,6 @@ Serial::Serial(const char *portName)
 {
 ///////////////////////////////////////////////////////////////////
 	connect(portName);
-	setterMap.clear();
 }
 ///////////////////////////////////////////////////////////////////
 Serial::~Serial() {
@@ -607,19 +606,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 		sfi.retSOTAllowed = false;
 		sfi.returnAfterSOT = true;
 
-		bool ret = evaluateResultWrapper(sfi, std::cout, pos);
-		if ( ret == true ) {
-			
-			std::map<int, int32_t>::iterator it;
-			it = setterMap.find((int)pid);
-			if ( it != setterMap.end() ) {
-				it->second = ntohl(value);
-			} else {
-				setterMap.emplace((int)pid, ntohl(value));
-			}
-		}
-		
-		return ret;
+		return evaluateResultWrapper(sfi, std::cout, pos);
 		
 	} else {
 		std::cerr << "Serial::processSetter: Unable to write data" << std::endl;

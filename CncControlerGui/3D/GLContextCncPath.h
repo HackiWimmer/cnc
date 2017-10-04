@@ -10,7 +10,7 @@ class GLContextCncPath : public GLContextCncPathBase {
 		GLContextCncPath(wxGLCanvas* canvas);
 		virtual ~GLContextCncPath();
 		
-		virtual const char* getContextName() { return "OpenGLContextCncPath"; };
+		virtual const char* getContextName() { return "GLContextCncPath"; };
 		
 	protected:
 		virtual void initContext();

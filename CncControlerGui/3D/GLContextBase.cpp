@@ -46,7 +46,7 @@ GLContextBase::~GLContextBase() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::globalInit() {
 /////////////////////////////////////////////////////////////////
-	// this is astatic function and should be called one time
+	// this is a static function and should be called one time
 	// normallly before creating the first context
 	// So, the initalization here is globally. 
 	// If context sensetive initializion is needed use init() instead

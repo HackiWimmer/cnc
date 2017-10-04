@@ -16,6 +16,7 @@ class CncConfig {
 	private:
 		bool changed;
 		CncUnit unit;
+		CncSpeed speedType;
 		double maxDimensions;
 		double maxDimensionsX;
 		double maxDimensionsY;
@@ -23,7 +24,7 @@ class CncConfig {
 		unsigned int stepsX, stepsY, stepsZ;
 		unsigned int multiplierX, multiplierY, multiplierZ;
 		unsigned int maxSpeedXY, maxSpeedZ;
-		unsigned int flySpeedXY, workSpeedXY, flySpeedZ, workSpeedZ;
+		unsigned int rapidSpeedXY, workSpeedXY, rapidSpeedZ, workSpeedZ;
 		unsigned int speedX, speedY, speedZ;
 		unsigned int pulsWidthOffsetX, pulsWidthOffsetY, pulsWidthOffsetZ;
 		double pitchX, pitchY, pitchZ;
@@ -71,13 +72,14 @@ class CncConfig {
 		CncConfig() 
 		: changed(true)
 		, unit(CncSteps)
+		, speedType(CncSpeedRapid)
 		, maxDimensionsX(0.0)
 		, maxDimensionsY(0.0)
 		, maxDimensionsZ(0.0)
 		, stepsX(200), stepsY(200), stepsZ(200)
 		, multiplierX(1), multiplierY(1), multiplierZ(1) 
 		, maxSpeedXY(100), maxSpeedZ(100)
-		, flySpeedXY(100), workSpeedXY(100), flySpeedZ(100), workSpeedZ(100)
+		, rapidSpeedXY(100), workSpeedXY(100), rapidSpeedZ(100), workSpeedZ(100)
 		, speedX(1), speedY(1), speedZ(1)
 		, pulsWidthOffsetX(100), pulsWidthOffsetY(100), pulsWidthOffsetZ(100)
 		, pitchX(2.0), pitchY(2.0), pitchZ(2.0)
@@ -106,14 +108,15 @@ class CncConfig {
 		CncConfig(CncConfig& cc) 
 		: changed(true)
 		, unit(cc.getUnit())
+		, speedType(cc.getSpeedType())
 		, maxDimensionsX(cc.getMaxDimensionX())
 		, maxDimensionsY(cc.getMaxDimensionY())
 		, maxDimensionsZ(cc.getMaxDimensionZ())
 		, stepsX(cc.getStepsX()), stepsY(cc.getStepsY()), stepsZ(cc.getStepsX())
 		, multiplierX(cc.getMultiplierX()), multiplierY(cc.getMultiplierY()), multiplierZ(cc.getMultiplierZ()) 
 		, maxSpeedXY(cc.getMaxSpeedXY()), maxSpeedZ(cc.getMaxSpeedZ())
-		, flySpeedXY(cc.getFlySpeedXY()), workSpeedXY(cc.getWorkSpeedXY())
-		, flySpeedZ(cc.getFlySpeedZ()), workSpeedZ(cc.getWorkSpeedZ())
+		, rapidSpeedXY(cc.getRapidSpeedXY()), workSpeedXY(cc.getWorkSpeedXY())
+		, rapidSpeedZ(cc.getRapidSpeedZ()), workSpeedZ(cc.getWorkSpeedZ())
 		, speedX(cc.getSpeedX()), speedY(cc.getSpeedY()), speedZ(cc.getSpeedX())
 		, pulsWidthOffsetX(cc.getPulsWidthOffsetX()), pulsWidthOffsetY(cc.getPulsWidthOffsetY()), pulsWidthOffsetZ(cc.getPulsWidthOffsetZ())
 		, pitchX(cc.getPitchX()), pitchY(cc.getPitchY()), pitchZ(cc.getPitchZ())
@@ -181,10 +184,10 @@ class CncConfig {
 			DataControlModel::addKeyValueRow(ret, "Multiplier (y)", 		(int)multiplierY);
 			DataControlModel::addKeyValueRow(ret, "Multiplier (z)", 		(int)multiplierZ);
 			DataControlModel::addKeyValueRow(ret, "Max speed XY", 			(int)maxSpeedXY);
-			DataControlModel::addKeyValueRow(ret, "Fly speed XY", 			(int)flySpeedXY);
+			DataControlModel::addKeyValueRow(ret, "Rapid speed XY", 		(int)rapidSpeedXY);
 			DataControlModel::addKeyValueRow(ret, "Work speed XY", 			(int)workSpeedXY);
 			DataControlModel::addKeyValueRow(ret, "Max speed Z", 			(int)maxSpeedZ);
-			DataControlModel::addKeyValueRow(ret, "Fly speed Z", 			(int)flySpeedZ);
+			DataControlModel::addKeyValueRow(ret, "Rapid speed Z", 			(int)rapidSpeedZ);
 			DataControlModel::addKeyValueRow(ret, "Work speed Z", 			(int)workSpeedZ);
 		}
 		////////////////////////////////////////////////////////////////////////
@@ -262,35 +265,33 @@ class CncConfig {
 			}	
 		}
 		////////////////////////////////////////////////////////////////////////
+		CncSpeed getSpeedType() { return speedType; }
+		
+		////////////////////////////////////////////////////////////////////////
 		CncConfig& setActiveSpeedXY(CncSpeed s) {
+			speedType = s;
 			switch( s ) {
 				
 				case CncSpeedWork: 	setSpeedX(getWorkSpeedXY());
 									setSpeedY(getWorkSpeedXY());
 									break;
 									
-				case CncSpeedFly:	setSpeedX(getFlySpeedXY());
-									setSpeedY(getFlySpeedXY());
+				case CncSpeedRapid:	setSpeedX(getRapidSpeedXY());
+									setSpeedY(getRapidSpeedXY());
 									break;
-									
-				default:
-									setSpeedX(1);
-									setSpeedY(1);
 			}
 			return *this;
 		}
 		////////////////////////////////////////////////////////////////////////
 		CncConfig& setActiveSpeedZ(CncSpeed s) {
+			speedType = s;
 			switch( s ) {
 				
 				case CncSpeedWork: 	setSpeedZ(getWorkSpeedZ());
 									break;
 									
-				case CncSpeedFly:	setSpeedZ(getFlySpeedZ());
+				case CncSpeedRapid:	setSpeedZ(getRapidSpeedZ());
 									break;
-									
-				default:
-									setSpeedZ(1);
 			}
 			return *this;
 		}
@@ -378,13 +379,13 @@ class CncConfig {
 		int getMaxSpeedZ() { return maxSpeedZ; }
 		CncConfig& setMaxSpeedZ(int s) { sc(); maxSpeedZ = s; return *this; }
 		////////////////////////////////////////////////////////////////////////
-		int getFlySpeedXY() { return flySpeedXY; }
-		CncConfig& setFlySpeedXY(int s) { sc(); flySpeedXY = s; return *this; }
+		int getRapidSpeedXY() { return rapidSpeedXY; }
+		CncConfig& setRapidSpeedXY(int s) { sc(); rapidSpeedXY = s; return *this; }
 		int getWorkSpeedXY() { return workSpeedXY; }
 		CncConfig& setWorkSpeedXY(int s) { sc(); workSpeedXY = s; return *this; }
 		////////////////////////////////////////////////////////////////////////
-		int getFlySpeedZ() { return flySpeedZ; }
-		CncConfig& setFlySpeedZ(int s) { sc(); flySpeedZ = s; return *this; }
+		int getRapidSpeedZ() { return rapidSpeedZ; }
+		CncConfig& setRapidSpeedZ(int s) { sc(); rapidSpeedZ = s; return *this; }
 		int getWorkSpeedZ() { return workSpeedZ; }
 		CncConfig& setWorkSpeedZ(int s) { sc(); workSpeedZ = s; return *this; }
 		////////////////////////////////////////////////////////////////////////
@@ -399,13 +400,13 @@ class CncConfig {
 		unsigned int getMultiplierY(void) { return multiplierY; }
 		unsigned int getMultiplierZ(void) { return multiplierZ; }
 		////////////////////////////////////////////////////////////////////////
-		double getDisplayFactX(void) { return dispFactX; }
-		double getDisplayFactY(void) { return dispFactY; }
-		double getDisplayFactZ(void) { return dispFactZ; }
+		double getDisplayFactX(CncUnit cu=CncMetric) { return ( cu == CncMetric ? dispFactX : 1.0 ); }
+		double getDisplayFactY(CncUnit cu=CncMetric) { return ( cu == CncMetric ? dispFactY : 1.0 ); }
+		double getDisplayFactZ(CncUnit cu=CncMetric) { return ( cu == CncMetric ? dispFactZ : 1.0 ); }
 		////////////////////////////////////////////////////////////////////////
-		double getCalculationFactX(void) { return calcFactX; }
-		double getCalculationFactY(void) { return calcFactY; }
-		double getCalculationFactZ(void) { return calcFactZ; }
+		double getCalculationFactX(CncUnit cu=CncMetric) { return ( cu == CncMetric ? calcFactX : 1.0 ); }
+		double getCalculationFactY(CncUnit cu=CncMetric) { return ( cu == CncMetric ? calcFactY : 1.0 ); }
+		double getCalculationFactZ(CncUnit cu=CncMetric) { return ( cu == CncMetric ? calcFactZ : 1.0 ); }
 		////////////////////////////////////////////////////////////////////////
 		double getDispFactX3D(void) { return dispFactX3D; }
 		double getDispFactY3D(void) { return dispFactY3D; }

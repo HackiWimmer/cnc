@@ -34,7 +34,6 @@ CncControl::CncControl(CncPortType pt)
 , durationCounter(0)
 , interruptState(false)
 , powerOn(false)
-, zAxisDown(false)
 , toolUpdateState(true)
 , stepDelay(0)
 , guiCtlSetup(NULL)
@@ -172,35 +171,8 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 		return false;
 		
 	} else {
-		DcmItemList rows;
-
-		if ( IS_GUI_CTL_VALID(setterValues) ) {
-			GET_GUI_CTL(setterValues)->Freeze();
-			GET_GUI_CTL(setterValues)->DeleteAllItems();
-			
-			std::map<int, int32_t> smap = serialPort->getSetterMap();
-			for (auto& x: smap) {
-				DataControlModel::addKeyValueRow(rows, ArduinoPIDs::getPIDLabel(x.first), x.second);
-			}
-			for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-				GET_GUI_CTL(setterValues)->AppendItem(*it);
-			}
-			GET_GUI_CTL(setterValues)->Thaw();
-		}
-		
-		rows.clear();
-		if ( IS_GUI_CTL_VALID(processedSetters) ) {
-			GET_GUI_CTL(processedSetters)->Freeze();
-			DataControlModel::addNumKeyValueRow(rows, GET_GUI_CTL(processedSetters)->GetItemCount() + 1, ArduinoPIDs::getPIDLabel((int)id), value);
-			
-			for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-				GET_GUI_CTL(processedSetters)->AppendItem(*it);
-			}
-			
-			int itemCount = guiCtlSetup->processedSetters->GetItemCount();
-			GET_GUI_CTL(processedSetters)->EnsureVisible(guiCtlSetup->processedSetters->RowToItem(itemCount - 1));
-			GET_GUI_CTL(processedSetters)->Thaw();
- 		}
+		wxASSERT( GET_UPD_THREAD );
+		GET_UPD_THREAD->postSetterValue(id, value);
 	}
 
 	return true;
@@ -261,7 +233,7 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, cncConfig->getRelyThreshold()));
 	
 	if ( processSetterList(setup) ) {
-		changeWorkSpeedXY(CncSpeedFly, true);
+		changeWorkSpeedXY(CncSpeedRapid);
 		
 		// reset error info
 		processCommand("r", std::cerr);
@@ -321,16 +293,6 @@ bool CncControl::isConnected() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
 	return serialPort->isConnected();
-}
-///////////////////////////////////////////////////////////////////
-double CncControl::convertToDisplayUnit(int32_t val, double fact) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	
-	if ( cncConfig->getUnit() == CncMetric ) {
-		return (double)(val * fact);
-	} 
-	return val;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processCommand(const unsigned char c, std::ostream& txtCtl) {
@@ -395,27 +357,28 @@ void CncControl::setGuiControls(GuiControlSetup* gcs) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosX() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	wxASSERT( GET_UPD_THREAD );
 	
 	curPos.setX(0);
 	zeroPos.setX(0);
 	startPos.setX(0);
-	setValue(GET_GUI_CTL(xAxis), curPos.getX() * getCncConfig()->getDisplayFactX());
+	GET_UPD_THREAD->postAppPos(curPos);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosY() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	wxASSERT( GET_UPD_THREAD );
 	
 	curPos.setY(0);
 	zeroPos.setY(0);
 	startPos.setY(0);
-	setValue(GET_GUI_CTL(yAxis), curPos.getY() * getCncConfig()->getDisplayFactY());
+	GET_UPD_THREAD->postAppPos(curPos);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosZ() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	wxASSERT( guiCtlSetup );
+	wxASSERT( GET_UPD_THREAD );
 	
 	int32_t val = 0L;
 	
@@ -432,7 +395,7 @@ void CncControl::setZeroPosZ() {
 		}
 	}
 
-	setValue(GET_GUI_CTL(zAxis), curPos.getZ() * getCncConfig()->getDisplayFactZ());
+	GET_UPD_THREAD->postAppPos(curPos);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos() {
@@ -478,7 +441,7 @@ bool CncControl::resetWatermarks() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::reset() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	wxASSERT( GET_UPD_THREAD );
 	
 	getSerial()->purge();
 	resetInterrupt();
@@ -495,12 +458,9 @@ bool CncControl::reset() {
 	setZeroPos();
 	
 	CncLongPosition cp = getControllerPos();
-	setValue(GET_GUI_CTL(xAxisCtl), cp.getX() * getCncConfig()->getDisplayFactX());
-	setValue(GET_GUI_CTL(yAxisCtl), cp.getY() * getCncConfig()->getDisplayFactY());
-	setValue(GET_GUI_CTL(zAxisCtl), cp.getZ() * getCncConfig()->getDisplayFactZ());
+	GET_UPD_THREAD->postCtlPos(cp);
 	
 	evaluateLimitState();
-	
 	switchToolOff();
 	
 	return true;
@@ -598,109 +558,35 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::moveUpZ() {
+void CncControl::changeWorkSpeedXY(CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	//std::cout << "CncControl::moveUpZ()" << std::endl;
-	
-	double dist = cncConfig->getCurZDistance();
-	double curZPos = curPos.getZ() * cncConfig->getDisplayFactZ(); // we need it as mm
-	double moveZ = 0.0;
-	
-	if ( curZPos != dist ) {
-		moveZ = dist - curZPos;
-		// correct round deviations
-		if ( moveZ < 0.00001 )
-			moveZ = 0.0;
-	}
-	
-	if ( (curZPos + moveZ) > cncConfig->getMaxZDistance() ) {
-		std::cerr << "CncControl::moveUpZ error:" << std::endl;
-		std::cerr << "Z(abs): " << curZPos + moveZ << std::endl;
-		std::cerr << "Z(cur): " << curZPos << std::endl;
-		std::cerr << "Z(mv):  " << moveZ << std::endl;
-		std::cerr << "Z(max): " << cncConfig->getMaxZDistance() << std::endl;
-		return false;
-	}
-	
-	bool ret = moveRelMetricZ(moveZ);
-	if ( ret ) {
-		zAxisDown = false;
-		updateZSlider();
-		changeWorkSpeedXY(CncSpeedFly);
-	} else {
-		std::cerr << "CncControl::moveUpZ() error: " << moveZ << ", " << curZPos << ", " << dist << std::endl;
-	}
-
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::moveDownZ() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	//std::cout << "CncControl::moveDownZ()" << std::endl;
-
-	double curZPos = curPos.getZ() * cncConfig->getDisplayFactZ(); // we need it as mm
-	double newZPos = cncConfig->getDurationPositionAbs(getDurationCounter());
-	double moveZ   = (curZPos - newZPos) * (-1);
-
-	if ( false ) {
-		std::clog << "moveDownZ:  " << std::endl;
-		std::clog << " zAxisDown  " << zAxisDown << std::endl;
-		std::clog << " curZPos:   " << curZPos << std::endl;
-		std::clog << " newZPos:   " << newZPos << std::endl;
-		std::clog << " moveZ:     "	<< moveZ << std::endl;
-		std::clog << " duration:  "	<< getDurationCounter() << std::endl;
-	}
-	
-	bool ret = moveRelMetricZ(moveZ);
-	if ( ret ) {
-		zAxisDown = true;
-		updateZSlider();
-		changeWorkSpeedXY(CncSpeedWork);
-	}
-	
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::changeWorkSpeedXY(CncSpeed s, bool force) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	if ( cncConfig->getSpeedType() == s )
+		return;
 	
 	cncConfig->setActiveSpeedXY(s);
 	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
 	processSetter(mmm, (s == CncSpeedWork));
 	processSetter(PID_SPEED_X, cncConfig->getSpeedX());
 	processSetter(PID_SPEED_Y, cncConfig->getSpeedY());
-	
-	if (GET_GUI_CTL(speedView) && toolUpdateState == true ) GET_GUI_CTL(speedView)->setCurrentSpeedX(cncConfig->getSpeedX());
-	if (GET_GUI_CTL(speedView) && toolUpdateState == true ) GET_GUI_CTL(speedView)->setCurrentSpeedY(cncConfig->getSpeedY());
-
-	if ( force == true )
-		updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeWorkSpeedZ(CncSpeed s, bool force) {
+void CncControl::changeWorkSpeedZ(CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
+	if ( cncConfig->getSpeedType() == s )
+		return;
+		
 	cncConfig->setActiveSpeedZ(s);
 	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
 	processSetter(mmm, (s == CncSpeedWork));
 	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
-	
-	if ( GET_GUI_CTL(speedView) && toolUpdateState == true ) GET_GUI_CTL(speedView)->setCurrentSpeedZ(cncConfig->getSpeedZ());
-
-	if ( force == true )
-		updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingStart() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	wxASSERT( GET_UPD_THREAD );
 	
-	setValue(GET_GUI_CTL(cmdDuration), "0");
-	setValue(GET_GUI_CTL(cmdCount), "0");
+	// update command values
+	GET_UPD_THREAD->postCmdValues(0, 0);
 	
 	ftime(&startTime);
 	commandCounter=0;
@@ -708,29 +594,23 @@ void CncControl::logProcessingStart() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingCurrent() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	wxASSERT( GET_UPD_THREAD );
 	
 	ftime(&endTime);
-	
-	int t_diff = (int) (1000.0 * (endTime.time - startTime.time) + (endTime.millitm - startTime.millitm));  
+	long t_diff = (long) (1000.0 * (endTime.time - startTime.time) + (endTime.millitm - startTime.millitm));  
 
-	setValue(GET_GUI_CTL(cmdDuration), t_diff);
-	setValue(GET_GUI_CTL(cmdCount), commandCounter);
+	// update command values
+	GET_UPD_THREAD->postCmdValues(commandCounter, t_diff);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingEnd(bool valuesOnly) {
-	wxASSERT(guiCtlSetup);
+	wxASSERT( GET_UPD_THREAD );
 	
-	// final set to compensate commandCounter%100
-	setValue(GET_GUI_CTL(xAxis), convertToDisplayUnit(curPos.getX(), cncConfig->getDisplayFactX()));
-	setValue(GET_GUI_CTL(yAxis), convertToDisplayUnit(curPos.getY(), cncConfig->getDisplayFactY()));
-	setValue(GET_GUI_CTL(zAxis), convertToDisplayUnit(curPos.getZ(), cncConfig->getDisplayFactZ()));
+	// update application position
+	GET_UPD_THREAD->postCtlPos(curPos);
 	
-	setValue(GET_GUI_CTL(xAxisCtl), convertToDisplayUnit(curCtlPos.getX(), cncConfig->getDisplayFactX()));
-	setValue(GET_GUI_CTL(yAxisCtl), convertToDisplayUnit(curCtlPos.getY(), cncConfig->getDisplayFactY()));
-	setValue(GET_GUI_CTL(zAxisCtl), convertToDisplayUnit(curCtlPos.getZ(), cncConfig->getDisplayFactZ()));
-
-	updateZSlider();
+	// update controller position
+	GET_UPD_THREAD->postCtlPos(curCtlPos);
 	
 	if ( valuesOnly == false )
 		logProcessingCurrent();
@@ -821,8 +701,8 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 		}
 	}
 	
-	if ( GET_GUI_CTL(mainWnd) != NULL )
-		GET_GUI_CTL(mainWnd)->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
+	if ( GET_GUI_CTL(mainFrame) != NULL )
+		GET_GUI_CTL(mainFrame)->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
 	
 	switch ( type ) {
 		
@@ -848,7 +728,7 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	wxASSERT( GET_UPD_THREAD );
 	
 	// Event handling, enables the interrrpt functionality
 	if ( cncConfig->isAllowEventHandling() ) {
@@ -867,15 +747,11 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			break;
 		
 		case CITPosition:
-			// Display coordinates
+			// display coordinates
 			if ( cncConfig->isOnlineUpdateCoordinates() ) {
+				// update controller position
 				curCtlPos = ci.controllerPos;
-				//todo update interval
-				if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
-					setValue(GET_GUI_CTL(xAxisCtl), convertToDisplayUnit(ci.controllerPos.getX(), cncConfig->getDisplayFactX()));
-					setValue(GET_GUI_CTL(yAxisCtl), convertToDisplayUnit(ci.controllerPos.getY(), cncConfig->getDisplayFactY()));
-					setValue(GET_GUI_CTL(zAxisCtl), convertToDisplayUnit(ci.controllerPos.getZ(), cncConfig->getDisplayFactZ()));
-				}
+				GET_UPD_THREAD->postCtlPos(ci.controllerPos);
 			}
 			
 			// pause hanling
@@ -931,26 +807,18 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 
 	// motion monitor
 	static CncMotionMonitor::VerticeData vd;
-	// todo . . . remove zAxisDown and penHandler
-	if ( zAxisDown == true )	vd.setWorkVertice(curPos);
-	else						vd.setFlyVertice(curPos);
-	
 	if ( IS_GUI_CTL_VALID(motionMonitor) ) {
+		vd.setVertice(cncConfig->getSpeedType(), curPos);
 		GET_GUI_CTL(motionMonitor)->appendVertice(vd);
 		updatePreview3D(false);
 	}
 
 	// Display coordinates
 	if ( cncConfig->isOnlineUpdateCoordinates() ) {
-		if ( commandCounter%cncConfig->getUpdateInterval() == 0 ) {
-			setValue(GET_GUI_CTL(xAxis), convertToDisplayUnit(curPos.getX(), cncConfig->getDisplayFactX()));
-			setValue(GET_GUI_CTL(yAxis), convertToDisplayUnit(curPos.getY(), cncConfig->getDisplayFactY()));
-			setValue(GET_GUI_CTL(zAxis), convertToDisplayUnit(curPos.getZ(), cncConfig->getDisplayFactZ()));
-			
-			logProcessingCurrent();
-		}
-	
-		updateZSlider();
+		// application position
+		GET_UPD_THREAD->postAppPos(curPos);
+		
+		logProcessingCurrent();
 	}
 	
 	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
@@ -1292,34 +1160,8 @@ bool CncControl::validatePositions() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( cncConfig->isModified() == false )
-		return;
-	
-	wxVector<wxVector<wxVariant>> rows;
-	if ( guiCtlSetup->staticCncConfig ) {
-		cncConfig->getStaticValues(rows);
-		GET_GUI_CTL(staticCncConfig)->Freeze();
-		GET_GUI_CTL(staticCncConfig)->DeleteAllItems();
-		for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-			wxVector<wxVariant> row = *it;
-			GET_GUI_CTL(staticCncConfig)->AppendItem(row);
-		}
-		GET_GUI_CTL(staticCncConfig)->Thaw();
-	}
-	
-	rows.clear();
-	if ( GET_GUI_CTL(dynamicCncConfig) ) {
-		cncConfig->getDynamicValues(rows);
-		GET_GUI_CTL(dynamicCncConfig)->Freeze();
-		GET_GUI_CTL(dynamicCncConfig)->DeleteAllItems();
-		for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-			wxVector<wxVariant> row = *it;
-			GET_GUI_CTL(dynamicCncConfig)->AppendItem(row);
-		}
-		GET_GUI_CTL(dynamicCncConfig)->Thaw();
-	}
+	wxASSERT( GET_UPD_THREAD );
+	GET_UPD_THREAD->postConfigUpdate(cncConfig);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::enableStepperMotors(bool s) {
@@ -1344,27 +1186,6 @@ void CncControl::enableStepperMotors(bool s) {
 	
 	if ( GET_GUI_CTL(motorState) )
 		GET_GUI_CTL(motorState)->Check(s);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::resetZSlider() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( guiCtlSetup->zView == NULL ) 
-		return;
-		
-	GET_GUI_CTL(zView)->resetAll();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::updateZSlider() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( guiCtlSetup->zView == NULL ) 
-		return;
-		
-	wxASSERT(cncConfig);
-	GET_GUI_CTL(zView)->updateView(curPos.getZ() * cncConfig->getDisplayFactZ(), *cncConfig);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::evaluateLimitState() {
@@ -1401,12 +1222,12 @@ void CncControl::displayLimitState(wxStaticText* ctl, bool value) {
 	if ( ctl != NULL ) {
 		if ( value == true ) {
 			ctl->SetLabel(wxString("1"));
-			ctl->SetBackgroundColour(*wxRED);
+			ctl->SetBackgroundColour(wxColour(255,128,128));
 			ctl->SetForegroundColour(*wxWHITE);
 			
 		} else {
 			ctl->SetLabel(wxString("0"));
-			ctl->SetBackgroundColour(*wxGREEN);
+			ctl->SetBackgroundColour(wxColour(181,230,29));
 			ctl->SetForegroundColour(*wxBLACK);
 
 		}

@@ -59,13 +59,20 @@ void ArduinoCMDs::init() {
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoCMDs::getCMDLabel(unsigned int id) {
+// not thread safe version - use instead getCMDLabel(unsigned int id, std::string& retVal) 
+/////////////////////////////////////////////////////////////////////////
+	return getCMDLabel(id, ArduinoCMDs::ret);
+}
+/////////////////////////////////////////////////////////////////////////
+const char* ArduinoCMDs::getCMDLabel(unsigned int id, std::string& retVal) {
+// thread safe version
 /////////////////////////////////////////////////////////////////////////
 	if ( id >= 0 && id < MAX_CMDS )
 		return cmds[id].c_str();
 
-	ret = "C [";
-	ret += std::to_string(id);
-	ret += "] is out of range";
+	retVal.assign("C [");
+	retVal.append(std::to_string(id));
+	retVal.append("] is out of range");
 	
 	return ret.c_str();
 }
@@ -173,15 +180,22 @@ void ArduinoPIDs::init() {
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {
+// not thread safe version - use instead getPIDLabel(unsigned int id, std::string& retVal) 
+/////////////////////////////////////////////////////////////////////////
+	return getPIDLabel(id, ret);
+}
+/////////////////////////////////////////////////////////////////////////
+const char* ArduinoPIDs::getPIDLabel(unsigned int id, std::string& retVal) {
+// thread safe version
 /////////////////////////////////////////////////////////////////////////
 	if ( id >= 0 && id < MAX_PIDS )
 		return pids[id].c_str();
 
-	ret = "PID [";
-	ret += std::to_string(id);
-	ret += "] is out of range";
+	retVal.assign("PID [");
+	retVal.append(std::to_string(id));
+	retVal.append("] is out of range");
 	
-	return ret.c_str();
+	return retVal.c_str();
 }
 
 std::string ArduinoErrorCodes::errorCodes[MAX_ERROR_CODES];
@@ -225,14 +239,21 @@ void ArduinoErrorCodes::init() {
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoErrorCodes::getECLabel(unsigned int id) {
+// not thread safe version - use instead getECLabel(unsigned int id, std::string& retVal) 
+/////////////////////////////////////////////////////////////////////////
+	return getECLabel(id, ArduinoErrorCodes::ret);
+}
+/////////////////////////////////////////////////////////////////////////
+const char* ArduinoErrorCodes::getECLabel(unsigned int id, std::string& retVal) {
+// thread safe version
 /////////////////////////////////////////////////////////////////////////
 	if ( id >= 0 && id < MAX_ERROR_CODES )
 		return errorCodes[id].c_str();
 
-	ret = "EC [";
-	ret += std::to_string(id);
-	ret += "] is out of range";
-	return ret.c_str();
+	retVal.assign("EC [");
+	retVal.append(std::to_string(id));
+	retVal.append("] is out of range");
+	return retVal.c_str();
 }
 
 std::string ArduinoDigitalPins::pins[MAX_PINS];
@@ -276,13 +297,20 @@ void ArduinoDigitalPins::init() {
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoDigitalPins::getPinLabel(unsigned int id) {
+// not thread safe version - use instead getPinLabel(unsigned int id, std::string& retVal) 
+/////////////////////////////////////////////////////////////////////////
+	return getPinLabel(id, ArduinoDigitalPins::ret);
+}
+/////////////////////////////////////////////////////////////////////////
+const char* ArduinoDigitalPins::getPinLabel(unsigned int id, std::string& retVal) {
+// thread safe version
 /////////////////////////////////////////////////////////////////////////
 	if ( id >= 0 && id < MAX_PINS )
 		return pins[id].c_str();
 
-	ret = "PIN [";
-	ret += std::to_string(id);
-	ret += "] is out of range";
+	retVal.assign("PIN [");
+	retVal.append(std::to_string(id));
+	retVal.append("] is out of range");
 	
 	return ret.c_str();
 }
@@ -300,13 +328,20 @@ void ArduinoAnalogPins::init() {
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoAnalogPins::getPinLabel(unsigned int id) {
+// not thread safe version - use instead getPinLabel(unsigned int id, std::string& retVal) 
+/////////////////////////////////////////////////////////////////////////
+	return getPinLabel(id, ArduinoAnalogPins::ret);
+}
+/////////////////////////////////////////////////////////////////////////
+const char* ArduinoAnalogPins::getPinLabel(unsigned int id, std::string& retVal) {
+// thread safe version
 /////////////////////////////////////////////////////////////////////////
 	if ( id >= 0 && id < MAX_PINS )
 		return pins[id].c_str();
 
-	ret = "PIN [";
-	ret += std::to_string(id);
-	ret += "] is out of range";
+	retVal.assign("PIN [");
+	retVal.append(std::to_string(id));
+	retVal.append("] is out of range");
 	
 	return ret.c_str();
 }

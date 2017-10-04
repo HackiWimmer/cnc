@@ -32,6 +32,7 @@
 #include "EndSwitchDialog.h"
 #include "CncFileNameService.h"
 #include "CncControllerTestSuite.h"
+#include "CncFilePreviewWnd.h"
 #include "SVGPathHandlerCnc.h"
 #include "GCodeFileParser.h"
 #include "GCodeFileParserOld.h"
@@ -39,6 +40,7 @@
 #include "SvgEditPopup.h"
 #include "HexDecoder.h"
 #include "UnitTestFrame.h"
+#include "UpdateManagerThread.h"
 #include "MainFrame.h"
 
 // special includes for WindowPoc handling. 
@@ -64,19 +66,24 @@ const char* _programVersion 	= "0.8.0.r";
 #define CL_LINE_SAVED_STYLE 201
 enum {MARGIN_LINE_NUMBERS, MARGIN_FOLD};
 
-wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
-	EVT_CLOSE(MainFrame::OnClose)
-	EVT_THREAD(wxEVT_COMMAND_MYTHREAD_UPDATE, MainFrame::OnThreadUpdate)
-	EVT_THREAD(wxEVT_COMMAND_MYTHREAD_COMPLETED, MainFrame::OnThreadCompletion)
-	EVT_TIMER(PERSPECTIVE_TIMER, MainFrame::OnPerspectiveTimer)
-wxEND_EVENT_TABLE()
 
-wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_COMPLETED, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_COMMAND_MYTHREAD_UPDATE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxThreadEvent);
+wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
+wxDEFINE_EVENT(wxEVT_XXX, wxCommandEvent);
+
+wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
+	EVT_CLOSE(MainFrame::onClose)
+	EVT_COMMAND(wxID_ANY, wxEVT_XXX, MainFrame::testFunction2)
+	EVT_THREAD(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, MainFrame::onThreadCompletion)
+	EVT_THREAD(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, MainFrame::onThreadUpdate)
+	EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, MainFrame::onPerspectiveTimer)
+wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
 MainFrame::MainFrame(wxWindow* parent)
 : MainFrameBClass(parent) 
+, updateManagerThread(NULL)
 , isCncControlInitialized(false)
 , isZeroReferenceValid(false)
 , canClose(true)
@@ -90,6 +97,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , defaultPortName(wxT(""))
 , cnc(new CncControl(CncEMU_NULL))
 , motionMonitor(NULL)
+, filePreviewWnd(new CncFilePreviewWnd(this))
 , serialSpy(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -107,7 +115,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , stcFileContentPopupMenu(NULL)
 , stcEmuContentPopupMenu(NULL)
 , inboundFileParser(NULL)
-, perspectiveTimer(this, wxID_HIGHEST + 1)
+, perspectiveTimer(this, wxEVT_PERSPECTIVE_TIMER)
 {
 ///////////////////////////////////////////////////////////////////
 	// detemine assert handler
@@ -141,7 +149,7 @@ MainFrame::~MainFrame() {
 	
 	// todo
 	//this->Unbind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent& event) {});
-
+	
 	wxASSERT(lruStore);
 	lruFileList.save(lruStore);
 	lruStore->Flush();
@@ -188,7 +196,6 @@ void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// overides the from wxcrafter generted method
-
 	event.Skip();
 	
 	if (event.IsDropDownClicked()) {
@@ -271,14 +278,6 @@ void MainFrame::install3DPane() {
 	std::clog << "Installing 3D draw pane . . . ";
 	motionMonitor = new CncMotionMonitor(parent, NULL);
 	motionMonitor->SetPosition(m_drawPane3D->GetPosition());
-	
-	/*
-	 * todo
-	motionMonitor->setPlayButton(m_3D_Animate);
-	motionMonitor->setTraceCtrl(m_trace3D);
-	motionMonitor->setSpinCtrls(m_spin3DAngelX, m_spin3DAngelY, m_spin3DAngelZ);
-	motionMonitor->view3D();
-	*/
 	
 	activate3DPerspectiveButton(m_3D_Perspective1);
 
@@ -430,16 +429,21 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 	// important to free the shared Pointer!
 	dlg.reset();
 }
-
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	filePreviewWnd->Show();
+	filePreviewWnd->previewFile("C:\\@Development\\@Projekte\\CNC-Templates\\@NC-Test.gcode", CncFilePreviewWnd::PreviewType::PT_GCODE);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	
+	filePreviewWnd->Show();
+	filePreviewWnd->previewFile("C:\\@Development\\@Projekte\\CNC-Templates\\@house.svg", CncFilePreviewWnd::PreviewType::PT_SVG);
 	
 	cout << "testFunction2"<< endl;
 	clog << "testFunction2"<< endl;
@@ -474,6 +478,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menues
 	hideAuiPane("Spy");
+	hideAuiPane("UnitCalculator");
+	
 	m_miToolbar->Check(m_auibarMain->IsShown());
 	m_miViewStatusbar->Check(m_statusBar->IsShown());
 	m_miViewTemplateManager->Check(m_scrollWinFile->IsShown());
@@ -542,7 +548,7 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::OnClose(wxCloseEvent& event) {
+void MainFrame::onClose(wxCloseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( checkIfTemplateIsModified() == false )
 		return;
@@ -565,6 +571,52 @@ void MainFrame::OnClose(wxCloseEvent& event) {
 			return;
 		}
 	}
+	
+	// Destroy the update manager thread
+	if ( updateManagerThread != NULL) {
+		updateManagerThread->stop();
+		
+		/*
+		while ( true ) {
+			{ // was the ~MyThread() function executed?
+				wxCriticalSectionLocker enter(pThreadCS);
+				if ( !updateManagerThread ) 
+					break;
+			}
+			// wait for thread completion
+			wxThread::This()->Sleep(10);
+		}
+		 * */
+	}
+	
+	//MessageBoxA(0,"","",0);
+	/* todo
+	 
+	// Destroy the update manager thread
+	{
+		wxCriticalSectionLocker enter(pThreadCS);
+		if ( updateManagerThread != NULL) {
+			std::clog << "Deleting update manager thread\n";
+			
+			if ( updateManagerThread->Delete() != wxTHREAD_NO_ERROR )
+				std::clog << "Can't delete the upadate manager thread!\n";
+				
+			std::clog << "Upadate manager thread is deleted\n";
+		}
+	}
+	// exit from the critical section to give the thread
+	// the possibility to enter its destructor
+	// (which is guarded with m_pThreadCS critical section!)
+    while ( true ) {
+        { // was the ~MyThread() function executed?
+            //wxCriticalSectionLocker enter(pThreadCS);
+            if ( !updateManagerThread ) 
+				;//break;
+        }
+        // wait for thread completion
+        wxThread::This()->Sleep(1);
+    }
+	 * */
 	
 	Destroy();
 }
@@ -723,10 +775,6 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 			
 			font = (ctl->StyleGetFont(wxSTC_GCODE_PARAM)).Bold();
 			ctl->StyleSetFont(wxSTC_GCODE_PARAM, font);
-			break;
-			
-		case TplText:
-			ctl->SetLexer(wxSTC_LEX_NULL);
 			break;
 			
 		default:
@@ -896,11 +944,37 @@ void MainFrame::setIcons() {
 		SetIcons( app_icons );
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::onThreadUpdate(wxThreadEvent& event) {
+///////////////////////////////////////////////////////////////////
+	std::clog << "OnThreadUpdate" << std::endl;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onThreadCompletion(wxThreadEvent& event) {
+///////////////////////////////////////////////////////////////////
+	std::clog << "OnThreadCompletion" << std::endl;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::initializeUpdateManagerThread() {
+///////////////////////////////////////////////////////////////////
+	// create the thread
+	updateManagerThread = new UpdateManagerThread(this);
+	wxThreadError error = updateManagerThread->Create();
+
+	if (error != wxTHREAD_NO_ERROR) {
+		wxMessageBox( _("Couldn't create update maanager thread!") );
+		abort();
+	}
+	
+	error = updateManagerThread->Run();
+	if (error != wxTHREAD_NO_ERROR) {
+		wxMessageBox( _("Couldn't run update manager thread!") );
+		abort();
+	}
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(m_portSelector);
-	wxASSERT(m_inputFileName);
-	wxASSERT(m_metricX); wxASSERT(m_metricY); wxASSERT(m_metricZ);
+	initializeUpdateManagerThread();
 
 	lruFileList.setListControl(m_lruList);
 	
@@ -908,7 +982,6 @@ void MainFrame::initialize(void) {
 	createStcFileControlPopupMenu();
 	createStcEmuControlPopupMenu();
 	decorateSearchButton();
-	decorateTemplateListBook();
 	switchMonitorButton(true);
 	determineRunMode();
 	registerGuiControls();
@@ -930,7 +1003,7 @@ void MainFrame::initialize(void) {
 	defaultPortName.assign(cfgStr);
 
 	// decorate dir control
-	m_dirCtrl->SetFilter("SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode|Text Files (*.txt)|*.txt"); 
+	m_dirCtrl->SetFilter("SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode"); 
 	m_dirCtrl->SetFilterIndex(0);
 
 	wxFloatingPointValidator<float> val2(1, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
@@ -1101,7 +1174,7 @@ bool MainFrame::initializeCncControl() {
 	updateCncConfigTrace();
 	
 	// z slider
-	cnc->updateZSlider();
+	updateManagerThread->postUpdateZView();
 	
 	//initilaize debug state
 	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
@@ -1232,37 +1305,18 @@ void MainFrame::selectPreconfiguredSpeedSetups(wxCommandEvent& event) {
 void MainFrame::determineCncOutputControls() {
 ///////////////////////////////////////////////////////////////////
 	//Determine output controls
+	guiCtlSetup->mainFrame			= this;
 	
-	guiCtlSetup->mainWnd			= this;
-	
-	guiCtlSetup->motionMonitor			= motionMonitor;
-	
-	guiCtlSetup->xAxis 				= m_xAxis;
-	guiCtlSetup->yAxis 				= m_yAxis;
-	guiCtlSetup->zAxis 				= m_zAxis;
-	
-	guiCtlSetup->xAxisCtl			= m_xAxisCtl;
-	guiCtlSetup->yAxisCtl			= m_yAxisCtl;
-	guiCtlSetup->zAxisCtl			= m_zAxisCtl;
-	
-	guiCtlSetup->cmdCount 			= m_cmdCount;
-	guiCtlSetup->cmdDuration 		= m_cmdDuration;
-	
-	guiCtlSetup->staticCncConfig	= m_dvListCtrlStatic;
-	guiCtlSetup->dynamicCncConfig 	= m_dvListCtrlDynamic;
+	guiCtlSetup->motionMonitor		= motionMonitor;
 	
 	guiCtlSetup->passingTrace		= m_passingCount;
 	guiCtlSetup->toolState 			= m_toolStateTrafficLight;
 	
-	guiCtlSetup->setterValues		= m_dvListCtrlLastSetters;
-	guiCtlSetup->processedSetters	= m_dvListCtrlProcessedSetters;
 	guiCtlSetup->controllerConfig	= m_dvListCtrlControllerConfig;
 	guiCtlSetup->controllerPinReport= m_dvListCtrlControllerPins;
 	guiCtlSetup->controllerErrorInfo= m_dvListCtrlControllerErrorInfo;
 	
 	guiCtlSetup->motorState 		= m_miMotorEnableState;
-	guiCtlSetup->zView				= m_zView;
-	guiCtlSetup->speedView			= m_speedView;
 	
 	guiCtlSetup->xMinLimit 			= m_xMinLimit;
 	guiCtlSetup->xMaxLimit 			= m_xMaxLimit;
@@ -1276,13 +1330,11 @@ void MainFrame::determineCncOutputControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateUnit() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(m_unit);
 	wxASSERT(cnc && cnc->getCncConfig());
 	wxASSERT(m_xAxis); wxASSERT(m_yAxis); wxASSERT(m_zAxis);
 
 	CncConfig* cncConfig = cnc->getCncConfig();
 	wxString unit = m_unit->GetValue();
-	CncUnit oldUnit = cncConfig->getUnit();
 
 	wxFloatingPointValidator<float> valX(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	wxFloatingPointValidator<float> valY(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
@@ -1306,7 +1358,7 @@ void MainFrame::updateUnit() {
 		cnc->getCncConfig()->setUnit(CncMetric); 
 		m_metricX->SetValue("0.000");
 		m_metricY->SetValue("0.000");
-		m_metricZEdit->SetValue("0.000");
+		m_metricZ->SetValue("0.000");
 	} else {
 		xLimit *= cncConfig->getStepsX();
 		yLimit *= cncConfig->getStepsY();
@@ -1315,7 +1367,7 @@ void MainFrame::updateUnit() {
 		cnc->getCncConfig()->setUnit(CncSteps);
 		m_metricX->SetValue("0");
 		m_metricY->SetValue("0");
-		m_metricZEdit->SetValue("0");
+		m_metricZ->SetValue("0");
 	}
 	
 	valX.SetRange(-xLimit, +xLimit);
@@ -1323,45 +1375,15 @@ void MainFrame::updateUnit() {
 	valZ.SetRange(-zLimit, +zLimit);
 	m_metricX->SetValidator(valX);
 	m_metricY->SetValidator(valY);
-	m_metricZEdit->SetValidator(valZ);
+	m_metricZ->SetValidator(valZ);
 	
 	// manual control
 	m_mmUnitX->SetLabel(unit);
 	m_mmUnitY->SetLabel(unit);
+	m_mmUnitZ->SetLabel(unit);
 
-	CncUnit newUnit = cncConfig->getUnit();
-	wxString x = m_xAxis->GetLineText(0);
-	wxString y = m_yAxis->GetLineText(0);
-	wxString z = m_zAxis->GetLineText(0);
-	double xd; x.ToCDouble(&xd);
-	double yd; y.ToCDouble(&yd);
-	double zd; z.ToCDouble(&zd);
-	
-	xd = cncConfig->convertX(oldUnit, newUnit, xd);
-	m_xAxis->Clear(); m_xAxis->SetValue(wxString() << xd);
-	
-	yd = cncConfig->convertY(oldUnit, newUnit, yd);
-	m_yAxis->Clear(); m_yAxis->SetValue(wxString() << yd);
-	
-	zd = cncConfig->convertZ(oldUnit, newUnit, zd);
-	m_zAxis->Clear(); m_zAxis->SetValue(wxString() << zd);
-	
-	x = m_xAxisCtl->GetLineText(0);
-	y = m_yAxisCtl->GetLineText(0);
-	z = m_zAxisCtl->GetLineText(0);
-	x.ToCDouble(&xd);
-	y.ToCDouble(&yd);
-	z.ToCDouble(&zd);
-
-	xd = cncConfig->convertX(oldUnit, newUnit, xd);
-	m_xAxisCtl->Clear(); m_xAxisCtl->SetValue(wxString() << xd);
-	
-	yd = cncConfig->convertY(oldUnit, newUnit, yd);
-	m_yAxisCtl->Clear(); m_yAxisCtl->SetValue(wxString() << yd);
-	
-	zd = cncConfig->convertZ(oldUnit, newUnit, zd);
-	m_zAxisCtl->Clear(); m_zAxisCtl->SetValue(wxString() << zd);
-	
+	// update controls
+	cnc->forceDisplayPositions();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::OnExit(wxCommandEvent& event) {
@@ -1430,16 +1452,16 @@ void MainFrame::selectPort(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::connectSerialPort() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
+	wxASSERT( cnc );
+	wxASSERT( updateManagerThread );
+	
 	wxBitmap bmpC = ImageLib16().Bitmap("BMP_CONNECTED");
 	wxBitmap bmpD = ImageLib16().Bitmap("BMP_DISCONNECTED");
-	
 	m_connect->SetBitmap(bmpD);
 	m_connect->Refresh();
 	m_connect->Update();
 	
 	startAnimationControl();
-	
 	m_serialTimer->Stop();
 	
 	if ( m_clearSerialSpyOnConnect->IsChecked() )
@@ -1448,6 +1470,11 @@ bool MainFrame::connectSerialPort() {
 	bool ret = false;
 	wxString sel(m_portSelector->GetStringSelection());
 	CncConfig cc(*cnc->getCncConfig());
+	
+	// to be thread safe during the connect . . .
+	// the cnc pointer will be deleted here
+	// and in this case the cnc config becomes invalid 
+	updateManagerThread->enableDisplay(false);
 	
 	delete cnc;
 	wxString cs;
@@ -1461,7 +1488,7 @@ bool MainFrame::connectSerialPort() {
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		cnc->updateCncConfig(cc);
-		cs.assign("NULL");
+		cs.assign("dev/null");
 		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
@@ -1478,6 +1505,12 @@ bool MainFrame::connectSerialPort() {
 		cs.append(sel);
 		m_miRqtIdleMessages->Check(true);
 	}
+	
+	wxASSERT(cnc);
+	
+	// now the cnc config is valis again
+	// reactivate the update manager thread
+	updateManagerThread->enableDisplay(true);
 
 	initializeCncControl();
 	lastPortName.clear();
@@ -1623,21 +1656,14 @@ void MainFrame::setZero() {
 	wxASSERT(cnc);
 	
 	bool ret = cnc->reset();
-	if ( ret == true  ) {
-		cnc->enableStepperMotors(true);
-		if ( cnc->moveUpZ() == false ) {
-			std::cerr << "MainFrame::setZero: Unable to initialize Z axis!"<< std::endl;
-			ret = false;
-		}
-	} else {
-		std::cerr << "MainFrame::setZero: Unable to reste the controller!"<< std::endl;
+	if ( ret == false  ) {
+		std::cerr << "MainFrame::setZero: Unable to reset the controller!"<< std::endl;
 	}
 	
 	if ( ret == true )
 		setRefPostionState(true);
 	
 	cnc->forceDisplayPositions();
-	cnc->enableStepperMotors(false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectUnit(wxCommandEvent& event) {
@@ -1811,7 +1837,8 @@ void MainFrame::updateCncConfigTrace() {
 	wxASSERT(cnc && cnc->getCncConfig());
 	
 	cnc->updateCncConfigTrace();
-	cnc->updateZSlider();
+	
+	updateManagerThread->postUpdateZView();
 	collectSummary();
 	
 	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", cnc->getCncConfig()->getRouterBitDiameter()));
@@ -1960,49 +1987,45 @@ void MainFrame::updateSpeedValues() {
 	double val; 
 	if ( fXY != 0 && wXY != 0 ) {
 		val = cnc->getCncConfig()->getMaxSpeedXY() * fXY/100;
-		cnc->getCncConfig()->setFlySpeedXY((int)val);
+		cnc->getCncConfig()->setRapidSpeedXY((int)val);
 
 		val = cnc->getCncConfig()->getMaxSpeedXY() * wXY/100;
 		cnc->getCncConfig()->setWorkSpeedXY((int)val);
 	} else {
-		cnc->getCncConfig()->setFlySpeedXY(1);
+		cnc->getCncConfig()->setRapidSpeedXY(1);
 		cnc->getCncConfig()->setWorkSpeedXY(1);
 	}
 
 	if ( fZ != 0 && wZ != 0 ) {
 		val = cnc->getCncConfig()->getMaxSpeedZ() * fZ/100;
-		cnc->getCncConfig()->setFlySpeedZ((int)val);
+		cnc->getCncConfig()->setRapidSpeedZ((int)val);
 
 		val = cnc->getCncConfig()->getMaxSpeedZ() * wZ/100;
 		cnc->getCncConfig()->setWorkSpeedZ((int)val);
 	} else {
-		cnc->getCncConfig()->setFlySpeedZ(1);
+		cnc->getCncConfig()->setRapidSpeedZ(1);
 		cnc->getCncConfig()->setWorkSpeedZ(1);
 	}
 	
 	if ( cnc->isConnected() ) {
-		if (selXY.MakeUpper() == "FLY")	cnc->changeWorkSpeedXY(CncSpeedFly, true);
-		else							cnc->changeWorkSpeedXY(CncSpeedWork, true);
+		if (selXY.MakeUpper() == "FLY")	cnc->changeWorkSpeedXY(CncSpeedRapid);
+		else							cnc->changeWorkSpeedXY(CncSpeedWork);
 		
-		if (selZ.MakeUpper()  == "FLY")	cnc->changeWorkSpeedZ(CncSpeedFly, true);
-		else							cnc->changeWorkSpeedZ(CncSpeedWork, true);
+		if (selZ.MakeUpper()  == "FLY")	cnc->changeWorkSpeedZ(CncSpeedRapid);
+		else							cnc->changeWorkSpeedZ(CncSpeedWork);
 		
 	} else {
-		cnc->getCncConfig()->setActiveSpeedXY(CncSpeedFly);
-		cnc->getCncConfig()->setActiveSpeedZ(CncSpeedFly);
+		cnc->getCncConfig()->setActiveSpeedXY(CncSpeedRapid);
+		cnc->getCncConfig()->setActiveSpeedZ(CncSpeedRapid);
 	}
 
 	updateCncConfigTrace();
+	
 	
 	m_speedView->setMaxSpeedX(cnc->getCncConfig()->getMaxSpeedXY());
 	m_speedView->setMaxSpeedY(cnc->getCncConfig()->getMaxSpeedXY());
 	m_speedView->setMaxSpeedZ(cnc->getCncConfig()->getMaxSpeedZ());
 
-	if ( m_menuItemToolControls->IsChecked() == true ) {
-		m_speedView->setCurrentSpeedX(cnc->getCncConfig()->getSpeedX());
-		m_speedView->setCurrentSpeedY(cnc->getCncConfig()->getSpeedY());
-		m_speedView->setCurrentSpeedZ(cnc->getCncConfig()->getSpeedZ());
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::defineMinMonitoring(wxCommandEvent& event) {
@@ -2170,7 +2193,6 @@ TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 	
 	if      ( ext == "SVG" )	return TplSvg;
 	else if ( ext == "GCODE") 	return TplGcode;
-	else if ( ext == "TXT") 	return TplText;
 
 	return TplUnknown;
 }
@@ -2238,14 +2260,6 @@ bool MainFrame::openFile(int pageToSelect) {
 				else					m_templateNotebook->SetSelection(pageToSelect);
 			}
 			break;
-		case TplText: 
-			ret = openTextFile();
-			if ( ret == true ) {
-				hideTplPreview();
-				if ( pageToSelect < 0 )	m_templateNotebook->SetSelection(TemplateContentPage);
-				else					m_templateNotebook->SetSelection(pageToSelect);
-			}
-			break;
 		default:
 			hideTplPreview();
 			std::cerr << "MainFrame::openFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
@@ -2278,11 +2292,10 @@ void MainFrame::introduceCurrentFile() {
 	
 	ignoreDirControlEvents = true;
 	{
-		//SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode|Text Files (*.txt)|*.txt
+		//SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode
 		switch ( getCurrentTemplateFormat() ) {
 			case TplSvg:	m_dirCtrl->SetFilterIndex(0); break;
 			case TplGcode:	m_dirCtrl->SetFilterIndex(1); break;
-			case TplText: 	m_dirCtrl->SetFilterIndex(2); break;
 			default: std::cerr << "MainFrame::introduceCurrentFile(): Invalid extention!" << std::endl;
 		}
 		
@@ -2353,7 +2366,7 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 								_("New Template File"), 
 								templateName,
 								"",
-                                "SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode|Text Files (*.txt)|*.txt", 
+                                "SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode", 
 								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
 	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
@@ -2390,7 +2403,7 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 								_("Open Template File"), 
 								templateName,
 								"",
-                                "SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode|Text Files (*.txt)|*.txt", 
+                                "SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode", 
 								wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
 	if ( openFileDialog.ShowModal() == wxID_CANCEL ) 
@@ -2518,7 +2531,6 @@ bool MainFrame::saveFile() {
 	switch ( getCurrentTemplateFormat() ) {
 		case TplSvg:
 		case TplGcode:
-		case TplText: 
 			ret = saveTextFile();
 			break;
 		default:
@@ -2580,7 +2592,7 @@ void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 	                            _("Save Template File"), 
 								getCurrentTemplatePathFileName(), 
 								"",
-								"SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode|Text Files (*.txt)|*.txt",  
+								"SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode",  
 								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 								
 	if (saveFileDialog.ShowModal() == wxID_CANCEL) 
@@ -2664,50 +2676,6 @@ bool MainFrame::processGCodeTemplate() {
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processTextTemplate() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(m_stcFileContent);
-
-	bool anythingDone = false;
-
-	// SVG Serial Emulator Support
-	cnc->getSerial()->beginSVG(mm, 
-	                           cnc->getCncConfig()->getMaxDimensionX(), 
-							   cnc->getCncConfig()->getMaxDimensionY());
-	cnc->getSerial()->beginPath(cnc->getCurPos().getX() * cnc->getCncConfig()->getDisplayFactX(), 
-	                            cnc->getCurPos().getY() * cnc->getCncConfig()->getDisplayFactY());
-	
-	for (long i=0; i<m_stcFileContent->GetNumberOfLines(); i++) {
-		m_stcFileContent->ShowPosition(i);
-		wxString line = m_stcFileContent->GetLineText(i);
-		line = line.Trim(false);
-		line = line.Trim(true);
-		
-		if ( !line.StartsWith("#") ) {
-			cnc->moveDownZ();
-			
-			if ( line.length() > 1 ) {
-				anythingDone = true;
-				cnc->processCommand(line.c_str(), std::cout);
-			} else if (line.length() == 1 ) {
-				anythingDone = true;
-				unsigned const char c = static_cast<unsigned char>(line[0]);
-				cnc->processCommand(c, std::cout);
-			}
-			
-			cnc->moveUpZ();
-		}
-	}
-	
-	// SVG Serial Emulator Support
-	cnc->getSerial()->closePath();
-	cnc->getSerial()->closeSVG();
-	
-	refreshSvgEmuFile();
-	
-	return anythingDone;
-}
-///////////////////////////////////////////////////////////////////
 bool MainFrame::processManualTemplate() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -2734,12 +2702,6 @@ bool MainFrame::processManualTemplate() {
 		
 		cnc->resetDurationCounter();
 
-		if ( m_metricZ->GetStringSelection() == "Up" ) {
-			cnc->moveUpZ();
-		} else {
-			cnc->moveDownZ();
-		}
-		
 		// transform to mm
 		if ( m_unit->GetValue() == "steps" ) {
 			xd *= cnc->getCncConfig()->getDisplayFactX();
@@ -2757,12 +2719,8 @@ bool MainFrame::processManualTemplate() {
 		cnc->manualSimpleMoveMetric(moveX, moveY, 0.0);
 		
 		cnc->resetDurationCounter();
-		cnc->enableStepperMotors(true);
-		cnc->moveUpZ();
-		cnc->enableStepperMotors(false);
-
 	} else {
-		wxString zs = m_metricZEdit->GetValue();
+		wxString zs = m_metricZ->GetValue();
 		double zd; 
 		if ( zs != "" )	zs.ToCDouble(&zd);
 		else			zd = 0.0;
@@ -3377,19 +3335,6 @@ void MainFrame::processTemplate() {
 	if ( checkIfRunCanBeProcessed() == false )
 		return;
 		 
-	if ( m_cbClearProceesdSetterList->GetStringSelection().MakeUpper() == "YES" ) {
-		m_dvListCtrlProcessedSetters->DeleteAllItems();
-	}
-	
-	if ( m_cbUseProceesdSetterList->GetStringSelection().MakeUpper() == "YES" ) {
-		 guiCtlSetup->processedSetters = m_dvListCtrlProcessedSetters;
-		 cnc->setGuiControls(guiCtlSetup);
-	} else {
-		m_dvListCtrlProcessedSetters->DeleteAllItems();
-		guiCtlSetup->processedSetters = NULL;
-		cnc->setGuiControls(guiCtlSetup);
-	}
-	
 	startAnimationControl();
 
 	// select draw pane
@@ -3413,7 +3358,6 @@ void MainFrame::processTemplate() {
 	cnc->logProcessingStart();
 	cnc->enableStepperMotors(true);
 	freezeLogger();
-	
 
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
@@ -3421,25 +3365,22 @@ void MainFrame::processTemplate() {
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			cnc->resetZSlider();
+			updateManagerThread->postResetZView();
 			ret = processSVGTemplate();
 			break;
 		case TplGcode:
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			cnc->resetZSlider();
+			updateManagerThread->postResetZView();
 			ret = processGCodeTemplate();
-			break;
-		case TplText:
-			ret = processTextTemplate();
 			break;
 		case TplManual: 
 			ret = processManualTemplate();
 			break;
 		case TplTest:
 			cnc->clearDrawControl();
-			cnc->resetZSlider();
+			updateManagerThread->postResetZView();
 			ret = processTestTemplate();
 			break;
 		default:
@@ -4328,7 +4269,7 @@ void MainFrame::moveManuallySliderZ(wxScrollEvent& event) {
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
-	m_metricZEdit->SetValue(val);
+	m_metricZ->SetValue(val);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableManuallyControls(bool force) {
@@ -4356,7 +4297,7 @@ void MainFrame::enableManuallyControls(bool force) {
 		
 	m_zManuallySlider->Enable(zFlag);
 	m_minManuallyZSlider->Enable(zFlag);
-	m_metricZEdit->Enable(zFlag);
+	m_metricZ->Enable(zFlag);
 	m_maxManuallyZSlider->Enable(zFlag);
 	m_zeroManuallyZSlider->Enable(zFlag);
 	m_signManuallyZSlider->Enable(zFlag);
@@ -4460,7 +4401,7 @@ void MainFrame::minManuallyZSlider(wxCommandEvent& event) {
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
-	m_metricZEdit->SetValue(val);
+	m_metricZ->SetValue(val);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::maxManuallyZSlider(wxCommandEvent& event) {
@@ -4473,7 +4414,7 @@ void MainFrame::maxManuallyZSlider(wxCommandEvent& event) {
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
-	m_metricZEdit->SetValue(val);
+	m_metricZ->SetValue(val);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::zeroManuallyXSlider(wxCommandEvent& event) {
@@ -4509,7 +4450,7 @@ void MainFrame::zeroManuallyZSlider(wxCommandEvent& event) {
 	} else {
 		val = wxString::Format(wxT("%4.3f"), 0.0);
 	}
-	m_metricZEdit->SetValue(val);
+	m_metricZ->SetValue(val);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::signManuallyXSlider(wxCommandEvent& event) {
@@ -4552,7 +4493,7 @@ void MainFrame::signManuallyYSlider(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::signManuallyZSlider(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString val = m_metricZEdit->GetValue();
+	wxString val = m_metricZ->GetValue();
 	double v;
 	val.ToDouble(&v);
 	if ( v != 0.0 )
@@ -4566,7 +4507,7 @@ void MainFrame::signManuallyZSlider(wxCommandEvent& event) {
 		m_zManuallySlider->SetValue(v);
 	}
 	
-	m_metricZEdit->SetValue(val);
+	m_metricZ->SetValue(val);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateMetricX(wxCommandEvent& event) {
@@ -4597,7 +4538,7 @@ void MainFrame::updateMetricY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateMetricZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString val = m_metricZEdit->GetValue();
+	wxString val = m_metricZ->GetValue();
 	double v;
 	val.ToDouble(&v);
 	
@@ -4606,11 +4547,6 @@ void MainFrame::updateMetricZ(wxCommandEvent& event) {
 	} else {
 		m_zManuallySlider->SetValue(v);
 	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::clearProcessedSetterList(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_dvListCtrlProcessedSetters->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectUAInboundPathList(wxDataViewEvent& event) {
@@ -4802,7 +4738,9 @@ void MainFrame::dirCtrlActivated(wxTreeEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::leaveLruList(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_lruList->DeselectAll();
+	int n = m_lruList->GetItemCount();
+	for (int i = 0; i < n; i++)
+		m_lruList->SetItemState(i, 0, wxLIST_STATE_SELECTED);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectCurrentFile(wxCommandEvent& event) {
@@ -4822,8 +4760,17 @@ void MainFrame::selectDefaultDirectory(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::lruListItemActivated(wxCommandEvent& event) {
+void MainFrame::lruListItemActivated(wxListEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxListItem info;
+	info.m_itemId = event.m_itemIndex;
+	info.m_col = 1;
+	info.m_mask = wxLIST_MASK_TEXT;
+	if ( m_lruList->GetItem(info) ) {
+		openFileFromFileManager(wxString(lruFileList.getFileName(info.m_itemId)));
+	}
+			
+/*
 	if ( m_lruList->GetStringSelection().length() > 0 ) {
 		int sel = m_lruList->GetSelection();
 		openFileFromFileManager(wxString(lruFileList.getFileName(sel)));
@@ -4832,14 +4779,25 @@ void MainFrame::lruListItemActivated(wxCommandEvent& event) {
 		//prepareTplPreview();
 		//highlightSvgPreview(false);
 	}
+	 * */
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::lruListItemSelected(wxCommandEvent& event) {
+void MainFrame::lruListItemSelected(wxListEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxListItem info;
+	info.m_itemId = event.m_itemIndex;
+	info.m_col = 1;
+	info.m_mask = wxLIST_MASK_TEXT;
+	if ( m_lruList->GetItem(info) ) {
+		updateSvgPreview(wxString(lruFileList.getFileName(info.m_itemId)));
+	}
+	
+	/*
 	if ( m_lruList->GetStringSelection().length() > 0 ) {
 		int sel = m_lruList->GetSelection();
 		updateSvgPreview(wxString(lruFileList.getFileName(sel)));
 	}
+	 * */
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::leaveEnterFileManagerControl(wxMouseEvent& event) {
@@ -5103,7 +5061,7 @@ void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::OnPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
+void MainFrame::onPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
 /////////////////////////////////////////////////////////////////////
 	if ( perspectiveTimer.IsRunning() == true )
 		perspectiveTimer.Stop();
@@ -5388,11 +5346,6 @@ void MainFrame::createStcFileControlPopupMenu() {
 		return;
 
 	stcFileContentPopupMenu = SvgEditPopup::createMenu(m_stcFileContent, stcFileContentPopupMenu, true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::decorateTemplateListBook() {
-///////////////////////////////////////////////////////////////////
-	m_templateToolbook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
@@ -6332,7 +6285,7 @@ void MainFrame::decorateSerialSpy() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::cfgStepDelayArduino(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_stepDelay->SetValue(125);
+	m_stepDelay->SetValue(int(m_stepDelay->GetMax() * 0.4));
 	updateStepDelay();
 }
 ///////////////////////////////////////////////////////////////////
@@ -6616,4 +6569,3 @@ void MainFrame::openPrevFile2(wxCommandEvent& event) {
 	wxString fn(m_svgPreviewFileName2->GetValue());
 	openFileExtern(wxT("notepad"), fn);
 }
-
