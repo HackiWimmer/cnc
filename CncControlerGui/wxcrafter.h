@@ -27,9 +27,10 @@
 #include <wx/slider.h>
 #include <wx/button.h>
 #include <wx/scrolwin.h>
-#include <wx/notebook.h>
+#include <wx/simplebook.h>
 #include <wx/panel.h>
 #include <wx/imaglist.h>
+#include <wx/notebook.h>
 #include <wx/statline.h>
 #include <wx/spinbutt.h>
 #include <wx/textctrl.h>
@@ -51,13 +52,11 @@
 #include <wx/webview.h>
 #include "CncSpeedView.h"
 #include <wx/listctrl.h>
-#include <wx/dirctrl.h>
-#include <wx/toolbook.h>
+#include <wx/splitter.h>
 #include "CncZView.h"
 #include <wx/timer.h>
-#include <wx/splitter.h>
 #include <wx/treectrl.h>
-#include <wx/simplebook.h>
+#include <wx/toolbook.h>
 #include <wx/collpane.h>
 #include <wx/dialog.h>
 #include <wx/bitmap.h>
@@ -114,6 +113,8 @@ protected:
     wxBitmapButton* m_controlerPause;
     wxButton* m_btnEmergenyStop;
     wxScrolledWindow* m_scrollWinMain;
+    wxSimplebook* m_mainViewBook;
+    wxPanel* m_mainBookStandardPanel;
     wxNotebook* m_mainNotebook;
     wxPanel* m_panelReference;
     wxStaticText* m_staticText779;
@@ -461,24 +462,39 @@ protected:
     wxTextCtrl* m_svgPreviewFileName1;
     wxButton* m_openPrevFile2;
     wxTextCtrl* m_svgPreviewFileName2;
+    wxPanel* m_mainBookPreviewPanel;
+    wxTextCtrl* m_textCtrl4343;
+    wxPanel* m_filePreviewPlaceholder;
     wxPanel* m_panelSpeed;
     wxStaticText* m_staticText28052;
     CncSpeedView* m_speedView;
-    wxScrolledWindow* m_scrollWinFile;
+    wxPanel* m_scrollWinFile;
     wxListCtrl* m_lruList;
-    wxStaticText* m_staticText1647;
-    wxGenericDirCtrl* m_dirCtrl;
-    wxButton* m_btDefaultDir;
-    wxButton* m_btCurrentFile;
+    wxStaticLine* m_staticLine4345;
+    wxPanel* m_mainFileViewPlaceholder;
     wxScrolledWindow* m_scrollWinLogger;
-    wxToolbook* m_loggerToolbook;
-    wxPanel* m_panel3157;
     wxBitmapButton* m_clearLogger;
     wxBitmapButton* m_freezeLogger;
     wxBitmapButton* m_copyLogger;
     wxCheckBox* m_showLoggerOnDemand;
     wxTextCtrl* m_logger;
     wxTextCtrl* m_tmpTraceInfo;
+    wxScrolledWindow* m_scrollSpy;
+    wxNotebook* m_notebook3835;
+    wxPanel* m_panel3809;
+    wxButton* m_enableSerialSpy;
+    wxButton* m_MarkSerialSpy;
+    wxButton* m_clearSerialSpy;
+    wxCheckBox* m_clearSerialSpyOnConnect;
+    wxSplitterWindow* m_splitter3821;
+    wxPanel* m_splitterPage3825;
+    wxTextCtrl* m_serialSpy;
+    wxPanel* m_splitterPage3829;
+    wxTextCtrl* m_serialSpyDetails;
+    wxPanel* m_panel3811;
+    wxPropertyGridManager* m_pgMgr3815;
+    wxPGProperty* m_pgProp3817;
+    wxPGProperty* m_pgProp3819;
     wxScrolledWindow* m_statusBar;
     wxStaticText* m_staticText3952;
     wxTextCtrl* m_cmdCount;
@@ -603,14 +619,6 @@ protected:
     wxPanel* m_svgEmuSource;
     wxBitmapToggleButton* m_svgEmuToggleWordWrap;
     wxStyledTextCtrl* m_stcEmuSource;
-    wxScrolledWindow* m_scrollSpy;
-    wxButton* m_enableSerialSpy;
-    wxButton* m_MarkSerialSpy;
-    wxButton* m_clearSerialSpy;
-    wxCheckBox* m_clearSerialSpyOnConnect;
-    wxTextCtrl* m_serialSpy;
-    wxStaticText* m_staticText27519;
-    wxTextCtrl* m_serialSpyDetails;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
     wxComboBox* m_cbUCUnitFrom;
@@ -836,18 +844,16 @@ protected:
     #endif // wxUSE_WEBVIEW
     virtual void openPrevFile1(wxCommandEvent& event) { event.Skip(); }
     virtual void openPrevFile2(wxCommandEvent& event) { event.Skip(); }
-    virtual void leaveEnterFileManagerControl(wxMouseEvent& event) { event.Skip(); }
     virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
-    virtual void dirCtrlChanged(wxTreeEvent& event) { event.Skip(); }
-    virtual void dirCtrlActivated(wxTreeEvent& event) { event.Skip(); }
-    virtual void selectDefaultDirectory(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectCurrentFile(wxCommandEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
+    virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
@@ -885,9 +891,6 @@ protected:
     virtual void emuContentRightDown(wxMouseEvent& event) { event.Skip(); }
     virtual void marginClickEmuSource(wxStyledTextEvent& event) { event.Skip(); }
     virtual void emuContentDClick(wxMouseEvent& event) { event.Skip(); }
-    virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCChangeFrom(wxCommandEvent& event) { event.Skip(); }
@@ -1285,25 +1288,40 @@ public:
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetPanelTemplateContent() { return m_panelTemplateContent; }
     wxNotebook* GetMainNotebook() { return m_mainNotebook; }
+    wxPanel* GetMainBookStandardPanel() { return m_mainBookStandardPanel; }
+    wxTextCtrl* GetTextCtrl4343() { return m_textCtrl4343; }
+    wxPanel* GetFilePreviewPlaceholder() { return m_filePreviewPlaceholder; }
+    wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
+    wxSimplebook* GetMainViewBook() { return m_mainViewBook; }
     wxScrolledWindow* GetScrollWinMain() { return m_scrollWinMain; }
     wxStaticText* GetStaticText28052() { return m_staticText28052; }
     CncSpeedView* GetSpeedView() { return m_speedView; }
     wxPanel* GetPanelSpeed() { return m_panelSpeed; }
     wxListCtrl* GetLruList() { return m_lruList; }
-    wxStaticText* GetStaticText1647() { return m_staticText1647; }
-    wxGenericDirCtrl* GetDirCtrl() { return m_dirCtrl; }
-    wxButton* GetBtDefaultDir() { return m_btDefaultDir; }
-    wxButton* GetBtCurrentFile() { return m_btCurrentFile; }
-    wxScrolledWindow* GetScrollWinFile() { return m_scrollWinFile; }
+    wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
+    wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
+    wxPanel* GetScrollWinFile() { return m_scrollWinFile; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetFreezeLogger() { return m_freezeLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
     wxCheckBox* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
     wxTextCtrl* GetLogger() { return m_logger; }
-    wxPanel* GetPanel3157() { return m_panel3157; }
-    wxToolbook* GetLoggerToolbook() { return m_loggerToolbook; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
     wxScrolledWindow* GetScrollWinLogger() { return m_scrollWinLogger; }
+    wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
+    wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
+    wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
+    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
+    wxTextCtrl* GetSerialSpy() { return m_serialSpy; }
+    wxPanel* GetSplitterPage3825() { return m_splitterPage3825; }
+    wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
+    wxPanel* GetSplitterPage3829() { return m_splitterPage3829; }
+    wxSplitterWindow* GetSplitter3821() { return m_splitter3821; }
+    wxPanel* GetPanel3809() { return m_panel3809; }
+    wxPropertyGridManager* GetPgMgr3815() { return m_pgMgr3815; }
+    wxPanel* GetPanel3811() { return m_panel3811; }
+    wxNotebook* GetNotebook3835() { return m_notebook3835; }
+    wxScrolledWindow* GetScrollSpy() { return m_scrollSpy; }
     wxStaticText* GetStaticText3952() { return m_staticText3952; }
     wxTextCtrl* GetCmdCount() { return m_cmdCount; }
     wxStaticText* GetStaticText395() { return m_staticText395; }
@@ -1425,14 +1443,6 @@ public:
     wxPanel* GetSvgEmuSource() { return m_svgEmuSource; }
     wxNotebook* GetOutboundNotebook() { return m_outboundNotebook; }
     wxScrolledWindow* GetScrollOutbound() { return m_scrollOutbound; }
-    wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
-    wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
-    wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
-    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
-    wxTextCtrl* GetSerialSpy() { return m_serialSpy; }
-    wxStaticText* GetStaticText27519() { return m_staticText27519; }
-    wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
-    wxScrolledWindow* GetScrollSpy() { return m_scrollSpy; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }
     wxComboBox* GetCbUCUnitFrom() { return m_cbUCUnitFrom; }
     wxStaticText* GetStaticText3259() { return m_staticText3259; }
@@ -1673,6 +1683,36 @@ public:
 };
 
 
+class CncFileViewBase : public wxPanel
+{
+protected:
+    wxBitmapButton* m_bmpButton3851;
+    wxBitmapButton* m_bmpButton38751;
+    wxBitmapButton* m_bmpButton38754;
+    wxListCtrl* m_fileList;
+    wxComboBox* m_filterExtention;
+    wxTextCtrl* m_currentDirectory;
+
+protected:
+    virtual void aFolderUp(wxCommandEvent& event) { event.Skip(); }
+    virtual void refresh(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectDefault(wxCommandEvent& event) { event.Skip(); }
+    virtual void fileListActivated(wxListEvent& event) { event.Skip(); }
+    virtual void fileListSelected(wxListEvent& event) { event.Skip(); }
+    virtual void selectFilter(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxBitmapButton* GetBmpButton3851() { return m_bmpButton3851; }
+    wxBitmapButton* GetBmpButton38751() { return m_bmpButton38751; }
+    wxBitmapButton* GetBmpButton38754() { return m_bmpButton38754; }
+    wxListCtrl* GetFileList() { return m_fileList; }
+    wxComboBox* GetFilterExtention() { return m_filterExtention; }
+    wxTextCtrl* GetCurrentDirectory() { return m_currentDirectory; }
+    CncFileViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~CncFileViewBase();
+};
+
+
 class GL3DOptionsBase : public wxFrame
 {
 protected:
@@ -1887,6 +1927,35 @@ public:
     }
 
     virtual ~ImageLib24();
+};
+
+
+class ImageLibFile : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibFile();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibFile();
 };
 
 

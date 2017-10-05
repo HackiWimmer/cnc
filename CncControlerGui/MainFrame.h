@@ -13,10 +13,12 @@
 #include "CncControl.h"
 #include "CncMotionMonitor.h"
 #include "CncSpyControl.h"
+#include "CncFileView.h"
 #include "codelite/wxPNGAnimation.h"
 
 class wxFileConfig;
 class CncFilePreviewWnd;
+class CncFilePreview;
 class wxMenu;
 class wxMenuItem;
 
@@ -25,6 +27,9 @@ enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
 wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxThreadEvent);
 wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxThreadEvent);
 wxDECLARE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
+wxDECLARE_EVENT(wxEVT_OPEN_FILE_FROM_FILE_VIEW, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_PREVIEW_FILE_FROM_FILE_VIEW, wxCommandEvent);
+
 wxDECLARE_EVENT(wxEVT_XXX, wxCommandEvent);
 
 ////////////////////////////////////////////////////////////////////
@@ -262,10 +267,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void killFocusMoveXYAxis(wxFocusEvent& event);
 		virtual void setFocusMoveXYAxis(wxFocusEvent& event);
 		virtual void setFocusMoveZAxis(wxFocusEvent& event);
-		virtual void dirCtrlActivated(wxTreeEvent& event);
-		virtual void dirCtrlChanged(wxTreeEvent& event);
-		virtual void selectCurrentFile(wxCommandEvent& event);
-		virtual void selectDefaultDirectory(wxCommandEvent& event);
 		virtual void leaveLruList(wxMouseEvent& event);
 		virtual void leaveEnterFileManagerControl(wxMouseEvent& event);
 		virtual void viewMainView(wxCommandEvent& event);
@@ -314,8 +315,7 @@ class MainFrame : public MainFrameBClass {
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
-		void install3DPane();
-		void installSypControl();
+		void installCustControls();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// svg edit popup callbacks
@@ -359,6 +359,7 @@ class MainFrame : public MainFrameBClass {
 		CncSpeedView* getSpeedView() { return m_speedView; }
 		
 		friend class UpdateManagerThread;
+		friend class CncFileView;
 		
 	private:
 		// Member variables
@@ -381,6 +382,8 @@ class MainFrame : public MainFrameBClass {
 		CncMotionMonitor* motionMonitor;
 		CncFilePreviewWnd* filePreviewWnd;
 		CncSpyControl* serialSpy;
+		CncFileView* fileView;
+		CncFilePreview* filePreview;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -424,7 +427,8 @@ class MainFrame : public MainFrameBClass {
 		
 		void introduceCurrentFile();
 		
-		void openSvgPreview(const wxString& fn, TemplateFormat format);
+		void openPreview(const wxString& fn);
+		void openPreview(const wxString& fn, TemplateFormat format);
 		void updateSvgPreview(const wxString& fn);
 		void openFileFromFileManager(const wxString& fn);
 		void highlightTplPreview(bool state);

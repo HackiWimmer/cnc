@@ -131,9 +131,13 @@
   <object class="wxBitmap" name="BMP_DISCONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
+  <object class="wxBitmap" name="BMP_ERROR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\picture-error (2).png</object>
+  <object class="wxBitmap" name="BMP_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bricks.png</object>
   <object class="wxBitmap" name="BMP_FINGER16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-finger.png</object>
   <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-finger@2x.png</object>
   <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-finger@2x.png</object>
+  <object class="wxBitmap" name="BMP_FOLDER">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\folder (2).png</object>
+  <object class="wxBitmap" name="BMP_FOLDER_UP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="BMP_FROZEN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-x-close.png</object>
   <object class="wxBitmap" name="BMP_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="BMP_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-x-close@2x.png</object>
@@ -229,11 +233,12 @@
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>
+  <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
   <object class="wxBitmap" name="media-repeat-blue">bitmaps\media-repeat-blue.png</object>
+  <object class="wxBitmap" name="meeting-organizer">bitmaps\meeting-organizer.png</object>
   <object class="wxBitmap" name="mill">bitmaps\mill.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
-  <object class="wxBitmap" name="page_white_database">bitmaps\page_white_database.png</object>
   <object class="wxBitmap" name="resize">bitmaps\resize.png</object>
   <object class="wxBitmap" name="runRelease">bitmaps\Icons\runRelease.ico</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
@@ -241,4 +246,6 @@
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="tools-report-bug1">bitmaps\tools-report-bug1.png</object>
+  <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
+  <object class="wxBitmap" name="workspace">bitmaps\workspace.png</object>
 </resource>

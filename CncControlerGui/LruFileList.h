@@ -32,7 +32,7 @@ class LruFileList {
 				listControl->AppendColumn("Last recently used:", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
 				
 				imageList->RemoveAll();
-				imageList->Add(ImageLib16().Bitmap("BMP_LRU_FILE"));
+				imageList->Add(ImageLibFile().Bitmap("BMP_LRU_FILE"));
 				
 				listControl->SetImageList(imageList, wxIMAGE_LIST_SMALL);
 				

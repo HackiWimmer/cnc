@@ -1,5 +1,6 @@
 #include <iostream>
 #include <wx/filename.h>
+#include "GlobalFunctions.h"
 #include "CncFilePreviewWnd.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -18,22 +19,8 @@ CncFilePreviewWnd::~CncFilePreviewWnd() {
 ///////////////////////////////////////////////////////////////////
 void CncFilePreviewWnd::installContent() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( m_previewPlaceHolder );
-		
-	wxWindow* parent = m_previewPlaceHolder->GetParent();
-	wxSizer* sizer   = m_previewPlaceHolder->GetContainingSizer();
-	
-	wxASSERT( parent != NULL );
-	wxASSERT( sizer != NULL );
-
-	preview = new CncFilePreview(parent);
-	preview->SetPosition(m_previewPlaceHolder->GetPosition());
-
-	sizer->Replace(m_previewPlaceHolder, preview, true);
-	sizer->Layout();
-	
-	// remove the placeholder
-	m_previewPlaceHolder->Destroy();
+	preview = new CncFilePreview(this);
+	GblFunc::replaceControl(m_previewPlaceHolder, preview);
 }
 ///////////////////////////////////////////////////////////////////
 CncFilePreviewWnd::PreviewType CncFilePreviewWnd::autoDetectPreviewType(const wxString& fileName) {

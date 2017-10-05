@@ -24,6 +24,7 @@
 #include <wx/txtstrm.h>
 #include <wx/vscroll.h>
 #include <wx/textdlg.h>
+#include "GlobalFunctions.h"
 #include "SerialPort.h"
 #include "CncPosition.h"
 #include "CncUsbPortScanner.h"
@@ -75,9 +76,15 @@ wxDEFINE_EVENT(wxEVT_XXX, wxCommandEvent);
 wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 	EVT_CLOSE(MainFrame::onClose)
 	EVT_COMMAND(wxID_ANY, wxEVT_XXX, MainFrame::testFunction2)
+	
 	EVT_THREAD(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, MainFrame::onThreadCompletion)
 	EVT_THREAD(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, MainFrame::onThreadUpdate)
+	
 	EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, MainFrame::onPerspectiveTimer)
+	/*
+wxDECLARE_EVENT(wxEVT_OPEN_FILE_FROM_FILE_VIEW, wxCommandEvent);
+wxDECLARE_EVENT(wxEVT_PREVIEW_FILE_FROM_FILE_VIEW, wxCommandEvent);
+ * */
 wxEND_EVENT_TABLE()
 
 ///////////////////////////////////////////////////////////////////
@@ -99,6 +106,8 @@ MainFrame::MainFrame(wxWindow* parent)
 , motionMonitor(NULL)
 , filePreviewWnd(new CncFilePreviewWnd(this))
 , serialSpy(NULL)
+, fileView(NULL)
+, filePreview(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -125,8 +134,7 @@ MainFrame::MainFrame(wxWindow* parent)
 	setIcons();
 	
 	// do this definitely here later it will causes a crash 
-	install3DPane();
-	installSypControl();
+	installCustControls();
 	
 	//m_templateNotebook->SetSelection(TemplatePreviewPage);
 	
@@ -258,66 +266,24 @@ void MainFrame::enableGuiControls(bool state) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::install3DPane() {
+void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( m_drawPane3D );
-		
-	wxWindow* parent = m_drawPane3D->GetParent();
-	wxSizer* sizer   = m_drawPane3D->GetContainingSizer();
-	
-	if ( parent == NULL ) {
-		std::cerr << "MainFrame::install3DPane(): Invalid parent pointer." << std::endl;
-		return;
-	}
-	
-	if ( sizer == NULL ) {
-		std::cerr << "MainFrame::install3DPane(): Invalid sizer pointer." << std::endl;
-		return;
-	}
-	
-	std::clog << "Installing 3D draw pane . . . ";
-	motionMonitor = new CncMotionMonitor(parent, NULL);
-	motionMonitor->SetPosition(m_drawPane3D->GetPosition());
-	
+	// Montion Monitor
+	motionMonitor = new CncMotionMonitor(this, NULL);
+	GblFunc::replaceControl(m_drawPane3D, motionMonitor);
 	activate3DPerspectiveButton(m_3D_Perspective1);
-
-	sizer->Replace(m_drawPane3D, motionMonitor, true);
-	sizer->Layout();
-	std::clog << "Done" << std::endl;
 	
-	// remove the placeholder
-	m_drawPane3D->Destroy();
-	//delete m_drawPane3D;
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::installSypControl() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT( m_serialSpy );
-		
-	wxWindow* parent = m_serialSpy->GetParent();
-	wxSizer* sizer   = m_serialSpy->GetContainingSizer();
+	//Spy
+	serialSpy = new CncSpyControl(this, wxID_ANY, m_serialSpyDetails);
+	GblFunc::replaceControl(m_serialSpy, serialSpy);
 	
-	if ( parent == NULL ) {
-		std::cerr << "MainFrame::installSypControl(): Invalid parent pointer." << std::endl;
-		return;
-	}
+	// File View
+	fileView = new CncFileView(this);
+	GblFunc::replaceControl(m_mainFileViewPlaceholder, fileView);
 	
-	if ( sizer == NULL ) {
-		std::cerr << "MainFrame::installSypControl(): Invalid sizer pointer." << std::endl;
-		return;
-	}
-	
-	std::clog << "Installing Spy Control . . . ";
-	serialSpy = new CncSpyControl(parent, wxID_ANY, m_serialSpyDetails);
-	serialSpy->SetPosition(m_serialSpy->GetPosition());
-
-	sizer->Replace(m_serialSpy, serialSpy, true);
-	sizer->Layout();
-	std::clog << "Done" << std::endl;
-	
-	// remove the placeholder
-	m_serialSpy->Destroy();
-	//delete m_serialSpy;
+	// File Preview
+	filePreview = new CncFilePreview(this);
+	GblFunc::replaceControl(m_filePreviewPlaceholder, filePreview);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -383,7 +349,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btRequestCtlPins);
 	registerGuiControl(m_btRequestCtlErrorInfo);
 	registerGuiControl(m_lruList);
-	registerGuiControl(m_dirCtrl);
+	registerGuiControl(fileView);
 	registerGuiControl(m_svgEmuResult);
 	registerGuiControl(m_svgEmuOpenFileAsSvg);
 	registerGuiControl(m_svgEmuReload);
@@ -434,16 +400,14 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	filePreviewWnd->Show();
-	filePreviewWnd->previewFile("C:\\@Development\\@Projekte\\CNC-Templates\\@NC-Test.gcode", CncFilePreviewWnd::PreviewType::PT_GCODE);
+	m_mainViewBook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
-	filePreviewWnd->Show();
-	filePreviewWnd->previewFile("C:\\@Development\\@Projekte\\CNC-Templates\\@house.svg", CncFilePreviewWnd::PreviewType::PT_SVG);
+	m_mainViewBook->SetSelection(1);
 	
 	cout << "testFunction2"<< endl;
 	clog << "testFunction2"<< endl;
@@ -454,8 +418,11 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
 	
+	filePreviewWnd->Show();
+	/*
 	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("Outbound");
 	cnc::cex1 << GetAuimgrMain()->SavePerspective() << endl;
+	 * */
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -477,7 +444,7 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menues
-	hideAuiPane("Spy");
+	//hideAuiPane("Spy");
 	hideAuiPane("UnitCalculator");
 	
 	m_miToolbar->Check(m_auibarMain->IsShown());
@@ -1002,10 +969,6 @@ void MainFrame::initialize(void) {
 	m_portSelector->SetStringSelection(cfgStr);
 	defaultPortName.assign(cfgStr);
 
-	// decorate dir control
-	m_dirCtrl->SetFilter("SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode"); 
-	m_dirCtrl->SetFilterIndex(0);
-
 	wxFloatingPointValidator<float> val2(1, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val2.SetRange(0, 50.0);
 	m_workpieceThickness->SetValidator(val2);
@@ -1082,6 +1045,7 @@ void MainFrame::initialize(void) {
 	config->Read("CncConfig/Debug", &cfgStr, "false"); 
 	if ( cfgStr == "true" ) { m_menuItemDebugSerial->Check(true); }
 	else				    { m_menuItemDebugSerial->Check(false); }
+	
 	decorateSerialSpy();
 	
 	resetMinMaxPositions();
@@ -1190,8 +1154,12 @@ bool MainFrame::initializeLruMenu() {
 	lruFileList.load(lruStore);
 	
 	wxString cfgStr;
-	config->Read("DefaultTemplate/Filename", &cfgStr, wxT(""));
 	
+	config->Read("DefaultTemplate/DefaultDir", &cfgStr, wxT(""));
+	fileView->setDefaultPath(cfgStr);
+	fileView->selectDefaultPath();
+	
+	config->Read("DefaultTemplate/Filename", &cfgStr, wxT(""));
 	wxFileName fn;
 	if ( cfgStr.length() > 0 ) 	fn.Assign(cfgStr);
 	else 						fn.Assign(lruFileList.getFileName(0));
@@ -1205,8 +1173,7 @@ bool MainFrame::initializeLruMenu() {
 		introduceCurrentFile();
 	} else {
 		config->Read("DefaultTemplate/DefaultDir", &cfgStr, wxT(""));
-		m_dirCtrl->SetPath(cfgStr);
-		m_dirCtrl->ExpandPath(cfgStr);
+		fileView->openDirectory(cfgStr);
 		updateSvgPreview("");
 		highlightTplPreview(false);
 				
@@ -2289,24 +2256,7 @@ bool MainFrame::openFile(int pageToSelect) {
 void MainFrame::introduceCurrentFile() {
 ///////////////////////////////////////////////////////////////////
 	lruFileList.addFile(getCurrentTemplatePathFileName());
-	
-	ignoreDirControlEvents = true;
-	{
-		//SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode
-		switch ( getCurrentTemplateFormat() ) {
-			case TplSvg:	m_dirCtrl->SetFilterIndex(0); break;
-			case TplGcode:	m_dirCtrl->SetFilterIndex(1); break;
-			default: std::cerr << "MainFrame::introduceCurrentFile(): Invalid extention!" << std::endl;
-		}
-		
-		if ( m_dirCtrl->GetFilterListCtrl() ) 
-			m_dirCtrl->GetFilterListCtrl()->Select(m_dirCtrl->GetFilterIndex());
-			
-		m_dirCtrl->ReCreateTree();
-		m_dirCtrl->SetPath(getCurrentTemplatePathFileName());
-		m_dirCtrl->ExpandPath(getCurrentTemplatePathFileName());
-	}
-	ignoreDirControlEvents = false;
+	fileView->selectFileInList(getCurrentTemplatePathFileName());
 	highlightTplPreview(false);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3524,7 +3474,7 @@ void MainFrame::prepareTplPreview(bool force) {
 		file.Write();
 		file.Close();
 		
-		openSvgPreview(tfn, getCurrentTemplateFormat());
+		openPreview(tfn, getCurrentTemplateFormat());
 		
 	} else {
 		std::cerr << "Error creating a temp file: " << tfn.c_str() << std::endl;
@@ -4641,7 +4591,26 @@ void MainFrame::updateCurveLibResolution() {
 	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::openSvgPreview(const wxString& fn, TemplateFormat format) {
+void MainFrame::openPreview(const wxString& fn) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(filePreview);
+	
+	m_mainViewBook->SetSelection(1);
+	TemplateFormat tf = getCurrentTemplateFormat(fn);
+	
+	switch ( tf ) {
+		case TplSvg:		filePreview->selectSVGPreview(fn);
+							break;
+							
+		case TplGcode:		filePreview->selectGCodePreview(fn);
+							break;
+		
+		default:			cnc::trc.logError(wxString("Cant preview: ") + fn );
+							break;
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::openPreview(const wxString& fn, TemplateFormat format) {
 ///////////////////////////////////////////////////////////////////
 	wxString url;
 	wxString tmpPreview("Default html page");
@@ -4689,12 +4658,17 @@ void MainFrame::updateSvgPreview(const wxString& fn) {
 		highlightTplPreview(true);
 		m_panelTplPreview->Refresh();
 
-		openSvgPreview(fn, getCurrentTemplateFormat(fn));
+		openPreview(fn, getCurrentTemplateFormat(fn));
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openFileFromFileManager(const wxString& f) {
 ///////////////////////////////////////////////////////////////////
+
+
+std::clog << "MainFrame::openFileFromFileManager: "<< f << std::endl;
+
+
 	if ( checkIfTemplateIsModified() == false ) {
 		prepareTplPreview();
 		highlightTplPreview(false);
@@ -4708,56 +4682,11 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 	openFile();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::dirCtrlChanged(wxTreeEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( ignoreDirControlEvents == true )
-		return;
-
-	//event.Skip(true);
-	
-	wxString sel = m_dirCtrl->GetFilePath();
-	if ( sel.length() <= 0 ) 
-		return;
-		
-	// update preview
-	updateSvgPreview(m_dirCtrl->GetFilePath());
-	
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::dirCtrlActivated(wxTreeEvent& event) {
-///////////////////////////////////////////////////////////////////
-	//event.Skip(true);
-	
-	wxString sel = m_dirCtrl->GetFilePath();
-	if ( sel.length() <= 0 ) 
-		return;
-	
-	openFileFromFileManager(m_dirCtrl->GetFilePath());
-	highlightTplPreview(false);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::leaveLruList(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	int n = m_lruList->GetItemCount();
 	for (int i = 0; i < n; i++)
 		m_lruList->SetItemState(i, 0, wxLIST_STATE_SELECTED);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectCurrentFile(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_dirCtrl->SetPath(getCurrentTemplatePathFileName());
-	m_dirCtrl->ExpandPath(getCurrentTemplatePathFileName());
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectDefaultDirectory(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString cfgStr;
-	config->Read("DefaultTemplate/DefaultDir", &cfgStr, wxT(""));
-	
-	if ( cfgStr != "" ) {
-		m_dirCtrl->SetPath(cfgStr);
-		m_dirCtrl->ExpandPath(cfgStr);
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemActivated(wxListEvent& event) {
@@ -4769,17 +4698,6 @@ void MainFrame::lruListItemActivated(wxListEvent& event) {
 	if ( m_lruList->GetItem(info) ) {
 		openFileFromFileManager(wxString(lruFileList.getFileName(info.m_itemId)));
 	}
-			
-/*
-	if ( m_lruList->GetStringSelection().length() > 0 ) {
-		int sel = m_lruList->GetSelection();
-		openFileFromFileManager(wxString(lruFileList.getFileName(sel)));
-
-		//Not necessary will be already released by openFileFromFileManager
-		//prepareTplPreview();
-		//highlightSvgPreview(false);
-	}
-	 * */
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemSelected(wxListEvent& event) {
@@ -4853,10 +4771,11 @@ void MainFrame::showAuiPane(wxWindow* pane, wxMenuItem* menu) {
 	if ( pane == getAUIPaneByName("Spy") ) {
 		enableSerialSpy(true);
 		GetAuimgrMain()->GetPane(pane).Floatable(true);
+		/*
 		GetAuimgrMain()->GetPane(pane).Dockable(false);
 		GetAuimgrMain()->GetPane(pane).Float();
 		GetAuimgrMain()->GetPane(pane).FloatingSize(600,500);
-		
+		*/
 		GetAuimgrMain()->Update();
 	}
 	
