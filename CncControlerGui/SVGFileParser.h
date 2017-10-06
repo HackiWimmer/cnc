@@ -22,9 +22,11 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 	
 	protected:
 	
-		bool cncNodeBreak;
+		CncControl* cncControl;
 		SVGPathHandlerCnc* pathHandler;
 		SVGUserAgent svgUserAgent;
+		
+		bool cncNodeBreak;
 
 		wxXmlDocument svgTrace;
 

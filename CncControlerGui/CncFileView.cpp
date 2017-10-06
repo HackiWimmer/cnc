@@ -150,7 +150,7 @@ bool CncFileView::openFile(const wxString& fileName) {
 bool CncFileView::previewFile(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
 	wxASSERT(mainFrame);
-	mainFrame->openPreview(fileName);
+	mainFrame->openMainPreview(fileName);
 	return true;
 }
 /////////////////////////////////////////////////////////////////
@@ -182,6 +182,11 @@ bool CncFileView::selectFileInList(const wxString& fileName) {
 	}
 	
 	return false;
+}
+/////////////////////////////////////////////////////////////////
+void CncFileView::fileListLeave(wxMouseEvent& event) {
+	wxASSERT(mainFrame);
+	mainFrame->selectMainBookSourcePanel();
 }
 /////////////////////////////////////////////////////////////////
 void CncFileView::fileListActivated(wxListEvent& event) {
@@ -292,3 +297,4 @@ void CncFileView::selectFilter(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////
 	refresh(event);
 }
+

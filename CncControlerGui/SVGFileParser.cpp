@@ -20,13 +20,14 @@
 //////////////////////////////////////////////////////////////////
 SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc) 
 : SVGNodeParser()
-, FileParser(fn, cnc)
-, cncNodeBreak(false)
+, FileParser(fn)
+, cncControl(cnc)
 , pathHandler(new SVGPathHandlerCnc(cnc))
+, svgUserAgent()
+, cncNodeBreak(false)
 , debugBase(NULL)
 , debugPath(NULL)
 , debugDetail(NULL)
-
 {
 //////////////////////////////////////////////////////////////////
 	createSvgTraceRoot();

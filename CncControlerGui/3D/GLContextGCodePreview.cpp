@@ -33,6 +33,7 @@ GLViewPort* GLContextGCodePreview::createViewPort() {
 void GLContextGCodePreview::initContext() {
 /////////////////////////////////////////////////////////////////
 	// do context specific initalization here
+	glClearColor(1.0, 1.0, 1.0, 1.0);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextGCodePreview::determineProjection(int w, int h) {

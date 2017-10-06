@@ -33,6 +33,7 @@ GLViewPort* GLContextCncPath::createViewPort() {
 void GLContextCncPath::initContext() {
 /////////////////////////////////////////////////////////////////
 	// do context specific initalization here
+	glClearColor(0.0, 0.0, 0.0, 0.0);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPath::determineProjection(int w, int h) {

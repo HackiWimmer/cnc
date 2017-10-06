@@ -102,7 +102,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		void clear();
 		void display();
 		void setCncConfig(const CncConfig& config);
-		void appendVertice(const VerticeData& vd);
+		void appendVertice(const CncMotionMonitor::VerticeData& vd);
 		void centerViewport();
 		void resetRotation();
 

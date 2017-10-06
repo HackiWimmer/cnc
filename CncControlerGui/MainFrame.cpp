@@ -35,8 +35,8 @@
 #include "CncControllerTestSuite.h"
 #include "CncFilePreviewWnd.h"
 #include "SVGPathHandlerCnc.h"
+#include "SVGFileParser.h"
 #include "GCodeFileParser.h"
-#include "GCodeFileParserOld.h"
 #include "CncArduino.h"
 #include "SvgEditPopup.h"
 #include "HexDecoder.h"
@@ -45,7 +45,7 @@
 #include "MainFrame.h"
 
 // special includes for WindowPoc handling. 
-//They have to be at the end of the list to avoid compilation errors
+// they have to be at the end of the list to avoid compilation errors
 #include <windows.h>
 #include <dbt.h>
 
@@ -107,7 +107,8 @@ MainFrame::MainFrame(wxWindow* parent)
 , filePreviewWnd(new CncFilePreviewWnd(this))
 , serialSpy(NULL)
 , fileView(NULL)
-, filePreview(NULL)
+, mainFilePreview(NULL)
+, monitorFilePreview(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -282,8 +283,13 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_mainFileViewPlaceholder, fileView);
 	
 	// File Preview
-	filePreview = new CncFilePreview(this);
-	GblFunc::replaceControl(m_filePreviewPlaceholder, filePreview);
+	mainFilePreview = new CncFilePreview(this);
+	GblFunc::replaceControl(m_filePreviewPlaceholder, mainFilePreview);
+	
+	// File Preview
+	monitorFilePreview = new CncFilePreview(this);
+	GblFunc::replaceControl(m_monitorTemplatePreviewPlaceHolder, monitorFilePreview);
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -399,15 +405,11 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	m_mainViewBook->SetSelection(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	
-	m_mainViewBook->SetSelection(1);
 	
 	cout << "testFunction2"<< endl;
 	clog << "testFunction2"<< endl;
@@ -451,8 +453,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	m_miViewStatusbar->Check(m_statusBar->IsShown());
 	m_miViewTemplateManager->Check(m_scrollWinFile->IsShown());
 	m_miViewLogger->Check(m_scrollWinLogger->IsShown());
-	m_miViewMonitor->Check(m_scrollOutbound->IsShown());
-	m_miViewMainView->Check(m_scrollWinMain->IsShown());
+	m_miViewMonitor->Check(m_scrollWinMonitor->IsShown());
+	m_miViewMainView->Check(m_scrollWinMonitor->IsShown());
 	m_miViewSpy->Check(m_scrollSpy->IsShown());
 	m_miViewSpeed->Check(m_panelSpeed->IsShown());
 	m_miViewUnitCalculator->Check(m_svgUnitCalulator->IsShown());
@@ -462,12 +464,13 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	CncFileNameService::trace(stream);
 	SvgUnitCalculator::trace(stream);
 	
+
 	// Auto connect ?
 	wxString cfgStr;
 	config->Read("App/AutoConnect", &cfgStr, wxT("false"));
 	if ( cfgStr == "true")
 		connectSerialPort();
-	
+	/*
 	// Auto process ?
 	config->Read("App/AutoProcess", &cfgStr, wxT("false"));
 	if ( cfgStr == "true" ) {
@@ -475,7 +478,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		processTemplate();
 		defineNormalMonitoring();
 	}
-	
+	*/
 	// don't works well
 	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
 	
@@ -687,9 +690,7 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	switch ( format ) {
 		case TplSvg:
 
-#ifndef DEBUG
 			ctl->SetLexer(wxSTC_LEX_HTML);
-#endif
 			
 			// setup highlight colours
 			ctl->StyleSetForeground(wxSTC_H_DOUBLESTRING,		wxColour(255, 	205, 	139));
@@ -1169,14 +1170,13 @@ bool MainFrame::initializeLruMenu() {
 		m_inputFileName->SetHint(fn.GetFullPath());
 		
 		openFile();
-		prepareTplPreview();
+		prepareAndShowMonitorTemplatePreview();
 		introduceCurrentFile();
 	} else {
 		config->Read("DefaultTemplate/DefaultDir", &cfgStr, wxT(""));
 		fileView->openDirectory(cfgStr);
-		updateSvgPreview("");
-		highlightTplPreview(false);
-				
+		
+		selectMainBookSourcePanel();
 		return false; 
 	}
 	
@@ -1783,12 +1783,12 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 	int ret = dlg.ShowModal();
 	switch ( ret ) {
 		case  wxID_YES:  	m_includingWpt->SetValue(true);
-							m_mainNotebook->SetSelection(MainReferencePage);
+							selectMainBookReferencePanel();
 							setZero();
 							break;
 							
 		case  wxID_NO:		m_includingWpt->SetValue(false);
-							m_mainNotebook->SetSelection(MainReferencePage);
+							selectMainBookReferencePanel();
 							setZero();
 							break;
 							
@@ -2144,11 +2144,11 @@ void MainFrame::refreshSvgEmuSourceFile(bool blank) {
 ///////////////////////////////////////////////////////////////////
 TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 ///////////////////////////////////////////////////////////////////
-	unsigned int sel = m_mainNotebook->GetSelection();
-	if ( sel == MainManuallyPage )
+	unsigned int sel = m_mainViewSelector->GetSelection();
+	if ( sel == MainBookSelection::MANUEL_PANEL )
 		return TplManual;
 		
-	if ( sel == MainTestPage )
+	if ( sel == MainBookSelection::TEST_PANEL )
 		return TplTest;
 		
 	wxFileName fn;
@@ -2178,7 +2178,7 @@ const wxString& MainFrame::getCurrentTemplatePathFileName() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::showTplPreview(bool show) {
+void MainFrame::showSvgExtPages(bool show) {
 ///////////////////////////////////////////////////////////////////
 	if ( show == false ) {
 		if (m_templateNotebook->FindPage(m_panelTplDebugger) != wxNOT_FOUND )
@@ -2186,9 +2186,6 @@ void MainFrame::showTplPreview(bool show) {
 
 		if (m_templateNotebook->FindPage(m_panelTplUserAgent) != wxNOT_FOUND )
 			m_templateNotebook->RemovePage(m_templateNotebook->FindPage(m_panelTplUserAgent));
-			
-		if (m_templateNotebook->FindPage(m_panelTplPreview) != wxNOT_FOUND )
-			m_templateNotebook->RemovePage(m_templateNotebook->FindPage(m_panelTplPreview));
 			
 	} else {
 		// correct insert order is very important
@@ -2201,40 +2198,36 @@ void MainFrame::showTplPreview(bool show) {
 			m_templateNotebook->InsertPage(TemplateDebuggerPage, m_panelTplDebugger, "", false);
 			templateNbInfo->decorate(TemplateDebuggerPage);
 		}
-
-		if (m_templateNotebook->FindPage(m_panelTplPreview) == wxNOT_FOUND ) {
-			m_templateNotebook->InsertPage(TemplatePreviewPage, m_panelTplPreview, "", false);
-			templateNbInfo->decorate(TemplatePreviewPage);
-		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openFile(int pageToSelect) {
 ///////////////////////////////////////////////////////////////////
 	// First select the template page to get the rigth result 
-	// by getCurrentTemplateFormat
-	m_mainNotebook->SetSelection(MainTemplatePage);
+	// from getCurrentTemplateFormat
+	selectMainBookSourcePanel();
 
 	templateFileLoading = true;
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
-		case TplSvg:
-		case TplGcode:
-			ret = openTextFile();
-			if ( ret == true ) {
-				showTplPreview();
-				if ( pageToSelect < 0 )	m_templateNotebook->SetSelection(TemplatePreviewPage);
-				else					m_templateNotebook->SetSelection(pageToSelect);
-			}
-			break;
-		default:
-			hideTplPreview();
-			std::cerr << "MainFrame::openFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
-			ret = false;
+		
+		case TplSvg:	ret = openTextFile();
+						if ( ret == true )
+							showSvgExtPages();
+						break;
+		
+		case TplGcode:	ret = openTextFile();
+						hideSvgExtPages();
+						break;
+						
+		default:		hideSvgExtPages();
+						std::cerr << "MainFrame::openFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
+						ret = false;
 	}
 	
 	if ( ret == true ) {
 		evaluateTemplateModificationTimeStamp();
+		
 		initTemplateEditStyle();
 		m_stcFileContent->DiscardEdits();
 		m_stcFileContent->EmptyUndoBuffer();
@@ -2257,7 +2250,7 @@ void MainFrame::introduceCurrentFile() {
 ///////////////////////////////////////////////////////////////////
 	lruFileList.addFile(getCurrentTemplatePathFileName());
 	fileView->selectFileInList(getCurrentTemplatePathFileName());
-	highlightTplPreview(false);
+	selectMainBookSourcePanel();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openTextFile() {
@@ -2279,7 +2272,7 @@ bool MainFrame::openTextFile() {
 		return true;
 	}
 	
-	std::cerr << "Error while opne file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
+	std::cerr << "Error while open file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -2338,7 +2331,7 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 			m_inputFileName->SetValue(ov);
 			m_inputFileName->SetHint(oh);
 		} else {
-			prepareTplPreview(true);
+			prepareAndShowMonitorTemplatePreview(true);
 		}
 	}
 	
@@ -2369,7 +2362,7 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
 	} else {
-		prepareTplPreview(true);
+		prepareAndShowMonitorTemplatePreview(true);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2452,7 +2445,7 @@ void MainFrame::activateMainWindow(wxActivateEvent& event) {
 			if ( !openFile() ) {
 					std::cerr << "MainFrame::activateMainWindow: Error while open file: " << fn.c_str() << std::endl;
 			}
-			prepareTplPreview(true);
+			prepareAndShowMonitorTemplatePreview(true);
 		}
 	}
 	
@@ -2475,22 +2468,22 @@ bool MainFrame::saveFile() {
 ///////////////////////////////////////////////////////////////////
 	// First select the template page to get the rigth result 
 	// by getCurrentTemplateFormat
-	m_mainNotebook->SetSelection(MainTemplatePage);
-
+	selectMainBookSourcePanel();
+	
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
 		case TplSvg:
-		case TplGcode:
-			ret = saveTextFile();
-			break;
-		default:
-			std::cerr << "MainFrame::saveFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
+		case TplGcode:		ret = saveTextFile();
+							break;
+							
+		default:			std::cerr << "MainFrame::saveFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
 	}
 	
 	if( ret == true ) {
 		m_stcFileContent->DiscardEdits();
 		m_stcFileContent->EmptyUndoBuffer();
 		evaluateTemplateModificationTimeStamp();
+		prepareAndShowMonitorTemplatePreview(true);
 	}
 		
 	return ret;
@@ -2621,8 +2614,8 @@ bool MainFrame::processGCodeTemplate() {
 ///////////////////////////////////////////////////////////////////
 	if ( inboundFileParser != NULL )
 		delete inboundFileParser;
-
-	inboundFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
+		
+	inboundFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), new GCodePathHandlerCnc(cnc));
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3079,7 +3072,7 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 			msg << "Please use the \"Set Current Position to Zero\" functionality on the \"References\" tab.";
 			
 			showAuiPane("MainView");
-			m_mainNotebook->SetSelection(MainReferencePage);
+			selectMainBookReferencePanel();
 			
 			int ret = showSetReferencePositionDlg(msg);
 			// means reference postion isn't set
@@ -3281,6 +3274,7 @@ void MainFrame::processTemplate() {
 	}
 	
 	showAuiPane("Outbound");
+	selectMonitorBookCncPanel();
 		
 	if ( checkIfRunCanBeProcessed() == false )
 		return;
@@ -3291,10 +3285,10 @@ void MainFrame::processTemplate() {
 	m_outboundNotebook->SetSelection(Outbound3DPage);
 		
 	// select template Page
-	if ( m_mainNotebook->GetSelection() != MainManuallyPage && 
-	     m_mainNotebook->GetSelection() != MainTestPage && 
-	     m_mainNotebook->GetSelection() != MainTemplatePage ) {
-		m_mainNotebook->SetSelection(MainTemplatePage);
+	if ( m_mainViewSelector->GetSelection() != MainBookSelection::MANUEL_PANEL && 
+	     m_mainViewSelector->GetSelection() != MainBookSelection::TEST_PANEL && 
+	     m_mainViewSelector->GetSelection() != MainBookSelection::SOURCE_PANEL ) {
+		selectMainBookSourcePanel();
 	}
 	
 	motionMonitor->pushProcessMode();
@@ -3421,33 +3415,8 @@ bool MainFrame::checkIfTemplateIsModified() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::mainBookPageChanging(wxNotebookEvent& event) {
+void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 ///////////////////////////////////////////////////////////////////
-	// currently not in use
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::mainBookPageChanged(wxNotebookEvent& event) {
-///////////////////////////////////////////////////////////////////
-	unsigned int sel = event.GetSelection();
-	
-	if ( (wxWindow*)event.GetEventObject() == m_mainNotebook ) {
-		// do nothing 
-	} else if ( (wxWindow*)event.GetEventObject() == m_templateNotebook ) {
-		if ( sel == TemplatePreviewPage ) {
-			prepareTplPreview();
-		} else if ( sel == TemplateContentPage) {
-			if ( m_stcFileContent->HasFocus() == false )
-				m_stcFileContent->SetFocus();
-		}
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::prepareTplPreview(bool force) {
-///////////////////////////////////////////////////////////////////
-	// wxString tfn(CncFileNameService::getCncTemplatePreviewFileName(getCurrentTemplateFormat()));
-	// this causes file access errors between this app and the internet explorer
-	// write a temp file instead to have anytime a new one
-	
 	if ( force == true )
 		lastTemplateFileNameForPreview.clear();
 
@@ -3457,8 +3426,24 @@ void MainFrame::prepareTplPreview(bool force) {
 		
 	lastTemplateFileNameForPreview = getCurrentTemplatePathFileName();
 
+	// wxString tfn(CncFileNameService::getCncTemplatePreviewFileName(getCurrentTemplateFormat()));
+	// this causes file access errors between this app and the internet explorer
+	// write a temp file instead to have anytime a new one
 	wxString tfn(CncFileNameService::getTempFileName(getCurrentTemplateFormat()));
 	
+	TemplateFormat tf = getCurrentTemplateFormat();
+	switch ( tf ) {
+		case TplSvg:		tfn.append(".svg");
+							break;
+							
+		case TplGcode:		tfn.append(".gcode");
+							break;
+		
+		default:			// do nothing;
+							break;
+	}
+		
+	// create a copy to avoid a modification of m_stcFileContent
 	wxTextFile file(tfn);
 	if ( !file.Exists() )
 		file.Create();
@@ -3474,8 +3459,8 @@ void MainFrame::prepareTplPreview(bool force) {
 		file.Write();
 		file.Close();
 		
-		openPreview(tfn, getCurrentTemplateFormat());
-		
+		openMonitorPreview(tfn);
+
 	} else {
 		std::cerr << "Error creating a temp file: " << tfn.c_str() << std::endl;
 	}
@@ -3847,7 +3832,7 @@ void MainFrame::saveEmuOutput(wxCommandEvent& event) {
 			std::cerr << "Error while open file: " << saveFileDialog.GetPath().c_str() << std::endl;
 		}
 		
-		prepareTplPreview(true);
+		prepareAndShowMonitorTemplatePreview(true);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -4591,18 +4576,16 @@ void MainFrame::updateCurveLibResolution() {
 	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::openPreview(const wxString& fn) {
+void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(filePreview);
+	wxASSERT(ctrl);
 	
-	m_mainViewBook->SetSelection(1);
 	TemplateFormat tf = getCurrentTemplateFormat(fn);
-	
 	switch ( tf ) {
-		case TplSvg:		filePreview->selectSVGPreview(fn);
+		case TplSvg:		ctrl->selectSVGPreview(fn);
 							break;
 							
-		case TplGcode:		filePreview->selectGCodePreview(fn);
+		case TplGcode:		ctrl->selectGCodePreview(fn);
 							break;
 		
 		default:			cnc::trc.logError(wxString("Cant preview: ") + fn );
@@ -4610,68 +4593,29 @@ void MainFrame::openPreview(const wxString& fn) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::openPreview(const wxString& fn, TemplateFormat format) {
+void MainFrame::openMainPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	wxString url;
-	wxString tmpPreview("Default html page");
-	
-	if ( fn.IsEmpty() ) {
-		url.assign(getBlankHtmlPage());
-	} else {
-		startAnimationControl();
-		
-		bool errorInfo = m_previewErrorInfo->GetValue();
-		
-		if ( format == TplSvg ) {
-			SVGFileParser fp(fn, cnc);
-			tmpPreview = CncFileNameService::getCncTemplatePreviewFileName(TplSvg);
-			fp.createPreview(tmpPreview, errorInfo);
-			
-		} else if ( format == TplGcode) {
-			GCodeFileParserOld fp(fn, cnc);
-			tmpPreview = CncFileNameService::getCncTemplatePreviewFileName(TplGcode);
-			fp.createPreview(tmpPreview, errorInfo);
-			
-		} else {
-			// avoid explorer extention handling
-			tmpPreview = CncFileNameService::getCncTemplatePreviewFileName(format);
-			wxCopyFile(fn, tmpPreview);
-		}
-		
-		url.assign(tmpPreview);
-	}
-	
-	m_svgPreviewFileName1->SetValue(fn);
-	m_svgPreviewFileName2->SetValue(tmpPreview);
-	m_svgPreview->LoadURL(url);
-	m_svgPreview->Update();
-	stopAnimationControl();
+	selectMainBookPreviewPanel();
+	openPreview(mainFilePreview, fn);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::updateSvgPreview(const wxString& fn) {
+void MainFrame::openMonitorPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	m_mainNotebook->SetSelection(MainTemplatePage);
 	
-	if ( m_templateNotebook->FindPage(m_panelTplPreview) != wxNOT_FOUND  ) {
-		m_templateNotebook->SetSelection(TemplatePreviewPage);
-		
-		highlightTplPreview(true);
-		m_panelTplPreview->Refresh();
-
-		openPreview(fn, getCurrentTemplateFormat(fn));
-	}
+	
+	
+	#warning why?????
+	//selectMonitorBookTemplatePanel();
+	openPreview(monitorFilePreview, fn);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openFileFromFileManager(const wxString& f) {
 ///////////////////////////////////////////////////////////////////
-
-
-std::clog << "MainFrame::openFileFromFileManager: "<< f << std::endl;
-
-
+	selectMainBookSourcePanel();
+	selectMonitorBookTemplatePanel();
+	
 	if ( checkIfTemplateIsModified() == false ) {
-		prepareTplPreview();
-		highlightTplPreview(false);
+		prepareAndShowMonitorTemplatePreview(true);
 		return;
 	}
 
@@ -4680,10 +4624,13 @@ std::clog << "MainFrame::openFileFromFileManager: "<< f << std::endl;
 	m_inputFileName->SetHint(fn.GetFullPath());
 
 	openFile();
+	prepareAndShowMonitorTemplatePreview(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::leaveLruList(wxMouseEvent& event) {
+void MainFrame::lruListItemLeave(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	selectMainBookSourcePanel();
+	
 	int n = m_lruList->GetItemCount();
 	for (int i = 0; i < n; i++)
 		m_lruList->SetItemState(i, 0, wxLIST_STATE_SELECTED);
@@ -4695,9 +4642,9 @@ void MainFrame::lruListItemActivated(wxListEvent& event) {
 	info.m_itemId = event.m_itemIndex;
 	info.m_col = 1;
 	info.m_mask = wxLIST_MASK_TEXT;
-	if ( m_lruList->GetItem(info) ) {
+	
+	if ( m_lruList->GetItem(info) )
 		openFileFromFileManager(wxString(lruFileList.getFileName(info.m_itemId)));
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemSelected(wxListEvent& event) {
@@ -4706,45 +4653,73 @@ void MainFrame::lruListItemSelected(wxListEvent& event) {
 	info.m_itemId = event.m_itemIndex;
 	info.m_col = 1;
 	info.m_mask = wxLIST_MASK_TEXT;
-	if ( m_lruList->GetItem(info) ) {
-		updateSvgPreview(wxString(lruFileList.getFileName(info.m_itemId)));
-	}
 	
-	/*
-	if ( m_lruList->GetStringSelection().length() > 0 ) {
-		int sel = m_lruList->GetSelection();
-		updateSvgPreview(wxString(lruFileList.getFileName(sel)));
-	}
-	 * */
+	if ( m_lruList->GetItem(info) )
+		openMainPreview(wxString(lruFileList.getFileName(info.m_itemId)));
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::leaveEnterFileManagerControl(wxMouseEvent& event) {
+void MainFrame::selectMainBookSourcePanel() {
 ///////////////////////////////////////////////////////////////////
-	prepareTplPreview(m_svgFilePreviewHint->IsShown());
-	highlightTplPreview(false);
+	m_mainViewSelector->SetSelection(MainBookSelection::SOURCE_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::SOURCE_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::highlightTplPreview(bool state) {
+void MainFrame::selectMainBookPreviewPanel() {
 ///////////////////////////////////////////////////////////////////
-	wxSizer* fgs = m_panelTplPreview->GetSizer();
-	if ( fgs == NULL )
-		return;
-	
-	if ( state == true ) {
-		m_panelTplPreview->SetBackgroundColour(wxColor(153,180,209));
-		m_svgFilePreviewHint->SetBackgroundColour(wxColor(153,180,209));
-		fgs->Show(m_svgFilePreviewHint);
-	} else {
-		m_panelTplPreview->SetBackgroundColour(wxNullColour);
-		fgs->Hide(m_svgFilePreviewHint);
-	}
-	
-	fgs->RecalcSizes();
-	fgs->Layout();
-	
-	m_svgPreview->Refresh();
-	m_panelTplPreview->Refresh();
+	m_mainViewSelector->SetSelection(MainBookSelection::PREVIEW_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::PREVIEW_PANEL);
 }
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectMainBookSetupPanel() {
+	m_monitorViewSelector->SetSelection(MainBookSelection::SETUP_PANEL);
+	m_monitorViewBook->SetSelection(MainBookSelection::SETUP_PANEL);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectMainBookReferencePanel() {
+	m_monitorViewSelector->SetSelection(MainBookSelection::REFERENCE_PANEL);
+	m_monitorViewBook->SetSelection(MainBookSelection::REFERENCE_PANEL);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectMainBookManuelPanel() {
+	m_monitorViewSelector->SetSelection(MainBookSelection::MANUEL_PANEL);
+	m_monitorViewBook->SetSelection(MainBookSelection::MANUEL_PANEL);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectMainBookTestPanel() {
+	m_monitorViewSelector->SetSelection(MainBookSelection::TEST_PANEL);
+	m_monitorViewBook->SetSelection(MainBookSelection::TEST_PANEL);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::mainViewSelectorSelected(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_mainViewBook->SetSelection(m_mainViewSelector->GetSelection());
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectMonitorBookCncPanel() {
+///////////////////////////////////////////////////////////////////
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::TEMPLATE_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::CNC_PANEL);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectMonitorBookTemplatePanel() {
+///////////////////////////////////////////////////////////////////
+	prepareAndShowMonitorTemplatePreview(true);
+	
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::TEMPLATE_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::TEMPLATE_PANEL);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::monitorViewSelectorSelected(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( m_monitorViewSelector->GetSelection() == MonitorBookSelection::TEMPLATE_PANEL)
+		prepareAndShowMonitorTemplatePreview(true);
+		
+	m_monitorViewBook->SetSelection(m_monitorViewSelector->GetSelection());
+}
+
+
+
+
 
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleAuiPane(wxWindow* pane, wxMenuItem* menu) {
@@ -4808,7 +4783,7 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	if      ( name == "ToolBar" ) 			return m_auibarMain;
 	else if ( name == "MainView")			return m_scrollWinMain;
 	else if ( name == "Logger")				return m_scrollWinLogger;
-	else if ( name == "Outbound")			return m_scrollOutbound;
+	else if ( name == "Outbound")			return m_scrollWinMonitor;
 	else if ( name == "TemplateManager")	return m_scrollWinFile;
 	else if ( name == "StatusBar")			return m_statusBar;
 	else if ( name == "Spy")				return m_scrollSpy;
@@ -4958,8 +4933,8 @@ void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 	} else if ( evt.pane->window == m_scrollWinLogger ) {
 		m_miViewLogger->Check(!m_scrollWinLogger->IsShown());
 		
-	} else if ( evt.pane->window == m_scrollOutbound ) {
-		m_miViewMonitor->Check(!m_scrollOutbound->IsShown());
+	} else if ( evt.pane->window == m_scrollWinMonitor ) {
+		m_miViewMonitor->Check(!m_scrollWinMonitor->IsShown());
 		
 	} else if ( evt.pane->window == m_scrollWinMain ) {
 		m_miViewMainView->Check(!m_scrollWinMain->IsShown());
@@ -4996,7 +4971,7 @@ void MainFrame::onPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::maximizeAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( event.pane->window == m_scrollOutbound || event.pane->window == m_scrollWinMain )
+	if ( event.pane->window == m_scrollWinMonitor || event.pane->window == m_scrollWinMain )
 		perspectiveTimer.Start(20);
 		
 	event.Skip(true);
@@ -5025,27 +5000,27 @@ void MainFrame::viewAllAuiPanes(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::hideAllAuiPanes() {
 ///////////////////////////////////////////////////////////////////
-	hideAuiPane(m_auibarMain,      m_miToolbar);
-	hideAuiPane(m_statusBar,       m_miViewStatusbar);
-	hideAuiPane(m_scrollWinFile,   m_miViewTemplateManager);
-	hideAuiPane(m_scrollWinLogger, m_miViewLogger);
-	hideAuiPane(m_scrollOutbound,  m_miViewMonitor);
-	hideAuiPane(m_scrollWinMain,   m_miViewMainView);
-	hideAuiPane(m_scrollSpy,       m_miViewSpy);
-	hideAuiPane(m_panelSpeed,      m_miViewSpeed);
-	hideAuiPane(m_svgUnitCalulator,m_miViewUnitCalculator);
+	hideAuiPane(m_auibarMain,       m_miToolbar);
+	hideAuiPane(m_statusBar,        m_miViewStatusbar);
+	hideAuiPane(m_scrollWinFile,    m_miViewTemplateManager);
+	hideAuiPane(m_scrollWinLogger,  m_miViewLogger);
+	hideAuiPane(m_scrollWinMonitor, m_miViewMonitor);
+	hideAuiPane(m_scrollWinMain,    m_miViewMainView);
+	hideAuiPane(m_scrollSpy,        m_miViewSpy);
+	hideAuiPane(m_panelSpeed,       m_miViewSpeed);
+	hideAuiPane(m_svgUnitCalulator, m_miViewUnitCalculator);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewAllAuiPanes(bool withSpy) {
 ///////////////////////////////////////////////////////////////////
-	showAuiPane(m_auibarMain,      m_miToolbar);
-	showAuiPane(m_statusBar,       m_miViewStatusbar);
-	showAuiPane(m_scrollWinFile,   m_miViewTemplateManager);
-	showAuiPane(m_scrollWinLogger, m_miViewLogger);
-	showAuiPane(m_scrollOutbound,  m_miViewMonitor);
-	showAuiPane(m_scrollWinMain,   m_miViewMainView);
-	showAuiPane(m_panelSpeed,      m_miViewSpeed);
-	showAuiPane(m_svgUnitCalulator,m_miViewUnitCalculator);
+	showAuiPane(m_auibarMain,        m_miToolbar);
+	showAuiPane(m_statusBar,         m_miViewStatusbar);
+	showAuiPane(m_scrollWinFile,     m_miViewTemplateManager);
+	showAuiPane(m_scrollWinLogger,   m_miViewLogger);
+	showAuiPane(m_scrollWinMonitor,  m_miViewMonitor);
+	showAuiPane(m_scrollWinMain,     m_miViewMainView);
+	showAuiPane(m_panelSpeed,        m_miViewSpeed);
+	showAuiPane(m_svgUnitCalulator,  m_miViewUnitCalculator);
 	
 	if ( withSpy )
 		showAuiPane(m_scrollSpy,       m_miViewSpy);
@@ -5649,7 +5624,7 @@ void MainFrame::togglePreviewErrorInfo(wxCommandEvent& event) {
 	else 
 		m_previewErrorInfo->SetToolTip("Preview without error information");
 		
-	prepareTplPreview(true);
+	prepareAndShowMonitorTemplatePreview(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateRunButton() {
@@ -6475,16 +6450,4 @@ void MainFrame::unitTestFramework(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	UnitTests test(this, 0, true);
 	test.ShowModal();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::openPrevFile1(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString fn(m_svgPreviewFileName1->GetValue());
-	openFileExtern(wxT("notepad"), fn);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::openPrevFile2(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString fn(m_svgPreviewFileName2->GetValue());
-	openFileExtern(wxT("notepad"), fn);
 }

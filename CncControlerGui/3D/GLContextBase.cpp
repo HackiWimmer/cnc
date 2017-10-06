@@ -252,7 +252,7 @@ void GLContextBase::drawCoordinateOrigin() {
 	// x axis
 	glBegin(GL_LINES);
 
-		glColor3f(coordOriginInfo.colours.x.Red()/255, coordOriginInfo.colours.x.Green()/255, coordOriginInfo.colours.x.Blue()/255);
+		glColor3ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue());
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(coordOriginInfo.length, 0.0f, 0.0f);
 		
@@ -262,7 +262,7 @@ void GLContextBase::drawCoordinateOrigin() {
 	// y axis
 	glBegin(GL_LINES);
 
-		glColor3f(coordOriginInfo.colours.y.Red()/255, coordOriginInfo.colours.y.Green()/255, coordOriginInfo.colours.y.Blue()/255);
+		glColor3ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue());
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(0.0f, coordOriginInfo.length, 0.0f);
 	
@@ -272,7 +272,7 @@ void GLContextBase::drawCoordinateOrigin() {
 	// z axis
 	glBegin(GL_LINES);
 
-		glColor3f(coordOriginInfo.colours.z.Red()/255, coordOriginInfo.colours.z.Green()/255, coordOriginInfo.colours.z.Blue()/255);
+		glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
 		glVertex3f(0.0f, 0.0f, 0.0f);
 		glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
 	
@@ -437,6 +437,7 @@ void GLContextBase::reshapeViewMode() {
 void GLContextBase::display() {
 /////////////////////////////////////////////////////////////////
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 	wxASSERT ( viewPort != NULL );
 	
 	// initialize model matrix

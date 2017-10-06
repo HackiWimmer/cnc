@@ -40,12 +40,13 @@ class MainFrame : public MainFrameBClass {
 
 	// User command
 	protected:
+    virtual void mainViewSelectorSelected(wxCommandEvent& event);
+		virtual void monitorViewSelectorSelected(wxCommandEvent& event);
+		virtual void lruListItemLeave(wxMouseEvent& event);
 		virtual void lruListItemActivated(wxListEvent& event);
 		virtual void lruListItemSelected(wxListEvent& event);
 		virtual void openMotionMonitorOptionDlg(wxCommandEvent& event);
 		virtual void viewStatusbar(wxCommandEvent& event);
-		virtual void openPrevFile1(wxCommandEvent& event);
-		virtual void openPrevFile2(wxCommandEvent& event);
 		virtual void searchAvailiablePorts(wxCommandEvent& event);
 		virtual void unitTestFramework(wxCommandEvent& event);
 		virtual void traceTimer(wxTimerEvent& event);
@@ -205,8 +206,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void defineNormalMonitoring(wxCommandEvent& event);
 		virtual void saveTemplate(wxCommandEvent& event);
 		virtual void saveTemplateAs(wxCommandEvent& event);
-		virtual void mainBookPageChanged(wxNotebookEvent& event);
-		virtual void mainBookPageChanging(wxNotebookEvent& event);
 		virtual void newTemplate(wxCommandEvent& event);
 		virtual void openTemplate(wxCommandEvent& event);
 		virtual void reloadTemplate(wxCommandEvent& event);
@@ -267,8 +266,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void killFocusMoveXYAxis(wxFocusEvent& event);
 		virtual void setFocusMoveXYAxis(wxFocusEvent& event);
 		virtual void setFocusMoveZAxis(wxFocusEvent& event);
-		virtual void leaveLruList(wxMouseEvent& event);
-		virtual void leaveEnterFileManagerControl(wxMouseEvent& event);
 		virtual void viewMainView(wxCommandEvent& event);
 		virtual void viewTemplateManager(wxCommandEvent& event);
 		virtual void viewLogger(wxCommandEvent& event);
@@ -305,13 +302,24 @@ class MainFrame : public MainFrameBClass {
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// global trace controls
-		wxTextCtrl* getLogger() { return m_logger; }
-		wxTextCtrl* getTrace() { return m_tmpTraceInfo; }
-		wxTextCtrl* getCtrlMessageHistory() { return m_controllerMsgHistory; }
+		wxTextCtrl* getLogger() 				{ return m_logger; }
+		wxTextCtrl* getTrace() 					{ return m_tmpTraceInfo; }
+		wxTextCtrl* getCtrlMessageHistory() 	{ return m_controllerMsgHistory; }
 		wxTextCtrl* getCtrlPathGeneratorTrace() { return pathGenerator->getPathTrace(); }
-		wxTextCtrl* getCtrlSerialSpy() { return serialSpy; }
+		wxTextCtrl* getCtrlSerialSpy() 			{ return serialSpy; }
 		
 		UpdateManagerThread* getUpdateManagerThread() { return updateManagerThread; }
+		
+		//////////////////////////////////////////////////////////////////////////////////
+		void selectMainBookSourcePanel();
+		void selectMainBookPreviewPanel();
+		void selectMainBookSetupPanel();
+		void selectMainBookReferencePanel();
+		void selectMainBookManuelPanel();
+		void selectMainBookTestPanel();
+		
+		void selectMonitorBookCncPanel();
+		void selectMonitorBookTemplatePanel();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
@@ -329,6 +337,7 @@ class MainFrame : public MainFrameBClass {
 		//////////////////////////////////////////////////////////////////////////////////
 		virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
 		
+		//////////////////////////////////////////////////////////////////////////////////
 		virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
 
 	protected:
@@ -383,7 +392,8 @@ class MainFrame : public MainFrameBClass {
 		CncFilePreviewWnd* filePreviewWnd;
 		CncSpyControl* serialSpy;
 		CncFileView* fileView;
-		CncFilePreview* filePreview;
+		CncFilePreview* mainFilePreview;
+		CncFilePreview* monitorFilePreview;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -427,11 +437,11 @@ class MainFrame : public MainFrameBClass {
 		
 		void introduceCurrentFile();
 		
-		void openPreview(const wxString& fn);
-		void openPreview(const wxString& fn, TemplateFormat format);
-		void updateSvgPreview(const wxString& fn);
+		void openPreview(CncFilePreview* ctrl, const wxString& fn);
+		void openMainPreview(const wxString& fn);
+		void openMonitorPreview(const wxString& fn);
 		void openFileFromFileManager(const wxString& fn);
-		void highlightTplPreview(bool state);
+		
 		const char* getSvgEmuFileName(wxString& ret);
 		
 		bool openFileExtern(const wxString& tool, const char* file);
@@ -560,9 +570,9 @@ class MainFrame : public MainFrameBClass {
 		void unfreezeLogger();
 		
 		void prepareNewTemplateFile();
-		void showTplPreview(bool show = true);
-		void hideTplPreview() { showTplPreview(false); }
-		void prepareTplPreview(bool force=false);
+		void showSvgExtPages(bool show = true);
+		void hideSvgExtPages() { showSvgExtPages(false); }
+		void prepareAndShowMonitorTemplatePreview(bool force=false);
 		void refreshSvgEmuFile(bool blank=false);
 		void refreshSvgEmuSourceFile(bool blank=false);
 		void showSVGEmuResult(bool show = true);

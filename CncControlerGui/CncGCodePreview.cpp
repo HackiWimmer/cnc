@@ -53,6 +53,8 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	// This is required even though dc is not used otherwise.
 	wxPaintDC dc(this);
+	
+	preview->SetCurrent(*this);
 
 	const wxSize cs = GetClientSize();
 	preview->reshape(cs.GetWidth(), cs.GetHeight());
@@ -105,4 +107,40 @@ void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 					Refresh(false);
 					break;
 	}
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::clear() {
+//////////////////////////////////////////////////
+	preview->clearPathData();
+	Refresh(false);
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::pushProcessMode() {
+//////////////////////////////////////////////////
+	clear();
+	preview->enablePositionMarker(false);
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::popProcessMode() {
+//////////////////////////////////////////////////
+	preview->enablePositionMarker(false);
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::appendVertice(const CncGCodePreview::VerticeData& vd) {
+//////////////////////////////////////////////////
+
+
+	typedef GLI::GLCncPathVertices::FormatType PathVerticeType;
+	typedef GLI::GLCncPathVertices::CncMode    DataVerticeMode;
+	
+	
+	static wxColour 		colour(128,128,128);
+	static PathVerticeType	formatType = PathVerticeType::FT_SOLID;
+	
+	double x = vd.getX() / 400.0;
+	double y = vd.getY() / 400.0;
+	double z = vd.getZ() / 400.0;
+	
+	static GLI::GLCncPathVertices d;
+	preview->appendPathData(d.set(x, y, z, colour, formatType, GLI::GLCncPathVertices::CncMode::CM_WORK)); 
 }

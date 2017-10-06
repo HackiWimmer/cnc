@@ -4,11 +4,12 @@
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
 #include <wx/stc/stc.h>
-#include "GCodePathHandlerBase.h"
+#include "3D/CncGCodePreview.h"
+#include "GCodePathHandlerGL.h"
 #include "GCodeFileParser.h"
 
 //////////////////////////////////////////////////////////////////
-GCodeFileParser::GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph) 
+GCodeFilePreview::GCodeFilePreview(const wxString& fn, GCodePathHandlerBase* ph) 
 : FileParser(fn)
 , pathHandler(ph)
 , currentLineNumber(0)
@@ -19,13 +20,13 @@ GCodeFileParser::GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph)
 	wxASSERT(pathHandler);
 }
 //////////////////////////////////////////////////////////////////
-GCodeFileParser::~GCodeFileParser() {
+GCodeFilePreview::~GCodeFilePreview() {
 //////////////////////////////////////////////////////////////////
 	if ( pathHandler != NULL )
 		delete pathHandler;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayMessage(const wxString& msg, int type) {
+bool GCodeFilePreview::displayMessage(const wxString& msg, int type) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << msg;
@@ -33,7 +34,7 @@ bool GCodeFileParser::displayMessage(const wxString& msg, int type) {
 	return displayMessage(ss, type);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
+bool GCodeFilePreview::displayMessage(std::stringstream& ss, int type) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream msg;
 	msg << wxString::Format("[%04d]: ", currentLineNumber);
@@ -48,42 +49,43 @@ bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
 	return (resumeOnError == true );
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnhandledBlockCommand(GCodeBlock& gcb) {
+bool GCodeFilePreview::displayUnhandledBlockCommand(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not handled GCode command: " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber);
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnsupportedBlockCommand(const GCodeField& field) {
+bool GCodeFilePreview::displayUnsupportedBlockCommand(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported GCode block command: " << field;
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnhandledParameter(const GCodeField& field) {
+bool GCodeFilePreview::displayUnhandledParameter(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported GCode parameter: " << field.getCmd();
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayToolChangeDetected(const GCodeField& field) {
+bool GCodeFilePreview::displayToolChangeDetected(const GCodeField& field) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported tool change: " << field;
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-void GCodeFileParser::setDefaultParameters() {
+void GCodeFilePreview::setDefaultParameters() {
 //////////////////////////////////////////////////////////////////
 	programEnd = false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::process() {
+bool GCodeFilePreview::process() {
 //////////////////////////////////////////////////////////////////
-	wxASSERT( pathHandler );
+	if ( pathHandler == NULL )
+		return true;
 	
 	// todo
 	pathHandler->prepareWork();
@@ -95,7 +97,7 @@ bool GCodeFileParser::process() {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::preprocess() {
+bool GCodeFilePreview::preprocess() {
 //////////////////////////////////////////////////////////////////
 	setDefaultParameters();
 
@@ -114,7 +116,7 @@ bool GCodeFileParser::preprocess() {
 			
 			if ( line.IsEmpty() == false ) {
 				if ( processBlock(line, gcb) == false ) {
-					std::cerr << "GCodeFileParser::preprocess(): Failed " <<std::endl;
+					std::cerr << "GCodeFilePreview::preprocess(): Failed " <<std::endl;
 					std::cerr << " Line number: " << currentLineNumber << std::endl;
 					return false;
 				}
@@ -129,7 +131,7 @@ bool GCodeFileParser::preprocess() {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
+bool GCodeFilePreview::processBlock(wxString& block, GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( GCodeBlock::removeComments(block, gcb.openComment) < 1 )
 		return true;
@@ -162,7 +164,7 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 	return performBlock(gcb);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
+bool GCodeFilePreview::processField(const GCodeField& field, GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( GCodeCommands::isBlockCommand(field.getCmd()) ) {
 		if ( GCodeCommands::isRegistered(field) == true ) {
@@ -215,7 +217,7 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
+bool GCodeFilePreview::performBlock(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( gcb.isValid() == false && gcb.hasMoveCmd() == true ) {
 		gcb.copyPrevCmdToCmd();
@@ -223,7 +225,7 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	
 	if ( gcb.isValid() == false ) {
 		if ( gcb.hasMoveCmd() ) {
-			std::cerr << "GCodeFileParser::processBlock: Invalid GCode block:" << std::endl;
+			std::cerr << "GCodeFilePreview::processBlock: Invalid GCode block:" << std::endl;
 			std::cerr << " Command:     " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber) << std::endl;
 			std::cerr << " Block:       " << gcb  << std::endl;
 			std::cerr << " Line number: " << currentLineNumber << std::endl;
@@ -244,7 +246,7 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processG(GCodeBlock& gcb) {
+bool GCodeFilePreview::processG(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
@@ -338,7 +340,7 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::processM(GCodeBlock& gcb) {
+bool GCodeFilePreview::processM(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	switch ( gcb.cmdNumber ) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::

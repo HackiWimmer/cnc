@@ -48,16 +48,24 @@ enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D 
 
 static const int UNDEFINED_LINE_NUMBER 				= -1;
 
-static const unsigned int MainReferencePage 		= 0;
-static const unsigned int MainSetupPage 			= 1;
-static const unsigned int MainTestPage 				= 2; 
-static const unsigned int MainManuallyPage 			= 3;
-static const unsigned int MainTemplatePage 			= 4;
+enum MainBookSelection {
+	SOURCE_PANEL				= 0,
+	PREVIEW_PANEL				= 1,
+	SETUP_PANEL					= 2,
+	REFERENCE_PANEL				= 3,
+	MANUEL_PANEL				= 4,
+	TEST_PANEL					= 5
+};
+
+enum MonitorBookSelection {
+	CNC_PANEL					= 0,
+	TEMPLATE_PANEL				= 1
+};
+
 
 static const unsigned int TemplateContentPage 		= 0; 
 static const unsigned int TemplateUserAgentPage 	= 1;
 static const unsigned int TemplateDebuggerPage 		= 2;
-static const unsigned int TemplatePreviewPage 		= 3;
 
 static const unsigned int OutboundCNCValuesPage 	= 0;
 static const unsigned int Outbound3DPage 			= 1;

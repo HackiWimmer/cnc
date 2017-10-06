@@ -1,32 +1,25 @@
 #ifndef GCODE_PATH_HANDLER_CNC_H
 #define GCODE_PATH_HANDLER_CNC_H
 
-#include "PathHandlerBase.h"
+#include "GCodePathHandlerBase.h"
 #include "CncControl.h"
 #include "CncPosition.h"
-#include "GCodeBlock.h"
 
-class GCodePathHandlerCnc : public PathHandlerBase {
+class GCodePathHandlerCnc : public GCodePathHandlerBase {
 	
 	public:
 		GCodePathHandlerCnc(CncControl* cnc);
 		virtual ~GCodePathHandlerCnc();
 		
-		void prepareWork(); 
-		void finishWork();
-		
-		bool processRapidLinearMove(GCodeBlock& gcb);
-		bool processLinearMove(GCodeBlock& gcb);
-		bool processArcMove(GCodeBlock& gcb, bool sweep);
-		bool moveToOrigin(GCodeBlock& gcb);
-		
 	protected:
+		
 		virtual bool processLinearMove(bool alreadyRendered);
+		virtual bool changeWorkSpeedXY(CncSpeed s);
+		virtual void prepareWorkImpl();
+		virtual void finishWorkImpl();
 		
 	private:
-		CncControl* 		cncControl;
-		
-		void updateCurrentPosition(GCodeBlock& gcb);
+		CncControl* cncControl;
 };
 
 #endif

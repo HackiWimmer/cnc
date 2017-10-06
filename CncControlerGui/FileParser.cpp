@@ -3,9 +3,8 @@
 #include "FileParser.h"
 
 ////////////////////////////////////////////////////////////////////////////
-FileParser::FileParser(const wxString& fn, CncControl* cnc) 
-: cncControl(cnc)
-, fileName(fn)
+FileParser::FileParser(const wxString& fn) 
+: fileName(fn)
 , runInfo()
 , debugControls()
 , inboundSourceControl(NULL)

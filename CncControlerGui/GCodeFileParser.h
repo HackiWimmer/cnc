@@ -1,5 +1,5 @@
-#ifndef GCODE_FILE_PARSER_H
-#define GCODE_FILE_PARSER_H
+#ifndef GCODE_FILE_PREVIEW_H
+#define GCODE_FILE_PREVIEW_H
 
 #include <fstream>
 #include <sstream>
@@ -15,17 +15,16 @@
 
 class wxXmlNode;
 class wxXmlAttribute;
+class CncGCodePreview;
 
 /////////////////////////////////////////////////////////////////////
 class GCodeFileParser : public FileParser {
 	
-	private:
-		GCodePathHandlerCnc* pathHandler;
+	protected:
+		GCodePathHandlerBase* pathHandler;
 		unsigned int currentLineNumber;
 		bool programEnd;
 		bool resumeOnError;
-		
-		std::fstream preview;
 		
 		// error message handling
 		inline bool displayMessage(const wxString& msg, int type);
@@ -44,8 +43,6 @@ class GCodeFileParser : public FileParser {
 		double getDefaultHeight() { return 1000.0; }
 		const char* getDefaultUnit() { return "mm"; }
 		
-	protected:
-		
 		void setDefaultParameters();
 		bool processBlock(wxString& block, GCodeBlock& gcb);
 		bool processField(const GCodeField& field, GCodeBlock& gcb);
@@ -60,9 +57,10 @@ class GCodeFileParser : public FileParser {
 		virtual bool process();
 
 	public:
-		GCodeFileParser(const wxString& fn, CncControl* cnc);
+		GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph);
 		virtual ~GCodeFileParser();
 		
 };
+
 
 #endif

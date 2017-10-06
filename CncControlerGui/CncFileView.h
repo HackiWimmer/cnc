@@ -12,6 +12,7 @@ class MainFrame;
 class CncFileView : public CncFileViewBase, public wxDirTraverser {
 	
 	protected:
+    virtual void fileListLeave(wxMouseEvent& event);
 		virtual void selectFilter(wxCommandEvent& event);
 		virtual void aFolderUp(wxCommandEvent& event);
 		virtual void refresh(wxCommandEvent& event);

@@ -2,10 +2,11 @@
 #define FILE_PARSER_H
 
 #include <wx/string.h>
-#include "CncControl.h"
 #include "FileParserRunInfo.h"
 
 class wxStyledTextCtrl;
+class wxStaticText;
+class wxDataViewListCtrl;
 class wxWebView;
 
 class FileParser {
@@ -30,7 +31,7 @@ class FileParser {
 		};
 		
 	public:
-		FileParser(const wxString& fn, CncControl* cnc);
+		FileParser(const wxString& fn);
 		virtual ~FileParser();
 		
 		virtual bool processDebug();
@@ -55,7 +56,6 @@ class FileParser {
 		void setDebuggerControls(DebugControls& dc);
 		
 	protected:
-		CncControl* cncControl;
 		wxString fileName;
 		FileParserRunInfo runInfo;
 

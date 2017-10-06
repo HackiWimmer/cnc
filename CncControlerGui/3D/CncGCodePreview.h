@@ -13,7 +13,7 @@
 class CncGCodePreview : public wxGLCanvas {
 
 	public:
-/*
+
 		class VerticeData {
 
 			public:
@@ -31,14 +31,14 @@ class CncGCodePreview : public wxGLCanvas {
 				}
 
 				//////////////////////////////////////////////
-				const long getX() const { return _x; }
-				const long getY() const { return _y; }
-				const long getZ() const { return _z; }
+				double getX() const { return _x; }
+				double getY() const { return _y; }
+				double getZ() const { return _z; }
 				
 				const GLI::GLCncPathVertices::CncMode getMode() const { return mode; }
 
 				//////////////////////////////////////////////
-				void setVertice(CncSpeed speedType, const CncLongPosition& cp) {
+				void setVertice(CncSpeed speedType, const CncDoublePosition& cp) {
 					switch ( speedType ) {
 						case CncSpeedWork: 	setWorkVertice(cp);
 											break;
@@ -51,13 +51,13 @@ class CncGCodePreview : public wxGLCanvas {
 			protected:
 
 				//CncLongPosition pos;
-				long _x;
-				long _y;
-				long _z;
+				double _x;
+				double _y;
+				double _z;
 				GLI::GLCncPathVertices::CncMode mode;
 				
 				//////////////////////////////////////////////
-				void setRapidVertice(const CncLongPosition& cp) {
+				void setRapidVertice(const CncDoublePosition& cp) {
 					_x = cp.getX();
 					_y = cp.getY();
 					_z = cp.getZ();
@@ -66,43 +66,43 @@ class CncGCodePreview : public wxGLCanvas {
 				}
 
 				//////////////////////////////////////////////
-				void setWorkVertice(const CncLongPosition& cp) {
+				void setWorkVertice(const CncDoublePosition& cp) {
 					_x = cp.getX();
 					_y = cp.getY();
 					_z = cp.getZ();
 					
 					mode = GLI::GLCncPathVertices::CncMode::CM_WORK;
 				}
-
 		};
-	*/
-
 
 		// constructor
 		CncGCodePreview(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncGCodePreview();
-
+		
 		// is used from global key down hook, that's the reason why it is public
 		void onKeyDown(wxKeyEvent& event);
-/*
+
 		// interface
+		void appendVertice(const CncGCodePreview::VerticeData& vd);
 		void clear();
-		void display();
-*/
+		
+		void pushProcessMode();
+		void popProcessMode();
+
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
-		void onCameraRotationTimer(wxTimerEvent& event);
 /*
 		void view(GLContextBase::ViewMode fm);
 */
+
+		
 	protected:
-	
-		GLContextCncPathBase* 		preview;
+		GLContextCncPathBase* preview;
 		
 	private:
-		//void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
+		void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
 		
 		wxDECLARE_NO_COPY_CLASS(CncGCodePreview);
 		wxDECLARE_EVENT_TABLE();

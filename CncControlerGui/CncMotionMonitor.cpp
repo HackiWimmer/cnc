@@ -126,7 +126,7 @@ void CncMotionMonitor::display() {
 	Refresh(false);
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::appendVertice(const VerticeData& vd) {
+void CncMotionMonitor::appendVertice(const CncMotionMonitor::VerticeData& vd) {
 //////////////////////////////////////////////////	
 	// Convert the given steps (abs) to a glpos (rel):
 	
@@ -194,6 +194,7 @@ void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	// This is required even though dc is not used otherwise.
 	wxPaintDC dc(this);
+	monitor->SetCurrent(*this);
 
 	const wxSize cs = GetClientSize();
 	monitor->reshape(cs.GetWidth(), cs.GetHeight());

@@ -3,12 +3,12 @@
   <Project Name="CncConrollerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
   <Project Name="FreeGlutWorkspace" Path="FreeGlutWorkspace/FreeGlutWorkspace.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="release2"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug" Selected="yes">
+    <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Debug"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Debug"/>

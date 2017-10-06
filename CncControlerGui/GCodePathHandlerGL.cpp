@@ -1,44 +1,54 @@
-#include "GCodePathHandlerCnc.h"
+#include "GCodePathHandlerGL.h"
 
 //////////////////////////////////////////////////////////////////
-GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc) 
+GCodePathHandlerGL::GCodePathHandlerGL(CncGCodePreview* gl) 
 : GCodePathHandlerBase()
-, cncControl(cnc)
+, glControl(gl)
+, currentSpeed(CncSpeed::CncSpeedRapid)
 {
 //////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl);
+	wxASSERT(glControl);
 }
 //////////////////////////////////////////////////////////////////
-GCodePathHandlerCnc::~GCodePathHandlerCnc() {
-//////////////////////////////////////////////////////////////////
-}
-//////////////////////////////////////////////////////////////////
-void GCodePathHandlerCnc::prepareWorkImpl() {
+GCodePathHandlerGL::~GCodePathHandlerGL() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-void GCodePathHandlerCnc::finishWorkImpl() {
+void GCodePathHandlerGL::prepareWorkImpl() {
 //////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl);
+	wxASSERT(glControl);
+	glControl->pushProcessMode();
+}
+//////////////////////////////////////////////////////////////////
+void GCodePathHandlerGL::finishWorkImpl() {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(glControl);
+	glControl->popProcessMode();
 	
+	/*
+	 * todo
 	currentPos.setXYZ(0.0, 0.0, 0.0);
 	
 	cncControl->moveXYZToZeroPos();
 	cncControl->switchToolOff();
+	 * */
 }
 //////////////////////////////////////////////////////////////////
-bool GCodePathHandlerCnc::processLinearMove(bool alreadyRendered) {
+bool GCodePathHandlerGL::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
-	//std::clog << currentPos << std::endl;
+	wxASSERT(glControl);
+	
+	static CncGCodePreview::VerticeData vd;
+	vd.setVertice(currentSpeed, currentPos);
+	glControl->appendVertice(vd);
 
 	#warning - consider unit!
-	return cncControl->moveAbsLinearMetricXYZ(currentPos.getX(), currentPos.getY(), currentPos.getZ(), alreadyRendered);
+	return true; 
 }
 //////////////////////////////////////////////////////////////////
-bool GCodePathHandlerCnc::changeWorkSpeedXY(CncSpeed s) {
+bool GCodePathHandlerGL::changeWorkSpeedXY(CncSpeed s) {
 //////////////////////////////////////////////////////////////////
-
-
-	cncControl->changeWorkSpeedXY(s);
+	currentSpeed = s;
 	return true;
 }
+

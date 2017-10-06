@@ -141,11 +141,12 @@ class PathHandlerBase {
 		
 		virtual bool isInitialized();
 		
-		// controller helper
+		// svg path habdler helper - only used from this class
 		virtual void simulateZAxisUp() 		{}
 		virtual void simulateZAxisDown() 	{}
 		virtual bool isZAxisUp() 			{ return true; }
 		virtual bool isZAxisDown() 			{ return false; }
+
 		
 	public:
 	

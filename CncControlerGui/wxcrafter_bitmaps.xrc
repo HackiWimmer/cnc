@@ -77,8 +77,6 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
-  <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
-  <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-debugger_restart">bitmaps\24-debugger_restart.png</object>
   <object class="wxBitmap" name="24-debugger_restart@2x">bitmaps\24-debugger_restart@2x.png</object>
   <object class="wxBitmap" name="24-down">bitmaps\24-down.png</object>
@@ -225,6 +223,7 @@
   <object class="wxBitmap" name="book_red">bitmaps\book_red.png</object>
   <object class="wxBitmap" name="bookmark-new-list">bitmaps\bookmark-new-list.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
+  <object class="wxBitmap" name="bricks">bitmaps\bricks.png</object>
   <object class="wxBitmap" name="bug (2)">bitmaps\bug (2).png</object>
   <object class="wxBitmap" name="bug-go">bitmaps\bug-go.png</object>
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
@@ -235,7 +234,6 @@
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
-  <object class="wxBitmap" name="media-repeat-blue">bitmaps\media-repeat-blue.png</object>
   <object class="wxBitmap" name="meeting-organizer">bitmaps\meeting-organizer.png</object>
   <object class="wxBitmap" name="mill">bitmaps\mill.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
@@ -243,9 +241,11 @@
   <object class="wxBitmap" name="runRelease">bitmaps\Icons\runRelease.ico</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="setting_tools">bitmaps\setting_tools.png</object>
+  <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
-  <object class="wxBitmap" name="tools-report-bug1">bitmaps\tools-report-bug1.png</object>
+  <object class="wxBitmap" name="view-orientation">bitmaps\view-orientation.png</object>
   <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
+  <object class="wxBitmap" name="window-close-3">bitmaps\window-close-3.png</object>
   <object class="wxBitmap" name="workspace">bitmaps\workspace.png</object>
 </resource>

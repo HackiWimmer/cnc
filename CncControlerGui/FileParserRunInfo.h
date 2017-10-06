@@ -1,6 +1,8 @@
 #ifndef FILE_PARSER_RUN_INFO
 #define FILE_PARSER_RUN_INFO
 
+#include "CncCommon.h"
+
 /////////////////////////////////////////////////////////////////////
 class FileParserRunInfo {
 	
