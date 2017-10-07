@@ -6,7 +6,7 @@
 UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 : wxThread(wxTHREAD_DETACHED)
 , pHandler(handler)
-, cncConfig(NULL)
+, cncConfig()
 , setterList()
 , setterCounter(0)
 , enabled(false) 
@@ -20,8 +20,6 @@ UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 ///////////////////////////////////////////////////////////////////
 UpdateManagerThread::~UpdateManagerThread() {
 ///////////////////////////////////////////////////////////////////
-
-std::clog << "todo adsdadsadadsdasd\n";
 	wxCriticalSectionLocker enter(pHandler->pThreadCS);
 	// the thread is being destroyed; make sure not to leave dangling pointers around
 	pHandler->updateManagerThread = NULL;
@@ -45,7 +43,6 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
 	unsigned int cnt 	= 0;
 	unsigned int sleep 	= 50;
-	int iError			= EXIT_SUCCESS;
 	
 	while ( !TestDestroy() ) {
 		// sleep a moment
@@ -77,9 +74,9 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 			cnt = 0;
 		//}
 		
-		if ( iError != EXIT_SUCCESS ) 
-			break; // some error has caused iError to be !=EXIT_SUCCESS
 	}
+	
+	#warning here is something to do
 	
 	//std::clog << "TestDestroy()" << std::endl;
 	//this->Sleep(500);
@@ -138,6 +135,7 @@ void UpdateManagerThread::postSetterValue(unsigned char id,  int32_t value) {
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::postResetZView() {
 ///////////////////////////////////////////////////////////////////
+	wxCriticalSectionLocker enter(pHandler->pThreadCS);
 	if ( pHandler->getZView() ) 
 		pHandler->getZView()->resetAll();
 }
@@ -147,6 +145,7 @@ void UpdateManagerThread::postUpdateZView() {
 	if ( cncConfig == NULL )
 		return;
 
+	wxCriticalSectionLocker enter(pHandler->pThreadCS);
 	if ( pHandler->getZView() ) {
 		double displayFactZ = cncConfig->getDisplayFactZ(cncConfig->getUnit());
 		pHandler->getZView()->updateView(appPos.getZ() * displayFactZ, *cncConfig);
@@ -218,11 +217,6 @@ void UpdateManagerThread::updateConfigurationControls() {
 	// speed control
 	CncSpeedView* sc = pHandler->getSpeedView();
 	if ( sc != NULL ) {
-		/*
-		sc->setMaxSpeedX(cncConfig->getMaxSpeedXY());
-		sc->setMaxSpeedY(cncConfig->getMaxSpeedXY());
-		sc->setMaxSpeedZ(cncConfig->getMaxSpeedZ());
-		*/
 		sc->setCurrentSpeedX(cncConfig->getSpeedX());
 		sc->setCurrentSpeedY(cncConfig->getSpeedY());
 		sc->setCurrentSpeedZ(cncConfig->getSpeedZ());
@@ -232,7 +226,7 @@ void UpdateManagerThread::updateConfigurationControls() {
 	wxDataViewListCtrl* scc = pHandler->getStaticCncConfigControl();
 	wxDataViewListCtrl* dcc = pHandler->getDynamicCncConfigControl();
 	
-	// satitc config
+	// static config
 	wxVector<wxVector<wxVariant>> tmpRows;
 	if ( scc != NULL ) {
 		// get the config
@@ -294,7 +288,7 @@ void UpdateManagerThread::updateSetterControls() {
 		sl = setterList;
 	}
 	
-	// in this case is nothing do to
+	// in this case nothing is do to
 	// and a continious update will be avoided
 	if ( sl.size() == (unsigned int)ps->GetItemCount() )
 		return;

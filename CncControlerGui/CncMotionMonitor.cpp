@@ -153,12 +153,12 @@ void CncMotionMonitor::appendVertice(float x, float y, float z, GLI::GLCncPathVe
 	
 	// decorate
 	switch ( cm ) {
-		case DataVerticeMode::CM_WORK:	colour 		= getFlags().workColour;
+		case DataVerticeMode::CM_WORK:	colour		= getFlags().workColour;
 										formatType	= PathVerticeType::FT_SOLID;
 										break;
 										
 		case DataVerticeMode::CM_FLY:	colour 		= getFlags().flyColour;
-										formatType	= ( getFlags().drawFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT);
+										formatType	= ( getFlags().drawFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT );
 										break;
 	}
 	

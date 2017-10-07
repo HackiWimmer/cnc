@@ -413,6 +413,7 @@
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="APP_USE_SPLASH"/>
       </Compiler>
       <Linker Options="-mwindows;$(shell wx-config --libs)" Required="yes">
         <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>

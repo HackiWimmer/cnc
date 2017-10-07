@@ -62,13 +62,13 @@ void GLContextBase::globalInit() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::init() {
 /////////////////////////////////////////////////////////////////
+	initContext();
+	
 	// call the initalization only one time
 	if ( initialized == true )
 		return;
 		
 	viewPort = createViewPort();
-	
-	initContext();
 	initialized = true;
 }
 /////////////////////////////////////////////////////////////////////
@@ -185,6 +185,9 @@ void GLContextBase::determineViewPortBounderies() {
 /////////////////////////////////////////////////////////////////
 	// ensure the right matrix
 	glMatrixMode(GL_MODELVIEW);
+
+	// the code below don't works well
+	return;
 
 	if ( isViewMode2D() ) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

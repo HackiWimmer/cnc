@@ -80,7 +80,7 @@
             <default>0</default>
           </object>
           <object class="separator"/>
-          <object class="wxBitmapButton" name="m_bmpButton4389">
+          <object class="wxBitmapButton" name="m_btSelectReferences">
             <bitmap>bitmaps/view-orientation.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
@@ -88,7 +88,7 @@
             </tooltip>
             <default>0</default>
           </object>
-          <object class="wxBitmapButton" name="m_bmpButton4385">
+          <object class="wxBitmapButton" name="m_btSelectManuallyMove">
             <bitmap>bitmaps/16-fold.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
@@ -96,7 +96,7 @@
             </tooltip>
             <default>0</default>
           </object>
-          <object class="wxBitmapButton" name="m_bmpButton4387">
+          <object class="wxBitmapButton" name="m_btSelectSetup">
             <bitmap>bitmaps/system-settings.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
@@ -104,7 +104,7 @@
             </tooltip>
             <default>0</default>
           </object>
-          <object class="wxBitmapButton" name="m_bmpButton43893">
+          <object class="wxBitmapButton" name="m_btSelectTemplate">
             <bitmap>bitmaps/bricks.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
@@ -352,7 +352,7 @@
         <min_size>100,100</min_size>
         <centre>1</centre>
         <layer>0</layer>
-        <row>0</row>
+        <row>1</row>
         <position>0</position>
         <close_button>0</close_button>
         <minimize_button>1</minimize_button>
@@ -381,11 +381,11 @@
                 <style>wxBORDER_NONE</style>
                 <content>
                   <item>Source View</item>
-                  <item>Template Preview</item>
                   <item>Setup</item>
                   <item>References</item>
                   <item>Manuel Controller</item>
                   <item>Test</item>
+                  <item>File Manager Preview</item>
                 </content>
                 <selection>0</selection>
               </object>
@@ -1003,31 +1003,6 @@
                               </object>
                             </object>
                           </object>
-                        </object>
-                      </object>
-                    </object>
-                  </object>
-                </object>
-                <object class="simplebookpage">
-                  <label>Page</label>
-                  <selected>0</selected>
-                  <object class="wxPanel" name="m_mainBookPreviewPanel">
-                    <style>wxTAB_TRAVERSAL</style>
-                    <object class="wxFlexGridSizer">
-                      <cols>1</cols>
-                      <rows>1</rows>
-                      <vgap>0</vgap>
-                      <hgap>0</hgap>
-                      <growablecols>0</growablecols>
-                      <growablerows>0</growablerows>
-                      <object class="sizeritem">
-                        <flag>wxALL|wxEXPAND</flag>
-                        <object class="wxPanel" name="m_filePreviewPlaceholder">
-                          <style>wxTAB_TRAVERSAL</style>
-                          <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                          <tooltip>
-                            <![CDATA[Only a placeholder]]>
-                          </tooltip>
                         </object>
                       </object>
                     </object>
@@ -5235,6 +5210,69 @@
                     </object>
                   </object>
                 </object>
+                <object class="simplebookpage">
+                  <label>Page</label>
+                  <selected>0</selected>
+                  <object class="wxPanel" name="m_mainBookPreviewPanel">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <object class="wxFlexGridSizer">
+                      <cols>1</cols>
+                      <rows>3</rows>
+                      <vgap>0</vgap>
+                      <hgap>0</hgap>
+                      <growablecols>0</growablecols>
+                      <growablerows>1</growablerows>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <object class="wxPanel" name="m_panel4398">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                          <object class="wxFlexGridSizer">
+                            <cols>2</cols>
+                            <rows>0</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols/>
+                            <growablerows/>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxStaticText" name="m_staticText4402">
+                                <label>File Manager Preview . . .</label>
+                                <style/>
+                                <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                <font>
+                                  <size>14</size>
+                                  <style>italic</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI Semibold</face>
+                                </font>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <object class="wxPanel" name="m_filePreviewPlaceholder">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                          <tooltip>
+                            <![CDATA[Only a placeholder]]>
+                          </tooltip>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <object class="wxTextCtrl" name="m_currentFileMangerPreviewFileName">
+                          <style>wxTE_RIGHT|wxTE_READONLY</style>
+                        </object>
+                      </object>
+                    </object>
+                  </object>
+                </object>
               </object>
             </object>
           </object>
@@ -5996,7 +6034,7 @@ Axis</label>
                                             <tooltip>
                                               <![CDATA[Option Dialog]]>
                                             </tooltip>
-                                            <bitmap>bitmaps/16-executable.png</bitmap>
+                                            <bitmap>bitmaps/anonymous_simple_weather_symbols_5.png</bitmap>
                                             <bitmapposition>wxLEFT</bitmapposition>
                                             <default>0</default>
                                           </object>
@@ -6953,11 +6991,31 @@ Axis</label>
           <style>wxTAB_TRAVERSAL</style>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
-            <rows>3</rows>
+            <rows>4</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>2</growablerows>
+            <growablerows>3</growablerows>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>1</border>
+              <object class="wxCheckBox" name="m_keepFileManagerPreview">
+                <font>
+                  <size>7</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <family>swiss</family>
+                  <underlined>0</underlined>
+                  <face>Segoe UI</face>
+                </font>
+                <tooltip>
+                  <![CDATA[Keep the Template Manger Preview\nafter the control leaved]]>
+                </tooltip>
+                <style/>
+                <label>Keep Preview</label>
+                <checked>0</checked>
+              </object>
+            </object>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
@@ -7125,7 +7183,7 @@ Axis</label>
               <border>1</border>
               <minsize>-1,24</minsize>
               <object class="wxTextCtrl" name="m_tmpTraceInfo">
-                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE</style>
+                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP</style>
                 <size>-1,24</size>
                 <bg>wxSYS_COLOUR_BTNTEXT</bg>
                 <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
@@ -7400,7 +7458,7 @@ Axis</label>
             <rows>1</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
-            <growablecols/>
+            <growablecols>2,4</growablecols>
             <growablerows>1</growablerows>
             <object class="sizeritem" name="flexGridSizer3696">
               <flag>wxALL</flag>
@@ -7471,17 +7529,17 @@ Axis</label>
               </object>
             </object>
             <object class="sizeritem" name="flexGridSizer3697">
-              <flag>wxALL</flag>
+              <flag>wxALL|wxEXPAND</flag>
               <border>2</border>
               <object class="wxFlexGridSizer">
                 <cols>1</cols>
                 <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
-                <growablecols/>
-                <growablerows/>
+                <growablecols>0</growablecols>
+                <growablerows>0</growablerows>
                 <object class="sizeritem">
-                  <flag>wxALL</flag>
+                  <flag>wxALL|wxEXPAND</flag>
                   <border>3</border>
                   <object class="wxTextCtrl" name="m_inputFileName">
                     <style>wxTE_READONLY|wxTE_CENTRE|wxBORDER_NONE</style>
@@ -7501,15 +7559,15 @@ Axis</label>
               </object>
             </object>
             <object class="sizeritem" name="flexGridSizer3698">
-              <flag>wxALL</flag>
+              <flag>wxALL|wxEXPAND</flag>
               <border>2</border>
               <object class="wxFlexGridSizer">
                 <cols>2</cols>
                 <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
-                <growablecols/>
-                <growablerows/>
+                <growablecols>1</growablecols>
+                <growablerows>0</growablerows>
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <border>3</border>
@@ -7525,7 +7583,7 @@ Axis</label>
                   </object>
                 </object>
                 <object class="sizeritem">
-                  <flag>wxALL</flag>
+                  <flag>wxALL|wxEXPAND</flag>
                   <border>5</border>
                   <minsize>80,16</minsize>
                   <object class="wxPanel" name="m_activityPanel">

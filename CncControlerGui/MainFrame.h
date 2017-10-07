@@ -40,7 +40,11 @@ class MainFrame : public MainFrameBClass {
 
 	// User command
 	protected:
-    virtual void mainViewSelectorSelected(wxCommandEvent& event);
+		virtual void onSelectManuallyMove(wxCommandEvent& event);
+		virtual void onSelectReferences(wxCommandEvent& event);
+		virtual void onSelectSetup(wxCommandEvent& event);
+		virtual void onSelectTemplate(wxCommandEvent& event);
+		virtual void mainViewSelectorSelected(wxCommandEvent& event);
 		virtual void monitorViewSelectorSelected(wxCommandEvent& event);
 		virtual void lruListItemLeave(wxMouseEvent& event);
 		virtual void lruListItemActivated(wxListEvent& event);

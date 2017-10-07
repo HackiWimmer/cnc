@@ -33,6 +33,7 @@ wxEND_EVENT_TABLE()
 CncGCodePreview::CncGCodePreview(wxWindow *parent, int *attribList) 
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
 , preview(new GLContextGCodePreview(this))
+, maxDimension(400.0)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
@@ -115,6 +116,14 @@ void CncGCodePreview::clear() {
 	Refresh(false);
 }
 //////////////////////////////////////////////////
+void CncGCodePreview::setMaxDimension(double maxDim) {
+//////////////////////////////////////////////////
+	if ( maxDim < 10.0 || maxDim > 2000.0 )
+		return;
+		
+	maxDimension = maxDim;
+}
+//////////////////////////////////////////////////
 void CncGCodePreview::pushProcessMode() {
 //////////////////////////////////////////////////
 	clear();
@@ -128,19 +137,27 @@ void CncGCodePreview::popProcessMode() {
 //////////////////////////////////////////////////
 void CncGCodePreview::appendVertice(const CncGCodePreview::VerticeData& vd) {
 //////////////////////////////////////////////////
-
-
 	typedef GLI::GLCncPathVertices::FormatType PathVerticeType;
 	typedef GLI::GLCncPathVertices::CncMode    DataVerticeMode;
-	
 	
 	static wxColour 		colour(128,128,128);
 	static PathVerticeType	formatType = PathVerticeType::FT_SOLID;
 	
-	double x = vd.getX() / 400.0;
-	double y = vd.getY() / 400.0;
-	double z = vd.getZ() / 400.0;
+	// decorate
+	switch ( vd.getMode() ) {
+		case DataVerticeMode::CM_WORK:	colour.Set(0, 0, 0);
+										formatType	= PathVerticeType::FT_SOLID;
+										break;
+										
+		case DataVerticeMode::CM_FLY:	colour.Set(255, 201, 14);
+										formatType	= PathVerticeType::FT_DOT;
+										break;
+	}
+	
+	double x = vd.getX() / maxDimension;
+	double y = vd.getY() / maxDimension;
+	double z = vd.getZ() / maxDimension;
 	
 	static GLI::GLCncPathVertices d;
-	preview->appendPathData(d.set(x, y, z, colour, formatType, GLI::GLCncPathVertices::CncMode::CM_WORK)); 
+	preview->appendPathData(d.set(x, y, z, colour, formatType, vd.getMode())); 
 }

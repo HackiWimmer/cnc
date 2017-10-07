@@ -34,6 +34,13 @@ void GLContextGCodePreview::initContext() {
 /////////////////////////////////////////////////////////////////
 	// do context specific initalization here
 	glClearColor(1.0, 1.0, 1.0, 1.0);
+	glShadeModel(GL_FLAT);
+	
+	glEnable(GL_LINE_SMOOTH);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); 
+	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextGCodePreview::determineProjection(int w, int h) {

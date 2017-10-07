@@ -294,6 +294,16 @@ void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+
+	registerGuiControl(m_btSelectReferences);
+	registerGuiControl(m_btSelectManuallyMove);
+	registerGuiControl(m_btSelectSetup);
+	registerGuiControl(m_btSelectTemplate);
+	registerGuiControl(m_cbCurveLibResolution);
+	registerGuiControl(m_3D_Refreh);
+	registerGuiControl(m_3D_Clear);
+
+
 	registerGuiControl(m_btPathGenerator);
 	registerGuiControl(m_checkManuallyXY);
 	registerGuiControl(m_checkManuallyZ);
@@ -420,11 +430,30 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
 	
-	filePreviewWnd->Show();
-	/*
-	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("Outbound");
-	cnc::cex1 << GetAuimgrMain()->SavePerspective() << endl;
-	 * */
+	//filePreviewWnd->Show();
+	
+	
+	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("MainView");
+	wxString x;
+	cnc::cex1 << pi.name << ": " << pi.IsResizable() << endl;
+	
+	pi.Float();
+	
+	//pi.MinSize(wxSize(393, -1)).MaxSize(wxSize(393, -1)).BestSize(wxSize(393, -1)); 
+	GetAuimgrMain()->Update();
+	
+	pi.Left();
+	pi.Dock();
+	
+	
+	
+	cnc::cex1 << pi.max_size.GetWidth() << ": " << pi.min_size.GetWidth() << ": " << pi.best_size.GetWidth()<< endl;
+	
+	GetAuimgrMain()->Update();
+	
+	
+	//cnc::cex1 << GetAuimgrMain()->SavePerspective() << endl;
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -546,6 +575,8 @@ void MainFrame::onClose(wxCloseEvent& event) {
 	if ( updateManagerThread != NULL) {
 		updateManagerThread->stop();
 		
+		
+		#warning here is something to do
 		/*
 		while ( true ) {
 			{ // was the ~MyThread() function executed?
@@ -764,7 +795,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 												portName.assign(n);
 											}
 											
-											std::clog << "A new COM device was detected on port: " << portName << std::endl;
+											cnc::trc.logInfo(wxString("A new COM device was detected on port: ") << portName);
 											break;
 											
 			case DBT_DEVICEREMOVECOMPLETE:	if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
@@ -773,7 +804,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 												portName.assign(n);
 											}
 											
-											std::clog << "The COM device was removed from port: " << portName << std::endl;
+											cnc::trc.logInfo(wxString("The COM device was removed from port: ") << portName);
 											break;
 											
 			default: ;
@@ -814,11 +845,6 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 						lastPortName.clear();
 						std::cerr << "Connection brocken" << std::endl;
 						cnc::trc.logWarning("Connection broken . . ."); 
-						
-						/*
-						m_portSelector->SetStringSelection(defaultPortName);
-						connectSerialPort();
-						*/
 					}
 				break;
 			}
@@ -2441,7 +2467,7 @@ void MainFrame::activateMainWindow(wxActivateEvent& event) {
 		wxDateTime dt = tplFile.GetModificationTime();
 		
 		if ( dt != lastTemplateModification ) {
-			std::clog << "Template change detected . . . Reload Template file: " << fn.c_str() << std::endl;
+			cnc::trc << "An externally template change is detected . . . template: " << fn.c_str() << " will be reloaded";
 			if ( !openFile() ) {
 					std::cerr << "MainFrame::activateMainWindow: Error while open file: " << fn.c_str() << std::endl;
 			}
@@ -2480,6 +2506,14 @@ bool MainFrame::saveFile() {
 	}
 	
 	if( ret == true ) {
+		
+		// update tab label
+		wxString name(m_templateNotebook->GetPageText(TemplateContentPage));
+		if ( name.StartsWith("*") == true ) {
+			name = name.SubString(1, name.length() -1 );
+			m_templateNotebook->SetPageText(TemplateContentPage, name);
+		}
+		
 		m_stcFileContent->DiscardEdits();
 		m_stcFileContent->EmptyUndoBuffer();
 		evaluateTemplateModificationTimeStamp();
@@ -3847,11 +3881,19 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 ///////////////////////////////////////////////////////////////////
 	updateFileContentPosition();
 	
+	// update tab label
+	wxString name(m_templateNotebook->GetPageText(TemplateContentPage));
+	if ( name.StartsWith("*") == false ) {
+		name.Prepend("*");
+		m_templateNotebook->SetPageText(TemplateContentPage, name);
+	}
+	
 	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
 	int c = event.GetUnicodeKey();
 	
 	wxString find(m_stcFileContent->GetSelectedText());
 	
+	// find
 	if ( c == 'F' && ctlKey == true ) {
 		event.Skip(false);
 		
@@ -3861,6 +3903,7 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 		m_svgEditSearch->SetFocus();
 		return;
 		
+	// goto line
 	} else if ( c == 'G' && ctlKey == true ) {
 		wxTextEntryDialog dlg(this, "Line Number:", "Go to line . . .", "");
 		dlg.SetMaxLength(32);
@@ -3877,6 +3920,18 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 					std::clog << "Template Source: Invalid line numer: " << ln << std::endl;
 			}
 		}
+		
+	// Undo
+	} else if ( c == 'Z' && ctlKey == true) {
+		m_stcFileContent->Undo();
+	
+	// Redo
+	} else if ( c == 'Y' && ctlKey == true) {
+		m_stcFileContent->Redo();
+		
+	// save
+	} else if ( c == 'S' && ctlKey == true) {
+		saveFile();
 	}
 	
 	event.Skip(true);
@@ -3951,6 +4006,7 @@ d) X(mid), Y(mid), Z(mid)
 */
 ///////////////////////////////////////////////////////////////////
 	disableControls();
+	selectMonitorBookCncPanel();
 
 	wxString sel = m_homeDefintion->GetStringSelection();
 	const char c = sel[0];
@@ -3979,23 +4035,38 @@ d) X(mid), Y(mid), Z(mid)
 void MainFrame::moveXToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
+	selectMonitorBookCncPanel();
+	
+	disableControls();
 	cnc->moveXToMid();
+	enableControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
+	selectMonitorBookCncPanel();
+	
+	
+	disableControls();
 	cnc->moveYToMid();
+	enableControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
+	selectMonitorBookCncPanel();
+	
+	disableControls();
 	cnc->moveZToMid();
+	enableControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroXY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	wxString sel = m_zeroMoveModeXY->GetStringSelection();
 	char mode = sel[0];
 
@@ -4011,6 +4082,8 @@ void MainFrame::moveToZeroXY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	wxString sel = m_zeroMoveModeXYZ->GetStringSelection();
 	char mode = sel[0];
 
@@ -4027,6 +4100,8 @@ void MainFrame::moveToZeroXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->simpleMoveZToZeroPos();
 	enableControls();
@@ -4034,6 +4109,8 @@ void MainFrame::moveToZeroZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveXToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveXToMinLimit();
 	enableControls();
@@ -4041,6 +4118,8 @@ void MainFrame::moveXToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveXToMax(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveXToMaxLimit();
 	enableControls();
@@ -4048,6 +4127,8 @@ void MainFrame::moveXToMax(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveYToMinLimit();
 	enableControls();
@@ -4055,6 +4136,8 @@ void MainFrame::moveYToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveYToMaxLimit();
 	enableControls();
@@ -4062,6 +4145,8 @@ void MainFrame::moveYToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveZToMinLimit();
 	enableControls();
@@ -4069,6 +4154,8 @@ void MainFrame::moveZToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveZToMaxLimit();
 	enableControls();
@@ -4076,6 +4163,8 @@ void MainFrame::moveZToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToTop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveZToTop();
 	enableControls();
@@ -4083,6 +4172,8 @@ void MainFrame::moveZToTop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToBottom(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+	
 	disableControls();
 	cnc->moveZToBottom();
 	enableControls();
@@ -4629,6 +4720,12 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemLeave(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( m_keepFileManagerPreview->IsChecked() )
+		return;
+		
+	if ( m_mainViewBook->GetSelection() != MainBookSelection::PREVIEW_PANEL )
+		return;
+		
 	selectMainBookSourcePanel();
 	
 	int n = m_lruList->GetItemCount();
@@ -4671,23 +4768,23 @@ void MainFrame::selectMainBookPreviewPanel() {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookSetupPanel() {
-	m_monitorViewSelector->SetSelection(MainBookSelection::SETUP_PANEL);
-	m_monitorViewBook->SetSelection(MainBookSelection::SETUP_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::SETUP_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::SETUP_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookReferencePanel() {
-	m_monitorViewSelector->SetSelection(MainBookSelection::REFERENCE_PANEL);
-	m_monitorViewBook->SetSelection(MainBookSelection::REFERENCE_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::REFERENCE_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::REFERENCE_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookManuelPanel() {
-	m_monitorViewSelector->SetSelection(MainBookSelection::MANUEL_PANEL);
-	m_monitorViewBook->SetSelection(MainBookSelection::MANUEL_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::MANUEL_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::MANUEL_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookTestPanel() {
-	m_monitorViewSelector->SetSelection(MainBookSelection::TEST_PANEL);
-	m_monitorViewBook->SetSelection(MainBookSelection::TEST_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::TEST_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::TEST_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mainViewSelectorSelected(wxCommandEvent& event) {
@@ -6450,4 +6547,24 @@ void MainFrame::unitTestFramework(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	UnitTests test(this, 0, true);
 	test.ShowModal();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectManuallyMove(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMainBookManuelPanel();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectReferences(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMainBookReferencePanel();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectSetup(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMainBookSetupPanel();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectTemplate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMainBookSourcePanel();
 }

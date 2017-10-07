@@ -50,11 +50,11 @@ static const int UNDEFINED_LINE_NUMBER 				= -1;
 
 enum MainBookSelection {
 	SOURCE_PANEL				= 0,
-	PREVIEW_PANEL				= 1,
-	SETUP_PANEL					= 2,
-	REFERENCE_PANEL				= 3,
-	MANUEL_PANEL				= 4,
-	TEST_PANEL					= 5
+	SETUP_PANEL					= 1,
+	REFERENCE_PANEL				= 2,
+	MANUEL_PANEL				= 3,
+	TEST_PANEL					= 4,
+	PREVIEW_PANEL				= 5
 };
 
 enum MonitorBookSelection {

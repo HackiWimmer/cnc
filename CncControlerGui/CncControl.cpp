@@ -653,27 +653,33 @@ bool CncControl::validateCurrentPostion() {
 	if ( positionCheck == false )
 		return true;
 		
-	// todo - performance - wxRealPoint, switch to predef values, etc
-	wxPoint p(curPos.getX()/cncConfig->getCalculationFactX(), curPos.getY()/cncConfig->getCalculationFactY());
-
-	if ( p.x >= cncConfig->getMaxDimensionX() || p.y >= cncConfig->getMaxDimensionY() ) {
+	// will only be done for emulation ports. It didn't makes sense for a cnc run
+	// see below
+	if ( serialPort->getPortType() != CncPORT ) {
+		// in the real cnc life this is not good enough. the check has to be done by
+		// the end switches at last.
+		bool error = false;
+		CncLongPosition::Watermarks wm;
+		curPos.getWatermarks(wm);
 		
-		std::clog << "Position out of range!" << std::endl;
-		std::clog << " Max valid X dimension: " << cncConfig->getMaxDimensionX() << std::endl;
-		std::clog << " Max valid Y dimension: " << cncConfig->getMaxDimensionY() << std::endl;
-		std::clog << " Current X Pos: " << p.x << std::endl;
-		std::clog << " Current Y Pos: " << p.y << std::endl;
-		return false;
-	}
+		if ( (wm.xMax - wm.xMin)/cncConfig->getCalculationFactX() > cncConfig->getMaxDimensionX() ) error = true;
+		if ( (wm.yMax - wm.yMin)/cncConfig->getCalculationFactY() > cncConfig->getMaxDimensionY() ) error = true;
+		if ( (wm.zMax - wm.zMin)/cncConfig->getCalculationFactZ() > cncConfig->getMaxDimensionZ() ) error = true;
 	
-	if ( p.x < -cncConfig->getMaxDimensionX() || p.y < -cncConfig->getMaxDimensionY() ) {
-		
-		std::clog << "Position out of range!" << std::endl;
-		std::clog << " Min valid X dimension: " << -cncConfig->getMaxDimensionX() << std::endl;
-		std::clog << " Min valid Y dimension: " << -cncConfig->getMaxDimensionY() << std::endl;
-		std::clog << " Current X Pos: " << p.x << std::endl;
-		std::clog << " Current Y Pos: " << p.y << std::endl;
-		return false;
+		if ( error == true ) {
+			std::cerr << "Position out of range!" << std::endl;
+			std::cerr << " Max valid X dimension: " << cncConfig->getMaxDimensionX() << std::endl;
+			std::cerr << " Max valid Y dimension: " << cncConfig->getMaxDimensionY() << std::endl;
+			std::cerr << " Max valid Z dimension: " << cncConfig->getMaxDimensionZ() << std::endl;
+			std::cerr << " Current Pos: " << curPos << std::endl;
+			std::cerr << " Min Watermark: " << wm.xMin << "," << wm.yMin << "," << wm.zMin << "," << std::endl;
+			std::cerr << " Max Watermark: " << wm.xMax << "," << wm.yMax << "," << wm.zMax << "," << std::endl;
+			std::cerr << " Calculated spread X :" <<  (wm.xMax - wm.xMin)/cncConfig->getCalculationFactX() << std::endl;
+			std::cerr << " Calculated spread Y :" <<  (wm.yMax - wm.yMin)/cncConfig->getCalculationFactY() << std::endl;
+			std::cerr << " Calculated spread Z :" <<  (wm.zMax - wm.zMin)/cncConfig->getCalculationFactZ() << std::endl;
+			
+			return false;
+		}
 	}
 	
 	return true;

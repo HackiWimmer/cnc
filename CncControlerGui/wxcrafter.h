@@ -89,10 +89,10 @@ protected:
     wxBitmapButton* m_searchConnections;
     wxBitmapComboBox* m_portSelector;
     wxBitmapButton* m_connect;
-    wxBitmapButton* m_bmpButton4389;
-    wxBitmapButton* m_bmpButton4385;
-    wxBitmapButton* m_bmpButton4387;
-    wxBitmapButton* m_bmpButton43893;
+    wxBitmapButton* m_btSelectReferences;
+    wxBitmapButton* m_btSelectManuallyMove;
+    wxBitmapButton* m_btSelectSetup;
+    wxBitmapButton* m_btSelectTemplate;
     wxStaticText* m_staticText1748;
     wxMenu* m_configStepDelayMenu;
     wxMenuItem* m_miCfgStepDelayMin;
@@ -161,8 +161,6 @@ protected:
     wxDataViewListCtrl* m_dvListCtrlSvgDebuggerInfoDetail;
     wxTextCtrl* m_svgDebuggerKey;
     wxTextCtrl* m_svgDebuggerValue;
-    wxPanel* m_mainBookPreviewPanel;
-    wxPanel* m_filePreviewPlaceholder;
     wxPanel* m_mainBookSetup;
     wxListbook* m_listbook2220;
     wxPanel* m_setupConfigPage;
@@ -458,6 +456,11 @@ protected:
     wxTextCtrl* m_ctrlTestParam4;
     wxStaticText* m_staticText248622;
     wxTextCtrl* m_ctrlTestParam5;
+    wxPanel* m_mainBookPreviewPanel;
+    wxPanel* m_panel4398;
+    wxStaticText* m_staticText4402;
+    wxPanel* m_filePreviewPlaceholder;
+    wxTextCtrl* m_currentFileMangerPreviewFileName;
     wxScrolledWindow* m_scrollWinMonitor;
     wxChoice* m_monitorViewSelector;
     wxSimplebook* m_monitorViewBook;
@@ -558,6 +561,7 @@ protected:
     wxStaticText* m_staticText28052;
     CncSpeedView* m_speedView;
     wxPanel* m_scrollWinFile;
+    wxCheckBox* m_keepFileManagerPreview;
     wxListCtrl* m_lruList;
     wxStaticLine* m_staticLine4345;
     wxPanel* m_mainFileViewPlaceholder;
@@ -711,6 +715,10 @@ protected:
     virtual void searchAvailiablePorts(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectReferences(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectManuallyMove(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectSetup(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event) { event.Skip(); }
     virtual void cfgStepDelayMin(wxCommandEvent& event) { event.Skip(); }
     virtual void cfgStepDelayMax(wxCommandEvent& event) { event.Skip(); }
@@ -951,10 +959,10 @@ public:
     wxBitmapButton* GetSearchConnections() { return m_searchConnections; }
     wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
     wxBitmapButton* GetConnect() { return m_connect; }
-    wxBitmapButton* GetBmpButton4389() { return m_bmpButton4389; }
-    wxBitmapButton* GetBmpButton4385() { return m_bmpButton4385; }
-    wxBitmapButton* GetBmpButton4387() { return m_bmpButton4387; }
-    wxBitmapButton* GetBmpButton43893() { return m_bmpButton43893; }
+    wxBitmapButton* GetBtSelectReferences() { return m_btSelectReferences; }
+    wxBitmapButton* GetBtSelectManuallyMove() { return m_btSelectManuallyMove; }
+    wxBitmapButton* GetBtSelectSetup() { return m_btSelectSetup; }
+    wxBitmapButton* GetBtSelectTemplate() { return m_btSelectTemplate; }
     wxStaticText* GetStaticText1748() { return m_staticText1748; }
     wxSlider* GetStepDelay() { return m_stepDelay; }
     wxStaticText* GetStepDelayValue() { return m_stepDelayValue; }
@@ -1012,8 +1020,6 @@ public:
     wxPanel* GetPanelTplDebugger() { return m_panelTplDebugger; }
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetMainBookSourcePanel() { return m_mainBookSourcePanel; }
-    wxPanel* GetFilePreviewPlaceholder() { return m_filePreviewPlaceholder; }
-    wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
     wxPropertyGridManager* GetPgMgrSetup() { return m_pgMgrSetup; }
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
     wxStaticText* GetStaticText1880() { return m_staticText1880; }
@@ -1284,6 +1290,11 @@ public:
     wxPanel* GetCtrlTestSuite() { return m_ctrlTestSuite; }
     wxTreebook* GetTreebookTest() { return m_treebookTest; }
     wxPanel* GetMainBookTest() { return m_mainBookTest; }
+    wxStaticText* GetStaticText4402() { return m_staticText4402; }
+    wxPanel* GetPanel4398() { return m_panel4398; }
+    wxPanel* GetFilePreviewPlaceholder() { return m_filePreviewPlaceholder; }
+    wxTextCtrl* GetCurrentFileMangerPreviewFileName() { return m_currentFileMangerPreviewFileName; }
+    wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
     wxSimplebook* GetMainViewBook() { return m_mainViewBook; }
     wxPanel* GetScrollWinMain() { return m_scrollWinMain; }
     wxChoice* GetMonitorViewSelector() { return m_monitorViewSelector; }
@@ -1382,6 +1393,7 @@ public:
     wxStaticText* GetStaticText28052() { return m_staticText28052; }
     CncSpeedView* GetSpeedView() { return m_speedView; }
     wxPanel* GetPanelSpeed() { return m_panelSpeed; }
+    wxCheckBox* GetKeepFileManagerPreview() { return m_keepFileManagerPreview; }
     wxListCtrl* GetLruList() { return m_lruList; }
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }

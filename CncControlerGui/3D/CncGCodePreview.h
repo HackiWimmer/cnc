@@ -83,6 +83,7 @@ class CncGCodePreview : public wxGLCanvas {
 		void onKeyDown(wxKeyEvent& event);
 
 		// interface
+		void setMaxDimension(double maxDim); 
 		void appendVertice(const CncGCodePreview::VerticeData& vd);
 		void clear();
 		
@@ -100,6 +101,7 @@ class CncGCodePreview : public wxGLCanvas {
 		
 	protected:
 		GLContextCncPathBase* preview;
+		double maxDimension;
 		
 	private:
 		void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);

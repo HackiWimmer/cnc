@@ -27,8 +27,6 @@
   <object class="wxBitmap" name="16-dll@2x">bitmaps\16-dll@2x.png</object>
   <object class="wxBitmap" name="16-error">bitmaps\16-error.png</object>
   <object class="wxBitmap" name="16-error@2x">bitmaps\16-error@2x.png</object>
-  <object class="wxBitmap" name="16-executable">bitmaps\16-executable.png</object>
-  <object class="wxBitmap" name="16-executable@2x">bitmaps\16-executable@2x.png</object>
   <object class="wxBitmap" name="16-execute_stop">bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="16-execute_stop@2x">bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="16-file_close">bitmaps\16-file_close.png</object>
@@ -144,12 +142,8 @@
   <object class="wxBitmap" name="BMP_MINUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
   <object class="wxBitmap" name="BMP_MINUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_MINUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-file_close.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-file_close@2x.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-file_close@2x.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-cog.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-cog@2x.png</object>
-  <object class="wxBitmap" name="BMP_MONITORING_NORMAL@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-cog@2x.png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-low (2).png</object>
+  <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full.png</object>
   <object class="wxBitmap" name="BMP_NOT_FROZEN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-find_and_replace.png</object>
   <object class="wxBitmap" name="BMP_NOT_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-find_and_replace@2x.png</object>
   <object class="wxBitmap" name="BMP_NOT_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-find_and_replace@2x.png</object>

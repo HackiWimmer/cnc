@@ -1,1 +1,1 @@
-./Debug/main.cpp.o ./Debug/up_CncControlerGui_3D_GLContextCncPath.cpp.o ./Debug/up_CncControlerGui_3D_GLContextTestCube.cpp.o ./Debug/up_CncControlerGui_3D_GLContextBase.cpp.o ./Debug/up_CncControlerGui_3D_GLContextPathBase.cpp.o ./Debug/up_CncControlerGui_3D_GLViewPort.cpp.o   
+./Release/main.cpp.o ./Release/up_CncControlerGui_3D_GLContextCncPath.cpp.o ./Release/up_CncControlerGui_3D_GLContextTestCube.cpp.o ./Release/up_CncControlerGui_3D_GLContextBase.cpp.o ./Release/up_CncControlerGui_3D_GLContextPathBase.cpp.o ./Release/up_CncControlerGui_3D_GLViewPort.cpp.o   
