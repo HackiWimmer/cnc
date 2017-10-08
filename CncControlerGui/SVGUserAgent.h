@@ -133,6 +133,7 @@ class SVGUserAgent{
 			SVGUserAgentInfo sua;
 			sua.lineNumber 			= cwp.currentLineNumber;
 			sua.nodeName 			= nodeName;
+			sua.elementId			= ( elementId.IsEmpty() == false ? elementId : "");
 			sua.nodeType			= SVGUserAgentInfo::NT_PATH;
 			sua.originalPath		= origPath;
 			sua.workingParameters 	= cwp;
@@ -146,21 +147,6 @@ class SVGUserAgent{
 		
 			userAgent.push_back(sua);
 			
-			// add inbound path to user agent list
-			if ( oCtl.inboundPathList != NULL ) {
-				DcmItemList rows;
-				wxString val(sua.nodeName);
-				
-				if ( elementId.IsEmpty() == false ) {
-					val << ",  id = ";
-					val << elementId;
-				}
-				
-				DataControlModel::addKeyCheckValueRow(rows, (int)sua.lineNumber, sua.shouldProceed(), val);
-				for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-					oCtl.inboundPathList->AppendItem(*it);
-				}
-			}
 			return true;
 		}
 		
@@ -169,6 +155,7 @@ class SVGUserAgent{
 			SVGUserAgentInfo sua;
 			sua.lineNumber 			= cwp.currentLineNumber;
 			sua.nodeName 			= nodeName;
+			sua.elementId			= ( elementId.IsEmpty() == false ? elementId : "");
 			sua.nodeType			= SVGUserAgentInfo::NT_CNC_PARAM;
 			sua.originalPath		= "";
 			sua.workingParameters 	= cwp;
@@ -178,16 +165,6 @@ class SVGUserAgent{
 			
 			userAgent.push_back(sua);
 			
-			// add inbound path to user agent list
-			if ( oCtl.inboundPathList != NULL ) {
-				DcmItemList rows;
-				wxString val(sua.nodeName);
-				
-				DataControlModel::addKeyCheckValueRow(rows, (int)sua.lineNumber, sua.shouldProceed(), val);
-				for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-					oCtl.inboundPathList->AppendItem(*it);
-				}
-			}
 			return true;
 		}
 		
@@ -328,12 +305,34 @@ class SVGUserAgent{
 		/////////////////////////////////////////////////////////
 		bool expand() {
 			displayUseDirective();
-			if ( oCtl.inboundPathList != NULL && oCtl.inboundPathList->GetItemCount() > 0 ) {
-				oCtl.inboundPathList->Select(oCtl.inboundPathList->RowToItem(0));
-				if ( oCtl.detailInfo != NULL )
-					oCtl.detailInfo->DeleteAllItems();
-				displayDetailInfo(0);
+			
+			// first fill the inbount path list
+			if ( oCtl.inboundPathList != NULL ) {
+				for ( auto it=userAgent.begin(); it != userAgent.end(); ++it) {
+					
+					DcmItemList rows;
+					wxString val(it->nodeName);
+					
+					if ( it->elementId.IsEmpty() == false ) {
+						val.append(",  id = ");
+						val.append(it->elementId);
+					}
+					
+					// append items
+					DataControlModel::addKeyCheckValueRow(rows, (int)it->lineNumber, it->shouldProceed(), val);
+					for (DcmItemList::iterator itr = rows.begin(); itr != rows.end(); ++itr)
+						oCtl.inboundPathList->AppendItem(*itr);
+				}
+				
+				// fill the detail list for the first item
+				if ( oCtl.inboundPathList->GetItemCount() > 0 ) {
+					oCtl.inboundPathList->Select(oCtl.inboundPathList->RowToItem(0));
+					if ( oCtl.detailInfo != NULL )
+						oCtl.detailInfo->DeleteAllItems();
+					displayDetailInfo(0);
+				}
 			}
+			
 			return true;
 		}
 		

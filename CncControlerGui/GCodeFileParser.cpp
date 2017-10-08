@@ -11,12 +11,12 @@
 GCodeFileParser::GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph) 
 : FileParser(fn)
 , pathHandler(ph)
-, currentLineNumber(0)
 , programEnd(false)
 , resumeOnError(true)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
+	pathHandler->setFileParser(this);
 }
 //////////////////////////////////////////////////////////////////
 GCodeFileParser::~GCodeFileParser() {
@@ -36,7 +36,7 @@ bool GCodeFileParser::displayMessage(const wxString& msg, int type) {
 bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream msg;
-	msg << wxString::Format("[%04d]: ", currentLineNumber);
+	msg << wxString::Format("[%04d]: ", getCurrentLineNumber());
 	msg << ss.str();
 	
 	switch ( type ) {
@@ -81,28 +81,20 @@ void GCodeFileParser::setDefaultParameters() {
 	programEnd = false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::process() {
+bool GCodeFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
-	wxASSERT( pathHandler );
-	
-	// todo
 	pathHandler->prepareWork();
-	
-	bool ret = preprocess();
-	
-	pathHandler->finishWork();
-	
-	return ret;
+	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::preprocess() {
+bool GCodeFileParser::spool() {
 //////////////////////////////////////////////////////////////////
 	setDefaultParameters();
 
 	wxFileInputStream input(fileName);
 	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
 	
-	currentLineNumber = 0;
+	setCurrentLineNumber(0);
 	GCodeBlock gcb;
 	
 	if ( input.IsOk() ) {
@@ -110,19 +102,24 @@ bool GCodeFileParser::preprocess() {
 			wxString line = text.ReadLine();
 			line.Trim(false).Trim(true);
 			
-			currentLineNumber++;
+			incCurrentLineNumber();
 			
 			if ( line.IsEmpty() == false ) {
 				if ( processBlock(line, gcb) == false ) {
 					std::cerr << "GCodeFileParser::preprocess(): Failed " <<std::endl;
-					std::cerr << " Line number: " << currentLineNumber << std::endl;
+					std::cerr << " Line number: " << getCurrentLineNumber() << std::endl;
 					return false;
 				}
 			}
 			
 			if ( programEnd == true )
 				break;
+				
+			if ( evaluateDebugState() == false )
+				return false;
 		}
+		
+		pathHandler->finishWork();
 		return true;
 	}
 	
@@ -157,6 +154,9 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 		} 
 		
 		processField(nextField, gcb);
+		
+		if ( evaluateProcessingState() == false )
+			return false;
 	}
 	
 	return performBlock(gcb);
@@ -226,7 +226,7 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 			std::cerr << "GCodeFileParser::processBlock: Invalid GCode block:" << std::endl;
 			std::cerr << " Command:     " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber) << std::endl;
 			std::cerr << " Block:       " << gcb  << std::endl;
-			std::cerr << " Line number: " << currentLineNumber << std::endl;
+			std::cerr << " Line number: " << getCurrentLineNumber() << std::endl;
 		} 
 		
 		return true;

@@ -171,8 +171,8 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 		return false;
 		
 	} else {
-		wxASSERT( GET_UPD_THREAD );
-		GET_UPD_THREAD->postSetterValue(id, value);
+		if ( GET_UPD_THREAD )
+			GET_UPD_THREAD->postSetterValue(id, value);
 	}
 
 	return true;
@@ -357,28 +357,27 @@ void CncControl::setGuiControls(GuiControlSetup* gcs) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosX() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( GET_UPD_THREAD );
-	
 	curPos.setX(0);
 	zeroPos.setX(0);
 	startPos.setX(0);
-	GET_UPD_THREAD->postAppPos(curPos);
+	
+	if ( GET_UPD_THREAD )
+		GET_UPD_THREAD->postAppPos(curPos);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosY() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( GET_UPD_THREAD );
-	
 	curPos.setY(0);
 	zeroPos.setY(0);
 	startPos.setY(0);
-	GET_UPD_THREAD->postAppPos(curPos);
+	
+	if ( GET_UPD_THREAD )
+		GET_UPD_THREAD->postAppPos(curPos);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosZ() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( guiCtlSetup );
-	wxASSERT( GET_UPD_THREAD );
 	
 	int32_t val = 0L;
 	
@@ -394,8 +393,9 @@ void CncControl::setZeroPosZ() {
 			std::cerr << "CncControl::setZeroPosZ: processSetter failed!"<< std::endl;
 		}
 	}
-
-	GET_UPD_THREAD->postAppPos(curPos);
+	
+	if ( GET_UPD_THREAD )
+		GET_UPD_THREAD->postAppPos(curPos);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos() {
@@ -441,7 +441,6 @@ bool CncControl::resetWatermarks() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::reset() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( GET_UPD_THREAD );
 	
 	getSerial()->purge();
 	resetInterrupt();
@@ -458,7 +457,9 @@ bool CncControl::reset() {
 	setZeroPos();
 	
 	CncLongPosition cp = getControllerPos();
-	GET_UPD_THREAD->postCtlPos(cp);
+	
+	if ( GET_UPD_THREAD )
+		GET_UPD_THREAD->postCtlPos(cp);
 	
 	evaluateLimitState();
 	switchToolOff();
@@ -583,10 +584,9 @@ void CncControl::changeWorkSpeedZ(CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingStart() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( GET_UPD_THREAD );
-	
 	// update command values
-	GET_UPD_THREAD->postCmdValues(0, 0);
+	if ( GET_UPD_THREAD )
+		GET_UPD_THREAD->postCmdValues(0, 0);
 	
 	ftime(&startTime);
 	commandCounter=0;
@@ -594,23 +594,22 @@ void CncControl::logProcessingStart() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingCurrent() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( GET_UPD_THREAD );
-	
 	ftime(&endTime);
 	long t_diff = (long) (1000.0 * (endTime.time - startTime.time) + (endTime.millitm - startTime.millitm));  
 
 	// update command values
-	GET_UPD_THREAD->postCmdValues(commandCounter, t_diff);
+	if ( GET_UPD_THREAD )
+		GET_UPD_THREAD->postCmdValues(commandCounter, t_diff);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingEnd(bool valuesOnly) {
-	wxASSERT( GET_UPD_THREAD );
-	
-	// update application position
-	GET_UPD_THREAD->postCtlPos(curPos);
-	
-	// update controller position
-	GET_UPD_THREAD->postCtlPos(curCtlPos);
+	if ( GET_UPD_THREAD ) {
+		// update application position
+		GET_UPD_THREAD->postCtlPos(curPos);
+		
+		// update controller position
+		GET_UPD_THREAD->postCtlPos(curCtlPos);
+	}
 	
 	if ( valuesOnly == false )
 		logProcessingCurrent();
@@ -734,7 +733,6 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( GET_UPD_THREAD );
 	
 	// Event handling, enables the interrrpt functionality
 	if ( cncConfig->isAllowEventHandling() ) {
@@ -757,7 +755,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			if ( cncConfig->isOnlineUpdateCoordinates() ) {
 				// update controller position
 				curCtlPos = ci.controllerPos;
-				GET_UPD_THREAD->postCtlPos(ci.controllerPos);
+				if ( GET_UPD_THREAD )
+					GET_UPD_THREAD->postCtlPos(ci.controllerPos);
 			}
 			
 			// pause hanling
@@ -822,7 +821,8 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	// Display coordinates
 	if ( cncConfig->isOnlineUpdateCoordinates() ) {
 		// application position
-		GET_UPD_THREAD->postAppPos(curPos);
+		if ( GET_UPD_THREAD )
+			GET_UPD_THREAD->postAppPos(curPos);
 		
 		logProcessingCurrent();
 	}
@@ -1166,8 +1166,8 @@ bool CncControl::validatePositions() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( GET_UPD_THREAD );
-	GET_UPD_THREAD->postConfigUpdate(cncConfig);
+	if ( GET_UPD_THREAD )
+		GET_UPD_THREAD->postConfigUpdate(cncConfig);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::enableStepperMotors(bool s) {

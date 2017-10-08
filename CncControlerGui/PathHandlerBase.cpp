@@ -1,6 +1,7 @@
 #include <iostream>
 #include "SVGCurveLib.h"
 #include "CncConfig.h"
+#include "FileParser.h"
 #include "PathHandlerBase.h"
 
 //////////////////////////////////////////////////////////////////

@@ -1,11 +1,7 @@
 #include <iostream>
 #include <wx/string.h>
-#include <wx/evtloop.h>
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
-#include <wx/checkbox.h>
-#include <wx/stattext.h>
-#include <wx/dataview.h>
 #include <wx/stc/stc.h>
 #include <wx/webview.h>
 #include <wx/filename.h>
@@ -25,12 +21,14 @@ SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc)
 , pathHandler(new SVGPathHandlerCnc(cnc))
 , svgUserAgent()
 , cncNodeBreak(false)
+, currentNodeName()
 , debugBase(NULL)
 , debugPath(NULL)
 , debugDetail(NULL)
 {
 //////////////////////////////////////////////////////////////////
-	createSvgTraceRoot();
+	wxASSERT(pathHandler);
+	pathHandler->setFileParser(this);
 }
 //////////////////////////////////////////////////////////////////
 SVGFileParser::~SVGFileParser() {
@@ -38,25 +36,64 @@ SVGFileParser::~SVGFileParser() {
 	delete pathHandler;
 }
 //////////////////////////////////////////////////////////////////
+bool SVGFileParser::evaluateProcessingCallback() {
+//////////////////////////////////////////////////////////////////
+	return evaluateProcessingState();
+}
+//////////////////////////////////////////////////////////////////
+void SVGFileParser::selectSourceControl(unsigned long pos) {
+//////////////////////////////////////////////////////////////////
+	// default handling
+	if ( inboundSourceControl == NULL ) {
+		FileParser::selectSourceControl(pos);
+		return;
+	}
+	
+	// debug only
+	bool debug = false;
+	if ( debug ) {
+		std::clog << pos << ": "<< currentNodeName << std::endl;
+		std::clog << inboundSourceControl->GetCurrentPos() << std::endl;
+		std::clog << inboundSourceControl->GetLine(pos) << std::endl;
+	}
+	
+	bool ok = false;
+	
+	// sets the position to the start of the given line
+	inboundSourceControl->GotoLine(pos);
+	inboundSourceControl->SearchAnchor();
+	// find start
+	long sp = inboundSourceControl->SearchNext(0, currentNodeName);
+	long ep = wxNOT_FOUND;
+	
+	if ( sp != wxNOT_FOUND ) {
+		inboundSourceControl->SetCurrentPos(sp);
+		inboundSourceControl->SearchAnchor();
+		// find end
+		ep = inboundSourceControl->SearchNext(0, ">");
+		
+		if ( ep != wxNOT_FOUND ) {
+			// make the end visible
+			inboundSourceControl->GotoPos(ep);
+			// select
+			inboundSourceControl->SetSelection(sp - 1, ep + 1);
+			ok = true;
+		}
+	}
+	
+	// debug only
+	if ( debug )
+		std::clog << sp << ", " << ep << "\n";
+	
+	// on error use the default handling
+	if ( ok == false )
+		FileParser::selectSourceControl(pos);
+}
+//////////////////////////////////////////////////////////////////
 void SVGFileParser::setPathHandler(PathHandlerBase* ph) {
 //////////////////////////////////////////////////////////////////
 	std::cerr << "SVGFileParser::setPathHandler: Invalid call, this class didn't support this method!" << endl;
 	std::cerr << "Nothig will be set." << endl;
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::createSvgTraceRoot() {
-//////////////////////////////////////////////////////////////////
-	wxXmlNode* root = svgTrace.DetachRoot();
-	if ( root )
-		delete root;
-		
-	root = new wxXmlNode(NULL, wxXML_ELEMENT_NODE, "Root");
-	svgTrace.SetRoot(root);
-}
-//////////////////////////////////////////////////////////////////
-long SVGFileParser::getCurrentLineNumber() {
-//////////////////////////////////////////////////////////////////
-	return pathHandler->getCncWorkingParameters().currentLineNumber;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) {
@@ -138,281 +175,6 @@ void SVGFileParser::broadcastDebugState(bool state) {
 	pathHandler->setDebugState(false);
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::checkIfBreakpointIsActive() {
-//////////////////////////////////////////////////////////////////
-	//evaluate if current processing phase should be debugged
-	if ( runInfo.getCurrentRunPhase() == FileParserRunInfo::RP_Preprocesser && 
-		 debugControls.debugPreprocessing != NULL && 
-		 debugControls.debugPreprocessing->IsChecked() == false )
-		return false;
-		
-	//evaluate if current processing phase should be debugged
-	if ( runInfo.getCurrentRunPhase() == FileParserRunInfo::RP_UserAgent && 
-		 debugControls.debugUserAgent != NULL && 
-		 debugControls.debugUserAgent->IsChecked() == false )
-		return false;
-		
-	//evaluate if current processing phase should be debugged
-	if ( runInfo.getCurrentRunPhase() == FileParserRunInfo::RP_Spool && 
-		 debugControls.debugSpooling != NULL && 
-		 debugControls.debugSpooling->IsChecked() == false )
-		return false;
-		
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::freezeDebugControls(bool freeze) {
-//////////////////////////////////////////////////////////////////
-	//todo freezeDebugControls ???
-	return;
-	
-	if ( freeze == true ) {
-		if ( debugControls.debuggerControlBase ) {
-			debugControls.debuggerControlBase->Update();
-			debugControls.debuggerControlBase->Refresh();
-			debugControls.debuggerControlBase->Freeze();
-		}
-	 
-		if ( debugControls.debuggerControlPath ) {
-			debugControls.debuggerControlPath->Update();
-			debugControls.debuggerControlPath->Freeze();
-		}
-		
-		if ( debugControls.debuggerControlDetail ) {
-			debugControls.debuggerControlDetail->Update();
-			debugControls.debuggerControlDetail->Freeze();
-		}
-	} else {
-		if ( debugControls.debuggerControlBase && debugControls.debuggerControlBase->IsFrozen() ) {
-			debugControls.debuggerControlBase->Thaw();
-			debugControls.debuggerControlBase->Update();
-		}
-			
-		if ( debugControls.debuggerControlPath && debugControls.debuggerControlPath->IsFrozen() ) {
-			debugControls.debuggerControlPath->Thaw();
-			debugControls.debuggerControlPath->Update();
-		}
-			
-		if ( debugControls.debuggerControlDetail && debugControls.debuggerControlDetail->IsFrozen() ) {
-			debugControls.debuggerControlDetail->Thaw();
-			debugControls.debuggerControlDetail->Update();
-		}
-	}
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::shouldStop() {
-//////////////////////////////////////////////////////////////////
-	return runInfo.getStopFlag();
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::evaluateDebugState(bool force) {
-//////////////////////////////////////////////////////////////////
-	// pause handling
-	if ( runInfo.getPauseFlag() == true ) {
-		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-		while ( runInfo.getPauseFlag() == true ) {
-			while ( evtLoop->Pending() )
-				evtLoop->Dispatch();
-				
-			if ( cncControl->isInterrupted() == true )
-				break;
-				
-			if ( runInfo.getStopFlag() == true )
-				break;
-		}
-		runInfo.setPauseFlag(false);
-		return;
-	}
-
-	// debug handling
-	if ( runInfo.getCurrentDebugState() == true ) {
-		
-		if ( force == false ) {
-			if ( checkIfBreakpointIsActive() == false )
-				return;
-		}
-			
-		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-		CncWorkingParameters cwp = pathHandler->getCncWorkingParameters();
-
-		freezeDebugControls(false);
-		//loop while next debug step should be appear (user event)
-		while ( runInfo.getNextFlag() == false ) {
-			while ( evtLoop->Pending() )
-				evtLoop->Dispatch();
-		
-			if ( cncControl->isInterrupted() == true )
-				break;
-				
-			if ( runInfo.getCurrentDebugState() == false )
-				break;
-				
-			if ( runInfo.getLastLineNumber() >= 0  && runInfo.getLastLineNumber() == cwp.currentLineNumber) {
-				break;
-			} else {
-				runInfo.setLastLineNumber(UNDEFINED_LINE_NUMBER);
-			}
-		}
-		freezeDebugControls(true);
-		runInfo.setNextFlag(false);
-	}
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValuesToTrace(wxDataViewListCtrl* ctl, wxXmlNode* node) {
-//////////////////////////////////////////////////////////////////
-	if ( runInfo.getCurrentDebugMode() == false ) 
-		return;
-	
-	wxASSERT(ctl);
-	wxASSERT(node);
-	
-	for ( int i=0; i<ctl->GetItemCount(); i++ ) {
-		wxXmlNode* n = new wxXmlNode();
-		n->SetName("B");
-		n->SetType(wxXML_CDATA_SECTION_NODE);
-
-		wxString content = (ctl->GetTextValue(i, 0));
-		content << "=";
-		content << ctl->GetTextValue(i, 1);
-		n->SetContent(content);
-		node->AddChild(n);
-	}
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::clearDebugControlBase() {
-//////////////////////////////////////////////////////////////////
-	if ( debugControls.debuggerControlBase == NULL )
-		return;
-	
-	if ( debugControls.debuggerControlBase->GetItemCount() > 0 ) {
-		debugBase = new wxXmlNode();
-		debugBase->SetName("DebugBaseNode");
-		debugBase->SetType(wxXML_ELEMENT_NODE);
-		svgTrace.GetRoot()->AddChild(debugBase);
-		
-		appendDebugValuesToTrace(debugControls.debuggerControlBase, debugBase);
-	}
-
-	debugControls.debuggerControlBase->DeleteAllItems();
-	debugControls.debuggerControlBase->Update();
-	debugControls.debuggerControlBase->Refresh();
-	clearDebugControlPath();
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::clearDebugControlPath() {
-//////////////////////////////////////////////////////////////////
-	if ( debugControls.debuggerControlPath == NULL )
-		return;
-	
-	if ( debugBase != NULL && debugControls.debuggerControlPath->GetItemCount() > 0 ) {
-		debugPath = new wxXmlNode();
-		debugPath->SetName("DebugPathNode");
-		debugPath->SetType(wxXML_ELEMENT_NODE);
-		debugBase->AddChild(debugPath);
-		
-		appendDebugValuesToTrace(debugControls.debuggerControlPath, debugPath);
-	}
-
-	debugControls.debuggerControlPath->DeleteAllItems();
-	debugControls.debuggerControlPath->Update();
-	debugControls.debuggerControlPath->Refresh();
-	clearDebugControlDetail();
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::clearDebugControlDetail() {
-//////////////////////////////////////////////////////////////////
-	if ( debugControls.debuggerControlDetail == NULL )
-		return;
-
-	if ( debugPath != NULL && debugControls.debuggerControlDetail->GetItemCount() > 0 ) {
-		debugDetail = new wxXmlNode();
-		debugDetail->SetName("DebugDetailNode");
-		debugDetail->SetType(wxXML_ELEMENT_NODE);
-		debugPath->AddChild(debugDetail);
-		
-		appendDebugValuesToTrace(debugControls.debuggerControlDetail, debugDetail);
-	}
-	
-	debugControls.debuggerControlDetail->DeleteAllItems();
-	debugControls.debuggerControlDetail->Update();
-	debugControls.debuggerControlDetail->Refresh();
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValue(wxDataViewListCtrl* ctl, const char* key, wxVariant value) {
-//////////////////////////////////////////////////////////////////
-	if ( runInfo.getCurrentDebugState() == false )
-		return;
-		
-	if ( checkIfBreakpointIsActive() == false )
-		return;
-		
-	if ( ctl == NULL )
-		return;
-		
-	wxVector<wxVariant> row;
-	row.push_back(wxString(key));
-	row.push_back(value.GetString());
-	ctl->AppendItem(row);
-	
-	int itemCount = ctl->GetItemCount();
-	ctl->EnsureVisible(ctl->RowToItem(itemCount - 1));
-	ctl->EnsureVisible(ctl->RowToItem(0));
-	ctl->Update();
-	ctl->Refresh();
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValue(wxDataViewListCtrl* ctl, DcmItemList& rows) {
-//////////////////////////////////////////////////////////////////
-	if ( runInfo.getCurrentDebugState() == false )
-		return;
-		
-	if ( checkIfBreakpointIsActive() == false )
-		return;
-		
-	for ( DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it ) {
-		DcmRow row = *it;
-		if ( row.size() == 2 ) {
-			appendDebugValue(ctl, row.at(0).GetString(), row.at(1).GetString());
-		}
-	}
-}
-//////////////////////////////////////////////////////////////////
-const char* SVGFileParser::convertToXmlString(wxString& value) {
-//////////////////////////////////////////////////////////////////
-	value.Replace(" ", "", true);
-	return value;
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValueBase( DcmItemList& rows) {
-//////////////////////////////////////////////////////////////////
-	appendDebugValue(debugControls.debuggerControlBase, rows);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValuePath( DcmItemList& rows) {
-//////////////////////////////////////////////////////////////////
-	appendDebugValue(debugControls.debuggerControlPath, rows);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValueDetail( DcmItemList& rows) {
-//////////////////////////////////////////////////////////////////
-	appendDebugValue(debugControls.debuggerControlDetail, rows);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValueBase(const char* key, wxVariant value) {
-//////////////////////////////////////////////////////////////////
-	appendDebugValue(debugControls.debuggerControlBase, key, value);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValuePath(const char* key, wxVariant value) {
-//////////////////////////////////////////////////////////////////
-	appendDebugValue(debugControls.debuggerControlPath, key, value);
-}
-//////////////////////////////////////////////////////////////////
-void SVGFileParser::appendDebugValueDetail(const char* key, wxVariant value) {
-//////////////////////////////////////////////////////////////////
-	appendDebugValue(debugControls.debuggerControlDetail, key, value);
-}
-//////////////////////////////////////////////////////////////////
 void SVGFileParser::debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString) {
 //////////////////////////////////////////////////////////////////
 	if ( attribute == NULL )
@@ -442,7 +204,7 @@ void SVGFileParser::debugXMLNode(wxXmlNode *child) {
 		return;
 
 	CncWorkingParameters cwp = pathHandler->getCncWorkingParameters();
-	appendDebugValueBase("Line Number", cwp.currentLineNumber);
+	appendDebugValueBase("Line Number", getCurrentLineNumber());
 	appendDebugValueBase("Reverse Path", cwp.getCorrectionType());
 	appendDebugValueBase("Node", child->GetName());
 	
@@ -454,7 +216,7 @@ void SVGFileParser::debugXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::clearControls() {
 //////////////////////////////////////////////////////////////////
-	clearDebugControlBase();
+	FileParser::clearControls();
 	svgUserAgent.clearControls();
 }
 //////////////////////////////////////////////////////////////////
@@ -465,38 +227,8 @@ bool SVGFileParser::createPreview(const wxString& resultingFileName, bool withEr
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
 //////////////////////////////////////////////////////////////////
-	runInfo.setCurrentRunPhase(p);
+	FileParser::initNextRunPhase(p);
 	pathHandler->setDebugState(runInfo.getCurrentDebugState());
-	
-	if ( debugControls.debugPhase == NULL )
-		return;
-		
-	debugControls.debugPhase->SetLabel(runInfo.getCurrentDebugPhaseAsString());
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::process() {
-//////////////////////////////////////////////////////////////////
-	wxASSERT(pathHandler);
-	
-	initNextRunPhase(FileParserRunInfo::RP_Preprocesser);
-	clearDebugControlBase();
-	bool ret = preprocess();
-	
-	if ( runInfo.processMore() && ret == true ) {
-		initNextRunPhase(FileParserRunInfo::RP_UserAgent);
-		svgUserAgent.expand();
-		clearDebugControlBase();
-		
-		if ( runInfo.processMore() ) {
-			initNextRunPhase(FileParserRunInfo::RP_Spool);
-			ret = spool();
-		}
-	} 
-	
-	initNextRunPhase(FileParserRunInfo::RP_Unknown);
-	freezeDebugControls(false);
-
-	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::spool() {
@@ -511,7 +243,11 @@ bool SVGFileParser::spool() {
 		SVGUserAgentInfo uai  = *itUav;
 		
 		pathHandler->setCncWorkingParameters(uai.workingParameters);
-	
+		// important! the current node name has to be set before setCurrentLineNumer() 
+		// to get a correct result in this overlaoded function
+		currentNodeName.assign(uai.nodeName);
+		setCurrentLineNumber(uai.lineNumber);
+
 		DcmItemList dil;
 		uai.getBaseDetails(dil);
 		appendDebugValueBase(dil);
@@ -521,12 +257,18 @@ bool SVGFileParser::spool() {
 		appendDebugValuePath(dil);
 		
 		if ( performPath(uai) == false ) {
+			
+			// in this case to stop here is valid
+			if ( runInfo.getStopFlag() == true )
+				return true;
+				
 			std::cerr << "SVGFileParser::performPath: Failed" << std::endl;
 			std::cerr << "Line number: " << uai.lineNumber << ", Node Type: " << uai.nodeName << std::endl;
 			return false;
 		}
 		
-		evaluateDebugState();
+		if ( evaluateDebugState() == false )
+			return false;
 	}
 	
 	pathHandler->finishWork();
@@ -660,7 +402,9 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 			uai.debug(pi, std::cerr);
 			return false;
 		}
-		evaluateDebugState();
+		
+		if ( evaluateProcessingState() == false )
+			return false;
 	}
 		
 	if ( pathHandler->finishCurrentPath() == false )
@@ -670,10 +414,10 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	if ( pathHandler->runCurrentPath() == false )
 		return false;
 		
-	evaluateDebugState();
+	//evaluateDebugState();
 	clearDebugControlBase();
 
-	if ( runInfo.getStopFlag() == true )
+	if ( evaluateProcessingState() == false )
 		return false;
 		
 	return true;
@@ -713,26 +457,28 @@ bool SVGFileParser::preprocess() {
 	cncNodeBreak = false;
 	bool ret = processXMLNode(child);
 	
-	// reset the soure editor selection 
-	selectSourceControl(0);
-
 	if ( ret == false ) {
 		std::cerr << "SVGFileParser: processXMLNode return false \n";
-		std::cerr << " Current line numer: " << pathHandler->getCncWorkingParameters().currentLineNumber << std::endl;
+		std::cerr << " Current line numer: " << getCurrentLineNumber() << std::endl;
 		std::cerr << " Duration counter: " << cncControl->getDurationCounter() << std::endl;
 		std::cerr << " File parsing stopped" << std::endl;
 	} else {
-		collectUserAgentTrace();
+		// fill the user agent controls
+		svgUserAgent.expand();
+		clearDebugControlBase();
 	}
-
+	
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
 	while ( child && cncNodeBreak == false) {
+		// important! the current node name has to be set before setCurrentLineNumer() 
+		// to get a correct result in this overlaoded function
+		currentNodeName.assign(child->GetName());
+		setCurrentLineNumber(child->GetLineNumber());
 		pathHandler->getCncWorkingParameters().currentLineNumber = child->GetLineNumber();
-		selectSourceControl(child->GetLineNumber() - 1);
 
 		if ( child->GetName() == SvgNodeTemplates::CncParameterBlockNodeName ) {
 			if ( evaluateCncParameters(child) == false )
@@ -847,6 +593,10 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			std::clog << "Obsolete Node. <CNC> isn't longer implemented. Line number: " << child->GetLineNumber() << std::endl;
 		}
 
+		// check the debug state before the next node
+		if ( evaluateDebugState() == false )
+			return false;
+			
 		// recursion call to get the complete depth
 		wxXmlNode* last = child;
 		if ( processXMLNode(child->GetChildren()) == false ) {
@@ -875,6 +625,10 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			return false;
 		
 		child = child->GetNext();
+		
+		// check the debug state before the next node
+		if ( evaluateDebugState() == false )
+			return false;
 	}
 
 	return true;
@@ -907,21 +661,6 @@ bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
 	
 	attr = child->GetAttribute("depth", wxString::Format("Z%lf", 0.0));
 	cwp.setCurrentZDepth(attr);
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::collectUserAgentTrace() {
-//////////////////////////////////////////////////////////////////
-	if ( runInfo.getCurrentDebugMode() == false )
-		return true;
-	
-	wxXmlNode* tr = new wxXmlNode();
-	tr->SetName("Trace");
-	tr->SetType(wxXML_ELEMENT_NODE);
-	tr->AddAttribute("type", "User Agent Trace");
-	svgTrace.GetRoot()->AddChild(tr);
-	svgUserAgent.evaluateTraceInfo(tr);
 	
 	return true;
 }

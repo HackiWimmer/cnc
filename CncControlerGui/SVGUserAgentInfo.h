@@ -62,6 +62,7 @@ struct SVGUserAgentInfo {
 		unsigned int lineNumber = UNDEFINED_LINE_NUMBER;
 		NodeType nodeType = NT_UNDEFINED;
 		wxString nodeName;
+		wxString elementId;
 		wxString originalPath;
 		
 		CncWorkingParameters workingParameters;

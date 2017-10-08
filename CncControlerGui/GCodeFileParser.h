@@ -22,7 +22,6 @@ class GCodeFileParser : public FileParser {
 	
 	protected:
 		GCodePathHandlerBase* pathHandler;
-		unsigned int currentLineNumber;
 		bool programEnd;
 		bool resumeOnError;
 		
@@ -52,14 +51,12 @@ class GCodeFileParser : public FileParser {
 		bool processM(GCodeBlock& gcb);
 		//....
 		
-		// overridden from SVGFileParser
 		virtual bool preprocess();
-		virtual bool process();
+		virtual bool spool();
 
 	public:
 		GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph);
 		virtual ~GCodeFileParser();
-		
 };
 
 

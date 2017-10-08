@@ -159,8 +159,9 @@ void UpdateManagerThread::display() {
 ///////////////////////////////////////////////////////////////////
 	// important: be thread safe in all prodedures below!
 	updatePositionControls();
-	updateConfigurationControls();
-	updateSetterControls();
+	//todo
+	//updateConfigurationControls();
+	//updateSetterControls();
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::updatePositionControls() {

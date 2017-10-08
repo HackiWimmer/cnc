@@ -2,6 +2,7 @@
 #define FILE_PARSER_H
 
 #include <wx/string.h>
+#include "DataControlModel.h"
 #include "FileParserRunInfo.h"
 
 class wxStyledTextCtrl;
@@ -19,7 +20,6 @@ class FileParser {
 			wxDataViewListCtrl* 	debuggerControlPath 	= NULL;
 			wxDataViewListCtrl* 	debuggerControlDetail 	= NULL;
 			wxMenuItem*				debugPreprocessing 		= NULL;
-			wxMenuItem*				debugUserAgent			= NULL;
 			wxMenuItem*				debugSpooling			= NULL;
 		};
 		
@@ -34,25 +34,26 @@ class FileParser {
 		FileParser(const wxString& fn);
 		virtual ~FileParser();
 		
-		virtual bool processDebug();
-		virtual bool processRelease();
-		
-		virtual void setUserAgentControls(UserAgentOutputControls& oc) {}
-		virtual void displayUserAgentDetailInfo(unsigned int pos) {}
-		virtual void clearControls() {}
-		
-		bool pause();
 		bool isPause() { return runInfo.getPauseFlag(); }
 		bool isProcessing() { return runInfo.isProcessing(); }
 		
-		void debugNextPath();
+		virtual bool processDebug();
+		virtual bool processRelease();
+		
+		bool togglePause();
+		
+		void debugNextBreakPoint();
 		void debugNextStep();
 		void debugStop();
 		void debugFinish();
 		
+		virtual void setUserAgentControls(UserAgentOutputControls& oc) {}
+		virtual void displayUserAgentDetailInfo(unsigned int pos) {}
+		virtual void clearControls() { clearDebugControlBase(); }
+		
+		int getCurrentLineNumber() { return currentLineNumber; };
 		void setInboundSourceControl(wxStyledTextCtrl* stc) { inboundSourceControl = stc; }
 		
-		void selectSourceControl(wxStyledTextCtrl* ctl, unsigned long pos);
 		void setDebuggerControls(DebugControls& dc);
 		
 	protected:
@@ -62,13 +63,47 @@ class FileParser {
 		DebugControls debugControls;
 		wxStyledTextCtrl* inboundSourceControl;
 		
-		virtual bool process() = 0;
+		virtual bool process();
+		virtual bool preprocess() = 0;
+		virtual bool spool() = 0;
+		virtual void initNextRunPhase(FileParserRunInfo::RunPhase p);
 		
-		virtual void evaluateDebugState(bool force = false) {}
+		virtual bool isInterrupted() { return false; }
 		virtual void broadcastDebugState(bool state) {}
 		virtual void broadcastDebugControls(DebugControls& dc) {}
 		
-		void selectSourceControl(unsigned long pos);
+		virtual void selectSourceControl(unsigned long pos);
+		
+		bool evaluateProcessingState();
+		bool evaluateDebugState(bool force = false);
+		
+		void setCurrentLineNumber(long ln);
+		void incCurrentLineNumber() { setCurrentLineNumber(++currentLineNumber); }
+		bool hasLineABreakpoint(long ln);
+		bool checkBreakpoint();
+		
+		void clearDebugControlBase();
+		void clearDebugControlPath();
+		void clearDebugControlDetail();
+		
+		void appendDebugValue(wxDataViewListCtrl* ctl, const char* key, wxVariant value);
+		void appendDebugValue(wxDataViewListCtrl* ctl, DcmItemList& rows);
+		void appendDebugValueDetail(const char* key, wxVariant value);
+		
+		void appendDebugValuePath(const char* key, wxVariant value);
+		void appendDebugValueBase(const char* key, wxVariant value);
+		
+		void appendDebugValueBase(DcmItemList& rows);
+		void appendDebugValuePath(DcmItemList& rows);
+		void appendDebugValueDetail(DcmItemList& rows);
+		
+		friend class SVGPathHandlerCnc;
+		friend class GCodePathHandlerCnc;
+		friend class GCodePathHandlerGL;
+		
+	private:
+		long currentLineNumber;
+		bool checkIfCurrentRunPhaseShouldBeDebugged();
 };
 
 #endif

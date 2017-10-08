@@ -20,7 +20,6 @@ namespace cnc {
 	const wxString& dblFormat1(double d);
 	const wxString& dblFormat2(double d1, double d2, const wxString& delimiter = _T(","));
 	const wxString& dblFormat3(double d1, double d2, double d3, const wxString& delimiter = _T(","));
-	
 }
 
 // common ostream operators
@@ -31,8 +30,9 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 using namespace std;
 
 // define globally const values
-static const float PI = 3.14159265;
-static const int MAX_PARAMETER_VALUES = 10;
+static const float PI 								= 3.14159265;
+static const int MAX_PARAMETER_VALUES 				= 10;
+static const int UNDEFINED_LINE_NUMBER 				= -1;
 
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
@@ -46,26 +46,43 @@ enum TemplateFormat 			{ TplUnknown, TplSvg, TplGcode, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3};
 
 
-static const int UNDEFINED_LINE_NUMBER 				= -1;
 
-enum MainBookSelection {
-	SOURCE_PANEL				= 0,
-	SETUP_PANEL					= 1,
-	REFERENCE_PANEL				= 2,
-	MANUEL_PANEL				= 3,
-	TEST_PANEL					= 4,
-	PREVIEW_PANEL				= 5
+
+class MainBookSelection {
+	public:
+		enum VAL {
+			SOURCE_PANEL				= 0,
+			SETUP_PANEL					= 1,
+			REFERENCE_PANEL				= 2,
+			MANUEL_PANEL				= 3,
+			TEST_PANEL					= 4,
+			PREVIEW_PANEL				= 5
+		};
 };
 
-enum MonitorBookSelection {
-	CNC_PANEL					= 0,
-	TEMPLATE_PANEL				= 1
+class MonitorBookSelection {
+	public:
+		enum VAL {
+			CNC_PANEL					= 0,
+			TEMPLATE_PANEL				= 1
+		};
 };
 
+class TemplateBookSelection {
+	public:
+		enum VAL {
+			SOURCE_PANEL				= 0,
+			USER_AGENT_PANEL			= 1
+		};
+};
 
-static const unsigned int TemplateContentPage 		= 0; 
-static const unsigned int TemplateUserAgentPage 	= 1;
-static const unsigned int TemplateDebuggerPage 		= 2;
+class SpyBookSelection {
+	public:
+		enum VAL {
+			SERIAL_SPY_PANEL			= 0,
+			DEBUGGER_PANEL				= 1
+		};
+};
 
 static const unsigned int OutboundCNCValuesPage 	= 0;
 static const unsigned int Outbound3DPage 			= 1;

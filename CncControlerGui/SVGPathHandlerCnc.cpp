@@ -5,6 +5,7 @@
 #include <wx/dataview.h>
 #include "SerialPort.h"
 #include "CncControl.h"
+#include "FileParser.h"
 #include "SvgUnitCalculator.h"
 #include "CncToolCorrection.h"
 #include "SVGPathHandlerCnc.h"
@@ -299,6 +300,9 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 	unsigned int cnt = 0;
 	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
 
+		if ( fileParser != NULL )
+			fileParser->evaluateDebugState();
+		
 		CncPathListEntry cpe = *it;
 		cnt++;
 		
@@ -368,8 +372,6 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 			double sy = pathListMgr.getStartPos().y;
 			cncControl->getSerial()->beginPath(sx, sy);
 		}
-		//todo evaluateDebugState
-		//MessageBoxA(0,"","",0);
 	}
 
 	return true;

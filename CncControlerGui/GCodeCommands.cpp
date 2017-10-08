@@ -39,7 +39,7 @@ class CommandStoreInitializer {
 			registerCommand(GCodeField("M08"), 		'C', ig,	false, "Flood Coolant On");
 			registerCommand(GCodeField("M09"), 		'C', ig,	false, "Coolant Off");
 			
-			registerCommand(GCodeField("M30"), 		'C', ig,	false, "Program Ennd And Rewind");
+			registerCommand(GCodeField("M30"), 		'C', ig,	false, "Program End And Rewind");
 		}
 		
 		//////////////////////////////////////////////////////////////////

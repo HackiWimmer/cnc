@@ -187,7 +187,7 @@ bool CncFileView::selectFileInList(const wxString& fileName) {
 void CncFileView::fileListLeave(wxMouseEvent& event) {
 	wxASSERT(mainFrame);
 	
-	if ( mainFrame->GetMainViewBook()->GetSelection() != MainBookSelection::PREVIEW_PANEL )
+	if ( mainFrame->GetMainViewBook()->GetSelection() != (int)MainBookSelection::PREVIEW_PANEL )
 		return;
 		
 	if ( mainFrame->GetKeepFileManagerPreview()->IsChecked() == true )

@@ -8,7 +8,7 @@ class FileParserRunInfo {
 	
 	public:
 		///////////////////////////////////////////////////////////////
-		enum RunPhase {RP_Unknown=0, RP_Preprocesser=1, RP_UserAgent=2,  RP_Spool=3, RP_LAST=4};
+		enum RunPhase {RP_Unknown=0, RP_Preprocesser=1, RP_Spool=2, RP_LAST=3};
 		
 	private:
 		RunPhase runPhase;
@@ -77,7 +77,7 @@ class FileParserRunInfo {
 		}
 		///////////////////////////////////////////////////////////////
 		void setCurrentRunPhase(RunPhase p) { 
-			if ( p == RP_LAST ) runPhase = RP_Unknown;
+			if ( p == RP_LAST ) 	runPhase = RP_Unknown;
 			else					runPhase = p; 
 			
 			setCurrentDebugState(debugMode[runPhase]);
@@ -98,23 +98,24 @@ class FileParserRunInfo {
 		bool getStopFlag() { return stop; }
 		
 		///////////////////////////////////////////////////////////////
-		void setNextFlag(bool n) { next = n; }
-		bool getNextFlag() { return next; }
+		void setStepByStepFlag(bool n) { next = n; }
+		bool getStepByStepFlag() { return next; }
 		
 		///////////////////////////////////////////////////////////////
 		void setPauseFlag(bool p) { pause = p; }
 		bool getPauseFlag() { return pause; }
 		///////////////////////////////////////////////////////////////
 		int getLastLineNumber() { return lastLineNumber; }
+		bool isLastLineNumberDefined() { return lastLineNumber != UNDEFINED_LINE_NUMBER; }
+		void resetLastLineNumber() { lastLineNumber = UNDEFINED_LINE_NUMBER; }
 		void setLastLineNumber(int ln) { lastLineNumber = ln; }
 		
 		///////////////////////////////////////////////////////////////
 		const char* getCurrentDebugPhaseAsString() {
 			switch ( runPhase) {
 				case RP_Preprocesser: 	return "Preprocessor";
-				case RP_UserAgent:		return "User Agent";
 				case RP_Spool:			return "Spooling";
-				default:					return "";
+				default:				return "";
 			}
 		}
 		

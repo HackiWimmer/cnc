@@ -61,11 +61,20 @@ const char* _programVersion 	= "0.8.0.d";
 const char* _programVersion 	= "0.8.0.r";
 #endif
 
-// file content change environment
-#define EDIT_TRACKER_MARGIN_ID 1
-#define CL_LINE_MODIFIED_STYLE 200
-#define CL_LINE_SAVED_STYLE 201
-enum {MARGIN_LINE_NUMBERS, MARGIN_FOLD};
+
+enum {
+		MARGIN_LINE_NUMBERS, 
+		MARGIN_EDIT_TRACKER,
+		MARGIN_BREAKPOINT,
+		MARGIN_FOLD
+};
+
+enum {
+		TE_DEFAULT_STYLE = 242,
+		TE_BREAKPOINT_STYLE,
+		TE_LINE_MODIFIED_STYLE,
+		TE_LINE_SAVED_STYLE
+};
 
 
 wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxThreadEvent);
@@ -95,7 +104,6 @@ MainFrame::MainFrame(wxWindow* parent)
 , isZeroReferenceValid(false)
 , canClose(true)
 , evaluatePositions(true)
-, svgDebugger(false)
 , templateFileLoading(false)
 , ignoreDirControlEvents(false)
 , runConfirmationInfo(RunConfirmationInfo::Wait)
@@ -136,8 +144,6 @@ MainFrame::MainFrame(wxWindow* parent)
 	
 	// do this definitely here later it will causes a crash 
 	installCustControls();
-	
-	//m_templateNotebook->SetSelection(TemplatePreviewPage);
 	
 	// define the popup parent frame
 	SvgEditPopup::setMainFrame(this);
@@ -665,7 +671,7 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 		ctl->StyleSetBackground (i, clDefaultBck);
 	}
 	
-	// setup gray background as default
+	// setup gray foreground as default
 	for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++) {
 		ctl->StyleSetForeground (i, clDefaultFgd);
 	}
@@ -687,12 +693,18 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	ctl->SetMarginMask(MARGIN_FOLD, wxSTC_MASK_FOLDERS);
 	ctl->SetMarginWidth(MARGIN_FOLD, 0);
 	ctl->SetMarginSensitive(MARGIN_FOLD, false);
-	ctl->SetFoldMarginColour(true, *wxBLACK);
+	ctl->SetFoldMarginColour(true, wxColour(73, 73, 73));
 	ctl->SetFoldMarginHiColour(true, *wxBLACK);
-
+	
 	// Set default styles 
-	ctl->StyleSetForeground (wxSTC_STYLE_LINENUMBER, clDefaultFgd);
-	ctl->StyleSetBackground (wxSTC_STYLE_LINENUMBER, clDefaultBck);
+	ctl->StyleSetForeground(TE_DEFAULT_STYLE, clDefaultFgd);
+	ctl->StyleSetBackground(TE_DEFAULT_STYLE, wxColour(73, 73, 73));
+	ctl->StyleSetBackground(TE_BREAKPOINT_STYLE, wxColour(128, 0, 0));
+	ctl->StyleSetForeground(TE_BREAKPOINT_STYLE, *wxWHITE);
+	ctl->StyleSetBackground(TE_LINE_SAVED_STYLE, wxColour(wxT("FOREST GREEN")));
+	ctl->StyleSetBackground(TE_LINE_MODIFIED_STYLE, wxColour(wxT("ORANGE")));
+	ctl->StyleSetForeground(wxSTC_STYLE_LINENUMBER, clDefaultFgd);
+	ctl->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour(73, 73, 73));
 	ctl->SetTabWidth(4);
 	ctl->SetWrapMode(wxSTC_WRAP_NONE);
 	ctl->SetReadOnly(false);
@@ -700,10 +712,20 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	// Enable line numbers
 	ctl->SetMarginWidth(MARGIN_LINE_NUMBERS, 35);
 	ctl->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
+	ctl->SetMarginSensitive(MARGIN_LINE_NUMBERS, true);
 	
-	ctl->SetMarginType(EDIT_TRACKER_MARGIN_ID, 4); // Styled Text margin
-	ctl->SetMarginWidth(EDIT_TRACKER_MARGIN_ID, 3);
-	ctl->SetMarginMask(EDIT_TRACKER_MARGIN_ID, 0);
+	// Enable breakpoint
+	ctl->SetMarginWidth(MARGIN_BREAKPOINT, 8);
+	ctl->SetMarginType(MARGIN_BREAKPOINT, wxSTC_MARGIN_TEXT);
+	ctl->SetMarginMask(MARGIN_BREAKPOINT, 0);
+	ctl->SetMarginSensitive(MARGIN_BREAKPOINT, true);
+
+	
+	// Enable edit style - file content marker
+	ctl->SetMarginWidth(MARGIN_EDIT_TRACKER, 3);
+	ctl->SetMarginType(MARGIN_EDIT_TRACKER, wxSTC_MARGIN_SYMBOL); 
+	ctl->SetMarginMask(MARGIN_EDIT_TRACKER, 0);
+
 	
 	// Configure caret style
 	ctl->SetCaretForeground(clCaretFgd);
@@ -712,10 +734,6 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	// Configure selection colours
 	//ctl->SetSelForeground(true, wxColour(255,201,14));
 	ctl->SetSelBackground(true, wxColour(83,83,83));
-	
-	// file content marker
-	ctl->StyleSetBackground(CL_LINE_SAVED_STYLE, wxColour(wxT("FOREST GREEN")));
-	ctl->StyleSetBackground(CL_LINE_MODIFIED_STYLE, wxColour(wxT("ORANGE")));
 	
 	// Set specific styles
 	switch ( format ) {
@@ -742,6 +760,7 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 			ctl->SetProperty(wxT("fold.preprocessor"), 			wxT("1"));
 			ctl->SetProperty(wxT("fold.html"), 					wxT("1"));
 			ctl->SetProperty(wxT("fold.html.preprocessor"), 	wxT("1"));
+			
 			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDER,        		wxSTC_MARK_BOXPLUS, 			clDefaultBck, clDefaultFgd);
 			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN,    		wxSTC_MARK_BOXMINUS, 			clDefaultBck, clDefaultFgd);
 			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDERSUB,    		wxSTC_MARK_VLINE,    			clDefaultBck, clDefaultFgd);
@@ -969,7 +988,7 @@ void MainFrame::initializeUpdateManagerThread() {
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
 	initializeUpdateManagerThread();
-
+	
 	lruFileList.setListControl(m_lruList);
 	
 	createAnimationControl();
@@ -977,6 +996,7 @@ void MainFrame::initialize(void) {
 	createStcEmuControlPopupMenu();
 	decorateSearchButton();
 	switchMonitorButton(true);
+	m_miStopAfterSpoolling->Check(true);
 	determineRunMode();
 	registerGuiControls();
 	enableManuallyControls();
@@ -1473,7 +1493,6 @@ bool MainFrame::connectSerialPort() {
 	wxString cs;
 	
 	disableControls();
-	disableAllRunControls();
 	hideSVGEmuResult();
 	
 	m_miRqtIdleMessages->Check(false);
@@ -1548,37 +1567,46 @@ void MainFrame::enableMenuItem(wxMenuItem* m, bool state) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableRunControls(bool state) {
+// state == false: processing active
+// state == true:  processing inacative
+// - triggered by enableControls(state)
 ///////////////////////////////////////////////////////////////////
-	m_rcRun->Enable(state);
-		
-	m_rcStop->Enable(!state);
-	m_btnEmergenyStop->Enable(!state);
-	
-	if ( isPause() ) {
-		m_rcStop->Enable(true);
-		m_btnEmergenyStop->Enable(true);
+	// only for debugging
+	if ( false ) {
+		std::clog << "state: " 			<< state;
+		std::clog << ", debug: " 		<< m_miRcDebug->IsChecked();
+		std::clog << ", pause: " 		<< isPause();
+		std::clog << std::endl;
 	}
-
 	
-	//todo
-	m_rcReset->Enable(		isPause() == false 		&& state);
+	// all buttons of the run control have to be enabled/disabeled here
+	// every time
 	
-	m_rcPause->Enable(		svgDebugger == false 	&& !state);
-	m_rcNextStep->Enable(	svgDebugger == true 	&& !state);
-	m_rcNextPath->Enable(	svgDebugger == true 	&& !state);
-	m_rcFinish->Enable(		svgDebugger == true 	&& !state);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::enableAllRunControls(bool state) {
-///////////////////////////////////////////////////////////////////
-	m_rcRun->Enable(state);
-	m_rcPause->Enable(state);
-	m_rcStop->Enable(state);
-	m_rcReset->Enable(state);
-	m_rcNextStep->Enable(state);
-	m_rcNextPath->Enable(state);
-	m_rcFinish->Enable(state);
-	m_btnEmergenyStop->Enable(!state);
+	if ( m_miRcDebug->IsChecked() == false ) {
+		
+		isPause() ? m_rcRun->Enable(true)           : m_rcRun->Enable(state);
+		isPause() ? m_rcPause->Enable(false)        : m_rcPause->Enable(!state);
+		isPause() ? m_rcStop->Enable(true)          : m_rcStop->Enable(!state);
+		isPause() ? m_btnEmergenyStop->Enable(true) : m_btnEmergenyStop->Enable(!state);
+		
+		m_rcReset->Enable(isPause() == false && state);
+		m_rcNextStep->Enable(false);
+		m_rcNextBreakpoint->Enable(false);
+		m_rcFinish->Enable(false);
+		
+	} else {
+		
+		isPause() ? m_rcRun->Enable(true)           : m_rcRun->Enable(state);
+		isPause() ? m_rcPause->Enable(false)        : m_rcPause->Enable(!state);
+		isPause() ? m_rcStop->Enable(true)          : m_rcStop->Enable(!state);
+		isPause() ? m_btnEmergenyStop->Enable(true) : m_btnEmergenyStop->Enable(!state);
+				
+		m_rcReset->Enable(isPause() == false && state);
+		
+		m_rcNextStep->Enable(!state);
+		m_rcNextBreakpoint->Enable(!state);
+		m_rcFinish->Enable(!state);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableControls(bool state) {
@@ -2171,10 +2199,10 @@ void MainFrame::refreshSvgEmuSourceFile(bool blank) {
 TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int sel = m_mainViewSelector->GetSelection();
-	if ( sel == MainBookSelection::MANUEL_PANEL )
+	if ( sel == (unsigned int)MainBookSelection::VAL::MANUEL_PANEL )
 		return TplManual;
 		
-	if ( sel == MainBookSelection::TEST_PANEL )
+	if ( sel == (unsigned int)MainBookSelection::VAL::TEST_PANEL )
 		return TplTest;
 		
 	wxFileName fn;
@@ -2207,22 +2235,14 @@ const wxString& MainFrame::getCurrentTemplatePathFileName() {
 void MainFrame::showSvgExtPages(bool show) {
 ///////////////////////////////////////////////////////////////////
 	if ( show == false ) {
-		if (m_templateNotebook->FindPage(m_panelTplDebugger) != wxNOT_FOUND )
-			m_templateNotebook->RemovePage(m_templateNotebook->FindPage(m_panelTplDebugger));
-
 		if (m_templateNotebook->FindPage(m_panelTplUserAgent) != wxNOT_FOUND )
 			m_templateNotebook->RemovePage(m_templateNotebook->FindPage(m_panelTplUserAgent));
 			
 	} else {
 		// correct insert order is very important
 		if (m_templateNotebook->FindPage(m_panelTplUserAgent) == wxNOT_FOUND ) {
-			m_templateNotebook->InsertPage(TemplateUserAgentPage, m_panelTplUserAgent, "", false);
-			templateNbInfo->decorate(TemplateUserAgentPage);
-		}
-
-		if (m_templateNotebook->FindPage(m_panelTplDebugger) == wxNOT_FOUND ) {
-			m_templateNotebook->InsertPage(TemplateDebuggerPage, m_panelTplDebugger, "", false);
-			templateNbInfo->decorate(TemplateDebuggerPage);
+			m_templateNotebook->InsertPage(TemplateBookSelection::VAL::USER_AGENT_PANEL, m_panelTplUserAgent, "", false);
+			templateNbInfo->decorate(TemplateBookSelection::VAL::USER_AGENT_PANEL);
 		}
 	}
 }
@@ -2401,7 +2421,7 @@ void MainFrame::reloadTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::reloadTemplateFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( !openFile(TemplateContentPage) ) {
+	if ( !openFile(TemplateBookSelection::VAL::SOURCE_PANEL) ) {
 		std::cerr << "Error while reloding template: " << getCurrentTemplateFileName().c_str() << std::endl;
 	}
 }
@@ -2508,10 +2528,10 @@ bool MainFrame::saveFile() {
 	if( ret == true ) {
 		
 		// update tab label
-		wxString name(m_templateNotebook->GetPageText(TemplateContentPage));
+		wxString name(m_templateNotebook->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
 		if ( name.StartsWith("*") == true ) {
 			name = name.SubString(1, name.length() -1 );
-			m_templateNotebook->SetPageText(TemplateContentPage, name);
+			m_templateNotebook->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
 		}
 		
 		m_stcFileContent->DiscardEdits();
@@ -2611,13 +2631,12 @@ bool MainFrame::processVirtualTemplate() {
 		
 	inboundFileParser->setInboundSourceControl(m_stcFileContent);
 
-	if ( svgDebugger == true ) {
+	if ( m_miRcDebug->IsChecked() == true ) {
 		SVGFileParser::DebugControls sdc;
 		sdc.debuggerControlBase 	= m_dvListCtrlSvgDebuggerInfoBase;
 		sdc.debuggerControlPath		= m_dvListCtrlSvgDebuggerInfoPath;
 		sdc.debuggerControlDetail	= m_dvListCtrlSvgDebuggerInfoDetail;
 		sdc.debugPreprocessing		= m_miRcPreprocessing;
-		sdc.debugUserAgent			= m_miRcUserAgent;
 		sdc.debugSpooling			= m_miRcSpooling;
 		sdc.debugPhase				= m_debugPhase;
 		
@@ -3168,7 +3187,6 @@ bool MainFrame::showConfigSummaryAndConfirmRun() {
 	
 	// control handling
 	disableControls();
-	disableAllRunControls();
 	m_btCancelRun->Enable(true);
 	m_btConfirmRun->Enable(true);
 	
@@ -3319,9 +3337,9 @@ void MainFrame::processTemplate() {
 	m_outboundNotebook->SetSelection(Outbound3DPage);
 		
 	// select template Page
-	if ( m_mainViewSelector->GetSelection() != MainBookSelection::MANUEL_PANEL && 
-	     m_mainViewSelector->GetSelection() != MainBookSelection::TEST_PANEL && 
-	     m_mainViewSelector->GetSelection() != MainBookSelection::SOURCE_PANEL ) {
+	if ( m_mainViewSelector->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
+	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::TEST_PANEL && 
+	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::SOURCE_PANEL ) {
 		selectMainBookSourcePanel();
 	}
 	
@@ -3882,10 +3900,10 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 	updateFileContentPosition();
 	
 	// update tab label
-	wxString name(m_templateNotebook->GetPageText(TemplateContentPage));
+	wxString name(m_templateNotebook->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
 	if ( name.StartsWith("*") == false ) {
 		name.Prepend("*");
-		m_templateNotebook->SetPageText(TemplateContentPage, name);
+		m_templateNotebook->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
 	}
 	
 	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
@@ -4587,7 +4605,7 @@ void MainFrame::selectUAInboundPathList(wxDataViewEvent& event) {
 			
 			wxVariant val;
 			m_dvListCtrlSvgUAInboundPathList->GetValue(val, sel, 0);
-			inboundFileParser->selectSourceControl(m_stcFileContent, val.GetInteger() - 1);
+			//inboundFileParser->selectSourceControl(val.GetInteger() - 1);
 		}
 	}
 	
@@ -4723,7 +4741,7 @@ void MainFrame::lruListItemLeave(wxMouseEvent& event) {
 	if ( m_keepFileManagerPreview->IsChecked() )
 		return;
 		
-	if ( m_mainViewBook->GetSelection() != MainBookSelection::PREVIEW_PANEL )
+	if ( m_mainViewBook->GetSelection() != MainBookSelection::VAL::PREVIEW_PANEL )
 		return;
 		
 	selectMainBookSourcePanel();
@@ -4757,34 +4775,36 @@ void MainFrame::lruListItemSelected(wxListEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookSourcePanel() {
 ///////////////////////////////////////////////////////////////////
-	m_mainViewSelector->SetSelection(MainBookSelection::SOURCE_PANEL);
-	m_mainViewBook->SetSelection(MainBookSelection::SOURCE_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::VAL::SOURCE_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::VAL::SOURCE_PANEL);
+	
+	m_templateNotebook->SetSelection( TemplateBookSelection::VAL::SOURCE_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookPreviewPanel() {
 ///////////////////////////////////////////////////////////////////
-	m_mainViewSelector->SetSelection(MainBookSelection::PREVIEW_PANEL);
-	m_mainViewBook->SetSelection(MainBookSelection::PREVIEW_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::VAL::PREVIEW_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::VAL::PREVIEW_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookSetupPanel() {
-	m_mainViewSelector->SetSelection(MainBookSelection::SETUP_PANEL);
-	m_mainViewBook->SetSelection(MainBookSelection::SETUP_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::VAL::SETUP_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::VAL::SETUP_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookReferencePanel() {
-	m_mainViewSelector->SetSelection(MainBookSelection::REFERENCE_PANEL);
-	m_mainViewBook->SetSelection(MainBookSelection::REFERENCE_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::VAL::REFERENCE_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::VAL::REFERENCE_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookManuelPanel() {
-	m_mainViewSelector->SetSelection(MainBookSelection::MANUEL_PANEL);
-	m_mainViewBook->SetSelection(MainBookSelection::MANUEL_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::VAL::MANUEL_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::VAL::MANUEL_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookTestPanel() {
-	m_mainViewSelector->SetSelection(MainBookSelection::TEST_PANEL);
-	m_mainViewBook->SetSelection(MainBookSelection::TEST_PANEL);
+	m_mainViewSelector->SetSelection(MainBookSelection::VAL::TEST_PANEL);
+	m_mainViewBook->SetSelection(MainBookSelection::VAL::TEST_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mainViewSelectorSelected(wxCommandEvent& event) {
@@ -4794,30 +4814,27 @@ void MainFrame::mainViewSelectorSelected(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookCncPanel() {
 ///////////////////////////////////////////////////////////////////
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::TEMPLATE_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::CNC_PANEL);
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	
+	m_outboundNotebook->SetSelection(Outbound3DPage);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookTemplatePanel() {
 ///////////////////////////////////////////////////////////////////
 	prepareAndShowMonitorTemplatePreview(true);
 	
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::TEMPLATE_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::TEMPLATE_PANEL);
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::monitorViewSelectorSelected(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_monitorViewSelector->GetSelection() == MonitorBookSelection::TEMPLATE_PANEL)
+	if ( m_monitorViewSelector->GetSelection() == MonitorBookSelection::VAL::TEMPLATE_PANEL)
 		prepareAndShowMonitorTemplatePreview(true);
 		
 	m_monitorViewBook->SetSelection(m_monitorViewSelector->GetSelection());
 }
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleAuiPane(wxWindow* pane, wxMenuItem* menu) {
 ///////////////////////////////////////////////////////////////////
@@ -4839,17 +4856,6 @@ void MainFrame::showAuiPane(wxWindow* pane, wxMenuItem* menu) {
 		return;
 		
 	GetAuimgrMain()->GetPane(pane).Show();
-	
-	if ( pane == getAUIPaneByName("Spy") ) {
-		enableSerialSpy(true);
-		GetAuimgrMain()->GetPane(pane).Floatable(true);
-		/*
-		GetAuimgrMain()->GetPane(pane).Dockable(false);
-		GetAuimgrMain()->GetPane(pane).Float();
-		GetAuimgrMain()->GetPane(pane).FloatingSize(600,500);
-		*/
-		GetAuimgrMain()->Update();
-	}
 	
 	if ( menu != NULL )
 		menu->Check(true);
@@ -5624,6 +5630,7 @@ void MainFrame::toggleTemplateWordWrapMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::marginClickFileContent(wxStyledTextEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	//folding
 	if ( event.GetMargin() == MARGIN_FOLD ) {
 		int lineClick = m_stcFileContent->LineFromPosition(event.GetPosition());
 		int levelClick = m_stcFileContent->GetFoldLevel(lineClick);
@@ -5632,6 +5639,20 @@ void MainFrame::marginClickFileContent(wxStyledTextEvent& event) {
 			m_stcFileContent->ToggleFold(lineClick);
 		}
 	}
+	
+	// break points
+	if ( event.GetMargin() == MARGIN_BREAKPOINT || event.GetMargin() == MARGIN_LINE_NUMBERS ) {
+		int lineClick = m_stcFileContent->LineFromPosition(event.GetPosition());
+
+		if ( m_stcFileContent->MarginGetText(lineClick) == "B" ) {
+			m_stcFileContent->MarginSetText(lineClick, wxT(" "));
+			m_stcFileContent->MarginSetStyle(lineClick, TE_DEFAULT_STYLE);
+		} else {
+			m_stcFileContent->MarginSetText(lineClick, wxT("B"));
+			m_stcFileContent->MarginSetStyle(lineClick, TE_BREAKPOINT_STYLE);
+		}
+	}
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::marginClickEmuSource(wxStyledTextEvent& event) {
@@ -5731,7 +5752,7 @@ void MainFrame::decorateRunButton() {
 	
 	toolTip = isPause() ? "Resume " : "Run";
 	
-	if ( svgDebugger == true ) {
+	if ( m_miRcDebug->IsChecked() == true ) {
 		toolTip += "(Debug)";
 		bmp = ImageLib24().Bitmap("BMP_RUN_DEBUG");
 	} else {
@@ -5740,16 +5761,15 @@ void MainFrame::decorateRunButton() {
 	}
 	
 	m_rcRun->SetToolTip(toolTip);
-	m_rcRun->SetBitmapDisabled(bmp);
 	m_rcRun->SetBitmap(bmp);
+	// generate the new disabled bmp
+	m_rcRun->SetBitmapDisabled(wxBitmap());
 	m_rcRun->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::determineRunMode() {
 ///////////////////////////////////////////////////////////////////
-	svgDebugger = m_miRcDebug->IsChecked();
-	
-	if ( svgDebugger == true ) {
+	if ( m_miRcDebug->IsChecked() == true ) {
 		m_svgParseMode->SetLabel("Debug");
 		m_svgParseMode->SetForegroundColour(wxColor(255,128,128));
 	} else {
@@ -5759,9 +5779,11 @@ void MainFrame::determineRunMode() {
 
 	decorateRunButton();
 	
-	m_miRcPreprocessing->Enable(svgDebugger == true);
-	m_miRcUserAgent->Enable(svgDebugger == true);
-	m_miRcSpooling->Enable(svgDebugger == true);
+	m_miStopAfterPreprocessing->Enable(true);
+	m_miStopAfterSpoolling->Enable(true);
+	
+	m_miRcPreprocessing->Enable( m_miRcDebug->IsChecked() );
+	m_miRcSpooling->Enable( m_miRcDebug->IsChecked() );
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcSelectRunMode(wxCommandEvent& event) {
@@ -5769,35 +5791,69 @@ void MainFrame::rcSelectRunMode(wxCommandEvent& event) {
 	determineRunMode();
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::rcSelectDebugArea(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( m_miRcPreprocessing->IsChecked() == false && m_miRcSpooling->IsChecked() == false ) {
+		wxString msg("Do you realy want to define no area to debug?");
+		wxMessageDialog dlg(this, msg, _T("Debug Area Check . . . "), 
+							wxOK|wxCENTRE|wxICON_INFORMATION);
+		dlg.ShowModal();
+	}
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::rcRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( isPause() == false ) {
-		if ( m_miRcDebug->IsChecked() == true ) 
-			m_templateNotebook->SetSelection(TemplateDebuggerPage);
-
-		processTemplate();
-	} else {
+	// toggle only the pause flag
+	if ( isPause() == true ) {
 		rcPause(event);
+		return;
 	}
+	
+	// perform a run
+	// Store the current interval
+	int interval = cnc->getCncConfig()->getUpdateInterval();
+	
+	if ( m_miRcDebug->IsChecked() == true ) {
+		
+		// check if the cuurent port is a cnc and no emulator port
+		if ( cnc->getSerial()->getPortType() == CncPORT ) {
+			
+			wxString msg("Do you realy want to debug a COM port?");
+			wxMessageDialog dlg(this, msg, _T("Port Check . . . "), 
+			                    wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
+			
+			if ( dlg.ShowModal() == wxID_CANCEL )
+				return;
+		}
+		
+		// bring the debug controls in front
+		showAuiPane("Spy");
+		m_spyNotebook->SetSelection(SpyBookSelection::VAL::DEBUGGER_PANEL);
+		
+		// to see each line during the debug session
+		cnc->getCncConfig()->setUpdateInterval(1);
+	} 
+
+	// process
+	processTemplate();
+	// restore the interval
+	cnc->getCncConfig()->setUpdateInterval(interval);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcPause(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
  	if ( inboundFileParser != NULL ) {
-		inboundFileParser->pause();
+		inboundFileParser->togglePause();
 		enableRunControls(inboundFileParser->isPause());
 	}
 	
 	decorateRunButton();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::rcNextPath(wxCommandEvent& event) {
+void MainFrame::rcNextBreakpoint(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( inboundFileParser != NULL )
-		inboundFileParser->debugNextPath();
-		
-	m_svgDebuggerKey->Clear();
-	m_svgDebuggerValue->Clear();
+		inboundFileParser->debugNextBreakPoint();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcNextStep(wxCommandEvent& event) {
@@ -5813,8 +5869,9 @@ void MainFrame::rcFinish(wxCommandEvent& event) {
 	if ( inboundFileParser != NULL )
 		inboundFileParser->debugFinish();
 		
-	m_svgDebuggerKey->Clear();
-	m_svgDebuggerValue->Clear();
+	m_rcNextBreakpoint->Enable(false);
+	m_rcNextStep->Enable(false);
+	m_rcFinish->Enable(false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcStop(wxCommandEvent& event) {
@@ -5822,10 +5879,13 @@ void MainFrame::rcStop(wxCommandEvent& event) {
 	wxASSERT(cnc);
 	
 	if ( getCurrentTemplateFormat() == TplTest ) {
+		
 		bool ret = cnc->getSerial()->sendTestSuiteEndFlag();
 		if ( ret == true ) 	cnc::trc.logInfo("Test was stopped");
 		else				cnc::trc.logError("Test stop was failed");
+		
 	} else {
+		
 		if ( inboundFileParser != NULL )
 			inboundFileParser->debugStop();
 		 
@@ -5839,6 +5899,14 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 	requestReset();
 	setRefPostionState(false);
 }
+
+
+
+
+
+
+
+
 ///////////////////////////////////////////////////////////////////
 void MainFrame::controlerPause(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
@@ -5864,7 +5932,6 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		m_testToggleTool->SetForegroundColour(*wxWHITE);
 		
 		disableControls();
-		disableAllRunControls();
 		m_testToggleEndSwitch->Enable(false);
 		m_testToggleTool->Enable(true);
 		
@@ -5898,7 +5965,6 @@ void MainFrame::testEndSwitchEvaluation(wxCommandEvent& event) {
 		m_testToggleEndSwitch->SetForegroundColour(*wxWHITE);
 		
 		disableControls();
-		disableAllRunControls();
 		m_testToggleEndSwitch->Enable(true);
 		
 		startAnimationControl();
@@ -6196,11 +6262,11 @@ void MainFrame::fileContentChange(wxStyledTextEvent& event) {
 			if(numlines == 0) {
 				// probably only the current line was modified
 				m_stcFileContent->MarginSetText(curline, wxT(" "));
-				m_stcFileContent->MarginSetStyle(curline, CL_LINE_MODIFIED_STYLE);
+				m_stcFileContent->MarginSetStyle(curline, TE_LINE_MODIFIED_STYLE);
 			} else {
 				for(int i = 0; i <= numlines; i++) {
 					m_stcFileContent->MarginSetText(curline + i, wxT(" "));
-					m_stcFileContent->MarginSetStyle(curline + i, CL_LINE_MODIFIED_STYLE);
+					m_stcFileContent->MarginSetStyle(curline + i, TE_LINE_MODIFIED_STYLE);
 				}
 			}
 			 
@@ -6568,3 +6634,4 @@ void MainFrame::onSelectTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	selectMainBookSourcePanel();
 }
+

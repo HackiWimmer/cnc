@@ -8,12 +8,18 @@ SVGNodeParser::SVGNodeParser()
 : pathHandler(NULL)
 {
 //////////////////////////////////////////////////////////////////
-	
+}
+//////////////////////////////////////////////////////////////////
+SVGNodeParser::SVGNodeParser(PathHandlerBase* ph)
+: pathHandler(ph)
+{
+//////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
 SVGNodeParser::~SVGNodeParser() {
 //////////////////////////////////////////////////////////////////
-	
+	if ( pathHandler != NULL )
+		delete pathHandler;
 }
 ///////////////////////////////////////////////////////////////////////
 inline int SVGNodeParser::getCommandParaCount(char c) {
@@ -57,7 +63,6 @@ inline int SVGNodeParser::getCommandParaCount(char c) {
 //////////////////////////////////////////////////////////////////
 bool SVGNodeParser::evaluatePath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
-	appendDebugValueBase("Resulting Path", data);
 	initNextPath(data);
 	
 	int sPos = -1;
@@ -94,9 +99,6 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 	if ( para.Length() == 0 )
 		return true;
 
-	clearDebugControlPath();
-	appendDebugValuePath("Path Fragment", para);
-	
 	double values[MAX_PARAMETER_VALUES];
 	
 	wxString token;
@@ -113,7 +115,7 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 			sPos++;
 			if ( (parameterCount = getCommandParaCount(c) ) < 0 ) {
 				std::cerr << "Not known command: " << c << std::endl;
-				std::cerr << "Current line numer: " << getCurrentLineNumber() << std::endl;
+				std::cerr << "Current line numer: " << 1 << std::endl;
 				break;
 			}
 		} else {
@@ -125,7 +127,6 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 				if ( i != sPos ) {
 					token = para.SubString(sPos, i - 1);
 					token.ToDouble(&values[valueCounter++]);
-					appendDebugValuePath("token", token);
 
 					if ( valueCounter == MAX_PARAMETER_VALUES ) {
 						std::cerr << "Max parameters count reached for: " << para.c_str() << std::endl;
@@ -138,7 +139,6 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 			} else if ( i == para.Length() - 1 ) {
 				token = para.SubString(sPos, i);
 				token.ToDouble(&values[valueCounter++]);
-				appendDebugValuePath("token", token);
 			}
 		}
 		
@@ -150,16 +150,15 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 			}
 			
 			bool ret = addPathElement(c, valueCounter, values);
-			evaluateDebugState();
-			
-			if ( shouldStop() == true )
-				return false;
 			
 			if ( ret == false )
 				return false;
 
 			valueCounter = 0;
 		} 
+		
+		if ( evaluateProcessingCallback() == false )
+			return false;
 	}
 	
 	bool ret = true;
@@ -167,7 +166,7 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 		std::cerr << "SVGFileParser:" << std::endl;
 		std::cerr << "Parameters count error in: " << para.c_str() << std::endl;
 		std::cerr << "Defined parameter count: " << parameterCount << "; Current value count: " << valueCounter << std::endl;
-		std::cerr << "Current line numer: " << getCurrentLineNumber() << std::endl;
+		std::cerr << "Current line numer: " << 1 << std::endl;
 		std::cerr << "Stored value list: " << std::endl;
 
 		for (unsigned int i=0; i<valueCounter; i++) {

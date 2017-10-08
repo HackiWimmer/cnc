@@ -80,7 +80,7 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		void setProcessMode(SvgPhProcessMode pm);
 		const SvgPhProcessMode getProcessMode() { return processMode; }
 		
-		void setDebugState(bool state) { debugState = false;/*state;*/ }
+		void setDebugState(bool state) { debugState = state; }
 		void setDebuggerControl(wxDataViewListCtrl* dcd) { debuggerControlDetail = dcd; }
 		
 		// path handling

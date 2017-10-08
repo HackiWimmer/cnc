@@ -182,7 +182,7 @@
             <min>0</min>
             <max>300</max>
             <value>0</value>
-            <size>100,-1</size>
+            <size>75,-1</size>
           </object>
           <object class="wxStaticText" name="m_stepDelayValue">
             <label>0 ms</label>
@@ -199,7 +199,7 @@
           </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_rcReset">
-            <bitmap>bitmaps/24-debugger_restart.png</bitmap>
+            <bitmap>bitmaps/16-debugger_restart.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Reset Controller]]>
@@ -229,18 +229,20 @@
                   </accel>
                 </object>
                 <object class="separator"/>
-                <object class="wxMenuItem" name="m_miRcPreprocessing">
+                <object class="wxMenuItem" name="m_miAutoBreakpoint">
                   <checkable>1</checkable>
-                  <label>Debug Area - Preprocessing</label>
-                  <bitmap>bitmaps/bookmark-new-list.png</bitmap>
+                  <label>Auto Breakpoint at the begin of each Debug Area</label>
+                  <bitmap>bitmaps/dialog-ok.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
+                  <checked>1</checked>
                 </object>
-                <object class="wxMenuItem" name="m_miRcUserAgent">
+                <object class="separator"/>
+                <object class="wxMenuItem" name="m_miRcPreprocessing">
                   <checkable>1</checkable>
-                  <label>Debug Area - UserAgent</label>
-                  <bitmap>bitmaps/bookmark-new-list.png</bitmap>
+                  <label>Debug Area - Preprocessing</label>
+                  <bitmap>bitmaps/dialog-ok.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
@@ -248,11 +250,28 @@
                 <object class="wxMenuItem" name="m_miRcSpooling">
                   <checkable>1</checkable>
                   <label>Debug Area - Spooling</label>
-                  <bitmap>bitmaps/bookmark-new-list.png</bitmap>
+                  <bitmap>bitmaps/dialog-ok.png</bitmap>
                   <accel>
                     <![CDATA[]]>
                   </accel>
                   <checked>1</checked>
+                </object>
+                <object class="separator"/>
+                <object class="wxMenuItem" name="m_miStopAfterPreprocessing">
+                  <radio>1</radio>
+                  <label>Stop after Preprocessing</label>
+                  <bitmap>bitmaps/media-playback-stop-7.png</bitmap>
+                  <accel>
+                    <![CDATA[]]>
+                  </accel>
+                </object>
+                <object class="wxMenuItem" name="m_miStopAfterSpoolling">
+                  <radio>1</radio>
+                  <label>Stop after Spooling (Default)</label>
+                  <bitmap>bitmaps/media-playback-stop-7.png</bitmap>
+                  <accel>
+                    <![CDATA[]]>
+                  </accel>
                 </object>
               </object>
             </dropdown>
@@ -266,7 +285,7 @@
             <bitmap>bitmaps/bug (2).png</bitmap>
           </object>
           <object class="wxBitmapButton" name="m_rcRun">
-            <bitmap>bitmaps/Icons/runRelease.ico</bitmap>
+            <bitmap>bitmaps/arrow-right-3.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Run or Debug]]>
@@ -274,42 +293,42 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_rcPause">
-            <bitmap>bitmaps/24-interrupt.png</bitmap>
+            <bitmap>bitmaps/media-playback-pause-blue.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Pause]]>
             </tooltip>
             <default>0</default>
           </object>
-          <object class="wxBitmapButton" name="m_rcNextPath">
-            <bitmap>bitmaps/24-down.png</bitmap>
+          <object class="wxBitmapButton" name="m_rcStop">
+            <bitmap>bitmaps/16-debugger_stop.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
-              <![CDATA[Next Path]]>
+              <![CDATA[Stop]]>
+            </tooltip>
+            <default>0</default>
+          </object>
+          <object class="wxBitmapButton" name="m_rcNextBreakpoint">
+            <bitmap>bitmaps/go-next-2.png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <tooltip>
+              <![CDATA[Debug: Next Breakpoint]]>
             </tooltip>
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_rcNextStep">
-            <bitmap>bitmaps/24-step_in.png</bitmap>
+            <bitmap>bitmaps/go-down-2.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
-              <![CDATA[Next Step]]>
+              <![CDATA[Debug: Next Step]]>
             </tooltip>
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_rcFinish">
-            <bitmap>bitmaps/24-forward.png</bitmap>
+            <bitmap>bitmaps/go-bottom.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
-              <![CDATA[Finish Session]]>
-            </tooltip>
-            <default>0</default>
-          </object>
-          <object class="wxBitmapButton" name="m_rcStop">
-            <bitmap>bitmaps/24-execute_stop.png</bitmap>
-            <style>wxBU_AUTODRAW</style>
-            <tooltip>
-              <![CDATA[Stop Session]]>
+              <![CDATA[Debug: Finish Session]]>
             </tooltip>
             <default>0</default>
           </object>
@@ -828,176 +847,6 @@
                                   <object class="wxTextCtrl" name="m_selectedUAInfo">
                                     <style>wxTE_READONLY</style>
                                     <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                  </object>
-                                </object>
-                              </object>
-                            </object>
-                          </object>
-                          <object class="notebookpage">
-                            <label>Debugger</label>
-                            <bitmap>bitmaps/book_red.png</bitmap>
-                            <selected>0</selected>
-                            <object class="wxPanel" name="m_panelTplDebugger">
-                              <style>wxTAB_TRAVERSAL</style>
-                              <hidden>1</hidden>
-                              <object class="wxFlexGridSizer">
-                                <cols>1</cols>
-                                <rows>5</rows>
-                                <vgap>0</vgap>
-                                <hgap>0</hgap>
-                                <growablecols>0</growablecols>
-                                <growablerows>1,2</growablerows>
-                                <object class="sizeritem" name="flexGridSizer1565">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <option>1</option>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>4</cols>
-                                    <rows>0</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>3</growablecols>
-                                    <growablerows/>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <border>2</border>
-                                      <object class="wxStaticText" name="m_staticText1370">
-                                        <label> SVG Note Information:</label>
-                                        <style/>
-                                        <font>
-                                          <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                                          <style>normal</style>
-                                          <weight>bold</weight>
-                                          <underlined>0</underlined>
-                                        </font>
-                                      </object>
-                                    </object>
-                                    <object class="spacer" name="Spacer1573">
-                                      <size>50,0</size>
-                                      <flag>wxALL</flag>
-                                      <border>5</border>
-                                      <option>1</option>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <border>2</border>
-                                      <object class="wxStaticText" name="m_staticText1571">
-                                        <label>Current debug phase:</label>
-                                        <style/>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <border>2</border>
-                                      <object class="wxStaticText" name="m_debugPhase">
-                                        <label/>
-                                        <style/>
-                                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                      </object>
-                                    </object>
-                                  </object>
-                                </object>
-                                <object class="sizeritem">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <border>2</border>
-                                  <object class="unknown" name="m_dvListCtrlSvgDebuggerInfoBase">
-                                    <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                    <tooltip>
-                                      <![CDATA[SVG Path Base Info]]>
-                                    </tooltip>
-                                  </object>
-                                </object>
-                                <object class="sizeritem" name="flexGridSizer1362">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <option>1</option>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>2</cols>
-                                    <rows>2</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>0,1</growablecols>
-                                    <growablerows>1</growablerows>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <border>2</border>
-                                      <object class="wxStaticText" name="m_staticText1372">
-                                        <label> SVG Path Information:</label>
-                                        <style/>
-                                        <font>
-                                          <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                                          <style>normal</style>
-                                          <weight>bold</weight>
-                                          <underlined>0</underlined>
-                                        </font>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <border>2</border>
-                                      <object class="wxStaticText" name="m_staticText1374">
-                                        <label> Detail Information:</label>
-                                        <style/>
-                                        <font>
-                                          <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
-                                          <style>normal</style>
-                                          <weight>bold</weight>
-                                          <underlined>0</underlined>
-                                        </font>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>2</border>
-                                      <object class="unknown" name="m_dvListCtrlSvgDebuggerInfoPath">
-                                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                        <tooltip>
-                                          <![CDATA[SVG Path Path Info]]>
-                                        </tooltip>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>2</border>
-                                      <object class="unknown" name="m_dvListCtrlSvgDebuggerInfoDetail">
-                                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                        <tooltip>
-                                          <![CDATA[SVG Path Processing Details]]>
-                                        </tooltip>
-                                      </object>
-                                    </object>
-                                  </object>
-                                </object>
-                                <object class="sizeritem" name="flexGridSizer1354">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <border>1</border>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>2</cols>
-                                    <rows>1</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>1</growablecols>
-                                    <growablerows>0</growablerows>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <border>1</border>
-                                      <object class="wxTextCtrl" name="m_svgDebuggerKey">
-                                        <style>wxTE_READONLY</style>
-                                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                        <tooltip>
-                                          <![CDATA[Key]]>
-                                        </tooltip>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxEXPAND</flag>
-                                      <border>1</border>
-                                      <object class="wxTextCtrl" name="m_svgDebuggerValue">
-                                        <style>wxTE_READONLY</style>
-                                        <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                        <tooltip>
-                                          <![CDATA[Value]]>
-                                        </tooltip>
-                                      </object>
-                                    </object>
                                   </object>
                                 </object>
                               </object>
@@ -7219,7 +7068,7 @@ Axis</label>
         <bottom>1</bottom>
         <layer>0</layer>
         <row>0</row>
-        <position>1</position>
+        <position>0</position>
         <close_button>1</close_button>
         <minimize_button>1</minimize_button>
         <maximize_button>1</maximize_button>
@@ -7236,7 +7085,7 @@ Axis</label>
             <growablerows>0</growablerows>
             <object class="sizeritem">
               <flag>wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND</flag>
-              <object class="wxNotebook" name="m_notebook3835">
+              <object class="wxNotebook" name="m_spyNotebook">
                 <style>wxBK_BOTTOM</style>
                 <object class="notebookpage">
                   <label>Serial Spy</label>
@@ -7413,10 +7262,171 @@ Axis</label>
                       <hgap>0</hgap>
                       <growablecols>0</growablecols>
                       <growablerows>0</growablerows>
-                      <object class="sizeritem">
+                      <object class="sizeritem" name="flexGridSizer1338">
                         <flag>wxALL|wxEXPAND</flag>
                         <border>5</border>
-                        <object class="unknown" name="m_pgMgr3815"/>
+                        <option>1</option>
+                        <object class="wxFlexGridSizer">
+                          <cols>1</cols>
+                          <rows>5</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols>0</growablecols>
+                          <growablerows>1,2</growablerows>
+                          <object class="sizeritem" name="flexGridSizer1565">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <option>1</option>
+                            <object class="wxFlexGridSizer">
+                              <cols>4</cols>
+                              <rows>0</rows>
+                              <vgap>0</vgap>
+                              <hgap>0</hgap>
+                              <growablecols>3</growablecols>
+                              <growablerows/>
+                              <object class="sizeritem">
+                                <flag>wxALL</flag>
+                                <border>2</border>
+                                <object class="wxStaticText" name="m_staticText1370">
+                                  <label> SVG Note Information:</label>
+                                  <style/>
+                                  <font>
+                                    <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                    <style>normal</style>
+                                    <weight>bold</weight>
+                                    <underlined>0</underlined>
+                                  </font>
+                                </object>
+                              </object>
+                              <object class="spacer" name="Spacer1573">
+                                <size>50,0</size>
+                                <flag>wxALL</flag>
+                                <border>5</border>
+                                <option>1</option>
+                              </object>
+                              <object class="sizeritem">
+                                <flag>wxALL</flag>
+                                <border>2</border>
+                                <object class="wxStaticText" name="m_staticText1571">
+                                  <label>Current debug phase:</label>
+                                  <style/>
+                                </object>
+                              </object>
+                              <object class="sizeritem">
+                                <flag>wxALL</flag>
+                                <border>2</border>
+                                <object class="wxStaticText" name="m_debugPhase">
+                                  <label/>
+                                  <style/>
+                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>2</border>
+                            <object class="unknown" name="m_dvListCtrlSvgDebuggerInfoBase">
+                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                              <tooltip>
+                                <![CDATA[SVG Path Base Info]]>
+                              </tooltip>
+                            </object>
+                          </object>
+                          <object class="sizeritem" name="flexGridSizer1362">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <option>1</option>
+                            <object class="wxFlexGridSizer">
+                              <cols>2</cols>
+                              <rows>2</rows>
+                              <vgap>0</vgap>
+                              <hgap>0</hgap>
+                              <growablecols>0,1</growablecols>
+                              <growablerows>1</growablerows>
+                              <object class="sizeritem">
+                                <flag>wxALL</flag>
+                                <border>2</border>
+                                <object class="wxStaticText" name="m_staticText1372">
+                                  <label> SVG Path Information:</label>
+                                  <style/>
+                                  <font>
+                                    <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                    <style>normal</style>
+                                    <weight>bold</weight>
+                                    <underlined>0</underlined>
+                                  </font>
+                                </object>
+                              </object>
+                              <object class="sizeritem">
+                                <flag>wxALL</flag>
+                                <border>2</border>
+                                <object class="wxStaticText" name="m_staticText1374">
+                                  <label> Detail Information:</label>
+                                  <style/>
+                                  <font>
+                                    <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                                    <style>normal</style>
+                                    <weight>bold</weight>
+                                    <underlined>0</underlined>
+                                  </font>
+                                </object>
+                              </object>
+                              <object class="sizeritem">
+                                <flag>wxALL|wxEXPAND</flag>
+                                <border>2</border>
+                                <object class="unknown" name="m_dvListCtrlSvgDebuggerInfoPath">
+                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                  <tooltip>
+                                    <![CDATA[SVG Path Path Info]]>
+                                  </tooltip>
+                                </object>
+                              </object>
+                              <object class="sizeritem">
+                                <flag>wxALL|wxEXPAND</flag>
+                                <border>2</border>
+                                <object class="unknown" name="m_dvListCtrlSvgDebuggerInfoDetail">
+                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                  <tooltip>
+                                    <![CDATA[SVG Path Processing Details]]>
+                                  </tooltip>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                          <object class="sizeritem" name="flexGridSizer1354">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>1</border>
+                            <object class="wxFlexGridSizer">
+                              <cols>2</cols>
+                              <rows>1</rows>
+                              <vgap>0</vgap>
+                              <hgap>0</hgap>
+                              <growablecols>1</growablecols>
+                              <growablerows>0</growablerows>
+                              <object class="sizeritem">
+                                <flag>wxALL</flag>
+                                <border>1</border>
+                                <object class="wxTextCtrl" name="m_svgDebuggerKey">
+                                  <style>wxTE_READONLY</style>
+                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                  <tooltip>
+                                    <![CDATA[Key]]>
+                                  </tooltip>
+                                </object>
+                              </object>
+                              <object class="sizeritem">
+                                <flag>wxALL|wxEXPAND</flag>
+                                <border>1</border>
+                                <object class="wxTextCtrl" name="m_svgDebuggerValue">
+                                  <style>wxTE_READONLY</style>
+                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                  <tooltip>
+                                    <![CDATA[Value]]>
+                                  </tooltip>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
                       </object>
                     </object>
                   </object>

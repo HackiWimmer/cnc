@@ -32,6 +32,8 @@
 
 #endif
 
+class FileParser;
+
 //////////////////////////////////////////////////////////////////
 class PathHandlerBase {
 //////////////////////////////////////////////////////////////////
@@ -99,6 +101,7 @@ class PathHandlerBase {
 		};
 
 		// members
+		FileParser*			fileParser;
 		bool 				firstPath;
 		bool 				newPath;
 		CncDoublePosition	startPos;
@@ -152,6 +155,8 @@ class PathHandlerBase {
 	
 		PathHandlerBase();
 		virtual ~PathHandlerBase();
+		
+		void setFileParser(FileParser* fp) { fileParser = fp; }
 		
 		// setter
 		void setCurveLibResolution(float res);

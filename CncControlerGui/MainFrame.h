@@ -40,6 +40,7 @@ class MainFrame : public MainFrameBClass {
 
 	// User command
 	protected:
+    virtual void rcSelectDebugArea(wxCommandEvent& event);
 		virtual void onSelectManuallyMove(wxCommandEvent& event);
 		virtual void onSelectReferences(wxCommandEvent& event);
 		virtual void onSelectSetup(wxCommandEvent& event);
@@ -124,7 +125,7 @@ class MainFrame : public MainFrameBClass {
 		virtual void rcSelectRunMode(wxCommandEvent& event);
 		virtual void togglePreviewErrorInfo(wxCommandEvent& event);
 		virtual void rcFinish(wxCommandEvent& event);
-		virtual void rcNextPath(wxCommandEvent& event);
+		virtual void rcNextBreakpoint(wxCommandEvent& event);
 		virtual void rcNextStep(wxCommandEvent& event);
 		virtual void rcPause(wxCommandEvent& event);
 		virtual void rcReset(wxCommandEvent& event);
@@ -380,7 +381,6 @@ class MainFrame : public MainFrameBClass {
 		bool isZeroReferenceValid;
 		bool canClose;
 		bool evaluatePositions;
-		bool svgDebugger;
 		bool templateFileLoading;
 		bool ignoreDirControlEvents;
 		
@@ -524,8 +524,9 @@ class MainFrame : public MainFrameBClass {
 		
 		void determineRunMode();
 		
-		bool isPause() { return inboundFileParser != NULL ? inboundFileParser->isPause() : false; }
-		bool isProcessing() { return inboundFileParser != NULL ? inboundFileParser->isProcessing() : false; }
+		bool isPause()				{ return inboundFileParser != NULL ? inboundFileParser->isPause()            : false; }
+		//bool isBreakpointActive()	{ return inboundFileParser != NULL ? inboundFileParser->isBreakpointActive() : false; }
+		bool isProcessing() 		{ return inboundFileParser != NULL ? inboundFileParser->isProcessing()       : false; }
 		
 		bool showConfigSummaryAndConfirmRun();
 		
@@ -540,9 +541,7 @@ class MainFrame : public MainFrameBClass {
 		
 		void decorateRunButton();
 		void enableRunControls(bool state = true);
-		void enableAllRunControls(bool state = true);
 		void disableRunControls() { enableRunControls(false); }
-		void disableAllRunControls() { enableAllRunControls(false); }
 		
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
