@@ -149,8 +149,6 @@ class Serial {
 		inline void decodeMessage(const unsigned char* message, std::ostream& mutliByteStream);
 		// give the result a more human readabal format
 		inline void decodeMultiByteResults(const char cmd, const unsigned char* result, std::ostream& mutliByteStream);
-		// claculates the current coordinates;
-		inline void determineCoordinates(unsigned const char c, CncLongPosition& pos);
 		// return true if the given cmd is a move command
 		bool isMoveCommand(unsigned char cmd);
 		// fetches the controler hand shake after sendData

@@ -29,7 +29,6 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		bool 				debugState;
 		double 				width, height;
 		wxString 			viewBox;
-		wxDataViewListCtrl* debuggerControlDetail;
 		CncWorkingParameters currentCncParameters;
 		
 		// spool path to cnc control
@@ -81,7 +80,6 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		const SvgPhProcessMode getProcessMode() { return processMode; }
 		
 		void setDebugState(bool state) { debugState = state; }
-		void setDebuggerControl(wxDataViewListCtrl* dcd) { debuggerControlDetail = dcd; }
 		
 		// path handling
 		virtual void prepareWork();

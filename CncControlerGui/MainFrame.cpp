@@ -30,7 +30,6 @@
 #include "CncUsbPortScanner.h"
 #include "CncPatternDefinitions.h"
 #include "SvgUnitCalculator.h"
-#include "EndSwitchDialog.h"
 #include "CncFileNameService.h"
 #include "CncControllerTestSuite.h"
 #include "CncFilePreviewWnd.h"
@@ -49,57 +48,64 @@
 #include <windows.h>
 #include <dbt.h>
 
+////////////////////////////////////////////////////////////////////
 // global strings
 const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
 const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
 const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
-const char* _defaultPerspective = "layout2|name=Toolbar;caption=Main;state=17148;dir=1;layer=0;row=0;pos=0;prop=100000;bestw=40;besth=40;minw=40;minh=40;maxw=40;maxh=40;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=MainView;caption=CNC Main View;state=31459324;dir=5;layer=0;row=0;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=TemplateManager;caption=CNC Template Manager;state=31459324;dir=3;layer=1;row=0;pos=0;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=160;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Logger;caption=CNC Logger;state=31459324;dir=3;layer=1;row=0;pos=1;prop=100000;bestw=100;besth=160;minw=100;minh=160;maxw=100;maxh=180;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=StatusBar;caption=;state=1020;dir=3;layer=2;row=0;pos=0;prop=100000;bestw=20;besth=28;minw=-1;minh=-1;maxw=-1;maxh=-1;floatx=-1;floaty=-1;floatw=-1;floath=-1|name=Outbound;caption=CNC Monitor;state=31459324;dir=2;layer=0;row=1;pos=0;prop=100000;bestw=800;besth=800;minw=10;minh=10;maxw=800;maxh=800;floatx=1462;floaty=216;floatw=400;floath=250|dock_size(1,0,0)=42|dock_size(5,0,0)=205|dock_size(3,1,0)=179|dock_size(3,2,0)=30|dock_size(2,0,1)=799|";
+
 #ifdef DEBUG
-const char* _programVersion 	= "0.8.0.d";
+	const char* _programVersion = "0.8.0.d";
 #else
-const char* _programVersion 	= "0.8.0.r";
+	const char* _programVersion = "0.8.0.r";
 #endif
+////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////
+// user defined scintila style options
+	enum {
+			MARGIN_LINE_NUMBERS, 
+			MARGIN_EDIT_TRACKER,
+			MARGIN_BREAKPOINT,
+			MARGIN_FOLD
+	};
 
-enum {
-		MARGIN_LINE_NUMBERS, 
-		MARGIN_EDIT_TRACKER,
-		MARGIN_BREAKPOINT,
-		MARGIN_FOLD
-};
+	enum {
+			TE_DEFAULT_STYLE = 242,
+			TE_BREAKPOINT_STYLE,
+			TE_LINE_MODIFIED_STYLE,
+			TE_LINE_SAVED_STYLE
+	};
+////////////////////////////////////////////////////////////////////
 
-enum {
-		TE_DEFAULT_STYLE = 242,
-		TE_BREAKPOINT_STYLE,
-		TE_LINE_MODIFIED_STYLE,
-		TE_LINE_SAVED_STYLE
-};
+////////////////////////////////////////////////////////////////////
+// app defined events
+	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxCommandEvent);
+	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxCommandEvent);
+	wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
+	wxDEFINE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, wxTimerEvent);
+////////////////////////////////////////////////////////////////////
 
-
-wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxThreadEvent);
-wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
-wxDEFINE_EVENT(wxEVT_XXX, wxCommandEvent);
-
+////////////////////////////////////////////////////////////////////
+// app defined event table
 wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 	EVT_CLOSE(MainFrame::onClose)
-	EVT_COMMAND(wxID_ANY, wxEVT_XXX, MainFrame::testFunction2)
 	
-	EVT_THREAD(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, MainFrame::onThreadCompletion)
-	EVT_THREAD(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, MainFrame::onThreadUpdate)
+	EVT_COMMAND(wxID_ANY, wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, MainFrame::onThreadCompletion)
+	EVT_COMMAND(wxID_ANY, wxEVT_UPDATE_MANAGER_THREAD_UPDATE, MainFrame::onThreadUpdate)
 	
 	EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, MainFrame::onPerspectiveTimer)
-	/*
-wxDECLARE_EVENT(wxEVT_OPEN_FILE_FROM_FILE_VIEW, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_PREVIEW_FILE_FROM_FILE_VIEW, wxCommandEvent);
- * */
+	EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, MainFrame::onDebugUserNotificationTimer)
+	
 wxEND_EVENT_TABLE()
+////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////
 MainFrame::MainFrame(wxWindow* parent)
 : MainFrameBClass(parent) 
 , updateManagerThread(NULL)
+, isDebugMode(false)
 , isCncControlInitialized(false)
 , isZeroReferenceValid(false)
 , canClose(true)
@@ -134,6 +140,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , stcEmuContentPopupMenu(NULL)
 , inboundFileParser(NULL)
 , perspectiveTimer(this, wxEVT_PERSPECTIVE_TIMER)
+, debugUserNotificationTime(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
 {
 ///////////////////////////////////////////////////////////////////
 	// detemine assert handler
@@ -144,6 +151,9 @@ MainFrame::MainFrame(wxWindow* parent)
 	
 	// do this definitely here later it will causes a crash 
 	installCustControls();
+	
+	// debugger configuration
+	FileParser::installDebugConfigPage(m_debuggerPropertyManagerGrid);
 	
 	// define the popup parent frame
 	SvgEditPopup::setMainFrame(this);
@@ -385,7 +395,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_svgEmuToggleWordWrap);
 	registerGuiControl(m_svgEmuToggleOrigPath);
 	registerGuiControl(m_switchMonitoing);
-	registerGuiControl(m_previewErrorInfo);
 	registerGuiControl(m_saveTemplate);
 	registerGuiControl(m_testCountX);
 	registerGuiControl(m_testCountY);
@@ -427,45 +436,24 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
+	/*
 	cout << "testFunction2"<< endl;
 	clog << "testFunction2"<< endl;
 	cerr << "testFunction2"<< endl;
+	*/
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
 	
-	//filePreviewWnd->Show();
-	
-	
-	wxAuiPaneInfo pi = GetAuimgrMain()->GetPane("MainView");
-	wxString x;
-	cnc::cex1 << pi.name << ": " << pi.IsResizable() << endl;
-	
-	pi.Float();
-	
-	//pi.MinSize(wxSize(393, -1)).MaxSize(wxSize(393, -1)).BestSize(wxSize(393, -1)); 
-	GetAuimgrMain()->Update();
-	
-	pi.Left();
-	pi.Dock();
-	
-	
-	
-	cnc::cex1 << pi.max_size.GetWidth() << ": " << pi.min_size.GetWidth() << ": " << pi.best_size.GetWidth()<< endl;
-	
-	GetAuimgrMain()->Update();
-	
-	
 	//cnc::cex1 << GetAuimgrMain()->SavePerspective() << endl;
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
-	
+	/*
 	cnc::trc.green();
 	cnc::trc << " Hallo";
 	cnc::trc.blue();
@@ -476,12 +464,13 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 	cnc::trc << " Hallo";
 	cnc::trc.resetTextAttr();
 	cnc::trc << " Hallo";
+	*/
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menues
-	//hideAuiPane("Spy");
+	hideAuiPane("Spy");
 	hideAuiPane("UnitCalculator");
 	
 	m_miToolbar->Check(m_auibarMain->IsShown());
@@ -553,6 +542,22 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::onThreadUpdate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxImage img =m_updateManagerUpdate->GetBitmap().ConvertToImage();
+	wxPoint p(m_updateManagerUpdate->GetSize().GetWidth()/2, m_updateManagerUpdate->GetSize().GetHeight()/2);
+
+	m_updateManagerUpdate->SetBitmap(wxBitmap(img.Rotate90()));
+	m_updateManagerUpdate->Refresh();
+	m_updateManagerUpdate->Update();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onThreadCompletion(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	std::clog << "OnThreadCompletion" << std::endl;
+	updateManagerThread = NULL;
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( checkIfTemplateIsModified() == false )
@@ -581,9 +586,6 @@ void MainFrame::onClose(wxCloseEvent& event) {
 	if ( updateManagerThread != NULL) {
 		updateManagerThread->stop();
 		
-		
-		#warning here is something to do
-		/*
 		while ( true ) {
 			{ // was the ~MyThread() function executed?
 				wxCriticalSectionLocker enter(pThreadCS);
@@ -593,37 +595,7 @@ void MainFrame::onClose(wxCloseEvent& event) {
 			// wait for thread completion
 			wxThread::This()->Sleep(10);
 		}
-		 * */
 	}
-	
-	//MessageBoxA(0,"","",0);
-	/* todo
-	 
-	// Destroy the update manager thread
-	{
-		wxCriticalSectionLocker enter(pThreadCS);
-		if ( updateManagerThread != NULL) {
-			std::clog << "Deleting update manager thread\n";
-			
-			if ( updateManagerThread->Delete() != wxTHREAD_NO_ERROR )
-				std::clog << "Can't delete the upadate manager thread!\n";
-				
-			std::clog << "Upadate manager thread is deleted\n";
-		}
-	}
-	// exit from the critical section to give the thread
-	// the possibility to enter its destructor
-	// (which is guarded with m_pThreadCS critical section!)
-    while ( true ) {
-        { // was the ~MyThread() function executed?
-            //wxCriticalSectionLocker enter(pThreadCS);
-            if ( !updateManagerThread ) 
-				;//break;
-        }
-        // wait for thread completion
-        wxThread::This()->Sleep(1);
-    }
-	 * */
 	
 	Destroy();
 }
@@ -957,16 +929,6 @@ void MainFrame::setIcons() {
 		SetIcons( app_icons );
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadUpdate(wxThreadEvent& event) {
-///////////////////////////////////////////////////////////////////
-	std::clog << "OnThreadUpdate" << std::endl;
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadCompletion(wxThreadEvent& event) {
-///////////////////////////////////////////////////////////////////
-	std::clog << "OnThreadCompletion" << std::endl;
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::initializeUpdateManagerThread() {
 ///////////////////////////////////////////////////////////////////
 	// create the thread
@@ -996,7 +958,6 @@ void MainFrame::initialize(void) {
 	createStcEmuControlPopupMenu();
 	decorateSearchButton();
 	switchMonitorButton(true);
-	m_miStopAfterSpoolling->Check(true);
 	determineRunMode();
 	registerGuiControls();
 	enableManuallyControls();
@@ -1185,7 +1146,7 @@ bool MainFrame::initializeCncControl() {
 	updateCncConfigTrace();
 	
 	// z slider
-	updateManagerThread->postUpdateZView();
+	umPostUpdateZView();
 	
 	//initilaize debug state
 	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
@@ -1466,7 +1427,6 @@ void MainFrame::selectPort(wxCommandEvent& event) {
 bool MainFrame::connectSerialPort() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
-	wxASSERT( updateManagerThread );
 	
 	wxBitmap bmpC = ImageLib16().Bitmap("BMP_CONNECTED");
 	wxBitmap bmpD = ImageLib16().Bitmap("BMP_DISCONNECTED");
@@ -1487,7 +1447,7 @@ bool MainFrame::connectSerialPort() {
 	// to be thread safe during the connect . . .
 	// the cnc pointer will be deleted here
 	// and in this case the cnc config becomes invalid 
-	updateManagerThread->enableDisplay(false);
+	umEnableDisplay(false);
 	
 	delete cnc;
 	wxString cs;
@@ -1522,7 +1482,7 @@ bool MainFrame::connectSerialPort() {
 	
 	// now the cnc config is valis again
 	// reactivate the update manager thread
-	updateManagerThread->enableDisplay(true);
+	umEnableDisplay(true);
 
 	initializeCncControl();
 	lastPortName.clear();
@@ -1574,7 +1534,7 @@ void MainFrame::enableRunControls(bool state) {
 	// only for debugging
 	if ( false ) {
 		std::clog << "state: " 			<< state;
-		std::clog << ", debug: " 		<< m_miRcDebug->IsChecked();
+		std::clog << ", debug: " 		<< isDebugMode;
 		std::clog << ", pause: " 		<< isPause();
 		std::clog << std::endl;
 	}
@@ -1582,9 +1542,12 @@ void MainFrame::enableRunControls(bool state) {
 	// all buttons of the run control have to be enabled/disabeled here
 	// every time
 	
-	if ( m_miRcDebug->IsChecked() == false ) {
+	isPause() ? m_rcDebugConfig->Enable(false) : m_rcRun->Enable(state);
+	
+	if ( isDebugMode == false ) {
 		
 		isPause() ? m_rcRun->Enable(true)           : m_rcRun->Enable(state);
+		isPause() ? m_rcDebug->Enable(false)        : m_rcDebug->Enable(state);
 		isPause() ? m_rcPause->Enable(false)        : m_rcPause->Enable(!state);
 		isPause() ? m_rcStop->Enable(true)          : m_rcStop->Enable(!state);
 		isPause() ? m_btnEmergenyStop->Enable(true) : m_btnEmergenyStop->Enable(!state);
@@ -1596,7 +1559,8 @@ void MainFrame::enableRunControls(bool state) {
 		
 	} else {
 		
-		isPause() ? m_rcRun->Enable(true)           : m_rcRun->Enable(state);
+		isPause() ? m_rcRun->Enable(false)          : m_rcRun->Enable(state);
+		isPause() ? m_rcDebug->Enable(true)         : m_rcDebug->Enable(state);
 		isPause() ? m_rcPause->Enable(false)        : m_rcPause->Enable(!state);
 		isPause() ? m_rcStop->Enable(true)          : m_rcStop->Enable(!state);
 		isPause() ? m_btnEmergenyStop->Enable(true) : m_btnEmergenyStop->Enable(!state);
@@ -1606,6 +1570,9 @@ void MainFrame::enableRunControls(bool state) {
 		m_rcNextStep->Enable(!state);
 		m_rcNextBreakpoint->Enable(!state);
 		m_rcFinish->Enable(!state);
+		
+		if ( m_rcNextBreakpoint->IsEnabled() )	startDebugUserNotification();
+		else									stopDebugUserNotification();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1859,7 +1826,7 @@ void MainFrame::updateCncConfigTrace() {
 	
 	cnc->updateCncConfigTrace();
 	
-	updateManagerThread->postUpdateZView();
+	umPostUpdateZView();
 	collectSummary();
 	
 	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", cnc->getCncConfig()->getRouterBitDiameter()));
@@ -2630,24 +2597,8 @@ bool MainFrame::processVirtualTemplate() {
 		inboundFileParser->setUserAgentControls(oc);
 		
 	inboundFileParser->setInboundSourceControl(m_stcFileContent);
-
-	if ( m_miRcDebug->IsChecked() == true ) {
-		SVGFileParser::DebugControls sdc;
-		sdc.debuggerControlBase 	= m_dvListCtrlSvgDebuggerInfoBase;
-		sdc.debuggerControlPath		= m_dvListCtrlSvgDebuggerInfoPath;
-		sdc.debuggerControlDetail	= m_dvListCtrlSvgDebuggerInfoDetail;
-		sdc.debugPreprocessing		= m_miRcPreprocessing;
-		sdc.debugSpooling			= m_miRcSpooling;
-		sdc.debugPhase				= m_debugPhase;
-		
-		inboundFileParser->setDebuggerControls(sdc);
-		
-		ret = inboundFileParser->processDebug();
-		clearDebugControls();
-
-	} else {
-		ret = inboundFileParser->processRelease();
-	}
+	if ( isDebugMode == true ) 	ret = inboundFileParser->processDebug();
+	else 						ret = inboundFileParser->processRelease();
 	
 	refreshSvgEmuFile();
 	
@@ -3157,7 +3108,6 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 	
 	cnc->evaluateLimitState();
 	if ( cnc->isALimitSwitchActive() ) {
-		manuallyDissolveEndSwitchDlg();
 		// always return false to reconfigure zero in this sitiuation
 		return false;
 	}
@@ -3332,6 +3282,10 @@ void MainFrame::processTemplate() {
 		return;
 		 
 	startAnimationControl();
+	
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	umPostEvent(evt.QueueResetEvent());
 
 	// select draw pane
 	m_outboundNotebook->SetSelection(Outbound3DPage);
@@ -3361,14 +3315,14 @@ void MainFrame::processTemplate() {
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			updateManagerThread->postResetZView();
+			umPostResetZView();
 			ret = processSVGTemplate();
 			break;
 		case TplGcode:
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			updateManagerThread->postResetZView();
+			umPostResetZView();
 			ret = processGCodeTemplate();
 			break;
 		case TplManual: 
@@ -3376,7 +3330,7 @@ void MainFrame::processTemplate() {
 			break;
 		case TplTest:
 			cnc->clearDrawControl();
-			updateManagerThread->postResetZView();
+			umPostResetZView();
 			ret = processTestTemplate();
 			break;
 		default:
@@ -4250,39 +4204,6 @@ void MainFrame::openCalculator(wxCommandEvent& event) {
 	openFileExtern(cmd, _(""));
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::clearDebugControls() {
-///////////////////////////////////////////////////////////////////
-	m_dvListCtrlSvgDebuggerInfoBase->DeleteAllItems();
-	m_dvListCtrlSvgDebuggerInfoPath->DeleteAllItems();
-	m_dvListCtrlSvgDebuggerInfoDetail->DeleteAllItems();
-	m_svgDebuggerKey->Clear();
-	m_svgDebuggerValue->Clear();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectSvgDebuggerInfo(wxDataViewListCtrl* ctl) {
-///////////////////////////////////////////////////////////////////
-	if ( ctl->HasSelection() ) {
-		int sel = ctl->GetSelectedRow();
-		m_svgDebuggerKey->SetValue(ctl->GetTextValue(sel, 0));
-		m_svgDebuggerValue->SetValue(ctl->GetTextValue(sel, 1));
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectSvgDebuggerInfoBase(wxDataViewEvent& event) {
-///////////////////////////////////////////////////////////////////
-	selectSvgDebuggerInfo(m_dvListCtrlSvgDebuggerInfoBase);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectSvgDebuggerInfoPath(wxDataViewEvent& event) {
-///////////////////////////////////////////////////////////////////
-	selectSvgDebuggerInfo(m_dvListCtrlSvgDebuggerInfoPath);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectSvgDebuggerInfoDetail(wxDataViewEvent& event) {
-///////////////////////////////////////////////////////////////////
-	selectSvgDebuggerInfo(m_dvListCtrlSvgDebuggerInfoDetail);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::moveManuallySliderX(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val;
@@ -4656,20 +4577,6 @@ void MainFrame::setFocusMoveZAxis(wxFocusEvent& event) {
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::manuallyDissolveEndSwitchDlg() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	
-	cnc->evaluateLimitState();
-	EndSwitchDialog esd(this, cnc);
-	esd.ShowModal();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::dissolveEndSwitchStates(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	manuallyDissolveEndSwitchDlg();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::updateCurveLibResolution(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateCurveLibResolution();
@@ -4710,9 +4617,6 @@ void MainFrame::openMainPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMonitorPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	
-	
-	
 	#warning why?????
 	//selectMonitorBookTemplatePanel();
 	openPreview(monitorFilePreview, fn);
@@ -5735,41 +5639,16 @@ const char* MainFrame::getErrorHtmlPage(const wxString& errorInfo) {
 	return fn.GetFullPath();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::togglePreviewErrorInfo(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( m_previewErrorInfo->GetValue() == true )
-		m_previewErrorInfo->SetToolTip("Preview with error information");
-	else 
-		m_previewErrorInfo->SetToolTip("Preview without error information");
-		
-	prepareAndShowMonitorTemplatePreview(true);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::decorateRunButton() {
 ///////////////////////////////////////////////////////////////////
-	wxBitmap bmp;
 	wxString toolTip;
-	
 	toolTip = isPause() ? "Resume " : "Run";
-	
-	if ( m_miRcDebug->IsChecked() == true ) {
-		toolTip += "(Debug)";
-		bmp = ImageLib24().Bitmap("BMP_RUN_DEBUG");
-	} else {
-		toolTip += "(Release)";
-		bmp = ImageLib24().Bitmap("BMP_RUN_RELEASE");
-	}
-	
 	m_rcRun->SetToolTip(toolTip);
-	m_rcRun->SetBitmap(bmp);
-	// generate the new disabled bmp
-	m_rcRun->SetBitmapDisabled(wxBitmap());
-	m_rcRun->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::determineRunMode() {
 ///////////////////////////////////////////////////////////////////
-	if ( m_miRcDebug->IsChecked() == true ) {
+	if ( isDebugMode ) {
 		m_svgParseMode->SetLabel("Debug");
 		m_svgParseMode->SetForegroundColour(wxColor(255,128,128));
 	} else {
@@ -5778,31 +5657,23 @@ void MainFrame::determineRunMode() {
 	}
 
 	decorateRunButton();
-	
-	m_miStopAfterPreprocessing->Enable(true);
-	m_miStopAfterSpoolling->Enable(true);
-	
-	m_miRcPreprocessing->Enable( m_miRcDebug->IsChecked() );
-	m_miRcSpooling->Enable( m_miRcDebug->IsChecked() );
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::rcSelectRunMode(wxCommandEvent& event) {
+void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	determineRunMode();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::rcSelectDebugArea(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( m_miRcPreprocessing->IsChecked() == false && m_miRcSpooling->IsChecked() == false ) {
-		wxString msg("Do you realy want to define no area to debug?");
-		wxMessageDialog dlg(this, msg, _T("Debug Area Check . . . "), 
-							wxOK|wxCENTRE|wxICON_INFORMATION);
-		dlg.ShowModal();
-	}
+	showAuiPane("Spy");
+	m_spyNotebook->SetSelection(SpyBookSelection::VAL::DEBUGGER_PANEL);
+	
+	if ( m_debuggerPropertyManagerGrid->GetPageCount() > 0 )
+		m_debuggerPropertyManagerGrid->SelectPage(0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( event.GetEventObject() == m_rcRun )	isDebugMode = false;
+	else										isDebugMode = true;
+	determineRunMode();
+	
 	// toggle only the pause flag
 	if ( isPause() == true ) {
 		rcPause(event);
@@ -5813,7 +5684,7 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 	// Store the current interval
 	int interval = cnc->getCncConfig()->getUpdateInterval();
 	
-	if ( m_miRcDebug->IsChecked() == true ) {
+	if ( isDebugMode == true ) {
 		
 		// check if the cuurent port is a cnc and no emulator port
 		if ( cnc->getSerial()->getPortType() == CncPORT ) {
@@ -5832,10 +5703,15 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 		
 		// to see each line during the debug session
 		cnc->getCncConfig()->setUpdateInterval(1);
-	} 
+	} else {
+		
+		hideAuiPane("Spy");
+	}
 
 	// process
 	processTemplate();
+	//std::clog << "processTemplate() returned"<< endl;
+	
 	// restore the interval
 	cnc->getCncConfig()->setUpdateInterval(interval);
 }
@@ -5860,8 +5736,6 @@ void MainFrame::rcNextStep(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( inboundFileParser != NULL )
 		inboundFileParser->debugNextStep();
-		
-	clearDebugControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcFinish(wxCommandEvent& event) {
@@ -5886,10 +5760,13 @@ void MainFrame::rcStop(wxCommandEvent& event) {
 		
 	} else {
 		
+		// toggle only the pause flag
+		if ( isPause() == true )
+			rcPause(event);
+		
 		if ( inboundFileParser != NULL )
 			inboundFileParser->debugStop();
 		 
-		clearDebugControls();
 		cnc::trc.logInfo("Debug session was stopped");
 	}
 }
@@ -5899,14 +5776,6 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 	requestReset();
 	setRefPostionState(false);
 }
-
-
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////
 void MainFrame::controlerPause(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
@@ -6634,4 +6503,55 @@ void MainFrame::onSelectTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	selectMainBookSourcePanel();
 }
-
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onDebugUserNotificationTimer(wxTimerEvent& WXUNUSED(event)) {
+/////////////////////////////////////////////////////////////////////
+	const wxColour c1(227, 227, 227);
+	const wxColour c2(255, 201, 14);
+	
+	if ( inboundFileParser ) {
+		if ( inboundFileParser->isWaitingForUserEvents() == false ) {
+			if ( m_rcNextBreakpoint->GetBackgroundColour() != c1 )	m_rcNextBreakpoint->SetBackgroundColour(c1);
+			if ( m_rcNextStep->GetBackgroundColour() != c1 )		m_rcNextStep->SetBackgroundColour(c1);
+			if ( m_rcFinish->GetBackgroundColour() != c1 )			m_rcFinish->SetBackgroundColour(c1);
+			
+			return;
+		}
+	}
+	
+	if ( m_rcNextBreakpoint->GetBackgroundColour() == c1 )	m_rcNextBreakpoint->SetBackgroundColour(c2);
+	else 													m_rcNextBreakpoint->SetBackgroundColour(c1);
+	
+	if ( m_rcNextStep->GetBackgroundColour() == c1 )		m_rcNextStep->SetBackgroundColour(c2);
+	else 													m_rcNextStep->SetBackgroundColour(c1);
+	
+	if ( m_rcFinish->GetBackgroundColour() == c1 )			m_rcFinish->SetBackgroundColour(c2);
+	else 													m_rcFinish->SetBackgroundColour(c1);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::startDebugUserNotification() {
+/////////////////////////////////////////////////////////////////////
+	const wxColour c(255, 201, 14);
+	m_rcNextBreakpoint->SetBackgroundColour(c);
+	m_rcNextStep->SetBackgroundColour(c);
+	m_rcFinish->SetBackgroundColour(c);
+	
+	if ( debugUserNotificationTime.IsRunning() == false )
+		debugUserNotificationTime.Start(1000);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::stopDebugUserNotification() {
+/////////////////////////////////////////////////////////////////////
+	const wxColour c(227, 227, 227);
+	m_rcNextBreakpoint->SetBackgroundColour(c);
+	m_rcNextStep->SetBackgroundColour(c);
+	m_rcFinish->SetBackgroundColour(c);
+	
+	if ( debugUserNotificationTime.IsRunning() == true )
+		debugUserNotificationTime.Stop();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::clearPositionSpy(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	umPostClearPositionSpy();
+}

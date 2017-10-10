@@ -37,6 +37,8 @@ namespace GLI {
 			const float factZ() const { return _z; }
 			
 			////////////////////////////////////////////
+			void resetScale() { _x = 1.0; _y = 1.0; _z = 1.0; }
+			
 			void incScale() { _x += _step; _y += _step; _z += _step; }
 			void decScale() { _x -= _step; _y -= _step; _z -= _step; }
 			

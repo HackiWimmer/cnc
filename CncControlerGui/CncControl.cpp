@@ -171,8 +171,8 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 		return false;
 		
 	} else {
-		if ( GET_UPD_THREAD )
-			GET_UPD_THREAD->postSetterValue(id, value);
+		if ( GET_GUI_CTL(mainFrame) )
+			GET_GUI_CTL(mainFrame)->umPostSetterValue(id, value);
 	}
 
 	return true;
@@ -361,8 +361,11 @@ void CncControl::setZeroPosX() {
 	zeroPos.setX(0);
 	startPos.setX(0);
 	
-	if ( GET_UPD_THREAD )
-		GET_UPD_THREAD->postAppPos(curPos);
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(curPos));
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosY() {
@@ -371,8 +374,11 @@ void CncControl::setZeroPosY() {
 	zeroPos.setY(0);
 	startPos.setY(0);
 	
-	if ( GET_UPD_THREAD )
-		GET_UPD_THREAD->postAppPos(curPos);
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(curPos));
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosZ() {
@@ -394,8 +400,11 @@ void CncControl::setZeroPosZ() {
 		}
 	}
 	
-	if ( GET_UPD_THREAD )
-		GET_UPD_THREAD->postAppPos(curPos);
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(curPos));
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos() {
@@ -441,7 +450,6 @@ bool CncControl::resetWatermarks() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::reset() {
 ///////////////////////////////////////////////////////////////////
-	
 	getSerial()->purge();
 	resetInterrupt();
 	
@@ -458,9 +466,12 @@ bool CncControl::reset() {
 	
 	CncLongPosition cp = getControllerPos();
 	
-	if ( GET_UPD_THREAD )
-		GET_UPD_THREAD->postCtlPos(cp);
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
 	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(cp));
+		
 	evaluateLimitState();
 	switchToolOff();
 	
@@ -565,6 +576,7 @@ void CncControl::changeWorkSpeedXY(CncSpeed s) {
 		return;
 	
 	cncConfig->setActiveSpeedXY(s);
+	
 	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
 	processSetter(mmm, (s == CncSpeedWork));
 	processSetter(PID_SPEED_X, cncConfig->getSpeedX());
@@ -577,6 +589,7 @@ void CncControl::changeWorkSpeedZ(CncSpeed s) {
 		return;
 		
 	cncConfig->setActiveSpeedZ(s);
+	
 	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
 	processSetter(mmm, (s == CncSpeedWork));
 	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
@@ -585,8 +598,11 @@ void CncControl::changeWorkSpeedZ(CncSpeed s) {
 void CncControl::logProcessingStart() {
 ///////////////////////////////////////////////////////////////////
 	// update command values
-	if ( GET_UPD_THREAD )
-		GET_UPD_THREAD->postCmdValues(0, 0);
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CommandEvent(0, 0));
 	
 	ftime(&startTime);
 	commandCounter=0;
@@ -594,21 +610,27 @@ void CncControl::logProcessingStart() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingCurrent() {
 ///////////////////////////////////////////////////////////////////
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
 	ftime(&endTime);
 	long t_diff = (long) (1000.0 * (endTime.time - startTime.time) + (endTime.millitm - startTime.millitm));  
 
 	// update command values
-	if ( GET_UPD_THREAD )
-		GET_UPD_THREAD->postCmdValues(commandCounter, t_diff);
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CommandEvent(commandCounter, t_diff));
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingEnd(bool valuesOnly) {
-	if ( GET_UPD_THREAD ) {
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+
+	if ( GET_GUI_CTL(mainFrame) ) {
 		// update application position
-		GET_UPD_THREAD->postCtlPos(curPos);
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(curPos));
 		
 		// update controller position
-		GET_UPD_THREAD->postCtlPos(curCtlPos);
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(curCtlPos));
 	}
 	
 	if ( valuesOnly == false )
@@ -755,8 +777,12 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			if ( cncConfig->isOnlineUpdateCoordinates() ) {
 				// update controller position
 				curCtlPos = ci.controllerPos;
-				if ( GET_UPD_THREAD )
-					GET_UPD_THREAD->postCtlPos(ci.controllerPos);
+				
+				typedef UpdateManagerThread::Event Event;
+				static Event evt;
+	
+				if ( GET_GUI_CTL(mainFrame) )
+					GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(ci.controllerPos));
 			}
 			
 			// pause hanling
@@ -786,7 +812,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::SerialCallback(int32_t cmcCount) {
+bool CncControl::SerialCallback(int32_t cmdCount) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
 	wxASSERT(guiCtlSetup);
@@ -797,7 +823,7 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 	}
 
 	// Evalutate the command counter
-	commandCounter += cmcCount;
+	commandCounter += cmdCount;
 	
 	// Event handling, enables the interrupt functionallity
 	if ( cncConfig->isAllowEventHandling() ) {
@@ -805,27 +831,38 @@ bool CncControl::SerialCallback(int32_t cmcCount) {
 		while (evtLoop->Pending())
 			evtLoop->Dispatch();
 	}
-
-	// position out of configured range?
-	if ( validateCurrentPostion() == false )
-		interrupt();
-
+	
 	// motion monitor
-	static CncMotionMonitor::VerticeData vd;
-	if ( IS_GUI_CTL_VALID(motionMonitor) ) {
-		vd.setVertice(cncConfig->getSpeedType(), curPos);
-		GET_GUI_CTL(motionMonitor)->appendVertice(vd);
-		updatePreview3D(false);
-	}
-
-	// Display coordinates
-	if ( cncConfig->isOnlineUpdateCoordinates() ) {
-		// application position
-		if ( GET_UPD_THREAD )
-			GET_UPD_THREAD->postAppPos(curPos);
+	static GLI::VerticeLongData vd;
+	static CncLongPosition prevPos;
+	
+	if ( curPos != prevPos ) {
 		
-		logProcessingCurrent();
+		if ( IS_GUI_CTL_VALID(motionMonitor) ) {
+			vd.setVertice(4242, cncConfig->getSpeedType(), curPos);
+			GET_GUI_CTL(motionMonitor)->appendVertice(vd);
+			
+			updatePreview3D(false);
+		}
+		
+		// Display coordinates
+		if ( cncConfig->isOnlineUpdateCoordinates() ) {
+			// application position
+			typedef UpdateManagerThread::Event Event;
+			static Event evt;
+			
+			if ( GET_GUI_CTL(mainFrame) )
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(vd.getId(), UpdateManagerThread::SpeedMode::UNDEFINED, curPos));
+		}
+		
+		prevPos = curPos;
+		
+		// position out of configured range?
+		if ( validateCurrentPostion() == false )
+			interrupt();
 	}
+	
+	logProcessingCurrent();
 	
 	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
 		std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
@@ -957,14 +994,6 @@ bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRender
 	if ( x1 == 0 && y1 == 0 )
 		return true;
 	
-	// optimize pure vertical moves, nothing to render
-	if ( x1 == 0 )
-		return serialPort->processMoveXY(x1, y1, true, curPos);
-		
-	// optimize pure horizontal moves, nothing to render
-	if ( y1 == 0 )
-		return serialPort->processMoveXY(x1, y1, true, curPos);
-
 	if ( renderMode == CncRenderAtController )
 		return serialPort->processMoveXY(x1, y1, false, curPos);
 		
@@ -973,19 +1002,12 @@ bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRender
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
-	long sum = x1 + y1 + z1;
-	
 	//avoid empty steps
-	if ( sum == 0 )
+	if ( x1 == 0 && y1 == 0 && z1 == 0 )
 		return true;
-		
-	// optimize pure one xisis moves, nothing to render
-	if ( sum == x1 || sum == y1 || sum == z1 )
-		return serialPort->processMoveXYZ(x1, y1, z1, true, curPos);
 	
-	if ( renderMode == CncRenderAtController ) {
+	if ( renderMode == CncRenderAtController )
 		return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curPos);
-	}
 
 	return false;
 }
@@ -1166,8 +1188,8 @@ bool CncControl::validatePositions() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
-	if ( GET_UPD_THREAD )
-		GET_UPD_THREAD->postConfigUpdate(cncConfig);
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostConfigUpdate(cncConfig);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::enableStepperMotors(bool s) {

@@ -1,6 +1,7 @@
 #ifndef OPENGL_CONTEXT_PATH_BASE_H
 #define OPENGL_CONTEXT_PATH_BASE_H
 
+#include <cfloat>
 #include "3D/GLCncPathData.h"
 #include "3D/GLContextBase.h"
 
@@ -78,6 +79,8 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		bool boundBox;
 		wxColour boundBoxColour;
+		
+		virtual float getAutoScaleFactor() { return ( autoScale ? cncPath.getAutoScaleFact() : 1.0); }
 		
 		virtual void determineModel();
 		virtual void markCurrentPosition();

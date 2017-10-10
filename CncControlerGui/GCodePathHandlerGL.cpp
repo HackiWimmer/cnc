@@ -24,25 +24,18 @@ void GCodePathHandlerGL::finishWorkImpl() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(glControl);
 	glControl->popProcessMode();
-	
-	/*
-	 * todo
-	currentPos.setXYZ(0.0, 0.0, 0.0);
-	
-	cncControl->moveXYZToZeroPos();
-	cncControl->switchToolOff();
-	 * */
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerGL::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(glControl);
 	
-	static CncGCodePreview::VerticeData vd;
-	vd.setVertice(currentSpeed, currentPos);
-	glControl->appendVertice(vd);
-
 	#warning - consider unit!
+	
+	static GLI::VerticeDoubleData vd;
+	vd.setVertice(0L, currentSpeed, currentPos);
+	glControl->appendVertice(vd);
+	
 	return true; 
 }
 //////////////////////////////////////////////////////////////////

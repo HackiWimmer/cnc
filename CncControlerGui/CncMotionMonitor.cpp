@@ -67,7 +67,6 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
-	
 	monitor->init();
 	testCube->init();
 	
@@ -113,20 +112,24 @@ void CncMotionMonitor::reconstruct() {
 	// clear the real monitor path data - keep in mind curPath is only a local copy
 	monitor->clearPathData();
 	
-	// reconstruct
-	GLI::GLCncPathVertices d;
-	for ( GLI::GLCncPath::iterator it = tmpPath.begin(); it != tmpPath.end(); ++it )
-		appendVertice(it->getX(), it->getY(), it->getZ(), it->getCncMode());
+	pushProcessMode();
 	
-	// redraw the scene with new properties
-	display();
+		// reconstruct
+		GLI::GLCncPathVertices d;
+		for ( GLI::GLCncPath::iterator it = tmpPath.begin(); it != tmpPath.end(); ++it )
+			appendVertice(it->getX(), it->getY(), it->getZ(), it->getCncMode());
+		
+		// redraw the scene with new properties
+		display();
+	
+	popProcessMode();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::display() {
 	Refresh(false);
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::appendVertice(const CncMotionMonitor::VerticeData& vd) {
+void CncMotionMonitor::appendVertice(const GLI::VerticeLongData& vd) {
 //////////////////////////////////////////////////	
 	// Convert the given steps (abs) to a glpos (rel):
 	
@@ -195,6 +198,7 @@ void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 	// This is required even though dc is not used otherwise.
 	wxPaintDC dc(this);
 	monitor->SetCurrent(*this);
+	monitor->init();
 
 	const wxSize cs = GetClientSize();
 	monitor->reshape(cs.GetWidth(), cs.GetHeight());
@@ -309,6 +313,9 @@ void CncMotionMonitor::rotateCamera(int angle) {
 void CncMotionMonitor::pushProcessMode() {
 //////////////////////////////////////////////////
 	//set processing flags
+	#warning todo
+	//monitor->normalizeRotation();
+	monitor->setAutoScaling(getFlags().autoScaling);
 	monitor->enablePositionMarker(getFlags().positionMarker);
 }
 //////////////////////////////////////////////////

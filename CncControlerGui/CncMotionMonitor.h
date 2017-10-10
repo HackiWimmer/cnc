@@ -7,6 +7,7 @@
 #include "CncPosition.h"
 #include "CncCommon.h"
 #include "CncConfig.h"
+#include "3D/VerticeData.h"
 #include "3D/GLContextPathBase.h"
 
 wxDECLARE_EVENT(wxEVT_MOTION_MONITOR_TIMER, wxTimerEvent);
@@ -18,72 +19,11 @@ class CncMotionMonitor : public wxGLCanvas {
 
 	public:
 
-		class VerticeData {
-
-			public:
-				
-				//////////////////////////////////////////////
-				VerticeData()
-				: _x(0)
-				, _y(0)
-				, _z(0)
-				, mode(GLI::GLCncPathVertices::CncMode::CM_FLY)
-				{}
-
-				//////////////////////////////////////////////
-				virtual ~VerticeData() {
-				}
-
-				//////////////////////////////////////////////
-				const long getX() const { return _x; }
-				const long getY() const { return _y; }
-				const long getZ() const { return _z; }
-				
-				const GLI::GLCncPathVertices::CncMode getMode() const { return mode; }
-
-				//////////////////////////////////////////////
-				void setVertice(CncSpeed speedType, const CncLongPosition& cp) {
-					switch ( speedType ) {
-						case CncSpeedWork: 	setWorkVertice(cp);
-											break;
-											
-						case CncSpeedRapid: setRapidVertice(cp);
-											break;
-					}
-				}
-
-			protected:
-
-				//CncLongPosition pos;
-				long _x;
-				long _y;
-				long _z;
-				GLI::GLCncPathVertices::CncMode mode;
-				
-				//////////////////////////////////////////////
-				void setRapidVertice(const CncLongPosition& cp) {
-					_x = cp.getX();
-					_y = cp.getY();
-					_z = cp.getZ();
-					
-					mode = GLI::GLCncPathVertices::CncMode::CM_FLY;
-				}
-
-				//////////////////////////////////////////////
-				void setWorkVertice(const CncLongPosition& cp) {
-					_x = cp.getX();
-					_y = cp.getY();
-					_z = cp.getZ();
-					
-					mode = GLI::GLCncPathVertices::CncMode::CM_WORK;
-				}
-
-		};
-		
 		///////////////////////////////////////////////////
 		struct Flags {
 			bool positionMarker 	= true;
 			bool drawFlyPath		= true;
+			bool autoScaling		= true;
 			
 			wxColour flyColour		= *wxYELLOW;
 			wxColour workColour		= *wxWHITE;
@@ -102,7 +42,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		void clear();
 		void display();
 		void setCncConfig(const CncConfig& config);
-		void appendVertice(const CncMotionMonitor::VerticeData& vd);
+		void appendVertice(const GLI::VerticeLongData& vd);
 		void centerViewport();
 		void resetRotation();
 

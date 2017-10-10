@@ -76,7 +76,6 @@ class CncControl {
 		#define GET_GUI_CTL(ctl)           (guiCtlSetup->ctl)
 		#define IS_GUI_CTL_VALID(ctl)      (guiCtlSetup != NULL && guiCtlSetup->ctl != NULL)
 		#define IS_GUI_CTL_NOT_VALID(ctl)  (guiCtlSetup == NULL || guiCtlSetup->ctl == NULL)
-		#define GET_UPD_THREAD             (GET_GUI_CTL(mainFrame)->getUpdateManagerThread())
 		// Tool state handling
 		CncToolStateControl toolState;
 		//measurements variables

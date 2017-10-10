@@ -27,8 +27,6 @@
   <object class="wxBitmap" name="16-debugger_stop@2x">bitmaps\16-debugger_stop@2x.png</object>
   <object class="wxBitmap" name="16-dll">bitmaps\16-dll.png</object>
   <object class="wxBitmap" name="16-dll@2x">bitmaps\16-dll@2x.png</object>
-  <object class="wxBitmap" name="16-error">bitmaps\16-error.png</object>
-  <object class="wxBitmap" name="16-error@2x">bitmaps\16-error@2x.png</object>
   <object class="wxBitmap" name="16-execute_stop">bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="16-execute_stop@2x">bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="16-file_close">bitmaps\16-file_close.png</object>
@@ -116,6 +114,9 @@
   <object class="wxBitmap" name="BMP_CONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="BMP_COORD_BOTTOM_TOP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\git-pull.png</object>
   <object class="wxBitmap" name="BMP_COORD_TOP_BOTTOM">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\git-push.png</object>
+  <object class="wxBitmap" name="BMP_DB_CONFIGURATION">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\server-connect.png</object>
+  <object class="wxBitmap" name="BMP_DB_PREPROCESSING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-orange.png</object>
+  <object class="wxBitmap" name="BMP_DB_SPOOLING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-blue.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
@@ -207,15 +208,14 @@
   <object class="wxBitmap" name="arrow-rotate-clockwise">bitmaps\arrow-rotate-clockwise.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="book_green">bitmaps\book_green.png</object>
+  <object class="wxBitmap" name="bookmark-2">bitmaps\bookmark-2.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bricks">bitmaps\bricks.png</object>
   <object class="wxBitmap" name="bug (2)">bitmaps\bug (2).png</object>
   <object class="wxBitmap" name="bug-go">bitmaps\bug-go.png</object>
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
-  <object class="wxBitmap" name="cube_green">bitmaps\cube_green.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
-  <object class="wxBitmap" name="dialog-ok">bitmaps\dialog-ok.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="git-settings">bitmaps\git-settings.png</object>
   <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>
@@ -224,12 +224,12 @@
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
-  <object class="wxBitmap" name="media-playback-stop-7">bitmaps\media-playback-stop-7.png</object>
   <object class="wxBitmap" name="meeting-organizer">bitmaps\meeting-organizer.png</object>
   <object class="wxBitmap" name="mill">bitmaps\mill.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
   <object class="wxBitmap" name="resize">bitmaps\resize.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
+  <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="setting_tools">bitmaps\setting_tools.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>

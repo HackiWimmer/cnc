@@ -46,7 +46,7 @@ class FileParserRunInfo {
 		
 		bool processMore() {
 			if ( runPhase >= finalizeAfter ) {
-				std::clog << "Run would be finalized after step: " << getCurrentDebugPhaseAsString() << std::endl;
+				std::clog << "This run are configured finalized after step: " << getCurrentDebugPhaseAsString() << std::endl;
 				return false;
 			}
 				

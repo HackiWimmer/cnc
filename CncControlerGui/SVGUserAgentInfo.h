@@ -127,10 +127,6 @@ struct SVGUserAgentInfo {
 		/////////////////////////////////////////////////////////
 		void getBaseDetails(DcmItemList& rows) {
 			wxString value;
-			
-			DataControlModel::addKeyValueRow(rows, "Line Number", 	(int)lineNumber);
-			DataControlModel::addKeyValueRow(rows, "Node", 			nodeName);
-			
 			workingParameters.getParameterList(rows);
 						
 			if ( nodeType == NT_PATH ) {

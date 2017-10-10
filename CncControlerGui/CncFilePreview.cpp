@@ -44,6 +44,7 @@ bool CncFilePreview::selectGCodePreview(const wxString& fileName) {
 	}
 	
 	GCodeFileParser gfp(fileName, new GCodePathHandlerGL(gcodePreview));
+	gfp.setDisplayWarnings(false);
 	return gfp.processRelease();
 }
 

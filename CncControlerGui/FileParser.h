@@ -2,25 +2,51 @@
 #define FILE_PARSER_H
 
 #include <wx/string.h>
+#include <wx/variant.h>
 #include "DataControlModel.h"
 #include "FileParserRunInfo.h"
 
-class wxStyledTextCtrl;
 class wxStaticText;
+class wxBitmapButton;
+class wxStyledTextCtrl;
 class wxDataViewListCtrl;
-class wxWebView;
+
+class wxPropertyGridManager;
+class wxPropertyGridPage;
+class wxPropertyCategory;
+class wxPGProperty;
 
 class FileParser {
 
 	public:
 		/////////////////////////////////////////////////////////////////////
-		struct DebugControls {
-			wxStaticText*			debugPhase 				= NULL;
-			wxDataViewListCtrl* 	debuggerControlBase 	= NULL;
-			wxDataViewListCtrl* 	debuggerControlPath 	= NULL;
-			wxDataViewListCtrl* 	debuggerControlDetail 	= NULL;
-			wxMenuItem*				debugPreprocessing 		= NULL;
-			wxMenuItem*				debugSpooling			= NULL;
+		struct DebugCtrl {
+
+			unsigned long 			propCount					= 0;
+			wxPropertyGridPage*		currentPage					= NULL;
+			wxPGProperty*			curentMainCategory			= NULL;
+			wxPGProperty*			currentNode					= NULL;
+			
+			void currentNodeAdd(const wxString& key, const wxVariant& value);
+			void currentNodeAdd(DcmRow& row);
+			void currentNodeAdd(DcmItemList& rows);
+			
+			void currentNodeAddToCategory(const wxString& catLabel, const wxString& key, const wxVariant& value);
+			void currentNodeAddToCategory(const wxString& catLabel, DcmRow& row);
+			void currentNodeAddToCategory(const wxString& catLabel, DcmItemList& rows);
+			
+			struct Config {
+				///////////////////////////////////////////////////////////////////////////
+				wxPGProperty* getProperty(const wxString& name);
+				
+				bool autoBreakpoint();
+				bool shouldDebugPreprocessing();
+				bool shouldDebugSpooling();
+				bool shouldStopAfterPreprocessing();
+				bool shouldStopAfterSpooling();
+				
+			} config;
+			
 		};
 		
 		/////////////////////////////////////////////////////////////////////
@@ -49,18 +75,36 @@ class FileParser {
 		
 		virtual void setUserAgentControls(UserAgentOutputControls& oc) {}
 		virtual void displayUserAgentDetailInfo(unsigned int pos) {}
-		virtual void clearControls() { clearDebugControlBase(); }
+		virtual void clearControls();
 		
 		int getCurrentLineNumber() { return currentLineNumber; };
 		void setInboundSourceControl(wxStyledTextCtrl* stc) { inboundSourceControl = stc; }
 		
-		void setDebuggerControls(DebugControls& dc);
+		void appendDebugValueBase(const char* key, wxVariant value);
+		void appendDebugValuePath(const char* key, wxVariant value);
+		void appendDebugValueDetail(const char* key, wxVariant value);
+		
+		void appendDebugValueBase(DcmItemList& rows);
+		void appendDebugValuePath(DcmItemList& rows);
+		void appendDebugValueDetail(DcmItemList& rows);
+		
+		void appendDebugValueBase(DcmRow& row);
+		void appendDebugValuePath(DcmRow& row);
+		void appendDebugValueDetail(DcmRow& row);
+		
+		bool isWaitingForUserEvents() { return waitingForUserEvents; }
+		
+		// configuration page handling
+		const int staticPageOffset = 1;
+		static wxPropertyGridManager* debuggerConfigurationPropertyGrid;
+		static void installDebugConfigPage(wxPropertyGridManager* pgm);
 		
 	protected:
 		wxString fileName;
 		FileParserRunInfo runInfo;
+		bool waitingForUserEvents;
 
-		DebugControls debugControls;
+		DebugCtrl debugControls;
 		wxStyledTextCtrl* inboundSourceControl;
 		
 		virtual bool process();
@@ -70,7 +114,6 @@ class FileParser {
 		
 		virtual bool isInterrupted() { return false; }
 		virtual void broadcastDebugState(bool state) {}
-		virtual void broadcastDebugControls(DebugControls& dc) {}
 		
 		virtual void selectSourceControl(unsigned long pos);
 		
@@ -82,28 +125,19 @@ class FileParser {
 		bool hasLineABreakpoint(long ln);
 		bool checkBreakpoint();
 		
-		void clearDebugControlBase();
-		void clearDebugControlPath();
-		void clearDebugControlDetail();
-		
-		void appendDebugValue(wxDataViewListCtrl* ctl, const char* key, wxVariant value);
-		void appendDebugValue(wxDataViewListCtrl* ctl, DcmItemList& rows);
-		void appendDebugValueDetail(const char* key, wxVariant value);
-		
-		void appendDebugValuePath(const char* key, wxVariant value);
-		void appendDebugValueBase(const char* key, wxVariant value);
-		
-		void appendDebugValueBase(DcmItemList& rows);
-		void appendDebugValuePath(DcmItemList& rows);
-		void appendDebugValueDetail(DcmItemList& rows);
-		
+		void registerNextDebugNode(const wxString& nodeName);
+
 		friend class SVGPathHandlerCnc;
 		friend class GCodePathHandlerCnc;
 		friend class GCodePathHandlerGL;
 		
 	private:
+		
 		long currentLineNumber;
-		bool checkIfCurrentRunPhaseShouldBeDebugged();
+		
+		#define SHOULD_DEBUG_HERE										\
+			if ( runInfo.getCurrentDebugState() == false )				\
+				return;
 };
 
 #endif

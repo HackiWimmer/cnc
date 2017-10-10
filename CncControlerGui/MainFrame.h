@@ -16,23 +16,26 @@
 #include "CncFileView.h"
 #include "codelite/wxPNGAnimation.h"
 
+////////////////////////////////////////////////////////////////////
+// forward declarations
 class wxFileConfig;
 class CncFilePreviewWnd;
 class CncFilePreview;
 class wxMenu;
 class wxMenuItem;
-
-enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
-
-wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxThreadEvent);
-wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxThreadEvent);
-wxDECLARE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
-wxDECLARE_EVENT(wxEVT_OPEN_FILE_FROM_FILE_VIEW, wxCommandEvent);
-wxDECLARE_EVENT(wxEVT_PREVIEW_FILE_FROM_FILE_VIEW, wxCommandEvent);
-
-wxDECLARE_EVENT(wxEVT_XXX, wxCommandEvent);
+////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
+// app defined events
+	wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxCommandEvent);
+	wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxCommandEvent);
+
+	wxDECLARE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
+	wxDECLARE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, wxTimerEvent);
+////////////////////////////////////////////////////////////////////
+
+////////////////////////////////////////////////////////////////////
+// global definitions
 typedef std::vector<wxWindow*> GuiControls;
 
 ////////////////////////////////////////////////////////////////////
@@ -40,7 +43,7 @@ class MainFrame : public MainFrameBClass {
 
 	// User command
 	protected:
-    virtual void rcSelectDebugArea(wxCommandEvent& event);
+    virtual void clearPositionSpy(wxCommandEvent& event);
 		virtual void onSelectManuallyMove(wxCommandEvent& event);
 		virtual void onSelectReferences(wxCommandEvent& event);
 		virtual void onSelectSetup(wxCommandEvent& event);
@@ -122,8 +125,7 @@ class MainFrame : public MainFrameBClass {
 		virtual void updateMetricZ(wxCommandEvent& event);
 		virtual void zeroManuallyZSlider(wxCommandEvent& event);
 		virtual void requestCurrentLimitStateIcon(wxMouseEvent& event);
-		virtual void rcSelectRunMode(wxCommandEvent& event);
-		virtual void togglePreviewErrorInfo(wxCommandEvent& event);
+		virtual void rcDebugConfig(wxCommandEvent& event);
 		virtual void rcFinish(wxCommandEvent& event);
 		virtual void rcNextBreakpoint(wxCommandEvent& event);
 		virtual void rcNextStep(wxCommandEvent& event);
@@ -264,7 +266,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void maxManuallyYSlider(wxCommandEvent& event);
 		virtual void updateMetricX(wxCommandEvent& event);
 		virtual void updateMetricY(wxCommandEvent& event);
-		virtual void dissolveEndSwitchStates(wxCommandEvent& event);
 		virtual void updateReverseStepSignX(wxCommandEvent& event);
 		virtual void updateReverseStepSignY(wxCommandEvent& event);
 		virtual void killFocusMoveZAxis(wxFocusEvent& event);
@@ -282,22 +283,22 @@ class MainFrame : public MainFrameBClass {
 		virtual void testFunction2(wxCommandEvent& event);
 		virtual void testFunction3(wxCommandEvent& event);
 		virtual void testFunction4(wxCommandEvent& event);
-		virtual void clearDebugControls();
 		virtual void disableSlider(wxMouseEvent& event);
-		virtual void selectSvgDebuggerInfoBase(wxDataViewEvent& event);
-		virtual void selectSvgDebuggerInfoPath(wxDataViewEvent& event);
-		virtual void selectSvgDebuggerInfoDetail(wxDataViewEvent& event);
 		virtual void OnExit(wxCommandEvent& event);
 		virtual void OnAbout(wxCommandEvent& event);
 		virtual void onClose(wxCloseEvent& event);
 		
-		void onThreadUpdate(wxThreadEvent& event);
-		void onThreadCompletion(wxThreadEvent& event);
+		void onThreadUpdate(wxCommandEvent& event);
+		void onThreadCompletion(wxCommandEvent& event);
 		void onPerspectiveTimer(wxTimerEvent& WXUNUSED(event));
+		void onDebugUserNotificationTimer(wxTimerEvent& WXUNUSED(event));
 		
 		wxDECLARE_EVENT_TABLE();
 		
 	public:
+		
+		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
+		
 		//////////////////////////////////////////////////////////////////////////////////
 		MainFrame(wxWindow* parent);
 		virtual ~MainFrame();
@@ -313,7 +314,23 @@ class MainFrame : public MainFrameBClass {
 		wxTextCtrl* getCtrlPathGeneratorTrace() { return pathGenerator->getPathTrace(); }
 		wxTextCtrl* getCtrlSerialSpy() 			{ return serialSpy; }
 		
-		UpdateManagerThread* getUpdateManagerThread() { return updateManagerThread; }
+		//////////////////////////////////////////////////////////////////////////////////
+		// UpdateManagerThread interface
+		// Important! Don't use the pointer updateManagerThread directly whitout a wxCriticalSectionLocker
+		#define SAVE_UPD_THREAD  wxCriticalSectionLocker enter(pThreadCS); if ( updateManagerThread == NULL ) return
+		void umEnableDisplay(bool state)													{ SAVE_UPD_THREAD; updateManagerThread->enableDisplay(state); }
+		
+		//void umPostAppPos(const CncLongPosition& pPos, const CncLongPosition& cPos) 		{ SAVE_UPD_THREAD; updateManagerThread->postAppPos(pPos, cPos); }
+		//void umPostAppPos(const CncLongPosition& pPos, const GLI::VerticeLongData& cVd) 	{ SAVE_UPD_THREAD; updateManagerThread->postAppPos(pPos, cVd); }
+		
+		void umPostClearPositionSpy()														{ SAVE_UPD_THREAD; updateManagerThread->postClearPositionSpy(); }
+		void umPostConfigUpdate(CncConfig* cncConfig)										{ SAVE_UPD_THREAD; updateManagerThread->postConfigUpdate(cncConfig); }
+		void umPostSetterValue(unsigned char id, int32_t value)								{ SAVE_UPD_THREAD; updateManagerThread->postSetterValue(id, value); }
+		void umPostResetZView()																{ SAVE_UPD_THREAD; updateManagerThread->postResetZView(); }
+		void umPostUpdateZView()															{ SAVE_UPD_THREAD; updateManagerThread->postUpdateZView(); }
+		
+		#define UPD_THREAD  if ( updateManagerThread == NULL ) return
+		void umPostEvent(const UpdateManagerThread::Event& evt) 							{ UPD_THREAD; updateManagerThread->postEvent(evt); }
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void selectMainBookSourcePanel();
@@ -377,6 +394,7 @@ class MainFrame : public MainFrameBClass {
 		
 	private:
 		// Member variables
+		bool isDebugMode;
 		bool isCncControlInitialized;
 		bool isZeroReferenceValid;
 		bool canClose;
@@ -422,6 +440,7 @@ class MainFrame : public MainFrameBClass {
 		FileParser* inboundFileParser;
 		
 		wxTimer perspectiveTimer;
+		wxTimer debugUserNotificationTime;
 		
 		GuiControls	guiControls;
 		
@@ -525,8 +544,10 @@ class MainFrame : public MainFrameBClass {
 		void determineRunMode();
 		
 		bool isPause()				{ return inboundFileParser != NULL ? inboundFileParser->isPause()            : false; }
-		//bool isBreakpointActive()	{ return inboundFileParser != NULL ? inboundFileParser->isBreakpointActive() : false; }
 		bool isProcessing() 		{ return inboundFileParser != NULL ? inboundFileParser->isProcessing()       : false; }
+		
+		void startDebugUserNotification();
+		void stopDebugUserNotification();
 		
 		bool showConfigSummaryAndConfirmRun();
 		
@@ -607,15 +628,9 @@ class MainFrame : public MainFrameBClass {
 		// misc
 				
 		void dispatch();
-		
 		void setZero();
-		
-		void manuallyDissolveEndSwitchDlg();
-		
 		void requestReset();
 		
-		void selectSvgDebuggerInfo(wxDataViewListCtrl* ctl);
-
 		void navigateX(CncDirection d);
 		void navigateY(CncDirection d);
 		void navigateZ(CncDirection d);

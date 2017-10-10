@@ -54,8 +54,8 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	// This is required even though dc is not used otherwise.
 	wxPaintDC dc(this);
-	
 	preview->SetCurrent(*this);
+	preview->init();
 
 	const wxSize cs = GetClientSize();
 	preview->reshape(cs.GetWidth(), cs.GetHeight());
@@ -135,7 +135,7 @@ void CncGCodePreview::popProcessMode() {
 	preview->enablePositionMarker(false);
 }
 //////////////////////////////////////////////////
-void CncGCodePreview::appendVertice(const CncGCodePreview::VerticeData& vd) {
+void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 //////////////////////////////////////////////////
 	typedef GLI::GLCncPathVertices::FormatType PathVerticeType;
 	typedef GLI::GLCncPathVertices::CncMode    DataVerticeMode;

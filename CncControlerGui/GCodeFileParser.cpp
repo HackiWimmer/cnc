@@ -12,6 +12,7 @@ GCodeFileParser::GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph)
 : FileParser(fn)
 , pathHandler(ph)
 , programEnd(false)
+, displayWarnings(true)
 , resumeOnError(true)
 {
 //////////////////////////////////////////////////////////////////
@@ -40,9 +41,9 @@ bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
 	msg << ss.str();
 	
 	switch ( type ) {
-		case wxICON_ERROR:		std::cerr << msg.str() << ", GCode program will be stopped." << std::endl; break;
-		case wxICON_WARNING:	std::clog << msg.str() << ", GCode program will be continued." << std::endl; break;
-		default:				std::cout << msg.str() << std::endl; break;
+		case wxICON_ERROR:		if ( true )				{ std::cerr << msg.str() << ", GCode program will be stopped."   << std::endl; } break;
+		case wxICON_WARNING:	if ( displayWarnings )	{ std::clog << msg.str() << ", GCode program will be continued." << std::endl; } break;
+		default:				if ( displayWarnings )	{ std::cout << msg.str() << std::endl; } break;
 	}
 	
 	return (resumeOnError == true );
@@ -110,13 +111,13 @@ bool GCodeFileParser::spool() {
 					std::cerr << " Line number: " << getCurrentLineNumber() << std::endl;
 					return false;
 				}
+				
+				if ( evaluateDebugState() == false )
+					return false;
 			}
 			
 			if ( programEnd == true )
 				break;
-				
-			if ( evaluateDebugState() == false )
-				return false;
 		}
 		
 		pathHandler->finishWork();
@@ -221,6 +222,8 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 		gcb.copyPrevCmdToCmd();
 	}
 	
+
+	
 	if ( gcb.isValid() == false ) {
 		if ( gcb.hasMoveCmd() ) {
 			std::cerr << "GCodeFileParser::processBlock: Invalid GCode block:" << std::endl;
@@ -233,15 +236,29 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	}
 	
 	//gcb.trace(std::clog);
-	
+	bool ret = false;
 	switch ( gcb.cmdCode ) {
-		case 'G':	return processG(gcb);
-		case 'M':	return processM(gcb);
+		case 'G':	ret = processG(gcb);	break;
+		case 'M':	ret = processM(gcb);	break;
 		//....
 		default: 	return displayUnhandledBlockCommand(gcb);
 	}
 	
-	return false;
+	
+	#warning todo
+	if ( runInfo.getCurrentDebugState() == true ) {
+		
+		
+		registerNextDebugNode(GCodeCommands::explainGCodeCommand(gcb.nodeName)); 
+		
+		
+		DcmItemList rows;
+		gcb.trace(rows);
+		appendDebugValueBase(rows);
+		//gcb.trace(std::clog);
+	}
+	
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processG(GCodeBlock& gcb) {

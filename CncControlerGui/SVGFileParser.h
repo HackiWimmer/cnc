@@ -2,6 +2,7 @@
 #define SVG_FILE_PARSER_H
 
 #include <iostream>
+#include "CncControl.h"
 #include "FileParser.h"
 #include "SVGNodeParser.h"
 #include "SVGPathHandlerCnc.h" 
@@ -52,7 +53,7 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		bool spool();
 		
 		void initXMLNode(wxXmlNode *child);
-		void debugXMLNode(wxXmlNode *child);
+		void registerXMLNode(wxXmlNode *child);
 		void debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString);
 		
 		inline bool performPath(SVGUserAgentInfo& uai);
@@ -65,20 +66,11 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		SVGFileParser(const wxString& fn, CncControl* cnc);
 		virtual ~SVGFileParser();
 		
-		virtual bool createPreview(const wxString& resultingFileName, bool withErrorInfo);
-		
-		
 		virtual void setPathHandler(PathHandlerBase* ph);
-		
 		SVGPathHandlerCnc* getPathHandler() { return pathHandler; }
 		
 		virtual void broadcastDebugState(bool state);
 		virtual void clearControls();
-		
-		virtual void broadcastDebugControls(DebugControls& dc) {
-			if ( pathHandler != NULL )
-				pathHandler->setDebuggerControl(dc.debuggerControlDetail);
-		}
 		
 		virtual void setUserAgentControls(UserAgentOutputControls& oc) {
 			SvgUserAgentOutputControls soc;

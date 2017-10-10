@@ -50,6 +50,10 @@ class GLContextBase : public wxGLContext {
 		void reshapeViewMode(int w, int h);
 		void reshapeViewMode();
 		
+		void setAutoScaling(bool as);
+		void normalizeScaling();
+		void normalizeRotation();
+		
 		// smoothing
 		void enableSmoothing(bool enable=true);
 		void disableSmoothing() { enableSmoothing(false); }
@@ -119,6 +123,7 @@ class GLContextBase : public wxGLContext {
 		bool 				initialized;
 		bool				drawViewPortBounderies;
 		bool				posMarker;
+		bool				autoScale;
 		
 		float				zoom;
 		
@@ -128,6 +133,9 @@ class GLContextBase : public wxGLContext {
 		GLI::ModelScale 	modelScale;
 		GLI::ModelRotate	modelRotate;
 		GLI::CameraPosition cameraPos;
+		
+		
+		virtual float getAutoScaleFactor() { return 1.0; }
 		
 		virtual void drawCoordinateOrigin();
 		virtual void drawPosMarker(float x, float y, float z);
@@ -148,6 +156,8 @@ class GLContextBase : public wxGLContext {
 	private:
 	
 		void determineViewPortBounderies();
+		
+		void drawCone();
 };
 
 #endif

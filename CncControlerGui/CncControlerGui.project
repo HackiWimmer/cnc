@@ -65,11 +65,11 @@
       <File Name="GL3DOptions.h"/>
       <File Name="3D/CncGCodePreview.h"/>
       <File Name="CncGCodePreview.cpp"/>
+      <VirtualDirectory Name="Utils">
+        <File Name="3D/VerticeData.h"/>
+      </VirtualDirectory>
     </VirtualDirectory>
-    <VirtualDirectory Name="EndSwitchDlg">
-      <File Name="EndSwitchDialog.cpp"/>
-      <File Name="EndSwitchDialog.h"/>
-    </VirtualDirectory>
+    <VirtualDirectory Name="EndSwitchDlg"/>
     <VirtualDirectory Name="PathGen">
       <File Name="PathGeneratorFrame.h"/>
       <File Name="PathGeneratorFrame.cpp"/>
@@ -195,6 +195,7 @@
       <File Name="HexDecoder.h"/>
       <File Name="GlobalFunctions.h"/>
       <File Name="GlobalFunctions.cpp"/>
+      <File Name="ConcurrentQueue.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Spy">
       <File Name="CncSpyControl.h"/>
@@ -427,7 +428,7 @@
         <Library Value="libfreeglut"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release2" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>

@@ -57,6 +57,7 @@ void GL3DOptions::restoreFlags() {
 	// update option grid
 	m_pgPropDrawFlyPath->SetValue(motionMonitor->getFlags().drawFlyPath);
 	m_pgPropPositionMarker->SetValue(motionMonitor->getFlags().positionMarker);
+	m_pgPropAutoScaling->SetValue(motionMonitor->getFlags().autoScaling);
 	
 	m_pgPropFlyColour->SetValue(wxVariant(wxColourPropertyValue(motionMonitor->getFlags().flyColour))); 
 	m_pgPropWorkColour->SetValue(wxVariant(wxColourPropertyValue(motionMonitor->getFlags().workColour))); 
@@ -98,6 +99,7 @@ void GL3DOptions::propertyChanged(wxPropertyGridEvent& event) {
 	// update all flags
 	motionMonitor->getFlags().drawFlyPath 		= m_pgPropDrawFlyPath->GetValue().GetBool();
 	motionMonitor->getFlags().positionMarker	= m_pgPropPositionMarker->GetValue().GetBool();
+	motionMonitor->getFlags().autoScaling		= m_pgPropAutoScaling->GetValue().GetBool();
 	
 	motionMonitor->getFlags().flyColour 		= ((wxSystemColourProperty*)m_pgPropFlyColour)->GetVal().m_colour;
 	motionMonitor->getFlags().workColour 		= ((wxSystemColourProperty*)m_pgPropWorkColour)->GetVal().m_colour;
@@ -226,4 +228,9 @@ void GL3DOptions::cameraCallBack(int angle) {
 void GL3DOptions::cameraRotationSpeedChanged(wxScrollEvent& event) {
 /////////////////////////////////////////////////////////////////
 	motionMonitor->setCameraRotationSpeed(m_sliderCameraRotationSpeed->GetValue());
+}
+/////////////////////////////////////////////////////////////////
+void GL3DOptions::onUpdateTimer(wxTimerEvent& event) {
+/////////////////////////////////////////////////////////////////
+	//Refresh();
 }

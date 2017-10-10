@@ -23,7 +23,6 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 , width(0.0)
 , height(0.0)
 , viewBox("")
-, debuggerControlDetail(NULL)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT( cncControl && cncControl->getCncConfig() );
@@ -52,22 +51,12 @@ void SVGPathHandlerCnc::debugCurrentPosition() {
 	if ( debugState == false )
 		return;
 	
-	wxString pos("");
-	pos << cncControl->getCurPos().getX();
-	pos << ", ";
-	pos << cncControl->getCurPos().getY();
-	pos << ", ";
-	pos << cncControl->getCurPos().getZ();
-	pos << " [steps]";
+	wxString pos(wxString::Format("%ld, %ld, %ld [steps]", cncControl->getCurPos().getY(), cncControl->getCurPos().getX(), cncControl->getCurPos().getZ() ));
 	appendDebugValueDetail("Current Pos(x,y,z)", pos);
 
-	pos.clear();
-	pos << cncControl->getCurPos().getX() * cncControl->getCncConfig()->getDisplayFactX();
-	pos << ", ";
-	pos << cncControl->getCurPos().getY() * cncControl->getCncConfig()->getDisplayFactY();
-	pos << ", ";
-	pos << cncControl->getCurPos().getZ() * cncControl->getCncConfig()->getDisplayFactZ();
-	pos << " [mm]";
+	pos.assign(wxString::Format("%.3lf, %.3lf, %.3lf [mm]", cncControl->getCurPos().getX() * cncControl->getCncConfig()->getDisplayFactX(), 
+	                                                        cncControl->getCurPos().getY() * cncControl->getCncConfig()->getDisplayFactY(),
+	                                                        cncControl->getCurPos().getZ() * cncControl->getCncConfig()->getDisplayFactZ()));
 	appendDebugValueDetail("Current Pos(x,y,z)", pos);
 }
 //////////////////////////////////////////////////////////////////
@@ -75,20 +64,14 @@ void SVGPathHandlerCnc::appendDebugValueDetail(const char* key, wxVariant value)
 //////////////////////////////////////////////////////////////////
 	if ( debugState == false )
 		return;
-		
-	if ( debuggerControlDetail == NULL )
+
+	if ( fileParser == NULL )
 		return;
 		
 	DcmRow row;
 	row.push_back(wxString(key));
 	row.push_back(value.GetString());
-	debuggerControlDetail->AppendItem(row);
-	
-	int itemCount = debuggerControlDetail->GetItemCount();
-	debuggerControlDetail->EnsureVisible(debuggerControlDetail->RowToItem(itemCount - 1));
-	debuggerControlDetail->EnsureVisible(debuggerControlDetail->RowToItem(0));
-	debuggerControlDetail->Update();
-	debuggerControlDetail->Refresh();
+	fileParser->appendDebugValueDetail(row);
 }
 //////////////////////////////////////////////////////////////////
 CncWorkingParameters& SVGPathHandlerCnc::getCncWorkingParameters() {

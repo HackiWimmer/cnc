@@ -23,6 +23,7 @@ struct GuiControlSetup {
 	wxTextCtrl* passingTrace		= NULL;
 	
 	wxStaticBitmap* toolState		= NULL;
+	wxMenuItem* motorState			= NULL;
 	
 	wxStaticText* xMinLimit			= NULL;
 	wxStaticText* xMaxLimit			= NULL;
@@ -31,12 +32,9 @@ struct GuiControlSetup {
 	wxStaticText* zMinLimit			= NULL;
 	wxStaticText* zMaxLimit			= NULL;
 	
-	wxMenuItem* motorState			= NULL;
-	
 	wxDataViewListCtrl* controllerConfig		= NULL;
 	wxDataViewListCtrl* controllerPinReport		= NULL;
 	wxDataViewListCtrl* controllerErrorInfo		= NULL;
-	
 };
 
 #endif

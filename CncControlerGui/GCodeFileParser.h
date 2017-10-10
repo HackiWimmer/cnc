@@ -23,6 +23,7 @@ class GCodeFileParser : public FileParser {
 	protected:
 		GCodePathHandlerBase* pathHandler;
 		bool programEnd;
+		bool displayWarnings;
 		bool resumeOnError;
 		
 		// error message handling
@@ -57,6 +58,8 @@ class GCodeFileParser : public FileParser {
 	public:
 		GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph);
 		virtual ~GCodeFileParser();
+		
+		void setDisplayWarnings(bool state) { displayWarnings = state; }
 };
 
 

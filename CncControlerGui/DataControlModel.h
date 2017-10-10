@@ -84,6 +84,19 @@ class DataControlModel {
 				ret.push_back(row);
 			}
 		}
+		
+		////////////////////////////////////////////////////////////////////////
+		static void addPositionSpyRow(DcmRow& row, long id,  wxVariant mode,
+		                              wxVariant x, wxVariant y, wxVariant z)
+		{
+			row.push_back(wxString::Format(wxT(" %06d"), id));
+			row.push_back(mode.GetString());
+			row.push_back(x.GetString());
+			row.push_back(y.GetString());
+			row.push_back(z.GetString());
+			row.push_back("");
+			
+		}
 };
 
 #endif

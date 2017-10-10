@@ -31,6 +31,7 @@
 #include <wx/arrstr.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
+#include <wx/statline.h>
 #include <wx/tglbtn.h>
 #include <wx/notebook.h>
 #include <wx/stc/stc.h>
@@ -42,7 +43,6 @@
 #include <wx/propgrid/manager.h>
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
-#include <wx/statline.h>
 #include <wx/spinbutt.h>
 #include <wx/checkbox.h>
 #include <wx/radiobox.h>
@@ -102,23 +102,14 @@ protected:
     wxSlider* m_stepDelay;
     wxStaticText* m_stepDelayValue;
     wxBitmapButton* m_rcReset;
-    wxMenu* m_rcConfigMenu;
-    wxMenuItem* m_miRcRun;
-    wxMenuItem* m_miRcDebug;
-    wxMenuItem* m_menuItem2028;
-    wxMenuItem* m_miAutoBreakpoint;
-    wxMenuItem* m_menuItem4434;
-    wxMenuItem* m_miRcPreprocessing;
-    wxMenuItem* m_miRcSpooling;
-    wxMenuItem* m_menuItem20281;
-    wxMenuItem* m_miStopAfterPreprocessing;
-    wxMenuItem* m_miStopAfterSpoolling;
-    wxBitmapButton* m_rcRun;
-    wxBitmapButton* m_rcPause;
-    wxBitmapButton* m_rcStop;
+    wxBitmapButton* m_rcDebugConfig;
+    wxBitmapButton* m_rcDebug;
     wxBitmapButton* m_rcNextBreakpoint;
     wxBitmapButton* m_rcNextStep;
     wxBitmapButton* m_rcFinish;
+    wxBitmapButton* m_rcRun;
+    wxBitmapButton* m_rcPause;
+    wxBitmapButton* m_rcStop;
     wxBitmapButton* m_controlerPause;
     wxButton* m_btnEmergenyStop;
     wxPanel* m_scrollWinMain;
@@ -127,11 +118,12 @@ protected:
     wxPanel* m_mainBookSourcePanel;
     wxButton* m_openSourceExtern;
     wxButton* m_openSvgExtern;
-    wxButton* m_btPathGenerator;
     wxButton* m_saveTemplate;
     wxButton* m_reloadTemplate;
+    wxStaticLine* m_staticLine4472;
     wxBitmapToggleButton* m_btSvgToggleWordWrap;
-    wxBitmapToggleButton* m_previewErrorInfo;
+    wxStaticLine* m_staticLine4474;
+    wxButton* m_btPathGenerator;
     wxNotebook* m_templateNotebook;
     wxPanel* m_panelTplEdit;
     wxStyledTextCtrl* m_stcFileContent;
@@ -577,17 +569,10 @@ protected:
     wxTextCtrl* m_serialSpy;
     wxPanel* m_splitterPage3829;
     wxTextCtrl* m_serialSpyDetails;
+    wxBitmapButton* m_bmpButton4487;
+    wxDataViewListCtrl* m_positionSpy;
     wxPanel* m_panel3811;
-    wxStaticText* m_staticText1370;
-    wxStaticText* m_staticText1571;
-    wxStaticText* m_debugPhase;
-    wxDataViewListCtrl* m_dvListCtrlSvgDebuggerInfoBase;
-    wxStaticText* m_staticText1372;
-    wxStaticText* m_staticText1374;
-    wxDataViewListCtrl* m_dvListCtrlSvgDebuggerInfoPath;
-    wxDataViewListCtrl* m_dvListCtrlSvgDebuggerInfoDetail;
-    wxTextCtrl* m_svgDebuggerKey;
-    wxTextCtrl* m_svgDebuggerValue;
+    wxPropertyGridManager* m_debuggerPropertyManagerGrid;
     wxScrolledWindow* m_statusBar;
     wxStaticText* m_staticText3952;
     wxTextCtrl* m_cmdCount;
@@ -621,6 +606,7 @@ protected:
     wxStaticText* m_staticText2199;
     wxStaticBitmap* m_refPosTrafficLight;
     wxStaticLine* m_staticLine6023412;
+    wxStaticBitmap* m_updateManagerUpdate;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
     wxComboBox* m_cbUCUnitFrom;
@@ -686,8 +672,6 @@ protected:
     wxMenuItem* m_menuItem1183;
     wxMenuItem* m_miReset;
     wxMenu* m_menuTools;
-    wxMenuItem* m_miManuallyDissolveEndState;
-    wxMenuItem* m_sep1559;
     wxMenuItem* m_miPathGenerator;
     wxMenuItem* m_miIniFile;
     wxMenuItem* m_miExternalEditor;
@@ -726,24 +710,22 @@ protected:
     virtual void stepDelayChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void stepDelayThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
-    virtual void rcSelectRunMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void rcSelectDebugArea(wxCommandEvent& event) { event.Skip(); }
+    virtual void rcDebugConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void rcRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void rcPause(wxCommandEvent& event) { event.Skip(); }
-    virtual void rcStop(wxCommandEvent& event) { event.Skip(); }
     virtual void rcNextBreakpoint(wxCommandEvent& event) { event.Skip(); }
     virtual void rcNextStep(wxCommandEvent& event) { event.Skip(); }
     virtual void rcFinish(wxCommandEvent& event) { event.Skip(); }
+    virtual void rcPause(wxCommandEvent& event) { event.Skip(); }
+    virtual void rcStop(wxCommandEvent& event) { event.Skip(); }
     virtual void controlerPause(wxCommandEvent& event) { event.Skip(); }
     virtual void emergencyStop(wxCommandEvent& event) { event.Skip(); }
     virtual void mainViewSelectorSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSourceExtern(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSvgExtern(wxCommandEvent& event) { event.Skip(); }
-    virtual void openSVGPathGenerator(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleTemplateWordWrapMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void togglePreviewErrorInfo(wxCommandEvent& event) { event.Skip(); }
+    virtual void openSVGPathGenerator(wxCommandEvent& event) { event.Skip(); }
     virtual void fileContentKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void fileContentLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void fileContentLeftUp(wxMouseEvent& event) { event.Skip(); }
@@ -891,9 +873,7 @@ protected:
     virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectSvgDebuggerInfoBase(wxDataViewEvent& event) { event.Skip(); }
-    virtual void selectSvgDebuggerInfoPath(wxDataViewEvent& event) { event.Skip(); }
-    virtual void selectSvgDebuggerInfoDetail(wxDataViewEvent& event) { event.Skip(); }
+    virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
@@ -940,7 +920,6 @@ protected:
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
-    virtual void dissolveEndSwitchStates(wxCommandEvent& event) { event.Skip(); }
     virtual void openConfigurationFile(wxCommandEvent& event) { event.Skip(); }
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
@@ -968,12 +947,14 @@ public:
     wxSlider* GetStepDelay() { return m_stepDelay; }
     wxStaticText* GetStepDelayValue() { return m_stepDelayValue; }
     wxBitmapButton* GetRcReset() { return m_rcReset; }
-    wxBitmapButton* GetRcRun() { return m_rcRun; }
-    wxBitmapButton* GetRcPause() { return m_rcPause; }
-    wxBitmapButton* GetRcStop() { return m_rcStop; }
+    wxBitmapButton* GetRcDebugConfig() { return m_rcDebugConfig; }
+    wxBitmapButton* GetRcDebug() { return m_rcDebug; }
     wxBitmapButton* GetRcNextBreakpoint() { return m_rcNextBreakpoint; }
     wxBitmapButton* GetRcNextStep() { return m_rcNextStep; }
     wxBitmapButton* GetRcFinish() { return m_rcFinish; }
+    wxBitmapButton* GetRcRun() { return m_rcRun; }
+    wxBitmapButton* GetRcPause() { return m_rcPause; }
+    wxBitmapButton* GetRcStop() { return m_rcStop; }
     wxBitmapButton* GetControlerPause() { return m_controlerPause; }
     wxButton* GetBtnEmergenyStop() { return m_btnEmergenyStop; }
 
@@ -982,11 +963,12 @@ public:
     wxChoice* GetMainViewSelector() { return m_mainViewSelector; }
     wxButton* GetOpenSourceExtern() { return m_openSourceExtern; }
     wxButton* GetOpenSvgExtern() { return m_openSvgExtern; }
-    wxButton* GetBtPathGenerator() { return m_btPathGenerator; }
     wxButton* GetSaveTemplate() { return m_saveTemplate; }
     wxButton* GetReloadTemplate() { return m_reloadTemplate; }
+    wxStaticLine* GetStaticLine4472() { return m_staticLine4472; }
     wxBitmapToggleButton* GetBtSvgToggleWordWrap() { return m_btSvgToggleWordWrap; }
-    wxBitmapToggleButton* GetPreviewErrorInfo() { return m_previewErrorInfo; }
+    wxStaticLine* GetStaticLine4474() { return m_staticLine4474; }
+    wxButton* GetBtPathGenerator() { return m_btPathGenerator; }
     wxStyledTextCtrl* GetStcFileContent() { return m_stcFileContent; }
     wxBitmapToggleButton* GetTbCaseSensitive() { return m_tbCaseSensitive; }
     wxBitmapToggleButton* GetTbWholeWord() { return m_tbWholeWord; }
@@ -1404,17 +1386,10 @@ public:
     wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
     wxPanel* GetSplitterPage3829() { return m_splitterPage3829; }
     wxSplitterWindow* GetSplitter3821() { return m_splitter3821; }
+    wxBitmapButton* GetBmpButton4487() { return m_bmpButton4487; }
+    wxDataViewListCtrl* GetPositionSpy() { return m_positionSpy; }
     wxPanel* GetPanel3809() { return m_panel3809; }
-    wxStaticText* GetStaticText1370() { return m_staticText1370; }
-    wxStaticText* GetStaticText1571() { return m_staticText1571; }
-    wxStaticText* GetDebugPhase() { return m_debugPhase; }
-    wxDataViewListCtrl* GetDvListCtrlSvgDebuggerInfoBase() { return m_dvListCtrlSvgDebuggerInfoBase; }
-    wxStaticText* GetStaticText1372() { return m_staticText1372; }
-    wxStaticText* GetStaticText1374() { return m_staticText1374; }
-    wxDataViewListCtrl* GetDvListCtrlSvgDebuggerInfoPath() { return m_dvListCtrlSvgDebuggerInfoPath; }
-    wxDataViewListCtrl* GetDvListCtrlSvgDebuggerInfoDetail() { return m_dvListCtrlSvgDebuggerInfoDetail; }
-    wxTextCtrl* GetSvgDebuggerKey() { return m_svgDebuggerKey; }
-    wxTextCtrl* GetSvgDebuggerValue() { return m_svgDebuggerValue; }
+    wxPropertyGridManager* GetDebuggerPropertyManagerGrid() { return m_debuggerPropertyManagerGrid; }
     wxPanel* GetPanel3811() { return m_panel3811; }
     wxNotebook* GetSpyNotebook() { return m_spyNotebook; }
     wxScrolledWindow* GetScrollSpy() { return m_scrollSpy; }
@@ -1450,6 +1425,7 @@ public:
     wxStaticText* GetStaticText2199() { return m_staticText2199; }
     wxStaticBitmap* GetRefPosTrafficLight() { return m_refPosTrafficLight; }
     wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
+    wxStaticBitmap* GetUpdateManagerUpdate() { return m_updateManagerUpdate; }
     wxScrolledWindow* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }
     wxComboBox* GetCbUCUnitFrom() { return m_cbUCUnitFrom; }
@@ -1729,6 +1705,7 @@ protected:
     wxPropertyGridManager* m_pgMgr3543;
     wxPGProperty* m_pgCatDisplayOptions;
     wxPGProperty* m_pgPropDrawType;
+    wxPGProperty* m_pgPropAutoScaling;
     wxPGProperty* m_pgPropDrawFlyPath;
     wxPGProperty* m_pgPropPositionMarker;
     wxPGProperty* m_pgPropWorkColour;
@@ -1760,6 +1737,7 @@ protected:
     wxSlider* m_sliderModelRotationXYZ;
     wxButton* m_btModelRotationResetXYZ;
     wxStaticLine* m_staticLine364117;
+    wxTimer* m_timer4476;
 
 protected:
     virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
@@ -1780,6 +1758,7 @@ protected:
     virtual void resetModelRotationZ(wxCommandEvent& event) { event.Skip(); }
     virtual void modelRotationXYZChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void resetModelRotationXYZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void onUpdateTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxPropertyGridManager* GetPgMgr3543() { return m_pgMgr3543; }
@@ -1805,6 +1784,7 @@ public:
     wxButton* GetBtModelRotationResetXYZ() { return m_btModelRotationResetXYZ; }
     wxStaticLine* GetStaticLine364117() { return m_staticLine364117; }
     wxCollapsiblePane* GetCollPaneModelRotation() { return m_collPaneModelRotation; }
+    wxTimer* GetTimer4476() { return m_timer4476; }
     GL3DOptionsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("3D Options"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP);
     virtual ~GL3DOptionsBase();
 };
@@ -1841,43 +1821,6 @@ public:
     wxTimer* GetUnitTestStartupTimer() { return m_unitTestStartupTimer; }
     UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
     virtual ~UnitTestsBase();
-};
-
-
-class EndSwitchDialogBase : public wxDialog
-{
-protected:
-    wxTextCtrl* m_limitInfo;
-    wxStaticText* m_staticText1547;
-    wxRadioBox* m_XAxisEndSwitchBox;
-    wxRadioBox* m_YAxisEndSwitchBox;
-    wxRadioBox* m_ZAxisEndSwitchBox;
-    wxButton* m_btDissolveX;
-    wxButton* m_btDissolveY;
-    wxButton* m_btDissolveZ;
-    wxButton* m_btCancle;
-
-protected:
-    virtual void selectX(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectY(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void dissolveX(wxCommandEvent& event) { event.Skip(); }
-    virtual void dissolveY(wxCommandEvent& event) { event.Skip(); }
-    virtual void dissolveZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void cancle(wxCommandEvent& event) { event.Skip(); }
-
-public:
-    wxTextCtrl* GetLimitInfo() { return m_limitInfo; }
-    wxStaticText* GetStaticText1547() { return m_staticText1547; }
-    wxRadioBox* GetXAxisEndSwitchBox() { return m_XAxisEndSwitchBox; }
-    wxRadioBox* GetYAxisEndSwitchBox() { return m_YAxisEndSwitchBox; }
-    wxRadioBox* GetZAxisEndSwitchBox() { return m_ZAxisEndSwitchBox; }
-    wxButton* GetBtDissolveX() { return m_btDissolveX; }
-    wxButton* GetBtDissolveY() { return m_btDissolveY; }
-    wxButton* GetBtDissolveZ() { return m_btDissolveZ; }
-    wxButton* GetBtCancle() { return m_btCancle; }
-    EndSwitchDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Manual end switch dissolving"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(400,320), long style = wxDEFAULT_DIALOG_STYLE);
-    virtual ~EndSwitchDialogBase();
 };
 
 
@@ -2052,6 +1995,35 @@ public:
     }
 
     virtual ~ImageLibAppIcons();
+};
+
+
+class ImageLibDebugger : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibDebugger();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibDebugger();
 };
 
 #endif

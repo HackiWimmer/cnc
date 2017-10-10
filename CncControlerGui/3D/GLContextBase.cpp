@@ -18,6 +18,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 , initialized(false)
 , drawViewPortBounderies(true)
 , posMarker(true)
+, autoScale(true)
 , zoom(1.0f)
 , viewMode(V2D_TOP)
 , coordOriginInfo()
@@ -185,9 +186,6 @@ void GLContextBase::determineViewPortBounderies() {
 /////////////////////////////////////////////////////////////////
 	// ensure the right matrix
 	glMatrixMode(GL_MODELVIEW);
-
-	// the code below don't works well
-	return;
 
 	if ( isViewMode2D() ) {
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -437,6 +435,24 @@ void GLContextBase::reshapeViewMode() {
 	reshapeViewMode(viewPort->getCurrentWindowWidth(), viewPort->getCurrentWindowHeigth());
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::setAutoScaling(bool as) {
+/////////////////////////////////////////////////////////////////
+	autoScale = as;
+	normalizeScaling();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::normalizeScaling() {
+/////////////////////////////////////////////////////////////////
+	if ( autoScale == true )
+		modelScale.resetScale();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::normalizeRotation() {
+/////////////////////////////////////////////////////////////////
+	modelRotate.reset2DDefaults();
+	modelRotate.reset3DDefaults();
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::display() {
 /////////////////////////////////////////////////////////////////
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -453,9 +469,9 @@ void GLContextBase::display() {
 	// main model
 	glPushMatrix();
 		// scale
-		glScalef(modelScale.factX() * viewPort->getDisplayFactor() * zoom, 
-				 modelScale.factY() * viewPort->getDisplayFactor() * zoom, 
-				 modelScale.factZ() * viewPort->getDisplayFactor() * zoom); 
+		glScalef(modelScale.factX() * viewPort->getDisplayFactor() * zoom / getAutoScaleFactor(), 
+				 modelScale.factY() * viewPort->getDisplayFactor() * zoom / getAutoScaleFactor(), 
+				 modelScale.factZ() * viewPort->getDisplayFactor() * zoom / getAutoScaleFactor()); 
 		// rotate
 		glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
 		glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
@@ -482,12 +498,57 @@ void GLContextBase::display() {
 	// draw coordinate origin
 	glPushMatrix();
 	
-		drawCoordinateOrigin();
+ 		drawCoordinateOrigin();
 		
 	glPopMatrix();
 	
 	glFlush();
 	checkGLError();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawCone() {
+////////////////////////////////////////////////////////////////
+#warning todo
+	const float PI = 3.14159265;
+	unsigned int parts = 32;
+	unsigned int size = parts * 6 + 12;
+	float steps = (float) ((PI * 2) / parts);
+	
+	float* vertex = new float[size];
+	
+	for (unsigned int i = 0; i <= parts; i++) {
+		float sin = (float) std::sin(i * steps);
+		float cos = (float) std::cos(i * steps);
+		// Hintere Seite des Zylinders
+		vertex[i * 3] = cos;
+		vertex[i * 3 + 1] = sin;
+		vertex[i * 3 + 2] = -0.5f;
+		
+		// Vordere Seite des Zylinders
+		vertex[i * 3 + parts * 3 + 3] = cos;
+		vertex[i * 3 + parts * 3 + 4] = sin;
+		vertex[i * 3 + parts * 3 + 5] = 0.5f;
+	}
+	
+	// Mitte derbeidenKreise
+	vertex[parts * 6 + 6] = 0;
+	vertex[parts * 6 + 7] = 0;
+	vertex[parts * 6 + 8] = -0.5f;
+	vertex[parts * 6 + 9] = 0;
+	vertex[parts * 6 + 10] = 0;
+	vertex[parts * 6 + 11] = 0.5f;
+	
+	
+	glEnableClientState (GL_VERTEX_ARRAY);
+   glEnableClientState (GL_COLOR_ARRAY);
+	
+	
+	glVertexPointer( 3, GL_FLOAT, 0, vertex ); // Set The Vertex Pointer To Vertex Data
+	//glColorPointer (3, GL_UNSIGNED_BYTE, sizeof (VertArray), (vertList[0]->color));
+	glDrawArrays (GL_POINTS, 0, size);
+	
+	    glDisableClientState (GL_VERTEX_ARRAY);
+    glDisableClientState (GL_COLOR_ARRAY);
 }
 
 

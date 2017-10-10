@@ -296,19 +296,6 @@ void Serial::fetchMultiByteResult(unsigned char * text, int maxBytes) {
 	text[bytes] = '\0';
 }
 ///////////////////////////////////////////////////////////////////
-inline void Serial::determineCoordinates(unsigned const char c, CncLongPosition& pos) {
-///////////////////////////////////////////////////////////////////
-	switch ( c ) {
-		case 'x': pos.decX(1); break;
-		case 'X': pos.incX(1); break;
-		case 'y': pos.decY(1); break;
-		case 'Y': pos.incY(1); break;
-		case 'z': pos.decZ(1); break;
-		case 'Z': pos.incZ(1); break;
-		default: ;// Do nothing
-	}
-}
-///////////////////////////////////////////////////////////////////
 void Serial::decodeMessage(const unsigned char* message, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	std::stringstream ss((char*)message);
@@ -995,8 +982,6 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 		case 'm':
 		case 'M':
 		{
-			cncControl->SerialCallback(1);
-
 			switch ( sfi.Mc.size ) {
 				case 1:
 					pos.incZ(sfi.Mc.value1);
@@ -1012,6 +997,9 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 					break;
 			}
 			
+			// ensure the position update
+			cncControl->SerialCallback(1);
+			
 			if (traceInfo) 
 				cnc::spy.finalizeOK();
 				
@@ -1021,7 +1009,17 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 		//RET_OK_Handler...........................................
 		default:
 		{
-			determineCoordinates(sfi.command, pos);
+			switch ( sfi.command ) {
+				case 'x': pos.decX(1); break;
+				case 'X': pos.incX(1); break;
+				case 'y': pos.decY(1); break;
+				case 'Y': pos.incY(1); break;
+				case 'z': pos.decZ(1); break;
+				case 'Z': pos.incZ(1); break;
+				default: ;// Do nothing
+			}
+			
+			// ensure the position update
 			cncControl->SerialCallback(1);
 				
 			if (traceInfo)

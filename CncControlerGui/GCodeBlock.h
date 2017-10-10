@@ -2,6 +2,7 @@
 #define GCODE_BLOCK_H
 
 #include "SvgUnitCalculator.h"
+#include "DataControlModel.h"
 #include "CncPosition.h"
 #include "GCodeField.h"
 #include "GCodeCommands.h"
@@ -100,6 +101,9 @@ class GCodeBlock {
 		const bool hasOneOf_XYZ() const { return (hasX() || hasY() || hasZ()); }
 		const bool hasOneOf_XY()  const { return (hasX() || hasY()); }
 		
+		const bool hasOneOf_IJ()  const { return (hasI() || hasJ()); }
+		const bool hasOneOf_SEF() const { return (hasS() || hasE() || hasF()); }
+		
 		const bool hasX() const		{ return x != INVALID_GCODE_FIELD_VALUE; }
 		const bool hasY() const 	{ return y != INVALID_GCODE_FIELD_VALUE; }
 		const bool hasZ() const 	{ return z != INVALID_GCODE_FIELD_VALUE; }
@@ -160,27 +164,26 @@ class GCodeBlock {
 		double getZMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(z, curPos.getZ()); }
 		
 		//////////////////////////////////////////////////////////////////
-		friend std::ostream &operator<< (std::ostream &ostr, const GCodeBlock &a) {
-			ostr         << "X=" << (a.hasX() ? wxString::Format("%f",a.x) : "-");
-			ostr << ", " << "Y=" << (a.hasY() ? wxString::Format("%f",a.y) : "-");
-			ostr << ", " << "Z=" << (a.hasZ() ? wxString::Format("%f",a.z) : "-");
-			ostr << ", " << "I=" << (a.hasI() ? wxString::Format("%f",a.i) : "-");
-			ostr << ", " << "J=" << (a.hasJ() ? wxString::Format("%f",a.j) : "-");
-			return ostr;
-		}
+		friend std::ostream &operator<< (std::ostream &ostr, const GCodeBlock &a);
+		void trace(std::ostream &ostr);
+		void trace(DcmItemList& rows);
 		
 		//////////////////////////////////////////////////////////////////
-		void trace(std::ostream &ostr) {
-			cmdCode			== INVALID_GCODE_COMMAND_CMD ? ostr << "?" : ostr << cmdCode;
-			cmdNumber		== INVALID_GCODE_COMMAND_NUM ? ostr << "-" : ostr << cmdNumber;
-			cmdSubNumber	== INVALID_GCODE_COMMAND_NUM ? ostr << ""  : ostr << cmdSubNumber;
-			
-			if ( hasMoveCmd() ) {
-				ostr << ":";
-				ostr << *this;
+		const char* getUnitAsString() { return SvgUnitCalculator::getUnitAsStr(unit); }
+		const char* getPositioningAsString(GCodePositioning p) {
+			switch (p) {
+				case GC_Relative: 	return "relative";
+				case GC_Absolute:	return "absolute";
 			}
-		
-			ostr << std::endl;
+			return "???";
+		}
+		const char* getPlaneAsString() {
+			switch (plane) {
+				case GC_XY_PLANE: 	return "XY";
+				case GC_ZX_PLANE:	return "ZX";
+				case GC_YZ_PLANE:	return "YZ";
+			}
+			return "???";
 		}
 };
 

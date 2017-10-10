@@ -172,7 +172,7 @@ bool SVGFileParser::setSVGViewBox(wxString vb) {
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::broadcastDebugState(bool state) {
 //////////////////////////////////////////////////////////////////
-	pathHandler->setDebugState(false);
+	pathHandler->setDebugState(state);
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::debugXMLAttribute(wxXmlAttribute *attribute, wxString& attrString) {
@@ -196,7 +196,7 @@ void SVGFileParser::initXMLNode(wxXmlNode *child) {
 	svgUserAgent.addXMLAttributes(attr);
 }
 //////////////////////////////////////////////////////////////////
-void SVGFileParser::debugXMLNode(wxXmlNode *child) {
+void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
 	initXMLNode(child);
 	
@@ -204,9 +204,7 @@ void SVGFileParser::debugXMLNode(wxXmlNode *child) {
 		return;
 
 	CncWorkingParameters cwp = pathHandler->getCncWorkingParameters();
-	appendDebugValueBase("Line Number", getCurrentLineNumber());
 	appendDebugValueBase("Reverse Path", cwp.getCorrectionType());
-	appendDebugValueBase("Node", child->GetName());
 	
 	wxString content;
 	wxXmlAttribute* attr = child->GetAttributes();
@@ -218,11 +216,6 @@ void SVGFileParser::clearControls() {
 //////////////////////////////////////////////////////////////////
 	FileParser::clearControls();
 	svgUserAgent.clearControls();
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::createPreview(const wxString& resultingFileName, bool withErrorInfo) {
-//////////////////////////////////////////////////////////////////
-	return wxCopyFile(fileName, resultingFileName);
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
@@ -247,6 +240,7 @@ bool SVGFileParser::spool() {
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(uai.nodeName);
 		setCurrentLineNumber(uai.lineNumber);
+		registerNextDebugNode(uai.nodeName);
 
 		DcmItemList dil;
 		uai.getBaseDetails(dil);
@@ -415,7 +409,6 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 		return false;
 		
 	//evaluateDebugState();
-	clearDebugControlBase();
 
 	if ( evaluateProcessingState() == false )
 		return false;
@@ -449,8 +442,6 @@ bool SVGFileParser::preprocess() {
 		std::cerr << "SVGFileParser: Erorr while processing setSVGViewBox\n";
 		return false;
 	}
-
-	clearDebugControlBase();
 	
 	// main entry point foor evaluateing all XML nodes
 	wxXmlNode *child = doc.GetRoot()->GetChildren();
@@ -465,7 +456,6 @@ bool SVGFileParser::preprocess() {
 	} else {
 		// fill the user agent controls
 		svgUserAgent.expand();
-		clearDebugControlBase();
 	}
 	
 	return ret;
@@ -478,27 +468,32 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(child->GetName());
 		setCurrentLineNumber(child->GetLineNumber());
+		registerXMLNode(child);
+		
 		pathHandler->getCncWorkingParameters().currentLineNumber = child->GetLineNumber();
 
 		if ( child->GetName() == SvgNodeTemplates::CncParameterBlockNodeName ) {
 			if ( evaluateCncParameters(child) == false )
 				return false;
 				
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
 				
 		} else if (child->GetName() == SvgNodeTemplates::CncBreakBlockNodeName ) {
 			cncNodeBreak = true;
 			std::clog << SvgNodeTemplates::CncBreakBlockNodeName << " detected at line number: " << child->GetLineNumber() << std::endl;
 			
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
 			
 		} else if (child->GetName() == SvgNodeTemplates::CncPauseBlockNodeName ) {
 			//todo
 			std::clog << SvgNodeTemplates::CncPauseBlockNodeName << " isn't currently implemented. Line number: " << child->GetLineNumber() << std::endl;
 			
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
 			
 		} else if (child->GetName().Upper() == "SYMBOL" ) {
@@ -519,16 +514,16 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			svgUserAgent.addStyle(a);
 			
 		} else if ( child->GetName().Upper() == "PATH" ) {
-			clearDebugControlBase();
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 			
 			wxString data = child->GetAttribute("d", "");
 			if ( evaluatePath(data)  == false )
 				return false;
 				
 		} else if ( child->GetName().Upper() == "CIRCLE" ) {
-			clearDebugControlBase();
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 			
 			wxString ret; 
 			if ( SVGElementConverter::convertCircleToPathData(child, ret) )
@@ -536,8 +531,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					return false;
 					
 		} else if ( child->GetName().Upper() == "ELLIPSE" ) {
-			clearDebugControlBase();
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 			
 			wxString ret; 
 			if ( SVGElementConverter::convertEllipseToPathData(child, ret) )
@@ -545,8 +540,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					return false;
 					
 		} else if ( child->GetName().Upper() == "LINE" ) {
-			clearDebugControlBase();
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertLineToPathData(child, ret) )
@@ -554,8 +549,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					return false;
 					
 		} else if ( child->GetName().Upper() == "POLYGON" ) {
-			clearDebugControlBase();
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertPolygonToPathData(child, ret) )
@@ -563,8 +558,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					return false;
 					
 		} else if ( child->GetName().Upper() == "POLYLINE" ) {
-			clearDebugControlBase();
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertPolylineToPathData(child, ret) )
@@ -572,8 +567,8 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					return false;
 					
 		} else if ( child->GetName().Upper() == "RECT" ) {
-			clearDebugControlBase();
-			debugXMLNode(child);
+			registerNextDebugNode(currentNodeName);
+			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertRectToPathData(child, ret) )
@@ -581,7 +576,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					return false;
 					
 		} else if ( child->GetName().Upper() == "USE" ) {
-			clearDebugControlBase();
+			registerNextDebugNode(currentNodeName);
 			
 			UseDirectiveVector& udv = svgUserAgent.getUseInfoVector();
 			UseDirective ud;

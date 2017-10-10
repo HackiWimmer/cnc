@@ -192,6 +192,23 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
+			const float getAutoScaleFact() {
+				if ( size() < 3 )
+					return 1.0;
+					
+				const float x = minVecties.getX(); float X = maxVecties.getX();
+				const float y = minVecties.getY(); float Y = maxVecties.getY();
+				const float z = minVecties.getZ(); float Z = maxVecties.getZ();
+				
+				float totalDistX = X - x;
+				float totalDistY = Y - y;
+				float totalDistZ = Z - z;
+				
+				// range: -2 >= ret <= 2
+				return std::max(std::max(totalDistZ, totalDistY), totalDistX);
+			}
+			
+			////////////////////////////////////////////
 			void clear() {
 				// reset boundings
 				minVecties.set(FLT_MAX, FLT_MAX, FLT_MAX);

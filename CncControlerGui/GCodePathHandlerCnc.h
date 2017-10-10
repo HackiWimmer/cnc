@@ -20,6 +20,7 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase {
 		
 	private:
 		CncControl* cncControl;
+		CncDoublePosition	previousPos;
 };
 
 #endif

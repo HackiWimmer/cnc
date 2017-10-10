@@ -4,6 +4,7 @@
 GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc) 
 : GCodePathHandlerBase()
 , cncControl(cnc)
+, previousPos(0.0, 0.0, 0.0)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
@@ -31,14 +32,12 @@ bool GCodePathHandlerCnc::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 	//std::clog << currentPos << std::endl;
 
-	#warning - consider unit!
+	#warning - consider unit
 	return cncControl->moveAbsLinearMetricXYZ(currentPos.getX(), currentPos.getY(), currentPos.getZ(), alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::changeWorkSpeedXY(CncSpeed s) {
 //////////////////////////////////////////////////////////////////
-
-
 	cncControl->changeWorkSpeedXY(s);
 	return true;
 }
