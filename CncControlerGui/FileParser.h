@@ -110,6 +110,8 @@ class FileParser {
 		virtual bool process();
 		virtual bool preprocess() = 0;
 		virtual bool spool() = 0;
+		virtual void initNextClientId(long id) = 0;
+		
 		virtual void initNextRunPhase(FileParserRunInfo::RunPhase p);
 		
 		virtual bool isInterrupted() { return false; }

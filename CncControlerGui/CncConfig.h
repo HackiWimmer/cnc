@@ -7,16 +7,19 @@
 #include "DataControlModel.h"
 
 #include "CncCommon.h"
+#include "CncSvgCurveLib.h"
 
-#ifndef _USE_WX_DUMMY_CANVAS 
-	#include "CncSvgCurveLib.h"
-#endif
 
+//////////////////////////////////////////////////////////////////////////////
+class wxPropertyGridManager;
+class wxConfigBase;
+
+//////////////////////////////////////////////////////////////////////////////
 class CncConfig {
+	
 	private:
 		bool changed;
 		CncUnit unit;
-		CncSpeed speedType;
 		double maxDimensions;
 		double maxDimensionsX;
 		double maxDimensionsY;
@@ -25,7 +28,6 @@ class CncConfig {
 		unsigned int multiplierX, multiplierY, multiplierZ;
 		unsigned int maxSpeedXY, maxSpeedZ;
 		unsigned int rapidSpeedXY, workSpeedXY, rapidSpeedZ, workSpeedZ;
-		unsigned int speedX, speedY, speedZ;
 		unsigned int pulsWidthOffsetX, pulsWidthOffsetY, pulsWidthOffsetZ;
 		double pitchX, pitchY, pitchZ;
 		double dispFactX, dispFactY, dispFactZ;
@@ -60,19 +62,28 @@ class CncConfig {
 		void rc() { changed = false; }
 		
 		////////////////////////////////////////////////////////////////////////
-		CncConfig& setSpeedX(unsigned int val) { sc(); speedX= val; return *this; }
-		CncConfig& setSpeedY(unsigned int val) { sc(); speedY= val; return *this; }
-		CncConfig& setSpeedZ(unsigned int val) { sc(); speedZ= val; return *this; }
+		
+		static void addProperty();
 		
 	public:
 		
+		// global config pointer - don't use this direct
+		static CncConfig* globalCncConfig;
+		
+		// global config interface
+		static CncConfig* getGlobalCncConfig() { wxASSERT(globalCncConfig); return globalCncConfig; }
+		static void setSetupGrid(wxPropertyGridManager* sg, wxConfigBase* config);
+		
+		
+		
+		
 		static wxComboBox* gblCurveLibSelector;
+		
 		
 		////////////////////////////////////////////////////////////////////////
 		CncConfig() 
 		: changed(true)
 		, unit(CncSteps)
-		, speedType(CncSpeedRapid)
 		, maxDimensionsX(0.0)
 		, maxDimensionsY(0.0)
 		, maxDimensionsZ(0.0)
@@ -80,7 +91,6 @@ class CncConfig {
 		, multiplierX(1), multiplierY(1), multiplierZ(1) 
 		, maxSpeedXY(100), maxSpeedZ(100)
 		, rapidSpeedXY(100), workSpeedXY(100), rapidSpeedZ(100), workSpeedZ(100)
-		, speedX(1), speedY(1), speedZ(1)
 		, pulsWidthOffsetX(100), pulsWidthOffsetY(100), pulsWidthOffsetZ(100)
 		, pitchX(2.0), pitchY(2.0), pitchZ(2.0)
 		, dispFactX(1.0), dispFactY(1.0), dispFactZ(1.0)
@@ -108,7 +118,6 @@ class CncConfig {
 		CncConfig(CncConfig& cc) 
 		: changed(true)
 		, unit(cc.getUnit())
-		, speedType(cc.getSpeedType())
 		, maxDimensionsX(cc.getMaxDimensionX())
 		, maxDimensionsY(cc.getMaxDimensionY())
 		, maxDimensionsZ(cc.getMaxDimensionZ())
@@ -117,7 +126,6 @@ class CncConfig {
 		, maxSpeedXY(cc.getMaxSpeedXY()), maxSpeedZ(cc.getMaxSpeedZ())
 		, rapidSpeedXY(cc.getRapidSpeedXY()), workSpeedXY(cc.getWorkSpeedXY())
 		, rapidSpeedZ(cc.getRapidSpeedZ()), workSpeedZ(cc.getWorkSpeedZ())
-		, speedX(cc.getSpeedX()), speedY(cc.getSpeedY()), speedZ(cc.getSpeedX())
 		, pulsWidthOffsetX(cc.getPulsWidthOffsetX()), pulsWidthOffsetY(cc.getPulsWidthOffsetY()), pulsWidthOffsetZ(cc.getPulsWidthOffsetZ())
 		, pitchX(cc.getPitchX()), pitchY(cc.getPitchY()), pitchZ(cc.getPitchZ())
 		, dispFactX(cc.getDisplayFactX()), dispFactY(cc.getDisplayFactY()), dispFactZ(cc.getDisplayFactZ())
@@ -134,7 +142,7 @@ class CncConfig {
 		, onlineUpdateDrawPane(cc.isOnlineUpdateDrawPane())
 		, allowEventHandling(cc.isAllowEventHandling())
 		, updateInterval(cc.getUpdateInterval())
-		, replyThreshold(cc.getRelyThreshold())
+		, replyThreshold(cc.getReplyThreshold())
 		, stepSignX(cc.getStepSignX())
 		, stepSignY(cc.getStepSignY())
 		{
@@ -166,60 +174,9 @@ class CncConfig {
 		void discardModifications() { changed = false; }
 		
 		////////////////////////////////////////////////////////////////////////
-		unsigned int getRelyThreshold() { return replyThreshold; }
+		unsigned int getReplyThreshold() { return replyThreshold; }
 		CncConfig& setRelyThreshold(unsigned int rt) { replyThreshold = rt; return *this; }
 		
-		////////////////////////////////////////////////////////////////////////
-		void getStaticValues(wxVector<wxVector<wxVariant>>& ret) {
-			DataControlModel::addKeyValueRow(ret, "Steps (x)", 				(int)stepsX);
-			DataControlModel::addKeyValueRow(ret, "Steps (y)", 				(int)stepsY);
-			DataControlModel::addKeyValueRow(ret, "Steps (z)", 				(int)stepsZ);
-			DataControlModel::addKeyValueRow(ret, "Puls width offset (x)", 	(int)pulsWidthOffsetX);
-			DataControlModel::addKeyValueRow(ret, "Puls width offset (y)", 	(int)pulsWidthOffsetY);
-			DataControlModel::addKeyValueRow(ret, "Puls width offset (z)", 	(int)pulsWidthOffsetZ);
-			DataControlModel::addKeyValueRow(ret, "Pitch (x)", 				pitchX);
-			DataControlModel::addKeyValueRow(ret, "Pitch (y)", 				pitchY);
-			DataControlModel::addKeyValueRow(ret, "Pitch (z)",				pitchZ);
-			DataControlModel::addKeyValueRow(ret, "Multiplier (x)", 		(int)multiplierX);
-			DataControlModel::addKeyValueRow(ret, "Multiplier (y)", 		(int)multiplierY);
-			DataControlModel::addKeyValueRow(ret, "Multiplier (z)", 		(int)multiplierZ);
-			DataControlModel::addKeyValueRow(ret, "Max speed XY", 			(int)maxSpeedXY);
-			DataControlModel::addKeyValueRow(ret, "Rapid speed XY", 		(int)rapidSpeedXY);
-			DataControlModel::addKeyValueRow(ret, "Work speed XY", 			(int)workSpeedXY);
-			DataControlModel::addKeyValueRow(ret, "Max speed Z", 			(int)maxSpeedZ);
-			DataControlModel::addKeyValueRow(ret, "Rapid speed Z", 			(int)rapidSpeedZ);
-			DataControlModel::addKeyValueRow(ret, "Work speed Z", 			(int)workSpeedZ);
-		}
-		////////////////////////////////////////////////////////////////////////
-		void getDynamicValues(wxVector<wxVector<wxVariant>>& ret) {
-			DataControlModel::addKeyValueRow(ret, "Tool diameter", 				routerBitDiameter);
-			DataControlModel::addKeyValueRow(ret, "Curve lib resolution", 		(double)CncConfig::getCurveLibResolution());
-			DataControlModel::addKeyValueRow(ret, "Current Speed (x)", 			(int)speedX);
-			DataControlModel::addKeyValueRow(ret, "Current Speed (y)", 			(int)speedY);
-			DataControlModel::addKeyValueRow(ret, "Current Speed (z)", 			(int)speedZ);
-			DataControlModel::addKeyValueRow(ret, "Max Dimension (x)", 			maxDimensionsX);
-			DataControlModel::addKeyValueRow(ret, "Max Dimension (y)", 			maxDimensionsY);
-			DataControlModel::addKeyValueRow(ret, "Step Sign (x)", 				stepSignX);
-			DataControlModel::addKeyValueRow(ret, "Step Sign (y)", 				stepSignY);
-			DataControlModel::addKeyValueRow(ret, "Reply Threshold", 			(int)replyThreshold);
-			DataControlModel::addKeyValueRow(ret, "Z axis values:", 			"");
-			DataControlModel::addKeyValueRow(ret, "  Max durations", 			(int)maxDurations);
-			DataControlModel::addKeyValueRow(ret, "  Duration count", 			(int)durationCount);
-			DataControlModel::addKeyValueRow(ret, "  Workpiece offset", 		workpieceOffset);
-			DataControlModel::addKeyValueRow(ret, "  Max duration thickness",	 maxDurationThickness);
-			DataControlModel::addKeyValueRow(ret, "  Calculated durations", 	(int)durationCount);
-			DataControlModel::addKeyValueRow(ret, "  Current Z distance", 		getCurZDistance());
-			DataControlModel::addKeyValueRow(ret, "  Wpt is included", 			getReferenceIncludesWpt());
-			
-			for (unsigned int i=0; i<maxDurations; i++) {
-				if ( durationSteps[i] != 0.0 ) {
-					wxString key("  Duration step[");
-					key << i;
-					key << "]";
-					DataControlModel::addKeyValueRow(ret, key, durationSteps[i]);
-				}
-			}
-		}
 		////////////////////////////////////////////////////////////////////////
 		void initZAxisValues() {
 			// example:
@@ -263,37 +220,6 @@ class CncConfig {
 			} else {
 				std::cerr << "CncConfig: Invalid maxDurationThickness: " << maxDurationThickness << std::endl;
 			}	
-		}
-		////////////////////////////////////////////////////////////////////////
-		CncSpeed getSpeedType() { return speedType; }
-		
-		////////////////////////////////////////////////////////////////////////
-		CncConfig& setActiveSpeedXY(CncSpeed s) {
-			speedType = s;
-			switch( s ) {
-				
-				case CncSpeedWork: 	setSpeedX(getWorkSpeedXY());
-									setSpeedY(getWorkSpeedXY());
-									break;
-									
-				case CncSpeedRapid:	setSpeedX(getRapidSpeedXY());
-									setSpeedY(getRapidSpeedXY());
-									break;
-			}
-			return *this;
-		}
-		////////////////////////////////////////////////////////////////////////
-		CncConfig& setActiveSpeedZ(CncSpeed s) {
-			speedType = s;
-			switch( s ) {
-				
-				case CncSpeedWork: 	setSpeedZ(getWorkSpeedZ());
-									break;
-									
-				case CncSpeedRapid:	setSpeedZ(getRapidSpeedZ());
-									break;
-			}
-			return *this;
 		}
 		
 		////////////////////////////////////////////////////////////////////////
@@ -374,24 +300,21 @@ class CncConfig {
 		double getPitchY(void) { return pitchY; }
 		double getPitchZ(void) { return pitchZ; }
 		////////////////////////////////////////////////////////////////////////
-		int getMaxSpeedXY() { return maxSpeedXY; }
-		CncConfig& setMaxSpeedXY(int s) { sc(); maxSpeedXY = s; return *this; }
-		int getMaxSpeedZ() { return maxSpeedZ; }
-		CncConfig& setMaxSpeedZ(int s) { sc(); maxSpeedZ = s; return *this; }
+		int getMaxSpeedXY();
+		int getMaxSpeedZ();
+
 		////////////////////////////////////////////////////////////////////////
 		int getRapidSpeedXY() { return rapidSpeedXY; }
 		CncConfig& setRapidSpeedXY(int s) { sc(); rapidSpeedXY = s; return *this; }
 		int getWorkSpeedXY() { return workSpeedXY; }
 		CncConfig& setWorkSpeedXY(int s) { sc(); workSpeedXY = s; return *this; }
+		
 		////////////////////////////////////////////////////////////////////////
 		int getRapidSpeedZ() { return rapidSpeedZ; }
 		CncConfig& setRapidSpeedZ(int s) { sc(); rapidSpeedZ = s; return *this; }
 		int getWorkSpeedZ() { return workSpeedZ; }
 		CncConfig& setWorkSpeedZ(int s) { sc(); workSpeedZ = s; return *this; }
-		////////////////////////////////////////////////////////////////////////
-		unsigned int getSpeedX(void) { return speedX; }
-		unsigned int getSpeedY(void) { return speedY; }
-		unsigned int getSpeedZ(void) { return speedZ; }
+		
 		////////////////////////////////////////////////////////////////////////
 		CncConfig& setMultiplierX(unsigned int val) { sc(); multiplierX = val; return *this; }
 		CncConfig& setMultiplierY(unsigned int val) { sc(); multiplierX = val; return *this; }

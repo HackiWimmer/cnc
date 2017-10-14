@@ -2,6 +2,7 @@
 #include <cfloat>
 #include <wx/dcclient.h>
 #include "CncCommon.h"
+#include "CncConfig.h"
 #include "CncZView.h"
 
 wxBEGIN_EVENT_TABLE(CncZView, wxPanel)
@@ -141,31 +142,31 @@ void CncZView::setHighWaterMark(double val) {
 	refresh(RT_WATER_MARKS);
 }
 /////////////////////////////////////////////////////////////////////
-void CncZView::updateView(double val, CncConfig& cc) {
+void CncZView::updateView(double val) {
 /////////////////////////////////////////////////////////////////////
-	if ( cc.isOnlineUpdateCoordinates() == false )
+	if ( CncConfig::getGlobalCncConfig()->isOnlineUpdateCoordinates() == false )
 		return;
 	
-	if ( cnc::dblCompare(maxValue, cc.getMaxDimensionZ() * scale) == false ) {
-		maxValue = cc.getMaxDimensionZ() * scale;
+	if ( cnc::dblCompare(maxValue, CncConfig::getGlobalCncConfig()->getMaxDimensionZ() * scale) == false ) {
+		maxValue = CncConfig::getGlobalCncConfig()->getMaxDimensionZ() * scale;
 		resetWaterMarks();
 		refresh(RT_ALL);
 	}
 	
-	if ( cnc::dblCompare(durationThickness, cc.getMaxDurationThickness()) == false ) {
-		durationThickness = cc.getMaxDurationThickness();
+	if ( cnc::dblCompare(durationThickness, CncConfig::getGlobalCncConfig()->getMaxDurationThickness()) == false ) {
+		durationThickness = CncConfig::getGlobalCncConfig()->getMaxDurationThickness();
 		resetWaterMarks();
 		refresh(RT_ALL);
 	}
 	
-	if ( cnc::dblCompare(workPieceThickness, cc.getWorkpieceThickness()) == false ) {
+	if ( cnc::dblCompare(workPieceThickness, CncConfig::getGlobalCncConfig()->getWorkpieceThickness()) == false ) {
 		resetWaterMarks();
-		workPieceThickness = cc.getWorkpieceThickness();
+		workPieceThickness = CncConfig::getGlobalCncConfig()->getWorkpieceThickness();
 		refresh(RT_WORKPIECE);
 	}
 	
-	if ( cnc::dblCompare(workPieceOffset, cc.getWorkpieceOffset()) == false ) {
-		workPieceOffset = cc.getWorkpieceOffset();
+	if ( cnc::dblCompare(workPieceOffset, CncConfig::getGlobalCncConfig()->getWorkpieceOffset()) == false ) {
+		workPieceOffset = CncConfig::getGlobalCncConfig()->getWorkpieceOffset();
 		resetWaterMarks();
 		refresh(RT_WORKPIECE);
 	}

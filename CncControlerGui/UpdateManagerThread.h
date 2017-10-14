@@ -7,17 +7,28 @@
 #include "3D/VerticeData.h"
 #include "CncPosition.h"
 
-typedef std::pair<unsigned char, int32_t> SetterPair;
-typedef std::vector<SetterPair> SetterList;
-
 class MainFrame;
 class UpdateManagerThread : public wxThread {
 	
 	public:
-		enum SpeedMode{UNDEFINED, RAPID, WORK};
+		enum SpeedMode{UNDEFINED = '\0', RAPID = 'R', WORK = 'W'};
 		
 		struct Event{
-			enum Type { EMPTY_UPD, QUEUE_RESET, COMMAND_UPD, APP_POS_UPD, CTL_POS_UPD };
+			enum Type { EMPTY_UPD, 
+			
+						QUEUE_RESET, 
+						POSSPY_RESET,
+						Z_VIEW_RESET,
+						
+						CONFIG_UPD,
+						COMMAND_UPD, 
+						APP_POS_UPD, 
+						CTL_POS_UPD,
+						Z_VIEW_UPD,
+						SPEED_UPD,
+						
+						SETTER_ADD
+					};
 			
 			Type type      = EMPTY_UPD;
 			bool processed = false;
@@ -25,9 +36,63 @@ class UpdateManagerThread : public wxThread {
 			//////////////////////////////////////////////////////////////
 			// no data
 			
+				inline const Event& ConfigUpdateEvent() {
+					type          = CONFIG_UPD;
+					processed     = false;
+					return *this;
+				}
+				
+			//////////////////////////////////////////////////////////////
+			// no data
+			
 				inline const Event& QueueResetEvent() {
 					type         = QUEUE_RESET;
 					processed    = false;
+					return *this;
+				}
+				
+			//////////////////////////////////////////////////////////////
+			// no data
+			
+				inline const Event& ZViewResetEvent() {
+					type         = Z_VIEW_RESET;
+					processed    = false;
+					return *this;
+				}
+
+				inline const Event& ZViewUpdateEvent() {
+					type         = Z_VIEW_UPD;
+					processed    = false;
+					return *this;
+				}
+				
+			//////////////////////////////////////////////////////////////
+			struct Spd {
+				unsigned int xSpeed = 1; 
+				unsigned int ySpeed = 1; 
+				unsigned int zSpeed = 1; 
+			} spd;
+			
+				inline const Event& SpeedEvent(unsigned int xs, unsigned int ys, unsigned int zs) {
+					type         = SPEED_UPD;
+					processed    = false;
+					spd.xSpeed = xs; 
+					spd.ySpeed = ys;
+					spd.zSpeed = zs;
+					return *this;
+				}
+			
+			//////////////////////////////////////////////////////////////
+			struct Set {
+				unsigned char	id; 
+				int32_t			value;
+			} set;
+			
+				inline const Event& SetterEvent(unsigned char i, int32_t v) {
+					type         = SETTER_ADD;
+					processed    = false;
+					set.id       = i;
+					set.value    = v;
 					return *this;
 				}
 			
@@ -44,7 +109,15 @@ class UpdateManagerThread : public wxThread {
 					cmd.duration = d;
 					return *this;
 				}
+			
 			//////////////////////////////////////////////////////////////
+			// no data
+			
+				inline const Event& PosSpyResetEvent() {
+					type			= POSSPY_RESET;
+					processed    	= false;
+					return *this;
+				}
 			
 			//////////////////////////////////////////////////////////////
 			struct Pos {
@@ -79,6 +152,20 @@ class UpdateManagerThread : public wxThread {
 					pos.curr.set(p);
 					return *this;
 				}
+				
+				inline const Event& AppPosEvent(long i, const wxString& s, const CncLongPosition& p) {
+					type			= APP_POS_UPD;
+					processed    	= false;
+					pos.id			= i;
+					switch ( (char)s[0] ) {
+						case 'R':	pos.speedMode	= RAPID; break;
+						case 'W':	pos.speedMode	= WORK;  break;
+						default:	pos.speedMode	= UNDEFINED;
+					}
+					pos.curr.set(p);
+					return *this;
+				}
+				
 			//////////////////////////////////////////////////////////////
 			
 		};
@@ -88,45 +175,18 @@ class UpdateManagerThread : public wxThread {
 		
 		// thread interface
 		void stop();
-		void enableDisplay(bool state=true);
 		void postEvent(const UpdateManagerThread::Event& evt);
-		void postConfigUpdate(CncConfig* cncConfig);
-		void postClearPositionSpy();
-		
-		
-		
-		
-		
-// old value interface
-
-void postSetterValue(unsigned char id, int32_t value);
-void postResetZView();
-void postUpdateZView();
-		
-
 		
 	protected:
 		const unsigned int maxSetterEntries = 1000;
 		
 		MainFrame* pHandler;
-		CncConfig* cncConfig;
-		SetterList setterList;
-		unsigned int setterCounter;
-		bool enabled;
 		bool queueReset;
 		bool exit;
 		
-		inline void updateConfigurationControls();
-		inline void updateSetterControls();
-		
-		
-		
-		
-		
-		
-		
 		ConcurrentQueue<UpdateManagerThread::Event> eventQueue;
 		UpdateManagerThread::Event lastCmdEvent;
+		UpdateManagerThread::Event lastSpeedEvent;
 		UpdateManagerThread::Event lastAppPosEvent;
 		UpdateManagerThread::Event lastCtlPosEvent;
 		
@@ -136,6 +196,11 @@ void postUpdateZView();
 		inline void pop();
 		inline void postHeartbeat();
 		
+		inline void idle();
+		inline void freezeControl(wxWindow* ctl, bool onlyHidden);
+		inline void thawControl(wxWindow* ctl);
+		inline void freezeControls(bool state);
+		
 		inline void checkQueueReset();
 		
 		inline void immediateUpdate();
@@ -144,6 +209,16 @@ void postUpdateZView();
 		inline void updateAppPosition();
 		inline void updateCtlPosition();
 		inline void updatePositionSpy(UpdateManagerThread::Event evt);
+		inline void clearPositionSpy();
+		
+		inline void resetZView();
+		inline void updateZView();
+		
+		inline void updateSpeedView();
+		
+		inline void updateSetterList(UpdateManagerThread::Event evt);
+		
+		inline void configUpdate();
 };
 
 #endif

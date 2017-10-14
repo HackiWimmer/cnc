@@ -6,7 +6,6 @@
 
 #include "CncPosition.h"
 #include "CncCommon.h"
-#include "CncConfig.h"
 #include "3D/VerticeData.h"
 #include "3D/GLContextPathBase.h"
 
@@ -41,7 +40,6 @@ class CncMotionMonitor : public wxGLCanvas {
 		// interface
 		void clear();
 		void display();
-		void setCncConfig(const CncConfig& config);
 		void appendVertice(const GLI::VerticeLongData& vd);
 		void centerViewport();
 		void resetRotation();
@@ -118,9 +116,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		int cameraRotationSpeed;
 		
 		float zoom;
-
-		CncConfig localCncConfig;
-
+		
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);

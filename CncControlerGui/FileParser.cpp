@@ -185,12 +185,17 @@ void FileParser::registerNextDebugNode(const wxString& nodeName) {
 	if ( debugControls.curentMainCategory == NULL )
 		return;
 		
+	//SHOULD_DEBUG_HERE
+		
 	wxString label(wxString::Format("[%06d] - %s", currentLineNumber, nodeName));
 	wxString name(wxString::Format("%d", debugControls.propCount++));
 	
 	debugControls.currentNode = new wxPropertyCategory(label, name);
 	debugControls.currentNode->SetExpanded(true);
-	debugControls.curentMainCategory->AppendChild(debugControls.currentNode);
+	
+	debugControls.curentMainCategory->InsertChild(0, debugControls.currentNode);
+	//debugControls.curentMainCategory->AppendChild(debugControls.currentNode);
+	debuggerConfigurationPropertyGrid->Refresh();
 }
 //////////////////////////////////////////////////////////////////
 void FileParser::appendDebugValueBase(DcmItemList& rows) {
@@ -303,6 +308,7 @@ void FileParser::setCurrentLineNumber(long ln) {
 ////////////////////////////////////////////////////////////////////////////
 	currentLineNumber = ln;
 	runInfo.setLastLineNumber(ln);
+	initNextClientId(ln);
 
 	// to handle the pause flag
 	evaluateProcessingState();

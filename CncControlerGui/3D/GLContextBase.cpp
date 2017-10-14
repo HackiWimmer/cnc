@@ -110,6 +110,14 @@ bool GLContextBase::isSmoothingEnabled() {
 	return (bool)glIsEnabled(GL_LINE_SMOOTH);
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks) {
+/////////////////////////////////////////////////////////////////
+	GLUquadricObj* quadric = gluNewQuadric();
+	gluQuadricDrawStyle(quadric, GLU_FILL);
+	gluCylinder(quadric, base, 0, height, slices, stacks);
+	gluDeleteQuadric(quadric);
+}
+/////////////////////////////////////////////////////////////////
 GLViewPort::PreDefPos GLContextBase::convertViewMode(GLContextBase::ViewMode newMode) {
 /////////////////////////////////////////////////////////////////
 	switch ( newMode ) {
@@ -238,6 +246,10 @@ void GLContextBase::drawCoordinateOrigin() {
 /////////////////////////////////////////////////////////////////
 	wxASSERT( viewPort != NULL );
 	
+	const float croneDiameter 	= 0.02f;
+	const float croneHight 		= 0.07f;
+	const float charOffset		= 0.006f;
+	
 	// ensure the right matrix
 	glMatrixMode(GL_MODELVIEW);
 	
@@ -249,36 +261,53 @@ void GLContextBase::drawCoordinateOrigin() {
 	glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
 	glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
 	glRotatef(modelRotate.angleZ(), 0.0f, 0.0f, 1.0f);
-
+	
 	// x axis
-	glBegin(GL_LINES);
+		glBegin(GL_LINES);
 
-		glColor3ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue());
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(coordOriginInfo.length, 0.0f, 0.0f);
+			glColor3ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue());
+			glVertex3f(0.0f, 0.0f, 0.0f);
+			glVertex3f(coordOriginInfo.length, 0.0f, 0.0f);
+			
+		glEnd();
+		renderBitmapString(coordOriginInfo.length + croneHight, -charOffset, -charOffset, GLUT_BITMAP_8_BY_13, "X");
 		
-	glEnd();
-	renderBitmapString(coordOriginInfo.length, 0.0f, 0.0f, GLUT_BITMAP_9_BY_15, "X");
+		glPushMatrix();
+			glTranslatef(coordOriginInfo.length, 0.0f, 0.0f);
+			glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
+			drawSolidCone(croneDiameter, croneHight, 30, 30);
+		glPopMatrix();
 	
 	// y axis
-	glBegin(GL_LINES);
+		glBegin(GL_LINES);
 
-		glColor3ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue());
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(0.0f, coordOriginInfo.length, 0.0f);
+			glColor3ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue());
+			glVertex3f(0.0f, 0.0f, 0.0f);
+			glVertex3f(0.0f, coordOriginInfo.length, 0.0f);
+		
+		glEnd();
+		renderBitmapString(0.0f, coordOriginInfo.length + croneHight, 0.0f, GLUT_BITMAP_8_BY_13, "Y");
+
+		glPushMatrix();
+			glTranslatef(-charOffset, coordOriginInfo.length, -charOffset);
+			glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
+			drawSolidCone(croneDiameter, croneHight, 30, 30);
+		glPopMatrix();
 	
-	glEnd();
-	renderBitmapString(0.0f, coordOriginInfo.length, 0.0f, GLUT_BITMAP_9_BY_15, "Y");
-
 	// z axis
-	glBegin(GL_LINES);
+		glBegin(GL_LINES);
 
-		glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
-		glVertex3f(0.0f, 0.0f, 0.0f);
-		glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
-	
-	glEnd();
-	renderBitmapString(0.0f, 0.0f, coordOriginInfo.length, GLUT_BITMAP_9_BY_15, "Z");
+			glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
+			glVertex3f(0.0f, 0.0f, 0.0f);
+			glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
+		
+		glEnd();
+		renderBitmapString(0.0f, 0.0f, coordOriginInfo.length + croneHight, GLUT_BITMAP_8_BY_13, "Z");
+		
+		glPushMatrix();
+			glTranslatef(-charOffset, -charOffset, coordOriginInfo.length);
+			drawSolidCone(croneDiameter, croneHight, 30, 30);
+		glPopMatrix();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawPosMarker(float x, float y, float z) {
@@ -505,60 +534,3 @@ void GLContextBase::display() {
 	glFlush();
 	checkGLError();
 }
-/////////////////////////////////////////////////////////////////
-void GLContextBase::drawCone() {
-////////////////////////////////////////////////////////////////
-#warning todo
-	const float PI = 3.14159265;
-	unsigned int parts = 32;
-	unsigned int size = parts * 6 + 12;
-	float steps = (float) ((PI * 2) / parts);
-	
-	float* vertex = new float[size];
-	
-	for (unsigned int i = 0; i <= parts; i++) {
-		float sin = (float) std::sin(i * steps);
-		float cos = (float) std::cos(i * steps);
-		// Hintere Seite des Zylinders
-		vertex[i * 3] = cos;
-		vertex[i * 3 + 1] = sin;
-		vertex[i * 3 + 2] = -0.5f;
-		
-		// Vordere Seite des Zylinders
-		vertex[i * 3 + parts * 3 + 3] = cos;
-		vertex[i * 3 + parts * 3 + 4] = sin;
-		vertex[i * 3 + parts * 3 + 5] = 0.5f;
-	}
-	
-	// Mitte derbeidenKreise
-	vertex[parts * 6 + 6] = 0;
-	vertex[parts * 6 + 7] = 0;
-	vertex[parts * 6 + 8] = -0.5f;
-	vertex[parts * 6 + 9] = 0;
-	vertex[parts * 6 + 10] = 0;
-	vertex[parts * 6 + 11] = 0.5f;
-	
-	
-	glEnableClientState (GL_VERTEX_ARRAY);
-   glEnableClientState (GL_COLOR_ARRAY);
-	
-	
-	glVertexPointer( 3, GL_FLOAT, 0, vertex ); // Set The Vertex Pointer To Vertex Data
-	//glColorPointer (3, GL_UNSIGNED_BYTE, sizeof (VertArray), (vertList[0]->color));
-	glDrawArrays (GL_POINTS, 0, size);
-	
-	    glDisableClientState (GL_VERTEX_ARRAY);
-    glDisableClientState (GL_COLOR_ARRAY);
-}
-
-
-
-
-
-
-
-
-
-
-
-

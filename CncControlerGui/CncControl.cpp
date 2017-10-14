@@ -23,7 +23,8 @@ static CommandTemplates CMDTPL;
 
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
-: portType(pt)
+: currentClientId(-1)
+, portType(pt)
 , serialPort(NULL)
 , cncConfig(NULL)
 , zeroPos(0,0,0)
@@ -31,6 +32,8 @@ CncControl::CncControl(CncPortType pt)
 , curPos(0,0,0)
 , controllerPos(0,0,0)
 , renderMode(CncRenderAtController)
+, speedType(CncSpeedRapid)
+, speedX(1), speedY(1), speedZ(1)
 , durationCounter(0)
 , interruptState(false)
 , powerOn(false)
@@ -51,8 +54,7 @@ CncControl::CncControl(CncPortType pt)
 	serialPort->enableSpyOutput();
 	
 	// create default config
-	CncConfig cc;
-	updateCncConfig(cc);
+	cncConfig = CncConfig::getGlobalCncConfig();
 	
 	// init pen handler
 	penHandler.reset();
@@ -61,7 +63,6 @@ CncControl::CncControl(CncPortType pt)
 CncControl::~CncControl() {
 ///////////////////////////////////////////////////////////////////
 	assert(serialPort);
-	assert(cncConfig);
 	
 	if ( getToolState() == true )
 		switchToolOff();
@@ -71,7 +72,6 @@ CncControl::~CncControl() {
 		serialPort->disconnect();
 
 	delete serialPort;
-	delete cncConfig;
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getStartPosMetric() {
@@ -146,14 +146,6 @@ const CncDoublePosition::Watermarks CncControl::getWaterMarksMetric() {
 
 	return retValue;
 }
-//////////////////////////////////////////////////////////////////
-void CncControl::updateCncConfig(CncConfig& cc) {
-///////////////////////////////////////////////////////////////////
-	if ( cncConfig != NULL )
-		delete cncConfig;
-	
-	cncConfig = new CncConfig(cc); 
-}
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processSetter(unsigned char id, int32_t value) {
 ///////////////////////////////////////////////////////////////////
@@ -171,8 +163,12 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 		return false;
 		
 	} else {
+		
+		typedef UpdateManagerThread::Event Event;
+		static Event evt;
+		
 		if ( GET_GUI_CTL(mainFrame) )
-			GET_GUI_CTL(mainFrame)->umPostSetterValue(id, value);
+			GET_GUI_CTL(mainFrame)->umPostEvent(evt.SetterEvent(id, value));
 	}
 
 	return true;
@@ -215,9 +211,9 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_PITCH_Y, convertDoubleToCtrlLong(PID_PITCH_Y, cncConfig->getPitchY())));
 	setup.push_back(SetterTuple(PID_PITCH_Z, convertDoubleToCtrlLong(PID_PITCH_Z, cncConfig->getPitchZ())));
 	
-	setup.push_back(SetterTuple(PID_SPEED_X, cncConfig->getSpeedX()));
-	setup.push_back(SetterTuple(PID_SPEED_Y, cncConfig->getSpeedY()));
-	setup.push_back(SetterTuple(PID_SPEED_Z, cncConfig->getSpeedZ()));
+	setup.push_back(SetterTuple(PID_SPEED_X, getSpeedX()));
+	setup.push_back(SetterTuple(PID_SPEED_Y, getSpeedY()));
+	setup.push_back(SetterTuple(PID_SPEED_Z, getSpeedZ()));
 	
 	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_X, cncConfig->getPulsWidthOffsetX()));
 	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_Y, cncConfig->getPulsWidthOffsetY()));
@@ -230,7 +226,7 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_X_STEP_SIGN, cncConfig->getStepSignX()));
 	setup.push_back(SetterTuple(PID_Y_STEP_SIGN, cncConfig->getStepSignY()));
 	
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, cncConfig->getRelyThreshold()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, cncConfig->getReplyThreshold()));
 	
 	if ( processSetterList(setup) ) {
 		changeWorkSpeedXY(CncSpeedRapid);
@@ -387,8 +383,8 @@ void CncControl::setZeroPosZ() {
 	
 	int32_t val = 0L;
 	
-	if ( getCncConfig()->getReferenceIncludesWpt() == true )
-		val = (long)round(getCncConfig()->getWorkpieceThickness() * getCncConfig()->getCalculationFactZ());
+	if ( cncConfig->getReferenceIncludesWpt() == true )
+		val = (long)round(cncConfig->getWorkpieceThickness() * cncConfig->getCalculationFactZ());
 	
 	curPos.setZ(val);
 	zeroPos.setZ(val);
@@ -572,27 +568,27 @@ bool CncControl::moveZToTop() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeWorkSpeedXY(CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
-	if ( cncConfig->getSpeedType() == s )
+	if ( getSpeedType() == s )
 		return;
 	
-	cncConfig->setActiveSpeedXY(s);
+	setActiveSpeedXY(s);
 	
 	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
 	processSetter(mmm, (s == CncSpeedWork));
-	processSetter(PID_SPEED_X, cncConfig->getSpeedX());
-	processSetter(PID_SPEED_Y, cncConfig->getSpeedY());
+	processSetter(PID_SPEED_X, getSpeedX());
+	processSetter(PID_SPEED_Y, getSpeedY());
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeWorkSpeedZ(CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
-	if ( cncConfig->getSpeedType() == s )
+	if ( getSpeedType() == s )
 		return;
 		
-	cncConfig->setActiveSpeedZ(s);
+	setActiveSpeedZ(s);
 	
 	int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
 	processSetter(mmm, (s == CncSpeedWork));
-	processSetter(PID_SPEED_Z, cncConfig->getSpeedZ());
+	processSetter(PID_SPEED_Z, getSpeedZ());
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingStart() {
@@ -839,7 +835,7 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	if ( curPos != prevPos ) {
 		
 		if ( IS_GUI_CTL_VALID(motionMonitor) ) {
-			vd.setVertice(4242, cncConfig->getSpeedType(), curPos);
+			vd.setVertice(getClientId(), getSpeedType(), curPos);
 			GET_GUI_CTL(motionMonitor)->appendVertice(vd);
 			
 			updatePreview3D(false);
@@ -852,7 +848,7 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 			static Event evt;
 			
 			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(vd.getId(), UpdateManagerThread::SpeedMode::UNDEFINED, curPos));
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(vd.getId(), getSpeedAsString(), curPos));
 		}
 		
 		prevPos = curPos;
@@ -1188,8 +1184,11 @@ bool CncControl::validatePositions() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
 	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostConfigUpdate(cncConfig);
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.ConfigUpdateEvent());
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::enableStepperMotors(bool s) {
@@ -1362,7 +1361,7 @@ bool CncControl::moveXToMinLimit() {
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double maxSteps = getCncConfig()->getMaxDimensionX() * (-1);
+	double maxSteps = cncConfig->getMaxDimensionX() * (-1);
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
@@ -1379,7 +1378,7 @@ bool CncControl::moveXToMaxLimit() {
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double maxSteps = getCncConfig()->getMaxDimensionX();
+	double maxSteps = cncConfig->getMaxDimensionX();
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
@@ -1396,7 +1395,7 @@ bool CncControl::moveYToMinLimit() {
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double maxSteps = getCncConfig()->getMaxDimensionY() * (-1);
+	double maxSteps = cncConfig->getMaxDimensionY() * (-1);
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
@@ -1413,7 +1412,7 @@ bool CncControl::moveYToMaxLimit() {
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double maxSteps = getCncConfig()->getMaxDimensionY();
+	double maxSteps = cncConfig->getMaxDimensionY();
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
@@ -1429,7 +1428,7 @@ bool CncControl::moveZToMinLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	double maxSteps = getCncConfig()->getMaxDimensionZ() * (-1);
+	double maxSteps = cncConfig->getMaxDimensionZ() * (-1);
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(maxSteps);
@@ -1445,7 +1444,7 @@ bool CncControl::moveZToMaxLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	double maxSteps = getCncConfig()->getMaxDimensionZ();
+	double maxSteps = cncConfig->getMaxDimensionZ();
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(maxSteps);
@@ -1459,7 +1458,7 @@ bool CncControl::moveZToMaxLimit() {
 bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double maxSteps = getCncConfig()->getMaxDimensionX();
+	double maxSteps = cncConfig->getMaxDimensionX();
 	bool ret = false;
 
 	if ( prepareSimpleMove() == true ) {
@@ -1474,7 +1473,7 @@ bool CncControl::moveXToMid() {
 bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double maxSteps = getCncConfig()->getMaxDimensionY();
+	double maxSteps = cncConfig->getMaxDimensionY();
 
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1489,7 +1488,7 @@ bool CncControl::moveYToMid() {
 bool CncControl::moveZToMid() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double maxSteps = getCncConfig()->getMaxDimensionZ();
+	double maxSteps = cncConfig->getMaxDimensionZ();
 
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1619,7 +1618,7 @@ bool CncControl::prepareSimpleMove(bool enaleEventHandling) {
 ///////////////////////////////////////////////////////////////////
 	logProcessingStart();
 	initNextDuration();
-	getCncConfig()->setAllowEventHandling(enaleEventHandling);
+	cncConfig->setAllowEventHandling(enaleEventHandling);
 	activatePositionCheck(false);
 	enableStepperMotors(true);
 	
@@ -1762,4 +1761,60 @@ void CncControl::sendIdleMessage() {
 	
 	//clog <<  wxDateTime::UNow().FormatTime() << " - idle,  delay:" << getStepDelay() << endl;
 	getSerial()->processIdle();
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::setActiveSpeedXY(CncSpeed s) {
+///////////////////////////////////////////////////////////////////
+	speedType = s;
+	switch( s ) {
+		
+		case CncSpeedWork: 	setSpeedX(cncConfig->getWorkSpeedXY());
+							setSpeedY(cncConfig->getWorkSpeedXY());
+							break;
+							
+		case CncSpeedRapid:	setSpeedX(cncConfig->getRapidSpeedXY());
+							setSpeedY(cncConfig->getRapidSpeedXY());
+							break;
+	}
+	
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SpeedEvent(getSpeedX(), getSpeedY(), getSpeedZ()));
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::setActiveSpeedZ(CncSpeed s) {
+///////////////////////////////////////////////////////////////////
+	speedType = s;
+	switch( s ) {
+		
+		case CncSpeedWork: 	setSpeedZ(cncConfig->getWorkSpeedZ());
+							break;
+							
+		case CncSpeedRapid:	setSpeedZ(cncConfig->getRapidSpeedZ());
+							break;
+	}
+	
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SpeedEvent(getSpeedX(), getSpeedY(), getSpeedZ()));
+}
+///////////////////////////////////////////////////////////////////
+const wxString& CncControl::getSpeedAsString() {
+///////////////////////////////////////////////////////////////////
+	static wxString ret;
+
+	switch( speedType ) {
+		
+		case CncSpeedWork: 	ret.assign("W");
+							break;
+							
+		case CncSpeedRapid:	ret.assign("R");
+							break;
+	}
+	
+	return ret;
 }

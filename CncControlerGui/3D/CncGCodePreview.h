@@ -6,7 +6,6 @@
 
 #include "CncPosition.h"
 #include "CncCommon.h"
-#include "CncConfig.h"
 #include "3D/VerticeData.h"
 #include "3D/GLContextGCodePreview.h"
 

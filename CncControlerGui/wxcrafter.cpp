@@ -28,6 +28,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auimgrMain->SetFlags( wxAUI_MGR_LIVE_RESIZE|wxAUI_MGR_TRANSPARENT_HINT|wxAUI_MGR_TRANSPARENT_DRAG|wxAUI_MGR_ALLOW_ACTIVE_PANE|wxAUI_MGR_ALLOW_FLOATING);
     m_auimgrMain->GetArtProvider()->SetMetric( wxAUI_DOCKART_SASH_SIZE, 3);
     m_auimgrMain->GetArtProvider()->SetColor( wxAUI_DOCKART_ACTIVE_CAPTION_COLOUR, wxColour(wxT("rgb(0,0,128)")));
+    m_auimgrMain->GetArtProvider()->SetColor( wxAUI_DOCKART_ACTIVE_CAPTION_GRADIENT_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     m_auimgrMain->GetArtProvider()->SetColor( wxAUI_DOCKART_INACTIVE_CAPTION_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
     m_auimgrMain->GetArtProvider()->SetColor( wxAUI_DOCKART_ACTIVE_CAPTION_TEXT_COLOUR, wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_auimgrMain->GetArtProvider()->SetMetric(wxAUI_DOCKART_GRADIENT_TYPE, wxAUI_GRADIENT_NONE);
@@ -36,6 +37,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auibarMain->SetToolBitmapSize(wxSize(16,16));
     
     m_auimgrMain->AddPane(m_auibarMain, wxAuiPaneInfo().Name(wxT("Toolbar")).Caption(_("Main")).Direction(wxAUI_DOCK_TOP).Layer(0).Row(0).Position(0).BestSize(40,40).MinSize(40,40).MaxSize(40,40).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    
+    m_bmpButton4490 = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("application-side-boxes")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_bmpButton4490->SetToolTip(_("Toggle Template Manager"));
+    m_auibarMain->AddControl(m_bmpButton4490);
+    
+    m_auibarMain->AddSeparator();
     
     m_staticText1842 = new wxStaticText(m_auibarMain, wxID_ANY, _("Port:"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     m_auibarMain->AddControl(m_staticText1842);
@@ -171,7 +178,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_scrollWinMain = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_scrollWinMain, wxAuiPaneInfo().Name(wxT("MainView")).Caption(_("CNC Main View")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(1).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
+    m_auimgrMain->AddPane(m_scrollWinMain, wxAuiPaneInfo().Name(wxT("SourceView")).Caption(_("CNC Main View")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(1).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
     wxFlexGridSizer* flexGridSizer434 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer434->SetFlexibleDirection( wxBOTH );
@@ -393,13 +400,23 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1809->Add(m_svgEditSearch, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_svgEditFind = new wxButton(m_panelTplEdit, wxID_ANY, _("Find"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), 0);
+    m_svgEditFind = new wxButton(m_panelTplEdit, wxID_ANY, _("Find"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_svgEditFind->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("system-search-2")), wxLEFT);
+    m_svgEditFind->SetBitmapMargins(2,2);
+    #endif
     
     flexGridSizer1809->Add(m_svgEditFind, 0, wxALL, WXC_FROM_DIP(1));
+    m_svgEditFind->SetMinSize(wxSize(-1,26));
     
-    m_svgEditFindPrev = new wxButton(m_panelTplEdit, wxID_ANY, _("Find Prev"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), 0);
+    m_svgEditFindPrev = new wxButton(m_panelTplEdit, wxID_ANY, _("Find Prev"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_svgEditFindPrev->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("go-up-search")), wxLEFT);
+    m_svgEditFindPrev->SetBitmapMargins(2,2);
+    #endif
     
     flexGridSizer1809->Add(m_svgEditFindPrev, 0, wxALL, WXC_FROM_DIP(1));
+    m_svgEditFindPrev->SetMinSize(wxSize(-1,26));
     
     wxFlexGridSizer* flexGridSizer713 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer713->SetFlexibleDirection( wxBOTH );
@@ -410,12 +427,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_filePosition = new wxStaticText(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(100,-1)), 0);
     m_filePosition->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_filePositionFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_filePosition->SetFont(m_filePositionFont);
     
     flexGridSizer713->Add(m_filePosition, 0, wxALL, WXC_FROM_DIP(1));
     m_filePosition->SetMinSize(wxSize(100,-1));
     
     m_svgEditStatus = new wxTextCtrl(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
     m_svgEditStatus->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_svgEditStatusFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_svgEditStatus->SetFont(m_svgEditStatusFont);
     #if wxVERSION_NUMBER >= 3000
     m_svgEditStatus->SetHint(wxT(""));
     #endif
@@ -424,6 +445,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_editMode = new wxStaticText(m_panelTplEdit, wxID_ANY, _("edit mode"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), 0);
     m_editMode->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_editModeFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_editMode->SetFont(m_editModeFont);
     
     flexGridSizer713->Add(m_editMode, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -551,96 +574,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxUnusedVar(m_pgMgrSetupArr);
     wxArrayInt m_pgMgrSetupIntArr;
     wxUnusedVar(m_pgMgrSetupIntArr);
-    m_pgMgrSetup = new wxPropertyGridManager(m_setupConfigPage, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_setupConfigPage, wxSize(-1,-1)), wxPG_DESCRIPTION|wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED);
+    m_pgMgrSetup = new wxPropertyGridManager(m_setupConfigPage, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_setupConfigPage, wxSize(-1,-1)), wxPG_DESCRIPTION|wxPG_TOOLBAR|wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED);
     
     flexGridSizer3705->Add(m_pgMgrSetup, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_pgCatWorking = m_pgMgrSetup->Append(  new wxPropertyCategory( _("Working") ) );
-    m_pgCatWorking->SetHelpString(wxT(""));
-    
-    m_pgProp3746 = m_pgMgrSetup->AppendIn( m_pgCatWorking,  new wxStringProperty( _("Tool Type"), wxPG_LABEL, wxT("")) );
-    m_pgProp3746->SetHelpString(wxT(""));
-    
-    m_pgProp3748 = m_pgMgrSetup->AppendIn( m_pgCatWorking,  new wxStringProperty( _("Tool Diameter"), wxPG_LABEL, wxT("")) );
-    m_pgProp3748->SetHelpString(wxT(""));
-    
-    m_pgCatSpeed = m_pgMgrSetup->Append(  new wxPropertyCategory( _("Speed") ) );
-    m_pgCatSpeed->SetHelpString(wxT(""));
-    
-    m_pgMgrSetupArr.Clear();
-    m_pgMgrSetupIntArr.Clear();
-    m_pgPropPredefSpeedConfig = m_pgMgrSetup->AppendIn( m_pgCatSpeed,  new wxEnumProperty( _("Predefined Speed Configurations"), wxPG_LABEL, m_pgMgrSetupArr, m_pgMgrSetupIntArr, 0) );
-    m_pgPropPredefSpeedConfig->SetHelpString(wxT(""));
-    m_pgPropPredefSpeedConfig->SetEditor( wxT("ComboBox") );
-    
-    m_pgCatXYSpeed = m_pgMgrSetup->AppendIn( m_pgCatSpeed,  new wxPropertyCategory( _("XY Axis") ) );
-    m_pgCatXYSpeed->SetHelpString(wxT(""));
-    
-    m_pgPropMaxSpeedXY = m_pgMgrSetup->AppendIn( m_pgCatXYSpeed,  new wxStringProperty( _("Max Speed XY Axis [rpm]"), wxPG_LABEL, wxT("")) );
-    m_pgPropMaxSpeedXY->SetHelpString(wxT(""));
-    
-    m_pgPropDefWorkSpeedXY = m_pgMgrSetup->AppendIn( m_pgCatXYSpeed,  new wxStringProperty( _("Default Work Speed [%]"), wxPG_LABEL, wxT("")) );
-    m_pgPropDefWorkSpeedXY->SetHelpString(wxT(""));
-    
-    m_pgPropDefRapidSpeedXY = m_pgMgrSetup->AppendIn( m_pgCatXYSpeed,  new wxStringProperty( _("Default Rapid Speed [%]"), wxPG_LABEL, wxT("")) );
-    m_pgPropDefRapidSpeedXY->SetHelpString(wxT(""));
-    
-    m_pgPropDefSpeedModeXY = m_pgMgrSetup->AppendIn( m_pgCatXYSpeed,  new wxStringProperty( _("Default Speed Mode"), wxPG_LABEL, wxT("")) );
-    m_pgPropDefSpeedModeXY->SetHelpString(wxT(""));
-    
-    m_pgCatZSpeed = m_pgMgrSetup->AppendIn( m_pgCatSpeed,  new wxPropertyCategory( _("ZAxis") ) );
-    m_pgCatZSpeed->SetHelpString(wxT(""));
-    
-    m_pgPropMaxSpeedZ = m_pgMgrSetup->AppendIn( m_pgCatZSpeed,  new wxStringProperty( _("Max Speed Z Axis [rpm]"), wxPG_LABEL, wxT("")) );
-    m_pgPropMaxSpeedZ->SetHelpString(wxT(""));
-    
-    m_pgPropDefWorkSpeedZ = m_pgMgrSetup->AppendIn( m_pgCatZSpeed,  new wxStringProperty( _("Default Work Speed [%]"), wxPG_LABEL, wxT("")) );
-    m_pgPropDefWorkSpeedZ->SetHelpString(wxT(""));
-    
-    m_pgPropDefRapidSpeedZ = m_pgMgrSetup->AppendIn( m_pgCatZSpeed,  new wxStringProperty( _("Default Rapid Speed [%]"), wxPG_LABEL, wxT("")) );
-    m_pgPropDefRapidSpeedZ->SetHelpString(wxT(""));
-    
-    m_pgPropDefSpeedModeZ = m_pgMgrSetup->AppendIn( m_pgCatZSpeed,  new wxStringProperty( _("Default Speed Mode"), wxPG_LABEL, wxT("")) );
-    m_pgPropDefSpeedModeZ->SetHelpString(wxT(""));
-    
-    m_pgCatDimension = m_pgMgrSetup->Append(  new wxPropertyCategory( _("Dimension") ) );
-    m_pgCatDimension->SetHelpString(wxT(""));
-    
-    m_pgPropMaxDimX = m_pgMgrSetup->AppendIn( m_pgCatDimension,  new wxFloatProperty( _("Max Dimension X Axis [mm]"), wxPG_LABEL, 0) );
-    m_pgPropMaxDimX->SetHelpString(wxT(""));
-    m_pgPropMaxDimX->SetEditor( wxT("TextCtrl") );
-    
-    m_pgPropMaxDimY = m_pgMgrSetup->AppendIn( m_pgCatDimension,  new wxFloatProperty( _("Max Dimension Y Axis [mm]"), wxPG_LABEL, 0) );
-    m_pgPropMaxDimY->SetHelpString(wxT(""));
-    m_pgPropMaxDimY->SetEditor( wxT("TextCtrl") );
-    
-    m_pgPropMaxDimZ = m_pgMgrSetup->AppendIn( m_pgCatDimension,  new wxFloatProperty( _("Max Dimension Z Axis [mm]"), wxPG_LABEL, 0) );
-    m_pgPropMaxDimZ->SetHelpString(wxT(""));
-    m_pgPropMaxDimZ->SetEditor( wxT("TextCtrl") );
-    
-    m_pgCatSvg = m_pgMgrSetup->Append(  new wxPropertyCategory( _("SVG") ) );
-    m_pgCatSvg->SetHelpString(wxT(""));
-    
-    m_pgCatGCode = m_pgMgrSetup->Append(  new wxPropertyCategory( _("GCode") ) );
-    m_pgCatGCode->SetHelpString(wxT(""));
-    
-    m_pgCatApplication = m_pgMgrSetup->Append(  new wxPropertyCategory( _("Application") ) );
-    m_pgCatApplication->SetHelpString(wxT(""));
-    
-    m_pgMgrSetupArr.Clear();
-    m_pgMgrSetupIntArr.Clear();
-    m_pgMgrSetupArr.Add(_("a) Always"));
-    m_pgMgrSetupArr.Add(_("b) Never"));
-    m_pgMgrSetupArr.Add(_("c) SerialPort Only"));
-    m_pgPropRunConfirmationMode = m_pgMgrSetup->AppendIn( m_pgCatApplication,  new wxEnumProperty( _("Run Confirmation Mode"), wxPG_LABEL, m_pgMgrSetupArr, m_pgMgrSetupIntArr, 0) );
-    m_pgPropRunConfirmationMode->SetHelpString(wxT(""));
-    m_pgPropRunConfirmationMode->SetEditor( wxT("ComboBox") );
-    
-    m_pgProp3750 = m_pgMgrSetup->AppendIn( m_pgCatApplication,  new wxStringProperty( _("Use Processed Setter List"), wxPG_LABEL, wxT("")) );
-    m_pgProp3750->SetHelpString(wxT(""));
-    
-    m_pgProp3752 = m_pgMgrSetup->AppendIn( m_pgCatApplication,  new wxStringProperty( _("Clear Processed Setter List before each Run"), wxPG_LABEL, wxT("")) );
-    m_pgProp3752->SetHelpString(wxT(""));
     
     m_setupEnvPage = new wxPanel(m_listbook2220, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook2220, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupEnvPageImgIndex;
@@ -3066,7 +3002,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_dvListCtrlProcessedSetters->AppendTextColumn(_("#"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(50), wxALIGN_LEFT);
     m_dvListCtrlProcessedSetters->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(200), wxALIGN_LEFT);
-    m_dvListCtrlProcessedSetters->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT);
+    m_dvListCtrlProcessedSetters->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_cncConfiguration = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_cncConfigurationImgIndex;
     m_cncConfigurationImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-member_protected")));
@@ -3892,7 +3828,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelSpeed = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_panelSpeed, wxAuiPaneInfo().Name(wxT("Speed")).Caption(_("Speed")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(0).Position(0).BestSize(80,-1).Fixed().CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_panelSpeed, wxAuiPaneInfo().Name(wxT("SpeedView")).Caption(_("Speed")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(80,-1).Fixed().CaptionVisible(true).MaximizeButton(false).CloseButton(true).MinimizeButton(true).PinButton(false));
     
     wxFlexGridSizer* flexGridSizer28011 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer28011->SetFlexibleDirection( wxBOTH );
@@ -3945,10 +3881,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1628->Add(m_mainFileViewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_scrollWinLogger = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHSCROLL | wxVSCROLL);
-    m_scrollWinLogger->SetScrollRate(5, 5);
+    m_scrollWinLogger = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_scrollWinLogger, wxAuiPaneInfo().Name(wxT("Logger")).Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(0).Position(0).BestSize(100,188).MinSize(100,188).MaxSize(100,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_scrollWinLogger, wxAuiPaneInfo().Name(wxT("Logger")).Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,140).MinSize(100,140).MaxSize(100,140).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     wxFlexGridSizer* flexGridSizer869 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer869->SetFlexibleDirection( wxBOTH );
@@ -3976,7 +3911,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1863->Add(m_clearLogger, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_freezeLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-find_and_replace")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_freezeLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("weather-freezing-rain")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_freezeLogger->SetToolTip(_("Freeze/Unfreeze Logger"));
     
     flexGridSizer1863->Add(m_freezeLogger, 0, wxALL, WXC_FROM_DIP(1));
@@ -4020,193 +3955,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer869->Add(m_tmpTraceInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     m_tmpTraceInfo->SetMinSize(wxSize(-1,24));
     
-    m_scrollSpy = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxHSCROLL|wxVSCROLL);
-    m_scrollSpy->SetScrollRate(5, 5);
+    m_statusBar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_statusBar->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     
-    m_auimgrMain->AddPane(m_scrollSpy, wxAuiPaneInfo().Name(wxT("Spy")).Caption(_("CNC Spy")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(0).Position(0).BestSize(100,188).MinSize(100,188).MaxSize(10,800).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
-    
-    wxFlexGridSizer* flexGridSizer3805 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer3805->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3805->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3805->AddGrowableCol(0);
-    flexGridSizer3805->AddGrowableRow(0);
-    m_scrollSpy->SetSizer(flexGridSizer3805);
-    
-    m_spyNotebook = new wxNotebook(m_scrollSpy, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollSpy, wxSize(-1,-1)), wxBK_BOTTOM);
-    m_spyNotebook->SetName(wxT("m_spyNotebook"));
-    wxImageList* m_spyNotebook_il = new wxImageList(16, 16);
-    m_spyNotebook->AssignImageList(m_spyNotebook_il);
-    
-    flexGridSizer3805->Add(m_spyNotebook, 0, wxLEFT|wxRIGHT|wxBOTTOM|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_panel3809 = new wxPanel(m_spyNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_spyNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_panel3809ImgIndex;
-    m_panel3809ImgIndex = m_spyNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("meeting-organizer")));
-    m_spyNotebook->AddPage(m_panel3809, _("Serial Spy"), false, m_panel3809ImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer4488 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer4488->SetFlexibleDirection( wxBOTH );
-    flexGridSizer4488->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4488->AddGrowableCol(0);
-    flexGridSizer4488->AddGrowableCol(1);
-    flexGridSizer4488->AddGrowableRow(0);
-    m_panel3809->SetSizer(flexGridSizer4488);
-    
-    wxFlexGridSizer* flexGridSizer27261 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer27261->SetFlexibleDirection( wxBOTH );
-    flexGridSizer27261->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer27261->AddGrowableCol(1);
-    flexGridSizer27261->AddGrowableRow(0);
-    
-    flexGridSizer4488->Add(flexGridSizer27261, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer27302 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer27302->SetFlexibleDirection( wxBOTH );
-    flexGridSizer27302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer27261->Add(flexGridSizer27302, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_enableSerialSpy = new wxButton(m_panel3809, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel3809, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_enableSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxLEFT);
-    m_enableSerialSpy->SetBitmapMargins(2,2);
-    #endif
-    m_enableSerialSpy->SetToolTip(_("Enable Serial Spy"));
-    
-    flexGridSizer27302->Add(m_enableSerialSpy, 0, wxALL, WXC_FROM_DIP(0));
-    m_enableSerialSpy->SetMinSize(wxSize(24,24));
-    
-    m_MarkSerialSpy = new wxButton(m_panel3809, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel3809, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_MarkSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-find_and_replace")), wxLEFT);
-    m_MarkSerialSpy->SetBitmapMargins(2,2);
-    #endif
-    m_MarkSerialSpy->SetToolTip(_("Add a Marker"));
-    
-    flexGridSizer27302->Add(m_MarkSerialSpy, 0, wxALL, WXC_FROM_DIP(0));
-    m_MarkSerialSpy->SetMinSize(wxSize(24,24));
-    
-    m_clearSerialSpy = new wxButton(m_panel3809, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel3809, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_clearSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
-    m_clearSerialSpy->SetBitmapMargins(2,2);
-    #endif
-    m_clearSerialSpy->SetToolTip(_("Clear the Spy Trace"));
-    
-    flexGridSizer27302->Add(m_clearSerialSpy, 0, wxALL, WXC_FROM_DIP(0));
-    m_clearSerialSpy->SetMinSize(wxSize(24,24));
-    
-    m_clearSerialSpyOnConnect = new wxCheckBox(m_panel3809, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel3809, wxSize(-1,-1)), 0);
-    m_clearSerialSpyOnConnect->SetValue(true);
-    m_clearSerialSpyOnConnect->SetToolTip(_("Clear on Connect"));
-    
-    flexGridSizer27302->Add(m_clearSerialSpyOnConnect, 0, wxALL, WXC_FROM_DIP(6));
-    
-    wxFlexGridSizer* flexGridSizer27417 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer27417->SetFlexibleDirection( wxBOTH );
-    flexGridSizer27417->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer27417->AddGrowableCol(0);
-    flexGridSizer27417->AddGrowableRow(0);
-    
-    flexGridSizer27261->Add(flexGridSizer27417, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_splitter3821 = new wxSplitterWindow(m_panel3809, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel3809, wxSize(-1,-1)), wxSP_3D);
-    m_splitter3821->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    m_splitter3821->SetSashGravity(0.65);
-    m_splitter3821->SetMinimumPaneSize(10);
-    
-    flexGridSizer27417->Add(m_splitter3821, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_splitterPage3825 = new wxPanel(m_splitter3821, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter3821, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    
-    wxFlexGridSizer* flexGridSizer3833 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer3833->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3833->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3833->AddGrowableCol(0);
-    flexGridSizer3833->AddGrowableRow(0);
-    m_splitterPage3825->SetSizer(flexGridSizer3833);
-    
-    m_serialSpy = new wxTextCtrl(m_splitterPage3825, wxID_ANY, wxT("Only a placeholder;Dont install any events similar the drawPane3D"), wxDefaultPosition, wxDLG_UNIT(m_splitterPage3825, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
-    wxFont m_serialSpyFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_serialSpy->SetFont(m_serialSpyFont);
-    
-    flexGridSizer3833->Add(m_serialSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_splitterPage3829 = new wxPanel(m_splitter3821, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter3821, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_splitter3821->SplitHorizontally(m_splitterPage3825, m_splitterPage3829, 0);
-    
-    wxFlexGridSizer* flexGridSizer3831 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer3831->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3831->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3831->AddGrowableCol(0);
-    flexGridSizer3831->AddGrowableRow(0);
-    m_splitterPage3829->SetSizer(flexGridSizer3831);
-    
-    m_serialSpyDetails = new wxTextCtrl(m_splitterPage3829, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage3829, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE);
-    m_serialSpyDetails->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_serialSpyDetails->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    wxFont m_serialSpyDetailsFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_serialSpyDetails->SetFont(m_serialSpyDetailsFont);
-    
-    flexGridSizer3831->Add(m_serialSpyDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer4480 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer4480->SetFlexibleDirection( wxBOTH );
-    flexGridSizer4480->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4480->AddGrowableCol(1);
-    flexGridSizer4480->AddGrowableRow(0);
-    
-    flexGridSizer4488->Add(flexGridSizer4480, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer4485 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer4485->SetFlexibleDirection( wxBOTH );
-    flexGridSizer4485->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer4480->Add(flexGridSizer4485, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_bmpButton4487 = new wxBitmapButton(m_panel3809, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panel3809, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_bmpButton4487->SetToolTip(_("Clear Position Spy"));
-    
-    flexGridSizer4485->Add(m_bmpButton4487, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_positionSpy = new wxDataViewListCtrl(m_panel3809, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel3809, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_positionSpy->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    wxFont m_positionSpyFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_positionSpy->SetFont(m_positionSpyFont);
-    
-    flexGridSizer4480->Add(m_positionSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_positionSpy->AppendTextColumn(_("ID"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(50), wxALIGN_RIGHT);
-    m_positionSpy->AppendBitmapColumn(_("Mode"), m_positionSpy->GetColumnCount(), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(50), wxALIGN_RIGHT);
-    m_positionSpy->AppendTextColumn(_("X"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(60), wxALIGN_RIGHT);
-    m_positionSpy->AppendTextColumn(_("Y"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(60), wxALIGN_RIGHT);
-    m_positionSpy->AppendTextColumn(_("Z"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(60), wxALIGN_RIGHT);
-    m_positionSpy->AppendTextColumn(_("."), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_panel3811 = new wxPanel(m_spyNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_spyNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_panel3811ImgIndex;
-    m_panel3811ImgIndex = m_spyNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("bug (2)")));
-    m_spyNotebook->AddPage(m_panel3811, _("Debugger"), false, m_panel3811ImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer4438 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer4438->SetFlexibleDirection( wxBOTH );
-    flexGridSizer4438->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4438->AddGrowableCol(0);
-    flexGridSizer4438->AddGrowableRow(0);
-    m_panel3811->SetSizer(flexGridSizer4438);
-    
-    wxArrayString m_debuggerPropertyManagerGridArr;
-    wxUnusedVar(m_debuggerPropertyManagerGridArr);
-    wxArrayInt m_debuggerPropertyManagerGridIntArr;
-    wxUnusedVar(m_debuggerPropertyManagerGridIntArr);
-    m_debuggerPropertyManagerGrid = new wxPropertyGridManager(m_panel3811, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel3811, wxSize(-1,-1)), wxPG_TOOLBAR|wxPG_LIMITED_EDITING|wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED);
-    
-    flexGridSizer4438->Add(m_debuggerPropertyManagerGrid, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_debuggerPropertyManagerGrid->GetGrid()->SetSplitterLeft(true);
-    m_statusBar = new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,16)), wxBORDER_NONE);
-    m_statusBar->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
-    m_statusBar->SetScrollRate(5, 5);
-    
-    m_auimgrMain->AddPane(m_statusBar, wxAuiPaneInfo().Name(wxT("StatusBar")).Direction(wxAUI_DOCK_BOTTOM).Layer(2).Row(0).Position(0).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgrMain->AddPane(m_statusBar, wxAuiPaneInfo().Name(wxT("StatusBar")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(0).Position(0).BestSize(100,26).MinSize(100,26).MaxSize(100,26).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
     wxFlexGridSizer* flexGridSizer436 = new wxFlexGridSizer(1, 36, 0, 0);
     flexGridSizer436->SetFlexibleDirection( wxBOTH );
@@ -4512,7 +4264,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_svgUnitCalulator->SetFont(m_svgUnitCalulatorFont);
     
     m_auimgrMain->AddPane(m_svgUnitCalulator, wxAuiPaneInfo().Name(wxT("UnitCalculator")).Direction(wxAUI_DOCK_TOP).Layer(0).Row(1).Position(0).BestSize(100,24).MinSize(100,24).MaxSize(100,24).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(true).MinimizeButton(false).PinButton(true));
-    m_auimgrMain->Update();
     
     wxFlexGridSizer* flexGridSizer3251 = new wxFlexGridSizer(1, 7, 0, 0);
     flexGridSizer3251->SetFlexibleDirection( wxBOTH );
@@ -4607,6 +4358,152 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3251->Add(m_btUCClose, 0, wxALL, WXC_FROM_DIP(2));
     m_btUCClose->SetMinSize(wxSize(20,20));
     
+    m_serialSpyView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    m_auimgrMain->AddPane(m_serialSpyView, wxAuiPaneInfo().Name(wxT("SerialSpy")).Caption(_("CNC Serial Spy")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    
+    wxFlexGridSizer* flexGridSizer27261 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer27261->SetFlexibleDirection( wxBOTH );
+    flexGridSizer27261->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer27261->AddGrowableCol(0);
+    flexGridSizer27261->AddGrowableRow(1);
+    m_serialSpyView->SetSizer(flexGridSizer27261);
+    
+    wxFlexGridSizer* flexGridSizer27302 = new wxFlexGridSizer(1, 10, 0, 0);
+    flexGridSizer27302->SetFlexibleDirection( wxBOTH );
+    flexGridSizer27302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer27261->Add(flexGridSizer27302, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_enableSerialSpy = new wxButton(m_serialSpyView, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_enableSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxLEFT);
+    m_enableSerialSpy->SetBitmapMargins(2,2);
+    #endif
+    m_enableSerialSpy->SetToolTip(_("Enable Serial Spy"));
+    
+    flexGridSizer27302->Add(m_enableSerialSpy, 0, wxALL, WXC_FROM_DIP(0));
+    m_enableSerialSpy->SetMinSize(wxSize(24,24));
+    
+    m_MarkSerialSpy = new wxButton(m_serialSpyView, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_MarkSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("bookmark-new-list")), wxLEFT);
+    m_MarkSerialSpy->SetBitmapMargins(2,2);
+    #endif
+    m_MarkSerialSpy->SetToolTip(_("Add a Marker"));
+    
+    flexGridSizer27302->Add(m_MarkSerialSpy, 0, wxALL, WXC_FROM_DIP(0));
+    m_MarkSerialSpy->SetMinSize(wxSize(24,24));
+    
+    m_clearSerialSpy = new wxButton(m_serialSpyView, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_clearSerialSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_clearSerialSpy->SetBitmapMargins(2,2);
+    #endif
+    m_clearSerialSpy->SetToolTip(_("Clear the Spy Trace"));
+    
+    flexGridSizer27302->Add(m_clearSerialSpy, 0, wxALL, WXC_FROM_DIP(0));
+    m_clearSerialSpy->SetMinSize(wxSize(24,24));
+    
+    m_clearSerialSpyOnConnect = new wxCheckBox(m_serialSpyView, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(-1,-1)), 0);
+    m_clearSerialSpyOnConnect->SetValue(true);
+    m_clearSerialSpyOnConnect->SetToolTip(_("Clear on Connect"));
+    
+    flexGridSizer27302->Add(m_clearSerialSpyOnConnect, 0, wxALL, WXC_FROM_DIP(6));
+    
+    wxFlexGridSizer* flexGridSizer3833 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer3833->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3833->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3833->AddGrowableCol(0);
+    flexGridSizer3833->AddGrowableRow(0);
+    
+    flexGridSizer27261->Add(flexGridSizer3833, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_serialSpy = new wxTextCtrl(m_serialSpyView, wxID_ANY, wxT("Only a placeholder;Dont install any events similar the drawPane3D"), wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
+    wxFont m_serialSpyFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_serialSpy->SetFont(m_serialSpyFont);
+    
+    flexGridSizer3833->Add(m_serialSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_serialSpyDetails = new wxTextCtrl(m_serialSpyView, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_serialSpyView, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE);
+    m_serialSpyDetails->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_serialSpyDetails->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_serialSpyDetailsFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_serialSpyDetails->SetFont(m_serialSpyDetailsFont);
+    
+    flexGridSizer3833->Add(m_serialSpyDetails, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_debuggerView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    m_auimgrMain->AddPane(m_debuggerView, wxAuiPaneInfo().Name(wxT("Debugger")).Caption(_("CNC Debugger")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    
+    wxFlexGridSizer* flexGridSizer4502 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer4502->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4502->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4502->AddGrowableCol(0);
+    flexGridSizer4502->AddGrowableRow(0);
+    m_debuggerView->SetSizer(flexGridSizer4502);
+    
+    wxArrayString m_debuggerPropertyManagerGridArr;
+    wxUnusedVar(m_debuggerPropertyManagerGridArr);
+    wxArrayInt m_debuggerPropertyManagerGridIntArr;
+    wxUnusedVar(m_debuggerPropertyManagerGridIntArr);
+    m_debuggerPropertyManagerGrid = new wxPropertyGridManager(m_debuggerView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_debuggerView, wxSize(-1,-1)), wxPG_TOOLBAR|wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED);
+    
+    flexGridSizer4502->Add(m_debuggerPropertyManagerGrid, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_positionMonitorView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(284,400)), wxTAB_TRAVERSAL);
+    
+    m_auimgrMain->AddPane(m_positionMonitorView, wxAuiPaneInfo().Name(wxT("PositionMonitor")).Caption(_("CNC Position Monitor")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(284,140).MinSize(284,140).MaxSize(284,140).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->Update();
+    
+    wxFlexGridSizer* flexGridSizer4480 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer4480->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4480->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4480->AddGrowableCol(0);
+    flexGridSizer4480->AddGrowableRow(1);
+    m_positionMonitorView->SetSizer(flexGridSizer4480);
+    
+    wxFlexGridSizer* flexGridSizer4485 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer4485->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4485->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4485->AddGrowableCol(1);
+    flexGridSizer4485->AddGrowableRow(0);
+    
+    flexGridSizer4480->Add(flexGridSizer4485, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_bmpButton4487 = new wxBitmapButton(m_positionMonitorView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_bmpButton4487->SetToolTip(_("Clear Position Spy"));
+    
+    flexGridSizer4485->Add(m_bmpButton4487, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer4524 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer4524->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4524->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4524->AddGrowableCol(0);
+    flexGridSizer4524->AddGrowableRow(0);
+    
+    flexGridSizer4485->Add(flexGridSizer4524, 1, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_staticText4526 = new wxStaticText(m_positionMonitorView, wxID_ANY, _("(lightly async)"), wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), 0);
+    wxFont m_staticText4526Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText4526->SetFont(m_staticText4526Font);
+    
+    flexGridSizer4524->Add(m_staticText4526, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    
+    m_positionSpy = new wxDataViewListCtrl(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
+    m_positionSpy->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    wxFont m_positionSpyFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_positionSpy->SetFont(m_positionSpyFont);
+    
+    flexGridSizer4480->Add(m_positionSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_positionSpy->AppendTextColumn(_("Ref"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(50), wxALIGN_RIGHT);
+    m_positionSpy->AppendTextColumn(_("#"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(24), wxALIGN_CENTER);
+    m_positionSpy->AppendTextColumn(_("X"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(60), wxALIGN_RIGHT);
+    m_positionSpy->AppendTextColumn(_("Y"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(60), wxALIGN_RIGHT);
+    m_positionSpy->AppendTextColumn(_("Z"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(60), wxALIGN_RIGHT);
+    m_positionSpy->AppendTextColumn(_("."), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_menuBar = new wxMenuBar(wxMB_DOCKABLE);
     this->SetMenuBar(m_menuBar);
     
@@ -4614,81 +4511,120 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuBar->Append(m_menuFile, _("&File"));
     
     m_miNewTemplate = new wxMenuItem(m_menuFile, wxID_ANY, _("New Template"), wxT(""), wxITEM_NORMAL);
+    m_miNewTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-new-3")));
     m_menuFile->Append(m_miNewTemplate);
     
     m_miOpenTemplate = new wxMenuItem(m_menuFile, wxID_ANY, _("Open Template"), wxT(""), wxITEM_NORMAL);
+    m_miOpenTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-open-5")));
     m_menuFile->Append(m_miOpenTemplate);
     
     m_miReloadTemplate = new wxMenuItem(m_menuFile, wxID_ANY, _("Reload Template"), wxT(""), wxITEM_NORMAL);
+    m_miReloadTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_reload")));
     m_menuFile->Append(m_miReloadTemplate);
     
     m_miSaveTemplate = new wxMenuItem(m_menuFile, wxID_ANY, _("Save Template"), wxT(""), wxITEM_NORMAL);
+    m_miSaveTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-6")));
     m_menuFile->Append(m_miSaveTemplate);
     
     m_miSaveTemplateAs = new wxMenuItem(m_menuFile, wxID_ANY, _("Save Template as"), wxT(""), wxITEM_NORMAL);
+    m_miSaveTemplateAs->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-as (2)")));
     m_menuFile->Append(m_miSaveTemplateAs);
     
     m_miSaveEmuOutput = new wxMenuItem(m_menuFile, wxID_ANY, _("Save Emulator Output as Template"), wxT(""), wxITEM_NORMAL);
+    m_miSaveEmuOutput->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-export")));
     m_menuFile->Append(m_miSaveEmuOutput);
     
     m_menuFile->AppendSeparator();
     
-    m_miReinit = new wxMenuItem(m_menuFile, wxID_ANY, _("Re-Initialize controller from INI File"), wxT(""), wxITEM_NORMAL);
-    m_menuFile->Append(m_miReinit);
-    
-    m_menuFile->AppendSeparator();
-    
     m_miExit = new wxMenuItem(m_menuFile, wxID_ANY, _("Exit"), wxT(""), wxITEM_NORMAL);
+    m_miExit->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("application-exit-4")));
     m_menuFile->Append(m_miExit);
     
     m_menuView = new wxMenu();
     m_menuBar->Append(m_menuView, _("View"));
     
-    m_miPerspectiveDefault = new wxMenuItem(m_menuView, wxID_ANY, _("Perspective - Default"), wxT(""), wxITEM_NORMAL);
-    m_menuView->Append(m_miPerspectiveDefault);
-    
-    m_miPerspectiveRun = new wxMenuItem(m_menuView, wxID_ANY, _("Perspective - Run"), wxT(""), wxITEM_NORMAL);
-    m_menuView->Append(m_miPerspectiveRun);
-    
-    m_miPerspectiveTemplate = new wxMenuItem(m_menuView, wxID_ANY, _("Perspective - Template"), wxT(""), wxITEM_NORMAL);
-    m_menuView->Append(m_miPerspectiveTemplate);
-    
-    m_menuView->AppendSeparator();
-    
     m_miToolbar = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Toolbar"), wxT(""), wxITEM_CHECK);
+    m_miToolbar->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miToolbar);
     
     m_miViewStatusbar = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Statusbar"), wxT(""), wxITEM_CHECK);
+    m_miViewStatusbar->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewStatusbar);
     
-    m_miViewMainView = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Main View"), wxT(""), wxITEM_CHECK);
-    m_menuView->Append(m_miViewMainView);
-    
     m_miViewTemplateManager = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Template Manager"), wxT(""), wxITEM_CHECK);
+    m_miViewTemplateManager->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewTemplateManager);
     
-    m_miViewLogger = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Logger"), wxT(""), wxITEM_CHECK);
-    m_menuView->Append(m_miViewLogger);
+    m_miViewMainView = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Source View"), wxT(""), wxITEM_CHECK);
+    m_miViewMainView->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
+    m_menuView->Append(m_miViewMainView);
     
-    m_miViewMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Monitor"), wxT(""), wxITEM_CHECK);
+    m_miViewMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Motion Monitor"), wxT(""), wxITEM_CHECK);
+    m_miViewMonitor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewMonitor);
     
-    m_miViewSpy = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Spy"), wxT(""), wxITEM_CHECK);
+    m_miViewPosMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Position Monitor"), wxT(""), wxITEM_CHECK);
+    m_miViewPosMonitor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
+    m_menuView->Append(m_miViewPosMonitor);
+    
+    m_miViewDebugger = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Debugger"), wxT(""), wxITEM_CHECK);
+    m_miViewDebugger->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
+    m_menuView->Append(m_miViewDebugger);
+    
+    m_miViewSpy = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Serial Spy"), wxT(""), wxITEM_CHECK);
+    m_miViewSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewSpy);
     
-    m_miViewSpeed = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Speed Config"), wxT(""), wxITEM_CHECK);
+    m_miViewLogger = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Logger"), wxT(""), wxITEM_CHECK);
+    m_miViewLogger->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
+    m_menuView->Append(m_miViewLogger);
+    
+    m_miViewSpeed = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Speed View"), wxT(""), wxITEM_CHECK);
+    m_miViewSpeed->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewSpeed);
     
-    m_miViewUnitCalculator = new wxMenuItem(m_menuView, wxID_ANY, _("SVG UnitCaluclator"), wxT(""), wxITEM_CHECK);
+    m_miViewUnitCalculator = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Unit Caluclator"), wxT(""), wxITEM_CHECK);
+    m_miViewUnitCalculator->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewUnitCalculator);
     
     m_menuView->AppendSeparator();
     
     m_miViewAll = new wxMenuItem(m_menuView, wxID_ANY, _("View all Panes"), wxT(""), wxITEM_NORMAL);
+    m_miViewAll->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose-3")));
     m_menuView->Append(m_miViewAll);
     
     m_miHideAll = new wxMenuItem(m_menuView, wxID_ANY, _("Hide all Panes"), wxT(""), wxITEM_NORMAL);
+    m_miHideAll->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-close")));
     m_menuView->Append(m_miHideAll);
+    
+    m_menuPerspective = new wxMenu();
+    m_menuBar->Append(m_menuPerspective, _("Perspective"));
+    
+    m_miPerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - Run"), wxT(""), wxITEM_NORMAL);
+    m_miPerspectiveRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
+    m_menuPerspective->Append(m_miPerspectiveRun);
+    
+    m_miPerspectiveDebug = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - Debug"), wxT(""), wxITEM_NORMAL);
+    m_miPerspectiveDebug->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
+    m_menuPerspective->Append(m_miPerspectiveDebug);
+    
+    m_miPerspectiveSource = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - Source"), wxT(""), wxITEM_NORMAL);
+    m_miPerspectiveSource->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
+    m_menuPerspective->Append(m_miPerspectiveSource);
+    
+    m_menuPerspective->AppendSeparator();
+    
+    m_menuSavePerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective - Run"), wxT(""), wxITEM_NORMAL);
+    m_menuSavePerspectiveRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
+    m_menuPerspective->Append(m_menuSavePerspectiveRun);
+    
+    m_menuSavePerspectiveDebug = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective - Debug"), wxT(""), wxITEM_NORMAL);
+    m_menuSavePerspectiveDebug->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
+    m_menuPerspective->Append(m_menuSavePerspectiveDebug);
+    
+    m_menuSavePerspectiveSource = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective - Source"), wxT(""), wxITEM_NORMAL);
+    m_menuSavePerspectiveSource->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
+    m_menuPerspective->Append(m_menuSavePerspectiveSource);
     
     m_menuMonitoring = new wxMenu();
     m_menuBar->Append(m_menuMonitoring, _("Monitoring"));
@@ -4776,44 +4712,55 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuBar->Append(m_menuTools, _("Tools"));
     
     m_miPathGenerator = new wxMenuItem(m_menuTools, wxID_ANY, _("SVG Path Generator"), wxT(""), wxITEM_NORMAL);
+    m_miPathGenerator->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
     m_menuTools->Append(m_miPathGenerator);
     
     m_miIniFile = new wxMenuItem(m_menuTools, wxID_ANY, _("Configuration File"), wxT(""), wxITEM_NORMAL);
+    m_miIniFile->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
     m_menuTools->Append(m_miIniFile);
     
     m_miExternalEditor = new wxMenuItem(m_menuTools, wxID_ANY, _("External Editor"), wxT(""), wxITEM_NORMAL);
+    m_miExternalEditor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
     m_menuTools->Append(m_miExternalEditor);
     
     m_miCalculator = new wxMenuItem(m_menuTools, wxID_ANY, _("Calculator"), wxT(""), wxITEM_NORMAL);
+    m_miCalculator->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
     m_menuTools->Append(m_miCalculator);
     
     m_miPyCam = new wxMenuItem(m_menuTools, wxID_ANY, _("PyCAM"), wxT(""), wxITEM_NORMAL);
+    m_miPyCam->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("executable")));
     m_menuTools->Append(m_miPyCam);
     
     m_menuTest = new wxMenu();
     m_menuBar->Append(m_menuTest, _("Test"));
     
     m_miUnitTestFramework = new wxMenuItem(m_menuTest, wxID_ANY, _("Unit Test Framework . . ."), wxT(""), wxITEM_NORMAL);
+    m_miUnitTestFramework->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")));
     m_menuTest->Append(m_miUnitTestFramework);
     
     m_menuTest->AppendSeparator();
     
     m_miTest1 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 1"), wxT(""), wxITEM_NORMAL);
+    m_miTest1->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest1);
     
     m_miTest2 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 2"), wxT(""), wxITEM_NORMAL);
+    m_miTest2->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest2);
     
     m_miTest3 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 3"), wxT(""), wxITEM_NORMAL);
+    m_miTest3->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest3);
     
     m_miTest4 = new wxMenuItem(m_menuTest, wxID_ANY, _("Test Function 4"), wxT(""), wxITEM_NORMAL);
+    m_miTest4->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("software-update-inactive (2)")));
     m_menuTest->Append(m_miTest4);
     
     m_menuAbout = new wxMenu();
     m_menuBar->Append(m_menuAbout, _("Help"));
     
     m_menuItem309 = new wxMenuItem(m_menuAbout, wxID_ANY, _("About"), wxT(""), wxITEM_NORMAL);
+    m_menuItem309->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("help-about")));
     m_menuAbout->Append(m_menuItem309);
     
     m_startupTimer = new wxTimer;
@@ -4887,14 +4834,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     }
     #endif
     
-    #if wxVERSION_NUMBER >= 2900
-    if(!wxPersistenceManager::Get().Find(m_spyNotebook)){
-        wxPersistenceManager::Get().RegisterAndRestore(m_spyNotebook);
-    } else {
-        wxPersistenceManager::Get().Restore(m_spyNotebook);
-    }
-    #endif
-    
     SetName(wxT("MainFrameBClass"));
     SetSize(1000,700);
     if (GetSizer()) {
@@ -4918,6 +4857,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auimgrMain->Connect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_RENDER, wxAuiManagerEventHandler(MainFrameBClass::renderAuiPane), NULL, this);
+    m_bmpButton4490->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateManager), NULL, this);
     m_searchConnections->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
@@ -5099,10 +5039,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_tmpTraceInfo->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
-    m_enableSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
-    m_MarkSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
-    m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
-    m_bmpButton4487->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     m_cmdDuration->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickDurationCount), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_xMinLimit->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::requestCurrentLimitStateIcon), NULL, this);
@@ -5115,28 +5051,36 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cbUCUnitTo->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
     m_cbUCValueFrom->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);
     m_btUCClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
+    m_enableSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
+    m_MarkSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
+    m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
+    m_bmpButton4487->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     this->Connect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Connect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Connect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);
     this->Connect(m_miSaveTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveTemplate), NULL, this);
     this->Connect(m_miSaveTemplateAs->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveTemplateAs), NULL, this);
     this->Connect(m_miSaveEmuOutput->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveEmuOutput), NULL, this);
-    this->Connect(m_miReinit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reinit), NULL, this);
     this->Connect(m_miExit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnExit), NULL, this);
-    this->Connect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveDefault), NULL, this);
-    this->Connect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveRun), NULL, this);
-    this->Connect(m_miPerspectiveTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveTemplate), NULL, this);
     this->Connect(m_miToolbar->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewToolbar), NULL, this);
     this->Connect(m_miViewStatusbar->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewStatusbar), NULL, this);
-    this->Connect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Connect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
-    this->Connect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);
+    this->Connect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Connect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
+    this->Connect(m_miViewPosMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewPosistionMonitor), NULL, this);
+    this->Connect(m_miViewDebugger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewDebugger), NULL, this);
     this->Connect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
+    this->Connect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);
     this->Connect(m_miViewSpeed->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpeed), NULL, this);
     this->Connect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Connect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Connect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
+    this->Connect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveRun), NULL, this);
+    this->Connect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveDebug), NULL, this);
+    this->Connect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveSource), NULL, this);
+    this->Connect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveRun), NULL, this);
+    this->Connect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveDebug), NULL, this);
+    this->Connect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveSource), NULL, this);
     this->Connect(m_menuItemUpdCoors->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineUpdateCoordinates), NULL, this);
     this->Connect(m_menuItemUpdDraw->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineOnlineDrawing), NULL, this);
     this->Connect(m_menuItemAllowEvents->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineAllowEvents), NULL, this);
@@ -5179,6 +5123,7 @@ MainFrameBClass::~MainFrameBClass()
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_RENDER, wxAuiManagerEventHandler(MainFrameBClass::renderAuiPane), NULL, this);
+    m_bmpButton4490->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateManager), NULL, this);
     m_searchConnections->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
@@ -5360,10 +5305,6 @@ MainFrameBClass::~MainFrameBClass()
     m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
-    m_enableSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
-    m_MarkSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
-    m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
-    m_bmpButton4487->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     m_cmdDuration->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickDurationCount), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_xMinLimit->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::requestCurrentLimitStateIcon), NULL, this);
@@ -5376,28 +5317,36 @@ MainFrameBClass::~MainFrameBClass()
     m_cbUCUnitTo->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
     m_cbUCValueFrom->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);
     m_btUCClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
+    m_enableSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
+    m_MarkSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
+    m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
+    m_bmpButton4487->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     this->Disconnect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Disconnect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Disconnect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);
     this->Disconnect(m_miSaveTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveTemplate), NULL, this);
     this->Disconnect(m_miSaveTemplateAs->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveTemplateAs), NULL, this);
     this->Disconnect(m_miSaveEmuOutput->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::saveEmuOutput), NULL, this);
-    this->Disconnect(m_miReinit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reinit), NULL, this);
     this->Disconnect(m_miExit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnExit), NULL, this);
-    this->Disconnect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveDefault), NULL, this);
-    this->Disconnect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveRun), NULL, this);
-    this->Disconnect(m_miPerspectiveTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::perspectiveTemplate), NULL, this);
     this->Disconnect(m_miToolbar->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewToolbar), NULL, this);
     this->Disconnect(m_miViewStatusbar->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewStatusbar), NULL, this);
-    this->Disconnect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Disconnect(m_miViewTemplateManager->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewTemplateManager), NULL, this);
-    this->Disconnect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);
+    this->Disconnect(m_miViewMainView->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMainView), NULL, this);
     this->Disconnect(m_miViewMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewMonitor), NULL, this);
+    this->Disconnect(m_miViewPosMonitor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewPosistionMonitor), NULL, this);
+    this->Disconnect(m_miViewDebugger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewDebugger), NULL, this);
     this->Disconnect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
+    this->Disconnect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);
     this->Disconnect(m_miViewSpeed->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpeed), NULL, this);
     this->Disconnect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Disconnect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Disconnect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
+    this->Disconnect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveRun), NULL, this);
+    this->Disconnect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveDebug), NULL, this);
+    this->Disconnect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveSource), NULL, this);
+    this->Disconnect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveRun), NULL, this);
+    this->Disconnect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveDebug), NULL, this);
+    this->Disconnect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveSource), NULL, this);
     this->Disconnect(m_menuItemUpdCoors->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineUpdateCoordinates), NULL, this);
     this->Disconnect(m_menuItemUpdDraw->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineOnlineDrawing), NULL, this);
     this->Disconnect(m_menuItemAllowEvents->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineAllowEvents), NULL, this);
@@ -8258,5 +8207,87 @@ ImageLibDebugger::ImageLibDebugger()
 }
 
 ImageLibDebugger::~ImageLibDebugger()
+{
+}
+
+ImageLibConfig::ImageLibConfig()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SPEED_CFG"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SPEED_CFG"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_ENV_CFG"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_ENV_CFG"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SVG_CFG"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SVG_CFG"), bmp));
+        }
+    }
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SVG_CFG@2x"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SVG_CFG@2x"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_GCODE_CFG"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_GCODE_CFG"), bmp));
+        }
+    }
+    
+}
+
+ImageLibConfig::~ImageLibConfig()
 {
 }

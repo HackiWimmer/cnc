@@ -3,6 +3,7 @@
 #include "3D/GLContextCncPath.h"
 #include "3D/GLContextTestCube.h"
 #include "GL3DOptions.h"
+#include "CncConfig.h"
 #include "CncCommon.h"
 #include "CncMotionMonitor.h"
 
@@ -63,7 +64,6 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
 , zoom(2.0f)
-, localCncConfig()
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
@@ -87,15 +87,6 @@ CncMotionMonitor::~CncMotionMonitor() {
 
 	if ( optionDlg != NULL ) 
 		delete optionDlg;
-}
-//////////////////////////////////////////////////
-void CncMotionMonitor::setCncConfig(const CncConfig& config) {
-//////////////////////////////////////////////////
-	// create a local copy of the given configuration
-	// this function has to be called every time
-	// a new configuartion is created
-	
-	localCncConfig = config;
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::clear() {
@@ -137,9 +128,9 @@ void CncMotionMonitor::appendVertice(const GLI::VerticeLongData& vd) {
 	// to a common unit like [mm], because [steps] are depends on 
 	// the corresponding pitch which is configured for each axis separatly 
 	
-	float x = vd.getX() / localCncConfig.getDispFactX3D(); 
-	float y = vd.getY() / localCncConfig.getDispFactY3D();
-	float z = vd.getZ() / localCncConfig.getDispFactZ3D();
+	float x = vd.getX() / CncConfig::getGlobalCncConfig()->getDispFactX3D(); 
+	float y = vd.getY() / CncConfig::getGlobalCncConfig()->getDispFactY3D();
+	float z = vd.getZ() / CncConfig::getGlobalCncConfig()->getDispFactZ3D();
 	
 	appendVertice(x, y, z, vd.getMode());
 }

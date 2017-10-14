@@ -7,7 +7,6 @@
 #include "3D/GLCncPathData.h"
 #include "3D/GLHelperModel.h"
 #include "3D/GLHelperCamera.h"
-#include "CncConfig.h"
 
 #ifdef _USE_WX_DUMMY_CANVAS 
 	#include "wxDummyCanvas.h"
@@ -156,8 +155,8 @@ class GLContextBase : public wxGLContext {
 	private:
 	
 		void determineViewPortBounderies();
-		
-		void drawCone();
+		void drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);
+
 };
 
 #endif

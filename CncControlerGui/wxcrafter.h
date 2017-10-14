@@ -20,10 +20,10 @@
 #include <wx/aui/auibar.h>
 #include <map>
 #include <wx/menu.h>
-#include <wx/stattext.h>
 #include <wx/bmpbuttn.h>
-#include <wx/bmpcbox.h>
 #include <wx/toolbar.h>
+#include <wx/stattext.h>
+#include <wx/bmpcbox.h>
 #include <wx/slider.h>
 #include <wx/button.h>
 #include <wx/panel.h>
@@ -41,8 +41,6 @@
 #include <wx/dataview.h>
 #include <wx/listbook.h>
 #include <wx/propgrid/manager.h>
-#include <wx/propgrid/property.h>
-#include <wx/propgrid/advprops.h>
 #include <wx/spinbutt.h>
 #include <wx/checkbox.h>
 #include <wx/radiobox.h>
@@ -54,10 +52,12 @@
 #include <wx/webview.h>
 #include "CncSpeedView.h"
 #include <wx/listctrl.h>
-#include <wx/splitter.h>
 #include <wx/timer.h>
+#include <wx/splitter.h>
 #include <wx/treectrl.h>
 #include <wx/toolbook.h>
+#include <wx/propgrid/property.h>
+#include <wx/propgrid/advprops.h>
 #include <wx/collpane.h>
 #include <wx/dialog.h>
 #include <wx/bitmap.h>
@@ -85,6 +85,7 @@ protected:
     wxAuiManager* m_auimgrMain;
     wxAuiToolBar* m_auibarMain;
     std::map<int, wxMenu*> m_dropdownMenus;
+    wxBitmapButton* m_bmpButton4490;
     wxStaticText* m_staticText1842;
     wxBitmapButton* m_searchConnections;
     wxBitmapComboBox* m_portSelector;
@@ -150,31 +151,6 @@ protected:
     wxListbook* m_listbook2220;
     wxPanel* m_setupConfigPage;
     wxPropertyGridManager* m_pgMgrSetup;
-    wxPGProperty* m_pgCatWorking;
-    wxPGProperty* m_pgProp3746;
-    wxPGProperty* m_pgProp3748;
-    wxPGProperty* m_pgCatSpeed;
-    wxPGProperty* m_pgPropPredefSpeedConfig;
-    wxPGProperty* m_pgCatXYSpeed;
-    wxPGProperty* m_pgPropMaxSpeedXY;
-    wxPGProperty* m_pgPropDefWorkSpeedXY;
-    wxPGProperty* m_pgPropDefRapidSpeedXY;
-    wxPGProperty* m_pgPropDefSpeedModeXY;
-    wxPGProperty* m_pgCatZSpeed;
-    wxPGProperty* m_pgPropMaxSpeedZ;
-    wxPGProperty* m_pgPropDefWorkSpeedZ;
-    wxPGProperty* m_pgPropDefRapidSpeedZ;
-    wxPGProperty* m_pgPropDefSpeedModeZ;
-    wxPGProperty* m_pgCatDimension;
-    wxPGProperty* m_pgPropMaxDimX;
-    wxPGProperty* m_pgPropMaxDimY;
-    wxPGProperty* m_pgPropMaxDimZ;
-    wxPGProperty* m_pgCatSvg;
-    wxPGProperty* m_pgCatGCode;
-    wxPGProperty* m_pgCatApplication;
-    wxPGProperty* m_pgPropRunConfirmationMode;
-    wxPGProperty* m_pgProp3750;
-    wxPGProperty* m_pgProp3752;
     wxPanel* m_setupEnvPage;
     wxStaticText* m_staticText1880;
     wxStaticLine* m_staticLine2226;
@@ -550,30 +526,14 @@ protected:
     wxListCtrl* m_lruList;
     wxStaticLine* m_staticLine4345;
     wxPanel* m_mainFileViewPlaceholder;
-    wxScrolledWindow* m_scrollWinLogger;
+    wxPanel* m_scrollWinLogger;
     wxBitmapButton* m_clearLogger;
     wxBitmapButton* m_freezeLogger;
     wxBitmapButton* m_copyLogger;
     wxCheckBox* m_showLoggerOnDemand;
     wxTextCtrl* m_logger;
     wxTextCtrl* m_tmpTraceInfo;
-    wxScrolledWindow* m_scrollSpy;
-    wxNotebook* m_spyNotebook;
-    wxPanel* m_panel3809;
-    wxButton* m_enableSerialSpy;
-    wxButton* m_MarkSerialSpy;
-    wxButton* m_clearSerialSpy;
-    wxCheckBox* m_clearSerialSpyOnConnect;
-    wxSplitterWindow* m_splitter3821;
-    wxPanel* m_splitterPage3825;
-    wxTextCtrl* m_serialSpy;
-    wxPanel* m_splitterPage3829;
-    wxTextCtrl* m_serialSpyDetails;
-    wxBitmapButton* m_bmpButton4487;
-    wxDataViewListCtrl* m_positionSpy;
-    wxPanel* m_panel3811;
-    wxPropertyGridManager* m_debuggerPropertyManagerGrid;
-    wxScrolledWindow* m_statusBar;
+    wxPanel* m_statusBar;
     wxStaticText* m_staticText3952;
     wxTextCtrl* m_cmdCount;
     wxStaticText* m_staticText395;
@@ -615,6 +575,19 @@ protected:
     wxTextCtrl* m_cbUCValueFrom;
     wxTextCtrl* m_cbUCValueTo;
     wxButton* m_btUCClose;
+    wxPanel* m_serialSpyView;
+    wxButton* m_enableSerialSpy;
+    wxButton* m_MarkSerialSpy;
+    wxButton* m_clearSerialSpy;
+    wxCheckBox* m_clearSerialSpyOnConnect;
+    wxTextCtrl* m_serialSpy;
+    wxTextCtrl* m_serialSpyDetails;
+    wxPanel* m_debuggerView;
+    wxPropertyGridManager* m_debuggerPropertyManagerGrid;
+    wxPanel* m_positionMonitorView;
+    wxBitmapButton* m_bmpButton4487;
+    wxStaticText* m_staticText4526;
+    wxDataViewListCtrl* m_positionSpy;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
     wxMenuItem* m_miNewTemplate;
@@ -624,26 +597,30 @@ protected:
     wxMenuItem* m_miSaveTemplateAs;
     wxMenuItem* m_miSaveEmuOutput;
     wxMenuItem* m_sep20;
-    wxMenuItem* m_miReinit;
-    wxMenuItem* m_sep201;
     wxMenuItem* m_miExit;
     wxMenu* m_menuView;
-    wxMenuItem* m_miPerspectiveDefault;
-    wxMenuItem* m_miPerspectiveRun;
-    wxMenuItem* m_miPerspectiveTemplate;
-    wxMenuItem* m_menuItem2771;
     wxMenuItem* m_miToolbar;
     wxMenuItem* m_miViewStatusbar;
-    wxMenuItem* m_miViewMainView;
     wxMenuItem* m_miViewTemplateManager;
-    wxMenuItem* m_miViewLogger;
+    wxMenuItem* m_miViewMainView;
     wxMenuItem* m_miViewMonitor;
+    wxMenuItem* m_miViewPosMonitor;
+    wxMenuItem* m_miViewDebugger;
     wxMenuItem* m_miViewSpy;
+    wxMenuItem* m_miViewLogger;
     wxMenuItem* m_miViewSpeed;
     wxMenuItem* m_miViewUnitCalculator;
     wxMenuItem* m_menuItem1665;
     wxMenuItem* m_miViewAll;
     wxMenuItem* m_miHideAll;
+    wxMenu* m_menuPerspective;
+    wxMenuItem* m_miPerspectiveRun;
+    wxMenuItem* m_miPerspectiveDebug;
+    wxMenuItem* m_miPerspectiveSource;
+    wxMenuItem* m_menuItem2771;
+    wxMenuItem* m_menuSavePerspectiveRun;
+    wxMenuItem* m_menuSavePerspectiveDebug;
+    wxMenuItem* m_menuSavePerspectiveSource;
     wxMenu* m_menuMonitoring;
     wxMenuItem* m_menuItemUpdCoors;
     wxMenuItem* m_menuItemUpdDraw;
@@ -696,6 +673,7 @@ protected:
     virtual void maximizeAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void restoreAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void renderAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
+    virtual void toggleTemplateManager(wxCommandEvent& event) { event.Skip(); }
     virtual void searchAvailiablePorts(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
@@ -870,10 +848,6 @@ protected:
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
-    virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
@@ -881,28 +855,36 @@ protected:
     virtual void selectUCUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCChangeFrom(wxCommandEvent& event) { event.Skip(); }
     virtual void closeUnitCalculator(wxCommandEvent& event) { event.Skip(); }
+    virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplateAs(wxCommandEvent& event) { event.Skip(); }
     virtual void saveEmuOutput(wxCommandEvent& event) { event.Skip(); }
-    virtual void reinit(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
-    virtual void perspectiveDefault(wxCommandEvent& event) { event.Skip(); }
-    virtual void perspectiveRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void perspectiveTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void viewToolbar(wxCommandEvent& event) { event.Skip(); }
     virtual void viewStatusbar(wxCommandEvent& event) { event.Skip(); }
-    virtual void viewMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void viewTemplateManager(wxCommandEvent& event) { event.Skip(); }
-    virtual void viewLogger(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewPosistionMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewDebugger(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpeed(wxCommandEvent& event) { event.Skip(); }
     virtual void viewUnitCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void viewAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
     virtual void hideAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
+    virtual void loadPerspectiveRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void loadPerspectiveDebug(wxCommandEvent& event) { event.Skip(); }
+    virtual void loadPerspectiveSource(wxCommandEvent& event) { event.Skip(); }
+    virtual void savePerspectiveRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void savePerspectiveDebug(wxCommandEvent& event) { event.Skip(); }
+    virtual void savePerspectiveSource(wxCommandEvent& event) { event.Skip(); }
     virtual void defineUpdateCoordinates(wxCommandEvent& event) { event.Skip(); }
     virtual void defineOnlineDrawing(wxCommandEvent& event) { event.Skip(); }
     virtual void defineAllowEvents(wxCommandEvent& event) { event.Skip(); }
@@ -935,6 +917,7 @@ protected:
     virtual void traceTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
+    wxBitmapButton* GetBmpButton4490() { return m_bmpButton4490; }
     wxStaticText* GetStaticText1842() { return m_staticText1842; }
     wxBitmapButton* GetSearchConnections() { return m_searchConnections; }
     wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
@@ -1376,23 +1359,7 @@ public:
     wxCheckBox* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
     wxTextCtrl* GetLogger() { return m_logger; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
-    wxScrolledWindow* GetScrollWinLogger() { return m_scrollWinLogger; }
-    wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
-    wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
-    wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
-    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
-    wxTextCtrl* GetSerialSpy() { return m_serialSpy; }
-    wxPanel* GetSplitterPage3825() { return m_splitterPage3825; }
-    wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
-    wxPanel* GetSplitterPage3829() { return m_splitterPage3829; }
-    wxSplitterWindow* GetSplitter3821() { return m_splitter3821; }
-    wxBitmapButton* GetBmpButton4487() { return m_bmpButton4487; }
-    wxDataViewListCtrl* GetPositionSpy() { return m_positionSpy; }
-    wxPanel* GetPanel3809() { return m_panel3809; }
-    wxPropertyGridManager* GetDebuggerPropertyManagerGrid() { return m_debuggerPropertyManagerGrid; }
-    wxPanel* GetPanel3811() { return m_panel3811; }
-    wxNotebook* GetSpyNotebook() { return m_spyNotebook; }
-    wxScrolledWindow* GetScrollSpy() { return m_scrollSpy; }
+    wxPanel* GetScrollWinLogger() { return m_scrollWinLogger; }
     wxStaticText* GetStaticText3952() { return m_staticText3952; }
     wxTextCtrl* GetCmdCount() { return m_cmdCount; }
     wxStaticText* GetStaticText395() { return m_staticText395; }
@@ -1426,7 +1393,7 @@ public:
     wxStaticBitmap* GetRefPosTrafficLight() { return m_refPosTrafficLight; }
     wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
     wxStaticBitmap* GetUpdateManagerUpdate() { return m_updateManagerUpdate; }
-    wxScrolledWindow* GetStatusBar() { return m_statusBar; }
+    wxPanel* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }
     wxComboBox* GetCbUCUnitFrom() { return m_cbUCUnitFrom; }
     wxStaticText* GetStaticText3259() { return m_staticText3259; }
@@ -1435,6 +1402,19 @@ public:
     wxTextCtrl* GetCbUCValueTo() { return m_cbUCValueTo; }
     wxButton* GetBtUCClose() { return m_btUCClose; }
     wxPanel* GetSvgUnitCalulator() { return m_svgUnitCalulator; }
+    wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
+    wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
+    wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
+    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
+    wxTextCtrl* GetSerialSpy() { return m_serialSpy; }
+    wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
+    wxPanel* GetSerialSpyView() { return m_serialSpyView; }
+    wxPropertyGridManager* GetDebuggerPropertyManagerGrid() { return m_debuggerPropertyManagerGrid; }
+    wxPanel* GetDebuggerView() { return m_debuggerView; }
+    wxBitmapButton* GetBmpButton4487() { return m_bmpButton4487; }
+    wxStaticText* GetStaticText4526() { return m_staticText4526; }
+    wxDataViewListCtrl* GetPositionSpy() { return m_positionSpy; }
+    wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }
@@ -2024,6 +2004,35 @@ public:
     }
 
     virtual ~ImageLibDebugger();
+};
+
+
+class ImageLibConfig : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibConfig();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibConfig();
 };
 
 #endif

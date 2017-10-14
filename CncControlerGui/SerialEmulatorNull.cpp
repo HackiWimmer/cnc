@@ -17,7 +17,7 @@ bool SerialEmulatorNULL::evaluateLimitStates(std::vector<int32_t>& ret) {
 	int limitStateY = LIMIT_UNSET;
 	int limitStateZ = LIMIT_UNSET;
 	
-	CncConfig* cncConfig = cncControl->getCncConfig();
+	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	
 	if ( (cncControl->getCurPos().getX() + lastCommand.Mc.lastMoveX)/cncConfig->getCalculationFactX() <= -cncConfig->getMaxDimensionX() )
 		limitStateX = LIMIT_MIN;

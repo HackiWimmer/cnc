@@ -64,6 +64,8 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
 		
+		virtual void initNextClientId(long id);
+		
 		// Getter and setter
 		void setMaxDimensions(SVGUnit u, double width, double height);
 		void setViewBox(const wxString& vb);

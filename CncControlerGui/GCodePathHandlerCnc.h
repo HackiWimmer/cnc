@@ -11,6 +11,8 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase {
 		GCodePathHandlerCnc(CncControl* cnc);
 		virtual ~GCodePathHandlerCnc();
 		
+		virtual void initNextClientId(long id);
+		
 	protected:
 		
 		virtual bool processLinearMove(bool alreadyRendered);

@@ -156,6 +156,8 @@ class PathHandlerBase {
 		PathHandlerBase();
 		virtual ~PathHandlerBase();
 		
+		virtual void initNextClientId(long id) {}
+		
 		void setFileParser(FileParser* fp) { fileParser = fp; }
 		
 		// setter

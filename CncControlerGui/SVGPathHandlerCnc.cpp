@@ -25,9 +25,9 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 , viewBox("")
 {
 //////////////////////////////////////////////////////////////////
-	wxASSERT( cncControl && cncControl->getCncConfig() );
+	wxASSERT(cncControl);
 	
-	toolRadius = cncControl->getCncConfig()->getRouterBitDiameter();
+	toolRadius = CncConfig::getGlobalCncConfig()->getRouterBitDiameter();
 	toolRadius /= 2.0; 
 	
 	if ( toolRadius < 0 )
@@ -39,6 +39,12 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::~SVGPathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////////////
+void SVGPathHandlerCnc::initNextClientId(long id) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(cncControl);
+	cncControl->setClientId(id);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::isInitialized() {
@@ -54,9 +60,9 @@ void SVGPathHandlerCnc::debugCurrentPosition() {
 	wxString pos(wxString::Format("%ld, %ld, %ld [steps]", cncControl->getCurPos().getY(), cncControl->getCurPos().getX(), cncControl->getCurPos().getZ() ));
 	appendDebugValueDetail("Current Pos(x,y,z)", pos);
 
-	pos.assign(wxString::Format("%.3lf, %.3lf, %.3lf [mm]", cncControl->getCurPos().getX() * cncControl->getCncConfig()->getDisplayFactX(), 
-	                                                        cncControl->getCurPos().getY() * cncControl->getCncConfig()->getDisplayFactY(),
-	                                                        cncControl->getCurPos().getZ() * cncControl->getCncConfig()->getDisplayFactZ()));
+	pos.assign(wxString::Format("%.3lf, %.3lf, %.3lf [mm]", cncControl->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX(), 
+	                                                        cncControl->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY(),
+	                                                        cncControl->getCurPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ()));
 	appendDebugValueDetail("Current Pos(x,y,z)", pos);
 }
 //////////////////////////////////////////////////////////////////
@@ -132,8 +138,8 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	PathHandlerBase::initNextPath();
 	
 	// Z depth management
-	wxASSERT( cncControl && cncControl->getCncConfig() );
-	CncConfig* cc = cncControl->getCncConfig();
+	wxASSERT(cncControl);
+	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	double zDepth = -currentCncParameters.getCurrentZDepth();
 	
 	if ( currentCncParameters.isCurrentZDepthAbs() == true ) {
@@ -414,11 +420,8 @@ bool SVGPathHandlerCnc::isZAxisDown() {
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveUpZ() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl->getCncConfig());
-	//std::cout << "CncControl::moveUpZ()" << std::endl;
-	
-	double dist = cncControl->getCncConfig()->getCurZDistance();
-	double curZPos = cncControl->getCurPos().getZ() * cncControl->getCncConfig()->getDisplayFactZ(); // we need it as mm
+	double dist = CncConfig::getGlobalCncConfig()->getCurZDistance();
+	double curZPos = cncControl->getCurPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
 	double moveZ = 0.0;
 	
 	if ( curZPos != dist ) {
@@ -428,12 +431,12 @@ bool SVGPathHandlerCnc::moveUpZ() {
 			moveZ = 0.0;
 	}
 	
-	if ( (curZPos + moveZ) > cncControl->getCncConfig()->getMaxZDistance() ) {
+	if ( (curZPos + moveZ) > CncConfig::getGlobalCncConfig()->getMaxZDistance() ) {
 		std::cerr << "CncControl::moveUpZ error:" << std::endl;
 		std::cerr << "Z(abs): " << curZPos + moveZ << std::endl;
 		std::cerr << "Z(cur): " << curZPos << std::endl;
 		std::cerr << "Z(mv):  " << moveZ << std::endl;
-		std::cerr << "Z(max): " << cncControl->getCncConfig()->getMaxZDistance() << std::endl;
+		std::cerr << "Z(max): " << CncConfig::getGlobalCncConfig()->getMaxZDistance() << std::endl;
 		return false;
 	}
 	
@@ -450,11 +453,8 @@ bool SVGPathHandlerCnc::moveUpZ() {
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveDownZ() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl->getCncConfig());
-	//std::cout << "CncControl::moveDownZ()" << std::endl;
-
-	double curZPos = cncControl->getCurPos().getZ() * cncControl->getCncConfig()->getDisplayFactZ(); // we need it as mm
-	double newZPos = cncControl->getCncConfig()->getDurationPositionAbs(cncControl->getDurationCounter());
+	double curZPos = cncControl->getCurPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
+	double newZPos = CncConfig::getGlobalCncConfig()->getDurationPositionAbs(cncControl->getDurationCounter());
 	double moveZ   = (curZPos - newZPos) * (-1);
 
 	if ( false ) {

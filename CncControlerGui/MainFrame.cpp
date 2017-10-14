@@ -116,7 +116,7 @@ MainFrame::MainFrame(wxWindow* parent)
 , traceTimerCounter(0)
 , lastPortName(wxT(""))
 , defaultPortName(wxT(""))
-, cnc(new CncControl(CncEMU_NULL))
+, cnc(NULL)
 , motionMonitor(NULL)
 , filePreviewWnd(new CncFilePreviewWnd(this))
 , serialSpy(NULL)
@@ -143,8 +143,19 @@ MainFrame::MainFrame(wxWindow* parent)
 , debugUserNotificationTime(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
 {
 ///////////////////////////////////////////////////////////////////
-	// detemine assert handler
+	// determine assert handler
 	wxSetDefaultAssertHandler();
+	
+	// initialize the global configuration and the cnc control
+	// the sequence below is important!
+	CncConfig::setSetupGrid(m_pgMgrSetup, config);
+	cnc = new CncControl(CncEMU_NULL);
+	
+	// initilazied update mananger thread
+	initializeUpdateManagerThread();
+	
+	// setup aui clear
+	hideAllAuiPanes();
 	
 	// decocate application
 	setIcons();
@@ -430,12 +441,12 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	
 	/*
 	cout << "testFunction2"<< endl;
 	clog << "testFunction2"<< endl;
@@ -469,31 +480,21 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	// Setup AUI Windows menues
-	hideAuiPane("Spy");
-	hideAuiPane("UnitCalculator");
-	
-	m_miToolbar->Check(m_auibarMain->IsShown());
-	m_miViewStatusbar->Check(m_statusBar->IsShown());
-	m_miViewTemplateManager->Check(m_scrollWinFile->IsShown());
-	m_miViewLogger->Check(m_scrollWinLogger->IsShown());
-	m_miViewMonitor->Check(m_scrollWinMonitor->IsShown());
-	m_miViewMainView->Check(m_scrollWinMonitor->IsShown());
-	m_miViewSpy->Check(m_scrollSpy->IsShown());
-	m_miViewSpeed->Check(m_panelSpeed->IsShown());
-	m_miViewUnitCalculator->Check(m_svgUnitCalulator->IsShown());
+	// Setup AUI Windows menue
+	loadPerspective("Run");
+	decorateViewMenu();
 	
 	// Show environment information
 	std::ostream stream(m_envrionmentInfo);
 	CncFileNameService::trace(stream);
 	SvgUnitCalculator::trace(stream);
-	
 
 	// Auto connect ?
 	wxString cfgStr;
 	config->Read("App/AutoConnect", &cfgStr, wxT("false"));
 	if ( cfgStr == "true")
 		connectSerialPort();
+		
 	/*
 	// Auto process ?
 	config->Read("App/AutoProcess", &cfgStr, wxT("false"));
@@ -503,10 +504,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		defineNormalMonitoring();
 	}
 	*/
-	// don't works well
-	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
-	
-	//todo
+
+	//todo - only temp
 	wxCommandEvent dummy;
 	//openSVGPathGenerator(dummy);
 }
@@ -949,7 +948,6 @@ void MainFrame::initializeUpdateManagerThread() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
-	initializeUpdateManagerThread();
 	
 	lruFileList.setListControl(m_lruList);
 	
@@ -1080,14 +1078,13 @@ bool MainFrame::initializeCncControl() {
 	wxString cfgStr, val;
 	long cfgLong;
 	double cfgDouble;
-	CncConfig* cncConfig = cnc->getCncConfig();
+	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	
 	if ( cncConfig != NULL ) {
 		config->Read("CncConfig/StepsX", &cfgLong, 200); cncConfig->setStepsX(cfgLong);
 		config->Read("CncConfig/StepsY", &cfgLong, 200); cncConfig->setStepsY(cfgLong);
 		config->Read("CncConfig/StepsZ", &cfgLong, 200); cncConfig->setStepsZ(cfgLong);
-		config->Read("CncConfig/MaxSpeedYX", &cfgLong, 100); cncConfig->setMaxSpeedXY(cfgLong);
-		config->Read("CncConfig/MaxSpeedZ",  &cfgLong, 100); cncConfig->setMaxSpeedZ(cfgLong);
+
 		config->Read("CncConfig/MultiplierX", &cfgLong, 1); cncConfig->setMultiplierX(cfgLong);
 		config->Read("CncConfig/MultiplierY", &cfgLong, 1); cncConfig->setMultiplierY(cfgLong);
 		config->Read("CncConfig/MultiplierZ", &cfgLong, 1); cncConfig->setMultiplierZ(cfgLong);
@@ -1146,7 +1143,9 @@ bool MainFrame::initializeCncControl() {
 	updateCncConfigTrace();
 	
 	// z slider
-	umPostUpdateZView();
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	umPostEvent(evt.ZViewUpdateEvent());
 	
 	//initilaize debug state
 	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
@@ -1304,10 +1303,10 @@ void MainFrame::determineCncOutputControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateUnit() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	wxASSERT(m_xAxis); wxASSERT(m_yAxis); wxASSERT(m_zAxis);
 
-	CncConfig* cncConfig = cnc->getCncConfig();
+	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	wxString unit = m_unit->GetValue();
 
 	wxFloatingPointValidator<float> valX(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
@@ -1329,7 +1328,7 @@ void MainFrame::updateUnit() {
 	m_zManuallySlider->SetValue(0);
 	
 	if ( unit == "mm" ) { 
-		cnc->getCncConfig()->setUnit(CncMetric); 
+		cncConfig->setUnit(CncMetric); 
 		m_metricX->SetValue("0.000");
 		m_metricY->SetValue("0.000");
 		m_metricZ->SetValue("0.000");
@@ -1338,7 +1337,7 @@ void MainFrame::updateUnit() {
 		yLimit *= cncConfig->getStepsY();
 		zLimit *= cncConfig->getStepsZ();
 
-		cnc->getCncConfig()->setUnit(CncSteps);
+		cncConfig->setUnit(CncSteps);
 		m_metricX->SetValue("0");
 		m_metricY->SetValue("0");
 		m_metricZ->SetValue("0");
@@ -1441,15 +1440,7 @@ bool MainFrame::connectSerialPort() {
 		clearSerialSpy();
 	
 	bool ret = false;
-	wxString sel(m_portSelector->GetStringSelection());
-	CncConfig cc(*cnc->getCncConfig());
-	
-	// to be thread safe during the connect . . .
-	// the cnc pointer will be deleted here
-	// and in this case the cnc config becomes invalid 
-	umEnableDisplay(false);
-	
-	delete cnc;
+	wxString sel(m_portSelector->GetStringSelection());	
 	wxString cs;
 	
 	disableControls();
@@ -1459,12 +1450,10 @@ bool MainFrame::connectSerialPort() {
 	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
-		cnc->updateCncConfig(cc);
 		cs.assign("dev/null");
 		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
-		cnc->updateCncConfig(cc);
 		wxString val;
 		cs.assign(CncFileNameService::getCncOutboundSvgFileName());
 		showSVGEmuResult();
@@ -1472,17 +1461,10 @@ bool MainFrame::connectSerialPort() {
 		
 	} else {
 		cnc = new CncControl(CncPORT);
-		cnc->updateCncConfig(cc);
 		cs.assign("\\\\.\\");
 		cs.append(sel);
 		m_miRqtIdleMessages->Check(true);
 	}
-	
-	wxASSERT(cnc);
-	
-	// now the cnc config is valis again
-	// reactivate the update manager thread
-	umEnableDisplay(true);
 
 	initializeCncControl();
 	lastPortName.clear();
@@ -1494,7 +1476,6 @@ bool MainFrame::connectSerialPort() {
 		lastPortName.assign(sel);
 		m_connect->SetBitmap(bmpC);
 		m_serialTimer->Start();
-		motionMonitor->setCncConfig(*cnc->getCncConfig());
 	}
 	
 	decoratePortSelector();
@@ -1608,12 +1589,6 @@ void MainFrame::connect(wxCommandEvent& event) {
 	connectSerialPort();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::reinit(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	isCncControlInitialized = false;
-	connectSerialPort();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::clearLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_logger->Clear();
@@ -1687,7 +1662,7 @@ void MainFrame::svgEmuOpenFileAsSvg(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusMaxDimensionX(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	wxASSERT(m_maxXDimension);
 	
 	wxString val = m_maxXDimension->GetValue();
@@ -1695,7 +1670,7 @@ void MainFrame::killFocusMaxDimensionX(wxFocusEvent& event) {
 	if ( val.length() > 0 )	val.ToDouble(&rbd);
 	else					rbd = 0.0;
 	
-	cnc->getCncConfig()->setMaxDimensionX(rbd);
+	CncConfig::getGlobalCncConfig()->setMaxDimensionX(rbd);
 	updateCncConfigTrace();
 	
 	event.Skip(true);
@@ -1703,7 +1678,7 @@ void MainFrame::killFocusMaxDimensionX(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusMaxDimensionY(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	wxASSERT(m_maxYDimension);
 	
 	wxString val = m_maxYDimension->GetValue();
@@ -1711,7 +1686,7 @@ void MainFrame::killFocusMaxDimensionY(wxFocusEvent& event) {
 	if ( val.length() > 0 )	val.ToDouble(&rbd);
 	else					rbd = 0.0;
 	
-	cnc->getCncConfig()->setMaxDimensionY(rbd);
+	CncConfig::getGlobalCncConfig()->setMaxDimensionY(rbd);
 	updateCncConfigTrace();
 	
 	event.Skip(true);
@@ -1719,7 +1694,7 @@ void MainFrame::killFocusMaxDimensionY(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusMaxDimensionZ(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	wxASSERT(m_maxZDimension);
 	
 	wxString val = m_maxZDimension->GetValue();
@@ -1727,7 +1702,7 @@ void MainFrame::killFocusMaxDimensionZ(wxFocusEvent& event) {
 	if ( val.length() > 0 )	val.ToDouble(&rbd);
 	else					rbd = 0.0;
 	
-	cnc->getCncConfig()->setMaxDimensionZ(rbd);
+	CncConfig::getGlobalCncConfig()->setMaxDimensionZ(rbd);
 	updateCncConfigTrace();
 	
 	event.Skip(true);
@@ -1735,7 +1710,7 @@ void MainFrame::killFocusMaxDimensionZ(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusRouterDiameter(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	wxASSERT(m_routerBitDiameter);
 	
 	wxString val = m_routerBitDiameter->GetValue();
@@ -1743,7 +1718,7 @@ void MainFrame::killFocusRouterDiameter(wxFocusEvent& event) {
 	if ( val.length() > 0 )	val.ToDouble(&rbd);
 	else					rbd = 0.0;
 
-	cnc->getCncConfig()->setRouterBitDiameter(rbd);
+	CncConfig::getGlobalCncConfig()->setRouterBitDiameter(rbd);
 	updateCncConfigTrace();
 	
 	event.Skip(true);
@@ -1751,14 +1726,14 @@ void MainFrame::killFocusRouterDiameter(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusReplyThreshold(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	
 	wxString rt = m_replyThreshold->GetValue();
 	long v = 0;
 	rt.ToLong(&v);
 	
-	if ( (unsigned long)v != cnc->getCncConfig()->getRelyThreshold() ) {
-		cnc->getCncConfig()->setRelyThreshold(v);
+	if ( (unsigned long)v != CncConfig::getGlobalCncConfig()->getReplyThreshold() ) {
+		CncConfig::getGlobalCncConfig()->setRelyThreshold(v);
 		cnc->setup(false);
 		updateCncConfigTrace();
 	}
@@ -1768,10 +1743,10 @@ void MainFrame::killFocusReplyThreshold(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateReverseStepSignX(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc && cnc->getCncConfig() );
+	wxASSERT(cnc);
 	wxString sel = m_cbStepSignX->GetStringSelection();
-	if ( sel.MakeUpper() == "YES") 	cnc->getCncConfig()->setStepSignX(-1);
-	else							cnc->getCncConfig()->setStepSignX(+1);
+	if ( sel.MakeUpper() == "YES") 	CncConfig::getGlobalCncConfig()->setStepSignX(-1);
+	else							CncConfig::getGlobalCncConfig()->setStepSignX(+1);
 	
 	cnc->setup(false);
 	updateCncConfigTrace();
@@ -1779,10 +1754,10 @@ void MainFrame::updateReverseStepSignX(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateReverseStepSignY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc && cnc->getCncConfig() );
+	wxASSERT(cnc);
 	wxString sel = m_cbStepSignY->GetStringSelection();
-	if ( sel.MakeUpper() == "YES") 	cnc->getCncConfig()->setStepSignY(-1);
-	else							cnc->getCncConfig()->setStepSignY(+1);
+	if ( sel.MakeUpper() == "YES") 	CncConfig::getGlobalCncConfig()->setStepSignY(-1);
+	else							CncConfig::getGlobalCncConfig()->setStepSignY(+1);
 	
 	cnc->setup(false);
 	updateCncConfigTrace();
@@ -1790,8 +1765,8 @@ void MainFrame::updateReverseStepSignY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateInclWpt(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
-	cnc->getCncConfig()->setReferenceIncludesWpt(m_includingWpt->IsChecked());
+	wxASSERT(cnc);
+	CncConfig::getGlobalCncConfig()->setReferenceIncludesWpt(m_includingWpt->IsChecked());
 	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
@@ -1822,19 +1797,22 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	
 	cnc->updateCncConfigTrace();
 	
-	umPostUpdateZView();
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	umPostEvent(evt.ZViewUpdateEvent());
+
 	collectSummary();
 	
-	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", cnc->getCncConfig()->getRouterBitDiameter()));
+	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", CncConfig::getGlobalCncConfig()->getRouterBitDiameter()));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	
 	wxString val = m_workpieceThickness->GetValue();
 	double wpt;
@@ -1849,8 +1827,8 @@ void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
 	m_lableWorkpieceThickness->SetToolTip(wxString::Format("Workpiece thickness: %.3lf mm", wpt));
 	m_lableWorkpieceThickness->Refresh();
 	
-	if ( cnc->getCncConfig()->getWorkpieceThickness() != wpt ) {
-		cnc->getCncConfig()->setWorkpieceThickness(wpt);
+	if ( CncConfig::getGlobalCncConfig()->getWorkpieceThickness() != wpt ) {
+		CncConfig::getGlobalCncConfig()->setWorkpieceThickness(wpt);
 		updateCncConfigTrace();
 		setRefPostionState(false);
 		
@@ -1861,14 +1839,14 @@ void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
 		showSetReferencePositionDlg(msg);
 	}
 	
-	m_crossings->ChangeValue(wxString() << cnc->getCncConfig()->getDurationCount());
+	m_crossings->ChangeValue(wxString() << CncConfig::getGlobalCncConfig()->getDurationCount());
 	
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::killFocusCrossingThickness(wxFocusEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig());
+	wxASSERT(cnc);
 	wxASSERT(m_crossingThickness);
 	
 	wxString val = m_crossingThickness->GetValue();
@@ -1877,12 +1855,12 @@ void MainFrame::killFocusCrossingThickness(wxFocusEvent& event) {
 	else					ct = 2.0;
 	
 	
-	if ( cnc->getCncConfig()->getMaxDurationThickness() != ct ) {
-		cnc->getCncConfig()->setMaxDurationThickness(ct);
+	if ( CncConfig::getGlobalCncConfig()->getMaxDurationThickness() != ct ) {
+		CncConfig::getGlobalCncConfig()->setMaxDurationThickness(ct);
 		updateCncConfigTrace();
 	}
 	
-	m_crossings->ChangeValue(wxString() << cnc->getCncConfig()->getDurationCount());
+	m_crossings->ChangeValue(wxString() << CncConfig::getGlobalCncConfig()->getDurationCount());
 	
 	event.Skip(true);
 }
@@ -1969,30 +1947,27 @@ void MainFrame::updateSpeedValues() {
 	if ( mXY <= 0 ) mXY = 1;
 	if ( mZ  <= 0 ) mZ  = 1;
 	
-	cnc->getCncConfig()->setMaxSpeedXY(mXY);
-	cnc->getCncConfig()->setMaxSpeedZ(mZ);
-	
 	double val; 
 	if ( fXY != 0 && wXY != 0 ) {
-		val = cnc->getCncConfig()->getMaxSpeedXY() * fXY/100;
-		cnc->getCncConfig()->setRapidSpeedXY((int)val);
+		val = CncConfig::getGlobalCncConfig()->getMaxSpeedXY() * fXY/100;
+		CncConfig::getGlobalCncConfig()->setRapidSpeedXY((int)val);
 
-		val = cnc->getCncConfig()->getMaxSpeedXY() * wXY/100;
-		cnc->getCncConfig()->setWorkSpeedXY((int)val);
+		val = CncConfig::getGlobalCncConfig()->getMaxSpeedXY() * wXY/100;
+		CncConfig::getGlobalCncConfig()->setWorkSpeedXY((int)val);
 	} else {
-		cnc->getCncConfig()->setRapidSpeedXY(1);
-		cnc->getCncConfig()->setWorkSpeedXY(1);
+		CncConfig::getGlobalCncConfig()->setRapidSpeedXY(1);
+		CncConfig::getGlobalCncConfig()->setWorkSpeedXY(1);
 	}
 
 	if ( fZ != 0 && wZ != 0 ) {
-		val = cnc->getCncConfig()->getMaxSpeedZ() * fZ/100;
-		cnc->getCncConfig()->setRapidSpeedZ((int)val);
+		val = CncConfig::getGlobalCncConfig()->getMaxSpeedZ() * fZ/100;
+		CncConfig::getGlobalCncConfig()->setRapidSpeedZ((int)val);
 
-		val = cnc->getCncConfig()->getMaxSpeedZ() * wZ/100;
-		cnc->getCncConfig()->setWorkSpeedZ((int)val);
+		val = CncConfig::getGlobalCncConfig()->getMaxSpeedZ() * wZ/100;
+		CncConfig::getGlobalCncConfig()->setWorkSpeedZ((int)val);
 	} else {
-		cnc->getCncConfig()->setRapidSpeedZ(1);
-		cnc->getCncConfig()->setWorkSpeedZ(1);
+		CncConfig::getGlobalCncConfig()->setRapidSpeedZ(1);
+		CncConfig::getGlobalCncConfig()->setWorkSpeedZ(1);
 	}
 	
 	if ( cnc->isConnected() ) {
@@ -2003,16 +1978,16 @@ void MainFrame::updateSpeedValues() {
 		else							cnc->changeWorkSpeedZ(CncSpeedWork);
 		
 	} else {
-		cnc->getCncConfig()->setActiveSpeedXY(CncSpeedRapid);
-		cnc->getCncConfig()->setActiveSpeedZ(CncSpeedRapid);
+		cnc->setActiveSpeedXY(CncSpeedRapid);
+		cnc->setActiveSpeedZ(CncSpeedRapid);
 	}
 
 	updateCncConfigTrace();
 	
 	
-	m_speedView->setMaxSpeedX(cnc->getCncConfig()->getMaxSpeedXY());
-	m_speedView->setMaxSpeedY(cnc->getCncConfig()->getMaxSpeedXY());
-	m_speedView->setMaxSpeedZ(cnc->getCncConfig()->getMaxSpeedZ());
+	m_speedView->setMaxSpeedX(CncConfig::getGlobalCncConfig()->getMaxSpeedXY());
+	m_speedView->setMaxSpeedY(CncConfig::getGlobalCncConfig()->getMaxSpeedXY());
+	m_speedView->setMaxSpeedZ(CncConfig::getGlobalCncConfig()->getMaxSpeedZ());
 
 }
 ///////////////////////////////////////////////////////////////////
@@ -2095,12 +2070,12 @@ void MainFrame::defineDebugSerial(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateMonitoring() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getCncConfig() );
+	wxASSERT(cnc);
 	
-	cnc->getCncConfig()->setOnlineUpdateCoordinates(m_menuItemUpdCoors->IsChecked());
-	cnc->getCncConfig()->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
-	cnc->getCncConfig()->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
-	cnc->getCncConfig()->setAllowEventHandling(m_menuItemDebugSerial->IsChecked());
+	CncConfig::getGlobalCncConfig()->setOnlineUpdateCoordinates(m_menuItemUpdCoors->IsChecked());
+	CncConfig::getGlobalCncConfig()->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
+	CncConfig::getGlobalCncConfig()->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
+	CncConfig::getGlobalCncConfig()->setAllowEventHandling(m_menuItemDebugSerial->IsChecked());
 	cnc->getSerial()->enableSpyOutput(m_menuItemDebugSerial->IsChecked());
 	cnc->setUpdateToolControlsState(m_menuItemToolControls->IsChecked());
 	
@@ -2629,10 +2604,10 @@ bool MainFrame::processManualTemplate() {
 	
 	// SVG Serial Emulator Support
 	cnc->getSerial()->beginSVG(mm, 
-							   cnc->getCncConfig()->getMaxDimensionX(), 
-							   cnc->getCncConfig()->getMaxDimensionY());
-	cnc->getSerial()->beginPath(cnc->getCurPos().getX() * cnc->getCncConfig()->getDisplayFactX(), 
-								cnc->getCurPos().getY() * cnc->getCncConfig()->getDisplayFactY());
+							   CncConfig::getGlobalCncConfig()->getMaxDimensionX(), 
+							   CncConfig::getGlobalCncConfig()->getMaxDimensionY());
+	cnc->getSerial()->beginPath(cnc->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX(), 
+								cnc->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY());
 		
 	if ( m_checkManuallyXY->GetValue() == true ) {
 		unsigned int sel = m_mmRadioCoordinates->GetSelection();
@@ -2651,15 +2626,15 @@ bool MainFrame::processManualTemplate() {
 
 		// transform to mm
 		if ( m_unit->GetValue() == "steps" ) {
-			xd *= cnc->getCncConfig()->getDisplayFactX();
-			yd *= cnc->getCncConfig()->getDisplayFactY();
+			xd *= CncConfig::getGlobalCncConfig()->getDisplayFactX();
+			yd *= CncConfig::getGlobalCncConfig()->getDisplayFactY();
 		}
 
 		double moveX = xd, moveY = yd;
 		// transfer to absolute coordinates
 		if ( sel == 0 ) {
-			moveX = xd - cnc->getCurPos().getX() * cnc->getCncConfig()->getDisplayFactX();
-			moveY = yd - cnc->getCurPos().getY() * cnc->getCncConfig()->getDisplayFactY();
+			moveX = xd - cnc->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX();
+			moveY = yd - cnc->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY();
 		}
 
 		//cnc->initNextDuration(); will be done by manualSimpleMoveMetric
@@ -2674,7 +2649,7 @@ bool MainFrame::processManualTemplate() {
 		
 		// transform to mm
 		if ( m_unit->GetValue() == "steps" ) 
-			zd *= cnc->getCncConfig()->getDisplayFactX();
+			zd *= CncConfig::getGlobalCncConfig()->getDisplayFactX();
 			
 		//cnc->initNextDuration(); will be done by manualSimpleMoveMetric
 		cnc->manualSimpleMoveMetric(0.0, 0.0, zd);
@@ -2759,10 +2734,10 @@ bool MainFrame::processTestInterval() {
 	
 	// SVG Serial Emulator Support
 	cnc->getSerial()->beginSVG(mm, 
-							   cnc->getCncConfig()->getMaxDimensionX(), 
-							   cnc->getCncConfig()->getMaxDimensionY());
-	cnc->getSerial()->beginPath(cnc->getCurPos().getX() * cnc->getCncConfig()->getDisplayFactX(), 
-								cnc->getCurPos().getY() * cnc->getCncConfig()->getDisplayFactY());
+							   CncConfig::getGlobalCncConfig()->getMaxDimensionX(), 
+							   CncConfig::getGlobalCncConfig()->getMaxDimensionY());
+	cnc->getSerial()->beginPath(cnc->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX(), 
+								cnc->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY());
 								
 	wxString sel = m_testIntervalMode->GetStringSelection();
 	char mode = sel[0];
@@ -2936,7 +2911,7 @@ void MainFrame::testDimTakeOverX(wxCommandEvent& event) {
 	
 	if ( v > 0.0 ) {
 		m_maxXDimension->SetValue(val);
-		cnc->getCncConfig()->setMaxDimensionX(v);
+		CncConfig::getGlobalCncConfig()->setMaxDimensionX(v);
 		
 		if ( m_testDimTakeOverAndSave->GetValue() == true )
 			config->Write("CncConfig/MaxDimensionsX", m_maxXDimension->GetValue());
@@ -2951,7 +2926,7 @@ void MainFrame::testDimTakeOverY(wxCommandEvent& event) {
 	
 	if ( v > 0.0 ) {
 		m_maxYDimension->SetValue(m_testDimResultY->GetValue());
-		cnc->getCncConfig()->setMaxDimensionY(v);
+		CncConfig::getGlobalCncConfig()->setMaxDimensionY(v);
 		
 		if ( m_testDimTakeOverAndSave->GetValue() == true )
 			config->Write("CncConfig/MaxDimensionsY", m_maxYDimension->GetValue());
@@ -2966,7 +2941,7 @@ void MainFrame::testDimTakeOverZ(wxCommandEvent& event) {
 
 	if ( v > 0.0 ) {
 		m_maxZDimension->SetValue(m_testDimResultZ->GetValue());
-		cnc->getCncConfig()->setMaxDimensionZ(v);
+		CncConfig::getGlobalCncConfig()->setMaxDimensionZ(v);
 		
 		if ( m_testDimTakeOverAndSave->GetValue() == true )
 			config->Write("CncConfig/MaxDimensionsZ", m_maxZDimension->GetValue());
@@ -3075,7 +3050,7 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 			msg << "How to fix it:\n";
 			msg << "Please use the \"Set Current Position to Zero\" functionality on the \"References\" tab.";
 			
-			showAuiPane("MainView");
+			showAuiPane("SourceView");
 			selectMainBookReferencePanel();
 			
 			int ret = showSetReferencePositionDlg(msg);
@@ -3195,10 +3170,7 @@ void MainFrame::collectSummary() {
 	if ( cnc == NULL )
 		return;
 		
-	if ( cnc->getCncConfig() == NULL )
-		return;
-		
-	CncConfig* cc = cnc->getCncConfig();
+	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	
 	DcmItemList rows;
 	DataControlModel::addNumParameterValueUnitRow(rows, "Tool Diameter",					wxString::Format(" %.3f", 	cc->getRouterBitDiameter()), 		" mm"); 
@@ -3303,7 +3275,7 @@ void MainFrame::processTemplate() {
 	disableControls();
 	resetMinMaxPositions();
 	updateCncConfigTrace();
-	cnc->getCncConfig()->setAllowEventHandling(true);
+	CncConfig::getGlobalCncConfig()->setAllowEventHandling(true);
 	cnc->processCommand("r", std::cout);
 	cnc->logProcessingStart();
 	cnc->enableStepperMotors(true);
@@ -3315,14 +3287,14 @@ void MainFrame::processTemplate() {
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			umPostResetZView();
+			umPostEvent(evt.ZViewResetEvent());
 			ret = processSVGTemplate();
 			break;
 		case TplGcode:
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			umPostResetZView();
+			umPostEvent(evt.ZViewResetEvent());
 			ret = processGCodeTemplate();
 			break;
 		case TplManual: 
@@ -3330,7 +3302,7 @@ void MainFrame::processTemplate() {
 			break;
 		case TplTest:
 			cnc->clearDrawControl();
-			umPostResetZView();
+			umPostEvent(evt.ZViewResetEvent());
 			ret = processTestTemplate();
 			break;
 		default:
@@ -3483,12 +3455,11 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 void MainFrame::changeUpdateInterval(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	wxASSERT(cnc->getCncConfig());
 
 	unsigned int interval = 1;
 	wxString val = m_cbUpdateInterval->GetValue();
 	interval = wxAtoi(val);
-	cnc->getCncConfig()->setUpdateInterval(interval);
+	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::keyDownXY(wxKeyEvent& event) {
@@ -4208,7 +4179,7 @@ void MainFrame::moveManuallySliderX(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactX()));
+		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactX()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
 	}
@@ -4219,7 +4190,7 @@ void MainFrame::moveManuallySliderY(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactY()));
+		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactY()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
 	}
@@ -4230,7 +4201,7 @@ void MainFrame::moveManuallySliderZ(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactZ()));
+		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactZ()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
@@ -4310,7 +4281,7 @@ void MainFrame::minManuallyXSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactX()));
+		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactX()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
 	}
@@ -4323,7 +4294,7 @@ void MainFrame::maxManuallyXSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactX()));
+		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactX()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
 	}
@@ -4336,7 +4307,7 @@ void MainFrame::minManuallyYSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactY()));
+		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactY()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
 	}
@@ -4349,7 +4320,7 @@ void MainFrame::maxManuallyYSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactY()));
+		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactY()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
 	}
@@ -4362,7 +4333,7 @@ void MainFrame::minManuallyZSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactZ()));
+		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactZ()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
@@ -4375,7 +4346,7 @@ void MainFrame::maxManuallyZSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * cnc->getCncConfig()->getCalculationFactZ()));
+		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactZ()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
@@ -4428,7 +4399,7 @@ void MainFrame::signManuallyXSlider(wxCommandEvent& event) {
 	
 	if ( m_unit->GetValue() == "steps" ) {
 		val = wxString::Format(wxT("%6.0f"), v);
-		m_xManuallySlider->SetValue(v / cnc->getCncConfig()->getCalculationFactX());
+		m_xManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactX());
 	} else {
 		val = wxString::Format(wxT("%4.3f"), v);
 		m_xManuallySlider->SetValue(v);
@@ -4447,7 +4418,7 @@ void MainFrame::signManuallyYSlider(wxCommandEvent& event) {
 	
 	if ( m_unit->GetValue() == "steps" ) {
 		val = wxString::Format(wxT("%6.0f"), v);
-		m_yManuallySlider->SetValue(v / cnc->getCncConfig()->getCalculationFactY());
+		m_yManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactY());
 	} else {
 		val = wxString::Format(wxT("%4.3f"), v);
 		m_yManuallySlider->SetValue(v);
@@ -4466,7 +4437,7 @@ void MainFrame::signManuallyZSlider(wxCommandEvent& event) {
 	
 	if ( m_unit->GetValue() == "steps" ) {
 		val = wxString::Format(wxT("%6.0f"), v);
-		m_zManuallySlider->SetValue(v / cnc->getCncConfig()->getCalculationFactZ());
+		m_zManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactZ());
 	} else {
 		val = wxString::Format(wxT("%4.3f"), v);
 		m_zManuallySlider->SetValue(v);
@@ -4482,7 +4453,7 @@ void MainFrame::updateMetricX(wxCommandEvent& event) {
 	val.ToDouble(&v);
 	
 	if ( m_unit->GetValue() == "steps" ) {
-		m_xManuallySlider->SetValue(v / cnc->getCncConfig()->getCalculationFactX());
+		m_xManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactX());
 	} else {
 		m_xManuallySlider->SetValue(v);
 	}
@@ -4495,7 +4466,7 @@ void MainFrame::updateMetricY(wxCommandEvent& event) {
 	val.ToDouble(&v);
 	
 	if ( m_unit->GetValue() == "steps" ) {
-		m_yManuallySlider->SetValue(v / cnc->getCncConfig()->getCalculationFactY());
+		m_yManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactY());
 	} else {
 		m_yManuallySlider->SetValue(v);
 	}
@@ -4508,7 +4479,7 @@ void MainFrame::updateMetricZ(wxCommandEvent& event) {
 	val.ToDouble(&v);
 	
 	if ( m_unit->GetValue() == "steps" ) {
-		m_zManuallySlider->SetValue(v / cnc->getCncConfig()->getCalculationFactZ());
+		m_zManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactZ());
 	} else {
 		m_zManuallySlider->SetValue(v);
 	}
@@ -4740,98 +4711,100 @@ void MainFrame::monitorViewSelectorSelected(wxCommandEvent& event) {
 	m_monitorViewBook->SetSelection(m_monitorViewSelector->GetSelection());
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::toggleAuiPane(wxWindow* pane, wxMenuItem* menu) {
+void MainFrame::toggleAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
 ///////////////////////////////////////////////////////////////////
 	if ( pane == NULL )
 		return;
 	
-	if ( GetAuimgrMain()->GetPane(pane).IsShown() )  {
-		hideAuiPane(pane, menu);
+	if ( GetAuimgrMain()->GetPane(pane).IsShown() )	hideAuiPane(pane, menu);
+	else											showAuiPane(pane, menu);
+	
+	if ( update )
+		GetAuimgrMain()->Update();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::showAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
+///////////////////////////////////////////////////////////////////
+	if ( pane == NULL )
+		return;
+		
+	if ( GetAuimgrMain()->GetPane(pane).IsShown() == false ) {
+		GetAuimgrMain()->GetPane(pane).Show();
+		
+		if ( menu != NULL )
+			menu->Check(true);
 			
-	} else {
-		showAuiPane(pane, menu);
+		if ( update )
+			GetAuimgrMain()->Update();
 	}
-	GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::showAuiPane(wxWindow* pane, wxMenuItem* menu) {
-///////////////////////////////////////////////////////////////////
-	if ( pane == NULL )
-		return;
-		
-	GetAuimgrMain()->GetPane(pane).Show();
-	
-	if ( menu != NULL )
-		menu->Check(true);
-		
-	GetAuimgrMain()->Update();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu) {
+void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
 ///////////////////////////////////////////////////////////////////
 	if ( pane == NULL )
 		return;
 
-	GetAuimgrMain()->GetPane(pane).Hide();
-	GetAuimgrMain()->GetPane(pane).DestroyOnClose(false);
-	pane->Close(true);
-	
-	if ( pane == getAUIPaneByName("Spy") )
-		enableSerialSpy(false);
-	
-	if ( menu != NULL )
-		menu->Check(false);
+	if ( GetAuimgrMain()->GetPane(pane).IsShown() == true ) {
+		GetAuimgrMain()->GetPane(pane).Hide();
+		GetAuimgrMain()->GetPane(pane).DestroyOnClose(false);
+		pane->Close(true);
 		
-	GetAuimgrMain()->Update();
+		if ( pane == getAUIPaneByName("SerialSpy") )
+			enableSerialSpy(false);
+		
+		if ( menu != NULL )
+			menu->Check(false);
+			
+		if ( update )
+			GetAuimgrMain()->Update();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 ///////////////////////////////////////////////////////////////////
-	if      ( name == "ToolBar" ) 			return m_auibarMain;
-	else if ( name == "MainView")			return m_scrollWinMain;
+	if      ( name == "Toolbar" ) 			return m_auibarMain;
+	else if ( name == "SourceView")			return m_scrollWinMain;
 	else if ( name == "Logger")				return m_scrollWinLogger;
 	else if ( name == "Outbound")			return m_scrollWinMonitor;
 	else if ( name == "TemplateManager")	return m_scrollWinFile;
 	else if ( name == "StatusBar")			return m_statusBar;
-	else if ( name == "Spy")				return m_scrollSpy;
-	else if ( name == "Speed")				return m_panelSpeed;
+	else if ( name == "SerialSpy")			return m_serialSpyView;
+	else if ( name == "SpeedView")			return m_panelSpeed;
 	else if ( name == "UnitCalculator")		return m_svgUnitCalulator;
+	else if ( name == "Debugger")			return m_debuggerView;
+	else if ( name == "PositionMonitor")	return m_positionMonitorView;
 
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
 wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 ///////////////////////////////////////////////////////////////////
-	if      ( name == "ToolBar" ) 			return m_miToolbar;
+	if      ( name == "Toolbar" ) 			return m_miToolbar;
 	else if ( name == "StatusBar")			return m_miViewStatusbar;
-	else if ( name == "MainView")			return m_miViewMainView;
+	else if ( name == "SourceView")			return m_miViewMainView;
 	else if ( name == "Logger")				return m_miViewLogger;
 	else if ( name == "Outbound")			return m_miViewMonitor;
 	else if ( name == "TemplateManager")	return m_miViewTemplateManager;
-	else if ( name == "Spy")				return m_miViewSpy;
-	else if ( name == "Speed")				return m_miViewSpeed;
+	else if ( name == "SerialSpy")			return m_miViewSpy;
+	else if ( name == "SpeedView")			return m_miViewSpeed;
 	else if ( name == "UnitCalculator")		return m_miViewUnitCalculator;
+	else if ( name == "Debugger")			return m_miViewDebugger;
+	else if ( name == "PositionMonitor")	return m_miViewPosMonitor;
 
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::toggleAuiPane(const wxString& name) {
+void MainFrame::decorateViewMenu() {
 ///////////////////////////////////////////////////////////////////
-	wxWindow* w = getAUIPaneByName(name);
-	if ( w == NULL ) {
-		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
-		return;
+	wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
+	for (unsigned int i = 0; i < panes.GetCount(); ++i) {
+		wxMenuItem* mi = getAUIMenuByName(panes.Item(i).name);
+		if ( mi )
+			mi->Check(panes.Item(i).window->IsShown());
 	}
-	wxMenuItem* m = getAUIMenuByName(name);
-	if ( w == NULL ) {
-		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
-		return;
-	}
-	
-	toggleAuiPane(w, m);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::showAuiPane(const wxString& name) {
+void MainFrame::toggleAuiPane(const wxString& name, bool update) {
 ///////////////////////////////////////////////////////////////////
 	wxWindow* w = getAUIPaneByName(name);
 	if ( w == NULL ) {
@@ -4844,10 +4817,10 @@ void MainFrame::showAuiPane(const wxString& name) {
 		return;
 	}
 	
-	showAuiPane(w, m);
+	toggleAuiPane(w, m, update);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::hideAuiPane(const wxString& name) {
+void MainFrame::showAuiPane(const wxString& name, bool update) {
 ///////////////////////////////////////////////////////////////////
 	wxWindow* w = getAUIPaneByName(name);
 	if ( w == NULL ) {
@@ -4860,7 +4833,23 @@ void MainFrame::hideAuiPane(const wxString& name) {
 		return;
 	}
 	
-	hideAuiPane(w, m);
+	showAuiPane(w, m, update);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::hideAuiPane(const wxString& name, bool update) {
+///////////////////////////////////////////////////////////////////
+	wxWindow* w = getAUIPaneByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	wxMenuItem* m = getAUIMenuByName(name);
+	if ( w == NULL ) {
+		std::cerr << "MainFrame::toggleAuiPane: Invalid pane window name: " << name << std::endl;
+		return;
+	}
+	
+	hideAuiPane(w, m, update);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewToolbar(wxCommandEvent& event) {
@@ -4875,7 +4864,7 @@ void MainFrame::viewStatusbar(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewMainView(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane("MainView");
+	toggleAuiPane("SourceView");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewTemplateManager(wxCommandEvent& event) {
@@ -4895,12 +4884,12 @@ void MainFrame::viewMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane("Spy");
+	toggleAuiPane("SerialSpy");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewSpeed(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	toggleAuiPane("Speed");
+	toggleAuiPane("SpeedView");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewUnitCalculator(wxCommandEvent& event) {
@@ -4908,58 +4897,24 @@ void MainFrame::viewUnitCalculator(wxCommandEvent& event) {
 	toggleAuiPane("UnitCalculator");
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::perspectiveDefault(wxCommandEvent& event) {
+void MainFrame::viewDebugger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	viewAllAuiPanes();
-	//GetAuimgrMain()->LoadPerspective(_defaultPerspective, true);
+	toggleAuiPane("Debugger");
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::perspectiveRun(wxCommandEvent& event) {
+void MainFrame::viewPosistionMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	hideAllAuiPanes();
-	showAuiPane("ToolBar");
-	showAuiPane("Outbound");
-	showAuiPane("Logger");
-	showAuiPane("StatusBar");
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::perspectiveTemplate(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	hideAllAuiPanes();
-	showAuiPane("ToolBar");
-	showAuiPane("MainView");
-	showAuiPane("Logger");
-	showAuiPane("StatusBar");
+	toggleAuiPane("PositionMonitor");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 ///////////////////////////////////////////////////////////////////
-	if ( evt.pane->window == m_scrollWinFile ) {
-		m_miViewTemplateManager->Check(!m_scrollWinFile->IsShown());
-		
-	} else if ( evt.pane->window == m_scrollWinLogger ) {
-		m_miViewLogger->Check(!m_scrollWinLogger->IsShown());
-		
-	} else if ( evt.pane->window == m_scrollWinMonitor ) {
-		m_miViewMonitor->Check(!m_scrollWinMonitor->IsShown());
-		
-	} else if ( evt.pane->window == m_scrollWinMain ) {
-		m_miViewMainView->Check(!m_scrollWinMain->IsShown());
-		
-	} else if ( evt.pane->window == m_scrollSpy ) {
-		m_miViewSpy->Check(!m_scrollSpy->IsShown());
+	wxMenuItem* menu = getAUIMenuByName(evt.pane->name);
+	if ( menu != NULL )
+		menu->Check(!evt.pane->window->IsShown());
+
+	if ( evt.pane->window == m_serialSpyView )
 		enableSerialSpy(false);
-		
-	} else if ( evt.pane->window == m_panelSpeed ) {
-		m_miViewSpeed->Check(!m_panelSpeed->IsShown());
-		
-	} else if ( evt.pane->window == m_statusBar ) {
-		m_miViewStatusbar->Check(!m_statusBar->IsShown());
-		
-	} else if ( evt.pane->window == m_panelSpeed ) {
-		m_miViewSpeed->Check(!m_panelSpeed->IsShown());
-		
-	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
@@ -5007,30 +4962,19 @@ void MainFrame::viewAllAuiPanes(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::hideAllAuiPanes() {
 ///////////////////////////////////////////////////////////////////
-	hideAuiPane(m_auibarMain,       m_miToolbar);
-	hideAuiPane(m_statusBar,        m_miViewStatusbar);
-	hideAuiPane(m_scrollWinFile,    m_miViewTemplateManager);
-	hideAuiPane(m_scrollWinLogger,  m_miViewLogger);
-	hideAuiPane(m_scrollWinMonitor, m_miViewMonitor);
-	hideAuiPane(m_scrollWinMain,    m_miViewMainView);
-	hideAuiPane(m_scrollSpy,        m_miViewSpy);
-	hideAuiPane(m_panelSpeed,       m_miViewSpeed);
-	hideAuiPane(m_svgUnitCalulator, m_miViewUnitCalculator);
+	wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
+	for (unsigned int i = 0; i < panes.GetCount(); ++i)
+		hideAuiPane( panes.Item(i).name);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewAllAuiPanes(bool withSpy) {
 ///////////////////////////////////////////////////////////////////
-	showAuiPane(m_auibarMain,        m_miToolbar);
-	showAuiPane(m_statusBar,         m_miViewStatusbar);
-	showAuiPane(m_scrollWinFile,     m_miViewTemplateManager);
-	showAuiPane(m_scrollWinLogger,   m_miViewLogger);
-	showAuiPane(m_scrollWinMonitor,  m_miViewMonitor);
-	showAuiPane(m_scrollWinMain,     m_miViewMainView);
-	showAuiPane(m_panelSpeed,        m_miViewSpeed);
-	showAuiPane(m_svgUnitCalulator,  m_miViewUnitCalculator);
-	
+	wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
+	for (unsigned int i = 0; i < panes.GetCount(); ++i)
+		showAuiPane( panes.Item(i).name);
+
 	if ( withSpy )
-		showAuiPane(m_scrollSpy,       m_miViewSpy);
+		showAuiPane(m_serialSpyView, m_miViewSpy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::disableSlider(wxMouseEvent& event) {
@@ -5661,8 +5605,7 @@ void MainFrame::determineRunMode() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	showAuiPane("Spy");
-	m_spyNotebook->SetSelection(SpyBookSelection::VAL::DEBUGGER_PANEL);
+	ensureAllPanesFromPerspectiveAreShown("Debug");
 	
 	if ( m_debuggerPropertyManagerGrid->GetPageCount() > 0 )
 		m_debuggerPropertyManagerGrid->SelectPage(0);
@@ -5682,7 +5625,7 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 	
 	// perform a run
 	// Store the current interval
-	int interval = cnc->getCncConfig()->getUpdateInterval();
+	int interval = CncConfig::getGlobalCncConfig()->getUpdateInterval();
 	
 	if ( isDebugMode == true ) {
 		
@@ -5698,14 +5641,13 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 		}
 		
 		// bring the debug controls in front
-		showAuiPane("Spy");
-		m_spyNotebook->SetSelection(SpyBookSelection::VAL::DEBUGGER_PANEL);
+		ensureAllPanesFromPerspectiveAreShown("Debug");
 		
 		// to see each line during the debug session
-		cnc->getCncConfig()->setUpdateInterval(1);
+		CncConfig::getGlobalCncConfig()->setUpdateInterval(1);
 	} else {
 		
-		hideAuiPane("Spy");
+		ensureAllPanesFromPerspectiveAreShown("Run");
 	}
 
 	// process
@@ -5713,7 +5655,7 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 	//std::clog << "processTemplate() returned"<< endl;
 	
 	// restore the interval
-	cnc->getCncConfig()->setUpdateInterval(interval);
+	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcPause(wxCommandEvent& event) {
@@ -6292,10 +6234,10 @@ void MainFrame::openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, co
 		pathGenerator->Show();
 	
 	//process
-	wxASSERT( cnc && cnc->getCncConfig() );
+	wxASSERT(cnc);
 	PathGeneratorStore::RegenerateParameter rp;
 	rp.in.editControl  = ctl;
-	rp.in.toolDiameter = cnc->getCncConfig()->getRouterBitDiameter();
+	rp.in.toolDiameter = CncConfig::getGlobalCncConfig()->getRouterBitDiameter();
 	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
 	
 	if ( pathGenerator->regenerateSvgBlock(rp) == false ) {
@@ -6322,10 +6264,10 @@ void MainFrame::regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const w
 	wxASSERT(root);
 	
 	// setup
-	wxASSERT( cnc && cnc->getCncConfig() );
+	wxASSERT(cnc);
 	PathGeneratorStore::RegenerateParameter rp;
 	rp.in.editControl  = ctl;
-	rp.in.toolDiameter = cnc->getCncConfig()->getRouterBitDiameter();
+	rp.in.toolDiameter =CncConfig::getGlobalCncConfig()->getRouterBitDiameter();
 	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
 	
 	// process
@@ -6553,5 +6495,102 @@ void MainFrame::stopDebugUserNotification() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clearPositionSpy(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	umPostClearPositionSpy();
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	umPostEvent(evt.PosSpyResetEvent());
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleTemplateManager(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	toggleAuiPane("TemplateManager");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::ensureAllPanesFromPerspectiveAreShown(const wxString& name) {
+/////////////////////////////////////////////////////////////////////
+	wxString id(wxString::Format("Perspectives/%s.PaneList", name));
+	wxString paneList;
+	
+	config->Read(id, &paneList, "");
+	if ( paneList.IsEmpty() == false ) {
+		
+		wxStringTokenizer tokenizer(paneList, "|");
+		while ( tokenizer.HasMoreTokens() ) {
+			wxString name = tokenizer.GetNextToken();
+			
+			name.Trim(true).Trim(false);
+			if ( name.IsEmpty() == false ) {
+				showAuiPane(name, false);
+			}
+		}
+		
+		GetAuimgrMain()->Update();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+bool MainFrame::loadPerspective(const wxString& name) {
+/////////////////////////////////////////////////////////////////////
+	wxString id(wxString::Format("Perspectives/%s", name));
+	wxString perspective;
+	
+	config->Read(id, &perspective, "");
+	bool ret = (perspective.IsEmpty() == false);
+	
+	if ( ret == false )	viewAllAuiPanes();
+	else				m_auimgrMain->LoadPerspective(perspective);
+	
+	return ret;
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::savePerspective(const wxString& name) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(config);
+	
+	wxString msg(wxString::Format("Do you really want to update the '%s' perspective?", name));
+	wxMessageDialog dlg(this, msg, _T("Perspective save. . . "), 
+	                    wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
+	
+	if ( dlg.ShowModal() == wxID_OK ) {
+		wxString id(wxString::Format("Perspectives/%s", name));
+		config->Write(id, m_auimgrMain->SavePerspective());
+		
+		// additional store a list of shown panes
+		wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
+		wxString list;
+		for (unsigned int i = 0; i < panes.GetCount(); ++i) {
+			if ( panes.Item(i).window->IsShown() )
+				list.append(wxString::Format("%s|", panes.Item(i).name));
+		}
+		config->Write(wxString::Format("%s.PaneList", id), list);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::loadPerspectiveRun(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	loadPerspective("Run");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::loadPerspectiveDebug(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	loadPerspective("Debug");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::loadPerspectiveSource(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	loadPerspective("Source");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::savePerspectiveRun(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	savePerspective("Run");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::savePerspectiveDebug(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	savePerspective("Debug");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::savePerspectiveSource(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	savePerspective("Source");
+}
+

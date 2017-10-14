@@ -3,7 +3,6 @@
 
 #include <wx/panel.h>
 #include <wx/dcclient.h>
-#include "CncConfig.h"
 
 class CncSpeedView : public wxPanel  {
 	

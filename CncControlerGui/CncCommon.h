@@ -76,14 +76,6 @@ class TemplateBookSelection {
 		};
 };
 
-class SpyBookSelection {
-	public:
-		enum VAL {
-			SERIAL_SPY_PANEL			= 0,
-			DEBUGGER_PANEL				= 1
-		};
-};
-
 static const unsigned int OutboundCNCValuesPage 	= 0;
 static const unsigned int Outbound3DPage 			= 1;
 static const unsigned int OutboundSvgPage 			= 2;

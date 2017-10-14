@@ -3,7 +3,6 @@
 
 #include <wx/panel.h>
 #include <wx/dcclient.h>
-#include "CncConfig.h"
 
 class CncZView : public wxPanel  {
 		
@@ -78,7 +77,7 @@ class CncZView : public wxPanel  {
 		void resetWaterMarks();
 		
 		// ste the given value and consider thee given config
-		void updateView(double value, CncConfig& cc);
+		void updateView(double value);
 		// sets the gravity, allowed value > 0.0 .... 1.0, else default 0.5
 		void setGravity(double val);
 		// sets zero to height/2

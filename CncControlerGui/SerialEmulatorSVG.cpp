@@ -26,8 +26,8 @@ void SerialEmulatorSVG::beginSVG(SVGUnit u, double w, double h, const wxString& 
 	unit = u;
 	
 	// determine the step factor with respect to the reference unit
-	stepFactX = cncControl->getCncConfig()->getDisplayFactX() * svgOutputParameters.zoomFactor * 1/SvgUnitCalculator::getFactorReferenceUnit2MM();
-	stepFactY = cncControl->getCncConfig()->getDisplayFactY() * svgOutputParameters.zoomFactor * 1/SvgUnitCalculator::getFactorReferenceUnit2MM();
+	stepFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX() * svgOutputParameters.zoomFactor * 1/SvgUnitCalculator::getFactorReferenceUnit2MM();
+	stepFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY() * svgOutputParameters.zoomFactor * 1/SvgUnitCalculator::getFactorReferenceUnit2MM();
 
 	// always values from original svg, because only then the original path fits correctly
 	width  		= w;

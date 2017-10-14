@@ -36,6 +36,12 @@ SVGFileParser::~SVGFileParser() {
 	delete pathHandler;
 }
 //////////////////////////////////////////////////////////////////
+void SVGFileParser::initNextClientId(long id) {
+//////////////////////////////////////////////////////////////////
+	wxASSERT(pathHandler);
+	pathHandler->initNextClientId(id);
+}
+//////////////////////////////////////////////////////////////////
 bool SVGFileParser::evaluateProcessingCallback() {
 //////////////////////////////////////////////////////////////////
 	return evaluateProcessingState();
@@ -645,7 +651,7 @@ void SVGFileParser::initNextPath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl && cncControl->getCncConfig());
+	wxASSERT(cncControl);
 	CncWorkingParameters& cwp = pathHandler->getCncWorkingParameters();
 	
 	wxString attr = child->GetAttribute("reverse", "no");

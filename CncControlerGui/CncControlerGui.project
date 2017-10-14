@@ -170,6 +170,10 @@
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
       <File Name="Codelite/wxPNGAnimation.h"/>
+      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="release2"/>
+      <File Name="Codelite/cl_aui_dock_art.h"/>
+      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="release2"/>
+      <File Name="Codelite/drawingutils.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
       <File Name="wxcrafter.cpp"/>

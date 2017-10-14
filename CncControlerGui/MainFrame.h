@@ -38,12 +38,22 @@ class wxMenuItem;
 // global definitions
 typedef std::vector<wxWindow*> GuiControls;
 
+
 ////////////////////////////////////////////////////////////////////
 class MainFrame : public MainFrameBClass {
 
 	// User command
 	protected:
-    virtual void clearPositionSpy(wxCommandEvent& event);
+		virtual void loadPerspectiveDebug(wxCommandEvent& event);
+		virtual void loadPerspectiveRun(wxCommandEvent& event);
+		virtual void loadPerspectiveSource(wxCommandEvent& event);
+		virtual void savePerspectiveDebug(wxCommandEvent& event);
+		virtual void savePerspectiveRun(wxCommandEvent& event);
+		virtual void savePerspectiveSource(wxCommandEvent& event);
+		virtual void viewDebugger(wxCommandEvent& event);
+		virtual void viewPosistionMonitor(wxCommandEvent& event);
+		virtual void toggleTemplateManager(wxCommandEvent& event);
+		virtual void clearPositionSpy(wxCommandEvent& event);
 		virtual void onSelectManuallyMove(wxCommandEvent& event);
 		virtual void onSelectReferences(wxCommandEvent& event);
 		virtual void onSelectSetup(wxCommandEvent& event);
@@ -72,9 +82,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void requestErrorCount(wxCommandEvent& event);
 		virtual void paintDrawPaneWindow(wxPaintEvent& event);
 		virtual void UpdateLogger(wxCommandEvent& event);
-		virtual void perspectiveDefault(wxCommandEvent& event);
-		virtual void perspectiveRun(wxCommandEvent& event);
-		virtual void perspectiveTemplate(wxCommandEvent& event);
 		virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event);
 		virtual void cfgStepDelayArduino(wxCommandEvent& event);
 		virtual void cfgStepDelayMax(wxCommandEvent& event);
@@ -245,7 +252,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void setZero(wxCommandEvent& event);
 		virtual void clearLogger(wxCommandEvent& event);
 		virtual void connect(wxCommandEvent& event);
-		virtual void reinit(wxCommandEvent& event);
 		virtual void selectUAInboundPathList(wxDataViewEvent& event);
 		virtual void selectUAUseDirectiveList(wxDataViewEvent& event);
 		virtual void selectUADetailInfo(wxDataViewEvent& event);
@@ -315,22 +321,9 @@ class MainFrame : public MainFrameBClass {
 		wxTextCtrl* getCtrlSerialSpy() 			{ return serialSpy; }
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		// UpdateManagerThread interface
-		// Important! Don't use the pointer updateManagerThread directly whitout a wxCriticalSectionLocker
-		#define SAVE_UPD_THREAD  wxCriticalSectionLocker enter(pThreadCS); if ( updateManagerThread == NULL ) return
-		void umEnableDisplay(bool state)													{ SAVE_UPD_THREAD; updateManagerThread->enableDisplay(state); }
-		
-		//void umPostAppPos(const CncLongPosition& pPos, const CncLongPosition& cPos) 		{ SAVE_UPD_THREAD; updateManagerThread->postAppPos(pPos, cPos); }
-		//void umPostAppPos(const CncLongPosition& pPos, const GLI::VerticeLongData& cVd) 	{ SAVE_UPD_THREAD; updateManagerThread->postAppPos(pPos, cVd); }
-		
-		void umPostClearPositionSpy()														{ SAVE_UPD_THREAD; updateManagerThread->postClearPositionSpy(); }
-		void umPostConfigUpdate(CncConfig* cncConfig)										{ SAVE_UPD_THREAD; updateManagerThread->postConfigUpdate(cncConfig); }
-		void umPostSetterValue(unsigned char id, int32_t value)								{ SAVE_UPD_THREAD; updateManagerThread->postSetterValue(id, value); }
-		void umPostResetZView()																{ SAVE_UPD_THREAD; updateManagerThread->postResetZView(); }
-		void umPostUpdateZView()															{ SAVE_UPD_THREAD; updateManagerThread->postUpdateZView(); }
-		
+		// this call is alread locked by the ConcurrentQueue class
 		#define UPD_THREAD  if ( updateManagerThread == NULL ) return
-		void umPostEvent(const UpdateManagerThread::Event& evt) 							{ UPD_THREAD; updateManagerThread->postEvent(evt); }
+		void umPostEvent(const UpdateManagerThread::Event& evt) 		{ UPD_THREAD; updateManagerThread->postEvent(evt); }
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void selectMainBookSourcePanel();
@@ -573,19 +566,25 @@ class MainFrame : public MainFrameBClass {
 		void enableMenuItem(wxMenuItem* m, bool state = true);
 		void disableMenuItem(wxMenuItem* m) { enableMenuItem(m, false); }
 
-		void toggleAuiPane(wxWindow* pane, wxMenuItem* menu);
-		void showAuiPane(wxWindow* pane, wxMenuItem* menu);
-		void hideAuiPane(wxWindow* pane, wxMenuItem* menu);
+		void toggleAuiPane(wxWindow* pane, wxMenuItem* menu, bool update=true);
+		void showAuiPane(wxWindow* pane, wxMenuItem* menu, bool update=true);
+		void hideAuiPane(wxWindow* pane, wxMenuItem* menu, bool update=true);
 		
-		void toggleAuiPane(const wxString& name);
-		void showAuiPane(const wxString& name);
-		void hideAuiPane(const wxString& name);
+		void toggleAuiPane(const wxString& name, bool update=true);
+		void showAuiPane(const wxString& name, bool update=true);
+		void hideAuiPane(const wxString& name, bool update=true);
 		
 		void hideAllAuiPanes();
 		void viewAllAuiPanes(bool withSpy=false);
 		
+		bool loadPerspective(const wxString& name);
+		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
+		void savePerspective(const wxString& name);
+		
 		wxWindow* getAUIPaneByName(const wxString& name);
 		wxMenuItem* getAUIMenuByName(const wxString& name);
+		
+		void decorateViewMenu();
 		
 		void startAnimationControl();
 		void stopAnimationControl();

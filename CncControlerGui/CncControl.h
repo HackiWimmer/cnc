@@ -30,7 +30,7 @@ class CncControl {
 		enum DimensionMode {DM_2D, DM_3D};
 		
 	private:
-		wxString stringTemplate;
+		long currentClientId;
 		
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
@@ -61,6 +61,9 @@ class CncControl {
 		CncLongPosition controllerPos;
 		// Render mode
 		CncRenderMode renderMode;
+		// speed values
+		CncSpeed speedType;
+		unsigned int speedX, speedY, speedZ;
 		// Duration counter
 		unsigned int durationCounter;
 		// Interrupt stae
@@ -114,6 +117,10 @@ class CncControl {
 		
 		CncControl(CncPortType pt);
 		virtual ~CncControl();
+		
+		void setClientId(long id) { currentClientId = id; }
+		const long getClientId() const { return currentClientId; }
+		
 		//Get the current port type
 		CncPortType getPortType(void) { return portType; }
 		// Connection to portName
@@ -122,9 +129,18 @@ class CncControl {
 		bool isConnected();
 		//Make Serial available
 		Serial* getSerial() { return serialPort; }
-		//Make cnc config available
-		CncConfig* getCncConfig() { return cncConfig; }
-		void updateCncConfig(CncConfig& cc);
+		//speed
+		CncSpeed getSpeedType() { return speedType; }
+		inline unsigned int getSpeedX(void) { return speedX; }
+		inline unsigned int getSpeedY(void) { return speedY; }
+		inline unsigned int getSpeedZ(void) { return speedZ; }
+		
+		inline void setSpeedX(unsigned int val) { speedX= val; }
+		inline void setSpeedY(unsigned int val) { speedY= val; }
+		inline void setSpeedZ(unsigned int val) { speedZ= val; }
+		void setActiveSpeedXY(CncSpeed s);
+		void setActiveSpeedZ(CncSpeed s);
+		const wxString& getSpeedAsString();
 		// wrapper
 		bool processCommand(const char* cmd, std::ostream& txtCtl);
 		// wrapper

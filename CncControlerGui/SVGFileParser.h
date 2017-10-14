@@ -45,12 +45,14 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		virtual bool isInterrupted() { return cncControl->isInterrupted(); }
 		virtual void selectSourceControl(unsigned long pos);
 		virtual bool addPathElement(char c, unsigned int count, double values[]);
+		virtual void initNextClientId(long id);
 		
 		bool processXMLNode(wxXmlNode *child);
 		bool evaluateCncParameters(wxXmlNode *child);
 		void evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm);
 		
 		bool spool();
+		
 		
 		void initXMLNode(wxXmlNode *child);
 		void registerXMLNode(wxXmlNode *child);
