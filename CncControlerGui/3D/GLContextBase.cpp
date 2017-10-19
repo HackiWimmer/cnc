@@ -270,7 +270,7 @@ void GLContextBase::drawCoordinateOrigin() {
 			glVertex3f(coordOriginInfo.length, 0.0f, 0.0f);
 			
 		glEnd();
-		renderBitmapString(coordOriginInfo.length + croneHight, -charOffset, -charOffset, GLUT_BITMAP_8_BY_13, "X");
+		renderBitmapString(coordOriginInfo.length + croneHight + charOffset, charOffset, charOffset, GLUT_BITMAP_8_BY_13, "X");
 		
 		glPushMatrix();
 			glTranslatef(coordOriginInfo.length, 0.0f, 0.0f);
@@ -286,10 +286,10 @@ void GLContextBase::drawCoordinateOrigin() {
 			glVertex3f(0.0f, coordOriginInfo.length, 0.0f);
 		
 		glEnd();
-		renderBitmapString(0.0f, coordOriginInfo.length + croneHight, 0.0f, GLUT_BITMAP_8_BY_13, "Y");
+		renderBitmapString(charOffset, coordOriginInfo.length + croneHight-charOffset, charOffset, GLUT_BITMAP_8_BY_13, "Y");
 
 		glPushMatrix();
-			glTranslatef(-charOffset, coordOriginInfo.length, -charOffset);
+			glTranslatef(0.0f, coordOriginInfo.length, 0.0f);
 			glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
 			drawSolidCone(croneDiameter, croneHight, 30, 30);
 		glPopMatrix();
@@ -302,11 +302,23 @@ void GLContextBase::drawCoordinateOrigin() {
 			glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
 		
 		glEnd();
-		renderBitmapString(0.0f, 0.0f, coordOriginInfo.length + croneHight, GLUT_BITMAP_8_BY_13, "Z");
+		//renderBitmapString(charOffset, charOffset, coordOriginInfo.length + croneHight + charOffset, GLUT_BITMAP_8_BY_13, "Z");
 		
 		glPushMatrix();
-			glTranslatef(-charOffset, -charOffset, coordOriginInfo.length);
-			drawSolidCone(croneDiameter, croneHight, 30, 30);
+			
+			#warning todo
+			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
+			glColor3ub(255, 255, 255);
+			drawSolidCone(croneDiameter * 0.8f, 0.0001f, 30, 30);
+		
+			glTranslatef(0.0f, 0.0f, 0.0001f);
+			glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
+			//drawSolidCone(croneDiameter, croneHight, 30, 30);
+			
+			glTranslatef(0.0f, 0.0f, croneHight);
+			glColor3ub(255, 255, 255);
+			drawSolidCone(croneDiameter * 0.1f, 0.0001f, 30, 30);
+			
 		glPopMatrix();
 }
 /////////////////////////////////////////////////////////////////

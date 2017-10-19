@@ -39,7 +39,6 @@
 #include <wx/combobox.h>
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
-#include <wx/listbook.h>
 #include <wx/propgrid/manager.h>
 #include <wx/spinbutt.h>
 #include <wx/checkbox.h>
@@ -49,6 +48,7 @@
 #include <wx/scrolwin.h>
 #include <wx/listbox.h>
 #include "CncZView.h"
+#include <wx/listbook.h>
 #include <wx/webview.h>
 #include "CncSpeedView.h"
 #include <wx/listctrl.h>
@@ -148,84 +148,13 @@ protected:
     wxDataViewListCtrl* m_dvListCtrlSvgUADetailInfo;
     wxTextCtrl* m_selectedUAInfo;
     wxPanel* m_mainBookSetup;
-    wxListbook* m_listbook2220;
+    wxNotebook* m_notebook4561;
     wxPanel* m_setupConfigPage;
     wxPropertyGridManager* m_pgMgrSetup;
-    wxPanel* m_setupEnvPage;
-    wxStaticText* m_staticText1880;
-    wxStaticLine* m_staticLine2226;
-    wxTextCtrl* m_envrionmentInfo;
-    wxPanel* m_setupWorkPage;
-    wxStaticText* m_staticText7791;
-    wxStaticLine* m_staticLine9572;
-    wxStaticText* m_staticText569;
-    wxTextCtrl* m_workpieceThickness;
-    wxStaticText* m_staticText1289;
-    wxTextCtrl* m_crossingThickness;
-    wxStaticLine* m_staticLine3109;
-    wxStaticText* m_staticText57510;
-    wxComboBox* m_cbToolType;
-    wxStaticText* m_staticText575;
-    wxTextCtrl* m_routerBitDiameter;
-    wxStaticLine* m_staticLine3111;
-    wxStaticText* m_staticText12374;
-    wxTextCtrl* m_replyThreshold;
-    wxStaticText* m_staticText1517;
-    wxComboBox* m_cbStepSignX;
-    wxStaticText* m_staticText1519;
-    wxComboBox* m_cbStepSignY;
-    wxStaticText* m_staticText1479;
-    wxComboBox* m_cbUseProceesdSetterList;
-    wxStaticText* m_staticText1475;
-    wxComboBox* m_cbClearProceesdSetterList;
-    wxPanel* m_setupSpeedPage;
-    wxStaticText* m_staticText779125;
-    wxStaticLine* m_staticLine957236;
-    wxStaticText* m_staticText2798;
-    wxComboBox* m_cbPreconfiguredSpeedSetups;
-    wxStaticLine* m_staticLine9572361;
-    wxStaticText* m_staticText9241;
-    wxTextCtrl* m_maxXYSpeed;
-    wxStaticText* m_staticText924;
-    wxComboBox* m_flySpeedXY;
-    wxStaticText* m_staticText932;
-    wxComboBox* m_workSpeedXY;
-    wxStaticText* m_staticText1019;
-    wxComboBox* m_currentSpeedXY;
-    wxButton* m_button266116;
-    wxStaticLine* m_staticLine3113;
-    wxStaticText* m_staticText1208;
-    wxTextCtrl* m_maxZSpeed;
-    wxStaticText* m_staticText92813;
-    wxComboBox* m_flySpeedZ;
-    wxStaticText* m_staticText1213;
-    wxComboBox* m_workSpeedZ;
-    wxStaticText* m_staticText101911;
-    wxComboBox* m_currentSpeedZ;
-    wxButton* m_button2661;
-    wxPanel* m_setupDimPage;
-    wxStaticText* m_staticText77912;
-    wxStaticLine* m_staticLine95723;
-    wxStaticText* m_staticText854;
-    wxTextCtrl* m_maxXDimension;
-    wxStaticText* m_staticText856;
-    wxTextCtrl* m_maxYDimension;
-    wxStaticText* m_staticText85611;
-    wxTextCtrl* m_maxZDimension;
-    wxPanel* m_setupSVGPage;
-    wxStaticText* m_staticText77914;
-    wxStaticLine* m_staticLine95725;
-    wxStaticText* m_staticText1237;
-    wxComboBox* m_cbSvgZoom;
-    wxStaticText* m_staticText1261;
-    wxComboBox* m_cbSvgIncludeOriginalPath;
-    wxStaticText* m_staticText126111;
-    wxComboBox* m_cbSvgFirstCrossing;
-    wxPanel* m_setupApp;
-    wxStaticText* m_staticText779122;
-    wxStaticLine* m_staticLine957233;
-    wxStaticText* m_staticText12375;
-    wxComboBox* m_cbRunConfirmationMode;
+    wxButton* m_loadConfiguration;
+    wxButton* m_saveConfiguration;
+    wxPanel* m_setupSpeedWizard;
+    wxStaticText* m_staticText4575;
     wxPanel* m_mainBookReference;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
@@ -362,7 +291,6 @@ protected:
     wxStaticText* m_staticText2381;
     wxStaticText* m_staticText2379;
     wxStaticText* m_staticText2383;
-    wxCheckBox* m_testDimTakeOverAndSave;
     wxStaticLine* m_staticLine2385;
     wxStaticText* m_testDimAxisX;
     wxCheckBox* m_testDimModeX;
@@ -422,6 +350,9 @@ protected:
     wxStaticText* m_staticText4402;
     wxPanel* m_filePreviewPlaceholder;
     wxTextCtrl* m_currentFileMangerPreviewFileName;
+    wxPanel* m_panelZView;
+    CncZView* m_zView;
+    wxStaticText* m_infoToolDiameter;
     wxScrolledWindow* m_scrollWinMonitor;
     wxChoice* m_monitorViewSelector;
     wxSimplebook* m_monitorViewBook;
@@ -459,10 +390,6 @@ protected:
     wxButton* m_btRequestCtlErrorInfo;
     wxDataViewListCtrl* m_dvListCtrlControllerErrorInfo;
     wxPanel* m_3DPane;
-    wxStaticText* m_staticText10481;
-    CncZView* m_zView;
-    wxStaticText* m_infoToolDiameter;
-    wxStaticBitmap* m_staticBitmap3490;
     wxStaticBitmap* m_lableWorkpieceThickness;
     wxStaticBitmap* m_toolStateTrafficLight;
     wxBitmapToggleButton* m_switchMonitoing;
@@ -604,6 +531,7 @@ protected:
     wxMenuItem* m_miViewTemplateManager;
     wxMenuItem* m_miViewMainView;
     wxMenuItem* m_miViewMonitor;
+    wxMenuItem* m_miViewZAxis;
     wxMenuItem* m_miViewPosMonitor;
     wxMenuItem* m_miViewDebugger;
     wxMenuItem* m_miViewSpy;
@@ -720,26 +648,12 @@ protected:
     virtual void selectUAInboundPathList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUAUseDirectiveList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUADetailInfo(wxDataViewEvent& event) { event.Skip(); }
-    virtual void killFocusWorkpieceThickness(wxFocusEvent& event) { event.Skip(); }
-    virtual void killFocusCrossingThickness(wxFocusEvent& event) { event.Skip(); }
-    virtual void killFocusRouterDiameter(wxFocusEvent& event) { event.Skip(); }
-    virtual void killFocusReplyThreshold(wxFocusEvent& event) { event.Skip(); }
-    virtual void updateReverseStepSignX(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateReverseStepSignY(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event) { event.Skip(); }
-    virtual void killFocusMaxSpeedXY(wxFocusEvent& event) { event.Skip(); }
-    virtual void updateFlySpeedXY(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateWorkSpeedXY(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateCurrentSpeedXY(wxCommandEvent& event) { event.Skip(); }
-    virtual void configureXYSpeedWithZValues(wxCommandEvent& event) { event.Skip(); }
-    virtual void killFocusMaxSpeedZ(wxFocusEvent& event) { event.Skip(); }
-    virtual void updateFlySpeedZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateWorkSpeedZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateCurrentSpeedZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void configureZSpeedWithXYValues(wxCommandEvent& event) { event.Skip(); }
-    virtual void killFocusMaxDimensionX(wxFocusEvent& event) { event.Skip(); }
-    virtual void killFocusMaxDimensionY(wxFocusEvent& event) { event.Skip(); }
-    virtual void killFocusMaxDimensionZ(wxFocusEvent& event) { event.Skip(); }
+    virtual void setupGridChanged(wxPropertyGridEvent& event) { event.Skip(); }
+    virtual void setupGridChanging(wxPropertyGridEvent& event) { event.Skip(); }
+    virtual void setupGridSelected(wxPropertyGridEvent& event) { event.Skip(); }
+    virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void loadConfiguration(wxCommandEvent& event) { event.Skip(); }
+    virtual void saveConfiguration(wxCommandEvent& event) { event.Skip(); }
     virtual void mvSpinUpX(wxSpinEvent& event) { event.Skip(); }
     virtual void mvSpinDownX(wxSpinEvent& event) { event.Skip(); }
     virtual void mvSpinUpY(wxSpinEvent& event) { event.Skip(); }
@@ -871,6 +785,7 @@ protected:
     virtual void viewTemplateManager(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMainView(wxCommandEvent& event) { event.Skip(); }
     virtual void viewMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void viewZAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void viewPosistionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void viewDebugger(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpy(wxCommandEvent& event) { event.Skip(); }
@@ -976,83 +891,12 @@ public:
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetMainBookSourcePanel() { return m_mainBookSourcePanel; }
     wxPropertyGridManager* GetPgMgrSetup() { return m_pgMgrSetup; }
+    wxButton* GetLoadConfiguration() { return m_loadConfiguration; }
+    wxButton* GetSaveConfiguration() { return m_saveConfiguration; }
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
-    wxStaticText* GetStaticText1880() { return m_staticText1880; }
-    wxStaticLine* GetStaticLine2226() { return m_staticLine2226; }
-    wxTextCtrl* GetEnvrionmentInfo() { return m_envrionmentInfo; }
-    wxPanel* GetSetupEnvPage() { return m_setupEnvPage; }
-    wxStaticText* GetStaticText7791() { return m_staticText7791; }
-    wxStaticLine* GetStaticLine9572() { return m_staticLine9572; }
-    wxStaticText* GetStaticText569() { return m_staticText569; }
-    wxTextCtrl* GetWorkpieceThickness() { return m_workpieceThickness; }
-    wxStaticText* GetStaticText1289() { return m_staticText1289; }
-    wxTextCtrl* GetCrossingThickness() { return m_crossingThickness; }
-    wxStaticLine* GetStaticLine3109() { return m_staticLine3109; }
-    wxStaticText* GetStaticText57510() { return m_staticText57510; }
-    wxComboBox* GetCbToolType() { return m_cbToolType; }
-    wxStaticText* GetStaticText575() { return m_staticText575; }
-    wxTextCtrl* GetRouterBitDiameter() { return m_routerBitDiameter; }
-    wxStaticLine* GetStaticLine3111() { return m_staticLine3111; }
-    wxStaticText* GetStaticText12374() { return m_staticText12374; }
-    wxTextCtrl* GetReplyThreshold() { return m_replyThreshold; }
-    wxStaticText* GetStaticText1517() { return m_staticText1517; }
-    wxComboBox* GetCbStepSignX() { return m_cbStepSignX; }
-    wxStaticText* GetStaticText1519() { return m_staticText1519; }
-    wxComboBox* GetCbStepSignY() { return m_cbStepSignY; }
-    wxStaticText* GetStaticText1479() { return m_staticText1479; }
-    wxComboBox* GetCbUseProceesdSetterList() { return m_cbUseProceesdSetterList; }
-    wxStaticText* GetStaticText1475() { return m_staticText1475; }
-    wxComboBox* GetCbClearProceesdSetterList() { return m_cbClearProceesdSetterList; }
-    wxPanel* GetSetupWorkPage() { return m_setupWorkPage; }
-    wxStaticText* GetStaticText779125() { return m_staticText779125; }
-    wxStaticLine* GetStaticLine957236() { return m_staticLine957236; }
-    wxStaticText* GetStaticText2798() { return m_staticText2798; }
-    wxComboBox* GetCbPreconfiguredSpeedSetups() { return m_cbPreconfiguredSpeedSetups; }
-    wxStaticLine* GetStaticLine9572361() { return m_staticLine9572361; }
-    wxStaticText* GetStaticText9241() { return m_staticText9241; }
-    wxTextCtrl* GetMaxXYSpeed() { return m_maxXYSpeed; }
-    wxStaticText* GetStaticText924() { return m_staticText924; }
-    wxComboBox* GetFlySpeedXY() { return m_flySpeedXY; }
-    wxStaticText* GetStaticText932() { return m_staticText932; }
-    wxComboBox* GetWorkSpeedXY() { return m_workSpeedXY; }
-    wxStaticText* GetStaticText1019() { return m_staticText1019; }
-    wxComboBox* GetCurrentSpeedXY() { return m_currentSpeedXY; }
-    wxButton* GetButton266116() { return m_button266116; }
-    wxStaticLine* GetStaticLine3113() { return m_staticLine3113; }
-    wxStaticText* GetStaticText1208() { return m_staticText1208; }
-    wxTextCtrl* GetMaxZSpeed() { return m_maxZSpeed; }
-    wxStaticText* GetStaticText92813() { return m_staticText92813; }
-    wxComboBox* GetFlySpeedZ() { return m_flySpeedZ; }
-    wxStaticText* GetStaticText1213() { return m_staticText1213; }
-    wxComboBox* GetWorkSpeedZ() { return m_workSpeedZ; }
-    wxStaticText* GetStaticText101911() { return m_staticText101911; }
-    wxComboBox* GetCurrentSpeedZ() { return m_currentSpeedZ; }
-    wxButton* GetButton2661() { return m_button2661; }
-    wxPanel* GetSetupSpeedPage() { return m_setupSpeedPage; }
-    wxStaticText* GetStaticText77912() { return m_staticText77912; }
-    wxStaticLine* GetStaticLine95723() { return m_staticLine95723; }
-    wxStaticText* GetStaticText854() { return m_staticText854; }
-    wxTextCtrl* GetMaxXDimension() { return m_maxXDimension; }
-    wxStaticText* GetStaticText856() { return m_staticText856; }
-    wxTextCtrl* GetMaxYDimension() { return m_maxYDimension; }
-    wxStaticText* GetStaticText85611() { return m_staticText85611; }
-    wxTextCtrl* GetMaxZDimension() { return m_maxZDimension; }
-    wxPanel* GetSetupDimPage() { return m_setupDimPage; }
-    wxStaticText* GetStaticText77914() { return m_staticText77914; }
-    wxStaticLine* GetStaticLine95725() { return m_staticLine95725; }
-    wxStaticText* GetStaticText1237() { return m_staticText1237; }
-    wxComboBox* GetCbSvgZoom() { return m_cbSvgZoom; }
-    wxStaticText* GetStaticText1261() { return m_staticText1261; }
-    wxComboBox* GetCbSvgIncludeOriginalPath() { return m_cbSvgIncludeOriginalPath; }
-    wxStaticText* GetStaticText126111() { return m_staticText126111; }
-    wxComboBox* GetCbSvgFirstCrossing() { return m_cbSvgFirstCrossing; }
-    wxPanel* GetSetupSVGPage() { return m_setupSVGPage; }
-    wxStaticText* GetStaticText779122() { return m_staticText779122; }
-    wxStaticLine* GetStaticLine957233() { return m_staticLine957233; }
-    wxStaticText* GetStaticText12375() { return m_staticText12375; }
-    wxComboBox* GetCbRunConfirmationMode() { return m_cbRunConfirmationMode; }
-    wxPanel* GetSetupApp() { return m_setupApp; }
-    wxListbook* GetListbook2220() { return m_listbook2220; }
+    wxStaticText* GetStaticText4575() { return m_staticText4575; }
+    wxPanel* GetSetupSpeedWizard() { return m_setupSpeedWizard; }
+    wxNotebook* GetNotebook4561() { return m_notebook4561; }
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
     wxStaticLine* GetStaticLine783() { return m_staticLine783; }
@@ -1187,7 +1031,6 @@ public:
     wxStaticText* GetStaticText2381() { return m_staticText2381; }
     wxStaticText* GetStaticText2379() { return m_staticText2379; }
     wxStaticText* GetStaticText2383() { return m_staticText2383; }
-    wxCheckBox* GetTestDimTakeOverAndSave() { return m_testDimTakeOverAndSave; }
     wxStaticLine* GetStaticLine2385() { return m_staticLine2385; }
     wxStaticText* GetTestDimAxisX() { return m_testDimAxisX; }
     wxCheckBox* GetTestDimModeX() { return m_testDimModeX; }
@@ -1252,6 +1095,9 @@ public:
     wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
     wxSimplebook* GetMainViewBook() { return m_mainViewBook; }
     wxPanel* GetScrollWinMain() { return m_scrollWinMain; }
+    CncZView* GetZView() { return m_zView; }
+    wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
+    wxPanel* GetPanelZView() { return m_panelZView; }
     wxChoice* GetMonitorViewSelector() { return m_monitorViewSelector; }
     wxStaticText* GetStaticText11481() { return m_staticText11481; }
     wxDataViewListCtrl* GetDvListCtrlConfigSummary() { return m_dvListCtrlConfigSummary; }
@@ -1284,10 +1130,6 @@ public:
     wxPanel* GetControllerErrorInfo() { return m_controllerErrorInfo; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
-    wxStaticText* GetStaticText10481() { return m_staticText10481; }
-    CncZView* GetZView() { return m_zView; }
-    wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
-    wxStaticBitmap* GetStaticBitmap3490() { return m_staticBitmap3490; }
     wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
     wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
@@ -1420,7 +1262,7 @@ public:
     wxTimer* GetStartupTimer() { return m_startupTimer; }
     wxTimer* GetSerialTimer() { return m_serialTimer; }
     wxTimer* GetTraceTimer() { return m_traceTimer; }
-    MainFrameBClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1000,700), long style = wxDEFAULT_FRAME_STYLE);
+    MainFrameBClass(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1600,1000), long style = wxDEFAULT_FRAME_STYLE);
     virtual ~MainFrameBClass();
 };
 

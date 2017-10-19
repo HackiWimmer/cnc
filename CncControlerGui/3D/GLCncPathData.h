@@ -193,7 +193,7 @@ namespace GLI {
 			
 			////////////////////////////////////////////
 			const float getAutoScaleFact() {
-				if ( size() < 3 )
+				if ( size() < 1 )
 					return 1.0;
 					
 				const float x = minVecties.getX(); float X = maxVecties.getX();

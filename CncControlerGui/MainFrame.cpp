@@ -102,11 +102,11 @@ wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////
-MainFrame::MainFrame(wxWindow* parent)
-: MainFrameBClass(parent) 
+MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
+: MainFrameBClass(parent)
+, GlobalConfigManager(this, GetPgMgrSetup(), globalConfig)
 , updateManagerThread(NULL)
 , isDebugMode(false)
-, isCncControlInitialized(false)
 , isZeroReferenceValid(false)
 , canClose(true)
 , evaluatePositions(true)
@@ -116,15 +116,14 @@ MainFrame::MainFrame(wxWindow* parent)
 , traceTimerCounter(0)
 , lastPortName(wxT(""))
 , defaultPortName(wxT(""))
-, cnc(NULL)
+, cnc(new CncControl(CncEMU_NULL))
 , motionMonitor(NULL)
-, filePreviewWnd(new CncFilePreviewWnd(this))
 , serialSpy(NULL)
 , fileView(NULL)
 , mainFilePreview(NULL)
 , monitorFilePreview(NULL)
 , guiCtlSetup(new GuiControlSetup())
-, config(new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
+, config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , pathGenerator(new PathGeneratorFrame(this, m_stcFileContent))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
@@ -145,12 +144,7 @@ MainFrame::MainFrame(wxWindow* parent)
 ///////////////////////////////////////////////////////////////////
 	// determine assert handler
 	wxSetDefaultAssertHandler();
-	
-	// initialize the global configuration and the cnc control
-	// the sequence below is important!
-	CncConfig::setSetupGrid(m_pgMgrSetup, config);
-	cnc = new CncControl(CncEMU_NULL);
-	
+			
 	// initilazied update mananger thread
 	initializeUpdateManagerThread();
 	
@@ -337,11 +331,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_ctrlTestSelection);
-	registerGuiControl(m_testDimTakeOverAndSave);
 	registerGuiControl(m_portSelector);
-	registerGuiControl(m_maxXDimension);
-	registerGuiControl(m_maxYDimension);
-	registerGuiControl(m_maxZDimension);
 	registerGuiControl(m_testDimModeX);
 	registerGuiControl(m_testDimModeY);
 	registerGuiControl(m_testDimModeZ);
@@ -381,10 +371,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_spinButtonZ);
 	registerGuiControl(m_moveXYAxisCtl);
 	registerGuiControl(m_moveZAxisCtl);
-	registerGuiControl(m_currentSpeedXY);
-	registerGuiControl(m_flySpeedXY);
-	registerGuiControl(m_workSpeedXY);
-	registerGuiControl(m_workSpeedZ);
 	registerGuiControl(m_reloadTemplate);
 	registerGuiControl(m_openSourceExtern);
 	registerGuiControl(m_openSvgExtern);
@@ -441,6 +427,8 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	CncConfig::getGlobalCncConfig()->setMaxDimensionX(42.42);
 
 }
 ///////////////////////////////////////////////////////////////////
@@ -484,29 +472,19 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	loadPerspective("Run");
 	decorateViewMenu();
 	
-	// Show environment information
-	std::ostream stream(m_envrionmentInfo);
-	CncFileNameService::trace(stream);
-	SvgUnitCalculator::trace(stream);
-
 	// Auto connect ?
-	wxString cfgStr;
-	config->Read("App/AutoConnect", &cfgStr, wxT("false"));
-	if ( cfgStr == "true")
+	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
 		connectSerialPort();
 		
-	/*
 	// Auto process ?
-	config->Read("App/AutoProcess", &cfgStr, wxT("false"));
-	if ( cfgStr == "true" ) {
+	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
 		defineMinMonitoring();
 		processTemplate();
 		defineNormalMonitoring();
 	}
-	*/
 
 	//todo - only temp
-	wxCommandEvent dummy;
+	//wxCommandEvent dummy;
 	//openSVGPathGenerator(dummy);
 }
 ///////////////////////////////////////////////////////////////////
@@ -971,37 +949,6 @@ void MainFrame::initialize(void) {
 	// setup cnc port selector box
 	decoratePortSelector();
 	
-	config->Read("COMConfig/DefaultPort", &cfgStr, wxString(_portEmulatorNULL));
-	m_portSelector->SetStringSelection(cfgStr);
-	defaultPortName.assign(cfgStr);
-
-	wxFloatingPointValidator<float> val2(1, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	val2.SetRange(0, 50.0);
-	m_workpieceThickness->SetValidator(val2);
-
-	wxFloatingPointValidator<float> val3(3, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	val3.SetRange(0, 10.0);
-	m_routerBitDiameter->SetValidator(val3);
-	
-	wxFloatingPointValidator<float> val4(3, NULL,wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	val4.SetRange(-1000, 1000);
-	m_maxXDimension->SetValidator(val4);
-	m_maxYDimension->SetValidator(val4);
-	m_maxZDimension->SetValidator(val4);
-	
-	wxFloatingPointValidator<float> val5(0, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	val5.SetRange(1, 1000);
-	m_maxXYSpeed->SetValidator(val5);
-	m_maxZSpeed->SetValidator(val5);
-	
-	wxFloatingPointValidator<float> val6(1, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	val2.SetRange(0.0, 4.0);
-	m_crossingThickness->SetValidator(val2);
-	
-	wxIntegerValidator<long> val7(NULL);
-	val7.SetRange(1, 4000);
-	m_replyThreshold->SetValidator(val7);
-	
 	wxFloatingPointValidator<float> val8(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	val8.SetRange(0, 100.0);
 	m_testDistanceX->SetValidator(val8);
@@ -1042,22 +989,17 @@ void MainFrame::initialize(void) {
 	comment << "Return + Ctrl   Set RefPos with workpiece Thickness\n";
 	(*m_moveZAxisCtl) << comment;
 	
-	config->Read("App/ShowTestMenu", &cfgStr, "false");
-	if ( cfgStr.MakeUpper().Trim() != "TRUE" ) {
+	if ( CncConfig::getGlobalCncConfig()->getShowTestMenuFlag() == false )
 		m_menuBar->Remove(m_menuBar->FindMenu("Test"));
-	}
-	
+		
 	//initilaize debug state
-	config->Read("CncConfig/Debug", &cfgStr, "false"); 
-	if ( cfgStr == "true" ) { m_menuItemDebugSerial->Check(true); }
-	else				    { m_menuItemDebugSerial->Check(false); }
+	m_menuItemDebugSerial->Check(false);
 	
 	decorateSerialSpy();
 	
 	resetMinMaxPositions();
 	initializeLruMenu();
 	initializeCncControl();
-	initializePreconfiguredSpeedSetups();
 	
 	m_outboundNotebook->SetSelection(Outbound3DPage);
 	m_notebookConfig->SetSelection(CNCSetterPage);
@@ -1073,72 +1015,49 @@ bool MainFrame::initializeCncControl() {
 
 	//Determine output controls
 	determineCncOutputControls();
-
+	
 	//Initialize the cnc configuartion
-	wxString cfgStr, val;
-	long cfgLong;
-	double cfgDouble;
 	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	
 	if ( cncConfig != NULL ) {
-		config->Read("CncConfig/StepsX", &cfgLong, 200); cncConfig->setStepsX(cfgLong);
-		config->Read("CncConfig/StepsY", &cfgLong, 200); cncConfig->setStepsY(cfgLong);
-		config->Read("CncConfig/StepsZ", &cfgLong, 200); cncConfig->setStepsZ(cfgLong);
-
-		config->Read("CncConfig/MultiplierX", &cfgLong, 1); cncConfig->setMultiplierX(cfgLong);
-		config->Read("CncConfig/MultiplierY", &cfgLong, 1); cncConfig->setMultiplierY(cfgLong);
-		config->Read("CncConfig/MultiplierZ", &cfgLong, 1); cncConfig->setMultiplierZ(cfgLong);
-		config->Read("CncConfig/PitchX", &cfgDouble, 2.0); cncConfig->setPitchX(cfgDouble);
-		config->Read("CncConfig/PitchY", &cfgDouble, 2.0); cncConfig->setPitchY(cfgDouble);
-		config->Read("CncConfig/PitchZ", &cfgDouble, 2.0); cncConfig->setPitchZ(cfgDouble);
-		config->Read("CncConfig/PulsWidthOffsetX", &cfgLong, 100); cncConfig->setPulsWidthOffsetX(cfgLong);
-		config->Read("CncConfig/PulsWidthOffsetY", &cfgLong, 100); cncConfig->setPulsWidthOffsetY(cfgLong);
-		config->Read("CncConfig/PulsWidthOffsetZ", &cfgLong, 100); cncConfig->setPulsWidthOffsetZ(cfgLong);
+		wxString value;
 		
-		if ( isCncControlInitialized == false ) {
-
-			// init max dimensions
-			config->Read("CncConfig/MaxDimensionsX", &cfgDouble, 1.0); cncConfig->setMaxDimensionX(cfgDouble);
-			m_maxXDimension->SetValue(wxString::Format("%4.3f", cncConfig->getMaxDimensionX()));
-
-			config->Read("CncConfig/MaxDimensionsY", &cfgDouble, 1.0); cncConfig->setMaxDimensionY(cfgDouble);
-			m_maxYDimension->SetValue(wxString::Format("%4.3f", cncConfig->getMaxDimensionY()));
-			
-			config->Read("CncConfig/MaxDimensionsZ", &cfgDouble, 1.0); cncConfig->setMaxDimensionZ(cfgDouble);
-			m_maxZDimension->SetValue(wxString::Format("%4.3f", cncConfig->getMaxDimensionZ()));
-
-			// init speed config
-			m_maxXYSpeed->SetValue(wxString() << cncConfig->getMaxSpeedXY());
-			config->Read("CncConfig/FlySpeedXY",  &cfgStr, "90");
-			m_flySpeedXY->SetStringSelection(cfgStr);
-			config->Read("CncConfig/WorkSpeedXY",  &cfgStr, "80");
-			m_workSpeedXY->SetStringSelection(cfgStr);
-			
-			m_maxZSpeed->SetValue(wxString() << cncConfig->getMaxSpeedZ());
-			config->Read("CncConfig/FlySpeedZ",  &cfgStr, "90");
-			m_flySpeedZ->SetStringSelection(cfgStr);
-			config->Read("CncConfig/WorkSpeedZ",  &cfgStr, "80");
-			m_workSpeedZ->SetStringSelection(cfgStr);
-			
-			m_currentSpeedXY->SetSelection(0);
-			m_currentSpeedZ->SetSelection(0);
-			updateSpeedValues();
+		// initialize display unit
+		m_unit->SetStringSelection(cncConfig->getDefaultDisplayUnitAsStr());
+		updateUnit();
 	
-			// init interval
-			unsigned int interval = 1;
-			val = m_cbUpdateInterval->GetValue();
-			interval = wxAtoi(val);
-			cncConfig->setUpdateInterval(interval);
+		// initialize com port
+		cncConfig->getDefaultPort(value);
+		m_portSelector->SetStringSelection(value);
+		defaultPortName.assign(value);
 
-			//initilaize cnc unit
-			config->Read("CncConfig/Unit", &cfgStr, "mm"); 
-			if ( cfgStr == "mm" ) { cncConfig->setUnit(CncMetric); m_unit->SetStringSelection("mm"); }
-			else				  { cncConfig->setUnit(CncSteps);  m_unit->SetStringSelection("steps"); }
-			updateUnit();
+		// initialize update interval
+		unsigned int interval = 1;
+		interval = wxAtoi(m_cbUpdateInterval->GetValue());
+		cncConfig->setUpdateInterval(interval);
+	
+		// initialize speed control
+		m_speedView->setMaxSpeedX(cncConfig->getMaxSpeedXY());
+		m_speedView->setMaxSpeedY(cncConfig->getMaxSpeedXY());
+		m_speedView->setMaxSpeedZ(cncConfig->getMaxSpeedZ());
+
+		if ( cnc->isConnected() ) {
+			if ( cncConfig->getDefaultSpeedModeXY(value) == "RAPID")	cnc->changeWorkSpeedXY(CncSpeedRapid);
+			else														cnc->changeWorkSpeedXY(CncSpeedWork);
+			
+			if ( cncConfig->getDefaultSpeedModeZ(value)  == "RAPID")	cnc->changeWorkSpeedZ(CncSpeedRapid);
+			else														cnc->changeWorkSpeedZ(CncSpeedWork);
+		} else {
+			cnc->changeWorkSpeedZ(CncSpeedRapid);
+			cnc->changeWorkSpeedZ(CncSpeedRapid);
 		}
+		
+		m_speedView->setCurrentSpeedX(cnc->getSpeedX());
+		m_speedView->setCurrentSpeedY(cnc->getSpeedY());
+		m_speedView->setCurrentSpeedZ(cnc->getSpeedZ());
 	}
 	
-	//Initialize the postion controls
+	// initialize the postion controls
 	cnc->setZeroPos();
 	updateCncConfigTrace();
 	
@@ -1151,8 +1070,7 @@ bool MainFrame::initializeCncControl() {
 	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
 	else				    					cnc->getSerial()->enableSpyOutput(false); 
 	
-	isCncControlInitialized = true;
-	return isCncControlInitialized;
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeLruMenu() {
@@ -1160,15 +1078,16 @@ bool MainFrame::initializeLruMenu() {
 	//load lru list from config file
 	lruFileList.load(lruStore);
 	
-	wxString cfgStr;
+	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	
-	config->Read("DefaultTemplate/DefaultDir", &cfgStr, wxT(""));
-	fileView->setDefaultPath(cfgStr);
+	wxString value;
+	cncConfig->getDefaultTplDir(value);
+	fileView->setDefaultPath(value);
 	fileView->selectDefaultPath();
 	
-	config->Read("DefaultTemplate/Filename", &cfgStr, wxT(""));
+	cncConfig->getDefaultTplFile(value);
 	wxFileName fn;
-	if ( cfgStr.length() > 0 ) 	fn.Assign(cfgStr);
+	if ( value.length() > 0 ) 	fn.Assign(value);
 	else 						fn.Assign(lruFileList.getFileName(0));
 	
 	if ( fn.Exists() ) {
@@ -1179,8 +1098,8 @@ bool MainFrame::initializeLruMenu() {
 		prepareAndShowMonitorTemplatePreview();
 		introduceCurrentFile();
 	} else {
-		config->Read("DefaultTemplate/DefaultDir", &cfgStr, wxT(""));
-		fileView->openDirectory(cfgStr);
+		cncConfig->getDefaultTplDir(value);
+		fileView->openDirectory(value);
 		
 		selectMainBookSourcePanel();
 		return false; 
@@ -1189,114 +1108,28 @@ bool MainFrame::initializeLruMenu() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::initializePreconfiguredSpeedSetups() {
-///////////////////////////////////////////////////////////////////
-	wxString fn(CncFileNameService::getSpeedConfigFileName());
-	wxFileConfig cfg(wxT("CncController"), wxEmptyString, fn, fn, wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
-	
-	m_cbPreconfiguredSpeedSetups->Clear();
-	
-	wxString str;
-	long dummy, cfgLong;
-	
-	// all groups...
-	bool bCont = cfg.GetFirstGroup(str, dummy);
-	unsigned int cnt = 0;
-	while ( bCont ) {
-		cnt++;
-		wxString item(wxString::Format("%03d: ", cnt));
-		item << str;
-		item << wxString(' ', 50 - str.Length());
-		
-		item << "[";
-		cfg.Read(str + "/FlySpeedXY", &cfgLong, 10); item << cfgLong; item << ", ";
-		cfg.Read(str + "/FlySpeedZ", &cfgLong, 10); item << cfgLong; item << ", ";
-		cfg.Read(str + "/WorkSpeedXY", &cfgLong, 10); item << cfgLong; item << ", ";
-		cfg.Read(str + "/WorkSpeedZ", &cfgLong, 10); item << cfgLong; item << "]";
-		
-		m_cbPreconfiguredSpeedSetups->Append(item);
-		bCont = cfg.GetNextGroup(str, dummy);
-	}
-	
-	if ( m_cbPreconfiguredSpeedSetups->GetCount() > 0 ) {
-		m_cbPreconfiguredSpeedSetups->Select(0);
-		wxCommandEvent dummyEvent;
-		selectPreconfiguredSpeedSetups(dummyEvent);
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::performSpeedValueConfig(wxComboBox* cb, const wxString& item) {
-///////////////////////////////////////////////////////////////////
-	if ( cb == NULL )
-		return;
-		
-	long test;
-	item.ToLong(&test);
-	if ( test < 0 || test > 100 )
-		return;
-	
-	if ( cb->FindString(item, true) == wxNOT_FOUND ) {
-		cb->Append(item);
-	} 
-	
-	cb->SetStringSelection(item);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::selectPreconfiguredSpeedSetups(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString item = m_cbPreconfiguredSpeedSetups->GetStringSelection();
-	int p1 = wxNOT_FOUND, p2 = wxNOT_FOUND;
-	if ( (p1 = item.Find("[")) != wxNOT_FOUND ) {
-		if ( (p2 = item.Find("]")) != wxNOT_FOUND && p2 >= p1 + 2) {
-			item = item.SubString(p1 + 1, p2 - 1);
-			
-			wxStringTokenizer tokenizer(item, ",");
-			unsigned int cnt = 0;
-			while ( tokenizer.HasMoreTokens() ) {
-				wxString token = tokenizer.GetNextToken();
-				token.Trim(true).Trim(false);
-				cnt++;
-				
-				switch ( cnt ) {
-					case 1:		performSpeedValueConfig(m_flySpeedXY, token);
-								break;
-					case 2:		performSpeedValueConfig(m_flySpeedZ, token);
-								break;
-					case 3:		performSpeedValueConfig(m_workSpeedXY, token);
-								break;
-					case 4:		performSpeedValueConfig(m_workSpeedZ, token);
-								break;
-					default: 	std::cerr << "MainFrame::selectPreconfiguredSpeedSetups: Invalid token count: " << cnt << std::endl;
-				}
-			}
-			
-			updateSpeedValues();
-		}
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::determineCncOutputControls() {
 ///////////////////////////////////////////////////////////////////
 	//Determine output controls
-	guiCtlSetup->mainFrame			= this;
+	guiCtlSetup->mainFrame				= this;
 	
-	guiCtlSetup->motionMonitor		= motionMonitor;
+	guiCtlSetup->motionMonitor			= motionMonitor;
 	
-	guiCtlSetup->passingTrace		= m_passingCount;
-	guiCtlSetup->toolState 			= m_toolStateTrafficLight;
+	guiCtlSetup->passingTrace			= m_passingCount;
+	guiCtlSetup->toolState 				= m_toolStateTrafficLight;
 	
-	guiCtlSetup->controllerConfig	= m_dvListCtrlControllerConfig;
-	guiCtlSetup->controllerPinReport= m_dvListCtrlControllerPins;
-	guiCtlSetup->controllerErrorInfo= m_dvListCtrlControllerErrorInfo;
+	guiCtlSetup->controllerConfig		= m_dvListCtrlControllerConfig;
+	guiCtlSetup->controllerPinReport	= m_dvListCtrlControllerPins;
+	guiCtlSetup->controllerErrorInfo	= m_dvListCtrlControllerErrorInfo;
 	
-	guiCtlSetup->motorState 		= m_miMotorEnableState;
+	guiCtlSetup->motorState 			= m_miMotorEnableState;
 	
-	guiCtlSetup->xMinLimit 			= m_xMinLimit;
-	guiCtlSetup->xMaxLimit 			= m_xMaxLimit;
-	guiCtlSetup->yMinLimit 			= m_yMinLimit;
-	guiCtlSetup->yMaxLimit 			= m_yMaxLimit;
-	guiCtlSetup->zMinLimit 			= m_zMinLimit;
-	guiCtlSetup->zMaxLimit 			= m_zMaxLimit;
+	guiCtlSetup->xMinLimit 				= m_xMinLimit;
+	guiCtlSetup->xMaxLimit 				= m_xMaxLimit;
+	guiCtlSetup->yMinLimit 				= m_yMinLimit;
+	guiCtlSetup->yMaxLimit 				= m_yMaxLimit;
+	guiCtlSetup->zMinLimit 				= m_zMinLimit;
+	guiCtlSetup->zMaxLimit 				= m_zMaxLimit;
 	
 	cnc->setGuiControls(guiCtlSetup);
 }
@@ -1328,7 +1161,7 @@ void MainFrame::updateUnit() {
 	m_zManuallySlider->SetValue(0);
 	
 	if ( unit == "mm" ) { 
-		cncConfig->setUnit(CncMetric); 
+		cncConfig->setDisplayUnit(CncMetric); 
 		m_metricX->SetValue("0.000");
 		m_metricY->SetValue("0.000");
 		m_metricZ->SetValue("0.000");
@@ -1337,7 +1170,7 @@ void MainFrame::updateUnit() {
 		yLimit *= cncConfig->getStepsY();
 		zLimit *= cncConfig->getStepsZ();
 
-		cncConfig->setUnit(CncSteps);
+		cncConfig->setDisplayUnit(CncSteps);
 		m_metricX->SetValue("0");
 		m_metricY->SetValue("0");
 		m_metricZ->SetValue("0");
@@ -1646,121 +1479,18 @@ void MainFrame::svgEmuReload(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::svgEmuOpenFileAsSource(wxCommandEvent& event) {
-	wxString cmd, svgFile;
-	config->Read("TemplateEditor/ExternalTool", &cmd, wxT("notepad "));
+	wxString tool, svgFile;
+	CncConfig::getGlobalCncConfig()->getEditorTool(tool);
 	getSvgEmuFileName(svgFile);
-	openFileExtern(cmd, svgFile);
+	openFileExtern(tool, svgFile);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::svgEmuOpenFileAsSvg(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString cmd, svgFile;
-	config->Read("EmulatorSVG/SVGFileViewer", &cmd, wxT("explorer "));
+	wxString tool, svgFile;
+		CncConfig::getGlobalCncConfig()->getSVGFileViewer(tool);
 	getSvgEmuFileName(svgFile);
-	openFileExtern(cmd, svgFile);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusMaxDimensionX(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	wxASSERT(m_maxXDimension);
-	
-	wxString val = m_maxXDimension->GetValue();
-	double rbd;
-	if ( val.length() > 0 )	val.ToDouble(&rbd);
-	else					rbd = 0.0;
-	
-	CncConfig::getGlobalCncConfig()->setMaxDimensionX(rbd);
-	updateCncConfigTrace();
-	
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusMaxDimensionY(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	wxASSERT(m_maxYDimension);
-	
-	wxString val = m_maxYDimension->GetValue();
-	double rbd;
-	if ( val.length() > 0 )	val.ToDouble(&rbd);
-	else					rbd = 0.0;
-	
-	CncConfig::getGlobalCncConfig()->setMaxDimensionY(rbd);
-	updateCncConfigTrace();
-	
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusMaxDimensionZ(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	wxASSERT(m_maxZDimension);
-	
-	wxString val = m_maxZDimension->GetValue();
-	double rbd;
-	if ( val.length() > 0 )	val.ToDouble(&rbd);
-	else					rbd = 0.0;
-	
-	CncConfig::getGlobalCncConfig()->setMaxDimensionZ(rbd);
-	updateCncConfigTrace();
-	
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusRouterDiameter(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	wxASSERT(m_routerBitDiameter);
-	
-	wxString val = m_routerBitDiameter->GetValue();
-	double rbd;
-	if ( val.length() > 0 )	val.ToDouble(&rbd);
-	else					rbd = 0.0;
-
-	CncConfig::getGlobalCncConfig()->setRouterBitDiameter(rbd);
-	updateCncConfigTrace();
-	
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusReplyThreshold(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	
-	wxString rt = m_replyThreshold->GetValue();
-	long v = 0;
-	rt.ToLong(&v);
-	
-	if ( (unsigned long)v != CncConfig::getGlobalCncConfig()->getReplyThreshold() ) {
-		CncConfig::getGlobalCncConfig()->setRelyThreshold(v);
-		cnc->setup(false);
-		updateCncConfigTrace();
-	}
-	
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateReverseStepSignX(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	wxString sel = m_cbStepSignX->GetStringSelection();
-	if ( sel.MakeUpper() == "YES") 	CncConfig::getGlobalCncConfig()->setStepSignX(-1);
-	else							CncConfig::getGlobalCncConfig()->setStepSignX(+1);
-	
-	cnc->setup(false);
-	updateCncConfigTrace();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateReverseStepSignY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	wxString sel = m_cbStepSignY->GetStringSelection();
-	if ( sel.MakeUpper() == "YES") 	CncConfig::getGlobalCncConfig()->setStepSignY(-1);
-	else							CncConfig::getGlobalCncConfig()->setStepSignY(+1);
-	
-	cnc->setup(false);
-	updateCncConfigTrace();
+	openFileExtern(tool, svgFile);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateInclWpt(wxCommandEvent& event) {
@@ -1773,7 +1503,7 @@ void MainFrame::updateInclWpt(wxCommandEvent& event) {
 int MainFrame::showSetReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
 	wxMessageDialog dlg(this, msg, _T("Action required  . . . "), 
-				wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
+				        wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
 	dlg.SetYesNoCancelLabels("Set with workpiece thickness ", "Set without workpiece thieckness", "Do it later . . . ");
 	
 	int ret = dlg.ShowModal();
@@ -1788,7 +1518,7 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 							setZero();
 							break;
 							
-		default:			m_crossingThickness->SetFocus(); 
+		default:			;//m_crossingThickness->SetFocus(); 
 							//do nothing
 	}
 	
@@ -1800,195 +1530,38 @@ void MainFrame::updateCncConfigTrace() {
 	wxASSERT(cnc);
 	
 	cnc->updateCncConfigTrace();
+	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", CncConfig::getGlobalCncConfig()->getToolDiameter()));
 	
 	typedef UpdateManagerThread::Event Event;
 	static Event evt;
 	umPostEvent(evt.ZViewUpdateEvent());
 
 	collectSummary();
-	
-	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", CncConfig::getGlobalCncConfig()->getRouterBitDiameter()));
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusWorkpieceThickness(wxFocusEvent& event) {
+void MainFrame::changeWorkpieceThickness() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
+	double wpt = CncConfig::getGlobalCncConfig()->getWorkpieceThickness();
 	
-	wxString val = m_workpieceThickness->GetValue();
-	double wpt;
-	if ( val.length() > 0 )	val.ToDouble(&wpt);
-	else					wpt = 0.0;
-	
-	if ( cnc::dblCompareNull(wpt) == true )
-		m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_NO_WPT"));
-	else 
-		m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_WPT"));
+	if ( cnc::dblCompareNull(wpt) == true )	m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_NO_WPT"));
+	else 									m_lableWorkpieceThickness->SetBitmap(ImageLib16().Bitmap("BMP_WPT"));
 		
 	m_lableWorkpieceThickness->SetToolTip(wxString::Format("Workpiece thickness: %.3lf mm", wpt));
 	m_lableWorkpieceThickness->Refresh();
+	setRefPostionState(false);
 	
-	if ( CncConfig::getGlobalCncConfig()->getWorkpieceThickness() != wpt ) {
-		CncConfig::getGlobalCncConfig()->setWorkpieceThickness(wpt);
-		updateCncConfigTrace();
-		setRefPostionState(false);
-		
-		wxString msg("A workpiece thickness change requires a redefinition of the CNC reference position.\n\n");
-		msg << "This have to be done before the next CNC run.\n\n";
-		msg << "The set function below can be used to set it directly.";
-		
-		showSetReferencePositionDlg(msg);
-	}
+	wxString msg("A workpiece thickness change requires a redefinition of the CNC reference position.\n\n");
+	msg << "This have to be done before the next CNC run.\n\n";
+	msg << "The set function below can be used to set it directly.";
 	
+	showSetReferencePositionDlg(msg);
 	m_crossings->ChangeValue(wxString() << CncConfig::getGlobalCncConfig()->getDurationCount());
-	
-	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusCrossingThickness(wxFocusEvent& event) {
+void MainFrame::changeCrossingThickness() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	wxASSERT(m_crossingThickness);
-	
-	wxString val = m_crossingThickness->GetValue();
-	double ct;
-	if ( val.length() > 0 )	val.ToDouble(&ct);
-	else					ct = 2.0;
-	
-	
-	if ( CncConfig::getGlobalCncConfig()->getMaxDurationThickness() != ct ) {
-		CncConfig::getGlobalCncConfig()->setMaxDurationThickness(ct);
-		updateCncConfigTrace();
-	}
-	
 	m_crossings->ChangeValue(wxString() << CncConfig::getGlobalCncConfig()->getDurationCount());
-	
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusMaxSpeedXY(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateFlySpeedXY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateWorkSpeedXY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusMaxSpeedZ(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateWorkSpeedZ(wxCommandEvent& event){
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateCurrentSpeedXY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateCurrentSpeedZ(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateFlySpeedZ(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::configureXYSpeedWithZValues(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_flySpeedXY->SetStringSelection(m_flySpeedZ->GetStringSelection());
-	m_workSpeedXY->SetStringSelection(m_workSpeedZ->GetStringSelection());
-	m_currentSpeedXY->SetStringSelection(m_currentSpeedZ->GetStringSelection());
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::configureZSpeedWithXYValues(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_flySpeedZ->SetStringSelection(m_flySpeedXY->GetStringSelection());
-	m_workSpeedZ->SetStringSelection(m_workSpeedXY->GetStringSelection());
-	m_currentSpeedZ->SetStringSelection(m_currentSpeedXY->GetStringSelection());
-	updateSpeedValues();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateSpeedValues() {
-///////////////////////////////////////////////////////////////////
-	wxString maxXY 	= m_maxXYSpeed->GetValue();
-	wxString flyXY  = m_flySpeedXY->GetStringSelection();
-	wxString workXY = m_workSpeedXY->GetStringSelection();
-	wxString selXY  = m_currentSpeedXY->GetStringSelection();
-	
-	wxString maxZ 	= m_maxZSpeed->GetValue();
-	wxString flyZ   = m_flySpeedZ->GetStringSelection();
-	wxString workZ  = m_workSpeedZ->GetStringSelection();
-	wxString selZ   = m_currentSpeedZ->GetStringSelection();
-	
-	long mXY=0, mZ = 0, fXY=0, wXY=0, fZ=0, wZ=0;
-	if ( maxXY.length()  > 0 ) 	maxXY.ToLong(&mXY);
-	if ( flyXY.length()  > 0 )	flyXY.ToLong(&fXY);
-	if ( workXY.length() > 0 )	workXY.ToLong(&wXY);
-	
-	if ( maxZ.length()   > 0 ) 	maxXY.ToLong(&mZ);
-	if ( flyZ.length()   > 0 )	flyZ.ToLong(&fZ);
-	if ( workZ.length()  > 0 )	workZ.ToLong(&wZ);
-
-	if ( mXY <= 0 ) mXY = 1;
-	if ( mZ  <= 0 ) mZ  = 1;
-	
-	double val; 
-	if ( fXY != 0 && wXY != 0 ) {
-		val = CncConfig::getGlobalCncConfig()->getMaxSpeedXY() * fXY/100;
-		CncConfig::getGlobalCncConfig()->setRapidSpeedXY((int)val);
-
-		val = CncConfig::getGlobalCncConfig()->getMaxSpeedXY() * wXY/100;
-		CncConfig::getGlobalCncConfig()->setWorkSpeedXY((int)val);
-	} else {
-		CncConfig::getGlobalCncConfig()->setRapidSpeedXY(1);
-		CncConfig::getGlobalCncConfig()->setWorkSpeedXY(1);
-	}
-
-	if ( fZ != 0 && wZ != 0 ) {
-		val = CncConfig::getGlobalCncConfig()->getMaxSpeedZ() * fZ/100;
-		CncConfig::getGlobalCncConfig()->setRapidSpeedZ((int)val);
-
-		val = CncConfig::getGlobalCncConfig()->getMaxSpeedZ() * wZ/100;
-		CncConfig::getGlobalCncConfig()->setWorkSpeedZ((int)val);
-	} else {
-		CncConfig::getGlobalCncConfig()->setRapidSpeedZ(1);
-		CncConfig::getGlobalCncConfig()->setWorkSpeedZ(1);
-	}
-	
-	if ( cnc->isConnected() ) {
-		if (selXY.MakeUpper() == "FLY")	cnc->changeWorkSpeedXY(CncSpeedRapid);
-		else							cnc->changeWorkSpeedXY(CncSpeedWork);
-		
-		if (selZ.MakeUpper()  == "FLY")	cnc->changeWorkSpeedZ(CncSpeedRapid);
-		else							cnc->changeWorkSpeedZ(CncSpeedWork);
-		
-	} else {
-		cnc->setActiveSpeedXY(CncSpeedRapid);
-		cnc->setActiveSpeedZ(CncSpeedRapid);
-	}
-
-	updateCncConfigTrace();
-	
-	
-	m_speedView->setMaxSpeedX(CncConfig::getGlobalCncConfig()->getMaxSpeedXY());
-	m_speedView->setMaxSpeedY(CncConfig::getGlobalCncConfig()->getMaxSpeedXY());
-	m_speedView->setMaxSpeedZ(CncConfig::getGlobalCncConfig()->getMaxSpeedZ());
-
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::defineMinMonitoring(wxCommandEvent& event) {
@@ -2371,26 +1944,26 @@ void MainFrame::reloadTemplateFromButton(wxCommandEvent& event) {
 void MainFrame::openTemplateSourceExtern(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	saveFile();
-		
-	wxString cmd;
-	config->Read("TemplateEditor/ExternalTool", &cmd, wxT("notepad"));
-	openFileExtern(cmd, getCurrentTemplatePathFileName());
+	
+	wxString tool;
+	CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+	openFileExtern(tool, getCurrentTemplatePathFileName());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplateSvgExtern(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString cmd;
+	wxString tool;
 	
 	switch ( getCurrentTemplateFormat() ) {
 		case TplSvg:
 					saveFile();
-					config->Read("App/SVGFileEditor", &cmd, wxT("notepad"));
-					openFileExtern(cmd, getCurrentTemplatePathFileName());
+					CncConfig::getGlobalCncConfig()->getSVGFileViewer(tool);
+					openFileExtern(tool, getCurrentTemplatePathFileName());
 					break;
 		case TplGcode:
 					saveFile();
-					config->Read("App/GCodeFileEditor", &cmd, wxT("notepad"));
-					openFileExtern(cmd, getCurrentTemplatePathFileName());
+					CncConfig::getGlobalCncConfig()->getGCodeFileViewer(tool);
+					openFileExtern(tool, getCurrentTemplatePathFileName());
 					break;
 		default:
 					std::clog << "No external editor availiable for current file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
@@ -2909,13 +2482,8 @@ void MainFrame::testDimTakeOverX(wxCommandEvent& event) {
 	wxString val = m_testDimResultX->GetValue();
 	val.ToDouble(&v);
 	
-	if ( v > 0.0 ) {
-		m_maxXDimension->SetValue(val);
+	if ( v > 0.0 )
 		CncConfig::getGlobalCncConfig()->setMaxDimensionX(v);
-		
-		if ( m_testDimTakeOverAndSave->GetValue() == true )
-			config->Write("CncConfig/MaxDimensionsX", m_maxXDimension->GetValue());
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testDimTakeOverY(wxCommandEvent& event) {
@@ -2924,13 +2492,8 @@ void MainFrame::testDimTakeOverY(wxCommandEvent& event) {
 	wxString val = m_testDimResultY->GetValue();
 	val.ToDouble(&v);
 	
-	if ( v > 0.0 ) {
-		m_maxYDimension->SetValue(m_testDimResultY->GetValue());
+	if ( v > 0.0 )
 		CncConfig::getGlobalCncConfig()->setMaxDimensionY(v);
-		
-		if ( m_testDimTakeOverAndSave->GetValue() == true )
-			config->Write("CncConfig/MaxDimensionsY", m_maxYDimension->GetValue());
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testDimTakeOverZ(wxCommandEvent& event) {
@@ -2939,13 +2502,8 @@ void MainFrame::testDimTakeOverZ(wxCommandEvent& event) {
 	wxString val = m_testDimResultZ->GetValue();
 	val.ToDouble(&v);
 
-	if ( v > 0.0 ) {
-		m_maxZDimension->SetValue(m_testDimResultZ->GetValue());
+	if ( v > 0.0 )
 		CncConfig::getGlobalCncConfig()->setMaxDimensionZ(v);
-		
-		if ( m_testDimTakeOverAndSave->GetValue() == true )
-			config->Write("CncConfig/MaxDimensionsZ", m_maxZDimension->GetValue());
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::processTestMove(wxStaticText* axis, wxStaticText* counter, int c, double xd, double yd, double zd) {
@@ -3093,12 +2651,18 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 bool MainFrame::showConfigSummaryAndConfirmRun() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
-	wxString mode = m_cbRunConfirmationMode->GetStringSelection();
+	
+	wxString mode;
+	CncConfig::getGlobalCncConfig()->getRunConfirmationMode(mode);
+	if ( mode.IsEmpty() == true )
+		mode.assign("Always");
+		
 	switch ( (char)mode[0] ) {
-		// alwyays
-		case 'a':	break;
+		// Always
+		case 'A':	break;
+		
 		// Serial Port only
-		case 'c': 	if ( cnc->getSerial()->isEmulator() )
+		case 'S': 	if ( cnc->getSerial()->isEmulator() )
 						return true;
 						
 					break;
@@ -3173,7 +2737,7 @@ void MainFrame::collectSummary() {
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	
 	DcmItemList rows;
-	DataControlModel::addNumParameterValueUnitRow(rows, "Tool Diameter",					wxString::Format(" %.3f", 	cc->getRouterBitDiameter()), 		" mm"); 
+	DataControlModel::addNumParameterValueUnitRow(rows, "Tool Diameter",					wxString::Format(" %.3f", 	cc->getToolDiameter()), 			" mm"); 
 	DataControlModel::addNumParameterValueUnitRow(rows, "Workpiece thickness", 				wxString::Format(" %4.3f", 	cc->getWorkpieceThickness()), 		" mm"); 
 	DataControlModel::addNumParameterValueUnitRow(rows, "Max thickness per crossing", 		wxString::Format(" %4.3f", 	cc->getMaxDurationThickness()), 	" mm"); 
 	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed XY", 					wxString::Format(" %d", 	cc->getWorkSpeedXY()), 				" rpm"); 
@@ -4124,49 +3688,32 @@ void MainFrame::moveZToBottom(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 SvgOutputParameters& MainFrame::evaluteSvgOutputParameters(SvgOutputParameters& sop) {
 ///////////////////////////////////////////////////////////////////
-	wxString sel = m_cbSvgZoom->GetStringSelection();
-	sel.ToDouble(&sop.zoomFactor);
-	
-	sel = m_cbSvgIncludeOriginalPath->GetStringSelection();
-	if (sel.MakeUpper() == "YES" ) 	sop.copyOrigPath = true;
-	else							sop.copyOrigPath = false;
-	
-	sel = m_cbSvgFirstCrossing->GetStringSelection();
-	if (sel.MakeUpper() == "YES" ) 	sop.onlyFirstCrossing = true;
-	else							sop.onlyFirstCrossing = false;
+	sop.zoomFactor 			= CncConfig::getGlobalCncConfig()->getSvgEmulatorCopyFactor();
+	sop.copyOrigPath 		= CncConfig::getGlobalCncConfig()->getSvgResultWithOrigPathFlag();
+	sop.onlyFirstCrossing 	= CncConfig::getGlobalCncConfig()->getSvgResultOnlyFirstCrossingFlag();
 	
 	return sop;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openConfigurationFile(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString cmd;
-	config->Read("TemplateEditor/ExternalTool", &cmd, wxT("notepad "));
-	openFileExtern(cmd, CncFileNameService::getConfigFileName());
+	wxString tool;
+	CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+	openFileExtern(tool, CncFileNameService::getConfigFileName());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openExternalEditor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString cmd;
-	wxString tool("Tools/ExternalEditor");
-	config->Read(tool, &cmd, wxT("notepad "));
-	if ( cmd.IsEmpty() ) {
-		std::cerr << "Nothing configured for: " << tool << std::endl;
-		return;
-	}
-	openFileExtern(cmd, _(""));
+	wxString tool;
+	CncConfig::getGlobalCncConfig()->getEditorTool(tool);
+	openFileExtern(tool, _(""));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openPyCam(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString cmd;
-	wxString tool("Tools/PyCAM");
-	config->Read(tool, &cmd, wxT(""));
-	if ( cmd.IsEmpty() ) {
-		std::cerr << "Nothing configured for: " << tool << std::endl;
-		return;
-	}
-	openFileExtern(cmd, _(""));
+	wxString tool;
+	CncConfig::getGlobalCncConfig()->getPyCamTool(tool);
+	openFileExtern(tool, _(""));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openCalculator(wxCommandEvent& event) {
@@ -4588,8 +4135,11 @@ void MainFrame::openMainPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMonitorPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	#warning why?????
-	//selectMonitorBookTemplatePanel();
+	// the call below creates an endlos loop
+	// because selectMonitorBookTemplatePanel 
+	// calls inderetly openMonitorPreview
+	// selectMonitorBookTemplatePanel();
+	
 	openPreview(monitorFilePreview, fn);
 }
 ///////////////////////////////////////////////////////////////////
@@ -4773,7 +4323,8 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "UnitCalculator")		return m_svgUnitCalulator;
 	else if ( name == "Debugger")			return m_debuggerView;
 	else if ( name == "PositionMonitor")	return m_positionMonitorView;
-
+	else if ( name == "ZView")				return m_panelZView;
+	
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
@@ -4790,7 +4341,8 @@ wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 	else if ( name == "UnitCalculator")		return m_miViewUnitCalculator;
 	else if ( name == "Debugger")			return m_miViewDebugger;
 	else if ( name == "PositionMonitor")	return m_miViewPosMonitor;
-
+	else if ( name == "ZView")				return m_miViewZAxis;
+	
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
@@ -4882,6 +4434,11 @@ void MainFrame::viewMonitor(wxCommandEvent& event) {
 	toggleAuiPane("Outbound");
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::viewZAxis(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	toggleAuiPane("ZView");
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::viewSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	toggleAuiPane("SerialSpy");
@@ -4923,7 +4480,7 @@ void MainFrame::onPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
 		perspectiveTimer.Stop();
 		
 	if ( m_miToolbar->IsChecked() )
-		showAuiPane("ToolBar");
+		showAuiPane("Toolbar");
 		
 	if ( m_miViewStatusbar->IsChecked() )
 		showAuiPane("StatusBar");
@@ -4988,7 +4545,8 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 	
 	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 		switch ( sel ) {
-			case OutboundSvgPage: 	m_svgEmuToggleOrigPath->Enable( m_cbSvgIncludeOriginalPath->GetStringSelection().Upper() == "YES" );
+			
+			case OutboundSvgPage: 	m_svgEmuToggleOrigPath->Enable( CncConfig::getGlobalCncConfig()->getSvgResultWithOrigPathFlag() );
 									break;
 									
 			case Outbound3DPage:	if ( cnc )
@@ -6237,7 +5795,7 @@ void MainFrame::openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, co
 	wxASSERT(cnc);
 	PathGeneratorStore::RegenerateParameter rp;
 	rp.in.editControl  = ctl;
-	rp.in.toolDiameter = CncConfig::getGlobalCncConfig()->getRouterBitDiameter();
+	rp.in.toolDiameter = CncConfig::getGlobalCncConfig()->getToolDiameter();
 	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
 	
 	if ( pathGenerator->regenerateSvgBlock(rp) == false ) {
@@ -6267,7 +5825,7 @@ void MainFrame::regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const w
 	wxASSERT(cnc);
 	PathGeneratorStore::RegenerateParameter rp;
 	rp.in.editControl  = ctl;
-	rp.in.toolDiameter =CncConfig::getGlobalCncConfig()->getRouterBitDiameter();
+	rp.in.toolDiameter =CncConfig::getGlobalCncConfig()->getToolDiameter();
 	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
 	
 	// process
@@ -6523,6 +6081,7 @@ void MainFrame::ensureAllPanesFromPerspectiveAreShown(const wxString& name) {
 			}
 		}
 		
+		decorateViewMenu();
 		GetAuimgrMain()->Update();
 	}
 }
@@ -6537,6 +6096,8 @@ bool MainFrame::loadPerspective(const wxString& name) {
 	
 	if ( ret == false )	viewAllAuiPanes();
 	else				m_auimgrMain->LoadPerspective(perspective);
+	
+	decorateViewMenu();
 	
 	return ret;
 }
@@ -6593,4 +6154,45 @@ void MainFrame::savePerspectiveSource(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	savePerspective("Source");
 }
-
+/////////////////////////////////////////////////////////////////////
+void MainFrame::releaseControllerSetupFromConfig() {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(cnc);
+	cnc->setup(false);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setupGridChanged(wxPropertyGridEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(CncConfig::getGlobalCncConfig());
+	CncConfig::getGlobalCncConfig()->setupGridChanged(this, event);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setupGridChanging(wxPropertyGridEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(CncConfig::getGlobalCncConfig());
+	CncConfig::getGlobalCncConfig()->setupGridChanging(this, event);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setupGridCommandButton(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(CncConfig::getGlobalCncConfig());
+	CncConfig::getGlobalCncConfig()->setupGridCommandButton(this, event);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setupGridSelected(wxPropertyGridEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(CncConfig::getGlobalCncConfig());
+	CncConfig::getGlobalCncConfig()->setupGridSelected(this, event);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::saveConfiguration(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(CncConfig::getGlobalCncConfig());
+	CncConfig::getGlobalCncConfig()->saveConfiguration(this, *config);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::loadConfiguration(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT(CncConfig::getGlobalCncConfig());
+	CncConfig::getGlobalCncConfig()->loadConfiguration(this, *config);
+}

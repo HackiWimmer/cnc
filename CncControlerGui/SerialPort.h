@@ -4,13 +4,15 @@
 #define ARDUINO_WAIT_TIME 2000
 
 #include <wx/string.h>
-#include <windows.h>
 #include <vector> 
 #include <map>
+
+#include <windef.h>
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
+//#include <windows.h>
 
 class CncControl;
 
@@ -124,9 +126,9 @@ class Serial {
 		// flag if the comand evaluation routine currently runs
 		bool isCommand;
 		//Get various information about the connection
-		COMSTAT status;
+		//COMSTAT status;
 		//Keep track of last error
-		DWORD errors;
+		//DWORD errors;
 		// output flag
 		bool traceInfo;
 		// Port name

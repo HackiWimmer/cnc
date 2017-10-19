@@ -132,7 +132,6 @@
       <File Name="CncToolStateControl.cpp"/>
       <File Name="CncArduino.h"/>
       <File Name="CncCommon.h"/>
-      <File Name="CncConfig.h"/>
       <File Name="CncControl.h"/>
       <File Name="CncControllerTestSuite.h"/>
       <File Name="CncFileNameService.h"/>
@@ -157,7 +156,6 @@
       <File Name="CncPathListManager.cpp"/>
       <File Name="CncClipperWrapper.h"/>
       <File Name="CncClipperWrapper.cpp"/>
-      <File Name="CncConfig.cpp"/>
       <File Name="CncUsbPortScanner.cpp"/>
       <File Name="CncUsbPortScanner.h"/>
       <File Name="CncFilePreview.cpp"/>
@@ -170,10 +168,10 @@
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
       <File Name="Codelite/wxPNGAnimation.h"/>
-      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="release2"/>
+      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="Debug;release2"/>
       <File Name="Codelite/cl_aui_dock_art.h"/>
-      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="release2"/>
-      <File Name="Codelite/drawingutils.h"/>
+      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="Debug;release2"/>
+      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Debug"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
       <File Name="wxcrafter.cpp"/>
@@ -243,6 +241,19 @@
         <File Name="SVGUserAgent.h"/>
         <File Name="SVGUserAgentInfo.h"/>
         <File Name="SvgViewBox.h"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
+    <VirtualDirectory Name="Config">
+      <File Name="CncConfig.cpp"/>
+      <File Name="CncConfig.h"/>
+      <VirtualDirectory Name="Pages">
+        <File Name="CfgApplicationPage.cpp"/>
+        <File Name="CfgEnvironmentPage.cpp"/>
+        <File Name="CncConfigCommon.h"/>
+        <File Name="CfgSVGOptionPage.cpp"/>
+        <File Name="CfgGCodeOptionPage.cpp"/>
+        <File Name="CfgGeneralPage.cpp"/>
+        <File Name="CfgWorkingPage.cpp"/>
       </VirtualDirectory>
     </VirtualDirectory>
   </VirtualDirectory>

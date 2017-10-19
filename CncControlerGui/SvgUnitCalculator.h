@@ -205,17 +205,16 @@ class SvgUnitCalculator {
 		
 		///////////////////////////////////////////////////////////////////
 		static void trace(std::ostream& os) {
-			os << "SvgUnitCalculator:" << std::endl;
 			os << " DPI                        : " << getDPI() << std::endl;
 			os << " SVG Reference Unit         : " << getReferenceUnitAsStr() << std::endl;
-			os << " Factor PX                  : " << wxString::Format(wxT(" %4.9f"), _DPI_FACT_PX) << std::endl;
-			os << " Factor PT                  : " << wxString::Format(wxT(" %4.9f"), _DPI_FACT_PT) << std::endl;
+			os << " Factor PX                  : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_PX) << std::endl;
+			os << " Factor PT                  : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_PT) << std::endl;
 			os << " Factor PC                  : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_PC)  << std::endl;
-			os << " Factor MM                  : " << wxString::Format(wxT(" %4.9f"), _DPI_FACT_MM) << std::endl;
-			os << " Factor CM                  : " << wxString::Format(wxT(" %4.9f"), _DPI_FACT_CM) << std::endl;
-			os << " Factor M                   : " << wxString::Format(wxT(" %4.9f"), _DPI_FACT_M)  << std::endl;
-			os << " Factor IN                  : " << wxString::Format(wxT(" %4.9f"), _DPI_FACT_IN) << std::endl;
-			os << " Factor FT                  : " << wxString::Format(wxT(" %4.9f"), _DPI_FACT_FT) << std::endl;
+			os << " Factor MM                  : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_MM) << std::endl;
+			os << " Factor CM                  : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_CM) << std::endl;
+			os << " Factor M                   : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_M)  << std::endl;
+			os << " Factor IN                  : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_IN) << std::endl;
+			os << " Factor FT                  : " << wxString::Format(wxT("%4.9f"), _DPI_FACT_FT) << std::endl;
 		}
 };
 

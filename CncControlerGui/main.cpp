@@ -2,6 +2,7 @@
 #include <wx/app.h>
 #include <wx/image.h>
 #include <wx/intl.h>
+#include <wx/config.h>
 #include <wx/splash.h>
 #include <wx/dcmemory.h>
 #include <wx/cmdline.h>
@@ -126,17 +127,26 @@ class MainApp : public wxApp {
 ///////////////////////////////////////////////////////////////////
 	private:
 		wxCmdLineParser parser;
+		wxFileConfig* globalFileConfig;
 	
 	public:
 		///////////////////////////////////////////////////////////
-		MainApp() {
+		MainApp() 
+		: globalFileConfig(NULL)
+		{
 		///////////////////////////////////////////////////////////
+			// init file and dir names
+			CncFileNameService::init();
+			globalFileConfig = new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
 		}
 		
 		///////////////////////////////////////////////////////////
 		virtual ~MainApp() {
 		///////////////////////////////////////////////////////////
 			resetStreamRedirection();
+			
+			if ( globalFileConfig != NULL )
+				delete globalFileConfig;
 		}
 		
 		///////////////////////////////////////////////////////////////////
@@ -253,11 +263,8 @@ class MainApp : public wxApp {
 			
 			wxValidator::SuppressBellOnError(true);
 			
-			// init file and dir names
-			CncFileNameService::init();
-			
 			// build and decorate the main frame
-			MainFrame *mainFrame = new MainFrame(NULL);
+			MainFrame *mainFrame = new MainFrame(NULL, globalFileConfig);
 			
 			// command line handling
 			if ( initializeCmdLine() == false )

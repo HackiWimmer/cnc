@@ -1,4 +1,3 @@
-#include "CncConfig.h"
 #include "CncSpeedView.h"
 
 wxBEGIN_EVENT_TABLE(CncSpeedView, wxPanel)

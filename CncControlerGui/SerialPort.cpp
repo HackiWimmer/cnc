@@ -6,6 +6,7 @@
 #include "CncCommon.h"
 #include "CncArduino.h"
 #include "SerialPort.h"
+#include <windows.h>
 
 char STATIC_CMD_CHAR[2];
 static wxMutex s_mutexProtectingTheGlobalData;
@@ -224,19 +225,22 @@ int Serial::readData(void *buffer, unsigned int nbChar) {
 	DWORD bytesRead;
 	//Number of bytes we'll really ask to read
 	unsigned int toRead;
+	
+	COMSTAT status;
+	DWORD errors;
 
 	//Use the ClearCommError function to get status info on the Serial port
-	ClearCommError(this->hSerial, &this->errors, &this->status);
+	ClearCommError(this->hSerial, &errors, &status);
 
 	//Check if there is something to read
-	if( this->status.cbInQue > 0 ) {
+	if( status.cbInQue > 0 ) {
 		//Check if there is enough data to read the required number
 		//of characters, if not we'll read only the available characters to prevent
 		//locking of the application.
-		if( this->status.cbInQue > nbChar ) {
+		if( status.cbInQue > nbChar ) {
 			toRead = nbChar;
 		} else {
-			toRead = this->status.cbInQue;
+			toRead = status.cbInQue;
 		}
 
 		//Try to read the require number of chars, and return the number of read bytes on success
@@ -253,8 +257,11 @@ bool Serial::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	DWORD bytesSend;
 
+	COMSTAT status;
+	DWORD errors;
+		
 	if( !WriteFile(this->hSerial, (void *)buffer, nbByte, &bytesSend, 0) ) {
-		ClearCommError(this->hSerial, &this->errors, &this->status);
+		ClearCommError(this->hSerial, &errors, &status);
 		return false;
 	} 
 	

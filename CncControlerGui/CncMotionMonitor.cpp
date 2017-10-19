@@ -304,7 +304,7 @@ void CncMotionMonitor::rotateCamera(int angle) {
 void CncMotionMonitor::pushProcessMode() {
 //////////////////////////////////////////////////
 	//set processing flags
-	#warning todo
+	#warning todo normalize rotation 
 	//monitor->normalizeRotation();
 	monitor->setAutoScaling(getFlags().autoScaling);
 	monitor->enablePositionMarker(getFlags().positionMarker);

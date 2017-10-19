@@ -13,7 +13,6 @@
 #else
   #include <stdio.h>
   #include <string.h>
-  //#include <windows.h>
   #define	STRSAFE_E_INSUFFICIENT_BUFFER   -1
   #define	_vsnprintf_s(p,s,z,f,a)		vsnprintf(p,s,f,a)
   

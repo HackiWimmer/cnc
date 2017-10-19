@@ -37,13 +37,36 @@ class wxMenuItem;
 ////////////////////////////////////////////////////////////////////
 // global definitions
 typedef std::vector<wxWindow*> GuiControls;
+class MainFrame;
+
+class GlobalConfigManager {
+	
+	public:
+		GlobalConfigManager(MainFrame* mf, wxPropertyGridManager* pgMgrSetup, wxFileConfig* globalConfig) {
+			wxASSERT(globalConfig);
+			wxASSERT(pgMgrSetup);
+			
+			// setup configuration
+			CncConfig::setupGlobalConfigurationGrid(pgMgrSetup, *globalConfig);
+			CncConfig::globalCncConfig = new CncConfig();
+			
+			// at least load the file configuration
+			CncConfig::globalCncConfig->loadConfiguration(mf, *globalConfig);
+		}
+		
+		~GlobalConfigManager() {
+			if ( CncConfig::globalCncConfig != NULL )
+				delete CncConfig::globalCncConfig;
+		}
+};
 
 
 ////////////////////////////////////////////////////////////////////
-class MainFrame : public MainFrameBClass {
+class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
+		virtual void viewZAxis(wxCommandEvent& event);
 		virtual void loadPerspectiveDebug(wxCommandEvent& event);
 		virtual void loadPerspectiveRun(wxCommandEvent& event);
 		virtual void loadPerspectiveSource(wxCommandEvent& event);
@@ -78,7 +101,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void viewUnitCalculator(wxCommandEvent& event);
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
-		virtual void selectPreconfiguredSpeedSetups(wxCommandEvent& event);
 		virtual void requestErrorCount(wxCommandEvent& event);
 		virtual void paintDrawPaneWindow(wxPaintEvent& event);
 		virtual void UpdateLogger(wxCommandEvent& event);
@@ -192,14 +214,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void fileContentLeftDown(wxMouseEvent& event);
 		virtual void fileContentKeyDown(wxKeyEvent& event);
 		virtual void svgEmuClear(wxCommandEvent& event);
-		virtual void updateFlySpeedXY(wxCommandEvent& event);
-		virtual void updateWorkSpeedXY(wxCommandEvent& event);
-		virtual void updateWorkSpeedZ(wxCommandEvent& event);
-		virtual void configureXYSpeedWithZValues(wxCommandEvent& event);
-		virtual void configureZSpeedWithXYValues(wxCommandEvent& event);
-		virtual void updateCurrentSpeedZ(wxCommandEvent& event);
-		virtual void updateFlySpeedZ(wxCommandEvent& event);
-		virtual void updateCurrentSpeedXY(wxCommandEvent& event);
 		virtual void selectPort(wxCommandEvent& event);
 		virtual void saveEmuOutput(wxCommandEvent& event);
 		virtual void requestVersion(wxCommandEvent& event);
@@ -236,15 +250,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void mvSpinUpX(wxSpinEvent& event);
 		virtual void mvSpinUpY(wxSpinEvent& event);
 		virtual void updateInclWpt(wxCommandEvent& event);
-		virtual void killFocusWorkpieceThickness(wxFocusEvent& event);
-		virtual void killFocusCrossingThickness(wxFocusEvent& event);
-		virtual void killFocusMaxDimensionX(wxFocusEvent& event);
-		virtual void killFocusMaxDimensionY(wxFocusEvent& event);
-		virtual void killFocusMaxDimensionZ(wxFocusEvent& event);
-		virtual void killFocusMaxSpeedXY(wxFocusEvent& event);
-		virtual void killFocusMaxSpeedZ(wxFocusEvent& event);
-		virtual void killFocusRouterDiameter(wxFocusEvent& event);
-		virtual void killFocusReplyThreshold(wxFocusEvent& event);
 		virtual void svgEmuOpenFileAsSource(wxCommandEvent& event);
 		virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event);
 		virtual void svgEmuReload(wxCommandEvent& event);
@@ -272,8 +277,6 @@ class MainFrame : public MainFrameBClass {
 		virtual void maxManuallyYSlider(wxCommandEvent& event);
 		virtual void updateMetricX(wxCommandEvent& event);
 		virtual void updateMetricY(wxCommandEvent& event);
-		virtual void updateReverseStepSignX(wxCommandEvent& event);
-		virtual void updateReverseStepSignY(wxCommandEvent& event);
 		virtual void killFocusMoveZAxis(wxFocusEvent& event);
 		virtual void killFocusMoveXYAxis(wxFocusEvent& event);
 		virtual void setFocusMoveXYAxis(wxFocusEvent& event);
@@ -294,6 +297,13 @@ class MainFrame : public MainFrameBClass {
 		virtual void OnAbout(wxCommandEvent& event);
 		virtual void onClose(wxCloseEvent& event);
 		
+		virtual void loadConfiguration(wxCommandEvent& event);
+		virtual void saveConfiguration(wxCommandEvent& event);
+		virtual void setupGridChanged(wxPropertyGridEvent& event);
+		virtual void setupGridChanging(wxPropertyGridEvent& event);
+		virtual void setupGridCommandButton(wxCommandEvent& event);
+		virtual void setupGridSelected(wxPropertyGridEvent& event);
+		
 		void onThreadUpdate(wxCommandEvent& event);
 		void onThreadCompletion(wxCommandEvent& event);
 		void onPerspectiveTimer(wxTimerEvent& WXUNUSED(event));
@@ -306,7 +316,7 @@ class MainFrame : public MainFrameBClass {
 		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		MainFrame(wxWindow* parent);
+		MainFrame(wxWindow* parent, wxFileConfig* globalConfig);
 		virtual ~MainFrame();
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -352,6 +362,13 @@ class MainFrame : public MainFrameBClass {
 		//////////////////////////////////////////////////////////////////////////////////
 		virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
 		
+		/////////////////////////////////////////////////////////////////////////////////
+		// configuration callbacks
+		void releaseControllerSetupFromConfig();
+		void updateCncConfigTrace();
+		void changeWorkpieceThickness();
+		void changeCrossingThickness();
+		
 		//////////////////////////////////////////////////////////////////////////////////
 		virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
 
@@ -388,7 +405,6 @@ class MainFrame : public MainFrameBClass {
 	private:
 		// Member variables
 		bool isDebugMode;
-		bool isCncControlInitialized;
 		bool isZeroReferenceValid;
 		bool canClose;
 		bool evaluatePositions;
@@ -404,7 +420,6 @@ class MainFrame : public MainFrameBClass {
 	
 		CncControl* cnc;
 		CncMotionMonitor* motionMonitor;
-		CncFilePreviewWnd* filePreviewWnd;
 		CncSpyControl* serialSpy;
 		CncFileView* fileView;
 		CncFilePreview* mainFilePreview;
@@ -489,7 +504,6 @@ class MainFrame : public MainFrameBClass {
 		// configuration
 		void updateStepDelay();
 		void updateUnit();
-		void updateSpeedValues();
 		void updateFileContentPosition();
 		void updateCurveLibResolution();
 		
@@ -509,9 +523,6 @@ class MainFrame : public MainFrameBClass {
 		void createStcEmuControlPopupMenu();
 		
 		int showSetReferencePositionDlg(wxString msg);
-		
-		void initializePreconfiguredSpeedSetups();
-		void performSpeedValueConfig(wxComboBox* cb, const wxString& item);
 		
 		///////////////////////////////////////////////////////////////
 		// search handling
@@ -545,7 +556,6 @@ class MainFrame : public MainFrameBClass {
 		bool showConfigSummaryAndConfirmRun();
 		
 		void collectSummary();
-		void updateCncConfigTrace();
 		
 		///////////////////////////////////////////////////////////////
 		// control handling

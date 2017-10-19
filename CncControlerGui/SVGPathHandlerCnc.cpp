@@ -27,7 +27,7 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
 	
-	toolRadius = CncConfig::getGlobalCncConfig()->getRouterBitDiameter();
+	toolRadius = CncConfig::getGlobalCncConfig()->getToolDiameter();
 	toolRadius /= 2.0; 
 	
 	if ( toolRadius < 0 )

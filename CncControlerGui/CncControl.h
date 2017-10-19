@@ -135,9 +135,9 @@ class CncControl {
 		inline unsigned int getSpeedY(void) { return speedY; }
 		inline unsigned int getSpeedZ(void) { return speedZ; }
 		
-		inline void setSpeedX(unsigned int val) { speedX= val; }
-		inline void setSpeedY(unsigned int val) { speedY= val; }
-		inline void setSpeedZ(unsigned int val) { speedZ= val; }
+		inline void setSpeedX(unsigned int val) { speedX = val; }
+		inline void setSpeedY(unsigned int val) { speedY = val; }
+		inline void setSpeedZ(unsigned int val) { speedZ = val; }
 		void setActiveSpeedXY(CncSpeed s);
 		void setActiveSpeedZ(CncSpeed s);
 		const wxString& getSpeedAsString();

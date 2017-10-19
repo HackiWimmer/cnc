@@ -253,9 +253,9 @@ void UpdateManagerThread::updateAppPosition() {
 	if ( lastAppPosEvent.processed == true )
 		return;
 		
-	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getUnit());
-	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getUnit());
-	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getUnit());
+	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
 	
 	wxString formatString(" %4.3f");
 	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
@@ -281,9 +281,9 @@ void UpdateManagerThread::updateCtlPosition() {
 	if ( lastCtlPosEvent.processed == true )
 		return;
 		
-	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getUnit());
-	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getUnit());
-	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getUnit());
+	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
 	
 	wxString formatString(" %4.3f");
 	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
@@ -303,9 +303,9 @@ void UpdateManagerThread::updatePositionSpy(UpdateManagerThread::Event evt) {
 	if ( CncConfig::getGlobalCncConfig() == NULL )
 		return;
 		
-	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getUnit());
-	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getUnit());
-	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getUnit());
+	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
 	
 	wxString formatString(" %4.3f");
 	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
@@ -357,7 +357,7 @@ void UpdateManagerThread::updateZView() {
 		return;
  
 	if ( pHandler->getZView() ) {
-		double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getUnit());
+		double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
 		pHandler->getZView()->updateView(lastAppPosEvent.pos.curr.getZ() * displayFactZ);
 	}
 }
@@ -395,6 +395,7 @@ void UpdateManagerThread::updateSetterList(UpdateManagerThread::Event evt) {
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::updateSpeedView() {
 ///////////////////////////////////////////////////////////////////
+	
 	if ( lastSpeedEvent.processed == true )
 		return;
 
@@ -410,6 +411,10 @@ void UpdateManagerThread::updateSpeedView() {
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::configUpdate() {
 ///////////////////////////////////////////////////////////////////
+	#warning todo
+	return;
+	
+	
 	if ( CncConfig::getGlobalCncConfig() == NULL )
 		return;
 		
@@ -457,7 +462,7 @@ void UpdateManagerThread::configUpdate() {
 	if ( dcc != NULL ) {
 		dcc->DeleteAllItems();
 		
-		DataControlModel::addKeyValueRow(list, "Tool diameter", 			CncConfig::getGlobalCncConfig()->getRouterBitDiameter());
+		DataControlModel::addKeyValueRow(list, "Tool diameter", 			CncConfig::getGlobalCncConfig()->getToolDiameter());
 		DataControlModel::addKeyValueRow(list, "Curve lib resolution", 		wxString::Format("%.3lf", CncConfig::getCurveLibResolution()));
 		DataControlModel::addKeyValueRow(list, "Max Dimension (X)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionX());
 		DataControlModel::addKeyValueRow(list, "Max Dimension (Y)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionY());
