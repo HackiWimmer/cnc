@@ -17,6 +17,10 @@ void GLViewPort::getPreDefCoordinatesXY(GLViewPort::PreDefPos pdp,
 								y = wndSizeH - margin;
 								break;
 								
+		case VPDP_TopMid:		x = wndSizeW/2;
+								y = wndSizeH - margin;
+								break;
+
 		case VPDP_TopRight:		x = wndSizeW - margin;
 								y = wndSizeH - margin;
 								break;
@@ -25,15 +29,27 @@ void GLViewPort::getPreDefCoordinatesXY(GLViewPort::PreDefPos pdp,
 								y = margin;
 								break;
 								
+		case VPDP_BottomMid:	x = wndSizeW/2;
+								y = margin;
+								break;
+
 		case VPDP_BottomRight:	x = wndSizeW - margin;
 								y = margin;
+								break;
+								
+		case VPDP_LeftMid:		x = margin;
+								y = wndSizeH/2;
+								break;
+								
+		case VPDP_RightMid:		x = wndSizeW - margin;
+								y = wndSizeH/2;
 								break;
 								
 		case VPDP_Center:		
 		default:				x = 0;
 								y = 0; 
 								break;
-	}
+	}		
 }
 /////////////////////////////////////////////////////////////////
 void GLViewPort::evaluate(int wndSizeW,

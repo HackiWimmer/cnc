@@ -45,9 +45,6 @@ enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpe
 enum TemplateFormat 			{ TplUnknown, TplSvg, TplGcode, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3};
 
-
-
-
 class MainBookSelection {
 	public:
 		enum VAL {
@@ -76,17 +73,26 @@ class TemplateBookSelection {
 		};
 };
 
-static const unsigned int OutboundCNCValuesPage 	= 0;
-static const unsigned int Outbound3DPage 			= 1;
-static const unsigned int OutboundSvgPage 			= 2;
-static const unsigned int OutboundSvgSource			= 3;
+class OutboundSelection{
+	public:
+		enum VAL {
+			SUMMARY_PANEL				= 0,
+			MOTION_MONITOR_PANAL		= 1,
+			SVG_OUTPUT_PANEL			= 2,
+			SVG_SOURCE_PANEL			= 3
+		};
+};
 
-static const unsigned int ConfigSummaryPage 		= 0;
-static const unsigned int CNCSetterPage 			= 1;
-static const unsigned int CNCPCConfig	 			= 2;
-static const unsigned int CNCControllerConfigPage 	= 3;
-static const unsigned int CNCControllerPinsPage		= 4;
-static const unsigned int CNCControllerMsgHistPage	= 5;
-static const unsigned int CNCControllerErrorPage 	= 6;
+class OutboundCfgSelection{
+	public:
+		enum VAL {
+			SUMMARY_PANEL				= 0,
+			CNC_SETTER_PANEL			= 1,
+			CNC_CONFIG_PANEL			= 2,
+			CNC_PIN_PANEL				= 3,
+			CNC_MSG_HIST_PANEL			= 4,
+			CNC_ERROR_PANEL				= 5
+		};
+};
 
 #endif

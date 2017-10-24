@@ -41,6 +41,7 @@ class CncGCodePreview : public wxGLCanvas {
 	protected:
 		GLContextCncPathBase* preview;
 		double maxDimension;
+		bool isShown;
 		
 	private:
 		void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);

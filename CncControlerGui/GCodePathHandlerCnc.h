@@ -12,6 +12,7 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase {
 		virtual ~GCodePathHandlerCnc();
 		
 		virtual void initNextClientId(long id);
+		virtual void switchToolState(bool state);
 		
 	protected:
 		

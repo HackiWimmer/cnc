@@ -128,40 +128,21 @@ class GCodeBlock {
 		const bool isAbsolutePositioningIJ() { return posModeIJ == GC_Absolute; }
 		
 		/////////////////////////////////////////////////////
-		double getAsPx(double value) {
-			if ( value == INVALID_GCODE_FIELD_VALUE )
-				return INVALID_GCODE_FIELD_VALUE;
-				
-			switch ( unit ) {
-				case mm:	return SvgUnitCalculator::convertMM2ReferenceUnit(value);
-				case in:	return SvgUnitCalculator::convertMM2ReferenceUnit(value / 25.4);
-				default: std::cerr << "GCodeBlock::getAsPx: Invalid GCode unit: " << SvgUnitCalculator::getUnitAsStr(unit) << std::endl;
-			}
-			return INVALID_GCODE_FIELD_VALUE;
-		}
+		const double getXMoveRelative(const CncDoublePosition& curPos) { return getMoveRelative(x, curPos.getX()); }
+		const double getYMoveRelative(const CncDoublePosition& curPos) { return getMoveRelative(y, curPos.getY()); }
+		const double getZMoveRelative(const CncDoublePosition& curPos) { return getMoveRelative(z, curPos.getZ()); }
 		
-		// Only for GCodeFileParserOld - remove it later
-			/////////////////////////////////////////////////////
-			double getXAsPx() { return getAsPx(x); }
-			double getYAsPx() { return getAsPx(y); }
-			double getZAsPx() { return getAsPx(z); }
-			double getIAsPx() { return getAsPx(i); }
-			double getJAsPx() { return getAsPx(j); }
+		const double getXMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(x, curPos.getX()); }
+		const double getYMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(y, curPos.getY()); }
+		const double getZMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(z, curPos.getZ()); }
+		
+		const double ensureUnit(double value) {
+			if ( unit == in )
+				return value * 25.4;
 			
-			/////////////////////////////////////////////////////
-			double getXMoveRelativePx(const CncDoublePosition& curPxPos) { return getMoveRelative(getAsPx(x), curPxPos.getX()); }
-			double getYMoveRelativePx(const CncDoublePosition& curPxPos) { return getMoveRelative(getAsPx(y), curPxPos.getY()); }
-			double getZMoveRelativePx(const CncDoublePosition& curPxPos) { return getMoveRelative(getAsPx(z), curPxPos.getZ()); }
-		// end
-		
-		/////////////////////////////////////////////////////
-		double getXMoveRelative(const CncDoublePosition& curPos) { return getMoveRelative(x, curPos.getX()); }
-		double getYMoveRelative(const CncDoublePosition& curPos) { return getMoveRelative(y, curPos.getY()); }
-		double getZMoveRelative(const CncDoublePosition& curPos) { return getMoveRelative(z, curPos.getZ()); }
-		
-		double getXMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(x, curPos.getX()); }
-		double getYMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(y, curPos.getY()); }
-		double getZMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(z, curPos.getZ()); }
+			wxASSERT( unit == mm );
+			return value;
+		}
 		
 		//////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const GCodeBlock &a);

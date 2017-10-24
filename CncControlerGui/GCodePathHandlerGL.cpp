@@ -29,10 +29,8 @@ void GCodePathHandlerGL::finishWorkImpl() {
 bool GCodePathHandlerGL::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(glControl);
-	
-	#warning - consider unit!
-	
 	static GLI::VerticeDoubleData vd;
+	
 	vd.setVertice(0L, currentSpeed, currentPos);
 	glControl->appendVertice(vd);
 	

@@ -55,31 +55,33 @@ bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
 	return (resumeOnError == true );
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnhandledBlockCommand(GCodeBlock& gcb) {
+bool GCodeFileParser::displayUnhandledBlockCommand(GCodeBlock& gcb, const char* additionalInfo) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not handled GCode command: " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber);
+	if ( additionalInfo != NULL )
+		ss << " [" << additionalInfo << "]";
+		
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnsupportedBlockCommand(const GCodeField& field) {
+bool GCodeFileParser::displayUnsupportedBlockCommand(const GCodeField& field, const char* additionalInfo) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported GCode block command: " << field;
+	if ( additionalInfo != NULL )
+		ss << " [" << additionalInfo << "]";
+		
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayUnhandledParameter(const GCodeField& field) {
+bool GCodeFileParser::displayUnhandledParameter(const GCodeField& field, const char* additionalInfo) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << "Not supported GCode parameter: " << field.getCmd();
-	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
-}
-//////////////////////////////////////////////////////////////////
-bool GCodeFileParser::displayToolChangeDetected(const GCodeField& field) {
-//////////////////////////////////////////////////////////////////
-	std::stringstream ss;
-	ss << "Not supported tool change: " << field;
+	if ( additionalInfo != NULL )
+		ss << " [" << additionalInfo << "]";
+		
 	return displayMessage(ss, resumeOnError ? wxICON_WARNING : wxICON_ERROR);
 }
 //////////////////////////////////////////////////////////////////
@@ -131,6 +133,20 @@ bool GCodeFileParser::spool() {
 	}
 	
 	return false;
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParser::postprocess() {
+//////////////////////////////////////////////////////////////////
+#warning
+/*
+	// display the tool ID summary
+	std::cout << wxString::Format("Tool ID Summary (count = %d):", (int)toolIds.size());
+	for ( auto it = toolIds.begin(); it != toolIds.end(); ++it) {
+		std::cout << " '" << (*it) << "'";
+	}
+	std::cout << std::endl;
+*/
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
@@ -185,19 +201,19 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 	}
 	
 	switch ( field.getCmd() ) {
-		case 'X':	gcb.x 			= field.getValue();
+		case 'X':	gcb.x 			= gcb.ensureUnit(field.getValue());
 					return true; 
 					
-		case 'Y':	gcb.y 			= field.getValue();
+		case 'Y':	gcb.y 			= gcb.ensureUnit(field.getValue());
 					return true; 
 					
-		case 'Z':	gcb.z 			= field.getValue();
+		case 'Z':	gcb.z 			= gcb.ensureUnit(field.getValue());
 					return true; 
 					
-		case 'I':	gcb.i 			= field.getValue();
+		case 'I':	gcb.i 			= gcb.ensureUnit(field.getValue());
 					return true; 
 					
-		case 'J':	gcb.j 			= field.getValue();
+		case 'J':	gcb.j 			= gcb.ensureUnit(field.getValue());
 					return true; 
 					
 		case 'S':	gcb.s 			= field.getValue();
@@ -209,7 +225,8 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 		case 'F':	gcb.f 			= field.getValue();
 					return true; 
 					
-		case 'T':	displayToolChangeDetected(field);
+		case 'T':	displayMessage(wxString::Format("Tool change prepared: ID: %.0lf", field.getValue()), wxICON_INFORMATION);
+					setNextToolID(field.getValue());
 					return true;
 		case 'N':
 		case 'H':
@@ -227,8 +244,6 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 	if ( gcb.isValid() == false && gcb.hasMoveCmd() == true ) {
 		gcb.copyPrevCmdToCmd();
 	}
-	
-
 	
 	if ( gcb.isValid() == false ) {
 		if ( gcb.hasMoveCmd() ) {
@@ -250,18 +265,13 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 		default: 	return displayUnhandledBlockCommand(gcb);
 	}
 	
-	
-	#warning todo
+	// perfom debug information 
 	if ( runInfo.getCurrentDebugState() == true ) {
-		
-		
 		registerNextDebugNode(GCodeCommands::explainGCodeCommand(gcb.nodeName)); 
 		
-		
-		DcmItemList rows;
+		static DcmItemList rows;
 		gcb.trace(rows);
 		appendDebugValueBase(rows);
-		//gcb.trace(std::clog);
 	}
 	
 	return ret;
@@ -365,26 +375,40 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	switch ( gcb.cmdNumber ) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
-		case 0:		// GC_M_StopOrUnconditionalStop
-		case 1:		// GC_M_SleepOrConditionalStop
-		case 2:		// GC_M_ProgramEnd
+		case  0:		// GC_M_StopOrUnconditionalStop
+		case  1:		// GC_M_SleepOrConditionalStop
+		case  2:		// GC_M_ProgramEnd
+		case 30:		// GC_M_ProgramEnd
 		{
 			programEnd = true; 
 			return true;
 		} //....................................................
 		
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
-		// Commands to skip:
 		case 3: 	// GC_M_SpindleOnClockwise
+		{
+			pathHandler->swichtToolOn();
+			return true;
+		}
 		case 4:		// GC_M_SpindleOnCounterClockwise
-		case 5: 	// GC_M_SpindleOff
+		{
+			return displayUnhandledBlockCommand(gcb);
+		}
+		case 5:		// GC_M_SpindleOff
+		{
+			pathHandler->swichtToolOff();
+			return true;
+		}
 		case 6:		// GC_M_ToolChange
+		{
+			#warning todo - impl. tool change
+			return true;
+		}
 		case 7:		// GC_M_MistCoolantOn
 		case 8:		// GC_M_FloodCoolantOn
 		case 9:		// GC_M_CoolantOff
 		{
-			// will all be handled by class SVGFileParser
-			return true;
+			return displayUnhandledBlockCommand(gcb);;
 		} //....................................................
 		
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::

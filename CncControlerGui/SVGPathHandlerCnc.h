@@ -7,11 +7,7 @@
 #include "CncWorkingParameters.h"
 #include "CncCommon.h"
 
-
 class CncControl;
-class wxDataViewListCtrl;
-
-enum SvgPhProcessMode {SvgPhController, SvgPhDebug};
 
 //////////////////////////////////////////////////////////////////
 class SVGPathHandlerCnc : public PathHandlerBase {
@@ -21,7 +17,6 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 	
 		SVGUnit 			unit;
 		CncControl* 		cncControl;
-		SvgPhProcessMode 	processMode;
 		SvgOriginalPathInfo origPathInfo;
 		double 				toolRadius;
 		bool 				zAxisDown;
@@ -37,7 +32,6 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		// path handling
 		bool beginCurrentPath();
 		bool repeatCurrentPath();
-		inline bool spoolCurrentPathWrapper(bool firstRun);
 		bool spoolCurrentPath(bool firstRun);
 		bool closeCurrentPath();
 		
@@ -48,7 +42,6 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
 		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
-		virtual void debugCurrentPosition();
 		
 		virtual bool isInitialized();
 		
@@ -77,10 +70,6 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 
 		CncWorkingParameters& getCncWorkingParameters();
 		void setCncWorkingParameters(CncWorkingParameters& cwp);
-		
-		void setProcessMode(SvgPhProcessMode pm);
-		const SvgPhProcessMode getProcessMode() { return processMode; }
-		
 		void setDebugState(bool state) { debugState = state; }
 		
 		// path handling

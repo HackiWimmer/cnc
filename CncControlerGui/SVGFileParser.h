@@ -39,6 +39,7 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		SVGUnit determineUnit (wxString uw, wxString uh);
 		
 		virtual bool preprocess();
+		virtual bool postprocess() { return true; }
 		virtual void initNextRunPhase(FileParserRunInfo::RunPhase p);
 		virtual void initNextPath(const wxString& data);
 		virtual bool evaluateProcessingCallback();
@@ -52,7 +53,6 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		void evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm);
 		
 		bool spool();
-		
 		
 		void initXMLNode(wxXmlNode *child);
 		void registerXMLNode(wxXmlNode *child);

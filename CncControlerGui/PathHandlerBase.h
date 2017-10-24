@@ -128,7 +128,6 @@ class PathHandlerBase {
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
 		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
-		virtual void debugCurrentPosition();
 		
 		//render functions
 		bool processMove(char c, unsigned int count, double values[]);

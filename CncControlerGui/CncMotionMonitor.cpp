@@ -63,6 +63,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , cameraRotationTimer(this, wxEVT_MONTION_MONITOR_TIMER)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
+, isShown(false)
 , zoom(2.0f)
 {
 //////////////////////////////////////////////////
@@ -93,6 +94,13 @@ void CncMotionMonitor::clear() {
 //////////////////////////////////////////////////
 	monitor->clearPathData();
 	Refresh(false);
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::setModelType(const GLContextBase::ModelType mt) {
+//////////////////////////////////////////////////
+	monitor->setModelType(mt);
+	monitor->setViewMode(GLContextBase::ViewMode::V3D_ISO1, true);
+	monitor->reshapeViewMode();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::reconstruct() {
@@ -192,16 +200,25 @@ void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 	monitor->init();
 
 	const wxSize cs = GetClientSize();
-	monitor->reshape(cs.GetWidth(), cs.GetHeight());
+	
+	if ( isShown )	monitor->reshape(cs.GetWidth(), cs.GetHeight());
+	else 			monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
 	monitor->display();
+	
+	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
+	// later this should not appear to support custom origin positions
+	// see if above
+	isShown = IsShownOnScreen();
 	
 	SwapBuffers();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onSize(wxSizeEvent& event) {
 //////////////////////////////////////////////////
-	// noting to do, in this caes the onPaint() even
-	// is also fired
+	const wxSize cs = GetClientSize();
+	
+	monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
+	monitor->display();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onEraseBackground(wxEraseEvent& event) {

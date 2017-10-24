@@ -6,25 +6,25 @@
 extern wxPropertyGridManager* 	globlSetupGrid;
 
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::pgChangedSvgCfgPage(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::pgChangedSvgCfgPage(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	wxPGProperty* p = event.GetProperty();
 	if ( p == NULL )
 		return;
+	
+	MainFrame* app = CncConfig::getGlobalCncConfig()->getTheApp();
+	wxASSERT( app != NULL );
 		
 	wxString name(p->GetName());
 	
 	if        ( name == CncSvg_Emu_COPY_FACTOR ) {
-		if ( mf != NULL )
-			mf->releaseControllerSetupFromConfig();
+		app->releaseControllerSetupFromConfig();
 		
 	} else if ( name == CncSvg_Emu_RSLT_WITH_ORIG_PATH ) {
-		if ( mf != NULL )
-			mf->releaseControllerSetupFromConfig();
+		app->releaseControllerSetupFromConfig();
 		
 	} else if ( name == CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS ) {
-		if ( mf != NULL )
-			mf->releaseControllerSetupFromConfig();
+		app->releaseControllerSetupFromConfig();
 		
 	}
 }
@@ -52,6 +52,20 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 	CncConfig::registerPageRoot(root, fps);
 	{
 		wxPGProperty* prop = NULL;
+		
+				//...................
+		wxPGProperty* parser = NULL;
+		curCatName.assign("Parsing behaviour");
+		parser = root->AppendChild( new wxPropertyCategory(curCatName));
+		registerCategory(curCatName, parser);
+		{
+			//...............
+			prop = parser->AppendChild( new wxBoolProperty("Reverse Y axis", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			registerProperty(CncSvg_Parser_REVERSE_Y_AXIS, prop);
+		}
 		
 		//...................
 		wxPGProperty* emu = NULL;

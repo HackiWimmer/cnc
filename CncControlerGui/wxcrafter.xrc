@@ -918,8 +918,34 @@
                             </object>
                           </object>
                           <object class="notebookpage">
+                            <label>Tool Magazine</label>
+                            <bitmap>bitmaps/database.png</bitmap>
+                            <selected>0</selected>
+                            <object class="wxPanel" name="m_setupToolMagazine">
+                              <style>wxTAB_TRAVERSAL</style>
+                              <object class="wxFlexGridSizer">
+                                <cols>1</cols>
+                                <rows>1</rows>
+                                <vgap>0</vgap>
+                                <hgap>0</hgap>
+                                <growablecols>0</growablecols>
+                                <growablerows>0</growablerows>
+                                <object class="sizeritem">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <object class="wxPanel" name="m_toolMagazinePlaceholder">
+                                    <style>wxTAB_TRAVERSAL</style>
+                                    <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                                    <tooltip>
+                                      <![CDATA[Only a placeholder]]>
+                                    </tooltip>
+                                  </object>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                          <object class="notebookpage">
                             <label>Wizard Speed</label>
-                            <bitmap>bitmaps/tools-wizard-2.png</bitmap>
+                            <bitmap>bitmaps/tools-wizard.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupSpeedWizard">
                               <style>wxTAB_TRAVERSAL</style>
@@ -3863,7 +3889,7 @@
       </object>
       <object class="wxAuiPaneInfo" name="ZView">
         <caption>Z Axis</caption>
-        <caption_visible>0</caption_visible>
+        <caption_visible>1</caption_visible>
         <top_dockable>1</top_dockable>
         <left_dockable>1</left_dockable>
         <bottom_dockable>1</bottom_dockable>
@@ -4162,78 +4188,6 @@
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>5</border>
                                             <object class="unknown" name="m_dvListCtrlProcessedSetters">
-                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                            </object>
-                                          </object>
-                                        </object>
-                                      </object>
-                                    </object>
-                                    <object class="listbookpage">
-                                      <label>PC Config</label>
-                                      <bitmap>bitmaps/16-member_protected.png</bitmap>
-                                      <selected>0</selected>
-                                      <object class="wxPanel" name="m_cncConfiguration">
-                                        <style>wxTAB_TRAVERSAL</style>
-                                        <object class="wxFlexGridSizer">
-                                          <cols>2</cols>
-                                          <rows>3</rows>
-                                          <vgap>0</vgap>
-                                          <hgap>0</hgap>
-                                          <growablecols>0,1</growablecols>
-                                          <growablerows>2</growablerows>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>5</border>
-                                            <object class="wxStaticText" name="m_staticText1283">
-                                              <label>Static Config</label>
-                                              <style/>
-                                              <font>
-                                                <size>9</size>
-                                                <style>normal</style>
-                                                <weight>bold</weight>
-                                                <family>swiss</family>
-                                                <underlined>0</underlined>
-                                                <face>Segoe UI</face>
-                                              </font>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL</flag>
-                                            <border>5</border>
-                                            <object class="wxStaticText" name="m_staticText1281">
-                                              <label>Dynamic Config</label>
-                                              <style/>
-                                              <font>
-                                                <size>9</size>
-                                                <style>normal</style>
-                                                <weight>bold</weight>
-                                                <family>swiss</family>
-                                                <underlined>0</underlined>
-                                                <face>Segoe UI</face>
-                                              </font>
-                                            </object>
-                                          </object>
-                                          <object class="spacer" name="Spacer2617">
-                                            <size>0,8</size>
-                                            <flag>wxALL</flag>
-                                            <option>1</option>
-                                          </object>
-                                          <object class="spacer" name="Spacer2619">
-                                            <size>0,8</size>
-                                            <flag>wxALL</flag>
-                                            <option>1</option>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>1</border>
-                                            <object class="unknown" name="m_dvListCtrlStatic">
-                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>1</border>
-                                            <object class="unknown" name="m_dvListCtrlDynamic">
                                               <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                             </object>
                                           </object>
@@ -4554,7 +4508,7 @@
                                           <flag>wxALL|wxEXPAND|wxALIGN_LEFT</flag>
                                           <option>1</option>
                                           <object class="wxFlexGridSizer">
-                                            <cols>2</cols>
+                                            <cols>3</cols>
                                             <rows>0</rows>
                                             <vgap>0</vgap>
                                             <hgap>0</hgap>
@@ -4562,22 +4516,58 @@
                                             <growablerows/>
                                             <object class="sizeritem">
                                               <flag>wxALL</flag>
-                                              <border>5</border>
-                                              <object class="wxStaticBitmap" name="m_lableWorkpieceThickness">
-                                                <bitmap>bitmaps/abb-import.png</bitmap>
-                                                <tooltip>
-                                                  <![CDATA[Workpiece thickness 0.000 mm]]>
-                                                </tooltip>
-                                              </object>
-                                            </object>
-                                            <object class="sizeritem">
-                                              <flag>wxALL</flag>
-                                              <border>5</border>
+                                              <border>1</border>
                                               <option>1</option>
                                               <object class="wxStaticBitmap" name="m_toolStateTrafficLight">
                                                 <bitmap>bitmaps/Icons/circle_red16.ico</bitmap>
                                                 <tooltip>
                                                   <![CDATA[Tool State]]>
+                                                </tooltip>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem" name="flexGridSizer4584">
+                                              <flag>wxALL</flag>
+                                              <object class="wxFlexGridSizer">
+                                                <cols>1</cols>
+                                                <rows>2</rows>
+                                                <vgap>0</vgap>
+                                                <hgap>0</hgap>
+                                                <growablecols/>
+                                                <growablerows/>
+                                                <object class="spacer" name="Spacer4586">
+                                                  <size>0,7</size>
+                                                  <flag>wxALL</flag>
+                                                  <option>1</option>
+                                                </object>
+                                                <object class="sizeritem">
+                                                  <flag>wxALL</flag>
+                                                  <minsize>12,-1</minsize>
+                                                  <object class="wxTextCtrl" name="m_toolId">
+                                                    <style>wxTE_READONLY|wxBORDER_NONE</style>
+                                                    <size>12,-1</size>
+                                                    <font>
+                                                      <size>7</size>
+                                                      <style>normal</style>
+                                                      <weight>bold</weight>
+                                                      <family>swiss</family>
+                                                      <underlined>0</underlined>
+                                                      <face>Segoe UI</face>
+                                                    </font>
+                                                    <tooltip>
+                                                      <![CDATA[Current Tool ID]]>
+                                                    </tooltip>
+                                                    <value>-1</value>
+                                                  </object>
+                                                </object>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL</flag>
+                                              <border>5</border>
+                                              <object class="wxStaticBitmap" name="m_lableWorkpieceThickness">
+                                                <bitmap>bitmaps/abb-import.png</bitmap>
+                                                <tooltip>
+                                                  <![CDATA[Workpiece thickness 0.000 mm]]>
                                                 </tooltip>
                                               </object>
                                             </object>
@@ -7047,21 +7037,21 @@
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuSavePerspectiveRun">
-          <label>Save as Perspective - Run</label>
+          <label>Save Perspective as Run</label>
           <bitmap>bitmaps/document-save-3.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveDebug">
-          <label>Save as Perspective - Debug</label>
+          <label>Save Perspective as Debug</label>
           <bitmap>bitmaps/document-save-3.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveSource">
-          <label>Save as Perspective - Source</label>
+          <label>Save Perspective as Source</label>
           <bitmap>bitmaps/document-save-3.png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -8167,6 +8157,242 @@
                       <![CDATA[Only a placeholder]]>
                     </tooltip>
                   </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxPanel" name="CncToolMagazineBase">
+    <style>wxTAB_TRAVERSAL</style>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem" name="flexGridSizer4595">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>1</border>
+        <object class="wxFlexGridSizer">
+          <cols>2</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem" name="flexGridSizer4620">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>1</border>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>4</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0</growablecols>
+              <growablerows>0</growablerows>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>1</border>
+                <object class="wxListCtrl" name="m_toolMagazine">
+                  <style>wxLC_SINGLE_SEL|wxLC_REPORT</style>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>2</border>
+                <object class="wxStaticLine" name="m_staticLine4628">
+                  <style>wxLI_HORIZONTAL</style>
+                </object>
+              </object>
+              <object class="sizeritem" name="flexGridSizer4607">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>1</border>
+                <option>1</option>
+                <object class="wxFlexGridSizer">
+                  <cols>7</cols>
+                  <rows>1</rows>
+                  <vgap>0</vgap>
+                  <hgap>0</hgap>
+                  <growablecols>5</growablecols>
+                  <growablerows>0</growablerows>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="m_staticText4609">
+                      <label>ID:</label>
+                      <style/>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>1</border>
+                    <minsize>30,-1</minsize>
+                    <object class="wxTextCtrl" name="m_toolMagazineId">
+                      <style>wxTE_RIGHT</style>
+                      <size>30,-1</size>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="m_staticText4613">
+                      <label>Type:</label>
+                      <style/>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>1</border>
+                    <object class="wxComboBox" name="m_toolMagazineType">
+                      <style>wxCB_READONLY</style>
+                      <selection>0</selection>
+                      <content>
+                        <item>
+                          <![CDATA[PEN]]>
+                        </item>
+                        <item>
+                          <![CDATA[ROUTER]]>
+                        </item>
+                      </content>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="m_staticText4617">
+                      <label>Diameter:</label>
+                      <style/>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>1</border>
+                    <object class="wxTextCtrl" name="m_toolMagazineDiameter">
+                      <style>wxTE_RIGHT</style>
+                      <value>0.000</value>
+                    </object>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="m_staticText4626">
+                      <label>[mm]</label>
+                      <style/>
+                    </object>
+                  </object>
+                </object>
+              </object>
+              <object class="sizeritem" name="flexGridSizer4636">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>1</border>
+                <option>1</option>
+                <object class="wxFlexGridSizer">
+                  <cols>3</cols>
+                  <rows>1</rows>
+                  <vgap>0</vgap>
+                  <hgap>0</hgap>
+                  <growablecols>2</growablecols>
+                  <growablerows>0</growablerows>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <border>5</border>
+                    <object class="wxStaticText" name="m_staticText4638">
+                      <label>Comment:</label>
+                      <style/>
+                    </object>
+                  </object>
+                  <object class="spacer" name="Spacer4643">
+                    <size>27,0</size>
+                    <flag>wxALL</flag>
+                    <option>1</option>
+                  </object>
+                  <object class="sizeritem">
+                    <flag>wxALL|wxEXPAND</flag>
+                    <border>1</border>
+                    <object class="wxTextCtrl" name="m_toolMagazineComment">
+                      <style/>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="sizeritem" name="flexGridSizer4597">
+            <flag>wxALL|wxEXPAND|wxALIGN_BOTTOM</flag>
+            <option>1</option>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>0</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols/>
+              <growablerows/>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>1</border>
+                <minsize>90,28</minsize>
+                <object class="wxButton" name="m_btToolMagazineRemove">
+                  <label>Remove</label>
+                  <style/>
+                  <size>90,28</size>
+                  <bitmap>bitmaps/plugin-delete.png</bitmap>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>1</border>
+                <minsize>90,28</minsize>
+                <object class="wxButton" name="m_btToolMagazineAdd">
+                  <label>New</label>
+                  <style/>
+                  <size>90,28</size>
+                  <bitmap>bitmaps/plugin-add.png</bitmap>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="spacer" name="Spacer4622">
+                <size>0,4</size>
+                <flag>wxALL</flag>
+                <option>1</option>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>1</border>
+                <object class="wxStaticLine" name="m_staticLine4624">
+                  <style>wxLI_HORIZONTAL</style>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>1</border>
+                <minsize>90,28</minsize>
+                <object class="wxButton" name="m_btToolMagazineEdit">
+                  <label>Update</label>
+                  <style/>
+                  <size>90,28</size>
+                  <bitmap>bitmaps/plugin-edit.png</bitmap>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>1</border>
+                <minsize>90,28</minsize>
+                <object class="wxButton" name="m_btToolMagazineCancle">
+                  <label>Cancle</label>
+                  <style/>
+                  <size>90,28</size>
+                  <bitmap>bitmaps/dialog-cancel-3.png</bitmap>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
                 </object>
               </object>
             </object>

@@ -20,6 +20,10 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		bool processArcMove(GCodeBlock& gcb, bool sweep);
 		bool moveToOrigin(GCodeBlock& gcb);
 		
+		virtual void switchToolState(bool state) = 0;
+		void swichtToolOn()  { switchToolState(true); }
+		void swichtToolOff() { switchToolState(false); }
+		
 	protected:
 		
 		virtual bool processLinearMove(bool alreadyRendered) = 0;

@@ -153,6 +153,8 @@ protected:
     wxPropertyGridManager* m_pgMgrSetup;
     wxButton* m_loadConfiguration;
     wxButton* m_saveConfiguration;
+    wxPanel* m_setupToolMagazine;
+    wxPanel* m_toolMagazinePlaceholder;
     wxPanel* m_setupSpeedWizard;
     wxStaticText* m_staticText4575;
     wxPanel* m_mainBookReference;
@@ -368,11 +370,6 @@ protected:
     wxPanel* m_cncSetters;
     wxStaticText* m_staticText1150;
     wxDataViewListCtrl* m_dvListCtrlProcessedSetters;
-    wxPanel* m_cncConfiguration;
-    wxStaticText* m_staticText1283;
-    wxStaticText* m_staticText1281;
-    wxDataViewListCtrl* m_dvListCtrlStatic;
-    wxDataViewListCtrl* m_dvListCtrlDynamic;
     wxPanel* m_controllerConfiguration;
     wxStaticText* m_staticText12831;
     wxButton* m_btRequestCtlConfig;
@@ -390,8 +387,9 @@ protected:
     wxButton* m_btRequestCtlErrorInfo;
     wxDataViewListCtrl* m_dvListCtrlControllerErrorInfo;
     wxPanel* m_3DPane;
-    wxStaticBitmap* m_lableWorkpieceThickness;
     wxStaticBitmap* m_toolStateTrafficLight;
+    wxTextCtrl* m_toolId;
+    wxStaticBitmap* m_lableWorkpieceThickness;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
     wxButton* m_motionMonitorOptionDlg;
@@ -894,6 +892,8 @@ public:
     wxButton* GetLoadConfiguration() { return m_loadConfiguration; }
     wxButton* GetSaveConfiguration() { return m_saveConfiguration; }
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
+    wxPanel* GetToolMagazinePlaceholder() { return m_toolMagazinePlaceholder; }
+    wxPanel* GetSetupToolMagazine() { return m_setupToolMagazine; }
     wxStaticText* GetStaticText4575() { return m_staticText4575; }
     wxPanel* GetSetupSpeedWizard() { return m_setupSpeedWizard; }
     wxNotebook* GetNotebook4561() { return m_notebook4561; }
@@ -1107,11 +1107,6 @@ public:
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
     wxDataViewListCtrl* GetDvListCtrlProcessedSetters() { return m_dvListCtrlProcessedSetters; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
-    wxStaticText* GetStaticText1283() { return m_staticText1283; }
-    wxStaticText* GetStaticText1281() { return m_staticText1281; }
-    wxDataViewListCtrl* GetDvListCtrlStatic() { return m_dvListCtrlStatic; }
-    wxDataViewListCtrl* GetDvListCtrlDynamic() { return m_dvListCtrlDynamic; }
-    wxPanel* GetCncConfiguration() { return m_cncConfiguration; }
     wxStaticText* GetStaticText12831() { return m_staticText12831; }
     wxButton* GetBtRequestCtlConfig() { return m_btRequestCtlConfig; }
     wxDataViewListCtrl* GetDvListCtrlControllerConfig() { return m_dvListCtrlControllerConfig; }
@@ -1130,8 +1125,9 @@ public:
     wxPanel* GetControllerErrorInfo() { return m_controllerErrorInfo; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
-    wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
     wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
+    wxTextCtrl* GetToolId() { return m_toolId; }
+    wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
     wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
@@ -1467,6 +1463,55 @@ public:
     wxSimplebook* GetPreviewBook() { return m_previewBook; }
     CncFilePreviewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncFilePreviewBase();
+};
+
+
+class CncToolMagazineBase : public wxPanel
+{
+protected:
+    wxListCtrl* m_toolMagazine;
+    wxStaticLine* m_staticLine4628;
+    wxStaticText* m_staticText4609;
+    wxTextCtrl* m_toolMagazineId;
+    wxStaticText* m_staticText4613;
+    wxComboBox* m_toolMagazineType;
+    wxStaticText* m_staticText4617;
+    wxTextCtrl* m_toolMagazineDiameter;
+    wxStaticText* m_staticText4626;
+    wxStaticText* m_staticText4638;
+    wxTextCtrl* m_toolMagazineComment;
+    wxButton* m_btToolMagazineRemove;
+    wxButton* m_btToolMagazineAdd;
+    wxStaticLine* m_staticLine4624;
+    wxButton* m_btToolMagazineEdit;
+    wxButton* m_btToolMagazineCancle;
+
+protected:
+    virtual void selectedTool(wxListEvent& event) { event.Skip(); }
+    virtual void removeTool(wxCommandEvent& event) { event.Skip(); }
+    virtual void addTool(wxCommandEvent& event) { event.Skip(); }
+    virtual void editTool(wxCommandEvent& event) { event.Skip(); }
+    virtual void cancle(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxListCtrl* GetToolMagazine() { return m_toolMagazine; }
+    wxStaticLine* GetStaticLine4628() { return m_staticLine4628; }
+    wxStaticText* GetStaticText4609() { return m_staticText4609; }
+    wxTextCtrl* GetToolMagazineId() { return m_toolMagazineId; }
+    wxStaticText* GetStaticText4613() { return m_staticText4613; }
+    wxComboBox* GetToolMagazineType() { return m_toolMagazineType; }
+    wxStaticText* GetStaticText4617() { return m_staticText4617; }
+    wxTextCtrl* GetToolMagazineDiameter() { return m_toolMagazineDiameter; }
+    wxStaticText* GetStaticText4626() { return m_staticText4626; }
+    wxStaticText* GetStaticText4638() { return m_staticText4638; }
+    wxTextCtrl* GetToolMagazineComment() { return m_toolMagazineComment; }
+    wxButton* GetBtToolMagazineRemove() { return m_btToolMagazineRemove; }
+    wxButton* GetBtToolMagazineAdd() { return m_btToolMagazineAdd; }
+    wxStaticLine* GetStaticLine4624() { return m_staticLine4624; }
+    wxButton* GetBtToolMagazineEdit() { return m_btToolMagazineEdit; }
+    wxButton* GetBtToolMagazineCancle() { return m_btToolMagazineCancle; }
+    CncToolMagazineBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~CncToolMagazineBase();
 };
 
 

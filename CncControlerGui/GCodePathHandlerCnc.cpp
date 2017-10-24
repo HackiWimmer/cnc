@@ -20,6 +20,11 @@ void GCodePathHandlerCnc::initNextClientId(long id) {
 	cncControl->setClientId(id);
 }
 //////////////////////////////////////////////////////////////////
+void GCodePathHandlerCnc::switchToolState(bool state) {
+//////////////////////////////////////////////////////////////////
+	state == true ? cncControl->switchToolOn() : cncControl->switchToolOff();
+}
+//////////////////////////////////////////////////////////////////
 void GCodePathHandlerCnc::prepareWorkImpl() {
 //////////////////////////////////////////////////////////////////
 }
@@ -37,8 +42,6 @@ void GCodePathHandlerCnc::finishWorkImpl() {
 bool GCodePathHandlerCnc::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-
-	#warning - consider unit
 	return cncControl->moveAbsLinearMetricXYZ(currentPos.getX(), currentPos.getY(), currentPos.getZ(), alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////

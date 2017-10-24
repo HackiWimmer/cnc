@@ -9,8 +9,17 @@ class GLViewPort {
 	public:
 		enum DistortType {VPT_Distored, VPT_Undistored};
 		enum OrigPosType {VPOP_Center, VPOP_Custom};
-		enum PreDefPos   {VPDP_TopLeft, VPDP_TopRight, VPDP_BottomLeft, VPDP_BottomRight, VPDP_Center};
-
+		enum PreDefPos   {VPDP_TopLeft, 
+		                  VPDP_TopRight, 
+						  VPDP_BottomLeft, 
+						  VPDP_BottomRight, 
+						  VPDP_TopMid, 
+						  VPDP_BottomMid, 
+						  VPDP_LeftMid, 
+						  VPDP_RightMid, 
+						  VPDP_Center
+						};
+		
 		////////////////////////////////////////////////////
 		GLViewPort(GLViewPort::DistortType type)
 		: x(0), y(0), w(0), h(0), n(0)

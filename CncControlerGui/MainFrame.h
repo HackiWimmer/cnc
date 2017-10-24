@@ -14,6 +14,7 @@
 #include "CncMotionMonitor.h"
 #include "CncSpyControl.h"
 #include "CncFileView.h"
+#include "CncToolMagazine.h"
 #include "codelite/wxPNGAnimation.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -45,13 +46,14 @@ class GlobalConfigManager {
 		GlobalConfigManager(MainFrame* mf, wxPropertyGridManager* pgMgrSetup, wxFileConfig* globalConfig) {
 			wxASSERT(globalConfig);
 			wxASSERT(pgMgrSetup);
+			wxASSERT(mf);
 			
 			// setup configuration
 			CncConfig::setupGlobalConfigurationGrid(pgMgrSetup, *globalConfig);
-			CncConfig::globalCncConfig = new CncConfig();
+			CncConfig::globalCncConfig = new CncConfig(mf);
 			
 			// at least load the file configuration
-			CncConfig::globalCncConfig->loadConfiguration(mf, *globalConfig);
+			CncConfig::globalCncConfig->loadConfiguration(*globalConfig);
 		}
 		
 		~GlobalConfigManager() {
@@ -391,9 +393,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxTextCtrl* getCmdCounterControl()  { return m_cmdCount; }
 		wxTextCtrl* getCmdDurationControl() { return m_cmdDuration; }
 		
-		wxDataViewListCtrl* getStaticCncConfigControl()  { return m_dvListCtrlStatic; }
-		wxDataViewListCtrl* getDynamicCncConfigControl() { return m_dvListCtrlDynamic; } 
-		
 		wxDataViewListCtrl* getProcessedSetterControl() { return m_dvListCtrlProcessedSetters; }
 		
 		CncZView* getZView() { return m_zView; }
@@ -424,6 +423,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncFileView* fileView;
 		CncFilePreview* mainFilePreview;
 		CncFilePreview* monitorFilePreview;
+		CncToolMagazine* toolMagaizne;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;

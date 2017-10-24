@@ -10,7 +10,6 @@
 #include "FileParser.h"
 #include "GCodeCommands.h"
 #include "GCodeBlock.h"
-#include "GCodePath.h"
 #include "CncControl.h"
 
 class wxXmlNode;
@@ -34,10 +33,9 @@ class GCodeFileParser : public FileParser {
 		inline bool displayWarnig(const wxString& msg) { std::stringstream ss; ss << msg.c_str(); return displayMessage(ss, wxICON_WARNING); }
 		inline bool displayInfo(const wxString& msg) { std::stringstream ss; ss << msg.c_str(); return displayMessage(ss, wxICON_INFORMATION); }
 		
-		inline bool displayUnsupportedBlockCommand(const GCodeField& gcb);
-		inline bool displayUnhandledBlockCommand(GCodeBlock& gcb);
-		inline bool displayUnhandledParameter(const GCodeField& field);
-		inline bool displayToolChangeDetected(const GCodeField& field);
+		inline bool displayUnsupportedBlockCommand(const GCodeField& gcb, const char* additionalInfo = NULL);
+		inline bool displayUnhandledBlockCommand(GCodeBlock& gcb, const char* additionalInfo = NULL);
+		inline bool displayUnhandledParameter(const GCodeField& field, const char* additionalInfo = NULL);
 		
 		double getDefaultWidth()  { return 1000.0; }
 		double getDefaultHeight() { return 1000.0; }
@@ -54,6 +52,7 @@ class GCodeFileParser : public FileParser {
 		
 		virtual bool preprocess();
 		virtual bool spool();
+		virtual bool postprocess();
 		virtual void initNextClientId(long id);
 
 	public:

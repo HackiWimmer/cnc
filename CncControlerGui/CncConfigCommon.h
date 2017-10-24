@@ -65,6 +65,7 @@
 	#define CncApplication_Tool_EXTERNAL_EDITOR 	"CncApplication.Tools/EXTERNAL_EDITOR"
 	#define CncApplication_Tool_PY_CAM 				"CncApplication.Tools/PY_CAM"
 	
+	#define CncSvg_Parser_REVERSE_Y_AXIS			"CncSvg.Parser/REVERSE_Y_AXIS"
 	#define CncSvg_Emu_COPY_FACTOR					"CncSvg.Emu/COPY_FACTOR"
 	#define CncSvg_Emu_RSLT_WITH_ORIG_PATH			"CncSvg.Emu/RESULT_WITH_ORIG_PATH"
 	#define CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS	"CncSvg.Emu/RESULT_ONLY_WITH_FIRST_CROSSING"

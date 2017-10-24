@@ -62,6 +62,11 @@ class CncSpeedView : public wxPanel  {
 		void setCurrentSpeedY(unsigned int value)	{ speedY = value; updateToolTip(); refresh(RT_Y); }
 		void setCurrentSpeedZ(unsigned int value)	{ speedZ = value; updateToolTip(); refresh(RT_Z); }
 		
+		void setCurrentSpeedXYZ(unsigned int x, unsigned int y, unsigned int z) { 
+			setCurrentSpeedX(x);
+			setCurrentSpeedY(y);
+			setCurrentSpeedZ(z);
+		}
 		
 		wxDECLARE_EVENT_TABLE();
 };

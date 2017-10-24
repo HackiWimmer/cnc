@@ -483,7 +483,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 				return false;
 				
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
 				
 		} else if (child->GetName() == SvgNodeTemplates::CncBreakBlockNodeName ) {
@@ -491,7 +490,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			std::clog << SvgNodeTemplates::CncBreakBlockNodeName << " detected at line number: " << child->GetLineNumber() << std::endl;
 			
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
 			
 		} else if (child->GetName() == SvgNodeTemplates::CncPauseBlockNodeName ) {
@@ -499,7 +497,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			std::clog << SvgNodeTemplates::CncPauseBlockNodeName << " isn't currently implemented. Line number: " << child->GetLineNumber() << std::endl;
 			
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
 			
 		} else if (child->GetName().Upper() == "SYMBOL" ) {
@@ -521,7 +518,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			
 		} else if ( child->GetName().Upper() == "PATH" ) {
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 			
 			wxString data = child->GetAttribute("d", "");
 			if ( evaluatePath(data)  == false )
@@ -529,7 +525,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 				
 		} else if ( child->GetName().Upper() == "CIRCLE" ) {
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 			
 			wxString ret; 
 			if ( SVGElementConverter::convertCircleToPathData(child, ret) )
@@ -538,7 +533,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					
 		} else if ( child->GetName().Upper() == "ELLIPSE" ) {
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 			
 			wxString ret; 
 			if ( SVGElementConverter::convertEllipseToPathData(child, ret) )
@@ -547,7 +541,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					
 		} else if ( child->GetName().Upper() == "LINE" ) {
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertLineToPathData(child, ret) )
@@ -556,7 +549,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					
 		} else if ( child->GetName().Upper() == "POLYGON" ) {
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertPolygonToPathData(child, ret) )
@@ -565,7 +557,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					
 		} else if ( child->GetName().Upper() == "POLYLINE" ) {
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertPolylineToPathData(child, ret) )
@@ -574,7 +565,6 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 					
 		} else if ( child->GetName().Upper() == "RECT" ) {
 			registerNextDebugNode(currentNodeName);
-			//registerXMLNode(child);
 
 			wxString ret; 
 			if ( SVGElementConverter::convertRectToPathData(child, ret) )

@@ -44,11 +44,6 @@ void PathHandlerBase::appendDebugValueDetail(const CncPathListEntry& cpe) {
 	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::debugCurrentPosition() {
-//////////////////////////////////////////////////////////////////
-	// currently nothing to do
-}
-//////////////////////////////////////////////////////////////////
 void PathHandlerBase::traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p) {
 //////////////////////////////////////////////////////////////////
 	if ( true ) {
@@ -520,7 +515,7 @@ bool PathHandlerBase::process(char c, unsigned int count, double values[]) {
 		case 'T': 	ret = processQuadraticBezierSmooth(c, count, values); 
 					break;
 		default: 
-			std::cerr << "SVGPathHandlerBase: Unkown command: " << c << std::endl;
+			std::cerr << "PathHandlerBase: Unkown command: " << c << std::endl;
 			ret = false;
 	}
 	

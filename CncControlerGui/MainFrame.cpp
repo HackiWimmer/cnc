@@ -122,6 +122,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , fileView(NULL)
 , mainFilePreview(NULL)
 , monitorFilePreview(NULL)
+, toolMagaizne(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -310,7 +311,10 @@ void MainFrame::installCustControls() {
 	// File Preview
 	monitorFilePreview = new CncFilePreview(this);
 	GblFunc::replaceControl(m_monitorTemplatePreviewPlaceHolder, monitorFilePreview);
-
+	
+	// tool magazine
+	toolMagaizne = new CncToolMagazine(this); 
+	GblFunc::replaceControl(m_toolMagazinePlaceholder, toolMagaizne);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -1001,8 +1005,8 @@ void MainFrame::initialize(void) {
 	initializeLruMenu();
 	initializeCncControl();
 	
-	m_outboundNotebook->SetSelection(Outbound3DPage);
-	m_notebookConfig->SetSelection(CNCSetterPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_SETTER_PANEL);
 	
 	// curve lib resulotion
 	CncConfig::gblCurveLibSelector = m_cbCurveLibResolution;
@@ -1052,9 +1056,7 @@ bool MainFrame::initializeCncControl() {
 			cnc->changeWorkSpeedZ(CncSpeedRapid);
 		}
 		
-		m_speedView->setCurrentSpeedX(cnc->getSpeedX());
-		m_speedView->setCurrentSpeedY(cnc->getSpeedY());
-		m_speedView->setCurrentSpeedZ(cnc->getSpeedZ());
+		m_speedView->setCurrentSpeedXYZ(cnc->getSpeedX(), cnc->getSpeedY(), cnc->getSpeedZ());
 	}
 	
 	// initialize the postion controls
@@ -1238,13 +1240,13 @@ void MainFrame::showSVGEmuResult(bool show) {
 	} else {
 
 		if (m_outboundNotebook->FindPage(m_svgEmuResult) == wxNOT_FOUND ) {
-			m_outboundNotebook->InsertPage(OutboundSvgPage, m_svgEmuResult,  "", false);
-			outboundNbInfo->decorate(OutboundSvgPage);
+			m_outboundNotebook->InsertPage(OutboundSelection::VAL::SVG_OUTPUT_PANEL, m_svgEmuResult,  "", false);
+			outboundNbInfo->decorate(OutboundSelection::VAL::SVG_OUTPUT_PANEL);
 		}
 		
 		if (m_outboundNotebook->FindPage(m_svgEmuSource) == wxNOT_FOUND ) {
-			m_outboundNotebook->InsertPage(OutboundSvgSource, m_svgEmuSource, "", false);
-			outboundNbInfo->decorate(OutboundSvgSource);
+			m_outboundNotebook->InsertPage(OutboundSelection::VAL::SVG_SOURCE_PANEL, m_svgEmuSource, "", false);
+			outboundNbInfo->decorate(OutboundSelection::VAL::SVG_SOURCE_PANEL);
 		}
 		
 	}
@@ -1495,7 +1497,6 @@ void MainFrame::svgEmuOpenFileAsSvg(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateInclWpt(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
 	CncConfig::getGlobalCncConfig()->setReferenceIncludesWpt(m_includingWpt->IsChecked());
 	updateCncConfigTrace();
 }
@@ -1504,7 +1505,7 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
 	wxMessageDialog dlg(this, msg, _T("Action required  . . . "), 
 				        wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
-	dlg.SetYesNoCancelLabels("Set with workpiece thickness ", "Set without workpiece thieckness", "Do it later . . . ");
+	dlg.SetYesNoCancelLabels("Set with workpiece thickness ", "Set without workpiece thickness", "Do it later . . . ");
 	
 	int ret = dlg.ShowModal();
 	switch ( ret ) {
@@ -1812,6 +1813,13 @@ void MainFrame::introduceCurrentFile() {
 	lruFileList.addFile(getCurrentTemplatePathFileName());
 	fileView->selectFileInList(getCurrentTemplatePathFileName());
 	selectMainBookSourcePanel();
+	
+	// publish model type
+	GLContextBase::ModelType mt = GLContextBase::ModelType::MT_RIGHT_HAND;
+	if ( getCurrentTemplateFormat() == TplSvg )
+		mt = GLContextBase::ModelType::MT_LEFT_HAND;
+		
+	motionMonitor->setModelType(mt);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openTextFile() {
@@ -2596,8 +2604,8 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 	wxASSERT(cnc);
 	
 	// select summary page
-	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
-	m_notebookConfig->SetSelection(ConfigSummaryPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
 	
 	if ( isZeroReferenceValid == false ) {
 		
@@ -2680,8 +2688,8 @@ bool MainFrame::showConfigSummaryAndConfirmRun() {
 	m_btConfirmRun->Enable(true);
 	
 	// select summary page
-	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
-	m_notebookConfig->SetSelection(ConfigSummaryPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
 	
 	// wait for user feedback
 	runConfirmationInfo = RunConfirmationInfo::Wait;
@@ -2766,11 +2774,11 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 		wxCommandEvent dummyEvent;
 		
 		switch ( sel ) {
-			case ConfigSummaryPage:
+			case OutboundCfgSelection::VAL::SUMMARY_PANEL:
 					collectSummary();
 					break;
 					
-			case CNCControllerPinsPage:
+			case OutboundCfgSelection::VAL::CNC_PIN_PANEL:
 					if ( runActive == true ) {
 						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
 						return;
@@ -2778,7 +2786,7 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 					requestControllerPinsFromButton(dummyEvent);
 					break;
 					
-			case CNCControllerConfigPage:
+			case OutboundCfgSelection::VAL::CNC_CONFIG_PANEL:
 					if ( runActive == true ) {
 						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
 						return;
@@ -2786,7 +2794,7 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 					requestControllerConfigFromButton(dummyEvent);
 					break;
 					
-			case CNCControllerErrorPage:
+			case OutboundCfgSelection::VAL::CNC_ERROR_PANEL:
 					if ( runActive == true ) {
 						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
 						return;
@@ -2824,12 +2832,13 @@ void MainFrame::processTemplate() {
 	umPostEvent(evt.QueueResetEvent());
 
 	// select draw pane
-	m_outboundNotebook->SetSelection(Outbound3DPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 		
 	// select template Page
 	if ( m_mainViewSelector->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
 	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::TEST_PANEL && 
-	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::SOURCE_PANEL ) {
+	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::SOURCE_PANEL &&
+		 m_mainViewSelector->GetSelection() != MainBookSelection::VAL::SETUP_PANEL) {
 		selectMainBookSourcePanel();
 	}
 	
@@ -3264,8 +3273,8 @@ void MainFrame::requestConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	cnc->processCommand("c", std::clog);
-	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
-	m_notebookConfig->SetSelection(CNCControllerConfigPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_CONFIG_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestControllerConfigFromButton(wxCommandEvent& event) {
@@ -3277,8 +3286,8 @@ void MainFrame::requestErrorInfo(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	cnc->processCommand("?", std::clog);
-	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
-	m_notebookConfig->SetSelection(CNCControllerErrorPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestControllerErrorInfoFromButton(wxCommandEvent& event) {
@@ -4242,7 +4251,7 @@ void MainFrame::selectMonitorBookCncPanel() {
 	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
 	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
 	
-	m_outboundNotebook->SetSelection(Outbound3DPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookTemplatePanel() {
@@ -4546,10 +4555,12 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 		switch ( sel ) {
 			
-			case OutboundSvgPage: 	m_svgEmuToggleOrigPath->Enable( CncConfig::getGlobalCncConfig()->getSvgResultWithOrigPathFlag() );
+			case OutboundSelection::VAL::SVG_OUTPUT_PANEL:
+									m_svgEmuToggleOrigPath->Enable( CncConfig::getGlobalCncConfig()->getSvgResultWithOrigPathFlag() );
 									break;
 									
-			case Outbound3DPage:	if ( cnc )
+			case OutboundSelection::VAL::MOTION_MONITOR_PANAL:
+									if ( cnc )
 										cnc->updatePreview3D();
 									break;
 		}
@@ -4563,12 +4574,14 @@ void MainFrame::outboundBookChanging(wxNotebookEvent& event) {
 	
 	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 		switch ( sel ) {
-			case OutboundSvgSource: if ( m_stcEmuSource->IsModified() ) {
-										m_stcEmuSource->SaveFile(getSvgEmuFileName(svgFile));
-										evaluateSvgEmuModificationTimeStamp();
-										refreshSvgEmuFile();
-									}
-									break;
+			case OutboundSelection::VAL::SVG_SOURCE_PANEL: 
+			
+					if ( m_stcEmuSource->IsModified() ) {
+						m_stcEmuSource->SaveFile(getSvgEmuFileName(svgFile));
+						evaluateSvgEmuModificationTimeStamp();
+						refreshSvgEmuFile();
+					}
+					break;
 		}
 	}
 }
@@ -5604,8 +5617,8 @@ void MainFrame::requestControllerPinsFromButton(wxCommandEvent& event) {
 void MainFrame::requestPins(wxCommandEvent& event) {
 	wxASSERT(cnc);
 	cnc->processCommand("Q", std::clog);
-	m_outboundNotebook->SetSelection(OutboundCNCValuesPage);
-	m_notebookConfig->SetSelection(CNCControllerPinsPage);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_PIN_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearControllerMsgHistory(wxCommandEvent& event) {
@@ -6164,35 +6177,35 @@ void MainFrame::releaseControllerSetupFromConfig() {
 void MainFrame::setupGridChanged(wxPropertyGridEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridChanged(this, event);
+	CncConfig::getGlobalCncConfig()->setupGridChanged(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setupGridChanging(wxPropertyGridEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridChanging(this, event);
+	CncConfig::getGlobalCncConfig()->setupGridChanging(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setupGridCommandButton(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridCommandButton(this, event);
+	CncConfig::getGlobalCncConfig()->setupGridCommandButton(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setupGridSelected(wxPropertyGridEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->setupGridSelected(this, event);
+	CncConfig::getGlobalCncConfig()->setupGridSelected(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::saveConfiguration(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->saveConfiguration(this, *config);
+	CncConfig::getGlobalCncConfig()->saveConfiguration(*config);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::loadConfiguration(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(CncConfig::getGlobalCncConfig());
-	CncConfig::getGlobalCncConfig()->loadConfiguration(this, *config);
+	CncConfig::getGlobalCncConfig()->loadConfiguration(*config);
 }

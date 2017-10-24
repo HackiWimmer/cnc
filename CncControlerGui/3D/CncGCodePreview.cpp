@@ -34,6 +34,7 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, int *attribList)
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
 , preview(new GLContextGCodePreview(this))
 , maxDimension(400.0)
+, isShown(false)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
@@ -58,8 +59,15 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 	preview->init();
 
 	const wxSize cs = GetClientSize();
-	preview->reshape(cs.GetWidth(), cs.GetHeight());
+	
+	if ( isShown )	preview->reshape(cs.GetWidth(), cs.GetHeight());
+	else 			preview->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
 	preview->display();
+	
+	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
+	// later this should not appear to support custom origin positions
+	// see if above
+	isShown = IsShownOnScreen();
 	
 	SwapBuffers();
 }

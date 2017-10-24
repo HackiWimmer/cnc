@@ -15,7 +15,6 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 : PathHandlerBase()
 , unit(px)
 , cncControl(cnc)
-, processMode(SvgPhController)
 , toolRadius(0.0)
 , zAxisDown(false)
 , initialized(false)
@@ -52,20 +51,6 @@ bool SVGPathHandlerCnc::isInitialized() {
 	return initialized;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::debugCurrentPosition() {
-//////////////////////////////////////////////////////////////////
-	if ( debugState == false )
-		return;
-	
-	wxString pos(wxString::Format("%ld, %ld, %ld [steps]", cncControl->getCurPos().getY(), cncControl->getCurPos().getX(), cncControl->getCurPos().getZ() ));
-	appendDebugValueDetail("Current Pos(x,y,z)", pos);
-
-	pos.assign(wxString::Format("%.3lf, %.3lf, %.3lf [mm]", cncControl->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX(), 
-	                                                        cncControl->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY(),
-	                                                        cncControl->getCurPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ()));
-	appendDebugValueDetail("Current Pos(x,y,z)", pos);
-}
-//////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::appendDebugValueDetail(const char* key, wxVariant value) {
 //////////////////////////////////////////////////////////////////
 	if ( debugState == false )
@@ -88,11 +73,6 @@ CncWorkingParameters& SVGPathHandlerCnc::getCncWorkingParameters() {
 void SVGPathHandlerCnc::setCncWorkingParameters(CncWorkingParameters& cwp) {
 //////////////////////////////////////////////////////////////////
 	currentCncParameters = cwp;
-}
-//////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::setProcessMode(SvgPhProcessMode pm) {
-//////////////////////////////////////////////////////////////////
-	processMode = pm;
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::setMaxDimensions(SVGUnit u, double w, double h) {
@@ -239,7 +219,7 @@ bool SVGPathHandlerCnc::repeatCurrentPath() {
 		return false;
 	
 	// spoolCurrentPath(false) --> means this isn't the first move
-	if ( spoolCurrentPathWrapper(cncControl->getDurationCounter() == 1) == false )
+	if ( spoolCurrentPath(cncControl->getDurationCounter() == 1) == false )
 		return false;
 		
 	if ( closeCurrentPath() == false )
@@ -276,17 +256,15 @@ bool SVGPathHandlerCnc::closeCurrentPath() {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-inline bool SVGPathHandlerCnc::spoolCurrentPathWrapper(bool firstRun) {
-//////////////////////////////////////////////////////////////////
-	bool ret = spoolCurrentPath(firstRun);
-	return ret;
-}
-//////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("spoolCurrentPath");
+	// firstRun = (cncControl->getDurationCounter() == 1)
+	
+	bool reverseYAxis = CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag();
 	
 	unsigned int cnt = 0;
+	// over one stored svg path <path M...../>
 	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
 
 		if ( fileParser != NULL )
@@ -315,7 +293,11 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 		double moveX = cpe.move.x;
 		double moveY = cpe.move.y;
 		bool firstListEntry = false;
+		
+		if ( reverseYAxis == true )
+			moveY *= -1;
 
+		// first path entry, always absolute
 		if ( std::distance(pathListMgr.begin(), it) == 0 ) {
 			TRACE_POSITIONS("spoolCurrentPath std::distance(pathList.begin(), it)");
 			firstListEntry = true;
@@ -328,9 +310,12 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 				startPos.setX(cncControl->getStartPosMetric().getX());
 				startPos.setY(cncControl->getStartPosMetric().getY());
 			}
-
+			// reconstuct the first move, this overrides moveX and moveY
+			// pathListMgr.getStartPos() is always absolute as well as currentPos
 			moveX = pathListMgr.getStartPos().x - currentPos.getX();
-			moveY = pathListMgr.getStartPos().y - currentPos.getY();
+			
+			if ( reverseYAxis == false )	moveY = +pathListMgr.getStartPos().y - currentPos.getY();
+			else 							moveY = -pathListMgr.getStartPos().y - currentPos.getY();
 
 			TRACE_FIRST_MOVE(moveX, moveY);
 		}
@@ -359,6 +344,9 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 			// serial->beginPath has a step to much
 			double sx = pathListMgr.getStartPos().x;
 			double sy = pathListMgr.getStartPos().y;
+			if ( reverseYAxis == true )
+				sy *= -1;
+				
 			cncControl->getSerial()->beginPath(sx, sy);
 		}
 	}

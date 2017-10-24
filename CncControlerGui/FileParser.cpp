@@ -5,6 +5,7 @@
 #include <wx/dataview.h>
 #include <wx/stattext.h>
 #include <wx/propgrid/manager.h>
+#include "CncConfigExt.h"
 #include "wxcrafter.h"
 #include "CncCommon.h"
 #include "FileParser.h"
@@ -130,12 +131,31 @@ FileParser::FileParser(const wxString& fn)
 , debugControls()
 , inboundSourceControl(NULL)
 , currentLineNumber(UNDEFINED_LINE_NUMBER)
+, toolIds()
 {
 ////////////////////////////////////////////////////////////////////////////
+	displayToolId(-1);
 }
 ////////////////////////////////////////////////////////////////////////////
 FileParser::~FileParser() {
 ////////////////////////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////////////
+void FileParser::displayToolId(int id) {
+//////////////////////////////////////////////////////////////////
+	wxTextCtrl* toolId = CncConfig::getGlobalCncConfig()->getTheApp()->GetToolId();
+	if ( toolId == NULL )
+		return;
+		
+	#warning - impl. search if tool available
+		
+	toolId->SetValue(wxString::Format("%d", id));
+}
+//////////////////////////////////////////////////////////////////
+void FileParser::setNextToolID(unsigned int id) {
+//////////////////////////////////////////////////////////////////
+	displayToolId(id);
+	toolIds.push_back(id);
 }
 //////////////////////////////////////////////////////////////////
 void FileParser::installDebugConfigPage(wxPropertyGridManager* pgm) {
@@ -280,6 +300,7 @@ bool FileParser::processDebug() {
 bool FileParser::process() {
 //////////////////////////////////////////////////////////////////
 	clearControls();
+	toolIds.clear();
 
 	// first: preprocessing
 	initNextRunPhase(FileParserRunInfo::RP_Preprocesser);
@@ -290,6 +311,8 @@ bool FileParser::process() {
 		initNextRunPhase(FileParserRunInfo::RP_Spool);
 		ret = spool();
 	} 
+	
+	ret = postprocess();
 	
 	// at the end rest the selection
 	if ( inboundSourceControl ) {

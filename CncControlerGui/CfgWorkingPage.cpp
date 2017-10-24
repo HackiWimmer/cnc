@@ -6,48 +6,45 @@
 extern wxPropertyGridManager* 	globlSetupGrid;
 
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::pgChangedWorkingCfgPage(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	wxPGProperty* p = event.GetProperty();
 	if ( p == NULL )
 		return;
 		
-	if ( mf == NULL )
-		return;
+	MainFrame* app = CncConfig::getGlobalCncConfig()->getTheApp();
+	wxASSERT( app != NULL );
 		
 	wxString name(p->GetName());
 	
 	if        ( name == CncWork_Ctl_REPLY_THRESHOLD ) {
-		if ( mf != NULL )
-			mf->releaseControllerSetupFromConfig();
+		app->releaseControllerSetupFromConfig();
 		
 	} else if ( name == CncWork_Wpt_THICKNESS ) {
 		CncConfig::getGlobalCncConfig()->currentZDepth = CncConfig::getGlobalCncConfig()->getWorkpieceThickness();
 		CncConfig::getGlobalCncConfig()->initZAxisValues();
 		
-		if ( mf != NULL )
-			mf->changeWorkpieceThickness();
+		app->changeWorkpieceThickness();
 		
 	} else if ( name == CncWork_Wpt_MAX_THICKNESS_CROSS ) {
 		CncConfig::getGlobalCncConfig()->initZAxisValues();
 		
-		if ( mf != NULL )
-			mf->changeCrossingThickness();
+		app->changeCrossingThickness();
 		
 	}
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::pgChangingWorkingCfgPage(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::pgChangingWorkingCfgPage(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	// Currently nothing todo
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::pgSelectedWorkingCfgPage(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::pgSelectedWorkingCfgPage(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	// Currently nothing todo
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::pgButtonWorkingCfgPage(MainFrame* mf, wxCommandEvent& event) {
+void CncConfig::pgButtonWorkingCfgPage(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	// Currently nothing todo
 }
@@ -111,7 +108,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 		registerCategory(curCatName, wpt);
 		{
 			//...............
-			validator.SetPrecision(3); validator.SetRange(0.1, 90.0);
+			validator.SetPrecision(3); validator.SetRange(0, 90.0);
 			prop = wpt->AppendChild( new wxFloatProperty("Thickness [mm]", NEXT_PROP_ID, 0.0));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));

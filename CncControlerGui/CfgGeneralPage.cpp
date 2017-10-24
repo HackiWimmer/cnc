@@ -6,7 +6,7 @@
 extern wxPropertyGridManager* 	globlSetupGrid;
 
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::pgChangedGeneralCfgPage(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	wxPGProperty* p = event.GetProperty();
 	if ( p == NULL )

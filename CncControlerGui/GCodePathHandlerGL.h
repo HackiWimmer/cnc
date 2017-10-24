@@ -11,6 +11,8 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		GCodePathHandlerGL(CncGCodePreview* gl);
 		virtual ~GCodePathHandlerGL();
 		
+		virtual void switchToolState(bool state) {}
+		
 	protected:
 		
 		virtual bool processLinearMove(bool alreadyRendered);

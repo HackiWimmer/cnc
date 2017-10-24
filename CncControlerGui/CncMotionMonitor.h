@@ -29,21 +29,23 @@ class CncMotionMonitor : public wxGLCanvas {
 			
 			// fill more flags here if neccessary
 		};
-
+		
 		// constructor
 		CncMotionMonitor(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncMotionMonitor();
-
+		
 		// is used from global key down hook, that's the reason why it is public
 		void onKeyDown(wxKeyEvent& event);
-
+		
 		// interface
 		void clear();
 		void display();
 		void appendVertice(const GLI::VerticeLongData& vd);
 		void centerViewport();
 		void resetRotation();
-
+		
+		void setModelType(const GLContextBase::ModelType mt);
+		
 		void viewTop() 		{ view(GLContextBase::ViewMode::V2D_TOP); }
 		void viewBottom() 	{ view(GLContextBase::ViewMode::V2D_BOTTOM); }
 		void viewLeft() 	{ view(GLContextBase::ViewMode::V2D_LEFT); }
@@ -114,6 +116,8 @@ class CncMotionMonitor : public wxGLCanvas {
 		wxTimer cameraRotationTimer;
 		int cameraRotationStepWidth;
 		int cameraRotationSpeed;
+		
+		bool isShown;
 		
 		float zoom;
 		

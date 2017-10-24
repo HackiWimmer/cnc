@@ -22,6 +22,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 , zoom(1.0f)
 , viewMode(V2D_TOP)
 , coordOriginInfo()
+, modelType(ModelType::MT_RIGHT_HAND)
 , viewPort(NULL)
 , modelScale()
 , modelRotate()
@@ -71,6 +72,7 @@ void GLContextBase::init() {
 		
 	viewPort = createViewPort();
 	initialized = true;
+	
 }
 /////////////////////////////////////////////////////////////////////
 void GLContextBase::checkGLError() {
@@ -120,20 +122,38 @@ void GLContextBase::drawSolidCone(GLdouble base, GLdouble height, GLint slices, 
 /////////////////////////////////////////////////////////////////
 GLViewPort::PreDefPos GLContextBase::convertViewMode(GLContextBase::ViewMode newMode) {
 /////////////////////////////////////////////////////////////////
-	switch ( newMode ) {
-		case V2D_TOP:			return GLViewPort::PreDefPos::VPDP_BottomLeft;
-		case V2D_BOTTOM:		return GLViewPort::PreDefPos::VPDP_BottomRight;
-		case V2D_LEFT:			return GLViewPort::PreDefPos::VPDP_BottomRight; 
-		case V2D_RIGHT:			return GLViewPort::PreDefPos::VPDP_BottomLeft; 
-		case V2D_FRONT:			return GLViewPort::PreDefPos::VPDP_BottomLeft; 
-		case V2D_REAR:			return GLViewPort::PreDefPos::VPDP_BottomRight;
+	if ( modelType == ModelType::MT_RIGHT_HAND ) {
+		switch ( newMode ) {
+			case V2D_TOP:				return GLViewPort::PreDefPos::VPDP_BottomLeft;
+			case V2D_BOTTOM:			return GLViewPort::PreDefPos::VPDP_BottomRight;
+			case V2D_LEFT:				return GLViewPort::PreDefPos::VPDP_BottomRight; 
+			case V2D_RIGHT:				return GLViewPort::PreDefPos::VPDP_BottomLeft; 
+			case V2D_FRONT:				return GLViewPort::PreDefPos::VPDP_BottomLeft; 
+			case V2D_REAR:				return GLViewPort::PreDefPos::VPDP_BottomRight;
 
-		case V3D_ISO1:			return GLViewPort::PreDefPos::VPDP_Center;
-		case V3D_ISO2:			return GLViewPort::PreDefPos::VPDP_Center;
-		case V3D_ISO3:			return GLViewPort::PreDefPos::VPDP_Center;
-		case V3D_ISO4:			return GLViewPort::PreDefPos::VPDP_Center;
-		
-		case V2D_CAM_ROT_XY_ZTOP:	return GLViewPort::PreDefPos::VPDP_Center;
+			case V3D_ISO1:				return GLViewPort::PreDefPos::VPDP_LeftMid;
+			case V3D_ISO2:				return GLViewPort::PreDefPos::VPDP_BottomMid;
+			case V3D_ISO3:				return GLViewPort::PreDefPos::VPDP_RightMid;
+			case V3D_ISO4:				return GLViewPort::PreDefPos::VPDP_TopMid;
+			
+			case V2D_CAM_ROT_XY_ZTOP:	return GLViewPort::PreDefPos::VPDP_Center;
+		}
+	} else {
+		switch ( newMode ) {
+			case V2D_TOP:				return GLViewPort::PreDefPos::VPDP_TopLeft;
+			case V2D_BOTTOM:			return GLViewPort::PreDefPos::VPDP_TopRight;
+			case V2D_LEFT:				return GLViewPort::PreDefPos::VPDP_BottomRight; 
+			case V2D_RIGHT:				return GLViewPort::PreDefPos::VPDP_BottomLeft; 
+			case V2D_FRONT:				return GLViewPort::PreDefPos::VPDP_BottomLeft; 
+			case V2D_REAR:				return GLViewPort::PreDefPos::VPDP_BottomRight;
+
+			case V3D_ISO1:				return GLViewPort::PreDefPos::VPDP_Center;
+			case V3D_ISO2:				return GLViewPort::PreDefPos::VPDP_Center;
+			case V3D_ISO3:				return GLViewPort::PreDefPos::VPDP_Center;
+			case V3D_ISO4:				return GLViewPort::PreDefPos::VPDP_Center;
+			
+			case V2D_CAM_ROT_XY_ZTOP:	return GLViewPort::PreDefPos::VPDP_Center;
+		}
 	}
 	
 	return GLViewPort::PreDefPos::VPDP_Center;
@@ -160,15 +180,26 @@ const char* GLContextBase::getViewModeAsString() {
 	return "Unknown view mode";
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::setViewMode(GLContextBase::ViewMode newMode) {
+void GLContextBase::setViewMode(GLContextBase::ViewMode newMode, bool force) {
 /////////////////////////////////////////////////////////////////
+	if ( viewMode == newMode && force == false )
+		return;
+
+	// is the current origin postion customized?
+	if ( viewPort != NULL && viewPort->getOriginPosType() == GLViewPort::VPOP_Custom ) {
+		// switch to the center mode
+		viewPort->resetCustomOrigPosType();
+	}
+
+
 	// is this a change from 2d to 3d or vs.
 	if ( getViewType() != getViewType(newMode) ) {
+		/*
 		// is the current origin postion customized?
 		if ( viewPort != NULL && viewPort->getOriginPosType() == GLViewPort::VPOP_Custom ) {
 			// switch to the center mode
 			viewPort->resetCustomOrigPosType();
-		}
+		}*/
 		
 		// if the view type going to change the model rotation
 		// has to be switched too
@@ -397,7 +428,7 @@ void GLContextBase::determineViewPort(int w, int h, int x, int y) {
 	
 	viewPort->evaluate(w, h, x, y);
 	//viewPort->trace(std::clog);
-
+	
 	glViewport(viewPort->getX(),  viewPort->getY(),
 			   (GLsizei)viewPort->getNormalizedSizeW(), 
 			   (GLsizei)viewPort->getNormalizedSizeH());
@@ -465,6 +496,9 @@ void GLContextBase::reshape(int w, int h, int x, int y) {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::reshapeViewMode(int w, int h) {
 /////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL )
+		return;
+	
 	int x = 0, y = 0;
 	// evaluate the corrsponding origin coordinates
 	viewPort->getPreDefCoordinatesXY(convertViewMode(viewMode), w, h, x, y);
@@ -473,6 +507,9 @@ void GLContextBase::reshapeViewMode(int w, int h) {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::reshapeViewMode() {
 /////////////////////////////////////////////////////////////////
+	if ( viewPort == NULL )
+		return;
+
 	reshapeViewMode(viewPort->getCurrentWindowWidth(), viewPort->getCurrentWindowHeigth());
 }
 /////////////////////////////////////////////////////////////////

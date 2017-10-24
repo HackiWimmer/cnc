@@ -16,8 +16,8 @@
 class MainFrame;
 
 //////////////////////////////////////////////////////////////////////////////
-typedef void (*PropertyEventFunc)(MainFrame* mf, wxPropertyGridEvent& event);
-typedef void (*PropertyCommandFunc)(MainFrame* mf, wxCommandEvent& event);
+typedef void (*PropertyEventFunc)(wxPropertyGridEvent& event);
+typedef void (*PropertyCommandFunc)(wxCommandEvent& event);
 struct PGFuncPtrStore {
 	wxString 				name;
 	PropertyEventFunc 		propertyChanged			= NULL;
@@ -35,11 +35,12 @@ class CncConfig {
 	private:
 		bool changed;
 		CncUnit currentUnit;
-
+		MainFrame* theApp;
+		
 		double dispFactX, dispFactY, dispFactZ;
 		double calcFactX, calcFactY, calcFactZ;
 		float dispFactX3D, dispFactY3D, dispFactZ3D;
-
+		
 		static const unsigned int maxDurations = 32;
 		unsigned int durationCount;
 		double durationSteps[maxDurations];
@@ -70,15 +71,15 @@ class CncConfig {
 		static void setupSvgCfgPage(wxConfigBase& config);
 		static void setupGCodeCfgPage(wxConfigBase& config);
 		
-		static void pgChangedWorkingCfgPage(MainFrame* mf, wxPropertyGridEvent& event);
-		static void pgChangingWorkingCfgPage(MainFrame* mf, wxPropertyGridEvent& event);
-		static void pgSelectedWorkingCfgPage(MainFrame* mf, wxPropertyGridEvent& event);
-		static void pgButtonWorkingCfgPage(MainFrame* mf, wxCommandEvent& event);
+		static void pgChangedWorkingCfgPage(wxPropertyGridEvent& event);
+		static void pgChangingWorkingCfgPage(wxPropertyGridEvent& event);
+		static void pgSelectedWorkingCfgPage(wxPropertyGridEvent& event);
+		static void pgButtonWorkingCfgPage(wxCommandEvent& event);
 		
-		static void pgChangedGeneralCfgPage(MainFrame* mf, wxPropertyGridEvent& event);
-		static void pgChangedApplicationCfgPage(MainFrame* mf, wxPropertyGridEvent& event);
-		static void pgChangedSvgCfgPage(MainFrame* mf, wxPropertyGridEvent& event);
-		static void pgChangedGCodeCfgPage(MainFrame* mf, wxPropertyGridEvent& event);
+		static void pgChangedGeneralCfgPage(wxPropertyGridEvent& event);
+		static void pgChangedApplicationCfgPage(wxPropertyGridEvent& event);
+		static void pgChangedSvgCfgPage(wxPropertyGridEvent& event);
+		static void pgChangedGCodeCfgPage(wxPropertyGridEvent& event);
 		
 		void updateCalculatedFactors();
 		void updateCalculatedZAxisValues();
@@ -92,8 +93,10 @@ class CncConfig {
 		
 	public:
 		
-		CncConfig() ;
+		CncConfig(MainFrame* app) ;
 		~CncConfig();
+		
+		MainFrame* getTheApp() { return theApp; }
 		
 		// global config pointer - don't use this directly
 		static CncConfig* globalCncConfig;
@@ -110,12 +113,12 @@ class CncConfig {
 		static void updateCurveLibResolutionSelector();
 		
 		// user events
-		void loadConfiguration(MainFrame* mf, wxConfigBase& config);
-		void saveConfiguration(MainFrame* mf, wxConfigBase& config);
-		void setupGridChanged(MainFrame* mf, wxPropertyGridEvent& event);
-		void setupGridChanging(MainFrame* mf, wxPropertyGridEvent& event);
-		void setupGridCommandButton(MainFrame* mf, wxCommandEvent& event);
-		void setupGridSelected(MainFrame* mf, wxPropertyGridEvent& event);
+		void loadConfiguration(wxConfigBase& config);
+		void saveConfiguration(wxConfigBase& config);
+		void setupGridChanged(wxPropertyGridEvent& event);
+		void setupGridChanging(wxPropertyGridEvent& event);
+		void setupGridCommandButton(wxCommandEvent& event);
+		void setupGridSelected(wxPropertyGridEvent& event);
 		
 		// modification flag
 		const bool isModified() 		{ return changed; }
@@ -145,6 +148,7 @@ class CncConfig {
 		const bool getShowTestMenuFlag();
 		const bool getSvgResultWithOrigPathFlag();
 		const bool getSvgResultOnlyFirstCrossingFlag();
+		const bool getSvgReverseYAxisFlag();
 		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
 		
 		const int getStepSignX();
@@ -215,8 +219,8 @@ class CncConfig {
 		CncConfig& setMaxDimensionX(const double val);
 		CncConfig& setMaxDimensionY(const double val);
 		CncConfig& setMaxDimensionZ(const double val);
-		CncConfig& setMaxZDistance(double d)					{ maxZDistance = d; return *this;}
-		CncConfig& setReferenceIncludesWpt(bool b) 				{ sc(); referenceIncludesWpt = b; return *this; }
+		CncConfig& setMaxZDistance(double d)					{ sc(); maxZDistance = d;         updateCalculatedZAxisValues(); return *this; }
+		CncConfig& setReferenceIncludesWpt(bool b) 				{ sc(); referenceIncludesWpt = b; updateCalculatedZAxisValues(); return *this; }
 		const double setCurrentZDepth(double dpt);
 };
 

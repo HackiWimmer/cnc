@@ -19,9 +19,10 @@ ConfigPGEventMap  globalPGEventMap;
 ConfigPropertyMap globalPropertyMap;
 
 ////////////////////////////////////////////////////////////////////////
-CncConfig::CncConfig() 
+CncConfig::CncConfig(MainFrame* app) 
 : changed(true)
 , currentUnit(CncSteps)
+, theApp(app)
 , dispFactX(1.0), dispFactY(1.0), dispFactZ(1.0)
 , calcFactX(1.0), calcFactY(1.0), calcFactZ(1.0)
 , dispFactX3D(1.0), dispFactY3D(1.0), dispFactZ3D(1.0)
@@ -277,7 +278,7 @@ void CncConfig::setupGlobalConfigurationGrid(wxPropertyGridManager* sg, wxConfig
 	
 	// decoration grid
 	globlSetupGrid->GetGrid()->ResetColours();
-	globlSetupGrid->GetGrid()->SetCaptionBackgroundColour(wxColour(112,146,190));
+	globlSetupGrid->GetGrid()->SetCaptionBackgroundColour(wxColour(255,182,108));
 	globlSetupGrid->GetGrid()->SetCaptionTextColour(wxColour(255,255,255));
 	globlSetupGrid->GetGrid()->SetCellBackgroundColour(wxColour(255,255,255));
 	
@@ -323,7 +324,7 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::loadConfiguration(MainFrame* mf, wxConfigBase& config) {
+void CncConfig::loadConfiguration(wxConfigBase& config) {
 ////////////////////////////////////////////////////////////////////////
 	if ( globlSetupGrid == NULL )
 		return;
@@ -364,7 +365,7 @@ void CncConfig::loadConfiguration(MainFrame* mf, wxConfigBase& config) {
 	sc();
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::saveConfiguration(MainFrame* mf, wxConfigBase& config) {
+void CncConfig::saveConfiguration(wxConfigBase& config) {
 ////////////////////////////////////////////////////////////////////////
 	if ( globlSetupGrid == NULL )
 		return;
@@ -397,10 +398,10 @@ void CncConfig::releaseChangedCallback(wxPGProperty* prop) {
 	event.SetPropertyGrid(prop->GetGrid());
 	event.SetPropertyValue(prop->GetValue());
 	
-	setupGridChanged(NULL, event);
+	setupGridChanged(event);
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::setupGridChanged(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::setupGridChanged(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	// perform the change flag
 	sc();
@@ -411,13 +412,13 @@ void CncConfig::setupGridChanged(MainFrame* mf, wxPropertyGridEvent& event) {
 	
 	auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
 	if ( it != globalPGEventMap.end() && it->second.propertyChanged != NULL)
-		(*(it->second.propertyChanged))(mf, event);
+		(*(it->second.propertyChanged))(event);
 		
-	if ( mf != NULL )
-		mf->updateCncConfigTrace();
+	wxASSERT( theApp != NULL );
+	theApp->updateCncConfigTrace();
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::setupGridChanging(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::setupGridChanging(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	wxPGProperty* p = event.GetProperty();
 	if ( p == NULL )
@@ -432,11 +433,11 @@ void CncConfig::setupGridChanging(MainFrame* mf, wxPropertyGridEvent& event) {
 		// process the event
 		auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
 		if ( it != globalPGEventMap.end()  && it->second.propertyChanging != NULL )
-			(*(it->second.propertyChanging))(mf, event);
+			(*(it->second.propertyChanging))(event);
 	}
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::setupGridCommandButton(MainFrame* mf, wxCommandEvent& event) {
+void CncConfig::setupGridCommandButton(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	wxPGProperty* p = globlSetupGrid->GetSelectedProperty();
 	if ( p == NULL )
@@ -444,10 +445,10 @@ void CncConfig::setupGridCommandButton(MainFrame* mf, wxCommandEvent& event) {
 	
 	auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
 	if ( it != globalPGEventMap.end() && it->second.propertyCommandButton != NULL )
-		(*(it->second.propertyCommandButton))(mf, event);
+		(*(it->second.propertyCommandButton))(event);
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::setupGridSelected(MainFrame* mf, wxPropertyGridEvent& event) {
+void CncConfig::setupGridSelected(wxPropertyGridEvent& event) {
 ////////////////////////////////////////////////////////////////////////
 	wxPGProperty* p = event.GetProperty();
 	if ( p == NULL )
@@ -455,7 +456,7 @@ void CncConfig::setupGridSelected(MainFrame* mf, wxPropertyGridEvent& event) {
 	
 	auto it = globalPGEventMap.find(CncConfig::getPageRoot(p));
 	if ( it != globalPGEventMap.end() && it->second.propertySelected != NULL )
-		(*(it->second.propertySelected))(mf, event);
+		(*(it->second.propertySelected))(event);
 }
 
 
@@ -505,7 +506,7 @@ const bool CncConfig::getAutoProcessFlag()							{ wxPGProperty* p = getProperty
 const bool CncConfig::getShowTestMenuFlag()							{ wxPGProperty* p = getProperty(CncApplication_SHOW_TEST_MENU); 		wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgResultWithOrigPathFlag()				{ wxPGProperty* p = getProperty(CncSvg_Emu_RSLT_WITH_ORIG_PATH); 		wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgResultOnlyFirstCrossingFlag()			{ wxPGProperty* p = getProperty(CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS); wxASSERT(p); return p->GetValue().GetBool(); }
-
+const bool CncConfig::getSvgReverseYAxisFlag()						{ wxPGProperty* p = getProperty(CncSvg_Parser_REVERSE_Y_AXIS); 			wxASSERT(p); return p->GetValue().GetBool(); }
 const int CncConfig::getStepSignX()									{ return 1; } // currently not supported -1 = reverse
 const int CncConfig::getStepSignY()									{ return 1; } // currently not supported -1 = reverse
 

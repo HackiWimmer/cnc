@@ -92,10 +92,6 @@ class GCodeField {
 		
 		////////////////////////////////////////////////////////
 		const double getValue() const { return value; }
-		GCodeField& setValue(double v) {
-			value = v;
-			return *this;
-		}
 		
 		////////////////////////////////////////////////////////
 		const bool isValid() const { 

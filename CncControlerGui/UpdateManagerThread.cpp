@@ -395,26 +395,24 @@ void UpdateManagerThread::updateSetterList(UpdateManagerThread::Event evt) {
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::updateSpeedView() {
 ///////////////////////////////////////////////////////////////////
-	
 	if ( lastSpeedEvent.processed == true )
 		return;
 
 	CncSpeedView* sc = pHandler->getSpeedView();
-	if ( sc != NULL ) {
-		sc->setCurrentSpeedX(lastSpeedEvent.spd.xSpeed);
-		sc->setCurrentSpeedY(lastSpeedEvent.spd.ySpeed);
-		sc->setCurrentSpeedZ(lastSpeedEvent.spd.zSpeed);
-	}
+	if ( sc != NULL )
+		sc->setCurrentSpeedXYZ(lastSpeedEvent.spd.xSpeed, lastSpeedEvent.spd.ySpeed, lastSpeedEvent.spd.zSpeed);
 	
 	lastSpeedEvent.processed = true;
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::configUpdate() {
 ///////////////////////////////////////////////////////////////////
-	#warning todo
-	return;
+	// currently nothing more todo
+	CncConfig::getGlobalCncConfig()->discardModifications();
 	
 	
+	#warning - move the code below to collectSummary
+	/*
 	if ( CncConfig::getGlobalCncConfig() == NULL )
 		return;
 		
@@ -491,4 +489,5 @@ void UpdateManagerThread::configUpdate() {
 		for (auto it = list.begin(); it != list.end(); ++it) 
 			dcc->AppendItem(*it);
 	}
+	*/
 }

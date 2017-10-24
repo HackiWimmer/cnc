@@ -64,10 +64,10 @@
       <File Name="GL3DOptions.cpp"/>
       <File Name="GL3DOptions.h"/>
       <File Name="3D/CncGCodePreview.h"/>
-      <File Name="CncGCodePreview.cpp"/>
       <VirtualDirectory Name="Utils">
         <File Name="3D/VerticeData.h"/>
       </VirtualDirectory>
+      <File Name="3D/CncGCodePreview.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="EndSwitchDlg"/>
     <VirtualDirectory Name="PathGen">
@@ -160,10 +160,10 @@
       <File Name="CncUsbPortScanner.h"/>
       <File Name="CncFilePreview.cpp"/>
       <File Name="CncFilePreview.h"/>
-      <File Name="CncFilePreviewWnd.cpp"/>
-      <File Name="CncFilePreviewWnd.h"/>
       <File Name="CncFileView.cpp"/>
       <File Name="CncFileView.h"/>
+      <File Name="CncFilePreviewWnd.cpp"/>
+      <File Name="CncFilePreviewWnd.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -249,12 +249,17 @@
       <VirtualDirectory Name="Pages">
         <File Name="CfgApplicationPage.cpp"/>
         <File Name="CfgEnvironmentPage.cpp"/>
-        <File Name="CncConfigCommon.h"/>
         <File Name="CfgSVGOptionPage.cpp"/>
         <File Name="CfgGCodeOptionPage.cpp"/>
         <File Name="CfgGeneralPage.cpp"/>
         <File Name="CfgWorkingPage.cpp"/>
       </VirtualDirectory>
+      <File Name="CncConfigExt.h"/>
+      <VirtualDirectory Name="Tabs">
+        <File Name="CncToolMagazine.cpp"/>
+        <File Name="CncToolMagazine.h"/>
+      </VirtualDirectory>
+      <File Name="CncConfigCommon.h"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">

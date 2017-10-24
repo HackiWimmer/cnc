@@ -21,21 +21,22 @@ class GLContextBase : public wxGLContext {
 		GLContextBase(wxGLCanvas* canvas);
 		virtual ~GLContextBase();
 		
-		enum ViewType { VT_2D = 100, VT_3D = 200 };
-		enum ViewMode {	V2D_TOP 		= VT_2D, 
-						V2D_BOTTOM, 
-						V2D_LEFT, 
-						V2D_RIGHT, 
-						V2D_FRONT, 
-						V2D_REAR,
-						
-						V3D_ISO1 		= VT_3D, 
-						V3D_ISO2, 
-						V3D_ISO3, 
-						V3D_ISO4,
-						
-						V2D_CAM_ROT_XY_ZTOP
-					};
+		enum ModelType { MT_LEFT_HAND, MT_RIGHT_HAND };
+		enum ViewType  { VT_2D = 100, VT_3D = 200 };
+		enum ViewMode  {	V2D_TOP 		= VT_2D, 
+							V2D_BOTTOM, 
+							V2D_LEFT, 
+							V2D_RIGHT, 
+							V2D_FRONT, 
+							V2D_REAR,
+							
+							V3D_ISO1 		= VT_3D, 
+							V3D_ISO2, 
+							V3D_ISO3, 
+							V3D_ISO4,
+							
+							V2D_CAM_ROT_XY_ZTOP
+						};
 		
 		// common 
 		virtual const char* getContextName() = 0;
@@ -66,7 +67,7 @@ class GLContextBase : public wxGLContext {
 		void centerViewport();
 		
 		// view mode
-		void setViewMode(GLContextBase::ViewMode newMode);
+		void setViewMode(GLContextBase::ViewMode newMode, bool force=false);
 		GLContextBase::ViewMode getViewMode() { return viewMode; }
 		const char* getViewModeAsString();
 		
@@ -82,6 +83,9 @@ class GLContextBase : public wxGLContext {
 				
 			return ViewType::VT_3D;
 		}
+		
+		void setModelType(const ModelType mt) { modelType = mt; }
+		const ModelType getModelType() { return modelType; }
 
 		GLViewPort::PreDefPos convertViewMode(GLContextBase::ViewMode newMode);
 		
@@ -128,6 +132,7 @@ class GLContextBase : public wxGLContext {
 		
 		ViewMode			viewMode;
 		CoordOrginInfo 		coordOriginInfo;
+		ModelType			modelType;
 		GLViewPort*			viewPort;
 		GLI::ModelScale 	modelScale;
 		GLI::ModelRotate	modelRotate;
