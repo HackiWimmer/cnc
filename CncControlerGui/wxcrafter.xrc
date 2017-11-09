@@ -844,7 +844,7 @@
                     <style>wxTAB_TRAVERSAL</style>
                     <object class="wxFlexGridSizer">
                       <cols>1</cols>
-                      <rows>1</rows>
+                      <rows>3</rows>
                       <vgap>0</vgap>
                       <hgap>0</hgap>
                       <growablecols>0</growablecols>
@@ -862,7 +862,7 @@
                               <style>wxTAB_TRAVERSAL</style>
                               <object class="wxFlexGridSizer">
                                 <cols>1</cols>
-                                <rows>2</rows>
+                                <rows>1</rows>
                                 <vgap>0</vgap>
                                 <hgap>0</hgap>
                                 <growablecols>0</growablecols>
@@ -874,44 +874,6 @@
                                     <tooltip>
                                       <![CDATA[rtrt]]>
                                     </tooltip>
-                                  </object>
-                                </object>
-                                <object class="sizeritem" name="flexGridSizer4541">
-                                  <flag>wxALL|wxALIGN_RIGHT</flag>
-                                  <border>1</border>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>2</cols>
-                                    <rows>1</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols>0</growablecols>
-                                    <growablerows>0</growablerows>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <border>1</border>
-                                      <minsize>-1,26</minsize>
-                                      <object class="wxButton" name="m_loadConfiguration">
-                                        <label>(Re)Load Configuration</label>
-                                        <style/>
-                                        <size>-1,26</size>
-                                        <bitmap>bitmaps/reload.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL|wxALIGN_RIGHT</flag>
-                                      <border>1</border>
-                                      <minsize>-1,26</minsize>
-                                      <object class="wxButton" name="m_saveConfiguration">
-                                        <label>Save Configuration</label>
-                                        <style/>
-                                        <size>-1,26</size>
-                                        <bitmap>bitmaps/16-file_save.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
                                   </object>
                                 </object>
                               </object>
@@ -974,6 +936,51 @@
                                   </object>
                                 </object>
                               </object>
+                            </object>
+                          </object>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>3</border>
+                        <object class="wxStaticLine" name="m_staticLine4645">
+                          <style>wxLI_HORIZONTAL</style>
+                        </object>
+                      </object>
+                      <object class="sizeritem" name="flexGridSizer4541">
+                        <flag>wxALL|wxALIGN_RIGHT</flag>
+                        <border>1</border>
+                        <object class="wxFlexGridSizer">
+                          <cols>2</cols>
+                          <rows>1</rows>
+                          <vgap>0</vgap>
+                          <hgap>0</hgap>
+                          <growablecols>0</growablecols>
+                          <growablerows>0</growablerows>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>-1,26</minsize>
+                            <object class="wxButton" name="m_loadConfiguration">
+                              <label>Restore Configuration</label>
+                              <style/>
+                              <size>-1,26</size>
+                              <bitmap>bitmaps/reload.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxALIGN_RIGHT</flag>
+                            <border>1</border>
+                            <minsize>-1,26</minsize>
+                            <object class="wxButton" name="m_saveConfiguration">
+                              <label>Save Configuration</label>
+                              <style/>
+                              <size>-1,26</size>
+                              <bitmap>bitmaps/16-file_save.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
                             </object>
                           </object>
                         </object>
@@ -8255,7 +8262,7 @@
                           <![CDATA[PEN]]>
                         </item>
                         <item>
-                          <![CDATA[ROUTER]]>
+                          <![CDATA[BIT]]>
                         </item>
                       </content>
                     </object>

@@ -145,6 +145,14 @@ class GCodeBlock {
 		}
 		
 		//////////////////////////////////////////////////////////////////
+		const double getCurrentFeedSpeed() {
+			if ( hasF() )
+				return f;
+				
+			return 0.0;
+		}
+		
+		//////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const GCodeBlock &a);
 		void trace(std::ostream &ostr);
 		void trace(DcmItemList& rows);

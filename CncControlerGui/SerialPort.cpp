@@ -1102,7 +1102,10 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 		case PID_HEARTBEAT:	return decodeHeartbeat(sfi);
 		
 		//RET_SOH_Handler..........................................
-		case PID_XYZ_POS:	return decodePositionInfo(sfi);
+		case PID_X_POS:
+		case PID_Y_POS:
+		case PID_Z_POS:
+		case PID_XYZ_POS:	return decodePositionInfo(sfi, cr);
 		
 		//RET_SOH_Handler..........................................
 		case PID_LIMIT:		return decodeLimitInfo(sfi);
@@ -1154,9 +1157,13 @@ bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::decodePositionInfo(SerialFetchInfo& sfi) {
+bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
-	if ( (sfi.Mc.bytes = readDataUntilSizeAvailable(sfi.Mc.result, sizeof(sfi.Mc.result))) <= 0 ) {
+	unsigned int size = LONG_BUF_SIZE;
+	if ( pid == PID_XYZ_POS )
+		size = sizeof(sfi.Mc.result);
+
+	if ( (sfi.Mc.bytes = readDataUntilSizeAvailable(sfi.Mc.result, size)) <= 0 ) {
 		std::cerr << "ERROR while reading position value(s). Nothing available" << std::endl;
 		return false;
 	}
@@ -1171,15 +1178,24 @@ bool Serial::decodePositionInfo(SerialFetchInfo& sfi) {
 	ci.infoType = CITPosition;
 	ci.command  = sfi.command;
 	ci.isPause	= isPauseActive();
+	ci.posType 	= pid;
 
 	sfi.Mc.p = sfi.Mc.result;
 	for (int i=0; i<sfi.Mc.bytes; i+=LONG_BUF_SIZE) {
 		memcpy(&sfi.Mc.value, sfi.Mc.p, LONG_BUF_SIZE);
 		
-		switch (i) {
-			case 0:	ci.controllerPos.setX(sfi.Mc.value); break;
-			case 4:	ci.controllerPos.setY(sfi.Mc.value); break;
-			case 8:	ci.controllerPos.setZ(sfi.Mc.value); break;
+		if ( pid == PID_XYZ_POS ) {
+			switch (i) {
+				case 0:	ci.xCtrlPos = sfi.Mc.value; break;
+				case 4:	ci.yCtrlPos = sfi.Mc.value; break;
+				case 8:	ci.zCtrlPos = sfi.Mc.value; break;
+			}
+		} else {
+			switch ( pid ) {
+				case PID_X_POS: ci.xCtrlPos = sfi.Mc.value; break;
+				case PID_Y_POS: ci.yCtrlPos = sfi.Mc.value; break;
+				case PID_Z_POS: ci.zCtrlPos = sfi.Mc.value; break;
+			}
 		}
 
 		sfi.Mc.p += LONG_BUF_SIZE;

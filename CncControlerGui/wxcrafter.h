@@ -151,12 +151,13 @@ protected:
     wxNotebook* m_notebook4561;
     wxPanel* m_setupConfigPage;
     wxPropertyGridManager* m_pgMgrSetup;
-    wxButton* m_loadConfiguration;
-    wxButton* m_saveConfiguration;
     wxPanel* m_setupToolMagazine;
     wxPanel* m_toolMagazinePlaceholder;
     wxPanel* m_setupSpeedWizard;
     wxStaticText* m_staticText4575;
+    wxStaticLine* m_staticLine4645;
+    wxButton* m_loadConfiguration;
+    wxButton* m_saveConfiguration;
     wxPanel* m_mainBookReference;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
@@ -889,14 +890,15 @@ public:
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetMainBookSourcePanel() { return m_mainBookSourcePanel; }
     wxPropertyGridManager* GetPgMgrSetup() { return m_pgMgrSetup; }
-    wxButton* GetLoadConfiguration() { return m_loadConfiguration; }
-    wxButton* GetSaveConfiguration() { return m_saveConfiguration; }
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
     wxPanel* GetToolMagazinePlaceholder() { return m_toolMagazinePlaceholder; }
     wxPanel* GetSetupToolMagazine() { return m_setupToolMagazine; }
     wxStaticText* GetStaticText4575() { return m_staticText4575; }
     wxPanel* GetSetupSpeedWizard() { return m_setupSpeedWizard; }
     wxNotebook* GetNotebook4561() { return m_notebook4561; }
+    wxStaticLine* GetStaticLine4645() { return m_staticLine4645; }
+    wxButton* GetLoadConfiguration() { return m_loadConfiguration; }
+    wxButton* GetSaveConfiguration() { return m_saveConfiguration; }
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
     wxStaticLine* GetStaticLine783() { return m_staticLine783; }
@@ -1491,7 +1493,7 @@ protected:
     virtual void removeTool(wxCommandEvent& event) { event.Skip(); }
     virtual void addTool(wxCommandEvent& event) { event.Skip(); }
     virtual void editTool(wxCommandEvent& event) { event.Skip(); }
-    virtual void cancle(wxCommandEvent& event) { event.Skip(); }
+    virtual void cancel(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxListCtrl* GetToolMagazine() { return m_toolMagazine; }

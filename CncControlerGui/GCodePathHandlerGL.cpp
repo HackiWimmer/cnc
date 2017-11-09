@@ -37,7 +37,7 @@ bool GCodePathHandlerGL::processLinearMove(bool alreadyRendered) {
 	return true; 
 }
 //////////////////////////////////////////////////////////////////
-bool GCodePathHandlerGL::changeWorkSpeedXY(CncSpeed s) {
+bool GCodePathHandlerGL::changeCurrentFeedSpeedXYZ(CncSpeed s, double value) {
 //////////////////////////////////////////////////////////////////
 	currentSpeed = s;
 	return true;

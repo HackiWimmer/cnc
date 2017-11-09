@@ -157,7 +157,7 @@ class CncPosition {
 		virtual ~CncPosition<T>() {
 		}
 		////////////////////////////////////////////////////////////////
-		void getWatermarks(Watermarks& wm) {
+		void getWatermarks(Watermarks& wm) const {
 			wm.xMin = xMin;
 			wm.yMin = yMin;
 			wm.zMin = zMin;

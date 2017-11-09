@@ -544,7 +544,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_mainBookSetup = new wxPanel(m_mainViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainViewBook->AddPage(m_mainBookSetup, _("Page"), false);
     
-    wxFlexGridSizer* flexGridSizer1884 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1884 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1884->SetFlexibleDirection( wxBOTH );
     flexGridSizer1884->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1884->AddGrowableCol(0);
@@ -563,7 +563,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_setupConfigPageImgIndex = m_notebook4561_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("system-settings")));
     m_notebook4561->AddPage(m_setupConfigPage, _("Main Config"), true, m_setupConfigPageImgIndex);
     
-    wxFlexGridSizer* flexGridSizer3705 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3705 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer3705->SetFlexibleDirection( wxBOTH );
     flexGridSizer3705->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3705->AddGrowableCol(0);
@@ -578,32 +578,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_pgMgrSetup->SetToolTip(_("rtrt"));
     
     flexGridSizer3705->Add(m_pgMgrSetup, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer4541 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer4541->SetFlexibleDirection( wxBOTH );
-    flexGridSizer4541->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4541->AddGrowableCol(0);
-    flexGridSizer4541->AddGrowableRow(0);
-    
-    flexGridSizer3705->Add(flexGridSizer4541, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    
-    m_loadConfiguration = new wxButton(m_setupConfigPage, wxID_ANY, _("(Re)Load Configuration"), wxDefaultPosition, wxDLG_UNIT(m_setupConfigPage, wxSize(-1,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_loadConfiguration->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("reload")), wxLEFT);
-    m_loadConfiguration->SetBitmapMargins(2,2);
-    #endif
-    
-    flexGridSizer4541->Add(m_loadConfiguration, 0, wxALL, WXC_FROM_DIP(1));
-    m_loadConfiguration->SetMinSize(wxSize(-1,26));
-    
-    m_saveConfiguration = new wxButton(m_setupConfigPage, wxID_ANY, _("Save Configuration"), wxDefaultPosition, wxDLG_UNIT(m_setupConfigPage, wxSize(-1,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_saveConfiguration->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save")), wxLEFT);
-    m_saveConfiguration->SetBitmapMargins(2,2);
-    #endif
-    
-    flexGridSizer4541->Add(m_saveConfiguration, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    m_saveConfiguration->SetMinSize(wxSize(-1,26));
     
     m_setupToolMagazine = new wxPanel(m_notebook4561, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebook4561, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_setupToolMagazineImgIndex;
@@ -639,6 +613,36 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText4575->SetFont(m_staticText4575Font);
     
     flexGridSizer4565->Add(m_staticText4575, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticLine4645 = new wxStaticLine(m_mainBookSetup, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookSetup, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer1884->Add(m_staticLine4645, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
+    
+    wxFlexGridSizer* flexGridSizer4541 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer4541->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4541->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4541->AddGrowableCol(0);
+    flexGridSizer4541->AddGrowableRow(0);
+    
+    flexGridSizer1884->Add(flexGridSizer4541, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    
+    m_loadConfiguration = new wxButton(m_mainBookSetup, wxID_ANY, _("Restore Configuration"), wxDefaultPosition, wxDLG_UNIT(m_mainBookSetup, wxSize(-1,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_loadConfiguration->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("reload")), wxLEFT);
+    m_loadConfiguration->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer4541->Add(m_loadConfiguration, 0, wxALL, WXC_FROM_DIP(1));
+    m_loadConfiguration->SetMinSize(wxSize(-1,26));
+    
+    m_saveConfiguration = new wxButton(m_mainBookSetup, wxID_ANY, _("Save Configuration"), wxDefaultPosition, wxDLG_UNIT(m_mainBookSetup, wxSize(-1,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_saveConfiguration->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_save")), wxLEFT);
+    m_saveConfiguration->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer4541->Add(m_saveConfiguration, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    m_saveConfiguration->SetMinSize(wxSize(-1,26));
     
     m_mainBookReference = new wxPanel(m_mainViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainViewBook->AddPage(m_mainBookReference, _("Page"), false);
@@ -5666,7 +5670,7 @@ CncToolMagazineBase::CncToolMagazineBase(wxWindow* parent, wxWindowID id, const 
     
     wxArrayString m_toolMagazineTypeArr;
     m_toolMagazineTypeArr.Add(wxT("PEN"));
-    m_toolMagazineTypeArr.Add(wxT("ROUTER"));
+    m_toolMagazineTypeArr.Add(wxT("BIT"));
     m_toolMagazineType = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_toolMagazineTypeArr, wxCB_READONLY);
     m_toolMagazineType->SetSelection(0);
     
@@ -5766,7 +5770,7 @@ CncToolMagazineBase::CncToolMagazineBase(wxWindow* parent, wxWindowID id, const 
     m_btToolMagazineRemove->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::removeTool), NULL, this);
     m_btToolMagazineAdd->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::addTool), NULL, this);
     m_btToolMagazineEdit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::editTool), NULL, this);
-    m_btToolMagazineCancle->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::cancle), NULL, this);
+    m_btToolMagazineCancle->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::cancel), NULL, this);
     
 }
 
@@ -5776,7 +5780,7 @@ CncToolMagazineBase::~CncToolMagazineBase()
     m_btToolMagazineRemove->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::removeTool), NULL, this);
     m_btToolMagazineAdd->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::addTool), NULL, this);
     m_btToolMagazineEdit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::editTool), NULL, this);
-    m_btToolMagazineCancle->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::cancle), NULL, this);
+    m_btToolMagazineCancle->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::cancel), NULL, this);
     
 }
 
@@ -7901,6 +7905,19 @@ ImageLibConfig::ImageLibConfig()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_GCODE_CFG"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_TOOL_MAGAZINE_ENTRY"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_TOOL_MAGAZINE_ENTRY"), bmp));
         }
     }
     

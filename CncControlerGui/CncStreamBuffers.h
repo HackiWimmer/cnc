@@ -239,7 +239,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		///////////////////////////////////////////////////////////
 		void logInfoMessage(const char* m) {
 			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(*wxLIGHT_GREY));
+				getTextControl()->SetDefaultStyle(wxTextAttr(*wxBLACK));
 				logMessage(m);
 			}
 		}

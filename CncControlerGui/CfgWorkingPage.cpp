@@ -81,24 +81,11 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 		registerCategory(curCatName, tool);
 		{
 			//...............
-			pgParameterMgrArr.Clear();
-			pgParameterMgrIntArr.Clear();
-			pgParameterMgrArr.Add(_("Router")); 
-			pgParameterMgrArr.Add(_("Pen"));
-			prop = tool->AppendChild( new wxEnumProperty("Type", NEXT_PROP_ID, pgParameterMgrArr, pgParameterMgrIntArr, 0));
+			prop = tool->AppendChild( new wxBoolProperty("Consider 'Default Tool'", NEXT_PROP_ID, true));
 			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetEditor( wxT("ComboBox") );
-			registerProperty(CncWork_Tool_TYPE, prop);
-			
-			//...............
-			validator.SetPrecision(3); validator.SetRange(0.1, 20.0);
-			prop = tool->AppendChild( new wxFloatProperty("Diameter [mm]", NEXT_PROP_ID, 0.0));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncWork_Tool_DIAMETER, prop);
+			prop->SetHelpString(_T("This tool will be used if a requested Tool ID didn't exists"));
+			prop->SetEditor( wxT("CheckBox") );
+			registerProperty(CncWork_Tool_DEFAULT, prop);
 		}
 		
 		//...................

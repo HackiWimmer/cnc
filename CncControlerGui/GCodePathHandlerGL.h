@@ -16,7 +16,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 	protected:
 		
 		virtual bool processLinearMove(bool alreadyRendered);
-		virtual bool changeWorkSpeedXY(CncSpeed s);
+		virtual bool changeCurrentFeedSpeedXYZ(CncSpeed s, double value = 0.0);
 		virtual void prepareWorkImpl();
 		virtual void finishWorkImpl();
 		

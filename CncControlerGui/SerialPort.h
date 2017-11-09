@@ -79,7 +79,10 @@ struct ContollerInfo {
 	
 	int64_t heartbeatValue				= 0;
 	
-	CncLongPosition controllerPos 		= {0,0,0};
+	unsigned char posType				= '\0';
+	int32_t xCtrlPos					= 0L;
+	int32_t yCtrlPos					= 0L;
+	int32_t zCtrlPos					= 0L;
 	
 	int setterId						= 0;
 	int32_t	setterValue					= 0L;
@@ -174,7 +177,7 @@ class Serial {
 		inline bool decodeGetter(SerialFetchInfo& sfi);
 		inline bool decodeHeartbeat(SerialFetchInfo& sfi);
 		inline bool decodeLimitInfo(SerialFetchInfo& sfi);
-		inline bool decodePositionInfo(SerialFetchInfo& sfi);
+		inline bool decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid);
 		
 		void resetLastFetchResult() { lastFetchResult = RET_NULL; }
 		void setLastFetchType(unsigned char ret) { lastFetchResult = ret; }

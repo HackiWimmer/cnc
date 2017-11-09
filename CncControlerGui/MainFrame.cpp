@@ -94,6 +94,7 @@ wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 	
 	EVT_COMMAND(wxID_ANY, wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, MainFrame::onThreadCompletion)
 	EVT_COMMAND(wxID_ANY, wxEVT_UPDATE_MANAGER_THREAD_UPDATE, MainFrame::onThreadUpdate)
+	EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, MainFrame::configurationUpdated)
 	
 	EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, MainFrame::onPerspectiveTimer)
 	EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, MainFrame::onDebugUserNotificationTimer)
@@ -249,6 +250,12 @@ void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
 			}
 		}
 	}
+}
+////////////////////////////////////////////////////////////////////////////
+void MainFrame::configurationUpdated(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////////////
+	#warning todo -impl MainFrame::configurationUpdated
+	//std::clog << "MainFrame::configurationUpdated(wxCommandEvent& event)" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::setRefPostionState(bool state) {
@@ -1046,17 +1053,17 @@ bool MainFrame::initializeCncControl() {
 		m_speedView->setMaxSpeedZ(cncConfig->getMaxSpeedZ());
 
 		if ( cnc->isConnected() ) {
-			if ( cncConfig->getDefaultSpeedModeXY(value) == "RAPID")	cnc->changeWorkSpeedXY(CncSpeedRapid);
-			else														cnc->changeWorkSpeedXY(CncSpeedWork);
+			if ( cncConfig->getDefaultSpeedModeXY(value) == "RAPID")	cnc->changeCurrentRpmSpeedXY(CncSpeedRapid);
+			else														cnc->changeCurrentRpmSpeedXY(CncSpeedWork);
 			
-			if ( cncConfig->getDefaultSpeedModeZ(value)  == "RAPID")	cnc->changeWorkSpeedZ(CncSpeedRapid);
-			else														cnc->changeWorkSpeedZ(CncSpeedWork);
+			if ( cncConfig->getDefaultSpeedModeZ(value)  == "RAPID")	cnc->changeCurrentRpmSpeedZ(CncSpeedRapid);
+			else														cnc->changeCurrentRpmSpeedZ(CncSpeedWork);
 		} else {
-			cnc->changeWorkSpeedZ(CncSpeedRapid);
-			cnc->changeWorkSpeedZ(CncSpeedRapid);
+			cnc->changeCurrentRpmSpeedZ(CncSpeedRapid);
+			cnc->changeCurrentRpmSpeedZ(CncSpeedRapid);
 		}
 		
-		m_speedView->setCurrentSpeedXYZ(cnc->getSpeedX(), cnc->getSpeedY(), cnc->getSpeedZ());
+		m_speedView->setCurrentSpeedXYZ(cnc->getRpmSpeedX(), cnc->getRpmSpeedY(), cnc->getRpmSpeedZ());
 	}
 	
 	// initialize the postion controls
@@ -3027,8 +3034,6 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::changeUpdateInterval(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-
 	unsigned int interval = 1;
 	wxString val = m_cbUpdateInterval->GetValue();
 	interval = wxAtoi(val);

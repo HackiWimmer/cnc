@@ -3,7 +3,7 @@
 
 /////////////////////////////////////////////////////////////////////////
 bool 						CncSvgCurveLib::useCncSvgCurveLib 	= true;
-const float 				CncSvgCurveLib::defaultIncrement 	= 0.09f;
+const float 				CncSvgCurveLib::defaultIncrement 	= 0.03f;
 float 						CncSvgCurveLib::tIncrement			= CncSvgCurveLib::defaultIncrement;
 ArcParameter 				CncSvgCurveLib::AP;
 QuadraticBezierParameter 	CncSvgCurveLib::QP;

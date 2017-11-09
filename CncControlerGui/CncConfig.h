@@ -13,8 +13,6 @@
 #include "CncCommon.h"
 #include "CncSvgCurveLib.h"
 
-class MainFrame;
-
 //////////////////////////////////////////////////////////////////////////////
 typedef void (*PropertyEventFunc)(wxPropertyGridEvent& event);
 typedef void (*PropertyCommandFunc)(wxCommandEvent& event);
@@ -29,13 +27,38 @@ struct PGFuncPtrStore {
 typedef std::map<wxPGProperty*, PGFuncPtrStore>		ConfigPGEventMap;
 typedef std::map<const wxString, wxPGProperty*> 	ConfigPropertyMap;
 
+
+wxDECLARE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
+
 //////////////////////////////////////////////////////////////////////////////
+class MainFrame;
+typedef std::map<wxWindow*, wxWindow*> RegisteredWindows;
+
+static const int TOOL_MAGAZINE_MIN_ID = -1;
+static const int TOOL_MAGAZINE_MAX_ID = 999;
+
+
 class CncConfig {
 	
+	public:
+		struct ToolMagazineEntry {
+		
+			double diameter 	= 0.0;
+			wxString type 		= "PEN";
+			wxString comment 	= "";
+			
+			const wxString& serialize(wxString& ret );
+			bool deserialize(const wxString& input);
+		};
+		
+		typedef std::map<int, ToolMagazineEntry> ToolMagazine;
+		
 	private:
 		bool changed;
 		CncUnit currentUnit;
 		MainFrame* theApp;
+		ToolMagazine toolMagazine;
+		RegisteredWindows registeredWindows;
 		
 		double dispFactX, dispFactY, dispFactZ;
 		double calcFactX, calcFactY, calcFactZ;
@@ -84,12 +107,18 @@ class CncConfig {
 		void updateCalculatedFactors();
 		void updateCalculatedZAxisValues();
 		
+		void broadcastConfigUpdateNotification();
+		
+		bool loadNonGuiConfig(const wxString& groupName, const wxString& entryName, const wxString& value);
+		void saveNonGuiConfig(wxConfigBase& config);
+		
 		void calculateFactors();
 		bool setPropertyValueFromConfig(const wxString& groupName, const wxString& entryName, const wxString& value);
 		void releaseChangedCallback(wxPGProperty* prop);
 		void initZAxisValues();
-		void sc() { changed = true; }
-		void rc() { changed = false; }
+		
+		void sc();
+		void rc();
 		
 	public:
 		
@@ -97,10 +126,13 @@ class CncConfig {
 		~CncConfig();
 		
 		MainFrame* getTheApp() { return theApp; }
+		void registerWindowForConfigNotification(wxWindow* wnd);
 		
 		// global config pointer - don't use this directly
 		static CncConfig* globalCncConfig;
 		static wxComboBox* gblCurveLibSelector;
+		
+		ToolMagazine& getToolMagazine() { return toolMagazine; }
 		
 		// global config interface
 		static CncConfig* getGlobalCncConfig() { wxASSERT(globalCncConfig); return globalCncConfig; }
@@ -137,6 +169,9 @@ class CncConfig {
 		CncConfig& setOnlineUpdateDrawPane(bool b) 				{ sc(); onlineUpdateDrawPane=b; return *this; }
 		CncConfig& setAllowEventHandling(bool b) 				{ sc(); allowEventHandling=b; return *this; }
 		CncConfig& setUpdateInterval(int i) 					{ sc(); updateInterval=i; return *this; }
+		
+		const double getToolDiameter(int toolId=-1);
+		const wxString& getToolType(wxString& ret, int toolId=-1);
 		
 		// configuration getters
 		const CncUnit getDisplayUnit(void);
@@ -181,7 +216,6 @@ class CncConfig {
 		const double getPitchY();
 		const double getPitchZ();
 		const double getSvgEmulatorCopyFactor();
-		const double getToolDiameter();
 		const double getMaxDurationThickness();
 		const double getWorkpieceThickness();
 		const double getDurationThickness(unsigned int duration);
@@ -211,8 +245,6 @@ class CncConfig {
 		const wxString& getDefaultTplDir(wxString& ret);
 		const wxString& getDefaultTplFile(wxString& ret);
 		const wxString& getRunConfirmationMode(wxString& ret);
-		const wxString& getToolType(wxString& ret);
-		
 		
 		// configuration setters
 		CncConfig& setDisplayUnit(const CncUnit unit);

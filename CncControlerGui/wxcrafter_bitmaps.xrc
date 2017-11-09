@@ -187,6 +187,7 @@
   <object class="wxBitmap" name="BMP_TEMPLATE_ROOT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-database.png</object>
   <object class="wxBitmap" name="BMP_TEMPLATE_ROOT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-database@2x.png</object>
   <object class="wxBitmap" name="BMP_TEMPLATE_ROOT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-database@2x.png</object>
+  <object class="wxBitmap" name="BMP_TOOL_MAGAZINE_ENTRY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\document-page-setup.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_DEFAULT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_grey16.ico</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_GREEN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_green16.ico</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_RED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_red16.ico</object>

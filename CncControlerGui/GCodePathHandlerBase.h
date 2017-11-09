@@ -27,7 +27,7 @@ class GCodePathHandlerBase : public PathHandlerBase {
 	protected:
 		
 		virtual bool processLinearMove(bool alreadyRendered) = 0;
-		virtual bool changeWorkSpeedXY(CncSpeed s) = 0;
+		virtual bool changeCurrentFeedSpeedXYZ(CncSpeed s, double value = 0.0) = 0;
 		virtual void prepareWorkImpl() = 0;
 		virtual void finishWorkImpl() = 0;
 		

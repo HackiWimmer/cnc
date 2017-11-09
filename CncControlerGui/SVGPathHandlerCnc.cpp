@@ -431,7 +431,7 @@ bool SVGPathHandlerCnc::moveUpZ() {
 	bool ret = cncControl->moveRelMetricZ(moveZ);
 	if ( ret ) {
 		zAxisDown = false;
-		cncControl->changeWorkSpeedXY(CncSpeedRapid);
+		cncControl->changeCurrentRpmSpeedXY(CncSpeedRapid);
 	} else {
 		std::cerr << "CncControl::moveUpZ() error: " << moveZ << ", " << curZPos << ", " << dist << std::endl;
 	}
@@ -457,7 +457,7 @@ bool SVGPathHandlerCnc::moveDownZ() {
 	bool ret = cncControl->moveRelMetricZ(moveZ);
 	if ( ret ) {
 		zAxisDown = true;
-		cncControl->changeWorkSpeedXY(CncSpeedWork);
+		cncControl->changeCurrentRpmSpeedXY(CncSpeedWork);
 	}
 	
 	return ret;

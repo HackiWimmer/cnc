@@ -310,6 +310,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void onThreadCompletion(wxCommandEvent& event);
 		void onPerspectiveTimer(wxTimerEvent& WXUNUSED(event));
 		void onDebugUserNotificationTimer(wxTimerEvent& WXUNUSED(event));
+		void configurationUpdated(wxCommandEvent& event);
 		
 		wxDECLARE_EVENT_TABLE();
 		
