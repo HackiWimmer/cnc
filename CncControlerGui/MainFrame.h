@@ -68,6 +68,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
+    virtual void trace3D(wxCommandEvent& event);
 		virtual void viewZAxis(wxCommandEvent& event);
 		virtual void loadPerspectiveDebug(wxCommandEvent& event);
 		virtual void loadPerspectiveRun(wxCommandEvent& event);
@@ -122,7 +123,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void traceTextUpdated(wxCommandEvent& event);
 		virtual void ctrlTestCaseSelected(wxCommandEvent& event);
 		virtual void treebookTestChanged(wxTreebookEvent& event);
-		virtual void controlerPause(wxCommandEvent& event);
 		virtual void openPyCam(wxCommandEvent& event);
 		virtual void moveXToMid(wxCommandEvent& event);
 		virtual void moveYToMid(wxCommandEvent& event);

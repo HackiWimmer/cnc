@@ -41,8 +41,14 @@ class GLContextCncPathBase : public GLContextBase {
 		/////////////////////////////////////////////////////////
 		void tracePathData(std::ostream& out) {
 			out << "Size: " << cncPath.size() << std::endl;
+			unsigned long cnt = 0;
 			for( GLI::GLCncPath::iterator it = cncPath.begin(); it < cncPath.end(); ++it ) {
-				out << ' ' << it->getX() << ',' << it->getY() << ',' << it->getZ() << std::endl;
+				out << ' ';
+				out << wxString::Format("%6lu", cnt++) << ": ";
+				out << wxString::Format("%+.10lf", it->getX()) << ", ";
+				out << wxString::Format("%+.10lf", it->getY()) << ", ";
+				out << wxString::Format("%+.10lf", it->getZ());
+				out << std::endl;
 			}
 		}
 		

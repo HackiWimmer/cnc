@@ -160,11 +160,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddSeparator();
     
-    m_controlerPause = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-interrupt")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_controlerPause->SetToolTip(_("Controller Pause"));
-    m_controlerPause->Hide();
-    m_auibarMain->AddControl(m_controlerPause);
-    
     m_btnEmergenyStop = new wxButton(m_auibarMain, wxID_ANY, _("Emergency Stop [ESC]"), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btnEmergenyStop->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("error")), wxRIGHT);
@@ -2663,6 +2658,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3497->Add(m_3D_Refreh, 0, wxALL, WXC_FROM_DIP(0));
     m_3D_Refreh->SetMinSize(wxSize(24,24));
     
+    m_3D_Trace = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Trace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("trace")), wxLEFT);
+    m_3D_Trace->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Trace->SetToolTip(_("Trace Montion Monitor Data"));
+    
+    flexGridSizer3497->Add(m_3D_Trace, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Trace->SetMinSize(wxSize(24,24));
+    
     m_3D_Clear = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_3D_Clear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
@@ -2706,12 +2711,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     wxArrayString m_cbUpdateIntervalArr;
     m_cbUpdateIntervalArr.Add(wxT("1"));
+    m_cbUpdateIntervalArr.Add(wxT("2"));
+    m_cbUpdateIntervalArr.Add(wxT("5"));
     m_cbUpdateIntervalArr.Add(wxT("10"));
     m_cbUpdateIntervalArr.Add(wxT("100"));
+    m_cbUpdateIntervalArr.Add(wxT("200"));
+    m_cbUpdateIntervalArr.Add(wxT("500"));
     m_cbUpdateIntervalArr.Add(wxT("1000"));
     m_cbUpdateInterval = new wxComboBox(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(-1,-1)), m_cbUpdateIntervalArr, wxCB_READONLY);
     m_cbUpdateInterval->SetToolTip(_("Determine Update Interval"));
-    m_cbUpdateInterval->SetSelection(1);
+    m_cbUpdateInterval->SetSelection(2);
     
     flexGridSizer3497->Add(m_cbUpdateInterval, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -3805,10 +3814,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4480->Add(flexGridSizer4485, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_bmpButton4487 = new wxBitmapButton(m_positionMonitorView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_bmpButton4487->SetToolTip(_("Clear Position Spy"));
+    m_btClearPositionSpy = new wxBitmapButton(m_positionMonitorView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btClearPositionSpy->SetToolTip(_("Clear Position Spy"));
     
-    flexGridSizer4485->Add(m_bmpButton4487, 0, wxALL, WXC_FROM_DIP(1));
+    flexGridSizer4485->Add(m_btClearPositionSpy, 0, wxALL, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer4524 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer4524->SetFlexibleDirection( wxBOTH );
@@ -4217,7 +4226,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rcRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
-    m_controlerPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::controlerPause), NULL, this);
     m_btnEmergenyStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
     m_mainViewSelector->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::mainViewSelectorSelected), NULL, this);
     m_openSourceExtern->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSourceExtern), NULL, this);
@@ -4326,6 +4334,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_switchMonitoing->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_motionMonitorOptionDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openMotionMonitorOptionDlg), NULL, this);
     m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
+    m_3D_Trace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::trace3D), NULL, this);
     m_3D_Clear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
     m_cbCurveLibResolution->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_cbUpdateInterval->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::changeUpdateInterval), NULL, this);
@@ -4377,7 +4386,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_enableSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
-    m_bmpButton4487->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
+    m_btClearPositionSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     this->Connect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Connect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Connect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);
@@ -4470,7 +4479,6 @@ MainFrameBClass::~MainFrameBClass()
     m_rcRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
-    m_controlerPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::controlerPause), NULL, this);
     m_btnEmergenyStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
     m_mainViewSelector->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::mainViewSelectorSelected), NULL, this);
     m_openSourceExtern->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSourceExtern), NULL, this);
@@ -4579,6 +4587,7 @@ MainFrameBClass::~MainFrameBClass()
     m_switchMonitoing->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_motionMonitorOptionDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openMotionMonitorOptionDlg), NULL, this);
     m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
+    m_3D_Trace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::trace3D), NULL, this);
     m_3D_Clear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
     m_cbCurveLibResolution->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_cbUpdateInterval->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::changeUpdateInterval), NULL, this);
@@ -4630,7 +4639,7 @@ MainFrameBClass::~MainFrameBClass()
     m_enableSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
-    m_bmpButton4487->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
+    m_btClearPositionSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     this->Disconnect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Disconnect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Disconnect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);

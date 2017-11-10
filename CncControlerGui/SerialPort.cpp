@@ -9,14 +9,12 @@
 #include <windows.h>
 
 char STATIC_CMD_CHAR[2];
-static wxMutex s_mutexProtectingTheGlobalData;
 
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
 : cncControl(cnc)
 , connected(false)
 , writeOnlyMoveCommands(false)
-, isPause(false)
 , isCommand(false)
 , traceInfo(true)
 , portName()
@@ -29,13 +27,13 @@ Serial::Serial(CncControl* cnc)
 Serial::Serial(const char *portName)
 : connected(false)
 , writeOnlyMoveCommands(false)
-, isPause(false)
 , isCommand(false)
 , traceInfo(true)
 , portName()
 , lastFetchResult(RET_NULL)
 {
 ///////////////////////////////////////////////////////////////////
+	STATIC_CMD_CHAR[1] = '\0';
 	connect(portName);
 }
 ///////////////////////////////////////////////////////////////////
@@ -190,16 +188,6 @@ void Serial::purge(void) {
 	//Flush any remaining characters in the buffers 
 	PurgeComm(this->hSerial, PURGE_RXCLEAR | PURGE_TXCLEAR);
 	Sleep(500);
-}
-///////////////////////////////////////////////////////////////////
-bool Serial::sendInterrupt() {
-///////////////////////////////////////////////////////////////////
-	return writeData((void*)"I", 1);
-}
-///////////////////////////////////////////////////////////////////
-bool Serial::sendTestSuiteEndFlag() {
-///////////////////////////////////////////////////////////////////
-	return writeData((void*)"t", 1);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::isMoveCommand(unsigned char cmd) {
@@ -654,6 +642,17 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
+bool Serial::sendSignal(const unsigned char cmd) {
+///////////////////////////////////////////////////////////////////
+	if ( isConnected() == false ) {
+		std::cout << "SERIAL::processCommand()::ERROR: Not connected\n";
+		return false;
+	}
+	
+	STATIC_CMD_CHAR[0] = cmd;
+	return writeData(STATIC_CMD_CHAR, 1);
+}
+///////////////////////////////////////////////////////////////////
 bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	STATIC_CMD_CHAR[0] = cmd;
@@ -667,7 +666,7 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 		return false;
 	}
 	
-	// Always log the start postion
+	// Always log the start position
 	cncControl->SerialCallback(0);
 	
 	char* p = (char*)cmd;
@@ -689,14 +688,6 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 			sfi.retSOTAllowed = true;
 			sfi.returnAfterSOT = true;
 			
-			switch ( cmd[i] ) {
-				case 'p':	isPause = false;
-							break;
-				case 'P':	isPause = true; 
-							break;
-				default:	;// do nothing
-			}
-
 			bool ret = evaluateResultWrapper(sfi, mutliByteStream, pos);
 			
 			if ( ret == false ) {
@@ -819,8 +810,6 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 	if ( cncControl->isInterrupted() )
 		return false;
 	
-	//todo
-	//wxMutexLocker lock(s_mutexProtectingTheGlobalData);
 	isCommand = true;
 	
 	bool ret = false;
@@ -1177,7 +1166,6 @@ bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 	ContollerInfo ci;
 	ci.infoType = CITPosition;
 	ci.command  = sfi.command;
-	ci.isPause	= isPauseActive();
 	ci.posType 	= pid;
 
 	sfi.Mc.p = sfi.Mc.result;

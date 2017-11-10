@@ -87,8 +87,6 @@ struct ContollerInfo {
 	int setterId						= 0;
 	int32_t	setterValue					= 0L;
 	
-	bool isPause						= false;
-	
 	int32_t xLimit						= 0L;
 	int32_t yLimit						= 0L;
 	int32_t zLimit						= 0L;
@@ -124,8 +122,6 @@ class Serial {
 		bool connected;
 		// for com porst this should always false
 		bool writeOnlyMoveCommands;
-		// flag to handle pause intervals
-		bool isPause;
 		// flag if the comand evaluation routine currently runs
 		bool isCommand;
 		//Get various information about the connection
@@ -163,8 +159,6 @@ class Serial {
 		// main handler for controller results
 		inline bool evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
 		inline bool evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		// sends an interrupt command to the controller
-		bool sendInterrupt();
 		// handle receiving data from controller
 		inline bool RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
 		// handle receiving text data from controller
@@ -178,6 +172,8 @@ class Serial {
 		inline bool decodeHeartbeat(SerialFetchInfo& sfi);
 		inline bool decodeLimitInfo(SerialFetchInfo& sfi);
 		inline bool decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid);
+		
+		bool sendSignal(const unsigned char cmd);
 		
 		void resetLastFetchResult() { lastFetchResult = RET_NULL; }
 		void setLastFetchType(unsigned char ret) { lastFetchResult = ret; }
@@ -219,8 +215,6 @@ class Serial {
 		// sets info debug mode
 		void enableSpyOutput(bool show=true) {traceInfo = show;}
 		bool isSpyOutput() {return traceInfo; }
-		// return the current pause flag
-		bool isPauseActive() { return isPause; }
 		// reurn the current command flag
 		bool isCommandActive() { return isCommand; }
 		// port writting
@@ -237,6 +231,11 @@ class Serial {
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMove(unsigned int size, int32_t values[], bool alreadyRendered, CncLongPosition& pos);
+		
+		bool sendInterrupt() 	{ return sendSignal(SIG_INTERRUPPT); }
+		bool sendHalt() 		{ return sendSignal(SIG_HALT); }
+		bool sendPause() 		{ return sendSignal(SIG_PAUSE); }
+		bool sendResume() 		{ return sendSignal(SIG_RESUME); }
 		
 		//SVG path handling
 		virtual void setSVGOutputParameters(const SvgOutputParameters& sp) {}

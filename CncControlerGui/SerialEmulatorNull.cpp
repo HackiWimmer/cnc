@@ -1,6 +1,35 @@
 #include "CncControl.h"
 #include "SerialEmulatorNULL.h"
 
+int pointA[3], pointB[3];
+
+///////////////////////////////////////////////////////////////////
+SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
+: SerialSpyPort(cnc)
+, posReplyThreshold(10)
+, setterMap()
+, curEmulatorPos(0L, 0L, 0L)
+, lastCommand()
+///////////////////////////////////////////////////////////////////
+{
+	setterMap.clear();
+}
+///////////////////////////////////////////////////////////////////
+SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
+: SerialSpyPort(portName) 
+, posReplyThreshold(10)
+, setterMap()
+, curEmulatorPos(0L, 0L, 0L)
+, lastCommand()
+///////////////////////////////////////////////////////////////////
+{
+	setterMap.clear();
+}
+///////////////////////////////////////////////////////////////////
+SerialEmulatorNULL::~SerialEmulatorNULL() {
+///////////////////////////////////////////////////////////////////
+	setterMap.clear();
+}
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::evaluatePositions(std::vector<int32_t>& ret) {
 ///////////////////////////////////////////////////////////////////
@@ -262,7 +291,13 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 		ci.setterValue = val;
 		cncControl->SerialControllerCallback(ci);
 		
+		// update setter map
 		setterMap[(int)id] = val;
+		
+		// special handling for later use
+		if ( (int)id == PID_POS_REPLY_THRESHOLD )
+			posReplyThreshold = val;
+		
 		return true;
 	}
 
@@ -282,9 +317,13 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 	else if ( lastCommand.cmd == 'Z' ) 	z = +1;
 	else if ( lastCommand.cmd == 'M'  || lastCommand.cmd == 'm' ) {
 		
-		//M....;			[len =  5]; only z axis
-		//M........;		[len =  9]; x and y axis
-		//M............;	[len = 13]; x, y and z axis
+		// update the current emulator position
+		curEmulatorPos.set(cncControl->getCurPos());
+		
+		// Move cmd format
+		// M....;			[len =  5]; only z axis
+		// M........;		[len =  9]; x and y axis
+		// M............;	[len = 13]; x, y and z axis
 		
 		unsigned int idx = 1;
 		unsigned char buf[4];
@@ -346,9 +385,14 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 		}
 	}
 	
-	// todo
+	// the emulator function readData and writeData runs in the same thread.
+	// so, it isn't possible to repeat a move command with serval position callbacks
+	// as a real mirco controller can do.
+	// Instead the the move is supported with its total distance - see readMove. 
+	// however, for a preview this is good enougth!
+	//
+	// the following linear rendering is only to support a more detailed writeMoveCmd(...)
 	bool ret = renderMove(x, y, z, b, nbByte);
-	//bool ret = writeMoveCmd(x, y, z, b, nbByte);
 	
 	// check for end state switches
 	CncLimitStates ls;
@@ -362,27 +406,17 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::renderMove(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte) {
+bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( lastCommand.cmd != 'M' ) {
-		return writeMoveCmd(x, y, z, buffer, nbByte);
-	}
-	
-	// render here
-	int i, dx, dy, dz, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
-	int pointA[3], pointB[3];
+	// already rendered ?
+	if ( lastCommand.cmd != 'M' )
+		return provideMove(dx, dy, dz, buffer, nbByte, true);
+	// else render here
 
-	pointA[0] = 0;
-	pointA[1] = 0;
-	pointA[2] = 0;
-	
-	pointB[0] = 0;
-	pointB[1] = 0;
-	pointB[2] = 0;
-	
-	dx = x;
-	dy = y;
-	dz = z;
+	// initialize
+	int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
+	memset(&pointA, 0, sizeof(pointA));
+	memset(&pointB, 0, sizeof(pointB));
 	
 	x_inc = (dx < 0) ? -1 : 1;
 	l = abs(dx);
@@ -397,85 +431,112 @@ bool SerialEmulatorNULL::renderMove(int32_t x , int32_t y , int32_t z, void *buf
 	dy2 = m << 1;
 	dz2 = n << 1;
 
+	// -------------------------------------------------------------
 	if ((l >= m) && (l >= n)) {
 		err_1 = dy2 - l;
 		err_2 = dz2 - l;
 		for (i = 0; i < l; i++) {
 			
-			//output
-			if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+			if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
 				return false;
-		
-			for (int j=0; j<3; j++ )
-				pointB[j] = pointA[j];
 			
 			if (err_1 > 0) {
 				pointA[1] += y_inc;
-				err_1 -= dx2;
+				err_1     -= dx2;
 			}
 			if (err_2 > 0) {
 				pointA[2] += z_inc;
-				err_2 -= dx2;
+				err_2     -= dx2;
 			}
-			err_1 += dy2;
-			err_2 += dz2;
+			err_1     += dy2;
+			err_2     += dz2;
 			pointA[0] += x_inc;
 		}
+	
+	// -------------------------------------------------------------
 	} else if ((m >= l) && (m >= n)) {
 		err_1 = dx2 - m;
 		err_2 = dz2 - m;
 		for (i = 0; i < m; i++) {
 			
-			//output
-			if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+			if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
 				return false;
-		
-			for (int j=0; j<3; j++ )
-				pointB[j] = pointA[j];
-				
+			
 			if (err_1 > 0) {
 				pointA[0] += x_inc;
-				err_1 -= dy2;
+				err_1     -= dy2;
 			}
 			if (err_2 > 0) {
 				pointA[2] += z_inc;
-				err_2 -= dy2;
+				err_2     -= dy2;
 			}
-			err_1 += dx2;
-			err_2 += dz2;
+			err_1     += dx2;
+			err_2     += dz2;
 			pointA[1] += y_inc;
 		}
+		
+	// -------------------------------------------------------------
 	} else {
 		err_1 = dy2 - n;
 		err_2 = dx2 - n;
 		for (i = 0; i < n; i++) {
 			
-			//output
-			if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+			if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
 				return false;
-		
-			for (int j=0; j<3; j++ )
-				pointB[j] = pointA[j];
-				
+			
 			if (err_1 > 0) {
 				pointA[1] += y_inc;
-				err_1 -= dz2;
+				err_1     -= dz2;
 			}
 			if (err_2 > 0) {
 				pointA[0] += x_inc;
-				err_2 -= dz2;
+				err_2     -= dz2;
 			}
-			err_1 += dy2;
-			err_2 += dx2;
+			err_1     += dy2;
+			err_2     += dx2;
 			pointA[2] += z_inc;
 		}
 	}
 	
-	//output
-	if ( writeMoveCmd(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
+	// -------------------------------------------------------------
+	if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte, true) == false )
 		return false;
 		
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force) {
+///////////////////////////////////////////////////////////////////
+	// simulate a direct controler callback
+	#warning - flag this from configuration
+	static int repearCount = 0;
+	if ( false ) {
+		repearCount++;
+		
+		if ( repearCount%posReplyThreshold == 0 || force == true ) {
+			
+			ContollerInfo ci;
+			ci.infoType = CITPosition;
+			ci.command  = lastCommand.cmd;
+			ci.posType 	= PID_XYZ_POS;
+
+			ci.xCtrlPos = curEmulatorPos.incX(dx);
+			ci.yCtrlPos = curEmulatorPos.incY(dy);
+			ci.zCtrlPos = curEmulatorPos.incZ(dz);
+
+			cncControl->SerialControllerCallback(ci);
+			
+			repearCount = 0;
+		}
+	}
+	
+	// do something with this coordinates
+	bool ret = writeMoveCmd(dx, dy, dz, buffer, nbByte);
+	
+	// copy point A into point B
+	memcpy(&pointB, &pointA, sizeof(pointA));
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, void *buffer, unsigned int nbByte) {

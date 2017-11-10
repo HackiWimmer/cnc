@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 4647,
+  "m_objCounter": 4649,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -2472,88 +2472,6 @@
            "m_options": ["separator"]
           }],
          "m_events": [],
-         "m_children": []
-        }, {
-         "m_type": 4404,
-         "proportion": 0,
-         "border": 5,
-         "gbSpan": "1,1",
-         "gbPosition": "0,0",
-         "m_styles": ["wxBU_AUTODRAW"],
-         "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
-         "m_properties": [{
-           "type": "winid",
-           "m_label": "ID:",
-           "m_winid": "wxID_ANY"
-          }, {
-           "type": "string",
-           "m_label": "Size:",
-           "m_value": "-1,-1"
-          }, {
-           "type": "string",
-           "m_label": "Minimum Size:",
-           "m_value": "-1,-1"
-          }, {
-           "type": "string",
-           "m_label": "Name:",
-           "m_value": "m_controlerPause "
-          }, {
-           "type": "multi-string",
-           "m_label": "Tooltip:",
-           "m_value": "Controller Pause"
-          }, {
-           "type": "colour",
-           "m_label": "Bg Colour:",
-           "colour": "<Default>"
-          }, {
-           "type": "colour",
-           "m_label": "Fg Colour:",
-           "colour": "<Default>"
-          }, {
-           "type": "font",
-           "m_label": "Font:",
-           "m_value": ""
-          }, {
-           "type": "bool",
-           "m_label": "Hidden",
-           "m_value": true
-          }, {
-           "type": "bool",
-           "m_label": "Disabled",
-           "m_value": false
-          }, {
-           "type": "bool",
-           "m_label": "Focused",
-           "m_value": false
-          }, {
-           "type": "string",
-           "m_label": "Class Name:",
-           "m_value": ""
-          }, {
-           "type": "string",
-           "m_label": "Include File:",
-           "m_value": ""
-          }, {
-           "type": "string",
-           "m_label": "Style:",
-           "m_value": ""
-          }, {
-           "type": "bitmapPicker",
-           "m_label": "Bitmap File:",
-           "m_path": "bitmaps/24-interrupt.png"
-          }, {
-           "type": "bool",
-           "m_label": "Default Button",
-           "m_value": false
-          }],
-         "m_events": [{
-           "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
-           "m_eventClass": "wxCommandEvent",
-           "m_eventHandler": "wxCommandEventHandler",
-           "m_functionNameAndSignature": "controlerPause(wxCommandEvent& event)",
-           "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
-           "m_noBody": false
-          }],
          "m_children": []
         }, {
          "m_type": 4400,
@@ -30934,6 +30852,101 @@
                             }, {
                              "type": "string",
                              "m_label": "Name:",
+                             "m_value": "m_3D_Trace"
+                            }, {
+                             "type": "multi-string",
+                             "m_label": "Tooltip:",
+                             "m_value": "Trace Montion Monitor Data"
+                            }, {
+                             "type": "colour",
+                             "m_label": "Bg Colour:",
+                             "colour": "<Default>"
+                            }, {
+                             "type": "colour",
+                             "m_label": "Fg Colour:",
+                             "colour": "<Default>"
+                            }, {
+                             "type": "font",
+                             "m_label": "Font:",
+                             "m_value": ""
+                            }, {
+                             "type": "bool",
+                             "m_label": "Hidden",
+                             "m_value": false
+                            }, {
+                             "type": "bool",
+                             "m_label": "Disabled",
+                             "m_value": false
+                            }, {
+                             "type": "bool",
+                             "m_label": "Focused",
+                             "m_value": false
+                            }, {
+                             "type": "string",
+                             "m_label": "Class Name:",
+                             "m_value": ""
+                            }, {
+                             "type": "string",
+                             "m_label": "Include File:",
+                             "m_value": ""
+                            }, {
+                             "type": "string",
+                             "m_label": "Style:",
+                             "m_value": ""
+                            }, {
+                             "type": "string",
+                             "m_label": "Label:",
+                             "m_value": ""
+                            }, {
+                             "type": "bool",
+                             "m_label": "Default Button",
+                             "m_value": false
+                            }, {
+                             "type": "bitmapPicker",
+                             "m_label": "Bitmap File:",
+                             "m_path": "bitmaps/trace.png"
+                            }, {
+                             "type": "choice",
+                             "m_label": "Direction",
+                             "m_selection": 0,
+                             "m_options": ["wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"]
+                            }, {
+                             "type": "string",
+                             "m_label": "Margins:",
+                             "m_value": "2,2"
+                            }],
+                           "m_events": [{
+                             "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
+                             "m_eventClass": "wxCommandEvent",
+                             "m_eventHandler": "wxCommandEventHandler",
+                             "m_functionNameAndSignature": "trace3D(wxCommandEvent& event)",
+                             "m_description": "Process a wxEVT_COMMAND_BUTTON_CLICKED event, when the button is clicked.",
+                             "m_noBody": false
+                            }],
+                           "m_children": []
+                          }, {
+                           "m_type": 4400,
+                           "proportion": 0,
+                           "border": 0,
+                           "gbSpan": "1,1",
+                           "gbPosition": "0,0",
+                           "m_styles": [],
+                           "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                           "m_properties": [{
+                             "type": "winid",
+                             "m_label": "ID:",
+                             "m_winid": "wxID_ANY"
+                            }, {
+                             "type": "string",
+                             "m_label": "Size:",
+                             "m_value": "24,24"
+                            }, {
+                             "type": "string",
+                             "m_label": "Minimum Size:",
+                             "m_value": "24,24"
+                            }, {
+                             "type": "string",
+                             "m_label": "Name:",
                              "m_value": "m_3D_Clear"
                             }, {
                              "type": "multi-string",
@@ -31313,7 +31326,7 @@
                             }, {
                              "type": "multi-string",
                              "m_label": "ComboBox Choices:",
-                             "m_value": "1\\n10\\n100\\n1000"
+                             "m_value": "1\\n2\\n5\\n10\\n100\\n200\\n500\\n1000"
                             }, {
                              "type": "string",
                              "m_label": "Text Hint",
@@ -31321,7 +31334,7 @@
                             }, {
                              "type": "string",
                              "m_label": "Selection:",
-                             "m_value": "1"
+                             "m_value": "2"
                             }, {
                              "type": "string",
                              "m_label": "Value:",
@@ -41846,7 +41859,7 @@
               }, {
                "type": "string",
                "m_label": "Name:",
-               "m_value": "m_bmpButton4487"
+               "m_value": "m_btClearPositionSpy"
               }, {
                "type": "multi-string",
                "m_label": "Tooltip:",

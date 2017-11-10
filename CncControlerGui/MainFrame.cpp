@@ -5236,7 +5236,10 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcPause(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
- 	if ( inboundFileParser != NULL ) {
+	if ( isPause() )	cnc->sendResume();
+	else				cnc->sendPause();
+	
+	if ( inboundFileParser != NULL ) {
 		inboundFileParser->togglePause();
 		enableRunControls(inboundFileParser->isPause());
 	}
@@ -5270,38 +5273,21 @@ void MainFrame::rcStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
-	if ( getCurrentTemplateFormat() == TplTest ) {
-		
-		bool ret = cnc->getSerial()->sendTestSuiteEndFlag();
-		if ( ret == true ) 	cnc::trc.logInfo("Test was stopped");
-		else				cnc::trc.logError("Test stop was failed");
-		
-	} else {
-		
-		// toggle only the pause flag
-		if ( isPause() == true )
-			rcPause(event);
-		
-		if ( inboundFileParser != NULL )
-			inboundFileParser->debugStop();
-		 
-		cnc::trc.logInfo("Debug session was stopped");
-	}
+	// toggle only the pause flag
+	if ( isPause() == true )
+		rcPause(event);
+	
+	if ( inboundFileParser != NULL )
+		inboundFileParser->debugStop();
+
+	cnc->sendHalt();
+	cnc::trc.logInfo("Current session is stopped");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcReset(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	requestReset();
 	setRefPostionState(false);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::controlerPause(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	//todo curently not tested
-	if ( cnc->getSerial()->isPauseActive() )
-		cnc->processCommand('p', std::clog);
-	else
-		cnc->processCommand('P', std::clog);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
@@ -5462,6 +5448,18 @@ void MainFrame::runOpenGLTest(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	//todo
 	//motionMonitor->runOpenGLTest();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::trace3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	std::clog << "Motion Monitor Data - ";
+	
+	std::stringstream ss;
+	motionMonitor->tracePathData(ss);
+	
+	m_logger->Freeze();
+	m_logger->AppendText(ss.str().c_str());
+	m_logger->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clear3D(wxCommandEvent& event) {
@@ -6214,3 +6212,4 @@ void MainFrame::loadConfiguration(wxCommandEvent& event) {
 	wxASSERT(CncConfig::getGlobalCncConfig());
 	CncConfig::getGlobalCncConfig()->loadConfiguration(*config);
 }
+

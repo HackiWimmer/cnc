@@ -80,6 +80,8 @@ class CncMotionMonitor : public wxGLCanvas {
 		
 		void reconstruct();
 		
+		void tracePathData(std::ostream& s);
+		
 		// camera handling
 		enum CameraMode{ CM_OFF, CM_CLOCKWISE, CM_COUNTER_CLOCKWISE};
 		void rotateCamera(int angle);

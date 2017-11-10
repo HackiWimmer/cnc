@@ -178,11 +178,12 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 										
 		case Event::Type::APP_POS_UPD:	lastAppPosEvent 			= evt;
 										lastAppPosEvent.processed	= false;
-										eventQueue.push(evt); 
+										//eventQueue.push(evt); 
 										break;
 										
 		case Event::Type::CTL_POS_UPD:	lastCtlPosEvent				= evt;
 										lastCtlPosEvent.processed	= false;
+										eventQueue.push(evt); 
 										break;
 										
 		default: 						;
@@ -209,7 +210,11 @@ void UpdateManagerThread::pop() {
 	
 		Event evt = eventQueue.pop();
 		switch ( evt.type ) {
+			/*
 			case Event::Type::APP_POS_UPD:	updatePositionSpy(evt); 
+											break;
+			*/
+			case Event::Type::CTL_POS_UPD:	updatePositionSpy(evt); 
 											break;
 											
 			case Event::Type::SETTER_ADD:	updateSetterList(evt);
@@ -322,6 +327,10 @@ void UpdateManagerThread::updatePositionSpy(UpdateManagerThread::Event evt) {
 		if ( row. size() == 6 ) {
 			ctl->InsertItem(0, row);
 			ctl->EnsureVisible(ctl->RowToItem(0));
+			
+			if ( pHandler ) {
+				pHandler->GetBtClearPositionSpy()->SetToolTip(wxString::Format("Item count: %d", ctl->GetItemCount()));
+			}
 		} else {
 			std::cerr << "UpdateManagerThread::updatePositionSpy: Invalid row size: " << row.size() << std::endl;
 			for ( auto it=row.begin(); it != row.end(); ++it )

@@ -217,17 +217,6 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_SPEED_Y, getRpmSpeedY()));
 	setup.push_back(SetterTuple(PID_SPEED_Z, getRpmSpeedZ()));
 	
-	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_X, cncConfig->getPulsWidthOffsetX()));
-	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_Y, cncConfig->getPulsWidthOffsetY()));
-	setup.push_back(SetterTuple(PID_SDRV_PULS_WITDH_OFFSET_Z, cncConfig->getPulsWidthOffsetZ()));
-
-	setup.push_back(SetterTuple(PID_STEP_MULTIPLIER_X, cncConfig->getMultiplierX()));
-	setup.push_back(SetterTuple(PID_STEP_MULTIPLIER_Y, cncConfig->getMultiplierY()));
-	setup.push_back(SetterTuple(PID_STEP_MULTIPLIER_Z, cncConfig->getMultiplierZ()));
-	
-	setup.push_back(SetterTuple(PID_X_STEP_SIGN, cncConfig->getStepSignX()));
-	setup.push_back(SetterTuple(PID_Y_STEP_SIGN, cncConfig->getStepSignY()));
-	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, cncConfig->getReplyThreshold()));
 	
 	if ( processSetterList(setup) ) {
@@ -359,11 +348,7 @@ void CncControl::setZeroPosX() {
 	zeroPos.setX(0);
 	startPos.setX(0);
 	
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(curPos));
+	postAppPos();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosY() {
@@ -372,11 +357,7 @@ void CncControl::setZeroPosY() {
 	zeroPos.setY(0);
 	startPos.setY(0);
 	
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(curPos));
+	postAppPos();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosZ() {
@@ -398,11 +379,7 @@ void CncControl::setZeroPosZ() {
 		}
 	}
 	
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(curPos));
+	postAppPos();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos() {
@@ -462,14 +439,9 @@ bool CncControl::reset() {
 	// do this after the controller reset, because setZeroPos will determine a new controller position on demand
 	setZeroPos();
 	
-	CncLongPosition cp = getControllerPos();
+	getControllerPos();
+	postCtlPos();
 	
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(cp));
-		
 	evaluateLimitState();
 	switchToolOff();
 	
@@ -634,16 +606,12 @@ void CncControl::logProcessingCurrent() {
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingEnd(bool valuesOnly) {
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-
-	if ( GET_GUI_CTL(mainFrame) ) {
-		// update application position
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(curPos));
-		
-		// update controller position
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(curCtlPos));
-	}
+///////////////////////////////////////////////////////////////////
+	// update application position
+	postAppPos();
+	
+	// update controller position
+	postCtlPos();
 	
 	if ( valuesOnly == false )
 		logProcessingCurrent();
@@ -718,7 +686,7 @@ bool CncControl::validatePostion(const CncLongPosition& pos) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::logPosition(const CncLongPosition& pos) {
+void CncControl::monitorPosition(const CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	// motion monitor
 	static GLI::VerticeLongData vd;
@@ -731,16 +699,6 @@ void CncControl::logPosition(const CncLongPosition& pos) {
 			GET_GUI_CTL(motionMonitor)->appendVertice(vd);
 			
 			updatePreview3D(false);
-		}
-		
-		// Display coordinates
-		if ( cncConfig->isOnlineUpdateCoordinates() ) {
-			// application position
-			typedef UpdateManagerThread::Event Event;
-			static Event evt;
-			
-			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(vd.getId(), getSpeedAsString(), pos));
 		}
 		
 		prevPos = pos;
@@ -809,6 +767,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	}
 	
 	switch ( ci.infoType ) {
+		// --------------------------------------------------------
 		case CITHeartbeat:
 			if ( ci.command == 'T' ) {
 				std::stringstream ss;
@@ -816,7 +775,8 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				cnc::trc.logInfoMessage(ss);
 			}
 			break;
-		
+			
+		// --------------------------------------------------------
 		case CITPosition:
 			// update controller position
 			switch ( ci.posType ) {
@@ -828,42 +788,27 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				default:			curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 			}
 			
-			// display coordinates
-			typedef UpdateManagerThread::Event Event;
-			static Event evt;
-
-			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(curCtlPos));
+			// display controller coordinates
+			postCtlPos();
 			
 			// motion monitor
-			logPosition(curCtlPos);
-			
-			// pause hanling
-			if ( ci.isPause == true ) {
-				// to avoid positon failtures truning a pause interval 
-				// synchronize the cur position with the controller position
-				switch ( ci.posType ) {
-					case PID_X_POS: 	curCtlPos.setX(ci.xCtrlPos); break;
-					case PID_Y_POS: 	curCtlPos.setY(ci.yCtrlPos); break;
-					case PID_Z_POS: 	curCtlPos.setZ(ci.zCtrlPos); break;
-					
-					case PID_XYZ_POS:
-					default:			curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
-				}
-			}
+			monitorPosition(curCtlPos);
 			
 			break;
 			
+		// --------------------------------------------------------
 		case CITSetterInfo:
 			//if ( getSerial()->isSpyOutput() == true )
 			//	cnc::spy << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
 			break;
 		
+		// --------------------------------------------------------
 		case CITLimitInfo:
 			//std::clog << "::L: " << ci.xLimit << ", " << ci.yLimit << ", " << ci.zLimit << std::endl;
 			evaluateLimitState(ci.xLimit, ci.yLimit, ci.zLimit);
 			break;
 		
+		// --------------------------------------------------------
 		default:
 			std::cerr << "CncControl::SerialControllerCallback:" << std::endl;
 			std::cerr << " No handler defined for controller info type:" << ci.infoType << std::endl;
@@ -892,9 +837,10 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 			evtLoop->Dispatch();
 	}
 	
-	// motion monitor
-	//logPosition(curPos);
-
+	// display application coordinates
+	postAppPos();
+	
+	// log processing
 	logProcessingCurrent();
 	
 	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
@@ -903,6 +849,40 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	}
 	
 	return !isInterrupted();
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::postAppPos() {
+///////////////////////////////////////////////////////////////////
+	static CncLongPosition lastPos;
+	if ( cncConfig->isOnlineUpdateCoordinates() ) {
+		// application position
+		typedef UpdateManagerThread::Event Event;
+		static Event evt;
+		
+		if ( lastPos != curPos ) {
+			if ( GET_GUI_CTL(mainFrame) )
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(getClientId(), getSpeedAsString(), curPos));
+		}
+	}
+	
+	lastPos.set(curPos);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::postCtlPos() {
+///////////////////////////////////////////////////////////////////
+	static CncLongPosition lastPos;
+	if ( cncConfig->isOnlineUpdateCoordinates() ) {
+		// controller position
+		typedef UpdateManagerThread::Event Event;
+		static Event evt;
+		
+		if ( lastPos != curCtlPos ) {
+			if ( GET_GUI_CTL(mainFrame) )
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(curCtlPos));
+		}
+	}
+	
+	lastPos.set(curCtlPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simpleMoveXYToZeroPos(CncDimensions dim) {

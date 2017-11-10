@@ -39,17 +39,20 @@ typedef std::map<int, int32_t> SetterMap;
 class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
-		bool writeMoveCmd(void *buffer, unsigned int nbByte);
-		
+		int32_t posReplyThreshold;
 		SetterMap setterMap;
-	
+		CncLongPosition curEmulatorPos;
+		
+		inline bool writeMoveCmd(void *buffer, unsigned int nbByte);
+		inline bool renderMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte);
+		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force=false);
+		
 	protected:
 		LastCommand lastCommand;
 		
 		const char* getConfiguration(wxString& ret);
 		
 		virtual bool writeSetter(void *buffer, unsigned int nbByte);
-		bool renderMove(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte);
 		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte);
 		
 		virtual int readDefault(void *buffer, unsigned int nbByte, const char* response);
@@ -63,18 +66,10 @@ class SerialEmulatorNULL : public SerialSpyPort
 	public:
 	
 		//Initialize Serial communication without an acitiv connection 
-		SerialEmulatorNULL(CncControl* cnc)
-		: SerialSpyPort(cnc)
-		{
-			setterMap.clear();
-		}
+		SerialEmulatorNULL(CncControl* cnc);
 		//Initialize Serial communication with the given COM port
-		SerialEmulatorNULL(const char *portName)
-		: SerialSpyPort(portName) 
-		{}
-		// Destuctor
-		virtual ~SerialEmulatorNULL()
-		{}
+		SerialEmulatorNULL(const char *portName);
+		virtual ~SerialEmulatorNULL();
 		
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulatorNULL"; }
@@ -82,15 +77,11 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual bool isEmulator() const { return true; }
 		// return the port type
 		virtual const CncPortType getPortType() const { return CncEMU_NULL; }
-		//Simulate connection
-		virtual bool connect(const char* portName) {
-			connected = true;
-			return true;
-		}
-		//Close the connection
-		virtual void disconnect(void) {
-			connected = false;
-		}
+		// simulate connection
+		virtual bool connect(const char* portName) { connected = true; return true; }
+		// close the connection
+		virtual void disconnect(void) { connected = false; }
+		// process a getter call
 		virtual bool processGetter(unsigned char pid, std::vector<int32_t>& ret);
 		// simulate read
 		virtual int readData(void *buffer, unsigned int nbByte);

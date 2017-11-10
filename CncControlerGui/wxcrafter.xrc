@@ -283,15 +283,6 @@
             <default>0</default>
           </object>
           <object class="separator"/>
-          <object class="wxBitmapButton" name="m_controlerPause">
-            <bitmap>bitmaps/24-interrupt.png</bitmap>
-            <style>wxBU_AUTODRAW</style>
-            <tooltip>
-              <![CDATA[Controller Pause]]>
-            </tooltip>
-            <hidden>1</hidden>
-            <default>0</default>
-          </object>
           <object class="wxButton" name="m_btnEmergenyStop">
             <label>Emergency Stop [ESC]</label>
             <style/>
@@ -4632,6 +4623,21 @@
                                         <object class="sizeritem">
                                           <flag>wxALL</flag>
                                           <minsize>24,24</minsize>
+                                          <object class="wxButton" name="m_3D_Trace">
+                                            <label/>
+                                            <style/>
+                                            <size>24,24</size>
+                                            <tooltip>
+                                              <![CDATA[Trace Montion Monitor Data]]>
+                                            </tooltip>
+                                            <bitmap>bitmaps/trace.png</bitmap>
+                                            <bitmapposition>wxLEFT</bitmapposition>
+                                            <default>0</default>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <minsize>24,24</minsize>
                                           <object class="wxButton" name="m_3D_Clear">
                                             <label/>
                                             <style/>
@@ -4732,16 +4738,28 @@
                                             <tooltip>
                                               <![CDATA[Determine Update Interval]]>
                                             </tooltip>
-                                            <selection>1</selection>
+                                            <selection>2</selection>
                                             <content>
                                               <item>
                                                 <![CDATA[1]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[2]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[5]]>
                                               </item>
                                               <item>
                                                 <![CDATA[10]]>
                                               </item>
                                               <item>
                                                 <![CDATA[100]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[200]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[500]]>
                                               </item>
                                               <item>
                                                 <![CDATA[1000]]>
@@ -6789,7 +6807,7 @@
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <border>1</border>
-                  <object class="wxBitmapButton" name="m_bmpButton4487">
+                  <object class="wxBitmapButton" name="m_btClearPositionSpy">
                     <bitmap>bitmaps/16-clean.png</bitmap>
                     <style>wxBU_AUTODRAW</style>
                     <tooltip>

@@ -22,7 +22,12 @@ void ArduinoCMDs::init() {
 	}
  
 	cmds[CMD_INVALID]               = "Invalid Command";
-	cmds[CMD_INTERRUPPT]            = "Push Interrupt";
+	
+	cmds[SIG_INTERRUPPT]            = "Push Signal Interrupt";
+	cmds[SIG_HALT]                  = "Push Signal Pause";
+	cmds[SIG_PAUSE]                 = "Push Signal Pause";
+	cmds[SIG_RESUME]                = "Push Signal Resume";
+	
 	cmds[CMD_IDLE]                  = "Pull Idle Callback";
 	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Congtroller";
 	cmds[CMD_RESET_ERRORINFO]       = "Push Reset Error Info";
@@ -32,9 +37,6 @@ void ArduinoCMDs::init() {
 
 	cmds[CMD_ENABLE_STEPPER_PIN]    = "Push Enable Stepper Motors";
 	cmds[CMD_DISABLE_STEPPER_PIN]   = "Push Disable Stepper Motors";
-
-	cmds[CMD_PAUSE_START]           = "Push Pause Start";
-	cmds[CMD_PAUSE_STOP]            = "Push Pause Stop";
 
 	cmds[CMD_POS_STEP_X]            = "Push Positive X Step";
 	cmds[CMD_NEG_STEP_X]            = "Push Negative X Step";
@@ -47,7 +49,6 @@ void ArduinoCMDs::init() {
 	cmds[CMD_RENDER_AND_MOVE]       = "Push Render and 3D Move";
 
 	cmds[CMD_TEST_START]            = "Push Pause Start";
-	cmds[CMD_TEST_STOP]             = "Push Pause Stop";
 
 	cmds[CMD_PRINT_CONFIG]          = "Pull Configuration";
 	cmds[CMD_PRINT_VERSION]         = "Pull Version";
@@ -111,10 +112,6 @@ void ArduinoPIDs::init() {
 	pids[PID_PITCH_Y]                         = "Pitch Y Axis";
 	pids[PID_PITCH_Z]                         = "Pitch Z Axis";
 	
-	pids[PID_STEP_MULTIPLIER_X]               = "Step multipier X axis"; 
-	pids[PID_STEP_MULTIPLIER_Y]               = "Step multipier Y axis"; 
-	pids[PID_STEP_MULTIPLIER_Z]               = "Step multipier Z axis"; 
-	
 	pids[PID_MIN_SWITCH]                      = "Min switch";  
 	pids[PID_MAX_SWITCH]                      = "Max switch";
 	pids[PID_LIMIT]                           = "Limit state";
@@ -136,10 +133,6 @@ void ArduinoPIDs::init() {
 	pids[PID_Y_POS]                           = "Y Pos";
 	pids[PID_Z_POS]                           = "Z Pos";
 
-	pids[PID_STEP_SIGN]                       = "Step Sign";
-	pids[PID_X_STEP_SIGN]                     = "X Step Sign";
-	pids[PID_Y_STEP_SIGN]                     = "Y Step Sign";
-
 	pids[PID_AXIS]                            = "Stepper Axis";
 	pids[PID_COMMON]                          = "Common";
 	pids[PID_SPEED]                           = "Speed";
@@ -149,14 +142,6 @@ void ArduinoPIDs::init() {
 	pids[PID_DIR_PIN]                         = "Direction pin";
 	pids[PID_ENABLE_STEPPERS]                 = "Stepper enable state";
 	pids[PID_AVG_STEP_DURRATION]              = "AVG Step duration [us]";
-	
-	pids[PID_SDRV_TYPE]                       = "Stepper Driver Type";
-	pids[PID_SDRV_MIN_STEP_PULSE_WIDTH_LOW]   = "Stepper Driver Min Step Pulse Width [LOW]";
-	pids[PID_SDRV_MIN_STEP_PULSE_WIDTH_HIGH]  = "Stepper Driver Min Step Pulse Width [HIGH]";
-	pids[PID_SDRV_MIN_DIR_PULSE_WIDTH]        = "Stepper Driver Min Dir Pulse Width";
-	pids[PID_SDRV_PULS_WITDH_OFFSET_X]        = "Stepper Driver Puls Width Offset X Axis";
-	pids[PID_SDRV_PULS_WITDH_OFFSET_Y]        = "Stepper Driver Puls Width Offset Y Axis";
-	pids[PID_SDRV_PULS_WITDH_OFFSET_Z]        = "Stepper Driver Puls Width Offset Z Axis";
 	
 	pids[PID_CURRENT_STEP_PULS_WIDTH_LOW]     = "Current Step Puls Width Low";
 	pids[PID_CURRENT_STEP_PULS_WIDTH_HIGH]    = "Current Step Puls Width High";

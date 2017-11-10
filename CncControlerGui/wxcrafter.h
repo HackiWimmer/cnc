@@ -111,7 +111,6 @@ protected:
     wxBitmapButton* m_rcRun;
     wxBitmapButton* m_rcPause;
     wxBitmapButton* m_rcStop;
-    wxBitmapButton* m_controlerPause;
     wxButton* m_btnEmergenyStop;
     wxPanel* m_scrollWinMain;
     wxChoice* m_mainViewSelector;
@@ -395,6 +394,7 @@ protected:
     wxStaticLine* m_staticLine3525;
     wxButton* m_motionMonitorOptionDlg;
     wxButton* m_3D_Refreh;
+    wxButton* m_3D_Trace;
     wxButton* m_3D_Clear;
     wxStaticText* m_staticText16032;
     wxComboBox* m_cbCurveLibResolution;
@@ -511,7 +511,7 @@ protected:
     wxPanel* m_debuggerView;
     wxPropertyGridManager* m_debuggerPropertyManagerGrid;
     wxPanel* m_positionMonitorView;
-    wxBitmapButton* m_bmpButton4487;
+    wxBitmapButton* m_btClearPositionSpy;
     wxStaticText* m_staticText4526;
     wxDataViewListCtrl* m_positionSpy;
     wxMenuBar* m_menuBar;
@@ -622,7 +622,6 @@ protected:
     virtual void rcFinish(wxCommandEvent& event) { event.Skip(); }
     virtual void rcPause(wxCommandEvent& event) { event.Skip(); }
     virtual void rcStop(wxCommandEvent& event) { event.Skip(); }
-    virtual void controlerPause(wxCommandEvent& event) { event.Skip(); }
     virtual void emergencyStop(wxCommandEvent& event) { event.Skip(); }
     virtual void mainViewSelectorSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplateSourceExtern(wxCommandEvent& event) { event.Skip(); }
@@ -729,6 +728,7 @@ protected:
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void openMotionMonitorOptionDlg(wxCommandEvent& event) { event.Skip(); }
     virtual void refresh3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void trace3D(wxCommandEvent& event) { event.Skip(); }
     virtual void clear3D(wxCommandEvent& event) { event.Skip(); }
     virtual void updateCurveLibResolution(wxCommandEvent& event) { event.Skip(); }
     virtual void changeUpdateInterval(wxCommandEvent& event) { event.Skip(); }
@@ -852,7 +852,6 @@ public:
     wxBitmapButton* GetRcRun() { return m_rcRun; }
     wxBitmapButton* GetRcPause() { return m_rcPause; }
     wxBitmapButton* GetRcStop() { return m_rcStop; }
-    wxBitmapButton* GetControlerPause() { return m_controlerPause; }
     wxButton* GetBtnEmergenyStop() { return m_btnEmergenyStop; }
 
     virtual void ShowAuiToolMenu(wxAuiToolBarEvent& event);
@@ -1134,6 +1133,7 @@ public:
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
     wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
     wxButton* Get3D_Refreh() { return m_3D_Refreh; }
+    wxButton* Get3D_Trace() { return m_3D_Trace; }
     wxButton* Get3D_Clear() { return m_3D_Clear; }
     wxStaticText* GetStaticText16032() { return m_staticText16032; }
     wxComboBox* GetCbCurveLibResolution() { return m_cbCurveLibResolution; }
@@ -1251,7 +1251,7 @@ public:
     wxPanel* GetSerialSpyView() { return m_serialSpyView; }
     wxPropertyGridManager* GetDebuggerPropertyManagerGrid() { return m_debuggerPropertyManagerGrid; }
     wxPanel* GetDebuggerView() { return m_debuggerView; }
-    wxBitmapButton* GetBmpButton4487() { return m_bmpButton4487; }
+    wxBitmapButton* GetBtClearPositionSpy() { return m_btClearPositionSpy; }
     wxStaticText* GetStaticText4526() { return m_staticText4526; }
     wxDataViewListCtrl* GetPositionSpy() { return m_positionSpy; }
     wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }

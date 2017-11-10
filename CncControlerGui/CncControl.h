@@ -130,7 +130,10 @@ class CncControl {
 		bool validatePostion(const CncLongPosition& pos);
 		
 		//
-		void logPosition(const CncLongPosition& pos);
+		void monitorPosition(const CncLongPosition& pos);
+		
+		inline void postAppPos();
+		inline void postCtlPos();
 		
 	public:
 		
@@ -166,13 +169,16 @@ class CncControl {
 		
 		
 		
+		// signal wrapper
+		bool sendInterrupt() 	{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
+		bool sendHalt() 		{ wxASSERT(serialPort); return serialPort->sendHalt(); }
+		bool sendPause() 		{ wxASSERT(serialPort); return serialPort->sendPause(); }
+		bool sendResume() 		{ wxASSERT(serialPort); return serialPort->sendResume(); }
 		
-		
-		
-		// wrapper
+		// comand wrapper
 		bool processCommand(const char* cmd, std::ostream& txtCtl);
-		// wrapper
 		bool processCommand(const unsigned char c, std::ostream& txtCtl);
+
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		// Zero positioning

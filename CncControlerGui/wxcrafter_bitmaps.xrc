@@ -71,8 +71,6 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
-  <object class="wxBitmap" name="24-interrupt">bitmaps\24-interrupt.png</object>
-  <object class="wxBitmap" name="24-interrupt@2x">bitmaps\24-interrupt@2x.png</object>
   <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\build-animation-sprite.png</object>
   <object class="wxBitmap" name="BMP_APP_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\application-view-gallery.png</object>
   <object class="wxBitmap" name="BMP_APP_D128">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo-root.png</object>
@@ -262,6 +260,7 @@
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="tools-wizard">bitmaps\tools-wizard.png</object>
+  <object class="wxBitmap" name="trace">bitmaps\trace.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>
