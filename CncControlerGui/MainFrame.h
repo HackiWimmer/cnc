@@ -68,7 +68,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
-    virtual void trace3D(wxCommandEvent& event);
+		virtual void activateAuiPane(wxAuiManagerEvent& event);
+		virtual void buttonAuiPane(wxAuiManagerEvent& event);
+		virtual void trace3D(wxCommandEvent& event);
 		virtual void viewZAxis(wxCommandEvent& event);
 		virtual void loadPerspectiveDebug(wxCommandEvent& event);
 		virtual void loadPerspectiveRun(wxCommandEvent& event);
@@ -374,6 +376,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
+		
+		//////////////////////////////////////////////////////////////////////////////////
+		void waitActive(unsigned int milliseconds, bool once = true);
+		void dispatchNext();
+		void dispatchAll();
 
 	protected:
  
@@ -589,8 +596,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void viewAllAuiPanes(bool withSpy=false);
 		
 		bool loadPerspective(const wxString& name);
-		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
 		void savePerspective(const wxString& name);
+		
+		void ensureRunPerspectiveMinimal();
+		void ensureDebugPerspectiveMinimal();
+		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
 		
 		wxWindow* getAUIPaneByName(const wxString& name);
 		wxMenuItem* getAUIMenuByName(const wxString& name);
@@ -637,7 +647,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		///////////////////////////////////////////////////////////////
 		// misc
 				
-		void dispatch();
 		void setZero();
 		void requestReset();
 		

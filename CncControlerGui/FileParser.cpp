@@ -448,12 +448,11 @@ bool FileParser::evaluateProcessingState() {
 		
 	if ( runInfo.getStopFlag() == true )
 		return false;
-	
+		
 	// pause handling
 	while ( runInfo.getPauseFlag() == true ) {
-		while ( wxEventLoopBase::GetActive()->Pending() )
-			wxEventLoopBase::GetActive()->Dispatch();
-			
+		THE_APP->dispatchAll();
+		
 		if ( isInterrupted() == true ) {
 			runInfo.setPauseFlag(false);
 			return false;
@@ -518,9 +517,8 @@ bool FileParser::evaluateDebugState(bool force) {
 	while ( checkBreakpoint() == true ) {
 		waitingForUserEvents = true;
 		
-		while ( wxEventLoopBase::GetActive()->Pending() )
-			wxEventLoopBase::GetActive()->Dispatch();
-	
+		THE_APP->dispatchAll();
+		
 		if ( isInterrupted() == true ) {
 			waitingForUserEvents = false;
 			return false;

@@ -103,7 +103,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
         m_dropdownMenus.insert(std::make_pair( m_configStepDelay->GetId(), m_configStepDelayMenu) );
     }
     
-    m_stepDelay = new wxSlider(m_auibarMain, wxID_ANY, 0, 0, 64, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(75,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
+    m_stepDelay = new wxSlider(m_auibarMain, wxID_ANY, 0, 0, 256, wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(75,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
     wxFont m_stepDelayFont(6, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_stepDelay->SetFont(m_stepDelayFont);
     m_stepDelay->SetToolTip(_("Artificially Step Delay"));
@@ -4203,6 +4203,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auimgrMain->Connect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_RENDER, wxAuiManagerEventHandler(MainFrameBClass::renderAuiPane), NULL, this);
+    m_auimgrMain->Connect(wxEVT_AUI_PANE_BUTTON, wxAuiManagerEventHandler(MainFrameBClass::buttonAuiPane), NULL, this);
+    m_auimgrMain->Connect(wxEVT_AUI_PANE_ACTIVATED, wxAuiManagerEventHandler(MainFrameBClass::activateAuiPane), NULL, this);
     m_bmpButton4490->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateManager), NULL, this);
     m_searchConnections->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
@@ -4456,6 +4458,8 @@ MainFrameBClass::~MainFrameBClass()
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_RENDER, wxAuiManagerEventHandler(MainFrameBClass::renderAuiPane), NULL, this);
+    m_auimgrMain->Disconnect(wxEVT_AUI_PANE_BUTTON, wxAuiManagerEventHandler(MainFrameBClass::buttonAuiPane), NULL, this);
+    m_auimgrMain->Disconnect(wxEVT_AUI_PANE_ACTIVATED, wxAuiManagerEventHandler(MainFrameBClass::activateAuiPane), NULL, this);
     m_bmpButton4490->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateManager), NULL, this);
     m_searchConnections->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);

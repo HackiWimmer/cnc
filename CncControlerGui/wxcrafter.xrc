@@ -189,7 +189,7 @@
               <![CDATA[Artificially Step Delay]]>
             </tooltip>
             <min>0</min>
-            <max>64</max>
+            <max>256</max>
             <value>0</value>
             <size>75,-1</size>
           </object>

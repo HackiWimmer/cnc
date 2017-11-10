@@ -113,6 +113,10 @@ class Serial {
 		// define long size
 		static const unsigned int LONG_BUF_SIZE = sizeof(int32_t);
 		
+	private:
+		// total distance
+		unsigned long long totalDistance[3];
+		
 	protected:
 		//Serial com handler
 		HANDLE hSerial;
@@ -230,7 +234,7 @@ class Serial {
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos);
-		bool processMove(unsigned int size, int32_t values[], bool alreadyRendered, CncLongPosition& pos);
+		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos);
 		
 		bool sendInterrupt() 	{ return sendSignal(SIG_INTERRUPPT); }
 		bool sendHalt() 		{ return sendSignal(SIG_HALT); }
@@ -253,6 +257,11 @@ class Serial {
 		
 		// sends the Test Suite end flag 't'
 		bool sendTestSuiteEndFlag();
+		
+		void resetTotalDistance() { totalDistance[0] = 0LL; totalDistance[1] = 0LL; totalDistance[2] = 0LL; }
+		unsigned long long getTotalDistanceX() { return totalDistance[0]; }
+		unsigned long long getTotalDistanceY() { return totalDistance[1]; }
+		unsigned long long getTotalDistanceZ() { return totalDistance[2]; }
 		
 };
 

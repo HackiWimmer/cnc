@@ -184,6 +184,10 @@ class UpdateManagerThread : public wxThread {
 		bool queueReset;
 		bool exit;
 		
+		double displayFactX;
+		double displayFactY;
+		double displayFactZ;
+		
 		ConcurrentQueue<UpdateManagerThread::Event> eventQueue;
 		UpdateManagerThread::Event lastCmdEvent;
 		UpdateManagerThread::Event lastSpeedEvent;

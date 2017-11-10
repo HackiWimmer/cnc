@@ -25,7 +25,7 @@ int CncUsbPortScanner::isComPortAvailable(int port) {
 					  0,              // Port attributes
 					  NULL);          // Handle to port with attribute to copy
 
-	if (hPort == INVALID_HANDLE_VALUE) {
+	if ( hPort == INVALID_HANDLE_VALUE ) {
 		// Invalid Porthandle, port NOT available
 		dwErr = GetLastError();
 		if (dwErr == ERROR_ACCESS_DENIED || dwErr == ERROR_GEN_FAILURE)

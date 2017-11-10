@@ -174,7 +174,7 @@ MainFrame::~MainFrame() {
 	// stop the serial timer and wait interval to finish the work behind
 	m_serialTimer->Stop();
 	if ( cnc != NULL )
-		cnc->waitActive(m_serialTimer->GetInterval());
+		waitActive(m_serialTimer->GetInterval());
 	
 	// unbind global key down hook
 	this->Unbind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
@@ -439,8 +439,9 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	CncConfig::getGlobalCncConfig()->setMaxDimensionX(42.42);
-
+	
+	clog << cnc->getSerial()->getTotalDistanceX() << endl;
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -588,11 +589,65 @@ void MainFrame::onClose(wxCloseEvent& event) {
 	Destroy();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::dispatch() {
+void MainFrame::waitActive(unsigned int milliseconds, bool once) {
+///////////////////////////////////////////////////////////////////
+	if ( milliseconds == 0 ) {
+		if ( once == true )
+			dispatchAll();
+		
+		return;
+	}
+	
+	wxDateTime s = wxDateTime::UNow();
+	wxDateTime e = wxDateTime::UNow();
+
+	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
+	if ( evtLoop == NULL )
+		return;
+
+	while ( wxTimeSpan(e - s).GetMilliseconds() < milliseconds ) {
+		while ( evtLoop->Pending() ) {
+			evtLoop->Dispatch();
+			
+			e = wxDateTime::UNow();
+			if ( wxTimeSpan(e - s).GetMilliseconds() < milliseconds )
+				break;
+		}
+		
+		e = wxDateTime::UNow();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::dispatchNext() {
 ///////////////////////////////////////////////////////////////////
 	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-	while (evtLoop->Pending() )
+	if ( evtLoop == NULL )
+		return;
+
+	if ( evtLoop->Pending() )
 		evtLoop->Dispatch();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::dispatchAll() {
+///////////////////////////////////////////////////////////////////
+	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
+	if ( evtLoop == NULL )
+		return;
+	
+	
+	while ( evtLoop->Pending() )
+		evtLoop->Dispatch();
+	
+	#warning - yield() is to slow
+	//evtLoop->Yield(true);
+	
+	/*
+	Please note: evtLoop->Yield() is better then the code below, 
+	it also considers timer events, aui-handling etc.
+	
+	while ( evtLoop->Pending() )
+		evtLoop->Dispatch();
+	*/
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initTemplateEditStyle() {
@@ -1289,6 +1344,10 @@ bool MainFrame::connectSerialPort() {
 	hideSVGEmuResult();
 	
 	m_miRqtIdleMessages->Check(false);
+	
+	// disconnect and delete the current cnc control
+	if ( cnc != NULL )
+		delete cnc;
 	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
@@ -2547,9 +2606,9 @@ void MainFrame::processTestMove(wxStaticText* axis, wxStaticText* counter, int c
 		m_testDurationCounterZ->SetLabel(wxString::Format("%d", c + 1));
 	}
 		
-	dispatch();
+	dispatchAll();
 	cnc->manualSimpleMoveMetric3D(xd, yd, zd);
-	dispatch();
+	dispatchAll();
 	
 	if ( axis != NULL ) {
 		axis->SetForegroundColour(*wxBLACK);
@@ -2710,7 +2769,7 @@ bool MainFrame::showConfigSummaryAndConfirmRun() {
 	cnc::trc.logWarning(msg);
 	
 	while ( runConfirmationInfo == RunConfirmationInfo::Wait ) {
-		dispatch();
+		dispatchAll();
 		now = wxDateTime::UNow();
 		wxTimeSpan diff = now - start;
 		if ( diff.GetSeconds() >= 1 ) {
@@ -3065,7 +3124,7 @@ void MainFrame::keyDownXY(wxKeyEvent& event) {
 	}
 	
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_moveXYAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownXY), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3097,7 +3156,7 @@ void MainFrame::keyDownZ(wxKeyEvent& event) {
 	}
 	
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_moveZAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownZ), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3110,7 +3169,7 @@ void MainFrame::mvSpinDownX(wxSpinEvent& event) {
 	navigateX(CncAnticlockwise);
 	
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_spinButtonX->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownX), NULL, this);
 } 
 ///////////////////////////////////////////////////////////////////
@@ -3123,7 +3182,7 @@ void MainFrame::mvSpinUpX(wxSpinEvent& event) {
 	navigateX(CncClockwise);
 	
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_spinButtonX->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpX), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3136,7 +3195,7 @@ void MainFrame::mvSpinDownY(wxSpinEvent& event) {
 	navigateY(CncAnticlockwise);
 	
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_spinButtonY->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownY), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3149,7 +3208,7 @@ void MainFrame::mvSpinUpY(wxSpinEvent& event) {
 	navigateY(CncClockwise);
 	
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_spinButtonY->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpY), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3162,7 +3221,7 @@ void MainFrame::mvSpinDownZ(wxSpinEvent& event) {
 	navigateZ(CncAnticlockwise);
 	
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_spinButtonZ->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(mvSpinDownZ), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3175,7 +3234,7 @@ void MainFrame::mvSpinUpZ(wxSpinEvent& event) {
 	navigateZ(CncClockwise);
 
 	// clear bufferd events and reconnect this event handler
-	dispatch();
+	dispatchAll();
 	m_spinButtonZ->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(mvSpinUpZ), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
@@ -4510,9 +4569,23 @@ void MainFrame::maximizeAuiPane(wxAuiManagerEvent& event) {
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::activateAuiPane(wxAuiManagerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	event.Skip(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::buttonAuiPane(wxAuiManagerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	#define AUI_CLOSE_BTN_ID 	= 101;
+	#define AUI_MIN_MAX_BTN_ID 	= 102;
+	#define AUI_PIN_BTN_ID 		= 104;
+	
+	event.Skip(true);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::restoreAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	// do nothing
+	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::renderAuiPane(wxAuiManagerEvent& event) {
@@ -5036,7 +5109,7 @@ bool MainFrame::openFileExtern(const wxString& tool, wxString& file) {
 	
 	wxExecute(cmd);
 	wxASSERT(cnc);
-	cnc->waitActive(1500);
+	waitActive(1500);
 
 	stopAnimationControl();
 	return true;
@@ -5181,7 +5254,7 @@ void MainFrame::determineRunMode() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	ensureAllPanesFromPerspectiveAreShown("Debug");
+	ensureDebugPerspectiveMinimal();
 	
 	if ( m_debuggerPropertyManagerGrid->GetPageCount() > 0 )
 		m_debuggerPropertyManagerGrid->SelectPage(0);
@@ -5217,13 +5290,13 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 		}
 		
 		// bring the debug controls in front
-		ensureAllPanesFromPerspectiveAreShown("Debug");
+		ensureDebugPerspectiveMinimal();
 		
 		// to see each line during the debug session
 		CncConfig::getGlobalCncConfig()->setUpdateInterval(1);
 	} else {
 		
-		ensureAllPanesFromPerspectiveAreShown("Run");
+		ensureRunPerspectiveMinimal();
 	}
 
 	// process
@@ -5342,7 +5415,7 @@ void MainFrame::testEndSwitchEvaluation(wxCommandEvent& event) {
 		
 		startAnimationControl();
 		while ( m_testToggleEndSwitch->GetValue() == true ) {
-			dispatch();
+			dispatchAll();
 			
 			if ( cnc->isInterrupted() ) {
 				m_testToggleEndSwitch->SetValue(false);
@@ -6077,6 +6150,18 @@ void MainFrame::clearPositionSpy(wxCommandEvent& event) {
 void MainFrame::toggleTemplateManager(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	toggleAuiPane("TemplateManager");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::ensureRunPerspectiveMinimal() {
+/////////////////////////////////////////////////////////////////////
+	if ( m_scrollWinMonitor->IsShown() == false )
+		ensureAllPanesFromPerspectiveAreShown("Run");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::ensureDebugPerspectiveMinimal() {
+/////////////////////////////////////////////////////////////////////
+	if ( m_scrollWinMonitor->IsShown() == false || m_debuggerView->IsShown() == false )
+		ensureAllPanesFromPerspectiveAreShown("Debug");
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::ensureAllPanesFromPerspectiveAreShown(const wxString& name) {

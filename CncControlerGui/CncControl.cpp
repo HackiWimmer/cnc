@@ -232,7 +232,7 @@ void CncControl::setup(bool doReset) {
 	std::cout << "Firmware:" << std::endl;
 	std::cout << " Available:\t";
 	std::stringstream ss;
-	processCommand("V", ss);
+	processCommand(CMD_PRINT_VERSION, ss);
 	std::cout << ss.str() << std::endl;
 	std::cout << " Required:\t" << FIRMWARE_VERSION << std::endl;
 	
@@ -429,7 +429,7 @@ bool CncControl::reset() {
 	resetInterrupt();
 	
 	std::cout << "Try to reset the controller\n";
-	if ( processCommand("R", std::cerr) ) {
+	if ( processCommand(CMD_RESET_CONTROLLER, std::cerr) ) {
 		std::cout << " Controller reseted\n";
 	} else {
 		std::cerr << " Controller reset failed\n";
@@ -439,7 +439,7 @@ bool CncControl::reset() {
 	// do this after the controller reset, because setZeroPos will determine a new controller position on demand
 	setZeroPos();
 	
-	getControllerPos();
+	curCtlPos = getControllerPos();
 	postCtlPos();
 	
 	evaluateLimitState();
@@ -622,33 +622,6 @@ void CncControl::forceDisplayPositions() {
 	logProcessingEnd(true);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::waitActive(unsigned int milliseconds, bool once) {
-///////////////////////////////////////////////////////////////////
-	if ( milliseconds == 0 ) {
-		if ( once == true ) {
-			while (wxEventLoopBase::GetActive()->Pending()) {
-				wxEventLoopBase::GetActive()->Dispatch();
-			}
-		}
-		return;
-	}
-	
-	wxDateTime s = wxDateTime::UNow();
-	wxDateTime e = wxDateTime::UNow();
-	
-	while ( wxTimeSpan(e - s).GetMilliseconds() < milliseconds ) {
-		while (wxEventLoopBase::GetActive()->Pending()) {
-			wxEventLoopBase::GetActive()->Dispatch();
-			
-			e = wxDateTime::UNow();
-			if ( wxTimeSpan(e - s).GetMilliseconds() < milliseconds )
-				break;
-		}
-		
-		e = wxDateTime::UNow();
-	}
-}
-///////////////////////////////////////////////////////////////////
 bool CncControl::validatePostion(const CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	if ( positionCheck == false )
@@ -760,11 +733,8 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
 	// Event handling, enables the interrrpt functionality
-	if ( cncConfig->isAllowEventHandling() ) {
-		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-		while (evtLoop->Pending())
-			evtLoop->Dispatch();
-	}
+	if ( cncConfig->isAllowEventHandling() )
+		THE_APP->dispatchAll();
 	
 	switch ( ci.infoType ) {
 		// --------------------------------------------------------
@@ -831,11 +801,8 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	commandCounter += cmdCount;
 	
 	// Event handling, enables the interrupt functionallity
-	if ( cncConfig->isAllowEventHandling() ) {
-		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-		while (evtLoop->Pending())
-			evtLoop->Dispatch();
-	}
+	if ( cncConfig->isAllowEventHandling() )
+		THE_APP->dispatchAll();
 	
 	// display application coordinates
 	postAppPos();
@@ -1155,7 +1122,7 @@ const CncLongPosition CncControl::getControllerPos() {
 
 	if ( isInterrupted() == false )
 		getSerial()->processGetter(PID_XYZ_POS, list);
-	
+		
 	if ( list.size() != 3 ){
 		controllerPos.setX(0);
 		controllerPos.setY(0);

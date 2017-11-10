@@ -10,6 +10,9 @@ CncControlerGui/Doxyfile/**
 FreeGlutWorkspace/Release/**
 FreeGlutWorkspace/Debug/**
 
+Experiments/Release/**
+Experiments/Debug/**
+
 #*.exe
 #*.txt
 #*.bat

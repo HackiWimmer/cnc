@@ -137,7 +137,7 @@ bool GCodeFileParser::spool() {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
-#warning
+#warning - something todo here?
 /*
 	// display the tool ID summary
 	std::cout << wxString::Format("Tool ID Summary (count = %d):", (int)toolIds.size());

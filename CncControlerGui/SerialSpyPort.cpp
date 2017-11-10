@@ -1,4 +1,5 @@
 #include "CncControl.h"
+#include "MainFrame.h"
 #include "SerialSpyPort.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -49,7 +50,7 @@ void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 	}
 	
 	// Artificially waste time
-	cncControl->waitActive(cncControl->getStepDelay(), false);
+	THE_APP->waitActive(cncControl->getStepDelay(), false);
 }
 ///////////////////////////////////////////////////////////////////
 int SerialSpyPort::readData(void *buffer, unsigned int nbByte) {

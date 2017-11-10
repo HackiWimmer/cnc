@@ -8,6 +8,9 @@ UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 , pHandler(handler)
 , queueReset(false)
 , exit(false)
+, displayFactX(1)
+, displayFactY(1)
+, displayFactZ(1)
 , eventQueue()
 ///////////////////////////////////////////////////////////////////
 {}
@@ -28,6 +31,10 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
 	unsigned int sleep = 1;
 	
+	displayFactX = GBL_CONFIG->getDisplayFactX(GBL_CONFIG->getDisplayUnit());
+	displayFactY = GBL_CONFIG->getDisplayFactY(GBL_CONFIG->getDisplayUnit());
+	displayFactZ = GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit());
+	
 	while ( !TestDestroy() ) {
 		this->Sleep(sleep);
 		
@@ -35,34 +42,30 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		if ( TestDestroy() ) break;
 		if ( exit == true )  break;
 		
-		// check if something should be done
-		if ( CncConfig::getGlobalCncConfig() != NULL ) {
+		if ( eventQueue.size() > 0 ) {
 			
-			if ( eventQueue.size() > 0 ) {
-				
-				// it's very important to freeze the gui controlls considered below 
-				// during it's content becomes change!
-				// Because, the onPaint() event isn't thread safe and the 
-				// eventloop.Disptch() call will crash sometimes.
-				freezeControls(true);
-				
-					while ( eventQueue.size() > 0 ) {
-						this->Sleep(sleep);
-						
-						// recheck this here after the sleep
-						if ( TestDestroy() ) break;
-						if ( exit == true )  break;
-						
-						pop();
-						idle();
-						postHeartbeat();
-					}
+			// it's very important to freeze the gui controlls considered below 
+			// during it's content becomes change!
+			// Because, the onPaint() event isn't thread safe and the 
+			// eventloop.Disptch() call will crash sometimes.
+			freezeControls(true);
+			
+				while ( eventQueue.size() > 0 ) {
+					this->Sleep(sleep);
 					
-				freezeControls(false);
-			}
-			
-			idle();
+					// recheck this here after the sleep
+					if ( TestDestroy() ) break;
+					if ( exit == true )  break;
+					
+					pop();
+					idle();
+					postHeartbeat();
+				}
+				
+			freezeControls(false);
 		}
+		
+		idle();
 		
 		// always post a heartbeat
 		postHeartbeat();
@@ -178,7 +181,6 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 										
 		case Event::Type::APP_POS_UPD:	lastAppPosEvent 			= evt;
 										lastAppPosEvent.processed	= false;
-										//eventQueue.push(evt); 
 										break;
 										
 		case Event::Type::CTL_POS_UPD:	lastCtlPosEvent				= evt;
@@ -195,25 +197,32 @@ void UpdateManagerThread::pop() {
 ///////////////////////////////////////////////////////////////////
 	typedef UpdateManagerThread::Event Event;
 	
-	int counter = 0;
+	const unsigned int portionCount = 32;
+	unsigned int counter = 0;
+	
 	// it's very important to freeze the gui controlls considered below 
 	// during it's content becomes change!
 	// Because, the onPaint() event isn't thread safe and the 
 	// eventloop.Disptch() call will crash sometimes.
 	freezeControls(true);
 	
+	unsigned int prevQueueSize = eventQueue.size();
+	
 	// do a portion of work
 	do {
 		
 		if ( eventQueue.size() == 0 )
 			break;
-	
+			
+		if ( counter%portionCount == 0 ) {
+			if ( prevQueueSize - counter != eventQueue.size() )
+				break;
+				
+			// stay in loop if no new queue entries are arrived
+		}
+		
 		Event evt = eventQueue.pop();
 		switch ( evt.type ) {
-			/*
-			case Event::Type::APP_POS_UPD:	updatePositionSpy(evt); 
-											break;
-			*/
 			case Event::Type::CTL_POS_UPD:	updatePositionSpy(evt); 
 											break;
 											
@@ -226,7 +235,9 @@ void UpdateManagerThread::pop() {
 			default: 						; // Waste the event;
 		}
 		
-	} while ( ++counter < 16 );
+		counter++;
+ 
+	} while ( true );
 	
 	freezeControls(false);
 }
@@ -258,10 +269,6 @@ void UpdateManagerThread::updateAppPosition() {
 	if ( lastAppPosEvent.processed == true )
 		return;
 		
-	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	
 	wxString formatString(" %4.3f");
 	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
 	if ( cnc::dblCompare(displayFactX, 1.0) )
@@ -286,10 +293,6 @@ void UpdateManagerThread::updateCtlPosition() {
 	if ( lastCtlPosEvent.processed == true )
 		return;
 		
-	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	
 	wxString formatString(" %4.3f");
 	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
 	if ( cnc::dblCompare(displayFactX, 1.0) )
@@ -308,10 +311,6 @@ void UpdateManagerThread::updatePositionSpy(UpdateManagerThread::Event evt) {
 	if ( CncConfig::getGlobalCncConfig() == NULL )
 		return;
 		
-	double displayFactX = CncConfig::getGlobalCncConfig()->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	double displayFactY = CncConfig::getGlobalCncConfig()->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	
 	wxString formatString(" %4.3f");
 	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
 	if ( cnc::dblCompare(displayFactX, 1.0) )
@@ -418,6 +417,11 @@ void UpdateManagerThread::configUpdate() {
 ///////////////////////////////////////////////////////////////////
 	// currently nothing more todo
 	CncConfig::getGlobalCncConfig()->discardModifications();
+	
+	displayFactX = GBL_CONFIG->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	displayFactY = GBL_CONFIG->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+	displayFactZ = GBL_CONFIG->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
+
 	
 	
 	#warning - move the code below to collectSummary

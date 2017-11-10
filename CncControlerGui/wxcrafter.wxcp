@@ -234,6 +234,20 @@
        "m_functionNameAndSignature": "renderAuiPane(wxAuiManagerEvent& event)",
        "m_description": "This event can be caught to override the default renderer in order to custom draw your wxAuiManager window (not recommended).",
        "m_noBody": false
+      }, {
+       "m_eventName": "wxEVT_AUI_PANE_BUTTON",
+       "m_eventClass": "wxAuiManagerEvent",
+       "m_eventHandler": "wxAuiManagerEventHandler",
+       "m_functionNameAndSignature": "buttonAuiPane(wxAuiManagerEvent& event)",
+       "m_description": "Triggered when any button is pressed for any docked panes",
+       "m_noBody": false
+      }, {
+       "m_eventName": "wxEVT_AUI_PANE_ACTIVATED",
+       "m_eventClass": "wxAuiManagerEvent",
+       "m_eventHandler": "wxAuiManagerEventHandler",
+       "m_functionNameAndSignature": "activateAuiPane(wxAuiManagerEvent& event)",
+       "m_description": "Triggered when a pane is made 'active'. This event is new since wxWidgets 2.9.4.",
+       "m_noBody": false
       }],
      "m_children": [{
        "m_type": 4463,
@@ -1542,7 +1556,7 @@
           }, {
            "type": "string",
            "m_label": "Max value:",
-           "m_value": "64"
+           "m_value": "256"
           }],
          "m_events": [{
            "m_eventName": "wxEVT_SCROLL_CHANGED",
@@ -35932,7 +35946,7 @@
             }, {
              "type": "multi-string",
              "m_label": "Tooltip:",
-             "m_value": ""
+             "m_value": "rwerew"
             }, {
              "type": "colour",
              "m_label": "Bg Colour:",

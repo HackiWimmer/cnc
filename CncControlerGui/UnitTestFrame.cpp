@@ -7,6 +7,7 @@
 #include "Tests/Test_CncPathListManager.h"
 #include "Tests/Test_SVGPathAssistant.h"
 #include "Tests/Test_CncClipperWrapper.h"
+#include "MainFrame.h"
 #include "UnitTestFrame.h"
 
 /////////////////////////////////////////////////////////////////////////////
@@ -131,9 +132,7 @@ void UnitTests::enableControls(bool state) {
 	// causes a not wanted horizontal scrolling of the test result stream
 	if ( state == true ) {
 		// fetch existing events before reconnecting
-		wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
-		while (evtLoop->Pending())
-			evtLoop->Dispatch();
+		THE_APP->dispatchAll();
 			
 		m_btUnitTestRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(runTest), NULL, this);
 	} else {

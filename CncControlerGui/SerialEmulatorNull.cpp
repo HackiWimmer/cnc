@@ -1,4 +1,5 @@
 #include "CncControl.h"
+#include "MainFrame.h"
 #include "SerialEmulatorNULL.h"
 
 int pointA[3], pointB[3];
@@ -9,10 +10,11 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , posReplyThreshold(10)
 , setterMap()
 , curEmulatorPos(0L, 0L, 0L)
+, lastSignal(CMD_INVALID)
 , lastCommand()
 ///////////////////////////////////////////////////////////////////
 {
-	setterMap.clear();
+	reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
@@ -20,14 +22,28 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , posReplyThreshold(10)
 , setterMap()
 , curEmulatorPos(0L, 0L, 0L)
+, lastSignal(CMD_INVALID)
 , lastCommand()
 ///////////////////////////////////////////////////////////////////
 {
-	setterMap.clear();
+	reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::~SerialEmulatorNULL() {
 ///////////////////////////////////////////////////////////////////
+	reset();
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::reset() {
+	lastCommand.restLastCmd();
+	lastCommand.resetM();
+	
+	lastSignal = CMD_INVALID;
+	
+	posReplyThreshold = 10;
+	
+	curEmulatorPos.setXYZ(0L, 0L, 0L);
+	
 	setterMap.clear();
 }
 ///////////////////////////////////////////////////////////////////
@@ -135,35 +151,28 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	int ret = 0;
 	
-	// debug only
-	if ( false ) {
-		std::clog << lastCommand.cmd << ", "
-		          << cncControl->getCurPos().getX() << ", "
-				  << cncControl->getCurPos().getY() << std::endl;
-	}
-
 	wxString firmWare(wxString::Format("%s", FIRMWARE_VERSION));
 	wxString retStr;
 	switch( lastCommand.cmd ) { 
-		case 'm':
-		case 'M':	ret = readMove(buffer, nbByte);
-					break;
-					
-		case 'V': 	ret = readDefault(buffer, nbByte, firmWare);
-					break;
-					
-		case '?': 	ret = readDefault(buffer, nbByte, "1:0:Not available, because there's no controller connection\n");
-					break;
-					
-		case 'c': 	ret = readDefault(buffer, nbByte, getConfiguration(retStr));
-					break;
-					
-		case 'Q': 	ret = readDefault(buffer, nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel for more details
-					break;
-					
-		default: 	((char*)buffer)[0] = RET_OK;
-					ret = 1;
-					lastCommand.restLastCmd();
+		case CMD_MOVE:
+		case CMD_RENDER_AND_MOVE:	ret = readMove(buffer, nbByte);
+									break;
+		
+		case CMD_PRINT_VERSION: 	ret = readDefault(buffer, nbByte, firmWare);
+									break;
+		
+		case CMD_PRINT_ERRORINFO: 	ret = readDefault(buffer, nbByte, "1:0:Not available, because there's no controller connection\n");
+									break;
+		
+		case CMD_PRINT_CONFIG: 		ret = readDefault(buffer, nbByte, getConfiguration(retStr));
+									break;
+		
+		case CMD_PRINT_PIN_REPORT: 	ret = readDefault(buffer, nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel for more details
+									break;
+		
+		default:					((char*)buffer)[0] = RET_OK;
+									ret = 1;
+									lastCommand.restLastCmd();
 	}
 	
 	spyReadData(ret, buffer, nbByte);
@@ -252,19 +261,33 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 	spyWriteData(b, nbByte);
 	
 	char* buffer = ((char*)b);
-	lastCommand.cmd = buffer[0];
+	unsigned char cmd = buffer[0];
 	
-	switch ( lastCommand.cmd ) {
-		case 'S':	return writeSetter(b, nbByte);
-		case 'x':
-		case 'X':
-		case 'y':
-		case 'Y':
-		case 'z':
-		case 'Z':
-		case 'm':
-		case 'M':	return writeMoveCmd(b, nbByte);
-		default:	; // Do nothing
+	switch ( cmd ) {
+		
+		case SIG_INTERRUPPT:
+		case SIG_HALT:
+		case SIG_PAUSE:
+		case SIG_RESUME:			lastSignal = cmd;
+									return true;
+
+		case CMD_RESET_CONTROLLER:	reset();
+									return true;
+				
+		case CMD_SETTER:			lastCommand.cmd = cmd; 
+									return writeSetter(b, nbByte);
+		
+		case CMD_NEG_STEP_X:
+		case CMD_POS_STEP_X:
+		case CMD_NEG_STEP_Y:
+		case CMD_POS_STEP_Y:
+		case CMD_NEG_STEP_Z:
+		case CMD_POS_STEP_Z:
+		case CMD_MOVE:
+		case CMD_RENDER_AND_MOVE:	lastCommand.cmd = cmd;
+									return writeMoveCmd(b, nbByte);
+		
+		default:					lastCommand.cmd = cmd;
 	}
 	
 	return true;
@@ -309,13 +332,14 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 	char* buffer = ((char*)b);
 	int32_t x = 0L, y = 0L, z = 0L;
 	
-	if      ( lastCommand.cmd == 'x' ) 	x = -1;
-	else if ( lastCommand.cmd == 'X' ) 	x = +1;
-	else if ( lastCommand.cmd == 'y' ) 	y = -1;
-	else if ( lastCommand.cmd == 'Y' ) 	y = +1;
-	else if ( lastCommand.cmd == 'z' ) 	z = -1;
-	else if ( lastCommand.cmd == 'Z' ) 	z = +1;
-	else if ( lastCommand.cmd == 'M'  || lastCommand.cmd == 'm' ) {
+	if      ( lastCommand.cmd == CMD_NEG_STEP_X ) 	x = -1;
+	else if ( lastCommand.cmd == CMD_POS_STEP_X ) 	x = +1;
+	else if ( lastCommand.cmd == CMD_NEG_STEP_Y ) 	y = -1;
+	else if ( lastCommand.cmd == CMD_POS_STEP_Y ) 	y = +1;
+	else if ( lastCommand.cmd == CMD_NEG_STEP_Z ) 	z = -1;
+	else if ( lastCommand.cmd == CMD_POS_STEP_Z ) 	z = +1;
+	else if ( lastCommand.cmd == CMD_RENDER_AND_MOVE  || 
+	          lastCommand.cmd == CMD_MOVE) {
 		
 		// update the current emulator position
 		curEmulatorPos.set(cncControl->getCurPos());
@@ -403,15 +427,17 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 		lastCommand.Mc.respondCount = 2;
 	}
 
+	// reset last signal
+	lastSignal = CMD_INVALID;
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	// already rendered ?
-	if ( lastCommand.cmd != 'M' )
+	if ( lastCommand.cmd != CMD_RENDER_AND_MOVE )
 		return provideMove(dx, dy, dz, buffer, nbByte, true);
-	// else render here
+	// else render above
 
 	// initialize
 	int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
@@ -507,8 +533,27 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force) {
 ///////////////////////////////////////////////////////////////////
+	// signal handling
+	switch ( lastSignal ) {
+	
+		case SIG_INTERRUPPT:
+		case SIG_HALT:				return false;
+		
+		case SIG_PAUSE:				// pause handling
+									while ( lastSignal == SIG_PAUSE ) {
+										THE_APP->dispatchAll();
+										THE_APP->waitActive(25, true);
+									}
+									break;
+		
+		case SIG_RESUME:			lastSignal = CMD_INVALID; 
+									break;
+		
+		default:					; // Do nothing
+	}
+	
 	// simulate a direct controler callback
-	#warning - flag this from configuration
+	#pragma message("flag this from configuration")
 	static int repearCount = 0;
 	if ( false ) {
 		repearCount++;

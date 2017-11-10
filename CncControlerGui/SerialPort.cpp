@@ -6,13 +6,15 @@
 #include "CncCommon.h"
 #include "CncArduino.h"
 #include "SerialPort.h"
+#include "MainFrame.h"
 #include <windows.h>
 
 char STATIC_CMD_CHAR[2];
 
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
-: cncControl(cnc)
+: totalDistance{0LL, 0LL, 0LL}
+, cncControl(cnc)
 , connected(false)
 , writeOnlyMoveCommands(false)
 , isCommand(false)
@@ -21,11 +23,13 @@ Serial::Serial(CncControl* cnc)
 , lastFetchResult(RET_NULL)
 {
 ///////////////////////////////////////////////////////////////////
+	resetTotalDistance();
 	STATIC_CMD_CHAR[1] = '\0';
 }
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(const char *portName)
-: connected(false)
+: totalDistance{0LL, 0LL, 0LL}
+, connected(false)
 , writeOnlyMoveCommands(false)
 , isCommand(false)
 , traceInfo(true)
@@ -33,7 +37,9 @@ Serial::Serial(const char *portName)
 , lastFetchResult(RET_NULL)
 {
 ///////////////////////////////////////////////////////////////////
+	resetTotalDistance();
 	STATIC_CMD_CHAR[1] = '\0';
+	
 	connect(portName);
 }
 ///////////////////////////////////////////////////////////////////
@@ -164,7 +170,7 @@ bool Serial::connect(const char* portName) {
 		std::cout << " .";
 		std::cout.flush();
 		//Sleep(ARDUINO_WAIT_TIME/5);
-		cncControl->waitActive(ARDUINO_WAIT_TIME/5);
+		THE_APP->waitActive(ARDUINO_WAIT_TIME/5);
 		
 		std::cout.flush();
 	}
@@ -739,12 +745,28 @@ bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRend
 	return processMove(size, values, alreadyRendered, pos);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMove(unsigned int size, int32_t values[], bool alreadyRendered, CncLongPosition& pos) {
+bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
 		std::cerr << "SERIAL::processMoveXY()::ERROR: Not connected\n";
 		return false;
 	}
+	
+	// measure total distance
+	switch ( size ) {
+		case 1:			totalDistance[2] += abs(values[0]);
+						break;
+						
+		case 2:			totalDistance[0] += abs(values[0]);
+						totalDistance[1] += abs(values[1]);
+						break;
+						
+		case 3:			totalDistance[0] += abs(values[0]);
+						totalDistance[1] += abs(values[1]);
+						totalDistance[2] += abs(values[2]);
+						break;
+	}
+	
 	// Always log the start postion
 	cncControl->SerialCallback(0);
 	

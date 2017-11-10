@@ -138,6 +138,11 @@ class CncConfig {
 		static CncConfig* getGlobalCncConfig() { wxASSERT(globalCncConfig); return globalCncConfig; }
 		static void setupGlobalConfigurationGrid(wxPropertyGridManager* sg, wxConfigBase& config);
 		
+		// global shortcuts
+		#define GBL_CONFIG  CncConfig::getGlobalCncConfig()
+		#define THE_APP     GBL_CONFIG->getTheApp()
+		
+		
 		// curve lib utils
 		static float getDefaultCurveLibResolution();
 		static float getCurveLibResolution();

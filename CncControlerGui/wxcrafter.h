@@ -600,6 +600,8 @@ protected:
     virtual void maximizeAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void restoreAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void renderAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
+    virtual void buttonAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
+    virtual void activateAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void toggleTemplateManager(wxCommandEvent& event) { event.Skip(); }
     virtual void searchAvailiablePorts(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }

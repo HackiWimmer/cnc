@@ -42,13 +42,18 @@ class SerialEmulatorNULL : public SerialSpyPort
 		int32_t posReplyThreshold;
 		SetterMap setterMap;
 		CncLongPosition curEmulatorPos;
+		unsigned char lastSignal;
 		
 		inline bool writeMoveCmd(void *buffer, unsigned int nbByte);
 		inline bool renderMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte);
 		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force=false);
 		
+		inline void reset();
+		
 	protected:
 		LastCommand lastCommand;
+		
+		unsigned char getLastSignal() { return lastSignal; }
 		
 		const char* getConfiguration(wxString& ret);
 		

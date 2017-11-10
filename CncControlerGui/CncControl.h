@@ -207,8 +207,6 @@ class CncControl {
 		bool SerialControllerCallback(const ContollerInfo& ci);
 		// Callback fromS Serial with a controller message
 		bool SerialMessageCallback(const ControllerMsgInfo& cmi);
-		// wait an dispath events
-		void waitActive(unsigned int milliseconds, bool once = true);
 		//interrupt the processing
 		void interrupt();
 		void resetInterrupt();
