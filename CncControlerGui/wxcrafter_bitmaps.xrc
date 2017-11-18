@@ -150,6 +150,8 @@
   <object class="wxBitmap" name="BMP_PLUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-plus.png</object>
   <object class="wxBitmap" name="BMP_PLUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-plus@2x.png</object>
   <object class="wxBitmap" name="BMP_PLUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-plus@2x.png</object>
+  <object class="wxBitmap" name="BMP_POS_SPY_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-close.png</object>
+  <object class="wxBitmap" name="BMP_POS_SPY_ON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-ok.png</object>
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef.png</object>
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef@2x.png</object>
   <object class="wxBitmap" name="BMP_PRE_DEF_PARA_SET@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-typedef@2x.png</object>
@@ -230,6 +232,7 @@
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
+  <object class="wxBitmap" name="dialog-ok">bitmaps\dialog-ok.png</object>
   <object class="wxBitmap" name="dialog-ok-4">bitmaps\dialog-ok-4.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
@@ -237,6 +240,7 @@
   <object class="wxBitmap" name="document-save-3">bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="document-save-6">bitmaps\document-save-6.png</object>
   <object class="wxBitmap" name="document-save-as (2)">bitmaps\document-save-as (2).png</object>
+  <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="executable">bitmaps\executable.png</object>
   <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>

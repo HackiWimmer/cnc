@@ -28,11 +28,8 @@ class wxMenuItem;
 
 ////////////////////////////////////////////////////////////////////
 // app defined events
-	wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxCommandEvent);
-	wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxCommandEvent);
-
-	wxDECLARE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
-	wxDECLARE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, wxTimerEvent);
+	wxDECLARE_EVENT(wxEVT_PERSPECTIVE_TIMER, 					wxTimerEvent);
+	wxDECLARE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 		wxTimerEvent);
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -68,6 +65,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
+    virtual void loopRepeatTest(wxCommandEvent& event);
+		virtual void selectPositionSpyContent(wxCommandEvent& event);
+		virtual void selectPositionSpy(wxCommandEvent& event);
+		virtual void copyPositionSpy(wxCommandEvent& event);
+		virtual void togglePositionSpy(wxCommandEvent& event);
 		virtual void activateAuiPane(wxAuiManagerEvent& event);
 		virtual void buttonAuiPane(wxAuiManagerEvent& event);
 		virtual void trace3D(wxCommandEvent& event);
@@ -308,10 +310,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void setupGridCommandButton(wxCommandEvent& event);
 		virtual void setupGridSelected(wxPropertyGridEvent& event);
 		
-		void onThreadUpdate(wxCommandEvent& event);
-		void onThreadCompletion(wxCommandEvent& event);
-		void onPerspectiveTimer(wxTimerEvent& WXUNUSED(event));
-		void onDebugUserNotificationTimer(wxTimerEvent& WXUNUSED(event));
+		void onThreadAppPosUpdate(UpdateManagerEvent& event);
+		void onThreadCtlPosUpdate(UpdateManagerEvent& event);
+		void onThreadHeartbeat(UpdateManagerEvent& event);
+		void onThreadCompletion(UpdateManagerEvent& event);
+		void onPerspectiveTimer(wxTimerEvent& event);
+		void onDebugUserNotificationTimer(wxTimerEvent& event);
 		void configurationUpdated(wxCommandEvent& event);
 		
 		wxDECLARE_EVENT_TABLE();
@@ -391,21 +395,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		UpdateManagerThread* updateManagerThread;
 		wxCriticalSection pThreadCS;
 		
-		wxTextCtrl* getAppPosControlX() { return m_xAxis; }
-		wxTextCtrl* getCtlPosControlX() { return m_xAxisCtl; }
-		wxTextCtrl* getAppPosControlY() { return m_yAxis; }
-		wxTextCtrl* getCtlPosControlY() { return m_yAxisCtl; }
-		wxTextCtrl* getAppPosControlZ() { return m_zAxis; }
-		wxTextCtrl* getCtlPosControlZ() { return m_zAxisCtl; }
-		
-		wxTextCtrl* getCmdCounterControl()  { return m_cmdCount; }
-		wxTextCtrl* getCmdDurationControl() { return m_cmdDuration; }
-		
-		wxDataViewListCtrl* getProcessedSetterControl() { return m_dvListCtrlProcessedSetters; }
-		
-		CncZView* getZView() { return m_zView; }
-		CncSpeedView* getSpeedView() { return m_speedView; }
-		
 		friend class UpdateManagerThread;
 		friend class CncFileView;
 		
@@ -445,6 +434,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		wxDateTime lastTemplateModification;
 		wxDateTime lastSvgEmuModification;
+		
+		long processLastDuartion;
 		wxDateTime processStartTime;
 		wxDateTime processEndTime;
 		
@@ -524,8 +515,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initTemplateEditStyle();
 		void initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat format);
 		
-		void buildCommandDurationToolTip();
-		
 		void createAnimationControl();
 		void createStcFileControlPopupMenu();
 		void createStcEmuControlPopupMenu();
@@ -544,7 +533,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		// run template handling
 		bool checkIfRunCanBeProcessed();
 		bool processVirtualTemplate();
-		void processTemplate();
+		bool processTemplate();
 		bool processSVGTemplate();
 		bool processGCodeTemplate();
 		bool processManualTemplate();
@@ -552,6 +541,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool processTestInterval();
 		bool processTestDimensions();
 		bool processControllerTestSuite();
+		
+		void logTimeConsumed();
 		
 		void determineRunMode();
 		
@@ -601,6 +592,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void ensureRunPerspectiveMinimal();
 		void ensureDebugPerspectiveMinimal();
 		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
+		
+		void clearPositionSpy();
 		
 		wxWindow* getAUIPaneByName(const wxString& name);
 		wxMenuItem* getAUIMenuByName(const wxString& name);

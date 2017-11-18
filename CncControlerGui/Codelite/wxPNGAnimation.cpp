@@ -67,7 +67,7 @@ void wxPNGAnimation::OnTimer(wxTimerEvent& event)
     if(m_index >= m_bitmaps.size()) {
         m_index = 0;
     }
-    Refresh();
+    Refresh(false);
 }
 
 void wxPNGAnimation::Start(int refereshRate)

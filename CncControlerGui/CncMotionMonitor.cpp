@@ -93,7 +93,7 @@ CncMotionMonitor::~CncMotionMonitor() {
 void CncMotionMonitor::clear() {
 //////////////////////////////////////////////////
 	monitor->clearPathData();
-	Refresh(false);
+	display();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::tracePathData(std::ostream& s) {
@@ -130,7 +130,8 @@ void CncMotionMonitor::reconstruct() {
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::display() {
-	Refresh(false);
+	//Refresh(false);
+	onPaint();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::appendVertice(const GLI::VerticeLongData& vd) {
@@ -182,25 +183,23 @@ void CncMotionMonitor::view(GLContextBase::ViewMode fm) {
 	const wxSize cs = GetClientSize();
 	monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
 	
-	Refresh(false);
+	display();
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::centerViewport() {
 /////////////////////////////////////////////////////////////////
 	monitor->centerViewport();
-	Refresh(false);
+	display();
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::resetRotation() {
 /////////////////////////////////////////////////////////////////
 	monitor->getModelRotation().reset2DDefaults();
-	Refresh(false);
+	display();
 }
-//////////////////////////////////////////////////
-void CncMotionMonitor::onPaint(wxPaintEvent& event) {
-//////////////////////////////////////////////////
-	// This is required even though dc is not used otherwise.
-	wxPaintDC dc(this);
+/////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaint() {
+/////////////////////////////////////////////////////////////////
 	monitor->SetCurrent(*this);
 	monitor->init();
 
@@ -216,6 +215,13 @@ void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 	isShown = IsShownOnScreen();
 	
 	SwapBuffers();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::onPaint(wxPaintEvent& event) {
+//////////////////////////////////////////////////
+	// This is required even though dc is not used otherwise.
+	wxPaintDC dc(this);
+	onPaint();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onSize(wxSizeEvent& event) {
@@ -243,7 +249,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 	if ( rot != 0 ) {
 		if (rot < 0 ) 	monitor->getModelScale().decScale();
 		else 			monitor->getModelScale().incScale();
-		Refresh(false);
+		display();
 	}
 	
 	// left button
@@ -253,7 +259,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		int y = cs.GetHeight() - event.GetY();
 		
 		monitor->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
-		Refresh(false);
+		display();
 	}
 }
 //////////////////////////////////////////////////
@@ -264,7 +270,7 @@ void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {
 					break;
 					
 		case 'C':	monitor->centerViewport();
-					Refresh(false);
+					display();
 					break;
 	}
 }
@@ -320,7 +326,7 @@ void CncMotionMonitor::rotateCamera(int angle) {
 													 monitor->getCameraPosition().getCurXYPlaneEyeRadius(),
 													 monitor->getCameraPosition().getEyeZ());
 	// redraw
-	Refresh(false);
+	display();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::pushProcessMode() {

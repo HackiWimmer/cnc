@@ -4738,7 +4738,7 @@
                                             <tooltip>
                                               <![CDATA[Determine Update Interval]]>
                                             </tooltip>
-                                            <selection>2</selection>
+                                            <selection>5</selection>
                                             <content>
                                               <item>
                                                 <![CDATA[1]]>
@@ -4751,6 +4751,12 @@
                                               </item>
                                               <item>
                                                 <![CDATA[10]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[20]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[50]]>
                                               </item>
                                               <item>
                                                 <![CDATA[100]]>
@@ -5612,6 +5618,9 @@
               <object class="wxListCtrl" name="m_lruList">
                 <style>wxLC_SINGLE_SEL|wxLC_REPORT</style>
                 <size>-1,110</size>
+                <tooltip>
+                  <![CDATA[rwerew]]>
+                </tooltip>
               </object>
             </object>
             <object class="sizeritem">
@@ -5837,34 +5846,8 @@
                   <flag>wxALL</flag>
                   <border>3</border>
                   <minsize>-1,18</minsize>
-                  <object class="wxStaticText" name="m_staticText3952">
-                    <label>Cmd Count:</label>
-                    <style/>
-                    <size>-1,18</size>
-                    <fg>wxSYS_COLOUR_ACTIVEBORDER</fg>
-                  </object>
-                </object>
-                <object class="sizeritem">
-                  <flag>wxALL</flag>
-                  <border>3</border>
-                  <minsize>60,18</minsize>
-                  <object class="wxTextCtrl" name="m_cmdCount">
-                    <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
-                    <size>60,18</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
-                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
-                    <tooltip>
-                      <![CDATA[Controller Command Count]]>
-                    </tooltip>
-                    <value>0</value>
-                  </object>
-                </object>
-                <object class="sizeritem">
-                  <flag>wxALL</flag>
-                  <border>3</border>
-                  <minsize>-1,18</minsize>
                   <object class="wxStaticText" name="m_staticText395">
-                    <label>Time consumed [ms]:</label>
+                    <label>Time consumed:</label>
                     <style/>
                     <size>-1,18</size>
                     <fg>wxSYS_COLOUR_ACTIVEBORDER</fg>
@@ -5873,13 +5856,13 @@
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <border>3</border>
-                  <minsize>60,18</minsize>
+                  <minsize>100,18</minsize>
                   <object class="wxTextCtrl" name="m_cmdDuration">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
-                    <size>60,18</size>
+                    <size>100,18</size>
                     <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
                     <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
-                    <value>0</value>
+                    <value>00:00:00.000</value>
                   </object>
                 </object>
               </object>
@@ -5998,7 +5981,7 @@
                     <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
                     <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                     <tooltip>
-                      <![CDATA[PC Pos]]>
+                      <![CDATA[Application Pos]]>
                     </tooltip>
                     <value>0</value>
                   </object>
@@ -6039,7 +6022,7 @@
                     <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
                     <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                     <tooltip>
-                      <![CDATA[PC Pos]]>
+                      <![CDATA[Application Pos]]>
                     </tooltip>
                     <value>0</value>
                   </object>
@@ -6080,7 +6063,7 @@
                     <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
                     <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
                     <tooltip>
-                      <![CDATA[PC Pos]]>
+                      <![CDATA[Application Pos]]>
                     </tooltip>
                     <value>0</value>
                   </object>
@@ -6772,9 +6755,9 @@
         <resizable>1</resizable>
         <movable>1</movable>
         <floatable>1</floatable>
-        <best_size>284,140</best_size>
-        <max_size>284,140</max_size>
-        <min_size>284,140</min_size>
+        <best_size>384,140</best_size>
+        <max_size>384,140</max_size>
+        <min_size>384,140</min_size>
         <bottom>1</bottom>
         <layer>0</layer>
         <row>1</row>
@@ -6789,26 +6772,42 @@
           <object class="wxFlexGridSizer">
             <minsize>284,140</minsize>
             <cols>1</cols>
-            <rows>2</rows>
+            <rows>3</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
-            <growablerows>1</growablerows>
+            <growablerows>2</growablerows>
             <object class="sizeritem" name="flexGridSizer4485">
               <flag>wxALL|wxEXPAND</flag>
               <option>1</option>
               <object class="wxFlexGridSizer">
-                <cols>2</cols>
+                <cols>6</cols>
                 <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
-                <growablecols>1</growablecols>
+                <growablecols>4</growablecols>
                 <growablerows>0</growablerows>
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <border>1</border>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapToggleButton" name="m_btTogglePosSpy">
+                    <style/>
+                    <size>26,26</size>
+                    <bitmap>bitmaps/dialog-ok.png</bitmap>
+                    <tooltip>
+                      <![CDATA[Disable PositionSpy]]>
+                    </tooltip>
+                    <checked>1</checked>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>1</border>
+                  <minsize>26,26</minsize>
                   <object class="wxBitmapButton" name="m_btClearPositionSpy">
                     <bitmap>bitmaps/16-clean.png</bitmap>
+                    <size>26,26</size>
                     <style>wxBU_AUTODRAW</style>
                     <tooltip>
                       <![CDATA[Clear Position Spy]]>
@@ -6816,31 +6815,101 @@
                     <default>0</default>
                   </object>
                 </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>1</border>
+                  <minsize>26,26</minsize>
+                  <object class="wxBitmapButton" name="m_btCopyPosSpy">
+                    <bitmap>bitmaps/edit-copy-7.png</bitmap>
+                    <size>26,26</size>
+                    <style>wxBU_AUTODRAW</style>
+                    <tooltip>
+                      <![CDATA[Copy PositionSpy]]>
+                    </tooltip>
+                    <default>0</default>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>5</border>
+                  <object class="wxStaticText" name="m_staticText4676">
+                    <label>Content:</label>
+                    <style/>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>2</border>
+                  <object class="wxComboBox" name="m_cbContentPosSpy">
+                    <style>wxCB_READONLY</style>
+                    <selection>1</selection>
+                    <content>
+                      <item>
+                        <![CDATA[App Pos]]>
+                      </item>
+                      <item>
+                        <![CDATA[Ctl Pos]]>
+                      </item>
+                    </content>
+                  </object>
+                </object>
                 <object class="sizeritem" name="flexGridSizer4524">
                   <flag>wxALL|wxALIGN_RIGHT</flag>
                   <option>1</option>
                   <object class="wxFlexGridSizer">
-                    <cols>1</cols>
+                    <cols>2</cols>
                     <rows>1</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
                     <growablecols>0</growablecols>
                     <growablerows>0</growablerows>
-                    <object class="sizeritem">
+                    <object class="sizeritem" name="flexGridSizer4660">
                       <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
-                      <border>5</border>
-                      <object class="wxStaticText" name="m_staticText4526">
-                        <label>(lightly async)</label>
-                        <style/>
-                        <font>
-                          <size>7</size>
-                          <style>italic</style>
-                          <weight>bold</weight>
-                          <family>swiss</family>
-                          <underlined>0</underlined>
-                          <face>Segoe UI</face>
-                        </font>
+                      <object class="wxFlexGridSizer">
+                        <cols>1</cols>
+                        <rows>2</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols>0</growablecols>
+                        <growablerows/>
+                        <object class="sizeritem">
+                          <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                          <object class="wxStaticText" name="m_staticText4526">
+                            <label>(lightly async)</label>
+                            <style/>
+                            <font>
+                              <size>7</size>
+                              <style>italic</style>
+                              <weight>bold</weight>
+                              <family>swiss</family>
+                              <underlined>0</underlined>
+                              <face>Segoe UI</face>
+                            </font>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <object class="wxStaticText" name="m_positionSpyCount">
+                            <label># 0</label>
+                            <style>wxALIGN_RIGHT</style>
+                            <fg>#0000FF</fg>
+                            <font>
+                              <size>7</size>
+                              <style>normal</style>
+                              <weight>normal</weight>
+                              <family>modern</family>
+                              <underlined>0</underlined>
+                              <face>Courier New</face>
+                            </font>
+                          </object>
+                        </object>
                       </object>
+                    </object>
+                    <object class="spacer" name="Spacer4664">
+                      <size>3,0</size>
+                      <flag>wxALL</flag>
+                      <border>1</border>
+                      <option>1</option>
                     </object>
                   </object>
                 </object>
@@ -6849,16 +6918,36 @@
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
-              <object class="unknown" name="m_positionSpy">
-                <bg>wxSYS_COLOUR_BTNFACE</bg>
+              <object class="wxStaticText" name="m_staticText4659">
+                <label>Ref:               F:              X:                     Y:                      Z:</label>
+                <style/>
+                <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
                 <font>
                   <size>8</size>
                   <style>normal</style>
-                  <weight>normal</weight>
+                  <weight>bold</weight>
                   <family>swiss</family>
                   <underlined>0</underlined>
                   <face>Segoe UI</face>
                 </font>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxListBox" name="m_positionSpy">
+                <style>wxLB_SINGLE</style>
+                <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                <font>
+                  <size>8</size>
+                  <style>normal</style>
+                  <weight>normal</weight>
+                  <family>modern</family>
+                  <underlined>0</underlined>
+                  <face>Courier New</face>
+                </font>
+                <content/>
+                <selection>-1</selection>
               </object>
             </object>
           </object>
@@ -7271,6 +7360,14 @@
         <style/>
         <object class="wxMenuItem" name="m_miUnitTestFramework">
           <label>Unit Test Framework . . .</label>
+          <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
+        <object class="wxMenuItem" name="m_miLoopRepeatTest">
+          <label>Loop Repeat Test [Run]</label>
           <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
           <accel>
             <![CDATA[]]>

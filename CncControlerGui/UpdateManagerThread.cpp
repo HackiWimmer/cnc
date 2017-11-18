@@ -6,20 +6,26 @@
 UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 : wxThread(wxTHREAD_DETACHED)
 , pHandler(handler)
-, queueReset(false)
 , exit(false)
-, displayFactX(1)
-, displayFactY(1)
-, displayFactZ(1)
-, eventQueue()
+, appPosSpyList()
+, ctlPosSpyList()
+, setterList()
 ///////////////////////////////////////////////////////////////////
-{}
+{
+	appPosSpyList.reserve(1000 * 1000);
+	ctlPosSpyList.reserve(1000 * 1000);
+	setterList.reserve(1000 * 1000);
+}
 ///////////////////////////////////////////////////////////////////
 UpdateManagerThread::~UpdateManagerThread() {
 ///////////////////////////////////////////////////////////////////
 	wxCriticalSectionLocker enter(pHandler->pThreadCS);
 	// the thread is being destroyed; make sure not to leave dangling pointers around
 	pHandler->updateManagerThread = NULL;
+	
+	appPosSpyList.clear();
+	ctlPosSpyList.clear();
+	setterList.clear();
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::stop() {
@@ -29,12 +35,12 @@ void UpdateManagerThread::stop() {
 ///////////////////////////////////////////////////////////////////
 wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
+	typedef UpdateManagerThread::Event LastPosSpyEntry;
+	UpdateManagerThread::EventId posEvtId = UpdateManagerThread::EventId::CTL_POS_UPDATE;
+	
 	unsigned int sleep = 1;
 	
-	displayFactX = GBL_CONFIG->getDisplayFactX(GBL_CONFIG->getDisplayUnit());
-	displayFactY = GBL_CONFIG->getDisplayFactY(GBL_CONFIG->getDisplayUnit());
-	displayFactZ = GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit());
-	
+	wxDateTime tsLast = wxDateTime::UNow();
 	while ( !TestDestroy() ) {
 		this->Sleep(sleep);
 		
@@ -42,106 +48,99 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		if ( TestDestroy() ) break;
 		if ( exit == true )  break;
 		
-		if ( eventQueue.size() > 0 ) {
+		// process data update
+		if ( (wxDateTime::UNow() - tsLast).GetMilliseconds() >= 50 ) {
 			
-			// it's very important to freeze the gui controlls considered below 
-			// during it's content becomes change!
-			// Because, the onPaint() event isn't thread safe and the 
-			// eventloop.Disptch() call will crash sometimes.
-			freezeControls(true);
-			
-				while ( eventQueue.size() > 0 ) {
-					this->Sleep(sleep);
+			UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, posEvtId);
+			LastPosSpyEntry lpse;
+			{
+				// ensure no one else updates posSpyList
+				wxCriticalSectionLocker lock(pHandler->pThreadCS);
+				switch ( posEvtId ) {
 					
-					// recheck this here after the sleep
-					if ( TestDestroy() ) break;
-					if ( exit == true )  break;
-					
-					pop();
-					idle();
-					postHeartbeat();
+					case UpdateManagerThread::EventId::APP_POS_UPDATE:	if ( appPosSpyList.size() > 0 )	lpse = appPosSpyList.back();
+																		else 							lpse.pos.reset();
+																		
+																		posEvtId = UpdateManagerThread::EventId::CTL_POS_UPDATE;
+																		break;
+																		
+					case UpdateManagerThread::EventId::CTL_POS_UPDATE:	if ( ctlPosSpyList.size() > 0 )	lpse = ctlPosSpyList.back();
+																		else 							lpse.pos.reset();
+																		
+																		posEvtId = UpdateManagerThread::EventId::APP_POS_UPDATE;
+																		break;
+																		
+					default:											;
 				}
-				
-			freezeControls(false);
+			}
+			
+			evt.setCurrentPosition(lpse.pos.pos);
+			
+			evt.setSpeedMode((char)lpse.pos.speedMode);
+			evt.setSpeedValue(lpse.pos.speedValue);
+			
+			evt.setReferenceId(lpse.pos.id);
+			
+			wxPostEvent(pHandler, evt);
 		}
 		
-		idle();
-		
-		// always post a heartbeat
-		postHeartbeat();
+		// process heartbeat
+		if ( (wxDateTime::UNow() - tsLast).GetMilliseconds() >= 500 ) {
+			UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::HEARTBEAT);
+			wxPostEvent(pHandler, evt);
+			
+			tsLast = wxDateTime::UNow();
+		}
 	}
 	
-	wxCommandEvent evt(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED);
-	pHandler->AddPendingEvent(evt);
+	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::COMPLETED);
+	wxPostEvent(pHandler, evt);
 	
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::idle() {
+void UpdateManagerThread::fillPositionSpy(wxListBox* lb, UpdateManagerThread::SpyContent sc, CncConfig& config) {
 ///////////////////////////////////////////////////////////////////
-	checkQueueReset();
-	immediateUpdate();
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::freezeControl(wxWindow* ctl, bool onlyHidden) {
-///////////////////////////////////////////////////////////////////
-	if ( ctl == NULL )
+	if( lb == NULL )
 		return;
 		
-	if ( onlyHidden == true && ctl->IsShownOnScreen() == true )
-		return;
+	CncUnit unit = config.getDisplayUnit();
+	double displayFactX = GBL_CONFIG->getDisplayFactX(unit);
+	double displayFactY = GBL_CONFIG->getDisplayFactY(unit);
+	double displayFactZ = GBL_CONFIG->getDisplayFactZ(unit);
 	
-	ctl->Enable(false);
-	
-	if ( ctl->IsFrozen() == false )
-		ctl->Freeze();
-	
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::thawControl(wxWindow* ctl) {
-///////////////////////////////////////////////////////////////////
-	if ( ctl == NULL )
-		return;
-
-	if ( ctl->IsFrozen() == true )
-		ctl->Thaw();
-
-	ctl->Enable(true);
-	ctl->Refresh();
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::freezeControls(bool state) {
-///////////////////////////////////////////////////////////////////
-	if ( state == true ) {
-		freezeControl(pHandler->GetPositionSpy(), false);
-		freezeControl(pHandler->getProcessedSetterControl(), false);
-	} else {
-		thawControl(pHandler->GetPositionSpy());
-		thawControl(pHandler->getProcessedSetterControl());
+	{
+		// ensure no one else updates posSpyList
+		wxCriticalSectionLocker lock(pHandler->pThreadCS);
+		
+		//clog << posSpyList->size() << ", " << lb->GetCount()  << endl;
+		
+		const int insertPos = 0;
+		PosSpyList* list = ( sc == UpdateManagerThread::SpyContent::APP_POSITIONS ? &appPosSpyList : &ctlPosSpyList );
+		for ( auto it = list->begin() + lb->GetCount(); it != list->end(); ++it ) {
+			
+			switch ( unit ) {
+				case CncSteps:	lb->Insert(wxString::Format("%08ld %c%05.1lf % 10ld  % 10ld  % 10ld", 
+															it->pos.id,
+															(char)it->pos.speedMode,
+															it->pos.speedValue,
+															it->pos.pos.getX(), 
+															it->pos.pos.getY(), 
+															it->pos.pos.getZ()), insertPos);
+								break;
+								
+				case CncMetric:
+								lb->Insert(wxString::Format("%08ld %c%05.1lf % 10.3lf  % 10.3lf  % 10.3lf", 
+															it->pos.id,
+															(char)it->pos.speedMode,
+															it->pos.speedValue,
+															it->pos.pos.getX() * displayFactX, 
+															it->pos.pos.getY() * displayFactY, 
+															it->pos.pos.getZ() * displayFactZ), insertPos);
+								break;
+			}
+		}
 	}
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::postHeartbeat() {
-///////////////////////////////////////////////////////////////////
-	static long counter = 0;
-	if ( ++counter%400 == 0 ) {
-		
-		wxCommandEvent evt(wxEVT_UPDATE_MANAGER_THREAD_UPDATE);
-		pHandler->AddPendingEvent(evt);
-		
-		counter = 0;
-	}
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::checkQueueReset() {
-///////////////////////////////////////////////////////////////////
-	if ( queueReset == false )
-		return;
-		
-	eventQueue.clear();
-	clearPositionSpy();
-		
-	queueReset = false;
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
@@ -150,281 +149,40 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 	
 	// the following things will be done immediatly
 	switch ( evt.type ) {
-		case Event::Type::EMPTY_UPD:	// do noting
-										break;
-										
-		case Event::Type::CONFIG_UPD:	eventQueue.push(evt); 
-										break;
-										
-		case Event::Type::POSSPY_RESET:	clearPositionSpy();
-										break;
-										
-		case Event::Type::QUEUE_RESET:	queueReset = true;
-										break;
-										
-		case Event::Type::Z_VIEW_RESET:	resetZView();
-										break;
-										
-		case Event::Type::Z_VIEW_UPD:	updateZView();
-										break;
-										
-		case Event::Type::SETTER_ADD:	eventQueue.push(evt); 
-										break;
-										
-		case Event::Type::SPEED_UPD:	lastSpeedEvent				= evt;
-										lastSpeedEvent.processed	= false;
-										break;
-										
-		case Event::Type::COMMAND_UPD:	lastCmdEvent 				= evt;
-										lastCmdEvent.processed		= false;
-										break;
-										
-		case Event::Type::APP_POS_UPD:	lastAppPosEvent 			= evt;
-										lastAppPosEvent.processed	= false;
-										break;
-										
-		case Event::Type::CTL_POS_UPD:	lastCtlPosEvent				= evt;
-										lastCtlPosEvent.processed	= false;
-										eventQueue.push(evt); 
-										break;
-										
-		default: 						;
-	}
-	
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::pop() {
-///////////////////////////////////////////////////////////////////
-	typedef UpdateManagerThread::Event Event;
-	
-	const unsigned int portionCount = 32;
-	unsigned int counter = 0;
-	
-	// it's very important to freeze the gui controlls considered below 
-	// during it's content becomes change!
-	// Because, the onPaint() event isn't thread safe and the 
-	// eventloop.Disptch() call will crash sometimes.
-	freezeControls(true);
-	
-	unsigned int prevQueueSize = eventQueue.size();
-	
-	// do a portion of work
-	do {
-		
-		if ( eventQueue.size() == 0 )
-			break;
-			
-		if ( counter%portionCount == 0 ) {
-			if ( prevQueueSize - counter != eventQueue.size() )
-				break;
-				
-			// stay in loop if no new queue entries are arrived
-		}
-		
-		Event evt = eventQueue.pop();
-		switch ( evt.type ) {
-			case Event::Type::CTL_POS_UPD:	updatePositionSpy(evt); 
+											
+		case Event::Type::EMPTY_UPD:		// do noting
 											break;
 											
-			case Event::Type::SETTER_ADD:	updateSetterList(evt);
+		case Event::Type::COMMAND_UPD:		// curently do noting
 											break;
 											
-			case Event::Type::CONFIG_UPD:	configUpdate();
+		case Event::Type::CONFIG_UPD:		// curently do noting
 											break;
 											
-			default: 						; // Waste the event;
-		}
-		
-		counter++;
- 
-	} while ( true );
-	
-	freezeControls(false);
+		case Event::Type::SETTER_ADD:		setterList.push_back(evt);
+											break;
+											
+		case Event::Type::POSSPY_RESET:		{
+												wxCriticalSectionLocker lock(pHandler->pThreadCS);
+												appPosSpyList.clear();
+												ctlPosSpyList.clear();
+											}
+											break;
+											
+		case Event::Type::APP_POS_UPD:		appPosSpyList.push_back(evt);
+											break;
+											
+		case Event::Type::CTL_POS_UPD:		ctlPosSpyList.push_back(evt);
+											break;
+											
+		default: 							;
+	}
 }
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::immediateUpdate() {
-///////////////////////////////////////////////////////////////////
-	updateCmdInfo();
-	updateAppPosition();
-	updateCtlPosition();
-	updateSpeedView();
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::updateCmdInfo() {
-///////////////////////////////////////////////////////////////////
-	if ( lastCmdEvent.processed == true )
-		return;
 
-	pHandler->getCmdCounterControl()->ChangeValue(wxString::Format(wxT("%i"),  lastCmdEvent.cmd.counter));
-	pHandler->getCmdDurationControl()->ChangeValue(wxString::Format(wxT("%i"), lastCmdEvent.cmd.duration));
-	
-	lastCmdEvent.processed = true;
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::updateAppPosition() {
-///////////////////////////////////////////////////////////////////
-	if ( CncConfig::getGlobalCncConfig() == NULL )
-		return;
-		
-	if ( lastAppPosEvent.processed == true )
-		return;
-		
-	wxString formatString(" %4.3f");
-	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
-	if ( cnc::dblCompare(displayFactX, 1.0) )
-		formatString.assign(" %8.0f");
-	
-	// application position
-	pHandler->getAppPosControlX()->ChangeValue(wxString::Format(formatString, lastAppPosEvent.pos.curr.getX() * displayFactX));
-	pHandler->getAppPosControlY()->ChangeValue(wxString::Format(formatString, lastAppPosEvent.pos.curr.getY() * displayFactY));
-	pHandler->getAppPosControlZ()->ChangeValue(wxString::Format(formatString, lastAppPosEvent.pos.curr.getZ() * displayFactZ));
-	
-	// Z view 
-	updateZView();
-		
-	lastAppPosEvent.processed = true;
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::updateCtlPosition() {
-///////////////////////////////////////////////////////////////////
-	if ( CncConfig::getGlobalCncConfig() == NULL )
-		return;
-		
-	if ( lastCtlPosEvent.processed == true )
-		return;
-		
-	wxString formatString(" %4.3f");
-	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
-	if ( cnc::dblCompare(displayFactX, 1.0) )
-		formatString.assign(" %8.0f");
-	
-	// application position
-	pHandler->getCtlPosControlX()->ChangeValue(wxString::Format(formatString, lastCtlPosEvent.pos.curr.getX() * displayFactX));
-	pHandler->getCtlPosControlY()->ChangeValue(wxString::Format(formatString, lastCtlPosEvent.pos.curr.getY() * displayFactY));
-	pHandler->getCtlPosControlZ()->ChangeValue(wxString::Format(formatString, lastCtlPosEvent.pos.curr.getZ() * displayFactZ));
-	
-	lastCtlPosEvent.processed = true;
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::updatePositionSpy(UpdateManagerThread::Event evt) {
-///////////////////////////////////////////////////////////////////
-	if ( CncConfig::getGlobalCncConfig() == NULL )
-		return;
-		
-	wxString formatString(" %4.3f");
-	// this presupposes that displayFactX = 1.0 always also valid for y and z ( 1.0 means steps)
-	if ( cnc::dblCompare(displayFactX, 1.0) )
-		formatString.assign(" %8.0f");
-		
-	wxDataViewListCtrl* ctl = pHandler->GetPositionSpy();
-	if ( ctl ) {
-		DcmRow row;
-		DataControlModel::addPositionSpyRow(row, evt.pos.id, wxString::Format(" %c", (char)evt.pos.speedMode),
-											wxString::Format(formatString, evt.pos.curr.getX() * displayFactX),
-											wxString::Format(formatString, evt.pos.curr.getY() * displayFactY),
-											wxString::Format(formatString, evt.pos.curr.getZ() * displayFactZ));
-		if ( row. size() == 6 ) {
-			ctl->InsertItem(0, row);
-			ctl->EnsureVisible(ctl->RowToItem(0));
-			
-			if ( pHandler ) {
-				pHandler->GetBtClearPositionSpy()->SetToolTip(wxString::Format("Item count: %d", ctl->GetItemCount()));
-			}
-		} else {
-			std::cerr << "UpdateManagerThread::updatePositionSpy: Invalid row size: " << row.size() << std::endl;
-			for ( auto it=row.begin(); it != row.end(); ++it )
-				std::cerr << ' ' << it->GetString() << std::endl;
-		}
-	}
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::clearPositionSpy() {
-///////////////////////////////////////////////////////////////////
-	// it's very important to freeze the gui controlls considered below 
-	// during it's content becomes change!
-	// Because, the onPaint() event isn't thread safe and the 
-	// eventloop.Disptch() call will crash sometimes.
-	freezeControls(true);
-	
-	if ( pHandler->GetPositionSpy() ) {
-		pHandler->GetPositionSpy()->DeleteAllItems();
-	}
-	
-	freezeControls(false);
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::resetZView() {
-///////////////////////////////////////////////////////////////////
-	if ( pHandler->getZView() ) 
-		pHandler->getZView()->resetAll();
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::updateZView() {
-///////////////////////////////////////////////////////////////////
-	if ( CncConfig::getGlobalCncConfig() == NULL )
-		return;
- 
-	if ( pHandler->getZView() ) {
-		double displayFactZ = CncConfig::getGlobalCncConfig()->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-		pHandler->getZView()->updateView(lastAppPosEvent.pos.curr.getZ() * displayFactZ);
-	}
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::updateSetterList(UpdateManagerThread::Event evt) {
-///////////////////////////////////////////////////////////////////
-	wxDataViewListCtrl* ps = pHandler->getProcessedSetterControl();
-	if ( ps == NULL )
-		return;
-		
-	unsigned int size = ps->GetItemCount();
-		
-	if ( size > maxSetterEntries ) {
-		ps->DeleteItem(size - 1);
-		
-		wxVariant c0;
-		ps->GetValue(c0, 0, 0);
-		size = c0.GetInteger() +1;
-	}
-		
-	std::string retVal;
-	DcmItemList rows;
-	DataControlModel::addNumKeyValueRow(rows, size, ArduinoPIDs::getPIDLabel((int)evt.set.id, retVal), evt.set.value);
-	
-	if ( rows[0].size() == 3) {
-		ps->InsertItem(0, rows[0]);
-		ps->EnsureVisible(ps->RowToItem(0));
-	} else {
-		std::cerr << "UpdateManagerThread::updateSetterList: Invalid rows size: " << rows.size() << std::endl;
-		wxVector<wxVariant> row = rows[0];
-		for ( auto it=row.begin(); it != row.end(); ++it )
-			std::cerr << ' ' << it->GetString() << std::endl;
-	}
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::updateSpeedView() {
-///////////////////////////////////////////////////////////////////
-	if ( lastSpeedEvent.processed == true )
-		return;
 
-	CncSpeedView* sc = pHandler->getSpeedView();
-	if ( sc != NULL )
-		sc->setCurrentSpeedXYZ(lastSpeedEvent.spd.xSpeed, lastSpeedEvent.spd.ySpeed, lastSpeedEvent.spd.zSpeed);
-	
-	lastSpeedEvent.processed = true;
-}
-///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::configUpdate() {
-///////////////////////////////////////////////////////////////////
-	// currently nothing more todo
-	CncConfig::getGlobalCncConfig()->discardModifications();
-	
-	displayFactX = GBL_CONFIG->getDisplayFactX(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	displayFactY = GBL_CONFIG->getDisplayFactY(CncConfig::getGlobalCncConfig()->getDisplayUnit());
-	displayFactZ = GBL_CONFIG->getDisplayFactZ(CncConfig::getGlobalCncConfig()->getDisplayUnit());
 
-	
-	
-	#warning - move the code below to collectSummary
+
+#warning - move the code below to collectSummary
 	/*
 	if ( CncConfig::getGlobalCncConfig() == NULL )
 		return;
@@ -503,4 +261,4 @@ void UpdateManagerThread::configUpdate() {
 			dcc->AppendItem(*it);
 	}
 	*/
-}
+

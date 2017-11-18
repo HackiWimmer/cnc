@@ -24,6 +24,7 @@
 #include <wx/txtstrm.h>
 #include <wx/vscroll.h>
 #include <wx/textdlg.h>
+#include <wx/clipbrd.h>
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
 #include "CncPosition.h"
@@ -81,10 +82,9 @@ const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 
 ////////////////////////////////////////////////////////////////////
 // app defined events
-	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, wxCommandEvent);
-	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD_UPDATE, wxCommandEvent);
-	wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, wxTimerEvent);
-	wxDEFINE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, wxTimerEvent);
+	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD, 			UpdateManagerEvent);
+	wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, 				wxTimerEvent);
+	wxDEFINE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 	wxTimerEvent);
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -92,12 +92,10 @@ const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 	EVT_CLOSE(MainFrame::onClose)
 	
-	EVT_COMMAND(wxID_ANY, wxEVT_UPDATE_MANAGER_THREAD_COMPLETED, MainFrame::onThreadCompletion)
-	EVT_COMMAND(wxID_ANY, wxEVT_UPDATE_MANAGER_THREAD_UPDATE, MainFrame::onThreadUpdate)
-	EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, MainFrame::configurationUpdated)
+	EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, 	MainFrame::configurationUpdated)
 	
-	EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, MainFrame::onPerspectiveTimer)
-	EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, MainFrame::onDebugUserNotificationTimer)
+	EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, 							MainFrame::onPerspectiveTimer)
+	EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 				MainFrame::onDebugUserNotificationTimer)
 	
 wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
@@ -133,6 +131,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , lruFileList(LruFileList(8))
 , lastTemplateModification(wxDateTime::UNow())
 , lastSvgEmuModification(wxDateTime::UNow())
+, processLastDuartion(0L)
 , processStartTime(wxDateTime::UNow())
 , processEndTime(wxDateTime::UNow())
 , lastTemplateFileNameForPreview(wxT(""))
@@ -165,8 +164,12 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	// define the popup parent frame
 	SvgEditPopup::setMainFrame(this);
 	
-	// bind global key down hook
-	this->Bind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
+	// bind 
+	this->Bind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 		this);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 	this, UpdateManagerThread::EventId::APP_POS_UPDATE);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 	this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 		this, UpdateManagerThread::EventId::HEARTBEAT);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 	this, UpdateManagerThread::EventId::COMPLETED);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -176,8 +179,12 @@ MainFrame::~MainFrame() {
 	if ( cnc != NULL )
 		waitActive(m_serialTimer->GetInterval());
 	
-	// unbind global key down hook
-	this->Unbind(wxEVT_CHAR_HOOK, &MainFrame::globalKeyDownHook, this);
+	// unbind 
+	this->Unbind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 		this);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 	this, UpdateManagerThread::EventId::APP_POS_UPDATE);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 	this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 		this, UpdateManagerThread::EventId::HEARTBEAT);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 	this, UpdateManagerThread::EventId::COMPLETED);
 	
 	// todo
 	//this->Unbind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent& event) {});
@@ -191,11 +198,11 @@ MainFrame::~MainFrame() {
 	config->Flush();
 	delete config;
 	
-	wxASSERT (pathGenerator);
+	wxASSERT(pathGenerator);
 	pathGenerator->Destroy();
 	delete pathGenerator;
 
-	wxASSERT (guiCtlSetup);
+	wxASSERT(guiCtlSetup);
 	delete guiCtlSetup;
 	
 	wxASSERT(outboundNbInfo);
@@ -335,7 +342,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_3D_Refreh);
 	registerGuiControl(m_3D_Clear);
 
-
+	registerGuiControl(m_cbContentPosSpy);
 	registerGuiControl(m_btPathGenerator);
 	registerGuiControl(m_checkManuallyXY);
 	registerGuiControl(m_checkManuallyZ);
@@ -531,17 +538,85 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadUpdate(wxCommandEvent& event) {
+void MainFrame::onThreadAppPosUpdate(UpdateManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	CncUnit unit = GBL_CONFIG->getDisplayUnit();
+	
+	// update position
+	switch ( unit ) {
+		case CncSteps:	// update application position
+						m_xAxis->ChangeValue(wxString::Format("%8ld", event.getCurrentPosition().getX()));
+						m_yAxis->ChangeValue(wxString::Format("%8ld", event.getCurrentPosition().getY()));
+						m_zAxis->ChangeValue(wxString::Format("%8ld", event.getCurrentPosition().getZ()));
+						break;
+						
+		case CncMetric:	// update application position
+						m_xAxis->ChangeValue(wxString::Format("%4.3lf", event.getCurrentPosition().getX() * GBL_CONFIG->getDisplayFactX(unit)));
+						m_yAxis->ChangeValue(wxString::Format("%4.3lf", event.getCurrentPosition().getY() * GBL_CONFIG->getDisplayFactY(unit)));
+						m_zAxis->ChangeValue(wxString::Format("%4.3lf", event.getCurrentPosition().getZ() * GBL_CONFIG->getDisplayFactZ(unit)));
+						break;
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onThreadCtlPosUpdate(UpdateManagerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	CncUnit unit = GBL_CONFIG->getDisplayUnit();
+	
+	// update position
+	switch ( unit ) {
+		case CncSteps:	// update controller position
+						m_xAxisCtl->ChangeValue(wxString::Format("%8ld", event.getCurrentPosition().getX()));
+						m_yAxisCtl->ChangeValue(wxString::Format("%8ld", event.getCurrentPosition().getY()));
+						m_zAxisCtl->ChangeValue(wxString::Format("%8ld", event.getCurrentPosition().getZ()));
+						break;
+						
+		case CncMetric:	// update controller position
+						m_xAxisCtl->ChangeValue(wxString::Format("%4.3lf", event.getCurrentPosition().getX() * GBL_CONFIG->getDisplayFactX(unit)));
+						m_yAxisCtl->ChangeValue(wxString::Format("%4.3lf", event.getCurrentPosition().getY() * GBL_CONFIG->getDisplayFactY(unit)));
+						m_zAxisCtl->ChangeValue(wxString::Format("%4.3lf", event.getCurrentPosition().getZ() * GBL_CONFIG->getDisplayFactZ(unit)));
+						break;
+	}
+	
+	// update z view
+	m_zView->updateView(event.getCurrentPosition().getZ() * GBL_CONFIG->getDisplayFactZ(unit));
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	// rotate heartbeat star
 	wxImage img =m_updateManagerUpdate->GetBitmap().ConvertToImage();
 	wxPoint p(m_updateManagerUpdate->GetSize().GetWidth()/2, m_updateManagerUpdate->GetSize().GetHeight()/2);
 
 	m_updateManagerUpdate->SetBitmap(wxBitmap(img.Rotate90()));
 	m_updateManagerUpdate->Refresh();
 	m_updateManagerUpdate->Update();
+	
+	// update position syp
+	static unsigned int lastCount = 0;
+	if ( m_btTogglePosSpy->GetValue() == true ) {
+		if ( updateManagerThread && m_positionSpy->IsShownOnScreen() ) {
+			
+			UpdateManagerThread::SpyContent sc = (UpdateManagerThread::SpyContent)m_cbContentPosSpy->GetSelection();
+			m_positionSpy->Freeze();
+			updateManagerThread->fillPositionSpy(m_positionSpy, sc, *GBL_CONFIG);
+			m_positionSpy->Thaw();
+			
+			if ( lastCount != m_positionSpy->GetCount() ) {
+				m_positionSpyCount->SetLabel(wxString::Format("# %010u", m_positionSpy->GetCount()));
+				m_positionSpyCount->SetToolTip(m_positionSpyCount->GetLabel());
+				lastCount = m_positionSpy->GetCount();
+			}
+		}
+	}
+	
+	// update time consumed
+	if ( pngAnimation->IsRunning() ) {
+		processEndTime = wxDateTime::UNow();
+		logTimeConsumed();
+	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadCompletion(wxCommandEvent& event) {
+void MainFrame::onThreadCompletion(UpdateManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	std::clog << "OnThreadCompletion" << std::endl;
 	updateManagerThread = NULL;
@@ -633,21 +708,32 @@ void MainFrame::dispatchAll() {
 	wxEventLoopBase* evtLoop = wxEventLoopBase::GetActive();
 	if ( evtLoop == NULL )
 		return;
-	
-	
-	while ( evtLoop->Pending() )
-		evtLoop->Dispatch();
-	
-	#warning - yield() is to slow
-	//evtLoop->Yield(true);
-	
+		
 	/*
-	Please note: evtLoop->Yield() is better then the code below, 
+	Please note: This is th fastest version, but evtLoop->Yield() is better then the code below, 
 	it also considers timer events, aui-handling etc.
 	
 	while ( evtLoop->Pending() )
 		evtLoop->Dispatch();
 	*/
+
+	/*
+	wxEVT_CATEGORY_ALL =
+		wxEVT_CATEGORY_UI|wxEVT_CATEGORY_USER_INPUT|wxEVT_CATEGORY_SOCKET| \
+		wxEVT_CATEGORY_TIMER|wxEVT_CATEGORY_THREAD|wxEVT_CATEGORY_UNKNOWN| \
+		wxEVT_CATEGORY_CLIPBOARD
+	
+	This is the slowest version
+	evtLoop->YieldFor(wxEVT_CATEGORY_ALL);
+	*/
+	
+	// the following cod is the best compromise, but aui handling isn't perfect
+	if ( wxTheApp->HasPendingEvents() )
+		wxTheApp->ProcessPendingEvents();
+		
+	while ( evtLoop->Pending() )
+		evtLoop->Dispatch();
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initTemplateEditStyle() {
@@ -1126,9 +1212,7 @@ bool MainFrame::initializeCncControl() {
 	updateCncConfigTrace();
 	
 	// z slider
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	umPostEvent(evt.ZViewUpdateEvent());
+	m_zView->updateView(cnc->getControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
 	
 	//initilaize debug state
 	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
@@ -1599,10 +1683,8 @@ void MainFrame::updateCncConfigTrace() {
 	cnc->updateCncConfigTrace();
 	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", CncConfig::getGlobalCncConfig()->getToolDiameter()));
 	
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	umPostEvent(evt.ZViewUpdateEvent());
-
+	m_zView->updateView(cnc->getControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
+	
 	collectSummary();
 }
 ///////////////////////////////////////////////////////////////////
@@ -2871,32 +2953,33 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::processTemplate() {
+bool MainFrame::processTemplate() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
 	if ( cnc->isInterrupted() ) {
 		std::cerr << "Cnc controller state is interrupted. Before it can run next time a reset is required!" << std::endl;
-		return;
+		return false;
 	}
 	
 	if( cnc->isConnected() == false) {
 		if ( !connectSerialPort() )
-			return;
+			return false;
 	}
 	
 	showAuiPane("Outbound");
 	selectMonitorBookCncPanel();
 		
 	if ( checkIfRunCanBeProcessed() == false )
-		return;
+		return false;
 		 
 	startAnimationControl();
 	
+	clearPositionSpy();
+	
 	typedef UpdateManagerThread::Event Event;
 	static Event evt;
-	umPostEvent(evt.QueueResetEvent());
-
+	
 	// select draw pane
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 		
@@ -2908,6 +2991,8 @@ void MainFrame::processTemplate() {
 		selectMainBookSourcePanel();
 	}
 	
+	processStartTime = wxDateTime::UNow();
+		
 	motionMonitor->pushProcessMode();
 
 	updateStepDelay();
@@ -2926,14 +3011,14 @@ void MainFrame::processTemplate() {
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			umPostEvent(evt.ZViewResetEvent());
+			//umPostEvent(evt.ZViewResetEvent());
 			ret = processSVGTemplate();
 			break;
 		case TplGcode:
 			if ( checkIfTemplateIsModified() == false )
 				break;
 			cnc->clearDrawControl();
-			umPostEvent(evt.ZViewResetEvent());
+			//umPostEvent(evt.ZViewResetEvent());
 			ret = processGCodeTemplate();
 			break;
 		case TplManual: 
@@ -2941,7 +3026,7 @@ void MainFrame::processTemplate() {
 			break;
 		case TplTest:
 			cnc->clearDrawControl();
-			umPostEvent(evt.ZViewResetEvent());
+			//umPostEvent(evt.ZViewResetEvent());
 			ret = processTestTemplate();
 			break;
 		default:
@@ -2976,10 +3061,27 @@ void MainFrame::processTemplate() {
 	
 	if ( ret )
 		cnc->updateDrawControl();
-	
+		
+	processEndTime = wxDateTime::UNow();
+	logTimeConsumed();
+		
 	unfreezeLogger();
 	enableControls();
 	stopAnimationControl();
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::logTimeConsumed() {
+///////////////////////////////////////////////////////////////////
+	processLastDuartion = (processEndTime - processStartTime).GetMilliseconds().ToLong();
+	
+	int n = (int) ( processLastDuartion % 1000);
+	int s = (int) ( processLastDuartion / 1000) % 60 ;
+	int m = (int) ((processLastDuartion / (1000 * 60)) % 60);
+	int h = (int) ((processLastDuartion / (1000 * 60 * 60)) % 24);
+	
+	m_cmdDuration->ChangeValue(wxString::Format("%02d:%02d:%02d.%03d", h, m, s, n));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::resetMinMaxPositions() {
@@ -3486,8 +3588,8 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 	// goto line
 	} else if ( c == 'G' && ctlKey == true ) {
 		wxTextEntryDialog dlg(this, "Line Number:", "Go to line . . .", "");
-		dlg.SetMaxLength(32);
-		dlg.SetTextValidator(wxFILTER_NUMERIC);
+		dlg.SetMaxLength(8);
+		dlg.SetTextValidator(wxFILTER_DIGITS);
 		if ( dlg.ShowModal() == wxID_OK  ) {
 			wxString s = dlg.GetValue();
 			s.Trim(true).Trim(false);
@@ -4547,7 +4649,7 @@ void MainFrame::closeAuiPane(wxAuiManagerEvent& evt) {
 		enableSerialSpy(false);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::onPerspectiveTimer(wxTimerEvent& WXUNUSED(event)) {
+void MainFrame::onPerspectiveTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( perspectiveTimer.IsRunning() == true )
 		perspectiveTimer.Stop();
@@ -4720,58 +4822,27 @@ void MainFrame::startAnimationControl() {
 		if ( pngAnimation->IsRunning() )
 			pngAnimation->Stop();
 			
-		pngAnimation->Start(10);
+		pngAnimation->Start(50);
 		pngAnimation->Update();
 	}
 	
 	wxColor color(255,128,128);
 	m_cmdDuration->SetForegroundColour(color);
-	m_cmdCount->SetForegroundColour(color);
-	m_cmdCount->GetParent()->Update();
+	m_cmdDuration->GetParent()->Update();
 	processStartTime = wxDateTime::UNow();
-	buildCommandDurationToolTip();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::stopAnimationControl() {
 ///////////////////////////////////////////////////////////////////
 	m_cmdDuration->SetForegroundColour(*wxWHITE);
-	m_cmdCount->SetForegroundColour(*wxWHITE);
 	
 	if ( pngAnimation != NULL ) {
 		if ( pngAnimation->IsRunning() ) {
 			pngAnimation->Stop();
 			pngAnimation->Update();
 			processEndTime = wxDateTime::UNow();
-			buildCommandDurationToolTip();
 		}
 	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::buildCommandDurationToolTip() {
-///////////////////////////////////////////////////////////////////
-	wxString tt;
-	tt << "Processing timestamps  . . .\n\n";
-	
-	tt << "Started: ";
-	if ( processStartTime.IsValid() ) {
-		tt << processStartTime.Format("%H:%M:%S.%l", wxDateTime::CET);
-	}
-	tt << "]\n";
-	
-	tt << "Finished: ";
-	if ( processEndTime.IsValid() ) {
-		tt << processEndTime.Format("%H:%M:%S.%l",   wxDateTime::CET);
-	}
-	tt << "\n\n";
-
-	tt << "Elapsed: ";
-	if ( processEndTime.IsValid() &&  processStartTime.IsValid()) {
-		wxTimeSpan diff = processEndTime - processStartTime;
-		tt << diff.Format("%H:%M:%S.%l");
-	}
-	tt << "\n";
-	
-	m_cmdDuration->SetToolTip(tt);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::dclickDurationCount(wxMouseEvent& event) {
@@ -5301,7 +5372,6 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 
 	// process
 	processTemplate();
-	//std::clog << "processTemplate() returned"<< endl;
 	
 	// restore the interval
 	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
@@ -6093,7 +6163,7 @@ void MainFrame::onSelectTemplate(wxCommandEvent& event) {
 	selectMainBookSourcePanel();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::onDebugUserNotificationTimer(wxTimerEvent& WXUNUSED(event)) {
+void MainFrame::onDebugUserNotificationTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	const wxColour c1(227, 227, 227);
 	const wxColour c2(255, 201, 14);
@@ -6140,11 +6210,18 @@ void MainFrame::stopDebugUserNotification() {
 		debugUserNotificationTime.Stop();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::clearPositionSpy(wxCommandEvent& event) {
+void MainFrame::clearPositionSpy() {
 /////////////////////////////////////////////////////////////////////
 	typedef UpdateManagerThread::Event Event;
 	static Event evt;
 	umPostEvent(evt.PosSpyResetEvent());
+	
+	m_positionSpy->Clear();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::clearPositionSpy(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	clearPositionSpy();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleTemplateManager(wxCommandEvent& event) {
@@ -6297,4 +6374,103 @@ void MainFrame::loadConfiguration(wxCommandEvent& event) {
 	wxASSERT(CncConfig::getGlobalCncConfig());
 	CncConfig::getGlobalCncConfig()->loadConfiguration(*config);
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::copyPositionSpy(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( m_positionSpy->GetCount() == 0 )
+		return;
 
+	// Write some text to the clipboard
+	if ( wxTheClipboard->Open() ) {
+		startAnimationControl();
+
+		wxString content;
+		content.reserve(64 * 10000);
+		for ( unsigned int i=0; i<m_positionSpy->GetCount(); i++ ) {
+			content.append(wxString::Format("%s\n", m_positionSpy->GetString(i)));
+		}
+		
+		// This data objects are held by the clipboard,
+		// so do not delete them in the app.
+		wxTheClipboard->SetData( new wxTextDataObject(content) );
+		wxTheClipboard->Close();
+		
+		stopAnimationControl();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::togglePositionSpy(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxBitmap bmpOn  = ImageLibPosSpy().Bitmap("BMP_POS_SPY_ON");
+	wxBitmap bmpOff = ImageLibPosSpy().Bitmap("BMP_POS_SPY_OFF");
+	
+	m_btTogglePosSpy->GetValue() ? m_btTogglePosSpy->SetBitmap(bmpOn) : m_btTogglePosSpy->SetBitmap(bmpOff);
+	m_btTogglePosSpy->Refresh();
+	m_btTogglePosSpy->Update();
+	
+	if ( m_btTogglePosSpy->GetValue() == false )
+		clearPositionSpy();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::selectPositionSpy(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	int item = m_positionSpy->GetSelection();
+	if ( item == wxNOT_FOUND )
+		return;
+	
+	wxString content(m_positionSpy->GetString(item));
+	clog << content << endl;
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::selectPositionSpyContent(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	clearPositionSpy();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::loopRepeatTest(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxTextEntryDialog dlg(this, "Loop Repeat Test:", "Loop count . . .", "");
+	dlg.SetMaxLength(8);
+	dlg.SetTextValidator(wxFILTER_DIGITS);
+	
+	unsigned int loopCount = 0;
+	if ( dlg.ShowModal() == wxID_OK  ) {
+		wxString s = dlg.GetValue();
+		s.Trim(true).Trim(false);
+		
+		if ( s.IsEmpty() == false ) {
+			long num;
+			s.ToLong(&num);
+			if ( num > 0 && num < 10000 )
+				loopCount = (unsigned int)num;
+		}
+	}
+	
+	if ( loopCount == 0 )
+		return;
+		
+	wxString title(GetTitle());
+	wxString info;
+	long duration = 0;
+
+	// loop
+	for ( unsigned int i=0; i<loopCount; i++) {
+		
+		bool ret = processTemplate();
+		duration += processLastDuartion;
+
+		info.Printf("Loop Counter : % 6d [#]; AVG duration: % 10ld [ms]", i + 1, duration / ( i + 1 ));
+		SetTitle(wxString::Format("%s         [%s]", title, info));
+		cnc::trc.logInfoMessage(info);
+
+		if ( ret == false )
+			break;
+			
+		waitActive(5);
+	}
+	
+	// sumary
+	cnc::trc.logInfoMessage("");
+	std::clog << wxString::Format("Loop Repeat Test Sumary: Count: % 6d [#]; AVG Duration: % 10ld [ms]", loopCount, duration / loopCount) << std::endl;
+	SetTitle(title);
+}

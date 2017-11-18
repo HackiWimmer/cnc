@@ -54,7 +54,7 @@ class CncControl {
 		// Defines the start postion of an object in relation to zeroPos 
 		CncLongPosition startPos;
 		// Defines the current pos
-		CncLongPosition curPos;
+		CncLongPosition curAppPos;
 		// Stores the lateset requested control positions
 		CncLongPosition curCtlPos;
 		// Stores the lateset requested control positions
@@ -132,8 +132,8 @@ class CncControl {
 		//
 		void monitorPosition(const CncLongPosition& pos);
 		
-		inline void postAppPos();
-		inline void postCtlPos();
+		inline void postAppPosition();
+		inline void postCtlPosition();
 		
 	public:
 		
@@ -245,7 +245,7 @@ class CncControl {
 		void updateCncConfigTrace();
 		// returns the correponding pc postions
 		const CncLongPosition getStartPos() { return startPos; }
-		const CncLongPosition getCurPos()   { return curPos; }
+		const CncLongPosition getCurPos()   { return curAppPos; }
 		const CncDoublePosition getStartPosMetric();
 		const CncDoublePosition getCurPosMetric();
 		const CncLongPosition getMinPositions();

@@ -132,7 +132,8 @@ class CncMotionMonitor : public wxGLCanvas {
 		void view(GLContextBase::ViewMode fm);
 		
 	private:
-		void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
+		inline void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
+		inline void onPaint();
 		
 		wxDECLARE_NO_COPY_CLASS(CncMotionMonitor);
 		wxDECLARE_EVENT_TABLE();

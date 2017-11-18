@@ -460,8 +460,6 @@ protected:
     wxTextCtrl* m_logger;
     wxTextCtrl* m_tmpTraceInfo;
     wxPanel* m_statusBar;
-    wxStaticText* m_staticText3952;
-    wxTextCtrl* m_cmdCount;
     wxStaticText* m_staticText395;
     wxTextCtrl* m_cmdDuration;
     wxStaticLine* m_staticLine602;
@@ -511,9 +509,15 @@ protected:
     wxPanel* m_debuggerView;
     wxPropertyGridManager* m_debuggerPropertyManagerGrid;
     wxPanel* m_positionMonitorView;
+    wxBitmapToggleButton* m_btTogglePosSpy;
     wxBitmapButton* m_btClearPositionSpy;
+    wxBitmapButton* m_btCopyPosSpy;
+    wxStaticText* m_staticText4676;
+    wxComboBox* m_cbContentPosSpy;
     wxStaticText* m_staticText4526;
-    wxDataViewListCtrl* m_positionSpy;
+    wxStaticText* m_positionSpyCount;
+    wxStaticText* m_staticText4659;
+    wxListBox* m_positionSpy;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
     wxMenuItem* m_miNewTemplate;
@@ -584,6 +588,8 @@ protected:
     wxMenu* m_menuTest;
     wxMenuItem* m_miUnitTestFramework;
     wxMenuItem* m_menuItem3361;
+    wxMenuItem* m_miLoopRepeatTest;
+    wxMenuItem* m_menuItem4684;
     wxMenuItem* m_miTest1;
     wxMenuItem* m_miTest2;
     wxMenuItem* m_miTest3;
@@ -773,7 +779,11 @@ protected:
     virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void togglePositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void copyPositionSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectPositionSpyContent(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
@@ -823,6 +833,7 @@ protected:
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void openPyCam(wxCommandEvent& event) { event.Skip(); }
     virtual void unitTestFramework(wxCommandEvent& event) { event.Skip(); }
+    virtual void loopRepeatTest(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction1(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction2(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction3(wxCommandEvent& event) { event.Skip(); }
@@ -1202,8 +1213,6 @@ public:
     wxTextCtrl* GetLogger() { return m_logger; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
     wxPanel* GetScrollWinLogger() { return m_scrollWinLogger; }
-    wxStaticText* GetStaticText3952() { return m_staticText3952; }
-    wxTextCtrl* GetCmdCount() { return m_cmdCount; }
     wxStaticText* GetStaticText395() { return m_staticText395; }
     wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
     wxStaticLine* GetStaticLine602() { return m_staticLine602; }
@@ -1253,9 +1262,15 @@ public:
     wxPanel* GetSerialSpyView() { return m_serialSpyView; }
     wxPropertyGridManager* GetDebuggerPropertyManagerGrid() { return m_debuggerPropertyManagerGrid; }
     wxPanel* GetDebuggerView() { return m_debuggerView; }
+    wxBitmapToggleButton* GetBtTogglePosSpy() { return m_btTogglePosSpy; }
     wxBitmapButton* GetBtClearPositionSpy() { return m_btClearPositionSpy; }
+    wxBitmapButton* GetBtCopyPosSpy() { return m_btCopyPosSpy; }
+    wxStaticText* GetStaticText4676() { return m_staticText4676; }
+    wxComboBox* GetCbContentPosSpy() { return m_cbContentPosSpy; }
     wxStaticText* GetStaticText4526() { return m_staticText4526; }
-    wxDataViewListCtrl* GetPositionSpy() { return m_positionSpy; }
+    wxStaticText* GetPositionSpyCount() { return m_positionSpyCount; }
+    wxStaticText* GetStaticText4659() { return m_staticText4659; }
+    wxListBox* GetPositionSpy() { return m_positionSpy; }
     wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }
@@ -1924,6 +1939,35 @@ public:
     }
 
     virtual ~ImageLibConfig();
+};
+
+
+class ImageLibPosSpy : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibPosSpy();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibPosSpy();
 };
 
 #endif

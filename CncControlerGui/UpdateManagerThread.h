@@ -3,30 +3,83 @@
 
 #include <wx/thread.h>
 #include "CncCommon.h"
-#include "ConcurrentQueue.h"
-#include "3D/VerticeData.h"
+#include "CncConfig.h"
 #include "CncPosition.h"
 
+////////////////////////////////////////////////////////////////////////////////////
+class UpdateManagerEvent;
+wxDECLARE_EVENT(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerEvent);
+
+class UpdateManagerEvent : public wxThreadEvent {
+	
+	public:
+		UpdateManagerEvent(wxEventType eventType = wxEVT_UPDATE_MANAGER_THREAD, int id = 0)
+		: wxThreadEvent(eventType, id)
+		, pos(0L, 0L, 0L)
+		, referenceId(-1L)
+		, speedMode('R')
+		, speedValue(0.0)
+		{}
+
+		UpdateManagerEvent(const UpdateManagerEvent& event)
+		: wxThreadEvent(event)
+		, pos(event.getCurrentPosition())
+		, referenceId(event.getReferenceId())
+		, speedMode(event.getSpeedMode())
+		, speedValue(event.getSpeedValue())
+		{
+			// already done by wxThreadEvent::wxThreadEvent(event)
+			// SetString(GetString().Clone());
+		}
+
+		virtual wxEvent *Clone() const {
+			return new UpdateManagerEvent(*this);
+		}
+		
+		const CncLongPosition& getCurrentPosition() const { return pos; }
+		void setCurrentPosition(const CncLongPosition& p) { pos.set(p); }
+		
+		const long getReferenceId() const { return referenceId; }
+		void setReferenceId(const long id) { referenceId = id; }
+		
+		const char getSpeedMode() const { return speedMode; }
+		void setSpeedMode(char m) { speedMode = m; }
+		
+		const double getSpeedValue() const { return speedValue; }
+		void setSpeedValue(double sv) { speedValue = sv; }
+		
+	private:
+		CncLongPosition pos;
+		
+		long referenceId;
+		char speedMode;
+		double speedValue;
+};
+
+typedef void (wxEvtHandler::*UpdateManagerEventFunction)(UpdateManagerEvent&);
+#define UpdateManagerEventHandler(func) wxEVENT_HANDLER_CAST(UpdateManagerEventFunction, func)
+
+////////////////////////////////////////////////////////////////////////////////////
 class MainFrame;
+
 class UpdateManagerThread : public wxThread {
 	
 	public:
-		enum SpeedMode{UNDEFINED = '\0', RAPID = 'R', WORK = 'W'};
+		enum SpyContent { APP_POSITIONS = 0, CTL_POSITIONS = 1};
+		enum EventId    { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4 };
+		enum SpeedMode  { UNDEFINED = '\0', RAPID = 'R', WORK = 'W' };
 		
 		struct Event{
 			enum Type { EMPTY_UPD, 
 			
-						QUEUE_RESET, 
 						POSSPY_RESET,
-						Z_VIEW_RESET,
 						
 						CONFIG_UPD,
 						COMMAND_UPD, 
-						APP_POS_UPD, 
-						CTL_POS_UPD,
-						Z_VIEW_UPD,
-						SPEED_UPD,
 						
+						APP_POS_UPD,
+						CTL_POS_UPD,
+					
 						SETTER_ADD
 					};
 			
@@ -42,46 +95,6 @@ class UpdateManagerThread : public wxThread {
 					return *this;
 				}
 				
-			//////////////////////////////////////////////////////////////
-			// no data
-			
-				inline const Event& QueueResetEvent() {
-					type         = QUEUE_RESET;
-					processed    = false;
-					return *this;
-				}
-				
-			//////////////////////////////////////////////////////////////
-			// no data
-			
-				inline const Event& ZViewResetEvent() {
-					type         = Z_VIEW_RESET;
-					processed    = false;
-					return *this;
-				}
-
-				inline const Event& ZViewUpdateEvent() {
-					type         = Z_VIEW_UPD;
-					processed    = false;
-					return *this;
-				}
-				
-			//////////////////////////////////////////////////////////////
-			struct Spd {
-				unsigned int xSpeed = 1; 
-				unsigned int ySpeed = 1; 
-				unsigned int zSpeed = 1; 
-			} spd;
-			
-				inline const Event& SpeedEvent(unsigned int xs, unsigned int ys, unsigned int zs) {
-					type         = SPEED_UPD;
-					processed    = false;
-					spd.xSpeed = xs; 
-					spd.ySpeed = ys;
-					spd.zSpeed = zs;
-					return *this;
-				}
-			
 			//////////////////////////////////////////////////////////////
 			struct Set {
 				unsigned char	id; 
@@ -122,53 +135,73 @@ class UpdateManagerThread : public wxThread {
 			//////////////////////////////////////////////////////////////
 			struct Pos {
 				long id					= -1;
+				double speedValue		= 0.0;
 				SpeedMode speedMode		= UNDEFINED;
-				CncLongPosition curr	= {0, 0, 0};
+				CncLongPosition pos	= {0, 0, 0};
+				
+				void reset() {
+					set();
+				}
+				
+				void set() {
+					id			= -1;
+					speedValue	= 0.0;
+					speedMode	= UNDEFINED;
+					pos.set({0, 0, 0});
+				}
+				
+				void set(long id, SpeedMode speedMode, double speedValue, const CncLongPosition& p) {
+					this->id			= id;
+					this->speedValue	= speedValue;
+					this->speedMode		= speedMode;
+					this->pos.set(p);
+				}
+
+				void set(long id, wxString speedMode, double sv, const CncLongPosition& p) {
+					SpeedMode sm;
+					switch ( (char)speedMode[0] ) {
+						case 'R':	sm = RAPID; break;
+						case 'W':	sm = WORK;  break;
+						default:	sm = UNDEFINED;
+					}
+					set(id, sm, sv, p);
+				}
+				
 			} pos;
 			
-				inline const Event& CtlPosEvent(const CncLongPosition& p) {
+				inline const Event& AppPosEvent(long i, SpeedMode sm, double sv, const CncLongPosition& p) {
+					type			= APP_POS_UPD;
+					processed    	= false;
+					pos.set(i, sm, sv, p);
+					return *this;
+				}
+				
+				inline const Event& AppPosEvent(long i, const wxString& sm, double sv, const CncLongPosition& p) {
+					type			= APP_POS_UPD;
+					processed    	= false;
+					pos.set(i, sm, sv, p);
+					return *this;
+				}
+
+				inline const Event& CtlPosEvent(long i, SpeedMode sm, double sv, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
-					pos.id			= -1;
-					pos.speedMode	= UNDEFINED;
-					pos.curr.set(p);
+					pos.set(i, sm, sv, p);
 					return *this;
 				}
 				
-				inline const Event& AppPosEvent(const CncLongPosition& p) {
-					type			= APP_POS_UPD;
+				inline const Event& CtlPosEvent(long i, const wxString& sm, double sv, const CncLongPosition& p) {
+					type			= CTL_POS_UPD;
 					processed    	= false;
-					pos.id			= -1;
-					pos.speedMode	= UNDEFINED;
-					pos.curr.set(p);
+					pos.set(i, sm, sv, p);
 					return *this;
 				}
-				
-				inline const Event& AppPosEvent(long i, SpeedMode s, const CncLongPosition& p) {
-					type			= APP_POS_UPD;
-					processed    	= false;
-					pos.id			= i;
-					pos.speedMode	= s;
-					pos.curr.set(p);
-					return *this;
-				}
-				
-				inline const Event& AppPosEvent(long i, const wxString& s, const CncLongPosition& p) {
-					type			= APP_POS_UPD;
-					processed    	= false;
-					pos.id			= i;
-					switch ( (char)s[0] ) {
-						case 'R':	pos.speedMode	= RAPID; break;
-						case 'W':	pos.speedMode	= WORK;  break;
-						default:	pos.speedMode	= UNDEFINED;
-					}
-					pos.curr.set(p);
-					return *this;
-				}
-				
 			//////////////////////////////////////////////////////////////
 			
 		};
+		
+		typedef std::vector<UpdateManagerThread::Event> PosSpyList;
+		typedef std::vector<UpdateManagerThread::Event> SetterList;
 		
 		UpdateManagerThread(MainFrame *handler);
 		~UpdateManagerThread();
@@ -177,52 +210,19 @@ class UpdateManagerThread : public wxThread {
 		void stop();
 		void postEvent(const UpdateManagerThread::Event& evt);
 		
+		void fillPositionSpy(wxListBox* lb, UpdateManagerThread::SpyContent sc, CncConfig& config);
+		
 	protected:
 		const unsigned int maxSetterEntries = 1000;
 		
 		MainFrame* pHandler;
-		bool queueReset;
 		bool exit;
 		
-		double displayFactX;
-		double displayFactY;
-		double displayFactZ;
-		
-		ConcurrentQueue<UpdateManagerThread::Event> eventQueue;
-		UpdateManagerThread::Event lastCmdEvent;
-		UpdateManagerThread::Event lastSpeedEvent;
-		UpdateManagerThread::Event lastAppPosEvent;
-		UpdateManagerThread::Event lastCtlPosEvent;
+		PosSpyList appPosSpyList;
+		PosSpyList ctlPosSpyList;
+		SetterList setterList;
 		
 		virtual ExitCode Entry();
-		
-	private:
-		inline void pop();
-		inline void postHeartbeat();
-		
-		inline void idle();
-		inline void freezeControl(wxWindow* ctl, bool onlyHidden);
-		inline void thawControl(wxWindow* ctl);
-		inline void freezeControls(bool state);
-		
-		inline void checkQueueReset();
-		
-		inline void immediateUpdate();
-		
-		inline void updateCmdInfo();
-		inline void updateAppPosition();
-		inline void updateCtlPosition();
-		inline void updatePositionSpy(UpdateManagerThread::Event evt);
-		inline void clearPositionSpy();
-		
-		inline void resetZView();
-		inline void updateZView();
-		
-		inline void updateSpeedView();
-		
-		inline void updateSetterList(UpdateManagerThread::Event evt);
-		
-		inline void configUpdate();
 };
 
 #endif
