@@ -43,6 +43,8 @@ class CncControl {
 			{}
 		};
 		
+		SetterMap setterMap;
+		
 	protected:
 		CncPortType portType;
 		// internal port object
@@ -214,6 +216,7 @@ class CncControl {
 		bool reset();
 		bool resetWatermarks();
 		// Setup the cnc control
+		void resetSetterMap();
 		void setup(bool reset = true);
 		// Measurements funtions
 		void logProcessingStart();

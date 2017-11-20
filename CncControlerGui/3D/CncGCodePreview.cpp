@@ -167,5 +167,5 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	double z = vd.getZ() / maxDimension;
 	
 	static GLI::GLCncPathVertices d;
-	preview->appendPathData(d.set(x, y, z, colour, formatType, vd.getMode())); 
+	preview->appendPathData(d.set(-1L, x, y, z, colour, formatType, vd.getMode())); 
 }

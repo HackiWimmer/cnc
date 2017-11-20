@@ -57,6 +57,11 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_ENABLE_PROBE_MODE]     = "Push Enable Probe Mode";
 	cmds[CMD_DISABLE_PROBE_MODE]    = "Push Disable Probe Mode";
+	
+	cmds[CMD_TEST_INFO_MESSAGE]     = "Pull Version";
+	cmds[CMD_TEST_WARN_MESSAGE]     = "Pull PIN Report";
+	cmds[CMD_TEST_ERROR_MESSAGE]    = "Pull Error Info";
+	
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoCMDs::getCMDLabel(unsigned int id) {
@@ -162,6 +167,9 @@ void ArduinoPIDs::init() {
 	
 	pids[PID_ERROR_COUNT]                     = "Error Count";
 	pids[PID_VERSION]                         = "Firmware Version";
+	
+	pids[PID_SEPARATOR]                       = "Separator";
+	
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {

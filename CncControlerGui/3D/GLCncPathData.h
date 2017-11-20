@@ -31,6 +31,7 @@ namespace GLI {
 			: _x(0)
 			, _y(0)
 			, _z(0)
+			, _id(-1L)
 			, colour(defaultColour)
 			, formatType(defaultFormatType)
 			, cncMode(defaultCncMode)
@@ -41,19 +42,21 @@ namespace GLI {
 			: _x(x)
 			, _y(y)
 			, _z(z)
+			, _id(-1L)
 			, colour(defaultColour)
 			, formatType(defaultFormatType)
 			, cncMode(defaultCncMode)
 			{}
 			
 			////////////////////////////////////////////
-			GLCncPathVertices(float x, float y, float z, 
+			GLCncPathVertices(long id, float x, float y, float z, 
 			                  const wxColour& col, 
 							  GLCncPathVertices::FormatType ft,
 							  GLCncPathVertices::CncMode cm) 
 			: _x(x)
 			, _y(y)
 			, _z(z)
+			, _id(id)
 			, colour(col)
 			, formatType(ft)
 			, cncMode(cm)
@@ -64,6 +67,7 @@ namespace GLI {
 			: _x(cpv.getX())
 			, _y(cpv.getY())
 			, _z(cpv.getZ())
+			, _id(cpv.getId())
 			, colour(cpv.getColour())
 			, formatType(cpv.getFormatType())
 			, cncMode(cpv.getCncMode())
@@ -79,34 +83,49 @@ namespace GLI {
 			const float getZ() const { return _z; }
 			
 			////////////////////////////////////////////
+			const long getId() const { return _id; }
+			
+			////////////////////////////////////////////
 			const GLCncPathVertices::FormatType getFormatType() const { return formatType; }
 			
 			////////////////////////////////////////////
 			const GLCncPathVertices::CncMode getCncMode() const { return cncMode; }
 			
 			////////////////////////////////////////////
-			const wxColour& getColour() const { return colour; }
+			const wxColour& getColour(long refID=-1L) const { 
+				if ( _id >= 0 && refID >= 0 ) {
+					if ( _id == refID )
+						return idColour;
+				}
+				
+				return colour; 
+			}
 			
 			////////////////////////////////////////////
-			const GLCncPathVertices& set(float x, float y, float z) {
+			const GLCncPathVertices& set(long id, float x, float y, float z) {
 				_x = x;
 				_y = y;
 				_z = z;
 				
+				id         = -1L;
+				
 				colour     = defaultColour;
 				formatType = defaultFormatType;
+				cncMode    = defaultCncMode;
 				
 				return *this;
 			}
 			
 			////////////////////////////////////////////
-			const GLCncPathVertices& set(float x, float y, float z, 
+			const GLCncPathVertices& set(long id, float x, float y, float z, 
 			                             const wxColour& col,
 			                             GLCncPathVertices::FormatType ft,
 										 GLCncPathVertices::CncMode cm) {
 				_x = x;
 				_y = y;
 				_z = z;
+				
+				_id = id;
 				
 				colour		= col;
 				formatType	= ft;
@@ -128,6 +147,10 @@ namespace GLI {
 			float _x;
 			float _y;
 			float _z;
+			
+			long _id;
+
+			const wxColour idColour = wxColour(255, 0, 0);
 			
 			wxColour   	colour;
 			FormatType 	formatType;
@@ -211,8 +234,8 @@ namespace GLI {
 			////////////////////////////////////////////
 			void clear() {
 				// reset boundings
-				minVecties.set(FLT_MAX, FLT_MAX, FLT_MAX);
-				maxVecties.set(FLT_MIN, FLT_MIN, FLT_MIN);
+				minVecties.set(-1L, FLT_MAX, FLT_MAX, FLT_MAX);
+				maxVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
 				
 				std::vector<GLCncPathVertices>::clear();
 			}

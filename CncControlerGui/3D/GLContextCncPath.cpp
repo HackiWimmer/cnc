@@ -33,7 +33,9 @@ GLViewPort* GLContextCncPath::createViewPort() {
 void GLContextCncPath::initContext() {
 /////////////////////////////////////////////////////////////////
 	// do context specific initalization here
-	glClearColor(0.0, 0.0, 0.0, 0.0);
+	if ( isEnabled() )	glClearColor(0.0, 0.0, 0.0, 0.0);
+	else 				glClearColor(127.0/255.0, 127.0/255.0, 127.0/255.0, 0.0);
+	
 	glShadeModel(GL_FLAT);
 	
 	glEnable(GL_LINE_SMOOTH);

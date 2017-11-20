@@ -24,6 +24,7 @@
 #include <wx/txtstrm.h>
 #include <wx/vscroll.h>
 #include <wx/textdlg.h>
+#include <wx/numformatter.h>
 #include <wx/clipbrd.h>
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
@@ -165,11 +166,12 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	SvgEditPopup::setMainFrame(this);
 	
 	// bind 
-	this->Bind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 		this);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 	this, UpdateManagerThread::EventId::APP_POS_UPDATE);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 	this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 		this, UpdateManagerThread::EventId::HEARTBEAT);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 	this, UpdateManagerThread::EventId::COMPLETED);
+	this->Bind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 				this);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 			this, UpdateManagerThread::EventId::APP_POS_UPDATE);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 			this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 				this, UpdateManagerThread::EventId::HEARTBEAT);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadDispatchAll,			this, UpdateManagerThread::EventId::DISPATCH_ALL);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 			this, UpdateManagerThread::EventId::COMPLETED);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -180,11 +182,12 @@ MainFrame::~MainFrame() {
 		waitActive(m_serialTimer->GetInterval());
 	
 	// unbind 
-	this->Unbind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 		this);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 	this, UpdateManagerThread::EventId::APP_POS_UPDATE);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 	this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 		this, UpdateManagerThread::EventId::HEARTBEAT);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 	this, UpdateManagerThread::EventId::COMPLETED);
+	this->Unbind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 				this);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 			this, UpdateManagerThread::EventId::APP_POS_UPDATE);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 			this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 				this, UpdateManagerThread::EventId::HEARTBEAT);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadDispatchAll, 			this, UpdateManagerThread::EventId::DISPATCH_ALL);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 			this, UpdateManagerThread::EventId::COMPLETED);
 	
 	// todo
 	//this->Unbind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent& event) {});
@@ -454,6 +457,7 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	
 	/*
 	cout << "testFunction2"<< endl;
 	clog << "testFunction2"<< endl;
@@ -483,6 +487,8 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 	cnc::trc.resetTextAttr();
 	cnc::trc << " Hallo";
 	*/
+	
+	cnc::trc.logWarning("This is a test warinig");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::startupTimer(wxTimerEvent& event) {
@@ -600,20 +606,26 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 			m_positionSpy->Freeze();
 			updateManagerThread->fillPositionSpy(m_positionSpy, sc, *GBL_CONFIG);
 			m_positionSpy->Thaw();
-			
-			if ( lastCount != m_positionSpy->GetCount() ) {
-				m_positionSpyCount->SetLabel(wxString::Format("# %010u", m_positionSpy->GetCount()));
-				m_positionSpyCount->SetToolTip(m_positionSpyCount->GetLabel());
-				lastCount = m_positionSpy->GetCount();
-			}
 		}
+	}
+
+	if ( lastCount != m_positionSpy->GetCount() ) {
+		//m_positionSpyCount->SetLabel(wxString::Format("# %010u", m_positionSpy->GetCount()));
+		m_positionSpyCount->SetLabel(wxNumberFormatter::ToString(((long)(m_positionSpy->GetCount()))));
+		m_positionSpyCount->SetToolTip(m_positionSpyCount->GetLabel());
+		lastCount = m_positionSpy->GetCount();
 	}
 	
 	// update time consumed
-	if ( pngAnimation->IsRunning() ) {
+	if ( pngAnimation && pngAnimation->IsRunning() ) {
 		processEndTime = wxDateTime::UNow();
 		logTimeConsumed();
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onThreadDispatchAll(UpdateManagerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	dispatchAll();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onThreadCompletion(UpdateManagerEvent& event) {
@@ -1154,7 +1166,7 @@ void MainFrame::initialize(void) {
 	initializeCncControl();
 	
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_SETTER_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
 	
 	// curve lib resulotion
 	CncConfig::gblCurveLibSelector = m_cbCurveLibResolution;
@@ -1793,6 +1805,11 @@ void MainFrame::defineDebugSerial(wxCommandEvent& event) {
 void MainFrame::updateMonitoring() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
+	
+	if ( motionMonitor != NULL ) {
+		motionMonitor->enable(m_menuItemUpdDraw->IsChecked());
+		motionMonitor->display();
+	}
 	
 	CncConfig::getGlobalCncConfig()->setOnlineUpdateCoordinates(m_menuItemUpdCoors->IsChecked());
 	CncConfig::getGlobalCncConfig()->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
@@ -2442,7 +2459,8 @@ bool MainFrame::processControllerTestSuite() {
 	cnc->processSetter(PID_TEST_VALUE3, atol(m_ctrlTestParam3->GetValue()));
 	cnc->processSetter(PID_TEST_VALUE4, atol(m_ctrlTestParam4->GetValue()));
 	cnc->processSetter(PID_TEST_VALUE5, atol(m_ctrlTestParam5->GetValue()));
-
+	updateSetterList();
+	
 	// run test
 	bool ret = false;
 
@@ -2906,6 +2924,22 @@ void MainFrame::collectSummary() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::updateSetterList() {
+///////////////////////////////////////////////////////////////////
+	if ( updateManagerThread == NULL )
+		return;
+		
+	startAnimationControl();
+	if ( m_setterList->IsFrozen() == false )
+		m_setterList->Freeze();
+		
+	updateManagerThread->fillSetterList(m_setterList);
+	
+	if ( m_setterList->IsFrozen() == true )
+		m_setterList->Thaw();
+	stopAnimationControl();
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// check if currentla a run is active and return if so to avoid 
@@ -2924,6 +2958,10 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 		switch ( sel ) {
 			case OutboundCfgSelection::VAL::SUMMARY_PANEL:
 					collectSummary();
+					break;
+					
+			case OutboundCfgSelection::VAL::CNC_SETTER_PANEL:
+					updateSetterList();
 					break;
 					
 			case OutboundCfgSelection::VAL::CNC_PIN_PANEL:
@@ -3000,7 +3038,10 @@ bool MainFrame::processTemplate() {
 	resetMinMaxPositions();
 	updateCncConfigTrace();
 	CncConfig::getGlobalCncConfig()->setAllowEventHandling(true);
+	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
 	cnc->processCommand("r", std::cout);
+	cnc->getSerial()->resetPostionCounter();
+	cnc->getSerial()->resetStepCounter();
 	cnc->logProcessingStart();
 	cnc->enableStepperMotors(true);
 	freezeLogger();
@@ -3068,6 +3109,9 @@ bool MainFrame::processTemplate() {
 	unfreezeLogger();
 	enableControls();
 	stopAnimationControl();
+	
+	clog << "Position Counter: " << cnc->getSerial()->getPostionCounter() << endl;
+	clog << "Step Counter:     " << cnc->getSerial()->getStepCounter() << endl;
 	
 	return ret;
 }
@@ -3497,8 +3541,12 @@ void MainFrame::requestReset() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	m_logger->Clear();
-	cnc->reset();
+	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RESET);
+	//cnc->reset();
+	cnc->setup(true);
 	cnc->clearDrawControl();
+	
+	updateSetterList();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestReset(wxCommandEvent& event) {
@@ -3647,6 +3695,12 @@ void MainFrame::updateFileContentPosition() {
 	wxString label = "Column: ";
 	label << x + 1;
 	m_filePosition->SetLabel(label);
+	
+	// try to select current  line as client id
+	if ( motionMonitor != NULL ) {
+		motionMonitor->setCurrentClientId(y);
+		motionMonitor->display();
+	}
 	
 	// display gcode help hint
 	m_svgEditStatus->SetValue("");
@@ -6419,7 +6473,36 @@ void MainFrame::selectPositionSpy(wxCommandEvent& event) {
 		return;
 	
 	wxString content(m_positionSpy->GetString(item));
-	clog << content << endl;
+	wxString lineNumber(content.BeforeFirst(' '));
+	
+	long ln =0L;
+	lineNumber.ToLong(&ln);
+	ln -= 1L;
+	
+	if ( ln <= 0L )
+		return;
+	
+	// select source control - try to find ref as line number
+	if ( inboundFileParser != NULL ) {
+		inboundFileParser->selectSourceControl(ln);
+	} else {
+		// select editor directly
+		m_stcFileContent->GotoLine(ln);
+		
+		if ( ln == 0 ) {
+			m_stcFileContent->SetSelectionStart(0);
+			m_stcFileContent->SetSelectionEnd(0);
+		} else {
+			m_stcFileContent->SetSelectionStart(m_stcFileContent->GetCurrentPos());
+			m_stcFileContent->SetSelectionEnd(m_stcFileContent->GetLineEndPosition(ln));
+		}
+	}
+	
+	// mark this id
+	if ( motionMonitor != NULL ) {
+		motionMonitor->setCurrentClientId(ln + 1);
+		motionMonitor->display();
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectPositionSpyContent(wxCommandEvent& event) {
@@ -6473,4 +6556,55 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	cnc::trc.logInfoMessage("");
 	std::clog << wxString::Format("Loop Repeat Test Sumary: Count: % 6d [#]; AVG Duration: % 10ld [ms]", loopCount, duration / loopCount) << std::endl;
 	SetTitle(title);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::clearSetterList(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	umPostEvent(evt.SetterListResetEvent());
+	
+	m_setterList->DeleteAllItems();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::sizeSetterList(wxSizeEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( m_setterList->IsFrozen() == false )
+		m_setterList->Freeze();
+		
+	// first set default sizes depending on content
+	m_setterList->SetColumnWidth(UpdateManagerThread::UMT_SETLST_NUM, wxLIST_AUTOSIZE);
+	m_setterList->SetColumnWidth(UpdateManagerThread::UMT_SETLST_KEY, wxLIST_AUTOSIZE);
+	m_setterList->SetColumnWidth(UpdateManagerThread::UMT_SETLST_VAL, wxLIST_AUTOSIZE);
+	
+	// try to strech the second (key) column
+	const int scrollbarWidth = 26;
+	int size = m_setterList->GetSize().GetWidth() 
+	           - m_setterList->GetColumnWidth(UpdateManagerThread::UMT_SETLST_NUM) 
+			   - m_setterList->GetColumnWidth(UpdateManagerThread::UMT_SETLST_VAL) 
+			   - scrollbarWidth;
+			   
+	if ( size > m_setterList->GetColumnWidth(UpdateManagerThread::UMT_SETLST_KEY) )
+		m_setterList->SetColumnWidth(UpdateManagerThread::UMT_SETLST_KEY, size);
+		
+	if ( m_setterList->IsFrozen() == true )
+		m_setterList->Thaw();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::requestInfoMessage(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc )
+		cnc->processCommand(CMD_TEST_INFO_MESSAGE, std::clog);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::requestWarningMessage(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc )
+		cnc->processCommand(CMD_TEST_WARN_MESSAGE, std::clog);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::requestErrorMessage(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc )
+		cnc->processCommand(CMD_TEST_ERROR_MESSAGE, std::clog);
 }

@@ -128,11 +128,13 @@ class MainApp : public wxApp {
 	private:
 		wxCmdLineParser parser;
 		wxFileConfig* globalFileConfig;
+		wxLocale local;
 	
 	public:
 		///////////////////////////////////////////////////////////
 		MainApp() 
 		: globalFileConfig(NULL)
+		, local(wxLANGUAGE_DEFAULT)
 		{
 		///////////////////////////////////////////////////////////
 			// init file and dir names

@@ -51,7 +51,7 @@ void GLContextCncPathBase::drawPoints() {
 				}
 			}
 			
-			glColor4ub(it->getColour().Red(), it->getColour().Green(), it->getColour().Blue(), alpha);
+			glColor4ub(it->getColour(currentClientId).Red(), it->getColour(currentClientId).Green(), it->getColour(currentClientId).Blue(), alpha);
 			
 			// determine the vertice
 			glVertex3f(it->getX(), it->getY(), it->getZ());
@@ -109,7 +109,7 @@ void GLContextCncPathBase::drawLines() {
 				}
 			}
 			
-			glColor4ub(curr->getColour().Red(), curr->getColour().Green(), curr->getColour().Blue(), alpha);
+			glColor4ub(curr->getColour(currentClientId).Red(), curr->getColour(currentClientId).Green(), curr->getColour(currentClientId).Blue(), alpha);
 			
 			glBegin(GL_LINES);
 				glVertex3f(prev->getX(), prev->getY(), prev->getZ());
@@ -156,7 +156,7 @@ void GLContextCncPathBase::drawLineStrips() {
 				}
 			}
 			
-			glColor4ub(it->getColour().Red(),it->getColour().Green(),it->getColour().Blue(), alpha);
+			glColor4ub(it->getColour(currentClientId).Red(),it->getColour(currentClientId).Green(),it->getColour(currentClientId).Blue(), alpha);
 			
 			// determine the vertice
 			glVertex3f(it->getX(), it->getY(), it->getZ());

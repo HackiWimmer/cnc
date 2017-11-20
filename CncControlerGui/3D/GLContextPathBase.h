@@ -17,6 +17,7 @@ class GLContextCncPathBase : public GLContextBase {
 		: GLContextBase(canvas)
 		, cncPath()
 		, drawType(DT_LINE_STRIP)
+		, currentClientId(-1L)
 		, boundBox(true)
 		, boundBoxColour(185, 127, 87)
 		{
@@ -68,6 +69,9 @@ class GLContextCncPathBase : public GLContextBase {
 		}
 		
 		/////////////////////////////////////////////////////////
+		void setCurrentClientId(long id) { currentClientId = id; }
+		
+		/////////////////////////////////////////////////////////
 		GLContextCncPathBase::DrawType getDrawType() { return drawType; }
 		void setDrawType(GLContextCncPathBase::DrawType t) { drawType = t; }
 		
@@ -78,10 +82,16 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		void setBoundBoxColour(const wxColour& c) {  boundBoxColour = c; }
 		const wxColour& getBoundBoxColour() { return boundBoxColour; }
+		
+		// origin
+		int getOriginX() { return ( viewPort != NULL ? viewPort->getX() : 0 ); }
+		int getOriginY() { return ( viewPort != NULL ? viewPort->getY() : 0 ); }
 
 	protected:
 		GLI::GLCncPath	cncPath;
 		DrawType drawType;
+		
+		long currentClientId;
 		
 		bool boundBox;
 		wxColour boundBoxColour;

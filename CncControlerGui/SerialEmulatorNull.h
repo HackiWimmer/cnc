@@ -7,7 +7,7 @@
 struct LastCommand {
 	unsigned char cmd 		= '\0';
 	unsigned int index 		= 0;
-	
+		
 	void restLastCmd() {
 		cmd 				= '\0';
 		index 				= 0;
@@ -32,14 +32,23 @@ struct LastCommand {
 		int32_t lastMoveZ 			= 0;
 	} Mc;
 	
-};
+	void resetMSG() {
+		Msg.text.clear();
+	}
 
-typedef std::map<int, int32_t> SetterMap;
+	struct MSG {
+		unsigned char type 		= 'I';
+		wxString text			= "";
+	} Msg;
+	
+};
 
 class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
 		int32_t posReplyThreshold;
+		size_t positionCounter;
+		size_t stepCounter;
 		SetterMap setterMap;
 		CncLongPosition curEmulatorPos;
 		unsigned char lastSignal;
@@ -61,6 +70,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte);
 		
 		virtual int readDefault(void *buffer, unsigned int nbByte, const char* response);
+		virtual int readMessage(void *buffer, unsigned int nbByte, const char* response);
 		virtual int readMove(void *buffer, unsigned int nbByte);
 
 		virtual int getCurrentMoveCmdPID();
@@ -92,6 +102,13 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual int readData(void *buffer, unsigned int nbByte);
 		// simulate write
 		virtual bool writeData(void *buffer, unsigned int nbByte);
+		
+		// position movement counting
+		virtual void resetPostionCounter();
+		virtual size_t getPostionCounter();
+
+		virtual void resetStepCounter();
+		virtual size_t getStepCounter();
 };
 
 #endif

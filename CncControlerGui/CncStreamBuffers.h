@@ -191,6 +191,11 @@ class CncBasicLogStream : public std::stringstream {
 class CncTraceLogStream : public CncBasicLogStream {
 	
 	protected:
+		
+		wxColour infoColour;
+		wxColour warningColour;
+		wxColour errorColour;
+		
 		///////////////////////////////////////////////////////////
 		virtual void logMessage(const char* m) {
 			clear();
@@ -218,11 +223,17 @@ class CncTraceLogStream : public CncBasicLogStream {
 		///////////////////////////////////////////////////////////
 		CncTraceLogStream() 
 		: CncBasicLogStream()
+		, infoColour(*wxWHITE)
+		, warningColour(255, 201, 14)
+		, errorColour(*wxRED)
 		{}
 
 		///////////////////////////////////////////////////////////
 		CncTraceLogStream(const CncTraceLogStream& ctb) 
 		: CncBasicLogStream()
+		, infoColour(*wxWHITE)
+		, warningColour(255, 201, 14)
+		, errorColour(*wxRED)
 		{}
 
 		///////////////////////////////////////////////////////////
@@ -239,7 +250,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		///////////////////////////////////////////////////////////
 		void logInfoMessage(const char* m) {
 			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(*wxBLACK));
+				getTextControl()->SetDefaultStyle(wxTextAttr(infoColour));
 				logMessage(m);
 			}
 		}
@@ -247,7 +258,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		///////////////////////////////////////////////////////////
 		void logWarningMessage(const char* m) {
 			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(wxColour(255, 201, 14)));
+				getTextControl()->SetDefaultStyle(wxTextAttr(warningColour));
 				logMessage(m);
 			}
 		}
@@ -255,10 +266,15 @@ class CncTraceLogStream : public CncBasicLogStream {
 		///////////////////////////////////////////////////////////
 		void logErrorMessage(const char* m) {
 			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(*wxRED));
+				getTextControl()->SetDefaultStyle(wxTextAttr(errorColour));
 				logMessage(m);
 			}
 		}
+		
+		///////////////////////////////////////////////////////////
+		void setInfoColour(const wxColour& c) 		{ infoColour = c; }
+		void setWarningColour(const wxColour& c) 	{ warningColour = c; }
+		void setErrorColour(const wxColour& c) 		{ errorColour = c; }
 		
 		///////////////////////////////////////////////////////////
 		void logInfo(const char* m) 	{ logInfoMessage(m); }
@@ -299,12 +315,17 @@ class CncMsgLogStream : public CncTraceLogStream {
 		///////////////////////////////////////////////////////////
 		CncMsgLogStream() 
 		: CncTraceLogStream()
-		{}
-
+		{
+			setInfoColour(*wxBLACK);
+			setWarningColour(wxColour(128, 64, 0));
+		}
+		
 		///////////////////////////////////////////////////////////
 		CncMsgLogStream(const CncMsgLogStream& cmb) 
 		: CncTraceLogStream()
-		{}
+		{
+			setInfoColour(*wxBLACK);
+		}
 
 		///////////////////////////////////////////////////////////
 		virtual ~CncMsgLogStream() 

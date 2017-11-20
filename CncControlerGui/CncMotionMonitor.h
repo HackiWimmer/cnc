@@ -38,6 +38,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		void onKeyDown(wxKeyEvent& event);
 		
 		// interface
+		void enable(bool state);
 		void clear();
 		void display();
 		void appendVertice(const GLI::VerticeLongData& vd);
@@ -106,7 +107,12 @@ class CncMotionMonitor : public wxGLCanvas {
 		void enableBoundBox(bool enable) { monitor->enableBoundBox(enable); }
 		const wxColour& getBoundBoxColour() { return monitor->getBoundBoxColour(); }
 		void setBoundBoxColour(const wxColour& c) { monitor->setBoundBoxColour(c); }
-			
+		
+		// client id
+		long getCurrentClientId() { return currentClientID; }
+		void setCurrentClientId(long id) { currentClientID = id; monitor->setCurrentClientId(id); }
+		void resetCurrentClientId() { setCurrentClientId(-1L); }
+		
 	protected:
 	
 		CncMotionMonitor::Flags		flags;
@@ -123,6 +129,8 @@ class CncMotionMonitor : public wxGLCanvas {
 		
 		float zoom;
 		
+		bool currentClientID;
+		
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);
@@ -132,7 +140,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		void view(GLContextBase::ViewMode fm);
 		
 	private:
-		inline void appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
+		inline void appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
 		inline void onPaint();
 		
 		wxDECLARE_NO_COPY_CLASS(CncMotionMonitor);

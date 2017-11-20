@@ -49,9 +49,9 @@
 #include <wx/listbox.h>
 #include "CncZView.h"
 #include <wx/listbook.h>
+#include <wx/listctrl.h>
 #include <wx/webview.h>
 #include "CncSpeedView.h"
-#include <wx/listctrl.h>
 #include <wx/timer.h>
 #include <wx/splitter.h>
 #include <wx/treectrl.h>
@@ -369,7 +369,8 @@ protected:
     wxButton* m_btConfirmRun;
     wxPanel* m_cncSetters;
     wxStaticText* m_staticText1150;
-    wxDataViewListCtrl* m_dvListCtrlProcessedSetters;
+    wxButton* m_btClearSetterList;
+    wxListCtrl* m_setterList;
     wxPanel* m_controllerConfiguration;
     wxStaticText* m_staticText12831;
     wxButton* m_btRequestCtlConfig;
@@ -572,6 +573,10 @@ protected:
     wxMenuItem* m_miRqtPins;
     wxMenuItem* m_menuErrorCount;
     wxMenuItem* m_miRqtErrorInfo;
+    wxMenuItem* m_menuItem46971;
+    wxMenuItem* m_menuItemInfoMessage;
+    wxMenuItem* m_menuItemWarningMessage;
+    wxMenuItem* m_menuItemErrorMessage;
     wxMenuItem* m_menuItem1187;
     wxMenuItem* m_miMotorEnableState;
     wxMenuItem* m_menuItem881;
@@ -729,6 +734,8 @@ protected:
     virtual void nootebookConfigChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
+    virtual void sizeSetterList(wxSizeEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
@@ -824,6 +831,9 @@ protected:
     virtual void requestPins(wxCommandEvent& event) { event.Skip(); }
     virtual void requestErrorCount(wxCommandEvent& event) { event.Skip(); }
     virtual void requestErrorInfo(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestInfoMessage(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestWarningMessage(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestErrorMessage(wxCommandEvent& event) { event.Skip(); }
     virtual void requestEnableStepperMotors(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }
@@ -1119,7 +1129,8 @@ public:
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetPanel2601() { return m_panel2601; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
-    wxDataViewListCtrl* GetDvListCtrlProcessedSetters() { return m_dvListCtrlProcessedSetters; }
+    wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
+    wxListCtrl* GetSetterList() { return m_setterList; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
     wxStaticText* GetStaticText12831() { return m_staticText12831; }
     wxButton* GetBtRequestCtlConfig() { return m_btRequestCtlConfig; }

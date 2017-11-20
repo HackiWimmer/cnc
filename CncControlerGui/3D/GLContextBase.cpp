@@ -15,6 +15,7 @@
 /////////////////////////////////////////////////////////////////
 GLContextBase::GLContextBase(wxGLCanvas* canvas) 
 : wxGLContext(canvas)
+, enabled(true)
 , initialized(false)
 , drawViewPortBounderies(true)
 , posMarker(true)
@@ -543,6 +544,17 @@ void GLContextBase::display() {
 	
 	//first position the camera
 	determineCameraPosition();
+
+	// inactive message
+	if ( isEnabled() == false ) {
+		glPushMatrix();
+			glColor3ub(128, 0, 0);
+			renderBitmapString(0.0, 0.0, 0.0, GLUT_BITMAP_HELVETICA_18, "Inactive");
+		glPopMatrix();
+		glFlush();
+		checkGLError();
+		return;
+	}
 	
 	// main model
 	glPushMatrix();

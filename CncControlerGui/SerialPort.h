@@ -12,7 +12,8 @@
 #include "CncCommon.h"
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
-//#include <windows.h>
+
+typedef std::map<int, int32_t> SetterMap;
 
 class CncControl;
 
@@ -241,6 +242,13 @@ class Serial {
 		bool sendPause() 		{ return sendSignal(SIG_PAUSE); }
 		bool sendResume() 		{ return sendSignal(SIG_RESUME); }
 		
+		// position movement counting
+		virtual void resetPostionCounter();
+		virtual size_t getPostionCounter();
+
+		virtual void resetStepCounter();
+		virtual size_t getStepCounter();
+				
 		//SVG path handling
 		virtual void setSVGOutputParameters(const SvgOutputParameters& sp) {}
 		virtual void beginSVG(SVGUnit u, double width, double heigth, const wxString& viewBox = "" ) {}

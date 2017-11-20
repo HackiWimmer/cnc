@@ -65,6 +65,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , cameraRotationSpeed(100)
 , isShown(false)
 , zoom(2.0f)
+, currentClientID(-1L)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
@@ -88,6 +89,11 @@ CncMotionMonitor::~CncMotionMonitor() {
 
 	if ( optionDlg != NULL ) 
 		delete optionDlg;
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::enable(bool state) {
+//////////////////////////////////////////////////
+	monitor->enable(state);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::clear() {
@@ -121,7 +127,7 @@ void CncMotionMonitor::reconstruct() {
 		// reconstruct
 		GLI::GLCncPathVertices d;
 		for ( GLI::GLCncPath::iterator it = tmpPath.begin(); it != tmpPath.end(); ++it )
-			appendVertice(it->getX(), it->getY(), it->getZ(), it->getCncMode());
+			appendVertice(it->getId(), it->getX(), it->getY(), it->getZ(), it->getCncMode());
 		
 		// redraw the scene with new properties
 		display();
@@ -141,15 +147,14 @@ void CncMotionMonitor::appendVertice(const GLI::VerticeLongData& vd) {
 	// To do this first we need to normalize the values for x, y and z 
 	// to a common unit like [mm], because [steps] are depends on 
 	// the corresponding pitch which is configured for each axis separatly 
-	
 	float x = vd.getX() / CncConfig::getGlobalCncConfig()->getDispFactX3D(); 
 	float y = vd.getY() / CncConfig::getGlobalCncConfig()->getDispFactY3D();
 	float z = vd.getZ() / CncConfig::getGlobalCncConfig()->getDispFactZ3D();
 	
-	appendVertice(x, y, z, vd.getMode());
+	appendVertice(vd.getId(), x, y, z, vd.getMode());
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::appendVertice(float x, float y, float z, GLI::GLCncPathVertices::CncMode cm) {
+void CncMotionMonitor::appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm) {
 //////////////////////////////////////////////////
 	// x, y, z have to be given as glpos
 
@@ -173,7 +178,7 @@ void CncMotionMonitor::appendVertice(float x, float y, float z, GLI::GLCncPathVe
 	// append
 	// todo - avoid duplicates last != new
 	static GLI::GLCncPathVertices d;
-	monitor->appendPathData(d.set(x, y, z, colour, formatType, cm)); 
+	monitor->appendPathData(d.set(id, x, y, z, colour, formatType, cm)); 
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::view(GLContextBase::ViewMode fm) {
@@ -252,14 +257,45 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		display();
 	}
 	
-	// left button
-	if ( event.LeftIsDown() == true ) {
-		// reverse y because the opengl viewport origin (0,0) is at left/bottom
-		int x = event.GetX();
-		int y = cs.GetHeight() - event.GetY();
+	if ( false ) {
+		#warning - how to?
+		static int ox, oy, x, y;
 		
-		monitor->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
-		display();
+		if ( event.LeftDown() == true ) {
+			ox = monitor->getOriginX() / 8;
+			oy = monitor->getOriginY() / 8;
+			x = event.GetX();
+			y = event.GetY();
+			
+			cerr << x << endl;
+			cerr << y << endl;
+		}
+
+		if ( event.LeftUp() == true ) {
+			int dx = event.GetX() - x;
+			int dy = event.GetY() - y;
+			
+			ox += dx;
+			oy += dy;
+			oy = cs.GetHeight() - y;
+			
+			clog << dx << ", " << ox << endl;
+			clog << dy << ", " << oy << endl;
+
+			monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+			display();
+		}
+	} else {
+		
+		// left button
+		if ( event.LeftIsDown() == true ) {
+			// reverse y because the opengl viewport origin (0,0) is at left/bottom
+			int x = event.GetX();
+			int y = cs.GetHeight() - event.GetY();
+			
+			monitor->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
+			display();
+		}
 	}
 }
 //////////////////////////////////////////////////
@@ -336,6 +372,8 @@ void CncMotionMonitor::pushProcessMode() {
 	//monitor->normalizeRotation();
 	monitor->setAutoScaling(getFlags().autoScaling);
 	monitor->enablePositionMarker(getFlags().positionMarker);
+	
+	resetCurrentClientId();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::popProcessMode() {

@@ -24,6 +24,7 @@ static CommandTemplates CMDTPL;
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
 : currentClientId(-1)
+, setterMap()
 , portType(pt)
 , serialPort(NULL)
 , cncConfig(NULL)
@@ -156,6 +157,16 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 
 	if ( isConnected() == false )
 		return false;
+	
+	#warning todo - impl setterMap as parameter bool + resetSetterMap() if value change
+	if ( true ) {
+		auto it = setterMap.find((int)id);
+		if ( it != setterMap.end() ) {
+			// value dosen't changed
+			if ( it->second == value )
+				return true;
+		}
+	}
 		
 	if ( serialPort->processSetter(id, value) == false ) {
 		std::cerr << std::endl << "CncControl::processSetterList: Setter failed." << std::endl;
@@ -163,22 +174,24 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 		std::cerr << " Value: " << value << std::endl;
 
 		return false;
-		
-	} else {
-		
-		typedef UpdateManagerThread::Event Event;
-		static Event evt;
-		
-		if ( GET_GUI_CTL(mainFrame) )
-			GET_GUI_CTL(mainFrame)->umPostEvent(evt.SetterEvent(id, value));
 	}
+	
+	// store
+	setterMap[id] = value;
+	
+	// publish setter event
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SetterEvent(id, value));
 
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processSetterList(std::vector<SetterTuple>& setup) {
 ///////////////////////////////////////////////////////////////////
-	for (std::vector<SetterTuple>::iterator it = setup.begin(); it != setup.end(); ++it) {
+	for ( auto it = setup.begin(); it != setup.end(); ++it) {
 		if ( processSetter((*it).id, (*it).value) == false ) {
 			return false;
 		}
@@ -187,10 +200,18 @@ bool CncControl::processSetterList(std::vector<SetterTuple>& setup) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
+void CncControl::resetSetterMap() {
+///////////////////////////////////////////////////////////////////
+	setterMap.clear();
+}
+///////////////////////////////////////////////////////////////////
 void CncControl::setup(bool doReset) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
 	wxASSERT(cncConfig);
+	
+	// always reset the map here to definitly reinitianlize the controller
+	resetSetterMap();
 	
 	if ( serialPort->isConnected() == false) 
 		return;
@@ -205,6 +226,8 @@ void CncControl::setup(bool doReset) {
 	std::cout << " Starting Controller initialization . . . ";
 
 	std::vector<SetterTuple> setup;
+	setup.push_back(SetterTuple(PID_SEPARATOR, SEPARARTOR_SETUP));
+	
 	setup.push_back(SetterTuple(PID_STEPS_X, cncConfig->getStepsX()));
 	setup.push_back(SetterTuple(PID_STEPS_Y, cncConfig->getStepsY()));
 	setup.push_back(SetterTuple(PID_STEPS_Z, cncConfig->getStepsZ()));

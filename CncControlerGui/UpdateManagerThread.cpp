@@ -1,4 +1,6 @@
 #include <iostream>
+#include <wx/intl.h>
+#include <wx/numformatter.h>
 #include "MainFrame.h"
 #include "UpdateManagerThread.h"
 
@@ -115,31 +117,127 @@ void UpdateManagerThread::fillPositionSpy(wxListBox* lb, UpdateManagerThread::Sp
 		
 		//clog << posSpyList->size() << ", " << lb->GetCount()  << endl;
 		
-		const int insertPos = 0;
+		const int insertPos 	= 0;
+		unsigned long prevCount = lb->GetCount();
+		wxString row;
+		
 		PosSpyList* list = ( sc == UpdateManagerThread::SpyContent::APP_POSITIONS ? &appPosSpyList : &ctlPosSpyList );
 		for ( auto it = list->begin() + lb->GetCount(); it != list->end(); ++it ) {
 			
 			switch ( unit ) {
-				case CncSteps:	lb->Insert(wxString::Format("%08ld %c%05.1lf % 10ld  % 10ld  % 10ld", 
-															it->pos.id,
-															(char)it->pos.speedMode,
-															it->pos.speedValue,
-															it->pos.pos.getX(), 
-															it->pos.pos.getY(), 
-															it->pos.pos.getZ()), insertPos);
+				case CncSteps:	row.Printf("%08ld %c%05.1lf % 10ld  % 10ld  % 10ld", 
+											it->pos.id,
+											(char)it->pos.speedMode,
+											it->pos.speedValue,
+											it->pos.pos.getX(), 
+											it->pos.pos.getY(), 
+											it->pos.pos.getZ());
 								break;
 								
-				case CncMetric:
-								lb->Insert(wxString::Format("%08ld %c%05.1lf % 10.3lf  % 10.3lf  % 10.3lf", 
-															it->pos.id,
-															(char)it->pos.speedMode,
-															it->pos.speedValue,
-															it->pos.pos.getX() * displayFactX, 
-															it->pos.pos.getY() * displayFactY, 
-															it->pos.pos.getZ() * displayFactZ), insertPos);
+				case CncMetric:	row.Printf("%08ld %c%05.1lf % 10.3lf  % 10.3lf  % 10.3lf", 
+											it->pos.id,
+											(char)it->pos.speedMode,
+											it->pos.speedValue,
+											it->pos.pos.getX() * displayFactX, 
+											it->pos.pos.getY() * displayFactY, 
+											it->pos.pos.getZ() * displayFactZ);
 								break;
 			}
+			
+			//lb->Insert(row, insertPos);
+			lb->Append(row);
+			
+			if ( lb->GetCount() - prevCount >= 5000 )
+				break;
 		}
+	}
+}
+///////////////////////////////////////////////////////////////////
+void UpdateManagerThread::fillSetterList(wxListCtrl* lb) {
+///////////////////////////////////////////////////////////////////
+	if( lb == NULL )
+		return;
+		
+	{
+		// ensure no one else updates posSpyList
+		wxCriticalSectionLocker lock(pHandler->pThreadCS);
+		
+		// decorate the columns
+		if ( lb->GetColumnCount() == 0 ) {
+			lb->AppendColumn("#:", 		wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
+			lb->AppendColumn("Key:",	wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
+			lb->AppendColumn("Value:", 	wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
+			
+			lb->SetSingleStyle(wxLC_HRULES | wxLC_VRULES, true);
+		}
+		
+		// fill/append the list
+		const int insertPos = 0;
+		unsigned long count = lb->GetItemCount();
+		std::string retVal;
+		
+		for ( auto it = setterList.begin() + lb->GetItemCount(); it != setterList.end(); ++it ) {
+			lb->InsertItem(insertPos, "",  0);
+
+			if ( it->set.id == PID_SEPARATOR ) {
+				wxString label("Bookmark: Type(<DEFAULT>)");
+				wxColour bgColour(*wxBLACK);
+				wxColour fgColour(*wxWHITE);
+				
+				switch ( it->set.value ) {
+					case SEPARARTOR_SETUP:		label.assign("Bookmark: Type(<SETUP>)");
+												bgColour.Set(0, 64, 64);
+												break;
+												
+					case SEPARARTOR_RESET:		label.assign("Bookmark: Type(<RESET>)");
+												bgColour.Set(0, 0, 64);
+												break;
+												
+					case SEPARARTOR_RUN:		label.assign("Bookmark: Type(<RUN>)");
+												bgColour.Set(128, 64, 64);
+												break;
+					default:					;
+				}
+				
+				lb->SetItemBackgroundColour(insertPos, bgColour);
+				lb->SetItemTextColour(insertPos, fgColour);
+				
+				lb->SetItem(insertPos, UMT_SETLST_NUM, wxString::Format("%010lu", ++count));
+				lb->SetItem(insertPos, UMT_SETLST_KEY, wxString::Format("%s:", label));
+				lb->SetItem(insertPos, UMT_SETLST_VAL, wxString::Format("%s.%03ld", it->ts.FormatTime(), it->ts.GetMillisecond()));
+				
+			} else {
+				lb->SetItem(insertPos, UMT_SETLST_NUM, wxString::Format("%010lu", ++count));
+				lb->SetItem(insertPos, UMT_SETLST_KEY, ArduinoPIDs::getPIDLabel((int)it->set.id, retVal));
+
+				switch ( it->set.id ) {
+					case PID_PITCH_X:
+					case PID_PITCH_Y:
+					case PID_PITCH_Z:		lb->SetItem(insertPos, UMT_SETLST_VAL, wxNumberFormatter::ToString((double)(it->set.value/1000.0), 2));
+											break;
+
+					default:				lb->SetItem(insertPos, UMT_SETLST_VAL, wxNumberFormatter::ToString((long)(it->set.value)));
+				}
+			}
+			
+			if ( count%100 ) {
+				UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::DISPATCH_ALL);
+				//wxPostEvent(pHandler, evt);
+			}
+		}
+		
+		// first set default sizes depending on content
+		lb->SetColumnWidth(UMT_SETLST_NUM, wxLIST_AUTOSIZE);
+		lb->SetColumnWidth(UMT_SETLST_KEY, wxLIST_AUTOSIZE);
+		lb->SetColumnWidth(UMT_SETLST_VAL, wxLIST_AUTOSIZE);
+		
+		// try to strech the second (key) column
+		const int scrollbarWidth = 26;
+		int size = lb->GetSize().GetWidth() - lb->GetColumnWidth(UMT_SETLST_NUM) - lb->GetColumnWidth(UMT_SETLST_VAL) - scrollbarWidth;
+		if ( size > lb->GetColumnWidth(UMT_SETLST_KEY) )
+			lb->SetColumnWidth(UMT_SETLST_KEY, size);
+			
+		lb->EnsureVisible(0);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -157,6 +255,12 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 											break;
 											
 		case Event::Type::CONFIG_UPD:		// curently do noting
+											break;
+											
+		case Event::Type::SETLST_RESET:		{
+												wxCriticalSectionLocker lock(pHandler->pThreadCS);
+												setterList.clear();
+											}
 											break;
 											
 		case Event::Type::SETTER_ADD:		setterList.push_back(evt);

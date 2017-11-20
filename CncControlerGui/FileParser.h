@@ -101,6 +101,8 @@ class FileParser {
 		static wxPropertyGridManager* debuggerConfigurationPropertyGrid;
 		static void installDebugConfigPage(wxPropertyGridManager* pgm);
 		
+		virtual void selectSourceControl(unsigned long pos);
+
 	protected:
 		wxString fileName;
 		FileParserRunInfo runInfo;
@@ -119,8 +121,6 @@ class FileParser {
 		
 		virtual bool isInterrupted() { return false; }
 		virtual void broadcastDebugState(bool state) {}
-		
-		virtual void selectSourceControl(unsigned long pos);
 		
 		bool evaluateProcessingState();
 		bool evaluateDebugState(bool force = false);

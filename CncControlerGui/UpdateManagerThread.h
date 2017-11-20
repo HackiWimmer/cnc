@@ -2,6 +2,7 @@
 #define INTERRUPT_THREAD_H
 
 #include <wx/thread.h>
+#include <wx/datetime.h>
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "CncPosition.h"
@@ -66,13 +67,18 @@ class UpdateManagerThread : public wxThread {
 	
 	public:
 		enum SpyContent { APP_POSITIONS = 0, CTL_POSITIONS = 1};
-		enum EventId    { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4 };
+		enum EventId    { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4, DISPATCH_ALL = 5 };
 		enum SpeedMode  { UNDEFINED = '\0', RAPID = 'R', WORK = 'W' };
+		
+		static const int UMT_SETLST_NUM = 0;
+		static const int UMT_SETLST_KEY = 1;
+		static const int UMT_SETLST_VAL = 2;
 		
 		struct Event{
 			enum Type { EMPTY_UPD, 
 			
 						POSSPY_RESET,
+						SETLST_RESET,
 						
 						CONFIG_UPD,
 						COMMAND_UPD, 
@@ -84,6 +90,7 @@ class UpdateManagerThread : public wxThread {
 					};
 			
 			Type type      = EMPTY_UPD;
+			wxDateTime ts  = wxDateTime::UNow();
 			bool processed = false;
 			
 			//////////////////////////////////////////////////////////////
@@ -96,6 +103,15 @@ class UpdateManagerThread : public wxThread {
 				}
 				
 			//////////////////////////////////////////////////////////////
+			// no data
+			
+				inline const Event& SetterListResetEvent() {
+					type			= SETLST_RESET;
+					processed    	= false;
+					return *this;
+				}
+				
+			//////////////////////////////////////////////////////////////
 			struct Set {
 				unsigned char	id; 
 				int32_t			value;
@@ -103,6 +119,7 @@ class UpdateManagerThread : public wxThread {
 			
 				inline const Event& SetterEvent(unsigned char i, int32_t v) {
 					type         = SETTER_ADD;
+					ts           = wxDateTime::UNow();
 					processed    = false;
 					set.id       = i;
 					set.value    = v;
@@ -211,6 +228,7 @@ class UpdateManagerThread : public wxThread {
 		void postEvent(const UpdateManagerThread::Event& evt);
 		
 		void fillPositionSpy(wxListBox* lb, UpdateManagerThread::SpyContent sc, CncConfig& config);
+		void fillSetterList(wxListCtrl* lb);
 		
 	protected:
 		const unsigned int maxSetterEntries = 1000;

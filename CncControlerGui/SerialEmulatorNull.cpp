@@ -8,6 +8,8 @@ int pointA[3], pointB[3];
 SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 : SerialSpyPort(cnc)
 , posReplyThreshold(10)
+, positionCounter(0)
+, stepCounter(0)
 , setterMap()
 , curEmulatorPos(0L, 0L, 0L)
 , lastSignal(CMD_INVALID)
@@ -20,6 +22,8 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 : SerialSpyPort(portName) 
 , posReplyThreshold(10)
+, positionCounter(0)
+, stepCounter(0)
 , setterMap()
 , curEmulatorPos(0L, 0L, 0L)
 , lastSignal(CMD_INVALID)
@@ -153,30 +157,115 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 	
 	wxString firmWare(wxString::Format("%s", FIRMWARE_VERSION));
 	wxString retStr;
+	
 	switch( lastCommand.cmd ) { 
 		case CMD_MOVE:
-		case CMD_RENDER_AND_MOVE:	ret = readMove(buffer, nbByte);
-									break;
+		case CMD_RENDER_AND_MOVE:		ret = readMove(buffer, nbByte);
+										break;
 		
-		case CMD_PRINT_VERSION: 	ret = readDefault(buffer, nbByte, firmWare);
-									break;
+		case CMD_PRINT_VERSION: 		ret = readDefault(buffer, nbByte, firmWare);
+										break;
 		
-		case CMD_PRINT_ERRORINFO: 	ret = readDefault(buffer, nbByte, "1:0:Not available, because there's no controller connection\n");
-									break;
+		case CMD_PRINT_ERRORINFO: 		ret = readDefault(buffer, nbByte, "1:0:Not available, because there's no controller connection\n");
+										break;
 		
-		case CMD_PRINT_CONFIG: 		ret = readDefault(buffer, nbByte, getConfiguration(retStr));
-									break;
+		case CMD_PRINT_CONFIG: 			ret = readDefault(buffer, nbByte, getConfiguration(retStr));
+										break;
 		
-		case CMD_PRINT_PIN_REPORT: 	ret = readDefault(buffer, nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel for more details
-									break;
+		case CMD_PRINT_PIN_REPORT: 		ret = readDefault(buffer, nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel for more details
+										break;
+									
+		case CMD_TEST_INFO_MESSAGE:		ret = readMessage(buffer, nbByte, "INFO");
+										break;
+										
+		case CMD_TEST_WARN_MESSAGE:		ret = readMessage(buffer, nbByte, "WARNING");
+										break;
+										
+		case CMD_TEST_ERROR_MESSAGE:	ret = readMessage(buffer, nbByte, "ERROR");
+										break;
 		
-		default:					((char*)buffer)[0] = RET_OK;
-									ret = 1;
-									lastCommand.restLastCmd();
+		default:						((char*)buffer)[0] = RET_OK;
+										ret = 1;
+										lastCommand.restLastCmd();
 	}
 	
 	spyReadData(ret, buffer, nbByte);
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::readMessage(void *buffer, unsigned int nbByte, const char* response) {
+///////////////////////////////////////////////////////////////////
+	if ( response == NULL )
+		return -1;
+		
+	if ( buffer == NULL )
+		return -1;
+	
+	// prepare the test message and start responding (publish RET_MSG)
+	if ( lastCommand.index == 0 ) {
+		((char*)buffer)[0] = RET_MSG;
+		
+		lastCommand.Msg.text.assign("This is a test message from type: ");
+		char type = response[0];
+		
+		switch ( type ) {
+			case 'W':	lastCommand.Msg.text.append(response);
+						break;
+						
+			case 'E':	lastCommand.Msg.text.append(response);
+						break;
+						
+			default:	type = 'I';
+						lastCommand.Msg.text.append(response);
+		}
+		
+		lastCommand.Msg.type = type;
+		lastCommand.index++;
+		return 1;
+	}
+	
+	// provide message type
+	if ( lastCommand.index == 1 ) {
+		((char*)buffer)[0] = lastCommand.Msg.type;
+		
+		lastCommand.index++;
+		return 1;
+	}
+	
+	// from here on spool the string
+	// consider: regarding the message type above the index is two to high.
+	int textPos = lastCommand.index - 2;
+	if ( textPos < 0 ) {
+		// this is an error
+		lastCommand.restLastCmd();
+		return -1;
+	}
+		
+	if ( (unsigned int)textPos < lastCommand.Msg.text.length() ) {
+		((char*)buffer)[0] = (char)lastCommand.Msg.text[textPos];
+		
+		lastCommand.index++;
+		return 1;
+	}
+	
+	// close spooling
+	if ( (unsigned int)textPos == lastCommand.Msg.text.length() ) {
+		((char*)buffer)[0] = MSG_CLOSE;
+		
+		lastCommand.index++;
+		return 1;
+	}
+	
+	// finalize the command
+	if ( (unsigned int)textPos > lastCommand.Msg.text.length() ) {
+		((char*)buffer)[0] = RET_OK;
+		
+		lastCommand.restLastCmd();
+		return 1;
+	}
+	
+	// this is an error
+	return -1;
 }
 ///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::readDefault(void *buffer, unsigned int nbByte, const char* response) {
@@ -533,6 +622,18 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force) {
 ///////////////////////////////////////////////////////////////////
+	
+	/*
+	if ( abs(dx) <= 10 && abs(dy) <= 10 && abs(dz) <= 10 )
+		return true;
+	*/
+	
+	
+	positionCounter++;
+	if ( dx != 0 ) stepCounter++;
+	if ( dy != 0 ) stepCounter++;
+	if ( dz != 0 ) stepCounter++;
+	
 	// signal handling
 	switch ( lastSignal ) {
 	
@@ -555,7 +656,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	// simulate a direct controler callback
 	#pragma message("flag this from configuration")
 	static int repearCount = 0;
-	if ( false ) {
+	if ( true ) {
 		repearCount++;
 		
 		if ( repearCount%posReplyThreshold == 0 || force == true ) {
@@ -588,5 +689,25 @@ bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, void *buf
 ///////////////////////////////////////////////////////////////////
 	// inheried classes do the work here
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::resetPostionCounter() {
+///////////////////////////////////////////////////////////////////
+	positionCounter = 0;
+}
+///////////////////////////////////////////////////////////////////
+size_t SerialEmulatorNULL::getPostionCounter() {
+///////////////////////////////////////////////////////////////////
+	return positionCounter;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::resetStepCounter() {
+///////////////////////////////////////////////////////////////////
+	stepCounter = 0;
+}
+///////////////////////////////////////////////////////////////////
+size_t SerialEmulatorNULL::getStepCounter() {
+///////////////////////////////////////////////////////////////////
+	return stepCounter;
 }
 

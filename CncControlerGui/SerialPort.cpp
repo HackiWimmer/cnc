@@ -213,6 +213,56 @@ bool Serial::isMoveCommand(unsigned char cmd) {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
+void Serial::resetPostionCounter() {
+///////////////////////////////////////////////////////////////////
+	processSetter(PID_RESERT_POS_COUNTER, MIN_LONG);
+}
+///////////////////////////////////////////////////////////////////
+size_t Serial::getPostionCounter() {
+///////////////////////////////////////////////////////////////////
+	if ( cncControl->isInterrupted() )
+		return 0;
+		
+	if ( cncControl->isConnected() == false )
+		return 0;
+
+	std::vector<int32_t> list;
+	if ( processGetter(PID_GET_POS_COUNTER, list) && list.size() == 2 ) {
+		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
+		// to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
+		size_t ret = list.at(0) + abs(MIN_LONG);
+		ret += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
+		return ret;
+	}
+	
+	return 0;
+}
+///////////////////////////////////////////////////////////////////
+void Serial::resetStepCounter() {
+///////////////////////////////////////////////////////////////////
+	processSetter(PID_RESERT_STEP_COUNTER, MIN_LONG);
+}
+///////////////////////////////////////////////////////////////////
+size_t Serial::getStepCounter() {
+///////////////////////////////////////////////////////////////////
+	if ( cncControl->isInterrupted() )
+		return 0;
+		
+	if ( cncControl->isConnected() == false )
+		return 0;
+
+	std::vector<int32_t> list;
+	if ( processGetter(PID_GET_STEP_COUNTER, list) && list.size() == 2 ) {
+		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
+		// to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
+		size_t ret = list.at(0) + abs(MIN_LONG);
+		ret += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
+		return ret;
+	}
+	
+	return 0;
+}
+///////////////////////////////////////////////////////////////////
 int Serial::readData(void *buffer, unsigned int nbChar) {
 ///////////////////////////////////////////////////////////////////
 	//Number of bytes we'll have read
@@ -271,23 +321,39 @@ bool Serial::isConnected() {
 	return connected;
 }
 ///////////////////////////////////////////////////////////////////
-void Serial::fetchMessage(unsigned char * text, int maxBytes) {
+void Serial::fetchMessage(unsigned char* text, int maxBytes) {
 ///////////////////////////////////////////////////////////////////
+	if ( text == NULL )
+		return;
+	
 	Sleep(200);
-	int i = 0;
-	for ( ; i<maxBytes; i++ ) {
-		unsigned char b[1];
-		if ( readData(b, 1) ) {
-			if ( b[0] == MSG_CLOSE )
-				break;
+	
+	const unsigned int length = 1;
+	unsigned char b[length];
+	
+	for (int i=0; i<maxBytes; i++ ) {
+		
+		if ( readData(b, length) ) {
+			
+			if ( b[0] == MSG_CLOSE ) {
+				// close the string
+				text[i] = '\0';
 				
+				// stop fetching here
+				break;
+			}
+			
+			// append text
 			text[i] = b[0];
+			
 		} else {
+			std::cerr << "Serial::fetchMessage: readData() failed!" << std::endl;
 			break;
 		}
 	}
-
-	text[i] = '\0';
+	
+	// final safty
+	text[maxBytes - 1] = '\0';
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::fetchMultiByteResult(unsigned char * text, int maxBytes) {
@@ -562,6 +628,10 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 		std::cerr << "SERIAL::processSetter()::ERROR: Not connected\n";
 		return false;
 	}
+	
+	// this shouldn't published to the controller
+	if ( pid == PID_SEPARATOR )
+		return true;
 	
 	if ( writeOnlyMoveCommands == true )
 		return true;
@@ -943,7 +1013,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			case RET_MSG:
 			{
-				fetchMessage(sfi.multiByteResult, sizeof(sfi.multiByteResult)-1);
+				fetchMessage(sfi.multiByteResult, sizeof(sfi.multiByteResult) - 1);
 
 				ControllerMsgInfo cmi;
 				decodeMessage(sfi.multiByteResult, cmi.message);

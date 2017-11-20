@@ -44,6 +44,10 @@ class GLContextBase : public wxGLContext {
 		
 		static void globalInit();
 		
+		void enable(bool state = true) { enabled = state; } 
+		void disable() { enable(false); }
+		bool isEnabled() { return enabled; }
+		
 		void init();
 		void display();
 		void reshape(int w, int h, int x=0, int y=0);
@@ -122,7 +126,8 @@ class GLContextBase : public wxGLContext {
 				: colours(), length(0.25f)
 				{}
 		};
-
+		
+		bool				enabled;
 		bool 				initialized;
 		bool				drawViewPortBounderies;
 		bool				posMarker;

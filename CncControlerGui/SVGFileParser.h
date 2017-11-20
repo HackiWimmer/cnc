@@ -44,7 +44,6 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		virtual void initNextPath(const wxString& data);
 		virtual bool evaluateProcessingCallback();
 		virtual bool isInterrupted() { return cncControl->isInterrupted(); }
-		virtual void selectSourceControl(unsigned long pos);
 		virtual bool addPathElement(char c, unsigned int count, double values[]);
 		virtual void initNextClientId(long id);
 		
@@ -74,6 +73,8 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		virtual void broadcastDebugState(bool state);
 		virtual void clearControls();
 		
+		virtual void selectSourceControl(unsigned long pos);
+
 		virtual void setUserAgentControls(UserAgentOutputControls& oc) {
 			SvgUserAgentOutputControls soc;
 			soc.detailInfo 			= oc.detailInfo;

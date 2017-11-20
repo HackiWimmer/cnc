@@ -65,7 +65,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
-    virtual void loopRepeatTest(wxCommandEvent& event);
+    virtual void requestErrorMessage(wxCommandEvent& event);
+    virtual void requestWarningMessage(wxCommandEvent& event);
+    virtual void requestInfoMessage(wxCommandEvent& event);
+    virtual void clearSetterList(wxCommandEvent& event);
+    virtual void sizeSetterList(wxSizeEvent& event);
+		virtual void loopRepeatTest(wxCommandEvent& event);
 		virtual void selectPositionSpyContent(wxCommandEvent& event);
 		virtual void selectPositionSpy(wxCommandEvent& event);
 		virtual void copyPositionSpy(wxCommandEvent& event);
@@ -313,7 +318,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void onThreadAppPosUpdate(UpdateManagerEvent& event);
 		void onThreadCtlPosUpdate(UpdateManagerEvent& event);
 		void onThreadHeartbeat(UpdateManagerEvent& event);
+		void onThreadDispatchAll(UpdateManagerEvent& event);
 		void onThreadCompletion(UpdateManagerEvent& event);
+		
 		void onPerspectiveTimer(wxTimerEvent& event);
 		void onDebugUserNotificationTimer(wxTimerEvent& event);
 		void configurationUpdated(wxCommandEvent& event);
@@ -559,6 +566,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		///////////////////////////////////////////////////////////////
 		// control handling
 		void decoratePortSelector(bool list=false);
+		
+		void updateSetterList();
 		
 		void determineCncOutputControls();
 		

@@ -4153,17 +4153,18 @@
                                           <rows>2</rows>
                                           <vgap>0</vgap>
                                           <hgap>0</hgap>
-                                          <growablecols>0,1</growablecols>
+                                          <growablecols>0</growablecols>
                                           <growablerows>1</growablerows>
-                                          <object class="sizeritem" name="flexGridSizer1471">
+                                          <object class="sizeritem" name="flexGridSizer4691">
                                             <flag>wxALL|wxEXPAND</flag>
+                                            <border>1</border>
                                             <object class="wxFlexGridSizer">
                                               <cols>2</cols>
-                                              <rows>0</rows>
+                                              <rows>1</rows>
                                               <vgap>0</vgap>
                                               <hgap>0</hgap>
-                                              <growablecols>1</growablecols>
-                                              <growablerows/>
+                                              <growablecols>0</growablecols>
+                                              <growablerows>0</growablerows>
                                               <object class="sizeritem">
                                                 <flag>wxALL</flag>
                                                 <border>5</border>
@@ -4180,12 +4181,24 @@
                                                   </font>
                                                 </object>
                                               </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxALIGN_RIGHT</flag>
+                                                <border>1</border>
+                                                <object class="wxButton" name="m_btClearSetterList">
+                                                  <label>Clear</label>
+                                                  <style/>
+                                                  <bitmap>bitmaps/16-clean.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
                                             </object>
                                           </object>
                                           <object class="sizeritem">
                                             <flag>wxALL|wxEXPAND</flag>
-                                            <border>5</border>
-                                            <object class="unknown" name="m_dvListCtrlProcessedSetters">
+                                            <border>1</border>
+                                            <object class="wxListCtrl" name="m_setterList">
+                                              <style>wxLC_REPORT</style>
                                               <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                             </object>
                                           </object>
@@ -4215,7 +4228,7 @@
                                               <vgap>0</vgap>
                                               <hgap>0</hgap>
                                               <growablecols>0</growablecols>
-                                              <growablerows/>
+                                              <growablerows>0</growablerows>
                                               <object class="sizeritem">
                                                 <flag>wxALL</flag>
                                                 <border>5</border>
@@ -4663,7 +4676,7 @@
                                           <border>1</border>
                                           <object class="wxComboBox" name="m_cbCurveLibResolution">
                                             <style>wxCB_READONLY</style>
-                                            <selection>-1</selection>
+                                            <selection>11</selection>
                                             <content>
                                               <item>
                                                 <![CDATA[0.001]]>
@@ -4769,6 +4782,24 @@
                                               </item>
                                               <item>
                                                 <![CDATA[1000]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[2000]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[5000]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[10000]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[20000]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[50000]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[100000]]>
                                               </item>
                                             </content>
                                           </object>
@@ -6919,9 +6950,10 @@
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
               <object class="wxStaticText" name="m_staticText4659">
-                <label>Ref:               F:              X:                     Y:                      Z:</label>
+                <label>Ref:               F:               X:                     Y:                       Z:</label>
                 <style/>
                 <bg>wxSYS_COLOUR_ACTIVECAPTION</bg>
+                <fg>wxSYS_COLOUR_CAPTIONTEXT</fg>
                 <font>
                   <size>8</size>
                   <style>normal</style>
@@ -7283,6 +7315,25 @@
         </object>
         <object class="wxMenuItem" name="m_miRqtErrorInfo">
           <label>Error Info</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
+        <object class="wxMenuItem" name="m_menuItemInfoMessage">
+          <label>Test - Info Message</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_menuItemWarningMessage">
+          <label>Test - Warning Message</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_menuItemErrorMessage">
+          <label>Test - Error Message</label>
           <accel>
             <![CDATA[]]>
           </accel>
