@@ -18,9 +18,12 @@ Serial::Serial(CncControl* cnc)
 , connected(false)
 , writeOnlyMoveCommands(false)
 , isCommand(false)
-, traceInfo(true)
 , portName()
 , lastFetchResult(RET_NULL)
+, traceSpyInfo(true)
+, spyMode(Serial::SypMode::SM_NONE)
+, spyRead(false)
+, spyWrite(false)
 {
 ///////////////////////////////////////////////////////////////////
 	resetTotalDistance();
@@ -32,9 +35,12 @@ Serial::Serial(const char *portName)
 , connected(false)
 , writeOnlyMoveCommands(false)
 , isCommand(false)
-, traceInfo(true)
 , portName()
 , lastFetchResult(RET_NULL)
+, traceSpyInfo(true)
+, spyMode(Serial::SypMode::SM_NONE)
+, spyRead(false)
+, spyWrite(false)
 {
 ///////////////////////////////////////////////////////////////////
 	resetTotalDistance();
@@ -47,6 +53,29 @@ Serial::~Serial() {
 ///////////////////////////////////////////////////////////////////
 	disconnect();
 }
+///////////////////////////////////////////////////////////////////
+void Serial::setSpyMode(Serial::SypMode sm) {
+///////////////////////////////////////////////////////////////////
+	spyMode = sm;
+	switch ( sm ) {
+		case Serial::SypMode::SM_NONE:	spyRead 	= false;
+										spyWrite	= false;
+										break;
+										
+		case Serial::SypMode::SM_READ:	spyRead 	= true;
+										spyWrite	= false;
+										break;
+										
+		case Serial::SypMode::SM_WRITE:	spyRead 	= false;
+										spyWrite	= true;
+										break;
+										
+		case Serial::SypMode::SM_ALL:	spyRead 	= true;
+										spyWrite	= true;
+										break;
+	}
+}
+
 ///////////////////////////////////////////////////////////////////
 void Serial::displayErrorInfo(LPTSTR lpszFunction) {
 ///////////////////////////////////////////////////////////////////
@@ -541,7 +570,7 @@ bool Serial::processIdle() {
 	cmd[idx++] = 'i';
 	p++;
 	
-	if ( traceInfo ) {
+	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
 		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
 	}
@@ -592,7 +621,7 @@ bool Serial::processTest(int32_t testId) {
 	memcpy(p, &testId, LONG_BUF_SIZE);
 	idx += LONG_BUF_SIZE;
 	
-	if ( traceInfo ) {
+	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
 		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
 	}
@@ -650,7 +679,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	memcpy(p, &value, LONG_BUF_SIZE);
 	idx += LONG_BUF_SIZE;
 	
-	if ( traceInfo ) {
+	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
 		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << ntohl(value) << "]\n";
 	}
@@ -689,7 +718,7 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 	cmd[0] = 'G';
 	cmd[1] = pid;
 	
-	if ( traceInfo ) {
+	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
 		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((pid)) << "]\n";
 	}
@@ -753,7 +782,7 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 			continue;
 		}
 
-		if ( traceInfo ) {
+		if ( traceSpyInfo && spyWrite ) {
 			cnc::spy.initializeResult();
 			cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
 		}
@@ -854,7 +883,7 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 		p   += LONG_BUF_SIZE;
 	}
 	
-	if ( traceInfo ) {
+	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
 		cnc::spy << "Send: '" << moveCommand[0] << "' [" << ArduinoCMDs::getCMDLabel(moveCommand[0]) << "]\n";
 	}
@@ -1041,7 +1070,7 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 		//RET_OK_Handler...........................................
 		case 'S':
 		{
-			if (traceInfo) 
+			if ( traceSpyInfo ) 
 				cnc::spy.finalizeOK();
 
 			cncControl->SerialCallback(1);
@@ -1060,7 +1089,7 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 				return false;
 			}
 			
-			if (traceInfo)
+			if ( traceSpyInfo )
 				cnc::spy.finalizeOK();
 				
 			return true;
@@ -1088,7 +1117,7 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			// ensure the position update
 			cncControl->SerialCallback(1);
 			
-			if (traceInfo) 
+			if ( traceSpyInfo ) 
 				cnc::spy.finalizeOK();
 				
 			return true;
@@ -1110,7 +1139,7 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			// ensure the position update
 			cncControl->SerialCallback(1);
 				
-			if (traceInfo)
+			if ( traceSpyInfo )
 				cnc::spy.finalizeOK();
 			
 			return true;
@@ -1133,7 +1162,7 @@ bool Serial::RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 			
 			cncControl->SerialCallback(1);
 			
-			if (traceInfo)
+			if ( traceSpyInfo )
 				cnc::spy.finalizeOK();
 				
 			return true;
@@ -1232,7 +1261,7 @@ bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 		sfi.Gc.p += LONG_BUF_SIZE;
 	}
 	
-	if (traceInfo)
+	if ( traceSpyInfo )
 		cnc::spy.finalizeOK();
 	
 	return true;

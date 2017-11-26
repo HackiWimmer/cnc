@@ -15,6 +15,7 @@
 #include "CncSpyControl.h"
 #include "CncFileView.h"
 #include "CncToolMagazine.h"
+#include "CncLargeScaleListCtrl.h"
 #include "codelite/wxPNGAnimation.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -65,14 +66,20 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
-    virtual void requestErrorMessage(wxCommandEvent& event);
-    virtual void requestWarningMessage(wxCommandEvent& event);
-    virtual void requestInfoMessage(wxCommandEvent& event);
-    virtual void clearSetterList(wxCommandEvent& event);
-    virtual void sizeSetterList(wxSizeEvent& event);
+    virtual void searchPosSpy(wxCommandEvent& event);
+		virtual void goPosSypFirstId(wxCommandEvent& event);
+		virtual void goPosSypLastId(wxCommandEvent& event);
+		virtual void goPosSypNextId(wxCommandEvent& event);
+		virtual void goPosSypPrevId(wxCommandEvent& event);
+		virtual void selectSerialSpyMode(wxCommandEvent& event);
+		virtual void requestErrorMessage(wxCommandEvent& event);
+		virtual void requestWarningMessage(wxCommandEvent& event);
+		virtual void requestInfoMessage(wxCommandEvent& event);
+		virtual void clearSetterList(wxCommandEvent& event);
+		virtual void sizeSetterList(wxSizeEvent& event);
 		virtual void loopRepeatTest(wxCommandEvent& event);
 		virtual void selectPositionSpyContent(wxCommandEvent& event);
-		virtual void selectPositionSpy(wxCommandEvent& event);
+		virtual void selectPositionSpy(wxListEvent& event);
 		virtual void copyPositionSpy(wxCommandEvent& event);
 		virtual void togglePositionSpy(wxCommandEvent& event);
 		virtual void activateAuiPane(wxAuiManagerEvent& event);
@@ -428,6 +435,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncFilePreview* mainFilePreview;
 		CncFilePreview* monitorFilePreview;
 		CncToolMagazine* toolMagaizne;
+		CncLargeScaledListCtrl* positionSpy;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -514,6 +522,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void updateCurveLibResolution();
 		
 		void decorateSearchButton();
+		
+		void decoratePosSpyControl();
+		void decoratePosSpyConnectButton(bool state);
 
 		void registerGuiControls();
 		bool initializeCncControl();
@@ -635,6 +646,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void enableSerialSpy(bool state = true);
 		void disableSerialSpy() { enableSerialSpy(false); }
 		void decorateSerialSpy();
+		void selectSerialSpyMode();
 		
 		void clearSerialSpy();
 		

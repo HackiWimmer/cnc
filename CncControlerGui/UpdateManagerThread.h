@@ -3,6 +3,8 @@
 
 #include <wx/thread.h>
 #include <wx/datetime.h>
+#include <boost/lockfree/spsc_queue.hpp>
+#include "CncLargeScaleListCtrl.h"
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "CncPosition.h"
@@ -70,9 +72,17 @@ class UpdateManagerThread : public wxThread {
 		enum EventId    { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4, DISPATCH_ALL = 5 };
 		enum SpeedMode  { UNDEFINED = '\0', RAPID = 'R', WORK = 'W' };
 		
-		static const int UMT_SETLST_NUM = 0;
-		static const int UMT_SETLST_KEY = 1;
-		static const int UMT_SETLST_VAL = 2;
+		static const int SET_LST_COL_NUM 		= 0;
+		static const int SET_LST_COL_KEY 		= 1;
+		static const int SET_LST_COL_VAL 		= 2;
+		
+		static const int POS_SPY_LIST_COL_REF	= 0;
+		static const int POS_SPY_LIST_COL_T		= 1;
+		static const int POS_SPY_LIST_COL_F		= 2;
+		static const int POS_SPY_LIST_COL_X		= 3;
+		static const int POS_SPY_LIST_COL_Y		= 4;
+		static const int POS_SPY_LIST_COL_Z		= 5;
+		static const int POS_SPY_LIST_SIZE		= 6;
 		
 		struct Event{
 			enum Type { EMPTY_UPD, 
@@ -83,8 +93,10 @@ class UpdateManagerThread : public wxThread {
 						CONFIG_UPD,
 						COMMAND_UPD, 
 						
+						POS_TYP_UPD,
 						APP_POS_UPD,
 						CTL_POS_UPD,
+						
 					
 						SETTER_ADD
 					};
@@ -149,6 +161,17 @@ class UpdateManagerThread : public wxThread {
 					return *this;
 				}
 			
+			//////////////////////////////////////////////////////////////
+			struct Cnt {
+				UpdateManagerThread::SpyContent posSpyType = CTL_POSITIONS;
+			} cnt;
+			
+				inline const Event& PosSypContentEvent(UpdateManagerThread::SpyContent sc) {
+					type         = POS_TYP_UPD;
+					cnt.posSpyType   = sc;
+					return *this;
+				}
+
 			//////////////////////////////////////////////////////////////
 			struct Pos {
 				long id					= -1;
@@ -217,9 +240,6 @@ class UpdateManagerThread : public wxThread {
 			
 		};
 		
-		typedef std::vector<UpdateManagerThread::Event> PosSpyList;
-		typedef std::vector<UpdateManagerThread::Event> SetterList;
-		
 		UpdateManagerThread(MainFrame *handler);
 		~UpdateManagerThread();
 		
@@ -227,17 +247,28 @@ class UpdateManagerThread : public wxThread {
 		void stop();
 		void postEvent(const UpdateManagerThread::Event& evt);
 		
-		void fillPositionSpy(wxListBox* lb, UpdateManagerThread::SpyContent sc, CncConfig& config);
+		unsigned int fillPositionSpy(CncLargeScaledListCtrl* lb);
 		void fillSetterList(wxListCtrl* lb);
 		
 	protected:
-		const unsigned int maxSetterEntries = 1000;
+		static const unsigned long posQueueSize 	= 1024 * 1024;
+		typedef std::vector<UpdateManagerThread::Event> SetterList;
+		typedef boost::lockfree::spsc_queue<UpdateManagerThread::Event, boost::lockfree::capacity<posQueueSize> > PosSpyQueue;
+		typedef boost::lockfree::spsc_queue<CncColumContainer, boost::lockfree::capacity<posQueueSize> > PosSpyStringQueue;
 		
 		MainFrame* pHandler;
 		bool exit;
 		
-		PosSpyList appPosSpyList;
-		PosSpyList ctlPosSpyList;
+		SpyContent posSpyContent;
+		
+		CncUnit unit;
+		double displayFactX;
+		double displayFactY;
+		double displayFactZ;
+		
+		PosSpyQueue posSpyQueue;
+		PosSpyStringQueue posSpyStringQueue;
+
 		SetterList setterList;
 		
 		virtual ExitCode Entry();

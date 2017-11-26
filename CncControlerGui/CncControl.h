@@ -246,6 +246,9 @@ class CncControl {
 		bool getToolState() { return powerOn; }
 		// Updates the config trace control
 		void updateCncConfigTrace();
+		
+		const CncLongPosition getCurCtlPos() { return curCtlPos; }
+		
 		// returns the correponding pc postions
 		const CncLongPosition getStartPos() { return startPos; }
 		const CncLongPosition getCurPos()   { return curAppPos; }

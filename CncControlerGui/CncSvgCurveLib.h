@@ -68,12 +68,12 @@ class CncSvgCurveLib : public SVGCurveLib {
 		static CubicBezierParameter CP;
 		
 		/////////////////////////////////////////////////////////////////////////
-		static float getResolution() {
+		static float getIncement() {
 			return tIncrement;
 		}
 		
 		/////////////////////////////////////////////////////////////////////////
-		static void setResolution(float t) {
+		static void setIncrement(float t) {
 			if ( t > 0 && t < 1 )	tIncrement = t;
 			else					tIncrement = defaultIncrement;
 		}

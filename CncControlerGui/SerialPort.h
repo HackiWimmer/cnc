@@ -111,6 +111,10 @@ struct SvgOriginalPathInfo {
 
 class Serial {
 	public:
+		
+		// SerialSyPort parameter
+		enum SypMode { SM_NONE = 0, SM_READ = 1, SM_WRITE = 2, SM_ALL = 3 };
+		
 		// define long size
 		static const unsigned int LONG_BUF_SIZE = sizeof(int32_t);
 		
@@ -129,19 +133,17 @@ class Serial {
 		bool writeOnlyMoveCommands;
 		// flag if the comand evaluation routine currently runs
 		bool isCommand;
-		//Get various information about the connection
-		//COMSTAT status;
-		//Keep track of last error
-		//DWORD errors;
-		// output flag
-		bool traceInfo;
 		// Port name
 		std::string portName;
 		// last fetch result
 		unsigned char lastFetchResult;
-		// Map of valid processed setters
-		//std::map<int, int32_t> setterMap;
+		// spy flags
+		bool traceSpyInfo;
+		Serial::SypMode spyMode;
+		bool spyRead;
+		bool spyWrite;
 		
+		// ...
 		unsigned char buf[LONG_BUF_SIZE];
 		unsigned char moveCommand[MAX_MOVE_CMD_SIZE];
 		
@@ -217,9 +219,11 @@ class Serial {
 		bool isConnected();
 		// returns the port name
 		virtual const char* getPortName() { return portName.c_str(); }
-		// sets info debug mode
-		void enableSpyOutput(bool show=true) {traceInfo = show;}
-		bool isSpyOutput() {return traceInfo; }
+		// set spy mode
+		void enableSpyOutput(bool show=true) { traceSpyInfo = show;}
+		bool isSpyOutputOn() { return traceSpyInfo; }
+		virtual void setSpyMode(Serial::SypMode sm);
+		Serial::SypMode getSpyMode() { return spyMode; };
 		// reurn the current command flag
 		bool isCommandActive() { return isCommand; }
 		// port writting

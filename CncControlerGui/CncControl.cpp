@@ -850,7 +850,7 @@ void CncControl::postAppPosition() {
 		#warning - impl speed value
 		if ( lastAppPos != curAppPos ) {
 			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(getClientId(), getSpeedAsString(), 42.7, curAppPos));
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(getClientId(), getSpeedAsString(), 4242.7, curAppPos));
 		}
 	}
 	
@@ -869,7 +869,7 @@ void CncControl::postCtlPosition() {
 		#warning - impl speed value
 		if ( lastCtlPos != curCtlPos ) {
 			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(getClientId(), getSpeedAsString(), 42.7, curCtlPos));
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(getClientId(), getSpeedAsString(), 4242.7, curCtlPos));
 		}
 	}
 	

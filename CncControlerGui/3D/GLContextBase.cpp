@@ -20,6 +20,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 , drawViewPortBounderies(true)
 , posMarker(true)
 , autoScale(true)
+, blending(true)
 , zoom(1.0f)
 , viewMode(V2D_TOP)
 , coordOriginInfo()
@@ -54,11 +55,13 @@ void GLContextBase::globalInit() {
 	// So, the initalization here is globally. 
 	// If context sensetive initializion is needed use init() instead
 	
+	// Hint: The scissor test affects glClear. so glEnable(GL_SCISSOR_TEST); and glScissor(x, y, width, height); 
+	// All measurements are in pixels. After this, all calls to glClear will only clear the area in the scissor box. Remember to disable it again afterwards. 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_FLAT);
 	
 	glEnable(GL_LINE_SMOOTH);
-
+	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 }
@@ -537,7 +540,7 @@ void GLContextBase::display() {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
 	wxASSERT ( viewPort != NULL );
-	
+
 	// initialize model matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity(); 

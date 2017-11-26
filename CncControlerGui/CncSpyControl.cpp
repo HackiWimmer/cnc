@@ -54,10 +54,12 @@ void CncSpyControl::AppendText(const wxString & text) {
 ///////////////////////////////////////////////////////////////////
 	sytleChanged = false;
 	wxTextCtrl::AppendText(text);
-	
+
+/*	
 	if ( text.length() > 0 && text[0] == '\n' ) {
 		decodeSerialSpyLine(GetLineText(GetNumberOfLines() - 2), false);
 	}
+*/
 }
 ///////////////////////////////////////////////////////////////////
 void CncSpyControl::AppendText(const wxChar & c) {
@@ -65,9 +67,11 @@ void CncSpyControl::AppendText(const wxChar & c) {
 	sytleChanged = false;
 	
 	wxTextCtrl::AppendText(c);
+/*
 	if ( c == '\n' ) {
-		decodeSerialSpyLine(GetLineText(GetNumberOfLines() - 2));
+		decodeSerialSpyLine(GetLineText(GetNumberOfLines() - 2), false);
 	}
+*/
 }
 ///////////////////////////////////////////////////////////////////
 void CncSpyControl::decodeSerialSpyLine(const wxString& line, bool displayInfo) {
@@ -76,11 +80,6 @@ void CncSpyControl::decodeSerialSpyLine(const wxString& line, bool displayInfo) 
 	
 	if ( IsFrozen() )
 		return;
-	
-	if ( displayInfo == true ) {
-		detailCtrl->AppendText(line);
-		detailCtrl->AppendText("\n");
-	}
 	
 	if ( line.Find("0x[") == wxNOT_FOUND ) {
 		if ( displayInfo == true )

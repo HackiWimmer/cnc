@@ -145,9 +145,9 @@ class CncConfig {
 		
 		// curve lib utils
 		static float getDefaultCurveLibResolution();
-		static float getCurveLibResolution();
-		static void setCurveLibResolution(double v);
-		static void updateCurveLibResolutionSelector();
+		static float getCurveLibIncrement();
+		static void setCurveLibIncrement(double v);
+		static void updateCurveLibIncrementSelector();
 		
 		// user events
 		void loadConfiguration(wxConfigBase& config);

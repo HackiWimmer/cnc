@@ -259,6 +259,9 @@ class SpyHexDecoder : public HexDecoder {
 								returnValue << decodeHexStringAsIntegers(hexString, temp);
 			}
 			
+			while ( returnValue.IsEmpty() == false && returnValue.Last() == '\n' )
+				returnValue.assign(returnValue.SubString(0, returnValue.length() - 2));
+			
 			return returnValue;
 		}
 };

@@ -132,6 +132,7 @@ class GLContextBase : public wxGLContext {
 		bool				drawViewPortBounderies;
 		bool				posMarker;
 		bool				autoScale;
+		bool				blending;
 		
 		float				zoom;
 		

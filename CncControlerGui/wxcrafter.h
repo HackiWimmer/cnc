@@ -52,8 +52,8 @@
 #include <wx/listctrl.h>
 #include <wx/webview.h>
 #include "CncSpeedView.h"
-#include <wx/timer.h>
 #include <wx/splitter.h>
+#include <wx/timer.h>
 #include <wx/treectrl.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/property.h>
@@ -504,21 +504,29 @@ protected:
     wxButton* m_enableSerialSpy;
     wxButton* m_MarkSerialSpy;
     wxButton* m_clearSerialSpy;
-    wxCheckBox* m_clearSerialSpyOnConnect;
+    wxComboBox* m_cbSerialSpyMode;
+    wxSplitterWindow* m_splitter4728;
+    wxPanel* m_splitterPage4732;
     wxTextCtrl* m_serialSpy;
+    wxPanel* m_splitterPage4736;
     wxTextCtrl* m_serialSpyDetails;
+    wxCheckBox* m_clearSerialSpyOnConnect;
+    wxCheckBox* m_clearSerialSpyBeforNextRun;
     wxPanel* m_debuggerView;
     wxPropertyGridManager* m_debuggerPropertyManagerGrid;
     wxPanel* m_positionMonitorView;
     wxBitmapToggleButton* m_btTogglePosSpy;
-    wxBitmapButton* m_btClearPositionSpy;
     wxBitmapButton* m_btCopyPosSpy;
-    wxStaticText* m_staticText4676;
+    wxBitmapButton* m_btSearchPosSpy;
+    wxBitmapButton* m_btClearPositionSpy;
     wxComboBox* m_cbContentPosSpy;
     wxStaticText* m_staticText4526;
-    wxStaticText* m_positionSpyCount;
-    wxStaticText* m_staticText4659;
-    wxListBox* m_positionSpy;
+    wxTextCtrl* m_positionSpyCount;
+    wxBitmapButton* m_bmpButton47181;
+    wxBitmapButton* m_bmpButton4718;
+    wxBitmapButton* m_bmpButton47182;
+    wxBitmapButton* m_bmpButton47183;
+    wxListCtrl* m_positionSpy;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
     wxMenuItem* m_miNewTemplate;
@@ -786,11 +794,16 @@ protected:
     virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectSerialSpyMode(wxCommandEvent& event) { event.Skip(); }
     virtual void togglePositionSpy(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void copyPositionSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void searchPosSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPositionSpyContent(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectPositionSpy(wxCommandEvent& event) { event.Skip(); }
+    virtual void goPosSypFirstId(wxCommandEvent& event) { event.Skip(); }
+    virtual void goPosSypLastId(wxCommandEvent& event) { event.Skip(); }
+    virtual void goPosSypPrevId(wxCommandEvent& event) { event.Skip(); }
+    virtual void goPosSypNextId(wxCommandEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
@@ -1267,21 +1280,29 @@ public:
     wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
     wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
     wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
-    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
+    wxComboBox* GetCbSerialSpyMode() { return m_cbSerialSpyMode; }
     wxTextCtrl* GetSerialSpy() { return m_serialSpy; }
+    wxPanel* GetSplitterPage4732() { return m_splitterPage4732; }
     wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
+    wxPanel* GetSplitterPage4736() { return m_splitterPage4736; }
+    wxSplitterWindow* GetSplitter4728() { return m_splitter4728; }
+    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
+    wxCheckBox* GetClearSerialSpyBeforNextRun() { return m_clearSerialSpyBeforNextRun; }
     wxPanel* GetSerialSpyView() { return m_serialSpyView; }
     wxPropertyGridManager* GetDebuggerPropertyManagerGrid() { return m_debuggerPropertyManagerGrid; }
     wxPanel* GetDebuggerView() { return m_debuggerView; }
     wxBitmapToggleButton* GetBtTogglePosSpy() { return m_btTogglePosSpy; }
-    wxBitmapButton* GetBtClearPositionSpy() { return m_btClearPositionSpy; }
     wxBitmapButton* GetBtCopyPosSpy() { return m_btCopyPosSpy; }
-    wxStaticText* GetStaticText4676() { return m_staticText4676; }
+    wxBitmapButton* GetBtSearchPosSpy() { return m_btSearchPosSpy; }
+    wxBitmapButton* GetBtClearPositionSpy() { return m_btClearPositionSpy; }
     wxComboBox* GetCbContentPosSpy() { return m_cbContentPosSpy; }
     wxStaticText* GetStaticText4526() { return m_staticText4526; }
-    wxStaticText* GetPositionSpyCount() { return m_positionSpyCount; }
-    wxStaticText* GetStaticText4659() { return m_staticText4659; }
-    wxListBox* GetPositionSpy() { return m_positionSpy; }
+    wxTextCtrl* GetPositionSpyCount() { return m_positionSpyCount; }
+    wxBitmapButton* GetBmpButton47181() { return m_bmpButton47181; }
+    wxBitmapButton* GetBmpButton4718() { return m_bmpButton4718; }
+    wxBitmapButton* GetBmpButton47182() { return m_bmpButton47182; }
+    wxBitmapButton* GetBmpButton47183() { return m_bmpButton47183; }
+    wxListCtrl* GetPositionSpy() { return m_positionSpy; }
     wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }

@@ -10,6 +10,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , posReplyThreshold(10)
 , positionCounter(0)
 , stepCounter(0)
+, repeatCount(0)
 , setterMap()
 , curEmulatorPos(0L, 0L, 0L)
 , lastSignal(CMD_INVALID)
@@ -622,17 +623,16 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force) {
 ///////////////////////////////////////////////////////////////////
-	
-	/*
-	if ( abs(dx) <= 10 && abs(dy) <= 10 && abs(dz) <= 10 )
-		return true;
-	*/
-	
-	
+	// statistic counting
 	positionCounter++;
 	if ( dx != 0 ) stepCounter++;
 	if ( dy != 0 ) stepCounter++;
 	if ( dz != 0 ) stepCounter++;
+	
+	// position management
+	curEmulatorPos.incX(dx);
+	curEmulatorPos.incY(dy);
+	curEmulatorPos.incZ(dz);
 	
 	// signal handling
 	switch ( lastSignal ) {
@@ -654,26 +654,32 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	}
 	
 	// simulate a direct controler callback
-	#pragma message("flag this from configuration")
-	static int repearCount = 0;
-	if ( true ) {
-		repearCount++;
+	static CncLongPosition lastReplyPos;
+	
+	CncLongPosition diff(curEmulatorPos - lastReplyPos);
+	
+	#warning !!!!!
+	//if ( true ) {
+	if ( abs( diff.getX() ) > 40 || abs( diff.getY() ) > 40 || abs( diff.getZ() ) > 120) {
+	
+	/*
+	repeatCount++;
+	if ( repeatCount%posReplyThreshold == 0 || force == true ) {
+	 */
 		
-		if ( repearCount%posReplyThreshold == 0 || force == true ) {
-			
-			ContollerInfo ci;
-			ci.infoType = CITPosition;
-			ci.command  = lastCommand.cmd;
-			ci.posType 	= PID_XYZ_POS;
+		ContollerInfo ci;
+		ci.infoType = CITPosition;
+		ci.command  = lastCommand.cmd;
+		ci.posType 	= PID_XYZ_POS;
 
-			ci.xCtrlPos = curEmulatorPos.incX(dx);
-			ci.yCtrlPos = curEmulatorPos.incY(dy);
-			ci.zCtrlPos = curEmulatorPos.incZ(dz);
+		ci.xCtrlPos = curEmulatorPos.getX();
+		ci.yCtrlPos = curEmulatorPos.getY();
+		ci.zCtrlPos = curEmulatorPos.getZ();
 
-			cncControl->SerialControllerCallback(ci);
-			
-			repearCount = 0;
-		}
+		cncControl->SerialControllerCallback(ci);
+		
+		repeatCount = 0;
+		lastReplyPos.set(curEmulatorPos);
 	}
 	
 	// do something with this coordinates

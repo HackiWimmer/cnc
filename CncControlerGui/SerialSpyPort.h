@@ -10,7 +10,6 @@ class SerialSpyPort : public Serial {
 		void spyReadData(int prevRet, void *buffer, unsigned int nbByte);
 		void spyWriteData(void *buffer, unsigned int nbByte);
 		
-
 	public:
 		SerialSpyPort(CncControl* cnc);
 		SerialSpyPort(const char *portName);
@@ -25,7 +24,6 @@ class SerialSpyPort : public Serial {
 		
 		virtual int readData(void *buffer, unsigned int nbByte);
 		virtual bool writeData(void *buffer, unsigned int nbByte);
-		
 		
 };
 

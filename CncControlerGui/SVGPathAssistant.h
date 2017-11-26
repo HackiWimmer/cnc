@@ -20,7 +20,7 @@ class SVGPathAssistant {
 		SVGPathAssistant()
 		: pathHandler(new PathHandlerBase())
 		, parser(pathHandler)
-		, prevCurveLibResoluton(CncConfig::getCurveLibResolution())
+		, prevCurveLibResoluton(CncConfig::getCurveLibIncrement())
 		{
 			pathHandler->setCurveLibResolution(CncConfig::getDefaultCurveLibResolution());
 			pathHandler->prepareWork();
@@ -28,7 +28,7 @@ class SVGPathAssistant {
 		
 		////////////////////////////////////////////////////////////
 		~SVGPathAssistant() {
-			CncConfig::setCurveLibResolution(prevCurveLibResoluton);
+			CncConfig::setCurveLibIncrement(prevCurveLibResoluton);
 		}
 		
 		void setCurveLibResolution(float res) { pathHandler->setCurveLibResolution(res); }

@@ -40,9 +40,11 @@ void GLContextCncPath::initContext() {
 	
 	glEnable(GL_LINE_SMOOTH);
 
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); 
-	glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	if ( blending ) {
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); 
+		glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+	}
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPath::determineProjection(int w, int h) {

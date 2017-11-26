@@ -636,23 +636,24 @@ float CncConfig::getDefaultCurveLibResolution() {
 ////////////////////////////////////////////////////////////////////////
 	return CncSvgCurveLib::getDefaultResolution();
 }
+
+
 ////////////////////////////////////////////////////////////////////////
-float CncConfig::getCurveLibResolution() { 
+float CncConfig::getCurveLibIncrement() { 
 ////////////////////////////////////////////////////////////////////////
-	return CncSvgCurveLib::getResolution(); 
+	return CncSvgCurveLib::getIncement(); 
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::setCurveLibResolution(double v) { 
+void CncConfig::setCurveLibIncrement(double v) { 
 ////////////////////////////////////////////////////////////////////////
-	CncSvgCurveLib::setResolution((float)v); 
-	updateCurveLibResolutionSelector();
+	CncSvgCurveLib::setIncrement((float)v); 
+	updateCurveLibIncrementSelector();
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::updateCurveLibResolutionSelector() { 
+void CncConfig::updateCurveLibIncrementSelector() { 
 ////////////////////////////////////////////////////////////////////////
 	if ( CncConfig::gblCurveLibSelector != NULL ) {
-		wxString label(wxString::Format("%.3f", CncSvgCurveLib::getResolution()));
-		CncConfig::gblCurveLibSelector->SetStringSelection(label);
+		CncConfig::gblCurveLibSelector->SetStringSelection(wxString::Format("%.3f", CncSvgCurveLib::getIncement()));
 	}
 }
 

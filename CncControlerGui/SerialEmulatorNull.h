@@ -49,6 +49,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		int32_t posReplyThreshold;
 		size_t positionCounter;
 		size_t stepCounter;
+		int repeatCount;
 		SetterMap setterMap;
 		CncLongPosition curEmulatorPos;
 		unsigned char lastSignal;

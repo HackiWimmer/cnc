@@ -21,7 +21,7 @@ PathHandlerBase::~PathHandlerBase() {
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::setCurveLibResolution(float res) { 
 //////////////////////////////////////////////////////////////////
-	CncConfig::setCurveLibResolution(res); 
+	CncConfig::setCurveLibIncrement(res); 
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::setPathList(const CncPathListManager& newPathList) {
@@ -272,8 +272,8 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 
 	} else {
 		// First process the curve
-		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibResolution());
-		for (float t=0; t<1; t+=CncConfig::getCurveLibResolution() ) {
+		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibIncrement());
+		for (float t=0; t<1; t+=CncConfig::getCurveLibIncrement() ) {
 			if ( processCurveLibPoint(SVGCurveLib::PointOnEllipticalArc(p0, values[0], values[1], values[2], (bool)values[3], (bool)values[4], p1, t).point) == false )
 				return false;
 		}
@@ -328,8 +328,8 @@ bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double 
 			
 	} else {
 		// First process the curve
-		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibResolution());
-		for (float t=0; t<1; t+=CncConfig::getCurveLibResolution() ) {
+		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibIncrement());
+		for (float t=0; t<1; t+=CncConfig::getCurveLibIncrement() ) {
 			if ( processCurveLibPoint(SVGCurveLib::PointOnQuadraticBezierCurve(p0, p1, p2, t)) == false )
 				return false;
 		}
@@ -391,8 +391,8 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 			
 	} else {
 		// First process the curve
-		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibResolution());
-		for (float t=0; t<1; t+=CncConfig::getCurveLibResolution() ) {
+		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibIncrement());
+		for (float t=0; t<1; t+=CncConfig::getCurveLibIncrement() ) {
 			if ( processCurveLibPoint(SVGCurveLib::PointOnCubicBezierCurve(p0, p1, p2, p3, t)) == false )
 				return false;
 		}
