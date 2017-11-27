@@ -64,6 +64,10 @@ class CncConfig {
 		double calcFactX, calcFactY, calcFactZ;
 		float dispFactX3D, dispFactY3D, dispFactZ3D;
 		
+		unsigned int replyThresholdX;
+		unsigned int replyThresholdY;
+		unsigned int replyThresholdZ;
+		
 		static const unsigned int maxDurations = 32;
 		unsigned int durationCount;
 		double durationSteps[maxDurations];
@@ -117,6 +121,9 @@ class CncConfig {
 		void releaseChangedCallback(wxPGProperty* prop);
 		void initZAxisValues();
 		
+		unsigned int calculateThreshold(double pitch, unsigned int steps);
+		void calculateThresholds();
+		
 		void sc();
 		void rc();
 		
@@ -124,6 +131,8 @@ class CncConfig {
 		
 		CncConfig(MainFrame* app) ;
 		~CncConfig();
+		
+		void init();
 		
 		MainFrame* getTheApp() { return theApp; }
 		void registerWindowForConfigNotification(wxWindow* wnd);
@@ -178,6 +187,10 @@ class CncConfig {
 		const double getToolDiameter(int toolId=-1);
 		const wxString& getToolType(wxString& ret, int toolId=-1);
 		
+		const unsigned int getReplyThresholdStepsX() { return replyThresholdX; }
+		const unsigned int getReplyThresholdStepsY() { return replyThresholdY; }
+		const unsigned int getReplyThresholdStepsZ() { return replyThresholdZ; }
+		
 		// configuration getters
 		const CncUnit getDisplayUnit(void);
 		const CncUnit getDefaultDisplayUnit(void);
@@ -209,7 +222,6 @@ class CncConfig {
 		const unsigned int getWorkSpeedXY();
 		const unsigned int getRapidSpeedZ();
 		const unsigned int getWorkSpeedZ();
-		const unsigned int getReplyThreshold();
 		const unsigned int getMaxDurations() 					{ return maxDurations; }
 		const unsigned int getDurationCount() 					{ return durationCount; }
 		
@@ -225,6 +237,7 @@ class CncConfig {
 		const double getWorkpieceThickness();
 		const double getDurationThickness(unsigned int duration);
 		const double getDurationPositionAbs(unsigned int duration);
+		const double getReplyThresholdMetric();
 		const double getDisplayFactX(CncUnit cu=CncMetric) 		{ return ( cu == CncMetric ? dispFactX : 1.0 ); }
 		const double getDisplayFactY(CncUnit cu=CncMetric)		{ return ( cu == CncMetric ? dispFactY : 1.0 ); }
 		const double getDisplayFactZ(CncUnit cu=CncMetric) 		{ return ( cu == CncMetric ? dispFactZ : 1.0 ); }

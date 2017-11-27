@@ -164,8 +164,6 @@
       <File Name="CncFilePreviewWnd.cpp"/>
       <File Name="CncFilePreviewWnd.h"/>
       <File Name="CncNumberFormatter.h"/>
-      <File Name="CncLargeScaleListCtrl.h"/>
-      <File Name="CncLargeScaleListCtrl.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
@@ -262,6 +260,12 @@
         <File Name="CncToolMagazine.h"/>
       </VirtualDirectory>
       <File Name="CncConfigCommon.h"/>
+    </VirtualDirectory>
+    <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncLargeScaleListCtrl.cpp"/>
+      <File Name="CncLargeScaleListCtrl.h"/>
+      <File Name="CncPosSpyListCtrl.h"/>
+      <File Name="CncPosSpyListCtrl.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">

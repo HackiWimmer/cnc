@@ -17,7 +17,8 @@ void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 		
 	wxString name(p->GetName());
 	
-	if        ( name == CncWork_Ctl_REPLY_THRESHOLD ) {
+	if ( name == CncWork_Ctl_REPLY_THRESHOLD_METRIC ) {
+		CncConfig::getGlobalCncConfig()->calculateThresholds();
 		app->releaseControllerSetupFromConfig();
 		
 	} else if ( name == CncWork_Wpt_THICKNESS ) {
@@ -85,7 +86,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->Enable(true);
 			prop->SetHelpString(_T("This tool will be used if a requested Tool ID didn't exists"));
 			prop->SetEditor( wxT("CheckBox") );
-			registerProperty(CncWork_Tool_DEFAULT, prop);
+			CncConfig::registerProperty(CncWork_Tool_DEFAULT, prop);
 		}
 		
 		//...................
@@ -101,7 +102,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncWork_Wpt_THICKNESS, prop);
+			CncConfig::registerProperty(CncWork_Wpt_THICKNESS, prop);
 			
 			//...............
 			validator.SetPrecision(3); validator.SetRange(0.1, 90.0);
@@ -110,7 +111,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncWork_Wpt_MAX_THICKNESS_CROSS, prop);
+			CncConfig::registerProperty(CncWork_Wpt_MAX_THICKNESS_CROSS, prop);
 		}
 		
 		//...................
@@ -120,13 +121,57 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 		registerCategory(curCatName, ctl);
 		{
 			//...............
-			validator.SetPrecision(0); validator.SetRange(0.9, 2000.0);
-			prop = ctl->AppendChild( new wxFloatProperty("Reply Threshold [steps]", NEXT_PROP_ID, 100));
+			pgParameterMgrArr.Clear();
+			pgParameterMgrIntArr.Clear();
+			pgParameterMgrArr.Add(_("0.001")); 
+			pgParameterMgrArr.Add(_("0.005")); 
+			pgParameterMgrArr.Add(_("0.010")); 
+			pgParameterMgrArr.Add(_("0.020")); 
+			pgParameterMgrArr.Add(_("0.030")); 
+			pgParameterMgrArr.Add(_("0.040")); 
+			pgParameterMgrArr.Add(_("0.050")); 
+			pgParameterMgrArr.Add(_("0.060")); 
+			pgParameterMgrArr.Add(_("0.070")); 
+			pgParameterMgrArr.Add(_("0.080")); 
+			pgParameterMgrArr.Add(_("0.090")); 
+			pgParameterMgrArr.Add(_("0.100")); 
+			pgParameterMgrArr.Add(_("0.200"));
+			pgParameterMgrArr.Add(_("0.300"));
+			pgParameterMgrArr.Add(_("0.400"));
+			pgParameterMgrArr.Add(_("0.500"));
+			pgParameterMgrArr.Add(_("0.600"));
+			pgParameterMgrArr.Add(_("0.700"));
+			pgParameterMgrArr.Add(_("0.800"));
+			pgParameterMgrArr.Add(_("0.900"));
+			pgParameterMgrArr.Add(_("1.000"));
+			pgParameterMgrArr.Add(_("2.000"));
+			pgParameterMgrArr.Add(_("5.000"));
+
+			prop = ctl->AppendChild( new wxEnumProperty("Position - Reply Threshold [mm]", NEXT_PROP_ID, pgParameterMgrArr, pgParameterMgrIntArr, 15));
 			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
+			prop->SetEditor( wxT("ComboBox") );
+			CncConfig::registerProperty(CncWork_Ctl_REPLY_THRESHOLD_METRIC, prop);
+			
+			prop = ctl->AppendChild( new wxStringProperty(" --> Position - Reply Threshold X [steps]", NEXT_PROP_ID, ""));
+			prop->Enable(false);
+			prop->SetHelpString("");
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncWork_Ctl_REPLY_THRESHOLD, prop);
+			prop->SetValue("");
+			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_X, prop);
+			
+			prop = ctl->AppendChild( new wxStringProperty(" --> Position - Reply Threshold Y [steps]", NEXT_PROP_ID, ""));
+			prop->Enable(false);
+			prop->SetHelpString("");
+			prop->SetEditor( wxT("TextCtrl") );
+			prop->SetValue("");
+			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y, prop);
+			
+			prop = ctl->AppendChild( new wxStringProperty(" --> Position - Reply Threshold Z [steps]", NEXT_PROP_ID, ""));
+			prop->Enable(false);
+			prop->SetHelpString("");
+			prop->SetEditor( wxT("TextCtrl") );
+			prop->SetValue("");
+			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z, prop);
 		}
 	}
 }

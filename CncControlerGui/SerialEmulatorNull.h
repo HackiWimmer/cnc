@@ -46,10 +46,11 @@ struct LastCommand {
 class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
-		int32_t posReplyThreshold;
+		int32_t posReplyThresholdX;
+		int32_t posReplyThresholdY;
+		int32_t posReplyThresholdZ;
 		size_t positionCounter;
 		size_t stepCounter;
-		int repeatCount;
 		SetterMap setterMap;
 		CncLongPosition curEmulatorPos;
 		unsigned char lastSignal;

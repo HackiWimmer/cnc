@@ -127,8 +127,9 @@ void ArduinoPIDs::init() {
 
 	pids[PID_CONTROLLER]                      = "Controller";
 	pids[PID_ROUTER_SWITCH]                   = "Tool switch";
-	pids[PID_POS_REPLY_THRESHOLD]             = "Position reply threshold";
-	pids[PID_POS_REPLY_COUNTER]               = "Position pelay counter";
+	pids[PID_POS_REPLY_THRESHOLD_X]           = "Position reply threshold X axis";
+	pids[PID_POS_REPLY_THRESHOLD_Y]           = "Position reply threshold Y axis";
+	pids[PID_POS_REPLY_THRESHOLD_Z]           = "Position reply threshold Z axis";
 	pids[PID_MIN_ENABLE_PULSE_WIDTH]          = "Stepper Driver Enbable Pulse Width";
 	pids[PID_PROBE_MODE]                      = "Probe Mode";
 

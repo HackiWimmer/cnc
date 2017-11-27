@@ -7,10 +7,11 @@ int pointA[3], pointB[3];
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 : SerialSpyPort(cnc)
-, posReplyThreshold(10)
+, posReplyThresholdX(1)
+, posReplyThresholdY(1)
+, posReplyThresholdZ(1)
 , positionCounter(0)
 , stepCounter(0)
-, repeatCount(0)
 , setterMap()
 , curEmulatorPos(0L, 0L, 0L)
 , lastSignal(CMD_INVALID)
@@ -22,7 +23,9 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 : SerialSpyPort(portName) 
-, posReplyThreshold(10)
+, posReplyThresholdX(1)
+, posReplyThresholdY(1)
+, posReplyThresholdZ(1)
 , positionCounter(0)
 , stepCounter(0)
 , setterMap()
@@ -45,7 +48,9 @@ void SerialEmulatorNULL::reset() {
 	
 	lastSignal = CMD_INVALID;
 	
-	posReplyThreshold = 10;
+	posReplyThresholdX = 1;
+	posReplyThresholdY = 1;
+	posReplyThresholdZ = 1;
 	
 	curEmulatorPos.setXYZ(0L, 0L, 0L);
 	
@@ -408,9 +413,11 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 		setterMap[(int)id] = val;
 		
 		// special handling for later use
-		if ( (int)id == PID_POS_REPLY_THRESHOLD )
-			posReplyThreshold = val;
-		
+		switch ( (int)id ) {
+			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = val; break;
+			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = val; break;
+			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = val; break;
+		}
 		return true;
 	}
 
@@ -655,30 +662,24 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	
 	// simulate a direct controler callback
 	static CncLongPosition lastReplyPos;
-	
 	CncLongPosition diff(curEmulatorPos - lastReplyPos);
 	
-	#warning !!!!!
-	//if ( true ) {
-	if ( abs( diff.getX() ) > 40 || abs( diff.getY() ) > 40 || abs( diff.getZ() ) > 120) {
-	
-	/*
-	repeatCount++;
-	if ( repeatCount%posReplyThreshold == 0 || force == true ) {
-	 */
-		
+	if ( abs( diff.getX() ) >= posReplyThresholdX || 
+	     abs( diff.getY() ) >= posReplyThresholdY || 
+		 abs( diff.getZ() ) >= posReplyThresholdZ ||
+		 force == true ) 
+	{
 		ContollerInfo ci;
 		ci.infoType = CITPosition;
 		ci.command  = lastCommand.cmd;
 		ci.posType 	= PID_XYZ_POS;
-
+		
 		ci.xCtrlPos = curEmulatorPos.getX();
 		ci.yCtrlPos = curEmulatorPos.getY();
 		ci.zCtrlPos = curEmulatorPos.getZ();
-
+		
 		cncControl->SerialControllerCallback(ci);
 		
-		repeatCount = 0;
 		lastReplyPos.set(curEmulatorPos);
 	}
 	

@@ -3944,10 +3944,23 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxFlexGridSizer* flexGridSizer4714 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer4714->SetFlexibleDirection( wxBOTH );
     flexGridSizer4714->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4714->AddGrowableCol(1);
+    flexGridSizer4714->AddGrowableCol(0);
     flexGridSizer4714->AddGrowableRow(0);
     
     flexGridSizer4480->Add(flexGridSizer4714, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer4711 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer4711->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4711->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4711->AddGrowableCol(0);
+    flexGridSizer4711->AddGrowableRow(0);
+    
+    flexGridSizer4714->Add(flexGridSizer4711, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_positionSpy = new wxListCtrl(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxLC_REPORT);
+    m_positionSpy->SetToolTip(_("Only a placeholder"));
+    
+    flexGridSizer4711->Add(m_positionSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer4716 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer4716->SetFlexibleDirection( wxBOTH );
@@ -3978,19 +3991,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4716->Add(m_bmpButton47183, 0, wxALL, WXC_FROM_DIP(0));
     m_bmpButton47183->SetMinSize(wxSize(24,24));
-    
-    wxFlexGridSizer* flexGridSizer4711 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer4711->SetFlexibleDirection( wxBOTH );
-    flexGridSizer4711->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4711->AddGrowableCol(0);
-    flexGridSizer4711->AddGrowableRow(0);
-    
-    flexGridSizer4714->Add(flexGridSizer4711, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_positionSpy = new wxListCtrl(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxLC_REPORT);
-    m_positionSpy->SetToolTip(_("Only a placeholder"));
-    
-    flexGridSizer4711->Add(m_positionSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_menuBar = new wxMenuBar(wxMB_DOCKABLE);
     this->SetMenuBar(m_menuBar);

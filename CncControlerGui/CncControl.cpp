@@ -240,7 +240,9 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_SPEED_Y, getRpmSpeedY()));
 	setup.push_back(SetterTuple(PID_SPEED_Z, getRpmSpeedZ()));
 	
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD, cncConfig->getReplyThreshold()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, cncConfig->getReplyThresholdStepsX()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, cncConfig->getReplyThresholdStepsZ()));
 	
 	if ( processSetterList(setup) ) {
 		changeCurrentRpmSpeedXYZ(CncSpeedRapid);

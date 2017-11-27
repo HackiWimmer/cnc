@@ -60,6 +60,7 @@ CncConfig::CncConfig(MainFrame* app)
 , dispFactX(1.0), dispFactY(1.0), dispFactZ(1.0)
 , calcFactX(1.0), calcFactY(1.0), calcFactZ(1.0)
 , dispFactX3D(1.0), dispFactY3D(1.0), dispFactZ3D(1.0)
+, replyThresholdX(1), replyThresholdY(1), replyThresholdZ(1)
 , currentZDepth(0.0)
 , maxZDistance(50.0)
 , referenceIncludesWpt(false)
@@ -70,13 +71,19 @@ CncConfig::CncConfig(MainFrame* app)
 ////////////////////////////////////////////////////////////////////////
 {
 	registerWindowForConfigNotification(app);
-	calculateFactors();
-	initZAxisValues();
+	init();
 }
 ////////////////////////////////////////////////////////////////////////
 CncConfig::~CncConfig() {
 ////////////////////////////////////////////////////////////////////////
 	toolMagazine.clear();
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::init() {
+////////////////////////////////////////////////////////////////////////
+	calculateFactors();
+	calculateThresholds();
+	initZAxisValues();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::sc() { 
@@ -620,10 +627,30 @@ const wxString& CncConfig::getToolType(wxString& ret, int toolId) {
 	ret.assign("PEN");
 	return ret;
 }
-
-
-
-
+////////////////////////////////////////////////////////////////////////
+unsigned int CncConfig::calculateThreshold(double pitch, unsigned int steps) {
+////////////////////////////////////////////////////////////////////////
+	double metric		= getReplyThresholdMetric();
+	if ( metric < 0.0 )
+		return 1;
+	
+	double min = pitch/steps;
+	if ( metric <= min )
+		return 1;
+		
+	return (unsigned int)(metric/min);
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::calculateThresholds() {
+////////////////////////////////////////////////////////////////////////
+	replyThresholdX = calculateThreshold(getPitchX(), getStepsX());
+	replyThresholdY = calculateThreshold(getPitchY(), getStepsY());
+	replyThresholdZ = calculateThreshold(getPitchZ(), getStepsZ());
+	
+	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_X)->SetValue((int)replyThresholdX);
+	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y)->SetValue((int)replyThresholdY);
+	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z)->SetValue((int)replyThresholdZ);
+}
 
 
 
@@ -668,6 +695,7 @@ const bool CncConfig::getShowTestMenuFlag()							{ wxPGProperty* p = getPropert
 const bool CncConfig::getSvgResultWithOrigPathFlag()				{ wxPGProperty* p = getProperty(CncSvg_Emu_RSLT_WITH_ORIG_PATH); 		wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgResultOnlyFirstCrossingFlag()			{ wxPGProperty* p = getProperty(CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS); wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgReverseYAxisFlag()						{ wxPGProperty* p = getProperty(CncSvg_Parser_REVERSE_Y_AXIS); 			wxASSERT(p); return p->GetValue().GetBool(); }
+
 const int CncConfig::getStepSignX()									{ return 1; } // currently not supported -1 = reverse
 const int CncConfig::getStepSignY()									{ return 1; } // currently not supported -1 = reverse
 
@@ -686,7 +714,6 @@ const unsigned int CncConfig::getPulsWidthOffsetZ() 				{ wxPGProperty* p = getP
 const unsigned int CncConfig::getMultiplierX() 						{ wxPGProperty* p = getProperty(CncConfig_MULTIPLIER_X); 				wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getMultiplierY() 						{ wxPGProperty* p = getProperty(CncConfig_MULTIPLIER_Y); 				wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getMultiplierZ()						{ wxPGProperty* p = getProperty(CncConfig_MULTIPLIER_Z); 				wxASSERT(p); return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getReplyThreshold() 					{ wxPGProperty* p = getProperty(CncWork_Ctl_REPLY_THRESHOLD); 			wxASSERT(p); return p->GetValue().GetInteger(); }
 
 const double CncConfig::getMaxDimension() 							{ return std::max(std::max(getMaxDimensionX(), getMaxDimensionY()), getMaxDimensionZ()); }
 const double CncConfig::getMaxDimensionX() 							{ wxPGProperty* p = getProperty(CncConfig_MAX_DIMENSION_X); 			wxASSERT(p); return p->GetValue().GetDouble(); } 
@@ -698,6 +725,8 @@ const double CncConfig::getPitchY() 								{ wxPGProperty* p = getProperty(CncC
 const double CncConfig::getPitchZ() 								{ wxPGProperty* p = getProperty(CncConfig_PITCH_Z); 					wxASSERT(p); return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxDurationThickness()					{ wxPGProperty* p = getProperty(CncWork_Wpt_MAX_THICKNESS_CROSS);		wxASSERT(p); return p->GetValue().GetDouble(); }
 const double CncConfig::getWorkpieceThickness()						{ wxPGProperty* p = getProperty(CncWork_Wpt_THICKNESS); 				wxASSERT(p); return p->GetValue().GetDouble(); }
+
+const double CncConfig::getReplyThresholdMetric()					{ wxPGProperty* p = getProperty(CncWork_Ctl_REPLY_THRESHOLD_METRIC); 	wxASSERT(p); double ret; p->GetValueAsString().ToDouble(&ret); return ret; }
 
 const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ wxPGProperty* p = getProperty(CncApplication_DEF_DISPLAY_UNIT); 		wxASSERT(p); return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }

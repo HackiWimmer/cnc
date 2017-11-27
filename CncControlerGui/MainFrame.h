@@ -15,7 +15,7 @@
 #include "CncSpyControl.h"
 #include "CncFileView.h"
 #include "CncToolMagazine.h"
-#include "CncLargeScaleListCtrl.h"
+#include "CncPosSpyListCtrl.h"
 #include "codelite/wxPNGAnimation.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -50,8 +50,11 @@ class GlobalConfigManager {
 			CncConfig::setupGlobalConfigurationGrid(pgMgrSetup, *globalConfig);
 			CncConfig::globalCncConfig = new CncConfig(mf);
 			
-			// at least load the file configuration
+			// load the file configuration
 			CncConfig::globalCncConfig->loadConfiguration(*globalConfig);
+			
+			// at least initialize
+			CncConfig::globalCncConfig->init();
 		}
 		
 		~GlobalConfigManager() {
@@ -435,7 +438,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncFilePreview* mainFilePreview;
 		CncFilePreview* monitorFilePreview;
 		CncToolMagazine* toolMagaizne;
-		CncLargeScaledListCtrl* positionSpy;
+		CncPosSpyListCtrl* positionSpy;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -523,7 +526,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void decorateSearchButton();
 		
-		void decoratePosSpyControl();
 		void decoratePosSpyConnectButton(bool state);
 
 		void registerGuiControls();

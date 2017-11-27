@@ -522,11 +522,11 @@ protected:
     wxComboBox* m_cbContentPosSpy;
     wxStaticText* m_staticText4526;
     wxTextCtrl* m_positionSpyCount;
+    wxListCtrl* m_positionSpy;
     wxBitmapButton* m_bmpButton47181;
     wxBitmapButton* m_bmpButton4718;
     wxBitmapButton* m_bmpButton47182;
     wxBitmapButton* m_bmpButton47183;
-    wxListCtrl* m_positionSpy;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
     wxMenuItem* m_miNewTemplate;
@@ -1298,11 +1298,11 @@ public:
     wxComboBox* GetCbContentPosSpy() { return m_cbContentPosSpy; }
     wxStaticText* GetStaticText4526() { return m_staticText4526; }
     wxTextCtrl* GetPositionSpyCount() { return m_positionSpyCount; }
+    wxListCtrl* GetPositionSpy() { return m_positionSpy; }
     wxBitmapButton* GetBmpButton47181() { return m_bmpButton47181; }
     wxBitmapButton* GetBmpButton4718() { return m_bmpButton4718; }
     wxBitmapButton* GetBmpButton47182() { return m_bmpButton47182; }
     wxBitmapButton* GetBmpButton47183() { return m_bmpButton47183; }
-    wxListCtrl* GetPositionSpy() { return m_positionSpy; }
     wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }

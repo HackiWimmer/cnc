@@ -232,18 +232,6 @@ const CncColumContainer& CncLargeScaledListCtrl::getRow(long item) {
 	return rows[translateItem(item)];
 }
 ///////////////////////////////////////////////////////////////////
-wxString CncLargeScaledListCtrl::OnGetItemText(long item, long column) const {
-///////////////////////////////////////////////////////////////////
-	if ( isItemValid(item) == false )
-		return _(wxString::Format("!%ld.%ld", item, column));
-		
-	// out of column range
-	if ( isColumnValid(column) == false )
-		return _("");
-		
-	return rows[translateItem(item)].getItem(column);
-}
-///////////////////////////////////////////////////////////////////
 long CncLargeScaledListCtrl::translateItem(long item) const {
 ///////////////////////////////////////////////////////////////////
 	if ( listType == CncLargeScaledListCtrl::ListType::REVERSE ) {
@@ -259,19 +247,22 @@ long CncLargeScaledListCtrl::translateItem(long item) const {
 	return item;
 }
 ///////////////////////////////////////////////////////////////////
+wxString CncLargeScaledListCtrl::OnGetItemText(long item, long column) const {
+///////////////////////////////////////////////////////////////////
+	if ( isItemValid(item) == false )
+		return _(wxString::Format("!%ld.%ld", item, column));
+		
+	// out of column range
+	if ( isColumnValid(column) == false )
+		return _("");
+		
+	return rows[translateItem(item)].getItem(column);
+}
+///////////////////////////////////////////////////////////////////
 int CncLargeScaledListCtrl::OnGetItemColumnImage(long item, long column) const {
 ///////////////////////////////////////////////////////////////////
-	// todo - currently not nesseccary
-	switch ( column ) {
-		case 0:		return 0;
-		case 1:		if ( GetItemText(item,column) == "R" )	return 1;
-					else									return 2;
-		case 3:
-		case 4:
-		case 5:		return 3;
-	}
-	
-	return -1; // default
+	// default behaviour
+	return -1;
 }
 ///////////////////////////////////////////////////////////////////
 wxListItemAttr* CncLargeScaledListCtrl::OnGetItemAttr(long item) const {

@@ -58,9 +58,9 @@ const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 
 #ifdef DEBUG
-	const char* _programVersion = "0.8.0.d";
+	const char* _programVersion = "0.8.1.d";
 #else
-	const char* _programVersion = "0.8.0.r";
+	const char* _programVersion = "0.8.1.r";
 #endif
 ////////////////////////////////////////////////////////////////////
 
@@ -336,7 +336,7 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_toolMagazinePlaceholder, toolMagaizne);
 	
 	// pos spy control
-	positionSpy = new CncLargeScaledListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	positionSpy = new CncPosSpyListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_positionSpy, positionSpy);
 	positionSpy->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
 }
@@ -1191,8 +1191,6 @@ void MainFrame::initialize(void) {
 	// curve lib resulotion
 	CncConfig::gblCurveLibSelector = m_cbCurveLibResolution;
 	CncConfig::setCurveLibIncrement(CncSvgCurveLib::defaultIncrement);
-	
-	decoratePosSpyControl();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeCncControl() {
@@ -6499,37 +6497,6 @@ void MainFrame::decoratePosSpyConnectButton(bool state) {
 	
 	if ( state == false )
 		clearPositionSpy();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::decoratePosSpyControl() {
-///////////////////////////////////////////////////////////////////
-	if ( positionSpy->GetColumnCount() != 0 )
-		return;
-		
-	// add colums
-	positionSpy->AppendColumn("Reference", 	wxLIST_FORMAT_RIGHT, 	100);
-	positionSpy->AppendColumn("", 			wxLIST_FORMAT_CENTER, 	 26);
-	positionSpy->AppendColumn("Speed", 		wxLIST_FORMAT_RIGHT, 	 50);
-	positionSpy->AppendColumn("X", 			wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
-	positionSpy->AppendColumn("Y", 			wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	positionSpy->AppendColumn("Z", 			wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	
-	// determine styles
-	positionSpy->setListType(CncLargeScaledListCtrl::ListType::REVERSE);
-	
-	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-	positionSpy->SetFont(font);
-	
-	positionSpy->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
-	
-	wxImageList* imageList = new wxImageList(16, 16, true);
-	imageList->RemoveAll();
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_REF"));
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_RAPID"));
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_WORK"));
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_POS"));
-	
-	positionSpy->SetImageList(imageList, wxIMAGE_LIST_SMALL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectPositionSpy(wxListEvent& event) {

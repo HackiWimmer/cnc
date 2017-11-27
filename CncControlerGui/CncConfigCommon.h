@@ -74,6 +74,12 @@
 	#define CncWork_Tool_DEFAULT					"CncWork.Tool/DEFAULT"
 	#define CncWork_Wpt_THICKNESS					"CncWork.Workpiece/THICKNESS"
 	#define CncWork_Wpt_MAX_THICKNESS_CROSS			"CncWork.Workpiece/MAX_THICKNESS_PER_CROSSING"
-	#define CncWork_Ctl_REPLY_THRESHOLD				"CncWork.Controller/REPLAY_THRESHOLD"
+
+	#define CncWork_Ctl_REPLY_THRESHOLD_METRIC		"CncWork.Controller/REPLAY_THRESHOLD_METRIC"
+	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_X		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_X"
+	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Y"
+	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Z"
+
+
 
 #endif
