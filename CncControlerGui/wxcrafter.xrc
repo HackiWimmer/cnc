@@ -88,6 +88,14 @@
             </tooltip>
             <default>0</default>
           </object>
+          <object class="wxBitmapToggleButton" name="m_btProbeMode">
+            <style>wxBU_EXACTFIT|wxBU_BOTTOM</style>
+            <bitmap>bitmaps/feed.png</bitmap>
+            <tooltip>
+              <![CDATA[Probe mode ...]]>
+            </tooltip>
+            <checked>1</checked>
+          </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_btSelectReferences">
             <bitmap>bitmaps/view-orientation.png</bitmap>
@@ -114,7 +122,7 @@
             <default>0</default>
           </object>
           <object class="wxBitmapButton" name="m_btSelectTemplate">
-            <bitmap>bitmaps/bricks.png</bitmap>
+            <bitmap>bitmaps/package-supported.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
               <![CDATA[Template]]>
@@ -189,7 +197,7 @@
               <![CDATA[Artificially Step Delay]]>
             </tooltip>
             <min>0</min>
-            <max>256</max>
+            <max>128</max>
             <value>0</value>
             <size>75,-1</size>
           </object>
@@ -4159,7 +4167,7 @@
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <object class="wxFlexGridSizer">
-                                              <cols>2</cols>
+                                              <cols>3</cols>
                                               <rows>1</rows>
                                               <vgap>0</vgap>
                                               <hgap>0</hgap>
@@ -4182,6 +4190,24 @@
                                                 </object>
                                               </object>
                                               <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <border>7</border>
+                                                <object class="wxTextCtrl" name="m_setterListCount">
+                                                  <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
+                                                  <bg>wxSYS_COLOUR_MENU</bg>
+                                                  <fg>#000040</fg>
+                                                  <font>
+                                                    <size>8</size>
+                                                    <style>normal</style>
+                                                    <weight>bold</weight>
+                                                    <family>swiss</family>
+                                                    <underlined>0</underlined>
+                                                    <face>Segoe UI</face>
+                                                  </font>
+                                                  <value># 0</value>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
                                                 <flag>wxALL|wxALIGN_RIGHT</flag>
                                                 <border>1</border>
                                                 <object class="wxButton" name="m_btClearSetterList">
@@ -4199,7 +4225,9 @@
                                             <border>1</border>
                                             <object class="wxListCtrl" name="m_setterList">
                                               <style>wxLC_REPORT</style>
-                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                              <tooltip>
+                                                <![CDATA[Only a placeholder]]>
+                                              </tooltip>
                                             </object>
                                           </object>
                                         </object>
@@ -4576,7 +4604,7 @@
                                               <flag>wxALL</flag>
                                               <border>5</border>
                                               <object class="wxStaticBitmap" name="m_lableWorkpieceThickness">
-                                                <bitmap>bitmaps/abb-import.png</bitmap>
+                                                <bitmap>bitmaps/distribute-vertical-equal.png</bitmap>
                                                 <tooltip>
                                                   <![CDATA[Workpiece thickness 0.000 mm]]>
                                                 </tooltip>
@@ -4663,13 +4691,38 @@
                                             <default>0</default>
                                           </object>
                                         </object>
+                                        <object class="spacer" name="Spacer47761">
+                                          <size>2,0</size>
+                                          <flag>wxALL</flag>
+                                          <option>1</option>
+                                        </object>
                                         <object class="sizeritem">
                                           <flag>wxALL|wxEXPAND</flag>
-                                          <border>5</border>
-                                          <object class="wxStaticText" name="m_staticText16032">
-                                            <label>Render Resolution:</label>
-                                            <style/>
+                                          <border>2</border>
+                                          <object class="wxStaticLine" name="m_staticLine47803">
+                                            <style>wxLI_VERTICAL</style>
                                           </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <object class="wxStaticText" name="m_staticText16032">
+                                            <label>Render
+Resolution:</label>
+                                            <style/>
+                                            <font>
+                                              <size>7</size>
+                                              <style>normal</style>
+                                              <weight>bold</weight>
+                                              <family>swiss</family>
+                                              <underlined>0</underlined>
+                                              <face>Segoe UI Semibold</face>
+                                            </font>
+                                          </object>
+                                        </object>
+                                        <object class="spacer" name="Spacer477612">
+                                          <size>2,0</size>
+                                          <flag>wxALL</flag>
+                                          <option>1</option>
                                         </object>
                                         <object class="sizeritem">
                                           <flag>wxALL|wxALIGN_RIGHT</flag>
@@ -4736,72 +4789,42 @@
                                           </object>
                                         </object>
                                         <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>2</border>
+                                          <object class="wxStaticLine" name="m_staticLine4780">
+                                            <style>wxLI_VERTICAL</style>
+                                          </object>
+                                        </object>
+                                        <object class="spacer" name="Spacer4776">
+                                          <size>2,0</size>
                                           <flag>wxALL</flag>
-                                          <border>5</border>
-                                          <object class="wxStaticText" name="m_staticText10543">
-                                            <label>Interval:</label>
+                                          <option>1</option>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <object class="wxStaticText" name="m_staticText32334">
+                                            <label>Display
+Interval [ms]:</label>
                                             <style/>
+                                            <font>
+                                              <size>7</size>
+                                              <style>normal</style>
+                                              <weight>bold</weight>
+                                              <family>swiss</family>
+                                              <underlined>0</underlined>
+                                              <face>Segoe UI Semibold</face>
+                                            </font>
                                           </object>
                                         </object>
                                         <object class="sizeritem">
                                           <flag>wxALL</flag>
-                                          <border>1</border>
-                                          <object class="wxComboBox" name="m_cbUpdateInterval">
-                                            <style>wxCB_READONLY</style>
-                                            <tooltip>
-                                              <![CDATA[Determine Update Interval]]>
-                                            </tooltip>
-                                            <selection>5</selection>
-                                            <content>
-                                              <item>
-                                                <![CDATA[1]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[2]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[5]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[10]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[20]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[50]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[100]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[200]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[500]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[1000]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[2000]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[5000]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[10000]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[20000]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[50000]]>
-                                              </item>
-                                              <item>
-                                                <![CDATA[100000]]>
-                                              </item>
-                                            </content>
+                                          <minsize>60,-1</minsize>
+                                          <object class="wxSlider" name="m_displayInterval">
+                                            <style>wxSL_HORIZONTAL</style>
+                                            <min>0</min>
+                                            <max>1000</max>
+                                            <value>50</value>
+                                            <size>60,-1</size>
                                           </object>
                                         </object>
                                       </object>
@@ -5132,12 +5155,12 @@
                                                 <label>Min(X,Y,Z):</label>
                                                 <style/>
                                                 <font>
-                                                  <size>8</size>
+                                                  <size>7</size>
                                                   <style>normal</style>
-                                                  <weight>normal</weight>
+                                                  <weight>bold</weight>
                                                   <family>swiss</family>
                                                   <underlined>0</underlined>
-                                                  <face>Segoe UI</face>
+                                                  <face>Segoe UI Semibold</face>
                                                 </font>
                                               </object>
                                             </object>
@@ -5205,12 +5228,12 @@
                                                 <label>Max(X,Y,Z):</label>
                                                 <style/>
                                                 <font>
-                                                  <size>8</size>
+                                                  <size>7</size>
                                                   <style>normal</style>
-                                                  <weight>normal</weight>
+                                                  <weight>bold</weight>
                                                   <family>swiss</family>
                                                   <underlined>0</underlined>
-                                                  <face>Segoe UI</face>
+                                                  <face>Segoe UI Semibold</face>
                                                 </font>
                                               </object>
                                             </object>
@@ -5994,6 +6017,14 @@
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <border>3</border>
+                  <minsize>26,-1</minsize>
+                  <object class="wxStaticBitmap" name="m_refPosTrafficLight">
+                    <size>26,-1</size>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>3</border>
                   <minsize>-1,18</minsize>
                   <object class="wxStaticText" name="LableX">
                     <label>X:</label>
@@ -6310,42 +6341,6 @@
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
               <object class="wxStaticLine" name="m_staticLine602341">
-                <style>wxLI_VERTICAL</style>
-              </object>
-            </object>
-            <object class="sizeritem" name="flexGridSizer3699">
-              <flag>wxALL</flag>
-              <border>2</border>
-              <object class="wxFlexGridSizer">
-                <cols>2</cols>
-                <rows>1</rows>
-                <vgap>0</vgap>
-                <hgap>0</hgap>
-                <growablecols/>
-                <growablerows/>
-                <object class="sizeritem">
-                  <flag>wxALL</flag>
-                  <border>3</border>
-                  <object class="wxStaticText" name="m_staticText2199">
-                    <label>Zero Pos:</label>
-                    <style/>
-                    <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
-                  </object>
-                </object>
-                <object class="sizeritem">
-                  <flag>wxALL</flag>
-                  <border>3</border>
-                  <minsize>30,-1</minsize>
-                  <object class="wxStaticBitmap" name="m_refPosTrafficLight">
-                    <size>30,-1</size>
-                  </object>
-                </object>
-              </object>
-            </object>
-            <object class="sizeritem">
-              <flag>wxALL|wxEXPAND</flag>
-              <border>1</border>
-              <object class="wxStaticLine" name="m_staticLine6023412">
                 <style>wxLI_VERTICAL</style>
               </object>
             </object>

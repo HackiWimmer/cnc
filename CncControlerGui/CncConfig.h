@@ -6,9 +6,9 @@
 #include <wx/config.h>
 #include <wx/textentry.h>
 #include <wx/valnum.h>
-
 #include <wx/combobox.h>
 #include <wx/propgrid/propgrid.h>
+#include "CncArduino.h"
 #include "DataControlModel.h"
 #include "CncCommon.h"
 #include "CncSvgCurveLib.h"
@@ -55,6 +55,7 @@ class CncConfig {
 		
 	private:
 		bool changed;
+		bool probeMode;
 		CncUnit currentUnit;
 		MainFrame* theApp;
 		ToolMagazine toolMagazine;
@@ -117,6 +118,7 @@ class CncConfig {
 		void saveNonGuiConfig(wxConfigBase& config);
 		
 		void calculateFactors();
+		void calculateSpeedValues();
 		bool setPropertyValueFromConfig(const wxString& groupName, const wxString& entryName, const wxString& value);
 		void releaseChangedCallback(wxPGProperty* prop);
 		void initZAxisValues();
@@ -170,6 +172,9 @@ class CncConfig {
 		const bool isModified() 		{ return changed; }
 		void discardModifications() 	{ changed = false; }
 		
+		void setProbeMode(bool state) { probeMode = state; }
+		bool isProbeMode() { return  probeMode; }
+		
 		double convertX(CncUnit oldUnit, CncUnit newUnit, double value);
 		double convertY(CncUnit oldUnit, CncUnit newUnit, double value);
 		double convertZ(CncUnit oldUnit, CncUnit newUnit, double value);
@@ -203,12 +208,16 @@ class CncConfig {
 		const bool getSvgResultOnlyFirstCrossingFlag();
 		const bool getSvgReverseYAxisFlag();
 		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
+		const bool getAvoidDupSetterValuesFlag();
 		
 		const int getStepSignX();
 		const int getStepSignY();
 		
-		const unsigned int getMaxSpeedXY();
-		const unsigned int getMaxSpeedZ();
+		const double getMaxSpeedX_MM_MIN();
+		const double getMaxSpeedY_MM_MIN();
+		const double getMaxSpeedZ_MM_MIN();
+		const double getMaxSpeedXYZ_MM_MIN();
+
 		const unsigned int getStepsX();
 		const unsigned int getStepsY();
 		const unsigned int getStepsZ();
@@ -218,12 +227,11 @@ class CncConfig {
 		const unsigned int getMultiplierX();
 		const unsigned int getMultiplierY();
 		const unsigned int getMultiplierZ();
-		const unsigned int getRapidSpeedXY();
-		const unsigned int getWorkSpeedXY();
-		const unsigned int getRapidSpeedZ();
-		const unsigned int getWorkSpeedZ();
 		const unsigned int getMaxDurations() 					{ return maxDurations; }
 		const unsigned int getDurationCount() 					{ return durationCount; }
+		const unsigned int calcSpeedOffsetX(double s);
+		const unsigned int calcSpeedOffsetY(double s);
+		const unsigned int calcSpeedOffsetZ(double s);
 		
 		const double getMaxDimension();
 		const double getMaxDimensionX();
@@ -238,6 +246,8 @@ class CncConfig {
 		const double getDurationThickness(unsigned int duration);
 		const double getDurationPositionAbs(unsigned int duration);
 		const double getReplyThresholdMetric();
+		const double getDefaultRapidSpeed_MM_MIN();
+		const double getDefaultWorkSpeed_MM_MIN();
 		const double getDisplayFactX(CncUnit cu=CncMetric) 		{ return ( cu == CncMetric ? dispFactX : 1.0 ); }
 		const double getDisplayFactY(CncUnit cu=CncMetric)		{ return ( cu == CncMetric ? dispFactY : 1.0 ); }
 		const double getDisplayFactZ(CncUnit cu=CncMetric) 		{ return ( cu == CncMetric ? dispFactZ : 1.0 ); }
@@ -257,8 +267,7 @@ class CncConfig {
 		const wxString& getXMLFileViewer(wxString& ret);
 		const wxString& getEditorTool(wxString& ret);
 		const wxString& getPyCamTool(wxString& ret);
-		const wxString& getDefaultSpeedModeXY(wxString& ret);
-		const wxString& getDefaultSpeedModeZ(wxString& ret);
+		const wxString& getDefaultSpeedModeXYZ(wxString& ret);
 		const wxString& getDefaultPort(wxString& ret);
 		const wxString& getDefaultTplDir(wxString& ret);
 		const wxString& getDefaultTplFile(wxString& ret);

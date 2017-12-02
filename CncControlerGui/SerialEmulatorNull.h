@@ -49,9 +49,13 @@ class SerialEmulatorNULL : public SerialSpyPort
 		int32_t posReplyThresholdX;
 		int32_t posReplyThresholdY;
 		int32_t posReplyThresholdZ;
+		int32_t speedOffsetX;
+		int32_t speedOffsetY;
+		int32_t speedOffsetZ;
 		size_t positionCounter;
 		size_t stepCounter;
 		SetterMap setterMap;
+		CncLongPosition targetMajorPos;
 		CncLongPosition curEmulatorPos;
 		unsigned char lastSignal;
 		
@@ -60,6 +64,10 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force=false);
 		
 		inline void reset();
+		
+		inline bool stepAxis(int32_t dx, int32_t speedOffset);
+		
+		inline __int64 getMircoscondTimestamp();
 		
 	protected:
 		LastCommand lastCommand;

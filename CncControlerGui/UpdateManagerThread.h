@@ -4,7 +4,8 @@
 #include <wx/thread.h>
 #include <wx/datetime.h>
 #include <boost/lockfree/spsc_queue.hpp>
-#include "CncLargeScaleListCtrl.h"
+#include "CncPosSpyListCtrl.h"
+#include "CncSetterListCtrl.h"
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "CncPosition.h"
@@ -69,20 +70,8 @@ class UpdateManagerThread : public wxThread {
 	
 	public:
 		enum SpyContent { APP_POSITIONS = 0, CTL_POSITIONS = 1};
-		enum EventId    { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4, DISPATCH_ALL = 5 };
+		enum EventId    { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4, DISPATCH_ALL = 5, POST_INFO = 6, POST_WARNING = 7, POST_ERROR = 8};
 		enum SpeedMode  { UNDEFINED = '\0', RAPID = 'R', WORK = 'W' };
-		
-		static const int SET_LST_COL_NUM 		= 0;
-		static const int SET_LST_COL_KEY 		= 1;
-		static const int SET_LST_COL_VAL 		= 2;
-		
-		static const int POS_SPY_LIST_COL_REF	= 0;
-		static const int POS_SPY_LIST_COL_T		= 1;
-		static const int POS_SPY_LIST_COL_F		= 2;
-		static const int POS_SPY_LIST_COL_X		= 3;
-		static const int POS_SPY_LIST_COL_Y		= 4;
-		static const int POS_SPY_LIST_COL_Z		= 5;
-		static const int POS_SPY_LIST_SIZE		= 6;
 		
 		struct Event{
 			enum Type { EMPTY_UPD, 
@@ -174,6 +163,7 @@ class UpdateManagerThread : public wxThread {
 
 			//////////////////////////////////////////////////////////////
 			struct Pos {
+				unsigned char pid		= '\0';
 				long id					= -1;
 				double speedValue		= 0.0;
 				SpeedMode speedMode		= UNDEFINED;
@@ -190,50 +180,51 @@ class UpdateManagerThread : public wxThread {
 					pos.set({0, 0, 0});
 				}
 				
-				void set(long id, SpeedMode speedMode, double speedValue, const CncLongPosition& p) {
+				void set(unsigned char pid, long id, SpeedMode speedMode, double speedValue, const CncLongPosition& p) {
+					this->pid 			= pid;
 					this->id			= id;
 					this->speedValue	= speedValue;
 					this->speedMode		= speedMode;
 					this->pos.set(p);
 				}
 
-				void set(long id, wxString speedMode, double sv, const CncLongPosition& p) {
+				void set(unsigned char pid, long id, wxString speedMode, double sv, const CncLongPosition& p) {
 					SpeedMode sm;
 					switch ( (char)speedMode[0] ) {
 						case 'R':	sm = RAPID; break;
 						case 'W':	sm = WORK;  break;
 						default:	sm = UNDEFINED;
 					}
-					set(id, sm, sv, p);
+					set(pid, id, sm, sv, p);
 				}
 				
 			} pos;
 			
-				inline const Event& AppPosEvent(long i, SpeedMode sm, double sv, const CncLongPosition& p) {
+				inline const Event& AppPosEvent(unsigned char pid, long i, SpeedMode sm, double sv, const CncLongPosition& p) {
 					type			= APP_POS_UPD;
 					processed    	= false;
-					pos.set(i, sm, sv, p);
+					pos.set(pid, i, sm, sv, p);
 					return *this;
 				}
 				
-				inline const Event& AppPosEvent(long i, const wxString& sm, double sv, const CncLongPosition& p) {
+				inline const Event& AppPosEvent(unsigned char pid, long i, const wxString& sm, double sv, const CncLongPosition& p) {
 					type			= APP_POS_UPD;
 					processed    	= false;
-					pos.set(i, sm, sv, p);
+					pos.set(pid, i, sm, sv, p);
 					return *this;
 				}
 
-				inline const Event& CtlPosEvent(long i, SpeedMode sm, double sv, const CncLongPosition& p) {
+				inline const Event& CtlPosEvent(unsigned char pid, long i, SpeedMode sm, double sv, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
-					pos.set(i, sm, sv, p);
+					pos.set(pid, i, sm, sv, p);
 					return *this;
 				}
 				
-				inline const Event& CtlPosEvent(long i, const wxString& sm, double sv, const CncLongPosition& p) {
+				inline const Event& CtlPosEvent(unsigned char pid, long i, const wxString& sm, double sv, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
-					pos.set(i, sm, sv, p);
+					pos.set(pid, i, sm, sv, p);
 					return *this;
 				}
 			//////////////////////////////////////////////////////////////
@@ -247,14 +238,20 @@ class UpdateManagerThread : public wxThread {
 		void stop();
 		void postEvent(const UpdateManagerThread::Event& evt);
 		
-		unsigned int fillPositionSpy(CncLargeScaledListCtrl* lb);
-		void fillSetterList(wxListCtrl* lb);
+		unsigned int fillPositionSpy(CncPosSpyListCtrl* lb);
+		unsigned int fillSetterList(CncSetterListCtrl* lb);
 		
 	protected:
+		
+		typedef UpdateManagerThread::Event LastPosSpyEntry;
+		typedef UpdateManagerThread::Event LastSetterEntry;
+		
 		static const unsigned long posQueueSize 	= 1024 * 1024;
 		typedef std::vector<UpdateManagerThread::Event> SetterList;
 		typedef boost::lockfree::spsc_queue<UpdateManagerThread::Event, boost::lockfree::capacity<posQueueSize> > PosSpyQueue;
+		typedef boost::lockfree::spsc_queue<UpdateManagerThread::Event, boost::lockfree::capacity<posQueueSize> > SetterQueue;
 		typedef boost::lockfree::spsc_queue<CncColumContainer, boost::lockfree::capacity<posQueueSize> > PosSpyStringQueue;
+		typedef boost::lockfree::spsc_queue<CncColumContainer, boost::lockfree::capacity<posQueueSize> > SetterStringQueue;
 		
 		MainFrame* pHandler;
 		bool exit;
@@ -268,10 +265,24 @@ class UpdateManagerThread : public wxThread {
 		
 		PosSpyQueue posSpyQueue;
 		PosSpyStringQueue posSpyStringQueue;
-
-		SetterList setterList;
+		
+		SetterQueue setterQueue;
+		SetterStringQueue setterStringQueue;
+		
+		LastPosSpyEntry lpse;
+		CncColumContainer posSpyRow;
+		
+		LastSetterEntry lste;
+		CncColumContainer setterRow;
 		
 		virtual ExitCode Entry();
+		inline void popAndFormatPosSpyQueue();
+		inline void popAndFormatSetterQueue();
+		
+		inline void postInfo(const wxString& msg);
+		inline void postWarning(const wxString& msg);
+		inline void postError(const wxString& msg);
+		
 };
 
 #endif

@@ -82,6 +82,7 @@ CncConfig::~CncConfig() {
 void CncConfig::init() {
 ////////////////////////////////////////////////////////////////////////
 	calculateFactors();
+	calculateSpeedValues();
 	calculateThresholds();
 	initZAxisValues();
 }
@@ -117,6 +118,58 @@ void CncConfig::broadcastConfigUpdateNotification() {
 		wxWindow* wnd = it->first;
 		if ( wnd != NULL && wnd->GetEventHandler() != NULL )
 			wnd->GetEventHandler()->AddPendingEvent(evt);
+	}
+}
+////////////////////////////////////////////////////////////////////////
+const unsigned int CncConfig::calcSpeedOffsetX(double s) {
+////////////////////////////////////////////////////////////////////////
+	CncSpeedCalculator scX(getPitchX(), getStepsX(), getPulsWidthOffsetX());
+	return scX.calcSpeedOffset(s);
+}
+////////////////////////////////////////////////////////////////////////
+const unsigned int CncConfig::calcSpeedOffsetY(double s) {
+////////////////////////////////////////////////////////////////////////
+	CncSpeedCalculator scY(getPitchY(), getStepsY(), getPulsWidthOffsetY());
+	return scY.calcSpeedOffset(s);
+}
+////////////////////////////////////////////////////////////////////////
+const unsigned int CncConfig::calcSpeedOffsetZ(double s) {
+////////////////////////////////////////////////////////////////////////
+	CncSpeedCalculator scZ(getPitchZ(), getStepsZ(), getPulsWidthOffsetZ());
+	return scZ.calcSpeedOffset(s);
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::calculateSpeedValues() {
+////////////////////////////////////////////////////////////////////////
+	CncSpeedCalculator scX(getPitchX(), getStepsX(), getPulsWidthOffsetX());
+	CncSpeedCalculator scY(getPitchY(), getStepsY(), getPulsWidthOffsetY());
+	CncSpeedCalculator scZ(getPitchZ(), getStepsZ(), getPulsWidthOffsetZ());
+	
+	double maxSpeedX = scX.getMaxSpeed_MM_MIN();
+	double maxSpeedY = scY.getMaxSpeed_MM_MIN();
+	double maxSpeedZ = scZ.getMaxSpeed_MM_MIN();
+	
+	double smallestMaxSpeed = std::min(maxSpeedX, maxSpeedY);
+	smallestMaxSpeed = std::min(smallestMaxSpeed, maxSpeedZ);
+	
+	wxPGProperty* prop = NULL;
+	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedX); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedY); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedZ); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(smallestMaxSpeed); }
+	
+	{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_PERCENT);
+		if (prop != NULL) {
+			double val = smallestMaxSpeed * prop->GetValue().GetDouble();
+			{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
+		}
+	}
+	
+	{ prop = getProperty(CncConfig_DEF_WORK_SPEED_PERCENT);
+		if (prop != NULL) {
+			double val = smallestMaxSpeed * prop->GetValue().GetDouble();
+			{ prop = getProperty(CncConfig_DEF_WORK_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
+		}
 	}
 }
 ////////////////////////////////////////////////////////////////////////
@@ -173,13 +226,15 @@ void CncConfig::initZAxisValues() {
 	// maxDurationThickness	= 2.0;
 	// currentZDepth		= 6.4;
 ////////////////////////////////////////////////////////////////////////
+	workpieceOffset = 1.5;
+		
 	for (unsigned int i=0; i<maxDurations; i++ ) {
 		durationSteps[i] = 0.0;
 	}
 
 	durationCount = 0;
 	if ( getMaxDurationThickness() > 0 ) {
-		durationCount = currentZDepth/ getMaxDurationThickness();							// --> 3
+		durationCount = currentZDepth/ getMaxDurationThickness();						// --> 3
 		if ( durationCount >= 1 ) {
 			double rest = currentZDepth - (durationCount *  getMaxDurationThickness());	//--> 0.4
 			
@@ -695,16 +750,11 @@ const bool CncConfig::getShowTestMenuFlag()							{ wxPGProperty* p = getPropert
 const bool CncConfig::getSvgResultWithOrigPathFlag()				{ wxPGProperty* p = getProperty(CncSvg_Emu_RSLT_WITH_ORIG_PATH); 		wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgResultOnlyFirstCrossingFlag()			{ wxPGProperty* p = getProperty(CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS); wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgReverseYAxisFlag()						{ wxPGProperty* p = getProperty(CncSvg_Parser_REVERSE_Y_AXIS); 			wxASSERT(p); return p->GetValue().GetBool(); }
+const bool CncConfig::getAvoidDupSetterValuesFlag()					{ wxPGProperty* p = getProperty(CncWork_Ctl_AVOID_DUP_SETTER_VALUES); 	wxASSERT(p); return p->GetValue().GetBool(); }
 
 const int CncConfig::getStepSignX()									{ return 1; } // currently not supported -1 = reverse
 const int CncConfig::getStepSignY()									{ return 1; } // currently not supported -1 = reverse
 
-const unsigned int CncConfig::getMaxSpeedZ() 						{ wxPGProperty* p = getProperty(CncConfig_MAX_SPEED_Z); 				wxASSERT(p); return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getMaxSpeedXY() 						{ wxPGProperty* p = getProperty(CncConfig_MAX_SPEED_XY); 				wxASSERT(p); return p->GetValue().GetInteger(); } 
-const unsigned int CncConfig::getRapidSpeedXY()						{ wxPGProperty* p = getProperty(CncConfig_DEF_RAPID_SPEED_XY); 			wxASSERT(p); return p->GetValue().GetDouble() * getMaxSpeedXY(); }
-const unsigned int CncConfig::getWorkSpeedXY()						{ wxPGProperty* p = getProperty(CncConfig_DEF_WORK_SPEED_XY); 			wxASSERT(p); return p->GetValue().GetDouble() * getMaxSpeedXY(); }
-const unsigned int CncConfig::getRapidSpeedZ()						{ wxPGProperty* p = getProperty(CncConfig_DEF_WORK_SPEED_Z); 			wxASSERT(p); return p->GetValue().GetDouble() * getMaxSpeedZ(); }
-const unsigned int CncConfig::getWorkSpeedZ()						{ wxPGProperty* p = getProperty(CncConfig_DEF_WORK_SPEED_Z); 			wxASSERT(p); return p->GetValue().GetDouble() * getMaxSpeedZ(); }
 const unsigned int CncConfig::getStepsX() 							{ wxPGProperty* p = getProperty(CncConfig_STEPS_X); 					wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ wxPGProperty* p = getProperty(CncConfig_STEPS_Y); 					wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsZ() 							{ wxPGProperty* p = getProperty(CncConfig_STEPS_Z); 					wxASSERT(p); return p->GetValue().GetInteger(); }
@@ -725,8 +775,15 @@ const double CncConfig::getPitchY() 								{ wxPGProperty* p = getProperty(CncC
 const double CncConfig::getPitchZ() 								{ wxPGProperty* p = getProperty(CncConfig_PITCH_Z); 					wxASSERT(p); return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxDurationThickness()					{ wxPGProperty* p = getProperty(CncWork_Wpt_MAX_THICKNESS_CROSS);		wxASSERT(p); return p->GetValue().GetDouble(); }
 const double CncConfig::getWorkpieceThickness()						{ wxPGProperty* p = getProperty(CncWork_Wpt_THICKNESS); 				wxASSERT(p); return p->GetValue().GetDouble(); }
-
 const double CncConfig::getReplyThresholdMetric()					{ wxPGProperty* p = getProperty(CncWork_Ctl_REPLY_THRESHOLD_METRIC); 	wxASSERT(p); double ret; p->GetValueAsString().ToDouble(&ret); return ret; }
+
+const double CncConfig::getDefaultRapidSpeed_MM_MIN()				{ wxPGProperty* p = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); 		wxASSERT(p); return p->GetValue().GetDouble(); }
+const double CncConfig::getDefaultWorkSpeed_MM_MIN()				{ wxPGProperty* p = getProperty(CncConfig_DEF_WORK_SPEED_MM_MIN); 		wxASSERT(p); return p->GetValue().GetDouble(); }
+
+const double CncConfig::getMaxSpeedX_MM_MIN()						{ wxPGProperty* p = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 			wxASSERT(p); return p->GetValue().GetDouble(); }
+const double CncConfig::getMaxSpeedY_MM_MIN()						{ wxPGProperty* p = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 			wxASSERT(p); return p->GetValue().GetDouble(); }
+const double CncConfig::getMaxSpeedZ_MM_MIN()						{ wxPGProperty* p = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 			wxASSERT(p); return p->GetValue().GetDouble(); }
+const double CncConfig::getMaxSpeedXYZ_MM_MIN()						{ wxPGProperty* p = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		wxASSERT(p); return p->GetValue().GetDouble(); }
 
 const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ wxPGProperty* p = getProperty(CncApplication_DEF_DISPLAY_UNIT); 		wxASSERT(p); return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }
@@ -737,8 +794,7 @@ const wxString& CncConfig::getGCodeFileViewer(wxString& ret)		{ wxPGProperty* p 
 const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ wxPGProperty* p = getProperty(CncApplication_Tool_XML_FILE_VIEWER); 	wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getEditorTool(wxString& ret)				{ wxPGProperty* p = getProperty(CncApplication_Tool_EXTERNAL_EDITOR); 	wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getPyCamTool(wxString& ret)				{ wxPGProperty* p = getProperty(CncApplication_Tool_PY_CAM); 			wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getDefaultSpeedModeXY(wxString& ret)		{ wxPGProperty* p = getProperty(CncConfig_DEF_SPEED_MODE_XY); 			wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
-const wxString& CncConfig::getDefaultSpeedModeZ(wxString& ret)		{ wxPGProperty* p = getProperty(CncConfig_DEF_SPEED_MODE_Z); 			wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
+const wxString& CncConfig::getDefaultSpeedModeXYZ(wxString& ret)	{ wxPGProperty* p = getProperty(CncConfig_DEF_SPEED_MODE_XYZ); 			wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getDefaultPort(wxString& ret)			{ wxPGProperty* p = getProperty(CncApplication_Com_DEFALT_PORT); 		wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getDefaultTplDir(wxString& ret)			{ wxPGProperty* p = getProperty(CncApplication_Tpl_DEFALT_DIRECTORY); 	wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getDefaultTplFile(wxString& ret)			{ wxPGProperty* p = getProperty(CncApplication_Tpl_DEFALT_FILE); 		wxASSERT(p); ret.assign(p->GetValueAsString()); return ret; }

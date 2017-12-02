@@ -100,6 +100,10 @@ void GLViewPort::evaluate(int wndSizeW,
 										x = custPosX - w / 2;
 										y = custPosY - h / 2;
 									}
+									
+									scissorX = custPosX * -1;
+									scissorY = custPosY * -1;
+									
 								} else {
 									if ( distortType == DistortType::VPT_Undistored) {
 										x = prevX - ( n - prevN ) / 2;
@@ -109,6 +113,9 @@ void GLViewPort::evaluate(int wndSizeW,
 										y = prevY - ( h - prevH ) / 2;
 									}
 								}
+								
+								//scissorX *= -1;
+								//scissorY *= -1;
 								
 								break;
 		case VPOP_Center:
@@ -124,6 +131,9 @@ void GLViewPort::evaluate(int wndSizeW,
 								// determine the new center (factor correction)
 								x -= ( w / 2 - wndSizeW / 2 );
 								y -= ( h / 2 - wndSizeH / 2 );
+								
+								scissorX = wndSizeW / 2;
+								scissorY = wndSizeH / 2;
 								
 								break;
 	}

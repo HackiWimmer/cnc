@@ -24,6 +24,7 @@ class GLViewPort {
 		GLViewPort(GLViewPort::DistortType type)
 		: x(0), y(0), w(0), h(0), n(0)
 		, windowWidth(0), windowHeigth(0)
+		, scissorX(x), scissorY(y)
 		, factor(8)
 		, distortType(type)
 		, origPosType(OrigPosType::VPOP_Center)
@@ -35,12 +36,14 @@ class GLViewPort {
 		
 		/////////////////////////////////////////////////////////
 		void trace(std::ostream& out) {
+			out << wxString::Format("Window Size w, h   : %d, %d", windowWidth, windowHeigth) << std::endl;
 			out << wxString::Format("Viewport:") << std::endl;
-			out << wxString::Format(" x, y, w, h, n: %d, %d, %d, %d, %d", x, y, w, h, n) << std::endl;
-			out << wxString::Format(" Destort Type   : %s", getDistortTypeAsString()) << std::endl;
-			out << wxString::Format(" Origin Pos     : %s", getOriginPosTypeAsString()) << std::endl;
-			out << wxString::Format(" Aspect         : %f", getAspect()) << std::endl;
-			out << wxString::Format(" Factor         : %d", getFactor()) << std::endl;
+			out << wxString::Format(" x, y, w, h, n     : %d, %d, %d, %d, %d", x, y, w, h, n) << std::endl;
+			out << wxString::Format(" Destort Type      : %s", getDistortTypeAsString()) << std::endl;
+			out << wxString::Format(" Origin Pos        : %s", getOriginPosTypeAsString()) << std::endl;
+			out << wxString::Format(" Aspect            : %f", getAspect()) << std::endl;
+			out << wxString::Format(" Factor            : %d", getFactor()) << std::endl;
+			out << wxString::Format(" Scissor x, y, w, h: %d, %d, %d, %d", getScissorX(), getScissorY(), getScissorW(), getScissorH()) << std::endl;
 		}
 
 		////////////////////////////////////////////////////
@@ -48,6 +51,12 @@ class GLViewPort {
 		int getY() { return y; }
 		int getW() { return w; }
 		int getH() { return h; }
+		
+		////////////////////////////////////////////////////
+		int getScissorX() { return scissorX; }
+		int getScissorY() { return scissorY; }
+		int getScissorW() { return windowWidth; }
+		int getScissorH() { return windowHeigth; }
 		
 		////////////////////////////////////////////////////
 		int getFactor() { return factor; }
@@ -116,6 +125,7 @@ class GLViewPort {
 
 		int x, y, w, h, n;
 		int windowWidth, windowHeigth;
+		int scissorX, scissorY;
 		int factor;
 		GLViewPort::DistortType distortType;
 		GLViewPort::OrigPosType origPosType;

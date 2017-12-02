@@ -12,7 +12,26 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 		
-	//std::clog << "CncConfig::pgChangedGeneralCfgPage" << std::endl;
+	wxString name(p->GetName());
+	
+	if ( name == CncConfig_STEPS_X ||
+	     name == CncConfig_STEPS_Y ||
+	     name == CncConfig_STEPS_Z ||
+
+	     name == CncConfig_PITCH_X ||
+	     name == CncConfig_PITCH_Y ||
+	     name == CncConfig_PITCH_Z ||
+
+	     name == CncConfig_DEF_RAPID_SPEED_PERCENT ||
+	     name == CncConfig_DEF_WORK_SPEED_PERCENT ||
+
+	     name == CncConfig_PULS_WIDTH_OFFSET_X ||
+	     name == CncConfig_PULS_WIDTH_OFFSET_Y ||
+	     name == CncConfig_PULS_WIDTH_OFFSET_Z ) 
+	{
+		GBL_CONFIG->calculateSpeedValues();
+	}
+
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
@@ -46,75 +65,73 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 		speed = root->AppendChild( new wxPropertyCategory(curCatName));
 		registerCategory(curCatName, speed);
 		{
-			//...............
-			pgParameterMgrArr.Clear();
-			pgParameterMgrIntArr.Clear();
-			pgParameterMgrArr.Add(_("RAPID")); 
-			pgParameterMgrArr.Add(_("WORK"));
-			prop = speed->AppendChild( new wxEnumProperty("Default rapid speed mode XY axis", NEXT_PROP_ID, pgParameterMgrArr, pgParameterMgrIntArr, 0));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetEditor( wxT("ComboBox") );
-			registerProperty(CncConfig_DEF_SPEED_MODE_XY, prop);
-			
 			//...................
-			prop = speed->AppendChild( new wxIntProperty("Max speed XY [rpm]", NEXT_PROP_ID, 100));
+			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Max speed X axis [mm/minute]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
-			prop->SetHelpString(_T("Max speed [rpm] of the stepper motors for the x and y axis."));
-			registerProperty(CncConfig_MAX_SPEED_XY, prop);
-			
-			//...............
-			validator.SetPrecision(1); validator.SetRange(0.09, 1);
-			prop = speed->AppendChild( new wxFloatProperty("Default rapid speed XY Axis [% from max]", NEXT_PROP_ID, 0.9));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_DEF_RAPID_SPEED_XY, prop);
-			
-			//...............
-			validator.SetPrecision(1); validator.SetRange(0.09, 1);
-			prop = speed->AppendChild( new wxFloatProperty("Default work speed XY Axis [% from max]", NEXT_PROP_ID, 0.9));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
+			registerProperty(CncConfig_MAX_SPEED_X_MM_MIN, prop);
+
+			//...................
+			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Max speed Y axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop->Enable(false);
 			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_DEF_WORK_SPEED_XY, prop);
+			registerProperty(CncConfig_MAX_SPEED_Y_MM_MIN, prop);
+
+			//...................
+			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Max speed Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop->Enable(false);
+			prop->SetValidator(validator);
+			registerProperty(CncConfig_MAX_SPEED_Z_MM_MIN, prop);
+
+			//...................
+			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Consolidated Max speed X, Y and Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop->Enable(false);
+			prop->SetValidator(validator);
+			registerProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN, prop);
 			
 			//...............
 			pgParameterMgrArr.Clear();
 			pgParameterMgrIntArr.Clear();
 			pgParameterMgrArr.Add(_("RAPID")); 
 			pgParameterMgrArr.Add(_("WORK"));
-			prop = speed->AppendChild( new wxEnumProperty("Default rapid speed mode Z axis", NEXT_PROP_ID, pgParameterMgrArr, pgParameterMgrIntArr, 0));
+			prop = speed->AppendChild( new wxEnumProperty("Default rapid speed mode XYZ axis", NEXT_PROP_ID, pgParameterMgrArr, pgParameterMgrIntArr, 0));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetEditor( wxT("ComboBox") );
-			registerProperty(CncConfig_DEF_SPEED_MODE_Z, prop);
+			registerProperty(CncConfig_DEF_SPEED_MODE_XYZ, prop);
+
+			//...................
+			validator.SetPrecision(2); validator.SetRange(0.0, 10.0);
+			prop = speed->AppendChild( new wxFloatProperty("Default rapid speed X, Y and Z axis [% from max]", NEXT_PROP_ID, 0.8));
+			prop->Enable(true);
+			prop->SetValidator(validator);
+			registerProperty(CncConfig_DEF_RAPID_SPEED_PERCENT, prop);
 			
 			//...................
-			prop = speed->AppendChild( new wxIntProperty("Max speed Z [rpm]", NEXT_PROP_ID, 100));
+			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Default rapid speed X, Y and Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
 			prop->Enable(false);
-			prop->SetHelpString(_T("Max speed [rpm] of the stepper motor for the z axis."));
-			registerProperty(CncConfig_MAX_SPEED_Z, prop);
-			
-			//...............
-			validator.SetPrecision(1); validator.SetRange(0.09, 1);
-			prop = speed->AppendChild( new wxFloatProperty("Default rapid speed Z Axis [% from max]", NEXT_PROP_ID, 0.9));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_DEF_RAPID_SPEED_Z, prop);
-			
-			//...............
-			validator.SetPrecision(1); validator.SetRange(0.09, 1);
-			prop = speed->AppendChild( new wxFloatProperty("Default work speed Z Axis [% from max]", NEXT_PROP_ID, 0.9));
+			registerProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN, prop);
+
+			//...................
+			validator.SetPrecision(1); validator.SetRange(0.0, 10.0);
+			prop = speed->AppendChild( new wxFloatProperty("Default work speed X, Y and Z axis [% from max]", NEXT_PROP_ID, 0.8));
 			prop->Enable(true);
-			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_DEF_WORK_SPEED_Z, prop);
+			registerProperty(CncConfig_DEF_WORK_SPEED_PERCENT, prop);
+			
+			//...................
+			validator.SetPrecision(1); validator.SetRange(0.0, 5000.0);
+			prop = speed->AppendChild( new wxFloatProperty("Default work speed X, Y and Z axis [mm/minute]", NEXT_PROP_ID, 100.0));
+			prop->Enable(false);
+			prop->SetValidator(validator);
+			registerProperty(CncConfig_DEF_WORK_SPEED_MM_MIN, prop);
+			
 		}
 		//...................
 		wxPGProperty* dimensions = NULL;

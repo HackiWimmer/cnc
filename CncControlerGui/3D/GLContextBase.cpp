@@ -55,10 +55,12 @@ void GLContextBase::globalInit() {
 	// So, the initalization here is globally. 
 	// If context sensetive initializion is needed use init() instead
 	
-	// Hint: The scissor test affects glClear. so glEnable(GL_SCISSOR_TEST); and glScissor(x, y, width, height); 
-	// All measurements are in pixels. After this, all calls to glClear will only clear the area in the scissor box. Remember to disable it again afterwards. 
 	glClearColor(0.0, 0.0, 0.0, 0.0);
 	glShadeModel(GL_FLAT);
+	
+	// Hint: The scissor test affects glClear. so glEnable(GL_SCISSOR_TEST); and glScissor(x, y, width, height); 
+	// All measurements are in pixels. After this, all calls to glClear will only clear the area in the scissor box. Remember to disable it again afterwards. 
+	//glEnable(GL_SCISSOR_TEST);
 	
 	glEnable(GL_LINE_SMOOTH);
 	
@@ -436,6 +438,10 @@ void GLContextBase::determineViewPort(int w, int h, int x, int y) {
 	glViewport(viewPort->getX(),  viewPort->getY(),
 			   (GLsizei)viewPort->getNormalizedSizeW(), 
 			   (GLsizei)viewPort->getNormalizedSizeH());
+	/*
+	glScissor(viewPort->getScissorX(), viewPort->getScissorY(),
+			  viewPort->getScissorW(), viewPort->getScissorH());
+	*/
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineProjection(int w, int h) {
@@ -538,7 +544,6 @@ void GLContextBase::normalizeRotation() {
 void GLContextBase::display() {
 /////////////////////////////////////////////////////////////////
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
 	wxASSERT ( viewPort != NULL );
 
 	// initialize model matrix

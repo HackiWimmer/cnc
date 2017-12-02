@@ -11,37 +11,37 @@ class CncColumContainer {
 	public:
 		/////////////////////////////////////////////////////////////
 		CncColumContainer()
-		: as()
+		: columns()
 		{
 		}
 
 		/////////////////////////////////////////////////////////////
 		CncColumContainer(unsigned int cc)
-		: as()
+		: columns()
 		{
-			as.Add("", cc);
+			columns.Add("", cc);
 		}
 		
 		/////////////////////////////////////////////////////////////
 		CncColumContainer(const CncColumContainer& cc)
-		: as(cc.getStringArray())
+		: columns(cc.getStringArray())
 		{
 		}
 		
 		/////////////////////////////////////////////////////////////
 		virtual ~CncColumContainer() {
-			
+			columns.Clear();
 		}
 		
 		/////////////////////////////////////////////////////////////
-		unsigned int getCount() const { return as.GetCount(); }
+		unsigned int getCount() const { return columns.GetCount(); }
 		
 		/////////////////////////////////////////////////////////////
 		bool updateItem(unsigned int index, const wxString& data) {
 			if ( index > getCount() - 1 )
 				return false;
 				
-			as[index].assign(data);
+			columns[index].assign(data);
 			return true;
 		}
 		
@@ -50,18 +50,18 @@ class CncColumContainer {
 			if ( index > getCount() - 1 )
 				return _("");
 				
-			return as[index];
+			return columns[index];
 		}
 		
 		/////////////////////////////////////////////////////////////
 		const wxArrayString& getStringArray() const {
-			return as;
+			return columns;
 		}
 		
 		/////////////////////////////////////////////////////////////
 		void trace(wxString& out) const {
 			for ( unsigned int i=0; i<getCount(); i++ ) {
-				out.append(as[i]);
+				out.append(columns[i]);
 				
 				if ( i == getCount() -1 )
 					break;
@@ -72,7 +72,8 @@ class CncColumContainer {
 		}
 		
 	private:
-		wxArrayString as;
+		wxArrayString columns;
+		
 };
 
 //////////////////////////////////////////////////////////////////////
@@ -123,9 +124,8 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		bool goBackwardUnitlColumnChangeIntern(long item, long column);
 		
 		CncColumContainer* createDummyRow(long item);
-		
-		
 		CncColumContainer* dummyRow;
+
 		RowContainer rows;
 		ListType listType;
 		long lastSelection;

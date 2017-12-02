@@ -3,19 +3,18 @@
 
 	#define CncToolMagazine_SECTION_NAME			"CncWork.ToolMagazine"
 	#define Attribute_READONLY						"READONLY"
+
+	#define CncConfig_MAX_SPEED_XYZ_MM_MIN			"Cnc.Config/MAX_SPEED_XYZ_MM_MIN"
+	#define CncConfig_MAX_SPEED_X_MM_MIN			"Cnc.Config/MAX_SPEED_X_MM_MIN"
+	#define CncConfig_MAX_SPEED_Y_MM_MIN			"Cnc.Config/MAX_SPEED_Y_MM_MIN"
+	#define CncConfig_MAX_SPEED_Z_MM_MIN			"Cnc.Config/MAX_SPEED_Z_MM_MIN"
 	
-	#define CncConfig_MAX_SPEED_XY 					"Cnc.Config/MAX_SPEED_XY"
-	#define CncConfig_MAX_SPEED_Z 					"Cnc.Config/MAX_SPEED_Z"
-	#define CncConfig_DEF_SPEED_MODE_XY				"Cnc.Config/DEF_SPEED_MODE_XY"
-	#define CncConfig_DEF_SPEED_MODE_Z				"Cnc.Config/DEF_SPEED_MODE_Z"
-	#define CncConfig_DEF_RAPID_SPEED_XY 			"Cnc.Config/DEF_RAPID_SPEED_XY"
-	#define CncConfig_DEF_RAPID_SPEED_Z 			"Cnc.Config/DEF_RAPID_SPEED_Z"
-	#define CncConfig_DEF_WORK_SPEED_XY 			"Cnc.Config/DEF_WORK_SPEED_XY"
-	#define CncConfig_DEF_WORK_SPEED_Z 				"Cnc.Config/DEF_WORK_SPEED_Z"
-	#define CncConfig_DEF_RAPID_SPEED_XY			"Cnc.Config/DEF_RAPID_SPEED_XY"
-	#define CncConfig_DEF_RAPID_SPEED_Z 			"Cnc.Config/DEF_RAPID_SPEED_Z"
-	#define CncConfig_DEF_WORK_SPEED_XY 			"Cnc.Config/DEF_WORK_SPEED_XY"
-	#define CncConfig_DEF_WORK_SPEED_Z 				"Cnc.Config/DEF_WORK_SPEED_Z"
+	#define CncConfig_DEF_SPEED_MODE_XYZ			"Cnc.Config/DEF_SPEED_MODE_XYZ"
+	#define CncConfig_DEF_RAPID_SPEED_PERCENT 		"Cnc.Config/DEF_RAPID_SPEED_PEERCENT"
+	#define CncConfig_DEF_WORK_SPEED_PERCENT 		"Cnc.Config/DEF_WORK_SPEED_PERCENT"
+	#define CncConfig_DEF_RAPID_SPEED_MM_MIN 		"Cnc.Config/DEF_RAPID_SPEED_MM_SEC"
+	#define CncConfig_DEF_WORK_SPEED_MM_MIN 		"Cnc.Config/DEF_WORK_SPEED_MM_SEC"
+	
 	#define CncConfig_MAX_DIMENSION_X 				"Cnc.Config/MAX_DIMENSION_X"
 	#define CncConfig_MAX_DIMENSION_Y 				"Cnc.Config/MAX_DIMENSION_Y"
 	#define CncConfig_MAX_DIMENSION_Z 				"Cnc.Config/MAX_DIMENSION_Z"
@@ -79,6 +78,7 @@
 	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_X		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_X"
 	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Y"
 	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Z"
+	#define CncWork_Ctl_AVOID_DUP_SETTER_VALUES		"CncWork.Controller/AVOID_DUP_SETTER_VALUES"
 
 
 

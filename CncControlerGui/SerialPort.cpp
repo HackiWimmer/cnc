@@ -1215,7 +1215,9 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 		case PID_X_POS:
 		case PID_Y_POS:
 		case PID_Z_POS:
-		case PID_XYZ_POS:	return decodePositionInfo(sfi, cr);
+		case PID_XYZ_POS:
+		case PID_XYZ_POS_MAJOR:
+		case PID_XYZ_POS_DETAIL:	return decodePositionInfo(sfi, cr);
 		
 		//RET_SOH_Handler..........................................
 		case PID_LIMIT:		return decodeLimitInfo(sfi);
@@ -1270,7 +1272,7 @@ bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = LONG_BUF_SIZE;
-	if ( pid == PID_XYZ_POS )
+	if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL )
 		size = sizeof(sfi.Mc.result);
 
 	if ( (sfi.Mc.bytes = readDataUntilSizeAvailable(sfi.Mc.result, size)) <= 0 ) {
@@ -1293,7 +1295,7 @@ bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 	for (int i=0; i<sfi.Mc.bytes; i+=LONG_BUF_SIZE) {
 		memcpy(&sfi.Mc.value, sfi.Mc.p, LONG_BUF_SIZE);
 		
-		if ( pid == PID_XYZ_POS ) {
+		if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL ) {
 			switch (i) {
 				case 0:	ci.xCtrlPos = sfi.Mc.value; break;
 				case 4:	ci.yCtrlPos = sfi.Mc.value; break;
@@ -1306,7 +1308,7 @@ bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 				case PID_Z_POS: ci.zCtrlPos = sfi.Mc.value; break;
 			}
 		}
-
+		
 		sfi.Mc.p += LONG_BUF_SIZE;
 	}
 	

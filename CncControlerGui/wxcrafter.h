@@ -24,15 +24,15 @@
 #include <wx/toolbar.h>
 #include <wx/stattext.h>
 #include <wx/bmpcbox.h>
-#include <wx/slider.h>
+#include <wx/tglbtn.h>
 #include <wx/button.h>
+#include <wx/slider.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
 #include <wx/arrstr.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statline.h>
-#include <wx/tglbtn.h>
 #include <wx/notebook.h>
 #include <wx/stc/stc.h>
 #include <wx/statbmp.h>
@@ -90,6 +90,7 @@ protected:
     wxBitmapButton* m_searchConnections;
     wxBitmapComboBox* m_portSelector;
     wxBitmapButton* m_connect;
+    wxBitmapToggleButton* m_btProbeMode;
     wxBitmapButton* m_btSelectReferences;
     wxBitmapButton* m_btSelectManuallyMove;
     wxBitmapButton* m_btSelectSetup;
@@ -369,6 +370,7 @@ protected:
     wxButton* m_btConfirmRun;
     wxPanel* m_cncSetters;
     wxStaticText* m_staticText1150;
+    wxTextCtrl* m_setterListCount;
     wxButton* m_btClearSetterList;
     wxListCtrl* m_setterList;
     wxPanel* m_controllerConfiguration;
@@ -397,10 +399,12 @@ protected:
     wxButton* m_3D_Refreh;
     wxButton* m_3D_Trace;
     wxButton* m_3D_Clear;
+    wxStaticLine* m_staticLine47803;
     wxStaticText* m_staticText16032;
     wxComboBox* m_cbCurveLibResolution;
-    wxStaticText* m_staticText10543;
-    wxComboBox* m_cbUpdateInterval;
+    wxStaticLine* m_staticLine4780;
+    wxStaticText* m_staticText32334;
+    wxSlider* m_displayInterval;
     wxPanel* m_3DOutboundControl;
     wxPanel* m_drawPane3D;
     wxButton* m_3D_Top;
@@ -469,6 +473,7 @@ protected:
     wxStaticText* m_svgParseMode;
     wxPanel* m_activityPanel;
     wxStaticLine* m_staticLine680;
+    wxStaticBitmap* m_refPosTrafficLight;
     wxStaticText* LableX;
     wxTextCtrl* m_xAxis;
     wxTextCtrl* m_xAxisCtl;
@@ -488,9 +493,6 @@ protected:
     wxStaticText* m_zMinLimit;
     wxStaticText* m_zMaxLimit;
     wxStaticLine* m_staticLine602341;
-    wxStaticText* m_staticText2199;
-    wxStaticBitmap* m_refPosTrafficLight;
-    wxStaticLine* m_staticLine6023412;
     wxStaticBitmap* m_updateManagerUpdate;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
@@ -625,6 +627,7 @@ protected:
     virtual void searchAvailiablePorts(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
+    virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectReferences(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectManuallyMove(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectSetup(wxCommandEvent& event) { event.Skip(); }
@@ -743,7 +746,6 @@ protected:
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
-    virtual void sizeSetterList(wxSizeEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
@@ -754,7 +756,9 @@ protected:
     virtual void trace3D(wxCommandEvent& event) { event.Skip(); }
     virtual void clear3D(wxCommandEvent& event) { event.Skip(); }
     virtual void updateCurveLibResolution(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeUpdateInterval(wxCommandEvent& event) { event.Skip(); }
+    virtual void displayIntervalThumbtrack(wxScrollEvent& event) { event.Skip(); }
+    virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
+    virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -872,6 +876,7 @@ public:
     wxBitmapButton* GetSearchConnections() { return m_searchConnections; }
     wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
     wxBitmapButton* GetConnect() { return m_connect; }
+    wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
     wxBitmapButton* GetBtSelectReferences() { return m_btSelectReferences; }
     wxBitmapButton* GetBtSelectManuallyMove() { return m_btSelectManuallyMove; }
     wxBitmapButton* GetBtSelectSetup() { return m_btSelectSetup; }
@@ -1142,6 +1147,7 @@ public:
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetPanel2601() { return m_panel2601; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
+    wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
     wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
     wxListCtrl* GetSetterList() { return m_setterList; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
@@ -1172,10 +1178,12 @@ public:
     wxButton* Get3D_Refreh() { return m_3D_Refreh; }
     wxButton* Get3D_Trace() { return m_3D_Trace; }
     wxButton* Get3D_Clear() { return m_3D_Clear; }
+    wxStaticLine* GetStaticLine47803() { return m_staticLine47803; }
     wxStaticText* GetStaticText16032() { return m_staticText16032; }
     wxComboBox* GetCbCurveLibResolution() { return m_cbCurveLibResolution; }
-    wxStaticText* GetStaticText10543() { return m_staticText10543; }
-    wxComboBox* GetCbUpdateInterval() { return m_cbUpdateInterval; }
+    wxStaticLine* GetStaticLine4780() { return m_staticLine4780; }
+    wxStaticText* GetStaticText32334() { return m_staticText32334; }
+    wxSlider* GetDisplayInterval() { return m_displayInterval; }
     wxPanel* GetDrawPane3D() { return m_drawPane3D; }
     wxPanel* Get3DOutboundControl() { return m_3DOutboundControl; }
     wxButton* Get3D_Top() { return m_3D_Top; }
@@ -1245,6 +1253,7 @@ public:
     wxStaticText* GetSvgParseMode() { return m_svgParseMode; }
     wxPanel* GetActivityPanel() { return m_activityPanel; }
     wxStaticLine* GetStaticLine680() { return m_staticLine680; }
+    wxStaticBitmap* GetRefPosTrafficLight() { return m_refPosTrafficLight; }
     wxStaticText* GetLableX() { return LableX; }
     wxTextCtrl* GetXAxis() { return m_xAxis; }
     wxTextCtrl* GetXAxisCtl() { return m_xAxisCtl; }
@@ -1264,9 +1273,6 @@ public:
     wxStaticText* GetZMinLimit() { return m_zMinLimit; }
     wxStaticText* GetZMaxLimit() { return m_zMaxLimit; }
     wxStaticLine* GetStaticLine602341() { return m_staticLine602341; }
-    wxStaticText* GetStaticText2199() { return m_staticText2199; }
-    wxStaticBitmap* GetRefPosTrafficLight() { return m_refPosTrafficLight; }
-    wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
     wxStaticBitmap* GetUpdateManagerUpdate() { return m_updateManagerUpdate; }
     wxPanel* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }
@@ -2000,6 +2006,64 @@ public:
     }
 
     virtual ~ImageLibPosSpy();
+};
+
+
+class ImageLibSetterList : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibSetterList();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibSetterList();
+};
+
+
+class ImageLibProbe : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibProbe();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibProbe();
 };
 
 #endif

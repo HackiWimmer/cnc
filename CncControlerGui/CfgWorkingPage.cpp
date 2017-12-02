@@ -172,6 +172,14 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("TextCtrl") );
 			prop->SetValue("");
 			registerProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z, prop);
+			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Avoid sending of duplicate Setter values", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_AVOID_DUP_SETTER_VALUES, prop);
+
 		}
 	}
 }

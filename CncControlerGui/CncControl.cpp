@@ -32,10 +32,10 @@ CncControl::CncControl(CncPortType pt)
 , startPos(0,0,0)
 , curAppPos(0,0,0)
 , controllerPos(0,0,0)
-, renderMode(CncRenderAtController)
 , speedType(CncSpeedRapid)
-, rpmSpeedX(500), rpmSpeedY(500), rpmSpeedZ(500)
-, feedSpeed(10)
+, feedSpeed_MM_MIN(0.0)
+, defaultFeedSpeedRapid_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
+, defaultFeedSpeedWork_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , durationCounter(0)
 , interruptState(false)
 , powerOn(false)
@@ -43,7 +43,6 @@ CncControl::CncControl(CncPortType pt)
 , stepDelay(0)
 , guiCtlSetup(NULL)
 , commandCounter(0)
-, displayCounter(0)
 , positionCheck(true)
 , drawPaneMargin(30)
 , speedMonitorMode(DM_2D)
@@ -158,8 +157,7 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 	if ( isConnected() == false )
 		return false;
 	
-	#warning todo - impl setterMap as parameter bool + resetSetterMap() if value change
-	if ( true ) {
+	if ( GBL_CONFIG->getAvoidDupSetterValuesFlag() ) {
 		auto it = setterMap.find((int)id);
 		if ( it != setterMap.end() ) {
 			// value dosen't changed
@@ -236,16 +234,16 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_PITCH_Y, convertDoubleToCtrlLong(PID_PITCH_Y, cncConfig->getPitchY())));
 	setup.push_back(SetterTuple(PID_PITCH_Z, convertDoubleToCtrlLong(PID_PITCH_Z, cncConfig->getPitchZ())));
 	
-	setup.push_back(SetterTuple(PID_SPEED_X, getRpmSpeedX()));
-	setup.push_back(SetterTuple(PID_SPEED_Y, getRpmSpeedY()));
-	setup.push_back(SetterTuple(PID_SPEED_Z, getRpmSpeedZ()));
+	setup.push_back(SetterTuple(PID_SPEED_OFFSET_X, GBL_CONFIG->calcSpeedOffsetX(feedSpeed_MM_MIN)));
+	setup.push_back(SetterTuple(PID_SPEED_OFFSET_Y, GBL_CONFIG->calcSpeedOffsetY(feedSpeed_MM_MIN)));
+	setup.push_back(SetterTuple(PID_SPEED_OFFSET_Z, GBL_CONFIG->calcSpeedOffsetZ(feedSpeed_MM_MIN)));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, cncConfig->getReplyThresholdStepsX()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, cncConfig->getReplyThresholdStepsZ()));
 	
 	if ( processSetterList(setup) ) {
-		changeCurrentRpmSpeedXYZ(CncSpeedRapid);
+		changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
 		
 		// reset error info
 		processCommand("r", std::cerr);
@@ -373,7 +371,7 @@ void CncControl::setZeroPosX() {
 	zeroPos.setX(0);
 	startPos.setX(0);
 	
-	postAppPosition();
+	postAppPosition(PID_XYZ_POS_MAJOR);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosY() {
@@ -382,7 +380,7 @@ void CncControl::setZeroPosY() {
 	zeroPos.setY(0);
 	startPos.setY(0);
 	
-	postAppPosition();
+	postAppPosition(PID_XYZ_POS_MAJOR);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPosZ() {
@@ -404,7 +402,7 @@ void CncControl::setZeroPosZ() {
 		}
 	}
 	
-	postAppPosition();
+	postAppPosition(PID_XYZ_POS_MAJOR);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos() {
@@ -465,7 +463,7 @@ bool CncControl::reset() {
 	setZeroPos();
 	
 	curCtlPos = getControllerPos();
-	postCtlPosition();
+	postCtlPosition(PID_XYZ_POS_MAJOR);
 	
 	evaluateLimitState();
 	switchToolOff();
@@ -565,43 +563,79 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ(CncSpeed s, double value) {
+const wxString& CncControl::getSpeedTypeAsString() {
 ///////////////////////////////////////////////////////////////////
-	if ( setActiveFeedSpeed(s, value) == true ) {
-		
-		int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
-		processSetter(mmm, (s == CncSpeedWork));
-		processSetter(PID_SPEED_X, getRpmSpeedX());
-		processSetter(PID_SPEED_Y, getRpmSpeedY());
-		processSetter(PID_SPEED_Z, getRpmSpeedZ());
+	static wxString ret;
+
+	switch( speedType ) {
+		case CncSpeedWork: 	ret.assign("W"); break;
+		case CncSpeedRapid:	ret.assign("R"); break;
 	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentRpmSpeedXYZ(CncSpeed s, unsigned int value) {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value) {
 ///////////////////////////////////////////////////////////////////
-	changeCurrentRpmSpeedZ(s, value);
-	changeCurrentRpmSpeedXY(s, value);
+	if ( value <= 0.0 )
+		return;
+	
+	if ( speedType == s && feedSpeed_MM_MIN == value )
+		return;
+		
+	speedType = s;
+	feedSpeed_MM_MIN = value;
+	
+	processSetter(PID_SPEED_OFFSET_X, GBL_CONFIG->calcSpeedOffsetX(value));
+	processSetter(PID_SPEED_OFFSET_Y, GBL_CONFIG->calcSpeedOffsetY(value));
+	processSetter(PID_SPEED_OFFSET_Z, GBL_CONFIG->calcSpeedOffsetZ(value));
+	
+	/*
+	typedef UpdateManagerThread::Event Event;
+	static Event evt;
+	
+	if ( GET_GUI_CTL(mainFrame) )
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SpeedEvent(getRpmSpeedX(), getRpmSpeedY(), getRpmSpeedZ()));
+	*/
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentRpmSpeedXY(CncSpeed s, unsigned int value) {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(CncSpeed s, double value) {
 ///////////////////////////////////////////////////////////////////
-	if ( setActiveRpmSpeedXY(s, value ) == true ) {
-		
-		int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
-		processSetter(mmm, (s == CncSpeedWork));
-		processSetter(PID_SPEED_X, getRpmSpeedX());
-		processSetter(PID_SPEED_Y, getRpmSpeedY());
-	}
+	changeCurrentFeedSpeedXYZ_MM_MIN(s, value * 60);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentRpmSpeedZ(CncSpeed s, unsigned int value) {
+void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
-	if ( setActiveRpmSpeedZ(s, value) == true ) {
-		
-		int mmm = getSpeedControlMode() == DM_2D ? PID_SWITCH_MOVE_MODE_STATE_2D : PID_SWITCH_MOVE_MODE_STATE_3D;
-		processSetter(mmm, (s == CncSpeedWork));
-		processSetter(PID_SPEED_Z, getRpmSpeedZ());
+	double value = 0.0;
+	
+	switch( s ) {
+		case CncSpeedWork: 	value = GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(); 	break;
+		case CncSpeedRapid:	value = GBL_CONFIG->getDefaultRapidSpeed_MM_MIN();	break;
 	}
+	
+	changeCurrentFeedSpeedXYZ_MM_MIN(s, value);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::setDefaultRapidSpeed_MM_MIN(double s) { 
+///////////////////////////////////////////////////////////////////
+	if ( s <= 0.0)
+		return;
+		
+	if ( s > GBL_CONFIG->getMaxSpeedXYZ_MM_MIN() )
+		return;
+		
+	defaultFeedSpeedRapid_MM_MIN = s; 
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::setDefaultWorkSpeed_MM_MIN(double s)  { 
+///////////////////////////////////////////////////////////////////
+	if ( s <= 0.0)
+		return;
+		
+	if ( s > GBL_CONFIG->getMaxSpeedXYZ_MM_MIN() )
+		return;
+
+	defaultFeedSpeedWork_MM_MIN  = s; 
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::logProcessingStart() {
@@ -633,7 +667,7 @@ void CncControl::logProcessingCurrent() {
 void CncControl::logProcessingEnd(bool valuesOnly) {
 ///////////////////////////////////////////////////////////////////
 	// update position
-	postAppPosition();
+	postAppPosition(PID_XYZ_POS_MAJOR);
 	
 	if ( valuesOnly == false )
 		logProcessingCurrent();
@@ -772,16 +806,18 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		case CITPosition:
 			// update controller position
 			switch ( ci.posType ) {
-				case PID_X_POS: 	curCtlPos.setX(ci.xCtrlPos); break;
-				case PID_Y_POS: 	curCtlPos.setY(ci.yCtrlPos); break;
-				case PID_Z_POS: 	curCtlPos.setZ(ci.zCtrlPos); break;
+				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); break;
+				case PID_Y_POS: 		curCtlPos.setY(ci.yCtrlPos); break;
+				case PID_Z_POS: 		curCtlPos.setZ(ci.zCtrlPos); break;
 				
 				case PID_XYZ_POS:
-				default:			curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
+				case PID_XYZ_POS_MAJOR:
+				case PID_XYZ_POS_DETAIL:
+				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 			}
 			
 			// display controller coordinates
-			postCtlPosition();
+			postCtlPosition(ci.posType);
 			
 			// motion monitor
 			monitorPosition(curCtlPos);
@@ -827,7 +863,7 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 		THE_APP->dispatchAll();
 	
 	// display application coordinates
-	postAppPosition();
+	postAppPosition(PID_XYZ_POS_MAJOR);
 	
 	// log processing
 	logProcessingCurrent();
@@ -840,7 +876,7 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	return !isInterrupted();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::postAppPosition() {
+void CncControl::postAppPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	static CncLongPosition lastAppPos;
 	
@@ -849,33 +885,31 @@ void CncControl::postAppPosition() {
 		typedef UpdateManagerThread::Event Event;
 		static Event evt;
 		
-		#warning - impl speed value
+		// app positions are always fron the type major
+		// so || pid == PID_XYZ_POS_MAJOR isn't necessary
+		// the compairison below is necessary, because this method is also called
+		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos ) {
 			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(getClientId(), getSpeedAsString(), 4242.7, curAppPos));
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, getClientId(), getSpeedTypeAsString(), getFeedSpeed_MM_MIN(), curAppPos));
 		}
 	}
 	
 	lastAppPos.set(curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::postCtlPosition() {
+void CncControl::postCtlPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
-	static CncLongPosition lastCtlPos;
-	
 	if ( cncConfig->isOnlineUpdateCoordinates() ) {
 		// application position
 		typedef UpdateManagerThread::Event Event;
 		static Event evt;
 		
-		#warning - impl speed value
-		if ( lastCtlPos != curCtlPos ) {
-			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(getClientId(), getSpeedAsString(), 4242.7, curCtlPos));
-		}
+		// a position compairsion isn't necessay here because the serialControllerCallback(...)
+		// call this method only on position changes
+		if ( GET_GUI_CTL(mainFrame) )
+			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, getClientId(), getSpeedTypeAsString(), getFeedSpeed_MM_MIN(), curCtlPos));
 	}
-	
-	lastCtlPos.set(curCtlPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::simpleMoveXYToZeroPos(CncDimensions dim) {
@@ -991,7 +1025,8 @@ bool CncControl::moveRelStepsZ(int32_t z) {
 	if ( z == 0 )
 		return true;
 	// z moves are always linear, as a consequence alreadyRendered can be true
-	return serialPort->processMoveZ(z, true, curAppPos);
+	// but to see the detail positions use true
+	return serialPort->processMoveZ(z, false, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered) {
@@ -1000,10 +1035,7 @@ bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRender
 	if ( x1 == 0 && y1 == 0 )
 		return true;
 	
-	if ( renderMode == CncRenderAtController )
-		return serialPort->processMoveXY(x1, y1, false, curAppPos);
-		
-	return false;
+	return serialPort->processMoveXY(x1, y1, false, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
@@ -1012,10 +1044,7 @@ bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool 
 	if ( x1 == 0 && y1 == 0 && z1 == 0 )
 		return true;
 	
-	if ( renderMode == CncRenderAtController )
-		return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curAppPos);
-
-	return false;
+	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelMetricZ(double z) {
@@ -1744,22 +1773,21 @@ void CncControl::appendNumKeyValueToControllerErrorInfo(int num, int code, const
 ///////////////////////////////////////////////////////////////////
 void CncControl::updatePreview3D(bool force) {
 ///////////////////////////////////////////////////////////////////
-	displayCounter++;
-	
 	if ( IS_GUI_CTL_NOT_VALID(motionMonitor) )
 		return;
 		
 	if ( force == true ) {
 		GET_GUI_CTL(motionMonitor)->display();
-		displayCounter = 0;
 		return;
 	}
 	
 	// Online drawing coordinates
 	if ( cncConfig->isOnlineUpdateDrawPane() ) {
-		if ( displayCounter%cncConfig->getUpdateInterval() == 0 ) {
+		static wxDateTime tsLastUpdate = wxDateTime::UNow();
+		
+		if ( (wxDateTime::UNow() - tsLastUpdate).GetMilliseconds() >= cncConfig->getUpdateInterval() ) {
 			GET_GUI_CTL(motionMonitor)->display();
-			displayCounter = 0;
+			tsLastUpdate = wxDateTime::UNow();
 		}
 	}
 }
@@ -1775,167 +1803,4 @@ void CncControl::sendIdleMessage() {
 	
 	//clog <<  wxDateTime::UNow().FormatTime() << " - idle,  delay:" << getStepDelay() << endl;
 	getSerial()->processIdle();
-}
-
-
-
-
-///////////////////////////////////////////////////////////////////
-bool CncControl::setActiveFeedSpeed(CncSpeed s, double value) {
-// value unit: mm/minute
-///////////////////////////////////////////////////////////////////
-	double xsRpm = 0.0;
-	double ysRpm = 0.0;
-	double zsRpm = 0.0;
-
-	if ( value > 0.0 ) {
-		double vMMS = value / 60.0;
-		
-		xsRpm = vMMS / cncConfig->getPitchX() * 60.0;
-		ysRpm = vMMS / cncConfig->getPitchY() * 60.0;
-		zsRpm = vMMS / cncConfig->getPitchZ() * 60.0;
-	
-	} else {
-		
-		xsRpm = cncConfig->getWorkSpeedXY();
-		ysRpm = cncConfig->getWorkSpeedXY();
-		zsRpm = cncConfig->getWorkSpeedZ();
-	}
-	
-	bool bx = setActiveRpmSpeedX(s, (unsigned int)round(xsRpm));
-	bool by = setActiveRpmSpeedY(s, (unsigned int)round(ysRpm));
-	bool bz = setActiveRpmSpeedZ(s, (unsigned int)round(zsRpm));
-	
-	return  ( bx || by || bz );
-}
-
-
-///////////////////////////////////////////////////////////////////
-bool CncControl::setActiveRpmSpeedXYZ(CncSpeed s, unsigned int value) {
-///////////////////////////////////////////////////////////////////
-	bool b1 = setActiveRpmSpeedZ(s, value);
-	bool b2 = setActiveRpmSpeedXY(s, value);
-	
-	return (b1 || b2);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::setActiveRpmSpeedXY(CncSpeed s, unsigned int value) {
-///////////////////////////////////////////////////////////////////
-	bool b1 = setActiveRpmSpeedX(s, value);
-	bool b2 = setActiveRpmSpeedY(s, value);
-	
-	return (b1 || b2);
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::setActiveRpmSpeedX(CncSpeed s, unsigned int value) {
-///////////////////////////////////////////////////////////////////
-	speedType = s;
-	
-	if ( value == getRpmSpeedX() )
-		return false;
-	
-	if ( ( value > 0 ) == false ) {
-		switch( s ) {
-			
-			case CncSpeedWork: 	value = cncConfig->getWorkSpeedXY();
-								break;
-								
-			case CncSpeedRapid:	value = cncConfig->getRapidSpeedXY();
-								break;
-		}
-	}
-	
-	rpmSpeedX = value;
-	
-	/*
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SpeedEvent(getRpmSpeedX(), getRpmSpeedY(), getRpmSpeedZ()));
-	*/
-	
-	return true;
-}
-
-///////////////////////////////////////////////////////////////////
-bool CncControl::setActiveRpmSpeedY(CncSpeed s, unsigned int value) {
-///////////////////////////////////////////////////////////////////
-	speedType = s;
-	
-	if ( value == getRpmSpeedY() )
-		return false;
-	
-	if ( ( value > 0 ) == false ) {
-		switch( s ) {
-			
-			case CncSpeedWork: 	value = cncConfig->getWorkSpeedXY();
-								break;
-								
-			case CncSpeedRapid:	value = cncConfig->getRapidSpeedXY();
-								break;
-		}
-	}
-	
-	rpmSpeedY = value;
-	
-	/*
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SpeedEvent(getRpmSpeedX(), getRpmSpeedY(), getRpmSpeedZ()));
-	*/
-	return true;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::setActiveRpmSpeedZ(CncSpeed s, unsigned int value) {
-///////////////////////////////////////////////////////////////////
-	speedType = s;
-	
-	if ( value == getRpmSpeedZ() )
-		return false;
-	
-	if ( ( value > 0 ) == false ) {
-		switch( s ) {
-			
-			case CncSpeedWork: 	value = cncConfig->getWorkSpeedZ();
-								break;
-								
-			case CncSpeedRapid:	value = cncConfig->getRapidSpeedZ();
-								break;
-		}
-	}
-	
-	rpmSpeedZ = value;
-/*
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SpeedEvent(getRpmSpeedX(), getRpmSpeedY(), getRpmSpeedZ()));
-*/
-	return true;
-}
-
-
-
-
-
-///////////////////////////////////////////////////////////////////
-const wxString& CncControl::getSpeedAsString() {
-///////////////////////////////////////////////////////////////////
-	static wxString ret;
-
-	switch( speedType ) {
-		
-		case CncSpeedWork: 	ret.assign("W");
-							break;
-							
-		case CncSpeedRapid:	ret.assign("R");
-							break;
-	}
-	
-	return ret;
 }

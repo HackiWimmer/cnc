@@ -49,6 +49,6 @@ bool GCodePathHandlerCnc::changeCurrentFeedSpeedXYZ(CncSpeed s, double value) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
 	
-	cncControl->changeCurrentFeedSpeedXYZ(s, value);
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(s, value);
 	return true;
 }

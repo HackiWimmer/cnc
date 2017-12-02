@@ -227,10 +227,15 @@ class CncPosition {
 		T incX(T x) { xPos += x; evaluateWatermarks(); return xPos; }
 		T incY(T y) { yPos += y; evaluateWatermarks(); return yPos; }
 		T incZ(T z) { zPos += z; evaluateWatermarks(); return zPos; }
+		
+		T inc(T x, T y, T z) { xPos +=x; yPos += y; zPos += z; evaluateWatermarks(); return zPos; }
+		
 		////////////////////////////////////////////////////////////////
 		T decX(T x) { xPos -= x; evaluateWatermarks(); return xPos; }
 		T decY(T y) { yPos -= y; evaluateWatermarks(); return yPos; }
 		T decZ(T z) { zPos -= z; evaluateWatermarks(); return zPos; }
+
+		T dec(T x, T y, T z) { xPos -=x; yPos -= y; zPos -= z; evaluateWatermarks(); return zPos; }
 		////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const CncPosition<T> &a) {
 			ostr << a.getX() << ", " << a.getY() << ", " << a.getZ();

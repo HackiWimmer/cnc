@@ -1,3 +1,4 @@
+#include <chrono>
 #include "CncControl.h"
 #include "MainFrame.h"
 #include "SerialEmulatorNULL.h"
@@ -10,9 +11,13 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
+, speedOffsetX(0)
+, speedOffsetY(0)
+, speedOffsetZ(0)
 , positionCounter(0)
 , stepCounter(0)
 , setterMap()
+, targetMajorPos(0L, 0L, 0L)
 , curEmulatorPos(0L, 0L, 0L)
 , lastSignal(CMD_INVALID)
 , lastCommand()
@@ -26,9 +31,13 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
+, speedOffsetX(0)
+, speedOffsetY(0)
+, speedOffsetZ(0)
 , positionCounter(0)
 , stepCounter(0)
 , setterMap()
+, targetMajorPos(0L, 0L, 0L)
 , curEmulatorPos(0L, 0L, 0L)
 , lastSignal(CMD_INVALID)
 , lastCommand()
@@ -120,10 +129,10 @@ bool SerialEmulatorNULL::processGetter(unsigned char pid, std::vector<int32_t>& 
 ///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::getCurrentMoveCmdPID() {
 ///////////////////////////////////////////////////////////////////
-	if ( lastCommand.Mc.respondCounter > 0 ) {
+	if ( lastCommand.Mc.respondCounter > 0 )
 		return PID_LIMIT;
-	}
-	return PID_XYZ_POS;
+	
+	return PID_XYZ_POS_MAJOR;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::getCurrentMoveCmdValues(int32_t &x, int32_t &y, int32_t &z) {
@@ -299,7 +308,7 @@ int SerialEmulatorNULL::readMove(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	int ret = 0;
 	
-	//RET_SOH, PID_XYZ_POS, X->getPosition(), Y->getPosition(), Z->getPosition()
+	//RET_SOH, PID_XYZ_POS_..., X->getPosition(), Y->getPosition(), Z->getPosition()
 	char tmpBuf[14];
 	int32_t x=0, y=0, z=0;
 	char* p = NULL;
@@ -417,7 +426,11 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = val; break;
 			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = val; break;
 			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = val; break;
+			case PID_SPEED_OFFSET_X: 		speedOffsetX       = val; break;
+			case PID_SPEED_OFFSET_Y: 		speedOffsetY       = val; break;
+			case PID_SPEED_OFFSET_Z: 		speedOffsetZ       = val; break;
 		}
+		
 		return true;
 	}
 
@@ -505,6 +518,10 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 						return false;
 		}
 	}
+	
+	// determine the target major position, this is the current pos + the given move
+	targetMajorPos.set(cncControl->getCurPos());
+	targetMajorPos.inc(lastCommand.Mc.lastMoveX, lastCommand.Mc.lastMoveY, lastCommand.Mc.lastMoveZ);
 	
 	// the emulator function readData and writeData runs in the same thread.
 	// so, it isn't possible to repeat a move command with serval position callbacks
@@ -632,33 +649,19 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 ///////////////////////////////////////////////////////////////////
 	// statistic counting
 	positionCounter++;
-	if ( dx != 0 ) stepCounter++;
-	if ( dy != 0 ) stepCounter++;
-	if ( dz != 0 ) stepCounter++;
+	stepCounter += abs(dx);
+	stepCounter += abs(dy);
+	stepCounter += abs(dz);
 	
 	// position management
 	curEmulatorPos.incX(dx);
 	curEmulatorPos.incY(dy);
 	curEmulatorPos.incZ(dz);
 	
-	// signal handling
-	switch ( lastSignal ) {
-	
-		case SIG_INTERRUPPT:
-		case SIG_HALT:				return false;
-		
-		case SIG_PAUSE:				// pause handling
-									while ( lastSignal == SIG_PAUSE ) {
-										THE_APP->dispatchAll();
-										THE_APP->waitActive(25, true);
-									}
-									break;
-		
-		case SIG_RESUME:			lastSignal = CMD_INVALID; 
-									break;
-		
-		default:					; // Do nothing
-	}
+	// simulate speed
+	if ( stepAxis(dx, speedOffsetX) == false ) return false;
+	if ( stepAxis(dy, speedOffsetY) == false ) return false;
+	if ( stepAxis(dz, speedOffsetZ) == false ) return false;
 	
 	// simulate a direct controler callback
 	static CncLongPosition lastReplyPos;
@@ -669,18 +672,19 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 		 abs( diff.getZ() ) >= posReplyThresholdZ ||
 		 force == true ) 
 	{
-		ContollerInfo ci;
-		ci.infoType = CITPosition;
-		ci.command  = lastCommand.cmd;
-		ci.posType 	= PID_XYZ_POS;
-		
-		ci.xCtrlPos = curEmulatorPos.getX();
-		ci.yCtrlPos = curEmulatorPos.getY();
-		ci.zCtrlPos = curEmulatorPos.getZ();
-		
-		cncControl->SerialControllerCallback(ci);
-		
-		lastReplyPos.set(curEmulatorPos);
+		if ( curEmulatorPos != targetMajorPos ) {
+			ContollerInfo ci;
+			ci.infoType = CITPosition;
+			ci.command  = lastCommand.cmd;
+			ci.posType 	= PID_XYZ_POS_DETAIL;
+			
+			ci.xCtrlPos = curEmulatorPos.getX();
+			ci.yCtrlPos = curEmulatorPos.getY();
+			ci.zCtrlPos = curEmulatorPos.getZ();
+			
+			cncControl->SerialControllerCallback(ci);
+			lastReplyPos.set(curEmulatorPos);
+		}
 	}
 	
 	// do something with this coordinates
@@ -690,6 +694,51 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	memcpy(&pointB, &pointA, sizeof(pointA));
 	
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+inline __int64 SerialEmulatorNULL::getMircoscondTimestamp() {
+///////////////////////////////////////////////////////////////////
+	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::stepAxis(int32_t steps, int32_t speedOffset) {
+///////////////////////////////////////////////////////////////////
+	static __int64 tsLastStep = getMircoscondTimestamp();
+	
+	for ( int32_t i = 0; i < abs(steps); i++ ) {
+		// signal handling
+		switch ( lastSignal ) {
+		
+			case SIG_INTERRUPPT:
+			case SIG_HALT:				return false;
+			
+			case SIG_PAUSE:				// pause handling
+										while ( lastSignal == SIG_PAUSE ) {
+											THE_APP->dispatchAll();
+											THE_APP->waitActive(25, true);
+										}
+										break;
+			
+			case SIG_RESUME:			lastSignal = CMD_INVALID; 
+										break;
+			
+			default:					; // Do nothing
+		}
+		
+		// simulate speed
+		if ( GBL_CONFIG->isProbeMode() == false ) {
+			while ( (getMircoscondTimestamp() - tsLastStep) < speedOffset ) {
+				struct timespec req = {0};
+				req.tv_sec = 0;
+				req.tv_nsec = 1 * 1000L;
+				nanosleep(&req, (struct timespec *)NULL);
+			}
+			
+			tsLastStep = getMircoscondTimestamp();
+		}
+	}
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, void *buffer, unsigned int nbByte) {

@@ -266,6 +266,8 @@
       <File Name="CncLargeScaleListCtrl.h"/>
       <File Name="CncPosSpyListCtrl.h"/>
       <File Name="CncPosSpyListCtrl.cpp"/>
+      <File Name="CncSetterListCtrl.h"/>
+      <File Name="CncSetterListCtrl.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
@@ -295,6 +297,7 @@
     <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.h" ExcludeProjConfig="Release"/>
     <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Release"/>
     <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Release"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncSpeedCalculator.h"/>
   </VirtualDirectory>
   <VirtualDirectory Name="UnitTests">
     <VirtualDirectory Name="Tests">

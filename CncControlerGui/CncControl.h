@@ -61,12 +61,11 @@ class CncControl {
 		CncLongPosition curCtlPos;
 		// Stores the lateset requested control positions
 		CncLongPosition controllerPos;
-		// Render mode
-		CncRenderMode renderMode;
 		// speed values
 		CncSpeed speedType;
-		unsigned int rpmSpeedX, rpmSpeedY, rpmSpeedZ;
-		double feedSpeed;
+		double feedSpeed_MM_MIN;
+		double defaultFeedSpeedRapid_MM_MIN;
+		double defaultFeedSpeedWork_MM_MIN;
 		// Duration counter
 		unsigned int durationCounter;
 		// Interrupt stae
@@ -88,7 +87,6 @@ class CncControl {
 		struct timeb endTime, startTime;
 		// command counter
 		int32_t commandCounter;
-		int32_t displayCounter;
 		// Flag to indicatate if a positions check aplies
 		bool positionCheck;
 		// Pen handler
@@ -117,25 +115,14 @@ class CncControl {
 		// secial convesion to transfer a double as long
 		long convertDoubleToCtrlLong(unsigned char 	id, double d);
 		
-		// speed
-		bool setActiveFeedSpeed(CncSpeed s, double value = 0.0);
-		
-		bool setActiveRpmSpeedXYZ(CncSpeed s, unsigned int value = 0.0);
-		bool setActiveRpmSpeedXY(CncSpeed s, unsigned int value = 0.0);
-		
-		bool setActiveRpmSpeedX(CncSpeed s, unsigned int value = 0.0);
-		bool setActiveRpmSpeedY(CncSpeed s, unsigned int value = 0.0);
-		bool setActiveRpmSpeedZ(CncSpeed s, unsigned int value = 0.0);
-		
-		
 		// validating given pos due to the given reference coordinates
 		bool validatePostion(const CncLongPosition& pos);
 		
 		//
 		void monitorPosition(const CncLongPosition& pos);
 		
-		inline void postAppPosition();
-		inline void postCtlPosition();
+		inline void postAppPosition(unsigned char pid);
+		inline void postCtlPosition(unsigned char pid);
 		
 	public:
 		
@@ -155,21 +142,14 @@ class CncControl {
 		Serial* getSerial() { return serialPort; }
 		//speed
 		CncSpeed getCurrentSpeedType() { return speedType; }
-		inline unsigned int getRpmSpeedX() { return rpmSpeedX; }
-		inline unsigned int getRpmSpeedY() { return rpmSpeedY; }
-		inline unsigned int getRpmSpeedZ() { return rpmSpeedZ; }
-		inline double getFeedSpeed() { return feedSpeed; }
+		inline double getFeedSpeed_MM_SEC() { return feedSpeed_MM_MIN / 60; }
+		inline double getFeedSpeed_MM_MIN() { return feedSpeed_MM_MIN; }
 		
+		void changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s);
+		void setDefaultRapidSpeed_MM_MIN(double s);
+		void setDefaultWorkSpeed_MM_MIN(double s);
 		
-		
-
-		
-		
-		
-
-		const wxString& getSpeedAsString();
-		
-		
+		const wxString& getSpeedTypeAsString();
 		
 		// signal wrapper
 		bool sendInterrupt() 	{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
@@ -274,10 +254,12 @@ class CncControl {
 		bool processSetter(unsigned char id, int32_t value);
 		bool processSetterList(std::vector<SetterTuple>& setup);
 		// Change the current speed parameter
-		void changeCurrentFeedSpeedXYZ(CncSpeed s, double value = 0.0);
-		void changeCurrentRpmSpeedXYZ(CncSpeed s, unsigned int value = 0);
-		void changeCurrentRpmSpeedXY(CncSpeed s, unsigned int value = 0);
-		void changeCurrentRpmSpeedZ(CncSpeed s, unsigned int value = 0);
+		void changeCurrentFeedSpeedXYZ_MM_SEC(CncSpeed s, double value = 0.0);
+		void changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value = 0.0);
+
+		//void changeCurrentRpmSpeedXYZ(CncSpeed s, unsigned int value = 0);
+		//void changeCurrentRpmSpeedXY(CncSpeed s, unsigned int value = 0);
+		//void changeCurrentRpmSpeedZ(CncSpeed s, unsigned int value = 0);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
@@ -346,10 +328,6 @@ class CncControl {
 		
 		// idle handling
 		void sendIdleMessage();
-		
-		// Speed monitor handling
-		void setSpeedControlMode(const DimensionMode& spm) { speedMonitorMode = spm; }
-		const DimensionMode& getSpeedControlMode() const   { return speedMonitorMode; }
 		
 };
 

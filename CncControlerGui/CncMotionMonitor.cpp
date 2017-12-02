@@ -258,7 +258,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 	}
 	
 	if ( false ) {
-		#warning - how to?
+		#warning - how to improve the mouse handling?
 		static int ox, oy, x, y;
 		
 		if ( event.LeftDown() == true ) {

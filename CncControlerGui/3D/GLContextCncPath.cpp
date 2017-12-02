@@ -22,6 +22,7 @@ GLContextCncPath::GLContextCncPath(wxGLCanvas* canvas)
 GLContextCncPath::~GLContextCncPath() {
 /////////////////////////////////////////////////////////////////
 	// do something here on demand
+	glDisable(GL_SCISSOR_TEST);
 }
 /////////////////////////////////////////////////////////////////
 GLViewPort* GLContextCncPath::createViewPort() {
@@ -45,6 +46,9 @@ void GLContextCncPath::initContext() {
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); 
 		glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 	}
+	
+	// currently this didn't work correctly
+	//glEnable(GL_SCISSOR_TEST);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPath::determineProjection(int w, int h) {

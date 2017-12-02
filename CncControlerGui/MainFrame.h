@@ -16,6 +16,7 @@
 #include "CncFileView.h"
 #include "CncToolMagazine.h"
 #include "CncPosSpyListCtrl.h"
+#include "CncSetterListCtrl.h"
 #include "codelite/wxPNGAnimation.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -69,6 +70,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
+    virtual void clickProbeMode(wxCommandEvent& event);
+    virtual void displayIntervalKeyDown(wxKeyEvent& event);
+    virtual void displayIntervalChanged(wxScrollEvent& event);
+    virtual void displayIntervalThumbtrack(wxScrollEvent& event);
     virtual void searchPosSpy(wxCommandEvent& event);
 		virtual void goPosSypFirstId(wxCommandEvent& event);
 		virtual void goPosSypLastId(wxCommandEvent& event);
@@ -79,7 +84,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void requestWarningMessage(wxCommandEvent& event);
 		virtual void requestInfoMessage(wxCommandEvent& event);
 		virtual void clearSetterList(wxCommandEvent& event);
-		virtual void sizeSetterList(wxSizeEvent& event);
 		virtual void loopRepeatTest(wxCommandEvent& event);
 		virtual void selectPositionSpyContent(wxCommandEvent& event);
 		virtual void selectPositionSpy(wxListEvent& event);
@@ -248,7 +252,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void requestEnableStepperMotors(wxCommandEvent& event);
 		virtual void keyDownZ(wxKeyEvent& event);
 		virtual void keyDownXY(wxKeyEvent& event);
-		virtual void changeUpdateInterval(wxCommandEvent& event);
 		virtual void emergencyStop(wxCommandEvent& event);
 		virtual void defineDebugSerial(wxCommandEvent& event);
 		virtual void defineMinMonitoring(wxCommandEvent& event);
@@ -330,6 +333,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void onThreadHeartbeat(UpdateManagerEvent& event);
 		void onThreadDispatchAll(UpdateManagerEvent& event);
 		void onThreadCompletion(UpdateManagerEvent& event);
+		void onThreadPostInfo(UpdateManagerEvent& event);
+		void onThreadPostWarning(UpdateManagerEvent& event);
+		void onThreadPostError(UpdateManagerEvent& event);
 		
 		void onPerspectiveTimer(wxTimerEvent& event);
 		void onDebugUserNotificationTimer(wxTimerEvent& event);
@@ -439,6 +445,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncFilePreview* monitorFilePreview;
 		CncToolMagazine* toolMagaizne;
 		CncPosSpyListCtrl* positionSpy;
+		CncSetterListCtrl* setterList;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -525,7 +532,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void updateCurveLibResolution();
 		
 		void decorateSearchButton();
-		
+		void decodrateProbeMode(bool probeMode);
 		void decoratePosSpyConnectButton(bool state);
 
 		void registerGuiControls();

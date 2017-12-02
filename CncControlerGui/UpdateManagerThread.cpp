@@ -4,7 +4,6 @@
 #include "MainFrame.h"
 #include "UpdateManagerThread.h"
 
-
 ///////////////////////////////////////////////////////////////////
 UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 : wxThread(wxTHREAD_DETACHED)
@@ -17,10 +16,14 @@ UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 , displayFactZ(1.0)
 , posSpyQueue()
 , posSpyStringQueue()
-, setterList()
+, setterQueue()
+, setterStringQueue()
+, lpse()
+, posSpyRow(CncPosSpyListCtrl::TOTAL_COL_COUNT)
+, lste()
+, setterRow(CncSetterListCtrl::TOTAL_COL_COUNT)
 ///////////////////////////////////////////////////////////////////
 {
-	setterList.reserve(1024 * 1024);
 }
 ///////////////////////////////////////////////////////////////////
 UpdateManagerThread::~UpdateManagerThread() {
@@ -31,7 +34,8 @@ UpdateManagerThread::~UpdateManagerThread() {
 	
 	posSpyQueue.reset();
 	posSpyStringQueue.reset();
-	setterList.clear();
+	setterQueue.reset();
+	setterStringQueue.reset();
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::stop() {
@@ -41,9 +45,17 @@ void UpdateManagerThread::stop() {
 ///////////////////////////////////////////////////////////////////
 wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
-	typedef UpdateManagerThread::Event LastPosSpyEntry;
 	UpdateManagerThread::EventId posEvtId = UpdateManagerThread::EventId::CTL_POS_UPDATE;
 	
+	
+/*
+	int us = 100; // length of time to sleep, in miliseconds
+	struct timespec req = {0};
+	req.tv_sec = 0;
+	req.tv_nsec = us * 1000L;
+	nanosleep(&req, (struct timespec *)NULL);
+*/
+
 	unsigned int sleep = 1;
 	
 	// initialize 
@@ -54,9 +66,6 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 	
 	wxDateTime tsLast = wxDateTime::UNow();
 	
-	LastPosSpyEntry lpse;
-	CncColumContainer posSpyRow(POS_SPY_LIST_SIZE);
-	
 	while ( !TestDestroy() ) {
 		this->Sleep(sleep);
 		
@@ -66,33 +75,12 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		
 		// --------------------------------------------------------------------
 		// format postion spy output
-		unsigned long count = 0;
-		while ( posSpyQueue.read_available() ) {
-			posSpyQueue.pop(lpse);
-			
-			switch ( unit ) {
-				case CncMetric:		posSpyRow.updateItem(POS_SPY_LIST_COL_REF, 	wxString::Format("%08ld", 	lpse.pos.id));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_T, 	wxString::Format("%c", 		(char)lpse.pos.speedMode));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_F, 	wxString::Format("%.1lf", 	lpse.pos.speedValue));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_X, 	wxString::Format("%.3lf", 	lpse.pos.pos.getX() * displayFactX));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_Y, 	wxString::Format("%.3lf", 	lpse.pos.pos.getY() * displayFactY));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_Z, 	wxString::Format("%.3lf", 	lpse.pos.pos.getZ() * displayFactZ));
-									break;
-									
-				case CncSteps:
-				default: 			posSpyRow.updateItem(POS_SPY_LIST_COL_REF, 	wxString::Format("%08ld", 	lpse.pos.id));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_T, 	wxString::Format("%c", 		(char)lpse.pos.speedMode));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_F, 	wxString::Format("%.1lf", 	lpse.pos.speedValue));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_X, 	wxString::Format("%ld", 	lpse.pos.pos.getX()));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_Y, 	wxString::Format("%ld", 	lpse.pos.pos.getY()));
-									posSpyRow.updateItem(POS_SPY_LIST_COL_Z, 	wxString::Format("%ld", 	lpse.pos.pos.getZ()));
-			}
-			
-			posSpyStringQueue.push(posSpyRow);
-			
-			if ( count++ > 1024 )
-				break;
-		}
+		popAndFormatPosSpyQueue();
+		
+		// --------------------------------------------------------------------
+		// format postion spy output
+		// do this at the call of fillSetterList(...) to get a better performanve here
+		//popAndFormatSetterQueue();
 		
 		// --------------------------------------------------------------------
 		// process data update
@@ -125,107 +113,139 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
-unsigned int UpdateManagerThread::fillPositionSpy(CncLargeScaledListCtrl* lb) {
+void UpdateManagerThread::postInfo(const wxString& msg) {
+///////////////////////////////////////////////////////////////////
+	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::POST_INFO);
+	evt.SetString(msg);
+	wxPostEvent(pHandler, evt);
+}
+///////////////////////////////////////////////////////////////////
+void UpdateManagerThread::postWarning(const wxString& msg) {
+///////////////////////////////////////////////////////////////////
+	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::POST_WARNING);
+	evt.SetString(msg);
+	wxPostEvent(pHandler, evt);
+}
+///////////////////////////////////////////////////////////////////
+void UpdateManagerThread::postError(const wxString& msg) {
+///////////////////////////////////////////////////////////////////
+	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::POST_ERROR);
+	evt.SetString(msg);
+	wxPostEvent(pHandler, evt);
+}
+///////////////////////////////////////////////////////////////////
+void UpdateManagerThread::popAndFormatPosSpyQueue() {
+///////////////////////////////////////////////////////////////////
+	unsigned long count = 0;
+	
+	while ( posSpyQueue.read_available() ) {
+		posSpyQueue.pop(lpse);
+		
+		switch ( unit ) {
+			case CncMetric:		posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 		lpse.pos.pid));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 	lpse.pos.id));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 		(char)lpse.pos.speedMode));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		wxString::Format("%.1lf", 	lpse.pos.speedValue));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%.3lf", 	lpse.pos.pos.getX() * displayFactX));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%.3lf", 	lpse.pos.pos.getY() * displayFactY));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%.3lf", 	lpse.pos.pos.getZ() * displayFactZ));
+								break;
+								
+			case CncSteps:
+			default: 			posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 		lpse.pos.pid));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 	lpse.pos.id));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 		(char)lpse.pos.speedMode));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		wxString::Format("%.1lf", 	lpse.pos.speedValue));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%ld", 	lpse.pos.pos.getX()));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%ld", 	lpse.pos.pos.getY()));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%ld", 	lpse.pos.pos.getZ()));
+		}
+		
+		posSpyStringQueue.push(posSpyRow);
+		
+		if ( count++ > 1024 )
+			break;
+	}
+}
+///////////////////////////////////////////////////////////////////
+void UpdateManagerThread::popAndFormatSetterQueue() {
+///////////////////////////////////////////////////////////////////
+	unsigned long count = 0;
+	std::string retVal;
+	
+	while ( setterQueue.read_available() ) {
+		setterQueue.pop(lste);
+		unsigned char pid = lste.set.id;
+
+		setterRow.updateItem(CncSetterListCtrl::COL_NUM, 	wxString::Format("%010lu", 		count + 1));
+		setterRow.updateItem(CncSetterListCtrl::COL_PID, 	wxString::Format("%u", 			pid));
+		
+		if ( pid == PID_SEPARATOR ) {
+			wxString label("Bookmark: Type(<UNKNOWN>)");
+			switch ( lste.set.value ) {
+				case SEPARARTOR_SETUP:		label.assign("Bookmark: Type(<SETUP>)"); break;
+				case SEPARARTOR_RESET:		label.assign("Bookmark: Type(<RESET>)"); break;
+				case SEPARARTOR_RUN:		label.assign("Bookmark: Type(<RUN>)");   break;
+			}
+			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		wxString::Format("%ld", lste.set.value));
+			setterRow.updateItem(CncSetterListCtrl::COL_KEY, 		label);
+			setterRow.updateItem(CncSetterListCtrl::COL_VAL, 		wxString::Format("%s.%03ld", 	lste.ts.FormatTime(), lste.ts.GetMillisecond()));
+			
+		} else {
+			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		"");
+			setterRow.updateItem(CncSetterListCtrl::COL_KEY, 		wxString::Format("%s", 			ArduinoPIDs::getPIDLabel((int)pid, retVal)));
+			
+			if ( pid >= PID_DOUBLE_RANG_START )	
+				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%.2lf", 	(double)(lste.set.value/1000)));
+			else
+				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%ld", 	lste.set.value));
+		}
+		
+		setterStringQueue.push(setterRow);
+		
+		if ( count++ > 512 )
+			break;
+	}
+}
+///////////////////////////////////////////////////////////////////
+unsigned int UpdateManagerThread::fillPositionSpy(CncPosSpyListCtrl* lb) {
 ///////////////////////////////////////////////////////////////////
 	if( lb == NULL )
 		 return 0;
 	
 	static const unsigned int MAX_ITEMS = 32000;
-	static CncColumContainer posSpyRows[MAX_ITEMS](POS_SPY_LIST_SIZE);
+	static CncColumContainer posSpyRows[MAX_ITEMS](CncPosSpyListCtrl::TOTAL_COL_COUNT);
 	
 	unsigned int sizeAvailable = posSpyStringQueue.pop(posSpyRows, MAX_ITEMS);
 	
 	if ( sizeAvailable > 0 ) {
 		if ( lb->appendItems(sizeAvailable, posSpyRows) == false ) {
-			
+			postError("UpdateManagerThread::fillPositionSpy(...): Error while append Items!");
 		}
 	}
 	
 	return sizeAvailable;
 }
 ///////////////////////////////////////////////////////////////////
-void UpdateManagerThread::fillSetterList(wxListCtrl* lb) {
+unsigned int UpdateManagerThread::fillSetterList(CncSetterListCtrl* lb) {
 ///////////////////////////////////////////////////////////////////
 	if( lb == NULL )
-		return;
+		return 0;
 		
-	{
-		// ensure no one else updates posSpyList
-		wxCriticalSectionLocker lock(pHandler->pThreadCS);
+	popAndFormatSetterQueue();
 		
-		// decorate the columns
-		if ( lb->GetColumnCount() == 0 ) {
-			lb->AppendColumn("#:", 		wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
-			lb->AppendColumn("Key:",	wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE);
-			lb->AppendColumn("Value:", 	wxLIST_FORMAT_RIGHT, wxLIST_AUTOSIZE);
-			
-			lb->SetSingleStyle(wxLC_HRULES | wxLC_VRULES, true);
+	static const unsigned int MAX_ITEMS = 4000;
+	static CncColumContainer setterRows[MAX_ITEMS](CncSetterListCtrl::TOTAL_COL_COUNT);
+	
+	unsigned int sizeAvailable = setterStringQueue.pop(setterRows, MAX_ITEMS);
+	
+	if ( sizeAvailable > 0 ) {
+		if ( lb->appendItems(sizeAvailable, setterRows) == false ) {
+			postError("UpdateManagerThread::fillSetterList(...): Error while append Items!");
 		}
-		
-		// fill/append the list
-		const int insertPos = 0;
-		unsigned long count = lb->GetItemCount();
-		std::string retVal;
-		
-		for ( auto it = setterList.begin() + lb->GetItemCount(); it != setterList.end(); ++it ) {
-			lb->InsertItem(insertPos, "",  0);
-
-			if ( it->set.id == PID_SEPARATOR ) {
-				wxString label("Bookmark: Type(<DEFAULT>)");
-				wxColour bgColour(*wxBLACK);
-				wxColour fgColour(*wxWHITE);
-				
-				switch ( it->set.value ) {
-					case SEPARARTOR_SETUP:		label.assign("Bookmark: Type(<SETUP>)");
-												bgColour.Set(0, 64, 64);
-												break;
-												
-					case SEPARARTOR_RESET:		label.assign("Bookmark: Type(<RESET>)");
-												bgColour.Set(0, 0, 64);
-												break;
-												
-					case SEPARARTOR_RUN:		label.assign("Bookmark: Type(<RUN>)");
-												bgColour.Set(128, 64, 64);
-												break;
-					default:					;
-				}
-				
-				lb->SetItemBackgroundColour(insertPos, bgColour);
-				lb->SetItemTextColour(insertPos, fgColour);
-				
-				lb->SetItem(insertPos, SET_LST_COL_NUM, wxString::Format("%010lu", ++count));
-				lb->SetItem(insertPos, SET_LST_COL_KEY, wxString::Format("%s:", label));
-				lb->SetItem(insertPos, SET_LST_COL_VAL, wxString::Format("%s.%03ld", it->ts.FormatTime(), it->ts.GetMillisecond()));
-				
-			} else {
-				lb->SetItem(insertPos, SET_LST_COL_NUM, wxString::Format("%010lu", ++count));
-				lb->SetItem(insertPos, SET_LST_COL_KEY, ArduinoPIDs::getPIDLabel((int)it->set.id, retVal));
-				
-				switch ( it->set.id ) {
-					case PID_PITCH_X:
-					case PID_PITCH_Y:
-					case PID_PITCH_Z:		lb->SetItem(insertPos, SET_LST_COL_VAL, CncNumberFormatter::toString((double)(it->set.value/1000.0), 2));
-											break;
-
-					default:				lb->SetItem(insertPos, SET_LST_COL_VAL, CncNumberFormatter::toString((long)(it->set.value)));
-				}
-			}
-			
-		}
-		
-		// first set default sizes depending on content
-		lb->SetColumnWidth(SET_LST_COL_NUM, wxLIST_AUTOSIZE);
-		lb->SetColumnWidth(SET_LST_COL_KEY, wxLIST_AUTOSIZE);
-		lb->SetColumnWidth(SET_LST_COL_VAL, wxLIST_AUTOSIZE);
-		
-		// try to strech the second (key) column
-		const int scrollbarWidth = 26;
-		int size = lb->GetSize().GetWidth() - lb->GetColumnWidth(SET_LST_COL_NUM) - lb->GetColumnWidth(SET_LST_COL_VAL) - scrollbarWidth;
-		if ( size > lb->GetColumnWidth(SET_LST_COL_KEY) )
-			lb->SetColumnWidth(SET_LST_COL_KEY, size);
-			
-		lb->EnsureVisible(0);
 	}
+	
+	return sizeAvailable;
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
@@ -251,7 +271,8 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 											
 		case Event::Type::SETLST_RESET:		{	// ensure no one else changes the setter list
 												wxCriticalSectionLocker lock(pHandler->pThreadCS);
-												setterList.clear();
+												setterQueue.reset();
+												setterStringQueue.reset();
 											}
 											break;
 											
@@ -262,7 +283,7 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 											}
 											break;
 											
-		case Event::Type::SETTER_ADD:		setterList.push_back(evt);
+		case Event::Type::SETTER_ADD:		setterQueue.push(evt);
 											break;
 											
 		case Event::Type::POS_TYP_UPD:		posSpyContent = evt.cnt.posSpyType;
