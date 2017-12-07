@@ -2,18 +2,18 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## release2
+## Debug
 ProjectName            :=CncConrollerGui
-ConfigurationName      :=release2
+ConfigurationName      :=Debug
 WorkspacePath          :=C:/@Development/@Projekte/c++/CNCGuiController
 ProjectPath            :=C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui
-IntermediateDirectory  :=./Release
+IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=03/12/2017
+Date                   :=07/12/2017
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -shared -fPIC
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=$(PreprocessorSwitch)NDEBUG $(PreprocessorSwitch)APP_USE_SPLASH 
+Preprocessors          :=$(PreprocessorSwitch)DEBUG 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -37,7 +37,7 @@ PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags) -D DEBUG 
 RcCompilerName         :=C:/@Development/Compilers/TDM-GCC-64/bin/windres.exe
-LinkOptions            :=  -mwindows $(shell wx-config --libs)
+LinkOptions            :=  -pg -mwindows $(shell wx-config --libs)
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)C:\@Development\boost\include\boost-1_64 $(IncludeSwitch). $(IncludeSwitch)C:\@Development\boost_1_65_0 $(IncludeSwitch)C:\@Development\freeglut\include 
 IncludePCH             := 
 RcIncludePath          := 
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:\@Developm
 AR       := C:/@Development/Compilers/TDM-GCC-64/bin/ar.exe rcu
 CXX      := C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 CC       := C:/@Development/Compilers/TDM-GCC-64/bin/gcc.exe
-CXXFLAGS := -Wno-deprecated-declarations -O3 -std=c++17 -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
-CFLAGS   :=  -O3 -Wall $(Preprocessors)
+CXXFLAGS := -Wno-deprecated-declarations -pg -g -O0 -std=c++17 -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
+CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/@Development/Compilers/TDM-GCC-64/bin/as.exe
 
@@ -73,9 +73,9 @@ Objects1=$(IntermediateDirectory)/GlobalFunctions.cpp$(ObjectSuffix) $(Intermedi
 	$(IntermediateDirectory)/CncConfig.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncLargeScaleListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPosSpyListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/Tests_Test_Base.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeBlock.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeCommands.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeField.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerCnc.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerGL.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextPathBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLViewPort.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextCncPath.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextTestCube.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextGCodePreview.cpp$(ObjectSuffix) $(IntermediateDirectory)/FileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathHandlerBase.cpp$(ObjectSuffix) \
 	$(IntermediateDirectory)/SVGFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGNodeParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGCurveLib.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgEditPopup.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGElementConverter.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgUnitCalculator.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgApplicationPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgEnvironmentPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgSVGOptionPage.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/CfgGCodeOptionPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgGeneralPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolMagazine.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorBase.cpp$(ObjectSuffix) 
+	$(IntermediateDirectory)/CfgGCodeOptionPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgGeneralPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolMagazine.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGenerators_PGenPolygon.cpp$(ObjectSuffix) 
 
-Objects2=$(IntermediateDirectory)/PathGenerators_PGenPolygon.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgGeneratorBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathFragment.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathGroup.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathString.cpp$(ObjectSuffix) \
+Objects2=$(IntermediateDirectory)/SvgGeneratorBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathFragment.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathGroup.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathString.cpp$(ObjectSuffix) \
 	
 
 
@@ -97,11 +97,11 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 MakeIntermediateDirs:
-	@$(MakeDirCommand) "./Release"
+	@$(MakeDirCommand) "./Debug"
 
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Release"
+	@$(MakeDirCommand) "./Debug"
 
 PreBuild:
 	@echo Executing Pre Build commands ...
@@ -752,6 +752,6 @@ $(IntermediateDirectory)/SvgPathString.cpp$(PreprocessSuffix): SvgPathString.cpp
 ## Clean
 ##
 clean:
-	$(RM) -r ./Release/
+	$(RM) -r ./Debug/
 
 

@@ -1,7 +1,7 @@
 #include <iostream>
 #include <sstream>
+#include <wx/tokenzr.h>
 #include "3D/GLContextBase.h"
-
 
 #ifdef __DARWIN__
     #include <OpenGL/glu.h>
@@ -50,6 +50,10 @@ GLContextBase::~GLContextBase() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::globalInit() {
 /////////////////////////////////////////////////////////////////
+	static bool alreadyCalled = false;
+	if ( alreadyCalled == true )
+		return;
+	
 	// this is a static function and should be called one time
 	// normallly before creating the first context
 	// So, the initalization here is globally. 
@@ -66,6 +70,26 @@ void GLContextBase::globalInit() {
 	
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::traceOpenGLVersionInfo(std::ostream& s) {
+/////////////////////////////////////////////////////////////////
+	s << "::OpenGL version linfo: ";
+	s << glGetString(GL_VERSION) 	<< "; ";
+	s << glGetString(GL_VENDOR) 	<< "; ";
+	s << glGetString(GL_RENDERER) 	<< std::endl;
+	//s << glGetString(GL_SHADING_LANGUAGE_VERSION​) << std::endl;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::traceeOpenGLExtentionInfo(std::ostream& s) {
+/////////////////////////////////////////////////////////////////
+	s << "Extention list:" << std::endl;
+	wxString ext(glGetString(GL_EXTENSIONS));
+	wxStringTokenizer extentions(ext, " ");
+	while ( extentions.HasMoreTokens() ) {
+		wxString token = extentions.GetNextToken();
+		s << " " << token << std::endl;
+	}
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::init() {
@@ -268,7 +292,7 @@ void GLContextBase::determineViewPortBounderies() {
 }
 /////////////////////////////////////////////////////////////////
 void  GLContextBase::renderBitmapString(float x, float y, float z, 
-                                            void* font, const char* string) {
+                                        void* font, const char* string) {
 /////////////////////////////////////////////////////////////////
 	// ensure the right matrix
 	glMatrixMode(GL_MODELVIEW);
@@ -277,7 +301,7 @@ void  GLContextBase::renderBitmapString(float x, float y, float z,
 	glRasterPos3f(x, y, z);
 	for (c = string; *c != '\0'; c++)
 		glutBitmapCharacter(font, *c);
-} 
+}
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawCoordinateOrigin() {
 /////////////////////////////////////////////////////////////////
@@ -457,7 +481,7 @@ void GLContextBase::determineModel() {
 /////////////////////////////////////////////////////////////////
 	glMatrixMode(GL_MODELVIEW);
 	
-	// this function hs to be overridden by derived classes
+	// this function has to be overridden by derived classes
 	// to define what is to draw
 }
 /////////////////////////////////////////////////////////////////
@@ -541,6 +565,22 @@ void GLContextBase::normalizeRotation() {
 	modelRotate.reset3DDefaults();
 }
 /////////////////////////////////////////////////////////////////
+float GLContextBase::getMaxScaleFactor() {
+/////////////////////////////////////////////////////////////////
+	float scaleFact = viewPort->getDisplayFactor() * zoom / 0.1;
+	scaleFact *= modelScale.getMaxScaleFactor();
+	
+	return scaleFact;
+}
+/////////////////////////////////////////////////////////////////
+float GLContextBase::getCurrentScaleFactor() {
+/////////////////////////////////////////////////////////////////
+	float scaleFact = viewPort->getDisplayFactor() * zoom / getAutoScaleFactor();
+	scaleFact *= modelScale.factX();
+	
+	return scaleFact;
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::display() {
 /////////////////////////////////////////////////////////////////
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -567,14 +607,14 @@ void GLContextBase::display() {
 	// main model
 	glPushMatrix();
 		// scale
-		glScalef(modelScale.factX() * viewPort->getDisplayFactor() * zoom / getAutoScaleFactor(), 
-				 modelScale.factY() * viewPort->getDisplayFactor() * zoom / getAutoScaleFactor(), 
-				 modelScale.factZ() * viewPort->getDisplayFactor() * zoom / getAutoScaleFactor()); 
+		float sf = getCurrentScaleFactor();
+		glScalef(sf, sf, sf);
+				 
 		// rotate
 		glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
 		glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
 		glRotatef(modelRotate.angleZ(), 0.0f, 0.0f, 1.0f);
-				 
+		
 		// draw the scene
 		determineModel();
 		

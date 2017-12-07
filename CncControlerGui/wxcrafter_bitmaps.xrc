@@ -130,6 +130,7 @@
   <object class="wxBitmap" name="BMP_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="BMP_GCODE_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\code-context.png</object>
   <object class="wxBitmap" name="BMP_GENERAL_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-inactive.png</object>
+  <object class="wxBitmap" name="BMP_HIDE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_up.png</object>
   <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\mill.png</object>
   <object class="wxBitmap" name="BMP_MINUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
@@ -176,6 +177,7 @@
   <object class="wxBitmap" name="BMP_SETTER">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-struct.png</object>
   <object class="wxBitmap" name="BMP_SETTER@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-struct@2x.png</object>
   <object class="wxBitmap" name="BMP_SETTER@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-struct@2x.png</object>
+  <object class="wxBitmap" name="BMP_SHOW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_down.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
@@ -247,6 +249,7 @@
   <object class="wxBitmap" name="document-save-3">bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="document-save-6">bitmaps\document-save-6.png</object>
   <object class="wxBitmap" name="document-save-as (2)">bitmaps\document-save-as (2).png</object>
+  <object class="wxBitmap" name="draw-vector">bitmaps\draw-vector.png</object>
   <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="executable">bitmaps\executable.png</object>
@@ -276,6 +279,7 @@
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
+  <object class="wxBitmap" name="tools-sum">bitmaps\tools-sum.png</object>
   <object class="wxBitmap" name="tools-wizard">bitmaps\tools-wizard.png</object>
   <object class="wxBitmap" name="trace">bitmaps\trace.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>

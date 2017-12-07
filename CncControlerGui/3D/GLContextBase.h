@@ -1,6 +1,7 @@
 #ifndef OPENGL_CONTEXTBASE_H
 #define OPENGL_CONTEXTBASE_H
 
+#include <ostream>
 #include <wx/colour.h>
 
 #include "3D/GLViewPort.h"
@@ -43,6 +44,8 @@ class GLContextBase : public wxGLContext {
 		virtual void keyboardHandler(unsigned char c);
 		
 		static void globalInit();
+		static void traceOpenGLVersionInfo(std::ostream& s);
+		static void traceeOpenGLExtentionInfo(std::ostream& s);
 		
 		void enable(bool state = true) { enabled = state; } 
 		void disable() { enable(false); }
@@ -70,6 +73,9 @@ class GLContextBase : public wxGLContext {
 		// viewPort
 		void centerViewport();
 		
+		virtual float getMaxScaleFactor();
+		virtual float getCurrentScaleFactor();
+
 		// view mode
 		void setViewMode(GLContextBase::ViewMode newMode, bool force=false);
 		GLContextBase::ViewMode getViewMode() { return viewMode; }

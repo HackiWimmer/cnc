@@ -234,9 +234,9 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_PITCH_Y, convertDoubleToCtrlLong(PID_PITCH_Y, cncConfig->getPitchY())));
 	setup.push_back(SetterTuple(PID_PITCH_Z, convertDoubleToCtrlLong(PID_PITCH_Z, cncConfig->getPitchZ())));
 	
-	setup.push_back(SetterTuple(PID_SPEED_OFFSET_X, GBL_CONFIG->calcSpeedOffsetX(feedSpeed_MM_MIN)));
-	setup.push_back(SetterTuple(PID_SPEED_OFFSET_Y, GBL_CONFIG->calcSpeedOffsetY(feedSpeed_MM_MIN)));
-	setup.push_back(SetterTuple(PID_SPEED_OFFSET_Z, GBL_CONFIG->calcSpeedOffsetZ(feedSpeed_MM_MIN)));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_OFFSET_X, cncConfig->getPulsWidthOffsetX()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_OFFSET_Y, cncConfig->getPulsWidthOffsetY()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_OFFSET_Z, cncConfig->getPulsWidthOffsetZ()));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, cncConfig->getReplyThresholdStepsX()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
@@ -585,10 +585,7 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value) {
 		
 	speedType = s;
 	feedSpeed_MM_MIN = value;
-	
-	processSetter(PID_SPEED_OFFSET_X, GBL_CONFIG->calcSpeedOffsetX(value));
-	processSetter(PID_SPEED_OFFSET_Y, GBL_CONFIG->calcSpeedOffsetY(value));
-	processSetter(PID_SPEED_OFFSET_Z, GBL_CONFIG->calcSpeedOffsetZ(value));
+	processSetter(PID_SPEED_MM_MIN, (long)(feedSpeed_MM_MIN * DBL_FACT));
 	
 	/*
 	typedef UpdateManagerThread::Event Event;

@@ -37,18 +37,30 @@ namespace GLI {
 			const float factZ() const { return _z; }
 			
 			////////////////////////////////////////////
+			float getMaxScaleFactor() { return 4.0; }
+			
+			// all three axis are always modified in sync!
 			void resetScale() { _x = 1.0; _y = 1.0; _z = 1.0; }
 			
-			void incScale() { _x += _step; _y += _step; _z += _step; }
-			void decScale() { _x -= _step; _y -= _step; _z -= _step; }
+			////////////////////////////////////////////
+			// all three axis are always modified in sync!
+			void incScale() { 
+				float test = _x + _step;
+				if ( test >= getMaxScaleFactor() )
+					return;
+					
+				_x += _step; _y += _step; _z += _step; 
+			}
 			
-			void incScaleX() { _x += _step; }
-			void incScaleY() { _y += _step; }
-			void incScaleZ() { _z += _step; }
-			
-			void decScaleX() { _x -= _step; }
-			void decScaleY() { _y -= _step; }
-			void decScaleZ() { _z -= _step; }
+			////////////////////////////////////////////
+			// all three axis are always modified in sync!
+			void decScale() { 
+				float test = _x - _step;
+				if ( test <= _step )
+					return;
+				
+				_x -= _step; _y -= _step; _z -= _step; 
+			}
 			
 			////////////////////////////////////////////
 			const float getStepWidth() const { return _step; }

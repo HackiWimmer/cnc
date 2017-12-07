@@ -5,6 +5,7 @@
 #include "GL3DOptions.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
+#include "MainFrame.h"
 #include "CncMotionMonitor.h"
 
 #ifdef __DARWIN__
@@ -72,6 +73,17 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	monitor->init();
 	testCube->init();
 	
+	// bind
+	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneX3D, 	this);
+	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneY3D, 	this);
+	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneZ3D, 	this);
+	GBL_CONFIG->getTheApp()->GetScalePane3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintScalePane3D, 		this);
+
+	GBL_CONFIG->getTheApp()->GetScalePane3D()->SetBackgroundColour(*wxBLACK);
+	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->SetBackgroundColour(*wxBLACK);
+	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->SetBackgroundColour(*wxBLACK);
+	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->SetBackgroundColour(*wxBLACK);
+	
 	// publish initial zoom factor
 	monitor->setZoomFactor(zoom);
 	
@@ -81,14 +93,27 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 //////////////////////////////////////////////////
 CncMotionMonitor::~CncMotionMonitor() {
 //////////////////////////////////////////////////
+	// unbind
+	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneX3D, 	this);
+	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneY3D, 	this);
+	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneZ3D, 	this);
+	GBL_CONFIG->getTheApp()->GetScalePane3D()->Unbind(wxEVT_PAINT, 		&CncMotionMonitor::onPaintScalePane3D, 		this);
+
 	if ( monitor != NULL ) 
 		delete monitor;
-
+	
 	if ( testCube != NULL ) 
 		delete testCube;
-
+	
 	if ( optionDlg != NULL ) 
 		delete optionDlg;
+}
+//////////////////////////////////////////////////
+unsigned int CncMotionMonitor::calculateScaleDisplay(unsigned int height) {
+//////////////////////////////////////////////////
+	float fact = ( monitor->getCurrentScaleFactor() * 1000 ) / ( monitor->getMaxScaleFactor() * 1000 );
+	//std::cerr <<  monitor->getCurrentScaleFactor() << ", " <<  monitor->getMaxScaleFactor() << ", " << fact << std::endl;
+	return (unsigned int)(fact * height);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::enable(bool state) {
@@ -136,7 +161,6 @@ void CncMotionMonitor::reconstruct() {
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::display() {
-	//Refresh(false);
 	onPaint();
 }
 //////////////////////////////////////////////////
@@ -147,9 +171,9 @@ void CncMotionMonitor::appendVertice(const GLI::VerticeLongData& vd) {
 	// To do this first we need to normalize the values for x, y and z 
 	// to a common unit like [mm], because [steps] are depends on 
 	// the corresponding pitch which is configured for each axis separatly 
-	float x = vd.getX() / CncConfig::getGlobalCncConfig()->getDispFactX3D(); 
-	float y = vd.getY() / CncConfig::getGlobalCncConfig()->getDispFactY3D();
-	float z = vd.getZ() / CncConfig::getGlobalCncConfig()->getDispFactZ3D();
+	float x = vd.getX() / GBL_CONFIG->getDispFactX3D(); 
+	float y = vd.getY() / GBL_CONFIG->getDispFactY3D();
+	float z = vd.getZ() / GBL_CONFIG->getDispFactZ3D();
 	
 	appendVertice(vd.getId(), x, y, z, vd.getMode());
 }
@@ -214,12 +238,90 @@ void CncMotionMonitor::onPaint() {
 	else 			monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
 	monitor->display();
 	
+	// update additional controls
+	GBL_CONFIG->getTheApp()->GetScalePane3D()->Refresh();
+	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->Refresh();
+	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->Refresh();
+	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->Refresh();
+	
 	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
 	// later this should not appear to support custom origin positions
 	// see if above
 	isShown = IsShownOnScreen();
 	
 	SwapBuffers();
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintRotatePane3D(wxPanel* panel, int angle) {
+/////////////////////////////////////////////////////////////////////
+	static wxColour posColour(0, 128, 0);
+	static wxColour negColour(196, 0, 0);
+	static wxColour colour;
+	static int lastAngle = 0;
+	
+	if ( angle != lastAngle )
+		panel->SetToolTip(wxString::Format("Rotation X: %d", angle));
+	
+	lastAngle = angle;
+	
+	angle < 0 ? colour = negColour : colour = posColour;
+	angle = abs(angle);
+
+	const wxSize size = panel->GetSize();
+	int height = size.GetHeight();
+	
+	unsigned int pos = (unsigned int)(height * angle/360);
+	
+	wxPaintDC dc(panel);
+	dc.SetPen(wxPen(colour));
+	dc.SetBrush(wxBrush(colour));
+
+	wxRect rect(0, height, size.GetWidth(), -pos);
+	dc.DrawRectangle(rect);
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintRotatePaneX3D(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	onPaintRotatePane3D(GBL_CONFIG->getTheApp()->GetRotatePaneX3D(), getAngleX());
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintRotatePaneY3D(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	onPaintRotatePane3D(GBL_CONFIG->getTheApp()->GetRotatePaneY3D(), getAngleY());
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintRotatePaneZ3D(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	onPaintRotatePane3D(GBL_CONFIG->getTheApp()->GetRotatePaneZ3D(), getAngleZ());
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintScalePane3D(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	static wxColour col(219,194,77);
+	static wxBrush  brush(col);
+	static wxPen    pen(col, 1, wxSOLID);
+	static unsigned int lastScalePos = 0;
+	
+	wxPanel* pane = GBL_CONFIG->getTheApp()->GetScalePane3D();
+	const wxSize size = pane->GetSize();
+	int height = size.GetHeight();
+
+	unsigned int pos = calculateScaleDisplay(height);
+	
+	// avoid duplicate drawing
+	if ( pos == lastScalePos )
+		pane->SetToolTip(wxString::Format("Scale: %d", pos));
+		
+	lastScalePos = pos;
+	
+	//clog << height << ", " << pos << endl;
+	
+	wxPaintDC dc(pane);
+	dc.SetPen(pen);
+	dc.SetBrush(brush);
+
+	wxRect rect(0, height, size.GetWidth(), -pos);
+	dc.DrawRectangle(rect);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onPaint(wxPaintEvent& event) {
@@ -239,7 +341,10 @@ void CncMotionMonitor::onSize(wxSizeEvent& event) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::onEraseBackground(wxEraseEvent& event) {
 //////////////////////////////////////////////////
-	// do nothing, only to avoid flashing on MSW
+	// update background 
+	monitor->display();
+	
+	// and avoid flashing on MSW
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onMouse(wxMouseEvent& event) {

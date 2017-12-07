@@ -120,7 +120,7 @@ class Serial {
 		
 	private:
 		// total distance
-		unsigned long long totalDistance[3];
+		long double totalDistance[4];
 		
 	protected:
 		//Serial com handler
@@ -142,6 +142,11 @@ class Serial {
 		Serial::SypMode spyMode;
 		bool spyRead;
 		bool spyWrite;
+		
+		// display factors
+		double factorX;
+		double factorY;
+		double factorZ;
 		
 		// ...
 		unsigned char buf[LONG_BUF_SIZE];
@@ -251,7 +256,11 @@ class Serial {
 		virtual size_t getPostionCounter();
 
 		virtual void resetStepCounter();
+		size_t requestStepCounter(unsigned char pid);
 		virtual size_t getStepCounter();
+		virtual size_t getStepCounterX();
+		virtual size_t getStepCounterY();
+		virtual size_t getStepCounterZ();
 				
 		//SVG path handling
 		virtual void setSVGOutputParameters(const SvgOutputParameters& sp) {}
@@ -270,10 +279,11 @@ class Serial {
 		// sends the Test Suite end flag 't'
 		bool sendTestSuiteEndFlag();
 		
-		void resetTotalDistance() { totalDistance[0] = 0LL; totalDistance[1] = 0LL; totalDistance[2] = 0LL; }
-		unsigned long long getTotalDistanceX() { return totalDistance[0]; }
-		unsigned long long getTotalDistanceY() { return totalDistance[1]; }
-		unsigned long long getTotalDistanceZ() { return totalDistance[2]; }
+		void resetTotalDistance() { totalDistance[0] = 0LL; totalDistance[1] = 0LL; totalDistance[2] = 0LL; totalDistance[3] = 0LL;}
+		long double getTotalDistanceX() { return totalDistance[0]; }
+		long double getTotalDistanceY() { return totalDistance[1]; }
+		long double getTotalDistanceZ() { return totalDistance[2]; }
+		long double getTotalDistance()  { return totalDistance[3]; }
 		
 };
 

@@ -198,8 +198,16 @@ MainFrame::~MainFrame() {
 	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadPostError,	 			this, UpdateManagerThread::EventId::POST_ERROR);
 	
 	positionSpy->Unbind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
-	// todo
+	
+	#warning todo -  Unbind popup menu event handlers, but how?
 	//this->Unbind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent& event) {});
+	
+	// explicit delete the motion monitor pointer here, beacause the motion monitor class
+	// considers the Mainframe GBL_CONFIG->getTheApp() pointer in its dtor 
+	// and this crashes definitly if the MainFame dtor is already passed
+	// the delete below avoid this behaviour
+	if ( motionMonitor != NULL )
+		delete motionMonitor;
 	
 	wxASSERT(lruStore);
 	lruFileList.save(lruStore);
@@ -493,9 +501,6 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 	
 	clog << CncConfig::getDefaultCurveLibResolution() << endl;
 	clog << CncConfig::getCurveLibIncrement() << endl;
-
-	
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -514,11 +519,13 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	loadPerspective("Run");
 	decorateViewMenu();
 	
+	GLContextBase::traceOpenGLVersionInfo(std::cout);
+	
 	// Auto connect ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
 		connectSerialPort();
 		
-	// Auto process ?
+		// Auto process ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
 		defineMinMonitoring();
 		processTemplate();
@@ -649,7 +656,6 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 		
 	// update time consumed
 	if ( pngAnimation && pngAnimation->IsRunning() ) {
-		processEndTime = wxDateTime::UNow();
 		logTimeConsumed();
 	}
 }
@@ -1151,6 +1157,8 @@ void MainFrame::initialize(void) {
 	registerGuiControls();
 	enableManuallyControls();
 	initTemplateEditStyle();
+	toggleMonitorStatistics(false);
+
 	
 	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
 	decorateTestSuiteParameters();
@@ -2435,8 +2443,8 @@ bool MainFrame::processManualTemplate() {
 
 		//cnc->initNextDuration(); will be done by manualSimpleMoveMetric
 		cnc->manualSimpleMoveMetric(moveX, moveY, 0.0);
-		
 		cnc->resetDurationCounter();
+		
 	} else {
 		wxString zs = m_metricZ->GetValue();
 		double zd; 
@@ -3100,9 +3108,12 @@ bool MainFrame::processTemplate() {
 	cnc->processCommand("r", std::cout);
 	cnc->getSerial()->resetPostionCounter();
 	cnc->getSerial()->resetStepCounter();
+	cnc->getSerial()->resetTotalDistance();
 	cnc->logProcessingStart();
 	cnc->enableStepperMotors(true);
 	freezeLogger();
+
+	
 
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
@@ -3133,7 +3144,6 @@ bool MainFrame::processTemplate() {
 	}
 	
 	// Check positions
-	setMinMaxPositions();
 	if ( cnc->validatePositions() == false ) {
 		if ( cnc->isInterrupted() == false ) {
 			std::cerr << "Validate positions failed" << std::endl;
@@ -3161,22 +3171,19 @@ bool MainFrame::processTemplate() {
 	if ( ret )
 		cnc->updateDrawControl();
 		
-	processEndTime = wxDateTime::UNow();
 	logTimeConsumed();
+	logStatistics();
 		
 	unfreezeLogger();
 	enableControls();
 	stopAnimationControl();
-	
-	#warning - todo gui
-	clog << "Position Counter: " << cnc->getSerial()->getPostionCounter() << endl;
-	clog << "Step Counter:     " << cnc->getSerial()->getStepCounter() << endl;
 	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::logTimeConsumed() {
 ///////////////////////////////////////////////////////////////////
+	processEndTime = wxDateTime::UNow();
 	processLastDuartion = (processEndTime - processStartTime).GetMilliseconds().ToLong();
 	
 	int n = (int) ( processLastDuartion % 1000);
@@ -3187,34 +3194,40 @@ void MainFrame::logTimeConsumed() {
 	m_cmdDuration->ChangeValue(wxString::Format("%02d:%02d:%02d.%03d", h, m, s, n));
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::resetMinMaxPositions() {
-///////////////////////////////////////////////////////////////////	
-	m_minPosX->SetLabel(wxString::Format(wxT("%4.4f"), 0.0));
-	m_minPosY->SetLabel(wxString::Format(wxT("%4.4f"), 0.0));
-	m_minPosZ->SetLabel(wxString::Format(wxT("%4.4f"), 0.0));
+void MainFrame::logStatistics() {
+///////////////////////////////////////////////////////////////////
+	if ( cnc == NULL )
+		return;
+		
+	return;
+	#warning
 
-	m_maxPosX->SetLabel(wxString::Format(wxT("%4.4f"), 0.0));
-	m_maxPosY->SetLabel(wxString::Format(wxT("%4.4f"), 0.0));
-	m_maxPosZ->SetLabel(wxString::Format(wxT("%4.4f"), 0.0));
+	CncDoublePosition min(cnc->getMinPositionsMetric());
+	CncDoublePosition max(cnc->getMaxPositionsMetric());
 	
-	cnc->resetWatermarks();
+	wxString s("Run statisic summary:\n");
+	//s.append(wxString::Format(wxT(" Boundings - Min(X,Y,Z) [mm]   : %4.4f, %4.4f, %4.4f\n"), 	min.getX(), min.getY(), min.getZ()));
+	//s.append(wxString::Format(wxT(" Boundings - Max(X,Y,Z) [mm]   : %4.4f, %4.4f, %4.4f\n"), 	max.getX(), max.getY(), max.getZ()));
+	//s.append(wxString::Format(wxT(" Distance  - total      [mm]   : %lf\n"), 					cnc->getSerial()->getTotalDistance()));
+	//s.append(wxString::Format(wxT(" Distance  - (X,Y,Z)    [mm]   : %lf, %lf, %lf\n"), 			cnc->getSerial()->getTotalDistanceX(), cnc->getSerial()->getTotalDistanceY(), cnc->getSerial()->getTotalDistanceZ()));
+	s.append(wxString::Format(wxT(" Steps     - total      [#]    : % 10ld\n"), 					cnc->getSerial()->getStepCounter()));
+	s.append(wxString::Format(wxT(" Steps     - (X,Y,Z)    [#]    : % 10ld, % 10ld, % 10ld\n"),		cnc->getSerial()->getStepCounterX(), cnc->getSerial()->getStepCounterY(), cnc->getSerial()->getStepCounterZ()));
+	s.append(wxString::Format(wxT(" Position counter       [#]    : % 10ld\n"),				 		cnc->getSerial()->getPostionCounter()));
+
+/*
+
+	xxx << " Speed AVG       :   " << (cnc->getSerial()->getTotalDistance()) / ( (double)(processLastDuartion) / 1000 ) * 60 << "[mm/min]" << endl;
+	xxx << " Speed AVG       :   " << (cnc->getSerial()->getTotalDistance()) / ( (double)(processLastDuartion) / 1000 )      << "[mm/sec]" << endl;
+*/	
+	m_statisticSummary->ChangeValue(s);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::setMinMaxPositions() {
-///////////////////////////////////////////////////////////////////
-	CncDoublePosition min = cnc->getMinPositionsMetric();
-	CncDoublePosition max = cnc->getMaxPositionsMetric();
-	
-	SVGUnit unit = mm;
-	//todo display unit in tab page
-
-	m_minPosX->SetLabel(wxString::Format(wxT("%4.4f"), min.getX() * SvgUnitCalculator::getFactorMM2Unit(unit)));
-	m_minPosY->SetLabel(wxString::Format(wxT("%4.4f"), min.getY() * SvgUnitCalculator::getFactorMM2Unit(unit)));
-	m_minPosZ->SetLabel(wxString::Format(wxT("%4.4f"), min.getZ() * SvgUnitCalculator::getFactorMM2Unit(unit)));
-
-	m_maxPosX->SetLabel(wxString::Format(wxT("%4.4f"), max.getX() * SvgUnitCalculator::getFactorMM2Unit(unit)));
-	m_maxPosY->SetLabel(wxString::Format(wxT("%4.4f"), max.getY() * SvgUnitCalculator::getFactorMM2Unit(unit)));
-	m_maxPosZ->SetLabel(wxString::Format(wxT("%4.4f"), max.getZ() * SvgUnitCalculator::getFactorMM2Unit(unit)));
+void MainFrame::resetMinMaxPositions() {
+///////////////////////////////////////////////////////////////////	
+	if ( cnc == NULL )
+		return;
+		
+	cnc->resetWatermarks();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::checkIfTemplateIsModified() {
@@ -6749,6 +6762,7 @@ void MainFrame::decodrateProbeMode(bool probeMode) {
 		m_btProbeMode->SetToolTip("Probe mode off");
 	}
 	
+	m_btProbeMode->SetValue(probeMode);
 	m_btProbeMode->Refresh();
 	m_btProbeMode->Update();
 	
@@ -6758,4 +6772,41 @@ void MainFrame::decodrateProbeMode(bool probeMode) {
 void MainFrame::clickProbeMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	decodrateProbeMode(m_btProbeMode->GetValue());
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMonitorStatistics(bool shown) {
+/////////////////////////////////////////////////////////////////////
+	wxFlexGridSizer* sizer = static_cast<wxFlexGridSizer*>(m_3DOutboundStatistics->GetContainingSizer());
+	if ( sizer == NULL )
+		return;
+		
+	wxASSERT(sizer->GetItemCount() == 2);
+	
+	const int monitorId = 0;
+	const int statisticId = 1;
+
+	if ( sizer->IsRowGrowable(monitorId))	sizer->RemoveGrowableRow(monitorId);
+	if ( sizer->IsRowGrowable(statisticId))	sizer->RemoveGrowableRow(statisticId);
+
+	if ( shown == false ) {
+		m_statisticBook->Show(false);
+		m_btShowHideStatistics->SetBitmap(ImageLibStatistics().Bitmap("BMP_HIDE"));
+
+		sizer->AddGrowableRow(monitorId,	0);
+	} else {
+		m_statisticBook->Show(true);
+		m_btShowHideStatistics->SetBitmap(ImageLibStatistics().Bitmap("BMP_SHOW"));
+
+		sizer->AddGrowableRow(monitorId,	3);
+		sizer->AddGrowableRow(statisticId,	1);
+	}
+	
+	sizer->Layout();
+	m_btShowHideStatistics->Refresh();
+	m_btShowHideStatistics->Update();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	toggleMonitorStatistics( m_statisticBook->IsShown() == false );
 }

@@ -1,4 +1,5 @@
 #include <chrono>
+#include <sys/time.h>
 #include "CncControl.h"
 #include "MainFrame.h"
 #include "SerialEmulatorNULL.h"
@@ -11,11 +12,16 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
+, minPulseWidthOffsetX(0)
+, minPulseWidthOffsetY(0)
+, minPulseWidthOffsetZ(0)
 , speedOffsetX(0)
 , speedOffsetY(0)
 , speedOffsetZ(0)
 , positionCounter(0)
-, stepCounter(0)
+, stepCounterX(0)
+, stepCounterY(0)
+, stepCounterZ(0)
 , setterMap()
 , targetMajorPos(0L, 0L, 0L)
 , curEmulatorPos(0L, 0L, 0L)
@@ -31,11 +37,16 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
+, minPulseWidthOffsetX(0)
+, minPulseWidthOffsetY(0)
+, minPulseWidthOffsetZ(0)
 , speedOffsetX(0)
 , speedOffsetY(0)
 , speedOffsetZ(0)
 , positionCounter(0)
-, stepCounter(0)
+, stepCounterX(0)
+, stepCounterY(0)
+, stepCounterZ(0)
 , setterMap()
 , targetMajorPos(0L, 0L, 0L)
 , curEmulatorPos(0L, 0L, 0L)
@@ -155,12 +166,18 @@ void SerialEmulatorNULL::getCurrentMoveCmdValues(int32_t &x, int32_t &y, int32_t
 const char* SerialEmulatorNULL::getConfiguration(wxString& ret) {
 ///////////////////////////////////////////////////////////////////
 	ret.clear();
-	ret << wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection");
+	ret.assign(wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection"));
+
+	// append additional values
+	setterMap[(int)PID_SPEED_OFFSET_X] = speedOffsetX;
+	setterMap[(int)PID_SPEED_OFFSET_Y] = speedOffsetY;
+	setterMap[(int)PID_SPEED_OFFSET_Z] = speedOffsetZ;
 	
 	SetterMap::iterator it;
 	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
-		if ( it->first >= PID_PITCH && it->first <= PID_PITCH_Z)	ret << wxString::Format(" %d:%.2lf\n", it->first, (double)(it->second/1000));
-		else														ret << wxString::Format(" %d:%d\n",    it->first, it->second);
+		
+		if ( it->first >= PID_DOUBLE_RANG_START )	ret.append(wxString::Format(" %d:%.2lf\n", it->first, (double)(it->second/DBL_FACT)));
+		else										ret.append(wxString::Format(" %d:%d\n",    it->first, it->second));
 	}
 	
 	return ret;
@@ -426,9 +443,15 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = val; break;
 			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = val; break;
 			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = val; break;
-			case PID_SPEED_OFFSET_X: 		speedOffsetX       = val; break;
-			case PID_SPEED_OFFSET_Y: 		speedOffsetY       = val; break;
-			case PID_SPEED_OFFSET_Z: 		speedOffsetZ       = val; break;
+			
+			case PID_PULSE_WIDTH_OFFSET_X:	minPulseWidthOffsetX = val; break;
+			case PID_PULSE_WIDTH_OFFSET_Y:	minPulseWidthOffsetY = val; break;
+			case PID_PULSE_WIDTH_OFFSET_Z:	minPulseWidthOffsetZ = val; break;
+			
+			case PID_SPEED_MM_MIN: 			speedOffsetX = GBL_CONFIG->calcSpeedOffsetX((double)val/DBL_FACT);
+											speedOffsetY = GBL_CONFIG->calcSpeedOffsetY((double)val/DBL_FACT);
+											speedOffsetZ = GBL_CONFIG->calcSpeedOffsetZ((double)val/DBL_FACT);
+											break;
 		}
 		
 		return true;
@@ -649,9 +672,9 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 ///////////////////////////////////////////////////////////////////
 	// statistic counting
 	positionCounter++;
-	stepCounter += abs(dx);
-	stepCounter += abs(dy);
-	stepCounter += abs(dz);
+	stepCounterX += abs(dx);
+	stepCounterY += abs(dy);
+	stepCounterZ += abs(dz);
 	
 	// position management
 	curEmulatorPos.incX(dx);
@@ -659,9 +682,13 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	curEmulatorPos.incZ(dz);
 	
 	// simulate speed
-	if ( stepAxis(dx, speedOffsetX) == false ) return false;
-	if ( stepAxis(dy, speedOffsetY) == false ) return false;
-	if ( stepAxis(dz, speedOffsetZ) == false ) return false;
+	static __int64 tsLastStepX = getMircoscondTimestamp();
+	static __int64 tsLastStepY = getMircoscondTimestamp();
+	static __int64 tsLastStepZ = getMircoscondTimestamp();
+	
+	if ( stepAxis(tsLastStepX, dx, speedOffsetX) == false ) return false;
+	if ( stepAxis(tsLastStepY, dy, speedOffsetY) == false ) return false;
+	if ( stepAxis(tsLastStepZ, dz, speedOffsetZ) == false ) return false;
 	
 	// simulate a direct controler callback
 	static CncLongPosition lastReplyPos;
@@ -699,11 +726,21 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 inline __int64 SerialEmulatorNULL::getMircoscondTimestamp() {
 ///////////////////////////////////////////////////////////////////
 	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
+	
+	struct timeval tv;
+	gettimeofday (&tv, NULL);
+	
+	return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::stepAxis(int32_t steps, int32_t speedOffset) {
+bool SerialEmulatorNULL::stepAxis(__int64& tsLastStep, int32_t steps, int32_t speedOffset) {
 ///////////////////////////////////////////////////////////////////
-	static __int64 tsLastStep = getMircoscondTimestamp();
+	
+	/* consider !
+		, minPulseWidthOffsetX(0)
+		, minPulseWidthOffsetY(0)
+		, minPulseWidthOffsetZ(0)
+	*/
 	
 	for ( int32_t i = 0; i < abs(steps); i++ ) {
 		// signal handling
@@ -727,10 +764,11 @@ bool SerialEmulatorNULL::stepAxis(int32_t steps, int32_t speedOffset) {
 		
 		// simulate speed
 		if ( GBL_CONFIG->isProbeMode() == false ) {
+			//cout << getMircoscondTimestamp() - tsLastStep << endl;
 			while ( (getMircoscondTimestamp() - tsLastStep) < speedOffset ) {
 				struct timespec req = {0};
 				req.tv_sec = 0;
-				req.tv_nsec = 1 * 1000L;
+				req.tv_nsec = 1000L;
 				nanosleep(&req, (struct timespec *)NULL);
 			}
 			
@@ -759,11 +797,29 @@ size_t SerialEmulatorNULL::getPostionCounter() {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::resetStepCounter() {
 ///////////////////////////////////////////////////////////////////
-	stepCounter = 0;
+	stepCounterX = 0;
+	stepCounterY = 0;
+	stepCounterZ = 0;
 }
 ///////////////////////////////////////////////////////////////////
 size_t SerialEmulatorNULL::getStepCounter() {
 ///////////////////////////////////////////////////////////////////
-	return stepCounter;
+	return stepCounterX + stepCounterY + stepCounterZ;
 }
+///////////////////////////////////////////////////////////////////
+size_t SerialEmulatorNULL::getStepCounterX() {
+///////////////////////////////////////////////////////////////////
+	return stepCounterX;
+}
+///////////////////////////////////////////////////////////////////
+size_t SerialEmulatorNULL::getStepCounterY() {
+///////////////////////////////////////////////////////////////////
+	return stepCounterY;
+}
+///////////////////////////////////////////////////////////////////
+size_t SerialEmulatorNULL::getStepCounterZ() {
+///////////////////////////////////////////////////////////////////
+	return stepCounterZ;
+}
+
 

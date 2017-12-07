@@ -70,11 +70,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User command
 	protected:
-    virtual void clickProbeMode(wxCommandEvent& event);
-    virtual void displayIntervalKeyDown(wxKeyEvent& event);
-    virtual void displayIntervalChanged(wxScrollEvent& event);
-    virtual void displayIntervalThumbtrack(wxScrollEvent& event);
-    virtual void searchPosSpy(wxCommandEvent& event);
+		virtual void toggleMonitorStatistics(wxCommandEvent& event);
+		virtual void clickProbeMode(wxCommandEvent& event);
+		virtual void displayIntervalKeyDown(wxKeyEvent& event);
+		virtual void displayIntervalChanged(wxScrollEvent& event);
+		virtual void displayIntervalThumbtrack(wxScrollEvent& event);
+		virtual void searchPosSpy(wxCommandEvent& event);
 		virtual void goPosSypFirstId(wxCommandEvent& event);
 		virtual void goPosSypLastId(wxCommandEvent& event);
 		virtual void goPosSypNextId(wxCommandEvent& event);
@@ -534,7 +535,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void decorateSearchButton();
 		void decodrateProbeMode(bool probeMode);
 		void decoratePosSpyConnectButton(bool state);
-
+		
+		void toggleMonitorStatistics(bool shown=false);
+		
 		void registerGuiControls();
 		bool initializeCncControl();
 		void initializeUpdateManagerThread();
@@ -570,6 +573,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool processControllerTestSuite();
 		
 		void logTimeConsumed();
+		void logStatistics();
 		
 		void determineRunMode();
 		
@@ -682,10 +686,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		SvgOutputParameters& evaluteSvgOutputParameters(SvgOutputParameters& sop);
 		
 		void resetMinMaxPositions();
-		void setMinMaxPositions();
-		
 		void setRefPostionState(bool state);
-		
 		void decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl);
 		
 };

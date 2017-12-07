@@ -69,6 +69,8 @@ class CncMotionMonitor : public wxGLCanvas {
 		
 		int getCameraEyeAngle() { return monitor->getCameraPosition().getCurXYPlaneEyeAngle(); }
 		
+		unsigned int calculateScaleDisplay(unsigned int height);
+		
 		// usage:
 		// getFlags().positionMarker 	= false;
 		// getFlags().smoothing			= true;
@@ -136,12 +138,19 @@ class CncMotionMonitor : public wxGLCanvas {
 		void onSize(wxSizeEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
 		void onCameraRotationTimer(wxTimerEvent& event);
-
+		
+		void onPaintRotatePaneX3D(wxPaintEvent& event);
+		void onPaintRotatePaneY3D(wxPaintEvent& event);
+		void onPaintRotatePaneZ3D(wxPaintEvent& event);
+		void onPaintScalePane3D(wxPaintEvent& event);
+		
 		void view(GLContextBase::ViewMode fm);
 		
 	private:
 		inline void appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
 		inline void onPaint();
+		
+		inline void onPaintRotatePane3D(wxPanel* panel, int angle);
 		
 		wxDECLARE_NO_COPY_CLASS(CncMotionMonitor);
 		wxDECLARE_EVENT_TABLE();

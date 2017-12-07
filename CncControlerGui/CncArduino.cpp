@@ -105,6 +105,7 @@ void ArduinoPIDs::init() {
 
 	pids[PID_UNKMOWN]                         = "Default PID";
 	pids[PID_STEPPER_INITIALIZED]             = "Stepper initialize state";
+	pids[PID_SPEED_OFFSET]                    = "Speed step offset [us]";
 	pids[PID_SPEED_OFFSET_X]                  = "Speed step offset X axis [us]";
 	pids[PID_SPEED_OFFSET_Y]                  = "Speed step offset Y axis [us]";
 	pids[PID_SPEED_OFFSET_Z]                  = "Speed step offset Z axis [us]";
@@ -143,7 +144,7 @@ void ArduinoPIDs::init() {
 
 	pids[PID_AXIS]                            = "Stepper Axis";
 	pids[PID_COMMON]                          = "Common";
-	pids[PID_SPEED]                           = "Speed";
+	pids[PID_SPEED_MM_MIN]                    = "Speed [mm/minute]";
 	pids[PID_STEPS]                           = "Steps";
 	pids[PID_STEP_MULTIPLIER]                 = "Multiplier";
 	pids[PID_STEP_PIN]                        = "Step pin";
@@ -151,9 +152,14 @@ void ArduinoPIDs::init() {
 	pids[PID_ENABLE_STEPPERS]                 = "Stepper enable state";
 	pids[PID_AVG_STEP_DURRATION]              = "AVG Step duration [us]";
 	
-	pids[PID_CURRENT_STEP_PULS_WIDTH_LOW]     = "Current Step Puls Width Low";
-	pids[PID_CURRENT_STEP_PULS_WIDTH_HIGH]    = "Current Step Puls Width High";
-	pids[PID_CURRENT_DIR_PULS_WIDTH]          = "Current Dir Puls Width";
+	pids[PID_CURRENT_STEP_PULSE_WIDTH_LOW]    = "Current Step Pulse Width Low";
+	pids[PID_CURRENT_STEP_PULSE_WIDTH_HIGH]   = "Current Step Pulse Width High";
+	pids[PID_CURRENT_DIR_PULSE_WIDTH]         = "Current Dir Pulse Width";
+	
+	pids[PID_PULSE_WIDTH_OFFSET]              = "Min Pulse Width Offset";
+	pids[PID_PULSE_WIDTH_OFFSET_X]            = "Min Pulse Width Offset X";
+	pids[PID_PULSE_WIDTH_OFFSET_Y]            = "Min Pulse Width Offset Y";
+	pids[PID_PULSE_WIDTH_OFFSET_Z]            = "Min Pulse Width Offset Z";
 	
 	pids[PID_TEST_SUITE]                      = "Test Suite";
 	pids[PID_TEST_VALUE1]                     = "Parmeter1";
@@ -172,7 +178,9 @@ void ArduinoPIDs::init() {
 	pids[PID_RESERT_POS_COUNTER]              = "Reset Position Counter";
 	pids[PID_GET_POS_COUNTER]                 = "Get Position Counter";
 	pids[PID_RESERT_STEP_COUNTER]             = "Reset Step Counter";
-	pids[PID_GET_STEP_COUNTER]                = "Get Step Counter";
+	pids[PID_GET_STEP_COUNTER_X]              = "Get Step Counter X";
+	pids[PID_GET_STEP_COUNTER_Y]              = "Get Step Counter Y";
+	pids[PID_GET_STEP_COUNTER_Z]              = "Get Step Counter Z";
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {

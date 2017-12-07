@@ -217,7 +217,7 @@ namespace GLI {
 			////////////////////////////////////////////
 			const float getAutoScaleFact() {
 				if ( size() < 1 )
-					return 1.0;
+					return 0.1;
 					
 				const float x = minVecties.getX(); float X = maxVecties.getX();
 				const float y = minVecties.getY(); float Y = maxVecties.getY();
@@ -228,7 +228,11 @@ namespace GLI {
 				float totalDistZ = Z - z;
 				
 				// range: -2 >= ret <= 2
-				return std::max(std::max(totalDistZ, totalDistY), totalDistX);
+				float ret = std::max(std::max(totalDistZ, totalDistY), totalDistX);
+				if ( ret < 0.1 )
+					return 0.1;
+				
+				return ret;
 			}
 			
 			////////////////////////////////////////////

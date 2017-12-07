@@ -406,7 +406,26 @@ protected:
     wxStaticText* m_staticText32334;
     wxSlider* m_displayInterval;
     wxPanel* m_3DOutboundControl;
+    wxPanel* m_rotatePaneZ3D;
+    wxStaticText* m_staticText487556;
+    wxPanel* m_rotatePaneY3D;
+    wxStaticText* m_staticText48755;
+    wxPanel* m_rotatePaneX3D;
+    wxStaticText* m_staticText4875;
     wxPanel* m_drawPane3D;
+    wxPanel* m_scalePane3D;
+    wxPanel* m_3DOutboundStatistics;
+    wxButton* m_btShowHideStatistics;
+    wxStaticText* m_staticText4884;
+    wxStaticText* m_staticText1128;
+    wxTextCtrl* m_crossings;
+    wxStaticText* m_staticText1966;
+    wxTextCtrl* m_passingCount;
+    wxNotebook* m_statisticBook;
+    wxPanel* m_statisticPageSum;
+    wxTextCtrl* m_statisticSummary;
+    wxPanel* m_statisticPageVecties;
+    wxListCtrl* m_VectiesListCtrl;
     wxButton* m_3D_Top;
     wxButton* m_3D_Bottom;
     wxButton* m_3D_Front;
@@ -419,18 +438,6 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
-    wxStaticText* m_staticText1128;
-    wxTextCtrl* m_crossings;
-    wxStaticText* m_staticText1966;
-    wxTextCtrl* m_passingCount;
-    wxStaticText* m_staticText16966;
-    wxStaticText* m_minPosX;
-    wxStaticText* m_minPosY;
-    wxStaticText* m_minPosZ;
-    wxStaticText* m_staticText169410;
-    wxStaticText* m_maxPosX;
-    wxStaticText* m_maxPosY;
-    wxStaticText* m_maxPosZ;
     wxPanel* m_svgEmuResult;
     wxButton* m_svgEmuOpenFileAsSource;
     wxButton* m_svgEmuOpenFileAsSvg;
@@ -759,6 +766,7 @@ protected:
     virtual void displayIntervalThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
+    virtual void toggleMonitorStatistics(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -1184,8 +1192,27 @@ public:
     wxStaticLine* GetStaticLine4780() { return m_staticLine4780; }
     wxStaticText* GetStaticText32334() { return m_staticText32334; }
     wxSlider* GetDisplayInterval() { return m_displayInterval; }
+    wxPanel* GetRotatePaneZ3D() { return m_rotatePaneZ3D; }
+    wxStaticText* GetStaticText487556() { return m_staticText487556; }
+    wxPanel* GetRotatePaneY3D() { return m_rotatePaneY3D; }
+    wxStaticText* GetStaticText48755() { return m_staticText48755; }
+    wxPanel* GetRotatePaneX3D() { return m_rotatePaneX3D; }
+    wxStaticText* GetStaticText4875() { return m_staticText4875; }
     wxPanel* GetDrawPane3D() { return m_drawPane3D; }
+    wxPanel* GetScalePane3D() { return m_scalePane3D; }
     wxPanel* Get3DOutboundControl() { return m_3DOutboundControl; }
+    wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
+    wxStaticText* GetStaticText4884() { return m_staticText4884; }
+    wxStaticText* GetStaticText1128() { return m_staticText1128; }
+    wxTextCtrl* GetCrossings() { return m_crossings; }
+    wxStaticText* GetStaticText1966() { return m_staticText1966; }
+    wxTextCtrl* GetPassingCount() { return m_passingCount; }
+    wxTextCtrl* GetStatisticSummary() { return m_statisticSummary; }
+    wxPanel* GetStatisticPageSum() { return m_statisticPageSum; }
+    wxListCtrl* GetVectiesListCtrl() { return m_VectiesListCtrl; }
+    wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
+    wxNotebook* GetStatisticBook() { return m_statisticBook; }
+    wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
     wxButton* Get3D_Top() { return m_3D_Top; }
     wxButton* Get3D_Bottom() { return m_3D_Bottom; }
     wxButton* Get3D_Front() { return m_3D_Front; }
@@ -1198,18 +1225,6 @@ public:
     wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
-    wxStaticText* GetStaticText1128() { return m_staticText1128; }
-    wxTextCtrl* GetCrossings() { return m_crossings; }
-    wxStaticText* GetStaticText1966() { return m_staticText1966; }
-    wxTextCtrl* GetPassingCount() { return m_passingCount; }
-    wxStaticText* GetStaticText16966() { return m_staticText16966; }
-    wxStaticText* GetMinPosX() { return m_minPosX; }
-    wxStaticText* GetMinPosY() { return m_minPosY; }
-    wxStaticText* GetMinPosZ() { return m_minPosZ; }
-    wxStaticText* GetStaticText169410() { return m_staticText169410; }
-    wxStaticText* GetMaxPosX() { return m_maxPosX; }
-    wxStaticText* GetMaxPosY() { return m_maxPosY; }
-    wxStaticText* GetMaxPosZ() { return m_maxPosZ; }
     wxPanel* Get3DPane() { return m_3DPane; }
     wxButton* GetSvgEmuOpenFileAsSource() { return m_svgEmuOpenFileAsSource; }
     wxButton* GetSvgEmuOpenFileAsSvg() { return m_svgEmuOpenFileAsSvg; }
@@ -2064,6 +2079,35 @@ public:
     }
 
     virtual ~ImageLibProbe();
+};
+
+
+class ImageLibStatistics : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibStatistics();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibStatistics();
 };
 
 #endif

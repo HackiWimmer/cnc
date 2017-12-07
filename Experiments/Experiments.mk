@@ -2,18 +2,18 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Debug
+## Release
 ProjectName            :=Experiments
-ConfigurationName      :=Debug
+ConfigurationName      :=Release
 WorkspacePath          :=C:/@Development/@Projekte/c++/CNCGuiController
 ProjectPath            :=C:/@Development/@Projekte/c++/CNCGuiController/Experiments
-IntermediateDirectory  :=./Debug
+IntermediateDirectory  :=./Release
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=02/12/2017
+Date                   :=04/12/2017
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -shared -fPIC
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=
+Preprocessors          :=$(PreprocessorSwitch)NDEBUG 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -37,8 +37,8 @@ PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags)
 RcCompilerName         :=C:/@Development/Compilers/TDM-GCC-64/bin/windres.exe
-LinkOptions            :=  $(shell wx-config   --libs --unicode=yes)
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch)C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui 
+LinkOptions            :=  -s $(shell wx-config --debug=no --libs --unicode=yes)
+IncludePath            :=  $(IncludeSwitch). 
 IncludePCH             := 
 RcIncludePath          := 
 Libs                   := 
@@ -52,8 +52,8 @@ LibPath                := $(LibraryPathSwitch).
 AR       := C:/@Development/Compilers/TDM-GCC-64/bin/ar.exe rcu
 CXX      := C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 CC       := C:/@Development/Compilers/TDM-GCC-64/bin/gcc.exe
-CXXFLAGS :=  -g -O0 -Wall $(shell wx-config --cxxflags --unicode=yes  ) $(Preprocessors)
-CFLAGS   :=  -g -O0 -Wall $(shell wx-config --cxxflags --unicode=yes  ) $(Preprocessors)
+CXXFLAGS :=  -O2 -Wall $(shell wx-config --cxxflags --unicode=yes --debug=no) $(Preprocessors)
+CFLAGS   :=  -O2 -Wall $(shell wx-config --cxxflags --unicode=yes --debug=no) $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/@Development/Compilers/TDM-GCC-64/bin/as.exe
 
@@ -83,11 +83,11 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 MakeIntermediateDirs:
-	@$(MakeDirCommand) "./Debug"
+	@$(MakeDirCommand) "./Release"
 
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Debug"
+	@$(MakeDirCommand) "./Release"
 
 PreBuild:
 
@@ -109,6 +109,6 @@ $(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
 ## Clean
 ##
 clean:
-	$(RM) -r ./Debug/
+	$(RM) -r ./Release/
 
 

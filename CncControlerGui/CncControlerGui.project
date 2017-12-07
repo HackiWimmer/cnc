@@ -297,7 +297,7 @@
     <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.h" ExcludeProjConfig="Release"/>
     <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Release"/>
     <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncSpeedCalculator.h"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncSpeedCalculator.h" ExcludeProjConfig="Debug;release2"/>
   </VirtualDirectory>
   <VirtualDirectory Name="UnitTests">
     <VirtualDirectory Name="Tests">

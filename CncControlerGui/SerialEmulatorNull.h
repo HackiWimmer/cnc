@@ -46,14 +46,20 @@ struct LastCommand {
 class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
+		
 		int32_t posReplyThresholdX;
 		int32_t posReplyThresholdY;
 		int32_t posReplyThresholdZ;
+		int32_t minPulseWidthOffsetX;
+		int32_t minPulseWidthOffsetY;
+		int32_t minPulseWidthOffsetZ;
 		int32_t speedOffsetX;
 		int32_t speedOffsetY;
 		int32_t speedOffsetZ;
 		size_t positionCounter;
-		size_t stepCounter;
+		size_t stepCounterX;
+		size_t stepCounterY;
+		size_t stepCounterZ;
 		SetterMap setterMap;
 		CncLongPosition targetMajorPos;
 		CncLongPosition curEmulatorPos;
@@ -65,7 +71,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		
 		inline void reset();
 		
-		inline bool stepAxis(int32_t dx, int32_t speedOffset);
+		inline bool stepAxis(__int64& tsLastStep, int32_t dist, int32_t speedOffset);
 		
 		inline __int64 getMircoscondTimestamp();
 		
@@ -89,7 +95,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual bool evaluateLimitStates(std::vector<int32_t>& ret);
 	
 	public:
-	
+		
 		//Initialize Serial communication without an acitiv connection 
 		SerialEmulatorNULL(CncControl* cnc);
 		//Initialize Serial communication with the given COM port
@@ -119,6 +125,9 @@ class SerialEmulatorNULL : public SerialSpyPort
 
 		virtual void resetStepCounter();
 		virtual size_t getStepCounter();
+		virtual size_t getStepCounterX();
+		virtual size_t getStepCounterY();
+		virtual size_t getStepCounterZ();
 };
 
 #endif

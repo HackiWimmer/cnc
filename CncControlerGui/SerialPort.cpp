@@ -13,7 +13,7 @@ char STATIC_CMD_CHAR[2];
 
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
-: totalDistance{0LL, 0LL, 0LL}
+: totalDistance{0L, 0L, 0L, 0L}
 , cncControl(cnc)
 , connected(false)
 , writeOnlyMoveCommands(false)
@@ -24,6 +24,9 @@ Serial::Serial(CncControl* cnc)
 , spyMode(Serial::SypMode::SM_NONE)
 , spyRead(false)
 , spyWrite(false)
+, factorX(GBL_CONFIG->getDisplayFactX())
+, factorY(GBL_CONFIG->getDisplayFactY())
+, factorZ(GBL_CONFIG->getDisplayFactZ())
 {
 ///////////////////////////////////////////////////////////////////
 	resetTotalDistance();
@@ -31,7 +34,7 @@ Serial::Serial(CncControl* cnc)
 }
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(const char *portName)
-: totalDistance{0LL, 0LL, 0LL}
+: totalDistance{0L, 0L, 0L, 0L}
 , connected(false)
 , writeOnlyMoveCommands(false)
 , isCommand(false)
@@ -41,6 +44,9 @@ Serial::Serial(const char *portName)
 , spyMode(Serial::SypMode::SM_NONE)
 , spyRead(false)
 , spyWrite(false)
+, factorX(GBL_CONFIG->getDisplayFactX())
+, factorY(GBL_CONFIG->getDisplayFactY())
+, factorZ(GBL_CONFIG->getDisplayFactZ())
 {
 ///////////////////////////////////////////////////////////////////
 	resetTotalDistance();
@@ -272,7 +278,7 @@ void Serial::resetStepCounter() {
 	processSetter(PID_RESERT_STEP_COUNTER, MIN_LONG);
 }
 ///////////////////////////////////////////////////////////////////
-size_t Serial::getStepCounter() {
+size_t Serial::requestStepCounter(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	if ( cncControl->isInterrupted() )
 		return 0;
@@ -281,7 +287,7 @@ size_t Serial::getStepCounter() {
 		return 0;
 
 	std::vector<int32_t> list;
-	if ( processGetter(PID_GET_STEP_COUNTER, list) && list.size() == 2 ) {
+	if ( processGetter(pid, list) && list.size() == 2 ) {
 		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
 		// to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
 		size_t ret = list.at(0) + abs(MIN_LONG);
@@ -290,6 +296,31 @@ size_t Serial::getStepCounter() {
 	}
 	
 	return 0;
+
+}
+///////////////////////////////////////////////////////////////////
+size_t Serial::getStepCounter() {
+///////////////////////////////////////////////////////////////////
+	size_t ret = 0;
+	ret += requestStepCounter(PID_GET_STEP_COUNTER_X);
+	ret += requestStepCounter(PID_GET_STEP_COUNTER_Y);
+	ret += requestStepCounter(PID_GET_STEP_COUNTER_Z);
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+size_t Serial::getStepCounterX() {
+///////////////////////////////////////////////////////////////////
+	return requestStepCounter(PID_GET_STEP_COUNTER_X);
+}
+///////////////////////////////////////////////////////////////////
+size_t Serial::getStepCounterY() {
+///////////////////////////////////////////////////////////////////
+	return requestStepCounter(PID_GET_STEP_COUNTER_Y);
+}
+///////////////////////////////////////////////////////////////////
+size_t Serial::getStepCounterZ() {
+///////////////////////////////////////////////////////////////////
+	return requestStepCounter(PID_GET_STEP_COUNTER_Z);
 }
 ///////////////////////////////////////////////////////////////////
 int Serial::readData(void *buffer, unsigned int nbChar) {
@@ -851,21 +882,6 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 		return false;
 	}
 	
-	// measure total distance
-	switch ( size ) {
-		case 1:			totalDistance[2] += abs(values[0]);
-						break;
-						
-		case 2:			totalDistance[0] += abs(values[0]);
-						totalDistance[1] += abs(values[1]);
-						break;
-						
-		case 3:			totalDistance[0] += abs(values[0]);
-						totalDistance[1] += abs(values[1]);
-						totalDistance[2] += abs(values[2]);
-						break;
-	}
-	
 	// Always log the start postion
 	cncControl->SerialCallback(0);
 	
@@ -899,7 +915,36 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 		sfi.Mc.value3		= values[2];
 		
 		//std::cout << moveCommand[0] << "," << values[0] << "," << values[1] << "," << values[2] << std::endl;
-		return evaluateResultWrapper(sfi, std::cout, pos);
+		bool ret = evaluateResultWrapper(sfi, std::cout, pos);
+		if ( ret == true ) {
+			// measure total distance
+			double 		x = 0.0, y = 0.0, z = 0.0;
+			const short X = 0, Y = 1, Z = 2, T = 3;
+			switch ( size ) {
+				case 1:			z = (abs(values[0]) * factorZ);
+								totalDistance[Z] += z;
+								totalDistance[T] += z;
+								break;
+								
+				case 2:			x = (abs(values[0]) * factorX);
+								y = (abs(values[1]) * factorY);
+								totalDistance[X] += x;
+								totalDistance[Y] += y;
+								totalDistance[T] += sqrt(x*x + y*y);
+								break;
+								
+				case 3:			x = (abs(values[0]) * factorX);
+								y = (abs(values[1]) * factorY);
+								z = (abs(values[2]) * factorZ);
+								totalDistance[X] += x;
+								totalDistance[Y] += y;
+								totalDistance[Z] += z;
+								totalDistance[T] += sqrt(x*x + y*y + z*z);
+								break;
+			}
+		}
+		
+		return ret;
 	
 	} else {
 		std::cerr << "Serial::processMove: Unable to write data" << std::endl;
