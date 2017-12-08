@@ -54,7 +54,10 @@ class GCodeFileParser : public FileParser {
 		virtual bool spool();
 		virtual bool postprocess();
 		virtual void initNextClientId(long id);
-
+		
+		virtual void logMeasurementStart();
+		virtual void logMeasurementEnd();
+		
 	public:
 		GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph);
 		virtual ~GCodeFileParser();

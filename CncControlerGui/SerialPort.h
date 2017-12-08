@@ -11,6 +11,7 @@
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "SvgUnitCalculator.h"
+#include "CncTimeFunctions.h"
 #include "CncPosition.h"
 
 typedef std::map<int, int32_t> SetterMap;
@@ -120,13 +121,17 @@ class Serial {
 		
 	private:
 		// total distance
-		long double totalDistance[4];
+		double totalDistance[4];
+		CncTimestamp tsMeasurementStart;
+		CncTimestamp tsMeasurementLast;
 		
 	protected:
 		//Serial com handler
 		HANDLE hSerial;
 		//cnc control object
 		CncControl* cncControl;
+		// Measurement status
+		bool measurementActive;
 		//Connection status
 		bool connected;
 		// for com porst this should always false
@@ -190,6 +195,11 @@ class Serial {
 		void resetLastFetchResult() { lastFetchResult = RET_NULL; }
 		void setLastFetchType(unsigned char ret) { lastFetchResult = ret; }
 		const unsigned char getLastFetchResult() const { return lastFetchResult; }
+		
+		void resetTotalDistance() { totalDistance[0] = 0.0; totalDistance[1] = 0.0; totalDistance[2] = 0.0; totalDistance[3] = 0.0;}
+		void logMeasurementTs();
+		virtual void startMeasurementIntern() {}
+		virtual void stopMeasurementIntern() {}
 		
 	public:
 		//Initialize Serial communication without an acitiv connection 
@@ -279,12 +289,16 @@ class Serial {
 		// sends the Test Suite end flag 't'
 		bool sendTestSuiteEndFlag();
 		
-		void resetTotalDistance() { totalDistance[0] = 0LL; totalDistance[1] = 0LL; totalDistance[2] = 0LL; totalDistance[3] = 0LL;}
-		long double getTotalDistanceX() { return totalDistance[0]; }
-		long double getTotalDistanceY() { return totalDistance[1]; }
-		long double getTotalDistanceZ() { return totalDistance[2]; }
-		long double getTotalDistance()  { return totalDistance[3]; }
+		void startMeasurement();
+		void stopMeasurement();
+		bool isMeasurementActive() const { return measurementActive; }
+		CncTimespan getMeasurementTimeSpan() const;
 		
+		double getCurrentFeedSpeed();
+		double getTotalDistanceX() { return totalDistance[0]; }
+		double getTotalDistanceY() { return totalDistance[1]; }
+		double getTotalDistanceZ() { return totalDistance[2]; }
+		double getTotalDistance()  { return totalDistance[3]; }
 };
 
 #endif // SERIALCLASS_H_INCLUDED

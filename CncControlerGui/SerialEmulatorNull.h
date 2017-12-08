@@ -56,6 +56,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		int32_t speedOffsetX;
 		int32_t speedOffsetY;
 		int32_t speedOffsetZ;
+		double speed_MM_MIN;
 		size_t positionCounter;
 		size_t stepCounterX;
 		size_t stepCounterY;
@@ -71,9 +72,9 @@ class SerialEmulatorNULL : public SerialSpyPort
 		
 		inline void reset();
 		
-		inline bool stepAxis(__int64& tsLastStep, int32_t dist, int32_t speedOffset);
-		
-		inline __int64 getMircoscondTimestamp();
+		inline bool stepAxis(char axis, CncTimestamp& tsLastStep, int32_t dist, int32_t speedOffset);
+		inline void digitalWriteLow(unsigned int width);
+		inline void digitalWriteHigh(unsigned int width);
 		
 	protected:
 		LastCommand lastCommand;

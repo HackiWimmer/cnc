@@ -148,7 +148,6 @@ class PathHandlerBase {
 		virtual void simulateZAxisDown() 	{}
 		virtual bool isZAxisUp() 			{ return true; }
 		virtual bool isZAxisDown() 			{ return false; }
-
 		
 	public:
 	
@@ -178,6 +177,9 @@ class PathHandlerBase {
 		virtual bool runCurrentPath();
 		virtual void finishWork();
 		
+		virtual void logMeasurementStart()	{}
+		virtual void logMeasurementEnd() 	{}
+
 		// get path repesentations
 		void tracePathList(std::ostream &ostr);
 		const char* getAsWktRepresentation() { return pathListMgr.getAsWktRepresentation(); }

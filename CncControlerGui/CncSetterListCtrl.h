@@ -7,6 +7,7 @@ class CncSetterListCtrl : public CncLargeScaledListCtrl {
 	
 	private:
 		wxString separatorPid;
+		wxListItemAttr defaultItemAttr;
 		wxListItemAttr separatorRunItemAttr;
 		wxListItemAttr separatorResetItemAttr;
 		wxListItemAttr separatorSetupItemAttr;

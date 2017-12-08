@@ -105,6 +105,42 @@ bool CncLargeScaledListCtrl::appendItems(unsigned int nsize, const CncColumConta
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
+bool CncLargeScaledListCtrl::updateItem(long item, const CncColumContainer& cc) {
+///////////////////////////////////////////////////////////////////
+	if ( cc.getCount() != (unsigned int)GetColumnCount() ) {
+		std::cerr << "CncLargeScaledListCtrl::updateItem: Invalid ColumnContainer size: " << cc.getCount();
+		std::cerr << ", required: " << GetColumnCount() << std::endl;
+		return false;
+	}
+	
+	if ( item > (long)rows.size() - 1 || item < 0L) {
+		std::cerr << "CncLargeScaledListCtrl::updateItem: item " << item << " out of bound. Update was rejected" << std::endl;
+		return false;
+	}
+		
+	rows[item] = cc;
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncLargeScaledListCtrl::updateItem(long item, long column, const wxString& value) {
+///////////////////////////////////////////////////////////////////
+	if ( column < 0L || column > GetColumnCount() -1 ) {
+		std::cerr << "CncLargeScaledListCtrl::updateItem: Invalid column index: " << column;
+		std::cerr << ", max: " << GetColumnCount() << std::endl;
+		return false;
+	}
+	
+	if ( item < 0L || item > (long)rows.size() - 1 ) {
+		std::cerr << "CncLargeScaledListCtrl::updateItem: item " << item << " out of bound. Update was rejected" << std::endl;
+		return false;
+	}
+		
+	rows[item].updateItem(column, value);
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::isItemValid(long item) const {
 ///////////////////////////////////////////////////////////////////
 	long size = rows.size();
@@ -184,9 +220,6 @@ bool CncLargeScaledListCtrl::goBackwardUnitlColumnChangeIntern(long item, long c
 		
 	if ( isColumnValid(column) == false )
 		return false;
-		
-		//	clog << "ls: " << ls << ", ref: " << positionSpy->GetItemText(ls, 0) << endl;
-
 		
 	// get the reference item
 	wxString ref(GetItemText(item, column));
@@ -268,8 +301,15 @@ int CncLargeScaledListCtrl::OnGetItemColumnImage(long item, long column) const {
 wxListItemAttr* CncLargeScaledListCtrl::OnGetItemAttr(long item) const {
 ///////////////////////////////////////////////////////////////////
 	// todo - currently not nesseccary
-	return wxListCtrl::OnGetItemAttr(item);
+	return NULL;
 }
+///////////////////////////////////////////////////////////////////
+wxListItemAttr* CncLargeScaledListCtrl::OnGetItemColumnAttr(long item, long column) const {
+///////////////////////////////////////////////////////////////////
+	// todo - currently not nesseccary
+	return NULL;
+}
+
 
 
 

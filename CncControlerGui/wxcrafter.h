@@ -397,7 +397,6 @@ protected:
     wxStaticLine* m_staticLine3525;
     wxButton* m_motionMonitorOptionDlg;
     wxButton* m_3D_Refreh;
-    wxButton* m_3D_Trace;
     wxButton* m_3D_Clear;
     wxStaticLine* m_staticLine47803;
     wxStaticText* m_staticText16032;
@@ -423,9 +422,13 @@ protected:
     wxTextCtrl* m_passingCount;
     wxNotebook* m_statisticBook;
     wxPanel* m_statisticPageSum;
-    wxTextCtrl* m_statisticSummary;
+    wxListCtrl* m_statisticSummaryListCtrl;
+    wxCheckBox* m_checkBoxStatisticUpdate;
     wxPanel* m_statisticPageVecties;
-    wxListCtrl* m_VectiesListCtrl;
+    wxButton* m_3D_Trace3;
+    wxButton* m_3D_Trace4;
+    wxButton* m_3D_Trace;
+    wxListCtrl* m_vectiesListCtrl;
     wxButton* m_3D_Top;
     wxButton* m_3D_Bottom;
     wxButton* m_3D_Front;
@@ -466,7 +469,6 @@ protected:
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_scrollWinLogger;
     wxBitmapButton* m_clearLogger;
-    wxBitmapButton* m_freezeLogger;
     wxBitmapButton* m_copyLogger;
     wxCheckBox* m_showLoggerOnDemand;
     wxTextCtrl* m_logger;
@@ -480,6 +482,8 @@ protected:
     wxStaticText* m_svgParseMode;
     wxPanel* m_activityPanel;
     wxStaticLine* m_staticLine680;
+    wxStaticText* LableF;
+    wxTextCtrl* m_feedSpeed;
     wxStaticBitmap* m_refPosTrafficLight;
     wxStaticText* LableX;
     wxTextCtrl* m_xAxis;
@@ -759,14 +763,16 @@ protected:
     virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void openMotionMonitorOptionDlg(wxCommandEvent& event) { event.Skip(); }
-    virtual void refresh3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void trace3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void clear3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void updateCurveLibResolution(wxCommandEvent& event) { event.Skip(); }
     virtual void displayIntervalThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void toggleMonitorStatistics(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
+    virtual void copyMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
+    virtual void traceMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -792,7 +798,6 @@ protected:
     virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
-    virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
@@ -1184,7 +1189,6 @@ public:
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
     wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
     wxButton* Get3D_Refreh() { return m_3D_Refreh; }
-    wxButton* Get3D_Trace() { return m_3D_Trace; }
     wxButton* Get3D_Clear() { return m_3D_Clear; }
     wxStaticLine* GetStaticLine47803() { return m_staticLine47803; }
     wxStaticText* GetStaticText16032() { return m_staticText16032; }
@@ -1207,9 +1211,13 @@ public:
     wxTextCtrl* GetCrossings() { return m_crossings; }
     wxStaticText* GetStaticText1966() { return m_staticText1966; }
     wxTextCtrl* GetPassingCount() { return m_passingCount; }
-    wxTextCtrl* GetStatisticSummary() { return m_statisticSummary; }
+    wxListCtrl* GetStatisticSummaryListCtrl() { return m_statisticSummaryListCtrl; }
+    wxCheckBox* GetCheckBoxStatisticUpdate() { return m_checkBoxStatisticUpdate; }
     wxPanel* GetStatisticPageSum() { return m_statisticPageSum; }
-    wxListCtrl* GetVectiesListCtrl() { return m_VectiesListCtrl; }
+    wxButton* Get3D_Trace3() { return m_3D_Trace3; }
+    wxButton* Get3D_Trace4() { return m_3D_Trace4; }
+    wxButton* Get3D_Trace() { return m_3D_Trace; }
+    wxListCtrl* GetVectiesListCtrl() { return m_vectiesListCtrl; }
     wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
     wxNotebook* GetStatisticBook() { return m_statisticBook; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
@@ -1254,7 +1262,6 @@ public:
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
     wxPanel* GetScrollWinFile() { return m_scrollWinFile; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
-    wxBitmapButton* GetFreezeLogger() { return m_freezeLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
     wxCheckBox* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
     wxTextCtrl* GetLogger() { return m_logger; }
@@ -1268,6 +1275,8 @@ public:
     wxStaticText* GetSvgParseMode() { return m_svgParseMode; }
     wxPanel* GetActivityPanel() { return m_activityPanel; }
     wxStaticLine* GetStaticLine680() { return m_staticLine680; }
+    wxStaticText* GetLableF() { return LableF; }
+    wxTextCtrl* GetFeedSpeed() { return m_feedSpeed; }
     wxStaticBitmap* GetRefPosTrafficLight() { return m_refPosTrafficLight; }
     wxStaticText* GetLableX() { return LableX; }
     wxTextCtrl* GetXAxis() { return m_xAxis; }

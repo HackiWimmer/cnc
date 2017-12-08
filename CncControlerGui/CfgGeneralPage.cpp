@@ -228,7 +228,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 		
 			//...............
 			validator.SetPrecision(0); validator.SetRange(50, 5000);
-			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset X Axis [ms]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset X Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
@@ -237,7 +237,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(50, 5000);
-			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset Y Axis [ms]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset Y Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
@@ -246,7 +246,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(50, 5000);
-			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset Z Axis [ms]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset Z Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
@@ -255,7 +255,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(1, 32);
-			prop = axis->AppendChild( new wxIntProperty("Step multiplier X Axis [ms]", NEXT_PROP_ID, 1));
+			prop = axis->AppendChild( new wxIntProperty("Step multiplier X Axis [#]", NEXT_PROP_ID, 1));
 			prop->Enable(false);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
@@ -264,7 +264,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(1, 32);
-			prop = axis->AppendChild( new wxIntProperty("Step multiplier Y Axis [ms]", NEXT_PROP_ID, 1));
+			prop = axis->AppendChild( new wxIntProperty("Step multiplier Y Axis [#]", NEXT_PROP_ID, 1));
 			prop->Enable(false);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
@@ -273,7 +273,7 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(1, 32);
-			prop = axis->AppendChild( new wxIntProperty("Step multiplier Z Axis [ms]", NEXT_PROP_ID, 1));
+			prop = axis->AppendChild( new wxIntProperty("Step multiplier Z Axis [#]", NEXT_PROP_ID, 1));
 			prop->Enable(false);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);

@@ -33,6 +33,7 @@
 #include "CncPatternDefinitions.h"
 #include "SvgUnitCalculator.h"
 #include "CncFileNameService.h"
+
 #include "CncControllerTestSuite.h"
 #include "CncFilePreviewWnd.h"
 #include "SVGPathHandlerCnc.h"
@@ -125,6 +126,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , toolMagaizne(NULL)
 , positionSpy(NULL)
 , setterList(NULL)
+, statisticSummaryListCtrl(NULL)
+, vectiesListCtrl(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -281,7 +284,7 @@ void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
 ////////////////////////////////////////////////////////////////////////////
 void MainFrame::configurationUpdated(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////////
-	#warning todo -impl MainFrame::configurationUpdated
+	// currently nothing to do
 	//std::clog << "MainFrame::configurationUpdated(wxCommandEvent& event)" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
@@ -358,6 +361,14 @@ void MainFrame::installCustControls() {
 	// pos spy control
 	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_setterList, setterList);
+	
+	// statistic summary
+	statisticSummaryListCtrl = new CncStatisticSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	GblFunc::replaceControl(m_statisticSummaryListCtrl, statisticSummaryListCtrl);
+	
+	// cvecties list
+	vectiesListCtrl = new CncVectiesListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	GblFunc::replaceControl(m_vectiesListCtrl, vectiesListCtrl);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -613,6 +624,9 @@ void MainFrame::onThreadCtlPosUpdate(UpdateManagerEvent& event) {
 						break;
 	}
 	
+	// feed speed
+	m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
+	
 	// update z view
 	m_zView->updateView(cnc->getCurCtlPos().getZ() * GBL_CONFIG->getDisplayFactZ(unit));
 }
@@ -658,6 +672,14 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 	if ( pngAnimation && pngAnimation->IsRunning() ) {
 		logTimeConsumed();
 	}
+	
+	// statistic
+	if (    m_checkBoxStatisticUpdate->IsChecked() == true 
+		 && isProcessing() 
+		 && statisticSummaryListCtrl->IsShownOnScreen()
+	   ) {
+		logStatistics();
+	   }
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onThreadDispatchAll(UpdateManagerEvent& event) {
@@ -1251,32 +1273,9 @@ bool MainFrame::initializeCncControl() {
 		cncConfig->getDefaultPort(value);
 		m_portSelector->SetStringSelection(value);
 		defaultPortName.assign(value);
-
+		
 		// initialize update interval
 		cncConfig->setUpdateInterval(m_displayInterval->GetValue());
-	
-#warning
-
-/*
-
-		// initialize speed control
-		m_speedView->setMaxSpeedX(cncConfig->getMaxSpeedXY());
-		m_speedView->setMaxSpeedY(cncConfig->getMaxSpeedXY());
-		m_speedView->setMaxSpeedZ(cncConfig->getMaxSpeedZ());
-
-		if ( cnc->isConnected() ) {
-			if ( cncConfig->getDefaultSpeedModeXY(value) == "RAPID")	cnc->changeCurrentRpmSpeedXY(CncSpeedRapid);
-			else														cnc->changeCurrentRpmSpeedXY(CncSpeedWork);
-			
-			if ( cncConfig->getDefaultSpeedModeZ(value)  == "RAPID")	cnc->changeCurrentRpmSpeedZ(CncSpeedRapid);
-			else														cnc->changeCurrentRpmSpeedZ(CncSpeedWork);
-		} else {
-			cnc->changeCurrentRpmSpeedZ(CncSpeedRapid);
-			cnc->changeCurrentRpmSpeedZ(CncSpeedRapid);
-		}
-		
-		m_speedView->setCurrentSpeedXYZ(cnc->getRpmSpeedX(), cnc->getRpmSpeedY(), cnc->getRpmSpeedZ());
-		 */
 	}
 	 
 	// initialize the postion controls
@@ -1655,21 +1654,6 @@ void MainFrame::clearLogger(wxCommandEvent& event) {
 	m_logger->Clear();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::freezeLogger() {
-///////////////////////////////////////////////////////////////////
-	if ( m_menuItemFreezeLogger->IsChecked() == false )
-		m_logger->Freeze();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::unfreezeLogger() {
-///////////////////////////////////////////////////////////////////
-	if ( m_logger->IsFrozen() ) {
-		m_logger->Thaw();
-		// Trick: This scrolls to the end of content
-		std::cout << ' ';
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::setZero(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	setZero();
@@ -1793,7 +1777,6 @@ void MainFrame::defineMinMonitoring() {
 	m_menuItemUpdCoors->Check(false);
 	m_menuItemUpdDraw->Check(false);
 	m_menuItemDebugSerial->Check(false);
-	m_menuItemFreezeLogger->Check(false);
 	m_menuItemDisplayUserAgent->Check(false);
 	m_menuItemToolControls->Check(false);
 	switchMonitorButton(false);
@@ -1810,7 +1793,6 @@ void MainFrame::defineNormalMonitoring() {
 	m_menuItemUpdCoors->Check(true);
 	m_menuItemUpdDraw->Check(true);
 	m_menuItemDebugSerial->Check(false);
-	m_menuItemFreezeLogger->Check(true);
 	m_menuItemDisplayUserAgent->Check(true);
 	m_menuItemToolControls->Check(true);
 	switchMonitorButton(true);
@@ -2020,7 +2002,7 @@ bool MainFrame::openFile(int pageToSelect) {
 		if ( inboundFileParser != NULL )
 			inboundFileParser->clearControls();
 		
-		cnc->clearDrawControl();
+		clearMotionMonitor();
 		cnc->getSerial()->clearSVG();
 		
 		introduceCurrentFile();
@@ -3096,9 +3078,9 @@ bool MainFrame::processTemplate() {
 	}
 	
 	processStartTime = wxDateTime::UNow();
-		
+	
 	motionMonitor->pushProcessMode();
-
+	
 	updateStepDelay();
 	disableControls();
 	resetMinMaxPositions();
@@ -3106,38 +3088,35 @@ bool MainFrame::processTemplate() {
 	CncConfig::getGlobalCncConfig()->setAllowEventHandling(true);
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
 	cnc->processCommand("r", std::cout);
-	cnc->getSerial()->resetPostionCounter();
-	cnc->getSerial()->resetStepCounter();
-	cnc->getSerial()->resetTotalDistance();
 	cnc->logProcessingStart();
 	cnc->enableStepperMotors(true);
-	freezeLogger();
-
 	
-
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
 		case TplSvg:
 			if ( checkIfTemplateIsModified() == false )
 				break;
-			cnc->clearDrawControl();
-			//umPostEvent(evt.ZViewResetEvent());
+			clearMotionMonitor();
+			// measurement handling will be done by the corespondinf file parser
 			ret = processSVGTemplate();
 			break;
 		case TplGcode:
 			if ( checkIfTemplateIsModified() == false )
 				break;
-			cnc->clearDrawControl();
-			//umPostEvent(evt.ZViewResetEvent());
+			clearMotionMonitor();
+			// measurement handling will be done by the corespondinf file parser
 			ret = processGCodeTemplate();
 			break;
-		case TplManual: 
+		case TplManual:
+			cnc->getSerial()->startMeasurement();
 			ret = processManualTemplate();
+			cnc->getSerial()->stopMeasurement();
 			break;
 		case TplTest:
-			cnc->clearDrawControl();
-			//umPostEvent(evt.ZViewResetEvent());
+			clearMotionMonitor();
+			cnc->getSerial()->startMeasurement();
 			ret = processTestTemplate();
+			cnc->getSerial()->stopMeasurement();
 			break;
 		default:
 			; // do nothing
@@ -3174,7 +3153,6 @@ bool MainFrame::processTemplate() {
 	logTimeConsumed();
 	logStatistics();
 		
-	unfreezeLogger();
 	enableControls();
 	stopAnimationControl();
 	
@@ -3199,27 +3177,83 @@ void MainFrame::logStatistics() {
 	if ( cnc == NULL )
 		return;
 		
-	return;
-	#warning
-
+	if ( vectiesListCtrl->IsShownOnScreen() )
+		updateStatisticPanel();
+		
 	CncDoublePosition min(cnc->getMinPositionsMetric());
 	CncDoublePosition max(cnc->getMaxPositionsMetric());
+	long measurementTimeSpan = cnc->getSerial()->getMeasurementTimeSpan();
 	
-	wxString s("Run statisic summary:\n");
-	//s.append(wxString::Format(wxT(" Boundings - Min(X,Y,Z) [mm]   : %4.4f, %4.4f, %4.4f\n"), 	min.getX(), min.getY(), min.getZ()));
-	//s.append(wxString::Format(wxT(" Boundings - Max(X,Y,Z) [mm]   : %4.4f, %4.4f, %4.4f\n"), 	max.getX(), max.getY(), max.getZ()));
-	//s.append(wxString::Format(wxT(" Distance  - total      [mm]   : %lf\n"), 					cnc->getSerial()->getTotalDistance()));
-	//s.append(wxString::Format(wxT(" Distance  - (X,Y,Z)    [mm]   : %lf, %lf, %lf\n"), 			cnc->getSerial()->getTotalDistanceX(), cnc->getSerial()->getTotalDistanceY(), cnc->getSerial()->getTotalDistanceZ()));
-	s.append(wxString::Format(wxT(" Steps     - total      [#]    : % 10ld\n"), 					cnc->getSerial()->getStepCounter()));
-	s.append(wxString::Format(wxT(" Steps     - (X,Y,Z)    [#]    : % 10ld, % 10ld, % 10ld\n"),		cnc->getSerial()->getStepCounterX(), cnc->getSerial()->getStepCounterY(), cnc->getSerial()->getStepCounterZ()));
-	s.append(wxString::Format(wxT(" Position counter       [#]    : % 10ld\n"),				 		cnc->getSerial()->getPostionCounter()));
-
-/*
-
-	xxx << " Speed AVG       :   " << (cnc->getSerial()->getTotalDistance()) / ( (double)(processLastDuartion) / 1000 ) * 60 << "[mm/min]" << endl;
-	xxx << " Speed AVG       :   " << (cnc->getSerial()->getTotalDistance()) / ( (double)(processLastDuartion) / 1000 )      << "[mm/sec]" << endl;
-*/	
-	m_statisticSummary->ChangeValue(s);
+	double elapsedTimeMSEC	= 0.0;
+	double elapsedTimeSEC	= 0.0;
+	double speed_MM_MIN		= 0.0;
+	double speed_MM_SEC		= 0.0;
+	
+	if ( measurementTimeSpan > 0L ) {
+		elapsedTimeMSEC = measurementTimeSpan / 1000;
+		elapsedTimeSEC  = elapsedTimeMSEC / 1000;
+		speed_MM_SEC 	= cnc->getSerial()->getTotalDistance() / elapsedTimeSEC;
+		speed_MM_MIN 	= speed_MM_SEC * 60;
+	}
+	
+	// statistic keys
+	static const char* SKEY_MIN_BOUND	= "Boundaries - Min";
+	static const char* SKEY_MAX_BOUND	= "Boundaries - Max";
+	static const char* SKEY_STEP_CNT	= "Step count";
+	static const char* SKEY_POS_CNT		= "Position count";
+	static const char* SKEY_DISTANCE 	= "Distance";
+	static const char* SKEY_TIME 		= "Time consumend";
+	static const char* SKEY_SPEED 		= "Feed speed";
+	
+	// add rows - ones a time
+	if ( statisticSummaryListCtrl->getItemCount() == 0 ) {
+		statisticSummaryListCtrl->addKey(SKEY_MIN_BOUND, 	"X, Y, Z", 				"mm");
+		statisticSummaryListCtrl->addKey(SKEY_MAX_BOUND, 	"X, Y, Z", 				"mm");
+		statisticSummaryListCtrl->addKey(SKEY_STEP_CNT, 	"Total, X, Y, Z", 		"#");
+		statisticSummaryListCtrl->addKey(SKEY_POS_CNT, 		"Total", 				"#");
+		statisticSummaryListCtrl->addKey(SKEY_DISTANCE, 	"Total, X, Y, Z", 		"mm");
+		statisticSummaryListCtrl->addKey(SKEY_TIME, 		"Total, Stepping", 		"ms");
+		statisticSummaryListCtrl->addKey(SKEY_SPEED, 		"mm/sec, mm/min", 		"mm/unit");
+	}
+	
+	// update statistic
+	statisticSummaryListCtrl->updateValues(SKEY_MIN_BOUND	, _("")
+															, CncNumberFormatter::toString(min.getX(), 3)
+															, CncNumberFormatter::toString(min.getY(), 3)
+															, CncNumberFormatter::toString(min.getZ(), 3));
+															
+	statisticSummaryListCtrl->updateValues(SKEY_MAX_BOUND	, _("")
+															, CncNumberFormatter::toString(max.getX(), 3)
+															, CncNumberFormatter::toString(max.getY(), 3)
+															, CncNumberFormatter::toString(max.getZ(), 3));
+	
+	statisticSummaryListCtrl->updateValues(SKEY_STEP_CNT	, CncNumberFormatter::toString(cnc->getSerial()->getStepCounter())
+															, CncNumberFormatter::toString(cnc->getSerial()->getStepCounterX())
+															, CncNumberFormatter::toString(cnc->getSerial()->getStepCounterY())
+															, CncNumberFormatter::toString(cnc->getSerial()->getStepCounterZ()));
+	
+	statisticSummaryListCtrl->updateValues(SKEY_POS_CNT		, _("")
+															, _("")
+															, _("")
+															, CncNumberFormatter::toString(cnc->getSerial()->getPostionCounter()));
+	
+	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistance()),  3)
+															, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistanceX()), 3)
+															, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistanceY()), 3)
+															, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistanceZ()), 3));
+	
+	statisticSummaryListCtrl->updateValues(SKEY_TIME		, _("")
+															, _("")
+															, CncNumberFormatter::toString((double)(processLastDuartion), 1)
+															, CncNumberFormatter::toString(elapsedTimeMSEC, 1));
+	
+	statisticSummaryListCtrl->updateValues(SKEY_SPEED		, _("")
+															, _("")
+															, CncNumberFormatter::toString(speed_MM_SEC, 1)
+															, CncNumberFormatter::toString(speed_MM_MIN, 1));
+	
+	statisticSummaryListCtrl->Refresh();
+	statisticSummaryListCtrl->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::resetMinMaxPositions() {
@@ -3607,7 +3641,7 @@ void MainFrame::requestReset() {
 	m_logger->Clear();
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RESET);
 	cnc->setup(true);
-	cnc->clearDrawControl();
+	clearMotionMonitor();
 	
 	updateSetterList();
 }
@@ -4861,6 +4895,15 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 										cnc->updatePreview3D();
 									break;
 		}
+	} else if ( (wxWindow*)event.GetEventObject() == m_statisticBook ) {
+		switch ( sel ) {
+			case StatisticSelection::VAL::SUMMARY_PANEL:
+									break;
+									
+			case StatisticSelection::VAL::VECTIES_PANAL:
+									updateStatisticPanel();
+									break;
+		}
 	} 
 }
 ///////////////////////////////////////////////////////////////////
@@ -4881,6 +4924,29 @@ void MainFrame::outboundBookChanging(wxNotebookEvent& event) {
 					break;
 		}
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::updateStatisticPanel() {
+///////////////////////////////////////////////////////////////////
+	if ( isProcessing() )
+		return;
+		
+	if ( vectiesListCtrl == NULL )
+		return;
+	
+	if ( motionMonitor == NULL )
+		return;
+		
+	long ic = vectiesListCtrl->getItemCount();
+	
+	if ( vectiesListCtrl->IsFrozen() == false )
+		vectiesListCtrl->Freeze();
+		
+	motionMonitor->fillVectiesListCtr(ic, vectiesListCtrl);
+	vectiesListCtrl->SetToolTip(wxString::Format("Item count: %ld", vectiesListCtrl->getItemCount()));
+
+	if ( vectiesListCtrl->IsFrozen() == true )
+		vectiesListCtrl->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayUserAgent(wxCommandEvent& event) {
@@ -5704,13 +5770,36 @@ void MainFrame::show3D(wxCommandEvent& event) {
 	} 
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::runOpenGLTest(wxCommandEvent& event) {
+void MainFrame::clearMotionMonitorVecties(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	//todo
-	//motionMonitor->runOpenGLTest();
+	vectiesListCtrl->clear();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::trace3D(wxCommandEvent& event) {
+void MainFrame::copyMotionMonitorVecties(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( vectiesListCtrl->getItemCount() == 0 )
+		return;
+
+	// Write some text to the clipboard
+	if ( wxTheClipboard->Open() ) {
+		startAnimationControl();
+
+		wxString content;
+		content.reserve(1024 * 1024);
+		
+		for ( long i=0; i<vectiesListCtrl->getItemCount(); i++ )
+			vectiesListCtrl->getRow(i).trace(content);
+		
+		// This data objects are held by the clipboard,
+		// so do not delete them in the app.
+		wxTheClipboard->SetData( new wxTextDataObject(content) );
+		wxTheClipboard->Close();
+		
+		stopAnimationControl();
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::traceMotionMonitorVecties(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	std::clog << "Motion Monitor Data - ";
 	
@@ -5722,12 +5811,21 @@ void MainFrame::trace3D(wxCommandEvent& event) {
 	m_logger->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::clear3D(wxCommandEvent& event) {
+void MainFrame::clearMotionMonitor() {
 ///////////////////////////////////////////////////////////////////
+	cnc->resetDrawControlInfo();
+	
 	motionMonitor->clear();
+	vectiesListCtrl->clear();
+	statisticSummaryListCtrl->resetValues();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::refresh3D(wxCommandEvent& event) {
+void MainFrame::clearMotionMonitor(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	clearMotionMonitor();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::refreshMotionMonitor(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc )
 		cnc->updatePreview3D();
@@ -5936,22 +6034,6 @@ void MainFrame::markSerialSpy(wxCommandEvent& event) {
 	dlg.SetMaxLength(64);
 	dlg.ShowModal();
 	serialSpy->addMarker(dlg.GetValue());
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::freezeLogger(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( m_logger->IsFrozen() ) {
-		m_freezeLogger->SetBitmap(ImageLib16().Bitmap("BMP_NOT_FROZEN")); 
-		m_freezeLogger->SetToolTip("Freeze Logger");
-		m_logger->Thaw();
-	} else {
-		m_freezeLogger->SetBitmap(ImageLib16().Bitmap("BMP_FROZEN")); 
-		m_freezeLogger->SetToolTip("Unfreeze Logger");
-		m_logger->Freeze();
-	}
-	
-	m_freezeLogger->Refresh();
-	m_freezeLogger->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableSerialSpy(wxCommandEvent& event) {
@@ -6799,6 +6881,9 @@ void MainFrame::toggleMonitorStatistics(bool shown) {
 
 		sizer->AddGrowableRow(monitorId,	3);
 		sizer->AddGrowableRow(statisticId,	1);
+		
+		if ( vectiesListCtrl->IsShownOnScreen() )
+			updateStatisticPanel();
 	}
 	
 	sizer->Layout();

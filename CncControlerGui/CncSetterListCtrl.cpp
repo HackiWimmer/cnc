@@ -20,6 +20,7 @@ wxEND_EVENT_TABLE()
 CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
 , separatorPid(wxString::Format("%d", (int)PID_SEPARATOR))
+, defaultItemAttr()
 , separatorRunItemAttr()
 , separatorResetItemAttr()
 , separatorSetupItemAttr()
@@ -46,6 +47,10 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 	imageList->Add(ImageLibSetterList().Bitmap("BMP_SEPARATOR"));	// 1
 	
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	
+	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
+	defaultItemAttr.SetFont(font);
+	defaultItemAttr.SetTextColour(GetTextColour());
 	
 	wxFont separatorFont(font);
 	separatorFont.MakeBold();
@@ -92,7 +97,7 @@ wxListItemAttr* CncSetterListCtrl::OnGetItemAttr(long item) const {
 	}
 	
 	// this indicates to use the default style
-	return NULL;
+	return (wxListItemAttr*)(&defaultItemAttr);
 }
 /////////////////////////////////////////////////////////////////////
 void CncSetterListCtrl::updateColumnWidth() {

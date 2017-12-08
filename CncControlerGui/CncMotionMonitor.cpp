@@ -6,6 +6,7 @@
 #include "CncConfig.h"
 #include "CncCommon.h"
 #include "MainFrame.h"
+#include "CncVectiesListCtrl.h"
 #include "CncMotionMonitor.h"
 
 #ifdef __DARWIN__
@@ -114,6 +115,39 @@ unsigned int CncMotionMonitor::calculateScaleDisplay(unsigned int height) {
 	float fact = ( monitor->getCurrentScaleFactor() * 1000 ) / ( monitor->getMaxScaleFactor() * 1000 );
 	//std::cerr <<  monitor->getCurrentScaleFactor() << ", " <<  monitor->getMaxScaleFactor() << ", " << fact << std::endl;
 	return (unsigned int)(fact * height);
+}
+//////////////////////////////////////////////////
+long CncMotionMonitor::fillVectiesListCtr(long curCount, CncVectiesListCtrl* listCtrl) {
+//////////////////////////////////////////////////
+	if ( listCtrl == NULL )
+		return 0L;
+	
+	const GLI::GLCncPath& data = monitor->getPathData();
+	if ( (long)data.size() == curCount )
+		return 0L;
+		
+	listCtrl->clear();
+		
+	CncColumContainer cc(CncVectiesListCtrl::TOTAL_COL_COUNT);
+	wxString type;
+	for ( auto it = data.begin(); it != data.end(); ++it ) {
+		
+		switch ( it->getCncMode() ) {
+			case GLI::GLCncPathVertices::CncMode::CM_FLY:	type.assign("R"); 
+															break;
+			default:										type.assign("W");
+		}
+		
+		cc.updateItem(CncVectiesListCtrl::COL_REF, 	wxString::Format("%010ld", it->getId()));
+		cc.updateItem(CncVectiesListCtrl::COL_T, 	type);
+		cc.updateItem(CncVectiesListCtrl::COL_X, 	wxString::Format("%.6lf", it->getX()));
+		cc.updateItem(CncVectiesListCtrl::COL_Y, 	wxString::Format("%.6lf", it->getY()));
+		cc.updateItem(CncVectiesListCtrl::COL_Z, 	wxString::Format("%.6lf", it->getZ()));
+		
+		listCtrl->appendItem(cc);
+	}
+	
+	return data.size();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::enable(bool state) {

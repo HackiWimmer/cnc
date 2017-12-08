@@ -18,6 +18,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , speedOffsetX(0)
 , speedOffsetY(0)
 , speedOffsetZ(0)
+, speed_MM_MIN(1L)
 , positionCounter(0)
 , stepCounterX(0)
 , stepCounterY(0)
@@ -43,6 +44,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , speedOffsetX(0)
 , speedOffsetY(0)
 , speedOffsetZ(0)
+, speed_MM_MIN(1L)
 , positionCounter(0)
 , stepCounterX(0)
 , stepCounterY(0)
@@ -448,9 +450,10 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 			case PID_PULSE_WIDTH_OFFSET_Y:	minPulseWidthOffsetY = val; break;
 			case PID_PULSE_WIDTH_OFFSET_Z:	minPulseWidthOffsetZ = val; break;
 			
-			case PID_SPEED_MM_MIN: 			speedOffsetX = GBL_CONFIG->calcSpeedOffsetX((double)val/DBL_FACT);
-											speedOffsetY = GBL_CONFIG->calcSpeedOffsetY((double)val/DBL_FACT);
-											speedOffsetZ = GBL_CONFIG->calcSpeedOffsetZ((double)val/DBL_FACT);
+			case PID_SPEED_MM_MIN: 			speed_MM_MIN = (double)(val/DBL_FACT);
+											speedOffsetX = GBL_CONFIG->calcSpeedOffsetX(speed_MM_MIN);
+											speedOffsetY = GBL_CONFIG->calcSpeedOffsetY(speed_MM_MIN);
+											speedOffsetZ = GBL_CONFIG->calcSpeedOffsetZ(speed_MM_MIN);
 											break;
 		}
 		
@@ -682,13 +685,18 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	curEmulatorPos.incZ(dz);
 	
 	// simulate speed
-	static __int64 tsLastStepX = getMircoscondTimestamp();
-	static __int64 tsLastStepY = getMircoscondTimestamp();
-	static __int64 tsLastStepZ = getMircoscondTimestamp();
+	static CncTimestamp tsLastStepX = {0};//CncTimeFunctions::getMicrosecondTimestamp();
+	static CncTimestamp tsLastStepY = {0};//CncTimeFunctions::getMicrosecondTimestamp();
+	static CncTimestamp tsLastStepZ = {0};//CncTimeFunctions::getMicrosecondTimestamp();
 	
-	if ( stepAxis(tsLastStepX, dx, speedOffsetX) == false ) return false;
-	if ( stepAxis(tsLastStepY, dy, speedOffsetY) == false ) return false;
-	if ( stepAxis(tsLastStepZ, dz, speedOffsetZ) == false ) return false;
+	if ( tsLastStepX == 0LL )	tsLastStepX = CncTimeFunctions::getMicrosecondTimestamp();
+	if ( tsLastStepY == 0LL )	tsLastStepX = CncTimeFunctions::getMicrosecondTimestamp();
+	if ( tsLastStepZ == 0LL )	tsLastStepX = CncTimeFunctions::getMicrosecondTimestamp();
+	
+	
+	if ( stepAxis('X', tsLastStepX, dx, speedOffsetX) == false ) return false;
+	if ( stepAxis('Y', tsLastStepY, dy, speedOffsetY) == false ) return false;
+	if ( stepAxis('Z', tsLastStepZ, dz, speedOffsetZ) == false ) return false;
 	
 	// simulate a direct controler callback
 	static CncLongPosition lastReplyPos;
@@ -723,25 +731,8 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-inline __int64 SerialEmulatorNULL::getMircoscondTimestamp() {
+bool SerialEmulatorNULL::stepAxis(char axis, CncTimestamp& tsLastStep, int32_t steps, int32_t speedOffset) {
 ///////////////////////////////////////////////////////////////////
-	return std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::system_clock::now().time_since_epoch()).count();
-	
-	struct timeval tv;
-	gettimeofday (&tv, NULL);
-	
-	return tv.tv_sec * 1000000 + tv.tv_usec;
-}
-///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::stepAxis(__int64& tsLastStep, int32_t steps, int32_t speedOffset) {
-///////////////////////////////////////////////////////////////////
-	
-	/* consider !
-		, minPulseWidthOffsetX(0)
-		, minPulseWidthOffsetY(0)
-		, minPulseWidthOffsetZ(0)
-	*/
-	
 	for ( int32_t i = 0; i < abs(steps); i++ ) {
 		// signal handling
 		switch ( lastSignal ) {
@@ -764,19 +755,44 @@ bool SerialEmulatorNULL::stepAxis(__int64& tsLastStep, int32_t steps, int32_t sp
 		
 		// simulate speed
 		if ( GBL_CONFIG->isProbeMode() == false ) {
-			//cout << getMircoscondTimestamp() - tsLastStep << endl;
-			while ( (getMircoscondTimestamp() - tsLastStep) < speedOffset ) {
-				struct timespec req = {0};
-				req.tv_sec = 0;
-				req.tv_nsec = 1000L;
-				nanosleep(&req, (struct timespec *)NULL);
-			}
 			
-			tsLastStep = getMircoscondTimestamp();
+			unsigned int pulseWidth = 0;
+			switch ( axis ) {
+				case 'X':	pulseWidth = minPulseWidthOffsetX; break;
+				case 'Y':	pulseWidth = minPulseWidthOffsetY; break;
+				case 'Z':	pulseWidth = minPulseWidthOffsetZ; break;
+				default:	wxASSERT(axis != 'X' && axis != 'Y' && axis != 'Z');
+			}
+		
+			digitalWriteHigh(pulseWidth);
+			{
+				while ( (CncTimeFunctions::getMicrosecondTimestamp() - tsLastStep) < speedOffset ) {
+					CncTimeFunctions::busyWaitMircoseconds(1);
+				}
+			}
+			digitalWriteLow(pulseWidth);
+			
+			tsLastStep = CncTimeFunctions::getMicrosecondTimestamp();
 		}
 	}
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::digitalWriteLow(unsigned int width) {
+///////////////////////////////////////////////////////////////////
+	if ( width == 0 )
+		return;
+	
+	CncTimeFunctions::busyWaitMircoseconds(width);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::digitalWriteHigh(unsigned int width) {
+///////////////////////////////////////////////////////////////////
+	if ( width == 0 )
+		return;
+	
+	CncTimeFunctions::busyWaitMircoseconds(width);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, void *buffer, unsigned int nbByte) {

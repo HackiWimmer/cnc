@@ -12,6 +12,7 @@
 wxDECLARE_EVENT(wxEVT_MOTION_MONITOR_TIMER, wxTimerEvent);
 
 class GL3DOptions;
+class CncVectiesListCtrl;
 
 /////////////////////////////////////////////////////////////
 class CncMotionMonitor : public wxGLCanvas {
@@ -70,6 +71,8 @@ class CncMotionMonitor : public wxGLCanvas {
 		int getCameraEyeAngle() { return monitor->getCameraPosition().getCurXYPlaneEyeAngle(); }
 		
 		unsigned int calculateScaleDisplay(unsigned int height);
+		
+		long fillVectiesListCtr(long curCount, CncVectiesListCtrl* listCtrl);
 		
 		// usage:
 		// getFlags().positionMarker 	= false;
@@ -147,6 +150,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		void view(GLContextBase::ViewMode fm);
 		
 	private:
+		
 		inline void appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
 		inline void onPaint();
 		

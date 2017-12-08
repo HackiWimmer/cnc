@@ -20,6 +20,9 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		virtual void prepareWorkImpl();
 		virtual void finishWorkImpl();
 		
+		virtual void logMeasurementStart() {}
+		virtual void logMeasurementEnd() {}
+		
 	private:
 		CncGCodePreview* glControl;
 		CncSpeed currentSpeed;

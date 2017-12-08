@@ -47,6 +47,9 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		virtual bool addPathElement(char c, unsigned int count, double values[]);
 		virtual void initNextClientId(long id);
 		
+		virtual void logMeasurementStart();
+		virtual void logMeasurementEnd();
+		
 		bool processXMLNode(wxXmlNode *child);
 		bool evaluateCncParameters(wxXmlNode *child);
 		void evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm);

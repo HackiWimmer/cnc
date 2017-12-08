@@ -206,7 +206,7 @@ class CncControl {
 		void setGuiControls(GuiControlSetup* guiCtlSetup);
 		//handle draw control
 		unsigned int getDrawPaneMargin() { return drawPaneMargin; }
-		void clearDrawControl();
+		void resetDrawControlInfo();
 		void updateDrawControl();
 		// Duration management
 		unsigned int getDurationCount();

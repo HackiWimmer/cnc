@@ -309,7 +309,10 @@ bool FileParser::process() {
 	// second: spooling
 	if ( runInfo.processMore() && ret == true ) {
 		initNextRunPhase(FileParserRunInfo::RP_Spool);
+		
+		logMeasurementStart();
 		ret = spool();
+		logMeasurementEnd();
 	} 
 	
 	ret = postprocess();

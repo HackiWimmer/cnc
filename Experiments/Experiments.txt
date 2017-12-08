@@ -1,1 +1,1 @@
-./Release/main.cpp.o   
+./Debug/main.cpp.o ./Debug/up_CncControlerGui_CncCommon.cpp.o ./Debug/up_CncControlerGui_CncTimeFunctions.cpp.o   

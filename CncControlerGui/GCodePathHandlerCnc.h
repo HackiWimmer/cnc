@@ -14,6 +14,9 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase {
 		virtual void initNextClientId(long id);
 		virtual void switchToolState(bool state);
 		
+		virtual void logMeasurementStart();
+		virtual void logMeasurementEnd();
+		
 	protected:
 		
 		virtual bool processLinearMove(bool alreadyRendered);

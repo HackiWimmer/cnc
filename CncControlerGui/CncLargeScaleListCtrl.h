@@ -94,6 +94,9 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		bool appendItem(const CncColumContainer& cc);
 		bool appendItems(unsigned int nsize, const CncColumContainer* cc);
 		
+		bool updateItem(long item, const CncColumContainer& cc);
+		bool updateItem(long item, long column, const wxString& value);
+
 		long getItemCount() { return rows.size(); }
 		
 		const CncColumContainer& getRow(long item);
@@ -114,7 +117,8 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		
 		virtual wxString OnGetItemText(long	item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
-		virtual wxListItemAttr *OnGetItemAttr(long item) const;
+		virtual wxListItemAttr* OnGetItemAttr(long item) const;
+		virtual wxListItemAttr* OnGetItemColumnAttr(long item, long column ) const;
 		
 		inline bool isItemValid(long item) const;
 		inline bool isColumnValid(long column) const;

@@ -1,5 +1,7 @@
 #include <string> 
 #include <sstream>
+#include <chrono>
+#include <sys/time.h>
 #include <wx/thread.h>
 #include "strsafe.h"
 #include "CncControl.h"
@@ -13,8 +15,11 @@ char STATIC_CMD_CHAR[2];
 
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
-: totalDistance{0L, 0L, 0L, 0L}
+: totalDistance{0.0, 0.0, 0.0, 0.0}
+, tsMeasurementStart(0LL)
+, tsMeasurementLast(0LL)
 , cncControl(cnc)
+, measurementActive(false)
 , connected(false)
 , writeOnlyMoveCommands(false)
 , isCommand(false)
@@ -34,7 +39,10 @@ Serial::Serial(CncControl* cnc)
 }
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(const char *portName)
-: totalDistance{0L, 0L, 0L, 0L}
+: totalDistance{0.0, 0.0, 0.0, 0.0}
+, tsMeasurementStart(0LL)
+, tsMeasurementLast(0LL)
+, measurementActive(false)
 , connected(false)
 , writeOnlyMoveCommands(false)
 , isCommand(false)
@@ -58,6 +66,67 @@ Serial::Serial(const char *portName)
 Serial::~Serial() {
 ///////////////////////////////////////////////////////////////////
 	disconnect();
+}
+///////////////////////////////////////////////////////////////////
+void Serial::startMeasurement() {
+///////////////////////////////////////////////////////////////////
+	measurementActive = true;
+	
+	resetPostionCounter();
+	resetStepCounter();
+	resetTotalDistance();
+	
+	tsMeasurementStart = CncTimeFunctions::getMicrosecondTimestamp();
+	tsMeasurementLast  = tsMeasurementStart;
+	startMeasurementIntern();
+}
+///////////////////////////////////////////////////////////////////
+void Serial::stopMeasurement() {
+///////////////////////////////////////////////////////////////////
+	measurementActive = false;
+	
+	stopMeasurementIntern();
+	logMeasurementTs();
+}
+///////////////////////////////////////////////////////////////////
+void Serial::logMeasurementTs() {
+///////////////////////////////////////////////////////////////////
+	tsMeasurementLast = CncTimeFunctions::getMicrosecondTimestamp();
+}
+///////////////////////////////////////////////////////////////////
+CncTimespan Serial::getMeasurementTimeSpan() const {
+///////////////////////////////////////////////////////////////////
+	return tsMeasurementLast - tsMeasurementStart;
+}
+///////////////////////////////////////////////////////////////////
+double Serial::getCurrentFeedSpeed() {
+///////////////////////////////////////////////////////////////////
+	if ( getMeasurementTimeSpan() == 0L )
+		return 0.0;
+	
+	if ( cnc::dblCompareNull(getTotalDistance()) == true )
+		return 0.0;
+		
+	if ( isMeasurementActive() == false )
+		return 0.0;
+	
+	// getTotalDistance()		==> mm
+	// getMeasurementTimeSpan 	==> us
+	// ret 						==> mm/min
+	
+	/*
+	// debug only
+	static CncTimestamp xxxx =  CncTimeFunctions::getMicrosecondTimestamp();
+	if ( tsMeasurementLast != xxxx ) {
+		clog << tsMeasurementStart << ", " << tsMeasurementLast << ", " << getMeasurementTimeSpan() << endl;
+		xxxx = tsMeasurementLast;
+	}*/
+	
+	double timeSpan = (double)(getMeasurementTimeSpan() / (1000 * 1000));
+	if ( cnc::dblCompareNull(timeSpan) == true )
+		return 0.0;
+		
+	return (getTotalDistance() / timeSpan) * 60;
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::setSpyMode(Serial::SypMode sm) {
@@ -942,6 +1011,8 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 								totalDistance[T] += sqrt(x*x + y*y + z*z);
 								break;
 			}
+			
+			logMeasurementTs();
 		}
 		
 		return ret;

@@ -15,6 +15,8 @@ namespace cnc {
 	extern CncMsgLogStream msg;
 	extern CncSerialSpyStream spy;
 	
+	int gettimeofday(struct timeval *tv, struct timezone *tz);
+	
 	bool dblCompare(double a, double b, double eps = std::numeric_limits<double>::epsilon());
 	bool dblCompareNull(double a, double eps = std::numeric_limits<double>::epsilon());
 	const wxString& dblFormat1(double d);
@@ -79,6 +81,14 @@ class OutboundSelection{
 			MOTION_MONITOR_PANAL		= 1,
 			SVG_OUTPUT_PANEL			= 2,
 			SVG_SOURCE_PANEL			= 3
+		};
+};
+
+class StatisticSelection{
+	public:
+		enum VAL {
+			SUMMARY_PANEL				= 0,
+			VECTIES_PANAL				= 1,
 		};
 };
 

@@ -52,7 +52,7 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		virtual bool isZAxisDown();
 		bool moveUpZ();
 		bool moveDownZ();
-
+		
 	public:
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
@@ -80,6 +80,8 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		virtual bool runCurrentPath();
 		virtual void finishWork();
 		
+		virtual void logMeasurementStart();
+		virtual void logMeasurementEnd();
 };
 
 #endif

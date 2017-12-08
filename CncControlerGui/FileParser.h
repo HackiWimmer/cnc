@@ -116,6 +116,8 @@ class FileParser {
 		virtual bool spool() = 0;
 		virtual bool postprocess() = 0;
 		virtual void initNextClientId(long id) = 0;
+		virtual void logMeasurementStart() = 0;
+		virtual void logMeasurementEnd() = 0;
 		
 		virtual void initNextRunPhase(FileParserRunInfo::RunPhase p);
 		

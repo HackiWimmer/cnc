@@ -8,11 +8,16 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="main.cpp"/>
+    <File Name="main.cpp" ExcludeProjConfig=""/>
+    <File Name="../CncControlerGui/CncCommon.cpp"/>
+    <File Name="../CncControlerGui/CncCommon.h"/>
+    <File Name="mani2.cpp" ExcludeProjConfig="Debug"/>
+    <File Name="../CncControlerGui/CncTimeFunctions.cpp"/>
+    <File Name="../CncControlerGui/CncTimeFunctions.h"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
-      <Compiler Options="" C_Options="" Assembler="">
+      <Compiler Options="-std=c++14;-std=c++11" C_Options="" Assembler="">
         <IncludePath Value="."/>
       </Compiler>
       <Linker Options="">

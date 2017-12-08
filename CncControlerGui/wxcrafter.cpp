@@ -490,7 +490,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1490->Add(m_staticText1498, 0, wxALL, WXC_FROM_DIP(2));
     
     m_dvListCtrlSvgUAInboundPathList = new wxDataViewListCtrl(m_panelTplUserAgent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_dvListCtrlSvgUAInboundPathList->SetBackgroundColour(wxColour(wxT("rgb(128,128,128)")));
+    m_dvListCtrlSvgUAInboundPathList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     
     flexGridSizer1490->Add(m_dvListCtrlSvgUAInboundPathList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
@@ -505,7 +505,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1490->Add(m_staticText14983, 0, wxALL, WXC_FROM_DIP(2));
     
     m_dvListCtrlSvgUAUseDirective = new wxDataViewListCtrl(m_panelTplUserAgent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_dvListCtrlSvgUAUseDirective->SetBackgroundColour(wxColour(wxT("rgb(128,128,128)")));
+    m_dvListCtrlSvgUAUseDirective->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     
     flexGridSizer1490->Add(m_dvListCtrlSvgUAUseDirective, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
@@ -527,7 +527,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1492->Add(m_staticText1500, 0, wxALL, WXC_FROM_DIP(2));
     
     m_dvListCtrlSvgUADetailInfo = new wxDataViewListCtrl(m_panelTplUserAgent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_dvListCtrlSvgUADetailInfo->SetBackgroundColour(wxColour(wxT("rgb(128,128,128)")));
+    m_dvListCtrlSvgUADetailInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     
     flexGridSizer1492->Add(m_dvListCtrlSvgUADetailInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
@@ -2681,16 +2681,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3497->Add(m_3D_Refreh, 0, wxALL, WXC_FROM_DIP(0));
     m_3D_Refreh->SetMinSize(wxSize(24,24));
     
-    m_3D_Trace = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_3D_Trace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("trace")), wxLEFT);
-    m_3D_Trace->SetBitmapMargins(2,2);
-    #endif
-    m_3D_Trace->SetToolTip(_("Trace Montion Monitor Data"));
-    
-    flexGridSizer3497->Add(m_3D_Trace, 0, wxALL, WXC_FROM_DIP(0));
-    m_3D_Trace->SetMinSize(wxSize(24,24));
-    
     m_3D_Clear = new wxButton(m_3DPane, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_3DPane, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_3D_Clear->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
@@ -2945,36 +2935,83 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_statisticPageSumImgIndex = m_statisticBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("tools-sum")));
     m_statisticBook->AddPage(m_statisticPageSum, _("Summary"), false, m_statisticPageSumImgIndex);
     
-    wxFlexGridSizer* flexGridSizer3499 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer3499 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer3499->SetFlexibleDirection( wxBOTH );
     flexGridSizer3499->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3499->AddGrowableCol(0);
     flexGridSizer3499->AddGrowableRow(0);
     m_statisticPageSum->SetSizer(flexGridSizer3499);
     
-    m_statisticSummary = new wxTextCtrl(m_statisticPageSum, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statisticPageSum, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE);
-    m_statisticSummary->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
-    m_statisticSummary->SetForegroundColour(wxColour(wxT("rgb(234,234,234)")));
-    wxFont m_statisticSummaryFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
-    m_statisticSummary->SetFont(m_statisticSummaryFont);
+    m_statisticSummaryListCtrl = new wxListCtrl(m_statisticPageSum, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statisticPageSum, wxSize(-1,-1)), wxLC_REPORT);
+    m_statisticSummaryListCtrl->SetToolTip(_("Only a placeholder"));
     
-    flexGridSizer3499->Add(m_statisticSummary, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer3499->Add(m_statisticSummaryListCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer4957 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer4957->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4957->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4957->AddGrowableCol(0);
+    flexGridSizer4957->AddGrowableRow(0);
+    
+    flexGridSizer3499->Add(flexGridSizer4957, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_checkBoxStatisticUpdate = new wxCheckBox(m_statisticPageSum, wxID_ANY, _("Continuous update"), wxDefaultPosition, wxDLG_UNIT(m_statisticPageSum, wxSize(-1,-1)), 0);
+    m_checkBoxStatisticUpdate->SetValue(false);
+    
+    flexGridSizer4957->Add(m_checkBoxStatisticUpdate, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_statisticPageVecties = new wxPanel(m_statisticBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statisticBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_statisticPageVectiesImgIndex;
     m_statisticPageVectiesImgIndex = m_statisticBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("draw-vector")));
     m_statisticBook->AddPage(m_statisticPageVecties, _("Vecties"), false, m_statisticPageVectiesImgIndex);
     
-    wxFlexGridSizer* flexGridSizer4915 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer4915 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer4915->SetFlexibleDirection( wxBOTH );
     flexGridSizer4915->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4915->AddGrowableCol(0);
+    flexGridSizer4915->AddGrowableCol(1);
     flexGridSizer4915->AddGrowableRow(0);
     m_statisticPageVecties->SetSizer(flexGridSizer4915);
     
-    m_VectiesListCtrl = new wxListCtrl(m_statisticPageVecties, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statisticPageVecties, wxSize(-1,-1)), wxLC_REPORT);
+    wxFlexGridSizer* flexGridSizer4953 = new wxFlexGridSizer(10, 1, 0, 0);
+    flexGridSizer4953->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4953->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer4915->Add(m_VectiesListCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer4915->Add(flexGridSizer4953, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_3D_Trace3 = new wxButton(m_statisticPageVecties, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statisticPageVecties, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Trace3->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_3D_Trace3->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Trace3->SetToolTip(_("Trace Montion Monitor Data"));
+    
+    flexGridSizer4953->Add(m_3D_Trace3, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Trace3->SetMinSize(wxSize(24,24));
+    
+    m_3D_Trace4 = new wxButton(m_statisticPageVecties, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statisticPageVecties, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Trace4->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("edit-copy-7")), wxLEFT);
+    m_3D_Trace4->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Trace4->SetToolTip(_("Trace Montion Monitor Data"));
+    
+    flexGridSizer4953->Add(m_3D_Trace4, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Trace4->SetMinSize(wxSize(24,24));
+    
+    m_3D_Trace = new wxButton(m_statisticPageVecties, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statisticPageVecties, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Trace->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("trace")), wxLEFT);
+    m_3D_Trace->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Trace->SetToolTip(_("Trace Montion Monitor Data"));
+    
+    flexGridSizer4953->Add(m_3D_Trace, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Trace->SetMinSize(wxSize(24,24));
+    
+    m_vectiesListCtrl = new wxListCtrl(m_statisticPageVecties, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statisticPageVecties, wxSize(-1,-1)), wxLC_REPORT);
+    m_vectiesListCtrl->SetToolTip(_("Only a placeholder"));
+    
+    flexGridSizer4915->Add(m_vectiesListCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer2311 = new wxFlexGridSizer(30, 1, 0, 0);
     flexGridSizer2311->SetFlexibleDirection( wxBOTH );
@@ -3367,12 +3404,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1863->Add(m_clearLogger, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_freezeLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("weather-freezing-rain")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_freezeLogger->SetToolTip(_("Freeze/Unfreeze Logger"));
-    
-    flexGridSizer1863->Add(m_freezeLogger, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_copyLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-copy")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_copyLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("edit-copy-7")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_copyLogger->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     m_copyLogger->SetToolTip(_("Copy Logger Panel"));
     
@@ -3430,13 +3462,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer436->Add(flexGridSizer3696, 0, wxALL, WXC_FROM_DIP(2));
     
-    m_staticText395 = new wxStaticText(m_statusBar, wxID_ANY, _("Time consumed:"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,18)), 0);
+    m_staticText395 = new wxStaticText(m_statusBar, wxID_ANY, _("Total time consumed:"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,18)), 0);
     m_staticText395->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVEBORDER));
     
     flexGridSizer3696->Add(m_staticText395, 0, wxALL, WXC_FROM_DIP(3));
     m_staticText395->SetMinSize(wxSize(-1,18));
     
-    m_cmdDuration = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("00:00:00.000"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(100,18)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
+    m_cmdDuration = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("00:00:00.000"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(70,18)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
     m_cmdDuration->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
     m_cmdDuration->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     #if wxVERSION_NUMBER >= 3000
@@ -3444,7 +3476,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     flexGridSizer3696->Add(m_cmdDuration, 0, wxALL, WXC_FROM_DIP(3));
-    m_cmdDuration->SetMinSize(wxSize(100,18));
+    m_cmdDuration->SetMinSize(wxSize(70,18));
     
     m_staticLine602 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -3497,11 +3529,28 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer436->Add(m_staticLine680, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer3694 = new wxFlexGridSizer(1, 10, 0, 0);
+    wxFlexGridSizer* flexGridSizer3694 = new wxFlexGridSizer(1, 12, 0, 0);
     flexGridSizer3694->SetFlexibleDirection( wxBOTH );
     flexGridSizer3694->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
     flexGridSizer436->Add(flexGridSizer3694, 0, wxALL, WXC_FROM_DIP(2));
+    
+    LableF = new wxStaticText(m_statusBar, wxID_ANY, _("F:"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,18)), 0);
+    LableF->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVEBORDER));
+    
+    flexGridSizer3694->Add(LableF, 0, wxALL, WXC_FROM_DIP(3));
+    LableF->SetMinSize(wxSize(-1,18));
+    
+    m_feedSpeed = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
+    m_feedSpeed->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_feedSpeed->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_feedSpeed->SetToolTip(_("Controller Pos"));
+    #if wxVERSION_NUMBER >= 3000
+    m_feedSpeed->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer3694->Add(m_feedSpeed, 0, wxALL, WXC_FROM_DIP(3));
+    m_feedSpeed->SetMinSize(wxSize(50,20));
     
     m_refPosTrafficLight = new wxStaticBitmap(m_statusBar, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(26,-1)), 0 );
     
@@ -4592,14 +4641,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btRequestCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
     m_switchMonitoing->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_motionMonitorOptionDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openMotionMonitorOptionDlg), NULL, this);
-    m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
-    m_3D_Trace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::trace3D), NULL, this);
-    m_3D_Clear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
+    m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshMotionMonitor), NULL, this);
+    m_3D_Clear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitor), NULL, this);
     m_cbCurveLibResolution->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_displayInterval->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::displayIntervalThumbtrack), NULL, this);
     m_displayInterval->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::displayIntervalChanged), NULL, this);
     m_displayInterval->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::displayIntervalKeyDown), NULL, this);
     m_btShowHideStatistics->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleMonitorStatistics), NULL, this);
+    m_3D_Trace3->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitorVecties), NULL, this);
+    m_3D_Trace4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyMotionMonitorVecties), NULL, this);
+    m_3D_Trace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::traceMotionMonitorVecties), NULL, this);
     m_3D_Top->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
     m_3D_Bottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
     m_3D_Front->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
@@ -4629,7 +4680,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
     m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
-    m_freezeLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_tmpTraceInfo->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
@@ -4865,14 +4915,16 @@ MainFrameBClass::~MainFrameBClass()
     m_btRequestCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
     m_switchMonitoing->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_motionMonitorOptionDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openMotionMonitorOptionDlg), NULL, this);
-    m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refresh3D), NULL, this);
-    m_3D_Trace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::trace3D), NULL, this);
-    m_3D_Clear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clear3D), NULL, this);
+    m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshMotionMonitor), NULL, this);
+    m_3D_Clear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitor), NULL, this);
     m_cbCurveLibResolution->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updateCurveLibResolution), NULL, this);
     m_displayInterval->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::displayIntervalThumbtrack), NULL, this);
     m_displayInterval->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::displayIntervalChanged), NULL, this);
     m_displayInterval->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::displayIntervalKeyDown), NULL, this);
     m_btShowHideStatistics->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleMonitorStatistics), NULL, this);
+    m_3D_Trace3->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitorVecties), NULL, this);
+    m_3D_Trace4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyMotionMonitorVecties), NULL, this);
+    m_3D_Trace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::traceMotionMonitorVecties), NULL, this);
     m_3D_Top->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
     m_3D_Bottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
     m_3D_Front->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
@@ -4902,7 +4954,6 @@ MainFrameBClass::~MainFrameBClass()
     m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
     m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
-    m_freezeLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
@@ -7116,56 +7167,6 @@ ImageLib16::ImageLib16()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_SERIAL_SPY_OFF@2x"), bmp));
-        }
-    }
-    
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NOT_FROZEN"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_NOT_FROZEN"), bmp));
-        }
-    }
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NOT_FROZEN@2x"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_NOT_FROZEN@2x"), bmp));
-        }
-    }
-    
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_FROZEN"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_FROZEN"), bmp));
-        }
-    }
-    {
-        wxBitmap bmp;
-        wxIcon icn;
-        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_FROZEN@2x"));
-        if(bmp.IsOk()) {
-            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
-                icn.CopyFromBitmap(bmp);
-                this->Add(icn);
-            }
-            m_bitmaps.insert(std::make_pair(wxT("BMP_FROZEN@2x"), bmp));
         }
     }
     

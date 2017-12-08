@@ -17,6 +17,8 @@
 #include "CncToolMagazine.h"
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
+#include "CncVectiesListCtrl.h"
+#include "CncStatisticSummaryListCtrl.h"
 #include "codelite/wxPNGAnimation.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -68,8 +70,11 @@ class GlobalConfigManager {
 ////////////////////////////////////////////////////////////////////
 class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
-	// User command
+	// User commands
 	protected:
+		virtual void clearMotionMonitorVecties(wxCommandEvent& event);
+		virtual void copyMotionMonitorVecties(wxCommandEvent& event);
+		virtual void traceMotionMonitorVecties(wxCommandEvent& event);
 		virtual void toggleMonitorStatistics(wxCommandEvent& event);
 		virtual void clickProbeMode(wxCommandEvent& event);
 		virtual void displayIntervalKeyDown(wxKeyEvent& event);
@@ -92,7 +97,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void togglePositionSpy(wxCommandEvent& event);
 		virtual void activateAuiPane(wxAuiManagerEvent& event);
 		virtual void buttonAuiPane(wxAuiManagerEvent& event);
-		virtual void trace3D(wxCommandEvent& event);
 		virtual void viewZAxis(wxCommandEvent& event);
 		virtual void loadPerspectiveDebug(wxCommandEvent& event);
 		virtual void loadPerspectiveRun(wxCommandEvent& event);
@@ -137,7 +141,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void cfgStepDelayMin(wxCommandEvent& event);
 		virtual void enableSerialSpy(wxCommandEvent& event);
 		virtual void clearSerialSpy(wxCommandEvent& event);
-		virtual void freezeLogger(wxCommandEvent& event);
 		virtual void nootebookConfigChanged(wxListbookEvent& event);
 		virtual void cancelRun(wxCommandEvent& event);
 		virtual void confirmRun(wxCommandEvent& event);
@@ -155,9 +158,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void testDimTakeOverX(wxCommandEvent& event);
 		virtual void testDimTakeOverY(wxCommandEvent& event);
 		virtual void testDimTakeOverZ(wxCommandEvent& event);
-		virtual void refresh3D(wxCommandEvent& event);
-		virtual void clear3D(wxCommandEvent& event);
-		virtual void runOpenGLTest(wxCommandEvent& event);
+		virtual void refreshMotionMonitor(wxCommandEvent& event);
+		virtual void clearMotionMonitor(wxCommandEvent& event);
 		virtual void show3D(wxCommandEvent& event);
 		virtual void showFromBottom3D(wxCommandEvent& event);
 		virtual void showFromFront3D(wxCommandEvent& event);
@@ -447,6 +449,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncToolMagazine* toolMagaizne;
 		CncPosSpyListCtrl* positionSpy;
 		CncSetterListCtrl* setterList;
+		CncStatisticSummaryListCtrl* statisticSummaryListCtrl;
+		CncVectiesListCtrl* vectiesListCtrl;
+		
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -587,6 +592,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void collectSummary();
 		
+		void updateStatisticPanel();
+		
 		///////////////////////////////////////////////////////////////
 		// control handling
 		void decoratePortSelector(bool list=false);
@@ -627,7 +634,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
 		
 		void clearPositionSpy();
-		
+		void clearMotionMonitor();
+
 		wxWindow* getAUIPaneByName(const wxString& name);
 		wxMenuItem* getAUIMenuByName(const wxString& name);
 		
@@ -635,9 +643,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void startAnimationControl();
 		void stopAnimationControl();
-		
-		void freezeLogger();
-		void unfreezeLogger();
 		
 		void prepareNewTemplateFile();
 		void showSvgExtPages(bool show = true);

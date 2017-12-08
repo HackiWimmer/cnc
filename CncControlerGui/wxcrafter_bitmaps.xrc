@@ -125,9 +125,6 @@
   <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-finger@2x.png</object>
   <object class="wxBitmap" name="BMP_FOLDER">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\folder (2).png</object>
   <object class="wxBitmap" name="BMP_FOLDER_UP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\go-up-search.png</object>
-  <object class="wxBitmap" name="BMP_FROZEN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-x-close.png</object>
-  <object class="wxBitmap" name="BMP_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-x-close@2x.png</object>
-  <object class="wxBitmap" name="BMP_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="BMP_GCODE_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\code-context.png</object>
   <object class="wxBitmap" name="BMP_GENERAL_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-inactive.png</object>
   <object class="wxBitmap" name="BMP_HIDE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_up.png</object>
@@ -138,9 +135,6 @@
   <object class="wxBitmap" name="BMP_MINUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-low (2).png</object>
   <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full.png</object>
-  <object class="wxBitmap" name="BMP_NOT_FROZEN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-find_and_replace.png</object>
-  <object class="wxBitmap" name="BMP_NOT_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-find_and_replace@2x.png</object>
-  <object class="wxBitmap" name="BMP_NOT_FROZEN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-find_and_replace@2x.png</object>
   <object class="wxBitmap" name="BMP_NO_WPT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
@@ -287,7 +281,6 @@
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>
   <object class="wxBitmap" name="view-orientation">bitmaps\view-orientation.png</object>
   <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
-  <object class="wxBitmap" name="weather-freezing-rain">bitmaps\weather-freezing-rain.png</object>
   <object class="wxBitmap" name="window-close-3">bitmaps\window-close-3.png</object>
   <object class="wxBitmap" name="workspace">bitmaps\workspace.png</object>
 </resource>

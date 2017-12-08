@@ -43,3 +43,4 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p) {
 	os << wxString::Format("%10.3lf,%10.3lf ", p.x, p.y);
 	return os;
 }
+
