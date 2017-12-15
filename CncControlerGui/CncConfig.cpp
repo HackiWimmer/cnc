@@ -121,33 +121,16 @@ void CncConfig::broadcastConfigUpdateNotification() {
 	}
 }
 ////////////////////////////////////////////////////////////////////////
-const unsigned int CncConfig::calcSpeedOffsetX(double s) {
-////////////////////////////////////////////////////////////////////////
-	CncSpeedCalculator scX(getPitchX(), getStepsX(), getPulsWidthOffsetX());
-	return scX.calcSpeedOffset(s);
-}
-////////////////////////////////////////////////////////////////////////
-const unsigned int CncConfig::calcSpeedOffsetY(double s) {
-////////////////////////////////////////////////////////////////////////
-	CncSpeedCalculator scY(getPitchY(), getStepsY(), getPulsWidthOffsetY());
-	return scY.calcSpeedOffset(s);
-}
-////////////////////////////////////////////////////////////////////////
-const unsigned int CncConfig::calcSpeedOffsetZ(double s) {
-////////////////////////////////////////////////////////////////////////
-	CncSpeedCalculator scZ(getPitchZ(), getStepsZ(), getPulsWidthOffsetZ());
-	return scZ.calcSpeedOffset(s);
-}
-////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
-	CncSpeedCalculator scX(getPitchX(), getStepsX(), getPulsWidthOffsetX());
-	CncSpeedCalculator scY(getPitchY(), getStepsY(), getPulsWidthOffsetY());
-	CncSpeedCalculator scZ(getPitchZ(), getStepsZ(), getPulsWidthOffsetZ());
+	CncSpeedManager csm(40,
+						getPitchX(), getStepsX(), 2 * getPulsWidthOffsetX(),
+						getPitchY(), getStepsY(), 2 * getPulsWidthOffsetY(),
+						getPitchZ(), getStepsZ(), 2 * getPulsWidthOffsetZ());
 	
-	double maxSpeedX = scX.getMaxSpeed_MM_MIN();
-	double maxSpeedY = scY.getMaxSpeed_MM_MIN();
-	double maxSpeedZ = scZ.getMaxSpeed_MM_MIN();
+	double maxSpeedX = csm.getMaxSpeedX_MM_MIN();
+	double maxSpeedY = csm.getMaxSpeedY_MM_MIN();
+	double maxSpeedZ = csm.getMaxSpeedZ_MM_MIN();
 	
 	double smallestMaxSpeed = std::min(maxSpeedX, maxSpeedY);
 	smallestMaxSpeed = std::min(smallestMaxSpeed, maxSpeedZ);

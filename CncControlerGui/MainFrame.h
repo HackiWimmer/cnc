@@ -72,6 +72,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onPaintSpeedPanel(wxPaintEvent& event);
 		virtual void clearMotionMonitorVecties(wxCommandEvent& event);
 		virtual void copyMotionMonitorVecties(wxCommandEvent& event);
 		virtual void traceMotionMonitorVecties(wxCommandEvent& event);

@@ -583,14 +583,6 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value) {
 	speedType = s;
 	feedSpeed_MM_MIN = value;
 	processSetter(PID_SPEED_MM_MIN, (long)(feedSpeed_MM_MIN * DBL_FACT));
-	
-	/*
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SpeedEvent(getRpmSpeedX(), getRpmSpeedY(), getRpmSpeedZ()));
-	*/
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(CncSpeed s, double value) {

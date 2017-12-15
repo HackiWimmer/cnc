@@ -229,9 +229,6 @@ class CncConfig {
 		const unsigned int getMultiplierZ();
 		const unsigned int getMaxDurations() 					{ return maxDurations; }
 		const unsigned int getDurationCount() 					{ return durationCount; }
-		const unsigned int calcSpeedOffsetX(double s);
-		const unsigned int calcSpeedOffsetY(double s);
-		const unsigned int calcSpeedOffsetZ(double s);
 		
 		const double getMaxDimension();
 		const double getMaxDimensionX();

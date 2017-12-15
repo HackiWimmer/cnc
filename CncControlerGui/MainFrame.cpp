@@ -63,6 +63,8 @@ const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 #else
 	const char* _programVersion = "0.8.1.r";
 #endif
+
+const char* _maxSpeedLabel		= "<{MAX}>";
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -579,6 +581,34 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
+///////////////////////////////////////////////////////////////////
+	static wxColour col(0, 128, 255);
+	static wxBrush  brush(col);
+	static wxPen    pen(col, 1, wxSOLID);
+	static unsigned int lastSpeedPos = 0;
+	
+	const wxSize size   = m_speedPanel->GetSize();
+	unsigned int pos    = size.GetWidth();
+	unsigned int height = size.GetHeight();
+	
+	if ( GBL_CONFIG->isProbeMode() == false ) 
+		pos *= cnc->getSerial()->getCurrentFeedSpeed() / GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+	
+	// avoid duplicate drawing
+	if ( pos == lastSpeedPos )
+		;//return;
+	
+	lastSpeedPos = pos;
+	
+	wxPaintDC dc(m_speedPanel);
+	dc.SetPen(pen);
+	dc.SetBrush(brush);
+	
+	wxRect rect(0, 0, pos, height);
+	dc.DrawRectangle(rect);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::onThreadAppPosUpdate(UpdateManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc == NULL )
@@ -624,9 +654,6 @@ void MainFrame::onThreadCtlPosUpdate(UpdateManagerEvent& event) {
 						break;
 	}
 	
-	// feed speed
-	m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
-	
 	// update z view
 	m_zView->updateView(cnc->getCurCtlPos().getZ() * GBL_CONFIG->getDisplayFactZ(unit));
 }
@@ -667,7 +694,7 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 		m_positionSpyCount->ChangeValue(CncNumberFormatter::toString(((long)(positionSpy->GetItemCount()))));
 		m_positionSpyCount->SetToolTip(m_positionSpyCount->GetLabel());
 	}
-		
+	
 	// update time consumed
 	if ( pngAnimation && pngAnimation->IsRunning() ) {
 		logTimeConsumed();
@@ -680,6 +707,13 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 	   ) {
 		logStatistics();
 	   }
+	   
+	// feed speed control + feed speed panel
+	m_speedPanel->Refresh();
+	m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
+
+	if ( GBL_CONFIG->isProbeMode() == true )
+		m_feedSpeed->ChangeValue(_maxSpeedLabel);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onThreadDispatchAll(UpdateManagerEvent& event) {
@@ -1180,7 +1214,8 @@ void MainFrame::initialize(void) {
 	enableManuallyControls();
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
-
+	
+	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
 	
 	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
 	decorateTestSuiteParameters();
@@ -3182,7 +3217,7 @@ void MainFrame::logStatistics() {
 		
 	CncDoublePosition min(cnc->getMinPositionsMetric());
 	CncDoublePosition max(cnc->getMaxPositionsMetric());
-	long measurementTimeSpan = cnc->getSerial()->getMeasurementTimeSpan();
+	CncNanoTimespan measurementTimeSpan = cnc->getSerial()->getMeasurementNanoTimeSpanTotal();
 	
 	double elapsedTimeMSEC	= 0.0;
 	double elapsedTimeSEC	= 0.0;
@@ -3190,10 +3225,16 @@ void MainFrame::logStatistics() {
 	double speed_MM_SEC		= 0.0;
 	
 	if ( measurementTimeSpan > 0L ) {
-		elapsedTimeMSEC = measurementTimeSpan / 1000;
-		elapsedTimeSEC  = elapsedTimeMSEC / 1000;
+		elapsedTimeMSEC = measurementTimeSpan / (1000.0 * 1000.0);
+		elapsedTimeSEC  = elapsedTimeMSEC / (1000.0);
 		speed_MM_SEC 	= cnc->getSerial()->getTotalDistance() / elapsedTimeSEC;
 		speed_MM_MIN 	= speed_MM_SEC * 60;
+	}
+	
+	wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel);
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		speedMMMIN.assign( CncNumberFormatter::toString(speed_MM_MIN, 1));
+		speedMMSEC.assign( CncNumberFormatter::toString(speed_MM_SEC, 1));
 	}
 	
 	// statistic keys
@@ -3203,7 +3244,7 @@ void MainFrame::logStatistics() {
 	static const char* SKEY_POS_CNT		= "Position count";
 	static const char* SKEY_DISTANCE 	= "Distance";
 	static const char* SKEY_TIME 		= "Time consumend";
-	static const char* SKEY_SPEED 		= "Feed speed";
+	static const char* SKEY_SPEED 		= "Feed speed AVG";
 	
 	// add rows - ones a time
 	if ( statisticSummaryListCtrl->getItemCount() == 0 ) {
@@ -3249,8 +3290,8 @@ void MainFrame::logStatistics() {
 	
 	statisticSummaryListCtrl->updateValues(SKEY_SPEED		, _("")
 															, _("")
-															, CncNumberFormatter::toString(speed_MM_SEC, 1)
-															, CncNumberFormatter::toString(speed_MM_MIN, 1));
+															, speedMMSEC
+															, speedMMMIN);
 	
 	statisticSummaryListCtrl->Refresh();
 	statisticSummaryListCtrl->Update();
@@ -6839,14 +6880,22 @@ void MainFrame::decodrateProbeMode(bool probeMode) {
 	if ( probeMode == true ) {
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_PROBE"));
 		m_btProbeMode->SetToolTip("Probe mode on");
+		m_probeModePanel->SetBackgroundColour(wxColour(255, 210, 210));
+		m_probeModeLabel->SetLabel("Probe mode: On");
+		
 	} else {
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_RELEASE"));
 		m_btProbeMode->SetToolTip("Probe mode off");
+		m_probeModePanel->SetBackgroundColour(wxColour(192, 192, 192));
+		m_probeModeLabel->SetLabel("Probe mode: Off");
 	}
 	
 	m_btProbeMode->SetValue(probeMode);
 	m_btProbeMode->Refresh();
 	m_btProbeMode->Update();
+	
+	m_probeModePanel->Refresh();
+	m_probeModePanel->Update();
 	
 	GBL_CONFIG->setProbeMode(probeMode);
 }

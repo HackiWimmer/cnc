@@ -2,18 +2,18 @@
 <CodeLite_Project Name="Experiments" Version="10.0.0" InternalType="Console">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00010001N0005Debug000000000000]]>
+      <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
     </Plugin>
   </Plugins>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
-    <File Name="main.cpp" ExcludeProjConfig=""/>
+    <File Name="main.cpp" ExcludeProjConfig="Release"/>
     <File Name="../CncControlerGui/CncCommon.cpp"/>
     <File Name="../CncControlerGui/CncCommon.h"/>
-    <File Name="mani2.cpp" ExcludeProjConfig="Debug"/>
     <File Name="../CncControlerGui/CncTimeFunctions.cpp"/>
     <File Name="../CncControlerGui/CncTimeFunctions.h"/>
+    <File Name="mainx.cpp"/>
   </VirtualDirectory>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -66,6 +66,7 @@
     </Configuration>
     <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-O2;-Wall;$(shell wx-config --cxxflags --unicode=yes --debug=no)" C_Options="-O2;-Wall;$(shell wx-config --cxxflags --unicode=yes --debug=no)" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui"/>
         <Preprocessor Value="NDEBUG"/>
       </Compiler>
       <Linker Options="-s;$(shell wx-config --debug=no --libs --unicode=yes)" Required="yes"/>

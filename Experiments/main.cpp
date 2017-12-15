@@ -57,7 +57,7 @@ void test2(CncSpeedCalculator& scx) {
 	unsigned int offset = scx.calcSpeedOffset(s);
 	clog << "Offset          = " << offset << endl;
 	
-	CncTimestamp tsStart = CncTimeFunctions::getMicrosecondTimestamp();
+	CncNanoTimestamp tsStart = CncTimeFunctions::getNanoTimestamp();
 	
 	for (unsigned int i = 0; i < stg; i++ ) {
 		digitalWrite(scx.getSinglePulseWidth());
@@ -66,7 +66,7 @@ void test2(CncSpeedCalculator& scx) {
 		
 		digitalWrite(scx.getSinglePulseWidth());
 	}
-	CncTimestamp tsStop = CncTimeFunctions::getMicrosecondTimestamp();
+	CncNanoTimestamp tsStop = CncTimeFunctions::getNanoTimestamp();
 	long duration = (tsStop - tsStart);
 	
 	clog << "Duration        = " << duration << ", " << ((double)(duration) / 1000) << ", " << ((double)duration) / (1000 * 1000) << endl;
@@ -80,9 +80,9 @@ void test3(CncSpeedCalculator& scx) {
 ///////////////////////////////////////////////////////////////////
 	std::clog << "::Test3 start ----------------------------------------" << std::endl;
 	
-	CncTimestamp tsStart = CncTimeFunctions::getMicrosecondTimestamp();
+	CncNanoTimestamp tsStart = CncTimeFunctions::getNanoTimestamp();
 	CncTimeFunctions::busyWaitMircoseconds(100);
-	CncTimestamp tsStop  = CncTimeFunctions::getMicrosecondTimestamp();
+	CncNanoTimestamp tsStop  = CncTimeFunctions::getNanoTimestamp();
 	
 	clog << "Start           = " << tsStart << endl;
 	clog << "Stop            = " << tsStop  << endl;

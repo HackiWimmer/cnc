@@ -88,14 +88,6 @@
             </tooltip>
             <default>0</default>
           </object>
-          <object class="wxBitmapToggleButton" name="m_btProbeMode">
-            <style>wxBU_EXACTFIT|wxBU_BOTTOM</style>
-            <bitmap>bitmaps/feed.png</bitmap>
-            <tooltip>
-              <![CDATA[Probe mode ...]]>
-            </tooltip>
-            <checked>1</checked>
-          </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_btSelectReferences">
             <bitmap>bitmaps/view-orientation.png</bitmap>
@@ -4935,14 +4927,25 @@ Interval [ms]:</label>
                                                       </object>
                                                     </object>
                                                   </object>
-                                                  <object class="sizeritem">
+                                                  <object class="sizeritem" name="flexGridSizer4973">
                                                     <flag>wxALL|wxEXPAND</flag>
-                                                    <object class="wxPanel" name="m_drawPane3D">
-                                                      <style/>
-                                                      <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                      <tooltip>
-                                                        <![CDATA[OpenGl Control placeholder]]>
-                                                      </tooltip>
+                                                    <object class="wxFlexGridSizer">
+                                                      <cols>1</cols>
+                                                      <rows>1</rows>
+                                                      <vgap>0</vgap>
+                                                      <hgap>0</hgap>
+                                                      <growablecols>0</growablecols>
+                                                      <growablerows>0</growablerows>
+                                                      <object class="sizeritem">
+                                                        <flag>wxALL|wxEXPAND</flag>
+                                                        <object class="wxPanel" name="m_drawPane3D">
+                                                          <style/>
+                                                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                                          <tooltip>
+                                                            <![CDATA[OpenGl Control placeholder]]>
+                                                          </tooltip>
+                                                        </object>
+                                                      </object>
                                                     </object>
                                                   </object>
                                                   <object class="sizeritem" name="flexGridSizer4867">
@@ -4983,7 +4986,7 @@ Interval [ms]:</label>
                                                   <object class="sizeritem" name="flexGridSizer4901">
                                                     <flag>wxALL|wxEXPAND</flag>
                                                     <object class="wxFlexGridSizer">
-                                                      <cols>2</cols>
+                                                      <cols>3</cols>
                                                       <rows>1</rows>
                                                       <vgap>0</vgap>
                                                       <hgap>0</hgap>
@@ -5025,6 +5028,65 @@ Interval [ms]:</label>
                                                                 <underlined>0</underlined>
                                                                 <face>Segoe UI</face>
                                                               </font>
+                                                            </object>
+                                                          </object>
+                                                        </object>
+                                                      </object>
+                                                      <object class="sizeritem" name="flexGridSizer4961">
+                                                        <flag>wxALL|wxEXPAND</flag>
+                                                        <option>1</option>
+                                                        <object class="wxFlexGridSizer">
+                                                          <cols>1</cols>
+                                                          <rows>1</rows>
+                                                          <vgap>0</vgap>
+                                                          <hgap>0</hgap>
+                                                          <growablecols>0</growablecols>
+                                                          <growablerows>0</growablerows>
+                                                          <object class="sizeritem">
+                                                            <flag>wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL</flag>
+                                                            <border>3</border>
+                                                            <minsize>-1,24</minsize>
+                                                            <object class="wxPanel" name="m_probeModePanel">
+                                                              <style>wxTAB_TRAVERSAL</style>
+                                                              <size>-1,24</size>
+                                                              <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                                                              <object class="wxFlexGridSizer">
+                                                                <minsize>-1,24</minsize>
+                                                                <cols>2</cols>
+                                                                <rows>1</rows>
+                                                                <vgap>0</vgap>
+                                                                <hgap>0</hgap>
+                                                                <growablecols>1</growablecols>
+                                                                <growablerows>0</growablerows>
+                                                                <object class="sizeritem">
+                                                                  <flag>wxALL</flag>
+                                                                  <border>1</border>
+                                                                  <object class="wxBitmapToggleButton" name="m_btProbeMode">
+                                                                    <style>wxBU_EXACTFIT|wxBU_BOTTOM</style>
+                                                                    <bitmap>bitmaps/feed.png</bitmap>
+                                                                    <tooltip>
+                                                                      <![CDATA[Probe mode ...]]>
+                                                                    </tooltip>
+                                                                    <checked>1</checked>
+                                                                  </object>
+                                                                </object>
+                                                                <object class="sizeritem">
+                                                                  <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+                                                                  <border>5</border>
+                                                                  <object class="wxStaticText" name="m_probeModeLabel">
+                                                                    <label>Probe Mode</label>
+                                                                    <style/>
+                                                                    <font>
+                                                                      <size>9</size>
+                                                                      <style>normal</style>
+                                                                      <weight>bold</weight>
+                                                                      <family>swiss</family>
+                                                                      <underlined>0</underlined>
+                                                                      <face>Segoe UI</face>
+                                                                    </font>
+                                                                  </object>
+                                                                </object>
+                                                              </object>
                                                             </object>
                                                           </object>
                                                         </object>
@@ -7034,9 +7096,9 @@ Interval [ms]:</label>
         <resizable>1</resizable>
         <movable>1</movable>
         <floatable>1</floatable>
-        <best_size>384,140</best_size>
-        <max_size>384,140</max_size>
-        <min_size>384,140</min_size>
+        <best_size>384,40</best_size>
+        <max_size>384,40</max_size>
+        <min_size>384,40</min_size>
         <bottom>1</bottom>
         <layer>0</layer>
         <row>1</row>
@@ -7051,7 +7113,7 @@ Interval [ms]:</label>
           <object class="wxFlexGridSizer">
             <minsize>284,140</minsize>
             <cols>1</cols>
-            <rows>2</rows>
+            <rows>3</rows>
             <vgap>0</vgap>
             <hgap>0</hgap>
             <growablecols>0</growablecols>
@@ -7221,7 +7283,7 @@ Interval [ms]:</label>
                   <border>1</border>
                   <object class="wxFlexGridSizer">
                     <cols>1</cols>
-                    <rows>1</rows>
+                    <rows>2</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
                     <growablecols>0</growablecols>
@@ -7229,9 +7291,21 @@ Interval [ms]:</label>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
                       <object class="wxListCtrl" name="m_positionSpy">
-                        <style>wxLC_REPORT</style>
+                        <style/>
                         <tooltip>
                           <![CDATA[Only a placeholder]]>
+                        </tooltip>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <minsize>-1,5</minsize>
+                      <object class="wxPanel" name="m_speedPanel">
+                        <style>wxTAB_TRAVERSAL</style>
+                        <size>-1,5</size>
+                        <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                        <tooltip>
+                          <![CDATA[Feed Speed]]>
                         </tooltip>
                       </object>
                     </object>
@@ -7245,7 +7319,7 @@ Interval [ms]:</label>
                     <rows>4</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
-                    <growablecols/>
+                    <growablecols>1</growablecols>
                     <growablerows/>
                     <object class="sizeritem">
                       <flag>wxALL</flag>

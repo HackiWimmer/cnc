@@ -24,15 +24,15 @@
 #include <wx/toolbar.h>
 #include <wx/stattext.h>
 #include <wx/bmpcbox.h>
-#include <wx/tglbtn.h>
-#include <wx/button.h>
 #include <wx/slider.h>
+#include <wx/button.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
 #include <wx/arrstr.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statline.h>
+#include <wx/tglbtn.h>
 #include <wx/notebook.h>
 #include <wx/stc/stc.h>
 #include <wx/statbmp.h>
@@ -90,7 +90,6 @@ protected:
     wxBitmapButton* m_searchConnections;
     wxBitmapComboBox* m_portSelector;
     wxBitmapButton* m_connect;
-    wxBitmapToggleButton* m_btProbeMode;
     wxBitmapButton* m_btSelectReferences;
     wxBitmapButton* m_btSelectManuallyMove;
     wxBitmapButton* m_btSelectSetup;
@@ -416,6 +415,9 @@ protected:
     wxPanel* m_3DOutboundStatistics;
     wxButton* m_btShowHideStatistics;
     wxStaticText* m_staticText4884;
+    wxPanel* m_probeModePanel;
+    wxBitmapToggleButton* m_btProbeMode;
+    wxStaticText* m_probeModeLabel;
     wxStaticText* m_staticText1128;
     wxTextCtrl* m_crossings;
     wxStaticText* m_staticText1966;
@@ -536,6 +538,7 @@ protected:
     wxStaticText* m_staticText4526;
     wxTextCtrl* m_positionSpyCount;
     wxListCtrl* m_positionSpy;
+    wxPanel* m_speedPanel;
     wxBitmapButton* m_bmpButton47181;
     wxBitmapButton* m_bmpButton4718;
     wxBitmapButton* m_bmpButton47182;
@@ -638,7 +641,6 @@ protected:
     virtual void searchAvailiablePorts(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
-    virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectReferences(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectManuallyMove(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectSetup(wxCommandEvent& event) { event.Skip(); }
@@ -770,6 +772,7 @@ protected:
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void toggleMonitorStatistics(wxCommandEvent& event) { event.Skip(); }
+    virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
     virtual void copyMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
     virtual void traceMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
@@ -817,6 +820,7 @@ protected:
     virtual void searchPosSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPositionSpyContent(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPaintSpeedPanel(wxPaintEvent& event) { event.Skip(); }
     virtual void goPosSypFirstId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypLastId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypPrevId(wxCommandEvent& event) { event.Skip(); }
@@ -889,7 +893,6 @@ public:
     wxBitmapButton* GetSearchConnections() { return m_searchConnections; }
     wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
     wxBitmapButton* GetConnect() { return m_connect; }
-    wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
     wxBitmapButton* GetBtSelectReferences() { return m_btSelectReferences; }
     wxBitmapButton* GetBtSelectManuallyMove() { return m_btSelectManuallyMove; }
     wxBitmapButton* GetBtSelectSetup() { return m_btSelectSetup; }
@@ -1207,6 +1210,9 @@ public:
     wxPanel* Get3DOutboundControl() { return m_3DOutboundControl; }
     wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
     wxStaticText* GetStaticText4884() { return m_staticText4884; }
+    wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
+    wxStaticText* GetProbeModeLabel() { return m_probeModeLabel; }
+    wxPanel* GetProbeModePanel() { return m_probeModePanel; }
     wxStaticText* GetStaticText1128() { return m_staticText1128; }
     wxTextCtrl* GetCrossings() { return m_crossings; }
     wxStaticText* GetStaticText1966() { return m_staticText1966; }
@@ -1329,6 +1335,7 @@ public:
     wxStaticText* GetStaticText4526() { return m_staticText4526; }
     wxTextCtrl* GetPositionSpyCount() { return m_positionSpyCount; }
     wxListCtrl* GetPositionSpy() { return m_positionSpy; }
+    wxPanel* GetSpeedPanel() { return m_speedPanel; }
     wxBitmapButton* GetBmpButton47181() { return m_bmpButton47181; }
     wxBitmapButton* GetBmpButton4718() { return m_bmpButton4718; }
     wxBitmapButton* GetBmpButton47182() { return m_bmpButton47182; }

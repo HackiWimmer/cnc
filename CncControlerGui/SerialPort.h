@@ -122,8 +122,12 @@ class Serial {
 	private:
 		// total distance
 		double totalDistance[4];
-		CncTimestamp tsMeasurementStart;
-		CncTimestamp tsMeasurementLast;
+		double totalDistanceRef;
+		double currentFeedSpeed;
+		CncLongPosition measurementRefPos;
+		CncNanoTimestamp tsMeasurementStart;
+		CncNanoTimestamp tsMeasurementRef;
+		CncNanoTimestamp tsMeasurementLast;
 		
 	protected:
 		//Serial com handler
@@ -196,10 +200,18 @@ class Serial {
 		void setLastFetchType(unsigned char ret) { lastFetchResult = ret; }
 		const unsigned char getLastFetchResult() const { return lastFetchResult; }
 		
+		void incTotalDistance(int32_t dx, int32_t dy, int32_t dz);
+		void incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy, int32_t cz);
+		void incTotalDistance(unsigned int size, const int32_t (&values)[3]);
+		
 		void resetTotalDistance() { totalDistance[0] = 0.0; totalDistance[1] = 0.0; totalDistance[2] = 0.0; totalDistance[3] = 0.0;}
-		void logMeasurementTs();
+		void logMeasurementRefTs(const CncLongPosition& pos);
+		void logMeasurementLastTs();
+				
 		virtual void startMeasurementIntern() {}
 		virtual void stopMeasurementIntern() {}
+		
+		bool sendSerialControllrCallback(ContollerInfo& ci);
 		
 	public:
 		//Initialize Serial communication without an acitiv connection 
@@ -292,8 +304,10 @@ class Serial {
 		void startMeasurement();
 		void stopMeasurement();
 		bool isMeasurementActive() const { return measurementActive; }
-		CncTimespan getMeasurementTimeSpan() const;
+		CncNanoTimespan getMeasurementNanoTimeSpanTotal() const;
+		CncNanoTimespan getMeasurementNanoTimeSpanLastRef() const;
 		
+		double getCurrentFeedSpeedAVG();
 		double getCurrentFeedSpeed();
 		double getTotalDistanceX() { return totalDistance[0]; }
 		double getTotalDistanceY() { return totalDistance[1]; }

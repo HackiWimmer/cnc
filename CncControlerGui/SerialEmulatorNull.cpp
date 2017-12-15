@@ -12,13 +12,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
-, minPulseWidthOffsetX(0)
-, minPulseWidthOffsetY(0)
-, minPulseWidthOffsetZ(0)
-, speedOffsetX(0)
-, speedOffsetY(0)
-, speedOffsetZ(0)
-, speed_MM_MIN(1L)
+, speedSimulator(NULL)
 , positionCounter(0)
 , stepCounterX(0)
 , stepCounterY(0)
@@ -30,6 +24,10 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , lastCommand()
 ///////////////////////////////////////////////////////////////////
 {
+	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
+											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), 2 * GBL_CONFIG->getPulsWidthOffsetX(),
+											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), 2 * GBL_CONFIG->getPulsWidthOffsetY(),
+											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), 2 * GBL_CONFIG->getPulsWidthOffsetZ());
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
@@ -38,13 +36,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
-, minPulseWidthOffsetX(0)
-, minPulseWidthOffsetY(0)
-, minPulseWidthOffsetZ(0)
-, speedOffsetX(0)
-, speedOffsetY(0)
-, speedOffsetZ(0)
-, speed_MM_MIN(1L)
+, speedSimulator(NULL)
 , positionCounter(0)
 , stepCounterX(0)
 , stepCounterY(0)
@@ -56,11 +48,18 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , lastCommand()
 ///////////////////////////////////////////////////////////////////
 {
+	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
+											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), 2 * GBL_CONFIG->getPulsWidthOffsetX(),
+											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), 2 * GBL_CONFIG->getPulsWidthOffsetY(),
+											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), 2 * GBL_CONFIG->getPulsWidthOffsetZ());
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::~SerialEmulatorNULL() {
 ///////////////////////////////////////////////////////////////////
+	if ( speedSimulator != NULL )
+		delete speedSimulator;
+		
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
@@ -170,11 +169,6 @@ const char* SerialEmulatorNULL::getConfiguration(wxString& ret) {
 	ret.clear();
 	ret.assign(wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection"));
 
-	// append additional values
-	setterMap[(int)PID_SPEED_OFFSET_X] = speedOffsetX;
-	setterMap[(int)PID_SPEED_OFFSET_Y] = speedOffsetY;
-	setterMap[(int)PID_SPEED_OFFSET_Z] = speedOffsetZ;
-	
 	SetterMap::iterator it;
 	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
 		
@@ -446,14 +440,22 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = val; break;
 			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = val; break;
 			
-			case PID_PULSE_WIDTH_OFFSET_X:	minPulseWidthOffsetX = val; break;
-			case PID_PULSE_WIDTH_OFFSET_Y:	minPulseWidthOffsetY = val; break;
-			case PID_PULSE_WIDTH_OFFSET_Z:	minPulseWidthOffsetZ = val; break;
+			case PID_PITCH_X:
+			case PID_PITCH_Y:
+			case PID_PITCH_Z:
+			case PID_STEPS_X:
+			case PID_STEPS_Y:
+			case PID_STEPS_Z:
+			case PID_PULSE_WIDTH_OFFSET_X:
+			case PID_PULSE_WIDTH_OFFSET_Y:
+			case PID_PULSE_WIDTH_OFFSET_Z:	speedSimulator->setup(	defaultLoopDuration,
+																	GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), 2 * GBL_CONFIG->getPulsWidthOffsetX(),
+																	GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), 2 * GBL_CONFIG->getPulsWidthOffsetY(),
+																	GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), 2 * GBL_CONFIG->getPulsWidthOffsetZ());
+											break;
+
 			
-			case PID_SPEED_MM_MIN: 			speed_MM_MIN = (double)(val/DBL_FACT);
-											speedOffsetX = GBL_CONFIG->calcSpeedOffsetX(speed_MM_MIN);
-											speedOffsetY = GBL_CONFIG->calcSpeedOffsetY(speed_MM_MIN);
-											speedOffsetZ = GBL_CONFIG->calcSpeedOffsetZ(speed_MM_MIN);
+			case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed((double)(val/DBL_FACT));
 											break;
 		}
 		
@@ -574,6 +576,12 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	// update speed simulator values
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		wxASSERT( speedSimulator != NULL );
+		speedSimulator->setNextMove(dx, dy, dz);
+	}
+	
 	// already rendered ?
 	if ( lastCommand.cmd != CMD_RENDER_AND_MOVE )
 		return provideMove(dx, dy, dz, buffer, nbByte, true);
@@ -667,7 +675,14 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *
 	// -------------------------------------------------------------
 	if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte, true) == false )
 		return false;
-		
+	
+	// perform any rest offset
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		wxASSERT( speedSimulator != NULL );
+		speedSimulator->performCurrentOffset(true);
+		speedSimulator->reset();
+	}
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -675,36 +690,27 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 ///////////////////////////////////////////////////////////////////
 	// statistic counting
 	positionCounter++;
-	stepCounterX += abs(dx);
-	stepCounterY += abs(dy);
-	stepCounterZ += abs(dz);
+	stepCounterX += absolute(dx);
+	stepCounterY += absolute(dy);
+	stepCounterZ += absolute(dz);
 	
 	// position management
 	curEmulatorPos.incX(dx);
 	curEmulatorPos.incY(dy);
 	curEmulatorPos.incZ(dz);
-	
+
 	// simulate speed
-	static CncTimestamp tsLastStepX = {0};//CncTimeFunctions::getMicrosecondTimestamp();
-	static CncTimestamp tsLastStepY = {0};//CncTimeFunctions::getMicrosecondTimestamp();
-	static CncTimestamp tsLastStepZ = {0};//CncTimeFunctions::getMicrosecondTimestamp();
-	
-	if ( tsLastStepX == 0LL )	tsLastStepX = CncTimeFunctions::getMicrosecondTimestamp();
-	if ( tsLastStepY == 0LL )	tsLastStepX = CncTimeFunctions::getMicrosecondTimestamp();
-	if ( tsLastStepZ == 0LL )	tsLastStepX = CncTimeFunctions::getMicrosecondTimestamp();
-	
-	
-	if ( stepAxis('X', tsLastStepX, dx, speedOffsetX) == false ) return false;
-	if ( stepAxis('Y', tsLastStepY, dy, speedOffsetY) == false ) return false;
-	if ( stepAxis('Z', tsLastStepZ, dz, speedOffsetZ) == false ) return false;
+	if ( stepAxis('X', dx) == false ) return false;
+	if ( stepAxis('Y', dy) == false ) return false;
+	if ( stepAxis('Z', dz) == false ) return false;
 	
 	// simulate a direct controler callback
 	static CncLongPosition lastReplyPos;
 	CncLongPosition diff(curEmulatorPos - lastReplyPos);
 	
-	if ( abs( diff.getX() ) >= posReplyThresholdX || 
-	     abs( diff.getY() ) >= posReplyThresholdY || 
-		 abs( diff.getZ() ) >= posReplyThresholdZ ||
+	if ( absolute( diff.getX() ) >= posReplyThresholdX || 
+	     absolute( diff.getY() ) >= posReplyThresholdY || 
+		 absolute( diff.getZ() ) >= posReplyThresholdZ ||
 		 force == true ) 
 	{
 		if ( curEmulatorPos != targetMajorPos ) {
@@ -717,7 +723,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 			ci.yCtrlPos = curEmulatorPos.getY();
 			ci.zCtrlPos = curEmulatorPos.getZ();
 			
-			cncControl->SerialControllerCallback(ci);
+			sendSerialControllrCallback(ci);
 			lastReplyPos.set(curEmulatorPos);
 		}
 	}
@@ -731,9 +737,9 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::stepAxis(char axis, CncTimestamp& tsLastStep, int32_t steps, int32_t speedOffset) {
+bool SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
 ///////////////////////////////////////////////////////////////////
-	for ( int32_t i = 0; i < abs(steps); i++ ) {
+	for ( int32_t i = 0; i < absolute(steps); i++ ) {
 		// signal handling
 		switch ( lastSignal ) {
 		
@@ -755,44 +761,28 @@ bool SerialEmulatorNULL::stepAxis(char axis, CncTimestamp& tsLastStep, int32_t s
 		
 		// simulate speed
 		if ( GBL_CONFIG->isProbeMode() == false ) {
+			wxASSERT( speedSimulator != NULL );
+			int32_t val = absolute(steps);
 			
-			unsigned int pulseWidth = 0;
 			switch ( axis ) {
-				case 'X':	pulseWidth = minPulseWidthOffsetX; break;
-				case 'Y':	pulseWidth = minPulseWidthOffsetY; break;
-				case 'Z':	pulseWidth = minPulseWidthOffsetZ; break;
+				case 'X':	if ( absolute(val) > 0 ) speedSimulator->simulateSteppingX(val);
+							break;
+							
+				case 'Y':	if ( absolute(val) > 0 ) speedSimulator->simulateSteppingY(val);
+							break;
+							
+				case 'Z':	if ( absolute(val) > 0 ) speedSimulator->simulateSteppingZ(val);
+							break;
+							
 				default:	wxASSERT(axis != 'X' && axis != 'Y' && axis != 'Z');
+							return false;
 			}
-		
-			digitalWriteHigh(pulseWidth);
-			{
-				while ( (CncTimeFunctions::getMicrosecondTimestamp() - tsLastStep) < speedOffset ) {
-					CncTimeFunctions::busyWaitMircoseconds(1);
-				}
-			}
-			digitalWriteLow(pulseWidth);
 			
-			tsLastStep = CncTimeFunctions::getMicrosecondTimestamp();
+			speedSimulator->performCurrentOffset(false);
 		}
 	}
 	
 	return true;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::digitalWriteLow(unsigned int width) {
-///////////////////////////////////////////////////////////////////
-	if ( width == 0 )
-		return;
-	
-	CncTimeFunctions::busyWaitMircoseconds(width);
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::digitalWriteHigh(unsigned int width) {
-///////////////////////////////////////////////////////////////////
-	if ( width == 0 )
-		return;
-	
-	CncTimeFunctions::busyWaitMircoseconds(width);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, void *buffer, unsigned int nbByte) {

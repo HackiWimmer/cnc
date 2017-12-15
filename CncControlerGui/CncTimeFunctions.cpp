@@ -1,47 +1,76 @@
 #include <iostream>
-#include <windows.h>
+#include "CncConfig.h"
+#include "MainFrame.h"
 #include "CncTimeFunctions.h"
 
+// this have to be done after #include "CncConfig.h"
+#include <Windows.h>
 
-LARGE_INTEGER 	counterFrequency		= { 0 };
-LARGE_INTEGER 	counterReading			= { 0 };
+bool initialized 						= false;
 unsigned int 	countsPerMicrosecond	= 0;
 unsigned int 	countsPerHalfUSec		= 0;
+unsigned int	tickInterval			= 0;
+LARGE_INTEGER 	counterFrequency		= { 0 };
+LARGE_INTEGER 	counterReading			= { 0 };
 time_t 			timeOfDayBase;
 
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::init() {
 ////////////////////////////////////////////////////////////////
-	init_gettimeofday();
-	
+	initialized = true;
 	SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
+
+	QueryPerformanceFrequency(&counterFrequency);
+	
+	countsPerMicrosecond 	= counterFrequency.QuadPart/1000000;
+	countsPerHalfUSec 		= (counterFrequency.QuadPart + 1)/2000000;
+	
+	tickInterval = ((1000.0 * 1000 * 1000)/counterFrequency.QuadPart);
+	
+	LARGE_INTEGER t0, t1;
+	unsigned int diff = 0;
+	unsigned int counter = 0;
+	for ( int i = 0; i < 1000; i++ ) {
+		QueryPerformanceCounter(&t0);
+		QueryPerformanceCounter(&t1);
+		
+		if ( (t1.QuadPart - t0.QuadPart) > 0 ) {
+			diff += (t1.QuadPart - t0.QuadPart);
+			counter++;
+		}
+	}
+	
+	diff /= counter;
+	tickInterval = std::max(tickInterval, tickInterval * diff);
+	
+	init_gettimeofday();
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::init_gettimeofday() {
 ////////////////////////////////////////////////////////////////
 	time_t then;
-	HANDLE curProcess;
-	DWORD priorityOld;
-	int s;
-	
-	QueryPerformanceFrequency (& counterFrequency);
-	countsPerMicrosecond = counterFrequency.QuadPart/1000000;
-	countsPerHalfUSec = (counterFrequency.QuadPart + 1)/2000000;
-	
-	curProcess = GetCurrentProcess();
-	priorityOld = GetPriorityClass(curProcess);
-	s = SetPriorityClass(curProcess, REALTIME_PRIORITY_CLASS);
-	
-	if ( !s )
-		printError("SetPriorityClass failed");
-	
 	time(&then);
 	do {
 		time(&timeOfDayBase);
 	} while (then == timeOfDayBase);
 	
 	QueryPerformanceCounter (&counterReading);
-	SetPriorityClass(curProcess, priorityOld);
+}
+////////////////////////////////////////////////////////////////
+int64_t CncTimeFunctions::getOPCFrequency() {
+////////////////////////////////////////////////////////////////
+	if ( initialized == false )
+		CncTimeFunctions::init();
+
+	return (int64_t)counterFrequency.QuadPart;
+}
+////////////////////////////////////////////////////////////////
+unsigned int CncTimeFunctions::geMaxtQPCResolutionNS() {
+////////////////////////////////////////////////////////////////
+	if ( initialized == false )
+		CncTimeFunctions::init();
+		
+	return tickInterval;
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::printError(const char *tag) {
@@ -61,47 +90,44 @@ void CncTimeFunctions::printError(const char *tag) {
 ////////////////////////////////////////////////////////////////
 int CncTimeFunctions::gettimeofday(struct timeval *tv, void *tz_unused) {
 ////////////////////////////////////////////////////////////////
+	if ( initialized == false )
+		CncTimeFunctions::init();
+
 	LARGE_INTEGER now;
-	BOOL s;
-	long long timeDiff;
+	CncNanoTimestamp timeDiff;
 	
-	if ( countsPerMicrosecond == 0 )
-		CncTimeFunctions::init_gettimeofday();
-	
-	s = QueryPerformanceCounter(&now);
-	
+	QueryPerformanceCounter(&now);
 	timeDiff = now.QuadPart - counterReading.QuadPart;
 	
 	tv->tv_sec  = timeOfDayBase + timeDiff/counterFrequency.QuadPart;
 	tv->tv_usec = ((timeDiff % counterFrequency.QuadPart) + countsPerHalfUSec) / countsPerMicrosecond;
 	
-	/*
-	if ( tv->tv_usec >= 1000 * 1000 ) {
-		//tv->tv_sec++;
-		//tv->tv_usec = 0;
-	}*/
-	
 	if ( tv->tv_usec >= 1000 * 1000 ) {
 		tv->tv_sec  += tv->tv_usec / (1000 * 1000);
 		tv->tv_usec  = tv->tv_usec % (1000 * 1000);
 	}
-	return !s;
+	 
+	return 0;
 }
 ////////////////////////////////////////////////////////////////
-CncTimestamp CncTimeFunctions::getMicrosecondTimestamp() {
+CncNanoTimestamp CncTimeFunctions::getNanoTimestamp() {
 ////////////////////////////////////////////////////////////////
-	struct CncTimeval t;
-	CncTimeFunctions::gettimeofday(&t, NULL);
+	if ( initialized == false )
+		CncTimeFunctions::init();
+
+	LARGE_INTEGER count;
+	QueryPerformanceCounter(&count);
 	
-	return t.getAsTimestamp();
+	time_point tp(duration(count.QuadPart * static_cast<CncNanoTimestamp>(period::den) / counterFrequency.QuadPart));
+	return tp.time_since_epoch().count();
 }
 ////////////////////////////////////////////////////////////////
-CncTimespan CncTimeFunctions::getTimeSpan(const CncTimeval& a, const CncTimeval& b) {
+CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncTimeval& a, const CncTimeval& b) {
 ////////////////////////////////////////////////////////////////
 	return (a.tv_sec * 1000 * 1000 + a.tv_usec - (b.tv_sec * 1000 * 1000 + b.tv_usec));
 }
 ////////////////////////////////////////////////////////////////
-CncTimespan CncTimeFunctions::getTimeSpan(const CncTimestamp& a, const CncTimestamp& b) {
+CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncNanoTimestamp& a, const CncNanoTimestamp& b) {
 ////////////////////////////////////////////////////////////////
 	 return a - b;
 }
@@ -116,4 +142,21 @@ void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 		
 	} while ( (t1.tv_sec * 1000 * 1000 + t1.tv_usec - (t0.tv_sec * 1000 * 1000 + t0.tv_usec)) < (int)micros );
 }
-
+////////////////////////////////////////////////////////////////
+void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
+////////////////////////////////////////////////////////////////
+	HANDLE timer; 
+	LARGE_INTEGER ft; 
+	
+	if ( micros > 2000 ) {
+		GBL_CONFIG->getTheApp()->waitActive(1);
+		micros -= 1000;
+	}
+		
+	// Convert to 100 nanosecond interval, negative value indicates relative time
+	ft.QuadPart = -( 10 * (__int64)micros); 
+	timer = CreateWaitableTimer(NULL, TRUE, NULL); 
+	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0); 
+	WaitForSingleObject(timer, INFINITE); 
+	CloseHandle(timer); 
+}

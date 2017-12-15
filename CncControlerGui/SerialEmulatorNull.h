@@ -3,6 +3,7 @@
 
 #include "SerialSpyPort.h"
 #include "CncArduino.h"
+#include "CncSpeedSimulator.h"
 
 struct LastCommand {
 	unsigned char cmd 		= '\0';
@@ -47,16 +48,14 @@ class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
 		
+		static const unsigned int defaultLoopDuration = 40;
+		
 		int32_t posReplyThresholdX;
 		int32_t posReplyThresholdY;
 		int32_t posReplyThresholdZ;
-		int32_t minPulseWidthOffsetX;
-		int32_t minPulseWidthOffsetY;
-		int32_t minPulseWidthOffsetZ;
-		int32_t speedOffsetX;
-		int32_t speedOffsetY;
-		int32_t speedOffsetZ;
-		double speed_MM_MIN;
+		
+		CncSpeedSimulator* speedSimulator;
+		
 		size_t positionCounter;
 		size_t stepCounterX;
 		size_t stepCounterY;
@@ -71,10 +70,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force=false);
 		
 		inline void reset();
-		
-		inline bool stepAxis(char axis, CncTimestamp& tsLastStep, int32_t dist, int32_t speedOffset);
-		inline void digitalWriteLow(unsigned int width);
-		inline void digitalWriteHigh(unsigned int width);
+		inline bool stepAxis(char axis, int32_t dist);
 		
 	protected:
 		LastCommand lastCommand;

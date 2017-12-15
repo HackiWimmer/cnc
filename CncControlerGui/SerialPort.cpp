@@ -16,7 +16,11 @@ char STATIC_CMD_CHAR[2];
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
 : totalDistance{0.0, 0.0, 0.0, 0.0}
+, totalDistanceRef(0.0)
+, currentFeedSpeed(0.0)
+, measurementRefPos(0, 0, 0)
 , tsMeasurementStart(0LL)
+, tsMeasurementRef(0LL)
 , tsMeasurementLast(0LL)
 , cncControl(cnc)
 , measurementActive(false)
@@ -40,7 +44,11 @@ Serial::Serial(CncControl* cnc)
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(const char *portName)
 : totalDistance{0.0, 0.0, 0.0, 0.0}
+, totalDistanceRef(0.0)
+, currentFeedSpeed(0.0)
+, measurementRefPos(0, 0, 0)
 , tsMeasurementStart(0LL)
+, tsMeasurementRef(0LL)
 , tsMeasurementLast(0LL)
 , measurementActive(false)
 , connected(false)
@@ -76,7 +84,8 @@ void Serial::startMeasurement() {
 	resetStepCounter();
 	resetTotalDistance();
 	
-	tsMeasurementStart = CncTimeFunctions::getMicrosecondTimestamp();
+	tsMeasurementStart = CncTimeFunctions::getNanoTimestamp();
+	tsMeasurementRef   = tsMeasurementStart;
 	tsMeasurementLast  = tsMeasurementStart;
 	startMeasurementIntern();
 }
@@ -86,22 +95,111 @@ void Serial::stopMeasurement() {
 	measurementActive = false;
 	
 	stopMeasurementIntern();
-	logMeasurementTs();
+	logMeasurementLastTs();
+	
+	// reset calculated feed speed
+	currentFeedSpeed = 0.0;
 }
 ///////////////////////////////////////////////////////////////////
-void Serial::logMeasurementTs() {
+void Serial::logMeasurementLastTs() {
 ///////////////////////////////////////////////////////////////////
-	tsMeasurementLast = CncTimeFunctions::getMicrosecondTimestamp();
+	tsMeasurementLast = CncTimeFunctions::getNanoTimestamp();
+	
+	// calculate current feed speed
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		const short T = 3;
+		CncNanoTimestamp tDiff = getMeasurementNanoTimeSpanLastRef();
+		double pDiff           = totalDistance[T] - totalDistanceRef;
+	
+		if ( tDiff > 0 && pDiff > 1.0 ) {
+			currentFeedSpeed  = pDiff;
+			currentFeedSpeed /= tDiff;
+			currentFeedSpeed *= std::nano::den;
+			currentFeedSpeed *= 60;
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
-CncTimespan Serial::getMeasurementTimeSpan() const {
+void Serial::logMeasurementRefTs(const CncLongPosition& pos) {
+///////////////////////////////////////////////////////////////////
+	tsMeasurementRef = CncTimeFunctions::getNanoTimestamp();
+	
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		const short T = 3;
+		totalDistanceRef = totalDistance[T];
+		measurementRefPos.set(pos);
+	}
+}
+///////////////////////////////////////////////////////////////////
+CncNanoTimespan Serial::getMeasurementNanoTimeSpanTotal() const {
 ///////////////////////////////////////////////////////////////////
 	return tsMeasurementLast - tsMeasurementStart;
 }
 ///////////////////////////////////////////////////////////////////
+CncNanoTimespan Serial::getMeasurementNanoTimeSpanLastRef() const {
+///////////////////////////////////////////////////////////////////
+	return tsMeasurementLast - tsMeasurementRef;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::sendSerialControllrCallback(ContollerInfo& ci) {
+///////////////////////////////////////////////////////////////////
+	if ( cncControl == NULL )
+		return false;
+		
+	// provide speed calculation info
+	if ( ci.infoType == CITPosition )
+		incTotalDistance(measurementRefPos, ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
+	
+	return cncControl->SerialControllerCallback(ci);
+}
+///////////////////////////////////////////////////////////////////
+void Serial::incTotalDistance(int32_t dx, int32_t dy, int32_t dz) {
+///////////////////////////////////////////////////////////////////
+	//dx, dy and dz acts as relative coordinates here
+	const short X = 0, Y = 1, Z = 2, T = 3;
+	double x 			 = (absolute(dx) * factorX);
+	double y 			 = (absolute(dy) * factorY);
+	double z 			 = (absolute(dz) * factorZ);
+	double t 			 = sqrt(x*x + y*y + z*z);
+	
+	totalDistance[X] 	+= x;
+	totalDistance[Y] 	+= y;
+	totalDistance[Z] 	+= z;
+	totalDistance[T] 	+= t;
+
+	logMeasurementLastTs();
+}
+///////////////////////////////////////////////////////////////////
+void Serial::incTotalDistance(unsigned int size, const int32_t (&values)[3]) {
+///////////////////////////////////////////////////////////////////
+	switch ( size ) {
+		case 1:		incTotalDistance(0,         0,         values[0]);	break;
+		case 2:		incTotalDistance(values[0], values[1], 0        ); 	break;
+		case 3:		incTotalDistance(values[0], values[1], values[2]); 	break;
+		default:	std::cerr << "Serial::incTotalDistance: Invalid size: " << size << endl;
+	}
+}
+///////////////////////////////////////////////////////////////////
+void Serial::incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy, int32_t cz) {
+///////////////////////////////////////////////////////////////////
+	// pos acts as reference here
+	// cx, cy and cz are absolte coordinates
+	
+	// create relative deltas to make a increment possible
+	incTotalDistance(cx - pos.getX(), cy - pos.getY(), cz - pos.getZ());
+	
+	// adjust ref pos
+	measurementRefPos.setXYZ(cx, cy, cz);
+}
+///////////////////////////////////////////////////////////////////
 double Serial::getCurrentFeedSpeed() {
 ///////////////////////////////////////////////////////////////////
-	if ( getMeasurementTimeSpan() == 0L )
+	return currentFeedSpeed;
+}
+///////////////////////////////////////////////////////////////////
+double Serial::getCurrentFeedSpeedAVG() {
+///////////////////////////////////////////////////////////////////
+	if ( getMeasurementNanoTimeSpanTotal() == 0L )
 		return 0.0;
 	
 	if ( cnc::dblCompareNull(getTotalDistance()) == true )
@@ -111,18 +209,10 @@ double Serial::getCurrentFeedSpeed() {
 		return 0.0;
 	
 	// getTotalDistance()		==> mm
-	// getMeasurementTimeSpan 	==> us
+	// getMeasurementTimeSpan 	==> ns
 	// ret 						==> mm/min
 	
-	/*
-	// debug only
-	static CncTimestamp xxxx =  CncTimeFunctions::getMicrosecondTimestamp();
-	if ( tsMeasurementLast != xxxx ) {
-		clog << tsMeasurementStart << ", " << tsMeasurementLast << ", " << getMeasurementTimeSpan() << endl;
-		xxxx = tsMeasurementLast;
-	}*/
-	
-	double timeSpan = (double)(getMeasurementTimeSpan() / (1000 * 1000));
+	double timeSpan = (double)(getMeasurementNanoTimeSpanTotal() / std::giga::den);
 	if ( cnc::dblCompareNull(timeSpan) == true )
 		return 0.0;
 		
@@ -444,6 +534,7 @@ bool Serial::writeData(void *buffer, unsigned int nbByte) {
 	
 	return true;
 }
+
 ///////////////////////////////////////////////////////////////////
 bool Serial::isConnected() {
 ///////////////////////////////////////////////////////////////////
@@ -972,7 +1063,10 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 		cnc::spy.initializeResult();
 		cnc::spy << "Send: '" << moveCommand[0] << "' [" << ArduinoCMDs::getCMDLabel(moveCommand[0]) << "]\n";
 	}
-		
+	
+	// to provide a time an pos reference for the speed calculation
+	logMeasurementRefTs(pos);
+	
 	if ( writeData(moveCommand, idx) ) {
 		SerialFetchInfo sfi;
 		sfi.command 		= moveCommand[0];
@@ -983,40 +1077,11 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 		sfi.Mc.value2		= values[1];
 		sfi.Mc.value3		= values[2];
 		
-		//std::cout << moveCommand[0] << "," << values[0] << "," << values[1] << "," << values[2] << std::endl;
 		bool ret = evaluateResultWrapper(sfi, std::cout, pos);
-		if ( ret == true ) {
-			// measure total distance
-			double 		x = 0.0, y = 0.0, z = 0.0;
-			const short X = 0, Y = 1, Z = 2, T = 3;
-			switch ( size ) {
-				case 1:			z = (abs(values[0]) * factorZ);
-								totalDistance[Z] += z;
-								totalDistance[T] += z;
-								break;
-								
-				case 2:			x = (abs(values[0]) * factorX);
-								y = (abs(values[1]) * factorY);
-								totalDistance[X] += x;
-								totalDistance[Y] += y;
-								totalDistance[T] += sqrt(x*x + y*y);
-								break;
-								
-				case 3:			x = (abs(values[0]) * factorX);
-								y = (abs(values[1]) * factorY);
-								z = (abs(values[2]) * factorZ);
-								totalDistance[X] += x;
-								totalDistance[Y] += y;
-								totalDistance[Z] += z;
-								totalDistance[T] += sqrt(x*x + y*y + z*z);
-								break;
-			}
-			
-			logMeasurementTs();
-		}
-		
+		// latest log this move
+		logMeasurementLastTs();
 		return ret;
-	
+		
 	} else {
 		std::cerr << "Serial::processMove: Unable to write data" << std::endl;
 		cncControl->SerialCallback(0);
@@ -1428,7 +1493,7 @@ bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 		sfi.Mc.p += LONG_BUF_SIZE;
 	}
 	
-	cncControl->SerialControllerCallback(ci);
+	sendSerialControllrCallback(ci);
 	
 	return true;
 }
@@ -1461,7 +1526,7 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 		sfi.Hc.p += LONG_BUF_SIZE;
 	}
 	
-	cncControl->SerialControllerCallback(ci);
+	sendSerialControllrCallback(ci);
 	
 	return true;
 }
@@ -1496,7 +1561,6 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 		sfi.Lc.p += LONG_BUF_SIZE;
 	}
 	
-	cncControl->SerialControllerCallback(ci);
-
+	sendSerialControllrCallback(ci);
 	return true;
 }

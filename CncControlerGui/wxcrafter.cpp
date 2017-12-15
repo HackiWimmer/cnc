@@ -58,11 +58,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_connect->SetToolTip(_("Connect to mirco controller"));
     m_auibarMain->AddControl(m_connect);
     
-    m_btProbeMode = new wxBitmapToggleButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("feed")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_EXACTFIT|wxBU_BOTTOM);
-    m_btProbeMode->SetToolTip(_("Probe mode ..."));
-    m_btProbeMode->SetValue(true);
-    m_auibarMain->AddControl(m_btProbeMode);
-    
     m_auibarMain->AddSeparator();
     
     m_btSelectReferences = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-orientation")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
@@ -2822,11 +2817,19 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer48671->Add(m_staticText4875, 0, wxALL, WXC_FROM_DIP(0));
     
+    wxFlexGridSizer* flexGridSizer4973 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer4973->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4973->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4973->AddGrowableCol(0);
+    flexGridSizer4973->AddGrowableRow(0);
+    
+    flexGridSizer2360->Add(flexGridSizer4973, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     m_drawPane3D = new wxPanel(m_3DOutboundControl, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DOutboundControl, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_drawPane3D->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_drawPane3D->SetToolTip(_("OpenGl Control placeholder"));
     
-    flexGridSizer2360->Add(m_drawPane3D, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer4973->Add(m_drawPane3D, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer4867 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer4867->SetFlexibleDirection( wxBOTH );
@@ -2853,7 +2856,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer4888->AddGrowableRow(1);
     m_3DOutboundStatistics->SetSizer(flexGridSizer4888);
     
-    wxFlexGridSizer* flexGridSizer4901 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer4901 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer4901->SetFlexibleDirection( wxBOTH );
     flexGridSizer4901->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4901->AddGrowableCol(1);
@@ -2877,6 +2880,39 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText4884->SetFont(m_staticText4884Font);
     
     flexGridSizer4902->Add(m_staticText4884, 0, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(4));
+    
+    wxFlexGridSizer* flexGridSizer4961 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer4961->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4961->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4961->AddGrowableCol(0);
+    flexGridSizer4961->AddGrowableRow(0);
+    
+    flexGridSizer4901->Add(flexGridSizer4961, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_probeModePanel = new wxPanel(m_3DOutboundStatistics, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_3DOutboundStatistics, wxSize(-1,24)), wxTAB_TRAVERSAL);
+    m_probeModePanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer4961->Add(m_probeModePanel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, WXC_FROM_DIP(3));
+    
+    wxFlexGridSizer* flexGridSizer4965 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer4965->SetFlexibleDirection( wxBOTH );
+    flexGridSizer4965->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4965->AddGrowableCol(1);
+    flexGridSizer4965->AddGrowableRow(0);
+    m_probeModePanel->SetSizer(flexGridSizer4965);
+    
+    m_btProbeMode = new wxBitmapToggleButton(m_probeModePanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("feed")), wxDefaultPosition, wxDLG_UNIT(m_probeModePanel, wxSize(-1,-1)), wxBU_EXACTFIT|wxBU_BOTTOM);
+    m_btProbeMode->SetToolTip(_("Probe mode ..."));
+    m_btProbeMode->SetValue(true);
+    
+    flexGridSizer4965->Add(m_btProbeMode, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_probeModeLabel = new wxStaticText(m_probeModePanel, wxID_ANY, _("Probe Mode"), wxDefaultPosition, wxDLG_UNIT(m_probeModePanel, wxSize(-1,-1)), 0);
+    wxFont m_probeModeLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_probeModeLabel->SetFont(m_probeModeLabelFont);
+    
+    flexGridSizer4965->Add(m_probeModeLabel, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    m_probeModePanel->SetMinSize(wxSize(-1,24));
     
     wxFlexGridSizer* flexGridSizer2803 = new wxFlexGridSizer(1, 4, 0, 0);
     flexGridSizer2803->SetFlexibleDirection( wxBOTH );
@@ -3984,10 +4020,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_positionMonitorView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(284,140)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_positionMonitorView, wxAuiPaneInfo().Name(wxT("PositionMonitor")).Caption(_("CNC Position Monitor")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(384,140).MinSize(384,140).MaxSize(384,140).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_positionMonitorView, wxAuiPaneInfo().Name(wxT("PositionMonitor")).Caption(_("CNC Position Monitor")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(384,40).MinSize(384,40).MaxSize(384,40).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     m_auimgrMain->Update();
     
-    wxFlexGridSizer* flexGridSizer4480 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer4480 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer4480->SetFlexibleDirection( wxBOTH );
     flexGridSizer4480->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4480->AddGrowableCol(0);
@@ -4082,7 +4118,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4480->Add(flexGridSizer4714, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer4711 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer4711 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer4711->SetFlexibleDirection( wxBOTH );
     flexGridSizer4711->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4711->AddGrowableCol(0);
@@ -4090,14 +4126,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4714->Add(flexGridSizer4711, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_positionSpy = new wxListCtrl(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxLC_REPORT);
+    m_positionSpy = new wxListCtrl(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), 0);
     m_positionSpy->SetToolTip(_("Only a placeholder"));
     
     flexGridSizer4711->Add(m_positionSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
+    m_speedPanel = new wxPanel(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,5)), wxTAB_TRAVERSAL);
+    m_speedPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    m_speedPanel->SetToolTip(_("Feed Speed"));
+    
+    flexGridSizer4711->Add(m_speedPanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_speedPanel->SetMinSize(wxSize(-1,5));
+    
     wxFlexGridSizer* flexGridSizer4716 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer4716->SetFlexibleDirection( wxBOTH );
     flexGridSizer4716->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4716->AddGrowableCol(1);
     
     flexGridSizer4714->Add(flexGridSizer4716, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -4513,7 +4557,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_searchConnections->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
-    m_btProbeMode->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
     m_btSelectReferences->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectReferences), NULL, this);
     m_btSelectManuallyMove->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
     m_btSelectSetup->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
@@ -4648,6 +4691,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_displayInterval->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::displayIntervalChanged), NULL, this);
     m_displayInterval->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::displayIntervalKeyDown), NULL, this);
     m_btShowHideStatistics->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleMonitorStatistics), NULL, this);
+    m_btProbeMode->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
     m_3D_Trace3->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitorVecties), NULL, this);
     m_3D_Trace4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyMotionMonitorVecties), NULL, this);
     m_3D_Trace->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::traceMotionMonitorVecties), NULL, this);
@@ -4704,6 +4748,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btSearchPosSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchPosSpy), NULL, this);
     m_btClearPositionSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     m_cbContentPosSpy->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPositionSpyContent), NULL, this);
+    m_speedPanel->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
     m_bmpButton47181->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypFirstId), NULL, this);
     m_bmpButton4718->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypLastId), NULL, this);
     m_bmpButton47182->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);
@@ -4787,7 +4832,6 @@ MainFrameBClass::~MainFrameBClass()
     m_searchConnections->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchAvailiablePorts), NULL, this);
     m_portSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPort), NULL, this);
     m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connect), NULL, this);
-    m_btProbeMode->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
     m_btSelectReferences->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectReferences), NULL, this);
     m_btSelectManuallyMove->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
     m_btSelectSetup->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
@@ -4922,6 +4966,7 @@ MainFrameBClass::~MainFrameBClass()
     m_displayInterval->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::displayIntervalChanged), NULL, this);
     m_displayInterval->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::displayIntervalKeyDown), NULL, this);
     m_btShowHideStatistics->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleMonitorStatistics), NULL, this);
+    m_btProbeMode->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
     m_3D_Trace3->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitorVecties), NULL, this);
     m_3D_Trace4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyMotionMonitorVecties), NULL, this);
     m_3D_Trace->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::traceMotionMonitorVecties), NULL, this);
@@ -4978,6 +5023,7 @@ MainFrameBClass::~MainFrameBClass()
     m_btSearchPosSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::searchPosSpy), NULL, this);
     m_btClearPositionSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearPositionSpy), NULL, this);
     m_cbContentPosSpy->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPositionSpyContent), NULL, this);
+    m_speedPanel->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
     m_bmpButton47181->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypFirstId), NULL, this);
     m_bmpButton4718->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypLastId), NULL, this);
     m_bmpButton47182->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);

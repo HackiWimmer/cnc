@@ -41,8 +41,9 @@ bool GCodePathHandlerBase::processRapidLinearMove(GCodeBlock& gcb) {
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
 	
-	changeCurrentFeedSpeedXYZ(CncSpeed::CncSpeedRapid, gcb.getCurrentFeedSpeed());
-				
+	//changeCurrentFeedSpeedXYZ(CncSpeed::CncSpeedRapid, gcb.getCurrentFeedSpeed());
+	changeCurrentFeedSpeedXYZ(CncSpeed::CncSpeedRapid, GBL_CONFIG->getMaxSpeedX_MM_MIN());
+	
 	updateCurrentPosition(gcb);
 	return processLinearMove(false);
 }
@@ -60,7 +61,9 @@ bool GCodePathHandlerBase::processLinearMove(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::processArcMove(GCodeBlock& gcb, bool sweep) {
 //////////////////////////////////////////////////////////////////
-	changeCurrentFeedSpeedXYZ(CncSpeed::CncSpeedWork, gcb.getCurrentFeedSpeed());
+	//changeCurrentFeedSpeedXYZ(CncSpeed::CncSpeedWork, gcb.getCurrentFeedSpeed());
+	// test only
+	changeCurrentFeedSpeedXYZ(CncSpeed::CncSpeedWork, GBL_CONFIG->getMaxSpeedX_MM_MIN());
 	
 	double r  = sqrt(pow(gcb.i, 2) + pow(gcb.j, 2)); // todo relative vs. absolute
 	double ex = gcb.x;
