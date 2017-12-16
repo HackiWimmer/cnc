@@ -185,6 +185,28 @@ int main( int argc, char** argv ) {
 ///////////////////////////////////////////////////////////////////
 	// initialize wxWidgets
 	wxInitializer init;
+
+	unsigned char p1[8];
+	unsigned char p2[8];
+
+	int32_t leLong = 123456;
+	memcpy(p1, &leLong, 4);
+	
+	p1[4] = '\0';
+	
+	
+	int32_t v  = htonl(leLong);
+	memcpy(p2, &v, 4);
+
+	p2[4] = '\0';
+	
+	
+	clog << p1 << endl;
+	clog << p2 << endl;
+	
+
+	return 0;
+
 	
 	CncTimeFunctions::init();
 	clog << "OPC Frequency         [Hz]: " << CncTimeFunctions::getOPCFrequency() << endl;

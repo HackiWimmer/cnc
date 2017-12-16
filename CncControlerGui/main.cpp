@@ -140,6 +140,10 @@ class MainApp : public wxApp {
 			CncFileNameService::init();
 			CncTimeFunctions::init();
 			globalFileConfig = new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
+			
+			// determine assert handler
+			// this show a lot of sizer assert
+			//wxSetDefaultAssertHandler();
 		}
 		
 		///////////////////////////////////////////////////////////
@@ -148,7 +152,7 @@ class MainApp : public wxApp {
 			resetStreamRedirection();
 			
 			if ( globalFileConfig != NULL )
-				delete globalFileConfig;
+				;//delete globalFileConfig;
 		}
 		
 		///////////////////////////////////////////////////////////////////

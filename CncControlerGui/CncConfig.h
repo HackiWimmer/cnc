@@ -137,6 +137,7 @@ class CncConfig {
 		void init();
 		
 		MainFrame* getTheApp() { return theApp; }
+		void destroyTheApp() { theApp = NULL; }
 		void registerWindowForConfigNotification(wxWindow* wnd);
 		
 		// global config pointer - don't use this directly

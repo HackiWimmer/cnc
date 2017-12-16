@@ -169,9 +169,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	// debugger configuration
 	FileParser::installDebugConfigPage(m_debuggerPropertyManagerGrid);
 	
-	// define the popup parent frame
-	SvgEditPopup::setMainFrame(this);
-	
 	// bind 
 	this->Bind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 				this);
 	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 			this, UpdateManagerThread::EventId::APP_POS_UPDATE);
@@ -204,9 +201,6 @@ MainFrame::~MainFrame() {
 	
 	positionSpy->Unbind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
 	
-	#warning todo -  Unbind popup menu event handlers, but how?
-	//this->Unbind(wxEVT_COMMAND_MENU_SELECTED, [](wxCommandEvent& event) {});
-	
 	// explicit delete the motion monitor pointer here, beacause the motion monitor class
 	// considers the Mainframe GBL_CONFIG->getTheApp() pointer in its dtor 
 	// and this crashes definitly if the MainFame dtor is already passed
@@ -236,11 +230,11 @@ MainFrame::~MainFrame() {
 	wxASSERT(templateNbInfo);
 	delete templateNbInfo;
 	
-	SvgEditPopup::destroyMenu(stcFileContentPopupMenu);
-	SvgEditPopup::destroyMenu(stcEmuContentPopupMenu);
-
 	wxASSERT (cnc);
 	delete cnc;
+	
+	DeletePendingEvents();
+	GBL_CONFIG->destroyTheApp();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
@@ -5085,39 +5079,19 @@ void MainFrame::fileContentRightDown(wxMouseEvent& event) {
 	if ( getCurrentTemplateFormat() != TplSvg )
 		return;
 	
-	wxPoint point = event.GetPosition();
-	// If from keyboard
-	if (point.x == -1 && point.y == -1) {
-		wxSize size = GetSize();
-		point.x = size.x / 2;
-		point.y = size.y / 2;
-	} else {
-		point = ScreenToClient(point);
-	}
-	
 	// Show popupmenu at position
 	if ( stcFileContentPopupMenu != NULL ) {
 		SvgEditPopup::enablePathGeneratorMenuItem(stcFileContentPopupMenu);
-		m_stcFileContent->PopupMenu(stcFileContentPopupMenu, point);
+		m_stcFileContent->PopupMenu(stcFileContentPopupMenu);
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::emuContentRightDown(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxPoint point = event.GetPosition();
-	// If from keyboard
-	if (point.x == -1 && point.y == -1) {
-		wxSize size = GetSize();
-		point.x = size.x / 2;
-		point.y = size.y / 2;
-	} else {
-		point = ScreenToClient(point);
-	}
-	
 	// Show popupmenu at position
 	if ( stcEmuContentPopupMenu != NULL ) {
 		SvgEditPopup::enablePathGeneratorMenuItem(stcEmuContentPopupMenu);
-		m_stcEmuSource->PopupMenu(stcEmuContentPopupMenu, point);
+		m_stcEmuSource->PopupMenu(stcEmuContentPopupMenu);
 	}
 }
 ///////////////////////////////////////////////////////////////////

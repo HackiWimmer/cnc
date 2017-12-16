@@ -39,7 +39,7 @@ void SerialSpyPort::spyReadData(int prevRet, void *buffer, unsigned int nbByte) 
 void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( traceSpyInfo == true ) {
-		if ( nbByte <= 0 )
+		if ( nbByte == 0 )
 			return;
 			
 		if ( spyWrite == true ) {

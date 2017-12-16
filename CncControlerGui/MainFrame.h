@@ -63,6 +63,8 @@ class GlobalConfigManager {
 		~GlobalConfigManager() {
 			if ( CncConfig::globalCncConfig != NULL )
 				delete CncConfig::globalCncConfig;
+				
+			CncConfig::globalCncConfig = NULL;
 		}
 };
 

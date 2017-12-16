@@ -85,8 +85,8 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual int readDefault(void *buffer, unsigned int nbByte, const char* response);
 		virtual int readMessage(void *buffer, unsigned int nbByte, const char* response);
 		virtual int readMove(void *buffer, unsigned int nbByte);
-
-		virtual int getCurrentMoveCmdPID();
+		
+		unsigned char getCurrentMoveCmdPID();
 		virtual void getCurrentMoveCmdValues(int32_t &x, int32_t &y, int32_t &z);
 		virtual bool evaluatePositions(std::vector<int32_t>& ret);
 		virtual bool evaluateLimitStates(std::vector<int32_t>& ret);

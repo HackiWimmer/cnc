@@ -139,7 +139,7 @@ bool SerialEmulatorNULL::processGetter(unsigned char pid, std::vector<int32_t>& 
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::getCurrentMoveCmdPID() {
+unsigned char SerialEmulatorNULL::getCurrentMoveCmdPID() {
 ///////////////////////////////////////////////////////////////////
 	if ( lastCommand.Mc.respondCounter > 0 )
 		return PID_LIMIT;
@@ -212,7 +212,7 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 		case CMD_TEST_ERROR_MESSAGE:	ret = readMessage(buffer, nbByte, "ERROR");
 										break;
 		
-		default:						((char*)buffer)[0] = RET_OK;
+		default:						((unsigned char*)buffer)[0] = RET_OK;
 										ret = 1;
 										lastCommand.restLastCmd();
 	}
@@ -231,7 +231,7 @@ int SerialEmulatorNULL::readMessage(void *buffer, unsigned int nbByte, const cha
 	
 	// prepare the test message and start responding (publish RET_MSG)
 	if ( lastCommand.index == 0 ) {
-		((char*)buffer)[0] = RET_MSG;
+		((unsigned char*)buffer)[0] = RET_MSG;
 		
 		lastCommand.Msg.text.assign("This is a test message from type: ");
 		char type = response[0];
@@ -254,7 +254,7 @@ int SerialEmulatorNULL::readMessage(void *buffer, unsigned int nbByte, const cha
 	
 	// provide message type
 	if ( lastCommand.index == 1 ) {
-		((char*)buffer)[0] = lastCommand.Msg.type;
+		((unsigned char*)buffer)[0] = lastCommand.Msg.type;
 		
 		lastCommand.index++;
 		return 1;
@@ -270,7 +270,7 @@ int SerialEmulatorNULL::readMessage(void *buffer, unsigned int nbByte, const cha
 	}
 		
 	if ( (unsigned int)textPos < lastCommand.Msg.text.length() ) {
-		((char*)buffer)[0] = (char)lastCommand.Msg.text[textPos];
+		((unsigned char*)buffer)[0] = (unsigned char)lastCommand.Msg.text[textPos];
 		
 		lastCommand.index++;
 		return 1;
@@ -278,7 +278,7 @@ int SerialEmulatorNULL::readMessage(void *buffer, unsigned int nbByte, const cha
 	
 	// close spooling
 	if ( (unsigned int)textPos == lastCommand.Msg.text.length() ) {
-		((char*)buffer)[0] = MSG_CLOSE;
+		((unsigned char*)buffer)[0] = MSG_CLOSE;
 		
 		lastCommand.index++;
 		return 1;
@@ -286,7 +286,7 @@ int SerialEmulatorNULL::readMessage(void *buffer, unsigned int nbByte, const cha
 	
 	// finalize the command
 	if ( (unsigned int)textPos > lastCommand.Msg.text.length() ) {
-		((char*)buffer)[0] = RET_OK;
+		((unsigned char*)buffer)[0] = RET_OK;
 		
 		lastCommand.restLastCmd();
 		return 1;
@@ -305,7 +305,7 @@ int SerialEmulatorNULL::readDefault(void *buffer, unsigned int nbByte, const cha
 			
 			case 0: 	lastCommand.index++;
 						ret = 1;
-						((char*)buffer)[0] = RET_SOT;
+						((unsigned char*)buffer)[0] = RET_SOT;
 						break;
 						
 			default:	ret = strlen(response);
@@ -322,9 +322,9 @@ int SerialEmulatorNULL::readMove(void *buffer, unsigned int nbByte) {
 	int ret = 0;
 	
 	//RET_SOH, PID_XYZ_POS_..., X->getPosition(), Y->getPosition(), Z->getPosition()
-	char tmpBuf[14];
 	int32_t x=0, y=0, z=0;
-	char* p = NULL;
+	unsigned char tmpBuf[14];
+	unsigned char* p = NULL;
 	
 	switch ( lastCommand.Mc.index ) {
 		case 0:		lastCommand.Mc.index++;
@@ -344,14 +344,22 @@ int SerialEmulatorNULL::readMove(void *buffer, unsigned int nbByte) {
 					
 					p = tmpBuf;
 					memcpy(p, &x, LONG_BUF_SIZE);
-
+					
 					p += LONG_BUF_SIZE;
 					memcpy(p, &y, LONG_BUF_SIZE);
-
+					
 					p += LONG_BUF_SIZE;
 					memcpy(p, &z, LONG_BUF_SIZE);
 					
-					ret = 12;
+					// debug only
+					if ( false ) {
+						clog << wxString::Format("%6d, %6d, %6d - ", x, y, z);
+						for (int i=0; i< 12; i++ )
+							clog << wxString::Format("%2X ", tmpBuf[i]);
+						clog << endl;
+					}
+					
+					ret = LONG_BUF_SIZE * 3;
 					break;
 
 		default:	lastCommand.Mc.respondCounter++;
@@ -377,7 +385,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		
 	spyWriteData(b, nbByte);
 	
-	char* buffer = ((char*)b);
+	unsigned char* buffer = ((unsigned char*)b);
 	unsigned char cmd = buffer[0];
 	
 	switch ( cmd ) {
@@ -412,7 +420,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	char* buffer = ((char*)b);
+	unsigned char* buffer = ((unsigned char*)b);
 	
 	if ( nbByte == LONG_BUF_SIZE + 2 ) {
 		unsigned char id = buffer[1];
@@ -467,7 +475,7 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	char* buffer = ((char*)b);
+	unsigned char* buffer = ((unsigned char*)b);
 	int32_t x = 0L, y = 0L, z = 0L;
 	
 	if      ( lastCommand.cmd == CMD_NEG_STEP_X ) 	x = -1;

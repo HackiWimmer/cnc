@@ -389,12 +389,12 @@ protected:
     wxButton* m_btRequestCtlErrorInfo;
     wxDataViewListCtrl* m_dvListCtrlControllerErrorInfo;
     wxPanel* m_3DPane;
-    wxStaticBitmap* m_toolStateTrafficLight;
-    wxTextCtrl* m_toolId;
-    wxStaticBitmap* m_lableWorkpieceThickness;
+    wxPanel* m_probeModePanel;
+    wxBitmapToggleButton* m_btProbeMode;
+    wxStaticText* m_probeModeLabel;
+    wxStaticLine* m_staticLine5016;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
-    wxButton* m_motionMonitorOptionDlg;
     wxButton* m_3D_Refreh;
     wxButton* m_3D_Clear;
     wxStaticLine* m_staticLine47803;
@@ -415,9 +415,13 @@ protected:
     wxPanel* m_3DOutboundStatistics;
     wxButton* m_btShowHideStatistics;
     wxStaticText* m_staticText4884;
-    wxPanel* m_probeModePanel;
-    wxBitmapToggleButton* m_btProbeMode;
-    wxStaticText* m_probeModeLabel;
+    wxStaticLine* m_staticLine50051;
+    wxStaticText* m_staticText5014;
+    wxStaticBitmap* m_lableWorkpieceThickness;
+    wxStaticBitmap* m_toolStateTrafficLight;
+    wxTextCtrl* m_toolId;
+    wxStaticLine* m_staticLine5005;
+    wxStaticLine* m_staticLine5008;
     wxStaticText* m_staticText1128;
     wxTextCtrl* m_crossings;
     wxStaticText* m_staticText1966;
@@ -443,6 +447,7 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
+    wxButton* m_motionMonitorOptionDlg;
     wxPanel* m_svgEmuResult;
     wxButton* m_svgEmuOpenFileAsSource;
     wxButton* m_svgEmuOpenFileAsSvg;
@@ -763,8 +768,8 @@ protected:
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
-    virtual void openMotionMonitorOptionDlg(wxCommandEvent& event) { event.Skip(); }
     virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void updateCurveLibResolution(wxCommandEvent& event) { event.Skip(); }
@@ -772,7 +777,6 @@ protected:
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void toggleMonitorStatistics(wxCommandEvent& event) { event.Skip(); }
-    virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
     virtual void copyMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
     virtual void traceMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
@@ -783,6 +787,7 @@ protected:
     virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void openMotionMonitorOptionDlg(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSource(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEmuReload(wxCommandEvent& event) { event.Skip(); }
@@ -1185,12 +1190,12 @@ public:
     wxPanel* GetControllerErrorInfo() { return m_controllerErrorInfo; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
-    wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
-    wxTextCtrl* GetToolId() { return m_toolId; }
-    wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
+    wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
+    wxStaticText* GetProbeModeLabel() { return m_probeModeLabel; }
+    wxPanel* GetProbeModePanel() { return m_probeModePanel; }
+    wxStaticLine* GetStaticLine5016() { return m_staticLine5016; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
-    wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
     wxButton* Get3D_Refreh() { return m_3D_Refreh; }
     wxButton* Get3D_Clear() { return m_3D_Clear; }
     wxStaticLine* GetStaticLine47803() { return m_staticLine47803; }
@@ -1210,9 +1215,13 @@ public:
     wxPanel* Get3DOutboundControl() { return m_3DOutboundControl; }
     wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
     wxStaticText* GetStaticText4884() { return m_staticText4884; }
-    wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
-    wxStaticText* GetProbeModeLabel() { return m_probeModeLabel; }
-    wxPanel* GetProbeModePanel() { return m_probeModePanel; }
+    wxStaticLine* GetStaticLine50051() { return m_staticLine50051; }
+    wxStaticText* GetStaticText5014() { return m_staticText5014; }
+    wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
+    wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
+    wxTextCtrl* GetToolId() { return m_toolId; }
+    wxStaticLine* GetStaticLine5005() { return m_staticLine5005; }
+    wxStaticLine* GetStaticLine5008() { return m_staticLine5008; }
     wxStaticText* GetStaticText1128() { return m_staticText1128; }
     wxTextCtrl* GetCrossings() { return m_crossings; }
     wxStaticText* GetStaticText1966() { return m_staticText1966; }
@@ -1239,6 +1248,7 @@ public:
     wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
+    wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
     wxPanel* Get3DPane() { return m_3DPane; }
     wxButton* GetSvgEmuOpenFileAsSource() { return m_svgEmuOpenFileAsSource; }
     wxButton* GetSvgEmuOpenFileAsSvg() { return m_svgEmuOpenFileAsSvg; }

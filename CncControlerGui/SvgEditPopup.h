@@ -3,7 +3,6 @@
 
 #include <wx/menu.h>
 #include <wx/stc/stc.h>
-#include "MainFrame.h"
 
 enum {
 	STC_PM_COMMENT = 0,
@@ -67,7 +66,6 @@ class SvgEditPopup {
 	
 	private:
 	
-		static MainFrame*	_mainFrame;
 		static unsigned int _idOffset;
 		
 		///////////////////////////////////////////////////////////////////
@@ -104,15 +102,10 @@ class SvgEditPopup {
 			} out;
 			
 		};
-
-		///////////////////////////////////////////////////////////////////
-		static void setMainFrame(MainFrame* frame) {
-			_mainFrame = frame;
-		}
+		
 		
 		///////////////////////////////////////////////////////////////////
 		static wxMenu* createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool extended);
-		static void destroyMenu(wxMenu* popup);
 		
 		///////////////////////////////////////////////////////////////////
 		static bool searchCurrentNode(wxStyledTextCtrl* ctl, EditSearchParam& parameter);

@@ -12,7 +12,7 @@ class HexDecoder {
 	public:
 		/////////////////////////////////////////////////////////
 		const char* decodeContollerResult(int ret) {
-			switch ( (const char)ret ) {
+			switch ( (const unsigned char)ret ) {
 				case RET_NULL:		return "Controller Fetch Result";
 				case RET_OK: 		return "RET_OK";
 				case RET_ERROR:		return "RET_ERROR";
@@ -26,6 +26,51 @@ class HexDecoder {
 			return s.c_str();
 		}
 		
+		/////////////////////////////////////////////////////////
+		static const wxString& reorderHexInt32String(wxString& hexToken) {
+			if ( hexToken.length() > 8 ) {
+				cerr << "HexDecoder::reorderHexInt32String: Length error: " << hexToken.length() << " - " << hexToken << endl;
+				return _T("00000000");
+			}
+			
+			wxString unordered(hexToken);
+			unordered.append(wxString('0', 8 - hexToken.length()));
+			
+			char hex[9];
+			hex[0] = (char)unordered[6];
+			hex[1] = (char)unordered[7];
+			hex[2] = (char)unordered[4];
+			hex[3] = (char)unordered[5];
+			hex[4] = (char)unordered[2];
+			hex[5] = (char)unordered[3];
+			hex[6] = (char)unordered[0];
+			hex[7] = (char)unordered[1];
+			hex[8] = '\0';
+			
+			hexToken.assign(hex);
+			return hexToken;
+		}
+		
+		/////////////////////////////////////////////////////////
+		static int32_t decodeHexValueAsInt32(const wxString& hexToken) {
+			//  examples are: 00000000,  2C010000,  FAF4FFFF
+			if ( hexToken.length() > 8 ) {
+				cerr << "HexDecoder::decodeHexValueAsInteger: Length error: " << hexToken.length() << " - " << hexToken << endl;
+				return 0;
+			}
+			
+			for ( unsigned int i = 0; i < hexToken.length(); i++ ) {
+				if ( isxdigit((char)(hexToken[i])) == 0 ) {
+					cerr << "HexDecoder::decodeHexValueAsInteger: Digit error at pos: " << i << " - " << hexToken << endl;
+					return 0;
+				}
+			}
+			
+			int32_t ret = 0;
+			sscanf(hexToken, "%8X", &ret);
+			return ret;
+		}
+
 		/////////////////////////////////////////////////////////
 		static int decodeHexValueAsInteger(const wxString& hexToken) {
 			int ret = 0;
@@ -100,7 +145,7 @@ class HexDecoder {
 				wxStringTokenizer tokenizer(hexToken, wxString::Format("%c", delimiter));
 				unsigned int count = 0;
 				wxString value;
-
+				
 				while ( tokenizer.HasMoreTokens() ) {
 					wxString token = tokenizer.GetNextToken();
 					
@@ -114,9 +159,10 @@ class HexDecoder {
 									break;
 									
 							case 0: value << token;
-									if ( ret.length() != 0 )
+									if ( ret.length() != 0 ) 
 										ret << ", ";
-									ret << ntohl(decodeHexValueAsInteger(value));
+									
+									ret << decodeHexValueAsInt32(reorderHexInt32String(value));
 									value.clear();
 									break;
 						}
@@ -135,7 +181,7 @@ class HexDecoder {
 			std::string s(hexToken.c_str());
 			size_t n = std::count(s.begin(), s.end(), ' ') + 1;
 			
-			// Deconde command
+			// Decode command
 			unsigned char cmd = '\0';
 			if ( n >= 1 ) {
 				cmd = decodeHexValueAsCharacter(hexToken);
@@ -228,7 +274,7 @@ class SpyHexDecoder : public HexDecoder {
 			returnValue << "\n";
 			
 			wxString temp;
-			switch ( (const char)t ) {
+			switch ( (const unsigned char)t ) {
 				case RET_NULL:	returnValue << "Read value: ";
 								returnValue << decodeContollerResult(decodeHexValueAsInteger(hexString));
 								break;

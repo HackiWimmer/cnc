@@ -348,6 +348,9 @@ void CncMotionMonitor::onPaintScalePane3D(wxPaintEvent& event) {
 		
 	lastScalePos = pos;
 	
+	// hack
+	pos *= 2;
+	
 	//clog << height << ", " << pos << endl;
 	
 	wxPaintDC dc(pane);

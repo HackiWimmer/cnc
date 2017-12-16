@@ -265,6 +265,7 @@
   <object class="wxBitmap" name="plugin-delete">bitmaps\plugin-delete.png</object>
   <object class="wxBitmap" name="plugin-edit">bitmaps\plugin-edit.png</object>
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
+  <object class="wxBitmap" name="roll">bitmaps\roll.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
