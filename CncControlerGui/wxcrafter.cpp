@@ -286,7 +286,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1368->SetMinSize(wxSize(28,-1));
     
     m_templateNotebook = new wxNotebook(m_mainBookSourcePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_BOTTOM|wxBK_DEFAULT);
-    m_templateNotebook->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     m_templateNotebook->SetName(wxT("m_templateNotebook"));
     wxImageList* m_templateNotebook_il = new wxImageList(16, 16);
     m_templateNotebook->AssignImageList(m_templateNotebook_il);
@@ -2372,7 +2371,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1142->AddGrowableRow(1);
     m_cncSetters->SetSizer(flexGridSizer1142);
     
-    wxFlexGridSizer* flexGridSizer4691 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer4691 = new wxFlexGridSizer(1, 4, 0, 0);
     flexGridSizer4691->SetFlexibleDirection( wxBOTH );
     flexGridSizer4691->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4691->AddGrowableCol(0);
@@ -2404,6 +2403,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     flexGridSizer4691->Add(m_btClearSetterList, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    
+    m_btRefreshSetterList = new wxButton(m_cncSetters, wxID_ANY, _("Refresh"), wxDefaultPosition, wxDLG_UNIT(m_cncSetters, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btRefreshSetterList->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_restart")), wxLEFT);
+    m_btRefreshSetterList->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer4691->Add(m_btRefreshSetterList, 0, wxALL, WXC_FROM_DIP(1));
     
     m_setterList = new wxListCtrl(m_cncSetters, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_cncSetters, wxSize(-1,-1)), wxLC_REPORT);
     m_setterList->SetToolTip(_("Only a placeholder"));
@@ -4570,6 +4577,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
 #endif
     // Connect events
     this->Connect(wxEVT_ACTIVATE, wxActivateEventHandler(MainFrameBClass::activateMainWindow), NULL, this);
+    this->Connect(wxEVT_MOVE_START, wxMoveEventHandler(MainFrameBClass::moveStartMainWindow), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(MainFrameBClass::closeAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Connect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
@@ -4701,6 +4709,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btCancelRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::cancelRun), NULL, this);
     m_btConfirmRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::confirmRun), NULL, this);
     m_btClearSetterList->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSetterList), NULL, this);
+    m_btRefreshSetterList->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshSetterList), NULL, this);
     m_btRequestCtlConfig->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerConfigFromButton), NULL, this);
     m_btRequestCtlPins->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
@@ -4776,6 +4785,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_bmpButton4718->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypLastId), NULL, this);
     m_bmpButton47182->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);
     m_bmpButton47183->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
+    m_menuBar->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::menuBarLButtonDown), NULL, this);
     this->Connect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Connect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Connect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);
@@ -4845,6 +4855,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
 MainFrameBClass::~MainFrameBClass()
 {
     this->Disconnect(wxEVT_ACTIVATE, wxActivateEventHandler(MainFrameBClass::activateMainWindow), NULL, this);
+    this->Disconnect(wxEVT_MOVE_START, wxMoveEventHandler(MainFrameBClass::moveStartMainWindow), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_CLOSE, wxAuiManagerEventHandler(MainFrameBClass::closeAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_MAXIMIZE, wxAuiManagerEventHandler(MainFrameBClass::maximizeAuiPane), NULL, this);
     m_auimgrMain->Disconnect(wxEVT_AUI_PANE_RESTORE, wxAuiManagerEventHandler(MainFrameBClass::restoreAuiPane), NULL, this);
@@ -4976,6 +4987,7 @@ MainFrameBClass::~MainFrameBClass()
     m_btCancelRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::cancelRun), NULL, this);
     m_btConfirmRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::confirmRun), NULL, this);
     m_btClearSetterList->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSetterList), NULL, this);
+    m_btRefreshSetterList->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshSetterList), NULL, this);
     m_btRequestCtlConfig->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerConfigFromButton), NULL, this);
     m_btRequestCtlPins->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
@@ -5051,6 +5063,7 @@ MainFrameBClass::~MainFrameBClass()
     m_bmpButton4718->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypLastId), NULL, this);
     m_bmpButton47182->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);
     m_bmpButton47183->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
+    m_menuBar->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::menuBarLButtonDown), NULL, this);
     this->Disconnect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Disconnect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Disconnect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);

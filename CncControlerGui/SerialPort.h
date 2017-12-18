@@ -22,7 +22,7 @@ struct SerialFetchInfo {
 	unsigned char command				= '\0';
 	unsigned char multiByteResult[2048];
 
-	unsigned int singleFetchTimeout 	= 1000;
+	unsigned int singleFetchTimeout 	= 5000;
 	unsigned int retSOTSleep			= 10;
 	unsigned int retSOHSleep			= 10;
 	bool retSOTAllowed					= false;
@@ -39,7 +39,7 @@ struct SerialFetchInfo {
 	} Hc;
 	
 	struct G {
-		std::vector<int32_t>* list			= NULL;
+		std::vector<int32_t>* list		= NULL;
 		unsigned char result[64];
 		unsigned char* p 				= NULL;
 		int32_t value 					= 0;
@@ -141,7 +141,7 @@ class Serial {
 		// for com porst this should always false
 		bool writeOnlyMoveCommands;
 		// flag if the comand evaluation routine currently runs
-		bool isCommand;
+		bool isCommandRunning;
 		// Port name
 		std::string portName;
 		// last fetch result
@@ -252,7 +252,7 @@ class Serial {
 		virtual void setSpyMode(Serial::SypMode sm);
 		Serial::SypMode getSpyMode() { return spyMode; };
 		// reurn the current command flag
-		bool isCommandActive() { return isCommand; }
+		bool isCommandActive() { return isCommandRunning; }
 		// port writting
 		virtual bool processGetter(unsigned char pid, std::vector<int32_t>& ret);
 		bool processSetter(unsigned char pid, int32_t value);
@@ -262,6 +262,8 @@ class Serial {
 		
 		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
 		bool processCommand(const char* cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
+		
+		bool convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
 		
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos);

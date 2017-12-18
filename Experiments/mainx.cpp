@@ -222,15 +222,15 @@ int main( int argc, char** argv ) {
 	clog << wxString::Format("Max speed Y         : %7.1lf", cfm.getMaxSpeedY_MM_MIN()) << std::endl;
 	clog << wxString::Format("Max speed Z         : %7.1lf", cfm.getMaxSpeedZ_MM_MIN()) << std::endl;
 	
-	clog << wxString::Format("Current offset X    : % 5d", cfm.getOffsetX()) << std::endl;
-	clog << wxString::Format("Current offset Y    : % 5d", cfm.getOffsetY()) << std::endl;
-	clog << wxString::Format("Current offset Z    : % 5d", cfm.getOffsetZ()) << std::endl;
+	clog << wxString::Format("Current offset X    : % 5d", cfm.getOffsetPerStepX()) << std::endl;
+	clog << wxString::Format("Current offset Y    : % 5d", cfm.getOffsetPerStepY()) << std::endl;
+	clog << wxString::Format("Current offset Z    : % 5d", cfm.getOffsetPerStepZ()) << std::endl;
 
 	cfm.setFeedSpeed(600.0);
 	cfm.setNextMove(67, 67, 200);
-	clog << wxString::Format("Current offset X    : % 5d", cfm.getOffsetX()) << std::endl;
-	clog << wxString::Format("Current offset Y    : % 5d", cfm.getOffsetY()) << std::endl;
-	clog << wxString::Format("Current offset Z    : % 5d", cfm.getOffsetZ()) << std::endl;
+	clog << wxString::Format("Current offset X    : % 5d", cfm.getOffsetPerStepX()) << std::endl;
+	clog << wxString::Format("Current offset Y    : % 5d", cfm.getOffsetPerStepY()) << std::endl;
+	clog << wxString::Format("Current offset Z    : % 5d", cfm.getOffsetPerStepZ()) << std::endl;
 	
 	cfmp = &cfm;
 	//test1(cfm);

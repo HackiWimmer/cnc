@@ -123,19 +123,21 @@ bool SerialEmulatorNULL::evaluateLimitStates(std::vector<int32_t>& ret) {
 bool SerialEmulatorNULL::processGetter(unsigned char pid, std::vector<int32_t>& ret) {
 ///////////////////////////////////////////////////////////////////
 	switch ( pid ) {
-		case PID_XYZ_POS:		return evaluatePositions(ret);
-		case PID_LIMIT:			return evaluateLimitStates(ret);
-		case PID_ERROR_COUNT:	ret.push_back(0); return true;
+		case PID_XYZ_POS:				return evaluatePositions(ret);
+		case PID_LIMIT:					return evaluateLimitStates(ret);
+		case PID_ERROR_COUNT:			ret.push_back(0); return true;
+		case PID_QUERY_READY_TO_RUN:	ret.push_back(1); return true;
 		default:				
-								SetterMap::iterator it;
-								it = setterMap.find((int)pid);
-								
-								if ( it != setterMap.end() ) {
-									ret.push_back((*it).second);
-								} else {
-									std::cerr << "SerialEmulatorNULL::processGetter: Invalid getter pid: " << pid << std::endl;
-								}
+										SetterMap::iterator it;
+										it = setterMap.find((int)pid);
+										
+										if ( it != setterMap.end() ) {
+											ret.push_back((*it).second);
+										} else {
+											std::cerr << "SerialEmulatorNULL::processGetter: Invalid getter pid: " << pid << std::endl;
+										}
 	}
+	
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -402,13 +404,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case CMD_SETTER:			lastCommand.cmd = cmd; 
 									return writeSetter(b, nbByte);
 		
-		case CMD_NEG_STEP_X:
-		case CMD_POS_STEP_X:
-		case CMD_NEG_STEP_Y:
-		case CMD_POS_STEP_Y:
-		case CMD_NEG_STEP_Z:
-		case CMD_POS_STEP_Z:
-		case CMD_MOVE:
+		case CMD_MOVE:				std::cerr << "SerialEmulatorNULL::writeData: The use of 'CMD_MOVE' is generally obsolete. Use 'CMD_RENDER_AND_MOVE' instead." << std::endl;
 		case CMD_RENDER_AND_MOVE:	lastCommand.cmd = cmd;
 									return writeMoveCmd(b, nbByte);
 		
@@ -590,11 +586,6 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *
 		speedSimulator->setNextMove(dx, dy, dz);
 	}
 	
-	// already rendered ?
-	if ( lastCommand.cmd != CMD_RENDER_AND_MOVE )
-		return provideMove(dx, dy, dz, buffer, nbByte, true);
-	// else render above
-
 	// initialize
 	int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
 	memset(&pointA, 0, sizeof(pointA));
@@ -773,13 +764,13 @@ bool SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
 			int32_t val = absolute(steps);
 			
 			switch ( axis ) {
-				case 'X':	if ( absolute(val) > 0 ) speedSimulator->simulateSteppingX(val);
+				case 'X':	if ( val > 0 ) speedSimulator->simulateSteppingX(val);
 							break;
 							
-				case 'Y':	if ( absolute(val) > 0 ) speedSimulator->simulateSteppingY(val);
+				case 'Y':	if ( val > 0 ) speedSimulator->simulateSteppingY(val);
 							break;
 							
-				case 'Z':	if ( absolute(val) > 0 ) speedSimulator->simulateSteppingZ(val);
+				case 'Z':	if ( val > 0 ) speedSimulator->simulateSteppingZ(val);
 							break;
 							
 				default:	wxASSERT(axis != 'X' && axis != 'Y' && axis != 'Z');

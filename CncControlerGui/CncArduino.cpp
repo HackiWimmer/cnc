@@ -29,7 +29,7 @@ void ArduinoCMDs::init() {
 	cmds[SIG_RESUME]                = "Push Signal Resume";
 	
 	cmds[CMD_IDLE]                  = "Pull Idle Callback";
-	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Congtroller";
+	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Controller";
 	cmds[CMD_RESET_ERRORINFO]       = "Push Reset Error Info";
 
 	cmds[CMD_SETTER]                = "Push Setter";
@@ -181,6 +181,16 @@ void ArduinoPIDs::init() {
 	pids[PID_GET_STEP_COUNTER_X]              = "Get Step Counter X";
 	pids[PID_GET_STEP_COUNTER_Y]              = "Get Step Counter Y";
 	pids[PID_GET_STEP_COUNTER_Z]              = "Get Step Counter Z";
+	
+	pids[PID_SPEED_MGMT]                      = "Speed Manager Parameters";
+	pids[PID_SPEED_MGMT_INITIALIZED]          = "Initialized state";
+	pids[PID_SPEED_MGMT_LOW_PULSE_WIDTH]      = "Low Pulse Width";
+	pids[PID_SPEED_MGMT_HIGH_PULSE_WIDTH]     = "High Pulse Width";
+	pids[PID_SPEED_MGMT_TOTAL_OFFSET]         = "Total Speed Offset";
+	pids[PID_SPEED_MGMT_PER_SETP_OFFSET]      = "Per Step Speed Offset";
+	pids[PID_SPEED_MGMT_MAX_SPEED]            = "Max Speed";
+	
+	
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {
@@ -237,9 +247,13 @@ void ArduinoErrorCodes::init() {
 	
 	errorCodes[E_STEPPER_PULS_WIDTH_TO_LARGE]        = "Arduino::recalcDriverConfig(): Value to large";
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
-
+	
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
 	errorCodes[E_TOTAL_COUNT]                        = "Total error count";
+	
+	errorCodes[E_SPEED_MGMT_NOT_INITIALIZED]         = "Speed Manager isn't initialized";
+	errorCodes[E_STEPPER_NOT_READY_TO_RUN]           = "Stepper not ready to run";
+	
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoErrorCodes::getECLabel(unsigned int id) {

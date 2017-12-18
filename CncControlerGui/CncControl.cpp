@@ -157,25 +157,28 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 	if ( isConnected() == false )
 		return false;
 	
-	if ( GBL_CONFIG->getAvoidDupSetterValuesFlag() ) {
-		auto it = setterMap.find((int)id);
-		if ( it != setterMap.end() ) {
-			// value dosen't changed
-			if ( it->second == value )
-				return true;
-		}
-	}
+	if ( id != PID_SEPARATOR ) {
 		
-	if ( serialPort->processSetter(id, value) == false ) {
-		std::cerr << std::endl << "CncControl::processSetterList: Setter failed." << std::endl;
-		std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)id) << std::endl;
-		std::cerr << " Value: " << value << std::endl;
+		if ( GBL_CONFIG->getAvoidDupSetterValuesFlag() ) {
+			auto it = setterMap.find((int)id);
+			if ( it != setterMap.end() ) {
+				// value dosen't changed
+				if ( it->second == value )
+					return true;
+			}
+		}
+			
+		if ( serialPort->processSetter(id, value) == false ) {
+			std::cerr << std::endl << "CncControl::processSetterList: Setter failed." << std::endl;
+			std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)id) << std::endl;
+			std::cerr << " Value: " << value << std::endl;
 
-		return false;
+			return false;
+		}
+		
+		// store
+		setterMap[id] = value;
 	}
-	
-	// store
-	setterMap[id] = value;
 	
 	// publish setter event
 	typedef UpdateManagerThread::Event Event;
@@ -245,8 +248,10 @@ void CncControl::setup(bool doReset) {
 	if ( processSetterList(setup) ) {
 		changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
 		
-		// reset error info
-		processCommand("r", std::cerr);
+		if ( GBL_CONFIG->isProbeMode() )	processCommand(CMD_ENABLE_PROBE_MODE, std::cerr);
+		else								processCommand(CMD_DISABLE_PROBE_MODE, std::cerr);
+		
+		processCommand(CMD_RESET_ERRORINFO, std::cerr);
 		
 		std::cout << "Ready\n";
 	}
@@ -265,7 +270,7 @@ void CncControl::setup(bool doReset) {
 	logProcessingEnd();
 }
 ///////////////////////////////////////////////////////////////////
-long CncControl::convertDoubleToCtrlLong(unsigned char 	id, double d) { 
+long CncControl::convertDoubleToCtrlLong(unsigned char id, double d) { 
 ///////////////////////////////////////////////////////////////////
 	if ( d <= MIN_LONG / DBL_FACT ) {
 		std::cerr << "CncControl::convertDoubleToCtrlLong(): Invalid double value: '" << d << "' for PID: " << ArduinoPIDs::getPIDLabel(id) << std::endl;
@@ -393,11 +398,13 @@ void CncControl::setZeroPosZ() {
 	zeroPos.setZ(val);
 	startPos.setZ(val);
 	
+	/*
 	if ( isConnected() == true ) {
 		if ( processSetter(PID_Z_POS, val)  == false ) {
 			std::cerr << "CncControl::setZeroPosZ: processSetter failed!"<< std::endl;
 		}
 	}
+	 * */
 	
 	postAppPosition(PID_XYZ_POS_MAJOR);
 }
@@ -419,6 +426,30 @@ void CncControl::interrupt() {
 	std::cerr << "CncControl: Interrupted" << std::endl;
 	interruptState = true;
 	switchToolOff(true);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::isReadyToRun() {
+///////////////////////////////////////////////////////////////////
+	if ( isConnected() == false ) {
+		std::cerr << "CncControl::isReadyToRun: The controller isn't connected!" << std::endl;
+		return false;
+	}
+	
+	if ( isInterrupted() == true ) {
+		std::cerr << "CncControl::isReadyToRun: The controller is interrupted. A reset is required!" << std::endl;
+		return false;
+	}
+	
+	// query the serial port
+	std::vector<int32_t> list;
+	getSerial()->processGetter(PID_QUERY_READY_TO_RUN, list);
+		
+	if ( list.size() != 1 ) {
+		std::cerr << "CncControl::isReadyToRun: Unable to a correcponding state from teh serial port:" << std::endl;
+		return false;
+	}
+	
+	return ( list.at(0) == 1L );
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isInterrupted() {

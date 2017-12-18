@@ -129,6 +129,8 @@ class CncControl {
 		CncControl(CncPortType pt);
 		virtual ~CncControl();
 		
+		bool isReadyToRun();
+		
 		void setClientId(long id) { currentClientId = id; }
 		const long getClientId() const { return currentClientId; }
 		

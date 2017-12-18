@@ -53,7 +53,7 @@ void PathHandlerBase::traceCurveLibPoint(const char* prefix, SVGCurveLib::PointG
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::traceFunctionCall(const char* fn) {
 //////////////////////////////////////////////////////////////////
-	std::cout << "SVGPathHandlerBase::" << fn << std::endl;
+	std::cout << "PathHandlerBase::" << fn << std::endl;
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::traceFirstMove(double moveX, double moveY) {
@@ -91,7 +91,7 @@ void PathHandlerBase::traceCurrentPosition() {
 bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
-		std::cerr << "SVGPathHandlerCnc::processMove: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processMove: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("Move",c);
@@ -152,7 +152,7 @@ bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 0 ) {
-		std::cerr << "SVGPathHandlerBase::processClose: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processClose: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("Close",c);
@@ -173,7 +173,7 @@ bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) 
 bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
-		std::cerr << "SVGPathHandlerBase::processLine: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processLine: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("Line",c);
@@ -196,7 +196,7 @@ bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
-		std::cerr << "SVGPathHandlerBase::processHLine: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processHLine: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	// Redirect to lineto command
@@ -210,7 +210,7 @@ bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) 
 bool PathHandlerBase::processVLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
-		std::cerr << "SVGPathHandlerBase::processVLine: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processVLine: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	// Redirect to lineto command
@@ -226,7 +226,8 @@ inline bool PathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p)
 	currentPos.setX(p.x);
 	currentPos.setY(p.y);
 	
-	if ( processLinearMove(true) == false )
+	// already rendered == true not longer supported
+	if ( processLinearMove(false) == false )
 		return false;
 		
 	return true;
@@ -235,7 +236,7 @@ inline bool PathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p)
 bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 7 ) {
-		std::cerr << "SVGPathHandlerBase::processARC: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processARC: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("EllipticalARC",c);
@@ -288,7 +289,7 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 4 ) {
-		std::cerr << "SVGPathHandlerBase::processQuadraticBezier: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processQuadraticBezier: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("QuadraticBezier",c);
@@ -348,7 +349,7 @@ bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double 
 bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 6 ) {
-		std::cerr << "SVGPathHandlerBase::processCubicBezier: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processCubicBezier: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("CubicBezier",c);
@@ -411,7 +412,7 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
-		std::cerr << "SVGPathHandlerBase::processQuadraticBezierSmooth: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processQuadraticBezierSmooth: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("QuadraticBezierSmooth",c);
@@ -434,7 +435,7 @@ bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, d
 bool PathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 4 ) {
-		std::cerr << "SVGPathHandlerBase::processCubicBezierSmooth: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processCubicBezierSmooth: Invalid command count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("CubicBezierSmooth",c);
@@ -469,7 +470,7 @@ void PathHandlerBase::debugProcess(char c, unsigned int count, double values[]) 
 bool PathHandlerBase::process(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( isInitialized() == false ) {
-		std::cerr << "SVGPathHandlerBase not initialized "<< std::endl;
+		std::cerr << "PathHandlerBase not initialized "<< std::endl;
 		return false;
 	}
 

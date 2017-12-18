@@ -315,7 +315,8 @@ bool FileParser::process() {
 		logMeasurementEnd();
 	} 
 	
-	ret = postprocess();
+	if ( ret == true )
+		ret = postprocess();
 	
 	// at the end rest the selection
 	if ( inboundSourceControl ) {

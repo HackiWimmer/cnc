@@ -26,7 +26,7 @@ Serial::Serial(CncControl* cnc)
 , measurementActive(false)
 , connected(false)
 , writeOnlyMoveCommands(false)
-, isCommand(false)
+, isCommandRunning(false)
 , portName()
 , lastFetchResult(RET_NULL)
 , traceSpyInfo(true)
@@ -53,7 +53,7 @@ Serial::Serial(const char *portName)
 , measurementActive(false)
 , connected(false)
 , writeOnlyMoveCommands(false)
-, isCommand(false)
+, isCommandRunning(false)
 , portName()
 , lastFetchResult(RET_NULL)
 , traceSpyInfo(true)
@@ -110,8 +110,10 @@ void Serial::logMeasurementLastTs() {
 		const short T = 3;
 		CncNanoTimestamp tDiff = getMeasurementNanoTimeSpanLastRef();
 		double pDiff           = totalDistance[T] - totalDistanceRef;
-	
-		if ( tDiff > 0 && pDiff > 1.0 ) {
+		
+		// to avoid miss caluclations on the basis of to short difference
+		// this is with respect, that windows can't sleep exactly
+		if ( tDiff > 0 && pDiff > 0.1 ) {
 			currentFeedSpeed  = pDiff;
 			currentFeedSpeed /= tDiff;
 			currentFeedSpeed *= std::nano::den;
@@ -378,7 +380,7 @@ void Serial::disconnect(void) {
 ///////////////////////////////////////////////////////////////////
 	if( connected ) {
 		connected = false;
-		isCommand = false;
+		isCommandRunning = false;
 		CloseHandle(hSerial);
 	}
 }
@@ -409,7 +411,7 @@ bool Serial::isMoveCommand(unsigned char cmd) {
 ///////////////////////////////////////////////////////////////////
 void Serial::resetPostionCounter() {
 ///////////////////////////////////////////////////////////////////
-	processSetter(PID_RESERT_POS_COUNTER, MIN_LONG);
+	processSetter(PID_RESERT_POS_COUNTER, 0);
 }
 ///////////////////////////////////////////////////////////////////
 size_t Serial::getPostionCounter() {
@@ -419,7 +421,10 @@ size_t Serial::getPostionCounter() {
 		
 	if ( cncControl->isConnected() == false )
 		return 0;
-
+		
+	if ( isCommandRunning )
+		return 0;
+	
 	std::vector<int32_t> list;
 	if ( processGetter(PID_GET_POS_COUNTER, list) && list.size() == 2 ) {
 		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
@@ -434,7 +439,7 @@ size_t Serial::getPostionCounter() {
 ///////////////////////////////////////////////////////////////////
 void Serial::resetStepCounter() {
 ///////////////////////////////////////////////////////////////////
-	processSetter(PID_RESERT_STEP_COUNTER, MIN_LONG);
+	processSetter(PID_RESERT_STEP_COUNTER, 0);
 }
 ///////////////////////////////////////////////////////////////////
 size_t Serial::requestStepCounter(unsigned char pid) {
@@ -444,7 +449,10 @@ size_t Serial::requestStepCounter(unsigned char pid) {
 		
 	if ( cncControl->isConnected() == false )
 		return 0;
-
+	
+	if ( isCommandRunning )
+		return 0;
+	
 	std::vector<int32_t> list;
 	if ( processGetter(pid, list) && list.size() == 2 ) {
 		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
@@ -455,7 +463,6 @@ size_t Serial::requestStepCounter(unsigned char pid) {
 	}
 	
 	return 0;
-
 }
 ///////////////////////////////////////////////////////////////////
 size_t Serial::getStepCounter() {
@@ -610,9 +617,14 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 				wxString key;
 				if ( (pos = s.find_first_of (':')) > 0 ) {
 					id = atoi((s.substr(0,pos)).c_str());
-					if ( s[0] == ' ' )
+					for ( unsigned int i=0; i<s.length(); i++) {
+						if ( s[i] != ' ')
+							break;
+							
 						key += "    ";
-					key += ArduinoPIDs::getPIDLabel((int)id);
+					}
+					
+					key += ArduinoPIDs::getPIDLabel((unsigned int)id);
 					
 					if ( cncControl->hasControllerConfigControl() == true ) {
 						cncControl->appendPidKeyValueToControllerConfig(id, key, s.substr(pos+1, s.length()-1).c_str() );
@@ -640,7 +652,7 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 						if ( cncControl->hasControllerErrorControl() == true ) {
 							cncControl->appendNumKeyValueToControllerErrorInfo(nr, id, ArduinoErrorCodes::getECLabel(id), s.substr(pos+1, s.length()-1).c_str() );
 						} else {
-							mutliByteStream << nr << ": " << ArduinoErrorCodes::getECLabel(id) /*<< "[" << id << "]"*/ << ": ";
+							mutliByteStream << nr << ": " << ArduinoErrorCodes::getECLabel((unsigned int)id) /*<< "[" << id << "]"*/ << ": ";
 							mutliByteStream << s.substr(pos+1, s.length()-1);
 							mutliByteStream << "\n";
 						}
@@ -732,7 +744,7 @@ int Serial::readDataUntilSizeAvailable(void *buffer, unsigned int nbByte, unsign
 			Sleep(1);
 
 			if ( ++cnt > maxDelay ) {
-				std::cerr << "Serial::readDataUntilSizeAvailable Timout reached:" << std::endl;
+				std::cerr << "Serial::readDataUntilSizeAvailable Timeout reached:" << std::endl;
 				return 0;
 			}
 				
@@ -798,6 +810,13 @@ bool Serial::processTest(int32_t testId) {
 		return false;
 	}
 	
+	if ( isCommandRunning ) {
+		std::clog << "Serial::processTest: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		std::clog << " Test ID: '" << testId << std::endl;
+		return true;
+	}
+
+	
 	if ( writeOnlyMoveCommands == true )
 		return true;
 	
@@ -852,7 +871,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	// this shouldn't published to the controller
 	if ( pid == PID_SEPARATOR )
 		return true;
-	
+		
 	if ( writeOnlyMoveCommands == true )
 		return true;
 	
@@ -870,9 +889,19 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	memcpy(p, &value, LONG_BUF_SIZE);
 	idx += LONG_BUF_SIZE;
 	
+	int32_t v = ntohl(value);
+	if ( isCommandRunning ) {
+		std::clog << "Serial::processSetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		if ( pid < PID_DOUBLE_RANG_START )	std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << v << "]\n";
+		else								std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << (double)(v)/DBL_FACT << "]\n";
+		return true;
+	}
+	
 	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << ntohl(value) << "]\n";
+		
+		if ( pid < PID_DOUBLE_RANG_START )	cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << v << "]\n";
+		else								cnc::spy << "Send '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << (double)(v)/DBL_FACT << "]\n";
 	}
 		
 	if ( writeData(cmd, idx) ) {
@@ -909,13 +938,19 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 	cmd[0] = 'G';
 	cmd[1] = pid;
 	
+	if ( isCommandRunning ) {
+		std::clog << "Serial::processGetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((pid)) << "]\n";
+		return true;
+	}
+	
 	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
 		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((pid)) << "]\n";
 	}
-
+	
 	list.clear();
-
+	
 	if ( writeData((char*)cmd, sizeof(cmd)) ) {
 		// only a dummy here
 		CncLongPosition pos(0,0,0);
@@ -941,7 +976,7 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 bool Serial::sendSignal(const unsigned char cmd) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
-		std::cout << "SERIAL::processCommand()::ERROR: Not connected\n";
+		std::cout << "SERIAL::sendSignal()::ERROR: Not connected\n";
 		return false;
 	}
 	
@@ -962,6 +997,12 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 		return false;
 	}
 	
+	if ( isCommandRunning ) {
+		std::clog << "Serial::processCommand: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
+		return true;
+	}
+
 	// Always log the start position
 	cncControl->SerialCallback(0);
 	
@@ -972,7 +1013,23 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 			p++; // important to have always the right index!
 			continue;
 		}
-
+		
+		// redirect this command types
+		switch ( cmd[i] ) {
+			case CMD_NEG_STEP_X:
+			case CMD_POS_STEP_X:
+			case CMD_NEG_STEP_Y:
+			case CMD_POS_STEP_Y:
+			case CMD_NEG_STEP_Z:
+			case CMD_POS_STEP_Z: 	if ( convertToMoveCommandAndProcess(cmd[i], mutliByteStream, pos) == false ) {
+										std::cerr << "Serial::processCommand: convertToMoveCommandAndProcess failed!" << std::endl;
+										return false;
+									}
+									
+									p++; // important to have always the right index!
+									continue;
+		}
+		
 		if ( traceSpyInfo && spyWrite ) {
 			cnc::spy.initializeResult();
 			cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "]\n";
@@ -1000,6 +1057,31 @@ bool Serial::processCommand(const char* cmd, std::ostream& mutliByteStream, CncL
 	}
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos) {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	const unsigned int size = 3;
+	const short X=0, Y=1, Z=2;
+	int32_t values[size];
+	values[X] = 0;
+	values[Y] = 0;
+	values[Z] = 0;
+	
+	switch ( cmd ) {
+		case CMD_NEG_STEP_X:	values[X] = -1; ret = processMove(size, values, false, pos); break;
+		case CMD_POS_STEP_X:	values[X] = +1; ret = processMove(size, values, false, pos); break;
+		case CMD_NEG_STEP_Y:	values[Y] = -1; ret = processMove(size, values, false, pos); break;
+		case CMD_POS_STEP_Y:	values[Y] = +1; ret = processMove(size, values, false, pos); break;
+		case CMD_NEG_STEP_Z:	values[Z] = -1; ret = processMove(size, values, false, pos); break;
+		case CMD_POS_STEP_Z: 	values[Z] = +1; ret = processMove(size, values, false, pos); break;
+		default:				std::cerr << "Serial::convertToMoveCommandAndProcess: Invalid command: " << cmd << std::endl;
+								ret = false;
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos) {
@@ -1042,14 +1124,25 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 		return false;
 	}
 	
+	if ( isCommandRunning ) {
+		std::clog << "Serial::processMove: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		std::clog << " Command: '" << moveCommand[0] << "' [" << ArduinoCMDs::getCMDLabel(moveCommand[0]) << "]\n";
+		std::clog << " Values: ";
+		for ( unsigned int i=0; i<size; i++ )
+			std::clog << values[i] << ", ";
+			
+		std::clog << std::endl;
+		return true;
+	}
+
 	// Always log the start postion
 	cncControl->SerialCallback(0);
 	
 	unsigned char* p = moveCommand;
 	unsigned int idx = 0;
 
-	if ( alreadyRendered  == true )	moveCommand[idx++] = 'm'; 
-	else							moveCommand[idx++] = 'M'; 
+	if ( alreadyRendered  == true )	moveCommand[idx++] = CMD_MOVE; 
+	else							moveCommand[idx++] = CMD_RENDER_AND_MOVE; 
 	p++;
 	
 	for (unsigned int i=0; i<size; i++) {
@@ -1112,7 +1205,7 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 	if ( cncControl->isInterrupted() )
 		return false;
 	
-	isCommand = true;
+	isCommandRunning = true;
 	
 	bool ret = false;
 	ret = evaluateResult(sfi, mutliByteStream, pos);
@@ -1121,7 +1214,7 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 		ret = false;
 	}
 	
-	isCommand = false;
+	isCommandRunning = false;
 	
 	return ret;
 }

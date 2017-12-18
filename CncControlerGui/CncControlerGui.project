@@ -164,7 +164,6 @@
       <File Name="CncFilePreviewWnd.cpp"/>
       <File Name="CncFilePreviewWnd.h"/>
       <File Name="CncNumberFormatter.h"/>
-      <File Name="CncSpeedManager.h"/>
       <File Name="CncSpeedSimulator.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Codelite">
@@ -173,7 +172,7 @@
       <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="Debug;release2"/>
       <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Debug"/>
       <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="Debug;release2"/>
-      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Debug"/>
+      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="release2;Debug;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
       <File Name="wxcrafter.cpp"/>
@@ -294,20 +293,20 @@
     <File Name="../Todos and known issues.txt"/>
   </VirtualDirectory>
   <VirtualDirectory Name="Arduino">
-    <File Name="../../../@StepperControl/StepperControl_1/CncController.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncController.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonValues.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/cv.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.h" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Release"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncSpeedManager.h"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncController.h" ExcludeProjConfig="release2;Release;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncController.ino" ExcludeProjConfig="Debug;Release;release2;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.h" ExcludeProjConfig="release2;Release;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.ino" ExcludeProjConfig="Debug;Release;release2;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.h" ExcludeProjConfig="release2;Release;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.ino" ExcludeProjConfig="Debug;Release;release2;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.h" ExcludeProjConfig="release2;Release;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.ino" ExcludeProjConfig="Debug;Release;release2;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CommonValues.h" ExcludeProjConfig="release2;Release;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/cv.h" ExcludeProjConfig="release2;Release;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.h" ExcludeProjConfig="release2;Release;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Debug;Release;release2;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Debug;Release;release2;"/>
+    <File Name="../../../@StepperControl/StepperControl_1/CncSpeedManager.h" ExcludeProjConfig="release2;"/>
   </VirtualDirectory>
   <VirtualDirectory Name="UnitTests">
     <VirtualDirectory Name="Tests">
@@ -322,8 +321,6 @@
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <VirtualDirectory Name="Clipper">
     <File Name="Clipper/clipper.cpp"/>
     <File Name="Clipper/clipper.hpp"/>
@@ -503,4 +500,7 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Dependencies Name="release2"/>
 </CodeLite_Project>

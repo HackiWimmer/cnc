@@ -74,6 +74,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void refreshSetterList(wxCommandEvent& event);
+    virtual void moveStartMainWindow(wxMoveEvent& event);
+    virtual void menuBarLButtonDown(wxMouseEvent& event);
     virtual void onPaintSpeedPanel(wxPaintEvent& event);
 		virtual void clearMotionMonitorVecties(wxCommandEvent& event);
 		virtual void copyMotionMonitorVecties(wxCommandEvent& event);
@@ -571,7 +574,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		// run template handling
 		bool checkIfRunCanBeProcessed();
 		bool processVirtualTemplate();
-		bool processTemplate();
+		bool processTemplateIntern();
+		bool processTemplateWrapper();
 		bool processSVGTemplate();
 		bool processGCodeTemplate();
 		bool processManualTemplate();

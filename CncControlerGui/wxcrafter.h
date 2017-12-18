@@ -371,6 +371,7 @@ protected:
     wxStaticText* m_staticText1150;
     wxTextCtrl* m_setterListCount;
     wxButton* m_btClearSetterList;
+    wxButton* m_btRefreshSetterList;
     wxListCtrl* m_setterList;
     wxPanel* m_controllerConfiguration;
     wxStaticText* m_staticText12831;
@@ -636,6 +637,7 @@ protected:
 
 protected:
     virtual void activateMainWindow(wxActivateEvent& event) { event.Skip(); }
+    virtual void moveStartMainWindow(wxMoveEvent& event) { event.Skip(); }
     virtual void closeAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void maximizeAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void restoreAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
@@ -764,6 +766,7 @@ protected:
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
+    virtual void refreshSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
@@ -830,6 +833,7 @@ protected:
     virtual void goPosSypLastId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypPrevId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypNextId(wxCommandEvent& event) { event.Skip(); }
+    virtual void menuBarLButtonDown(wxMouseEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
@@ -1170,6 +1174,7 @@ public:
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
     wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
     wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
+    wxButton* GetBtRefreshSetterList() { return m_btRefreshSetterList; }
     wxListCtrl* GetSetterList() { return m_setterList; }
     wxPanel* GetCncSetters() { return m_cncSetters; }
     wxStaticText* GetStaticText12831() { return m_staticText12831; }

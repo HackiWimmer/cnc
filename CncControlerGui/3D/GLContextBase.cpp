@@ -145,8 +145,9 @@ bool GLContextBase::isSmoothingEnabled() {
 void GLContextBase::drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks) {
 /////////////////////////////////////////////////////////////////
 	GLUquadricObj* quadric = gluNewQuadric();
+	gluQuadricTexture(quadric, GL_TRUE);
 	gluQuadricDrawStyle(quadric, GLU_FILL);
-	gluCylinder(quadric, base, 0, height, slices, stacks);
+	gluCylinder(quadric, base, 0.0, height, slices, stacks);
 	gluDeleteQuadric(quadric);
 }
 /////////////////////////////////////////////////////////////////
@@ -363,23 +364,22 @@ void GLContextBase::drawCoordinateOrigin() {
 			glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
 		
 		glEnd();
-		//renderBitmapString(charOffset, charOffset, coordOriginInfo.length + croneHight + charOffset, GLUT_BITMAP_8_BY_13, "Z");
+		renderBitmapString(charOffset, charOffset, coordOriginInfo.length + croneHight + charOffset, GLUT_BITMAP_8_BY_13, "Z");
 		
 		glPushMatrix();
 			
-			#warning todo
-			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
-			glColor3ub(255, 255, 255);
-			drawSolidCone(croneDiameter * 0.8f, 0.0001f, 30, 30);
-		
-			glTranslatef(0.0f, 0.0f, 0.0001f);
 			glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
-			//drawSolidCone(croneDiameter, croneHight, 30, 30);
-			
-			glTranslatef(0.0f, 0.0f, croneHight);
+			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
+			drawSolidCone(croneDiameter, croneHight, 30, 30);
+			/*
 			glColor3ub(255, 255, 255);
-			drawSolidCone(croneDiameter * 0.1f, 0.0001f, 30, 30);
+			glTranslatef(0.0f, 0.0f, coordOriginInfo.length);
+			drawSolidCone(croneDiameter * 0.8f, 0.0001f, 30, 30);
 			
+			glColor3ub(255, 242, 0);
+			glTranslatef(0.0f, 0.0f, croneHight);
+			drawSolidCone(croneDiameter * 0.5f, 0.0001f, 30, 30);
+			*/
 		glPopMatrix();
 }
 /////////////////////////////////////////////////////////////////

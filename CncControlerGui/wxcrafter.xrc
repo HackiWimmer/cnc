@@ -492,7 +492,6 @@
                         <flag>wxALL|wxEXPAND</flag>
                         <object class="wxNotebook" name="m_templateNotebook">
                           <style>wxNB_NOPAGETHEME|wxBK_BOTTOM|wxBK_DEFAULT</style>
-                          <bg>wxSYS_COLOUR_BTNFACE</bg>
                           <object class="notebookpage">
                             <label>Source</label>
                             <bitmap>bitmaps/book_blue.png</bitmap>
@@ -4162,7 +4161,7 @@
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <object class="wxFlexGridSizer">
-                                              <cols>3</cols>
+                                              <cols>4</cols>
                                               <rows>1</rows>
                                               <vgap>0</vgap>
                                               <hgap>0</hgap>
@@ -4209,6 +4208,17 @@
                                                   <label>Clear</label>
                                                   <style/>
                                                   <bitmap>bitmaps/16-clean.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL</flag>
+                                                <border>1</border>
+                                                <object class="wxButton" name="m_btRefreshSetterList">
+                                                  <label>Refresh</label>
+                                                  <style/>
+                                                  <bitmap>bitmaps/16-debugger_restart.png</bitmap>
                                                   <bitmapposition>wxLEFT</bitmapposition>
                                                   <default>0</default>
                                                 </object>

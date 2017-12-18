@@ -59,9 +59,9 @@ const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 
 #ifdef DEBUG
-	const char* _programVersion = "0.8.1.d";
+	const char* _programVersion = "0.8.6.d";
 #else
-	const char* _programVersion = "0.8.1.r";
+	const char* _programVersion = "0.8.6.r";
 #endif
 
 const char* _maxSpeedLabel		= "<{MAX}>";
@@ -535,7 +535,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		// Auto process ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
 		defineMinMonitoring();
-		processTemplate();
+		processTemplateWrapper();
 		defineNormalMonitoring();
 	}
 
@@ -577,9 +577,13 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( cnc == NULL )
+		return;
+	
 	static wxColour col(0, 128, 255);
 	static wxBrush  brush(col);
-	static wxPen    pen(col, 1, wxSOLID);
+	static wxPen    barPen(col, 1, wxSOLID);
+	static wxPen    wpPen(*wxRED, 1, wxSOLID);
 	static unsigned int lastSpeedPos = 0;
 	
 	const wxSize size   = m_speedPanel->GetSize();
@@ -595,12 +599,23 @@ void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
 	
 	lastSpeedPos = pos;
 	
+	// bar
 	wxPaintDC dc(m_speedPanel);
-	dc.SetPen(pen);
+	dc.SetPen(barPen);
 	dc.SetBrush(brush);
 	
 	wxRect rect(0, 0, pos, height);
 	dc.DrawRectangle(rect);
+	
+	// watermark for current config
+	if ( GBL_CONFIG->isProbeMode() == false )  {
+		unsigned int wp = size.GetWidth() * cnc->getFeedSpeed_MM_MIN() / GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+		dc.SetPen(wpPen);
+		
+		// move wp 2 pixel to the left so see valu = max also.
+		dc.DrawLine(wp - 2, 0, wp - 2, height);
+		dc.DrawLine(wp - 1, 0, wp - 1, height);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onThreadAppPosUpdate(UpdateManagerEvent& event) {
@@ -1553,10 +1568,11 @@ bool MainFrame::connectSerialPort() {
 		decodrateProbeMode(false);
 		m_miRqtIdleMessages->Check(true);
 	}
-
-	initializeCncControl();
-	lastPortName.clear();
 	
+	initializeCncControl();
+	selectSerialSpyMode();
+	
+	lastPortName.clear();
 	if ( (ret = cnc->connect(cs)) == true )  {
 		cnc->setup();
 		cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
@@ -1567,12 +1583,13 @@ bool MainFrame::connectSerialPort() {
 		selectSerialSpyMode();
 	}
 	
+	updateSetterList();
 	decoratePortSelector();
 	m_connect->Refresh();
 	m_connect->Update();
 	stopAnimationControl();
 	enableControls();
-
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1964,6 +1981,7 @@ TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 	
 	if      ( ext == "SVG" )	return TplSvg;
 	else if ( ext == "GCODE") 	return TplGcode;
+	else if ( ext == "NGC") 	return TplGcode;
 
 	return TplUnknown;
 }
@@ -2112,7 +2130,7 @@ void MainFrame::newTemplate(wxCommandEvent& event) {
 								_("New Template File"), 
 								templateName,
 								"",
-                                "SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode", 
+                                "SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode", 
 								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 
 	if ( newFileDialog.ShowModal() == wxID_CANCEL ) 
@@ -2149,7 +2167,7 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 								_("Open Template File"), 
 								templateName,
 								"",
-                                "SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode", 
+                                "SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode", 
 								wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
 	if ( openFileDialog.ShowModal() == wxID_CANCEL ) 
@@ -2346,7 +2364,7 @@ void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 	                            _("Save Template File"), 
 								getCurrentTemplatePathFileName(), 
 								"",
-								"SVG Files (*.svg)|*.svg|GCode Files (*.gcode)|*.gcode",  
+								"SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode",  
 								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
 								
 	if (saveFileDialog.ShowModal() == wxID_CANCEL) 
@@ -3065,36 +3083,45 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processTemplate() {
+bool MainFrame::processTemplateWrapper() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
-	if ( cnc->isInterrupted() ) {
-		std::cerr << "Cnc controller state is interrupted. Before it can run next time a reset is required!" << std::endl;
-		return false;
+	bool ret = true;
+	
+	if ( cnc->isReadyToRun() == false ) {
+		std::cerr << "MainFrame::processTemplateWrapper: Controller isn't ready to run: Run was rejected!" << std::endl;
+		ret = false;
 	}
 	
-	if( cnc->isConnected() == false) {
-		if ( !connectSerialPort() )
-			return false;
+	if ( ret == true )
+		ret = checkIfRunCanBeProcessed();
+	
+	if ( ret == true )
+		ret = processTemplateIntern();
+	
+	if ( ret == false ) {
+		std::cerr << "For more details please consider the controller error info"<< std::endl;
+		m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+		m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
 	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+// don't call this method dirctly, instead use processTemplateWrapper
+bool MainFrame::processTemplateIntern() {
+///////////////////////////////////////////////////////////////////
+	startAnimationControl();
 	
 	if ( m_clearSerialSpyBeforNextRun->IsChecked() )
 		clearSerialSpy();
-		
-	showAuiPane("Outbound");
-	selectMonitorBookCncPanel();
-		
-	if ( checkIfRunCanBeProcessed() == false )
-		return false;
-		 
-	startAnimationControl();
-	
+
 	clearPositionSpy();
 	
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
+	showAuiPane("Outbound");
+	selectMonitorBookCncPanel();
+
 	// select draw pane
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 		
@@ -5535,6 +5562,11 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 	else										isDebugMode = true;
 	determineRunMode();
 	
+	// ensure the monitor is visible, especally if isPause == true
+	// because then the processing should be resume
+	showAuiPane("Outbound");
+	selectMonitorBookCncPanel();
+
 	// toggle only the pause flag
 	if ( isPause() == true ) {
 		rcPause(event);
@@ -5569,7 +5601,7 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 	}
 
 	// process
-	processTemplate();
+	processTemplateWrapper();
 	
 	// restore the interval
 	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
@@ -6054,7 +6086,6 @@ void MainFrame::markSerialSpy(wxCommandEvent& event) {
 void MainFrame::enableSerialSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_menuItemDebugSerial->Check(!m_menuItemDebugSerial->IsChecked());
-	
 	updateMonitoring();
 	decorateSerialSpy();
 }
@@ -6714,7 +6745,7 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	// loop
 	for ( unsigned int i=0; i<loopCount; i++) {
 		
-		bool ret = processTemplate();
+		bool ret = processTemplateWrapper();
 		duration += processLastDuartion;
 
 		info.Printf("Loop Counter : % 6d [#]; AVG duration: % 10ld [ms]", i + 1, duration / ( i + 1 ));
@@ -6731,6 +6762,11 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	cnc::trc.logInfoMessage("");
 	std::clog << wxString::Format("Loop Repeat Test Sumary: Count: % 6d [#]; AVG Duration: % 10ld [ms]", loopCount, duration / loopCount) << std::endl;
 	SetTitle(title);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::refreshSetterList(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	updateSetterList();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clearSetterList(wxCommandEvent& event) {
@@ -6872,6 +6908,7 @@ void MainFrame::decodrateProbeMode(bool probeMode) {
 	m_probeModePanel->Update();
 	
 	GBL_CONFIG->setProbeMode(probeMode);
+	releaseControllerSetupFromConfig();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickProbeMode(wxCommandEvent& event) {
@@ -6917,4 +6954,27 @@ void MainFrame::toggleMonitorStatistics(bool shown) {
 void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	toggleMonitorStatistics( m_statisticBook->IsShown() == false );
+}
+
+
+
+
+
+
+
+
+/////////////////////////////////////////////////////////////////////
+void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	
+	//isProcessing()
+	
+	
+	clog << "aDASDASDASD" << endl;
+}
+void MainFrame::moveStartMainWindow(wxMoveEvent& event)
+{
+	clog << "aDASDASDASD" << endl;
+	
+	event.Skip(true);
 }

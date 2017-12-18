@@ -8,7 +8,22 @@
 #include <wx/string.h>
 
 
+////////////////////////////////////////////////////////////////
+void activeWaitMircoseconds(int64_t micros) {
+////////////////////////////////////////////////////////////////
+	static const int64_t threshold = 1600;
 
+	std::clog << micros << ", ";
+	
+	if ( micros > 3000 ) {
+		int64_t x = (micros - threshold) / 1000;
+		micros = threshold + (micros - threshold) % 1000;
+		
+		std::clog << x << ", ";
+	}
+	
+	std::clog << micros << std::endl;
+}
 
 
 ///////////////////////////////////////////////////////////////////
@@ -16,6 +31,15 @@ int main( int argc, char** argv ) {
 ///////////////////////////////////////////////////////////////////
 	// initialize wxWidgets
 	wxInitializer init;
+
+
+	activeWaitMircoseconds(340);
+	activeWaitMircoseconds(5789);
+	activeWaitMircoseconds(3400);
+	activeWaitMircoseconds(1600);
+
+return 0;
+
 
 	unsigned char p1[8];
 	unsigned char p2[8];

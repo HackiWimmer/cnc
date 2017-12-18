@@ -57,15 +57,15 @@ class CncSpeedSimulator : public CncSpeedManager {
 		}
 		
 		//////////////////////////////////////////////////////////////////////////
-		void simulateSteppingX(unsigned int dx)  { stepCounterX += lStepsX; uint64_t v = dx * (getOffsetX() + getTotalPulseOffsetX()); currentAccumulatedOffset += v; totalAccumulatedOffsetX += v; }
-		void simulateSteppingY(unsigned int dx)  { stepCounterY += lStepsY; uint64_t v = dx * (getOffsetY() + getTotalPulseOffsetY()); currentAccumulatedOffset += v; totalAccumulatedOffsetY += v; }
-		void simulateSteppingZ(unsigned int dx)  { stepCounterZ += lStepsZ; uint64_t v = dx * (getOffsetZ() + getTotalPulseOffsetZ()); currentAccumulatedOffset += v; totalAccumulatedOffsetZ += v; }
+		void simulateSteppingX(unsigned int dx)  { stepCounterX += lStepsX; uint64_t v = dx * (getOffsetPerStepX() + getTotalPulseOffsetX()); currentAccumulatedOffset += v; totalAccumulatedOffsetX += v; }
+		void simulateSteppingY(unsigned int dy)  { stepCounterY += lStepsY; uint64_t v = dy * (getOffsetPerStepY() + getTotalPulseOffsetY()); currentAccumulatedOffset += v; totalAccumulatedOffsetY += v; }
+		void simulateSteppingZ(unsigned int dz)  { stepCounterZ += lStepsZ; uint64_t v = dz * (getOffsetPerStepZ() + getTotalPulseOffsetZ()); currentAccumulatedOffset += v; totalAccumulatedOffsetZ += v; }
 		
 		//////////////////////////////////////////////////////////////////////////
 		void performCurrentOffset(bool force=false) {
 			// consider the windows standard timer resolution of 15,625 ms
-			if ( currentAccumulatedOffset >= 16000 || force == true ) {
-				CncTimeFunctions::sleepMircoseconds(currentAccumulatedOffset);
+			if ( currentAccumulatedOffset >= 16000LL || force == true ) {
+				CncTimeFunctions::activeWaitMircoseconds(currentAccumulatedOffset);
 				
 				totalAccumulatedOffset   += currentAccumulatedOffset;
 				currentAccumulatedOffset  = 0LL;
