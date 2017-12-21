@@ -3,6 +3,8 @@
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
 
+#include "CncConfigProperty.h"
+
 extern wxPropertyGridManager* 	globlSetupGrid;
 
 ////////////////////////////////////////////////////////////////////////
@@ -58,7 +60,7 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 	
 	wxArrayString pgParameterMgrArr;
 	wxArrayInt pgParameterMgrIntArr;
-	wxFloatingPointValidator<float> validator(3, NULL, wxNUM_VAL_DEFAULT);
+	wxFloatingPointValidator<double> validator(3, NULL, wxNUM_VAL_DEFAULT);
 	
 	//......................
 	curCatName.assign("Working Settings");
@@ -95,6 +97,39 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 		wpt = root->AppendChild( new wxPropertyCategory(curCatName));
 		registerCategory(curCatName, wpt);
 		{
+
+			
+			
+			//...............
+			validator.SetPrecision(6); validator.SetRange(0, 90.0);
+			prop = wpt->AppendChild( new CncConfigProperty("Test [mm]", NEXT_PROP_ID, "0.0"));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			
+			//prop->SetMaxLength(6);
+			
+			/*
+			wxFloatingPointValidator<float>* xxx = ((wxFloatingPointValidator<float>*)(prop->GetValidator()));
+			
+			clog << xxx.GetPrecision() << endl;
+			
+			
+			xxx->SetRange(0, 90.0);
+			xxx->SetPrecision(3);
+			prop->SetValidator(*xxx);
+			*/
+			
+			//prop->SetValidator(validator);
+			
+			prop->SetEditor( wxT("CncTextEditor") );
+			CncConfig::registerProperty(CncTEST_TEST, prop);
+
+
+
+
+
+
+
 			//...............
 			validator.SetPrecision(3); validator.SetRange(0, 90.0);
 			prop = wpt->AppendChild( new wxFloatProperty("Thickness [mm]", NEXT_PROP_ID, 0.0));

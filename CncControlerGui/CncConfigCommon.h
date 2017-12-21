@@ -81,5 +81,7 @@
 	#define CncWork_Ctl_AVOID_DUP_SETTER_VALUES		"CncWork.Controller/AVOID_DUP_SETTER_VALUES"
 
 
+#define CncTEST_TEST					"CncTest.Test/DUMMY"
+
 
 #endif

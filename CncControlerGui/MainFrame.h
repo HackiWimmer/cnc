@@ -74,10 +74,16 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void refreshSetterList(wxCommandEvent& event);
-    virtual void moveStartMainWindow(wxMoveEvent& event);
-    virtual void menuBarLButtonDown(wxMouseEvent& event);
-    virtual void onPaintSpeedPanel(wxPaintEvent& event);
+    virtual void renameTemplateFromButton(wxCommandEvent& event);
+		virtual void removeTemplateFromButton(wxCommandEvent& event);
+		virtual void onSelectCncMonitor(wxCommandEvent& event);
+		virtual void onSelectInboundPreview(wxCommandEvent& event);
+		virtual void onSelectTemplatePreview(wxCommandEvent& event);
+		virtual void onSelectTestPage(wxCommandEvent& event);
+		virtual void refreshSetterList(wxCommandEvent& event);
+		virtual void moveStartMainWindow(wxMoveEvent& event);
+		virtual void menuBarLButtonDown(wxMouseEvent& event);
+		virtual void onPaintSpeedPanel(wxPaintEvent& event);
 		virtual void clearMotionMonitorVecties(wxCommandEvent& event);
 		virtual void copyMotionMonitorVecties(wxCommandEvent& event);
 		virtual void traceMotionMonitorVecties(wxCommandEvent& event);
@@ -528,6 +534,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool openTextFile();
 		bool saveFile();
 		bool saveTextFile();
+		bool saveTextFileAs();
 		
 		///////////////////////////////////////////////////////////////
 		// monitoring

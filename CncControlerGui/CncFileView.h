@@ -12,7 +12,9 @@ class MainFrame;
 class CncFileView : public CncFileViewBase, public wxDirTraverser {
 	
 	protected:
-    virtual void fileListLeave(wxMouseEvent& event);
+		virtual void selectOpenTemplate(wxCommandEvent& event);
+		virtual void selectNewTemplate(wxCommandEvent& event);
+		virtual void fileListLeave(wxMouseEvent& event);
 		virtual void selectFilter(wxCommandEvent& event);
 		virtual void aFolderUp(wxCommandEvent& event);
 		virtual void refresh(wxCommandEvent& event);
@@ -32,6 +34,8 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		
 		void setDefaultPath(const wxString& dirname);
 		void selectDefaultPath();
+		
+		void update();
 		
 	protected:
 		wxString defaultPath;

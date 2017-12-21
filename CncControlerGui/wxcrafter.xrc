@@ -93,7 +93,7 @@
             <bitmap>bitmaps/view-orientation.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
-              <![CDATA[References]]>
+              <![CDATA[References Page]]>
             </tooltip>
             <default>0</default>
           </object>
@@ -109,7 +109,7 @@
             <bitmap>bitmaps/system-settings.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
-              <![CDATA[Setup]]>
+              <![CDATA[Setup Page]]>
             </tooltip>
             <default>0</default>
           </object>
@@ -117,7 +117,41 @@
             <bitmap>bitmaps/package-supported.png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
-              <![CDATA[Template]]>
+              <![CDATA[Template Page]]>
+            </tooltip>
+            <default>0</default>
+          </object>
+          <object class="separator"/>
+          <object class="wxBitmapButton" name="m_btSelectInboundPreview4">
+            <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <tooltip>
+              <![CDATA[Test Page]]>
+            </tooltip>
+            <default>0</default>
+          </object>
+          <object class="wxBitmapButton" name="m_btSelectInboundPreview">
+            <bitmap>bitmaps/filepreview.png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <tooltip>
+              <![CDATA[Inbound Preview]]>
+            </tooltip>
+            <default>0</default>
+          </object>
+          <object class="separator"/>
+          <object class="wxBitmapButton" name="m_btSelectCncPreview">
+            <bitmap>bitmaps/brick-go1.png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <tooltip>
+              <![CDATA[CNC Monitor]]>
+            </tooltip>
+            <default>0</default>
+          </object>
+          <object class="wxBitmapButton" name="m_btSelectTemplatePreview">
+            <bitmap>bitmaps/document-preview.png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <tooltip>
+              <![CDATA[Template Preview]]>
             </tooltip>
             <default>0</default>
           </object>
@@ -403,11 +437,18 @@
                               <style/>
                               <size>24,24</size>
                               <tooltip>
-                                <![CDATA[Open Source extern with corresbonding tool]]>
+                                <![CDATA[Open Source extern with configured tool]]>
                               </tooltip>
                               <bitmap>bitmaps/16-gtk.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL|wxEXPAND</flag>
+                            <border>2</border>
+                            <object class="wxStaticLine" name="m_staticLine44728">
+                              <style>wxLI_HORIZONTAL</style>
                             </object>
                           </object>
                           <object class="sizeritem">
@@ -435,12 +476,50 @@
                               <style/>
                               <size>24,24</size>
                               <tooltip>
-                                <![CDATA[Reload Source]]>
+                                <![CDATA[Reload current Template]]>
                               </tooltip>
                               <bitmap>bitmaps/16-file_reload.png</bitmap>
                               <bitmapposition>wxLEFT</bitmapposition>
                               <default>0</default>
                             </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_renameTemplate">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Rename current Template]]>
+                              </tooltip>
+                              <bitmap>bitmaps/edit-rename.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="sizeritem">
+                            <flag>wxALL</flag>
+                            <border>1</border>
+                            <minsize>24,24</minsize>
+                            <object class="wxButton" name="m_removeTemplate">
+                              <label/>
+                              <style/>
+                              <size>24,24</size>
+                              <tooltip>
+                                <![CDATA[Remove current Template]]>
+                              </tooltip>
+                              <bitmap>bitmaps/16-clean.png</bitmap>
+                              <bitmapposition>wxLEFT</bitmapposition>
+                              <default>0</default>
+                            </object>
+                          </object>
+                          <object class="spacer" name="Spacer5041">
+                            <size>0,20</size>
+                            <flag>wxALL</flag>
+                            <border>5</border>
+                            <option>1</option>
                           </object>
                           <object class="sizeritem">
                             <flag>wxALL|wxEXPAND</flag>
@@ -3827,12 +3906,22 @@
                       <vgap>0</vgap>
                       <hgap>0</hgap>
                       <growablecols>0</growablecols>
-                      <growablerows>1</growablerows>
+                      <growablerows>0</growablerows>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <object class="wxPanel" name="m_filePreviewPlaceholder">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+                          <tooltip>
+                            <![CDATA[Only a placeholder]]>
+                          </tooltip>
+                        </object>
+                      </object>
                       <object class="sizeritem">
                         <flag>wxALL|wxEXPAND</flag>
                         <object class="wxPanel" name="m_panel4398">
                           <style>wxTAB_TRAVERSAL</style>
-                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                          <bg>#0000A0</bg>
                           <object class="wxFlexGridSizer">
                             <cols>2</cols>
                             <rows>0</rows>
@@ -3848,26 +3937,16 @@
                                 <style/>
                                 <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                 <font>
-                                  <size>14</size>
+                                  <size>12</size>
                                   <style>italic</style>
                                   <weight>bold</weight>
-                                  <family>swiss</family>
+                                  <family>default</family>
                                   <underlined>0</underlined>
-                                  <face>Segoe UI Semibold</face>
+                                  <face>Arial</face>
                                 </font>
                               </object>
                             </object>
                           </object>
-                        </object>
-                      </object>
-                      <object class="sizeritem">
-                        <flag>wxALL|wxEXPAND</flag>
-                        <object class="wxPanel" name="m_filePreviewPlaceholder">
-                          <style>wxTAB_TRAVERSAL</style>
-                          <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                          <tooltip>
-                            <![CDATA[Only a placeholder]]>
-                          </tooltip>
                         </object>
                       </object>
                       <object class="sizeritem">
@@ -4012,7 +4091,7 @@
                 </font>
                 <style>wxBORDER_NONE</style>
                 <content>
-                  <item>CNC Preview</item>
+                  <item>CNC Monitor</item>
                   <item>Template Preview</item>
                 </content>
                 <selection>0</selection>
@@ -5922,7 +6001,7 @@ Interval [ms]:</label>
                   <face>Segoe UI</face>
                 </font>
                 <tooltip>
-                  <![CDATA[Keep the Template Manger Preview\nafter the control leaved]]>
+                  <![CDATA[Keep the Template Manager Preview\nafter the control is leaved]]>
                 </tooltip>
                 <style/>
                 <label>Keep Preview</label>
@@ -9123,7 +9202,7 @@ Interval [ms]:</label>
           <object class="sizeritem">
             <flag>wxALL</flag>
             <minsize>24,24</minsize>
-            <object class="wxBitmapButton" name="m_bmpButton3851">
+            <object class="wxBitmapButton" name="m_btDirUp">
               <bitmap>bitmaps/go-up-search.png</bitmap>
               <size>24,24</size>
               <style>wxBU_AUTODRAW</style>
@@ -9136,7 +9215,7 @@ Interval [ms]:</label>
           <object class="sizeritem">
             <flag>wxALL</flag>
             <minsize>24,24</minsize>
-            <object class="wxBitmapButton" name="m_bmpButton38751">
+            <object class="wxBitmapButton" name="m_btRefresh">
               <bitmap>bitmaps/view-refresh-3.png</bitmap>
               <size>24,24</size>
               <style>wxBU_AUTODRAW</style>
@@ -9149,12 +9228,45 @@ Interval [ms]:</label>
           <object class="sizeritem">
             <flag>wxALL</flag>
             <minsize>24,24</minsize>
-            <object class="wxBitmapButton" name="m_bmpButton38754">
+            <object class="wxBitmapButton" name="m_btDefaultPath">
               <bitmap>bitmaps/workspace.png</bitmap>
               <size>24,24</size>
               <style>wxBU_AUTODRAW</style>
               <tooltip>
                 <![CDATA[Select Default Path]]>
+              </tooltip>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>1</border>
+            <object class="wxStaticLine" name="m_staticLine5035">
+              <style>wxLI_VERTICAL</style>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <minsize>24,24</minsize>
+            <object class="wxBitmapButton" name="m_btNewTemplate">
+              <bitmap>bitmaps/document-new-3.png</bitmap>
+              <size>24,24</size>
+              <style>wxBU_AUTODRAW</style>
+              <tooltip>
+                <![CDATA[New Template]]>
+              </tooltip>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <minsize>24,24</minsize>
+            <object class="wxBitmapButton" name="m_btOpenTemplate">
+              <bitmap>bitmaps/document-open-5.png</bitmap>
+              <size>24,24</size>
+              <style>wxBU_AUTODRAW</style>
+              <tooltip>
+                <![CDATA[Open Template  Dialog]]>
               </tooltip>
               <default>0</default>
             </object>

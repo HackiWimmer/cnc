@@ -1,6 +1,7 @@
 #ifndef LRU_LIST_H
 #define LRU_LIST_H
 
+#include <iostream>
 #include <vector>
 #include <wx/fileconf.h>
 #include <wx/filename.h>
@@ -86,6 +87,7 @@ class LruFileList {
 		
 		////////////////////////////////////////////////////////////////
 		void addFile(const wxString& f) {
+			// f includes the full path
 			wxFileName fn(f);
 			
 			if ( fn.Exists() == false ) {
@@ -103,18 +105,42 @@ class LruFileList {
 				// search if entry already exists
 				for ( LruList::iterator it=lruList.begin(); it!=lruList.end(); ++it) {
 					if ( *it == f ) {
+						// remove the file
 						lruList.erase(it);
 						if ( lruList.size() == 0 )
 							break;
 						
-						// restart
+						// restart to also find mutiple entries
 						it = lruList.begin();
 					} 
 				}
 			}
 			
+			// inster the current file at the top
 			lruList.insert(lruList.begin(), fn);
+			
+			// shrink the lru list to the max size
 			lruList.resize(size);
+			
+			updateListControl();
+		}
+		
+		////////////////////////////////////////////////////////////////
+		void removeFile(const wxString& f) {
+			wxFileName fn(f);
+			
+			// search if entry exists
+			for ( LruList::iterator it=lruList.begin(); it!=lruList.end(); ++it) {
+				if ( *it == f ) {
+					// remove the file
+					lruList.erase(it);
+					if ( lruList.size() == 0 )
+						break;
+					
+					// restart to also find mutiple entries
+					it = lruList.begin();
+				} 
+			}
 			
 			updateListControl();
 		}

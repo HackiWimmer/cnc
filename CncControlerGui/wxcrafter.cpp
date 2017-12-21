@@ -61,7 +61,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auibarMain->AddSeparator();
     
     m_btSelectReferences = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-orientation")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btSelectReferences->SetToolTip(_("References"));
+    m_btSelectReferences->SetToolTip(_("References Page"));
     m_auibarMain->AddControl(m_btSelectReferences);
     
     m_btSelectManuallyMove = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-fold")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
@@ -69,12 +69,32 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auibarMain->AddControl(m_btSelectManuallyMove);
     
     m_btSelectSetup = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("system-settings")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btSelectSetup->SetToolTip(_("Setup"));
+    m_btSelectSetup->SetToolTip(_("Setup Page"));
     m_auibarMain->AddControl(m_btSelectSetup);
     
     m_btSelectTemplate = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("package-supported")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btSelectTemplate->SetToolTip(_("Template"));
+    m_btSelectTemplate->SetToolTip(_("Template Page"));
     m_auibarMain->AddControl(m_btSelectTemplate);
+    
+    m_auibarMain->AddSeparator();
+    
+    m_btSelectInboundPreview4 = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectInboundPreview4->SetToolTip(_("Test Page"));
+    m_auibarMain->AddControl(m_btSelectInboundPreview4);
+    
+    m_btSelectInboundPreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("filepreview")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectInboundPreview->SetToolTip(_("Inbound Preview"));
+    m_auibarMain->AddControl(m_btSelectInboundPreview);
+    
+    m_auibarMain->AddSeparator();
+    
+    m_btSelectCncPreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("brick-go1")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectCncPreview->SetToolTip(_("CNC Monitor"));
+    m_auibarMain->AddControl(m_btSelectCncPreview);
+    
+    m_btSelectTemplatePreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-preview")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectTemplatePreview->SetToolTip(_("Template Preview"));
+    m_auibarMain->AddControl(m_btSelectTemplatePreview);
     
     m_auibarMain->AddSeparator();
     
@@ -234,10 +254,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_openSvgExtern->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-gtk")), wxLEFT);
     m_openSvgExtern->SetBitmapMargins(2,2);
     #endif
-    m_openSvgExtern->SetToolTip(_("Open Source extern with corresbonding tool"));
+    m_openSvgExtern->SetToolTip(_("Open Source extern with configured tool"));
     
     flexGridSizer1368->Add(m_openSvgExtern, 0, wxALL, WXC_FROM_DIP(1));
     m_openSvgExtern->SetMinSize(wxSize(24,24));
+    
+    m_staticLine44728 = new wxStaticLine(m_mainBookSourcePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer1368->Add(m_staticLine44728, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     m_saveTemplate = new wxButton(m_mainBookSourcePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -254,10 +278,32 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_reloadTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-file_reload")), wxLEFT);
     m_reloadTemplate->SetBitmapMargins(2,2);
     #endif
-    m_reloadTemplate->SetToolTip(_("Reload Source"));
+    m_reloadTemplate->SetToolTip(_("Reload current Template"));
     
     flexGridSizer1368->Add(m_reloadTemplate, 0, wxALL, WXC_FROM_DIP(1));
     m_reloadTemplate->SetMinSize(wxSize(24,24));
+    
+    m_renameTemplate = new wxButton(m_mainBookSourcePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_renameTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("edit-rename")), wxLEFT);
+    m_renameTemplate->SetBitmapMargins(2,2);
+    #endif
+    m_renameTemplate->SetToolTip(_("Rename current Template"));
+    
+    flexGridSizer1368->Add(m_renameTemplate, 0, wxALL, WXC_FROM_DIP(1));
+    m_renameTemplate->SetMinSize(wxSize(24,24));
+    
+    m_removeTemplate = new wxButton(m_mainBookSourcePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_removeTemplate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_removeTemplate->SetBitmapMargins(2,2);
+    #endif
+    m_removeTemplate->SetToolTip(_("Remove current Template"));
+    
+    flexGridSizer1368->Add(m_removeTemplate, 0, wxALL, WXC_FROM_DIP(1));
+    m_removeTemplate->SetMinSize(wxSize(24,24));
+    
+    flexGridSizer1368->Add(0, 20, 1, wxALL, WXC_FROM_DIP(5));
     
     m_staticLine4472 = new wxStaticLine(m_mainBookSourcePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -2170,11 +2216,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3892->SetFlexibleDirection( wxBOTH );
     flexGridSizer3892->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer3892->AddGrowableCol(0);
-    flexGridSizer3892->AddGrowableRow(1);
+    flexGridSizer3892->AddGrowableRow(0);
     m_mainBookPreviewPanel->SetSizer(flexGridSizer3892);
     
+    m_filePreviewPlaceholder = new wxPanel(m_mainBookPreviewPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookPreviewPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_filePreviewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    m_filePreviewPlaceholder->SetToolTip(_("Only a placeholder"));
+    
+    flexGridSizer3892->Add(m_filePreviewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
     m_panel4398 = new wxPanel(m_mainBookPreviewPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookPreviewPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_panel4398->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_panel4398->SetBackgroundColour(wxColour(wxT("rgb(0,0,160)")));
     
     flexGridSizer3892->Add(m_panel4398, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -2185,16 +2237,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_staticText4402 = new wxStaticText(m_panel4398, wxID_ANY, _("File Manager Preview . . ."), wxDefaultPosition, wxDLG_UNIT(m_panel4398, wxSize(-1,-1)), 0);
     m_staticText4402->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_staticText4402Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
+    wxFont m_staticText4402Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Arial"));
     m_staticText4402->SetFont(m_staticText4402Font);
     
     flexGridSizer4400->Add(m_staticText4402, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_filePreviewPlaceholder = new wxPanel(m_mainBookPreviewPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookPreviewPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_filePreviewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    m_filePreviewPlaceholder->SetToolTip(_("Only a placeholder"));
-    
-    flexGridSizer3892->Add(m_filePreviewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_currentFileMangerPreviewFileName = new wxTextCtrl(m_mainBookPreviewPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookPreviewPanel, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
     #if wxVERSION_NUMBER >= 3000
@@ -2251,7 +2297,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_scrollWinMonitor->SetSizer(flexGridSizer4348);
     
     wxArrayString m_monitorViewSelectorArr;
-    m_monitorViewSelectorArr.Add(wxT("CNC Preview"));
+    m_monitorViewSelectorArr.Add(wxT("CNC Monitor"));
     m_monitorViewSelectorArr.Add(wxT("Template Preview"));
     m_monitorViewSelector = new wxChoice(m_scrollWinMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinMonitor, wxSize(-1,-1)), m_monitorViewSelectorArr, wxBORDER_NONE);
     wxFont m_monitorViewSelectorFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
@@ -3422,7 +3468,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_keepFileManagerPreview->SetValue(false);
     wxFont m_keepFileManagerPreviewFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_keepFileManagerPreview->SetFont(m_keepFileManagerPreviewFont);
-    m_keepFileManagerPreview->SetToolTip(_("Keep the Template Manger Preview\nafter the control leaved"));
+    m_keepFileManagerPreview->SetToolTip(_("Keep the Template Manager Preview\nafter the control is leaved"));
     
     flexGridSizer1628->Add(m_keepFileManagerPreview, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -4592,6 +4638,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btSelectManuallyMove->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
     m_btSelectSetup->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
     m_btSelectTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplate), NULL, this);
+    m_btSelectInboundPreview4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTestPage), NULL, this);
+    m_btSelectInboundPreview->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectInboundPreview), NULL, this);
+    m_btSelectCncPreview->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectCncMonitor), NULL, this);
+    m_btSelectTemplatePreview->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplatePreview), NULL, this);
     this->Connect(wxID_ANY, wxEVT_COMMAND_AUITOOLBAR_TOOL_DROPDOWN, wxAuiToolBarEventHandler(MainFrameBClass::cfgStepDelayDropDown), NULL, this);
     this->Connect(m_miCfgStepDelayMin->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMin), NULL, this);
     this->Connect(m_miCfgStepDelayMax->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMax), NULL, this);
@@ -4613,6 +4663,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_openSvgExtern->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSvgExtern), NULL, this);
     m_saveTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveTemplateFromButton), NULL, this);
     m_reloadTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::reloadTemplateFromButton), NULL, this);
+    m_renameTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
+    m_removeTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
     m_btSvgToggleWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
     m_btPathGenerator->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     m_stcFileContent->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::fileContentKeyDown), NULL, this);
@@ -4870,6 +4922,10 @@ MainFrameBClass::~MainFrameBClass()
     m_btSelectManuallyMove->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
     m_btSelectSetup->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
     m_btSelectTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplate), NULL, this);
+    m_btSelectInboundPreview4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTestPage), NULL, this);
+    m_btSelectInboundPreview->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectInboundPreview), NULL, this);
+    m_btSelectCncPreview->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectCncMonitor), NULL, this);
+    m_btSelectTemplatePreview->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplatePreview), NULL, this);
     this->Disconnect(wxID_ANY, wxEVT_COMMAND_AUITOOLBAR_TOOL_DROPDOWN, wxAuiToolBarEventHandler(MainFrameBClass::cfgStepDelayDropDown), NULL, this);
     this->Disconnect(m_miCfgStepDelayMin->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMin), NULL, this);
     this->Disconnect(m_miCfgStepDelayMax->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::cfgStepDelayMax), NULL, this);
@@ -4891,6 +4947,8 @@ MainFrameBClass::~MainFrameBClass()
     m_openSvgExtern->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSvgExtern), NULL, this);
     m_saveTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveTemplateFromButton), NULL, this);
     m_reloadTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::reloadTemplateFromButton), NULL, this);
+    m_renameTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
+    m_removeTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
     m_btSvgToggleWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
     m_btPathGenerator->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     m_stcFileContent->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::fileContentKeyDown), NULL, this);
@@ -6336,23 +6394,39 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     
     flexGridSizer3841->Add(flexGridSizer3847, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_bmpButton3851 = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("go-up-search")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
-    m_bmpButton3851->SetToolTip(_(".."));
+    m_btDirUp = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("go-up-search")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btDirUp->SetToolTip(_(".."));
     
-    flexGridSizer3847->Add(m_bmpButton3851, 0, wxALL, WXC_FROM_DIP(0));
-    m_bmpButton3851->SetMinSize(wxSize(24,24));
+    flexGridSizer3847->Add(m_btDirUp, 0, wxALL, WXC_FROM_DIP(0));
+    m_btDirUp->SetMinSize(wxSize(24,24));
     
-    m_bmpButton38751 = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-refresh-3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
-    m_bmpButton38751->SetToolTip(_("Refresh"));
+    m_btRefresh = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-refresh-3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btRefresh->SetToolTip(_("Refresh"));
     
-    flexGridSizer3847->Add(m_bmpButton38751, 0, wxALL, WXC_FROM_DIP(0));
-    m_bmpButton38751->SetMinSize(wxSize(24,24));
+    flexGridSizer3847->Add(m_btRefresh, 0, wxALL, WXC_FROM_DIP(0));
+    m_btRefresh->SetMinSize(wxSize(24,24));
     
-    m_bmpButton38754 = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("workspace")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
-    m_bmpButton38754->SetToolTip(_("Select Default Path"));
+    m_btDefaultPath = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("workspace")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btDefaultPath->SetToolTip(_("Select Default Path"));
     
-    flexGridSizer3847->Add(m_bmpButton38754, 0, wxALL, WXC_FROM_DIP(0));
-    m_bmpButton38754->SetMinSize(wxSize(24,24));
+    flexGridSizer3847->Add(m_btDefaultPath, 0, wxALL, WXC_FROM_DIP(0));
+    m_btDefaultPath->SetMinSize(wxSize(24,24));
+    
+    m_staticLine5035 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer3847->Add(m_staticLine5035, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btNewTemplate = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-new-3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btNewTemplate->SetToolTip(_("New Template"));
+    
+    flexGridSizer3847->Add(m_btNewTemplate, 0, wxALL, WXC_FROM_DIP(0));
+    m_btNewTemplate->SetMinSize(wxSize(24,24));
+    
+    m_btOpenTemplate = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-open-5")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btOpenTemplate->SetToolTip(_("Open Template  Dialog"));
+    
+    flexGridSizer3847->Add(m_btOpenTemplate, 0, wxALL, WXC_FROM_DIP(0));
+    m_btOpenTemplate->SetMinSize(wxSize(24,24));
     
     m_fileList = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLC_VRULES|wxLC_HRULES|wxLC_SINGLE_SEL|wxLC_REPORT);
     
@@ -6389,9 +6463,11 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
          GetSizer()->Fit(this);
     }
     // Connect events
-    m_bmpButton3851->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::aFolderUp), NULL, this);
-    m_bmpButton38751->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::refresh), NULL, this);
-    m_bmpButton38754->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectDefault), NULL, this);
+    m_btDirUp->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::aFolderUp), NULL, this);
+    m_btRefresh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::refresh), NULL, this);
+    m_btDefaultPath->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectDefault), NULL, this);
+    m_btNewTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectNewTemplate), NULL, this);
+    m_btOpenTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectOpenTemplate), NULL, this);
     m_fileList->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(CncFileViewBase::fileListActivated), NULL, this);
     m_fileList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncFileViewBase::fileListSelected), NULL, this);
     m_fileList->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncFileViewBase::fileListLeave), NULL, this);
@@ -6401,9 +6477,11 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
 
 CncFileViewBase::~CncFileViewBase()
 {
-    m_bmpButton3851->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::aFolderUp), NULL, this);
-    m_bmpButton38751->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::refresh), NULL, this);
-    m_bmpButton38754->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectDefault), NULL, this);
+    m_btDirUp->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::aFolderUp), NULL, this);
+    m_btRefresh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::refresh), NULL, this);
+    m_btDefaultPath->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectDefault), NULL, this);
+    m_btNewTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectNewTemplate), NULL, this);
+    m_btOpenTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectOpenTemplate), NULL, this);
     m_fileList->Disconnect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(CncFileViewBase::fileListActivated), NULL, this);
     m_fileList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncFileViewBase::fileListSelected), NULL, this);
     m_fileList->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncFileViewBase::fileListLeave), NULL, this);

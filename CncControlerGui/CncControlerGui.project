@@ -122,6 +122,7 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncNumberFormatter.cpp"/>
       <File Name="CncArduino.cpp"/>
       <File Name="CncControl.cpp"/>
       <File Name="CncControllerTestSuite.cpp"/>
@@ -245,6 +246,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Config">
+      <File Name="CncConfigProperty.cpp"/>
+      <File Name="CncConfigProperty.h"/>
       <File Name="CncConfig.cpp"/>
       <File Name="CncConfig.h"/>
       <VirtualDirectory Name="Pages">

@@ -6,6 +6,7 @@
 #include <wx/splash.h>
 #include <wx/dcmemory.h>
 #include <wx/cmdline.h>
+#include <wx/intl.h>
 #include "CncFileNameService.h"
 #include "CncStreamBuffers.h"
 #include "CncTimeFunctions.h"
@@ -128,11 +129,14 @@ class MainApp : public wxApp {
 ///////////////////////////////////////////////////////////////////
 	private:
 		wxCmdLineParser parser;
+		wxLocale locale;
 		wxFileConfig* globalFileConfig;
+		
 	
 	public:
 		///////////////////////////////////////////////////////////
 		MainApp() 
+		//: locale(wxLANGUAGE_DEFAULT)
 		: globalFileConfig(NULL)
 		{
 		///////////////////////////////////////////////////////////

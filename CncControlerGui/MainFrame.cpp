@@ -44,6 +44,10 @@
 #include "HexDecoder.h"
 #include "UnitTestFrame.h"
 #include "UpdateManagerThread.h"
+
+#include "CncConfigProperty.h"
+
+
 #include "MainFrame.h"
 
 // special includes for WindowPoc handling. 
@@ -104,6 +108,7 @@ wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
 
+
 ///////////////////////////////////////////////////////////////////
 MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 : MainFrameBClass(parent)
@@ -153,6 +158,9 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 ///////////////////////////////////////////////////////////////////
 	// determine assert handler
 	wxSetDefaultAssertHandler();
+	
+	// init the specialized wxGrid editor
+	CncTextCtrlEditor::init();
 			
 	// initilazied update mananger thread
 	initializeUpdateManagerThread();
@@ -369,6 +377,8 @@ void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(m_removeTemplate);
+	registerGuiControl(m_renameTemplate);
 
 	registerGuiControl(m_btProbeMode);
 	registerGuiControl(m_btSelectReferences);
@@ -2102,19 +2112,33 @@ void MainFrame::prepareNewTemplateFile() {
 	m_stcFileContent->ClearAll();
 	
 	wxFileName fn(getCurrentTemplateFileName());
+	TemplateFormat tf = getCurrentTemplateFormat();
 	
-	if ( fn.GetExt().MakeUpper() == "SVG") {
+	if ( tf == TplSvg ) {
 		m_stcFileContent->AppendText("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\r\n");
 		m_stcFileContent->AppendText("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\r\n");
 		m_stcFileContent->AppendText("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n");
 		m_stcFileContent->AppendText("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100mm\" height=\"100mm\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\r\n");
-		m_stcFileContent->AppendText("<title>CncControl SerialEmulatorSVG output</title>\r\n");
+		m_stcFileContent->AppendText("<title>CNC Woodworking standard template</title>\r\n");
 		m_stcFileContent->AppendText("<desc>....</desc>\r\n");
 		
 		m_stcFileContent->AppendText(SvgNodeTemplates::getSamplesAsString());
 	
 		m_stcFileContent->AppendText("\r\n");
 		m_stcFileContent->AppendText("</svg>\r\n");
+		
+	} else if ( tf == TplGcode ) {
+		m_stcFileContent->AppendText("(<1: Programmanfang>)\n");
+		m_stcFileContent->AppendText("G17 G40\n");
+		m_stcFileContent->AppendText("G80\n");
+		m_stcFileContent->AppendText("G90\n");
+		
+		m_stcFileContent->AppendText("T01 M6\n");
+		m_stcFileContent->AppendText("S0 F700 M3\n");
+		m_stcFileContent->AppendText("G43 H07\n");
+		m_stcFileContent->AppendText("\n\n\n");
+		m_stcFileContent->AppendText("M2\n");
+		
 	} else {
 		//Curently do nothing
 	}
@@ -2199,6 +2223,97 @@ void MainFrame::reloadTemplateFromButton(wxCommandEvent& event) {
 	if ( !openFile(TemplateBookSelection::VAL::SOURCE_PANEL) ) {
 		std::cerr << "Error while reloding template: " << getCurrentTemplateFileName().c_str() << std::endl;
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString fn (getCurrentTemplatePathFileName());
+	wxFileName tplFile(fn);
+	
+	if ( tplFile.Exists() == false ) {
+		std::cerr << "MainFrame::removeTemplateFromButton: Cant find: " << fn << std::endl;
+		return;
+	}
+	
+	wxString msg("Do you really want to remove the following template from the disk?\n\nTemplate:\n");
+	msg.append(fn);
+	wxMessageDialog dlg(this, msg, _T("Remove template . . . "), 
+		                wxYES|wxNO|wxCANCEL|wxICON_QUESTION|wxCENTRE);
+	
+	int ret = dlg.ShowModal();
+	if ( ret == wxID_YES ) {
+		if ( wxRemoveFile(fn) == false ) {
+			std::cerr << "MainFrame::removeTemplateFromButton: failed!" << std::endl;
+			return;
+		}
+		
+		std::clog << "Template: " << fn << " was removed." << std::endl;
+		
+		// update file lists
+		lruFileList.removeFile(fn);
+		lruFileList.save(lruStore);
+		
+		fileView->update();
+		
+		// clear source editor an motion monitor
+		m_stcFileContent->ClearAll();
+		clearMotionMonitor();
+		m_inputFileName->SetValue("");
+		m_inputFileName->SetHint("");
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::renameTemplateFromButton(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxString oldFileName (getCurrentTemplatePathFileName());
+	wxFileName tplFile(oldFileName);
+	
+	if ( tplFile.Exists() == false ) {
+		std::cerr << "MainFrame::renameTemplateFromButton: Cant find: " << oldFileName << std::endl;
+		return;
+	}
+	
+	wxTextEntryDialog dlg(this, "Rename current Template:", "New Name", tplFile.GetFullName());
+	dlg.SetMaxLength(256);
+	if ( dlg.ShowModal() != wxID_OK )
+		return;
+	
+	// search again - if the dialog was a long time opened the file may be removed otherwise
+	if ( tplFile.Exists() == false ) {
+		std::cerr << "MainFrame::renameTemplateFromButton: Cant find: " << oldFileName << std::endl;
+		return;
+	}
+	
+	// build new file name
+	wxString newFileName(tplFile.GetPathWithSep());
+	newFileName.append(dlg.GetValue());
+	
+	wxFileName newTplFile(newFileName);
+	if ( newTplFile.Exists() == true ) {
+		
+		wxString msg("The new template name below already exists. Should it be overwritten?\n\nNew template name:\n");
+		msg.append(newFileName);
+		wxMessageDialog dlg(this, msg, _T("Template already exists. . . "), 
+		                wxYES|wxNO|wxCANCEL|wxICON_QUESTION|wxCENTRE);
+		
+		if ( dlg.ShowModal() != wxID_YES )
+			return;
+	}
+	
+	if ( wxRenameFile(oldFileName, newFileName, true) == false ) {
+		std::cerr << "MainFrame::renameTemplateFromButton: wxRenameFile failed: From: " << oldFileName << " to: " << newFileName << std::endl;
+		return;
+	}
+	
+	// update file lists
+	lruFileList.removeFile(oldFileName);
+	lruFileList.addFile(newFileName);
+	lruFileList.save(lruStore);
+	
+	fileView->update();
+	
+	m_inputFileName->SetValue(newTplFile.GetFullName());
+	m_inputFileName->SetHint(tplFile.GetPathWithSep());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplateSourceExtern(wxCommandEvent& event) {
@@ -2297,7 +2412,8 @@ bool MainFrame::saveFile() {
 		case TplGcode:		ret = saveTextFile();
 							break;
 							
-		default:			std::cerr << "MainFrame::saveFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
+		///default:			std::cerr << "MainFrame::saveFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
+		default:			ret = saveTextFileAs();
 	}
 	
 	if( ret == true ) {
@@ -2346,6 +2462,39 @@ bool MainFrame::saveTextFile() {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
+bool MainFrame::saveTextFileAs() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(m_inputFileName);
+	
+	wxFileDialog saveFileDialog(this, 
+	                            _("Save Template File"), 
+								getCurrentTemplatePathFileName(), 
+								"",
+								"SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode",  
+								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+								
+	if ( saveFileDialog.ShowModal() == wxID_CANCEL ) 
+		return true;
+
+	wxString ov = getCurrentTemplateFileName();
+	wxString oh = getCurrentTemplatePathFileName();
+	
+	m_inputFileName->SetValue(saveFileDialog.GetFilename());
+	m_inputFileName->SetHint(saveFileDialog.GetPath());
+	
+	bool ret = false;
+	if ( !saveFile() ) {
+		m_inputFileName->SetValue(ov);
+		m_inputFileName->SetHint(oh);
+	} else {
+		m_stcFileContent->DiscardEdits();
+		introduceCurrentFile();
+		ret = true;
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::saveTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	saveFile();
@@ -2358,31 +2507,7 @@ void MainFrame::saveTemplateFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(m_inputFileName);
-	
-	wxFileDialog saveFileDialog(this, 
-	                            _("Save Template File"), 
-								getCurrentTemplatePathFileName(), 
-								"",
-								"SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode",  
-								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-								
-	if (saveFileDialog.ShowModal() == wxID_CANCEL) 
-		return;
-
-	wxString ov = getCurrentTemplateFileName();
-	wxString oh = getCurrentTemplatePathFileName();
-	
-	m_inputFileName->SetValue(saveFileDialog.GetFilename());
-	m_inputFileName->SetHint(saveFileDialog.GetPath());
-	
-	if ( !saveFile() ) {
-		m_inputFileName->SetValue(ov);
-		m_inputFileName->SetHint(oh);
-	} else {
-		m_stcFileContent->DiscardEdits();
-		introduceCurrentFile();
-	}
+	saveTextFileAs();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processVirtualTemplate() {
@@ -3086,8 +3211,11 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 bool MainFrame::processTemplateWrapper() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	
 	bool ret = true;
+	
+	wxString fn (getCurrentTemplatePathFileName());
+	if ( fn.IsEmpty() == true )
+		return false;
 	
 	if ( cnc->isReadyToRun() == false ) {
 		std::cerr << "MainFrame::processTemplateWrapper: Controller isn't ready to run: Run was rejected!" << std::endl;
@@ -3109,7 +3237,7 @@ bool MainFrame::processTemplateWrapper() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-// don't call this method dirctly, instead use processTemplateWrapper
+// don't call this method directly, instead use processTemplateWrapper
 bool MainFrame::processTemplateIntern() {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
@@ -4501,6 +4629,8 @@ void MainFrame::updateCurveLibResolution() {
 void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(ctrl);
+	
+	m_currentFileMangerPreviewFileName->ChangeValue(fn);
 	
 	TemplateFormat tf = getCurrentTemplateFormat(fn);
 	switch ( tf ) {
@@ -6407,6 +6537,26 @@ void MainFrame::onSelectTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	selectMainBookSourcePanel();
 }
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectInboundPreview(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMainBookPreviewPanel();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectTestPage(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMainBookTestPanel();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectCncMonitor(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMonitorBookCncPanel();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSelectTemplatePreview(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	selectMonitorBookTemplatePanel();
+}
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onDebugUserNotificationTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////
@@ -6966,15 +7116,11 @@ void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	
 	//isProcessing()
 	
 	
-	clog << "aDASDASDASD" << endl;
 }
-void MainFrame::moveStartMainWindow(wxMoveEvent& event)
-{
-	clog << "aDASDASDASD" << endl;
-	
-	event.Skip(true);
+void MainFrame::moveStartMainWindow(wxMoveEvent& event) {
+	//event.Skip(true);
 }
+

@@ -74,7 +74,7 @@ void GLContextBase::globalInit() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::traceOpenGLVersionInfo(std::ostream& s) {
 /////////////////////////////////////////////////////////////////
-	s << "::OpenGL version linfo: ";
+	s << "::OpenGL version info: ";
 	s << glGetString(GL_VERSION) 	<< "; ";
 	s << glGetString(GL_VENDOR) 	<< "; ";
 	s << glGetString(GL_RENDERER) 	<< std::endl;
