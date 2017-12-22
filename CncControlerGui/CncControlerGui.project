@@ -110,13 +110,24 @@
       <File Name="CncPatternDefinitions.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
-      <File Name="SerialEmulatorFile.cpp"/>
-      <File Name="SerialEmulatorNull.cpp"/>
-      <File Name="SerialEmulatorSVG.cpp"/>
+      <File Name="SerialSimulatorFacade.cpp"/>
+      <File Name="SerialSimulatorFacade.h"/>
+      <VirtualDirectory Name="Native">
+        <File Name="SerialEmulatorSVG.h"/>
+        <File Name="SerialEmulatorSVG.cpp"/>
+        <File Name="SerialEmulatorNull.h"/>
+        <File Name="SerialEmulatorNull.cpp"/>
+        <File Name="SerialEmulatorFile.h"/>
+        <File Name="SerialEmulatorFile.cpp"/>
+      </VirtualDirectory>
       <File Name="SerialPort.cpp"/>
-      <File Name="SerialEmulatorFile.h"/>
-      <File Name="SerialEmulatorNull.h"/>
-      <File Name="SerialEmulatorSVG.h"/>
+      <VirtualDirectory Name="Simulators">
+        <File Name="SerialSimulatorDevNull.cpp"/>
+        <File Name="SerialSimulatorDevNull.h"/>
+        <File Name="SerialSimulatorBase.cpp"/>
+        <File Name="SerialSimulatorBase.h"/>
+        <File Name="SerialData.h"/>
+      </VirtualDirectory>
       <File Name="SerialPort.h"/>
       <File Name="SerialSpyPort.h"/>
       <File Name="SerialSpyPort.cpp"/>

@@ -134,7 +134,7 @@ CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncNanoTimestamp& a, const C
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 ////////////////////////////////////////////////////////////////
-	if ( micros < 0LL )
+	if ( micros <= 0LL )
 		return;
 
 	struct timeval t0, t1;
@@ -146,30 +146,30 @@ void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 	} while ( (t1.tv_sec * 1000 * 1000 + t1.tv_usec - (t0.tv_sec * 1000 * 1000 + t0.tv_usec)) < (int)micros );
 }
 ////////////////////////////////////////////////////////////////
-void CncTimeFunctions::activeWaitMircoseconds(int64_t micros) {
+void CncTimeFunctions::activeWaitMircoseconds(int64_t micros, bool active) {
 ////////////////////////////////////////////////////////////////
-	if ( micros < 0LL )
+	if ( micros <= 0LL )
 		return;
 	
-	static const int64_t threshold = 1625LL;
+	static const int64_t threshold = 16250LL;
 	
-	if ( micros > 3000 ) {
+	if ( micros > 30000 ) {
 		int64_t x = (micros - threshold) / 1000;
 		micros    = threshold + (micros - threshold) % 1000;
 		
-		GBL_CONFIG->getTheApp()->waitActive(x);
+		if ( active == true ) 	GBL_CONFIG->getTheApp()->waitActive(x);
+		else					sleepMircoseconds(x * 1000);
 	}
-	
+		
 	sleepMircoseconds(micros);
 }
-
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
 ////////////////////////////////////////////////////////////////
-	if ( micros < 0LL )
+	if ( micros <= 0LL )
 		return;
 	
-	if ( micros < 1625LL )
+	if ( micros <= 16250LL )
 		busyWaitMircoseconds(micros);
 	
 	HANDLE timer; 

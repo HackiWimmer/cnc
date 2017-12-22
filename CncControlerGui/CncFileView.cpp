@@ -12,7 +12,8 @@ enum FileListImage {
 };
 const char* ALL_FILES 		= "*.*";
 const char* SVG_FILES 		= "*.svg";
-const char* GCODE_FILES 	= "*.gcode";
+const char* GCODE_FILES1 	= "*.gcode";
+const char* GCODE_FILES2 	= "*.ngc";
 
 /////////////////////////////////////////////////////////////////
 CncFileView::CncFileView(MainFrame* parent)
@@ -37,7 +38,8 @@ CncFileView::CncFileView(MainFrame* parent)
 	
 	filterList.push_back(ALL_FILES);
 	filterList.push_back(SVG_FILES);
-	filterList.push_back(GCODE_FILES);
+	filterList.push_back(GCODE_FILES1);
+	filterList.push_back(GCODE_FILES2);
 	
 	for ( auto it = filterList.begin(); it != filterList.end(); ++it )
 		m_filterExtention->Append(*it);

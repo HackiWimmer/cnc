@@ -65,7 +65,18 @@ class CncSpeedSimulator : public CncSpeedManager {
 		void performCurrentOffset(bool force=false) {
 			// consider the windows standard timer resolution of 15,625 ms
 			if ( currentAccumulatedOffset >= 16000LL || force == true ) {
-				CncTimeFunctions::activeWaitMircoseconds(currentAccumulatedOffset);
+				CncTimeFunctions::activeWaitMircoseconds(currentAccumulatedOffset, true);
+				
+				totalAccumulatedOffset   += currentAccumulatedOffset;
+				currentAccumulatedOffset  = 0LL;
+			}
+		}
+		
+		//////////////////////////////////////////////////////////////////////////
+		void performCurrentOffsetThreadLocal(bool force=false) {
+			// consider the windows standard timer resolution of 15,625 ms
+			if ( currentAccumulatedOffset >= 16000LL || force == true ) {
+				CncTimeFunctions::activeWaitMircoseconds(currentAccumulatedOffset, false);
 				
 				totalAccumulatedOffset   += currentAccumulatedOffset;
 				currentAccumulatedOffset  = 0LL;

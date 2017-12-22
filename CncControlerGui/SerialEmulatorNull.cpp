@@ -63,6 +63,13 @@ SerialEmulatorNULL::~SerialEmulatorNULL() {
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::sleepMilliseconds(unsigned int millis) {
+///////////////////////////////////////////////////////////////////
+	// do nothing because the emulator runs in the same thread as
+	// the application arround
+	//Sleep(millis);
+}
+///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::reset() {
 	lastCommand.restLastCmd();
 	lastCommand.resetM();

@@ -45,10 +45,10 @@ void UpdateManagerThread::stop() {
 ///////////////////////////////////////////////////////////////////
 wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
-	UpdateManagerThread::EventId posEvtId = UpdateManagerThread::EventId::CTL_POS_UPDATE;
-	
+	MainFrame::EventId posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
 	
 /*
+ * to sleep with more granullary
 	int us = 100; // length of time to sleep, in miliseconds
 	struct timespec req = {0};
 	req.tv_sec = 0;
@@ -87,8 +87,8 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		if ( (wxDateTime::UNow() - tsLast).GetMilliseconds() >= 50 ) {
 			UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, posEvtId);
 			
-			if ( posEvtId == UpdateManagerThread::EventId::APP_POS_UPDATE) 	posEvtId = UpdateManagerThread::EventId::CTL_POS_UPDATE;
-			else															posEvtId = UpdateManagerThread::EventId::APP_POS_UPDATE;
+			if ( posEvtId == MainFrame::EventId::APP_POS_UPDATE) 	posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
+			else													posEvtId = MainFrame::EventId::APP_POS_UPDATE;
 			
 			wxPostEvent(pHandler, evt);
 		}
@@ -96,7 +96,7 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		// --------------------------------------------------------------------
 		// process heartbeat
 		if ( (wxDateTime::UNow() - tsLast).GetMilliseconds() >= 500 ) {
-			UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::HEARTBEAT);
+			UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, MainFrame::EventId::HEARTBEAT);
 			wxPostEvent(pHandler, evt);
 			
 			// debug only
@@ -107,29 +107,34 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 	}
 	
 	// post complete event
-	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::COMPLETED);
+	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, MainFrame::EventId::COMPLETED);
 	wxPostEvent(pHandler, evt);
 	
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
+bool UpdateManagerThread::somethingLeftToDo() {
+///////////////////////////////////////////////////////////////////
+	return (posSpyStringQueue.read_available() > 0);
+}
+///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::postInfo(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
-	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::POST_INFO);
+	wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO);
 	evt.SetString(msg);
 	wxPostEvent(pHandler, evt);
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::postWarning(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
-	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::POST_WARNING);
+	wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_WARNING);
 	evt.SetString(msg);
 	wxPostEvent(pHandler, evt);
 }
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::postError(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
-	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, UpdateManagerThread::EventId::POST_ERROR);
+	wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
 	evt.SetString(msg);
 	wxPostEvent(pHandler, evt);
 }
@@ -256,9 +261,6 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 	switch ( evt.type ) {
 											
 		case Event::Type::EMPTY_UPD:		// do noting
-											break;
-											
-		case Event::Type::COMMAND_UPD:		// curently do noting
 											break;
 											
 		case Event::Type::CONFIG_UPD:		// update format factors

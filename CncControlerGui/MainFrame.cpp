@@ -25,6 +25,8 @@
 #include <wx/vscroll.h>
 #include <wx/textdlg.h>
 #include <wx/clipbrd.h>
+#include <wx/version.h> 
+#include <boost/version.hpp>
 #include "CncNumberFormatter.h"
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
@@ -57,10 +59,9 @@
 
 ////////////////////////////////////////////////////////////////////
 // global strings
-const char* _portEmulatorNULL 	= "<PortEmulator(dev/null)>";
-const char* _portEmulatorSVG  	= "<PortEmulator(SVGFile)>";
 const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
+const char* _maxSpeedLabel		= "<{MAX}>";
 
 #ifdef DEBUG
 	const char* _programVersion = "0.8.6.d";
@@ -68,7 +69,6 @@ const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
 	const char* _programVersion = "0.8.6.r";
 #endif
 
-const char* _maxSpeedLabel		= "<{MAX}>";
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -93,6 +93,8 @@ const char* _maxSpeedLabel		= "<{MAX}>";
 	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD, 			UpdateManagerEvent);
 	wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, 				wxTimerEvent);
 	wxDEFINE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 	wxTimerEvent);
+	wxDEFINE_EVENT(wxEVT_TRACE_FROM_THREAD,					wxThreadEvent);
+	wxDEFINE_EVENT(wxEVT_DISPATCH_ALL,						wxThreadEvent);
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -178,15 +180,15 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	FileParser::installDebugConfigPage(m_debuggerPropertyManagerGrid);
 	
 	// bind 
-	this->Bind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 				this);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 			this, UpdateManagerThread::EventId::APP_POS_UPDATE);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 			this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 				this, UpdateManagerThread::EventId::HEARTBEAT);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadDispatchAll,			this, UpdateManagerThread::EventId::DISPATCH_ALL);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 			this, UpdateManagerThread::EventId::COMPLETED);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadPostInfo,	 			this, UpdateManagerThread::EventId::POST_INFO);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadPostWarning, 			this, UpdateManagerThread::EventId::POST_WARNING);
-	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadPostError,	 			this, UpdateManagerThread::EventId::POST_ERROR);
+	this->Bind(wxEVT_CHAR_HOOK, 					&MainFrame::globalKeyDownHook, 				this);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadAppPosUpdate, 			this, MainFrame::EventId::APP_POS_UPDATE);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadCtlPosUpdate, 			this, MainFrame::EventId::CTL_POS_UPDATE);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadHeartbeat, 				this, MainFrame::EventId::HEARTBEAT);
+	this->Bind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadCompletion, 			this, MainFrame::EventId::COMPLETED);
+	this->Bind(wxEVT_DISPATCH_ALL, 					&MainFrame::onThreadDispatchAll,			this, MainFrame::EventId::DISPATCH_ALL);
+	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostInfo,	 			this, MainFrame::EventId::POST_INFO);
+	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostWarning, 			this, MainFrame::EventId::POST_WARNING);
+	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostError,	 			this, MainFrame::EventId::POST_ERROR);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -197,15 +199,15 @@ MainFrame::~MainFrame() {
 		waitActive(m_serialTimer->GetInterval());
 	
 	// unbind 
-	this->Unbind(wxEVT_CHAR_HOOK, 				&MainFrame::globalKeyDownHook, 				this);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadAppPosUpdate, 			this, UpdateManagerThread::EventId::APP_POS_UPDATE);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCtlPosUpdate, 			this, UpdateManagerThread::EventId::CTL_POS_UPDATE);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadHeartbeat, 				this, UpdateManagerThread::EventId::HEARTBEAT);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadDispatchAll, 			this, UpdateManagerThread::EventId::DISPATCH_ALL);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadCompletion, 			this, UpdateManagerThread::EventId::COMPLETED);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadPostInfo,	 			this, UpdateManagerThread::EventId::POST_INFO);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadPostWarning, 			this, UpdateManagerThread::EventId::POST_WARNING);
-	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 	&MainFrame::onThreadPostError,	 			this, UpdateManagerThread::EventId::POST_ERROR);
+	this->Unbind(wxEVT_CHAR_HOOK, 					&MainFrame::globalKeyDownHook, 				this);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadAppPosUpdate, 			this, MainFrame::EventId::APP_POS_UPDATE);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadCtlPosUpdate, 			this, MainFrame::EventId::CTL_POS_UPDATE);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadHeartbeat, 				this, MainFrame::EventId::HEARTBEAT);
+	this->Unbind(wxEVT_UPDATE_MANAGER_THREAD, 		&MainFrame::onThreadCompletion, 			this, MainFrame::EventId::COMPLETED);
+	this->Unbind(wxEVT_DISPATCH_ALL, 				&MainFrame::onThreadDispatchAll, 			this, MainFrame::EventId::DISPATCH_ALL);
+	this->Unbind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostInfo,	 			this, MainFrame::EventId::POST_INFO);
+	this->Unbind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostWarning, 			this, MainFrame::EventId::POST_WARNING);
+	this->Unbind(wxEVT_TRACE_FROM_THREAD,	 		&MainFrame::onThreadPostError,	 			this, MainFrame::EventId::POST_ERROR);
 	
 	positionSpy->Unbind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
 	
@@ -238,8 +240,8 @@ MainFrame::~MainFrame() {
 	wxASSERT(templateNbInfo);
 	delete templateNbInfo;
 	
-	wxASSERT (cnc);
-	delete cnc;
+	if ( cnc != NULL );
+		delete cnc;
 	
 	DeletePendingEvents();
 	GBL_CONFIG->destroyTheApp();
@@ -257,6 +259,20 @@ void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 	}
 	
 	event.Skip(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::umPostEvent(const UpdateManagerThread::Event& evt) { 
+///////////////////////////////////////////////////////////////////
+	if ( updateManagerThread == NULL ) 
+		return;
+	
+	if ( updateManagerThread->IsPaused() == true ) {
+		wxCriticalSectionLocker enter(pThreadCS);
+		updateManagerThread->Resume();
+	}
+	
+	//clog << "MainFrame::umPostEvent " << evt.getTypeAsString() << endl;
+	updateManagerThread->postEvent(evt); 
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
@@ -440,7 +456,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_openSourceExtern);
 	registerGuiControl(m_openSvgExtern);
 	registerGuiControl(m_btRequestCtlConfig);
-	registerGuiControl(m_btRequestCtlPins);
+	registerGuiControl(m_btRequestControllerPins);
 	registerGuiControl(m_btRequestCtlErrorInfo);
 	registerGuiControl(m_lruList);
 	registerGuiControl(fileView);
@@ -493,31 +509,14 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	//clog << "cnc->getSerial()->getTotalDistanceX(): " << cnc->getSerial()->getTotalDistanceX() << endl;
-	
-	GBL_CONFIG->init();
-	
-	
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 	
-	/*
-	cout << "testFunction2"<< endl;
-	clog << "testFunction2"<< endl;
-	cerr << "testFunction2"<< endl;
-	*/
-/*	
-			static float getDefaultCurveLibResolution();
-		static float getCurveLibResolution();
-		static void setCurveLibResolution(double v);
-		static void updateCurveLibResolutionSelector();
-	*/
 	
-	clog << CncConfig::getDefaultCurveLibResolution() << endl;
-	clog << CncConfig::getCurveLibIncrement() << endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -530,12 +529,43 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 	cnc::trc.logInfoMessage("Test function 4");
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::traceWxWidgetsVersion(std::ostream& out) {
+///////////////////////////////////////////////////////////////////
+	out << "::wxWidgets version info: " 
+		<< wxMAJOR_VERSION
+		<< "."
+		<< wxMINOR_VERSION
+		<< "."
+		<< wxRELEASE_NUMBER;
+		
+		if ( wxSUBRELEASE_NUMBER > 0 ) {
+			out << " - "
+			    << wxSUBRELEASE_NUMBER;
+		}
+		
+		out << std::endl;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::traceBoostVersion(std::ostream& out) {
+///////////////////////////////////////////////////////////////////
+	out << "::Boost version info: " 
+		<< BOOST_VERSION / 100000
+		<< "."
+		<< BOOST_VERSION / 100 % 1000
+		<< "."
+		<< BOOST_VERSION % 100 
+		<< std::endl;
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menue
 	loadPerspective("Run");
 	decorateViewMenu();
 	
+	// Version infos
+	traceWxWidgetsVersion(std::cout);
+	traceBoostVersion(std::cout);
 	GLContextBase::traceOpenGLVersionInfo(std::cout);
 	
 	// Auto connect ?
@@ -568,21 +598,42 @@ void MainFrame::traceTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::serialTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( cnc == NULL )
+		return;
+		
+	if ( cnc->isConnected() == false )
+		return;
+	
+	// give the cnc or serial port a change to do
+	// somethinf periodically e. g. pause a thread
+	cnc->onPeriodicallyAppEvent();
+	
+	// pause the update manager thread if nothing more is to do
+	static unsigned int counter = 0;
+	if ( updateManagerThread != NULL ) {
+		if ( updateManagerThread->IsPaused() == false ) {
+			if ( updateManagerThread->somethingLeftToDo() == false ) {
+				// a counter of 10 means 5 seconds
+				if ( ++counter > 10 ) {
+					wxCriticalSectionLocker enter(pThreadCS);
+					updateManagerThread->Pause();
+					
+					counter = 0;
+				}
+			}
+		}
+	}
+	
 	// idle handling
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
 		if ( m_connect->IsEnabled() == false )
 			return;
 		
-		if ( cnc == NULL )
-			return;
-			
-		if ( cnc->isConnected() == false )
-			return;
-			
 		m_serialTimer->Stop();
 		cnc->sendIdleMessage();
 		m_serialTimer->Start();
 	}
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
@@ -687,11 +738,39 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 	m_updateManagerUpdate->Refresh();
 	m_updateManagerUpdate->Update();
 	
+	// update time consumed
+	if ( pngAnimation && pngAnimation->IsRunning() ) {
+		logTimeConsumed();
+	}
+	
+	// statistic
+	if (    m_checkBoxStatisticUpdate->IsChecked() == true 
+		 && isProcessing() 
+		 && statisticSummaryListCtrl->IsShownOnScreen() ) 
+	{
+		logStatistics();
+	}
+	
+	// feed speed control + feed speed panel
+	if ( cnc != NULL && cnc->getSerial() != NULL ) {
+		m_speedPanel->Refresh();
+		m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
+		
+		if ( GBL_CONFIG->isProbeMode() == true )
+			m_feedSpeed->ChangeValue(_maxSpeedLabel);
+	}
+	
 	// update position syp
+	if ( updateManagerThread == NULL )
+		return;
+		
+	if ( updateManagerThread->IsPaused() == true )
+		return;
+		
 	bool updatePosCount = false;
 	static long lastCount = 0;
 	if ( m_btTogglePosSpy->GetValue() == true ) {
-		if ( updateManagerThread && positionSpy->IsShownOnScreen() ) {
+		if ( positionSpy->IsShownOnScreen() ) {
 			if ( updateManagerThread->fillPositionSpy(positionSpy) > 0 ) {
 				positionSpy->Refresh();
 			}
@@ -708,34 +787,14 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 			updatePosCount = true;
 		}
 	}
-
+	
 	if ( updatePosCount == true ) {
 		m_positionSpyCount->ChangeValue(CncNumberFormatter::toString(((long)(positionSpy->GetItemCount()))));
 		m_positionSpyCount->SetToolTip(m_positionSpyCount->GetLabel());
 	}
-	
-	// update time consumed
-	if ( pngAnimation && pngAnimation->IsRunning() ) {
-		logTimeConsumed();
-	}
-	
-	// statistic
-	if (    m_checkBoxStatisticUpdate->IsChecked() == true 
-		 && isProcessing() 
-		 && statisticSummaryListCtrl->IsShownOnScreen()
-	   ) {
-		logStatistics();
-	   }
-	   
-	// feed speed control + feed speed panel
-	m_speedPanel->Refresh();
-	m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
-
-	if ( GBL_CONFIG->isProbeMode() == true )
-		m_feedSpeed->ChangeValue(_maxSpeedLabel);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadDispatchAll(UpdateManagerEvent& event) {
+void MainFrame::onThreadDispatchAll(wxThreadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	dispatchAll();
 }
@@ -746,19 +805,19 @@ void MainFrame::onThreadCompletion(UpdateManagerEvent& event) {
 	updateManagerThread = NULL;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadPostInfo(UpdateManagerEvent& event) {
+void MainFrame::onThreadPostInfo(wxThreadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( event.GetString().IsEmpty() == false )
 		std::cout << event.GetString() << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadPostWarning(UpdateManagerEvent& event) {
+void MainFrame::onThreadPostWarning(wxThreadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( event.GetString().IsEmpty() == false )
 		cnc::cex1 << event.GetString() << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onThreadPostError(UpdateManagerEvent& event) {
+void MainFrame::onThreadPostError(wxThreadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( event.GetString().IsEmpty() == false )
 		std::cerr << event.GetString() << std::endl;
@@ -788,8 +847,26 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		}
 	}
 	
+	// Destroy the serial port connection.
+	// It's very important to do this here in case  
+	// the serial port has threads
+	if ( cnc != NULL ) {
+		{
+			wxCriticalSectionLocker enter(pThreadCS);
+			cnc->disconnect();
+			
+			delete cnc;
+			cnc = NULL;
+		}
+	}
+	
 	// Destroy the update manager thread
 	if ( updateManagerThread != NULL) {
+		if ( updateManagerThread->IsRunning() == false) {
+			wxCriticalSectionLocker enter(pThreadCS);
+			updateManagerThread->Resume();
+		}
+		
 		updateManagerThread->stop();
 		
 		while ( true ) {
@@ -1103,7 +1180,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 				if ( lastPortName == portName )
 					if ( cnc && cnc->isConnected() ) {
 						cnc->interrupt();
-						cnc->getSerial()->disconnect();
+						cnc->disconnect();
 						lastPortName.clear();
 						std::cerr << "Connection brocken" << std::endl;
 						cnc::trc.logWarning("Connection broken . . ."); 
@@ -1132,6 +1209,7 @@ void MainFrame::decoratePortSelector(bool list) {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
 	m_portSelector->Clear();
+	
 	// add default ports
 	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
@@ -1139,6 +1217,9 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( lastPortName == _portEmulatorSVG )		m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
+	if ( lastPortName == _portSimulatorNULL )	m_portSelector->Append(_portSimulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portSimulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+
 	// add com ports
 	int pStart 	= 0;
 	int pEnd 	= 256;
@@ -1207,7 +1288,7 @@ void MainFrame::initializeUpdateManagerThread() {
 	wxThreadError error = updateManagerThread->Create();
 
 	if (error != wxTHREAD_NO_ERROR) {
-		wxMessageBox( _("Couldn't create update maanager thread!") );
+		wxMessageBox( _("Couldn't create update manager thread!") );
 		abort();
 	}
 	
@@ -1461,8 +1542,6 @@ void MainFrame::updateUnit() {
 	m_mmUnitY->SetLabel(unit);
 	m_mmUnitZ->SetLabel(unit);
 
-	// update controls
-	cnc->forceDisplayPositions();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::OnExit(wxCommandEvent& event) {
@@ -1553,6 +1632,7 @@ bool MainFrame::connectSerialPort() {
 	hideSVGEmuResult();
 	
 	m_miRqtIdleMessages->Check(false);
+	m_miRqtIdleMessages->Enable(false);
 	
 	// disconnect and delete the current cnc control
 	if ( cnc != NULL )
@@ -1561,6 +1641,11 @@ bool MainFrame::connectSerialPort() {
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		cs.assign("dev/null");
+		decodrateProbeMode(true);
+		
+	} else if ( sel == _portSimulatorNULL ) {
+		cnc = new CncControl(CncPORT_SIMU);
+		cs.assign(_portSimulatorNULL);
 		decodrateProbeMode(true);
 		
 	} else if ( sel == _portEmulatorSVG ) {
@@ -1576,7 +1661,14 @@ bool MainFrame::connectSerialPort() {
 		cs.assign("\\\\.\\");
 		cs.append(sel);
 		decodrateProbeMode(false);
+	}
+	
+	if ( cnc == NULL || cnc->getSerial() == NULL )
+		return false;
+		
+	if ( cnc->getSerial()->canProcessIdle() ) {
 		m_miRqtIdleMessages->Check(true);
+		m_miRqtIdleMessages->Enable(true);
 	}
 	
 	initializeCncControl();
@@ -1678,6 +1770,8 @@ void MainFrame::enableControls(bool state) {
 	// set global state
 	canClose = state;
 	
+	//ShowFullScreen(!state);
+	
 	// enable all relevant controls
 	enableGuiControls(state);
 	
@@ -1685,8 +1779,9 @@ void MainFrame::enableControls(bool state) {
 	enableManuallyControls(!state);
 
 	// enable menu bar
-	for (unsigned int i=0; i<m_menuBar->GetMenuCount();i++)
+	for (unsigned int i=0; i<m_menuBar->GetMenuCount(); i++) {
 		m_menuBar->EnableTop(i, state);
+	}
 		
 	// enable template editor
 	m_stcFileContent->SetReadOnly(!state);
@@ -1720,7 +1815,6 @@ void MainFrame::setZero() {
 	wxASSERT(cnc);
 	
 	cnc->setup(true);
-	cnc->forceDisplayPositions();
 	setRefPostionState(true);
 }
 ///////////////////////////////////////////////////////////////////
@@ -3141,6 +3235,11 @@ void MainFrame::updateSetterList() {
 	if ( updateManagerThread == NULL )
 		return;
 		
+	if ( updateManagerThread->IsPaused() == true ) {
+		wxCriticalSectionLocker enter(pThreadCS);
+		updateManagerThread->Resume();
+	}
+		
 	if ( setterList->IsFrozen() == false )
 		setterList->Freeze();
 		
@@ -3149,6 +3248,7 @@ void MainFrame::updateSetterList() {
 		setterList->Refresh();
 		
 		setterList->EnsureVisible(0L);
+		setterList->SetSingleStyle(wxLC_HRULES | wxLC_VRULES, true);
 	}
 
 	if ( setterList->IsFrozen() == true )
@@ -3272,7 +3372,6 @@ bool MainFrame::processTemplateIntern() {
 	CncConfig::getGlobalCncConfig()->setAllowEventHandling(true);
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
 	cnc->processCommand("r", std::cout);
-	cnc->logProcessingStart();
 	cnc->enableStepperMotors(true);
 	
 	bool ret = false;
@@ -3327,7 +3426,6 @@ bool MainFrame::processTemplateIntern() {
 	}
 	
 	cnc->enableStepperMotors(false);
-	cnc->logProcessingEnd();
 	
 	motionMonitor->popProcessMode();
 	
@@ -3777,7 +3875,9 @@ void MainFrame::requestConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestControllerConfigFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	m_btRequestCtlConfig->Enable(false);
 	requestConfig(event);
+	m_btRequestCtlConfig->Enable(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestErrorInfo(wxCommandEvent& event) {
@@ -3790,7 +3890,9 @@ void MainFrame::requestErrorInfo(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestControllerErrorInfoFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	m_btRequestCtlErrorInfo->Enable(false);
 	requestErrorInfo(event);
+	m_btRequestCtlErrorInfo->Enable(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestErrorCount(wxCommandEvent& event) {
@@ -6149,7 +6251,9 @@ void MainFrame::traceTextUpdated(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestControllerPinsFromButton(wxCommandEvent& event) {
+	m_btRequestControllerPins->Enable(false);
 	requestPins(event);
+	m_btRequestControllerPins->Enable(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestPins(wxCommandEvent& event) {
@@ -6814,6 +6918,28 @@ void MainFrame::decoratePosSpyConnectButton(bool state) {
 		clearPositionSpy();
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::selectSourceControlLineNumber(long ln) {
+/////////////////////////////////////////////////////////////////////
+	if ( ln <= 0L )
+		return;
+
+	// select source control - try to find ref as line number
+	if ( inboundFileParser != NULL ) {
+		inboundFileParser->selectSourceControl(ln);
+	} else {
+		// select editor directly
+		m_stcFileContent->GotoLine(ln);
+		
+		if ( ln == 0 ) {
+			m_stcFileContent->SetSelectionStart(0);
+			m_stcFileContent->SetSelectionEnd(0);
+		} else {
+			m_stcFileContent->SetSelectionStart(m_stcFileContent->GetCurrentPos());
+			m_stcFileContent->SetSelectionEnd(m_stcFileContent->GetLineEndPosition(ln));
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::selectPositionSpy(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	long item = event.m_itemIndex;
@@ -6834,21 +6960,7 @@ void MainFrame::selectPositionSpy(wxListEvent& event) {
 	if ( ln <= 0L )
 		return;
 	
-	// select source control - try to find ref as line number
-	if ( inboundFileParser != NULL ) {
-		inboundFileParser->selectSourceControl(ln);
-	} else {
-		// select editor directly
-		m_stcFileContent->GotoLine(ln);
-		
-		if ( ln == 0 ) {
-			m_stcFileContent->SetSelectionStart(0);
-			m_stcFileContent->SetSelectionEnd(0);
-		} else {
-			m_stcFileContent->SetSelectionStart(m_stcFileContent->GetCurrentPos());
-			m_stcFileContent->SetSelectionEnd(m_stcFileContent->GetLineEndPosition(ln));
-		}
-	}
+	selectSourceControlLineNumber(ln);
 	
 	// mark this id
 	if ( motionMonitor != NULL ) {
@@ -6931,20 +7043,32 @@ void MainFrame::clearSetterList(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::requestInfoMessage(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc )
-		cnc->processCommand(CMD_TEST_INFO_MESSAGE, std::clog);
+	if ( cnc == NULL )
+		return;
+		
+	cnc->processCommand(CMD_TEST_INFO_MESSAGE, std::clog);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_MSG_HIST_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::requestWarningMessage(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc )
-		cnc->processCommand(CMD_TEST_WARN_MESSAGE, std::clog);
+	if ( cnc == NULL )
+		return;
+		
+	cnc->processCommand(CMD_TEST_WARN_MESSAGE, std::clog);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_MSG_HIST_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::requestErrorMessage(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc )
-		cnc->processCommand(CMD_TEST_ERROR_MESSAGE, std::clog);
+	if ( cnc == NULL )
+		return;
+		
+	cnc->processCommand(CMD_TEST_ERROR_MESSAGE, std::clog);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_MSG_HIST_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::goPosSypFirstId(wxCommandEvent& event) {
@@ -7066,6 +7190,15 @@ void MainFrame::clickProbeMode(wxCommandEvent& event) {
 	decodrateProbeMode(m_btProbeMode->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::leftDownProbeModePanel(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( m_btProbeMode->IsEnabled() == false )
+		return;
+		
+	m_btProbeMode->SetValue(!m_btProbeMode->GetValue());
+	decodrateProbeMode(m_btProbeMode->GetValue());
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMonitorStatistics(bool shown) {
 /////////////////////////////////////////////////////////////////////
 	wxFlexGridSizer* sizer = static_cast<wxFlexGridSizer*>(m_3DOutboundStatistics->GetContainingSizer());
@@ -7101,9 +7234,49 @@ void MainFrame::toggleMonitorStatistics(bool shown) {
 	m_btShowHideStatistics->Update();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
+void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	toggleMonitorStatistics( m_statisticBook->IsShown() == false );
+	if ( updateManagerThread != NULL ) {
+		if ( updateManagerThread->IsPaused() == true ) {
+			wxCriticalSectionLocker enter(pThreadCS);
+			updateManagerThread->Resume();
+		}
+	}
+
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::keyDownLogger(wxKeyEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
+	int c = event.GetUnicodeKey();
+	
+	if ( c == 'C' && ctlKey == true ) {
+		m_logger->Copy();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::dclickLogger(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	long pos = -1, col = -1, row = -1;
+	pos = m_logger->GetInsertionPoint();
+	if ( m_logger->PositionToXY(pos, &col, &row) == false )
+		return;
+		
+	wxString line(m_logger->GetLineText(row));
+	line.Trim(false);
+	
+	if ( line.StartsWith('[') == false )
+		return;
+		
+	line.assign(line.BeforeFirst(']'));
+	line.assign(line.AfterFirst('['));
+	
+	long lineNumber = -1;
+	if ( line.ToLong(&lineNumber) == false )
+		return;
+	
+	selectSourceControlLineNumber(lineNumber - 1);
+	//MessageBoxA(0,wxString::Format("%ld", lineNumber),"",0);
 }
 
 
@@ -7113,14 +7286,27 @@ void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
 
 
 
-/////////////////////////////////////////////////////////////////////
-void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	//isProcessing()
-	
-	
-}
+
+
+
+
 void MainFrame::moveStartMainWindow(wxMoveEvent& event) {
 	//event.Skip(true);
 }
 
+void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
+
+	toggleMonitorStatistics( m_statisticBook->IsShown() == false );
+}
+
+void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
+
+	//isProcessing()
+	
+	
+}
+
+void MainFrame::xxxxxxxxxxxxx(wxMouseEvent& event)
+{
+	clog << "xxxxxxxxxxxxx"<< endl;
+}

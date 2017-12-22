@@ -154,6 +154,13 @@
      "m_functionNameAndSignature": "moveStartMainWindow(wxMoveEvent& event)",
      "m_description": "Process a wxEVT_MOVE_START event, which is generated when the user starts to move or size a window. Windows only",
      "m_noBody": false
+    }, {
+     "m_eventName": "wxEVT_LEFT_DOWN",
+     "m_eventClass": "wxMouseEvent",
+     "m_eventHandler": "wxMouseEventHandler",
+     "m_functionNameAndSignature": "xxxxxxxxxxxxx(wxMouseEvent& event)",
+     "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
+     "m_noBody": false
     }],
    "m_children": [{
      "m_type": 4480,
@@ -29005,7 +29012,7 @@
                               }, {
                                "type": "font",
                                "m_label": "Font:",
-                               "m_value": ""
+                               "m_value": "8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT(\"Segoe UI\")"
                               }, {
                                "type": "bool",
                                "m_label": "Hidden",
@@ -29188,7 +29195,7 @@
                           }, {
                            "type": "font",
                            "m_label": "Font:",
-                           "m_value": ""
+                           "m_value": "8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT(\"Segoe UI\")"
                           }, {
                            "type": "bool",
                            "m_label": "Hidden",
@@ -29421,7 +29428,7 @@
                                 }, {
                                  "type": "string",
                                  "m_label": "Name:",
-                                 "m_value": "m_btRequestCtlPins"
+                                 "m_value": "m_btRequestControllerPins"
                                 }, {
                                  "type": "multi-string",
                                  "m_label": "Tooltip:",
@@ -30104,7 +30111,7 @@
                              "border": 1,
                              "gbSpan": "1,1",
                              "gbPosition": "0,0",
-                             "m_styles": ["wxTE_RICH", "wxTE_READONLY", "wxTE_MULTILINE"],
+                             "m_styles": ["wxTE_RICH", "wxTE_READONLY", "wxTE_MULTILINE", "wxTE_DONTWRAP", "wxHSCROLL", "wxVSCROLL"],
                              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                              "m_properties": [{
                                "type": "winid",
@@ -30226,7 +30233,7 @@
                           }, {
                            "type": "font",
                            "m_label": "Font:",
-                           "m_value": ""
+                           "m_value": "8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT(\"Segoe UI\")"
                           }, {
                            "type": "bool",
                            "m_label": "Hidden",
@@ -31087,7 +31094,14 @@
                                "m_label": "Style:",
                                "m_value": ""
                               }],
-                             "m_events": [],
+                             "m_events": [{
+                               "m_eventName": "wxEVT_LEFT_DOWN",
+                               "m_eventClass": "wxMouseEvent",
+                               "m_eventHandler": "wxMouseEventHandler",
+                               "m_functionNameAndSignature": "leftDownProbeModePanel(wxMouseEvent& event)",
+                               "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
+                               "m_noBody": false
+                              }],
                              "m_children": [{
                                "m_type": 4403,
                                "proportion": 1,
@@ -31289,7 +31303,21 @@
                                    "m_label": "Wrap:",
                                    "m_value": "-1"
                                   }],
-                                 "m_events": [],
+                                 "m_events": [{
+                                   "m_eventName": "wxEVT_LEFT_DOWN",
+                                   "m_eventClass": "wxMouseEvent",
+                                   "m_eventHandler": "wxMouseEventHandler",
+                                   "m_functionNameAndSignature": "leftDownProbeModePanel(wxMouseEvent& event)",
+                                   "m_description": "Process a wxEVT_LEFT_DOWN event. The handler of this event should normally call event.Skip() to allow the default processing to take place as otherwise the window under mouse wouldn't get the focus.",
+                                   "m_noBody": false
+                                  }, {
+                                   "m_eventName": "wxEVT_LEFT_DCLICK",
+                                   "m_eventClass": "wxMouseEvent",
+                                   "m_eventHandler": "wxMouseEventHandler",
+                                   "m_functionNameAndSignature": "leftDownProbeModePanel(wxMouseEvent& event)",
+                                   "m_description": "Process a wxEVT_LEFT_DCLICK event.",
+                                   "m_noBody": false
+                                  }],
                                  "m_children": []
                                 }]
                               }]
@@ -39558,7 +39586,7 @@
                 }, {
                  "type": "multi-string",
                  "m_label": "Tooltip:",
-                 "m_value": "Logger Output"
+                 "m_value": "Logger Output "
                 }, {
                  "type": "colour",
                  "m_label": "Bg Colour:",
@@ -39622,6 +39650,20 @@
                  "m_eventHandler": "wxCommandEventHandler",
                  "m_functionNameAndSignature": "UpdateLogger(wxCommandEvent& event)",
                  "m_description": "Respond to a wxEVT_COMMAND_TEXT_UPDATED event, generated when the text changes.\nNotice that this event will be sent when the text controls contents changes\n - whether this is due to user input or comes from the program itself\n(for example, if SetValue() is called); see ChangeValue() for a function which does not send this event.",
+                 "m_noBody": false
+                }, {
+                 "m_eventName": "wxEVT_KEY_DOWN",
+                 "m_eventClass": "wxKeyEvent",
+                 "m_eventHandler": "wxKeyEventHandler",
+                 "m_functionNameAndSignature": "keyDownLogger(wxKeyEvent& event)",
+                 "m_description": "Process a wxEVT_KEY_DOWN event (any key has been pressed)",
+                 "m_noBody": false
+                }, {
+                 "m_eventName": "wxEVT_LEFT_DCLICK",
+                 "m_eventClass": "wxMouseEvent",
+                 "m_eventHandler": "wxMouseEventHandler",
+                 "m_functionNameAndSignature": "dclickLogger(wxMouseEvent& event)",
+                 "m_description": "Process a wxEVT_LEFT_DCLICK event.",
                  "m_noBody": false
                 }],
                "m_children": []
@@ -42481,7 +42523,7 @@
             }, {
              "type": "string",
              "m_label": "Name:",
-             "m_value": "m_updateManagerUpdate"
+             "m_value": "m_updateManagerUpdate "
             }, {
              "type": "multi-string",
              "m_label": "Tooltip:",
@@ -42527,7 +42569,14 @@
              "m_label": "Bitmap File:",
              "m_path": "bitmaps/bookmark-2.png"
             }],
-           "m_events": [],
+           "m_events": [{
+             "m_eventName": "wxEVT_LEFT_DCLICK",
+             "m_eventClass": "wxMouseEvent",
+             "m_eventHandler": "wxMouseEventHandler",
+             "m_functionNameAndSignature": "dclickUpdateManagerThreadSymbol(wxMouseEvent& event)",
+             "m_description": "Process a wxEVT_LEFT_DCLICK event.",
+             "m_noBody": false
+            }],
            "m_children": []
           }]
         }]

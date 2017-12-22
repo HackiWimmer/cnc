@@ -72,6 +72,8 @@ class GCodeBlock {
 		double				s				= INVALID_GCODE_FIELD_VALUE;
 		double				e				= INVALID_GCODE_FIELD_VALUE;
 		double 				f				= INVALID_GCODE_FIELD_VALUE;
+		
+		double 				p				= INVALID_GCODE_FIELD_VALUE;
 
 		/////////////////////////////////////////////////////
 		void reInit();
@@ -114,6 +116,8 @@ class GCodeBlock {
 		const bool hasS() const		{ return s != INVALID_GCODE_FIELD_VALUE; }
 		const bool hasE() const		{ return e != INVALID_GCODE_FIELD_VALUE; }
 		const bool hasF() const		{ return f != INVALID_GCODE_FIELD_VALUE; }
+		
+		const bool hasP() const		{ return p != INVALID_GCODE_FIELD_VALUE; }
 		
 		const bool hasMoveCmd() const { 
 			return (hasOneOf_XYZ() || hasI() || hasJ()); 

@@ -18,6 +18,7 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		bool processRapidLinearMove(GCodeBlock& gcb);
 		bool processLinearMove(GCodeBlock& gcb);
 		bool processArcMove(GCodeBlock& gcb, bool sweep);
+		bool processDwell(GCodeBlock& gcb);
 		bool moveToOrigin(GCodeBlock& gcb);
 		
 		virtual void switchToolState(bool state) = 0;
@@ -26,6 +27,7 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		
 	protected:
 		
+		virtual bool processDwellIntern(int64_t microseconds) { return true; }
 		virtual bool processLinearMove(bool alreadyRendered) = 0;
 		virtual bool changeCurrentFeedSpeedXYZ(CncSpeed s, double value = 0.0) = 0;
 		virtual void prepareWorkImpl() = 0;

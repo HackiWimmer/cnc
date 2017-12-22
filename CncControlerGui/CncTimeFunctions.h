@@ -80,7 +80,7 @@ class CncTimeFunctions {
 				
 		static int gettimeofday(struct timeval *tv, void *tz_unused);
 		static void sleepMircoseconds(int64_t micros);
-		static void activeWaitMircoseconds(int64_t micros);
+		static void activeWaitMircoseconds(int64_t micros, bool active=true);
 		static void busyWaitMircoseconds(unsigned int micros);
 		
 		static CncNanoTimestamp   getNanoTimestamp();

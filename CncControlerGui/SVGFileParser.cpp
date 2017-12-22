@@ -363,9 +363,6 @@ bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
 	it = ud.attributes.find("transform");
 	
 	if ( it != ud.attributes.end() ) {
-		
-		cout << uai.lineNumber << endl;
-		
 		// reset current svg matrix
 		pathHandler->getSvgTransformMatrix().unchanged();
 		

@@ -64,3 +64,12 @@ bool GCodePathHandlerCnc::changeCurrentFeedSpeedXYZ(CncSpeed s, double value) {
 	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(s, value);
 	return true;
 }
+//////////////////////////////////////////////////////////////////
+bool GCodePathHandlerCnc::processDwellIntern(int64_t microseconds) {
+//////////////////////////////////////////////////////////////////
+	std::cout << " Dwell: " << ((double)microseconds) / (1000 * 1000) << "[s] . . .";
+	CncTimeFunctions::activeWaitMircoseconds(microseconds, true);
+	std::clog << " Done\n";
+	
+	return true;
+}

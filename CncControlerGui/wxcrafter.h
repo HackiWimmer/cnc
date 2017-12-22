@@ -386,7 +386,7 @@ protected:
     wxDataViewListCtrl* m_dvListCtrlControllerConfig;
     wxPanel* m_controllerPinReport;
     wxStaticText* m_staticText128313;
-    wxButton* m_btRequestCtlPins;
+    wxButton* m_btRequestControllerPins;
     wxDataViewListCtrl* m_dvListCtrlControllerPins;
     wxPanel* m_conrollerMessages;
     wxStaticText* m_staticText1283132;
@@ -645,6 +645,7 @@ protected:
 protected:
     virtual void activateMainWindow(wxActivateEvent& event) { event.Skip(); }
     virtual void moveStartMainWindow(wxMoveEvent& event) { event.Skip(); }
+    virtual void xxxxxxxxxxxxx(wxMouseEvent& event) { event.Skip(); }
     virtual void closeAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void maximizeAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
     virtual void restoreAuiPane(wxAuiManagerEvent& event) { event.Skip(); }
@@ -784,6 +785,7 @@ protected:
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void leftDownProbeModePanel(wxMouseEvent& event) { event.Skip(); }
     virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
@@ -824,10 +826,13 @@ protected:
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
+    virtual void keyDownLogger(wxKeyEvent& event) { event.Skip(); }
+    virtual void dclickLogger(wxMouseEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
+    virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCChangeFrom(wxCommandEvent& event) { event.Skip(); }
@@ -1202,7 +1207,7 @@ public:
     wxDataViewListCtrl* GetDvListCtrlControllerConfig() { return m_dvListCtrlControllerConfig; }
     wxPanel* GetControllerConfiguration() { return m_controllerConfiguration; }
     wxStaticText* GetStaticText128313() { return m_staticText128313; }
-    wxButton* GetBtRequestCtlPins() { return m_btRequestCtlPins; }
+    wxButton* GetBtRequestControllerPins() { return m_btRequestControllerPins; }
     wxDataViewListCtrl* GetDvListCtrlControllerPins() { return m_dvListCtrlControllerPins; }
     wxPanel* GetControllerPinReport() { return m_controllerPinReport; }
     wxStaticText* GetStaticText1283132() { return m_staticText1283132; }

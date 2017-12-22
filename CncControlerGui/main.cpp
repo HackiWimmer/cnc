@@ -106,6 +106,17 @@ void installStreamRedirection(MainFrame* mainFrame) {
 void resetStreamRedirection() {
 ///////////////////////////////////////////////////////////////////
 	// deconstruct redirecting
+	
+	// ungregister text controls
+	psbufCout->ungregisterTextControl();
+	psbufClog->ungregisterTextControl();
+	psbufCerr->ungregisterTextControl();
+	psbufCex1->ungregisterTextControl();
+	psbufCtrc->ungregisterTextControl();
+	psbufCmsg->ungregisterTextControl();
+	psbufCspy->ungregisterTextControl();
+	
+	// redirect to old buf
 	std::cout.rdbuf(sbOldCout);
 	std::cerr.rdbuf(sbOldClog);
 	std::cerr.rdbuf(sbOldCerr);
@@ -129,7 +140,7 @@ class MainApp : public wxApp {
 ///////////////////////////////////////////////////////////////////
 	private:
 		wxCmdLineParser parser;
-		wxLocale locale;
+		//wxLocale locale;
 		wxFileConfig* globalFileConfig;
 		
 	
@@ -153,8 +164,6 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual ~MainApp() {
 		///////////////////////////////////////////////////////////
-			resetStreamRedirection();
-			
 			if ( globalFileConfig != NULL )
 				;//delete globalFileConfig;
 		}
@@ -299,6 +308,14 @@ class MainApp : public wxApp {
 			
 			SetTopWindow(mainFrame);
 			return GetTopWindow()->Show();
+		}
+		
+		///////////////////////////////////////////////////////////
+		virtual int OnExit() {
+		///////////////////////////////////////////////////////////
+			
+			resetStreamRedirection();
+			return wxApp::OnExit();
 		}
 };
 

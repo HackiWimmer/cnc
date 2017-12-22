@@ -4378,6 +4378,14 @@
                                             <border>1</border>
                                             <object class="unknown" name="m_dvListCtrlControllerConfig">
                                               <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                              <font>
+                                                <size>8</size>
+                                                <style>wxFONTFAMILY_SWISS</style>
+                                                <weight>wxFONTSTYLE_NORMAL</weight>
+                                                <family>wxFONTWEIGHT_NORMAL</family>
+                                                <underlined>false</underlined>
+                                                <face>wxT("Segoe UI")</face>
+                                              </font>
                                             </object>
                                           </object>
                                         </object>
@@ -4389,6 +4397,14 @@
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_controllerPinReport">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <font>
+                                          <size>8</size>
+                                          <style>wxFONTFAMILY_SWISS</style>
+                                          <weight>wxFONTSTYLE_NORMAL</weight>
+                                          <family>wxFONTWEIGHT_NORMAL</family>
+                                          <underlined>false</underlined>
+                                          <face>wxT("Segoe UI")</face>
+                                        </font>
                                         <tooltip>
                                           <![CDATA[Request Controller Pin Report]]>
                                         </tooltip>
@@ -4429,7 +4445,7 @@
                                               <object class="sizeritem">
                                                 <flag>wxALL|wxALIGN_RIGHT</flag>
                                                 <border>1</border>
-                                                <object class="wxButton" name="m_btRequestCtlPins">
+                                                <object class="wxButton" name="m_btRequestControllerPins">
                                                   <label>Request</label>
                                                   <style/>
                                                   <bitmap>bitmaps/16-debugger_restart.png</bitmap>
@@ -4508,7 +4524,7 @@
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <object class="wxTextCtrl" name="m_controllerMsgHistory">
-                                              <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE</style>
+                                              <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP|wxHSCROLL|wxVSCROLL</style>
                                               <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                               <font>
                                                 <size>10</size>
@@ -4529,6 +4545,14 @@
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_controllerErrorInfo">
                                         <style>wxTAB_TRAVERSAL</style>
+                                        <font>
+                                          <size>8</size>
+                                          <style>wxFONTFAMILY_SWISS</style>
+                                          <weight>wxFONTSTYLE_NORMAL</weight>
+                                          <family>wxFONTWEIGHT_NORMAL</family>
+                                          <underlined>false</underlined>
+                                          <face>wxT("Segoe UI")</face>
+                                        </font>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
                                           <rows>2</rows>

@@ -75,6 +75,8 @@ class SerialEmulatorNULL : public SerialSpyPort
 	protected:
 		LastCommand lastCommand;
 		
+		virtual void sleepMilliseconds(unsigned int millis);
+		
 		unsigned char getLastSignal() { return lastSignal; }
 		
 		const char* getConfiguration(wxString& ret);

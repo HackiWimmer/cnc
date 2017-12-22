@@ -34,6 +34,8 @@ class wxMenuItem;
 // app defined events
 	wxDECLARE_EVENT(wxEVT_PERSPECTIVE_TIMER, 					wxTimerEvent);
 	wxDECLARE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 		wxTimerEvent);
+	wxDECLARE_EVENT(wxEVT_TRACE_FROM_THREAD,	 				wxThreadEvent);
+	wxDECLARE_EVENT(wxEVT_DISPATCH_ALL,							wxThreadEvent);
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -74,7 +76,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void renameTemplateFromButton(wxCommandEvent& event);
+		virtual void dclickLogger(wxMouseEvent& event);
+    virtual void xxxxxxxxxxxxx(wxMouseEvent& event);
+		virtual void keyDownLogger(wxKeyEvent& event);
+		virtual void leftDownProbeModePanel(wxMouseEvent& event);
+		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
+		virtual void renameTemplateFromButton(wxCommandEvent& event);
 		virtual void removeTemplateFromButton(wxCommandEvent& event);
 		virtual void onSelectCncMonitor(wxCommandEvent& event);
 		virtual void onSelectInboundPreview(wxCommandEvent& event);
@@ -346,11 +353,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void onThreadAppPosUpdate(UpdateManagerEvent& event);
 		void onThreadCtlPosUpdate(UpdateManagerEvent& event);
 		void onThreadHeartbeat(UpdateManagerEvent& event);
-		void onThreadDispatchAll(UpdateManagerEvent& event);
 		void onThreadCompletion(UpdateManagerEvent& event);
-		void onThreadPostInfo(UpdateManagerEvent& event);
-		void onThreadPostWarning(UpdateManagerEvent& event);
-		void onThreadPostError(UpdateManagerEvent& event);
+		void onThreadDispatchAll(wxThreadEvent& event);
+		void onThreadPostInfo(wxThreadEvent& event);
+		void onThreadPostWarning(wxThreadEvent& event);
+		void onThreadPostError(wxThreadEvent& event);
 		
 		void onPerspectiveTimer(wxTimerEvent& event);
 		void onDebugUserNotificationTimer(wxTimerEvent& event);
@@ -359,7 +366,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxDECLARE_EVENT_TABLE();
 		
 	public:
-		
+		enum EventId { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4, DISPATCH_ALL = 5, POST_INFO = 6, POST_WARNING = 7, POST_ERROR = 8 };
 		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -379,8 +386,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// this call is alread locked by the ConcurrentQueue class
-		#define UPD_THREAD  if ( updateManagerThread == NULL ) return
-		void umPostEvent(const UpdateManagerThread::Event& evt) 		{ UPD_THREAD; updateManagerThread->postEvent(evt); }
+		void umPostEvent(const UpdateManagerThread::Event& evt);
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void selectMainBookSourcePanel();
@@ -498,6 +504,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void setIcons();
 		
+		void traceWxWidgetsVersion(std::ostream& out);
+		void traceBoostVersion(std::ostream& out);
+		
 		///////////////////////////////////////////////////////////////
 		// Path Generator
 		void displayPGenErrorInfo(const wxString& errorInfo);
@@ -610,6 +619,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// control handling
+		void selectSourceControlLineNumber(long ln);
+			
 		void decoratePortSelector(bool list=false);
 		
 		void updateSetterList();

@@ -22,7 +22,7 @@ struct SerialFetchInfo {
 	unsigned char command				= '\0';
 	unsigned char multiByteResult[2048];
 
-	unsigned int singleFetchTimeout 	= 5000;
+	unsigned int singleFetchTimeout 	= 10000;
 	unsigned int retSOTSleep			= 10;
 	unsigned int retSOHSleep			= 10;
 	bool retSOTAllowed					= false;
@@ -161,6 +161,8 @@ class Serial {
 		unsigned char buf[LONG_BUF_SIZE];
 		unsigned char moveCommand[MAX_MOVE_CMD_SIZE];
 		
+		virtual void sleepMilliseconds(unsigned int millis);
+		
 		//Fetch remaing bytes for message results
 		inline void fetchMessage(unsigned char * text, int maxBytes);
 		//Fetch remaing bytes for multi byte results  
@@ -242,6 +244,8 @@ class Serial {
 		//Writes data from a buffer through the Serial connection
 		//return true on success.
 		virtual bool writeData(void *buffer, unsigned int nbByte);
+		// will be released periodically be the main thread
+		virtual void onPeriodicallyAppEvent() {}
 		//Check if we are actually connected
 		bool isConnected();
 		// returns the port name
@@ -258,6 +262,8 @@ class Serial {
 		bool processSetter(unsigned char pid, int32_t value);
 		
 		bool processTest(int32_t testId);
+		// indicates if idle message can be requested
+		virtual bool canProcessIdle() { return true; }
 		bool processIdle();
 		
 		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);

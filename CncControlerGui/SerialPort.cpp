@@ -76,6 +76,13 @@ Serial::~Serial() {
 	disconnect();
 }
 ///////////////////////////////////////////////////////////////////
+void Serial::sleepMilliseconds(unsigned int millis) {
+///////////////////////////////////////////////////////////////////
+	// Sleep a while to give the real microcontroller a portion 
+	// of time to do something
+	Sleep(millis);
+}
+///////////////////////////////////////////////////////////////////
 void Serial::startMeasurement() {
 ///////////////////////////////////////////////////////////////////
 	measurementActive = true;
@@ -389,7 +396,7 @@ void Serial::purge(void) {
 ///////////////////////////////////////////////////////////////////
 	//Flush any remaining characters in the buffers 
 	PurgeComm(this->hSerial, PURGE_RXCLEAR | PURGE_TXCLEAR);
-	Sleep(500);
+	THE_APP->waitActive(500);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::isMoveCommand(unsigned char cmd) {
@@ -429,8 +436,8 @@ size_t Serial::getPostionCounter() {
 	if ( processGetter(PID_GET_POS_COUNTER, list) && list.size() == 2 ) {
 		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
 		// to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
-		size_t ret = list.at(0) + abs(MIN_LONG);
-		ret += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
+		size_t ret  = list.at(0) + abs(MIN_LONG);
+		ret        += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
 		return ret;
 	}
 	
@@ -457,8 +464,8 @@ size_t Serial::requestStepCounter(unsigned char pid) {
 	if ( processGetter(pid, list) && list.size() == 2 ) {
 		// the controler delivers a signed value because the getter interface didn't alow a unsigned.
 		// to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
-		size_t ret = list.at(0) + abs(MIN_LONG);
-		ret += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
+		size_t ret =  list.at(0) + abs(MIN_LONG);
+		ret        += list.at(1) * (abs(MIN_LONG) + MAX_LONG);
 		return ret;
 	}
 	
@@ -553,7 +560,7 @@ void Serial::fetchMessage(unsigned char* text, int maxBytes) {
 	if ( text == NULL )
 		return;
 	
-	Sleep(200);
+	sleepMilliseconds(200);
 	
 	const unsigned int length = 1;
 	unsigned char b[length];
@@ -585,7 +592,8 @@ void Serial::fetchMessage(unsigned char* text, int maxBytes) {
 ///////////////////////////////////////////////////////////////////
 void Serial::fetchMultiByteResult(unsigned char * text, int maxBytes) {
 ///////////////////////////////////////////////////////////////////
-	Sleep(200);
+	sleepMilliseconds(200);
+	
 	int bytes = readData(text, maxBytes);
 	text[bytes] = '\0';
 }
@@ -739,10 +747,10 @@ int Serial::readDataUntilSizeAvailable(void *buffer, unsigned int nbByte, unsign
 			p += bytesRead;
 			remainingBytes -= bytesRead;
 			bytesRead = 0;
-
+			
 		} else {
-			Sleep(1);
-
+			sleepMilliseconds(1);
+			
 			if ( ++cnt > maxDelay ) {
 				std::cerr << "Serial::readDataUntilSizeAvailable Timeout reached:" << std::endl;
 				return 0;
@@ -1326,7 +1334,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			default: {
 				
-				std::cerr << "Serial::evaluateResult: Invalid Acknowlege: \n" << sfi.command <<", as integer: " << (int)ret << "\n";
+				std::cerr << "Serial::evaluateResult: Invalid Acknowlege: \n Cmd: " << sfi.command << ", Acknowlege as integer: " << (int)ret << "\n";
 				cncControl->SerialCallback(1);
 				
 				return false;
@@ -1510,8 +1518,8 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
 bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
-	Sleep(sfi.retSOHSleep);
-
+	sleepMilliseconds(sfi.retSOHSleep);
+	
 	if ( (sfi.Gc.bytes = readData(sfi.Gc.result, sizeof(sfi.Gc.result))) <= 0 ) {
 		std::cerr << "ERROR while reading getter value(s). Nothing available" << std::endl;
 		return false;

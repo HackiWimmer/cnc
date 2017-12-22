@@ -87,3 +87,20 @@ bool GCodePathHandlerBase::processArcMove(GCodeBlock& gcb, bool sweep) {
 	// for each curve lib point
 	return process(cmd, 7, values);
 }
+//////////////////////////////////////////////////////////////////
+bool GCodePathHandlerBase::processDwell(GCodeBlock& gcb) {
+//////////////////////////////////////////////////////////////////
+	int64_t waitTimeout = 0LL;
+	
+	if ( gcb.hasP() && gcb.p > 0.0 ) {
+		// p contains seconds
+		waitTimeout = (unsigned int)(gcb.p * 1000 * 1000);
+	} 
+	
+	if ( waitTimeout != 0LL ) {
+		return processDwellIntern(waitTimeout);
+	}
+		
+	std::cerr << "GCodePathHandlerBase::processDwell: Invalid parameter value P: " << waitTimeout << " [us]" << std::endl;
+	return false;
+}

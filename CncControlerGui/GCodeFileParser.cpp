@@ -238,6 +238,9 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 		case 'T':	displayMessage(wxString::Format("Tool change prepared: ID: %.0lf", field.getValue()), wxICON_INFORMATION);
 					setNextToolID(field.getValue());
 					return true;
+					
+		case 'P':	gcb.p 			= field.getValue();
+					return true; 
 		case 'N':
 		case 'H':
 		case '*':	//skip this fields
@@ -309,6 +312,10 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		{
 			return pathHandler->processArcMove(gcb, true);
 		}
+		case 4: 	// GC_G: Dwell
+		{
+			return pathHandler->processDwell(gcb);
+		}
 		//....................................................
 		case 20:	// GC_G: Set Units To Inches
 		{
@@ -362,13 +369,6 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		case 92:	// GC_G: Set Position:
 		{
 			//todo implement GCode: Set Position:
-			return true;
-		} //....................................................
-		
-		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
-		// Commands to skip:
-		case 4: 	// GC_G: Dwell:
-		{ 
 			return true;
 		} //....................................................
 		

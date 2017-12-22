@@ -5,14 +5,14 @@
   <Project Name="Experiments" Path="Experiments/Experiments.project" Active="No"/>
   <Project Name="UnitTests" Path="UnitTests/UnitTests.project" Active="No"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Release" Selected="yes">
+    <WorkspaceConfiguration Name="Release" Selected="no">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="release2"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Release"/>
       <Project Name="Experiments" ConfigName="Release"/>
       <Project Name="UnitTests" ConfigName="Release"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Debug" Selected="no">
+    <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
       <Project Name="CncConrollerGui" ConfigName="Debug"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Debug"/>

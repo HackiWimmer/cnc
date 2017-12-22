@@ -103,8 +103,11 @@ void ArduinoPIDs::init() {
 		pids[i]  = s.c_str();
 	}
 
-	pids[PID_UNKMOWN]                         = "Default PID";
+	pids[PID_UNKNOWN]                         = "Default PID";
 	pids[PID_STEPPER_INITIALIZED]             = "Stepper initialize state";
+	
+	pids[PID_QUERY_READY_TO_RUN]              = "Ready to run";
+	
 	pids[PID_SPEED_OFFSET]                    = "Speed step offset [us]";
 	pids[PID_SPEED_OFFSET_X]                  = "Speed step offset X axis [us]";
 	pids[PID_SPEED_OFFSET_Y]                  = "Speed step offset Y axis [us]";
@@ -190,7 +193,9 @@ void ArduinoPIDs::init() {
 	pids[PID_SPEED_MGMT_PER_SETP_OFFSET]      = "Per Step Speed Offset";
 	pids[PID_SPEED_MGMT_MAX_SPEED]            = "Max Speed";
 	
-	
+	pids[PID_MAX_DIMENSION_X]                 = "Max Dimension X [Steps]";
+	pids[PID_MAX_DIMENSION_Y]                 = "Max Dimension Y [Steps]";
+	pids[PID_MAX_DIMENSION_Z]                 = "Max Dimension Z [Steps]";
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {
@@ -230,7 +235,7 @@ void ArduinoErrorCodes::init() {
 		errorCodes[i]  = "Unknow error code: ";
 	}
 
-	errorCodes[E_NO_ERROR]                           = "No Error";
+	errorCodes[E_NO_ERROR]                           = "Current Error Count";
 	errorCodes[E_UNKNOW_COMMAND]                     = "Arduino::loop(): Unknown Command";
 	errorCodes[E_INVALID_PARAM_ID]                   = "Arduino::setValue(): Invalid parameter ID"; 
 	errorCodes[E_INVALID_PARAM_STREAM]               = "Arduino::setValue(): Noting to read";
@@ -341,7 +346,7 @@ void ArduinoAnalogPins::init() {
 		pins[i]  = s.c_str();
 	}
 
-	pins[PID_UNKMOWN]              = "Default PIN";
+	pins[PID_UNKNOWN]              = "Default PIN";
 	pins[INTERRUPT_LED_ID]         = "Interrupt LED";
 }
 /////////////////////////////////////////////////////////////////////////

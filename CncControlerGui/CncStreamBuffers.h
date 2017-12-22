@@ -29,8 +29,10 @@ class LoggerStreamBuf : public std::streambuf {
 		///////////////////////////////////////////////////////////
 		virtual int overflow (int c = EOF) {
 			
-			ctl->SetDefaultStyle(textAttr);
-			ctl->AppendText((wxChar)c);
+			if ( ctl != NULL ) {
+				ctl->SetDefaultStyle(textAttr);
+				ctl->AppendText((wxChar)c);
+			}
 			
 			// return something different from EOF
 			return 0;
@@ -51,7 +53,13 @@ class LoggerStreamBuf : public std::streambuf {
 		wxTextCtrl* getTextControl() const {
 			return ctl;
 		}
+		
+		///////////////////////////////////////////////////////////
+		void ungregisterTextControl() {
+			ctl = NULL;
+		}
 };
+
 
 ///////////////////////////////////////////////////////////////////
 class CncCoutBuf : public LoggerStreamBuf {
@@ -145,7 +153,12 @@ class CncBasicLogStream : public std::stringstream {
 		
 		//////////////////////////////////////////////////////////
 		virtual ~CncBasicLogStream() {
-			
+		}
+		
+		//////////////////////////////////////////////////////////
+		void ungregisterTextControl() {
+			if ( logStreamBuffer != NULL )
+				logStreamBuffer->ungregisterTextControl();
 		}
 		
 		//////////////////////////////////////////////////////////

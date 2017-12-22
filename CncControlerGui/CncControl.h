@@ -84,9 +84,7 @@ class CncControl {
 		// Tool state handling
 		CncToolStateControl toolState;
 		//measurements variables
-		struct timeb endTime, startTime;
-		// command counter
-		int32_t commandCounter;
+		//struct timeb endTime, startTime;
 		// Flag to indicatate if a positions check aplies
 		bool positionCheck;
 		// Pen handler
@@ -138,8 +136,13 @@ class CncControl {
 		CncPortType getPortType(void) { return portType; }
 		// Connection to portName
 		bool connect(const char * portName);
+		// Disconnection the serial connection
+		bool disconnect();
 		// Check the connection
 		bool isConnected();
+		
+		void onPeriodicallyAppEvent();
+		
 		//Make Serial available
 		Serial* getSerial() { return serialPort; }
 		//speed
@@ -199,11 +202,11 @@ class CncControl {
 		bool resetWatermarks();
 		// Setup the cnc control
 		void resetSetterMap();
-		void setup(bool reset = true);
+		bool setup(bool reset = true);
 		// Measurements funtions
-		void logProcessingStart();
-		void logProcessingCurrent();
-		void logProcessingEnd(bool valuesOnly = false);
+		//void logProcessingStart();
+		//void logProcessingCurrent();
+		//void logProcessingEnd(bool valuesOnly = false);
 		// Sets the output controls for cooridinate infos
 		void setGuiControls(GuiControlSetup* guiCtlSetup);
 		//handle draw control
@@ -251,7 +254,6 @@ class CncControl {
 		const CncLimitStates& getLimitState() { return limitStates; }
 		// validates pc and controller positions
 		bool validatePositions();
-		void forceDisplayPositions();
 		// processing the given setter values
 		bool processSetter(unsigned char id, int32_t value);
 		bool processSetterList(std::vector<SetterTuple>& setup);

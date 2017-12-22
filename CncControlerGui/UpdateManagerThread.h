@@ -70,7 +70,6 @@ class UpdateManagerThread : public wxThread {
 	
 	public:
 		enum SpyContent { APP_POSITIONS = 0, CTL_POSITIONS = 1};
-		enum EventId    { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4, DISPATCH_ALL = 5, POST_INFO = 6, POST_WARNING = 7, POST_ERROR = 8};
 		enum SpeedMode  { UNDEFINED = '\0', RAPID = 'R', WORK = 'W' };
 		
 		struct Event{
@@ -80,19 +79,32 @@ class UpdateManagerThread : public wxThread {
 						SETLST_RESET,
 						
 						CONFIG_UPD,
-						COMMAND_UPD, 
 						
 						POS_TYP_UPD,
 						APP_POS_UPD,
 						CTL_POS_UPD,
 						
-					
 						SETTER_ADD
 					};
 			
 			Type type      = EMPTY_UPD;
 			wxDateTime ts  = wxDateTime::UNow();
 			bool processed = false;
+			
+			const char* getTypeAsString() const {
+				switch ( type ) {
+					case EMPTY_UPD:			return "EMPTY_UPD Event"; 
+					case POSSPY_RESET:		return "POSSPY_RESET Event";
+					case SETLST_RESET:		return "SETLST_RESET Event";
+					case CONFIG_UPD:		return "CONFIG_UPD Event";
+					case POS_TYP_UPD:		return "POS_TYP_UPD Event";
+					case APP_POS_UPD:		return "APP_POS_UPD Event";
+					case CTL_POS_UPD:		return "CTL_POS_UPD Event";
+					case SETTER_ADD:		return "SETTER_ADD Event";
+				}
+				
+				return "Unknown event type";
+			}
 			
 			//////////////////////////////////////////////////////////////
 			// no data
@@ -124,20 +136,6 @@ class UpdateManagerThread : public wxThread {
 					processed    = false;
 					set.id       = i;
 					set.value    = v;
-					return *this;
-				}
-			
-			//////////////////////////////////////////////////////////////
-			struct Cmd {
-				long counter   = 0;
-				long duration  = 0;;
-			} cmd;
-			
-				inline const Event& CommandEvent(long c, long d) {
-					type         = COMMAND_UPD;
-					processed    = false;
-					cmd.counter  = c;
-					cmd.duration = d;
 					return *this;
 				}
 			
@@ -232,11 +230,13 @@ class UpdateManagerThread : public wxThread {
 		};
 		
 		UpdateManagerThread(MainFrame *handler);
-		~UpdateManagerThread();
+		virtual ~UpdateManagerThread();
 		
 		// thread interface
 		void stop();
 		void postEvent(const UpdateManagerThread::Event& evt);
+		
+		bool somethingLeftToDo();
 		
 		unsigned int fillPositionSpy(CncPosSpyListCtrl* lb);
 		unsigned int fillSetterList(CncSetterListCtrl* lb);

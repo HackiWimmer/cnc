@@ -10,6 +10,7 @@
 #include <wx/evtloop.h>
 #include "DataControlModel.h"
 #include "SerialPort.h"
+#include "SerialSimulatorFacade.h"
 #include "SerialEmulatorNULL.h"
 #include "SerialEmulatorFile.h"
 #include "SerialEmulatorSVG.h"
@@ -42,16 +43,16 @@ CncControl::CncControl(CncPortType pt)
 , toolUpdateState(true)
 , stepDelay(0)
 , guiCtlSetup(NULL)
-, commandCounter(0)
 , positionCheck(true)
 , drawPaneMargin(30)
 , speedMonitorMode(DM_2D)
 {
 //////////////////////////////////////////////////////////////////
-	if      ( pt == CncPORT ) 		serialPort = new SerialSpyPort(this);
-	else if ( pt == CncEMU_NULL )	serialPort = new SerialEmulatorNULL(this);
-	else if ( pt == CncEMU_SVG )	serialPort = new SerialEmulatorSVG(this);
-	else 							serialPort = new SerialSpyPort(this);
+	if      ( pt == CncPORT ) 			serialPort = new SerialSpyPort(this);
+	else if ( pt == CncPORT_SIMU )	serialPort = new SerialSimulatorFacade(this);
+	else if ( pt == CncEMU_NULL )		serialPort = new SerialEmulatorNULL(this);
+	else if ( pt == CncEMU_SVG )		serialPort = new SerialEmulatorSVG(this);
+	else 								serialPort = new SerialSpyPort(this);
 	
 	serialPort->enableSpyOutput();
 	
@@ -70,8 +71,7 @@ CncControl::~CncControl() {
 		switchToolOff();
 	
 	// safty
-	if ( serialPort->isConnected() )
-		serialPort->disconnect();
+	disconnect();
 
 	delete serialPort;
 }
@@ -206,7 +206,7 @@ void CncControl::resetSetterMap() {
 	setterMap.clear();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setup(bool doReset) {
+bool CncControl::setup(bool doReset) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
 	wxASSERT(cncConfig);
@@ -214,18 +214,43 @@ void CncControl::setup(bool doReset) {
 	// always reset the map here to definitly reinitianlize the controller
 	resetSetterMap();
 	
-	if ( serialPort->isConnected() == false) 
-		return;
-
-	logProcessingStart();
-
-	if ( doReset == true )
-		reset();
+	if ( serialPort->isConnected() == false ) 
+		return false;
+	
+	// reste controller on demand
+	if ( doReset == true ) {
+		if ( reset() == false ) {
+			std::cerr << " CncControl::setup: reset controller failed!\n";
+			return false;
+		}
+			
+		// Firmware check
+		std::stringstream ss;
+		processCommand(CMD_PRINT_VERSION, ss);
+		std::cout << " Firmware check . . . [Available: " << ss.str() << "; Required: " << FIRMWARE_VERSION << "] . . .";
 		
+		if ( wxString(FIRMWARE_VERSION) == ss.str().c_str() )	std::clog << " OK" << std::endl;
+		else													cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
+	}
+	
+	// evaluate limit states
 	evaluateLimitState();
-
-	std::cout << " Starting Controller initialization . . . ";
-
+	
+	std::cout << " Starting controller initialization . . . \n";
+	wxTextCtrl* logger = GBL_CONFIG->getTheApp()->GetLogger(); wxASSERT( logger != NULL );
+	long logPos = logger->GetLastPosition();
+	
+	// setup probe mode
+	bool ret = true;
+	if ( GBL_CONFIG->isProbeMode() )	ret = processCommand(CMD_ENABLE_PROBE_MODE, std::cerr);
+	else								ret = processCommand(CMD_DISABLE_PROBE_MODE, std::cerr);
+	
+	if ( ret == false ) {
+		std::cerr << " CncControl::setup: Probe mode configuration failed!\n";
+		return false;
+	}
+	
+	// process initial setters
 	std::vector<SetterTuple> setup;
 	setup.push_back(SetterTuple(PID_SEPARATOR, SEPARARTOR_SETUP));
 	
@@ -245,29 +270,30 @@ void CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, cncConfig->getReplyThresholdStepsZ()));
 	
-	if ( processSetterList(setup) ) {
-		changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
-		
-		if ( GBL_CONFIG->isProbeMode() )	processCommand(CMD_ENABLE_PROBE_MODE, std::cerr);
-		else								processCommand(CMD_DISABLE_PROBE_MODE, std::cerr);
-		
-		processCommand(CMD_RESET_ERRORINFO, std::cerr);
-		
-		std::cout << "Ready\n";
+	if ( processSetterList(setup) == false) {
+		std::cerr << " CncControl::setup: Calling processSetterList() failed!\n";
+		return false;
 	}
 	
-	// Firmware check
-	std::cout << "Firmware:" << std::endl;
-	std::cout << " Available:\t";
-	std::stringstream ss;
-	processCommand(CMD_PRINT_VERSION, ss);
-	std::cout << ss.str() << std::endl;
-	std::cout << " Required:\t" << FIRMWARE_VERSION << std::endl;
+	// speed setup
+	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
+		
+	// reset error information
+	ret = processCommand(CMD_RESET_ERRORINFO, std::cerr);
+	if ( ret == false) {
+		std::cerr << " CncControl::setup: Reset error information failed!\n";
+		return false;
+	}
 	
-	if ( wxString(FIRMWARE_VERSION) != ss.str().c_str() )
-		cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
-
-	logProcessingEnd();
+	// check if some output was logged in between, if not 
+	// remove last '\n' and put 'Ready' at the end of the
+	// same line as the starting the initialization hint
+	if ( logPos == logger->GetLastPosition() ) {
+		logger->Remove(logPos - 1, logPos);
+	}
+	
+	std::clog << "Ready\n";
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 long CncControl::convertDoubleToCtrlLong(unsigned char id, double d) { 
@@ -285,17 +311,31 @@ long CncControl::convertDoubleToCtrlLong(unsigned char id, double d) {
 	return d * DBL_FACT; 
 }
 ///////////////////////////////////////////////////////////////////
+bool CncControl::disconnect() {
+///////////////////////////////////////////////////////////////////
+	if ( serialPort->isConnected() ) {
+		wxTextCtrl* logger = GBL_CONFIG->getTheApp()->GetLogger(); wxASSERT( logger != NULL );
+		
+		std::cout << " Disconnecting serial port . . .\n";
+		long logPos = logger->GetLastPosition();
+		
+		serialPort->disconnect();
+		
+		if ( logPos == logger->GetLastPosition() )
+			logger->Remove(logPos - 1, logPos);
+	
+		std::clog << " Disconnected\n";
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::connect(const char * portName) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
+	disconnect();
 	
-	std::cout << "::" << serialPort->getClassName() << ":" << std::endl;
-	if ( serialPort->isConnected() ) {
-		std::cout << " Disconnecting . . ." << std::endl;
-		serialPort->disconnect();
-	}
-
-	std::clog << " Try to connect to: " << portName << std::endl;
+	std::clog << "Try to connect to: " << serialPort->getClassName() << "("<< portName << ")" << std::endl;
 	bool ret = serialPort->connect(portName);
 	if ( ret == true ) {
 		std::cout << " Connection established." << std::endl;
@@ -308,6 +348,12 @@ bool CncControl::isConnected() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
 	return serialPort->isConnected();
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::onPeriodicallyAppEvent() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(serialPort);
+	serialPort->onPeriodicallyAppEvent();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processCommand(const unsigned char c, std::ostream& txtCtl) {
@@ -479,7 +525,7 @@ bool CncControl::reset() {
 	getSerial()->purge();
 	resetInterrupt();
 	
-	std::cout << "Try to reset the controller\n";
+	std::cout << " Try to reset the controller\n";
 	if ( processCommand(CMD_RESET_CONTROLLER, std::cerr) ) {
 		std::cout << " Controller reseted\n";
 	} else {
@@ -653,46 +699,6 @@ void CncControl::setDefaultWorkSpeed_MM_MIN(double s)  {
 		return;
 
 	defaultFeedSpeedWork_MM_MIN  = s; 
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::logProcessingStart() {
-///////////////////////////////////////////////////////////////////
-	// update command values
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CommandEvent(0, 0));
-	
-	ftime(&startTime);
-	commandCounter=0;
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::logProcessingCurrent() {
-///////////////////////////////////////////////////////////////////
-	typedef UpdateManagerThread::Event Event;
-	static Event evt;
-	
-	ftime(&endTime);
-	long t_diff = (long) (1000.0 * (endTime.time - startTime.time) + (endTime.millitm - startTime.millitm));  
-
-	// update command values
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.CommandEvent(commandCounter, t_diff));
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::logProcessingEnd(bool valuesOnly) {
-///////////////////////////////////////////////////////////////////
-	// update position
-	postAppPosition(PID_XYZ_POS_MAJOR);
-	
-	if ( valuesOnly == false )
-		logProcessingCurrent();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::forceDisplayPositions() {
-///////////////////////////////////////////////////////////////////
-	logProcessingEnd(true);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::validatePostion(const CncLongPosition& pos) {
@@ -872,18 +878,12 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 		return false;
 	}
 
-	// Evalutate the command counter
-	commandCounter += cmdCount;
-	
 	// Event handling, enables the interrupt functionallity
 	if ( cncConfig->isAllowEventHandling() )
 		THE_APP->dispatchAll();
 	
 	// display application coordinates
 	postAppPosition(PID_XYZ_POS_MAJOR);
-	
-	// log processing
-	logProcessingCurrent();
 	
 	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
 		std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
@@ -1201,8 +1201,8 @@ const CncLongPosition CncControl::getControllerPos() {
 		controllerPos.setZ(0);
 		
 		if ( isConnected() == true && isInterrupted() == false ) {
-			std::cerr << "CncControl::getControllerPos: Unable to evaluate controller position:" << std::endl;
-			std::cerr << " Received value count: " << list.size() << std::endl;
+			std::cerr << "CncControl::getControllerPos: Unable to evaluate controllers position:" << std::endl;
+			std::cerr << " Received value count: " << list.size() << ", expected: 3" << std::endl;
 		}
 	} else {
 		controllerPos.setX(list.at(0));
@@ -1222,8 +1222,8 @@ const CncLongPosition CncControl::getControllerLimitState() {
 	
 	if ( list.size() != 3 ){
 		if ( isInterrupted() == false ) {
-			std::cerr << "CncControl::getControllerLimitState: Unable to evaluate controller limit state:" << std::endl;
-			std::cerr << " Received value count: " << list.size() << std::endl;
+			std::cerr << "CncControl::getControllerLimitState: Unable to evaluate controllers limit state:" << std::endl;
+			std::cerr << " Received value count: " << list.size() << ", expected: 3" << std::endl;
 		}
 	} else {
 		return {list.at(0), list.at(1), list.at(2)};
@@ -1672,7 +1672,6 @@ bool CncControl::manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool a
 ///////////////////////////////////////////////////////////////////
 bool CncControl::prepareSimpleMove(bool enaleEventHandling) {
 ///////////////////////////////////////////////////////////////////
-	logProcessingStart();
 	initNextDuration();
 	cncConfig->setAllowEventHandling(enaleEventHandling);
 	activatePositionCheck(false);
@@ -1691,8 +1690,6 @@ void CncControl::reconfigureSimpleMove(bool correctPositions) {
 	if ( validatePositions() == false && correctPositions == true ) {
 		curAppPos = getControllerPos();
 	}
-		
-	logProcessingEnd();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::hasControllerConfigControl() {
