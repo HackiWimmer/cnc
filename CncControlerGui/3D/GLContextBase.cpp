@@ -29,6 +29,10 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 , modelScale()
 , modelRotate()
 , cameraPos()
+, lastReshapeX(0)
+, lastReshapeY(0)
+, lastReshapeW(0)
+, lastReshapeH(0)
 {
 /////////////////////////////////////////////////////////////////
 	if ( canvas != NULL )
@@ -74,7 +78,7 @@ void GLContextBase::globalInit() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::traceOpenGLVersionInfo(std::ostream& s) {
 /////////////////////////////////////////////////////////////////
-	s << "::OpenGL version info: ";
+	s << " :: OpenGL version info: ";
 	s << glGetString(GL_VERSION) 	<< "; ";
 	s << glGetString(GL_VENDOR) 	<< "; ";
 	s << glGetString(GL_RENDERER) 	<< std::endl;
@@ -215,23 +219,15 @@ void GLContextBase::setViewMode(GLContextBase::ViewMode newMode, bool force) {
 /////////////////////////////////////////////////////////////////
 	if ( viewMode == newMode && force == false )
 		return;
-
-	// is the current origin postion customized?
+	
+	// is the current origin position customized?
 	if ( viewPort != NULL && viewPort->getOriginPosType() == GLViewPort::VPOP_Custom ) {
 		// switch to the center mode
 		viewPort->resetCustomOrigPosType();
 	}
-
-
+	
 	// is this a change from 2d to 3d or vs.
 	if ( getViewType() != getViewType(newMode) ) {
-		/*
-		// is the current origin postion customized?
-		if ( viewPort != NULL && viewPort->getOriginPosType() == GLViewPort::VPOP_Custom ) {
-			// switch to the center mode
-			viewPort->resetCustomOrigPosType();
-		}*/
-		
 		// if the view type going to change the model rotation
 		// has to be switched too
 		if ( isViewMode2D(newMode) == true )	modelRotate.restore2DDefaults();
@@ -245,6 +241,8 @@ void GLContextBase::centerViewport() {
 /////////////////////////////////////////////////////////////////
 	if ( viewPort != NULL )
 		viewPort->centerViewport();
+	
+	reshape(lastReshapeW, lastReshapeH, 0, 0);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::keyboardHandler(unsigned char c) {
@@ -324,9 +322,9 @@ void GLContextBase::drawCoordinateOrigin() {
 	glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
 	glRotatef(modelRotate.angleZ(), 0.0f, 0.0f, 1.0f);
 	
-	// x axis
+		// x axis
 		glBegin(GL_LINES);
-
+			
 			glColor3ub(coordOriginInfo.colours.x.Red(), coordOriginInfo.colours.x.Green(), coordOriginInfo.colours.x.Blue());
 			glVertex3f(0.0f, 0.0f, 0.0f);
 			glVertex3f(coordOriginInfo.length, 0.0f, 0.0f);
@@ -339,26 +337,26 @@ void GLContextBase::drawCoordinateOrigin() {
 			glRotatef(90.0f, 0.0f, 1.0f, 0.0f);
 			drawSolidCone(croneDiameter, croneHight, 30, 30);
 		glPopMatrix();
-	
-	// y axis
+		
+		// y axis
 		glBegin(GL_LINES);
-
+			
 			glColor3ub(coordOriginInfo.colours.y.Red(), coordOriginInfo.colours.y.Green(), coordOriginInfo.colours.y.Blue());
 			glVertex3f(0.0f, 0.0f, 0.0f);
 			glVertex3f(0.0f, coordOriginInfo.length, 0.0f);
 		
 		glEnd();
 		renderBitmapString(charOffset, coordOriginInfo.length + croneHight-charOffset, charOffset, GLUT_BITMAP_8_BY_13, "Y");
-
+			
 		glPushMatrix();
 			glTranslatef(0.0f, coordOriginInfo.length, 0.0f);
 			glRotatef(270.0f, 1.0f, 0.0f, 0.0f);
 			drawSolidCone(croneDiameter, croneHight, 30, 30);
 		glPopMatrix();
-	
-	// z axis
+		
+		// z axis
 		glBegin(GL_LINES);
-
+			
 			glColor3ub(coordOriginInfo.colours.z.Red(), coordOriginInfo.colours.z.Green(), coordOriginInfo.colours.z.Blue());
 			glVertex3f(0.0f, 0.0f, 0.0f);
 			glVertex3f(0.0f, 0.0f, coordOriginInfo.length);
@@ -522,8 +520,19 @@ void GLContextBase::determineCameraPosition() {
 			   cameraPos.getUpX(),     cameraPos.getUpY(),     cameraPos.getUpZ());
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::reshape(int w, int h) {
+/////////////////////////////////////////////////////////////////
+	determineViewPort(w, h, lastReshapeX, lastReshapeY);
+	determineProjection(w, h);
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::reshape(int w, int h, int x, int y) {
 /////////////////////////////////////////////////////////////////
+	lastReshapeX = x;
+	lastReshapeY = y;
+	lastReshapeW = w;
+	lastReshapeH = h;
+	
 	determineViewPort(w, h, x, y);
 	determineProjection(w, h);
 }
@@ -532,7 +541,7 @@ void GLContextBase::reshapeViewMode(int w, int h) {
 /////////////////////////////////////////////////////////////////
 	if ( viewPort == NULL )
 		return;
-	
+		
 	int x = 0, y = 0;
 	// evaluate the corrsponding origin coordinates
 	viewPort->getPreDefCoordinatesXY(convertViewMode(viewMode), w, h, x, y);
@@ -561,8 +570,18 @@ void GLContextBase::normalizeScaling() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::normalizeRotation() {
 /////////////////////////////////////////////////////////////////
-	modelRotate.reset2DDefaults();
-	modelRotate.reset3DDefaults();
+	if ( isViewMode2D() )	modelRotate.reset2DDefaults();
+	else 					modelRotate.reset3DDefaults();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::normalizeCamera() {
+/////////////////////////////////////////////////////////////////
+	cameraPos.reset();
+	
+	if ( viewMode == V2D_CAM_ROT_XY_ZTOP )
+		viewMode = V3D_ISO1;
+	
+	determineCameraPosition();
 }
 /////////////////////////////////////////////////////////////////
 float GLContextBase::getMaxScaleFactor() {

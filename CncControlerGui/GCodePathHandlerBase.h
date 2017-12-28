@@ -9,8 +9,16 @@
 class GCodePathHandlerBase : public PathHandlerBase {
 	
 	public:
+		enum CutterCompensation { CC_OFF, CC_STATIC_LEFT, CC_STATIC_RIGHT, CC_DYNAMIC_LEFT, CC_DYNAMIC_RIGHT };
+		
 		GCodePathHandlerBase();
 		virtual ~GCodePathHandlerBase();
+		
+		GCodePathHandlerBase::CutterCompensation getCutterCompensationMode() { return cutterCompMode; }
+		void setCutterCompensationMode(GCodePathHandlerBase::CutterCompensation ccm) { cutterCompMode = ccm; }
+		
+		int getToolLengthOffsetId() { return toolLengthOffsetId; }
+		void setToolLengthOffsetId(int tloi) { toolLengthOffsetId = tloi; }
 		
 		void prepareWork(); 
 		void finishWork();
@@ -34,6 +42,9 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		virtual void finishWorkImpl() = 0;
 		
 	private:
+		
+		CutterCompensation cutterCompMode;
+		int toolLengthOffsetId;
 		
 		void updateCurrentPosition(GCodeBlock& gcb);
 };

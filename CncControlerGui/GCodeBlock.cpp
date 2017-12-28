@@ -89,6 +89,8 @@ void GCodeBlock::trace(std::ostream &ostr) {
 //////////////////////////////////////////////////////////////////
 void GCodeBlock::trace(DcmItemList& rows) {
 //////////////////////////////////////////////////////////////////
+	rows.clear();
+	
 	DataControlModel::addKeyValueRow(rows, "Unit", 				getUnitAsString());
 	DataControlModel::addKeyValueRow(rows, "Positioning XYZ", 	getPositioningAsString(posModeXYZ));
 	DataControlModel::addKeyValueRow(rows, "Positioning IJ", 	getPositioningAsString(posModeIJ));

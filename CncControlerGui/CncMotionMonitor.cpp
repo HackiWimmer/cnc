@@ -399,34 +399,33 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		display();
 	}
 	
-	if ( false ) {
-		#warning - how to improve the mouse handling?
-		static int ox, oy, x, y;
+	// move origin
+	if ( event.ControlDown() == true ) {
+		static int x = 0, y = 0;
+		static bool moveMode = false;
 		
+		// store the current origin position
 		if ( event.LeftDown() == true ) {
-			ox = monitor->getOriginX() / 8;
-			oy = monitor->getOriginY() / 8;
-			x = event.GetX();
-			y = event.GetY();
-			
-			cerr << x << endl;
-			cerr << y << endl;
+			x  = event.GetX();
+			y  = event.GetY();
+			moveMode = true;
 		}
-
-		if ( event.LeftUp() == true ) {
-			int dx = event.GetX() - x;
-			int dy = event.GetY() - y;
+		
+		// calculate new origin
+		if ( moveMode == true ) {
+			int dx = +(event.GetX() - x);
+			int dy = -(event.GetY() - y);
 			
-			ox += dx;
-			oy += dy;
-			oy = cs.GetHeight() - y;
-			
-			clog << dx << ", " << ox << endl;
-			clog << dy << ", " << oy << endl;
-
-			monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+			monitor->reshape(cs.GetWidth(), cs.GetHeight(), dx, dy);
 			display();
 		}
+		
+		// reset move mode
+		if ( event.LeftUp() == true ) {
+			moveMode = false;
+		}
+		
+	// set origin
 	} else {
 		
 		// left button
@@ -443,13 +442,40 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
+	static const int delta = 10;
+	const wxSize cs = GetClientSize();
+	
+	int ox = monitor->getLastReshapeX();
+	int oy = monitor->getLastReshapeY();
+	if ( ox == 0 )	ox = cs.GetWidth()/2;
+	if ( oy == 0 )	oy = cs.GetHeight()/2;
+		
 	switch ( event.GetKeyCode() ) {
-		case 'O':	showOptionDialog();
-					break;
+		
+		case 'O':			showOptionDialog();
+							break;
 					
-		case 'C':	monitor->centerViewport();
-					display();
-					break;
+		case 'C':			monitor->centerViewport();
+							display();
+							break;
+					
+		case WXK_UP:		oy += delta; monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+							display();
+							break;
+							
+		case WXK_DOWN:		oy -= delta; monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+							display();
+							break;
+		
+		case WXK_LEFT:		ox -= delta; 
+							monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+							display();
+							break;
+							
+		case WXK_RIGHT:		ox += delta; 
+							monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
+							display();
+							break;
 	}
 }
 //////////////////////////////////////////////////
@@ -510,12 +536,16 @@ void CncMotionMonitor::rotateCamera(int angle) {
 void CncMotionMonitor::pushProcessMode() {
 //////////////////////////////////////////////////
 	//set processing flags
-	#warning todo normalize rotation 
-	//monitor->normalizeRotation();
+	monitor->normalizeRotation();
+	monitor->normalizeCamera();
+	
 	monitor->setAutoScaling(getFlags().autoScaling);
 	monitor->enablePositionMarker(getFlags().positionMarker);
 	
 	resetCurrentClientId();
+	
+	if ( optionDlg != NULL && optionDlg->IsShownOnScreen() )
+		optionDlg->update();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::popProcessMode() {

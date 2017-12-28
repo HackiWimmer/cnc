@@ -4565,7 +4565,7 @@
                       }, {
                        "type": "string",
                        "m_label": "# Rows:",
-                       "m_value": "1"
+                       "m_value": "3"
                       }, {
                        "type": "string",
                        "m_label": "Growable columns:",

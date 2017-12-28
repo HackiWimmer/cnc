@@ -68,8 +68,10 @@ class CncControl {
 		double defaultFeedSpeedWork_MM_MIN;
 		// Duration counter
 		unsigned int durationCounter;
-		// Interrupt stae
+		// Interrupt state
 		bool interruptState;
+		// position flf
+		bool positionOutOfRangeFlag;
 		// power state
 		bool powerOn;
 		// flag for updating tools
@@ -106,17 +108,14 @@ class CncControl {
 		void displayLimitState(wxStaticText* ctl, bool value);
 		void evaluateLimitState(long x, long y, long z);
 		
-		//simple move
+		// simple move
 		bool prepareSimpleMove(bool enaleEventHandling = true);
 		void reconfigureSimpleMove(bool correctPositions);
 		
 		// secial convesion to transfer a double as long
 		long convertDoubleToCtrlLong(unsigned char 	id, double d);
 		
-		// validating given pos due to the given reference coordinates
-		bool validatePostion(const CncLongPosition& pos);
-		
-		//
+		// display the given pos in the open gl view
 		void monitorPosition(const CncLongPosition& pos);
 		
 		inline void postAppPosition(unsigned char pid);
@@ -140,6 +139,12 @@ class CncControl {
 		bool disconnect();
 		// Check the connection
 		bool isConnected();
+		
+		void resetPositionOutOfRangeFlag() { positionOutOfRangeFlag = false; }
+		bool getPositionOutOfRangeFlag() { return positionOutOfRangeFlag; }
+		
+		// validating given pos due to the given reference coordinates
+		bool isPositionOutOfRange(const CncLongPosition& pos, bool trace=true);
 		
 		void onPeriodicallyAppEvent();
 		
@@ -253,7 +258,7 @@ class CncControl {
 		const CncLongPosition getControllerLimitState();
 		const CncLimitStates& getLimitState() { return limitStates; }
 		// validates pc and controller positions
-		bool validatePositions();
+		bool validateAppAgainstCtlPosition();
 		// processing the given setter values
 		bool processSetter(unsigned char id, int32_t value);
 		bool processSetterList(std::vector<SetterTuple>& setup);

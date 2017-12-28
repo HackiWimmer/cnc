@@ -53,13 +53,20 @@ class GLContextBase : public wxGLContext {
 		
 		void init();
 		void display();
-		void reshape(int w, int h, int x=0, int y=0);
+		void reshape(int w, int h);
+		void reshape(int w, int h, int x, int y);
 		void reshapeViewMode(int w, int h);
 		void reshapeViewMode();
+		
+		int getLastReshapeX() { return lastReshapeX; }
+		int getLastReshapeY() { return lastReshapeY; }
+		int getLastReshapeW() { return lastReshapeW; }
+		int getLastReshapeH() { return lastReshapeH; }
 		
 		void setAutoScaling(bool as);
 		void normalizeScaling();
 		void normalizeRotation();
+		void normalizeCamera();
 		
 		// smoothing
 		void enableSmoothing(bool enable=true);
@@ -170,7 +177,12 @@ class GLContextBase : public wxGLContext {
 		void renderBitmapString(float x, float y, float z, void* font, const char* string);
 		 
 	private:
-	
+		
+		int lastReshapeX;
+		int lastReshapeY;
+		int lastReshapeW;
+		int lastReshapeH;
+		
 		void determineViewPortBounderies();
 		void drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);
 

@@ -32,7 +32,7 @@ class GCodeBlock {
 			double ret = thisValue;
 				
 			if ( isAbsolutePositioningXYZ() == false )
-				ret =  thisValue - currentAxisValue;
+				ret =  currentAxisValue + thisValue;
 			
 			return ret;
 		}
@@ -74,6 +74,8 @@ class GCodeBlock {
 		double 				f				= INVALID_GCODE_FIELD_VALUE;
 		
 		double 				p				= INVALID_GCODE_FIELD_VALUE;
+		
+		double 				h				= INVALID_GCODE_FIELD_VALUE;
 
 		/////////////////////////////////////////////////////
 		void reInit();
@@ -118,6 +120,8 @@ class GCodeBlock {
 		const bool hasF() const		{ return f != INVALID_GCODE_FIELD_VALUE; }
 		
 		const bool hasP() const		{ return p != INVALID_GCODE_FIELD_VALUE; }
+		
+		const bool hasH() const		{ return h != INVALID_GCODE_FIELD_VALUE; }
 		
 		const bool hasMoveCmd() const { 
 			return (hasOneOf_XYZ() || hasI() || hasJ()); 

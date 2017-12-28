@@ -61,6 +61,16 @@ class CommandStoreInitializer {
 			
 			registerCommand(GCodeField("G30"), 		'C', 0,		false, "Zero Return");
 			
+			registerCommand(GCodeField("G40"), 		'C', 0,		false, "Cutter Compensation off");
+			registerCommand(GCodeField("G41"), 		'C', 0,		false, "Cutter Compensation on - static left");
+			registerCommand(GCodeField("G41.1"), 	'C', 0,		false, "Cutter Compensation on - dynamic left");
+			registerCommand(GCodeField("G42"), 		'C', 0,		false, "Cutter Compensation on - static right");
+			registerCommand(GCodeField("G42.1"), 	'C', 0,		false, "Cutter Compensation on - dynamic right");
+			
+			registerCommand(GCodeField("G43"),	 	'C', 0,		false, "Tool Length offset");
+			
+			registerCommand(GCodeField("G80"),	 	'C', 0,		false, "Cancel Canned Cycle");
+			
 			registerCommand(GCodeField("G90"), 		'C', 3,		false, "Absolute Positioning");
 			registerCommand(GCodeField("G91"), 		'C', 3,		false, "Relative Positioning");
 			registerCommand(GCodeField("G90.1"), 	'C', 4,		false, "Arc Center Absolute Mode");

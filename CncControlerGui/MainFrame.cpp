@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
+#include <cctype>
 #include <math.h>
 
 #include <wx/datetime.h>
@@ -529,9 +530,20 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 	cnc::trc.logInfoMessage("Test function 4");
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::traceGccVersion(std::ostream& out) {
+///////////////////////////////////////////////////////////////////
+	out << " :: g++ version info: " 
+		<< __GNUC__
+		<< "."
+		<< __GNUC_MINOR__
+		<< "."
+		<< __GNUC_PATCHLEVEL__
+		<< std::endl;
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::traceWxWidgetsVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	out << "::wxWidgets version info: " 
+	out << " :: wxWidgets version info: " 
 		<< wxMAJOR_VERSION
 		<< "."
 		<< wxMINOR_VERSION
@@ -548,12 +560,21 @@ void MainFrame::traceWxWidgetsVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceBoostVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	out << "::Boost version info: " 
+	out << " :: Boost version info: " 
 		<< BOOST_VERSION / 100000
 		<< "."
 		<< BOOST_VERSION / 100 % 1000
 		<< "."
 		<< BOOST_VERSION % 100 
+		<< std::endl;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
+///////////////////////////////////////////////////////////////////
+	out << " :: Programm version info: " 
+		<< _programTitel 
+		<< " "
+		<< _programVersion
 		<< std::endl;
 }
 ///////////////////////////////////////////////////////////////////
@@ -564,9 +585,12 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	decorateViewMenu();
 	
 	// Version infos
+	std::clog << "Version Information:" << std::endl;
+	traceGccVersion(std::cout);
 	traceWxWidgetsVersion(std::cout);
 	traceBoostVersion(std::cout);
 	GLContextBase::traceOpenGLVersionInfo(std::cout);
+	traceWoodworkingCncVersion(std::cout);
 	
 	// Auto connect ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
@@ -1825,9 +1849,12 @@ void MainFrame::selectUnit(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 const char* MainFrame::getSvgEmuFileName(wxString& ret) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT( cnc && cnc->getSerial() );
-	ret = cnc->getSerial()->getPortName();
-	return ret.c_str();
+	if ( cnc && cnc->getSerial() ) {
+		ret = cnc->getSerial()->getPortName();
+		return ret.c_str();
+	}
+	
+	return "";
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::svgEmuReload(wxCommandEvent& event) {
@@ -2351,6 +2378,8 @@ void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
 		
 		// clear source editor an motion monitor
 		m_stcFileContent->ClearAll();
+		m_stcFileContent->DiscardEdits();
+		
 		clearMotionMonitor();
 		m_inputFileName->SetValue("");
 		m_inputFileName->SetHint("");
@@ -3098,7 +3127,7 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 		}
 	}
 
-	if ( evaluatePositions == true && cnc->validatePositions() == false ) {
+	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false ) {
 		
 		wxString msg("Validate positions failed\n");
 		msg << "\nPC pos        : ";
@@ -3209,6 +3238,16 @@ void MainFrame::cancelRun(wxCommandEvent& event) {
 	runConfirmationInfo = RunConfirmationInfo::Canceled;
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::collectSvgSpecificSummary(DcmItemList& rows) {
+///////////////////////////////////////////////////////////////////
+	// todo - add headline and rows
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::collectGCodeSpecificSummary(DcmItemList& rows) {
+///////////////////////////////////////////////////////////////////
+	// todo - add headline and rows
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::collectSummary() {
 ///////////////////////////////////////////////////////////////////
 	if ( cnc == NULL )
@@ -3223,6 +3262,82 @@ void MainFrame::collectSummary() {
 //	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed XY", 					wxString::Format(" %d", 	cc->getWorkSpeedXY()), 				" rpm"); 
 //	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed Z", 					wxString::Format(" %d", 	cc->getWorkSpeedZ()), 				" rpm");
 	// ...
+	
+	switch ( getCurrentTemplateFormat() ) {
+		case TplSvg:	collectSvgSpecificSummary(rows);
+						break;
+		
+		case TplGcode:	collectGCodeSpecificSummary(rows);
+						break;
+						
+		default:		; // do nothing
+	}
+
+
+
+#warning - integrate the code below to collectSummary
+	/*
+	if ( scc != NULL ) {
+		scc->DeleteAllItems();
+		
+		DataControlModel::addKeyValueRow(list, "Steps (x)", 				(int)CncConfig::getGlobalCncConfig()->getStepsX());
+		DataControlModel::addKeyValueRow(list, "Steps (y)", 				(int)CncConfig::getGlobalCncConfig()->getStepsY());
+		DataControlModel::addKeyValueRow(list, "Steps (z)", 				(int)CncConfig::getGlobalCncConfig()->getStepsZ());
+		DataControlModel::addKeyValueRow(list, "Puls width offset (x)", 	(int)CncConfig::getGlobalCncConfig()->getPulsWidthOffsetX());
+		DataControlModel::addKeyValueRow(list, "Puls width offset (y)", 	(int)CncConfig::getGlobalCncConfig()->getPulsWidthOffsetY());
+		DataControlModel::addKeyValueRow(list, "Puls width offset (z)", 	(int)CncConfig::getGlobalCncConfig()->getPulsWidthOffsetZ());
+		DataControlModel::addKeyValueRow(list, "Pitch (x)", 				CncConfig::getGlobalCncConfig()->getPitchX());
+		DataControlModel::addKeyValueRow(list, "Pitch (y)", 				CncConfig::getGlobalCncConfig()->getPitchY());
+		DataControlModel::addKeyValueRow(list, "Pitch (z)",					CncConfig::getGlobalCncConfig()->getPitchZ());
+		DataControlModel::addKeyValueRow(list, "Multiplier (x)", 			(int)CncConfig::getGlobalCncConfig()->getMultiplierX());
+		DataControlModel::addKeyValueRow(list, "Multiplier (y)", 			(int)CncConfig::getGlobalCncConfig()->getMultiplierY());
+		DataControlModel::addKeyValueRow(list, "Multiplier (z)", 			(int)CncConfig::getGlobalCncConfig()->getMultiplierZ());
+		DataControlModel::addKeyValueRow(list, "Max speed XY", 				(int)CncConfig::getGlobalCncConfig()->getMaxSpeedXY());
+		DataControlModel::addKeyValueRow(list, "Rapid speed XY", 			(int)CncConfig::getGlobalCncConfig()->getRapidSpeedXY());
+		DataControlModel::addKeyValueRow(list, "Work speed XY", 			(int)CncConfig::getGlobalCncConfig()->getWorkSpeedXY());
+		DataControlModel::addKeyValueRow(list, "Max speed Z", 				(int)CncConfig::getGlobalCncConfig()->getMaxSpeedZ());
+		DataControlModel::addKeyValueRow(list, "Rapid speed Z", 			(int)CncConfig::getGlobalCncConfig()->getRapidSpeedZ());
+		DataControlModel::addKeyValueRow(list, "Work speed Z", 				(int)CncConfig::getGlobalCncConfig()->getWorkSpeedZ());
+		
+		// 
+		for (auto it = list.begin(); it != list.end(); ++it) 
+			scc->AppendItem(*it);
+	}
+	
+	list.clear();
+	if ( dcc != NULL ) {
+		dcc->DeleteAllItems();
+		
+		DataControlModel::addKeyValueRow(list, "Tool diameter", 			CncConfig::getGlobalCncConfig()->getToolDiameter());
+		DataControlModel::addKeyValueRow(list, "Curve lib resolution", 		wxString::Format("%.3lf", CncConfig::getCurveLibResolution()));
+		DataControlModel::addKeyValueRow(list, "Max Dimension (X)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionX());
+		DataControlModel::addKeyValueRow(list, "Max Dimension (Y)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionY());
+		DataControlModel::addKeyValueRow(list, "Max Dimension (Z)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionZ());
+		DataControlModel::addKeyValueRow(list, "Step Sign (x)", 			CncConfig::getGlobalCncConfig()->getStepSignX());
+		DataControlModel::addKeyValueRow(list, "Step Sign (y)", 			CncConfig::getGlobalCncConfig()->getStepSignY());
+		DataControlModel::addKeyValueRow(list, "Reply Threshold", 			(int)CncConfig::getGlobalCncConfig()->getReplyThreshold());
+		DataControlModel::addKeyValueRow(list, "Z axis values:", 			"");
+		DataControlModel::addKeyValueRow(list, "  Max durations", 			(int)CncConfig::getGlobalCncConfig()->getMaxDurations());
+		DataControlModel::addKeyValueRow(list, "  Workpiece offset", 		CncConfig::getGlobalCncConfig()->getWorkpieceOffset());
+		DataControlModel::addKeyValueRow(list, "  Max duration thickness",	CncConfig::getGlobalCncConfig()->getMaxDurationThickness());
+		DataControlModel::addKeyValueRow(list, "  Calculated durations", 	(int)CncConfig::getGlobalCncConfig()->getDurationCount());
+		DataControlModel::addKeyValueRow(list, "  Current Z distance", 		CncConfig::getGlobalCncConfig()->getCurZDistance());
+		DataControlModel::addKeyValueRow(list, "  Wpt is included", 		CncConfig::getGlobalCncConfig()->getReferenceIncludesWpt());
+		
+		for (unsigned int i=0; i<CncConfig::getGlobalCncConfig()->getMaxDurations(); i++) {
+			if ( CncConfig::getGlobalCncConfig()->getDurationThickness(i) != 0.0 ) {
+				wxString key("  Duration step[");
+				key << i;
+				key << "]";
+				DataControlModel::addKeyValueRow(list, key, CncConfig::getGlobalCncConfig()->getDurationThickness(i));
+			}
+		}
+		
+		// append
+		for (auto it = list.begin(); it != list.end(); ++it) 
+			dcc->AppendItem(*it);
+	}
+	*/
 
 	m_dvListCtrlConfigSummary->DeleteAllItems();
 	for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
@@ -3362,16 +3477,15 @@ bool MainFrame::processTemplateIntern() {
 	}
 	
 	processStartTime = wxDateTime::UNow();
-	
 	motionMonitor->pushProcessMode();
 	
 	updateStepDelay();
 	disableControls();
 	resetMinMaxPositions();
 	updateCncConfigTrace();
-	CncConfig::getGlobalCncConfig()->setAllowEventHandling(true);
+	
+	GBL_CONFIG->setAllowEventHandling(true);
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
-	cnc->processCommand("r", std::cout);
 	cnc->enableStepperMotors(true);
 	
 	bool ret = false;
@@ -3406,11 +3520,25 @@ bool MainFrame::processTemplateIntern() {
 	}
 	
 	// Check positions
-	if ( cnc->validatePositions() == false ) {
+	if ( cnc->validateAppAgainstCtlPosition() == false ) {
 		if ( cnc->isInterrupted() == false ) {
 			std::cerr << "Validate positions failed" << std::endl;
 			std::cerr << "PC pos        : " << cnc->getCurPos() << std::endl;
 			std::cerr << "Controller pos: " << cnc->getControllerPos() << std::endl;
+			setRefPostionState(false);
+		}
+	}
+	
+	if ( cnc->getPositionOutOfRangeFlag() == true ) {
+		if ( cnc->isInterrupted() == false ) {
+			std::cerr << "Out of range: During the last run the position limits were exceeded." << std::endl;
+			CncLongPosition::Watermarks wm = cnc->getWaterMarks();
+			CncLongPosition min(wm.xMin, wm.yMin, wm.zMin);
+			CncLongPosition max(wm.xMax, wm.yMax, wm.zMax);
+			
+			cnc->isPositionOutOfRange(min, true);
+			cnc->isPositionOutOfRange(max, true);
+			
 			setRefPostionState(false);
 		}
 	}
@@ -4008,6 +4136,7 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 	}
 	
 	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
+	bool shtKey = (GetAsyncKeyState(VK_SHIFT)   != 0);
 	int c = event.GetUnicodeKey();
 	
 	wxString find(m_stcFileContent->GetSelectedText());
@@ -4041,16 +4170,35 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 		}
 		
 	// Undo
-	} else if ( c == 'Z' && ctlKey == true) {
+	} else if ( c == 'Z' && ctlKey == true ) {
 		m_stcFileContent->Undo();
 	
 	// Redo
-	} else if ( c == 'Y' && ctlKey == true) {
+	} else if ( c == 'Y' && ctlKey == true ) {
 		m_stcFileContent->Redo();
 		
 	// save
-	} else if ( c == 'S' && ctlKey == true) {
+	} else if ( c == 'S' && ctlKey == true ) {
 		saveFile();
+		
+	// goto home
+	} else if ( c == WXK_HOME && ctlKey == true ) {
+		m_stcFileContent->GotoLine(0);
+		m_stcFileContent->Home();
+		
+	// goto end
+	} else if ( c == WXK_END && ctlKey == true ) {
+		m_stcFileContent->GotoLine(m_stcFileContent->GetLineCount() - 1);
+		m_stcFileContent->LineEnd();
+		
+	// select cur pos to home
+	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
+		m_stcFileContent->SetSelection(m_stcFileContent->GetCurrentPos(), 0);
+		
+	// select cur pos to end
+	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
+		m_stcFileContent->SetSelection(m_stcFileContent->GetCurrentPos(), 
+		                               m_stcFileContent->GetLastPosition());
 	}
 	
 	event.Skip(true);
@@ -7264,12 +7412,34 @@ void MainFrame::dclickLogger(wxMouseEvent& event) {
 		
 	wxString line(m_logger->GetLineText(row));
 	line.Trim(false);
+	line.MakeUpper();
 	
-	if ( line.StartsWith('[') == false )
-		return;
+	if ( line.StartsWith('[') == true ) {
+		line.assign(line.BeforeFirst(']'));
+		line.assign(line.AfterFirst('['));
 		
-	line.assign(line.BeforeFirst(']'));
-	line.assign(line.AfterFirst('['));
+	} else if ( line.Contains("LINE") == true ) {
+		int p = line.Find("LINE");
+		bool start = false;
+		wxString ln;
+		for (unsigned int i=p; i<line.length(); i++ ) {
+			
+			if ( start == false && isdigit((char)line[i]) != 0 )
+				start = true;
+			
+			if ( start == true && isdigit((char)line[i]) == 0 )
+				break;
+				
+			if ( start == true )
+				ln.append(line[i]);
+		}
+		
+		line.assign(ln);
+		
+	} else {
+		
+		return;
+	}
 	
 	long lineNumber = -1;
 	if ( line.ToLong(&lineNumber) == false )
@@ -7293,20 +7463,12 @@ void MainFrame::dclickLogger(wxMouseEvent& event) {
 void MainFrame::moveStartMainWindow(wxMoveEvent& event) {
 	//event.Skip(true);
 }
-
 void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
-
 	toggleMonitorStatistics( m_statisticBook->IsShown() == false );
 }
-
 void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
-
 	//isProcessing()
-	
-	
 }
-
-void MainFrame::xxxxxxxxxxxxx(wxMouseEvent& event)
-{
-	clog << "xxxxxxxxxxxxx"<< endl;
+void MainFrame::xxxxxxxxxxxxx(wxMouseEvent& event) {
+	//clog << "xxxxxxxxxxxxx"<< endl;
 }

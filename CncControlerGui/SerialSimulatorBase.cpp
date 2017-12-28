@@ -42,7 +42,6 @@ SerialSimulatorThread::SerialSimulatorThread(SerialSimulatorFacade* facade)
 , lastSignal(0)
 ///////////////////////////////////////////////////////////////////
 {
-	memset(bytes, 0, maxByteArraySize);
 }
 ///////////////////////////////////////////////////////////////////
 SerialSimulatorThread::~SerialSimulatorThread() {
@@ -192,6 +191,22 @@ double SerialSimulatorThread::getSetterValueAsDouble(unsigned char pid, double d
 	else								ret = (double)(val);
 	
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::resetPositionCounter() {
+///////////////////////////////////////////////////////////////////
+	positionCounter 		= MIN_LONG;
+	positionOverflowCounter = 0;
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::resetStepCounter() {
+///////////////////////////////////////////////////////////////////
+	stepCounterX 			= MIN_LONG;
+	stepCounterY 			= MIN_LONG;
+	stepCounterZ 			= MIN_LONG;
+	stepOverflowCounterX 	= 0;
+	stepOverflowCounterY 	= 0;
+	stepOverflowCounterZ 	= 0;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::incPosIstionCounter() {

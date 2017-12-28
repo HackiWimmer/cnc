@@ -12,6 +12,7 @@ class SerialSimulatorFacade : public SerialSpyPort {
 	private:
 		SerialSimulatorThread* serialThread;
 		
+		bool lock;
 		void createSerialThread();
 		void destroySerialThread();
 		
@@ -46,7 +47,7 @@ class SerialSimulatorFacade : public SerialSpyPort {
 		// indicates if idle message can be requested
 		virtual bool canProcessIdle() { return false; }
 		// will be released periodically be the main thread
-		virtual void onPeriodicallyAppEvent();
+		virtual void onPeriodicallyAppEvent(bool interrupted);
 		// simulate connection
 		virtual bool connect(const char* portName);
 		// close the connection

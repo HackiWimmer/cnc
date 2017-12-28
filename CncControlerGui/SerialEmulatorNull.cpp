@@ -71,6 +71,7 @@ void SerialEmulatorNULL::sleepMilliseconds(unsigned int millis) {
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::reset() {
+///////////////////////////////////////////////////////////////////
 	lastCommand.restLastCmd();
 	lastCommand.resetM();
 	
@@ -83,6 +84,11 @@ void SerialEmulatorNULL::reset() {
 	curEmulatorPos.setXYZ(0L, 0L, 0L);
 	
 	setterMap.clear();
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::resetCounter() {
+///////////////////////////////////////////////////////////////////
+	
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::evaluatePositions(std::vector<int32_t>& ret) {
@@ -404,10 +410,10 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case SIG_PAUSE:
 		case SIG_RESUME:			lastSignal = cmd;
 									return true;
-
+		
 		case CMD_RESET_CONTROLLER:	reset();
 									return true;
-				
+		
 		case CMD_SETTER:			lastCommand.cmd = cmd; 
 									return writeSetter(b, nbByte);
 		

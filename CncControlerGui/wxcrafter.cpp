@@ -343,7 +343,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panelTplEditImgIndex = m_templateNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_blue")));
     m_templateNotebook->AddPage(m_panelTplEdit, _("Source"), false, m_panelTplEditImgIndex);
     
-    wxFlexGridSizer* flexGridSizer1294 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer1294 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1294->SetFlexibleDirection( wxBOTH );
     flexGridSizer1294->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1294->AddGrowableCol(0);

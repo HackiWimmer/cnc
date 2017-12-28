@@ -104,6 +104,7 @@ class GLContextCncPathBase : public GLContextBase {
 		void drawBoundBox();
 		
 	private:
+		
 		void drawPoints();
 		void drawLines();
 		void drawLineStrips();

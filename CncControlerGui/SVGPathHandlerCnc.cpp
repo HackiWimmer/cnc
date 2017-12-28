@@ -288,7 +288,7 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 		if ( cpe.zAxisDown == false && isZAxisDown() == true ) {
 			if ( moveUpZ() == false )
 					return false;
-					/* todo
+			/* todo
 			if ( cncControl->getDurationCounter() == 1 ) {
 				// If this will be done for further durations the z axis moves to top before moving to the depth of the next duration
 				if ( cncControl->moveUpZ() == false )

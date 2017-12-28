@@ -115,8 +115,7 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 			sPos++;
 			if ( (parameterCount = getCommandParaCount(c) ) < 0 ) {
 				std::cerr << "Not known command: " << c << std::endl;
-				std::cerr << "Current line numer: " << 1 << std::endl;
-				break;
+				return false;
 			}
 		} else {
 			if ( para[i] == ' ' || para[i] == ',' || para[i] == '-' || para[i] == '+' ) {
@@ -153,7 +152,7 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 			
 			if ( ret == false )
 				return false;
-
+			
 			valueCounter = 0;
 		} 
 		
@@ -166,7 +165,6 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 		std::cerr << "SVGFileParser:" << std::endl;
 		std::cerr << "Parameters count error in: " << para.c_str() << std::endl;
 		std::cerr << "Defined parameter count: " << parameterCount << "; Current value count: " << valueCounter << std::endl;
-		std::cerr << "Current line numer: " << 1 << std::endl;
 		std::cerr << "Stored value list: " << std::endl;
 
 		for (unsigned int i=0; i<valueCounter; i++) {

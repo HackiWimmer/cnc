@@ -8,6 +8,7 @@
 SerialSimulatorFacade::SerialSimulatorFacade(CncControl* cnc)
 : SerialSpyPort(cnc)
 , serialThread(NULL)
+, lock(false)
 , serialMutex()
 , serialCondition(serialMutex)
 ///////////////////////////////////////////////////////////////////
@@ -17,6 +18,7 @@ SerialSimulatorFacade::SerialSimulatorFacade(CncControl* cnc)
 SerialSimulatorFacade::SerialSimulatorFacade(const char *portName)
 : SerialSpyPort(portName) 
 , serialThread(NULL)
+, lock(false)
 , serialMutex()
 , serialCondition(serialMutex)
 ///////////////////////////////////////////////////////////////////
@@ -27,6 +29,15 @@ SerialSimulatorFacade::SerialSimulatorFacade(const char *portName)
 ///////////////////////////////////////////////////////////////////
 SerialSimulatorFacade::~SerialSimulatorFacade() {
 ///////////////////////////////////////////////////////////////////
+	{
+		wxCriticalSectionLocker enter(serialThreadCS);
+		// free the wxCondition - see sleepMilliseconds(...)
+		// bytes to read now available
+		wxMutexLocker lock(serialMutex);
+		// same as Signal() here -- one waiter only
+		serialCondition.Broadcast();
+	}
+	
 	destroySerialThread();
 }
 ///////////////////////////////////////////////////////////////////
@@ -38,13 +49,15 @@ void SerialSimulatorFacade::sleepMilliseconds(unsigned int millis) {
 		return;
 	}
 	
-	// sleep in this case mean waiting until the condition is true
-	// the mutex should be initially locked - see wxCondition description
-	serialMutex.Lock();
-	serialCondition.WaitTimeout(millis);
+	if ( lock == true ) {
+		// sleep in this case mean waiting until the condition is true
+		// the mutex should be initially locked - see wxCondition description
+		serialMutex.Lock();
+		serialCondition.WaitTimeout(millis);
+	}
 }
 ///////////////////////////////////////////////////////////////////
-void SerialSimulatorFacade::onPeriodicallyAppEvent() {
+void SerialSimulatorFacade::onPeriodicallyAppEvent(bool interrupted) {
 ///////////////////////////////////////////////////////////////////
 	if ( serialThread == NULL )
 		return;
@@ -52,8 +65,16 @@ void SerialSimulatorFacade::onPeriodicallyAppEvent() {
 	if ( connected == false )
 		return;
 		
+	if ( interrupted == true ) {
+		serialThread->purgeReadQueue();
+		std::cerr << "SerialSimulatorFacade::onPeriodicallyAppEvent: The read queue was purged manually. Controller is interrupted and have to be reseted!" << std::endl;
+		pauseSerialThread();
+		return;
+	}
+		
 	if ( serialThread->IsPaused() == false ) {
 		if ( (wxDateTime::UNow() - serialThread->getLastLog()).GetMilliseconds() > 3000 ) {
+			static unsigned int counter = 0;
 			
 			if ( serialThread->readAvailable() > 0 ) {
 				cnc::cex1 << "SerialSimulatorFacade::onPeriodicallyAppEvent: Going to pause the serial thread. Warning: More bytes to read availiable: " << serialThread->readAvailable();
@@ -62,7 +83,15 @@ void SerialSimulatorFacade::onPeriodicallyAppEvent() {
 				// to give the run control a change to release events
 				GBL_CONFIG->getTheApp()->dispatchAll();
 				
+				// to avoid an endless warning cycle
+				if ( counter++ > 4 ) {
+					serialThread->purgeReadQueue();
+					std::cerr << "SerialSimulatorFacade::onPeriodicallyAppEvent: The read queue was purged manually. Controller should may be reseted!" << std::endl;
+					counter = 0;
+				}
+				
 			} else {
+				
 				pauseSerialThread();
 			}
 		}
@@ -162,6 +191,9 @@ bool SerialSimulatorFacade::connect(const char* pn) {
 	if ( serialThread == NULL )
 		return false;
 	
+	// release condition handling
+	lock = true;
+	
 	// wait a portion of time so, that the new thread 
 	// was well established and ready to use
 	wxThread::This()->Sleep(10);
@@ -178,6 +210,9 @@ void SerialSimulatorFacade::disconnect(void) {
 	if ( serialThread == NULL )
 		return;
 		
+	// stop condition handling
+	lock = false;
+	
 	// wakeup on demand
 	wakeUpOnDemand();
 	

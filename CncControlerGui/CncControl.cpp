@@ -39,6 +39,7 @@ CncControl::CncControl(CncPortType pt)
 , defaultFeedSpeedWork_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , durationCounter(0)
 , interruptState(false)
+, positionOutOfRangeFlag(false)
 , powerOn(false)
 , toolUpdateState(true)
 , stepDelay(0)
@@ -292,7 +293,7 @@ bool CncControl::setup(bool doReset) {
 		logger->Remove(logPos - 1, logPos);
 	}
 	
-	std::clog << "Ready\n";
+	std::clog << "Ready - OK\n";
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -338,7 +339,8 @@ bool CncControl::connect(const char * portName) {
 	std::clog << "Try to connect to: " << serialPort->getClassName() << "("<< portName << ")" << std::endl;
 	bool ret = serialPort->connect(portName);
 	if ( ret == true ) {
-		std::cout << " Connection established." << std::endl;
+		std::cout << " . . . Connection established -";
+		std::clog << " OK" << std::endl;
 	}
 
 	return ret;
@@ -353,23 +355,32 @@ bool CncControl::isConnected() {
 void CncControl::onPeriodicallyAppEvent() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
-	serialPort->onPeriodicallyAppEvent();
+	serialPort->onPeriodicallyAppEvent(isInterrupted());
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processCommand(const unsigned char c, std::ostream& txtCtl) {
 ///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+	
 	wxASSERT(serialPort);
 	return serialPort->processCommand(c, txtCtl, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processCommand(const char* cmd, std::ostream& txtCtl) {
 ///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+
 	wxASSERT(serialPort);
 	return serialPort->processCommand(cmd, txtCtl, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+
 	wxASSERT(serialPort);
 	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curAppPos);
 }
@@ -444,14 +455,6 @@ void CncControl::setZeroPosZ() {
 	zeroPos.setZ(val);
 	startPos.setZ(val);
 	
-	/*
-	if ( isConnected() == true ) {
-		if ( processSetter(PID_Z_POS, val)  == false ) {
-			std::cerr << "CncControl::setZeroPosZ: processSetter failed!"<< std::endl;
-		}
-	}
-	 * */
-	
 	postAppPosition(PID_XYZ_POS_MAJOR);
 }
 ///////////////////////////////////////////////////////////////////
@@ -524,10 +527,18 @@ bool CncControl::reset() {
 ///////////////////////////////////////////////////////////////////
 	getSerial()->purge();
 	resetInterrupt();
+	resetPositionOutOfRangeFlag();
 	
-	std::cout << " Try to reset the controller\n";
-	if ( processCommand(CMD_RESET_CONTROLLER, std::cerr) ) {
-		std::cout << " Controller reseted\n";
+	wxTextCtrl* logger = GBL_CONFIG->getTheApp()->GetLogger(); wxASSERT( logger != NULL );
+	std::cout << " Try to reset the controller . . .\n";
+	long logPos = logger->GetLastPosition();
+	
+	bool ret = processCommand(CMD_RESET_CONTROLLER, std::cerr);
+	if ( logPos == logger->GetLastPosition() )
+		logger->Remove(logPos - 1, logPos);
+		
+	if ( ret == true ) {
+		std::clog << " Controller reseted - OK\n";
 	} else {
 		std::cerr << " Controller reset failed\n";
 		return false;
@@ -701,10 +712,10 @@ void CncControl::setDefaultWorkSpeed_MM_MIN(double s)  {
 	defaultFeedSpeedWork_MM_MIN  = s; 
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::validatePostion(const CncLongPosition& pos) {
+bool CncControl::isPositionOutOfRange(const CncLongPosition& pos, bool trace) {
 ///////////////////////////////////////////////////////////////////
 	if ( positionCheck == false )
-		return true;
+		return false;
 		
 	// will only be done for emulation ports. It didn't makes sense for a cnc run
 	// see below
@@ -719,7 +730,7 @@ bool CncControl::validatePostion(const CncLongPosition& pos) {
 		if ( (wm.yMax - wm.yMin)/cncConfig->getCalculationFactY() > cncConfig->getMaxDimensionY() ) error = true;
 		if ( (wm.zMax - wm.zMin)/cncConfig->getCalculationFactZ() > cncConfig->getMaxDimensionZ() ) error = true;
 	
-		if ( error == true ) {
+		if ( error == true && trace == true ) {
 			std::cerr << "Position out of range!" << std::endl;
 			std::cerr << " Max valid X dimension: " << cncConfig->getMaxDimensionX() << std::endl;
 			std::cerr << " Max valid Y dimension: " << cncConfig->getMaxDimensionY() << std::endl;
@@ -731,11 +742,11 @@ bool CncControl::validatePostion(const CncLongPosition& pos) {
 			std::cerr << " Calculated spread Y :" <<  (wm.yMax - wm.yMin)/cncConfig->getCalculationFactY() << std::endl;
 			std::cerr << " Calculated spread Z :" <<  (wm.zMax - wm.zMin)/cncConfig->getCalculationFactZ() << std::endl;
 			
-			return false;
+			return true;
 		}
 	}
 	
-	return true;
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::monitorPosition(const CncLongPosition& pos) {
@@ -755,10 +766,14 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 		
 		prevPos = pos;
 		
-		// position out of configured range?
-		if ( validatePostion(pos) == false )
-			interrupt();
-		
+		#warning - to do: move flag to configuration
+		if ( false ) {
+			if ( isPositionOutOfRange(pos, true) == true )
+				interrupt();
+		} else {
+			if ( isPositionOutOfRange(pos, false) == true )
+				positionOutOfRangeFlag = true;
+		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -814,6 +829,9 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	// Event handling, enables the interrrpt functionality
 	if ( cncConfig->isAllowEventHandling() )
 		THE_APP->dispatchAll();
+		
+	if ( isInterrupted() )
+		return false;
 	
 	switch ( ci.infoType ) {
 		// --------------------------------------------------------
@@ -885,10 +903,11 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	// display application coordinates
 	postAppPosition(PID_XYZ_POS_MAJOR);
 	
+	/*
 	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
 		std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
 		interrupt();
-	}
+	}*/
 	
 	return !isInterrupted();
 }
@@ -1232,7 +1251,7 @@ const CncLongPosition CncControl::getControllerLimitState() {
 	return {0, 0, 0};
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::validatePositions() {
+bool CncControl::validateAppAgainstCtlPosition() {
 ///////////////////////////////////////////////////////////////////
 	CncLongPosition ctlPos = getControllerPos();
 	return ( curAppPos == ctlPos );
@@ -1687,7 +1706,7 @@ void CncControl::reconfigureSimpleMove(bool correctPositions) {
 	activatePositionCheck(true);
 	resetDurationCounter();
 	
-	if ( validatePositions() == false && correctPositions == true ) {
+	if ( validateAppAgainstCtlPosition() == false && correctPositions == true ) {
 		curAppPos = getControllerPos();
 	}
 }

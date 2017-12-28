@@ -48,7 +48,11 @@ void SerialSimulatorDevNull::resetSerial() {
 	// to do something specialized things here
 	curSimulatorPos.setXYZ(0L, 0L, 0L);
 	curLimitStates.setXYZ(LIMIT_UNSET, LIMIT_UNSET, LIMIT_UNSET);
-
+	
+	posReplyThresholdX = 0;
+	posReplyThresholdY = 0;
+	posReplyThresholdZ = 0;
+	
 	speedSimulator->setup(	defaultLoopDuration,
 							0.0, 0, 0,
 							0.0, 0, 0,
@@ -164,6 +168,12 @@ unsigned char SerialSimulatorDevNull::performSetterValue(unsigned char pid, int3
 										break;
 										
 		case PID_POS_REPLY_THRESHOLD_Z:	posReplyThresholdZ = value; 
+										break;
+										
+		case PID_RESERT_POS_COUNTER:	resetPositionCounter();
+										break;
+										
+		case PID_RESERT_STEP_COUNTER:	resetStepCounter();
 										break;
 	}
 	

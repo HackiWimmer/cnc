@@ -10,10 +10,12 @@ class GL3DOptions : public GL3DOptionsBase
 		virtual ~GL3DOptions();
 		
 		void cameraCallBack(int angle);
+		void update();
 		
 	protected:
-    virtual void onUpdateTimer(wxTimerEvent& event);
-    virtual void cameraRotationSpeedChanged(wxScrollEvent& event);
+		
+		virtual void onUpdateTimer(wxTimerEvent& event);
+		virtual void cameraRotationSpeedChanged(wxScrollEvent& event);
 		virtual void resetCameraPostion(wxCommandEvent& event);
 		virtual void autoCameraRotationAnticlockwise(wxCommandEvent& event);
 		virtual void autoCameraRotationClockwise(wxCommandEvent& event);

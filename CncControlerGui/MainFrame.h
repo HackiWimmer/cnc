@@ -504,8 +504,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void setIcons();
 		
+		void traceGccVersion(std::ostream& out);
 		void traceWxWidgetsVersion(std::ostream& out);
 		void traceBoostVersion(std::ostream& out);
+		void traceWoodworkingCncVersion(std::ostream& out);
 		
 		///////////////////////////////////////////////////////////////
 		// Path Generator
@@ -614,6 +616,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool showConfigSummaryAndConfirmRun();
 		
 		void collectSummary();
+		void collectSvgSpecificSummary(DcmItemList& rows);
+		void collectGCodeSpecificSummary(DcmItemList& rows);
 		
 		void updateStatisticPanel();
 		

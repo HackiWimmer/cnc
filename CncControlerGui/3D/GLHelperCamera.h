@@ -22,6 +22,15 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
+			void reset() {
+				_eyeX = _eyeY = _eyeZ = 0.0f;
+				_cntX = _cntY = _cntZ = 0.0f;
+				_upX  = _upY  = _upZ  = 0.0f;
+				
+				setUpPos(0.0f, 0.0f, 1.0f);
+			}
+			
+			////////////////////////////////////////////
 			void setEyePos(float x, float y, float z) {
 				_eyeX = x; _eyeY = y; _eyeZ = z;
 			}

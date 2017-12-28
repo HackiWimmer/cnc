@@ -92,8 +92,9 @@ class GLViewPort {
 			}
 			return "???";
 		}
+		
 		void centerViewport() { origPosType = VPOP_Center; }
-
+		
 		////////////////////////////////////////////////////
 		GLViewPort::OrigPosType getOriginPosType() { return origPosType; }
 		const char* getOriginPosTypeAsString() {

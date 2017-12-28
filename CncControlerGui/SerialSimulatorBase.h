@@ -53,6 +53,9 @@ class SerialSimulatorThread : public wxThread {
 		void incStepCounterY(int32_t dy);
 		void incStepCounterZ(int32_t dz);
 		
+		void resetPositionCounter();
+		void resetStepCounter();
+		
 		int32_t getPositionCounter() 	{ return positionCounter; }
 		int32_t getStepCounterX() 		{ return stepCounterX; }
 		int32_t getStepCounterY() 		{ return stepCounterY; }
@@ -94,9 +97,6 @@ class SerialSimulatorThread : public wxThread {
 		virtual unsigned char performSetterValue(unsigned char pid, int32_t value);
 		
 	private:
-		static const unsigned int maxByteArraySize = 1024;
-		SerialByte bytes[maxByteArraySize];
-		
 		SerialSimulatorFacade* caller;
 		wxCondition* callerCondition;
 		wxMutex*     callerMutex;

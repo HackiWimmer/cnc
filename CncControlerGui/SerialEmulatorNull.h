@@ -70,6 +70,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force=false);
 		
 		inline void reset();
+		inline void resetCounter();
 		inline bool stepAxis(char axis, int32_t dist);
 		
 	protected:

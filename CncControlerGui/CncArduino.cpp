@@ -20,7 +20,7 @@ void ArduinoCMDs::init() {
 		s += std::to_string(i);
 		cmds[i]  = s.c_str();
 	}
- 
+	
 	cmds[CMD_INVALID]               = "Invalid Command";
 	
 	cmds[SIG_INTERRUPPT]            = "Push Signal Interrupt";
@@ -31,25 +31,25 @@ void ArduinoCMDs::init() {
 	cmds[CMD_IDLE]                  = "Pull Idle Callback";
 	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Controller";
 	cmds[CMD_RESET_ERRORINFO]       = "Push Reset Error Info";
-
+	
 	cmds[CMD_SETTER]                = "Push Setter";
 	cmds[CMD_GETTER]                = "Pull Getter";
-
+	
 	cmds[CMD_ENABLE_STEPPER_PIN]    = "Push Enable Stepper Motors";
 	cmds[CMD_DISABLE_STEPPER_PIN]   = "Push Disable Stepper Motors";
-
+	
 	cmds[CMD_POS_STEP_X]            = "Push Positive X Step";
 	cmds[CMD_NEG_STEP_X]            = "Push Negative X Step";
 	cmds[CMD_POS_STEP_Y]            = "Push Positive Y Step";
 	cmds[CMD_NEG_STEP_Y]            = "Push Negative Y Step";
 	cmds[CMD_POS_STEP_Z]            = "Push Positive Z Step";
 	cmds[CMD_NEG_STEP_Z]            = "Push Negative Z Step";
-
+	
 	cmds[CMD_MOVE]                  = "Push 3D Move";
 	cmds[CMD_RENDER_AND_MOVE]       = "Push Render and 3D Move";
-
+	
 	cmds[CMD_TEST_START]            = "Push Pause Start";
-
+	
 	cmds[CMD_PRINT_CONFIG]          = "Pull Configuration";
 	cmds[CMD_PRINT_VERSION]         = "Pull Version";
 	cmds[CMD_PRINT_PIN_REPORT]      = "Pull PIN Report";

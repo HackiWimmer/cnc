@@ -78,8 +78,8 @@ class FileParser {
 		virtual void setUserAgentControls(UserAgentOutputControls& oc) {}
 		virtual void displayUserAgentDetailInfo(unsigned int pos) {}
 		virtual void clearControls();
+		virtual int getCurrentLineNumber() { return currentLineNumber; };
 		
-		int getCurrentLineNumber() { return currentLineNumber; };
 		void setInboundSourceControl(wxStyledTextCtrl* stc) { inboundSourceControl = stc; }
 		
 		void appendDebugValueBase(const char* key, wxVariant value);

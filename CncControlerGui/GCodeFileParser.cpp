@@ -147,15 +147,16 @@ bool GCodeFileParser::spool() {
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
-#warning - something todo here?
-/*
+	// currently nothing to do
+	
+	/*
 	// display the tool ID summary
 	std::cout << wxString::Format("Tool ID Summary (count = %d):", (int)toolIds.size());
 	for ( auto it = toolIds.begin(); it != toolIds.end(); ++it) {
 		std::cout << " '" << (*it) << "'";
 	}
 	std::cout << std::endl;
-*/
+	*/
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -241,8 +242,11 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 					
 		case 'P':	gcb.p 			= field.getValue();
 					return true; 
+					
+		case 'H':	gcb.h 			= field.getValue();
+					return true; 
+					
 		case 'N':
-		case 'H':
 		case '*':	//skip this fields
 					return true;
 					
@@ -346,6 +350,56 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		{
 			return pathHandler->moveToOrigin(gcb);
 		} //....................................................
+		case 40: 	// GC_G: Cutter Compensation off
+		{
+			pathHandler->setCutterCompensationMode(GCodePathHandlerBase::CC_OFF);
+			return true;
+		} //....................................................
+		case 41: 	// GC_G: Cutter Compensation (Left) on
+		{	
+			if ( gcb.hasCmdSubNumber() == false ) {
+				pathHandler->setCutterCompensationMode(GCodePathHandlerBase::CC_STATIC_LEFT);
+			} else  {
+				if ( gcb.cmdSubNumber == 1L ) { // G41.1
+					pathHandler->setCutterCompensationMode(GCodePathHandlerBase::CC_DYNAMIC_LEFT);
+				} else {
+					return false;
+				}
+			}
+			
+			return true;
+		} //....................................................
+		case 42: 	// GC_G: Cutter Compensation (Right) on
+		{	
+			if ( gcb.hasCmdSubNumber() == false ) {
+				pathHandler->setCutterCompensationMode(GCodePathHandlerBase::CC_STATIC_RIGHT);
+			} else  {
+				if ( gcb.cmdSubNumber == 1L ) { // G42.1
+					pathHandler->setCutterCompensationMode(GCodePathHandlerBase::CC_DYNAMIC_RIGHT);
+				} else {
+					return false;
+				}
+			}
+			
+			return true;
+		} //....................................................
+		case 43: 	// GC_G: Tool length offset
+		{
+			if ( gcb.hasH() ) {
+				int id = (int)gcb.h;
+				if ( id > 0 ) {
+					pathHandler->setToolLengthOffsetId(id);
+					return true;
+				}
+			}
+			
+			return false;
+		} //
+		case 80: 	// GC_G: Cancle Canned Cycle
+		{
+			// does currntly nothing beause G81 to G89 are also not supported
+			return true;
+		} //
 		case 90: 	// GC_G: Absolute Positioning:
 		{
 			if ( gcb.cmdSubNumber == 1L ) { // G90.1

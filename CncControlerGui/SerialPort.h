@@ -245,7 +245,7 @@ class Serial {
 		//return true on success.
 		virtual bool writeData(void *buffer, unsigned int nbByte);
 		// will be released periodically be the main thread
-		virtual void onPeriodicallyAppEvent() {}
+		virtual void onPeriodicallyAppEvent(bool interrupted) {}
 		//Check if we are actually connected
 		bool isConnected();
 		// returns the port name
