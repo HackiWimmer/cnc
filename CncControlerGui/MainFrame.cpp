@@ -36,10 +36,10 @@
 #include "CncPatternDefinitions.h"
 #include "SvgUnitCalculator.h"
 #include "CncFileNameService.h"
-
 #include "CncControllerTestSuite.h"
 #include "CncFilePreviewWnd.h"
 #include "SVGPathHandlerCnc.h"
+#include "ManuallyParser.h"
 #include "SVGFileParser.h"
 #include "GCodeFileParser.h"
 #include "CncArduino.h"
@@ -138,6 +138,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , setterList(NULL)
 , statisticSummaryListCtrl(NULL)
 , vectiesListCtrl(NULL)
+, cncSummaryListCtrl(NULL)
 , guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -387,16 +388,19 @@ void MainFrame::installCustControls() {
 	statisticSummaryListCtrl = new CncStatisticSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_statisticSummaryListCtrl, statisticSummaryListCtrl);
 	
-	// cvecties list
+	// vecties list
 	vectiesListCtrl = new CncVectiesListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_vectiesListCtrl, vectiesListCtrl);
+	
+	// summary list
+	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
 	registerGuiControl(m_removeTemplate);
 	registerGuiControl(m_renameTemplate);
-
 	registerGuiControl(m_btProbeMode);
 	registerGuiControl(m_btSelectReferences);
 	registerGuiControl(m_btSelectManuallyMove);
@@ -405,11 +409,8 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_cbCurveLibResolution);
 	registerGuiControl(m_3D_Refreh);
 	registerGuiControl(m_3D_Clear);
-
 	registerGuiControl(m_cbContentPosSpy);
 	registerGuiControl(m_btPathGenerator);
-	registerGuiControl(m_checkManuallyXY);
-	registerGuiControl(m_checkManuallyZ);
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_ctrlTestSelection);
@@ -487,6 +488,28 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testModeX);
 	registerGuiControl(m_testModeY);
 	registerGuiControl(m_testModeZ);
+	registerGuiControl(m_xManuallySlider);
+	registerGuiControl(m_yManuallySlider);
+	registerGuiControl(m_zManuallySlider);
+	registerGuiControl(m_minManuallyXSlider);
+	registerGuiControl(m_minManuallyYSlider);
+	registerGuiControl(m_minManuallyZSlider);
+	registerGuiControl(m_metricX);
+	registerGuiControl(m_metricY);
+	registerGuiControl(m_metricZ);
+	registerGuiControl(m_maxManuallyXSlider);
+	registerGuiControl(m_maxManuallyYSlider);
+	registerGuiControl(m_maxManuallyZSlider);
+	registerGuiControl(m_zeroManuallyXSlider);
+	registerGuiControl(m_zeroManuallyYSlider);
+	registerGuiControl(m_zeroManuallyZSlider);
+	registerGuiControl(m_signManuallyXSlider);
+	registerGuiControl(m_signManuallyYSlider);
+	registerGuiControl(m_signManuallyZSlider);
+	registerGuiControl(m_manuallyToolId);
+	registerGuiControl(m_manuallySpeedType);
+	registerGuiControl(m_manuallySpeedValue);
+	registerGuiControl(m_mmRadioCoordinates);
 	
 	//...
 }
@@ -1335,7 +1358,6 @@ void MainFrame::initialize(void) {
 	determineRunMode();
 	decoratePosSpyConnectButton(true);
 	registerGuiControls();
-	enableManuallyControls();
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
 	
@@ -1351,11 +1373,16 @@ void MainFrame::initialize(void) {
 	// setup cnc port selector box
 	decoratePortSelector();
 	
-	wxFloatingPointValidator<float> val8(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	val8.SetRange(0, 100.0);
-	m_testDistanceX->SetValidator(val8);
-	m_testDistanceY->SetValidator(val8);
-	m_testDistanceZ->SetValidator(val8);
+	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	val.SetRange(0, 100.0);
+	val.SetPrecision(3);
+	m_testDistanceX->SetValidator(val);
+	m_testDistanceY->SetValidator(val);
+	m_testDistanceZ->SetValidator(val);
+	
+	val.SetRange(0, 5000.0);
+	val.SetPrecision(1);
+	m_manuallySpeedValue->SetValidator(val);
 	
 	wxIntegerValidator<long> val9(NULL);
 	m_ctrlTestParam1->SetValidator(val9);
@@ -1800,7 +1827,7 @@ void MainFrame::enableControls(bool state) {
 	enableGuiControls(state);
 	
 	//enable manually controls
-	enableManuallyControls(!state);
+	enableManuallyControls(state);
 
 	// enable menu bar
 	for (unsigned int i=0; i<m_menuBar->GetMenuCount(); i++) {
@@ -2681,74 +2708,43 @@ bool MainFrame::processGCodeTemplate() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processManualTemplate() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
+	wxASSERT( cnc != NULL );
 	
-	// SVG Serial Emulator Support
-	cnc->getSerial()->beginSVG(mm, 
-							   CncConfig::getGlobalCncConfig()->getMaxDimensionX(), 
-							   CncConfig::getGlobalCncConfig()->getMaxDimensionY());
-	cnc->getSerial()->beginPath(cnc->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX(), 
-								cnc->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY());
+	if ( inboundFileParser != NULL )
+		delete inboundFileParser;
 		
-	if ( m_checkManuallyXY->GetValue() == true ) {
-		unsigned int sel = m_mmRadioCoordinates->GetSelection();
+	ManuallyParser* p = new ManuallyParser(new ManuallyPathHandlerCnc(cnc));
+	inboundFileParser = p;
 
-		wxString xs = m_metricX->GetValue();
-		double xd; 
-		if ( xs != "" )	xs.ToCDouble(&xd);
-		else			xd = 0.0;
-		
-		wxString ys = m_metricY->GetValue();
-		double yd; 
-		if ( ys != "" ) ys.ToCDouble(&yd);
-		else			yd = 0.0;
-		
-		cnc->resetDurationCounter();
-
-		// transform to mm
-		if ( m_unit->GetValue() == "steps" ) {
-			xd *= CncConfig::getGlobalCncConfig()->getDisplayFactX();
-			yd *= CncConfig::getGlobalCncConfig()->getDisplayFactY();
-		}
-
-		double moveX = xd, moveY = yd;
-		// transfer to absolute coordinates
-		if ( sel == 0 ) {
-			moveX = xd - cnc->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX();
-			moveY = yd - cnc->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY();
-		}
-
-		//cnc->initNextDuration(); will be done by manualSimpleMoveMetric
-		cnc->manualSimpleMoveMetric(moveX, moveY, 0.0);
-		cnc->resetDurationCounter();
-		
-	} else {
-		wxString zs = m_metricZ->GetValue();
-		double zd; 
-		if ( zs != "" )	zs.ToCDouble(&zd);
-		else			zd = 0.0;
-		
-		// transform to mm
-		if ( m_unit->GetValue() == "steps" ) 
-			zd *= CncConfig::getGlobalCncConfig()->getDisplayFactX();
-			
-		//cnc->initNextDuration(); will be done by manualSimpleMoveMetric
-		cnc->manualSimpleMoveMetric(0.0, 0.0, zd);
-		cnc->resetDurationCounter();
-	}
+	ManuallyPathHandlerCnc::MoveDefinition move;
+	move.speedType 		= ( m_manuallySpeedType->GetSelection()  == 0 ? CncSpeedRapid : CncSpeedWork );
+	move.absoluteMove	= ( m_mmRadioCoordinates->GetSelection() == 0 );
+	move.toolState		= true;
 	
-	// SVG Serial Emulator Support
-	cnc->getSerial()->closePath();
-	cnc->getSerial()->closeSVG();
+	m_manuallySpeedValue->GetValue().ToDouble(&move.f);
+	m_metricX->GetValue().ToDouble(&move.x);
+	m_metricY->GetValue().ToDouble(&move.y);
+	m_metricZ->GetValue().ToDouble(&move.z);
 	
-	refreshSvgEmuFile();
-
-	return true;
+	if ( m_unit->GetValue() == "steps" ) {
+		move.x *= GBL_CONFIG->getDisplayFactX();
+		move.y *= GBL_CONFIG->getDisplayFactY();
+		move.z *= GBL_CONFIG->getDisplayFactZ();
+	} 
+	
+	p->reset(cnc->getCurPosMetric());
+	p->addMove(move);
+	
+	bool ret = false;
+	if ( isDebugMode == true ) 	ret = p->processDebug();
+	else 						ret = p->processRelease();
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processTestTemplate() {
 ///////////////////////////////////////////////////////////////////
-	wxWindow* page = m_treebookTest->GetCurrentPage();
+	wxWindow* page = m_testCaseBook->GetCurrentPage();
 	if ( page != NULL ) {
 		if 		( page == m_testIntervalPage )	return processTestInterval();
 		else if ( page == m_testDimensions )	return processTestDimensions();
@@ -2757,13 +2753,13 @@ bool MainFrame::processTestTemplate() {
 		
 		wxString msg;
 		msg << "This Test (\"";
-		msg << m_treebookTest->GetPageText(m_treebookTest->GetSelection()); 
+		msg << m_testCaseBook->GetPageText(m_testCaseBook->GetSelection()); 
 		msg << "\") isn't assigned to the run mode. May be there is an action control on the test page itself.\n\n";
 		msg << "Nothing will be done.\n" ;
 		
 		wxMessageDialog dlg(this, msg, _T("MainFrame::processTestTemplate(): Not registered test . . . "), 
 							wxOK||wxCENTRE|wxICON_QUESTION);
-
+		
 		dlg.ShowModal();
 		return true;
 	}
@@ -3238,14 +3234,16 @@ void MainFrame::cancelRun(wxCommandEvent& event) {
 	runConfirmationInfo = RunConfirmationInfo::Canceled;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::collectSvgSpecificSummary(DcmItemList& rows) {
+void MainFrame::collectSvgSpecificSummary() {
 ///////////////////////////////////////////////////////////////////
 	// todo - add headline and rows
+	cncSummaryListCtrl->addHeadline(CncSummaryListCtrl::ParameterType::PT_HEADLINE, "SVG specific Settings");
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::collectGCodeSpecificSummary(DcmItemList& rows) {
+void MainFrame::collectGCodeSpecificSummary() {
 ///////////////////////////////////////////////////////////////////
 	// todo - add headline and rows
+	cncSummaryListCtrl->addHeadline(CncSummaryListCtrl::ParameterType::PT_HEADLINE, "GCode specific Settings");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectSummary() {
@@ -3253,8 +3251,18 @@ void MainFrame::collectSummary() {
 	if ( cnc == NULL )
 		return;
 		
+	typedef CncSummaryListCtrl::ParameterType PT;
+		
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
+	cncSummaryListCtrl->clear();
 	
+	cncSummaryListCtrl->addHeadline(PT::PT_HEADLINE, "Common Settings");
+	
+	
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "1", "7");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "1", "7", "qm");
+	
+	/*
 	DcmItemList rows;
 	DataControlModel::addNumParameterValueUnitRow(rows, "Tool Diameter",					wxString::Format(" %.3f", 	cc->getToolDiameter()), 			" mm"); 
 	DataControlModel::addNumParameterValueUnitRow(rows, "Workpiece thickness", 				wxString::Format(" %4.3f", 	cc->getWorkpieceThickness()), 		" mm"); 
@@ -3263,11 +3271,15 @@ void MainFrame::collectSummary() {
 //	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed Z", 					wxString::Format(" %d", 	cc->getWorkSpeedZ()), 				" rpm");
 	// ...
 	
+	m_dvListCtrlConfigSummary->Set
+	*/
+	
+	
 	switch ( getCurrentTemplateFormat() ) {
-		case TplSvg:	collectSvgSpecificSummary(rows);
+		case TplSvg:	collectSvgSpecificSummary();
 						break;
 		
-		case TplGcode:	collectGCodeSpecificSummary(rows);
+		case TplGcode:	collectGCodeSpecificSummary();
 						break;
 						
 		default:		; // do nothing
@@ -3338,11 +3350,12 @@ void MainFrame::collectSummary() {
 			dcc->AppendItem(*it);
 	}
 	*/
-
+/*
 	m_dvListCtrlConfigSummary->DeleteAllItems();
 	for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
 		m_dvListCtrlConfigSummary->AppendItem(*it);
 	}
+	 * */
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateSetterList() {
@@ -3505,9 +3518,7 @@ bool MainFrame::processTemplateIntern() {
 			ret = processGCodeTemplate();
 			break;
 		case TplManual:
-			cnc->getSerial()->startMeasurement();
 			ret = processManualTemplate();
-			cnc->getSerial()->stopMeasurement();
 			break;
 		case TplTest:
 			clearMotionMonitor();
@@ -3530,7 +3541,7 @@ bool MainFrame::processTemplateIntern() {
 	}
 	
 	if ( cnc->getPositionOutOfRangeFlag() == true ) {
-		if ( cnc->isInterrupted() == false ) {
+		//if ( cnc->isInterrupted() == false ) {
 			std::cerr << "Out of range: During the last run the position limits were exceeded." << std::endl;
 			CncLongPosition::Watermarks wm = cnc->getWaterMarks();
 			CncLongPosition min(wm.xMin, wm.yMin, wm.zMin);
@@ -3540,7 +3551,7 @@ bool MainFrame::processTemplateIntern() {
 			cnc->isPositionOutOfRange(max, true);
 			
 			setRefPostionState(false);
-		}
+		//}
 	}
 	
 	// Check error count
@@ -4521,56 +4532,17 @@ void MainFrame::moveManuallySliderZ(wxScrollEvent& event) {
 	m_metricZ->SetValue(val);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::enableManuallyControls(bool force) {
+void MainFrame::enableManuallyControls(bool state) {
 ///////////////////////////////////////////////////////////////////
-	bool xyFlag = m_checkManuallyXY->GetValue();
-	bool zFlag  = !xyFlag;
-	
-	if ( force == true ) 
-		xyFlag = zFlag = false;
-	
-	m_xManuallySlider->Enable(xyFlag);
-	m_yManuallySlider->Enable(xyFlag);
-	m_minManuallyXSlider->Enable(xyFlag);
-	m_minManuallyYSlider->Enable(xyFlag);
-	m_metricX->Enable(xyFlag);
-	m_metricY->Enable(xyFlag);
-	m_maxManuallyXSlider->Enable(xyFlag);
-	m_maxManuallyYSlider->Enable(xyFlag);
-	m_zeroManuallyXSlider->Enable(xyFlag);
-	m_zeroManuallyYSlider->Enable(xyFlag);
-	m_signManuallyXSlider->Enable(xyFlag);
-	m_signManuallyYSlider->Enable(xyFlag);
-	m_metricZ->Enable(xyFlag);
-	m_mmRadioCoordinates->Enable(xyFlag);
-		
-	m_zManuallySlider->Enable(zFlag);
-	m_minManuallyZSlider->Enable(zFlag);
-	m_metricZ->Enable(zFlag);
-	m_maxManuallyZSlider->Enable(zFlag);
-	m_zeroManuallyZSlider->Enable(zFlag);
-	m_signManuallyZSlider->Enable(zFlag);
-	
+	#warning how ????
 	// handle interval mode
-	if ( force == false ) {
+	if ( state == false ) {
 		wxString sel = m_testIntervalMode->GetStringSelection();
 		char mode = sel[0];
 
 		m_testCountY->Enable(mode == 'A');
 		m_testCountZ->Enable(mode == 'A');
 	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::checkManuallyXY(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_checkManuallyZ->SetValue(!m_checkManuallyXY->GetValue());
-	enableManuallyControls();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::checkManuallyZ(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_checkManuallyXY->SetValue(!m_checkManuallyZ->GetValue());
-	enableManuallyControls();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::changeManuallySliderX(wxScrollEvent& event) {

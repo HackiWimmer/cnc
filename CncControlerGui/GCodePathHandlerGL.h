@@ -12,6 +12,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		virtual ~GCodePathHandlerGL();
 		
 		virtual void switchToolState(bool state) {}
+		virtual bool shouldAToolChangeProcessed() { return false; }
 		
 	protected:
 		

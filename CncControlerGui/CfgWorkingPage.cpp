@@ -78,20 +78,6 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 		wxPGProperty* prop = NULL;
 		
 		//...................
-		wxPGProperty* tool = NULL;
-		curCatName.assign("Tool");
-		tool = root->AppendChild( new wxPropertyCategory(curCatName));
-		registerCategory(curCatName, tool);
-		{
-			//...............
-			prop = tool->AppendChild( new wxBoolProperty("Consider 'Default Tool'", NEXT_PROP_ID, true));
-			prop->Enable(true);
-			prop->SetHelpString(_T("This tool will be used if a requested Tool ID didn't exists"));
-			prop->SetEditor( wxT("CheckBox") );
-			CncConfig::registerProperty(CncWork_Tool_DEFAULT, prop);
-		}
-		
-		//...................
 		wxPGProperty* wpt = NULL;
 		curCatName.assign("Workpiece");
 		wpt = root->AppendChild( new wxPropertyCategory(curCatName));

@@ -4,13 +4,15 @@
 #include "CncConfig.h"
 #include "wxcrafter.h"
 
-class CncToolMagazine : public CncToolMagazineBase
-{
+class CncToolMagazine : public CncToolMagazineBase {
+	
 	public:
 		CncToolMagazine(wxWindow* parent);
 		virtual ~CncToolMagazine();
 		
 	protected:
+    virtual void clickUseDefaultTool(wxCommandEvent& event);
+    virtual void selectDefaultToolMappedTo(wxCommandEvent& event);
 		virtual void cancel(wxCommandEvent& event);
 		virtual void addTool(wxCommandEvent& event);
 		virtual void editTool(wxCommandEvent& event);
@@ -27,8 +29,8 @@ class CncToolMagazine : public CncToolMagazineBase
 		
 		void selectedItem(const unsigned int index);
 		void setInsertState(bool state);
-		void getConfigToolMagazine();
-		void setConfigToolMagazine();
+		void getToolMagazineConfig();
+		void setToolMagazineConfig();
 		bool checkIfIdAlreadyExists(const int newId);
 };
 

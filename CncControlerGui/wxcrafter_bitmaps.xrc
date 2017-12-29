@@ -127,6 +127,7 @@
   <object class="wxBitmap" name="BMP_FOLDER_UP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="BMP_GCODE_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\code-context.png</object>
   <object class="wxBitmap" name="BMP_GENERAL_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-inactive.png</object>
+  <object class="wxBitmap" name="BMP_HEADLINE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\view-list-multicolumn-4.png</object>
   <object class="wxBitmap" name="BMP_HIDE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_up.png</object>
   <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\mill.png</object>
@@ -168,9 +169,7 @@
   <object class="wxBitmap" name="BMP_SERIAL_SYP_ON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SYP_ON@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SYP_ON@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
-  <object class="wxBitmap" name="BMP_SETTER">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-struct.png</object>
-  <object class="wxBitmap" name="BMP_SETTER@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-struct@2x.png</object>
-  <object class="wxBitmap" name="BMP_SETTER@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-struct@2x.png</object>
+  <object class="wxBitmap" name="BMP_SETTER">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\application-put.png</object>
   <object class="wxBitmap" name="BMP_SHOW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_down.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
@@ -190,12 +189,15 @@
   <object class="wxBitmap" name="BMP_TEMPLATE_ROOT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-database.png</object>
   <object class="wxBitmap" name="BMP_TEMPLATE_ROOT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-database@2x.png</object>
   <object class="wxBitmap" name="BMP_TEMPLATE_ROOT@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-database@2x.png</object>
-  <object class="wxBitmap" name="BMP_TOOL_MAGAZINE_ENTRY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\document-page-setup.png</object>
+  <object class="wxBitmap" name="BMP_TOOL_MAGAZINE_ENTRY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\settings.png</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_DEFAULT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_grey16.ico</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_GREEN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_green16.ico</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_RED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_YELLOW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_yellow16.ico</object>
+  <object class="wxBitmap" name="BMP_TYPE_COMMON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\flag-green-2.png</object>
+  <object class="wxBitmap" name="BMP_TYPE_GCODE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\flag-yellow-2.png</object>
   <object class="wxBitmap" name="BMP_TYPE_RAPID">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full (2).png</object>
+  <object class="wxBitmap" name="BMP_TYPE_SVG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\flag-blue-2.png</object>
   <object class="wxBitmap" name="BMP_TYPE_WORK">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-medium (2).png</object>
   <object class="wxBitmap" name="BMP_VALUE_DOUBLE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-pink.png</object>
   <object class="wxBitmap" name="BMP_VALUE_ENUM">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-red.png</object>

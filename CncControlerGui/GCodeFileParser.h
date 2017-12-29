@@ -1,5 +1,5 @@
-#ifndef GCODE_FILE_PREVIEW_H
-#define GCODE_FILE_PREVIEW_H
+#ifndef GCODE_FILE_PARSER_H
+#define GCODE_FILE_PARSER_H
 
 #include <fstream>
 #include <sstream>
@@ -57,6 +57,8 @@ class GCodeFileParser : public FileParser {
 		
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
+		
+		virtual bool shouldAToolChangeProcessed() { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 		
 	public:
 		GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph);

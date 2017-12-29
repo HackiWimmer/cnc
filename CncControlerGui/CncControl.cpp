@@ -766,7 +766,7 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 		
 		prevPos = pos;
 		
-		#warning - to do: move flag to configuration
+#warning - to do: move flag to configuration
 		if ( false ) {
 			if ( isPositionOutOfRange(pos, true) == true )
 				interrupt();

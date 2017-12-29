@@ -65,6 +65,8 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		inline bool performTransform(SVGUserAgentInfo& uai);
 		inline bool performUse(SVGUserAgentInfo& uai, UseDirective& ud);
 		inline bool spoolPath(SVGUserAgentInfo& uai, const wxString& transform = "");
+		
+		virtual bool shouldAToolChangeProcessed() { return (pathHandler != NULL ? pathHandler->shouldAToolChangeProcessed() : false); }
 
 	public:
 		SVGFileParser(const wxString& fn, CncControl* cnc);

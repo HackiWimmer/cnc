@@ -2,6 +2,10 @@
 #define CNC_CONFIG_COMMON_H
 
 	#define CncToolMagazine_SECTION_NAME			"CncWork.ToolMagazine"
+	#define CncToolMagazineParam_SECTION_NAME		"CncWork.ToolMagazineParameter"
+	#define CncToolMagazineParam_USE_DEF_TOOL		"USE_DEFAULT_TOOL"
+	#define CncToolMagazineParam_MAP_DEF_TOOL_TO	"MAP_DEFAULT_TOOL_TO"
+		
 	#define Attribute_READONLY						"READONLY"
 
 	#define CncConfig_MAX_SPEED_XYZ_MM_MIN			"Cnc.Config/MAX_SPEED_XYZ_MM_MIN"
@@ -70,7 +74,6 @@
 	#define CncSvg_Emu_RSLT_WITH_ORIG_PATH			"CncSvg.Emu/RESULT_WITH_ORIG_PATH"
 	#define CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS	"CncSvg.Emu/RESULT_ONLY_WITH_FIRST_CROSSING"
 	
-	#define CncWork_Tool_DEFAULT					"CncWork.Tool/DEFAULT"
 	#define CncWork_Wpt_THICKNESS					"CncWork.Workpiece/THICKNESS"
 	#define CncWork_Wpt_MAX_THICKNESS_CROSS			"CncWork.Workpiece/MAX_THICKNESS_PER_CROSSING"
 

@@ -44,11 +44,18 @@ class CncConfig {
 		struct ToolMagazineEntry {
 		
 			double diameter 	= 0.0;
+			double length		= 0.0;
+			double offset		= 0.0;
 			wxString type 		= "PEN";
 			wxString comment 	= "";
 			
 			const wxString& serialize(wxString& ret );
 			bool deserialize(const wxString& input);
+		};
+		
+		struct ToolMagazineParameter {
+			bool useDefaultTool			= true;
+			wxString defaultMappedTo	= "-1";
 		};
 		
 		typedef std::map<int, ToolMagazineEntry> ToolMagazine;
@@ -59,6 +66,7 @@ class CncConfig {
 		CncUnit currentUnit;
 		MainFrame* theApp;
 		ToolMagazine toolMagazine;
+		ToolMagazineParameter toolMagazineParameter;
 		RegisteredWindows registeredWindows;
 		
 		double dispFactX, dispFactY, dispFactZ;
@@ -145,6 +153,7 @@ class CncConfig {
 		static wxComboBox* gblCurveLibSelector;
 		
 		ToolMagazine& getToolMagazine() { return toolMagazine; }
+		ToolMagazineParameter& getToolMagazineParameter() { return toolMagazineParameter; }
 		
 		// global config interface
 		static CncConfig* getGlobalCncConfig() { wxASSERT(globalCncConfig); return globalCncConfig; }
@@ -153,7 +162,6 @@ class CncConfig {
 		// global shortcuts
 		#define GBL_CONFIG  CncConfig::getGlobalCncConfig()
 		#define THE_APP     GBL_CONFIG->getTheApp()
-		
 		
 		// curve lib utils
 		static float getDefaultCurveLibResolution();
@@ -190,7 +198,12 @@ class CncConfig {
 		CncConfig& setAllowEventHandling(bool b) 				{ sc(); allowEventHandling=b; return *this; }
 		CncConfig& setUpdateInterval(int i) 					{ sc(); updateInterval=i; return *this; }
 		
+		
+		bool checkToolExists(int toolId=-1);
+		int translateToolId(int toolId=-1);
 		const double getToolDiameter(int toolId=-1);
+		const double getToolLength(int toolId=-1);
+		const double getToolOffset(int toolId=-1);
 		const wxString& getToolType(wxString& ret, int toolId=-1);
 		
 		const unsigned int getReplyThresholdStepsX() { return replyThresholdX; }

@@ -162,6 +162,8 @@ class PathHandlerBase {
 		void setCurveLibResolution(float res);
 		void setPathList(const CncPathListManager& newPathList);
 		
+		void initCurrentPos(const CncDoublePosition& pos);
+		
 		// getter
 		SVGTransformMatrix& getSvgTransformMatrix() { return currentSvgTransformMatrix; }
 		unsigned int getDataPointCount() const { return pathListMgr.getPathListSize(); }
@@ -179,7 +181,9 @@ class PathHandlerBase {
 		
 		virtual void logMeasurementStart()	{}
 		virtual void logMeasurementEnd() 	{}
-
+		
+		virtual bool shouldAToolChangeProcessed() { return true; }
+		
 		// get path repesentations
 		void tracePathList(std::ostream &ostr);
 		const char* getAsWktRepresentation() { return pathListMgr.getAsWktRepresentation(); }

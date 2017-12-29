@@ -18,6 +18,7 @@
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
 #include "CncVectiesListCtrl.h"
+#include "CncSummaryListCtrl.h"
 #include "CncStatisticSummaryListCtrl.h"
 #include "codelite/wxPNGAnimation.h"
 
@@ -191,8 +192,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void testCountXSpinCtl(wxSpinEvent& event);
 		virtual void testCountXUpdated(wxCommandEvent& event);
 		virtual void selectTestIntervalMode(wxCommandEvent& event);
-		virtual void checkManuallyXY(wxCommandEvent& event);
-		virtual void checkManuallyZ(wxCommandEvent& event);
 		virtual void changeManuallySliderZ(wxScrollEvent& event);
 		virtual void maxManuallyZSlider(wxCommandEvent& event);
 		virtual void minManuallyZSlider(wxCommandEvent& event);
@@ -469,6 +468,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncSetterListCtrl* setterList;
 		CncStatisticSummaryListCtrl* statisticSummaryListCtrl;
 		CncVectiesListCtrl* vectiesListCtrl;
+		CncSummaryListCtrl* cncSummaryListCtrl;
 		
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
@@ -616,8 +616,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool showConfigSummaryAndConfirmRun();
 		
 		void collectSummary();
-		void collectSvgSpecificSummary(DcmItemList& rows);
-		void collectGCodeSpecificSummary(DcmItemList& rows);
+		void collectSvgSpecificSummary();
+		void collectGCodeSpecificSummary();
 		
 		void updateStatisticPanel();
 		
@@ -701,7 +701,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 		///////////////////////////////////////////////////////////////
 		// manually control
-		void enableManuallyControls(bool force = false);
+		void enableManuallyControls(bool state);
 		void processTestMove(wxStaticText* axis, wxStaticText* counter, 
 		                     int c, double xd, double yd, double zd);
 		

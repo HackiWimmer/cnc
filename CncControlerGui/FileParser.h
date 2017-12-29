@@ -16,7 +16,7 @@ class wxPropertyGridPage;
 class wxPropertyCategory;
 class wxPGProperty;
 
-typedef std::vector<unsigned int> ToolIds;
+typedef std::vector<int> ToolIds;
 
 class FileParser {
 
@@ -134,7 +134,8 @@ class FileParser {
 		
 		void registerNextDebugNode(const wxString& nodeName);
 		
-		void setNextToolID(unsigned int id);
+		bool setNextToolID(unsigned int id);
+		virtual bool shouldAToolChangeProcessed() { return false; }
 		
 		friend class SVGPathHandlerCnc;
 		friend class GCodePathHandlerCnc;
@@ -149,7 +150,11 @@ class FileParser {
 			if ( runInfo.getCurrentDebugState() == false )				\
 				return;
 				
+		void displayToolId(const wxString& id);
 		void displayToolId(int id);
+		
+		bool isAToolAvailable();
+		int getCurrentToolId();
 };
 
 #endif

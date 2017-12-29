@@ -7,17 +7,18 @@
 const unsigned int TM_COL_ID			= 1;
 const unsigned int TM_COL_TYPE			= 2;
 const unsigned int TM_COL_DIAMETER		= 3;
-const unsigned int TM_COL_COMMENT		= 4;
+const unsigned int TM_COL_LENGTH		= 4;
+const unsigned int TM_COL_OFFSET		= 5;
+const unsigned int TM_COL_COMMENT		= 6;
 
+const char* defaultTool					= "-1";
 ////////////////////////////////////////////////////////////////////
 // app defined event table
-
 
 wxBEGIN_EVENT_TABLE(CncToolMagazine, CncToolMagazineBase)
 	EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, CncToolMagazine::configurationUpdated)
 wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
-
 
 ////////////////////////////////////////////////////////////////////////////
 CncToolMagazine::CncToolMagazine(wxWindow* parent)
@@ -36,17 +37,25 @@ CncToolMagazine::CncToolMagazine(wxWindow* parent)
 	m_toolMagazine->AppendColumn("ID", 			wxLIST_FORMAT_RIGHT , wxLIST_AUTOSIZE);
 	m_toolMagazine->AppendColumn("Type", 		wxLIST_FORMAT_CENTER, wxLIST_AUTOSIZE);
 	m_toolMagazine->AppendColumn("Diameter", 	wxLIST_FORMAT_RIGHT,  wxLIST_AUTOSIZE);
+	m_toolMagazine->AppendColumn("Length", 		wxLIST_FORMAT_RIGHT,  wxLIST_AUTOSIZE);
+	m_toolMagazine->AppendColumn("Offset", 		wxLIST_FORMAT_RIGHT,  wxLIST_AUTOSIZE);
 	m_toolMagazine->AppendColumn("Comment", 	wxLIST_FORMAT_LEFT,   250);
 	
 	wxFloatingPointValidator<float> idVal(0, NULL, wxNUM_VAL_DEFAULT );
 	idVal.SetRange(0, 999);
 	m_toolMagazineId->SetValidator(idVal);
 
-	wxFloatingPointValidator<float> diaVal(3, NULL, wxNUM_VAL_DEFAULT );
-	diaVal.SetRange(0.0, 25.0);
-	m_toolMagazineDiameter->SetValidator(diaVal);
+	wxFloatingPointValidator<float> doubleValidator(3, NULL, wxNUM_VAL_DEFAULT );
+	doubleValidator.SetRange(0.0, 25.0);
+	m_toolMagazineDiameter->SetValidator(doubleValidator);
 	
-	getConfigToolMagazine();
+	doubleValidator.SetRange(0.0, 60.0);
+	m_toolMagazineLength->SetValidator(doubleValidator);
+	
+	doubleValidator.SetRange(0.0, 60.0);
+	m_toolMagazineOffset->SetValidator(doubleValidator);
+	
+	getToolMagazineConfig();
 	selectedItem(0);
 	
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
@@ -59,9 +68,10 @@ CncToolMagazine::~CncToolMagazine() {
 	m_toolMagazine->DeleteAllItems();
 }
 ////////////////////////////////////////////////////////////////////////////
-void CncToolMagazine::getConfigToolMagazine() {
+void CncToolMagazine::getToolMagazineConfig() {
 ////////////////////////////////////////////////////////////////////////////
 	m_toolMagazine->DeleteAllItems();
+	m_cbDefaultMappedTo->Clear();
 	
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	if ( cc != NULL ) {
@@ -79,7 +89,11 @@ void CncToolMagazine::getConfigToolMagazine() {
 				m_toolMagazine->SetItem(index, TM_COL_ID, 			wxString::Format("%d", 		id));
 				m_toolMagazine->SetItem(index, TM_COL_TYPE, 		wxString::Format("%s", 		entry.type));
 				m_toolMagazine->SetItem(index, TM_COL_DIAMETER, 	wxString::Format("%.3lf", 	entry.diameter));
+				m_toolMagazine->SetItem(index, TM_COL_LENGTH, 		wxString::Format("%.3lf", 	entry.length));
+				m_toolMagazine->SetItem(index, TM_COL_OFFSET, 		wxString::Format("%.3lf", 	entry.offset));
 				m_toolMagazine->SetItem(index, TM_COL_COMMENT, 		wxString::Format("%s", 		entry.comment));
+				
+				m_cbDefaultMappedTo->Append(wxString::Format("%d", id));
 			}
 		}
 	}
@@ -87,19 +101,40 @@ void CncToolMagazine::getConfigToolMagazine() {
 	// add default tool - on demand
 	if ( checkIfIdAlreadyExists(-1) == false ) {
 		m_toolMagazine->InsertItem(0, "",  0);
-		m_toolMagazine->SetItem(0, TM_COL_ID, 			"-1");
+		m_toolMagazine->SetItem(0, TM_COL_ID, 			defaultTool);
 		m_toolMagazine->SetItem(0, TM_COL_TYPE, 		"PEN");
 		m_toolMagazine->SetItem(0, TM_COL_DIAMETER, 	"0.000");
+		m_toolMagazine->SetItem(0, TM_COL_LENGTH, 		"0.000");
+		m_toolMagazine->SetItem(0, TM_COL_OFFSET, 		"0.000");
 		m_toolMagazine->SetItem(0, TM_COL_COMMENT, 		"Default Tool");
+		
+		m_cbDefaultMappedTo->Append(defaultTool);
+	}
+	
+	// tool magazine parameter
+	if ( cc != NULL ) {
+		CncConfig::ToolMagazineParameter& tmp = cc->getToolMagazineParameter();
+	
+		m_cbDefaultToolUsage->SetValue(tmp.useDefaultTool);
+		
+		if ( tmp.defaultMappedTo.IsEmpty() ) tmp.defaultMappedTo = defaultTool;
+		m_cbDefaultMappedTo->SetStringSelection(tmp.defaultMappedTo);
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
-void CncToolMagazine::setConfigToolMagazine() {
+void CncToolMagazine::setToolMagazineConfig() {
 ////////////////////////////////////////////////////////////////////////////
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	if ( cc == NULL )
 		return;
 		
+	// tool magazine parameter
+	CncConfig::ToolMagazineParameter& tmp = cc->getToolMagazineParameter();
+	tmp.useDefaultTool 	= m_cbDefaultToolUsage->GetValue();
+	tmp.defaultMappedTo	= m_cbDefaultMappedTo->GetStringSelection();
+	if ( tmp.defaultMappedTo.IsEmpty() ) tmp.defaultMappedTo	= defaultTool;
+	
+	// tool magazine
 	CncConfig::ToolMagazine& tm = cc->getToolMagazine();
 	tm.clear();
 	
@@ -114,6 +149,14 @@ void CncToolMagazine::setConfigToolMagazine() {
 		cell.assign(m_toolMagazine->GetItemText(i, TM_COL_DIAMETER));
 		cell.ToDouble(&entry.diameter);
 		
+		// length
+		cell.assign(m_toolMagazine->GetItemText(i, TM_COL_LENGTH));
+		cell.ToDouble(&entry.length);
+		
+		// offset
+		cell.assign(m_toolMagazine->GetItemText(i, TM_COL_OFFSET));
+		cell.ToDouble(&entry.offset);
+		
 		// comment
 		entry.comment.assign(m_toolMagazine->GetItemText(i, TM_COL_COMMENT));
 		
@@ -127,7 +170,7 @@ void CncToolMagazine::setConfigToolMagazine() {
 ////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::configurationUpdated(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////////
-	getConfigToolMagazine();
+	getToolMagazineConfig();
 	//std::clog << "CncToolMagazine::configurationUpdated(wxCommandEvent& event)" << std::endl;
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -157,6 +200,8 @@ void CncToolMagazine::addTool(wxCommandEvent& event) {
 	m_toolMagazine->SetItem(index, TM_COL_ID, 			"");
 	m_toolMagazine->SetItem(index, TM_COL_TYPE, 		m_toolMagazineType->GetStringSelection());
 	m_toolMagazine->SetItem(index, TM_COL_DIAMETER, 	"0.000");
+	m_toolMagazine->SetItem(index, TM_COL_LENGTH, 		"0.000");
+	m_toolMagazine->SetItem(index, TM_COL_OFFSET, 		"0.000");
 	m_toolMagazine->SetItem(index, TM_COL_COMMENT, 		"");
 	
 	// deselect all items
@@ -200,11 +245,13 @@ void CncToolMagazine::editTool(wxCommandEvent& event) {
 	m_toolMagazine->SetItem(index, TM_COL_ID, 			wxString::Format("%ld", id));
 	m_toolMagazine->SetItem(index, TM_COL_TYPE, 		m_toolMagazineType->GetStringSelection());
 	m_toolMagazine->SetItem(index, TM_COL_DIAMETER, 	m_toolMagazineDiameter->GetValue());
+	m_toolMagazine->SetItem(index, TM_COL_LENGTH, 		m_toolMagazineLength->GetValue());
+	m_toolMagazine->SetItem(index, TM_COL_OFFSET, 		m_toolMagazineOffset->GetValue());
 	m_toolMagazine->SetItem(index, TM_COL_COMMENT, 		m_toolMagazineComment->GetValue());
 	
 	m_toolMagazineId->Enable(false);
 	setInsertState(false);
-	setConfigToolMagazine();
+	setToolMagazineConfig();
 	
 	m_toolMagazine->Enable(true);
 	m_btToolMagazineEdit->Enable(true);
@@ -213,15 +260,36 @@ void CncToolMagazine::editTool(wxCommandEvent& event) {
 	m_btToolMagazineCancle->Enable(false);
 }
 ////////////////////////////////////////////////////////////////////////////
+void CncToolMagazine::clickUseDefaultTool(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////////////
+	// tool magazine parameter
+	wxString lastMappedTo = m_cbDefaultMappedTo->GetStringSelection();
+	
+	// select mapped to  . . .
+	int sel = m_cbDefaultMappedTo->FindString(lastMappedTo);
+	
+	if ( sel >= 0 )	m_cbDefaultMappedTo->Select(sel);
+	else			m_cbDefaultMappedTo->SetStringSelection(defaultTool);
+	
+	setToolMagazineConfig();
+}
+////////////////////////////////////////////////////////////////////////////
+void CncToolMagazine::selectDefaultToolMappedTo(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////////////
+	clickUseDefaultTool(event);
+}
+////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::cancel(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////////
 	unsigned int index = m_toolMagazine->GetItemCount() - 1;
 	if ( index > 0 )
 		m_toolMagazine->DeleteItem(index);
 
+	m_toolMagazine->Enable(true);
+	
 	selectedItem(0);
 	setInsertState(false);
-	setConfigToolMagazine();
+	setToolMagazineConfig();
 }
 ////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::removeTool(wxCommandEvent& event) {
@@ -230,7 +298,7 @@ void CncToolMagazine::removeTool(wxCommandEvent& event) {
 		return;
 	
 	m_toolMagazine->DeleteItem(lastSelectedItem);
-	setConfigToolMagazine();
+	setToolMagazineConfig();
 }
 ////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::selectedTool(wxListEvent& event) {

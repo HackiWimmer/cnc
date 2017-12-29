@@ -236,7 +236,7 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 		case 'F':	gcb.f 			= field.getValue();
 					return true; 
 					
-		case 'T':	displayMessage(wxString::Format("Tool change prepared: ID: %.0lf", field.getValue()), wxICON_INFORMATION);
+		case 'T':	//displayMessage(wxString::Format("Tool change prepared: ID: %.0lf", field.getValue()), wxICON_INFORMATION);
 					setNextToolID(field.getValue());
 					return true;
 					
@@ -465,7 +465,8 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		}
 		case 6:		// GC_M_ToolChange
 		{
-			#warning todo - impl. tool change
+			// a tool change isn't yet supported
+			// a correponding message will be display by setNextToolID(....)
 			return true;
 		}
 		case 7:		// GC_M_MistCoolantOn

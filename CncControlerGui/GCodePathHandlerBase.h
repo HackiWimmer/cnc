@@ -20,8 +20,8 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		int getToolLengthOffsetId() { return toolLengthOffsetId; }
 		void setToolLengthOffsetId(int tloi) { toolLengthOffsetId = tloi; }
 		
-		void prepareWork(); 
-		void finishWork();
+		virtual void prepareWork(); 
+		virtual void finishWork();
 		
 		bool processRapidLinearMove(GCodeBlock& gcb);
 		bool processLinearMove(GCodeBlock& gcb);

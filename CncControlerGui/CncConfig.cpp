@@ -25,6 +25,8 @@ const wxString& CncConfig::ToolMagazineEntry::serialize(wxString& ret ) {
 ////////////////////////////////////////////////////////////////////////
 	ret.assign(wxString::Format("T=%s", 		type));
 	ret.append(wxString::Format(";D=%.3lf", 	diameter));
+	ret.append(wxString::Format(";L=%.3lf", 	length));
+	ret.append(wxString::Format(";O=%.3lf", 	offset));
 	ret.append(wxString::Format(";C=%s", 		comment));
 	return ret;
 }
@@ -43,6 +45,8 @@ bool CncConfig::ToolMagazineEntry::deserialize(const wxString& input) {
 			wxString val = token.AfterFirst('=');
 			
 			if      ( key == 'D' )		val.ToDouble(&diameter);
+			else if ( key == 'L' )		val.ToDouble(&length);
+			else if ( key == 'O' )		val.ToDouble(&offset);
 			else if ( key == 'C' )		comment.assign(val);
 			else if ( key == 'T' )		type.assign(val);
 		}
@@ -451,7 +455,15 @@ bool CncConfig::loadNonGuiConfig(const wxString& groupName, const wxString& entr
 		if ( toolId >= TOOL_MAGAZINE_MIN_ID && toolId <= TOOL_MAGAZINE_MAX_ID )
 			toolMagazine[toolId] = tme;
 	}
-
+	
+	// tool magazine parameter
+	if ( groupName == CncToolMagazineParam_SECTION_NAME ) {
+	
+		std::clog << entryName << "=" << value << endl;
+		if      ( entryName == CncToolMagazineParam_USE_DEF_TOOL)		{ toolMagazineParameter.useDefaultTool  = ( value == "0" ? false : true ); }
+		else if ( entryName == CncToolMagazineParam_MAP_DEF_TOOL_TO)	{ toolMagazineParameter.defaultMappedTo =  value; }
+	}
+	
 	return true;
 }
 ////////////////////////////////////////////////////////////////////////
@@ -527,7 +539,7 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 void CncConfig::saveNonGuiConfig(wxConfigBase& config) {
 ////////////////////////////////////////////////////////////////////////
 	wxString section;
-
+	
 	// tool magazine
 	section.assign(CncToolMagazine_SECTION_NAME);
 	config.DeleteGroup(section);
@@ -541,6 +553,13 @@ void CncConfig::saveNonGuiConfig(wxConfigBase& config) {
 		wxString value;
 		config.Write(wxString::Format("/%s/%s", section, entry), it->second.serialize(value));
 	}
+	
+	// tool magazine parameter
+	section.assign(CncToolMagazineParam_SECTION_NAME);
+	config.DeleteGroup(section);
+	config.Write(wxString::Format("/%s/%s", section, CncToolMagazineParam_USE_DEF_TOOL), 	toolMagazineParameter.useDefaultTool);
+	config.Write(wxString::Format("/%s/%s", section, CncToolMagazineParam_MAP_DEF_TOOL_TO), toolMagazineParameter.defaultMappedTo);
+	
 	
 	//...
 }
@@ -616,24 +635,65 @@ void CncConfig::setupGridSelected(wxPropertyGridEvent& event) {
 		(*(it->second.propertySelected))(event);
 }
 ////////////////////////////////////////////////////////////////////////
+bool CncConfig::checkToolExists(int toolId) {
+////////////////////////////////////////////////////////////////////////
+	auto it = toolMagazine.find(toolId);
+	if ( it != toolMagazine.end() )
+		return true;
+		
+	// tool id did not exist
+	return false;
+}
+////////////////////////////////////////////////////////////////////////
+int CncConfig::translateToolId(int toolId) {
+////////////////////////////////////////////////////////////////////////
+	auto it = toolMagazine.find(toolId);
+	if ( it != toolMagazine.end() )
+		return toolId;
+		
+	// tool id did not exist
+	if ( toolMagazineParameter.useDefaultTool == false )
+		return toolId;
+		
+	// evaluate tool mapping
+	long id = -1;
+	if ( toolMagazineParameter.defaultMappedTo.ToLong(&id) == false )
+		return toolId;
+		
+	// search mapped toll
+	it = toolMagazine.find(id);
+	if ( it != toolMagazine.end() )
+		return id;
+		
+	// mapped tool id did already not exist
+	return toolId;
+}
+////////////////////////////////////////////////////////////////////////
 const double CncConfig::getToolDiameter(int toolId) {
 ////////////////////////////////////////////////////////////////////////
-	wxPGProperty* p = getProperty(CncWork_Tool_DEFAULT);
-	bool dflt = false;
-	if ( p ) dflt = p->GetValue().GetDouble();
-	
 	auto it = toolMagazine.find(toolId);
 	if ( it != toolMagazine.end() ) {
-		// if tool id exists
 		return it->second.diameter;
-		
-	} else {
-		// if the default tool should used
-		if ( dflt == true ) {
-			it = toolMagazine.find(-1);
-			if ( it != toolMagazine.end() )
-				return it->second.diameter;
-		}
+	}
+	
+	return 0.0;
+}
+////////////////////////////////////////////////////////////////////////
+const double CncConfig::getToolLength(int toolId) {
+////////////////////////////////////////////////////////////////////////
+	auto it = toolMagazine.find(toolId);
+	if ( it != toolMagazine.end() ) {
+		return it->second.length;
+	}
+	
+	return 0.0;
+}
+////////////////////////////////////////////////////////////////////////
+const double CncConfig::getToolOffset(int toolId) {
+////////////////////////////////////////////////////////////////////////
+	auto it = toolMagazine.find(toolId);
+	if ( it != toolMagazine.end() ) {
+		return it->second.offset;
 	}
 	
 	return 0.0;
@@ -641,25 +701,10 @@ const double CncConfig::getToolDiameter(int toolId) {
 ////////////////////////////////////////////////////////////////////////
 const wxString& CncConfig::getToolType(wxString& ret, int toolId) {
 ////////////////////////////////////////////////////////////////////////
-	wxPGProperty* p = getProperty(CncWork_Tool_DEFAULT);
-	bool dflt = false;
-	if ( p ) dflt = p->GetValue().GetDouble();
-	
 	auto it = toolMagazine.find(toolId);
 	if ( it != toolMagazine.end() ) {
-		// if tool id exists
 		ret.assign(it->second.type);
 		return ret;
-		
-	} else {
-		// if the default tool should used
-		if ( dflt == true ) {
-			it = toolMagazine.find(-1);
-			if ( it != toolMagazine.end() ) {
-				ret.assign(it->second.type);
-				return ret;
-			}
-		}
 	}
 	
 	ret.assign("PEN");

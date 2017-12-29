@@ -28,7 +28,7 @@ class CncSetterListCtrl : public CncLargeScaledListCtrl {
 		virtual ~CncSetterListCtrl();
 		
 		void updateColumnWidth();
-
+		
 		void onSize(wxSizeEvent& event);
 		void onPaint(wxPaintEvent& event);
 		void onEraseBackground(wxEraseEvent& event);

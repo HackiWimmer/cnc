@@ -143,19 +143,59 @@ FileParser::~FileParser() {
 //////////////////////////////////////////////////////////////////
 void FileParser::displayToolId(int id) {
 //////////////////////////////////////////////////////////////////
+	displayToolId(wxString::Format("%d", id));
+}
+//////////////////////////////////////////////////////////////////
+void FileParser::displayToolId(const wxString& id) {
+//////////////////////////////////////////////////////////////////
 	wxTextCtrl* toolId = CncConfig::getGlobalCncConfig()->getTheApp()->GetToolId();
 	if ( toolId == NULL )
 		return;
-		
-	#warning - impl. search if tool available
-		
-	toolId->SetValue(wxString::Format("%d", id));
+	
+	toolId->SetValue(id);
 }
 //////////////////////////////////////////////////////////////////
-void FileParser::setNextToolID(unsigned int id) {
+bool FileParser::setNextToolID(unsigned int id) {
 //////////////////////////////////////////////////////////////////
-	displayToolId(id);
-	toolIds.push_back(id);
+	if ( shouldAToolChangeProcessed() == false )
+		return true;
+	
+	int toolId = GBL_CONFIG->translateToolId(id);
+	
+	// Check for tool change
+	if ( toolIds.size() > 0 ) {
+		if ( *toolIds.begin() != toolId ) {
+			std::cerr << "A tool change isn't supported yet: Current id: " << toolIds[toolIds.size() - 1] 
+			          << "; New id: " << toolId << " [" << id << "]" << std::endl;
+			std::cerr << "The current tool stays unchanged! - this is may be an error!" << std::endl;
+			return false;
+		}
+	}
+	
+	if ( GBL_CONFIG->checkToolExists(toolId) == false ) {
+		std::cerr << "Tool id didn't exists: " << toolId << " [" << id << "]" << std::endl;
+		std::cerr << "The current tool stays unchanged! - this is may be an error!" << std::endl;
+		displayToolId("-");
+		return false;
+	}
+	
+	displayToolId(toolId);
+	toolIds.push_back(toolId);
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool FileParser::isAToolAvailable() {
+//////////////////////////////////////////////////////////////////
+	return ( toolIds.size() > 0 ); 
+}
+//////////////////////////////////////////////////////////////////
+int FileParser::getCurrentToolId() {
+//////////////////////////////////////////////////////////////////
+	if ( isAToolAvailable() == false )
+		return -9;
+		
+	return toolIds[toolIds.size() - 1];
 }
 //////////////////////////////////////////////////////////////////
 void FileParser::installDebugConfigPage(wxPropertyGridManager* pgm) {

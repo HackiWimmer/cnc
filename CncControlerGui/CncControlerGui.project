@@ -8,6 +8,16 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
+    <VirtualDirectory Name="Inbound - Manually">
+      <VirtualDirectory Name="PathHandler">
+        <File Name="ManuallyPathHandlerCnc.cpp"/>
+        <File Name="ManuallyPathHandlerCnc.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Parser">
+        <File Name="ManuallyParser.h"/>
+        <File Name="ManuallyParser.cpp"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
     <VirtualDirectory Name="Inbound - GCode">
       <VirtualDirectory Name="Parser">
         <File Name="GCodeFileParser.h"/>
@@ -277,6 +287,8 @@
       <File Name="CncConfigCommon.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncSummaryListCtrl.cpp"/>
+      <File Name="CncSummaryListCtrl.h"/>
       <File Name="CncLargeScaleListCtrl.cpp"/>
       <File Name="CncLargeScaleListCtrl.h"/>
       <File Name="CncPosSpyListCtrl.h"/>
