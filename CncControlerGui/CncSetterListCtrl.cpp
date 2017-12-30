@@ -11,9 +11,7 @@
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncSetterListCtrl, CncLargeScaledListCtrl)
-	EVT_PAINT(CncSetterListCtrl::onPaint)
 	EVT_SIZE(CncSetterListCtrl::onSize)
-	EVT_ERASE_BACKGROUND(CncSetterListCtrl::onEraseBackground)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
@@ -126,16 +124,4 @@ void CncSetterListCtrl::updateColumnWidth() {
 void CncSetterListCtrl::onSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	updateColumnWidth();
-}
-/////////////////////////////////////////////////////////////////////
-void CncSetterListCtrl::onPaint(wxPaintEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	// currently nothing todo
-	event.Skip(true);
-}
-/////////////////////////////////////////////////////////////////////
-void CncSetterListCtrl::onEraseBackground(wxEraseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	// currently nothing todo
-	event.Skip(true);
 }

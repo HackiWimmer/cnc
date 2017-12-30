@@ -479,6 +479,9 @@ protected:
     wxStyledTextCtrl* m_stcEmuSource;
     wxPanel* m_monitorTemplatePanel;
     wxPanel* m_monitorTemplatePreviewPlaceHolder;
+    wxPanel* m_panel5144;
+    wxStaticText* m_staticText5142;
+    wxTextCtrl* m_currentInboundFilePreviewFileName;
     wxPanel* m_panelSpeed;
     wxStaticText* m_staticText28052;
     CncSpeedView* m_speedView;
@@ -677,10 +680,11 @@ protected:
     virtual void stepDelayThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebugConfig(wxCommandEvent& event) { event.Skip(); }
-    virtual void rcRun(wxCommandEvent& event) { event.Skip(); }
+    virtual void rcDebug(wxCommandEvent& event) { event.Skip(); }
     virtual void rcNextBreakpoint(wxCommandEvent& event) { event.Skip(); }
     virtual void rcNextStep(wxCommandEvent& event) { event.Skip(); }
     virtual void rcFinish(wxCommandEvent& event) { event.Skip(); }
+    virtual void rcRun(wxCommandEvent& event) { event.Skip(); }
     virtual void rcPause(wxCommandEvent& event) { event.Skip(); }
     virtual void rcStop(wxCommandEvent& event) { event.Skip(); }
     virtual void emergencyStop(wxCommandEvent& event) { event.Skip(); }
@@ -1304,6 +1308,9 @@ public:
     wxNotebook* GetOutboundNotebook() { return m_outboundNotebook; }
     wxPanel* GetMonitorBookCncPanel() { return m_monitorBookCncPanel; }
     wxPanel* GetMonitorTemplatePreviewPlaceHolder() { return m_monitorTemplatePreviewPlaceHolder; }
+    wxStaticText* GetStaticText5142() { return m_staticText5142; }
+    wxPanel* GetPanel5144() { return m_panel5144; }
+    wxTextCtrl* GetCurrentInboundFilePreviewFileName() { return m_currentInboundFilePreviewFileName; }
     wxPanel* GetMonitorTemplatePanel() { return m_monitorTemplatePanel; }
     wxSimplebook* GetMonitorViewBook() { return m_monitorViewBook; }
     wxScrolledWindow* GetScrollWinMonitor() { return m_scrollWinMonitor; }
@@ -1633,6 +1640,7 @@ protected:
     wxTextCtrl* m_toolMagazineComment;
     wxStaticText* m_staticText5082;
     wxButton* m_btToolMagazineRemove;
+    wxButton* m_btToolMagazineDuplicate;
     wxButton* m_btToolMagazineAdd;
     wxButton* m_btToolMagazineEdit;
     wxButton* m_btToolMagazineCancle;
@@ -1641,7 +1649,9 @@ protected:
     virtual void selectedTool(wxListEvent& event) { event.Skip(); }
     virtual void clickUseDefaultTool(wxCommandEvent& event) { event.Skip(); }
     virtual void selectDefaultToolMappedTo(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectType(wxCommandEvent& event) { event.Skip(); }
     virtual void removeTool(wxCommandEvent& event) { event.Skip(); }
+    virtual void duplicateTool(wxCommandEvent& event) { event.Skip(); }
     virtual void addTool(wxCommandEvent& event) { event.Skip(); }
     virtual void editTool(wxCommandEvent& event) { event.Skip(); }
     virtual void cancel(wxCommandEvent& event) { event.Skip(); }
@@ -1675,6 +1685,7 @@ public:
     wxTextCtrl* GetToolMagazineComment() { return m_toolMagazineComment; }
     wxStaticText* GetStaticText5082() { return m_staticText5082; }
     wxButton* GetBtToolMagazineRemove() { return m_btToolMagazineRemove; }
+    wxButton* GetBtToolMagazineDuplicate() { return m_btToolMagazineDuplicate; }
     wxButton* GetBtToolMagazineAdd() { return m_btToolMagazineAdd; }
     wxButton* GetBtToolMagazineEdit() { return m_btToolMagazineEdit; }
     wxButton* GetBtToolMagazineCancle() { return m_btToolMagazineCancle; }

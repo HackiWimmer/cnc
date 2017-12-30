@@ -207,6 +207,7 @@ class Serial {
 		void incTotalDistance(unsigned int size, const int32_t (&values)[3]);
 		
 		void resetTotalDistance() { totalDistance[0] = 0.0; totalDistance[1] = 0.0; totalDistance[2] = 0.0; totalDistance[3] = 0.0;}
+		void adjustMeasurementRefTs();
 		void logMeasurementRefTs(const CncLongPosition& pos);
 		void logMeasurementLastTs();
 				

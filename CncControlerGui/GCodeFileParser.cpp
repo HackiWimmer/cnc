@@ -43,12 +43,12 @@ bool GCodeFileParser::displayMessage(const wxString& msg, int type) {
 bool GCodeFileParser::displayMessage(std::stringstream& ss, int type) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream msg;
-	msg << wxString::Format("[%04d]: ", getCurrentLineNumber());
+	msg << wxString::Format(" [%04d]: ", getCurrentLineNumber());
 	msg << ss.str();
 	
 	switch ( type ) {
 		case wxICON_ERROR:		if ( true )				{ std::cerr << msg.str() << ", GCode program will be stopped."   << std::endl; } break;
-		case wxICON_WARNING:	if ( displayWarnings )	{ std::clog << msg.str() << ", GCode program will be continued." << std::endl; } break;
+		case wxICON_WARNING:	if ( displayWarnings )	{ std::cout << msg.str() << ", GCode program will be continued." << std::endl; } break;
 		default:				if ( displayWarnings )	{ std::cout << msg.str() << std::endl; } break;
 	}
 	
@@ -470,10 +470,22 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 			return true;
 		}
 		case 7:		// GC_M_MistCoolantOn
+		{
+			// mist coolant isn't yet supported
+			// the command will skiped silent
+			return true;
+		}
 		case 8:		// GC_M_FloodCoolantOn
+		{
+			// float coolant isn't yet supported
+			// the command will skiped silent
+			return true;
+		}
 		case 9:		// GC_M_CoolantOff
 		{
-			return displayUnhandledBlockCommand(gcb);;
+			// coolant isn't yet supported
+			// the command will skiped silent
+			return true;
 		} //....................................................
 		
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::

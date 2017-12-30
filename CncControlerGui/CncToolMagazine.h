@@ -11,8 +11,10 @@ class CncToolMagazine : public CncToolMagazineBase {
 		virtual ~CncToolMagazine();
 		
 	protected:
-    virtual void clickUseDefaultTool(wxCommandEvent& event);
-    virtual void selectDefaultToolMappedTo(wxCommandEvent& event);
+		virtual void selectType(wxCommandEvent& event);
+		virtual void duplicateTool(wxCommandEvent& event);
+		virtual void clickUseDefaultTool(wxCommandEvent& event);
+		virtual void selectDefaultToolMappedTo(wxCommandEvent& event);
 		virtual void cancel(wxCommandEvent& event);
 		virtual void addTool(wxCommandEvent& event);
 		virtual void editTool(wxCommandEvent& event);
@@ -27,6 +29,8 @@ class CncToolMagazine : public CncToolMagazineBase {
 		long lastSelectedItem;
 		bool insertState;
 		
+		void enableInputFields();
+		void completeTool(unsigned int index);
 		void selectedItem(const unsigned int index);
 		void setInsertState(bool state);
 		void getToolMagazineConfig();

@@ -23,7 +23,7 @@ CncSummaryListCtrl::CncSummaryListCtrl(wxWindow *parent, long style)
 	AppendColumn("Type", 		wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Parameter", 	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Value",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Unit", 		wxLIST_FORMAT_CENTER,	wxLIST_AUTOSIZE);
+	AppendColumn("Unit", 		wxLIST_FORMAT_LEFT,		wxLIST_AUTOSIZE);
 	
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::NORMAL);
@@ -86,10 +86,10 @@ void CncSummaryListCtrl::onSize(wxSizeEvent& event) {
 		Freeze();
 		
 	// first set default sizes depending on content
-	SetColumnWidth(COL_TYPE, 	 40);
+	SetColumnWidth(COL_TYPE, 	 26);
 	SetColumnWidth(COL_PARAM, 	wxLIST_AUTOSIZE);
-	SetColumnWidth(COL_VALUE, 	150);
-	SetColumnWidth(COL_UNIT, 	 50);
+	SetColumnWidth(COL_VALUE, 	250);
+	SetColumnWidth(COL_UNIT, 	 80);
 	
 	// try to strech the second (key) column
 	const int scrollbarWidth = 26;

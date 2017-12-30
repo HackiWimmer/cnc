@@ -77,12 +77,12 @@ void SVGPathHandlerCnc::appendDebugValueDetail(const char* key, wxVariant value)
 	fileParser->appendDebugValueDetail(row);
 }
 //////////////////////////////////////////////////////////////////
-CncWorkingParameters& SVGPathHandlerCnc::getCncWorkingParameters() {
+SvgCncParameters& SVGPathHandlerCnc::getSvgCncParameters() {
 //////////////////////////////////////////////////////////////////
 	return currentCncParameters;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::setCncWorkingParameters(CncWorkingParameters& cwp) {
+void SVGPathHandlerCnc::setCncWorkingParameters(SvgCncParameters& cwp) {
 //////////////////////////////////////////////////////////////////
 	currentCncParameters = cwp;
 }

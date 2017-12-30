@@ -13,7 +13,7 @@ class CncSetterListCtrl : public CncLargeScaledListCtrl {
 		wxListItemAttr separatorSetupItemAttr;
 		
 		virtual int OnGetItemColumnImage(long item, long column) const;
-		virtual wxListItemAttr *OnGetItemAttr(long item) const;
+		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		
 	public:
 		static const int COL_TYPE 		= 0;
@@ -30,8 +30,6 @@ class CncSetterListCtrl : public CncLargeScaledListCtrl {
 		void updateColumnWidth();
 		
 		void onSize(wxSizeEvent& event);
-		void onPaint(wxPaintEvent& event);
-		void onEraseBackground(wxEraseEvent& event);
 		
 		wxDECLARE_NO_COPY_CLASS(CncSetterListCtrl);
 		wxDECLARE_EVENT_TABLE();

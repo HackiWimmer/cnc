@@ -77,6 +77,8 @@ class CncConfig {
 		unsigned int replyThresholdY;
 		unsigned int replyThresholdZ;
 		
+		int currentToolId;
+		
 		static const unsigned int maxDurations = 32;
 		unsigned int durationCount;
 		double durationSteps[maxDurations];
@@ -176,6 +178,12 @@ class CncConfig {
 		void setupGridChanging(wxPropertyGridEvent& event);
 		void setupGridCommandButton(wxCommandEvent& event);
 		void setupGridSelected(wxPropertyGridEvent& event);
+		
+		int getCurrentToolId() { return currentToolId; }
+		void setCurrentToolId(int id) { currentToolId = id; }
+		const wxString getCurrentToolParamAsString();
+		const wxString getToolParamAsString(int id);
+		const wxString getDefaultToolParamAsString();
 		
 		// modification flag
 		const bool isModified() 		{ return changed; }

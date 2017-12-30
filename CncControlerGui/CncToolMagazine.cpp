@@ -193,6 +193,32 @@ void CncToolMagazine::setInsertState(bool state) {
 	m_btToolMagazineEdit->SetLabel(( state == true ? "Insert" : "Update" ));
 }
 ////////////////////////////////////////////////////////////////////////////
+void CncToolMagazine::completeTool(unsigned int index) {
+////////////////////////////////////////////////////////////////////////////
+	// deselect all items
+	for ( int i=0; i<m_toolMagazine->GetItemCount(); i++)
+		m_toolMagazine->SetItemState(i, 0, wxLIST_STATE_SELECTED);
+		
+	// select the new one
+	selectedItem(index);
+	setInsertState(true);
+	
+	m_toolMagazine->Enable(false);
+	m_btToolMagazineAdd->Enable(false);
+	m_btToolMagazineDuplicate->Enable(false);
+	m_btToolMagazineRemove->Enable(false);
+	
+	m_btToolMagazineEdit->Enable(true);
+	m_btToolMagazineCancle->Enable(true);
+	
+	m_toolMagazineId->Enable(true);
+	m_toolMagazineType->Enable(true);
+	m_toolMagazineComment->Enable(true);
+	
+	// do this after m_toolMagazineType is updated
+	enableInputFields();
+}
+////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::addTool(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////////////////
 	unsigned int index = m_toolMagazine->GetItemCount();
@@ -204,26 +230,24 @@ void CncToolMagazine::addTool(wxCommandEvent& event) {
 	m_toolMagazine->SetItem(index, TM_COL_OFFSET, 		"0.000");
 	m_toolMagazine->SetItem(index, TM_COL_COMMENT, 		"");
 	
-	// deselect all items
-	for ( int i=0; i<m_toolMagazine->GetItemCount(); i++)
-		m_toolMagazine->SetItemState(i, 0, wxLIST_STATE_SELECTED);
-		
-	// select the new one
-	selectedItem(index);
+	completeTool(index);
+}
+////////////////////////////////////////////////////////////////////////////
+void CncToolMagazine::duplicateTool(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////////////
+	if ( lastSelectedItem < 0 )
+		addTool(event);
 	
-	setInsertState(true);
+	unsigned int index = m_toolMagazine->GetItemCount();
+	m_toolMagazine->InsertItem(index, "",  0);
+	m_toolMagazine->SetItem(index, TM_COL_ID, 			"");
+	m_toolMagazine->SetItem(index, TM_COL_TYPE, 		m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_TYPE));
+	m_toolMagazine->SetItem(index, TM_COL_DIAMETER, 	m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_DIAMETER));
+	m_toolMagazine->SetItem(index, TM_COL_LENGTH, 		m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_LENGTH));
+	m_toolMagazine->SetItem(index, TM_COL_OFFSET, 		m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_OFFSET));
+	m_toolMagazine->SetItem(index, TM_COL_COMMENT, 		m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_COMMENT));
 	
-	m_toolMagazine->Enable(false);
-	m_btToolMagazineAdd->Enable(false);
-	m_btToolMagazineRemove->Enable(false);
-	
-	m_btToolMagazineEdit->Enable(true);
-	m_btToolMagazineCancle->Enable(true);
-	
-	m_toolMagazineComment->Enable(true);
-	m_toolMagazineDiameter->Enable(true);
-	m_toolMagazineType->Enable(true);
-	m_toolMagazineId->Enable(true);
+	completeTool(index);
 }
 ////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::editTool(wxCommandEvent& event) {
@@ -256,6 +280,7 @@ void CncToolMagazine::editTool(wxCommandEvent& event) {
 	m_toolMagazine->Enable(true);
 	m_btToolMagazineEdit->Enable(true);
 	m_btToolMagazineAdd->Enable(true);
+	m_btToolMagazineDuplicate->Enable(true);
 	m_btToolMagazineRemove->Enable(true);
 	m_btToolMagazineCancle->Enable(false);
 }
@@ -311,21 +336,50 @@ void CncToolMagazine::selectedTool(wxListEvent& event) {
 	m_toolMagazineComment->Enable(index != 0);
 	m_btToolMagazineRemove->Enable(index != 0);
 	
-	m_toolMagazineDiameter->Enable(true);
 	m_toolMagazineType->Enable(true);
 	
 	m_btToolMagazineEdit->Enable(true);
 	m_btToolMagazineAdd->Enable(true);
+	m_btToolMagazineDuplicate->Enable(true);
 	m_btToolMagazineCancle->Enable(false);
 	
 	m_toolMagazineId->SetValue(m_toolMagazine->GetItemText(index, TM_COL_ID));
 	m_toolMagazineDiameter->SetValue(m_toolMagazine->GetItemText(index, TM_COL_DIAMETER));
+	m_toolMagazineLength->SetValue(m_toolMagazine->GetItemText(index, TM_COL_LENGTH));
+	m_toolMagazineOffset->SetValue(m_toolMagazine->GetItemText(index, TM_COL_OFFSET));
 	m_toolMagazineComment->SetValue(m_toolMagazine->GetItemText(index, TM_COL_COMMENT));
 	m_toolMagazineType->SetStringSelection(m_toolMagazine->GetItemText(index, TM_COL_TYPE));
+	
+	// do this after m_toolMagazineType is updated
+	enableInputFields();
 }
 ////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::selectedItem(const unsigned int index) {
 ////////////////////////////////////////////////////////////////////////////
 	m_toolMagazine->SetItemState(index, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
 }
-
+////////////////////////////////////////////////////////////////////////////
+void CncToolMagazine::selectType(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////////////////
+	enableInputFields();
+}
+////////////////////////////////////////////////////////////////////////////
+void CncToolMagazine::enableInputFields() {
+////////////////////////////////////////////////////////////////////////////
+	wxString sel(m_toolMagazineType->GetStringSelection());
+	if ( sel == "PEN" ) {
+		m_toolMagazineDiameter->SetValue("0.000");
+		m_toolMagazineLength->SetValue("0.000");
+		m_toolMagazineOffset->SetValue("0.000");
+	} else {
+		if ( lastSelectedItem >= 0 ) {
+			m_toolMagazineDiameter->SetValue(m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_DIAMETER));
+			m_toolMagazineLength->SetValue(m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_LENGTH));
+			m_toolMagazineOffset->SetValue(m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_OFFSET));
+		}
+	}
+	
+	m_toolMagazineDiameter->Enable(sel != "PEN");
+	m_toolMagazineLength->Enable(sel != "PEN");
+	m_toolMagazineOffset->Enable(sel != "PEN");
+}

@@ -182,6 +182,8 @@ class PathHandlerBase {
 		virtual void logMeasurementStart()	{}
 		virtual void logMeasurementEnd() 	{}
 		
+		virtual void processWait(int64_t microseconds);
+		
 		virtual bool shouldAToolChangeProcessed() { return true; }
 		
 		// get path repesentations

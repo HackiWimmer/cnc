@@ -4,7 +4,7 @@
 #include "PathHandlerBase.h"
 #include "SerialPort.h"
 #include "CncToolCorrection.h"
-#include "CncWorkingParameters.h"
+#include "SvgCncParameters.h"
 #include "CncCommon.h"
 
 class CncControl;
@@ -24,7 +24,7 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		bool 				debugState;
 		double 				width, height;
 		wxString 			viewBox;
-		CncWorkingParameters currentCncParameters;
+		SvgCncParameters currentCncParameters;
 		
 		// spool path to cnc control
 		bool moveLinearXY(double x, double y, bool alreadyRendered);
@@ -68,8 +68,8 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		double getH() { return height; }
 		const char* getViewBox() { return viewBox.c_str(); }
 
-		CncWorkingParameters& getCncWorkingParameters();
-		void setCncWorkingParameters(CncWorkingParameters& cwp);
+		SvgCncParameters& getSvgCncParameters();
+		void setCncWorkingParameters(SvgCncParameters& cwp);
 		void setDebugState(bool state) { debugState = state; }
 		
 		// path handling

@@ -876,22 +876,8 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		return;
 		
 	if ( canClose == false) {
-		if ( m_svgParseMode->GetLabel().Contains("Debug") ) {
-			wxString msg("A debug session is currently active. Should the application yet closed?");
-			wxMessageDialog dlg(this, msg, _T("Close application. . . "), 
-		                    wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
-			
-			if ( dlg.ShowModal() == wxID_CANCEL ) {
-				cnc::trc.logWarning("Can't close the application due to an active debug session");
-				return;
-			}
-			
-			if ( inboundFileParser != NULL )
-				inboundFileParser->debugStop();
-		} else {
-			cnc::trc.logWarning("Can't close the application due to an active run session");
-			return;
-		}
+		cnc::trc.logWarning("Can't close the application due to an active run/debug session");
+		return;
 	}
 	
 	// Destroy the serial port connection.
@@ -900,8 +886,11 @@ void MainFrame::onClose(wxCloseEvent& event) {
 	if ( cnc != NULL ) {
 		{
 			wxCriticalSectionLocker enter(pThreadCS);
+			cnc->sendHalt();
 			cnc->disconnect();
 			
+			// this will crash if a run  or debug is active
+			// this have to be avoided - see can close above
 			delete cnc;
 			cnc = NULL;
 		}
@@ -1827,7 +1816,7 @@ void MainFrame::enableControls(bool state) {
 	enableGuiControls(state);
 	
 	//enable manually controls
-	enableManuallyControls(state);
+	enableTestControls(state);
 
 	// enable menu bar
 	for (unsigned int i=0; i<m_menuBar->GetMenuCount(); i++) {
@@ -1937,12 +1926,10 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 void MainFrame::updateCncConfigTrace() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	
 	cnc->updateCncConfigTrace();
-	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", CncConfig::getGlobalCncConfig()->getToolDiameter()));
 	
+	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", GBL_CONFIG->getToolDiameter(GBL_CONFIG->getCurrentToolId())));
 	m_zView->updateView(cnc->getControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
-	
 	collectSummary();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3236,14 +3223,36 @@ void MainFrame::cancelRun(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectSvgSpecificSummary() {
 ///////////////////////////////////////////////////////////////////
-	// todo - add headline and rows
+	typedef CncSummaryListCtrl::ParameterType PT;
+	CncConfig* cc = CncConfig::getGlobalCncConfig();
+	
 	cncSummaryListCtrl->addHeadline(CncSummaryListCtrl::ParameterType::PT_HEADLINE, "SVG specific Settings");
+
+	cncSummaryListCtrl->addParameter(PT::PT_SVG, "Z axis values:", "", "");
+	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Max durations", 				wxString::Format("%u",		cc->getMaxDurations()),							"#");
+	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Workpiece offset", 				wxString::Format("%4.3f",	cc->getWorkpieceOffset()),						"mm");
+	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Max duration thickness", 		wxString::Format("%4.3f",	cc->getMaxDurationThickness()),					"mm");
+	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Calculated durations", 			wxString::Format("%u",		cc->getDurationCount()),						"#");
+	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Current Z distance", 			wxString::Format("%4.3f",	cc->getCurZDistance()),							"mm");
+	cncSummaryListCtrl->addParameter(PT::PT_SVG, "  Wpt is included", 				wxString::Format("%d",		cc->getReferenceIncludesWpt()),					"-");
+	
+	for (unsigned int i=0; i<cc->getMaxDurations(); i++) {
+		if ( cc->getDurationThickness(i) != 0.0 ) {
+			cncSummaryListCtrl->addParameter(PT::PT_SVG, 
+			                                 wxString::Format("   Duration step[%02u]", i), 
+			                                 wxString::Format("%4.3f",	cc->getDurationThickness(i)),
+			                                 "mm");
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectGCodeSpecificSummary() {
 ///////////////////////////////////////////////////////////////////
-	// todo - add headline and rows
+	typedef CncSummaryListCtrl::ParameterType PT;
+	CncConfig* cc = CncConfig::getGlobalCncConfig();
+	
 	cncSummaryListCtrl->addHeadline(CncSummaryListCtrl::ParameterType::PT_HEADLINE, "GCode specific Settings");
+	cncSummaryListCtrl->addParameter(PT::PT_GCODE, "Sample . . . .", 					wxString::Format("%4.3f",	cc->getReplyThresholdMetric()),						"xx");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::collectSummary() {
@@ -3257,24 +3266,14 @@ void MainFrame::collectSummary() {
 	cncSummaryListCtrl->clear();
 	
 	cncSummaryListCtrl->addHeadline(PT::PT_HEADLINE, "Common Settings");
-	
-	
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "1", "7");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "1", "7", "qm");
-	
-	/*
-	DcmItemList rows;
-	DataControlModel::addNumParameterValueUnitRow(rows, "Tool Diameter",					wxString::Format(" %.3f", 	cc->getToolDiameter()), 			" mm"); 
-	DataControlModel::addNumParameterValueUnitRow(rows, "Workpiece thickness", 				wxString::Format(" %4.3f", 	cc->getWorkpieceThickness()), 		" mm"); 
-	DataControlModel::addNumParameterValueUnitRow(rows, "Max thickness per crossing", 		wxString::Format(" %4.3f", 	cc->getMaxDurationThickness()), 	" mm"); 
-//	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed XY", 					wxString::Format(" %d", 	cc->getWorkSpeedXY()), 				" rpm"); 
-//	DataControlModel::addNumParameterValueUnitRow(rows, "Work speed Z", 					wxString::Format(" %d", 	cc->getWorkSpeedZ()), 				" rpm");
-	// ...
-	
-	m_dvListCtrlConfigSummary->Set
-	*/
-	
-	
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Tool", 					cc->getDefaultToolParamAsString(),												"-");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Workpiece thickness", 				wxString::Format("%4.3f", 	cc->getWorkpieceThickness()),						"mm");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Curve lib resolution", 			wxString::Format("%.3lf", 	CncConfig::getCurveLibIncrement()),					"-");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Papid speed", 				wxString::Format("%4.3f", 	cc->getDefaultRapidSpeed_MM_MIN()),					"mm/min");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Work speed", 				wxString::Format("%4.3f", 	cc->getDefaultWorkSpeed_MM_MIN()),					"mm/min");
+	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Reply Threshold", 					wxString::Format("%4.3f",	cc->getReplyThresholdMetric()),						"mm");
+
+	// type specific . . .
 	switch ( getCurrentTemplateFormat() ) {
 		case TplSvg:	collectSvgSpecificSummary();
 						break;
@@ -3284,78 +3283,6 @@ void MainFrame::collectSummary() {
 						
 		default:		; // do nothing
 	}
-
-
-
-#warning - integrate the code below to collectSummary
-	/*
-	if ( scc != NULL ) {
-		scc->DeleteAllItems();
-		
-		DataControlModel::addKeyValueRow(list, "Steps (x)", 				(int)CncConfig::getGlobalCncConfig()->getStepsX());
-		DataControlModel::addKeyValueRow(list, "Steps (y)", 				(int)CncConfig::getGlobalCncConfig()->getStepsY());
-		DataControlModel::addKeyValueRow(list, "Steps (z)", 				(int)CncConfig::getGlobalCncConfig()->getStepsZ());
-		DataControlModel::addKeyValueRow(list, "Puls width offset (x)", 	(int)CncConfig::getGlobalCncConfig()->getPulsWidthOffsetX());
-		DataControlModel::addKeyValueRow(list, "Puls width offset (y)", 	(int)CncConfig::getGlobalCncConfig()->getPulsWidthOffsetY());
-		DataControlModel::addKeyValueRow(list, "Puls width offset (z)", 	(int)CncConfig::getGlobalCncConfig()->getPulsWidthOffsetZ());
-		DataControlModel::addKeyValueRow(list, "Pitch (x)", 				CncConfig::getGlobalCncConfig()->getPitchX());
-		DataControlModel::addKeyValueRow(list, "Pitch (y)", 				CncConfig::getGlobalCncConfig()->getPitchY());
-		DataControlModel::addKeyValueRow(list, "Pitch (z)",					CncConfig::getGlobalCncConfig()->getPitchZ());
-		DataControlModel::addKeyValueRow(list, "Multiplier (x)", 			(int)CncConfig::getGlobalCncConfig()->getMultiplierX());
-		DataControlModel::addKeyValueRow(list, "Multiplier (y)", 			(int)CncConfig::getGlobalCncConfig()->getMultiplierY());
-		DataControlModel::addKeyValueRow(list, "Multiplier (z)", 			(int)CncConfig::getGlobalCncConfig()->getMultiplierZ());
-		DataControlModel::addKeyValueRow(list, "Max speed XY", 				(int)CncConfig::getGlobalCncConfig()->getMaxSpeedXY());
-		DataControlModel::addKeyValueRow(list, "Rapid speed XY", 			(int)CncConfig::getGlobalCncConfig()->getRapidSpeedXY());
-		DataControlModel::addKeyValueRow(list, "Work speed XY", 			(int)CncConfig::getGlobalCncConfig()->getWorkSpeedXY());
-		DataControlModel::addKeyValueRow(list, "Max speed Z", 				(int)CncConfig::getGlobalCncConfig()->getMaxSpeedZ());
-		DataControlModel::addKeyValueRow(list, "Rapid speed Z", 			(int)CncConfig::getGlobalCncConfig()->getRapidSpeedZ());
-		DataControlModel::addKeyValueRow(list, "Work speed Z", 				(int)CncConfig::getGlobalCncConfig()->getWorkSpeedZ());
-		
-		// 
-		for (auto it = list.begin(); it != list.end(); ++it) 
-			scc->AppendItem(*it);
-	}
-	
-	list.clear();
-	if ( dcc != NULL ) {
-		dcc->DeleteAllItems();
-		
-		DataControlModel::addKeyValueRow(list, "Tool diameter", 			CncConfig::getGlobalCncConfig()->getToolDiameter());
-		DataControlModel::addKeyValueRow(list, "Curve lib resolution", 		wxString::Format("%.3lf", CncConfig::getCurveLibResolution()));
-		DataControlModel::addKeyValueRow(list, "Max Dimension (X)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionX());
-		DataControlModel::addKeyValueRow(list, "Max Dimension (Y)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionY());
-		DataControlModel::addKeyValueRow(list, "Max Dimension (Z)", 		CncConfig::getGlobalCncConfig()->getMaxDimensionZ());
-		DataControlModel::addKeyValueRow(list, "Step Sign (x)", 			CncConfig::getGlobalCncConfig()->getStepSignX());
-		DataControlModel::addKeyValueRow(list, "Step Sign (y)", 			CncConfig::getGlobalCncConfig()->getStepSignY());
-		DataControlModel::addKeyValueRow(list, "Reply Threshold", 			(int)CncConfig::getGlobalCncConfig()->getReplyThreshold());
-		DataControlModel::addKeyValueRow(list, "Z axis values:", 			"");
-		DataControlModel::addKeyValueRow(list, "  Max durations", 			(int)CncConfig::getGlobalCncConfig()->getMaxDurations());
-		DataControlModel::addKeyValueRow(list, "  Workpiece offset", 		CncConfig::getGlobalCncConfig()->getWorkpieceOffset());
-		DataControlModel::addKeyValueRow(list, "  Max duration thickness",	CncConfig::getGlobalCncConfig()->getMaxDurationThickness());
-		DataControlModel::addKeyValueRow(list, "  Calculated durations", 	(int)CncConfig::getGlobalCncConfig()->getDurationCount());
-		DataControlModel::addKeyValueRow(list, "  Current Z distance", 		CncConfig::getGlobalCncConfig()->getCurZDistance());
-		DataControlModel::addKeyValueRow(list, "  Wpt is included", 		CncConfig::getGlobalCncConfig()->getReferenceIncludesWpt());
-		
-		for (unsigned int i=0; i<CncConfig::getGlobalCncConfig()->getMaxDurations(); i++) {
-			if ( CncConfig::getGlobalCncConfig()->getDurationThickness(i) != 0.0 ) {
-				wxString key("  Duration step[");
-				key << i;
-				key << "]";
-				DataControlModel::addKeyValueRow(list, key, CncConfig::getGlobalCncConfig()->getDurationThickness(i));
-			}
-		}
-		
-		// append
-		for (auto it = list.begin(); it != list.end(); ++it) 
-			dcc->AppendItem(*it);
-	}
-	*/
-/*
-	m_dvListCtrlConfigSummary->DeleteAllItems();
-	for (wxVector<wxVector<wxVariant>>::iterator it = rows.begin(); it != rows.end(); ++it) {
-		m_dvListCtrlConfigSummary->AppendItem(*it);
-	}
-	 * */
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateSetterList() {
@@ -3411,7 +3338,7 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 					
 			case OutboundCfgSelection::VAL::CNC_PIN_PANEL:
 					if ( runActive == true ) {
-						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
+						cnc::trc.logWarning("During an active run controller requests are not possible! Ty it later again.");
 						return;
 					}
 					requestControllerPinsFromButton(dummyEvent);
@@ -3419,7 +3346,7 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 					
 			case OutboundCfgSelection::VAL::CNC_CONFIG_PANEL:
 					if ( runActive == true ) {
-						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
+						cnc::trc.logWarning("During an active run controller requests are not possible! Ty it later again.");
 						return;
 					}
 					requestControllerConfigFromButton(dummyEvent);
@@ -3427,7 +3354,7 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 					
 			case OutboundCfgSelection::VAL::CNC_ERROR_PANEL:
 					if ( runActive == true ) {
-						cnc::trc.logWarning("During an active run no controller requests are possible! Ty it later again.");
+						cnc::trc.logWarning("During an active run controller requests are not possible! Ty it later again.");
 						return;
 					}
 					requestControllerErrorInfoFromButton(dummyEvent);
@@ -3457,9 +3384,12 @@ bool MainFrame::processTemplateWrapper() {
 		ret = processTemplateIntern();
 	
 	if ( ret == false ) {
-		std::cerr << "For more details please consider the controller error info"<< std::endl;
+		cnc::cex1 << wxString::Format("%s - Processing finished with errors . . .", wxDateTime::UNow().FormatISOTime()) << std::endl;
+		cnc::cex1 << "For more details please try to consider the controller error info tab" << std::endl;
 		m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
 		m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
+	} else {
+		std::clog << wxString::Format("%s - Processing finished successfully . . .", wxDateTime::UNow().FormatISOTime()) << std::endl;
 	}
 	
 	return ret;
@@ -4152,8 +4082,18 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 	
 	wxString find(m_stcFileContent->GetSelectedText());
 	
+	// run
+	if      ( c == 'R' && ctlKey == true && shtKey == true) {
+		wxCommandEvent dummy;
+		rcRun(dummy);
+		
+	// debug
+	} if      ( c == 'D' && ctlKey == true && shtKey == true) {
+		wxCommandEvent dummy;
+		rcDebug(dummy);
+		
 	// find
-	if ( c == 'F' && ctlKey == true ) {
+	} else if ( c == 'F' && ctlKey == true ) {
 		event.Skip(false);
 		
 		if ( find.IsEmpty() == false ) 
@@ -4532,9 +4472,8 @@ void MainFrame::moveManuallySliderZ(wxScrollEvent& event) {
 	m_metricZ->SetValue(val);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::enableManuallyControls(bool state) {
+void MainFrame::enableTestControls(bool state) {
 ///////////////////////////////////////////////////////////////////
-	#warning how ????
 	// handle interval mode
 	if ( state == false ) {
 		wxString sel = m_testIntervalMode->GetStringSelection();
@@ -4852,8 +4791,9 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(ctrl);
 	
-	m_currentFileMangerPreviewFileName->ChangeValue(fn);
-	
+	if      ( ctrl == mainFilePreview )		m_currentFileMangerPreviewFileName->ChangeValue(fn);
+	else if ( ctrl == monitorFilePreview)	m_currentInboundFilePreviewFileName->ChangeValue(fn);
+		
 	TemplateFormat tf = getCurrentTemplateFormat(fn);
 	switch ( tf ) {
 		case TplSvg:		ctrl->selectSVGPreview(fn);
@@ -5908,10 +5848,8 @@ void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 		m_debuggerPropertyManagerGrid->SelectPage(0);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::rcRun(wxCommandEvent& event) {
+void MainFrame::rcRun() {
 ///////////////////////////////////////////////////////////////////
-	if ( event.GetEventObject() == m_rcRun )	isDebugMode = false;
-	else										isDebugMode = true;
 	determineRunMode();
 	
 	// ensure the monitor is visible, especally if isPause == true
@@ -5921,7 +5859,7 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 
 	// toggle only the pause flag
 	if ( isPause() == true ) {
-		rcPause(event);
+		rcPause();
 		return;
 	}
 	
@@ -5959,7 +5897,19 @@ void MainFrame::rcRun(wxCommandEvent& event) {
 	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::rcPause(wxCommandEvent& event) {
+void MainFrame::rcDebug(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	isDebugMode = true;
+	rcRun();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::rcRun(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	isDebugMode = false;
+	rcRun();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::rcPause() {
 ///////////////////////////////////////////////////////////////////
 	if ( isPause() )	cnc->sendResume();
 	else				cnc->sendPause();
@@ -5970,6 +5920,11 @@ void MainFrame::rcPause(wxCommandEvent& event) {
 	}
 	
 	decorateRunButton();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::rcPause(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	rcPause();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcNextBreakpoint(wxCommandEvent& event) {

@@ -7,7 +7,7 @@
 #include <wx/dataview.h>
 #include <wx/xml/xml.h>
 #include "SVGUserAgentInfo.h"
-#include "CncWorkingParameters.h"
+#include "SvgCncParameters.h"
 #include "DataControlModel.h"
 #include "CncPosition.h"
 
@@ -129,42 +129,69 @@ class SVGUserAgent{
 		}
 		
 		/////////////////////////////////////////////////////////
-		bool initNextPath(CncWorkingParameters& cwp, const wxString& origPath) {
+		bool initNextPath(SvgCncParameters& cwp, const wxString& origPath) {
 			SVGUserAgentInfo sua;
 			sua.lineNumber 			= cwp.currentLineNumber;
 			sua.nodeName 			= nodeName;
 			sua.elementId			= ( elementId.IsEmpty() == false ? elementId : "");
 			sua.nodeType			= SVGUserAgentInfo::NT_PATH;
 			sua.originalPath		= origPath;
-			sua.workingParameters 	= cwp;
+			sua.cncParameters 		= cwp;
 			
 			// move the following list
 			sua.attributes.swap(collectedAttributes);
+			
 			// copy the following lists
 			sua.ids				= collectedIds;
 			sua.transformList 	= collectedTransforms;
 			sua.styleList		= collectedStyles;
 		
 			userAgent.push_back(sua);
-			
 			return true;
 		}
 		
 		/////////////////////////////////////////////////////////
-		bool initNextCncNode(CncWorkingParameters& cwp) {
+		bool initNextCncParameterNode(const SvgCncParameters& cwp) {
 			SVGUserAgentInfo sua;
 			sua.lineNumber 			= cwp.currentLineNumber;
 			sua.nodeName 			= nodeName;
-			sua.elementId			= ( elementId.IsEmpty() == false ? elementId : "");
+			sua.elementId			= "";
 			sua.nodeType			= SVGUserAgentInfo::NT_CNC_PARAM;
 			sua.originalPath		= "";
-			sua.workingParameters 	= cwp;
+			sua.cncParameters 		= cwp;
 			
-			// copy the following lists
+			// copy the following lists - why ????
 			sua.styleList		= collectedStyles;
 			
 			userAgent.push_back(sua);
+			return true;
+		}
+		
+		/////////////////////////////////////////////////////////
+		bool initNextCncBreakNode(const SvgCncBreak& scb) {
+			SVGUserAgentInfo sua;
+			sua.lineNumber 			= scb.currentLineNumber;
+			sua.nodeName 			= nodeName;
+			sua.elementId			= "";
+			sua.nodeType			= SVGUserAgentInfo::NT_CNC_BREAK;
+			sua.originalPath		= "";
+			sua.cncBreak			= scb;
 			
+			userAgent.push_back(sua);
+			return true;
+		}
+		
+		/////////////////////////////////////////////////////////
+		bool initNextCncPauseNode(const SvgCncPause& scp) {
+			SVGUserAgentInfo sua;
+			sua.lineNumber 			= scp.currentLineNumber;
+			sua.nodeName 			= nodeName;
+			sua.elementId			= "";
+			sua.nodeType			= SVGUserAgentInfo::NT_CNC_PAUSE;
+			sua.originalPath		= "";
+			sua.cncPause			= scp;
+			
+			userAgent.push_back(sua);
 			return true;
 		}
 		

@@ -2300,7 +2300,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3892->Add(m_filePreviewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panel4398 = new wxPanel(m_mainBookPreviewPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookPreviewPanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_panel4398->SetBackgroundColour(wxColour(wxT("rgb(0,0,160)")));
+    m_panel4398->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
     
     flexGridSizer3892->Add(m_panel4398, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
@@ -2310,8 +2310,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panel4398->SetSizer(flexGridSizer4400);
     
     m_staticText4402 = new wxStaticText(m_panel4398, wxID_ANY, _("File Manager Preview . . ."), wxDefaultPosition, wxDLG_UNIT(m_panel4398, wxSize(-1,-1)), 0);
-    m_staticText4402->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    wxFont m_staticText4402Font(12, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Arial"));
+    m_staticText4402->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
+    wxFont m_staticText4402Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText4402->SetFont(m_staticText4402Font);
     
     flexGridSizer4400->Add(m_staticText4402, 0, wxALL, WXC_FROM_DIP(5));
@@ -3496,7 +3496,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_monitorTemplatePanel = new wxPanel(m_monitorViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_monitorViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_monitorViewBook->AddPage(m_monitorTemplatePanel, _("Page"), false);
     
-    wxFlexGridSizer* flexGridSizer4359 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer4359 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer4359->SetFlexibleDirection( wxBOTH );
     flexGridSizer4359->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4359->AddGrowableCol(0);
@@ -3508,6 +3508,31 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_monitorTemplatePreviewPlaceHolder->SetToolTip(_("only a placeholder"));
     
     flexGridSizer4359->Add(m_monitorTemplatePreviewPlaceHolder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panel5144 = new wxPanel(m_monitorTemplatePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_monitorTemplatePanel, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel5144->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
+    
+    flexGridSizer4359->Add(m_panel5144, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5146 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer5146->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5146->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    m_panel5144->SetSizer(flexGridSizer5146);
+    
+    m_staticText5142 = new wxStaticText(m_panel5144, wxID_ANY, _("Inbound File Preview . . ."), wxDefaultPosition, wxDLG_UNIT(m_panel5144, wxSize(-1,-1)), 0);
+    m_staticText5142->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
+    m_staticText5142->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
+    wxFont m_staticText5142Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5142->SetFont(m_staticText5142Font);
+    
+    flexGridSizer5146->Add(m_staticText5142, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_currentInboundFilePreviewFileName = new wxTextCtrl(m_monitorTemplatePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_monitorTemplatePanel, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
+    #if wxVERSION_NUMBER >= 3000
+    m_currentInboundFilePreviewFileName->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer4359->Add(m_currentInboundFilePreviewFileName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelSpeed = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -4724,7 +4749,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_stepDelay->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::stepDelayThumbtrack), NULL, this);
     m_rcReset->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcReset), NULL, this);
     m_rcDebugConfig->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebugConfig), NULL, this);
-    m_rcDebug->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
+    m_rcDebug->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebug), NULL, this);
     m_rcNextBreakpoint->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
@@ -5012,7 +5037,7 @@ MainFrameBClass::~MainFrameBClass()
     m_stepDelay->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::stepDelayThumbtrack), NULL, this);
     m_rcReset->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcReset), NULL, this);
     m_rcDebugConfig->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebugConfig), NULL, this);
-    m_rcDebug->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
+    m_rcDebug->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebug), NULL, this);
     m_rcNextBreakpoint->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
@@ -6376,10 +6401,9 @@ CncToolMagazineBase::CncToolMagazineBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer5052->Add(m_staticText5082, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
     
-    wxFlexGridSizer* flexGridSizer4597 = new wxFlexGridSizer(1, 4, 0, 0);
+    wxFlexGridSizer* flexGridSizer4597 = new wxFlexGridSizer(1, 5, 0, 0);
     flexGridSizer4597->SetFlexibleDirection( wxBOTH );
     flexGridSizer4597->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer4597->AddGrowableRow(0);
     
     flexGridSizer4592->Add(flexGridSizer4597, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
@@ -6391,6 +6415,15 @@ CncToolMagazineBase::CncToolMagazineBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer4597->Add(m_btToolMagazineRemove, 0, wxALL, WXC_FROM_DIP(1));
     m_btToolMagazineRemove->SetMinSize(wxSize(90,24));
+    
+    m_btToolMagazineDuplicate = new wxButton(this, wxID_ANY, _("Duplicate"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(90,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btToolMagazineDuplicate->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("plugin-add")), wxLEFT);
+    m_btToolMagazineDuplicate->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer4597->Add(m_btToolMagazineDuplicate, 0, wxALL, WXC_FROM_DIP(1));
+    m_btToolMagazineDuplicate->SetMinSize(wxSize(90,24));
     
     m_btToolMagazineAdd = new wxButton(this, wxID_ANY, _("New"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(90,24)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -6429,7 +6462,9 @@ CncToolMagazineBase::CncToolMagazineBase(wxWindow* parent, wxWindowID id, const 
     m_toolMagazine->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncToolMagazineBase::selectedTool), NULL, this);
     m_cbDefaultToolUsage->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(CncToolMagazineBase::clickUseDefaultTool), NULL, this);
     m_cbDefaultMappedTo->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncToolMagazineBase::selectDefaultToolMappedTo), NULL, this);
+    m_toolMagazineType->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncToolMagazineBase::selectType), NULL, this);
     m_btToolMagazineRemove->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::removeTool), NULL, this);
+    m_btToolMagazineDuplicate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::duplicateTool), NULL, this);
     m_btToolMagazineAdd->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::addTool), NULL, this);
     m_btToolMagazineEdit->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::editTool), NULL, this);
     m_btToolMagazineCancle->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::cancel), NULL, this);
@@ -6441,7 +6476,9 @@ CncToolMagazineBase::~CncToolMagazineBase()
     m_toolMagazine->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncToolMagazineBase::selectedTool), NULL, this);
     m_cbDefaultToolUsage->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(CncToolMagazineBase::clickUseDefaultTool), NULL, this);
     m_cbDefaultMappedTo->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncToolMagazineBase::selectDefaultToolMappedTo), NULL, this);
+    m_toolMagazineType->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncToolMagazineBase::selectType), NULL, this);
     m_btToolMagazineRemove->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::removeTool), NULL, this);
+    m_btToolMagazineDuplicate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::duplicateTool), NULL, this);
     m_btToolMagazineAdd->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::addTool), NULL, this);
     m_btToolMagazineEdit->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::editTool), NULL, this);
     m_btToolMagazineCancle->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncToolMagazineBase::cancel), NULL, this);

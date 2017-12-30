@@ -300,13 +300,14 @@ int CncLargeScaledListCtrl::OnGetItemColumnImage(long item, long column) const {
 ///////////////////////////////////////////////////////////////////
 wxListItemAttr* CncLargeScaledListCtrl::OnGetItemAttr(long item) const {
 ///////////////////////////////////////////////////////////////////
-	// todo - currently not nesseccary
+	// default behaviour
+	#warning why is this method never called?
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
 wxListItemAttr* CncLargeScaledListCtrl::OnGetItemColumnAttr(long item, long column) const {
 ///////////////////////////////////////////////////////////////////
-	// todo - currently not nesseccary
+	// default behaviour
 	return NULL;
 }
 

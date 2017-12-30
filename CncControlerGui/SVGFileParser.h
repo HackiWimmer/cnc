@@ -25,7 +25,6 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		CncControl* cncControl;
 		SVGPathHandlerCnc* pathHandler;
 		SVGUserAgent svgUserAgent;
-		bool cncNodeBreak;
 		
 		wxString currentNodeName;
 		

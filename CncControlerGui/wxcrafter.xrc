@@ -4029,7 +4029,7 @@
                         <flag>wxALL|wxEXPAND</flag>
                         <object class="wxPanel" name="m_panel4398">
                           <style>wxTAB_TRAVERSAL</style>
-                          <bg>#0000A0</bg>
+                          <bg>#004080</bg>
                           <object class="wxFlexGridSizer">
                             <cols>2</cols>
                             <rows>0</rows>
@@ -4043,14 +4043,14 @@
                               <object class="wxStaticText" name="m_staticText4402">
                                 <label>File Manager Preview . . .</label>
                                 <style/>
-                                <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                                <fg>#FFFFFF</fg>
                                 <font>
                                   <size>12</size>
-                                  <style>italic</style>
+                                  <style>normal</style>
                                   <weight>bold</weight>
-                                  <family>default</family>
+                                  <family>swiss</family>
                                   <underlined>0</underlined>
-                                  <face>Arial</face>
+                                  <face>Segoe UI</face>
                                 </font>
                               </object>
                             </object>
@@ -6013,7 +6013,7 @@ Interval [ms]:</label>
                     <style>wxTAB_TRAVERSAL</style>
                     <object class="wxFlexGridSizer">
                       <cols>1</cols>
-                      <rows>1</rows>
+                      <rows>3</rows>
                       <vgap>0</vgap>
                       <hgap>0</hgap>
                       <growablecols>0</growablecols>
@@ -6026,6 +6026,45 @@ Interval [ms]:</label>
                           <tooltip>
                             <![CDATA[only a placeholder]]>
                           </tooltip>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <object class="wxPanel" name="m_panel5144">
+                          <style>wxTAB_TRAVERSAL</style>
+                          <bg>#004080</bg>
+                          <object class="wxFlexGridSizer">
+                            <cols>2</cols>
+                            <rows>0</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols/>
+                            <growablerows/>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <border>5</border>
+                              <object class="wxStaticText" name="m_staticText5142">
+                                <label>Inbound File Preview . . .</label>
+                                <style/>
+                                <bg>#004080</bg>
+                                <fg>#FFFFFF</fg>
+                                <font>
+                                  <size>12</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <object class="wxTextCtrl" name="m_currentInboundFilePreviewFileName">
+                          <style>wxTE_RIGHT|wxTE_READONLY</style>
                         </object>
                       </object>
                     </object>
@@ -9343,12 +9382,12 @@ Interval [ms]:</label>
         <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
         <option>1</option>
         <object class="wxFlexGridSizer">
-          <cols>4</cols>
+          <cols>5</cols>
           <rows>1</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
           <growablecols/>
-          <growablerows>0</growablerows>
+          <growablerows/>
           <object class="sizeritem">
             <flag>wxALL</flag>
             <border>1</border>
@@ -9358,6 +9397,19 @@ Interval [ms]:</label>
               <style/>
               <size>90,24</size>
               <bitmap>bitmaps/plugin-delete.png</bitmap>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>90,24</minsize>
+            <object class="wxButton" name="m_btToolMagazineDuplicate">
+              <label>Duplicate</label>
+              <style/>
+              <size>90,24</size>
+              <bitmap>bitmaps/plugin-add.png</bitmap>
               <bitmapposition>wxLEFT</bitmapposition>
               <default>0</default>
             </object>

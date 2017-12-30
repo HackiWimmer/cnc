@@ -65,6 +65,7 @@ CncConfig::CncConfig(MainFrame* app)
 , calcFactX(1.0), calcFactY(1.0), calcFactZ(1.0)
 , dispFactX3D(1.0), dispFactY3D(1.0), dispFactZ3D(1.0)
 , replyThresholdX(1), replyThresholdY(1), replyThresholdZ(1)
+, currentToolId(-1)
 , currentZDepth(0.0)
 , maxZDistance(50.0)
 , referenceIncludesWpt(false)
@@ -271,7 +272,6 @@ const double CncConfig::setCurrentZDepth(double dpt) {
 	initZAxisValues();
 	return currentZDepth;
 }
-
 ////////////////////////////////////////////////////////////////////////
 const double CncConfig::getDurationThickness(unsigned int duration) {
 ////////////////////////////////////////////////////////////////////////
@@ -458,8 +458,6 @@ bool CncConfig::loadNonGuiConfig(const wxString& groupName, const wxString& entr
 	
 	// tool magazine parameter
 	if ( groupName == CncToolMagazineParam_SECTION_NAME ) {
-	
-		std::clog << entryName << "=" << value << endl;
 		if      ( entryName == CncToolMagazineParam_USE_DEF_TOOL)		{ toolMagazineParameter.useDefaultTool  = ( value == "0" ? false : true ); }
 		else if ( entryName == CncToolMagazineParam_MAP_DEF_TOOL_TO)	{ toolMagazineParameter.defaultMappedTo =  value; }
 	}
@@ -645,12 +643,43 @@ bool CncConfig::checkToolExists(int toolId) {
 	return false;
 }
 ////////////////////////////////////////////////////////////////////////
+const wxString CncConfig::getToolParamAsString(int id) {
+////////////////////////////////////////////////////////////////////////
+	wxString ret;
+	auto it = toolMagazine.find(id);
+	if ( it == toolMagazine.end() ) {
+		return wxString::Format("Unknown tool id: %d", id);
+	}
+	
+	ToolMagazineEntry tme = it->second;
+	ret = wxString::Format( "ID=%d; T=%s; D=%4.3lf; L=%4.3lf; O=%4.3lf",
+							id,
+							tme.type,
+							tme.diameter,
+							tme.length,
+							tme.offset);
+	return ret;
+}
+////////////////////////////////////////////////////////////////////////
+const wxString CncConfig::getDefaultToolParamAsString() {
+////////////////////////////////////////
+	return getToolParamAsString(translateToolId(-1));
+}
+////////////////////////////////////////////////////////////////////////
+const wxString CncConfig::getCurrentToolParamAsString() {
+///////////////////////////////////////////////////////////////////////
+	return getToolParamAsString(translateToolId(getCurrentToolId()));
+}
+////////////////////////////////////////////////////////////////////////
 int CncConfig::translateToolId(int toolId) {
 ////////////////////////////////////////////////////////////////////////
-	auto it = toolMagazine.find(toolId);
-	if ( it != toolMagazine.end() )
-		return toolId;
-		
+	if ( toolId >= 0 ) {
+		// try to find
+		auto it = toolMagazine.find(toolId);
+		if ( it != toolMagazine.end() )
+			return toolId;
+	}
+	
 	// tool id did not exist
 	if ( toolMagazineParameter.useDefaultTool == false )
 		return toolId;
@@ -660,8 +689,8 @@ int CncConfig::translateToolId(int toolId) {
 	if ( toolMagazineParameter.defaultMappedTo.ToLong(&id) == false )
 		return toolId;
 		
-	// search mapped toll
-	it = toolMagazine.find(id);
+	// search mapped tool
+	auto it = toolMagazine.find(id);
 	if ( it != toolMagazine.end() )
 		return id;
 		
@@ -734,20 +763,11 @@ void CncConfig::calculateThresholds() {
 	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y)->SetValue((int)replyThresholdY);
 	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z)->SetValue((int)replyThresholdZ);
 }
-
-
-
-
-
-
-#warning - todo reorganize getDefaultCurveLibResolution()
 ////////////////////////////////////////////////////////////////////////
 float CncConfig::getDefaultCurveLibResolution() {
 ////////////////////////////////////////////////////////////////////////
 	return CncSvgCurveLib::getDefaultResolution();
 }
-
-
 ////////////////////////////////////////////////////////////////////////
 float CncConfig::getCurveLibIncrement() { 
 ////////////////////////////////////////////////////////////////////////
@@ -766,12 +786,8 @@ void CncConfig::updateCurveLibIncrementSelector() {
 		CncConfig::gblCurveLibSelector->SetStringSelection(wxString::Format("%.3f", CncSvgCurveLib::getIncement()));
 	}
 }
-
-
-
 ////////////////////////////////////////////////////////////////////////
 // config getters
-
 const bool CncConfig::getAutoConnectFlag()							{ wxPGProperty* p = getProperty(CncApplication_AUTO_CONNECT); 			wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getAutoProcessFlag()							{ wxPGProperty* p = getProperty(CncApplication_AUTO_PROCESS); 			wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getShowTestMenuFlag()							{ wxPGProperty* p = getProperty(CncApplication_SHOW_TEST_MENU); 		wxASSERT(p); return p->GetValue().GetBool(); }

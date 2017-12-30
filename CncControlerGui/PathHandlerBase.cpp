@@ -2,6 +2,7 @@
 #include "SVGCurveLib.h"
 #include "CncConfig.h"
 #include "FileParser.h"
+#include "CncTimeFunctions.h"
 #include "PathHandlerBase.h"
 
 //////////////////////////////////////////////////////////////////
@@ -587,4 +588,10 @@ void PathHandlerBase::tracePathList(std::ostream &ostr) {
 		cnt++;
 	}
 }
-
+//////////////////////////////////////////////////////////////////
+void PathHandlerBase::processWait(int64_t microseconds) {
+//////////////////////////////////////////////////////////////////
+	std::cout << " Processing Dwell: " << ((double)microseconds) / (1000 * 1000) << "[s] . . .";
+	CncTimeFunctions::activeWaitMircoseconds(microseconds, true);
+	std::clog << " Done\n";
+}

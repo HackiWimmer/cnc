@@ -148,11 +148,15 @@ void FileParser::displayToolId(int id) {
 //////////////////////////////////////////////////////////////////
 void FileParser::displayToolId(const wxString& id) {
 //////////////////////////////////////////////////////////////////
-	wxTextCtrl* toolId = CncConfig::getGlobalCncConfig()->getTheApp()->GetToolId();
-	if ( toolId == NULL )
+	wxTextCtrl* toolIdCtrl = CncConfig::getGlobalCncConfig()->getTheApp()->GetToolId();
+	if ( toolIdCtrl == NULL )
 		return;
+		
+	long toolId = 0;
+	id.ToLong(&toolId);
 	
-	toolId->SetValue(id);
+	toolIdCtrl->SetValue(id);
+	toolIdCtrl->SetToolTip(wxString::Format("Last Tool: %s", GBL_CONFIG->getToolParamAsString(toolId)));
 }
 //////////////////////////////////////////////////////////////////
 bool FileParser::setNextToolID(unsigned int id) {
@@ -179,6 +183,7 @@ bool FileParser::setNextToolID(unsigned int id) {
 		return false;
 	}
 	
+	GBL_CONFIG->setCurrentToolId(toolId);
 	displayToolId(toolId);
 	toolIds.push_back(toolId);
 	

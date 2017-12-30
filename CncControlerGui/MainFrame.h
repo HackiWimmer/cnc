@@ -78,8 +78,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 	// User commands
 	protected:
 		virtual void dclickLogger(wxMouseEvent& event);
-    virtual void xxxxxxxxxxxxx(wxMouseEvent& event);
+		virtual void xxxxxxxxxxxxx(wxMouseEvent& event);
 		virtual void keyDownLogger(wxKeyEvent& event);
+		
 		virtual void leftDownProbeModePanel(wxMouseEvent& event);
 		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void renameTemplateFromButton(wxCommandEvent& event);
@@ -207,6 +208,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void rcPause(wxCommandEvent& event);
 		virtual void rcReset(wxCommandEvent& event);
 		virtual void rcRun(wxCommandEvent& event);
+		virtual void rcDebug(wxCommandEvent& event);
 		virtual void rcStop(wxCommandEvent& event);
 		virtual void switchMonitoring(wxCommandEvent& event);
 		virtual void fileContentChange(wxStyledTextEvent& event);
@@ -590,6 +592,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// run template handling
+		void rcRun();
+		void rcPause();
+		
 		bool checkIfRunCanBeProcessed();
 		bool processVirtualTemplate();
 		bool processTemplateIntern();
@@ -701,7 +706,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 		///////////////////////////////////////////////////////////////
 		// manually control
-		void enableManuallyControls(bool state);
+		void enableTestControls(bool state);
 		void processTestMove(wxStaticText* axis, wxStaticText* counter, 
 		                     int c, double xd, double yd, double zd);
 		

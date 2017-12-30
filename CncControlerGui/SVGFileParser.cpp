@@ -20,7 +20,6 @@ SVGFileParser::SVGFileParser(const wxString& fn, CncControl* cnc)
 , cncControl(cnc)
 , pathHandler(new SVGPathHandlerCnc(cnc))
 , svgUserAgent()
-, cncNodeBreak(false)
 , currentNodeName()
 , debugBase(NULL)
 , debugPath(NULL)
@@ -75,11 +74,22 @@ void SVGFileParser::selectSourceControl(unsigned long pos) {
 	
 	bool ok = false;
 	
+	long backStep = 1;
+	wxString searchStart(currentNodeName);
+	
+	// only if the currentNodeName exists use it as serach start point
+	// this is only the case if the parser runs preprocess() or spool()
+	if ( inboundSourceControl->GetLine(pos).Contains(currentNodeName) == false ) {
+		backStep = 0;
+		searchStart.assign("<");
+	}
+	
 	// sets the position to the start of the given line
 	inboundSourceControl->GotoLine(pos);
+	inboundSourceControl->Home();
 	inboundSourceControl->SearchAnchor();
 	// find start
-	long sp = inboundSourceControl->SearchNext(0, currentNodeName);
+	long sp = inboundSourceControl->SearchNext(0, searchStart);
 	long ep = wxNOT_FOUND;
 	
 	if ( sp != wxNOT_FOUND ) {
@@ -92,7 +102,7 @@ void SVGFileParser::selectSourceControl(unsigned long pos) {
 			// make the end visible
 			inboundSourceControl->GotoPos(ep);
 			// select
-			inboundSourceControl->SetSelection(sp - 1, ep + 1);
+			inboundSourceControl->SetSelection(sp - backStep, ep + 1);
 			ok = true;
 		}
 	}
@@ -219,7 +229,7 @@ void SVGFileParser::registerXMLNode(wxXmlNode *child) {
 	if ( runInfo.getCurrentDebugState() == false )
 		return;
 
-	CncWorkingParameters cwp = pathHandler->getCncWorkingParameters();
+	SvgCncParameters cwp = pathHandler->getSvgCncParameters();
 	appendDebugValueBase("Reverse Path", cwp.getCorrectionType());
 	
 	wxString content;
@@ -251,7 +261,16 @@ bool SVGFileParser::spool() {
 	for ( UserAgentVector::iterator itUav = uav.begin(); itUav != uav.end(); ++itUav ) {
 		SVGUserAgentInfo uai  = *itUav;
 		
-		pathHandler->setCncWorkingParameters(uai.workingParameters);
+		if ( uai.nodeName == SvgNodeTemplates::CncBreakBlockNodeName ) {
+			std::cout << " CncBreak at line " << uai.lineNumber << " detected. Processing will stop here." << std::endl;
+			break;
+		}
+		
+		if ( uai.nodeName == SvgNodeTemplates::CncPauseBlockNodeName ) {
+			pathHandler->processWait(uai.cncPause.microseconds);
+		}
+		
+		pathHandler->setCncWorkingParameters(uai.cncParameters);
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(uai.nodeName);
@@ -458,7 +477,6 @@ bool SVGFileParser::preprocess() {
 	
 	// main entry point foor evaluateing all XML nodes
 	wxXmlNode *child = doc.GetRoot()->GetChildren();
-	cncNodeBreak = false;
 	bool ret = processXMLNode(child);
 	
 	if ( ret == false ) {
@@ -476,57 +494,61 @@ bool SVGFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
-	while ( child && cncNodeBreak == false) {
+	while ( child ) {
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(child->GetName());
 		setCurrentLineNumber(child->GetLineNumber());
 		registerXMLNode(child);
 		
-		pathHandler->getCncWorkingParameters().currentLineNumber = child->GetLineNumber();
+		pathHandler->getSvgCncParameters().currentLineNumber = child->GetLineNumber();
 
 		if ( child->GetName() == SvgNodeTemplates::CncParameterBlockNodeName ) {
 			if ( evaluateCncParameters(child) == false )
 				return false;
 				
 			registerNextDebugNode(currentNodeName);
-			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
+			svgUserAgent.initNextCncParameterNode(pathHandler->getSvgCncParameters());
 				
 		} else if (child->GetName() == SvgNodeTemplates::CncBreakBlockNodeName ) {
-			cncNodeBreak = true;
-			std::clog << SvgNodeTemplates::CncBreakBlockNodeName << " detected at line number: " << child->GetLineNumber() << std::endl;
-			
 			registerNextDebugNode(currentNodeName);
-			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
+			
+			SvgCncBreak scb;
+			scb.currentLineNumber = getCurrentLineNumber();
+			svgUserAgent.initNextCncBreakNode(scb);
 			
 		} else if (child->GetName() == SvgNodeTemplates::CncPauseBlockNodeName ) {
-			//todo
-			std::clog << SvgNodeTemplates::CncPauseBlockNodeName << " isn't currently implemented. Line number: " << child->GetLineNumber() << std::endl;
-			
 			registerNextDebugNode(currentNodeName);
-			svgUserAgent.initNextCncNode(pathHandler->getCncWorkingParameters());
+		
+			SvgCncPause scp;
+			scp.currentLineNumber = getCurrentLineNumber();
+			double p = 0.0;
+			if ( child->GetAttribute("p", "0.0").ToDouble(&p) )
+				scp.microseconds = (int64_t)(p * 1000 * 1000);
+			
+			svgUserAgent.initNextCncPauseNode(scp);
 			
 		} else if (child->GetName().Upper() == "SYMBOL" ) {
-			wxString a = child->GetAttribute("id", "");
+			wxString a(child->GetAttribute("id", ""));
 			svgUserAgent.addID(a, child->GetName().c_str());
 			
-			a = child->GetAttribute("transform", "");
+			a.assign(child->GetAttribute("transform", ""));
 			svgUserAgent.addTransform(a);
 			
 		} else if (child->GetName().Upper() == "G" ) {
-			wxString a = child->GetAttribute("id", "");
+			wxString a(child->GetAttribute("id", ""));
 			svgUserAgent.addID(a, child->GetName().c_str());
 			
-			a = child->GetAttribute("transform", "");
+			a.assign(child->GetAttribute("transform", ""));
 			svgUserAgent.addTransform(a);
 			
-			a = child->GetAttribute("style", "");
+			a.assign(child->GetAttribute("style", ""));
 			svgUserAgent.addStyle(a);
 			
 		} else if ( child->GetName().Upper() == "PATH" ) {
 			registerNextDebugNode(currentNodeName);
 			
-			wxString data = child->GetAttribute("d", "");
+			wxString data(child->GetAttribute("d", ""));
 			if ( evaluatePath(data)  == false )
 				return false;
 				
@@ -587,8 +609,7 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 			udv.push_back(svgUserAgent.evaluateUseDirective(ud));
 			
 		} else if (child->GetName().Upper() == "CNC") {
-			//todo
-			std::clog << "Obsolete Node. <CNC> isn't longer implemented. Line number: " << child->GetLineNumber() << std::endl;
+			cnc::cex1 << "Obsolete Node. <CNC> isn't longer supported. Line number: " << child->GetLineNumber() << std::endl;
 		}
 
 		// check the debug state before the next node
@@ -603,17 +624,17 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		
 		// close the id, transform and style attribute (on demand)
 		if ( last != NULL ) {
-			wxString a = last->GetAttribute("id", "");
+			wxString a(last->GetAttribute("id", ""));
 			if ( a != "" )
 				svgUserAgent.removeId(a);
 				
-			a = last->GetAttribute("transform", "");
+			a.assign(last->GetAttribute("transform", ""));
 			if ( a != "" )
 				svgUserAgent.removeLastTransform();
 			
 			// only style attributes frmom <g> are colleted before
 			if ( last->GetName().Upper() == "G" ) {
-				a = last->GetAttribute("style", "");
+				a.assign(last->GetAttribute("style", ""));
 				if ( a != "" )
 					svgUserAgent.removeLastStyle();
 			}
@@ -643,13 +664,13 @@ void SVGFileParser::evaluateUse(wxXmlAttribute *attribute, DoubleStringMap& dsm)
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::initNextPath(const wxString& data) {
 //////////////////////////////////////////////////////////////////
-	svgUserAgent.initNextPath(pathHandler->getCncWorkingParameters(), data);
+	svgUserAgent.initNextPath(pathHandler->getSvgCncParameters(), data);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::evaluateCncParameters(wxXmlNode *child) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	CncWorkingParameters& cwp = pathHandler->getCncWorkingParameters();
+	SvgCncParameters& cwp = pathHandler->getSvgCncParameters();
 	
 	wxString attr = child->GetAttribute("reverse", "no");
 	cwp.setReverseFlag(attr);

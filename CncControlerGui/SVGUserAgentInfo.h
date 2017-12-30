@@ -57,7 +57,7 @@ struct SVGUserAgentInfo {
 		
 	public:
 	
-		enum NodeType { NT_UNDEFINED, NT_PATH, NT_CNC_PARAM };
+		enum NodeType { NT_UNDEFINED, NT_PATH, NT_CNC_PARAM, NT_CNC_BREAK, NT_CNC_PAUSE };
 	
 		unsigned int lineNumber = UNDEFINED_LINE_NUMBER;
 		NodeType nodeType = NT_UNDEFINED;
@@ -65,7 +65,9 @@ struct SVGUserAgentInfo {
 		wxString elementId;
 		wxString originalPath;
 		
-		CncWorkingParameters workingParameters;
+		SvgCncBreak cncBreak;
+		SvgCncPause cncPause;
+		SvgCncParameters cncParameters;
 		
 		DoubleStringMap attributes;
 		DoubleStringMap ids;
@@ -127,9 +129,10 @@ struct SVGUserAgentInfo {
 		/////////////////////////////////////////////////////////
 		void getBaseDetails(DcmItemList& rows) {
 			wxString value;
-			workingParameters.getParameterList(rows);
-						
+			
 			if ( nodeType == NT_PATH ) {
+				cncParameters.getParameterList(rows);
+				
 				value.clear();
 				for (DoubleStringMap::iterator it=attributes.begin(); it!=attributes.end(); ++it) {
 					value += it->first;
@@ -189,7 +192,7 @@ struct SVGUserAgentInfo {
 				return false;
 				
 			// if 'display:none' is configured don't spool this path
-			// != wxNOT_FOUND == FOUND
+			// != wxNOT_FOUND ==> means FOUND
 			if ( wxString(getStyleInfoAsString()).Find("display:none") != wxNOT_FOUND )
 				return false;
 				

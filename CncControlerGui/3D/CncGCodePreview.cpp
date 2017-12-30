@@ -2,6 +2,7 @@
 
 #include "3D/CncGCodePreview.h"
 #include "GL3DOptions.h"
+#include "CncConfig.h"
 #include "CncCommon.h"
 
 #ifdef __DARWIN__
@@ -162,9 +163,9 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 										break;
 	}
 	
-	double x = vd.getX() / maxDimension;
-	double y = vd.getY() / maxDimension;
-	double z = vd.getZ() / maxDimension;
+	double x = vd.getX() / (maxDimension / GBL_CONFIG->getCalculationFactX());
+	double y = vd.getY() / (maxDimension / GBL_CONFIG->getCalculationFactY());
+	double z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
 	
 	static GLI::GLCncPathVertices d;
 	preview->appendPathData(d.set(-1L, x, y, z, colour, formatType, vd.getMode())); 

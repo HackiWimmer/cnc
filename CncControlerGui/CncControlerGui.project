@@ -163,7 +163,6 @@
       <File Name="CncSvgCurveLib.h"/>
       <File Name="CncToolCorrection.h"/>
       <File Name="CncToolStateControl.h"/>
-      <File Name="CncWorkingParameters.h"/>
       <File Name="CommandTemplates.h"/>
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
@@ -251,6 +250,7 @@
         <File Name="SVGPathHandlerCnc.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Utils">
+        <File Name="SvgCncParameters.h"/>
         <File Name="SVGCurveLib.cpp"/>
         <File Name="SVGCurveLib.h"/>
         <File Name="SvgEditPopup.cpp"/>
@@ -351,6 +351,9 @@
     <File Name="Clipper/clipper.cpp"/>
     <File Name="Clipper/clipper.hpp"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Dependencies Name="release2"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -526,7 +529,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
-  <Dependencies Name="release2"/>
 </CodeLite_Project>

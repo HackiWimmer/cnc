@@ -4,7 +4,21 @@
 #include "CncCommon.h"
 #include "DataControlModel.h"
 
-struct CncWorkingParameters {
+//////////////////////////////////////////////////////////////////
+struct SvgCncBreak {
+	public:
+		int currentLineNumber		= UNDEFINED_LINE_NUMBER;
+};
+
+//////////////////////////////////////////////////////////////////
+struct SvgCncPause {
+	public:
+		int currentLineNumber		= UNDEFINED_LINE_NUMBER;
+		int64_t microseconds		= 0LL;
+};
+
+//////////////////////////////////////////////////////////////////
+struct SvgCncParameters {
 	
 	private:
 	
@@ -81,7 +95,7 @@ struct CncWorkingParameters {
 		
 		///////////////////////////////////////////////////////////
 		void getParameterList(DcmItemList& rows) {
-			DataControlModel::addKeyValueRow(rows, "Cnc Working Parameters", 	"");
+			DataControlModel::addKeyValueRow(rows, "SVG CNC-Parameters", 	"");
 			DataControlModel::addKeyValueRow(rows, "  Reverse Path", 			reversePath ? "Yes" : "No");
 			DataControlModel::addKeyValueRow(rows, "  Correction Type", 		getCorrectionTypeAsString());
 			DataControlModel::addKeyValueRow(rows, "  Z Depth", 				getZDeptAsString());
