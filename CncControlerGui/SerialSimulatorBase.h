@@ -48,7 +48,7 @@ class SerialSimulatorThread : public wxThread {
 		void addErrorInfo(unsigned int id, const char* info = NULL);
 		void resetLastSignal() { lastSignal = CMD_INVALID; }
 		
-		void incPosIstionCounter();
+		void incPosistionCounter();
 		void incStepCounterX(int32_t dx);
 		void incStepCounterY(int32_t dy);
 		void incStepCounterZ(int32_t dz);
@@ -84,7 +84,12 @@ class SerialSimulatorThread : public wxThread {
 		void Serial_write(const char* response);
 		
 		void Serial_writeLongValue(int32_t val);
-		void Serial_writeLongValue(unsigned char pid, int32_t val);
+		
+		void Serial_writeGetterValues(unsigned char pid, int32_t val);
+		void Serial_writeGetterValues(unsigned char pid, int32_t val1, int32_t val2);
+		void Serial_writeGetterValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3);
+		
+		void Serial_writeLongValues(unsigned char pid, int32_t val);
 		void Serial_writeLongValues(unsigned char pid, int32_t val1, int32_t val2);
 		void Serial_writeLongValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3);
 		
@@ -135,6 +140,7 @@ class SerialSimulatorThread : public wxThread {
 		void performResetController();
 		void performResetErrorInfo();
 		
+		void performVersionInfo();
 		void performConfiguration();
 		void performPinReport();
 		void performErrorInfo();

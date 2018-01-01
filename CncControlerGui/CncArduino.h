@@ -2,7 +2,13 @@
 #define CNC_ARDUINO_INCLUDES
 
 #include <string>
-#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1\cv.h"
+
+#if defined(__WXMSW__)
+	#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1\cv.h"
+#else
+	#include "../../StepperControl_1/cv.h"
+#endif
+
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 class ArduinoCMDs {
@@ -46,6 +52,9 @@ class ArduinoPIDs {
 		/////////////////////////////////////////////////////////////////////////
 		static const char* getPIDLabel(unsigned int id);
 		static const char* getPIDLabel(unsigned int id, std::string& retVal);
+		static const char* getPIDLabelWithDefault(unsigned int id, const std::string& defaultValue);
+		
+		static bool exists(unsigned int id);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////

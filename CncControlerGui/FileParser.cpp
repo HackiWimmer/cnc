@@ -240,17 +240,17 @@ void FileParser::clearControls() {
 	debuggerConfigurationPropertyGrid->GetGrid()->SetCellBackgroundColour(wxColour(255,255,255));
 
 	debugControls.currentPage 			= NULL;
-	debugControls.curentMainCategory 	= NULL;
+	debugControls.currentMainCategory 	= NULL;
 	debugControls.currentNode 			= NULL;
 	debugControls.propCount 			= 0;
 }
 //////////////////////////////////////////////////////////////////
 void FileParser::registerNextDebugNode(const wxString& nodeName) {
 //////////////////////////////////////////////////////////////////
-	if ( debugControls.curentMainCategory == NULL )
+	if ( debugControls.currentMainCategory == NULL )
 		return;
 		
-	//SHOULD_DEBUG_HERE
+	SHOULD_DEBUG_HERE
 		
 	wxString label(wxString::Format("[%06d] - %s", currentLineNumber, nodeName));
 	wxString name(wxString::Format("%d", debugControls.propCount++));
@@ -258,7 +258,7 @@ void FileParser::registerNextDebugNode(const wxString& nodeName) {
 	debugControls.currentNode = new wxPropertyCategory(label, name);
 	debugControls.currentNode->SetExpanded(true);
 	
-	debugControls.curentMainCategory->InsertChild(0, debugControls.currentNode);
+	debugControls.currentMainCategory->InsertChild(0, debugControls.currentNode);
 	//debugControls.curentMainCategory->AppendChild(debugControls.currentNode);
 	debuggerConfigurationPropertyGrid->Refresh();
 }
@@ -433,9 +433,9 @@ void FileParser::initNextRunPhase(FileParserRunInfo::RunPhase p) {
 		
 		// create the main category for the new page
 		wxString name(wxString::Format("%d", debugControls.propCount++));
-		debugControls.curentMainCategory = new wxPropertyCategory(runInfo.getCurrentDebugPhaseAsString(), name);
-		debugControls.curentMainCategory->SetExpanded(true);
-		debugControls.currentPage->Append(debugControls.curentMainCategory);
+		debugControls.currentMainCategory = new wxPropertyCategory(runInfo.getCurrentDebugPhaseAsString(), name);
+		debugControls.currentMainCategory->SetExpanded(true);
+		debugControls.currentPage->Append(debugControls.currentMainCategory);
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -586,6 +586,7 @@ bool FileParser::evaluateDebugState(bool force) {
 			
 		Sleep(25);
 	}
+	
 	waitingForUserEvents = false;
 	
 	return true;

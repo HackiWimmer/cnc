@@ -3576,7 +3576,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1628->Add(m_keepFileManagerPreview, 0, wxALL, WXC_FROM_DIP(1));
     
     m_lruList = new wxListCtrl(m_scrollWinFile, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinFile, wxSize(-1,110)), wxLC_SINGLE_SEL|wxLC_REPORT);
-    m_lruList->SetToolTip(_("rwerew"));
     
     flexGridSizer1628->Add(m_lruList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -4906,6 +4905,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(MainFrameBClass::lruListItemSelected), NULL, this);
     m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
+    m_lruList->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLruList), NULL, this);
     m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
     m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
@@ -5194,6 +5194,7 @@ MainFrameBClass::~MainFrameBClass()
     m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(MainFrameBClass::lruListItemSelected), NULL, this);
     m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
+    m_lruList->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLruList), NULL, this);
     m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
     m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);

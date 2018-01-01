@@ -209,7 +209,7 @@ void SerialSimulatorThread::resetStepCounter() {
 	stepOverflowCounterZ 	= 0;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialSimulatorThread::incPosIstionCounter() {
+void SerialSimulatorThread::incPosistionCounter() {
 ///////////////////////////////////////////////////////////////////
 	// detect overflows
 	if ( positionCounter == MAX_LONG ) { 
@@ -282,16 +282,45 @@ void SerialSimulatorThread::pushAndReleaseBytes() {
 	unsigned int pushedSize = 0;
 	unsigned int size       = byteWriter.size();
 	
-	if ( ( pushedSize = readDataQueue.push(byteWriter.getBuffer(), size) ) != size ) {
+	unsigned int counter = 0;
+	while ( ( pushedSize = readDataQueue.push(byteWriter.getBuffer(), size) ) != size ) {
 		
-		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
-		evt.SetString(wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push failed: Size required: %u, Size pushed: %u", size, pushedSize));
-		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
-		return;
+		size -= pushedSize;
+		
+		counter++;
+		if ( counter > 100 ) {
+			
+			
+			/*
+			wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
+			std::stringstream ss;
+			byteWriter.trace(ss);
+			evt.SetString(wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push failed: Size required: %04u, Size pushed: %04u. Byte stream: {%s}", size, pushedSize, ss.str().c_str()));
+			wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+			*/
+			
+			std::stringstream ss;
+			byteWriter.trace(ss);
+			addErrorInfo(E_INVALID_PARAMETER, wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push failed: Size required: %04u, Size pushed: %04u. Byte stream: {%s}", size, pushedSize, ss.str().c_str()));
+			
+			byteWriter.reset();
+			return;
+		}
 	}
 	
-	releaseCondition();
+	
+	
+	// debug only
+	if ( false ) {
+		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
+		std::stringstream ss;
+		byteWriter.trace(ss);
+		evt.SetString(wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push preview required: %04u, Size pushed: %04u. Byte stream: {%s}", size, pushedSize, ss.str().c_str()));
+		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+	}
+	
 	byteWriter.reset();
+	releaseCondition();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::Serial_write(const unsigned char b) { 
@@ -312,7 +341,37 @@ void SerialSimulatorThread::Serial_writeLongValue(int32_t val) {
 	pushAndReleaseBytes();
 }
 ///////////////////////////////////////////////////////////////////
-void SerialSimulatorThread::Serial_writeLongValue(unsigned char pid, int32_t val) {
+void SerialSimulatorThread::Serial_writeGetterValues(unsigned char pid, int32_t val) {
+///////////////////////////////////////////////////////////////////
+	byteWriter.write(RET_SOH);
+	byteWriter.write(pid);
+	byteWriter.write((unsigned char)1);
+	byteWriter.write(val);
+	pushAndReleaseBytes();
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::Serial_writeGetterValues(unsigned char pid, int32_t val1, int32_t val2) {
+///////////////////////////////////////////////////////////////////
+	byteWriter.write(RET_SOH);
+	byteWriter.write(pid);
+	byteWriter.write((unsigned char)2);
+	byteWriter.write(val1);
+	byteWriter.write(val2);
+	pushAndReleaseBytes();
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::Serial_writeGetterValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3) {
+///////////////////////////////////////////////////////////////////
+	byteWriter.write(RET_SOH);
+	byteWriter.write(pid);
+	byteWriter.write((unsigned char)3);
+	byteWriter.write(val1);
+	byteWriter.write(val2);
+	byteWriter.write(val3);
+	pushAndReleaseBytes();
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::Serial_writeLongValues(unsigned char pid, int32_t val) {
 ///////////////////////////////////////////////////////////////////
 	byteWriter.write(RET_SOH);
 	byteWriter.write(pid);
@@ -345,9 +404,8 @@ int SerialSimulatorThread::readData(void *buffer, unsigned int nbByte) {
 	static SerialByte serialBytes[MAX_ITEMS];
 	
 	tsLastLog = wxDateTime::UNow();
-	
+
 	unsigned int sizeAvailable = readDataQueue.pop(serialBytes, nbByte);
-	
 	if ( sizeAvailable == 0 )
 		return 0;
 		
@@ -368,30 +426,43 @@ bool SerialSimulatorThread::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::performErrorInfo() {
 ///////////////////////////////////////////////////////////////////
-	Serial_write(RET_SOT);
-
-	Serial_write("0");
-	Serial_write(TEXT_SEPARATOR);
-	Serial_write(E_TOTAL_COUNT);
-	Serial_write(TEXT_SEPARATOR);
-	Serial_write(wxString::Format("%u", (unsigned int)errorList.size()));
-	Serial_write(TEXT_CLOSE);
+	byteWriter.write(RET_SOT);
+	
+	byteWriter.write("0");
+	byteWriter.write(TEXT_SEPARATOR);
+	byteWriter.write(E_TOTAL_COUNT);
+	byteWriter.write(TEXT_SEPARATOR);
+	byteWriter.write(wxString::Format("%u", (unsigned int)errorList.size()));
+	byteWriter.write(TEXT_CLOSE);
 	
 	unsigned int cnt = 1;
 	for ( auto it = errorList.begin(); it != errorList.end(); ++it ) {
 		
-		Serial_write(wxString::Format("%u", cnt++));
-		Serial_write(TEXT_SEPARATOR);
-		Serial_write(wxString::Format("%u", it->id));
-		Serial_write(TEXT_SEPARATOR);
-		Serial_write(it->additionalInfo);
-		Serial_write(TEXT_CLOSE);
+		byteWriter.write(wxString::Format("%u", cnt++));
+		byteWriter.write(TEXT_SEPARATOR);
+		byteWriter.write(wxString::Format("%u", it->id));
+		byteWriter.write(TEXT_SEPARATOR);
+		byteWriter.write(it->additionalInfo);
+		byteWriter.write(TEXT_CLOSE);
 	}
+	
+	byteWriter.write(MBYTE_CLOSE);
+	
+	pushAndReleaseBytes();
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::performVersionInfo() {
+///////////////////////////////////////////////////////////////////
+	byteWriter.write(RET_SOT);
+	byteWriter.write(FIRMWARE_VERSION);
+	byteWriter.write(MBYTE_CLOSE);
+	
+	pushAndReleaseBytes();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::performConfiguration() {
 ///////////////////////////////////////////////////////////////////
-	Serial_write(RET_SOT);
+	byteWriter.write(RET_SOT);
 
 	wxString config(wxString::Format("%d:%s\n", PID_COMMON, "Here are only the setter map values, because there's a simulator connection"));
 	for ( auto it=setterMap.begin(); it!=setterMap.end(); ++it ) {
@@ -399,14 +470,20 @@ void SerialSimulatorThread::performConfiguration() {
 		else										config.append(wxString::Format(" %d:%d\n",    it->first, it->second));
 	}
 	
-	Serial_write(config);
+	byteWriter.write(config);
+	
+	byteWriter.write(MBYTE_CLOSE);
+	pushAndReleaseBytes();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::performPinReport() {
 ///////////////////////////////////////////////////////////////////
 	// see DataControlModel for more details
-	Serial_write(RET_SOT);
-	Serial_write(wxString::Format("%i:0:0:0\n", MAX_PINS));
+	byteWriter.write(RET_SOT);
+	byteWriter.write(wxString::Format("%i:0:0:0\n", MAX_PINS));
+
+	byteWriter.write(MBYTE_CLOSE);
+	pushAndReleaseBytes();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::performMessage(unsigned char type, const char* msg) {
@@ -414,16 +491,18 @@ void SerialSimulatorThread::performMessage(unsigned char type, const char* msg) 
 	if ( msg == NULL)
 		return;
 		
-	Serial_write(RET_MSG);
+	byteWriter.write(RET_MSG);
 	
 	switch ( type ) {
-		case CMD_TEST_WARN_MESSAGE:		Serial_write('W'); break;
-		case CMD_TEST_ERROR_MESSAGE:	Serial_write('E'); break;
-		default:						Serial_write('I'); break;
+		case CMD_TEST_WARN_MESSAGE:		byteWriter.write('W'); break;
+		case CMD_TEST_ERROR_MESSAGE:	byteWriter.write('E'); break;
+		default:						byteWriter.write('I'); break;
 	}
 	
-	Serial_write(msg);
-	Serial_write(MSG_CLOSE);
+	byteWriter.write(msg);
+
+	byteWriter.write(MBYTE_CLOSE);
+	pushAndReleaseBytes();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::performHeartbeat() {
@@ -446,7 +525,7 @@ void SerialSimulatorThread::performHeartbeat() {
 unsigned char SerialSimulatorThread::performGetterValueIntern() {
 ///////////////////////////////////////////////////////////////////
 	if ( Serial_available() == 0 ) {
-		Serial_writeLongValue(PID_UNKNOWN, 0);
+		Serial_writeGetterValues(PID_UNKNOWN, 0);
 		addErrorInfo(E_INVALID_GETTER_ID);
 		return RET_ERROR;
 	}
@@ -458,16 +537,16 @@ unsigned char SerialSimulatorThread::performGetterValueIntern() {
 unsigned char SerialSimulatorThread::performGetterValueDefault(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	switch ( pid ) {
-		case PID_ERROR_COUNT:				Serial_writeLongValue(PID_ERROR_COUNT, (int32_t)(errorList.size())); break;
+		case PID_ERROR_COUNT:				Serial_writeGetterValues(PID_ERROR_COUNT, (int32_t)(errorList.size())); break;
 		
 		default:							SetterMap::iterator it;
 											it = setterMap.find((int)pid);
 											if ( it != setterMap.end() ) {
-												Serial_writeLongValue(pid, (*it).second); break;
+												Serial_writeGetterValues(pid, (*it).second); 
 												
 											} else {
 												
-												Serial_writeLongValue(PID_UNKNOWN, 0);
+												Serial_writeGetterValues(PID_UNKNOWN, 0);
 												addErrorInfo(E_INVALID_GETTER_ID, wxString::Format("%u", pid));
 												return RET_ERROR;
 											}
@@ -537,7 +616,6 @@ void SerialSimulatorThread::releaseCondition() {
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::processNextCommand() {
 ///////////////////////////////////////////////////////////////////
-	//std::cerr << "processNextCommand " << std::endl;
 	if ( writeDataQueue.read_available() == 0 )
 		return;
 	
@@ -548,13 +626,15 @@ void SerialSimulatorThread::processNextCommand() {
 	if ( Serial_available() == 0 )
 		return;
 		
-	unsigned char cmd = Serial_read();
-	unsigned char ret = RET_OK;
+	unsigned char cmd	= Serial_read();
+	unsigned char ret 	= RET_OK;
+	bool sendReturnCode = true;
 	
 	switch ( cmd ) {
 		
 		// --------------------------------------------------------------------------
 		// Signals
+		// - must return without an return code
 		// --------------------------------------------------------------------------
 		
 		// Interrupt
@@ -562,7 +642,8 @@ void SerialSimulatorThread::processNextCommand() {
 		case SIG_HALT:
 		case SIG_PAUSE:
 		case SIG_RESUME:				lastSignal = cmd;
-										return;
+										sendReturnCode = false;
+										break;
 		
 		// --------------------------------------------------------------------------
 		// Commands - which requires a return value
@@ -587,6 +668,9 @@ void SerialSimulatorThread::processNextCommand() {
 										//controller.setPosReplyState(false);
 										break;
 										
+		case CMD_GETTER:				ret = performGetterValueIntern();
+										break;
+		
 		case CMD_SETTER:				ret = performSetterValueIntern();
 										break;
 										
@@ -612,23 +696,23 @@ void SerialSimulatorThread::processNextCommand() {
 
 		// --------------------------------------------------------------------------
 		// Commands - multi byte return
-		// - must always return directly
+		// - must return without an return code
 		// --------------------------------------------------------------------------
-		case CMD_PRINT_VERSION: 		Serial_write(RET_SOT);
-										Serial_write(FIRMWARE_VERSION);
-										return;
+		case CMD_PRINT_VERSION: 		performVersionInfo();
+										sendReturnCode = false;
+										break;
 		
-		case CMD_GETTER:				performGetterValueIntern();
-										return;
-										
 		case CMD_PRINT_CONFIG:			performConfiguration();
-										return;
+										sendReturnCode = false;
+										break;
 		
 		case CMD_PRINT_PIN_REPORT:		performPinReport();
-										return;
+										sendReturnCode = false;
+										break;
 		
 		case CMD_PRINT_ERRORINFO:		performErrorInfo();
-										return;
+										sendReturnCode = false;
+										break;
 										
 		// --------------------------------------------------------------------------
 		// Error handling
@@ -638,5 +722,8 @@ void SerialSimulatorThread::processNextCommand() {
 										ret = RET_OK;
 	}
 	
-	Serial_write(ret);
+	if ( sendReturnCode == true )
+		Serial_write(ret);
+		
+	//releaseCondition();
 }

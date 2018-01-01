@@ -2,6 +2,7 @@
 #define SERIAL_DATA
 
 #include <iostream>
+#include <wx/string.h>
 #include "CncArduino.h"
 
 /////////////////////////////////////////////////////////////////////////
@@ -161,6 +162,11 @@ class SerialDataWriter {
 			return buffer;
 		}
 		
+		void trace(std::ostream& out) {
+			for ( unsigned int i=0; i<pos; i++) {
+				out << wxString::Format("%02X ", buffer[i].c);
+			}
+		}
 		
 		unsigned int available() const {
 			if ( pos < maxSerialDataWriterBufferSize )
@@ -184,6 +190,12 @@ class SerialDataWriter {
 				return false;
 				
 			unsigned int size = strlen(str);
+			if ( size == 0 )
+				return false;
+			
+			if ( str[size - 1 ] == '\0' )
+				size--;
+				
 			if ( available() < size )
 				return false;
 				

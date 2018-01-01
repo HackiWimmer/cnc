@@ -319,7 +319,7 @@ class CncControl {
 		// controller pin report
 		bool hasControllerPinControl();
 		void clearControllerPinControl();
-		void appendNumKeyValueToControllerErrorInfo(const char* desc, int pin, int type, int mode, int value);
+		void appendNumKeyValueToControllerPinInfo(const char* desc, int pin, int type, int mode, int value);
 		
 		void setUpdateToolControlsState(bool state) { toolUpdateState = state; }
 		

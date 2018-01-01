@@ -89,8 +89,7 @@ class SerialEmulatorSVG : public SerialEmulatorFile {
 		void initClass();
 		const char* getSVGUnitAsStr();
 		
-		virtual bool writeSetter(void *buffer, unsigned int nbByte);
-		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte);
+		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte);
 		
 		// stream output 
 		void streamSvgHeader(std::fstream& fs);

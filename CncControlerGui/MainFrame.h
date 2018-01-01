@@ -77,6 +77,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void keyDownLruList(wxKeyEvent& event);
 		virtual void dclickLogger(wxMouseEvent& event);
 		virtual void xxxxxxxxxxxxx(wxMouseEvent& event);
 		virtual void keyDownLogger(wxKeyEvent& event);

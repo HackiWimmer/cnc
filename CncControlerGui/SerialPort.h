@@ -23,8 +23,6 @@ struct SerialFetchInfo {
 	unsigned char multiByteResult[2048];
 
 	unsigned int singleFetchTimeout 	= 10000;
-	unsigned int retSOTSleep			= 10;
-	unsigned int retSOHSleep			= 10;
 	bool retSOTAllowed					= false;
 	bool returnAfterSOT					= true;
 	bool retSOHAllowed					= false;
@@ -40,10 +38,11 @@ struct SerialFetchInfo {
 	
 	struct G {
 		std::vector<int32_t>* list		= NULL;
-		unsigned char result[64];
-		unsigned char* p 				= NULL;
+		unsigned char result[sizeof(int32_t)];
+		unsigned int timeout 			= 1000;
 		int32_t value 					= 0;
 		int bytes 						= -1;
+		int count 						= -1;
 	} Gc;
 	
 	struct M {
@@ -161,13 +160,10 @@ class Serial {
 		unsigned char buf[LONG_BUF_SIZE];
 		unsigned char moveCommand[MAX_MOVE_CMD_SIZE];
 		
+		virtual void waitDuringRead(unsigned int millis); 
 		virtual void sleepMilliseconds(unsigned int millis);
 		
-		//Fetch remaing bytes for message results
-		inline void fetchMessage(unsigned char * text, int maxBytes);
-		//Fetch remaing bytes for multi byte results  
-		inline void fetchMultiByteResult(unsigned char * text, int maxBytes);
-		//determine OS error message	
+		//determine OS error message
 		inline void displayErrorInfo(LPTSTR lpszFunction);
 		// decodes the given controler msg
 		inline void decodeMessage(const unsigned char* message, std::ostream& mutliByteStream);
@@ -177,8 +173,10 @@ class Serial {
 		bool isMoveCommand(unsigned char cmd);
 		// fetches the controler hand shake after sendData
 		inline unsigned char fetchControllerResult(unsigned int maxDelay=1000);
-		// reads data from controller until nbBytes are ceived 0r maxDelay reached
-		inline int readDataUntilSizeAvailable(void *buffer, unsigned int nbByte, unsigned int maxDelay = 1000);
+		// reads data from controller until nbBytes are ceived or maxDelay was reached
+		inline int readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByte, unsigned int maxDelay = 1000, bool withErrorMsg = true);
+		// reads data from controller until a MBYTE_CLOSE wa received or maxDelay was reached
+		inline int readDataUntilMultyByteClose(unsigned char *buffer, unsigned int nbByte);
 		// main handler for controller results
 		inline bool evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
 		inline bool evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
@@ -283,8 +281,8 @@ class Serial {
 		bool sendResume() 		{ return sendSignal(SIG_RESUME); }
 		
 		// position movement counting
-		virtual void resetPostionCounter();
-		virtual size_t getPostionCounter();
+		virtual void resetPositionCounter();
+		virtual size_t getPositionCounter();
 
 		virtual void resetStepCounter();
 		size_t requestStepCounter(unsigned char pid);

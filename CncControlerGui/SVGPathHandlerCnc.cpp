@@ -146,7 +146,7 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 			zDepth = 0.0;
 		}
 	}
-
+	
 	if ( cnc::dblCompare(cc->setCurrentZDepth(zDepth), zDepth) == false ) {
 		if ( cc->getWorkpieceThickness() != 0 ) {
 			std::cerr << "SVGPathHandlerCnc::initNextPath: error while setting Z depth: ";

@@ -1,47 +1,148 @@
 #ifndef SERIAL_EMULATOR_CLASS
 #define SERIAL_EMULATOR_CLASS
 
+#include <ostream>
 #include "SerialSpyPort.h"
+#include "CncLimitStates.h"
 #include "CncArduino.h"
 #include "CncSpeedSimulator.h"
 
 struct LastCommand {
-	unsigned char cmd 		= '\0';
+	unsigned char cmd 		= CMD_INVALID;
 	unsigned int index 		= 0;
 		
 	void restLastCmd() {
-		cmd 				= '\0';
+		Serial.reset();
+		cmd 				= CMD_INVALID;
 		index 				= 0;
 	}
-	
-	void resetM() {
-		Mc.index 			= 0;
-		Mc.lastMoveX 		= 0;
-		Mc.lastMoveY 		= 0;
-		Mc.lastMoveZ 		= 0; 
-		Mc.respondCount 	= 1;
-		Mc.respondCounter 	= 0;
-	}
-	
-	struct M {
-		unsigned int index 			= 0;
-		unsigned int respondCount	= 1;
-		unsigned int respondCounter	= 0;
-		bool lastLimitState 		= false;
-		int32_t lastMoveX 			= 0;
-		int32_t lastMoveY 			= 0;
-		int32_t lastMoveZ 			= 0;
-	} Mc;
-	
-	void resetMSG() {
-		Msg.text.clear();
-	}
 
-	struct MSG {
-		unsigned char type 		= 'I';
-		wxString text			= "";
-	} Msg;
-	
+	struct SERIAL {
+		
+		private:
+			static const unsigned int maxSize = 2048;
+			unsigned char buffer[maxSize];
+			
+			unsigned char* p = NULL;
+			unsigned int pos = 0;
+		
+		public:
+			/////////////////////////////////////////////////////
+			SERIAL() {
+				p = buffer;
+			}
+			/////////////////////////////////////////////////////
+			unsigned int available() const {
+				return maxSize - pos;
+			}
+			/////////////////////////////////////////////////////
+			unsigned int size() const {
+				return maxSize;
+			}
+			/////////////////////////////////////////////////////
+			unsigned int length() const {
+				return pos;
+			}
+			/////////////////////////////////////////////////////
+			void reset() {
+				p = buffer;
+				pos = 0;
+			}
+			/////////////////////////////////////////////////////
+			void trace(std::ostream& out) const {
+				for ( unsigned int i = 0; i < length(); i++ )
+					out << wxString::Format("%02X ", buffer[i]);
+					
+				out << std::endl;
+			}
+			/////////////////////////////////////////////////////
+			unsigned char get(unsigned int i) {
+				if ( i > length() - 1 )
+					return 0;
+					
+				return buffer[i];
+			}
+			/////////////////////////////////////////////////////
+			bool getBytes(unsigned char* b, unsigned int i, unsigned int l) {
+				// (l - 1) with respect to the fact that 
+				// pos = i is also included
+				if ( i + (l - 1) > length() - 1 )
+					return false;
+					
+				if ( b == NULL )
+					return false;
+					
+				memcpy(b, &buffer[i], l);
+				return true;
+			}
+			/////////////////////////////////////////////////////
+			int write(const char b) {
+				return write((const unsigned char)b);
+			}
+			/////////////////////////////////////////////////////
+			int write(const unsigned char b) {
+				buffer[pos] = b;
+				p++;
+				pos++;
+				
+				return 1;
+			}
+			/////////////////////////////////////////////////////
+			int write(const char* t) {
+				if ( t == NULL )
+					return 0;
+					
+				unsigned int size = strlen(t);
+				
+				if ( available() < size )
+					return 0;
+					
+				if ( t[size - 1 ] == '\0' )
+					size--;
+					
+				if ( size == 0 )
+					return 0;
+				
+				memcpy(p, t, size);
+				p   += size;
+				pos += size;
+				
+				return size;
+			}
+			/////////////////////////////////////////////////////
+			int write(int32_t v) {
+				
+				if ( available() < sizeof(int32_t) )
+					return 0;
+					
+				memcpy(p, &v, sizeof(int32_t));
+				p   += sizeof(int32_t);
+				pos += sizeof(int32_t);
+				
+				return sizeof(int32_t);
+			} 
+			/////////////////////////////////////////////////////
+			int write(int32_t v1, int32_t v2) {
+
+				int ret = 0;
+				ret += write(v1);
+				ret += write(v2);
+				
+				return ret;
+			} 
+			/////////////////////////////////////////////////////
+			int write(int32_t v1, int32_t v2, int32_t v3) {
+				
+				int ret = 0;
+				ret += write(v1);
+				ret += write(v2);
+				ret += write(v3);
+				
+				return ret;
+			} 
+
+		
+	} Serial;
 };
 
 class SerialEmulatorNULL : public SerialSpyPort
@@ -54,46 +155,80 @@ class SerialEmulatorNULL : public SerialSpyPort
 		int32_t posReplyThresholdY;
 		int32_t posReplyThresholdZ;
 		
-		CncSpeedSimulator* speedSimulator;
+		CncLimitStates limitStates;
 		
-		size_t positionCounter;
-		size_t stepCounterX;
-		size_t stepCounterY;
-		size_t stepCounterZ;
+		CncSpeedSimulator* speedSimulator;
+
+		int32_t positionCounter;
+		int32_t stepCounterX;
+		int32_t stepCounterY;
+		int32_t stepCounterZ;
+
+		int32_t positionOverflowCounter;
+		int32_t stepOverflowCounterX;
+		int32_t stepOverflowCounterY;
+		int32_t stepOverflowCounterZ;
+
 		SetterMap setterMap;
 		CncLongPosition targetMajorPos;
 		CncLongPosition curEmulatorPos;
-		unsigned char lastSignal;
 		
-		inline bool writeMoveCmd(void *buffer, unsigned int nbByte);
-		inline bool renderMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte);
-		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force=false);
+		inline bool writeMoveCmd(unsigned char *buffer, unsigned int nbByte);
+		inline bool renderMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte);
+		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force=false);
 		
 		inline void reset();
 		inline void resetCounter();
 		inline bool stepAxis(char axis, int32_t dist);
+
+		inline void writerGetterValues(unsigned char pid, int32_t v);
+		inline void writerGetterValues(unsigned char pid, int32_t v1, int32_t v2);
+		inline void writerGetterValues(unsigned char pid, int32_t v1, int32_t v2, int32_t v3);
 		
 	protected:
 		LastCommand lastCommand;
+		unsigned char lastSignal;
 		
+		virtual void waitDuringRead(unsigned int millis); 
 		virtual void sleepMilliseconds(unsigned int millis);
 		
 		unsigned char getLastSignal() { return lastSignal; }
 		
 		const char* getConfiguration(wxString& ret);
+
+		virtual bool writeGetter(unsigned char *buffer, unsigned int nbByte);
+		virtual bool writeSetter(unsigned char *buffer, unsigned int nbByte);
+		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte);
+			
+		virtual int performSerialBytes(unsigned char *buffer, unsigned int nbByte);
 		
-		virtual bool writeSetter(void *buffer, unsigned int nbByte);
-		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, void *buffer, unsigned int nbByte);
+		virtual int performSOT(unsigned char *buffer, unsigned int nbByte, const char* response);
+		virtual int performMSG(unsigned char *buffer, unsigned int nbByte, const char* response);
+		virtual int performMajorMove(unsigned char *buffer, unsigned int nbByte);
 		
-		virtual int readDefault(void *buffer, unsigned int nbByte, const char* response);
-		virtual int readMessage(void *buffer, unsigned int nbByte, const char* response);
-		virtual int readMove(void *buffer, unsigned int nbByte);
-		
-		unsigned char getCurrentMoveCmdPID();
-		virtual void getCurrentMoveCmdValues(int32_t &x, int32_t &y, int32_t &z);
 		virtual bool evaluatePositions(std::vector<int32_t>& ret);
 		virtual bool evaluateLimitStates(std::vector<int32_t>& ret);
-	
+		virtual bool evaluateLimitStates();
+
+		// position movement counting
+		void incPosistionCounter();
+		void incStepCounterX(int32_t dx);
+		void incStepCounterY(int32_t dy);
+		void incStepCounterZ(int32_t dz);
+
+	void resetEmuPositionCounter();
+		int32_t getEmuPositionCounter() { return positionCounter; }
+		int32_t getEmuPositionOverflowCounter() { return positionOverflowCounter; }
+
+		void resetEmuStepCounter();
+		int32_t getEmuStepCounterX() { return stepCounterX; }
+		int32_t getEmuStepCounterY() { return stepCounterY; }
+		int32_t getEmuStepCounterZ() { return stepCounterZ; }
+
+		int32_t getEmuStepOverflowCounterX() { return stepOverflowCounterX; }
+		int32_t getEmuStepOverflowCounterY() { return stepOverflowCounterY; }
+		int32_t getEmuStepOverflowCounterZ() { return stepOverflowCounterZ; }
+
 	public:
 		
 		//Initialize Serial communication without an acitiv connection 
@@ -112,22 +247,10 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual bool connect(const char* portName) { connected = true; return true; }
 		// close the connection
 		virtual void disconnect(void) { connected = false; }
-		// process a getter call
-		virtual bool processGetter(unsigned char pid, std::vector<int32_t>& ret);
 		// simulate read
 		virtual int readData(void *buffer, unsigned int nbByte);
 		// simulate write
 		virtual bool writeData(void *buffer, unsigned int nbByte);
-		
-		// position movement counting
-		virtual void resetPostionCounter();
-		virtual size_t getPostionCounter();
-
-		virtual void resetStepCounter();
-		virtual size_t getStepCounter();
-		virtual size_t getStepCounterX();
-		virtual size_t getStepCounterY();
-		virtual size_t getStepCounterZ();
 };
 
 #endif

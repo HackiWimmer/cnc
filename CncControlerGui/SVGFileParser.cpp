@@ -257,9 +257,10 @@ bool SVGFileParser::spool() {
 	
 	pathHandler->prepareWork();
 
-	// over all stored pathes
+	// over all stored pathes#
+	SVGUserAgentInfo uai;
 	for ( UserAgentVector::iterator itUav = uav.begin(); itUav != uav.end(); ++itUav ) {
-		SVGUserAgentInfo uai  = *itUav;
+		uai = *itUav;
 		
 		if ( uai.nodeName == SvgNodeTemplates::CncBreakBlockNodeName ) {
 			std::cout << " CncBreak at line " << uai.lineNumber << " detected. Processing will stop here." << std::endl;
@@ -276,14 +277,16 @@ bool SVGFileParser::spool() {
 		currentNodeName.assign(uai.nodeName);
 		setCurrentLineNumber(uai.lineNumber);
 		registerNextDebugNode(uai.nodeName);
-
-		DcmItemList dil;
-		uai.getBaseDetails(dil);
-		appendDebugValueBase(dil);
 		
-		dil.clear();
-		uai.getPathDetails(dil);
-		appendDebugValuePath(dil);
+		if ( runInfo.getCurrentDebugState() == true ) {
+			DcmItemList dil;
+			uai.getBaseDetails(dil);
+			appendDebugValueBase(dil);
+			
+			dil.clear();
+			uai.getPathDetails(dil);
+			appendDebugValuePath(dil);
+		}
 		
 		if ( performPath(uai) == false ) {
 			
@@ -334,7 +337,7 @@ bool SVGFileParser::performPath(SVGUserAgentInfo& uai) {
 		if ( spoolPath(uai) == false )
 			return false;
 	}
-
+	
 	// spool this path by id (use directive)
 	if ( performPathByIds(uai) == false ) {
 		std::cerr << "SVGFileParser::performPathByIds: Failed" << std::endl;
@@ -410,29 +413,27 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 //////////////////////////////////////////////////////////////////
 	if ( uai.shouldProceed() == false )
 		return true;
-	
+		
 	SvgOriginalPathInfo sopi;
-	sopi.pathData 			= uai.originalPath;
-	sopi.transformInfo 		= uai.getTransformInfoAsString();
-	sopi.useTransformInfo	= transform;
+	sopi.pathData.assign(uai.originalPath);
+	sopi.transformInfo.assign(uai.getTransformInfoAsString());
+	sopi.useTransformInfo.assign(transform);
 	
 	if ( pathHandler->initNextPath(sopi) == false )
 		return false;
 		
-	PathInfoVector piv = uai.pathInfoList;
-	for ( PathInfoVector::iterator itPiv = piv.begin(); itPiv != piv.end(); ++itPiv ) {
-		PathInfo pi = *itPiv;
-
-		if ( pathHandler->process(pi.cmd, pi.count, pi.values) == false ) {
+	//PathInfoVector piv = uai.pathInfoList;
+	for ( PathInfoVector::iterator itPiv = uai.pathInfoList.begin(); itPiv != uai.pathInfoList.end(); ++itPiv ) {
+		if ( pathHandler->process(itPiv->cmd, itPiv->count, itPiv->values) == false ) {
 			std::cerr << "SVGFileParser::spoolPath failed" << std::endl;
-			uai.debug(pi, std::cerr);
+			uai.debug(*itPiv, std::cerr);
 			return false;
 		}
 		
 		if ( evaluateProcessingState() == false )
 			return false;
 	}
-		
+	
 	if ( pathHandler->finishCurrentPath() == false )
 		return false;
 		
@@ -440,8 +441,6 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	if ( pathHandler->runCurrentPath() == false )
 		return false;
 		
-	//evaluateDebugState();
-
 	if ( evaluateProcessingState() == false )
 		return false;
 		

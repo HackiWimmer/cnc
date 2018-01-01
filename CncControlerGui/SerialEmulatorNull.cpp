@@ -2,7 +2,7 @@
 #include <sys/time.h>
 #include "CncControl.h"
 #include "MainFrame.h"
-#include "SerialEmulatorNULL.h"
+#include "SerialEmulatorNull.h"
 
 int pointA[3], pointB[3];
 
@@ -12,16 +12,21 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
+, limitStates()
 , speedSimulator(NULL)
-, positionCounter(0)
-, stepCounterX(0)
-, stepCounterY(0)
-, stepCounterZ(0)
+, positionCounter(MIN_LONG)
+, stepCounterX(MIN_LONG)
+, stepCounterY(MIN_LONG)
+, stepCounterZ(MIN_LONG)
+, positionOverflowCounter(0)
+, stepOverflowCounterX(0)
+, stepOverflowCounterY(0)
+, stepOverflowCounterZ(0)
 , setterMap()
 , targetMajorPos(0L, 0L, 0L)
 , curEmulatorPos(0L, 0L, 0L)
-, lastSignal(CMD_INVALID)
 , lastCommand()
+, lastSignal(CMD_INVALID)
 ///////////////////////////////////////////////////////////////////
 {
 	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
@@ -36,6 +41,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , posReplyThresholdX(1)
 , posReplyThresholdY(1)
 , posReplyThresholdZ(1)
+, limitStates()
 , speedSimulator(NULL)
 , positionCounter(0)
 , stepCounterX(0)
@@ -44,8 +50,8 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , setterMap()
 , targetMajorPos(0L, 0L, 0L)
 , curEmulatorPos(0L, 0L, 0L)
-, lastSignal(CMD_INVALID)
 , lastCommand()
+, lastSignal(CMD_INVALID)
 ///////////////////////////////////////////////////////////////////
 {
 	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
@@ -63,18 +69,21 @@ SerialEmulatorNULL::~SerialEmulatorNULL() {
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::waitDuringRead(unsigned int millis) {
+///////////////////////////////////////////////////////////////////
+	// do nothing because the emulator runs in the same thread as
+	// the application around
+}
+///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::sleepMilliseconds(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
 	// do nothing because the emulator runs in the same thread as
 	// the application arround
-	//Sleep(millis);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::reset() {
 ///////////////////////////////////////////////////////////////////
 	lastCommand.restLastCmd();
-	lastCommand.resetM();
-	
 	lastSignal = CMD_INVALID;
 	
 	posReplyThresholdX = 1;
@@ -93,90 +102,49 @@ void SerialEmulatorNULL::resetCounter() {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::evaluatePositions(std::vector<int32_t>& ret) {
 ///////////////////////////////////////////////////////////////////
-	ret.push_back(cncControl->getCurPos().getX() + lastCommand.Mc.lastMoveX);
-	ret.push_back(cncControl->getCurPos().getY() + lastCommand.Mc.lastMoveY);
-	ret.push_back(cncControl->getCurPos().getZ() + lastCommand.Mc.lastMoveZ);
+	ret.push_back(targetMajorPos.getX());
+	ret.push_back(targetMajorPos.getY());
+	ret.push_back(targetMajorPos.getZ());
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::evaluateLimitStates(std::vector<int32_t>& ret) {
+bool SerialEmulatorNULL::evaluateLimitStates(std::vector<int32_t>& list) {
 ///////////////////////////////////////////////////////////////////
-	int limitStateX = LIMIT_UNSET;
-	int limitStateY = LIMIT_UNSET;
-	int limitStateZ = LIMIT_UNSET;
+	bool ret = evaluateLimitStates();
+	
+	list.push_back(limitStates.getXLimit());
+	list.push_back(limitStates.getYLimit());
+	list.push_back(limitStates.getZLimit());
+
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::evaluateLimitStates() {
+///////////////////////////////////////////////////////////////////
+	limitStates.reset();
 	
 	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	
-	if ( (cncControl->getCurPos().getX() + lastCommand.Mc.lastMoveX)/cncConfig->getCalculationFactX() <= -cncConfig->getMaxDimensionX() )
-		limitStateX = LIMIT_MIN;
+	if ( (targetMajorPos.getX())/cncConfig->getCalculationFactX() <= -cncConfig->getMaxDimensionX() )
+		limitStates.setXLimit(LIMIT_MIN);
 		
-	if ( (cncControl->getCurPos().getX() + lastCommand.Mc.lastMoveX)/cncConfig->getCalculationFactX() >= +cncConfig->getMaxDimensionX() )
-		limitStateX = LIMIT_MAX;
+	if ( (targetMajorPos.getX())/cncConfig->getCalculationFactX() >= +cncConfig->getMaxDimensionX() )
+		limitStates.setXLimit(LIMIT_MAX);
 	
-	if ( (cncControl->getCurPos().getY() + lastCommand.Mc.lastMoveY)/cncConfig->getCalculationFactY() <= -cncConfig->getMaxDimensionY() )
-		limitStateY = LIMIT_MIN;
+	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactY() <= -cncConfig->getMaxDimensionY() )
+		limitStates.setYLimit(LIMIT_MIN);
 		
-	if ( (cncControl->getCurPos().getY() + lastCommand.Mc.lastMoveY)/cncConfig->getCalculationFactY() >= +cncConfig->getMaxDimensionY() )
-		limitStateY = LIMIT_MAX;
+	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactY() >= +cncConfig->getMaxDimensionY() )
+		limitStates.setYLimit(LIMIT_MAX);
 		
-	if ( (cncControl->getCurPos().getZ() + lastCommand.Mc.lastMoveZ)/cncConfig->getCalculationFactZ() <= -cncConfig->getMaxDimensionZ() )
-		limitStateZ = LIMIT_MIN;
+	if ( (targetMajorPos.getZ())/cncConfig->getCalculationFactZ() <= -cncConfig->getMaxDimensionZ() )
+		limitStates.setZLimit(LIMIT_MIN);
 		
-	if ( (cncControl->getCurPos().getZ() + lastCommand.Mc.lastMoveZ)/cncConfig->getCalculationFactZ() >= +cncConfig->getMaxDimensionZ() )
-		limitStateZ = LIMIT_MAX;
+	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactZ() >= +cncConfig->getMaxDimensionZ() )
+		limitStates.setZLimit(LIMIT_MAX);
 		
-	ret.push_back(limitStateX);
-	ret.push_back(limitStateY);
-	ret.push_back(limitStateZ);
-	
 	return true;
-}
-///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::processGetter(unsigned char pid, std::vector<int32_t>& ret) {
-///////////////////////////////////////////////////////////////////
-	switch ( pid ) {
-		case PID_XYZ_POS:				return evaluatePositions(ret);
-		case PID_LIMIT:					return evaluateLimitStates(ret);
-		case PID_ERROR_COUNT:			ret.push_back(0); return true;
-		case PID_QUERY_READY_TO_RUN:	ret.push_back(1); return true;
-		default:				
-										SetterMap::iterator it;
-										it = setterMap.find((int)pid);
-										
-										if ( it != setterMap.end() ) {
-											ret.push_back((*it).second);
-										} else {
-											std::cerr << "SerialEmulatorNULL::processGetter: Invalid getter pid: " << pid << std::endl;
-										}
-	}
-	
-	return false;
-}
-///////////////////////////////////////////////////////////////////
-unsigned char SerialEmulatorNULL::getCurrentMoveCmdPID() {
-///////////////////////////////////////////////////////////////////
-	if ( lastCommand.Mc.respondCounter > 0 )
-		return PID_LIMIT;
-	
-	return PID_XYZ_POS_MAJOR;
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::getCurrentMoveCmdValues(int32_t &x, int32_t &y, int32_t &z) {
-///////////////////////////////////////////////////////////////////
-	if ( lastCommand.Mc.respondCounter > 0 ) {
-		CncLimitStates ls;
-		ls.setXYZLimit(cncControl->getControllerLimitState());
-		
-		x = ls.getXLimit();
-		y = ls.getYLimit();
-		z = ls.getZLimit();
-		return;
-	}
-	
-	x = cncControl->getCurPos().getX() + lastCommand.Mc.lastMoveX;
-	y = cncControl->getCurPos().getY() + lastCommand.Mc.lastMoveY;
-	z = cncControl->getCurPos().getZ() + lastCommand.Mc.lastMoveZ;
 }
 ///////////////////////////////////////////////////////////////////
 const char* SerialEmulatorNULL::getConfiguration(wxString& ret) {
@@ -198,199 +166,215 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	int ret = 0;
 	
-	wxString firmWare(wxString::Format("%s", FIRMWARE_VERSION));
-	wxString retStr;
+	static wxString firmWare(wxString::Format("%s", FIRMWARE_VERSION));
+	static wxString retStr;
 	
-	switch( lastCommand.cmd ) { 
-		case CMD_MOVE:
-		case CMD_RENDER_AND_MOVE:		ret = readMove(buffer, nbByte);
-										break;
+	// if the lastCommand.index is 0 then no read-spooling information available
+	// or in other words lastCommand.Serial is EMPTY
+	if ( lastCommand.index == 0 )  {
+		switch( lastCommand.cmd ) { 
+			
+			case CMD_INVALID:				// do nothing if no command is registered
+											ret = 0;
+											break;
+											
+			case CMD_GETTER:				ret = performSerialBytes((unsigned char*)(buffer), nbByte);
+											break;
+			
+			case CMD_MOVE:
+			case CMD_RENDER_AND_MOVE:		ret = performMajorMove((unsigned char*)(buffer), nbByte);
+											break;
+			
+			case CMD_PRINT_VERSION: 		ret = performSOT((unsigned char*)(buffer), nbByte, firmWare);
+											break;
+			
+			case CMD_PRINT_ERRORINFO: 		ret = performSOT((unsigned char*)(buffer), nbByte, "1:0:Not available, because there's no controller connection\n");
+											break;
+			
+			case CMD_PRINT_CONFIG: 			ret = performSOT((unsigned char*)(buffer), nbByte, getConfiguration(retStr));
+											break;
+			
+			case CMD_PRINT_PIN_REPORT: 		ret = performSOT((unsigned char*)(buffer), nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel::addPinReportRow(...) for more details
+											break;
+			
+			case CMD_TEST_INFO_MESSAGE:		ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'I', "This is a test message from type: INFO"));
+											break;
+			
+			case CMD_TEST_WARN_MESSAGE:		ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'W', "This is a test message from type: WARNING"));
+											break;
+			
+			case CMD_TEST_ERROR_MESSAGE:	ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'E', "This is a test message from type: ERROR"));
+											break;
+			
+			default:						// for all unsupported commands provide
+											// a positive feedback
+											((unsigned char*)buffer)[0] = RET_OK;
+											ret = 1;
+											lastCommand.restLastCmd();
+		}
 		
-		case CMD_PRINT_VERSION: 		ret = readDefault(buffer, nbByte, firmWare);
-										break;
+	} else {
 		
-		case CMD_PRINT_ERRORINFO: 		ret = readDefault(buffer, nbByte, "1:0:Not available, because there's no controller connection\n");
-										break;
+		ret = 0;
 		
-		case CMD_PRINT_CONFIG: 			ret = readDefault(buffer, nbByte, getConfiguration(retStr));
-										break;
-		
-		case CMD_PRINT_PIN_REPORT: 		ret = readDefault(buffer, nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel for more details
-										break;
-									
-		case CMD_TEST_INFO_MESSAGE:		ret = readMessage(buffer, nbByte, "INFO");
-										break;
-										
-		case CMD_TEST_WARN_MESSAGE:		ret = readMessage(buffer, nbByte, "WARNING");
-										break;
-										
-		case CMD_TEST_ERROR_MESSAGE:	ret = readMessage(buffer, nbByte, "ERROR");
-										break;
-		
-		default:						((unsigned char*)buffer)[0] = RET_OK;
-										ret = 1;
-										lastCommand.restLastCmd();
+		// only if an command is registed
+		if ( lastCommand.cmd != CMD_INVALID ) {
+			// now something should be availibale at the serial
+			ret = performSerialBytes((unsigned char*)(buffer), nbByte);
+		}
 	}
 	
 	spyReadData(ret, buffer, nbByte);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::readMessage(void *buffer, unsigned int nbByte, const char* response) {
+int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	// only if something is requested
+	// assumtion: buffer allocates nbByte bytes  
+	if ( nbByte > 0 ) {
+		// debug only
+		bool debug = false;
+		if ( debug ) {
+			cout << "performSerialBytes: " << "index: " << lastCommand.index << ", nbByte: " << nbByte << ", length: " << lastCommand.Serial.length() << ", bytes: ";
+			lastCommand.Serial.trace(std::clog);
+		}
+		
+		// indicate end of serial as false
+		bool last = false;
+		
+		// initialize bytes to copy
+		unsigned int bytesToCopy = nbByte;
+		
+		// check boundings
+		if ( lastCommand.index + bytesToCopy > lastCommand.Serial.length() ) {
+			// in this case not enougth bytes availiable and bytesToCopy 
+			// have to be truncated
+			
+			// prevent an overflow of bytesToCopy which is unsigned
+			if ( lastCommand.Serial.length() - lastCommand.index < 0 ) {
+				cerr << "SerialEmulatorNULL::performSerialBytes Determine bytesToCopy failed!"
+				<< "  Current index:  " << lastCommand.index
+				<< ", Bytes to copy: " << bytesToCopy
+				<< ", Total length: " << lastCommand.Serial.length()
+				<< std::endl;
+				
+				cerr << "Current command will be aborted!"
+				<< std::endl;
+				
+				lastCommand.restLastCmd();
+				return -1;
+			}
+			
+			// indicates the end of the serial
+			last = true;
+			
+			// ... now this substruction is safe
+			bytesToCopy = lastCommand.Serial.length() - lastCommand.index;
+		}
+		
+		// if the boundings are ok this definitive the signal to resetLastCmd()
+		if ( lastCommand.index + bytesToCopy == lastCommand.Serial.length() )
+			last = true;
+		
+		if ( debug ) {
+			clog << "bytesToCopy: "<< bytesToCopy << endl;
+		}
+		
+		if ( bytesToCopy > 0 ) {
+			// read bytes to copy from serial
+			if ( lastCommand.Serial.getBytes(buffer, lastCommand.index, bytesToCopy) == false ) {
+				cerr << "SerialEmulatorNULL::performSerialBytes getBytes(...) failed!"
+				<< "  Current index:  " << lastCommand.index
+				<< ", Bytes to copy: " << bytesToCopy
+				<< ", Total length: " << lastCommand.Serial.length()
+				<< std::endl;
+			
+				cerr << "Current command will be aborted!"
+				<< std::endl;
+			
+				lastCommand.restLastCmd();
+				return -1;
+			}
+
+			// index handling
+			lastCommand.index += bytesToCopy;
+		}
+		
+		if ( debug ) {
+			clog << "last: "<< last << endl;
+		}
+
+		// close/finalize the last command
+		if ( last == true )
+			lastCommand.restLastCmd();
+		
+		return bytesToCopy;
+	}
+	
+	return 0;
+}
+///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::performMSG(unsigned char *buffer, unsigned int nbByte, const char* response) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( lastCommand.index == 0 );
+		
 	if ( response == NULL )
 		return -1;
 		
 	if ( buffer == NULL )
 		return -1;
+		
+	lastCommand.Serial.write(RET_MSG);
+	lastCommand.Serial.write(response);
+	lastCommand.Serial.write(MBYTE_CLOSE);
+	lastCommand.Serial.write(RET_OK);
 	
-	// prepare the test message and start responding (publish RET_MSG)
-	if ( lastCommand.index == 0 ) {
-		((unsigned char*)buffer)[0] = RET_MSG;
+	// support the first byte
+	return performSerialBytes(buffer, nbByte);
+}
+///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::performSOT(unsigned char *buffer, unsigned int nbByte, const char* response) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( lastCommand.index == 0 );
 		
-		lastCommand.Msg.text.assign("This is a test message from type: ");
-		char type = response[0];
-		
-		switch ( type ) {
-			case 'W':	lastCommand.Msg.text.append(response);
-						break;
-						
-			case 'E':	lastCommand.Msg.text.append(response);
-						break;
-						
-			default:	type = 'I';
-						lastCommand.Msg.text.append(response);
-		}
-		
-		lastCommand.Msg.type = type;
-		lastCommand.index++;
-		return 1;
-	}
-	
-	// provide message type
-	if ( lastCommand.index == 1 ) {
-		((unsigned char*)buffer)[0] = lastCommand.Msg.type;
-		
-		lastCommand.index++;
-		return 1;
-	}
-	
-	// from here on spool the string
-	// consider: regarding the message type above the index is two to high.
-	int textPos = lastCommand.index - 2;
-	if ( textPos < 0 ) {
-		// this is an error
-		lastCommand.restLastCmd();
+	if ( response == NULL )
 		return -1;
-	}
 		
-	if ( (unsigned int)textPos < lastCommand.Msg.text.length() ) {
-		((unsigned char*)buffer)[0] = (unsigned char)lastCommand.Msg.text[textPos];
+	if ( buffer == NULL )
+		return -1;
 		
-		lastCommand.index++;
-		return 1;
-	}
+	lastCommand.Serial.write(RET_SOT);
+	lastCommand.Serial.write(response);
+	lastCommand.Serial.write(MBYTE_CLOSE);
 	
-	// close spooling
-	if ( (unsigned int)textPos == lastCommand.Msg.text.length() ) {
-		((unsigned char*)buffer)[0] = MSG_CLOSE;
-		
-		lastCommand.index++;
-		return 1;
-	}
-	
-	// finalize the command
-	if ( (unsigned int)textPos > lastCommand.Msg.text.length() ) {
-		((unsigned char*)buffer)[0] = RET_OK;
-		
-		lastCommand.restLastCmd();
-		return 1;
-	}
-	
-	// this is an error
-	return -1;
+	// support the first byte
+	return performSerialBytes(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::readDefault(void *buffer, unsigned int nbByte, const char* response) {
+int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	int ret = 0;
+	wxASSERT( lastCommand.index == 0 );
 	
-	if ( response != NULL ) {
-		switch ( lastCommand.index ) {
-			
-			case 0: 	lastCommand.index++;
-						ret = 1;
-						((unsigned char*)buffer)[0] = RET_SOT;
-						break;
-						
-			default:	ret = strlen(response);
-						memcpy(buffer, response, ret);
-						lastCommand.restLastCmd();
-		}
+	if ( buffer == NULL )
+		return -1;
+	
+	// first write the major position
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_XYZ_POS_MAJOR);
+	lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ());
+	lastCommand.Serial.write(RET_OK);
+	
+	// secondary provide the limit information
+	if ( limitStates.hasLimit() ) {
+		lastCommand.Serial.write(RET_SOH);
+		lastCommand.Serial.write(PID_LIMIT);
+		lastCommand.Serial.write(limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
+		lastCommand.Serial.write(RET_OK);
 	}
 	
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::readMove(void *buffer, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	int ret = 0;
-	
-	//RET_SOH, PID_XYZ_POS_..., X->getPosition(), Y->getPosition(), Z->getPosition()
-	int32_t x=0, y=0, z=0;
-	unsigned char tmpBuf[14];
-	unsigned char* p = NULL;
-	
-	switch ( lastCommand.Mc.index ) {
-		case 0:		lastCommand.Mc.index++;
-					tmpBuf[0] = RET_SOH;
-					
-					ret = 1;
-					break;
-					
-		case 1:		lastCommand.Mc.index++;
-					tmpBuf[0] = getCurrentMoveCmdPID();
-					
-					ret = 1;
-					break;
-					
-		case 2:		lastCommand.Mc.index++;
-					getCurrentMoveCmdValues(x, y, z);
-					
-					p = tmpBuf;
-					memcpy(p, &x, LONG_BUF_SIZE);
-					
-					p += LONG_BUF_SIZE;
-					memcpy(p, &y, LONG_BUF_SIZE);
-					
-					p += LONG_BUF_SIZE;
-					memcpy(p, &z, LONG_BUF_SIZE);
-					
-					// debug only
-					if ( false ) {
-						clog << wxString::Format("%6d, %6d, %6d - ", x, y, z);
-						for (int i=0; i< 12; i++ )
-							clog << wxString::Format("%2X ", tmpBuf[i]);
-						clog << endl;
-					}
-					
-					ret = LONG_BUF_SIZE * 3;
-					break;
-
-		default:	lastCommand.Mc.respondCounter++;
-
-					if ( lastCommand.Mc.respondCounter == lastCommand.Mc.respondCount ) {
-						tmpBuf[0] = RET_OK;
-						ret = 1;
-						lastCommand.resetM();
-					} else {
-						lastCommand.Mc.index = 0;
-					}
-	}
-
-	memcpy(buffer, &tmpBuf, ret);
-	
-	return ret;
+	// support the first byte
+	return performSerialBytes(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
@@ -412,14 +396,18 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 									return true;
 		
 		case CMD_RESET_CONTROLLER:	reset();
+									lastCommand.cmd = cmd;
 									return true;
 		
+		case CMD_GETTER:			lastCommand.cmd = cmd;
+									return writeGetter(buffer, nbByte);
+		
 		case CMD_SETTER:			lastCommand.cmd = cmd; 
-									return writeSetter(b, nbByte);
+									return writeSetter(buffer, nbByte);
 		
 		case CMD_MOVE:				std::cerr << "SerialEmulatorNULL::writeData: The use of 'CMD_MOVE' is generally obsolete. Use 'CMD_RENDER_AND_MOVE' instead." << std::endl;
 		case CMD_RENDER_AND_MOVE:	lastCommand.cmd = cmd;
-									return writeMoveCmd(b, nbByte);
+									return writeMoveCmd(buffer, nbByte);
 		
 		default:					lastCommand.cmd = cmd;
 	}
@@ -427,10 +415,77 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
+void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v) {
 ///////////////////////////////////////////////////////////////////
-	unsigned char* buffer = ((unsigned char*)b);
+    lastCommand.Serial.write(RET_SOH);
+    lastCommand.Serial.write(pid);
+	lastCommand.Serial.write((unsigned char)1);
+    lastCommand.Serial.write(v);
+    lastCommand.Serial.write(RET_OK);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v1, int32_t v2) {
+///////////////////////////////////////////////////////////////////
+    lastCommand.Serial.write(RET_SOH);
+    lastCommand.Serial.write(pid);
+	lastCommand.Serial.write((unsigned char)2);
+    lastCommand.Serial.write(v1, v2);
+    lastCommand.Serial.write(RET_OK);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v1, int32_t v2, int32_t v3) {
+///////////////////////////////////////////////////////////////////
+    lastCommand.Serial.write(RET_SOH);
+    lastCommand.Serial.write(pid);
+	lastCommand.Serial.write((unsigned char)3);
+    lastCommand.Serial.write(v1, v2, v3);
+    lastCommand.Serial.write(RET_OK);
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(nbByte > 1 );
+	unsigned char pid = buffer[1];
 	
+	switch ( pid ) {
+		
+		case PID_ERROR_COUNT:			    writerGetterValues(pid, (int32_t)0); break;
+		case PID_QUERY_READY_TO_RUN:	    writerGetterValues(pid, (int32_t)1); break;
+		
+		case PID_X_POS:   					writerGetterValues(pid, curEmulatorPos.getX()); break;
+		case PID_Y_POS:   					writerGetterValues(pid, curEmulatorPos.getY()); break;
+		case PID_Z_POS:  					writerGetterValues(pid, curEmulatorPos.getZ()); break;
+		case PID_XY_POS:  					writerGetterValues(pid, curEmulatorPos.getX(), curEmulatorPos.getY()); break;
+		case PID_XYZ_POS: 					writerGetterValues(pid, curEmulatorPos.getX(), curEmulatorPos.getY(), curEmulatorPos.getZ()); break;
+		
+		case PID_LIMIT:						evaluateLimitStates();
+											writerGetterValues(pid, limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
+											break;
+		
+		case PID_GET_POS_COUNTER:			writerGetterValues(pid, getEmuPositionCounter(), getEmuPositionOverflowCounter()); break;
+		
+		case PID_GET_STEP_COUNTER_X:		writerGetterValues(pid, getEmuStepCounterX(), getEmuStepOverflowCounterX()); break;
+		case PID_GET_STEP_COUNTER_Y:		writerGetterValues(pid, getEmuStepCounterY(), getEmuStepOverflowCounterY()); break;
+		case PID_GET_STEP_COUNTER_Z:		writerGetterValues(pid, getEmuStepCounterZ(), getEmuStepOverflowCounterZ()); break;
+		
+		default:							SetterMap::iterator it;
+											it = setterMap.find((int)pid);
+											if ( it != setterMap.end() ) {
+												
+												writerGetterValues(pid, (*it).second);
+												
+											} else {
+												
+												writerGetterValues(PID_UNKNOWN, 0);
+												return false;
+											}
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
 	if ( nbByte == LONG_BUF_SIZE + 2 ) {
 		unsigned char id = buffer[1];
 		unsigned char valBuf[4];
@@ -482,19 +537,11 @@ bool SerialEmulatorNULL::writeSetter(void *b, unsigned int nbByte) {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
+bool SerialEmulatorNULL::writeMoveCmd(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	unsigned char* buffer = ((unsigned char*)b);
 	int32_t x = 0L, y = 0L, z = 0L;
 	
-	if      ( lastCommand.cmd == CMD_NEG_STEP_X ) 	x = -1;
-	else if ( lastCommand.cmd == CMD_POS_STEP_X ) 	x = +1;
-	else if ( lastCommand.cmd == CMD_NEG_STEP_Y ) 	y = -1;
-	else if ( lastCommand.cmd == CMD_POS_STEP_Y ) 	y = +1;
-	else if ( lastCommand.cmd == CMD_NEG_STEP_Z ) 	z = -1;
-	else if ( lastCommand.cmd == CMD_POS_STEP_Z ) 	z = +1;
-	else if ( lastCommand.cmd == CMD_RENDER_AND_MOVE  || 
-	          lastCommand.cmd == CMD_MOVE) {
+	if ( lastCommand.cmd == CMD_RENDER_AND_MOVE || lastCommand.cmd == CMD_MOVE) {
 		
 		// update the current emulator position
 		curEmulatorPos.set(cncControl->getCurPos());
@@ -513,27 +560,19 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 						buf[1] = buffer[idx++];
 						buf[0] = buffer[idx++];
 						memcpy(&z, buf, LONG_BUF_SIZE);
-						lastCommand.Mc.lastMoveX = x;
-						lastCommand.Mc.lastMoveY = y;
-						lastCommand.Mc.lastMoveZ = z;
-						
 						break;
 						
-			case 9:		lastCommand.Mc.lastMoveZ = z;
-						buf[3] = buffer[idx++];
+			case 9:		buf[3] = buffer[idx++];
 						buf[2] = buffer[idx++];
 						buf[1] = buffer[idx++];
 						buf[0] = buffer[idx++];
 						memcpy(&x, buf, LONG_BUF_SIZE);
-						lastCommand.Mc.lastMoveX = x;
 						
 						buf[3] = buffer[idx++];
 						buf[2] = buffer[idx++];
 						buf[1] = buffer[idx++];
 						buf[0] = buffer[idx++];
 						memcpy(&y, buf, LONG_BUF_SIZE);
-						lastCommand.Mc.lastMoveY = y;
-						
 						break;
 						
 			case 13:	buf[3] = buffer[idx++];
@@ -541,21 +580,18 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 						buf[1] = buffer[idx++];
 						buf[0] = buffer[idx++];
 						memcpy(&x, buf, LONG_BUF_SIZE);
-						lastCommand.Mc.lastMoveX = x;
 						
 						buf[3] = buffer[idx++];
 						buf[2] = buffer[idx++];
 						buf[1] = buffer[idx++];
 						buf[0] = buffer[idx++];
 						memcpy(&y, buf, LONG_BUF_SIZE);
-						lastCommand.Mc.lastMoveY = y;
 						
 						buf[3] = buffer[idx++];
 						buf[2] = buffer[idx++];
 						buf[1] = buffer[idx++];
 						buf[0] = buffer[idx++];
 						memcpy(&z, buf, LONG_BUF_SIZE);
-						lastCommand.Mc.lastMoveZ = z;
 						break;
 			default:
 						std::cerr << "SerialEmulatorNULL::handleMoveCmd error." << std::endl;
@@ -566,7 +602,7 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 	
 	// determine the target major position, this is the current pos + the given move
 	targetMajorPos.set(cncControl->getCurPos());
-	targetMajorPos.inc(lastCommand.Mc.lastMoveX, lastCommand.Mc.lastMoveY, lastCommand.Mc.lastMoveZ);
+	targetMajorPos.inc(x, y, z);
 	
 	// the emulator function readData and writeData runs in the same thread.
 	// so, it isn't possible to repeat a move command with serval position callbacks
@@ -575,23 +611,14 @@ bool SerialEmulatorNULL::writeMoveCmd(void *b, unsigned int nbByte) {
 	// however, for a preview this is good enougth!
 	//
 	// the following linear rendering is only to support a more detailed writeMoveCmd(...)
-	bool ret = renderMove(x, y, z, b, nbByte);
+	bool ret = renderMove(x, y, z, buffer, nbByte);
 	
-	// check for end state switches
-	CncLimitStates ls;
-	ls.setXYZLimit(cncControl->getControllerLimitState());
-	
-	if ( lastCommand.Mc.lastLimitState != ls.hasLimit() ) {
-		lastCommand.Mc.lastLimitState = ls.hasLimit();
-		lastCommand.Mc.respondCount = 2;
-	}
-
 	// reset last signal
 	lastSignal = CMD_INVALID;
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte) {
+bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	// update speed simulator values
 	if ( GBL_CONFIG->isProbeMode() == false ) {
@@ -698,14 +725,15 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, void *
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void *buffer, unsigned int nbByte, bool force) {
+bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force) {
 ///////////////////////////////////////////////////////////////////
 	// statistic counting
-	positionCounter++;
-	stepCounterX += absolute(dx);
-	stepCounterY += absolute(dy);
-	stepCounterZ += absolute(dz);
-	
+	incPosistionCounter();
+
+    incStepCounterX(dx);
+    incStepCounterY(dy);
+    incStepCounterZ(dz);
+
 	// position management
 	curEmulatorPos.incX(dx);
 	curEmulatorPos.incY(dy);
@@ -716,7 +744,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 	if ( stepAxis('Y', dy) == false ) return false;
 	if ( stepAxis('Z', dz) == false ) return false;
 	
-	// simulate a direct controler callback
+	// simulate a direct controller callback.
 	static CncLongPosition lastReplyPos;
 	CncLongPosition diff(curEmulatorPos - lastReplyPos);
 	
@@ -726,6 +754,17 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, void 
 		 force == true ) 
 	{
 		if ( curEmulatorPos != targetMajorPos ) {
+			// due to the fact, that the emulators runs in the 
+			// same thread as the main loop it makes not sense 
+			// to write here someting to the serial. This is 
+			// because the first main lool readData(...) call 
+			// is at the earliest if this writeMove(...) call is 
+			// totally finished. So, the one and only way to 
+			// communicate continous with the cnc control is to call 
+			// the SerialControllrCallback directly. Otherwise the 
+			// complete serial data will be fetch in one block 
+			// at the end if this writeMove(...) call was finalized.
+
 			ContollerInfo ci;
 			ci.infoType = CITPosition;
 			ci.command  = lastCommand.cmd;
@@ -797,47 +836,78 @@ bool SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, void *buffer, unsigned int nbByte) {
+bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	// inheried classes do the work here
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetPostionCounter() {
+void SerialEmulatorNULL::resetEmuPositionCounter() {
 ///////////////////////////////////////////////////////////////////
-	positionCounter = 0;
+    positionCounter 		= MIN_LONG;
+    positionOverflowCounter = 0;
 }
 ///////////////////////////////////////////////////////////////////
-size_t SerialEmulatorNULL::getPostionCounter() {
+void SerialEmulatorNULL::resetEmuStepCounter() {
 ///////////////////////////////////////////////////////////////////
-	return positionCounter;
+    stepCounterX 			= MIN_LONG;
+    stepCounterY 			= MIN_LONG;
+    stepCounterZ 			= MIN_LONG;
+    stepOverflowCounterX 	= 0;
+    stepOverflowCounterY 	= 0;
+    stepOverflowCounterZ 	= 0;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetStepCounter() {
+void SerialEmulatorNULL::incPosistionCounter() {
 ///////////////////////////////////////////////////////////////////
-	stepCounterX = 0;
-	stepCounterY = 0;
-	stepCounterZ = 0;
-}
-///////////////////////////////////////////////////////////////////
-size_t SerialEmulatorNULL::getStepCounter() {
-///////////////////////////////////////////////////////////////////
-	return stepCounterX + stepCounterY + stepCounterZ;
-}
-///////////////////////////////////////////////////////////////////
-size_t SerialEmulatorNULL::getStepCounterX() {
-///////////////////////////////////////////////////////////////////
-	return stepCounterX;
-}
-///////////////////////////////////////////////////////////////////
-size_t SerialEmulatorNULL::getStepCounterY() {
-///////////////////////////////////////////////////////////////////
-	return stepCounterY;
-}
-///////////////////////////////////////////////////////////////////
-size_t SerialEmulatorNULL::getStepCounterZ() {
-///////////////////////////////////////////////////////////////////
-	return stepCounterZ;
-}
+    // detect overflows
+    if ( positionCounter == MAX_LONG ) {
+        positionCounter = MIN_LONG;
+        positionOverflowCounter++;
+    }
 
+    positionCounter++;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::incStepCounterX(int32_t dx) {
+///////////////////////////////////////////////////////////////////
+    // detect overflows
+    int32_t test = MAX_LONG - absolute(dx);
+    if ( test < stepCounterX ) {
+        stepCounterX  = MIN_LONG;
+        stepCounterX += (test - stepCounterX);
+        stepOverflowCounterX++;
+        return;
+    }
+
+    stepCounterX += absolute(dx);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::incStepCounterY(int32_t dy) {
+///////////////////////////////////////////////////////////////////
+    // detect overflows
+    int32_t test = MAX_LONG - absolute(dy);
+    if ( test < stepCounterY ) {
+        stepCounterY  = MIN_LONG;
+        stepCounterY += (test - stepCounterY);
+        stepOverflowCounterY++;
+        return;
+    }
+
+    stepCounterY += absolute(dy);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::incStepCounterZ(int32_t dz) {
+///////////////////////////////////////////////////////////////////
+    // detect overflows
+    int32_t test = MAX_LONG - absolute(dz);
+    if ( test < stepCounterZ ) {
+        stepCounterZ  = MIN_LONG;
+        stepCounterZ += (test - stepCounterZ);
+        stepOverflowCounterZ++;
+        return;
+    }
+
+    stepCounterZ += absolute(dz);
+}
 

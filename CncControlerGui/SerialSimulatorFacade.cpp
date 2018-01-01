@@ -8,7 +8,6 @@
 SerialSimulatorFacade::SerialSimulatorFacade(CncControl* cnc)
 : SerialSpyPort(cnc)
 , serialThread(NULL)
-, lock(false)
 , serialMutex()
 , serialCondition(serialMutex)
 ///////////////////////////////////////////////////////////////////
@@ -18,7 +17,6 @@ SerialSimulatorFacade::SerialSimulatorFacade(CncControl* cnc)
 SerialSimulatorFacade::SerialSimulatorFacade(const char *portName)
 : SerialSpyPort(portName) 
 , serialThread(NULL)
-, lock(false)
 , serialMutex()
 , serialCondition(serialMutex)
 ///////////////////////////////////////////////////////////////////
@@ -29,6 +27,8 @@ SerialSimulatorFacade::SerialSimulatorFacade(const char *portName)
 ///////////////////////////////////////////////////////////////////
 SerialSimulatorFacade::~SerialSimulatorFacade() {
 ///////////////////////////////////////////////////////////////////
+	std::clog << "SerialSimulatorFacade::~SerialSimulatorFacade() 1" << std::endl;
+	
 	{
 		wxCriticalSectionLocker enter(serialThreadCS);
 		// free the wxCondition - see sleepMilliseconds(...)
@@ -38,10 +38,12 @@ SerialSimulatorFacade::~SerialSimulatorFacade() {
 		serialCondition.Broadcast();
 	}
 	
+	std::clog << "SerialSimulatorFacade::~SerialSimulatorFacade() 2" << std::endl;
 	destroySerialThread();
+	std::clog << "SerialSimulatorFacade::~SerialSimulatorFacade() 3" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialSimulatorFacade::sleepMilliseconds(unsigned int millis) {
+void SerialSimulatorFacade::waitDuringRead(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
 	// if no thread exists wait conventional
 	if ( serialThread == NULL ) {
@@ -49,12 +51,15 @@ void SerialSimulatorFacade::sleepMilliseconds(unsigned int millis) {
 		return;
 	}
 	
-	if ( lock == true ) {
-		// sleep in this case mean waiting until the condition is true
-		// the mutex should be initially locked - see wxCondition description
-		serialMutex.Lock();
-		serialCondition.WaitTimeout(millis);
-	}
+	// sleep in this case mean waiting until the condition is true
+	// the mutex should be initially locked - see wxCondition description
+	serialMutex.Lock();
+	serialCondition.WaitTimeout(millis);
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorFacade::sleepMilliseconds(unsigned int millis) {
+///////////////////////////////////////////////////////////////////
+	GBL_CONFIG->getTheApp()->waitActive(millis);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorFacade::onPeriodicallyAppEvent(bool interrupted) {
@@ -66,9 +71,11 @@ void SerialSimulatorFacade::onPeriodicallyAppEvent(bool interrupted) {
 		return;
 		
 	if ( interrupted == true ) {
-		serialThread->purgeReadQueue();
-		std::cerr << "SerialSimulatorFacade::onPeriodicallyAppEvent: The read queue was purged manually. Controller is interrupted and have to be reseted!" << std::endl;
-		pauseSerialThread();
+		if ( serialThread->readAvailable() > 0 ) {
+			serialThread->purgeReadQueue();
+			cnc::cex1 << "SerialSimulatorFacade::onPeriodicallyAppEvent: The read queue was purged manually. Controller is interrupted and have to be reseted!" << std::endl;
+			pauseSerialThread();
+		}
 		return;
 	}
 		
@@ -156,17 +163,24 @@ void SerialSimulatorFacade::destroySerialThread() {
 ///////////////////////////////////////////////////////////////////
 	// destroy the serial thread
 	if ( serialThread != NULL ) {
+		std::clog << "SerialSimulatorFacade::destroySerialThread() 1"<< std::endl;
 		wakeUpOnDemand();
-		
+		std::clog << "SerialSimulatorFacade::destroySerialThread() 2"<< std::endl;
 		{
 			wxCriticalSectionLocker enter(serialThreadCS);
 			
+			std::clog << "SerialSimulatorFacade::destroySerialThread() 2.1"<< std::endl;
+			
 			if ( serialThread->Delete() != wxTHREAD_NO_ERROR )
 				wxMessageBox("SerialSimulatorFacade::destroySerialThread: Can't delete the thread!");
+				
+			std::clog << "SerialSimulatorFacade::destroySerialThread() 3"<< std::endl;
 		}
 		
 		// wait for thread completion
 		wxThread::This()->Sleep(10);
+		
+		std::clog << "SerialSimulatorFacade::destroySerialThread() 4"<< std::endl;
 		
 		// no additional checks for thread completion implemented
 		// because TestDestroy() will be called immediately
@@ -191,9 +205,6 @@ bool SerialSimulatorFacade::connect(const char* pn) {
 	if ( serialThread == NULL )
 		return false;
 	
-	// release condition handling
-	lock = true;
-	
 	// wait a portion of time so, that the new thread 
 	// was well established and ready to use
 	wxThread::This()->Sleep(10);
@@ -209,9 +220,6 @@ void SerialSimulatorFacade::disconnect(void) {
 	
 	if ( serialThread == NULL )
 		return;
-		
-	// stop condition handling
-	lock = false;
 	
 	// wakeup on demand
 	wakeUpOnDemand();

@@ -26,7 +26,7 @@ class FileParser {
 
 			unsigned long 			propCount					= 0;
 			wxPropertyGridPage*		currentPage					= NULL;
-			wxPGProperty*			curentMainCategory			= NULL;
+			wxPGProperty*			currentMainCategory			= NULL;
 			wxPGProperty*			currentNode					= NULL;
 			
 			void currentNodeAdd(const wxString& key, const wxVariant& value);

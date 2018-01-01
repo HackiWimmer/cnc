@@ -62,6 +62,7 @@ class CncConfig {
 		
 	private:
 		bool changed;
+		bool notificationActivated;
 		bool probeMode;
 		CncUnit currentUnit;
 		MainFrame* theApp;
@@ -148,7 +149,6 @@ class CncConfig {
 		
 		MainFrame* getTheApp() { return theApp; }
 		void destroyTheApp() { theApp = NULL; }
-		void registerWindowForConfigNotification(wxWindow* wnd);
 		
 		// global config pointer - don't use this directly
 		static CncConfig* globalCncConfig;
@@ -164,6 +164,17 @@ class CncConfig {
 		// global shortcuts
 		#define GBL_CONFIG  CncConfig::getGlobalCncConfig()
 		#define THE_APP     GBL_CONFIG->getTheApp()
+		
+		// notifications
+		void registerWindowForConfigNotification(wxWindow* wnd);
+		void deactivateConfigNotification();
+		void activateConfigNotification();
+		
+		class NotificationDeactivator {
+			public:
+				NotificationDeactivator()  { GBL_CONFIG->deactivateConfigNotification(); }
+				~NotificationDeactivator() { GBL_CONFIG->activateConfigNotification(); }
+		};
 		
 		// curve lib utils
 		static float getDefaultCurveLibResolution();

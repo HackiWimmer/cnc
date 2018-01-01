@@ -342,7 +342,7 @@ bool SerialSimulatorDevNull::stepAxisXYZ(int32_t dx , int32_t dy , int32_t dz, b
 		return false;
 	
 	// statistic
-	incPosistionCounter();
+	incPosIstionCounter();
 	incStepCounterX(dx);
 	incStepCounterY(dy);
 	incStepCounterZ(dz);

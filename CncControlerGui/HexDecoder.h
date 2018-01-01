@@ -14,12 +14,12 @@ class HexDecoder {
 		const char* decodeContollerResult(int ret) {
 			switch ( (const unsigned char)ret ) {
 				case RET_NULL:		return "Controller Fetch Result";
-				case RET_OK: 		return "RET_OK";
-				case RET_ERROR:		return "RET_ERROR";
-				case RET_SOT:		return "RET_SOT";
-				case RET_SOH:		return "RET_SOH";
-				case RET_MSG:		return "RET_MSG";
 				case RET_SENT:		return "Sent data";
+				case RET_OK: 		
+				case RET_ERROR:		
+				case RET_SOT:		
+				case RET_SOH:		
+				case RET_MSG:		return ArduinoPIDs::getPIDLabel((const unsigned char)ret);
 			}
 			
 			static wxString s(wxString::Format("Unkonwn fetch result value(%d)", ret));
@@ -85,7 +85,8 @@ class HexDecoder {
 		
 		/////////////////////////////////////////////////////////
 		static const char* decodeHexValueAsArduinoPID(const wxString& hexToken) {
-			return ArduinoPIDs::getPIDLabel(decodeHexValueAsInteger(hexToken));
+			int val = decodeHexValueAsInteger(hexToken);
+			return ArduinoPIDs::getPIDLabelWithDefault(val, std::string(wxString::Format("%d", val).c_str()));
 		}
 		
 		/////////////////////////////////////////////////////////
@@ -98,7 +99,9 @@ class HexDecoder {
 				if ( token.IsEmpty() == false ) {
 					if ( count++ > 0 )
 						ret << ", ";
-					ret << ArduinoPIDs::getPIDLabel(decodeHexValueAsInteger(token));
+						
+					int val = decodeHexValueAsInteger(hexToken);
+					ret << ArduinoPIDs::getPIDLabelWithDefault(val, std::string(wxString::Format("%d", val).c_str()));
 				}
 			}
 			ret << "\n";

@@ -39637,6 +39637,13 @@
              "m_functionNameAndSignature": "lruListItemLeave(wxMouseEvent& event)",
              "m_description": "Process a wxEVT_LEAVE_WINDOW event.",
              "m_noBody": false
+            }, {
+             "m_eventName": "wxEVT_KEY_DOWN",
+             "m_eventClass": "wxKeyEvent",
+             "m_eventHandler": "wxKeyEventHandler",
+             "m_functionNameAndSignature": "keyDownLruList(wxKeyEvent& event)",
+             "m_description": "Process a wxEVT_KEY_DOWN event (any key has been pressed)",
+             "m_noBody": false
             }],
            "m_children": []
           }, {

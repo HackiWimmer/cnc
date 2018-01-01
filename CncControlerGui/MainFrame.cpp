@@ -1675,8 +1675,10 @@ bool MainFrame::connectSerialPort() {
 	m_miRqtIdleMessages->Enable(false);
 	
 	// disconnect and delete the current cnc control
-	if ( cnc != NULL )
+	if ( cnc != NULL ) {
+		cnc->disconnect();
 		delete cnc;
+	}
 	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
@@ -1705,11 +1707,13 @@ bool MainFrame::connectSerialPort() {
 	
 	if ( cnc == NULL || cnc->getSerial() == NULL )
 		return false;
-		
+	
+	#warning activate this again
+	/*
 	if ( cnc->getSerial()->canProcessIdle() ) {
 		m_miRqtIdleMessages->Check(true);
 		m_miRqtIdleMessages->Enable(true);
-	}
+	}*/
 	
 	initializeCncControl();
 	selectSerialSpyMode();
@@ -3303,7 +3307,6 @@ void MainFrame::updateSetterList() {
 		setterList->Refresh();
 		
 		setterList->EnsureVisible(0L);
-		setterList->SetSingleStyle(wxLC_HRULES | wxLC_VRULES, true);
 	}
 
 	if ( setterList->IsFrozen() == true )
@@ -3367,6 +3370,13 @@ bool MainFrame::processTemplateWrapper() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	bool ret = true;
+	
+	// it's very import to deactivate the notifications during a run
+	// because instead every config change (sc()) will release a notification
+	// this will be the case for example if the SVG path handler changes
+	// the z -axis values . . .
+	// as a result the processing slows down significantly.
+	CncConfig::NotificationDeactivator cfgNotDeactivation;
 	
 	wxString fn (getCurrentTemplatePathFileName());
 	if ( fn.IsEmpty() == true )
@@ -3592,7 +3602,7 @@ void MainFrame::logStatistics() {
 	statisticSummaryListCtrl->updateValues(SKEY_POS_CNT		, _("")
 															, _("")
 															, _("")
-															, CncNumberFormatter::toString(cnc->getSerial()->getPostionCounter()));
+															, CncNumberFormatter::toString(cnc->getSerial()->getPositionCounter()));
 	
 	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistance()),  3)
 															, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistanceX()), 3)
@@ -7374,6 +7384,21 @@ void MainFrame::dclickLogger(wxMouseEvent& event) {
 	
 	selectSourceControlLineNumber(lineNumber - 1);
 	//MessageBoxA(0,wxString::Format("%ld", lineNumber),"",0);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::keyDownLruList(wxKeyEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
+	int c = event.GetUnicodeKey();
+	
+	// save
+	if ( c == 'S' && ctlKey == true ) {
+		lruFileList.save(lruStore);
+		std::clog << "LRU List saved . . . " << std::endl;
+		return;
+	}
+	
+	event.Skip(true);
 }
 
 

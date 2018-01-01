@@ -18,6 +18,8 @@ class CncSpeedSimulator : public CncSpeedManager {
 		long stepCounterY;
 		long stepCounterZ;
 		
+		CncNanoTimestamp tsAfterLastWait;
+		
 	public:
 		
 		//////////////////////////////////////////////////////////////////////////
@@ -37,6 +39,7 @@ class CncSpeedSimulator : public CncSpeedManager {
 		, stepCounterX(0L)
 		, stepCounterY(0L)
 		, stepCounterZ(0L)
+		, tsAfterLastWait(0LL)
 		{
 		}
 		
@@ -63,12 +66,33 @@ class CncSpeedSimulator : public CncSpeedManager {
 		
 		//////////////////////////////////////////////////////////////////////////
 		void performCurrentOffset(bool force=false) {
-			// consider the windows standard timer resolution of 15,625 ms
-			if ( currentAccumulatedOffset >= 16000LL || force == true ) {
-				CncTimeFunctions::activeWaitMircoseconds(currentAccumulatedOffset, true);
+			
+			#warning
+			if ( false ) {
+				// consider the windows standard timer resolution of 15,625 ms
+				if ( currentAccumulatedOffset >= 16000LL || force == true ) {
+					CncTimeFunctions::activeWaitMircoseconds(currentAccumulatedOffset, true);
+					
+					totalAccumulatedOffset   += currentAccumulatedOffset;
+					currentAccumulatedOffset  = 0LL;
+				}
+			} else {
 				
-				totalAccumulatedOffset   += currentAccumulatedOffset;
-				currentAccumulatedOffset  = 0LL;
+				int64_t waitPeriod = currentAccumulatedOffset;
+				if ( tsAfterLastWait > 0LL )
+					waitPeriod = currentAccumulatedOffset - ( CncTimeFunctions::getNanoTimestamp() - tsAfterLastWait );
+					
+				// consider the windows standard timer resolution of 15,625 ms
+				if ( waitPeriod >= 16000LL || force == true ) {
+					CncTimeFunctions::activeWaitMircoseconds(waitPeriod, false);
+					
+					totalAccumulatedOffset   += currentAccumulatedOffset;
+					currentAccumulatedOffset  = 0LL;
+					
+					
+				}
+				
+				tsAfterLastWait = CncTimeFunctions::getNanoTimestamp();
 			}
 		}
 		
@@ -94,6 +118,5 @@ class CncSpeedSimulator : public CncSpeedManager {
 		long getStepCounterY() { return stepCounterY; }
 		long getStepCounterZ() { return stepCounterZ; }
 };
-
 
 #endif

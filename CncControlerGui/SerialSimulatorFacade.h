@@ -12,7 +12,6 @@ class SerialSimulatorFacade : public SerialSpyPort {
 	private:
 		SerialSimulatorThread* serialThread;
 		
-		bool lock;
 		void createSerialThread();
 		void destroySerialThread();
 		
@@ -25,6 +24,7 @@ class SerialSimulatorFacade : public SerialSpyPort {
 		void resumeSerialThread();
 		void wakeUpOnDemand();
 		
+		virtual void waitDuringRead(unsigned int millis); 
 		virtual void sleepMilliseconds(unsigned int millis);
 		
 	public:

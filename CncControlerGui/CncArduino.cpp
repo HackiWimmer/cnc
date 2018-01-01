@@ -94,15 +94,23 @@ class ArduinoPIDsInitializer {
 		}
 }; ArduinoPIDsInitializer api;
 
+const char* UNKNOWN_PID = "Unknown PID: ";
 /////////////////////////////////////////////////////////////////////////
 void ArduinoPIDs::init() {
 /////////////////////////////////////////////////////////////////////////
 	for (int i=0; i<MAX_PIDS -1;i++){
-		std::string s("Unknown PID: ");
+		std::string s(UNKNOWN_PID);
 		s += std::to_string(i);
 		pids[i]  = s.c_str();
 	}
-
+	
+	pids[RET_NULL]                            = "RET_NULL";
+	pids[RET_OK]                              = "RET_OK";
+	pids[RET_ERROR]                           = "RET_ERROR";
+	pids[RET_SOT]                             = "RET_SOT";
+	pids[RET_SOH]                             = "RET_SOH";
+	pids[RET_MSG]                             = "RET_MSG";
+	
 	pids[PID_UNKNOWN]                         = "Default PID";
 	pids[PID_STEPPER_INITIALIZED]             = "Stepper initialize state";
 	
@@ -207,14 +215,32 @@ const char* ArduinoPIDs::getPIDLabel(unsigned int id) {
 const char* ArduinoPIDs::getPIDLabel(unsigned int id, std::string& retVal) {
 // thread safe version
 /////////////////////////////////////////////////////////////////////////
-	if ( id >= 0 && id < MAX_PIDS )
+	if ( id >= 0 && id < MAX_PIDS ) 
 		return pids[id].c_str();
-
+	
 	retVal.assign("PID [");
 	retVal.append(std::to_string(id));
 	retVal.append("] is out of range");
 	
 	return retVal.c_str();
+}
+/////////////////////////////////////////////////////////////////////////
+const char* ArduinoPIDs::getPIDLabelWithDefault(unsigned int id, const std::string& defaultValue) {
+/////////////////////////////////////////////////////////////////////////
+	if ( exists(id) == true )
+		return pids[id].c_str();
+	
+	return defaultValue.c_str();
+}
+/////////////////////////////////////////////////////////////////////////
+bool ArduinoPIDs::exists(unsigned int id) {
+/////////////////////////////////////////////////////////////////////////
+	if ( id >= 0 && id < MAX_PIDS ) {
+		if ( pids[id].find(UNKNOWN_PID) == string::npos )
+			return true;
+	}
+	
+	return false;
 }
 
 std::string ArduinoErrorCodes::errorCodes[MAX_ERROR_CODES];

@@ -829,6 +829,7 @@ protected:
     virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
+    virtual void keyDownLruList(wxKeyEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }

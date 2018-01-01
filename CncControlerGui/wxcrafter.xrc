@@ -6189,9 +6189,6 @@ Interval [ms]:</label>
               <object class="wxListCtrl" name="m_lruList">
                 <style>wxLC_SINGLE_SEL|wxLC_REPORT</style>
                 <size>-1,110</size>
-                <tooltip>
-                  <![CDATA[rwerew]]>
-                </tooltip>
               </object>
             </object>
             <object class="sizeritem">

@@ -903,11 +903,12 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	// display application coordinates
 	postAppPosition(PID_XYZ_POS_MAJOR);
 	
-	/*
 	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
-		std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
-		interrupt();
-	}*/
+		if ( GBL_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
+			std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
+			interrupt();
+		}
+	}
 	
 	return !isInterrupted();
 }
@@ -1772,7 +1773,7 @@ void CncControl::clearControllerErrorControl() {
 		GET_GUI_CTL(controllerErrorInfo)->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::appendNumKeyValueToControllerErrorInfo(const char* desc, int pin, int type, int mode, int value) {
+void CncControl::appendNumKeyValueToControllerPinInfo(const char* desc, int pin, int type, int mode, int value) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	

@@ -57,6 +57,7 @@ bool CncConfig::ToolMagazineEntry::deserialize(const wxString& input) {
 ////////////////////////////////////////////////////////////////////////
 CncConfig::CncConfig(MainFrame* app) 
 : changed(true)
+, notificationActivated(true)
 , currentUnit(CncSteps)
 , theApp(app)
 , toolMagazine()
@@ -97,13 +98,25 @@ void CncConfig::sc() {
 ////////////////////////////////////////////////////////////////////////
 	changed = true; 
 	
-	broadcastConfigUpdateNotification();
+	if ( notificationActivated == true )
+		broadcastConfigUpdateNotification();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::rc() { 
 //rc = reset changed
 ////////////////////////////////////////////////////////////////////////
 	changed = false; 
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::deactivateConfigNotification() {
+	notificationActivated = false;
+}
+////////////////////////////////////////////////////////////////////////
+void CncConfig::activateConfigNotification() {
+	notificationActivated = true;
+
+	// release always a notification after the (re)activation
+	broadcastConfigUpdateNotification();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::registerWindowForConfigNotification(wxWindow* wnd) {

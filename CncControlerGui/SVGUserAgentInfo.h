@@ -33,8 +33,8 @@ struct SVGUserAgentInfo {
 ////////////////////////////////////////////////////////////////
 
 	private:
-		wxString transformInfotring;
-		wxString styleInfotring;
+		wxString transformInfoString;
+		wxString styleInfoString;
 		
 		/////////////////////////////////////////////////////////
 		bool isMemberOf(const wxString& id, const char* type) {
@@ -166,24 +166,24 @@ struct SVGUserAgentInfo {
 		
 		/////////////////////////////////////////////////////////
 		const char* getTransformInfoAsString() {
-			transformInfotring.clear();
+			transformInfoString.clear();
 			for (TransformVector::iterator it=transformList.begin(); it!=transformList.end(); ++it) {
-				transformInfotring << *it;
-				transformInfotring << " ";
+				transformInfoString.append(*it);
+				transformInfoString.append(" ");
 			}
 			
-			return transformInfotring.c_str();
+			return transformInfoString.c_str();
 		}
 		
 		/////////////////////////////////////////////////////////
 		const char* getStyleInfoAsString() {
-			styleInfotring.clear();
+			styleInfoString.clear();
 			for (StyleVector::iterator it=styleList.begin(); it!=styleList.end(); ++it) {
-				styleInfotring << *it;
-				styleInfotring << " ";
+				styleInfoString.append(*it);
+				styleInfoString.append(" ");
 			}
 			
-			return styleInfotring.c_str();
+			return styleInfoString.c_str();
 		}
 		
 		/////////////////////////////////////////////////////////

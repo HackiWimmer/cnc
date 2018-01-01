@@ -126,6 +126,15 @@ class CncLimitStates {
 		const int32_t getZLimit() { return getLimit(zMinLimit, zMaxLimit); }
 		
 		///////////////////////////////////////////////////////////////////
+		void reset() {
+			xMinLimit = false;
+			xMaxLimit = false;
+			yMinLimit = false;
+			yMaxLimit = false;
+			zMinLimit = false;
+			zMaxLimit = false;
+		}
+				///////////////////////////////////////////////////////////////////
 		const bool hasLimit() {
 			return (xMinLimit || xMaxLimit || yMinLimit || yMaxLimit || zMinLimit || zMaxLimit);
 		}

@@ -328,14 +328,7 @@ void SerialEmulatorSVG::disconnect(void) {
 	SerialEmulatorFile::disconnect();
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorSVG::writeSetter(void *b, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	bool ret = SerialEmulatorNULL::writeSetter(b, nbByte);
-	// todo later decode setter
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool SerialEmulatorSVG::writeMoveCmd(int32_t x , int32_t y , int32_t z, void *b, unsigned int nbByte) {
+bool SerialEmulatorSVG::writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( writeState == false )
 		return true;
