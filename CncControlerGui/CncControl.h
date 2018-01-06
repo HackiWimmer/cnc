@@ -204,14 +204,12 @@ class CncControl {
 		void resetInterrupt();
 		bool isInterrupted();
 		bool reset();
+		bool resetErrorInfo();
+		bool checkForErrosAndResetErrorInfo(int32_t& preveErrorCount);
 		bool resetWatermarks();
 		// Setup the cnc control
 		void resetSetterMap();
 		bool setup(bool reset = true);
-		// Measurements funtions
-		//void logProcessingStart();
-		//void logProcessingCurrent();
-		//void logProcessingEnd(bool valuesOnly = false);
 		// Sets the output controls for cooridinate infos
 		void setGuiControls(GuiControlSetup* guiCtlSetup);
 		//handle draw control
@@ -251,7 +249,9 @@ class CncControl {
 		const CncLongPosition::Watermarks getWaterMarks();
 		const CncDoublePosition::Watermarks getWaterMarksMetric();
 		// query the current error count
-		const int32_t getControllerErrorCount();
+		const int32_t getControllerErrorCount(bool withPurge=false);
+		// query the current error information
+		bool requestErrorInformation(bool withPurge=false);
 		// query the current controller position
 		const CncLongPosition getControllerPos();
 		// query the current controller limit state

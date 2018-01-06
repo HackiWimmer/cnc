@@ -22,7 +22,7 @@ struct SerialFetchInfo {
 	unsigned char command				= '\0';
 	unsigned char multiByteResult[2048];
 
-	unsigned int singleFetchTimeout 	= 10000;
+	unsigned int singleFetchTimeout 	= 2000;
 	bool retSOTAllowed					= false;
 	bool returnAfterSOT					= true;
 	bool retSOHAllowed					= false;

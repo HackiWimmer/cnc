@@ -175,6 +175,10 @@ class SerialDataWriter {
 			return 0;
 		}
 		
+		bool write(const char b) {
+			return write((const unsigned char)b);
+		}
+		
 		bool write(unsigned char c) {
 			if ( available() < 1 )
 				return false;

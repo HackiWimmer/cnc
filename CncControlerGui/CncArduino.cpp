@@ -282,6 +282,7 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
 	errorCodes[E_TOTAL_COUNT]                        = "Total error count";
 	
+	errorCodes[E_PURE_TEXT_VALUE_ERROR]              = "Pure text message";
 	errorCodes[E_SPEED_MGMT_NOT_INITIALIZED]         = "Speed Manager isn't initialized";
 	errorCodes[E_STEPPER_NOT_READY_TO_RUN]           = "Stepper not ready to run";
 	

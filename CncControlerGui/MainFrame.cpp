@@ -460,6 +460,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btRequestCtlConfig);
 	registerGuiControl(m_btRequestControllerPins);
 	registerGuiControl(m_btRequestCtlErrorInfo);
+	registerGuiControl(m_btResetCtlErrorInfo);
 	registerGuiControl(m_lruList);
 	registerGuiControl(fileView);
 	registerGuiControl(m_svgEmuResult);
@@ -1721,6 +1722,7 @@ bool MainFrame::connectSerialPort() {
 	lastPortName.clear();
 	if ( (ret = cnc->connect(cs)) == true )  {
 		cnc->setup();
+		cnc->resetErrorInfo();
 		cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 		updateCncConfigTrace();
 		lastPortName.assign(sel);
@@ -3389,17 +3391,33 @@ bool MainFrame::processTemplateWrapper() {
 	
 	if ( ret == true )
 		ret = checkIfRunCanBeProcessed();
-	
+		
+	if ( GBL_CONFIG->getResetErrorInfoBeforeRunFlag() )
+		cnc->resetErrorInfo();
+		
 	if ( ret == true )
 		ret = processTemplateIntern();
 	
-	if ( ret == false ) {
+	// additional check controllers error count
+	int32_t errorCount = cnc->getControllerErrorCount(!ret);
+	ret = ( errorCount == 0);
+	
+	// prepare final statements
+	if ( ret == false) {
 		cnc::cex1 << wxString::Format("%s - Processing finished with errors . . .", wxDateTime::UNow().FormatISOTime()) << std::endl;
-		cnc::cex1 << "For more details please try to consider the controller error info tab" << std::endl;
-		m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-		m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
+		
+		if ( errorCount > 0 ) {
+			cnc::cex1 << "For more details please try to consider the controller error info tab" << std::endl;
+			m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+			m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
+			
+		} else if ( errorCount < 0 ) {
+			cnc::cex1 << "It was impossible to request the error information!" << std::endl;
+			
+		}
 	} else {
 		std::clog << wxString::Format("%s - Processing finished successfully . . .", wxDateTime::UNow().FormatISOTime()) << std::endl;
+		
 	}
 	
 	return ret;
@@ -3412,12 +3430,12 @@ bool MainFrame::processTemplateIntern() {
 	
 	if ( m_clearSerialSpyBeforNextRun->IsChecked() )
 		clearSerialSpy();
-
+	
 	clearPositionSpy();
 	
 	showAuiPane("Outbound");
 	selectMonitorBookCncPanel();
-
+	
 	// select draw pane
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 		
@@ -3425,7 +3443,7 @@ bool MainFrame::processTemplateIntern() {
 	if ( m_mainViewSelector->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
 	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::TEST_PANEL && 
 	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::SOURCE_PANEL &&
-		 m_mainViewSelector->GetSelection() != MainBookSelection::VAL::SETUP_PANEL) {
+	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::SETUP_PANEL) {
 		selectMainBookSourcePanel();
 	}
 	
@@ -3478,6 +3496,8 @@ bool MainFrame::processTemplateIntern() {
 			std::cerr << "Controller pos: " << cnc->getControllerPos() << std::endl;
 			setRefPostionState(false);
 		}
+		
+		ret = false;
 	}
 	
 	if ( cnc->getPositionOutOfRangeFlag() == true ) {
@@ -3492,16 +3512,6 @@ bool MainFrame::processTemplateIntern() {
 			
 			setRefPostionState(false);
 		//}
-	}
-	
-	// Check error count
-	int32_t cnt = -1;
-	if ( (cnt = cnc->getControllerErrorCount() ) != 0 ) {
-		if ( cnc->isInterrupted() == false ) {
-			wxString msg("Controller Error Count: ");
-			msg << cnt;
-			displayNotification('E', "Controller Error Check", msg, 5);
-		}
 	}
 	
 	cnc->enableStepperMotors(false);
@@ -3940,14 +3950,14 @@ void MainFrame::requestVersion(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	std::stringstream ss;
-	cnc->processCommand("V", ss);
+	cnc->processCommand(CMD_PRINT_VERSION, ss);
 	cnc::trc.logInfoMessage(ss);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	cnc->processCommand("c", std::clog);
+	cnc->processCommand(CMD_PRINT_CONFIG, std::clog);
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_CONFIG_PANEL);
 }
@@ -3962,7 +3972,7 @@ void MainFrame::requestControllerConfigFromButton(wxCommandEvent& event) {
 void MainFrame::requestErrorInfo(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	cnc->processCommand("?", std::clog);
+	cnc->requestErrorInformation(true);
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
 }
@@ -3972,6 +3982,13 @@ void MainFrame::requestControllerErrorInfoFromButton(wxCommandEvent& event) {
 	m_btRequestCtlErrorInfo->Enable(false);
 	requestErrorInfo(event);
 	m_btRequestCtlErrorInfo->Enable(true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::resetControllerErrorInfoFromButton(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	m_btResetCtlErrorInfo->Enable(false);
+	requestResetErrorInfo(event);
+	m_btResetCtlErrorInfo->Enable(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestErrorCount(wxCommandEvent& event) {
@@ -4006,20 +4023,62 @@ void MainFrame::requestCurrentLimitStateIcon(wxMouseEvent& event) {
 	cnc::trc.logInfoMessage("Limit controles were updated . . .");
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::requestReset(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	requestReset();
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::requestReset() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	m_logger->Clear();
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RESET);
 	cnc->setup(true);
-	clearMotionMonitor();
 	
+	clearMotionMonitor();
 	updateSetterList();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::requestReset(wxCommandEvent& event) {
+void MainFrame::clearControllerErrorInfoFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	requestReset();
+	m_dvListCtrlControllerErrorInfo->DeleteAllItems();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::requestResetErrorInfo(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cnc);
+	m_dvListCtrlControllerErrorInfo->DeleteAllItems();
+	
+	// check last response id
+	std::stringstream ss;
+	if ( cnc->processCommand(CMD_PRINT_LAST_ERROR_RESPONSE_ID, ss) ) {
+		if ( m_lastErrorInfoResponseId->GetValue() != ss.str().c_str() ) {
+			wxString msg("Since the last error info request, the error info content has changed\n\nShould it requested before the error info going to reset?");
+			wxMessageDialog dlg(this, msg, _T("Reset Error Information  . . . "), wxYES|wxNO|wxCANCEL|wxCENTRE|wxICON_QUESTION);
+			
+			switch ( dlg.ShowModal() ) {
+				case wxID_YES:		cnc->requestErrorInformation();
+									break;
+									
+				case wxID_CANCEL:	return;
+			}
+		}
+	}
+	
+	// reset the error info
+	cnc->resetErrorInfo();
+	
+	// update response id
+	ss.str("");
+	cnc->processCommand(CMD_PRINT_LAST_ERROR_RESPONSE_ID, ss);
+	m_lastErrorInfoResponseId->ChangeValue(ss.str().c_str());
+	
+	// update list control
+	cnc->appendNumKeyValueToControllerErrorInfo(0, E_TOTAL_COUNT, ArduinoErrorCodes::getECLabel((unsigned int)E_TOTAL_COUNT) , "0");
+	
+	// select page
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
+	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::saveEmuOutput(wxCommandEvent& event) {
@@ -7424,3 +7483,4 @@ void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
 void MainFrame::xxxxxxxxxxxxx(wxMouseEvent& event) {
 	//clog << "xxxxxxxxxxxxx"<< endl;
 }
+

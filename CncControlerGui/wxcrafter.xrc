@@ -4620,7 +4620,7 @@
                                                 <flag>wxALL|wxALIGN_RIGHT</flag>
                                                 <border>1</border>
                                                 <object class="wxButton" name="m_btClearMsgHistory">
-                                                  <label>Clear</label>
+                                                  <label>Clear List</label>
                                                   <style/>
                                                   <tooltip>
                                                     <![CDATA[Clear the Message Histroy]]>
@@ -4667,7 +4667,7 @@
                                         </font>
                                         <object class="wxFlexGridSizer">
                                           <cols>1</cols>
-                                          <rows>2</rows>
+                                          <rows>3</rows>
                                           <vgap>0</vgap>
                                           <hgap>0</hgap>
                                           <growablecols>0</growablecols>
@@ -4677,7 +4677,7 @@
                                             <border>1</border>
                                             <option>1</option>
                                             <object class="wxFlexGridSizer">
-                                              <cols>2</cols>
+                                              <cols>4</cols>
                                               <rows>1</rows>
                                               <vgap>0</vgap>
                                               <hgap>0</hgap>
@@ -4702,6 +4702,20 @@
                                               <object class="sizeritem">
                                                 <flag>wxALL|wxALIGN_RIGHT</flag>
                                                 <border>1</border>
+                                                <object class="wxButton" name="m_btResetCtlErrorInfo">
+                                                  <label>Reset . . .</label>
+                                                  <style/>
+                                                  <tooltip>
+                                                    <![CDATA[Reset Controller Error Info]]>
+                                                  </tooltip>
+                                                  <bitmap>bitmaps/git-reset.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxALIGN_RIGHT</flag>
+                                                <border>1</border>
                                                 <object class="wxButton" name="m_btRequestCtlErrorInfo">
                                                   <label>Request</label>
                                                   <style/>
@@ -4713,6 +4727,21 @@
                                                   <default>0</default>
                                                 </object>
                                               </object>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxALIGN_RIGHT</flag>
+                                                <border>1</border>
+                                                <object class="wxButton" name="m_btClearCtlErrorInfoList">
+                                                  <label>Clear List</label>
+                                                  <style/>
+                                                  <tooltip>
+                                                    <![CDATA[Clear Error Info List]]>
+                                                  </tooltip>
+                                                  <hidden>1</hidden>
+                                                  <bitmap>bitmaps/16-clean.png</bitmap>
+                                                  <bitmapposition>wxLEFT</bitmapposition>
+                                                  <default>0</default>
+                                                </object>
+                                              </object>
                                             </object>
                                           </object>
                                           <object class="sizeritem">
@@ -4720,6 +4749,79 @@
                                             <border>1</border>
                                             <object class="unknown" name="m_dvListCtrlControllerErrorInfo">
                                               <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                            </object>
+                                          </object>
+                                          <object class="sizeritem" name="flexGridSizer5155">
+                                            <flag>wxALL|wxEXPAND</flag>
+                                            <border>1</border>
+                                            <option>1</option>
+                                            <object class="wxFlexGridSizer">
+                                              <cols>1</cols>
+                                              <rows>1</rows>
+                                              <vgap>0</vgap>
+                                              <hgap>0</hgap>
+                                              <growablecols>0</growablecols>
+                                              <growablerows>0</growablerows>
+                                              <object class="sizeritem">
+                                                <flag>wxALL|wxEXPAND</flag>
+                                                <object class="wxPanel" name="m_panel5162">
+                                                  <style>wxTAB_TRAVERSAL</style>
+                                                  <bg>#004080</bg>
+                                                  <object class="wxFlexGridSizer">
+                                                    <cols>1</cols>
+                                                    <rows>1</rows>
+                                                    <vgap>0</vgap>
+                                                    <hgap>0</hgap>
+                                                    <growablecols>0</growablecols>
+                                                    <growablerows>0</growablerows>
+                                                    <object class="sizeritem" name="flexGridSizer5160">
+                                                      <flag>wxALL|wxALIGN_RIGHT</flag>
+                                                      <object class="wxFlexGridSizer">
+                                                        <cols>2</cols>
+                                                        <rows>1</rows>
+                                                        <vgap>0</vgap>
+                                                        <hgap>0</hgap>
+                                                        <growablecols/>
+                                                        <growablerows/>
+                                                        <object class="sizeritem">
+                                                          <flag>wxALL|wxALIGN_RIGHT</flag>
+                                                          <object class="wxStaticText" name="m_staticText5159">
+                                                            <label>Last Response ID:</label>
+                                                            <style/>
+                                                            <bg>#004080</bg>
+                                                            <fg>#FFFFFF</fg>
+                                                            <font>
+                                                              <size>8</size>
+                                                              <style>normal</style>
+                                                              <weight>bold</weight>
+                                                              <family>swiss</family>
+                                                              <underlined>0</underlined>
+                                                              <face>Segoe UI Semibold</face>
+                                                            </font>
+                                                          </object>
+                                                        </object>
+                                                        <object class="sizeritem">
+                                                          <flag>wxALL|wxALIGN_RIGHT</flag>
+                                                          <object class="wxTextCtrl" name="m_lastErrorInfoResponseId">
+                                                            <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
+                                                            <bg>#004080</bg>
+                                                            <fg>#FFFFFF</fg>
+                                                            <font>
+                                                              <size>8</size>
+                                                              <style>normal</style>
+                                                              <weight>bold</weight>
+                                                              <family>swiss</family>
+                                                              <underlined>0</underlined>
+                                                              <face>Segoe UI</face>
+                                                            </font>
+                                                            <value>#12345</value>
+                                                          </object>
+                                                        </object>
+                                                      </object>
+                                                    </object>
+                                                  </object>
+                                                </object>
+                                              </object>
                                             </object>
                                           </object>
                                         </object>
@@ -6189,6 +6291,9 @@ Interval [ms]:</label>
               <object class="wxListCtrl" name="m_lruList">
                 <style>wxLC_SINGLE_SEL|wxLC_REPORT</style>
                 <size>-1,110</size>
+                <tooltip>
+                  <![CDATA[rwerew]]>
+                </tooltip>
               </object>
             </object>
             <object class="sizeritem">
@@ -7914,6 +8019,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemUpdCoors">
           <checkable>1</checkable>
           <label>Update Coordinates</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7922,6 +8028,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemUpdDraw">
           <checkable>1</checkable>
           <label>Online Preview</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7930,6 +8037,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemAllowEvents">
           <checkable>1</checkable>
           <label>Allow Events</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7938,6 +8046,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemDisplayUserAgent">
           <checkable>1</checkable>
           <label>Display User Agent Content</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7946,6 +8055,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemToolControls">
           <checkable>1</checkable>
           <label>Update Tool-/Speed-Controls</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7955,6 +8065,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemDebugSerial">
           <checkable>1</checkable>
           <label>Spy Serial (very slow)</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7962,6 +8073,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemFreezeLogger">
           <checkable>1</checkable>
           <label>Unfreeze Logger</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7970,12 +8082,14 @@ Interval [ms]:</label>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuItemMinMonitoring">
           <label>Setup Minimal Monitoring</label>
+          <bitmap>bitmaps/network-wireless-low (2).png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuItemNormalMonitoring">
           <label>Setup Standard Monitoring</label>
+          <bitmap>bitmaps/network-wireless-full (2).png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7987,6 +8101,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miRqtIdleMessages">
           <checkable>1</checkable>
           <label>Request Idle Messages</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7995,30 +8110,35 @@ Interval [ms]:</label>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtVersion">
           <label>Software Version</label>
+          <bitmap>bitmaps/enumerator.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miRqtConfig">
           <label>Current Config</label>
+          <bitmap>bitmaps/system-settings.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miRqtPins">
           <label>Pin Report</label>
+          <bitmap>bitmaps/messagebox_info.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuErrorCount">
           <label>Error Count</label>
+          <bitmap>bitmaps/messagebox_info.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miRqtErrorInfo">
           <label>Error Info</label>
+          <bitmap>bitmaps/messagebox_info.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8026,18 +8146,21 @@ Interval [ms]:</label>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuItemInfoMessage">
           <label>Test - Info Message</label>
+          <bitmap>bitmaps/dialog-information (2).png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuItemWarningMessage">
           <label>Test - Warning Message</label>
+          <bitmap>bitmaps/dialog-warning-3 (2).png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuItemErrorMessage">
           <label>Test - Error Message</label>
+          <bitmap>bitmaps/dialog-error-5 (2).png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8046,6 +8169,7 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miMotorEnableState">
           <checkable>1</checkable>
           <label>Enable stepper motors</label>
+          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8053,19 +8177,29 @@ Interval [ms]:</label>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtCurPos">
           <label>Current Position</label>
+          <bitmap>bitmaps/messagebox_info.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miRqtLimit">
           <label>Current Limit State</label>
+          <bitmap>bitmaps/messagebox_info.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="m_miReset">
+        <object class="wxMenuItem" name="m_miRqtReset">
           <label>Reset Controller</label>
+          <bitmap>bitmaps/git-reset.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_miRqtResetErrorInfo">
+          <label>Reset Error Info</label>
+          <bitmap>bitmaps/git-reset.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>

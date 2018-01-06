@@ -15,11 +15,19 @@
  * 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO|WARNING|ERROR);
  *		evt.SetString("<... message to log ...>");
  * 		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+ * 
+ *	Or one of the following functions:
+ *		void publishLogStreamAsInfoMsg();
+ *		void publishLogStreamAsWarningMsg();
+ *		void publishLogStreamAsErrorMsg();
+ *		void appendLogStreamToErrorInfo(unsigned char eid = E_PURE_TEXT_VALUE_ERROR);
 */
 
 ///////////////////////////////////////////////////////////////////
 SerialSimulatorThread::SerialSimulatorThread(SerialSimulatorFacade* facade) 
 : wxThread(wxTHREAD_DETACHED)
+, logStream()
+, fatalErrorState(false)
 , caller(facade)
 , callerCondition(&caller->serialCondition)
 , callerMutex(&caller->serialMutex)
@@ -34,6 +42,7 @@ SerialSimulatorThread::SerialSimulatorThread(SerialSimulatorFacade* facade)
 , stepOverflowCounterZ(0)
 , writeDataQueue()
 , readDataQueue()
+, errorInfoResponseId(0LL)
 , errorList()
 , setterMap()
 , byteReader()
@@ -42,6 +51,7 @@ SerialSimulatorThread::SerialSimulatorThread(SerialSimulatorFacade* facade)
 , lastSignal(0)
 ///////////////////////////////////////////////////////////////////
 {
+	performNextErrorInfoResponseId();
 }
 ///////////////////////////////////////////////////////////////////
 SerialSimulatorThread::~SerialSimulatorThread() {
@@ -62,10 +72,68 @@ wxThread::ExitCode SerialSimulatorThread::Entry() {
 	// dispatch with maximum speed here
 	// the thread will be paused if nothing is to do
 	while ( !TestDestroy() ) {
+		
+		/*
+		// check space left
+		if ( writeDataQueue.write_available() < queueSize/4 ) {
+			wxASSERT(caller != NULL);
+			wxCriticalSectionLocker enter(caller->serialThreadCS);
+			
+			writeDataQueue.reset();
+		}
+		
+		// check space left
+		if ( readDataQueue.write_available() < queueSize/4 ) {
+			wxASSERT(caller != NULL);
+			wxCriticalSectionLocker enter(caller->serialThreadCS);
+			
+			readDataQueue.reset();
+		}
+		*/
+		
+		// command handling
 		processNextCommand();
 	}
 	
 	return NULL;
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::publishLogStreamAsInfoMsg() {
+///////////////////////////////////////////////////////////////////
+	static wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO);
+	evt.SetString(logStream.str().c_str());
+	wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+	
+	// clear the stream
+	logStream.str("");
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::publishLogStreamAsWarningMsg() {
+///////////////////////////////////////////////////////////////////
+	static wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_WARNING);
+	evt.SetString(logStream.str().c_str());
+	wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+	
+	// clear the stream
+	logStream.str("");
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::publishLogStreamAsErrorMsg() {
+///////////////////////////////////////////////////////////////////
+	static wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
+	evt.SetString(logStream.str().c_str());
+	wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+	
+	// clear the stream
+	logStream.str("");
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::appendLogStreamToErrorInfo(unsigned char eid) {
+///////////////////////////////////////////////////////////////////
+	addErrorInfo(eid, logStream.str().c_str());
+	
+	// clear the stream
+	logStream.str("");
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int SerialSimulatorThread::readAvailable() const {
@@ -81,7 +149,7 @@ unsigned char SerialSimulatorThread::readBufferFrontByte() const {
 		
 		return readDataQueue.front().c;
 	}
-		
+	
 	return RET_NULL;
 }
 ///////////////////////////////////////////////////////////////////
@@ -109,8 +177,6 @@ void SerialSimulatorThread::performResetController() {
 		setterMap.clear();
 	}
 	
-	performResetErrorInfo();
-	
 	// init some values
 	positionCounter = MIN_LONG;
 	stepCounterX    = MIN_LONG;
@@ -122,7 +188,9 @@ void SerialSimulatorThread::performResetController() {
 	stepOverflowCounterY    = 0;
 	stepOverflowCounterZ    = 0;
 	
-	setterMap[PID_QUERY_READY_TO_RUN] 		= 1;
+	setterMap[PID_QUERY_READY_TO_RUN] = 1;
+	
+	fatalErrorState = false;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::performResetErrorInfo() {
@@ -131,6 +199,8 @@ void SerialSimulatorThread::performResetErrorInfo() {
 		wxCriticalSectionLocker enter(caller->serialThreadCS);
 		errorList.clear();
 	}
+	
+	performNextErrorInfoResponseId();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::addErrorInfo(unsigned int id, const char* info) {
@@ -142,6 +212,7 @@ void SerialSimulatorThread::addErrorInfo(unsigned int id, const char* info) {
 		ei.additionalInfo = info;
 		
 	errorList.push_back(ei);
+	performNextErrorInfoResponseId();
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialSimulatorThread::getSetterValueAsLong(unsigned char pid, int32_t& value, int32_t defaultValue) {
@@ -282,41 +353,35 @@ void SerialSimulatorThread::pushAndReleaseBytes() {
 	unsigned int pushedSize = 0;
 	unsigned int size       = byteWriter.size();
 	
-	unsigned int counter = 0;
-	while ( ( pushedSize = readDataQueue.push(byteWriter.getBuffer(), size) ) != size ) {
+	// error handling - not enough space left
+	if ( readDataQueue.write_available() < size ) {
+		logStream << wxString::Format("SerialFacadeThread::pushAndReleaseBytes: to less write space: Size required: %04u, available: %04u, Byte stream: ", size, (unsigned long)readDataQueue.write_available());
+		byteWriter.trace(logStream);
+		//appendLogStreamToErrorInfo();
+		publishLogStreamAsErrorMsg();
 		
-		size -= pushedSize;
-		
-		counter++;
-		if ( counter > 100 ) {
-			
-			
-			/*
-			wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
-			std::stringstream ss;
-			byteWriter.trace(ss);
-			evt.SetString(wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push failed: Size required: %04u, Size pushed: %04u. Byte stream: {%s}", size, pushedSize, ss.str().c_str()));
-			wxPostEvent(GBL_CONFIG->getTheApp(), evt);
-			*/
-			
-			std::stringstream ss;
-			byteWriter.trace(ss);
-			addErrorInfo(E_INVALID_PARAMETER, wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push failed: Size required: %04u, Size pushed: %04u. Byte stream: {%s}", size, pushedSize, ss.str().c_str()));
-			
-			byteWriter.reset();
-			return;
-		}
+		byteWriter.reset();
+		fatalErrorState = true;
+		return;
 	}
 	
-	
+	// error handling - push failed
+	if ( ( pushedSize = readDataQueue.push(byteWriter.getBuffer(), size) ) != size ) {
+		logStream << wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push failed: Size required: %04u, Size pushed: %04u. Byte stream: ", size, pushedSize);
+		byteWriter.trace(logStream);
+		//appendLogStreamToErrorInfo();
+		publishLogStreamAsErrorMsg();
+		
+		byteWriter.reset();
+		fatalErrorState = true;
+		return;
+	}
 	
 	// debug only
 	if ( false ) {
-		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
-		std::stringstream ss;
-		byteWriter.trace(ss);
-		evt.SetString(wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push preview required: %04u, Size pushed: %04u. Byte stream: {%s}", size, pushedSize, ss.str().c_str()));
-		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+		logStream << wxString::Format("SerialFacadeThread::pushAndReleaseBytes: readDataQueue.push preview required: %04u, Size pushed: %04u. Byte stream: ", size, pushedSize);
+		byteWriter.trace(logStream);
+		publishLogStreamAsInfoMsg();
 	}
 	
 	byteWriter.reset();
@@ -400,12 +465,20 @@ void SerialSimulatorThread::Serial_writeLongValues(unsigned char pid, int32_t va
 ///////////////////////////////////////////////////////////////////
 int SerialSimulatorThread::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	static const unsigned int MAX_ITEMS = 32000;
+	if ( fatalErrorState == true )
+		return -1;
+	
+	static const unsigned int MAX_ITEMS = 1024;
 	static SerialByte serialBytes[MAX_ITEMS];
 	
 	tsLastLog = wxDateTime::UNow();
-
-	unsigned int sizeAvailable = readDataQueue.pop(serialBytes, nbByte);
+	
+	unsigned int sizeAvailable = readDataQueue.read_available();
+	if (  sizeAvailable ==  0 )
+		return 0;
+		
+	sizeAvailable = std::min(std::min(sizeAvailable, nbByte), MAX_ITEMS - 1 );
+	sizeAvailable = readDataQueue.pop(serialBytes, sizeAvailable);
 	if ( sizeAvailable == 0 )
 		return 0;
 		
@@ -415,6 +488,9 @@ int SerialSimulatorThread::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialSimulatorThread::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	if ( fatalErrorState == true )
+		return false;
+	
 	tsLastLog = wxDateTime::UNow();
 	
 	if ( buffer == NULL || nbByte == 0 )
@@ -424,13 +500,29 @@ bool SerialSimulatorThread::writeData(void *buffer, unsigned int nbByte) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::performNextErrorInfoResponseId() {
+	errorInfoResponseId = CncTimeFunctions::getNanoTimestamp();
+}
+///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::performLastErrorInfoResponseId() {
+///////////////////////////////////////////////////////////////////
+	byteWriter.write(RET_SOT);
+	byteWriter.write(wxString::Format("%lld", errorInfoResponseId));
+	byteWriter.write(MBYTE_CLOSE);
+	
+	pushAndReleaseBytes();
+}
+///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::performErrorInfo() {
 ///////////////////////////////////////////////////////////////////
 	byteWriter.write(RET_SOT);
 	
+	byteWriter.write(wxString::Format("%lld", errorInfoResponseId));
+	byteWriter.write(TEXT_CLOSE);
+	
 	byteWriter.write("0");
 	byteWriter.write(TEXT_SEPARATOR);
-	byteWriter.write(E_TOTAL_COUNT);
+	byteWriter.write(wxString::Format("%u", E_TOTAL_COUNT));
 	byteWriter.write(TEXT_SEPARATOR);
 	byteWriter.write(wxString::Format("%u", (unsigned int)errorList.size()));
 	byteWriter.write(TEXT_CLOSE);
@@ -616,6 +708,11 @@ void SerialSimulatorThread::releaseCondition() {
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::processNextCommand() {
 ///////////////////////////////////////////////////////////////////
+	if ( fatalErrorState == true ) {
+		Serial_write(RET_ERROR);
+		return;
+	}
+	
 	if ( writeDataQueue.read_available() == 0 )
 		return;
 	
@@ -693,27 +790,30 @@ void SerialSimulatorThread::processNextCommand() {
 		case CMD_DISABLE_PROBE_MODE:	probeMode = false;
 										ret = RET_OK;
 										break;
-
+		
 		// --------------------------------------------------------------------------
 		// Commands - multi byte return
 		// - must return without an return code
 		// --------------------------------------------------------------------------
-		case CMD_PRINT_VERSION: 		performVersionInfo();
-										sendReturnCode = false;
-										break;
+		case CMD_PRINT_VERSION: 				performVersionInfo();
+												sendReturnCode = false;
+												break;
 		
-		case CMD_PRINT_CONFIG:			performConfiguration();
-										sendReturnCode = false;
-										break;
+		case CMD_PRINT_CONFIG:					performConfiguration();
+												sendReturnCode = false;
+												break;
 		
-		case CMD_PRINT_PIN_REPORT:		performPinReport();
-										sendReturnCode = false;
-										break;
+		case CMD_PRINT_PIN_REPORT:				performPinReport();
+												sendReturnCode = false;
+												break;
 		
-		case CMD_PRINT_ERRORINFO:		performErrorInfo();
-										sendReturnCode = false;
-										break;
-										
+		case CMD_PRINT_ERRORINFO:				performErrorInfo();
+												sendReturnCode = false;
+												break;
+		
+		case CMD_PRINT_LAST_ERROR_RESPONSE_ID:	performLastErrorInfoResponseId();
+												sendReturnCode = false;
+												break;
 		// --------------------------------------------------------------------------
 		// Error handling
 		// --------------------------------------------------------------------------

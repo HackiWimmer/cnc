@@ -178,7 +178,10 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force=false);
 		
 		inline void reset();
+		inline void resetErrorInfo();
 		inline void resetCounter();
+		inline void resetPositionCounter();
+		inline void resetStepCounter();
 		inline bool stepAxis(char axis, int32_t dist);
 
 		inline void writerGetterValues(unsigned char pid, int32_t v);
@@ -189,18 +192,32 @@ class SerialEmulatorNULL : public SerialSpyPort
 		LastCommand lastCommand;
 		unsigned char lastSignal;
 		
+		struct ErrorInfo {
+			unsigned int id			= 0;
+			wxString additionalInfo	= _("");
+		};
+		
+		typedef std::vector<ErrorInfo> ErrorList;
+		CncNanoTimestamp errorInfoResponseId;
+		ErrorList errorList;
+		
+		void performNextErrorInfoResponseId();
+		void addErrorInfo(unsigned char eid, const wxString& text);
+		
 		virtual void waitDuringRead(unsigned int millis); 
 		virtual void sleepMilliseconds(unsigned int millis);
 		
 		unsigned char getLastSignal() { return lastSignal; }
 		
-		const char* getConfiguration(wxString& ret);
-
 		virtual bool writeGetter(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeSetter(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte);
 			
 		virtual int performSerialBytes(unsigned char *buffer, unsigned int nbByte);
+		
+		virtual int performConfiguration(unsigned char *buffer, unsigned int nbByte);
+		virtual int performErrorInfo(unsigned char *buffer, unsigned int nbByte);
+		virtual int performLastErrorInfoResponseId(unsigned char *buffer, unsigned int nbByte);
 		
 		virtual int performSOT(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMSG(unsigned char *buffer, unsigned int nbByte, const char* response);

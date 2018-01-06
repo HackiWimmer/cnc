@@ -577,13 +577,14 @@ void Serial::decodeMessage(const unsigned char* message, std::ostream& mutliByte
 void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	size_t pos;
+	unsigned int lineCounter = 0;
 	int id;
 	int nr;
 	std::stringstream ss((char*)result);
 	std::string s;
 
 	switch ( cmd ) {
-		case 'c': 
+		case CMD_PRINT_CONFIG: 
 			if ( cncControl->hasControllerConfigControl() == true )
 				cncControl->clearControllerConfigControl();
 				
@@ -611,22 +612,34 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 			}
 			break;
 			
-		case '?':
+		case CMD_PRINT_ERRORINFO:
 			if ( cncControl->hasControllerErrorControl() == true )
 				cncControl->clearControllerErrorControl();
 			
+			lineCounter = 0;
 			while (getline(ss, s, '\n')) {
+				lineCounter++;
+				
+				clog << s << endl;
+				
+				// first fetch response id
+				if ( lineCounter == 1 ) {
+					GBL_CONFIG->getTheApp()->GetLastErrorInfoResponseId()->ChangeValue(s.c_str());
+					continue;
+				}
+				
+				// ... now decode error info
 				if ( (pos = s.find_first_of (':')) > 0 ) {
 					nr = atoi((s.substr(0,pos)).c_str());
 					
 					s = s.substr(pos+1, s.length()-1);
 					if ( (pos = s.find_first_of (':')) > 0 ) {
 						id = atoi((s.substr(0,pos)).c_str());
-					
+						
 						if ( cncControl->hasControllerErrorControl() == true ) {
 							cncControl->appendNumKeyValueToControllerErrorInfo(nr, id, ArduinoErrorCodes::getECLabel(id), s.substr(pos+1, s.length()-1).c_str() );
 						} else {
-							mutliByteStream << nr << ": " << ArduinoErrorCodes::getECLabel((unsigned int)id) /*<< "[" << id << "]"*/ << ": ";
+							mutliByteStream << nr << ": " << ArduinoErrorCodes::getECLabel(id) << ": ";
 							mutliByteStream << s.substr(pos+1, s.length()-1);
 							mutliByteStream << "\n";
 						}
@@ -635,7 +648,7 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 			}
 			break;
 			
-		case 'Q':
+		case CMD_PRINT_PIN_REPORT:
 			if ( cncControl->hasControllerPinControl() == true )
 				cncControl->clearControllerPinControl();
 			
@@ -703,7 +716,7 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 	unsigned char* p = (unsigned char*)buffer;
 	
 	unsigned int remainingBytes = nbByte;
-	unsigned int bytesRead 		= 0;
+	int bytesRead 		= 0;
 	
 	unsigned int cnt = 0;
 	
@@ -713,7 +726,7 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 			
 			// Make the memcpy below safe
 			// Please note this condition normally not occurs
-			if ( bytesRead > remainingBytes ) {
+			if ( bytesRead > (int)remainingBytes ) {
 				std::cerr << "Serial::readDataUntilSizeAvailable: readData(...) delivers to much bytes:" 
 				<< " Requested: " << std::min(remainingBytes, maxBytes)
 				<< " Received: "  << bytesRead
@@ -1373,9 +1386,11 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 					ControllerMsgInfo cmi;
 					decodeMessage(sfi.multiByteResult, cmi.message);
 					cncControl->SerialMessageCallback(cmi);
+					
+					return true;
 				}
 				
-				return evaluateResult(sfi, mutliByteStream, pos);
+				return false;
 			}
 			//evaluateResult..........................................
 			default: {

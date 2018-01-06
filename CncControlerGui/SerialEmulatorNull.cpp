@@ -27,6 +27,8 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , curEmulatorPos(0L, 0L, 0L)
 , lastCommand()
 , lastSignal(CMD_INVALID)
+, errorInfoResponseId(0LL)
+, errorList()
 ///////////////////////////////////////////////////////////////////
 {
 	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
@@ -43,15 +45,21 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , posReplyThresholdZ(1)
 , limitStates()
 , speedSimulator(NULL)
-, positionCounter(0)
-, stepCounterX(0)
-, stepCounterY(0)
-, stepCounterZ(0)
+, positionCounter(MIN_LONG)
+, stepCounterX(MIN_LONG)
+, stepCounterY(MIN_LONG)
+, stepCounterZ(MIN_LONG)
+, positionOverflowCounter(0)
+, stepOverflowCounterX(0)
+, stepOverflowCounterY(0)
+, stepOverflowCounterZ(0)
 , setterMap()
 , targetMajorPos(0L, 0L, 0L)
 , curEmulatorPos(0L, 0L, 0L)
 , lastCommand()
 , lastSignal(CMD_INVALID)
+, errorInfoResponseId(0LL)
+, errorList()
 ///////////////////////////////////////////////////////////////////
 {
 	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
@@ -67,6 +75,7 @@ SerialEmulatorNULL::~SerialEmulatorNULL() {
 		delete speedSimulator;
 		
 	reset();
+	resetErrorInfo();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::waitDuringRead(unsigned int millis) {
@@ -79,6 +88,25 @@ void SerialEmulatorNULL::sleepMilliseconds(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
 	// do nothing because the emulator runs in the same thread as
 	// the application arround
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::performNextErrorInfoResponseId() {
+	errorInfoResponseId = CncTimeFunctions::getNanoTimestamp();
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::addErrorInfo(unsigned char eid, const wxString& text) {
+///////////////////////////////////////////////////////////////////
+	ErrorInfo inf;
+	inf.id = eid;
+	inf.additionalInfo.assign(text);
+	errorList.push_back(inf);
+	performNextErrorInfoResponseId();
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::resetErrorInfo() {
+///////////////////////////////////////////////////////////////////
+	errorList.clear();
+	performNextErrorInfoResponseId();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::reset() {
@@ -95,9 +123,26 @@ void SerialEmulatorNULL::reset() {
 	setterMap.clear();
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::resetPositionCounter() {
+///////////////////////////////////////////////////////////////////
+	positionCounter			= MIN_LONG;
+	positionOverflowCounter	= 0;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::resetStepCounter() {
+///////////////////////////////////////////////////////////////////
+	stepCounterX			= MIN_LONG;
+	stepCounterY			= MIN_LONG;
+	stepCounterZ			= MIN_LONG;
+	stepOverflowCounterX	= 0;;
+	stepOverflowCounterY	= 0;;
+	stepOverflowCounterZ	= 0;;
+}
+///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::resetCounter() {
 ///////////////////////////////////////////////////////////////////
-	
+	resetPositionCounter();
+	resetStepCounter();
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::evaluatePositions(std::vector<int32_t>& ret) {
@@ -147,21 +192,6 @@ bool SerialEmulatorNULL::evaluateLimitStates() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-const char* SerialEmulatorNULL::getConfiguration(wxString& ret) {
-///////////////////////////////////////////////////////////////////
-	ret.clear();
-	ret.assign(wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection"));
-
-	SetterMap::iterator it;
-	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
-		
-		if ( it->first >= PID_DOUBLE_RANG_START )	ret.append(wxString::Format(" %d:%.2lf\n", it->first, (double)(it->second/DBL_FACT)));
-		else										ret.append(wxString::Format(" %d:%d\n",    it->first, it->second));
-	}
-	
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	int ret = 0;
@@ -174,43 +204,46 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 	if ( lastCommand.index == 0 )  {
 		switch( lastCommand.cmd ) { 
 			
-			case CMD_INVALID:				// do nothing if no command is registered
-											ret = 0;
-											break;
-											
-			case CMD_GETTER:				ret = performSerialBytes((unsigned char*)(buffer), nbByte);
-											break;
+			case CMD_INVALID:						// do nothing if no command is registered
+													ret = 0;
+													break;
+			
+			case CMD_GETTER:						ret = performSerialBytes((unsigned char*)(buffer), nbByte);
+													break;
 			
 			case CMD_MOVE:
-			case CMD_RENDER_AND_MOVE:		ret = performMajorMove((unsigned char*)(buffer), nbByte);
-											break;
+			case CMD_RENDER_AND_MOVE:				ret = performMajorMove((unsigned char*)(buffer), nbByte);
+													break;
 			
-			case CMD_PRINT_VERSION: 		ret = performSOT((unsigned char*)(buffer), nbByte, firmWare);
-											break;
+			case CMD_PRINT_VERSION: 				ret = performSOT((unsigned char*)(buffer), nbByte, firmWare);
+													break;
 			
-			case CMD_PRINT_ERRORINFO: 		ret = performSOT((unsigned char*)(buffer), nbByte, "1:0:Not available, because there's no controller connection\n");
-											break;
+			case CMD_PRINT_ERRORINFO: 				ret = performErrorInfo((unsigned char*)(buffer), nbByte);
+													break;
+											
+			case CMD_PRINT_LAST_ERROR_RESPONSE_ID:	ret = performLastErrorInfoResponseId((unsigned char*)(buffer), nbByte);
+													break;
 			
-			case CMD_PRINT_CONFIG: 			ret = performSOT((unsigned char*)(buffer), nbByte, getConfiguration(retStr));
-											break;
+			case CMD_PRINT_CONFIG: 					ret = performConfiguration((unsigned char*)(buffer), nbByte);
+													break;
 			
-			case CMD_PRINT_PIN_REPORT: 		ret = performSOT((unsigned char*)(buffer), nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel::addPinReportRow(...) for more details
-											break;
+			case CMD_PRINT_PIN_REPORT: 				ret = performSOT((unsigned char*)(buffer), nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel::addPinReportRow(...) for more details
+													break;
 			
-			case CMD_TEST_INFO_MESSAGE:		ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'I', "This is a test message from type: INFO"));
-											break;
+			case CMD_TEST_INFO_MESSAGE:				ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'I', "This is a test message from type: INFO"));
+													break;
 			
-			case CMD_TEST_WARN_MESSAGE:		ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'W', "This is a test message from type: WARNING"));
-											break;
+			case CMD_TEST_WARN_MESSAGE:				ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'W', "This is a test message from type: WARNING"));
+													break;
 			
-			case CMD_TEST_ERROR_MESSAGE:	ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'E', "This is a test message from type: ERROR"));
-											break;
+			case CMD_TEST_ERROR_MESSAGE:			ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'E', "This is a test message from type: ERROR"));
+													break;
 			
-			default:						// for all unsupported commands provide
-											// a positive feedback
-											((unsigned char*)buffer)[0] = RET_OK;
-											ret = 1;
-											lastCommand.restLastCmd();
+			default:								// for all unsupported commands provide
+													// a positive feedback
+													((unsigned char*)buffer)[0] = RET_OK;
+													ret = 1;
+													lastCommand.restLastCmd();
 		}
 		
 	} else {
@@ -328,7 +361,6 @@ int SerialEmulatorNULL::performMSG(unsigned char *buffer, unsigned int nbByte, c
 	lastCommand.Serial.write(RET_MSG);
 	lastCommand.Serial.write(response);
 	lastCommand.Serial.write(MBYTE_CLOSE);
-	lastCommand.Serial.write(RET_OK);
 	
 	// support the first byte
 	return performSerialBytes(buffer, nbByte);
@@ -346,6 +378,71 @@ int SerialEmulatorNULL::performSOT(unsigned char *buffer, unsigned int nbByte, c
 		
 	lastCommand.Serial.write(RET_SOT);
 	lastCommand.Serial.write(response);
+	lastCommand.Serial.write(MBYTE_CLOSE);
+	
+	// support the first byte
+	return performSerialBytes(buffer, nbByte);
+}
+
+///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::performConfiguration(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	if ( buffer == NULL )
+		return -1;
+		
+	lastCommand.Serial.write(RET_SOT);
+	lastCommand.Serial.write(wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection"));
+
+	SetterMap::iterator it;
+	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
+		if ( it->first >= PID_DOUBLE_RANG_START )	lastCommand.Serial.write(wxString::Format(" %d:%.2lf\n", it->first, (double)(it->second/DBL_FACT)));
+		else										lastCommand.Serial.write(wxString::Format(" %d:%d\n",    it->first, it->second));
+	}
+	
+	lastCommand.Serial.write(MBYTE_CLOSE);
+	
+	// support the first byte
+	return performSerialBytes(buffer, nbByte);
+}
+///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::performLastErrorInfoResponseId(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	lastCommand.Serial.write(RET_SOT);
+	lastCommand.Serial.write(wxString::Format("%lld", errorInfoResponseId));
+	lastCommand.Serial.write(MBYTE_CLOSE);
+	
+	// support the first byte
+	return performSerialBytes(buffer, nbByte);
+}
+///////////////////////////////////////////////////////////////////
+int SerialEmulatorNULL::performErrorInfo(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	if ( buffer == NULL )
+		return -1;
+		
+	lastCommand.Serial.write(RET_SOT);
+	
+	lastCommand.Serial.write(wxString::Format("%lld", errorInfoResponseId));
+	lastCommand.Serial.write(TEXT_CLOSE);
+	
+	lastCommand.Serial.write("0");
+	lastCommand.Serial.write(TEXT_SEPARATOR);
+	lastCommand.Serial.write(wxString::Format("%u", E_TOTAL_COUNT));
+	lastCommand.Serial.write(TEXT_SEPARATOR);
+	lastCommand.Serial.write(wxString::Format("%u", (unsigned int)errorList.size()));
+	lastCommand.Serial.write(TEXT_CLOSE);
+	
+	unsigned int cnt = 1;
+	for ( auto it = errorList.begin(); it != errorList.end(); ++it ) {
+		
+		lastCommand.Serial.write(wxString::Format("%u", cnt++));
+		lastCommand.Serial.write(TEXT_SEPARATOR);
+		lastCommand.Serial.write(wxString::Format("%u", it->id));
+		lastCommand.Serial.write(TEXT_SEPARATOR);
+		lastCommand.Serial.write(it->additionalInfo);
+		lastCommand.Serial.write(TEXT_CLOSE);
+	}
+	
 	lastCommand.Serial.write(MBYTE_CLOSE);
 	
 	// support the first byte
@@ -399,6 +496,10 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 									lastCommand.cmd = cmd;
 									return true;
 		
+		case CMD_RESET_ERRORINFO:	resetErrorInfo();
+									lastCommand.cmd = cmd;
+									return true;
+		
 		case CMD_GETTER:			lastCommand.cmd = cmd;
 									return writeGetter(buffer, nbByte);
 		
@@ -449,7 +550,7 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 	
 	switch ( pid ) {
 		
-		case PID_ERROR_COUNT:			    writerGetterValues(pid, (int32_t)0); break;
+		case PID_ERROR_COUNT:			    writerGetterValues(pid, (int32_t)errorList.size()); break;
 		case PID_QUERY_READY_TO_RUN:	    writerGetterValues(pid, (int32_t)1); break;
 		
 		case PID_X_POS:   					writerGetterValues(pid, curEmulatorPos.getX()); break;
@@ -475,7 +576,7 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 												writerGetterValues(pid, (*it).second);
 												
 											} else {
-												
+												addErrorInfo(E_GETTER_ID_NOT_FOUND, wxString::Format("Getter as int value: %03d", (int)pid));
 												writerGetterValues(PID_UNKNOWN, 0);
 												return false;
 											}
@@ -507,10 +608,13 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 		setterMap[(int)id] = val;
 		
 		// special handling for later use
-		switch ( (int)id ) {
+		switch ( id ) {
 			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = val; break;
 			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = val; break;
 			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = val; break;
+			
+			case PID_RESERT_POS_COUNTER:  		resetPositionCounter(); break;
+			case PID_RESERT_STEP_COUNTER: 		resetStepCounter(); 	break;
 			
 			case PID_PITCH_X:
 			case PID_PITCH_Y:

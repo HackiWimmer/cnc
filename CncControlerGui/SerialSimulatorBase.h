@@ -30,6 +30,13 @@ class SerialSimulatorThread : public wxThread {
 		
 	protected:
 		
+		std::stringstream logStream;
+		
+		void publishLogStreamAsInfoMsg();
+		void publishLogStreamAsWarningMsg();
+		void publishLogStreamAsErrorMsg();
+		void appendLogStreamToErrorInfo(unsigned char eid = E_PURE_TEXT_VALUE_ERROR);
+		
 		struct ErrorInfo {
 			unsigned int id			= 0;
 			wxString additionalInfo	= _("");
@@ -37,7 +44,7 @@ class SerialSimulatorThread : public wxThread {
 		
 		typedef std::vector<ErrorInfo> ErrorList;
 		
-		static const unsigned long queueSize 	= 1024;
+		static const unsigned long queueSize 	= 1024;// * 1024;
 		typedef boost::lockfree::spsc_queue<SerialData, boost::lockfree::capacity<queueSize> > WriteDataQueue;
 		typedef boost::lockfree::spsc_queue<SerialByte, boost::lockfree::capacity<queueSize> > ReadDataQueue;
 		typedef std::map<unsigned char, int32_t> SetterMap;
@@ -102,6 +109,8 @@ class SerialSimulatorThread : public wxThread {
 		virtual unsigned char performSetterValue(unsigned char pid, int32_t value);
 		
 	private:
+		bool fatalErrorState;
+		
 		SerialSimulatorFacade* caller;
 		wxCondition* callerCondition;
 		wxMutex*     callerMutex;
@@ -121,6 +130,7 @@ class SerialSimulatorThread : public wxThread {
 		WriteDataQueue writeDataQueue;
 		ReadDataQueue readDataQueue;
 		
+		CncNanoTimestamp errorInfoResponseId;
 		ErrorList errorList;
 		SetterMap setterMap;
 		
@@ -144,6 +154,7 @@ class SerialSimulatorThread : public wxThread {
 		void performConfiguration();
 		void performPinReport();
 		void performErrorInfo();
+		void performLastErrorInfoResponseId();
 		
 		void performHeartbeat();
 		
@@ -152,6 +163,8 @@ class SerialSimulatorThread : public wxThread {
 		unsigned char performSetterValueIntern();
 		unsigned char performGetterValueIntern();
 		unsigned char performGetterValueDefault(unsigned char pid);
+		
+		void performNextErrorInfoResponseId();
 
 };
 

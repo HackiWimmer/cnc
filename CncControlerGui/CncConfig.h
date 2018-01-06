@@ -240,8 +240,9 @@ class CncConfig {
 		const bool getSvgResultWithOrigPathFlag();
 		const bool getSvgResultOnlyFirstCrossingFlag();
 		const bool getSvgReverseYAxisFlag();
-		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
 		const bool getAvoidDupSetterValuesFlag();
+		const bool getResetErrorInfoBeforeRunFlag();
+		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
 		
 		const int getStepSignX();
 		const int getStepSignY();

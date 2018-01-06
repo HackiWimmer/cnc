@@ -279,13 +279,6 @@ bool CncControl::setup(bool doReset) {
 	// speed setup
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
 		
-	// reset error information
-	ret = processCommand(CMD_RESET_ERRORINFO, std::cerr);
-	if ( ret == false) {
-		std::cerr << " CncControl::setup: Reset error information failed!\n";
-		return false;
-	}
-	
 	// check if some output was logged in between, if not 
 	// remove last '\n' and put 'Ready' at the end of the
 	// same line as the starting the initialization hint
@@ -554,6 +547,35 @@ bool CncControl::reset() {
 	switchToolOff();
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::resetErrorInfo() {
+////////////checkForErrosAndResetErrorInfo/////////////////////////////////////////
+	bool ret = processCommand(CMD_RESET_ERRORINFO, std::cerr);
+	if ( ret == false) {
+		std::cerr << " CncControl::resetErrorInfo: Reset error information failed!\n";
+		return false;
+	}
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::checkForErrosAndResetErrorInfo(int32_t& preveErrorCount) {
+///////////////////////////////////////////////////////////////////
+	// first of all purge the port to reinitialize the protocol here
+	// important in case of previous error sitiuations
+	// getSerial()->purge(); will be done by getControllerErrorCount() below
+	
+	// ... then determine the current error count and request 
+	// error information on demand
+	preveErrorCount = getControllerErrorCount();
+	if ( preveErrorCount > 0 ) {
+		if ( processCommand(CMD_PRINT_ERRORINFO, std::cerr) == false )
+			std::cerr << " CncControl::resetErrorInfo: Request error information failed!\n";
+	}
+	
+	// ... and last reset the error information
+	return resetErrorInfo();
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncControl::getDurationCount() {
@@ -1189,10 +1211,16 @@ void CncControl::switchToolOff(bool force) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-const int32_t CncControl::getControllerErrorCount() {
+const int32_t CncControl::getControllerErrorCount(bool withPurge) {
 ///////////////////////////////////////////////////////////////////
+	if ( withPurge == true ) {
+		// first of all purge the port to reinitialize the protocol here
+		// important in case of previous error sitiuations
+		getSerial()->purge();
+	}
+	
 	std::vector<int32_t> list;
-
+	
 	if ( isInterrupted() == false )
 		getSerial()->processGetter(PID_ERROR_COUNT, list);
 		
@@ -1206,6 +1234,24 @@ const int32_t CncControl::getControllerErrorCount() {
 	}
 
 	return list.at(0);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::requestErrorInformation(bool withPurge) {
+///////////////////////////////////////////////////////////////////
+	if ( withPurge == true ) {
+		// first of all purge the port to reinitialize the protocol here
+		// important in case of previous error sitiuations
+		getSerial()->purge();
+	}
+	
+	bool ret = processCommand(CMD_PRINT_ERRORINFO, std::cerr);
+	
+	if ( GET_GUI_CTL(controllerErrorInfo) ) {
+		if ( GET_GUI_CTL(controllerErrorInfo)->GetItemCount() > 1 )	GET_GUI_CTL(controllerErrorInfo)->SetForegroundColour(*wxRED);
+		else														GET_GUI_CTL(controllerErrorInfo)->SetForegroundColour(*wxBLACK);
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 const CncLongPosition CncControl::getControllerPos() {
@@ -1795,7 +1841,7 @@ void CncControl::appendNumKeyValueToControllerErrorInfo(int num, int code, const
 	
 	if ( hasControllerErrorControl() ) {
 		DcmItemList rows;
-
+		
 		DataControlModel::addNumKeyValueRow(rows, num, code, key, value);
 		guiCtlSetup->controllerErrorInfo->Freeze();
 		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {

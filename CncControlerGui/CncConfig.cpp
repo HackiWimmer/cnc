@@ -808,6 +808,7 @@ const bool CncConfig::getSvgResultWithOrigPathFlag()				{ wxPGProperty* p = getP
 const bool CncConfig::getSvgResultOnlyFirstCrossingFlag()			{ wxPGProperty* p = getProperty(CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS); wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgReverseYAxisFlag()						{ wxPGProperty* p = getProperty(CncSvg_Parser_REVERSE_Y_AXIS); 			wxASSERT(p); return p->GetValue().GetBool(); }
 const bool CncConfig::getAvoidDupSetterValuesFlag()					{ wxPGProperty* p = getProperty(CncWork_Ctl_AVOID_DUP_SETTER_VALUES); 	wxASSERT(p); return p->GetValue().GetBool(); }
+const bool CncConfig::getResetErrorInfoBeforeRunFlag()				{ wxPGProperty* p = getProperty(CncWork_Ctl_RESET_ERRORINFO_BEFORE_RUN); wxASSERT(p); return p->GetValue().GetBool(); }
 
 const int CncConfig::getStepSignX()									{ return 1; } // currently not supported -1 = reverse
 const int CncConfig::getStepSignY()									{ return 1; } // currently not supported -1 = reverse

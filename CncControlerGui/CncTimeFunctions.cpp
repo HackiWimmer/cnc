@@ -114,11 +114,11 @@ CncNanoTimestamp CncTimeFunctions::getNanoTimestamp() {
 ////////////////////////////////////////////////////////////////
 	if ( initialized == false )
 		CncTimeFunctions::init();
-
+	
 	LARGE_INTEGER count;
 	QueryPerformanceCounter(&count);
 	
-	time_point tp(duration(count.QuadPart * static_cast<CncNanoTimestamp>(period::den) / counterFrequency.QuadPart));
+	time_point tp(duration(count.QuadPart * (static_cast<CncNanoTimestamp>(period::den) / counterFrequency.QuadPart)));
 	return tp.time_since_epoch().count();
 }
 ////////////////////////////////////////////////////////////////

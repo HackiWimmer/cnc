@@ -2651,7 +2651,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2586->Add(m_staticText1283132, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_btClearMsgHistory = new wxButton(m_conrollerMessages, wxID_ANY, _("Clear"), wxDefaultPosition, wxDLG_UNIT(m_conrollerMessages, wxSize(-1,-1)), 0);
+    m_btClearMsgHistory = new wxButton(m_conrollerMessages, wxID_ANY, _("Clear List"), wxDefaultPosition, wxDLG_UNIT(m_conrollerMessages, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btClearMsgHistory->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
     m_btClearMsgHistory->SetBitmapMargins(2,2);
@@ -2674,14 +2674,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_controllerErrorInfoImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-patch")));
     m_notebookConfig->AddPage(m_controllerErrorInfo, _("Ctrl Error Info"), false, m_controllerErrorInfoImgIndex);
     
-    wxFlexGridSizer* flexGridSizer13062 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer13062 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer13062->SetFlexibleDirection( wxBOTH );
     flexGridSizer13062->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer13062->AddGrowableCol(0);
     flexGridSizer13062->AddGrowableRow(1);
     m_controllerErrorInfo->SetSizer(flexGridSizer13062);
     
-    wxFlexGridSizer* flexGridSizer13113 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer13113 = new wxFlexGridSizer(1, 4, 0, 0);
     flexGridSizer13113->SetFlexibleDirection( wxBOTH );
     flexGridSizer13113->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer13113->AddGrowableCol(0);
@@ -2694,6 +2694,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer13113->Add(m_staticText128314, 0, wxALL, WXC_FROM_DIP(5));
     
+    m_btResetCtlErrorInfo = new wxButton(m_controllerErrorInfo, wxID_ANY, _("Reset . . ."), wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btResetCtlErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-reset")), wxLEFT);
+    m_btResetCtlErrorInfo->SetBitmapMargins(2,2);
+    #endif
+    m_btResetCtlErrorInfo->SetToolTip(_("Reset Controller Error Info"));
+    
+    flexGridSizer13113->Add(m_btResetCtlErrorInfo, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    
     m_btRequestCtlErrorInfo = new wxButton(m_controllerErrorInfo, wxID_ANY, _("Request"), wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btRequestCtlErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_restart")), wxLEFT);
@@ -2702,6 +2711,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btRequestCtlErrorInfo->SetToolTip(_("Request Controller Error Info"));
     
     flexGridSizer13113->Add(m_btRequestCtlErrorInfo, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    
+    m_btClearCtlErrorInfoList = new wxButton(m_controllerErrorInfo, wxID_ANY, _("Clear List"), wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btClearCtlErrorInfoList->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
+    m_btClearCtlErrorInfoList->SetBitmapMargins(2,2);
+    #endif
+    m_btClearCtlErrorInfoList->SetToolTip(_("Clear Error Info List"));
+    m_btClearCtlErrorInfoList->Hide();
+    
+    flexGridSizer13113->Add(m_btClearCtlErrorInfoList, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
     
     m_dvListCtrlControllerErrorInfo = new wxDataViewListCtrl(m_controllerErrorInfo, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
     m_dvListCtrlControllerErrorInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
@@ -2712,6 +2731,51 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Error Code"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT);
     m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Error Text"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Info"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    wxFlexGridSizer* flexGridSizer5155 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5155->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5155->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5155->AddGrowableCol(0);
+    flexGridSizer5155->AddGrowableRow(0);
+    
+    flexGridSizer13062->Add(flexGridSizer5155, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_panel5162 = new wxPanel(m_controllerErrorInfo, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel5162->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
+    
+    flexGridSizer5155->Add(m_panel5162, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5163 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5163->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5163->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5163->AddGrowableCol(0);
+    flexGridSizer5163->AddGrowableRow(0);
+    m_panel5162->SetSizer(flexGridSizer5163);
+    
+    wxFlexGridSizer* flexGridSizer5160 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5160->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5160->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5163->Add(flexGridSizer5160, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_staticText5159 = new wxStaticText(m_panel5162, wxID_ANY, _("Last Response ID:"), wxDefaultPosition, wxDLG_UNIT(m_panel5162, wxSize(-1,-1)), 0);
+    m_staticText5159->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
+    m_staticText5159->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
+    wxFont m_staticText5159Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
+    m_staticText5159->SetFont(m_staticText5159Font);
+    
+    flexGridSizer5160->Add(m_staticText5159, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_lastErrorInfoResponseId = new wxTextCtrl(m_panel5162, wxID_ANY, wxT("#12345"), wxDefaultPosition, wxDLG_UNIT(m_panel5162, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
+    m_lastErrorInfoResponseId->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
+    m_lastErrorInfoResponseId->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
+    wxFont m_lastErrorInfoResponseIdFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_lastErrorInfoResponseId->SetFont(m_lastErrorInfoResponseIdFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_lastErrorInfoResponseId->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer5160->Add(m_lastErrorInfoResponseId, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
     m_3DPane = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_3DPaneImgIndex;
     m_3DPaneImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("package-x-generic1")));
@@ -3576,6 +3640,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1628->Add(m_keepFileManagerPreview, 0, wxALL, WXC_FROM_DIP(1));
     
     m_lruList = new wxListCtrl(m_scrollWinFile, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinFile, wxSize(-1,110)), wxLC_SINGLE_SEL|wxLC_REPORT);
+    m_lruList->SetToolTip(_("rwerew"));
     
     flexGridSizer1628->Add(m_lruList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -4477,94 +4542,120 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuBar->Append(m_menuMonitoring, _("Monitoring"));
     
     m_menuItemUpdCoors = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Update Coordinates"), wxT(""), wxITEM_CHECK);
+    m_menuItemUpdCoors->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemUpdCoors);
     m_menuItemUpdCoors->Check();
     
     m_menuItemUpdDraw = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Online Preview"), wxT(""), wxITEM_CHECK);
+    m_menuItemUpdDraw->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemUpdDraw);
     m_menuItemUpdDraw->Check();
     
     m_menuItemAllowEvents = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Allow Events"), wxT(""), wxITEM_CHECK);
+    m_menuItemAllowEvents->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemAllowEvents);
     m_menuItemAllowEvents->Check();
     
     m_menuItemDisplayUserAgent = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Display User Agent Content"), wxT(""), wxITEM_CHECK);
+    m_menuItemDisplayUserAgent->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemDisplayUserAgent);
     m_menuItemDisplayUserAgent->Check();
     
     m_menuItemToolControls = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Update Tool-/Speed-Controls"), wxT(""), wxITEM_CHECK);
+    m_menuItemToolControls->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemToolControls);
     m_menuItemToolControls->Check();
     
     m_menuMonitoring->AppendSeparator();
     
     m_menuItemDebugSerial = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Spy Serial (very slow)"), wxT(""), wxITEM_CHECK);
+    m_menuItemDebugSerial->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemDebugSerial);
     
     m_menuItemFreezeLogger = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Unfreeze Logger"), wxT(""), wxITEM_CHECK);
+    m_menuItemFreezeLogger->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemFreezeLogger);
     m_menuItemFreezeLogger->Check();
     
     m_menuMonitoring->AppendSeparator();
     
     m_menuItemMinMonitoring = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Setup Minimal Monitoring"), wxT(""), wxITEM_NORMAL);
+    m_menuItemMinMonitoring->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("network-wireless-low (2)")));
     m_menuMonitoring->Append(m_menuItemMinMonitoring);
     
     m_menuItemNormalMonitoring = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Setup Standard Monitoring"), wxT(""), wxITEM_NORMAL);
+    m_menuItemNormalMonitoring->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("network-wireless-full (2)")));
     m_menuMonitoring->Append(m_menuItemNormalMonitoring);
     
     m_menuRequestor = new wxMenu();
     m_menuBar->Append(m_menuRequestor, _("Controller Requests"));
     
     m_miRqtIdleMessages = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Request Idle Messages"), wxT(""), wxITEM_CHECK);
+    m_miRqtIdleMessages->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuRequestor->Append(m_miRqtIdleMessages);
     m_miRqtIdleMessages->Check();
     
     m_menuRequestor->AppendSeparator();
     
     m_miRqtVersion = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Software Version"), wxT(""), wxITEM_NORMAL);
+    m_miRqtVersion->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("enumerator")));
     m_menuRequestor->Append(m_miRqtVersion);
     
     m_miRqtConfig = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Current Config"), wxT(""), wxITEM_NORMAL);
+    m_miRqtConfig->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("system-settings")));
     m_menuRequestor->Append(m_miRqtConfig);
     
     m_miRqtPins = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Pin Report"), wxT(""), wxITEM_NORMAL);
+    m_miRqtPins->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
     m_menuRequestor->Append(m_miRqtPins);
     
     m_menuErrorCount = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Error Count"), wxT(""), wxITEM_NORMAL);
+    m_menuErrorCount->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
     m_menuRequestor->Append(m_menuErrorCount);
     
     m_miRqtErrorInfo = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Error Info"), wxT(""), wxITEM_NORMAL);
+    m_miRqtErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
     m_menuRequestor->Append(m_miRqtErrorInfo);
     
     m_menuRequestor->AppendSeparator();
     
     m_menuItemInfoMessage = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Test - Info Message"), wxT(""), wxITEM_NORMAL);
+    m_menuItemInfoMessage->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")));
     m_menuRequestor->Append(m_menuItemInfoMessage);
     
     m_menuItemWarningMessage = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Test - Warning Message"), wxT(""), wxITEM_NORMAL);
+    m_menuItemWarningMessage->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-warning-3 (2)")));
     m_menuRequestor->Append(m_menuItemWarningMessage);
     
     m_menuItemErrorMessage = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Test - Error Message"), wxT(""), wxITEM_NORMAL);
+    m_menuItemErrorMessage->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-error-5 (2)")));
     m_menuRequestor->Append(m_menuItemErrorMessage);
     
     m_menuRequestor->AppendSeparator();
     
     m_miMotorEnableState = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Enable stepper motors"), wxT(""), wxITEM_CHECK);
+    m_miMotorEnableState->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuRequestor->Append(m_miMotorEnableState);
     
     m_menuRequestor->AppendSeparator();
     
     m_miRqtCurPos = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Current Position"), wxT(""), wxITEM_NORMAL);
+    m_miRqtCurPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
     m_menuRequestor->Append(m_miRqtCurPos);
     
     m_miRqtLimit = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Current Limit State"), wxT(""), wxITEM_NORMAL);
+    m_miRqtLimit->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
     m_menuRequestor->Append(m_miRqtLimit);
     
     m_menuRequestor->AppendSeparator();
     
-    m_miReset = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Reset Controller"), wxT(""), wxITEM_NORMAL);
-    m_menuRequestor->Append(m_miReset);
+    m_miRqtReset = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Reset Controller"), wxT(""), wxITEM_NORMAL);
+    m_miRqtReset->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-reset")));
+    m_menuRequestor->Append(m_miRqtReset);
+    
+    m_miRqtResetErrorInfo = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Reset Error Info"), wxT(""), wxITEM_NORMAL);
+    m_miRqtResetErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-reset")));
+    m_menuRequestor->Append(m_miRqtResetErrorInfo);
     
     m_menuTools = new wxMenu();
     m_menuBar->Append(m_menuTools, _("Tools"));
@@ -4860,7 +4951,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btRequestCtlConfig->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerConfigFromButton), NULL, this);
     m_btRequestControllerPins->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
+    m_btResetCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::resetControllerErrorInfoFromButton), NULL, this);
     m_btRequestCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
+    m_btClearCtlErrorInfoList->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerErrorInfoFromButton), NULL, this);
     m_probeModePanel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::leftDownProbeModePanel), NULL, this);
     m_btProbeMode->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
     m_probeModeLabel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::leftDownProbeModePanel), NULL, this);
@@ -4986,7 +5079,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Connect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Connect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
-    this->Connect(m_miReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
+    this->Connect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
+    this->Connect(m_miRqtResetErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResetErrorInfo), NULL, this);
     this->Connect(m_miPathGenerator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     this->Connect(m_miIniFile->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openConfigurationFile), NULL, this);
     this->Connect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
@@ -5149,7 +5243,9 @@ MainFrameBClass::~MainFrameBClass()
     m_btRequestCtlConfig->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerConfigFromButton), NULL, this);
     m_btRequestControllerPins->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
+    m_btResetCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::resetControllerErrorInfoFromButton), NULL, this);
     m_btRequestCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
+    m_btClearCtlErrorInfoList->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerErrorInfoFromButton), NULL, this);
     m_probeModePanel->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::leftDownProbeModePanel), NULL, this);
     m_btProbeMode->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
     m_probeModeLabel->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::leftDownProbeModePanel), NULL, this);
@@ -5275,7 +5371,8 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miMotorEnableState->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestEnableStepperMotors), NULL, this);
     this->Disconnect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Disconnect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
-    this->Disconnect(m_miReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
+    this->Disconnect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
+    this->Disconnect(m_miRqtResetErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResetErrorInfo), NULL, this);
     this->Disconnect(m_miPathGenerator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     this->Disconnect(m_miIniFile->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openConfigurationFile), NULL, this);
     this->Disconnect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);

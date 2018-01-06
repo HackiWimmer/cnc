@@ -89,7 +89,6 @@ class CncSpeedSimulator : public CncSpeedManager {
 					totalAccumulatedOffset   += currentAccumulatedOffset;
 					currentAccumulatedOffset  = 0LL;
 					
-					
 				}
 				
 				tsAfterLastWait = CncTimeFunctions::getNanoTimestamp();

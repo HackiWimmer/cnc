@@ -237,7 +237,10 @@
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
+  <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
+  <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="dialog-ok-4">bitmaps\dialog-ok-4.png</object>
+  <object class="wxBitmap" name="dialog-warning-3 (2)">bitmaps\dialog-warning-3 (2).png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
@@ -249,10 +252,12 @@
   <object class="wxBitmap" name="draw-vector">bitmaps\draw-vector.png</object>
   <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
   <object class="wxBitmap" name="edit-rename">bitmaps\edit-rename.png</object>
+  <object class="wxBitmap" name="enumerator">bitmaps\enumerator.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="executable">bitmaps\executable.png</object>
   <object class="wxBitmap" name="feed">bitmaps\feed.png</object>
   <object class="wxBitmap" name="filepreview">bitmaps\filepreview.png</object>
+  <object class="wxBitmap" name="git-reset">bitmaps\git-reset.png</object>
   <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>
   <object class="wxBitmap" name="go-down-2">bitmaps\go-down-2.png</object>
   <object class="wxBitmap" name="go-down-7">bitmaps\go-down-7.png</object>
@@ -264,6 +269,9 @@
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
   <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
+  <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
+  <object class="wxBitmap" name="network-wireless-full (2)">bitmaps\network-wireless-full (2).png</object>
+  <object class="wxBitmap" name="network-wireless-low (2)">bitmaps\network-wireless-low (2).png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
   <object class="wxBitmap" name="plugin-add">bitmaps\plugin-add.png</object>

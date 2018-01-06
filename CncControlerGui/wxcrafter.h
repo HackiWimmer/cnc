@@ -399,8 +399,13 @@ protected:
     wxTextCtrl* m_controllerMsgHistory;
     wxPanel* m_controllerErrorInfo;
     wxStaticText* m_staticText128314;
+    wxButton* m_btResetCtlErrorInfo;
     wxButton* m_btRequestCtlErrorInfo;
+    wxButton* m_btClearCtlErrorInfoList;
     wxDataViewListCtrl* m_dvListCtrlControllerErrorInfo;
+    wxPanel* m_panel5162;
+    wxStaticText* m_staticText5159;
+    wxTextCtrl* m_lastErrorInfoResponseId;
     wxPanel* m_3DPane;
     wxPanel* m_probeModePanel;
     wxBitmapToggleButton* m_btProbeMode;
@@ -628,7 +633,8 @@ protected:
     wxMenuItem* m_miRqtCurPos;
     wxMenuItem* m_miRqtLimit;
     wxMenuItem* m_menuItem1183;
-    wxMenuItem* m_miReset;
+    wxMenuItem* m_miRqtReset;
+    wxMenuItem* m_miRqtResetErrorInfo;
     wxMenu* m_menuTools;
     wxMenuItem* m_miPathGenerator;
     wxMenuItem* m_miIniFile;
@@ -790,7 +796,9 @@ protected:
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
+    virtual void resetControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void leftDownProbeModePanel(wxMouseEvent& event) { event.Skip(); }
     virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
@@ -906,6 +914,7 @@ protected:
     virtual void requestCurrentPos(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestResetErrorInfo(wxCommandEvent& event) { event.Skip(); }
     virtual void openConfigurationFile(wxCommandEvent& event) { event.Skip(); }
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
@@ -1228,8 +1237,13 @@ public:
     wxTextCtrl* GetControllerMsgHistory() { return m_controllerMsgHistory; }
     wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
     wxStaticText* GetStaticText128314() { return m_staticText128314; }
+    wxButton* GetBtResetCtlErrorInfo() { return m_btResetCtlErrorInfo; }
     wxButton* GetBtRequestCtlErrorInfo() { return m_btRequestCtlErrorInfo; }
+    wxButton* GetBtClearCtlErrorInfoList() { return m_btClearCtlErrorInfoList; }
     wxDataViewListCtrl* GetDvListCtrlControllerErrorInfo() { return m_dvListCtrlControllerErrorInfo; }
+    wxStaticText* GetStaticText5159() { return m_staticText5159; }
+    wxTextCtrl* GetLastErrorInfoResponseId() { return m_lastErrorInfoResponseId; }
+    wxPanel* GetPanel5162() { return m_panel5162; }
     wxPanel* GetControllerErrorInfo() { return m_controllerErrorInfo; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }

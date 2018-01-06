@@ -143,6 +143,7 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncZView.h"/>
       <File Name="CncNumberFormatter.cpp"/>
       <File Name="CncArduino.cpp"/>
       <File Name="CncControl.cpp"/>
@@ -168,7 +169,6 @@
       <File Name="LinearFunc.h"/>
       <File Name="CncStreamBuffers.cpp"/>
       <File Name="CncZView.cpp"/>
-      <File Name="CnczView.h"/>
       <File Name="CncCommon.cpp"/>
       <File Name="CncSpeedView.h"/>
       <File Name="CncSpeedView.cpp"/>

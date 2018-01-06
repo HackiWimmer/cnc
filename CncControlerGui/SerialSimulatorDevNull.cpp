@@ -13,6 +13,12 @@
  * 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO|WARNING|ERROR);
  *		evt.SetString("<... message to log ...>");
  * 		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+ * 
+ *	Or one of the following functions:
+ *		void publishLogStreamAsInfoMsg();
+ *		void publishLogStreamAsWarningMsg();
+ *		void publishLogStreamAsErrorMsg();
+ *		void appendLogStreamToErrorInfo(unsigned char eid = E_PURE_TEXT_VALUE_ERROR);
 */
 
 ///////////////////////////////////////////////////////////////////
