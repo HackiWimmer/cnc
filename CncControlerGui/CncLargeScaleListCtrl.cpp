@@ -301,14 +301,13 @@ int CncLargeScaledListCtrl::OnGetItemColumnImage(long item, long column) const {
 wxListItemAttr* CncLargeScaledListCtrl::OnGetItemAttr(long item) const {
 ///////////////////////////////////////////////////////////////////
 	// default behaviour
-	#warning why is this method never called?
 	return NULL;
 }
 ///////////////////////////////////////////////////////////////////
 wxListItemAttr* CncLargeScaledListCtrl::OnGetItemColumnAttr(long item, long column) const {
 ///////////////////////////////////////////////////////////////////
 	// default behaviour
-	return NULL;
+	return OnGetItemAttr(item);
 }
 
 

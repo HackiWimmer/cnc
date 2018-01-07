@@ -134,16 +134,35 @@ CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncNanoTimestamp& a, const C
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 ////////////////////////////////////////////////////////////////
+	if ( micros <= 0 )
+		return;
+	
+	CncNanoTimestamp tsStart = getNanoTimestamp();
+	CncNanoTimestamp tsEnd   = 0LL;
+	do {
+		tsEnd  = getNanoTimestamp();
+	} while ( (tsEnd - tsStart)/1000 < micros );
+}
+////////////////////////////////////////////////////////////////
+void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
+////////////////////////////////////////////////////////////////
 	if ( micros <= 0LL )
 		return;
-
-	struct timeval t0, t1;
-	CncTimeFunctions::gettimeofday(&t0, NULL);
 	
-	do {
-		CncTimeFunctions::gettimeofday(&t1, NULL);
-		
-	} while ( (t1.tv_sec * 1000 * 1000 + t1.tv_usec - (t0.tv_sec * 1000 * 1000 + t0.tv_usec)) < (int)micros );
+	if ( micros <= 16250LL ) {
+		busyWaitMircoseconds(micros);
+		return;
+	}
+	
+	HANDLE timer; 
+	LARGE_INTEGER ft; 
+	
+	// Convert to 100 nanosecond interval, negative value indicates relative time
+	ft.QuadPart = -( 10 * (__int64)micros); 
+	timer = CreateWaitableTimer(NULL, TRUE, NULL); 
+	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0); 
+	WaitForSingleObject(timer, INFINITE); 
+	CloseHandle(timer); 
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::activeWaitMircoseconds(int64_t micros, bool active) {
@@ -162,23 +181,4 @@ void CncTimeFunctions::activeWaitMircoseconds(int64_t micros, bool active) {
 	}
 		
 	sleepMircoseconds(micros);
-}
-////////////////////////////////////////////////////////////////
-void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
-////////////////////////////////////////////////////////////////
-	if ( micros <= 0LL )
-		return;
-	
-	if ( micros <= 16250LL )
-		busyWaitMircoseconds(micros);
-	
-	HANDLE timer; 
-	LARGE_INTEGER ft; 
-	
-	// Convert to 100 nanosecond interval, negative value indicates relative time
-	ft.QuadPart = -( 10 * (__int64)micros); 
-	timer = CreateWaitableTimer(NULL, TRUE, NULL); 
-	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0); 
-	WaitForSingleObject(timer, INFINITE); 
-	CloseHandle(timer); 
 }

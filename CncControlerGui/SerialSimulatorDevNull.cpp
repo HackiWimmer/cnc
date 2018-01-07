@@ -335,8 +335,8 @@ bool SerialSimulatorDevNull::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
 	if ( isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		//realeaseCondition();
-		speedSimulator->performCurrentOffsetThreadLocal(true);
-		speedSimulator->reset();
+		speedSimulator->performCurrentOffset(true);
+		speedSimulator->finalizeMove();
 	}
 	
 	return true;
@@ -427,7 +427,7 @@ bool SerialSimulatorDevNull::stepAxis(char axis, int32_t steps) {
 							return false;
 			}
 			
-			speedSimulator->performCurrentOffsetThreadLocal(false);
+			speedSimulator->performCurrentOffset(false);
 		}
 	}
 	

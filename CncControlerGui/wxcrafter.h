@@ -93,7 +93,7 @@ protected:
     wxBitmapButton* m_btSelectManuallyMove;
     wxBitmapButton* m_btSelectSetup;
     wxBitmapButton* m_btSelectTemplate;
-    wxBitmapButton* m_btSelectInboundPreview4;
+    wxBitmapButton* m_btSelectInboundTest;
     wxBitmapButton* m_btSelectInboundPreview;
     wxBitmapButton* m_btSelectCncPreview;
     wxBitmapButton* m_btSelectTemplatePreview;
@@ -453,6 +453,7 @@ protected:
     wxButton* m_3D_Trace4;
     wxButton* m_3D_Trace;
     wxListCtrl* m_vectiesListCtrl;
+    wxPanel* m_panel5165;
     wxButton* m_3D_Top;
     wxButton* m_3D_Bottom;
     wxButton* m_3D_Front;
@@ -940,7 +941,7 @@ public:
     wxBitmapButton* GetBtSelectManuallyMove() { return m_btSelectManuallyMove; }
     wxBitmapButton* GetBtSelectSetup() { return m_btSelectSetup; }
     wxBitmapButton* GetBtSelectTemplate() { return m_btSelectTemplate; }
-    wxBitmapButton* GetBtSelectInboundPreview4() { return m_btSelectInboundPreview4; }
+    wxBitmapButton* GetBtSelectInboundTest() { return m_btSelectInboundTest; }
     wxBitmapButton* GetBtSelectInboundPreview() { return m_btSelectInboundPreview; }
     wxBitmapButton* GetBtSelectCncPreview() { return m_btSelectCncPreview; }
     wxBitmapButton* GetBtSelectTemplatePreview() { return m_btSelectTemplatePreview; }
@@ -1291,6 +1292,7 @@ public:
     wxButton* Get3D_Trace() { return m_3D_Trace; }
     wxListCtrl* GetVectiesListCtrl() { return m_vectiesListCtrl; }
     wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
+    wxPanel* GetPanel5165() { return m_panel5165; }
     wxNotebook* GetStatisticBook() { return m_statisticBook; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
     wxButton* Get3D_Top() { return m_3D_Top; }

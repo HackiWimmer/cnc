@@ -78,9 +78,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddSeparator();
     
-    m_btSelectInboundPreview4 = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_btSelectInboundPreview4->SetToolTip(_("Test Page"));
-    m_auibarMain->AddControl(m_btSelectInboundPreview4);
+    m_btSelectInboundTest = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("software-update-available-3 (2)")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_btSelectInboundTest->SetToolTip(_("Test Page"));
+    m_auibarMain->AddControl(m_btSelectInboundTest);
     
     m_btSelectInboundPreview = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("filepreview")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_btSelectInboundPreview->SetToolTip(_("Inbound Preview"));
@@ -2387,7 +2387,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer4348->Add(m_monitorViewBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_monitorBookCncPanel = new wxPanel(m_monitorViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_monitorViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_monitorBookCncPanel->SetToolTip(_("ee"));
     m_monitorViewBook->AddPage(m_monitorBookCncPanel, _("Page"), false);
     
     wxFlexGridSizer* flexGridSizer649 = new wxFlexGridSizer(1, 1, 0, 0);
@@ -3208,7 +3207,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_statisticPageVecties = new wxPanel(m_statisticBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statisticBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_statisticPageVectiesImgIndex;
     m_statisticPageVectiesImgIndex = m_statisticBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("draw-vector")));
-    m_statisticBook->AddPage(m_statisticPageVecties, _("Vecties"), false, m_statisticPageVectiesImgIndex);
+    m_statisticBook->AddPage(m_statisticPageVecties, _("Monitor Vecties"), false, m_statisticPageVectiesImgIndex);
     
     wxFlexGridSizer* flexGridSizer4915 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer4915->SetFlexibleDirection( wxBOTH );
@@ -3257,6 +3256,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_vectiesListCtrl->SetToolTip(_("Only a placeholder"));
     
     flexGridSizer4915->Add(m_vectiesListCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panel5165 = new wxPanel(m_statisticBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statisticBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_panel5165ImgIndex;
+    m_panel5165ImgIndex = m_statisticBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("sports-shuttlecock")));
+    m_statisticBook->AddPage(m_panel5165, _("Speed Simulator Trace"), false, m_panel5165ImgIndex);
     
     wxFlexGridSizer* flexGridSizer2311 = new wxFlexGridSizer(30, 1, 0, 0);
     flexGridSizer2311->SetFlexibleDirection( wxBOTH );
@@ -3685,7 +3689,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1863->Add(m_clearLogger, 0, wxALL, WXC_FROM_DIP(1));
     
     m_copyLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("edit-copy-7")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_copyLogger->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     m_copyLogger->SetToolTip(_("Copy Logger Panel"));
     
     flexGridSizer1863->Add(m_copyLogger, 0, wxALL, WXC_FROM_DIP(1));
@@ -4827,7 +4830,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btSelectManuallyMove->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
     m_btSelectSetup->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
     m_btSelectTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplate), NULL, this);
-    m_btSelectInboundPreview4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTestPage), NULL, this);
+    m_btSelectInboundTest->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTestPage), NULL, this);
     m_btSelectInboundPreview->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectInboundPreview), NULL, this);
     m_btSelectCncPreview->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectCncMonitor), NULL, this);
     m_btSelectTemplatePreview->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplatePreview), NULL, this);
@@ -5119,7 +5122,7 @@ MainFrameBClass::~MainFrameBClass()
     m_btSelectManuallyMove->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectManuallyMove), NULL, this);
     m_btSelectSetup->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectSetup), NULL, this);
     m_btSelectTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplate), NULL, this);
-    m_btSelectInboundPreview4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTestPage), NULL, this);
+    m_btSelectInboundTest->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTestPage), NULL, this);
     m_btSelectInboundPreview->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectInboundPreview), NULL, this);
     m_btSelectCncPreview->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectCncMonitor), NULL, this);
     m_btSelectTemplatePreview->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onSelectTemplatePreview), NULL, this);

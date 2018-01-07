@@ -620,8 +620,6 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 			while (getline(ss, s, '\n')) {
 				lineCounter++;
 				
-				clog << s << endl;
-				
 				// first fetch response id
 				if ( lineCounter == 1 ) {
 					GBL_CONFIG->getTheApp()->GetLastErrorInfoResponseId()->ChangeValue(s.c_str());

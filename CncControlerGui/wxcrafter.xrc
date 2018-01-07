@@ -122,7 +122,7 @@
             <default>0</default>
           </object>
           <object class="separator"/>
-          <object class="wxBitmapButton" name="m_btSelectInboundPreview4">
+          <object class="wxBitmapButton" name="m_btSelectInboundTest">
             <bitmap>bitmaps/software-update-available-3 (2).png</bitmap>
             <style>wxBU_AUTODRAW</style>
             <tooltip>
@@ -4215,9 +4215,6 @@
                   <selected>0</selected>
                   <object class="wxPanel" name="m_monitorBookCncPanel">
                     <style>wxTAB_TRAVERSAL</style>
-                    <tooltip>
-                      <![CDATA[ee]]>
-                    </tooltip>
                     <object class="wxFlexGridSizer">
                       <cols>1</cols>
                       <rows>1</rows>
@@ -5597,7 +5594,7 @@ Interval [ms]:</label>
                                                         </object>
                                                       </object>
                                                       <object class="notebookpage">
-                                                        <label>Vecties</label>
+                                                        <label>Monitor Vecties</label>
                                                         <bitmap>bitmaps/draw-vector.png</bitmap>
                                                         <selected>0</selected>
                                                         <object class="wxPanel" name="m_statisticPageVecties">
@@ -5676,6 +5673,14 @@ Interval [ms]:</label>
                                                               </object>
                                                             </object>
                                                           </object>
+                                                        </object>
+                                                      </object>
+                                                      <object class="notebookpage">
+                                                        <label>Speed Simulator Trace</label>
+                                                        <bitmap>bitmaps/sports-shuttlecock.png</bitmap>
+                                                        <selected>0</selected>
+                                                        <object class="wxPanel" name="m_panel5165">
+                                                          <style>wxTAB_TRAVERSAL</style>
                                                         </object>
                                                       </object>
                                                     </object>
@@ -6382,7 +6387,6 @@ Interval [ms]:</label>
                       <object class="wxBitmapButton" name="m_copyLogger">
                         <bitmap>bitmaps/edit-copy-7.png</bitmap>
                         <style>wxBU_AUTODRAW</style>
-                        <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
                         <tooltip>
                           <![CDATA[Copy Logger Panel]]>
                         </tooltip>

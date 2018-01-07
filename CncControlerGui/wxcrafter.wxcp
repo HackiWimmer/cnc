@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 5163,
+  "m_objCounter": 5165,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxcrafter_bitmaps.cpp",
@@ -1133,7 +1133,7 @@
           }, {
            "type": "string",
            "m_label": "Name:",
-           "m_value": "m_btSelectInboundPreview4"
+           "m_value": "m_btSelectInboundTest"
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
@@ -27570,7 +27570,7 @@
               }, {
                "type": "multi-string",
                "m_label": "Tooltip:",
-               "m_value": "ee"
+               "m_value": ""
               }, {
                "type": "colour",
                "m_label": "Bg Colour:",
@@ -36011,7 +36011,7 @@
                                     }, {
                                      "type": "string",
                                      "m_label": "Label:",
-                                     "m_value": "Vecties"
+                                     "m_value": "Monitor Vecties"
                                     }, {
                                      "type": "bitmapPicker",
                                      "m_label": "Bitmap File:",
@@ -36473,6 +36473,89 @@
                                        "m_children": []
                                       }]
                                     }]
+                                  }, {
+                                   "m_type": 4441,
+                                   "proportion": 0,
+                                   "border": 5,
+                                   "gbSpan": "1,1",
+                                   "gbPosition": "0,0",
+                                   "m_styles": ["wxTAB_TRAVERSAL"],
+                                   "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM"],
+                                   "m_properties": [{
+                                     "type": "winid",
+                                     "m_label": "ID:",
+                                     "m_winid": "wxID_ANY"
+                                    }, {
+                                     "type": "string",
+                                     "m_label": "Size:",
+                                     "m_value": "-1,-1"
+                                    }, {
+                                     "type": "string",
+                                     "m_label": "Minimum Size:",
+                                     "m_value": "-1,-1"
+                                    }, {
+                                     "type": "string",
+                                     "m_label": "Name:",
+                                     "m_value": "m_panel5165"
+                                    }, {
+                                     "type": "multi-string",
+                                     "m_label": "Tooltip:",
+                                     "m_value": ""
+                                    }, {
+                                     "type": "colour",
+                                     "m_label": "Bg Colour:",
+                                     "colour": "<Default>"
+                                    }, {
+                                     "type": "colour",
+                                     "m_label": "Fg Colour:",
+                                     "colour": "<Default>"
+                                    }, {
+                                     "type": "font",
+                                     "m_label": "Font:",
+                                     "m_value": ""
+                                    }, {
+                                     "type": "bool",
+                                     "m_label": "Hidden",
+                                     "m_value": false
+                                    }, {
+                                     "type": "bool",
+                                     "m_label": "Disabled",
+                                     "m_value": false
+                                    }, {
+                                     "type": "bool",
+                                     "m_label": "Focused",
+                                     "m_value": false
+                                    }, {
+                                     "type": "string",
+                                     "m_label": "Class Name:",
+                                     "m_value": ""
+                                    }, {
+                                     "type": "string",
+                                     "m_label": "Include File:",
+                                     "m_value": ""
+                                    }, {
+                                     "type": "string",
+                                     "m_label": "Style:",
+                                     "m_value": ""
+                                    }, {
+                                     "type": "string",
+                                     "m_label": "Label:",
+                                     "m_value": "Speed Simulator Trace"
+                                    }, {
+                                     "type": "bitmapPicker",
+                                     "m_label": "Bitmap File:",
+                                     "m_path": "bitmaps/sports-shuttlecock.png"
+                                    }, {
+                                     "type": "bool",
+                                     "m_label": "Selected",
+                                     "m_value": false
+                                    }, {
+                                     "type": "bool",
+                                     "m_label": "Null Page",
+                                     "m_value": false
+                                    }],
+                                   "m_events": [],
+                                   "m_children": []
                                   }]
                                 }]
                               }]
@@ -40677,7 +40760,7 @@
                 }, {
                  "type": "colour",
                  "m_label": "Bg Colour:",
-                 "colour": "Highlight"
+                 "colour": "<Default>"
                 }, {
                  "type": "colour",
                  "m_label": "Fg Colour:",

@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+
 #include <chrono>
 #include <sys/time.h>
 #include "CncControl.h"
@@ -823,8 +826,11 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	if ( GBL_CONFIG->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->performCurrentOffset(true);
-		speedSimulator->reset();
-	}
+		speedSimulator->finalizeMove();
+		
+		#warning 
+		clog << "CD: " << speedSimulator->getCurrentDistance() << ",  TE: " << speedSimulator->getCurrentTimeElapsed() << ",  CS: " << speedSimulator->getCurrentFeedSpeed() << endl;
+	} 
 	
 	return true;
 }
@@ -833,16 +839,16 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 ///////////////////////////////////////////////////////////////////
 	// statistic counting
 	incPosistionCounter();
-
-    incStepCounterX(dx);
-    incStepCounterY(dy);
-    incStepCounterZ(dz);
-
+	
+	incStepCounterX(dx);
+	incStepCounterY(dy);
+	incStepCounterZ(dz);
+	
 	// position management
 	curEmulatorPos.incX(dx);
 	curEmulatorPos.incY(dy);
 	curEmulatorPos.incZ(dz);
-
+	
 	// simulate speed
 	if ( stepAxis('X', dx) == false ) return false;
 	if ( stepAxis('Y', dy) == false ) return false;
@@ -1014,4 +1020,19 @@ void SerialEmulatorNULL::incStepCounterZ(int32_t dz) {
 
     stepCounterZ += absolute(dz);
 }
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::traceSpeedInformation() {
+///////////////////////////////////////////////////////////////////
+	if ( speedSimulator == NULL )
+		return;
+		
+	#warning currently only a hack
+	wxString fn(wxString::Format("c:\\temp\\speed.%s.csv", wxDateTime::Now().Format("%Y%m%d-%H%M%S")));
+	std::filebuf fb;
+	fb.open (fn,std::ios::out);
+	std::ostream os(&fb);
 
+	speedSimulator->trace(os);
+
+	fb.close();
+}

@@ -145,7 +145,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , pathGenerator(new PathGeneratorFrame(this, m_stcFileContent))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
-, lruFileList(LruFileList(8))
+, lruFileList(LruFileList(16))
 , lastTemplateModification(wxDateTime::UNow())
 , lastSvgEmuModification(wxDateTime::UNow())
 , processLastDuartion(0L)
@@ -406,6 +406,10 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btSelectManuallyMove);
 	registerGuiControl(m_btSelectSetup);
 	registerGuiControl(m_btSelectTemplate);
+	registerGuiControl(m_btSelectInboundTest);
+	registerGuiControl(m_btSelectInboundPreview);
+	registerGuiControl(m_btSelectCncPreview);
+	registerGuiControl(m_btSelectTemplatePreview);
 	registerGuiControl(m_cbCurveLibResolution);
 	registerGuiControl(m_3D_Refreh);
 	registerGuiControl(m_3D_Clear);
@@ -3420,6 +3424,8 @@ bool MainFrame::processTemplateWrapper() {
 		
 	}
 	
+	cnc->getSerial()->traceSpeedInformation();
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -4074,7 +4080,8 @@ void MainFrame::requestResetErrorInfo(wxCommandEvent& event) {
 	m_lastErrorInfoResponseId->ChangeValue(ss.str().c_str());
 	
 	// update list control
-	cnc->appendNumKeyValueToControllerErrorInfo(0, E_TOTAL_COUNT, ArduinoErrorCodes::getECLabel((unsigned int)E_TOTAL_COUNT) , "0");
+	if ( m_dvListCtrlControllerErrorInfo->GetItemCount() == 0 )
+		cnc->appendNumKeyValueToControllerErrorInfo(0, E_TOTAL_COUNT, ArduinoErrorCodes::getECLabel((unsigned int)E_TOTAL_COUNT) , "0");
 	
 	// select page
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);

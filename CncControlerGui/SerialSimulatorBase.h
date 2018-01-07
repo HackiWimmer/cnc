@@ -165,6 +165,8 @@ class SerialSimulatorThread : public wxThread {
 		unsigned char performGetterValueDefault(unsigned char pid);
 		
 		void performNextErrorInfoResponseId();
+		
+		virtual void traceSpeedInformation();
 
 };
 

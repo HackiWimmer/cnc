@@ -320,6 +320,8 @@ class Serial {
 		double getTotalDistanceY() { return totalDistance[1]; }
 		double getTotalDistanceZ() { return totalDistance[2]; }
 		double getTotalDistance()  { return totalDistance[3]; }
+		
+		virtual void traceSpeedInformation() {}
 };
 
 #endif // SERIALCLASS_H_INCLUDED

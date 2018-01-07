@@ -143,6 +143,7 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncSpeedSimulator.cpp"/>
       <File Name="CncZView.h"/>
       <File Name="CncNumberFormatter.cpp"/>
       <File Name="CncArduino.cpp"/>

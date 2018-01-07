@@ -180,10 +180,11 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline void reset();
 		inline void resetErrorInfo();
 		inline void resetCounter();
-		inline void resetPositionCounter();
-		inline void resetStepCounter();
 		inline bool stepAxis(char axis, int32_t dist);
-
+		
+		void resetPositionCounter();
+		void resetStepCounter();
+		
 		inline void writerGetterValues(unsigned char pid, int32_t v);
 		inline void writerGetterValues(unsigned char pid, int32_t v1, int32_t v2);
 		inline void writerGetterValues(unsigned char pid, int32_t v1, int32_t v2, int32_t v3);
@@ -268,6 +269,8 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual int readData(void *buffer, unsigned int nbByte);
 		// simulate write
 		virtual bool writeData(void *buffer, unsigned int nbByte);
+		
+		virtual void traceSpeedInformation();
 };
 
 #endif
