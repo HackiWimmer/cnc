@@ -1,6 +1,8 @@
 #ifndef OPENGL_CAMERA_HELPER_H
 #define OPENGL_CAMERA_HELPER_H
 
+#include <cmath>
+
 namespace GLI {
 	
 	////////////////////////////////////////////////////////////////
@@ -69,7 +71,7 @@ namespace GLI {
 			const float getUpY() const { return _upY; }
 			const float getUpZ() const { return _upZ; }
 			
-			const int getCurXYPlaneEyeAngle() 		{ return round(std::atan2(_eyeY, _eyeX) * 180 / PI); }
+			const int getCurXYPlaneEyeAngle() 		{ return round(atan2(_eyeY, _eyeX) * 180 / PI); }
 			const float getCurXYPlaneEyeRadius() 	{ return sqrt(_eyeX * _eyeX + _eyeY * _eyeY); }
 			
 			////////////////////////////////////////////
@@ -77,8 +79,8 @@ namespace GLI {
 				setUpPos(0.0, 0.0, 1.0);
 				setCenterPos(0.0, 0.0, 0.0);
 				
-				_eyeX = std::cos(angle*PI/180) * radius;
-				_eyeY = std::sin(angle*PI/180) * radius;
+				_eyeX = cos(angle*PI/180) * radius;
+				_eyeY = sin(angle*PI/180) * radius;
 				_eyeZ = z;
 			}
 			

@@ -1,18 +1,15 @@
 #ifndef SERIALCLASS_H_INCLUDED
 #define SERIALCLASS_H_INCLUDED
 
-#define ARDUINO_WAIT_TIME 2000
-
-#include <wx/string.h>
 #include <vector> 
 #include <map>
-
-#include <windef.h>
+#include <wx/string.h>
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "SvgUnitCalculator.h"
 #include "CncTimeFunctions.h"
 #include "CncPosition.h"
+#include "SerialOSD.h"
 
 typedef std::map<int, int32_t> SetterMap;
 
@@ -109,7 +106,7 @@ struct SvgOriginalPathInfo {
 	wxString useTransformInfo			= "";
 };
 
-class Serial {
+class Serial : public SerialOSD {
 	public:
 		
 		// SerialSyPort parameter
@@ -129,14 +126,10 @@ class Serial {
 		CncNanoTimestamp tsMeasurementLast;
 		
 	protected:
-		//Serial com handler
-		HANDLE hSerial;
 		//cnc control object
 		CncControl* cncControl;
 		// Measurement status
 		bool measurementActive;
-		//Connection status
-		bool connected;
 		// for com porst this should always false
 		bool writeOnlyMoveCommands;
 		// flag if the comand evaluation routine currently runs
@@ -163,8 +156,6 @@ class Serial {
 		virtual void waitDuringRead(unsigned int millis); 
 		virtual void sleepMilliseconds(unsigned int millis);
 		
-		//determine OS error message
-		inline void displayErrorInfo(LPTSTR lpszFunction);
 		// decodes the given controler msg
 		inline void decodeMessage(const unsigned char* message, std::ostream& mutliByteStream);
 		// give the result a more human readabal format
@@ -245,8 +236,6 @@ class Serial {
 		virtual bool writeData(void *buffer, unsigned int nbByte);
 		// will be released periodically be the main thread
 		virtual void onPeriodicallyAppEvent(bool interrupted) {}
-		//Check if we are actually connected
-		bool isConnected();
 		// returns the port name
 		virtual const char* getPortName() { return portName.c_str(); }
 		// set spy mode

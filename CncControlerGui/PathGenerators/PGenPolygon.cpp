@@ -401,7 +401,7 @@ bool PGenPolygon::inlayPolygonB(SvgPathGroup& spg,
 		wxString xxx(' ', callDepth);
 		clog << xxx << callDepth << " duration count: " << cnt << "; result size: "<< results.size() << endl;
 		
-		MessageBoxA(0, wxString::Format("%d", results.getOuterCount()),"",0);
+		//MessageBoxA(0, wxString::Format("%d", results.getOuterCount()),"",0);
 		
 		// nothing more to do
 		if ( results.getOuterCount() == 0 )

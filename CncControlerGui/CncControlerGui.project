@@ -120,6 +120,13 @@
       <File Name="CncPatternDefinitions.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
+      <VirtualDirectory Name="OSD">
+        <File Name="SerialOSD.h"/>
+        <File Name="SerialMsw.h"/>
+        <File Name="SerialMsw.cpp"/>
+        <File Name="SerialGtk.h"/>
+        <File Name="SerialGtk.cpp"/>
+      </VirtualDirectory>
       <File Name="SerialSimulatorFacade.cpp"/>
       <File Name="SerialSimulatorFacade.h"/>
       <VirtualDirectory Name="Native">
@@ -319,22 +326,6 @@
     <File Name="Commands1.txt"/>
     <File Name="../Todos and known issues.txt"/>
   </VirtualDirectory>
-  <VirtualDirectory Name="Arduino">
-    <File Name="../../../@StepperControl/StepperControl_1/CncController.h" ExcludeProjConfig="release2;Release;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncController.ino" ExcludeProjConfig="Debug;Release;release2;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.h" ExcludeProjConfig="release2;Release;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncStepper.ino" ExcludeProjConfig="Debug;Release;release2;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.h" ExcludeProjConfig="release2;Release;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncTestSuite.ino" ExcludeProjConfig="Debug;Release;release2;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.h" ExcludeProjConfig="release2;Release;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonFunctions.ino" ExcludeProjConfig="Debug;Release;release2;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CommonValues.h" ExcludeProjConfig="release2;Release;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/cv.h" ExcludeProjConfig="release2;Release;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.h" ExcludeProjConfig="release2;Release;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/LastErrorCodes.ino" ExcludeProjConfig="Debug;Release;release2;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/StepperControl_1.ino" ExcludeProjConfig="Debug;Release;release2;"/>
-    <File Name="../../../@StepperControl/StepperControl_1/CncSpeedManager.h" ExcludeProjConfig="release2;"/>
-  </VirtualDirectory>
   <VirtualDirectory Name="UnitTests">
     <VirtualDirectory Name="Tests">
       <File Name="Tests/Test_Base.h"/>
@@ -352,9 +343,6 @@
     <File Name="Clipper/clipper.cpp"/>
     <File Name="Clipper/clipper.hpp"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
-  <Dependencies Name="release2"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -530,4 +518,7 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Dependencies Name="release2"/>
 </CodeLite_Project>

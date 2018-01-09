@@ -15,8 +15,6 @@ namespace cnc {
 	extern CncMsgLogStream msg;
 	extern CncSerialSpyStream spy;
 	
-	int gettimeofday(struct timeval *tv, struct timezone *tz);
-	
 	bool dblCompare(double a, double b, double eps = std::numeric_limits<double>::epsilon());
 	bool dblCompareNull(double a, double eps = std::numeric_limits<double>::epsilon());
 	const wxString& dblFormat1(double d);

@@ -2,13 +2,7 @@
 #define CNC_ARDUINO_INCLUDES
 
 #include <string>
-
-#if defined(__WXMSW__)
-	#include "C:\@Development\@Projekte\@StepperControl\StepperControl_1\cv.h"
-#else
-	#include "../../StepperControl_1/cv.h"
-#endif
-
+#include "../StepperControl/cv.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 class ArduinoCMDs {

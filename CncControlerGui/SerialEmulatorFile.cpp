@@ -8,20 +8,20 @@ bool SerialEmulatorFile::connect(const char* fileName) {
 	
 	fileStream.open(fileName, fileFlags);
 	if ( fileStream.is_open() ) {
-		connected = true;
+		setConnected(true);
 	} else {
 		std::cerr << "SerialEmulatorFile::connect: Failed" << std::endl;
 		std::cerr << "Can't open file: '" << fileName << "'" << std::endl;
-		connected = false;
+		setConnected(false);
 	}
 
-	return connected;
+	return isConnected();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorFile::disconnect(void) {
 ///////////////////////////////////////////////////////////////////
 	fileStream.close();
-	connected = false;
+	setConnected(false);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorFile::writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte) {

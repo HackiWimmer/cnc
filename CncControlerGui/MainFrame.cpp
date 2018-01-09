@@ -47,16 +47,15 @@
 #include "HexDecoder.h"
 #include "UnitTestFrame.h"
 #include "UpdateManagerThread.h"
-
 #include "CncConfigProperty.h"
-
-
 #include "MainFrame.h"
 
-// special includes for WindowPoc handling. 
-// they have to be at the end of the list to avoid compilation errors
-#include <windows.h>
-#include <dbt.h>
+#ifdef __WXMSW__
+	// special includes for WindowPoc handling. 
+	// they have to be at the end of the list to avoid compilation errors
+	#include <windows.h>
+	#include <dbt.h>
+#endif
 
 ////////////////////////////////////////////////////////////////////
 // global strings
@@ -1160,6 +1159,7 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 			;// do nothing
 	}	
 }
+#ifdef __WXMSW__
 ///////////////////////////////////////////////////////////////////
 WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) {
 ///////////////////////////////////////////////////////////////////
@@ -1234,6 +1234,9 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 	
 	return ret;
 }
+#else
+	// currently no equivalent
+#endif
 ///////////////////////////////////////////////////////////////////
 void MainFrame::searchAvailiablePorts(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////

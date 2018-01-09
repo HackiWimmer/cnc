@@ -234,7 +234,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		void incStepCounterY(int32_t dy);
 		void incStepCounterZ(int32_t dz);
 
-	void resetEmuPositionCounter();
+		void resetEmuPositionCounter();
 		int32_t getEmuPositionCounter() { return positionCounter; }
 		int32_t getEmuPositionOverflowCounter() { return positionOverflowCounter; }
 
@@ -262,9 +262,9 @@ class SerialEmulatorNULL : public SerialSpyPort
 		// return the port type
 		virtual const CncPortType getPortType() const { return CncEMU_NULL; }
 		// simulate connection
-		virtual bool connect(const char* portName) { connected = true; return true; }
+		virtual bool connect(const char* portName) { setConnected(true); return true; }
 		// close the connection
-		virtual void disconnect(void) { connected = false; }
+		virtual void disconnect(void) { setConnected(false); }
 		// simulate read
 		virtual int readData(void *buffer, unsigned int nbByte);
 		// simulate write

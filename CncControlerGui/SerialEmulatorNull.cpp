@@ -479,7 +479,7 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( connected == false )
+	if ( isConnected() == false )
 		return false;
 		
 	spyWriteData(b, nbByte);
@@ -826,10 +826,12 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	if ( GBL_CONFIG->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->performCurrentOffset(true);
-		speedSimulator->finalizeMove();
 		
 		#warning 
-		clog << "CD: " << speedSimulator->getCurrentDistance() << ",  TE: " << speedSimulator->getCurrentTimeElapsed() << ",  CS: " << speedSimulator->getCurrentFeedSpeed() << endl;
+		clog << "CD: " << speedSimulator->getMeasurementDistance() << ",  TE: " << speedSimulator->getMeasurementTimeElapsed() << ",  CS: " << speedSimulator->getMeasurementFeedSpeed() << endl;
+
+
+		speedSimulator->finalizeMove();
 	} 
 	
 	return true;

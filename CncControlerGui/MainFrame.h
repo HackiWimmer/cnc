@@ -20,7 +20,7 @@
 #include "CncVectiesListCtrl.h"
 #include "CncSummaryListCtrl.h"
 #include "CncStatisticSummaryListCtrl.h"
-#include "codelite/wxPNGAnimation.h"
+#include "Codelite/wxPNGAnimation.h"
 
 ////////////////////////////////////////////////////////////////////
 // forward declarations
@@ -77,8 +77,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void clearControllerErrorInfoFromButton(wxCommandEvent& event);
-    virtual void requestResetErrorInfo(wxCommandEvent& event);
+		virtual void clearControllerErrorInfoFromButton(wxCommandEvent& event);
+		virtual void requestResetErrorInfo(wxCommandEvent& event);
 		virtual void resetControllerErrorInfoFromButton(wxCommandEvent& event);
 		virtual void keyDownLruList(wxKeyEvent& event);
 		virtual void dclickLogger(wxMouseEvent& event);
@@ -429,7 +429,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void changeCrossingThickness();
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
+#		ifdef __WXMSW__
+			virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
+#		else
+			// currently no equivalent
+#		endif
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void waitActive(unsigned int milliseconds, bool once = true);

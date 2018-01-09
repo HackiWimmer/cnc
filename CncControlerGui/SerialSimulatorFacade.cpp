@@ -67,7 +67,7 @@ void SerialSimulatorFacade::onPeriodicallyAppEvent(bool interrupted) {
 	if ( serialThread == NULL )
 		return;
 
-	if ( connected == false )
+	if ( isConnected() == false )
 		return;
 		
 	if ( interrupted == true ) {
@@ -189,7 +189,7 @@ void SerialSimulatorFacade::destroySerialThread() {
 ///////////////////////////////////////////////////////////////////
 bool SerialSimulatorFacade::connect(const char* pn) {
 /////////////////////////////////////////////////////////////////// 
-	if ( connected == true )
+	if ( isConnected() == true )
 		return true;
 	
 	// store the port name
@@ -209,13 +209,13 @@ bool SerialSimulatorFacade::connect(const char* pn) {
 	// was well established and ready to use
 	wxThread::This()->Sleep(10);
 	
-	connected = ( serialThread != NULL && serialThread->IsRunning() ); 
-	return connected; 
+	setConnected( serialThread != NULL && serialThread->IsRunning() ); 
+	return isConnected(); 
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorFacade::disconnect(void) {
 ///////////////////////////////////////////////////////////////////
-	if ( connected == false )
+	if ( isConnected() == false )
 		return;
 	
 	if ( serialThread == NULL )
@@ -224,12 +224,12 @@ void SerialSimulatorFacade::disconnect(void) {
 	// wakeup on demand
 	wakeUpOnDemand();
 	
-	connected = false;
+	setConnected(false);
 }
 ///////////////////////////////////////////////////////////////////
 int SerialSimulatorFacade::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( connected == false )
+	if ( isConnected() == false )
 		return 0;
 	
 	if ( serialThread == NULL )
@@ -245,7 +245,7 @@ int SerialSimulatorFacade::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialSimulatorFacade::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( connected == false )
+	if ( isConnected() == false )
 		return false;
 		
 	if ( serialThread == NULL )
