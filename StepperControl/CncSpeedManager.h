@@ -28,13 +28,16 @@ class CncSpeedManager {
       double distance           = 0.0;
       double feedSpeed          = 0.0;
 
+      Measurement() { reset(); }
+      ~Measurement() {}
+
       void reset() {
         tsStart     = 0L;
         tsEnd       = 0L;
         
         timeElapsed = 0L;
         distance    = 0.0;
-        feedSpeed   = 0.0;
+        feedSpeed   = MIN_LONG;
       }
     };
     //////////////////////////////////////////////////////////////////////////
@@ -306,7 +309,10 @@ class CncSpeedManager {
        
         measurement.timeElapsed  = measurement.tsEnd - measurement.tsStart;
         measurement.feedSpeed    = ((1000L * 1000L * measurement.distance) / measurement.timeElapsed) * 60;
-      } 
+      } else {
+        
+        measurement.feedSpeed = configedFeedSpeed;
+      }
     }
 		
     //////////////////////////////////////////////////////////////////////////

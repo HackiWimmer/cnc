@@ -19,6 +19,7 @@ extern inline void writeLongValue(long val);
 extern inline void writeLongValue(unsigned char pid, long val);
 extern inline void writeLongValues(unsigned char pid, long val1, long val2);
 extern inline void writeLongValues(unsigned char pid, long val1, long val2, long val3);
+extern inline void writeLongValues(unsigned char pid, long val1, long val2, long val3, long val4);
 
 extern inline void pushMessage(const char type, const char* msg);
 extern inline void pushInfoMessage(const char* msg);

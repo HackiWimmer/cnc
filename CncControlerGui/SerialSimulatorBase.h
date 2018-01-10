@@ -99,6 +99,7 @@ class SerialSimulatorThread : public wxThread {
 		void Serial_writeLongValues(unsigned char pid, int32_t val);
 		void Serial_writeLongValues(unsigned char pid, int32_t val1, int32_t val2);
 		void Serial_writeLongValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3);
+		void Serial_writeLongValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3, int32_t val4);
 		
 		// interface for inherited classes
 		virtual void resetSerial()								= 0;

@@ -18,7 +18,7 @@ class PenHandler {
 		void generateWorkPens() {
 			// default
 			for ( unsigned int j=0; j<maxWorkPens; j++ )
-				workPens[j] = wxPen(wxColor(0, 0, 0), 1, wxSOLID);
+				workPens[j] = wxPen(wxColor(0, 0, 0), 1, wxPENSTYLE_SOLID);
 				
 			// individual colors
 			int rc = 255, gc = 0, bc = 0;
@@ -29,7 +29,7 @@ class PenHandler {
 						
 						if ( i < maxWorkPens ) {
 							//clog << i << ": " << rc << ", " << gc << ", " << bc << endl;
-							workPens[i] = wxPen(wxColor(rc, gc, bc), 1, wxSOLID);
+							workPens[i] = wxPen(wxColor(rc, gc, bc), 1, wxPENSTYLE_SOLID);
 						}
 						
 						i++;
@@ -47,11 +47,11 @@ class PenHandler {
 		///////////////////////////////////////////////////////////////////////
 		PenHandler()
 		: durationCounter(0)
-		, flyingPen(wxPen(wxColor(128,128,128), 1, wxDOT))
-		, gridPenDefault(wxPen(*wxWHITE, 1, wxSOLID))
-		, gridPen010(wxPen(wxColor(50,50,50), 1,wxDOT ))
-		, gridPen050(wxPen(wxColor(0,64,128), 1, wxDOT_DASH))
-		, gridPen100(wxPen(wxColor(109,109,109), 1, wxDOT_DASH))
+		, flyingPen(wxPen(wxColor(128,128,128), 1, wxPENSTYLE_DOT))
+		, gridPenDefault(wxPen(*wxWHITE, 1, wxPENSTYLE_SOLID))
+		, gridPen010(wxPen(wxColor(50,50,50), 1, wxPENSTYLE_DOT ))
+		, gridPen050(wxPen(wxColor(0,64,128), 1, wxPENSTYLE_DOT_DASH))
+		, gridPen100(wxPen(wxColor(109,109,109), 1, wxPENSTYLE_DOT_DASH))
 		{
 			generateWorkPens();
 			currentPen 	= workPens[0];

@@ -463,6 +463,17 @@ void SerialSimulatorThread::Serial_writeLongValues(unsigned char pid, int32_t va
 	pushAndReleaseBytes();
 }
 ///////////////////////////////////////////////////////////////////
+void SerialSimulatorThread::Serial_writeLongValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3, int32_t val4) {
+///////////////////////////////////////////////////////////////////
+	byteWriter.write(RET_SOH);
+	byteWriter.write(pid);
+	byteWriter.write(val1);
+	byteWriter.write(val2);
+	byteWriter.write(val3);
+	byteWriter.write(val4);
+	pushAndReleaseBytes();
+}
+///////////////////////////////////////////////////////////////////
 int SerialSimulatorThread::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( fatalErrorState == true )

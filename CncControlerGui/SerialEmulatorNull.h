@@ -140,7 +140,18 @@ struct LastCommand {
 				
 				return ret;
 			} 
-
+			/////////////////////////////////////////////////////
+			int write(int32_t v1, int32_t v2, int32_t v3, int32_t v4) {
+				
+				int ret = 0;
+				ret += write(v1);
+				ret += write(v2);
+				ret += write(v3);
+				ret += write(v4);
+				
+				return ret;
+			} 
+			
 		
 	} Serial;
 };

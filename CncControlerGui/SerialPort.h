@@ -43,7 +43,7 @@ struct SerialFetchInfo {
 	} Gc;
 	
 	struct M {
-		unsigned char result[sizeof(int32_t) * 3];
+		unsigned char result[sizeof(int32_t) * 4];
 		unsigned char* p 				= NULL;
 		int32_t value 					= 0;
 		int bytes 						= -1;
@@ -82,12 +82,16 @@ struct ContollerInfo {
 	int32_t yCtrlPos					= 0L;
 	int32_t zCtrlPos					= 0L;
 	
+	double feedSpeed					= MIN_LONG;
+	
 	int setterId						= 0;
 	int32_t	setterValue					= 0L;
 	
 	int32_t xLimit						= 0L;
 	int32_t yLimit						= 0L;
 	int32_t zLimit						= 0L;
+	
+	bool hasSpeedInformation() { return feedSpeed > 0.0; }
 };
 
 struct ControllerMsgInfo {

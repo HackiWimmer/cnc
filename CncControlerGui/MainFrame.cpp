@@ -1,3 +1,5 @@
+//-Wno-deprecated-declarations
+
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -60,7 +62,7 @@
 ////////////////////////////////////////////////////////////////////
 // global strings
 const char* _programTitel 		= "Woodworking CNC Controller";
-const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2017";
+const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2018";
 const char* _maxSpeedLabel		= "<{MAX}>";
 
 #ifdef DEBUG
@@ -805,10 +807,9 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 	// feed speed control + feed speed panel
 	if ( cnc != NULL && cnc->getSerial() != NULL ) {
 		m_speedPanel->Refresh();
-		m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
 		
-		if ( GBL_CONFIG->isProbeMode() == true )
-			m_feedSpeed->ChangeValue(_maxSpeedLabel);
+		if ( GBL_CONFIG->isProbeMode() == true )	m_feedSpeed->ChangeValue(_maxSpeedLabel);
+		else										m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
 	}
 	
 	// update position syp

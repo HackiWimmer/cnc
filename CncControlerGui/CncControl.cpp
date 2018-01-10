@@ -877,6 +877,10 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				case PID_XYZ_POS_MAJOR:
 				case PID_XYZ_POS_DETAIL:
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
+				
+				#warning
+				clog << "FEED SPEED: " << ci.feedSpeed << endl;
+			
 			}
 			
 			// display controller coordinates

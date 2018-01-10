@@ -79,7 +79,8 @@ void SerialSimulatorDevNull::performCurrentPositions(unsigned char pid) {
 									
 		case PID_XYZ_POS: 
 		case PID_XYZ_POS_MAJOR: 
-		case PID_XYZ_POS_DETAIL: 	Serial_writeLongValues(pid, curSimulatorPos.getX(), curSimulatorPos.getY(), curSimulatorPos.getZ());
+		case PID_XYZ_POS_DETAIL: 	wxASSERT( speedSimulator != NULL);
+									Serial_writeLongValues(pid, curSimulatorPos.getX(), curSimulatorPos.getY(), curSimulatorPos.getZ(), (int32_t)(speedSimulator->getMeasurementFeedSpeed() * DBL_FACT));
 									break;
 									
 		default:					; // do nothing

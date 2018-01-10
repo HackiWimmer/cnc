@@ -1476,9 +1476,10 @@ bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 		
 		if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL ) {
 			switch (i) {
-				case 0:	ci.xCtrlPos = sfi.Mc.value; break;
-				case 4:	ci.yCtrlPos = sfi.Mc.value; break;
-				case 8:	ci.zCtrlPos = sfi.Mc.value; break;
+				case  0:	ci.xCtrlPos  = sfi.Mc.value; break;
+				case  4:	ci.yCtrlPos  = sfi.Mc.value; break;
+				case  8:	ci.zCtrlPos  = sfi.Mc.value; break;
+				case 12:	ci.feedSpeed = sfi.Mc.value/DBL_FACT; break;
 			}
 		} else {
 			switch ( pid ) {

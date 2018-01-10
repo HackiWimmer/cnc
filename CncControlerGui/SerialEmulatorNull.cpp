@@ -455,6 +455,7 @@ int SerialEmulatorNULL::performErrorInfo(unsigned char *buffer, unsigned int nbB
 int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( lastCommand.index == 0 );
+	wxASSERT( speedSimulator != NULL );
 	
 	if ( buffer == NULL )
 		return -1;
@@ -462,7 +463,8 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 	// first write the major position
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_XYZ_POS_MAJOR);
-	lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ());
+	lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ(), (int32_t)(speedSimulator->getMeasurementFeedSpeed() * DBL_FACT));
+	//lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ());
 	lastCommand.Serial.write(RET_OK);
 	
 	// secondary provide the limit information
@@ -826,11 +828,6 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	if ( GBL_CONFIG->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->performCurrentOffset(true);
-		
-		#warning 
-		clog << "CD: " << speedSimulator->getMeasurementDistance() << ",  TE: " << speedSimulator->getMeasurementTimeElapsed() << ",  CS: " << speedSimulator->getMeasurementFeedSpeed() << endl;
-
-
 		speedSimulator->finalizeMove();
 	} 
 	
@@ -876,15 +873,19 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 			// the SerialControllrCallback directly. Otherwise the 
 			// complete serial data will be fetch in one block 
 			// at the end if this writeMove(...) call was finalized.
-
-			ContollerInfo ci;
-			ci.infoType = CITPosition;
-			ci.command  = lastCommand.cmd;
-			ci.posType 	= PID_XYZ_POS_DETAIL;
 			
-			ci.xCtrlPos = curEmulatorPos.getX();
-			ci.yCtrlPos = curEmulatorPos.getY();
-			ci.zCtrlPos = curEmulatorPos.getZ();
+			wxASSERT( speedSimulator != NULL );
+			
+			ContollerInfo ci;
+			ci.infoType  = CITPosition;
+			ci.command   = lastCommand.cmd;
+			ci.posType   = PID_XYZ_POS_DETAIL;
+			
+			ci.xCtrlPos  = curEmulatorPos.getX();
+			ci.yCtrlPos  = curEmulatorPos.getY();
+			ci.zCtrlPos  = curEmulatorPos.getZ();
+			
+			ci.feedSpeed = speedSimulator->getMeasurementFeedSpeed();
 			
 			sendSerialControllrCallback(ci);
 			lastReplyPos.set(curEmulatorPos);
