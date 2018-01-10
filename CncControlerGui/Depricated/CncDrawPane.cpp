@@ -1,47 +1,28 @@
 #include <iostream>
+
 #include <wx/dcclient.h>
 #include <wx/app.h> 
 
+#ifdef USE_WXCRAFTER
+	#include "wxcrafter.h"
+#endif
+
 #ifdef __DARWIN__
     #include <OpenGL/glu.h>
-	#include <OpenGL/glut.h>
-	#include <OpenGL/freeglut.h>
 #else
     #include <GL/glu.h>
-	#include <GL/glut.h>
-	#include <GL/freeglut.h>
 #endif
 
 #include "trackball.h"
-#include "wxcrafter.h"
 #include "CncCommon.h"
 #include "CncDrawPane.h"
 
-// ----------------------------------------------------------------------------
-// CncOpenGLDrawPaneContext
-// ----------------------------------------------------------------------------
 CncOpenGLDrawPaneContext* CncOpenGLDrawPane::globalContext = NULL;
-class GlobalContextManager {
-	public:
-		//////////////////////////////////////////////////////
-		GlobalContextManager() {
-			// init glut lib
-			/*
-			int   argc = 1;
-			char* argv[1] = { wxString("CncOpenGLDrawPane").char_str() };
-			glutInit(&argc, argv);
-			 * */
-		}
-		//////////////////////////////////////////////////////
-		~GlobalContextManager() {
-			CncOpenGLDrawPane::destroyGlobalContext();
-		}
-		
-}; GlobalContextManager _gcm;
 
 // ----------------------------------------------------------------------------
 // CncOpenGLDrawPane Event Table
 // ----------------------------------------------------------------------------
+
 wxBEGIN_EVENT_TABLE(CncOpenGLDrawPane, wxGLCanvas)
 	EVT_PAINT(CncOpenGLDrawPane::OnPaint)
 	EVT_MOUSE_EVENTS(CncOpenGLDrawPane::OnMouse)
@@ -60,9 +41,7 @@ CncOpenGLDrawPane::CncOpenGLDrawPane(wxWindow *parent, int *attribList)
 // viewport settings.
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, 
 	         wxFULL_REPAINT_ON_RESIZE)
-, cncConfig(NULL)
 , spinTimerInterval(DEFAULT_SPIN_TIMER_INTERVAL)
-, currentViewType(DPVT_3D_ISO1)
 , viewPort()
 , translate()
 , scale()
@@ -73,19 +52,16 @@ CncOpenGLDrawPane::CncOpenGLDrawPane(wxWindow *parent, int *attribList)
 , spinAngleX(NULL)
 , spinAngleY(NULL)
 , spinAngleZ(NULL)
-, currentOrigin(DPO_CENTER)
+, planeSelcetion(DPS_XY)
 {
 	trackball(globalData.quat, 0.0f, 0.0f, 0.0f, 0.0f);
 	
-	initDisplayAngles(-48.0, 350.0, -40.0);
-	
 	// select a inital view, this also initializes viewPort
-	view(currentViewType);
+	view3D();
 }
 /////////////////////////////////////////////////////////////////////
 CncOpenGLDrawPane::~CncOpenGLDrawPane() {
 /////////////////////////////////////////////////////////////////////
-
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::trace(const wxString& msg) {
@@ -97,15 +73,9 @@ void CncOpenGLDrawPane::trace(const wxString& msg) {
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::setCncConfig(CncConfig* conf) {
+void CncOpenGLDrawPane::setWorkpieceInfo(const CncOpenGLDrawPaneContext::WorkpieceInfo& wi) {
 /////////////////////////////////////////////////////////////////////
-	cncConfig = conf;
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::setDisplayInfo(const CncOpenGLDrawPaneContext::DisplayOptions3D& di) {
-/////////////////////////////////////////////////////////////////////
-	displayInfo = di;
-	Refresh();
+	workpieceInfo = wi;
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::runOpenGLTest() {
@@ -168,8 +138,10 @@ void CncOpenGLDrawPane::clear3D() {
 	clearDataVector();
 	stopSpinTimer();
 	
-	if ( IsShown() )
+	if ( IsShown() ) {
 		Refresh(false);
+		//view3D();
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::animate3D() {
@@ -177,7 +149,7 @@ void CncOpenGLDrawPane::animate3D() {
 	switchSpinTimer();
 }
 /////////////////////////////////////////////////////////////////////
-CncOpenGLDrawPaneContext& CncOpenGLDrawPane::initGlobalContext(wxGLCanvas *canvas, CncConfig* conf) {
+CncOpenGLDrawPaneContext& CncOpenGLDrawPane::initGlobalContext(wxGLCanvas *canvas) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT( canvas != NULL );
 
@@ -186,25 +158,12 @@ CncOpenGLDrawPaneContext& CncOpenGLDrawPane::initGlobalContext(wxGLCanvas *canva
 		CncOpenGLDrawPane::globalContext = new CncOpenGLDrawPaneContext(canvas);
 
 	globalContext->SetCurrent(*canvas);
-	globalContext->setCncConfig(conf);
-	
 	return *globalContext;
 }
 /////////////////////////////////////////////////////////////////////
 DrawPaneData& CncOpenGLDrawPane::getDataVector() {
 /////////////////////////////////////////////////////////////////////
 	return data;
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::setDataVector(const DrawPaneData& newData) {
-/////////////////////////////////////////////////////////////////////
-	if ( newData.size() > 0 )	data.assign(newData.begin(), newData.end()-1);
-	else 						clearDataVector();
-}
-/////////////////////////////////////////////////////////////////////
-void CncOpenGLDrawPane::appendDataVector(const DoublePointPair3D& newData) {
-/////////////////////////////////////////////////////////////////////
-	data.push_back(newData);
 }
 /////////////////////////////////////////////////////////////////////
 DrawPaneData& CncOpenGLDrawPane::clearDataVector() {
@@ -219,6 +178,7 @@ void CncOpenGLDrawPane::displayDataVector() {
 /////////////////////////////////////////////////////////////////////
 	//Releaes the repaining
 	Refresh(false);
+	Update();
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::setDisplayAngles(float ax, float ay, float az, bool updateCtrl) {
@@ -330,8 +290,11 @@ void CncOpenGLDrawPane::decoratePlayButton(bool state) {
 		return;
 		
 	wxBitmap bmp;
+
+#ifdef USE_WXCRAFTER
 	if ( state == false )	bmp = ImageLib16().Bitmap("BMP_PLAY_3D"); 
 	else 					bmp = ImageLib16().Bitmap("BMP_STOP_3D");
+#endif
 
 	if ( state == true ) {
 		playButton->SetToolTip("Stop Animated 3D View");
@@ -374,9 +337,6 @@ void CncOpenGLDrawPane::resetProjectionMode() {
 /////////////////////////////////////////////////////////////////////
 	if ( !IsShownOnScreen() )
 		return;
-		
-	if ( globalContext == NULL )
-		return;
 
 	// This is normally only necessary if there is more than one wxGLCanvas
 	// or more than one wxGLContext in the application.
@@ -387,7 +347,7 @@ void CncOpenGLDrawPane::resetProjectionMode() {
 
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
-	gluPerspective(15.0f, (GLfloat)viewPort.w/viewPort.h, 0.01, 10000.0);
+	gluPerspective(15.0f, (GLfloat)viewPort.w/viewPort.h, 1.0, 10.0);
 
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
@@ -396,11 +356,10 @@ void CncOpenGLDrawPane::resetProjectionMode() {
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::OnSize(wxSizeEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	/*if ( currentOrigin == DPO_CUSTOM )
+	if ( currentOrigin == DPO_CUSTOM )
 		currentOrigin = DPO_CENTER;
 		
 	resetProjectionMode();
-	 * */
 }
 /////////////////////////////////////////////////////////////////////
 void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
@@ -411,10 +370,10 @@ void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
 	evaluateViewPort();
 	glViewport(viewPort.x, viewPort.y, viewPort.w, viewPort.h);
 
-	CncOpenGLDrawPaneContext& dpc = CncOpenGLDrawPane::initGlobalContext(this, cncConfig);
+	CncOpenGLDrawPaneContext& dpc = CncOpenGLDrawPane::initGlobalContext(this);
 	SetCurrent(*globalContext);
 	
-	dpc.setDisplayInfo(displayInfo);
+	dpc.setWorkpieceInfo(workpieceInfo);
 		
 	// Initialize the global OpenGl data with the first call of OnPaint
 	if ( globalData.isInitialized() == false ) {
@@ -423,7 +382,7 @@ void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
 		globalData.initialize();
 	}   
 
-	static GLfloat m[4][4];
+	GLfloat m[4][4];
 	build_rotmatrix(m, globalData.quat);
 	glMultMatrixf( &m[0][0] );
 
@@ -432,21 +391,16 @@ void CncOpenGLDrawPane::OnPaint(wxPaintEvent& WXUNUSED(event)) {
 	glLoadIdentity();
 	glTranslatef(translate.x, translate.y, translate.z);
 	glScalef(scale.x, scale.y, scale.z);
-	//glScalef(1.0,1.0,1.0);
-	
-	// todo
-	if ( false ) {
-		std::stringstream ss;
-		ss << "ViewPort: "<< viewPort;
-		ss << "; Translate: " << translate;
-		ss << "; Scale: " << scale;
-		trace(ss);
-	}
-	
+
+	std::stringstream ss;
+	ss << "ViewPort: "<< viewPort;
+	ss << "; Translate: " << translate;
+	ss << "; Scale: " << scale;
+	trace(ss);
+
 	rotate(true);
-	
-	dpc.displayDataVector(data, currentViewType, GetClientSize());
-	
+	dpc.displayDataVector(data);
+		
 	SwapBuffers();
 }
 /////////////////////////////////////////////////////////////////////
@@ -531,6 +485,12 @@ void CncOpenGLDrawPane::OnMouse(wxMouseEvent& event) {
 	
 	// do something
 	if ( event.ControlDown() == true ) {
+		translateByMouse(event);
+		
+	} else if ( event.ShiftDown() == true ) {
+		moveViewPortByMouse(event);
+
+	} else {
 		// rotate 3D objects
 		if ( !dragging ) { 
 			dragging = 1;
@@ -543,11 +503,6 @@ void CncOpenGLDrawPane::OnMouse(wxMouseEvent& event) {
 		last_x = event.GetX();
 		last_y = event.GetY();
 		event.Skip(false);
-
-	} else if ( event.ShiftDown() == true ) {
-		moveViewPortByMouse(event);
-	} else {
-		translateByMouse(event);
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -706,18 +661,16 @@ void CncOpenGLDrawPane::view(DrawPaneViewType view) {
 /////////////////////////////////////////////////////////////////////
 	// reset translate and scale
 	translate.init();
-	//scale.init();
-	
-	currentViewType = view;
+	scale.init();
 
 	switch ( view ) {
-		case DPVT_Bottom:	setOriginTL();
+		case DPVT_Top:	 	setOriginTL();
 							displayAngels.setX(+180.0f);
 							displayAngels.setY(+  0.0f);
 							displayAngels.setZ(+  0.0f);
 							break;
 							
-		case DPVT_Top: 		setOriginBL();
+		case DPVT_Bottom: 	setOriginBL();
 							displayAngels.setX(+  0.0f);
 							displayAngels.setY(-360.0f);
 							displayAngels.setZ(+  0.0f);
@@ -747,30 +700,12 @@ void CncOpenGLDrawPane::view(DrawPaneViewType view) {
 							displayAngels.setZ(-270.0f);
 							break;
 
-		case DPVT_3D_ISO1:	setOriginCenter();
-							displayAngels.setX(-50.0f);
-							displayAngels.setY(0.0f);
-							displayAngels.setZ(-40.0f);
+		case DPVT_3D:
+		default: 			setOriginCenter();
+							displayAngels.setX(displayAngels.getDefaultX());
+							displayAngels.setY(displayAngels.getDefaultY());
+							displayAngels.setZ(displayAngels.getDefaultZ());
 							break;
-		
-		case DPVT_3D_ISO2:	setOriginCenter();
-							displayAngels.setX(-50.0f);
-							displayAngels.setY(0.0f);
-							displayAngels.setZ(-140.0f);
-							break;
-							
-		case DPVT_3D_ISO3:	setOriginCenter();
-							displayAngels.setX(-50.0f);
-							displayAngels.setY(0.0f);
-							displayAngels.setZ(50.0f);
-							break;
-							
-		case DPVT_3D_ISO4:	setOriginCenter();
-							displayAngels.setX(-50.0f);
-							displayAngels.setY(0.0f);
-							displayAngels.setZ(210.0f);
-							break;
-							
 	}
 
 	Refresh(false);

@@ -3,11 +3,6 @@
 
 #include <vector>
 #include "CncPoint3D.h"
-#include "CncConfig.h"
-
-enum DrawPaneViewType 	{ DPVT_Front, DPVT_Rear, DPVT_Top, DPVT_Bottom, DPVT_Left, DPVT_Right, DPVT_3D_ISO1, DPVT_3D_ISO2, DPVT_3D_ISO3, DPVT_3D_ISO4 };
-enum DrawPaneOrigin 	{ DPO_TOP_LEFT, DPO_TOP_RIGHT, DPO_BOTTOM_LEFT, DPO_BOTTOM_RIGHT, DPO_CENTER, DPO_CUSTOM};
-enum DrawPaneSelect 	{ DPS_XY, DPS_YZ, DPS_ZX };
 
 ////////////////////////////////////////////////////////////
 struct DisplayAngels {
@@ -90,6 +85,9 @@ struct DisplayAngels {
 		}
 };
 
+typedef std::vector<DoublePointPair3D> DrawPaneData;
+
+
 ////////////////////////////////////////////////////////////
 class CncOpenGLDrawPaneContext : public wxGLContext {
 ////////////////////////////////////////////////////////////
@@ -98,29 +96,23 @@ class CncOpenGLDrawPaneContext : public wxGLContext {
 	    CncOpenGLDrawPaneContext(wxGLCanvas *canvas);
 	    ~CncOpenGLDrawPaneContext();
 		
-		struct DisplayOptions3D {
+		struct WorkpieceInfo {
 			bool drawZeroPlane			= true;
 			bool drawWorkpieceSurface	= true;
 			bool drawWorkpieceOffset	= true;
+			
+			double thickness 			= 0.0;
+			double offset 				= 0.0;
 		};
 	
 		// render the data 
-		void displayDataVector(DrawPaneData& dpd, DrawPaneViewType viewType, wxSize curSize);
-		
-		// setting configuration
-		void setCncConfig(CncConfig* conf);
-		
-		// setting display options
-		void setDisplayInfo(const DisplayOptions3D& di) { displayInfo = di; }
+		void displayDataVector(DrawPaneData& dpd);
 		
 		///////////////////////////////////////////////////////
-		static unsigned char* convImageToPixels(const wxImage& img, const wxColour& cTrans, unsigned char cAlpha);
-		static unsigned char* convTextToPixels(const wxString& sText, const wxFont& sFont, const wxColour& sForeColo, 
-                                               const wxColour& sBackColo, unsigned char cAlpha, int* width, int* height); 
+		void setWorkpieceInfo(const WorkpieceInfo& wi) { workpieceInfo = wi; }
 	
 	private:
-		DisplayOptions3D displayInfo;
-		CncConfig* cncConfig;
+		WorkpieceInfo workpieceInfo;
 		
 		struct Axises {
 
@@ -152,8 +144,8 @@ class CncOpenGLDrawPaneContext : public wxGLContext {
 		};
 
 		Axises axises;
-		
-		void displayCoordinateOrigin(DrawPaneViewType viewType);
+
+		void displayCoordinateOrigin();
 		
 		void drawX();
 		void drawY();
@@ -161,8 +153,6 @@ class CncOpenGLDrawPaneContext : public wxGLContext {
 		
 		void drawZeroPlane();
 		void drawWorkpieceSurface();
-		
-		void testGL(wxSize s);
 };
 
 #endif

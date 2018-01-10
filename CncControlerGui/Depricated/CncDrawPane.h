@@ -7,7 +7,6 @@
 #include <wx/spinctrl.h>
 #include <wx/textctrl.h>
 #include <wx/button.h>
-#include "CncConfig.h"
 #include "CncDrawPaneContext.h"
 
 #if !wxUSE_GLCANVAS
@@ -68,6 +67,10 @@ struct CncOpenGLData {
 class CncOpenGLDrawPane : public wxGLCanvas {
 ////////////////////////////////////////////////////////////
 	public:
+		
+		enum DrawPaneViewType 	{ DPVT_Front, DPVT_Rear, DPVT_Top, DPVT_Bottom, DPVT_Left, DPVT_Right, DPVT_3D };
+		enum DrawPaneOrigin 	{ DPO_TOP_LEFT, DPO_TOP_RIGHT, DPO_BOTTOM_LEFT, DPO_BOTTOM_RIGHT, DPO_CENTER, DPO_CUSTOM};
+		enum DrawPaneSelect 	{ DPS_XY, DPS_YZ, DPS_ZX };
 		
 		///////////////////////////////////////////////////
 		struct ViewPort {
@@ -137,13 +140,6 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 				return ostr;
 			}
 		};
-		
-		///////////////////////////////////////////////
-		static void destroyGlobalContext() {
-			if ( globalContext != NULL )
-				delete globalContext;
-				globalContext = NULL;
-		}
 
 	private:
 		
@@ -151,10 +147,8 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		static CncOpenGLDrawPaneContext* globalContext;
 		static const unsigned int DEFAULT_SPIN_TIMER_INTERVAL = 50;
 
-		CncOpenGLDrawPaneContext::DisplayOptions3D displayInfo;
-		CncConfig* cncConfig;
+		CncOpenGLDrawPaneContext::WorkpieceInfo workpieceInfo;
 		unsigned int spinTimerInterval;
-		DrawPaneViewType currentViewType;
 		ViewPort viewPort;
 		Translate translate;
 		Scale scale;
@@ -168,12 +162,9 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		wxSpinCtrl* spinAngleY;
 		wxSpinCtrl* spinAngleZ;
 		
+		DrawPaneSelect planeSelcetion;
 		DrawPaneOrigin currentOrigin;
 
-		float refFactorX;
-		float refFactorY;
-		float refFactorZ;
-		
 		DrawPaneData data;
 		CncOpenGLData globalData;
 		
@@ -214,18 +205,18 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		// current data vector
 		DrawPaneData& getDataVector();
 		DrawPaneData& clearDataVector();
-		void setDataVector(const DrawPaneData& data);
-		void appendDataVector(const DoublePointPair3D& data);
 		
-		// repainting
+		void setWorkpieceInfo(const CncOpenGLDrawPaneContext::WorkpieceInfo& wi);
+		
+		// repaining
 		void displayDataVector();
 
 		// setter
-		void setDisplayInfo(const CncOpenGLDrawPaneContext::DisplayOptions3D& wi);
 		void initDisplayAngles(float ax, float ay, float az);
 		void setDisplayAngles(float ax, float ay, float az, bool updateCtrl = false);
-		void setSpinTimerInterval(const unsigned int i) { spinTimerInterval = i; }
-		void setCncConfig(CncConfig* conf);
+		void setSpinTimerInterval(const unsigned int i) {
+			spinTimerInterval = i;
+		}
 		
 		// test
 		void runOpenGLTest();
@@ -238,12 +229,7 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		void viewBottom()	{ view(DPVT_Bottom); }
 		void viewLeft()		{ view(DPVT_Left);   }
 		void viewRight()	{ view(DPVT_Right);  }
-		
-		void view3D()		{ view(DPVT_3D_ISO1);}
-		void view3DIso1()	{ view(DPVT_3D_ISO1);}
-		void view3DIso2()	{ view(DPVT_3D_ISO2);}
-		void view3DIso3()	{ view(DPVT_3D_ISO3);}
-		void view3DIso4()	{ view(DPVT_3D_ISO4);}
+		void view3D()		{ view(DPVT_3D);  	 }
 		
 		// predefined origns
 		void evaluateViewPort();
@@ -252,6 +238,10 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		void setOriginBL() 		{ currentOrigin = DPO_BOTTOM_LEFT; 	return evaluateViewPort(); }
 		void setOriginBR() 		{ currentOrigin = DPO_BOTTOM_RIGHT; return evaluateViewPort(); }
 		void setOriginCenter() 	{ currentOrigin = DPO_CENTER; 		return evaluateViewPort(); }
+		
+		//Plane
+		void setPlaneSelection(const DrawPaneSelect& ps) { planeSelcetion = ps; }
+		const DrawPaneSelect& getplaneSelection() const { return planeSelcetion; }
 		
 		// control
 		void clear3D();
@@ -265,7 +255,7 @@ class CncOpenGLDrawPane : public wxGLCanvas {
 		static void CheckGLError();
 
 		// global context
-		static CncOpenGLDrawPaneContext& initGlobalContext(wxGLCanvas *canvas, CncConfig* conf);
+		static CncOpenGLDrawPaneContext& initGlobalContext(wxGLCanvas *canvas);
 		
 		// is used from global kex down hook
 		void OnKeyDown(wxKeyEvent& event);

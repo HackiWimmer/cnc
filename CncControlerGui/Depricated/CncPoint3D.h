@@ -1,8 +1,6 @@
 #ifndef CNC_POINT_3D_H
 #define CNC_POINT_3D_H
 
-
-// todo - remove this class
 ////////////////////////////////////////////////////////////
 template<class T> class CncPoint3D {
 ////////////////////////////////////////////////////////////
@@ -119,10 +117,10 @@ template<class T> class CncPointPair3D {
 		CncPoint3D<T> p1;
 		CncPoint3D<T> p2;
 		
-		wxColour defaultDrawColour = *wxWHITE;
+		const wxColour defaultDrawColour = *wxWHITE;
 		wxColour drawColor;
 		
-		int defaultLineStyle = wxSOLID;
+		const int defaultLineStyle = wxSOLID;
 		int lineStyle;
 	
 	public:
@@ -137,7 +135,7 @@ template<class T> class CncPointPair3D {
 			p2.reint();
 		}
 		///////////////////////////////////////////////////////
-		CncPointPair3D (const CncPointPair3D<T>& from) 
+		CncPointPair3D (const CncPointPair3D& from) 
 		///////////////////////////////////////////////////////
 		: drawColor(from.getDrawColour())
 		, lineStyle(from.getLineStyle())
@@ -239,7 +237,5 @@ typedef CncPointPair3D<int> 		IntPointPair3D;
 typedef CncPointPair3D<long> 		LongPointPair3D;
 typedef CncPointPair3D<double> 		DoublePointPair3D;
 typedef CncPointPair3D<float> 		FloatPointPair3D;
-
-typedef std::vector<DoublePointPair3D> DrawPaneData;
 
 #endif
