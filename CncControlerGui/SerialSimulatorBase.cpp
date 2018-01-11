@@ -1,5 +1,5 @@
 #include "CncArduino.h"
-#include "CncTimeFunctions.h"
+#include "OSD/CncTimeFunctions.h"
 #include "MainFrame.h"
 #include "SerialSimulatorFacade.h"
 #include "SerialSimulatorBase.h"

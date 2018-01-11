@@ -283,6 +283,12 @@ class UpdateManagerThread : public wxThread {
 		inline void postWarning(const wxString& msg);
 		inline void postError(const wxString& msg);
 		
+	private:
+		static const unsigned int MAX_POS_SPY_ITEMS = 32000;
+		static const unsigned int MAX_SETTER_ITEMS  =  4000;
+		
+		CncColumContainer posSpyRows[MAX_POS_SPY_ITEMS];
+		CncColumContainer setterRows[MAX_SETTER_ITEMS];
 };
 
 #endif

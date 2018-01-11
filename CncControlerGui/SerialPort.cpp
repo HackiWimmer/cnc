@@ -3,6 +3,11 @@
 #include <chrono>
 #include <sys/time.h>
 #include <wx/thread.h>
+
+#ifdef __WXGTK__
+	#include <arpa/inet.h>
+#endif
+
 #include "CncControl.h"
 #include "CncCommon.h"
 #include "CncArduino.h"

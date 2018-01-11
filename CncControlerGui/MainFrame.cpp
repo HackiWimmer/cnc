@@ -57,6 +57,8 @@
 	// they have to be at the end of the list to avoid compilation errors
 	#include <windows.h>
 	#include <dbt.h>
+	
+	#define CNC_GCODE_LEXER
 #endif
 
 ////////////////////////////////////////////////////////////////////
@@ -1138,6 +1140,7 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 			break;
 			
 		case TplGcode:
+#ifdef CNC_GCODE_LEXER
 			ctl->SetLexer(wxSTC_LEX_GCODE);
 			
 			// setup highlight colours
@@ -1154,6 +1157,7 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 			
 			font = (ctl->StyleGetFont(wxSTC_GCODE_PARAM)).Bold();
 			ctl->StyleSetFont(wxSTC_GCODE_PARAM, font);
+#endif
 			break;
 			
 		default:

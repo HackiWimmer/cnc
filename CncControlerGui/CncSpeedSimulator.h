@@ -2,7 +2,7 @@
 #define CNC_SPEED_SIMULATOR
 
 #include <iostream>
-#include "CncTimeFunctions.h"
+#include "OSD/CncTimeFunctions.h"
 #include "CncArduino.h"
 
 class CncSpeedSimulator : public CncSpeedManager {

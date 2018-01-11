@@ -1,6 +1,13 @@
-
 #include "SerialEmulatorFile.h"
-#include <windows.h>
+
+#ifdef __WXGTK__
+	#include <arpa/inet.h>
+#endif
+
+#ifdef __WXMSW__
+	#include <Winsock2.h>
+#endif
+
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorFile::connect(const char* fileName) {
 ///////////////////////////////////////////////////////////////////

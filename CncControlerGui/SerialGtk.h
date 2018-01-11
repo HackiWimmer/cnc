@@ -8,6 +8,10 @@
 				//Connection status
 				bool connected;
 			
+			protected:
+				
+				void setConnected(bool state) { connected = state; }
+				
 			public:
 				SerialGtk();
 				virtual ~SerialGtk();

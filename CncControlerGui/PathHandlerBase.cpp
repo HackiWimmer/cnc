@@ -2,7 +2,7 @@
 #include "SVGCurveLib.h"
 #include "CncConfig.h"
 #include "FileParser.h"
-#include "CncTimeFunctions.h"
+#include "OSD/CncTimeFunctions.h"
 #include "PathHandlerBase.h"
 
 //////////////////////////////////////////////////////////////////

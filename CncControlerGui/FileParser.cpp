@@ -5,6 +5,7 @@
 #include <wx/dataview.h>
 #include <wx/stattext.h>
 #include <wx/propgrid/manager.h>
+#include "OSD/CncTimeFunctions.h"
 #include "CncConfigExt.h"
 #include "wxcrafter.h"
 #include "CncCommon.h"
@@ -512,7 +513,7 @@ bool FileParser::evaluateProcessingState() {
 			return false;
 		}
 		
-		Sleep(25);
+		CncTimeFunctions::sleep(25);
 	}
 	
 	return true;
@@ -584,7 +585,7 @@ bool FileParser::evaluateDebugState(bool force) {
 		if ( runInfo.isLastLineNumberDefined() == false )
 			break;
 			
-		Sleep(25);
+		CncTimeFunctions::sleep(25);
 	}
 	
 	waitingForUserEvents = false;

@@ -9,7 +9,7 @@
 #include <wx/intl.h>
 #include "CncFileNameService.h"
 #include "CncStreamBuffers.h"
-#include "CncTimeFunctions.h"
+#include "OSD/CncTimeFunctions.h"
 #include "MainFrame.h"
 
 extern const char* _programVersion;

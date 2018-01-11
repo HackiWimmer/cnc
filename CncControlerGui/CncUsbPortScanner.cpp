@@ -1,8 +1,10 @@
+#include <iostream>
+#include <wx/string.h>
 #include "CncUsbPortScanner.h"
 
-#include <wx/string.h>
-#include <windows.h>
-#include <iostream>
+#ifdef __WXMSW__
+	#include <windows.h>
+#endif
 
 // Namespace
 using namespace std;
@@ -10,6 +12,7 @@ using namespace std;
 ///////////////////////////////////////////////////////////////////
 int CncUsbPortScanner::isComPortAvailable(int port) {
 ///////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	wxString strPort("");
 	HANDLE  hPort = NULL;
 	DWORD dwErr(0);
@@ -38,16 +41,22 @@ int CncUsbPortScanner::isComPortAvailable(int port) {
 		CloseHandle(hPort); // Port release
 		return 1;  // Port exists
 	}
+#endif
+
+#ifdef __WXGTK__
+	#warning todo GTK implementation
+#endif
 }
 ///////////////////////////////////////////////////////////////////
 int CncUsbPortScanner::scan() {
 ///////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	cout << "USB Device Lister." << endl;
-
+	
 	// Get Number Of Devices
 	UINT nDevices = 0;
 	GetRawInputDeviceList( NULL, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
-
+	
 	// Got Any?
 	if( nDevices < 1 ) {
 		// Exit
@@ -59,7 +68,7 @@ int CncUsbPortScanner::scan() {
 	// Allocate Memory For Device List
 	PRAWINPUTDEVICELIST pRawInputDeviceList;
 	pRawInputDeviceList = new RAWINPUTDEVICELIST[ sizeof( RAWINPUTDEVICELIST ) * nDevices ];
-
+	
 	// Got Memory?
 	if( pRawInputDeviceList == NULL ) {
 		// Error
@@ -71,18 +80,18 @@ int CncUsbPortScanner::scan() {
 	// Fill Device List Buffer
 	int nResult;
 	nResult = GetRawInputDeviceList( pRawInputDeviceList, &nDevices, sizeof( RAWINPUTDEVICELIST ) );
-
+	
 	// Got Device List?
 	if( nResult < 0 ) {
 		// Clean Up
 		delete [] pRawInputDeviceList;
-
+		
 		// Error
 		cout << "ERR: Could not get device list.";
 		cin.get();
 		return 0;
 	}
-
+	
 	// Loop Through Device List
 	for( UINT i = 0; i < nDevices; i++ ) {
 		// Get Character Count For Device Name
@@ -91,16 +100,16 @@ int CncUsbPortScanner::scan() {
 										 RIDI_DEVICENAME,                // Get Device Name
 										 NULL,                           // NO Buff, Want Count!
 										 &nBufferSize );                 // Char Count Here!
-
+		
 		// Got Device Name?
 		if( nResult < 0 ) {
 			// Error
 			cout << "ERR: Unable to get Device Name character count.. Moving to next device." << endl << endl;
-
+			
 			// Next
 			continue;
 		}
-
+		
 		// Allocate Memory For Device Name
 		WCHAR* wcDeviceName = new WCHAR[ nBufferSize + 1 ];
 		 
@@ -108,49 +117,49 @@ int CncUsbPortScanner::scan() {
 		if( wcDeviceName == NULL ) {
 			// Error
 			cout << "ERR: Unable to allocate memory for Device Name.. Moving to next device." << endl << endl;
-
+			
 			// Next
 			continue;
 		}
-
+		
 		// Get Name
 		nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice, // Device
 										 RIDI_DEVICENAME,                // Get Device Name
 										 wcDeviceName,                   // Get Name!
 										 &nBufferSize );                 // Char Count
-
+		
 		// Got Device Name?
 		if( nResult < 0 ) {
 			// Error
 			cout << "ERR: Unable to get Device Name.. Moving to next device." << endl << endl;
-
+			
 			// Clean Up
 			delete [] wcDeviceName;
-
+			
 			// Next
 			continue;
 		}
-
+		
 		// Set Device Info & Buffer Size
 		RID_DEVICE_INFO rdiDeviceInfo;
 		rdiDeviceInfo.cbSize = sizeof( RID_DEVICE_INFO );
 		nBufferSize = rdiDeviceInfo.cbSize;
-
+		
 		// Get Device Info
 		nResult = GetRawInputDeviceInfo( pRawInputDeviceList[i].hDevice,
 										 RIDI_DEVICEINFO,
 										 &rdiDeviceInfo,
 										 &nBufferSize );
-
+		
 		// Got All Buffer?
 		if( nResult < 0 ) {
 			// Error
 			cout << "ERR: Unable to read Device Info.. Moving to next device." << endl << endl;
-
+			
 			// Next
 			continue;
 		}
-
+		
 		// Mouse
 		if( rdiDeviceInfo.dwType == RIM_TYPEMOUSE ) {
 			// Current Device
@@ -165,7 +174,7 @@ int CncUsbPortScanner::scan() {
 				cout << "Mouse does not have horizontal wheel" << endl;
 			}
 		}
-
+		
 		// Keyboard
 		else if( rdiDeviceInfo.dwType == RIM_TYPEKEYBOARD ) {
 			// Current Device
@@ -178,7 +187,7 @@ int CncUsbPortScanner::scan() {
 			cout << "Type of the keyboard: " << rdiDeviceInfo.keyboard.dwType << endl;
 			cout << "Subtype of the keyboard: " << rdiDeviceInfo.keyboard.dwSubType << endl;
 		}
-
+		
 		// Some HID
 		else {
 			// (rdi.dwType == RIM_TYPEHID)
@@ -191,16 +200,23 @@ int CncUsbPortScanner::scan() {
 			cout << "Usage for the device: " << rdiDeviceInfo.hid.usUsage << endl;
 			cout << "Usage Page for the device: " << rdiDeviceInfo.hid.usUsagePage << endl;
 		}
-
+		
 		// Delete Name Memory!
 		delete [] wcDeviceName;
 	}
-
+	
 	// Clean Up - Free Memory
 	delete [] pRawInputDeviceList;
-
+	
 	// Exit
 	cout << endl << "Finnished.";
 	cin.get();
+	
 	return 0;
+#endif
+
+#ifdef __WXGTK__
+	#warning todo GTK implementation
+	return 0;
+#endif
 }

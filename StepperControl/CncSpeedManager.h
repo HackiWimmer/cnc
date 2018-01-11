@@ -5,13 +5,13 @@
 
 	#include <iostream>
 	#include "CncCommon.h"
-  #include "CncTimeFunctions.h"
-  using namespace cnc;
+	#include "OSD/CncTimeFunctions.h"
+	using namespace cnc;
 
 #else
 
-  #include "CommonFunctions.h"
-   
+	#include "CommonFunctions.h"
+	
 #endif
 
 //////////////////////////////////////////////////////////////////////////////////

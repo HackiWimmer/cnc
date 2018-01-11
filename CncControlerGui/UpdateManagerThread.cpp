@@ -24,6 +24,11 @@ UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 , setterRow(CncSetterListCtrl::TOTAL_COL_COUNT)
 ///////////////////////////////////////////////////////////////////
 {
+	for ( unsigned int i=0; i<MAX_POS_SPY_ITEMS; i++)
+		posSpyRows[i].initColumnCount(CncPosSpyListCtrl::TOTAL_COL_COUNT);
+		
+	for ( unsigned int i=0; i<MAX_SETTER_ITEMS; i++)
+		setterRows[i].initColumnCount(CncSetterListCtrl::TOTAL_COL_COUNT);
 }
 ///////////////////////////////////////////////////////////////////
 UpdateManagerThread::~UpdateManagerThread() {
@@ -218,10 +223,7 @@ unsigned int UpdateManagerThread::fillPositionSpy(CncPosSpyListCtrl* lb) {
 	if( lb == NULL )
 		 return 0;
 	
-	static const unsigned int MAX_ITEMS = 32000;
-	static CncColumContainer posSpyRows[MAX_ITEMS](CncPosSpyListCtrl::TOTAL_COL_COUNT);
-	
-	unsigned int sizeAvailable = posSpyStringQueue.pop(posSpyRows, MAX_ITEMS);
+	unsigned int sizeAvailable = posSpyStringQueue.pop(posSpyRows, MAX_POS_SPY_ITEMS);
 	
 	if ( sizeAvailable > 0 ) {
 		if ( lb->appendItems(sizeAvailable, posSpyRows) == false ) {
@@ -238,11 +240,8 @@ unsigned int UpdateManagerThread::fillSetterList(CncSetterListCtrl* lb) {
 		return 0;
 		
 	popAndFormatSetterQueue();
-		
-	static const unsigned int MAX_ITEMS = 4000;
-	static CncColumContainer setterRows[MAX_ITEMS](CncSetterListCtrl::TOTAL_COL_COUNT);
 	
-	unsigned int sizeAvailable = setterStringQueue.pop(setterRows, MAX_ITEMS);
+	unsigned int sizeAvailable = setterStringQueue.pop(setterRows, MAX_SETTER_ITEMS);
 	
 	if ( sizeAvailable > 0 ) {
 		if ( lb->appendItems(sizeAvailable, setterRows) == false ) {

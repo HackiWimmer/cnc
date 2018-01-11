@@ -150,6 +150,12 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <VirtualDirectory Name="OSD">
+        <File Name="CncUsbPortScanner.h"/>
+        <File Name="CncUsbPortScanner.cpp"/>
+        <File Name="OSD/CncTimeFunctions.h"/>
+        <File Name="OSD/CncTimeFunctions.cpp"/>
+      </VirtualDirectory>
       <File Name="CncSpeedSimulator.cpp"/>
       <File Name="CncZView.h"/>
       <File Name="CncNumberFormatter.cpp"/>
@@ -184,8 +190,6 @@
       <File Name="CncPathListManager.cpp"/>
       <File Name="CncClipperWrapper.h"/>
       <File Name="CncClipperWrapper.cpp"/>
-      <File Name="CncUsbPortScanner.cpp"/>
-      <File Name="CncUsbPortScanner.h"/>
       <File Name="CncFilePreview.cpp"/>
       <File Name="CncFilePreview.h"/>
       <File Name="CncFileView.cpp"/>
@@ -307,10 +311,6 @@
       <File Name="CncVectiesListCtrl.cpp"/>
       <File Name="CncStatisticSummaryListCtrl.h"/>
       <File Name="CncStatisticSummaryListCtrl.cpp"/>
-    </VirtualDirectory>
-    <VirtualDirectory Name="OS depending">
-      <File Name="CncTimeFunctions.h"/>
-      <File Name="CncTimeFunctions.cpp"/>
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">

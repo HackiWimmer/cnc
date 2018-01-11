@@ -11,20 +11,23 @@ class CncColumContainer {
 	public:
 		/////////////////////////////////////////////////////////////
 		CncColumContainer()
-		: columns()
+		: initialized(false)
+		, columns()
 		{
 		}
-
+		
 		/////////////////////////////////////////////////////////////
 		CncColumContainer(unsigned int cc)
-		: columns()
+		: initialized(true)
+		, columns()
 		{
 			columns.Add("", cc);
 		}
 		
 		/////////////////////////////////////////////////////////////
 		CncColumContainer(const CncColumContainer& cc)
-		: columns(cc.getStringArray())
+		: initialized(cc.isInitialized())
+		, columns(cc.getStringArray())
 		{
 		}
 		
@@ -32,6 +35,17 @@ class CncColumContainer {
 		virtual ~CncColumContainer() {
 			columns.Clear();
 		}
+		
+		/////////////////////////////////////////////////////////////
+		unsigned int initColumnCount(unsigned int cc) {
+			if ( isInitialized() == false )
+				columns.Add("", cc);
+				
+			return columns.GetCount();
+		}
+		
+		/////////////////////////////////////////////////////////////
+		bool isInitialized() const { return initialized; }
 		
 		/////////////////////////////////////////////////////////////
 		unsigned int getCount() const { return columns.GetCount(); }
@@ -72,6 +86,7 @@ class CncColumContainer {
 		}
 		
 	private:
+		bool initialized;
 		wxArrayString columns;
 		
 };

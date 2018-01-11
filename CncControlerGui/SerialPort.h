@@ -7,7 +7,7 @@
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "SvgUnitCalculator.h"
-#include "CncTimeFunctions.h"
+#include "OSD/CncTimeFunctions.h"
 #include "CncPosition.h"
 #include "SerialOSD.h"
 

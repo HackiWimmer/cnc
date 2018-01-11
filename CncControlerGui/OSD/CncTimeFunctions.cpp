@@ -1,22 +1,30 @@
+#ifdef __WXGTK__
+	#include <time.h>
+#endif
+
 #include <iostream>
 #include "CncConfig.h"
 #include "MainFrame.h"
 #include "CncTimeFunctions.h"
 
-// this have to be done after #include "CncConfig.h"
-#include <Windows.h>
+#ifdef __WXMSW__
+	// this have to be done after #include "CncConfig.h"
+	#include <Windows.h>
 
-bool initialized 						= false;
-unsigned int 	countsPerMicrosecond	= 0;
-unsigned int 	countsPerHalfUSec		= 0;
-unsigned int	tickInterval			= 0;
-LARGE_INTEGER 	counterFrequency		= { 0 };
-LARGE_INTEGER 	counterReading			= { 0 };
-time_t 			timeOfDayBase;
+	bool initialized 						= false;
+	unsigned int 	countsPerMicrosecond	= 0;
+	unsigned int 	countsPerHalfUSec		= 0;
+	unsigned int	tickInterval			= 0;
+	LARGE_INTEGER 	counterFrequency		= { 0 };
+	LARGE_INTEGER 	counterReading			= { 0 };
+	time_t 			timeOfDayBase;
+	
+#endif
 
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::init() {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	initialized = true;
 	SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 
@@ -44,10 +52,12 @@ void CncTimeFunctions::init() {
 	tickInterval = std::max(tickInterval, tickInterval * diff);
 	
 	init_gettimeofday();
+#endif
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::init_gettimeofday() {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	time_t then;
 	time(&then);
 	do {
@@ -55,26 +65,36 @@ void CncTimeFunctions::init_gettimeofday() {
 	} while (then == timeOfDayBase);
 	
 	QueryPerformanceCounter (&counterReading);
+#endif
 }
 ////////////////////////////////////////////////////////////////
 int64_t CncTimeFunctions::getOPCFrequency() {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	if ( initialized == false )
 		CncTimeFunctions::init();
-
+	
 	return (int64_t)counterFrequency.QuadPart;
+#else
+	return 0LL;
+#endif
 }
 ////////////////////////////////////////////////////////////////
 unsigned int CncTimeFunctions::geMaxtQPCResolutionNS() {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	if ( initialized == false )
 		CncTimeFunctions::init();
 		
 	return tickInterval;
+#else
+	return 0;
+#endif
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::printError(const char *tag) {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	LPVOID msg;
 	int errorCode = GetLastError();
 	
@@ -86,10 +106,12 @@ void CncTimeFunctions::printError(const char *tag) {
 	std::cerr << tag << ": " << "Error code: " << errorCode << "Error msg: " << (LPTSTR)msg << std::endl;
 	
 	LocalFree(msg);
+#endif
 }
 ////////////////////////////////////////////////////////////////
-int CncTimeFunctions::gettimeofday(struct timeval *tv, void *tz_unused) {
+int CncTimeFunctions::gettimeofday(struct timeval *tv, void *tz) {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	if ( initialized == false )
 		CncTimeFunctions::init();
 
@@ -108,10 +130,16 @@ int CncTimeFunctions::gettimeofday(struct timeval *tv, void *tz_unused) {
 	}
 	 
 	return 0;
+# endif
+
+#ifdef __WXGTK__
+	return gettimeofday(tv, tz);
+#endif
 }
 ////////////////////////////////////////////////////////////////
 CncNanoTimestamp CncTimeFunctions::getNanoTimestamp() {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	if ( initialized == false )
 		CncTimeFunctions::init();
 	
@@ -120,6 +148,14 @@ CncNanoTimestamp CncTimeFunctions::getNanoTimestamp() {
 	
 	time_point tp(duration(count.QuadPart * (static_cast<CncNanoTimestamp>(period::den) / counterFrequency.QuadPart)));
 	return tp.time_since_epoch().count();
+#endif
+
+#ifdef __WXGTK__
+	struct timeval tv;
+	gettimeofday(&tv, NULL);
+	
+	return tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+#endif
 }
 ////////////////////////////////////////////////////////////////
 CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncTimeval& a, const CncTimeval& b) {
@@ -134,6 +170,7 @@ CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncNanoTimestamp& a, const C
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 ////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
 	if ( micros <= 0 )
 		return;
 	
@@ -142,12 +179,19 @@ void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 	do {
 		tsEnd  = getNanoTimestamp();
 	} while ( (tsEnd - tsStart)/1000 < micros );
+#endif
+
+#ifdef __WXGTK__
+	sleepMircoseconds((int64_t) micros)
+#endif
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
 ////////////////////////////////////////////////////////////////
 	if ( micros <= 0LL )
 		return;
+
+#ifdef __WXMSW__
 	
 	if ( micros <= 16250LL ) {
 		busyWaitMircoseconds(micros);
@@ -163,6 +207,15 @@ void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
 	SetWaitableTimer(timer, &ft, 0, NULL, NULL, 0); 
 	WaitForSingleObject(timer, INFINITE); 
 	CloseHandle(timer); 
+#endif
+
+#ifdef __WXGTK__
+	struct timespec req, rem;
+	req.tv_sec  = micros/1000;
+	req.tv_nsec = micros%1000;
+	
+	nanosleep(req, rem);
+#endif
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::activeWaitMircoseconds(int64_t micros, bool active) {
@@ -181,4 +234,15 @@ void CncTimeFunctions::activeWaitMircoseconds(int64_t micros, bool active) {
 	}
 		
 	sleepMircoseconds(micros);
+}
+////////////////////////////////////////////////////////////////
+void CncTimeFunctions::sleep(unsigned int milliseconds) {
+////////////////////////////////////////////////////////////////
+#ifdef __WXMSW__
+	Sleep(milliseconds);
+#endif
+
+#ifdef __WXGTK__
+	sleep(milliseconds);
+#endif
 }

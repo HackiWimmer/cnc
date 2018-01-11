@@ -879,7 +879,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 				
 				#warning
-				clog << "FEED SPEED: " << ci.feedSpeed << endl;
+				//clog << "FEED SPEED: " << ci.feedSpeed << endl;
 			
 			}
 			
