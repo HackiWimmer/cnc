@@ -18,6 +18,7 @@
 #include "CncCommon.h"
 #include "CncControl.h"
 #include "CncFileNameService.h"
+#include "CncAsyncKeyboardState.h"
 #include "MainFrame.h"
 
 static CommandTemplates CMDTPL;
@@ -929,7 +930,7 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	// display application coordinates
 	postAppPosition(PID_XYZ_POS_MAJOR);
 	
-	if ( GetAsyncKeyState(VK_ESCAPE) != 0 ) {
+	if ( CncAsyncKeyboardState::isEscapePressed() != 0 ) {
 		if ( GBL_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
 			std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
 			interrupt();

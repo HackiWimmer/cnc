@@ -151,6 +151,8 @@
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <VirtualDirectory Name="OSD">
+        <File Name="CncAsyncKeyboardState.cpp"/>
+        <File Name="CncAsyncKeyboardState.h"/>
         <File Name="CncUsbPortScanner.h"/>
         <File Name="CncUsbPortScanner.cpp"/>
         <File Name="OSD/CncTimeFunctions.h"/>

@@ -52,15 +52,6 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
 	MainFrame::EventId posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
 	
-/*
- * to sleep with more granullary
-	int us = 100; // length of time to sleep, in miliseconds
-	struct timespec req = {0};
-	req.tv_sec = 0;
-	req.tv_nsec = us * 1000L;
-	nanosleep(&req, (struct timespec *)NULL);
-*/
-
 	unsigned int sleep = 1;
 	
 	// initialize 
@@ -186,7 +177,7 @@ void UpdateManagerThread::popAndFormatSetterQueue() {
 	while ( setterQueue.read_available() ) {
 		setterQueue.pop(lste);
 		unsigned char pid = lste.set.id;
-
+		
 		setterRow.updateItem(CncSetterListCtrl::COL_NUM, 	wxString::Format("%010lu", 		count + 1));
 		setterRow.updateItem(CncSetterListCtrl::COL_PID, 	wxString::Format("%u", 			pid));
 		

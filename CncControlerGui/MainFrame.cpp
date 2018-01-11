@@ -1,4 +1,26 @@
-//-Wno-deprecated-declarations
+/*
+FYI: codelite win build options
+g++.exe -c  "...." 
+ * -Wno-deprecated-declarations -O3 -std=c++17 -std=c++14 -std=c++11 -Wall -mthreads -DHAVE_W32API_H -D__WXMSW__ -DNDEBUG -D_UNICODE 
+ * -IC:/@Development/wxWidgets-3.1.0/lib/gcc_dll/mswu 
+ * -IC:/@Development/wxWidgets-3.1.0/include 
+ * -DWXUSINGDLL 
+ * -Wno-ctor-dtor-privacy 
+ * -pipe 
+ * -fmessage-length=0    
+ * -DNDEBUG 
+ * -DAPP_USE_SPLASH
+ * -I. -IC:\@Development\boost\include\boost-1_64 
+ * -I. 
+ * -IC:\@Development\boost_1_65_0 
+ * -IC:\@Development\freeglut\include
+
+C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..." 
+  * -L. -LC:\@Development\boost\lib -LC:\@Development\freeglut\lib\x64  -lwxmsw31u_stc -lwxmsw31u_webview -lwxmsw31u_propgrid -lwxmsw31u_adv -lwxmsw31u_gl 
+  * -lopengl32 -lglu32 -lfreeglut  -mwindows  -mthreads -LC:/@Development/wxWidgets-3.1.0/lib/gcc_dll -lwxmsw31u_richtext -lwxmsw31u_xrc -lwxmsw31u_aui 
+  * -lwxmsw31u_html -lwxmsw31u_adv -lwxmsw31u_core -lwxbase31u_xml -lwxbase31u_net -lwxbase31u -lwxscintilla -lwxtiff -lwxjpeg -lwxpng -lwxzlib -lwxregexu -lwxexpat 
+  * -lkernel32 -luser32 -lgdi32 -lcomdlg32 -lwxregexu -lwinspool -lwinmm -lshell32 -lcomctl32 -lversion -lshlwapi -lole32 -loleaut32 -luuid -lrpcrt4 -ladvapi32 -lwsock32
+*/
 
 #include <iostream>
 #include <sstream>
@@ -50,6 +72,7 @@
 #include "UnitTestFrame.h"
 #include "UpdateManagerThread.h"
 #include "CncConfigProperty.h"
+#include "CncAsyncKeyboardState.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -1246,7 +1269,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 void MainFrame::searchAvailiablePorts(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	disableControls();
-	decoratePortSelector(GetAsyncKeyState(VK_CONTROL) != 0);
+	decoratePortSelector(CncAsyncKeyboardState::isControlPressed());
 	enableControls();
 	
 	if ( m_portSelector->FindString(lastPortName) == wxNOT_FOUND ) {
@@ -3749,8 +3772,8 @@ void MainFrame::keyDownXY(wxKeyEvent& event) {
 		case WXK_SPACE:		m_moveZAxisCtl->SetFocus();		break;
 		
 		case WXK_RETURN: 	
-							if ( GetAsyncKeyState(VK_CONTROL) != 0 ) 	m_includingWpt->SetValue(true);
-							else										m_includingWpt->SetValue(false);
+							if ( CncAsyncKeyboardState::isControlPressed() ) 	m_includingWpt->SetValue(true);
+							else												m_includingWpt->SetValue(false);
 							setZero();
 							event.Skip(false);
 							break;
@@ -3781,8 +3804,8 @@ void MainFrame::keyDownZ(wxKeyEvent& event) {
 							break;
 		
 		case WXK_RETURN: 	
-							if ( GetAsyncKeyState(VK_CONTROL) != 0 ) 	m_includingWpt->SetValue(true);
-							else										m_includingWpt->SetValue(false);
+							if ( CncAsyncKeyboardState::isControlPressed() ) 	m_includingWpt->SetValue(true);
+							else												m_includingWpt->SetValue(false);
 							setZero();
 							event.Skip(false);
 							break;
@@ -3876,9 +3899,9 @@ void MainFrame::mvSpinUpZ(wxSpinEvent& event) {
 void MainFrame::navigateX(CncDirection d) {
 ///////////////////////////////////////////////////////////////////
 	double fact = 1;
-	bool shtKey = (GetAsyncKeyState(VK_SHIFT) 	!= 0);
-	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
-	bool altKey = (GetAsyncKeyState(VK_MENU) != 0);
+	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
+	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
+	bool altKey = CncAsyncKeyboardState::isAltPressed();
 
 	if ( altKey ) {
 		fact /= 100;
@@ -3905,9 +3928,9 @@ void MainFrame::navigateX(CncDirection d) {
 void MainFrame::navigateY(CncDirection d) {
 ///////////////////////////////////////////////////////////////////
 	double fact = 1;
-	bool shtKey = (GetAsyncKeyState(VK_SHIFT) 	!= 0);
-	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
-	bool altKey = (GetAsyncKeyState(VK_MENU) != 0);
+	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
+	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
+	bool altKey = CncAsyncKeyboardState::isAltPressed();
 
 	if ( altKey ) {
 		fact /= 100;
@@ -3934,9 +3957,9 @@ void MainFrame::navigateY(CncDirection d) {
 void MainFrame::navigateZ(CncDirection d) {
 ///////////////////////////////////////////////////////////////////
 	double fact = 1;
-	bool shtKey = (GetAsyncKeyState(VK_SHIFT) 	!= 0);
-	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
-	bool altKey = (GetAsyncKeyState(VK_MENU) != 0);
+	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
+	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
+	bool altKey = CncAsyncKeyboardState::isAltPressed();
 
 	if ( altKey ) {
 		fact /= 100;
@@ -4160,8 +4183,8 @@ void MainFrame::fileContentKeyDown(wxKeyEvent& event){
 		m_templateNotebook->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
 	}
 	
-	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
-	bool shtKey = (GetAsyncKeyState(VK_SHIFT)   != 0);
+	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
+	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
 	int c = event.GetUnicodeKey();
 	
 	wxString find(m_stcFileContent->GetSelectedText());
@@ -7406,7 +7429,7 @@ void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::keyDownLogger(wxKeyEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
+	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
 	int c = event.GetUnicodeKey();
 	
 	if ( c == 'C' && ctlKey == true ) {
@@ -7462,7 +7485,7 @@ void MainFrame::dclickLogger(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::keyDownLruList(wxKeyEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	bool ctlKey = (GetAsyncKeyState(VK_CONTROL) != 0);
+	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
 	int c = event.GetUnicodeKey();
 	
 	// save
