@@ -258,6 +258,7 @@
         <File Name="SVGPathHandlerCnc.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Utils">
+        <File Name="SvgTransformMatrix.h"/>
         <File Name="SvgCncParameters.h"/>
         <File Name="SVGCurveLib.cpp"/>
         <File Name="SVGCurveLib.h"/>
@@ -266,7 +267,6 @@
         <File Name="SVGElementConverter.cpp"/>
         <File Name="SVGElementConverter.h"/>
         <File Name="SVGPathAssistant.h"/>
-        <File Name="SVGTransformMatrix.h"/>
         <File Name="SvgUnitCalculator.cpp"/>
         <File Name="SvgUnitCalculator.h"/>
         <File Name="SVGUserAgent.h"/>

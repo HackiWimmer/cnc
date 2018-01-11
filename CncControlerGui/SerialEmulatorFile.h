@@ -2,7 +2,7 @@
 #define SERIAL_EMULATOR_FILE_CLASS
 
 #include <fstream> 
-#include "SerialEmulatorNull.h"
+#include "SerialEmulatorNULL.h"
 
 class SerialEmulatorFile : public SerialEmulatorNULL
 {

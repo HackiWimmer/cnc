@@ -5,7 +5,7 @@
 #include <wx/variant.h>
 #include <wx/gdicmn.h>
 #include <wx/string.h>
-#include "SVGTransformMatrix.h"
+#include "SvgTransformMatrix.h"
 #include "CncSvgCurveLib.h"
 #include "CncPosition.h"
 #include "CncPathListManager.h"

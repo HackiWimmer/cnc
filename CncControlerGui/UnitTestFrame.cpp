@@ -36,7 +36,7 @@ UnitTests::UnitTests(wxWindow* parent, int iti, bool ar)
 	}
 	
 	// do this definitly here, for more information please see UnitTests::enableControls()
-	m_btUnitTestRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(runTest), NULL, this);
+	m_btUnitTestRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTests::runTest), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////////////
 UnitTests::~UnitTests() {
@@ -47,7 +47,7 @@ UnitTests::~UnitTests() {
 	testStore.clear();
 	
 	// do this definitly here, for more information please see UnitTests::enableControls()
-	m_btUnitTestRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(runTest), NULL, this);
+	m_btUnitTestRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTests::runTest), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////////////
 const wxString& UnitTests::formatName(const wxString name) {
@@ -134,9 +134,9 @@ void UnitTests::enableControls(bool state) {
 		// fetch existing events before reconnecting
 		THE_APP->dispatchAll();
 			
-		m_btUnitTestRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(runTest), NULL, this);
+		m_btUnitTestRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTests::runTest), NULL, this);
 	} else {
-		m_btUnitTestRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(runTest), NULL, this);
+		m_btUnitTestRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTests::runTest), NULL, this);
 	}
 	
 	m_btUnitTestRun->Refresh();

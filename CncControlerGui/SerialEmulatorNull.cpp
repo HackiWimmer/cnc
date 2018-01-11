@@ -5,7 +5,7 @@
 #include <sys/time.h>
 #include "CncControl.h"
 #include "MainFrame.h"
-#include "SerialEmulatorNull.h"
+#include "SerialEmulatorNULL.h"
 
 int pointA[3], pointB[3];
 

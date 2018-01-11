@@ -6,7 +6,7 @@
 #include "FileParser.h"
 #include "SVGNodeParser.h"
 #include "SVGPathHandlerCnc.h" 
-#include "SVGTransformMatrix.h"
+#include "SvgTransformMatrix.h"
 #include "SVGUserAgent.h"
 
 class wxString;
