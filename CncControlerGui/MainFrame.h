@@ -11,6 +11,7 @@
 #include "PathGeneratorFrame.h"
 #include "UpdateManagerThread.h"
 #include "CncControl.h"
+#include "CncPerspective.h"
 #include "CncMotionMonitor.h"
 #include "CncSpyControl.h"
 #include "CncFileView.h"
@@ -77,6 +78,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		
 		virtual void clearControllerErrorInfoFromButton(wxCommandEvent& event);
 		virtual void requestResetErrorInfo(wxCommandEvent& event);
 		virtual void resetControllerErrorInfoFromButton(wxCommandEvent& event);
@@ -124,12 +126,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void activateAuiPane(wxAuiManagerEvent& event);
 		virtual void buttonAuiPane(wxAuiManagerEvent& event);
 		virtual void viewZAxis(wxCommandEvent& event);
-		virtual void loadPerspectiveDebug(wxCommandEvent& event);
-		virtual void loadPerspectiveRun(wxCommandEvent& event);
-		virtual void loadPerspectiveSource(wxCommandEvent& event);
-		virtual void savePerspectiveDebug(wxCommandEvent& event);
-		virtual void savePerspectiveRun(wxCommandEvent& event);
-		virtual void savePerspectiveSource(wxCommandEvent& event);
+		virtual void loadPerspective(wxCommandEvent& event);
+		virtual void savePerspective(wxCommandEvent& event);
+		virtual void addUserPerspective(wxCommandEvent& event);
+		virtual void renameUserPerspective(wxCommandEvent& event);
+		virtual void removeUserPerspective(wxCommandEvent& event);
 		virtual void viewDebugger(wxCommandEvent& event);
 		virtual void viewPosistionMonitor(wxCommandEvent& event);
 		virtual void toggleTemplateManager(wxCommandEvent& event);
@@ -450,6 +451,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxCriticalSection pThreadCS;
 		
 		friend class UpdateManagerThread;
+		friend class CncPerspective;
 		friend class CncFileView;
 		
 	private:
@@ -481,6 +483,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncVectiesListCtrl* vectiesListCtrl;
 		CncSummaryListCtrl* cncSummaryListCtrl;
 		
+		CncPerspective perspectiveHandler;
 		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
@@ -637,6 +640,15 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// control handling
+		/*
+		int getNextUserPerspectiveInsertIndex(unsigned int sepIndex);
+		bool getAllUserPerspectiveNamesFromMenuLabels(wxArrayString& items);
+		bool checkIfPerspectiveAlreadyExists(const wxString& name);
+		bool isUserPerspective(const wxString& menuLabel);
+		bool insertNextUserPerspective(const wxString& newLabel);
+		bool renameUserPerspective(const wxString& from, const wxString& to);
+		*/
+		
 		void selectSourceControlLineNumber(long ln);
 			
 		void decoratePortSelector(bool list=false);
@@ -668,13 +680,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void hideAllAuiPanes();
 		void viewAllAuiPanes(bool withSpy=false);
-		
-		bool loadPerspective(const wxString& name);
-		void savePerspective(const wxString& name);
-		
-		void ensureRunPerspectiveMinimal();
-		void ensureDebugPerspectiveMinimal();
-		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
 		
 		void clearPositionSpy();
 		void clearMotionMonitor();

@@ -87,7 +87,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 // global strings
 const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2018";
-const char* _maxSpeedLabel		= "<{MAX}>";
 
 #ifdef DEBUG
 	const char* _programVersion = "0.8.6.d";
@@ -164,6 +163,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , statisticSummaryListCtrl(NULL)
 , vectiesListCtrl(NULL)
 , cncSummaryListCtrl(NULL)
+, perspectiveHandler(globalConfig, m_menuPerspective)
 , guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -224,6 +224,8 @@ MainFrame::~MainFrame() {
 	m_serialTimer->Stop();
 	if ( cnc != NULL )
 		waitActive(m_serialTimer->GetInterval());
+	
+	perspectiveHandler.destroyUserPerspectives();
 	
 	// unbind 
 	this->Unbind(wxEVT_CHAR_HOOK, 					&MainFrame::globalKeyDownHook, 				this);
@@ -634,7 +636,7 @@ void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menue
-	loadPerspective("Run");
+	perspectiveHandler.loadPerspective("Run");
 	decorateViewMenu();
 	
 	// Version infos
@@ -747,7 +749,7 @@ void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
 	
 	// watermark for current config
 	if ( GBL_CONFIG->isProbeMode() == false )  {
-		unsigned int wp = size.GetWidth() * cnc->getFeedSpeed_MM_MIN() / GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+		unsigned int wp = size.GetWidth() * cnc->getConfiguredFeedSpeed_MM_MIN() / GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
 		dc.SetPen(wpPen);
 		
 		// move wp 2 pixel to the left so see valu = max also.
@@ -833,7 +835,7 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 		m_speedPanel->Refresh();
 		
 		if ( GBL_CONFIG->isProbeMode() == true )	m_feedSpeed->ChangeValue(_maxSpeedLabel);
-		else										m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getSerial()->getCurrentFeedSpeed()));
+		else										m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getCurrentFeedSpeed_MM_MIN()));
 	}
 	
 	// update position syp
@@ -1384,6 +1386,7 @@ void MainFrame::initialize(void) {
 	registerGuiControls();
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
+	perspectiveHandler.setupUserPerspectives();
 	
 	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
 	
@@ -5948,7 +5951,7 @@ void MainFrame::determineRunMode() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcDebugConfig(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	ensureDebugPerspectiveMinimal();
+	perspectiveHandler.ensureDebugPerspectiveMinimal();
 	
 	if ( m_debuggerPropertyManagerGrid->GetPageCount() > 0 )
 		m_debuggerPropertyManagerGrid->SelectPage(0);
@@ -5987,13 +5990,13 @@ void MainFrame::rcRun() {
 		}
 		
 		// bring the debug controls in front
-		ensureDebugPerspectiveMinimal();
+		perspectiveHandler.ensureDebugPerspectiveMinimal();
 		
 		// to see each line during the debug session
 		CncConfig::getGlobalCncConfig()->setUpdateInterval(1);
 	} else {
 		
-		ensureRunPerspectiveMinimal();
+		perspectiveHandler.ensureRunPerspectiveMinimal();
 	}
 
 	// process
@@ -6909,108 +6912,55 @@ void MainFrame::toggleTemplateManager(wxCommandEvent& event) {
 	toggleAuiPane("TemplateManager");
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::ensureRunPerspectiveMinimal() {
+void MainFrame::loadPerspective(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	if ( m_scrollWinMonitor->IsShown() == false )
-		ensureAllPanesFromPerspectiveAreShown("Run");
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::ensureDebugPerspectiveMinimal() {
-/////////////////////////////////////////////////////////////////////
-	if ( m_scrollWinMonitor->IsShown() == false || m_debuggerView->IsShown() == false )
-		ensureAllPanesFromPerspectiveAreShown("Debug");
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::ensureAllPanesFromPerspectiveAreShown(const wxString& name) {
-/////////////////////////////////////////////////////////////////////
-	wxString id(wxString::Format("Perspectives/%s.PaneList", name));
-	wxString paneList;
-	
-	config->Read(id, &paneList, "");
-	if ( paneList.IsEmpty() == false ) {
+	wxMenuItem* mi = m_menuPerspective->FindChildItem(event.GetId());
+	if ( mi != NULL ) {
+		wxString perspective(mi->GetItemLabelText());
+		bool up = CncPerspective::isUserPerspective(perspective);
 		
-		wxStringTokenizer tokenizer(paneList, "|");
-		while ( tokenizer.HasMoreTokens() ) {
-			wxString name = tokenizer.GetNextToken();
+		// strip name
+		perspective.assign(perspective.AfterFirst(CncPerspective::getNameEnclose()));
+		perspective.assign(perspective.BeforeLast(CncPerspective::getNameEnclose()));
+		
+		if ( up == true )
+			perspective.Prepend(CncPerspective::getNameEnclose());
 			
-			name.Trim(true).Trim(false);
-			if ( name.IsEmpty() == false ) {
-				showAuiPane(name, false);
-			}
-		}
-		
-		decorateViewMenu();
-		GetAuimgrMain()->Update();
+		perspectiveHandler.loadPerspective(perspective);
 	}
 }
 /////////////////////////////////////////////////////////////////////
-bool MainFrame::loadPerspective(const wxString& name) {
+void MainFrame::savePerspective(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxString id(wxString::Format("Perspectives/%s", name));
-	wxString perspective;
-	
-	config->Read(id, &perspective, "");
-	bool ret = (perspective.IsEmpty() == false);
-	
-	if ( ret == false )	viewAllAuiPanes();
-	else				m_auimgrMain->LoadPerspective(perspective);
-	
-	decorateViewMenu();
-	
-	return ret;
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::savePerspective(const wxString& name) {
-/////////////////////////////////////////////////////////////////////
-	wxASSERT(config);
-	
-	wxString msg(wxString::Format("Do you really want to update the '%s' perspective?", name));
-	wxMessageDialog dlg(this, msg, _T("Perspective save. . . "), 
-	                    wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
-	
-	if ( dlg.ShowModal() == wxID_OK ) {
-		wxString id(wxString::Format("Perspectives/%s", name));
-		config->Write(id, m_auimgrMain->SavePerspective());
+	wxMenuItem* mi = m_menuPerspective->FindChildItem(event.GetId());
+	if ( mi != NULL ) {
+		wxString perspective(mi->GetItemLabelText());
+		bool up = CncPerspective::isUserPerspective(perspective);
 		
-		// additional store a list of shown panes
-		wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
-		wxString list;
-		for (unsigned int i = 0; i < panes.GetCount(); ++i) {
-			if ( panes.Item(i).window->IsShown() )
-				list.append(wxString::Format("%s|", panes.Item(i).name));
-		}
-		config->Write(wxString::Format("%s.PaneList", id), list);
+		// strip name
+		perspective.assign(perspective.AfterFirst(CncPerspective::getNameEnclose()));
+		perspective.assign(perspective.BeforeLast(CncPerspective::getNameEnclose()));
+
+		if ( up == true )
+			perspective.Prepend(CncPerspective::getNameEnclose());
+			
+		perspectiveHandler.savePerspective(perspective);
 	}
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::loadPerspectiveRun(wxCommandEvent& event) {
+void MainFrame::addUserPerspective(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	loadPerspective("Run");
+	perspectiveHandler.addUserPerspective();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::loadPerspectiveDebug(wxCommandEvent& event) {
+void MainFrame::renameUserPerspective(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	loadPerspective("Debug");
+	perspectiveHandler.renameUserPerspective();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::loadPerspectiveSource(wxCommandEvent& event) {
+void MainFrame::removeUserPerspective(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	loadPerspective("Source");
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::savePerspectiveRun(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	savePerspective("Run");
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::savePerspectiveDebug(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	savePerspective("Debug");
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::savePerspectiveSource(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	savePerspective("Source");
+	perspectiveHandler.removeUserPerspective();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::releaseControllerSetupFromConfig() {

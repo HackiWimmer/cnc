@@ -6646,7 +6646,7 @@ Interval [ms]:</label>
                     <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
                     <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                     <tooltip>
-                      <![CDATA[Controller Pos]]>
+                      <![CDATA[Current Feed Speed]]>
                     </tooltip>
                     <value>0</value>
                   </object>
@@ -7974,21 +7974,21 @@ Interval [ms]:</label>
         <label>Perspective</label>
         <style/>
         <object class="wxMenuItem" name="m_miPerspectiveRun">
-          <label>Perspective - Run</label>
+          <label>Perspective - 'Run'</label>
           <bitmap>bitmaps/view-choose.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miPerspectiveDebug">
-          <label>Perspective - Debug</label>
+          <label>Perspective - 'Debug'</label>
           <bitmap>bitmaps/view-choose.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_miPerspectiveSource">
-          <label>Perspective - Source</label>
+          <label>Perspective - 'Source'</label>
           <bitmap>bitmaps/view-choose.png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -7996,22 +7996,44 @@ Interval [ms]:</label>
         </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuSavePerspectiveRun">
-          <label>Save Perspective as Run</label>
+          <label>Save Perspective as 'Run'</label>
           <bitmap>bitmaps/document-save-3.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveDebug">
-          <label>Save Perspective as Debug</label>
+          <label>Save Perspective as 'Debug'</label>
           <bitmap>bitmaps/document-save-3.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
         </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveSource">
-          <label>Save Perspective as Source</label>
+          <label>Save Perspective as 'Source'</label>
           <bitmap>bitmaps/document-save-3.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
+        <object class="wxMenuItem" name="m_menuAddUserPerspective">
+          <label>Add User Perspective</label>
+          <bitmap>bitmaps/16-plus.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_menuRenameUserPerspective">
+          <label>Rename User Perspective</label>
+          <bitmap>bitmaps/edit-rename.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_menuRemoveUserPerspective">
+          <label>Remove User Perspective</label>
+          <bitmap>bitmaps/16-execute_stop.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>

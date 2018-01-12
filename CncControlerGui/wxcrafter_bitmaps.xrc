@@ -199,6 +199,8 @@
   <object class="wxBitmap" name="BMP_TYPE_RAPID">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full (2).png</object>
   <object class="wxBitmap" name="BMP_TYPE_SVG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\flag-blue-2.png</object>
   <object class="wxBitmap" name="BMP_TYPE_WORK">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-medium (2).png</object>
+  <object class="wxBitmap" name="BMP_USER_PERSPECTIVE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\view-choose.png</object>
+  <object class="wxBitmap" name="BMP_USER_PERSPECTIVE_SAVE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="BMP_VALUE_DOUBLE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-pink.png</object>
   <object class="wxBitmap" name="BMP_VALUE_ENUM">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-red.png</object>
   <object class="wxBitmap" name="BMP_VALUE_INACTIVE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-yellow.png</object>

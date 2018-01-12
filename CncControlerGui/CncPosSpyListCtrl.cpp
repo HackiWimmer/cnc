@@ -12,13 +12,13 @@ CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("",	 		wxLIST_FORMAT_LEFT, 	 22);
-	AppendColumn("Reference", 	wxLIST_FORMAT_LEFT, 	 80);
-	AppendColumn("", 			wxLIST_FORMAT_CENTER, 	 22);
-	AppendColumn("Speed", 		wxLIST_FORMAT_RIGHT, 	 50);
-	AppendColumn("X", 			wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
-	AppendColumn("Y", 			wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Z", 			wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("",	 			wxLIST_FORMAT_LEFT, 	 22);
+	AppendColumn("Reference", 		wxLIST_FORMAT_LEFT, 	 70);
+	AppendColumn("", 				wxLIST_FORMAT_CENTER, 	 22);
+	AppendColumn("Speed [mm/min]", 	wxLIST_FORMAT_RIGHT, 	100);
+	AppendColumn("X", 				wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
+	AppendColumn("Y", 				wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("Z", 				wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::REVERSE);

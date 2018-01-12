@@ -154,6 +154,9 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncPerspective.cpp"/>
+      <File Name="CncPerspective.h"/>
+      <File Name="CncZView.h"/>
       <VirtualDirectory Name="OSD">
         <File Name="OSD/webviewDummy.h"/>
         <File Name="OSD/webviewOSD.h"/>
@@ -165,7 +168,6 @@
         <File Name="OSD/CncAsyncKeyboardState.cpp"/>
       </VirtualDirectory>
       <File Name="CncSpeedSimulator.cpp"/>
-      <File Name="CncZView.h"/>
       <File Name="CncNumberFormatter.cpp"/>
       <File Name="CncArduino.cpp"/>
       <File Name="CncControl.cpp"/>

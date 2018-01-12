@@ -63,7 +63,8 @@ class CncControl {
 		CncLongPosition controllerPos;
 		// speed values
 		CncSpeed speedType;
-		double feedSpeed_MM_MIN;
+		double configuredFeedSpeed_MM_MIN;
+		double currentFeedSpeed_MM_MIN;
 		double defaultFeedSpeedRapid_MM_MIN;
 		double defaultFeedSpeedWork_MM_MIN;
 		// Duration counter
@@ -152,8 +153,9 @@ class CncControl {
 		Serial* getSerial() { return serialPort; }
 		//speed
 		CncSpeed getCurrentSpeedType() { return speedType; }
-		inline double getFeedSpeed_MM_SEC() { return feedSpeed_MM_MIN / 60; }
-		inline double getFeedSpeed_MM_MIN() { return feedSpeed_MM_MIN; }
+		double getConfiguredFeedSpeed_MM_SEC() { return configuredFeedSpeed_MM_MIN / 60; }
+		double getConfiguredFeedSpeed_MM_MIN() { return configuredFeedSpeed_MM_MIN; }
+		double getCurrentFeedSpeed_MM_MIN();
 		
 		void changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s);
 		void setDefaultRapidSpeed_MM_MIN(double s);

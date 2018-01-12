@@ -240,9 +240,9 @@ bool CncToolCorrection::process(CncPathList& oList) {
 	return false;
 }
 ///////////////////////////////////////////////////////
-void CncToolCorrection::debugPoints(const char* prefix, CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3) {
+void CncToolCorrection::debugPoints(const char* userPerspectivePrefix, CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3) {
 ///////////////////////////////////////////////////////
-	std::cout << prefix << ": (" << P1.move.x << "," << P1.move.y << ")" 
+	std::cout << userPerspectivePrefix << ": (" << P1.move.x << "," << P1.move.y << ")" 
 	                     << " (" << P2.move.x << "," << P2.move.y << ")" 
 						 << " (" << P3.move.x << "," << P3.move.y << ")" 
 						 << std::endl;

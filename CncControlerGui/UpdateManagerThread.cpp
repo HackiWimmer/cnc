@@ -137,29 +137,33 @@ void UpdateManagerThread::postError(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
 void UpdateManagerThread::popAndFormatPosSpyQueue() {
 ///////////////////////////////////////////////////////////////////
+	static wxString speedInfo("");
 	unsigned long count = 0;
 	
 	while ( posSpyQueue.read_available() ) {
 		posSpyQueue.pop(lpse);
 		
+		if ( lpse.pos.currentSpeedValue < 0.0 )	speedInfo.assign(wxString::Format("%.1lf / %s",    lpse.pos.configuredSpeedValue, _maxSpeedLabel));
+		else									speedInfo.assign(wxString::Format("%.1lf / %.1lf", lpse.pos.configuredSpeedValue, lpse.pos.currentSpeedValue));
+		
 		switch ( unit ) {
-			case CncMetric:		posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 		lpse.pos.pid));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 	lpse.pos.id));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 		(char)lpse.pos.speedMode));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		wxString::Format("%.1lf", 	lpse.pos.speedValue));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%.3lf", 	lpse.pos.pos.getX() * displayFactX));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%.3lf", 	lpse.pos.pos.getY() * displayFactY));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%.3lf", 	lpse.pos.pos.getZ() * displayFactZ));
+			case CncMetric:		posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 			lpse.pos.pid));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 		lpse.pos.id));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 			(char)lpse.pos.speedMode));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		speedInfo);
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%.3lf", 		lpse.pos.pos.getX() * displayFactX));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%.3lf", 		lpse.pos.pos.getY() * displayFactY));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%.3lf", 		lpse.pos.pos.getZ() * displayFactZ));
 								break;
 								
 			case CncSteps:
-			default: 			posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 		lpse.pos.pid));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 	lpse.pos.id));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 		(char)lpse.pos.speedMode));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		wxString::Format("%.1lf", 	lpse.pos.speedValue));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%ld", 	lpse.pos.pos.getX()));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%ld", 	lpse.pos.pos.getY()));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%ld", 	lpse.pos.pos.getZ()));
+			default: 			posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 			lpse.pos.pid));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 		lpse.pos.id));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 			(char)lpse.pos.speedMode));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		speedInfo);
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%ld", 		lpse.pos.pos.getX()));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%ld", 		lpse.pos.pos.getY()));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%ld", 		lpse.pos.pos.getZ()));
 		}
 		
 		posSpyStringQueue.push(posSpyRow);

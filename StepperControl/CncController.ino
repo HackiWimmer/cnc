@@ -178,6 +178,8 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
   long x = X->getPosition();  
   long y = Y->getPosition();  
   long z = Z->getPosition();  
+
+  long speedValue = speedManager.getMeasurementFeedSpeed() * DBL_FACT;
   
   if ( absolute(x - lastSendPositionX) >= posReplyThresholdX ||
        absolute(y - lastSendPositionY) >= posReplyThresholdY ||
@@ -200,7 +202,7 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
       case PID_XYZ_POS: 
       case PID_XYZ_POS_MAJOR: 
       case PID_XYZ_POS_DETAIL: 
-                      writeLongValues(pid, x, y, z);
+                      writeLongValues(pid, x, y, z, speedValue);
                       lastSendPositionX = x; 
                       lastSendPositionY = y; 
                       lastSendPositionZ = z; 

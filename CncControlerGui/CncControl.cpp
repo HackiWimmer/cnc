@@ -35,7 +35,8 @@ CncControl::CncControl(CncPortType pt)
 , curAppPos(0,0,0)
 , controllerPos(0,0,0)
 , speedType(CncSpeedRapid)
-, feedSpeed_MM_MIN(0.0)
+, configuredFeedSpeed_MM_MIN(0.0)
+, currentFeedSpeed_MM_MIN(MIN_LONG)
 , defaultFeedSpeedRapid_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , defaultFeedSpeedWork_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , durationCounter(0)
@@ -685,15 +686,18 @@ const wxString& CncControl::getSpeedTypeAsString() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value) {
 ///////////////////////////////////////////////////////////////////
+	// always reset the current speed value
+	currentFeedSpeed_MM_MIN = MIN_LONG;
+	
 	if ( value <= 0.0 )
 		return;
 	
-	if ( speedType == s && feedSpeed_MM_MIN == value )
+	if ( speedType == s && configuredFeedSpeed_MM_MIN == value )
 		return;
 		
 	speedType = s;
-	feedSpeed_MM_MIN = value;
-	processSetter(PID_SPEED_MM_MIN, (long)(feedSpeed_MM_MIN * DBL_FACT));
+	configuredFeedSpeed_MM_MIN = value;
+	processSetter(PID_SPEED_MM_MIN, (long)(configuredFeedSpeed_MM_MIN * DBL_FACT));
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(CncSpeed s, double value) {
@@ -878,10 +882,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				case PID_XYZ_POS_MAJOR:
 				case PID_XYZ_POS_DETAIL:
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
-				
-				#warning
-				//clog << "FEED SPEED: " << ci.feedSpeed << endl;
-			
+										currentFeedSpeed_MM_MIN = ci.feedSpeed;
 			}
 			
 			// display controller coordinates
@@ -940,6 +941,11 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	return !isInterrupted();
 }
 ///////////////////////////////////////////////////////////////////
+double CncControl::getCurrentFeedSpeed_MM_MIN() {
+///////////////////////////////////////////////////////////////////
+	return currentFeedSpeed_MM_MIN;
+}
+///////////////////////////////////////////////////////////////////
 void CncControl::postAppPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	static CncLongPosition lastAppPos;
@@ -955,7 +961,7 @@ void CncControl::postAppPosition(unsigned char pid) {
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos ) {
 			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, getClientId(), getSpeedTypeAsString(), getFeedSpeed_MM_MIN(), curAppPos));
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, getClientId(), getSpeedTypeAsString(), getConfiguredFeedSpeed_MM_MIN(), getCurrentFeedSpeed_MM_MIN(), curAppPos));
 		}
 	}
 	
@@ -972,7 +978,7 @@ void CncControl::postCtlPosition(unsigned char pid) {
 		// a position compairsion isn't necessay here because the serialControllerCallback(...)
 		// call this method only on position changes
 		if ( GET_GUI_CTL(mainFrame) )
-			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, getClientId(), getSpeedTypeAsString(), getFeedSpeed_MM_MIN(), curCtlPos));
+			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, getClientId(), getSpeedTypeAsString(), getConfiguredFeedSpeed_MM_MIN(), getCurrentFeedSpeed_MM_MIN(), curCtlPos));
 	}
 }
 ///////////////////////////////////////////////////////////////////

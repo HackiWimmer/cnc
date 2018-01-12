@@ -30,6 +30,7 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 #define _portSimulatorNULL	"<PortSimulator(dev/null)>"
 #define _portEmulatorNULL 	"<PortEmulator(dev/null)>"
 #define _portEmulatorSVG  	"<PortEmulator(SVGFile)>"
+#define _maxSpeedLabel		"<MAX>"
 
 // make std globally available
 using namespace std;

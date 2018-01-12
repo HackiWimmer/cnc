@@ -3827,7 +3827,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_feedSpeed = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
     m_feedSpeed->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
     m_feedSpeed->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
-    m_feedSpeed->SetToolTip(_("Controller Pos"));
+    m_feedSpeed->SetToolTip(_("Current Feed Speed"));
     #if wxVERSION_NUMBER >= 3000
     m_feedSpeed->SetHint(wxT(""));
     #endif
@@ -4515,31 +4515,45 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuPerspective = new wxMenu();
     m_menuBar->Append(m_menuPerspective, _("Perspective"));
     
-    m_miPerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - Run"), wxT(""), wxITEM_NORMAL);
+    m_miPerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - 'Run'"), wxT(""), wxITEM_NORMAL);
     m_miPerspectiveRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
     m_menuPerspective->Append(m_miPerspectiveRun);
     
-    m_miPerspectiveDebug = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - Debug"), wxT(""), wxITEM_NORMAL);
+    m_miPerspectiveDebug = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - 'Debug'"), wxT(""), wxITEM_NORMAL);
     m_miPerspectiveDebug->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
     m_menuPerspective->Append(m_miPerspectiveDebug);
     
-    m_miPerspectiveSource = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - Source"), wxT(""), wxITEM_NORMAL);
+    m_miPerspectiveSource = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - 'Source'"), wxT(""), wxITEM_NORMAL);
     m_miPerspectiveSource->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
     m_menuPerspective->Append(m_miPerspectiveSource);
     
     m_menuPerspective->AppendSeparator();
     
-    m_menuSavePerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as Run"), wxT(""), wxITEM_NORMAL);
+    m_menuSavePerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as 'Run'"), wxT(""), wxITEM_NORMAL);
     m_menuSavePerspectiveRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
     m_menuPerspective->Append(m_menuSavePerspectiveRun);
     
-    m_menuSavePerspectiveDebug = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as Debug"), wxT(""), wxITEM_NORMAL);
+    m_menuSavePerspectiveDebug = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as 'Debug'"), wxT(""), wxITEM_NORMAL);
     m_menuSavePerspectiveDebug->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
     m_menuPerspective->Append(m_menuSavePerspectiveDebug);
     
-    m_menuSavePerspectiveSource = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as Source"), wxT(""), wxITEM_NORMAL);
+    m_menuSavePerspectiveSource = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as 'Source'"), wxT(""), wxITEM_NORMAL);
     m_menuSavePerspectiveSource->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
     m_menuPerspective->Append(m_menuSavePerspectiveSource);
+    
+    m_menuPerspective->AppendSeparator();
+    
+    m_menuAddUserPerspective = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Add User Perspective"), wxT(""), wxITEM_NORMAL);
+    m_menuAddUserPerspective->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-plus")));
+    m_menuPerspective->Append(m_menuAddUserPerspective);
+    
+    m_menuRenameUserPerspective = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Rename User Perspective"), wxT(""), wxITEM_NORMAL);
+    m_menuRenameUserPerspective->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("edit-rename")));
+    m_menuPerspective->Append(m_menuRenameUserPerspective);
+    
+    m_menuRemoveUserPerspective = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Remove User Perspective"), wxT(""), wxITEM_NORMAL);
+    m_menuRemoveUserPerspective->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-execute_stop")));
+    m_menuPerspective->Append(m_menuRemoveUserPerspective);
     
     m_menuMonitoring = new wxMenu();
     m_menuBar->Append(m_menuMonitoring, _("Monitoring"));
@@ -5057,12 +5071,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Connect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Connect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
-    this->Connect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveRun), NULL, this);
-    this->Connect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveDebug), NULL, this);
-    this->Connect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveSource), NULL, this);
-    this->Connect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveRun), NULL, this);
-    this->Connect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveDebug), NULL, this);
-    this->Connect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveSource), NULL, this);
+    this->Connect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Connect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Connect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Connect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
+    this->Connect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
+    this->Connect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
+    this->Connect(m_menuAddUserPerspective->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::addUserPerspective), NULL, this);
+    this->Connect(m_menuRenameUserPerspective->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::renameUserPerspective), NULL, this);
+    this->Connect(m_menuRemoveUserPerspective->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::removeUserPerspective), NULL, this);
     this->Connect(m_menuItemUpdCoors->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineUpdateCoordinates), NULL, this);
     this->Connect(m_menuItemUpdDraw->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineOnlineDrawing), NULL, this);
     this->Connect(m_menuItemAllowEvents->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineAllowEvents), NULL, this);
@@ -5349,12 +5366,15 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Disconnect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Disconnect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
-    this->Disconnect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveRun), NULL, this);
-    this->Disconnect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveDebug), NULL, this);
-    this->Disconnect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspectiveSource), NULL, this);
-    this->Disconnect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveRun), NULL, this);
-    this->Disconnect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveDebug), NULL, this);
-    this->Disconnect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspectiveSource), NULL, this);
+    this->Disconnect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Disconnect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Disconnect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Disconnect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
+    this->Disconnect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
+    this->Disconnect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
+    this->Disconnect(m_menuAddUserPerspective->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::addUserPerspective), NULL, this);
+    this->Disconnect(m_menuRenameUserPerspective->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::renameUserPerspective), NULL, this);
+    this->Disconnect(m_menuRemoveUserPerspective->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::removeUserPerspective), NULL, this);
     this->Disconnect(m_menuItemUpdCoors->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineUpdateCoordinates), NULL, this);
     this->Disconnect(m_menuItemUpdDraw->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineOnlineDrawing), NULL, this);
     this->Disconnect(m_menuItemAllowEvents->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineAllowEvents), NULL, this);
@@ -8981,5 +9001,49 @@ ImageLibSummary::ImageLibSummary()
 }
 
 ImageLibSummary::~ImageLibSummary()
+{
+}
+
+ImageLibPerspective::ImageLibPerspective()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_USER_PERSPECTIVE"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_USER_PERSPECTIVE"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_USER_PERSPECTIVE_SAVE"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_USER_PERSPECTIVE_SAVE"), bmp));
+        }
+    }
+    
+}
+
+ImageLibPerspective::~ImageLibPerspective()
 {
 }

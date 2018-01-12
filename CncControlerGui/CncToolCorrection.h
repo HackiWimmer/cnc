@@ -90,7 +90,7 @@ class CncToolCorrection {
 		// debugs the complete list
 		void debugList(const CncPathList& list);
 		// print out the point dripple
-		void debugPoints(const char* prefix, CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3);
+		void debugPoints(const char* userPerspectivePrefix, CncPathListEntry P1, CncPathListEntry P2, CncPathListEntry P3);
 		// handle one point path
 		bool processBorehole(CncPathList& olist);
 		// handle two point path

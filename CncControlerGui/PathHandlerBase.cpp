@@ -51,10 +51,10 @@ void PathHandlerBase::appendDebugValueDetail(const CncPathListEntry& cpe) {
 	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p) {
+void PathHandlerBase::traceCurveLibPoint(const char* userPerspectivePrefix, SVGCurveLib::PointGeneric<>& p) {
 //////////////////////////////////////////////////////////////////
 	if ( true ) {
-		std::clog << prefix << ":" << p.x << "," << p.y << std::endl;
+		std::clog << userPerspectivePrefix << ":" << p.x << "," << p.y << std::endl;
 	}
 }
 //////////////////////////////////////////////////////////////////
@@ -70,9 +70,9 @@ void PathHandlerBase::traceFirstMove(double moveX, double moveY) {
 	std::cout << " Move Rel: " << moveX << "," << moveY << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::tracePositions(const char* prefix) {
+void PathHandlerBase::tracePositions(const char* userPerspectivePrefix) {
 //////////////////////////////////////////////////////////////////
-	std::cout << "tracePositions(" << prefix << ")" << std::endl;
+	std::cout << "tracePositions(" << userPerspectivePrefix << ")" << std::endl;
 	
 	if ( pathListMgr.getPathListSize() > 0 ) {
 		CncPathList::iterator it = pathListMgr.begin();

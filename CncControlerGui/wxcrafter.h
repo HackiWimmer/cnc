@@ -604,6 +604,10 @@ protected:
     wxMenuItem* m_menuSavePerspectiveRun;
     wxMenuItem* m_menuSavePerspectiveDebug;
     wxMenuItem* m_menuSavePerspectiveSource;
+    wxMenuItem* m_menuItem27711;
+    wxMenuItem* m_menuAddUserPerspective;
+    wxMenuItem* m_menuRenameUserPerspective;
+    wxMenuItem* m_menuRemoveUserPerspective;
     wxMenu* m_menuMonitoring;
     wxMenuItem* m_menuItemUpdCoors;
     wxMenuItem* m_menuItemUpdDraw;
@@ -889,12 +893,11 @@ protected:
     virtual void viewUnitCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void viewAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
     virtual void hideAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
-    virtual void loadPerspectiveRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void loadPerspectiveDebug(wxCommandEvent& event) { event.Skip(); }
-    virtual void loadPerspectiveSource(wxCommandEvent& event) { event.Skip(); }
-    virtual void savePerspectiveRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void savePerspectiveDebug(wxCommandEvent& event) { event.Skip(); }
-    virtual void savePerspectiveSource(wxCommandEvent& event) { event.Skip(); }
+    virtual void loadPerspective(wxCommandEvent& event) { event.Skip(); }
+    virtual void savePerspective(wxCommandEvent& event) { event.Skip(); }
+    virtual void addUserPerspective(wxCommandEvent& event) { event.Skip(); }
+    virtual void renameUserPerspective(wxCommandEvent& event) { event.Skip(); }
+    virtual void removeUserPerspective(wxCommandEvent& event) { event.Skip(); }
     virtual void defineUpdateCoordinates(wxCommandEvent& event) { event.Skip(); }
     virtual void defineOnlineDrawing(wxCommandEvent& event) { event.Skip(); }
     virtual void defineAllowEvents(wxCommandEvent& event) { event.Skip(); }
@@ -2269,6 +2272,35 @@ public:
     }
 
     virtual ~ImageLibSummary();
+};
+
+
+class ImageLibPerspective : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibPerspective();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibPerspective();
 };
 
 #endif

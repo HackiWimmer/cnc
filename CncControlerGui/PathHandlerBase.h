@@ -112,10 +112,10 @@ class PathHandlerBase {
 		SVGTransformMatrix  currentSvgTransformMatrix;
 		
 		// trace functions
-		void traceCurveLibPoint(const char* prefix, SVGCurveLib::PointGeneric<>& p);
+		void traceCurveLibPoint(const char* userPerspectivePrefix, SVGCurveLib::PointGeneric<>& p);
 		void traceFunctionCall(const char* fn);
 		void traceCurrentPosition();
-		void tracePositions(const char* prefix);
+		void tracePositions(const char* userPerspectivePrefix);
 		void traceFirstMove(double moveX, double moveY);
 		
 		// curvel lib helper

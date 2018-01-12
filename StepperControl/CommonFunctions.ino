@@ -62,17 +62,7 @@ inline void writeGetterValues(unsigned char pid, long val1, long val2, long val3
   writeLongValue(val2);
   writeLongValue(val3);
 }
-/////////////////////////////////////////////////////////////////////////////////////
-inline void writeGetterValues(unsigned char pid, long val1, long val2, long val3, long val4) {
-/////////////////////////////////////////////////////////////////////////////////////
-  Serial.write(RET_SOH);
-  Serial.write(pid);
-  writeByteValue(3);
-  writeLongValue(val1);
-  writeLongValue(val2);
-  writeLongValue(val3);
-  writeLongValue(val4);
-}
+
 /////////////////////////////////////////////////////////////////////////////////////
 inline void writeLongValue(long val) {
 /////////////////////////////////////////////////////////////////////////////////////
@@ -103,6 +93,16 @@ inline void writeLongValues(unsigned char pid, long val1, long val2, long val3) 
   writeLongValue(val1);
   writeLongValue(val2);
   writeLongValue(val3);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+inline void writeLongValues(unsigned char pid, long val1, long val2, long val3, long val4) {
+/////////////////////////////////////////////////////////////////////////////////////
+  Serial.write(RET_SOH);
+  Serial.write(pid);
+  writeLongValue(val1);
+  writeLongValue(val2);
+  writeLongValue(val3);
+  writeLongValue(val4);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 inline void sendHeartbeat() {

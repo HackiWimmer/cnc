@@ -161,68 +161,71 @@ class UpdateManagerThread : public wxThread {
 
 			//////////////////////////////////////////////////////////////
 			struct Pos {
-				unsigned char pid		= '\0';
-				long id					= -1;
-				double speedValue		= 0.0;
-				SpeedMode speedMode		= UNDEFINED;
-				CncLongPosition pos	= {0, 0, 0};
+				unsigned char pid				= '\0';
+				long id							= -1;
+				double configuredSpeedValue		= 0.0;
+				double currentSpeedValue		= 0.0;
+				SpeedMode speedMode				= UNDEFINED;
+				CncLongPosition pos				= {0, 0, 0};
 				
 				void reset() {
 					set();
 				}
 				
 				void set() {
-					id			= -1;
-					speedValue	= 0.0;
-					speedMode	= UNDEFINED;
+					id						= -1;
+					configuredSpeedValue	= 0.0;
+					currentSpeedValue		= 0.0;
+					speedMode				= UNDEFINED;
 					pos.set({0, 0, 0});
 				}
 				
-				void set(unsigned char pid, long id, SpeedMode speedMode, double speedValue, const CncLongPosition& p) {
-					this->pid 			= pid;
-					this->id			= id;
-					this->speedValue	= speedValue;
-					this->speedMode		= speedMode;
+				void set(unsigned char pid, long id, SpeedMode speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
+					this->pid 					= pid;
+					this->id					= id;
+					this->configuredSpeedValue	= cfgSpeedValue;
+					this->currentSpeedValue		= curSpeedValue;
+					this->speedMode				= speedMode;
 					this->pos.set(p);
 				}
-
-				void set(unsigned char pid, long id, wxString speedMode, double sv, const CncLongPosition& p) {
+				
+				void set(unsigned char pid, long id, wxString speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					SpeedMode sm;
 					switch ( (char)speedMode[0] ) {
 						case 'R':	sm = RAPID; break;
 						case 'W':	sm = WORK;  break;
 						default:	sm = UNDEFINED;
 					}
-					set(pid, id, sm, sv, p);
+					set(pid, id, sm, cfgSpeedValue, curSpeedValue, p);
 				}
 				
 			} pos;
 			
-				inline const Event& AppPosEvent(unsigned char pid, long i, SpeedMode sm, double sv, const CncLongPosition& p) {
+				inline const Event& AppPosEvent(unsigned char pid, long i, SpeedMode sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= APP_POS_UPD;
 					processed    	= false;
-					pos.set(pid, i, sm, sv, p);
+					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}
 				
-				inline const Event& AppPosEvent(unsigned char pid, long i, const wxString& sm, double sv, const CncLongPosition& p) {
+				inline const Event& AppPosEvent(unsigned char pid, long i, const wxString& sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= APP_POS_UPD;
 					processed    	= false;
-					pos.set(pid, i, sm, sv, p);
+					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}
 
-				inline const Event& CtlPosEvent(unsigned char pid, long i, SpeedMode sm, double sv, const CncLongPosition& p) {
+				inline const Event& CtlPosEvent(unsigned char pid, long i, SpeedMode sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
-					pos.set(pid, i, sm, sv, p);
+					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}
 				
-				inline const Event& CtlPosEvent(unsigned char pid, long i, const wxString& sm, double sv, const CncLongPosition& p) {
+				inline const Event& CtlPosEvent(unsigned char pid, long i, const wxString& sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
-					pos.set(pid, i, sm, sv, p);
+					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}
 			//////////////////////////////////////////////////////////////
