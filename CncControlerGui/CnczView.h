@@ -4,6 +4,7 @@
 #include <wx/panel.h>
 #include <wx/dcclient.h>
 
+
 class CncZView : public wxPanel  {
 		
 	protected:

@@ -8,6 +8,10 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
+    <VirtualDirectory Name="Clipper">
+      <File Name="Clipper/clipper.hpp"/>
+      <File Name="Clipper/clipper.cpp"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="Inbound - Manually">
       <VirtualDirectory Name="PathHandler">
         <File Name="ManuallyPathHandlerCnc.cpp"/>
@@ -121,11 +125,11 @@
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
       <VirtualDirectory Name="OSD">
-        <File Name="SerialOSD.h"/>
-        <File Name="SerialMsw.h"/>
-        <File Name="SerialMsw.cpp"/>
-        <File Name="SerialGtk.h"/>
-        <File Name="SerialGtk.cpp"/>
+        <File Name="OSD/SerialOSD.h"/>
+        <File Name="OSD/SerialMsw.h"/>
+        <File Name="OSD/SerialMsw.cpp"/>
+        <File Name="OSD/SerialGtk.h"/>
+        <File Name="OSD/SerialGtk.cpp"/>
       </VirtualDirectory>
       <File Name="SerialSimulatorFacade.cpp"/>
       <File Name="SerialSimulatorFacade.h"/>
@@ -151,12 +155,14 @@
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
       <VirtualDirectory Name="OSD">
-        <File Name="CncAsyncKeyboardState.cpp"/>
-        <File Name="CncAsyncKeyboardState.h"/>
-        <File Name="CncUsbPortScanner.h"/>
-        <File Name="CncUsbPortScanner.cpp"/>
+        <File Name="OSD/webviewDummy.h"/>
+        <File Name="OSD/webviewOSD.h"/>
+        <File Name="OSD/CncUsbPortScanner.h"/>
+        <File Name="OSD/CncUsbPortScanner.cpp"/>
         <File Name="OSD/CncTimeFunctions.h"/>
         <File Name="OSD/CncTimeFunctions.cpp"/>
+        <File Name="OSD/CncAsyncKeyboardState.h"/>
+        <File Name="OSD/CncAsyncKeyboardState.cpp"/>
       </VirtualDirectory>
       <File Name="CncSpeedSimulator.cpp"/>
       <File Name="CncZView.h"/>
@@ -340,10 +346,6 @@
     </VirtualDirectory>
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="Clipper">
-    <File Name="Clipper/clipper.cpp"/>
-    <File Name="Clipper/clipper.hpp"/>
   </VirtualDirectory>
   <Dependencies Name="Debug"/>
   <Dependencies Name="Release"/>

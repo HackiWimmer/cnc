@@ -4,12 +4,12 @@
 #include <vector> 
 #include <map>
 #include <wx/string.h>
+#include "OSD/CncTimeFunctions.h"
+#include "OSD/SerialOSD.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
 #include "SvgUnitCalculator.h"
-#include "OSD/CncTimeFunctions.h"
 #include "CncPosition.h"
-#include "SerialOSD.h"
 
 typedef std::map<int, int32_t> SetterMap;
 

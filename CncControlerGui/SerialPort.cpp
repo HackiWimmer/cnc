@@ -8,6 +8,7 @@
 	#include <arpa/inet.h>
 #endif
 
+#include "OSD/CncTimeFunctions.h"
 #include "CncControl.h"
 #include "CncCommon.h"
 #include "CncArduino.h"
@@ -80,14 +81,14 @@ Serial::~Serial() {
 ///////////////////////////////////////////////////////////////////
 void Serial::waitDuringRead(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
-	Sleep(millis);
+	CncTimeFunctions::sleep(millis);
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::sleepMilliseconds(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
 	// Sleep a while to give the real microcontroller a portion 
 	// of time to do something
-	Sleep(millis);
+	CncTimeFunctions::sleep(millis);
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::startMeasurement() {

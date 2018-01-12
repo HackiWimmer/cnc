@@ -27,7 +27,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include <fstream>
 #include <cctype>
 #include <math.h>
-
 #include <wx/datetime.h>
 #include <wx/debug.h>
 #include <wx/msgdlg.h>
@@ -41,7 +40,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include <wx/filename.h>
 #include <wx/msgdlg.h>
 #include <wx/evtloop.h>
-#include <wx/webview.h>
 #include <wx/dataview.h>
 #include <wx/stc/stc.h>
 #include <wx/wfstream.h>
@@ -52,11 +50,13 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include <wx/clipbrd.h>
 #include <wx/version.h> 
 #include <boost/version.hpp>
+#include "OSD/CncUsbPortScanner.h"
+#include "OSD/CncAsyncKeyboardState.h"
+#include "OSD/webviewOSD.h"
 #include "CncNumberFormatter.h"
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
 #include "CncPosition.h"
-#include "CncUsbPortScanner.h"
 #include "CncPatternDefinitions.h"
 #include "SvgUnitCalculator.h"
 #include "CncFileNameService.h"
@@ -72,7 +72,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "UnitTestFrame.h"
 #include "UpdateManagerThread.h"
 #include "CncConfigProperty.h"
-#include "CncAsyncKeyboardState.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -3760,7 +3759,7 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 void MainFrame::keyDownXY(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// disconnect this event handler to avoid the processing of buffered events
-	m_moveXYAxisCtl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownXY), NULL, this);
+	m_moveXYAxisCtl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::keyDownXY), NULL, this);
 	
 	wxASSERT(cnc);
 	int c = event.GetKeyCode();
@@ -3783,7 +3782,7 @@ void MainFrame::keyDownXY(wxKeyEvent& event) {
 	
 	// clear bufferd events and reconnect this event handler
 	dispatchAll();
-	m_moveXYAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(keyDownXY), NULL, this);
+	m_moveXYAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::keyDownXY), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::keyDownZ(wxKeyEvent& event) {

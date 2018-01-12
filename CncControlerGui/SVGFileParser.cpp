@@ -3,8 +3,8 @@
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
 #include <wx/stc/stc.h>
-#include <wx/webview.h>
 #include <wx/filename.h>
+#include "OSD/webviewOSD.h"
 #include "SvgEditPopup.h"
 #include "SVGElementConverter.h"
 #include "SvgUnitCalculator.h"

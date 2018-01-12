@@ -1,4 +1,4 @@
-#include <wx/webview.h>
+
 #include <wx/stc/stc.h>
 #include <wx/menu.h>
 #include <wx/evtloop.h>
@@ -6,6 +6,7 @@
 #include <wx/stattext.h>
 #include <wx/propgrid/manager.h>
 #include "OSD/CncTimeFunctions.h"
+#include "OSD/webviewOSD.h"
 #include "CncConfigExt.h"
 #include "wxcrafter.h"
 #include "CncCommon.h"
