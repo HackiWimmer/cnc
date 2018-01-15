@@ -109,7 +109,7 @@ void CncTimeFunctions::printError(const char *tag) {
 #endif
 }
 ////////////////////////////////////////////////////////////////
-int CncTimeFunctions::gettimeofday(struct timeval *tv, void *tz) {
+int CncTimeFunctions::getTimeOfDay(struct timeval *tv, void *tz) {
 ////////////////////////////////////////////////////////////////
 #ifdef __WXMSW__
 	if ( initialized == false )
@@ -133,7 +133,7 @@ int CncTimeFunctions::gettimeofday(struct timeval *tv, void *tz) {
 # endif
 
 #ifdef __WXGTK__
-	return gettimeofday(tv, tz);
+	return gettimeofday(tv, NULL);
 #endif
 }
 ////////////////////////////////////////////////////////////////

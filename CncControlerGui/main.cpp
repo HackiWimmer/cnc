@@ -283,8 +283,6 @@ class MainApp : public wxApp {
 			wxLocale(LC_NUMERIC);
 			
 			// Add the common image handlers
-			wxImage::AddHandler( new wxPNGHandler );
-			wxImage::AddHandler( new wxJPEGHandler );
 			wxInitAllImageHandlers();
 			
 			wxValidator::SuppressBellOnError(true);

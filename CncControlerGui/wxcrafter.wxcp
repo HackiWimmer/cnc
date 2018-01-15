@@ -28180,7 +28180,7 @@
                              "border": 1,
                              "gbSpan": "1,1",
                              "gbPosition": "0,0",
-                             "m_styles": ["wxLC_VRULES", "wxLC_HRULES", "wxLC_SORT_DESCENDING", "wxLC_SINGLE_SEL", "wxLC_VIRTUAL", "wxLC_REPORT"],
+                             "m_styles": ["wxLC_VIRTUAL", "wxLC_REPORT"],
                              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                              "m_properties": [{
                                "type": "winid",
@@ -40964,7 +40964,7 @@
                 }, {
                  "type": "colour",
                  "m_label": "Bg Colour:",
-                 "colour": "Desktop"
+                 "colour": "(0,0,0)"
                 }, {
                  "type": "colour",
                  "m_label": "Fg Colour:",
@@ -48302,7 +48302,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48353,7 +48353,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48404,7 +48404,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48455,7 +48455,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48506,7 +48506,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48557,7 +48557,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48608,7 +48608,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48659,7 +48659,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48710,7 +48710,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48761,7 +48761,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48812,7 +48812,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -48863,7 +48863,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -49645,7 +49645,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -49696,7 +49696,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -49747,7 +49747,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -49798,7 +49798,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -49849,7 +49849,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -49944,7 +49944,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -49995,7 +49995,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -50204,7 +50204,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -50788,7 +50788,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": "bitmaps/dialog-ok-4.png"
+           "m_path": ""
           }, {
            "type": "choice",
            "m_label": "Kind:",
@@ -51973,7 +51973,7 @@
    "m_properties": [{
      "type": "string",
      "m_label": "Size:",
-     "m_value": "600,750"
+     "m_value": "1600,750"
     }, {
      "type": "string",
      "m_label": "Minimum Size:",
@@ -58118,7 +58118,7 @@
                             }, {
                              "type": "string",
                              "m_label": "Label:",
-                             "m_value": "Tool Correction"
+                             "m_value": "Tool Correction Flag"
                             }, {
                              "type": "multi-string",
                              "m_label": "Tooltip:",

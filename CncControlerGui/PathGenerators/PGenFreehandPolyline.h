@@ -21,7 +21,7 @@ class PGenFreehandPolyline : public PGenPolygon {
 		
 		///////////////////////////////////////////////////////////////////
 		virtual void initParameters()  {
-			name		= "Freehand";
+			name		= "Free Line";
 			treePath 	= "Polylines [mm]";
 			
 			commonValues.canJointType = false;

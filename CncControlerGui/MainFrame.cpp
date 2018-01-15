@@ -4911,7 +4911,8 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 		case TplGcode:		ctrl->selectGCodePreview(fn);
 							break;
 		
-		default:			cnc::trc.logError(wxString("Cant preview: ") + fn );
+		default:			if ( fn.IsEmpty() == false )
+								cnc::trc.logError(wxString::Format("Cant preview: '%s'", fn));
 							break;
 	}
 }

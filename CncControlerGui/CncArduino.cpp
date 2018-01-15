@@ -373,7 +373,6 @@ void ArduinoAnalogPins::init() {
 		pins[i]  = s.c_str();
 	}
 
-	pins[PID_UNKNOWN]              = "Default PIN";
 	pins[INTERRUPT_LED_ID]         = "Interrupt LED";
 }
 /////////////////////////////////////////////////////////////////////////

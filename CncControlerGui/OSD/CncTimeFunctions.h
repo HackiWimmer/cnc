@@ -83,7 +83,7 @@ class CncTimeFunctions {
 		
 		static void sleep(unsigned int milliseconds);
 		
-		static int gettimeofday(struct timeval *tv, void *tz = NULL);
+		static int getTimeOfDay(struct timeval *tv, void *tz = NULL);
 		static void sleepMircoseconds(int64_t micros);
 		static void activeWaitMircoseconds(int64_t micros, bool active=true);
 		static void busyWaitMircoseconds(unsigned int micros);

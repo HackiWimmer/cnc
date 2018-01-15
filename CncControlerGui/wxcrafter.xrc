@@ -4286,7 +4286,7 @@
                                             <flag>wxALL|wxEXPAND</flag>
                                             <border>1</border>
                                             <object class="wxListCtrl" name="m_cncSummaryListCtrl">
-                                              <style>wxLC_VRULES|wxLC_HRULES|wxLC_SORT_DESCENDING|wxLC_SINGLE_SEL|wxLC_VIRTUAL|wxLC_REPORT</style>
+                                              <style>wxLC_VIRTUAL|wxLC_REPORT</style>
                                               <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                               <tooltip>
                                                 <![CDATA[Only a placeholder]]>
@@ -6422,7 +6422,7 @@ Interval [ms]:</label>
                       <border>1</border>
                       <object class="wxTextCtrl" name="m_logger">
                         <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL</style>
-                        <bg>wxSYS_COLOUR_BACKGROUND</bg>
+                        <bg>#000000</bg>
                         <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
                         <font>
                           <size>10</size>
@@ -7861,7 +7861,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miToolbar">
           <checkable>1</checkable>
           <label>CNC Toolbar</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7869,7 +7868,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewStatusbar">
           <checkable>1</checkable>
           <label>CNC Statusbar</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7877,7 +7875,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewTemplateManager">
           <checkable>1</checkable>
           <label>CNC Template Manager</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7885,7 +7882,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewMainView">
           <checkable>1</checkable>
           <label>CNC Source View</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7893,7 +7889,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewMonitor">
           <checkable>1</checkable>
           <label>CNC Motion Monitor</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7901,7 +7896,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewZAxis">
           <checkable>1</checkable>
           <label>CNC Z Axis</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7909,7 +7903,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewPosMonitor">
           <checkable>1</checkable>
           <label>CNC Position Monitor</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7917,7 +7910,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewDebugger">
           <checkable>1</checkable>
           <label>CNC Debugger</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7925,7 +7917,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewSpy">
           <checkable>1</checkable>
           <label>CNC Serial Spy</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7933,7 +7924,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewLogger">
           <checkable>1</checkable>
           <label>CNC Logger</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7941,7 +7931,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewSpeed">
           <checkable>1</checkable>
           <label>CNC Speed View</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -7949,7 +7938,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miViewUnitCalculator">
           <checkable>1</checkable>
           <label>CNC Unit Caluclator</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8045,7 +8033,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemUpdCoors">
           <checkable>1</checkable>
           <label>Update Coordinates</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8054,7 +8041,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemUpdDraw">
           <checkable>1</checkable>
           <label>Online Preview</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8063,7 +8049,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemAllowEvents">
           <checkable>1</checkable>
           <label>Allow Events</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8072,7 +8057,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemDisplayUserAgent">
           <checkable>1</checkable>
           <label>Display User Agent Content</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8081,7 +8065,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemToolControls">
           <checkable>1</checkable>
           <label>Update Tool-/Speed-Controls</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8091,7 +8074,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemDebugSerial">
           <checkable>1</checkable>
           <label>Spy Serial (very slow)</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8099,7 +8081,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_menuItemFreezeLogger">
           <checkable>1</checkable>
           <label>Unfreeze Logger</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8127,7 +8108,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miRqtIdleMessages">
           <checkable>1</checkable>
           <label>Request Idle Messages</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8195,7 +8175,6 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miMotorEnableState">
           <checkable>1</checkable>
           <label>Enable stepper motors</label>
-          <bitmap>bitmaps/dialog-ok-4.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>
@@ -8335,7 +8314,7 @@ Interval [ms]:</label>
     <title>SVG Path Generator</title>
     <centered>1</centered>
     <style>wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT</style>
-    <size>600,750</size>
+    <size>1600,750</size>
     <bg>wxSYS_COLOUR_3DLIGHT</bg>
     <object class="wxFlexGridSizer">
       <cols>1</cols>

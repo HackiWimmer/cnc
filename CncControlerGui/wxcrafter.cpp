@@ -2444,7 +2444,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2603->Add(0, 8, 1, wxALL, WXC_FROM_DIP(0));
     
-    m_cncSummaryListCtrl = new wxListCtrl(m_panel2601, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel2601, wxSize(-1,-1)), wxLC_VRULES|wxLC_HRULES|wxLC_SORT_DESCENDING|wxLC_SINGLE_SEL|wxLC_VIRTUAL|wxLC_REPORT);
+    m_cncSummaryListCtrl = new wxListCtrl(m_panel2601, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel2601, wxSize(-1,-1)), wxLC_VIRTUAL|wxLC_REPORT);
     m_cncSummaryListCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     m_cncSummaryListCtrl->SetToolTip(_("Only a placeholder"));
     
@@ -3708,7 +3708,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3158->Add(flexGridSizer2520, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_logger = new wxTextCtrl(m_scrollWinLogger, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL);
-    m_logger->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BACKGROUND));
+    m_logger->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     m_logger->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
     wxFont m_loggerFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_logger->SetFont(m_loggerFont);
@@ -4455,51 +4455,39 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuBar->Append(m_menuView, _("View"));
     
     m_miToolbar = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Toolbar"), wxT(""), wxITEM_CHECK);
-    m_miToolbar->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miToolbar);
     
     m_miViewStatusbar = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Statusbar"), wxT(""), wxITEM_CHECK);
-    m_miViewStatusbar->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewStatusbar);
     
     m_miViewTemplateManager = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Template Manager"), wxT(""), wxITEM_CHECK);
-    m_miViewTemplateManager->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewTemplateManager);
     
     m_miViewMainView = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Source View"), wxT(""), wxITEM_CHECK);
-    m_miViewMainView->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewMainView);
     
     m_miViewMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Motion Monitor"), wxT(""), wxITEM_CHECK);
-    m_miViewMonitor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewMonitor);
     
     m_miViewZAxis = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Z Axis"), wxT(""), wxITEM_CHECK);
-    m_miViewZAxis->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewZAxis);
     
     m_miViewPosMonitor = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Position Monitor"), wxT(""), wxITEM_CHECK);
-    m_miViewPosMonitor->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewPosMonitor);
     
     m_miViewDebugger = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Debugger"), wxT(""), wxITEM_CHECK);
-    m_miViewDebugger->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewDebugger);
     
     m_miViewSpy = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Serial Spy"), wxT(""), wxITEM_CHECK);
-    m_miViewSpy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewSpy);
     
     m_miViewLogger = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Logger"), wxT(""), wxITEM_CHECK);
-    m_miViewLogger->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewLogger);
     
     m_miViewSpeed = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Speed View"), wxT(""), wxITEM_CHECK);
-    m_miViewSpeed->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewSpeed);
     
     m_miViewUnitCalculator = new wxMenuItem(m_menuView, wxID_ANY, _("CNC Unit Caluclator"), wxT(""), wxITEM_CHECK);
-    m_miViewUnitCalculator->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuView->Append(m_miViewUnitCalculator);
     
     m_menuView->AppendSeparator();
@@ -4559,38 +4547,31 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuBar->Append(m_menuMonitoring, _("Monitoring"));
     
     m_menuItemUpdCoors = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Update Coordinates"), wxT(""), wxITEM_CHECK);
-    m_menuItemUpdCoors->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemUpdCoors);
     m_menuItemUpdCoors->Check();
     
     m_menuItemUpdDraw = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Online Preview"), wxT(""), wxITEM_CHECK);
-    m_menuItemUpdDraw->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemUpdDraw);
     m_menuItemUpdDraw->Check();
     
     m_menuItemAllowEvents = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Allow Events"), wxT(""), wxITEM_CHECK);
-    m_menuItemAllowEvents->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemAllowEvents);
     m_menuItemAllowEvents->Check();
     
     m_menuItemDisplayUserAgent = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Display User Agent Content"), wxT(""), wxITEM_CHECK);
-    m_menuItemDisplayUserAgent->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemDisplayUserAgent);
     m_menuItemDisplayUserAgent->Check();
     
     m_menuItemToolControls = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Update Tool-/Speed-Controls"), wxT(""), wxITEM_CHECK);
-    m_menuItemToolControls->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemToolControls);
     m_menuItemToolControls->Check();
     
     m_menuMonitoring->AppendSeparator();
     
     m_menuItemDebugSerial = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Spy Serial (very slow)"), wxT(""), wxITEM_CHECK);
-    m_menuItemDebugSerial->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemDebugSerial);
     
     m_menuItemFreezeLogger = new wxMenuItem(m_menuMonitoring, wxID_ANY, _("Unfreeze Logger"), wxT(""), wxITEM_CHECK);
-    m_menuItemFreezeLogger->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuMonitoring->Append(m_menuItemFreezeLogger);
     m_menuItemFreezeLogger->Check();
     
@@ -4608,7 +4589,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuBar->Append(m_menuRequestor, _("Controller Requests"));
     
     m_miRqtIdleMessages = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Request Idle Messages"), wxT(""), wxITEM_CHECK);
-    m_miRqtIdleMessages->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuRequestor->Append(m_miRqtIdleMessages);
     m_miRqtIdleMessages->Check();
     
@@ -4651,7 +4631,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuRequestor->AppendSeparator();
     
     m_miMotorEnableState = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Enable stepper motors"), wxT(""), wxITEM_CHECK);
-    m_miMotorEnableState->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-ok-4")));
     m_menuRequestor->Append(m_miMotorEnableState);
     
     m_menuRequestor->AppendSeparator();
@@ -6050,7 +6029,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     m_pgParameterMgrArr.Add(_("none"));
     m_pgParameterMgrArr.Add(_("inner"));
     m_pgParameterMgrArr.Add(_("outer"));
-    m_pgPropCncToolCorrection = m_pgParameterMgr->AppendIn( m_pgCatCncParameter,  new wxEnumProperty( _("Tool Correction"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
+    m_pgPropCncToolCorrection = m_pgParameterMgr->AppendIn( m_pgCatCncParameter,  new wxEnumProperty( _("Tool Correction Flag"), wxPG_LABEL, m_pgParameterMgrArr, m_pgParameterMgrIntArr, 0) );
     m_pgPropCncToolCorrection->SetHelpString(wxT(""));
     
     m_pgPropCncReversePath = m_pgParameterMgr->AppendIn( m_pgCatCncParameter,  new wxBoolProperty( _("Reverse Path"), wxPG_LABEL, 0) );
@@ -6164,7 +6143,7 @@ PathGeneratorFrameBase::PathGeneratorFrameBase(wxWindow* parent, wxWindowID id, 
     #endif
     
     SetName(wxT("PathGeneratorFrameBase"));
-    SetSize(600,750);
+    SetSize(1600,750);
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }

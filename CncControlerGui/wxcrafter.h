@@ -1597,7 +1597,7 @@ public:
     wxSplitterWindow* GetSplitter3185() { return m_splitter3185; }
     wxPanel* GetRightMainSplitterPage() { return m_rightMainSplitterPage; }
     wxSplitterWindow* GetMainSplitter() { return m_mainSplitter; }
-    PathGeneratorFrameBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SVG Path Generator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(600,750), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
+    PathGeneratorFrameBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("SVG Path Generator"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(1600,750), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
     virtual ~PathGeneratorFrameBase();
 };
 
