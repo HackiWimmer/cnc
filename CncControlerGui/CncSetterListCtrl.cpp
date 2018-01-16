@@ -73,7 +73,7 @@ CncSetterListCtrl::~CncSetterListCtrl() {
 int CncSetterListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	switch ( column ) {
-		case COL_TYPE: 	if ( GetItemText(item, COL_PID) == separatorPid )	return 1;
+		case COL_TYPE: 	if ( getItemText(item, COL_PID) == separatorPid )	return 1;
 						else												return 0;
 	}
 	
@@ -82,8 +82,8 @@ int CncSetterListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncSetterListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
-	if ( GetItemText(item, COL_PID) == separatorPid ) {
-		wxString val(GetItemText(item, COL_TYPE));
+	if ( getItemText(item, COL_PID) == separatorPid ) {
+		wxString val(getItemText(item, COL_TYPE));
 		long id;
 		val.ToLong(&id);
 		

@@ -6489,7 +6489,7 @@ Interval [ms]:</label>
         <pin_button>0</pin_button>
         <object class="wxPanel" name="m_statusBar">
           <style>wxTAB_TRAVERSAL</style>
-          <bg>wxSYS_COLOUR_GRAYTEXT</bg>
+          <bg>#6D6D6D</bg>
           <object class="wxFlexGridSizer">
             <cols>36</cols>
             <rows>1</rows>
@@ -6525,8 +6525,8 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_cmdDuration">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>70,18</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
-                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                    <bg>#696969</bg>
+                    <fg>#FFFFFF</fg>
                     <value>00:00:00.000</value>
                   </object>
                 </object>
@@ -6555,8 +6555,8 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_inputFileName">
                     <style>wxTE_READONLY|wxTE_CENTRE|wxBORDER_NONE</style>
                     <size>150,-1</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
-                    <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
+                    <bg>#696969</bg>
+                    <fg>#FFFFFF</fg>
                     <value>&lt;Template Name&gt;</value>
                   </object>
                 </object>
@@ -6587,7 +6587,7 @@ Interval [ms]:</label>
                     <label>pM</label>
                     <style>wxALIGN_CENTRE</style>
                     <size>50,-1</size>
-                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                    <fg>#FFFFFF</fg>
                     <tooltip>
                       <![CDATA[SVG Parse Mode]]>
                     </tooltip>
@@ -6600,7 +6600,7 @@ Interval [ms]:</label>
                   <object class="wxPanel" name="m_activityPanel">
                     <style>wxTAB_TRAVERSAL</style>
                     <size>80,16</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                    <bg>#696969</bg>
                     <tooltip>
                       <![CDATA[Activity Control]]>
                     </tooltip>
@@ -6643,8 +6643,8 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_feedSpeed">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>50,20</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
-                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                    <bg>#696969</bg>
+                    <fg>#FFFFFF</fg>
                     <tooltip>
                       <![CDATA[Current Feed Speed]]>
                     </tooltip>
@@ -6678,7 +6678,7 @@ Interval [ms]:</label>
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>50,20</size>
                     <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
-                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                    <fg>#FFFFFF</fg>
                     <tooltip>
                       <![CDATA[Application Pos]]>
                     </tooltip>
@@ -6692,7 +6692,7 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_xAxisCtl">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>50,20</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                    <bg>#696969</bg>
                     <fg>#8080FF</fg>
                     <tooltip>
                       <![CDATA[Controller Pos]]>
@@ -6718,8 +6718,8 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_yAxis">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>50,20</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
-                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                    <bg>#696969</bg>
+                    <fg>#FFFFFF</fg>
                     <tooltip>
                       <![CDATA[Application Pos]]>
                     </tooltip>
@@ -6733,7 +6733,7 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_yAxisCtl">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>50,20</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                    <bg>#696969</bg>
                     <fg>#8080FF</fg>
                     <tooltip>
                       <![CDATA[Controller Pos]]>
@@ -6759,8 +6759,8 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_zAxis">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>50,20</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
-                    <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
+                    <bg>#696969</bg>
+                    <fg>#FFFFFF</fg>
                     <tooltip>
                       <![CDATA[Application Pos]]>
                     </tooltip>
@@ -6774,7 +6774,7 @@ Interval [ms]:</label>
                   <object class="wxTextCtrl" name="m_zAxisCtl">
                     <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                     <size>50,20</size>
-                    <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                    <bg>#696969</bg>
                     <fg>#8080FF</fg>
                     <tooltip>
                       <![CDATA[Controller Pos]]>
@@ -6848,7 +6848,7 @@ Interval [ms]:</label>
                     <label/>
                     <style>wxALIGN_CENTRE</style>
                     <size>10,16</size>
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <bg>#000000</bg>
                     <font>
                       <size>8</size>
                       <style>normal</style>
@@ -6870,7 +6870,7 @@ Interval [ms]:</label>
                     <label/>
                     <style>wxALIGN_CENTRE</style>
                     <size>10,16</size>
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <bg>#000000</bg>
                     <font>
                       <size>8</size>
                       <style>normal</style>
@@ -6892,7 +6892,7 @@ Interval [ms]:</label>
                     <label/>
                     <style>wxALIGN_CENTRE</style>
                     <size>10,16</size>
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <bg>#000000</bg>
                     <font>
                       <size>8</size>
                       <style>normal</style>
@@ -6914,7 +6914,7 @@ Interval [ms]:</label>
                     <label/>
                     <style>wxALIGN_CENTRE</style>
                     <size>10,16</size>
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <bg>#000000</bg>
                     <font>
                       <size>8</size>
                       <style>normal</style>
@@ -6936,7 +6936,7 @@ Interval [ms]:</label>
                     <label/>
                     <style>wxALIGN_CENTRE</style>
                     <size>10,16</size>
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <bg>#000000</bg>
                     <font>
                       <size>8</size>
                       <style>normal</style>
@@ -6958,7 +6958,7 @@ Interval [ms]:</label>
                     <label/>
                     <style>wxALIGN_CENTRE</style>
                     <size>10,16</size>
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <bg>#000000</bg>
                     <font>
                       <size>8</size>
                       <style>normal</style>

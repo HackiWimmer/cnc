@@ -39,7 +39,7 @@ CncVectiesListCtrl::~CncVectiesListCtrl() {
 int CncVectiesListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	switch ( column ) {
-		case COL_T:		if ( GetItemText(item, column) == "R" )		return 0;
+		case COL_T:		if ( getItemText(item, column) == "R" )		return 0;
 						else										return 1;
 	}
 	

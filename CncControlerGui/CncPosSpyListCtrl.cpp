@@ -52,12 +52,12 @@ CncPosSpyListCtrl::~CncPosSpyListCtrl() {
 int CncPosSpyListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	switch ( column ) {
-		case COL_PID: 	if ( GetItemText(item, column) == majorPosPid )	return 0;
+		case COL_PID: 	if ( getItemText(item, column) == majorPosPid )	return 0;
 						else											return 1;
 						
 		case COL_REF:	return -1;
 		
-		case COL_T:		if ( GetItemText(item, column) == "R" )			return 2;
+		case COL_T:		if ( getItemText(item, column) == "R" )			return 2;
 						else											return 3;
 						
 		case COL_F:		return -1;
@@ -72,7 +72,7 @@ int CncPosSpyListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncPosSpyListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
-	if ( GetItemText(item, COL_PID) == majorPosPid )
+	if ( getItemText(item, COL_PID) == majorPosPid )
 		return (wxListItemAttr*)(&majorPosItemAttr);
 	
 	// this indicates to use the default style

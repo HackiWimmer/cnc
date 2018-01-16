@@ -62,16 +62,15 @@ int CncSummaryListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	long idx = -1;
 	switch ( column ) {
-		case COL_TYPE:		GetItemText(item, column).ToLong(&idx);
+		case COL_TYPE:		getItemText(item, column).ToLong(&idx);
 							break;
 	}
-	
 	return idx;
 }
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncSummaryListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
-	if ( GetItemText(item, COL_TYPE) == wxString::Format("%d", PT_HEADLINE) ) {
+	if ( getItemText(item, COL_TYPE) == wxString::Format("%d", PT_HEADLINE) ) {
 		return (wxListItemAttr*)(&headlineItemAttr);
 	}
 	

@@ -3727,7 +3727,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_tmpTraceInfo->SetMinSize(wxSize(-1,24));
     
     m_statusBar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_statusBar->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
+    m_statusBar->SetBackgroundColour(wxColour(wxT("rgb(109,109,109)")));
     
     m_auimgrMain->AddPane(m_statusBar, wxAuiPaneInfo().Name(wxT("StatusBar")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(0).Position(0).BestSize(100,26).MinSize(100,26).MaxSize(100,26).Fixed().CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
     
@@ -3752,8 +3752,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText395->SetMinSize(wxSize(-1,18));
     
     m_cmdDuration = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("00:00:00.000"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(70,18)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_cmdDuration->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
-    m_cmdDuration->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_cmdDuration->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
+    m_cmdDuration->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     #if wxVERSION_NUMBER >= 3000
     m_cmdDuration->SetHint(wxT(""));
     #endif
@@ -3774,8 +3774,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer436->Add(flexGridSizer3697, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     m_inputFileName = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("<Template Name>"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(150,-1)), wxTE_READONLY|wxTE_CENTRE|wxBORDER_NONE);
-    m_inputFileName->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
-    m_inputFileName->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
+    m_inputFileName->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
+    m_inputFileName->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     #if wxVERSION_NUMBER >= 3000
     m_inputFileName->SetHint(wxT(""));
     #endif
@@ -3795,14 +3795,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer436->Add(flexGridSizer3698, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     m_svgParseMode = new wxStaticText(m_statusBar, wxID_ANY, _("pM"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,-1)), wxALIGN_CENTRE);
-    m_svgParseMode->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_svgParseMode->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     m_svgParseMode->SetToolTip(_("SVG Parse Mode"));
     
     flexGridSizer3698->Add(m_svgParseMode, 0, wxALL, WXC_FROM_DIP(3));
     m_svgParseMode->SetMinSize(wxSize(50,-1));
     
     m_activityPanel = new wxPanel(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(80,16)), wxTAB_TRAVERSAL);
-    m_activityPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_activityPanel->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
     m_activityPanel->SetToolTip(_("Activity Control"));
     
     flexGridSizer3698->Add(m_activityPanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
@@ -3825,8 +3825,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     LableF->SetMinSize(wxSize(-1,18));
     
     m_feedSpeed = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_feedSpeed->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
-    m_feedSpeed->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_feedSpeed->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
+    m_feedSpeed->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     m_feedSpeed->SetToolTip(_("Current Feed Speed"));
     #if wxVERSION_NUMBER >= 3000
     m_feedSpeed->SetHint(wxT(""));
@@ -3848,7 +3848,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_xAxis = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
     m_xAxis->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
-    m_xAxis->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_xAxis->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     m_xAxis->SetToolTip(_("Application Pos"));
     #if wxVERSION_NUMBER >= 3000
     m_xAxis->SetHint(wxT(""));
@@ -3858,7 +3858,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_xAxis->SetMinSize(wxSize(50,20));
     
     m_xAxisCtl = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_xAxisCtl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_xAxisCtl->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
     m_xAxisCtl->SetForegroundColour(wxColour(wxT("rgb(128,128,255)")));
     m_xAxisCtl->SetToolTip(_("Controller Pos"));
     #if wxVERSION_NUMBER >= 3000
@@ -3875,8 +3875,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     LabelY->SetMinSize(wxSize(-1,18));
     
     m_yAxis = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_yAxis->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
-    m_yAxis->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_yAxis->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
+    m_yAxis->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     m_yAxis->SetToolTip(_("Application Pos"));
     #if wxVERSION_NUMBER >= 3000
     m_yAxis->SetHint(wxT(""));
@@ -3886,7 +3886,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_yAxis->SetMinSize(wxSize(50,20));
     
     m_yAxisCtl = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_yAxisCtl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_yAxisCtl->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
     m_yAxisCtl->SetForegroundColour(wxColour(wxT("rgb(128,128,255)")));
     m_yAxisCtl->SetToolTip(_("Controller Pos"));
     #if wxVERSION_NUMBER >= 3000
@@ -3903,8 +3903,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     LableZ->SetMinSize(wxSize(-1,18));
     
     m_zAxis = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_zAxis->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
-    m_zAxis->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
+    m_zAxis->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
+    m_zAxis->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     m_zAxis->SetToolTip(_("Application Pos"));
     #if wxVERSION_NUMBER >= 3000
     m_zAxis->SetHint(wxT(""));
@@ -3914,7 +3914,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zAxis->SetMinSize(wxSize(50,20));
     
     m_zAxisCtl = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_zAxisCtl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_zAxisCtl->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
     m_zAxisCtl->SetForegroundColour(wxColour(wxT("rgb(128,128,255)")));
     m_zAxisCtl->SetToolTip(_("Controller Pos"));
     #if wxVERSION_NUMBER >= 3000
@@ -3953,7 +3953,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer3695->Add(m_staticText1196, 0, wxALL, WXC_FROM_DIP(3));
     
     m_xMinLimit = new wxStaticText(m_statusBar, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(10,16)), wxALIGN_CENTRE);
-    m_xMinLimit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_xMinLimit->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     wxFont m_xMinLimitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_xMinLimit->SetFont(m_xMinLimitFont);
     m_xMinLimit->SetToolTip(_("X Min Limit"));
@@ -3962,7 +3962,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_xMinLimit->SetMinSize(wxSize(10,16));
     
     m_xMaxLimit = new wxStaticText(m_statusBar, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(10,16)), wxALIGN_CENTRE);
-    m_xMaxLimit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_xMaxLimit->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     wxFont m_xMaxLimitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_xMaxLimit->SetFont(m_xMaxLimitFont);
     m_xMaxLimit->SetToolTip(_("X Max Limit"));
@@ -3971,7 +3971,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_xMaxLimit->SetMinSize(wxSize(10,16));
     
     m_yMinLimit = new wxStaticText(m_statusBar, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(10,16)), wxALIGN_CENTRE);
-    m_yMinLimit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_yMinLimit->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     wxFont m_yMinLimitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_yMinLimit->SetFont(m_yMinLimitFont);
     m_yMinLimit->SetToolTip(_("Y Min Limit"));
@@ -3980,7 +3980,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_yMinLimit->SetMinSize(wxSize(10,16));
     
     m_yMaxLimit = new wxStaticText(m_statusBar, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(10,16)), wxALIGN_CENTRE);
-    m_yMaxLimit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_yMaxLimit->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     wxFont m_yMaxLimitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_yMaxLimit->SetFont(m_yMaxLimitFont);
     m_yMaxLimit->SetToolTip(_("Y Max Limit"));
@@ -3989,7 +3989,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_yMaxLimit->SetMinSize(wxSize(10,16));
     
     m_zMinLimit = new wxStaticText(m_statusBar, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(10,16)), wxALIGN_CENTRE);
-    m_zMinLimit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_zMinLimit->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     wxFont m_zMinLimitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_zMinLimit->SetFont(m_zMinLimitFont);
     m_zMinLimit->SetToolTip(_("Z Min Limit"));
@@ -3998,7 +3998,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zMinLimit->SetMinSize(wxSize(10,16));
     
     m_zMaxLimit = new wxStaticText(m_statusBar, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(10,16)), wxALIGN_CENTRE);
-    m_zMaxLimit->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_zMaxLimit->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     wxFont m_zMaxLimitFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
     m_zMaxLimit->SetFont(m_zMaxLimitFont);
     m_zMaxLimit->SetToolTip(_("Z Max Limit"));

@@ -6,7 +6,7 @@
 	#endif
 
 	#ifdef __WXGTK__
-		#indclude "OSD/webviewDummy.h"
+		#include "OSD/webViewDummy.h"
 	#endif
 
 #endif

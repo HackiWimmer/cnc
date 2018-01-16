@@ -81,9 +81,10 @@ class CncTimeFunctions {
 		static int64_t getOPCFrequency();
 		static unsigned int geMaxtQPCResolutionNS();
 		
-		static void sleep(unsigned int milliseconds);
+		
 		
 		static int getTimeOfDay(struct timeval *tv, void *tz = NULL);
+		static void sleepMilliseconds(unsigned int milliseconds);
 		static void sleepMircoseconds(int64_t micros);
 		static void activeWaitMircoseconds(int64_t micros, bool active=true);
 		static void busyWaitMircoseconds(unsigned int micros);

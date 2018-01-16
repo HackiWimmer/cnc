@@ -103,6 +103,9 @@ if ( false )
 
 endif()
 
+file(MAKE_DIRECTORY "/home/fw591/dev/cnc/CncControlerGui/Release")
+set(EXECUTABLE_OUTPUT_PATH "/home/fw591/dev/cnc/CncControlerGui/Release")
+
 set(SOURCE_FILES
         CncControlerGui/OSD/CncTimeFunctions.cpp
         CncControlerGui/3D/CncGCodePreview.cpp
@@ -214,8 +217,8 @@ set(SOURCE_FILES
         CncControlerGui/CncToolMagazine.h
         CncControlerGui/CncToolStateControl.cpp
         CncControlerGui/CncToolStateControl.h
-        CncControlerGui/CncUsbPortScanner.cpp
-        CncControlerGui/CncUsbPortScanner.h
+        CncControlerGui/OSD/CncUsbPortScanner.cpp
+        CncControlerGui/OSD/CncUsbPortScanner.h
         CncControlerGui/CncVectiesListCtrl.cpp
         CncControlerGui/CncVectiesListCtrl.h
         CncControlerGui/CncZView.cpp
@@ -269,8 +272,12 @@ set(SOURCE_FILES
         CncControlerGui/PgPropertyHelpInfos.cpp
         CncControlerGui/PointAbs.h
         CncControlerGui/SerialData.h
-        CncControlerGui/SerialMsw.cpp
-        CncControlerGui/SerialGtk.cpp
+        CncControlerGui/CncPerspective.cpp
+        CncControlerGui/CncPerspective.h
+        CncControlerGui/OSD/CncAsyncKeyboardState.cpp
+        CncControlerGui/OSD/CncAsyncKeyboardState.h
+        CncControlerGui/OSD/SerialMsw.cpp
+        CncControlerGui/OSD/SerialGtk.cpp
         CncControlerGui/Codelite/wxPNGAnimation.cpp
         CncControlerGui/Codelite/wxPNGAnimation.h
         CncControlerGui/SerialEmulatorFile.cpp

@@ -182,7 +182,7 @@ void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
 #endif
 
 #ifdef __WXGTK__
-	sleepMircoseconds((int64_t) micros)
+	sleepMircoseconds((int64_t) micros);
 #endif
 }
 ////////////////////////////////////////////////////////////////
@@ -210,11 +210,13 @@ void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
 #endif
 
 #ifdef __WXGTK__
-	struct timespec req, rem;
+/*
+	struct timespec req;
 	req.tv_sec  = micros/1000;
 	req.tv_nsec = micros%1000;
 	
-	nanosleep(req, rem);
+	nanosleep(req, NULL);
+*/
 #endif
 }
 ////////////////////////////////////////////////////////////////
@@ -236,7 +238,7 @@ void CncTimeFunctions::activeWaitMircoseconds(int64_t micros, bool active) {
 	sleepMircoseconds(micros);
 }
 ////////////////////////////////////////////////////////////////
-void CncTimeFunctions::sleep(unsigned int milliseconds) {
+void CncTimeFunctions::sleepMilliseconds(unsigned int milliseconds) {
 ////////////////////////////////////////////////////////////////
 #ifdef __WXMSW__
 	Sleep(milliseconds);

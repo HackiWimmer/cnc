@@ -194,7 +194,7 @@ bool CncLargeScaledListCtrl::goForwardUnitlColumnChangeIntern(long item, long co
 		return false;
 		
 	// get the reference item
-	wxString ref(GetItemText(item, column));
+	wxString ref(getItemText(item, column));
 	long count = listType == CncLargeScaledListCtrl::ListType::NORMAL ? item : translateItem(item);
 	
 	for (auto it = rows.begin() + count; it < rows.end(); ++it ) {
@@ -222,7 +222,7 @@ bool CncLargeScaledListCtrl::goBackwardUnitlColumnChangeIntern(long item, long c
 		return false;
 		
 	// get the reference item
-	wxString ref(GetItemText(item, column));
+	wxString ref(getItemText(item, column));
 	long count = listType == CncLargeScaledListCtrl::ListType::NORMAL ? translateItem(item) : item;
 
 	for (auto it = rows.rbegin() + count; it < rows.rend(); ++it ) {
@@ -278,6 +278,18 @@ long CncLargeScaledListCtrl::translateItem(long item) const {
 	}
 	
 	return item;
+}
+///////////////////////////////////////////////////////////////////
+wxString CncLargeScaledListCtrl::getItemText(long item, long column) const {
+///////////////////////////////////////////////////////////////////
+	if ( isItemValid(item) == false )
+		return _(wxString::Format("!%ld.%ld", item, column));
+		
+	// out of column range
+	if ( isColumnValid(column) == false )
+		return _("");
+		
+	return rows[translateItem(item)].getItem(column);
 }
 ///////////////////////////////////////////////////////////////////
 wxString CncLargeScaledListCtrl::OnGetItemText(long item, long column) const {

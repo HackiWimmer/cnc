@@ -126,10 +126,13 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		bool goForwardUnitlColumnChange(long item, long column);
 		bool goBackwardUnitlColumnChange(long item, long column);
 		
+	protected:
+		wxString getItemText(long item, long column) const;	
+	
 	private:
 		
 		typedef std::vector<CncColumContainer> 	RowContainer;
-		
+			
 		virtual wxString OnGetItemText(long	item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;

@@ -514,7 +514,7 @@ bool FileParser::evaluateProcessingState() {
 			return false;
 		}
 		
-		CncTimeFunctions::sleep(25);
+		CncTimeFunctions::sleepMilliseconds(25);
 	}
 	
 	return true;
@@ -586,7 +586,7 @@ bool FileParser::evaluateDebugState(bool force) {
 		if ( runInfo.isLastLineNumberDefined() == false )
 			break;
 			
-		CncTimeFunctions::sleep(25);
+		CncTimeFunctions::sleepMilliseconds(25);
 	}
 	
 	waitingForUserEvents = false;
