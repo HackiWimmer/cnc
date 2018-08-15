@@ -87,7 +87,7 @@ public:
      * @param gdc [in/out] graphics DC
      * @return true on success, false otherwise
      */
-    static bool GetGCDC(wxDC& dc, wxGCDC& gdc);
+    static bool GetGCDC(wxDC& dc,  michwxGCDC& gdc);
     
     /**
      * @brief Return true if the current theme dominant colour is dark

@@ -16,6 +16,8 @@ class CncController {
     CncSpeedManager speedManager;
     LastErrorCodes* errorInfo;
 
+    unsigned char analogLimitPin;
+
     int minEnablePulseWide;
 
     long posReplyThresholdX;
@@ -39,10 +41,12 @@ class CncController {
     inline bool renderAndStepAxisXY(long x1, long y1);
     inline bool moveXYZ();
 
+    inline bool evaluateAnalogLimitPin(LimitSwitch::LimitStates& ls);
+
     //////////////////////////////////////////////////////////////////////////////
   public:
     //////////////////////////////////////////////////////////////////////////////
-    CncController(LastErrorCodes& lec);
+    CncController(const unsigned char analogLimitPin, LastErrorCodes& lec);
     ~CncController();
 
     //////////////////////////////////////////////////////////////////////////////
@@ -64,7 +68,8 @@ class CncController {
     bool sendCurrentLimitStates(bool force = false);
     
     //////////////////////////////////////////////////////////////////////////////
-    // this method id used by the main loop
+    bool evaluateLimitState(const CncStepper* stepper, long& limit);
+    bool evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit);
     bool evaluateAndSendLimitStates();
     
     //////////////////////////////////////////////////////////////////////////////
@@ -116,6 +121,10 @@ class CncController {
 
     //////////////////////////////////////////////////////////////////////////////
     bool renderAndStepAxisXYZ(long x1, long y1, long z1);
+
+    //////////////////////////////////////////////////////////////////////////////
+    void setAnalogLimitPin(const unsigned char alp) { analogLimitPin = alp; }
+    bool isAnalogLimitPinAvailable() { return analogLimitPin == ANALOG_LIMIT_PIN_ID; }
 };
 
 #endif

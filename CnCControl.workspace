@@ -3,7 +3,6 @@
   <Project Name="CncConrollerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
   <Project Name="FreeGlutWorkspace" Path="FreeGlutWorkspace/FreeGlutWorkspace.project" Active="No"/>
   <Project Name="UnitTests" Path="UnitTests/UnitTests.project" Active="No"/>
-  <Project Name="StepperControl" Path="StepperControl/StepperControl.project"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>

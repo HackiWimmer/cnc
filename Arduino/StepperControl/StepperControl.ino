@@ -10,7 +10,7 @@
 
 // Global Parameters
 LastErrorCodes errorInfo;
-CncController controller(errorInfo);
+CncController controller(ANALOG_LIMIT_PIN_OFF, errorInfo);
 
 /////////////////////////////////////////////////////////////////////////////////////
 void printConfig() {
@@ -58,6 +58,16 @@ long isReadyToRun(){
   // return value: '1' always is OK, instead '0'
   long ret = controller.isReadyToRun();
   return ret;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void writeLimitGetter() {
+/////////////////////////////////////////////////////////////////////////////////////  
+  long x = LimitSwitch::LIMIT_UNKNOWN;
+  long y = LimitSwitch::LIMIT_UNKNOWN;
+  long z = LimitSwitch::LIMIT_UNKNOWN;
+
+  controller.evaluateLimitStates(x, y, z);
+  writeGetterValues(PID_LIMIT, x, y, z);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 unsigned char getValue() {
@@ -125,7 +135,7 @@ unsigned char getValue() {
     case PID_GET_STEP_COUNTER_Z:      writeGetterValues(PID_GET_STEP_COUNTER_Z, controller.getStepperZ()->getStepCounter(), controller.getStepperZ()->getStepCounterOverflow());
                                       break;
     // getValue() ............................................
-    case PID_LIMIT:                   writeGetterValues(PID_LIMIT, controller.getStepperX()->readLimitState(), controller.getStepperY()->readLimitState(), controller.getStepperZ()->readLimitState());
+    case PID_LIMIT:                   writeLimitGetter();
                                       break;
     // getValue() ............................................
     case PID_POS_REPLY_THRESHOLD_X:   writeGetterValues(PID_POS_REPLY_THRESHOLD_X, controller.getPosReplyThresholdX());
@@ -393,6 +403,8 @@ void setup() {
   digitalWrite(SUPPORT_PIN, HIGH);
 
   reset();
+
+  controller.setAnalogLimitPin(ANALOG_LIMIT_PIN_ID);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void handleInterrupt() {

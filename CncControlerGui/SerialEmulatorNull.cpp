@@ -175,22 +175,22 @@ bool SerialEmulatorNULL::evaluateLimitStates() {
 	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	
 	if ( (targetMajorPos.getX())/cncConfig->getCalculationFactX() <= -cncConfig->getMaxDimensionX() )
-		limitStates.setXLimit(LIMIT_MIN);
+		limitStates.setXLimit(LimitSwitch::LIMIT_MIN);
 		
 	if ( (targetMajorPos.getX())/cncConfig->getCalculationFactX() >= +cncConfig->getMaxDimensionX() )
-		limitStates.setXLimit(LIMIT_MAX);
+		limitStates.setXLimit(LimitSwitch::LIMIT_MAX);
 	
 	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactY() <= -cncConfig->getMaxDimensionY() )
-		limitStates.setYLimit(LIMIT_MIN);
+		limitStates.setYLimit(LimitSwitch::LIMIT_MIN);
 		
 	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactY() >= +cncConfig->getMaxDimensionY() )
-		limitStates.setYLimit(LIMIT_MAX);
+		limitStates.setYLimit(LimitSwitch::LIMIT_MAX);
 		
 	if ( (targetMajorPos.getZ())/cncConfig->getCalculationFactZ() <= -cncConfig->getMaxDimensionZ() )
-		limitStates.setZLimit(LIMIT_MIN);
+		limitStates.setZLimit(LimitSwitch::LIMIT_MIN);
 		
 	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactZ() >= +cncConfig->getMaxDimensionZ() )
-		limitStates.setZLimit(LIMIT_MAX);
+		limitStates.setZLimit(LimitSwitch::LIMIT_MAX);
 		
 	return true;
 }

@@ -2,7 +2,7 @@
 #define CNC_ARDUINO_INCLUDES
 
 #include <string>
-#include "../StepperControl/cv.h"
+#include "../Arduino/StepperControl/cv.h"
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 class ArduinoCMDs {

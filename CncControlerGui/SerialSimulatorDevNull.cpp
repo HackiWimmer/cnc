@@ -26,7 +26,7 @@ SerialSimulatorDevNull::SerialSimulatorDevNull(SerialSimulatorFacade* caller)
 : SerialSimulatorThread(caller)
 , targetMajorPos(0L, 0L, 0L)
 , curSimulatorPos(0L, 0L, 0L)
-, curLimitStates(LIMIT_UNSET, LIMIT_UNSET, LIMIT_UNSET)
+, curLimitStates(LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET)
 , speedSimulator(NULL)
 , posReplyThresholdX(0)
 , posReplyThresholdY(0)
@@ -53,7 +53,7 @@ void SerialSimulatorDevNull::resetSerial() {
 ///////////////////////////////////////////////////////////////////
 	// to do something specialized things here
 	curSimulatorPos.setXYZ(0L, 0L, 0L);
-	curLimitStates.setXYZ(LIMIT_UNSET, LIMIT_UNSET, LIMIT_UNSET);
+	curLimitStates.setXYZ(LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET);
 	
 	posReplyThresholdX = 0;
 	posReplyThresholdY = 0;
@@ -99,14 +99,14 @@ void SerialSimulatorDevNull::performLimitStates() {
 	getSetterValueAsLong(PID_MAX_DIMENSION_Z, mz, 0);
 	
 	if ( mx != 0 && my != 0 && mz != 0 ) {
-		if ( curSimulatorPos.getX() <= -mx )	limitStateX = LIMIT_MIN;
-		if ( curSimulatorPos.getX() >= +mx )	limitStateX = LIMIT_MAX;
+		if ( curSimulatorPos.getX() <= -mx )	limitStateX = LimitSwitch::LIMIT_MIN;
+		if ( curSimulatorPos.getX() >= +mx )	limitStateX = LimitSwitch::LIMIT_MAX;
 
-		if ( curSimulatorPos.getY() <= -my )	limitStateY = LIMIT_MIN;
-		if ( curSimulatorPos.getY() >= +my )	limitStateY = LIMIT_MAX;
+		if ( curSimulatorPos.getY() <= -my )	limitStateY = LimitSwitch::LIMIT_MIN;
+		if ( curSimulatorPos.getY() >= +my )	limitStateY = LimitSwitch::LIMIT_MAX;
 
-		if ( curSimulatorPos.getZ() <= -mz )	limitStateZ = LIMIT_MIN;
-		if ( curSimulatorPos.getZ() >= +mz )	limitStateZ = LIMIT_MAX;
+		if ( curSimulatorPos.getZ() <= -mz )	limitStateZ = LimitSwitch::LIMIT_MIN;
+		if ( curSimulatorPos.getZ() >= +mz )	limitStateZ = LimitSwitch::LIMIT_MAX;
 	}
 	
 	curLimitStates.setX(limitStateX);

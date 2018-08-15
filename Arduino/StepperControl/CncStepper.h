@@ -96,8 +96,8 @@ class CncStepper {
 
     //////////////////////////////////////////////////////////////////////////////
     void setLimitStateManually(long value) {
-      if ( value > 0 )  { maxReached = true; lastStepDirection = +1; }
-      else              { minReached = true; lastStepDirection = -1; }
+      if ( value > 0 )  { maxReached = true; lastStepDirection = DIRECTION_POS; }
+      else              { minReached = true; lastStepDirection = DIRECTION_NEG; }
     }
 
     //////////////////////////////////////////////////////////////////////////////

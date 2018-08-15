@@ -1,6 +1,7 @@
 #ifndef COMMON_VALUES_H
 #define COMMON_VALUES_H
 
+#include "LimitSwitchController/LimitSwitchDefinitions.h"
 
 ////////////////////////////////////////////////////////////////////////
 // common global functions - start
@@ -17,7 +18,6 @@
 
 // common global functions - end
 ////////////////////////////////////////////////////////////////////////
-
 
 // .....................................................................
 // Pin setup
@@ -40,9 +40,12 @@
   const unsigned char TOOL_PIN                            =  12;
   const unsigned char SUPPORT_PIN                         =  13;
 
+  #define ANALOG_LIMIT_PIN                                   A2
+  const unsigned char ANALOG_LIMIT_PIN_ID                 =   2;
+  const unsigned char ANALOG_LIMIT_PIN_OFF                = 255;
+  
   #define INTERRUPT_LED                                      A3
   const unsigned char INTERRUPT_LED_ID                    =   3;
-
 // .....................................................................
 // Signals
 // .....................................................................
@@ -337,12 +340,10 @@
   const int  MAX_INT                                     = +32767;
   
   const unsigned MAX_UINT                                = +65535;
-  
-  const long LIMIT_MIN                                   = -1L;
-  const long LIMIT_MAX                                   = +1L;
-  const long LIMIT_SET_BUT_MIN_MAX_UNKNOWN               = MAX_LONG;
-  const long LIMIT_UNSET                                 = 0L;
 
- 
+  const int DIRECTION_UNKNOWN                            =  0;
+  const int DIRECTION_POS                                = +1;
+  const int DIRECTION_NEG                                = -1;
+  
 #endif
 

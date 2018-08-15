@@ -25,7 +25,7 @@ CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, by
 , steps(1L)
 , stepCounter(0L)
 , stepCounterOverflow(0L)
-, lastStepDirection(0)
+, lastStepDirection(DIRECTION_UNKNOWN)
 , curPos(0L)
 , controller(crtl)
 , errorInfo(lec)
@@ -85,7 +85,7 @@ void CncStepper::setPitch(const double p) {
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::reset() {
 //////////////////////////////////////////////////////////////////////////////
-  lastStepDirection = 0;
+  lastStepDirection = DIRECTION_UNKNOWN;
   tsLoopRef         = 0L;
   tsLoopEnd         = 0L;
   tsStepRef         = 0L;
@@ -159,34 +159,39 @@ void CncStepper::setMaxReached(bool state) {
 //////////////////////////////////////////////////////////////////////////////
 long CncStepper::readLimitState(int dir) {
 //////////////////////////////////////////////////////////////////////////////
-  int val = digitalRead(limitPin);
+  if ( digitalRead(limitPin) == LIMIT_SWITCH_OFF )
+    return LimitSwitch::LIMIT_UNSET;
   
-  if ( val == LOW ) {
-    switch ( dir ) {
-      case -1:  return LIMIT_MIN;
-      case +1:  return LIMIT_MAX;
-      default:  return LIMIT_SET_BUT_MIN_MAX_UNKNOWN;
-    }
+  switch ( dir ) {
+    case DIRECTION_NEG:   return LimitSwitch::LIMIT_MIN;
+    case DIRECTION_POS:   return LimitSwitch::LIMIT_MAX;
+    default:              ;
   }
- 
-  return LIMIT_UNSET;
+
+  // in this case the direction is unclear, try to get more information by calling the controller
+  long limit = LimitSwitch::LIMIT_UNKNOWN;
+  if ( controller->evaluateLimitState(this, limit) )
+    return limit;
+
+  // in this case no valid limit information available
+  return LimitSwitch::LIMIT_UNKNOWN;
 }
 //////////////////////////////////////////////////////////////////////////////
 long CncStepper::getLimitState() {
 //////////////////////////////////////////////////////////////////////////////  
-  if ( minReached == true ) return LIMIT_MIN;
-  if ( maxReached == true ) return LIMIT_MAX;
+  if ( minReached == true ) return LimitSwitch::LIMIT_MIN;
+  if ( maxReached == true ) return LimitSwitch::LIMIT_MAX;
   
-  return LIMIT_UNSET;
+  return LimitSwitch::LIMIT_UNSET;
 }
 //////////////////////////////////////////////////////////////////////////////
 bool CncStepper::checkLimit(int dir) {
 //////////////////////////////////////////////////////////////////////////////
   int val = digitalRead(limitPin);
-  if ( val == LOW ) {
+  if ( val == LIMIT_SWITCH_ON ) {
 
     // unclear sitiuation avoid movement!
-    if ( lastStepDirection == 0 ) {
+    if ( lastStepDirection == DIRECTION_UNKNOWN ) {
       sendCurrentLimitStates(true);
       broadcastInterrupt();
       return true;
@@ -202,11 +207,11 @@ bool CncStepper::checkLimit(int dir) {
       
     switch ( dir ) {
       
-      case +1:  setMaxReached(true);
-                return true;
+      case DIRECTION_POS:   setMaxReached(true);
+                            return true;
       
-      case -1:  setMinReached(true);
-                return true;
+      case DIRECTION_NEG:   setMinReached(true);
+                            return true;
     }
   } else {
     // reset limit state
@@ -250,7 +255,7 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
   
   // -----------------------------------------------------------
   // determine direction and init driver
-  short stepDirection = (stepsToMove < 0 ? -1 : +1);
+  short stepDirection = (stepsToMove < 0 ? DIRECTION_NEG : DIRECTION_POS);
   digitalWrite(directionPin, (stepsToMove > 0));
   delayMicroseconds(dirPulseWidth);
   

@@ -4,7 +4,15 @@
 
 #include "CncFileNameService.h"
 
-wxString CncFileNameService::_configFileName("CncController.ini");
+
+#ifdef __WXMSW__
+	wxString CncFileNameService::_configFileName("CncController.windows.ini");
+#endif
+
+#ifdef __WXGTK__
+	wxString CncFileNameService::_configFileName("CncController.unix.ini");
+#endif
+
 wxString CncFileNameService::_lruFileName("CncControllerLruStore.ini");
 wxString CncFileNameService::_preconfiguredSpeedConfigFileName(wxString("Database") + wxFileName::GetPathSeparator() + "PreconfiguredSpeedSetups.ini");
 

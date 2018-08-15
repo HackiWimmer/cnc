@@ -154,6 +154,7 @@ class MainApp : public wxApp {
 			// init file and dir names
 			CncFileNameService::init();
 			CncTimeFunctions::init();
+
 			globalFileConfig = new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
 			
 			// determine assert handler

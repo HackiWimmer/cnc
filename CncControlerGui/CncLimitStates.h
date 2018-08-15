@@ -17,19 +17,19 @@ class CncLimitStates {
 		///////////////////////////////////////////////////////////////////
 		void setLimit(int32_t v, bool &min, bool &max) {
 			switch ( v ) {
-				case LIMIT_MIN:
+				case LimitSwitch::LIMIT_MIN:
 					min = true;
 					max = false;
 					break;
-				case LIMIT_MAX:
+				case LimitSwitch::LIMIT_MAX:
 					min = false;
 					max = true;
 					break;
-				case LIMIT_UNSET:
+				case LimitSwitch::LIMIT_UNSET:
 					min= false;
 					max = false;
 					break;
-				case LIMIT_SET_BUT_MIN_MAX_UNKNOWN:
+				case LimitSwitch::LIMIT_UNKNOWN:
 				default: 
 					min = true;
 					max = true;
@@ -41,34 +41,34 @@ class CncLimitStates {
 		int32_t getLimit(bool min, bool max) {
 			
 			if ( min == true && max == true )
-				return LIMIT_SET_BUT_MIN_MAX_UNKNOWN;
+				return LimitSwitch::LIMIT_UNKNOWN;
 			
 			if ( min == false && max == false )
-				return LIMIT_UNSET;
+				return LimitSwitch::LIMIT_UNSET;
 				
 			if ( min == true )
-				return LIMIT_MIN;
+				return LimitSwitch::LIMIT_MIN;
 				
 			if ( max == true )
-				return LIMIT_MAX;
+				return LimitSwitch::LIMIT_MAX;
 				
-			return LIMIT_SET_BUT_MIN_MAX_UNKNOWN;
+			return LimitSwitch::LIMIT_UNKNOWN;
 		}
 		
 		///////////////////////////////////////////////////////////////////
 		wxString& getLimitString(wxString& ret, int32_t limit) {
 			ret.clear();
 			switch ( limit ) {
-				case LIMIT_UNSET:
+				case LimitSwitch::LIMIT_UNSET:
 							ret = "No limit active.";
 							break;
-				case LIMIT_MIN:
+				case LimitSwitch::LIMIT_MIN:
 							ret = "Min switch is active.";
 							break;
-				case LIMIT_MAX:
+				case LimitSwitch::LIMIT_MAX:
 							ret = "Max switch is active.";
 							break;
-				case LIMIT_SET_BUT_MIN_MAX_UNKNOWN:
+				case LimitSwitch::LIMIT_UNKNOWN:
 							ret = "Limit active, but the position is unclear.";
 							break;
 				default:	ret = "Unknown limit state!";
@@ -80,17 +80,17 @@ class CncLimitStates {
 		///////////////////////////////////////////////////////////////////
 		void displayLimit(const char axis, int32_t limit, bool wrongOnly = true) {
 			switch ( limit ) {
-				case LIMIT_UNSET:
+				case LimitSwitch::LIMIT_UNSET:
 							if ( wrongOnly == false )
 								std::clog << axis << ": No limit active." << std::endl;
 							break; 
-				case LIMIT_MIN:
+				case LimitSwitch::LIMIT_MIN:
 							//std::cerr << axis << ": Min switch is active." << std::endl;
 							break;
-				case LIMIT_MAX:
+				case LimitSwitch::LIMIT_MAX:
 							//std::cerr << axis << ": Max switch is active." << std::endl;
 							break;
-				case LIMIT_SET_BUT_MIN_MAX_UNKNOWN:
+				case LimitSwitch::LIMIT_UNKNOWN:
 							std::cerr << axis << ": Limit active, but the position is unclear." << std::endl;
 							break;
 				default:	if ( wrongOnly == false )

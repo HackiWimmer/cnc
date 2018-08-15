@@ -5,13 +5,14 @@
 int pointA[3], pointB[3];
 
 /////////////////////////////////////////////////////////////////////////////////////
-CncController::CncController(LastErrorCodes& lec) 
+CncController::CncController(const unsigned char alp, LastErrorCodes& lec) 
 /////////////////////////////////////////////////////////////////////////////////////
 : X(new CncStepper(this, 'X', X_STP, X_DIR, X_LIMIT, lec))
 , Y(new CncStepper(this, 'Y', Y_STP, Y_DIR, Y_LIMIT, lec))
 , Z(new CncStepper(this, 'Z', Z_STP, Z_DIR, Z_LIMIT, lec))
 , speedManager()
 , errorInfo(&lec)
+, analogLimitPin(alp)
 , posReplyThresholdX(100L)
 , posReplyThresholdY(100L)
 , posReplyThresholdZ(100L)
@@ -213,16 +214,76 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
   }
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncController::evaluateAndSendLimitStates() {
+bool CncController::evaluateAnalogLimitPin(LimitSwitch::LimitStates& ls) {
 /////////////////////////////////////////////////////////////////////////////////////
-  long x = X->readLimitState(0);
-  long y = Y->readLimitState(0);
-  long z = Z->readLimitState(0);
+  if ( isAnalogLimitPinAvailable() == false ) {
+    ls.resetToError(); 
+    return false;
+  }
 
-  writeLongValues(PID_LIMIT, x, y, z);
-  return (x != 0 && y != 0 && z != 0 );
+  const int msDelay = 5;
+  LimitSwitch::readLimitStates(analogLimitPin, msDelay, ls);
+  
+  return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
+bool CncController::evaluateLimitState(const CncStepper* stepper, long& limit) {
+///////////////////////////////////////////////////////////////////////////////////// 
+  long x = LimitSwitch::LIMIT_UNKNOWN;
+  long y = LimitSwitch::LIMIT_UNKNOWN;
+  long z = LimitSwitch::LIMIT_UNKNOWN;
+
+  bool ret = evaluateLimitStates(x, y, z);
+
+  if      ( stepper == X )  limit = x;
+  else if ( stepper == Y )  limit = y;
+  else if ( stepper == Z )  limit = z;
+  else                      limit = LimitSwitch::LIMIT_UNKNOWN;
+
+  return ret;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool CncController::evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit) {
+/////////////////////////////////////////////////////////////////////////////////////
+  // call the steppers to read their individual pins
+  xLimit = X->readLimitState(DIRECTION_UNKNOWN);
+  yLimit = Y->readLimitState(DIRECTION_UNKNOWN);
+  zLimit = Z->readLimitState(DIRECTION_UNKNOWN);
+
+  // try to get a better information for unclear behaviurs
+  if ( xLimit == LimitSwitch::LIMIT_UNKNOWN || yLimit == LimitSwitch::LIMIT_UNKNOWN || zLimit == LimitSwitch::LIMIT_UNKNOWN ) {
+    if ( isAnalogLimitPinAvailable() == true ) {
+      // read it from analog pin
+      LimitSwitch::LimitStates ls;
+      evaluateAnalogLimitPin(ls);
+
+      if ( xLimit == LimitSwitch::LIMIT_UNKNOWN ) 
+        xLimit = ls.xLimit();
+
+      if ( yLimit == LimitSwitch::LIMIT_UNKNOWN )
+        yLimit = ls.yLimit();
+
+      if ( zLimit == LimitSwitch::LIMIT_UNKNOWN )
+        zLimit = ls.zLimit();        
+    }
+  } 
+
+  return (xLimit != LimitSwitch::LIMIT_UNSET && yLimit != LimitSwitch::LIMIT_UNSET && zLimit != LimitSwitch::LIMIT_UNSET );
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// This method evaluate the limit states by reading the corresponding pins
+bool CncController::evaluateAndSendLimitStates() {
+/////////////////////////////////////////////////////////////////////////////////////
+  long x = LimitSwitch::LIMIT_UNKNOWN;
+  long y = LimitSwitch::LIMIT_UNKNOWN;
+  long z = LimitSwitch::LIMIT_UNKNOWN;
+
+  bool ret = evaluateLimitStates(x, y, z);
+  writeLongValues(PID_LIMIT, x, y, z);
+  return ret;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// This method evaluate the limit states by the current stepper states
 bool CncController::sendCurrentLimitStates(bool force) {
 /////////////////////////////////////////////////////////////////////////////////////
   long x = X->getLimitState();
@@ -230,10 +291,10 @@ bool CncController::sendCurrentLimitStates(bool force) {
   long z = Z->getLimitState();
 
   // the states will be only sent if one of them is activ or they should be forced
-  if ( x != 0 || y != 0 || z != 0 || force == true )
+  if ( x != LimitSwitch::LIMIT_UNSET || y != LimitSwitch::LIMIT_UNSET || z != LimitSwitch::LIMIT_UNSET || force == true )
     writeLongValues(PID_LIMIT, x, y, z);
     
-  return (x != 0 && y != 0 && z != 0 );
+  return (x != LimitSwitch::LIMIT_UNSET && y != LimitSwitch::LIMIT_UNSET && z != LimitSwitch::LIMIT_UNSET );
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncController::broadcastInterrupt() {
