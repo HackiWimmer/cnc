@@ -1,12 +1,12 @@
 #include "LastErrorCodes.h"
 
 //////////////////////////////////////////////////////////////////
-void LastErrorCodes::setNextErrorInfo(int id, const String& text) {
+unsigned char LastErrorCodes::setNextErrorInfo(int id, const String& text) {
 //////////////////////////////////////////////////////////////////
-  setNextErrorInfo(id, text.c_str());
+  return setNextErrorInfo(id, text.c_str());
 }
 //////////////////////////////////////////////////////////////////
-void LastErrorCodes::setNextErrorInfo(int id, const char* text) {
+unsigned char LastErrorCodes::setNextErrorInfo(int id, const char* text) {
 //////////////////////////////////////////////////////////////////
   unsigned int insertIndex = curIndex;
 
@@ -43,4 +43,6 @@ void LastErrorCodes::setNextErrorInfo(int id, const char* text) {
   }
 
   pushErrorMessage(msg.c_str());
+  
+  return RET_ERROR;
 }

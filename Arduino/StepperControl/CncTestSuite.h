@@ -18,9 +18,9 @@ class CncTestSuite {
     const char* getParameterInfo(unsigned int id);
 
     // test routines 
-    char runHeartbeatTest();
-    char runMotorConfigInterval();
-    char runDurationTest();
+    unsigned char runHeartbeatTest();
+    unsigned char runMotorConfigInterval();
+    unsigned char runDurationTest();
     //...
     
    public:
@@ -79,7 +79,7 @@ class CncTestSuite {
       static void printConfig();
   
       //////////////////////////////////////////////////////////////////////////////
-      char run();
+      unsigned char run();
 };
 
 #endif

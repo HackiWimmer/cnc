@@ -7,6 +7,7 @@
 class LastErrorCodes {
   private:
     static const unsigned int size = 16;
+    
     unsigned int curIndex;
     unsigned int totalCount;
     
@@ -54,8 +55,8 @@ class LastErrorCodes {
     }
 
     //////////////////////////////////////////////////////////////////
-    void setNextErrorInfo(int id, const char* text = NULL );
-    void setNextErrorInfo(int id, const String& text);
+    unsigned char setNextErrorInfo(int id, const char* text = NULL );
+    unsigned char setNextErrorInfo(int id, const String& text);
     
     //////////////////////////////////////////////////////////////////
     int getErrorCount() { return curIndex; }

@@ -5,7 +5,9 @@
 int pointA[3], pointB[3];
 
 /////////////////////////////////////////////////////////////////////////////////////
-CncController::CncController(const unsigned char alp, LastErrorCodes& lec) 
+CncController::CncController(const unsigned char alp, 
+                             const unsigned char asp, 
+                             LastErrorCodes& lec) 
 /////////////////////////////////////////////////////////////////////////////////////
 : X(new CncStepper(this, 'X', X_STP, X_DIR, X_LIMIT, lec))
 , Y(new CncStepper(this, 'Y', Y_STP, Y_DIR, Y_LIMIT, lec))
@@ -13,6 +15,7 @@ CncController::CncController(const unsigned char alp, LastErrorCodes& lec)
 , speedManager()
 , errorInfo(&lec)
 , analogLimitPin(alp)
+, analogSupportPin(asp)
 , posReplyThresholdX(100L)
 , posReplyThresholdY(100L)
 , posReplyThresholdZ(100L)
@@ -72,7 +75,6 @@ unsigned int CncController::getLowPulseWidth(char axis){
   }
    
   return 1000;
-  //return MAX_UINT;
 }
 //////////////////////////////////////////////////////////////////////////////
 unsigned int CncController::getHighPulseWidth(char axis) {
@@ -84,13 +86,12 @@ unsigned int CncController::getHighPulseWidth(char axis) {
   }
    
   return 1000;
-  //return MAX_UINT;
 }
 //////////////////////////////////////////////////////////////////////////////
 bool CncController::enableStepperPin(bool state){
 //////////////////////////////////////////////////////////////////////////////
-  if ( probeMode == false )   digitalWrite(ENABLE_PIN, state == true ? LOW : HIGH);
-  else                        digitalWrite(ENABLE_PIN, HIGH);
+  if ( probeMode == false )   digitalWrite(ENABLE_PIN, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
+  else                        digitalWrite(ENABLE_PIN, ENABLE_STATE_OFF);
 
   delayMicroseconds(minEnablePulseWide);
   return state;
@@ -106,7 +107,9 @@ void CncController::printConfig() {
     Serial.print(BLANK); Serial.print(PID_PROBE_MODE);                     Serial.print(TEXT_SEPARATOR); Serial.print(controller.isProbeMode());           Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_ENABLE_STEPPERS);                Serial.print(TEXT_SEPARATOR); Serial.print(!digitalRead(ENABLE_PIN));           Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_MIN_ENABLE_PULSE_WIDTH);         Serial.print(TEXT_SEPARATOR); Serial.print(minEnablePulseWide);                 Serial.write(TEXT_CLOSE);
+    Serial.print(BLANK); Serial.print(PID_ANALOG_LIMIT_PIN);               Serial.print(TEXT_SEPARATOR); Serial.print(analogLimitPin);                     Serial.write(TEXT_CLOSE);
 
+    
     Serial.print(BLANK);  Serial.print(PID_SPEED_MGMT);                    Serial.print(TEXT_SEPARATOR);                                                   Serial.write(TEXT_CLOSE);
     Serial.print(BLANK2); Serial.print(PID_SPEED_MGMT_INITIALIZED);        Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.isInitialized());       Serial.write(TEXT_CLOSE);
     
@@ -213,6 +216,26 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
     }
   }
 }
+/////////////////////////////////////////////////////////////////////////////////////  
+bool CncController::evaluateSupportButtonState() {
+// true:  button pressed
+// false: button released
+/////////////////////////////////////////////////////////////////////////////////////  
+  if ( isAnalogSupportPinAvailable() == false )
+    return false;
+
+  const int msDelay = 5;
+
+  SupportPin::SupportStates ss;
+  ss.readAnalogValue(analogSupportPin, msDelay);
+
+  return ss.isSupportButtonPressed();
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+bool CncController::evaluateToolState() {
+/////////////////////////////////////////////////////////////////////////////////////  
+  return ( digitalRead(TOOL_FEEDBACK_PIN) == TOOL_STATE_ON );
+}
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncController::evaluateAnalogLimitPin(LimitSwitch::LimitStates& ls) {
 /////////////////////////////////////////////////////////////////////////////////////
@@ -222,7 +245,7 @@ bool CncController::evaluateAnalogLimitPin(LimitSwitch::LimitStates& ls) {
   }
 
   const int msDelay = 5;
-  LimitSwitch::readLimitStates(analogLimitPin, msDelay, ls);
+  ls.readAnalogValue(analogLimitPin, msDelay);
   
   return true;
 }
@@ -257,14 +280,16 @@ bool CncController::evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit
       LimitSwitch::LimitStates ls;
       evaluateAnalogLimitPin(ls);
 
-      if ( xLimit == LimitSwitch::LIMIT_UNKNOWN ) 
-        xLimit = ls.xLimit();
-
-      if ( yLimit == LimitSwitch::LIMIT_UNKNOWN )
-        yLimit = ls.yLimit();
-
-      if ( zLimit == LimitSwitch::LIMIT_UNKNOWN )
-        zLimit = ls.zLimit();        
+      if ( ls. hasError() == false ) {
+        if ( xLimit == LimitSwitch::LIMIT_UNKNOWN ) 
+          xLimit = ls.xLimit();
+  
+        if ( yLimit == LimitSwitch::LIMIT_UNKNOWN )
+          yLimit = ls.yLimit();
+  
+        if ( zLimit == LimitSwitch::LIMIT_UNKNOWN )
+          zLimit = ls.zLimit();        
+      }
     }
   } 
 

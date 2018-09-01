@@ -9,12 +9,18 @@
 class CncStepper {
 
   private:
-  
+
+    static const bool NORMALIZED_INCREMENT_DIRECTION_VALUE = HIGH;
+    static const bool INVERSED_INCREMENT_DIRECTION_VALUE   = LOW;
+
+    bool INCREMENT_DIRECTION_VALUE;
+
     bool initialized;
     bool interrupted;
     bool pauseStepping;
     bool minReached;
     bool maxReached;
+    
     short minLimitCnt;
     short maxLimitCnt;
     
@@ -59,6 +65,8 @@ class CncStepper {
 
     inline void calcStepDuration(unsigned long lastDuration);
 
+    inline bool isCancelMoveSignalRelevant(const unsigned char sig);
+
   public:
     //////////////////////////////////////////////////////////////////////////////
     CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin, LastErrorCodes& lec);
@@ -96,8 +104,8 @@ class CncStepper {
 
     //////////////////////////////////////////////////////////////////////////////
     void setLimitStateManually(long value) {
-      if ( value > 0 )  { maxReached = true; lastStepDirection = DIRECTION_POS; }
-      else              { minReached = true; lastStepDirection = DIRECTION_NEG; }
+      if ( value > 0 )  { maxReached = true; lastStepDirection = DIRECTION_INC; }
+      else              { minReached = true; lastStepDirection = DIRECTION_DEC; }
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -148,6 +156,16 @@ class CncStepper {
     bool enableStepperPin(bool state = true);
     bool disableStepperPin() { return enableStepperPin(false); }
 
+    //////////////////////////////////////////////////////////////////////////////
+    // The following functionality is to overrule the stepper cabling
+    void normalizeIncrementDirectionValue()  { INCREMENT_DIRECTION_VALUE = NORMALIZED_INCREMENT_DIRECTION_VALUE; }
+    void inverseIncrementDirectionValue()    { INCREMENT_DIRECTION_VALUE = INVERSED_INCREMENT_DIRECTION_VALUE;   }
+    void setIncrementDirectionValue(long v)  { v == NORMALIZED_INCREMENT_DIRECTION ? normalizeIncrementDirectionValue() : inverseIncrementDirectionValue(); }
+  
+    inline bool getIncrementDirectionValue() { return INCREMENT_DIRECTION_VALUE;  }
+    inline bool getDecrementDirectionValue() { return !INCREMENT_DIRECTION_VALUE; }
+
+    //////////////////////////////////////////////////////////////////////////////
 };
 
 #endif

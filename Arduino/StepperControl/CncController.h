@@ -4,6 +4,9 @@
 #include "CncSpeedManager.h"
 #include "LastErrorCodes.h"
 
+#include "LimitSwitchController/LimitSwitchDefinitions.h"
+#include "LimitSwitchController/SupportPinDefinitions.h"
+
 class CncStepper;
 class CncController {
 
@@ -17,6 +20,7 @@ class CncController {
     LastErrorCodes* errorInfo;
 
     unsigned char analogLimitPin;
+    unsigned char analogSupportPin;
 
     int minEnablePulseWide;
 
@@ -46,7 +50,10 @@ class CncController {
     //////////////////////////////////////////////////////////////////////////////
   public:
     //////////////////////////////////////////////////////////////////////////////
-    CncController(const unsigned char analogLimitPin, LastErrorCodes& lec);
+    CncController(const unsigned char analogLimitPin, 
+                  const unsigned char analogSupportPin, 
+                  LastErrorCodes& lec);
+                  
     ~CncController();
 
     //////////////////////////////////////////////////////////////////////////////
@@ -71,7 +78,13 @@ class CncController {
     bool evaluateLimitState(const CncStepper* stepper, long& limit);
     bool evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit);
     bool evaluateAndSendLimitStates();
-    
+
+    //////////////////////////////////////////////////////////////////////////////
+    bool evaluateToolState();
+
+    //////////////////////////////////////////////////////////////////////////////
+    bool evaluateSupportButtonState();
+        
     //////////////////////////////////////////////////////////////////////////////
     void sendCurrentPositions(unsigned char pid, bool force);
     void broadcastInterrupt();
@@ -101,19 +114,19 @@ class CncController {
 
     //////////////////////////////////////////////////////////////////////////////
     // to get the whole unsigned int32_t range the controller starts counting with MIN_LONG
-    void resetPositionCounter() { positionCounter = MIN_LONG; positionCounterOverflow = 0L; }
-    long getPositionCounter() { return positionCounter; }
-    long getPositionCounterOverflow() { return positionCounterOverflow; }
+    void resetPositionCounter()         { positionCounter = MIN_LONG; positionCounterOverflow = 0L; }
+    long getPositionCounter()           { return positionCounter; }
+    long getPositionCounterOverflow()   { return positionCounterOverflow; }
     inline void incPositionCounter();
 
     //////////////////////////////////////////////////////////////////////////////
     void printConfig();
 
     //////////////////////////////////////////////////////////////////////////////
-    bool isProbeMode() { return probeMode; }
-    void setProbeMode(bool state = true) { probeMode = state; }
-    void enableProbeMode() { setProbeMode(true); }
-    void disableProbeMode() { setProbeMode(false); }
+    bool isProbeMode()                    { return probeMode; }
+    void setProbeMode(bool state = true)  { probeMode = state; }
+    void enableProbeMode()                { setProbeMode(true); }
+    void disableProbeMode()               { setProbeMode(false); }
     
     //////////////////////////////////////////////////////////////////////////////
     bool enableStepperPin(bool state = true);
@@ -123,8 +136,14 @@ class CncController {
     bool renderAndStepAxisXYZ(long x1, long y1, long z1);
 
     //////////////////////////////////////////////////////////////////////////////
+    int getAnalogLimitPin()                         { return analogLimitPin; }
+    bool isAnalogLimitPinAvailable()                { return analogLimitPin == ANALOG_LIMIT_PIN_ID; }
     void setAnalogLimitPin(const unsigned char alp) { analogLimitPin = alp; }
-    bool isAnalogLimitPinAvailable() { return analogLimitPin == ANALOG_LIMIT_PIN_ID; }
+
+    //////////////////////////////////////////////////////////////////////////////
+    int getAnalogSupportPin()                         { return analogSupportPin; }
+    bool isAnalogSupportPinAvailable()                { return analogSupportPin == ANALOG_SUPPORT_PIN_ID; }
+    void setAnalogSupportPin(const unsigned char asp) { analogSupportPin = asp; }
 };
 
 #endif

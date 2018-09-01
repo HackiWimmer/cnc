@@ -4,7 +4,8 @@
 //////////////////////////////////////////////////////////////////////////////
 CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin, LastErrorCodes& lec)
 //////////////////////////////////////////////////////////////////////////////
-: initialized(false)
+: INCREMENT_DIRECTION_VALUE(NORMALIZED_INCREMENT_DIRECTION_VALUE)
+, initialized(false)
 , interrupted(false)
 , pauseStepping(false)
 , minReached(false)
@@ -40,12 +41,34 @@ CncStepper::~CncStepper() {
 /////////////////////////////////////////////////////////////////////////////////////
 long CncStepper::isReadyToRun() {
 /////////////////////////////////////////////////////////////////////////////////////
-  //todo
-  return 1L;
+  long ret = 1;
+  
+  if ( interrupted == true ) {
+    errorInfo.setNextErrorInfo(E_INTERRUPT, BLANK + axis);
+    ret = 0;
+  }
+  
+  if ( readLimitState() != LimitSwitch::LIMIT_UNSET ) {
+    errorInfo.setNextErrorInfo(E_LIMIT_SWITCH_ACTIVE, BLANK + axis);
+    ret = 0;
+  }
+  
+  return ret;  
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::printConfig() {
 //////////////////////////////////////////////////////////////////////////////
+  unsigned char pidIncrementDirectionValue = PID_UNKNOWN;
+  
+  switch ( axis ) {
+    case 'X': pidIncrementDirectionValue = PID_INCREMENT_DIRECTION_VALUE_X; 
+              break;
+    case 'Y': pidIncrementDirectionValue = PID_INCREMENT_DIRECTION_VALUE_Y; 
+              break;
+    case 'Z': pidIncrementDirectionValue = PID_INCREMENT_DIRECTION_VALUE_Z; 
+              break;
+  }
+
   Serial.print(PID_AXIS); Serial.print(TEXT_SEPARATOR); Serial.print(axis); Serial.write(TEXT_CLOSE);
 
     Serial.print(BLANK); Serial.print(PID_STEPPER_INITIALIZED);            Serial.print(TEXT_SEPARATOR); Serial.print(initialized);                   Serial.write(TEXT_CLOSE);
@@ -56,11 +79,12 @@ void CncStepper::printConfig() {
     Serial.print(BLANK); Serial.print(PID_AVG_STEP_DURRATION);             Serial.print(TEXT_SEPARATOR); Serial.print(avgStepDuartion);               Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_STEP_PIN);                       Serial.print(TEXT_SEPARATOR); Serial.print(getStepPin());                  Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_DIR_PIN);                        Serial.print(TEXT_SEPARATOR); Serial.print(getDirectionPin());             Serial.write(TEXT_CLOSE);
+    Serial.print(BLANK); Serial.print(pidIncrementDirectionValue);         Serial.print(TEXT_SEPARATOR); Serial.print(getIncrementDirectionValue());  Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_MIN_SWITCH);                     Serial.print(TEXT_SEPARATOR); Serial.print(minReached);                    Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_MAX_SWITCH);                     Serial.print(TEXT_SEPARATOR); Serial.print(maxReached);                    Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_LIMIT);                          Serial.print(TEXT_SEPARATOR); Serial.print(readLimitState());              Serial.write(TEXT_CLOSE);
     Serial.print(BLANK); Serial.print(PID_LAST_STEP_DIR);                  Serial.print(TEXT_SEPARATOR); Serial.print(getLastStepDirection());        Serial.write(TEXT_CLOSE);
- 
+
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncStepper::incStepCounter() { 
@@ -159,18 +183,19 @@ void CncStepper::setMaxReached(bool state) {
 //////////////////////////////////////////////////////////////////////////////
 long CncStepper::readLimitState(int dir) {
 //////////////////////////////////////////////////////////////////////////////
-  if ( digitalRead(limitPin) == LIMIT_SWITCH_OFF )
+  if ( digitalRead(limitPin) == LimitSwitch::LIMIT_SWITCH_OFF )
     return LimitSwitch::LIMIT_UNSET;
-  
+
+  // determine which one . . .
   switch ( dir ) {
-    case DIRECTION_NEG:   return LimitSwitch::LIMIT_MIN;
-    case DIRECTION_POS:   return LimitSwitch::LIMIT_MAX;
+    case DIRECTION_INC:   return LimitSwitch::LIMIT_MAX;
+    case DIRECTION_DEC:   return LimitSwitch::LIMIT_MIN;
     default:              ;
   }
 
   // in this case the direction is unclear, try to get more information by calling the controller
   long limit = LimitSwitch::LIMIT_UNKNOWN;
-  if ( controller->evaluateLimitState(this, limit) )
+  if ( controller->evaluateLimitState(this, limit) == true )
     return limit;
 
   // in this case no valid limit information available
@@ -188,7 +213,7 @@ long CncStepper::getLimitState() {
 bool CncStepper::checkLimit(int dir) {
 //////////////////////////////////////////////////////////////////////////////
   int val = digitalRead(limitPin);
-  if ( val == LIMIT_SWITCH_ON ) {
+  if ( val == LimitSwitch::LIMIT_SWITCH_ON ) {
 
     // unclear sitiuation avoid movement!
     if ( lastStepDirection == DIRECTION_UNKNOWN ) {
@@ -207,10 +232,10 @@ bool CncStepper::checkLimit(int dir) {
       
     switch ( dir ) {
       
-      case DIRECTION_POS:   setMaxReached(true);
+      case DIRECTION_INC:   setMaxReached(true);
                             return true;
       
-      case DIRECTION_NEG:   setMinReached(true);
+      case DIRECTION_DEC:   setMinReached(true);
                             return true;
     }
   } else {
@@ -222,6 +247,18 @@ bool CncStepper::checkLimit(int dir) {
   }
 
   return false;
+}
+//////////////////////////////////////////////////////////////////////////////
+bool CncStepper::isCancelMoveSignalRelevant(const unsigned char sig) {
+  bool ret = false;
+  
+  switch ( axis ) {
+    case 'X': ret = (sig == SIG_CANCEL_X_MOVE); break;
+    case 'Y': ret = (sig == SIG_CANCEL_Y_MOVE); break;
+    case 'Z': ret = (sig == SIG_CANCEL_Z_MOVE); break;
+  }
+
+  return ret;
 }
 //////////////////////////////////////////////////////////////////////////////
 bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
@@ -244,7 +281,7 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
 
   // -----------------------------------------------------------
   if ( controller->isProbeMode() == false ) {
-    if ( digitalRead(ENABLE_PIN) == HIGH ) {
+    if ( digitalRead(ENABLE_PIN) == ENABLE_STATE_OFF ) {
       // Possibly an error ?
       if ( testActive == false )
         errorInfo.setNextErrorInfo(E_STEPPER_NOT_ENALED, String(String(axis) + " Axis"));
@@ -255,13 +292,18 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
   
   // -----------------------------------------------------------
   // determine direction and init driver
-  short stepDirection = (stepsToMove < 0 ? DIRECTION_NEG : DIRECTION_POS);
-  digitalWrite(directionPin, (stepsToMove > 0));
+  // stepsToMove == 0 is already checked above
+  short stepDirection = (stepsToMove > 0 ? DIRECTION_INC : DIRECTION_DEC);
+
+  // The functions getIn/DecrementDirectionValue() switches the physical direction of "stepsToMove > 0".
+  // The rest of the stepper logic isn't affected because this is to overrule the stepper cabling only
+  // and the physical min and max position staying unchanged
+  digitalWrite(directionPin, (stepDirection > 0 ? getIncrementDirectionValue() : getDecrementDirectionValue()));
   delayMicroseconds(dirPulseWidth);
   
   // -----------------------------------------------------------
   // start step loop 
-  unsigned long stepsLeft = absolute(stepsToMove);
+  unsigned long stepsLeft       = absolute(stepsToMove);
   unsigned char frontSerialByte = CMD_INVALID;
   
   tsLoopEnd = 0L;
@@ -280,10 +322,23 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
     // ----------------------------------------------------------
     // limit handling
     if ( checkLimit(stepDirection) == true ) {
+      // Case:  A limit is activ
+
       if ( testActive == true )
         return false;
-        
+
+      // TODO: ALWAYS CREATE AN ERROR
       return true;
+    }
+
+    // ----------------------------------------------------------
+    // tool observation handling
+    if ( controller->evaluateToolState() == false ) {
+      // Case: The tool isn't running
+
+      // false will create an error case outside the stepper
+      // this will abort the current run
+      return false;
     }
 
     // ----------------------------------------------------------
@@ -295,20 +350,51 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
         case SIG_INTERRUPPT:
                     // dont remove the signal from serial, so an explizit reset have to be called by the interface
                     broadcastInterrupt();
+
+                    // Signalize an error
                     return false;
 
         case SIG_HALT:
-                    // dont remove the signal from serial, so an explizit reset have to be called by the interface
+                    // remove the signal from serial
+                    Serial.read();
+                    
+                    // Options:
+                    //  - Returning false here signalize an error and the complete run cycle (PC) stopps as a result.
+                    //  - Returning true here stopps the current move (while loop), so far so good, but the current run cycle 
+                    //    continue with the next existing move command which is not the meaning of HALT.
+                    
                     return false;
                     
         case SIG_PAUSE:
+                    // remove the signal from serial
                     Serial.read();
                     pauseStepping = true;
+
+                    // Don't leave the wigle loop, so break is used here
                     break;
 
         case SIG_RESUME:
+                    // remove the signal from serial
                     Serial.read();
                     pauseStepping = false;
+
+                    // Don't leave the wigle loop, so break is used here
+                    break;
+
+        case SIG_CANCEL_X_MOVE: 
+        case SIG_CANCEL_Y_MOVE: 
+        case SIG_CANCEL_Z_MOVE:
+                    // first check the signal context
+                    if ( isCancelMoveSignalRelevant(frontSerialByte) == true ) {
+                      // remove the signal from serial
+                      Serial.read();
+                      
+                      // Controlled cancellation: In this case it should look like a complete 
+                      // successful move outside the stepper class 
+                      return true;
+                    }
+
+                    // in this case nothing to do
                     break;
       }
     }
@@ -332,7 +418,6 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
     
     if ( controller->isProbeMode() == false ) {
       //sleepMicroseconds(controller->getPerStepSpeedOffset(axis));
-      
       
       int pulseDelay = 0;
       if ( controller->isProbeMode() == false )
@@ -363,7 +448,7 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
     }
 
     // ----------------------------------------------------------
-    // position handling
+    // position handling -/+1
     curPos += stepDirection;
 
     // ----------------------------------------------------------

@@ -19,29 +19,29 @@ class CncSpeedManager {
     
     protected:
 
-    //////////////////////////////////////////////////////////////////////////
-    struct Measurement {
-      unsigned long tsStart     = 0L;
-      unsigned long tsEnd       = 0L;
-      
-      unsigned long timeElapsed = 0L;
-      double distance           = 0.0;
-      double feedSpeed          = 0.0;
-
-      Measurement() { reset(); }
-      ~Measurement() {}
-
-      void reset() {
-        tsStart     = 0L;
-        tsEnd       = 0L;
+      //////////////////////////////////////////////////////////////////////////
+      struct Measurement {
+        unsigned long tsStart     = 0L;
+        unsigned long tsEnd       = 0L;
         
-        timeElapsed = 0L;
-        distance    = 0.0;
-        feedSpeed   = MIN_LONG;
-      }
-    };
-    //////////////////////////////////////////////////////////////////////////
-    
+        unsigned long timeElapsed = 0L;
+        double distance           = 0.0;
+        double feedSpeed          = 0.0;
+  
+        Measurement() { reset(); }
+        ~Measurement() {}
+  
+        void reset() {
+          tsStart     = 0L;
+          tsEnd       = 0L;
+          
+          timeElapsed = 0L;
+          distance    = 0.0;
+          feedSpeed   = MIN_LONG;
+        }
+      };
+      
+      //////////////////////////////////////////////////////////////////////////
         Measurement measurement; 
    
         bool initialized;
@@ -148,24 +148,23 @@ class CncSpeedManager {
             perStepOffsetY            = ( lStepsY > 0 ? totalOffsetY / lStepsY : 0 );
             perStepOffsetZ            = ( lStepsZ > 0 ? totalOffsetZ / lStepsZ : 0 );
             
-#ifndef SKETCH_COMPILE
-            if ( false ) {
+            #ifndef SKETCH_COMPILE
+              if ( false ) {
                 std::cout << "T: " << tSteps << ", " << restDuration << ", " << currentDistance << ", " <<  totalLoopDuration << ", " << totalTime << ", " << configedFeedSpeed << endl;
                 std::cout << "X: " << totalOffsetX << ", " << perStepOffsetX << ", " << lStepsX << ", " << fx << endl;
                 std::cout << "Y: " << totalOffsetY << ", " << perStepOffsetY << ", " << lStepsY << ", " << fy << endl;
                 std::cout << "Z: " << totalOffsetZ << ", " << perStepOffsetZ << ", " << lStepsZ << ", " << fz << endl;
-            }
-#endif
-            
+              }
+            #endif
         }
 
     //////////////////////////////////////////////////////////////////////////
     inline unsigned long getTimeStamp() {
-#ifndef SKETCH_COMPILE
-      return CncTimeFunctions::getNanoTimestamp() / 1000;
-#else
-      return micros();
-#endif
+      #ifndef SKETCH_COMPILE
+        return CncTimeFunctions::getNanoTimestamp() / 1000;
+      #else
+        return micros();
+      #endif
     }
         
     public:

@@ -11,7 +11,7 @@ extern inline void sendHeartbeat();
 
 extern inline void writeByteValue(unsigned char val);
 
-extern inline void writeGetterValues(unsigned char pid, long val);
+extern inline void writeGetterValue(unsigned char pid, long val);
 extern inline void writeGetterValues(unsigned char pid, long val1, long val2);
 extern inline void writeGetterValues(unsigned char pid, long val1, long val2, long val3);
 

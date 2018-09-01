@@ -1,7 +1,7 @@
 #ifndef COMMON_VALUES_H
 #define COMMON_VALUES_H
 
-#include "LimitSwitchController/LimitSwitchDefinitions.h"
+#include "LimitSwitchController/CommonDefinitions.h"
 
 ////////////////////////////////////////////////////////////////////////
 // common global functions - start
@@ -38,14 +38,19 @@
   const unsigned char Z_LIMIT                             =  11;
 
   const unsigned char TOOL_PIN                            =  12;
-  const unsigned char SUPPORT_PIN                         =  13;
+  const unsigned char TOOL_FEEDBACK_PIN                   =  13;
 
-  #define ANALOG_LIMIT_PIN                                   A2
-  const unsigned char ANALOG_LIMIT_PIN_ID                 =   2;
-  const unsigned char ANALOG_LIMIT_PIN_OFF                = 255;
-  
   #define INTERRUPT_LED                                      A3
   const unsigned char INTERRUPT_LED_ID                    =   3;
+
+  #define ANALOG_LIMIT_PIN                                   A4
+  const unsigned char ANALOG_LIMIT_PIN_ID                 =   4;
+  const unsigned char ANALOG_LIMIT_PIN_OFF                = 255;
+
+  #define ANALOG_SUPPORT_PIN                                 A5
+  const unsigned char ANALOG_SUPPORT_PIN_ID               =   5;
+  const unsigned char ANALOG_SUPPORT_PIN_OFF              = 255;
+  
 // .....................................................................
 // Signals
 // .....................................................................
@@ -54,6 +59,10 @@
   const unsigned char SIG_HALT                            =  'H';
   const unsigned char SIG_PAUSE                           =  'P';
   const unsigned char SIG_RESUME                          =  'p';
+
+  const unsigned char SIG_CANCEL_X_MOVE                   =  '1';
+  const unsigned char SIG_CANCEL_Y_MOVE                   =  '2';
+  const unsigned char SIG_CANCEL_Z_MOVE                   =  '3';
 
 // .....................................................................
 // Commands
@@ -157,6 +166,9 @@
   const unsigned char PID_STEPPER_INITIALIZED             =  23;
   const unsigned char PID_SEPARATOR                       =  24;
   const unsigned char PID_QUERY_READY_TO_RUN              =  25;
+  const unsigned char PID_INCREMENT_DIRECTION_VALUE_X     =  26;
+  const unsigned char PID_INCREMENT_DIRECTION_VALUE_Y     =  27;
+  const unsigned char PID_INCREMENT_DIRECTION_VALUE_Z     =  28;
 
   const unsigned char PID_SPEED_OFFSET                    =  30;
   const unsigned char PID_SPEED_OFFSET_X                  =  31;
@@ -173,6 +185,7 @@
   const unsigned char PID_X_LIMIT                         =  44;
   const unsigned char PID_Y_LIMIT                         =  45;
   const unsigned char PID_Z_LIMIT                         =  46;
+  const unsigned char PID_ANALOG_LIMIT_PIN                =  47;
 
   const unsigned char PID_CONTROLLER                      =  50;
   const unsigned char PID_ROUTER_SWITCH                   =  51;
@@ -303,6 +316,8 @@
   const unsigned char E_SPEED_MGMT_NOT_INITIALIZED        =  40;
   const unsigned char E_STEPPER_NOT_READY_TO_RUN          =  41;
 
+  const unsigned char E_LIMIT_SWITCH_ACTIVE               =  51;
+
   const unsigned char E_PURE_TEXT_VALUE_ERROR             = 252;
   const unsigned char E_INTERRUPT                         = 253;
   const unsigned char E_TOTAL_COUNT                       = 254;
@@ -316,13 +331,19 @@
 //
 // .....................................................................
 
-  #define FIRMWARE_VERSION                              "0.9.1"
+  #define FIRMWARE_VERSION                              "0.9.2"
 
-  #define EMPTY_TEXT_VAL                                 ""
-  #define BLANK                                          " "
-  #define BLANK2                                         "  "
-  #define BLANK3                                         "   "
-  #define BLANK4                                         "    "
+  #define NORMALIZED_INCREMENT_DIRECTION                 0
+  #define INVERSED_INCREMENT_DIRECTION                   1
+
+  #define ANALOG_LOW                                     0
+  #define ANALOG_HIGH                                    255
+  
+  #define TOOL_STATE_OFF                                 LOW
+  #define TOOL_STATE_ON                                  HIGH 
+
+  #define ENABLE_STATE_OFF                               HIGH
+  #define ENABLE_STATE_ON                                LOW 
 
   const long BAUD_RATE                                   =  115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
   const int  MAX_PARAM_SIZE                              =  64;
@@ -342,8 +363,8 @@
   const unsigned MAX_UINT                                = +65535;
 
   const int DIRECTION_UNKNOWN                            =  0;
-  const int DIRECTION_POS                                = +1;
-  const int DIRECTION_NEG                                = -1;
-  
+  const int DIRECTION_INC                                = +1;
+  const int DIRECTION_DEC                                = -1;
+
 #endif
 

@@ -28,6 +28,7 @@ bool CncTestSuite::checkForTestSuiteEndFlag() {
     return true;
 
   unsigned char frontSerialByte = CMD_INVALID;
+  
   if ( peakSerial(frontSerialByte) == true ) {
     if ( frontSerialByte == SIG_HALT ) {
       Serial.read();
@@ -61,7 +62,7 @@ const char* CncTestSuite::getParameterInfo(unsigned int id) {
   return parameterInfo.c_str();
 }
 //////////////////////////////////////////////////////////////////////////////
-char CncTestSuite::run() {
+unsigned char CncTestSuite::run() {
 //////////////////////////////////////////////////////////////////////////////
   char ret = RET_OK;
 
@@ -77,12 +78,10 @@ char CncTestSuite::run() {
     case TID_DURATION:            ret = runDurationTest();
                                   break;                          
 
-    case TID_INVALID:             errorInfo.setNextErrorInfo(E_INVALID_TEST_ID);
-                                  ret = RET_ERROR;
+    case TID_INVALID:             ret = errorInfo.setNextErrorInfo(E_INVALID_TEST_ID);
                                   break;
                       
-    default:                      errorInfo.setNextErrorInfo(E_NOT_KNOWN_TEST_ID, String(testId).c_str());
-                                  ret = RET_ERROR;
+    default:                      ret = errorInfo.setNextErrorInfo(E_NOT_KNOWN_TEST_ID, String(testId).c_str());
                                   break; 
   }
 
@@ -90,7 +89,7 @@ char CncTestSuite::run() {
   return ret;
 }
 //////////////////////////////////////////////////////////////////////////////
-char CncTestSuite::runHeartbeatTest() {
+unsigned char CncTestSuite::runHeartbeatTest() {
 //////////////////////////////////////////////////////////////////////////////
   long maxValue   = 10;
   long delayValue = 1000;
@@ -113,7 +112,7 @@ char CncTestSuite::runHeartbeatTest() {
   return RET_OK;
 }
 //////////////////////////////////////////////////////////////////////////////
-char CncTestSuite::runMotorConfigInterval() {
+unsigned char CncTestSuite::runMotorConfigInterval() {
 //////////////////////////////////////////////////////////////////////////////
   long axis           = 0;
   long distance       = 0;
@@ -148,8 +147,8 @@ char CncTestSuite::runMotorConfigInterval() {
     case 1:   stepper = controller.getStepperX(); break;
     case 2:   stepper = controller.getStepperY(); break;
     case 3:   stepper = controller.getStepperZ(); break;
-    default:  errorInfo.setNextErrorInfo(E_INVALID_PARAMETER, String(1).c_str());
-              return RET_ERROR;
+    
+    default:  return errorInfo.setNextErrorInfo(E_INVALID_PARAMETER, String(1).c_str());
   }
 
   long steps = stepper->calcStepsForMM(distance);
@@ -160,12 +159,13 @@ char CncTestSuite::runMotorConfigInterval() {
 
     if ( CncTestSuite::checkForTestSuiteEndFlag() == true )
       break;
-      
-    if ( supportButton == 1 && digitalRead(SUPPORT_PIN) == HIGH ) {
+
+    if ( supportButton == 1 && controller.evaluateSupportButtonState() == false  ) {
       stepper->enableStepperPin(false);
       delay(500);
       continue;
     }
+    
     stepper->enableStepperPin(true);
       
     if ( stepper->stepAxis(steps, true) == false )
@@ -177,7 +177,7 @@ char CncTestSuite::runMotorConfigInterval() {
   return RET_OK;
 }
 //////////////////////////////////////////////////////////////////////////////
-char CncTestSuite::runDurationTest() {
+unsigned char CncTestSuite::runDurationTest() {
 //////////////////////////////////////////////////////////////////////////////
   long durations = 0;
   
@@ -185,18 +185,15 @@ char CncTestSuite::runDurationTest() {
     durations = CncTestSuite::testParam1;
 
   if ( durations == 0 ) {
-    errorInfo.setNextErrorInfo(E_INVALID_PARAMETER, getParameterInfo(1));
-    return RET_ERROR;
+    return errorInfo.setNextErrorInfo(E_INVALID_PARAMETER, getParameterInfo(1));
   }
 
   unsigned long sTime = millis();
-
 
   for ( long i=0; i< durations; i++) {
     //writeLongValues(PID_XYZ_POS, i, i, i);
     //writeLongValue(PID_X_POS, i);
   }
-  
 
   unsigned long eTime = millis();
   unsigned long total = eTime - sTime;
