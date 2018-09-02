@@ -540,8 +540,7 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 	unsigned char* p = (unsigned char*)buffer;
 	
 	unsigned int remainingBytes = nbByte;
-	int bytesRead 		= 0;
-	
+	int bytesRead 	 = 0;
 	unsigned int cnt = 0;
 	
 	while ( remainingBytes > 0 ) {
@@ -1376,7 +1375,7 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 	switch( cr ) {
 		
 		//RET_SOH_Handler..........................................
-		case PID_HEARTBEAT:	return decodeHeartbeat(sfi);
+		case PID_HEARTBEAT:			return decodeHeartbeat(sfi);
 		
 		//RET_SOH_Handler..........................................
 		case PID_X_POS:
@@ -1387,8 +1386,8 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 		case PID_XYZ_POS_DETAIL:	return decodePositionInfo(sfi, cr);
 		
 		//RET_SOH_Handler..........................................
-		case PID_LIMIT:		return decodeLimitInfo(sfi);
-		
+		case PID_LIMIT:				return decodeLimitInfo(sfi);
+			
 		//RET_SOH_Handler..........................................
 		default:
 		{
@@ -1504,39 +1503,6 @@ bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
-///////////////////////////////////////////////////////////////////
-	if ( (sfi.Hc.bytes = readDataUntilSizeAvailable(sfi.Hc.result, sizeof(sfi.Hc.result))) <= 0 ) {
-		std::cerr << "ERROR while reading heartbeat. Nothing available" << std::endl;
-		return false;
-	}
-	
-	if ( sfi.Hc.bytes%4 != 0 ) {
-		std::cerr << "ERROR while reading heartbeat. Result cant broken down to int32_t values. Byte count: " << sfi.Hc.bytes << std::endl;
-		return false;
-	}
-	
-	ContollerInfo ci;
-	ci.infoType = CITHeartbeat;
-	ci.command   = sfi.command;
-	
-	sfi.Hc.p = sfi.Hc.result;
-	for (int i=0; i<sfi.Hc.bytes; i+=LONG_BUF_SIZE) {
-		memcpy(&sfi.Hc.value, sfi.Hc.p, LONG_BUF_SIZE);
-		
-		switch (i) {
-			case 0:	ci.heartbeatValue  = sfi.Hc.value; break;
-			case 4:	ci.heartbeatValue += sfi.Hc.value; break;
-		}
-
-		sfi.Hc.p += LONG_BUF_SIZE;
-	}
-	
-	sendSerialControllrCallback(ci);
-	
-	return true;
-}
-///////////////////////////////////////////////////////////////////
 bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
 	if ( (sfi.Lc.bytes = readDataUntilSizeAvailable(sfi.Lc.result, sizeof(sfi.Lc.result))) <= 0 ) {
@@ -1567,6 +1533,69 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 		sfi.Lc.p += LONG_BUF_SIZE;
 	}
 	
+	sendSerialControllrCallback(ci);
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
+///////////////////////////////////////////////////////////////////
+	unsigned char byteCount[1];
+	if ( readDataUntilSizeAvailable(byteCount, sizeof(byteCount)) <= 0 ) {
+		std::cerr << "ERROR while reading heartbeat byte count. Nothing available" << std::endl;
+		return false;
+	}
+
+	int32_t counterValue = 0;
+	if ( (sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, sizeof(sfi.Sc.result))) <= LONG_BUF_SIZE ) {
+		std::cerr << "ERROR while reading heartbeat counter value. Nothing available" << std::endl;
+		return false;
+	}
+	sfi.Sc.p = sfi.Sc.result;
+	memcpy(&counterValue, sfi.Lc.p, LONG_BUF_SIZE);
+	
+	ContollerInfo ci;
+	ci.infoType 		= CITHeartbeat;
+	ci.command   		= sfi.command;
+	ci.heartbeatValue  	= counterValue;
+
+	// if nothing more available . . .
+	if ( byteCount[0] - LONG_BUF_SIZE <= 0 ) {
+		sendSerialControllrCallback(ci);
+		return true;
+	}
+
+	// evaluate further bytes on demand. . .
+	const short ONE_BYTE_SIZE 			= 1;
+	
+	const short LIMIT_STATE_IDX			= 0;
+	const short SUPPORT_STATE_IDX		= 1;
+	const short BYTE_3_IDX				= 2;
+	const short BYTE_4_IDX				= 3;
+
+/*
+ * TODO
+	sfi.Sc.bytes = readDataUntilSizeAvailable(counterValue, byteCount[0]);
+	sfi.Sc.p 	 = sfi.Sc.result;
+	
+	if ( sfi.Sc.bytes != byteCount[0] ) {
+		std::out << "WARNING while reading furter heartbeat bytes. Expected byte count: " << byteCount[0] " received: " << sfi.Sc.bytes << std::endl;
+	}
+	
+	for (int b=0; b<sfi.Sc.bytes; b+=ONE_BYTE_SIZE) {
+		memcpy(&sfi.Sc.value, sfi.Sc.p, ONE_BYTE_SIZE);
+		
+		switch (b) {
+			case LIMIT_STATE_IDX:	ci.limitState   = true; ci.limitStateValue   = sfi.Sc.value; break;
+			case SUPPORT_STATE_IDX:	ci.supportState = true; ci.supportStateValue = sfi.Sc.value; break;
+			case BYTE_3_IDX:		; break;
+			case BYTE_4_IDX:		; break;
+				
+			default: std::cerr << "ERROR while reading state info values. Currently only 4 bytes (int32) possible" << std::endl;
+		}
+
+		sfi.Sc.p += ONE_BYTE_SIZE;
+	}
+*/
 	sendSerialControllrCallback(ci);
 	return true;
 }

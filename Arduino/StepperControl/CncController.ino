@@ -217,7 +217,12 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
   }
 }
 /////////////////////////////////////////////////////////////////////////////////////  
-bool CncController::evaluateSupportButtonState() {
+bool CncController::evaluateToolState() {
+/////////////////////////////////////////////////////////////////////////////////////  
+  return ( digitalRead(TOOL_FEEDBACK_PIN) == TOOL_STATE_ON );
+}
+/////////////////////////////////////////////////////////////////////////////////////  
+bool CncController::evaluateSupportButton1State(unsigned short idx) {
 // true:  button pressed
 // false: button released
 /////////////////////////////////////////////////////////////////////////////////////  
@@ -226,26 +231,39 @@ bool CncController::evaluateSupportButtonState() {
 
   const int msDelay = 5;
 
-  SupportPin::SupportStates ss;
-  ss.readAnalogValue(analogSupportPin, msDelay);
+  CncInterface::ISP::States sp;
+  sp.readAnalogValue(analogSupportPin, msDelay);
 
-  return ss.isSupportButtonPressed();
-}
-/////////////////////////////////////////////////////////////////////////////////////  
-bool CncController::evaluateToolState() {
-/////////////////////////////////////////////////////////////////////////////////////  
-  return ( digitalRead(TOOL_FEEDBACK_PIN) == TOOL_STATE_ON );
+  switch ( idx ) {
+    case 1: return sp.isSupportButton1Pressed();
+    case 2: return sp.isSupportButton1Pressed();
+    case 3: return sp.isSupportButton1Pressed();
+  }
+  
+  return false;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncController::evaluateAnalogLimitPin(LimitSwitch::LimitStates& ls) {
+bool CncController::evaluateAnalogLimitPin(CncInterface::ILS::States& ls) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( isAnalogLimitPinAvailable() == false ) {
-    ls.resetToError(); 
+    ls.reset(); 
     return false;
   }
 
   const int msDelay = 5;
   ls.readAnalogValue(analogLimitPin, msDelay);
+  
+  return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool CncController::evaluateAnalogSupportPin(CncInterface::ISP::States& sp) {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( isAnalogSupportPinAvailable() == false ) {
+    return false;
+  }
+
+  const int msDelay = 5;
+  sp.readAnalogValue(analogSupportPin, msDelay);
   
   return true;
 }
@@ -276,8 +294,9 @@ bool CncController::evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit
   // try to get a better information for unclear behaviurs
   if ( xLimit == LimitSwitch::LIMIT_UNKNOWN || yLimit == LimitSwitch::LIMIT_UNKNOWN || zLimit == LimitSwitch::LIMIT_UNKNOWN ) {
     if ( isAnalogLimitPinAvailable() == true ) {
+      
       // read it from analog pin
-      LimitSwitch::LimitStates ls;
+      CncInterface::ILS::States ls;
       evaluateAnalogLimitPin(ls);
 
       if ( ls. hasError() == false ) {
@@ -297,15 +316,33 @@ bool CncController::evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit
 }
 /////////////////////////////////////////////////////////////////////////////////////
 // This method evaluate the limit states by reading the corresponding pins
-bool CncController::evaluateAndSendLimitStates() {
+bool CncController::evaluateAndSendStates() {
 /////////////////////////////////////////////////////////////////////////////////////
-  long x = LimitSwitch::LIMIT_UNKNOWN;
-  long y = LimitSwitch::LIMIT_UNKNOWN;
-  long z = LimitSwitch::LIMIT_UNKNOWN;
 
-  bool ret = evaluateLimitStates(x, y, z);
-  writeLongValues(PID_LIMIT, x, y, z);
-  return ret;
+  if ( isAnalogLimitPinAvailable() == false) {
+    long x = LimitSwitch::LIMIT_UNKNOWN;
+    long y = LimitSwitch::LIMIT_UNKNOWN;
+    long z = LimitSwitch::LIMIT_UNKNOWN;
+  
+    bool ret = evaluateLimitStates(x, y, z);
+    writeLongValues(PID_LIMIT, x, y, z);
+    return ret;
+  }
+
+  CncInterface::ILS::States ls;
+  evaluateAnalogLimitPin(ls);
+
+  if ( isAnalogSupportPinAvailable() == false ) {
+    sendHeartbeat(ls.getStates());
+    return true;
+  }
+
+  CncInterface::ISP::States sp;
+  evaluateAnalogSupportPin(sp);
+  
+  sendHeartbeat(ls.getStates(), sp.getStates());
+  
+  return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 // This method evaluate the limit states by the current stepper states

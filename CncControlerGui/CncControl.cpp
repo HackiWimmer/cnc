@@ -863,13 +863,29 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	switch ( ci.infoType ) {
 		// --------------------------------------------------------
 		case CITHeartbeat:
-			if ( ci.command == 'T' ) {
+			if ( ci.command == CMD_TEST_START ) {
 				std::stringstream ss;
 				ss << "Heartbeat received - Value: " << ci.heartbeatValue << std::endl;
 				cnc::trc.logInfoMessage(ss);
 			}
+			
+			if ( ci.limitState == true ) {
+				CncInterface::ILS::States ls(ci.limitStateValue);
+				displayLimitStates(ls);
+			}
+			
+			if ( ci.supportState == true ) {
+				//TODO
+			}
+			
 			break;
 			
+		// --------------------------------------------------------
+		case CITLimitInfo:
+			//std::clog << "::L: " << ci.xLimit << ", " << ci.yLimit << ", " << ci.zLimit << std::endl;
+			displayLimitStates(ci.xLimit, ci.yLimit, ci.zLimit);
+			
+			break;
 		// --------------------------------------------------------
 		case CITPosition:
 			// update controller position
@@ -897,12 +913,6 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		case CITSetterInfo:
 			//if ( getSerial()->isSpyOutput() == true )
 			//	cnc::spy << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
-			break;
-		
-		// --------------------------------------------------------
-		case CITLimitInfo:
-			//std::clog << "::L: " << ci.xLimit << ", " << ci.yLimit << ", " << ci.zLimit << std::endl;
-			evaluateLimitState(ci.xLimit, ci.yLimit, ci.zLimit);
 			break;
 		
 		// --------------------------------------------------------
@@ -1348,24 +1358,33 @@ void CncControl::enableStepperMotors(bool s) {
 		GET_GUI_CTL(motorState)->Check(s);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::evaluateLimitState() {
-///////////////////////////////////////////////////////////////////
-	CncLongPosition ls = getControllerLimitState();
-	evaluateLimitState(ls.getX(), ls.getY(), ls.getZ());
-}
-///////////////////////////////////////////////////////////////////
 wxString& CncControl::getLimitInfoString(wxString& ret) {
 ///////////////////////////////////////////////////////////////////
 	return limitStates.getLimitInfoString(ret);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::evaluateLimitState(long x, long y, long z) {
+void CncControl::evaluateLimitState() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	CncLongPosition ls = getControllerLimitState();
+	CncInterface::ILS::States states(ls.getX(), ls.getY(), ls.getZ());
 	
-	limitStates.setXLimit(x);
-	limitStates.setYLimit(y);
-	limitStates.setZLimit(z);
+	displayLimitStates(states);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::displayLimitStates(const int32_t x, const int32_t y, const int32_t z) {
+///////////////////////////////////////////////////////////////////
+	CncInterface::ILS::States ls(x, y, z);
+	displayLimitStates(ls);
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::displayLimitStates(const CncInterface::ILS::States& ls) {
+///////////////////////////////////////////////////////////////////
+	limitStates.setXMinLimit(ls.xMin());
+	limitStates.setXMaxLimit(ls.xMax());
+	limitStates.setYMinLimit(ls.yMin());
+	limitStates.setYMaxLimit(ls.yMax());
+	limitStates.setZMinLimit(ls.zMin());
+	limitStates.setZMaxLimit(ls.zMax());
 	
 	displayLimitState(GET_GUI_CTL(xMinLimit), limitStates.getXMinLimit());
 	displayLimitState(GET_GUI_CTL(xMaxLimit), limitStates.getXMaxLimit());

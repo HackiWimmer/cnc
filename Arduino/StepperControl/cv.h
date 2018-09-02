@@ -3,5 +3,6 @@
 
 #include "CommonValues.h"
 #include "CncSpeedManager.h"
+#include "AnalogPinController/CommonDefinitions.h"
 
 #endif

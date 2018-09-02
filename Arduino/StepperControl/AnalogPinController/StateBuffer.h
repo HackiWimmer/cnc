@@ -9,15 +9,14 @@ inline void headline() {
 }
 
 //-----------------------------------------------------------------
-class ByteState {
+class StateBuffer {
 
   protected:
 
-    static const unsigned short ANALOG_READ_WRITE_FACTOR  = 1024/256;
     static const unsigned int INIT_VALUE                  = 0;
 
     unsigned int pinValue;
-    char stringValue[8];
+    char stringValue[9];
 
     //-------------------------------------------------------------
     bool getBit(unsigned char idx) const { 
@@ -53,11 +52,11 @@ class ByteState {
     void setValue(unsigned int value)  { pinValue = value; }
 
   public:
-    ByteState() 
+    StateBuffer() 
     : pinValue(INIT_VALUE)
     {}
 
-    explicit ByteState(const unsigned int value) 
+    explicit StateBuffer(const unsigned int value) 
     : pinValue(value)
     {}
 
@@ -94,15 +93,16 @@ class ByteState {
     //-------------------------------------------------------------
     virtual const char* getValueAsString() {
       memset(&stringValue, '0', sizeof(stringValue));
+      stringValue[8]= '\0';
       
-      if ( pinValue & 128 ) stringValue[7] = '1';
-      if ( pinValue &  64 ) stringValue[6] = '1';
-      if ( pinValue &  32 ) stringValue[5] = '1';
-      if ( pinValue &  16 ) stringValue[4] = '1';
-      if ( pinValue &   8 ) stringValue[3] = '1';
-      if ( pinValue &   4 ) stringValue[2] = '1';
-      if ( pinValue &   2 ) stringValue[1] = '1';
-      if ( pinValue &   1 ) stringValue[0] = '1';
+      if ( pinValue & 128 ) stringValue[0] = '1';
+      if ( pinValue &  64 ) stringValue[1] = '1';
+      if ( pinValue &  32 ) stringValue[2] = '1';
+      if ( pinValue &  16 ) stringValue[3] = '1';
+      if ( pinValue &   8 ) stringValue[4] = '1';
+      if ( pinValue &   4 ) stringValue[5] = '1';
+      if ( pinValue &   2 ) stringValue[6] = '1';
+      if ( pinValue &   1 ) stringValue[7] = '1';
       
       return stringValue;
     }
@@ -111,7 +111,7 @@ class ByteState {
 
 
     //-------------------------------------------------------------
-    ByteState::PinType getPinType(int pin) {
+    StateBuffer::PinType getPinType(int pin) {
       switch ( pin ) {
         case A0: 
         case A1: 
@@ -125,7 +125,7 @@ class ByteState {
     void initInputPin(int pin, bool value) {
       if ( getPinType(pin) == PT_ANALOG ) {
         pinMode(pin, INPUT);
-        analogWrite(pin, value=HIGH ? 255 : 0);              
+        analogWrite(pin, value == HIGH ? 255 : 0);              
       } else {
         pinMode(pin, INPUT);
         digitalWrite(pin, value);              
@@ -133,7 +133,7 @@ class ByteState {
     }
     //-------------------------------------------------------------
     bool getAnalogStateAsBool(int pin) {
-      return analogRead(pin) == 255;
+      return analogRead(pin) > 0;
     }
     //-------------------------------------------------------------
     bool readPin(int pin) {
@@ -144,33 +144,6 @@ class ByteState {
       return ret;
     }
 
-  public:  
-    
-    //-------------------------------------------------------------
-    unsigned int readAnalogValue(int pin, int msdelay) {
-      if ( msdelay > 0 )
-        delay(msdelay);
-        
-      // consider analogRead delivers values from 0 to 1023
-      int readValue = analogRead(pin);
-    
-      // recalulate the readValue to a range from 0 ... 255
-      //       0:      0,  1,  2,  3
-      //       1:      4,  5,  6,  7
-      //       2:      8,  9, 10, 11
-      //       3:     12, 13, 14, 15
-      //       4:     16, 17, 18, 19
-      // ...
-      // example:   readValue  = 18
-      // offset     = 18 % 4 = 2
-      // writeValue = (18 - 2) / 4 = 4
-       
-      short offset              = readValue % ANALOG_READ_WRITE_FACTOR;
-      unsigned int writtenValue = (readValue - offset) / ANALOG_READ_WRITE_FACTOR;
-    
-      setValue(writtenValue);
-      return writtenValue;
-    }
 };
 
 #endif

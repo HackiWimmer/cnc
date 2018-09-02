@@ -22,7 +22,6 @@ void printConfig() {
   controller.printConfig();
   CncTestSuite::printConfig();
 
-  // Todo append values
   Serial.write(MBYTE_CLOSE);
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -500,7 +499,7 @@ void loop() {
     
           // SB command - Idle handling
           case CMD_IDLE:
-                controller.evaluateAndSendLimitStates();
+                controller.evaluateAndSendStates();
                 break;
 
           // MB command - Movement

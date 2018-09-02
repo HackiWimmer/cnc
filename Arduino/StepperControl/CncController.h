@@ -4,8 +4,7 @@
 #include "CncSpeedManager.h"
 #include "LastErrorCodes.h"
 
-#include "LimitSwitchController/LimitSwitchDefinitions.h"
-#include "LimitSwitchController/SupportPinDefinitions.h"
+#include "AnalogPinController/CncInterface.h"
 
 class CncStepper;
 class CncController {
@@ -45,7 +44,10 @@ class CncController {
     inline bool renderAndStepAxisXY(long x1, long y1);
     inline bool moveXYZ();
 
-    inline bool evaluateAnalogLimitPin(LimitSwitch::LimitStates& ls);
+    inline bool evaluateAnalogLimitPin(CncInterface::ILS::States& ls);
+    inline bool evaluateAnalogSupportPin(CncInterface::ISP::States& ss);
+
+    inline bool evaluateSupportButton1State(unsigned short idx);
 
     //////////////////////////////////////////////////////////////////////////////
   public:
@@ -77,13 +79,15 @@ class CncController {
     //////////////////////////////////////////////////////////////////////////////
     bool evaluateLimitState(const CncStepper* stepper, long& limit);
     bool evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit);
-    bool evaluateAndSendLimitStates();
+    bool evaluateAndSendStates();
 
     //////////////////////////////////////////////////////////////////////////////
     bool evaluateToolState();
 
     //////////////////////////////////////////////////////////////////////////////
-    bool evaluateSupportButtonState();
+    bool evaluateSupportButton1State() { return evaluateSupportButton1State(1); }
+    bool evaluateSupportButton2State() { return evaluateSupportButton1State(2); }
+    bool evaluateSupportButton3State() { return evaluateSupportButton1State(3); }
         
     //////////////////////////////////////////////////////////////////////////////
     void sendCurrentPositions(unsigned char pid, bool force);

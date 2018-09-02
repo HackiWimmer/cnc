@@ -60,6 +60,14 @@ struct SerialFetchInfo {
 		int bytes 						= -1;
 		unsigned int size				= -1;
 	} Lc;
+
+	struct S {
+		unsigned char result[sizeof(int32_t) * 1];
+		unsigned char* p 				= NULL;
+		unsigned char value 			= 0;
+		int bytes 						= -1;
+		unsigned int size				= -1;
+	} Sc;
 	
 	struct T {
 		unsigned char result[sizeof(int32_t) * 1];
@@ -75,12 +83,16 @@ struct ContollerInfo {
 	ControllerInfoType infoType			= CITUnknown;
 	unsigned char command				= '\0';
 	
-	int64_t heartbeatValue				= 0;
+	int32_t heartbeatValue				= 0;
+	bool limitState						= false;
+	bool supportState					= false;
+	unsigned char limitStateValue		= 0;
+	unsigned char supportStateValue		= 0;
 	
 	unsigned char posType				= '\0';
-	int32_t xCtrlPos					= 0L;
-	int32_t yCtrlPos					= 0L;
-	int32_t zCtrlPos					= 0L;
+	int32_t xCtrlPos					= 0;
+	int32_t yCtrlPos					= 0;
+	int32_t zCtrlPos					= 0;
 	
 	double feedSpeed					= MIN_LONG;
 	

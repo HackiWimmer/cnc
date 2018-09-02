@@ -343,7 +343,6 @@ void ArduinoDigitalPins::init() {
 	pins[Z_LIMIT]            = "LIMIT PIN Z";
 	
 	pins[TOOL_PIN]           = "TOOL ENABLE PIN";
-	pins[SUPPORT_PIN]        = "SUPPORT PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoDigitalPins::getPinLabel(unsigned int id) {

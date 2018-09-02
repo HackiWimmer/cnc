@@ -31,9 +31,26 @@ inline bool convertLongToDouble(const long val, double& ret) {
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void writeByteValue(unsigned char val) {
+inline void writeByteValue(unsigned char b) {
 /////////////////////////////////////////////////////////////////////////////////////
-    Serial.write(val);
+    Serial.write(b);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+inline void writeByteValue(unsigned char pid, unsigned char b) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  Serial.write(RET_SOH);
+  Serial.write(pid);
+  writeByteValue(b);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+inline void writeByteValues(unsigned char pid, unsigned char b[], unsigned short size) {
+/////////////////////////////////////////////////////////////////////////////////////
+  Serial.write(RET_SOH);
+  Serial.write(pid);
+  
+  for ( unsigned short i=0; i<size; i++ ) {
+    writeByteValue(b[i]);
+  }
 }
 /////////////////////////////////////////////////////////////////////////////////////
 inline void writeGetterValue(unsigned char pid, long val) {
@@ -106,19 +123,40 @@ inline void writeLongValues(unsigned char pid, long val1, long val2, long val3, 
 /////////////////////////////////////////////////////////////////////////////////////
 inline void sendHeartbeat() {
 /////////////////////////////////////////////////////////////////////////////////////
-  unsigned long val = millis();
-  long v1 = 0;
-  long v2 = 0;
-  
-  if ( val > MAX_LONG ) {
-    v1 = MAX_LONG;
-    v2 = val - MAX_LONG;    
-  } else {
-    v1 = val;
-    v2 = 0;
-  }
+  Serial.write(RET_SOH);
+  Serial.write(PID_HEARTBEAT);
+  Serial.write(sizeof(long));
+  writeLongValue(millis() % MAX_LONG);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+inline void sendHeartbeat(unsigned char limitState) {
+/////////////////////////////////////////////////////////////////////////////////////
+  unsigned char byteCount = sizeof(long) + 4;
 
-  writeLongValues(PID_HEARTBEAT, v1, v2);
+  Serial.write(RET_SOH);
+  Serial.write(PID_HEARTBEAT);
+  Serial.write(byteCount);
+  writeLongValue(millis() % MAX_LONG);
+
+  writeByteValue(limitState);
+  writeByteValue(255);
+  writeByteValue(255);
+  writeByteValue(255);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+inline void sendHeartbeat(unsigned char limitState, unsigned char supportState) {
+/////////////////////////////////////////////////////////////////////////////////////
+  unsigned char byteCount = sizeof(long) + 4;
+
+  Serial.write(RET_SOH);
+  Serial.write(PID_HEARTBEAT);
+  Serial.write(byteCount);
+  writeLongValue(millis() % MAX_LONG);
+
+  writeByteValue(limitState);
+  writeByteValue(supportState);
+  writeByteValue(255);
+  writeByteValue(255);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 inline void pushMessage(const char type, const char* msg) {

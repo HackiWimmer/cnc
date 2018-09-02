@@ -160,7 +160,7 @@ unsigned char CncTestSuite::runMotorConfigInterval() {
     if ( CncTestSuite::checkForTestSuiteEndFlag() == true )
       break;
 
-    if ( supportButton == 1 && controller.evaluateSupportButtonState() == false  ) {
+    if ( supportButton == 1 && controller.evaluateSupportButton1State() == false  ) {
       stepper->enableStepperPin(false);
       delay(500);
       continue;

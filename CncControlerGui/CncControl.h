@@ -107,7 +107,8 @@ class CncControl {
 		// Limit management
 		CncLimitStates limitStates;
 		void displayLimitState(wxStaticText* ctl, bool value);
-		void evaluateLimitState(long x, long y, long z);
+		void displayLimitStates(const int32_t x, const int32_t y, const int32_t z);
+		void displayLimitStates(const CncInterface::ILS::States& ls);
 		
 		// simple move
 		bool prepareSimpleMove(bool enaleEventHandling = true);

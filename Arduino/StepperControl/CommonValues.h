@@ -1,7 +1,8 @@
 #ifndef COMMON_VALUES_H
 #define COMMON_VALUES_H
 
-#include "LimitSwitchController/CommonDefinitions.h"
+#include "AnalogPinController/CommonDefinitions.h"
+#include "AnalogPinController/CncInterface.h"
 
 ////////////////////////////////////////////////////////////////////////
 // common global functions - start
@@ -87,7 +88,7 @@
   const unsigned char CMD_NEG_STEP_Y                      =  'y';
   const unsigned char CMD_POS_STEP_Z                      =  'Z';
   const unsigned char CMD_NEG_STEP_Z                      =  'z';
-  
+
   const unsigned char CMD_MOVE                            =  'm';
   const unsigned char CMD_RENDER_AND_MOVE                 =  'M';
   

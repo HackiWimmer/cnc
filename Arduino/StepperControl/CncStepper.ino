@@ -42,12 +42,12 @@ CncStepper::~CncStepper() {
 long CncStepper::isReadyToRun() {
 /////////////////////////////////////////////////////////////////////////////////////
   long ret = 1;
-  
+
   if ( interrupted == true ) {
     errorInfo.setNextErrorInfo(E_INTERRUPT, BLANK + axis);
     ret = 0;
   }
-  
+
   if ( readLimitState() != LimitSwitch::LIMIT_UNSET ) {
     errorInfo.setNextErrorInfo(E_LIMIT_SWITCH_ACTIVE, BLANK + axis);
     ret = 0;
@@ -466,6 +466,7 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
   }      
   // end step loop ----------------------------------------------
   
+  digitalWrite(directionPin, LOW);
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////

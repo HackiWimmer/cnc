@@ -1,8 +1,8 @@
 
 #define SKETCH_COMPILE = TRUE
 
-#include "LimitSwitchDefinitions.h"
-#include "SupportPinDefinitions.h"
+#include "LimitStates.h"
+#include "SupportStates.h"
 
 // ------------------------------------------------------------
 // Outout Pins - only analog output pins are valid here
@@ -45,9 +45,19 @@ void setup() {
   limitStates.init();
   limitStates.reset();
   writeLimitState();
+
+  pinMode(13, INPUT);
 }
 //-------------------------------------------------------------
 void loop() {
+
+  digitalWrite(13, true);
+  Serial.print(digitalRead(13));
+  Serial.print(", ");
+  digitalWrite(13, false);
+  Serial.print(digitalRead(13));
+  Serial.print(", "); 
+
   // For debugging only
   if ( Serial.available() > 0 ) {
     byte c = Serial.read();
