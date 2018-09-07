@@ -390,13 +390,13 @@ bool Serial::writeData(void *buffer, unsigned int nbByte) {
 	return SerialOSD::writeData(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-void Serial::decodeMessage(const unsigned char* message, std::ostream& mutliByteStream) {
+void Serial::decodeMessage(const unsigned char* mutliByteStream, std::ostream& message) {
 ///////////////////////////////////////////////////////////////////
-	std::stringstream ss((char*)message);
+	std::stringstream ss(mutliByteStream[0] == MT_MID_FLAG ? ArduinoErrorCodes::getECLabel(mutliByteStream[0]) : (char*)mutliByteStream);
 	
 	std::string s;
 	while ( getline(ss, s, '\n') ) {
-		mutliByteStream << s.substr(0, s.length()).c_str()  << std::endl;
+		message << s.substr(0, s.length()).c_str()  << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -499,16 +499,21 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 					value = atoi((s.substr(0,pos)).c_str());
 				
 				if ( pin != -1 && type != -1 && mode != -1 && value != -1 ) {
-					
 					if ( cncControl->hasControllerPinControl() == true ) {
 						cncControl->appendNumKeyValueToControllerPinInfo((type == (int)'D' ? ArduinoDigitalPins::getPinLabel(pin) : ArduinoAnalogPins::getPinLabel(pin)),
                                                                           pin, type, mode, value);
 					} else {
-						mutliByteStream << (type == (int)'D' ? ArduinoDigitalPins::getPinLabel(pin) : ArduinoAnalogPins::getPinLabel(pin)) << ": ";
+						mutliByteStream << (char)type << ":" << (type == (int)'D' ? ArduinoDigitalPins::getPinLabel(pin) : ArduinoAnalogPins::getPinLabel(pin)) << ": ";
 						mutliByteStream	<< (char)type << ": ";
 						mutliByteStream << (char)mode << ": ";
 						mutliByteStream << value << "\n";
 					}
+				} else {
+					mutliByteStream << "Invalid format:\n";
+					mutliByteStream << (char)type << ":";
+					mutliByteStream	<< (char)type << ": ";
+					mutliByteStream << (char)mode << ": ";
+					mutliByteStream << value << "\n";
 				}
 			}
 			break;
@@ -660,7 +665,7 @@ bool Serial::processIdle() {
 	unsigned char* p = cmd;
 	
 	int idx = 0;
-	cmd[idx++] = 'i';
+	cmd[idx++] = CMD_IDLE;
 	p++;
 	
 	if ( traceSpyInfo && spyWrite ) {
@@ -713,7 +718,7 @@ bool Serial::processTest(int32_t testId) {
 	unsigned char* p = cmd;
 	
 	int idx = 0;
-	cmd[idx++] = 'T';
+	cmd[idx++] = CMD_TEST_START;
 	p++;
 	
 	testId = htonl(testId);
@@ -768,7 +773,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	unsigned char* p = cmd;
 	
 	int idx = 0;
-	cmd[idx++] = 'S';
+	cmd[idx++] = CMD_SETTER;
 	p++;
 	
 	cmd[idx++] = pid;
@@ -813,10 +818,10 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
+bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
-		std::cerr << "SERIAL::processSetter()::ERROR: Not connected\n";
+		std::cerr << "SERIAL::processGetter()::ERROR: Not connected\n";
 		return false;
 	}
 	
@@ -824,7 +829,7 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 		return true;
 	
 	unsigned char cmd[2];
-	cmd[0] = 'G';
+	cmd[0] = CMD_GETTER;
 	cmd[1] = pid;
 	
 	if ( isCommandRunning ) {
@@ -855,6 +860,78 @@ bool Serial::processGetter(unsigned char pid, std::vector<int32_t>& list) {
 		
 	} else {
 		std::cerr << "Serial::processGetter: Unable to write data" << std::endl;
+		cncControl->SerialCallback(0);
+		return false;
+	}
+	
+	return false;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::processGetterList(PidList pidList, GetterListValues& map) {
+///////////////////////////////////////////////////////////////////
+	if ( isConnected() == false ) {
+		std::cerr << "SERIAL::processGetter()::ERROR: Not connected\n";
+		return false;
+	}
+	
+	if ( writeOnlyMoveCommands == true )
+		return true;
+		
+	const int CMD_PFREFIX 		=   2;
+	const int MAX_PID_LIST_SIZE = 250; // max 255 regading unsigned char
+	
+	if ( pidList.size() > MAX_PID_LIST_SIZE ) {
+		std::cerr << "SERIAL::processGetterList()::ERROR: Too much pids. Max=254; received:" << pidList.size() << "\n";
+		return false;
+	}
+	
+	unsigned char cmd[MAX_PID_LIST_SIZE + CMD_PFREFIX];
+	
+	cmd[0] = CMD_GETTER_LIST;
+	cmd[1] = (unsigned char)pidList.size();
+		
+	if ( isCommandRunning ) {
+		std::clog << "Serial::processGetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][size=" << pidList.size() << "]\n";
+		return true;
+	}
+	
+	if ( traceSpyInfo && spyWrite ) {
+		cnc::spy.initializeResult();
+		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((cmd[1])) << "][";
+		
+		for (PidList::iterator it = pidList.begin() ; it != pidList.end(); ++it) {
+			
+			if ( it != pidList.begin() )
+				cnc::spy << ',';
+			
+    		cnc::spy << ArduinoPIDs::getPIDLabel(*it);
+		}
+		cnc::spy << "]\n";
+	}
+
+	// append pid list
+	unsigned char idx = CMD_PFREFIX;
+	for (PidList::iterator it = pidList.begin() ; it != pidList.end(); ++it, idx++)
+		cmd[idx] = *it;
+	
+	map.clear();
+	
+	if ( writeData((char*)cmd, idx) ) {
+		// only a dummy here
+		CncLongPosition pos(0,0,0);
+		
+		SerialFetchInfo sfi;
+		sfi.command = cmd[0];
+		sfi.singleFetchTimeout = 100;
+		sfi.retSOHAllowed = true;
+		sfi.returnAfterSOH = true;
+		sfi.Gc.map = &map;
+
+		return evaluateResultWrapper(sfi, std::cout, pos);
+		
+	} else {
+		std::cerr << "Serial::processGetterList: Unable to write data" << std::endl;
 		cncControl->SerialCallback(0);
 		return false;
 	}
@@ -1343,9 +1420,9 @@ bool Serial::RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	// read first byte (content info) after RET_SOH
-	unsigned char cr = fetchControllerResult(sfi.singleFetchTimeout);
+	unsigned char pid = fetchControllerResult(sfi.singleFetchTimeout);
 	
-	if ( cr == RET_ERROR ) {
+	if ( pid == RET_ERROR ) {
 		wxString msg("Serial::RET_SOH_Handler: Can't read content info");
 		std::cerr << msg<< std::endl;
 		cnc::spy.finalizeERROR(msg);
@@ -1354,10 +1431,13 @@ bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 	
 	switch ( sfi.command ) {
 		//RET_SOH_Handler..........................................
-		case 'G': 		return decodeGetter(sfi);
+		case CMD_GETTER: 		return decodeGetter(pid, sfi);
+
+		//RET_SOH_Handler..........................................
+		case CMD_GETTER_LIST: 	return decodeGetterList(pid, sfi);
 		
 		//RET_SOH_Handler..........................................
-		default:		return decode_RET_SOH_Default(cr, sfi);
+		default:				return decode_RET_SOH_Default(pid, sfi);
 	}
 
 	// should not occur
@@ -1365,14 +1445,14 @@ bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
+bool Serial::decode_RET_SOH_Default(unsigned char pid, SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
-	if ( cr == RET_ERROR ) {
+	if ( pid == RET_ERROR ) {
 		std::cerr << "Serial::decode_RET_SOH_Default: Can't read content info" << std::endl;
 		return false;
 	}
 
-	switch( cr ) {
+	switch( pid ) {
 		
 		//RET_SOH_Handler..........................................
 		case PID_HEARTBEAT:			return decodeHeartbeat(sfi);
@@ -1383,7 +1463,7 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 		case PID_Z_POS:
 		case PID_XYZ_POS:
 		case PID_XYZ_POS_MAJOR:
-		case PID_XYZ_POS_DETAIL:	return decodePositionInfo(sfi, cr);
+		case PID_XYZ_POS_DETAIL:	return decodePositionInfo(pid, sfi);
 		
 		//RET_SOH_Handler..........................................
 		case PID_LIMIT:				return decodeLimitInfo(sfi);
@@ -1391,7 +1471,7 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 		//RET_SOH_Handler..........................................
 		default:
 		{
-			std::cerr << "Serial::decode_RET_SOH_Default: Undefined content info: " << ArduinoPIDs::getPIDLabel((int)cr) << std::endl;
+			std::cerr << "Serial::decode_RET_SOH_Default: Undefined content info: " << ArduinoPIDs::getPIDLabel((int)pid) << std::endl;
 			return false;
 		}
 	}
@@ -1400,51 +1480,47 @@ bool Serial::decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi) {
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::decodeGetter(SerialFetchInfo& sfi) {
+bool Serial::decodeGetterList(unsigned char pid, SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
-	// first read getter count
+	// read getter request count
 	if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, 1, sfi.Gc.timeout) ) != 1 ) {
-		std::cerr << "Serial::decodeGetter: Read of getter count failed." << std::endl;
+		std::cerr << "Serial::decodeGetter: Read of getter list count failed." << std::endl;
 		return false;
 	}
-	
-	// determine value count
-	sfi.Gc.count = (int)sfi.Gc.result[0];
-	
+
 	// error handling
-	if ( sfi.Gc.count <= 0 ) {
-		std::cerr << "Serial::decodeGetter: Read failed, nothing available." << std::endl;
+	if ( sfi.Gc.map == NULL ) {
+		std::cerr << "Serial::decodeGetterList: Invalid map" << std::endl;
 		return false;
 	}
-	
-	// error handling
-	if ( sfi.Gc.count > 32 ) {
-		std::cerr << "Serial::decodeGetter: Read failed, to much values!. Received count: " << sfi.Gc.bytes << std::endl;
-		return false;
-	}
-	
-	// error handling
-	if ( sfi.Gc.list == NULL ) {
-		std::cerr << "Serial::RET_SOT_Handler: Invalid list" << std::endl;
-		return false;
-	}
-	
-	// fetch the values
-	int count = sfi.Gc.count;
-	for ( int i=0; i<count; i++ ) {
-		
-		if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, LONG_BUF_SIZE, sfi.Gc.timeout) ) != LONG_BUF_SIZE ) {
-			std::cerr << "Serial::decodeGetter: Read failed. Size error! Received size: " << sfi.Gc.bytes << std::endl;
+
+	// over all requests
+	unsigned char getterValueCount = sfi.Gc.result[0];
+	for ( unsigned char i=0; i<getterValueCount; i++ ) {
+		GetterValues list;
+		sfi.Gc.list = &list;
+
+		// read next sub pid
+		if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, 1, sfi.Gc.timeout) ) != 1 ) {
+			std::cerr << "Serial::decodeGetterList: No more pids available." << std::endl;
 			return false;
 		}
 		
-		memcpy(&sfi.Gc.value, sfi.Gc.result, LONG_BUF_SIZE);
-		sfi.Gc.list->push_back(sfi.Gc.value);
+		unsigned char subPid = sfi.Gc.result[0];
+		const bool DO_NOT_FINALIZE = false;
+			
+		if ( decodeGetter(subPid, sfi, DO_NOT_FINALIZE) == false) {
+			std::cerr << "Serial::decodeGetterList: call of decodeGetter(...) failed. SubPid: " << ArduinoPIDs::getPIDLabel(subPid) << std::endl;
+			return false; 
+		}
+		
+		// store the results
+		(*sfi.Gc.map)[subPid] = *sfi.Gc.list;
 	}
 	
 	// read return code
 	if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, 1, sfi.Gc.timeout) ) != 1 ) {
-		std::cerr << "Serial::decodeGetter: Read return code failed." << std::endl;
+		std::cerr << "Serial::decodeGetterList: Read return code failed." << std::endl;
 		return false;
 	}
 	
@@ -1454,7 +1530,65 @@ bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 	return (sfi.Gc.result[0] == RET_OK);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid) {
+bool Serial::decodeGetter(unsigned char pid, SerialFetchInfo& sfi, bool finalize) {
+///////////////////////////////////////////////////////////////////
+	// first read getter count
+	if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, 1, sfi.Gc.timeout) ) != 1 ) {
+		std::cerr << "Serial::decodeGetter: Read of getter count failed. PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+		return false;
+	}
+	
+	// determine value count
+	sfi.Gc.count = (int)sfi.Gc.result[0];
+	
+	// error handling
+	if ( sfi.Gc.count <= 0 ) {
+		std::cerr << "Serial::decodeGetter: Read failed, nothing available. PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+		return false;
+	}
+	
+	// error handling
+	if ( sfi.Gc.count > 32 ) {
+		std::cerr << "Serial::decodeGetter: Read failed, too much values!. Received count: " << sfi.Gc.bytes << "; PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+		return false;
+	}
+	
+	// error handling
+	if ( sfi.Gc.list == NULL ) {
+		std::cerr << "Serial::RET_SOT_Handler: Invalid list. PID" << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+		return false;
+	}
+	
+	// fetch the values
+	int count = sfi.Gc.count;
+	for ( int i=0; i<count; i++ ) {
+		
+		if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, LONG_BUF_SIZE, sfi.Gc.timeout) ) != LONG_BUF_SIZE ) {
+			std::cerr << "Serial::decodeGetter: Read failed. Size error! Received size: " << sfi.Gc.bytes << "; PID" << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+			return false;
+		}
+		
+		memcpy(&sfi.Gc.value, sfi.Gc.result, LONG_BUF_SIZE);
+		sfi.Gc.list->push_back(sfi.Gc.value);
+	}
+	
+	if ( finalize == true ) {
+		// read return code
+		if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, 1, sfi.Gc.timeout) ) != 1 ) {
+			std::cerr << "Serial::decodeGetter: Read return code failed. PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+			return false;
+		}
+		
+		if ( traceSpyInfo )
+			cnc::spy.finalizeOK();
+	} else {
+		sfi.Gc.result[0] = RET_OK;
+	}
+	
+	return (sfi.Gc.result[0] == RET_OK);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = LONG_BUF_SIZE;
 	if ( pid == PID_XYZ_POS || pid == PID_XYZ_POS_MAJOR || pid == PID_XYZ_POS_DETAIL )
@@ -1546,7 +1680,7 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 	}
 
 	int32_t counterValue = 0;
-	if ( (sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, sizeof(sfi.Sc.result))) <= LONG_BUF_SIZE ) {
+	if ( (sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, sizeof(sfi.Sc.result))) <= (int)LONG_BUF_SIZE ) {
 		std::cerr << "ERROR while reading heartbeat counter value. Nothing available" << std::endl;
 		return false;
 	}
@@ -1572,30 +1706,34 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 	const short BYTE_3_IDX				= 2;
 	const short BYTE_4_IDX				= 3;
 
-/*
- * TODO
-	sfi.Sc.bytes = readDataUntilSizeAvailable(counterValue, byteCount[0]);
+	if ( (unsigned int)byteCount[0] > sizeof(sfi.Sc.result) ) {
+		std::cerr << "ERROR while reading further heartbeat content, more space needed" << std::endl;
+		return false;
+	}
+
+	sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, (unsigned int)byteCount[0]);
 	sfi.Sc.p 	 = sfi.Sc.result;
 	
 	if ( sfi.Sc.bytes != byteCount[0] ) {
-		std::out << "WARNING while reading furter heartbeat bytes. Expected byte count: " << byteCount[0] " received: " << sfi.Sc.bytes << std::endl;
+		std::cerr << "WARNING while reading furter heartbeat bytes. Expected byte count: " << (unsigned int)byteCount[0];
+		std::cerr << " received: " << sfi.Sc.bytes << std::endl;
 	}
 	
 	for (int b=0; b<sfi.Sc.bytes; b+=ONE_BYTE_SIZE) {
 		memcpy(&sfi.Sc.value, sfi.Sc.p, ONE_BYTE_SIZE);
 		
 		switch (b) {
-			case LIMIT_STATE_IDX:	ci.limitState   = true; ci.limitStateValue   = sfi.Sc.value; break;
-			case SUPPORT_STATE_IDX:	ci.supportState = true; ci.supportStateValue = sfi.Sc.value; break;
-			case BYTE_3_IDX:		; break;
-			case BYTE_4_IDX:		; break;
+			case LIMIT_STATE_IDX:		ci.limitState   = true; ci.limitStateValue   = sfi.Sc.value; break;
+			case SUPPORT_STATE_IDX:		ci.supportState = true; ci.supportStateValue = sfi.Sc.value; break;
+			case BYTE_3_IDX:			; break;
+			case BYTE_4_IDX:			; break;
 				
 			default: std::cerr << "ERROR while reading state info values. Currently only 4 bytes (int32) possible" << std::endl;
 		}
 
 		sfi.Sc.p += ONE_BYTE_SIZE;
 	}
-*/
+
 	sendSerialControllrCallback(ci);
 	return true;
 }

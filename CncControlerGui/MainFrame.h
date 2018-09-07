@@ -5,6 +5,7 @@
 #include <wx/wx.h>
 #include <wx/notifmsg.h>
 #include <wx/generic/notifmsg.h>
+#include <wx/event.h>
 #include "NotebookInfo.h"
 #include "LruFileList.h"
 #include "FileParser.h"
@@ -78,7 +79,20 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void cmLeftDClick(wxMouseEvent& event);
+
+    virtual void requestHeartbeat(wxCommandEvent& event);
 		
+		virtual void changeCmSpeedSlider(wxScrollEvent& event);
+		virtual void cmLeftUp(wxMouseEvent& event);
+		virtual void cmXnegLeftDown(wxMouseEvent& event);
+		virtual void cmXposLeftDown(wxMouseEvent& event);
+		virtual void cmYnegLeftDown(wxMouseEvent& event);
+		virtual void cmYposLeftDown(wxMouseEvent& event);
+		virtual void cmZnegLeftDown(wxMouseEvent& event);
+		virtual void cmZposLeftDown(wxMouseEvent& event);
+		virtual void cmKillFocus(wxFocusEvent& event);
+		virtual void cmLeave(wxMouseEvent& event);
 		virtual void clearControllerErrorInfoFromButton(wxCommandEvent& event);
 		virtual void requestResetErrorInfo(wxCommandEvent& event);
 		virtual void resetControllerErrorInfoFromButton(wxCommandEvent& event);
@@ -516,6 +530,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
 		
+		void manualContinuousMoveStart(wxWindow* ctrl, bool x, bool y, bool z, const CncDirection dir);
+		void manualContinuousMoveStop();
+	
 		void setIcons();
 		
 		void traceGccVersion(std::ostream& out);

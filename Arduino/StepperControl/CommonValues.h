@@ -25,32 +25,32 @@
 // .....................................................................
 
   const unsigned char MAX_PINS                            =  32;
-  const unsigned char X_STP                               =   2;
-  const unsigned char Y_STP                               =   3;
-  const unsigned char Z_STP                               =   4;
-  const unsigned char X_DIR                               =   5;
-  const unsigned char Y_DIR                               =   6;
-  const unsigned char Z_DIR                               =   7;
+  const unsigned char PIN_X_STP                           =   2;
+  const unsigned char PIN_Y_STP                           =   3;
+  const unsigned char PIN_Z_STP                           =   4;
+  const unsigned char PIN_X_DIR                           =   5;
+  const unsigned char PIN_Y_DIR                           =   6;
+  const unsigned char PIN_Z_DIR                           =   7;
 
-  const unsigned char ENABLE_PIN                          =   8;
+  const unsigned char PIN_ENABLE                          =   8;
 
-  const unsigned char X_LIMIT                             =   9;
-  const unsigned char Y_LIMIT                             =  10;
-  const unsigned char Z_LIMIT                             =  11;
+  const unsigned char PIN_X_LIMIT                         =   9;
+  const unsigned char PIN_Y_LIMIT                         =  10;
+  const unsigned char PIN_Z_LIMIT                         =  11;
 
-  const unsigned char TOOL_PIN                            =  12;
-  const unsigned char TOOL_FEEDBACK_PIN                   =  13;
+  const unsigned char PIN_TOOL_ENABLE                     =  12;
+  const unsigned char PIN_TOOL_FEEDBACK                   =  13;
 
-  #define INTERRUPT_LED                                      A3
-  const unsigned char INTERRUPT_LED_ID                    =   3;
+  #define PIN_INTERRUPT_LED                                  A3
+  const unsigned char PIN_INTERRUPT_LED_ID                =   3;
 
-  #define ANALOG_LIMIT_PIN                                   A4
-  const unsigned char ANALOG_LIMIT_PIN_ID                 =   4;
-  const unsigned char ANALOG_LIMIT_PIN_OFF                = 255;
+  #define PIN_ANALOG_LIMIT                                   A4
+  const unsigned char PIN_ANALOG_LIMIT_ID                 =   4;
+  const unsigned char PIN_ANALOG_LIMIT_OFF                = 255;
 
-  #define ANALOG_SUPPORT_PIN                                 A5
-  const unsigned char ANALOG_SUPPORT_PIN_ID               =   5;
-  const unsigned char ANALOG_SUPPORT_PIN_OFF              = 255;
+  #define PIN_ANALOG_SUPPORT                                 A5
+  const unsigned char PIN_ANALOG_SUPPORT_ID               =   5;
+  const unsigned char PIN_ANALOG_SUPPORT_OFF              = 255;
   
 // .....................................................................
 // Signals
@@ -78,6 +78,7 @@
   
   const unsigned char CMD_SETTER                          =  'S';
   const unsigned char CMD_GETTER                          =  'G';
+  const unsigned char CMD_GETTER_LIST                     =  'g';
   
   const unsigned char CMD_ENABLE_STEPPER_PIN              =  'E';
   const unsigned char CMD_DISABLE_STEPPER_PIN             =  'e';
@@ -127,7 +128,7 @@
 // .....................................................................
 
   const unsigned char MAX_PIDS                            = 255;
-  const unsigned char PID_UNKNOWN                         = 254;
+  const unsigned char PID_UNKNOWN                         = 241;
   
   const unsigned char PID_RESERVED_RANGE_START            =   1;
   const unsigned char PID_RESERVED_RANGE_END              =  19;
@@ -170,7 +171,8 @@
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_X     =  26;
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_Y     =  27;
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_Z     =  28;
-
+  const unsigned char PID_GETTER_LIST                     =  29;
+  
   const unsigned char PID_SPEED_OFFSET                    =  30;
   const unsigned char PID_SPEED_OFFSET_X                  =  31;
   const unsigned char PID_SPEED_OFFSET_Y                  =  32;
@@ -187,6 +189,7 @@
   const unsigned char PID_Y_LIMIT                         =  45;
   const unsigned char PID_Z_LIMIT                         =  46;
   const unsigned char PID_ANALOG_LIMIT_PIN                =  47;
+  const unsigned char PID_ANALOG_SUPPORT_PIN              =  48;
 
   const unsigned char PID_CONTROLLER                      =  50;
   const unsigned char PID_ROUTER_SWITCH                   =  51;
@@ -287,6 +290,8 @@
 // Message types
 // .....................................................................
 
+  const unsigned char MT_MID_FLAG                         =  '#';
+  
   const unsigned char MT_INFO                             =  'I';
   const unsigned char MT_WARNING                          =  'W';
   const unsigned char MT_ERROR                            =  'E';
@@ -302,7 +307,8 @@
   const unsigned char E_INVALID_PARAM_STREAM              =   3;
   const unsigned char E_GETTER_ID_NOT_FOUND               =   4;
   const unsigned char E_INVALID_GETTER_ID                 =   5;
-  const unsigned char E_INVALID_MOVE_CMD                  =   6;
+  const unsigned char E_INVALID_GETTER_LIST_COUNT         =   6;
+  const unsigned char E_INVALID_MOVE_CMD                  =   7;
 
   const unsigned char E_INVALID_TEST_ID                   =  10;
   const unsigned char E_NOT_KNOWN_TEST_ID                 =  11;

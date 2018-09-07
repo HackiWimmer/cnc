@@ -128,7 +128,7 @@ class GLContextBase : public wxGLContext {
 					wxColour x, y, z;
 					
 					Colours() 
-					: x(255, 0, 0), y(27, 139, 61), z(0, 0, 255)
+					: x(255, 0, 0), y(0, 0, 255), z(27, 139, 61)
 					{}
 				};
 			

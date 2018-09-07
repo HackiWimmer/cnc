@@ -1135,166 +1135,404 @@
                                   <style>wxLI_HORIZONTAL</style>
                                 </object>
                               </object>
-                              <object class="sizeritem" name="flexGridSizer547">
+                              <object class="sizeritem">
                                 <flag>wxALL|wxEXPAND</flag>
-                                <option>1</option>
-                                <object class="wxFlexGridSizer">
-                                  <cols>3</cols>
-                                  <rows>18</rows>
-                                  <vgap>1</vgap>
-                                  <hgap>0</hgap>
-                                  <growablecols>1</growablecols>
-                                  <growablerows>1,4</growablerows>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="m_staticText821">
-                                      <label/>
-                                      <style/>
+                                <border>5</border>
+                                <object class="wxNotebook" name="m_manualMotionControl">
+                                  <style>wxBK_DEFAULT</style>
+                                  <font>
+                                    <size>9</size>
+                                    <style>normal</style>
+                                    <weight>bold</weight>
+                                    <family>swiss</family>
+                                    <underlined>0</underlined>
+                                    <face>Segoe UI</face>
+                                  </font>
+                                  <object class="notebookpage">
+                                    <label>Navigator</label>
+                                    <selected>0</selected>
+                                    <object class="wxPanel" name="m_panel5187">
+                                      <style>wxTAB_TRAVERSAL</style>
+                                      <object class="wxFlexGridSizer">
+                                        <cols>1</cols>
+                                        <rows>2</rows>
+                                        <vgap>0</vgap>
+                                        <hgap>0</hgap>
+                                        <growablecols>0</growablecols>
+                                        <growablerows>1</growablerows>
+                                        <object class="sizeritem" name="flexGridSizer5206">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <option>1</option>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>4</cols>
+                                            <rows>1</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols>1</growablecols>
+                                            <growablerows>0</growablerows>
+                                            <object class="sizeritem">
+                                              <flag>wxALL</flag>
+                                              <border>2</border>
+                                              <object class="wxStaticText" name="m_staticText5208">
+                                                <label>Speed [%max]:</label>
+                                                <style/>
+                                                <font>
+                                                  <size>9</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <object class="wxSlider" name="m_cmSpeedSlider">
+                                                <style>wxSL_SELRANGE|wxSL_HORIZONTAL</style>
+                                                <font>
+                                                  <size>9</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                                <min>0</min>
+                                                <max>100</max>
+                                                <value>80</value>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL</flag>
+                                              <border>2</border>
+                                              <minsize>20,-1</minsize>
+                                              <object class="wxStaticText" name="m_cmSpeedValue">
+                                                <label>100</label>
+                                                <style/>
+                                                <font>
+                                                  <size>9</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL</flag>
+                                              <border>2</border>
+                                              <object class="wxStaticText" name="m_staticText5216">
+                                                <label>%</label>
+                                                <style/>
+                                                <font>
+                                                  <size>9</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                              </object>
+                                            </object>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem" name="flexGridSizer5189">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>5</border>
+                                          <option>1</option>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>2</cols>
+                                            <rows>3</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols>0,1</growablecols>
+                                            <growablerows>0,1,2</growablerows>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>5</border>
+                                              <object class="wxButton" name="m_cmXneg">
+                                                <label>-X</label>
+                                                <style/>
+                                                <bg>#FF8080</bg>
+                                                <font>
+                                                  <size>18</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                                <bitmapposition>wxLEFT</bitmapposition>
+                                                <default>0</default>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>5</border>
+                                              <object class="wxButton" name="m_cmXpos">
+                                                <label>+X</label>
+                                                <style/>
+                                                <bg>#FF8080</bg>
+                                                <font>
+                                                  <size>18</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                                <bitmapposition>wxLEFT</bitmapposition>
+                                                <default>0</default>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>5</border>
+                                              <object class="wxButton" name="m_cmYneg">
+                                                <label>-Y</label>
+                                                <style/>
+                                                <bg>#0080C0</bg>
+                                                <font>
+                                                  <size>18</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                                <bitmapposition>wxLEFT</bitmapposition>
+                                                <default>0</default>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>5</border>
+                                              <object class="wxButton" name="m_cmYpos">
+                                                <label>+Y</label>
+                                                <style/>
+                                                <bg>#0080C0</bg>
+                                                <font>
+                                                  <size>18</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                                <bitmapposition>wxLEFT</bitmapposition>
+                                                <default>0</default>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>5</border>
+                                              <object class="wxButton" name="m_cmZneg">
+                                                <label>-Z</label>
+                                                <style/>
+                                                <bg>#008000</bg>
+                                                <font>
+                                                  <size>18</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                                <bitmapposition>wxLEFT</bitmapposition>
+                                                <default>0</default>
+                                              </object>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL|wxEXPAND</flag>
+                                              <border>5</border>
+                                              <object class="wxButton" name="m_cmZpos">
+                                                <label>+Z</label>
+                                                <style/>
+                                                <bg>#008000</bg>
+                                                <font>
+                                                  <size>18</size>
+                                                  <style>normal</style>
+                                                  <weight>bold</weight>
+                                                  <family>swiss</family>
+                                                  <underlined>0</underlined>
+                                                  <face>Segoe UI</face>
+                                                </font>
+                                                <bitmapposition>wxLEFT</bitmapposition>
+                                                <default>0</default>
+                                              </object>
+                                            </object>
+                                          </object>
+                                        </object>
+                                      </object>
                                     </object>
                                   </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL|wxEXPAND</flag>
-                                    <border>2</border>
-                                    <object class="wxSpinButton" name="m_spinButtonX">
-                                      <style>wxSP_HORIZONTAL</style>
-                                      <value>0</value>
-                                      <min>0</min>
-                                      <max>100</max>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="m_staticText63169">
-                                      <label>+x</label>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL|wxEXPAND</flag>
-                                    <border>2</border>
-                                    <object class="wxSpinButton" name="m_spinButtonY">
-                                      <style>wxSP_VERTICAL</style>
-                                      <value>0</value>
-                                      <min>0</min>
-                                      <max>100</max>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL|wxEXPAND</flag>
-                                    <border>2</border>
-                                    <object class="wxTextCtrl" name="m_moveXYAxisCtl">
-                                      <style>wxTE_MULTILINE|wxHSCROLL</style>
-                                      <fg>#004080</fg>
-                                      <font>
-                                        <size>8</size>
-                                        <style>normal</style>
-                                        <weight>normal</weight>
-                                        <family>modern</family>
-                                        <underlined>0</underlined>
-                                        <face>Courier New</face>
-                                      </font>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxStaticText" name="m_staticText823">
-                                      <label/>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>2</border>
-                                    <object class="wxStaticText" name="m_staticText6316">
-                                      <label>+y</label>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>2</border>
-                                    <object class="wxStaticText" name="m_staticText825">
-                                      <label/>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>2</border>
-                                    <object class="wxStaticText" name="m_staticText827">
-                                      <label/>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>2</border>
-                                    <object class="wxStaticText" name="m_staticText631">
-                                      <label>+z</label>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>2</border>
-                                    <object class="wxStaticText" name="m_staticText832">
-                                      <label/>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <border>2</border>
-                                    <object class="wxStaticText" name="m_staticText834">
-                                      <label/>
-                                      <style/>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL|wxEXPAND</flag>
-                                    <border>2</border>
-                                    <object class="wxSpinButton" name="m_spinButtonZ">
-                                      <style>wxSP_VERTICAL</style>
-                                      <value>0</value>
-                                      <min>0</min>
-                                      <max>100</max>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL|wxEXPAND</flag>
-                                    <border>2</border>
-                                    <object class="wxTextCtrl" name="m_moveZAxisCtl">
-                                      <style>wxTE_MULTILINE|wxHSCROLL</style>
-                                      <fg>#004080</fg>
-                                      <font>
-                                        <size>8</size>
-                                        <style>normal</style>
-                                        <weight>normal</weight>
-                                        <family>modern</family>
-                                        <underlined>0</underlined>
-                                        <face>Courier New</face>
-                                      </font>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <minsize>-1,1</minsize>
-                                    <object class="wxStaticText" name="m_staticText830">
-                                      <label/>
-                                      <style/>
-                                      <size>-1,1</size>
-                                    </object>
-                                  </object>
-                                  <object class="sizeritem">
-                                    <flag>wxALL</flag>
-                                    <minsize>-1,1</minsize>
-                                    <object class="wxStaticText" name="m_staticText836">
-                                      <label/>
-                                      <style/>
-                                      <size>-1,1</size>
+                                  <object class="notebookpage">
+                                    <label>Old</label>
+                                    <selected>0</selected>
+                                    <object class="wxPanel" name="m_panel5185">
+                                      <style>wxTAB_TRAVERSAL</style>
+                                      <object class="wxFlexGridSizer">
+                                        <cols>3</cols>
+                                        <rows>18</rows>
+                                        <vgap>1</vgap>
+                                        <hgap>0</hgap>
+                                        <growablecols>1</growablecols>
+                                        <growablerows>1,4</growablerows>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>5</border>
+                                          <object class="wxStaticText" name="m_staticText821">
+                                            <label/>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>2</border>
+                                          <object class="wxSpinButton" name="m_spinButtonX">
+                                            <style>wxSP_HORIZONTAL</style>
+                                            <value>0</value>
+                                            <min>0</min>
+                                            <max>100</max>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>5</border>
+                                          <object class="wxStaticText" name="m_staticText63169">
+                                            <label>+x</label>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>2</border>
+                                          <object class="wxSpinButton" name="m_spinButtonY">
+                                            <style>wxSP_VERTICAL</style>
+                                            <value>0</value>
+                                            <min>0</min>
+                                            <max>100</max>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>2</border>
+                                          <object class="wxTextCtrl" name="m_moveXYAxisCtl">
+                                            <style>wxTE_MULTILINE|wxHSCROLL</style>
+                                            <fg>#004080</fg>
+                                            <font>
+                                              <size>8</size>
+                                              <style>normal</style>
+                                              <weight>normal</weight>
+                                              <family>modern</family>
+                                              <underlined>0</underlined>
+                                              <face>Courier New</face>
+                                            </font>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>5</border>
+                                          <object class="wxStaticText" name="m_staticText823">
+                                            <label/>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>2</border>
+                                          <object class="wxStaticText" name="m_staticText6316">
+                                            <label>+y</label>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>2</border>
+                                          <object class="wxStaticText" name="m_staticText825">
+                                            <label/>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>2</border>
+                                          <object class="wxStaticText" name="m_staticText827">
+                                            <label/>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>2</border>
+                                          <object class="wxStaticText" name="m_staticText631">
+                                            <label>+z</label>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>2</border>
+                                          <object class="wxStaticText" name="m_staticText832">
+                                            <label/>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>2</border>
+                                          <object class="wxStaticText" name="m_staticText834">
+                                            <label/>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>2</border>
+                                          <object class="wxSpinButton" name="m_spinButtonZ">
+                                            <style>wxSP_VERTICAL</style>
+                                            <value>0</value>
+                                            <min>0</min>
+                                            <max>100</max>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>2</border>
+                                          <object class="wxTextCtrl" name="m_moveZAxisCtl">
+                                            <style>wxTE_MULTILINE|wxHSCROLL</style>
+                                            <fg>#004080</fg>
+                                            <font>
+                                              <size>8</size>
+                                              <style>normal</style>
+                                              <weight>normal</weight>
+                                              <family>modern</family>
+                                              <underlined>0</underlined>
+                                              <face>Courier New</face>
+                                            </font>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <minsize>-1,1</minsize>
+                                          <object class="wxStaticText" name="m_staticText830">
+                                            <label/>
+                                            <style/>
+                                            <size>-1,1</size>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <minsize>-1,1</minsize>
+                                          <object class="wxStaticText" name="m_staticText836">
+                                            <label/>
+                                            <style/>
+                                            <size>-1,1</size>
+                                          </object>
+                                        </object>
+                                      </object>
                                     </object>
                                   </object>
                                 </object>
@@ -2360,7 +2598,7 @@
                                         <object class="wxStaticText" name="m_staticText797">
                                           <label>Y:</label>
                                           <style/>
-                                          <fg>#008000</fg>
+                                          <fg>#0080C0</fg>
                                           <font>
                                             <size>9</size>
                                             <style>normal</style>
@@ -2398,7 +2636,7 @@
                                         <object class="wxTextCtrl" name="m_metricY">
                                           <style>wxTE_RIGHT</style>
                                           <size>120,-1</size>
-                                          <bg>#008000</bg>
+                                          <bg>#0080C0</bg>
                                           <fg>#FFFFFF</fg>
                                           <value>0.000</value>
                                         </object>
@@ -2523,7 +2761,7 @@
                                         <object class="wxStaticText" name="m_staticText7973">
                                           <label>Z:</label>
                                           <style/>
-                                          <fg>#0000FF</fg>
+                                          <fg>#008000</fg>
                                           <font>
                                             <size>9</size>
                                             <style>normal</style>
@@ -2561,7 +2799,7 @@
                                         <object class="wxTextCtrl" name="m_metricZ">
                                           <style>wxTE_RIGHT</style>
                                           <size>120,-1</size>
-                                          <bg>#0000FF</bg>
+                                          <bg>#008000</bg>
                                           <fg>#FFFFFF</fg>
                                           <value>0.000</value>
                                         </object>
@@ -8117,6 +8355,13 @@ Interval [ms]:</label>
         <object class="wxMenuItem" name="m_miRqtVersion">
           <label>Software Version</label>
           <bitmap>bitmaps/enumerator.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="wxMenuItem" name="m_miRqtHeartbeat">
+          <label>Heartbeat</label>
+          <bitmap>bitmaps/heart-2.png</bitmap>
           <accel>
             <![CDATA[]]>
           </accel>

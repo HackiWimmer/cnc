@@ -9,7 +9,6 @@
       <Project Name="CncConrollerGui" ConfigName="release2"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Release"/>
       <Project Name="UnitTests" ConfigName="Release"/>
-      <Project Name="StepperControl" ConfigName="Debug"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>

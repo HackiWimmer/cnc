@@ -267,6 +267,7 @@
   <object class="wxBitmap" name="go-next-2">bitmaps\go-next-2.png</object>
   <object class="wxBitmap" name="go-up-7">bitmaps\go-up-7.png</object>
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
+  <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
   <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>

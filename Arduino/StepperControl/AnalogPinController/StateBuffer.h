@@ -8,6 +8,9 @@ inline void headline() {
   for (short i=0; i<30; i++, Serial.print('-'));
 }
 
+
+static const char* EM_BUFFER_TO_SMALL    = "Given buffer to small";
+
 //-----------------------------------------------------------------
 class StateBuffer {
 

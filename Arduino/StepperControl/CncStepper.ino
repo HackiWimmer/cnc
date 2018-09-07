@@ -1,4 +1,5 @@
 #include "CommonFunctions.h"
+#include "CncSpeedManager.h"
 #include "CncStepper.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -69,22 +70,35 @@ void CncStepper::printConfig() {
               break;
   }
 
+  #define PRINT_PARAMETER( Pid, value ) \
+    Serial.print(BLANK); \
+    Serial.print(Pid);   Serial.print(TEXT_SEPARATOR); \
+    Serial.print(value); Serial.write(TEXT_CLOSE);
+
   Serial.print(PID_AXIS); Serial.print(TEXT_SEPARATOR); Serial.print(axis); Serial.write(TEXT_CLOSE);
 
-    Serial.print(BLANK); Serial.print(PID_STEPPER_INITIALIZED);            Serial.print(TEXT_SEPARATOR); Serial.print(initialized);                   Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_CURRENT_DIR_PULSE_WIDTH);        Serial.print(TEXT_SEPARATOR); Serial.print(dirPulseWidth);                 Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_PULSE_WIDTH_OFFSET);             Serial.print(TEXT_SEPARATOR); Serial.print(pulseWidthOffset);              Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_STEPS);                          Serial.print(TEXT_SEPARATOR); Serial.print(getSteps());                    Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_PITCH);                          Serial.print(TEXT_SEPARATOR); Serial.print(getPitch());                    Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_AVG_STEP_DURRATION);             Serial.print(TEXT_SEPARATOR); Serial.print(avgStepDuartion);               Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_STEP_PIN);                       Serial.print(TEXT_SEPARATOR); Serial.print(getStepPin());                  Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_DIR_PIN);                        Serial.print(TEXT_SEPARATOR); Serial.print(getDirectionPin());             Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(pidIncrementDirectionValue);         Serial.print(TEXT_SEPARATOR); Serial.print(getIncrementDirectionValue());  Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_MIN_SWITCH);                     Serial.print(TEXT_SEPARATOR); Serial.print(minReached);                    Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_MAX_SWITCH);                     Serial.print(TEXT_SEPARATOR); Serial.print(maxReached);                    Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_LIMIT);                          Serial.print(TEXT_SEPARATOR); Serial.print(readLimitState());              Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_LAST_STEP_DIR);                  Serial.print(TEXT_SEPARATOR); Serial.print(getLastStepDirection());        Serial.write(TEXT_CLOSE);
+    PRINT_PARAMETER(PID_STEPPER_INITIALIZED,              initialized)
+    PRINT_PARAMETER(PID_CURRENT_DIR_PULSE_WIDTH,          dirPulseWidth)
+    PRINT_PARAMETER(PID_PULSE_WIDTH_OFFSET,               pulseWidthOffset)
+    PRINT_PARAMETER(PID_STEPS,                            getSteps())
+    PRINT_PARAMETER(PID_PITCH,                            getPitch())
+    PRINT_PARAMETER(PID_AVG_STEP_DURRATION,               avgStepDuartion)
+    PRINT_PARAMETER(PID_STEP_PIN,                         getStepPin())
+    PRINT_PARAMETER(PID_DIR_PIN,                          getDirectionPin())
+    PRINT_PARAMETER(pidIncrementDirectionValue,           getIncrementDirectionValue())
+    PRINT_PARAMETER(PID_MIN_SWITCH,                       minReached)
+    PRINT_PARAMETER(PID_MAX_SWITCH,                       maxReached)
+    PRINT_PARAMETER(PID_LIMIT,                            readLimitState())
+    PRINT_PARAMETER(PID_LAST_STEP_DIR,                    getLastStepDirection())
 
+    const CncSpeedManager& sm = controller->getSpeedManager();
+    PRINT_PARAMETER(PID_SPEED_MGMT_LOW_PULSE_WIDTH,       sm.getLowPulseWidthX())
+    PRINT_PARAMETER(PID_SPEED_MGMT_HIGH_PULSE_WIDTH,      sm.getHighPulseWidthX())
+    PRINT_PARAMETER(PID_SPEED_MGMT_TOTAL_OFFSET,          sm.getTotalOffsetX())
+    PRINT_PARAMETER(PID_SPEED_MGMT_PER_SETP_OFFSET,       sm.getOffsetPerStepX())
+    PRINT_PARAMETER(PID_SPEED_MGMT_MAX_SPEED,             sm.getMaxSpeedX_MM_MIN())
+  
+  #undef PRINT_PARAMETER
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncStepper::incStepCounter() { 
@@ -281,7 +295,7 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
 
   // -----------------------------------------------------------
   if ( controller->isProbeMode() == false ) {
-    if ( digitalRead(ENABLE_PIN) == ENABLE_STATE_OFF ) {
+    if ( digitalRead(PIN_ENABLE) == ENABLE_STATE_OFF ) {
       // Possibly an error ?
       if ( testActive == false )
         errorInfo.setNextErrorInfo(E_STEPPER_NOT_ENALED, String(String(axis) + " Axis"));

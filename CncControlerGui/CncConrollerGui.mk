@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=06/09/2018
+Date                   :=09/09/2018
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -shared -fPIC
@@ -105,9 +105,6 @@ $(IntermediateDirectory)/.d:
 	@$(MakeDirCommand) "./Release"
 
 PreBuild:
-	@echo Executing Pre Build commands ...
-	rem gcc -E -dM CncControl.cpp
-	@echo Done
 
 
 ##

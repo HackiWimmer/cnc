@@ -16,6 +16,8 @@ class LastErrorCodes {
 
     unsigned long responseId;
 
+    bool withoutErrorMessage;
+
     //////////////////////////////////////////////////////////////////
     void flipArray() {
       for ( unsigned int i=1; i<size-1; i++ ) {
@@ -49,14 +51,18 @@ class LastErrorCodes {
         lastErrorCodes[i] = 0;
         lastErrorTexts[i] = "";
       }
-      
-      totalCount = 0;
-      curIndex = 0;
+
+      withoutErrorMessage = false;
+      totalCount          = 0;
+      curIndex            = 0;
     }
 
     //////////////////////////////////////////////////////////////////
     unsigned char setNextErrorInfo(int id, const char* text = NULL );
     unsigned char setNextErrorInfo(int id, const String& text);
+
+    unsigned char setNextErrorInfoWithoutErrorMessage(int id, const char* text = NULL );
+    unsigned char setNextErrorInfoWithoutErrorMessage(int id, const String& text);
     
     //////////////////////////////////////////////////////////////////
     int getErrorCount() { return curIndex; }
@@ -83,7 +89,7 @@ class LastErrorCodes {
       Serial.print(TEXT_CLOSE);
      
       for ( unsigned int i=0; i<curIndex; i++) {
-        Serial.print(i+1);
+        Serial.print(i + 1);
         Serial.print(TEXT_SEPARATOR);
         Serial.print(lastErrorCodes[i]);
         Serial.print(TEXT_SEPARATOR);

@@ -10,45 +10,89 @@
 
 // Global Parameters
 LastErrorCodes errorInfo;
-CncController controller(ANALOG_LIMIT_PIN_OFF, ANALOG_SUPPORT_PIN_OFF, errorInfo);
+CncController controller(PIN_ANALOG_LIMIT_OFF, PIN_ANALOG_SUPPORT_OFF, errorInfo);
 
+/////////////////////////////////////////////////////////////////////////////////////
+void printSketchVersion() {
+/////////////////////////////////////////////////////////////////////////////////////
+  Serial.write(RET_SOT);
+    Serial.write(FIRMWARE_VERSION);
+  Serial.write(MBYTE_CLOSE);
+}
 /////////////////////////////////////////////////////////////////////////////////////
 void printConfig() {
   /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOT);
-  Serial.print(PID_COMMON);        Serial.print(TEXT_SEPARATOR);     Serial.print(BLANK);                                                            Serial.print(TEXT_CLOSE);
-  Serial.print(BLANK);             Serial.print(PID_VERSION);        Serial.print(TEXT_SEPARATOR); Serial.print(FIRMWARE_VERSION);                   Serial.print(TEXT_CLOSE);
 
-  controller.printConfig();
-  CncTestSuite::printConfig();
+    Serial.print(PID_COMMON);        Serial.print(TEXT_SEPARATOR);     Serial.print(BLANK);                                             Serial.print(TEXT_CLOSE);
+    Serial.print(BLANK);             Serial.print(PID_VERSION);        Serial.print(TEXT_SEPARATOR); Serial.print(FIRMWARE_VERSION);    Serial.print(TEXT_CLOSE);
+  
+    controller.printConfig();
+    CncTestSuite::printConfig();
 
   Serial.write(MBYTE_CLOSE);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void printPinReport() {
-  /////////////////////////////////////////////////////////////////////////////////////
-  const int d = 'D';
-  const int a = 'A';
-  const int i = 'I';
-  const int o = 'O';
+/////////////////////////////////////////////////////////////////////////////////////
+  const int I = 'I';
+  const int O = 'O';
+
+  #define PRINT_DIGITAL_PIN( Pin, Type ) \
+    Serial.print(Pin);  Serial.print(TEXT_SEPARATOR); \
+    Serial.print((int)'D');  Serial.print(TEXT_SEPARATOR); \
+    Serial.print((int)Type); Serial.print(TEXT_SEPARATOR); \
+    Serial.print(digitalRead(Pin)); \
+    Serial.print(TEXT_CLOSE); 
+    
+  #define PRINT_ANALOG_PIN( Pin, Type ) \
+    Serial.print(Pin);  Serial.print(TEXT_SEPARATOR); \
+    Serial.print((int)'A');  Serial.print(TEXT_SEPARATOR); \
+    Serial.print((int)Type); Serial.print(TEXT_SEPARATOR); \
+    Serial.print(analogRead(Pin)); \
+    Serial.print(TEXT_CLOSE); 
+
+  #define PRINT_ANALOG_PIN_EXT( Pin, Interface ) \
+    { \
+      int value = Interface.getValue(); \
+      Serial.print(Pin);    Serial.print(TEXT_SEPARATOR); \
+      Serial.print((int)'A');    Serial.print(TEXT_SEPARATOR); \
+      Serial.print((int)'I');    Serial.print(TEXT_SEPARATOR); \
+      Serial.print(value);  Serial.print(BLANK); \
+      Serial.print('-');    Serial.print(BLANK); \
+      Serial.print(Interface.getValueAsString()); \
+      Serial.print(TEXT_CLOSE); \
+    }
 
   Serial.write(RET_SOT);
 
-  Serial.print(X_STP);              Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(X_STP));             Serial.print(TEXT_CLOSE);
-  Serial.print(Y_STP);              Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(Y_STP));             Serial.print(TEXT_CLOSE);
-  Serial.print(Z_STP);              Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(Z_STP));             Serial.print(TEXT_CLOSE);
-  Serial.print(X_DIR);              Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(X_DIR));             Serial.print(TEXT_CLOSE);
-  Serial.print(Y_DIR);              Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(Y_DIR));             Serial.print(TEXT_CLOSE);
-  Serial.print(Z_DIR);              Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(Z_DIR));             Serial.print(TEXT_CLOSE);
-  Serial.print(ENABLE_PIN);         Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(ENABLE_PIN));        Serial.print(TEXT_CLOSE);
-  Serial.print(X_LIMIT);            Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(i); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(X_LIMIT));           Serial.print(TEXT_CLOSE);
-  Serial.print(Y_LIMIT);            Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(i); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(Y_LIMIT));           Serial.print(TEXT_CLOSE);
-  Serial.print(Z_LIMIT);            Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(i); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(Z_LIMIT));           Serial.print(TEXT_CLOSE);
-  Serial.print(TOOL_PIN);           Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(i); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(TOOL_PIN));          Serial.print(TEXT_CLOSE);
-  Serial.print(TOOL_FEEDBACK_PIN);  Serial.print(TEXT_SEPARATOR); Serial.print(d); Serial.print(TEXT_SEPARATOR); Serial.print(i); Serial.print(TEXT_SEPARATOR); Serial.print(digitalRead(TOOL_FEEDBACK_PIN)); Serial.print(TEXT_CLOSE);
-  Serial.print(INTERRUPT_LED_ID);   Serial.print(TEXT_SEPARATOR); Serial.print(a); Serial.print(TEXT_SEPARATOR); Serial.print(o); Serial.print(TEXT_SEPARATOR); Serial.print(analogRead(INTERRUPT_LED));      Serial.print(TEXT_CLOSE);
+    PRINT_DIGITAL_PIN(PIN_X_STP,                O)
+    PRINT_DIGITAL_PIN(PIN_Y_STP,                O)
+    PRINT_DIGITAL_PIN(PIN_Z_STP,                O)
+  
+    PRINT_DIGITAL_PIN(PIN_X_DIR,                O)
+    PRINT_DIGITAL_PIN(PIN_Y_DIR,                O)
+    PRINT_DIGITAL_PIN(PIN_Z_DIR,                O)
+  
+    PRINT_DIGITAL_PIN(PIN_ENABLE ,              O)
+    
+    PRINT_DIGITAL_PIN(PIN_X_LIMIT,              I)
+    PRINT_DIGITAL_PIN(PIN_Y_LIMIT,              I)
+    PRINT_DIGITAL_PIN(PIN_Z_LIMIT,              I)
+
+    PRINT_DIGITAL_PIN(PIN_TOOL_ENABLE,          I)
+    PRINT_DIGITAL_PIN(PIN_TOOL_FEEDBACK,        I)
+
+    PRINT_ANALOG_PIN(PIN_INTERRUPT_LED_ID,      I)
+    
+    PRINT_ANALOG_PIN_EXT(PIN_ANALOG_LIMIT,      CncInterface::ILS::States(analogRead(PIN_ANALOG_LIMIT)))
+    PRINT_ANALOG_PIN_EXT(PIN_ANALOG_SUPPORT,    CncInterface::ISP::States(analogRead(PIN_ANALOG_SUPPORT)))
 
   Serial.write(MBYTE_CLOSE);  
+
+  #undef PRINT_DIGITAL_PIN  
+  #undef PRINT_ANALOG_PIN  
+  #undef PRINT_ANALOG_PIN_EXT
 }
 /////////////////////////////////////////////////////////////////////////////////////
 long isReadyToRun(){
@@ -58,6 +102,18 @@ long isReadyToRun(){
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
+void switchToolState(bool state, bool force = false) {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( force == false ) {
+    if ( controller.isProbeMode() == true ) {
+      digitalWrite(PIN_TOOL_ENABLE, TOOL_STATE_OFF);
+      return;
+    }
+  }
+  
+  digitalWrite(PIN_TOOL_ENABLE, state == true ? TOOL_STATE_ON : TOOL_STATE_OFF);
+}
+/////////////////////////////////////////////////////////////////////////////////////
 void writeLimitGetter() {
 /////////////////////////////////////////////////////////////////////////////////////  
   long x = LimitSwitch::LIMIT_UNKNOWN;
@@ -65,97 +121,167 @@ void writeLimitGetter() {
   long z = LimitSwitch::LIMIT_UNKNOWN;
 
   controller.evaluateLimitStates(x, y, z);
-  writeGetterValues(PID_LIMIT, x, y, z);
+  writeGetterListValues(PID_LIMIT, x, y, z);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+unsigned char evaluateGetter(unsigned char pid, bool withErrorMessage=true) {
+/////////////////////////////////////////////////////////////////////////////////////
+
+  // safety check to avoid protocol errors
+  if (pid < PID_LONG_RANGE_START || pid > PID_DOUBLE_RANG_END ) {
+    writeGetterListValue(PID_UNKNOWN, 0);
+
+    if ( withErrorMessage == true )  return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, String((int)pid).c_str());
+    else                             return errorInfo.setNextErrorInfoWithoutErrorMessage(E_INVALID_GETTER_ID, String((int)pid).c_str());
+  }
+  
+  switch ( pid ) {
+    // processGetter() ............................................
+    case PID_QUERY_READY_TO_RUN:      writeGetterListValue(PID_QUERY_READY_TO_RUN, isReadyToRun());
+                                      break;
+    // processGetter() ............................................
+    case PID_SPEED_OFFSET_X:          writeGetterListValue(PID_SPEED_OFFSET_X, controller.getPerStepSpeedOffsetX());
+                                      break;
+    // processGetter() ............................................
+    case PID_SPEED_OFFSET_Y:          writeGetterListValue(PID_SPEED_OFFSET_Y, controller.getPerStepSpeedOffsetY());
+                                      break;
+    // processGetter() ............................................
+    case PID_SPEED_OFFSET_Z:          writeGetterListValue(PID_SPEED_OFFSET_Z, controller.getPerStepSpeedOffsetZ());
+                                      break;
+    // processGetter() ............................................
+    case PID_STEPS_X:                 writeGetterListValue(PID_STEPS_X, controller.getStepperX()->getSteps());
+                                      break;
+    // processGetter() ............................................
+    case PID_STEPS_Y:                 writeGetterListValue(PID_STEPS_Y, controller.getStepperY()->getSteps());
+                                      break;
+    // processGetter() ............................................
+    case PID_STEPS_Z:                 writeGetterListValue(PID_STEPS_Z, controller.getStepperZ()->getSteps());
+                                      break;
+    // processGetter() ............................................
+    case PID_X_POS:                   writeGetterListValue(PID_X_POS, controller.getStepperX()->getPosition());
+                                      break;
+    // processGetter() ............................................
+    case PID_Y_POS:                   writeGetterListValue(PID_Y_POS, controller.getStepperY()->getPosition());
+                                      break;
+    // processGetter() ............................................
+    case PID_Z_POS:                   writeGetterListValue(PID_Z_POS, controller.getStepperZ()->getPosition());
+                                      break;
+    // processGetter() ............................................
+    case PID_XY_POS:                  writeGetterListValues(PID_XY_POS, controller.getStepperX()->getPosition(), controller.getStepperY()->getPosition());
+                                      break;
+    // processGetter() ............................................
+    case PID_XYZ_POS:                 writeGetterListValues(PID_XYZ_POS, controller.getStepperX()->getPosition(), controller.getStepperY()->getPosition(), controller.getStepperZ()->getPosition());
+                                      break;
+    // processGetter() ............................................
+    case PID_GET_POS_COUNTER:         writeGetterListValues(PID_GET_POS_COUNTER, controller.getPositionCounter(), controller.getPositionCounterOverflow());
+                                      break;
+    // processGetter() ............................................
+    case PID_GET_STEP_COUNTER_X:      writeGetterListValues(PID_GET_STEP_COUNTER_X, controller.getStepperX()->getStepCounter(), controller.getStepperX()->getStepCounterOverflow());
+                                      break;
+    // processGetter() ............................................
+    case PID_GET_STEP_COUNTER_Y:      writeGetterListValues(PID_GET_STEP_COUNTER_Y, controller.getStepperY()->getStepCounter(), controller.getStepperY()->getStepCounterOverflow());
+                                      break;
+    // processGetter() ............................................
+    case PID_GET_STEP_COUNTER_Z:      writeGetterListValues(PID_GET_STEP_COUNTER_Z, controller.getStepperZ()->getStepCounter(), controller.getStepperZ()->getStepCounterOverflow());
+                                      break;
+    // processGetter() ............................................
+    case PID_LIMIT:                   writeLimitGetter();
+                                      break;
+    // processGetter() ............................................
+    case PID_POS_REPLY_THRESHOLD_X:   writeGetterListValue(PID_POS_REPLY_THRESHOLD_X, controller.getPosReplyThresholdX());
+                                      break;
+    // processGetter() ............................................
+    case PID_POS_REPLY_THRESHOLD_Y:   writeGetterListValue(PID_POS_REPLY_THRESHOLD_Y, controller.getPosReplyThresholdY());
+                                      break;
+    // processGetter() ............................................
+    case PID_POS_REPLY_THRESHOLD_Z:   writeGetterListValue(PID_POS_REPLY_THRESHOLD_Z, controller.getPosReplyThresholdZ());
+                                      break;
+    // processGetter() ............................................
+    case PID_ERROR_COUNT:             writeGetterListValue(PID_ERROR_COUNT, errorInfo.getErrorCount());
+                                      break;
+    // processGetter() ............................................
+    case PID_ANALOG_LIMIT_PIN:        writeGetterListValue(PID_ANALOG_LIMIT_PIN, controller.getAnalogLimitPin());
+                                      break;
+   // processGetter() ............................................
+    case PID_ANALOG_SUPPORT_PIN:      writeGetterListValue(PID_ANALOG_SUPPORT_PIN, controller.getAnalogSupportPin());
+                                      break;
+
+    // processGetter() ............................................
+    default:                          writeGetterListValue(PID_UNKNOWN, 0);
+                                      if ( withErrorMessage == true )  return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, String((int)pid).c_str());
+    else                                                               return errorInfo.setNextErrorInfoWithoutErrorMessage(E_INVALID_GETTER_ID, String((int)pid).c_str());
+  }
+
+  return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 // provides information to the serial
+//   Serial.write(RET_SOH);
+//   Serial.write(PID_GETTER_LIST);
+//   Serial.write(<GETTER_COUNT>);
+//   foreach 
+//       writeGetterListValue(PID, ....)  
+unsigned char processGetterList() {
+/////////////////////////////////////////////////////////////////////////////////////
+  // Wait a protion of time.
+  // This is very importent for the next multibyte read
+  delay(1);
+
+  // Start result
+  Serial.write(RET_SOH);
+  Serial.write(PID_GETTER_LIST);
+
+  if ( Serial.available() <= 0 ) {
+    Serial.write((unsigned char)1);
+    writeGetterSingleValue(PID_UNKNOWN, 0);
+    
+    return errorInfo.setNextErrorInfo(E_INVALID_GETTER_LIST_COUNT, EMPTY_TEXT_VAL);
+  }
+
+  // complete result . . .
+  unsigned char count = Serial.read();
+  Serial.write(count);
+  
+  // over all getter ids
+  for ( unsigned char i=0; i<count; i++ ) {
+    
+    // check if more available
+    if ( Serial.available() <= 0 ) {
+      writeGetterListValue(PID_UNKNOWN, 0);
+      continue;
+    }
+
+    // append the next getter
+    unsigned char pid = Serial.read();
+    
+    const bool WITH_ERROR_MESSAGE = false;
+    evaluateGetter(pid, WITH_ERROR_MESSAGE);
+  }
+
+  return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+// provides information to the serial
+//   Serial.write(RET_SOH);
+//   writeGetterListValue(PID, ....)  
 unsigned char processGetter() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Wait a protion of time.
   // This is very importent for the next multibyte read
   delay(1);
 
+  // Start result
+  Serial.write(RET_SOH);
+ 
   if ( Serial.available() <= 0 ) {
-    writeLongValue(PID_UNKNOWN, 0);
+    writeGetterSingleValue(PID_UNKNOWN, 0);
     return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, EMPTY_TEXT_VAL);
   }
   
-  unsigned char id = Serial.read();
-
-  switch ( id ) {
-    // processGetter() ............................................
-    case PID_QUERY_READY_TO_RUN:      writeGetterValue(PID_QUERY_READY_TO_RUN, isReadyToRun());
-                                      break;
-    // processGetter() ............................................
-    case PID_SPEED_OFFSET_X:          writeGetterValue(PID_SPEED_OFFSET_X, controller.getPerStepSpeedOffsetX());
-                                      break;
-    // processGetter() ............................................
-    case PID_SPEED_OFFSET_Y:          writeGetterValue(PID_SPEED_OFFSET_Y, controller.getPerStepSpeedOffsetY());
-                                      break;
-    // processGetter() ............................................
-    case PID_SPEED_OFFSET_Z:          writeGetterValue(PID_SPEED_OFFSET_Z, controller.getPerStepSpeedOffsetZ());
-                                      break;
-    // processGetter() ............................................
-    case PID_STEPS_X:                 writeGetterValue(PID_STEPS_X, controller.getStepperX()->getSteps());
-                                      break;
-    // processGetter() ............................................
-    case PID_STEPS_Y:                 writeGetterValue(PID_STEPS_Y, controller.getStepperY()->getSteps());
-                                      break;
-    // processGetter() ............................................
-    case PID_STEPS_Z:                 writeGetterValue(PID_STEPS_Z, controller.getStepperZ()->getSteps());
-                                      break;
-    // processGetter() ............................................
-    case PID_X_POS:                   writeGetterValue(PID_X_POS, controller.getStepperX()->getPosition());
-                                      break;
-    // processGetter() ............................................
-    case PID_Y_POS:                   writeGetterValue(PID_Y_POS, controller.getStepperY()->getPosition());
-                                      break;
-    // processGetter() ............................................
-    case PID_Z_POS:                   writeGetterValue(PID_Z_POS, controller.getStepperZ()->getPosition());
-                                      break;
-    // processGetter() ............................................
-    case PID_XY_POS:                  writeGetterValues(PID_XY_POS, controller.getStepperX()->getPosition(), controller.getStepperY()->getPosition());
-                                      break;
-    // processGetter() ............................................
-    case PID_XYZ_POS:                 writeGetterValues(PID_XYZ_POS, controller.getStepperX()->getPosition(), controller.getStepperY()->getPosition(), controller.getStepperZ()->getPosition());
-                                      break;
-    // processGetter() ............................................
-    case PID_GET_POS_COUNTER:         writeGetterValues(PID_GET_POS_COUNTER, controller.getPositionCounter(), controller.getPositionCounterOverflow());
-                                      break;
-    // processGetter() ............................................
-    case PID_GET_STEP_COUNTER_X:      writeGetterValues(PID_GET_STEP_COUNTER_X, controller.getStepperX()->getStepCounter(), controller.getStepperX()->getStepCounterOverflow());
-                                      break;
-    // processGetter() ............................................
-    case PID_GET_STEP_COUNTER_Y:      writeGetterValues(PID_GET_STEP_COUNTER_Y, controller.getStepperY()->getStepCounter(), controller.getStepperY()->getStepCounterOverflow());
-                                      break;
-    // processGetter() ............................................
-    case PID_GET_STEP_COUNTER_Z:      writeGetterValues(PID_GET_STEP_COUNTER_Z, controller.getStepperZ()->getStepCounter(), controller.getStepperZ()->getStepCounterOverflow());
-                                      break;
-    // processGetter() ............................................
-    case PID_LIMIT:                   writeLimitGetter();
-                                      break;
-    // processGetter() ............................................
-    case PID_POS_REPLY_THRESHOLD_X:   writeGetterValue(PID_POS_REPLY_THRESHOLD_X, controller.getPosReplyThresholdX());
-                                      break;
-    // processGetter() ............................................
-    case PID_POS_REPLY_THRESHOLD_Y:   writeGetterValue(PID_POS_REPLY_THRESHOLD_Y, controller.getPosReplyThresholdY());
-                                      break;
-    // processGetter() ............................................
-    case PID_POS_REPLY_THRESHOLD_Z:   writeGetterValue(PID_POS_REPLY_THRESHOLD_Z, controller.getPosReplyThresholdZ());
-                                      break;
-    // processGetter() ............................................
-    case PID_ERROR_COUNT:             writeGetterValue(PID_ERROR_COUNT, errorInfo.getErrorCount());
-                                      break;
-    // processGetter() ............................................
-    case PID_ANALOG_LIMIT_PIN:        writeGetterValue(PID_ANALOG_LIMIT_PIN, controller.getAnalogLimitPin());
-                                      break;
-
-    // processGetter() ............................................
-    default:                          writeGetterValue(PID_UNKNOWN, 0);
-                                      return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, String((int)id).c_str());
-  }
-
-  return RET_OK;
+  unsigned char pid = Serial.read();
+  
+  // commplete result
+  return evaluateGetter(pid);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 // provides information from the serial
@@ -271,8 +397,12 @@ unsigned char processSetter() {
     case PID_SPEED_MM_MIN:        controller.setSpeedValue(dValue); 
                                   break;
     // processSetter() ............................................
-    case PID_ANALOG_LIMIT_PIN:    if ( lValue != 0 )  controller.setAnalogLimitPin(ANALOG_LIMIT_PIN_ID);
-                                  else                controller.setAnalogLimitPin(ANALOG_LIMIT_PIN_OFF);
+    case PID_ANALOG_LIMIT_PIN:    if ( lValue != 0 )  controller.setAnalogLimitPin(PIN_ANALOG_LIMIT_ID);
+                                  else                controller.setAnalogLimitPin(PIN_ANALOG_LIMIT_OFF);
+                                  break; 
+    // processSetter() ............................................
+    case PID_ANALOG_SUPPORT_PIN:  if ( lValue != 0 )  controller.setAnalogSupportPin(PIN_ANALOG_SUPPORT_ID);
+                                  else                controller.setAnalogSupportPin(PIN_ANALOG_SUPPORT_OFF);
                                   break; 
     // processSetter() ............................................
     // call it with lValue = NORMALIZED_INCREMENT_DIRECTION || INVERSED_INCREMENT_DIRECTION
@@ -368,17 +498,6 @@ unsigned char decodeTest() {
   return ts.run();
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void switchToolState(bool state) {
-/////////////////////////////////////////////////////////////////////////////////////
-  if ( controller.isProbeMode() == true ) {
-    digitalWrite(TOOL_PIN, TOOL_STATE_OFF);
-    return;
-  }
-
-  if ( state ) digitalWrite(TOOL_PIN, TOOL_STATE_ON);
-  else         digitalWrite(TOOL_PIN, TOOL_STATE_OFF);
-}
-/////////////////////////////////////////////////////////////////////////////////////
 inline void clearSerial() {
 /////////////////////////////////////////////////////////////////////////////////////
   delay(1);
@@ -391,10 +510,12 @@ inline void clearSerial() {
 /////////////////////////////////////////////////////////////////////////////////////
 char reset() {
 /////////////////////////////////////////////////////////////////////////////////////
-  // hide Interrupt LED
-  analogWrite(INTERRUPT_LED, ANALOG_LOW);
-
-  switchToolState(false);
+  // Turn off ...
+  switchToolState(false, true);
+  digitalWrite(PIN_ENABLE,          ENABLE_STATE_OFF);
+  
+  // Hide the Interrupt LED
+  analogWrite(PIN_INTERRUPT_LED,    ANALOG_LOW);
 
   // stop running tests
   CncTestSuite::resetInterruptFlag();
@@ -406,43 +527,53 @@ char reset() {
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void setup() {
-/////////////////////////////////////////////////////////////////////////////////////
-  Serial.begin(BAUD_RATE);
-  Serial.setTimeout(1000);
-  Serial.flush();
-
-  pinMode(X_DIR,              OUTPUT);
-  pinMode(Y_DIR,              OUTPUT);
-  pinMode(Z_DIR,              OUTPUT);
-  pinMode(X_STP,              OUTPUT);
-  pinMode(Y_STP,              OUTPUT);
-  pinMode(Z_STP,              OUTPUT);
-  pinMode(ENABLE_PIN,         OUTPUT);  digitalWrite(ENABLE_PIN,        ENABLE_STATE_OFF);
-  pinMode(TOOL_PIN,           OUTPUT);  digitalWrite(TOOL_PIN,          TOOL_STATE_OFF);
-  pinMode(TOOL_FEEDBACK_PIN,  INPUT);   digitalWrite(TOOL_FEEDBACK_PIN, TOOL_STATE_OFF);
-
-  pinMode(X_LIMIT,            INPUT);   digitalWrite(X_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
-  pinMode(Y_LIMIT,            INPUT);   digitalWrite(Y_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
-  pinMode(Z_LIMIT,            INPUT);   digitalWrite(Z_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
-
-  reset();
-}
-/////////////////////////////////////////////////////////////////////////////////////
 void processInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
-  digitalWrite(TOOL_PIN,            TOOL_STATE_OFF);
-  digitalWrite(TOOL_FEEDBACK_PIN,   TOOL_STATE_OFF);
-  digitalWrite(ENABLE_PIN,          ENABLE_STATE_OFF);
+  // Turn off ...
+  switchToolState(false, true);
+  digitalWrite(PIN_ENABLE,          ENABLE_STATE_OFF);
 
   // Show Interrup LED
-  analogWrite(INTERRUPT_LED, ANALOG_HIGH);
+  analogWrite(PIN_INTERRUPT_LED,    ANALOG_HIGH);
 
   // stop running tests
   CncTestSuite::interruptTest();
 
   controller.broadcastInterrupt();
   errorInfo.setNextErrorInfo(E_INTERRUPT, EMPTY_TEXT_VAL);
+
+  pushErrorMessage(E_INTERRUPT);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void setup() {
+/////////////////////////////////////////////////////////////////////////////////////
+  Serial.begin(BAUD_RATE);
+  Serial.setTimeout(1000);
+  Serial.flush();
+
+  // digital pins
+    pinMode(PIN_X_DIR,              OUTPUT);  digitalWrite(PIN_X_DIR,             LOW);
+    pinMode(PIN_Y_DIR,              OUTPUT);  digitalWrite(PIN_Y_DIR,             LOW);
+    pinMode(PIN_Z_DIR,              OUTPUT);  digitalWrite(PIN_Z_DIR,             LOW);
+    pinMode(PIN_X_STP,              OUTPUT);  digitalWrite(PIN_X_STP,             LOW);
+    pinMode(PIN_Y_STP,              OUTPUT);  digitalWrite(PIN_Y_STP,             LOW);
+    pinMode(PIN_Z_STP,              OUTPUT);  digitalWrite(PIN_Z_STP,             LOW);
+    
+    pinMode(PIN_X_LIMIT,            INPUT);   digitalWrite(PIN_X_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
+    pinMode(PIN_Y_LIMIT,            INPUT);   digitalWrite(PIN_Y_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
+    pinMode(PIN_Z_LIMIT,            INPUT);   digitalWrite(PIN_Z_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
+  
+    pinMode(PIN_ENABLE,             OUTPUT);  digitalWrite(PIN_ENABLE,            ENABLE_STATE_OFF);
+    
+    pinMode(PIN_TOOL_ENABLE,        OUTPUT);  digitalWrite(PIN_TOOL_ENABLE,       TOOL_STATE_OFF);
+    pinMode(PIN_TOOL_FEEDBACK,      INPUT);   digitalWrite(PIN_TOOL_FEEDBACK,     TOOL_STATE_OFF);
+
+  // analog pins
+    pinMode(PIN_INTERRUPT_LED,      OUTPUT);  analogWrite(PIN_INTERRUPT_LED,      ANALOG_LOW);
+    pinMode(PIN_ANALOG_LIMIT,       INPUT);   analogWrite(PIN_ANALOG_LIMIT,       ANALOG_LOW); 
+    pinMode(PIN_ANALOG_SUPPORT,     INPUT);   analogWrite(PIN_ANALOG_LIMIT,       ANALOG_LOW);  
+
+  reset();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void loop() {
@@ -510,7 +641,12 @@ void loop() {
                 controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
                 controller.setPosReplyState(false);
                 break;
-  
+
+          // MB command - Parameter getter
+          case CMD_GETTER_LIST:
+                r = processGetterList();
+                break;
+            
           // MB command - Parameter getter
           case CMD_GETTER:
                 r = processGetter();
@@ -572,9 +708,7 @@ void loop() {
     
           // MB command - Print version
           case CMD_PRINT_VERSION:
-                Serial.write(RET_SOT);
-                Serial.write(FIRMWARE_VERSION);
-                Serial.write(MBYTE_CLOSE);
+                printSketchVersion();
                 return;
 
           // MB command - Pin report

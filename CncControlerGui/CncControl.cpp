@@ -26,6 +26,7 @@ static CommandTemplates CMDTPL;
 ///////////////////////////////////////////////////////////////////
 CncControl::CncControl(CncPortType pt) 
 : currentClientId(-1)
+, runContinuousMove(false)
 , setterMap()
 , portType(pt)
 , serialPort(NULL)
@@ -1257,6 +1258,34 @@ const int32_t CncControl::getControllerErrorCount(bool withPurge) {
 	return list.at(0);
 }
 ///////////////////////////////////////////////////////////////////
+bool CncControl::displayGetterList(const PidList& pidList) {
+///////////////////////////////////////////////////////////////////
+	if ( pidList.size() == 0 )
+		return false;
+
+	GetterListValues map;
+	getSerial()->processGetterList(pidList, map);
+	
+	// show content:
+	std::cout << "Getter List Report:" << std::endl;
+	for (GetterListValues::iterator itl=map.begin(); itl!=map.end(); ++itl) {
+		std::cout << ' ' << ArduinoPIDs::getPIDLabel(itl->first) << " => [";
+			
+		GetterValues& list = itl->second;
+		for (GetterValues::iterator itp = list.begin() ; itp != list.end(); ++itp) {
+
+			if ( itp != list.begin() )	
+				std::cout << ',';
+
+			std::cout << *itp;
+		}			
+		
+		std::cout << "]\n";
+	}
+
+	return true;
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::requestErrorInformation(bool withPurge) {
 ///////////////////////////////////////////////////////////////////
 	if ( withPurge == true ) {
@@ -1650,6 +1679,43 @@ bool CncControl::moveZToMid() {
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::manualContinuousMoveStop() {
+///////////////////////////////////////////////////////////////////
+	runContinuousMove = false;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::manualContinuousMoveStart(bool x, bool y, bool z, const CncDirection dir) {
+///////////////////////////////////////////////////////////////////
+	//reentrun this
+	if ( getSerial()->isCommandActive() == true )
+		return false;
+	
+	int32_t xSteps = x ? 100 : 0;
+	int32_t ySteps = y ? 10 : 0;
+	int32_t zSteps = z ? 10 : 0;
+	
+	xSteps *= dir == CncClockwise ? 1 : -1;
+	ySteps *= dir == CncClockwise ? 1 : -1;
+	zSteps *= dir == CncClockwise ? 1 : -1;
+	
+	initNextDuration();
+	cncConfig->setAllowEventHandling(true);
+	activatePositionCheck(false);
+	enableStepperMotors(true);
+	
+	runContinuousMove = true;
+	while ( runContinuousMove ) {
+		moveRelLinearStepsXYZ(xSteps, ySteps, zSteps, false);
+		THE_APP->dispatchAll();
+	}
+	
+	enableStepperMotors(false);
+	activatePositionCheck(true);
+	resetDurationCounter();
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::manualSimpleMoveMetric(double x, double y, double z, bool alreadyRendered) {

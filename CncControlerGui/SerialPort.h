@@ -11,7 +11,10 @@
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
 
-typedef std::map<int, int32_t> SetterMap;
+typedef std::map<int, int32_t> 					SetterMap;
+typedef std::vector<unsigned char> 				PidList;
+typedef std::vector<int32_t> 					GetterValues;
+typedef std::map<unsigned char, GetterValues> 	GetterListValues;
 
 class CncControl;
 
@@ -34,7 +37,8 @@ struct SerialFetchInfo {
 	} Hc;
 	
 	struct G {
-		std::vector<int32_t>* list		= NULL;
+		GetterValues* list				= NULL;
+		GetterListValues* map			= NULL;
 		unsigned char result[sizeof(int32_t)];
 		unsigned int timeout 			= 1000;
 		int32_t value 					= 0;
@@ -173,7 +177,7 @@ class Serial : public SerialOSD {
 		virtual void sleepMilliseconds(unsigned int millis);
 		
 		// decodes the given controler msg
-		inline void decodeMessage(const unsigned char* message, std::ostream& mutliByteStream);
+		inline void decodeMessage(const unsigned char* mutliByteStream, std::ostream& message);
 		// give the result a more human readabal format
 		inline void decodeMultiByteResults(const char cmd, const unsigned char* result, std::ostream& mutliByteStream);
 		// return true if the given cmd is a move command
@@ -196,10 +200,11 @@ class Serial : public SerialOSD {
 		// decodes the given fetch result depending cr
 		inline bool decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi);
 		// decodes the give fetch result
-		inline bool decodeGetter(SerialFetchInfo& sfi);
+		inline bool decodeGetter(unsigned char pid, SerialFetchInfo& sfi, bool finalize=true);
+		inline bool decodeGetterList(unsigned char pid, SerialFetchInfo& sfi);
 		inline bool decodeHeartbeat(SerialFetchInfo& sfi);
 		inline bool decodeLimitInfo(SerialFetchInfo& sfi);
-		inline bool decodePositionInfo(SerialFetchInfo& sfi, unsigned char pid);
+		inline bool decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi);
 		
 		bool sendSignal(const unsigned char cmd);
 		
@@ -262,7 +267,8 @@ class Serial : public SerialOSD {
 		// reurn the current command flag
 		bool isCommandActive() { return isCommandRunning; }
 		// port writting
-		virtual bool processGetter(unsigned char pid, std::vector<int32_t>& ret);
+		bool processGetter(unsigned char pid, GetterValues& ret);
+		bool processGetterList(PidList pidList, GetterListValues& ret);
 		bool processSetter(unsigned char pid, int32_t value);
 		
 		bool processTest(int32_t testId);

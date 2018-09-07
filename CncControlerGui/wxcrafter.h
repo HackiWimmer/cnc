@@ -166,6 +166,19 @@ protected:
     wxPanel* m_mainBookReference;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
+    wxNotebook* m_manualMotionControl;
+    wxPanel* m_panel5187;
+    wxStaticText* m_staticText5208;
+    wxSlider* m_cmSpeedSlider;
+    wxStaticText* m_cmSpeedValue;
+    wxStaticText* m_staticText5216;
+    wxButton* m_cmXneg;
+    wxButton* m_cmXpos;
+    wxButton* m_cmYneg;
+    wxButton* m_cmYpos;
+    wxButton* m_cmZneg;
+    wxButton* m_cmZpos;
+    wxPanel* m_panel5185;
     wxStaticText* m_staticText821;
     wxSpinButton* m_spinButtonX;
     wxStaticText* m_staticText63169;
@@ -624,6 +637,7 @@ protected:
     wxMenuItem* m_miRqtIdleMessages;
     wxMenuItem* m_menuItem2530;
     wxMenuItem* m_miRqtVersion;
+    wxMenuItem* m_miRqtHeartbeat;
     wxMenuItem* m_miRqtConfig;
     wxMenuItem* m_miRqtPins;
     wxMenuItem* m_menuErrorCount;
@@ -730,6 +744,17 @@ protected:
     virtual void setupGridChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridSelected(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void changeCmSpeedSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void cmKillFocus(wxFocusEvent& event) { event.Skip(); }
+    virtual void cmLeave(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmLeftUp(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmXnegLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmLeftDClick(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmXposLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmYnegLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmYposLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmZnegLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void cmZposLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void mvSpinUpX(wxSpinEvent& event) { event.Skip(); }
     virtual void mvSpinDownX(wxSpinEvent& event) { event.Skip(); }
     virtual void mvSpinUpY(wxSpinEvent& event) { event.Skip(); }
@@ -907,6 +932,7 @@ protected:
     virtual void defineMinMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void defineNormalMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void requestVersion(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestHeartbeat(wxCommandEvent& event) { event.Skip(); }
     virtual void requestConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void requestPins(wxCommandEvent& event) { event.Skip(); }
     virtual void requestErrorCount(wxCommandEvent& event) { event.Skip(); }
@@ -1012,6 +1038,17 @@ public:
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
     wxStaticLine* GetStaticLine783() { return m_staticLine783; }
+    wxStaticText* GetStaticText5208() { return m_staticText5208; }
+    wxSlider* GetCmSpeedSlider() { return m_cmSpeedSlider; }
+    wxStaticText* GetCmSpeedValue() { return m_cmSpeedValue; }
+    wxStaticText* GetStaticText5216() { return m_staticText5216; }
+    wxButton* GetCmXneg() { return m_cmXneg; }
+    wxButton* GetCmXpos() { return m_cmXpos; }
+    wxButton* GetCmYneg() { return m_cmYneg; }
+    wxButton* GetCmYpos() { return m_cmYpos; }
+    wxButton* GetCmZneg() { return m_cmZneg; }
+    wxButton* GetCmZpos() { return m_cmZpos; }
+    wxPanel* GetPanel5187() { return m_panel5187; }
     wxStaticText* GetStaticText821() { return m_staticText821; }
     wxSpinButton* GetSpinButtonX() { return m_spinButtonX; }
     wxStaticText* GetStaticText63169() { return m_staticText63169; }
@@ -1028,6 +1065,8 @@ public:
     wxTextCtrl* GetMoveZAxisCtl() { return m_moveZAxisCtl; }
     wxStaticText* GetStaticText830() { return m_staticText830; }
     wxStaticText* GetStaticText836() { return m_staticText836; }
+    wxPanel* GetPanel5185() { return m_panel5185; }
+    wxNotebook* GetManualMotionControl() { return m_manualMotionControl; }
     wxCheckBox* GetIncludingWpt() { return m_includingWpt; }
     wxButton* GetSetZero() { return m_setZero; }
     wxStaticText* GetStaticText1156() { return m_staticText1156; }

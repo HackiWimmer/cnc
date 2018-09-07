@@ -31,6 +31,7 @@ class CncControl {
 		
 	private:
 		long currentClientId;
+		bool runContinuousMove;
 		
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
@@ -173,6 +174,9 @@ class CncControl {
 		// comand wrapper
 		bool processCommand(const char* cmd, std::ostream& txtCtl);
 		bool processCommand(const unsigned char c, std::ostream& txtCtl);
+		
+		// cgetter list wrapper	
+		bool displayGetterList(const PidList& pidlist);
 
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
@@ -268,10 +272,6 @@ class CncControl {
 		// Change the current speed parameter
 		void changeCurrentFeedSpeedXYZ_MM_SEC(CncSpeed s, double value = 0.0);
 		void changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value = 0.0);
-
-		//void changeCurrentRpmSpeedXYZ(CncSpeed s, unsigned int value = 0);
-		//void changeCurrentRpmSpeedXY(CncSpeed s, unsigned int value = 0);
-		//void changeCurrentRpmSpeedZ(CncSpeed s, unsigned int value = 0);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
@@ -290,6 +290,9 @@ class CncControl {
 		bool moveXToMid();
 		bool moveYToMid();
 		bool moveZToMid();
+		
+		bool manualContinuousMoveStart(bool x, bool y, bool z, const CncDirection dir);
+		void manualContinuousMoveStop();
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);
 		bool manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);

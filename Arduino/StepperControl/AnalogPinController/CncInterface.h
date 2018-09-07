@@ -43,6 +43,7 @@ namespace CncInterface {
 
       static const unsigned short ANALOG_READ_WRITE_FACTOR  = 1024/256;
       unsigned char states;
+      char stringValue[9];
      
     public:
       //-------------------------------------------------------------
@@ -56,7 +57,7 @@ namespace CncInterface {
       void reset() { states = 0; }
 
       //-------------------------------------------------------------
-      unsigned char getStates() const { return states; }
+      unsigned char getValue() const { return states; }
     
       //-------------------------------------------------------------
       bool getBit(unsigned char idx) const {
@@ -88,8 +89,27 @@ namespace CncInterface {
         }
       }
 
+      //-------------------------------------------------------------
+      virtual const char* getValueAsString() {
+        stringValue[0] = getBit(8) == true ? '1' : '0';
+        stringValue[1] = getBit(7) == true ? '1' : '0';
+        stringValue[2] = getBit(6) == true ? '1' : '0';
+        stringValue[3] = getBit(5) == true ? '1' : '0';
+        stringValue[4] = getBit(4) == true ? '1' : '0';
+        stringValue[5] = getBit(3) == true ? '1' : '0';
+        stringValue[6] = getBit(2) == true ? '1' : '0';
+        stringValue[7] = getBit(1) == true ? '1' : '0';
+        stringValue[8] = '\0';
+        
+        return stringValue;
+      }
+
+      virtual const char* getValueAsReport(char* ret) {
+        return ret;
+      }
+
+      //-------------------------------------------------------------
       #ifdef SKETCH_COMPILE
-        //-------------------------------------------------------------
         unsigned int readAnalogValue(int pin, int msdelay) {
           if ( msdelay > 0 )
             delay(msdelay);
@@ -127,7 +147,7 @@ namespace CncInterface {
         : StatesBase() {}
 
         explicit States(const States& s)
-        : StatesBase(s.getStates()) {}
+        : StatesBase(s.getValue()) {}
 
         explicit States(unsigned char s)
         : StatesBase(s) {}
@@ -168,7 +188,7 @@ namespace CncInterface {
         : StatesBase(s) {}
   
         explicit States(const States& s)
-        : StatesBase(s.getStates()) {}
+        : StatesBase(s.getValue()) {}
 
         States(const int32_t x, const int32_t y, const int32_t z) 
         : StatesBase()

@@ -9,9 +9,9 @@ CncController::CncController(const unsigned char alp,
                              const unsigned char asp, 
                              LastErrorCodes& lec) 
 /////////////////////////////////////////////////////////////////////////////////////
-: X(new CncStepper(this, 'X', X_STP, X_DIR, X_LIMIT, lec))
-, Y(new CncStepper(this, 'Y', Y_STP, Y_DIR, Y_LIMIT, lec))
-, Z(new CncStepper(this, 'Z', Z_STP, Z_DIR, Z_LIMIT, lec))
+: X(new CncStepper(this, 'X', PIN_X_STP, PIN_X_DIR, PIN_X_LIMIT, lec))
+, Y(new CncStepper(this, 'Y', PIN_Y_STP, PIN_Y_DIR, PIN_Y_LIMIT, lec))
+, Z(new CncStepper(this, 'Z', PIN_Z_STP, PIN_Z_DIR, PIN_Z_LIMIT, lec))
 , speedManager()
 , errorInfo(&lec)
 , analogLimitPin(alp)
@@ -90,8 +90,8 @@ unsigned int CncController::getHighPulseWidth(char axis) {
 //////////////////////////////////////////////////////////////////////////////
 bool CncController::enableStepperPin(bool state){
 //////////////////////////////////////////////////////////////////////////////
-  if ( probeMode == false )   digitalWrite(ENABLE_PIN, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
-  else                        digitalWrite(ENABLE_PIN, ENABLE_STATE_OFF);
+  if ( probeMode == false )   digitalWrite(PIN_ENABLE, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
+  else                        digitalWrite(PIN_ENABLE, ENABLE_STATE_OFF);
 
   delayMicroseconds(minEnablePulseWide);
   return state;
@@ -99,44 +99,27 @@ bool CncController::enableStepperPin(bool state){
 /////////////////////////////////////////////////////////////////////////////////////
 void CncController::printConfig() {
 /////////////////////////////////////////////////////////////////////////////////////
-  Serial.print(PID_CONTROLLER); Serial.print(TEXT_SEPARATOR); Serial.write(TEXT_CLOSE);
-    
-    Serial.print(BLANK); Serial.print(PID_POS_REPLY_THRESHOLD_X);          Serial.print(TEXT_SEPARATOR); Serial.print(controller.getPosReplyThresholdX()); Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_POS_REPLY_THRESHOLD_Y);          Serial.print(TEXT_SEPARATOR); Serial.print(controller.getPosReplyThresholdY()); Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_POS_REPLY_THRESHOLD_Z);          Serial.print(TEXT_SEPARATOR); Serial.print(controller.getPosReplyThresholdZ()); Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_PROBE_MODE);                     Serial.print(TEXT_SEPARATOR); Serial.print(controller.isProbeMode());           Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_ENABLE_STEPPERS);                Serial.print(TEXT_SEPARATOR); Serial.print(!digitalRead(ENABLE_PIN));           Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_MIN_ENABLE_PULSE_WIDTH);         Serial.print(TEXT_SEPARATOR); Serial.print(minEnablePulseWide);                 Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK); Serial.print(PID_ANALOG_LIMIT_PIN);               Serial.print(TEXT_SEPARATOR); Serial.print(analogLimitPin);                     Serial.write(TEXT_CLOSE);
+  #define PRINT_PARAMETER( Pid, value ) \
+      Serial.print(BLANK); \
+      Serial.print(Pid);   Serial.print(TEXT_SEPARATOR); \
+      Serial.print(value); Serial.write(TEXT_CLOSE);
 
+  Serial.print(PID_CONTROLLER); Serial.print(TEXT_SEPARATOR); Serial.write(TEXT_CLOSE);
+    PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_X,            getPosReplyThresholdX())
+    PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_Y,            getPosReplyThresholdY())
+    PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_Z,            getPosReplyThresholdZ())
+    PRINT_PARAMETER(PID_PROBE_MODE,                       isProbeMode())
+    PRINT_PARAMETER(PID_ENABLE_STEPPERS,                  !digitalRead(PIN_ENABLE))
+    PRINT_PARAMETER(PID_MIN_ENABLE_PULSE_WIDTH,           minEnablePulseWide)
+    PRINT_PARAMETER(PID_ANALOG_LIMIT_PIN,                 analogLimitPin)
+    PRINT_PARAMETER(PID_ANALOG_SUPPORT_PIN,               analogSupportPin)
+    PRINT_PARAMETER(PID_SPEED_MGMT_INITIALIZED,           speedManager.isInitialized())
+
+  #undef PRINT_PARAMETER
     
-    Serial.print(BLANK);  Serial.print(PID_SPEED_MGMT);                    Serial.print(TEXT_SEPARATOR);                                                   Serial.write(TEXT_CLOSE);
-    Serial.print(BLANK2); Serial.print(PID_SPEED_MGMT_INITIALIZED);        Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.isInitialized());       Serial.write(TEXT_CLOSE);
-    
-    Serial.print(BLANK2); Serial.print(PID_AXIS);                          Serial.print(TEXT_SEPARATOR); Serial.print('X');                                Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_LOW_PULSE_WIDTH);   Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getLowPulseWidthX());   Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_HIGH_PULSE_WIDTH);  Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getHighPulseWidthX());  Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_TOTAL_OFFSET);      Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getTotalOffsetX());     Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_PER_SETP_OFFSET);   Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getOffsetPerStepX());   Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_MAX_SPEED);         Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getMaxSpeedX_MM_MIN()); Serial.write(TEXT_CLOSE);
-    
-    Serial.print(BLANK2); Serial.print(PID_AXIS);                          Serial.print(TEXT_SEPARATOR); Serial.print('Y');                                Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_LOW_PULSE_WIDTH);   Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getLowPulseWidthY());   Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_HIGH_PULSE_WIDTH);  Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getHighPulseWidthY());  Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_TOTAL_OFFSET);      Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getTotalOffsetY());     Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_PER_SETP_OFFSET);   Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getOffsetPerStepY());   Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_MAX_SPEED);         Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getMaxSpeedY_MM_MIN()); Serial.write(TEXT_CLOSE);
-    
-    Serial.print(BLANK2); Serial.print(PID_AXIS);                          Serial.print(TEXT_SEPARATOR); Serial.print('Z');                                Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_LOW_PULSE_WIDTH);   Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getLowPulseWidthZ());   Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_HIGH_PULSE_WIDTH);  Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getHighPulseWidthZ());  Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_TOTAL_OFFSET);      Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getTotalOffsetZ());     Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_PER_SETP_OFFSET);   Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getOffsetPerStepZ());   Serial.write(TEXT_CLOSE);
-     Serial.print(BLANK3); Serial.print(PID_SPEED_MGMT_MAX_SPEED);         Serial.print(TEXT_SEPARATOR); Serial.print(speedManager.getMaxSpeedZ_MM_MIN()); Serial.write(TEXT_CLOSE);
-  
-    X->printConfig();
-    Y->printConfig();
-    Z->printConfig();
+  X->printConfig();
+  Y->printConfig();
+  Z->printConfig();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncController::reset() {
@@ -219,7 +202,7 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
 /////////////////////////////////////////////////////////////////////////////////////  
 bool CncController::evaluateToolState() {
 /////////////////////////////////////////////////////////////////////////////////////  
-  return ( digitalRead(TOOL_FEEDBACK_PIN) == TOOL_STATE_ON );
+  return ( digitalRead(PIN_TOOL_FEEDBACK) == TOOL_STATE_ON );
 }
 /////////////////////////////////////////////////////////////////////////////////////  
 bool CncController::evaluateSupportButton1State(unsigned short idx) {
@@ -333,14 +316,14 @@ bool CncController::evaluateAndSendStates() {
   evaluateAnalogLimitPin(ls);
 
   if ( isAnalogSupportPinAvailable() == false ) {
-    sendHeartbeat(ls.getStates());
+    sendHeartbeat(ls.getValue());
     return true;
   }
 
   CncInterface::ISP::States sp;
   evaluateAnalogSupportPin(sp);
   
-  sendHeartbeat(ls.getStates(), sp.getStates());
+  sendHeartbeat(ls.getValue(), sp.getValue());
   
   return true;
 }

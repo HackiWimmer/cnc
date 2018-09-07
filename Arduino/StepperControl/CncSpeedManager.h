@@ -263,7 +263,7 @@ class CncSpeedManager {
 
             // set
             if ( fm > 0.0 ) configedFeedSpeed = fm / 60;
-            else                  configedFeedSpeed = 0.0;
+            else            configedFeedSpeed = 0.0;
 
             reset();
             measurement.reset();
@@ -323,48 +323,48 @@ class CncSpeedManager {
         double getMeasurementFeedSpeed()          { return measurement.feedSpeed; }
         
         //////////////////////////////////////////////////////////////////////////
-        double getConfiguredFeedSpeed()     { return configedFeedSpeed; }
+        double getConfiguredFeedSpeed()     const { return configedFeedSpeed; }
         
         //////////////////////////////////////////////////////////////////////////
-        unsigned int getTotalOffsetX()      { return totalOffsetX; }
-        unsigned int getTotalOffsetY()      { return totalOffsetY; }
-        unsigned int getTotalOffsetZ()      { return totalOffsetZ; }
+        unsigned int getTotalOffsetX()      const { return totalOffsetX; }
+        unsigned int getTotalOffsetY()      const { return totalOffsetY; }
+        unsigned int getTotalOffsetZ()      const { return totalOffsetZ; }
     
-        unsigned int getOffsetPerStepX()    { return perStepOffsetX; }
-        unsigned int getOffsetPerStepY()    { return perStepOffsetY; }
-        unsigned int getOffsetPerStepZ()    { return perStepOffsetZ; }
+        unsigned int getOffsetPerStepX()    const { return perStepOffsetX; }
+        unsigned int getOffsetPerStepY()    const { return perStepOffsetY; }
+        unsigned int getOffsetPerStepZ()    const { return perStepOffsetZ; }
         
         //////////////////////////////////////////////////////////////////////////
-        double getCurrentDistance()         { return currentDistance; }
+        double getCurrentDistance()         const { return currentDistance; }
         
         //////////////////////////////////////////////////////////////////////////
-        unsigned int getConstOffset()       { return constOffset; }
+        unsigned int getConstOffset()       const { return constOffset; }
         
-        unsigned int getTotalPulseOffsetX() { return tPulseOffsetX; }
-        unsigned int getTotalPulseOffsetY() { return tPulseOffsetY; }
-        unsigned int getTotalPulseOffsetZ() { return tPulseOffsetZ; }
+        unsigned int getTotalPulseOffsetX() const { return tPulseOffsetX; }
+        unsigned int getTotalPulseOffsetY() const { return tPulseOffsetY; }
+        unsigned int getTotalPulseOffsetZ() const { return tPulseOffsetZ; }
         
-        unsigned int getLowPulseWidthX()    { return (tPulseOffsetX - constOffset) / 2; }
-        unsigned int getLowPulseWidthY()    { return (tPulseOffsetX - constOffset) / 2; }
-        unsigned int getLowPulseWidthZ()    { return (tPulseOffsetX - constOffset) / 2; }
+        unsigned int getLowPulseWidthX()    const { return (tPulseOffsetX - constOffset) / 2; }
+        unsigned int getLowPulseWidthY()    const { return (tPulseOffsetX - constOffset) / 2; }
+        unsigned int getLowPulseWidthZ()    const { return (tPulseOffsetX - constOffset) / 2; }
         
-        unsigned int getHighPulseWidthX()   { return (tPulseOffsetX - constOffset) / 2; }
-        unsigned int getHighPulseWidthY()   { return (tPulseOffsetX - constOffset) / 2; }
-        unsigned int getHighPulseWidthZ()   { return (tPulseOffsetX - constOffset) / 2; }
+        unsigned int getHighPulseWidthX()   const { return (tPulseOffsetX - constOffset) / 2; }
+        unsigned int getHighPulseWidthY()   const { return (tPulseOffsetX - constOffset) / 2; }
+        unsigned int getHighPulseWidthZ()   const { return (tPulseOffsetX - constOffset) / 2; }
     
         //////////////////////////////////////////////////////////////////////////
-        double getMaxSpeedX_MM_MIN()        { return maxFeedSpeedX * 60; }
-        double getMaxSpeedY_MM_MIN()        { return maxFeedSpeedY * 60; }
-        double getMaxSpeedZ_MM_MIN()        { return maxFeedSpeedZ * 60; }
+        double getMaxSpeedX_MM_MIN()        const { return maxFeedSpeedX * 60; }
+        double getMaxSpeedY_MM_MIN()        const { return maxFeedSpeedY * 60; }
+        double getMaxSpeedZ_MM_MIN()        const { return maxFeedSpeedZ * 60; }
     
-        double getMaxSpeedY_MM_SEC()        { return maxFeedSpeedY; }
-        double getMaxSpeedX_MM_SEC()        { return maxFeedSpeedX; }
-        double getMaxSpeedT_MM_SEC()        { return maxFeedSpeedZ; }
+        double getMaxSpeedY_MM_SEC()        const { return maxFeedSpeedY; }
+        double getMaxSpeedX_MM_SEC()        const { return maxFeedSpeedX; }
+        double getMaxSpeedT_MM_SEC()        const { return maxFeedSpeedZ; }
         
         //////////////////////////////////////////////////////////////////////////
-        unsigned int getMaxStepsX()         { return maxStepsX; }
-        unsigned int getMaxStepsY()         { return maxStepsY; }
-        unsigned int getMaxStepsZ()         { return maxStepsZ; }
+        unsigned int getMaxStepsX()         const { return maxStepsX; }
+        unsigned int getMaxStepsY()         const { return maxStepsY; }
+        unsigned int getMaxStepsZ()         const { return maxStepsZ; }
     
 };
 

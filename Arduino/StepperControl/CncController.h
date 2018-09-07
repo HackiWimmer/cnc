@@ -64,7 +64,9 @@ class CncController {
     //////////////////////////////////////////////////////////////////////////////
     void setupSpeedManager();
 
-    void setSpeedValue(double fm)  { speedManager. setFeedSpeed(fm); }
+    const CncSpeedManager& getSpeedManager() const { return speedManager; }
+
+    void setSpeedValue(double fm)         { speedManager.setFeedSpeed(fm);           }
     unsigned int getPerStepSpeedOffsetX() { return speedManager.getOffsetPerStepX(); }
     unsigned int getPerStepSpeedOffsetY() { return speedManager.getOffsetPerStepY(); }
     unsigned int getPerStepSpeedOffsetZ() { return speedManager.getOffsetPerStepZ(); }
@@ -141,12 +143,12 @@ class CncController {
 
     //////////////////////////////////////////////////////////////////////////////
     int getAnalogLimitPin()                         { return analogLimitPin; }
-    bool isAnalogLimitPinAvailable()                { return analogLimitPin == ANALOG_LIMIT_PIN_ID; }
+    bool isAnalogLimitPinAvailable()                { return analogLimitPin == PIN_ANALOG_LIMIT_ID; }
     void setAnalogLimitPin(const unsigned char alp) { analogLimitPin = alp; }
 
     //////////////////////////////////////////////////////////////////////////////
     int getAnalogSupportPin()                         { return analogSupportPin; }
-    bool isAnalogSupportPinAvailable()                { return analogSupportPin == ANALOG_SUPPORT_PIN_ID; }
+    bool isAnalogSupportPinAvailable()                { return analogSupportPin == PIN_ANALOG_SUPPORT_ID; }
     void setAnalogSupportPin(const unsigned char asp) { analogSupportPin = asp; }
 };
 

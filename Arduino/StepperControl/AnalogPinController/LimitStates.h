@@ -50,6 +50,36 @@ namespace LimitSwitch {
         setBit(BIT_2,        false);
         setBit(BIT_1,        false);
       }
+
+      //-------------------------------------------------------------
+      virtual const char* getValueAsReport(char* ret) {
+        if ( ret == NULL )
+          return ret;
+
+        if ( sizeof(ret) < 128 ) {
+          strcpy(ret, EM_BUFFER_TO_SMALL);
+          return ret;
+        }
+
+        const char* low  = "Low";
+        const char* high = "High";
+
+        sprintf(ret, "%c %s=%d\n"
+                     "%c %s=%d\n"
+                     "%c %s=%d\n"
+                     "%c %s=%d\n"
+                     "%c %s=%d\n"
+                     "%c %s=%d\n", 
+                     'X', low,  getBit(BIT_LS_X_MIN),
+                     'X', high, getBit(BIT_LS_X_MAX),
+                     'Y', low,  getBit(BIT_LS_Y_MIN),
+                     'Y', high, getBit(BIT_LS_Y_MAX),
+                     'Z', low,  getBit(BIT_LS_Z_MIN),
+                     'Z', high, getBit(BIT_LS_Z_MAX)
+               );
+
+        return ret;
+      }
       
       //-------------------------------------------------------------
       virtual void report() {

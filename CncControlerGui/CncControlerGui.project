@@ -419,7 +419,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O3;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\freeglut\include"/>
@@ -472,7 +472,7 @@
       </Completion>
     </Configuration>
     <Configuration Name="release2" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\freeglut\include"/>
@@ -502,7 +502,7 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
-        <Command Enabled="yes">rem gcc -E -dM CncControl.cpp</Command>
+        <Command Enabled="no"># gcc -E -dM CncControl.cpp</Command>
       </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">

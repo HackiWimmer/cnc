@@ -7,6 +7,7 @@
     const char CR                        =    '\n';
     const char MINUS                     =     '-';
     const char EQUAL                     =     '=';
+    const char HASH                      =     '#';
     
     const char* EMPTY_TEXT_VAL           =      "";
     const char* BLANK                    =     " ";

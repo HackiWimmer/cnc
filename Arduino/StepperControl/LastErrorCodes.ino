@@ -1,6 +1,28 @@
 #include "LastErrorCodes.h"
 
 //////////////////////////////////////////////////////////////////
+unsigned char LastErrorCodes::setNextErrorInfoWithoutErrorMessage(int id, const char* text) {
+//////////////////////////////////////////////////////////////////
+  unsigned char ret   = RET_ERROR;
+  
+  withoutErrorMessage  = true;
+  ret = setNextErrorInfo(id, text);
+  withoutErrorMessage  = false;
+  
+  return ret;
+}
+//////////////////////////////////////////////////////////////////
+unsigned char LastErrorCodes::setNextErrorInfoWithoutErrorMessage(int id, const String& text) {
+//////////////////////////////////////////////////////////////////
+  unsigned char ret   = RET_ERROR;
+  
+  withoutErrorMessage  = true;
+  ret = setNextErrorInfo(id, text);
+  withoutErrorMessage  = false;
+  
+  return ret;
+}
+//////////////////////////////////////////////////////////////////
 unsigned char LastErrorCodes::setNextErrorInfo(int id, const String& text) {
 //////////////////////////////////////////////////////////////////
   return setNextErrorInfo(id, text.c_str());
@@ -32,17 +54,19 @@ unsigned char LastErrorCodes::setNextErrorInfo(int id, const char* text) {
   totalCount++;  
   performNextResponseId();
 
-  // puplish this message too
-  String msg("{[");
-  msg += String(id);
-  msg += "]} ";
-
-  if ( text != NULL ) {
-    msg += ": ";
-    msg += text;
+  // puplish this as message too
+  if ( withoutErrorMessage == false ) {
+    String msg("{[");
+    msg += String(id);
+    msg += "]} ";
+  
+    if ( text != NULL ) {
+      msg += ": ";
+      msg += text;
+    }
+  
+    pushErrorMessage(msg.c_str());
   }
-
-  pushErrorMessage(msg.c_str());
   
   return RET_ERROR;
 }

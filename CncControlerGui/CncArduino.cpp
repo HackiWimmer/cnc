@@ -27,6 +27,9 @@ void ArduinoCMDs::init() {
 	cmds[SIG_HALT]                  = "Push Signal Pause";
 	cmds[SIG_PAUSE]                 = "Push Signal Pause";
 	cmds[SIG_RESUME]                = "Push Signal Resume";
+	cmds[SIG_CANCEL_X_MOVE]         = "Push Signal Cancle X Move";
+	cmds[SIG_CANCEL_Y_MOVE]         = "Push Signal Cancle Y Move";
+	cmds[SIG_CANCEL_Z_MOVE]         = "Push Signal Cancle Z Move";
 	
 	cmds[CMD_IDLE]                  = "Pull Idle Callback";
 	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Controller";
@@ -34,6 +37,7 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_SETTER]                = "Push Setter";
 	cmds[CMD_GETTER]                = "Pull Getter";
+	cmds[CMD_GETTER_LIST]           = "Pull Getter List";
 	
 	cmds[CMD_ENABLE_STEPPER_PIN]    = "Push Enable Stepper Motors";
 	cmds[CMD_DISABLE_STEPPER_PIN]   = "Push Disable Stepper Motors";
@@ -136,7 +140,10 @@ void ArduinoPIDs::init() {
 	pids[PID_X_LIMIT]                         = "X limit state";
 	pids[PID_Y_LIMIT]                         = "Y limit state";
 	pids[PID_Z_LIMIT]                         = "Z limit state";
-
+	
+	pids[PID_ANALOG_LIMIT_PIN]                = "Analog Limit state";
+	pids[PID_ANALOG_SUPPORT_PIN]              = "Analog Support state";
+	
 	pids[PID_CONTROLLER]                      = "Controller";
 	pids[PID_ROUTER_SWITCH]                   = "Tool switch";
 	pids[PID_POS_REPLY_THRESHOLD_X]           = "Position reply threshold X axis";
@@ -267,6 +274,7 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_INVALID_PARAM_STREAM]               = "Arduino::setValue(): Noting to read";
 	errorCodes[E_GETTER_ID_NOT_FOUND]                = "Arduino::getValue(): Cant read getter id";
 	errorCodes[E_INVALID_GETTER_ID]                  = "Arduino::getValue(): Getter id not known"; 
+	errorCodes[E_INVALID_GETTER_LIST_COUNT]			 = "Arduino::getValues(): Getter list count not available";
 	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Cant read long from Serial: invalid size: ";
 	
 	errorCodes[E_INVALID_TEST_ID]                    = "Arduino::devodeTest(): Invalid Test id";
@@ -329,20 +337,21 @@ void ArduinoDigitalPins::init() {
 		pins[i]  = s.c_str();
 	}
 
-	pins[X_STP]              = "STEP PIN X";
-	pins[Y_STP]              = "STEP PIN Y";
-	pins[Z_STP]              = "STEP PIN Z";
-	pins[X_DIR]              = "DIR PIN X";
-	pins[Y_DIR]              = "DIR PIN Y";
-	pins[Z_DIR]              = "DIR PIN Z";
+	pins[PIN_X_STP]              = "STEP PIN X";
+	pins[PIN_Y_STP]              = "STEP PIN Y";
+	pins[PIN_Z_STP]              = "STEP PIN Z";
+	pins[PIN_X_DIR]              = "DIR PIN X";
+	pins[PIN_Y_DIR]              = "DIR PIN Y";
+	pins[PIN_Z_DIR]              = "DIR PIN Z";
 	
-	pins[ENABLE_PIN]         = "STEPPER MOTOR ENABLE PIN";
+	pins[PIN_ENABLE]             = "STEPPER ENABLE PIN";
 	
-	pins[X_LIMIT]            = "LIMIT PIN X";
-	pins[Y_LIMIT]            = "LIMIT PIN Y";
-	pins[Z_LIMIT]            = "LIMIT PIN Z";
+	pins[PIN_X_LIMIT]            = "LIMIT PIN X";
+	pins[PIN_Y_LIMIT]            = "LIMIT PIN Y";
+	pins[PIN_Z_LIMIT]            = "LIMIT PIN Z";
 	
-	pins[TOOL_PIN]           = "TOOL ENABLE PIN";
+	pins[PIN_TOOL_ENABLE]        = "TOOL ENABLE PIN";
+	pins[PIN_TOOL_FEEDBACK]      = "TOOL FEEDBACK PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoDigitalPins::getPinLabel(unsigned int id) {
@@ -372,7 +381,9 @@ void ArduinoAnalogPins::init() {
 		pins[i]  = s.c_str();
 	}
 
-	pins[INTERRUPT_LED_ID]         = "Interrupt LED";
+	pins[PIN_INTERRUPT_LED_ID]   = "INTERRUPT LED PIN";
+	pins[PIN_ANALOG_LIMIT_ID]    = "ANALOG LIMIT PIN";
+	pins[PIN_ANALOG_SUPPORT_ID]  = "ANALOG SUPPORT PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoAnalogPins::getPinLabel(unsigned int id) {
