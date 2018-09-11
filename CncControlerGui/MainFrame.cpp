@@ -724,7 +724,6 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		cnc->sendIdleMessage();
 		m_serialTimer->Start();
 	}
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
@@ -846,8 +845,16 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 	if ( cnc != NULL && cnc->getSerial() != NULL ) {
 		m_speedPanel->Refresh();
 		
-		if ( GBL_CONFIG->isProbeMode() == true )	m_feedSpeed->ChangeValue(_maxSpeedLabel);
-		else										m_feedSpeed->ChangeValue(wxString::Format("%.1lf", cnc->getCurrentFeedSpeed_MM_MIN()));
+		wxString sValue(_maxSpeedLabel);
+		
+		if ( GBL_CONFIG->isProbeMode() == false ) {	
+			
+			const double dValue = cnc->getRealtimeFeedSpeed_MM_MIN();
+			if ( dValue  < 0.0 ) sValue.assign(_maxSpeedLabel);
+			else 				 sValue.assign(wxString::Format("%.1lf", dValue));
+		}
+		
+		m_feedSpeed->ChangeValue(sValue);
 	}
 	
 	// update position syp
@@ -1402,8 +1409,6 @@ void MainFrame::initialize(void) {
 	
 	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
 	
-	m_cmSpeedValue->SetLabel(wxString::Format("%d",m_cmSpeedSlider->GetValue()));
-	
 	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
 	decorateTestSuiteParameters();
 	
@@ -1563,6 +1568,8 @@ void MainFrame::determineCncOutputControls() {
 	
 	guiCtlSetup->passingTrace			= m_passingCount;
 	guiCtlSetup->toolState 				= m_toolStateTrafficLight;
+	
+	guiCtlSetup->heartbeatState			= m_heartbeatState;
 	
 	guiCtlSetup->controllerConfig		= m_dvListCtrlControllerConfig;
 	guiCtlSetup->controllerPinReport	= m_dvListCtrlControllerPins;
@@ -1761,7 +1768,7 @@ bool MainFrame::connectSerialPort() {
 		return false;
 	
 	if ( cnc->getSerial()->canProcessIdle() ) {
-		m_miRqtIdleMessages->Check(true);
+		//m_miRqtIdleMessages->Check(true);
 		m_miRqtIdleMessages->Enable(true);
 	}
 	
@@ -4007,12 +4014,9 @@ void MainFrame::requestVersion(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestHeartbeat(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	#warning todo HB
-	/*wxASSERT(cnc);
-	std::stringstream ss;
-	cnc->processCommand(CMD_PRINT_VERSION, ss);
-	cnc::trc.logInfoMessage(ss);
-	*/
+	wxASSERT(cnc);
+	std::stringstream dummy;
+	cnc->processCommand(CMD_HEARTBEAT, dummy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestConfig(wxCommandEvent& event) {
@@ -7473,30 +7477,46 @@ void MainFrame::keyDownLruList(wxKeyEvent& event) {
 	event.Skip(true);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::changeCmSpeedSlider(wxScrollEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	m_cmSpeedValue->SetLabel(wxString::Format("%d",m_cmSpeedSlider->GetValue()));
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::manualContinuousMoveStart(wxWindow* ctrl, bool x, bool y, bool z, const CncDirection dir) {
 /////////////////////////////////////////////////////////////////////
-	std::cout << (double)(m_cmSpeedSlider->GetValue())/100 << "    " << cnc->getCurrentFeedSpeed_MM_MIN() << std::endl;
-	
-	
-	cnc->changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
-	
-	//changeCurrentFeedSpeedXYZ_MM_MIN(s, value);
-
-		
 	wxASSERT(cnc);
 	wxASSERT(ctrl);
 	
+	const short SMALLEST		= 0;
+	const short SMALL			= 1;
+	const short MEDIUM			= 2;
+	const short LARGE			= 3;
+	const short LARGEST			= 4;
+	
+	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
+	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
+	bool altKey = CncAsyncKeyboardState::isAltPressed();
+	
+	CncControl::StepSensitivity stepSensitivity = CncControl::StepSensitivity::SMALLEST;
+	if ( shtKey || ctlKey || altKey ) {
+		
+		if ( shtKey && ctlKey )			stepSensitivity = CncControl::StepSensitivity::LARGEST;
+		else if ( shtKey )				stepSensitivity = CncControl::StepSensitivity::SMALL;
+		else if ( ctlKey )				stepSensitivity = CncControl::StepSensitivity::MEDIUM;
+		else if ( altKey )				stepSensitivity = CncControl::StepSensitivity::LARGE;
+	} 
+	
+	switch ( stepSensitivity ) {
+		case CncControl::StepSensitivity::SMALLEST:		m_cbStepSensitivity->Select(SMALLEST); 	stepSensitivity = CncControl::StepSensitivity::SMALLEST; 	break;
+		case CncControl::StepSensitivity::SMALL:		m_cbStepSensitivity->Select(SMALL); 	stepSensitivity = CncControl::StepSensitivity::SMALL;		break;
+		case CncControl::StepSensitivity::MEDIUM:		m_cbStepSensitivity->Select(MEDIUM); 	stepSensitivity = CncControl::StepSensitivity::MEDIUM;		break;
+		case CncControl::StepSensitivity::LARGE:		m_cbStepSensitivity->Select(LARGE); 	stepSensitivity = CncControl::StepSensitivity::LARGE; 		break;
+		case CncControl::StepSensitivity::LARGEST:		m_cbStepSensitivity->Select(LARGEST); 	stepSensitivity = CncControl::StepSensitivity::LARGEST;		break;
+	}
+
 	cnc->manualContinuousMoveStop();
 	enableGuiControls(false);
 	enableRunControls(false);
 	ctrl->Enable(true);
+	cnc->changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMax);
 	
-	cnc->manualContinuousMoveStart(x, y, z, dir);
+	cnc->manualContinuousMoveStart(stepSensitivity, x, y, z, dir);
+	
 	enableGuiControls(true);
 	enableRunControls(true);
 	
@@ -7515,44 +7535,32 @@ void MainFrame::manualContinuousMoveStop() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	//m_cmXneg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmXnegLeftDown), NULL, this);
 	manualContinuousMoveStart(m_cmXneg, true, false, false, CncAnticlockwise);
-	//m_cmXneg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmXnegLeftDown), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	//m_cmXpos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmXposLeftDown), NULL, this);
 	manualContinuousMoveStart(m_cmXpos, true, false, false, CncClockwise);
-	//m_cmXpos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmXposLeftDown), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmYnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	//m_cmYneg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmYnegLeftDown), NULL, this);
 	manualContinuousMoveStart(m_cmYneg, false, true, false, CncAnticlockwise);
-	//m_cmYneg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmYnegLeftDown), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmYposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	//m_cmYpos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmYposLeftDown), NULL, this);
 	manualContinuousMoveStart(m_cmYpos, false, true, false, CncClockwise);
-	//m_cmYpos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmYposLeftDown), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmZnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	//m_cmZneg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmZnegLeftDown), NULL, this);
 	manualContinuousMoveStart(m_cmZneg, false, false, true, CncAnticlockwise);
-	//m_cmZneg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmZnegLeftDown), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmZposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	//m_cmZpos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmZposLeftDown), NULL, this);
 	manualContinuousMoveStart(m_cmZpos, false, false, true, CncClockwise);
-	//m_cmZpos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrame::cmZposLeftDown), NULL, this);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmLeftDClick(wxMouseEvent& event) {

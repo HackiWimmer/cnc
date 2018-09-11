@@ -17,7 +17,7 @@ namespace GLI {
 			, _x(0)
 			, _y(0)
 			, _z(0)
-			, _mode(GLI::GLCncPathVertices::CncMode::CM_FLY)
+			, _mode(GLI::GLCncPathVertices::CncMode::CM_RAPID)
 			{}
 
 			//////////////////////////////////////////////
@@ -49,12 +49,16 @@ namespace GLI {
 			void setVertice(long id, CncSpeed speedType, const CncPosition<T>& cp) {
 				_id = id;
 				
+				_x = cp.getX();
+				_y = cp.getY();
+				_z = cp.getZ();
+
+				typedef GLI::GLCncPathVertices::CncMode Mode;
 				switch ( speedType ) {
-					case CncSpeedWork: 	setWorkVertice(cp);
-										break;
-										
-					case CncSpeedRapid: setRapidVertice(cp);
-										break;
+					case CncSpeedWork: 			_mode = Mode::CM_WORK; 	break;
+					case CncSpeedRapid: 		_mode = Mode::CM_RAPID;	break;
+					case CncSpeedMax: 			_mode = Mode::CM_WORK;	break;
+					case CncSpeedUserDefined: 	_mode = Mode::CM_WORK;	break;
 				}
 			}
 		
@@ -65,24 +69,6 @@ namespace GLI {
 			T _y;
 			T _z;
 			GLI::GLCncPathVertices::CncMode _mode;
-			
-			//////////////////////////////////////////////
-			void setRapidVertice(const CncPosition<T>& cp) {
-				_x = cp.getX();
-				_y = cp.getY();
-				_z = cp.getZ();
-				
-				_mode = GLI::GLCncPathVertices::CncMode::CM_FLY;
-			}
-
-			//////////////////////////////////////////////
-			void setWorkVertice(const CncPosition<T>& cp) {
-				_x = cp.getX();
-				_y = cp.getY();
-				_z = cp.getZ();
-				
-				_mode = GLI::GLCncPathVertices::CncMode::CM_WORK;
-			}
 	};
 
 	

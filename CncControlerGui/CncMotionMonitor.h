@@ -25,9 +25,10 @@ class CncMotionMonitor : public wxGLCanvas {
 			bool drawFlyPath		= true;
 			bool autoScaling		= true;
 			
-			wxColour flyColour		= *wxYELLOW;
-			wxColour workColour		= *wxWHITE;
-			
+			wxColour rapidColour		= *wxYELLOW;
+			wxColour workColour			= *wxWHITE;
+			wxColour maxColour			= *wxBLUE;
+			wxColour userDefinedColour	= *wxLIGHT_GREY;
 			// fill more flags here if neccessary
 		};
 		

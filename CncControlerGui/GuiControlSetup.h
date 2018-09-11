@@ -22,6 +22,8 @@ struct GuiControlSetup {
 	
 	wxTextCtrl* passingTrace		= NULL;
 	
+	wxStaticBitmap* heartbeatState	= NULL;
+	
 	wxStaticBitmap* toolState		= NULL;
 	wxMenuItem* motorState			= NULL;
 	

@@ -211,6 +211,10 @@ void ArduinoPIDs::init() {
 	pids[PID_MAX_DIMENSION_X]                 = "Max Dimension X [Steps]";
 	pids[PID_MAX_DIMENSION_Y]                 = "Max Dimension Y [Steps]";
 	pids[PID_MAX_DIMENSION_Z]                 = "Max Dimension Z [Steps]";
+	
+	pids[PID_INCREMENT_DIRECTION_VALUE_X]     = "Invert dircetion X";
+	pids[PID_INCREMENT_DIRECTION_VALUE_Y]     = "Invert dircetion Y";
+	pids[PID_INCREMENT_DIRECTION_VALUE_Z]     = "Invert dircetion Z";
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {

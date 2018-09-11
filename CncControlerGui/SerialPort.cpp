@@ -1604,7 +1604,7 @@ bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 		return false;
 	}
 
-	//fetch 3 int32_t values
+	//fetch 4 int32_t values
 	ContollerInfo ci;
 	ci.infoType = CITPosition;
 	ci.command  = sfi.command;
@@ -1678,43 +1678,44 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 		std::cerr << "ERROR while reading heartbeat byte count. Nothing available" << std::endl;
 		return false;
 	}
-
-	int32_t counterValue = 0;
-	if ( (sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, sizeof(sfi.Sc.result))) <= (int)LONG_BUF_SIZE ) {
+	
+	// first reading heartbeat value
+	if ( (sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, LONG_BUF_SIZE)) < (int)LONG_BUF_SIZE ) {
 		std::cerr << "ERROR while reading heartbeat counter value. Nothing available" << std::endl;
 		return false;
 	}
 	sfi.Sc.p = sfi.Sc.result;
-	memcpy(&counterValue, sfi.Lc.p, LONG_BUF_SIZE);
+	int32_t heartbeatValue = 0;
+	memcpy(&heartbeatValue, sfi.Sc.p, LONG_BUF_SIZE);
 	
 	ContollerInfo ci;
 	ci.infoType 		= CITHeartbeat;
 	ci.command   		= sfi.command;
-	ci.heartbeatValue  	= counterValue;
-
+	ci.heartbeatValue  	= heartbeatValue;
+	
 	// if nothing more available . . .
-	if ( byteCount[0] - LONG_BUF_SIZE <= 0 ) {
+	byteCount[0] -= LONG_BUF_SIZE;
+	if ( byteCount[0] <= 0 ) {
 		sendSerialControllrCallback(ci);
 		return true;
 	}
-
-	// evaluate further bytes on demand. . .
-	const short ONE_BYTE_SIZE 			= 1;
 	
+	if ( (unsigned int)byteCount[0] > sizeof(sfi.Sc.result) ) {
+		//todo
+	}
+	
+	// evaluate further bytes on demand. . .
+	const short ONE_BYTE_SIZE 		= 1;
 	const short LIMIT_STATE_IDX			= 0;
 	const short SUPPORT_STATE_IDX		= 1;
 	const short BYTE_3_IDX				= 2;
 	const short BYTE_4_IDX				= 3;
-
-	if ( (unsigned int)byteCount[0] > sizeof(sfi.Sc.result) ) {
-		std::cerr << "ERROR while reading further heartbeat content, more space needed" << std::endl;
-		return false;
-	}
-
+	
+	// read remaining bytes
 	sfi.Sc.bytes = readDataUntilSizeAvailable(sfi.Sc.result, (unsigned int)byteCount[0]);
 	sfi.Sc.p 	 = sfi.Sc.result;
 	
-	if ( sfi.Sc.bytes != byteCount[0] ) {
+	if ( sfi.Sc.bytes != byteCount[0]) {
 		std::cerr << "WARNING while reading furter heartbeat bytes. Expected byte count: " << (unsigned int)byteCount[0];
 		std::cerr << " received: " << sfi.Sc.bytes << std::endl;
 	}

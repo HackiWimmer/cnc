@@ -27,8 +27,10 @@ const double endSwitchStepBackMertic = 2.5;
 ///////////////////////////////////////////////////////////////////
 class CncControl {
 	public:
-		enum DimensionMode {DM_2D, DM_3D};
-		
+		enum DimensionMode   { DM_2D, DM_3D };
+		enum StepSensitivity { SMALLEST = 1, SMALL = 10 , MEDIUM = 50, LARGE = 100, LARGEST = 200 };
+		const short STEP_SENSITIVITY_FACTOR = 100;
+
 	private:
 		long currentClientId;
 		bool runContinuousMove;
@@ -63,11 +65,17 @@ class CncControl {
 		// Stores the lateset requested control positions
 		CncLongPosition controllerPos;
 		// speed values
-		CncSpeed speedType;
-		double configuredFeedSpeed_MM_MIN;
-		double currentFeedSpeed_MM_MIN;
+		// actual rte (measured) speed value
+		double realtimeFeedSpeed_MM_MIN;
+		
+		// default values for work and rapid
 		double defaultFeedSpeedRapid_MM_MIN;
 		double defaultFeedSpeedWork_MM_MIN;
+
+		// actual configured speed type and value
+		CncSpeed configuredSpeedType;
+		double configuredFeedSpeed_MM_MIN;
+
 		// Duration counter
 		unsigned int durationCounter;
 		// Interrupt state
@@ -80,6 +88,9 @@ class CncControl {
 		bool toolUpdateState;
 		// Artificially Step Delay
 		unsigned int stepDelay;
+		// heartbeat value
+		int32_t lastCncHeartbeatValue;
+		
 		// output controls
 		GuiControlSetup* guiCtlSetup;
 		#define GET_GUI_CTL(ctl)           (guiCtlSetup->ctl)
@@ -154,16 +165,17 @@ class CncControl {
 		//Make Serial available
 		Serial* getSerial() { return serialPort; }
 		//speed
-		CncSpeed getCurrentSpeedType() { return speedType; }
+		CncSpeed getConfiguredSpeedType() { return configuredSpeedType; }
+		const wxString& getConfiguredSpeedTypeAsString();
+		
+		double getRealtimeFeedSpeed_MM_MIN();
+		
 		double getConfiguredFeedSpeed_MM_SEC() { return configuredFeedSpeed_MM_MIN / 60; }
 		double getConfiguredFeedSpeed_MM_MIN() { return configuredFeedSpeed_MM_MIN; }
-		double getCurrentFeedSpeed_MM_MIN();
 		
 		void changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s);
 		void setDefaultRapidSpeed_MM_MIN(double s);
 		void setDefaultWorkSpeed_MM_MIN(double s);
-		
-		const wxString& getSpeedTypeAsString();
 		
 		// signal wrapper
 		bool sendInterrupt() 	{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
@@ -270,8 +282,8 @@ class CncControl {
 		bool processSetter(unsigned char id, int32_t value);
 		bool processSetterList(std::vector<SetterTuple>& setup);
 		// Change the current speed parameter
-		void changeCurrentFeedSpeedXYZ_MM_SEC(CncSpeed s, double value = 0.0);
-		void changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value = 0.0);
+		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0);
+		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
@@ -291,7 +303,8 @@ class CncControl {
 		bool moveYToMid();
 		bool moveZToMid();
 		
-		bool manualContinuousMoveStart(bool x, bool y, bool z, const CncDirection dir);
+		bool manualContinuousMoveStart(StepSensitivity s,  bool x, bool y, bool z, const CncDirection dir);
+		bool manualContinuousMoveStart(double stepSensitivity, bool x, bool y, bool z, const CncDirection dir);
 		void manualContinuousMoveStop();
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);

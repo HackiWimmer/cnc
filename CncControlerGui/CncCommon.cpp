@@ -32,6 +32,20 @@ const wxString& cnc::dblFormat3(double d1, double d2, double d3, const wxString&
 	return s;
 }
 //////////////////////////////////////////////////////////////
+const wxString& cnc::getCncSpeedTypeAsString(CncSpeed s) {
+//////////////////////////////////////////////////////////////
+	static wxString ret;
+	
+	switch( s ) {
+		case CncSpeedWork: 			ret.assign(cnc::WORK_SPEED_CHAR); 			break;
+		case CncSpeedRapid:			ret.assign(cnc::RAPID_SPEED_CHAR);			break;
+		case CncSpeedMax:			ret.assign(cnc::MAX_SPEED_CHAR); 			break;
+		case CncSpeedUserDefined:	ret.assign(cnc::USER_DEFIND_SPEED_CHAR); 	break;
+	}
+	
+	return ret;
+}
+//////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream& os, const wxPoint& p) {
 //////////////////////////////////////////////////////////////
 	os << wxString::Format("%10ld,%10ld ", p.x, p.y);

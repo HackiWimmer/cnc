@@ -73,6 +73,8 @@
   const unsigned char CMD_INVALID                         = '\0';
   
   const unsigned char CMD_IDLE                            =  'i';
+  const unsigned char CMD_HEARTBEAT                       =  'h';
+  
   const unsigned char CMD_RESET_CONTROLLER                =  'R';
   const unsigned char CMD_RESET_ERRORINFO                 =  'r';
   
@@ -352,26 +354,33 @@
   #define ENABLE_STATE_OFF                               HIGH
   #define ENABLE_STATE_ON                                LOW 
 
-  const long BAUD_RATE                                   =  115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
-  const int  MAX_PARAM_SIZE                              =  64;
-  const int  MAX_MOVE_CMD_SIZE                           =  16;
-  
-  const char MBYTE_CLOSE                                 =  RET_MBYTE_CLOSE;
-  const char TEXT_CLOSE                                  =  '\n';
-  const char TEXT_SEPARATOR                              =  ':';
+  const char MBYTE_CLOSE                                 = RET_MBYTE_CLOSE;
+  const char TEXT_CLOSE                                  = '\n';
+  const char TEXT_SEPARATOR                              = ':';
 
-  const long DBL_FACT                                    = 1000;
-  const long MIN_LONG                                    = -2147483648L;
-  const long MAX_LONG                                    = +2147483647L;
-  
-  const int  MIN_INT                                     = -32767;
-  const int  MAX_INT                                     = +32767;
-  
-  const unsigned MAX_UINT                                = +65535;
+  const int16_t cncHeartbeatInterval                     = 2000; // milli seconds
 
-  const int DIRECTION_UNKNOWN                            =  0;
-  const int DIRECTION_INC                                = +1;
-  const int DIRECTION_DEC                                = -1;
+  const int32_t NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
+  const int32_t INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
+
+  const int32_t BAUD_RATE                                = 115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
+
+  const int16_t DIRECTION_UNKNOWN                        =  0;
+  const int16_t DIRECTION_INC                            = +1;
+  const int16_t DIRECTION_DEC                            = -1;
+
+  const int16_t MAX_PARAM_SIZE                           = 64;
+  const int16_t MAX_MOVE_CMD_SIZE                        = 16;
+  
+  const int32_t DBL_FACT                                 = 1000;
+  const int32_t MIN_LONG                                 = -2147483648L;
+  const int32_t MAX_LONG                                 = +2147483647L;
+  
+  const int16_t MIN_INT                                  = -32767;
+  const int16_t MAX_INT                                  = +32767;
+  
+  const uint16_t MAX_UINT                                = +65535;
+
 
 #endif
 

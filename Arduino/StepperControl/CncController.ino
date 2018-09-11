@@ -2,7 +2,9 @@
 #include "CommonFunctions.h"
 #include "CommonValues.h"
 
-int pointA[3], pointB[3];
+static const short POINT_LENGTH = 3;
+  int pointA[POINT_LENGTH];
+  int pointB[POINT_LENGTH];
 
 /////////////////////////////////////////////////////////////////////////////////////
 CncController::CncController(const unsigned char alp, 
@@ -26,6 +28,7 @@ CncController::CncController(const unsigned char alp,
 , positionCounterOverflow(0L)
 , posReplyState(false)
 , probeMode(false)
+, lastHeartbeat(0)
 {
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -48,7 +51,7 @@ long CncController::isReadyToRun() {
 ////////////////////////////////////////////////////////////////////////////////////
 void CncController::setupSpeedManager() {
 /////////////////////////////////////////////////////////////////////////////////////
-  speedManager.setup( 40,
+  speedManager.setup( 20,
                       X->getPitch(), X->getSteps(), X->getPulseWidthOffset() * 2,
                       Y->getPitch(), Y->getSteps(), Y->getPulseWidthOffset() * 2,
                       Z->getPitch(), Z->getSteps(), Z->getPulseWidthOffset() * 2);
@@ -63,7 +66,6 @@ unsigned int CncController::getPerStepSpeedOffset(char axis) {
   }
 
   return 1000;
-  //return MAX_UINT;
 }
 //////////////////////////////////////////////////////////////////////////////
 unsigned int CncController::getLowPulseWidth(char axis){
@@ -166,7 +168,7 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
   long y = Y->getPosition();  
   long z = Z->getPosition();  
 
-  long speedValue = speedManager.getMeasurementFeedSpeed() * DBL_FACT;
+  long speedValue = speedManager.getMeasurementFeedSpeed_MM_MIN() * DBL_FACT;
   
   if ( absolute(x - lastSendPositionX) >= posReplyThresholdX ||
        absolute(y - lastSendPositionY) >= posReplyThresholdY ||
@@ -205,7 +207,7 @@ bool CncController::evaluateToolState() {
   return ( digitalRead(PIN_TOOL_FEEDBACK) == TOOL_STATE_ON );
 }
 /////////////////////////////////////////////////////////////////////////////////////  
-bool CncController::evaluateSupportButton1State(unsigned short idx) {
+bool CncController::evaluateSupportButtonState(unsigned short idx) {
 // true:  button pressed
 // false: button released
 /////////////////////////////////////////////////////////////////////////////////////  
@@ -219,8 +221,8 @@ bool CncController::evaluateSupportButton1State(unsigned short idx) {
 
   switch ( idx ) {
     case 1: return sp.isSupportButton1Pressed();
-    case 2: return sp.isSupportButton1Pressed();
-    case 3: return sp.isSupportButton1Pressed();
+    case 2: return sp.isSupportButton2Pressed();
+    case 3: return sp.isSupportButton3Pressed();
   }
   
   return false;
@@ -298,36 +300,6 @@ bool CncController::evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit
   return (xLimit != LimitSwitch::LIMIT_UNSET && yLimit != LimitSwitch::LIMIT_UNSET && zLimit != LimitSwitch::LIMIT_UNSET );
 }
 /////////////////////////////////////////////////////////////////////////////////////
-// This method evaluate the limit states by reading the corresponding pins
-bool CncController::evaluateAndSendStates() {
-/////////////////////////////////////////////////////////////////////////////////////
-
-  if ( isAnalogLimitPinAvailable() == false) {
-    long x = LimitSwitch::LIMIT_UNKNOWN;
-    long y = LimitSwitch::LIMIT_UNKNOWN;
-    long z = LimitSwitch::LIMIT_UNKNOWN;
-  
-    bool ret = evaluateLimitStates(x, y, z);
-    writeLongValues(PID_LIMIT, x, y, z);
-    return ret;
-  }
-
-  CncInterface::ILS::States ls;
-  evaluateAnalogLimitPin(ls);
-
-  if ( isAnalogSupportPinAvailable() == false ) {
-    sendHeartbeat(ls.getValue());
-    return true;
-  }
-
-  CncInterface::ISP::States sp;
-  evaluateAnalogSupportPin(sp);
-  
-  sendHeartbeat(ls.getValue(), sp.getValue());
-  
-  return true;
-}
-/////////////////////////////////////////////////////////////////////////////////////
 // This method evaluate the limit states by the current stepper states
 bool CncController::sendCurrentLimitStates(bool force) {
 /////////////////////////////////////////////////////////////////////////////////////
@@ -342,6 +314,45 @@ bool CncController::sendCurrentLimitStates(bool force) {
   return (x != LimitSwitch::LIMIT_UNSET && y != LimitSwitch::LIMIT_UNSET && z != LimitSwitch::LIMIT_UNSET );
 }
 /////////////////////////////////////////////////////////////////////////////////////
+bool CncController::heartbeat() {
+/////////////////////////////////////////////////////////////////////////////////////
+  unsigned char limitState    = 0;
+  unsigned char supportState  = 0;
+
+  if ( isAnalogSupportPinAvailable() == true ) {
+    
+    CncInterface::ILS::States ls;
+    evaluateAnalogLimitPin(ls);
+    limitState = ls.getValue();
+    
+  } else {
+    
+    long x = LimitSwitch::LIMIT_UNKNOWN;
+    long y = LimitSwitch::LIMIT_UNKNOWN;
+    long z = LimitSwitch::LIMIT_UNKNOWN;
+  
+    if ( evaluateLimitStates(x, y, z) ) {
+      CncInterface::ILS::States ls(x, y, z);   
+      limitState = ls.getValue();
+    }
+  }
+
+  if ( isAnalogSupportPinAvailable() == true ) {
+    CncInterface::ISP::States sp;
+    evaluateAnalogSupportPin(sp);
+    supportState = sp.getValue();
+  }
+  
+  sendHeartbeat(limitState, supportState);
+  return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool CncController::idle() {
+/////////////////////////////////////////////////////////////////////////////////////
+  heartbeat();
+  return true;
+}
+/////////////////////////////////////////////////////////////////////////////////////
 void CncController::broadcastInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
   X->interrupt();
@@ -354,53 +365,6 @@ void CncController::broadcastPause(bool state) {
   X->pause(state);
   Y->pause(state);
   Z->pause(state); 
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncController::stepAxisX(long x){
-/////////////////////////////////////////////////////////////////////////////////////
-  return X->stepAxis(x);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncController::stepAxisY(long y){
-/////////////////////////////////////////////////////////////////////////////////////
-  return Y->stepAxis(y);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncController::stepAxisZ(long z){
-/////////////////////////////////////////////////////////////////////////////////////
-  return Z->stepAxis(z);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-bool CncController::renderAndStepAxisXY(long x1, long y1) {
-/////////////////////////////////////////////////////////////////////////////////////
-  //avoid empty steps
-  if ( x1 == 0 && y1 == 0)
-    return true;
-  
-  long x0 = 0, y0 = 0;
-  long dx =  absolute(x1-x0), sx = x0<x1 ? 1 : -1;
-  long dy = -absolute(y1-y0), sy = y0<y1 ? 1 : -1;
-  long err = dx+dy, e2; // error value e_xy 
-
-  long xOld = x0, yOld = y0;
-  while( true ) {
-
-    if ( X->stepAxis(x0 - xOld) == false )
-      return false;
-
-    if ( Y->stepAxis(y0 - yOld) == false )
-      return false;
-      
-    xOld = x0; 
-    yOld = y0;
-    
-    if (x0==x1 && y0==y1) break;
-    e2 = 2*err;
-    if (e2 > dy) { err += dy; x0 += sx; } // e_xy+e_x > 0
-    if (e2 < dx) { err += dx; y0 += sy; } // e_xy+e_y < 0
-  }
-
-  return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncController::moveXYZ() {  
@@ -435,13 +399,13 @@ bool CncController::renderAndStepAxisXYZ(long dx, long dy, long dz) {
   memset(&pointB, 0, sizeof(pointB));
 
   x_inc = (dx < 0) ? -1 : 1;
-  l = absolute(dx);
+  l     = absolute(dx);
   
   y_inc = (dy < 0) ? -1 : 1;
-  m = absolute(dy);
+  m     = absolute(dy);
   
   z_inc = (dz < 0) ? -1 : 1;
-  n = absolute(dz);
+  n     = absolute(dz);
   
   dx2 = l << 1;
   dy2 = m << 1;
@@ -455,21 +419,13 @@ bool CncController::renderAndStepAxisXYZ(long dx, long dy, long dz) {
     for (i = 0; i < l; i++) {
       
       //output
-      if ( moveXYZ() == false )
-        return false;
+      if ( moveXYZ() == false ) return false;
       
-      if (err_1 > 0) {
-        pointA[1] += y_inc;
-        err_1 -= dx2;
-      }
+      if (err_1 > 0) { pointA[1] += y_inc; err_1 -= dx2; }
+      if (err_2 > 0) { pointA[2] += z_inc; err_2 -= dx2; }
       
-      if (err_2 > 0) {
-        pointA[2] += z_inc;
-        err_2 -= dx2;
-      }
-      
-      err_1 += dy2;
-      err_2 += dz2;
+      err_1     += dy2;
+      err_2     += dz2;
       pointA[0] += x_inc;
     }
 
@@ -481,24 +437,16 @@ bool CncController::renderAndStepAxisXYZ(long dx, long dy, long dz) {
     for (i = 0; i < m; i++) {
       
       //output
-      if ( moveXYZ() == false )
-        return false;
+      if ( moveXYZ() == false ) return false;
     
-      for (int j=0; j<3; j++ )
-        pointB[j] = pointA[j];
+      //for (int j=0; j<POINT_LENGTH; j++ )  pointB[j] = pointA[j];
+      memcpy(pointB, pointA, sizeof(pointB));
         
-      if (err_1 > 0) {
-        pointA[0] += x_inc;
-        err_1 -= dy2;
-      }
+      if (err_1 > 0) { pointA[0] += x_inc; err_1 -= dy2; }
+      if (err_2 > 0) { pointA[2] += z_inc; err_2 -= dy2; }
       
-      if (err_2 > 0) {
-        pointA[2] += z_inc;
-        err_2 -= dy2;
-      }
-      
-      err_1 += dx2;
-      err_2 += dz2;
+      err_1     += dx2;
+      err_2     += dz2;
       pointA[1] += y_inc;
     }
 
@@ -510,24 +458,16 @@ bool CncController::renderAndStepAxisXYZ(long dx, long dy, long dz) {
     for (i = 0; i < n; i++) {
       
       //output
-      if ( moveXYZ() == false )
-        return false;
+      if ( moveXYZ() == false ) return false;
     
-      for (int j=0; j<3; j++ )
-        pointB[j] = pointA[j];
+      //for (int j=0; j<POINT_LENGTH; j++ ) pointB[j] = pointA[j];
+      memcpy(pointB, pointA, sizeof(pointB));
         
-      if (err_1 > 0) {
-        pointA[1] += y_inc;
-        err_1 -= dz2;
-      }
+      if (err_1 > 0) { pointA[1] += y_inc; err_1 -= dz2; }
+      if (err_2 > 0) { pointA[0] += x_inc; err_2 -= dz2; }
       
-      if (err_2 > 0) {
-        pointA[0] += x_inc;
-        err_2 -= dz2;
-      }
-      
-      err_1 += dy2;
-      err_2 += dx2;
+      err_1     += dy2;
+      err_2     += dx2;
       pointA[2] += z_inc;
     }
   }
@@ -535,6 +475,10 @@ bool CncController::renderAndStepAxisXYZ(long dx, long dy, long dz) {
   //output
   if ( moveXYZ() == false )
     return false;
+
+  if ( isProbeMode() == false ) {
+    speedManager.finalizeMove();
+  }
 
   return true;
 }

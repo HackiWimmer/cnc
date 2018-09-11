@@ -129,17 +129,9 @@ long CncMotionMonitor::fillVectiesListCtr(long curCount, CncVectiesListCtrl* lis
 	listCtrl->clear();
 		
 	CncColumContainer cc(CncVectiesListCtrl::TOTAL_COL_COUNT);
-	wxString type;
 	for ( auto it = data.begin(); it != data.end(); ++it ) {
-		
-		switch ( it->getCncMode() ) {
-			case GLI::GLCncPathVertices::CncMode::CM_FLY:	type.assign("R"); 
-															break;
-			default:										type.assign("W");
-		}
-		
 		cc.updateItem(CncVectiesListCtrl::COL_REF, 	wxString::Format("%010ld", it->getId()));
-		cc.updateItem(CncVectiesListCtrl::COL_T, 	type);
+		cc.updateItem(CncVectiesListCtrl::COL_T, 	GLI::GLCncPathVertices::getCncModeAsString(it->getCncMode()));
 		cc.updateItem(CncVectiesListCtrl::COL_X, 	wxString::Format("%.6lf", it->getX()));
 		cc.updateItem(CncVectiesListCtrl::COL_Y, 	wxString::Format("%.6lf", it->getY()));
 		cc.updateItem(CncVectiesListCtrl::COL_Z, 	wxString::Format("%.6lf", it->getZ()));
@@ -224,12 +216,24 @@ void CncMotionMonitor::appendVertice(long id, float x, float y, float z, GLI::GL
 	
 	// decorate
 	switch ( cm ) {
-		case DataVerticeMode::CM_WORK:	colour		= getFlags().workColour;
+		case DataVerticeMode::CM_WORK:	
+										colour		= getFlags().workColour;
 										formatType	= PathVerticeType::FT_SOLID;
 										break;
 										
-		case DataVerticeMode::CM_FLY:	colour 		= getFlags().flyColour;
+		case DataVerticeMode::CM_RAPID:	
+										colour 		= getFlags().rapidColour;
 										formatType	= ( getFlags().drawFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT );
+										break;
+										
+		case DataVerticeMode::CM_MAX:	
+										colour 		= getFlags().maxColour;
+										formatType	= PathVerticeType::FT_SOLID;
+										break;
+										
+		case DataVerticeMode::CM_USER_DEFINED:	
+										colour 		= getFlags().userDefinedColour;
+										formatType	= PathVerticeType::FT_SOLID;
 										break;
 	}
 	

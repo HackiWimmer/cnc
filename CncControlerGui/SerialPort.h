@@ -66,7 +66,7 @@ struct SerialFetchInfo {
 	} Lc;
 
 	struct S {
-		unsigned char result[sizeof(int32_t) * 1];
+		unsigned char result[sizeof(int32_t) * 4];
 		unsigned char* p 				= NULL;
 		unsigned char value 			= 0;
 		int bytes 						= -1;

@@ -64,7 +64,7 @@ void GL3DOptions::restoreFlags() {
 	m_pgPropPositionMarker->SetValue(motionMonitor->getFlags().positionMarker);
 	m_pgPropAutoScaling->SetValue(motionMonitor->getFlags().autoScaling);
 	
-	m_pgPropFlyColour->SetValue(wxVariant(wxColourPropertyValue(motionMonitor->getFlags().flyColour))); 
+	m_pgPropFlyColour->SetValue(wxVariant(wxColourPropertyValue(motionMonitor->getFlags().rapidColour))); 
 	m_pgPropWorkColour->SetValue(wxVariant(wxColourPropertyValue(motionMonitor->getFlags().workColour))); 
 	
 	// draw type
@@ -106,7 +106,7 @@ void GL3DOptions::propertyChanged(wxPropertyGridEvent& event) {
 	motionMonitor->getFlags().positionMarker	= m_pgPropPositionMarker->GetValue().GetBool();
 	motionMonitor->getFlags().autoScaling		= m_pgPropAutoScaling->GetValue().GetBool();
 	
-	motionMonitor->getFlags().flyColour 		= ((wxSystemColourProperty*)m_pgPropFlyColour)->GetVal().m_colour;
+	motionMonitor->getFlags().rapidColour 		= ((wxSystemColourProperty*)m_pgPropFlyColour)->GetVal().m_colour;
 	motionMonitor->getFlags().workColour 		= ((wxSystemColourProperty*)m_pgPropWorkColour)->GetVal().m_colour;
 	
 	// draw type

@@ -128,6 +128,9 @@
   <object class="wxBitmap" name="BMP_GCODE_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\code-context.png</object>
   <object class="wxBitmap" name="BMP_GENERAL_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\software-update-inactive.png</object>
   <object class="wxBitmap" name="BMP_HEADLINE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\view-list-multicolumn-4.png</object>
+  <object class="wxBitmap" name="BMP_HEART">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\heart-2.png</object>
+  <object class="wxBitmap" name="BMP_HEART_MINUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\heart-delete.png</object>
+  <object class="wxBitmap" name="BMP_HEART_PLUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\heart-add.png</object>
   <object class="wxBitmap" name="BMP_HIDE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_up.png</object>
   <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\mill.png</object>

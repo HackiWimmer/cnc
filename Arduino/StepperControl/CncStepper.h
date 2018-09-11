@@ -10,9 +10,6 @@ class CncStepper {
 
   private:
 
-    static const bool NORMALIZED_INCREMENT_DIRECTION_VALUE = HIGH;
-    static const bool INVERSED_INCREMENT_DIRECTION_VALUE   = LOW;
-
     bool INCREMENT_DIRECTION_VALUE;
 
     bool initialized;

@@ -464,8 +464,10 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 	// first write the major position
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_XYZ_POS_MAJOR);
-	lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ(), (int32_t)(speedSimulator->getMeasurementFeedSpeed() * DBL_FACT));
-	//lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ());
+	lastCommand.Serial.write(targetMajorPos.getX(),
+			                 targetMajorPos.getY(),
+							 targetMajorPos.getZ(),
+							 (int32_t)(speedSimulator->getMeasurementFeedSpeed_MM_MIN() * DBL_FACT));
 	lastCommand.Serial.write(RET_OK);
 	
 	// secondary provide the limit information
@@ -886,7 +888,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 			ci.yCtrlPos  = curEmulatorPos.getY();
 			ci.zCtrlPos  = curEmulatorPos.getZ();
 			
-			ci.feedSpeed = speedSimulator->getMeasurementFeedSpeed();
+			ci.feedSpeed = speedSimulator->getMeasurementFeedSpeed_MM_MIN();
 			
 			sendSerialControllrCallback(ci);
 			lastReplyPos.set(curEmulatorPos);

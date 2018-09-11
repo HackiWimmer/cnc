@@ -40,15 +40,15 @@ void printPinReport() {
 
   #define PRINT_DIGITAL_PIN( Pin, Type ) \
     Serial.print(Pin);  Serial.print(TEXT_SEPARATOR); \
-    Serial.print((int)'D');  Serial.print(TEXT_SEPARATOR); \
-    Serial.print((int)Type); Serial.print(TEXT_SEPARATOR); \
+    Serial.print('D');  Serial.print(TEXT_SEPARATOR); \
+    Serial.print(Type); Serial.print(TEXT_SEPARATOR); \
     Serial.print(digitalRead(Pin)); \
     Serial.print(TEXT_CLOSE); 
     
   #define PRINT_ANALOG_PIN( Pin, Type ) \
     Serial.print(Pin);  Serial.print(TEXT_SEPARATOR); \
-    Serial.print((int)'A');  Serial.print(TEXT_SEPARATOR); \
-    Serial.print((int)Type); Serial.print(TEXT_SEPARATOR); \
+    Serial.print('A');  Serial.print(TEXT_SEPARATOR); \
+    Serial.print(Type); Serial.print(TEXT_SEPARATOR); \
     Serial.print(analogRead(Pin)); \
     Serial.print(TEXT_CLOSE); 
 
@@ -56,10 +56,10 @@ void printPinReport() {
     { \
       int value = Interface.getValue(); \
       Serial.print(Pin);    Serial.print(TEXT_SEPARATOR); \
-      Serial.print((int)'A');    Serial.print(TEXT_SEPARATOR); \
-      Serial.print((int)'I');    Serial.print(TEXT_SEPARATOR); \
-      Serial.print(value);  Serial.print(BLANK); \
-      Serial.print('-');    Serial.print(BLANK); \
+      Serial.print('A');    Serial.print(TEXT_SEPARATOR); \
+      Serial.print('I');    Serial.print(TEXT_SEPARATOR); \
+      Serial.print(value);  Serial.print(TEXT_SEPARATOR); \
+      Serial.print('-');    Serial.print(TEXT_SEPARATOR); \
       Serial.print(Interface.getValueAsString()); \
       Serial.print(TEXT_CLOSE); \
     }
@@ -124,17 +124,9 @@ void writeLimitGetter() {
   writeGetterListValues(PID_LIMIT, x, y, z);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-unsigned char evaluateGetter(unsigned char pid, bool withErrorMessage=true) {
+unsigned char evaluateGetter(unsigned char pid) {
 /////////////////////////////////////////////////////////////////////////////////////
 
-  // safety check to avoid protocol errors
-  if (pid < PID_LONG_RANGE_START || pid > PID_DOUBLE_RANG_END ) {
-    writeGetterListValue(PID_UNKNOWN, 0);
-
-    if ( withErrorMessage == true )  return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, String((int)pid).c_str());
-    else                             return errorInfo.setNextErrorInfoWithoutErrorMessage(E_INVALID_GETTER_ID, String((int)pid).c_str());
-  }
-  
   switch ( pid ) {
     // processGetter() ............................................
     case PID_QUERY_READY_TO_RUN:      writeGetterListValue(PID_QUERY_READY_TO_RUN, isReadyToRun());
@@ -202,14 +194,10 @@ unsigned char evaluateGetter(unsigned char pid, bool withErrorMessage=true) {
     // processGetter() ............................................
     case PID_ANALOG_LIMIT_PIN:        writeGetterListValue(PID_ANALOG_LIMIT_PIN, controller.getAnalogLimitPin());
                                       break;
-   // processGetter() ............................................
-    case PID_ANALOG_SUPPORT_PIN:      writeGetterListValue(PID_ANALOG_SUPPORT_PIN, controller.getAnalogSupportPin());
-                                      break;
 
     // processGetter() ............................................
     default:                          writeGetterListValue(PID_UNKNOWN, 0);
-                                      if ( withErrorMessage == true )  return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, String((int)pid).c_str());
-    else                                                               return errorInfo.setNextErrorInfoWithoutErrorMessage(E_INVALID_GETTER_ID, String((int)pid).c_str());
+                                      return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, String((int)pid).c_str());
   }
 
   return RET_OK;
@@ -227,7 +215,6 @@ unsigned char processGetterList() {
   // This is very importent for the next multibyte read
   delay(1);
 
-  // Start result
   Serial.write(RET_SOH);
   Serial.write(PID_GETTER_LIST);
 
@@ -237,8 +224,7 @@ unsigned char processGetterList() {
     
     return errorInfo.setNextErrorInfo(E_INVALID_GETTER_LIST_COUNT, EMPTY_TEXT_VAL);
   }
-
-  // complete result . . .
+  
   unsigned char count = Serial.read();
   Serial.write(count);
   
@@ -253,9 +239,7 @@ unsigned char processGetterList() {
 
     // append the next getter
     unsigned char pid = Serial.read();
-    
-    const bool WITH_ERROR_MESSAGE = false;
-    evaluateGetter(pid, WITH_ERROR_MESSAGE);
+    evaluateGetter(pid);
   }
 
   return RET_OK;
@@ -270,17 +254,14 @@ unsigned char processGetter() {
   // This is very importent for the next multibyte read
   delay(1);
 
-  // Start result
   Serial.write(RET_SOH);
- 
+
   if ( Serial.available() <= 0 ) {
     writeGetterSingleValue(PID_UNKNOWN, 0);
     return errorInfo.setNextErrorInfo(E_INVALID_GETTER_ID, EMPTY_TEXT_VAL);
   }
   
   unsigned char pid = Serial.read();
-  
-  // commplete result
   return evaluateGetter(pid);
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -401,10 +382,6 @@ unsigned char processSetter() {
                                   else                controller.setAnalogLimitPin(PIN_ANALOG_LIMIT_OFF);
                                   break; 
     // processSetter() ............................................
-    case PID_ANALOG_SUPPORT_PIN:  if ( lValue != 0 )  controller.setAnalogSupportPin(PIN_ANALOG_SUPPORT_ID);
-                                  else                controller.setAnalogSupportPin(PIN_ANALOG_SUPPORT_OFF);
-                                  break; 
-    // processSetter() ............................................
     // call it with lValue = NORMALIZED_INCREMENT_DIRECTION || INVERSED_INCREMENT_DIRECTION
     case PID_INCREMENT_DIRECTION_VALUE_X:   
                                   controller.getStepperX()->setIncrementDirectionValue(lValue); 
@@ -464,10 +441,7 @@ unsigned char decodeMove() {
     default:  return RET_ERROR;
   }
 
-  if ( controller.renderAndStepAxisXYZ(x, y, z) == false )
-    return RET_ERROR;
-
-  return RET_OK;
+  return ( controller.renderAndStepAxisXYZ(x, y, z) == false ? RET_ERROR : RET_OK);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 unsigned char decodeTest() {
@@ -578,170 +552,176 @@ void setup() {
 /////////////////////////////////////////////////////////////////////////////////////
 void loop() {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( Serial.available() > 0 ) {
-    char r = RET_OK;
-    byte c = Serial.read();
+  if ( Serial.available() <= 0 )
+    return;  
 
-    switch ( c ) {
+  char r = RET_OK;
+  byte c = Serial.read();
 
-      // --------------------------------------------------------------------------
-      // Signals
-      // --------------------------------------------------------------------------
+  switch ( c ) {
 
-          // Interrupt
-          case SIG_INTERRUPPT:
-                processInterrupt();
-                return;
+    // --------------------------------------------------------------------------
+    // Signals
+    // --------------------------------------------------------------------------
+
+        // Interrupt
+        case SIG_INTERRUPPT:
+              processInterrupt();
+              return;
+
+        // Resume
+        case SIG_RESUME:
+              controller.broadcastPause(false); // off
+              return;
+
+        // Pause
+        case SIG_PAUSE:
+              controller.broadcastPause(true);  // on
+              return;
+
+        // Cancel running moves
+        case SIG_HALT:
+        case SIG_CANCEL_X_MOVE: 
+        case SIG_CANCEL_Y_MOVE: 
+        case SIG_CANCEL_Z_MOVE: 
+              // Nothing to do here, these signals are relevant for running 
+              // move commands only and they are processed at the CncStepper
+              // In this case here the signal does nothing and goes away.
+              return;
+
+    // --------------------------------------------------------------------------
+    // Commands - which requires a return value
+    // - return default --> r = RET_OK | RET_ERROR
+    // --------------------------------------------------------------------------
+
+        // SB command -  Reset
+        case CMD_RESET_CONTROLLER:
+              r = reset();
+              break;
+
+        // SB command -  Reset error info
+        case CMD_RESET_ERRORINFO:
+              errorInfo.resetErrorInfo();
+              break;
   
-          // Resume
-          case SIG_RESUME:
-                controller.broadcastPause(false); // off
-                return;
+        // SB command - Idle handling
+        case CMD_IDLE:
+              controller.idle();
+              break;
 
-          // Pause
-          case SIG_PAUSE:
-                controller.broadcastPause(true);  // on
-                return;
+        // SB command - Heartbeat handling
+        case CMD_HEARTBEAT:
+              controller.heartbeat();
+              break;
 
-          // Cancel running moves
-          case SIG_HALT:
-          case SIG_CANCEL_X_MOVE: 
-          case SIG_CANCEL_Y_MOVE: 
-          case SIG_CANCEL_Z_MOVE: 
-                // Nothing to do here, these signals are relevant for running 
-                // move commands only and they are processed at the CncStepper
-                // In this case here the signal does nothing and goes away.
-                return;
+        // MB command - Movement
+        case CMD_MOVE:               // obsolete command
+        case CMD_RENDER_AND_MOVE:
+              controller.setPosReplyState(true);
+              r = decodeMove();
+              controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
+              controller.setPosReplyState(false);
+              break;
 
-      // --------------------------------------------------------------------------
-      // Commands - which requires a return value
-      // - return default --> r = RET_OK | RET_ERROR
-      // --------------------------------------------------------------------------
+        // MB command - Parameter getter
+        case CMD_GETTER_LIST:
+              r = processGetterList();
+              break;
+          
+        // MB command - Parameter getter
+        case CMD_GETTER:
+              r = processGetter();
+              break;
 
-          // SB command -  Reset
-          case CMD_RESET_CONTROLLER:
-                r = reset();
-                break;
+        // SB command - Parameter setter
+        case CMD_SETTER:
+              r = processSetter();
+              break;
+  
+        // SB command - Enable stepper motors
+        case CMD_ENABLE_STEPPER_PIN:
+              controller.enableStepperPin(true);
+              break;
+  
+        // SB command - Disable stepper motors
+        case CMD_DISABLE_STEPPER_PIN:
+              controller.enableStepperPin(false);
+              break;
+  
+        // SB command - Test suite
+        case CMD_TEST_START:
+              r = decodeTest();
+              break;
+  
+        // SB command - Probe
+        case CMD_ENABLE_PROBE_MODE:
+              controller.enableProbeMode();
+              r = RET_OK;
+              break;
+              
+        // SB command - Probe
+        case CMD_DISABLE_PROBE_MODE:
+              controller.disableProbeMode();
+              r = RET_OK;
+              break;
 
-          // SB command -  Reset error info
-          case CMD_RESET_ERRORINFO:
-                errorInfo.resetErrorInfo();
-                break;
-    
-          // SB command - Idle handling
-          case CMD_IDLE:
-                controller.evaluateAndSendStates();
-                break;
+    // --------------------------------------------------------------------------
+    // Commands - multi byte return
+    // - must always return directly
+    // --------------------------------------------------------------------------
 
-          // MB command - Movement
-          case CMD_MOVE:               // obsolete command
-          case CMD_RENDER_AND_MOVE:
-                controller.setPosReplyState(true);
-                r = decodeMove();
-                controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
-                controller.setPosReplyState(false);
-                break;
+        case CMD_TEST_INFO_MESSAGE:
+              pushInfoMessage("This is a test message from type: 'INFO'");
+              return;
 
-          // MB command - Parameter getter
-          case CMD_GETTER_LIST:
-                r = processGetterList();
-                break;
-            
-          // MB command - Parameter getter
-          case CMD_GETTER:
-                r = processGetter();
-                break;
+        case CMD_TEST_WARN_MESSAGE:
+              pushWarningMessage("This is a test message from type: 'WARNING'");
+              return;
 
-          // SB command - Parameter setter
-          case CMD_SETTER:
-                r = processSetter();
-                break;
-    
-          // SB command - Enable stepper motors
-          case CMD_ENABLE_STEPPER_PIN:
-                controller.enableStepperPin(true);
-                break;
-    
-          // SB command - Disable stepper motors
-          case CMD_DISABLE_STEPPER_PIN:
-                controller.enableStepperPin(false);
-                break;
-    
-          // SB command - Test suite
-          case CMD_TEST_START:
-                r = decodeTest();
-                break;
-    
-          // SB command - Probe
-          case CMD_ENABLE_PROBE_MODE:
-                controller.enableProbeMode();
-                r = RET_OK;
-                break;
-                
-          // SB command - Probe
-          case CMD_DISABLE_PROBE_MODE:
-                controller.disableProbeMode();
-                r = RET_OK;
-                break;
+        case CMD_TEST_ERROR_MESSAGE:
+              pushErrorMessage("This is a test message from type: 'ERROR'");
+              return;
 
-      // --------------------------------------------------------------------------
-      // Commands - multi byte return
-      // - must always return directly
-      // --------------------------------------------------------------------------
+        // MB command - Print configuration
+        case CMD_PRINT_CONFIG:
+              printConfig();
+              return;
+  
+        // MB command - Print version
+        case CMD_PRINT_VERSION:
+              printSketchVersion();
+              return;
 
-          case CMD_TEST_INFO_MESSAGE:
-                pushInfoMessage("This is a test message from type: 'INFO'");
-                return;
+        // MB command - Pin report
+        case CMD_PRINT_PIN_REPORT:
+              printPinReport();
+              return;
 
-          case CMD_TEST_WARN_MESSAGE:
-                pushWarningMessage("This is a test message from type: 'WARNING'");
-                return;
+        // MB command - Send last error
+        case CMD_PRINT_ERRORINFO:
+              errorInfo.writeErrorInfo();
+              return;
 
-          case CMD_TEST_ERROR_MESSAGE:
-                pushErrorMessage("This is a test message from type: 'ERROR'");
-                return;
+        // MB command - Send last error
+        case CMD_PRINT_LAST_ERROR_RESPONSE_ID:
+              errorInfo.writeLastErrorInfoResponseId();
+              return;
 
-          // MB command - Print configuration
-          case CMD_PRINT_CONFIG:
-                printConfig();
-                return;
-    
-          // MB command - Print version
-          case CMD_PRINT_VERSION:
-                printSketchVersion();
-                return;
+    // --------------------------------------------------------------------------
+    // Error handling
+    // --------------------------------------------------------------------------
 
-          // MB command - Pin report
-          case CMD_PRINT_PIN_REPORT:
-                printPinReport();
-                return;
-
-          // MB command - Send last error
-          case CMD_PRINT_ERRORINFO:
-                errorInfo.writeErrorInfo();
-                return;
-
-          // MB command - Send last error
-          case CMD_PRINT_LAST_ERROR_RESPONSE_ID:
-                errorInfo.writeLastErrorInfoResponseId();
-                return;
-
-      // --------------------------------------------------------------------------
-      // Error handling
-      // --------------------------------------------------------------------------
-
-          // Unknown commands
-          default:
-                String et("[");
-                et.concat(c);
-                et.concat(']');
-                
-                r = errorInfo.setNextErrorInfo(E_UNKNOW_COMMAND, et.c_str());
-    }
-
-    // hand shake
-    Serial.write(r);
+        // Unknown commands
+        default:
+              String et("[");
+              et.concat(c);
+              et.concat(']');
+              
+              r = errorInfo.setNextErrorInfo(E_UNKNOW_COMMAND, et.c_str());
   }
+
+  // hand shake
+  Serial.write(r);
 }
 
 

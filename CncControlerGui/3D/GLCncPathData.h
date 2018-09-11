@@ -4,6 +4,7 @@
 #include <cfloat>
 #include <vector>
 #include <wx/colour.h>
+#include "CncCommon.h"
 
 namespace GLI {
 	
@@ -13,8 +14,10 @@ namespace GLI {
 		public:
 			
 			enum CncMode {
-				CM_FLY, 
-				CM_WORK
+				CM_RAPID, 
+				CM_WORK,
+				CM_MAX,
+				CM_USER_DEFINED
 			};
 			
 			enum FormatType { 
@@ -75,6 +78,18 @@ namespace GLI {
 			
 			////////////////////////////////////////////
 			~GLCncPathVertices() {
+			}
+			
+			////////////////////////////////////////////
+			static const wxString& getCncModeAsString(CncMode m) {
+				static wxString ret;
+				switch( m ) {
+					case CM_WORK: 			ret.assign(cnc::WORK_SPEED_CHAR); 		break;
+					case CM_RAPID:			ret.assign(cnc::RAPID_SPEED_CHAR);		break;
+					case CM_MAX:			ret.assign(cnc::MAX_SPEED_CHAR); 		break;
+					case CM_USER_DEFINED:	ret.assign(cnc::USER_DEFIND_SPEED_CHAR); break;
+				}
+				return ret;
 			}
 			
 			////////////////////////////////////////////

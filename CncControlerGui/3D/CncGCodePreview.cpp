@@ -153,13 +153,25 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	static PathVerticeType	formatType = PathVerticeType::FT_SOLID;
 	
 	// decorate
+	#warning define currect colours for max and ud
 	switch ( vd.getMode() ) {
-		case DataVerticeMode::CM_WORK:	colour.Set(0, 0, 0);
+		case DataVerticeMode::CM_WORK:	
+										colour.Set(0, 0, 0);
 										formatType	= PathVerticeType::FT_SOLID;
 										break;
 										
-		case DataVerticeMode::CM_FLY:	colour.Set(255, 201, 14);
+		case DataVerticeMode::CM_RAPID:	
+										colour.Set(255, 201, 14);
 										formatType	= PathVerticeType::FT_DOT;
+										break;
+										
+		case DataVerticeMode::CM_MAX:	colour.Set(0, 255, 0);
+										formatType	= PathVerticeType::FT_SOLID;
+										break;
+										
+		case DataVerticeMode::CM_USER_DEFINED:
+										colour.Set(0, 0, 255);
+										formatType	= PathVerticeType::FT_SOLID;
 										break;
 	}
 	

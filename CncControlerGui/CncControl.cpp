@@ -35,17 +35,18 @@ CncControl::CncControl(CncPortType pt)
 , startPos(0,0,0)
 , curAppPos(0,0,0)
 , controllerPos(0,0,0)
-, speedType(CncSpeedRapid)
-, configuredFeedSpeed_MM_MIN(0.0)
-, currentFeedSpeed_MM_MIN(MIN_LONG)
+, realtimeFeedSpeed_MM_MIN(MAX_FEED_SPEED_VALUE)
 , defaultFeedSpeedRapid_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , defaultFeedSpeedWork_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
+, configuredSpeedType(CncSpeedRapid)
+, configuredFeedSpeed_MM_MIN(0.0)
 , durationCounter(0)
 , interruptState(false)
 , positionOutOfRangeFlag(false)
 , powerOn(false)
 , toolUpdateState(true)
 , stepDelay(0)
+, lastCncHeartbeatValue(0)
 , guiCtlSetup(NULL)
 , positionCheck(true)
 , drawPaneMargin(30)
@@ -273,6 +274,15 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, cncConfig->getReplyThresholdStepsX()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, cncConfig->getReplyThresholdStepsZ()));
+	
+	#warning move these flags to configuration
+	int32_t dirValueX = INVERSED_INCREMENT_DIRECTION_VALUE;
+	int32_t dirValueY = NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	int32_t dirValueZ = NORMALIZED_INCREMENT_DIRECTION_VALUE;
+
+	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_X, dirValueX));
+	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_Y, dirValueY));
+	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_Z, dirValueZ));
 	
 	if ( processSetterList(setup) == false) {
 		std::cerr << " CncControl::setup: Calling processSetterList() failed!\n";
@@ -673,37 +683,40 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-const wxString& CncControl::getSpeedTypeAsString() {
+const wxString& CncControl::getConfiguredSpeedTypeAsString() {
 ///////////////////////////////////////////////////////////////////
 	static wxString ret;
-
-	switch( speedType ) {
-		case CncSpeedWork: 	ret.assign("W"); break;
-		case CncSpeedRapid:	ret.assign("R"); break;
-	}
-	
+	ret.assign(cnc::getCncSpeedTypeAsString(configuredSpeedType));
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(CncSpeed s, double value) {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value) {
 ///////////////////////////////////////////////////////////////////
-	// always reset the current speed value
-	currentFeedSpeed_MM_MIN = MIN_LONG;
+	// always reset the realtime speed value
+	realtimeFeedSpeed_MM_MIN = MAX_FEED_SPEED_VALUE;
 	
-	if ( value <= 0.0 )
-		return;
+	const double maxValue = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	
-	if ( speedType == s && configuredFeedSpeed_MM_MIN == value )
+	// safety checks 
+	if ( value <= 0.0 )			value = maxValue;
+	if ( value > maxValue )		value = maxValue;
+
+	//avoid the setter below if nothing will change
+	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) )
 		return;
 		
-	speedType = s;
+	if      ( cnc::dblCompare(value, defaultFeedSpeedRapid_MM_MIN) )	configuredSpeedType = CncSpeedRapid;
+	else if ( cnc::dblCompare(value, defaultFeedSpeedWork_MM_MIN )	)	configuredSpeedType = CncSpeedWork;
+	else if ( cnc::dblCompare(value, maxValue  )					)	configuredSpeedType = CncSpeedMax;
+	else																configuredSpeedType = CncSpeedUserDefined;
+	
 	configuredFeedSpeed_MM_MIN = value;
 	processSetter(PID_SPEED_MM_MIN, (long)(configuredFeedSpeed_MM_MIN * DBL_FACT));
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(CncSpeed s, double value) {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value) {
 ///////////////////////////////////////////////////////////////////
-	changeCurrentFeedSpeedXYZ_MM_MIN(s, value * 60);
+	changeCurrentFeedSpeedXYZ_MM_MIN(value * 60);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s) {
@@ -711,11 +724,13 @@ void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s) {
 	double value = 0.0;
 	
 	switch( s ) {
-		case CncSpeedWork: 	value = GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(); 	break;
-		case CncSpeedRapid:	value = GBL_CONFIG->getDefaultRapidSpeed_MM_MIN();	break;
+		case CncSpeedWork: 			value = GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(); 	break;
+		case CncSpeedRapid:			value = GBL_CONFIG->getDefaultRapidSpeed_MM_MIN();	break;
+		case CncSpeedMax:			value = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();		break;
+		case CncSpeedUserDefined:	return;	
 	}
 	
-	changeCurrentFeedSpeedXYZ_MM_MIN(s, value);
+	changeCurrentFeedSpeedXYZ_MM_MIN(value);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setDefaultRapidSpeed_MM_MIN(double s) { 
@@ -786,7 +801,7 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 	if ( pos != prevPos ) {
 		
 		if ( IS_GUI_CTL_VALID(motionMonitor) ) {
-			vd.setVertice(getClientId(), getCurrentSpeedType(), pos);
+			vd.setVertice(getClientId(), getConfiguredSpeedType(), pos);
 			GET_GUI_CTL(motionMonitor)->appendVertice(vd);
 			
 			updatePreview3D(false);
@@ -864,23 +879,35 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	switch ( ci.infoType ) {
 		// --------------------------------------------------------
 		case CITHeartbeat:
-			if ( ci.command == CMD_TEST_START ) {
-				std::stringstream ss;
-				ss << "Heartbeat received - Value: " << ci.heartbeatValue << std::endl;
-				cnc::trc.logInfoMessage(ss);
+		{
+			std::stringstream ss;
+			ss << "Heartbeat received - Value: " << ci.heartbeatValue;
+			
+			if ( GET_GUI_CTL(heartbeatState) ) {
+				static bool flag = false;
+				if ( flag )	{ flag = false; GET_GUI_CTL(heartbeatState)->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART")); }
+				else		{ flag = true;  GET_GUI_CTL(heartbeatState)->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
+
+				GET_GUI_CTL(heartbeatState)->GetParent()->Refresh();
+				GET_GUI_CTL(heartbeatState)->GetParent()->Update();
 			}
+			
+			lastCncHeartbeatValue = ci.heartbeatValue;
 			
 			if ( ci.limitState == true ) {
 				CncInterface::ILS::States ls(ci.limitStateValue);
 				displayLimitStates(ls);
+				ss << " : " << ls.getValueAsString();
 			}
 			
 			if ( ci.supportState == true ) {
-				//TODO
+				CncInterface::ISP::States sp(ci.supportStateValue);
+				ss << " : " << sp.getValueAsString();
 			}
 			
+			cnc::trc.logInfoMessage(ss);
 			break;
-			
+		}
 		// --------------------------------------------------------
 		case CITLimitInfo:
 			//std::clog << "::L: " << ci.xLimit << ", " << ci.yLimit << ", " << ci.zLimit << std::endl;
@@ -899,7 +926,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				case PID_XYZ_POS_MAJOR:
 				case PID_XYZ_POS_DETAIL:
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
-										currentFeedSpeed_MM_MIN = ci.feedSpeed;
+										realtimeFeedSpeed_MM_MIN = ci.feedSpeed;
 			}
 			
 			// display controller coordinates
@@ -952,9 +979,9 @@ bool CncControl::SerialCallback(int32_t cmdCount) {
 	return !isInterrupted();
 }
 ///////////////////////////////////////////////////////////////////
-double CncControl::getCurrentFeedSpeed_MM_MIN() {
+double CncControl::getRealtimeFeedSpeed_MM_MIN() {
 ///////////////////////////////////////////////////////////////////
-	return currentFeedSpeed_MM_MIN;
+	return realtimeFeedSpeed_MM_MIN;
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::postAppPosition(unsigned char pid) {
@@ -972,7 +999,13 @@ void CncControl::postAppPosition(unsigned char pid) {
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos ) {
 			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, getClientId(), getSpeedTypeAsString(), getConfiguredFeedSpeed_MM_MIN(), getCurrentFeedSpeed_MM_MIN(), curAppPos));
+				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, 
+				                                                    getClientId(), 
+				                                                    getConfiguredSpeedTypeAsString(), 
+				                                                    getConfiguredFeedSpeed_MM_MIN(), 
+				                                                    getRealtimeFeedSpeed_MM_MIN(), 
+				                                                    curAppPos)
+				                                   );
 		}
 	}
 	
@@ -989,7 +1022,13 @@ void CncControl::postCtlPosition(unsigned char pid) {
 		// a position compairsion isn't necessay here because the serialControllerCallback(...)
 		// call this method only on position changes
 		if ( GET_GUI_CTL(mainFrame) )
-			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, getClientId(), getSpeedTypeAsString(), getConfiguredFeedSpeed_MM_MIN(), getCurrentFeedSpeed_MM_MIN(), curCtlPos));
+			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, 
+			                                                    getClientId(), 
+			                                                    getConfiguredSpeedTypeAsString(), 
+			                                                    getConfiguredFeedSpeed_MM_MIN(), 
+			                                                    getRealtimeFeedSpeed_MM_MIN(), 
+			                                                    curCtlPos)
+			                                   );
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1686,31 +1725,54 @@ void CncControl::manualContinuousMoveStop() {
 	runContinuousMove = false;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart(bool x, bool y, bool z, const CncDirection dir) {
+bool CncControl::manualContinuousMoveStart(StepSensitivity s, bool x, bool y, bool z, const CncDirection dir) {
 ///////////////////////////////////////////////////////////////////
-	//reentrun this
+	const double swx = s/(double)STEP_SENSITIVITY_FACTOR;
+	const double swy = s/(double)STEP_SENSITIVITY_FACTOR;
+	const double swz = s/(double)STEP_SENSITIVITY_FACTOR;
+
+	const double stepSensitivity = std::min(swz, std::min(swx, swy));
+	return manualContinuousMoveStart(stepSensitivity, x, y, z, dir);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::manualContinuousMoveStart(double stepSensitivity, bool x, bool y, bool z, const CncDirection dir) {
+///////////////////////////////////////////////////////////////////
 	if ( getSerial()->isCommandActive() == true )
 		return false;
 	
-	int32_t xSteps = x ? 100 : 0;
-	int32_t ySteps = y ? 10 : 0;
-	int32_t zSteps = z ? 10 : 0;
+	// Quality check
+	const double MIN_STEP_WIDTH = GBL_CONFIG->getCalculationFactX(CncMetric)
+			                    * SMALLEST/(double)STEP_SENSITIVITY_FACTOR;
+
+	const double MAX_STEP_WIDTH = GBL_CONFIG->getCalculationFactX(CncMetric)
+			                    * LARGEST/(double)STEP_SENSITIVITY_FACTOR;
+
+	if ( stepSensitivity < 0.0 || cnc::dblCompareNull(stepSensitivity) ) 	stepSensitivity = MIN_STEP_WIDTH;
+	if ( stepSensitivity > MAX_STEP_WIDTH )									stepSensitivity = MAX_STEP_WIDTH;
+
+	// Setup
+	double xDim = x ? stepSensitivity : 0.0;
+	double yDim = y ? stepSensitivity : 0.0;
+	double zDim = z ? stepSensitivity : 0.0;
 	
-	xSteps *= dir == CncClockwise ? 1 : -1;
-	ySteps *= dir == CncClockwise ? 1 : -1;
-	zSteps *= dir == CncClockwise ? 1 : -1;
+	xDim *= dir == CncClockwise ? 1 : -1;
+	yDim *= dir == CncClockwise ? 1 : -1;
+	zDim *= dir == CncClockwise ? 1 : -1;
 	
+	// Move preparation
 	initNextDuration();
 	cncConfig->setAllowEventHandling(true);
 	activatePositionCheck(false);
 	enableStepperMotors(true);
 	
+	// Move loop
 	runContinuousMove = true;
 	while ( runContinuousMove ) {
-		moveRelLinearStepsXYZ(xSteps, ySteps, zSteps, false);
+		moveRelLinearMetricXYZ(xDim, yDim, zDim, false);
 		THE_APP->dispatchAll();
 	}
 	
+	// Move touch up
 	enableStepperMotors(false);
 	activatePositionCheck(true);
 	resetDurationCounter();
@@ -1973,10 +2035,8 @@ void CncControl::sendIdleMessage() {
 	if ( getSerial() == NULL )
 		return;
 		
-	if ( getSerial()->isCommandActive() == true ) {
+	if ( getSerial()->isCommandActive() == true )
 		return;
-	}
 	
-	//clog <<  wxDateTime::UNow().FormatTime() << " - idle,  delay:" << getStepDelay() << endl;
 	getSerial()->processIdle();
 }

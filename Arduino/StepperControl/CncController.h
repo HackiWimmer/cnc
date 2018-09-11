@@ -37,17 +37,14 @@ class CncController {
     bool posReplyState;
     bool probeMode;
 
-    inline bool stepAxisX(long x);
-    inline bool stepAxisY(long y);
-    inline bool stepAxisZ(long z);
+    unsigned long lastHeartbeat;
 
-    inline bool renderAndStepAxisXY(long x1, long y1);
     inline bool moveXYZ();
 
     inline bool evaluateAnalogLimitPin(CncInterface::ILS::States& ls);
     inline bool evaluateAnalogSupportPin(CncInterface::ISP::States& ss);
 
-    inline bool evaluateSupportButton1State(unsigned short idx);
+    inline bool evaluateSupportButtonState(unsigned short idx);
 
     //////////////////////////////////////////////////////////////////////////////
   public:
@@ -81,15 +78,18 @@ class CncController {
     //////////////////////////////////////////////////////////////////////////////
     bool evaluateLimitState(const CncStepper* stepper, long& limit);
     bool evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit);
-    bool evaluateAndSendStates();
+
+    //////////////////////////////////////////////////////////////////////////////
+    bool heartbeat();
+    bool idle();
 
     //////////////////////////////////////////////////////////////////////////////
     bool evaluateToolState();
 
     //////////////////////////////////////////////////////////////////////////////
-    bool evaluateSupportButton1State() { return evaluateSupportButton1State(1); }
-    bool evaluateSupportButton2State() { return evaluateSupportButton1State(2); }
-    bool evaluateSupportButton3State() { return evaluateSupportButton1State(3); }
+    bool evaluateSupportButton1State() { return evaluateSupportButtonState(1); }
+    bool evaluateSupportButton2State() { return evaluateSupportButtonState(2); }
+    bool evaluateSupportButton3State() { return evaluateSupportButtonState(3); }
         
     //////////////////////////////////////////////////////////////////////////////
     void sendCurrentPositions(unsigned char pid, bool force);

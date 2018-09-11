@@ -42,13 +42,21 @@ static const int UNDEFINED_LINE_NUMBER 				= -1;
 
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
-enum CncSpeed 					{ CncSpeedWork, CncSpeedRapid };
+enum CncSpeed 					{ CncSpeedWork, CncSpeedRapid, CncSpeedMax, CncSpeedUserDefined };
 enum CncPortType 				{ CncPORT, CncPORT_SIMU, CncEMU_NULL, CncEMU_SVG };
 enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
 enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4};
 enum TemplateFormat 			{ TplUnknown, TplSvg, TplGcode, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3};
+
+namespace cnc {
+	const char RAPID_SPEED_CHAR 		= 'R';
+	const char WORK_SPEED_CHAR			= 'W';
+	const char MAX_SPEED_CHAR 			= 'M';
+	const char USER_DEFIND_SPEED_CHAR 	= 'U';
+	const wxString& getCncSpeedTypeAsString(CncSpeed s);
+};
 
 class MainBookSelection {
 	public:

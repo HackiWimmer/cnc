@@ -168,10 +168,8 @@ protected:
     wxStaticLine* m_staticLine783;
     wxNotebook* m_manualMotionControl;
     wxPanel* m_panel5187;
-    wxStaticText* m_staticText5208;
-    wxSlider* m_cmSpeedSlider;
-    wxStaticText* m_cmSpeedValue;
-    wxStaticText* m_staticText5216;
+    wxStaticText* m_cbStepSensitivityText;
+    wxComboBox* m_cbStepSensitivity;
     wxButton* m_cmXneg;
     wxButton* m_cmXpos;
     wxButton* m_cmYneg;
@@ -518,6 +516,8 @@ protected:
     wxPanel* m_statusBar;
     wxStaticText* m_staticText395;
     wxTextCtrl* m_cmdDuration;
+    wxStaticLine* m_staticLine6021;
+    wxStaticBitmap* m_heartbeatState;
     wxStaticLine* m_staticLine602;
     wxTextCtrl* m_inputFileName;
     wxStaticLine* m_staticLine6801;
@@ -744,7 +744,6 @@ protected:
     virtual void setupGridChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridSelected(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void changeCmSpeedSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void cmKillFocus(wxFocusEvent& event) { event.Skip(); }
     virtual void cmLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void cmLeftUp(wxMouseEvent& event) { event.Skip(); }
@@ -1038,10 +1037,8 @@ public:
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
     wxStaticLine* GetStaticLine783() { return m_staticLine783; }
-    wxStaticText* GetStaticText5208() { return m_staticText5208; }
-    wxSlider* GetCmSpeedSlider() { return m_cmSpeedSlider; }
-    wxStaticText* GetCmSpeedValue() { return m_cmSpeedValue; }
-    wxStaticText* GetStaticText5216() { return m_staticText5216; }
+    wxStaticText* GetCbStepSensitivityText() { return m_cbStepSensitivityText; }
+    wxComboBox* GetCbStepSensitivity() { return m_cbStepSensitivity; }
     wxButton* GetCmXneg() { return m_cmXneg; }
     wxButton* GetCmXpos() { return m_cmXpos; }
     wxButton* GetCmYneg() { return m_cmYneg; }
@@ -1389,6 +1386,8 @@ public:
     wxPanel* GetScrollWinLogger() { return m_scrollWinLogger; }
     wxStaticText* GetStaticText395() { return m_staticText395; }
     wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
+    wxStaticLine* GetStaticLine6021() { return m_staticLine6021; }
+    wxStaticBitmap* GetHeartbeatState() { return m_heartbeatState; }
     wxStaticLine* GetStaticLine602() { return m_staticLine602; }
     wxTextCtrl* GetInputFileName() { return m_inputFileName; }
     wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }
@@ -2340,6 +2339,35 @@ public:
     }
 
     virtual ~ImageLibPerspective();
+};
+
+
+class ImageLibHeartbeat : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibHeartbeat();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibHeartbeat();
 };
 
 #endif

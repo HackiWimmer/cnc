@@ -79,11 +79,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void cmLeftDClick(wxMouseEvent& event);
-
-    virtual void requestHeartbeat(wxCommandEvent& event);
-		
-		virtual void changeCmSpeedSlider(wxScrollEvent& event);
+		virtual void cmLeftDClick(wxMouseEvent& event);
+		virtual void requestHeartbeat(wxCommandEvent& event);
 		virtual void cmLeftUp(wxMouseEvent& event);
 		virtual void cmXnegLeftDown(wxMouseEvent& event);
 		virtual void cmXposLeftDown(wxMouseEvent& event);

@@ -264,6 +264,7 @@ bool CncStepper::checkLimit(int dir) {
 }
 //////////////////////////////////////////////////////////////////////////////
 bool CncStepper::isCancelMoveSignalRelevant(const unsigned char sig) {
+//////////////////////////////////////////////////////////////////////////////
   bool ret = false;
   
   switch ( axis ) {
@@ -322,7 +323,12 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
   
   tsLoopEnd = 0L;
   tsStepLst = 0L;
-    
+/*
+for ( unsigned int i=0; i<absolute(stepsToMove) ; i++)
+  incStepCounter();
+
+return true;
+*/
   while ( stepsLeft > 0 ) {
 
     // ----------------------------------------------------------
@@ -344,9 +350,9 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
       // TODO: ALWAYS CREATE AN ERROR
       return true;
     }
-
     // ----------------------------------------------------------
     // tool observation handling
+    /*
     if ( controller->evaluateToolState() == false ) {
       // Case: The tool isn't running
 
@@ -354,9 +360,11 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
       // this will abort the current run
       return false;
     }
+    */
 
     // ----------------------------------------------------------
     // observe the serial port for signals
+    /*
     if ( peakSerial(frontSerialByte) == true ) {
       switch ( frontSerialByte ) {
         
@@ -412,7 +420,7 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
                     break;
       }
     }
-
+*/
     // ----------------------------------------------------------
     // pause handling
     if ( pauseStepping == true ) {
@@ -426,18 +434,15 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
     // ----------------------------------------------------------
     // step the driver
     if ( controller->isProbeMode() == false ) { 
+      
       digitalWrite(stepPin, HIGH); 
       sleepMicroseconds(controller->getHighPulseWidth(axis)); 
-    }
-    
-    if ( controller->isProbeMode() == false ) {
-      //sleepMicroseconds(controller->getPerStepSpeedOffset(axis));
       
       int pulseDelay = 0;
-      if ( controller->isProbeMode() == false )
-        pulseDelay = controller->getPerStepSpeedOffset(axis);
+      pulseDelay = controller->getPerStepSpeedOffset(axis);
 
-      if ( pulseDelay > 0 ) {
+      #warning todo
+      if ( false /* pulseDelay > 0 */) {
         // ----------------------------------------------------------
         // speed delay
         tsStepRef = micros();
@@ -454,9 +459,7 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
         }
         tsStepLst = tsStepRef;
       }
-    }
-    
-    if ( controller->isProbeMode() == false ) {
+
       digitalWrite(stepPin, LOW);  
       sleepMicroseconds(controller->getLowPulseWidth(axis));
     }
@@ -480,11 +483,12 @@ bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
   }      
   // end step loop ----------------------------------------------
   
-  digitalWrite(directionPin, LOW);
+  //digitalWrite(directionPin, LOW);
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
 inline void CncStepper::calcStepDuration(unsigned long lastDuration) {
+//////////////////////////////////////////////////////////////////////////////
   if ( avgStepDuartion == 0L )  avgStepDuartion = lastDuration;
   else                          avgStepDuartion = (double)((avgStepDuartion + lastDuration)/2);    
 }

@@ -750,38 +750,33 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5204->AddGrowableRow(1);
     m_panel5187->SetSizer(flexGridSizer5204);
     
-    wxFlexGridSizer* flexGridSizer5206 = new wxFlexGridSizer(1, 4, 0, 0);
+    wxFlexGridSizer* flexGridSizer5206 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer5206->SetFlexibleDirection( wxBOTH );
     flexGridSizer5206->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5206->AddGrowableCol(1);
+    flexGridSizer5206->AddGrowableCol(0);
     flexGridSizer5206->AddGrowableRow(0);
+    flexGridSizer5206->AddGrowableRow(1);
     
     flexGridSizer5204->Add(flexGridSizer5206, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText5208 = new wxStaticText(m_panel5187, wxID_ANY, _("Speed [%max]:"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
-    wxFont m_staticText5208Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5208->SetFont(m_staticText5208Font);
+    m_cbStepSensitivityText = new wxStaticText(m_panel5187, wxID_ANY, _("Step Sensitivity:"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
+    wxFont m_cbStepSensitivityTextFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Courier New"));
+    m_cbStepSensitivityText->SetFont(m_cbStepSensitivityTextFont);
     
-    flexGridSizer5206->Add(m_staticText5208, 0, wxALL, WXC_FROM_DIP(2));
+    flexGridSizer5206->Add(m_cbStepSensitivityText, 0, wxALL, WXC_FROM_DIP(3));
     
-    m_cmSpeedSlider = new wxSlider(m_panel5187, wxID_ANY, 80, 0, 100, wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), wxSL_SELRANGE|wxSL_HORIZONTAL);
-    wxFont m_cmSpeedSliderFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_cmSpeedSlider->SetFont(m_cmSpeedSliderFont);
+    wxArrayString m_cbStepSensitivityArr;
+    m_cbStepSensitivityArr.Add(wxT("SMALLEST - 0.01 mm :   Default"));
+    m_cbStepSensitivityArr.Add(wxT("SMALL    - 0.10 mm : + Shift"));
+    m_cbStepSensitivityArr.Add(wxT("MEDIUM   - 0.50 mm : + Ctrl"));
+    m_cbStepSensitivityArr.Add(wxT("LARGE    - 1.00 mm : + Alt"));
+    m_cbStepSensitivityArr.Add(wxT("LARGEST  - 2.00 mm : + Shift + Ctrl"));
+    m_cbStepSensitivity = new wxComboBox(m_panel5187, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), m_cbStepSensitivityArr, wxCB_READONLY);
+    wxFont m_cbStepSensitivityFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Courier New"));
+    m_cbStepSensitivity->SetFont(m_cbStepSensitivityFont);
+    m_cbStepSensitivity->SetSelection(0);
     
-    flexGridSizer5206->Add(m_cmSpeedSlider, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_cmSpeedValue = new wxStaticText(m_panel5187, wxID_ANY, _("100"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
-    wxFont m_cmSpeedValueFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_cmSpeedValue->SetFont(m_cmSpeedValueFont);
-    
-    flexGridSizer5206->Add(m_cmSpeedValue, 0, wxALL, WXC_FROM_DIP(2));
-    m_cmSpeedValue->SetMinSize(wxSize(20,-1));
-    
-    m_staticText5216 = new wxStaticText(m_panel5187, wxID_ANY, _("%"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
-    wxFont m_staticText5216Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5216->SetFont(m_staticText5216Font);
-    
-    flexGridSizer5206->Add(m_staticText5216, 0, wxALL, WXC_FROM_DIP(2));
+    flexGridSizer5206->Add(m_cbStepSensitivity, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer5189 = new wxFlexGridSizer(3, 2, 0, 0);
     flexGridSizer5189->SetFlexibleDirection( wxBOTH );
@@ -792,49 +787,49 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5189->AddGrowableRow(1);
     flexGridSizer5189->AddGrowableRow(2);
     
-    flexGridSizer5204->Add(flexGridSizer5189, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5204->Add(flexGridSizer5189, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_cmXneg = new wxButton(m_panel5187, wxID_ANY, _("-X"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     m_cmXneg->SetBackgroundColour(wxColour(wxT("rgb(255,128,128)")));
     wxFont m_cmXnegFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cmXneg->SetFont(m_cmXnegFont);
     
-    flexGridSizer5189->Add(m_cmXneg, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5189->Add(m_cmXneg, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_cmXpos = new wxButton(m_panel5187, wxID_ANY, _("+X"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     m_cmXpos->SetBackgroundColour(wxColour(wxT("rgb(255,128,128)")));
     wxFont m_cmXposFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cmXpos->SetFont(m_cmXposFont);
     
-    flexGridSizer5189->Add(m_cmXpos, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5189->Add(m_cmXpos, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_cmYneg = new wxButton(m_panel5187, wxID_ANY, _("-Y"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     m_cmYneg->SetBackgroundColour(wxColour(wxT("rgb(0,128,192)")));
     wxFont m_cmYnegFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cmYneg->SetFont(m_cmYnegFont);
     
-    flexGridSizer5189->Add(m_cmYneg, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5189->Add(m_cmYneg, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_cmYpos = new wxButton(m_panel5187, wxID_ANY, _("+Y"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     m_cmYpos->SetBackgroundColour(wxColour(wxT("rgb(0,128,192)")));
     wxFont m_cmYposFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cmYpos->SetFont(m_cmYposFont);
     
-    flexGridSizer5189->Add(m_cmYpos, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5189->Add(m_cmYpos, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_cmZneg = new wxButton(m_panel5187, wxID_ANY, _("-Z"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     m_cmZneg->SetBackgroundColour(wxColour(wxT("rgb(0,128,0)")));
     wxFont m_cmZnegFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cmZneg->SetFont(m_cmZnegFont);
     
-    flexGridSizer5189->Add(m_cmZneg, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5189->Add(m_cmZneg, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_cmZpos = new wxButton(m_panel5187, wxID_ANY, _("+Z"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     m_cmZpos->SetBackgroundColour(wxColour(wxT("rgb(0,128,0)")));
     wxFont m_cmZposFont(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_cmZpos->SetFont(m_cmZposFont);
     
-    flexGridSizer5189->Add(m_cmZpos, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5189->Add(m_cmZpos, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_panel5185 = new wxPanel(m_manualMotionControl, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_manualMotionControl, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_manualMotionControl->AddPage(m_panel5185, _("Old"), false);
@@ -3839,7 +3834,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxFlexGridSizer* flexGridSizer436 = new wxFlexGridSizer(1, 36, 0, 0);
     flexGridSizer436->SetFlexibleDirection( wxBOTH );
     flexGridSizer436->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer436->AddGrowableCol(2);
     flexGridSizer436->AddGrowableCol(4);
     flexGridSizer436->AddGrowableRow(0);
     m_statusBar->SetSizer(flexGridSizer436);
@@ -3865,6 +3859,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer3696->Add(m_cmdDuration, 0, wxALL, WXC_FROM_DIP(3));
     m_cmdDuration->SetMinSize(wxSize(70,18));
+    
+    m_staticLine6021 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer436->Add(m_staticLine6021, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_heartbeatState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("heart-2")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
+    m_heartbeatState->SetToolTip(_("Heartbeat State"));
+    
+    flexGridSizer436->Add(m_heartbeatState, 0, wxALL, WXC_FROM_DIP(5));
     
     m_staticLine602 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -3941,6 +3944,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_feedSpeed->SetMinSize(wxSize(50,20));
     
     m_refPosTrafficLight = new wxStaticBitmap(m_statusBar, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(26,-1)), 0 );
+    m_refPosTrafficLight->SetToolTip(_("Reference Pos  State"));
     
     flexGridSizer3694->Add(m_refPosTrafficLight, 0, wxALL, WXC_FROM_DIP(3));
     m_refPosTrafficLight->SetMinSize(wxSize(26,-1));
@@ -4993,9 +4997,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_pgMgrSetup->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainFrameBClass::setupGridChanging), NULL, this);
     m_pgMgrSetup->Connect(wxEVT_PG_SELECTED, wxPropertyGridEventHandler(MainFrameBClass::setupGridSelected), NULL, this);
     m_pgMgrSetup->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setupGridCommandButton), NULL, this);
-    m_cmSpeedSlider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeCmSpeedSlider), NULL, this);
-    m_cmSpeedSlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeCmSpeedSlider), NULL, this);
-    m_cmSpeedSlider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::changeCmSpeedSlider), NULL, this);
     m_cmXneg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::cmKillFocus), NULL, this);
     m_cmXneg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::cmLeave), NULL, this);
     m_cmXneg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::cmLeftUp), NULL, this);
@@ -5322,9 +5323,6 @@ MainFrameBClass::~MainFrameBClass()
     m_pgMgrSetup->Disconnect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainFrameBClass::setupGridChanging), NULL, this);
     m_pgMgrSetup->Disconnect(wxEVT_PG_SELECTED, wxPropertyGridEventHandler(MainFrameBClass::setupGridSelected), NULL, this);
     m_pgMgrSetup->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setupGridCommandButton), NULL, this);
-    m_cmSpeedSlider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeCmSpeedSlider), NULL, this);
-    m_cmSpeedSlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeCmSpeedSlider), NULL, this);
-    m_cmSpeedSlider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::changeCmSpeedSlider), NULL, this);
     m_cmXneg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::cmKillFocus), NULL, this);
     m_cmXneg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::cmLeave), NULL, this);
     m_cmXneg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::cmLeftUp), NULL, this);
@@ -9209,5 +9207,62 @@ ImageLibPerspective::ImageLibPerspective()
 }
 
 ImageLibPerspective::~ImageLibPerspective()
+{
+}
+
+ImageLibHeartbeat::ImageLibHeartbeat()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_HEART"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_HEART"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_HEART_PLUS"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_HEART_PLUS"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_HEART_MINUS"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_HEART_MINUS"), bmp));
+        }
+    }
+    
+}
+
+ImageLibHeartbeat::~ImageLibHeartbeat()
 {
 }
