@@ -155,7 +155,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		inline void appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
 		inline void onPaint();
 		
-		inline void onPaintRotatePane3D(wxPanel* panel, int angle);
+		inline void onPaintRotatePane3D(const char axis, wxPanel* panel, int angle);
 		
 		wxDECLARE_NO_COPY_CLASS(CncMotionMonitor);
 		wxDECLARE_EVENT_TABLE();

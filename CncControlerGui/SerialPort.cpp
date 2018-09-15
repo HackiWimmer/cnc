@@ -163,7 +163,7 @@ CncNanoTimespan Serial::getMeasurementNanoTimeSpanLastRef() const {
 	return tsMeasurementLast - tsMeasurementRef;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::sendSerialControllrCallback(ContollerInfo& ci) {
+bool Serial::sendSerialControllerCallback(ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
 	if ( cncControl == NULL )
 		return false;
@@ -212,34 +212,6 @@ void Serial::incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy
 	
 	// adjust ref pos
 	measurementRefPos.setXYZ(cx, cy, cz);
-}
-///////////////////////////////////////////////////////////////////
-double Serial::getCurrentFeedSpeed() {
-///////////////////////////////////////////////////////////////////
-	#warning - obsolete
-	return currentFeedSpeed;
-}
-///////////////////////////////////////////////////////////////////
-double Serial::getCurrentFeedSpeedAVG() {
-///////////////////////////////////////////////////////////////////
-	if ( getMeasurementNanoTimeSpanTotal() == 0L )
-		return 0.0;
-	
-	if ( cnc::dblCompareNull(getTotalDistance()) == true )
-		return 0.0;
-		
-	if ( isMeasurementActive() == false )
-		return 0.0;
-	
-	// getTotalDistance()		==> mm
-	// getMeasurementTimeSpan 	==> ns
-	// ret 						==> mm/min
-	
-	double timeSpan = (double)(getMeasurementNanoTimeSpanTotal() / std::giga::den);
-	if ( cnc::dblCompareNull(timeSpan) == true )
-		return 0.0;
-		
-	return (getTotalDistance() / timeSpan) * 60;
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::setSpyMode(Serial::SypMode sm) {
@@ -851,7 +823,7 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 		
 		SerialFetchInfo sfi;
 		sfi.command = cmd[0];
-		sfi.singleFetchTimeout = 100;
+		sfi.singleFetchTimeout = 1000;
 		sfi.retSOHAllowed = true;
 		sfi.returnAfterSOH = true;
 		sfi.Gc.list = &list;
@@ -1090,6 +1062,10 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 		return false;
 	}
 	
+	//std::cout << values[0] << ", " << values[1] << ", " <<  values[2]  << ", " <<  alreadyRendered << std::endl;
+	//if ( alreadyRendered )
+	//	std::cout << values[0] << ", " << values[1] << ", " <<  values[2]  << ", " <<  alreadyRendered << std::endl;
+	
 	if ( isCommandRunning ) {
 		std::clog << "Serial::processMove: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		std::clog << " Command: '" << moveCommand[0] << "' [" << ArduinoCMDs::getCMDLabel(moveCommand[0]) << "]\n";
@@ -1128,13 +1104,15 @@ bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alr
 	
 	if ( writeData(moveCommand, idx) ) {
 		SerialFetchInfo sfi;
-		sfi.command 		= moveCommand[0];
-		sfi.retSOHAllowed 	= true;
-		sfi.returnAfterSOH  = false;
-		sfi.Mc.size 		= size;
-		sfi.Mc.value1		= values[0];
-		sfi.Mc.value2		= values[1];
-		sfi.Mc.value3		= values[2];
+		sfi.command 			= moveCommand[0];
+		#warning consider speed delay here
+		//sfi.singleFetchTimeout 	= 
+		sfi.retSOHAllowed 		= true;
+		sfi.returnAfterSOH  	= false;
+		sfi.Mc.size 			= size;
+		sfi.Mc.value1			= values[0];
+		sfi.Mc.value2			= values[1];
+		sfi.Mc.value3			= values[2];
 		
 		bool ret = evaluateResultWrapper(sfi, std::cout, pos);
 		// latest log this move
@@ -1632,7 +1610,7 @@ bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 		sfi.Mc.p += LONG_BUF_SIZE;
 	}
 	
-	sendSerialControllrCallback(ci);
+	sendSerialControllerCallback(ci);
 	
 	return true;
 }
@@ -1667,7 +1645,7 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 		sfi.Lc.p += LONG_BUF_SIZE;
 	}
 	
-	sendSerialControllrCallback(ci);
+	sendSerialControllerCallback(ci);
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1696,7 +1674,7 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 	// if nothing more available . . .
 	byteCount[0] -= LONG_BUF_SIZE;
 	if ( byteCount[0] <= 0 ) {
-		sendSerialControllrCallback(ci);
+		sendSerialControllerCallback(ci);
 		return true;
 	}
 	
@@ -1705,9 +1683,9 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 	}
 	
 	// evaluate further bytes on demand. . .
-	const short ONE_BYTE_SIZE 		= 1;
-	const short LIMIT_STATE_IDX			= 0;
-	const short SUPPORT_STATE_IDX		= 1;
+	const short ONE_BYTE_SIZE 			= 1;
+	const short LIMIT_STATE_IDX			= I2C_BYTE_LIMIT_STATE;
+	const short SUPPORT_STATE_IDX		= I2C_BYTE_SUPPORT_STATE;
 	const short BYTE_3_IDX				= 2;
 	const short BYTE_4_IDX				= 3;
 	
@@ -1723,7 +1701,7 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 	for (int b=0; b<sfi.Sc.bytes; b+=ONE_BYTE_SIZE) {
 		memcpy(&sfi.Sc.value, sfi.Sc.p, ONE_BYTE_SIZE);
 		
-		switch (b) {
+		switch ( b ) {
 			case LIMIT_STATE_IDX:		ci.limitState   = true; ci.limitStateValue   = sfi.Sc.value; break;
 			case SUPPORT_STATE_IDX:		ci.supportState = true; ci.supportStateValue = sfi.Sc.value; break;
 			case BYTE_3_IDX:			; break;
@@ -1731,10 +1709,10 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 				
 			default: std::cerr << "ERROR while reading state info values. Currently only 4 bytes (int32) possible" << std::endl;
 		}
-
+		
 		sfi.Sc.p += ONE_BYTE_SIZE;
 	}
 
-	sendSerialControllrCallback(ci);
+	sendSerialControllerCallback(ci);
 	return true;
 }

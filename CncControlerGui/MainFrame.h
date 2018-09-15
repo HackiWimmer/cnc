@@ -79,6 +79,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
 		virtual void cmLeftDClick(wxMouseEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
 		virtual void cmLeftUp(wxMouseEvent& event);
@@ -420,6 +421,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		//////////////////////////////////////////////////////////////////////////////////
 		// setup
 		void installCustControls();
+		void changeManuallySpeedValue();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// svg edit popup callbacks
@@ -536,6 +538,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void traceWxWidgetsVersion(std::ostream& out);
 		void traceBoostVersion(std::ostream& out);
 		void traceWoodworkingCncVersion(std::ostream& out);
+		
+		void displayReport(int id);
 		
 		///////////////////////////////////////////////////////////////
 		// Path Generator

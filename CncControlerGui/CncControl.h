@@ -166,7 +166,6 @@ class CncControl {
 		Serial* getSerial() { return serialPort; }
 		//speed
 		CncSpeed getConfiguredSpeedType() { return configuredSpeedType; }
-		const wxString& getConfiguredSpeedTypeAsString();
 		
 		double getRealtimeFeedSpeed_MM_MIN();
 		
@@ -282,8 +281,8 @@ class CncControl {
 		bool processSetter(unsigned char id, int32_t value);
 		bool processSetterList(std::vector<SetterTuple>& setup);
 		// Change the current speed parameter
-		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0);
-		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0);
+		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeed s = CncSpeedUserDefined);
+		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeed s = CncSpeedUserDefined);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)

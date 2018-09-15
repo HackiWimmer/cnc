@@ -37,18 +37,22 @@ namespace LimitSwitch {
       }
 
       //-------------------------------------------------------------
-      virtual void evaluate() {
+      virtual bool evaluate() {
+        const unsigned int oldPinValue = pinValue;
+        
         setBit(BIT_LS_X_MIN, readPin(PIN_LS_X_MIN) == LIMIT_SWITCH_ON);
         setBit(BIT_LS_X_MAX, readPin(PIN_LS_X_MAX) == LIMIT_SWITCH_ON);
       
         setBit(BIT_LS_Y_MIN, readPin(PIN_LS_Y_MIN) == LIMIT_SWITCH_ON);
-        setBit(BIT_LS_Y_MAX, readPin(PIN_LS_Y_MIN) == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_Y_MAX, readPin(PIN_LS_Y_MAX) == LIMIT_SWITCH_ON);
         
         setBit(BIT_LS_Z_MIN, readPin(PIN_LS_Z_MIN) == LIMIT_SWITCH_ON);
         setBit(BIT_LS_Y_MAX, readPin(PIN_LS_Z_MAX) == LIMIT_SWITCH_ON);
 
         setBit(BIT_2,        false);
         setBit(BIT_1,        false);
+
+        return ( oldPinValue != pinValue );
       }
 
       //-------------------------------------------------------------
@@ -104,6 +108,27 @@ namespace LimitSwitch {
         Serial.print(PIN_LS_Y_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MAX)); Serial.print(CR);
         Serial.print(PIN_LS_Z_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MIN)); Serial.print(CR);
         Serial.print(PIN_LS_Z_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MAX)); Serial.print(CR);
+      }
+
+      //-------------------------------------------------------------
+      virtual void trace() {
+        Serial.print("LS Report:");
+        Serial.print(BLANK);
+        Serial.print(getValue());
+        Serial.print(BLANK3);
+        Serial.print("'");
+        Serial.print(getValueAsString());
+        Serial.print("'");
+        Serial.print(BLANK);
+      
+        Serial.print("PIN Values: ");
+        Serial.print(PIN_LS_X_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MIN)); Serial.print(COMMA);
+        Serial.print(PIN_LS_X_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_X_MAX)); Serial.print(COMMA);
+        Serial.print(PIN_LS_Y_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MIN)); Serial.print(COMMA);
+        Serial.print(PIN_LS_Y_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Y_MAX)); Serial.print(COMMA);
+        Serial.print(PIN_LS_Z_MIN); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MIN)); Serial.print(COMMA);
+        Serial.print(PIN_LS_Z_MAX); Serial.print(EQUAL); Serial.print(readPin(PIN_LS_Z_MAX)); Serial.print(COMMA);  
+        Serial.print(CR);       
       }
   };
 } // namespace

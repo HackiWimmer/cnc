@@ -55,7 +55,7 @@ namespace cnc {
 	const char WORK_SPEED_CHAR			= 'W';
 	const char MAX_SPEED_CHAR 			= 'M';
 	const char USER_DEFIND_SPEED_CHAR 	= 'U';
-	const wxString& getCncSpeedTypeAsString(CncSpeed s);
+	const char getCncSpeedTypeAsCharacter(CncSpeed s);
 };
 
 class MainBookSelection {

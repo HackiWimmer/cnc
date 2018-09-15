@@ -224,7 +224,7 @@ class Serial : public SerialOSD {
 		virtual void startMeasurementIntern() {}
 		virtual void stopMeasurementIntern() {}
 		
-		bool sendSerialControllrCallback(ContollerInfo& ci);
+		bool sendSerialControllerCallback(ContollerInfo& ci);
 		
 	public:
 		//Initialize Serial communication without an acitiv connection 
@@ -325,8 +325,6 @@ class Serial : public SerialOSD {
 		CncNanoTimespan getMeasurementNanoTimeSpanTotal() const;
 		CncNanoTimespan getMeasurementNanoTimeSpanLastRef() const;
 		
-		double getCurrentFeedSpeedAVG();
-		double getCurrentFeedSpeed();
 		double getTotalDistanceX() { return totalDistance[0]; }
 		double getTotalDistanceY() { return totalDistance[1]; }
 		double getTotalDistanceZ() { return totalDistance[2]; }

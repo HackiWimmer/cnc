@@ -3,11 +3,13 @@
 
 #include <chrono>
 #include <sys/time.h>
+#include "CncCommon.h"
 #include "CncControl.h"
 #include "MainFrame.h"
 #include "SerialEmulatorNull.h"
 
-int pointA[3], pointB[3];
+static const short POINT_LENGTH = 3;
+int pointA[POINT_LENGTH], pointB[POINT_LENGTH];
 
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
@@ -34,10 +36,12 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , errorList()
 ///////////////////////////////////////////////////////////////////
 {
-	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
-											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), 2 * GBL_CONFIG->getPulsWidthOffsetX(),
-											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), 2 * GBL_CONFIG->getPulsWidthOffsetY(),
-											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), 2 * GBL_CONFIG->getPulsWidthOffsetZ());
+	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
+											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(),
+											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
+											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ()
+										  );
+	
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
@@ -65,11 +69,12 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , errorList()
 ///////////////////////////////////////////////////////////////////
 {
-	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
-											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), 2 * GBL_CONFIG->getPulsWidthOffsetX(),
-											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), 2 * GBL_CONFIG->getPulsWidthOffsetY(),
-											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), 2 * GBL_CONFIG->getPulsWidthOffsetZ());
-	reset();
+	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
+											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(),
+											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
+											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ()
+										   );
+		reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::~SerialEmulatorNULL() {
@@ -514,7 +519,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case CMD_SETTER:			lastCommand.cmd = cmd; 
 									return writeSetter(buffer, nbByte);
 		
-		case CMD_MOVE:				std::cerr << "SerialEmulatorNULL::writeData: The use of 'CMD_MOVE' is generally obsolete. Use 'CMD_RENDER_AND_MOVE' instead." << std::endl;
+		case CMD_MOVE:
 		case CMD_RENDER_AND_MOVE:	lastCommand.cmd = cmd;
 									return writeMoveCmd(buffer, nbByte);
 		
@@ -630,12 +635,16 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			case PID_STEPS_X:
 			case PID_STEPS_Y:
 			case PID_STEPS_Z:
-			case PID_PULSE_WIDTH_OFFSET_X:
-			case PID_PULSE_WIDTH_OFFSET_Y:
-			case PID_PULSE_WIDTH_OFFSET_Z:	speedSimulator->setup(	defaultLoopDuration,
-																	GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), 2 * GBL_CONFIG->getPulsWidthOffsetX(),
-																	GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), 2 * GBL_CONFIG->getPulsWidthOffsetY(),
-																	GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), 2 * GBL_CONFIG->getPulsWidthOffsetZ());
+			case PID_PULSE_WIDTH_LOW_X:
+			case PID_PULSE_WIDTH_LOW_Y:
+			case PID_PULSE_WIDTH_LOW_Z:
+			case PID_PULSE_WIDTH_HIGH_X:
+			case PID_PULSE_WIDTH_HIGH_Y:
+			case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->setup(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
+																	GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(),
+																	GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
+																	GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ()
+																 );
 											break;
 
 			
@@ -740,8 +749,8 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	
 	// initialize
 	int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
-	memset(&pointA, 0, sizeof(pointA));
-	memset(&pointB, 0, sizeof(pointB));
+	memset(pointA, 0, sizeof(pointA));
+	memset(pointB, 0, sizeof(pointB));
 	
 	x_inc = (dx < 0) ? -1 : 1;
 	l = abs(dx);
@@ -765,14 +774,9 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 			if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
 				return false;
 			
-			if (err_1 > 0) {
-				pointA[1] += y_inc;
-				err_1     -= dx2;
-			}
-			if (err_2 > 0) {
-				pointA[2] += z_inc;
-				err_2     -= dx2;
-			}
+			if (err_1 > 0) { pointA[1] += y_inc; err_1 -= dx2; }
+			if (err_2 > 0) { pointA[2] += z_inc; err_2 -= dx2; }
+			
 			err_1     += dy2;
 			err_2     += dz2;
 			pointA[0] += x_inc;
@@ -787,14 +791,9 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 			if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
 				return false;
 			
-			if (err_1 > 0) {
-				pointA[0] += x_inc;
-				err_1     -= dy2;
-			}
-			if (err_2 > 0) {
-				pointA[2] += z_inc;
-				err_2     -= dy2;
-			}
+			if (err_1 > 0) { pointA[0] += x_inc; err_1 -= dy2; }
+			if (err_2 > 0) { pointA[2] += z_inc; err_2 -= dy2; }
+			
 			err_1     += dx2;
 			err_2     += dz2;
 			pointA[1] += y_inc;
@@ -809,14 +808,9 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 			if ( provideMove(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], buffer, nbByte) == false )
 				return false;
 			
-			if (err_1 > 0) {
-				pointA[1] += y_inc;
-				err_1     -= dz2;
-			}
-			if (err_2 > 0) {
-				pointA[0] += x_inc;
-				err_2     -= dz2;
-			}
+			if (err_1 > 0) { pointA[1] += y_inc; err_1 -= dz2; }
+			if (err_2 > 0) { pointA[0] += x_inc; err_2 -= dz2; }
+			
 			err_1     += dy2;
 			err_2     += dx2;
 			pointA[2] += z_inc;
@@ -890,7 +884,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 			
 			ci.feedSpeed = speedSimulator->getMeasurementFeedSpeed_MM_MIN();
 			
-			sendSerialControllrCallback(ci);
+			sendSerialControllerCallback(ci);
 			lastReplyPos.set(curEmulatorPos);
 		}
 	}
@@ -899,7 +893,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 	bool ret = writeMoveCmd(dx, dy, dz, buffer, nbByte);
 	
 	// copy point A into point B
-	memcpy(&pointB, &pointA, sizeof(pointA));
+	memcpy(pointB, pointA, sizeof(pointA));
 	
 	return ret;
 }
@@ -929,7 +923,7 @@ bool SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
 		// simulate speed
 		if ( GBL_CONFIG->isProbeMode() == false ) {
 			wxASSERT( speedSimulator != NULL );
-			int32_t val = absolute(steps);
+			const int32_t val = absolute(steps);
 			
 			switch ( axis ) {
 				case 'X':	if ( val > 0 ) speedSimulator->simulateSteppingX(val);

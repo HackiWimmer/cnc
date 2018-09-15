@@ -161,14 +161,15 @@ unsigned char CncTestSuite::runMotorConfigInterval() {
       break;
 
     if ( supportButton == 1 && controller.evaluateSupportButton1State() == false  ) {
-      stepper->enableStepperPin(false);
+      controller.enableStepperPin(false);
       delay(500);
       continue;
     }
     
-    stepper->enableStepperPin(true);
-      
-    if ( stepper->stepAxis(steps, true) == false )
+    controller.enableStepperPin(true);
+
+      //TODO
+//    if ( stepper->stepAxis(steps, true) == false )
       break;
       
     steps *= -1;

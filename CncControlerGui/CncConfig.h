@@ -255,9 +255,13 @@ class CncConfig {
 		const unsigned int getStepsX();
 		const unsigned int getStepsY();
 		const unsigned int getStepsZ();
-		const unsigned int getPulsWidthOffsetX();
-		const unsigned int getPulsWidthOffsetY();
-		const unsigned int getPulsWidthOffsetZ();
+		const unsigned int getStepsXYZ();
+		const unsigned int getLowPulsWidthX();
+		const unsigned int getLowPulsWidthY();
+		const unsigned int getLowPulsWidthZ();
+		const unsigned int getHighPulsWidthX();
+		const unsigned int getHighPulsWidthY();
+		const unsigned int getHighPulsWidthZ();
 		const unsigned int getMultiplierX();
 		const unsigned int getMultiplierY();
 		const unsigned int getMultiplierZ();

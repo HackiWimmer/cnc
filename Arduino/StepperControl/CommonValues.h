@@ -9,13 +9,56 @@
 //
 // They are here defined because they are shared between C++ and sketch
 
-  template <class T>
-  inline T absolute(T val) {
-    if ( val < 0.0 )
-      val *= -1;
-      
-    return val;
-  }
+//////////////////////////////////////////////////////////////////
+template <class T>
+inline T minimum (T v1, T v2, T v3) {
+  #ifdef SKETCH_COMPILE
+    return min( v3, min(v1, v2));
+  #else
+    return std::min( v3, std::min(v1, v2));
+  #endif
+}
+
+//////////////////////////////////////////////////////////////////
+template <class T>
+T maximum ( T v1, T v2, T v3) {
+  #ifdef SKETCH_COMPILE
+    return max( v3, max(v1, v2));
+  #else
+    return std::max( v3, std::max(v1, v2));
+  #endif  
+}
+
+//////////////////////////////////////////////////////////////////
+template <class T>
+inline T absolute(T val) {
+  if ( val < 0.0 )
+    val *= -1;
+    
+  return val;
+}
+
+//////////////////////////////////////////////////////////////////  
+template <>
+inline int8_t absolute(int8_t x) {
+  const int8_t a = x >> 7;
+  return ((x ^ a) - a);
+}
+
+////////////////////////////////////////////////////////////////// 
+template <>
+inline int16_t absolute(int16_t x) {
+  const int16_t a = x >> 15;
+  return ((x ^ a) - a);
+}
+
+//////////////////////////////////////////////////////////////////  
+template <>
+inline int32_t absolute(int32_t x) {
+  const int32_t a = x >> 31;
+  return ((x ^ a) - a);
+}
+
 
 // common global functions - end
 ////////////////////////////////////////////////////////////////////////
@@ -41,16 +84,8 @@
   const unsigned char PIN_TOOL_ENABLE                     =  12;
   const unsigned char PIN_TOOL_FEEDBACK                   =  13;
 
-  #define PIN_INTERRUPT_LED                                  A3
-  const unsigned char PIN_INTERRUPT_LED_ID                =   3;
-
-  #define PIN_ANALOG_LIMIT                                   A4
-  const unsigned char PIN_ANALOG_LIMIT_ID                 =   4;
-  const unsigned char PIN_ANALOG_LIMIT_OFF                = 255;
-
-  #define PIN_ANALOG_SUPPORT                                 A5
-  const unsigned char PIN_ANALOG_SUPPORT_ID               =   5;
-  const unsigned char PIN_ANALOG_SUPPORT_OFF              = 255;
+  #define PIN_INTERRUPT_LED                                   A3   
+  const unsigned char PIN_INTERRUPT_LED_ID                 =   3;
   
 // .....................................................................
 // Signals
@@ -60,10 +95,6 @@
   const unsigned char SIG_HALT                            =  'H';
   const unsigned char SIG_PAUSE                           =  'P';
   const unsigned char SIG_RESUME                          =  'p';
-
-  const unsigned char SIG_CANCEL_X_MOVE                   =  '1';
-  const unsigned char SIG_CANCEL_Y_MOVE                   =  '2';
-  const unsigned char SIG_CANCEL_Z_MOVE                   =  '3';
 
 // .....................................................................
 // Commands
@@ -175,33 +206,33 @@
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_Z     =  28;
   const unsigned char PID_GETTER_LIST                     =  29;
   
-  const unsigned char PID_SPEED_OFFSET                    =  30;
-  const unsigned char PID_SPEED_OFFSET_X                  =  31;
-  const unsigned char PID_SPEED_OFFSET_Y                  =  32;
-  const unsigned char PID_SPEED_OFFSET_Z                  =  33;
-  const unsigned char PID_STEPS_X                         =  34;
-  const unsigned char PID_STEPS_Y                         =  35;
-  const unsigned char PID_STEPS_Z                         =  36;
-
+  const unsigned char PID_SPEED_CONTROLLER                =  30;
+  const unsigned char PID_SPEED_OFFSET                    =  31;
+  const unsigned char PID_SPEED_OFFSET_X                  =  32;
+  const unsigned char PID_SPEED_OFFSET_Y                  =  33;
+  const unsigned char PID_SPEED_OFFSET_Z                  =  34;
+  const unsigned char PID_STEPS_X                         =  35;
+  const unsigned char PID_STEPS_Y                         =  36;
+  const unsigned char PID_STEPS_Z                         =  37;
+  const unsigned char PID_LAST_STEP_DIR                   =  38;
+   
   const unsigned char PID_MIN_SWITCH                      =  40;
   const unsigned char PID_MAX_SWITCH                      =  41;
   const unsigned char PID_LIMIT                           =  42;
-  const unsigned char PID_LAST_STEP_DIR                   =  43;
-  const unsigned char PID_X_LIMIT                         =  44;
-  const unsigned char PID_Y_LIMIT                         =  45;
-  const unsigned char PID_Z_LIMIT                         =  46;
-  const unsigned char PID_ANALOG_LIMIT_PIN                =  47;
-  const unsigned char PID_ANALOG_SUPPORT_PIN              =  48;
-
+  const unsigned char PID_X_LIMIT                         =  43;
+  const unsigned char PID_Y_LIMIT                         =  44;
+  const unsigned char PID_Z_LIMIT                         =  45;
+  const unsigned char PID_I2C_LIMIT_VALUE                 =  46;
+  const unsigned char PID_I2C_SUPPORT_VALUE               =  47;
+ 
   const unsigned char PID_CONTROLLER                      =  50;
   const unsigned char PID_ROUTER_SWITCH                   =  51;
-  const unsigned char PID_MIN_ENABLE_PULSE_WIDTH          =  52;
-  const unsigned char PID_POS_REPLY_THRESHOLD_X           =  53;
-  const unsigned char PID_POS_REPLY_THRESHOLD_Y           =  54;
-  const unsigned char PID_POS_REPLY_THRESHOLD_Z           =  55;
-  const unsigned char PID_MAX_DIMENSION_X                 =  56;
-  const unsigned char PID_MAX_DIMENSION_Y                 =  57;
-  const unsigned char PID_MAX_DIMENSION_Z                 =  58;
+  const unsigned char PID_POS_REPLY_THRESHOLD_X           =  52;
+  const unsigned char PID_POS_REPLY_THRESHOLD_Y           =  53;
+  const unsigned char PID_POS_REPLY_THRESHOLD_Z           =  54;
+  const unsigned char PID_MAX_DIMENSION_X                 =  55;
+  const unsigned char PID_MAX_DIMENSION_Y                 =  56;
+  const unsigned char PID_MAX_DIMENSION_Z                 =  57;
 
   const unsigned char PID_XYZ_POS                         =  60;
   const unsigned char PID_XYZ_POS_MAJOR                   =  61;
@@ -219,7 +250,7 @@
   const unsigned char PID_STEP_PIN                        =  74;
   const unsigned char PID_DIR_PIN                         =  75;
   const unsigned char PID_ENABLE_STEPPERS                 =  76;
-  const unsigned char PID_AVG_STEP_DURRATION              =  77;
+  const unsigned char PID_AVG_STEP_DURATION               =  77;
 
   const unsigned char PID_TEST_SUITE                      =  80;
   const unsigned char PID_TEST_VALUE1                     =  81;
@@ -229,21 +260,21 @@
   const unsigned char PID_TEST_VALUE5                     =  85;
   const unsigned char PID_TEST_INTERRUPT                  =  86;
   
-  const unsigned char PID_SPEED_MGMT                      =  90;
-  const unsigned char PID_SPEED_MGMT_INITIALIZED          =  91;
-  const unsigned char PID_SPEED_MGMT_LOW_PULSE_WIDTH      =  92;
-  const unsigned char PID_SPEED_MGMT_HIGH_PULSE_WIDTH     =  93;
-  const unsigned char PID_SPEED_MGMT_TOTAL_OFFSET         =  94;
-  const unsigned char PID_SPEED_MGMT_PER_SETP_OFFSET      =  95;
-  const unsigned char PID_SPEED_MGMT_MAX_SPEED            =  96;
+  const unsigned char PID_SPEED_CTRL_INITIALIZED          =  90;
+  const unsigned char PID_SPEED_CTRL_TOTAL_OFFSET         =  91;
+  const unsigned char PID_SPEED_CTRL_RPM                  =  92;
+  const unsigned char PID_SPEED_CTRL_SYNTH_SPEED_DELAY    =  94;
+  const unsigned char PID_SPEED_CTRL_MAX_SPEED            =  95;
   
-  const unsigned char PID_CURRENT_STEP_PULSE_WIDTH_LOW    = 100;
-  const unsigned char PID_CURRENT_STEP_PULSE_WIDTH_HIGH   = 101;
-  const unsigned char PID_CURRENT_DIR_PULSE_WIDTH         = 102;
-  const unsigned char PID_PULSE_WIDTH_OFFSET              = 103;
-  const unsigned char PID_PULSE_WIDTH_OFFSET_X            = 104;
-  const unsigned char PID_PULSE_WIDTH_OFFSET_Y            = 105;
-  const unsigned char PID_PULSE_WIDTH_OFFSET_Z            = 106;
+  const unsigned char PID_PULSE_WIDTH_OFFSET_DIR          = 100;
+  const unsigned char PID_PULSE_WIDTH_OFFSET_LOW          = 101;
+  const unsigned char PID_PULSE_WIDTH_OFFSET_HIGH         = 102;
+  const unsigned char PID_PULSE_WIDTH_LOW_X               = 103;
+  const unsigned char PID_PULSE_WIDTH_LOW_Y               = 104;
+  const unsigned char PID_PULSE_WIDTH_LOW_Z               = 105;
+  const unsigned char PID_PULSE_WIDTH_HIGH_X              = 106;
+  const unsigned char PID_PULSE_WIDTH_HIGH_Y              = 107;
+  const unsigned char PID_PULSE_WIDTH_HIGH_Z              = 108;
   
   const unsigned char PID_RESERT_POS_COUNTER              = 110;
   const unsigned char PID_GET_POS_COUNTER                 = 111;
@@ -318,6 +349,7 @@
   
   const unsigned char E_STEPPER_NOT_ENALED                =  20;
   const unsigned char E_STEPPER_NOT_INITIALIZED           =  21;
+  const unsigned char E_TOOL_NOT_ENALED                   =  22;
   
   const unsigned char E_STEPPER_PULS_WIDTH_TO_LARGE       =  30;
   const unsigned char E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE=  31;
@@ -340,19 +372,25 @@
 //
 // .....................................................................
 
-  #define FIRMWARE_VERSION                              "0.9.2"
+  #define FIRMWARE_VERSION                              "0.9.5"
 
   #define NORMALIZED_INCREMENT_DIRECTION                 0
   #define INVERSED_INCREMENT_DIRECTION                   1
 
   #define ANALOG_LOW                                     0
   #define ANALOG_HIGH                                    255
+
+  #define ON                                             true
+  #define OFF                                            false
   
   #define TOOL_STATE_OFF                                 LOW
   #define TOOL_STATE_ON                                  HIGH 
 
   #define ENABLE_STATE_OFF                               HIGH
   #define ENABLE_STATE_ON                                LOW 
+
+  #define PAUSE_ACTIVE                                   true
+  #define PAUSE_INACTIVE                                 false
 
   const char MBYTE_CLOSE                                 = RET_MBYTE_CLOSE;
   const char TEXT_CLOSE                                  = '\n';
@@ -362,6 +400,9 @@
 
   const int32_t NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
   const int32_t INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
+
+  const int16_t SPEED_MANAGER_CONST_STATIC_OFFSET_US     = 100; // [us]
+  const int16_t SPEED_MANAGER_CONST_LOOP_OFFSET_US       =  25; // [us]
 
   const int32_t BAUD_RATE                                = 115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
 

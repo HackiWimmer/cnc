@@ -1,78 +1,70 @@
-
 #define SKETCH_COMPILE = TRUE
 
+#include <Wire.h>
+#include "CommonDefinitions.h"
 #include "LimitStates.h"
 #include "SupportStates.h"
 
 // ------------------------------------------------------------
-// Outout Pins - only analog output pins are valid here
-const SHORT PIN_LS_ANALOG_OUT       =  8;
-const SHORT PIN_SP_ANALOG_OUT       =  9;
-  
-// ------------------------------------------------------------
 // globals
+bool                        debugMode;
 LimitSwitch::LimitStates    limitStates;
 SupportPin::SupportStates   supportStates;
 
 //-------------------------------------------------------------
-inline void encodeSupportState() {
-  supportStates.reset();
-  supportStates.evaluate();
+void requestEvent() {
+  byte data[I2C_BYTE_COUNT];
+  data[I2C_BYTE_SUPPORT_STATE] = (byte)supportStates.getValue();
+  data[I2C_BYTE_LIMIT_STATE]   = (byte)limitStates.getValue();
+  
+  Wire.write(data, I2C_BYTE_COUNT);    
 }
-//-------------------------------------------------------------
-inline void encodeLimitState() {
-  limitStates.reset();
-  limitStates.evaluate();
-}
-//-------------------------------------------------------------
-inline void writeSupportState() {
-  analogWrite(PIN_SP_ANALOG_OUT, supportStates.getValue());
-}
-//-------------------------------------------------------------
-inline void writeLimitState() {
-  analogWrite(PIN_LS_ANALOG_OUT, limitStates.getValue());
-}
+
 //-------------------------------------------------------------
 void setup() {
   Serial.begin(57600);
   Serial.setTimeout(1000);
   Serial.flush();
 
+  Wire.begin(I2C_DEVICE_ID);          
+  Wire.onRequest(requestEvent);
+
+  debugMode = false;
+
   supportStates.init();
   supportStates.reset();
-  writeSupportState();
 
   limitStates.init();
   limitStates.reset();
-  writeLimitState();
 
+ //TODO
   pinMode(13, INPUT);
 }
 //-------------------------------------------------------------
 void loop() {
 
-  digitalWrite(13, true);
-  Serial.print(digitalRead(13));
-  Serial.print(", ");
-  digitalWrite(13, false);
-  Serial.print(digitalRead(13));
-  Serial.print(", "); 
-
   // For debugging only
   if ( Serial.available() > 0 ) {
     byte c = Serial.read();
 
-    if ( c != '\0' ) {
-      limitStates.report();
-      supportStates.report();
+    switch ( c ) {
+      case 'd':
+      case 'D':   debugMode = true; 
+                  break;
+      //default:    debugMode = false;
     }
   }
 
-  // Normal processing
-  encodeLimitState();
-  writeLimitState();
+  limitStates.evaluate();
+  supportStates.evaluate();
 
-  encodeSupportState();
-  writeSupportState();
+  // For debugging only
+  if ( debugMode == true ) {
+      limitStates.trace();
+      supportStates.trace();
+      delay(1000);
+  }
+
+  delay(1);
 }
 

@@ -1,14 +1,13 @@
+#include <SoftwareSerial.h>
 #include "CommonFunctions.h"
-#include "CncSpeedManager.h"
 #include "CncStepper.h"
 
 //////////////////////////////////////////////////////////////////////////////
 CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin, LastErrorCodes& lec)
 //////////////////////////////////////////////////////////////////////////////
 : INCREMENT_DIRECTION_VALUE(NORMALIZED_INCREMENT_DIRECTION_VALUE)
-, initialized(false)
 , interrupted(false)
-, pauseStepping(false)
+, calculateDuration(false)
 , minReached(false)
 , maxReached(false)
 , minLimitCnt(0)
@@ -17,22 +16,20 @@ CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, by
 , stepPin(stpPin)
 , limitPin(lmtPin)
 , axis(a)
-, dirPulseWidth(2)
-, pulseWidthOffset(100L * 100L)
-, avgStepDuartion(0L)
-, tsLoopRef(0L)
-, tsLoopEnd(0L)
-, tsStepRef(0L)
-, tsStepLst(0L)
 , steps(1L)
+, pitch(0.0)
+, validPitch(false)
+, dirPulseWidth(1)
+, lowPulsWidth(500)
+, highPulsWidth(500)
+, avgStepDuartion(0L)
+, stepDirection(SD_UNKNOWN)
 , stepCounter(0L)
 , stepCounterOverflow(0L)
-, lastStepDirection(DIRECTION_UNKNOWN)
 , curPos(0L)
+, posReplyThresholdCount(0L)
 , controller(crtl)
 , errorInfo(lec)
-, validPitch(false)
-, pitch(0.0)
 {
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -40,9 +37,9 @@ CncStepper::~CncStepper() {
 //////////////////////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////////////////////////////
-long CncStepper::isReadyToRun() {
+int32_t CncStepper::isReadyToRun() {
 /////////////////////////////////////////////////////////////////////////////////////
-  long ret = 1;
+  int32_t ret = 1;
 
   if ( interrupted == true ) {
     errorInfo.setNextErrorInfo(E_INTERRUPT, BLANK + axis);
@@ -72,32 +69,26 @@ void CncStepper::printConfig() {
 
   #define PRINT_PARAMETER( Pid, value ) \
     Serial.print(BLANK); \
+    Serial.print(BLANK); \
     Serial.print(Pid);   Serial.print(TEXT_SEPARATOR); \
     Serial.print(value); Serial.write(TEXT_CLOSE);
 
   Serial.print(PID_AXIS); Serial.print(TEXT_SEPARATOR); Serial.print(axis); Serial.write(TEXT_CLOSE);
 
-    PRINT_PARAMETER(PID_STEPPER_INITIALIZED,              initialized)
-    PRINT_PARAMETER(PID_CURRENT_DIR_PULSE_WIDTH,          dirPulseWidth)
-    PRINT_PARAMETER(PID_PULSE_WIDTH_OFFSET,               pulseWidthOffset)
+    PRINT_PARAMETER(PID_PULSE_WIDTH_OFFSET_DIR,           dirPulseWidth)
+    PRINT_PARAMETER(PID_PULSE_WIDTH_OFFSET_LOW,           lowPulsWidth)
+    PRINT_PARAMETER(PID_PULSE_WIDTH_OFFSET_HIGH,          highPulsWidth)
     PRINT_PARAMETER(PID_STEPS,                            getSteps())
     PRINT_PARAMETER(PID_PITCH,                            getPitch())
-    PRINT_PARAMETER(PID_AVG_STEP_DURRATION,               avgStepDuartion)
+    PRINT_PARAMETER(PID_AVG_STEP_DURATION,                avgStepDuartion)
     PRINT_PARAMETER(PID_STEP_PIN,                         getStepPin())
     PRINT_PARAMETER(PID_DIR_PIN,                          getDirectionPin())
     PRINT_PARAMETER(pidIncrementDirectionValue,           getIncrementDirectionValue())
     PRINT_PARAMETER(PID_MIN_SWITCH,                       minReached)
     PRINT_PARAMETER(PID_MAX_SWITCH,                       maxReached)
     PRINT_PARAMETER(PID_LIMIT,                            readLimitState())
-    PRINT_PARAMETER(PID_LAST_STEP_DIR,                    getLastStepDirection())
+    PRINT_PARAMETER(PID_LAST_STEP_DIR,                    getStepDirection())
 
-    const CncSpeedManager& sm = controller->getSpeedManager();
-    PRINT_PARAMETER(PID_SPEED_MGMT_LOW_PULSE_WIDTH,       sm.getLowPulseWidthX())
-    PRINT_PARAMETER(PID_SPEED_MGMT_HIGH_PULSE_WIDTH,      sm.getHighPulseWidthX())
-    PRINT_PARAMETER(PID_SPEED_MGMT_TOTAL_OFFSET,          sm.getTotalOffsetX())
-    PRINT_PARAMETER(PID_SPEED_MGMT_PER_SETP_OFFSET,       sm.getOffsetPerStepX())
-    PRINT_PARAMETER(PID_SPEED_MGMT_MAX_SPEED,             sm.getMaxSpeedX_MM_MIN())
-  
   #undef PRINT_PARAMETER
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -117,41 +108,34 @@ void CncStepper::setPitch(const double p) {
   validPitch = ( p > 0.0 ); 
   if ( validPitch ) 
     pitch = p;
-
-  controller->setupSpeedManager();
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::reset() {
 //////////////////////////////////////////////////////////////////////////////
-  lastStepDirection = DIRECTION_UNKNOWN;
-  tsLoopRef         = 0L;
-  tsLoopEnd         = 0L;
-  tsStepRef         = 0L;
-  tsStepLst         = 0L;
-  avgStepDuartion   = 0L;
-  interrupted       = false;
-  minReached        = false;
-  maxReached        = false;
-  pauseStepping     = false;
+  stepDirection         = SD_UNKNOWN;
+  avgStepDuartion       = 0L;
+  interrupted           = false;
+  minReached            = false;
+  maxReached            = false;
 
+  resetPosReplyThresholdCouter();
   resetStepCounter();
+}
+//////////////////////////////////////////////////////////////////////////////
+int32_t CncStepper::calcStepsForMM(int32_t mm) {
+//////////////////////////////////////////////////////////////////////////////
+  if ( isPitchValid() == false )
+    return 0;
 
-  initialized = true;
-}
-//////////////////////////////////////////////////////////////////////////////
-bool CncStepper::enableStepperPin(bool state){
-//////////////////////////////////////////////////////////////////////////////
-  return controller->enableStepperPin(state);
-}
+  if ( mm == 0 )
+    return 0;
+
+  return mm * steps / pitch;
+}  
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::sendCurrentLimitStates(bool force) {
 //////////////////////////////////////////////////////////////////////////////
   controller->sendCurrentLimitStates(force);
-}
-//////////////////////////////////////////////////////////////////////////////
-void CncStepper::sendCurrentPositions(unsigned char pid, bool force) {
-//////////////////////////////////////////////////////////////////////////////
-  controller->sendCurrentPositions(pid, force);  
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::broadcastInterrupt() {
@@ -195,7 +179,7 @@ void CncStepper::setMaxReached(bool state) {
   sendCurrentLimitStates(true);
 }
 //////////////////////////////////////////////////////////////////////////////
-long CncStepper::readLimitState(int dir) {
+int32_t CncStepper::readLimitState(int dir) {
 //////////////////////////////////////////////////////////////////////////////
   if ( digitalRead(limitPin) == LimitSwitch::LIMIT_SWITCH_OFF )
     return LimitSwitch::LIMIT_UNSET;
@@ -208,7 +192,7 @@ long CncStepper::readLimitState(int dir) {
   }
 
   // in this case the direction is unclear, try to get more information by calling the controller
-  long limit = LimitSwitch::LIMIT_UNKNOWN;
+  int32_t limit = LimitSwitch::LIMIT_UNKNOWN;
   if ( controller->evaluateLimitState(this, limit) == true )
     return limit;
 
@@ -216,7 +200,7 @@ long CncStepper::readLimitState(int dir) {
   return LimitSwitch::LIMIT_UNKNOWN;
 }
 //////////////////////////////////////////////////////////////////////////////
-long CncStepper::getLimitState() {
+int32_t CncStepper::getLimitState() {
 //////////////////////////////////////////////////////////////////////////////  
   if ( minReached == true ) return LimitSwitch::LIMIT_MIN;
   if ( maxReached == true ) return LimitSwitch::LIMIT_MAX;
@@ -230,7 +214,7 @@ bool CncStepper::checkLimit(int dir) {
   if ( val == LimitSwitch::LIMIT_SWITCH_ON ) {
 
     // unclear sitiuation avoid movement!
-    if ( lastStepDirection == DIRECTION_UNKNOWN ) {
+    if ( stepDirection == SD_UNKNOWN ) {
       sendCurrentLimitStates(true);
       broadcastInterrupt();
       return true;
@@ -263,233 +247,89 @@ bool CncStepper::checkLimit(int dir) {
   return false;
 }
 //////////////////////////////////////////////////////////////////////////////
-bool CncStepper::isCancelMoveSignalRelevant(const unsigned char sig) {
+bool CncStepper::setDirection(int32_t steps) {
 //////////////////////////////////////////////////////////////////////////////
-  bool ret = false;
-  
-  switch ( axis ) {
-    case 'X': ret = (sig == SIG_CANCEL_X_MOVE); break;
-    case 'Y': ret = (sig == SIG_CANCEL_Y_MOVE); break;
-    case 'Z': ret = (sig == SIG_CANCEL_Z_MOVE); break;
-  }
+  if      ( steps <  0 ) return setDirection(SD_DEC);
+  else if ( steps >= 0 ) return setDirection(SD_INC);
 
-  return ret;
+  return false;
 }
 //////////////////////////////////////////////////////////////////////////////
-bool CncStepper::stepAxis(long stepsToMove, bool testActive) {
+bool CncStepper::setDirection(const StepDirection sd) {
 //////////////////////////////////////////////////////////////////////////////
-
-  // -----------------------------------------------------------
-  // avoid everything in this states
-  if ( isInterrupted() )
-    return false;
-
-  if ( initialized == false ) {
-    errorInfo.setNextErrorInfo(E_STEPPER_NOT_INITIALIZED, String(String(axis) + " Axis"));
-    return false;
-  }
-
-  // -----------------------------------------------------------
-  // nothing to do
-  if ( stepsToMove == 0 ) 
+  if ( stepDirection == sd )
     return true;
-
-  // -----------------------------------------------------------
-  if ( controller->isProbeMode() == false ) {
-    if ( digitalRead(PIN_ENABLE) == ENABLE_STATE_OFF ) {
-      // Possibly an error ?
-      if ( testActive == false )
-        errorInfo.setNextErrorInfo(E_STEPPER_NOT_ENALED, String(String(axis) + " Axis"));
-        
-      return testActive;
-    }
+  
+  stepDirection = sd;
+  
+  if ( controller->isProbeMode() == OFF ) {
+    // The functions getIn/DecrementDirectionValue() switches the physical direction of "stepDirection".
+    // The rest of the stepper logic isn't affected because this is to overrule the stepper cabling only
+    // and the physical min and max position staying unchanged
+    const bool dir = (stepDirection == SD_INC ? getIncrementDirectionValue() : getDecrementDirectionValue());
+    
+    digitalWrite(directionPin, dir);
+    // dont sleep here because a portion of time appears automatically before stepping
+    // delayMicroseconds(dirPulseWidth);
   }
   
-  // -----------------------------------------------------------
-  // determine direction and init driver
-  // stepsToMove == 0 is already checked above
-  short stepDirection = (stepsToMove > 0 ? DIRECTION_INC : DIRECTION_DEC);
-
-  // The functions getIn/DecrementDirectionValue() switches the physical direction of "stepsToMove > 0".
-  // The rest of the stepper logic isn't affected because this is to overrule the stepper cabling only
-  // and the physical min and max position staying unchanged
-  digitalWrite(directionPin, (stepDirection > 0 ? getIncrementDirectionValue() : getDecrementDirectionValue()));
-  delayMicroseconds(dirPulseWidth);
-  
-  // -----------------------------------------------------------
-  // start step loop 
-  unsigned long stepsLeft       = absolute(stepsToMove);
-  unsigned char frontSerialByte = CMD_INVALID;
-  
-  tsLoopEnd = 0L;
-  tsStepLst = 0L;
-/*
-for ( unsigned int i=0; i<absolute(stepsToMove) ; i++)
-  incStepCounter();
-
-return true;
-*/
-  while ( stepsLeft > 0 ) {
-
-    // ----------------------------------------------------------
-    // calculate loop duration
-    tsLoopRef = micros();
-    // with repect to the fact, that micros() overflow (go back to zero) 
-    // after approximately 70 minutes - on 16 MHz Arduino boards
-    if ( tsLoopEnd > 0L && tsLoopRef > tsLoopEnd)
-      calcStepDuration(tsLoopRef - tsLoopEnd);
-
-    // ----------------------------------------------------------
-    // limit handling
-    if ( checkLimit(stepDirection) == true ) {
-      // Case:  A limit is activ
-
-      if ( testActive == true )
-        return false;
-
-      // TODO: ALWAYS CREATE AN ERROR
-      return true;
-    }
-    // ----------------------------------------------------------
-    // tool observation handling
-    /*
-    if ( controller->evaluateToolState() == false ) {
-      // Case: The tool isn't running
-
-      // false will create an error case outside the stepper
-      // this will abort the current run
-      return false;
-    }
-    */
-
-    // ----------------------------------------------------------
-    // observe the serial port for signals
-    /*
-    if ( peakSerial(frontSerialByte) == true ) {
-      switch ( frontSerialByte ) {
-        
-        // interrupt handling
-        case SIG_INTERRUPPT:
-                    // dont remove the signal from serial, so an explizit reset have to be called by the interface
-                    broadcastInterrupt();
-
-                    // Signalize an error
-                    return false;
-
-        case SIG_HALT:
-                    // remove the signal from serial
-                    Serial.read();
-                    
-                    // Options:
-                    //  - Returning false here signalize an error and the complete run cycle (PC) stopps as a result.
-                    //  - Returning true here stopps the current move (while loop), so far so good, but the current run cycle 
-                    //    continue with the next existing move command which is not the meaning of HALT.
-                    
-                    return false;
-                    
-        case SIG_PAUSE:
-                    // remove the signal from serial
-                    Serial.read();
-                    pauseStepping = true;
-
-                    // Don't leave the wigle loop, so break is used here
-                    break;
-
-        case SIG_RESUME:
-                    // remove the signal from serial
-                    Serial.read();
-                    pauseStepping = false;
-
-                    // Don't leave the wigle loop, so break is used here
-                    break;
-
-        case SIG_CANCEL_X_MOVE: 
-        case SIG_CANCEL_Y_MOVE: 
-        case SIG_CANCEL_Z_MOVE:
-                    // first check the signal context
-                    if ( isCancelMoveSignalRelevant(frontSerialByte) == true ) {
-                      // remove the signal from serial
-                      Serial.read();
-                      
-                      // Controlled cancellation: In this case it should look like a complete 
-                      // successful move outside the stepper class 
-                      return true;
-                    }
-
-                    // in this case nothing to do
-                    break;
-      }
-    }
-*/
-    // ----------------------------------------------------------
-    // pause handling
-    if ( pauseStepping == true ) {
-       while ( checkSerialForPauseCommands(pauseStepping) == true ) {
-           sendHeartbeat();
-           delay(50);
-       }
-       pauseStepping = false;
-    }
-
-    // ----------------------------------------------------------
-    // step the driver
-    if ( controller->isProbeMode() == false ) { 
-      
-      digitalWrite(stepPin, HIGH); 
-      sleepMicroseconds(controller->getHighPulseWidth(axis)); 
-      
-      int pulseDelay = 0;
-      pulseDelay = controller->getPerStepSpeedOffset(axis);
-
-      #warning todo
-      if ( false /* pulseDelay > 0 */) {
-        // ----------------------------------------------------------
-        // speed delay
-        tsStepRef = micros();
-        // with repect to the fact, that micros() overflow (go back to zero) 
-        // after approximately 70 minutes - on 16 MHz Arduino boards
-        if ( tsStepLst > 0L && tsStepRef > tsStepLst ) {
-          
-          long diff = pulseDelay - (tsStepRef - tsStepLst);
-          if ( diff > 0 ) delayMicroseconds(diff);
-          else            delayMicroseconds(0);
-          
-        } else {
-          delayMicroseconds(pulseDelay);
-        }
-        tsStepLst = tsStepRef;
-      }
-
-      digitalWrite(stepPin, LOW);  
-      sleepMicroseconds(controller->getLowPulseWidth(axis));
-    }
-
-    // ----------------------------------------------------------
-    // position handling -/+1
-    curPos += stepDirection;
-
-    // ----------------------------------------------------------
-    // configure next step
-    lastStepDirection = stepDirection;
-    stepsLeft--;
-    incStepCounter();
-
-    // ----------------------------------------------------------
-    // calculate the loop duration - ensure the last step of this loop 
-    // is always considered
-    if ( stepsLeft > 0 )  tsLoopEnd = tsLoopRef;
-    else                  calcStepDuration(micros() - tsLoopRef);
-    
-  }      
-  // end step loop ----------------------------------------------
-  
-  //digitalWrite(directionPin, LOW);
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
-inline void CncStepper::calcStepDuration(unsigned long lastDuration) {
+bool CncStepper::performNextStep() {
+//////////////////////////////////////////////////////////////////////////////
+  uint32_t tsStartStepping = micros();
+
+  // first check
+  // -----------------------------------------------------------
+  // avoid everything in this states
+  
+  if ( isInterrupted() )
+    return false;
+
+  if ( stepDirection == SD_UNKNOWN ) {
+    interrupted = true;
+    return false;
+  }
+
+  if ( checkLimit(stepDirection) == true ) {
+    // Case:  A limit is activ
+    // TODO: ALWAYS CREATE AN ERROR
+    return true;
+  }
+
+  // then stepping . . .
+  if ( controller->isProbeMode() == OFF ) { 
+    
+    // start the step puls
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(highPulsWidth); 
+
+    // stop the step puls
+    digitalWrite(stepPin, LOW);
+    // dont sleep here because a portion of time appears automatically before 
+    // the next performNextStep() call appears
+    // delayMicroseconds(lowPulsWidth);
+  } else {
+     delayMicroseconds(highPulsWidth + lowPulsWidth);
+  }
+
+  // ----------------------------------------------------------
+  // position handling -/+1
+  curPos += stepDirection;
+  incPosReplyThresholdCouter();
+  incStepCounter();
+
+  if ( calculateDuration )
+    calcStepLoopDuration(micros() - tsStartStepping);
+    
+  return true;
+}
+//////////////////////////////////////////////////////////////////////////////
+inline void CncStepper::calcStepLoopDuration(uint32_t lastDuration) {
 //////////////////////////////////////////////////////////////////////////////
   if ( avgStepDuartion == 0L )  avgStepDuartion = lastDuration;
   else                          avgStepDuartion = (double)((avgStepDuartion + lastDuration)/2);    
 }
+
 

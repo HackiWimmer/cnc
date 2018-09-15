@@ -27,9 +27,6 @@ void ArduinoCMDs::init() {
 	cmds[SIG_HALT]                  = "Push Signal Pause";
 	cmds[SIG_PAUSE]                 = "Push Signal Pause";
 	cmds[SIG_RESUME]                = "Push Signal Resume";
-	cmds[SIG_CANCEL_X_MOVE]         = "Push Signal Cancle X Move";
-	cmds[SIG_CANCEL_Y_MOVE]         = "Push Signal Cancle Y Move";
-	cmds[SIG_CANCEL_Z_MOVE]         = "Push Signal Cancle Z Move";
 	
 	cmds[CMD_IDLE]                  = "Pull Idle Callback";
 	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Controller";
@@ -140,16 +137,15 @@ void ArduinoPIDs::init() {
 	pids[PID_X_LIMIT]                         = "X limit state";
 	pids[PID_Y_LIMIT]                         = "Y limit state";
 	pids[PID_Z_LIMIT]                         = "Z limit state";
+
+	pids[PID_I2C_LIMIT_VALUE]                 = "Analog Limit value";
+	pids[PID_I2C_SUPPORT_VALUE]               = "Analog Support value";
 	
-	pids[PID_ANALOG_LIMIT_PIN]                = "Analog Limit state";
-	pids[PID_ANALOG_SUPPORT_PIN]              = "Analog Support state";
-	
-	pids[PID_CONTROLLER]                      = "Controller";
+	pids[PID_CONTROLLER]                      = "Cnc Controller";
 	pids[PID_ROUTER_SWITCH]                   = "Tool switch";
 	pids[PID_POS_REPLY_THRESHOLD_X]           = "Position reply threshold X axis";
 	pids[PID_POS_REPLY_THRESHOLD_Y]           = "Position reply threshold Y axis";
 	pids[PID_POS_REPLY_THRESHOLD_Z]           = "Position reply threshold Z axis";
-	pids[PID_MIN_ENABLE_PULSE_WIDTH]          = "Stepper Driver Enbable Pulse Width";
 	pids[PID_PROBE_MODE]                      = "Probe Mode";
 
 	pids[PID_XYZ_POS_MAJOR]                   = "XYZ Pos - Type Major";
@@ -168,16 +164,17 @@ void ArduinoPIDs::init() {
 	pids[PID_STEP_PIN]                        = "Step pin";
 	pids[PID_DIR_PIN]                         = "Direction pin";
 	pids[PID_ENABLE_STEPPERS]                 = "Stepper enable state";
-	pids[PID_AVG_STEP_DURRATION]              = "AVG Step duration [us]";
-	
-	pids[PID_CURRENT_STEP_PULSE_WIDTH_LOW]    = "Current Step Pulse Width Low";
-	pids[PID_CURRENT_STEP_PULSE_WIDTH_HIGH]   = "Current Step Pulse Width High";
-	pids[PID_CURRENT_DIR_PULSE_WIDTH]         = "Current Dir Pulse Width";
-	
-	pids[PID_PULSE_WIDTH_OFFSET]              = "Min Pulse Width Offset";
-	pids[PID_PULSE_WIDTH_OFFSET_X]            = "Min Pulse Width Offset X";
-	pids[PID_PULSE_WIDTH_OFFSET_Y]            = "Min Pulse Width Offset Y";
-	pids[PID_PULSE_WIDTH_OFFSET_Z]            = "Min Pulse Width Offset Z";
+	pids[PID_AVG_STEP_DURATION]               = "AVG Step loop duration [us]";
+
+	pids[PID_PULSE_WIDTH_OFFSET_DIR]          = "Direction Pulse Width";
+	pids[PID_PULSE_WIDTH_OFFSET_LOW]          = "Step Pulse Width Low";
+	pids[PID_PULSE_WIDTH_OFFSET_HIGH]         = "Step Pulse Width High";
+	pids[PID_PULSE_WIDTH_LOW_X]               = "Step Pulse Width Low X";
+	pids[PID_PULSE_WIDTH_LOW_Y]               = "Step Pulse Width Low Y";
+	pids[PID_PULSE_WIDTH_LOW_Z]               = "Step Pulse Width Low Z";
+	pids[PID_PULSE_WIDTH_HIGH_X]              = "Step Pulse Width High X";
+	pids[PID_PULSE_WIDTH_HIGH_Y]              = "Step Pulse Width High Y";
+	pids[PID_PULSE_WIDTH_HIGH_Z]              = "Step Pulse Width High Z";
 	
 	pids[PID_TEST_SUITE]                      = "Test Suite";
 	pids[PID_TEST_VALUE1]                     = "Parmeter1";
@@ -200,13 +197,12 @@ void ArduinoPIDs::init() {
 	pids[PID_GET_STEP_COUNTER_Y]              = "Get Step Counter Y";
 	pids[PID_GET_STEP_COUNTER_Z]              = "Get Step Counter Z";
 	
-	pids[PID_SPEED_MGMT]                      = "Speed Manager Parameters";
-	pids[PID_SPEED_MGMT_INITIALIZED]          = "Initialized state";
-	pids[PID_SPEED_MGMT_LOW_PULSE_WIDTH]      = "Low Pulse Width";
-	pids[PID_SPEED_MGMT_HIGH_PULSE_WIDTH]     = "High Pulse Width";
-	pids[PID_SPEED_MGMT_TOTAL_OFFSET]         = "Total Speed Offset";
-	pids[PID_SPEED_MGMT_PER_SETP_OFFSET]      = "Per Step Speed Offset";
-	pids[PID_SPEED_MGMT_MAX_SPEED]            = "Max Speed";
+	pids[PID_SPEED_CONTROLLER]                = "Feed Speed Controller";
+	pids[PID_SPEED_CTRL_INITIALIZED]          = "Initialized state";
+	pids[PID_SPEED_CTRL_RPM]                  = "Rounds per minute";
+	pids[PID_SPEED_CTRL_TOTAL_OFFSET]         = "Total Speed Offset";
+	pids[PID_SPEED_CTRL_SYNTH_SPEED_DELAY]    = "Synthetically Speed Delay";
+	pids[PID_SPEED_CTRL_MAX_SPEED]            = "Max Speed";
 	
 	pids[PID_MAX_DIMENSION_X]                 = "Max Dimension X [Steps]";
 	pids[PID_MAX_DIMENSION_Y]                 = "Max Dimension Y [Steps]";
@@ -247,7 +243,7 @@ const char* ArduinoPIDs::getPIDLabelWithDefault(unsigned int id, const std::stri
 bool ArduinoPIDs::exists(unsigned int id) {
 /////////////////////////////////////////////////////////////////////////
 	if ( id >= 0 && id < MAX_PIDS ) {
-		if ( pids[id].find(UNKNOWN_PID) == string::npos )
+		if ( pids[id].find(UNKNOWN_PID) == std::string::npos )
 			return true;
 	}
 	
@@ -278,15 +274,16 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_INVALID_PARAM_STREAM]               = "Arduino::setValue(): Noting to read";
 	errorCodes[E_GETTER_ID_NOT_FOUND]                = "Arduino::getValue(): Cant read getter id";
 	errorCodes[E_INVALID_GETTER_ID]                  = "Arduino::getValue(): Getter id not known"; 
-	errorCodes[E_INVALID_GETTER_LIST_COUNT]			 = "Arduino::getValues(): Getter list count not available";
+	errorCodes[E_INVALID_GETTER_LIST_COUNT]          = "Arduino::getValues(): Getter list count not available";
 	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Cant read long from Serial: invalid size: ";
 	
 	errorCodes[E_INVALID_TEST_ID]                    = "Arduino::devodeTest(): Invalid Test id";
 	errorCodes[E_NOT_KNOWN_TEST_ID]                  = "Arduino::TestSuite::run(): Not known Test id: ";
 	errorCodes[E_INVALID_PARAMETER]                  = "Arduino::TestSuite::run(): Invalid parameter nr: ";
 	
-	errorCodes[E_STEPPER_NOT_ENALED]                 = "Arduino::stepAxis: Stepper not enaled: ";
-	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxis: Stepper not initialized: ";
+	errorCodes[E_STEPPER_NOT_ENALED]                 = "Arduino::stepAxisXYZ: Stepper not enaled";
+	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxisXYZ: Stepper not initialized";
+	errorCodes[E_TOOL_NOT_ENALED]                    = "Arduino::stepAxisXYZ: Tool not enabled";
 	
 	errorCodes[E_STEPPER_PULS_WIDTH_TO_LARGE]        = "Arduino::recalcDriverConfig(): Value to large";
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
@@ -386,8 +383,6 @@ void ArduinoAnalogPins::init() {
 	}
 
 	pins[PIN_INTERRUPT_LED_ID]   = "INTERRUPT LED PIN";
-	pins[PIN_ANALOG_LIMIT_ID]    = "ANALOG LIMIT PIN";
-	pins[PIN_ANALOG_SUPPORT_ID]  = "ANALOG SUPPORT PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoAnalogPins::getPinLabel(unsigned int id) {

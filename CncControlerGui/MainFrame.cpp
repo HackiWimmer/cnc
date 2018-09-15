@@ -539,7 +539,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_signManuallyYSlider);
 	registerGuiControl(m_signManuallyZSlider);
 	registerGuiControl(m_manuallyToolId);
-	registerGuiControl(m_manuallySpeedType);
+	registerGuiControl(m_manuallySpeedSlider);
 	registerGuiControl(m_manuallySpeedValue);
 	registerGuiControl(m_mmRadioCoordinates);
 	
@@ -568,23 +568,30 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 	dlg.reset();
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::displayReport(int id) {
+///////////////////////////////////////////////////////////////////
+	PidList pidList;
+	
+	switch ( id ) {
+		case 1:			pidList.push_back(PID_I2C_LIMIT_VALUE);
+						pidList.push_back(PID_I2C_SUPPORT_VALUE);
+						//pidList.push_back(PID_SPEED_OFFSET_Y);
+						//pidList.push_back(PID_SPEED_OFFSET_Z);
+						break;
+	}
+	
+	cnc->displayGetterList(pidList);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	PidList pidList;
-	pidList.push_back((unsigned char)37);
-	pidList.push_back(PID_SPEED_OFFSET_X);
-	pidList.push_back(PID_SPEED_OFFSET_Y);
-	pidList.push_back(PID_SPEED_OFFSET_Z);
-	cnc->displayGetterList(pidList);
+	displayReport(1);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -735,20 +742,12 @@ void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
 	static wxBrush  brush(col);
 	static wxPen    barPen(col, 1, wxSOLID);
 	static wxPen    wpPen(*wxRED, 1, wxSOLID);
-	static unsigned int lastSpeedPos = 0;
 	
 	const wxSize size   = m_speedPanel->GetSize();
 	unsigned int pos    = size.GetWidth();
 	unsigned int height = size.GetHeight();
 	
-	if ( GBL_CONFIG->isProbeMode() == false ) 
-		pos *= cnc->getSerial()->getCurrentFeedSpeed() / GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
-	
-	// avoid duplicate drawing
-	if ( pos == lastSpeedPos )
-		;//return;
-	
-	lastSpeedPos = pos;
+	pos *= (cnc->getRealtimeFeedSpeed_MM_MIN() / GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
 	
 	// bar
 	wxPaintDC dc(m_speedPanel);
@@ -759,14 +758,15 @@ void MainFrame::onPaintSpeedPanel(wxPaintEvent& event) {
 	dc.DrawRectangle(rect);
 	
 	// watermark for current config
-	if ( GBL_CONFIG->isProbeMode() == false )  {
-		unsigned int wp = size.GetWidth() * cnc->getConfiguredFeedSpeed_MM_MIN() / GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
-		dc.SetPen(wpPen);
-		
-		// move wp 2 pixel to the left so see valu = max also.
-		dc.DrawLine(wp - 2, 0, wp - 2, height);
-		dc.DrawLine(wp - 1, 0, wp - 1, height);
-	}
+	unsigned int wp = size.GetWidth() 
+	                * cnc->getConfiguredFeedSpeed_MM_MIN() 
+					/ GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+					
+	dc.SetPen(wpPen);
+	
+	// move wp 2 pixel to the left so see valu = max also.
+	dc.DrawLine(wp - 2, 0, wp - 2, height);
+	dc.DrawLine(wp - 1, 0, wp - 1, height);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onThreadAppPosUpdate(UpdateManagerEvent& event) {
@@ -1306,12 +1306,14 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
+	/*
 	if ( lastPortName == _portEmulatorSVG )		m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
 	if ( lastPortName == _portSimulatorNULL )	m_portSelector->Append(_portSimulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portSimulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
-
+	*/
+	
 	// add com ports
 	int pStart 	= 0;
 	int pEnd 	= 256;
@@ -1405,6 +1407,7 @@ void MainFrame::initialize(void) {
 	registerGuiControls();
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
+	changeManuallySpeedValue();
 	perspectiveHandler.setupUserPerspectives();
 	
 	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
@@ -2755,6 +2758,17 @@ bool MainFrame::processGCodeTemplate() {
 	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::changeManuallySpeedSlider(wxScrollEvent& event) {
+///////////////////////////////////////////////////////////////////
+	changeManuallySpeedValue();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::changeManuallySpeedValue() {
+///////////////////////////////////////////////////////////////////
+	double fact = m_manuallySpeedSlider->GetValue()/100.0;
+	m_manuallySpeedValue->ChangeValue(wxString::Format("%5.1lf", fact * GBL_CONFIG->getMaxSpeedXYZ_MM_MIN()));
+}
+///////////////////////////////////////////////////////////////////
 bool MainFrame::processManualTemplate() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc != NULL );
@@ -2766,7 +2780,7 @@ bool MainFrame::processManualTemplate() {
 	inboundFileParser = p;
 
 	ManuallyPathHandlerCnc::MoveDefinition move;
-	move.speedType 		= ( m_manuallySpeedType->GetSelection()  == 0 ? CncSpeedRapid : CncSpeedWork );
+	move.speedType 		= CncSpeedUserDefined;
 	move.absoluteMove	= ( m_mmRadioCoordinates->GetSelection() == 0 );
 	move.toolState		= true;
 	
@@ -3514,6 +3528,7 @@ bool MainFrame::processTemplateIntern() {
 	updateCncConfigTrace();
 	
 	GBL_CONFIG->setAllowEventHandling(true);
+	cnc->resetSetterMap();
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
 	cnc->enableStepperMotors(true);
 	
@@ -3581,6 +3596,7 @@ bool MainFrame::processTemplateIntern() {
 		
 	logTimeConsumed();
 	logStatistics();
+	displayReport(1);
 		
 	enableControls();
 	stopAnimationControl();
@@ -3617,18 +3633,30 @@ void MainFrame::logStatistics() {
 	double elapsedTimeSEC	= 0.0;
 	double speed_MM_MIN		= 0.0;
 	double speed_MM_SEC		= 0.0;
+	long speed_SP_SEC		= 0;
+	long speed_RPM			= 0;
 	
 	if ( measurementTimeSpan > 0L ) {
 		elapsedTimeMSEC = measurementTimeSpan / (1000.0 * 1000.0);
 		elapsedTimeSEC  = elapsedTimeMSEC / (1000.0);
 		speed_MM_SEC 	= cnc->getSerial()->getTotalDistance() / elapsedTimeSEC;
 		speed_MM_MIN 	= speed_MM_SEC * 60;
+		
+		speed_SP_SEC    = cnc->getSerial()->getStepCounter() / elapsedTimeSEC;
+		speed_RPM		= (speed_SP_SEC / GBL_CONFIG->getStepsXYZ() ) * 60;
 	}
+
+	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);
 	
-	wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel);
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	bool setupSpeedValue = GBL_CONFIG->isProbeMode() == false;
+	if ( cnc->getSerial()->isEmulator() == false )
+		setupSpeedValue = true;
+
+	if (  setupSpeedValue ) {
 		speedMMMIN.assign( CncNumberFormatter::toString(speed_MM_MIN, 1));
 		speedMMSEC.assign( CncNumberFormatter::toString(speed_MM_SEC, 1));
+		speedSPSEC.assign( CncNumberFormatter::toString(speed_SP_SEC));
+		speedRPM.assign(   CncNumberFormatter::toString(speed_RPM));
 	}
 	
 	// statistic keys
@@ -3639,15 +3667,17 @@ void MainFrame::logStatistics() {
 	static const char* SKEY_DISTANCE 	= "Distance";
 	static const char* SKEY_TIME 		= "Time consumend";
 	static const char* SKEY_SPEED 		= "Feed speed AVG";
-	
+	static const char* SKEY_SPEED_EXT	= "Performance AVG";
+
 	// add rows - ones a time
 	if ( statisticSummaryListCtrl->getItemCount() == 0 ) {
 		statisticSummaryListCtrl->addKey(SKEY_MIN_BOUND, 	"X, Y, Z", 				"mm");
 		statisticSummaryListCtrl->addKey(SKEY_MAX_BOUND, 	"X, Y, Z", 				"mm");
-		statisticSummaryListCtrl->addKey(SKEY_STEP_CNT, 	"Total, X, Y, Z", 		"#");
-		statisticSummaryListCtrl->addKey(SKEY_POS_CNT, 		"Total", 				"#");
+		statisticSummaryListCtrl->addKey(SKEY_STEP_CNT, 	"Total, X, Y, Z", 		"steps");
+		statisticSummaryListCtrl->addKey(SKEY_POS_CNT, 		"Total", 				"steps");
 		statisticSummaryListCtrl->addKey(SKEY_DISTANCE, 	"Total, X, Y, Z", 		"mm");
 		statisticSummaryListCtrl->addKey(SKEY_TIME, 		"Total, Stepping", 		"ms");
+		statisticSummaryListCtrl->addKey(SKEY_SPEED_EXT, 	"steps/sec, rpm", 		"unit");
 		statisticSummaryListCtrl->addKey(SKEY_SPEED, 		"mm/sec, mm/min", 		"mm/unit");
 	}
 	
@@ -3682,11 +3712,16 @@ void MainFrame::logStatistics() {
 															, CncNumberFormatter::toString((double)(processLastDuartion), 1)
 															, CncNumberFormatter::toString(elapsedTimeMSEC, 1));
 	
+	statisticSummaryListCtrl->updateValues(SKEY_SPEED_EXT	, _("")
+															, _("")
+															, speedSPSEC
+															, speedRPM);
+	
 	statisticSummaryListCtrl->updateValues(SKEY_SPEED		, _("")
 															, _("")
 															, speedMMSEC
 															, speedMMMIN);
-	
+															
 	statisticSummaryListCtrl->Refresh();
 	statisticSummaryListCtrl->Update();
 }
@@ -7605,6 +7640,5 @@ void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
 void MainFrame::xxxxxxxxxxxxx(wxMouseEvent& event) {
 	//clog << "xxxxxxxxxxxxx"<< endl;
 }
-
 
 

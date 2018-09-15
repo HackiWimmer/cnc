@@ -4,6 +4,7 @@
 #include <iostream>
 #include "OSD/CncTimeFunctions.h"
 #include "CncArduino.h"
+#include "CncSpeedManager.h"
 
 class CncSpeedSimulator : public CncSpeedManager {
 	
@@ -42,7 +43,7 @@ class CncSpeedSimulator : public CncSpeedManager {
 		
 		
 		//////////////////////////////////////////////////////////////////////////
-		CncSpeedSimulator(unsigned int cOffset,
+		CncSpeedSimulator(unsigned int cStepStaticOffset, unsigned int cStepLoopOffset,
 						  double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
 						  double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
 						  double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ);

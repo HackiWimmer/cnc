@@ -234,7 +234,7 @@ inline bool PathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p)
 	currentPos.setY(p.y);
 	
 	// already rendered == true not longer supported
-	if ( processLinearMove(false) == false )
+	if ( processLinearMove(true) == false )
 		return false;
 		
 	return true;

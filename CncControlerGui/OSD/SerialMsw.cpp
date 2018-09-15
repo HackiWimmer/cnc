@@ -10,6 +10,38 @@
 #include <windows.h>
 
 ///////////////////////////////////////////////////////////////////
+void traceDCB(const DCB& dcbSerialParams) {
+///////////////////////////////////////////////////////////////////
+
+	std::cout << " dcbSerialParams.DCBlength:         " << dcbSerialParams.DCBlength << std::endl;
+	std::cout << " dcbSerialParams.BaudRate:          " << dcbSerialParams.BaudRate << std::endl;
+	std::cout << " dcbSerialParams.fBinary:           " << dcbSerialParams.fBinary << std::endl;
+	std::cout << " dcbSerialParams.fParity:           " << dcbSerialParams.fParity << std::endl;
+	std::cout << " dcbSerialParams.fOutxCtsFlow:      " << dcbSerialParams.fOutxCtsFlow << std::endl;
+	std::cout << " dcbSerialParams.fOutxDsrFlow:      " << dcbSerialParams.fOutxDsrFlow << std::endl;
+	std::cout << " dcbSerialParams.fDtrControl:       " << dcbSerialParams.fDtrControl << std::endl;
+	std::cout << " dcbSerialParams.fDsrSensitivity:   " << dcbSerialParams.fDsrSensitivity << std::endl;
+	std::cout << " dcbSerialParams.fTXContinueOnXoff: " << dcbSerialParams.fTXContinueOnXoff << std::endl;
+	std::cout << " dcbSerialParams.fNull:             " << dcbSerialParams.fNull << std::endl;
+	std::cout << " dcbSerialParams.fOutX:             " << dcbSerialParams.fOutX << std::endl;
+	std::cout << " dcbSerialParams.fInX:              " << dcbSerialParams.fInX << std::endl;
+	std::cout << " dcbSerialParams.fErrorChar:        " << dcbSerialParams.fInX << std::endl;
+	std::cout << " dcbSerialParams.fRtsControl:       " << dcbSerialParams.fErrorChar << std::endl;
+	std::cout << " dcbSerialParams.fAbortOnError:     " << dcbSerialParams.fAbortOnError << std::endl;
+	std::cout << " dcbSerialParams.ByteSize:          " << (int)dcbSerialParams.ByteSize << std::endl;
+	std::cout << " dcbSerialParams.Parity:            " << (int)dcbSerialParams.Parity << std::endl;
+	std::cout << " dcbSerialParams.StopBits:          " << (int)dcbSerialParams.StopBits << std::endl;
+	std::cout << " dcbSerialParams.XonLim:            " << (int)dcbSerialParams.XonLim << std::endl;
+	std::cout << " dcbSerialParams.XoffLim:           " << (int)dcbSerialParams.XoffLim << std::endl;
+ 	std::cout << " dcbSerialParams.XonChar:           " << (int)dcbSerialParams.XonChar << std::endl;
+	std::cout << " dcbSerialParams.XoffChar:          " << (int)dcbSerialParams.XoffChar << std::endl;
+ 	std::cout << " dcbSerialParams.ErrorChar:         " << (int)dcbSerialParams.ErrorChar << std::endl;
+	std::cout << " dcbSerialParams.EofChar:           " << (int)dcbSerialParams.EofChar << std::endl;
+	std::cout << " dcbSerialParams.EvtChar:           " << (int)dcbSerialParams.EvtChar << std::endl;
+	std::cout << std::endl;
+}
+
+///////////////////////////////////////////////////////////////////
 SerialMsw::SerialMsw() 
 : connected(false)
 ///////////////////////////////////////////////////////////////////
@@ -37,10 +69,12 @@ bool SerialMsw::connect(const char* portName) {
 	//Check if the connection was successfull
 	if( hSerial==INVALID_HANDLE_VALUE )
 	{
-		if( GetLastError()==ERROR_FILE_NOT_FOUND ){
+		DWORD lastError = GetLastError();
+		if( lastError == ERROR_FILE_NOT_FOUND ){
 			std::cerr << " Serial::ERROR: Handle was not attached. Reason: " << portName << " not available.\n";
 		} else {
-			std::cerr << " Serial::ERROR: Unknown error!";
+			std::cerr << " Serial::ERROR: Errno: " << lastError << "\n";
+			displayErrorInfo(lastError, _T("CreateFileA"));
 		}
 	
 		return false;
@@ -56,26 +90,28 @@ bool SerialMsw::connect(const char* portName) {
 		return false;
 	} 
 	
+	if ( true ) {
+		std::clog << "Received DCB parameters:" << std::endl;
+		traceDCB(dcbSerialParams);
+	}
+	
+
 	//Define serial connection parameters for the arduino board
-	dcbSerialParams.BaudRate      	= BAUD_RATE;
+	//dcbSerialParams.BaudRate      	= BAUD_RATE;
 	dcbSerialParams.fBinary       	= TRUE;
-	dcbSerialParams.fParity      	= FALSE;
+	dcbSerialParams.ByteSize      	= 8;
+	dcbSerialParams.Parity        	= NOPARITY;
+	dcbSerialParams.StopBits      	= ONESTOPBIT;
 	dcbSerialParams.fOutxCtsFlow 	= FALSE;
 	dcbSerialParams.fOutxDsrFlow  	= FALSE;
-	dcbSerialParams.fDtrControl   	= DTR_CONTROL_DISABLE;
 	dcbSerialParams.fDsrSensitivity = FALSE; // ??? should this be TRUE?
 	dcbSerialParams.fNull         	= FALSE;
 	dcbSerialParams.fOutX         	= FALSE;
 	dcbSerialParams.fInX          	= FALSE;
-	dcbSerialParams.fRtsControl   	= RTS_CONTROL_DISABLE;
 	dcbSerialParams.fAbortOnError 	= TRUE;
-	dcbSerialParams.ByteSize      	= 8;
-	dcbSerialParams.Parity        	= NOPARITY;
-	dcbSerialParams.StopBits      	= ONESTOPBIT;
+	dcbSerialParams.fDtrControl   	= DTR_CONTROL_DISABLE;
+	dcbSerialParams.fRtsControl   	= RTS_CONTROL_DISABLE;
 	
-	//dcbSerialParams.fDtrControl   	= DTR_CONTROL_ENABLE;
-	//dcbSerialParams.fRtsControl   	= RTS_CONTROL_ENABLE;
-
 	//Set the parameters and check for their proper application
 	if(!SetCommState(hSerial, &dcbSerialParams)) {
 		std::cerr << "Serial::ALERT: Could not set Serial Port parameters";
@@ -96,10 +132,9 @@ bool SerialMsw::connect(const char* portName) {
 	}
 
 	std::cout << " Serial::INFO: Connected to port: " << portName << "\n";
-	std::cout << " Baud rate: " << BAUD_RATE << "\n";
+	std::cout << " Baud rate: " << dcbSerialParams.BaudRate << "\n";
 	std::cout << " Waiting for controller board response ";
 	std::cout.flush();
-
 	
 	//Flush any remaining characters in the buffers 
 	PurgeComm(this->hSerial, PURGE_RXCLEAR | PURGE_TXCLEAR);
@@ -186,13 +221,11 @@ bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialMsw::displayErrorInfo(LPTSTR lpszFunction) {
+void SerialMsw::displayErrorInfo(DWORD lastError, LPCTSTR lpszFunction) {
 ///////////////////////////////////////////////////////////////////
 	// Retrieve the system error message for the last-error code
-	
 	LPVOID lpMsgBuf;
-	LPVOID lpDisplayBuf;
-	DWORD dw = GetLastError(); 
+	DWORD dw = lastError;
 
 	FormatMessage(
 		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
@@ -202,23 +235,20 @@ void SerialMsw::displayErrorInfo(LPTSTR lpszFunction) {
 		dw,
 		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
 		(LPTSTR) &lpMsgBuf,
-		0, NULL );
-
-	// Display the error message and exit the process
-	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
-		(lstrlen((LPCTSTR)lpMsgBuf) + lstrlen((LPCTSTR)lpszFunction) + 40) * sizeof(TCHAR)); 
-
-	StringCchPrintf((LPTSTR)lpDisplayBuf, 
-		LocalSize(lpDisplayBuf) / sizeof(TCHAR),
-		"%S failed with error %ld: %S", 
-		lpszFunction, dw, (LPCTSTR)lpMsgBuf); 
-
-	std::cerr << (LPCTSTR)lpDisplayBuf;
-    
-    LocalFree(lpMsgBuf);
-    LocalFree(lpDisplayBuf);
-	 
+		0, 
+		NULL
+	);
+		
+	/*
+	LPSTR   = char*
+	LPCSTR  = const char*
+	LPWSTR  = wchar_t*
+	LPCWSTR = const wchar_t*
+	LPTSTR  = char* or wchar_t* depending on _UNICODE
+	LPCTSTR = const char* or const wchar_t* depending on _UNICODE
+	*/
+	std::cerr << " Error Message: " << wxString(static_cast<const wchar_t*>(lpMsgBuf)) << std::endl;
+	LocalFree(lpMsgBuf);
 }
-
 
 #endif

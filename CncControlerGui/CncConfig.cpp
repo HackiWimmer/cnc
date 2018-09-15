@@ -3,6 +3,7 @@
 #include "MainFrame.h"
 #include "wxcrafter.h"
 #include "CncConfigCommon.h"
+#include "CncSpeedManager.h"
 #include "CncConfig.h"
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
@@ -141,10 +142,13 @@ void CncConfig::broadcastConfigUpdateNotification() {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
-	CncSpeedManager csm(40,
-						getPitchX(), getStepsX(), 2 * getPulsWidthOffsetX(),
-						getPitchY(), getStepsY(), 2 * getPulsWidthOffsetY(),
-						getPitchZ(), getStepsZ(), 2 * getPulsWidthOffsetZ());
+	CncSpeedManager csm(SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
+						getPitchX(), getStepsX(), getLowPulsWidthX() + getHighPulsWidthX(),
+						getPitchY(), getStepsY(), getLowPulsWidthY() + getHighPulsWidthY(),
+						getPitchZ(), getStepsZ(), getLowPulsWidthZ() + getHighPulsWidthZ()
+						);
+	
+	int stepsXYZ = ( getStepsX() +  getStepsY() +  getStepsZ() ) / 3;
 	
 	double maxSpeedX = csm.getMaxSpeedX_MM_MIN();
 	double maxSpeedY = csm.getMaxSpeedY_MM_MIN();
@@ -154,6 +158,7 @@ void CncConfig::calculateSpeedValues() {
 	smallestMaxSpeed = std::min(smallestMaxSpeed, maxSpeedZ);
 	
 	wxPGProperty* prop = NULL;
+	{ prop = getProperty(CncConfig_STEPS_XYZ); 					if (prop != NULL) prop->SetValue(stepsXYZ); }
 	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedX); }
 	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedY); }
 	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedZ); }
@@ -816,9 +821,13 @@ const int CncConfig::getStepSignY()									{ return 1; } // currently not suppo
 const unsigned int CncConfig::getStepsX() 							{ wxPGProperty* p = getProperty(CncConfig_STEPS_X); 					wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ wxPGProperty* p = getProperty(CncConfig_STEPS_Y); 					wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsZ() 							{ wxPGProperty* p = getProperty(CncConfig_STEPS_Z); 					wxASSERT(p); return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getPulsWidthOffsetX() 				{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_OFFSET_X); 		wxASSERT(p); return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getPulsWidthOffsetY() 				{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_OFFSET_Y); 		wxASSERT(p); return p->GetValue().GetInteger(); }
-const unsigned int CncConfig::getPulsWidthOffsetZ() 				{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_OFFSET_Z); 		wxASSERT(p); return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getStepsXYZ()							{ wxPGProperty* p = getProperty(CncConfig_STEPS_XYZ); 					wxASSERT(p); return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getLowPulsWidthX() 					{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_LOW_X); 			wxASSERT(p); return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getLowPulsWidthY() 					{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_LOW_Y); 			wxASSERT(p); return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getLowPulsWidthZ() 					{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_LOW_Z); 			wxASSERT(p); return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthX() 					{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_HIGH_X); 			wxASSERT(p); return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthY() 					{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_HIGH_Y); 			wxASSERT(p); return p->GetValue().GetInteger(); }
+const unsigned int CncConfig::getHighPulsWidthZ() 					{ wxPGProperty* p = getProperty(CncConfig_PULS_WIDTH_HIGH_Z); 			wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getMultiplierX() 						{ wxPGProperty* p = getProperty(CncConfig_MULTIPLIER_X); 				wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getMultiplierY() 						{ wxPGProperty* p = getProperty(CncConfig_MULTIPLIER_Y); 				wxASSERT(p); return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getMultiplierZ()						{ wxPGProperty* p = getProperty(CncConfig_MULTIPLIER_Z); 				wxASSERT(p); return p->GetValue().GetInteger(); }

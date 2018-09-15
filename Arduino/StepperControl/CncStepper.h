@@ -1,20 +1,22 @@
 #ifndef CNC_STEPPER_H
 #define CNC_STEPPER_H
 
-#include <SoftwareSerial.h>
 #include "CncController.h"
 #include "LastErrorCodes.h"
 #include "CommonValues.h"
 
 class CncStepper {
-
+  public:
+    enum StepDirection { SD_INC     = DIRECTION_INC, 
+                         SD_DEC     = DIRECTION_DEC, 
+                         SD_UNKNOWN = DIRECTION_UNKNOWN
+                       };
+    
   private:
-
     bool INCREMENT_DIRECTION_VALUE;
 
-    bool initialized;
     bool interrupted;
-    bool pauseStepping;
+    bool calculateDuration;
     bool minReached;
     bool maxReached;
     
@@ -24,45 +26,39 @@ class CncStepper {
     byte directionPin;
     byte stepPin;
     byte limitPin;
+    
     char axis;
 
-    unsigned short dirPulseWidth;
-
-    long pulseWidthOffset;
+    uint32_t steps;
+    double pitch;
+    bool validPitch;
+    
+    unsigned int dirPulseWidth;
+    unsigned int lowPulsWidth;
+    unsigned int highPulsWidth;
       
-    unsigned long avgStepDuartion;
+    uint32_t avgStepDuartion;
 
-    unsigned long tsLoopRef;
-    unsigned long tsLoopEnd;
-    
-    unsigned long tsStepRef;
-    unsigned long tsStepLst;
-    
-    unsigned long steps;
+    StepDirection stepDirection;
+    int32_t stepCounter;
+    int32_t stepCounterOverflow;
+    int32_t curPos;
 
-    long stepCounter;
-    long stepCounterOverflow;
-
-    short lastStepDirection;
+    int32_t posReplyThresholdCount;
     
-    long curPos;
     CncController* controller;
     LastErrorCodes& errorInfo;
 
-    bool validPitch;
-    double pitch;
-      
-    void setMinReached(bool state);
-    void setMaxReached(bool state);
-    bool checkLimit(int dir);
+    inline void incStepCounter();
+        
+    inline void setMinReached(bool state);
+    inline void setMaxReached(bool state);
+    inline bool checkLimit(int dir);
 
     inline void sendCurrentLimitStates(bool force);
-    inline void sendCurrentPositions(unsigned char pid, bool force);
     inline void broadcastInterrupt();
 
-    inline void calcStepDuration(unsigned long lastDuration);
-
-    inline bool isCancelMoveSignalRelevant(const unsigned char sig);
+    inline void calcStepLoopDuration(uint32_t lastDuration);
 
   public:
     //////////////////////////////////////////////////////////////////////////////
@@ -70,97 +66,92 @@ class CncStepper {
     ~CncStepper();
 
     //////////////////////////////////////////////////////////////////////////////
-    long isReadyToRun();
+    int32_t isReadyToRun();    
+    
+    //////////////////////////////////////////////////////////////////////////////
+    void setLimitStateManually(int32_t value) {
+      if ( value > 0 )  { maxReached = true; stepDirection = SD_INC; }
+      else              { minReached = true; stepDirection = SD_DEC; }
+    }
+    
+    //////////////////////////////////////////////////////////////////////////////
+    void printConfig();
 
     //////////////////////////////////////////////////////////////////////////////
-    short getLastStepDirection() { return lastStepDirection; }
+    uint32_t getAvgStepDuration()           const  { return avgStepDuartion; }
 
     //////////////////////////////////////////////////////////////////////////////
-    bool isInitialized() { return initialized; }
+    StepDirection getStepDirection()        const  { return stepDirection; }
 
     //////////////////////////////////////////////////////////////////////////////
-    void interrupt() { interrupted = true; }
-    bool isInterrupted() { return interrupted; }
     void reset();
+    void interrupt()                               { interrupted = true; }
+    bool isInterrupted()                    const  { return interrupted; }
+
+    //////////////////////////////////////////////////////////////////////////////
+    bool isDuartionCalcActive()             const  { return calculateDuration; }
+    void activateDurationCalc(bool state = true)   { calculateDuration = state; }
+    void deactivateDurationCalc()                  { activateDurationCalc(false); }
     
     //////////////////////////////////////////////////////////////////////////////
-    void pause(bool state) { pauseStepping = state; }
-    
-    //////////////////////////////////////////////////////////////////////////////
-    long getLimitState();
-    long readLimitState() { return readLimitState(lastStepDirection); }
-    long readLimitState(int dir);
+    int32_t getLimitState();
+    int32_t readLimitState()                       { return readLimitState(stepDirection); }
+    int32_t readLimitState(int dir);
 
     //////////////////////////////////////////////////////////////////////////////
-    byte getDirectionPin()  { return directionPin; }
-    byte getStepPin()       { return stepPin; }
+    byte getDirectionPin()                  const  { return directionPin; }
+    byte getStepPin()                       const  { return stepPin; }
 
     //////////////////////////////////////////////////////////////////////////////
-    bool isMinReached() { return minReached; }
-    bool isMaxReached() { return maxReached; }
+    bool isMinReached()                     const  { return minReached; }
+    bool isMaxReached()                     const  { return maxReached; }
 
     //////////////////////////////////////////////////////////////////////////////
-    void setLimitStateManually(long value) {
-      if ( value > 0 )  { maxReached = true; lastStepDirection = DIRECTION_INC; }
-      else              { minReached = true; lastStepDirection = DIRECTION_DEC; }
-    }
+    unsigned int getLowPulseWidth()         const  { return lowPulsWidth;  }
+    unsigned int getHighPulseWidth()        const  { return highPulsWidth; }
+    void setLowPulseWidth(int lpw)                 { lowPulsWidth  = lpw;  }
+    void setHighPulseWidth(int hpw)                { highPulsWidth = hpw;  }
 
     //////////////////////////////////////////////////////////////////////////////
-    long getPulseWidthOffset() { return pulseWidthOffset; }
-    void setPulseWidthOffset(long pwo) {
-      pulseWidthOffset = pwo;
-      controller->setupSpeedManager();
-    }
+    uint32_t getSteps()                     const  { return steps; }
+    void setSteps(uint32_t s)                      { steps = s;    }
 
     //////////////////////////////////////////////////////////////////////////////
-    unsigned long getSteps() { return steps; }
-    void setSteps(unsigned long s) { 
-      steps = s;
-      controller->setupSpeedManager();
-    }
-
-    //////////////////////////////////////////////////////////////////////////////
-    void resetPosition() { setPosition(0); }
-    void setPosition(long val) { curPos = val; }
-    long getPosition() { return curPos; }
+    void resetPosition()                           { setPosition(0); }
+    void setPosition(int32_t val)                  { curPos = val;   }
+    int32_t getPosition()                   const  { return curPos;  }
 
     //////////////////////////////////////////////////////////////////////////////
     void setPitch(const double p);
-    double getPitch() { return pitch; }
-    bool isPitchValid() { return validPitch; }
+    double getPitch()                       const  { return pitch; }
+    bool isPitchValid()                     const  { return validPitch; }
 
     //////////////////////////////////////////////////////////////////////////////
-    long calcStepsForMM(long mm) {
-      if ( isPitchValid() == false )
-        return 0;
-
-      if ( mm == 0 )
-        return 0;
-
-      return mm * steps / pitch;
-    }
+    int32_t calcStepsForMM(int32_t mm); 
 
     //////////////////////////////////////////////////////////////////////////////
-    void resetStepCounter() { stepCounter = MIN_LONG; stepCounterOverflow = 0L; }
-    long getStepCounter() { return stepCounter; }
-    long getStepCounterOverflow() { return stepCounterOverflow; }
-    inline void incStepCounter();
+    void resetStepCounter()                       { stepCounter = MIN_LONG; stepCounterOverflow = 0L; }
+    int32_t getStepCounter()                const { return stepCounter; }
+    int32_t getStepCounterOverflow()        const { return stepCounterOverflow; }
 
     //////////////////////////////////////////////////////////////////////////////
-    void printConfig();
-    
-    bool stepAxis(long steps, bool testActive = false);
-    bool enableStepperPin(bool state = true);
-    bool disableStepperPin() { return enableStepperPin(false); }
+    bool setDirection(int32_t steps);
+    bool setDirection(const StepDirection stepDirection);
+    bool performNextStep();
+
+    //////////////////////////////////////////////////////////////////////////////
+    int32_t getPosReplyThresholdCouter()     const { return posReplyThresholdCount; }
+    inline void incPosReplyThresholdCouter()       { posReplyThresholdCount++;      }
+    void resetPosReplyThresholdCouter()            { posReplyThresholdCount = 0;    }
 
     //////////////////////////////////////////////////////////////////////////////
     // The following functionality is to overrule the stepper cabling
-    void normalizeIncrementDirectionValue()  { INCREMENT_DIRECTION_VALUE = NORMALIZED_INCREMENT_DIRECTION_VALUE; }
-    void inverseIncrementDirectionValue()    { INCREMENT_DIRECTION_VALUE = INVERSED_INCREMENT_DIRECTION_VALUE;   }
-    void setIncrementDirectionValue(long v)  { v == NORMALIZED_INCREMENT_DIRECTION ? normalizeIncrementDirectionValue() : inverseIncrementDirectionValue(); }
+    void normalizeIncrementDirectionValue()        { INCREMENT_DIRECTION_VALUE = NORMALIZED_INCREMENT_DIRECTION_VALUE; }
+    void inverseIncrementDirectionValue()          { INCREMENT_DIRECTION_VALUE = INVERSED_INCREMENT_DIRECTION_VALUE;   }
+    void setIncrementDirectionValue(int32_t v)     { v == NORMALIZED_INCREMENT_DIRECTION ? normalizeIncrementDirectionValue() : inverseIncrementDirectionValue(); }
   
-    inline bool getIncrementDirectionValue() { return INCREMENT_DIRECTION_VALUE;  }
-    inline bool getDecrementDirectionValue() { return !INCREMENT_DIRECTION_VALUE; }
+    inline bool getIncrementDirectionValue() const { return INCREMENT_DIRECTION_VALUE;  }
+    inline bool getDecrementDirectionValue() const { return !INCREMENT_DIRECTION_VALUE; }
 
     //////////////////////////////////////////////////////////////////////////////
 };

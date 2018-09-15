@@ -4,6 +4,7 @@
 	#ifdef __WXMSW__
 	
 		#include <windef.h>
+
 		
 		class SerialMsw {
 			
@@ -14,7 +15,7 @@
 				bool connected;
 				
 				//determine OS error message
-				inline void displayErrorInfo(LPTSTR lpszFunction);
+				inline void displayErrorInfo(DWORD lastError, LPCTSTR lpszFunction);
 				
 			protected:
 				

@@ -3,13 +3,12 @@
 
 typedef unsigned char SHORT;
 
+static const char* EM_BUFFER_TO_SMALL    = "Given buffer to small";
+
 //-------------------------------------------------------------
 inline void headline() {
   for (short i=0; i<30; i++, Serial.print('-'));
 }
-
-
-static const char* EM_BUFFER_TO_SMALL    = "Given buffer to small";
 
 //-----------------------------------------------------------------
 class StateBuffer {
@@ -39,15 +38,28 @@ class StateBuffer {
     
     //-------------------------------------------------------------
     void setBit(unsigned char idx, bool value) { 
-      switch (idx) {
-        case 8:     pinValue |= value << 7;
-        case 7:     pinValue |= value << 6;
-        case 6:     pinValue |= value << 5;
-        case 5:     pinValue |= value << 4;
-        case 4:     pinValue |= value << 3;
-        case 3:     pinValue |= value << 2;
-        case 2:     pinValue |= value << 1;
-        case 1:     pinValue |= value << 0;
+      if ( value == true ) {
+        switch (idx) {
+          case 8:     pinValue |= (1 << 7); break;
+          case 7:     pinValue |= (1 << 6); break;
+          case 6:     pinValue |= (1 << 5); break;
+          case 5:     pinValue |= (1 << 4); break;
+          case 4:     pinValue |= (1 << 3); break;
+          case 3:     pinValue |= (1 << 2); break;
+          case 2:     pinValue |= (1 << 1); break;
+          case 1:     pinValue |= (1 << 0); break;
+        }
+      } else {
+         switch (idx) {
+          case 8:     pinValue &= ~(1 << 7); break;
+          case 7:     pinValue &= ~(1 << 6); break;
+          case 6:     pinValue &= ~(1 << 5); break;
+          case 5:     pinValue &= ~(1 << 4); break;
+          case 4:     pinValue &= ~(1 << 3); break;
+          case 3:     pinValue &= ~(1 << 2); break;
+          case 2:     pinValue &= ~(1 << 1); break;
+          case 1:     pinValue &= ~(1 << 0); break;
+        }       
       }
     }
 
@@ -66,7 +78,8 @@ class StateBuffer {
     //-------------------------------------------------------------
     virtual void init()     = 0;
     virtual void report()   = 0;
-    virtual void evaluate() = 0;
+    virtual void trace()    = 0;
+    virtual bool evaluate() = 0;
 
     //-------------------------------------------------------------
     void reset() { pinValue = INIT_VALUE; }
@@ -84,14 +97,15 @@ class StateBuffer {
     bool getBit2() const { return pinValue &   2; }
     bool getBit1() const { return pinValue &   1; }
 
-    void setBit8(bool value = true) { pinValue |= value << 7; }
-    void setBit7(bool value = true) { pinValue |= value << 6; }
-    void setBit6(bool value = true) { pinValue |= value << 5; }
-    void setBit5(bool value = true) { pinValue |= value << 4; }
-    void setBit4(bool value = true) { pinValue |= value << 3; }
-    void setBit3(bool value = true) { pinValue |= value << 2; }
-    void setBit2(bool value = true) { pinValue |= value << 1; }
-    void setBit1(bool value = true) { pinValue |= value << 0; }
+    //-------------------------------------------------------------
+    void setBit8(bool value = true) { if ( value ) {pinValue |= (1 << 7);} else {pinValue &= (1 << 7);} }
+    void setBit7(bool value = true) { if ( value ) {pinValue |= (1 << 6);} else {pinValue &= (1 << 6);} }
+    void setBit6(bool value = true) { if ( value ) {pinValue |= (1 << 5);} else {pinValue &= (1 << 5);} }
+    void setBit5(bool value = true) { if ( value ) {pinValue |= (1 << 4);} else {pinValue &= (1 << 4);} }
+    void setBit4(bool value = true) { if ( value ) {pinValue |= (1 << 3);} else {pinValue &= (1 << 3);} }
+    void setBit3(bool value = true) { if ( value ) {pinValue |= (1 << 2);} else {pinValue &= (1 << 2);} }
+    void setBit2(bool value = true) { if ( value ) {pinValue |= (1 << 1);} else {pinValue &= (1 << 1);} }
+    void setBit1(bool value = true) { if ( value ) {pinValue |= (1 << 0);} else {pinValue &= (1 << 0);} }
 
     //-------------------------------------------------------------
     virtual const char* getValueAsString() {
@@ -136,7 +150,10 @@ class StateBuffer {
     }
     //-------------------------------------------------------------
     bool getAnalogStateAsBool(int pin) {
-      return analogRead(pin) > 0;
+      // The used cricut don't switch the pin to a zero value
+      // analog pin switches between 10,11,12 and 1023
+      const int VALUE_TO_COMPARE = 64;
+      return analogRead(pin) >= VALUE_TO_COMPARE;
     }
     //-------------------------------------------------------------
     bool readPin(int pin) {

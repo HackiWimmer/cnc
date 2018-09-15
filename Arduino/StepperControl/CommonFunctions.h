@@ -3,6 +3,13 @@
 
 	#define epsilon ((double)0.000999)
 
+  struct I2CData {
+    unsigned char limitState;
+    unsigned char supportState; 
+  };
+
+  extern inline bool readI2CSlave(I2CData& data);
+
 	extern inline void sleepMicroseconds(unsigned long usec);
 
 	extern inline bool dblCompare(double a, double b);

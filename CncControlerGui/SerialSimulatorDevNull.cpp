@@ -37,7 +37,7 @@ SerialSimulatorDevNull::SerialSimulatorDevNull(SerialSimulatorFacade* caller)
 	memset(&renderPointB, 0, sizeof(renderPointB));
 	
 	// initial setup, will be initiated later with concret values
-	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
+	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
 											0.0, 0, 0,
 											0.0, 0, 0,
 											0.0, 0, 0);
@@ -59,7 +59,7 @@ void SerialSimulatorDevNull::resetSerial() {
 	posReplyThresholdY = 0;
 	posReplyThresholdZ = 0;
 	
-	speedSimulator->setup(	defaultLoopDuration,
+	speedSimulator->setup(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
 							0.0, 0, 0,
 							0.0, 0, 0,
 							0.0, 0, 0);
@@ -159,12 +159,22 @@ unsigned char SerialSimulatorDevNull::performSetterValue(unsigned char pid, int3
 		case PID_STEPS_X:
 		case PID_STEPS_Y:
 		case PID_STEPS_Z:
-		case PID_PULSE_WIDTH_OFFSET_X:
-		case PID_PULSE_WIDTH_OFFSET_Y:
-		case PID_PULSE_WIDTH_OFFSET_Z:	speedSimulator->setup(	defaultLoopDuration,
-																getSetterValueAsDouble(PID_PITCH_X, 0.0), getSetterValueAsLong(PID_STEPS_X, 0), 2 * getSetterValueAsLong(PID_PULSE_WIDTH_OFFSET_X, 0),
-																getSetterValueAsDouble(PID_PITCH_Y, 0.0), getSetterValueAsLong(PID_STEPS_Y, 0), 2 * getSetterValueAsLong(PID_PULSE_WIDTH_OFFSET_Y, 0),
-																getSetterValueAsDouble(PID_PITCH_Z, 0.0), getSetterValueAsLong(PID_STEPS_Z, 0), 2 * getSetterValueAsLong(PID_PULSE_WIDTH_OFFSET_Z, 0));
+		case PID_PULSE_WIDTH_LOW_X:
+		case PID_PULSE_WIDTH_LOW_Y:
+		case PID_PULSE_WIDTH_LOW_Z:
+		case PID_PULSE_WIDTH_HIGH_X:
+		case PID_PULSE_WIDTH_HIGH_Y:
+		case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->setup(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
+																getSetterValueAsDouble(PID_PITCH_X, 0.0), 
+																 getSetterValueAsLong(PID_STEPS_X, 0), 
+																 getSetterValueAsLong(PID_PULSE_WIDTH_LOW_X, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_X, 0),
+																getSetterValueAsDouble(PID_PITCH_Y, 0.0), 
+																 getSetterValueAsLong(PID_STEPS_Y, 0), 
+																 getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Y, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Y, 0),
+																getSetterValueAsDouble(PID_PITCH_Z, 0.0), 
+																 getSetterValueAsLong(PID_STEPS_Z, 0), 
+																 getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Z, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Z, 0)
+															 );
 										break;
 		
 		

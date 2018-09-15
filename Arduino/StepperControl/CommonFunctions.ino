@@ -1,3 +1,4 @@
+#include <Wire.h>
 #include "CommonValues.h"
 
 //////////////////////////////////////////////////////////////
@@ -6,8 +7,29 @@ void sleepMicroseconds(unsigned long usec) {
   long milli = usec / 1000;
   long micro = usec % 1000;
 
-  delay(milli);
+  if ( milli )
+    delay(milli);
+    
   delayMicroseconds(micro);
+}
+//////////////////////////////////////////////////////////////
+bool readI2CSlave(I2CData& data) {
+//////////////////////////////////////////////////////////////
+  Wire.requestFrom(I2C_DEVICE_ID, I2C_BYTE_COUNT);
+
+  if ( Wire.available() > 0 ) {
+    unsigned int counter = 0;
+    while ( Wire.available()) {
+      switch ( counter ) {
+        case I2C_BYTE_LIMIT_STATE:     data.limitState    = Wire.read();  break;
+        case I2C_BYTE_SUPPORT_STATE:   data.supportState  = Wire.read();  break;
+        default:  return false;
+      }
+      counter++;
+    }
+  }
+
+  return true;
 }
 //////////////////////////////////////////////////////////////
 inline bool dblCompare(double a, double b) {
@@ -167,9 +189,12 @@ inline void sendHeartbeat(unsigned char limitState, unsigned char supportState) 
   Serial.write(PID_HEARTBEAT);
   Serial.write(byteCount);
   writeLongValue(millis() % MAX_LONG);
-
-  writeByteValue(limitState);
-  writeByteValue(supportState);
+  for (unsigned int i=0; i<I2C_BYTE_COUNT; i++) {
+    switch ( i ) {
+      case I2C_BYTE_LIMIT_STATE:    writeByteValue(limitState);   break;
+      case I2C_BYTE_SUPPORT_STATE:  writeByteValue(supportState); break;
+    }
+  }
   writeByteValue(255);
   writeByteValue(255);
 }
@@ -186,6 +211,7 @@ inline void pushMessage(const char type, const char* msg) {
   
   Serial.print(msg);
   Serial.write(MBYTE_CLOSE);
+  Serial.flush();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -249,12 +275,12 @@ inline bool checkSerialForPauseCommands(bool currentPauseState) {
     if ( Serial.available() > 0 ) {
       
       switch ( Serial.peek() ) {
-        case 'p': ret = false; 
+        case 'p': ret = PAUSE_INACTIVE; 
                   // remove the cmd for serial
                   Serial.read(); 
                   break;
                   
-        case 'P': ret = true;
+        case 'P': ret = PAUSE_ACTIVE;
                   // remove the cmd for serial
                   Serial.read();  
                   break;

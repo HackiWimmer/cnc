@@ -28,8 +28,8 @@ namespace SupportPin {
   const unsigned char BIT_IS_SUPPORT_BUTTON_2_PRESSED    =     7;
   const unsigned char BIT_IS_SUPPORT_BUTTON_3_PRESSED    =     6;
   const unsigned char BIT_5                              =     5;
-  const unsigned char BIT_4                              =     4;
-  const unsigned char BIT_3                              =     3;
+  const unsigned char BIT_IS_SUPPORT_SWITCH_1_PRESSED    =     4;
+  const unsigned char BIT_IS_SUPPORT_SWITCH_2_PRESSED    =     3;
   const unsigned char BIT_IS_TOOL_POWERED                =     2;
   const unsigned char BIT_IS_CABLE_CONNECTED             =     1;
 
@@ -58,7 +58,7 @@ namespace CncInterface {
 
       //-------------------------------------------------------------
       unsigned char getValue() const { return states; }
-    
+      
       //-------------------------------------------------------------
       bool getBit(unsigned char idx) const {
         switch (idx) {
@@ -77,15 +77,28 @@ namespace CncInterface {
       
       //-------------------------------------------------------------
       void setBit(unsigned char idx, bool value) { 
-        switch (idx) {
-          case 8:     states |= value << 7;
-          case 7:     states |= value << 6;
-          case 6:     states |= value << 5;
-          case 5:     states |= value << 4;
-          case 4:     states |= value << 3;
-          case 3:     states |= value << 2;
-          case 2:     states |= value << 1;
-          case 1:     states |= value << 0;
+        if ( value == true ) {
+          switch (idx) {
+            case 8:     states |= (1 << 7); break;
+            case 7:     states |= (1 << 6); break;
+            case 6:     states |= (1 << 5); break;
+            case 5:     states |= (1 << 4); break;
+            case 4:     states |= (1 << 3); break;
+            case 3:     states |= (1 << 2); break;
+            case 2:     states |= (1 << 1); break;
+            case 1:     states |= (1 << 0); break;
+          }
+        } else {
+           switch (idx) {
+            case 8:     states &= ~(1 << 7); break;
+            case 7:     states &= ~(1 << 6); break;
+            case 6:     states &= ~(1 << 5); break;
+            case 5:     states &= ~(1 << 4); break;
+            case 4:     states &= ~(1 << 3); break;
+            case 3:     states &= ~(1 << 2); break;
+            case 2:     states &= ~(1 << 1); break;
+            case 1:     states &= ~(1 << 0); break;
+          }       
         }
       }
 
@@ -104,37 +117,10 @@ namespace CncInterface {
         return stringValue;
       }
 
+      //-------------------------------------------------------------
       virtual const char* getValueAsReport(char* ret) {
         return ret;
       }
-
-      //-------------------------------------------------------------
-      #ifdef SKETCH_COMPILE
-        unsigned int readAnalogValue(int pin, int msdelay) {
-          if ( msdelay > 0 )
-            delay(msdelay);
-            
-          // consider analogRead delivers values from 0 to 1023
-          int readValue = analogRead(pin);
-        
-          // recalulate the readValue to a range from 0 ... 255
-          //       0:      0,  1,  2,  3
-          //       1:      4,  5,  6,  7
-          //       2:      8,  9, 10, 11
-          //       3:     12, 13, 14, 15
-          //       4:     16, 17, 18, 19
-          // ...
-          // example:   readValue  = 18
-          // offset     = 18 % 4 = 2
-          // writeValue = (18 - 2) / 4 = 4
-           
-          short offset              = readValue % ANALOG_READ_WRITE_FACTOR;
-          unsigned int writtenValue = (readValue - offset) / ANALOG_READ_WRITE_FACTOR;
-        
-          states = (unsigned char)writtenValue;
-          return writtenValue;
-        }      
-      #endif  
   };
 
   namespace ISP {
@@ -151,14 +137,17 @@ namespace CncInterface {
 
         explicit States(unsigned char s)
         : StatesBase(s) {}
-
+        
         //-------------------------------------------------------------
         bool isSupportButton1Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_1_PRESSED);   }
         bool isSupportButton2Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_2_PRESSED);   }
         bool isSupportButton3Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_3_PRESSED);   }
         
-        bool isToolPowered()                         { return getBit(SupportPin::BIT_IS_TOOL_POWERED);             }
-        bool isCableConnected()                      { return getBit(SupportPin::BIT_IS_CABLE_CONNECTED);          }
+        bool isSupportSwitch1Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_SWITCH_1_PRESSED);   }
+        bool isSupportSwitch2Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_SWITCH_2_PRESSED);   }
+        
+        bool isToolPowered()                         { return getBit(SupportPin::BIT_IS_TOOL_POWERED);               }
+        bool isCableConnected()                      { return getBit(SupportPin::BIT_IS_CABLE_CONNECTED);            }
         // add more named getters on demand . . .
         
     }; // States

@@ -160,8 +160,6 @@ class SerialEmulatorNULL : public SerialSpyPort
 {
 	private:
 		
-		static const unsigned int defaultLoopDuration = 40;
-		
 		int32_t posReplyThresholdX;
 		int32_t posReplyThresholdY;
 		int32_t posReplyThresholdZ;

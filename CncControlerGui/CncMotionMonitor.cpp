@@ -216,25 +216,21 @@ void CncMotionMonitor::appendVertice(long id, float x, float y, float z, GLI::GL
 	
 	// decorate
 	switch ( cm ) {
-		case DataVerticeMode::CM_WORK:	
-										colour		= getFlags().workColour;
-										formatType	= PathVerticeType::FT_SOLID;
-										break;
+		case DataVerticeMode::CM_WORK:			colour		= getFlags().workColour;
+												formatType	= PathVerticeType::FT_SOLID;
+												break;
 										
-		case DataVerticeMode::CM_RAPID:	
-										colour 		= getFlags().rapidColour;
-										formatType	= ( getFlags().drawFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT );
-										break;
+		case DataVerticeMode::CM_RAPID:			colour 		= getFlags().rapidColour;
+												formatType	= ( getFlags().drawFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT );
+												break;
 										
-		case DataVerticeMode::CM_MAX:	
-										colour 		= getFlags().maxColour;
-										formatType	= PathVerticeType::FT_SOLID;
-										break;
+		case DataVerticeMode::CM_MAX:			colour 		= getFlags().maxColour;
+												formatType	= PathVerticeType::FT_SOLID;
+												break;
 										
-		case DataVerticeMode::CM_USER_DEFINED:	
-										colour 		= getFlags().userDefinedColour;
-										formatType	= PathVerticeType::FT_SOLID;
-										break;
+		case DataVerticeMode::CM_USER_DEFINED:	colour 		= getFlags().userDefinedColour;
+												formatType	= PathVerticeType::FT_SOLID;
+												break;
 	}
 	
 	// append
@@ -290,47 +286,42 @@ void CncMotionMonitor::onPaint() {
 	SwapBuffers();
 }
 /////////////////////////////////////////////////////////////////////
-void CncMotionMonitor::onPaintRotatePane3D(wxPanel* panel, int angle) {
+void CncMotionMonitor::onPaintRotatePaneX3D(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	onPaintRotatePane3D('X', GBL_CONFIG->getTheApp()->GetRotatePaneX3D(), getAngleX());
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintRotatePaneY3D(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	onPaintRotatePane3D('Y', GBL_CONFIG->getTheApp()->GetRotatePaneY3D(), getAngleY());
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintRotatePaneZ3D(wxPaintEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	onPaintRotatePane3D('Z', GBL_CONFIG->getTheApp()->GetRotatePaneZ3D(), getAngleZ());
+}
+/////////////////////////////////////////////////////////////////////
+void CncMotionMonitor::onPaintRotatePane3D(const char axis, wxPanel* panel, int angle) {
 /////////////////////////////////////////////////////////////////////
 	static wxColour posColour(0, 128, 0);
 	static wxColour negColour(196, 0, 0);
 	static wxColour colour;
-	static int lastAngle = 0;
 	
-	if ( angle != lastAngle )
-		panel->SetToolTip(wxString::Format("Rotation X: %d", angle));
-	
-	lastAngle = angle;
+	panel->SetToolTip(wxString::Format("Rotation %c: %d", axis, angle));
 	
 	angle < 0 ? colour = negColour : colour = posColour;
 	angle = abs(angle);
 
 	const wxSize size = panel->GetSize();
-	int height = size.GetHeight();
+	const int height = size.GetHeight();
 	
-	unsigned int pos = (unsigned int)(height * angle/360);
+	const unsigned int pos = (unsigned int)(height * angle/360);
+	const wxRect rect(0, height, size.GetWidth(), -pos);
 	
 	wxPaintDC dc(panel);
 	dc.SetPen(wxPen(colour));
 	dc.SetBrush(wxBrush(colour));
-
-	wxRect rect(0, height, size.GetWidth(), -pos);
 	dc.DrawRectangle(rect);
-}
-/////////////////////////////////////////////////////////////////////
-void CncMotionMonitor::onPaintRotatePaneX3D(wxPaintEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	onPaintRotatePane3D(GBL_CONFIG->getTheApp()->GetRotatePaneX3D(), getAngleX());
-}
-/////////////////////////////////////////////////////////////////////
-void CncMotionMonitor::onPaintRotatePaneY3D(wxPaintEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	onPaintRotatePane3D(GBL_CONFIG->getTheApp()->GetRotatePaneY3D(), getAngleY());
-}
-/////////////////////////////////////////////////////////////////////
-void CncMotionMonitor::onPaintRotatePaneZ3D(wxPaintEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	onPaintRotatePane3D(GBL_CONFIG->getTheApp()->GetRotatePaneZ3D(), getAngleZ());
 }
 /////////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaintScalePane3D(wxPaintEvent& event) {
@@ -338,30 +329,18 @@ void CncMotionMonitor::onPaintScalePane3D(wxPaintEvent& event) {
 	static wxColour col(219,194,77);
 	static wxBrush  brush(col);
 	static wxPen    pen(col, 1, wxSOLID);
-	static unsigned int lastScalePos = 0;
 	
 	wxPanel* pane = GBL_CONFIG->getTheApp()->GetScalePane3D();
 	const wxSize size = pane->GetSize();
-	int height = size.GetHeight();
-
-	unsigned int pos = calculateScaleDisplay(height);
+	const int height = size.GetHeight();
+	const unsigned int pos = calculateScaleDisplay(height) * 2;  // hack: *2
 	
-	// avoid duplicate drawing
-	if ( pos == lastScalePos )
-		pane->SetToolTip(wxString::Format("Scale: %d", pos));
-		
-	lastScalePos = pos;
-	
-	// hack
-	pos *= 2;
-	
-	//clog << height << ", " << pos << endl;
+	const wxRect rect(0, height, size.GetWidth(), -pos);
+	pane->SetToolTip(wxString::Format("Scale: %d", pos));
 	
 	wxPaintDC dc(pane);
 	dc.SetPen(pen);
 	dc.SetBrush(brush);
-
-	wxRect rect(0, height, size.GetWidth(), -pos);
 	dc.DrawRectangle(rect);
 }
 //////////////////////////////////////////////////
@@ -396,7 +375,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 	this->SetFocusFromKbd();
 	
 	// wheel
-	int rot = event.GetWheelRotation();
+	const int rot = event.GetWheelRotation();
 	if ( rot != 0 ) {
 		if (rot < 0 ) 	monitor->getModelScale().decScale();
 		else 			monitor->getModelScale().incScale();
@@ -417,8 +396,8 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		
 		// calculate new origin
 		if ( moveMode == true ) {
-			int dx = +(event.GetX() - x);
-			int dy = -(event.GetY() - y);
+			const int dx = +(event.GetX() - x);
+			const int dy = -(event.GetY() - y);
 			
 			monitor->reshape(cs.GetWidth(), cs.GetHeight(), dx, dy);
 			display();
@@ -435,8 +414,8 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		// left button
 		if ( event.LeftIsDown() == true ) {
 			// reverse y because the opengl viewport origin (0,0) is at left/bottom
-			int x = event.GetX();
-			int y = cs.GetHeight() - event.GetY();
+			const int x = event.GetX();
+			const int y = cs.GetHeight() - event.GetY();
 			
 			monitor->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
 			display();

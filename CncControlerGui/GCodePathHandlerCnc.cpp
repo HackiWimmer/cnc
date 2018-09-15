@@ -60,9 +60,7 @@ bool GCodePathHandlerCnc::processLinearMove(bool alreadyRendered) {
 bool GCodePathHandlerCnc::changeCurrentFeedSpeedXYZ(CncSpeed s, double value) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	
-	#warning s is obsolete here
-	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(value);
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(value, s);
 	return true;
 }
 //////////////////////////////////////////////////////////////////

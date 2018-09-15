@@ -199,9 +199,11 @@
   <object class="wxBitmap" name="BMP_TRAFFIC_LIGHT_YELLOW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\Icons\circle_yellow16.ico</object>
   <object class="wxBitmap" name="BMP_TYPE_COMMON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\flag-green-2.png</object>
   <object class="wxBitmap" name="BMP_TYPE_GCODE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\flag-yellow-2.png</object>
-  <object class="wxBitmap" name="BMP_TYPE_RAPID">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full (2).png</object>
+  <object class="wxBitmap" name="BMP_TYPE_MAX">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet-red.png</object>
+  <object class="wxBitmap" name="BMP_TYPE_RAPID">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet-go.png</object>
   <object class="wxBitmap" name="BMP_TYPE_SVG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\flag-blue-2.png</object>
-  <object class="wxBitmap" name="BMP_TYPE_WORK">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-medium (2).png</object>
+  <object class="wxBitmap" name="BMP_TYPE_USER_DEFINED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet-purple.png</object>
+  <object class="wxBitmap" name="BMP_TYPE_WORK">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet-feed.png</object>
   <object class="wxBitmap" name="BMP_USER_PERSPECTIVE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="BMP_USER_PERSPECTIVE_SAVE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="BMP_VALUE_DOUBLE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-pink.png</object>

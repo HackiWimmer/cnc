@@ -112,11 +112,11 @@ void CncSpeedSimulator::TimeStampInfo::trace(std::ostream& out) {
 }
 //////////////////////////////////////////////////////////////////////////
 CncSpeedSimulator::CncSpeedSimulator(
- unsigned int cOffset,
+ unsigned int cStepStaticOffset, unsigned int cStepLoopOffset,
  double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
  double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
  double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ)
-: CncSpeedManager(cOffset, pitchX, stepsX, pulseOffsetX, pitchY, stepsY, pulseOffsetY, pitchZ, stepsZ, pulseOffsetZ) 
+: CncSpeedManager(cStepStaticOffset, cStepLoopOffset, pitchX, stepsX, pulseOffsetX, pitchY, stepsY, pulseOffsetY, pitchZ, stepsZ, pulseOffsetZ) 
 , traceFlag(true)
 , traceInfo()
 , curTsInfo()

@@ -15,7 +15,7 @@
     
 #endif
 
-const long MAX_FEED_SPEED_VALUE = MIN_LONG;
+const int32_t MAX_FEED_SPEED_VALUE = MIN_LONG;
 
 //////////////////////////////////////////////////////////////////////////////////
 class CncSpeedManager {
@@ -24,23 +24,23 @@ class CncSpeedManager {
 
       //////////////////////////////////////////////////////////////////////////
       struct Measurement {
-        unsigned long tsStart     = 0L;
-        unsigned long tsEnd       = 0L;
+        uint32_t tsStart     = 0L;
+        uint32_t tsEnd       = 0L;
         
-        unsigned long timeElapsed = 0L;
+        uint32_t timeElapsed = 0L;
         double distance           = 0.0;
         double feedSpeed          = 0.0;
   
         Measurement()  { reset(); }
         ~Measurement() {}
   
-        void reset() {
+        void reset(double sValue = 0.0) {
           tsStart     = 0L;
           tsEnd       = 0L;
           
           timeElapsed = 0L;
           distance    = 0.0;
-          feedSpeed   = MAX_FEED_SPEED_VALUE;
+          feedSpeed   = sValue;
         }
       };
       
@@ -48,18 +48,21 @@ class CncSpeedManager {
         Measurement measurement; 
    
         bool initialized;
-
+        bool traceOn;
+        
         double configuredFeedSpeed;
-        double currentDistance;
+        double currentMoveDistance;
+        double runningDistance;
         
         double maxFeedSpeedX, maxFeedSpeedY, maxFeedSpeedZ;
         double gearingX, gearingY, gearingZ;
         
         int currentCorrectionValue;
-        unsigned int constOffset;
-        
+        unsigned int constStepStaticOffset, constStepLoopOffset;
+     
         unsigned int tPulseOffsetX, tPulseOffsetY, tPulseOffsetZ;
         unsigned int maxStepsX, maxStepsY, maxStepsZ;
+        unsigned int maxRpmX, maxRpmY, maxRpmZ;
         unsigned int totalOffsetX, totalOffsetY, totalOffsetZ;
         unsigned int perStepOffsetX, perStepOffsetY, perStepOffsetZ;
         
@@ -78,15 +81,21 @@ class CncSpeedManager {
         }
         
         //////////////////////////////////////////////////////////////////////////
-        void calculate() {
-            // Quality check
-            if ( dblCompareNull(configuredFeedSpeed) == true )  { reset(); return; }
-            if ( initialized == false )                         { reset(); return; }
-
-            // Calculate
-            const long tSteps = lStepsX + lStepsY + lStepsZ; 							// Total [steps]
-            if ( tSteps == 0 ) { resetOffset(); return; }
+        bool calculate() {
+            #ifndef SKETCH_COMPILE
+              if ( traceOn ) {
+                std::cout << "SpeedManager::calculate()" << std::endl;
+              }
+            #endif
             
+            // Quality check
+            if ( dblCompareNull(configuredFeedSpeed) == true )  { reset(); return false; }
+            if ( initialized == false )                         { reset(); return false; }
+
+            // Calculate - steps are absolute
+            const int32_t tSteps = lStepsX + lStepsY + lStepsZ; 							// Total [steps]
+            if ( tSteps == 0 ) { resetOffset(); return true; }
+        
             const double fx = (double)(lStepsX) / tSteps; 								// Factor [%]
             const double fy = (double)(lStepsY) / tSteps; 								// Factor [%]
             const double fz = (double)(lStepsZ) / tSteps; 								// Factor [%]
@@ -95,12 +104,12 @@ class CncSpeedManager {
             const double distanceY = lStepsY * gearingY; 							  	// [mm]
             const double distanceZ = lStepsZ * gearingZ; 								  // [mm]
             
-            currentDistance                 = sqrt(  distanceX * distanceX
+            currentMoveDistance             = sqrt(  distanceX * distanceX
             		                                   + distanceY * distanceY
 												                           + distanceZ * distanceZ
 												                          );     								  // [mm]
 
-            const double totalTime          = (currentDistance / configuredFeedSpeed)
+            const double totalTime          = (currentMoveDistance / configuredFeedSpeed)
             		                            * 1000.0 * 1000.0; 						// [us]
             
             const double totalLoopDuration  = lStepsX * tPulseOffsetX
@@ -117,10 +126,10 @@ class CncSpeedManager {
             // restLoopDuration is the timespan which has to be syntactically waited
             // to realize the configured feed speed
 
-            measurement.distance     += currentDistance;								// [mm]
+            measurement.distance     += currentMoveDistance;							// [mm]
 
             // Is syntactically wait required?
-            if ( restLoopDuration < 0.0 || dblCompareNull(restLoopDuration) ) { resetOffset(); return; }
+            //if ( restLoopDuration < 0.0 || dblCompareNull(restLoopDuration) ) { resetOffset(); return true; }
             
             totalOffsetX              = ( lStepsX > 0 ? (fx * restLoopDuration) : 0 ); 	// [us]
             totalOffsetY              = ( lStepsY > 0 ? (fy * restLoopDuration) : 0 ); 	// [us]
@@ -131,37 +140,44 @@ class CncSpeedManager {
             perStepOffsetZ            = ( lStepsZ > 0 ? totalOffsetZ / lStepsZ : 0 );  	// [us/step]
             
             #ifndef SKETCH_COMPILE
-              if ( false ) {
-                std::cout << "T: " << tSteps << ", " << restLoopDuration << ", " << currentDistance << ", " <<  totalLoopDuration << ", " << totalTime << ", " << configuredFeedSpeed << endl;
-                std::cout << "X: " << totalOffsetX << ", " << perStepOffsetX << ", " << lStepsX << ", " << fx << endl;
-                std::cout << "Y: " << totalOffsetY << ", " << perStepOffsetY << ", " << lStepsY << ", " << fy << endl;
-                std::cout << "Z: " << totalOffsetZ << ", " << perStepOffsetZ << ", " << lStepsZ << ", " << fz << endl;
+              if ( traceOn ) {
+				  /*
+                std::cout << " T: " << tSteps << ", " << restLoopDuration << ", " << currentDistance << ", " <<  totalLoopDuration << ", " << totalTime << ", " << configuredFeedSpeed << endl;
+                std::cout << " X: " << totalOffsetX << ", " << perStepOffsetX << ", " << lStepsX << ", " << fx << endl;
+                std::cout << " Y: " << totalOffsetY << ", " << perStepOffsetY << ", " << lStepsY << ", " << fy << endl;
+                std::cout << " Z: " << totalOffsetZ << ", " << perStepOffsetZ << ", " << lStepsZ << ", " << fz << endl;
+				 * */
               }
             #endif
+
+            return true;
         }
 
-    //////////////////////////////////////////////////////////////////////////
-    inline unsigned long getTimeStamp() {
-      #ifndef SKETCH_COMPILE
-        return CncTimeFunctions::getNanoTimestamp() / 1000;
-      #else
-        return micros();
-      #endif
-    }
-        
+        //////////////////////////////////////////////////////////////////////////
+        inline uint32_t getTimeStamp() {
+          #ifndef SKETCH_COMPILE
+            return CncTimeFunctions::getNanoTimestamp() / 1000;
+          #else
+            return micros();
+          #endif
+        }
+         
     public:
         
         //////////////////////////////////////////////////////////////////////////
         CncSpeedManager() 
         : measurement()
         , initialized(false)
+        , traceOn(false)
         , configuredFeedSpeed(0.0)
-        , currentDistance(0.0)
+        , currentMoveDistance(0.0)
+        , runningDistance(0.0)
         , maxFeedSpeedX(0.0), maxFeedSpeedY(0.0), maxFeedSpeedZ(0.0)
         , gearingX(0.0), gearingY(0.0), gearingZ(0.0)
-        , constOffset(0)
+        , constStepStaticOffset(0), constStepLoopOffset(0)
         , tPulseOffsetX(0), tPulseOffsetY(0), tPulseOffsetZ(0)
         , maxStepsX(0), maxStepsY(0), maxStepsZ(0)
+        , maxRpmX(0), maxRpmY(0), maxRpmZ(0)
         , totalOffsetX(0), totalOffsetY(0), totalOffsetZ(0)
         , perStepOffsetX(0), perStepOffsetY(0), perStepOffsetZ(0)
         , lStepsX(0), lStepsY(0), lStepsZ(0)
@@ -169,24 +185,27 @@ class CncSpeedManager {
         }
         
         //////////////////////////////////////////////////////////////////////////
-        CncSpeedManager(unsigned int cOffset,
+        CncSpeedManager(unsigned int cStepStaticOffset, unsigned int cStepLoopOffset, 
                         double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
                         double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
                         double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ) 
         : measurement()
         , initialized(false)
+        , traceOn(false)
         , configuredFeedSpeed(0.0)
-        , currentDistance(0.0)
+        , currentMoveDistance(0.0)
+        , runningDistance(0.0)
         , maxFeedSpeedX(0.0), maxFeedSpeedY(0.0), maxFeedSpeedZ(0.0)
         , gearingX(0.0), gearingY(0.0), gearingZ(0.0)
-        , constOffset(cOffset)
+        , constStepStaticOffset(cStepStaticOffset), constStepLoopOffset(cStepLoopOffset)
         , tPulseOffsetX(0), tPulseOffsetY(0), tPulseOffsetZ(0)
         , maxStepsX(0), maxStepsY(0), maxStepsZ(0)
+        , maxRpmX(0), maxRpmY(0), maxRpmZ(0)
         , totalOffsetX(0), totalOffsetY(0), totalOffsetZ(0)
         , perStepOffsetX(0), perStepOffsetY(0), perStepOffsetZ(0)
         , lStepsX(0), lStepsY(0), lStepsZ(0)
         {
-            setup(  cOffset,
+            setup(  cStepLoopOffset, cStepStaticOffset,
                     pitchX, stepsX, pulseOffsetX,
                     pitchY, stepsY, pulseOffsetY,
                     pitchZ, stepsZ, pulseOffsetZ);
@@ -197,7 +216,7 @@ class CncSpeedManager {
         }
         
         //////////////////////////////////////////////////////////////////////////
-        void setup(unsigned int cOffset,
+        bool setup( unsigned int cStepStaticOffset, unsigned int cStepLoopOffset,
                     double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
                     double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
                     double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ) {
@@ -205,36 +224,64 @@ class CncSpeedManager {
             initialized = false;
                         
             if ( stepsX == 0 || stepsY == 0 || stepsZ == 0 )
-                return;
+                return initialized;
             
             if ( dblCompareNull(pitchX) || dblCompareNull(pitchY) | dblCompareNull(pitchZ) )
-                return;
+                return initialized;
             
             if ( pulseOffsetX == 0 || pulseOffsetY == 0 || pulseOffsetZ == 0 )
-                return;
+                return initialized;
             
             // preconfig/setup values
-            gearingX = (double)(pitchX / stepsX); // [mm/steps]
-            gearingY = (double)(pitchY / stepsY); // [mm/steps]
-            gearingZ = (double)(pitchZ / stepsZ); // [mm/steps]
+            constStepStaticOffset = cStepStaticOffset;                         // [us]
+            constStepLoopOffset   = cStepLoopOffset;                           // [us]
             
-            tPulseOffsetX = pulseOffsetX + cOffset; // [us]
-            tPulseOffsetY = pulseOffsetY + cOffset; // [us]
-            tPulseOffsetZ = pulseOffsetZ + cOffset; // [us]
+            gearingX      = (double)(pitchX / stepsX);                         // [mm/steps]
+            gearingY      = (double)(pitchY / stepsY);                         // [mm/steps]
+            gearingZ      = (double)(pitchZ / stepsZ);                         // [mm/steps]
             
-            maxStepsX = (unsigned int)(1.0 / ( tPulseOffsetX / 1000.0 / 1000.0 )); // [steps/s]
-            maxStepsY = (unsigned int)(1.0 / ( tPulseOffsetY / 1000.0 / 1000.0 )); // [steps/s]
-            maxStepsZ = (unsigned int)(1.0 / ( tPulseOffsetZ / 1000.0 / 1000.0 )); // [steps/s]
+            tPulseOffsetX = pulseOffsetX + cStepLoopOffset;                    // [us]         - contains HIGH and LOW period + loop offset
+            tPulseOffsetY = pulseOffsetY + cStepLoopOffset;                    // [us]         - contains HIGH and LOW period + loop offset
+            tPulseOffsetZ = pulseOffsetZ + cStepLoopOffset;                    // [us]         - contains HIGH and LOW period + loop offset
+
+            const double base = 1000L * 1000L - cStepStaticOffset;
+            maxStepsX     = (unsigned int)(base / tPulseOffsetX);               // [steps/s]    
+            maxStepsY     = (unsigned int)(base / tPulseOffsetY);               // [steps/s]    
+            maxStepsZ     = (unsigned int)(base / tPulseOffsetZ);               // [steps/s]  
+
+             maxStepsX = 4000;
+              maxStepsY = 4000;
+               maxStepsZ = 4000;
+        
+            maxFeedSpeedX = gearingX * maxStepsX;                              // [mm/s]
+            maxFeedSpeedY = gearingY * maxStepsY;                              // [mm/s]
+            maxFeedSpeedZ = gearingZ * maxStepsZ;                              // [mm/s]
+
+            maxRpmX       = maxStepsX/stepsX * 60;                             // [rpm]
+            maxRpmY       = maxStepsY/stepsY * 60;                             // [rpm]
+            maxRpmZ       = maxStepsZ/stepsZ * 60;                             // [rpm]
             
-            maxFeedSpeedX = gearingX * maxStepsX; // [mm/s]
-            maxFeedSpeedY = gearingY * maxStepsY; // [mm/s]
-            maxFeedSpeedZ = gearingZ * maxStepsZ; // [mm/s]
+            traceSetup();
             
             initialized = true;
+            return initialized;
         }
-        
+
         //////////////////////////////////////////////////////////////////////////
-        bool isInitialized() { return initialized; }
+        void traceSetup() {
+          #ifndef SKETCH_COMPILE
+              std::cout << "SpeedManager::setup()" << std::endl;
+              std::cout << "X: tOffset:" << tPulseOffsetX << ", mSteps: " << maxStepsX << ", mSpeed [mm/min]: " << maxFeedSpeedX * 60 << " mRpm : " << maxRpmX << ", gearing: " << gearingX << endl;
+              std::cout << "Y: tOffset:" << tPulseOffsetY << ", mSteps: " << maxStepsY << ", mSpeed [mm/min]: " << maxFeedSpeedY * 60 << " mRpm : " << maxRpmY << ", gearing: " << gearingY << endl;
+              std::cout << "Z: tOffset:" << tPulseOffsetZ << ", mSteps: " << maxStepsZ << ", mSpeed [mm/min]: " << maxFeedSpeedZ * 60 << " mRpm : " << maxRpmZ << ", gearing: " << gearingX << endl;
+          #endif          
+        }
+       
+        //////////////////////////////////////////////////////////////////////////
+        virtual void initMove() {}
+    
+        //////////////////////////////////////////////////////////////////////////
+        virtual void completeMove() {}
         
         //////////////////////////////////////////////////////////////////////////
         // fm	 			  :	[mm/min]
@@ -245,16 +292,16 @@ class CncSpeedManager {
         	// internal speed values a in [mm/s]
         	fm /= 60.0;
 
-            // do nothing if the value isn't changed 
-            if (  dblCompare(fm, configuredFeedSpeed ) == true )
-                return;
+          // do nothing if the value isn't changed 
+          if (  dblCompare(fm, configuredFeedSpeed ) == true )
+              return;
 
-            // set
-            if ( fm > 0.0 ) configuredFeedSpeed = fm;
-            else            configuredFeedSpeed = 0.0;
+          // set
+          if ( fm > 0.0 ) configuredFeedSpeed = fm;
+          else            configuredFeedSpeed = 0.0;
 
-            reset();
-            measurement.reset();
+          reset();
+          measurement.reset(configuredFeedSpeed * 60.0);
         }
                 
         //////////////////////////////////////////////////////////////////////////
@@ -277,41 +324,57 @@ class CncSpeedManager {
         }
 
         //////////////////////////////////////////////////////////////////////////
-        virtual void initMove() {
+        double appendToRunningDistance(short dx, short dy, short dz) {
+          const double x = gearingX * dx;
+          const double y = gearingY * dy;
+          const double z = gearingZ * dz;
+          
+          runningDistance += sqrt( x * x + y * y + z * z ); // [mm]
+
+          return runningDistance;
         }
-    
+
         //////////////////////////////////////////////////////////////////////////
         void finalizeMove() {
           // give inherited classes a change to do something
           completeMove();
     
           // log end point
-          if ( measurement.tsStart != 0L)
+          determineFeedSpeed();
+        }
+
+        //////////////////////////////////////////////////////////////////////////
+        void determineFeedSpeed() {
+           // log current point
+          if ( measurement.tsStart != 0L )
             measurement.tsEnd = getTimeStamp();
-    
+
+            measurement.timeElapsed = measurement.tsEnd
+                                    - measurement.tsStart;     // [us]
+                                     
           // calculate current feed speed - consider time stamp overflow
           // for more details please see micros()
-          if ( measurement.tsEnd > measurement.tsStart ) {
+          // and consider timespans > 1 ms only
+          if ( measurement.timeElapsed > 1000 ) {
 
-        	measurement.timeElapsed  = measurement.tsEnd
-            						 - measurement.tsStart;							// [us]
-
+            // To avoid underflows reorganize the formula
+            // mm / (us / 1000 * 1000) ==> (mm * 1000 * 1000) / us
+            // last but not least convert from [mm/sec] to [mm/min]
             measurement.feedSpeed    = ((1000L * 1000L * measurement.distance)
-            		                 / measurement.timeElapsed)
-            		                 * 60;											// [mm/min]
+                                     / measurement.timeElapsed)
+                                     * 60;                      // [mm/min]
 
           } else {
             
             measurement.feedSpeed    = configuredFeedSpeed
-            						 * 60;											// [mm/min]
+                                     * 60;                      // [mm/min]
           }
         }
-            
         //////////////////////////////////////////////////////////////////////////
-        virtual void completeMove() {}
-
+        bool isInitialized()                        const { return initialized; }
+        
         //////////////////////////////////////////////////////////////////////////
-        unsigned long getMeasurementTimeElapsed() 	const { return measurement.timeElapsed; }
+        uint32_t getMeasurementTimeElapsed() 	      const { return measurement.timeElapsed; }
         double getMeasurementDistance()           	const { return measurement.distance; }
         double getMeasurementFeedSpeed_MM_MIN()   	const { return measurement.feedSpeed; }
         
@@ -329,22 +392,23 @@ class CncSpeedManager {
         unsigned int getOffsetPerStepZ()    		const { return perStepOffsetZ; }
         
         //////////////////////////////////////////////////////////////////////////
-        double getCurrentDistance()         		const { return currentDistance; }
+        double getCurrentMoveDistance()         const { return currentMoveDistance; }
         
         //////////////////////////////////////////////////////////////////////////
-        unsigned int getConstOffset()       		const { return constOffset; }
+        unsigned int getConstStepStaticOffset() const { return constStepStaticOffset; }
+        unsigned int getConstStepLoopOffset()   const { return constStepLoopOffset; }
         
         unsigned int getTotalPulseOffsetX() 		const { return tPulseOffsetX; }
         unsigned int getTotalPulseOffsetY() 		const { return tPulseOffsetY; }
         unsigned int getTotalPulseOffsetZ() 		const { return tPulseOffsetZ; }
         
-        unsigned int getLowPulseWidthX()    		const { return (tPulseOffsetX - constOffset) / 2; }
-        unsigned int getLowPulseWidthY()    		const { return (tPulseOffsetY - constOffset) / 2; }
-        unsigned int getLowPulseWidthZ()    		const { return (tPulseOffsetZ - constOffset) / 2; }
+        unsigned int getLowPulseWidthX()    		const { return (tPulseOffsetX - constStepLoopOffset) / 2; }
+        unsigned int getLowPulseWidthY()    		const { return (tPulseOffsetY - constStepLoopOffset) / 2; }
+        unsigned int getLowPulseWidthZ()    		const { return (tPulseOffsetZ - constStepLoopOffset) / 2; }
         
-        unsigned int getHighPulseWidthX()   		const { return (tPulseOffsetX - constOffset) / 2; }
-        unsigned int getHighPulseWidthY()   		const { return (tPulseOffsetY - constOffset) / 2; }
-        unsigned int getHighPulseWidthZ()   		const { return (tPulseOffsetZ - constOffset) / 2; }
+        unsigned int getHighPulseWidthX()   		const { return (tPulseOffsetX - constStepLoopOffset) / 2; }
+        unsigned int getHighPulseWidthY()   		const { return (tPulseOffsetY - constStepLoopOffset) / 2; }
+        unsigned int getHighPulseWidthZ()   		const { return (tPulseOffsetZ - constStepLoopOffset) / 2; }
     
         //////////////////////////////////////////////////////////////////////////
         double getMaxSpeedX_MM_MIN()        		const { return maxFeedSpeedX * 60; }
@@ -359,7 +423,11 @@ class CncSpeedManager {
         unsigned int getMaxStepsX()         		const { return maxStepsX; }
         unsigned int getMaxStepsY()         		const { return maxStepsY; }
         unsigned int getMaxStepsZ()         		const { return maxStepsZ; }
-    
+
+        //////////////////////////////////////////////////////////////////////////
+        unsigned int getMaxRpmX()               const { return maxRpmX; }
+        unsigned int getMaxRpmY()               const { return maxRpmY; }
+        unsigned int getMaxRpmZ()               const { return maxRpmZ; } 
 };
 
 #endif

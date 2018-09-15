@@ -34,9 +34,9 @@
 #include <wx/statline.h>
 #include <wx/tglbtn.h>
 #include <wx/notebook.h>
-#include <wx/stc/stc.h>
 #include <wx/statbmp.h>
 #include <wx/combobox.h>
+#include <wx/stc/stc.h>
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
 #include <wx/propgrid/manager.h>
@@ -132,7 +132,6 @@ protected:
     wxButton* m_btPathGenerator;
     wxNotebook* m_templateNotebook;
     wxPanel* m_panelTplEdit;
-    wxStyledTextCtrl* m_stcFileContent;
     wxBitmapToggleButton* m_tbCaseSensitive;
     wxBitmapToggleButton* m_tbWholeWord;
     wxBitmapToggleButton* m_tbRegEx;
@@ -141,6 +140,7 @@ protected:
     wxComboBox* m_svgEditSearch;
     wxButton* m_svgEditFind;
     wxButton* m_svgEditFindPrev;
+    wxStyledTextCtrl* m_stcFileContent;
     wxStaticText* m_filePosition;
     wxTextCtrl* m_svgEditStatus;
     wxStaticText* m_editMode;
@@ -238,9 +238,8 @@ protected:
     wxRadioBox* m_mmRadioCoordinates;
     wxStaticText* m_staticText5101;
     wxComboBox* m_manuallyToolId;
-    wxStaticText* m_staticText5118;
-    wxComboBox* m_manuallySpeedType;
     wxStaticText* m_staticText5105;
+    wxSlider* m_manuallySpeedSlider;
     wxTextCtrl* m_manuallySpeedValue;
     wxStaticText* m_staticText5113;
     wxStaticLine* m_staticLine5109;
@@ -385,7 +384,7 @@ protected:
     wxNotebook* m_outboundNotebook;
     wxPanel* m_cncParameters;
     wxListbook* m_notebookConfig;
-    wxPanel* m_panel2601;
+    wxPanel* m_cncSummary;
     wxStaticText* m_staticText11481;
     wxListCtrl* m_cncSummaryListCtrl;
     wxButton* m_btCancelRun;
@@ -443,7 +442,7 @@ protected:
     wxPanel* m_scalePane3D;
     wxPanel* m_3DOutboundStatistics;
     wxButton* m_btShowHideStatistics;
-    wxStaticText* m_staticText4884;
+    wxButton* m_bt2ShowHideStatistics;
     wxStaticLine* m_staticLine50051;
     wxStaticText* m_staticText5014;
     wxStaticBitmap* m_lableWorkpieceThickness;
@@ -722,6 +721,11 @@ protected:
     virtual void removeTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleTemplateWordWrapMode(wxCommandEvent& event) { event.Skip(); }
     virtual void openSVGPathGenerator(wxCommandEvent& event) { event.Skip(); }
+    virtual void toogleSvgEditSearchFlag(wxCommandEvent& event) { event.Skip(); }
+    virtual void svgEditSearchTextChanged(wxCommandEvent& event) { event.Skip(); }
+    virtual void svgEditSelected(wxCommandEvent& event) { event.Skip(); }
+    virtual void svgEditFind(wxCommandEvent& event) { event.Skip(); }
+    virtual void svgEditFindPrev(wxCommandEvent& event) { event.Skip(); }
     virtual void fileContentKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void fileContentLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void fileContentLeftUp(wxMouseEvent& event) { event.Skip(); }
@@ -730,11 +734,6 @@ protected:
     virtual void fileContentKeyUp(wxKeyEvent& event) { event.Skip(); }
     virtual void fileContentChange(wxStyledTextEvent& event) { event.Skip(); }
     virtual void fileContentDClick(wxMouseEvent& event) { event.Skip(); }
-    virtual void toogleSvgEditSearchFlag(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEditSearchTextChanged(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEditSelected(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEditFind(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEditFindPrev(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUAInboundPathList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUAUseDirectiveList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUADetailInfo(wxDataViewEvent& event) { event.Skip(); }
@@ -783,6 +782,7 @@ protected:
     virtual void moveZToMin(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToTop(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToBottom(wxCommandEvent& event) { event.Skip(); }
+    virtual void changeManuallySpeedSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void minManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
     virtual void updateMetricX(wxCommandEvent& event) { event.Skip(); }
     virtual void maxManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
@@ -1001,7 +1001,6 @@ public:
     wxBitmapToggleButton* GetBtSvgToggleWordWrap() { return m_btSvgToggleWordWrap; }
     wxStaticLine* GetStaticLine4474() { return m_staticLine4474; }
     wxButton* GetBtPathGenerator() { return m_btPathGenerator; }
-    wxStyledTextCtrl* GetStcFileContent() { return m_stcFileContent; }
     wxBitmapToggleButton* GetTbCaseSensitive() { return m_tbCaseSensitive; }
     wxBitmapToggleButton* GetTbWholeWord() { return m_tbWholeWord; }
     wxBitmapToggleButton* GetTbRegEx() { return m_tbRegEx; }
@@ -1010,6 +1009,7 @@ public:
     wxComboBox* GetSvgEditSearch() { return m_svgEditSearch; }
     wxButton* GetSvgEditFind() { return m_svgEditFind; }
     wxButton* GetSvgEditFindPrev() { return m_svgEditFindPrev; }
+    wxStyledTextCtrl* GetStcFileContent() { return m_stcFileContent; }
     wxStaticText* GetFilePosition() { return m_filePosition; }
     wxTextCtrl* GetSvgEditStatus() { return m_svgEditStatus; }
     wxStaticText* GetEditMode() { return m_editMode; }
@@ -1109,9 +1109,8 @@ public:
     wxRadioBox* GetMmRadioCoordinates() { return m_mmRadioCoordinates; }
     wxStaticText* GetStaticText5101() { return m_staticText5101; }
     wxComboBox* GetManuallyToolId() { return m_manuallyToolId; }
-    wxStaticText* GetStaticText5118() { return m_staticText5118; }
-    wxComboBox* GetManuallySpeedType() { return m_manuallySpeedType; }
     wxStaticText* GetStaticText5105() { return m_staticText5105; }
+    wxSlider* GetManuallySpeedSlider() { return m_manuallySpeedSlider; }
     wxTextCtrl* GetManuallySpeedValue() { return m_manuallySpeedValue; }
     wxStaticText* GetStaticText5113() { return m_staticText5113; }
     wxStaticLine* GetStaticLine5109() { return m_staticLine5109; }
@@ -1257,7 +1256,7 @@ public:
     wxListCtrl* GetCncSummaryListCtrl() { return m_cncSummaryListCtrl; }
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
-    wxPanel* GetPanel2601() { return m_panel2601; }
+    wxPanel* GetCncSummary() { return m_cncSummary; }
     wxStaticText* GetStaticText1150() { return m_staticText1150; }
     wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
     wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
@@ -1311,7 +1310,7 @@ public:
     wxPanel* GetScalePane3D() { return m_scalePane3D; }
     wxPanel* Get3DOutboundControl() { return m_3DOutboundControl; }
     wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
-    wxStaticText* GetStaticText4884() { return m_staticText4884; }
+    wxButton* GetBt2ShowHideStatistics() { return m_bt2ShowHideStatistics; }
     wxStaticLine* GetStaticLine50051() { return m_staticLine50051; }
     wxStaticText* GetStaticText5014() { return m_staticText5014; }
     wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }

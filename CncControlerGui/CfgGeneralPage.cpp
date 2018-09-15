@@ -14,20 +14,25 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 		
 	wxString name(p->GetName());
 	
-	if ( name == CncConfig_STEPS_X ||
-	     name == CncConfig_STEPS_Y ||
-	     name == CncConfig_STEPS_Z ||
+	if (    name == CncConfig_STEPS_X
+	     || name == CncConfig_STEPS_Y
+	     || name == CncConfig_STEPS_Z
 
-	     name == CncConfig_PITCH_X ||
-	     name == CncConfig_PITCH_Y ||
-	     name == CncConfig_PITCH_Z ||
+	     || name == CncConfig_PITCH_X
+	     || name == CncConfig_PITCH_Y
+	     || name == CncConfig_PITCH_Z
 
-	     name == CncConfig_DEF_RAPID_SPEED_PERCENT ||
-	     name == CncConfig_DEF_WORK_SPEED_PERCENT ||
+	     || name == CncConfig_DEF_RAPID_SPEED_PERCENT
+	     || name == CncConfig_DEF_WORK_SPEED_PERCENT
 
-	     name == CncConfig_PULS_WIDTH_OFFSET_X ||
-	     name == CncConfig_PULS_WIDTH_OFFSET_Y ||
-	     name == CncConfig_PULS_WIDTH_OFFSET_Z ) 
+	     || name == CncConfig_PULS_WIDTH_LOW_X
+	     || name == CncConfig_PULS_WIDTH_LOW_Y
+	     || name == CncConfig_PULS_WIDTH_LOW_Z 
+		 
+	     || name == CncConfig_PULS_WIDTH_HIGH_X
+	     || name == CncConfig_PULS_WIDTH_HIGH_Y
+	     || name == CncConfig_PULS_WIDTH_HIGH_Z 
+	   ) 
 	{
 		GBL_CONFIG->calculateSpeedValues();
 	}
@@ -198,6 +203,15 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
 			registerProperty(CncConfig_STEPS_Z, prop);
+			
+			//...............
+			validator.SetPrecision(0); validator.SetRange(1, 10000);
+			prop = axis->AppendChild( new wxIntProperty("Steps XYZ AVG [/rotation]", NEXT_PROP_ID, 200));
+			prop->Enable(false);
+			prop->SetHelpString(_T(""));
+			prop->SetValidator(validator);
+			prop->SetEditor( wxT("TextCtrl") );
+			registerProperty(CncConfig_STEPS_XYZ, prop);
 		
 			//...............
 			validator.SetPrecision(3); validator.SetRange(0.1, 50.0);
@@ -228,30 +242,57 @@ void CncConfig::setupGeneralCfgPage(wxConfigBase& config) {
 		
 			//...............
 			validator.SetPrecision(0); validator.SetRange(50, 5000);
-			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset X Axis [us]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("Low Puls Width X Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_OFFSET_Y, prop);
+			registerProperty(CncConfig_PULS_WIDTH_LOW_X, prop);
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(50, 5000);
-			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset Y Axis [us]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("High Puls Width X Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_OFFSET_X, prop);
+			registerProperty(CncConfig_PULS_WIDTH_HIGH_X, prop);
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(50, 5000);
-			prop = axis->AppendChild( new wxIntProperty("PulsWidthOffset Z Axis [us]", NEXT_PROP_ID, 100));
+			prop = axis->AppendChild( new wxIntProperty("Low Puls Width Y Axis [us]", NEXT_PROP_ID, 100));
 			prop->Enable(true);
 			prop->SetHelpString(_T(""));
 			prop->SetValidator(validator);
 			prop->SetEditor( wxT("TextCtrl") );
-			registerProperty(CncConfig_PULS_WIDTH_OFFSET_Z, prop);
+			registerProperty(CncConfig_PULS_WIDTH_LOW_Y, prop);
+			
+			//...............
+			validator.SetPrecision(0); validator.SetRange(50, 5000);
+			prop = axis->AppendChild( new wxIntProperty("High Puls Width Y Axis [us]", NEXT_PROP_ID, 100));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetValidator(validator);
+			prop->SetEditor( wxT("TextCtrl") );
+			registerProperty(CncConfig_PULS_WIDTH_HIGH_Y, prop);
+			
+			//...............
+			validator.SetPrecision(0); validator.SetRange(50, 5000);
+			prop = axis->AppendChild( new wxIntProperty("Low Puls Width Z Axis [us]", NEXT_PROP_ID, 100));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetValidator(validator);
+			prop->SetEditor( wxT("TextCtrl") );
+			registerProperty(CncConfig_PULS_WIDTH_LOW_Z, prop);
+			
+			//...............
+			validator.SetPrecision(0); validator.SetRange(50, 5000);
+			prop = axis->AppendChild( new wxIntProperty("High Puls Width Z Axis [us]", NEXT_PROP_ID, 100));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetValidator(validator);
+			prop->SetEditor( wxT("TextCtrl") );
+			registerProperty(CncConfig_PULS_WIDTH_HIGH_Z, prop);
 			
 			//...............
 			validator.SetPrecision(0); validator.SetRange(1, 32);

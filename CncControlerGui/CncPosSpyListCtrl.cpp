@@ -15,7 +15,7 @@ CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
 	AppendColumn("",	 			wxLIST_FORMAT_LEFT, 	 22);
 	AppendColumn("Reference", 		wxLIST_FORMAT_LEFT, 	 70);
 	AppendColumn("", 				wxLIST_FORMAT_CENTER, 	 22);
-	AppendColumn("Speed [mm/min]", 	wxLIST_FORMAT_RIGHT, 	100);
+	AppendColumn("Speed [mm/min]", 	wxLIST_FORMAT_LEFT, 	100);
 	AppendColumn("X", 				wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
 	AppendColumn("Y", 				wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Z", 				wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -30,11 +30,13 @@ CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_PID_MAJOR"));	// 0
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_PID_DETAIL"));	// 1
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_RAPID"));	// 2
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_WORK"));	// 3
-	imageList->Add(ImageLibPosSpy().Bitmap("BMP_POS"));			// 4
+	imageList->Add(ImageLibPosSpy().Bitmap("BMP_PID_MAJOR"));			// 0
+	imageList->Add(ImageLibPosSpy().Bitmap("BMP_PID_DETAIL"));			// 1
+	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_RAPID"));			// 2
+	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_WORK"));			// 3
+	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_MAX"));			// 4
+	imageList->Add(ImageLibPosSpy().Bitmap("BMP_TYPE_USER_DEFINED"));	// 5
+	imageList->Add(ImageLibPosSpy().Bitmap("BMP_POS"));					// 6
 	
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 	
@@ -57,14 +59,18 @@ int CncPosSpyListCtrl::OnGetItemColumnImage(long item, long column) const {
 						
 		case COL_REF:	return -1;
 		
-		case COL_T:		if ( getItemText(item, column) == "R" )			return 2;
-						else											return 3;
+		case COL_T:		switch( (char)(getItemText(item, column))[0] ) {
+							case 'R':	return 2;
+							case 'W':	return 3;
+							case 'M':	return 4;
+							case 'U':	return 5;
+						}
 						
 		case COL_F:		return -1;
 		
 		case COL_X:
 		case COL_Y:
-		case COL_Z:		return 4;
+		case COL_Z:		return 6;
 	}
 
 	return -1;

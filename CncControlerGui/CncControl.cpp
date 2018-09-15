@@ -237,7 +237,7 @@ bool CncControl::setup(bool doReset) {
 		if ( wxString(FIRMWARE_VERSION) == ss.str().c_str() )	std::clog << " OK" << std::endl;
 		else													cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
 	}
-	
+
 	// evaluate limit states
 	evaluateLimitState();
 	
@@ -267,9 +267,12 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_PITCH_Y, convertDoubleToCtrlLong(PID_PITCH_Y, cncConfig->getPitchY())));
 	setup.push_back(SetterTuple(PID_PITCH_Z, convertDoubleToCtrlLong(PID_PITCH_Z, cncConfig->getPitchZ())));
 	
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_OFFSET_X, cncConfig->getPulsWidthOffsetX()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_OFFSET_Y, cncConfig->getPulsWidthOffsetY()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_OFFSET_Z, cncConfig->getPulsWidthOffsetZ()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_X,  cncConfig->getLowPulsWidthX()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Y,  cncConfig->getLowPulsWidthY()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Z,  cncConfig->getLowPulsWidthZ()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_X, cncConfig->getHighPulsWidthX()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Y, cncConfig->getHighPulsWidthY()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Z, cncConfig->getHighPulsWidthZ()));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, cncConfig->getReplyThresholdStepsX()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
@@ -683,14 +686,12 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-const wxString& CncControl::getConfiguredSpeedTypeAsString() {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value, CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
-	static wxString ret;
-	ret.assign(cnc::getCncSpeedTypeAsString(configuredSpeedType));
-	return ret;
+	changeCurrentFeedSpeedXYZ_MM_MIN(value * 60, s);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value) {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeed s) {
 ///////////////////////////////////////////////////////////////////
 	// always reset the realtime speed value
 	realtimeFeedSpeed_MM_MIN = MAX_FEED_SPEED_VALUE;
@@ -705,18 +706,9 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value) {
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) )
 		return;
 		
-	if      ( cnc::dblCompare(value, defaultFeedSpeedRapid_MM_MIN) )	configuredSpeedType = CncSpeedRapid;
-	else if ( cnc::dblCompare(value, defaultFeedSpeedWork_MM_MIN )	)	configuredSpeedType = CncSpeedWork;
-	else if ( cnc::dblCompare(value, maxValue  )					)	configuredSpeedType = CncSpeedMax;
-	else																configuredSpeedType = CncSpeedUserDefined;
-	
+	configuredSpeedType = s;
 	configuredFeedSpeed_MM_MIN = value;
 	processSetter(PID_SPEED_MM_MIN, (long)(configuredFeedSpeed_MM_MIN * DBL_FACT));
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value) {
-///////////////////////////////////////////////////////////////////
-	changeCurrentFeedSpeedXYZ_MM_MIN(value * 60);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s) {
@@ -730,7 +722,7 @@ void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s) {
 		case CncSpeedUserDefined:	return;	
 	}
 	
-	changeCurrentFeedSpeedXYZ_MM_MIN(value);
+	changeCurrentFeedSpeedXYZ_MM_MIN(value, s);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setDefaultRapidSpeed_MM_MIN(double s) { 
@@ -898,11 +890,13 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				CncInterface::ILS::States ls(ci.limitStateValue);
 				displayLimitStates(ls);
 				ss << " : " << ls.getValueAsString();
+				ss << " (" << (int)ci.limitStateValue << ")";
 			}
 			
 			if ( ci.supportState == true ) {
 				CncInterface::ISP::States sp(ci.supportStateValue);
 				ss << " : " << sp.getValueAsString();
+				ss << " (" << (int)ci.supportStateValue << ")";
 			}
 			
 			cnc::trc.logInfoMessage(ss);
@@ -1001,7 +995,7 @@ void CncControl::postAppPosition(unsigned char pid) {
 			if ( GET_GUI_CTL(mainFrame) )
 				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, 
 				                                                    getClientId(), 
-				                                                    getConfiguredSpeedTypeAsString(), 
+				                                                    configuredSpeedType, 
 				                                                    getConfiguredFeedSpeed_MM_MIN(), 
 				                                                    getRealtimeFeedSpeed_MM_MIN(), 
 				                                                    curAppPos)
@@ -1024,7 +1018,7 @@ void CncControl::postCtlPosition(unsigned char pid) {
 		if ( GET_GUI_CTL(mainFrame) )
 			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, 
 			                                                    getClientId(), 
-			                                                    getConfiguredSpeedTypeAsString(), 
+			                                                    configuredSpeedType, 
 			                                                    getConfiguredFeedSpeed_MM_MIN(), 
 			                                                    getRealtimeFeedSpeed_MM_MIN(), 
 			                                                    curCtlPos)
@@ -1145,7 +1139,7 @@ bool CncControl::moveRelStepsZ(int32_t z) {
 	if ( z == 0 )
 		return true;
 	// z moves are always linear, as a consequence alreadyRendered can be true
-	// but to see the detail positions use true
+	// but to see the detail positions use false
 	return serialPort->processMoveZ(z, false, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
@@ -1155,7 +1149,7 @@ bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRender
 	if ( x1 == 0 && y1 == 0 )
 		return true;
 	
-	return serialPort->processMoveXY(x1, y1, false, curAppPos);
+	return serialPort->processMoveXY(x1, y1, alreadyRendered, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
@@ -1303,7 +1297,10 @@ bool CncControl::displayGetterList(const PidList& pidList) {
 		return false;
 
 	GetterListValues map;
-	getSerial()->processGetterList(pidList, map);
+	if ( getSerial()->processGetterList(pidList, map) == false ) {
+		std::cerr << "Error while processing getter list" << std::endl;
+		return false;
+	}
 	
 	// show content:
 	std::cout << "Getter List Report:" << std::endl;
