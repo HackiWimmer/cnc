@@ -558,21 +558,11 @@ void setup() {
     pinMode(PIN_INTERRUPT_LED,      OUTPUT);  analogWrite(PIN_INTERRUPT_LED,      ANALOG_LOW);
 
   reset();
+  controller.evaluateI2CAvailable();
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void loop() {
 /////////////////////////////////////////////////////////////////////////////////////
-/*
-    I2CData data;
-    if ( readI2CSlave(data) ) {
-      Serial.print((int)data.limitState); 
-      Serial.print(' ');
-      Serial.print((int)data.supportState); 
-      Serial.print("\n");
-    }
-return;
-*/
-
   if ( Serial.available() <= 0 )
     return;  
 

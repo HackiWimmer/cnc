@@ -17,16 +17,17 @@ bool readI2CSlave(I2CData& data) {
 //////////////////////////////////////////////////////////////
   Wire.requestFrom(I2C_DEVICE_ID, I2C_BYTE_COUNT);
 
-  if ( Wire.available() > 0 ) {
-    unsigned int counter = 0;
-    while ( Wire.available()) {
-      switch ( counter ) {
-        case I2C_BYTE_LIMIT_STATE:     data.limitState    = Wire.read();  break;
-        case I2C_BYTE_SUPPORT_STATE:   data.supportState  = Wire.read();  break;
-        default:  return false;
-      }
-      counter++;
+  if ( Wire.available() <= 0 )
+    return false;
+
+  unsigned int counter = 0;
+  while ( Wire.available()) {
+    switch ( counter ) {
+      case I2C_BYTE_LIMIT_STATE:     data.limitState    = Wire.read();  break;
+      case I2C_BYTE_SUPPORT_STATE:   data.supportState  = Wire.read();  break;
+      default:  return false;
     }
+    counter++;
   }
 
   return true;

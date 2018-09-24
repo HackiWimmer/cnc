@@ -13,7 +13,8 @@ FreeGlutWorkspace/Debug/**
 Experiments/Release/**
 Experiments/Debug/**
 
-
+RenderAndMove/Release/**
+RenderAndMove/Debug/**
 
 UnitTests/Release/**
 UnitTests/Debug/**

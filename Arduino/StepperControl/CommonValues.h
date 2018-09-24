@@ -222,8 +222,9 @@ inline int32_t absolute(int32_t x) {
   const unsigned char PID_X_LIMIT                         =  43;
   const unsigned char PID_Y_LIMIT                         =  44;
   const unsigned char PID_Z_LIMIT                         =  45;
-  const unsigned char PID_I2C_LIMIT_VALUE                 =  46;
-  const unsigned char PID_I2C_SUPPORT_VALUE               =  47;
+  const unsigned char PID_I2C_AVAILABEL                   =  46;
+  const unsigned char PID_I2C_LIMIT_VALUE                 =  47;
+  const unsigned char PID_I2C_SUPPORT_VALUE               =  48;
  
   const unsigned char PID_CONTROLLER                      =  50;
   const unsigned char PID_ROUTER_SWITCH                   =  51;

@@ -138,8 +138,9 @@ void ArduinoPIDs::init() {
 	pids[PID_Y_LIMIT]                         = "Y limit state";
 	pids[PID_Z_LIMIT]                         = "Z limit state";
 
-	pids[PID_I2C_LIMIT_VALUE]                 = "Analog Limit value";
-	pids[PID_I2C_SUPPORT_VALUE]               = "Analog Support value";
+	pids[PID_I2C_AVAILABEL  ]                 = "I2C Availabel";
+	pids[PID_I2C_LIMIT_VALUE]                 = "I2C Limit value";
+	pids[PID_I2C_SUPPORT_VALUE]               = "I2C Support value";
 	
 	pids[PID_CONTROLLER]                      = "Cnc Controller";
 	pids[PID_ROUTER_SWITCH]                   = "Tool switch";

@@ -72,6 +72,7 @@ CncController::CncController(LastErrorCodes& lec)
 , posReplyState(OFF)
 , probeMode(OFF)
 , pause(PAUSE_INACTIVE)
+, I2CAvailable(false)
 , lastHeartbeat(0)
 {
 }
@@ -81,6 +82,21 @@ CncController::~CncController() {
   delete X;
   delete Y;
   delete Z;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool CncController::evaluateI2CAvailable() {
+/////////////////////////////////////////////////////////////////////////////////////
+  // try to request data
+  I2CData data;
+  I2CAvailable = readI2CSlave(data);
+
+  // On demand try a second one
+  if ( I2CAvailable == false ) {
+    delay(1000);
+    I2CAvailable = readI2CSlave(data);
+  }
+
+  return I2CAvailable;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 int32_t CncController::isReadyToRun() {
@@ -122,6 +138,7 @@ void CncController::printConfig() {
     PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_Z,            getPosReplyThresholdZ())
     PRINT_PARAMETER(PID_PROBE_MODE,                       isProbeMode())
     PRINT_PARAMETER(PID_ENABLE_STEPPERS,                  !digitalRead(PIN_ENABLE))
+    PRINT_PARAMETER(PID_I2C_AVAILABEL,                    isI2CAvailable())
 
     int limitState = -1, supportState = -1;
     if ( isI2CAvailable() == true ) {

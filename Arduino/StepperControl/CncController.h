@@ -30,6 +30,7 @@ class CncController {
     bool posReplyState;
     bool probeMode;
     bool pause;
+    bool I2CAvailable;
 
     unsigned long lastHeartbeat;
 
@@ -129,7 +130,8 @@ class CncController {
     bool renderAndStepAxisXYZ(int32_t x1, int32_t y1, int32_t z1);
 
     //////////////////////////////////////////////////////////////////////////////
-    bool isI2CAvailable() const { return true; }
+    bool evaluateI2CAvailable();
+    bool isI2CAvailable() const { return I2CAvailable; }
 
 };
 
