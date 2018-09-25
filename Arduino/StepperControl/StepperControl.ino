@@ -69,7 +69,7 @@ inline void printPinReport() {
     PRINT_DIGITAL_PIN(PIN_Y_DIR,                O)
     PRINT_DIGITAL_PIN(PIN_Z_DIR,                O)
   
-    PRINT_DIGITAL_PIN(PIN_ENABLE ,              O)
+    PRINT_DIGITAL_PIN(PIN_STEPPER_ENABLE ,      O)
     
     PRINT_DIGITAL_PIN(PIN_X_LIMIT,              I)
     PRINT_DIGITAL_PIN(PIN_Y_LIMIT,              I)
@@ -313,7 +313,7 @@ inline unsigned char processSetter() {
                                   controller.getStepperZ()->resetStepCounter();   
                                   break;
     // processSetter() ............................................
-    case PID_ROUTER_SWITCH:       switchToolState(lValue > 0); 
+    case PID_TOOL_SWITCH:         switchToolState(lValue > 0); 
                                   break;
     // processSetter() ............................................
     case PID_POS_REPLY_THRESHOLD_X: 
@@ -498,7 +498,7 @@ inline char reset() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
   switchToolState(false, true);
-  digitalWrite(PIN_ENABLE,          ENABLE_STATE_OFF);
+  digitalWrite(PIN_STEPPER_ENABLE,  ENABLE_STATE_OFF);
   
   // Hide the Interrupt LED
   analogWrite(PIN_INTERRUPT_LED,    ANALOG_LOW);
@@ -517,7 +517,7 @@ inline void processInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
   switchToolState(false, true);
-  digitalWrite(PIN_ENABLE,          ENABLE_STATE_OFF);
+  digitalWrite(PIN_STEPPER_ENABLE,  ENABLE_STATE_OFF);
 
   // Show Interrup LED
   analogWrite(PIN_INTERRUPT_LED,    ANALOG_HIGH);
@@ -551,7 +551,7 @@ void setup() {
     pinMode(PIN_Y_LIMIT,            INPUT);   digitalWrite(PIN_Y_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
     pinMode(PIN_Z_LIMIT,            INPUT);   digitalWrite(PIN_Z_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
   
-    pinMode(PIN_ENABLE,             OUTPUT);  digitalWrite(PIN_ENABLE,            ENABLE_STATE_OFF); 
+    pinMode(PIN_STEPPER_ENABLE,     OUTPUT);  digitalWrite(PIN_STEPPER_ENABLE,    ENABLE_STATE_OFF); 
     pinMode(PIN_TOOL_ENABLE,        OUTPUT);  digitalWrite(PIN_TOOL_ENABLE,       TOOL_STATE_OFF);
 
   // analog pins

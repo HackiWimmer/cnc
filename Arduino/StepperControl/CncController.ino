@@ -118,8 +118,8 @@ void CncController::setupSpeedController() {
 //////////////////////////////////////////////////////////////////////////////
 bool CncController::enableStepperPin(bool state){
 //////////////////////////////////////////////////////////////////////////////
-  if ( probeMode == false )   digitalWrite(PIN_ENABLE, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
-  else                        digitalWrite(PIN_ENABLE, ENABLE_STATE_OFF);
+  if ( probeMode == false )   digitalWrite(PIN_STEPPER_ENABLE, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
+  else                        digitalWrite(PIN_STEPPER_ENABLE, ENABLE_STATE_OFF);
 
   delayMicroseconds(minEnablePulseWide);
   return state;
@@ -137,7 +137,8 @@ void CncController::printConfig() {
     PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_Y,            getPosReplyThresholdY())
     PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_Z,            getPosReplyThresholdZ())
     PRINT_PARAMETER(PID_PROBE_MODE,                       isProbeMode())
-    PRINT_PARAMETER(PID_ENABLE_STEPPERS,                  !digitalRead(PIN_ENABLE))
+    PRINT_PARAMETER(PID_ENABLE_STEPPERS,                  digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_ON)
+    PRINT_PARAMETER(PID_TOOL_SWITCH,                      digitalRead(PIN_TOOL_ENABLE)    == TOOL_STATE_ON)
     PRINT_PARAMETER(PID_I2C_AVAILABEL,                    isI2CAvailable())
 
     int limitState = -1, supportState = -1;
@@ -369,7 +370,7 @@ bool CncController::observeEnablePin() {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( isProbeMode() == OFF ) {
     
-    if ( digitalRead(PIN_ENABLE) == ENABLE_STATE_OFF ) {
+    if ( digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_OFF ) {
        errorInfo->setNextErrorInfo(E_STEPPER_NOT_ENALED);
        return false;
     }

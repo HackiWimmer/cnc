@@ -75,7 +75,7 @@ inline int32_t absolute(int32_t x) {
   const unsigned char PIN_Y_DIR                           =   6;
   const unsigned char PIN_Z_DIR                           =   7;
 
-  const unsigned char PIN_ENABLE                          =   8;
+  const unsigned char PIN_STEPPER_ENABLE                  =   8;
 
   const unsigned char PIN_X_LIMIT                         =   9;
   const unsigned char PIN_Y_LIMIT                         =  10;
@@ -227,7 +227,7 @@ inline int32_t absolute(int32_t x) {
   const unsigned char PID_I2C_SUPPORT_VALUE               =  48;
  
   const unsigned char PID_CONTROLLER                      =  50;
-  const unsigned char PID_ROUTER_SWITCH                   =  51;
+  const unsigned char PID_TOOL_SWITCH                     =  51;
   const unsigned char PID_POS_REPLY_THRESHOLD_X           =  52;
   const unsigned char PID_POS_REPLY_THRESHOLD_Y           =  53;
   const unsigned char PID_POS_REPLY_THRESHOLD_Z           =  54;
@@ -384,8 +384,8 @@ inline int32_t absolute(int32_t x) {
   #define ON                                             true
   #define OFF                                            false
   
-  #define TOOL_STATE_OFF                                 LOW
-  #define TOOL_STATE_ON                                  HIGH 
+  #define TOOL_STATE_OFF                                 HIGH
+  #define TOOL_STATE_ON                                  LOW 
 
   #define ENABLE_STATE_OFF                               HIGH
   #define ENABLE_STATE_ON                                LOW 

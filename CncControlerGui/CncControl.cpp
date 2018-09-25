@@ -1246,7 +1246,7 @@ void CncControl::switchToolOn() {
 		return;
 
 	if ( powerOn == false ) { 
-		if ( processSetter(PID_ROUTER_SWITCH, 1) ) {
+		if ( processSetter(PID_TOOL_SWITCH, 1) ) {
 			powerOn = true;
 			setToolState();
 		}
@@ -1259,7 +1259,7 @@ void CncControl::switchToolOff(bool force) {
 		return;
 
 	if ( powerOn == true || force == true ) {
-		if ( processSetter(PID_ROUTER_SWITCH, 0) ) {
+		if ( processSetter(PID_TOOL_SWITCH, 0) ) {
 			powerOn = false;
 			setToolState();
 		}

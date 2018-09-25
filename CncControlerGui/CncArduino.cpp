@@ -113,40 +113,40 @@ void ArduinoPIDs::init() {
 	pids[RET_MSG]                             = "RET_MSG";
 	
 	pids[PID_UNKNOWN]                         = "Default PID";
-	pids[PID_STEPPER_INITIALIZED]             = "Stepper initialize state";
+	pids[PID_STEPPER_INITIALIZED]             = "Stepper Initialize State";
 	
 	pids[PID_QUERY_READY_TO_RUN]              = "Ready to run";
 	
-	pids[PID_SPEED_OFFSET]                    = "Speed step offset [us]";
-	pids[PID_SPEED_OFFSET_X]                  = "Speed step offset X axis [us]";
-	pids[PID_SPEED_OFFSET_Y]                  = "Speed step offset Y axis [us]";
-	pids[PID_SPEED_OFFSET_Z]                  = "Speed step offset Z axis [us]";
-	pids[PID_STEPS_X]                         = "Steps X axis";
-	pids[PID_STEPS_Y]                         = "Steps Y axis";
-	pids[PID_STEPS_Z]                         = "Steps Z axis";
+	pids[PID_SPEED_OFFSET]                    = "Speed Step Offset [us]";
+	pids[PID_SPEED_OFFSET_X]                  = "Speed Step Offset X Axis [us]";
+	pids[PID_SPEED_OFFSET_Y]                  = "Speed Step Offset Y Axis [us]";
+	pids[PID_SPEED_OFFSET_Z]                  = "Speed Step Offset Z Axis [us]";
+	pids[PID_STEPS_X]                         = "Steps X Axis";
+	pids[PID_STEPS_Y]                         = "Steps Y Axis";
+	pids[PID_STEPS_Z]                         = "Steps Z Axis";
 	
 	pids[PID_PITCH]                           = "Pitch";
 	pids[PID_PITCH_X]                         = "Pitch X Axis";
 	pids[PID_PITCH_Y]                         = "Pitch Y Axis";
 	pids[PID_PITCH_Z]                         = "Pitch Z Axis";
 	
-	pids[PID_MIN_SWITCH]                      = "Min switch";  
-	pids[PID_MAX_SWITCH]                      = "Max switch";
-	pids[PID_LIMIT]                           = "Limit state";
-	pids[PID_LAST_STEP_DIR]                   = "Last step direction";
-	pids[PID_X_LIMIT]                         = "X limit state";
-	pids[PID_Y_LIMIT]                         = "Y limit state";
-	pids[PID_Z_LIMIT]                         = "Z limit state";
+	pids[PID_MIN_SWITCH]                      = "Min Switch";  
+	pids[PID_MAX_SWITCH]                      = "Max Switch";
+	pids[PID_LIMIT]                           = "Limit State";
+	pids[PID_LAST_STEP_DIR]                   = "Last Step Direction";
+	pids[PID_X_LIMIT]                         = "X limit State";
+	pids[PID_Y_LIMIT]                         = "Y limit State";
+	pids[PID_Z_LIMIT]                         = "Z limit State";
 
 	pids[PID_I2C_AVAILABEL  ]                 = "I2C Availabel";
-	pids[PID_I2C_LIMIT_VALUE]                 = "I2C Limit value";
-	pids[PID_I2C_SUPPORT_VALUE]               = "I2C Support value";
+	pids[PID_I2C_LIMIT_VALUE]                 = "I2C Limit Value";
+	pids[PID_I2C_SUPPORT_VALUE]               = "I2C Support Value";
 	
 	pids[PID_CONTROLLER]                      = "Cnc Controller";
-	pids[PID_ROUTER_SWITCH]                   = "Tool switch";
-	pids[PID_POS_REPLY_THRESHOLD_X]           = "Position reply threshold X axis";
-	pids[PID_POS_REPLY_THRESHOLD_Y]           = "Position reply threshold Y axis";
-	pids[PID_POS_REPLY_THRESHOLD_Z]           = "Position reply threshold Z axis";
+	pids[PID_TOOL_SWITCH]                     = "Tool Enabled State";
+	pids[PID_POS_REPLY_THRESHOLD_X]           = "Position Reply Threshold X Axis";
+	pids[PID_POS_REPLY_THRESHOLD_Y]           = "Position Reply Threshold Y Axis";
+	pids[PID_POS_REPLY_THRESHOLD_Z]           = "Position Reply Threshold Z Axis";
 	pids[PID_PROBE_MODE]                      = "Probe Mode";
 
 	pids[PID_XYZ_POS_MAJOR]                   = "XYZ Pos - Type Major";
@@ -162,10 +162,10 @@ void ArduinoPIDs::init() {
 	pids[PID_SPEED_MM_MIN]                    = "Speed [mm/minute]";
 	pids[PID_STEPS]                           = "Steps";
 	pids[PID_STEP_MULTIPLIER]                 = "Multiplier";
-	pids[PID_STEP_PIN]                        = "Step pin";
-	pids[PID_DIR_PIN]                         = "Direction pin";
-	pids[PID_ENABLE_STEPPERS]                 = "Stepper enable state";
-	pids[PID_AVG_STEP_DURATION]               = "AVG Step loop duration [us]";
+	pids[PID_STEP_PIN]                        = "Step Pin";
+	pids[PID_DIR_PIN]                         = "Direction Pin";
+	pids[PID_ENABLE_STEPPERS]                 = "Stepper Enable State";
+	pids[PID_AVG_STEP_DURATION]               = "AVG Step Loop Duration [us]";
 
 	pids[PID_PULSE_WIDTH_OFFSET_DIR]          = "Direction Pulse Width";
 	pids[PID_PULSE_WIDTH_OFFSET_LOW]          = "Step Pulse Width Low";
@@ -199,8 +199,8 @@ void ArduinoPIDs::init() {
 	pids[PID_GET_STEP_COUNTER_Z]              = "Get Step Counter Z";
 	
 	pids[PID_SPEED_CONTROLLER]                = "Feed Speed Controller";
-	pids[PID_SPEED_CTRL_INITIALIZED]          = "Initialized state";
-	pids[PID_SPEED_CTRL_RPM]                  = "Rounds per minute";
+	pids[PID_SPEED_CTRL_INITIALIZED]          = "Initialized State";
+	pids[PID_SPEED_CTRL_RPM]                  = "Rounds Per Minute";
 	pids[PID_SPEED_CTRL_TOTAL_OFFSET]         = "Total Speed Offset";
 	pids[PID_SPEED_CTRL_SYNTH_SPEED_DELAY]    = "Synthetically Speed Delay";
 	pids[PID_SPEED_CTRL_MAX_SPEED]            = "Max Speed";
@@ -209,9 +209,9 @@ void ArduinoPIDs::init() {
 	pids[PID_MAX_DIMENSION_Y]                 = "Max Dimension Y [Steps]";
 	pids[PID_MAX_DIMENSION_Z]                 = "Max Dimension Z [Steps]";
 	
-	pids[PID_INCREMENT_DIRECTION_VALUE_X]     = "Invert dircetion X";
-	pids[PID_INCREMENT_DIRECTION_VALUE_Y]     = "Invert dircetion Y";
-	pids[PID_INCREMENT_DIRECTION_VALUE_Z]     = "Invert dircetion Z";
+	pids[PID_INCREMENT_DIRECTION_VALUE_X]     = "Invert Dircetion X";
+	pids[PID_INCREMENT_DIRECTION_VALUE_Y]     = "Invert Dircetion Y";
+	pids[PID_INCREMENT_DIRECTION_VALUE_Z]     = "Invert Dircetion Z";
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int id) {
@@ -346,7 +346,7 @@ void ArduinoDigitalPins::init() {
 	pins[PIN_Y_DIR]              = "DIR PIN Y";
 	pins[PIN_Z_DIR]              = "DIR PIN Z";
 	
-	pins[PIN_ENABLE]             = "STEPPER ENABLE PIN";
+	pins[PIN_STEPPER_ENABLE]     = "STEPPER ENABLE PIN";
 	
 	pins[PIN_X_LIMIT]            = "LIMIT PIN X";
 	pins[PIN_Y_LIMIT]            = "LIMIT PIN Y";
