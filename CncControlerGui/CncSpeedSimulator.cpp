@@ -116,7 +116,7 @@ CncSpeedSimulator::CncSpeedSimulator(
  double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
  double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
  double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ)
-: CncSpeedManager(cStepStaticOffset, cStepLoopOffset, pitchX, stepsX, pulseOffsetX, pitchY, stepsY, pulseOffsetY, pitchZ, stepsZ, pulseOffsetZ) 
+: CncSpeedController() 
 , traceFlag(true)
 , traceInfo()
 , curTsInfo()
@@ -156,24 +156,24 @@ void CncSpeedSimulator::reset() {
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateSteppingX(unsigned int dx)  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterX += lStepsX; 
-	uint64_t v = dx * (getOffsetPerStepX() + getTotalPulseOffsetX()); 
+	stepCounterX += abs(dx);
+	uint64_t v = dx * (X.synthSpeedDelay + X.totalOffset); 
 	totalAccumulatedOffsetX  += v;
 	currentAccumulatedOffset += v; 
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateSteppingY(unsigned int dy)  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterY += lStepsY; 
-	uint64_t v = dy * (getOffsetPerStepY() + getTotalPulseOffsetY()); 
+	stepCounterY += abs(dy);
+	uint64_t v = dy * (Y.synthSpeedDelay + Y.totalOffset); 
 	totalAccumulatedOffsetY  += v; 
 	currentAccumulatedOffset += v; 
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateSteppingZ(unsigned int dz)  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterZ += lStepsZ; 
-	uint64_t v = dz * (getOffsetPerStepZ() + getTotalPulseOffsetZ()); 
+	stepCounterZ += abs(dz);
+	uint64_t v = dz * (Z.synthSpeedDelay + Z.totalOffset); 
 	totalAccumulatedOffsetZ  += v; 
 	currentAccumulatedOffset += v; 
 }
@@ -248,9 +248,10 @@ void CncSpeedSimulator::trace(std::ostream& out) {
 	}
 }
 //////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::initMove() {
+void CncSpeedSimulator::initMove(int32_t dx, int32_t dy, int32_t dz) {
 //////////////////////////////////////////////////////////////////////////
 	// currently noting to do
+	#warning
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::completeMove() {

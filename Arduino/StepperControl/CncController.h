@@ -34,6 +34,8 @@ class CncController {
 
     unsigned long lastHeartbeat;
 
+    I2CData lastI2CData;
+
     inline bool observeSerialFrontByte();
     inline bool observeEnablePin();
     inline bool observeToolState();
@@ -131,6 +133,7 @@ class CncController {
 
     //////////////////////////////////////////////////////////////////////////////
     bool evaluateI2CAvailable();
+    bool evaluateI2CData();
     bool isI2CAvailable() const { return I2CAvailable; }
 
 };

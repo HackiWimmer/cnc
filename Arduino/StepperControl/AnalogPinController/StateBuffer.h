@@ -1,8 +1,6 @@
 #ifndef BYTE_STATE_H
 #define BYTE_STATE_H
 
-typedef unsigned char SHORT;
-
 static const char* EM_BUFFER_TO_SMALL    = "Given buffer to small";
 
 //-------------------------------------------------------------
@@ -132,8 +130,10 @@ class StateBuffer {
       switch ( pin ) {
         case A0: 
         case A1: 
-        case A2: 
-        case A3: return PT_ANALOG;
+        case A2:
+        case A3:
+        case A6: 
+        case A7: return PT_ANALOG;
       }
       
       return PT_DIGITAL;

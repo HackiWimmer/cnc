@@ -7,15 +7,6 @@
 
 namespace SupportPin {
 
-  const SHORT PIN_SS_SUPPORT_BUTTON_1_PRESSED    =  10;
-  const SHORT PIN_SS_SUPPORT_BUTTON_2_PRESSED    =  11;
-  const SHORT PIN_SS_SUPPORT_BUTTON_3_PRESSED    =  12;
-  const SHORT PIN_SS_PIN_5                       =  13;
-  const SHORT PIN_SS_SUPPORT_SWITCH_1_PRESSED    =  A0;
-  const SHORT PIN_SS_SUPPORT_SWITCH_2_PRESSED    =  A1;
-  const SHORT PIN_SS_TOOL_POWERED                =  A2;
-  const SHORT PIN_SS_CABLE_CONNECTED             =  A3;
-
   //-----------------------------------------------------------------
   class SupportStates : public StateBuffer {
 

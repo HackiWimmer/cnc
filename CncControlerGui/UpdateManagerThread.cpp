@@ -75,7 +75,7 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		
 		// --------------------------------------------------------------------
 		// format postion spy output
-		// do this at the call of fillSetterList(...) to get a better performanve here
+		// do this at the call of fillSetterList(...) to get a better performance here
 		//popAndFormatSetterQueue();
 		
 		// --------------------------------------------------------------------
@@ -201,9 +201,9 @@ void UpdateManagerThread::popAndFormatSetterQueue() {
 			setterRow.updateItem(CncSetterListCtrl::COL_KEY, 		wxString::Format("%s", 			ArduinoPIDs::getPIDLabel((int)pid, retVal)));
 			
 			if ( pid >= PID_DOUBLE_RANG_START )	
-				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%.2lf", 	(double)(lste.set.value/1000)));
+				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%.2lf", 		(double)(lste.set.value/1000)));
 			else
-				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%ld", 	lste.set.value));
+				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%ld", 		lste.set.value));
 		}
 		
 		setterStringQueue.push(setterRow);

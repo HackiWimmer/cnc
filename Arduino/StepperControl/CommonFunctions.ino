@@ -2,6 +2,53 @@
 #include "CommonValues.h"
 
 //////////////////////////////////////////////////////////////
+PinType getPinType(uint8_t pin) {
+//////////////////////////////////////////////////////////////
+uint8_t port = digitalPinToPort(pin);
+
+if ( port == NOT_A_PIN ) 
+  return PT_UNKNOWN;
+
+    // this is uno specific!
+    switch ( pin ) {
+      case A0: 
+      case A1: 
+      case A2:
+      case A3:
+      case A4: 
+      case A5: return PT_ANALOG;
+    }
+    
+    return PT_DIGITAL;
+}
+//////////////////////////////////////////////////////////////
+uint8_t getPinMode(uint8_t pin) {
+//////////////////////////////////////////////////////////////
+  uint8_t bit  = digitalPinToBitMask(pin);
+  uint8_t port = digitalPinToPort(pin);
+
+  if ( port == NOT_A_PIN ) 
+    return UNKNOWN_PIN;
+
+  // Is there a bit we can check?
+  if ( bit == 0 ) 
+    return UNKNOWN_PIN;
+
+  // Is there only a single bit set?
+  if ( bit & (bit - 1) ) 
+    return UNKNOWN_PIN;
+
+  volatile uint8_t *reg, *out;
+  reg = portModeRegister(port);
+  out = portOutputRegister(port);
+
+  if      (*reg & bit)  return OUTPUT;
+  else if (*out & bit)  return INPUT_PULLUP;
+  else                  return INPUT;
+
+  return UNKNOWN_PIN;
+}
+//////////////////////////////////////////////////////////////
 void sleepMicroseconds(unsigned long usec) {
 //////////////////////////////////////////////////////////////
   long milli = usec / 1000;
@@ -32,6 +79,27 @@ bool readI2CSlave(I2CData& data) {
 
   return true;
 }
+//////////////////////////////////////////////////////////////
+bool sendDataToI2CSlave(const byte data[], unsigned int len) {
+//////////////////////////////////////////////////////////////
+  if ( len == 0 )
+    return false;
+
+  Wire.beginTransmission(I2C_DEVICE_ID);
+  int bytes = Wire.write(data, len);            
+  byte ret = Wire.endTransmission();  
+
+  /* ret = 
+    0: success
+    1: data too long to fit in transmit buffer
+    2: received NACK on transmit of address
+    3: received NACK on transmit of data
+    4: other error 
+  */
+  
+  return ( ret == 0 && bytes == (int)len );
+}
+
 //////////////////////////////////////////////////////////////
 inline bool dblCompare(double a, double b) {
 //////////////////////////////////////////////////////////////

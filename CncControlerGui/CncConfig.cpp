@@ -3,7 +3,7 @@
 #include "MainFrame.h"
 #include "wxcrafter.h"
 #include "CncConfigCommon.h"
-#include "CncSpeedManager.h"
+#include "CncCommon.h"
 #include "CncConfig.h"
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
@@ -142,38 +142,33 @@ void CncConfig::broadcastConfigUpdateNotification() {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
-	CncSpeedManager csm(SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
-						getPitchX(), getStepsX(), getLowPulsWidthX() + getHighPulsWidthX(),
-						getPitchY(), getStepsY(), getLowPulsWidthY() + getHighPulsWidthY(),
-						getPitchZ(), getStepsZ(), getLowPulsWidthZ() + getHighPulsWidthZ()
-						);
+	CncSpeedController csc;
+	csc.X.setup(getStepsX(), getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthX() + getHighPulsWidthX());
+	csc.Y.setup(getStepsY(), getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthY() + getHighPulsWidthY());
+	csc.Z.setup(getStepsZ(), getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthZ() + getHighPulsWidthZ());
 	
-	int stepsXYZ = ( getStepsX() +  getStepsY() +  getStepsZ() ) / 3;
-	
-	double maxSpeedX = csm.getMaxSpeedX_MM_MIN();
-	double maxSpeedY = csm.getMaxSpeedY_MM_MIN();
-	double maxSpeedZ = csm.getMaxSpeedZ_MM_MIN();
-	
-	double smallestMaxSpeed = std::min(maxSpeedX, maxSpeedY);
-	smallestMaxSpeed = std::min(smallestMaxSpeed, maxSpeedZ);
+	const int stepsXYZ     = ( getStepsX() +  getStepsY() +  getStepsZ() ) / 3;
+	const double maxSpeedX = csc.X.maxDistPerMinute;
+	const double maxSpeedY = csc.Y.maxDistPerMinute;
+	const double maxSpeedZ = csc.Z.maxDistPerMinute;
 	
 	wxPGProperty* prop = NULL;
 	{ prop = getProperty(CncConfig_STEPS_XYZ); 					if (prop != NULL) prop->SetValue(stepsXYZ); }
 	{ prop = getProperty(CncConfig_MAX_SPEED_X_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedX); }
 	{ prop = getProperty(CncConfig_MAX_SPEED_Y_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedY); }
 	{ prop = getProperty(CncConfig_MAX_SPEED_Z_MM_MIN); 		if (prop != NULL) prop->SetValue(maxSpeedZ); }
-	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(smallestMaxSpeed); }
+	{ prop = getProperty(CncConfig_MAX_SPEED_XYZ_MM_MIN); 		if (prop != NULL) prop->SetValue(csc.getMaxFeedSpeed_MM_MIN()); }
 	
 	{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_PERCENT);
 		if (prop != NULL) {
-			double val = smallestMaxSpeed * prop->GetValue().GetDouble();
+			const double val = csc.getMaxFeedSpeed_MM_MIN() * prop->GetValue().GetDouble();
 			{ prop = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
 		}
 	}
 	
 	{ prop = getProperty(CncConfig_DEF_WORK_SPEED_PERCENT);
 		if (prop != NULL) {
-			double val = smallestMaxSpeed * prop->GetValue().GetDouble();
+			const double val = csc.getMaxFeedSpeed_MM_MIN() * prop->GetValue().GetDouble();
 			{ prop = getProperty(CncConfig_DEF_WORK_SPEED_MM_MIN); if (prop != NULL) prop->SetValue(val); }
 		}
 	}

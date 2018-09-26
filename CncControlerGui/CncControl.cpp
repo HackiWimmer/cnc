@@ -294,7 +294,7 @@ bool CncControl::setup(bool doReset) {
 	
 	// speed setup
 	changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
-		
+	
 	// check if some output was logged in between, if not 
 	// remove last '\n' and put 'Ready' at the end of the
 	// same line as the starting the initialization hint

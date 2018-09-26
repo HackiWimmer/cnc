@@ -8,7 +8,37 @@
     
 #ifdef SKETCH_COMPILE
   namespace {
-  
+
+    typedef unsigned char SHORT;
+
+    // Additional Output Pins
+    const SHORT PIN_SUPPORT_SWITCH1_STATE       =      8;
+    const SHORT PIN_SUPPORT_SWITCH2_STATE       =      9;
+    const SHORT PIN_SUPPORT_TOOL_POWERED        =     10;
+    const SHORT PIN_SUPPORT_CABLE_CONNECTED     =     11;
+
+    // Limit Input Pins
+    const SHORT PIN_LS_X_MIN                    =      2;
+    const SHORT PIN_LS_X_MAX                    =      3;
+    const SHORT PIN_LS_Y_MIN                    =      4;
+    const SHORT PIN_LS_Y_MAX                    =      5;
+    const SHORT PIN_LS_Z_MIN                    =      6;
+    const SHORT PIN_LS_Z_MAX                    =      7;
+
+    // Support Input Pins
+    const SHORT PIN_SS_SUPPORT_BUTTON_1_PRESSED =     A6;
+    const SHORT PIN_SS_SUPPORT_BUTTON_2_PRESSED =     A7;
+    const SHORT PIN_SS_SUPPORT_BUTTON_3_PRESSED =     12;
+    const SHORT PIN_SS_PIN_5                    =     13;
+    const SHORT PIN_SS_SUPPORT_SWITCH_1_PRESSED =     A0;
+    const SHORT PIN_SS_SUPPORT_SWITCH_2_PRESSED =     A1;
+    const SHORT PIN_SS_TOOL_POWERED             =     A2;
+    const SHORT PIN_SS_CABLE_CONNECTED          =     A3;
+
+    // Commands
+    const SHORT CMD_RESET                       =     'r';
+
+    // Further constants
     const char CR                               =    '\n';
     const char MINUS                            =     '-';
     const char EQUAL                            =     '=';

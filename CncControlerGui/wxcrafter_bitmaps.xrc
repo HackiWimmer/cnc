@@ -303,6 +303,7 @@
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>
   <object class="wxBitmap" name="view-orientation">bitmaps\view-orientation.png</object>
   <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
+  <object class="wxBitmap" name="weather-lightning (2)">bitmaps\weather-lightning (2).png</object>
   <object class="wxBitmap" name="window-close-3">bitmaps\window-close-3.png</object>
   <object class="wxBitmap" name="workspace">bitmaps\workspace.png</object>
 </resource>

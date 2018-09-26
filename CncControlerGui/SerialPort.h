@@ -206,8 +206,6 @@ class Serial : public SerialOSD {
 		inline bool decodeLimitInfo(SerialFetchInfo& sfi);
 		inline bool decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi);
 		
-		bool sendSignal(const unsigned char cmd);
-		
 		void resetLastFetchResult() { lastFetchResult = RET_NULL; }
 		void setLastFetchType(unsigned char ret) { lastFetchResult = ret; }
 		const unsigned char getLastFetchResult() const { return lastFetchResult; }
@@ -266,6 +264,8 @@ class Serial : public SerialOSD {
 		Serial::SypMode getSpyMode() { return spyMode; };
 		// reurn the current command flag
 		bool isCommandActive() { return isCommandRunning; }
+		// signals
+		bool sendSignal(const unsigned char cmd);
 		// port writting
 		bool processGetter(unsigned char pid, GetterValues& ret);
 		bool processGetterList(PidList pidList, GetterListValues& ret);

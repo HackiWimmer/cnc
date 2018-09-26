@@ -122,6 +122,11 @@ void CncStepper::reset() {
   resetStepCounter();
 }
 //////////////////////////////////////////////////////////////////////////////
+void CncStepper::resetDirectionPin() {
+//////////////////////////////////////////////////////////////////////////////
+  digitalWrite(directionPin, LOW);
+}
+//////////////////////////////////////////////////////////////////////////////
 int32_t CncStepper::calcStepsForMM(int32_t mm) {
 //////////////////////////////////////////////////////////////////////////////
   if ( isPitchValid() == false )
@@ -158,7 +163,7 @@ void CncStepper::setMinReached(bool state) {
     minReached = state;
   }
 
-  sendCurrentLimitStates(true);
+  sendCurrentLimitStates(FORCE);
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::setMaxReached(bool state) {
@@ -176,7 +181,7 @@ void CncStepper::setMaxReached(bool state) {
     maxReached = state;
   }
 
-  sendCurrentLimitStates(true);
+  sendCurrentLimitStates(FORCE);
 }
 //////////////////////////////////////////////////////////////////////////////
 int32_t CncStepper::readLimitState(int dir) {
@@ -215,16 +220,16 @@ bool CncStepper::checkLimit(int dir) {
 
     // unclear sitiuation avoid movement!
     if ( stepDirection == SD_UNKNOWN ) {
-      sendCurrentLimitStates(true);
+      sendCurrentLimitStates(FORCE);
       broadcastInterrupt();
       return true;
     }
 
-    // enable move the the opposite direction
+    // enable the move in the opposite direction
     if ( minReached && dir > 0 )
       return false;
       
-    // enable move the the opposite direction
+    // enable the move in the opposite direction
     if ( maxReached && dir < 0 )
       return false;
       
@@ -278,7 +283,7 @@ bool CncStepper::setDirection(const StepDirection sd) {
 //////////////////////////////////////////////////////////////////////////////
 bool CncStepper::performNextStep() {
 //////////////////////////////////////////////////////////////////////////////
-  uint32_t tsStartStepping = micros();
+  uint32_t tsStartStepping = calculateDuration ? micros() : 0;
 
   // first check
   // -----------------------------------------------------------

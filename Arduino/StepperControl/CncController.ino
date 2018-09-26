@@ -74,8 +74,8 @@ CncController::CncController(LastErrorCodes& lec)
 , pause(PAUSE_INACTIVE)
 , I2CAvailable(false)
 , lastHeartbeat(0)
-{
-}
+, lastI2CData()
+{}
 /////////////////////////////////////////////////////////////////////////////////////
 CncController::~CncController() {
 /////////////////////////////////////////////////////////////////////////////////////
@@ -87,16 +87,24 @@ CncController::~CncController() {
 bool CncController::evaluateI2CAvailable() {
 /////////////////////////////////////////////////////////////////////////////////////
   // try to request data
-  I2CData data;
-  I2CAvailable = readI2CSlave(data);
+  I2CAvailable = readI2CSlave(lastI2CData);
 
   // On demand try a second one
   if ( I2CAvailable == false ) {
     delay(1000);
-    I2CAvailable = readI2CSlave(data);
+    I2CAvailable = readI2CSlave(lastI2CData);
   }
 
   return I2CAvailable;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+bool CncController::evaluateI2CData() {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( isI2CAvailable() == false )
+    return false;
+  
+  // request data
+  return readI2CSlave(lastI2CData);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 int32_t CncController::isReadyToRun() {
@@ -143,10 +151,9 @@ void CncController::printConfig() {
 
     int limitState = -1, supportState = -1;
     if ( isI2CAvailable() == true ) {
-      I2CData data;
-      if ( readI2CSlave(data) ) {
-        limitState   = (int)data.limitState;
-        supportState = (int)data.supportState;
+      if ( readI2CSlave(lastI2CData) ) {
+        limitState   = (int)lastI2CData.limitState;
+        supportState = (int)lastI2CData.supportState;
       }
     }
     
@@ -200,10 +207,9 @@ bool CncController::evaluateSupportButtonState(unsigned short idx) {
   if ( isI2CAvailable() == false )
     return false;
     
-  I2CData data;
   CncInterface::ISP::States sp;
-  if ( readI2CSlave(data) ) sp = CncInterface::ISP::States(data.supportState);
-  else                      return false;
+  if ( readI2CSlave(lastI2CData) )  sp = CncInterface::ISP::States(lastI2CData.supportState);
+  else                              return false;
  
   switch ( idx ) {
     case 1: return sp.isSupportButton1Pressed();
@@ -221,10 +227,9 @@ bool CncController::evaluateSupportSwitchState(unsigned short idx) {
   if ( isI2CAvailable() == false )
     return false;
     
-  I2CData data;
   CncInterface::ISP::States sp;
-  if ( readI2CSlave(data) ) sp = CncInterface::ISP::States(data.supportState);
-  else                      return false;
+  if ( readI2CSlave(lastI2CData) )  sp = CncInterface::ISP::States(lastI2CData.supportState);
+  else                              return false;
  
   switch ( idx ) {
     case 1: return sp.isSupportSwitch1Pressed();
@@ -241,9 +246,8 @@ bool CncController::evaluateAnalogLimitPin(CncInterface::ILS::States& ls) {
     return false;
   }
 
-  I2CData data;
-  if ( readI2CSlave(data) ) ls = CncInterface::ILS::States(data.limitState);
-  else                      return false;
+  if ( readI2CSlave(lastI2CData) )  ls = CncInterface::ILS::States(lastI2CData.limitState);
+  else                              return false;
 
   return true;
 }
@@ -253,9 +257,8 @@ bool CncController::evaluateAnalogSupportPin(CncInterface::ISP::States& sp) {
   if ( isI2CAvailable() == false )
     return false;
   
-  I2CData data;
-  if ( readI2CSlave(data) ) sp = CncInterface::ISP::States(data.supportState);
-  else                      return false;
+  if ( readI2CSlave(lastI2CData) )  sp = CncInterface::ISP::States(lastI2CData.supportState);
+  else                              return false;
   
   return true;
 }
@@ -289,10 +292,9 @@ bool CncController::evaluateLimitStates(int32_t& xLimit, int32_t& yLimit, int32_
       
       // read it from analog pin
       CncInterface::ILS::States ls;
-      I2CData data;
-      if ( readI2CSlave(data) ) {
+      if ( readI2CSlave(lastI2CData) ) {
 
-        CncInterface::ILS::States ls(data.limitState);
+        CncInterface::ILS::States ls(lastI2CData.limitState);
         if ( ls. hasError() == false ) {
           if ( xLimit == LimitSwitch::LIMIT_UNKNOWN ) 
             xLimit = ls.xLimit();
@@ -330,10 +332,9 @@ bool CncController::heartbeat() {
   unsigned char supportState  = 0;
 
   if ( isI2CAvailable() == true ) {
-    I2CData data;
-    if ( readI2CSlave(data) ) {
-      limitState   = data.limitState; 
-      supportState = data.supportState;
+    if ( readI2CSlave(lastI2CData) ) {
+      limitState   = lastI2CData.limitState; 
+      supportState = lastI2CData.supportState;
     }
     
   } else {
@@ -471,7 +472,6 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
     X->resetPosReplyThresholdCouter();
     Y->resetPosReplyThresholdCouter();
     Z->resetPosReplyThresholdCouter();
-    //speedManager.determineFeedSpeed();
     
     switch ( pid ) {
       case PID_X_POS: writeLongValue(pid, X->getPosition());
@@ -567,7 +567,11 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
   if ( dx == 0 && dy == 0 && dz == 0 ) 
     return true;
 
-  const unsigned long tsStart = micros();
+  //const unsigned long tsStart = micros();
+  const unsigned long tsStart = speedController.getTimeStamp();
+  
+  if ( isProbeMode() == OFF )
+    speedController.initMove(dx, dy, dz);
   
   // initialize
   int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
@@ -673,11 +677,10 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
         speedController.setRealtimeFeedSpeed_MM_SEC((1000.0 * 1000.0 * distance) / ( timeElapsed + SPEED_MANAGER_CONST_STATIC_OFFSET_US ));
     }
   }
-/*
-  if ( isProbeMode() == OFF ) {
-    speedManager.finalizeMove();
-  }
-*/
+
+  if ( isProbeMode() == OFF )
+    speedController.completeMove();
+
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////

@@ -472,7 +472,7 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 	lastCommand.Serial.write(targetMajorPos.getX(),
 			                 targetMajorPos.getY(),
 							 targetMajorPos.getZ(),
-							 (int32_t)(speedSimulator->getMeasurementFeedSpeed_MM_MIN() * DBL_FACT));
+							 (int32_t)(speedSimulator->getRealtimeFeedSpeed_MM_MIN() * DBL_FACT));
 	lastCommand.Serial.write(RET_OK);
 	
 	// secondary provide the limit information
@@ -640,15 +640,13 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			case PID_PULSE_WIDTH_LOW_Z:
 			case PID_PULSE_WIDTH_HIGH_X:
 			case PID_PULSE_WIDTH_HIGH_Y:
-			case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->setup(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
-																	GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(),
-																	GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
-																	GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ()
-																 );
+			case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->X.setup(GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
+											speedSimulator->Y.setup(GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
+											speedSimulator->Z.setup(GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
 											break;
 
 			
-			case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed((double)(val/DBL_FACT));
+			case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed_MM_MIN((double)(val/DBL_FACT));
 											break;
 		}
 		
@@ -744,7 +742,7 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	// update speed simulator values
 	if ( GBL_CONFIG->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
-		speedSimulator->setNextMove(dx, dy, dz);
+		speedSimulator->initMove(dx, dy, dz);
 	}
 	
 	// initialize
@@ -825,7 +823,7 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	if ( GBL_CONFIG->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->performCurrentOffset(true);
-		speedSimulator->finalizeMove();
+		speedSimulator->completeMove();
 	} 
 	
 	return true;
@@ -882,7 +880,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 			ci.yCtrlPos  = curEmulatorPos.getY();
 			ci.zCtrlPos  = curEmulatorPos.getZ();
 			
-			ci.feedSpeed = speedSimulator->getMeasurementFeedSpeed_MM_MIN();
+			ci.feedSpeed = speedSimulator->getRealtimeFeedSpeed_MM_MIN();
 			
 			sendSerialControllerCallback(ci);
 			lastReplyPos.set(curEmulatorPos);

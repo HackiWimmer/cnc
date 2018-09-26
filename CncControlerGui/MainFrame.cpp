@@ -570,6 +570,7 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayReport(int id) {
 ///////////////////////////////////////////////////////////////////
+	return;
 	PidList pidList;
 	
 	switch ( id ) {
@@ -1780,14 +1781,15 @@ bool MainFrame::connectSerialPort() {
 	
 	lastPortName.clear();
 	if ( (ret = cnc->connect(cs)) == true )  {
-		cnc->setup();
-		cnc->resetErrorInfo();
-		cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
-		updateCncConfigTrace();
-		lastPortName.assign(sel);
-		m_connect->SetBitmap(bmpC);
-		m_serialTimer->Start();
-		selectSerialSpyMode();
+		if ( (ret = cnc->setup()) == true ) {
+			cnc->resetErrorInfo();
+			cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
+			updateCncConfigTrace();
+			lastPortName.assign(sel);
+			m_connect->SetBitmap(bmpC);
+			m_serialTimer->Start();
+			selectSerialSpyMode();
+		}
 	}
 	
 	updateSetterList();
@@ -4137,6 +4139,12 @@ void MainFrame::requestReset() {
 	
 	clearMotionMonitor();
 	updateSetterList();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::requestInterrupt(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cnc);
+	cnc->getSerial()->sendSignal(SIG_INTERRUPPT);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearControllerErrorInfoFromButton(wxCommandEvent& event) {

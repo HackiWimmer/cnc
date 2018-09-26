@@ -653,6 +653,8 @@ protected:
     wxMenuItem* m_menuItem1183;
     wxMenuItem* m_miRqtReset;
     wxMenuItem* m_miRqtResetErrorInfo;
+    wxMenuItem* m_menuItem11831;
+    wxMenuItem* m_miRqtSendInterrupt;
     wxMenu* m_menuTools;
     wxMenuItem* m_miPathGenerator;
     wxMenuItem* m_miIniFile;
@@ -944,6 +946,7 @@ protected:
     virtual void requestCurrentLimitState(wxCommandEvent& event) { event.Skip(); }
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
     virtual void requestResetErrorInfo(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestInterrupt(wxCommandEvent& event) { event.Skip(); }
     virtual void openConfigurationFile(wxCommandEvent& event) { event.Skip(); }
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }

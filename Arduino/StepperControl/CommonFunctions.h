@@ -3,10 +3,8 @@
 
 	#define epsilon ((double)0.000999)
 
-  struct I2CData {
-    unsigned char limitState;
-    unsigned char supportState; 
-  };
+  extern inline uint8_t getPinMode(uint8_t pin);
+  extern PinType getPinType(uint8_t pin);
 
   extern inline bool readI2CSlave(I2CData& data);
 

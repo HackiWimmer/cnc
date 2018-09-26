@@ -7,13 +7,6 @@
 
 namespace LimitSwitch {
 
-  const SHORT PIN_LS_X_MIN            =  2;
-  const SHORT PIN_LS_X_MAX            =  3;
-  const SHORT PIN_LS_Y_MIN            =  4;
-  const SHORT PIN_LS_Y_MAX            =  5;
-  const SHORT PIN_LS_Z_MIN            =  6;
-  const SHORT PIN_LS_Z_MAX            =  7;
-
   //-----------------------------------------------------------------
   class LimitStates : public StateBuffer {
 

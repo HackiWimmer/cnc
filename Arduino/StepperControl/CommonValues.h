@@ -59,10 +59,29 @@ inline int32_t absolute(int32_t x) {
   return ((x ^ a) - a);
 }
 
-
 // common global functions - end
 ////////////////////////////////////////////////////////////////////////
 
+struct I2CData {
+  unsigned char limitState;
+  unsigned char supportState; 
+
+  I2CData() 
+  : limitState(0)
+  , supportState(0)
+  {}
+
+  explicit I2CData(const I2CData& d) 
+  : limitState(d.limitState)
+  , supportState(d.limitState)
+  {}
+
+  void reset() {
+    limitState   = 0;
+    supportState = 0;     
+  }
+};
+  
 // .....................................................................
 // Pin setup
 // .....................................................................
@@ -84,6 +103,12 @@ inline int32_t absolute(int32_t x) {
   const unsigned char PIN_TOOL_ENABLE                     =  12;
   const unsigned char PIN_TOOL_FEEDBACK                   =  13;
 
+  // A0 CNC Shield: Reset/Abort
+  // A1 CNC Shield: Feed Hold
+  // A2 CNC Shield: Cycle Start / Resume
+  // A3 CNC Shield: Collant Enabled
+  // A4 CNC Shield: free
+  // A5 CNC Shield: free
   #define PIN_INTERRUPT_LED                                   A3   
   const unsigned char PIN_INTERRUPT_LED_ID                 =   3;
   
@@ -375,12 +400,16 @@ inline int32_t absolute(int32_t x) {
 
   #define FIRMWARE_VERSION                              "0.9.5"
 
+  #define UNKNOWN_PIN                                    0xFF
+
   #define NORMALIZED_INCREMENT_DIRECTION                 0
   #define INVERSED_INCREMENT_DIRECTION                   1
 
   #define ANALOG_LOW                                     0
   #define ANALOG_HIGH                                    255
 
+  #define FORCE                                          true
+  
   #define ON                                             true
   #define OFF                                            false
   
@@ -392,6 +421,8 @@ inline int32_t absolute(int32_t x) {
 
   #define PAUSE_ACTIVE                                   true
   #define PAUSE_INACTIVE                                 false
+
+  enum PinType                                          {PT_UNKNOWN = 0, PT_ANALOG = 1, PT_DIGITAL = 2};
 
   const char MBYTE_CLOSE                                 = RET_MBYTE_CLOSE;
   const char TEXT_CLOSE                                  = '\n';

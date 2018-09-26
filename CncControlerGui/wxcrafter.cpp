@@ -4751,6 +4751,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_miRqtResetErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-reset")));
     m_menuRequestor->Append(m_miRqtResetErrorInfo);
     
+    m_menuRequestor->AppendSeparator();
+    
+    m_miRqtSendInterrupt = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Interrupt"), wxT(""), wxITEM_NORMAL);
+    m_miRqtSendInterrupt->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("weather-lightning (2)")));
+    m_menuRequestor->Append(m_miRqtSendInterrupt);
+    
     m_menuTools = new wxMenu();
     m_menuBar->Append(m_menuTools, _("Tools"));
     
@@ -5221,6 +5227,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Connect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
     this->Connect(m_miRqtResetErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResetErrorInfo), NULL, this);
+    this->Connect(m_miRqtSendInterrupt->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInterrupt), NULL, this);
     this->Connect(m_miPathGenerator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     this->Connect(m_miIniFile->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openConfigurationFile), NULL, this);
     this->Connect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);
@@ -5551,6 +5558,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Disconnect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
     this->Disconnect(m_miRqtResetErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResetErrorInfo), NULL, this);
+    this->Disconnect(m_miRqtSendInterrupt->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInterrupt), NULL, this);
     this->Disconnect(m_miPathGenerator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     this->Disconnect(m_miIniFile->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openConfigurationFile), NULL, this);
     this->Disconnect(m_miExternalEditor->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openExternalEditor), NULL, this);

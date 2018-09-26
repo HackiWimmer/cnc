@@ -106,6 +106,24 @@ inline void switchToolState(bool state, bool force = false) {
   digitalWrite(PIN_TOOL_ENABLE, state == true ? TOOL_STATE_ON : TOOL_STATE_OFF);
 }
 /////////////////////////////////////////////////////////////////////////////////////
+inline void switchStepperState(bool state) {
+/////////////////////////////////////////////////////////////////////////////////////
+  digitalWrite(PIN_STEPPER_ENABLE,  state);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+inline void switchOutputPinState(int pin, bool state) {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( getPinMode(pin) != OUTPUT )
+    return;
+
+  PinType pt = getPinType(pin);
+  if ( pt == PT_UNKNOWN )
+    return;
+
+  if ( pt == PT_ANALOG )   analogWrite(pin,  state == true ? ANALOG_HIGH : ANALOG_LOW);
+  else                     digitalWrite(pin, state == true ? HIGH        : LOW);
+}
+/////////////////////////////////////////////////////////////////////////////////////
 inline void writeLimitGetter() {
 /////////////////////////////////////////////////////////////////////////////////////  
   long x = LimitSwitch::LIMIT_UNKNOWN;
@@ -385,6 +403,8 @@ inline unsigned char processSetter() {
                                   break;
     // processSetter() ............................................
     case PID_SPEED_MM_MIN:        controller.setSpeedValue(dValue); 
+                                  //TODO
+                                   // controller.setSpeedValue(0.0); 
                                   break;
     // processSetter() ............................................
     // call it with lValue = NORMALIZED_INCREMENT_DIRECTION || INVERSED_INCREMENT_DIRECTION
@@ -497,11 +517,11 @@ inline void clearSerial() {
 inline char reset() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
-  switchToolState(false, true);
-  digitalWrite(PIN_STEPPER_ENABLE,  ENABLE_STATE_OFF);
+  switchToolState(TOOL_STATE_OFF, FORCE);
+  switchStepperState(ENABLE_STATE_OFF);
   
   // Hide the Interrupt LED
-  analogWrite(PIN_INTERRUPT_LED,    ANALOG_LOW);
+  switchOutputPinState(PIN_INTERRUPT_LED, OFF);
 
   // stop running tests
   CncTestSuite::resetInterruptFlag();
@@ -516,11 +536,11 @@ inline char reset() {
 inline void processInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
-  switchToolState(false, true);
-  digitalWrite(PIN_STEPPER_ENABLE,  ENABLE_STATE_OFF);
+  switchToolState(TOOL_STATE_OFF, FORCE);
+  switchStepperState(ENABLE_STATE_OFF);
 
   // Show Interrup LED
-  analogWrite(PIN_INTERRUPT_LED,    ANALOG_HIGH);
+  switchOutputPinState(PIN_INTERRUPT_LED, ON);
 
   // stop running tests
   CncTestSuite::interruptTest();
@@ -563,8 +583,11 @@ void setup() {
 /////////////////////////////////////////////////////////////////////////////////////
 void loop() {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( Serial.available() <= 0 )
-    return;  
+  
+  if ( Serial.available() <= 0 ) {
+    controller.evaluateI2CData();
+    return;
+  }
 
   char r = RET_OK;
   byte c = Serial.read();
@@ -625,6 +648,9 @@ void loop() {
         case CMD_RENDER_AND_MOVE:
               controller.setPosReplyState(true);
               r = decodeMove();
+              controller.getStepperX()->resetDirectionPin();
+              controller.getStepperY()->resetDirectionPin();
+              controller.getStepperZ()->resetDirectionPin();
               controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
               controller.setPosReplyState(false);
               break;

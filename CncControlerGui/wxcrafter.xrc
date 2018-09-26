@@ -8432,6 +8432,14 @@ Interval [ms]:</label>
             <![CDATA[]]>
           </accel>
         </object>
+        <object class="separator"/>
+        <object class="wxMenuItem" name="m_miRqtSendInterrupt">
+          <label>Interrupt</label>
+          <bitmap>bitmaps/weather-lightning (2).png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
       </object>
       <object class="wxMenu" name="m_menuTools">
         <label>Tools</label>

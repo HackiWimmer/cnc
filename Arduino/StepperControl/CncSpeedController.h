@@ -1,6 +1,21 @@
 #ifndef CNC_SPEED_CONTROLLER
 #define CNC_SPEED_CONTROLLER
 
+#ifndef SKETCH_COMPILE
+
+    #include <iostream>
+    #include "CncCommon.h"
+    #include "OSD/CncTimeFunctions.h"
+    using namespace cnc;
+
+#else
+
+  #include "CommonValues.h"
+    
+#endif
+
+const int32_t MAX_FEED_SPEED_VALUE = MIN_LONG;
+
 class CncSpeedController {
   
   protected:
@@ -158,6 +173,13 @@ class CncSpeedController {
     , Z('Z')
     {}
 
+    virtual ~CncSpeedController()
+    {}
+
+    //////////////////////////////////////////////////////////////////////////
+    virtual void initMove(int32_t, int32_t, int32_t) {}
+    virtual void completeMove() {}
+
     //////////////////////////////////////////////////////////////////
     bool isInitialized()                   const { return X.isInitialized() && Y.isInitialized() && Z.isInitialized(); }
     bool isSpeedConfigured()               const { return X.isSpeedConfigured() && Y.isSpeedConfigured() && Z.isSpeedConfigured(); }
@@ -237,6 +259,15 @@ class CncSpeedController {
         #undef PRINT_PARAMETER    
       }
     #endif 
+
+    //////////////////////////////////////////////////////////////////
+    uint32_t getTimeStamp() {
+      #ifndef SKETCH_COMPILE
+        return CncTimeFunctions::getNanoTimestamp() / 1000;
+      #else
+        return micros();
+      #endif
+    }       
     
     //////////////////////////////////////////////////////////////////
     #ifndef SKETCH_COMPILE

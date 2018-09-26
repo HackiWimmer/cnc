@@ -3,10 +3,10 @@
 
 #include <iostream>
 #include "OSD/CncTimeFunctions.h"
+#include "CncCommon.h"
 #include "CncArduino.h"
-#include "CncSpeedManager.h"
 
-class CncSpeedSimulator : public CncSpeedManager {
+class CncSpeedSimulator : public CncSpeedController {
 	
 	public:
 		
@@ -67,7 +67,7 @@ class CncSpeedSimulator : public CncSpeedManager {
 		long getStepCounterY() { return stepCounterY; }
 		long getStepCounterZ() { return stepCounterZ; }
 		
-		virtual void initMove();
+		virtual void initMove(int32_t dx, int32_t dy, int32_t dz);
 		virtual void completeMove();
 		
 	private:

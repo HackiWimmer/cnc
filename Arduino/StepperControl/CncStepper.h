@@ -85,6 +85,7 @@ class CncStepper {
 
     //////////////////////////////////////////////////////////////////////////////
     void reset();
+    void resetDirectionPin();
     void interrupt()                               { interrupted = true; }
     bool isInterrupted()                    const  { return interrupted; }
 

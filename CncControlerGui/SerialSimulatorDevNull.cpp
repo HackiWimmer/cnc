@@ -59,10 +59,9 @@ void SerialSimulatorDevNull::resetSerial() {
 	posReplyThresholdY = 0;
 	posReplyThresholdZ = 0;
 	
-	speedSimulator->setup(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
-							0.0, 0, 0,
-							0.0, 0, 0,
-							0.0, 0, 0);
+	speedSimulator->X.setup(0, 0.0, SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 0);
+	speedSimulator->Y.setup(0, 0.0, SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 0);
+	speedSimulator->Z.setup(0, 0.0, SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 0);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorDevNull::performCurrentPositions(unsigned char pid) {
@@ -83,7 +82,7 @@ void SerialSimulatorDevNull::performCurrentPositions(unsigned char pid) {
 									Serial_writeLongValues(pid, curSimulatorPos.getX(),
 											                    curSimulatorPos.getY(),
 																curSimulatorPos.getZ(),
-																(int32_t)(speedSimulator->getMeasurementFeedSpeed_MM_MIN() * DBL_FACT));
+																(int32_t)(speedSimulator->getRealtimeFeedSpeed_MM_MIN() * DBL_FACT));
 									break;
 									
 		default:					; // do nothing
@@ -164,21 +163,25 @@ unsigned char SerialSimulatorDevNull::performSetterValue(unsigned char pid, int3
 		case PID_PULSE_WIDTH_LOW_Z:
 		case PID_PULSE_WIDTH_HIGH_X:
 		case PID_PULSE_WIDTH_HIGH_Y:
-		case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->setup(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
+		case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->X.setup(getSetterValueAsLong(PID_STEPS_X, 0), 
 																getSetterValueAsDouble(PID_PITCH_X, 0.0), 
-																 getSetterValueAsLong(PID_STEPS_X, 0), 
-																 getSetterValueAsLong(PID_PULSE_WIDTH_LOW_X, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_X, 0),
+																SPEED_MANAGER_CONST_STATIC_OFFSET_US, 
+																SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+																getSetterValueAsLong(PID_PULSE_WIDTH_LOW_X, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_X, 0));
+										speedSimulator->Y.setup(getSetterValueAsLong(PID_STEPS_Y, 0), 
 																getSetterValueAsDouble(PID_PITCH_Y, 0.0), 
-																 getSetterValueAsLong(PID_STEPS_Y, 0), 
-																 getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Y, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Y, 0),
+																SPEED_MANAGER_CONST_STATIC_OFFSET_US, 
+																SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+																getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Y, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Y, 0));
+										speedSimulator->Z.setup(getSetterValueAsLong(PID_STEPS_Z, 0), 
 																getSetterValueAsDouble(PID_PITCH_Z, 0.0), 
-																 getSetterValueAsLong(PID_STEPS_Z, 0), 
-																 getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Z, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Z, 0)
-															 );
+																SPEED_MANAGER_CONST_STATIC_OFFSET_US, 
+																SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+																getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Z, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Z, 0));
 										break;
 		
 		
-		case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed((double)(value/DBL_FACT));
+		case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed_MM_MIN((double)(value/DBL_FACT));
 										break;
 										
 		case PID_POS_REPLY_THRESHOLD_X:	posReplyThresholdX = value; 
@@ -253,7 +256,7 @@ bool SerialSimulatorDevNull::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
 	// update speed simulator values
 	if ( isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
-		speedSimulator->setNextMove(dx, dy, dz);
+		speedSimulator->initMove(dx, dy, dz);
 	}
 	
 	// initialize
@@ -350,7 +353,7 @@ bool SerialSimulatorDevNull::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
 		wxASSERT( speedSimulator != NULL );
 		//realeaseCondition();
 		speedSimulator->performCurrentOffset(true);
-		speedSimulator->finalizeMove();
+		speedSimulator->completeMove();
 	}
 	
 	return true;
