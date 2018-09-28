@@ -362,9 +362,36 @@ void CncController::broadcastInterrupt() {
   Z->interrupt();
 }
 /////////////////////////////////////////////////////////////////////////////////////
+void CncController::switchToolState(bool state, bool force) {
+/////////////////////////////////////////////////////////////////////////////////////
+  if ( force == false ) {
+    if ( isProbeMode() == true ) {
+      digitalWrite(PIN_TOOL_ENABLE, TOOL_STATE_OFF);
+      return;
+    }
+  }
+  
+  digitalWrite(PIN_TOOL_ENABLE, state);
+
+  // give the tool a portion of time to run properly
+  if ( state == TOOL_STATE_ON )
+    delay(500);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncController::switchStepperState(bool state) {
+/////////////////////////////////////////////////////////////////////////////////////
+  digitalWrite(PIN_STEPPER_ENABLE,  state);
+}
+/////////////////////////////////////////////////////////////////////////////////////
 void CncController::broadcastPause(bool state) {
 /////////////////////////////////////////////////////////////////////////////////////
   pause = state; 
+  switchToolState( pause == PAUSE_ACTIVE ? TOOL_STATE_OFF : TOOL_STATE_ON, FORCE);
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncController::broadcastHalt() {
+/////////////////////////////////////////////////////////////////////////////////////
+  switchToolState(TOOL_STATE_OFF, FORCE);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncController::observeEnablePin() {
@@ -417,29 +444,33 @@ bool CncController::observeSerialFrontByte() {
                   //  - Returning false here signalize an error and the complete run cycle (PC) stopps as a result.
                   //  - Returning true here stopps the current move (while loop), so far so good, but the current run cycle 
                   //    continue with the next existing move command which is not the meaning of HALT.
-                  
+                  broadcastHalt();
                   return false;
                   
       case SIG_PAUSE:
                   // remove the signal from serial
                   Serial.read();
                   pause = PAUSE_ACTIVE;
-  
-                  // Don't leave the wigle loop, so break is used here
+                  
+                   // Don't return here - see the pause handling below
                   break;
   
       case SIG_RESUME:
                   // remove the signal from serial
                   Serial.read();
                   pause = PAUSE_INACTIVE;
-  
-                  // Don't leave the wigle loop, so break is used here
+                  
+                  // Don't return here - see the pause handling below
+                  break;
     }
   }
 
   // ----------------------------------------------------------
   // pause handling
   if ( pause == PAUSE_ACTIVE ) {
+
+     broadcastPause(pause);
+    
      static const short PAUSE_WAIT_DELAY = 50;
      static const short HB_MOD           = 1000 / PAUSE_WAIT_DELAY;
      
@@ -452,7 +483,9 @@ bool CncController::observeSerialFrontByte() {
       delay(PAUSE_WAIT_DELAY);
       counter ++;
      }
+     
      pause = PAUSE_INACTIVE;
+     broadcastPause(pause);
   }
  
   return true;

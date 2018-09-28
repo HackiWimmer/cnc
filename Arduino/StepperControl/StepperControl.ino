@@ -94,23 +94,6 @@ inline long isReadyToRun(){
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void switchToolState(bool state, bool force = false) {
-/////////////////////////////////////////////////////////////////////////////////////
-  if ( force == false ) {
-    if ( controller.isProbeMode() == true ) {
-      digitalWrite(PIN_TOOL_ENABLE, TOOL_STATE_OFF);
-      return;
-    }
-  }
-  
-  digitalWrite(PIN_TOOL_ENABLE, state == true ? TOOL_STATE_ON : TOOL_STATE_OFF);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-inline void switchStepperState(bool state) {
-/////////////////////////////////////////////////////////////////////////////////////
-  digitalWrite(PIN_STEPPER_ENABLE,  state);
-}
-/////////////////////////////////////////////////////////////////////////////////////
 inline void switchOutputPinState(int pin, bool state) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( getPinMode(pin) != OUTPUT )
@@ -331,7 +314,7 @@ inline unsigned char processSetter() {
                                   controller.getStepperZ()->resetStepCounter();   
                                   break;
     // processSetter() ............................................
-    case PID_TOOL_SWITCH:         switchToolState(lValue > 0); 
+    case PID_TOOL_SWITCH:         controller.switchToolState(lValue == 0 ? TOOL_STATE_OFF: TOOL_STATE_ON); 
                                   break;
     // processSetter() ............................................
     case PID_POS_REPLY_THRESHOLD_X: 
@@ -517,9 +500,9 @@ inline void clearSerial() {
 inline char reset() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
-  switchToolState(TOOL_STATE_OFF, FORCE);
-  switchStepperState(ENABLE_STATE_OFF);
-  
+  controller.switchToolState(TOOL_STATE_OFF, FORCE);
+  controller.switchStepperState(ENABLE_STATE_OFF);
+
   // Hide the Interrupt LED
   switchOutputPinState(PIN_INTERRUPT_LED, OFF);
 
@@ -536,8 +519,8 @@ inline char reset() {
 inline void processInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
-  switchToolState(TOOL_STATE_OFF, FORCE);
-  switchStepperState(ENABLE_STATE_OFF);
+  controller.switchToolState(TOOL_STATE_OFF, FORCE);
+  controller.switchStepperState(ENABLE_STATE_OFF);
 
   // Show Interrup LED
   switchOutputPinState(PIN_INTERRUPT_LED, ON);
@@ -571,8 +554,8 @@ void setup() {
     pinMode(PIN_Y_LIMIT,            INPUT);   digitalWrite(PIN_Y_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
     pinMode(PIN_Z_LIMIT,            INPUT);   digitalWrite(PIN_Z_LIMIT,           LimitSwitch::LIMIT_SWITCH_OFF);
   
-    pinMode(PIN_STEPPER_ENABLE,     OUTPUT);  digitalWrite(PIN_STEPPER_ENABLE,    ENABLE_STATE_OFF); 
-    pinMode(PIN_TOOL_ENABLE,        OUTPUT);  digitalWrite(PIN_TOOL_ENABLE,       TOOL_STATE_OFF);
+    pinMode(PIN_STEPPER_ENABLE,     OUTPUT);  // state will be managed the reset below 
+    pinMode(PIN_TOOL_ENABLE,        OUTPUT);  // state will be managed the reset below 
 
   // analog pins
     pinMode(PIN_INTERRUPT_LED,      OUTPUT);  analogWrite(PIN_INTERRUPT_LED,      ANALOG_LOW);
@@ -615,7 +598,7 @@ void loop() {
 
         // Cancel running moves
         case SIG_HALT:
-               // In this case here the signal does nothing and goes away.
+              controller.broadcastHalt(); 
               return;
 
     // --------------------------------------------------------------------------

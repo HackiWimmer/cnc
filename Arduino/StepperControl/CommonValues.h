@@ -413,8 +413,8 @@ struct I2CData {
   #define ON                                             true
   #define OFF                                            false
   
-  #define TOOL_STATE_OFF                                 HIGH
-  #define TOOL_STATE_ON                                  LOW 
+  #define TOOL_STATE_OFF                                 LOW
+  #define TOOL_STATE_ON                                  HIGH 
 
   #define ENABLE_STATE_OFF                               HIGH
   #define ENABLE_STATE_ON                                LOW 

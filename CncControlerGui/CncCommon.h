@@ -116,4 +116,15 @@ class OutboundCfgSelection{
 		};
 };
 
+class TestBookSelection {
+	public:
+		enum VAL {
+			INTERVAL					= 0,
+			DIMENSION					= 1,
+			LIMIT						= 2,
+			TOOL						= 3,
+			SUITE						= 4
+		};
+};
+
 #endif

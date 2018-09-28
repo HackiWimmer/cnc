@@ -1409,6 +1409,7 @@ void MainFrame::initialize(void) {
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
 	changeManuallySpeedValue();
+	
 	perspectiveHandler.setupUserPerspectives();
 	
 	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
@@ -1570,6 +1571,8 @@ void MainFrame::determineCncOutputControls() {
 	
 	guiCtlSetup->motionMonitor			= motionMonitor;
 	
+	guiCtlSetup->testToggleTool			= m_testToggleTool;
+	
 	guiCtlSetup->passingTrace			= m_passingCount;
 	guiCtlSetup->toolState 				= m_toolStateTrafficLight;
 	
@@ -1715,8 +1718,8 @@ bool MainFrame::connectSerialPort() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
 	
-	wxBitmap bmpC = ImageLib16().Bitmap("BMP_CONNECTED");
-	wxBitmap bmpD = ImageLib16().Bitmap("BMP_DISCONNECTED");
+	const wxBitmap bmpC = ImageLib16().Bitmap("BMP_CONNECTED");
+	const wxBitmap bmpD = ImageLib16().Bitmap("BMP_DISCONNECTED");
 	m_connect->SetBitmap(bmpD);
 	m_connect->Refresh();
 	m_connect->Update();
@@ -1727,8 +1730,11 @@ bool MainFrame::connectSerialPort() {
 	if ( m_clearSerialSpyOnConnect->IsChecked() )
 		clearSerialSpy();
 		
+	const wxString sel(m_portSelector->GetStringSelection());
+	if ( sel.IsEmpty() ) 
+		return false;
+	
 	bool ret = false;
-	wxString sel(m_portSelector->GetStringSelection());	
 	wxString cs;
 	
 	disableControls();
@@ -1785,6 +1791,7 @@ bool MainFrame::connectSerialPort() {
 			cnc->resetErrorInfo();
 			cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 			updateCncConfigTrace();
+			decorateSwitchToolOnOff(cnc->getToolState());
 			lastPortName.assign(sel);
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
@@ -5965,6 +5972,22 @@ const char* MainFrame::getBlankHtmlPage() {
 	return fn.GetFullPath();
 }
 ///////////////////////////////////////////////////////////////////
+const char* MainFrame::getCurrentPortName(wxString& ret) {
+///////////////////////////////////////////////////////////////////
+	ret.assign("Unknown Port Name");
+	if ( cnc != NULL ) {
+		wxString cn(cnc->getSerial()->getClassName());
+		wxString pn(cnc->getSerial()->getPortName());
+		pn.Replace("\\","",true);
+		pn.Replace(".","",true);
+		
+		if ( pn.IsEmpty() )	ret.assign(wxString::Format("%s", cn));
+		else				ret.assign(wxString::Format("%s", pn));
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
 const char* MainFrame::getErrorHtmlPage(const wxString& errorInfo) {
 ///////////////////////////////////////////////////////////////////
 	wxFileName fn(CncFileNameService::getErrorHtmlPageFileName());
@@ -6152,6 +6175,22 @@ void MainFrame::rcReset(wxCommandEvent& event) {
 	setRefPostionState(false);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::decorateSwitchToolOnOff(bool state) {
+///////////////////////////////////////////////////////////////////
+	if ( state == true ) {
+		m_testToggleTool->SetLabel("Switch Tool Off");
+		m_testToggleTool->SetBackgroundColour(wxColour(255,128,128));
+		m_testToggleTool->SetForegroundColour(*wxWHITE);
+	} else {
+		m_testToggleTool->SetLabel("Switch Tool On");
+		m_testToggleTool->SetBackgroundColour(*wxGREEN);
+		m_testToggleTool->SetForegroundColour(*wxBLACK);
+	}
+	
+	m_testToggleTool->Refresh(true);
+	m_testToggleTool->Update();
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -6161,11 +6200,10 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		return;
 	}
 	
+	decorateSwitchToolOnOff(m_testToggleTool->GetValue());
+	m_testToggleTool->Enable(false);
+	
 	if ( m_testToggleTool->GetValue() == true ) {
-		m_testToggleTool->SetLabel("Switch Tool Off");
-		m_testToggleTool->SetBackgroundColour(*wxRED);
-		m_testToggleTool->SetForegroundColour(*wxWHITE);
-		
 		disableControls();
 		m_testToggleEndSwitch->Enable(false);
 		m_testToggleTool->Enable(true);
@@ -6183,6 +6221,9 @@ void MainFrame::testSwitchToolOnOff(wxCommandEvent& event) {
 		cnc->switchToolOff();
 		stopAnimationControl();
 	}
+	
+	m_testToggleTool->Enable(true);
+	updateSetterList();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testEndSwitchEvaluation(wxCommandEvent& event) {
@@ -6492,9 +6533,23 @@ void MainFrame::decorateTestSuiteParameters() {
 	cnc->activatePositionCheck(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::treebookTestChanged(wxTreebookEvent& event) {
+void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	decorateTestSuiteParameters();
+	unsigned int sel = event.GetSelection();
+	
+	switch ( sel ) {
+		case TestBookSelection::VAL::INTERVAL:
+		case TestBookSelection::VAL::DIMENSION:
+		case TestBookSelection::VAL::LIMIT:		break;
+		
+		case TestBookSelection::VAL::TOOL:		if ( cnc != NULL )
+													m_testToggleTool->SetValue(cnc->getToolState());
+												decorateSwitchToolOnOff(m_testToggleTool->GetValue());
+												break;
+												
+		case TestBookSelection::VAL::SUITE:		decorateTestSuiteParameters();
+												break;
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::ctrlTestCaseSelected(wxCommandEvent& event) {
@@ -7556,9 +7611,12 @@ void MainFrame::manualContinuousMoveStart(wxWindow* ctrl, bool x, bool y, bool z
 	enableGuiControls(false);
 	enableRunControls(false);
 	ctrl->Enable(true);
+	
 	cnc->changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMax);
 	
+	motionMonitor->pushProcessMode();
 	cnc->manualContinuousMoveStart(stepSensitivity, x, y, z, dir);
+	motionMonitor->popProcessMode();
 	
 	enableGuiControls(true);
 	enableRunControls(true);
@@ -7648,5 +7706,6 @@ void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
 void MainFrame::xxxxxxxxxxxxx(wxMouseEvent& event) {
 	//clog << "xxxxxxxxxxxxx"<< endl;
 }
+
 
 

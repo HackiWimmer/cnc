@@ -18876,7 +18876,14 @@
                    "m_label": "Style:",
                    "m_value": ""
                   }],
-                 "m_events": [],
+                 "m_events": [{
+                   "m_eventName": "wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED",
+                   "m_eventClass": "wxListbookEvent",
+                   "m_eventHandler": "wxListbookEventHandler",
+                   "m_functionNameAndSignature": "testCaseBookChanged(wxListbookEvent& event)",
+                   "m_description": "The page selection was changed",
+                   "m_noBody": false
+                  }],
                  "m_children": [{
                    "m_type": 4441,
                    "proportion": 0,

@@ -79,7 +79,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void requestInterrupt(wxCommandEvent& event);
+		virtual void testCaseBookChanged(wxListbookEvent& event);
+		virtual void requestInterrupt(wxCommandEvent& event);
 		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
 		virtual void cmLeftDClick(wxMouseEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
@@ -189,7 +190,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void requestPins(wxCommandEvent& event);
 		virtual void traceTextUpdated(wxCommandEvent& event);
 		virtual void ctrlTestCaseSelected(wxCommandEvent& event);
-		virtual void treebookTestChanged(wxTreebookEvent& event);
 		virtual void openPyCam(wxCommandEvent& event);
 		virtual void moveXToMid(wxCommandEvent& event);
 		virtual void moveYToMid(wxCommandEvent& event);
@@ -454,6 +454,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void waitActive(unsigned int milliseconds, bool once = true);
 		void dispatchNext();
 		void dispatchAll();
+		
+		const char* getCurrentPortName(wxString& ret);
 
 	protected:
  
@@ -612,6 +614,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void createStcEmuControlPopupMenu();
 		
 		int showSetReferencePositionDlg(wxString msg);
+		
+		void decorateSwitchToolOnOff(bool state);
 		
 		///////////////////////////////////////////////////////////////
 		// search handling

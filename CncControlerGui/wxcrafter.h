@@ -806,6 +806,7 @@ protected:
     virtual void signManuallyZSlider(wxCommandEvent& event) { event.Skip(); }
     virtual void moveManuallySliderZ(wxScrollEvent& event) { event.Skip(); }
     virtual void changeManuallySliderZ(wxScrollEvent& event) { event.Skip(); }
+    virtual void testCaseBookChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void selectTestIntervalMode(wxCommandEvent& event) { event.Skip(); }
     virtual void testCountXSpinCtl(wxSpinEvent& event) { event.Skip(); }
     virtual void testCountXUpdated(wxCommandEvent& event) { event.Skip(); }

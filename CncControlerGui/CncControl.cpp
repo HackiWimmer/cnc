@@ -4,6 +4,7 @@
 #include <cfloat>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
+#include <wx/tglbtn.h>
 #include <wx/slider.h>
 #include <wx/dataview.h>
 #include <wx/propgrid/manager.h>
@@ -219,6 +220,9 @@ bool CncControl::setup(bool doReset) {
 	// always reset the map here to definitly reinitianlize the controller
 	resetSetterMap();
 	
+	// init setup
+	processSetter(PID_SEPARATOR, SEPARARTOR_SETUP);
+	
 	if ( serialPort->isConnected() == false ) 
 		return false;
 	
@@ -228,7 +232,7 @@ bool CncControl::setup(bool doReset) {
 			std::cerr << " CncControl::setup: reset controller failed!\n";
 			return false;
 		}
-			
+		
 		// Firmware check
 		std::stringstream ss;
 		processCommand(CMD_PRINT_VERSION, ss);
@@ -237,7 +241,10 @@ bool CncControl::setup(bool doReset) {
 		if ( wxString(FIRMWARE_VERSION) == ss.str().c_str() )	std::clog << " OK" << std::endl;
 		else													cnc::cex1 << " Firmware is possibly not compatible!" << std::endl;
 	}
-
+	
+	// always switch the tool off - safety - but may be already done by reset();
+	switchToolOff(true);
+	
 	// evaluate limit states
 	evaluateLimitState();
 	
@@ -257,8 +264,6 @@ bool CncControl::setup(bool doReset) {
 	
 	// process initial setters
 	std::vector<SetterTuple> setup;
-	setup.push_back(SetterTuple(PID_SEPARATOR, SEPARARTOR_SETUP));
-	
 	setup.push_back(SetterTuple(PID_STEPS_X, cncConfig->getStepsX()));
 	setup.push_back(SetterTuple(PID_STEPS_Y, cncConfig->getStepsY()));
 	setup.push_back(SetterTuple(PID_STEPS_Z, cncConfig->getStepsZ()));
@@ -560,7 +565,7 @@ bool CncControl::reset() {
 	postCtlPosition(PID_XYZ_POS_MAJOR);
 	
 	evaluateLimitState();
-	switchToolOff();
+	switchToolOff(true);
 	
 	return true;
 }
@@ -1248,6 +1253,8 @@ void CncControl::switchToolOn() {
 	if ( powerOn == false ) { 
 		if ( processSetter(PID_TOOL_SWITCH, 1) ) {
 			powerOn = true;
+			if ( GET_GUI_CTL(testToggleTool) )
+				GET_GUI_CTL(testToggleTool)->SetValue(powerOn);
 			setToolState();
 		}
 	}
@@ -1261,6 +1268,8 @@ void CncControl::switchToolOff(bool force) {
 	if ( powerOn == true || force == true ) {
 		if ( processSetter(PID_TOOL_SWITCH, 0) ) {
 			powerOn = false;
+			if ( GET_GUI_CTL(testToggleTool) )
+				GET_GUI_CTL(testToggleTool)->SetValue(powerOn);
 			setToolState();
 		}
 	}

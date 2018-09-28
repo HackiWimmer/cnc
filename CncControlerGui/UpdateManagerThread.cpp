@@ -187,10 +187,13 @@ void UpdateManagerThread::popAndFormatSetterQueue() {
 		
 		if ( pid == PID_SEPARATOR ) {
 			wxString label("Bookmark: Type(<UNKNOWN>)");
+			wxString portName;
+			pHandler->getCurrentPortName(portName);
+			
 			switch ( lste.set.value ) {
-				case SEPARARTOR_SETUP:		label.assign("Bookmark: Type(<SETUP>)"); break;
-				case SEPARARTOR_RESET:		label.assign("Bookmark: Type(<RESET>)"); break;
-				case SEPARARTOR_RUN:		label.assign("Bookmark: Type(<RUN>)");   break;
+				case SEPARARTOR_SETUP:		label.assign(wxString::Format("Bookmark: Type(<SETUP>[%s])", portName)); break;
+				case SEPARARTOR_RESET:		label.assign(wxString::Format("Bookmark: Type(<RESET>[%s])", portName)); break;
+				case SEPARARTOR_RUN:		label.assign(wxString::Format("Bookmark: Type(<RUN>[%s])",   portName)); break;
 			}
 			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		wxString::Format("%ld", lste.set.value));
 			setterRow.updateItem(CncSetterListCtrl::COL_KEY, 		label);

@@ -13,30 +13,33 @@ class CncMotionMonitor;
 class CncZView;
 class CncSpeedView;
 class MainFrame;
+class wxToggleButton;
 
 struct GuiControlSetup {
 	
-	MainFrame* mainFrame			= NULL;
+	MainFrame* mainFrame						= NULL;
 	
-	CncMotionMonitor* motionMonitor	= NULL;
+	CncMotionMonitor* motionMonitor				= NULL;
 	
-	wxTextCtrl* passingTrace		= NULL;
+	wxTextCtrl* passingTrace					= NULL;
 	
-	wxStaticBitmap* heartbeatState	= NULL;
+	wxStaticBitmap* heartbeatState				= NULL;
 	
-	wxStaticBitmap* toolState		= NULL;
-	wxMenuItem* motorState			= NULL;
+	wxStaticBitmap* toolState					= NULL;
+	wxMenuItem* motorState						= NULL;
 	
-	wxStaticText* xMinLimit			= NULL;
-	wxStaticText* xMaxLimit			= NULL;
-	wxStaticText* yMinLimit			= NULL;
-	wxStaticText* yMaxLimit			= NULL;
-	wxStaticText* zMinLimit			= NULL;
-	wxStaticText* zMaxLimit			= NULL;
+	wxStaticText* xMinLimit						= NULL;
+	wxStaticText* xMaxLimit						= NULL;
+	wxStaticText* yMinLimit						= NULL;
+	wxStaticText* yMaxLimit						= NULL;
+	wxStaticText* zMinLimit						= NULL;
+	wxStaticText* zMaxLimit						= NULL;
 	
 	wxDataViewListCtrl* controllerConfig		= NULL;
 	wxDataViewListCtrl* controllerPinReport		= NULL;
 	wxDataViewListCtrl* controllerErrorInfo		= NULL;
+	
+	wxToggleButton* testToggleTool   			= NULL;
 };
 
 #endif

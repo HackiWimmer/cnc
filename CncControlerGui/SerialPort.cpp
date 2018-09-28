@@ -238,7 +238,10 @@ void Serial::setSpyMode(Serial::SypMode sm) {
 ///////////////////////////////////////////////////////////////////
 bool Serial::connect(const char* portName) {
 ///////////////////////////////////////////////////////////////////
-	return SerialOSD::connect(portName);
+	bool ret = SerialOSD::connect(portName);
+	ret == true ? this->portName = portName : this->portName = "";
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::disconnect(void) {
@@ -248,6 +251,8 @@ void Serial::disconnect(void) {
 		SerialOSD::disconnect();
 		isCommandRunning = false;
 	}
+	
+	this->portName = "";
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::purge(void) {
@@ -756,6 +761,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	idx += LONG_BUF_SIZE;
 	
 	int32_t v = ntohl(value);
+	
 	if ( isCommandRunning ) {
 		std::clog << "Serial::processSetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
 		if ( pid < PID_DOUBLE_RANG_START )	std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << v << "]\n";
@@ -767,7 +773,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 		cnc::spy.initializeResult();
 		
 		if ( pid < PID_DOUBLE_RANG_START )	cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << v << "]\n";
-		else								cnc::spy << "Send '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << (double)(v)/DBL_FACT << "]\n";
+		else								cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << (double)(v)/DBL_FACT << "]\n";
 	}
 		
 	if ( writeData(cmd, idx) ) {

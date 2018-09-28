@@ -4753,7 +4753,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_menuRequestor->AppendSeparator();
     
-    m_miRqtSendInterrupt = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Interrupt"), wxT(""), wxITEM_NORMAL);
+    m_miRqtSendInterrupt = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Interrupt"), _("wewe"), wxITEM_NORMAL);
     m_miRqtSendInterrupt->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("weather-lightning (2)")));
     m_menuRequestor->Append(m_miRqtSendInterrupt);
     
@@ -5071,6 +5071,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_signManuallyZSlider->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::signManuallyZSlider), NULL, this);
     m_zManuallySlider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::moveManuallySliderZ), NULL, this);
     m_zManuallySlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeManuallySliderZ), NULL, this);
+    m_testCaseBook->Connect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::testCaseBookChanged), NULL, this);
     m_testIntervalMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Connect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
@@ -5402,6 +5403,7 @@ MainFrameBClass::~MainFrameBClass()
     m_signManuallyZSlider->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::signManuallyZSlider), NULL, this);
     m_zManuallySlider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::moveManuallySliderZ), NULL, this);
     m_zManuallySlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeManuallySliderZ), NULL, this);
+    m_testCaseBook->Disconnect(wxEVT_COMMAND_LISTBOOK_PAGE_CHANGED, wxListbookEventHandler(MainFrameBClass::testCaseBookChanged), NULL, this);
     m_testIntervalMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectTestIntervalMode), NULL, this);
     m_testCountX->Disconnect(wxEVT_SPINCTRL, wxSpinEventHandler(MainFrameBClass::testCountXSpinCtl), NULL, this);
     m_testCountX->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::testCountXUpdated), NULL, this);
