@@ -291,6 +291,7 @@ struct I2CData {
   const unsigned char PID_SPEED_CTRL_RPM                  =  92;
   const unsigned char PID_SPEED_CTRL_SYNTH_SPEED_DELAY    =  94;
   const unsigned char PID_SPEED_CTRL_MAX_SPEED            =  95;
+  const unsigned char PID_SPEED_CTRL_CFG_SPEED            =  96;
   
   const unsigned char PID_PULSE_WIDTH_OFFSET_DIR          = 100;
   const unsigned char PID_PULSE_WIDTH_OFFSET_LOW          = 101;

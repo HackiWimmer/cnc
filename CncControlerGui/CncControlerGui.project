@@ -8,6 +8,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
+    <File Name="SecureRun.h"/>
+    <File Name="SecureRun.cpp"/>
     <VirtualDirectory Name="Clipper">
       <File Name="Clipper/clipper.hpp"/>
       <File Name="Clipper/clipper.cpp"/>

@@ -53,6 +53,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
+#include "SecureRun.h"
 #include "CncNumberFormatter.h"
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
@@ -135,6 +136,110 @@ wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
 
+wxWindow* xxx;
+////////////////////////////////////////////////////////////////////
+class CncRunEventFilter : public wxEventFilter {
+	public:
+		CncRunEventFilter() {
+			wxEvtHandler::AddFilter(this);
+		}
+		virtual ~CncRunEventFilter() {
+			wxEvtHandler::RemoveFilter(this);
+		}
+		
+		virtual int FilterEvent(wxEvent& event) {
+			// Update the last user activity
+			const wxEventType t = event.GetEventType();
+			const wxWindow* wnd = (wxWindow*)event.GetEventObject();
+			
+			return Event_Skip;
+			return Event_Ignore;
+			
+			
+			if( event.GetEventObject()== xxx)
+				return Event_Ignore;
+			
+			if ( t == wxEVT_LEFT_DOWN || t == wxEVT_COMMAND_LEFT_CLICK) {
+				std::cout << event.GetEventObject();
+				if ( event.GetEventObject() != NULL ) {
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetClassName());
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName1());
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName2());
+				}
+				
+				std::cout << std::endl;
+				//return Event_Ignore;
+			}
+			
+			if ( t == wxEVT_SCROLLWIN_THUMBTRACK || t == wxEVT_SCROLL_THUMBTRACK) {
+				std::cout << event.GetEventObject();
+				std::cout << " " << xxx;
+				if ( event.GetEventObject() != NULL ) {
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetClassName());
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName1());
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName2());
+				}
+				
+				std::cout << std::endl;
+				//return Event_Ignore;
+			}
+
+			
+			return Event_Skip;
+			return Event_Ignore;
+			
+			
+			//if ( event.GetEventObject())
+				//std::cout << event.GetEventObject()->GetClassInfo()->GetClassName() << std::endl;
+			
+			
+			//std::cout << t << std::endl;;
+			//if ( wnd && wnd->GetParent() == GBL_CONFIG->getTheApp()->GetLogger() )
+			//return Event_Ignore;
+			
+				if (/*   t ==  wxEVT_SCROLLWIN_TOP
+					|| t == wxEVT_SCROLLWIN_BOTTOM
+					|| t == wxEVT_SCROLLWIN_LINEUP
+					|| t == wxEVT_SCROLLWIN_LINEDOWN
+					|| t == wxEVT_SCROLLWIN_PAGEUP
+					|| t == wxEVT_SCROLLWIN_PAGEDOWN
+					|| t == wxEVT_SCROLLWIN_THUMBTRACK
+					|| t == wxEVT_SCROLLWIN_THUMBRELEASE 
+					
+					   t == wxEVT_COMMAND_LEFT_CLICK
+					|| t == wxEVT_COMMAND_LEFT_DCLICK
+					|| t == wxEVT_COMMAND_RIGHT_CLICK
+					|| t == wxEVT_COMMAND_RIGHT_DCLICK
+					*/
+					 t == wxEVT_COMMAND_SET_FOCUS
+					|| t == wxEVT_COMMAND_KILL_FOCUS
+					|| t == wxEVT_COMMAND_ENTER
+					) {
+						std::cout << "x\n";
+						event.Skip(false);
+						return Event_Processed;
+					}
+		
+			
+			if ( t == wxEVT_MENU ) {
+				std::cout << "x\n";
+				return Event_Ignore;
+			}
+			
+			/*
+			if ( t == wxEVT_KEY_DOWN || t == wxEVT_MOTION ||
+					t == wxEVT_LEFT_DOWN ||
+						t == wxEVT_RIGHT_DOWN ||
+							t == wxEVT_MIDDLE_DOWN )
+			{
+				m_last = wxDateTime::Now();
+			}
+			 * */
+			// Continue processing the event normally as well.
+			return Event_Skip;
+		}
+};
+////////////////////////////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////////////////
 MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
@@ -187,6 +292,10 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 ///////////////////////////////////////////////////////////////////
 	// determine assert handler
 	wxSetDefaultAssertHandler();
+	
+	
+	xxx = m_logger;
+	
 	
 	// init the specialized wxGrid editor
 	CncTextCtrlEditor::init();
@@ -704,7 +813,7 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		return;
 	
 	// give the cnc or serial port a change to do
-	// somethinf periodically e. g. pause a thread
+	// something periodically e. g. pause a thread
 	cnc->onPeriodicallyAppEvent();
 	
 	// pause the update manager thread if nothing more is to do
@@ -724,13 +833,18 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	}
 	
 	// idle handling
+	static unsigned int idleCounter = 0;
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
 		if ( m_connect->IsEnabled() == false )
 			return;
+		idleCounter++;
 		
-		m_serialTimer->Stop();
-		cnc->sendIdleMessage();
-		m_serialTimer->Start();
+		if ( idleCounter%2 == 0 ) {
+			idleCounter = 0;
+			m_serialTimer->Stop();
+			cnc->sendIdleMessage();
+			m_serialTimer->Start();
+		}
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1033,13 +1147,12 @@ void MainFrame::dispatchAll() {
 	evtLoop->YieldFor(wxEVT_CATEGORY_ALL);
 	*/
 	
-	// the following cod is the best compromise, but aui handling isn't perfect
+	// the following code is the best compromise, but aui handling isn't perfect
 	if ( wxTheApp->HasPendingEvents() )
 		wxTheApp->ProcessPendingEvents();
 		
 	while ( evtLoop->Pending() )
 		evtLoop->Dispatch();
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initTemplateEditStyle() {
@@ -1778,7 +1891,7 @@ bool MainFrame::connectSerialPort() {
 		return false;
 	
 	if ( cnc->getSerial()->canProcessIdle() ) {
-		//m_miRqtIdleMessages->Check(true);
+		m_miRqtIdleMessages->Check(true);
 		m_miRqtIdleMessages->Enable(true);
 	}
 	
@@ -3452,6 +3565,12 @@ bool MainFrame::processTemplateWrapper() {
 	wxASSERT(cnc);
 	bool ret = true;
 	
+	CncRunEventFilter cef;
+	
+	// deactivate idle requests
+	bool idleMsgStateBefore = m_miRqtIdleMessages->IsChecked();
+	m_miRqtIdleMessages->Check(false);
+	
 	// it's very import to deactivate the notifications during a run
 	// because instead every config change (sc()) will release a notification
 	// this will be the case for example if the SVG path handler changes
@@ -3495,8 +3614,9 @@ bool MainFrame::processTemplateWrapper() {
 			
 		}
 	} else {
+		// restore idle requests as before
+		m_miRqtIdleMessages->Check(idleMsgStateBefore);
 		std::clog << wxString::Format("%s - Processing finished successfully . . .", wxDateTime::UNow().FormatISOTime()) << std::endl;
-		
 	}
 	
 	cnc->getSerial()->traceSpeedInformation();
@@ -6096,7 +6216,13 @@ void MainFrame::rcRun() {
 	}
 
 	// process
-	processTemplateWrapper();
+	#warning
+	if ( false ) {
+		processTemplateWrapper();
+	} else {
+		SecureRun sr(this);
+		sr.ShowModal();
+	}
 	
 	// restore the interval
 	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);

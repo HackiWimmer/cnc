@@ -2373,4 +2373,27 @@ public:
     virtual ~ImageLibHeartbeat();
 };
 
+
+class SecureRunBase : public wxDialog
+{
+protected:
+    wxPanel* m_panel5254;
+    wxButton* m_btRun;
+    wxButton* m_btPause;
+    wxButton* m_btStop;
+
+protected:
+    virtual void run(wxCommandEvent& event) { event.Skip(); }
+    virtual void pause(wxCommandEvent& event) { event.Skip(); }
+    virtual void stop(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxPanel* GetPanel5254() { return m_panel5254; }
+    wxButton* GetBtRun() { return m_btRun; }
+    wxButton* GetBtPause() { return m_btPause; }
+    wxButton* GetBtStop() { return m_btStop; }
+    SecureRunBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Secure Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxSTAY_ON_TOP|wxRESIZE_BORDER);
+    virtual ~SecureRunBase();
+};
+
 #endif

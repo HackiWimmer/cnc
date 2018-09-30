@@ -204,6 +204,7 @@ void ArduinoPIDs::init() {
 	pids[PID_SPEED_CTRL_TOTAL_OFFSET]         = "Total Speed Offset";
 	pids[PID_SPEED_CTRL_SYNTH_SPEED_DELAY]    = "Synthetically Speed Delay";
 	pids[PID_SPEED_CTRL_MAX_SPEED]            = "Max Speed";
+	pids[PID_SPEED_CTRL_CFG_SPEED]            = "Configured Speed";
 	
 	pids[PID_MAX_DIMENSION_X]                 = "Max Dimension X [Steps]";
 	pids[PID_MAX_DIMENSION_Y]                 = "Max Dimension Y [Steps]";

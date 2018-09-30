@@ -7596,7 +7596,7 @@ Interval [ms]:</label>
                               <flag>wxALL|wxEXPAND</flag>
                               <border>1</border>
                               <object class="wxTextCtrl" name="m_serialSpy">
-                                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+                                <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB</style>
                                 <font>
                                   <size>10</size>
                                   <style>normal</style>
@@ -10684,6 +10684,82 @@ Interval [ms]:</label>
               <style/>
               <label>Auto Run</label>
               <checked>1</checked>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxDialog" name="SecureRunBase">
+    <title>Secure Run</title>
+    <centered>1</centered>
+    <style>wxSTAY_ON_TOP|wxRESIZE_BORDER</style>
+    <size>500,300</size>
+    <object class="wxFlexGridSizer">
+      <minsize>500,300</minsize>
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>1</growablerows>
+      <object class="sizeritem" name="flexGridSizer5250">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>0</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <minsize>-1,16</minsize>
+            <object class="wxPanel" name="m_panel5254">
+              <style>wxTAB_TRAVERSAL</style>
+              <size>-1,16</size>
+              <bg>#0000FF</bg>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer5255">
+        <flag>wxALL</flag>
+        <border>5</border>
+        <object class="wxFlexGridSizer">
+          <cols>3</cols>
+          <rows>0</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0,1,2</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <minsize>200,60</minsize>
+            <object class="wxButton" name="m_btRun">
+              <label>run</label>
+              <style/>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <object class="wxButton" name="m_btPause">
+              <label>Pause</label>
+              <style/>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <object class="wxButton" name="m_btStop">
+              <label>Stop</label>
+              <style/>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
             </object>
           </object>
         </object>

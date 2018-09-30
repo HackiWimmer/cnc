@@ -169,6 +169,32 @@ class MainApp : public wxApp {
 				;//delete globalFileConfig;
 		}
 		
+		
+		virtual int FilterEvent(wxEvent& event) {
+			// Update the last user activity
+			const wxEventType t = event.GetEventType();
+			const wxWindow* wnd = (wxWindow*)event.GetEventObject();
+			
+			
+			if ( t == wxEVT_COMMAND_LEFT_CLICK ) {
+				//wxMouseEvent ev = (wxMouseEvent*)event;
+				//if ( event.Dragging() )
+				//	return Event_Ignore;
+			}
+			
+			if ( t == wxEVT_SCROLLWIN_THUMBTRACK || t == wxEVT_SCROLL_THUMBTRACK) {
+				std::cout << event.GetEventObject();
+				if ( event.GetEventObject() != NULL ) {
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetClassName());
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName1());
+					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName2());
+				}
+				
+				std::cout << std::endl;
+				return Event_Ignore;
+			}
+			return Event_Skip;
+		}
 		///////////////////////////////////////////////////////////////////
 		void printUsage(wxCmdLineParser& parser) {
 		//////////////////////////////////////////////////////////////////

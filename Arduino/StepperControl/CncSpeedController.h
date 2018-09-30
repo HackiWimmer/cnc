@@ -52,6 +52,12 @@ class CncSpeedController {
       , speedConfigured(false)
       {}
 
+      Axis(const Axis& a)
+      : axis(a.axis)
+      , initialized(a.initialized)
+      , speedConfigured(a.speedConfigured)
+      {}
+
       //////////////////////////////////////////////////////////////////
       bool isInitialized()     const { return initialized;     }
       bool isSpeedConfigured() const { return speedConfigured; }
@@ -93,7 +99,7 @@ class CncSpeedController {
         
         return speedConfigured;
       }
-      
+
       //////////////////////////////////////////////////////////////////
       #ifdef SKETCH_COMPILE
         void printConfig() {
@@ -162,7 +168,7 @@ class CncSpeedController {
   public:
     
     Axis X, Y, Z;
-    
+
     //////////////////////////////////////////////////////////////////
     CncSpeedController()
     : initialized(false)
@@ -251,13 +257,15 @@ class CncSpeedController {
 
           PRINT_PARAMETER(PID_SPEED_CTRL_INITIALIZED,       isInitialized())
           PRINT_PARAMETER(PID_SPEED_CTRL_MAX_SPEED,         getMaxFeedSpeed_MM_MIN())
+          PRINT_PARAMETER(PID_SPEED_CTRL_CFG_SPEED,         getConfiguredFeedSpeed_MM_MIN())
         
           X.printConfig();
           Y.printConfig();
-          Z.printConfig();   
-      
+          Z.printConfig();        
+  
         #undef PRINT_PARAMETER    
       }
+      
     #endif 
 
     //////////////////////////////////////////////////////////////////

@@ -397,6 +397,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initialize(void);
 		
 		//////////////////////////////////////////////////////////////////////////////////
+		bool secureRun() { return processTemplateWrapper(); }
+		
+		//////////////////////////////////////////////////////////////////////////////////
 		// global trace controls
 		wxTextCtrl* getLogger() 				{ return m_logger; }
 		wxTextCtrl* getTrace() 					{ return m_tmpTraceInfo; }

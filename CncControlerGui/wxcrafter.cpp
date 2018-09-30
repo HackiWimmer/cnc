@@ -4298,7 +4298,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer4740->AddGrowableRow(0);
     m_splitterPage4732->SetSizer(flexGridSizer4740);
     
-    m_serialSpy = new wxTextCtrl(m_splitterPage4732, wxID_ANY, wxT("Only a placeholder;Dont install any events similar the drawPane3D"), wxDefaultPosition, wxDLG_UNIT(m_splitterPage4732, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
+    m_serialSpy = new wxTextCtrl(m_splitterPage4732, wxID_ANY, wxT("Only a placeholder;Dont install any events similar the drawPane3D"), wxDefaultPosition, wxDLG_UNIT(m_splitterPage4732, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB);
     wxFont m_serialSpyFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_serialSpy->SetFont(m_serialSpyFont);
     
@@ -4355,7 +4355,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxUnusedVar(m_debuggerPropertyManagerGridArr);
     wxArrayInt m_debuggerPropertyManagerGridIntArr;
     wxUnusedVar(m_debuggerPropertyManagerGridIntArr);
-    m_debuggerPropertyManagerGrid = new wxPropertyGridManager(m_debuggerView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_debuggerView, wxSize(-1,-1)), wxPG_TOOLBAR|wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED);
+    m_debuggerPropertyManagerGrid = new wxPropertyGridManager(m_debuggerView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_debuggerView, wxSize(-1,-1)), wxPG_TOOLBAR|wxPG_SPLITTER_AUTO_CENTER|wxPG_BOLD_MODIFIED|wxHSCROLL|wxVSCROLL);
     
     flexGridSizer4502->Add(m_debuggerPropertyManagerGrid, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -9294,4 +9294,92 @@ ImageLibHeartbeat::ImageLibHeartbeat()
 
 ImageLibHeartbeat::~ImageLibHeartbeat()
 {
+}
+
+SecureRunBase::SecureRunBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer5246 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5246->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5246->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5246->AddGrowableCol(0);
+    flexGridSizer5246->AddGrowableRow(1);
+    flexGridSizer5246->SetMinSize(500,300);
+    this->SetSizer(flexGridSizer5246);
+    
+    wxFlexGridSizer* flexGridSizer5250 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer5250->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5250->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5250->AddGrowableCol(0);
+    flexGridSizer5250->AddGrowableRow(0);
+    
+    flexGridSizer5246->Add(flexGridSizer5250, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panel5254 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,16)), wxTAB_TRAVERSAL);
+    m_panel5254->SetBackgroundColour(wxColour(wxT("rgb(0,0,255)")));
+    
+    flexGridSizer5250->Add(m_panel5254, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_panel5254->SetMinSize(wxSize(-1,16));
+    
+    wxFlexGridSizer* flexGridSizer5255 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer5255->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5255->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5255->AddGrowableCol(0);
+    flexGridSizer5255->AddGrowableCol(1);
+    flexGridSizer5255->AddGrowableCol(2);
+    flexGridSizer5255->AddGrowableRow(0);
+    
+    flexGridSizer5246->Add(flexGridSizer5255, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btRun = new wxButton(this, wxID_ANY, _("run"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer5255->Add(m_btRun, 0, wxALL, WXC_FROM_DIP(0));
+    m_btRun->SetMinSize(wxSize(200,60));
+    
+    m_btPause = new wxButton(this, wxID_ANY, _("Pause"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer5255->Add(m_btPause, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_btStop = new wxButton(this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    
+    flexGridSizer5255->Add(m_btStop, 0, wxALL, WXC_FROM_DIP(0));
+    
+    SetName(wxT("SecureRunBase"));
+    SetMinClientSize(wxSize(500,300));
+    SetSize(500,300);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    m_btRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::run), NULL, this);
+    m_btPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::pause), NULL, this);
+    m_btStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
+    
+}
+
+SecureRunBase::~SecureRunBase()
+{
+    m_btRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::run), NULL, this);
+    m_btPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::pause), NULL, this);
+    m_btStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
+    
 }

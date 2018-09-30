@@ -123,16 +123,7 @@ inline unsigned char evaluateGetter(unsigned char pid) {
   switch ( pid ) {
     // processGetter() ............................................
     case PID_QUERY_READY_TO_RUN:      writeGetterListValue(PID_QUERY_READY_TO_RUN, isReadyToRun());
-        /*                              break;
-    // processGetter() ............................................
-    case PID_SPEED_OFFSET_X:          writeGetterListValue(PID_SPEED_OFFSET_X, controller.getPerStepSpeedOffsetX());
                                       break;
-    // processGetter() ............................................
-    case PID_SPEED_OFFSET_Y:          writeGetterListValue(PID_SPEED_OFFSET_Y, controller.getPerStepSpeedOffsetY());
-                                      break;
-    // processGetter() ............................................
-    case PID_SPEED_OFFSET_Z:          writeGetterListValue(PID_SPEED_OFFSET_Z, controller.getPerStepSpeedOffsetZ());
-                 */                     break;
     // processGetter() ............................................
     case PID_STEPS_X:                 writeGetterListValue(PID_STEPS_X, controller.getStepperX()->getSteps());
                                       break;
