@@ -9,16 +9,25 @@ class SecureRun : public SecureRunBase
 		SecureRun(MainFrame* parent);
 		virtual ~SecureRun();
 		
-		void interrupt();
+		void enableControls(bool state);
 		
 	protected:
-		virtual void stop(wxCommandEvent& event);
-		virtual void run(wxCommandEvent& event);
-		virtual void pause(wxCommandEvent& event);
+		virtual void blinkTimer(wxTimerEvent& event);
+		virtual void startupTimer(wxTimerEvent& event);
 		
-		void updateButtonState();
+		virtual void initDialog(wxInitDialogEvent& event);
+		
+		virtual void show(wxShowEvent& event);
+		
+		virtual void play(wxCommandEvent& event);
+		virtual void emergengy(wxCommandEvent& event);
+		virtual void stop(wxCommandEvent& event);
 		
 	private:
 		MainFrame* parentFrame;
+		bool       isPause;
+		bool       headerFlag;
+		
+		void hideDialog();
 };
 #endif // SECURERUN_H

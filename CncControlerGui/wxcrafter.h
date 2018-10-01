@@ -1939,6 +1939,47 @@ public:
 };
 
 
+class SecureRunBase : public wxDialog
+{
+protected:
+    wxTimer* m_startupTimer;
+    wxTimer* m_blinkTimer;
+    wxPanel* m_header;
+    wxStaticLine* m_staticLine527312;
+    wxStaticText* m_staticText5271;
+    wxStaticLine* m_staticLine52731;
+    wxButton* m_btPlay;
+    wxButton* m_btStop;
+    wxStaticLine* m_staticLine52733;
+    wxButton* m_btEmergengy;
+    wxStaticLine* m_staticLine5273;
+
+protected:
+    virtual void initDialog(wxInitDialogEvent& event) { event.Skip(); }
+    virtual void show(wxShowEvent& event) { event.Skip(); }
+    virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void blinkTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void play(wxCommandEvent& event) { event.Skip(); }
+    virtual void stop(wxCommandEvent& event) { event.Skip(); }
+    virtual void emergengy(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxTimer* GetStartupTimer() { return m_startupTimer; }
+    wxTimer* GetBlinkTimer() { return m_blinkTimer; }
+    wxPanel* GetHeader() { return m_header; }
+    wxStaticLine* GetStaticLine527312() { return m_staticLine527312; }
+    wxStaticText* GetStaticText5271() { return m_staticText5271; }
+    wxStaticLine* GetStaticLine52731() { return m_staticLine52731; }
+    wxButton* GetBtPlay() { return m_btPlay; }
+    wxButton* GetBtStop() { return m_btStop; }
+    wxStaticLine* GetStaticLine52733() { return m_staticLine52733; }
+    wxButton* GetBtEmergengy() { return m_btEmergengy; }
+    wxStaticLine* GetStaticLine5273() { return m_staticLine5273; }
+    SecureRunBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Secure Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP);
+    virtual ~SecureRunBase();
+};
+
+
 class ImageLib16 : public wxImageList
 {
 protected:
@@ -2374,26 +2415,32 @@ public:
 };
 
 
-class SecureRunBase : public wxDialog
+class ImageLibSecureRun : public wxImageList
 {
 protected:
-    wxPanel* m_panel5254;
-    wxButton* m_btRun;
-    wxButton* m_btPause;
-    wxButton* m_btStop;
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
 
 protected:
-    virtual void run(wxCommandEvent& event) { event.Skip(); }
-    virtual void pause(wxCommandEvent& event) { event.Skip(); }
-    virtual void stop(wxCommandEvent& event) { event.Skip(); }
 
 public:
-    wxPanel* GetPanel5254() { return m_panel5254; }
-    wxButton* GetBtRun() { return m_btRun; }
-    wxButton* GetBtPause() { return m_btPause; }
-    wxButton* GetBtStop() { return m_btStop; }
-    SecureRunBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Secure Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxSTAY_ON_TOP|wxRESIZE_BORDER);
-    virtual ~SecureRunBase();
+    ImageLibSecureRun();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibSecureRun();
 };
 
 #endif

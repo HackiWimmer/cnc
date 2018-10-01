@@ -7520,6 +7520,145 @@ UnitTestsBase::~UnitTestsBase()
 
 }
 
+SecureRunBase::SecureRunBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    m_startupTimer = new wxTimer;
+    m_startupTimer->Start(100, false);
+    
+    m_blinkTimer = new wxTimer;
+    m_blinkTimer->Start(750, false);
+    
+    wxBoxSizer* boxSizer5282 = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(boxSizer5282);
+    
+    wxBoxSizer* boxSizer5289 = new wxBoxSizer(wxVERTICAL);
+    
+    boxSizer5282->Add(boxSizer5289, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_header = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(460,16)), wxTAB_TRAVERSAL);
+    m_header->SetBackgroundColour(wxColour(wxT("rgb(0,0,255)")));
+    
+    boxSizer5289->Add(m_header, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_header->SetMinSize(wxSize(460,16));
+    
+    wxFlexGridSizer* flexGridSizer5294 = new wxFlexGridSizer(1, 11, 0, 0);
+    flexGridSizer5294->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5294->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    boxSizer5282->Add(flexGridSizer5294, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticLine527312 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL|wxLI_HORIZONTAL);
+    
+    flexGridSizer5294->Add(m_staticLine527312, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText5271 = new wxStaticText(this, wxID_ANY, _("Secure Run\nPanel"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5271Font(14, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
+    m_staticText5271->SetFont(m_staticText5271Font);
+    
+    flexGridSizer5294->Add(m_staticText5271, 0, wxALL|wxEXPAND, WXC_FROM_DIP(16));
+    
+    m_staticLine52731 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL|wxLI_HORIZONTAL);
+    
+    flexGridSizer5294->Add(m_staticLine52731, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_btPlay = new wxButton(this, wxID_ANY, _("Pause"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(90,90)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btPlay->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("secureRunPause")), wxBOTTOM);
+    m_btPlay->SetBitmapMargins(0,0);
+    #endif
+    m_btPlay->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVEBORDER));
+    wxFont m_btPlayFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btPlay->SetFont(m_btPlayFont);
+    m_btPlay->SetToolTip(_("Pause Current Run"));
+    
+    flexGridSizer5294->Add(m_btPlay, 0, wxALL, WXC_FROM_DIP(0));
+    m_btPlay->SetMinSize(wxSize(90,90));
+    
+    m_btStop = new wxButton(this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(90,90)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btStop->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("secureRunStop")), wxBOTTOM);
+    m_btStop->SetBitmapMargins(0,0);
+    #endif
+    m_btStop->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE));
+    wxFont m_btStopFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btStop->SetFont(m_btStopFont);
+    m_btStop->SetToolTip(_("Stop Current Run"));
+    
+    flexGridSizer5294->Add(m_btStop, 0, wxALL, WXC_FROM_DIP(0));
+    m_btStop->SetMinSize(wxSize(90,90));
+    
+    flexGridSizer5294->Add(16, 90, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticLine52733 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL|wxLI_HORIZONTAL);
+    
+    flexGridSizer5294->Add(m_staticLine52733, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    flexGridSizer5294->Add(8, 90, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_btEmergengy = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(90,90)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btEmergengy->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("emergengy-button-klein")), wxLEFT);
+    m_btEmergengy->SetBitmapMargins(0,0);
+    #endif
+    m_btEmergengy->SetBackgroundColour(wxColour(wxT("rgb(255,223,223)")));
+    m_btEmergengy->SetToolTip(_("Emergengy Button"));
+    
+    flexGridSizer5294->Add(m_btEmergengy, 0, wxALL, WXC_FROM_DIP(0));
+    m_btEmergengy->SetMinSize(wxSize(90,90));
+    
+    flexGridSizer5294->Add(8, 90, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticLine5273 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL|wxLI_HORIZONTAL);
+    
+    flexGridSizer5294->Add(m_staticLine5273, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    SetName(wxT("SecureRunBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxVERTICAL);
+    } else {
+        CentreOnScreen(wxVERTICAL);
+    }
+    // Connect events
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(SecureRunBase::initDialog), NULL, this);
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(SecureRunBase::show), NULL, this);
+    m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::startupTimer), NULL, this);
+    m_blinkTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::blinkTimer), NULL, this);
+    m_btPlay->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::play), NULL, this);
+    m_btStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
+    m_btEmergengy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::emergengy), NULL, this);
+    
+}
+
+SecureRunBase::~SecureRunBase()
+{
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(SecureRunBase::initDialog), NULL, this);
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(SecureRunBase::show), NULL, this);
+    m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::startupTimer), NULL, this);
+    m_blinkTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::blinkTimer), NULL, this);
+    m_btPlay->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::play), NULL, this);
+    m_btStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
+    m_btEmergengy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::emergengy), NULL, this);
+    
+    m_startupTimer->Stop();
+    wxDELETE( m_startupTimer );
+
+    m_blinkTimer->Stop();
+    wxDELETE( m_blinkTimer );
+
+}
+
 ImageLib16::ImageLib16()
     : wxImageList(16, 16, true)
     , m_imagesWidth(16)
@@ -9296,8 +9435,10 @@ ImageLibHeartbeat::~ImageLibHeartbeat()
 {
 }
 
-SecureRunBase::SecureRunBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-    : wxDialog(parent, id, title, pos, size, style)
+ImageLibSecureRun::ImageLibSecureRun()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
 {
     if ( !bBitmapLoaded ) {
         // We need to initialise the default bitmap handler
@@ -9306,80 +9447,34 @@ SecureRunBase::SecureRunBase(wxWindow* parent, wxWindowID id, const wxString& ti
         bBitmapLoaded = true;
     }
     
-    wxFlexGridSizer* flexGridSizer5246 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5246->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5246->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5246->AddGrowableCol(0);
-    flexGridSizer5246->AddGrowableRow(1);
-    flexGridSizer5246->SetMinSize(500,300);
-    this->SetSizer(flexGridSizer5246);
-    
-    wxFlexGridSizer* flexGridSizer5250 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer5250->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5250->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5250->AddGrowableCol(0);
-    flexGridSizer5250->AddGrowableRow(0);
-    
-    flexGridSizer5246->Add(flexGridSizer5250, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_panel5254 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,16)), wxTAB_TRAVERSAL);
-    m_panel5254->SetBackgroundColour(wxColour(wxT("rgb(0,0,255)")));
-    
-    flexGridSizer5250->Add(m_panel5254, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_panel5254->SetMinSize(wxSize(-1,16));
-    
-    wxFlexGridSizer* flexGridSizer5255 = new wxFlexGridSizer(0, 3, 0, 0);
-    flexGridSizer5255->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5255->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5255->AddGrowableCol(0);
-    flexGridSizer5255->AddGrowableCol(1);
-    flexGridSizer5255->AddGrowableCol(2);
-    flexGridSizer5255->AddGrowableRow(0);
-    
-    flexGridSizer5246->Add(flexGridSizer5255, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btRun = new wxButton(this, wxID_ANY, _("run"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    flexGridSizer5255->Add(m_btRun, 0, wxALL, WXC_FROM_DIP(0));
-    m_btRun->SetMinSize(wxSize(200,60));
-    
-    m_btPause = new wxButton(this, wxID_ANY, _("Pause"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    flexGridSizer5255->Add(m_btPause, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_btStop = new wxButton(this, wxID_ANY, _("Stop"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    
-    flexGridSizer5255->Add(m_btStop, 0, wxALL, WXC_FROM_DIP(0));
-    
-    SetName(wxT("SecureRunBase"));
-    SetMinClientSize(wxSize(500,300));
-    SetSize(500,300);
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_RUN"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_RUN"), bmp));
+        }
     }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
-    } else {
-        CentreOnScreen(wxBOTH);
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_PAUSE"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_PAUSE"), bmp));
+        }
     }
-#if wxVERSION_NUMBER >= 2900
-    if(!wxPersistenceManager::Get().Find(this)) {
-        wxPersistenceManager::Get().RegisterAndRestore(this);
-    } else {
-        wxPersistenceManager::Get().Restore(this);
-    }
-#endif
-    // Connect events
-    m_btRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::run), NULL, this);
-    m_btPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::pause), NULL, this);
-    m_btStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
     
 }
 
-SecureRunBase::~SecureRunBase()
+ImageLibSecureRun::~ImageLibSecureRun()
 {
-    m_btRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::run), NULL, this);
-    m_btPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::pause), NULL, this);
-    m_btStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
-    
 }

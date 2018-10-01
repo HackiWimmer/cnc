@@ -143,6 +143,7 @@
   <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
+  <object class="wxBitmap" name="BMP_PAUSE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\secureRunPause.png</object>
   <object class="wxBitmap" name="BMP_PID_DETAIL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="BMP_PID_MAJOR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-password (2).png</object>
   <object class="wxBitmap" name="BMP_PLAY_3D">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-executable.png</object>
@@ -163,6 +164,7 @@
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_PS_UNKNOWN@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\feed.png</object>
+  <object class="wxBitmap" name="BMP_RUN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\secureRun.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\goto (2).png</object>
   <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\arrow-right-3.png</object>
   <object class="wxBitmap" name="BMP_SEPARATOR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\messagebox_info.png</object>
@@ -258,6 +260,7 @@
   <object class="wxBitmap" name="draw-vector">bitmaps\draw-vector.png</object>
   <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
   <object class="wxBitmap" name="edit-rename">bitmaps\edit-rename.png</object>
+  <object class="wxBitmap" name="emergengy-button-klein">bitmaps\emergengy-button-klein.png</object>
   <object class="wxBitmap" name="enumerator">bitmaps\enumerator.png</object>
   <object class="wxBitmap" name="error">bitmaps\error.png</object>
   <object class="wxBitmap" name="executable">bitmaps\executable.png</object>
@@ -287,6 +290,8 @@
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
   <object class="wxBitmap" name="roll">bitmaps\roll.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
+  <object class="wxBitmap" name="secureRunPause">bitmaps\secureRunPause.png</object>
+  <object class="wxBitmap" name="secureRunStop">bitmaps\secureRunStop.png</object>
   <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
   <object class="wxBitmap" name="software-update-available-3 (2)">bitmaps\software-update-available-3 (2).png</object>

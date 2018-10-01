@@ -53,7 +53,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
-#include "SecureRun.h"
 #include "CncNumberFormatter.h"
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
@@ -73,6 +72,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "UnitTestFrame.h"
 #include "UpdateManagerThread.h"
 #include "CncConfigProperty.h"
+#include "SecureRun.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -136,7 +136,6 @@ wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
 
-wxWindow* xxx;
 ////////////////////////////////////////////////////////////////////
 class CncRunEventFilter : public wxEventFilter {
 	public:
@@ -149,94 +148,11 @@ class CncRunEventFilter : public wxEventFilter {
 		
 		virtual int FilterEvent(wxEvent& event) {
 			// Update the last user activity
-			const wxEventType t = event.GetEventType();
-			const wxWindow* wnd = (wxWindow*)event.GetEventObject();
+			//const wxEventType t = event.GetEventType();
+			//const wxWindow* wnd = (wxWindow*)event.GetEventObject();
 			
 			return Event_Skip;
-			return Event_Ignore;
-			
-			
-			if( event.GetEventObject()== xxx)
-				return Event_Ignore;
-			
-			if ( t == wxEVT_LEFT_DOWN || t == wxEVT_COMMAND_LEFT_CLICK) {
-				std::cout << event.GetEventObject();
-				if ( event.GetEventObject() != NULL ) {
-					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetClassName());
-					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName1());
-					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName2());
-				}
-				
-				std::cout << std::endl;
-				//return Event_Ignore;
-			}
-			
-			if ( t == wxEVT_SCROLLWIN_THUMBTRACK || t == wxEVT_SCROLL_THUMBTRACK) {
-				std::cout << event.GetEventObject();
-				std::cout << " " << xxx;
-				if ( event.GetEventObject() != NULL ) {
-					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetClassName());
-					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName1());
-					std::cout << " " << wxString(event.GetEventObject()->GetClassInfo()->GetBaseClassName2());
-				}
-				
-				std::cout << std::endl;
-				//return Event_Ignore;
-			}
-
-			
-			return Event_Skip;
-			return Event_Ignore;
-			
-			
-			//if ( event.GetEventObject())
-				//std::cout << event.GetEventObject()->GetClassInfo()->GetClassName() << std::endl;
-			
-			
-			//std::cout << t << std::endl;;
-			//if ( wnd && wnd->GetParent() == GBL_CONFIG->getTheApp()->GetLogger() )
 			//return Event_Ignore;
-			
-				if (/*   t ==  wxEVT_SCROLLWIN_TOP
-					|| t == wxEVT_SCROLLWIN_BOTTOM
-					|| t == wxEVT_SCROLLWIN_LINEUP
-					|| t == wxEVT_SCROLLWIN_LINEDOWN
-					|| t == wxEVT_SCROLLWIN_PAGEUP
-					|| t == wxEVT_SCROLLWIN_PAGEDOWN
-					|| t == wxEVT_SCROLLWIN_THUMBTRACK
-					|| t == wxEVT_SCROLLWIN_THUMBRELEASE 
-					
-					   t == wxEVT_COMMAND_LEFT_CLICK
-					|| t == wxEVT_COMMAND_LEFT_DCLICK
-					|| t == wxEVT_COMMAND_RIGHT_CLICK
-					|| t == wxEVT_COMMAND_RIGHT_DCLICK
-					*/
-					 t == wxEVT_COMMAND_SET_FOCUS
-					|| t == wxEVT_COMMAND_KILL_FOCUS
-					|| t == wxEVT_COMMAND_ENTER
-					) {
-						std::cout << "x\n";
-						event.Skip(false);
-						return Event_Processed;
-					}
-		
-			
-			if ( t == wxEVT_MENU ) {
-				std::cout << "x\n";
-				return Event_Ignore;
-			}
-			
-			/*
-			if ( t == wxEVT_KEY_DOWN || t == wxEVT_MOTION ||
-					t == wxEVT_LEFT_DOWN ||
-						t == wxEVT_RIGHT_DOWN ||
-							t == wxEVT_MIDDLE_DOWN )
-			{
-				m_last = wxDateTime::Now();
-			}
-			 * */
-			// Continue processing the event normally as well.
-			return Event_Skip;
 		}
 };
 ////////////////////////////////////////////////////////////////////
@@ -288,14 +204,11 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , inboundFileParser(NULL)
 , perspectiveTimer(this, wxEVT_PERSPECTIVE_TIMER)
 , debugUserNotificationTime(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
+, secureRunDlg(new SecureRun(this))
 {
 ///////////////////////////////////////////////////////////////////
 	// determine assert handler
 	wxSetDefaultAssertHandler();
-	
-	
-	xxx = m_logger;
-	
 	
 	// init the specialized wxGrid editor
 	CncTextCtrlEditor::init();
@@ -371,6 +284,9 @@ MainFrame::~MainFrame() {
 
 	wxASSERT(guiCtlSetup);
 	delete guiCtlSetup;
+	
+	wxASSERT(secureRunDlg);
+	delete secureRunDlg;
 	
 	wxASSERT(outboundNbInfo);
 	delete outboundNbInfo;
@@ -2091,7 +2007,9 @@ int MainFrame::showSetReferencePositionDlg(wxString msg) {
 				        wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
 	dlg.SetYesNoCancelLabels("Set with workpiece thickness ", "Set without workpiece thickness", "Do it later . . . ");
 	
+	secureRunDlg->enableControls(false);
 	int ret = dlg.ShowModal();
+	secureRunDlg->enableControls(true);
 	switch ( ret ) {
 		case  wxID_YES:  	m_includingWpt->SetValue(true);
 							selectMainBookReferencePanel();
@@ -6216,12 +6134,14 @@ void MainFrame::rcRun() {
 	}
 
 	// process
-	#warning
-	if ( false ) {
-		processTemplateWrapper();
+	const bool USE_SECURE_RUN_DLG = true;
+	if ( USE_SECURE_RUN_DLG == true && isDebugMode == false ) {
+		wxASSERT(secureRunDlg);
+		if ( secureRunDlg->IsShown() )
+			secureRunDlg->Show(false);
+		secureRunDlg->ShowModal();
 	} else {
-		SecureRun sr(this);
-		sr.ShowModal();
+		processTemplateWrapper();
 	}
 	
 	// restore the interval

@@ -31,6 +31,7 @@ class CncFilePreviewWnd;
 class CncFilePreview;
 class wxMenu;
 class wxMenuItem;
+class SecureRun;
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -532,6 +533,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxTimer debugUserNotificationTime;
 		
 		GuiControls	guiControls;
+		
+		SecureRun* secureRunDlg;
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
 		
