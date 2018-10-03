@@ -9,11 +9,13 @@
 
 struct LastCommand {
 	unsigned char cmd 		= CMD_INVALID;
+	unsigned char ret       = RET_ERROR;
 	unsigned int index 		= 0;
 		
 	void restLastCmd() {
 		Serial.reset();
 		cmd 				= CMD_INVALID;
+		ret 				= RET_ERROR;
 		index 				= 0;
 	}
 
@@ -183,13 +185,17 @@ class SerialEmulatorNULL : public SerialSpyPort
 		CncLongPosition curEmulatorPos;
 		
 		inline bool writeMoveCmd(unsigned char *buffer, unsigned int nbByte);
+		
+		inline bool moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte);
 		inline bool renderMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte);
 		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force=false);
 		
 		inline void reset();
 		inline void resetErrorInfo();
 		inline void resetCounter();
-		inline bool stepAxis(char axis, int32_t dist);
+		inline unsigned char stepAxis(char axis, int32_t dist);
+		
+		inline bool translateStepAxisRetValue(unsigned char ret);
 		
 		void resetPositionCounter();
 		void resetStepCounter();
@@ -236,7 +242,9 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual bool evaluatePositions(std::vector<int32_t>& ret);
 		virtual bool evaluateLimitStates(std::vector<int32_t>& ret);
 		virtual bool evaluateLimitStates();
-
+		
+		virtual void adjustAppPostionAfterMoveUntilSignal(CncLongPosition& appPos);
+		
 		// position movement counting
 		void incPosistionCounter();
 		void incStepCounterX(int32_t dx);

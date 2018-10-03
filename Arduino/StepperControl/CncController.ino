@@ -411,6 +411,7 @@ bool CncController::observeToolState() {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( isProbeMode() == OFF ) {
 /*
+ * TODO
     if ( digitalRead(PIN_TOOL_FEEDBACK) == TOOL_STATE_OFF ) {
       errorInfo->setNextErrorInfo(E_TOOL_NOT_ENALED);
       return false;
@@ -421,7 +422,7 @@ bool CncController::observeToolState() {
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncController::observeSerialFrontByte() {
+bool CncController::observeSerialFrontByte(unsigned char& retValue) {
 /////////////////////////////////////////////////////////////////////////////////////
   unsigned char serialFrontByte = CMD_INVALID;
   
@@ -434,6 +435,7 @@ bool CncController::observeSerialFrontByte() {
                   broadcastInterrupt();
   
                   // Signalize an error
+                  retValue = RET_INTERRUPT;
                   return false;
   
       case SIG_HALT:
@@ -445,14 +447,24 @@ bool CncController::observeSerialFrontByte() {
                   //  - Returning true here stopps the current move (while loop), so far so good, but the current run cycle 
                   //    continue with the next existing move command which is not the meaning of HALT.
                   broadcastHalt();
+                  
+                  retValue = RET_HALT;
                   return false;
                   
+      case SIG_QUIT_MOVE:
+                  // remove the signal from serial
+                  Serial.read();
+                  
+                  retValue = RET_QUIT;
+                  return false; 
+
       case SIG_PAUSE:
                   // remove the signal from serial
                   Serial.read();
                   pause = PAUSE_ACTIVE;
                   
                    // Don't return here - see the pause handling below
+                   
                   break;
   
       case SIG_RESUME:
@@ -487,7 +499,8 @@ bool CncController::observeSerialFrontByte() {
      pause = PAUSE_INACTIVE;
      broadcastPause(pause);
   }
- 
+  
+  retValue = RET_OK;
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -534,32 +547,36 @@ void CncController::sendCurrentPositions(unsigned char pid, bool force) {
   }
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncController::stepAxisXYZ() {  
+unsigned char CncController::stepAxisXYZ() {  
 /////////////////////////////////////////////////////////////////////////////////////
   typedef RenderStruct RS;
+
+  // if stepAxisXYZ() is called from renderAndStepAxisXYZ - normal processing -
+  // RS conatins dx, dy and dz with in range [-1, 0, +1] only
    
   // avoid empty processing
   if ( RS::empty() )
-    return true;
+    return RET_OK;
 
   // speed up the performance and observate in intervalls
-  if ( positionCounter%16 == 0 ) {
-
-    if ( observeSerialFrontByte() == false )
-      return false;
+  // blind flying: e.g. 16 * 0,015 (12 mm / 800 steps) = 0,24 mm
+  if ( positionCounter%1 == 0 ) {
+    unsigned char retValue;
+    if ( observeSerialFrontByte(retValue) == false )
+      return retValue;
 
     if ( observeEnablePin() == false )
-      return false;
+      return RET_ERROR;
   
     if ( observeToolState() == false )
-      return false;
+      return RET_ERROR;
   }
   
   incPositionCounter();
 
   if ( RS::dx() != 0) {
     if ( X->performNextStep() == false )
-      return false;
+      return RET_ERROR;
 
     RS::xStepCount++;
 
@@ -569,18 +586,17 @@ bool CncController::stepAxisXYZ() {
   
   if ( RS::dy() != 0 ) {
     if ( Y->performNextStep() == false )
-      return false;
+      return RET_ERROR;
       
     RS::yStepCount++;
     
     if ( RS::yDelay > 0 )
       delayMicroseconds(RS::yDelay);
-      
   }
     
   if ( RS::dz() != 0 ) {
     if ( Z->performNextStep() == false )
-      return false;
+      return RET_ERROR;
       
     RS::zStepCount++;
     
@@ -591,14 +607,14 @@ bool CncController::stepAxisXYZ() {
   sendCurrentPositions(PID_XYZ_POS_DETAIL, false);  
   RS::swap();
       
-  return true;
+  return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
+unsigned char CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
   // avoid empty processing
   if ( dx == 0 && dy == 0 && dz == 0 ) 
-    return true;
+    return RET_OK;
 
   //const unsigned long tsStart = micros();
   const unsigned long tsStart = speedController.getTimeStamp();
@@ -608,7 +624,7 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
   
   // initialize
   int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
-  bool ret = false;
+  unsigned char ret = RET_ERROR;
 
   x_inc = (dx < 0) ? -1 : 1;
   l     = absolute<int32_t>(dx);
@@ -628,13 +644,13 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
   // because the directions didn't switch during a call of
   // renderAndStepAxisXYZ()
   if ( X->setDirection(dx) == false )
-    return false;
+    return RET_ERROR;
 
   if ( Y->setDirection(dy) == false )
-    return false;
+    return RET_ERROR;
 
   if ( Z->setDirection(dz) == false )
-    return false;
+    return RET_ERROR;
 
   typedef RenderStruct RS;
   RS::reset();
@@ -647,9 +663,9 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
     for (i = 0; i < l; i++) {
 
       ret = stepAxisXYZ();
-      if ( ret == false ) { return false; }
-      if (err_1 > 0)      { RS::A[RS::IDX_Y] += y_inc; err_1 -= dx2; }
-      if (err_2 > 0)      { RS::A[RS::IDX_Z] += z_inc; err_2 -= dx2; }
+      if ( ret != RET_OK ) { return ret; }
+      if (err_1 > 0)       { RS::A[RS::IDX_Y] += y_inc; err_1 -= dx2; }
+      if (err_2 > 0)       { RS::A[RS::IDX_Z] += z_inc; err_2 -= dx2; }
       
       err_1            += dy2;
       err_2            += dz2;
@@ -664,9 +680,9 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
     for (i = 0; i < m; i++) {
 
       ret = stepAxisXYZ();
-      if ( ret == false ) { return false; }
-      if (err_1 > 0)      { RS::A[RS::IDX_X] += x_inc; err_1 -= dy2; }
-      if (err_2 > 0)      { RS::A[RS::IDX_Z] += z_inc; err_2 -= dy2; }
+      if ( ret != RET_OK ) { return ret; }
+      if (err_1 > 0)       { RS::A[RS::IDX_X] += x_inc; err_1 -= dy2; }
+      if (err_2 > 0)       { RS::A[RS::IDX_Z] += z_inc; err_2 -= dy2; }
       
       err_1            += dx2;
       err_2            += dz2;
@@ -681,9 +697,9 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
     for (i = 0; i < n; i++) {
 
       ret = stepAxisXYZ();
-      if ( ret == false ) { return false; }
-      if (err_1 > 0)      { RS::A[RS::IDX_Y] += y_inc; err_1 -= dz2; }
-      if (err_2 > 0)      { RS::A[RS::IDX_X] += x_inc; err_2 -= dz2; }
+      if ( ret != RET_OK ) { return ret; }
+      if (err_1 > 0)       { RS::A[RS::IDX_Y] += y_inc; err_1 -= dz2; }
+      if (err_2 > 0)       { RS::A[RS::IDX_X] += x_inc; err_2 -= dz2; }
       
       err_1            += dy2;
       err_2            += dx2;
@@ -691,8 +707,8 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
     }
   }
   
-  if ( stepAxisXYZ() == false )
-    return false;
+  if ( (ret = stepAxisXYZ()) != RET_OK )
+    return ret;
 
   if ( speedController.isSpeedConfigured() ) {
     const unsigned long timeElapsed = micros() - tsStart;
@@ -714,7 +730,66 @@ bool CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_t dz) {
   if ( isProbeMode() == OFF )
     speedController.completeMove();
 
-  return true;
+  return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+unsigned char CncController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz) {
+/////////////////////////////////////////////////////////////////////////////////////
+  const int32_t x = dx;
+  const int32_t y = dy;
+  const int32_t z = dz;
+
+  // speed setup
+  const double MAX_SPEED   = speedController.getMaxFeedSpeed_MM_MIN();
+  
+  const double SPEED_STEP1 = MAX_SPEED * 0.05;  const unsigned int TIMESPAN_STEP1  =  500; // ms
+  const double SPEED_STEP2 = MAX_SPEED * 0.25;  const unsigned int TIMESPAN_STEP2  = 1000; // ms
+  const double SPEED_STEP3 = MAX_SPEED * 0.50;  const unsigned int TIMESPAN_STEP3  = 1500; // ms
+  const double SPEED_STEP4 = MAX_SPEED * 0.75;  const unsigned int TIMESPAN_STEP4  = 2000; // ms
+  const double SPEED_STEP5 = MAX_SPEED;
+
+  double currentSpeed = SPEED_STEP1;
+  setSpeedValue(currentSpeed);
+  
+  unsigned char ret = RET_OK;
+  unsigned long tsStart = millis();
+  
+  if ( x != 0 || y != 0 || z !=0 ) {
+    while ( (ret = renderAndStepAxisXYZ(x, y, z)) == RET_OK ) {
+  
+      // break by interrupt
+      if (    X->isInterrupted() 
+           || Y->isInterrupted() 
+           || Z->isInterrupted() 
+         )
+      { return RET_INTERRUPT; }
+
+      // break by limit
+      if (    X->getLimitState() != LimitSwitch::LIMIT_UNSET 
+           || Y->getLimitState() != LimitSwitch::LIMIT_UNSET 
+           || Z->getLimitState() != LimitSwitch::LIMIT_UNSET 
+         )
+      { return RET_ERROR; }
+
+      // mormally this loop will be broken by signals
+      // like SIG_QUIT, or SIG_HALT and renderAndStepAxisXYZ()
+      // return != RET_OK
+
+      if ( (millis() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
+        { currentSpeed = SPEED_STEP2; setSpeedValue(currentSpeed); }
+  
+      if ( (millis() - tsStart) > TIMESPAN_STEP2 && currentSpeed < SPEED_STEP3 )
+        { currentSpeed = SPEED_STEP3; setSpeedValue(currentSpeed); }
+        
+      if ( (millis() - tsStart) > TIMESPAN_STEP3 && currentSpeed < SPEED_STEP4 )
+        { currentSpeed = SPEED_STEP4; setSpeedValue(currentSpeed); }
+        
+      if ( (millis() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
+        { currentSpeed = SPEED_STEP5; setSpeedValue(currentSpeed); }
+    }
+  }
+  
+  return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncController::setSpeedValue(double fm) { 

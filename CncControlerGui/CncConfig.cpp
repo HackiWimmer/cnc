@@ -70,6 +70,8 @@ CncConfig::CncConfig(MainFrame* app)
 , currentToolId(-1)
 , currentZDepth(0.0)
 , maxZDistance(50.0)
+, workpieceThickness(0.0)
+, referencePositionMode(CncRefPositionMode::CncRM_Mode1)
 , referenceIncludesWpt(false)
 , onlineUpdateCoordinates(true)
 , onlineUpdateDrawPane(true)
@@ -109,11 +111,22 @@ void CncConfig::rc() {
 	changed = false; 
 }
 ////////////////////////////////////////////////////////////////////////
+void CncConfig::setProbeMode(bool state) { 
+////////////////////////////////////////////////////////////////////////
+	if ( state == true )	std::cout << " Set Probe Mode on"  << std::endl;
+	else					std::cout << " Set Probe Mode off" << std::endl;
+	
+	probeMode = state;
+	THE_APP->decorateProbeMode(probeMode);
+}
+////////////////////////////////////////////////////////////////////////
 void CncConfig::deactivateConfigNotification() {
 	notificationActivated = false;
+////////////////////////////////////////////////////////////////////////
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::activateConfigNotification() {
+////////////////////////////////////////////////////////////////////////
 	notificationActivated = true;
 
 	// release always a notification after the (re)activation
@@ -408,7 +421,7 @@ void CncConfig::setupGlobalConfigurationGrid(wxPropertyGridManager* sg, wxConfig
 	
 	// decoration grid
 	globlSetupGrid->GetGrid()->ResetColours();
-	globlSetupGrid->GetGrid()->SetCaptionBackgroundColour(wxColour(255,182,108));
+	globlSetupGrid->GetGrid()->SetCaptionBackgroundColour(wxColour(128,128,255));
 	globlSetupGrid->GetGrid()->SetCaptionTextColour(wxColour(255,255,255));
 	globlSetupGrid->GetGrid()->SetCellBackgroundColour(wxColour(255,255,255));
 	
@@ -836,7 +849,6 @@ const double CncConfig::getPitchX() 								{ wxPGProperty* p = getProperty(CncC
 const double CncConfig::getPitchY() 								{ wxPGProperty* p = getProperty(CncConfig_PITCH_Y);						wxASSERT(p); return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchZ() 								{ wxPGProperty* p = getProperty(CncConfig_PITCH_Z); 					wxASSERT(p); return p->GetValue().GetDouble(); }
 const double CncConfig::getMaxDurationThickness()					{ wxPGProperty* p = getProperty(CncWork_Wpt_MAX_THICKNESS_CROSS);		wxASSERT(p); return p->GetValue().GetDouble(); }
-const double CncConfig::getWorkpieceThickness()						{ wxPGProperty* p = getProperty(CncWork_Wpt_THICKNESS); 				wxASSERT(p); return p->GetValue().GetDouble(); }
 const double CncConfig::getReplyThresholdMetric()					{ wxPGProperty* p = getProperty(CncWork_Ctl_REPLY_THRESHOLD_METRIC); 	wxASSERT(p); double ret; p->GetValueAsString().ToDouble(&ret); return ret; }
 
 const double CncConfig::getDefaultRapidSpeed_MM_MIN()				{ wxPGProperty* p = getProperty(CncConfig_DEF_RAPID_SPEED_MM_MIN); 		wxASSERT(p); return p->GetValue().GetDouble(); }

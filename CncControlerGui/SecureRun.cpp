@@ -10,6 +10,7 @@ SecureRun::SecureRun(MainFrame* parent)
 {
 	m_startupTimer->Stop();
 	m_blinkTimer->Stop();
+	SetReturnCode(wxID_OK);
 }
 ///////////////////////////////////////////////////////////////////
 SecureRun::~SecureRun() {
@@ -27,6 +28,8 @@ void SecureRun::initDialog(wxInitDialogEvent& event) {
 	wxPoint pos = parentFrame->GetRcReset()->GetPosition();
 	pos.x -= 38;
 	SetPosition(pos);
+	
+	SetEscapeId(m_btEmergengy->GetId());
 }
 ///////////////////////////////////////////////////////////////////
 void SecureRun::show(wxShowEvent& event) {
@@ -37,16 +40,18 @@ void SecureRun::show(wxShowEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void SecureRun::hideDialog() {
+void SecureRun::hideDialog(int retValue) {
 ///////////////////////////////////////////////////////////////////
+	SetReturnCode(retValue);
+	
 	m_blinkTimer->Stop();
 	Show(false);
 }
 ///////////////////////////////////////////////////////////////////
 void SecureRun::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	parentFrame->secureRun();
-	hideDialog();
+	bool ret = parentFrame->secureRun();
+	hideDialog( ret == true ? wxID_OK : wxID_ABORT );
 }
 ///////////////////////////////////////////////////////////////////
 void SecureRun::blinkTimer(wxTimerEvent& event) {
@@ -62,14 +67,14 @@ void SecureRun::stop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
 	wxPostEvent(parentFrame->GetRcStop(), evt);
-	hideDialog();
+	hideDialog(wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////
 void SecureRun::emergengy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
 	wxPostEvent(parentFrame->GetBtnEmergenyStop(), evt);
-	hideDialog();
+	hideDialog(wxID_ABORT);
 }
 ///////////////////////////////////////////////////////////////////
 void SecureRun::play(wxCommandEvent& event) {

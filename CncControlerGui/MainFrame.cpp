@@ -73,6 +73,8 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "UpdateManagerThread.h"
 #include "CncConfigProperty.h"
 #include "SecureRun.h"
+#include "CncReferencePosition.h"
+#include "CncConnectProgress.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -87,12 +89,12 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 ////////////////////////////////////////////////////////////////////
 // global strings
 const char* _programTitel 		= "Woodworking CNC Controller";
-const char* _copyRight			= "copyright by Stefan Hoelzer 2016 - 2018";
+const char* _copyRight			= "invented by Hacki Wimmer 2016 - 2018";
 
 #ifdef DEBUG
-	const char* _programVersion = "0.8.7.d";
+	const char* _programVersion = "0.8.8.d";
 #else
-	const char* _programVersion = "0.8.7.r";
+	const char* _programVersion = "0.8.8.r";
 #endif
 
 ////////////////////////////////////////////////////////////////////
@@ -205,6 +207,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , perspectiveTimer(this, wxEVT_PERSPECTIVE_TIMER)
 , debugUserNotificationTime(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
 , secureRunDlg(new SecureRun(this))
+, refPositionDlg(new CncReferencePosition(this))
 {
 ///////////////////////////////////////////////////////////////////
 	// determine assert handler
@@ -303,6 +306,12 @@ MainFrame::~MainFrame() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( secureRunDlg && secureRunDlg->IsShownOnScreen() )
+		wxPostEvent(secureRunDlg, event);
+	
+	if ( refPositionDlg && refPositionDlg->IsShownOnScreen() )
+		wxPostEvent(refPositionDlg, event);
+	
 	if ( motionMonitor && motionMonitor->IsShownOnScreen() ) {
 		// This is necessary to avoid the default notebook key handling
 		if ( motionMonitor->HasFocus() ) {
@@ -370,11 +379,25 @@ void MainFrame::setRefPostionState(bool state) {
 	if ( isZeroReferenceValid == true ) bmp = ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_GREEN"); 
 	else 								bmp = ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_RED");
 	
-	wxImage img = bmp.ConvertToImage();
-	img = img.Rotate90(false);
+	wxString tip("Reference position state: ");
+	// display ref pos mode too
+	if ( isZeroReferenceValid == true ) {
+		wxMemoryDC mdc(bmp);
+		mdc.SetFont(wxFontInfo(8).FaceName("Arial"));
+		mdc.SetTextForeground(wxColor(0, 0, 0));
+		mdc.DrawText(wxString::Format("%d", (int)GBL_CONFIG->getReferencePositionMode()), {5,1});
+		bmp = mdc.GetAsBitmap();
+		
+		tip.append("Valid\n");
+		tip.append(wxString::Format("Reference position mode: %d", (int)GBL_CONFIG->getReferencePositionMode()));
+		
+	} else {
+		tip.append("Not Valid");
+		
+	}
 	
-	wxBitmap b(img);
-	m_refPosTrafficLight->SetBitmap(b);
+	m_refPosTrafficLight->SetToolTip(tip);
+	m_refPosTrafficLight->SetBitmap(bmp);
 	m_statusBar->Refresh();
 	m_statusBar->Update();
 }
@@ -479,6 +502,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testDimTakeZ);
 	registerGuiControl(m_testDimTakeAll);
 	registerGuiControl(m_connect);
+	registerGuiControl(m_refPosition);
 	registerGuiControl(m_zToTop);
 	registerGuiControl(m_zToBottom);
 	registerGuiControl(m_xToMin);
@@ -498,18 +522,12 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_zeroMoveModeXY);
 	registerGuiControl(m_zeroMoveModeXYZ);
 	registerGuiControl(m_zeroMoveModeZ);
-	registerGuiControl(m_setZero);
 	registerGuiControl(m_clearLogger);
 	registerGuiControl(m_displayInterval);
 	registerGuiControl(m_svgEmuOpenFileAsSvg);
 	registerGuiControl(m_svgEmuOpenFileAsSource);
 	registerGuiControl(m_svgEmuReload);
 	registerGuiControl(m_svgEmuClear);
-	registerGuiControl(m_spinButtonX);
-	registerGuiControl(m_spinButtonY);
-	registerGuiControl(m_spinButtonZ);
-	registerGuiControl(m_moveXYAxisCtl);
-	registerGuiControl(m_moveZAxisCtl);
 	registerGuiControl(m_reloadTemplate);
 	registerGuiControl(m_openSourceExtern);
 	registerGuiControl(m_openSvgExtern);
@@ -574,7 +592,10 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_cmYpos);
 	registerGuiControl(m_cmZneg);
 	registerGuiControl(m_cmZpos);
-	
+	registerGuiControl(m_cmXnegYneg);
+	registerGuiControl(m_cmXposYpos);
+	registerGuiControl(m_cmXnegYpos);
+	registerGuiControl(m_cmXposYneg);
 	//...
 }
 ///////////////////////////////////////////////////////////////////
@@ -612,7 +633,7 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	displayReport(1);
+	std::cout << "probeMode" << GBL_CONFIG->isProbeMode()<< std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -694,7 +715,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	
 	// Auto connect ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
-		connectSerialPort();
+		connectSerialPortDialog();
 		
 		// Auto process ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
@@ -751,8 +772,6 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	// idle handling
 	static unsigned int idleCounter = 0;
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
-		if ( m_connect->IsEnabled() == false )
-			return;
 		idleCounter++;
 		
 		if ( idleCounter%2 == 0 ) {
@@ -1287,7 +1306,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 					wxMessageDialog dlg(this, msg, _T("New connection available. Try to connect  . . . "), wxYES|wxNO|wxCENTRE|wxICON_QUESTION);
 					if ( dlg.ShowModal() == wxID_YES ) {
 						m_portSelector->SetStringSelection(portName);
-						connectSerialPort();
+						connectSerialPortDialog();
 					}
 				}
 			}
@@ -1475,29 +1494,6 @@ void MainFrame::initialize(void) {
 	tVal.SetCharIncludes(", ");
 	m_cbUCValueFrom->SetValidator(tVal);
 	
-	wxString comment("");
-	comment << "+/-x:           cursor right/left\n";
-	comment << "+/-y:           cursor down/up\n";
-	comment << "+ Alt           step=0,01\n";
-	comment << "+ Ctrl          step=0,10\n";
-	comment << "+ Shift         step=2,00\n";
-	comment << "+ Ctrl + Shift  step*=10\n";
-	comment << "Space           Goto Z\n";
-	comment << "Return          Set RefPos\n";
-	comment << "Return + Ctrl   Set RefPos with workpiece Thickness\n";
-	(*m_moveXYAxisCtl) << comment;
-
-	comment = "";
-	comment << "+/-z:           cursor up/down\n";
-	comment << "+ Alt           step=0,01\n";
-	comment << "+ Ctrl          step=0,10\n";
-	comment << "+ Shift         step=2,00\n";
-	comment << "+ Ctrl + Shift  step*=10\n";
-	comment << "Space           Goto XY\n";
-	comment << "Return          Set RefPos\n";
-	comment << "Return + Ctrl   Set RefPos with workpiece Thickness\n";
-	(*m_moveZAxisCtl) << comment;
-	
 	if ( CncConfig::getGlobalCncConfig()->getShowTestMenuFlag() == false )
 		m_menuBar->Remove(m_menuBar->FindMenu("Test"));
 		
@@ -1612,6 +1608,7 @@ void MainFrame::determineCncOutputControls() {
 	guiCtlSetup->controllerErrorInfo	= m_dvListCtrlControllerErrorInfo;
 	
 	guiCtlSetup->motorState 			= m_miMotorEnableState;
+	guiCtlSetup->probeModeState			= m_btProbeMode;
 	
 	guiCtlSetup->xMinLimit 				= m_xMinLimit;
 	guiCtlSetup->xMaxLimit 				= m_xMaxLimit;
@@ -1703,7 +1700,7 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 	info.SetName(_programTitel);
 	info.SetVersion(_programVersion);
 	info.SetLicence(_("GPL v2 or later"));
-	info.AddDeveloper("Stefan Hoelzer");
+	info.AddDeveloper("Hacki Wimmmer");
 	info.SetDescription(description);
 	info.SetIcon(icon);
 	info.SetCopyright(_copyRight);
@@ -1739,8 +1736,15 @@ void MainFrame::showSVGEmuResult(bool show) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectPort(wxCommandEvent& event) {
 	if ( lastPortName != m_portSelector->GetStringSelection() ) {
-		connectSerialPort();
+		connectSerialPortDialog();
 	}
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::connectSerialPortDialog() {
+///////////////////////////////////////////////////////////////////
+	CncConnectProgress dlg(this);
+	
+	return ( dlg.ShowModal() == wxID_OK);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::connectSerialPort() {
@@ -1781,18 +1785,18 @@ bool MainFrame::connectSerialPort() {
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		cs.assign("dev/null");
-		decodrateProbeMode(true);
+		GBL_CONFIG->setProbeMode(true);
 		
 	} else if ( sel == _portSimulatorNULL ) {
 		cnc = new CncControl(CncPORT_SIMU);
 		cs.assign(_portSimulatorNULL);
-		decodrateProbeMode(true);
+		GBL_CONFIG->setProbeMode(true);
 		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
 		wxString val;
 		cs.assign(CncFileNameService::getCncOutboundSvgFileName());
-		decodrateProbeMode(true);
+		GBL_CONFIG->setProbeMode(true);
 		showSVGEmuResult();
 		enableMenuItem(m_miSaveEmuOutput, true);
 		
@@ -1800,7 +1804,7 @@ bool MainFrame::connectSerialPort() {
 		cnc = new CncControl(CncPORT);
 		cs.assign("\\\\.\\");
 		cs.append(sel);
-		decodrateProbeMode(false);
+		GBL_CONFIG->setProbeMode(false);
 	}
 	
 	if ( cnc == NULL || cnc->getSerial() == NULL )
@@ -1816,15 +1820,17 @@ bool MainFrame::connectSerialPort() {
 	
 	lastPortName.clear();
 	if ( (ret = cnc->connect(cs)) == true )  {
+		lastPortName.assign(sel);
+		clearMotionMonitor();
+		
 		if ( (ret = cnc->setup()) == true ) {
 			cnc->resetErrorInfo();
 			cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 			updateCncConfigTrace();
 			decorateSwitchToolOnOff(cnc->getToolState());
-			lastPortName.assign(sel);
+			selectSerialSpyMode();
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
-			selectSerialSpyMode();
 		}
 	}
 	
@@ -1940,7 +1946,7 @@ void MainFrame::enableControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	connectSerialPort();
+	connectSerialPortDialog();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearLogger(wxCommandEvent& event) {
@@ -1948,16 +1954,13 @@ void MainFrame::clearLogger(wxCommandEvent& event) {
 	m_logger->Clear();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::setZero(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	setZero();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::setZero() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
 	cnc->setup(true);
+	cnc->setZeroPos();
+	
 	setRefPostionState(true);
 }
 ///////////////////////////////////////////////////////////////////
@@ -1995,36 +1998,31 @@ void MainFrame::svgEmuOpenFileAsSvg(wxCommandEvent& event) {
 	openFileExtern(tool, svgFile);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::updateInclWpt(wxCommandEvent& event) {
+int MainFrame::showReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
-	CncConfig::getGlobalCncConfig()->setReferenceIncludesWpt(m_includingWpt->IsChecked());
-	updateCncConfigTrace();
-}
-///////////////////////////////////////////////////////////////////
-int MainFrame::showSetReferencePositionDlg(wxString msg) {
-///////////////////////////////////////////////////////////////////
-	wxMessageDialog dlg(this, msg, _T("Action required  . . . "), 
-				        wxCANCEL|wxYES|wxNO|wxCENTRE|wxICON_INFORMATION);
-	dlg.SetYesNoCancelLabels("Set with workpiece thickness ", "Set without workpiece thickness", "Do it later . . . ");
-	
+	wxASSERT(refPositionDlg);
 	secureRunDlg->enableControls(false);
-	int ret = dlg.ShowModal();
-	secureRunDlg->enableControls(true);
-	switch ( ret ) {
-		case  wxID_YES:  	m_includingWpt->SetValue(true);
-							selectMainBookReferencePanel();
-							setZero();
-							break;
-							
-		case  wxID_NO:		m_includingWpt->SetValue(false);
-							selectMainBookReferencePanel();
-							setZero();
-							break;
-							
-		default:			;//m_crossingThickness->SetFocus(); 
-							//do nothing
+	
+	refPositionDlg->setMessage(msg);
+	refPositionDlg->setMeasurePlateThickness(GBL_CONFIG->getMeasurePlateThickness());
+	
+	int ret = refPositionDlg->ShowModal();
+	
+	if ( ret == wxID_OK ) {
+		
+		double wpt = refPositionDlg->getWorkpieceThickness();
+		GBL_CONFIG->setReferenceIncludesWpt(cnc::dblCompareNull(wpt) == false);
+		GBL_CONFIG->setWorkpieceThickness(wpt);
+		GBL_CONFIG->setReferencePositionMode(refPositionDlg->getReferenceMode());
+		updateCncConfigTrace();
+		
+		setZero();
+	} else {
+		cnc::cex1 << " Set reference position aborted . . . " << endl;
 	}
 	
+	//selectMonitorBookCncPanel();
+	secureRunDlg->enableControls(true);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -2054,7 +2052,7 @@ void MainFrame::changeWorkpieceThickness() {
 	msg << "This have to be done before the next CNC run.\n\n";
 	msg << "The set function below can be used to set it directly.";
 	
-	showSetReferencePositionDlg(msg);
+	showReferencePositionDlg(msg);
 	m_crossings->ChangeValue(wxString() << CncConfig::getGlobalCncConfig()->getDurationCount());
 }
 ///////////////////////////////////////////////////////////////////
@@ -3207,25 +3205,6 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
 	
-	if ( isZeroReferenceValid == false ) {
-		
-		TemplateFormat tf = getCurrentTemplateFormat();
-		
-		if ( tf != TplManual && tf != TplTest ) {
-			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n\n");
-			msg << "How to fix it:\n";
-			msg << "Please use the \"Set Current Position to Zero\" functionality on the \"References\" tab.";
-			
-			showAuiPane("SourceView");
-			selectMainBookReferencePanel();
-			
-			int ret = showSetReferencePositionDlg(msg);
-			// means reference postion isn't set
-			if ( ret != wxID_YES && ret != wxID_NO)
-				return false;
-		}
-	}
-
 	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false ) {
 		
 		wxString msg("Validate positions failed\n");
@@ -3252,7 +3231,22 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 		// always return false to reconfigure zero in this sitiuation
 		return false;
 	}
- 
+	
+	if ( isZeroReferenceValid == false ) {
+		
+		TemplateFormat tf = getCurrentTemplateFormat();
+		
+		if ( tf != TplManual && tf != TplTest ) {
+			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n\n");
+			msg << "How to fix it:\n";
+			msg << "Please use the \"Set Current Position to Zero\" functionality on the \"References\" tab.";
+			
+			// means reference postion isn't set
+			if ( showReferencePositionDlg(msg) != wxID_OK )
+				return false;
+		}
+	}
+	
 	return showConfigSummaryAndConfirmRun();
 }
 ///////////////////////////////////////////////////////////////////
@@ -3508,19 +3502,38 @@ bool MainFrame::processTemplateWrapper() {
 	if ( ret == true )
 		ret = checkIfRunCanBeProcessed();
 		
-	if ( GBL_CONFIG->getResetErrorInfoBeforeRunFlag() )
-		cnc->resetErrorInfo();
+	int32_t errorCount = 0;
+	if ( ret == true ) {
 		
-	if ( ret == true )
-		ret = processTemplateIntern();
-	
-	// additional check controllers error count
-	int32_t errorCount = cnc->getControllerErrorCount(!ret);
-	ret = ( errorCount == 0);
+		if ( GBL_CONFIG->getResetErrorInfoBeforeRunFlag() )
+			cnc->resetErrorInfo();
+			
+		// process
+		const bool USE_SECURE_RUN_DLG = true;
+		if ( USE_SECURE_RUN_DLG == true && isDebugMode == false ) {
+			wxASSERT(secureRunDlg);
+			if ( secureRunDlg->IsShown() )
+				secureRunDlg->Show(false);
+				
+			ret = (secureRunDlg->ShowModal() == wxID_OK);
+			
+		} else {
+			ret = processTemplateIntern();
+			
+		}
+		// additional check controllers error count
+		errorCount = cnc->getControllerErrorCount(!ret);
+		ret = ( errorCount == 0 );
+	}
 	
 	// prepare final statements
 	if ( ret == false) {
-		cnc::cex1 << wxString::Format("%s - Processing finished with errors . . .", wxDateTime::UNow().FormatISOTime()) << std::endl;
+		
+		wxString hint;
+		if ( errorCount == 0 ) 	{ hint.assign("not successfully"); }
+		else					{ hint.assign("with errors");      }
+		
+		cnc::cex1 << wxString::Format("%s - Processing finished %s . . .", wxDateTime::UNow().FormatISOTime(), hint) << std::endl;
 		
 		if ( errorCount > 0 ) {
 			cnc::cex1 << "For more details please try to consider the controller error info tab" << std::endl;
@@ -3858,145 +3871,6 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 	std::cerr << "Emergency Stop detected" << std::endl;
 	cnc->interrupt();
 	setRefPostionState(false);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::keyDownXY(wxKeyEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_moveXYAxisCtl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::keyDownXY), NULL, this);
-	
-	wxASSERT(cnc);
-	int c = event.GetKeyCode();
-	switch ( c ) {
-		case WXK_UP:		navigateY(CncAnticlockwise); 	break;
-		case WXK_DOWN:		navigateY(CncClockwise); 		break;
-		case WXK_LEFT:		navigateX(CncAnticlockwise);	break;
-		case WXK_RIGHT:		navigateX(CncClockwise); 		break;
-		case WXK_SPACE:		m_moveZAxisCtl->SetFocus();		break;
-		
-		case WXK_RETURN: 	
-							if ( CncAsyncKeyboardState::isControlPressed() ) 	m_includingWpt->SetValue(true);
-							else												m_includingWpt->SetValue(false);
-							setZero();
-							event.Skip(false);
-							break;
-							
-		default:		event.Skip(false);
-	}
-	
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_moveXYAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::keyDownXY), NULL, this);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::keyDownZ(wxKeyEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_moveZAxisCtl->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::keyDownZ), NULL, this);
-	
-	wxASSERT(cnc);
-	int c = event.GetKeyCode();
-	switch ( c ) {
-		case WXK_DOWN:		navigateZ(CncAnticlockwise);
-							break;
-							
-		case WXK_UP:		navigateZ(CncClockwise);
-							break;
-							
-		case WXK_SPACE:		m_moveXYAxisCtl->SetFocus();
-							break;
-		
-		case WXK_RETURN: 	
-							if ( CncAsyncKeyboardState::isControlPressed() ) 	m_includingWpt->SetValue(true);
-							else												m_includingWpt->SetValue(false);
-							setZero();
-							event.Skip(false);
-							break;
-							
-		default:			event.Skip(false);
-	}
-	
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_moveZAxisCtl->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrame::keyDownZ), NULL, this);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::mvSpinDownX(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_spinButtonX->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrame::mvSpinDownX), NULL, this);
-
-	wxASSERT(cnc);
-	navigateX(CncAnticlockwise);
-	
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_spinButtonX->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrame::mvSpinDownX), NULL, this);
-} 
-///////////////////////////////////////////////////////////////////
-void MainFrame::mvSpinUpX(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_spinButtonX->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrame::mvSpinUpX), NULL, this);
-
-	wxASSERT(cnc);
-	navigateX(CncClockwise);
-	
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_spinButtonX->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrame::mvSpinUpX), NULL, this);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::mvSpinDownY(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_spinButtonY->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrame::mvSpinDownY), NULL, this);
-
-	wxASSERT(cnc);
-	navigateY(CncAnticlockwise);
-	
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_spinButtonY->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrame::mvSpinDownY), NULL, this);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::mvSpinUpY(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_spinButtonY->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrame::mvSpinUpY), NULL, this);
-
-	wxASSERT(cnc);
-	navigateY(CncClockwise);
-	
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_spinButtonY->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrame::mvSpinUpY), NULL, this);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::mvSpinDownZ(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_spinButtonZ->Disconnect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrame::mvSpinDownZ), NULL, this);
-
-	wxASSERT(cnc);
-	navigateZ(CncAnticlockwise);
-	
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_spinButtonZ->Connect(wxEVT_SPIN_DOWN, wxSpinEventHandler(MainFrame::mvSpinDownZ), NULL, this);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::mvSpinUpZ(wxSpinEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// disconnect this event handler to avoid the processing of buffered events
-	m_spinButtonZ->Disconnect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrame::mvSpinUpZ), NULL, this);
-
-	wxASSERT(cnc);
-	navigateZ(CncClockwise);
-
-	// clear bufferd events and reconnect this event handler
-	dispatchAll();
-	m_spinButtonZ->Connect(wxEVT_SPIN_UP, wxSpinEventHandler(MainFrame::mvSpinUpZ), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::navigateX(CncDirection d) {
@@ -4968,34 +4842,6 @@ void MainFrame::selectUAUseDirectiveList(wxDataViewEvent& event) {
 		int sel = m_dvListCtrlSvgUAUseDirective->GetSelectedRow();
 		m_selectedUAInfo->SetValue(m_dvListCtrlSvgUAUseDirective->GetTextValue(sel, 1));
 	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusMoveXYAxis(wxFocusEvent& event) {
-	m_moveXYAxisCtl->SetBackgroundColour(*wxWHITE);
-	m_moveXYAxisCtl->Refresh();
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::setFocusMoveXYAxis(wxFocusEvent& event)  {
-	wxColor c(191,205,219);
-	m_moveXYAxisCtl->SetBackgroundColour(c);
-	m_moveXYAxisCtl->Refresh();
-	m_moveXYAxisCtl->SetInsertionPoint(0);
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::killFocusMoveZAxis(wxFocusEvent& event) {
-	m_moveZAxisCtl->SetBackgroundColour(*wxWHITE);
-	m_moveZAxisCtl->Refresh();
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::setFocusMoveZAxis(wxFocusEvent& event) {
-	wxColor c(191,205,219);
-	m_moveZAxisCtl->SetBackgroundColour(c);
-	m_moveZAxisCtl->Refresh();
-	m_moveZAxisCtl->SetInsertionPoint(0);
-	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateCurveLibResolution(wxCommandEvent& event) {
@@ -6132,18 +5978,10 @@ void MainFrame::rcRun() {
 		
 		perspectiveHandler.ensureRunPerspectiveMinimal();
 	}
-
-	// process
-	const bool USE_SECURE_RUN_DLG = true;
-	if ( USE_SECURE_RUN_DLG == true && isDebugMode == false ) {
-		wxASSERT(secureRunDlg);
-		if ( secureRunDlg->IsShown() )
-			secureRunDlg->Show(false);
-		secureRunDlg->ShowModal();
-	} else {
-		processTemplateWrapper();
-	}
 	
+	// process
+	processTemplateWrapper();
+
 	// restore the interval
 	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
 }
@@ -7464,18 +7302,18 @@ void MainFrame::displayIntervalKeyDown(wxKeyEvent& event) {
 	CncConfig::getGlobalCncConfig()->setUpdateInterval(m_displayInterval->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::decodrateProbeMode(bool probeMode) {
+void MainFrame::decorateProbeMode(bool probeMode) {
 /////////////////////////////////////////////////////////////////////
 	if ( probeMode == true ) {
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_PROBE"));
 		m_btProbeMode->SetToolTip("Probe mode on");
-		m_probeModePanel->SetBackgroundColour(wxColour(255, 210, 210));
+		m_probeModePanel->SetForegroundColour(wxColour(128, 0, 0));
 		m_probeModeLabel->SetLabel("Probe mode: On");
 		
 	} else {
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_RELEASE"));
 		m_btProbeMode->SetToolTip("Probe mode off");
-		m_probeModePanel->SetBackgroundColour(wxColour(192, 192, 192));
+		m_probeModePanel->SetForegroundColour(wxColour(0, 0, 0));
 		m_probeModeLabel->SetLabel("Probe mode: Off");
 	}
 	
@@ -7486,13 +7324,15 @@ void MainFrame::decodrateProbeMode(bool probeMode) {
 	m_probeModePanel->Refresh();
 	m_probeModePanel->Update();
 	
-	GBL_CONFIG->setProbeMode(probeMode);
-	releaseControllerSetupFromConfig();
+	if ( motionMonitor != NULL ) {
+		motionMonitor->decorateProbeMode(GBL_CONFIG->isProbeMode());
+		motionMonitor->display();
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickProbeMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	decodrateProbeMode(m_btProbeMode->GetValue());
+	GBL_CONFIG->setProbeMode(m_btProbeMode->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::leftDownProbeModePanel(wxMouseEvent& event) {
@@ -7501,7 +7341,7 @@ void MainFrame::leftDownProbeModePanel(wxMouseEvent& event) {
 		return;
 		
 	m_btProbeMode->SetValue(!m_btProbeMode->GetValue());
-	decodrateProbeMode(m_btProbeMode->GetValue());
+	GBL_CONFIG->setProbeMode(m_btProbeMode->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMonitorStatistics(bool shown) {
@@ -7621,137 +7461,148 @@ void MainFrame::keyDownLruList(wxKeyEvent& event) {
 	event.Skip(true);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::manualContinuousMoveStart(wxWindow* ctrl, bool x, bool y, bool z, const CncDirection dir) {
+void MainFrame::manualContinuousMoveStart(wxWindow* ctrl, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	wxASSERT(ctrl);
 	
-	const short SMALLEST		= 0;
-	const short SMALL			= 1;
-	const short MEDIUM			= 2;
-	const short LARGE			= 3;
-	const short LARGEST			= 4;
+	if ( cnc->isInterrupted() == true ) {
+		std::cerr << "Interrupt aktive. Not will be done . . ." << std::endl;
+		return;
+	}
 	
 	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
 	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
 	bool altKey = CncAsyncKeyboardState::isAltPressed();
 	
-	CncControl::StepSensitivity stepSensitivity = CncControl::StepSensitivity::SMALLEST;
+	CncControl::StepSensitivity stepSensitivity = CncControl::StepSensitivity::FINEST;
 	if ( shtKey || ctlKey || altKey ) {
 		
-		if ( shtKey && ctlKey )			stepSensitivity = CncControl::StepSensitivity::LARGEST;
-		else if ( shtKey )				stepSensitivity = CncControl::StepSensitivity::SMALL;
-		else if ( ctlKey )				stepSensitivity = CncControl::StepSensitivity::MEDIUM;
-		else if ( altKey )				stepSensitivity = CncControl::StepSensitivity::LARGE;
+		if ( shtKey && ctlKey )			stepSensitivity = CncControl::StepSensitivity::ROUGHEST;
+		else if ( ctlKey )				stepSensitivity = CncControl::StepSensitivity::ROUGH;
+		else if ( shtKey )				stepSensitivity = CncControl::StepSensitivity::MEDIUM;
+		else if ( altKey )				stepSensitivity = CncControl::StepSensitivity::FINE;
 	} 
 	
-	switch ( stepSensitivity ) {
-		case CncControl::StepSensitivity::SMALLEST:		m_cbStepSensitivity->Select(SMALLEST); 	stepSensitivity = CncControl::StepSensitivity::SMALLEST; 	break;
-		case CncControl::StepSensitivity::SMALL:		m_cbStepSensitivity->Select(SMALL); 	stepSensitivity = CncControl::StepSensitivity::SMALL;		break;
-		case CncControl::StepSensitivity::MEDIUM:		m_cbStepSensitivity->Select(MEDIUM); 	stepSensitivity = CncControl::StepSensitivity::MEDIUM;		break;
-		case CncControl::StepSensitivity::LARGE:		m_cbStepSensitivity->Select(LARGE); 	stepSensitivity = CncControl::StepSensitivity::LARGE; 		break;
-		case CncControl::StepSensitivity::LARGEST:		m_cbStepSensitivity->Select(LARGEST); 	stepSensitivity = CncControl::StepSensitivity::LARGEST;		break;
-	}
-
 	cnc->manualContinuousMoveStop();
-	enableGuiControls(false);
-	enableRunControls(false);
-	ctrl->Enable(true);
-	
-	cnc->changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMax);
 	
 	motionMonitor->pushProcessMode();
-	cnc->manualContinuousMoveStart(stepSensitivity, x, y, z, dir);
+	cnc->manualContinuousMoveStart(stepSensitivity, x, y, z);
 	motionMonitor->popProcessMode();
 	
-	enableGuiControls(true);
-	enableRunControls(true);
-	
-	// clear bufferd events and reconnect this event handler
+	// clear bufferd events
 	dispatchAll();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::manualContinuousMoveStop() {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	
 	cnc->manualContinuousMoveStop();
-	enableGuiControls(true);
-	enableRunControls(true);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXneg, true, false, false, CncAnticlockwise);
+	manualContinuousMoveStart(m_cmXneg, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXpos, true, false, false, CncClockwise);
+	manualContinuousMoveStart(m_cmXpos, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmYnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmYneg, false, true, false, CncAnticlockwise);
+	manualContinuousMoveStart(m_cmYneg, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmYposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmYpos, false, true, false, CncClockwise);
+	manualContinuousMoveStart(m_cmYpos, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmZnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmZneg, false, false, true, CncAnticlockwise);
+	manualContinuousMoveStart(m_cmZneg, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir);
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmZposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmZpos, false, false, true, CncClockwise);
+	manualContinuousMoveStart(m_cmZpos, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir);
+	event.Skip(false);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::cmXnegYnegLeftDown(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	manualContinuousMoveStart(m_cmXnegYneg, CncLinearDirection::CncNegDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::cmXnegYposLeftDown(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	manualContinuousMoveStart(m_cmXnegYpos, CncLinearDirection::CncNegDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::cmXposYnegLeftDown(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	manualContinuousMoveStart(m_cmXposYneg, CncLinearDirection::CncPosDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::cmXposYposLeftDown(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	manualContinuousMoveStart(m_cmXposYpos, CncLinearDirection::CncPosDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmLeftDClick(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	manualContinuousMoveStop();
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmLeftUp(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	manualContinuousMoveStop();
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmKillFocus(wxFocusEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	manualContinuousMoveStop();
+	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmLeave(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	manualContinuousMoveStop();
+	event.Skip(false);
 }
-
-
-
-
-
-
-
-
-
-
-
-void MainFrame::moveStartMainWindow(wxMoveEvent& event) {
-	//event.Skip(true);
+/////////////////////////////////////////////////////////////////////
+void MainFrame::setReferencePosition(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	showReferencePositionDlg("User defined call . . .");
 }
+/////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
 	toggleMonitorStatistics( m_statisticBook->IsShown() == false );
 }
-void MainFrame::menuBarLButtonDown(wxMouseEvent& event) {
-	//isProcessing()
+/////////////////////////////////////////////////////////////////////
+void MainFrame::warmStartController(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc ) {
+		cnc->getSerial()->sendSoftwareReset();
+		connectSerialPortDialog();
+	}
 }
-void MainFrame::xxxxxxxxxxxxx(wxMouseEvent& event) {
-	//clog << "xxxxxxxxxxxxx"<< endl;
+/////////////////////////////////////////////////////////////////////
+void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_pgMgrSetup->SelectPage(event.GetSelection());
 }
-
-
-

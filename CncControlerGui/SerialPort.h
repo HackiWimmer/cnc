@@ -136,6 +136,9 @@ class Serial : public SerialOSD {
 		static const unsigned int LONG_BUF_SIZE = sizeof(int32_t);
 		
 	private:
+		
+		bool canIdle;
+		
 		// total distance
 		double totalDistance[4];
 		double totalDistanceRef;
@@ -224,6 +227,8 @@ class Serial : public SerialOSD {
 		
 		bool sendSerialControllerCallback(ContollerInfo& ci);
 		
+		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command, CncLongPosition& pos);
+		
 	public:
 		//Initialize Serial communication without an acitiv connection 
 		Serial(CncControl* cnc);
@@ -245,6 +250,8 @@ class Serial : public SerialOSD {
 		virtual void disconnect(void);
 		//Flush any remaining characters in the serial buffers 
 		virtual void purge(void);
+		// read all remaining bytes from serial to /dev/null
+		virtual void clearRemainingBytes(bool trace=false);
 		//Read data in a buffer, if nbByte is greater than the
 		//maximum number of bytes available, it will return only the
 		//bytes available. The function return -1 when nothing could
@@ -257,6 +264,8 @@ class Serial : public SerialOSD {
 		virtual void onPeriodicallyAppEvent(bool interrupted) {}
 		// returns the port name
 		virtual const char* getPortName() { return portName.c_str(); }
+		// give the inheried classes a chance to do that
+		virtual void adjustAppPostionAfterMoveUntilSignal(CncLongPosition& appPos) {}
 		// set spy mode
 		void enableSpyOutput(bool show=true) { traceSpyInfo = show;}
 		bool isSpyOutputOn() { return traceSpyInfo; }
@@ -284,12 +293,16 @@ class Serial : public SerialOSD {
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos);
-		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos);
 		
-		bool sendInterrupt() 	{ return sendSignal(SIG_INTERRUPPT); }
-		bool sendHalt() 		{ return sendSignal(SIG_HALT); }
-		bool sendPause() 		{ return sendSignal(SIG_PAUSE); }
-		bool sendResume() 		{ return sendSignal(SIG_RESUME); }
+		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos);
+		bool processMoveUntilSignal(unsigned int size, const int32_t (&values)[3], CncLongPosition& pos);
+		
+		bool sendInterrupt() 		{ return sendSignal(SIG_INTERRUPPT);     }
+		bool sendHalt() 			{ return sendSignal(SIG_HALT);           }
+		bool sendPause() 			{ return sendSignal(SIG_PAUSE);          }
+		bool sendResume() 			{ return sendSignal(SIG_RESUME);         }
+		bool sendQuitMove()			{ return sendSignal(SIG_QUIT_MOVE);      }
+		bool sendSoftwareReset() 	{ return sendSignal(SIG_SOFTWARE_RESET); }
 		
 		// position movement counting
 		virtual void resetPositionCounter();

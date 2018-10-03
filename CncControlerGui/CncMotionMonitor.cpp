@@ -88,7 +88,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	// publish initial zoom factor
 	monitor->setZoomFactor(zoom);
 	
-	// deactivte process mode by default
+	// deactivate process mode by default
 	popProcessMode();
 }
 //////////////////////////////////////////////////
@@ -145,6 +145,11 @@ long CncMotionMonitor::fillVectiesListCtr(long curCount, CncVectiesListCtrl* lis
 void CncMotionMonitor::enable(bool state) {
 //////////////////////////////////////////////////
 	monitor->enable(state);
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::decorateProbeMode(bool state) {
+//////////////////////////////////////////////////
+	monitor->decorateProbeMode(state);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::clear() {

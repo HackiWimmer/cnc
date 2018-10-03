@@ -41,6 +41,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		
 		// interface
 		void enable(bool state);
+		void decorateProbeMode(bool state);
 		void clear();
 		void display();
 		void appendVertice(const GLI::VerticeLongData& vd);

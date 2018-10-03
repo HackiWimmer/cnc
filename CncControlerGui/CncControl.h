@@ -28,12 +28,13 @@ const double endSwitchStepBackMertic = 2.5;
 class CncControl {
 	public:
 		enum DimensionMode   { DM_2D, DM_3D };
-		enum StepSensitivity { SMALLEST = 1, SMALL = 10 , MEDIUM = 50, LARGE = 100, LARGEST = 200 };
+		enum StepSensitivity { FINEST = 1, FINE = 10 , MEDIUM = 50, ROUGH = 100, ROUGHEST = 200 };
 		const short STEP_SENSITIVITY_FACTOR = 100;
 
 	private:
 		long currentClientId;
 		bool runContinuousMove;
+		bool continuousMoveAppBased;
 		
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
@@ -286,7 +287,8 @@ class CncControl {
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)
-		void enableStepperMotors(bool s);
+		bool enableStepperMotors(bool s);
+		bool enableProbeMode(bool s);
 		//Limit management
 		wxString& getLimitInfoString(wxString& ret);
 		void evaluateLimitState();
@@ -302,8 +304,9 @@ class CncControl {
 		bool moveYToMid();
 		bool moveZToMid();
 		
-		bool manualContinuousMoveStart(StepSensitivity s,  bool x, bool y, bool z, const CncDirection dir);
-		bool manualContinuousMoveStart(double stepSensitivity, bool x, bool y, bool z, const CncDirection dir);
+		bool manualContinuousMoveStart(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		bool manualContinuousMoveStart_AppBased(const double x, const double y, const double z);
+		bool manualContinuousMoveStart_CtrlBased(const double x, const double y, const double z);
 		void manualContinuousMoveStop();
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);

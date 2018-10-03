@@ -13,21 +13,8 @@ class GLContextCncPathBase : public GLContextBase {
 		enum DrawType { DT_POINTS, DT_LINES, DT_LINE_STRIP };
 		
 		/////////////////////////////////////////////////////////
-		GLContextCncPathBase(wxGLCanvas* canvas)
-		: GLContextBase(canvas)
-		, cncPath()
-		, drawType(DT_LINE_STRIP)
-		, currentClientId(-1L)
-		, boundBox(true)
-		, boundBoxColour(185, 127, 87)
-		{
-			cncPath.reserve(1024 * 1024);
-		}
-		
-		/////////////////////////////////////////////////////////
-		virtual ~GLContextCncPathBase() {
-			clearPathData();
-		}
+		GLContextCncPathBase(wxGLCanvas* canvas);
+		virtual ~GLContextCncPathBase();
 		
 		/////////////////////////////////////////////////////////
 		void clearPathData() {

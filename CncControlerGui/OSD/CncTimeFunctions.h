@@ -90,9 +90,9 @@ class CncTimeFunctions {
 		static void busyWaitMircoseconds(unsigned int micros);
 		
 		static CncNanoTimestamp   getNanoTimestamp();
-		static CncMicroTimestamp  getMicroTimestamp() 	{ return getNanoTimestamp() / (double)std::kilo::den; }
-		static CncMilliTimestamp  getMilliTimestamp() 	{ return getNanoTimestamp() / (double)std::mega::den; }
-		static CncSecondTimestamp getSecondTimestamp() 	{ return getNanoTimestamp() / (double)std::giga::den; }
+		static CncMicroTimestamp  getMicroTimestamp() 	{ return getNanoTimestamp() / (double)std::kilo::num; }
+		static CncMilliTimestamp  getMilliTimestamp() 	{ return getNanoTimestamp() / (double)std::mega::num; }
+		static CncSecondTimestamp getSecondTimestamp() 	{ return getNanoTimestamp() / (double)std::giga::num; }
 		
 		static CncNanoTimespan getTimeSpan(const CncTimeval& a, const CncTimeval& b);
 		static CncNanoTimespan getTimeSpan(const CncNanoTimestamp& a, const CncNanoTimestamp& b);

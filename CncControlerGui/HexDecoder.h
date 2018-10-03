@@ -19,6 +19,9 @@ class HexDecoder {
 				case RET_ERROR:		
 				case RET_SOT:		
 				case RET_SOH:		
+				case RET_INTERRUPT:
+				case RET_HALT:
+				case RET_QUIT:
 				case RET_MSG:		return ArduinoPIDs::getPIDLabel((const unsigned char)ret);
 			}
 			

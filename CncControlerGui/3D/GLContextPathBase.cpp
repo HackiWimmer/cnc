@@ -11,7 +11,93 @@
 	#include <GL/freeglut.h>
 #endif
 
+#include <wx/bitmap.h>
+#include "wxcrafter.h"
 
+GLuint theTexture = 0;
+/////////////////////////////////////////////////////////
+GLuint LoadBMP(const wxImage& img) {
+/////////////////////////////////////////////////////////
+	const unsigned char *data = img.GetData();
+	unsigned int width        = img.GetWidth();
+	unsigned int height       = img.GetHeight();
+	
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	
+	return texture;
+}
+/////////////////////////////////////////////////////////
+static void drawBox(GLfloat size, GLenum type) {
+/////////////////////////////////////////////////////////
+	static GLfloat n[6][3] =
+	{
+	{-1.0, 0.0, 0.0},
+	{0.0, 1.0, 0.0},
+	{1.0, 0.0, 0.0},
+	{0.0, -1.0, 0.0},
+	{0.0, 0.0, 1.0},
+	{0.0, 0.0, -1.0}
+	};
+	
+	static GLint faces[6][4] =
+	{
+	{0, 1, 2, 3},
+	{3, 2, 6, 7},
+	{7, 6, 5, 4},
+	{4, 5, 1, 0},
+	{5, 6, 2, 1},
+	{7, 4, 0, 3}
+	};
+	
+	GLfloat v[8][3];
+	GLint i;
+
+	v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+	v[4][0] = v[5][0] = v[6][0] = v[7][0] = +size / 2;
+	v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+	v[2][1] = v[3][1] = v[6][1] = v[7][1] = +size / 2;
+	v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+	v[1][2] = v[2][2] = v[5][2] = v[6][2] = +size / 2;
+	
+	glBindTexture(GL_TEXTURE_2D, theTexture);
+	
+	for (i = 5; i >= 0; i--) {
+	glBegin(type);
+		glNormal3fv(&n[i][0]);
+		glTexCoord2f(0.0, 0.0); glVertex3fv(&v[faces[i][0]][0]);
+		glTexCoord2f(1.0, 0.0); glVertex3fv(&v[faces[i][1]][0]);
+		glTexCoord2f(1.0, 1.0); glVertex3fv(&v[faces[i][2]][0]);
+		glTexCoord2f(0.0, 1.0); glVertex3fv(&v[faces[i][3]][0]);
+	glEnd();
+	}
+}
+
+/////////////////////////////////////////////////////////
+GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
+: GLContextBase(canvas)
+, cncPath()
+, drawType(DT_LINE_STRIP)
+, currentClientId(-1L)
+, boundBox(true)
+, boundBoxColour(185, 127, 87)
+/////////////////////////////////////////////////////////
+{
+	cncPath.reserve(1024 * 1024);
+	
+	wxBitmap bmp = ImageLibBig().Bitmap("BMP_CNC");
+	wxImage img  = bmp.ConvertToImage();
+	theTexture   = LoadBMP(img);
+}
+/////////////////////////////////////////////////////////
+GLContextCncPathBase::~GLContextCncPathBase() {
+/////////////////////////////////////////////////////////
+	clearPathData();
+}
 /////////////////////////////////////////////////////////
 void GLContextCncPathBase::markCurrentPosition() {
 /////////////////////////////////////////////////////////
@@ -167,6 +253,17 @@ void GLContextCncPathBase::drawLineStrips() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::determineModel() {
 /////////////////////////////////////////////////////////////////
+	if ( isEnabled() == false ) {
+		glPushMatrix();
+			glEnable(GL_TEXTURE_2D);
+				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
+				glBindTexture(GL_TEXTURE_2D, theTexture);
+				drawBox(0.05, GL_QUADS);
+			glDisable(GL_TEXTURE_2D);
+		glPopMatrix();
+		return;
+	}
+	
 	switch ( drawType ) {
 		case DT_POINTS:		drawPoints(); 		break;
 		case DT_LINES:		drawLines(); 		break;

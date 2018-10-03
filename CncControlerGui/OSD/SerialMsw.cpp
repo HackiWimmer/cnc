@@ -97,7 +97,7 @@ bool SerialMsw::connect(const char* portName) {
 	
 
 	//Define serial connection parameters for the arduino board
-	//dcbSerialParams.BaudRate      	= BAUD_RATE;
+	dcbSerialParams.BaudRate      	= BAUD_RATE;
 	dcbSerialParams.fBinary       	= TRUE;
 	dcbSerialParams.ByteSize      	= 8;
 	dcbSerialParams.Parity        	= NOPARITY;

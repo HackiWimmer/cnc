@@ -78,7 +78,6 @@
 	#define CncSvg_Emu_RSLT_WITH_ORIG_PATH			"CncSvg.Emu/RESULT_WITH_ORIG_PATH"
 	#define CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS	"CncSvg.Emu/RESULT_ONLY_WITH_FIRST_CROSSING"
 	
-	#define CncWork_Wpt_THICKNESS					"CncWork.Workpiece/THICKNESS"
 	#define CncWork_Wpt_MAX_THICKNESS_CROSS			"CncWork.Workpiece/MAX_THICKNESS_PER_CROSSING"
 
 	#define CncWork_Ctl_REPLY_THRESHOLD_METRIC		"CncWork.Controller/REPLAY_THRESHOLD_METRIC"

@@ -221,7 +221,8 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 													break;
 			
 			case CMD_MOVE:
-			case CMD_RENDER_AND_MOVE:				ret = performMajorMove((unsigned char*)(buffer), nbByte);
+			case CMD_RENDER_AND_MOVE:
+			case CMD_MOVE_UNIT_SIGNAL:				ret = performMajorMove((unsigned char*)(buffer), nbByte);
 													break;
 			
 			case CMD_PRINT_VERSION: 				ret = performSOT((unsigned char*)(buffer), nbByte, firmWare);
@@ -297,8 +298,8 @@ int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int n
 			if ( lastCommand.Serial.length() - lastCommand.index < 0 ) {
 				cerr << "SerialEmulatorNULL::performSerialBytes Determine bytesToCopy failed!"
 				<< "  Current index:  " << lastCommand.index
-				<< ", Bytes to copy: " << bytesToCopy
-				<< ", Total length: " << lastCommand.Serial.length()
+				<< ", Bytes to copy: "  << bytesToCopy
+				<< ", Total length: "   << lastCommand.Serial.length()
 				<< std::endl;
 				
 				cerr << "Current command will be aborted!"
@@ -473,18 +474,23 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 			                 targetMajorPos.getY(),
 							 targetMajorPos.getZ(),
 							 (int32_t)(speedSimulator->getRealtimeFeedSpeed_MM_MIN() * DBL_FACT));
-	lastCommand.Serial.write(RET_OK);
+	lastCommand.Serial.write(lastCommand.ret);
 	
 	// secondary provide the limit information
 	if ( limitStates.hasLimit() ) {
 		lastCommand.Serial.write(RET_SOH);
 		lastCommand.Serial.write(PID_LIMIT);
 		lastCommand.Serial.write(limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
-		lastCommand.Serial.write(RET_OK);
+		lastCommand.Serial.write(lastCommand.ret);
 	}
 	
 	// support the first byte
 	return performSerialBytes(buffer, nbByte);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::adjustAppPostionAfterMoveUntilSignal(CncLongPosition& appPos) {
+///////////////////////////////////////////////////////////////////
+	appPos = targetMajorPos;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
@@ -502,7 +508,8 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case SIG_INTERRUPPT:
 		case SIG_HALT:
 		case SIG_PAUSE:
-		case SIG_RESUME:			lastSignal = cmd;
+		case SIG_RESUME:
+		case SIG_QUIT_MOVE: 		lastSignal = cmd;
 									return true;
 		
 		case CMD_RESET_CONTROLLER:	reset();
@@ -520,7 +527,8 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 									return writeSetter(buffer, nbByte);
 		
 		case CMD_MOVE:
-		case CMD_RENDER_AND_MOVE:	lastCommand.cmd = cmd;
+		case CMD_RENDER_AND_MOVE:
+		case CMD_MOVE_UNIT_SIGNAL:	lastCommand.cmd = cmd;
 									return writeMoveCmd(buffer, nbByte);
 		
 		default:					lastCommand.cmd = cmd;
@@ -660,7 +668,10 @@ bool SerialEmulatorNULL::writeMoveCmd(unsigned char *buffer, unsigned int nbByte
 ///////////////////////////////////////////////////////////////////
 	int32_t x = 0L, y = 0L, z = 0L;
 	
-	if ( lastCommand.cmd == CMD_RENDER_AND_MOVE || lastCommand.cmd == CMD_MOVE) {
+	if (    lastCommand.cmd == CMD_RENDER_AND_MOVE 
+	     || lastCommand.cmd == CMD_MOVE
+		 || lastCommand.cmd == CMD_MOVE_UNIT_SIGNAL
+		) {
 		
 		// update the current emulator position
 		curEmulatorPos.set(cncControl->getCurPos());
@@ -719,21 +730,77 @@ bool SerialEmulatorNULL::writeMoveCmd(unsigned char *buffer, unsigned int nbByte
 		}
 	}
 	
-	// determine the target major position, this is the current pos + the given move
-	targetMajorPos.set(cncControl->getCurPos());
-	targetMajorPos.inc(x, y, z);
+	bool ret = false;
+	if ( lastCommand.cmd == CMD_MOVE_UNIT_SIGNAL ) {
+		ret = moveUntilSignal(x, y, z, buffer, nbByte);
 	
-	// the emulator function readData and writeData runs in the same thread.
-	// so, it isn't possible to repeat a move command with serval position callbacks
-	// as a real mirco controller can do.
-	// Instead the the move is supported with its total distance - see readMove. 
-	// however, for a preview this is good enougth!
-	//
-	// the following linear rendering is only to support a more detailed writeMoveCmd(...)
-	bool ret = renderMove(x, y, z, buffer, nbByte);
+	} else {
+		// determine the target major position, this is the current pos + the given move
+		targetMajorPos.set(cncControl->getCurPos());
+		targetMajorPos.inc(x, y, z);
+		
+		// the emulator function readData and writeData runs in the same thread.
+		// so, it isn't possible to repeat a move command with serval position callbacks
+		// as a real mirco controller can do.
+		// Instead the the move is supported with its total distance - see readMove. 
+		// however, for a preview this is good enougth!
+		//
+		// the following linear rendering is only to support a more detailed writeMoveCmd(...)
+		ret = renderMove(x, y, z, buffer, nbByte);
+	}
 	
 	// reset last signal
 	lastSignal = CMD_INVALID;
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	// determine the target major position, this is the current pos + ...
+	targetMajorPos.set(cncControl->getCurPos());
+	
+	// Always disable probe mode here, otherwise very long move distances appear
+	// this is already done by the application
+	
+	// speed setup
+	const double MAX_SPEED   = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+	
+	const double SPEED_STEP1 = MAX_SPEED * 0.05;	const unsigned int TIMESPAN_STEP1  =  500; // ms
+	const double SPEED_STEP2 = MAX_SPEED * 0.25;	const unsigned int TIMESPAN_STEP2  = 1000; // ms
+	const double SPEED_STEP3 = MAX_SPEED * 0.50;	const unsigned int TIMESPAN_STEP3  = 1500; // ms
+	const double SPEED_STEP4 = MAX_SPEED * 0.75;	const unsigned int TIMESPAN_STEP4  = 2000; // ms
+	const double SPEED_STEP5 = MAX_SPEED;
+	
+	double currentSpeed = SPEED_STEP1;
+	speedSimulator->setFeedSpeed_MM_MIN(currentSpeed);
+	
+	bool ret = false;
+	CncMilliTimestamp tsStart = CncTimeFunctions::getMilliTimestamp();
+	while ( (ret = renderMove(dx, dy, dz, buffer, nbByte) ) == true ) {
+		
+		// important because in case of SIG_QUIT_MOVE renderMove returns true
+		if ( lastCommand.ret != RET_OK )
+			break;
+	
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
+			{ currentSpeed = SPEED_STEP2; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
+
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP2 && currentSpeed < SPEED_STEP3 )
+			{ currentSpeed = SPEED_STEP3; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
+			
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP3 && currentSpeed < SPEED_STEP4 )
+			{ currentSpeed = SPEED_STEP4; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
+			
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
+			{ currentSpeed = SPEED_STEP5; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
+		
+		// the given moves
+		targetMajorPos.inc(dx, dy, dz);
+	}
+	
+	// reactivate configured probe mode state
+	// this is already done by the application
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -744,6 +811,10 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->initMove(dx, dy, dz);
 	}
+	
+	// presetup the move return value, 
+	// it will be overriden by stepAxis on demand
+	lastCommand.ret = RET_OK;
 	
 	// initialize
 	int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
@@ -829,6 +900,20 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::translateStepAxisRetValue(unsigned char ret) {
+///////////////////////////////////////////////////////////////////
+	lastCommand.ret = ret;
+	
+	switch ( ret ) {
+		case RET_INTERRUPT:		return false;
+		case RET_ERROR:			return false;
+		
+		case RET_HALT:			return true;
+		case RET_QUIT:			return true;
+		default:				return true;
+	}
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force) {
 ///////////////////////////////////////////////////////////////////
 	// statistic counting
@@ -844,13 +929,19 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 	curEmulatorPos.incZ(dz);
 	
 	// simulate speed
-	if ( stepAxis('X', dx) == false ) return false;
-	if ( stepAxis('Y', dy) == false ) return false;
-	if ( stepAxis('Z', dz) == false ) return false;
+	unsigned char retVal;
+	if ( (retVal = stepAxis('X', dx)) != RET_OK ) return translateStepAxisRetValue(retVal);
+	if ( (retVal = stepAxis('Y', dy)) != RET_OK ) return translateStepAxisRetValue(retVal);
+	if ( (retVal = stepAxis('Z', dz)) != RET_OK ) return translateStepAxisRetValue(retVal);
 	
 	// simulate a direct controller callback.
 	static CncLongPosition lastReplyPos;
 	CncLongPosition diff(curEmulatorPos - lastReplyPos);
+	
+	//std::cout << force << endl;
+	//std::cout << curEmulatorPos.getX() << ", " << lastReplyPos.getX() << "; " << posReplyThresholdX << ", " << diff.getX() << std::endl;
+	//std::cout << curEmulatorPos.getY() << ", " << lastReplyPos.getY() << "; " << posReplyThresholdY << ", " << diff.getY() << std::endl;
+	//std::cout << curEmulatorPos.getZ() << ", " << lastReplyPos.getZ() << "; " << posReplyThresholdZ << ", " << diff.getZ() << std::endl;
 	
 	if ( absolute( diff.getX() ) >= posReplyThresholdX || 
 	     absolute( diff.getY() ) >= posReplyThresholdY || 
@@ -896,14 +987,15 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
+unsigned char SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
 ///////////////////////////////////////////////////////////////////
 	for ( int32_t i = 0; i < absolute(steps); i++ ) {
 		// signal handling
 		switch ( lastSignal ) {
 		
-			case SIG_INTERRUPPT:
-			case SIG_HALT:				return false;
+			case SIG_INTERRUPPT:		return RET_INTERRUPT;
+			case SIG_HALT:				return RET_HALT;
+			case SIG_QUIT_MOVE:			return RET_QUIT;
 			
 			case SIG_PAUSE:				// pause handling
 										while ( lastSignal == SIG_PAUSE ) {
@@ -934,14 +1026,14 @@ bool SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
 							break;
 							
 				default:	wxASSERT(axis != 'X' && axis != 'Y' && axis != 'Z');
-							return false;
+							return RET_ERROR;
 			}
 			
 			speedSimulator->performCurrentOffset(false);
 		}
 	}
 	
-	return true;
+	return RET_OK;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, unsigned char *buffer, unsigned int nbByte) {

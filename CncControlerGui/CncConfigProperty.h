@@ -19,7 +19,6 @@ class CncTextCtrlEditor : public wxPGTextCtrlEditor {
 		CncTextCtrlEditor() 
 		: wxPGTextCtrlEditor() 
 		{
-			std::clog << "ctor";
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////

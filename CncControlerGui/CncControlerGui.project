@@ -156,6 +156,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncReferencePosition.h"/>
+      <File Name="CncReferencePosition.cpp"/>
+      <File Name="CncConnectProgress.h"/>
+      <File Name="CncConnectProgress.cpp"/>
       <File Name="CncPerspective.cpp"/>
       <File Name="CncPerspective.h"/>
       <File Name="CncZView.h"/>
@@ -351,9 +355,6 @@
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
-  <Dependencies Name="release2"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -529,4 +530,7 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Dependencies Name="release2"/>
 </CodeLite_Project>

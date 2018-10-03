@@ -51,6 +51,9 @@ class GLContextBase : public wxGLContext {
 		void disable() { enable(false); }
 		bool isEnabled() { return enabled; }
 		
+		void decorateProbeMode(bool state);
+		bool isProbeMode() { return probeMode; }
+		
 		void init();
 		void display();
 		void reshape(int w, int h);
@@ -146,6 +149,7 @@ class GLContextBase : public wxGLContext {
 		bool				posMarker;
 		bool				autoScale;
 		bool				blending;
+		bool				probeMode;
 		
 		float				zoom;
 		

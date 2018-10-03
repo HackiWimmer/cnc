@@ -27,6 +27,7 @@ void ArduinoCMDs::init() {
 	cmds[SIG_HALT]                  = "Push Signal Pause";
 	cmds[SIG_PAUSE]                 = "Push Signal Pause";
 	cmds[SIG_RESUME]                = "Push Signal Resume";
+	cmds[SIG_QUIT_MOVE]             = "Push Signal Quit Move";
 	
 	cmds[CMD_IDLE]                  = "Pull Idle Callback";
 	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Controller";
@@ -110,6 +111,9 @@ void ArduinoPIDs::init() {
 	pids[RET_ERROR]                           = "RET_ERROR";
 	pids[RET_SOT]                             = "RET_SOT";
 	pids[RET_SOH]                             = "RET_SOH";
+	pids[RET_INTERRUPT]                       = "RET_INTERRUPT"; 
+	pids[RET_HALT]                            = "RET_HALT"; 
+	pids[RET_QUIT]                            = "RET_QUIT";
 	pids[RET_MSG]                             = "RET_MSG";
 	
 	pids[PID_UNKNOWN]                         = "Default PID";

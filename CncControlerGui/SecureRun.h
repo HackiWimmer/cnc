@@ -28,6 +28,6 @@ class SecureRun : public SecureRunBase
 		bool       isPause;
 		bool       headerFlag;
 		
-		void hideDialog();
+		void hideDialog(int retValue);
 };
 #endif // SECURERUN_H

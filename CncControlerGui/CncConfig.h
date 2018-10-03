@@ -86,6 +86,9 @@ class CncConfig {
 		double workpieceOffset;
 		double currentZDepth;
 		double maxZDistance;
+		
+		double workpieceThickness;
+		CncRefPositionMode referencePositionMode;
 		bool referenceIncludesWpt;
 		
 		bool onlineUpdateCoordinates;
@@ -200,7 +203,7 @@ class CncConfig {
 		const bool isModified() 		{ return changed; }
 		void discardModifications() 	{ changed = false; }
 		
-		void setProbeMode(bool state) { probeMode = state; }
+		void setProbeMode(bool state); 
 		bool isProbeMode() { return  probeMode; }
 		
 		double convertX(CncUnit oldUnit, CncUnit newUnit, double value);
@@ -242,7 +245,12 @@ class CncConfig {
 		const bool getSvgReverseYAxisFlag();
 		const bool getAvoidDupSetterValuesFlag();
 		const bool getResetErrorInfoBeforeRunFlag();
+		
 		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
+		const double getWorkpieceThickness()					{ return workpieceThickness; }
+		const CncRefPositionMode getReferencePositionMode()     { return referencePositionMode; }
+		
+		const double getMeasurePlateThickness()					{ return 1.2; } //TODO
 		
 		const int getStepSignX();
 		const int getStepSignY();
@@ -277,7 +285,6 @@ class CncConfig {
 		const double getPitchZ();
 		const double getSvgEmulatorCopyFactor();
 		const double getMaxDurationThickness();
-		const double getWorkpieceThickness();
 		const double getDurationThickness(unsigned int duration);
 		const double getDurationPositionAbs(unsigned int duration);
 		const double getReplyThresholdMetric();
@@ -313,8 +320,10 @@ class CncConfig {
 		CncConfig& setMaxDimensionX(const double val);
 		CncConfig& setMaxDimensionY(const double val);
 		CncConfig& setMaxDimensionZ(const double val);
-		CncConfig& setMaxZDistance(double d)					{ sc(); maxZDistance = d;         updateCalculatedZAxisValues(); return *this; }
-		CncConfig& setReferenceIncludesWpt(bool b) 				{ sc(); referenceIncludesWpt = b; updateCalculatedZAxisValues(); return *this; }
+		CncConfig& setMaxZDistance(double d)					  { sc(); maxZDistance          = d; updateCalculatedZAxisValues(); return *this; }
+		CncConfig& setReferenceIncludesWpt(bool b) 				  { sc(); referenceIncludesWpt  = b; updateCalculatedZAxisValues(); return *this; }
+		CncConfig& setWorkpieceThickness(double t)                { sc(); workpieceThickness    = t; updateCalculatedZAxisValues(); return *this; }
+		CncConfig& setReferencePositionMode(CncRefPositionMode m) { sc(); referencePositionMode = m; updateCalculatedZAxisValues(); return *this; }
 		const double setCurrentZDepth(double dpt);
 };
 

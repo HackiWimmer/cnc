@@ -165,6 +165,7 @@ void CncToolMagazine::setToolMagazineConfig() {
 		long id; cell.ToLong(&id);
 		
 		tm[id] = entry;
+		
 	}
 }
 ////////////////////////////////////////////////////////////////////////////
@@ -266,7 +267,9 @@ void CncToolMagazine::editTool(wxCommandEvent& event) {
 		return;
 	}
 	
-	m_toolMagazine->SetItem(index, TM_COL_ID, 			wxString::Format("%ld", id));
+	wxString ID(wxString::Format("%ld", id));
+	
+	m_toolMagazine->SetItem(index, TM_COL_ID, 			ID);
 	m_toolMagazine->SetItem(index, TM_COL_TYPE, 		m_toolMagazineType->GetStringSelection());
 	m_toolMagazine->SetItem(index, TM_COL_DIAMETER, 	m_toolMagazineDiameter->GetValue());
 	m_toolMagazine->SetItem(index, TM_COL_LENGTH, 		m_toolMagazineLength->GetValue());
@@ -276,6 +279,9 @@ void CncToolMagazine::editTool(wxCommandEvent& event) {
 	m_toolMagazineId->Enable(false);
 	setInsertState(false);
 	setToolMagazineConfig();
+	
+	if ( m_cbDefaultMappedTo->FindString(ID) < 0  )
+		m_cbDefaultMappedTo->Append(ID);
 	
 	m_toolMagazine->Enable(true);
 	m_btToolMagazineEdit->Enable(true);
@@ -322,8 +328,12 @@ void CncToolMagazine::removeTool(wxCommandEvent& event) {
 	if ( lastSelectedItem < 0 || lastSelectedItem > m_toolMagazine->GetItemCount() - 1 )
 		return;
 	
+	wxString ID = m_toolMagazine->GetItemText(lastSelectedItem, TM_COL_ID);
 	m_toolMagazine->DeleteItem(lastSelectedItem);
 	setToolMagazineConfig();
+	
+	if ( m_cbDefaultMappedTo->FindString(ID) > 0  )
+		m_cbDefaultMappedTo->Delete(m_cbDefaultMappedTo->FindString(ID));
 }
 ////////////////////////////////////////////////////////////////////////////
 void CncToolMagazine::selectedTool(wxListEvent& event) {

@@ -53,6 +53,21 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 	{
 		wxPGProperty* prop = NULL;
 		
+		//...................
+		wxPGProperty* wpt = NULL;
+		curCatName.assign("Workpiece");
+		wpt = root->AppendChild( new wxPropertyCategory(curCatName));
+		registerCategory(curCatName, wpt);
+		{
+			//...............
+			validator.SetPrecision(3); validator.SetRange(0.1, 90.0);
+			prop = wpt->AppendChild( new wxFloatProperty("Max Thickness per crossing [mm]", NEXT_PROP_ID, 2.0));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetValidator(validator);
+			prop->SetEditor( wxT("TextCtrl") );
+			CncConfig::registerProperty(CncWork_Wpt_MAX_THICKNESS_CROSS, prop);
+		}
 				//...................
 		wxPGProperty* parser = NULL;
 		curCatName.assign("Parsing behaviour");

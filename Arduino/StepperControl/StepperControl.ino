@@ -14,6 +14,11 @@ LastErrorCodes errorInfo;
 CncController controller(errorInfo);
 
 /////////////////////////////////////////////////////////////////////////////////////
+// "Software Reset" function
+void (*softwareReset)(void)=0;
+/////////////////////////////////////////////////////////////////////////////////////
+
+/////////////////////////////////////////////////////////////////////////////////////
 inline void printSketchVersion() {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOT);
@@ -408,8 +413,9 @@ inline unsigned char processSetter() {
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline unsigned char decodeMove() {
+inline unsigned char decodeMove(unsigned char cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
+
   // Wait a protion of time.
   // This is very importent for the next readBytes above
   delayMicroseconds(700);
@@ -447,7 +453,13 @@ inline unsigned char decodeMove() {
     default:  return RET_ERROR;
   }
 
-  return ( controller.renderAndStepAxisXYZ(x, y, z) == false ? RET_ERROR : RET_OK);
+  // select underlying mechanism 
+  switch ( cmd ) {
+    case CMD_MOVE_UNIT_SIGNAL:  return controller.moveUntilSignal(x, y, z);
+    default:                    return controller.renderAndStepAxisXYZ(x, y, z);
+  }
+
+  return RET_ERROR;
 }
 /////////////////////////////////////////////////////////////////////////////////////
 inline unsigned char decodeTest() {
@@ -502,8 +514,15 @@ inline char reset() {
 
   // broadcast reset
   controller.reset();
+  
+  
   clearSerial();
-
+/*
+  Serial.end();
+  Serial.begin(BAUD_RATE);
+  Serial.setTimeout(1000);
+  Serial.flush();
+  */
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -572,6 +591,11 @@ void loop() {
     // Signals
     // --------------------------------------------------------------------------
 
+        // Software reset
+        case SIG_SOFTWARE_RESET:
+              softwareReset();        
+              return;
+              
         // Interrupt
         case SIG_INTERRUPPT:
               processInterrupt();
@@ -590,6 +614,11 @@ void loop() {
         // Cancel running moves
         case SIG_HALT:
               controller.broadcastHalt(); 
+              return;
+
+        // quit moves until signal
+       case SIG_QUIT_MOVE:
+       //TODO  
               return;
 
     // --------------------------------------------------------------------------
@@ -618,10 +647,13 @@ void loop() {
               break;
 
         // MB command - Movement
-        case CMD_MOVE:               // obsolete command
+        case CMD_MOVE: // obsolete command
         case CMD_RENDER_AND_MOVE:
+        case CMD_MOVE_UNIT_SIGNAL:
               controller.setPosReplyState(true);
-              r = decodeMove();
+
+              r = decodeMove(c);
+              
               controller.getStepperX()->resetDirectionPin();
               controller.getStepperY()->resetDirectionPin();
               controller.getStepperZ()->resetDirectionPin();
@@ -654,11 +686,6 @@ void loop() {
               controller.enableStepperPin(false);
               break;
   
-        // SB command - Test suite
-        case CMD_TEST_START:
-              r = decodeTest();
-              break;
-  
         // SB command - Probe
         case CMD_ENABLE_PROBE_MODE:
               controller.enableProbeMode();
@@ -670,7 +697,12 @@ void loop() {
               controller.disableProbeMode();
               r = RET_OK;
               break;
-
+              
+        // SB command - Test suite
+        case CMD_TEST_START:
+              r = decodeTest();
+              break;
+              
     // --------------------------------------------------------------------------
     // Commands - multi byte return
     // - must always return directly

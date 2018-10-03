@@ -32,6 +32,7 @@ class CncFilePreview;
 class wxMenu;
 class wxMenuItem;
 class SecureRun;
+class CncReferencePosition;
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -80,6 +81,13 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void changeConfigToolbook(wxToolbookEvent& event);
+		virtual void warmStartController(wxCommandEvent& event);
+		virtual void setReferencePosition(wxCommandEvent& event);
+		virtual void cmXnegYnegLeftDown(wxMouseEvent& event);
+		virtual void cmXnegYposLeftDown(wxMouseEvent& event);
+		virtual void cmXposYnegLeftDown(wxMouseEvent& event);
+		virtual void cmXposYposLeftDown(wxMouseEvent& event);
 		virtual void testCaseBookChanged(wxListbookEvent& event);
 		virtual void requestInterrupt(wxCommandEvent& event);
 		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
@@ -99,10 +107,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void resetControllerErrorInfoFromButton(wxCommandEvent& event);
 		virtual void keyDownLruList(wxKeyEvent& event);
 		virtual void dclickLogger(wxMouseEvent& event);
-		
-		virtual void xxxxxxxxxxxxx(wxMouseEvent& event);
 		virtual void keyDownLogger(wxKeyEvent& event);
-		
 		virtual void leftDownProbeModePanel(wxMouseEvent& event);
 		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void renameTemplateFromButton(wxCommandEvent& event);
@@ -112,8 +117,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void onSelectTemplatePreview(wxCommandEvent& event);
 		virtual void onSelectTestPage(wxCommandEvent& event);
 		virtual void refreshSetterList(wxCommandEvent& event);
-		virtual void moveStartMainWindow(wxMoveEvent& event);
-		virtual void menuBarLButtonDown(wxMouseEvent& event);
 		virtual void onPaintSpeedPanel(wxPaintEvent& event);
 		virtual void clearMotionMonitorVecties(wxCommandEvent& event);
 		virtual void copyMotionMonitorVecties(wxCommandEvent& event);
@@ -293,8 +296,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event);
 		virtual void requestReset(wxCommandEvent& event);
 		virtual void requestEnableStepperMotors(wxCommandEvent& event);
-		virtual void keyDownZ(wxKeyEvent& event);
-		virtual void keyDownXY(wxKeyEvent& event);
 		virtual void emergencyStop(wxCommandEvent& event);
 		virtual void defineDebugSerial(wxCommandEvent& event);
 		virtual void defineMinMonitoring(wxCommandEvent& event);
@@ -310,18 +311,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void defineUpdateCoordinates(wxCommandEvent& event);
 		virtual void defineAllowEvents(wxCommandEvent& event);
 		virtual void defineOnlineDrawing(wxCommandEvent& event);
-		virtual void mvSpinDownY(wxSpinEvent& event);
-		virtual void mvSpinDownZ(wxSpinEvent& event);
-		virtual void mvSpinUpZ(wxSpinEvent& event);
-		virtual void mvSpinDownX(wxSpinEvent& event);
-		virtual void mvSpinUpX(wxSpinEvent& event);
-		virtual void mvSpinUpY(wxSpinEvent& event);
-		virtual void updateInclWpt(wxCommandEvent& event);
 		virtual void svgEmuOpenFileAsSource(wxCommandEvent& event);
 		virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event);
 		virtual void svgEmuReload(wxCommandEvent& event);
 		virtual void selectUnit(wxCommandEvent& event);
-		virtual void setZero(wxCommandEvent& event);
 		virtual void clearLogger(wxCommandEvent& event);
 		virtual void connect(wxCommandEvent& event);
 		virtual void selectUAInboundPathList(wxDataViewEvent& event);
@@ -344,10 +337,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void maxManuallyYSlider(wxCommandEvent& event);
 		virtual void updateMetricX(wxCommandEvent& event);
 		virtual void updateMetricY(wxCommandEvent& event);
-		virtual void killFocusMoveZAxis(wxFocusEvent& event);
-		virtual void killFocusMoveXYAxis(wxFocusEvent& event);
-		virtual void setFocusMoveXYAxis(wxFocusEvent& event);
-		virtual void setFocusMoveZAxis(wxFocusEvent& event);
 		virtual void viewMainView(wxCommandEvent& event);
 		virtual void viewTemplateManager(wxCommandEvent& event);
 		virtual void viewLogger(wxCommandEvent& event);
@@ -398,7 +387,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initialize(void);
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		bool secureRun() { return processTemplateWrapper(); }
+		bool secureRun() { return processTemplateIntern(); }
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// global trace controls
@@ -470,6 +459,16 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		UpdateManagerThread* updateManagerThread;
 		wxCriticalSection pThreadCS;
 		
+		void manualContinuousMoveStart(wxWindow* ctrl, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		void manualContinuousMoveStop();
+		
+		bool connectSerialPort();
+		
+		void decorateProbeMode(bool probeMode);
+		
+		friend class CncConfig;
+		friend class CncReferencePosition;
+		friend class CncConnectProgress;
 		friend class UpdateManagerThread;
 		friend class CncPerspective;
 		friend class CncFileView;
@@ -535,12 +534,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		GuiControls	guiControls;
 		
 		SecureRun* secureRunDlg;
+		CncReferencePosition* refPositionDlg;
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
 		
-		void manualContinuousMoveStart(wxWindow* ctrl, bool x, bool y, bool z, const CncDirection dir);
-		void manualContinuousMoveStop();
-	
 		void setIcons();
 		
 		void traceGccVersion(std::ostream& out);
@@ -603,7 +600,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void updateCurveLibResolution();
 		
 		void decorateSearchButton();
-		void decodrateProbeMode(bool probeMode);
 		void decoratePosSpyConnectButton(bool state);
 		
 		void toggleMonitorStatistics(bool shown=false);
@@ -619,7 +615,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void createStcFileControlPopupMenu();
 		void createStcEmuControlPopupMenu();
 		
-		int showSetReferencePositionDlg(wxString msg);
+		int showReferencePositionDlg(wxString msg);
 		
 		void decorateSwitchToolOnOff(bool state);
 		
@@ -763,13 +759,13 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void navigateY(CncDirection d);
 		void navigateZ(CncDirection d);
 		
-		bool connectSerialPort();
-		
 		SvgOutputParameters& evaluteSvgOutputParameters(SvgOutputParameters& sop);
 		
 		void resetMinMaxPositions();
 		void setRefPostionState(bool state);
 		void decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl);
+		
+		bool connectSerialPortDialog();
 		
 };
 

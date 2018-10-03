@@ -120,6 +120,9 @@ struct I2CData {
   const unsigned char SIG_HALT                            =  'H';
   const unsigned char SIG_PAUSE                           =  'P';
   const unsigned char SIG_RESUME                          =  'p';
+  const unsigned char SIG_QUIT_MOVE                       =  'q';
+
+  const unsigned char SIG_SOFTWARE_RESET                  =  '#';
 
 // .....................................................................
 // Commands
@@ -150,6 +153,8 @@ struct I2CData {
 
   const unsigned char CMD_MOVE                            =  'm';
   const unsigned char CMD_RENDER_AND_MOVE                 =  'M';
+
+  const unsigned char CMD_MOVE_UNIT_SIGNAL                =  '>';
   
   const unsigned char CMD_TEST_START                      =  'T';
   
@@ -208,7 +213,10 @@ struct I2CData {
   const unsigned char RET_SOT                             =   3;   // Start of text
   const unsigned char RET_OK                              =   4;   // Ack
   const unsigned char RET_ERROR                           =   5;   // Nack
-  const unsigned char RET_MSG                             =   6;   // Start of message
+  const unsigned char RET_INTERRUPT                       =   6;   // 
+  const unsigned char RET_HALT                            =   7;   // 
+  const unsigned char RET_QUIT                            =   8;   // 
+  const unsigned char RET_MSG                             =   9;   // Start of message
 
 // .....................................................................
 // Please consider

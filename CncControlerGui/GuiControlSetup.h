@@ -14,6 +14,7 @@ class CncZView;
 class CncSpeedView;
 class MainFrame;
 class wxToggleButton;
+class wxBitmapToggleButton;
 
 struct GuiControlSetup {
 	
@@ -27,6 +28,7 @@ struct GuiControlSetup {
 	
 	wxStaticBitmap* toolState					= NULL;
 	wxMenuItem* motorState						= NULL;
+	wxBitmapToggleButton* probeModeState		= NULL;
 	
 	wxStaticText* xMinLimit						= NULL;
 	wxStaticText* xMaxLimit						= NULL;

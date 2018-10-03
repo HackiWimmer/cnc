@@ -6,9 +6,11 @@
 #ifdef __DARWIN__
     #include <OpenGL/glu.h>
 	#include <OpenGL/glut.h>
+	#include <OpenGL/freeglut.h>
 #else
     #include <GL/glu.h>
 	#include <GL/glut.h>
+	#include <GL/freeglut.h>
 	#include <GL/glext.h>
 #endif
 
@@ -21,6 +23,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 , posMarker(true)
 , autoScale(true)
 , blending(true)
+, probeMode(false)
 , zoom(1.0f)
 , viewMode(V2D_TOP)
 , coordOriginInfo()
@@ -600,6 +603,11 @@ float GLContextBase::getCurrentScaleFactor() {
 	return scaleFact;
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::decorateProbeMode(bool state) {
+/////////////////////////////////////////////////////////////////
+	probeMode = state;
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::display() {
 /////////////////////////////////////////////////////////////////
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -612,17 +620,6 @@ void GLContextBase::display() {
 	//first position the camera
 	determineCameraPosition();
 
-	// inactive message
-	if ( isEnabled() == false ) {
-		glPushMatrix();
-			glColor3ub(128, 0, 0);
-			renderBitmapString(0.0, 0.0, 0.0, GLUT_BITMAP_HELVETICA_18, "Inactive");
-		glPopMatrix();
-		glFlush();
-		checkGLError();
-		return;
-	}
-	
 	// main model
 	glPushMatrix();
 		// scale

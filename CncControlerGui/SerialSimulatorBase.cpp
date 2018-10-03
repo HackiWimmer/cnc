@@ -782,15 +782,15 @@ void SerialSimulatorThread::processNextCommand() {
 		case CMD_SETTER:				ret = performSetterValueIntern();
 										break;
 										
-		case CMD_TEST_INFO_MESSAGE:		performMessage(cmd, "This ia a test message from type: 'INFO'");
+		case CMD_TEST_INFO_MESSAGE:		performMessage(cmd, "This is a test message from type: 'INFO'");
 										ret = RET_OK;
 										break;
 										
-		case CMD_TEST_WARN_MESSAGE:		performMessage(cmd, "This ia a test message from type: 'WARNING'");
+		case CMD_TEST_WARN_MESSAGE:		performMessage(cmd, "This is a test message from type: 'WARNING'");
 										ret = RET_OK;
 										break;
 										
-		case CMD_TEST_ERROR_MESSAGE:	performMessage(cmd, "This ia a test message from type: 'ERROR'");
+		case CMD_TEST_ERROR_MESSAGE:	performMessage(cmd, "This is a test message from type: 'ERROR'");
 										ret = RET_OK;
 										break;
 										

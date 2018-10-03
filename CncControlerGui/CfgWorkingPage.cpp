@@ -23,15 +23,8 @@ void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 		CncConfig::getGlobalCncConfig()->calculateThresholds();
 		app->releaseControllerSetupFromConfig();
 		
-	} else if ( name == CncWork_Wpt_THICKNESS ) {
-		CncConfig::getGlobalCncConfig()->currentZDepth = CncConfig::getGlobalCncConfig()->getWorkpieceThickness();
-		CncConfig::getGlobalCncConfig()->initZAxisValues();
-		
-		app->changeWorkpieceThickness();
-		
 	} else if ( name == CncWork_Wpt_MAX_THICKNESS_CROSS ) {
 		CncConfig::getGlobalCncConfig()->initZAxisValues();
-		
 		app->changeCrossingThickness();
 		
 	}
@@ -76,64 +69,6 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 	CncConfig::registerPageRoot(root, fps);
 	{
 		wxPGProperty* prop = NULL;
-		
-		//...................
-		wxPGProperty* wpt = NULL;
-		curCatName.assign("Workpiece");
-		wpt = root->AppendChild( new wxPropertyCategory(curCatName));
-		registerCategory(curCatName, wpt);
-		{
-
-			
-			
-			//...............
-			validator.SetPrecision(6); validator.SetRange(0, 90.0);
-			prop = wpt->AppendChild( new CncConfigProperty("Test [mm]", NEXT_PROP_ID, "0.0"));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			
-			//prop->SetMaxLength(6);
-			
-			/*
-			wxFloatingPointValidator<float>* xxx = ((wxFloatingPointValidator<float>*)(prop->GetValidator()));
-			
-			clog << xxx.GetPrecision() << endl;
-			
-			
-			xxx->SetRange(0, 90.0);
-			xxx->SetPrecision(3);
-			prop->SetValidator(*xxx);
-			*/
-			
-			//prop->SetValidator(validator);
-			
-			prop->SetEditor( wxT("CncTextEditor") );
-			CncConfig::registerProperty(CncTEST_TEST, prop);
-
-
-
-
-
-
-
-			//...............
-			validator.SetPrecision(3); validator.SetRange(0, 90.0);
-			prop = wpt->AppendChild( new wxFloatProperty("Thickness [mm]", NEXT_PROP_ID, 0.0));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			CncConfig::registerProperty(CncWork_Wpt_THICKNESS, prop);
-			
-			//...............
-			validator.SetPrecision(3); validator.SetRange(0.1, 90.0);
-			prop = wpt->AppendChild( new wxFloatProperty("Max Thickness per crossing [mm]", NEXT_PROP_ID, 2.0));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetValidator(validator);
-			prop->SetEditor( wxT("TextCtrl") );
-			CncConfig::registerProperty(CncWork_Wpt_MAX_THICKNESS_CROSS, prop);
-		}
 		
 		//...................
 		wxPGProperty* ctl = NULL;

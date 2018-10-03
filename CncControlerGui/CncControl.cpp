@@ -28,6 +28,7 @@ static CommandTemplates CMDTPL;
 CncControl::CncControl(CncPortType pt) 
 : currentClientId(-1)
 , runContinuousMove(false)
+, continuousMoveAppBased(false)
 , setterMap()
 , portType(pt)
 , serialPort(NULL)
@@ -253,11 +254,7 @@ bool CncControl::setup(bool doReset) {
 	long logPos = logger->GetLastPosition();
 	
 	// setup probe mode
-	bool ret = true;
-	if ( GBL_CONFIG->isProbeMode() )	ret = processCommand(CMD_ENABLE_PROBE_MODE, std::cerr);
-	else								ret = processCommand(CMD_DISABLE_PROBE_MODE, std::cerr);
-	
-	if ( ret == false ) {
+	if ( enableProbeMode(GBL_CONFIG->isProbeMode()) == false ) {
 		std::cerr << " CncControl::setup: Probe mode configuration failed!\n";
 		return false;
 	}
@@ -1169,7 +1166,7 @@ bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool 
 bool CncControl::moveRelMetricZ(double z) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double sZ = z * cncConfig->getCalculationFactZ();
+	const double sZ = z * cncConfig->getCalculationFactZ();
 	
 	return moveRelStepsZ((int32_t)round(sZ));
 }
@@ -1177,8 +1174,8 @@ bool CncControl::moveRelMetricZ(double z) {
 bool CncControl::moveRelLinearMetricXY(double x1, double y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double sX1 = x1 * cncConfig->getCalculationFactX();
-	double sY1 = y1 * cncConfig->getCalculationFactY();
+	const double sX1 = x1 * cncConfig->getCalculationFactX();
+	const double sY1 = y1 * cncConfig->getCalculationFactY();
 	
 	return moveRelLinearStepsXY((int32_t)round(sX1), 
 	                            (int32_t)round(sY1),
@@ -1188,9 +1185,9 @@ bool CncControl::moveRelLinearMetricXY(double x1, double y1, bool alreadyRendere
 bool CncControl::moveRelLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double sX1 = x1 * cncConfig->getCalculationFactX();
-	double sY1 = y1 * cncConfig->getCalculationFactY();
-	double sZ1 = z1 * cncConfig->getCalculationFactZ();
+	const double sX1 = x1 * cncConfig->getCalculationFactX();
+	const double sY1 = y1 * cncConfig->getCalculationFactY();
+	const double sZ1 = z1 * cncConfig->getCalculationFactZ();
 	
 	return moveRelLinearStepsXYZ((int32_t)round(sX1), 
 	                             (int32_t)round(sY1),
@@ -1201,7 +1198,7 @@ bool CncControl::moveRelLinearMetricXYZ(double x1, double y1, double z1, bool al
 bool CncControl::moveAbsMetricZ(double z) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double sZ = z * cncConfig->getCalculationFactZ();
+	const double sZ = z * cncConfig->getCalculationFactZ();
 	
 	return moveRelStepsZ( (int32_t)round(sZ) - curAppPos.getZ() );
 }
@@ -1209,8 +1206,8 @@ bool CncControl::moveAbsMetricZ(double z) {
 bool CncControl::moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double sX1 = x1 * cncConfig->getCalculationFactX();
-	double sY1 = y1 * cncConfig->getCalculationFactY();
+	const double sX1 = x1 * cncConfig->getCalculationFactX();
+	const double sY1 = y1 * cncConfig->getCalculationFactY();
 	
 	return moveRelLinearStepsXY((int32_t)round(sX1) - curAppPos.getX(), 
 	                            (int32_t)round(sY1) - curAppPos.getY(),
@@ -1220,9 +1217,9 @@ bool CncControl::moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendere
 bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	double sX1 = x1 * cncConfig->getCalculationFactX();
-	double sY1 = y1 * cncConfig->getCalculationFactY();
-	double sZ1 = z1 * cncConfig->getCalculationFactZ();
+	const double sX1 = x1 * cncConfig->getCalculationFactX();
+	const double sY1 = y1 * cncConfig->getCalculationFactY();
+	const double sZ1 = z1 * cncConfig->getCalculationFactZ();
 	
 	return moveRelLinearStepsXYZ((int32_t)round(sX1) - curAppPos.getX(),
 	                             (int32_t)round(sY1) - curAppPos.getY(),
@@ -1408,28 +1405,50 @@ void CncControl::updateCncConfigTrace() {
 		GET_GUI_CTL(mainFrame)->umPostEvent(evt.ConfigUpdateEvent());
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::enableStepperMotors(bool s) {
+bool CncControl::enableStepperMotors(bool s) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
 	if ( isInterrupted() )
-		return;
+		return false;
 		
 	if ( isConnected() == false )
-		return;
+		return false;
 	
-	bool ret = false;
-	if ( s == true ) 	ret = processCommand("E", std::cout);
-	else				ret = processCommand("e", std::cout);
-	
+	bool ret = processCommand( ( s == true ? CMD_ENABLE_STEPPER_PIN : CMD_DISABLE_STEPPER_PIN), std::cout);
 	if ( ret == false ) {
 		std::cerr << "CncControl::enableStepperMotors" << std::endl;
 		std::cerr << " Error while enabling stepper motors. State=" << s << std::endl;
-		return;
+		return false;
 	}
 	
 	if ( GET_GUI_CTL(motorState) )
 		GET_GUI_CTL(motorState)->Check(s);
+		
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::enableProbeMode(bool s) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(guiCtlSetup);
+	
+	if ( isInterrupted() )
+		return false;
+		
+	if ( isConnected() == false )
+		return false;
+	
+	bool ret = processCommand( ( s == true ? CMD_ENABLE_PROBE_MODE : CMD_DISABLE_PROBE_MODE), std::cout);
+	if ( ret == false ) {
+		std::cerr << "CncControl::enableProbeMode" << std::endl;
+		std::cerr << " Error while enabling probe mode. State=" << s << std::endl;
+		return false;
+	}
+	
+	if ( GET_GUI_CTL(probeModeState) )
+		GET_GUI_CTL(probeModeState)->SetValue(s);
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 wxString& CncControl::getLimitInfoString(wxString& ret) {
@@ -1728,53 +1747,80 @@ bool CncControl::moveZToMid() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::manualContinuousMoveStop() {
 ///////////////////////////////////////////////////////////////////
+	if ( continuousMoveAppBased == false ) 	
+		if ( runContinuousMove == true )
+			getSerial()->sendSignal(SIG_QUIT_MOVE);
+	
 	runContinuousMove = false;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart(StepSensitivity s, bool x, bool y, bool z, const CncDirection dir) {
+bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
 ///////////////////////////////////////////////////////////////////
-	const double swx = s/(double)STEP_SENSITIVITY_FACTOR;
-	const double swy = s/(double)STEP_SENSITIVITY_FACTOR;
-	const double swz = s/(double)STEP_SENSITIVITY_FACTOR;
-
-	const double stepSensitivity = std::min(swz, std::min(swx, swy));
-	return manualContinuousMoveStart(stepSensitivity, x, y, z, dir);
+	const double SSF = (double)STEP_SENSITIVITY_FACTOR;
+	
+	// Setup
+	const double xDim = s/SSF * x;
+	const double yDim = s/SSF * y;
+	const double zDim = s/SSF * z;
+	
+	bool ret = false;
+	if ( continuousMoveAppBased == true ) 	ret = manualContinuousMoveStart_AppBased(xDim, yDim, zDim);
+	else									ret = manualContinuousMoveStart_CtrlBased(xDim, yDim, zDim);
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart(double stepSensitivity, bool x, bool y, bool z, const CncDirection dir) {
+bool CncControl::manualContinuousMoveStart_AppBased(const double xDim, const double yDim, const double zDim) {
 ///////////////////////////////////////////////////////////////////
 	if ( getSerial()->isCommandActive() == true )
 		return false;
+		
+	// Always disable probe mode here, otherwise very long move distances appear
+	const bool probeModeBefore = GBL_CONFIG->isProbeMode();
+	if ( enableProbeMode(false) == false ) {
+		std::cerr << " Cant disable probe mode. Manual continous move aborted" << std::endl;
+		return false;
+	}
+	GBL_CONFIG->setProbeMode(false);
 	
-	// Quality check
-	const double MIN_STEP_WIDTH = GBL_CONFIG->getCalculationFactX(CncMetric)
-			                    * SMALLEST/(double)STEP_SENSITIVITY_FACTOR;
-
-	const double MAX_STEP_WIDTH = GBL_CONFIG->getCalculationFactX(CncMetric)
-			                    * LARGEST/(double)STEP_SENSITIVITY_FACTOR;
-
-	if ( stepSensitivity < 0.0 || cnc::dblCompareNull(stepSensitivity) ) 	stepSensitivity = MIN_STEP_WIDTH;
-	if ( stepSensitivity > MAX_STEP_WIDTH )									stepSensitivity = MAX_STEP_WIDTH;
-
-	// Setup
-	double xDim = x ? stepSensitivity : 0.0;
-	double yDim = y ? stepSensitivity : 0.0;
-	double zDim = z ? stepSensitivity : 0.0;
+	// speed setup
+	const double MAX_SPEED   = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	
-	xDim *= dir == CncClockwise ? 1 : -1;
-	yDim *= dir == CncClockwise ? 1 : -1;
-	zDim *= dir == CncClockwise ? 1 : -1;
+	const double SPEED_STEP1 = MAX_SPEED * 0.05;	const unsigned int TIMESPAN_STEP1  =  500; // ms
+	const double SPEED_STEP2 = MAX_SPEED * 0.25;	const unsigned int TIMESPAN_STEP2  = 1000; // ms
+	const double SPEED_STEP3 = MAX_SPEED * 0.50;	const unsigned int TIMESPAN_STEP3  = 1500; // ms
+	const double SPEED_STEP4 = MAX_SPEED * 0.75;	const unsigned int TIMESPAN_STEP4  = 2000; // ms
+	const double SPEED_STEP5 = MAX_SPEED;
+	
+	double currentSpeed = SPEED_STEP1;
+	changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed);
 	
 	// Move preparation
 	initNextDuration();
-	cncConfig->setAllowEventHandling(true);
+	GBL_CONFIG->setAllowEventHandling(true);
 	activatePositionCheck(false);
 	enableStepperMotors(true);
 	
 	// Move loop
 	runContinuousMove = true;
+	CncMilliTimestamp tsStart = CncTimeFunctions::getMilliTimestamp();
 	while ( runContinuousMove ) {
-		moveRelLinearMetricXYZ(xDim, yDim, zDim, false);
+		
+		if ( moveRelLinearMetricXYZ(xDim, yDim, zDim, false) )
+			break;
+		
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
+			{ currentSpeed = SPEED_STEP2; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
+
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP2 && currentSpeed < SPEED_STEP3 )
+			{ currentSpeed = SPEED_STEP3; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
+			
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP3 && currentSpeed < SPEED_STEP4 )
+			{ currentSpeed = SPEED_STEP4; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
+			
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
+			{ currentSpeed = SPEED_STEP5; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
+			
 		THE_APP->dispatchAll();
 	}
 	
@@ -1782,6 +1828,60 @@ bool CncControl::manualContinuousMoveStart(double stepSensitivity, bool x, bool 
 	enableStepperMotors(false);
 	activatePositionCheck(true);
 	resetDurationCounter();
+	
+	// reactivate configured probe mode state
+	int ret = false;
+	if ( (ret = enableProbeMode(probeModeBefore)) == false ) {
+		std::cerr << " Cant reactivate probe mode." << std::endl;
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const double yDim, const double zDim) {
+///////////////////////////////////////////////////////////////////
+	if ( getSerial()->isCommandActive() == true )
+		return false;
+		
+	// Always disable probe mode here, otherwise very long move distances appear
+	const bool probeModeBefore = GBL_CONFIG->isProbeMode();
+	if ( enableProbeMode(false) == false ) {
+		std::cerr << " Cant disable probe mode. Manual continous move aborted" << std::endl;
+		return false;
+	}
+	GBL_CONFIG->setProbeMode(false);
+	
+	// Move preparation
+	initNextDuration();
+	GBL_CONFIG->setAllowEventHandling(true);
+	activatePositionCheck(false);
+	enableStepperMotors(true);
+	
+	double sX = xDim * cncConfig->getCalculationFactX();
+	double sY = yDim * cncConfig->getCalculationFactY();
+	double sZ = zDim * cncConfig->getCalculationFactZ();
+	
+	int32_t values[3];
+	values[0] = (int32_t)round(sX);
+	values[1] = (int32_t)round(sY);
+	values[2] = (int32_t)round(sZ);
+	
+	// move loop
+	runContinuousMove = true;
+	bool ret = getSerial()->processMoveUntilSignal(sizeof(values)/sizeof(int32_t), values, curAppPos);
+	if ( ret == false )
+		std::cerr << "Error while processMoveUntilSignal!" << std::endl;
+	
+	// Move touch up
+	enableStepperMotors(false);
+	activatePositionCheck(true);
+	resetDurationCounter();
+	
+	// reactivate configured probe mode state
+	if ( (ret = enableProbeMode(probeModeBefore)) == false ) {
+		std::cerr << " Cant reactivate probe mode." << std::endl;
+	}
+	GBL_CONFIG->setProbeMode(probeModeBefore);
 	
 	return true;
 }

@@ -36,20 +36,20 @@ class CncController {
 
     I2CData lastI2CData;
 
-    inline bool observeSerialFrontByte();
+    inline bool observeSerialFrontByte(unsigned char& retValue);
     inline bool observeEnablePin();
     inline bool observeToolState();
     
-    inline bool stepAxisXYZ();
-
     inline bool evaluateAnalogLimitPin(CncInterface::ILS::States& ls);
     inline bool evaluateAnalogSupportPin(CncInterface::ISP::States& ss);
 
     inline bool evaluateSupportButtonState(unsigned short idx);
     inline bool evaluateSupportSwitchState(unsigned short idx);
 
-    //////////////////////////////////////////////////////////////////////////////
+    inline unsigned char stepAxisXYZ();
+
   public:
+  
     //////////////////////////////////////////////////////////////////////////////
     CncController(LastErrorCodes& lec);
                   
@@ -134,7 +134,8 @@ class CncController {
     bool disableStepperPin()                        { return enableStepperPin(false); }
 
     //////////////////////////////////////////////////////////////////////////////
-    bool renderAndStepAxisXYZ(int32_t x1, int32_t y1, int32_t z1);
+    unsigned char moveUntilSignal(int32_t x1, int32_t y1, int32_t z1);
+    unsigned char renderAndStepAxisXYZ(int32_t x1, int32_t y1, int32_t z1);
 
     //////////////////////////////////////////////////////////////////////////////
     bool evaluateI2CAvailable();
