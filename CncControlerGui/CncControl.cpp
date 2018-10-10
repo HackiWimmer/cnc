@@ -710,7 +710,12 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeed s) {
 		
 	configuredSpeedType = s;
 	configuredFeedSpeed_MM_MIN = value;
-	processSetter(PID_SPEED_MM_MIN, (long)(configuredFeedSpeed_MM_MIN * DBL_FACT));
+	
+	if ( GET_GUI_CTL(configuredFeedSpeed) )
+		GET_GUI_CTL(configuredFeedSpeed)->ChangeValue(wxString::Format("%3.1lf", value));
+	
+	if ( processSetter(PID_SPEED_MM_MIN, (long)(configuredFeedSpeed_MM_MIN * DBL_FACT)) == false ) 
+		std::cerr << "changeCurrentFeedSpeedXYZ_MM_MIN: processSetter failed" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s) {
@@ -1493,12 +1498,10 @@ void CncControl::displayLimitState(wxStaticText* ctl, bool value) {
 ///////////////////////////////////////////////////////////////////
 	if ( ctl != NULL ) {
 		if ( value == true ) {
-			ctl->SetLabel(wxString("1"));
 			ctl->SetBackgroundColour(wxColour(255,128,128));
 			ctl->SetForegroundColour(*wxWHITE);
 			
 		} else {
-			ctl->SetLabel(wxString("0"));
 			ctl->SetBackgroundColour(wxColour(181,230,29));
 			ctl->SetForegroundColour(*wxBLACK);
 

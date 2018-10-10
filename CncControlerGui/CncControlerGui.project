@@ -200,8 +200,6 @@
       <File Name="CncStreamBuffers.cpp"/>
       <File Name="CncZView.cpp"/>
       <File Name="CncCommon.cpp"/>
-      <File Name="CncSpeedView.h"/>
-      <File Name="CncSpeedView.cpp"/>
       <File Name="CncPathListManager.h"/>
       <File Name="CncPathListManager.cpp"/>
       <File Name="CncClipperWrapper.h"/>

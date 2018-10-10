@@ -50,7 +50,6 @@
 #include "CncZView.h"
 #include <wx/listctrl.h>
 #include <wx/webview.h>
-#include "CncSpeedView.h"
 #include <wx/splitter.h>
 #include <wx/timer.h>
 #include <wx/treectrl.h>
@@ -420,8 +419,7 @@ protected:
     wxStaticText* m_staticText5159;
     wxTextCtrl* m_lastErrorInfoResponseId;
     wxPanel* m_3DPane;
-    wxPanel* m_probeModePanel;
-    wxStaticText* m_probeModeLabel;
+    wxPanel* m_placeholderPanel;
     wxStaticLine* m_staticLine5016;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
@@ -448,7 +446,7 @@ protected:
     wxStaticLine* m_staticLine50051;
     wxStaticText* m_staticText5014;
     wxStaticBitmap* m_lableWorkpieceThickness;
-    wxStaticBitmap* m_toolStateTrafficLight;
+    wxStaticBitmap* m_toolState;
     wxTextCtrl* m_toolId;
     wxStaticLine* m_staticLine5005;
     wxStaticLine* m_staticLine5008;
@@ -500,9 +498,6 @@ protected:
     wxPanel* m_panel5144;
     wxStaticText* m_staticText5142;
     wxTextCtrl* m_currentInboundFilePreviewFileName;
-    wxPanel* m_panelSpeed;
-    wxStaticText* m_staticText28052;
-    CncSpeedView* m_speedView;
     wxPanel* m_scrollWinFile;
     wxCheckBox* m_keepFileManagerPreview;
     wxListCtrl* m_lruList;
@@ -524,29 +519,47 @@ protected:
     wxStaticLine* m_staticLine6801;
     wxStaticText* m_svgParseMode;
     wxPanel* m_activityPanel;
+    wxStaticLine* m_staticLine680114;
+    wxStaticText* m_staticText5656;
+    wxStaticBitmap* m_probeModeState;
+    wxStaticText* m_probeModeStateLabel;
+    wxStaticLine* m_staticLine60234112;
+    wxStaticText* m_staticText5651;
+    wxStaticBitmap* m_refPosState;
     wxStaticLine* m_staticLine680;
     wxStaticText* LableF;
-    wxTextCtrl* m_feedSpeed;
-    wxStaticBitmap* m_refPosTrafficLight;
+    wxTextCtrl* m_configuredFeedSpeed;
+    wxTextCtrl* m_realtimeFeedSpeed;
+    wxStaticLine* m_staticLine6801222;
     wxStaticText* LableX;
     wxTextCtrl* m_xAxis;
     wxTextCtrl* m_xAxisCtl;
+    wxStaticLine* m_staticLine602348910;
     wxStaticText* LabelY;
     wxTextCtrl* m_yAxis;
     wxTextCtrl* m_yAxisCtl;
+    wxStaticLine* m_staticLine6023489;
     wxStaticText* LableZ;
     wxTextCtrl* m_zAxis;
     wxTextCtrl* m_zAxisCtl;
+    wxStaticLine* m_staticLine602348;
     wxComboBox* m_unit;
     wxStaticLine* m_staticLine60234;
     wxStaticText* m_staticText1196;
     wxStaticText* m_xMinLimit;
-    wxStaticText* m_xMaxLimit;
     wxStaticText* m_yMinLimit;
-    wxStaticText* m_yMaxLimit;
     wxStaticText* m_zMinLimit;
+    wxStaticText* m_xMaxLimit;
+    wxStaticText* m_yMaxLimit;
     wxStaticText* m_zMaxLimit;
     wxStaticLine* m_staticLine602341;
+    wxStaticText* m_staticText5637;
+    wxStaticText* m_supportButton1State;
+    wxStaticText* m_supportButton2State;
+    wxStaticText* m_supportButton3State;
+    wxStaticText* m_cableConnectedState;
+    wxStaticText* m_toolPowerObserverState;
+    wxStaticLine* m_staticLine6023412;
     wxStaticBitmap* m_updateManagerUpdate;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
@@ -605,7 +618,6 @@ protected:
     wxMenuItem* m_miViewDebugger;
     wxMenuItem* m_miViewSpy;
     wxMenuItem* m_miViewLogger;
-    wxMenuItem* m_miViewSpeed;
     wxMenuItem* m_miViewUnitCalculator;
     wxMenuItem* m_menuItem1665;
     wxMenuItem* m_miViewAll;
@@ -909,7 +921,6 @@ protected:
     virtual void viewDebugger(wxCommandEvent& event) { event.Skip(); }
     virtual void viewSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void viewLogger(wxCommandEvent& event) { event.Skip(); }
-    virtual void viewSpeed(wxCommandEvent& event) { event.Skip(); }
     virtual void viewUnitCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void viewAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
     virtual void hideAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
@@ -1288,8 +1299,7 @@ public:
     wxPanel* GetControllerErrorInfo() { return m_controllerErrorInfo; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
-    wxStaticText* GetProbeModeLabel() { return m_probeModeLabel; }
-    wxPanel* GetProbeModePanel() { return m_probeModePanel; }
+    wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
     wxStaticLine* GetStaticLine5016() { return m_staticLine5016; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
@@ -1315,7 +1325,7 @@ public:
     wxStaticLine* GetStaticLine50051() { return m_staticLine50051; }
     wxStaticText* GetStaticText5014() { return m_staticText5014; }
     wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
-    wxStaticBitmap* GetToolStateTrafficLight() { return m_toolStateTrafficLight; }
+    wxStaticBitmap* GetToolState() { return m_toolState; }
     wxTextCtrl* GetToolId() { return m_toolId; }
     wxStaticLine* GetStaticLine5005() { return m_staticLine5005; }
     wxStaticLine* GetStaticLine5008() { return m_staticLine5008; }
@@ -1370,9 +1380,6 @@ public:
     wxPanel* GetMonitorTemplatePanel() { return m_monitorTemplatePanel; }
     wxSimplebook* GetMonitorViewBook() { return m_monitorViewBook; }
     wxScrolledWindow* GetScrollWinMonitor() { return m_scrollWinMonitor; }
-    wxStaticText* GetStaticText28052() { return m_staticText28052; }
-    CncSpeedView* GetSpeedView() { return m_speedView; }
-    wxPanel* GetPanelSpeed() { return m_panelSpeed; }
     wxCheckBox* GetKeepFileManagerPreview() { return m_keepFileManagerPreview; }
     wxListCtrl* GetLruList() { return m_lruList; }
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
@@ -1393,29 +1400,47 @@ public:
     wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }
     wxStaticText* GetSvgParseMode() { return m_svgParseMode; }
     wxPanel* GetActivityPanel() { return m_activityPanel; }
+    wxStaticLine* GetStaticLine680114() { return m_staticLine680114; }
+    wxStaticText* GetStaticText5656() { return m_staticText5656; }
+    wxStaticBitmap* GetProbeModeState() { return m_probeModeState; }
+    wxStaticText* GetProbeModeStateLabel() { return m_probeModeStateLabel; }
+    wxStaticLine* GetStaticLine60234112() { return m_staticLine60234112; }
+    wxStaticText* GetStaticText5651() { return m_staticText5651; }
+    wxStaticBitmap* GetRefPosState() { return m_refPosState; }
     wxStaticLine* GetStaticLine680() { return m_staticLine680; }
     wxStaticText* GetLableF() { return LableF; }
-    wxTextCtrl* GetFeedSpeed() { return m_feedSpeed; }
-    wxStaticBitmap* GetRefPosTrafficLight() { return m_refPosTrafficLight; }
+    wxTextCtrl* GetConfiguredFeedSpeed() { return m_configuredFeedSpeed; }
+    wxTextCtrl* GetRealtimeFeedSpeed() { return m_realtimeFeedSpeed; }
+    wxStaticLine* GetStaticLine6801222() { return m_staticLine6801222; }
     wxStaticText* GetLableX() { return LableX; }
     wxTextCtrl* GetXAxis() { return m_xAxis; }
     wxTextCtrl* GetXAxisCtl() { return m_xAxisCtl; }
+    wxStaticLine* GetStaticLine602348910() { return m_staticLine602348910; }
     wxStaticText* GetLabelY() { return LabelY; }
     wxTextCtrl* GetYAxis() { return m_yAxis; }
     wxTextCtrl* GetYAxisCtl() { return m_yAxisCtl; }
+    wxStaticLine* GetStaticLine6023489() { return m_staticLine6023489; }
     wxStaticText* GetLableZ() { return LableZ; }
     wxTextCtrl* GetZAxis() { return m_zAxis; }
     wxTextCtrl* GetZAxisCtl() { return m_zAxisCtl; }
+    wxStaticLine* GetStaticLine602348() { return m_staticLine602348; }
     wxComboBox* GetUnit() { return m_unit; }
     wxStaticLine* GetStaticLine60234() { return m_staticLine60234; }
     wxStaticText* GetStaticText1196() { return m_staticText1196; }
     wxStaticText* GetXMinLimit() { return m_xMinLimit; }
-    wxStaticText* GetXMaxLimit() { return m_xMaxLimit; }
     wxStaticText* GetYMinLimit() { return m_yMinLimit; }
-    wxStaticText* GetYMaxLimit() { return m_yMaxLimit; }
     wxStaticText* GetZMinLimit() { return m_zMinLimit; }
+    wxStaticText* GetXMaxLimit() { return m_xMaxLimit; }
+    wxStaticText* GetYMaxLimit() { return m_yMaxLimit; }
     wxStaticText* GetZMaxLimit() { return m_zMaxLimit; }
     wxStaticLine* GetStaticLine602341() { return m_staticLine602341; }
+    wxStaticText* GetStaticText5637() { return m_staticText5637; }
+    wxStaticText* GetSupportButton1State() { return m_supportButton1State; }
+    wxStaticText* GetSupportButton2State() { return m_supportButton2State; }
+    wxStaticText* GetSupportButton3State() { return m_supportButton3State; }
+    wxStaticText* GetCableConnectedState() { return m_cableConnectedState; }
+    wxStaticText* GetToolPowerObserverState() { return m_toolPowerObserverState; }
+    wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
     wxStaticBitmap* GetUpdateManagerUpdate() { return m_updateManagerUpdate; }
     wxPanel* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }

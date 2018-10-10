@@ -23,6 +23,7 @@ struct GuiControlSetup {
 	CncMotionMonitor* motionMonitor				= NULL;
 	
 	wxTextCtrl* passingTrace					= NULL;
+	wxTextCtrl* configuredFeedSpeed				= NULL;
 	
 	wxStaticBitmap* heartbeatState				= NULL;
 	

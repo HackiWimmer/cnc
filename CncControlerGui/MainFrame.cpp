@@ -396,8 +396,8 @@ void MainFrame::setRefPostionState(bool state) {
 		
 	}
 	
-	m_refPosTrafficLight->SetToolTip(tip);
-	m_refPosTrafficLight->SetBitmap(bmp);
+	m_refPosState->SetToolTip(tip);
+	m_refPosState->SetBitmap(bmp);
 	m_statusBar->Refresh();
 	m_statusBar->Update();
 }
@@ -904,7 +904,7 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 			else 				 sValue.assign(wxString::Format("%.1lf", dValue));
 		}
 		
-		m_feedSpeed->ChangeValue(sValue);
+		m_realtimeFeedSpeed->ChangeValue(sValue);
 	}
 	
 	// update position syp
@@ -1599,7 +1599,10 @@ void MainFrame::determineCncOutputControls() {
 	guiCtlSetup->testToggleTool			= m_testToggleTool;
 	
 	guiCtlSetup->passingTrace			= m_passingCount;
-	guiCtlSetup->toolState 				= m_toolStateTrafficLight;
+	
+	guiCtlSetup->configuredFeedSpeed	= m_configuredFeedSpeed;
+	
+	guiCtlSetup->toolState 				= m_toolState;
 	
 	guiCtlSetup->heartbeatState			= m_heartbeatState;
 	
@@ -5072,7 +5075,6 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "TemplateManager")	return m_scrollWinFile;
 	else if ( name == "StatusBar")			return m_statusBar;
 	else if ( name == "SerialSpy")			return m_serialSpyView;
-	else if ( name == "SpeedView")			return m_panelSpeed;
 	else if ( name == "UnitCalculator")		return m_svgUnitCalulator;
 	else if ( name == "Debugger")			return m_debuggerView;
 	else if ( name == "PositionMonitor")	return m_positionMonitorView;
@@ -5090,7 +5092,6 @@ wxMenuItem* MainFrame::getAUIMenuByName(const wxString& name) {
 	else if ( name == "Outbound")			return m_miViewMonitor;
 	else if ( name == "TemplateManager")	return m_miViewTemplateManager;
 	else if ( name == "SerialSpy")			return m_miViewSpy;
-	else if ( name == "SpeedView")			return m_miViewSpeed;
 	else if ( name == "UnitCalculator")		return m_miViewUnitCalculator;
 	else if ( name == "Debugger")			return m_miViewDebugger;
 	else if ( name == "PositionMonitor")	return m_miViewPosMonitor;
@@ -5195,11 +5196,6 @@ void MainFrame::viewZAxis(wxCommandEvent& event) {
 void MainFrame::viewSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	toggleAuiPane("SerialSpy");
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::viewSpeed(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	toggleAuiPane("SpeedView");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewUnitCalculator(wxCommandEvent& event) {
@@ -7307,22 +7303,24 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 	if ( probeMode == true ) {
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_PROBE"));
 		m_btProbeMode->SetToolTip("Probe mode on");
-		m_probeModePanel->SetForegroundColour(wxColour(128, 0, 0));
-		m_probeModeLabel->SetLabel("Probe mode: On");
+		
+		m_probeModeState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_YELLOW"));
+		m_probeModeState->SetToolTip("Probe mode is ON");
+		m_probeModeStateLabel->SetLabel(" ON");
 		
 	} else {
 		m_btProbeMode->SetBitmap(ImageLibProbe().Bitmap("BMP_RELEASE"));
 		m_btProbeMode->SetToolTip("Probe mode off");
-		m_probeModePanel->SetForegroundColour(wxColour(0, 0, 0));
-		m_probeModeLabel->SetLabel("Probe mode: Off");
+		
+		m_probeModeState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_DEFAULT"));
+		m_probeModeState->SetToolTip("Probe mode is OFF");
+		m_probeModeStateLabel->SetLabel("OFF");
+		
 	}
 	
 	m_btProbeMode->SetValue(probeMode);
 	m_btProbeMode->Refresh();
 	m_btProbeMode->Update();
-	
-	m_probeModePanel->Refresh();
-	m_probeModePanel->Update();
 	
 	if ( motionMonitor != NULL ) {
 		motionMonitor->decorateProbeMode(GBL_CONFIG->isProbeMode());
@@ -7332,15 +7330,6 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickProbeMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	GBL_CONFIG->setProbeMode(m_btProbeMode->GetValue());
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::leftDownProbeModePanel(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	if ( m_btProbeMode->IsEnabled() == false )
-		return;
-		
-	m_btProbeMode->SetValue(!m_btProbeMode->GetValue());
 	GBL_CONFIG->setProbeMode(m_btProbeMode->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
@@ -7605,4 +7594,7 @@ void MainFrame::warmStartController(wxCommandEvent& event) {
 void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	m_pgMgrSetup->SelectPage(event.GetSelection());
+}
+void MainFrame::leftDownProbeModePanel(wxMouseEvent& event)
+{
 }

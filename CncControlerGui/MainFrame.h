@@ -81,6 +81,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void leftDownProbeModePanel(wxMouseEvent& event);
     virtual void changeConfigToolbook(wxToolbookEvent& event);
 		virtual void warmStartController(wxCommandEvent& event);
 		virtual void setReferencePosition(wxCommandEvent& event);
@@ -108,7 +109,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void keyDownLruList(wxKeyEvent& event);
 		virtual void dclickLogger(wxMouseEvent& event);
 		virtual void keyDownLogger(wxKeyEvent& event);
-		virtual void leftDownProbeModePanel(wxMouseEvent& event);
 		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void renameTemplateFromButton(wxCommandEvent& event);
 		virtual void removeTemplateFromButton(wxCommandEvent& event);
@@ -173,7 +173,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void closeUnitCalculator(wxCommandEvent& event);
 		virtual void emuContentDClick(wxMouseEvent& event);
 		virtual void fileContentDClick(wxMouseEvent& event);
-		virtual void viewSpeed(wxCommandEvent& event);
 		virtual void viewUnitCalculator(wxCommandEvent& event);
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
