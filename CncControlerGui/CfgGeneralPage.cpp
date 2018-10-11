@@ -35,6 +35,8 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	   ) 
 	{
 		GBL_CONFIG->calculateSpeedValues();
+		if ( THE_APP )
+			THE_APP->updateSpeedConfigPlayground();
 	}
 
 }

@@ -1118,33 +1118,127 @@
                             </object>
                           </object>
                           <object class="notebookpage">
-                            <label>Wizard Speed</label>
+                            <label>Speed Playground</label>
                             <bitmap>bitmaps/tools-wizard.png</bitmap>
                             <selected>0</selected>
                             <object class="wxPanel" name="m_setupSpeedWizard">
                               <style>wxTAB_TRAVERSAL</style>
                               <hidden>1</hidden>
                               <object class="wxFlexGridSizer">
-                                <cols>2</cols>
-                                <rows>0</rows>
+                                <cols>1</cols>
+                                <rows>2</rows>
                                 <vgap>0</vgap>
                                 <hgap>0</hgap>
-                                <growablecols/>
-                                <growablerows/>
-                                <object class="sizeritem">
-                                  <flag>wxALL</flag>
-                                  <border>5</border>
-                                  <object class="wxStaticText" name="m_staticText4575">
-                                    <label>Placeholder . . .</label>
-                                    <style/>
-                                    <font>
-                                      <size>18</size>
-                                      <style>italic</style>
-                                      <weight>bold</weight>
-                                      <family>swiss</family>
-                                      <underlined>0</underlined>
-                                      <face>Segoe UI</face>
-                                    </font>
+                                <growablecols>0</growablecols>
+                                <growablerows>1</growablerows>
+                                <object class="sizeritem" name="flexGridSizer5673">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>1</border>
+                                  <option>1</option>
+                                  <object class="wxFlexGridSizer">
+                                    <cols>2</cols>
+                                    <rows>1</rows>
+                                    <vgap>0</vgap>
+                                    <hgap>0</hgap>
+                                    <growablecols>1</growablecols>
+                                    <growablerows>0</growablerows>
+                                    <object class="sizeritem" name="flexGridSizer5681">
+                                      <flag>wxALL</flag>
+                                      <border>1</border>
+                                      <object class="wxFlexGridSizer">
+                                        <cols>1</cols>
+                                        <rows>2</rows>
+                                        <vgap>0</vgap>
+                                        <hgap>0</hgap>
+                                        <growablecols/>
+                                        <growablerows/>
+                                        <object class="spacer" name="Spacer5683">
+                                          <size>0,5</size>
+                                          <flag>wxALL</flag>
+                                          <option>1</option>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>5</border>
+                                          <object class="wxStaticText" name="m_staticText5677">
+                                            <label>Feed Speed Value [mm/min]:</label>
+                                            <style/>
+                                            <font>
+                                              <size>9</size>
+                                              <style>normal</style>
+                                              <weight>bold</weight>
+                                              <family>swiss</family>
+                                              <underlined>0</underlined>
+                                              <face>Segoe UI</face>
+                                            </font>
+                                          </object>
+                                        </object>
+                                      </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <border>2</border>
+                                      <object class="wxSlider" name="m_speedConfigSlider">
+                                        <style>wxSL_LABELS|wxSL_AUTOTICKS|wxSL_HORIZONTAL</style>
+                                        <font>
+                                          <size>9</size>
+                                          <style>normal</style>
+                                          <weight>bold</weight>
+                                          <family>swiss</family>
+                                          <underlined>0</underlined>
+                                          <face>Segoe UI</face>
+                                        </font>
+                                        <min>0</min>
+                                        <max>100</max>
+                                        <value>50</value>
+                                      </object>
+                                    </object>
+                                  </object>
+                                </object>
+                                <object class="sizeritem" name="flexGridSizer5678">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>1</border>
+                                  <object class="wxFlexGridSizer">
+                                    <cols>1</cols>
+                                    <rows>2</rows>
+                                    <vgap>0</vgap>
+                                    <hgap>0</hgap>
+                                    <growablecols>0</growablecols>
+                                    <growablerows>1</growablerows>
+                                    <object class="sizeritem">
+                                      <flag>wxALL</flag>
+                                      <border>5</border>
+                                      <object class="wxStaticText" name="m_staticText5680">
+                                        <label>Speed Configuration Trace:</label>
+                                        <style/>
+                                        <font>
+                                          <size>9</size>
+                                          <style>normal</style>
+                                          <weight>bold</weight>
+                                          <family>swiss</family>
+                                          <underlined>0</underlined>
+                                          <face>Segoe UI</face>
+                                        </font>
+                                      </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <border>1</border>
+                                      <object class="wxTextCtrl" name="m_speedConfigTrace">
+                                        <style>wxTE_MULTILINE</style>
+                                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                        <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
+                                        <font>
+                                          <size>9</size>
+                                          <style>normal</style>
+                                          <weight>normal</weight>
+                                          <family>modern</family>
+                                          <underlined>0</underlined>
+                                          <face>Consolas</face>
+                                        </font>
+                                        <value>eee</value>
+                                      </object>
+                                    </object>
                                   </object>
                                 </object>
                               </object>
@@ -2317,7 +2411,7 @@ Roughest:</label>
                                       <object class="sizeritem" name="flexGridSizer5114">
                                         <flag>wxALL|wxEXPAND</flag>
                                         <object class="wxFlexGridSizer">
-                                          <cols>3</cols>
+                                          <cols>5</cols>
                                           <rows>1</rows>
                                           <vgap>0</vgap>
                                           <hgap>0</hgap>
@@ -2348,6 +2442,21 @@ Roughest:</label>
                                                   <![CDATA[-1]]>
                                                 </item>
                                               </content>
+                                            </object>
+                                          </object>
+                                          <object class="spacer" name="Spacer52331">
+                                            <size>14,0</size>
+                                            <flag>wxALL</flag>
+                                            <border>5</border>
+                                            <option>1</option>
+                                          </object>
+                                          <object class="sizeritem">
+                                            <flag>wxALL|wxALIGN_RIGHT</flag>
+                                            <border>5</border>
+                                            <object class="wxCheckBox" name="m_checkBoxToolEnabled">
+                                              <style>wxALIGN_RIGHT</style>
+                                              <label>Tool Enabled</label>
+                                              <checked>0</checked>
                                             </object>
                                           </object>
                                         </object>
@@ -8011,6 +8120,7 @@ State</label>
                     <growablerows>0</growablerows>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
+                      <border>1</border>
                       <object class="wxSplitterWindow" name="m_splitter4728">
                         <style/>
                         <gravity>0.7</gravity>
@@ -8604,6 +8714,13 @@ State</label>
       <object class="wxMenu" name="m_menuPerspective">
         <label>Perspective</label>
         <style/>
+        <object class="wxMenuItem" name="m_miPerspectiveDefault">
+          <label>Perspective - 'Default'</label>
+          <bitmap>bitmaps/view-choose.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
         <object class="wxMenuItem" name="m_miPerspectiveRun">
           <label>Perspective - 'Run'</label>
           <bitmap>bitmaps/view-choose.png</bitmap>
@@ -8626,6 +8743,13 @@ State</label>
           </accel>
         </object>
         <object class="separator"/>
+        <object class="wxMenuItem" name="m_menuSavePerspectiveDefault">
+          <label>Save Perspective as 'Default'</label>
+          <bitmap>bitmaps/document-save-3.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
         <object class="wxMenuItem" name="m_menuSavePerspectiveRun">
           <label>Save Perspective as 'Run'</label>
           <bitmap>bitmaps/document-save-3.png</bitmap>

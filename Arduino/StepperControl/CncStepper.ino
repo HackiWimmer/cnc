@@ -19,9 +19,14 @@ CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, by
 , steps(1L)
 , pitch(0.0)
 , validPitch(false)
-, dirPulseWidth(1)
+, dirPulseWidth(10)
 , lowPulsWidth(500)
 , highPulsWidth(500)
+, minPulsWidth(highPulsWidth + lowPulsWidth)
+, tsPrevStep(0L)
+, tsCurrStep(0L)
+, tsPrevDirChange(0L)
+, tsCurrDirChange(0L)
 , avgStepDuartion(0L)
 , stepDirection(SD_UNKNOWN)
 , stepCounter(0L)
@@ -118,13 +123,14 @@ void CncStepper::reset() {
   minReached            = false;
   maxReached            = false;
 
+  tsPrevStep            = 0L;
+  tsCurrStep            = 0L;
+
+  tsPrevDirChange       = 0L;
+  tsCurrDirChange       = 0L;
+
   resetPosReplyThresholdCouter();
   resetStepCounter();
-}
-//////////////////////////////////////////////////////////////////////////////
-void CncStepper::resetDirectionPin() {
-//////////////////////////////////////////////////////////////////////////////
-  digitalWrite(directionPin, LOW);
 }
 //////////////////////////////////////////////////////////////////////////////
 int32_t CncStepper::calcStepsForMM(int32_t mm) {
@@ -252,6 +258,14 @@ bool CncStepper::checkLimit(int dir) {
   return false;
 }
 //////////////////////////////////////////////////////////////////////////////
+void CncStepper::resetDirectionPin() {
+//////////////////////////////////////////////////////////////////////////////
+return;
+  
+  if ( getIncrementDirectionValue() == false )  setDirection(DIRECTION_INC);
+  else                                          setDirection(DIRECTION_DEC);            
+}
+//////////////////////////////////////////////////////////////////////////////
 bool CncStepper::setDirection(int32_t steps) {
 //////////////////////////////////////////////////////////////////////////////
   if      ( steps <  0 ) return setDirection(SD_DEC);
@@ -266,6 +280,19 @@ bool CncStepper::setDirection(const StepDirection sd) {
     return true;
   
   stepDirection = sd;
+
+  // gurantiee total puls width
+  
+  /*tsCurrDirChange = micros();
+
+  if ( tsCurrDirChange <= tsPrevDirChange ) {
+    delayMicroseconds(dirPulseWidth);
+    
+  } else {
+    unsigned int tsDiff = tsCurrDirChange - tsPrevDirChange;
+    if ( tsDiff < dirPulseWidth )
+      delayMicroseconds(tsDiff);
+  }*/
   
   if ( controller->isProbeMode() == OFF ) {
     // The functions getIn/DecrementDirectionValue() switches the physical direction of "stepDirection".
@@ -274,8 +301,9 @@ bool CncStepper::setDirection(const StepDirection sd) {
     const bool dir = (stepDirection == SD_INC ? getIncrementDirectionValue() : getDecrementDirectionValue());
     
     digitalWrite(directionPin, dir);
-    // dont sleep here because a portion of time appears automatically before stepping
-    // delayMicroseconds(dirPulseWidth);
+    
+    // don't sleep here, because period will be guranteed by tsCurrDirChange and tsPrevDirChange
+    delayMicroseconds(dirPulseWidth);
   }
   
   return true;
@@ -303,20 +331,41 @@ bool CncStepper::performNextStep() {
     return true;
   }
 
+  // gurantiee total puls width
+  tsCurrStep = micros();
+
+  // micros(): Returns the number of microseconds since the Arduino board began running the current program. 
+  // This number will overflow (go back to zero), after approximately 70 minutes. On 16 MHz Arduino boards 
+  // (e.g. Duemilanove and Nano), this function has a resolution of four microseconds 
+  // (i.e. the value returned is always a multiple of four).
+  // Check this . . . 
+  if ( tsCurrStep <= tsPrevStep ) {
+    delayMicroseconds(minPulsWidth * 2);
+    
+  } else {
+    // normal processing
+    unsigned long tsDiff = tsCurrStep - tsPrevStep;
+    if ( tsDiff < minPulsWidth )
+      delayMicroseconds(tsDiff);
+  }
+  
   // then stepping . . .
   if ( controller->isProbeMode() == OFF ) { 
-    
+    tsPrevStep = tsCurrStep;
+       
     // start the step puls
     digitalWrite(stepPin, HIGH);
     delayMicroseconds(highPulsWidth); 
 
     // stop the step puls
     digitalWrite(stepPin, LOW);
-    // dont sleep here because a portion of time appears automatically before 
-    // the next performNextStep() call appears
+    
+    // dont sleep here, because this period will be guranteed by tsPrecStep and tsCurrStep
     // delayMicroseconds(lowPulsWidth);
+    
   } else {
-     delayMicroseconds(highPulsWidth + lowPulsWidth);
+     // simulate step delay
+     delayMicroseconds(minPulsWidth);
   }
 
   // ----------------------------------------------------------

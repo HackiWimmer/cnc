@@ -733,18 +733,64 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_setupSpeedWizard->Hide();
     int m_setupSpeedWizardImgIndex;
     m_setupSpeedWizardImgIndex = m_notebook4561_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("tools-wizard")));
-    m_notebook4561->AddPage(m_setupSpeedWizard, _("Wizard Speed"), false, m_setupSpeedWizardImgIndex);
+    m_notebook4561->AddPage(m_setupSpeedWizard, _("Speed Playground"), false, m_setupSpeedWizardImgIndex);
     
-    wxFlexGridSizer* flexGridSizer4565 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer4565 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer4565->SetFlexibleDirection( wxBOTH );
     flexGridSizer4565->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer4565->AddGrowableCol(0);
+    flexGridSizer4565->AddGrowableRow(1);
     m_setupSpeedWizard->SetSizer(flexGridSizer4565);
     
-    m_staticText4575 = new wxStaticText(m_setupSpeedWizard, wxID_ANY, _("Placeholder . . ."), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), 0);
-    wxFont m_staticText4575Font(18, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText4575->SetFont(m_staticText4575Font);
+    wxFlexGridSizer* flexGridSizer5673 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5673->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5673->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5673->AddGrowableCol(1);
+    flexGridSizer5673->AddGrowableRow(0);
     
-    flexGridSizer4565->Add(m_staticText4575, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer4565->Add(flexGridSizer5673, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5681 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5681->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5681->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5673->Add(flexGridSizer5681, 0, wxALL, WXC_FROM_DIP(1));
+    
+    flexGridSizer5681->Add(0, 5, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5677 = new wxStaticText(m_setupSpeedWizard, wxID_ANY, _("Feed Speed Value [mm/min]:"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), 0);
+    wxFont m_staticText5677Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5677->SetFont(m_staticText5677Font);
+    
+    flexGridSizer5681->Add(m_staticText5677, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_speedConfigSlider = new wxSlider(m_setupSpeedWizard, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxSL_LABELS|wxSL_AUTOTICKS|wxSL_HORIZONTAL);
+    wxFont m_speedConfigSliderFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_speedConfigSlider->SetFont(m_speedConfigSliderFont);
+    
+    flexGridSizer5673->Add(m_speedConfigSlider, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    wxFlexGridSizer* flexGridSizer5678 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5678->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5678->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5678->AddGrowableCol(0);
+    flexGridSizer5678->AddGrowableRow(1);
+    
+    flexGridSizer4565->Add(flexGridSizer5678, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText5680 = new wxStaticText(m_setupSpeedWizard, wxID_ANY, _("Speed Configuration Trace:"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), 0);
+    wxFont m_staticText5680Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5680->SetFont(m_staticText5680Font);
+    
+    flexGridSizer5678->Add(m_staticText5680, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_speedConfigTrace = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("eee"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxTE_MULTILINE);
+    m_speedConfigTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_speedConfigTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
+    wxFont m_speedConfigTraceFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_speedConfigTrace->SetFont(m_speedConfigTraceFont);
+    
+    flexGridSizer5678->Add(m_speedConfigTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_mainBookReference = new wxPanel(m_mainViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainViewBook->AddPage(m_mainBookReference, _("Page"), false);
@@ -1381,7 +1427,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1522->Add(flexGridSizer5099, 1, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
-    wxFlexGridSizer* flexGridSizer5114 = new wxFlexGridSizer(1, 3, 0, 0);
+    wxFlexGridSizer* flexGridSizer5114 = new wxFlexGridSizer(1, 5, 0, 0);
     flexGridSizer5114->SetFlexibleDirection( wxBOTH );
     flexGridSizer5114->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5114->AddGrowableCol(2);
@@ -1401,6 +1447,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_manuallyToolId->SetSelection(0);
     
     flexGridSizer5114->Add(m_manuallyToolId, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    flexGridSizer5114->Add(14, 0, 1, wxALL, WXC_FROM_DIP(5));
+    
+    m_checkBoxToolEnabled = new wxCheckBox(m_mainBookManual, wxID_ANY, _("Tool Enabled"), wxDefaultPosition, wxDLG_UNIT(m_mainBookManual, wxSize(-1,-1)), wxALIGN_RIGHT);
+    m_checkBoxToolEnabled->SetValue(false);
+    
+    flexGridSizer5114->Add(m_checkBoxToolEnabled, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
     
     wxFlexGridSizer* flexGridSizer5111 = new wxFlexGridSizer(1, 4, 0, 0);
     flexGridSizer5111->SetFlexibleDirection( wxBOTH );
@@ -4529,7 +4582,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_splitter4728->SetSashGravity(0.7);
     m_splitter4728->SetMinimumPaneSize(10);
     
-    flexGridSizer3833->Add(m_splitter4728, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer3833->Add(m_splitter4728, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_splitterPage4732 = new wxPanel(m_splitter4728, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter4728, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -4836,6 +4889,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuPerspective = new wxMenu();
     m_menuBar->Append(m_menuPerspective, _("Perspective"));
     
+    m_miPerspectiveDefault = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - 'Default'"), wxT(""), wxITEM_NORMAL);
+    m_miPerspectiveDefault->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
+    m_menuPerspective->Append(m_miPerspectiveDefault);
+    
     m_miPerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Perspective - 'Run'"), wxT(""), wxITEM_NORMAL);
     m_miPerspectiveRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose")));
     m_menuPerspective->Append(m_miPerspectiveRun);
@@ -4849,6 +4906,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuPerspective->Append(m_miPerspectiveSource);
     
     m_menuPerspective->AppendSeparator();
+    
+    m_menuSavePerspectiveDefault = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as 'Default'"), wxT(""), wxITEM_NORMAL);
+    m_menuSavePerspectiveDefault->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
+    m_menuPerspective->Append(m_menuSavePerspectiveDefault);
     
     m_menuSavePerspectiveRun = new wxMenuItem(m_menuPerspective, wxID_ANY, _("Save Perspective as 'Run'"), wxT(""), wxITEM_NORMAL);
     m_menuSavePerspectiveRun->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("document-save-3")));
@@ -5242,6 +5303,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_pgMgrSetup->Connect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainFrameBClass::setupGridChanging), NULL, this);
     m_pgMgrSetup->Connect(wxEVT_PG_SELECTED, wxPropertyGridEventHandler(MainFrameBClass::setupGridSelected), NULL, this);
     m_pgMgrSetup->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setupGridCommandButton), NULL, this);
+    m_speedConfigSlider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeSpeedConfigSlider), NULL, this);
+    m_speedConfigSlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeSpeedConfigSlider), NULL, this);
     m_cmXnegYpos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::cmKillFocus), NULL, this);
     m_cmXnegYpos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::cmLeave), NULL, this);
     m_cmXnegYpos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::cmLeftUp), NULL, this);
@@ -5307,6 +5370,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zToMin->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToMin), NULL, this);
     m_zToTop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
+    m_manuallyToolId->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectManuallyToolId), NULL, this);
     m_manuallySpeedSlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
@@ -5356,7 +5420,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btResetCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::resetControllerErrorInfoFromButton), NULL, this);
     m_btRequestCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
     m_btClearCtlErrorInfoList->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerErrorInfoFromButton), NULL, this);
-    m_placeholderPanel->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::leftDownProbeModePanel), NULL, this);
     m_switchMonitoing->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshMotionMonitor), NULL, this);
     m_3D_Clear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitor), NULL, this);
@@ -5418,6 +5481,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_cbUCUnitTo->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
     m_cbUCValueFrom->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);
     m_btUCClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
+    m_serialSpyView->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
+    m_serialSpyView->Connect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
     m_enableSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
@@ -5452,9 +5517,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Connect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Connect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
+    this->Connect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
     this->Connect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
     this->Connect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
     this->Connect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Connect(m_menuSavePerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
     this->Connect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
     this->Connect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
     this->Connect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
@@ -5577,6 +5644,8 @@ MainFrameBClass::~MainFrameBClass()
     m_pgMgrSetup->Disconnect(wxEVT_PG_CHANGING, wxPropertyGridEventHandler(MainFrameBClass::setupGridChanging), NULL, this);
     m_pgMgrSetup->Disconnect(wxEVT_PG_SELECTED, wxPropertyGridEventHandler(MainFrameBClass::setupGridSelected), NULL, this);
     m_pgMgrSetup->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::setupGridCommandButton), NULL, this);
+    m_speedConfigSlider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeSpeedConfigSlider), NULL, this);
+    m_speedConfigSlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeSpeedConfigSlider), NULL, this);
     m_cmXnegYpos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::cmKillFocus), NULL, this);
     m_cmXnegYpos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::cmLeave), NULL, this);
     m_cmXnegYpos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::cmLeftUp), NULL, this);
@@ -5642,6 +5711,7 @@ MainFrameBClass::~MainFrameBClass()
     m_zToMin->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToMin), NULL, this);
     m_zToTop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
+    m_manuallyToolId->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectManuallyToolId), NULL, this);
     m_manuallySpeedSlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
@@ -5691,7 +5761,6 @@ MainFrameBClass::~MainFrameBClass()
     m_btResetCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::resetControllerErrorInfoFromButton), NULL, this);
     m_btRequestCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
     m_btClearCtlErrorInfoList->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerErrorInfoFromButton), NULL, this);
-    m_placeholderPanel->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::leftDownProbeModePanel), NULL, this);
     m_switchMonitoing->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshMotionMonitor), NULL, this);
     m_3D_Clear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitor), NULL, this);
@@ -5753,6 +5822,8 @@ MainFrameBClass::~MainFrameBClass()
     m_cbUCUnitTo->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
     m_cbUCValueFrom->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::selectUCChangeFrom), NULL, this);
     m_btUCClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::closeUnitCalculator), NULL, this);
+    m_serialSpyView->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
+    m_serialSpyView->Disconnect(wxEVT_MOUSE_CAPTURE_LOST, wxMouseCaptureLostEventHandler(MainFrameBClass::leaveSerialSpy), NULL, this);
     m_enableSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::enableSerialSpy), NULL, this);
     m_MarkSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::markSerialSpy), NULL, this);
     m_clearSerialSpy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearSerialSpy), NULL, this);
@@ -5787,9 +5858,11 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
     this->Disconnect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Disconnect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
+    this->Disconnect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
     this->Disconnect(m_miPerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
     this->Disconnect(m_miPerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
     this->Disconnect(m_miPerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
+    this->Disconnect(m_menuSavePerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
     this->Disconnect(m_menuSavePerspectiveRun->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
     this->Disconnect(m_menuSavePerspectiveDebug->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);
     this->Disconnect(m_menuSavePerspectiveSource->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::savePerspective), NULL, this);

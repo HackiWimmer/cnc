@@ -18,12 +18,12 @@
     const SHORT PIN_SUPPORT_CABLE_CONNECTED     =     11;
 
     // Limit Input Pins
-    const SHORT PIN_LS_X_MIN                    =      2;
-    const SHORT PIN_LS_X_MAX                    =      3;
+    const SHORT PIN_LS_Z_MIN                    =      2;
+    const SHORT PIN_LS_Z_MAX                    =      3;
     const SHORT PIN_LS_Y_MIN                    =      4;
     const SHORT PIN_LS_Y_MAX                    =      5;
-    const SHORT PIN_LS_Z_MIN                    =      6;
-    const SHORT PIN_LS_Z_MAX                    =      7;
+    const SHORT PIN_LS_X_MIN                    =      6;
+    const SHORT PIN_LS_X_MAX                    =      7;
 
     // Support Input Pins
     const SHORT PIN_SS_SUPPORT_BUTTON_1_PRESSED =     A6;

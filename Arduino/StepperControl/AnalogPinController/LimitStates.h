@@ -40,7 +40,7 @@ namespace LimitSwitch {
         setBit(BIT_LS_Y_MAX, readPin(PIN_LS_Y_MAX) == LIMIT_SWITCH_ON);
         
         setBit(BIT_LS_Z_MIN, readPin(PIN_LS_Z_MIN) == LIMIT_SWITCH_ON);
-        setBit(BIT_LS_Y_MAX, readPin(PIN_LS_Z_MAX) == LIMIT_SWITCH_ON);
+        setBit(BIT_LS_Z_MAX, readPin(PIN_LS_Z_MAX) == LIMIT_SWITCH_ON);
 
         setBit(BIT_2,        false);
         setBit(BIT_1,        false);

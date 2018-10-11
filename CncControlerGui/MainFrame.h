@@ -81,8 +81,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void leftDownProbeModePanel(wxMouseEvent& event);
-    virtual void changeConfigToolbook(wxToolbookEvent& event);
+		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
+		virtual void selectManuallyToolId(wxCommandEvent& event);
+		virtual void leaveSerialSpy(wxMouseEvent& event);
+		virtual void changeConfigToolbook(wxToolbookEvent& event);
 		virtual void warmStartController(wxCommandEvent& event);
 		virtual void setReferencePosition(wxCommandEvent& event);
 		virtual void cmXnegYnegLeftDown(wxMouseEvent& event);
@@ -465,6 +467,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void decorateProbeMode(bool probeMode);
 		
+		void updateSpeedConfigPlayground();
+		
 		friend class CncConfig;
 		friend class CncReferencePosition;
 		friend class CncConnectProgress;
@@ -631,10 +635,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void rcRun();
 		void rcPause();
 		
-		bool checkIfRunCanBeProcessed();
+		bool checkIfRunCanBeProcessed(bool confirm=true);
 		bool processVirtualTemplate();
 		bool processTemplateIntern();
-		bool processTemplateWrapper();
+		bool processTemplateWrapper(bool confirm=true);
 		bool processSVGTemplate();
 		bool processGCodeTemplate();
 		bool processManualTemplate();

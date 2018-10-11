@@ -3,6 +3,10 @@
 
 	#define epsilon ((double)0.000999)
 
+  /////////////////////////////////////////////////////////////////////////////////////
+  // "Software Reset" function
+  extern void (*softwareReset)(void);
+
   extern inline uint8_t getPinMode(uint8_t pin);
   extern PinType getPinType(uint8_t pin);
 

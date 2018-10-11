@@ -13,7 +13,7 @@ class StateBuffer {
 
   protected:
 
-    static const unsigned int INIT_VALUE                  = 0;
+    const unsigned int INIT_VALUE                  = 0;
 
     unsigned int pinValue;
     char stringValue[9];
@@ -57,7 +57,7 @@ class StateBuffer {
           case 3:     pinValue &= ~(1 << 2); break;
           case 2:     pinValue &= ~(1 << 1); break;
           case 1:     pinValue &= ~(1 << 0); break;
-        }       
+        } 
       }
     }
 

@@ -794,6 +794,9 @@ void SerialSimulatorThread::processNextCommand() {
 										ret = RET_OK;
 										break;
 										
+										#warning move to setter
+										/*
+										 * #warning move to setter
 		case CMD_ENABLE_PROBE_MODE:		probeMode = true;
 										ret = RET_OK;
 										break;
@@ -801,6 +804,7 @@ void SerialSimulatorThread::processNextCommand() {
 		case CMD_DISABLE_PROBE_MODE:	probeMode = false;
 										ret = RET_OK;
 										break;
+										 * */
 		
 		// --------------------------------------------------------------------------
 		// Commands - multi byte return

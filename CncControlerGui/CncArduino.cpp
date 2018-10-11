@@ -37,9 +37,6 @@ void ArduinoCMDs::init() {
 	cmds[CMD_GETTER]                = "Pull Getter";
 	cmds[CMD_GETTER_LIST]           = "Pull Getter List";
 	
-	cmds[CMD_ENABLE_STEPPER_PIN]    = "Push Enable Stepper Motors";
-	cmds[CMD_DISABLE_STEPPER_PIN]   = "Push Disable Stepper Motors";
-	
 	cmds[CMD_POS_STEP_X]            = "Push Positive X Step";
 	cmds[CMD_NEG_STEP_X]            = "Push Negative X Step";
 	cmds[CMD_POS_STEP_Y]            = "Push Positive Y Step";
@@ -56,9 +53,6 @@ void ArduinoCMDs::init() {
 	cmds[CMD_PRINT_VERSION]         = "Pull Version";
 	cmds[CMD_PRINT_PIN_REPORT]      = "Pull PIN Report";
 	cmds[CMD_PRINT_ERRORINFO]       = "Pull Error Info";
-	
-	cmds[CMD_ENABLE_PROBE_MODE]     = "Push Enable Probe Mode";
-	cmds[CMD_DISABLE_PROBE_MODE]    = "Push Disable Probe Mode";
 	
 	cmds[CMD_TEST_INFO_MESSAGE]     = "Pull Version";
 	cmds[CMD_TEST_WARN_MESSAGE]     = "Pull PIN Report";
@@ -151,7 +145,7 @@ void ArduinoPIDs::init() {
 	pids[PID_POS_REPLY_THRESHOLD_X]           = "Position Reply Threshold X Axis";
 	pids[PID_POS_REPLY_THRESHOLD_Y]           = "Position Reply Threshold Y Axis";
 	pids[PID_POS_REPLY_THRESHOLD_Z]           = "Position Reply Threshold Z Axis";
-	pids[PID_PROBE_MODE]                      = "Probe Mode";
+	pids[PID_PROBE_MODE]                      = "Probe Mode State";
 
 	pids[PID_XYZ_POS_MAJOR]                   = "XYZ Pos - Type Major";
 	pids[PID_XYZ_POS_DETAIL]                  = "XYZ Pos - Type Detail";

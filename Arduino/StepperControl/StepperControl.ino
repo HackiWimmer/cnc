@@ -14,11 +14,6 @@ LastErrorCodes errorInfo;
 CncController controller(errorInfo);
 
 /////////////////////////////////////////////////////////////////////////////////////
-// "Software Reset" function
-void (*softwareReset)(void)=0;
-/////////////////////////////////////////////////////////////////////////////////////
-
-/////////////////////////////////////////////////////////////////////////////////////
 inline void printSketchVersion() {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOT);
@@ -382,8 +377,6 @@ inline unsigned char processSetter() {
                                   break;
     // processSetter() ............................................
     case PID_SPEED_MM_MIN:        controller.setSpeedValue(dValue); 
-                                  //TODO
-                                   // controller.setSpeedValue(0.0); 
                                   break;
     // processSetter() ............................................
     // call it with lValue = NORMALIZED_INCREMENT_DIRECTION || INVERSED_INCREMENT_DIRECTION
@@ -395,6 +388,14 @@ inline unsigned char processSetter() {
                                   break;
     case PID_INCREMENT_DIRECTION_VALUE_Z:   
                                   controller.getStepperZ()->setIncrementDirectionValue(lValue); 
+                                  break;
+
+    // processSetter() ............................................
+    case PID_PROBE_MODE:          controller.setProbeMode(lValue != 0);
+                                  break;
+
+    // processSetter() ............................................
+    case PID_ENABLE_STEPPERS:     controller.enableStepperPin(lValue != 0);
                                   break;
 
     // processSetter() ............................................
@@ -415,10 +416,9 @@ inline unsigned char processSetter() {
 /////////////////////////////////////////////////////////////////////////////////////
 inline unsigned char decodeMove(unsigned char cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
-
   // Wait a protion of time.
   // This is very importent for the next readBytes above
-  delayMicroseconds(700);
+  delayMicroseconds(1000);
 
   byte b[4];
   int32_t v[3];
@@ -674,28 +674,6 @@ void loop() {
         // SB command - Parameter setter
         case CMD_SETTER:
               r = processSetter();
-              break;
-  
-        // SB command - Enable stepper motors
-        case CMD_ENABLE_STEPPER_PIN:
-              controller.enableStepperPin(true);
-              break;
-  
-        // SB command - Disable stepper motors
-        case CMD_DISABLE_STEPPER_PIN:
-              controller.enableStepperPin(false);
-              break;
-  
-        // SB command - Probe
-        case CMD_ENABLE_PROBE_MODE:
-              controller.enableProbeMode();
-              r = RET_OK;
-              break;
-              
-        // SB command - Probe
-        case CMD_DISABLE_PROBE_MODE:
-              controller.disableProbeMode();
-              r = RET_OK;
               break;
               
         // SB command - Test suite

@@ -155,6 +155,7 @@ class CncSpeedController {
           ostr << o << "   Steps per Second           [step/sec] : " << a.stepsPerSec       << std::endl;
           ostr << o << "   Microseconds per Step     [usec/step] : " << a.microSecPerStep   << std::endl;
           ostr << o << "   Synthetically Speed Delay [usec/step] : " << a.synthSpeedDelay   << std::endl;
+          ostr << std::endl;
           
           return ostr;
         }

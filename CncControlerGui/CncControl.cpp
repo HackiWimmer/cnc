@@ -505,7 +505,7 @@ bool CncControl::isReadyToRun() {
 	getSerial()->processGetter(PID_QUERY_READY_TO_RUN, list);
 		
 	if ( list.size() != 1 ) {
-		std::cerr << "CncControl::isReadyToRun: Unable to a correcponding state from teh serial port:" << std::endl;
+		std::cerr << "CncControl::isReadyToRun: Unable due to the corresponding state of the serial port:" << std::endl;
 		return false;
 	}
 	
@@ -1420,7 +1420,7 @@ bool CncControl::enableStepperMotors(bool s) {
 	if ( isConnected() == false )
 		return false;
 	
-	bool ret = processCommand( ( s == true ? CMD_ENABLE_STEPPER_PIN : CMD_DISABLE_STEPPER_PIN), std::cout);
+	bool ret = processSetter(PID_ENABLE_STEPPERS, (int32_t)s);
 	if ( ret == false ) {
 		std::cerr << "CncControl::enableStepperMotors" << std::endl;
 		std::cerr << " Error while enabling stepper motors. State=" << s << std::endl;
@@ -1443,7 +1443,7 @@ bool CncControl::enableProbeMode(bool s) {
 	if ( isConnected() == false )
 		return false;
 	
-	bool ret = processCommand( ( s == true ? CMD_ENABLE_PROBE_MODE : CMD_DISABLE_PROBE_MODE), std::cout);
+	bool ret = processSetter(PID_PROBE_MODE, (int32_t)s);
 	if ( ret == false ) {
 		std::cerr << "CncControl::enableProbeMode" << std::endl;
 		std::cerr << " Error while enabling probe mode. State=" << s << std::endl;

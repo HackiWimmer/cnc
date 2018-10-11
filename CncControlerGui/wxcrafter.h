@@ -42,9 +42,9 @@
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
 #include <wx/radiobox.h>
+#include <wx/checkbox.h>
 #include <wx/listbook.h>
 #include <wx/spinctrl.h>
-#include <wx/checkbox.h>
 #include <wx/scrolwin.h>
 #include <wx/listbox.h>
 #include "CncZView.h"
@@ -169,7 +169,10 @@ protected:
     wxPanel* m_setupToolMagazine;
     wxPanel* m_toolMagazinePlaceholder;
     wxPanel* m_setupSpeedWizard;
-    wxStaticText* m_staticText4575;
+    wxStaticText* m_staticText5677;
+    wxSlider* m_speedConfigSlider;
+    wxStaticText* m_staticText5680;
+    wxTextCtrl* m_speedConfigTrace;
     wxPanel* m_mainBookReference;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
@@ -240,6 +243,7 @@ protected:
     wxRadioBox* m_mmRadioCoordinates;
     wxStaticText* m_staticText5101;
     wxComboBox* m_manuallyToolId;
+    wxCheckBox* m_checkBoxToolEnabled;
     wxStaticText* m_staticText5105;
     wxSlider* m_manuallySpeedSlider;
     wxTextCtrl* m_manuallySpeedValue;
@@ -623,10 +627,12 @@ protected:
     wxMenuItem* m_miViewAll;
     wxMenuItem* m_miHideAll;
     wxMenu* m_menuPerspective;
+    wxMenuItem* m_miPerspectiveDefault;
     wxMenuItem* m_miPerspectiveRun;
     wxMenuItem* m_miPerspectiveDebug;
     wxMenuItem* m_miPerspectiveSource;
     wxMenuItem* m_menuItem2771;
+    wxMenuItem* m_menuSavePerspectiveDefault;
     wxMenuItem* m_menuSavePerspectiveRun;
     wxMenuItem* m_menuSavePerspectiveDebug;
     wxMenuItem* m_menuSavePerspectiveSource;
@@ -762,6 +768,7 @@ protected:
     virtual void setupGridChanging(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridSelected(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void changeSpeedConfigSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void cmKillFocus(wxFocusEvent& event) { event.Skip(); }
     virtual void cmLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void cmLeftUp(wxMouseEvent& event) { event.Skip(); }
@@ -791,6 +798,7 @@ protected:
     virtual void moveZToMin(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToTop(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToBottom(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectManuallyToolId(wxCommandEvent& event) { event.Skip(); }
     virtual void changeManuallySpeedSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void minManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
     virtual void updateMetricX(wxCommandEvent& event) { event.Skip(); }
@@ -838,7 +846,6 @@ protected:
     virtual void resetControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerErrorInfoFromButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void leftDownProbeModePanel(wxMouseEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMotionMonitor(wxCommandEvent& event) { event.Skip(); }
@@ -890,6 +897,8 @@ protected:
     virtual void selectUCUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCChangeFrom(wxCommandEvent& event) { event.Skip(); }
     virtual void closeUnitCalculator(wxCommandEvent& event) { event.Skip(); }
+    virtual void leaveSerialSpy(wxMouseEvent& event) { event.Skip(); }
+    virtual void leaveSerialSpy(wxMouseCaptureLostEvent& event) { event.Skip(); }
     virtual void enableSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
@@ -1049,7 +1058,10 @@ public:
     wxPanel* GetSetupConfigPage() { return m_setupConfigPage; }
     wxPanel* GetToolMagazinePlaceholder() { return m_toolMagazinePlaceholder; }
     wxPanel* GetSetupToolMagazine() { return m_setupToolMagazine; }
-    wxStaticText* GetStaticText4575() { return m_staticText4575; }
+    wxStaticText* GetStaticText5677() { return m_staticText5677; }
+    wxSlider* GetSpeedConfigSlider() { return m_speedConfigSlider; }
+    wxStaticText* GetStaticText5680() { return m_staticText5680; }
+    wxTextCtrl* GetSpeedConfigTrace() { return m_speedConfigTrace; }
     wxPanel* GetSetupSpeedWizard() { return m_setupSpeedWizard; }
     wxNotebook* GetNotebook4561() { return m_notebook4561; }
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
@@ -1122,6 +1134,7 @@ public:
     wxRadioBox* GetMmRadioCoordinates() { return m_mmRadioCoordinates; }
     wxStaticText* GetStaticText5101() { return m_staticText5101; }
     wxComboBox* GetManuallyToolId() { return m_manuallyToolId; }
+    wxCheckBox* GetCheckBoxToolEnabled() { return m_checkBoxToolEnabled; }
     wxStaticText* GetStaticText5105() { return m_staticText5105; }
     wxSlider* GetManuallySpeedSlider() { return m_manuallySpeedSlider; }
     wxTextCtrl* GetManuallySpeedValue() { return m_manuallySpeedValue; }

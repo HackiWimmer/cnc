@@ -36,6 +36,13 @@ class CncStepper {
     unsigned int dirPulseWidth;
     unsigned int lowPulsWidth;
     unsigned int highPulsWidth;
+    unsigned int minPulsWidth;
+
+    unsigned long tsPrevStep;
+    unsigned long tsCurrStep;
+
+    unsigned long tsPrevDirChange;
+    unsigned long tsCurrDirChange;
       
     uint32_t avgStepDuartion;
 
@@ -110,8 +117,8 @@ class CncStepper {
     //////////////////////////////////////////////////////////////////////////////
     unsigned int getLowPulseWidth()         const  { return lowPulsWidth;  }
     unsigned int getHighPulseWidth()        const  { return highPulsWidth; }
-    void setLowPulseWidth(int lpw)                 { lowPulsWidth  = lpw;  }
-    void setHighPulseWidth(int hpw)                { highPulsWidth = hpw;  }
+    void setLowPulseWidth(int lpw)                 { lowPulsWidth  = lpw;  minPulsWidth = highPulsWidth + lowPulsWidth; }
+    void setHighPulseWidth(int hpw)                { highPulsWidth = hpw;  minPulsWidth = highPulsWidth + lowPulsWidth; }
 
     //////////////////////////////////////////////////////////////////////////////
     uint32_t getSteps()                     const  { return steps; }

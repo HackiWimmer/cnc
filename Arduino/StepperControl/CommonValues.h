@@ -141,9 +141,6 @@ struct I2CData {
   const unsigned char CMD_GETTER                          =  'G';
   const unsigned char CMD_GETTER_LIST                     =  'g';
   
-  const unsigned char CMD_ENABLE_STEPPER_PIN              =  'E';
-  const unsigned char CMD_DISABLE_STEPPER_PIN             =  'e';
-  
   const unsigned char CMD_POS_STEP_X                      =  'X';
   const unsigned char CMD_NEG_STEP_X                      =  'x';
   const unsigned char CMD_POS_STEP_Y                      =  'Y';
@@ -164,9 +161,6 @@ struct I2CData {
   const unsigned char CMD_PRINT_ERRORINFO                 =  '?';
   const unsigned char CMD_PRINT_LAST_ERROR_RESPONSE_ID    =  '!';
     
-  const unsigned char CMD_ENABLE_PROBE_MODE               =  'K';
-  const unsigned char CMD_DISABLE_PROBE_MODE              =  'k';
-  
   // Ranges reserved via above definitions:
   //   48 -  57 --> '0'..'9'
   //   65 -  90 --> 'A'..'Z'
@@ -442,8 +436,8 @@ struct I2CData {
   const int32_t NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;
   const int32_t INVERSED_INCREMENT_DIRECTION_VALUE       = 0;
 
-  const int16_t SPEED_MANAGER_CONST_STATIC_OFFSET_US     = 100; // [us]
-  const int16_t SPEED_MANAGER_CONST_LOOP_OFFSET_US       =  25; // [us]
+  const int16_t SPEED_MANAGER_CONST_STATIC_OFFSET_US     = 0; // [us]
+  const int16_t SPEED_MANAGER_CONST_LOOP_OFFSET_US       = 0; // [us]
 
   const int32_t BAUD_RATE                                = 115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
 

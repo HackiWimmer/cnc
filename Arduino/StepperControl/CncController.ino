@@ -428,6 +428,10 @@ bool CncController::observeSerialFrontByte(unsigned char& retValue) {
   
   if ( peakSerial(serialFrontByte) == true ) {
     switch ( serialFrontByte ) {
+
+      case SIG_SOFTWARE_RESET:
+                  softwareReset();   
+                  return false;
       
       // interrupt handling
       case SIG_INTERRUPPT:
@@ -561,7 +565,7 @@ unsigned char CncController::stepAxisXYZ() {
   // speed up the performance and observate in intervalls
   // blind flying: e.g. 16 * 0,015 (12 mm / 800 steps) = 0,24 mm
   if ( positionCounter%1 == 0 ) {
-    unsigned char retValue;
+    unsigned char retValue = RET_ERROR;
     if ( observeSerialFrontByte(retValue) == false )
       return retValue;
 

@@ -1176,14 +1176,13 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	// to provide a time an pos reference for the speed calculation
 	logMeasurementRefTs(pos);
 	
-	canIdle = false;
+	canIdle  = false;
 	bool ret = false;
 
 	if ( writeData(moveCommand, idx) ) {
 		SerialFetchInfo sfi;
 		sfi.command 			= moveCommand[0];
-		#warning consider speed delay here
-		//sfi.singleFetchTimeout 	= 
+		sfi.singleFetchTimeout 	= 3000;
 		sfi.retSOHAllowed 		= true;
 		sfi.returnAfterSOH  	= false;
 		sfi.Mc.size 			= size;
@@ -1265,8 +1264,8 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			{
 				std::cerr << "Serial::fetchControllerResult: " 
 					      << decodeContollerResult(ret) 
-					      << " while processing cmd: " 
-					      << sfi.command << std::endl;
+					      << " while processing: " 
+					      << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl;
 				
 				if ( sfi.autoCallErrorInfo == true ) {
 					processCommand("?", mutliByteStream, pos);
@@ -1278,22 +1277,23 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			//evaluateResult..........................................
 			case RET_HALT:
 			{
-				std::cout << "Serial::fetchControllerResult: " 
+				cnc::cex1 << "Serial::fetchControllerResult: " 
 					      << decodeContollerResult(ret) 
-					      << " while processing cmd: " 
-					      << sfi.command << std::endl;
-
+					      << " while processing: " 
+					      << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl;
+					
 				cncControl->SerialCallback(1);
-				return true;
+				return false;
 			}
 			//evaluateResult..........................................
 			case RET_QUIT:
 			{
+				/*
 				std::cout << "Serial::fetchControllerResult: " 
 					      << decodeContollerResult(ret) 
-					      << " while processing cmd: " 
-					      << sfi.command << std::endl;
-
+					      << " while processing: " 
+					      << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl;
+				*/
 				cncControl->SerialCallback(1);
 				return true;
 			}

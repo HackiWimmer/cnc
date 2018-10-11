@@ -702,7 +702,7 @@ void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Setup AUI Windows menue
-	perspectiveHandler.loadPerspective("Run");
+	perspectiveHandler.loadPerspective("Default");
 	decorateViewMenu();
 	
 	// Version infos
@@ -1457,6 +1457,7 @@ void MainFrame::initialize(void) {
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
 	changeManuallySpeedValue();
+	updateSpeedConfigPlayground();
 	
 	perspectiveHandler.setupUserPerspectives();
 	
@@ -1530,7 +1531,7 @@ bool MainFrame::initializeCncControl() {
 		// initialize display unit
 		m_unit->SetStringSelection(cncConfig->getDefaultDisplayUnitAsStr());
 		updateUnit();
-	
+		
 		// initialize com port
 		cncConfig->getDefaultPort(value);
 		m_portSelector->SetStringSelection(value);
@@ -1626,18 +1627,95 @@ void MainFrame::determineCncOutputControls() {
 void MainFrame::updateUnit() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	wxASSERT(m_xAxis); wxASSERT(m_yAxis); wxASSERT(m_zAxis);
-
 	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	wxString unit = m_unit->GetValue();
 
-	wxFloatingPointValidator<float> valX(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	wxFloatingPointValidator<float> valY(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
-	wxFloatingPointValidator<float> valZ(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
+	wxFloatingPointValidator<float> val(3, NULL, wxNUM_VAL_DEFAULT );//, wxNUM_VAL_ZERO_AS_BLANK);
 	
-	double xLimit = +cncConfig->getMaxDimensionX()/2;
-	double yLimit = +cncConfig->getMaxDimensionY()/2;
-	double zLimit = +cncConfig->getMaxDimensionZ()/2;
+	double xLimit = +cncConfig->getMaxDimensionX()/2; // [mm]
+	double yLimit = +cncConfig->getMaxDimensionY()/2; // [mm]
+	double zLimit = +cncConfig->getMaxDimensionZ()/2; // [mm]
+	
+	double valueX = m_xManuallySlider->GetValue();
+	double valueY = m_yManuallySlider->GetValue();
+	double valueZ = m_zManuallySlider->GetValue();
+	
+	wxString xAppPos(m_xAxis->GetValue());
+	wxString yAppPos(m_yAxis->GetValue());
+	wxString zAppPos(m_zAxis->GetValue());
+	wxString xCtlPos(m_xAxisCtl->GetValue());
+	wxString yCtlPos(m_yAxisCtl->GetValue());
+	wxString zCtlPos(m_zAxisCtl->GetValue());
+	
+	int precision = 0;
+
+	if ( unit == "mm" ) { 
+		cncConfig->setDisplayUnit(CncMetric); 
+		precision = 3;
+		
+		valueX *= GBL_CONFIG->getDisplayFactX();
+		valueY *= GBL_CONFIG->getDisplayFactY();
+		valueZ *= GBL_CONFIG->getDisplayFactZ();
+		
+		m_metricX->SetValue(wxString::Format("%4.3lf", valueX));
+		m_metricY->SetValue(wxString::Format("%4.3lf", valueY));
+		m_metricZ->SetValue(wxString::Format("%4.3lf", valueZ));
+		
+		long v; 
+		xAppPos.ToLong(&v);
+		m_xAxis->ChangeValue(wxString::Format("%4.3lf", (double)(v * GBL_CONFIG->getDisplayFactX())));
+		
+		yAppPos.ToLong(&v);
+		m_yAxis->ChangeValue(wxString::Format("%4.3lf", (double)(v * GBL_CONFIG->getDisplayFactY())));
+		
+		zAppPos.ToLong(&v);
+		m_zAxis->ChangeValue(wxString::Format("%4.3lf", (double)(v * GBL_CONFIG->getDisplayFactZ())));
+		
+		xCtlPos.ToLong(&v);
+		m_xAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * GBL_CONFIG->getDisplayFactX())));
+		
+		yCtlPos.ToLong(&v);
+		m_yAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * GBL_CONFIG->getDisplayFactY())));
+		
+		zCtlPos.ToLong(&v);
+		m_zAxisCtl->ChangeValue(wxString::Format("%4.3lf", (double)(v * GBL_CONFIG->getDisplayFactZ())));
+		
+	} else {
+		xLimit *= GBL_CONFIG->getCalculationFactX();
+		yLimit *= GBL_CONFIG->getCalculationFactY();
+		zLimit *= GBL_CONFIG->getCalculationFactZ();
+		
+		cncConfig->setDisplayUnit(CncSteps);
+		
+		valueX *= GBL_CONFIG->getCalculationFactX();
+		valueY *= GBL_CONFIG->getCalculationFactY();
+		valueZ *= GBL_CONFIG->getCalculationFactZ();
+		
+		m_metricX->SetValue(wxString::Format("%d", (long)valueX));
+		m_metricY->SetValue(wxString::Format("%d", (long)valueY));
+		m_metricZ->SetValue(wxString::Format("%d", (long)valueZ));
+		
+		double v; 
+		xAppPos.ToDouble(&v);
+		m_xAxis->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactX())));
+		
+		yAppPos.ToDouble(&v);
+		m_yAxis->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactY())));
+		
+		zAppPos.ToDouble(&v);
+		m_zAxis->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactZ())));
+		
+		xCtlPos.ToDouble(&v);
+		m_xAxisCtl->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactX())));
+		
+		yCtlPos.ToDouble(&v);
+		m_yAxisCtl->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactY())));
+		
+		zCtlPos.ToDouble(&v);
+		m_zAxisCtl->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactZ())));
+		
+		precision = 0;
+	}
 	
 	m_xManuallySlider->SetMin(-xLimit);
 	m_xManuallySlider->SetMax(+xLimit);
@@ -1645,32 +1723,17 @@ void MainFrame::updateUnit() {
 	m_yManuallySlider->SetMax(+yLimit);
 	m_zManuallySlider->SetMin(-zLimit);
 	m_zManuallySlider->SetMax(+zLimit);
-	m_xManuallySlider->SetValue(0);
-	m_yManuallySlider->SetValue(0);
-	m_zManuallySlider->SetValue(0);
 	
-	if ( unit == "mm" ) { 
-		cncConfig->setDisplayUnit(CncMetric); 
-		m_metricX->SetValue("0.000");
-		m_metricY->SetValue("0.000");
-		m_metricZ->SetValue("0.000");
-	} else {
-		xLimit *= cncConfig->getStepsX();
-		yLimit *= cncConfig->getStepsY();
-		zLimit *= cncConfig->getStepsZ();
-
-		cncConfig->setDisplayUnit(CncSteps);
-		m_metricX->SetValue("0");
-		m_metricY->SetValue("0");
-		m_metricZ->SetValue("0");
-	}
+	m_xManuallySlider->SetValue(valueX);
+	m_yManuallySlider->SetValue(valueY);
+	m_zManuallySlider->SetValue(valueZ);
 	
-	valX.SetRange(-xLimit, +xLimit);
-	valY.SetRange(-yLimit, +yLimit);
-	valZ.SetRange(-zLimit, +zLimit);
-	m_metricX->SetValidator(valX);
-	m_metricY->SetValidator(valY);
-	m_metricZ->SetValidator(valZ);
+	val.SetPrecision(precision);
+	val.SetRange(-xLimit, +xLimit);
+	
+	m_metricX->SetValidator(val);
+	m_metricY->SetValidator(val);
+	m_metricZ->SetValidator(val);
 	
 	// manual control
 	m_mmUnitX->SetLabel(unit);
@@ -2823,7 +2886,7 @@ bool MainFrame::processManualTemplate() {
 	ManuallyPathHandlerCnc::MoveDefinition move;
 	move.speedType 		= CncSpeedUserDefined;
 	move.absoluteMove	= ( m_mmRadioCoordinates->GetSelection() == 0 );
-	move.toolState		= true;
+	move.toolState		= m_checkBoxToolEnabled->GetValue();
 	
 	m_manuallySpeedValue->GetValue().ToDouble(&move.f);
 	m_metricX->GetValue().ToDouble(&move.x);
@@ -3200,7 +3263,7 @@ void MainFrame::testCountXUpdated(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::checkIfRunCanBeProcessed() {
+bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
@@ -3250,7 +3313,7 @@ bool MainFrame::checkIfRunCanBeProcessed() {
 		}
 	}
 	
-	return showConfigSummaryAndConfirmRun();
+	return (confirm == true ? showConfigSummaryAndConfirmRun() : true);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::showConfigSummaryAndConfirmRun() {
@@ -3475,7 +3538,7 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::processTemplateWrapper() {
+bool MainFrame::processTemplateWrapper(bool confirm) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	bool ret = true;
@@ -3503,7 +3566,7 @@ bool MainFrame::processTemplateWrapper() {
 	}
 	
 	if ( ret == true )
-		ret = checkIfRunCanBeProcessed();
+		ret = checkIfRunCanBeProcessed(confirm);
 		
 	int32_t errorCount = 0;
 	if ( ret == true ) {
@@ -3530,13 +3593,14 @@ bool MainFrame::processTemplateWrapper() {
 	}
 	
 	// prepare final statements
+	wxString probeMode(GBL_CONFIG->isProbeMode() ? "ON" :"OFF");
 	if ( ret == false) {
 		
 		wxString hint;
 		if ( errorCount == 0 ) 	{ hint.assign("not successfully"); }
 		else					{ hint.assign("with errors");      }
 		
-		cnc::cex1 << wxString::Format("%s - Processing finished %s . . .", wxDateTime::UNow().FormatISOTime(), hint) << std::endl;
+		cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
 		
 		if ( errorCount > 0 ) {
 			cnc::cex1 << "For more details please try to consider the controller error info tab" << std::endl;
@@ -3550,7 +3614,7 @@ bool MainFrame::processTemplateWrapper() {
 	} else {
 		// restore idle requests as before
 		m_miRqtIdleMessages->Check(idleMsgStateBefore);
-		std::clog << wxString::Format("%s - Processing finished successfully . . .", wxDateTime::UNow().FormatISOTime()) << std::endl;
+		std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
 	}
 	
 	cnc->getSerial()->traceSpeedInformation();
@@ -4546,7 +4610,7 @@ void MainFrame::moveManuallySliderX(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactX()));
+		val = wxString::Format(wxT("%d"),    (int)(m_xManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
 	}
@@ -4557,7 +4621,7 @@ void MainFrame::moveManuallySliderY(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactY()));
+		val = wxString::Format(wxT("%d"),    (int)(m_yManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
 	}
@@ -4568,7 +4632,7 @@ void MainFrame::moveManuallySliderZ(wxScrollEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactZ()));
+		val = wxString::Format(wxT("%d"),    (int)(m_zManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
@@ -4608,7 +4672,7 @@ void MainFrame::minManuallyXSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactX()));
+		val = wxString::Format(wxT("%d"),    (int)(m_xManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
 	}
@@ -4621,7 +4685,7 @@ void MainFrame::maxManuallyXSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_xManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactX()));
+		val = wxString::Format(wxT("%d"),    (int)(m_xManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_xManuallySlider->GetValue()));
 	}
@@ -4634,7 +4698,7 @@ void MainFrame::minManuallyYSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactY()));
+		val = wxString::Format(wxT("%d"),    (int)(m_yManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
 	}
@@ -4647,7 +4711,7 @@ void MainFrame::maxManuallyYSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_yManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactY()));
+		val = wxString::Format(wxT("%d"),    (int)(m_yManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_yManuallySlider->GetValue()));
 	}
@@ -4660,7 +4724,7 @@ void MainFrame::minManuallyZSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactZ()));
+		val = wxString::Format(wxT("%d"),    (int)(m_zManuallySlider->GetValue() ));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
@@ -4673,7 +4737,7 @@ void MainFrame::maxManuallyZSlider(wxCommandEvent& event) {
 	
 	wxString val;
 	if ( m_unit->GetValue() == "steps" ) {
-		val = wxString::Format(wxT("%d"), (int)(m_zManuallySlider->GetValue() * CncConfig::getGlobalCncConfig()->getCalculationFactZ()));
+		val = wxString::Format(wxT("%d"),    (int)(m_zManuallySlider->GetValue()));
 	} else {
 		val = wxString::Format(wxT("%4.3f"), (double)(m_zManuallySlider->GetValue()));
 	}
@@ -4726,7 +4790,7 @@ void MainFrame::signManuallyXSlider(wxCommandEvent& event) {
 	
 	if ( m_unit->GetValue() == "steps" ) {
 		val = wxString::Format(wxT("%6.0f"), v);
-		m_xManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactX());
+		m_xManuallySlider->SetValue(v);
 	} else {
 		val = wxString::Format(wxT("%4.3f"), v);
 		m_xManuallySlider->SetValue(v);
@@ -4745,7 +4809,7 @@ void MainFrame::signManuallyYSlider(wxCommandEvent& event) {
 	
 	if ( m_unit->GetValue() == "steps" ) {
 		val = wxString::Format(wxT("%6.0f"), v);
-		m_yManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactY());
+		m_yManuallySlider->SetValue(v);
 	} else {
 		val = wxString::Format(wxT("%4.3f"), v);
 		m_yManuallySlider->SetValue(v);
@@ -4764,7 +4828,7 @@ void MainFrame::signManuallyZSlider(wxCommandEvent& event) {
 	
 	if ( m_unit->GetValue() == "steps" ) {
 		val = wxString::Format(wxT("%6.0f"), v);
-		m_zManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactZ());
+		m_zManuallySlider->SetValue(v);
 	} else {
 		val = wxString::Format(wxT("%4.3f"), v);
 		m_zManuallySlider->SetValue(v);
@@ -4776,12 +4840,14 @@ void MainFrame::signManuallyZSlider(wxCommandEvent& event) {
 void MainFrame::updateMetricX(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val = m_metricX->GetValue();
-	double v;
-	val.ToDouble(&v);
-	
+
 	if ( m_unit->GetValue() == "steps" ) {
-		m_xManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactX());
+		long v;
+		val.ToLong(&v);
+		m_xManuallySlider->SetValue(v);
 	} else {
+		double v;
+		val.ToDouble(&v);
 		m_xManuallySlider->SetValue(v);
 	}
 }
@@ -4789,12 +4855,14 @@ void MainFrame::updateMetricX(wxCommandEvent& event) {
 void MainFrame::updateMetricY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val = m_metricY->GetValue();
-	double v;
-	val.ToDouble(&v);
 	
 	if ( m_unit->GetValue() == "steps" ) {
-		m_yManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactY());
+		long v;
+		val.ToLong(&v);
+		m_yManuallySlider->SetValue(v);
 	} else {
+		double v;
+		val.ToDouble(&v);
 		m_yManuallySlider->SetValue(v);
 	}
 }
@@ -4802,12 +4870,14 @@ void MainFrame::updateMetricY(wxCommandEvent& event) {
 void MainFrame::updateMetricZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString val = m_metricZ->GetValue();
-	double v;
-	val.ToDouble(&v);
 	
 	if ( m_unit->GetValue() == "steps" ) {
-		m_zManuallySlider->SetValue(v / CncConfig::getGlobalCncConfig()->getCalculationFactZ());
+		long v;
+		val.ToLong(&v);
+		m_zManuallySlider->SetValue(v);
 	} else {
+		double v;
+		val.ToDouble(&v);
 		m_zManuallySlider->SetValue(v);
 	}
 }
@@ -5957,7 +6027,7 @@ void MainFrame::rcRun() {
 		// check if the cuurent port is a cnc and no emulator port
 		if ( cnc->getSerial()->getPortType() == CncPORT ) {
 			
-			wxString msg("Do you realy want to debug a COM port?");
+			wxString msg("Do you really want to debug a COM port?");
 			wxMessageDialog dlg(this, msg, _T("Port Check . . . "), 
 			                    wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
 			
@@ -7146,7 +7216,7 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	// loop
 	for ( unsigned int i=0; i<loopCount; i++) {
 		
-		bool ret = processTemplateWrapper();
+		bool ret = processTemplateWrapper( i == 0 );
 		duration += processLastDuartion;
 
 		info.Printf("Loop Counter : % 6d [#]; AVG duration: % 10ld [ms]", i + 1, duration / ( i + 1 ));
@@ -7595,6 +7665,36 @@ void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	m_pgMgrSetup->SelectPage(event.GetSelection());
 }
-void MainFrame::leftDownProbeModePanel(wxMouseEvent& event)
+/////////////////////////////////////////////////////////////////////
+void MainFrame::leaveSerialSpy(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_serialSpyDetails->Clear();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::updateSpeedConfigPlayground() {
+/////////////////////////////////////////////////////////////////////
+	if ( m_speedConfigSlider ) {
+		m_speedConfigSlider->SetRange(0, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
+		
+		CncSpeedController csc;
+		csc.X.setup(GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
+		csc.Y.setup(GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
+		csc.Z.setup(GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
+		
+		csc.setFeedSpeed_MM_MIN(m_speedConfigSlider->GetValue());
+		
+		std::stringstream ss;
+		ss << csc;
+		m_speedConfigTrace->ChangeValue(ss.str());
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::changeSpeedConfigSlider(wxScrollEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	updateSpeedConfigPlayground();
+}
+
+
+void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 }

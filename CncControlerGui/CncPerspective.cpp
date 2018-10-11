@@ -323,7 +323,7 @@ bool CncPerspective::removeUserPerspective() {
 		return false;
 	
 	wxString msg(wxString::Format("Do you really want to remove the the user perspective: '%s'", rmvLabel));
-	wxMessageDialog qDlg(mf, msg, _T("Remove User Perspective . . ."), wxOK|wxCANCEL|wxCENTRE|wxICON_ERROR);
+	wxMessageDialog qDlg(mf, msg, _T("Remove User Perspective . . ."), wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
 	if ( qDlg.ShowModal() != wxID_OK ) 
 		return false;
 	

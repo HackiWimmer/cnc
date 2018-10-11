@@ -40,7 +40,7 @@ inline void debugOnDemand() {
   return;
   
   limitStates.trace();
-  supportStates.trace();
+  //supportStates.trace();
   delay(1000);
 }
 
@@ -100,9 +100,9 @@ void loop() {
 
   // create additional output information
   CncInterface::ISP::States states(supportStates.getValue());
-  if ( PIN_SUPPORT_SWITCH1_STATE > 0 )    digitalWrite(PIN_SUPPORT_SWITCH1_STATE,   states.isSupportSwitch1Pressed());
-  if ( PIN_SUPPORT_SWITCH2_STATE > 0 )    digitalWrite(PIN_SUPPORT_SWITCH2_STATE,   states.isSupportSwitch2Pressed()); 
-  if ( PIN_SUPPORT_TOOL_POWERED > 0 )     digitalWrite(PIN_SUPPORT_TOOL_POWERED,    states.isToolPowered());
+  if ( PIN_SUPPORT_SWITCH1_STATE   > 0 )  digitalWrite(PIN_SUPPORT_SWITCH1_STATE,   states.isSupportSwitch1Pressed());
+  if ( PIN_SUPPORT_SWITCH2_STATE   > 0 )  digitalWrite(PIN_SUPPORT_SWITCH2_STATE,   states.isSupportSwitch2Pressed()); 
+  if ( PIN_SUPPORT_TOOL_POWERED    > 0 )  digitalWrite(PIN_SUPPORT_TOOL_POWERED,    states.isToolPowered());
   if ( PIN_SUPPORT_CABLE_CONNECTED > 0 )  digitalWrite(PIN_SUPPORT_CABLE_CONNECTED, states.isCableConnected());
 
   debugOnDemand();
