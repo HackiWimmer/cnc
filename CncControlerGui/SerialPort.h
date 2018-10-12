@@ -264,8 +264,6 @@ class Serial : public SerialOSD {
 		virtual void onPeriodicallyAppEvent(bool interrupted) {}
 		// returns the port name
 		virtual const char* getPortName() { return portName.c_str(); }
-		// give the inheried classes a chance to do that
-		virtual void adjustAppPostionAfterMoveUntilSignal(CncLongPosition& appPos) {}
 		// set spy mode
 		void enableSpyOutput(bool show=true) { traceSpyInfo = show;}
 		bool isSpyOutputOn() { return traceSpyInfo; }

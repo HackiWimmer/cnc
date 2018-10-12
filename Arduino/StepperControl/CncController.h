@@ -69,7 +69,7 @@ class CncController {
     bool sendCurrentLimitStates(bool force = false);
     
     //////////////////////////////////////////////////////////////////////////////
-    bool evaluateLimitState(const CncStepper* stepper, long& limit);
+    bool isAnyLimitActive();
     bool evaluateLimitStates(long& xLimit, long& yLimit, long& zLimit);
 
     //////////////////////////////////////////////////////////////////////////////

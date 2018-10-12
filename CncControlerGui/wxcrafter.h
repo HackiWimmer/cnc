@@ -171,8 +171,25 @@ protected:
     wxPanel* m_setupSpeedWizard;
     wxStaticText* m_staticText5677;
     wxSlider* m_speedConfigSlider;
-    wxStaticText* m_staticText5680;
+    wxStaticText* m_staticText5709;
+    wxStaticText* m_staticText5717;
+    wxTextCtrl* m_speedConfigStepsX;
+    wxStaticText* m_staticText5719;
+    wxTextCtrl* m_speedConfigStepsY;
+    wxStaticText* m_staticText5721;
+    wxTextCtrl* m_speedConfigStepsZ;
+    wxNotebook* m_notebook5687;
+    wxPanel* m_panel5699;
     wxTextCtrl* m_speedConfigTrace;
+    wxPanel* m_panelSpeedPgAxisX;
+    wxTextCtrl* m_accelConfigTraceX;
+    wxTextCtrl* m_speedConfigTraceX;
+    wxPanel* m_panelSpeedPgAxisY;
+    wxTextCtrl* m_accelConfigTraceY;
+    wxTextCtrl* m_speedConfigTraceY;
+    wxPanel* m_panelSpeedPgAxisZ;
+    wxTextCtrl* m_accelConfigTraceZ;
+    wxTextCtrl* m_speedConfigTraceZ;
     wxPanel* m_mainBookReference;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
@@ -769,6 +786,7 @@ protected:
     virtual void setupGridSelected(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
     virtual void changeSpeedConfigSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void updatedSpeedConfigSteps(wxCommandEvent& event) { event.Skip(); }
     virtual void cmKillFocus(wxFocusEvent& event) { event.Skip(); }
     virtual void cmLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void cmLeftUp(wxMouseEvent& event) { event.Skip(); }
@@ -1060,8 +1078,25 @@ public:
     wxPanel* GetSetupToolMagazine() { return m_setupToolMagazine; }
     wxStaticText* GetStaticText5677() { return m_staticText5677; }
     wxSlider* GetSpeedConfigSlider() { return m_speedConfigSlider; }
-    wxStaticText* GetStaticText5680() { return m_staticText5680; }
+    wxStaticText* GetStaticText5709() { return m_staticText5709; }
+    wxStaticText* GetStaticText5717() { return m_staticText5717; }
+    wxTextCtrl* GetSpeedConfigStepsX() { return m_speedConfigStepsX; }
+    wxStaticText* GetStaticText5719() { return m_staticText5719; }
+    wxTextCtrl* GetSpeedConfigStepsY() { return m_speedConfigStepsY; }
+    wxStaticText* GetStaticText5721() { return m_staticText5721; }
+    wxTextCtrl* GetSpeedConfigStepsZ() { return m_speedConfigStepsZ; }
     wxTextCtrl* GetSpeedConfigTrace() { return m_speedConfigTrace; }
+    wxPanel* GetPanel5699() { return m_panel5699; }
+    wxTextCtrl* GetAccelConfigTraceX() { return m_accelConfigTraceX; }
+    wxTextCtrl* GetSpeedConfigTraceX() { return m_speedConfigTraceX; }
+    wxPanel* GetPanelSpeedPgAxisX() { return m_panelSpeedPgAxisX; }
+    wxTextCtrl* GetAccelConfigTraceY() { return m_accelConfigTraceY; }
+    wxTextCtrl* GetSpeedConfigTraceY() { return m_speedConfigTraceY; }
+    wxPanel* GetPanelSpeedPgAxisY() { return m_panelSpeedPgAxisY; }
+    wxTextCtrl* GetAccelConfigTraceZ() { return m_accelConfigTraceZ; }
+    wxTextCtrl* GetSpeedConfigTraceZ() { return m_speedConfigTraceZ; }
+    wxPanel* GetPanelSpeedPgAxisZ() { return m_panelSpeedPgAxisZ; }
+    wxNotebook* GetNotebook5687() { return m_notebook5687; }
     wxPanel* GetSetupSpeedWizard() { return m_setupSpeedWizard; }
     wxNotebook* GetNotebook4561() { return m_notebook4561; }
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }

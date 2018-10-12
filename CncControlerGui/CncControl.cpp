@@ -1613,7 +1613,7 @@ bool CncControl::moveXToMinLimit() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
-		if (ret)
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(+endSwitchStepBackMertic, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
@@ -1630,7 +1630,7 @@ bool CncControl::moveXToMaxLimit() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
-		if (ret)
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
@@ -1647,7 +1647,7 @@ bool CncControl::moveYToMinLimit() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
-		if (ret)
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(0.0, +endSwitchStepBackMertic, true);
 	}
 	reconfigureSimpleMove(ret);
@@ -1664,7 +1664,7 @@ bool CncControl::moveYToMaxLimit() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
-		if (ret)
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
 	}
 	reconfigureSimpleMove(ret);
@@ -1680,7 +1680,7 @@ bool CncControl::moveZToMinLimit() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(maxSteps);
-		if (ret)
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelMetricZ(+endSwitchStepBackMertic);
 	}
 	reconfigureSimpleMove(ret);
@@ -1696,7 +1696,7 @@ bool CncControl::moveZToMaxLimit() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(maxSteps);
-		if (ret)
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelMetricZ(-endSwitchStepBackMertic);
 	}
 	reconfigureSimpleMove(ret);
@@ -1711,7 +1711,7 @@ bool CncControl::moveXToMid() {
 
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
-		if ( ret )
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(-maxSteps/2, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
@@ -1726,7 +1726,7 @@ bool CncControl::moveYToMid() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
-		if ( ret )
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(0.0, -maxSteps/2, true);
 	}
 	reconfigureSimpleMove(ret);
@@ -1741,7 +1741,7 @@ bool CncControl::moveZToMid() {
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(maxSteps);
-		if ( ret )
+		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelMetricZ(-maxSteps/2);
 	}
 	reconfigureSimpleMove(ret);
@@ -1770,6 +1770,10 @@ bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDir
 	if ( continuousMoveAppBased == true ) 	ret = manualContinuousMoveStart_AppBased(xDim, yDim, zDim);
 	else									ret = manualContinuousMoveStart_CtrlBased(xDim, yDim, zDim);
 	
+	// adjust the pc position
+	if ( ret == true )
+		curAppPos = curCtlPos;
+		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1995,7 +1999,7 @@ bool CncControl::manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool a
 						ret = moveRelLinearMetricXYZ(0.0, 0.0, -endSwitchStepBackMertic, false);
 				}
 			}
-				
+			
 			reconfigureSimpleMove(ret);
 		}
 	}

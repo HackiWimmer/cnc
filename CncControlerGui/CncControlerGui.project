@@ -156,6 +156,7 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncConfigCommon.h"/>
       <File Name="CncReferencePosition.h"/>
       <File Name="CncReferencePosition.cpp"/>
       <File Name="CncConnectProgress.h"/>
@@ -310,7 +311,6 @@
         <File Name="CncToolMagazine.cpp"/>
         <File Name="CncToolMagazine.h"/>
       </VirtualDirectory>
-      <File Name="CncConfigCommon.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
       <File Name="CncSummaryListCtrl.cpp"/>

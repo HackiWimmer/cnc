@@ -1117,10 +1117,6 @@ bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRend
 bool Serial::processMoveUntilSignal(unsigned int size, const int32_t (&values)[3], CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	bool ret = processMoveInternal(size, values, CMD_MOVE_UNIT_SIGNAL, pos);
-	
-	//if ( ret == true) 
-		adjustAppPostionAfterMoveUntilSignal(pos);
-		
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1210,6 +1206,7 @@ const char* Serial::decodeContollerResult(int ret) {
 		case RET_NULL:			return "RET_NULL";
 		case RET_OK: 			return "RET_OK";
 		case RET_ERROR:			return "RET_ERROR";
+		case RET_LIMIT:			return "RET_LIMIT";
 		case RET_SOT:			return "RET_SOT";
 		case RET_SOH:			return "RET_SOH";
 		case RET_INTERRUPT:		return "RET_INTERRUPT";
@@ -1296,6 +1293,18 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 				*/
 				cncControl->SerialCallback(1);
 				return true;
+			}
+			//evaluateResult..........................................
+			case RET_LIMIT:
+			{
+				
+				std::cout << "Serial::fetchControllerResult: " 
+					      << decodeContollerResult(ret) 
+					      << " while processing: " 
+					      << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl;
+				
+				cncControl->SerialCallback(1);
+				return false;
 			}
 			//evaluateResult..........................................
 			case RET_SOT:

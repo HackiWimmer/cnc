@@ -207,10 +207,11 @@ struct I2CData {
   const unsigned char RET_SOT                             =   3;   // Start of text
   const unsigned char RET_OK                              =   4;   // Ack
   const unsigned char RET_ERROR                           =   5;   // Nack
-  const unsigned char RET_INTERRUPT                       =   6;   // 
-  const unsigned char RET_HALT                            =   7;   // 
-  const unsigned char RET_QUIT                            =   8;   // 
-  const unsigned char RET_MSG                             =   9;   // Start of message
+  const unsigned char RET_LIMIT                           =   6;   //
+  const unsigned char RET_INTERRUPT                       =   7;   // 
+  const unsigned char RET_HALT                            =   8;   // 
+  const unsigned char RET_QUIT                            =   9;   // 
+  const unsigned char RET_MSG                             =  10;   // Start of message
 
 // .....................................................................
 // Please consider

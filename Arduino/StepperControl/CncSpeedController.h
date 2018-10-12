@@ -14,6 +14,177 @@
     
 #endif
 
+
+    
+//////////////////////////////////////////////////////////////////////
+#define  startPeriodStepsMin    250
+#define  stopPeriodStepsMin     250
+#define  periodStepsMin         startPeriodStepsMin + stopPeriodStepsMin
+  
+class AccelerationProfile {
+
+  private:
+    bool active;
+    bool enabled;
+    
+    unsigned int startSpeedDelay;
+    unsigned int stopSpeedDelay;
+    unsigned int feedSpeedDelay;
+
+    unsigned int startDelayDelta;
+    unsigned int stopDelayDelta;
+
+    int32_t startStepCountMark;
+    int32_t stopStepCountMark;
+  
+    int32_t stepCounter;
+
+  public:
+  
+    //////////////////////////////////////////////////////////////////
+    explicit AccelerationProfile() 
+    : active(true)
+    , enabled(true)
+    , startSpeedDelay(0)
+    , stopSpeedDelay(0)
+    , feedSpeedDelay(0)
+    , startDelayDelta(0)
+    , stopDelayDelta(0)
+    , startStepCountMark(-1)
+    , stopStepCountMark(-1)
+    , stepCounter(0)
+    {}    
+
+    /*
+    //////////////////////////////////////////////////////////////////
+    explicit AccelerationProfile(const AccelerationProfile& ap) 
+    : active(ap.isActive())
+    , startSpeedDelay(ap.getStartSpeedDelay())
+    , stopSpeedDelay(ap.getStopSpeedDelay())
+    , feedSpeedDelay(ap.getFeedSpeedDelay())
+    , stepCounter(ap.getStepCounter())
+    {} */   
+    
+    //////////////////////////////////////////////////////////////////
+    virtual ~AccelerationProfile(){
+    }
+
+    //////////////////////////////////////////////////////////////////
+    bool isActive()             const { return active; }
+    double getStartSpeedDelay() const { return startSpeedDelay; }
+    double getStopSpeedDelay()  const { return stopSpeedDelay;  }
+    double getFeedSpeedDelay()  const { return feedSpeedDelay;  }
+
+    int32_t getStepCounter()    const { return stepCounter;  }
+
+    //////////////////////////////////////////////////////////////////
+    void enable(bool state = true)  { enabled = state; }
+    void disable()                  { enable(false);   }
+    bool isEnabled()                { return enabled;  }
+
+    //////////////////////////////////////////////////////////////////
+    #ifndef SKETCH_COMPILE
+      friend std::ostream &operator<< (std::ostream &ostr, const AccelerationProfile &a) {
+        
+        ostr << "AccelerationProfile:" << std::endl;
+        ostr << " active               : " << a.active                  << std::endl;
+        ostr << " startSpeedDelay      : " << a.startSpeedDelay         << std::endl;
+        ostr << " stopSpeedDelay       : " << a.stopSpeedDelay          << std::endl;
+        ostr << " feedSpeedDelay       : " << a.feedSpeedDelay          << std::endl;
+    
+        ostr << " startDelayDelta      : " << a.startDelayDelta         << std::endl;
+        ostr << " stopDelayDelta       : " << a.stopDelayDelta          << std::endl;
+    
+        ostr << " startStepCountMark   : " << a.startStepCountMark      << std::endl;
+        ostr << " stopStepCountMark    : " << a.stopStepCountMark       << std::endl;
+      
+        ostr << " stepCounter          : " << a.stepCounter             << std::endl;   
+
+        ostr << std::endl;
+        return ostr;
+      }
+    #endif
+      
+    //////////////////////////////////////////////////////////////////
+    void setup(double startDelay, double stopDelay) {
+      startSpeedDelay = startDelay;
+      stopSpeedDelay  = stopDelay;
+    }
+    
+    //////////////////////////////////////////////////////////////////
+    void initFeedSpeedDelay(const unsigned int d) {
+      feedSpeedDelay = d;
+    }
+    
+    //////////////////////////////////////////////////////////////////
+    bool calculate(const int32_t stepsToMove) {
+      int32_t stm = absolute(stepsToMove);
+      
+      // always reset index
+      stepCounter = 0;
+
+      // total period long enough?
+      active = (stm > periodStepsMin && feedSpeedDelay > 0); 
+      if ( active == true ) {
+        
+        // determine periods
+        startStepCountMark = startPeriodStepsMin;
+        stopStepCountMark  = stm - stopPeriodStepsMin;
+
+        // determin deltas
+        startDelayDelta = feedSpeedDelay <= startSpeedDelay ? (startSpeedDelay - feedSpeedDelay) / startStepCountMark : 0;
+        stopDelayDelta  = feedSpeedDelay <= stopSpeedDelay  ? (stopSpeedDelay  - feedSpeedDelay) / (stm - stopStepCountMark) : 0;
+
+        if ( startDelayDelta <= 0 || stopDelayDelta <= 0 )
+          active = false;
+      } 
+      
+      if ( active == false && 0 ) {
+        
+        // determine periods
+        startStepCountMark = 0;
+        stopStepCountMark  = 0;
+
+        // determin deltas
+        startDelayDelta = 0;
+        stopDelayDelta  = 0;       
+      }
+    
+      return active;
+    }
+
+    //////////////////////////////////////////////////////////////////
+    unsigned int getNextAccelDelay() {
+
+      // deavtivated - then nothing to add
+      if ( enabled == false )                       { return stepCounter++, 0; }
+      
+      // is configured speed to low - then nothing to add
+      if ( feedSpeedDelay >= startSpeedDelay )      { return stepCounter++, 0; }
+
+      // is total period to small - then add a delay to archive the start speed  
+      if ( active == false )                        { return stepCounter++, (startSpeedDelay - feedSpeedDelay); }
+      
+      // is targed period active - then nothing to add
+      if (        stepCounter > startStepCountMark && stepCounter < stopStepCountMark ) { 
+        return stepCounter++, 0; 
+        
+      } else if ( stepCounter <= startStepCountMark ) {
+        stepCounter++;
+        return startSpeedDelay - ((stepCounter -1) * startDelayDelta);
+        
+      } else if ( stepCounter >= stopStepCountMark ) {
+        stepCounter++;
+        return ( stepCounter - stopStepCountMark )* stopDelayDelta;
+      }
+
+      // error
+      
+      return 0;
+    }
+};
+
+//////////////////////////////////////////////////////////////////////
 const int32_t MAX_FEED_SPEED_VALUE = MIN_LONG;
 
 class CncSpeedController {
@@ -44,6 +215,13 @@ class CncSpeedController {
       unsigned int    stepsPerSec         =   0;
       unsigned int    microSecPerStep     =   0;
       unsigned int    rpm                 =   0;
+      
+      //////////////////////////////////////////////////////////////////
+      Axis()
+      : axis('#')
+      , initialized(false)
+      , speedConfigured(false)
+      {}
       
       //////////////////////////////////////////////////////////////////
       Axis(const char a)
@@ -137,8 +315,8 @@ class CncSpeedController {
       //////////////////////////////////////////////////////////////////
       #ifndef SKETCH_COMPILE
         friend std::ostream &operator<< (std::ostream &ostr, const Axis &a) {
-          const char* o = "   ";
-          ostr << " Axis: " << a.axis << ':'                                                << std::endl;
+          const char* o = " ";
+          ostr << "Axis: "                                                                 << std::endl;
           ostr << o << "Steps                            [steps] : " << a.steps             << std::endl;
           ostr << o << "Pitch                           [mm/360] : " << a.pitch             << std::endl;
           ostr << o << "Gearing                        [mm/step] : " << a.gearing           << std::endl;
@@ -165,10 +343,37 @@ class CncSpeedController {
     bool initialized;
     double configuredFeedSpeed_MM_SEC;
     double realtimeFeedSpeed_MM_SEC;
+
+   //////////////////////////////////////////////////////////////////
+   void setupAccelerationProfile(const char axis, unsigned int s, double p, unsigned int oR, unsigned int oS, unsigned int tPW,
+                                 double startSpeed, double stopSpeed) 
+   {
+      Axis AccelCalcStart, AccelCalcStop;
+      AccelCalcStart.setup(s, p, oR, oS, tPW);
+      AccelCalcStop.setup(s, p, oR, oS, tPW);
+
+      switch ( axis ) {
+        case 'X': AccelCalcStart.calculateStatics(startSpeed);
+                  AccelCalcStop.calculateStatics(stopSpeed);
+                  APX.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay); 
+                  break;
+                  
+        case 'Y': AccelCalcStart.calculateStatics(startSpeed);
+                  AccelCalcStop.calculateStatics(stopSpeed);
+                  APY.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay); 
+                  break;
+                  
+        case 'Z': AccelCalcStart.calculateStatics(startSpeed);
+                  AccelCalcStop.calculateStatics(stopSpeed);
+                  APZ.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay);  
+                  break;
+      }
+    }
     
   public:
     
     Axis X, Y, Z;
+    AccelerationProfile APX, APY, APZ;
 
     //////////////////////////////////////////////////////////////////
     CncSpeedController()
@@ -178,15 +383,35 @@ class CncSpeedController {
     , X('X')
     , Y('Y')
     , Z('Z')
+    , APX() 
+    , APY() 
+    , APZ()
     {}
 
     virtual ~CncSpeedController()
     {}
 
     //////////////////////////////////////////////////////////////////////////
-    virtual void initMove(int32_t, int32_t, int32_t) {}
+    virtual void initMove(int32_t dx, int32_t dy, int32_t dz) {
+      APX.calculate(dx);
+      APY.calculate(dy);
+      APZ.calculate(dz);
+    }
+
+    //////////////////////////////////////////////////////////////////////////
     virtual void completeMove() {}
 
+    //////////////////////////////////////////////////////////////////////////
+    unsigned int getNextAccelDelayX()            { return APX.getNextAccelDelay(); }
+    unsigned int getNextAccelDelayY()            { return APY.getNextAccelDelay(); }
+    unsigned int getNextAccelDelayZ()            { return APZ.getNextAccelDelay(); }
+
+    void enableAccelerationX(bool state)         { APX.enable(state); }
+    void enableAccelerationY(bool state)         { APY.enable(state); }
+    void enableAccelerationZ(bool state)         { APZ.enable(state); }
+
+    void enableAccelerationXYZ(bool state)       { enableAccelerationX(state); enableAccelerationY(state); enableAccelerationZ(state);}
+    
     //////////////////////////////////////////////////////////////////
     bool isInitialized()                   const { return X.isInitialized() && Y.isInitialized() && Z.isInitialized(); }
     bool isSpeedConfigured()               const { return X.isSpeedConfigured() && Y.isSpeedConfigured() && Z.isSpeedConfigured(); }
@@ -206,6 +431,15 @@ class CncSpeedController {
        
     //////////////////////////////////////////////////////////////////
     void setup(const char axis, unsigned int s, double p, unsigned int oR, unsigned int oS, unsigned int tPW) {
+      
+      #ifdef SKETCH_COMPILE
+        #warning move this to config
+      #endif
+      const double startSpeed = 20.0; // mm/sec
+      const double stopSpeed  = 20.0;
+
+      setupAccelerationProfile(axis, s, p, oR, oS, tPW, startSpeed, stopSpeed);
+      
       switch ( axis ) {
         case 'X': X.setup(s, p, oR, oS, tPW); break;
         case 'Y': Y.setup(s, p, oR, oS, tPW); break;
@@ -214,35 +448,22 @@ class CncSpeedController {
     }
     
     //////////////////////////////////////////////////////////////////
-    void setFeedSpeed_MM_MIN(double s) {
-      configuredFeedSpeed_MM_SEC = ( s < 0.0 ? 0.0 : s / 60 );
+    void setFeedSpeed_MM_SEC(double s) {
+      configuredFeedSpeed_MM_SEC = ( s < 0.0 ? 0.0 : s );
       realtimeFeedSpeed_MM_SEC   = configuredFeedSpeed_MM_SEC;
       
       X.calculateStatics(configuredFeedSpeed_MM_SEC);
       Y.calculateStatics(configuredFeedSpeed_MM_SEC);
       Z.calculateStatics(configuredFeedSpeed_MM_SEC);
-    }
 
+      APX.initFeedSpeedDelay(X.synthSpeedDelay);
+      APY.initFeedSpeedDelay(Y.synthSpeedDelay);
+      APZ.initFeedSpeedDelay(Z.synthSpeedDelay);      
+    }
+    
     //////////////////////////////////////////////////////////////////
-    void simulateSteps(int32_t , int32_t , int32_t ) {
-      /*
-      const uint32_t ax       = absolute<int32_t>(dx);
-      const uint32_t ay       = absolute<int32_t>(dy);
-      const uint32_t az       = absolute<int32_t>(dz);
-      
-      const uint32_t tx       = ax * (X.synthSpeedDelay + X.totalOffset);
-      const uint32_t ty       = ay * (Y.synthSpeedDelay + Y.totalOffset);
-      const uint32_t tz       = az * (Z.synthSpeedDelay + Z.totalOffset);
-      const uint32_t t        = tx + ty + tz;
-      
-      const uint32_t totalCountOfSteps    = ax + ay + az;
-      
-      const double totalDistance          = ax * X.gearing
-                                          + ay * Y.gearing
-                                          + az * Z.gearing;
-      
-      //const double speed                  = (1000L *1000L * totalDistance) / t * 60; 
-      */         
+    void setFeedSpeed_MM_MIN(double s) {
+      setFeedSpeed_MM_SEC(s/60);
     }
 
     //////////////////////////////////////////////////////////////////
@@ -281,13 +502,8 @@ class CncSpeedController {
     //////////////////////////////////////////////////////////////////
     #ifndef SKETCH_COMPILE
       friend std::ostream &operator<< (std::ostream &ostr, const CncSpeedController &c) {
-        ostr << "CncSpeedController Axis: " << std::endl;
-        ostr << c.X;
-        ostr << c.Y;
-        ostr << c.Z;
-        
-        ostr                                                                                            << std::endl;
-        ostr << "CncSpeedController Parameters: "                                                       << std::endl;
+       
+        ostr << "CncSpeedController"                                                                    << std::endl;
         ostr << " Configured FeedSpeed XYZ:         [mm/sec] : " << c.getConfiguredFeedSpeed_MM_SEC()   << std::endl;
         ostr << " Configured FeedSpeed XYZ:         [mm/min] : " << c.getConfiguredFeedSpeed_MM_MIN()   << std::endl;
         ostr << " Max FeedSpeed XYZ:                [mm/sec] : " << c.getMaxFeedSpeed_MM_SEC()          << std::endl;

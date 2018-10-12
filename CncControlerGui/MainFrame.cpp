@@ -1480,9 +1480,15 @@ void MainFrame::initialize(void) {
 	m_testDistanceY->SetValidator(val);
 	m_testDistanceZ->SetValidator(val);
 	
-	val.SetRange(0, 5000.0);
+	val.SetRange(0, 50000.0);
 	val.SetPrecision(1);
 	m_manuallySpeedValue->SetValidator(val);
+	
+	val.SetRange(0, 50000);
+	val.SetPrecision(0);
+	m_speedConfigStepsX->SetValidator(val);
+	m_speedConfigStepsY->SetValidator(val);
+	m_speedConfigStepsZ->SetValidator(val);
 	
 	wxIntegerValidator<long> val9(NULL);
 	m_ctrlTestParam1->SetValidator(val9);
@@ -1876,11 +1882,6 @@ bool MainFrame::connectSerialPort() {
 	if ( cnc == NULL || cnc->getSerial() == NULL )
 		return false;
 	
-	if ( cnc->getSerial()->canProcessIdle() ) {
-		m_miRqtIdleMessages->Check(true);
-		m_miRqtIdleMessages->Enable(true);
-	}
-	
 	initializeCncControl();
 	selectSerialSpyMode();
 	
@@ -1897,6 +1898,11 @@ bool MainFrame::connectSerialPort() {
 			selectSerialSpyMode();
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
+			
+			if ( cnc->getSerial()->canProcessIdle() ) {
+				m_miRqtIdleMessages->Check(true);
+				m_miRqtIdleMessages->Enable(true);
+			}
 		}
 	}
 	
@@ -7677,15 +7683,27 @@ void MainFrame::updateSpeedConfigPlayground() {
 		m_speedConfigSlider->SetRange(0, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
 		
 		CncSpeedController csc;
-		csc.X.setup(GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
-		csc.Y.setup(GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
-		csc.Z.setup(GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
+		csc.setup('X', GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
+		csc.setup('Y', GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
+		csc.setup('Z', GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
 		
 		csc.setFeedSpeed_MM_MIN(m_speedConfigSlider->GetValue());
 		
-		std::stringstream ss;
-		ss << csc;
-		m_speedConfigTrace->ChangeValue(ss.str());
+		long x; m_speedConfigStepsX->GetValue().ToLong(&x);
+		long y; m_speedConfigStepsY->GetValue().ToLong(&y);
+		long z; m_speedConfigStepsZ->GetValue().ToLong(&z);
+		csc.initMove(x, y, z);
+		
+		std::stringstream ssX, ssY, ssZ, ssAX, ssAY, ssAZ, ssC;
+		ssC << csc;  		m_speedConfigTrace->ChangeValue(ssC.str());
+		
+		ssX << csc.X;  		m_speedConfigTraceX->ChangeValue(ssX.str());
+		ssY << csc.Y;  		m_speedConfigTraceY->ChangeValue(ssY.str());
+		ssZ << csc.Z;  		m_speedConfigTraceZ->ChangeValue(ssZ.str());
+		
+		ssAX << csc.APX;  	m_accelConfigTraceX->ChangeValue(ssAX.str());
+		ssAY << csc.APY;  	m_accelConfigTraceY->ChangeValue(ssAY.str());
+		ssAZ << csc.APZ;  	m_accelConfigTraceZ->ChangeValue(ssAZ.str());
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -7693,8 +7711,17 @@ void MainFrame::changeSpeedConfigSlider(wxScrollEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	updateSpeedConfigPlayground();
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::updatedSpeedConfigSteps(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	updateSpeedConfigPlayground();
+}
+
+
+
 
 
 void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 }
+

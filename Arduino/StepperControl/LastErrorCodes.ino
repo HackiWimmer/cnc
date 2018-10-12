@@ -67,6 +67,6 @@ unsigned char LastErrorCodes::setNextErrorInfo(int id, const char* text) {
   
     pushErrorMessage(msg.c_str());
   }
-  
+
   return RET_ERROR;
 }

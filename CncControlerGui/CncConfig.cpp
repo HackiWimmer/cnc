@@ -113,11 +113,9 @@ void CncConfig::rc() {
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setProbeMode(bool state) { 
 ////////////////////////////////////////////////////////////////////////
-	if ( state == true )	std::cout << " Set Probe Mode on"  << std::endl;
-	else					std::cout << " Set Probe Mode off" << std::endl;
-	
 	probeMode = state;
-	THE_APP->decorateProbeMode(probeMode);
+	if ( THE_APP )
+		THE_APP->decorateProbeMode(probeMode);
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::deactivateConfigNotification() {
@@ -156,9 +154,9 @@ void CncConfig::broadcastConfigUpdateNotification() {
 void CncConfig::calculateSpeedValues() {
 ////////////////////////////////////////////////////////////////////////
 	CncSpeedController csc;
-	csc.X.setup(getStepsX(), getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthX() + getHighPulsWidthX());
-	csc.Y.setup(getStepsY(), getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthY() + getHighPulsWidthY());
-	csc.Z.setup(getStepsZ(), getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthZ() + getHighPulsWidthZ());
+	csc.setup('X', getStepsX(), getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthX() + getHighPulsWidthX());
+	csc.setup('Y', getStepsY(), getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthY() + getHighPulsWidthY());
+	csc.setup('Z', getStepsZ(), getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, getLowPulsWidthZ() + getHighPulsWidthZ());
 	
 	const int stepsXYZ     = ( getStepsX() +  getStepsY() +  getStepsZ() ) / 3;
 	const double maxSpeedX = csc.X.maxDistPerMinute;

@@ -103,6 +103,7 @@ void ArduinoPIDs::init() {
 	pids[RET_NULL]                            = "RET_NULL";
 	pids[RET_OK]                              = "RET_OK";
 	pids[RET_ERROR]                           = "RET_ERROR";
+	pids[RET_LIMIT]                           = "RET_LIMIT";
 	pids[RET_SOT]                             = "RET_SOT";
 	pids[RET_SOH]                             = "RET_SOH";
 	pids[RET_INTERRUPT]                       = "RET_INTERRUPT"; 

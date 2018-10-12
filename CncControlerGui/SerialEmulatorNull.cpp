@@ -488,11 +488,6 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 	return performSerialBytes(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::adjustAppPostionAfterMoveUntilSignal(CncLongPosition& appPos) {
-///////////////////////////////////////////////////////////////////
-	appPos = targetMajorPos;
-}
-///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false )
@@ -793,10 +788,10 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, u
 			
 		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
 			{ currentSpeed = SPEED_STEP5; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
-		
-		// the given moves
-		targetMajorPos.inc(dx, dy, dz);
 	}
+	
+	// adjust last callback position
+	targetMajorPos = curEmulatorPos;
 	
 	// reactivate configured probe mode state
 	// this is already done by the application

@@ -81,6 +81,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
 		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
 		virtual void selectManuallyToolId(wxCommandEvent& event);
 		virtual void leaveSerialSpy(wxMouseEvent& event);

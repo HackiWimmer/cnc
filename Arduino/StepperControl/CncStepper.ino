@@ -25,8 +25,6 @@ CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, by
 , minPulsWidth(highPulsWidth + lowPulsWidth)
 , tsPrevStep(0L)
 , tsCurrStep(0L)
-, tsPrevDirChange(0L)
-, tsCurrDirChange(0L)
 , avgStepDuartion(0L)
 , stepDirection(SD_UNKNOWN)
 , stepCounter(0L)
@@ -47,12 +45,12 @@ int32_t CncStepper::isReadyToRun() {
   int32_t ret = 1;
 
   if ( interrupted == true ) {
-    errorInfo.setNextErrorInfo(E_INTERRUPT, BLANK + axis);
+    errorInfo.setNextErrorInfoWithoutErrorMessage(E_INTERRUPT, BLANK + axis);
     ret = 0;
   }
 
   if ( readLimitState() != LimitSwitch::LIMIT_UNSET ) {
-    errorInfo.setNextErrorInfo(E_LIMIT_SWITCH_ACTIVE, BLANK + axis);
+    errorInfo.setNextErrorInfoWithoutErrorMessage(E_LIMIT_SWITCH_ACTIVE, BLANK + axis);
     ret = 0;
   }
   
@@ -126,9 +124,6 @@ void CncStepper::reset() {
   tsPrevStep            = 0L;
   tsCurrStep            = 0L;
 
-  tsPrevDirChange       = 0L;
-  tsCurrDirChange       = 0L;
-
   resetPosReplyThresholdCouter();
   resetStepCounter();
 }
@@ -199,13 +194,7 @@ int32_t CncStepper::readLimitState(int dir) {
   switch ( dir ) {
     case DIRECTION_INC:   return LimitSwitch::LIMIT_MAX;
     case DIRECTION_DEC:   return LimitSwitch::LIMIT_MIN;
-    default:              ;
   }
-
-  // in this case the direction is unclear, try to get more information by calling the controller
-  int32_t limit = LimitSwitch::LIMIT_UNKNOWN;
-  if ( controller->evaluateLimitState(this, limit) == true )
-    return limit;
 
   // in this case no valid limit information available
   return LimitSwitch::LIMIT_UNKNOWN;
@@ -281,19 +270,6 @@ bool CncStepper::setDirection(const StepDirection sd) {
   
   stepDirection = sd;
 
-  // gurantiee total puls width
-  
-  /*tsCurrDirChange = micros();
-
-  if ( tsCurrDirChange <= tsPrevDirChange ) {
-    delayMicroseconds(dirPulseWidth);
-    
-  } else {
-    unsigned int tsDiff = tsCurrDirChange - tsPrevDirChange;
-    if ( tsDiff < dirPulseWidth )
-      delayMicroseconds(tsDiff);
-  }*/
-  
   if ( controller->isProbeMode() == OFF ) {
     // The functions getIn/DecrementDirectionValue() switches the physical direction of "stepDirection".
     // The rest of the stepper logic isn't affected because this is to overrule the stepper cabling only
@@ -301,15 +277,13 @@ bool CncStepper::setDirection(const StepDirection sd) {
     const bool dir = (stepDirection == SD_INC ? getIncrementDirectionValue() : getDecrementDirectionValue());
     
     digitalWrite(directionPin, dir);
-    
-    // don't sleep here, because period will be guranteed by tsCurrDirChange and tsPrevDirChange
     delayMicroseconds(dirPulseWidth);
   }
   
   return true;
 }
 //////////////////////////////////////////////////////////////////////////////
-bool CncStepper::performNextStep() {
+unsigned char CncStepper::performNextStep() {
 //////////////////////////////////////////////////////////////////////////////
   uint32_t tsStartStepping = calculateDuration ? micros() : 0;
 
@@ -318,17 +292,15 @@ bool CncStepper::performNextStep() {
   // avoid everything in this states
   
   if ( isInterrupted() )
-    return false;
+    return RET_INTERRUPT;
 
   if ( stepDirection == SD_UNKNOWN ) {
     interrupted = true;
-    return false;
+    return RET_INTERRUPT;
   }
 
   if ( checkLimit(stepDirection) == true ) {
-    // Case:  A limit is activ
-    // TODO: ALWAYS CREATE AN ERROR
-    return true;
+    return RET_LIMIT;
   }
 
   // gurantiee total puls width
@@ -377,7 +349,7 @@ bool CncStepper::performNextStep() {
   if ( calculateDuration )
     calcStepLoopDuration(micros() - tsStartStepping);
     
-  return true;
+  return RET_OK;
 }
 //////////////////////////////////////////////////////////////////////////////
 inline void CncStepper::calcStepLoopDuration(uint32_t lastDuration) {

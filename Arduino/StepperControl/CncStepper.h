@@ -41,9 +41,6 @@ class CncStepper {
     unsigned long tsPrevStep;
     unsigned long tsCurrStep;
 
-    unsigned long tsPrevDirChange;
-    unsigned long tsCurrDirChange;
-      
     uint32_t avgStepDuartion;
 
     StepDirection stepDirection;
@@ -145,7 +142,7 @@ class CncStepper {
     //////////////////////////////////////////////////////////////////////////////
     bool setDirection(int32_t steps);
     bool setDirection(const StepDirection stepDirection);
-    bool performNextStep();
+    unsigned char performNextStep();
 
     //////////////////////////////////////////////////////////////////////////////
     int32_t getPosReplyThresholdCouter()     const { return posReplyThresholdCount; }

@@ -263,20 +263,10 @@ bool CncController::evaluateAnalogSupportPin(CncInterface::ISP::States& sp) {
   return true;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-bool CncController::evaluateLimitState(const CncStepper* stepper, int32_t& limit) {
-///////////////////////////////////////////////////////////////////////////////////// 
-  int32_t x = LimitSwitch::LIMIT_UNKNOWN;
-  int32_t y = LimitSwitch::LIMIT_UNKNOWN;
-  int32_t z = LimitSwitch::LIMIT_UNKNOWN;
-
-  bool ret = evaluateLimitStates(x, y, z);
-
-  if      ( stepper == X )  limit = x;
-  else if ( stepper == Y )  limit = y;
-  else if ( stepper == Z )  limit = z;
-  else                      limit = LimitSwitch::LIMIT_UNKNOWN;
-
-  return ret;
+bool CncController::isAnyLimitActive() {
+/////////////////////////////////////////////////////////////////////////////////////
+  int32_t xLimit, yLimit, zLimit;
+  return evaluateLimitStates(xLimit, yLimit, zLimit);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool CncController::evaluateLimitStates(int32_t& xLimit, int32_t& yLimit, int32_t& zLimit) {
@@ -295,7 +285,7 @@ bool CncController::evaluateLimitStates(int32_t& xLimit, int32_t& yLimit, int32_
       if ( readI2CSlave(lastI2CData) ) {
 
         CncInterface::ILS::States ls(lastI2CData.limitState);
-        if ( ls. hasError() == false ) {
+        if ( ls.hasError() == false ) {
           if ( xLimit == LimitSwitch::LIMIT_UNKNOWN ) 
             xLimit = ls.xLimit();
           
@@ -562,10 +552,11 @@ unsigned char CncController::stepAxisXYZ() {
   if ( RS::empty() )
     return RET_OK;
 
+  unsigned char retValue = RET_ERROR;
+
   // speed up the performance and observate in intervalls
   // blind flying: e.g. 16 * 0,015 (12 mm / 800 steps) = 0,24 mm
   if ( positionCounter%1 == 0 ) {
-    unsigned char retValue = RET_ERROR;
     if ( observeSerialFrontByte(retValue) == false )
       return retValue;
 
@@ -579,33 +570,33 @@ unsigned char CncController::stepAxisXYZ() {
   incPositionCounter();
 
   if ( RS::dx() != 0) {
-    if ( X->performNextStep() == false )
-      return RET_ERROR;
+    if ( (retValue = X->performNextStep()) != RET_OK ) 
+      return retValue;
 
     RS::xStepCount++;
 
     if ( RS::xDelay > 0 )
-      delayMicroseconds(RS::xDelay);
+      delayMicroseconds(RS::xDelay + speedController.getNextAccelDelayX());
   }
   
   if ( RS::dy() != 0 ) {
-    if ( Y->performNextStep() == false )
-      return RET_ERROR;
+    if ( (retValue = Y->performNextStep()) != RET_OK )
+      return retValue;
       
     RS::yStepCount++;
     
     if ( RS::yDelay > 0 )
-      delayMicroseconds(RS::yDelay);
+      delayMicroseconds(RS::yDelay + speedController.getNextAccelDelayY());
   }
     
   if ( RS::dz() != 0 ) {
-    if ( Z->performNextStep() == false )
-      return RET_ERROR;
+    if ( (retValue = Z->performNextStep()) != RET_OK )
+      return retValue;
       
     RS::zStepCount++;
     
     if ( RS::zDelay > 0 )
-      delayMicroseconds(RS::zDelay);
+      delayMicroseconds(RS::zDelay + speedController.getNextAccelDelayZ());
   }
 
   sendCurrentPositions(PID_XYZ_POS_DETAIL, false);  
@@ -627,7 +618,7 @@ unsigned char CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
     speedController.initMove(dx, dy, dz);
   
   // initialize
-  int i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
+  int32_t i, l, m, n, x_inc, y_inc, z_inc, err_1, err_2, dx2, dy2, dz2;
   unsigned char ret = RET_ERROR;
 
   x_inc = (dx < 0) ? -1 : 1;
@@ -757,6 +748,8 @@ unsigned char CncController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz)
   
   unsigned char ret = RET_OK;
   unsigned long tsStart = millis();
+
+  speedController.enableAccelerationXYZ(false);
   
   if ( x != 0 || y != 0 || z !=0 ) {
     while ( (ret = renderAndStepAxisXYZ(x, y, z)) == RET_OK ) {
@@ -766,14 +759,20 @@ unsigned char CncController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz)
            || Y->isInterrupted() 
            || Z->isInterrupted() 
          )
-      { return RET_INTERRUPT; }
+      { 
+        ret = RET_INTERRUPT; 
+        break;
+      }
 
       // break by limit
       if (    X->getLimitState() != LimitSwitch::LIMIT_UNSET 
            || Y->getLimitState() != LimitSwitch::LIMIT_UNSET 
            || Z->getLimitState() != LimitSwitch::LIMIT_UNSET 
          )
-      { return RET_ERROR; }
+      { 
+        ret =  RET_ERROR; 
+        break;
+      }
 
       // mormally this loop will be broken by signals
       // like SIG_QUIT, or SIG_HALT and renderAndStepAxisXYZ()
@@ -792,7 +791,8 @@ unsigned char CncController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz)
         { currentSpeed = SPEED_STEP5; setSpeedValue(currentSpeed); }
     }
   }
-  
+
+  speedController.enableAccelerationXYZ(true);
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////

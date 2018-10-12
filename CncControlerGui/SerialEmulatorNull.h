@@ -243,8 +243,6 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual bool evaluateLimitStates(std::vector<int32_t>& ret);
 		virtual bool evaluateLimitStates();
 		
-		virtual void adjustAppPostionAfterMoveUntilSignal(CncLongPosition& appPos);
-		
 		// position movement counting
 		void incPosistionCounter();
 		void incStepCounterX(int32_t dx);

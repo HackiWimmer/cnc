@@ -89,7 +89,6 @@ inline void printPinReport() {
 /////////////////////////////////////////////////////////////////////////////////////
 inline long isReadyToRun(){
 /////////////////////////////////////////////////////////////////////////////////////
-  // return value: '1' always is OK, instead '0'
   long ret = controller.isReadyToRun();
   return ret;
 }
@@ -515,14 +514,18 @@ inline char reset() {
   // broadcast reset
   controller.reset();
   
-  
   clearSerial();
+
+  Wire.end();
+  Wire.begin(); 
+  
 /*
   Serial.end();
   Serial.begin(BAUD_RATE);
   Serial.setTimeout(1000);
   Serial.flush();
-  */
+*/
+
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
