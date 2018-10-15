@@ -149,13 +149,10 @@ class SerialSimulatorThread : public wxThread {
 		void processNextCommand();
 		
 		void performResetController();
-		void performResetErrorInfo();
 		
 		void performVersionInfo();
 		void performConfiguration();
 		void performPinReport();
-		void performErrorInfo();
-		void performLastErrorInfoResponseId();
 		
 		void performHeartbeat();
 		
@@ -164,8 +161,6 @@ class SerialSimulatorThread : public wxThread {
 		unsigned char performSetterValueIntern();
 		unsigned char performGetterValueIntern();
 		unsigned char performGetterValueDefault(unsigned char pid);
-		
-		void performNextErrorInfoResponseId();
 		
 		virtual void traceSpeedInformation();
 

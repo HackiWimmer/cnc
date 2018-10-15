@@ -533,8 +533,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_openSvgExtern);
 	registerGuiControl(m_btRequestCtlConfig);
 	registerGuiControl(m_btRequestControllerPins);
-	registerGuiControl(m_btRequestCtlErrorInfo);
-	registerGuiControl(m_btResetCtlErrorInfo);
 	registerGuiControl(m_lruList);
 	registerGuiControl(fileView);
 	registerGuiControl(m_svgEmuResult);
@@ -633,7 +631,7 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	std::cout << "probeMode" << GBL_CONFIG->isProbeMode()<< std::endl;
+	cnc->processCommand('9', std::cout);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -1615,7 +1613,6 @@ void MainFrame::determineCncOutputControls() {
 	
 	guiCtlSetup->controllerConfig		= m_dvListCtrlControllerConfig;
 	guiCtlSetup->controllerPinReport	= m_dvListCtrlControllerPins;
-	guiCtlSetup->controllerErrorInfo	= m_dvListCtrlControllerErrorInfo;
 	
 	guiCtlSetup->motorState 			= m_miMotorEnableState;
 	guiCtlSetup->probeModeState			= m_btProbeMode;
@@ -1891,7 +1888,6 @@ bool MainFrame::connectSerialPort() {
 		clearMotionMonitor();
 		
 		if ( (ret = cnc->setup()) == true ) {
-			cnc->resetErrorInfo();
 			cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 			updateCncConfigTrace();
 			decorateSwitchToolOnOff(cnc->getToolState());
@@ -2958,17 +2954,11 @@ bool MainFrame::processControllerTestSuite() {
 		return false;
 	}
 	
-	cnc->processSetter(PID_TEST_VALUE1, atol(m_ctrlTestParam1->GetValue()));
-	cnc->processSetter(PID_TEST_VALUE2, atol(m_ctrlTestParam2->GetValue()));
-	cnc->processSetter(PID_TEST_VALUE3, atol(m_ctrlTestParam3->GetValue()));
-	cnc->processSetter(PID_TEST_VALUE4, atol(m_ctrlTestParam4->GetValue()));
-	cnc->processSetter(PID_TEST_VALUE5, atol(m_ctrlTestParam5->GetValue()));
 	updateSetterList();
 	
 	// run test
 	bool ret = false;
 
-	ret =  cnc->getSerial()->processTest(id);
 	
 	std::clog << "Test finished (" << CncControllerTestSuite::getTestCaseName(id) << ")" << endl;
 	return ret;
@@ -3501,7 +3491,6 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 
 	m_dvListCtrlControllerConfig->DeleteAllItems();
 	m_dvListCtrlControllerPins->DeleteAllItems();
-	m_dvListCtrlControllerErrorInfo->DeleteAllItems();
 	
 	unsigned int sel = event.GetSelection();
 	if ( (wxWindow*)event.GetEventObject() == m_notebookConfig ) {
@@ -3531,14 +3520,6 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 						return;
 					}
 					requestControllerConfigFromButton(dummyEvent);
-					break;
-					
-			case OutboundCfgSelection::VAL::CNC_ERROR_PANEL:
-					if ( runActive == true ) {
-						cnc::trc.logWarning("During an active run controller requests are not possible! Ty it later again.");
-						return;
-					}
-					requestControllerErrorInfoFromButton(dummyEvent);
 					break;
 		}
 	}
@@ -3574,12 +3555,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	if ( ret == true )
 		ret = checkIfRunCanBeProcessed(confirm);
 		
-	int32_t errorCount = 0;
 	if ( ret == true ) {
 		
-		if ( GBL_CONFIG->getResetErrorInfoBeforeRunFlag() )
-			cnc->resetErrorInfo();
-			
 		// process
 		const bool USE_SECURE_RUN_DLG = true;
 		if ( USE_SECURE_RUN_DLG == true && isDebugMode == false ) {
@@ -3593,30 +3570,14 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			ret = processTemplateIntern();
 			
 		}
-		// additional check controllers error count
-		errorCount = cnc->getControllerErrorCount(!ret);
-		ret = ( errorCount == 0 );
 	}
 	
 	// prepare final statements
 	wxString probeMode(GBL_CONFIG->isProbeMode() ? "ON" :"OFF");
 	if ( ret == false) {
-		
-		wxString hint;
-		if ( errorCount == 0 ) 	{ hint.assign("not successfully"); }
-		else					{ hint.assign("with errors");      }
-		
+		wxString hint("not successfully");
 		cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
 		
-		if ( errorCount > 0 ) {
-			cnc::cex1 << "For more details please try to consider the controller error info tab" << std::endl;
-			m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-			m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
-			
-		} else if ( errorCount < 0 ) {
-			cnc::cex1 << "It was impossible to request the error information!" << std::endl;
-			
-		}
 	} else {
 		// restore idle requests as before
 		m_miRqtIdleMessages->Check(idleMsgStateBefore);
@@ -4063,37 +4024,6 @@ void MainFrame::requestControllerConfigFromButton(wxCommandEvent& event) {
 	m_btRequestCtlConfig->Enable(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::requestErrorInfo(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	cnc->requestErrorInformation(true);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::requestControllerErrorInfoFromButton(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_btRequestCtlErrorInfo->Enable(false);
-	requestErrorInfo(event);
-	m_btRequestCtlErrorInfo->Enable(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::resetControllerErrorInfoFromButton(wxCommandEvent& event) {
-//////////////////////////////////////////////////////////////////
-	m_btResetCtlErrorInfo->Enable(false);
-	requestResetErrorInfo(event);
-	m_btResetCtlErrorInfo->Enable(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::requestErrorCount(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	int32_t cnt = cnc->getControllerErrorCount();
-	std::stringstream ss;
-	ss << "Current controller error count: " << cnt;
-	cnc::trc.logInfoMessage(ss.str().c_str());
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::requestCurrentPos(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -4137,49 +4067,6 @@ void MainFrame::requestInterrupt(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	cnc->getSerial()->sendSignal(SIG_INTERRUPPT);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::clearControllerErrorInfoFromButton(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_dvListCtrlControllerErrorInfo->DeleteAllItems();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::requestResetErrorInfo(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	m_dvListCtrlControllerErrorInfo->DeleteAllItems();
-	
-	// check last response id
-	std::stringstream ss;
-	if ( cnc->processCommand(CMD_PRINT_LAST_ERROR_RESPONSE_ID, ss) ) {
-		if ( m_lastErrorInfoResponseId->GetValue() != ss.str().c_str() ) {
-			wxString msg("Since the last error info request, the error info content has changed\n\nShould it requested before the error info going to reset?");
-			wxMessageDialog dlg(this, msg, _T("Reset Error Information  . . . "), wxYES|wxNO|wxCANCEL|wxCENTRE|wxICON_QUESTION);
-			
-			switch ( dlg.ShowModal() ) {
-				case wxID_YES:		cnc->requestErrorInformation();
-									break;
-									
-				case wxID_CANCEL:	return;
-			}
-		}
-	}
-	
-	// reset the error info
-	cnc->resetErrorInfo();
-	
-	// update response id
-	ss.str("");
-	cnc->processCommand(CMD_PRINT_LAST_ERROR_RESPONSE_ID, ss);
-	m_lastErrorInfoResponseId->ChangeValue(ss.str().c_str());
-	
-	// update list control
-	if ( m_dvListCtrlControllerErrorInfo->GetItemCount() == 0 )
-		cnc->appendNumKeyValueToControllerErrorInfo(0, E_TOTAL_COUNT, ArduinoErrorCodes::getECLabel((unsigned int)E_TOTAL_COUNT) , "0");
-	
-	// select page
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_ERROR_PANEL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::saveEmuOutput(wxCommandEvent& event) {

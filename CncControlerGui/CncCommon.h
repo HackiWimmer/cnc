@@ -113,8 +113,7 @@ class OutboundCfgSelection{
 			CNC_SETTER_PANEL			= 1,
 			CNC_CONFIG_PANEL			= 2,
 			CNC_PIN_PANEL				= 3,
-			CNC_MSG_HIST_PANEL			= 4,
-			CNC_ERROR_PANEL				= 5
+			CNC_MSG_HIST_PANEL			= 4
 		};
 };
 

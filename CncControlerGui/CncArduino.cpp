@@ -31,11 +31,9 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_IDLE]                  = "Pull Idle Callback";
 	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Controller";
-	cmds[CMD_RESET_ERRORINFO]       = "Push Reset Error Info";
 	
 	cmds[CMD_SETTER]                = "Push Setter";
 	cmds[CMD_GETTER]                = "Pull Getter";
-	cmds[CMD_GETTER_LIST]           = "Pull Getter List";
 	
 	cmds[CMD_POS_STEP_X]            = "Push Positive X Step";
 	cmds[CMD_NEG_STEP_X]            = "Push Negative X Step";
@@ -47,12 +45,10 @@ void ArduinoCMDs::init() {
 	cmds[CMD_MOVE]                  = "Push 3D Move";
 	cmds[CMD_RENDER_AND_MOVE]       = "Push Render and 3D Move";
 	
-	cmds[CMD_TEST_START]            = "Push Pause Start";
-	
+
 	cmds[CMD_PRINT_CONFIG]          = "Pull Configuration";
 	cmds[CMD_PRINT_VERSION]         = "Pull Version";
 	cmds[CMD_PRINT_PIN_REPORT]      = "Pull PIN Report";
-	cmds[CMD_PRINT_ERRORINFO]       = "Pull Error Info";
 	
 	cmds[CMD_TEST_INFO_MESSAGE]     = "Pull Version";
 	cmds[CMD_TEST_WARN_MESSAGE]     = "Pull PIN Report";
@@ -176,18 +172,7 @@ void ArduinoPIDs::init() {
 	pids[PID_PULSE_WIDTH_HIGH_Y]              = "Step Pulse Width High Y";
 	pids[PID_PULSE_WIDTH_HIGH_Z]              = "Step Pulse Width High Z";
 	
-	pids[PID_TEST_SUITE]                      = "Test Suite";
-	pids[PID_TEST_VALUE1]                     = "Parmeter1";
-	pids[PID_TEST_VALUE2]                     = "Parmeter2";
-	pids[PID_TEST_VALUE3]                     = "Parmeter3";
-	pids[PID_TEST_VALUE4]                     = "Parmeter4";
-	pids[PID_TEST_VALUE5]                     = "Parmeter5";
-	
-	pids[PID_TEST_INTERRUPT]                  = "Test Interrupt Flag";
-	
-	pids[PID_ERROR_COUNT]                     = "Error Count";
 	pids[PID_VERSION]                         = "Firmware Version";
-	
 	pids[PID_SEPARATOR]                       = "Separator";
 	
 	pids[PID_RESERT_POS_COUNTER]              = "Reset Position Counter";

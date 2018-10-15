@@ -106,9 +106,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void cmZposLeftDown(wxMouseEvent& event);
 		virtual void cmKillFocus(wxFocusEvent& event);
 		virtual void cmLeave(wxMouseEvent& event);
-		virtual void clearControllerErrorInfoFromButton(wxCommandEvent& event);
-		virtual void requestResetErrorInfo(wxCommandEvent& event);
-		virtual void resetControllerErrorInfoFromButton(wxCommandEvent& event);
 		virtual void keyDownLruList(wxKeyEvent& event);
 		virtual void dclickLogger(wxMouseEvent& event);
 		virtual void keyDownLogger(wxKeyEvent& event);
@@ -179,7 +176,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void viewUnitCalculator(wxCommandEvent& event);
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
-		virtual void requestErrorCount(wxCommandEvent& event);
 		virtual void paintDrawPaneWindow(wxPaintEvent& event);
 		virtual void UpdateLogger(wxCommandEvent& event);
 		virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event);
@@ -294,8 +290,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void requestCurrentLimitState(wxCommandEvent& event);
 		virtual void requestConfig(wxCommandEvent& event);
 		virtual void requestControllerConfigFromButton(wxCommandEvent& event);
-		virtual void requestErrorInfo(wxCommandEvent& event);
-		virtual void requestControllerErrorInfoFromButton(wxCommandEvent& event);
 		virtual void requestReset(wxCommandEvent& event);
 		virtual void requestEnableStepperMotors(wxCommandEvent& event);
 		virtual void emergencyStop(wxCommandEvent& event);

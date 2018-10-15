@@ -40,7 +40,6 @@ struct GuiControlSetup {
 	
 	wxDataViewListCtrl* controllerConfig		= NULL;
 	wxDataViewListCtrl* controllerPinReport		= NULL;
-	wxDataViewListCtrl* controllerErrorInfo		= NULL;
 	
 	wxToggleButton* testToggleTool   			= NULL;
 };

@@ -85,7 +85,6 @@
 	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Y"
 	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Z"
 	#define CncWork_Ctl_AVOID_DUP_SETTER_VALUES		"CncWork.Controller/AVOID_DUP_SETTER_VALUES"
-	#define CncWork_Ctl_RESET_ERRORINFO_BEFORE_RUN	"CncWork.Controller/RESET_ERRORINFO_BEFORE_RUN"
 
 
 #define CncTEST_TEST					"CncTest.Test/DUMMY"

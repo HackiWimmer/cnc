@@ -58,8 +58,6 @@
   <object class="wxBitmap" name="16-minus@2x">bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="16-ok">bitmaps\16-ok.png</object>
   <object class="wxBitmap" name="16-ok@2x">bitmaps\16-ok@2x.png</object>
-  <object class="wxBitmap" name="16-patch">bitmaps\16-patch.png</object>
-  <object class="wxBitmap" name="16-patch@2x">bitmaps\16-patch@2x.png</object>
   <object class="wxBitmap" name="16-plus">bitmaps\16-plus.png</object>
   <object class="wxBitmap" name="16-plus@2x">bitmaps\16-plus@2x.png</object>
   <object class="wxBitmap" name="16-record">bitmaps\16-record.png</object>

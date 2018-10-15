@@ -2,8 +2,6 @@
 #define CNC_CONTROLLER_H
 
 #include "CncSpeedController.h"
-#include "LastErrorCodes.h"
-
 #include "AnalogPinController/CncInterface.h"
 
 class CncStepper;
@@ -16,9 +14,6 @@ class CncController {
     CncStepper* Z;
 
     CncSpeedController speedController;
-    LastErrorCodes* errorInfo;
-
-    int minEnablePulseWide;
 
     long posReplyThresholdX;
     long posReplyThresholdY;
@@ -51,8 +46,7 @@ class CncController {
   public:
   
     //////////////////////////////////////////////////////////////////////////////
-    CncController(LastErrorCodes& lec);
-                  
+    CncController();
     ~CncController();
 
     //////////////////////////////////////////////////////////////////////////////

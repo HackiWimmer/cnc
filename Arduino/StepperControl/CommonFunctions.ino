@@ -1,6 +1,7 @@
 #include <Wire.h>
 #include "CommonValues.h"
 
+String LastErrorCodes::gblErrorMessage = "";
 
 //////////////////////////////////////////////////////////////
 // "Software Reset" function
@@ -53,6 +54,26 @@ uint8_t getPinMode(uint8_t pin) {
   else                  return INPUT;
 
   return UNKNOWN_PIN;
+}
+//////////////////////////////////////////////////////////////
+void printDigitalPin(const unsigned char Pin, const int Mode) {
+//////////////////////////////////////////////////////////////
+  int Type = (int)'D'; 
+  Serial.print(Pin);  Serial.print(TEXT_SEPARATOR); 
+  Serial.print(Type); Serial.print(TEXT_SEPARATOR);
+  Serial.print(Mode); Serial.print(TEXT_SEPARATOR);
+  Serial.print(digitalRead(Pin));
+  Serial.print(TEXT_CLOSE); 
+}
+//////////////////////////////////////////////////////////////    
+void printAnalogPin(const unsigned char Pin, const int Mode) {
+//////////////////////////////////////////////////////////////
+  int Type = (int)'A'; 
+  Serial.print(Pin);  Serial.print(TEXT_SEPARATOR); 
+  Serial.print(Type); Serial.print(TEXT_SEPARATOR); 
+  Serial.print(Mode); Serial.print(TEXT_SEPARATOR); 
+  Serial.print(analogRead(Pin)); 
+  Serial.print(TEXT_CLOSE); 
 }
 //////////////////////////////////////////////////////////////
 void sleepMicroseconds(unsigned long usec) {
@@ -150,46 +171,34 @@ inline void writeByteValues(unsigned char pid, unsigned char b[], unsigned short
   }
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void writeGetterListValue(unsigned char pid, long val) {
-/////////////////////////////////////////////////////////////////////////////////////  
+void writeGetterValue(unsigned char pid, int32_t val1) {
+/////////////////////////////////////////////////////////////////////////////////////
+  Serial.write(RET_SOH);
+  Serial.write(PID_GETTER);
   Serial.write(pid);
   writeByteValue(1);
-  writeLongValue(val);
+  writeLongValue(val1);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void writeGetterListValues(unsigned char pid, long val1, long val2) {
+void writeGetterValues(unsigned char pid, int32_t val1, int32_t val2) {
 /////////////////////////////////////////////////////////////////////////////////////
+  Serial.write(RET_SOH);
+  Serial.write(PID_GETTER);
   Serial.write(pid);
   writeByteValue(2);
   writeLongValue(val1);
   writeLongValue(val2);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void writeGetterListValues(unsigned char pid, long val1, long val2, long val3) {
+void writeGetterValues(unsigned char pid, int32_t val1, int32_t val2, int32_t val3) {
 /////////////////////////////////////////////////////////////////////////////////////
+  Serial.write(RET_SOH);
+  Serial.write(PID_GETTER);
   Serial.write(pid);
   writeByteValue(3);
   writeLongValue(val1);
   writeLongValue(val2);
   writeLongValue(val3);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-inline void writeGetterSingleValue(unsigned char pid, long val) {
-/////////////////////////////////////////////////////////////////////////////////////  
-  Serial.write(RET_SOH);
-  writeGetterListValue(pid, val);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-inline void writeGetterSingleValues(unsigned char pid, long val1, long val2) {
-/////////////////////////////////////////////////////////////////////////////////////
-  Serial.write(RET_SOH);
-  writeGetterListValues(pid, val1, val2);  
-}
-/////////////////////////////////////////////////////////////////////////////////////
-inline void writeGetterSingleValues(unsigned char pid, long val1, long val2, long val3) {
-/////////////////////////////////////////////////////////////////////////////////////
-  Serial.write(RET_SOH);
-  writeGetterListValues(pid, val1, val2, val3);  
 }
 /////////////////////////////////////////////////////////////////////////////////////
 inline void writeUnsignedIntValue(uint16_t val) {
@@ -247,103 +256,85 @@ inline void writeLongValues(unsigned char pid, long val1, long val2, long val3, 
   writeLongValue(val4);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void sendHeartbeat() {
+void sendHeartbeat() {
 /////////////////////////////////////////////////////////////////////////////////////
+  unsigned char byteCount = sizeof(int32_t);
   Serial.write(RET_SOH);
   Serial.write(PID_HEARTBEAT);
-  Serial.write((unsigned char)sizeof(long));
+  Serial.write(byteCount);
   writeLongValue(millis() % MAX_LONG);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void sendHeartbeat(unsigned char limitState) {
+void sendHeartbeat(unsigned char limitState, unsigned char supportState) {
 /////////////////////////////////////////////////////////////////////////////////////
-  unsigned char byteCount = sizeof(long) + 4;
+  unsigned char byteCount = 2 * sizeof(int32_t);
 
   Serial.write(RET_SOH);
   Serial.write(PID_HEARTBEAT);
   Serial.write(byteCount);
   writeLongValue(millis() % MAX_LONG);
-
-  writeByteValue(limitState);
-  writeByteValue(255);
-  writeByteValue(255);
-  writeByteValue(255);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-inline void sendHeartbeat(unsigned char limitState, unsigned char supportState) {
-/////////////////////////////////////////////////////////////////////////////////////
-  unsigned char byteCount = sizeof(long) + 4;
-
-  Serial.write(RET_SOH);
-  Serial.write(PID_HEARTBEAT);
-  Serial.write(byteCount);
-  writeLongValue(millis() % MAX_LONG);
+  
   for (unsigned int i=0; i<I2C_BYTE_COUNT; i++) {
     switch ( i ) {
       case I2C_BYTE_LIMIT_STATE:    writeByteValue(limitState);   break;
       case I2C_BYTE_SUPPORT_STATE:  writeByteValue(supportState); break;
     }
   }
-  writeByteValue(255);
-  writeByteValue(255);
+  
+  writeByteValue(255); // reserved
+  writeByteValue(255); // reserved
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void pushMessage(const char type, const char* msg) {
+void pushMessage(const char type, const unsigned char mid, const char* msg) {
 /////////////////////////////////////////////////////////////////////////////////////
-  Serial.write(RET_MSG);
-  
-  switch ( type ) {
-    case MT_WARNING:  Serial.write(MT_WARNING); break;
-    case MT_ERROR:    Serial.write(MT_ERROR);   break;
-    default:          Serial.write(MT_INFO);    break; 
-  }
-  
-  Serial.print(msg);
+  Serial.write(RET_SOH);
+    Serial.write(PID_MSG);
+    switch ( type ) {
+      case MT_WARNING:  Serial.write(MT_WARNING); break;
+      case MT_ERROR:    Serial.write(MT_ERROR);   break;
+      default:          Serial.write(MT_INFO);    break; 
+    }
+
+    if ( mid != E_NO_ERROR ) {
+      Serial.write(MT_MID_FLAG);
+      Serial.write(mid);
+    }
+
+    if ( msg != NULL )
+      Serial.print(msg);
+    
   Serial.write(MBYTE_CLOSE);
   Serial.flush();
 }
-
 /////////////////////////////////////////////////////////////////////////////////////
-inline void pushInfoMessage(const unsigned char mid) {
+void pushInfoMessage(const unsigned char mid, const char* msg) {
 /////////////////////////////////////////////////////////////////////////////////////
-  char msg[2];
-  msg[0] = MT_MID_FLAG;
-  msg[1] = mid;
-  
-  pushInfoMessage(msg);
+  pushMessage(MT_INFO, mid, msg);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void pushWarningMessage(const unsigned char mid) {
+void pushWarningMessage(const unsigned char mid, const char* msg) {
 /////////////////////////////////////////////////////////////////////////////////////
-  char msg[2];
-  msg[0] = MT_MID_FLAG;
-  msg[1] = mid;
-  
-  pushWarningMessage(msg);
+  pushMessage(MT_WARNING, mid, msg);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void pushErrorMessage(const unsigned char mid) {
+void pushErrorMessage(const unsigned char mid, const char* msg) {
 /////////////////////////////////////////////////////////////////////////////////////
-  char msg[2];
-  msg[0] = MT_MID_FLAG;
-  msg[1] = mid;
-  
-  pushErrorMessage(msg);
+  pushMessage(MT_ERROR, mid, msg);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void pushInfoMessage(const char* msg) {
+void pushInfoMessage(const char* msg) {
 /////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_INFO, msg);
+  pushMessage(MT_INFO, E_NO_ERROR, msg);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void pushWarningMessage(const char* msg) {
+void pushWarningMessage(const char* msg) {
 /////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_WARNING, msg);
+  pushMessage(MT_WARNING, E_NO_ERROR, msg);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void pushErrorMessage(const char* msg) {
+void pushErrorMessage(const char* msg) {
 /////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_ERROR, msg);
+  pushMessage(MT_ERROR, E_NO_ERROR, msg);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 inline bool peakSerial(unsigned char& c) {

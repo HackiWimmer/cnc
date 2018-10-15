@@ -57,13 +57,12 @@ unsigned short RenderStruct::zStepCount                    = 0;
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-CncController::CncController(LastErrorCodes& lec) 
+CncController::CncController() 
 /////////////////////////////////////////////////////////////////////////////////////
-: X(new CncStepper(this, 'X', PIN_X_STP, PIN_X_DIR, PIN_X_LIMIT, lec))
-, Y(new CncStepper(this, 'Y', PIN_Y_STP, PIN_Y_DIR, PIN_Y_LIMIT, lec))
-, Z(new CncStepper(this, 'Z', PIN_Z_STP, PIN_Z_DIR, PIN_Z_LIMIT, lec))
+: X(new CncStepper(this, 'X', PIN_X_STP, PIN_X_DIR, PIN_X_LIMIT))
+, Y(new CncStepper(this, 'Y', PIN_Y_STP, PIN_Y_DIR, PIN_Y_LIMIT))
+, Z(new CncStepper(this, 'Z', PIN_Z_STP, PIN_Z_DIR, PIN_Z_LIMIT))
 , speedController()
-, errorInfo(&lec)
 , posReplyThresholdX(100L)
 , posReplyThresholdY(100L)
 , posReplyThresholdZ(100L)
@@ -109,10 +108,10 @@ bool CncController::evaluateI2CData() {
 /////////////////////////////////////////////////////////////////////////////////////
 int32_t CncController::isReadyToRun() {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( speedController.isInitialized() == false )   { errorInfo->setNextErrorInfo(E_SPEED_MGMT_NOT_INITIALIZED, BLANK);  return 0L; }
-  if ( X->isReadyToRun() == 0L )                    { errorInfo->setNextErrorInfo(E_STEPPER_NOT_READY_TO_RUN, "X");      return 0L; }
-  if ( Y->isReadyToRun() == 0L )                    { errorInfo->setNextErrorInfo(E_STEPPER_NOT_READY_TO_RUN, "Y");      return 0L; }
-  if ( Z->isReadyToRun() == 0L )                    { errorInfo->setNextErrorInfo(E_STEPPER_NOT_READY_TO_RUN, "Z");      return 0L; }
+  if ( speedController.isInitialized() == false )   { pushErrorMessage(E_SPEED_MGMT_NOT_INITIALIZED);       return 0L; }
+  if ( X->isReadyToRun() == 0L )                    { pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN, "X");    return 0L; }
+  if ( Y->isReadyToRun() == 0L )                    { pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN, "Y");    return 0L; }
+  if ( Z->isReadyToRun() == 0L )                    { pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN, "Z");    return 0L; }
   
   return 1L;
 }
@@ -129,7 +128,7 @@ bool CncController::enableStepperPin(bool state){
   if ( probeMode == false )   digitalWrite(PIN_STEPPER_ENABLE, state == true ? ENABLE_STATE_ON : ENABLE_STATE_OFF);
   else                        digitalWrite(PIN_STEPPER_ENABLE, ENABLE_STATE_OFF);
 
-  delayMicroseconds(minEnablePulseWide);
+  delayMicroseconds(10);
   return state;
 }
 /////////////////////////////////////////////////////////////////////////////////////
@@ -141,6 +140,7 @@ void CncController::printConfig() {
       Serial.print(value); Serial.write(TEXT_CLOSE);
 
   Serial.print(PID_CONTROLLER); Serial.print(TEXT_SEPARATOR); Serial.write(TEXT_CLOSE);
+  
     PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_X,            getPosReplyThresholdX())
     PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_Y,            getPosReplyThresholdY())
     PRINT_PARAMETER(PID_POS_REPLY_THRESHOLD_Z,            getPosReplyThresholdZ())
@@ -389,7 +389,7 @@ bool CncController::observeEnablePin() {
   if ( isProbeMode() == OFF ) {
     
     if ( digitalRead(PIN_STEPPER_ENABLE) == ENABLE_STATE_OFF ) {
-       errorInfo->setNextErrorInfo(E_STEPPER_NOT_ENALED);
+       pushErrorMessage(E_STEPPER_NOT_ENALED); 
        return false;
     }
   }

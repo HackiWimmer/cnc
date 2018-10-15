@@ -244,7 +244,6 @@ class CncConfig {
 		const bool getSvgResultOnlyFirstCrossingFlag();
 		const bool getSvgReverseYAxisFlag();
 		const bool getAvoidDupSetterValuesFlag();
-		const bool getResetErrorInfoBeforeRunFlag();
 		
 		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
 		const double getWorkpieceThickness()					{ return workpieceThickness; }

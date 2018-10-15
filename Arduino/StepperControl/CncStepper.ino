@@ -3,7 +3,7 @@
 #include "CncStepper.h"
 
 //////////////////////////////////////////////////////////////////////////////
-CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin, LastErrorCodes& lec)
+CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin)
 //////////////////////////////////////////////////////////////////////////////
 : INCREMENT_DIRECTION_VALUE(NORMALIZED_INCREMENT_DIRECTION_VALUE)
 , interrupted(false)
@@ -32,7 +32,6 @@ CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, by
 , curPos(0L)
 , posReplyThresholdCount(0L)
 , controller(crtl)
-, errorInfo(lec)
 {
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -45,12 +44,12 @@ int32_t CncStepper::isReadyToRun() {
   int32_t ret = 1;
 
   if ( interrupted == true ) {
-    errorInfo.setNextErrorInfoWithoutErrorMessage(E_INTERRUPT, BLANK + axis);
+    pushErrorMessage(E_INTERRUPT);
     ret = 0;
   }
 
   if ( readLimitState() != LimitSwitch::LIMIT_UNSET ) {
-    errorInfo.setNextErrorInfoWithoutErrorMessage(E_LIMIT_SWITCH_ACTIVE, BLANK + axis);
+    pushErrorMessage(E_LIMIT_SWITCH_ACTIVE);
     ret = 0;
   }
   

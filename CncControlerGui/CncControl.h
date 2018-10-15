@@ -213,7 +213,7 @@ class CncControl {
 		bool moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
 		
 		// Callback from Serial
-		bool SerialCallback(int32_t cmdCount);
+		bool SerialCallback();
 		// Callback from Serial with controller content
 		bool SerialControllerCallback(const ContollerInfo& ci);
 		// Callback fromS Serial with a controller message
@@ -223,8 +223,6 @@ class CncControl {
 		void resetInterrupt();
 		bool isInterrupted();
 		bool reset();
-		bool resetErrorInfo();
-		bool checkForErrosAndResetErrorInfo(int32_t& preveErrorCount);
 		bool resetWatermarks();
 		// Setup the cnc control
 		void resetSetterMap();
@@ -267,10 +265,6 @@ class CncControl {
 		const CncDoublePosition getMaxPositionsMetric();
 		const CncLongPosition::Watermarks getWaterMarks();
 		const CncDoublePosition::Watermarks getWaterMarksMetric();
-		// query the current error count
-		const int32_t getControllerErrorCount(bool withPurge=false);
-		// query the current error information
-		bool requestErrorInformation(bool withPurge=false);
 		// query the current controller position
 		const CncLongPosition getControllerPos();
 		// query the current controller limit state
@@ -327,15 +321,10 @@ class CncControl {
 		bool simpleMoveXYZToZeroPos(CncDimensions dim);
 		bool simpleMoveZToZeroPos();
 		
-		// contorler configuration output
+		// controller configuration output
 		bool hasControllerConfigControl();
 		void clearControllerConfigControl();
 		void appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value);
-		
-		// controller error output
-		bool hasControllerErrorControl();
-		void clearControllerErrorControl();
-		void appendNumKeyValueToControllerErrorInfo(int num, int code, const char* key, const char* value);
 		
 		// controller pin report
 		bool hasControllerPinControl();

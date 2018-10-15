@@ -773,7 +773,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5681->Add(20, 0, 1, wxALL, WXC_FROM_DIP(0));
     
     m_speedConfigSlider = new wxSlider(m_setupSpeedWizard, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxSL_LABELS|wxSL_HORIZONTAL);
-    wxFont m_speedConfigSliderFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    wxFont m_speedConfigSliderFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_speedConfigSlider->SetFont(m_speedConfigSliderFont);
     
     flexGridSizer5681->Add(m_speedConfigSlider, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
@@ -803,6 +803,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5707->Add(m_staticText5717, 0, wxALL, WXC_FROM_DIP(5));
     
     m_speedConfigStepsX = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxTE_RIGHT);
+    wxFont m_speedConfigStepsXFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_speedConfigStepsX->SetFont(m_speedConfigStepsXFont);
     #if wxVERSION_NUMBER >= 3000
     m_speedConfigStepsX->SetHint(wxT(""));
     #endif
@@ -816,6 +818,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5707->Add(m_staticText5719, 0, wxALL, WXC_FROM_DIP(5));
     
     m_speedConfigStepsY = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxTE_RIGHT);
+    wxFont m_speedConfigStepsYFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_speedConfigStepsY->SetFont(m_speedConfigStepsYFont);
     #if wxVERSION_NUMBER >= 3000
     m_speedConfigStepsY->SetHint(wxT(""));
     #endif
@@ -829,6 +833,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5707->Add(m_staticText5721, 0, wxALL, WXC_FROM_DIP(5));
     
     m_speedConfigStepsZ = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxTE_RIGHT);
+    wxFont m_speedConfigStepsZFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_speedConfigStepsZ->SetFont(m_speedConfigStepsZFont);
     #if wxVERSION_NUMBER >= 3000
     m_speedConfigStepsZ->SetHint(wxT(""));
     #endif
@@ -3037,115 +3043,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2577->Add(m_controllerMsgHistory, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_controllerErrorInfo = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    wxFont m_controllerErrorInfoFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("wxT(\"Segoe UI\")"));
-    m_controllerErrorInfo->SetFont(m_controllerErrorInfoFont);
-    int m_controllerErrorInfoImgIndex;
-    m_controllerErrorInfoImgIndex = m_notebookConfig_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-patch")));
-    m_notebookConfig->AddPage(m_controllerErrorInfo, _("Ctrl Error Info"), false, m_controllerErrorInfoImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer13062 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer13062->SetFlexibleDirection( wxBOTH );
-    flexGridSizer13062->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer13062->AddGrowableCol(0);
-    flexGridSizer13062->AddGrowableRow(1);
-    m_controllerErrorInfo->SetSizer(flexGridSizer13062);
-    
-    wxFlexGridSizer* flexGridSizer13113 = new wxFlexGridSizer(1, 4, 0, 0);
-    flexGridSizer13113->SetFlexibleDirection( wxBOTH );
-    flexGridSizer13113->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer13113->AddGrowableCol(0);
-    
-    flexGridSizer13062->Add(flexGridSizer13113, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_staticText128314 = new wxStaticText(m_controllerErrorInfo, wxID_ANY, _("Requested Controller Error Info:"), wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), 0);
-    wxFont m_staticText128314Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText128314->SetFont(m_staticText128314Font);
-    
-    flexGridSizer13113->Add(m_staticText128314, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btResetCtlErrorInfo = new wxButton(m_controllerErrorInfo, wxID_ANY, _("Reset . . ."), wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btResetCtlErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-reset")), wxLEFT);
-    m_btResetCtlErrorInfo->SetBitmapMargins(2,2);
-    #endif
-    m_btResetCtlErrorInfo->SetToolTip(_("Reset Controller Error Info"));
-    
-    flexGridSizer13113->Add(m_btResetCtlErrorInfo, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    
-    m_btRequestCtlErrorInfo = new wxButton(m_controllerErrorInfo, wxID_ANY, _("Request"), wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btRequestCtlErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_restart")), wxLEFT);
-    m_btRequestCtlErrorInfo->SetBitmapMargins(2,2);
-    #endif
-    m_btRequestCtlErrorInfo->SetToolTip(_("Request Controller Error Info"));
-    
-    flexGridSizer13113->Add(m_btRequestCtlErrorInfo, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    
-    m_btClearCtlErrorInfoList = new wxButton(m_controllerErrorInfo, wxID_ANY, _("Clear List"), wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btClearCtlErrorInfoList->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxLEFT);
-    m_btClearCtlErrorInfoList->SetBitmapMargins(2,2);
-    #endif
-    m_btClearCtlErrorInfoList->SetToolTip(_("Clear Error Info List"));
-    m_btClearCtlErrorInfoList->Hide();
-    
-    flexGridSizer13113->Add(m_btClearCtlErrorInfoList, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    
-    m_dvListCtrlControllerErrorInfo = new wxDataViewListCtrl(m_controllerErrorInfo, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), wxDV_ROW_LINES|wxDV_SINGLE);
-    m_dvListCtrlControllerErrorInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
-    
-    flexGridSizer13062->Add(m_dvListCtrlControllerErrorInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("#"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT);
-    m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Error Code"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT);
-    m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Error Text"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    m_dvListCtrlControllerErrorInfo->AppendTextColumn(_("Info"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
-    wxFlexGridSizer* flexGridSizer5155 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer5155->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5155->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5155->AddGrowableCol(0);
-    flexGridSizer5155->AddGrowableRow(0);
-    
-    flexGridSizer13062->Add(flexGridSizer5155, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_panel5162 = new wxPanel(m_controllerErrorInfo, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_controllerErrorInfo, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_panel5162->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
-    
-    flexGridSizer5155->Add(m_panel5162, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer5163 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer5163->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5163->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5163->AddGrowableCol(0);
-    flexGridSizer5163->AddGrowableRow(0);
-    m_panel5162->SetSizer(flexGridSizer5163);
-    
-    wxFlexGridSizer* flexGridSizer5160 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer5160->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5160->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5163->Add(flexGridSizer5160, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
-    
-    m_staticText5159 = new wxStaticText(m_panel5162, wxID_ANY, _("Last Response ID:"), wxDefaultPosition, wxDLG_UNIT(m_panel5162, wxSize(-1,-1)), 0);
-    m_staticText5159->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
-    m_staticText5159->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
-    wxFont m_staticText5159Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI Semibold"));
-    m_staticText5159->SetFont(m_staticText5159Font);
-    
-    flexGridSizer5160->Add(m_staticText5159, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
-    
-    m_lastErrorInfoResponseId = new wxTextCtrl(m_panel5162, wxID_ANY, wxT("#12345"), wxDefaultPosition, wxDLG_UNIT(m_panel5162, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_lastErrorInfoResponseId->SetBackgroundColour(wxColour(wxT("rgb(0,64,128)")));
-    m_lastErrorInfoResponseId->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
-    wxFont m_lastErrorInfoResponseIdFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_lastErrorInfoResponseId->SetFont(m_lastErrorInfoResponseIdFont);
-    #if wxVERSION_NUMBER >= 3000
-    m_lastErrorInfoResponseId->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer5160->Add(m_lastErrorInfoResponseId, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
-    
     m_3DPane = new wxPanel(m_outboundNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_outboundNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_3DPaneImgIndex;
     m_3DPaneImgIndex = m_outboundNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("package-x-generic1")));
@@ -5169,14 +5066,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_miRqtPins->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
     m_menuRequestor->Append(m_miRqtPins);
     
-    m_menuErrorCount = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Error Count"), wxT(""), wxITEM_NORMAL);
-    m_menuErrorCount->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
-    m_menuRequestor->Append(m_menuErrorCount);
-    
-    m_miRqtErrorInfo = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Error Info"), wxT(""), wxITEM_NORMAL);
-    m_miRqtErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("messagebox_info")));
-    m_menuRequestor->Append(m_miRqtErrorInfo);
-    
     m_menuRequestor->AppendSeparator();
     
     m_menuItemInfoMessage = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Test - Info Message"), wxT(""), wxITEM_NORMAL);
@@ -5211,10 +5100,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_miRqtReset = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Reset Controller"), wxT(""), wxITEM_NORMAL);
     m_miRqtReset->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-reset")));
     m_menuRequestor->Append(m_miRqtReset);
-    
-    m_miRqtResetErrorInfo = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Reset Error Info"), wxT(""), wxITEM_NORMAL);
-    m_miRqtResetErrorInfo->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("git-reset")));
-    m_menuRequestor->Append(m_miRqtResetErrorInfo);
     
     m_menuRequestor->AppendSeparator();
     
@@ -5594,9 +5479,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btRequestCtlConfig->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerConfigFromButton), NULL, this);
     m_btRequestControllerPins->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
-    m_btResetCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::resetControllerErrorInfoFromButton), NULL, this);
-    m_btRequestCtlErrorInfo->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
-    m_btClearCtlErrorInfoList->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerErrorInfoFromButton), NULL, this);
     m_switchMonitoing->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_3D_Refreh->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshMotionMonitor), NULL, this);
     m_3D_Clear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitor), NULL, this);
@@ -5717,8 +5599,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miRqtHeartbeat->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestHeartbeat), NULL, this);
     this->Connect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Connect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
-    this->Connect(m_menuErrorCount->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorCount), NULL, this);
-    this->Connect(m_miRqtErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorInfo), NULL, this);
     this->Connect(m_menuItemInfoMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInfoMessage), NULL, this);
     this->Connect(m_menuItemWarningMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestWarningMessage), NULL, this);
     this->Connect(m_menuItemErrorMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorMessage), NULL, this);
@@ -5726,7 +5606,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Connect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Connect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
-    this->Connect(m_miRqtResetErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResetErrorInfo), NULL, this);
     this->Connect(m_miRqtSendInterrupt->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInterrupt), NULL, this);
     this->Connect(m_miRqtWarmstart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::warmStartController), NULL, this);
     this->Connect(m_miPathGenerator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
@@ -5939,9 +5818,6 @@ MainFrameBClass::~MainFrameBClass()
     m_btRequestCtlConfig->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerConfigFromButton), NULL, this);
     m_btRequestControllerPins->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerPinsFromButton), NULL, this);
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
-    m_btResetCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::resetControllerErrorInfoFromButton), NULL, this);
-    m_btRequestCtlErrorInfo->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::requestControllerErrorInfoFromButton), NULL, this);
-    m_btClearCtlErrorInfoList->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerErrorInfoFromButton), NULL, this);
     m_switchMonitoing->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::switchMonitoring), NULL, this);
     m_3D_Refreh->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::refreshMotionMonitor), NULL, this);
     m_3D_Clear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearMotionMonitor), NULL, this);
@@ -6062,8 +5938,6 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miRqtHeartbeat->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestHeartbeat), NULL, this);
     this->Disconnect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
     this->Disconnect(m_miRqtPins->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestPins), NULL, this);
-    this->Disconnect(m_menuErrorCount->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorCount), NULL, this);
-    this->Disconnect(m_miRqtErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorInfo), NULL, this);
     this->Disconnect(m_menuItemInfoMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInfoMessage), NULL, this);
     this->Disconnect(m_menuItemWarningMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestWarningMessage), NULL, this);
     this->Disconnect(m_menuItemErrorMessage->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestErrorMessage), NULL, this);
@@ -6071,7 +5945,6 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miRqtCurPos->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentPos), NULL, this);
     this->Disconnect(m_miRqtLimit->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestCurrentLimitState), NULL, this);
     this->Disconnect(m_miRqtReset->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestReset), NULL, this);
-    this->Disconnect(m_miRqtResetErrorInfo->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestResetErrorInfo), NULL, this);
     this->Disconnect(m_miRqtSendInterrupt->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestInterrupt), NULL, this);
     this->Disconnect(m_miRqtWarmstart->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::warmStartController), NULL, this);
     this->Disconnect(m_miPathGenerator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
@@ -8166,7 +8039,7 @@ CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer5582->Add(flexGridSizer5591, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText5589 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText5589 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial Port . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText5589Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText5589->SetFont(m_staticText5589Font);
     

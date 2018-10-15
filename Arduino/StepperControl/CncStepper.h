@@ -2,7 +2,6 @@
 #define CNC_STEPPER_H
 
 #include "CncController.h"
-#include "LastErrorCodes.h"
 #include "CommonValues.h"
 
 class CncStepper {
@@ -51,7 +50,6 @@ class CncStepper {
     int32_t posReplyThresholdCount;
     
     CncController* controller;
-    LastErrorCodes& errorInfo;
 
     inline void incStepCounter();
         
@@ -66,7 +64,7 @@ class CncStepper {
 
   public:
     //////////////////////////////////////////////////////////////////////////////
-    CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin, LastErrorCodes& lec);
+    CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin);
     ~CncStepper();
 
     //////////////////////////////////////////////////////////////////////////////

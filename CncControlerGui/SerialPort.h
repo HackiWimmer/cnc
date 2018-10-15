@@ -18,15 +18,21 @@ typedef std::map<unsigned char, GetterValues> 	GetterListValues;
 
 class CncControl;
 
+struct LastSerialResult {
+	unsigned char cmd 				    = '\0';
+	unsigned char ret				    = RET_NULL;
+	
+	void reset() { 
+		cmd 				 			= '\0';
+		ret								= RET_NULL;
+	}
+};
+
 struct SerialFetchInfo {
 	unsigned char command				= '\0';
 	unsigned char multiByteResult[2048];
 
 	unsigned int singleFetchTimeout 	= 2000;
-	bool retSOTAllowed					= false;
-	bool returnAfterSOT					= true;
-	bool retSOHAllowed					= false;
-	bool returnAfterSOH					= true;
 	bool autoCallErrorInfo 				= false;
 
 	struct H {
@@ -160,7 +166,7 @@ class Serial : public SerialOSD {
 		// Port name
 		std::string portName;
 		// last fetch result
-		unsigned char lastFetchResult;
+		LastSerialResult lastFetchResult;
 		// spy flags
 		bool traceSpyInfo;
 		Serial::SypMode spyMode;
@@ -180,7 +186,7 @@ class Serial : public SerialOSD {
 		virtual void sleepMilliseconds(unsigned int millis);
 		
 		// decodes the given controler msg
-		inline void decodeMessage(const unsigned char* mutliByteStream, std::ostream& message);
+		inline void decodeMessage(const int bytes, const unsigned char* mutliByteStream, std::ostream& message);
 		// give the result a more human readabal format
 		inline void decodeMultiByteResults(const char cmd, const unsigned char* result, std::ostream& mutliByteStream);
 		// return true if the given cmd is a move command
@@ -196,22 +202,21 @@ class Serial : public SerialOSD {
 		inline bool evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
 		// handle receiving data from controller
 		inline bool RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		// handle receiving text data from controller
-		inline bool RET_SOT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool RET_HALT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool RET_QUIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);	
 		// handle receiving binary data from controller
 		inline bool RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		// decodes the given fetch result depending cr
-		inline bool decode_RET_SOH_Default(unsigned char cr, SerialFetchInfo& sfi);
 		// decodes the give fetch result
-		inline bool decodeGetter(unsigned char pid, SerialFetchInfo& sfi, bool finalize=true);
-		inline bool decodeGetterList(unsigned char pid, SerialFetchInfo& sfi);
+		inline bool decodeGetter(SerialFetchInfo& sfi);
+		inline bool decodeText(unsigned char pid, SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		inline bool decodeHeartbeat(SerialFetchInfo& sfi);
 		inline bool decodeLimitInfo(SerialFetchInfo& sfi);
 		inline bool decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi);
 		
-		void resetLastFetchResult() { lastFetchResult = RET_NULL; }
-		void setLastFetchType(unsigned char ret) { lastFetchResult = ret; }
-		const unsigned char getLastFetchResult() const { return lastFetchResult; }
+		const LastSerialResult& getLastFetchResult() const { return lastFetchResult; }
 		
 		void incTotalDistance(int32_t dx, int32_t dy, int32_t dz);
 		void incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy, int32_t cz);
@@ -277,8 +282,6 @@ class Serial : public SerialOSD {
 		bool processGetter(unsigned char pid, GetterValues& ret);
 		bool processGetterList(PidList pidList, GetterListValues& ret);
 		bool processSetter(unsigned char pid, int32_t value);
-		
-		bool processTest(int32_t testId);
 		// indicates if idle message can be requested
 		virtual bool canProcessIdle() { return true; }
 		bool processIdle();

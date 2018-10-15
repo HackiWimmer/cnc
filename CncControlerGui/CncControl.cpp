@@ -567,35 +567,6 @@ bool CncControl::reset() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::resetErrorInfo() {
-////////////checkForErrosAndResetErrorInfo/////////////////////////////////////////
-	bool ret = processCommand(CMD_RESET_ERRORINFO, std::cerr);
-	if ( ret == false) {
-		std::cerr << " CncControl::resetErrorInfo: Reset error information failed!\n";
-		return false;
-	}
-	
-	return true;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::checkForErrosAndResetErrorInfo(int32_t& preveErrorCount) {
-///////////////////////////////////////////////////////////////////
-	// first of all purge the port to reinitialize the protocol here
-	// important in case of previous error sitiuations
-	// getSerial()->purge(); will be done by getControllerErrorCount() below
-	
-	// ... then determine the current error count and request 
-	// error information on demand
-	preveErrorCount = getControllerErrorCount();
-	if ( preveErrorCount > 0 ) {
-		if ( processCommand(CMD_PRINT_ERRORINFO, std::cerr) == false )
-			std::cerr << " CncControl::resetErrorInfo: Request error information failed!\n";
-	}
-	
-	// ... and last reset the error information
-	return resetErrorInfo();
-}
-///////////////////////////////////////////////////////////////////
 unsigned int CncControl::getDurationCount() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
@@ -826,21 +797,6 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 	char type = (char)msg[0];
 	msg = msg.SubString(1, msg.length());
 	
-	int p1 = wxNOT_FOUND, p2 = wxNOT_FOUND;
-	if ( (p1 = msg.Find("{[")) != wxNOT_FOUND ) {
-		if ( (p2 = msg.Find("]}")) != wxNOT_FOUND && p2 >= p1 + 2) {
-			wxString idStr = msg.SubString(p1+2, p2-1);
-			long id;
-			idStr.ToLong(&id);
-			wxString errorCode = ArduinoErrorCodes::getECLabel(id);
-			wxString replace("{[");
-			replace << idStr;
-			replace << "]}";
-			
-			msg.Replace(replace, errorCode);
-		}
-	}
-	
 	if ( GET_GUI_CTL(mainFrame) != NULL )
 		GET_GUI_CTL(mainFrame)->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
 	
@@ -849,14 +805,17 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 		case 'W':	
 					cnc::msg.logWarning(now.Format("Warning Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logWarning(msg);
+					cnc::cex1 << "Received the following CNC Controller Warning:\n" << msg;
 					break;
 					
 		case 'E':	cnc::msg.logError(now.Format("Error Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logError(msg);
+					std::cerr << "Received the following CNC Controller Error:\n" << msg;
 					break;
 					
 		default:	cnc::msg.logInfo(now.Format("Info Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logInfo(msg);
+					std::cout << "Received the following CNC Controller Information:\n" << msg;
 	}
 	
 	cnc::msg.setTextColour(wxColour(128, 128, 0));
@@ -953,7 +912,7 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::SerialCallback(int32_t cmdCount) {
+bool CncControl::SerialCallback() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
 	wxASSERT(guiCtlSetup);
@@ -1277,31 +1236,6 @@ void CncControl::switchToolOff(bool force) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-const int32_t CncControl::getControllerErrorCount(bool withPurge) {
-///////////////////////////////////////////////////////////////////
-	if ( withPurge == true ) {
-		// first of all purge the port to reinitialize the protocol here
-		// important in case of previous error sitiuations
-		getSerial()->purge();
-	}
-	
-	std::vector<int32_t> list;
-	
-	if ( isInterrupted() == false )
-		getSerial()->processGetter(PID_ERROR_COUNT, list);
-		
-	if ( list.size() != 1 ){
-		if ( isInterrupted() == false ) {
-			std::cerr << "CncControl::getControllerErrorCount: Unable to evaluate error count:" << std::endl;
-			std::cerr << " Received value count: " << list.size() << std::endl;
-		}
-		
-		return -1;
-	}
-
-	return list.at(0);
-}
-///////////////////////////////////////////////////////////////////
 bool CncControl::displayGetterList(const PidList& pidList) {
 ///////////////////////////////////////////////////////////////////
 	if ( pidList.size() == 0 )
@@ -1331,24 +1265,6 @@ bool CncControl::displayGetterList(const PidList& pidList) {
 	}
 
 	return true;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::requestErrorInformation(bool withPurge) {
-///////////////////////////////////////////////////////////////////
-	if ( withPurge == true ) {
-		// first of all purge the port to reinitialize the protocol here
-		// important in case of previous error sitiuations
-		getSerial()->purge();
-	}
-	
-	bool ret = processCommand(CMD_PRINT_ERRORINFO, std::cerr);
-	
-	if ( GET_GUI_CTL(controllerErrorInfo) ) {
-		if ( GET_GUI_CTL(controllerErrorInfo)->GetItemCount() > 1 )	GET_GUI_CTL(controllerErrorInfo)->SetForegroundColour(*wxRED);
-		else														GET_GUI_CTL(controllerErrorInfo)->SetForegroundColour(*wxBLACK);
-	}
-	
-	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 const CncLongPosition CncControl::getControllerPos() {
@@ -2067,34 +1983,19 @@ bool CncControl::hasControllerPinControl() {
 	return ( GET_GUI_CTL(controllerPinReport) != NULL );
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::hasControllerErrorControl() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	return ( GET_GUI_CTL(controllerErrorInfo) != NULL );
-}
-///////////////////////////////////////////////////////////////////
 void CncControl::clearControllerPinControl() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	if ( hasControllerErrorControl() )
+	if ( hasControllerPinControl() )
 		GET_GUI_CTL(controllerPinReport)->DeleteAllItems();
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::clearControllerErrorControl() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( hasControllerErrorControl() ) 
-		GET_GUI_CTL(controllerErrorInfo)->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::appendNumKeyValueToControllerPinInfo(const char* desc, int pin, int type, int mode, int value) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	if ( hasControllerErrorControl() ) {
+	if ( hasControllerPinControl() ) {
 		DcmItemList rows;
 
 		DataControlModel::addPinReportRow(rows, desc, pin, type, mode, value);
@@ -2103,22 +2004,6 @@ void CncControl::appendNumKeyValueToControllerPinInfo(const char* desc, int pin,
 			GET_GUI_CTL(controllerPinReport)->AppendItem(*it);
 		}
 		GET_GUI_CTL(controllerPinReport)->Thaw();
-	}
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::appendNumKeyValueToControllerErrorInfo(int num, int code, const char* key, const char* value) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( hasControllerErrorControl() ) {
-		DcmItemList rows;
-		
-		DataControlModel::addNumKeyValueRow(rows, num, code, key, value);
-		guiCtlSetup->controllerErrorInfo->Freeze();
-		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-			GET_GUI_CTL(controllerErrorInfo)->AppendItem(*it);
-		}
-		GET_GUI_CTL(controllerErrorInfo)->Thaw();
 	}
 }
 ///////////////////////////////////////////////////////////////////

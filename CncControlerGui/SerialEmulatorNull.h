@@ -191,7 +191,6 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force=false);
 		
 		inline void reset();
-		inline void resetErrorInfo();
 		inline void resetCounter();
 		inline unsigned char stepAxis(char axis, int32_t dist);
 		
@@ -232,11 +231,9 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual int performSerialBytes(unsigned char *buffer, unsigned int nbByte);
 		
 		virtual int performConfiguration(unsigned char *buffer, unsigned int nbByte);
-		virtual int performErrorInfo(unsigned char *buffer, unsigned int nbByte);
-		virtual int performLastErrorInfoResponseId(unsigned char *buffer, unsigned int nbByte);
 		
-		virtual int performSOT(unsigned char *buffer, unsigned int nbByte, const char* response);
-		virtual int performMSG(unsigned char *buffer, unsigned int nbByte, const char* response);
+		virtual int performText(unsigned char *buffer, unsigned int nbByte, const char* response);
+		virtual int performMsg(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMajorMove(unsigned char *buffer, unsigned int nbByte);
 		
 		virtual bool evaluatePositions(std::vector<int32_t>& ret);

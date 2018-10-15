@@ -135,11 +135,9 @@ struct I2CData {
   const unsigned char CMD_HEARTBEAT                       =  'h';
   
   const unsigned char CMD_RESET_CONTROLLER                =  'R';
-  const unsigned char CMD_RESET_ERRORINFO                 =  'r';
-  
+    
   const unsigned char CMD_SETTER                          =  'S';
   const unsigned char CMD_GETTER                          =  'G';
-  const unsigned char CMD_GETTER_LIST                     =  'g';
   
   const unsigned char CMD_POS_STEP_X                      =  'X';
   const unsigned char CMD_NEG_STEP_X                      =  'x';
@@ -153,13 +151,9 @@ struct I2CData {
 
   const unsigned char CMD_MOVE_UNIT_SIGNAL                =  '>';
   
-  const unsigned char CMD_TEST_START                      =  'T';
-  
   const unsigned char CMD_PRINT_CONFIG                    =  'c';
   const unsigned char CMD_PRINT_VERSION                   =  'V';
   const unsigned char CMD_PRINT_PIN_REPORT                =  'Q';
-  const unsigned char CMD_PRINT_ERRORINFO                 =  '?';
-  const unsigned char CMD_PRINT_LAST_ERROR_RESPONSE_ID    =  '!';
     
   // Ranges reserved via above definitions:
   //   48 -  57 --> '0'..'9'
@@ -204,14 +198,17 @@ struct I2CData {
   const unsigned char RET_MBYTE_CLOSE                     =   0;   // reserved - see also MBYTE_CLOSE
   const unsigned char RET_NULL                            =   1;   // Invalid ret code
   const unsigned char RET_SOH                             =   2;   // Start of header
-  const unsigned char RET_SOT                             =   3;   // Start of text
-  const unsigned char RET_OK                              =   4;   // Ack
-  const unsigned char RET_ERROR                           =   5;   // Nack
-  const unsigned char RET_LIMIT                           =   6;   //
-  const unsigned char RET_INTERRUPT                       =   7;   // 
-  const unsigned char RET_HALT                            =   8;   // 
-  const unsigned char RET_QUIT                            =   9;   // 
-  const unsigned char RET_MSG                             =  10;   // Start of message
+  const unsigned char RET_OK                              =   3;   // Ack
+  const unsigned char RET_ERROR                           =   4;   // Nack
+  const unsigned char RET_LIMIT                           =   5;   //
+  const unsigned char RET_INTERRUPT                       =   6;   // 
+  const unsigned char RET_HALT                            =   7;   // 
+  const unsigned char RET_QUIT                            =   8;   // 
+
+  
+  const unsigned char RET_MSG                             =  10;   // depricated
+  const unsigned char RET_SOT                             =  11;   // depricated
+
 
 // .....................................................................
 // Please consider
@@ -223,16 +220,14 @@ struct I2CData {
 // start long pid range
 // .....................................................................
 
-  const unsigned char PID_ERROR_COUNT                     =  20;
-  const unsigned char PID_VERSION                         =  21;
-  const unsigned char PID_HEARTBEAT                       =  22;
-  const unsigned char PID_STEPPER_INITIALIZED             =  23;
-  const unsigned char PID_SEPARATOR                       =  24;
-  const unsigned char PID_QUERY_READY_TO_RUN              =  25;
-  const unsigned char PID_INCREMENT_DIRECTION_VALUE_X     =  26;
-  const unsigned char PID_INCREMENT_DIRECTION_VALUE_Y     =  27;
-  const unsigned char PID_INCREMENT_DIRECTION_VALUE_Z     =  28;
-  const unsigned char PID_GETTER_LIST                     =  29;
+  const unsigned char PID_VERSION                         =  20;
+  const unsigned char PID_HEARTBEAT                       =  21;
+  const unsigned char PID_TEXT                            =  22;
+  const unsigned char PID_MSG                             =  23;
+  const unsigned char PID_GETTER                          =  24;
+  const unsigned char PID_STEPPER_INITIALIZED             =  25;
+  const unsigned char PID_SEPARATOR                       =  26;
+  const unsigned char PID_QUERY_READY_TO_RUN              =  27;
   
   const unsigned char PID_SPEED_CONTROLLER                =  30;
   const unsigned char PID_SPEED_OFFSET                    =  31;
@@ -243,7 +238,7 @@ struct I2CData {
   const unsigned char PID_STEPS_Y                         =  36;
   const unsigned char PID_STEPS_Z                         =  37;
   const unsigned char PID_LAST_STEP_DIR                   =  38;
-   
+     
   const unsigned char PID_MIN_SWITCH                      =  40;
   const unsigned char PID_MAX_SWITCH                      =  41;
   const unsigned char PID_LIMIT                           =  42;
@@ -281,13 +276,10 @@ struct I2CData {
   const unsigned char PID_ENABLE_STEPPERS                 =  76;
   const unsigned char PID_AVG_STEP_DURATION               =  77;
 
-  const unsigned char PID_TEST_SUITE                      =  80;
-  const unsigned char PID_TEST_VALUE1                     =  81;
-  const unsigned char PID_TEST_VALUE2                     =  82;
-  const unsigned char PID_TEST_VALUE3                     =  83;
-  const unsigned char PID_TEST_VALUE4                     =  84;
-  const unsigned char PID_TEST_VALUE5                     =  85;
-  const unsigned char PID_TEST_INTERRUPT                  =  86;
+  const unsigned char PID_TEST_INTERRUPT                  =  80;
+  const unsigned char PID_INCREMENT_DIRECTION_VALUE_X     =  81;
+  const unsigned char PID_INCREMENT_DIRECTION_VALUE_Y     =  82;
+  const unsigned char PID_INCREMENT_DIRECTION_VALUE_Z     =  83;
   
   const unsigned char PID_SPEED_CTRL_INITIALIZED          =  90;
   const unsigned char PID_SPEED_CTRL_TOTAL_OFFSET         =  91;

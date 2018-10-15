@@ -136,13 +136,6 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_AVOID_DUP_SETTER_VALUES, prop);
 			
-			//...............
-			prop = ctl->AppendChild( new wxBoolProperty("Reset error info before each run/debug", NEXT_PROP_ID, true));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetEditor( wxT("CheckBox") );
-			CncConfig::registerProperty(CncWork_Ctl_RESET_ERRORINFO_BEFORE_RUN, prop);
-			
 		}
 	}
 }

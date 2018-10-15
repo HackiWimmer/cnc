@@ -1199,7 +1199,7 @@
                                           <object class="wxSlider" name="m_speedConfigSlider">
                                             <style>wxSL_LABELS|wxSL_HORIZONTAL</style>
                                             <font>
-                                              <size>9</size>
+                                              <size>8</size>
                                               <style>normal</style>
                                               <weight>bold</weight>
                                               <family>swiss</family>
@@ -1265,6 +1265,14 @@
                                           <border>1</border>
                                           <object class="wxTextCtrl" name="m_speedConfigStepsX">
                                             <style>wxTE_RIGHT</style>
+                                            <font>
+                                              <size>8</size>
+                                              <style>normal</style>
+                                              <weight>normal</weight>
+                                              <family>swiss</family>
+                                              <underlined>0</underlined>
+                                              <face>Segoe UI</face>
+                                            </font>
                                             <value>1000</value>
                                           </object>
                                         </object>
@@ -1289,6 +1297,14 @@
                                           <border>1</border>
                                           <object class="wxTextCtrl" name="m_speedConfigStepsY">
                                             <style>wxTE_RIGHT</style>
+                                            <font>
+                                              <size>8</size>
+                                              <style>normal</style>
+                                              <weight>normal</weight>
+                                              <family>swiss</family>
+                                              <underlined>0</underlined>
+                                              <face>Segoe UI</face>
+                                            </font>
                                             <value>1000</value>
                                           </object>
                                         </object>
@@ -1313,6 +1329,14 @@
                                           <border>1</border>
                                           <object class="wxTextCtrl" name="m_speedConfigStepsZ">
                                             <style>wxTE_RIGHT</style>
+                                            <font>
+                                              <size>8</size>
+                                              <style>normal</style>
+                                              <weight>normal</weight>
+                                              <family>swiss</family>
+                                              <underlined>0</underlined>
+                                              <face>Segoe UI</face>
+                                            </font>
                                             <value>1000</value>
                                           </object>
                                         </object>
@@ -5270,182 +5294,6 @@ Roughest:</label>
                                         </object>
                                       </object>
                                     </object>
-                                    <object class="listbookpage">
-                                      <label>Ctrl Error Info</label>
-                                      <bitmap>bitmaps/16-patch.png</bitmap>
-                                      <selected>0</selected>
-                                      <object class="wxPanel" name="m_controllerErrorInfo">
-                                        <style>wxTAB_TRAVERSAL</style>
-                                        <font>
-                                          <size>8</size>
-                                          <style>wxFONTFAMILY_SWISS</style>
-                                          <weight>wxFONTSTYLE_NORMAL</weight>
-                                          <family>wxFONTWEIGHT_NORMAL</family>
-                                          <underlined>false</underlined>
-                                          <face>wxT("Segoe UI")</face>
-                                        </font>
-                                        <object class="wxFlexGridSizer">
-                                          <cols>1</cols>
-                                          <rows>3</rows>
-                                          <vgap>0</vgap>
-                                          <hgap>0</hgap>
-                                          <growablecols>0</growablecols>
-                                          <growablerows>1</growablerows>
-                                          <object class="sizeritem" name="flexGridSizer13113">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>1</border>
-                                            <option>1</option>
-                                            <object class="wxFlexGridSizer">
-                                              <cols>4</cols>
-                                              <rows>1</rows>
-                                              <vgap>0</vgap>
-                                              <hgap>0</hgap>
-                                              <growablecols>0</growablecols>
-                                              <growablerows/>
-                                              <object class="sizeritem">
-                                                <flag>wxALL</flag>
-                                                <border>5</border>
-                                                <object class="wxStaticText" name="m_staticText128314">
-                                                  <label>Requested Controller Error Info:</label>
-                                                  <style/>
-                                                  <font>
-                                                    <size>12</size>
-                                                    <style>normal</style>
-                                                    <weight>bold</weight>
-                                                    <family>swiss</family>
-                                                    <underlined>0</underlined>
-                                                    <face>Segoe UI</face>
-                                                  </font>
-                                                </object>
-                                              </object>
-                                              <object class="sizeritem">
-                                                <flag>wxALL|wxALIGN_RIGHT</flag>
-                                                <border>1</border>
-                                                <object class="wxButton" name="m_btResetCtlErrorInfo">
-                                                  <label>Reset . . .</label>
-                                                  <style/>
-                                                  <tooltip>
-                                                    <![CDATA[Reset Controller Error Info]]>
-                                                  </tooltip>
-                                                  <bitmap>bitmaps/git-reset.png</bitmap>
-                                                  <bitmapposition>wxLEFT</bitmapposition>
-                                                  <default>0</default>
-                                                </object>
-                                              </object>
-                                              <object class="sizeritem">
-                                                <flag>wxALL|wxALIGN_RIGHT</flag>
-                                                <border>1</border>
-                                                <object class="wxButton" name="m_btRequestCtlErrorInfo">
-                                                  <label>Request</label>
-                                                  <style/>
-                                                  <tooltip>
-                                                    <![CDATA[Request Controller Error Info]]>
-                                                  </tooltip>
-                                                  <bitmap>bitmaps/16-debugger_restart.png</bitmap>
-                                                  <bitmapposition>wxLEFT</bitmapposition>
-                                                  <default>0</default>
-                                                </object>
-                                              </object>
-                                              <object class="sizeritem">
-                                                <flag>wxALL|wxALIGN_RIGHT</flag>
-                                                <border>1</border>
-                                                <object class="wxButton" name="m_btClearCtlErrorInfoList">
-                                                  <label>Clear List</label>
-                                                  <style/>
-                                                  <tooltip>
-                                                    <![CDATA[Clear Error Info List]]>
-                                                  </tooltip>
-                                                  <hidden>1</hidden>
-                                                  <bitmap>bitmaps/16-clean.png</bitmap>
-                                                  <bitmapposition>wxLEFT</bitmapposition>
-                                                  <default>0</default>
-                                                </object>
-                                              </object>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>1</border>
-                                            <object class="unknown" name="m_dvListCtrlControllerErrorInfo">
-                                              <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
-                                            </object>
-                                          </object>
-                                          <object class="sizeritem" name="flexGridSizer5155">
-                                            <flag>wxALL|wxEXPAND</flag>
-                                            <border>1</border>
-                                            <option>1</option>
-                                            <object class="wxFlexGridSizer">
-                                              <cols>1</cols>
-                                              <rows>1</rows>
-                                              <vgap>0</vgap>
-                                              <hgap>0</hgap>
-                                              <growablecols>0</growablecols>
-                                              <growablerows>0</growablerows>
-                                              <object class="sizeritem">
-                                                <flag>wxALL|wxEXPAND</flag>
-                                                <object class="wxPanel" name="m_panel5162">
-                                                  <style>wxTAB_TRAVERSAL</style>
-                                                  <bg>#004080</bg>
-                                                  <object class="wxFlexGridSizer">
-                                                    <cols>1</cols>
-                                                    <rows>1</rows>
-                                                    <vgap>0</vgap>
-                                                    <hgap>0</hgap>
-                                                    <growablecols>0</growablecols>
-                                                    <growablerows>0</growablerows>
-                                                    <object class="sizeritem" name="flexGridSizer5160">
-                                                      <flag>wxALL|wxALIGN_RIGHT</flag>
-                                                      <object class="wxFlexGridSizer">
-                                                        <cols>2</cols>
-                                                        <rows>1</rows>
-                                                        <vgap>0</vgap>
-                                                        <hgap>0</hgap>
-                                                        <growablecols/>
-                                                        <growablerows/>
-                                                        <object class="sizeritem">
-                                                          <flag>wxALL|wxALIGN_RIGHT</flag>
-                                                          <object class="wxStaticText" name="m_staticText5159">
-                                                            <label>Last Response ID:</label>
-                                                            <style/>
-                                                            <bg>#004080</bg>
-                                                            <fg>#FFFFFF</fg>
-                                                            <font>
-                                                              <size>8</size>
-                                                              <style>normal</style>
-                                                              <weight>bold</weight>
-                                                              <family>swiss</family>
-                                                              <underlined>0</underlined>
-                                                              <face>Segoe UI Semibold</face>
-                                                            </font>
-                                                          </object>
-                                                        </object>
-                                                        <object class="sizeritem">
-                                                          <flag>wxALL|wxALIGN_RIGHT</flag>
-                                                          <object class="wxTextCtrl" name="m_lastErrorInfoResponseId">
-                                                            <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
-                                                            <bg>#004080</bg>
-                                                            <fg>#FFFFFF</fg>
-                                                            <font>
-                                                              <size>8</size>
-                                                              <style>normal</style>
-                                                              <weight>bold</weight>
-                                                              <family>swiss</family>
-                                                              <underlined>0</underlined>
-                                                              <face>Segoe UI</face>
-                                                            </font>
-                                                            <value>#12345</value>
-                                                          </object>
-                                                        </object>
-                                                      </object>
-                                                    </object>
-                                                  </object>
-                                                </object>
-                                              </object>
-                                            </object>
-                                          </object>
-                                        </object>
-                                      </object>
-                                    </object>
                                   </object>
                                 </object>
                               </object>
@@ -9183,20 +9031,6 @@ State</label>
             <![CDATA[]]>
           </accel>
         </object>
-        <object class="wxMenuItem" name="m_menuErrorCount">
-          <label>Error Count</label>
-          <bitmap>bitmaps/messagebox_info.png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-        </object>
-        <object class="wxMenuItem" name="m_miRqtErrorInfo">
-          <label>Error Info</label>
-          <bitmap>bitmaps/messagebox_info.png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-        </object>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_menuItemInfoMessage">
           <label>Test - Info Message</label>
@@ -9245,13 +9079,6 @@ State</label>
         <object class="separator"/>
         <object class="wxMenuItem" name="m_miRqtReset">
           <label>Reset Controller</label>
-          <bitmap>bitmaps/git-reset.png</bitmap>
-          <accel>
-            <![CDATA[]]>
-          </accel>
-        </object>
-        <object class="wxMenuItem" name="m_miRqtResetErrorInfo">
-          <label>Reset Error Info</label>
           <bitmap>bitmaps/git-reset.png</bitmap>
           <accel>
             <![CDATA[]]>
@@ -11898,7 +11725,7 @@ Thickness</label>
                 <flag>wxALL|wxEXPAND</flag>
                 <border>5</border>
                 <object class="wxStaticText" name="m_staticText5589">
-                  <label>Connecting the Serial . . .</label>
+                  <label>Connecting the Serial Port . . .</label>
                   <style/>
                   <font>
                     <size>9</size>

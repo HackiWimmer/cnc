@@ -83,7 +83,6 @@ SerialEmulatorNULL::~SerialEmulatorNULL() {
 		delete speedSimulator;
 		
 	reset();
-	resetErrorInfo();
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::waitDuringRead(unsigned int millis) {
@@ -105,17 +104,13 @@ void SerialEmulatorNULL::performNextErrorInfoResponseId() {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::addErrorInfo(unsigned char eid, const wxString& text) {
 ///////////////////////////////////////////////////////////////////
-	ErrorInfo inf;
+	/*
+	 ErrorInfo inf;
 	inf.id = eid;
 	inf.additionalInfo.assign(text);
 	errorList.push_back(inf);
 	performNextErrorInfoResponseId();
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::resetErrorInfo() {
-///////////////////////////////////////////////////////////////////
-	errorList.clear();
-	performNextErrorInfoResponseId();
+	 * */
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::reset() {
@@ -225,28 +220,22 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 			case CMD_MOVE_UNIT_SIGNAL:				ret = performMajorMove((unsigned char*)(buffer), nbByte);
 													break;
 			
-			case CMD_PRINT_VERSION: 				ret = performSOT((unsigned char*)(buffer), nbByte, firmWare);
-													break;
-			
-			case CMD_PRINT_ERRORINFO: 				ret = performErrorInfo((unsigned char*)(buffer), nbByte);
-													break;
-											
-			case CMD_PRINT_LAST_ERROR_RESPONSE_ID:	ret = performLastErrorInfoResponseId((unsigned char*)(buffer), nbByte);
+			case CMD_PRINT_VERSION: 				ret = performText((unsigned char*)(buffer), nbByte, firmWare);
 													break;
 			
 			case CMD_PRINT_CONFIG: 					ret = performConfiguration((unsigned char*)(buffer), nbByte);
 													break;
 			
-			case CMD_PRINT_PIN_REPORT: 				ret = performSOT((unsigned char*)(buffer), nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel::addPinReportRow(...) for more details
+			case CMD_PRINT_PIN_REPORT: 				ret = performText((unsigned char*)(buffer), nbByte, wxString::Format("%i:0:0:0\n", MAX_PINS)); // see DataControlModel::addPinReportRow(...) for more details
 													break;
 			
-			case CMD_TEST_INFO_MESSAGE:				ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'I', "This is a test message from type: INFO"));
+			case CMD_TEST_INFO_MESSAGE:				ret = performMsg((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'I', "This is a test message from type: INFO"));
 													break;
 			
-			case CMD_TEST_WARN_MESSAGE:				ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'W', "This is a test message from type: WARNING"));
+			case CMD_TEST_WARN_MESSAGE:				ret = performMsg((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'W', "This is a test message from type: WARNING"));
 													break;
 			
-			case CMD_TEST_ERROR_MESSAGE:			ret = performMSG((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'E', "This is a test message from type: ERROR"));
+			case CMD_TEST_ERROR_MESSAGE:			ret = performMsg((unsigned char*)(buffer), nbByte, wxString::Format("%c%s", 'E', "This is a test message from type: ERROR"));
 													break;
 			
 			default:								// for all unsupported commands provide
@@ -358,7 +347,7 @@ int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int n
 	return 0;
 }
 ///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::performMSG(unsigned char *buffer, unsigned int nbByte, const char* response) {
+int SerialEmulatorNULL::performMsg(unsigned char *buffer, unsigned int nbByte, const char* response) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( lastCommand.index == 0 );
 		
@@ -368,15 +357,17 @@ int SerialEmulatorNULL::performMSG(unsigned char *buffer, unsigned int nbByte, c
 	if ( buffer == NULL )
 		return -1;
 		
-	lastCommand.Serial.write(RET_MSG);
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_MSG);
 	lastCommand.Serial.write(response);
 	lastCommand.Serial.write(MBYTE_CLOSE);
+	lastCommand.Serial.write(RET_OK);
 	
 	// support the first byte
 	return performSerialBytes(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::performSOT(unsigned char *buffer, unsigned int nbByte, const char* response) {
+int SerialEmulatorNULL::performText(unsigned char *buffer, unsigned int nbByte, const char* response) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( lastCommand.index == 0 );
 		
@@ -386,9 +377,11 @@ int SerialEmulatorNULL::performSOT(unsigned char *buffer, unsigned int nbByte, c
 	if ( buffer == NULL )
 		return -1;
 		
-	lastCommand.Serial.write(RET_SOT);
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_TEXT);
 	lastCommand.Serial.write(response);
 	lastCommand.Serial.write(MBYTE_CLOSE);
+	lastCommand.Serial.write(RET_OK);
 	
 	// support the first byte
 	return performSerialBytes(buffer, nbByte);
@@ -400,7 +393,8 @@ int SerialEmulatorNULL::performConfiguration(unsigned char *buffer, unsigned int
 	if ( buffer == NULL )
 		return -1;
 		
-	lastCommand.Serial.write(RET_SOT);
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_TEXT);
 	lastCommand.Serial.write(wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection"));
 
 	SetterMap::iterator it;
@@ -410,50 +404,7 @@ int SerialEmulatorNULL::performConfiguration(unsigned char *buffer, unsigned int
 	}
 	
 	lastCommand.Serial.write(MBYTE_CLOSE);
-	
-	// support the first byte
-	return performSerialBytes(buffer, nbByte);
-}
-///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::performLastErrorInfoResponseId(unsigned char *buffer, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	lastCommand.Serial.write(RET_SOT);
-	lastCommand.Serial.write(wxString::Format("%lld", errorInfoResponseId));
-	lastCommand.Serial.write(MBYTE_CLOSE);
-	
-	// support the first byte
-	return performSerialBytes(buffer, nbByte);
-}
-///////////////////////////////////////////////////////////////////
-int SerialEmulatorNULL::performErrorInfo(unsigned char *buffer, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	if ( buffer == NULL )
-		return -1;
-		
-	lastCommand.Serial.write(RET_SOT);
-	
-	lastCommand.Serial.write(wxString::Format("%lld", errorInfoResponseId));
-	lastCommand.Serial.write(TEXT_CLOSE);
-	
-	lastCommand.Serial.write("0");
-	lastCommand.Serial.write(TEXT_SEPARATOR);
-	lastCommand.Serial.write(wxString::Format("%u", E_TOTAL_COUNT));
-	lastCommand.Serial.write(TEXT_SEPARATOR);
-	lastCommand.Serial.write(wxString::Format("%u", (unsigned int)errorList.size()));
-	lastCommand.Serial.write(TEXT_CLOSE);
-	
-	unsigned int cnt = 1;
-	for ( auto it = errorList.begin(); it != errorList.end(); ++it ) {
-		
-		lastCommand.Serial.write(wxString::Format("%u", cnt++));
-		lastCommand.Serial.write(TEXT_SEPARATOR);
-		lastCommand.Serial.write(wxString::Format("%u", it->id));
-		lastCommand.Serial.write(TEXT_SEPARATOR);
-		lastCommand.Serial.write(it->additionalInfo);
-		lastCommand.Serial.write(TEXT_CLOSE);
-	}
-	
-	lastCommand.Serial.write(MBYTE_CLOSE);
+	lastCommand.Serial.write(RET_OK);
 	
 	// support the first byte
 	return performSerialBytes(buffer, nbByte);
@@ -511,10 +462,6 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 									lastCommand.cmd = cmd;
 									return true;
 		
-		case CMD_RESET_ERRORINFO:	resetErrorInfo();
-									lastCommand.cmd = cmd;
-									return true;
-		
 		case CMD_GETTER:			lastCommand.cmd = cmd;
 									return writeGetter(buffer, nbByte);
 		
@@ -534,7 +481,6 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v) {
 ///////////////////////////////////////////////////////////////////
-    lastCommand.Serial.write(RET_SOH);
     lastCommand.Serial.write(pid);
 	lastCommand.Serial.write((unsigned char)1);
     lastCommand.Serial.write(v);
@@ -543,7 +489,6 @@ void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v) {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v1, int32_t v2) {
 ///////////////////////////////////////////////////////////////////
-    lastCommand.Serial.write(RET_SOH);
     lastCommand.Serial.write(pid);
 	lastCommand.Serial.write((unsigned char)2);
     lastCommand.Serial.write(v1, v2);
@@ -552,7 +497,6 @@ void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v1, int32
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v1, int32_t v2, int32_t v3) {
 ///////////////////////////////////////////////////////////////////
-    lastCommand.Serial.write(RET_SOH);
     lastCommand.Serial.write(pid);
 	lastCommand.Serial.write((unsigned char)3);
     lastCommand.Serial.write(v1, v2, v3);
@@ -564,9 +508,11 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 	wxASSERT(nbByte > 1 );
 	unsigned char pid = buffer[1];
 	
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_GETTER);
+	
 	switch ( pid ) {
 		
-		case PID_ERROR_COUNT:			    writerGetterValues(pid, (int32_t)errorList.size()); break;
 		case PID_QUERY_READY_TO_RUN:	    writerGetterValues(pid, (int32_t)1); break;
 		
 		case PID_X_POS:   					writerGetterValues(pid, curEmulatorPos.getX()); break;
