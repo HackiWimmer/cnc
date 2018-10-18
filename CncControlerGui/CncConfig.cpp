@@ -195,9 +195,12 @@ void CncConfig::calculateFactors() {
 	calcFactY = 0.0 + (getStepsY()/getPitchY());
 	calcFactZ = 0.0 + (getStepsZ()/getPitchZ());
 	
-	dispFactX3D = 1.0 * getMaxDimensionX() * calcFactX;
-	dispFactY3D = 1.0 * getMaxDimensionY() * calcFactY;
-	dispFactZ3D = 1.0 * getMaxDimensionZ() * calcFactZ;
+	double maxDim = std::max(getMaxDimensionX(), getMaxDimensionY());
+	maxDim        = std::max(getMaxDimensionZ(), maxDim);
+	
+	dispFactX3D = 1.0 * maxDim * calcFactX;
+	dispFactY3D = 1.0 * maxDim * calcFactY;
+	dispFactZ3D = 1.0 * maxDim * calcFactZ;
 	
 	updateCalculatedFactors();
 }
