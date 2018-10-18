@@ -207,16 +207,6 @@ class SerialEmulatorNULL : public SerialSpyPort
 		LastCommand lastCommand;
 		unsigned char lastSignal;
 		
-		struct ErrorInfo {
-			unsigned int id			= 0;
-			wxString additionalInfo	= _("");
-		};
-		
-		typedef std::vector<ErrorInfo> ErrorList;
-		CncNanoTimestamp errorInfoResponseId;
-		ErrorList errorList;
-		
-		void performNextErrorInfoResponseId();
 		void addErrorInfo(unsigned char eid, const wxString& text);
 		
 		virtual void waitDuringRead(unsigned int millis); 

@@ -51,6 +51,7 @@ wxBEGIN_EVENT_TABLE(CncMotionMonitor, wxGLCanvas)
 	EVT_ERASE_BACKGROUND(CncMotionMonitor::onEraseBackground)
 	EVT_MOUSE_EVENTS(CncMotionMonitor::onMouse)
 	EVT_KEY_DOWN(CncMotionMonitor::onKeyDown)
+	EVT_LEAVE_WINDOW(CncMotionMonitor::onLeave)
 	EVT_TIMER(wxEVT_MONTION_MONITOR_TIMER, CncMotionMonitor::onCameraRotationTimer)
 wxEND_EVENT_TABLE()
 
@@ -371,6 +372,13 @@ void CncMotionMonitor::onEraseBackground(wxEraseEvent& event) {
 	
 	// and avoid flashing on MSW
 }
+#warning
+static bool moveMode = false;
+//////////////////////////////////////////////////
+void CncMotionMonitor::onLeave(wxMouseEvent& event) {
+//////////////////////////////////////////////////
+	moveMode = false;
+}
 //////////////////////////////////////////////////
 void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
@@ -389,22 +397,29 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 	
 	// move origin
 	if ( event.ControlDown() == true ) {
-		static int x = 0, y = 0;
-		static bool moveMode = false;
+		static int lx = 0, ly = 0;
+		static int mx = 0, my = 0;
 		
-		// store the current origin position
-		if ( event.LeftDown() == true ) {
-			x  = event.GetX();
-			y  = event.GetY();
+		
+		if ( event.LeftDown() == true && moveMode == false ) {
+			lx = monitor->getLastReshapeX();
+			ly = cs.GetHeight() - monitor->getLastReshapeY();
+			
+			mx = event.GetX();
+			my = event.GetY();
+			
 			moveMode = true;
 		}
 		
 		// calculate new origin
 		if ( moveMode == true ) {
-			const int dx = +(event.GetX() - x);
-			const int dy = -(event.GetY() - y);
+			const int dx = event.GetX() - mx;
+			const int dy = event.GetY() - my;
 			
-			monitor->reshape(cs.GetWidth(), cs.GetHeight(), dx, dy);
+			const int nx = lx + dx;
+			const int ny = cs.GetHeight() - ly - dy;
+			
+			monitor->reshape(cs.GetWidth(), cs.GetHeight(), nx, ny);
 			display();
 		}
 		
@@ -412,7 +427,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		if ( event.LeftUp() == true ) {
 			moveMode = false;
 		}
-		
+
 	// set origin
 	} else {
 		

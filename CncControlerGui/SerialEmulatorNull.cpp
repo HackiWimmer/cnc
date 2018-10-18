@@ -32,8 +32,6 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , curEmulatorPos(0L, 0L, 0L)
 , lastCommand()
 , lastSignal(CMD_INVALID)
-, errorInfoResponseId(0LL)
-, errorList()
 ///////////////////////////////////////////////////////////////////
 {
 	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
@@ -65,8 +63,6 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , curEmulatorPos(0L, 0L, 0L)
 , lastCommand()
 , lastSignal(CMD_INVALID)
-, errorInfoResponseId(0LL)
-, errorList()
 ///////////////////////////////////////////////////////////////////
 {
 	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
@@ -74,7 +70,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
 											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ()
 										   );
-		reset();
+	reset();
 }
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorNULL::~SerialEmulatorNULL() {
@@ -97,20 +93,21 @@ void SerialEmulatorNULL::sleepMilliseconds(unsigned int millis) {
 	// the application arround
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::performNextErrorInfoResponseId() {
-///////////////////////////////////////////////////////////////////
-	errorInfoResponseId = CncTimeFunctions::getNanoTimestamp();
-}
-///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::addErrorInfo(unsigned char eid, const wxString& text) {
 ///////////////////////////////////////////////////////////////////
-	/*
-	 ErrorInfo inf;
-	inf.id = eid;
-	inf.additionalInfo.assign(text);
-	errorList.push_back(inf);
-	performNextErrorInfoResponseId();
-	 * */
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_MSG);
+	lastCommand.Serial.write(MT_ERROR);
+	
+	if ( eid != E_NO_ERROR ) {
+		lastCommand.Serial.write(MT_MID_FLAG);
+		lastCommand.Serial.write(eid);
+	}
+	
+	lastCommand.Serial.write(text);
+	
+	lastCommand.Serial.write(MBYTE_CLOSE);
+	lastCommand.Serial.write(RET_OK);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::reset() {

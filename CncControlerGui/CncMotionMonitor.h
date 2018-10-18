@@ -141,6 +141,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);
+		void onLeave(wxMouseEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
 		void onCameraRotationTimer(wxTimerEvent& event);
 		
