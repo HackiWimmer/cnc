@@ -4,6 +4,16 @@
 #include "CncController.h"
 #include "CommonValues.h"
 
+struct PwmProfile {
+  
+    unsigned int dirPulseWidth;
+    
+    unsigned int lowPulsWidth;
+    unsigned int highPulsWidth;
+
+    unsigned int getMinPulsWidth() { return lowPulsWidth + highPulsWidth; }
+};
+
 class CncStepper {
   public:
     enum StepDirection { SD_INC     = DIRECTION_INC, 
@@ -13,7 +23,8 @@ class CncStepper {
     
   private:
     bool INCREMENT_DIRECTION_VALUE;
-
+    PwmProfile pwmProfile;
+    
     bool interrupted;
     bool calculateDuration;
     bool minReached;
@@ -28,10 +39,6 @@ class CncStepper {
     
     char axis;
 
-    uint32_t steps;
-    double pitch;
-    bool validPitch;
-    
     unsigned int dirPulseWidth;
     unsigned int lowPulsWidth;
     unsigned int highPulsWidth;
@@ -40,6 +47,9 @@ class CncStepper {
     unsigned long tsPrevStep;
     unsigned long tsCurrStep;
 
+    double pitch;
+    
+    uint32_t steps;
     uint32_t avgStepDuartion;
 
     StepDirection stepDirection;
@@ -118,19 +128,15 @@ class CncStepper {
     //////////////////////////////////////////////////////////////////////////////
     uint32_t getSteps()                     const  { return steps; }
     void setSteps(uint32_t s)                      { steps = s;    }
-
+    
+    //////////////////////////////////////////////////////////////////////////////
+    double getPitch()                       const  { return pitch; }
+    void setPitch(double p)                        { pitch = p;    }
+    
     //////////////////////////////////////////////////////////////////////////////
     void resetPosition()                           { setPosition(0); }
     void setPosition(int32_t val)                  { curPos = val;   }
     int32_t getPosition()                   const  { return curPos;  }
-
-    //////////////////////////////////////////////////////////////////////////////
-    void setPitch(const double p);
-    double getPitch()                       const  { return pitch; }
-    bool isPitchValid()                     const  { return validPitch; }
-
-    //////////////////////////////////////////////////////////////////////////////
-    int32_t calcStepsForMM(int32_t mm); 
 
     //////////////////////////////////////////////////////////////////////////////
     void resetStepCounter()                       { stepCounter = MIN_LONG; stepCounterOverflow = 0L; }

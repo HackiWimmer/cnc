@@ -6,6 +6,7 @@
 CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin)
 //////////////////////////////////////////////////////////////////////////////
 : INCREMENT_DIRECTION_VALUE(NORMALIZED_INCREMENT_DIRECTION_VALUE)
+, pwmProfile()
 , interrupted(false)
 , calculateDuration(false)
 , minReached(false)
@@ -16,15 +17,14 @@ CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, by
 , stepPin(stpPin)
 , limitPin(lmtPin)
 , axis(a)
-, steps(1L)
-, pitch(0.0)
-, validPitch(false)
 , dirPulseWidth(10)
 , lowPulsWidth(500)
 , highPulsWidth(500)
 , minPulsWidth(highPulsWidth + lowPulsWidth)
 , tsPrevStep(0L)
 , tsCurrStep(0L)
+, pitch(1.0)
+, steps(400)
 , avgStepDuartion(0L)
 , stepDirection(SD_UNKNOWN)
 , stepCounter(0L)
@@ -105,13 +105,6 @@ void CncStepper::incStepCounter() {
   stepCounter++;
 }
 //////////////////////////////////////////////////////////////////////////////
-void CncStepper::setPitch(const double p) { 
-//////////////////////////////////////////////////////////////////////////////
-  validPitch = ( p > 0.0 ); 
-  if ( validPitch ) 
-    pitch = p;
-}
-//////////////////////////////////////////////////////////////////////////////
 void CncStepper::reset() {
 //////////////////////////////////////////////////////////////////////////////
   stepDirection         = SD_UNKNOWN;
@@ -127,17 +120,6 @@ void CncStepper::reset() {
   resetStepCounter();
 }
 //////////////////////////////////////////////////////////////////////////////
-int32_t CncStepper::calcStepsForMM(int32_t mm) {
-//////////////////////////////////////////////////////////////////////////////
-  if ( isPitchValid() == false )
-    return 0;
-
-  if ( mm == 0 )
-    return 0;
-
-  return mm * steps / pitch;
-}  
-//////////////////////////////////////////////////////////////////////////////
 void CncStepper::sendCurrentLimitStates(bool force) {
 //////////////////////////////////////////////////////////////////////////////
   controller->sendCurrentLimitStates(force);
@@ -145,6 +127,7 @@ void CncStepper::sendCurrentLimitStates(bool force) {
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::broadcastInterrupt() {
 //////////////////////////////////////////////////////////////////////////////
+  interrupted = true;
   controller->broadcastInterrupt();
 }
 //////////////////////////////////////////////////////////////////////////////
@@ -294,7 +277,7 @@ unsigned char CncStepper::performNextStep() {
     return RET_INTERRUPT;
 
   if ( stepDirection == SD_UNKNOWN ) {
-    interrupted = true;
+    broadcastInterrupt();
     return RET_INTERRUPT;
   }
 

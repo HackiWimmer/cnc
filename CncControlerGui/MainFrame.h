@@ -191,7 +191,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void requestControllerPinsFromButton(wxCommandEvent& event);
 		virtual void requestPins(wxCommandEvent& event);
 		virtual void traceTextUpdated(wxCommandEvent& event);
-		virtual void ctrlTestCaseSelected(wxCommandEvent& event);
 		virtual void openPyCam(wxCommandEvent& event);
 		virtual void moveXToMid(wxCommandEvent& event);
 		virtual void moveYToMid(wxCommandEvent& event);
@@ -640,7 +639,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool processTestTemplate();
 		bool processTestInterval();
 		bool processTestDimensions();
-		bool processControllerTestSuite();
 		
 		void logTimeConsumed();
 		void logStatistics();
@@ -727,10 +725,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void registerGuiControl(wxWindow* ctl); 
 		void disableGuiControls();
 		void enableGuiControls(bool state = true);
-		
-		void decorateTestSuiteParameters();
-		void enableTestParameter(bool state);
-		void disableTestParameter() { enableTestParameter(false); }
 		
 		void enableSerialSpy(bool state = true);
 		void disableSerialSpy() { enableSerialSpy(false); }

@@ -60,7 +60,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncPatternDefinitions.h"
 #include "SvgUnitCalculator.h"
 #include "CncFileNameService.h"
-#include "CncControllerTestSuite.h"
 #include "CncFilePreviewWnd.h"
 #include "SVGPathHandlerCnc.h"
 #include "ManuallyParser.h"
@@ -492,7 +491,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btPathGenerator);
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
-	registerGuiControl(m_ctrlTestSelection);
 	registerGuiControl(m_portSelector);
 	registerGuiControl(m_testDimModeX);
 	registerGuiControl(m_testDimModeY);
@@ -1461,9 +1459,6 @@ void MainFrame::initialize(void) {
 	
 	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
 	
-	CncControllerTestSuite::fillTestCases(m_ctrlTestSelection);
-	decorateTestSuiteParameters();
-	
 	this->SetTitle(wxString(_programTitel) + " " + _programVersion);
 	
 	wxString cfgStr;
@@ -1487,13 +1482,6 @@ void MainFrame::initialize(void) {
 	m_speedConfigStepsX->SetValidator(val);
 	m_speedConfigStepsY->SetValidator(val);
 	m_speedConfigStepsZ->SetValidator(val);
-	
-	wxIntegerValidator<long> val9(NULL);
-	m_ctrlTestParam1->SetValidator(val9);
-	m_ctrlTestParam2->SetValidator(val9);
-	m_ctrlTestParam3->SetValidator(val9); 
-	m_ctrlTestParam4->SetValidator(val9);
-	m_ctrlTestParam5->SetValidator(val9);
 	
 	wxTextValidator tVal(wxFILTER_NUMERIC);
 	tVal.SetCharIncludes(", ");
@@ -2008,8 +1996,6 @@ void MainFrame::enableControls(bool state) {
 	// run control
 	enableRunControls(state);
 	
-	// test suite controls
-	enableTestParameter(state);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -2917,7 +2903,6 @@ bool MainFrame::processTestTemplate() {
 	if ( page != NULL ) {
 		if 		( page == m_testIntervalPage )	return processTestInterval();
 		else if ( page == m_testDimensions )	return processTestDimensions();
-		else if ( page == m_ctrlTestSuite )		return processControllerTestSuite();
 		//...
 		
 		wxString msg;
@@ -2935,33 +2920,6 @@ bool MainFrame::processTestTemplate() {
 	
 	std::cerr << "MainFrame::processTestTemplate(): Invalid page selection!" << std::endl;
 	return false;
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::processControllerTestSuite() {
-///////////////////////////////////////////////////////////////////
-	long id = atol(m_ctrlTestSelectedId->GetValue());
-	std::clog << "Run Test: " << CncControllerTestSuite::getTestCaseName(id) << endl;
-	
-	if ( cnc->isConnected() == false ) {
-		std::cerr << "Not connetced, nothing will be processed." << std::endl;
-		std::clog << "Test finished (" << CncControllerTestSuite::getTestCaseName(id) << ")" << endl;
-		return false;
-	}
-
-	if ( cnc->getSerial()->isEmulator() == true ) {
-		std::cerr << "No controller connected, nothing will be processed." << std::endl;
-		std::clog << "Test finished (" << CncControllerTestSuite::getTestCaseName(id) << ")" << endl;
-		return false;
-	}
-	
-	updateSetterList();
-	
-	// run test
-	bool ret = false;
-
-	
-	std::clog << "Test finished (" << CncControllerTestSuite::getTestCaseName(id) << ")" << endl;
-	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processTestInterval() {
@@ -6256,126 +6214,6 @@ void MainFrame::openMotionMonitorOptionDlg(wxCommandEvent& event) {
 	motionMonitor->showOptionDialog();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::enableTestParameter(bool state) {
-///////////////////////////////////////////////////////////////////
-	long id = 0;
-	m_ctrlTestSelectedId->GetValue().ToLong(&id);
-	int count = CncControllerTestSuite::getParameterCount(id);
-	
- 	m_ctrlTestParam1->Enable(false);
-	m_ctrlTestParam2->Enable(false);
-	m_ctrlTestParam3->Enable(false);
-	m_ctrlTestParam4->Enable(false);
-	m_ctrlTestParam5->Enable(false);
-					
-	switch ( count ) {
-		case 1: 	m_ctrlTestParam1->Enable(state);
-					break;
-					
-		case 2: 	m_ctrlTestParam1->Enable(state);
-					m_ctrlTestParam2->Enable(state);
-					break;
-					
-		case 3: 	m_ctrlTestParam1->Enable(state);
-					m_ctrlTestParam2->Enable(state);
-					m_ctrlTestParam3->Enable(state);
-					break;
-					
-		case 4: 	m_ctrlTestParam1->Enable(state);
-					m_ctrlTestParam2->Enable(state);
-					m_ctrlTestParam3->Enable(state);
-					m_ctrlTestParam4->Enable(state);
-					break;
-					
-		case 5: 	m_ctrlTestParam1->Enable(state);
-					m_ctrlTestParam2->Enable(state);
-					m_ctrlTestParam3->Enable(state);
-					m_ctrlTestParam4->Enable(state);
-					m_ctrlTestParam5->Enable(state);
-					break;
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::decorateTestSuiteParameters() {
-///////////////////////////////////////////////////////////////////
-	int sel = m_ctrlTestSelection->GetSelection();
-	wxString item = m_ctrlTestSelection->GetString(sel);
-	
-	m_ctrlTestParam1->Enable(false);
-	m_ctrlTestParam2->Enable(false);
-	m_ctrlTestParam3->Enable(false);
-	m_ctrlTestParam4->Enable(false);
-	m_ctrlTestParam5->Enable(false);
-	m_ctrlTestParam1->SetValue("");
-	m_ctrlTestParam2->SetValue("");
-	m_ctrlTestParam3->SetValue("");
-	m_ctrlTestParam4->SetValue("");
-	m_ctrlTestParam5->SetValue("");
-	
-	m_ctrlTestDescription->SetValue("");
-
-	if ( item.IsEmpty() == true )
-		return;
-	
-	long id = 0;
-	item.BeforeFirst(':').ToLong(&id);
-	
-	if ( id <= 0 || id > 100 )
-		return;
-		
-	m_ctrlTestSelectedId->SetValue(wxString::Format("%d", id));
-	m_ctrlTestDescription->SetValue(CncControllerTestSuite::getTestCaseDescrption(id));
-	
-	cnc->activatePositionCheck(false);
-	
-	int count = CncControllerTestSuite::getParameterCount(id);
-	switch ( count ) {
-		case 1:		m_ctrlTestParam1->Enable(true);
-					m_ctrlTestParam1->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue1(id)));
-					break;
-					
-		case 2:		m_ctrlTestParam1->Enable(true);
-					m_ctrlTestParam2->Enable(true);
-					m_ctrlTestParam1->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue1(id)));
-					m_ctrlTestParam2->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue2(id)));
-					break;
-					
-		case 3:		m_ctrlTestParam1->Enable(true);
-					m_ctrlTestParam2->Enable(true); 
-					m_ctrlTestParam3->Enable(true);
-					m_ctrlTestParam1->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue1(id)));
-					m_ctrlTestParam2->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue2(id)));
-					m_ctrlTestParam3->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue3(id)));
-					break;
-					
-		case 4:		m_ctrlTestParam1->Enable(true);
-					m_ctrlTestParam2->Enable(true); 
-					m_ctrlTestParam3->Enable(true); 
-					m_ctrlTestParam4->Enable(true); 
-					m_ctrlTestParam1->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue1(id)));
-					m_ctrlTestParam2->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue2(id)));
-					m_ctrlTestParam3->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue3(id)));
-					m_ctrlTestParam4->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue4(id)));
-					break;
-					
-		case 5:		m_ctrlTestParam1->Enable(true);
-					m_ctrlTestParam2->Enable(true); 
-					m_ctrlTestParam3->Enable(true); 
-					m_ctrlTestParam4->Enable(true); 
-					m_ctrlTestParam5->Enable(true); 
-					m_ctrlTestParam1->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue1(id)));
-					m_ctrlTestParam2->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue2(id)));
-					m_ctrlTestParam3->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue3(id)));
-					m_ctrlTestParam4->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue4(id)));
-					m_ctrlTestParam5->SetValue(wxString::Format("%d", CncControllerTestSuite::getDefaultValue5(id)));
-					break;
-					
-		default:	; // do nothing
-	}
-	
-	cnc->activatePositionCheck(true);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int sel = event.GetSelection();
@@ -6390,14 +6228,7 @@ void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 												decorateSwitchToolOnOff(m_testToggleTool->GetValue());
 												break;
 												
-		case TestBookSelection::VAL::SUITE:		decorateTestSuiteParameters();
-												break;
 	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::ctrlTestCaseSelected(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	decorateTestSuiteParameters();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceTextUpdated(wxCommandEvent& event) {

@@ -2501,165 +2501,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2275->Add(m_testToggleTool, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_ctrlTestSuite = new wxPanel(m_testCaseBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_testCaseBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_ctrlTestSuiteImgIndex;
-    m_ctrlTestSuiteImgIndex = m_testCaseBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-class")));
-    m_testCaseBook->AddPage(m_ctrlTestSuite, _("Ctrl Test Suite:"), false, m_ctrlTestSuiteImgIndex);
-    
-    wxFlexGridSizer* flexGridSizer24722 = new wxFlexGridSizer(10, 1, 0, 0);
-    flexGridSizer24722->SetFlexibleDirection( wxBOTH );
-    flexGridSizer24722->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer24722->AddGrowableCol(0);
-    m_ctrlTestSuite->SetSizer(flexGridSizer24722);
-    
-    wxFlexGridSizer* flexGridSizer21573253 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer21573253->SetFlexibleDirection( wxBOTH );
-    flexGridSizer21573253->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer21573253->AddGrowableCol(0);
-    
-    flexGridSizer24722->Add(flexGridSizer21573253, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer25094 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer25094->SetFlexibleDirection( wxBOTH );
-    flexGridSizer25094->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer25094->AddGrowableCol(1);
-    
-    flexGridSizer21573253->Add(flexGridSizer25094, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText21174365 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("CNC Test Suite:"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    wxFont m_staticText21174365Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText21174365->SetFont(m_staticText21174365Font);
-    
-    flexGridSizer25094->Add(m_staticText21174365, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_ctrlTestSelectedId = new wxTextCtrl(m_ctrlTestSuite, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), wxTE_RIGHT);
-    m_ctrlTestSelectedId->Enable(false);
-    #if wxVERSION_NUMBER >= 3000
-    m_ctrlTestSelectedId->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer25094->Add(m_ctrlTestSelectedId, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    
-    m_staticLine22535477 = new wxStaticLine(m_ctrlTestSuite, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer21573253->Add(m_staticLine22535477, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    wxFlexGridSizer* flexGridSizer24808 = new wxFlexGridSizer(4, 1, 0, 0);
-    flexGridSizer24808->SetFlexibleDirection( wxBOTH );
-    flexGridSizer24808->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer24808->AddGrowableCol(0);
-    flexGridSizer24808->AddGrowableRow(1);
-    
-    flexGridSizer24722->Add(flexGridSizer24808, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_staticText25139 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("Test Cases:"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    wxFont m_staticText25139Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText25139Font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_staticText25139->SetFont(m_staticText25139Font);
-    
-    flexGridSizer24808->Add(m_staticText25139, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_scrollWin2571 = new wxScrolledWindow(m_ctrlTestSuite, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,120)), wxHSCROLL|wxVSCROLL);
-    m_scrollWin2571->SetScrollRate(5, 5);
-    
-    flexGridSizer24808->Add(m_scrollWin2571, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer2573 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer2573->SetFlexibleDirection( wxBOTH );
-    flexGridSizer2573->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer2573->AddGrowableCol(0);
-    flexGridSizer2573->AddGrowableRow(0);
-    m_scrollWin2571->SetSizer(flexGridSizer2573);
-    
-    wxArrayString m_ctrlTestSelectionArr;
-    m_ctrlTestSelection = new wxListBox(m_scrollWin2571, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWin2571, wxSize(-1,-1)), m_ctrlTestSelectionArr, wxLB_HSCROLL|wxLB_SINGLE|wxHSCROLL|wxVSCROLL);
-    m_ctrlTestSelection->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    wxFont m_ctrlTestSelectionFont = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_ctrlTestSelectionFont.SetWeight(wxFONTWEIGHT_BOLD);
-    m_ctrlTestSelection->SetFont(m_ctrlTestSelectionFont);
-    
-    flexGridSizer2573->Add(m_ctrlTestSelection, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    m_scrollWin2571->SetMinSize(wxSize(-1,120));
-    
-    m_staticText251911 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("Description:"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    wxFont m_staticText251911Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
-    m_staticText251911Font.SetWeight(wxFONTWEIGHT_BOLD);
-    m_staticText251911->SetFont(m_staticText251911Font);
-    
-    flexGridSizer24808->Add(m_staticText251911, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_ctrlTestDescription = new wxTextCtrl(m_ctrlTestSuite, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,100)), wxTE_READONLY|wxTE_MULTILINE);
-    m_ctrlTestDescription->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
-    
-    flexGridSizer24808->Add(m_ctrlTestDescription, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    m_ctrlTestDescription->SetMinSize(wxSize(-1,100));
-    
-    wxFlexGridSizer* flexGridSizer248413 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer248413->SetFlexibleDirection( wxBOTH );
-    flexGridSizer248413->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer24722->Add(flexGridSizer248413, 1, wxALL|wxEXPAND, WXC_FROM_DIP(4));
-    
-    m_staticText2486121314 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("Test Parameter 1 - (4 Byte Integer)"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    m_staticText2486121314->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer248413->Add(m_staticText2486121314, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_ctrlTestParam1 = new wxTextCtrl(m_ctrlTestSuite, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), wxTE_RIGHT);
-    #if wxVERSION_NUMBER >= 3000
-    m_ctrlTestParam1->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer248413->Add(m_ctrlTestParam1, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
-    
-    m_staticText24861216 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("Test Parameter 2 - (4 Byte Integer)"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    m_staticText24861216->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer248413->Add(m_staticText24861216, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_ctrlTestParam2 = new wxTextCtrl(m_ctrlTestSuite, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), wxTE_RIGHT);
-    #if wxVERSION_NUMBER >= 3000
-    m_ctrlTestParam2->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer248413->Add(m_ctrlTestParam2, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
-    
-    m_staticText24861418 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("Test Parameter 3 - (4 Byte Integer)"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    m_staticText24861418->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer248413->Add(m_staticText24861418, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_ctrlTestParam3 = new wxTextCtrl(m_ctrlTestSuite, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), wxTE_RIGHT);
-    #if wxVERSION_NUMBER >= 3000
-    m_ctrlTestParam3->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer248413->Add(m_ctrlTestParam3, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
-    
-    m_staticText24861520 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("Test Parameter 4 - (4 Byte Integer)"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    m_staticText24861520->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer248413->Add(m_staticText24861520, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_ctrlTestParam4 = new wxTextCtrl(m_ctrlTestSuite, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), wxTE_RIGHT);
-    #if wxVERSION_NUMBER >= 3000
-    m_ctrlTestParam4->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer248413->Add(m_ctrlTestParam4, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
-    
-    m_staticText248622 = new wxStaticText(m_ctrlTestSuite, wxID_ANY, _("Test Parameter 5 - (4 Byte Integer)"), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), 0);
-    m_staticText248622->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
-    
-    flexGridSizer248413->Add(m_staticText248622, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_ctrlTestParam5 = new wxTextCtrl(m_ctrlTestSuite, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_ctrlTestSuite, wxSize(-1,-1)), wxTE_RIGHT);
-    #if wxVERSION_NUMBER >= 3000
-    m_ctrlTestParam5->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer248413->Add(m_ctrlTestParam5, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
-    
     m_mainBookPreviewPanel = new wxPanel(m_mainViewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainViewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_mainViewBook->AddPage(m_mainBookPreviewPanel, _("Page"), false);
     
@@ -5467,7 +5308,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_testDimTakeAll->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testDimTakeOverAll), NULL, this);
     m_testToggleEndSwitch->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testEndSwitchEvaluation), NULL, this);
     m_testToggleTool->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
-    m_ctrlTestSelection->Connect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::ctrlTestCaseSelected), NULL, this);
     m_monitorViewSelector->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::monitorViewSelectorSelected), NULL, this);
     m_outboundNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
     m_outboundNotebook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::outboundBookChanging), NULL, this);
@@ -5806,7 +5646,6 @@ MainFrameBClass::~MainFrameBClass()
     m_testDimTakeAll->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testDimTakeOverAll), NULL, this);
     m_testToggleEndSwitch->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testEndSwitchEvaluation), NULL, this);
     m_testToggleTool->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::testSwitchToolOnOff), NULL, this);
-    m_ctrlTestSelection->Disconnect(wxEVT_COMMAND_LISTBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::ctrlTestCaseSelected), NULL, this);
     m_monitorViewSelector->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::monitorViewSelectorSelected), NULL, this);
     m_outboundNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::outboundBookChanged), NULL, this);
     m_outboundNotebook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGING, wxNotebookEventHandler(MainFrameBClass::outboundBookChanging), NULL, this);
@@ -8039,7 +7878,7 @@ CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer5582->Add(flexGridSizer5591, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText5589 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial Port . . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText5589 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial Port. . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText5589Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText5589->SetFont(m_staticText5589Font);
     

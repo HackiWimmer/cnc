@@ -209,7 +209,6 @@ inline unsigned char processSetter() {
     return RET_ERROR;
   }
 
-
   // order the bytes
   lValue  = (long)b[0] << 24;
   lValue += (long)b[1] << 16;

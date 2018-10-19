@@ -133,6 +133,7 @@ class CncMotionMonitor : public wxGLCanvas {
 		int cameraRotationSpeed;
 		
 		bool isShown;
+		bool mouseMoveMode;
 		
 		float zoom;
 		

@@ -123,8 +123,7 @@ class TestBookSelection {
 			INTERVAL					= 0,
 			DIMENSION					= 1,
 			LIMIT						= 2,
-			TOOL						= 3,
-			SUITE						= 4
+			TOOL						= 3
 		};
 };
 

@@ -178,7 +178,6 @@
       <File Name="CncNumberFormatter.cpp"/>
       <File Name="CncArduino.cpp"/>
       <File Name="CncControl.cpp"/>
-      <File Name="CncControllerTestSuite.cpp"/>
       <File Name="CncFileNameService.cpp"/>
       <File Name="CncSvgCurveLib.cpp"/>
       <File Name="CncToolCorrection.cpp"/>
@@ -186,7 +185,6 @@
       <File Name="CncArduino.h"/>
       <File Name="CncCommon.h"/>
       <File Name="CncControl.h"/>
-      <File Name="CncControllerTestSuite.h"/>
       <File Name="CncFileNameService.h"/>
       <File Name="CncLimitStates.h"/>
       <File Name="CncPathListEntry.h"/>

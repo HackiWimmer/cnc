@@ -24,7 +24,9 @@
 class AccelerationProfile {
 
   private:
-    bool active;
+
+    enum Period { P_INACTIVE, P_ACCEL, P_TARGET, P_DEACCEL };
+    
     bool enabled;
     
     unsigned int startSpeedDelay;
@@ -36,15 +38,17 @@ class AccelerationProfile {
 
     int32_t startStepCountMark;
     int32_t stopStepCountMark;
-  
+
+    int32_t stepsToMove;
     int32_t stepCounter;
+
+    Period period;
 
   public:
   
     //////////////////////////////////////////////////////////////////
     explicit AccelerationProfile() 
-    : active(true)
-    , enabled(true)
+    : enabled(true)
     , startSpeedDelay(0)
     , stopSpeedDelay(0)
     , feedSpeedDelay(0)
@@ -52,7 +56,9 @@ class AccelerationProfile {
     , stopDelayDelta(0)
     , startStepCountMark(-1)
     , stopStepCountMark(-1)
+    , stepsToMove(0)
     , stepCounter(0)
+    , period(P_ACCEL)
     {}    
 
     /*
@@ -66,11 +72,10 @@ class AccelerationProfile {
     {} */   
     
     //////////////////////////////////////////////////////////////////
-    virtual ~AccelerationProfile(){
+    ~AccelerationProfile(){
     }
 
     //////////////////////////////////////////////////////////////////
-    bool isActive()             const { return active; }
     double getStartSpeedDelay() const { return startSpeedDelay; }
     double getStopSpeedDelay()  const { return stopSpeedDelay;  }
     double getFeedSpeedDelay()  const { return feedSpeedDelay;  }
@@ -87,7 +92,7 @@ class AccelerationProfile {
       friend std::ostream &operator<< (std::ostream &ostr, const AccelerationProfile &a) {
         
         ostr << "AccelerationProfile:" << std::endl;
-        ostr << " active               : " << a.active                  << std::endl;
+
         ostr << " startSpeedDelay      : " << a.startSpeedDelay         << std::endl;
         ostr << " stopSpeedDelay       : " << a.stopSpeedDelay          << std::endl;
         ostr << " feedSpeedDelay       : " << a.feedSpeedDelay          << std::endl;
@@ -98,6 +103,7 @@ class AccelerationProfile {
         ostr << " startStepCountMark   : " << a.startStepCountMark      << std::endl;
         ostr << " stopStepCountMark    : " << a.stopStepCountMark       << std::endl;
       
+        ostr << " stepToMove           : " << a.stepsToMove             << std::endl;
         ostr << " stepCounter          : " << a.stepCounter             << std::endl;   
 
         ostr << std::endl;
@@ -117,29 +123,30 @@ class AccelerationProfile {
     }
     
     //////////////////////////////////////////////////////////////////
-    bool calculate(const int32_t stepsToMove) {
-      int32_t stm = absolute(stepsToMove);
+    bool calculate(const int32_t stm) {
+      stepsToMove = absolute(stm);
       
       // always reset index
       stepCounter = 0;
 
       // total period long enough?
-      active = (stm > periodStepsMin && feedSpeedDelay > 0); 
+      bool active = (stepsToMove > periodStepsMin && feedSpeedDelay > 0); 
       if ( active == true ) {
         
         // determine periods
         startStepCountMark = startPeriodStepsMin;
-        stopStepCountMark  = stm - stopPeriodStepsMin;
+        stopStepCountMark  = stepsToMove - stopPeriodStepsMin;
 
         // determin deltas
         startDelayDelta = feedSpeedDelay <= startSpeedDelay ? (startSpeedDelay - feedSpeedDelay) / startStepCountMark : 0;
-        stopDelayDelta  = feedSpeedDelay <= stopSpeedDelay  ? (stopSpeedDelay  - feedSpeedDelay) / (stm - stopStepCountMark) : 0;
+        stopDelayDelta  = feedSpeedDelay <= stopSpeedDelay  ? (stopSpeedDelay  - feedSpeedDelay) / (stepsToMove - stopStepCountMark) : 0;
 
         if ( startDelayDelta <= 0 || stopDelayDelta <= 0 )
           active = false;
       } 
-      
-      if ( active == false && 0 ) {
+
+      // is total period to small?
+      if ( active == false ) {
         
         // determine periods
         startStepCountMark = 0;
@@ -147,7 +154,13 @@ class AccelerationProfile {
 
         // determin deltas
         startDelayDelta = 0;
-        stopDelayDelta  = 0;       
+        stopDelayDelta  = 0; 
+        
+        period = P_INACTIVE;
+        
+      } else {
+        period = P_ACCEL;
+        
       }
     
       return active;
@@ -156,31 +169,40 @@ class AccelerationProfile {
     //////////////////////////////////////////////////////////////////
     unsigned int getNextAccelDelay() {
 
-      // deavtivated - then nothing to add
-      if ( enabled == false )                       { return stepCounter++, 0; }
-      
-      // is configured speed to low - then nothing to add
-      if ( feedSpeedDelay >= startSpeedDelay )      { return stepCounter++, 0; }
-
-      // is total period to small - then add a delay to archive the start speed  
-      if ( active == false )                        { return stepCounter++, (startSpeedDelay - feedSpeedDelay); }
-      
-      // is targed period active - then nothing to add
-      if (        stepCounter > startStepCountMark && stepCounter < stopStepCountMark ) { 
+      // deactivated - then nothing to add
+      if ( enabled == false ) 
         return stepCounter++, 0; 
-        
-      } else if ( stepCounter <= startStepCountMark ) {
-        stepCounter++;
-        return startSpeedDelay - ((stepCounter -1) * startDelayDelta);
-        
-      } else if ( stepCounter >= stopStepCountMark ) {
-        stepCounter++;
-        return ( stepCounter - stopStepCountMark )* stopDelayDelta;
+      
+      // is configured speed smaller then startSpeedDelay - then nothing to add
+      if ( feedSpeedDelay >= startSpeedDelay )
+        return stepCounter++, 0; 
+
+      // increment index
+      stepCounter++;
+      
+      switch ( period ) {
+
+        case P_INACTIVE: {      return (startSpeedDelay - feedSpeedDelay);
+          
+        }
+        case P_ACCEL: {         if ( stepCounter >= startStepCountMark ) 
+                                  period = P_TARGET;
+
+                                return startSpeedDelay - ((stepCounter -1) * startDelayDelta);
+        }                         
+        case P_TARGET: {        if ( stepCounter >= stopStepCountMark )
+                                  period = P_DEACCEL;
+
+                                return 0;
+        }  
+        case P_DEACCEL: {       if ( stepCounter >= stepsToMove )
+                                  period = P_INACTIVE;
+          
+                                return ( stepCounter - stopStepCountMark ) * stopDelayDelta;             
+        }
       }
 
-      // error
-      
-      return 0;
+      return (startSpeedDelay - feedSpeedDelay);
     }
 };
 

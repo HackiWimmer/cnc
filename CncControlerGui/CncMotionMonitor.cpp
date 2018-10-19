@@ -67,6 +67,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
 , isShown(false)
+, mouseMoveMode(false)
 , zoom(2.0f)
 , currentClientID(-1L)
 {
@@ -372,12 +373,10 @@ void CncMotionMonitor::onEraseBackground(wxEraseEvent& event) {
 	
 	// and avoid flashing on MSW
 }
-#warning
-static bool moveMode = false;
 //////////////////////////////////////////////////
 void CncMotionMonitor::onLeave(wxMouseEvent& event) {
 //////////////////////////////////////////////////
-	moveMode = false;
+	mouseMoveMode = false;
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onMouse(wxMouseEvent& event) {
@@ -400,19 +399,18 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		static int lx = 0, ly = 0;
 		static int mx = 0, my = 0;
 		
-		
-		if ( event.LeftDown() == true && moveMode == false ) {
+		if ( event.LeftDown() == true && mouseMoveMode == false ) {
 			lx = monitor->getLastReshapeX();
 			ly = cs.GetHeight() - monitor->getLastReshapeY();
 			
 			mx = event.GetX();
 			my = event.GetY();
 			
-			moveMode = true;
+			mouseMoveMode = true;
 		}
 		
 		// calculate new origin
-		if ( moveMode == true ) {
+		if ( mouseMoveMode == true ) {
 			const int dx = event.GetX() - mx;
 			const int dy = event.GetY() - my;
 			
@@ -425,7 +423,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 		
 		// reset move mode
 		if ( event.LeftUp() == true ) {
-			moveMode = false;
+			mouseMoveMode = false;
 		}
 
 	// set origin

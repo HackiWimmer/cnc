@@ -45,9 +45,8 @@
 #include <wx/checkbox.h>
 #include <wx/listbook.h>
 #include <wx/spinctrl.h>
-#include <wx/scrolwin.h>
-#include <wx/listbox.h>
 #include "CncZView.h"
+#include <wx/scrolwin.h>
 #include <wx/listctrl.h>
 #include <wx/webview.h>
 #include <wx/splitter.h>
@@ -373,25 +372,6 @@ protected:
     wxStaticText* m_staticText211726;
     wxStaticLine* m_staticLine225337;
     wxToggleButton* m_testToggleTool;
-    wxPanel* m_ctrlTestSuite;
-    wxStaticText* m_staticText21174365;
-    wxTextCtrl* m_ctrlTestSelectedId;
-    wxStaticLine* m_staticLine22535477;
-    wxStaticText* m_staticText25139;
-    wxScrolledWindow* m_scrollWin2571;
-    wxListBox* m_ctrlTestSelection;
-    wxStaticText* m_staticText251911;
-    wxTextCtrl* m_ctrlTestDescription;
-    wxStaticText* m_staticText2486121314;
-    wxTextCtrl* m_ctrlTestParam1;
-    wxStaticText* m_staticText24861216;
-    wxTextCtrl* m_ctrlTestParam2;
-    wxStaticText* m_staticText24861418;
-    wxTextCtrl* m_ctrlTestParam3;
-    wxStaticText* m_staticText24861520;
-    wxTextCtrl* m_ctrlTestParam4;
-    wxStaticText* m_staticText248622;
-    wxTextCtrl* m_ctrlTestParam5;
     wxPanel* m_mainBookPreviewPanel;
     wxPanel* m_filePreviewPlaceholder;
     wxPanel* m_panel4398;
@@ -837,7 +817,6 @@ protected:
     virtual void testDimTakeOverAll(wxCommandEvent& event) { event.Skip(); }
     virtual void testEndSwitchEvaluation(wxCommandEvent& event) { event.Skip(); }
     virtual void testSwitchToolOnOff(wxCommandEvent& event) { event.Skip(); }
-    virtual void ctrlTestCaseSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void monitorViewSelectorSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void outboundBookChanging(wxNotebookEvent& event) { event.Skip(); }
@@ -1263,25 +1242,6 @@ public:
     wxStaticLine* GetStaticLine225337() { return m_staticLine225337; }
     wxToggleButton* GetTestToggleTool() { return m_testToggleTool; }
     wxPanel* GetTestToolPage() { return m_testToolPage; }
-    wxStaticText* GetStaticText21174365() { return m_staticText21174365; }
-    wxTextCtrl* GetCtrlTestSelectedId() { return m_ctrlTestSelectedId; }
-    wxStaticLine* GetStaticLine22535477() { return m_staticLine22535477; }
-    wxStaticText* GetStaticText25139() { return m_staticText25139; }
-    wxListBox* GetCtrlTestSelection() { return m_ctrlTestSelection; }
-    wxScrolledWindow* GetScrollWin2571() { return m_scrollWin2571; }
-    wxStaticText* GetStaticText251911() { return m_staticText251911; }
-    wxTextCtrl* GetCtrlTestDescription() { return m_ctrlTestDescription; }
-    wxStaticText* GetStaticText2486121314() { return m_staticText2486121314; }
-    wxTextCtrl* GetCtrlTestParam1() { return m_ctrlTestParam1; }
-    wxStaticText* GetStaticText24861216() { return m_staticText24861216; }
-    wxTextCtrl* GetCtrlTestParam2() { return m_ctrlTestParam2; }
-    wxStaticText* GetStaticText24861418() { return m_staticText24861418; }
-    wxTextCtrl* GetCtrlTestParam3() { return m_ctrlTestParam3; }
-    wxStaticText* GetStaticText24861520() { return m_staticText24861520; }
-    wxTextCtrl* GetCtrlTestParam4() { return m_ctrlTestParam4; }
-    wxStaticText* GetStaticText248622() { return m_staticText248622; }
-    wxTextCtrl* GetCtrlTestParam5() { return m_ctrlTestParam5; }
-    wxPanel* GetCtrlTestSuite() { return m_ctrlTestSuite; }
     wxListbook* GetTestCaseBook() { return m_testCaseBook; }
     wxPanel* GetMainBookTest() { return m_mainBookTest; }
     wxPanel* GetFilePreviewPlaceholder() { return m_filePreviewPlaceholder; }
