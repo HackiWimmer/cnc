@@ -229,15 +229,13 @@ struct I2CData {
   const unsigned char PID_SEPARATOR                       =  26;
   const unsigned char PID_QUERY_READY_TO_RUN              =  27;
   
-  const unsigned char PID_SPEED_CONTROLLER                =  30;
-  const unsigned char PID_SPEED_OFFSET                    =  31;
-  const unsigned char PID_SPEED_OFFSET_X                  =  32;
-  const unsigned char PID_SPEED_OFFSET_Y                  =  33;
-  const unsigned char PID_SPEED_OFFSET_Z                  =  34;
-  const unsigned char PID_STEPS_X                         =  35;
-  const unsigned char PID_STEPS_Y                         =  36;
-  const unsigned char PID_STEPS_Z                         =  37;
-  const unsigned char PID_LAST_STEP_DIR                   =  38;
+  const unsigned char PID_STEPS_X                         =  30;
+  const unsigned char PID_STEPS_Y                         =  31;
+  const unsigned char PID_STEPS_Z                         =  32;
+  const unsigned char PID_LAST_STEP_DIR                   =  33;
+  const unsigned char PID_ACCEL_PROFILE                   =  34;
+  const unsigned char PID_ACCEL_START_SPEED               =  35;
+  const unsigned char PID_ACCEL_STOP_SPEED                =  36;
      
   const unsigned char PID_MIN_SWITCH                      =  40;
   const unsigned char PID_MAX_SWITCH                      =  41;
@@ -270,20 +268,20 @@ struct I2CData {
   const unsigned char PID_AXIS                            =  70;
   const unsigned char PID_COMMON                          =  71;
   const unsigned char PID_STEPS                           =  72;
-  const unsigned char PID_STEP_MULTIPLIER                 =  73;
-  const unsigned char PID_STEP_PIN                        =  74;
-  const unsigned char PID_DIR_PIN                         =  75;
-  const unsigned char PID_ENABLE_STEPPERS                 =  76;
-  const unsigned char PID_AVG_STEP_DURATION               =  77;
+  const unsigned char PID_STEP_PIN                        =  73;
+  const unsigned char PID_DIR_PIN                         =  74;
+  const unsigned char PID_ENABLE_STEPPERS                 =  75;
+  const unsigned char PID_AVG_STEP_DURATION               =  76;
 
   const unsigned char PID_TEST_INTERRUPT                  =  80;
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_X     =  81;
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_Y     =  82;
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_Z     =  83;
-  
-  const unsigned char PID_SPEED_CTRL_INITIALIZED          =  90;
-  const unsigned char PID_SPEED_CTRL_TOTAL_OFFSET         =  91;
-  const unsigned char PID_SPEED_CTRL_RPM                  =  92;
+
+  const unsigned char PID_SPEED_CONTROLLER                =  90;
+  const unsigned char PID_SPEED_CTRL_INITIALIZED          =  91;
+  const unsigned char PID_SPEED_CTRL_TOTAL_OFFSET         =  92;
+  const unsigned char PID_SPEED_CTRL_RPM                  =  93;
   const unsigned char PID_SPEED_CTRL_SYNTH_SPEED_DELAY    =  94;
   const unsigned char PID_SPEED_CTRL_MAX_SPEED            =  95;
   const unsigned char PID_SPEED_CTRL_CFG_SPEED            =  96;
@@ -360,15 +358,12 @@ struct I2CData {
   const unsigned char E_UNKNOW_COMMAND                    =   1;
   const unsigned char E_INVALID_PARAM_ID                  =   2;
   const unsigned char E_INVALID_PARAM_STREAM              =   3;
-  const unsigned char E_GETTER_ID_NOT_FOUND               =   4;
-  const unsigned char E_INVALID_GETTER_ID                 =   5;
-  const unsigned char E_INVALID_GETTER_LIST_COUNT         =   6;
-  const unsigned char E_INVALID_MOVE_CMD                  =   7;
+  const unsigned char E_INVALID_PARAM_STREAM_LEN          =   4;
+  const unsigned char E_GETTER_ID_NOT_FOUND               =   5;
+  const unsigned char E_INVALID_GETTER_ID                 =   6;
+  const unsigned char E_INVALID_GETTER_LIST_COUNT         =   7;
+  const unsigned char E_INVALID_MOVE_CMD                  =   8;
 
-  const unsigned char E_INVALID_TEST_ID                   =  10;
-  const unsigned char E_NOT_KNOWN_TEST_ID                 =  11;
-  const unsigned char E_INVALID_PARAMETER                 =  12;
-  
   const unsigned char E_STEPPER_NOT_ENALED                =  20;
   const unsigned char E_STEPPER_NOT_INITIALIZED           =  21;
   const unsigned char E_TOOL_NOT_ENALED                   =  22;
@@ -438,7 +433,7 @@ struct I2CData {
   const int16_t DIRECTION_INC                            = +1;
   const int16_t DIRECTION_DEC                            = -1;
 
-  const int16_t MAX_PARAM_SIZE                           = 64;
+  const int16_t MAX_SETTER_VALUES                        = 16;
   const int16_t MAX_MOVE_CMD_SIZE                        = 16;
   
   const int32_t DBL_FACT                                 = 1000;

@@ -47,7 +47,7 @@ class AccelerationProfile {
   public:
   
     //////////////////////////////////////////////////////////////////
-    explicit AccelerationProfile() 
+    AccelerationProfile() 
     : enabled(true)
     , startSpeedDelay(0)
     , stopSpeedDelay(0)
@@ -124,6 +124,10 @@ class AccelerationProfile {
     
     //////////////////////////////////////////////////////////////////
     bool calculate(const int32_t stm) {
+      
+      if ( enabled == false )
+        return true; 
+      
       stepsToMove = absolute(stm);
       
       // always reset index
@@ -153,8 +157,8 @@ class AccelerationProfile {
         stopStepCountMark  = 0;
 
         // determin deltas
-        startDelayDelta = 0;
-        stopDelayDelta  = 0; 
+        startDelayDelta    = 0;
+        stopDelayDelta     = 0; 
         
         period = P_INACTIVE;
         
@@ -215,6 +219,9 @@ class CncSpeedController {
   
     struct Axis {
       char            axis                = '?';
+      
+      AccelerationProfile AP;
+      
       bool            initialized         = false;
       bool            speedConfigured     = false;
       
@@ -241,6 +248,7 @@ class CncSpeedController {
       //////////////////////////////////////////////////////////////////
       Axis()
       : axis('#')
+      , AP()
       , initialized(false)
       , speedConfigured(false)
       {}
@@ -248,12 +256,14 @@ class CncSpeedController {
       //////////////////////////////////////////////////////////////////
       Axis(const char a)
       : axis(a)
+      , AP()
       , initialized(false)
       , speedConfigured(false)
       {}
 
       Axis(const Axis& a)
       : axis(a.axis)
+      , AP()
       , initialized(a.initialized)
       , speedConfigured(a.speedConfigured)
       {}
@@ -319,7 +329,6 @@ class CncSpeedController {
               Serial.print(Pid);   Serial.print(TEXT_SEPARATOR); \
               Serial.print(value); Serial.write(TEXT_CLOSE); 
               
-
               PRINT_PARAMETER_L1(PID_AXIS,                              axis)
               PRINT_PARAMETER_L2(PID_STEPS,                             steps)
               PRINT_PARAMETER_L2(PID_SPEED_CTRL_TOTAL_OFFSET,           totalOffset)
@@ -328,7 +337,7 @@ class CncSpeedController {
 
               PRINT_PARAMETER_L3(PID_SPEED_CTRL_RPM,                    rpm)
               PRINT_PARAMETER_L3(PID_SPEED_CTRL_SYNTH_SPEED_DELAY,      synthSpeedDelay)
-
+   
           #undef PRINT_PARAMETER_L1
           #undef PRINT_PARAMETER_L2
           #undef PRINT_PARAMETER_L3
@@ -362,52 +371,20 @@ class CncSpeedController {
       #endif
     };
 
-    bool initialized;
     double configuredFeedSpeed_MM_SEC;
     double realtimeFeedSpeed_MM_SEC;
 
-   //////////////////////////////////////////////////////////////////
-   void setupAccelerationProfile(const char axis, unsigned int s, double p, unsigned int oR, unsigned int oS, unsigned int tPW,
-                                 double startSpeed, double stopSpeed) 
-   {
-      Axis AccelCalcStart, AccelCalcStop;
-      AccelCalcStart.setup(s, p, oR, oS, tPW);
-      AccelCalcStop.setup(s, p, oR, oS, tPW);
-
-      switch ( axis ) {
-        case 'X': AccelCalcStart.calculateStatics(startSpeed);
-                  AccelCalcStop.calculateStatics(stopSpeed);
-                  APX.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay); 
-                  break;
-                  
-        case 'Y': AccelCalcStart.calculateStatics(startSpeed);
-                  AccelCalcStop.calculateStatics(stopSpeed);
-                  APY.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay); 
-                  break;
-                  
-        case 'Z': AccelCalcStart.calculateStatics(startSpeed);
-                  AccelCalcStop.calculateStatics(stopSpeed);
-                  APZ.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay);  
-                  break;
-      }
-    }
-    
   public:
     
     Axis X, Y, Z;
-    AccelerationProfile APX, APY, APZ;
 
     //////////////////////////////////////////////////////////////////
     CncSpeedController()
-    : initialized(false)
-    , configuredFeedSpeed_MM_SEC(0.0)
+    : configuredFeedSpeed_MM_SEC(0.0)
     , realtimeFeedSpeed_MM_SEC(0.0)
     , X('X')
     , Y('Y')
     , Z('Z')
-    , APX() 
-    , APY() 
-    , APZ()
     {}
 
     virtual ~CncSpeedController()
@@ -415,22 +392,22 @@ class CncSpeedController {
 
     //////////////////////////////////////////////////////////////////////////
     virtual void initMove(int32_t dx, int32_t dy, int32_t dz) {
-      APX.calculate(dx);
-      APY.calculate(dy);
-      APZ.calculate(dz);
+      X.AP.calculate(dx);
+      Y.AP.calculate(dy);
+      Z.AP.calculate(dz);
     }
 
     //////////////////////////////////////////////////////////////////////////
     virtual void completeMove() {}
 
     //////////////////////////////////////////////////////////////////////////
-    unsigned int getNextAccelDelayX()            { return APX.getNextAccelDelay(); }
-    unsigned int getNextAccelDelayY()            { return APY.getNextAccelDelay(); }
-    unsigned int getNextAccelDelayZ()            { return APZ.getNextAccelDelay(); }
+    unsigned int getNextAccelDelayX()            { return X.AP.getNextAccelDelay(); }
+    unsigned int getNextAccelDelayY()            { return Y.AP.getNextAccelDelay(); }
+    unsigned int getNextAccelDelayZ()            { return Z.AP.getNextAccelDelay(); }
 
-    void enableAccelerationX(bool state)         { APX.enable(state); }
-    void enableAccelerationY(bool state)         { APY.enable(state); }
-    void enableAccelerationZ(bool state)         { APZ.enable(state); }
+    void enableAccelerationX(bool state)         { X.AP.enable(state); }
+    void enableAccelerationY(bool state)         { Y.AP.enable(state); }
+    void enableAccelerationZ(bool state)         { Z.AP.enable(state); }
 
     void enableAccelerationXYZ(bool state)       { enableAccelerationX(state); enableAccelerationY(state); enableAccelerationZ(state);}
     
@@ -439,8 +416,8 @@ class CncSpeedController {
     bool isSpeedConfigured()               const { return X.isSpeedConfigured() && Y.isSpeedConfigured() && Z.isSpeedConfigured(); }
   
     //////////////////////////////////////////////////////////////////
-    double getMaxFeedSpeed_MM_MIN() const { return minimum(X.maxDistPerMinute, Y.maxDistPerMinute, Z.maxDistPerMinute); }
-    double getMaxFeedSpeed_MM_SEC() const { return minimum(X.maxDistPerSecond, Y.maxDistPerSecond, Z.maxDistPerSecond); }
+    double getMaxFeedSpeed_MM_MIN()        const { return minimum(X.maxDistPerMinute, Y.maxDistPerMinute, Z.maxDistPerMinute); }
+    double getMaxFeedSpeed_MM_SEC()        const { return minimum(X.maxDistPerSecond, Y.maxDistPerSecond, Z.maxDistPerSecond); }
     
     //////////////////////////////////////////////////////////////////
     double getConfiguredFeedSpeed_MM_MIN() const { return configuredFeedSpeed_MM_SEC * 60; }
@@ -452,20 +429,27 @@ class CncSpeedController {
     void setRealtimeFeedSpeed_MM_SEC(const double s) { realtimeFeedSpeed_MM_SEC = (s > 0 ? s : 0.0); } 
        
     //////////////////////////////////////////////////////////////////
-    void setup(const char axis, unsigned int s, double p, unsigned int oR, unsigned int oS, unsigned int tPW) {
+    void setup(const char axis, unsigned int s, double p, 
+               unsigned int oR, unsigned int oS, unsigned int tPW,
+               int32_t startSpeed_MM_SEC = 5, int32_t stopSpeed_MM_SEC = 5) 
+    {
+      Axis AccelCalcStart, AccelCalcStop;
+      AccelCalcStart.setup(s, p, oR, oS, tPW);
+      AccelCalcStop.setup(s, p, oR, oS, tPW);
       
-      #ifdef SKETCH_COMPILE
-        #warning move this to config
-      #endif
-      const double startSpeed = 15.0; // mm/sec
-      const double stopSpeed  = 15.0;
+      AccelCalcStart.calculateStatics(startSpeed_MM_SEC);
+      AccelCalcStop.calculateStatics(stopSpeed_MM_SEC);
 
-      setupAccelerationProfile(axis, s, p, oR, oS, tPW, startSpeed, stopSpeed);
-      
       switch ( axis ) {
-        case 'X': X.setup(s, p, oR, oS, tPW); break;
-        case 'Y': Y.setup(s, p, oR, oS, tPW); break;
-        case 'Z': Z.setup(s, p, oR, oS, tPW); break;
+        case 'X': X.setup(s, p, oR, oS, tPW);
+                  X.AP.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay); 
+                  break;
+        case 'Y': Y.setup(s, p, oR, oS, tPW);
+                  Y.AP.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay); 
+                  break;
+        case 'Z': Z.setup(s, p, oR, oS, tPW);
+                  Z.AP.setup(AccelCalcStart.synthSpeedDelay, AccelCalcStop.synthSpeedDelay);  
+                  break;
       }
     }
     
@@ -478,9 +462,9 @@ class CncSpeedController {
       Y.calculateStatics(configuredFeedSpeed_MM_SEC);
       Z.calculateStatics(configuredFeedSpeed_MM_SEC);
 
-      APX.initFeedSpeedDelay(X.synthSpeedDelay);
-      APY.initFeedSpeedDelay(Y.synthSpeedDelay);
-      APZ.initFeedSpeedDelay(Z.synthSpeedDelay);      
+      X.AP.initFeedSpeedDelay(X.synthSpeedDelay);
+      Y.AP.initFeedSpeedDelay(Y.synthSpeedDelay);
+      Z.AP.initFeedSpeedDelay(Z.synthSpeedDelay);      
     }
     
     //////////////////////////////////////////////////////////////////

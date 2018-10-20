@@ -38,14 +38,22 @@ class CncControl {
 		
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
-			unsigned char 	id;
-			int32_t			value;
+			unsigned char 	pid;
+			SetterValueList values;
 			
 			SetterTuple(unsigned char i, int32_t v)
-			: id(i)
-			, value(v)
+			: pid(i)
+			, values()
+			{
+				values.push_back(v);
+			}
+			
+			SetterTuple(unsigned char i, SetterValueList v)
+			: pid(i)
+			, values(v)
 			{}
 		};
+		typedef std::vector<SetterTuple> Setters;
 		
 		SetterMap setterMap;
 		
@@ -280,8 +288,9 @@ class CncControl {
 		// validates pc and controller positions
 		bool validateAppAgainstCtlPosition();
 		// processing the given setter values
-		bool processSetter(unsigned char id, int32_t value);
-		bool processSetterList(std::vector<SetterTuple>& setup);
+		bool processSetter(unsigned char pid, int32_t value);
+		bool processSetter(unsigned char pid, const SetterValueList& values);
+		bool processSetterList(const Setters& setup);
 		// Change the current speed parameter
 		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeed s = CncSpeedUserDefined);
 		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeed s = CncSpeedUserDefined);
@@ -329,7 +338,7 @@ class CncControl {
 		// controller configuration output
 		bool hasControllerConfigControl();
 		void clearControllerConfigControl();
-		void appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value);
+		void appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value, const char* unit);
 		
 		// controller pin report
 		bool hasControllerPinControl();

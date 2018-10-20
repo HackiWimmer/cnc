@@ -21,8 +21,9 @@ class CncSetterListCtrl : public CncLargeScaledListCtrl {
 		static const int COL_PID 		= 2;
 		static const int COL_KEY 		= 3;
 		static const int COL_VAL 		= 4;
+		static const int COL_UNIT 		= 5;
 		
-		static const int TOTAL_COL_COUNT	= 5;
+		static const int TOTAL_COL_COUNT	= 6;
 		
 		CncSetterListCtrl(wxWindow *parent, long style);
 		virtual ~CncSetterListCtrl();

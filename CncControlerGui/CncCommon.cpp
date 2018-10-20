@@ -1,6 +1,18 @@
 #include "CncCommon.h"
 
 //////////////////////////////////////////////////////////////
+void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor) {
+//////////////////////////////////////////////////////////////
+	unsigned int counter = 0;
+	for ( auto it=values.begin(); it != values.end(); it++) {
+		if ( factor == 1 ) 	s << wxString::Format("%ld",   *it);
+		else				s << wxString::Format("%.2lf", (double)(*it)/factor);
+		
+		if ( ++counter != values.size() )
+			s << ", ";
+	}
+}
+//////////////////////////////////////////////////////////////
 bool cnc::dblCompare( double a, double b, double eps) {
 //////////////////////////////////////////////////////////////
 	return std::abs(a - b) <= eps; 

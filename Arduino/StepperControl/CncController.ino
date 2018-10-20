@@ -2,8 +2,6 @@
 #include "CommonFunctions.h"
 #include "CommonValues.h"
 
-
-
 /////////////////////////////////////////////////////////////////////////////////////
 struct RenderStruct {
 
@@ -122,9 +120,34 @@ int32_t CncController::isReadyToRun() {
 ////////////////////////////////////////////////////////////////////////////////////
 void CncController::setupSpeedController() {
 /////////////////////////////////////////////////////////////////////////////////////
-  speedController.setup('X', X->getSteps(), X->getPitch(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, X->getLowPulseWidth() + X->getHighPulseWidth());
-  speedController.setup('Y', Y->getSteps(), Y->getPitch(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, Y->getLowPulseWidth() + Y->getHighPulseWidth());
-  speedController.setup('Z', Z->getSteps(), Z->getPitch(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, Z->getLowPulseWidth() + Z->getHighPulseWidth());
+  typedef RenderStruct RS;
+  
+  speedController.setup('X', X->getSteps(), X->getPitch(), 
+                        SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, X->getLowPulseWidth() + X->getHighPulseWidth(),
+                        RS::pwmPX.startSpeed_MM_SEC, RS::pwmPX.stopSpeed_MM_SEC
+                       );
+                       
+  speedController.setup('Y', Y->getSteps(), Y->getPitch(), 
+                        SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, Y->getLowPulseWidth() + Y->getHighPulseWidth(),
+                        RS::pwmPY.startSpeed_MM_SEC, RS::pwmPY.stopSpeed_MM_SEC
+                       );
+                       
+  speedController.setup('Z', Z->getSteps(), Z->getPitch(), 
+                        SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, Z->getLowPulseWidth() + Z->getHighPulseWidth(),
+                        RS::pwmPZ.startSpeed_MM_SEC, RS::pwmPZ.stopSpeed_MM_SEC
+                       );
+}
+/////////////////////////////////////////////////////////////////////////////////////
+void CncController::setupAccelProfile(int32_t v1, int32_t v2, int32_t v3, int32_t v4, int32_t v5, int32_t v6) {
+/////////////////////////////////////////////////////////////////////////////////////
+  typedef RenderStruct RS;
+  
+  RS::pwmPX.startSpeed_MM_SEC = v1;
+  RS::pwmPX.stopSpeed_MM_SEC  = v2;
+  RS::pwmPY.startSpeed_MM_SEC = v3;
+  RS::pwmPY.stopSpeed_MM_SEC  = v4;
+  RS::pwmPZ.startSpeed_MM_SEC = v5;
+  RS::pwmPZ.stopSpeed_MM_SEC  = v6;
 }
 //////////////////////////////////////////////////////////////////////////////
 bool CncController::enableStepperPin(bool state){
@@ -806,12 +829,15 @@ void CncController::setSpeedValue(double fm) {
     RS::pwmPX.speedDelay = speedController.X.synthSpeedDelay;
     RS::pwmPY.speedDelay = speedController.Y.synthSpeedDelay;
     RS::pwmPZ.speedDelay = speedController.Z.synthSpeedDelay;
+    speedController.enableAccelerationXYZ(true);
     
   } else {
     
     RS::pwmPX.speedDelay = 0;
     RS::pwmPY.speedDelay = 0;
     RS::pwmPZ.speedDelay = 0;
+    speedController.enableAccelerationXYZ(false);
   }
 }
+
 

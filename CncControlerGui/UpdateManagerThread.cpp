@@ -182,7 +182,7 @@ void UpdateManagerThread::popAndFormatSetterQueue() {
 		setterQueue.pop(lste);
 		unsigned char pid = lste.set.id;
 		
-		setterRow.updateItem(CncSetterListCtrl::COL_NUM, 	wxString::Format("%010lu", 		count + 1));
+		setterRow.updateItem(CncSetterListCtrl::COL_NUM, 	wxString::Format("%06lu", 		count%1000000 + 1));
 		setterRow.updateItem(CncSetterListCtrl::COL_PID, 	wxString::Format("%u", 			pid));
 		
 		if ( pid == PID_SEPARATOR ) {
@@ -190,23 +190,24 @@ void UpdateManagerThread::popAndFormatSetterQueue() {
 			wxString portName;
 			pHandler->getCurrentPortName(portName);
 			
-			switch ( lste.set.value ) {
+			int32_t value = lste.set.values.front();
+			switch ( value ) {
 				case SEPARARTOR_SETUP:		label.assign(wxString::Format("Bookmark: Type(<SETUP>[%s])", portName)); break;
 				case SEPARARTOR_RESET:		label.assign(wxString::Format("Bookmark: Type(<RESET>[%s])", portName)); break;
 				case SEPARARTOR_RUN:		label.assign(wxString::Format("Bookmark: Type(<RUN>[%s])",   portName)); break;
 			}
-			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		wxString::Format("%ld", lste.set.value));
+			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		wxString::Format("%ld", value));
 			setterRow.updateItem(CncSetterListCtrl::COL_KEY, 		label);
 			setterRow.updateItem(CncSetterListCtrl::COL_VAL, 		wxString::Format("%s.%03ld", 	lste.ts.FormatTime(), lste.ts.GetMillisecond()));
 			
 		} else {
 			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		"");
 			setterRow.updateItem(CncSetterListCtrl::COL_KEY, 		wxString::Format("%s", 			ArduinoPIDs::getPIDLabel((int)pid, retVal)));
-			
-			if ( pid >= PID_DOUBLE_RANG_START )	
-				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%.2lf", 		(double)(lste.set.value/1000)));
-			else
-				setterRow.updateItem(CncSetterListCtrl::COL_VAL, 	wxString::Format("%ld", 		lste.set.value));
+			setterRow.updateItem(CncSetterListCtrl::COL_UNIT, 		wxString::Format("%s", 			ArduinoPIDs::getPIDUnit((int)pid, retVal)));
+
+			std::stringstream ss;
+			traceSetterValueList(ss, lste.set.values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
+			setterRow.updateItem(CncSetterListCtrl::COL_VAL, wxString::Format("%s", ss.str()));
 		}
 		
 		setterStringQueue.push(setterRow);

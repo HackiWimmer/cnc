@@ -156,7 +156,15 @@ const CncDoublePosition::Watermarks CncControl::getWaterMarksMetric() {
 	return retValue;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::processSetter(unsigned char id, int32_t value) {
+bool CncControl::processSetter(unsigned char pid, int32_t value) {
+///////////////////////////////////////////////////////////////////
+	SetterValueList values;
+	values.push_back(value);
+	
+	return processSetter(pid, values);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::processSetter(unsigned char pid, const SetterValueList& values) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() )
 		return false;
@@ -164,27 +172,38 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 	if ( isConnected() == false )
 		return false;
 	
-	if ( id != PID_SEPARATOR ) {
+	if ( pid != PID_SEPARATOR ) {
 		
 		if ( GBL_CONFIG->getAvoidDupSetterValuesFlag() ) {
-			auto it = setterMap.find((int)id);
+			auto it = setterMap.find((int)pid);
 			if ( it != setterMap.end() ) {
-				// value dosen't changed
-				if ( it->second == value )
-					return true;
+				// any value(s) are changed?
+				SetterValueList smvl = it->second;
+				if ( smvl.size() == values.size() ) {
+					bool somethingChanged = false;
+					auto itvv=values.begin();
+					for ( auto itmv=smvl.begin(); itmv != smvl.end(); itmv++, itvv++) {
+						if ( *itmv != *itvv ) {
+							somethingChanged = true;
+							break;
+						}
+					}
+					if ( somethingChanged == false )
+						return true;
+				}
 			}
 		}
 			
-		if ( serialPort->processSetter(id, value) == false ) {
-			std::cerr << std::endl << "CncControl::processSetterList: Setter failed." << std::endl;
-			std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)id) << std::endl;
-			std::cerr << " Value: " << value << std::endl;
-
+		if ( serialPort->processSetter(pid, values) == false ) {
+			std::cerr << std::endl << "CncControl::processSetter: Setter failed." << std::endl;
+			std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)pid) << std::endl;
+			std::cerr << " Value(s): ";
+			traceSetterValueList(std::cerr, values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
 			return false;
 		}
 		
 		// store
-		setterMap[id] = value;
+		setterMap[pid] = values;
 	}
 	
 	// publish setter event
@@ -192,17 +211,24 @@ bool CncControl::processSetter(unsigned char id, int32_t value) {
 	static Event evt;
 	
 	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SetterEvent(id, value));
+		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SetterEvent(pid, values));
+		
+	if ( THE_APP != NULL ) {
+		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
+		wxPostEvent(THE_APP->GetBtRefreshSetterList(), evt);
+	}
 
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::processSetterList(std::vector<SetterTuple>& setup) {
+bool CncControl::processSetterList(const Setters& setup) {
 ///////////////////////////////////////////////////////////////////
-	for ( auto it = setup.begin(); it != setup.end(); ++it) {
-		if ( processSetter((*it).id, (*it).value) == false ) {
+	for ( auto itl = setup.begin(); itl != setup.end(); ++itl) {
+		SetterValueList svl = (*itl).values;
+		unsigned char pid   = (*itl).pid;
+		
+		if ( processSetter(pid, svl) == false )
 			return false;
-		}
 	}
 	
 	return true;
@@ -260,7 +286,7 @@ bool CncControl::setup(bool doReset) {
 	}
 	
 	// process initial setters
-	std::vector<SetterTuple> setup;
+	Setters setup;
 	setup.push_back(SetterTuple(PID_STEPS_X, cncConfig->getStepsX()));
 	setup.push_back(SetterTuple(PID_STEPS_Y, cncConfig->getStepsY()));
 	setup.push_back(SetterTuple(PID_STEPS_Z, cncConfig->getStepsZ()));
@@ -275,6 +301,15 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_X, cncConfig->getHighPulsWidthX()));
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Y, cncConfig->getHighPulsWidthY()));
 	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Z, cncConfig->getHighPulsWidthZ()));
+	
+	SetterValueList accelList;
+	accelList.push_back(GBL_CONFIG->getAccelStartSpeedX_MM_MIN()/60);
+	accelList.push_back(GBL_CONFIG->getAccelStopSpeedX_MM_MIN()/60);
+	accelList.push_back(GBL_CONFIG->getAccelStartSpeedY_MM_MIN()/60);
+	accelList.push_back(GBL_CONFIG->getAccelStopSpeedY_MM_MIN()/60);
+	accelList.push_back(GBL_CONFIG->getAccelStartSpeedZ_MM_MIN()/60);
+	accelList.push_back(GBL_CONFIG->getAccelStopSpeedZ_MM_MIN()/60);
+	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, cncConfig->getReplyThresholdStepsX()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
@@ -682,6 +717,9 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeed s) {
 	configuredSpeedType = s;
 	configuredFeedSpeed_MM_MIN = value;
 	
+	if ( THE_APP != NULL && THE_APP->GetBtSpeedControl()->GetValue() == false)
+		configuredFeedSpeed_MM_MIN = 0.0;
+	
 	if ( GET_GUI_CTL(configuredFeedSpeed) )
 		GET_GUI_CTL(configuredFeedSpeed)->ChangeValue(wxString::Format("%3.1lf", value));
 	
@@ -900,12 +938,6 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			
 			break;
 			
-		// --------------------------------------------------------
-		case CITSetterInfo:
-			//if ( getSerial()->isSpyOutput() == true )
-			//	cnc::spy << "Setter: " << ArduinoPIDs::getPIDLabel((int)ci.setterId) << ": " << ci.setterValue << std::endl;
-			break;
-		
 		// --------------------------------------------------------
 		default:
 			std::cerr << "CncControl::SerialControllerCallback:" << std::endl;
@@ -2023,14 +2055,14 @@ void CncControl::clearControllerConfigControl() {
 		GET_GUI_CTL(controllerConfig)->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value) {
+void CncControl::appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value, const char* unit) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
 	if ( hasControllerConfigControl() ) {
 		DcmItemList rows;
 
-		DataControlModel::addNumKeyValueRow(rows, pid, key, value);
+		DataControlModel::addNumKeyValueUnitRow(rows, pid, key, value, unit);
 		GET_GUI_CTL(controllerConfig)->Freeze();
 		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
 			GET_GUI_CTL(controllerConfig)->AppendItem(*it);

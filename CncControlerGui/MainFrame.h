@@ -81,6 +81,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void clickSpeedControl(wxCommandEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
 		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
 		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
@@ -601,6 +602,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void decorateSearchButton();
 		void decoratePosSpyConnectButton(bool state);
+		void decorateSpeedControlBtn(bool useSpeedCfg);
 		
 		void toggleMonitorStatistics(bool shown=false);
 		

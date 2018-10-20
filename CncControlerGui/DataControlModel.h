@@ -56,11 +56,30 @@ class DataControlModel {
 			ret.push_back(row);
 		}
 		////////////////////////////////////////////////////////////////////////
+		static void addNumKeyValueUnitRow(DcmItemList& ret, unsigned int count, const char* key, wxVariant value, const char* unit) {
+			DcmRow row;
+			row.push_back(wxString::Format(wxT(" %i"),(int)count));
+			row.push_back(key);
+			row.push_back(unit);
+			row.push_back(wxString::Format(wxT(" %s"), value.GetString()));
+			ret.push_back(row);
+		}
+		////////////////////////////////////////////////////////////////////////
 		static void addNumKeyValueRow(DcmItemList& ret, unsigned int count, unsigned int code, const char* key, wxVariant value) {
 			DcmRow row;
 			row.push_back(wxString::Format(wxT(" %i"),(int)count));
 			row.push_back(wxString::Format(wxT(" %i"),(int)code));
 			row.push_back(key);
+			row.push_back(value.GetString());
+			ret.push_back(row);
+		}
+		////////////////////////////////////////////////////////////////////////
+		static void addNumKeyValueUnitRow(DcmItemList& ret, unsigned int count, unsigned int code, const char* key, wxVariant value, const char* unit) {
+			DcmRow row;
+			row.push_back(wxString::Format(wxT(" %i"),(int)count));
+			row.push_back(wxString::Format(wxT(" %i"),(int)code));
+			row.push_back(key);
+			row.push_back(unit);
 			row.push_back(value.GetString());
 			ret.push_back(row);
 		}

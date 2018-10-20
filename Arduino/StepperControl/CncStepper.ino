@@ -90,6 +90,8 @@ void CncStepper::printConfig() {
     PRINT_PARAMETER(PID_MAX_SWITCH,                       maxReached)
     PRINT_PARAMETER(PID_LIMIT,                            readLimitState())
     PRINT_PARAMETER(PID_LAST_STEP_DIR,                    getStepDirection())
+    PRINT_PARAMETER(PID_ACCEL_START_SPEED,                pwmProfile.startSpeed_MM_SEC * 60)
+    PRINT_PARAMETER(PID_ACCEL_STOP_SPEED,                 pwmProfile.stopSpeed_MM_SEC * 60)
 
   #undef PRINT_PARAMETER
 }
@@ -283,33 +285,35 @@ unsigned char CncStepper::performNextStep() {
     return RET_LIMIT;
   }
 
-  // gurantiee total puls width
-  tsCurrStep = micros();
-
-  // -------
-  // |     |
-  // |     |-------------------------------------------
-  // \ hpw \     lpw    \
-  // \      minpw       \  speedDelay  \  accelDelay  \ 
+  if ( controller->isSpeedControllerActive() ) {
+    // gurantiee total puls width
+    tsCurrStep = micros();
   
-  unsigned long currPulsWidth = minPulsWidth 
-                              + pwmProfile.speedDelay 
-                              + pwmProfile.accelDelay;
-
-  // micros(): Returns the number of microseconds since the Arduino board began running the current program. 
-  // This number will overflow (go back to zero), after approximately 70 minutes. On 16 MHz Arduino boards 
-  // (e.g. Duemilanove and Nano), this function has a resolution of four microseconds 
-  // (i.e. the value returned is always a multiple of four).
-  // Check this . . . 
-  if ( tsCurrStep <= tsPrevStep ) {
-    delayMicroseconds(minPulsWidth * 2);
+    // -------
+    // |     |
+    // |     |-------------------------------------------
+    // / hpw /     lpw    / 
+    // /      minpw       /  speedDelay  /  accelDelay  / 
     
-  } else {
-    // normal processing
-    unsigned long tsDiff = tsCurrStep - tsPrevStep;
-    
-    if ( tsDiff < currPulsWidth )
-      delayMicroseconds( currPulsWidth - tsDiff );
+    unsigned long currPulsWidth = minPulsWidth 
+                                + pwmProfile.speedDelay 
+                                + pwmProfile.accelDelay;
+  
+    // micros(): Returns the number of microseconds since the Arduino board began running the current program. 
+    // This number will overflow (go back to zero), after approximately 70 minutes. On 16 MHz Arduino boards 
+    // (e.g. Duemilanove and Nano), this function has a resolution of four microseconds 
+    // (i.e. the value returned is always a multiple of four).
+    // Check this . . . 
+    if ( tsCurrStep <= tsPrevStep ) {
+      delayMicroseconds(minPulsWidth * 2);
+      
+    } else {
+      // normal processing
+      unsigned long tsDiff = tsCurrStep - tsPrevStep;
+      
+      if ( tsDiff < currPulsWidth )
+        delayMicroseconds( currPulsWidth - tsDiff );
+    }
   }
   
   // then stepping . . .
@@ -327,8 +331,8 @@ unsigned char CncStepper::performNextStep() {
     // delayMicroseconds(lowPulsWidth);
     
   } else {
-     // simulate step delay ???
-     delayMicroseconds(minPulsWidth);
+     // simulate step delay
+     delayMicroseconds(highPulsWidth);
   }
 
   // ----------------------------------------------------------

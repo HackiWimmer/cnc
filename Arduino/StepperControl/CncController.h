@@ -7,9 +7,11 @@
 ///////////////////////////////////////////////////////////////////////////////////
 struct PwmProfile {
   
-  unsigned int speedDelay = 0;
-  unsigned int accelDelay = 0;
-    
+  unsigned int speedDelay         = 1;
+  unsigned int accelDelay         = 1;
+
+  unsigned int startSpeed_MM_SEC  = 1;
+  unsigned int stopSpeed_MM_SEC   = 1;  
 };
 
 ///////////////////////////////////////////////////////////////////////////////////
@@ -63,6 +65,7 @@ class CncController {
 
     //////////////////////////////////////////////////////////////////////////////
     void setupSpeedController();
+    void setupAccelProfile(int32_t v1, int32_t v2, int32_t v3, int32_t v4, int32_t v5, int32_t v6);
 
     const CncSpeedController& getSpeedController() const { return speedController; }
     void setSpeedValue(double fm);
@@ -131,6 +134,9 @@ class CncController {
     void setProbeMode(bool state = true)            { probeMode = state; }
     void enableProbeMode()                          { setProbeMode(true); }
     void disableProbeMode()                         { setProbeMode(false); }
+
+    //////////////////////////////////////////////////////////////////////////////
+    bool isSpeedControllerActive()           const  { return speedController.isSpeedConfigured(); }
     
     //////////////////////////////////////////////////////////////////////////////
     bool enableStepperPin(bool state = true);

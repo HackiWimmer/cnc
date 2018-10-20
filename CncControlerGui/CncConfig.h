@@ -251,13 +251,21 @@ class CncConfig {
 		
 		const double getMeasurePlateThickness()					{ return 1.2; } //TODO
 		
-		const int getStepSignX();
-		const int getStepSignY();
-		
 		const double getMaxSpeedX_MM_MIN();
 		const double getMaxSpeedY_MM_MIN();
 		const double getMaxSpeedZ_MM_MIN();
 		const double getMaxSpeedXYZ_MM_MIN();
+		
+		const double getAccelStartSpeedX_MM_MIN();
+		const double getAccelStopSpeedX_MM_MIN();
+		const double getAccelStartSpeedY_MM_MIN();
+		const double getAccelStopSpeedY_MM_MIN();
+		const double getAccelStartSpeedZ_MM_MIN();
+		const double getAccelStopSpeedZ_MM_MIN();
+			
+		const double getMaxWorkSpeedX_MM_MIN();
+		const double getMaxWorkSpeedY_MM_MIN();
+		const double getMaxWorkSpeedZ_MM_MIN();
 
 		const unsigned int getStepsX();
 		const unsigned int getStepsY();
@@ -269,9 +277,6 @@ class CncConfig {
 		const unsigned int getHighPulsWidthX();
 		const unsigned int getHighPulsWidthY();
 		const unsigned int getHighPulsWidthZ();
-		const unsigned int getMultiplierX();
-		const unsigned int getMultiplierY();
-		const unsigned int getMultiplierZ();
 		const unsigned int getMaxDurations() 					{ return maxDurations; }
 		const unsigned int getDurationCount() 					{ return durationCount; }
 		

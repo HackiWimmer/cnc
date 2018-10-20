@@ -105,6 +105,7 @@ protected:
     wxStaticText* m_stepDelayValue;
     wxBitmapButton* m_rcReset;
     wxBitmapToggleButton* m_btProbeMode;
+    wxBitmapToggleButton* m_btSpeedControl;
     wxBitmapButton* m_rcDebugConfig;
     wxBitmapButton* m_rcDebug;
     wxBitmapButton* m_rcNextBreakpoint;
@@ -519,12 +520,16 @@ protected:
     wxStaticBitmap* m_probeModeState;
     wxStaticText* m_probeModeStateLabel;
     wxStaticLine* m_staticLine60234112;
-    wxStaticText* m_staticText5651;
-    wxStaticBitmap* m_refPosState;
+    wxStaticText* m_staticText56563;
+    wxStaticBitmap* m_speedCtrlState;
+    wxStaticText* m_speedCtrlStateLabel;
     wxStaticLine* m_staticLine680;
     wxStaticText* LableF;
     wxTextCtrl* m_configuredFeedSpeed;
     wxTextCtrl* m_realtimeFeedSpeed;
+    wxStaticLine* m_staticLine602341127;
+    wxStaticText* m_staticText5651;
+    wxStaticBitmap* m_refPosState;
     wxStaticLine* m_staticLine6801222;
     wxStaticText* LableX;
     wxTextCtrl* m_xAxis;
@@ -715,6 +720,7 @@ protected:
     virtual void stepDelayThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
     virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void clickSpeedControl(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebugConfig(wxCommandEvent& event) { event.Skip(); }
     virtual void rcDebug(wxCommandEvent& event) { event.Skip(); }
     virtual void rcNextBreakpoint(wxCommandEvent& event) { event.Skip(); }
@@ -980,6 +986,7 @@ public:
     wxStaticText* GetStepDelayValue() { return m_stepDelayValue; }
     wxBitmapButton* GetRcReset() { return m_rcReset; }
     wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
+    wxBitmapToggleButton* GetBtSpeedControl() { return m_btSpeedControl; }
     wxBitmapButton* GetRcDebugConfig() { return m_rcDebugConfig; }
     wxBitmapButton* GetRcDebug() { return m_rcDebug; }
     wxBitmapButton* GetRcNextBreakpoint() { return m_rcNextBreakpoint; }
@@ -1393,12 +1400,16 @@ public:
     wxStaticBitmap* GetProbeModeState() { return m_probeModeState; }
     wxStaticText* GetProbeModeStateLabel() { return m_probeModeStateLabel; }
     wxStaticLine* GetStaticLine60234112() { return m_staticLine60234112; }
-    wxStaticText* GetStaticText5651() { return m_staticText5651; }
-    wxStaticBitmap* GetRefPosState() { return m_refPosState; }
+    wxStaticText* GetStaticText56563() { return m_staticText56563; }
+    wxStaticBitmap* GetSpeedCtrlState() { return m_speedCtrlState; }
+    wxStaticText* GetSpeedCtrlStateLabel() { return m_speedCtrlStateLabel; }
     wxStaticLine* GetStaticLine680() { return m_staticLine680; }
     wxStaticText* GetLableF() { return LableF; }
     wxTextCtrl* GetConfiguredFeedSpeed() { return m_configuredFeedSpeed; }
     wxTextCtrl* GetRealtimeFeedSpeed() { return m_realtimeFeedSpeed; }
+    wxStaticLine* GetStaticLine602341127() { return m_staticLine602341127; }
+    wxStaticText* GetStaticText5651() { return m_staticText5651; }
+    wxStaticBitmap* GetRefPosState() { return m_refPosState; }
     wxStaticLine* GetStaticLine6801222() { return m_staticLine6801222; }
     wxStaticText* GetLableX() { return LableX; }
     wxTextCtrl* GetXAxis() { return m_xAxis; }
@@ -2610,6 +2621,35 @@ public:
     }
 
     virtual ~ImageLibSecureRun();
+};
+
+
+class ImageLibSpeed : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibSpeed();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibSpeed();
 };
 
 #endif

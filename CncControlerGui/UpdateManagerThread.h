@@ -126,15 +126,15 @@ class UpdateManagerThread : public wxThread {
 			//////////////////////////////////////////////////////////////
 			struct Set {
 				unsigned char	id; 
-				int32_t			value;
+				SetterValueList	values;
 			} set;
 			
-				inline const Event& SetterEvent(unsigned char i, int32_t v) {
+				inline const Event& SetterEvent(unsigned char i, const SetterValueList& v) {
 					type         = SETTER_ADD;
 					ts           = wxDateTime::UNow();
 					processed    = false;
 					set.id       = i;
-					set.value    = v;
+					set.values   = v;
 					return *this;
 				}
 			

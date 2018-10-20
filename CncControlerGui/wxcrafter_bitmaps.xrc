@@ -180,6 +180,8 @@
   <object class="wxBitmap" name="BMP_SERIAL_SYP_ON@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
   <object class="wxBitmap" name="BMP_SETTER">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\application-put.png</object>
   <object class="wxBitmap" name="BMP_SHOW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_down.png</object>
+  <object class="wxBitmap" name="BMP_SPEED_CTRL_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\time-delete.png</object>
+  <object class="wxBitmap" name="BMP_SPEED_CTRL_ON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\time-add.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
@@ -336,6 +338,7 @@
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
+  <object class="wxBitmap" name="time-add">bitmaps\time-add.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="tools-sum">bitmaps\tools-sum.png</object>
   <object class="wxBitmap" name="trace">bitmaps\trace.png</object>

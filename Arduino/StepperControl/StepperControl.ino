@@ -152,6 +152,7 @@ inline unsigned char evaluateGetter(unsigned char pid) {
     // evaluateGetter() ............................................
     default:                          writeGetterValue(PID_UNKNOWN, 0);
 
+                                      LastErrorCodes::clear();
                                       LastErrorCodes::gblErrorMessage = "[";
                                       LastErrorCodes::gblErrorMessage.concat(pid);
                                       LastErrorCodes::gblErrorMessage.concat("]");
@@ -186,47 +187,75 @@ inline unsigned char processSetter() {
   // This is very importent for the next multibyte read
   delay(1);
 
-  if ( Serial.available() <= 0) {
+  struct Values {
+    bool isDouble = false;
+    long   l      = 0;
+    double d      = 0.0;   
+  };
+
+  Values values[MAX_SETTER_VALUES];
+  byte b[4];
+  
+  // error handling: pid + count
+  if ( Serial.available() < 2) {
     pushErrorMessage(E_INVALID_PARAM_ID);
     return RET_ERROR;
   }
   
-  unsigned char id = Serial.read();
-
-  byte   b[4];
-  long   lValue = 0;
-  double dValue = 0.0;
+  unsigned char pid        = Serial.read();
+  unsigned char valueCount = Serial.read();
   
-  if ( Serial.available() <= 0) {
-    pushErrorMessage(E_INVALID_PARAM_STREAM);
-    return RET_ERROR;
-  }
+  unsigned short byteCount = Serial.available();
+  unsigned short tryCount  = 0;
+  while ( byteCount < valueCount * sizeof(int32_t) ) {
+    delay(1);
+    byteCount = Serial.available();
     
-  // read a 4 byte value
-  unsigned int size = Serial.readBytes(b, 4);
-  if ( size != 4 ) {
-    pushErrorMessage(E_INVALID_PARAM_STREAM);
+    // error handling
+    if ( ++tryCount >= 5 ) {
+      pushErrorMessage(E_INVALID_PARAM_STREAM);
+      return RET_ERROR;      
+    }
+  }
+
+  // error handling
+  if ( byteCount%sizeof(int32_t) != 0 || byteCount/sizeof(int32_t) > MAX_SETTER_VALUES ) {
+    LastErrorCodes::clear();
+    LastErrorCodes::gblErrorMessage.concat('[');
+    LastErrorCodes::gblErrorMessage.concat(byteCount);
+    LastErrorCodes::gblErrorMessage.concat(']');
+    pushErrorMessage(E_INVALID_PARAM_STREAM_LEN, LastErrorCodes::gblErrorMessage.c_str());
     return RET_ERROR;
   }
 
-  // order the bytes
-  lValue  = (long)b[0] << 24;
-  lValue += (long)b[1] << 16;
-  lValue += (long)b[2] << 8;
-  lValue += (long)b[3];
+  // over all given values
+  for (unsigned short i=0; i<byteCount/sizeof(int32_t); i++) {
+    
+    // read a 4 byte
+    unsigned int size = Serial.readBytes(b, sizeof(int32_t));
+    if ( size != sizeof(int32_t) ) {
+      pushErrorMessage(E_INVALID_PARAM_STREAM);
+      return RET_ERROR;
+    }
+    
+    // order the bytes
+    values[i].l  = (long)b[0] << 24;
+    values[i].l += (long)b[1] << 16;
+    values[i].l += (long)b[2] << 8;
+    values[i].l += (long)b[3];
 
-  // double conversion
-  if ( id >= PID_DOUBLE_RANG_START )  
-    convertLongToDouble(lValue, dValue);
+    if ( isDoubleValue(pid) )  convertLongToDouble(values[i].l, values[i].d);
+    else                       values[i].d = 0.0;      
+  }
 
-   // process id
-  switch ( id ) {
+  // process pid
+  switch ( pid ) {
     // processSetter() ............................................
-    case PID_X_POS:               controller.getStepperX()->setPosition(lValue); 
+    case PID_X_POS:               controller.getStepperX()->setPosition(values[0].l); 
                                   break;
-    case PID_Y_POS:               controller.getStepperY()->setPosition(lValue); 
+    case PID_Y_POS:               controller.getStepperY()->setPosition(values[0].l); 
                                   break;
-    case PID_Z_POS:               controller.getStepperZ()->setPosition(lValue); 
+    case PID_Z_POS:               controller.getStepperZ()->setPosition(values[0].l); 
                                   break;
     // processSetter() ............................................
     case PID_RESERT_POS_COUNTER:  controller.resetPositionCounter(); 
@@ -236,89 +265,105 @@ inline unsigned char processSetter() {
                                   controller.getStepperZ()->resetStepCounter();   
                                   break;
     // processSetter() ............................................
-    case PID_TOOL_SWITCH:         controller.switchToolState(lValue == 0 ? TOOL_STATE_OFF: TOOL_STATE_ON); 
+    case PID_TOOL_SWITCH:         controller.switchToolState(values[0].l == 0 ? TOOL_STATE_OFF: TOOL_STATE_ON); 
                                   break;
     // processSetter() ............................................
     case PID_POS_REPLY_THRESHOLD_X: 
-                                  controller.setPosReplyThresholdX(lValue); 
+                                  controller.setPosReplyThresholdX(values[0].l); 
                                   break;
     case PID_POS_REPLY_THRESHOLD_Y: 
-                                  controller.setPosReplyThresholdY(lValue); 
+                                  controller.setPosReplyThresholdY(values[0].l); 
                                   break;
     case PID_POS_REPLY_THRESHOLD_Z: 
-                                  controller.setPosReplyThresholdZ(lValue); 
+                                  controller.setPosReplyThresholdZ(values[0].l); 
                                   break;
     // processSetter() ............................................
-    case PID_X_LIMIT:             controller.getStepperX()->setLimitStateManually(lValue); 
+    case PID_X_LIMIT:             controller.getStepperX()->setLimitStateManually(values[0].l); 
                                   break;
-    case PID_Y_LIMIT:             controller.getStepperY()->setLimitStateManually(lValue); 
+    case PID_Y_LIMIT:             controller.getStepperY()->setLimitStateManually(values[0].l); 
                                   break;
-    case PID_Z_LIMIT:             controller.getStepperZ()->setLimitStateManually(lValue); 
-                                  break;
-    // processSetter() ............................................
-    case PID_STEPS_X:             controller.getStepperX()->setSteps(lValue); 
-                                  controller.setupSpeedController();
-                                  break;
-    case PID_STEPS_Y:             controller.getStepperY()->setSteps(lValue); 
-                                  controller.setupSpeedController();
-                                  break;
-    case PID_STEPS_Z:             controller.getStepperZ()->setSteps(lValue); 
-                                  controller.setupSpeedController();
+    case PID_Z_LIMIT:             controller.getStepperZ()->setLimitStateManually(values[0].l); 
                                   break;
     // processSetter() ............................................
-    case PID_PITCH_X:             controller.getStepperX()->setPitch(dValue); 
+    case PID_STEPS_X:             controller.getStepperX()->setSteps(values[0].l); 
                                   controller.setupSpeedController();
                                   break;
-    case PID_PITCH_Y:             controller.getStepperY()->setPitch(dValue); 
+    case PID_STEPS_Y:             controller.getStepperY()->setSteps(values[0].l); 
                                   controller.setupSpeedController();
                                   break;
-    case PID_PITCH_Z:             controller.getStepperZ()->setPitch(dValue); 
+    case PID_STEPS_Z:             controller.getStepperZ()->setSteps(values[0].l); 
                                   controller.setupSpeedController();
                                   break;
     // processSetter() ............................................
-    case PID_PULSE_WIDTH_LOW_X:   controller.getStepperX()->setLowPulseWidth(lValue); 
+    case PID_PITCH_X:             controller.getStepperX()->setPitch(values[0].d); 
                                   controller.setupSpeedController();
                                   break;
-    case PID_PULSE_WIDTH_LOW_Y:   controller.getStepperY()->setLowPulseWidth(lValue); 
+    case PID_PITCH_Y:             controller.getStepperY()->setPitch(values[0].d); 
                                   controller.setupSpeedController();
                                   break;
-    case PID_PULSE_WIDTH_LOW_Z:   controller.getStepperZ()->setLowPulseWidth(lValue); 
+    case PID_PITCH_Z:             controller.getStepperZ()->setPitch(values[0].d); 
                                   controller.setupSpeedController();
                                   break;
     // processSetter() ............................................
-    case PID_PULSE_WIDTH_HIGH_X:  controller.getStepperX()->setHighPulseWidth(lValue); 
+    case PID_PULSE_WIDTH_LOW_X:   controller.getStepperX()->setLowPulseWidth(values[0].l); 
                                   controller.setupSpeedController();
                                   break;
-    case PID_PULSE_WIDTH_HIGH_Y:  controller.getStepperY()->setHighPulseWidth(lValue); 
+    case PID_PULSE_WIDTH_LOW_Y:   controller.getStepperY()->setLowPulseWidth(values[0].l); 
                                   controller.setupSpeedController();
                                   break;
-    case PID_PULSE_WIDTH_HIGH_Z:  controller.getStepperZ()->setHighPulseWidth(lValue); 
+    case PID_PULSE_WIDTH_LOW_Z:   controller.getStepperZ()->setLowPulseWidth(values[0].l); 
+                                  controller.setupSpeedController();
+                                  break;
+    // processSetter() ............................................
+    case PID_PULSE_WIDTH_HIGH_X:  controller.getStepperX()->setHighPulseWidth(values[0].l); 
+                                  controller.setupSpeedController();
+                                  break;
+    case PID_PULSE_WIDTH_HIGH_Y:  controller.getStepperY()->setHighPulseWidth(values[0].l); 
+                                  controller.setupSpeedController();
+                                  break;
+    case PID_PULSE_WIDTH_HIGH_Z:  controller.getStepperZ()->setHighPulseWidth(values[0].l); 
                                   controller.setupSpeedController();
                                   break;
 
     // processSetter() ............................................
-    case PID_SPEED_MM_MIN:        controller.setSpeedValue(dValue); 
+    case PID_SPEED_MM_MIN:        controller.setSpeedValue(values[0].d); 
+                                  break;
+
+    // processSetter() ............................................
+    case PID_ACCEL_PROFILE:       // todo
+                                  controller.setupAccelProfile(values[0].l,
+                                                               values[1].l,
+                                                               values[2].l,
+                                                               values[3].l,
+                                                               values[4].l,
+                                                               values[5].l                                                               
+                                                               );
+                                  controller.setupSpeedController();
                                   break;
     // processSetter() ............................................
     // call it with lValue = NORMALIZED_INCREMENT_DIRECTION || INVERSED_INCREMENT_DIRECTION
     case PID_INCREMENT_DIRECTION_VALUE_X:   
-                                  controller.getStepperX()->setIncrementDirectionValue(lValue); 
+                                  controller.getStepperX()->setIncrementDirectionValue(values[0].l); 
                                   break;
     case PID_INCREMENT_DIRECTION_VALUE_Y:   
-                                  controller.getStepperY()->setIncrementDirectionValue(lValue); 
+                                  controller.getStepperY()->setIncrementDirectionValue(values[0].l); 
                                   break;
     case PID_INCREMENT_DIRECTION_VALUE_Z:   
-                                  controller.getStepperZ()->setIncrementDirectionValue(lValue); 
+                                  controller.getStepperZ()->setIncrementDirectionValue(values[0].l); 
                                   break;
 
     // processSetter() ............................................
-    case PID_PROBE_MODE:          controller.setProbeMode(lValue != 0);
+    case PID_PROBE_MODE:          controller.setProbeMode(values[0].l != 0);
                                   break;
     // processSetter() ............................................
-    case PID_ENABLE_STEPPERS:     controller.enableStepperPin(lValue != 0);
+    case PID_ENABLE_STEPPERS:     controller.enableStepperPin(values[0].l != 0);
                                   break;
     // processSetter() ............................................
-    default:                      pushErrorMessage(E_INVALID_PARAM_ID);
+    default:                      LastErrorCodes::clear();
+                                  LastErrorCodes::gblErrorMessage.concat('[');
+                                  LastErrorCodes::gblErrorMessage.concat(pid);
+                                  LastErrorCodes::gblErrorMessage.concat(']');
+                                  pushErrorMessage(E_INVALID_PARAM_ID, LastErrorCodes::gblErrorMessage.c_str());
                                   return RET_ERROR;
   }
 
@@ -339,7 +384,7 @@ inline unsigned char decodeMove(unsigned char cmd) {
   unsigned short size  = 0;
   unsigned short count = 0;
 
-  static const short MAX_VALUES = 3;
+  const short MAX_VALUES = 3;
 
   //fetch 1 to max 3 long values
   while ( (size = Serial.available()) > 0 ) {
@@ -423,7 +468,6 @@ inline void processInterrupt() {
 
   // Show Interrup LED
   switchOutputPinState(PIN_INTERRUPT_LED, ON);
-
 
   controller.broadcastInterrupt();
   pushErrorMessage(E_INTERRUPT);
@@ -601,7 +645,7 @@ void loop() {
 
         // Unknown commands
         default:
-              LastErrorCodes::gblErrorMessage = "";
+              LastErrorCodes::clear();
               LastErrorCodes::gblErrorMessage.concat('[');
               LastErrorCodes::gblErrorMessage.concat(c);
               LastErrorCodes::gblErrorMessage.concat(']');

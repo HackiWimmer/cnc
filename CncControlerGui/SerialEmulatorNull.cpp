@@ -395,12 +395,23 @@ int SerialEmulatorNULL::performConfiguration(unsigned char *buffer, unsigned int
 		
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_TEXT);
-	lastCommand.Serial.write(wxString::Format("%d:%s\n", PID_COMMON, "Here only collected setter values, because there's no controller connection"));
+	lastCommand.Serial.write(wxString::Format("%d:%s\n", PID_COMMON, "Only a setter collection"));
 
 	SetterMap::iterator it;
 	for ( it=setterMap.begin(); it!=setterMap.end(); ++it ) {
-		if ( it->first >= PID_DOUBLE_RANG_START )	lastCommand.Serial.write(wxString::Format(" %d:%.2lf\n", it->first, (double)(it->second/DBL_FACT)));
-		else										lastCommand.Serial.write(wxString::Format(" %d:%d\n",    it->first, it->second));
+		wxString valueList(wxString::Format(" %d:", it->first));
+		SetterValueList values = it->second;
+		unsigned int counter = 0;
+		for ( auto itvl = values.begin(); itvl != values.end(); itvl++ ) {
+			
+			if ( it->first >= PID_DOUBLE_RANG_START )	valueList.append(wxString::Format("%.2lf", (double)(*itvl/DBL_FACT)));
+			else										valueList.append(wxString::Format("%d",    *itvl));
+			
+			if ( ++counter != values.size() )
+				valueList.append(", ");
+		}
+		valueList.append("\n");
+		lastCommand.Serial.write(valueList);
 	}
 	
 	lastCommand.Serial.write(MBYTE_CLOSE);
@@ -548,11 +559,15 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 		case PID_GET_STEP_COUNTER_Y:		writerGetterValues(pid, getEmuStepCounterY(), getEmuStepOverflowCounterY()); break;
 		case PID_GET_STEP_COUNTER_Z:		writerGetterValues(pid, getEmuStepCounterZ(), getEmuStepOverflowCounterZ()); break;
 		
-		default:							SetterMap::iterator it;
-											it = setterMap.find((int)pid);
+		default:							auto it = setterMap.find((int)pid);
 											if ( it != setterMap.end() ) {
 												
-												writerGetterValues(pid, (*it).second);
+												SetterValueList values = (*it).second;
+												lastCommand.Serial.write(pid);
+												lastCommand.Serial.write((unsigned char)values.size());
+												
+												for ( auto itvl = values.begin(); itvl != values.end(); itvl++ )
+													lastCommand.Serial.write(*itvl);
 												
 											} else {
 												addErrorInfo(E_GETTER_ID_NOT_FOUND, wxString::Format("Getter as int value: %03d", (int)pid));
@@ -566,31 +581,36 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( nbByte == LONG_BUF_SIZE + 2 ) {
-		unsigned char id = buffer[1];
-		unsigned char valBuf[4];
-		int32_t val = 0;
+	const unsigned int offset = 3; // CMD + PID + COUNT
+	unsigned int valueSize  = nbByte - offset;
 	
-		valBuf[3] = buffer[2];
-		valBuf[2] = buffer[3];
-		valBuf[1] = buffer[4];
-		valBuf[0] = buffer[5];
-		memcpy(&val, valBuf, LONG_BUF_SIZE);
-		
-		ContollerInfo ci;
-		ci.infoType    = CITSetterInfo;
-		ci.setterId    = (int)id;
-		ci.setterValue = val;
-		cncControl->SerialControllerCallback(ci);
+	if ( valueSize % LONG_BUF_SIZE == 0 ) {
+		unsigned int valueCount = valueSize / LONG_BUF_SIZE;
+		unsigned int index      = offset;
+		unsigned char pid       = buffer[1];
+		unsigned char valBuf[LONG_BUF_SIZE];
 		
 		// update setter map
-		setterMap[(int)id] = val;
+		SetterValueList values;
+		for ( unsigned int i=0; i<valueCount; i++ ) {
+			
+			valBuf[3] = buffer[index + 0];
+			valBuf[2] = buffer[index + 1];
+			valBuf[1] = buffer[index + 2];
+			valBuf[0] = buffer[index + 3];
+			
+			int32_t value = 0;
+			memcpy(&value, valBuf, LONG_BUF_SIZE);
+			values.push_back(value);
+		}
 		
+		setterMap[pid] = values;
+
 		// special handling for later use
-		switch ( id ) {
-			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = val; break;
-			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = val; break;
-			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = val; break;
+		switch ( pid ) {
+			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = values.front(); break;
+			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = values.front(); break;
+			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = values.front(); break;
 			
 			case PID_RESERT_POS_COUNTER:  		resetPositionCounter(); break;
 			case PID_RESERT_STEP_COUNTER: 		resetStepCounter(); 	break;
@@ -612,7 +632,7 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 											break;
 
 			
-			case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed_MM_MIN((double)(val/DBL_FACT));
+			case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed_MM_MIN((double)(values.front()/DBL_FACT));
 											break;
 		}
 		

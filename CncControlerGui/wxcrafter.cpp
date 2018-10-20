@@ -151,6 +151,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btProbeMode->SetValue(true);
     m_auibarMain->AddControl(m_btProbeMode);
     
+    m_btSpeedControl = new wxBitmapToggleButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("time-add")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_EXACTFIT|wxBU_BOTTOM);
+    m_btSpeedControl->SetToolTip(_("SpeedControl ..."));
+    m_btSpeedControl->SetValue(true);
+    m_auibarMain->AddControl(m_btSpeedControl);
+    
     m_auibarMain->AddSeparator();
     
     m_rcDebugConfig = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("server-connect")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
@@ -2816,6 +2821,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_dvListCtrlControllerConfig->AppendTextColumn(_("PID"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_RIGHT);
     m_dvListCtrlControllerConfig->AppendTextColumn(_("Key"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
+    m_dvListCtrlControllerConfig->AppendTextColumn(_("Unit"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_dvListCtrlControllerConfig->AppendTextColumn(_("Value"), wxDATAVIEW_CELL_INERT, WXC_FROM_DIP(-2), wxALIGN_LEFT);
     m_controllerPinReport = new wxPanel(m_notebookConfig, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookConfig, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     wxFont m_controllerPinReportFont(8, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("wxT(\"Segoe UI\")"));
@@ -3953,29 +3959,37 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer436->Add(m_staticLine60234112, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizerRefPosState = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizerRefPosState->SetFlexibleDirection( wxBOTH );
-    flexGridSizerRefPosState->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    wxFlexGridSizer* flexGridSizerSpeedControl = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizerSpeedControl->SetFlexibleDirection( wxBOTH );
+    flexGridSizerSpeedControl->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizer436->Add(flexGridSizerRefPosState, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer436->Add(flexGridSizerSpeedControl, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_staticText5651 = new wxStaticText(m_statusBar, wxID_ANY, _("Ref.\nState"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0);
-    m_staticText5651->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    wxFont m_staticText5651Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText5651->SetFont(m_staticText5651Font);
+    m_staticText56563 = new wxStaticText(m_statusBar, wxID_ANY, _("Speed\nCtrl."), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0);
+    m_staticText56563->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    wxFont m_staticText56563Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText56563->SetFont(m_staticText56563Font);
     
-    flexGridSizerRefPosState->Add(m_staticText5651, 0, wxALL, WXC_FROM_DIP(1));
+    flexGridSizerSpeedControl->Add(m_staticText56563, 0, wxALL, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer5652 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer5652->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5652->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    wxFlexGridSizer* flexGridSizer56624 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer56624->SetFlexibleDirection( wxBOTH );
+    flexGridSizer56624->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    flexGridSizerRefPosState->Add(flexGridSizer5652, 0, wxALL, WXC_FROM_DIP(0));
+    flexGridSizerSpeedControl->Add(flexGridSizer56624, 0, wxALL, WXC_FROM_DIP(0));
     
-    m_refPosState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-record")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
-    m_refPosState->SetToolTip(_("Reference Pos  State"));
+    m_speedCtrlState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-record")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
+    m_speedCtrlState->SetToolTip(_("Speed Control State"));
     
-    flexGridSizer5652->Add(m_refPosState, 0, wxALL, WXC_FROM_DIP(0));
+    flexGridSizer56624->Add(m_speedCtrlState, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_speedCtrlStateLabel = new wxStaticText(m_statusBar, wxID_ANY, _("OFF"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(17,-1)), wxALIGN_RIGHT);
+    m_speedCtrlStateLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    wxFont m_speedCtrlStateLabelFont(5, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_speedCtrlStateLabel->SetFont(m_speedCtrlStateLabelFont);
+    
+    flexGridSizer56624->Add(m_speedCtrlStateLabel, 0, wxALL, WXC_FROM_DIP(0));
+    m_speedCtrlStateLabel->SetMinSize(wxSize(17,-1));
     
     m_staticLine680 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -4026,6 +4040,34 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5648->Add(m_realtimeFeedSpeed, 0, wxALL, WXC_FROM_DIP(0));
     m_realtimeFeedSpeed->SetMinSize(wxSize(50,11));
+    
+    m_staticLine602341127 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer436->Add(m_staticLine602341127, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizerRefPosState = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizerRefPosState->SetFlexibleDirection( wxBOTH );
+    flexGridSizerRefPosState->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer436->Add(flexGridSizerRefPosState, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText5651 = new wxStaticText(m_statusBar, wxID_ANY, _("Ref.\nState"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0);
+    m_staticText5651->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    wxFont m_staticText5651Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText5651->SetFont(m_staticText5651Font);
+    
+    flexGridSizerRefPosState->Add(m_staticText5651, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5652 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5652->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5652->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizerRefPosState->Add(flexGridSizer5652, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_refPosState = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-record")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
+    m_refPosState->SetToolTip(_("Reference Pos  State"));
+    
+    flexGridSizer5652->Add(m_refPosState, 0, wxALL, WXC_FROM_DIP(0));
     
     m_staticLine6801222 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -5179,6 +5221,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_stepDelay->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::stepDelayThumbtrack), NULL, this);
     m_rcReset->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcReset), NULL, this);
     m_btProbeMode->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
+    m_btSpeedControl->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickSpeedControl), NULL, this);
     m_rcDebugConfig->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebugConfig), NULL, this);
     m_rcDebug->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebug), NULL, this);
     m_rcNextBreakpoint->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
@@ -5518,6 +5561,7 @@ MainFrameBClass::~MainFrameBClass()
     m_stepDelay->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::stepDelayThumbtrack), NULL, this);
     m_rcReset->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcReset), NULL, this);
     m_btProbeMode->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickProbeMode), NULL, this);
+    m_btSpeedControl->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clickSpeedControl), NULL, this);
     m_rcDebugConfig->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebugConfig), NULL, this);
     m_rcDebug->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcDebug), NULL, this);
     m_rcNextBreakpoint->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
@@ -10466,5 +10510,49 @@ ImageLibSecureRun::ImageLibSecureRun()
 }
 
 ImageLibSecureRun::~ImageLibSecureRun()
+{
+}
+
+ImageLibSpeed::ImageLibSpeed()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SPEED_CTRL_ON"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SPEED_CTRL_ON"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SPEED_CTRL_OFF"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SPEED_CTRL_OFF"), bmp));
+        }
+    }
+    
+}
+
+ImageLibSpeed::~ImageLibSpeed()
 {
 }

@@ -30,6 +30,7 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 	AppendColumn("PID", 	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Key", 	wxLIST_FORMAT_LEFT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Value",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("Unit",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
@@ -106,14 +107,22 @@ void CncSetterListCtrl::updateColumnWidth() {
 		
 	// first set default sizes depending on content
 	SetColumnWidth(COL_TYPE, 	 22);
-	SetColumnWidth(COL_NUM, 	 84);
+	SetColumnWidth(COL_NUM, 	 64);
 	SetColumnWidth(COL_PID, 	 40);
 	SetColumnWidth(COL_KEY, 	wxLIST_AUTOSIZE);
 	SetColumnWidth(COL_VAL, 	120);
+	SetColumnWidth(COL_UNIT, 	 58);
 	
 	// try to strech the second (key) column
 	const int scrollbarWidth = 26;
-	int size = GetSize().GetWidth() - GetColumnWidth(COL_NUM) - GetColumnWidth(COL_VAL) - GetColumnWidth(COL_TYPE) - GetColumnWidth(COL_PID) - scrollbarWidth;
+	int size = GetSize().GetWidth() 
+	         - GetColumnWidth(COL_NUM) 
+			 - GetColumnWidth(COL_VAL) 
+			 - GetColumnWidth(COL_UNIT)
+			 - GetColumnWidth(COL_TYPE) 
+			 - GetColumnWidth(COL_PID) 
+			 - scrollbarWidth;
+			 
 	if ( size > GetColumnWidth(COL_KEY) )
 		SetColumnWidth(COL_KEY, size);
 		

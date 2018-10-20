@@ -22,6 +22,9 @@ namespace cnc {
 	const wxString& dblFormat3(double d1, double d2, double d3, const wxString& delimiter = _T(","));
 }
 
+typedef std::vector<int32_t>	SetterValueList;
+void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor=1);
+
 // common ostream operators
 std::ostream& operator<<(std::ostream& os, const wxPoint& p);
 std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);

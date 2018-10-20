@@ -421,6 +421,9 @@ void MainFrame::enableGuiControls(bool state) {
 		if ( (*it) != NULL )
 			(*it)->Enable(state);
 	}
+	
+	if ( state == true )
+		m_btSpeedControl->Enable(GBL_CONFIG->isProbeMode());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::installCustControls() {
@@ -474,6 +477,10 @@ void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(m_checkBoxToolEnabled);
+	registerGuiControl(m_manuallyCorrectLimitPos);
+	registerGuiControl(m_rcSecureDlg);
+	registerGuiControl(m_btSpeedControl);
 	registerGuiControl(m_removeTemplate);
 	registerGuiControl(m_renameTemplate);
 	registerGuiControl(m_btProbeMode);
@@ -1441,6 +1448,7 @@ void MainFrame::initialize(void) {
 	createStcFileControlPopupMenu();
 	createStcEmuControlPopupMenu();
 	decorateSearchButton();
+	decorateSpeedControlBtn(true);
 	switchMonitorButton(true);
 	determineRunMode();
 	decoratePosSpyConnectButton(true);
@@ -7125,6 +7133,42 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 void MainFrame::clickProbeMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	GBL_CONFIG->setProbeMode(m_btProbeMode->GetValue());
+	cnc->enableProbeMode(m_btProbeMode->GetValue());
+	
+	m_btSpeedControl->Enable(GBL_CONFIG->isProbeMode());
+	if ( GBL_CONFIG->isProbeMode() )	decorateSpeedControlBtn(GBL_CONFIG->isProbeMode());
+	else								decorateSpeedControlBtn(true);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::clickSpeedControl(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	decorateSpeedControlBtn(m_btSpeedControl->GetValue());
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::decorateSpeedControlBtn(bool useSpeedCfg) {
+/////////////////////////////////////////////////////////////////////
+	if ( useSpeedCfg == true )	{
+		m_btSpeedControl->SetBitmap((ImageLibSpeed().Bitmap("BMP_SPEED_CTRL_ON")));
+		m_btSpeedControl->SetToolTip("Speed Contoller is active");
+		
+		m_speedCtrlState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_YELLOW"));
+		m_speedCtrlState->SetToolTip("Speed Controller is ON");
+		m_speedCtrlStateLabel->SetLabel(" ON");
+		
+	} else {
+		m_btSpeedControl->SetBitmap((ImageLibSpeed().Bitmap("BMP_SPEED_CTRL_OFF")));
+		m_btSpeedControl->SetToolTip("Speed Contoller is inactive");
+		
+		m_speedCtrlState->SetBitmap(ImageLib24().Bitmap("BMP_TRAFFIC_LIGHT_DEFAULT"));
+		m_speedCtrlState->SetToolTip("Speed Controller is OFF");
+		m_speedCtrlStateLabel->SetLabel(" OFF");
+	}
+	
+	m_btSpeedControl->SetValue(useSpeedCfg);
+	m_btSpeedControl->Refresh();
+	
+	m_speedCtrlState->Refresh();
+	m_speedCtrlStateLabel->Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMonitorStatistics(bool shown) {
@@ -7401,9 +7445,21 @@ void MainFrame::updateSpeedConfigPlayground() {
 		m_speedConfigSlider->SetRange(0, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
 		
 		CncSpeedController csc;
-		csc.setup('X', GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
-		csc.setup('Y', GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
-		csc.setup('Z', GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
+		csc.setup('X', GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), 
+		          SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+				  GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(),
+				  GBL_CONFIG->getAccelStartSpeedX_MM_MIN()/60, GBL_CONFIG->getAccelStopSpeedX_MM_MIN()/60
+				 );
+		csc.setup('Y', GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), 
+		          SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+				  GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
+				  GBL_CONFIG->getAccelStartSpeedY_MM_MIN()/60, GBL_CONFIG->getAccelStopSpeedY_MM_MIN()/60
+				 );
+		csc.setup('Z', GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), 
+		          SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+				  GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ(),
+				  GBL_CONFIG->getAccelStartSpeedZ_MM_MIN()/60, GBL_CONFIG->getAccelStopSpeedZ_MM_MIN()/60
+				  );
 		
 		csc.setFeedSpeed_MM_MIN(m_speedConfigSlider->GetValue());
 		
@@ -7419,9 +7475,9 @@ void MainFrame::updateSpeedConfigPlayground() {
 		ssY << csc.Y;  		m_speedConfigTraceY->ChangeValue(ssY.str());
 		ssZ << csc.Z;  		m_speedConfigTraceZ->ChangeValue(ssZ.str());
 		
-		ssAX << csc.APX;  	m_accelConfigTraceX->ChangeValue(ssAX.str());
-		ssAY << csc.APY;  	m_accelConfigTraceY->ChangeValue(ssAY.str());
-		ssAZ << csc.APZ;  	m_accelConfigTraceZ->ChangeValue(ssAZ.str());
+		ssAX << csc.X.AP;  	m_accelConfigTraceX->ChangeValue(ssAX.str());
+		ssAY << csc.Y.AP;  	m_accelConfigTraceY->ChangeValue(ssAY.str());
+		ssAZ << csc.Z.AP;  	m_accelConfigTraceZ->ChangeValue(ssAZ.str());
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -7444,17 +7500,16 @@ void MainFrame::decorateSecureDlgChoice(bool useDlg) {
 	m_rcSecureDlg->Refresh();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::rcSecureDlg(wxCommandEvent& event)
+void MainFrame::rcSecureDlg(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-{
 	decorateSecureDlgChoice(!useSecureRunDlg);
 }
-
 
 
 
 void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 }
+
 
 

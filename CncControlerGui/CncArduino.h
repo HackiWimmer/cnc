@@ -28,8 +28,19 @@ class ArduinoCMDs {
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 class ArduinoPIDs {
+	private:
+		struct PidInfo {
+			std::string label;
+			std::string unit;
+			
+			void setup(const char* l, const char* u = "") {
+				label = l;
+				unit  = u;
+			}
+		};
+	
 	public:
-		static std::string pids[MAX_PIDS];
+		static PidInfo pids[MAX_PIDS];
 		static std::string ret;
 		
 		/////////////////////////////////////////////////////////////////////////
@@ -48,7 +59,10 @@ class ArduinoPIDs {
 		static const char* getPIDLabel(unsigned int id, std::string& retVal);
 		static const char* getPIDLabelWithDefault(unsigned int id, const std::string& defaultValue);
 		
-		static bool exists(unsigned int id);
+		static const char* getPIDUnit(unsigned int id);
+		static const char* getPIDUnit(unsigned int id, std::string& retVal);
+		
+		static bool exists(unsigned int pid);
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////

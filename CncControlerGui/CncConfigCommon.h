@@ -13,6 +13,17 @@
 	#define CncConfig_MAX_SPEED_Y_MM_MIN			"Cnc.Config/MAX_SPEED_Y_MM_MIN"
 	#define CncConfig_MAX_SPEED_Z_MM_MIN			"Cnc.Config/MAX_SPEED_Z_MM_MIN"
 	
+	#define CncConfig_ACCEL_START_SPEED_X_MM_MIN	"Cnc.Config/ACCEL_START_SPEED_X_MM_MIN"
+	#define CncConfig_ACCEL_STOP_SPEED_X_MM_MIN		"Cnc.Config/ACCEL_STOP_SPEED_X_MM_MIN"
+	#define CncConfig_ACCEL_START_SPEED_Y_MM_MIN	"Cnc.Config/ACCEL_START_SPEED_Y_MM_MIN"
+	#define CncConfig_ACCEL_STOP_SPEED_Y_MM_MIN		"Cnc.Config/ACCEL_STOP_SPEED_Y_MM_MIN"
+	#define CncConfig_ACCEL_START_SPEED_Z_MM_MIN	"Cnc.Config/ACCEL_START_SPEED_Z_MM_MIN"
+	#define CncConfig_ACCEL_STOP_SPEED_Z_MM_MIN		"Cnc.Config/ACCEL_STOP_SPEED_Z_MM_MIN"
+	
+	#define CncConfig_MAX_WORK_SPEED_X_MM_MIN		"Cnc.Config/MAX_WORK_SPEED_X_MM_MIN"
+	#define CncConfig_MAX_WORK_SPEED_Y_MM_MIN		"Cnc.Config/MAX_WORK_SPEED_Y_MM_MIN"
+	#define CncConfig_MAX_WORK_SPEED_Z_MM_MIN		"Cnc.Config/MAX_WORK_SPEED_Z_MM_MIN"
+	
 	#define CncConfig_DEF_SPEED_MODE_XYZ			"Cnc.Config/DEF_SPEED_MODE_XYZ"
 	#define CncConfig_DEF_RAPID_SPEED_PERCENT 		"Cnc.Config/DEF_RAPID_SPEED_PEERCENT"
 	#define CncConfig_DEF_WORK_SPEED_PERCENT 		"Cnc.Config/DEF_WORK_SPEED_PERCENT"

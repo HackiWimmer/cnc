@@ -266,6 +266,14 @@
             </tooltip>
             <checked>1</checked>
           </object>
+          <object class="wxBitmapToggleButton" name="m_btSpeedControl">
+            <style>wxBU_EXACTFIT|wxBU_BOTTOM</style>
+            <bitmap>bitmaps/time-add.png</bitmap>
+            <tooltip>
+              <![CDATA[SpeedControl ...]]>
+            </tooltip>
+            <checked>1</checked>
+          </object>
           <object class="separator"/>
           <object class="wxBitmapButton" name="m_rcDebugConfig">
             <bitmap>bitmaps/server-connect.png</bitmap>
@@ -6905,13 +6913,13 @@ Mode</label>
                 <style>wxLI_VERTICAL</style>
               </object>
             </object>
-            <object class="sizeritem" name="flexGridSizerRefPosState">
+            <object class="sizeritem" name="flexGridSizerSpeedControl">
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
               <option>1</option>
               <object class="wxFlexGridSizer">
-                <cols>2</cols>
-                <rows>1</rows>
+                <cols>3</cols>
+                <rows>0</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
                 <growablecols/>
@@ -6919,9 +6927,9 @@ Mode</label>
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <border>1</border>
-                  <object class="wxStaticText" name="m_staticText5651">
-                    <label>Ref.
-State</label>
+                  <object class="wxStaticText" name="m_staticText56563">
+                    <label>Speed
+Ctrl.</label>
                     <style/>
                     <fg>wxSYS_COLOUR_BTNFACE</fg>
                     <font>
@@ -6934,22 +6942,40 @@ State</label>
                     </font>
                   </object>
                 </object>
-                <object class="sizeritem" name="flexGridSizer5652">
+                <object class="sizeritem" name="flexGridSizer56624">
                   <flag>wxALL</flag>
                   <object class="wxFlexGridSizer">
                     <cols>1</cols>
-                    <rows>1</rows>
+                    <rows>2</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
                     <growablecols/>
                     <growablerows/>
                     <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <object class="wxStaticBitmap" name="m_refPosState">
+                      <flag>wxALL|wxALIGN_RIGHT</flag>
+                      <object class="wxStaticBitmap" name="m_speedCtrlState">
                         <bitmap>bitmaps/16-record.png</bitmap>
                         <tooltip>
-                          <![CDATA[Reference Pos  State]]>
+                          <![CDATA[Speed Control State]]>
                         </tooltip>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <minsize>17,-1</minsize>
+                      <object class="wxStaticText" name="m_speedCtrlStateLabel">
+                        <label>OFF</label>
+                        <style>wxALIGN_RIGHT</style>
+                        <size>17,-1</size>
+                        <fg>wxSYS_COLOUR_BTNFACE</fg>
+                        <font>
+                          <size>5</size>
+                          <style>normal</style>
+                          <weight>bold</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
                       </object>
                     </object>
                   </object>
@@ -7043,6 +7069,64 @@ State</label>
                           <![CDATA[Realtime Feed Speed]]>
                         </tooltip>
                         <value>0</value>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <object class="wxStaticLine" name="m_staticLine602341127">
+                <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem" name="flexGridSizerRefPosState">
+              <flag>wxALL|wxEXPAND</flag>
+              <border>1</border>
+              <option>1</option>
+              <object class="wxFlexGridSizer">
+                <cols>2</cols>
+                <rows>1</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols/>
+                <growablerows/>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>1</border>
+                  <object class="wxStaticText" name="m_staticText5651">
+                    <label>Ref.
+State</label>
+                    <style/>
+                    <fg>wxSYS_COLOUR_BTNFACE</fg>
+                    <font>
+                      <size>7</size>
+                      <style>normal</style>
+                      <weight>normal</weight>
+                      <family>swiss</family>
+                      <underlined>0</underlined>
+                      <face>Segoe UI</face>
+                    </font>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer5652">
+                  <flag>wxALL</flag>
+                  <object class="wxFlexGridSizer">
+                    <cols>1</cols>
+                    <rows>1</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols/>
+                    <growablerows/>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <object class="wxStaticBitmap" name="m_refPosState">
+                        <bitmap>bitmaps/16-record.png</bitmap>
+                        <tooltip>
+                          <![CDATA[Reference Pos  State]]>
+                        </tooltip>
                       </object>
                     </object>
                   </object>

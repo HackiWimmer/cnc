@@ -11,10 +11,10 @@
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
 
-typedef std::map<int, int32_t> 					SetterMap;
-typedef std::vector<unsigned char> 				PidList;
-typedef std::vector<int32_t> 					GetterValues;
-typedef std::map<unsigned char, GetterValues> 	GetterListValues;
+typedef std::map<unsigned char, SetterValueList> 	SetterMap;
+typedef std::vector<unsigned char> 					PidList;
+typedef std::vector<int32_t> 						GetterValues;
+typedef std::map<unsigned char, GetterValues> 		GetterListValues;
 
 class CncControl;
 
@@ -88,7 +88,7 @@ struct SerialFetchInfo {
 	} Tc;
 };
 
-enum ControllerInfoType {CITUnknown, CITHeartbeat, CITPosition, CITSetterInfo, CITLimitInfo};
+enum ControllerInfoType {CITUnknown, CITHeartbeat, CITPosition, CITLimitInfo};
 struct ContollerInfo {
 	ControllerInfoType infoType			= CITUnknown;
 	unsigned char command				= '\0';
@@ -282,6 +282,7 @@ class Serial : public SerialOSD {
 		bool processGetter(unsigned char pid, GetterValues& ret);
 		bool processGetterList(PidList pidList, GetterListValues& ret);
 		bool processSetter(unsigned char pid, int32_t value);
+		bool processSetter(unsigned char pid, const SetterValueList& values);
 		// indicates if idle message can be requested
 		virtual bool canProcessIdle() { return true; }
 		bool processIdle();

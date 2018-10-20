@@ -431,8 +431,10 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 					
 					key += ArduinoPIDs::getPIDLabel((unsigned int)id);
 					
+					wxString unit = ArduinoPIDs::getPIDUnit((unsigned int)id);
+					
 					if ( cncControl->hasControllerConfigControl() == true ) {
-						cncControl->appendPidKeyValueToControllerConfig(id, key, s.substr(pos+1, s.length()-1).c_str() );
+						cncControl->appendPidKeyValueToControllerConfig(id, key, s.substr(pos+1, s.length()-1).c_str(), unit);
 					} else {
 						mutliByteStream << key.c_str() /*<< "[" << id << "]"*/ << ": ";
 						mutliByteStream << s.substr(pos+1, s.length()-1).c_str() << std::endl;
@@ -690,6 +692,14 @@ bool Serial::processIdle() {
 ///////////////////////////////////////////////////////////////////
 bool Serial::processSetter(unsigned char pid, int32_t value) {
 ///////////////////////////////////////////////////////////////////
+	SetterValueList values;
+	values.push_back(value);
+	
+	return processSetter(pid, values);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::processSetter(unsigned char pid, const SetterValueList& values) {
+///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
 		std::cerr << "SERIAL::processSetter()::ERROR: Not connected\n";
 		return false;
@@ -702,7 +712,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	if ( writeOnlyMoveCommands == true )
 		return true;
 	
-	unsigned char cmd[8];
+	unsigned char cmd[3 * sizeof(unsigned char) + MAX_SETTER_VALUES * LONG_BUF_SIZE];
 	unsigned char* p = cmd;
 	
 	int idx = 0;
@@ -711,25 +721,51 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	
 	cmd[idx++] = pid;
 	p++;
-
-	value = htonl(value);
-	memcpy(p, &value, LONG_BUF_SIZE);
-	idx += LONG_BUF_SIZE;
 	
-	int32_t v = ntohl(value);
+	cmd[idx++] = (unsigned char)values.size();
+	p++;
+
+	for ( auto it = values.begin(); it != values.end(); it++ ) {
+		int32_t value = htonl(*it);
+		memcpy(p, &value, LONG_BUF_SIZE);
+		idx += LONG_BUF_SIZE;
+		p += LONG_BUF_SIZE;
+	}
 	
 	if ( isCommandRunning ) {
 		std::clog << "Serial::processSetter: Serial is currently in fetching mode: This command will be rejected:" << std::endl;
-		if ( pid < PID_DOUBLE_RANG_START )	std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << v << "]\n";
-		else								std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << (double)(v)/DBL_FACT << "]\n";
+		if ( pid < PID_DOUBLE_RANG_START )	{
+			std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
+												 <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
+												 <<   "["; 
+												 traceSetterValueList(std::clog, values, 1);
+			std::clog                            << "]\n";
+		} else {
+			std::clog << " Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
+			                                     <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
+												 <<   "[";
+												 traceSetterValueList(std::clog, values, DBL_FACT);
+			std::clog                            << "]\n";
+		}
 		return true;
 	}
 	
 	if ( traceSpyInfo && spyWrite ) {
 		cnc::spy.initializeResult();
 		
-		if ( pid < PID_DOUBLE_RANG_START )	cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << v << "]\n";
-		else								cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((int)pid) << "][" << (double)(v)/DBL_FACT << "]\n";
+		if ( pid < PID_DOUBLE_RANG_START )	{
+			cnc::spy << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
+												<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 		<< "]"
+												<<   "[";
+												traceSetterValueList(cnc::spy, values, 1);
+			cnc::spy							<< "]\n";
+		} else {
+			cnc::spy << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
+												<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 		<< "]"
+												<<   "[";
+												traceSetterValueList(cnc::spy, values, DBL_FACT);
+			cnc::spy							<< "]\n";
+		}
 	}
 	
 	canIdle = false;
@@ -1296,7 +1332,6 @@ bool Serial::RET_QUIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStrea
 ///////////////////////////////////////////////////////////////////
 bool Serial::RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
-	#warning
 	std::cout << "Serial::evaluateResult: " 
 			  << decodeContollerResult(RET_LIMIT) 
 			  << " while processing: " 
