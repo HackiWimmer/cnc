@@ -861,11 +861,14 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			
 			if ( ci.supportState == true ) {
 				CncInterface::ISP::States sp(ci.supportStateValue);
+				displaySupportStates(sp);
 				ss << " : " << sp.getValueAsString();
 				ss << " (" << (int)ci.supportStateValue << ")";
+			} else {
+				displayUnknownSupportStates();
 			}
 			
-			cnc::trc.logInfoMessage(ss);
+			//cnc::trc.logInfoMessage(ss);
 			break;
 		}
 		// --------------------------------------------------------
@@ -1427,6 +1430,30 @@ void CncControl::displayLimitState(wxStaticText* ctl, bool value) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void CncControl::displaySupportStates(const CncInterface::ISP::States& sp) {
+///////////////////////////////////////////////////////////////////
+	if ( THE_APP != NULL ) {
+		THE_APP->GetSupportButton1State()->SetBackgroundColour(sp.isSupportButton1Pressed() ? wxColour(181,230,29) : wxColour(255,128,128));
+		THE_APP->GetSupportButton2State()->SetBackgroundColour(sp.isSupportButton2Pressed() ? wxColour(181,230,29) : wxColour(255,128,128));
+		THE_APP->GetSupportButton3State()->SetBackgroundColour(sp.isSupportButton3Pressed() ? wxColour(181,230,29) : wxColour(255,128,128));
+		
+		THE_APP->GetCableConnectedState()->SetBackgroundColour(sp.isCableConnected() ? wxColour(217,217,0) : wxColour(255,128,128));
+		THE_APP->GetToolPowerObserverState()->SetBackgroundColour(sp.isToolPowered() ? wxColour(217,217,0) : wxColour(255,128,128));
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::displayUnknownSupportStates() {
+///////////////////////////////////////////////////////////////////
+	if ( THE_APP != NULL ) {
+		THE_APP->GetSupportButton1State()->SetBackgroundColour(wxColour(128,128,128));
+		THE_APP->GetSupportButton2State()->SetBackgroundColour(wxColour(128,128,128));
+		THE_APP->GetSupportButton3State()->SetBackgroundColour(wxColour(128,128,128));
+		
+		THE_APP->GetCableConnectedState()->SetBackgroundColour(wxColour(128,128,128));
+		THE_APP->GetToolPowerObserverState()->SetBackgroundColour(wxColour(128,128,128));
+	}
+}
+///////////////////////////////////////////////////////////////////
 bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox* max, double& result) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
@@ -1673,7 +1700,7 @@ void CncControl::manualContinuousMoveStop() {
 	runContinuousMove = false;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
+bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool corrcetLimit) {
 ///////////////////////////////////////////////////////////////////
 	const double SSF = (double)STEP_SENSITIVITY_FACTOR;
 	
@@ -1683,8 +1710,8 @@ bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDir
 	const double zDim = s/SSF * z;
 	
 	bool ret = false;
-	if ( continuousMoveAppBased == true ) 	ret = manualContinuousMoveStart_AppBased(xDim, yDim, zDim);
-	else									ret = manualContinuousMoveStart_CtrlBased(xDim, yDim, zDim);
+	if ( continuousMoveAppBased == true ) 	ret = manualContinuousMoveStart_AppBased(xDim, yDim, zDim, corrcetLimit);
+	else									ret = manualContinuousMoveStart_CtrlBased(xDim, yDim, zDim, corrcetLimit);
 	
 	// adjust the pc position
 	if ( ret == true )
@@ -1693,7 +1720,7 @@ bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDir
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart_AppBased(const double xDim, const double yDim, const double zDim) {
+bool CncControl::manualContinuousMoveStart_AppBased(const double xDim, const double yDim, const double zDim, bool corrcetLimit) {
 ///////////////////////////////////////////////////////////////////
 	if ( getSerial()->isCommandActive() == true )
 		return false;
@@ -1729,8 +1756,11 @@ bool CncControl::manualContinuousMoveStart_AppBased(const double xDim, const dou
 	CncMilliTimestamp tsStart = CncTimeFunctions::getMilliTimestamp();
 	while ( runContinuousMove ) {
 		
-		if ( moveRelLinearMetricXYZ(xDim, yDim, zDim, false) )
+		if ( moveRelLinearMetricXYZ(xDim, yDim, zDim, false) == false )  {
+			if ( limitStates.hasLimit() && corrcetLimit)
+				correctLimitPositions();
 			break;
+		}
 		
 		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
 			{ currentSpeed = SPEED_STEP2; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
@@ -1753,7 +1783,7 @@ bool CncControl::manualContinuousMoveStart_AppBased(const double xDim, const dou
 	resetDurationCounter();
 	
 	// reactivate configured probe mode state
-	int ret = false;
+	bool ret = false;
 	if ( (ret = enableProbeMode(probeModeBefore)) == false ) {
 		std::cerr << " Cant reactivate probe mode." << std::endl;
 	}
@@ -1761,7 +1791,7 @@ bool CncControl::manualContinuousMoveStart_AppBased(const double xDim, const dou
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const double yDim, const double zDim) {
+bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const double yDim, const double zDim, bool corrcetLimit) {
 ///////////////////////////////////////////////////////////////////
 	if ( getSerial()->isCommandActive() == true )
 		return false;
@@ -1792,8 +1822,11 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	// move loop
 	runContinuousMove = true;
 	bool ret = getSerial()->processMoveUntilSignal(sizeof(values)/sizeof(int32_t), values, curAppPos);
-	if ( ret == false )
-		std::cerr << "Error while processMoveUntilSignal!" << std::endl;
+	if ( ret == false ) {
+		
+		if ( limitStates.hasLimit() && corrcetLimit)
+			ret = correctLimitPositions();
+	}
 	
 	// Move touch up
 	enableStepperMotors(false);
@@ -1807,6 +1840,36 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	GBL_CONFIG->setProbeMode(probeModeBefore);
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::correctLimitPositions() {
+///////////////////////////////////////////////////////////////////
+	bool ret = true;
+	
+	if ( limitStates.hasLimit() ) {
+		
+		double xsbm = 0.0, ysbm = 0.0, zsbm  = 0.0;
+		if (  limitStates.getXMinLimit() && !limitStates.getXMaxLimit() )	xsbm = +endSwitchStepBackMertic;
+		if ( !limitStates.getXMinLimit() &&  limitStates.getXMaxLimit() )	xsbm = -endSwitchStepBackMertic;
+		
+		if (  limitStates.getYMinLimit() && !limitStates.getYMaxLimit() )	ysbm = +endSwitchStepBackMertic;
+		if ( !limitStates.getYMinLimit() &&  limitStates.getYMaxLimit() )	ysbm = -endSwitchStepBackMertic;
+		
+		if (  limitStates.getZMinLimit() && !limitStates.getZMaxLimit() )	zsbm = +endSwitchStepBackMertic;
+		if ( !limitStates.getZMinLimit() &&  limitStates.getZMaxLimit() )	zsbm = -endSwitchStepBackMertic;
+		
+		// limit correction
+		if ( moveRelLinearMetricXYZ(xsbm, ysbm, zsbm, true) == false ) {
+			std::cerr << "CncControl::correctLimitPositions(): Error while corrrecting limit positions!" << std::endl;
+			ret = false;
+		}
+		
+		// adjust position on demand
+		if ( validateAppAgainstCtlPosition() == false )
+			curAppPos = getControllerPos();
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::manualSimpleMoveMetric(double x, double y, double z, bool alreadyRendered) {

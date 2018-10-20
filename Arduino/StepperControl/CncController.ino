@@ -2,20 +2,21 @@
 #include "CommonFunctions.h"
 #include "CommonValues.h"
 
+
+
 /////////////////////////////////////////////////////////////////////////////////////
 struct RenderStruct {
-  static const short POINT_LENGTH = 3;
-  static const short IDX_X        = 0;
-  static const short IDX_Y        = 1;
-  static const short IDX_Z        = 2;
-  
-  static int A[POINT_LENGTH];
-  static int B[POINT_LENGTH];
 
-  static unsigned short xDelay;
-  static unsigned short yDelay;
-  static unsigned short zDelay;
+  static PwmProfile pwmPX, pwmPY, pwmPZ;
   
+  static const int POINT_LENGTH = 3;
+  static const int IDX_X        = 0;
+  static const int IDX_Y        = 1;
+  static const int IDX_Z        = 2;
+  
+  static int32_t A[POINT_LENGTH];
+  static int32_t B[POINT_LENGTH];
+
   static unsigned short xStepCount;
   static unsigned short yStepCount;
   static unsigned short zStepCount;
@@ -45,11 +46,14 @@ struct RenderStruct {
   static int dz() { return A[IDX_Z] - B[IDX_Z]; }
 };
 
-int            RenderStruct::A[RenderStruct::POINT_LENGTH] = {0,0,0};
-int            RenderStruct::B[RenderStruct::POINT_LENGTH] = {0,0,0};
-unsigned short RenderStruct::xDelay                        = 0;
-unsigned short RenderStruct::yDelay                        = 0;
-unsigned short RenderStruct::zDelay                        = 0;
+/////////////////////////////////////////////////////////////////////////////////////
+int32_t        RenderStruct::A[RenderStruct::POINT_LENGTH] = {0,0,0};
+int32_t        RenderStruct::B[RenderStruct::POINT_LENGTH] = {0,0,0};
+
+PwmProfile     RenderStruct::pwmPX; 
+PwmProfile     RenderStruct::pwmPY; 
+PwmProfile     RenderStruct::pwmPZ;
+
 unsigned short RenderStruct::xStepCount                    = 0;
 unsigned short RenderStruct::yStepCount                    = 0;
 unsigned short RenderStruct::zStepCount                    = 0;
@@ -59,9 +63,9 @@ unsigned short RenderStruct::zStepCount                    = 0;
 /////////////////////////////////////////////////////////////////////////////////////
 CncController::CncController() 
 /////////////////////////////////////////////////////////////////////////////////////
-: X(new CncStepper(this, 'X', PIN_X_STP, PIN_X_DIR, PIN_X_LIMIT))
-, Y(new CncStepper(this, 'Y', PIN_Y_STP, PIN_Y_DIR, PIN_Y_LIMIT))
-, Z(new CncStepper(this, 'Z', PIN_Z_STP, PIN_Z_DIR, PIN_Z_LIMIT))
+: X(new CncStepper(this, RenderStruct::pwmPX, 'X', PIN_X_STP, PIN_X_DIR, PIN_X_LIMIT))
+, Y(new CncStepper(this, RenderStruct::pwmPY, 'Y', PIN_Y_STP, PIN_Y_DIR, PIN_Y_LIMIT))
+, Z(new CncStepper(this, RenderStruct::pwmPZ, 'Z', PIN_Z_STP, PIN_Z_DIR, PIN_Z_LIMIT))
 , speedController()
 , posReplyThresholdX(100L)
 , posReplyThresholdY(100L)
@@ -570,33 +574,33 @@ unsigned char CncController::stepAxisXYZ() {
   incPositionCounter();
 
   if ( RS::dx() != 0) {
+
+    RS::pwmPX.accelDelay = speedController.getNextAccelDelayX();
+    
     if ( (retValue = X->performNextStep()) != RET_OK ) 
       return retValue;
 
     RS::xStepCount++;
-
-    if ( RS::xDelay > 0 )
-      delayMicroseconds(RS::xDelay + speedController.getNextAccelDelayX());
   }
   
   if ( RS::dy() != 0 ) {
-    if ( (retValue = Y->performNextStep()) != RET_OK )
+    
+     RS::pwmPY.accelDelay = speedController.getNextAccelDelayY();
+     
+     if ( (retValue = Y->performNextStep()) != RET_OK )
       return retValue;
       
     RS::yStepCount++;
-    
-    if ( RS::yDelay > 0 )
-      delayMicroseconds(RS::yDelay + speedController.getNextAccelDelayY());
   }
     
   if ( RS::dz() != 0 ) {
-    if ( (retValue = Z->performNextStep()) != RET_OK )
+    
+     RS::pwmPZ.accelDelay = speedController.getNextAccelDelayZ();
+     
+     if ( (retValue = Z->performNextStep()) != RET_OK )
       return retValue;
       
     RS::zStepCount++;
-    
-    if ( RS::zDelay > 0 )
-      delayMicroseconds(RS::zDelay + speedController.getNextAccelDelayZ());
   }
 
   sendCurrentPositions(PID_XYZ_POS_DETAIL, false);  
@@ -728,12 +732,8 @@ unsigned char CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-unsigned char CncController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz) {
+unsigned char CncController::moveUntilSignal(const int32_t dx, const int32_t dy, const int32_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
-  const int32_t x = dx;
-  const int32_t y = dy;
-  const int32_t z = dz;
-
   // speed setup
   const double MAX_SPEED   = speedController.getMaxFeedSpeed_MM_MIN();
   
@@ -751,8 +751,8 @@ unsigned char CncController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz)
 
   speedController.enableAccelerationXYZ(false);
   
-  if ( x != 0 || y != 0 || z !=0 ) {
-    while ( (ret = renderAndStepAxisXYZ(x, y, z)) == RET_OK ) {
+  if ( dx != 0 || dy != 0 || dz !=0 ) {
+    while ( (ret = renderAndStepAxisXYZ(dx, dy, dz)) == RET_OK ) {
   
       // break by interrupt
       if (    X->isInterrupted() 
@@ -770,7 +770,7 @@ unsigned char CncController::moveUntilSignal(int32_t dx, int32_t dy, int32_t dz)
            || Z->getLimitState() != LimitSwitch::LIMIT_UNSET 
          )
       { 
-        ret =  RET_ERROR; 
+        ret =  RET_LIMIT; 
         break;
       }
 
@@ -803,13 +803,15 @@ void CncController::setSpeedValue(double fm) {
   typedef RenderStruct RS;
   
   if ( speedController.isSpeedConfigured() ) {
-    RS::xDelay = speedController.X.synthSpeedDelay;
-    RS::yDelay = speedController.Y.synthSpeedDelay;
-    RS::zDelay = speedController.Z.synthSpeedDelay;
+    RS::pwmPX.speedDelay = speedController.X.synthSpeedDelay;
+    RS::pwmPY.speedDelay = speedController.Y.synthSpeedDelay;
+    RS::pwmPZ.speedDelay = speedController.Z.synthSpeedDelay;
+    
   } else {
-    RS::xDelay = 0;
-    RS::yDelay = 0;
-    RS::zDelay = 0;
+    
+    RS::pwmPX.speedDelay = 0;
+    RS::pwmPY.speedDelay = 0;
+    RS::pwmPZ.speedDelay = 0;
   }
 }
 

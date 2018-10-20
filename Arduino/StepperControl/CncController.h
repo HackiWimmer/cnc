@@ -4,6 +4,15 @@
 #include "CncSpeedController.h"
 #include "AnalogPinController/CncInterface.h"
 
+///////////////////////////////////////////////////////////////////////////////////
+struct PwmProfile {
+  
+  unsigned int speedDelay = 0;
+  unsigned int accelDelay = 0;
+    
+};
+
+///////////////////////////////////////////////////////////////////////////////////
 class CncStepper;
 class CncController {
 
@@ -128,7 +137,7 @@ class CncController {
     bool disableStepperPin()                        { return enableStepperPin(false); }
 
     //////////////////////////////////////////////////////////////////////////////
-    unsigned char moveUntilSignal(int32_t x1, int32_t y1, int32_t z1);
+    unsigned char moveUntilSignal(const int32_t x1, const int32_t y1, const int32_t z1);
     unsigned char renderAndStepAxisXYZ(int32_t x1, int32_t y1, int32_t z1);
 
     //////////////////////////////////////////////////////////////////////////////

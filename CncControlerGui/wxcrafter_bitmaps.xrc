@@ -169,6 +169,8 @@
   <object class="wxBitmap" name="BMP_RUN">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\secureRun.png</object>
   <object class="wxBitmap" name="BMP_RUN_DEBUG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\goto (2).png</object>
   <object class="wxBitmap" name="BMP_RUN_RELEASE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\arrow-right-3.png</object>
+  <object class="wxBitmap" name="BMP_SECURE_DLG_NO">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\aui-close-inactive.png</object>
+  <object class="wxBitmap" name="BMP_SECURE_DLG_YES">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\window-new-2.png</object>
   <object class="wxBitmap" name="BMP_SEPARATOR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop.png</object>
   <object class="wxBitmap" name="BMP_SERIAL_SPY_OFF@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-debugger_stop@2x.png</object>
@@ -344,6 +346,7 @@
   <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
   <object class="wxBitmap" name="weather-lightning (2)">bitmaps\weather-lightning (2).png</object>
   <object class="wxBitmap" name="window-close-3">bitmaps\window-close-3.png</object>
+  <object class="wxBitmap" name="window-new-2">bitmaps\window-new-2.png</object>
   <object class="wxBitmap" name="workspace">bitmaps\workspace.png</object>
   <object class="wxBitmap" name="world-link">bitmaps\world-link.png</object>
 </resource>

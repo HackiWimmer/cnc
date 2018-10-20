@@ -166,6 +166,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , isDebugMode(false)
 , isZeroReferenceValid(false)
 , canClose(true)
+, useSecureRunDlg(true)
 , evaluatePositions(true)
 , templateFileLoading(false)
 , ignoreDirControlEvents(false)
@@ -766,16 +767,10 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	}
 	
 	// idle handling
-	static unsigned int idleCounter = 0;
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
-		idleCounter++;
-		
-		if ( idleCounter%2 == 0 ) {
-			idleCounter = 0;
-			m_serialTimer->Stop();
-			cnc->sendIdleMessage();
-			m_serialTimer->Start();
-		}
+		m_serialTimer->Stop();
+		cnc->sendIdleMessage();
+		m_serialTimer->Start();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1449,6 +1444,7 @@ void MainFrame::initialize(void) {
 	switchMonitorButton(true);
 	determineRunMode();
 	decoratePosSpyConnectButton(true);
+	decorateSecureDlgChoice(true);
 	registerGuiControls();
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
@@ -1843,11 +1839,13 @@ bool MainFrame::connectSerialPort() {
 		cnc = new CncControl(CncEMU_NULL);
 		cs.assign("dev/null");
 		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
 		
 	} else if ( sel == _portSimulatorNULL ) {
 		cnc = new CncControl(CncPORT_SIMU);
 		cs.assign(_portSimulatorNULL);
 		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
 		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
@@ -1856,12 +1854,14 @@ bool MainFrame::connectSerialPort() {
 		GBL_CONFIG->setProbeMode(true);
 		showSVGEmuResult();
 		enableMenuItem(m_miSaveEmuOutput, true);
+		decorateSecureDlgChoice(false);
 		
 	} else {
 		cnc = new CncControl(CncPORT);
 		cs.assign("\\\\.\\");
 		cs.append(sel);
 		GBL_CONFIG->setProbeMode(false);
+		decorateSecureDlgChoice(true);
 	}
 	
 	if ( cnc == NULL || cnc->getSerial() == NULL )
@@ -2875,6 +2875,7 @@ bool MainFrame::processManualTemplate() {
 	move.speedType 		= CncSpeedUserDefined;
 	move.absoluteMove	= ( m_mmRadioCoordinates->GetSelection() == 0 );
 	move.toolState		= m_checkBoxToolEnabled->GetValue();
+	move.correctLimit   = m_manuallyCorrectLimitPos->GetValue();
 	
 	m_manuallySpeedValue->GetValue().ToDouble(&move.f);
 	m_metricX->GetValue().ToDouble(&move.x);
@@ -3516,8 +3517,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	if ( ret == true ) {
 		
 		// process
-		const bool USE_SECURE_RUN_DLG = true;
-		if ( USE_SECURE_RUN_DLG == true && isDebugMode == false ) {
+		if ( useSecureRunDlg == true && isDebugMode == false ) {
 			wxASSERT(secureRunDlg);
 			if ( secureRunDlg->IsShown() )
 				secureRunDlg->Show(false);
@@ -7434,7 +7434,21 @@ void MainFrame::updatedSpeedConfigSteps(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	updateSpeedConfigPlayground();
 }
-
+/////////////////////////////////////////////////////////////////////
+void MainFrame::decorateSecureDlgChoice(bool useDlg) {
+/////////////////////////////////////////////////////////////////////
+	useSecureRunDlg = useDlg;
+	if ( useSecureRunDlg == true )	m_rcSecureDlg->SetBitmap((ImageLibSecureRun().Bitmap("BMP_SECURE_DLG_YES")));
+	else 							m_rcSecureDlg->SetBitmap((ImageLibSecureRun().Bitmap("BMP_SECURE_DLG_NO")));
+	
+	m_rcSecureDlg->Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::rcSecureDlg(wxCommandEvent& event)
+/////////////////////////////////////////////////////////////////////
+{
+	decorateSecureDlgChoice(!useSecureRunDlg);
+}
 
 
 
@@ -7442,4 +7456,5 @@ void MainFrame::updatedSpeedConfigSteps(wxCommandEvent& event) {
 void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 }
+
 

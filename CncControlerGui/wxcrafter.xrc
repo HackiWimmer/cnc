@@ -308,6 +308,11 @@
             <default>0</default>
           </object>
           <object class="separator"/>
+          <object class="wxBitmapButton" name="m_rcSecureDlg">
+            <bitmap>bitmaps/window-new-2.png</bitmap>
+            <style>wxBU_AUTODRAW</style>
+            <default>0</default>
+          </object>
           <object class="wxBitmapButton" name="m_rcRun">
             <bitmap>bitmaps/arrow-right-3.png</bitmap>
             <style>wxBU_AUTODRAW</style>
@@ -2679,14 +2684,14 @@ Roughest:</label>
                                   <rows>1</rows>
                                   <vgap>0</vgap>
                                   <hgap>0</hgap>
-                                  <growablecols>0,1</growablecols>
+                                  <growablecols>1</growablecols>
                                   <growablerows>0</growablerows>
                                   <object class="sizeritem">
                                     <flag>wxALL|wxEXPAND</flag>
                                     <border>1</border>
                                     <object class="wxRadioBox" name="m_mmRadioCoordinates">
                                       <label>How to use the coordinates . . .</label>
-                                      <style>wxRA_SPECIFY_ROWS</style>
+                                      <style>wxRA_SPECIFY_COLS</style>
                                       <dimension>1</dimension>
                                       <selection>1</selection>
                                       <content>
@@ -2701,7 +2706,7 @@ Roughest:</label>
                                     <option>1</option>
                                     <object class="wxFlexGridSizer">
                                       <cols>1</cols>
-                                      <rows>2</rows>
+                                      <rows>4</rows>
                                       <vgap>0</vgap>
                                       <hgap>0</hgap>
                                       <growablecols>0</growablecols>
@@ -2802,6 +2807,35 @@ Roughest:</label>
                                             <object class="wxStaticText" name="m_staticText5113">
                                               <label>mm/min</label>
                                               <style/>
+                                            </object>
+                                          </object>
+                                        </object>
+                                      </object>
+                                      <object class="sizeritem">
+                                        <flag>wxALL|wxEXPAND</flag>
+                                        <border>1</border>
+                                        <object class="wxStaticLine" name="m_staticLine5729">
+                                          <style>wxLI_HORIZONTAL</style>
+                                        </object>
+                                      </object>
+                                      <object class="sizeritem" name="flexGridSizer5723">
+                                        <flag>wxALL|wxEXPAND</flag>
+                                        <border>5</border>
+                                        <option>1</option>
+                                        <object class="wxFlexGridSizer">
+                                          <cols>2</cols>
+                                          <rows>1</rows>
+                                          <vgap>0</vgap>
+                                          <hgap>0</hgap>
+                                          <growablecols>0,1</growablecols>
+                                          <growablerows>0</growablerows>
+                                          <object class="sizeritem">
+                                            <flag>wxALL|wxEXPAND</flag>
+                                            <border>3</border>
+                                            <object class="wxCheckBox" name="m_manuallyCorrectLimitPos">
+                                              <style/>
+                                              <label>Currect Limit Positions</label>
+                                              <checked>1</checked>
                                             </object>
                                           </object>
                                         </object>

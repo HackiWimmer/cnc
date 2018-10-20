@@ -212,6 +212,9 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 			case CMD_GETTER:						ret = performSerialBytes((unsigned char*)(buffer), nbByte);
 													break;
 			
+			case CMD_IDLE:							ret = performSerialBytes((unsigned char*)(buffer), nbByte);
+													break;
+			
 			case CMD_MOVE:
 			case CMD_RENDER_AND_MOVE:
 			case CMD_MOVE_UNIT_SIGNAL:				ret = performMajorMove((unsigned char*)(buffer), nbByte);
@@ -454,6 +457,9 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case SIG_RESUME:
 		case SIG_QUIT_MOVE: 		lastSignal = cmd;
 									return true;
+									
+		case CMD_IDLE:				lastCommand.cmd = cmd;
+									return writeHeartbeat(buffer, nbByte);
 		
 		case CMD_RESET_CONTROLLER:	reset();
 									lastCommand.cmd = cmd;
@@ -473,6 +479,20 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		default:					lastCommand.cmd = cmd;
 	}
 	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::writeHeartbeat(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	unsigned char byteCount = sizeof(int32_t);
+
+  //writeLongValue(millis() % MAX_LONG);
+  
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_HEARTBEAT);
+	lastCommand.Serial.write(byteCount);
+	lastCommand.Serial.write(42);
+	lastCommand.Serial.write(RET_OK);
 	return true;
 }
 ///////////////////////////////////////////////////////////////////

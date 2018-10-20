@@ -66,6 +66,10 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 	}
 	
 	bool ret = cncControl->moveAbsLinearMetricXYZ(currentPos.getX(), currentPos.getY(), currentPos.getZ(), false);
+	if ( ret == false && md.correctLimit == true ) {
+		ret = cncControl->correctLimitPositions();
+	}
+	
 	switchToolState(false);
 	
 	return ret;

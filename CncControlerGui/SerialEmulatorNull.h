@@ -214,6 +214,8 @@ class SerialEmulatorNULL : public SerialSpyPort
 		
 		unsigned char getLastSignal() { return lastSignal; }
 		
+		virtual bool writeHeartbeat(unsigned char *buffer, unsigned int nbByte);
+		
 		virtual bool writeGetter(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeSetter(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte);

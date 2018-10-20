@@ -67,14 +67,12 @@ void SecureRun::stop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
 	wxPostEvent(parentFrame->GetRcStop(), evt);
-	//hideDialog(wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////
 void SecureRun::emergengy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
 	wxPostEvent(parentFrame->GetBtnEmergenyStop(), evt);
-	//hideDialog(wxID_ABORT);
 }
 ///////////////////////////////////////////////////////////////////
 void SecureRun::play(wxCommandEvent& event) {

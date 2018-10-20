@@ -4,16 +4,6 @@
 #include "CncController.h"
 #include "CommonValues.h"
 
-struct PwmProfile {
-  
-    unsigned int dirPulseWidth;
-    
-    unsigned int lowPulsWidth;
-    unsigned int highPulsWidth;
-
-    unsigned int getMinPulsWidth() { return lowPulsWidth + highPulsWidth; }
-};
-
 class CncStepper {
   public:
     enum StepDirection { SD_INC     = DIRECTION_INC, 
@@ -23,7 +13,7 @@ class CncStepper {
     
   private:
     bool INCREMENT_DIRECTION_VALUE;
-    PwmProfile pwmProfile;
+    PwmProfile& pwmProfile;
     
     bool interrupted;
     bool calculateDuration;
@@ -74,7 +64,7 @@ class CncStepper {
 
   public:
     //////////////////////////////////////////////////////////////////////////////
-    CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin);
+    CncStepper(CncController* crtl, PwmProfile& pwm, char a, byte stpPin, byte dirPin, byte lmtPin);
     ~CncStepper();
 
     //////////////////////////////////////////////////////////////////////////////

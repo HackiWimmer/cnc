@@ -139,15 +139,15 @@ namespace CncInterface {
         : StatesBase(s) {}
         
         //-------------------------------------------------------------
-        bool isSupportButton1Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_1_PRESSED);   }
-        bool isSupportButton2Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_2_PRESSED);   }
-        bool isSupportButton3Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_3_PRESSED);   }
+        bool isSupportButton1Pressed()        const  { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_1_PRESSED);   }
+        bool isSupportButton2Pressed()        const  { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_2_PRESSED);   }
+        bool isSupportButton3Pressed()        const  { return getBit(SupportPin::BIT_IS_SUPPORT_BUTTON_3_PRESSED);   }
         
-        bool isSupportSwitch1Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_SWITCH_1_PRESSED);   }
-        bool isSupportSwitch2Pressed()               { return getBit(SupportPin::BIT_IS_SUPPORT_SWITCH_2_PRESSED);   }
+        bool isSupportSwitch1Pressed()        const  { return getBit(SupportPin::BIT_IS_SUPPORT_SWITCH_1_PRESSED);   }
+        bool isSupportSwitch2Pressed()        const  { return getBit(SupportPin::BIT_IS_SUPPORT_SWITCH_2_PRESSED);   }
         
-        bool isToolPowered()                         { return getBit(SupportPin::BIT_IS_TOOL_POWERED);               }
-        bool isCableConnected()                      { return getBit(SupportPin::BIT_IS_CABLE_CONNECTED);            }
+        bool isToolPowered()                  const  { return getBit(SupportPin::BIT_IS_TOOL_POWERED);               }
+        bool isCableConnected()               const  { return getBit(SupportPin::BIT_IS_CABLE_CONNECTED);            }
         // add more named getters on demand . . .
         
     }; // States

@@ -175,6 +175,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_auibarMain->AddSeparator();
     
+    m_rcSecureDlg = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("window-new-2")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_auibarMain->AddControl(m_rcSecureDlg);
+    
     m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-right-3")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
     m_rcRun->SetToolTip(_("Run - Release"));
     m_auibarMain->AddControl(m_rcRun);
@@ -1575,7 +1578,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxFlexGridSizer* flexGridSizer1522 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer1522->SetFlexibleDirection( wxBOTH );
     flexGridSizer1522->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer1522->AddGrowableCol(0);
     flexGridSizer1522->AddGrowableCol(1);
     flexGridSizer1522->AddGrowableRow(0);
     
@@ -1584,12 +1586,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxArrayString m_mmRadioCoordinatesArr;
     m_mmRadioCoordinatesArr.Add(_("Absolute"));
     m_mmRadioCoordinatesArr.Add(_("Relative"));
-    m_mmRadioCoordinates = new wxRadioBox(m_mainBookManual, wxID_ANY, _("How to use the coordinates . . ."), wxDefaultPosition, wxDLG_UNIT(m_mainBookManual, wxSize(-1,-1)), m_mmRadioCoordinatesArr, 1, wxRA_SPECIFY_ROWS);
+    m_mmRadioCoordinates = new wxRadioBox(m_mainBookManual, wxID_ANY, _("How to use the coordinates . . ."), wxDefaultPosition, wxDLG_UNIT(m_mainBookManual, wxSize(-1,-1)), m_mmRadioCoordinatesArr, 1, wxRA_SPECIFY_COLS);
     m_mmRadioCoordinates->SetSelection(1);
     
     flexGridSizer1522->Add(m_mmRadioCoordinates, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer5099 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer5099 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer5099->SetFlexibleDirection( wxBOTH );
     flexGridSizer5099->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5099->AddGrowableCol(0);
@@ -1653,6 +1655,24 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticText5113 = new wxStaticText(m_mainBookManual, wxID_ANY, _("mm/min"), wxDefaultPosition, wxDLG_UNIT(m_mainBookManual, wxSize(-1,-1)), 0);
     
     flexGridSizer5111->Add(m_staticText5113, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticLine5729 = new wxStaticLine(m_mainBookManual, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookManual, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5099->Add(m_staticLine5729, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5723 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5723->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5723->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5723->AddGrowableCol(0);
+    flexGridSizer5723->AddGrowableCol(1);
+    flexGridSizer5723->AddGrowableRow(0);
+    
+    flexGridSizer5099->Add(flexGridSizer5723, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_manuallyCorrectLimitPos = new wxCheckBox(m_mainBookManual, wxID_ANY, _("Currect Limit Positions"), wxDefaultPosition, wxDLG_UNIT(m_mainBookManual, wxSize(-1,-1)), 0);
+    m_manuallyCorrectLimitPos->SetValue(true);
+    
+    flexGridSizer5723->Add(m_manuallyCorrectLimitPos, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
     m_staticLine5109 = new wxStaticLine(m_mainBookManual, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookManual, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -5164,6 +5184,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rcNextBreakpoint->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
+    m_rcSecureDlg->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcSecureDlg), NULL, this);
     m_rcRun->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
@@ -5502,6 +5523,7 @@ MainFrameBClass::~MainFrameBClass()
     m_rcNextBreakpoint->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextBreakpoint), NULL, this);
     m_rcNextStep->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcNextStep), NULL, this);
     m_rcFinish->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcFinish), NULL, this);
+    m_rcSecureDlg->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcSecureDlg), NULL, this);
     m_rcRun->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPause->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
@@ -10412,6 +10434,32 @@ ImageLibSecureRun::ImageLibSecureRun()
                 this->Add(icn);
             }
             m_bitmaps.insert(std::make_pair(wxT("BMP_PAUSE"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SECURE_DLG_YES"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SECURE_DLG_YES"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_SECURE_DLG_NO"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_SECURE_DLG_NO"), bmp));
         }
     }
     

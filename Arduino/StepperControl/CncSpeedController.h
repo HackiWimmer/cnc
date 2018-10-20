@@ -457,8 +457,8 @@ class CncSpeedController {
       #ifdef SKETCH_COMPILE
         #warning move this to config
       #endif
-      const double startSpeed = 20.0; // mm/sec
-      const double stopSpeed  = 20.0;
+      const double startSpeed = 15.0; // mm/sec
+      const double stopSpeed  = 15.0;
 
       setupAccelerationProfile(axis, s, p, oR, oS, tPW, startSpeed, stopSpeed);
       

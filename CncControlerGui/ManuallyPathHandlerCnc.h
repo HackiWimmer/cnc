@@ -13,6 +13,7 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 			CncSpeed speedType 	= CncSpeedRapid;
 			bool absoluteMove 	= false;
 			bool toolState 		= false;
+			bool correctLimit   = true;
 			
 			double f = 0.0;
 			double x = 0.0;

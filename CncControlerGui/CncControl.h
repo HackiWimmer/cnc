@@ -122,6 +122,8 @@ class CncControl {
 		void displayLimitState(wxStaticText* ctl, bool value);
 		void displayLimitStates(const int32_t x, const int32_t y, const int32_t z);
 		void displayLimitStates(const CncInterface::ILS::States& ls);
+		void displayUnknownSupportStates();
+		void displaySupportStates(const CncInterface::ISP::States& sp);
 		
 		// simple move
 		bool prepareSimpleMove(bool enaleEventHandling = true);
@@ -135,6 +137,9 @@ class CncControl {
 		
 		inline void postAppPosition(unsigned char pid);
 		inline void postCtlPosition(unsigned char pid);
+		
+		bool manualContinuousMoveStart_AppBased(const double x, const double y, const double z, bool correctLimit=true);
+		bool manualContinuousMoveStart_CtrlBased(const double x, const double y, const double z, bool correctLimit=true);
 		
 	public:
 		
@@ -211,6 +216,8 @@ class CncControl {
 		bool moveAbsMetricZ(double z);
 		bool moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendered);
 		bool moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
+		
+		bool correctLimitPositions();
 		
 		// Callback from Serial
 		bool SerialCallback();
@@ -298,9 +305,7 @@ class CncControl {
 		bool moveYToMid();
 		bool moveZToMid();
 		
-		bool manualContinuousMoveStart(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
-		bool manualContinuousMoveStart_AppBased(const double x, const double y, const double z);
-		bool manualContinuousMoveStart_CtrlBased(const double x, const double y, const double z);
+		bool manualContinuousMoveStart(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit=true);
 		void manualContinuousMoveStop();
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);

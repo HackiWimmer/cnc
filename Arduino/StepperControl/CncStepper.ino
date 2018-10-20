@@ -3,10 +3,10 @@
 #include "CncStepper.h"
 
 //////////////////////////////////////////////////////////////////////////////
-CncStepper::CncStepper(CncController* crtl, char a, byte stpPin, byte dirPin, byte lmtPin)
+CncStepper::CncStepper(CncController* crtl, PwmProfile& pwm, char a, byte stpPin, byte dirPin, byte lmtPin)
 //////////////////////////////////////////////////////////////////////////////
 : INCREMENT_DIRECTION_VALUE(NORMALIZED_INCREMENT_DIRECTION_VALUE)
-, pwmProfile()
+, pwmProfile(pwm)
 , interrupted(false)
 , calculateDuration(false)
 , minReached(false)
@@ -231,8 +231,6 @@ bool CncStepper::checkLimit(int dir) {
 //////////////////////////////////////////////////////////////////////////////
 void CncStepper::resetDirectionPin() {
 //////////////////////////////////////////////////////////////////////////////
-return;
-  
   if ( getIncrementDirectionValue() == false )  setDirection(DIRECTION_INC);
   else                                          setDirection(DIRECTION_DEC);            
 }
@@ -288,6 +286,16 @@ unsigned char CncStepper::performNextStep() {
   // gurantiee total puls width
   tsCurrStep = micros();
 
+  // -------
+  // |     |
+  // |     |-------------------------------------------
+  // \ hpw \     lpw    \
+  // \      minpw       \  speedDelay  \  accelDelay  \ 
+  
+  unsigned long currPulsWidth = minPulsWidth 
+                              + pwmProfile.speedDelay 
+                              + pwmProfile.accelDelay;
+
   // micros(): Returns the number of microseconds since the Arduino board began running the current program. 
   // This number will overflow (go back to zero), after approximately 70 minutes. On 16 MHz Arduino boards 
   // (e.g. Duemilanove and Nano), this function has a resolution of four microseconds 
@@ -299,8 +307,9 @@ unsigned char CncStepper::performNextStep() {
   } else {
     // normal processing
     unsigned long tsDiff = tsCurrStep - tsPrevStep;
-    if ( tsDiff < minPulsWidth )
-      delayMicroseconds(tsDiff);
+    
+    if ( tsDiff < currPulsWidth )
+      delayMicroseconds( currPulsWidth - tsDiff );
   }
   
   // then stepping . . .
@@ -318,7 +327,7 @@ unsigned char CncStepper::performNextStep() {
     // delayMicroseconds(lowPulsWidth);
     
   } else {
-     // simulate step delay
+     // simulate step delay ???
      delayMicroseconds(minPulsWidth);
   }
 

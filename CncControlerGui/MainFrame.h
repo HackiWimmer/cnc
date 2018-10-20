@@ -81,7 +81,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
+		virtual void rcSecureDlg(wxCommandEvent& event);
+		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
 		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
 		virtual void selectManuallyToolId(wxCommandEvent& event);
 		virtual void leaveSerialSpy(wxMouseEvent& event);
@@ -460,6 +461,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool connectSerialPort();
 		
 		void decorateProbeMode(bool probeMode);
+		void decorateSecureDlgChoice(bool useDlg);
 		
 		void updateSpeedConfigPlayground();
 		
@@ -475,6 +477,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool isDebugMode;
 		bool isZeroReferenceValid;
 		bool canClose;
+		bool useSecureRunDlg;
 		bool evaluatePositions;
 		bool templateFileLoading;
 		bool ignoreDirControlEvents;
