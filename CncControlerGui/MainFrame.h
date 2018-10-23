@@ -19,6 +19,7 @@
 #include "CncToolMagazine.h"
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
+#include "CfgAccelerationGraph.h"
 #include "CncVectiesListCtrl.h"
 #include "CncSummaryListCtrl.h"
 #include "CncStatisticSummaryListCtrl.h"
@@ -81,6 +82,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
     virtual void clickSpeedControl(wxCommandEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
 		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
@@ -464,6 +466,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void decorateProbeMode(bool probeMode);
 		void decorateSecureDlgChoice(bool useDlg);
 		
+		void initSpeedConfigPlayground();
 		void updateSpeedConfigPlayground();
 		
 		friend class CncConfig;
@@ -502,6 +505,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncStatisticSummaryListCtrl* statisticSummaryListCtrl;
 		CncVectiesListCtrl* vectiesListCtrl;
 		CncSummaryListCtrl* cncSummaryListCtrl;
+		CfgAccelerationGraph* accelGraphPanel; 
 		
 		CncPerspective perspectiveHandler;
 		GuiControlSetup* guiCtlSetup;

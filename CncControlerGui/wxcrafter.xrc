@@ -1230,11 +1230,11 @@
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>1</border>
                                       <object class="wxFlexGridSizer">
-                                        <cols>8</cols>
+                                        <cols>11</cols>
                                         <rows>1</rows>
                                         <vgap>0</vgap>
                                         <hgap>0</hgap>
-                                        <growablecols>3,5,7</growablecols>
+                                        <growablecols>3,5,7,10</growablecols>
                                         <growablerows>0</growablerows>
                                         <object class="sizeritem">
                                           <flag>wxALL</flag>
@@ -1276,8 +1276,10 @@
                                         <object class="sizeritem">
                                           <flag>wxALL|wxEXPAND</flag>
                                           <border>1</border>
+                                          <minsize>100,-1</minsize>
                                           <object class="wxTextCtrl" name="m_speedConfigStepsX">
                                             <style>wxTE_RIGHT</style>
+                                            <size>100,-1</size>
                                             <font>
                                               <size>8</size>
                                               <style>normal</style>
@@ -1308,8 +1310,10 @@
                                         <object class="sizeritem">
                                           <flag>wxALL|wxEXPAND</flag>
                                           <border>1</border>
+                                          <minsize>100,-1</minsize>
                                           <object class="wxTextCtrl" name="m_speedConfigStepsY">
                                             <style>wxTE_RIGHT</style>
+                                            <size>100,-1</size>
                                             <font>
                                               <size>8</size>
                                               <style>normal</style>
@@ -1340,8 +1344,10 @@
                                         <object class="sizeritem">
                                           <flag>wxALL|wxEXPAND</flag>
                                           <border>1</border>
+                                          <minsize>100,-1</minsize>
                                           <object class="wxTextCtrl" name="m_speedConfigStepsZ">
                                             <style>wxTE_RIGHT</style>
+                                            <size>100,-1</size>
                                             <font>
                                               <size>8</size>
                                               <style>normal</style>
@@ -1351,6 +1357,48 @@
                                               <face>Segoe UI</face>
                                             </font>
                                             <value>1000</value>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>1</border>
+                                          <object class="wxStaticLine" name="m_staticLine5781">
+                                            <style>wxLI_VERTICAL</style>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <border>5</border>
+                                          <object class="wxStaticText" name="m_staticText5777">
+                                            <label>Accel Axis:</label>
+                                            <style/>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>1</border>
+                                          <object class="wxComboBox" name="m_speedConfigAccelAxis">
+                                            <style>wxCB_READONLY</style>
+                                            <font>
+                                              <size>8</size>
+                                              <style>normal</style>
+                                              <weight>normal</weight>
+                                              <family>swiss</family>
+                                              <underlined>0</underlined>
+                                              <face>Segoe UI</face>
+                                            </font>
+                                            <selection>0</selection>
+                                            <content>
+                                              <item>
+                                                <![CDATA[X]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[Y]]>
+                                              </item>
+                                              <item>
+                                                <![CDATA[Z]]>
+                                              </item>
+                                            </content>
                                           </object>
                                         </object>
                                       </object>
@@ -1387,18 +1435,60 @@
                                               <growablerows>0</growablerows>
                                               <object class="sizeritem">
                                                 <flag>wxALL|wxEXPAND</flag>
-                                                <object class="wxTextCtrl" name="m_speedConfigTrace">
-                                                  <style>wxTE_MULTILINE</style>
-                                                  <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                  <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
-                                                  <font>
-                                                    <size>8</size>
-                                                    <style>normal</style>
-                                                    <weight>normal</weight>
-                                                    <family>modern</family>
-                                                    <underlined>0</underlined>
-                                                    <face>Consolas</face>
-                                                  </font>
+                                                <border>5</border>
+                                                <object class="wxSplitterWindow" name="m_splitter5759">
+                                                  <style>wxSP_3D</style>
+                                                  <gravity>0.65</gravity>
+                                                  <minsize>10</minsize>
+                                                  <sashpos>0</sashpos>
+                                                  <orientation>horizontal</orientation>
+                                                  <object class="wxPanel" name="m_accelGraphPanelMain">
+                                                    <style>wxTAB_TRAVERSAL</style>
+                                                    <bg>wxSYS_COLOUR_INACTIVECAPTIONTEXT</bg>
+                                                    <object class="wxFlexGridSizer">
+                                                      <cols>1</cols>
+                                                      <rows>1</rows>
+                                                      <vgap>0</vgap>
+                                                      <hgap>0</hgap>
+                                                      <growablecols>0</growablecols>
+                                                      <growablerows>0</growablerows>
+                                                      <object class="sizeritem">
+                                                        <flag>wxALL|wxEXPAND</flag>
+                                                        <border>3</border>
+                                                        <object class="wxPanel" name="m_accelGraphPanel">
+                                                          <style>wxTAB_TRAVERSAL|wxHSCROLL|wxVSCROLL</style>
+                                                          <bg>wxSYS_COLOUR_BTNHIGHLIGHT</bg>
+                                                        </object>
+                                                      </object>
+                                                    </object>
+                                                  </object>
+                                                  <object class="wxPanel" name="m_splitterPage5767">
+                                                    <style>wxTAB_TRAVERSAL</style>
+                                                    <object class="wxFlexGridSizer">
+                                                      <cols>1</cols>
+                                                      <rows>1</rows>
+                                                      <vgap>0</vgap>
+                                                      <hgap>0</hgap>
+                                                      <growablecols>0</growablecols>
+                                                      <growablerows>0</growablerows>
+                                                      <object class="sizeritem">
+                                                        <flag>wxALL|wxEXPAND</flag>
+                                                        <object class="wxTextCtrl" name="m_speedConfigTrace">
+                                                          <style>wxTE_MULTILINE</style>
+                                                          <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                                                          <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
+                                                          <font>
+                                                            <size>8</size>
+                                                            <style>normal</style>
+                                                            <weight>normal</weight>
+                                                            <family>modern</family>
+                                                            <underlined>0</underlined>
+                                                            <face>Consolas</face>
+                                                          </font>
+                                                        </object>
+                                                      </object>
+                                                    </object>
+                                                  </object>
                                                 </object>
                                               </object>
                                             </object>

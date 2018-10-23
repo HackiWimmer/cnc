@@ -121,6 +121,10 @@ class AccelerationProfile {
     void initFeedSpeedDelay(const unsigned int d) {
       feedSpeedDelay = d;
     }
+
+    //////////////////////////////////////////////////////////////////
+    int32_t getStartStepCountMark() const { return startStepCountMark; }
+    int32_t getStopStepCountMark()  const { return stopStepCountMark;  }
     
     //////////////////////////////////////////////////////////////////
     bool calculate(const int32_t stm) {
@@ -189,17 +193,17 @@ class AccelerationProfile {
         case P_INACTIVE: {      return (startSpeedDelay - feedSpeedDelay);
           
         }
-        case P_ACCEL: {         if ( stepCounter >= startStepCountMark ) 
+        case P_ACCEL: {         if ( stepCounter -1> startStepCountMark ) 
                                   period = P_TARGET;
 
-                                return startSpeedDelay - ((stepCounter -1) * startDelayDelta);
+                                return startSpeedDelay - feedSpeedDelay - ((stepCounter) * startDelayDelta);
         }                         
         case P_TARGET: {        if ( stepCounter >= stopStepCountMark )
                                   period = P_DEACCEL;
 
                                 return 0;
         }  
-        case P_DEACCEL: {       if ( stepCounter >= stepsToMove )
+        case P_DEACCEL: {       if ( stepCounter -1 > stepsToMove )
                                   period = P_INACTIVE;
           
                                 return ( stepCounter - stopStepCountMark ) * stopDelayDelta;             
@@ -215,7 +219,7 @@ const int32_t MAX_FEED_SPEED_VALUE = MIN_LONG;
 
 class CncSpeedController {
   
-  protected:
+  public:
   
     struct Axis {
       char            axis                = '?';
@@ -371,13 +375,15 @@ class CncSpeedController {
       #endif
     };
 
-    double configuredFeedSpeed_MM_SEC;
+  protected:
+    
+	double configuredFeedSpeed_MM_SEC;
     double realtimeFeedSpeed_MM_SEC;
 
   public:
     
     Axis X, Y, Z;
-
+	
     //////////////////////////////////////////////////////////////////
     CncSpeedController()
     : configuredFeedSpeed_MM_SEC(0.0)

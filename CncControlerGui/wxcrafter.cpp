@@ -786,12 +786,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5681->Add(m_speedConfigSlider, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    wxFlexGridSizer* flexGridSizer5707 = new wxFlexGridSizer(1, 8, 0, 0);
+    wxFlexGridSizer* flexGridSizer5707 = new wxFlexGridSizer(1, 11, 0, 0);
     flexGridSizer5707->SetFlexibleDirection( wxBOTH );
     flexGridSizer5707->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5707->AddGrowableCol(3);
     flexGridSizer5707->AddGrowableCol(5);
     flexGridSizer5707->AddGrowableCol(7);
+    flexGridSizer5707->AddGrowableCol(10);
     flexGridSizer5707->AddGrowableRow(0);
     
     flexGridSizer5673->Add(flexGridSizer5707, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
@@ -810,7 +811,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5707->Add(m_staticText5717, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_speedConfigStepsX = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxTE_RIGHT);
+    m_speedConfigStepsX = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(100,-1)), wxTE_RIGHT);
     wxFont m_speedConfigStepsXFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_speedConfigStepsX->SetFont(m_speedConfigStepsXFont);
     #if wxVERSION_NUMBER >= 3000
@@ -818,6 +819,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     flexGridSizer5707->Add(m_speedConfigStepsX, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_speedConfigStepsX->SetMinSize(wxSize(100,-1));
     
     m_staticText5719 = new wxStaticText(m_setupSpeedWizard, wxID_ANY, _("Y:"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), 0);
     wxFont m_staticText5719Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
@@ -825,7 +827,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5707->Add(m_staticText5719, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_speedConfigStepsY = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxTE_RIGHT);
+    m_speedConfigStepsY = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(100,-1)), wxTE_RIGHT);
     wxFont m_speedConfigStepsYFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_speedConfigStepsY->SetFont(m_speedConfigStepsYFont);
     #if wxVERSION_NUMBER >= 3000
@@ -833,6 +835,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     flexGridSizer5707->Add(m_speedConfigStepsY, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_speedConfigStepsY->SetMinSize(wxSize(100,-1));
     
     m_staticText5721 = new wxStaticText(m_setupSpeedWizard, wxID_ANY, _("Z:"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), 0);
     wxFont m_staticText5721Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
@@ -840,7 +843,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5707->Add(m_staticText5721, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_speedConfigStepsZ = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxTE_RIGHT);
+    m_speedConfigStepsZ = new wxTextCtrl(m_setupSpeedWizard, wxID_ANY, wxT("1000"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(100,-1)), wxTE_RIGHT);
     wxFont m_speedConfigStepsZFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_speedConfigStepsZ->SetFont(m_speedConfigStepsZFont);
     #if wxVERSION_NUMBER >= 3000
@@ -848,6 +851,26 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     flexGridSizer5707->Add(m_speedConfigStepsZ, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_speedConfigStepsZ->SetMinSize(wxSize(100,-1));
+    
+    m_staticLine5781 = new wxStaticLine(m_setupSpeedWizard, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer5707->Add(m_staticLine5781, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText5777 = new wxStaticText(m_setupSpeedWizard, wxID_ANY, _("Accel Axis:"), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), 0);
+    
+    flexGridSizer5707->Add(m_staticText5777, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_speedConfigAccelAxisArr;
+    m_speedConfigAccelAxisArr.Add(wxT("X"));
+    m_speedConfigAccelAxisArr.Add(wxT("Y"));
+    m_speedConfigAccelAxisArr.Add(wxT("Z"));
+    m_speedConfigAccelAxis = new wxComboBox(m_setupSpeedWizard, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_setupSpeedWizard, wxSize(-1,-1)), m_speedConfigAccelAxisArr, wxCB_READONLY);
+    wxFont m_speedConfigAccelAxisFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_speedConfigAccelAxis->SetFont(m_speedConfigAccelAxisFont);
+    m_speedConfigAccelAxis->SetSelection(0);
+    
+    flexGridSizer5707->Add(m_speedConfigAccelAxis, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer5678 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer5678->SetFlexibleDirection( wxBOTH );
@@ -876,13 +899,44 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer56917->AddGrowableRow(0);
     m_panel5699->SetSizer(flexGridSizer56917);
     
-    m_speedConfigTrace = new wxTextCtrl(m_panel5699, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5699, wxSize(-1,-1)), wxTE_MULTILINE);
+    m_splitter5759 = new wxSplitterWindow(m_panel5699, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel5699, wxSize(-1,-1)), wxSP_3D);
+    m_splitter5759->SetSashGravity(0.65);
+    m_splitter5759->SetMinimumPaneSize(10);
+    
+    flexGridSizer56917->Add(m_splitter5759, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_accelGraphPanelMain = new wxPanel(m_splitter5759, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter5759, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_accelGraphPanelMain->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTIONTEXT));
+    
+    wxFlexGridSizer* flexGridSizer5773 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5773->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5773->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5773->AddGrowableCol(0);
+    flexGridSizer5773->AddGrowableRow(0);
+    m_accelGraphPanelMain->SetSizer(flexGridSizer5773);
+    
+    m_accelGraphPanel = new wxPanel(m_accelGraphPanelMain, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_accelGraphPanelMain, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxHSCROLL|wxVSCROLL);
+    m_accelGraphPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    
+    flexGridSizer5773->Add(m_accelGraphPanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
+    
+    m_splitterPage5767 = new wxPanel(m_splitter5759, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter5759, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter5759->SplitHorizontally(m_accelGraphPanelMain, m_splitterPage5767, 0);
+    
+    wxFlexGridSizer* flexGridSizer5769 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5769->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5769->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5769->AddGrowableCol(0);
+    flexGridSizer5769->AddGrowableRow(0);
+    m_splitterPage5767->SetSizer(flexGridSizer5769);
+    
+    m_speedConfigTrace = new wxTextCtrl(m_splitterPage5767, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage5767, wxSize(-1,-1)), wxTE_MULTILINE);
     m_speedConfigTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_speedConfigTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
     wxFont m_speedConfigTraceFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_speedConfigTrace->SetFont(m_speedConfigTraceFont);
     
-    flexGridSizer56917->Add(m_speedConfigTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer5769->Add(m_speedConfigTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelSpeedPgAxisX = new wxPanel(m_notebook5687, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebook5687, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelSpeedPgAxisXImgIndex;
@@ -5272,6 +5326,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_speedConfigStepsX->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigSteps), NULL, this);
     m_speedConfigStepsY->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigSteps), NULL, this);
     m_speedConfigStepsZ->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigSteps), NULL, this);
+    m_speedConfigAccelAxis->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigAccelAxis), NULL, this);
     m_cmXnegYpos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::cmKillFocus), NULL, this);
     m_cmXnegYpos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::cmLeave), NULL, this);
     m_cmXnegYpos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::cmLeftUp), NULL, this);
@@ -5612,6 +5667,7 @@ MainFrameBClass::~MainFrameBClass()
     m_speedConfigStepsX->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigSteps), NULL, this);
     m_speedConfigStepsY->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigSteps), NULL, this);
     m_speedConfigStepsZ->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigSteps), NULL, this);
+    m_speedConfigAccelAxis->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::updatedSpeedConfigAccelAxis), NULL, this);
     m_cmXnegYpos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(MainFrameBClass::cmKillFocus), NULL, this);
     m_cmXnegYpos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::cmLeave), NULL, this);
     m_cmXnegYpos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::cmLeftUp), NULL, this);

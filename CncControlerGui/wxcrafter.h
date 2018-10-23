@@ -41,6 +41,7 @@
 #include <wx/dataview.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
+#include <wx/splitter.h>
 #include <wx/radiobox.h>
 #include <wx/checkbox.h>
 #include <wx/listbook.h>
@@ -49,7 +50,6 @@
 #include <wx/scrolwin.h>
 #include <wx/listctrl.h>
 #include <wx/webview.h>
-#include <wx/splitter.h>
 #include <wx/timer.h>
 #include <wx/treectrl.h>
 #include <wx/propgrid/property.h>
@@ -179,8 +179,15 @@ protected:
     wxTextCtrl* m_speedConfigStepsY;
     wxStaticText* m_staticText5721;
     wxTextCtrl* m_speedConfigStepsZ;
+    wxStaticLine* m_staticLine5781;
+    wxStaticText* m_staticText5777;
+    wxComboBox* m_speedConfigAccelAxis;
     wxNotebook* m_notebook5687;
     wxPanel* m_panel5699;
+    wxSplitterWindow* m_splitter5759;
+    wxPanel* m_accelGraphPanelMain;
+    wxPanel* m_accelGraphPanel;
+    wxPanel* m_splitterPage5767;
     wxTextCtrl* m_speedConfigTrace;
     wxPanel* m_panelSpeedPgAxisX;
     wxTextCtrl* m_accelConfigTraceX;
@@ -765,6 +772,7 @@ protected:
     virtual void setupGridCommandButton(wxCommandEvent& event) { event.Skip(); }
     virtual void changeSpeedConfigSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void updatedSpeedConfigSteps(wxCommandEvent& event) { event.Skip(); }
+    virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void cmKillFocus(wxFocusEvent& event) { event.Skip(); }
     virtual void cmLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void cmLeftUp(wxMouseEvent& event) { event.Skip(); }
@@ -1058,7 +1066,14 @@ public:
     wxTextCtrl* GetSpeedConfigStepsY() { return m_speedConfigStepsY; }
     wxStaticText* GetStaticText5721() { return m_staticText5721; }
     wxTextCtrl* GetSpeedConfigStepsZ() { return m_speedConfigStepsZ; }
+    wxStaticLine* GetStaticLine5781() { return m_staticLine5781; }
+    wxStaticText* GetStaticText5777() { return m_staticText5777; }
+    wxComboBox* GetSpeedConfigAccelAxis() { return m_speedConfigAccelAxis; }
+    wxPanel* GetAccelGraphPanel() { return m_accelGraphPanel; }
+    wxPanel* GetAccelGraphPanelMain() { return m_accelGraphPanelMain; }
     wxTextCtrl* GetSpeedConfigTrace() { return m_speedConfigTrace; }
+    wxPanel* GetSplitterPage5767() { return m_splitterPage5767; }
+    wxSplitterWindow* GetSplitter5759() { return m_splitter5759; }
     wxPanel* GetPanel5699() { return m_panel5699; }
     wxTextCtrl* GetAccelConfigTraceX() { return m_accelConfigTraceX; }
     wxTextCtrl* GetSpeedConfigTraceX() { return m_speedConfigTraceX; }

@@ -473,6 +473,10 @@ void MainFrame::installCustControls() {
 	// summary list
 	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
+	
+	// acceleration graph
+	accelGraphPanel = new CfgAccelerationGraph(this); 
+	GblFunc::replaceControl(m_accelGraphPanel, accelGraphPanel);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -1457,7 +1461,7 @@ void MainFrame::initialize(void) {
 	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
 	changeManuallySpeedValue();
-	updateSpeedConfigPlayground();
+	initSpeedConfigPlayground();
 	
 	perspectiveHandler.setupUserPerspectives();
 	
@@ -7439,10 +7443,19 @@ void MainFrame::leaveSerialSpy(wxMouseEvent& event) {
 	m_serialSpyDetails->Clear();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::updateSpeedConfigPlayground() {
+void MainFrame::initSpeedConfigPlayground() {
 /////////////////////////////////////////////////////////////////////
 	if ( m_speedConfigSlider ) {
 		m_speedConfigSlider->SetRange(0, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
+		m_speedConfigSlider->SetValue(GBL_CONFIG->getMaxSpeedXYZ_MM_MIN() * 0.7);
+	}
+	
+	updateSpeedConfigPlayground();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::updateSpeedConfigPlayground() {
+/////////////////////////////////////////////////////////////////////
+	if ( m_speedConfigSlider ) {
 		
 		CncSpeedController csc;
 		csc.setup('X', GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), 
@@ -7478,6 +7491,22 @@ void MainFrame::updateSpeedConfigPlayground() {
 		ssAX << csc.X.AP;  	m_accelConfigTraceX->ChangeValue(ssAX.str());
 		ssAY << csc.Y.AP;  	m_accelConfigTraceY->ChangeValue(ssAY.str());
 		ssAZ << csc.Z.AP;  	m_accelConfigTraceZ->ChangeValue(ssAZ.str());
+		
+		wxASSERT(accelGraphPanel);
+		char axis   = m_speedConfigAccelAxis->GetStringSelection()[0];
+		int32_t stm = 0;
+		switch ( axis ) {
+			case 'X': stm = x; break;
+			case 'Y': stm = y; break;
+			case 'Z': stm = z; break;
+			default : axis = '\0';
+		}
+		
+		if ( axis != '\0' ) {
+			accelGraphPanel->init(&csc);
+			accelGraphPanel->calculate(axis, stm);
+			accelGraphPanel->display();
+		}
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -7487,6 +7516,11 @@ void MainFrame::changeSpeedConfigSlider(wxScrollEvent& event) {
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::updatedSpeedConfigSteps(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	updateSpeedConfigPlayground();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::updatedSpeedConfigAccelAxis(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	updateSpeedConfigPlayground();
 }
