@@ -25,7 +25,7 @@ class UpdateManagerEvent : public wxThreadEvent {
 		, speedValue(0.0)
 		{}
 
-		UpdateManagerEvent(const UpdateManagerEvent& event)
+		explicit UpdateManagerEvent(const UpdateManagerEvent& event)
 		: wxThreadEvent(event)
 		, pos(event.getCurrentPosition())
 		, referenceId(event.getReferenceId())

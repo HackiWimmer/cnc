@@ -802,16 +802,16 @@ unsigned char CncController::moveUntilSignal(const int32_t dx, const int32_t dy,
       // return != RET_OK
 
       if ( (millis() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
-        { currentSpeed = SPEED_STEP2; setSpeedValue(currentSpeed); }
+        { currentSpeed = SPEED_STEP2; setSpeedValue(currentSpeed, false); }
   
       if ( (millis() - tsStart) > TIMESPAN_STEP2 && currentSpeed < SPEED_STEP3 )
-        { currentSpeed = SPEED_STEP3; setSpeedValue(currentSpeed); }
+        { currentSpeed = SPEED_STEP3; setSpeedValue(currentSpeed, false); }
         
       if ( (millis() - tsStart) > TIMESPAN_STEP3 && currentSpeed < SPEED_STEP4 )
-        { currentSpeed = SPEED_STEP4; setSpeedValue(currentSpeed); }
+        { currentSpeed = SPEED_STEP4; setSpeedValue(currentSpeed, false); }
         
       if ( (millis() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
-        { currentSpeed = SPEED_STEP5; setSpeedValue(currentSpeed); }
+        { currentSpeed = SPEED_STEP5; setSpeedValue(currentSpeed, false); }
     }
   }
 
@@ -819,7 +819,7 @@ unsigned char CncController::moveUntilSignal(const int32_t dx, const int32_t dy,
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void CncController::setSpeedValue(double fm) { 
+void CncController::setSpeedValue(double fm, bool activateAcceleration) { 
 /////////////////////////////////////////////////////////////////////////////////////
   speedController.setFeedSpeed_MM_MIN(fm);  
 
@@ -829,7 +829,9 @@ void CncController::setSpeedValue(double fm) {
     RS::pwmPX.speedDelay = speedController.X.synthSpeedDelay;
     RS::pwmPY.speedDelay = speedController.Y.synthSpeedDelay;
     RS::pwmPZ.speedDelay = speedController.Z.synthSpeedDelay;
-    speedController.enableAccelerationXYZ(true);
+    
+    if ( activateAcceleration )
+      speedController.enableAccelerationXYZ(true);
     
   } else {
     

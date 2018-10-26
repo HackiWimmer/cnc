@@ -74,6 +74,7 @@
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
   <object class="wxBitmap" name="24-connected@2x">bitmaps\24-connected@2x.png</object>
   <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\build-animation-sprite.png</object>
+  <object class="wxBitmap" name="BMP_ACTIVATED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="BMP_APP_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\application-view-gallery.png</object>
   <object class="wxBitmap" name="BMP_APP_D128">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo-root.png</object>
   <object class="wxBitmap" name="BMP_APP_D128@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\128-codelite-logo-root@2x.png</object>
@@ -116,6 +117,7 @@
   <object class="wxBitmap" name="BMP_DB_CONFIGURATION">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="BMP_DB_PREPROCESSING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-orange.png</object>
   <object class="wxBitmap" name="BMP_DB_SPOOLING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-blue.png</object>
+  <object class="wxBitmap" name="BMP_DEACTIVATED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad-inactive.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
@@ -141,6 +143,8 @@
   <object class="wxBitmap" name="BMP_MINUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
   <object class="wxBitmap" name="BMP_MONITORING_MINIMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-low (2).png</object>
   <object class="wxBitmap" name="BMP_MONITORING_NORMAL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\network-wireless-full.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_XY">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_all-small.png</object>
+  <object class="wxBitmap" name="BMP_NAVI_Z">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\dpad_updown-small.png</object>
   <object class="wxBitmap" name="BMP_NO_WPT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="BMP_OK16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok.png</object>
   <object class="wxBitmap" name="BMP_OK16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-ok@2x.png</object>
@@ -182,6 +186,8 @@
   <object class="wxBitmap" name="BMP_SHOW">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_down.png</object>
   <object class="wxBitmap" name="BMP_SPEED_CTRL_OFF">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\time-delete.png</object>
   <object class="wxBitmap" name="BMP_SPEED_CTRL_ON">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\time-add.png</object>
+  <object class="wxBitmap" name="BMP_STICK_LEFT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\lstick_all-small.png</object>
+  <object class="wxBitmap" name="BMP_STICK_RIGHT">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad\navi\rstick_updown-small.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
   <object class="wxBitmap" name="BMP_STOP_3D@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-execute_stop@2x.png</object>
@@ -277,6 +283,7 @@
   <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
   <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
+  <object class="wxBitmap" name="dialog-information-3 (2)">bitmaps\dialog-information-3 (2).png</object>
   <object class="wxBitmap" name="dialog-warning-3 (2)">bitmaps\dialog-warning-3 (2).png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
@@ -286,6 +293,7 @@
   <object class="wxBitmap" name="document-save-3">bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="document-save-6">bitmaps\document-save-6.png</object>
   <object class="wxBitmap" name="document-save-as (2)">bitmaps\document-save-as (2).png</object>
+  <object class="wxBitmap" name="dpad_none-small">bitmaps\gamepad\navi\dpad_none-small.png</object>
   <object class="wxBitmap" name="draw-vector">bitmaps\draw-vector.png</object>
   <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
   <object class="wxBitmap" name="edit-rename">bitmaps\edit-rename.png</object>
@@ -295,6 +303,7 @@
   <object class="wxBitmap" name="executable">bitmaps\executable.png</object>
   <object class="wxBitmap" name="feed">bitmaps\feed.png</object>
   <object class="wxBitmap" name="filepreview">bitmaps\filepreview.png</object>
+  <object class="wxBitmap" name="gamepad-active">bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="git-reset">bitmaps\git-reset.png</object>
   <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>
   <object class="wxBitmap" name="go-down-2">bitmaps\go-down-2.png</object>
@@ -307,6 +316,7 @@
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
   <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
+  <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
   <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="mode1">bitmaps\ReferencePosition\mode1.png</object>
@@ -320,11 +330,17 @@
   <object class="wxBitmap" name="network-wireless-medium (2)">bitmaps\network-wireless-medium (2).png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
+  <object class="wxBitmap" name="playstation-circle-dark-icon24">bitmaps\gamepad\playstation-circle-dark-icon24.png</object>
+  <object class="wxBitmap" name="playstation-cross-dark-icon24">bitmaps\gamepad\playstation-cross-dark-icon24.png</object>
+  <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
+  <object class="wxBitmap" name="playstation-square-dark-icon24">bitmaps\gamepad\playstation-square-dark-icon24.png</object>
+  <object class="wxBitmap" name="playstation-triangle-dark-icon16">bitmaps\gamepad\playstation-triangle-dark-icon16.png</object>
   <object class="wxBitmap" name="plugin-add">bitmaps\plugin-add.png</object>
   <object class="wxBitmap" name="plugin-delete">bitmaps\plugin-delete.png</object>
   <object class="wxBitmap" name="plugin-edit">bitmaps\plugin-edit.png</object>
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
   <object class="wxBitmap" name="roll">bitmaps\roll.png</object>
+  <object class="wxBitmap" name="rstick_updown-small">bitmaps\gamepad\navi\rstick_updown-small.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="secureRunPause">bitmaps\secureRunPause.png</object>
   <object class="wxBitmap" name="secureRunStop">bitmaps\secureRunStop.png</object>

@@ -70,6 +70,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "HexDecoder.h"
 #include "UnitTestFrame.h"
 #include "UpdateManagerThread.h"
+#include "GamepadThread.h"
 #include "CncConfigProperty.h"
 #include "SecureRun.h"
 #include "CncReferencePosition.h"
@@ -97,6 +98,7 @@ const char* _copyRight			= "invented by Hacki Wimmer 2016 - 2018";
 #endif
 
 ////////////////////////////////////////////////////////////////////
+unsigned int CncGampadDeactivator::referenceCounter = 0;
 
 ////////////////////////////////////////////////////////////////////
 // user defined scintila style options
@@ -118,6 +120,7 @@ const char* _copyRight			= "invented by Hacki Wimmer 2016 - 2018";
 ////////////////////////////////////////////////////////////////////
 // app defined events
 	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD, 			UpdateManagerEvent);
+	wxDEFINE_EVENT(wxEVT_GAMEPAD_THREAD, 					GamepadEvent);
 	wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, 				wxTimerEvent);
 	wxDEFINE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 	wxTimerEvent);
 	wxDEFINE_EVENT(wxEVT_TRACE_FROM_THREAD,					wxThreadEvent);
@@ -163,6 +166,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 : MainFrameBClass(parent)
 , GlobalConfigManager(this, GetPgMgrSetup(), globalConfig)
 , updateManagerThread(NULL)
+, gamepadThread(NULL)
 , isDebugMode(false)
 , isZeroReferenceValid(false)
 , canClose(true)
@@ -219,6 +223,10 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	// initilazied update mananger thread
 	initializeUpdateManagerThread();
 	
+	// initilazied gamepad thread
+	if ( true )
+		initializeGamepadThread();
+	
 	// setup aui clear
 	hideAllAuiPanes();
 	
@@ -241,6 +249,10 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostInfo,	 			this, MainFrame::EventId::POST_INFO);
 	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostWarning, 			this, MainFrame::EventId::POST_WARNING);
 	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostError,	 			this, MainFrame::EventId::POST_ERROR);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadUpadte, 			this, MainFrame::EventId::GAMEPAD_STATE);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadHeartbeat, 		this, MainFrame::EventId::GAMEPAD_HEARTBEAT);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -262,6 +274,8 @@ MainFrame::~MainFrame() {
 	this->Unbind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostInfo,	 			this, MainFrame::EventId::POST_INFO);
 	this->Unbind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostWarning, 			this, MainFrame::EventId::POST_WARNING);
 	this->Unbind(wxEVT_TRACE_FROM_THREAD,	 		&MainFrame::onThreadPostError,	 			this, MainFrame::EventId::POST_ERROR);
+	this->Unbind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
+	this->Unbind(wxEVT_GAMEPAD_THREAD,	 			&MainFrame::onGamepdThreadCompletion,	 	this, MainFrame::EventId::COMPLETED);
 	
 	positionSpy->Unbind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
 	
@@ -330,7 +344,7 @@ void MainFrame::umPostEvent(const UpdateManagerThread::Event& evt) {
 		return;
 	
 	if ( updateManagerThread->IsPaused() == true ) {
-		wxCriticalSectionLocker enter(pThreadCS);
+		wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 		updateManagerThread->Resume();
 	}
 	
@@ -477,6 +491,11 @@ void MainFrame::installCustControls() {
 	// acceleration graph
 	accelGraphPanel = new CfgAccelerationGraph(this); 
 	GblFunc::replaceControl(m_accelGraphPanel, accelGraphPanel);
+	
+	// gamepad status
+	cncGamepadState = new CncGamepadControllerState(this); 
+	GblFunc::replaceControl(m_gamepadStateController, cncGamepadState);
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
@@ -768,7 +787,7 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 			if ( updateManagerThread->somethingLeftToDo() == false ) {
 				// a counter of 10 means 5 seconds
 				if ( ++counter > 10 ) {
-					wxCriticalSectionLocker enter(pThreadCS);
+					wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 					updateManagerThread->Pause();
 					
 					counter = 0;
@@ -972,6 +991,38 @@ void MainFrame::onThreadPostError(wxThreadEvent& event) {
 		std::cerr << event.GetString() << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::onGamepdThreadInitialized(GamepadEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//std::cout << "MainFrame::onGamepdThreadInitilaized" << std::endl;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onGamepdThreadCompletion(GamepadEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//std::cout << "MainFrame::onGamepdThreadCompletion" << std::endl;
+	gamepadThread = NULL;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onGamepdThreadHeartbeat(GamepadEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( event.data.connectionStateChanged == true ) {
+		decorateGamepadState(event.data.connected);
+		
+		if ( event.data.connected == false )	cnc::trc.logWarning(" Gamepad disconnected");
+		else									cnc::trc.logWarning(" Gamepad connected");
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onGamepdThreadUpadte(GamepadEvent& event) {
+///////////////////////////////////////////////////////////////////
+	onGamepdThreadHeartbeat(event);
+	
+	if ( event.data.connected == false )
+		return;
+	
+	if ( cncGamepadState )
+		cncGamepadState->update(event);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( checkIfTemplateIsModified() == false )
@@ -987,7 +1038,7 @@ void MainFrame::onClose(wxCloseEvent& event) {
 	// the serial port has threads
 	if ( cnc != NULL ) {
 		{
-			wxCriticalSectionLocker enter(pThreadCS);
+			wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 			cnc->sendHalt();
 			cnc->disconnect();
 			
@@ -1001,21 +1052,42 @@ void MainFrame::onClose(wxCloseEvent& event) {
 	// Destroy the update manager thread
 	if ( updateManagerThread != NULL) {
 		if ( updateManagerThread->IsRunning() == false) {
-			wxCriticalSectionLocker enter(pThreadCS);
+			wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 			updateManagerThread->Resume();
 		}
 		
 		updateManagerThread->stop();
 		
 		while ( true ) {
-			{ // was the ~MyThread() function executed?
-				wxCriticalSectionLocker enter(pThreadCS);
+			{ // was the ~UpdateManagerThreadThread() function executed?
+				wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 				if ( !updateManagerThread ) 
 					break;
 			}
 			// wait for thread completion
 			wxThread::This()->Sleep(10);
 		}
+	}
+	
+	// Destroy the gamepad thread
+	if ( gamepadThread != NULL) {
+		if ( gamepadThread->IsRunning() == false) {
+			wxCriticalSectionLocker enter(pGamepadThreadCS);
+			gamepadThread->Resume();
+		}
+		
+		gamepadThread->stop();
+		
+		while ( true ) {
+			{ // was the ~GamepadThread() function executed?
+				wxCriticalSectionLocker enter(pGamepadThreadCS);
+				if ( !gamepadThread ) 
+					break;
+			}
+			// wait for thread completion
+			wxThread::This()->Sleep(10);
+		}
+		 
 	}
 	
 	Destroy();
@@ -1263,12 +1335,13 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) {
 ///////////////////////////////////////////////////////////////////
 	wxString portName("Undefined");
+	PDEV_BROADCAST_HDR lpdb = NULL;
+	
 	if ( message == WM_DEVICECHANGE) {
-		PDEV_BROADCAST_HDR lpdb = (PDEV_BROADCAST_HDR)lParam;
-		
 		// logging
 		switch ( wParam ) {
-			case DBT_DEVICEARRIVAL:			if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
+			case DBT_DEVICEARRIVAL:			lpdb = (PDEV_BROADCAST_HDR)lParam;
+											if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
 												PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
 												wxString n(pPort->dbcp_name);
 												portName.assign(n);
@@ -1277,7 +1350,8 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 											cnc::trc.logInfo(wxString("A new COM device was detected on port: ") << portName);
 											break;
 											
-			case DBT_DEVICEREMOVECOMPLETE:	if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
+			case DBT_DEVICEREMOVECOMPLETE:	lpdb = (PDEV_BROADCAST_HDR)lParam;
+											if ( lpdb->dbch_devicetype == DBT_DEVTYP_PORT ) {
 												PDEV_BROADCAST_PORT pPort = (PDEV_BROADCAST_PORT) lpdb;
 												wxString n(pPort->dbcp_name);
 												portName.assign(n);
@@ -1327,8 +1401,14 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 					}
 				break;
 			}
+			
+			case DBT_DEVNODES_CHANGED: {
+				activateGamepadNotificationsOnDemand(true);
+				break;
+			}
+			
 			default: ;
-		}
+		} 
 	}
 	
 	return ret;
@@ -1442,6 +1522,26 @@ void MainFrame::initializeUpdateManagerThread() {
 		wxMessageBox( _("Couldn't run update manager thread!") );
 		abort();
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::initializeGamepadThread() {
+///////////////////////////////////////////////////////////////////
+	// create the thread
+	gamepadThread = new GamepadThread(this);
+	wxThreadError error = gamepadThread->Create();
+
+	if (error != wxTHREAD_NO_ERROR) {
+		wxMessageBox( _("Couldn't create gamepad thread!") );
+		abort();
+	}
+	
+	error = gamepadThread->Run();
+	if (error != wxTHREAD_NO_ERROR) {
+		wxMessageBox( _("Couldn't run gamepad thread!") );
+		abort();
+	}
+	
+	activateGamepadNotifications(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
@@ -2072,6 +2172,7 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 	refPositionDlg->setMessage(msg);
 	refPositionDlg->setMeasurePlateThickness(GBL_CONFIG->getMeasurePlateThickness());
 	
+	activateGamepadNotifications(true);
 	int ret = refPositionDlg->ShowModal();
 	
 	if ( ret == wxID_OK ) {
@@ -2844,10 +2945,57 @@ bool MainFrame::processVirtualTemplate() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool MainFrame::isGamepadNotificationActive() {
+///////////////////////////////////////////////////////////////////
+	if ( gamepadThread == NULL )
+		return false;
+		
+	return gamepadThread->IsRunning();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::activateGamepadNotificationsOnDemand(bool state) {
+///////////////////////////////////////////////////////////////////
+	if ( CncGampadDeactivator::gamepadNotificationsAllowed() == false ) {
+		activateGamepadNotifications(false);
+		return;
+	}
+	
+	activateGamepadNotifications(state);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::activateGamepadNotifications(bool state) {
+///////////////////////////////////////////////////////////////////
+	if ( gamepadThread == NULL )
+		return;
+		
+	bool changed = false;
+	if ( state == false ) {
+		if ( gamepadThread->IsRunning() ) {
+			gamepadThread->Pause();
+			changed = true;
+		}
+	} else {
+		if ( gamepadThread->IsPaused() ) {
+			gamepadThread->Resume();
+			changed = true;
+		}
+	}
+	
+	decorateGamepadState(gamepadThread->IsRunning());
+	
+	
+	//if ( gamepadThread->IsPaused() )	cnc::trc.logInfoMessage( changed ? "Gamepad thread deactivated" : "Gamepad thread stays deactivated");
+	//else								cnc::trc.logInfoMessage( changed ? "Gamepad thread activated"   : "Gamepad thread stays activated");
+	if ( gamepadThread->IsPaused() )	std::cout << ( changed ? "Gamepad thread deactivated" : "Gamepad thread stays deactivated") << std::endl;
+	else								std::cout << ( changed ? "Gamepad thread activated"   : "Gamepad thread stays activated") << std::endl;
+}
+///////////////////////////////////////////////////////////////////
 bool MainFrame::processSVGTemplate() {
 ///////////////////////////////////////////////////////////////////
 	if ( inboundFileParser != NULL )
 		delete inboundFileParser;
+		
+	CncGampadDeactivator cpd(this);
 		
 	inboundFileParser = new SVGFileParser(getCurrentTemplatePathFileName().c_str(), cnc);
 	return processVirtualTemplate();
@@ -2858,6 +3006,8 @@ bool MainFrame::processGCodeTemplate() {
 	if ( inboundFileParser != NULL )
 		delete inboundFileParser;
 		
+	CncGampadDeactivator cpd(this);
+	
 	inboundFileParser = new GCodeFileParser(getCurrentTemplatePathFileName().c_str(), new GCodePathHandlerCnc(cnc));
 	return processVirtualTemplate();
 }
@@ -3434,7 +3584,7 @@ void MainFrame::updateSetterList() {
 		return;
 		
 	if ( updateManagerThread->IsPaused() == true ) {
-		wxCriticalSectionLocker enter(pThreadCS);
+		wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 		updateManagerThread->Resume();
 	}
 		
@@ -7214,11 +7364,10 @@ void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( updateManagerThread != NULL ) {
 		if ( updateManagerThread->IsPaused() == true ) {
-			wxCriticalSectionLocker enter(pThreadCS);
+			wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 			updateManagerThread->Resume();
 		}
 	}
-
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::keyDownLogger(wxKeyEvent& event) {
@@ -7292,15 +7441,17 @@ void MainFrame::keyDownLruList(wxKeyEvent& event) {
 	event.Skip(true);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::manualContinuousMoveStart(wxWindow* ctrl, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
+void MainFrame::manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	wxASSERT(ctrl);
 	
 	if ( cnc->isInterrupted() == true ) {
-		std::cerr << "Interrupt aktive. Not will be done . . ." << std::endl;
+		std::cerr << "Interrupt active. Nothing will be done . . ." << std::endl;
 		return;
 	}
+	
+	if ( cnc->isContinuousMoveActive() )
+		return;
 	
 	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
 	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
@@ -7333,61 +7484,61 @@ void MainFrame::manualContinuousMoveStop() {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXneg, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXpos, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmYnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmYneg, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmYposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmYpos, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmZnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmZneg, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir);
+	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmZposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmZpos, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir);
+	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXnegYnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXnegYneg, CncLinearDirection::CncNegDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXnegYposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXnegYpos, CncLinearDirection::CncNegDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXposYnegLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXposYneg, CncLinearDirection::CncPosDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cmXposYposLeftDown(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(m_cmXposYpos, CncLinearDirection::CncPosDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 /////////////////////////////////////////////////////////////////////
@@ -7525,6 +7676,21 @@ void MainFrame::updatedSpeedConfigAccelAxis(wxCommandEvent& event) {
 	updateSpeedConfigPlayground();
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::decorateGamepadState(bool state) {
+/////////////////////////////////////////////////////////////////////
+	if ( state == true )	m_gamepadState->SetBitmap((ImageLibGamepad().Bitmap("BMP_ACTIVATED")));
+	else 					m_gamepadState->SetBitmap((ImageLibGamepad().Bitmap("BMP_DEACTIVATED")));
+	
+	if ( state == false ) {
+		m_gpBmp1->Show(false);
+		m_gpBmp2->Show(false);
+		m_gpBmp3->Show(false);
+		m_gpBmp4->Show(false);
+	}
+	
+	m_gamepadState->Refresh();
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::decorateSecureDlgChoice(bool useDlg) {
 /////////////////////////////////////////////////////////////////////
 	useSecureRunDlg = useDlg;
@@ -7538,6 +7704,12 @@ void MainFrame::rcSecureDlg(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	decorateSecureDlgChoice(!useSecureRunDlg);
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::cncMainViewChanged(wxNotebookEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	activateGamepadNotificationsOnDemand(true);
+}
+
 
 
 

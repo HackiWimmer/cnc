@@ -4,7 +4,7 @@
 #include <iostream>
 #include "OSD/CncTimeFunctions.h"
 #include "CncCommon.h"
-#include "CncArduino.h"
+#include "CncSpeedController.h"
 
 class CncSpeedSimulator : public CncSpeedController {
 	

@@ -11,6 +11,7 @@
 #include "FileParser.h"
 #include "PathGeneratorFrame.h"
 #include "UpdateManagerThread.h"
+#include "GamepadThread.h"
 #include "CncControl.h"
 #include "CncPerspective.h"
 #include "CncMotionMonitor.h"
@@ -20,6 +21,7 @@
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
 #include "CfgAccelerationGraph.h"
+#include "CncGamepadControllerState.h"
 #include "CncVectiesListCtrl.h"
 #include "CncSummaryListCtrl.h"
 #include "CncStatisticSummaryListCtrl.h"
@@ -76,14 +78,14 @@ class GlobalConfigManager {
 		}
 };
 
-
 ////////////////////////////////////////////////////////////////////
 class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
-    virtual void clickSpeedControl(wxCommandEvent& event);
+    virtual void cncMainViewChanged(wxNotebookEvent& event);
+		virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
+		virtual void clickSpeedControl(wxCommandEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
 		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
 		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
@@ -367,15 +369,35 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void onThreadPostInfo(wxThreadEvent& event);
 		void onThreadPostWarning(wxThreadEvent& event);
 		void onThreadPostError(wxThreadEvent& event);
+		void onGamepdThreadInitialized(GamepadEvent& event);
+		void onGamepdThreadCompletion(GamepadEvent& event);
+		void onGamepdThreadUpadte(GamepadEvent& event);
+		void onGamepdThreadHeartbeat(GamepadEvent& event);
 		
 		void onPerspectiveTimer(wxTimerEvent& event);
 		void onDebugUserNotificationTimer(wxTimerEvent& event);
 		void configurationUpdated(wxCommandEvent& event);
 		
+		bool isGamepadNotificationActive();
+		void activateGamepadNotificationsOnDemand(bool state);
+		void activateGamepadNotifications(bool state);
+		
 		wxDECLARE_EVENT_TABLE();
 		
 	public:
-		enum EventId { COMPLETED = 1, HEARTBEAT = 2, APP_POS_UPDATE = 3, CTL_POS_UPDATE = 4, DISPATCH_ALL = 5, POST_INFO = 6, POST_WARNING = 7, POST_ERROR = 8 };
+		enum EventId { 	INITIALIZED 		=  1,
+						COMPLETED 			=  2,
+						HEARTBEAT 			=  3, 
+						APP_POS_UPDATE 		=  4, 
+						CTL_POS_UPDATE 		=  5, 
+						DISPATCH_ALL 		=  6, 
+						POST_INFO 			=  7, 
+						POST_WARNING 		=  8, 
+						POST_ERROR 			=  9,
+						GAMEPAD_STATE		= 10,
+						GAMEPAD_HEARTBEAT	= 11
+					  };
+					  
 		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -456,9 +478,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
  
 		// Interrupt thread handling
 		UpdateManagerThread* updateManagerThread;
-		wxCriticalSection pThreadCS;
+		wxCriticalSection pUpdateManagerThreadCS;
 		
-		void manualContinuousMoveStart(wxWindow* ctrl, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
+		GamepadThread* gamepadThread;
+		wxCriticalSection pGamepadThreadCS;
+		
+		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		void manualContinuousMoveStop();
 		
 		bool connectSerialPort();
@@ -466,13 +491,18 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void decorateProbeMode(bool probeMode);
 		void decorateSecureDlgChoice(bool useDlg);
 		
+		void decorateGamepadState(bool state);
+		
 		void initSpeedConfigPlayground();
 		void updateSpeedConfigPlayground();
 		
 		friend class CncConfig;
+		friend class CncGampadDeactivator;
 		friend class CncReferencePosition;
+		friend class CncGamepadControllerState;
 		friend class CncConnectProgress;
 		friend class UpdateManagerThread;
+		friend class GamepadThread;
 		friend class CncPerspective;
 		friend class CncFileView;
 		
@@ -506,6 +536,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncVectiesListCtrl* vectiesListCtrl;
 		CncSummaryListCtrl* cncSummaryListCtrl;
 		CfgAccelerationGraph* accelGraphPanel; 
+		CncGamepadControllerState* cncGamepadState;
 		
 		CncPerspective perspectiveHandler;
 		GuiControlSetup* guiCtlSetup;
@@ -613,6 +644,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void registerGuiControls();
 		bool initializeCncControl();
 		void initializeUpdateManagerThread();
+		void initializeGamepadThread();
 		bool initializeLruMenu();
 		void initTemplateEditStyle();
 		void initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat format);
@@ -768,6 +800,39 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		bool connectSerialPortDialog();
 		
+};
+
+////////////////////////////////////////////////////////////////////
+class CncGampadDeactivator {
+	
+	private:
+		static unsigned int referenceCounter;
+		
+		MainFrame* parent;
+		bool reconstructPrevState;
+		bool prevState;
+		
+	public:
+		explicit CncGampadDeactivator(MainFrame* p, bool rps = false)
+		: parent(p)
+		, reconstructPrevState(rps)
+		, prevState(false)
+		{
+			wxASSERT(parent);
+			referenceCounter++;
+			
+			prevState = parent->isGamepadNotificationActive();
+			parent->activateGamepadNotifications(false);
+		}
+		
+		~CncGampadDeactivator() {
+			if ( reconstructPrevState == true ) 	parent->activateGamepadNotifications(prevState);
+			else 									parent->activateGamepadNotifications(true);
+			
+			referenceCounter--;
+		}
+		
+		static bool gamepadNotificationsAllowed() { return referenceCounter == 0; }
 };
 
 #endif // MAINFRAME_H

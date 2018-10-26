@@ -50,6 +50,23 @@ double CncReferencePosition::getWorkpieceThickness() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+void CncReferencePosition::shiftReferenceMode() {
+///////////////////////////////////////////////////////////////////
+	short mode = evaluateMode();
+	
+	m_btMode1->SetValue(false);
+	m_btMode2->SetValue(false);
+	m_btMode3->SetValue(false);
+	m_btMode4->SetValue(false);
+	m_btMode5->SetValue(false);
+	m_btMode6->SetValue(false);
+	
+	if ( mode == CncRefPositionMode::CncRM_Mode6 ) 	mode = 1;
+	else											mode++;
+	
+	setMode(mode);
+}
+///////////////////////////////////////////////////////////////////
 short CncReferencePosition::evaluateMode() {
 ///////////////////////////////////////////////////////////////////
 	if (      m_btMode1->GetValue() == true ) return 1;
@@ -101,70 +118,70 @@ void CncReferencePosition::setMode(short mode) {
 void CncReferencePosition::navigateXPos(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btXPos, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateXNeg(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btXNeg, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateYPos(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btYPos, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 //////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateYNeg(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btYNeg, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateZPos(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btZPos, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateZNeg(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btZNeg, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateXNegYNeg(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btXNegYNeg, CncLinearDirection::CncNegDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateXNegYPos(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btXNegYNeg, CncLinearDirection::CncNegDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateXPosYNeg(wxMouseEvent& event){
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btXNegYNeg, CncLinearDirection::CncPosDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::navigateXPosYPos(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(m_btXNegYNeg, CncLinearDirection::CncPosDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
+	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
 	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
@@ -228,7 +245,7 @@ void CncReferencePosition::mode6(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::init(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxPoint pos = {60, 60};
+	wxPoint pos = {10, 60};
 	SetPosition(pos);
 	
 	SetAffirmativeId(m_btSet->GetId());
@@ -242,6 +259,7 @@ void CncReferencePosition::init(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::show(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	m_rbStepSensitivity->SetSelection(parentFrame->GetRbStepSensitivity()->GetSelection());
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::cancel(wxCommandEvent& event) {
@@ -266,4 +284,11 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 	SetReturnCode(wxID_OK);
 	Show(false);
 }
-
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::selectStepSensitivity(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	if ( parentFrame == NULL)
+		return;
+		
+	parentFrame->GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
+}

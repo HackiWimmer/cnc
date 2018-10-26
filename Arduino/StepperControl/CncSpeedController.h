@@ -5,6 +5,7 @@
 
     #include <iostream>
     #include "CncCommon.h"
+    #include "CncArduino.h"
     #include "OSD/CncTimeFunctions.h"
     using namespace cnc;
 
@@ -44,6 +45,11 @@ class AccelerationProfile {
 
     Period period;
 
+    
+    //////////////////////////////////////////////////////////////////
+    explicit AccelerationProfile(const AccelerationProfile&) 
+    {}
+    
   public:
   
     //////////////////////////////////////////////////////////////////
@@ -61,16 +67,6 @@ class AccelerationProfile {
     , period(P_ACCEL)
     {}    
 
-    /*
-    //////////////////////////////////////////////////////////////////
-    explicit AccelerationProfile(const AccelerationProfile& ap) 
-    : active(ap.isActive())
-    , startSpeedDelay(ap.getStartSpeedDelay())
-    , stopSpeedDelay(ap.getStopSpeedDelay())
-    , feedSpeedDelay(ap.getFeedSpeedDelay())
-    , stepCounter(ap.getStepCounter())
-    {} */   
-    
     //////////////////////////////////////////////////////////////////
     ~AccelerationProfile(){
     }
@@ -193,19 +189,24 @@ class AccelerationProfile {
         case P_INACTIVE: {      return (startSpeedDelay - feedSpeedDelay);
           
         }
-        case P_ACCEL: {         if ( stepCounter -1> startStepCountMark ) 
-                                  period = P_TARGET;
+        case P_ACCEL: {         int delta = startSpeedDelay - feedSpeedDelay - ((stepCounter) * startDelayDelta);
+                                if ( stepCounter >= startStepCountMark ) {
+                                  // to avoid precision loss
+                                  if ( delta <= 0 ) 
+                                    period = P_TARGET;
+                                }
 
-                                return startSpeedDelay - feedSpeedDelay - ((stepCounter) * startDelayDelta);
+                                return delta < 0 ? 0 : delta;
         }                         
-        case P_TARGET: {        if ( stepCounter >= stopStepCountMark )
-                                  period = P_DEACCEL;
+        case P_TARGET: {        if ( stepCounter >= stopStepCountMark ) 
+                                     period = P_DEACCEL;
 
                                 return 0;
         }  
-        case P_DEACCEL: {       if ( stepCounter -1 > stepsToMove )
+        case P_DEACCEL: {       if ( stepCounter >= stepsToMove )
                                   period = P_INACTIVE;
-          
+
+                                // precision loss at the end isn't important
                                 return ( stepCounter - stopStepCountMark ) * stopDelayDelta;             
         }
       }

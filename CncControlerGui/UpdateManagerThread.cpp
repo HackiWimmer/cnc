@@ -33,7 +33,7 @@ UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
 ///////////////////////////////////////////////////////////////////
 UpdateManagerThread::~UpdateManagerThread() {
 ///////////////////////////////////////////////////////////////////
-	wxCriticalSectionLocker enter(pHandler->pThreadCS);
+	wxCriticalSectionLocker enter(pHandler->pUpdateManagerThreadCS);
 	// the thread is being destroyed; make sure not to leave dangling pointers around
 	pHandler->updateManagerThread = NULL;
 	
@@ -270,14 +270,14 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 											break;
 											
 		case Event::Type::SETLST_RESET:		{	// ensure no one else changes the setter list
-												wxCriticalSectionLocker lock(pHandler->pThreadCS);
+												wxCriticalSectionLocker lock(pHandler->pUpdateManagerThreadCS);
 												setterQueue.reset();
 												setterStringQueue.reset();
 											}
 											break;
 											
 		case Event::Type::POSSPY_RESET:		{	// ensure no one else changes the queues
-												wxCriticalSectionLocker lock(pHandler->pThreadCS);
+												wxCriticalSectionLocker lock(pHandler->pUpdateManagerThreadCS);
 												posSpyQueue.reset();
 												posSpyStringQueue.reset();
 											}

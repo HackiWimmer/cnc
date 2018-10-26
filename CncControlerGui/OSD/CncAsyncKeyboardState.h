@@ -8,6 +8,7 @@ class CncAsyncKeyboardState {
 		static bool isControlPressed();
 		static bool isShiftPressed();
 		static bool isAltPressed();
+		static bool isAltGrPressed();
 		static bool isEscapePressed();
 };
 

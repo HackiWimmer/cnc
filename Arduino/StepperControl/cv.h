@@ -5,7 +5,6 @@
 // Therefore everything here has to be C++ compileable
 
 #include "CommonValues.h"
-#include "CncSpeedController.h"
 #include "AnalogPinController/CommonDefinitions.h"
 
 #endif

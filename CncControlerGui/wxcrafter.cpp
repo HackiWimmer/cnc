@@ -181,6 +181,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auibarMain->AddSeparator();
     
     m_rcSecureDlg = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("window-new-2")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcSecureDlg->SetToolTip(_("Toggle Secure Run Dialog Mode"));
     m_auibarMain->AddControl(m_rcSecureDlg);
     
     m_rcRun = new wxBitmapButton(m_auibarMain, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-right-3")), wxDefaultPosition, wxDLG_UNIT(m_auibarMain, wxSize(-1,-1)), wxBU_AUTODRAW);
@@ -1052,7 +1053,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1393->Add(flexGridSizer777, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText779 = new wxStaticText(m_mainBookReference, wxID_ANY, _("Manually Motion Control"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    m_staticText779 = new wxStaticText(m_mainBookReference, wxID_ANY, _("Manually Motion Control:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
     wxFont m_staticText779Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText779->SetFont(m_staticText779Font);
     
@@ -1067,20 +1068,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_manualMotionControl->SetFont(m_manualMotionControlFont);
     m_manualMotionControl->SetName(wxT("m_manualMotionControl"));
     
-    flexGridSizer777->Add(m_manualMotionControl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer777->Add(m_manualMotionControl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
     m_panel5187 = new wxPanel(m_manualMotionControl, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_manualMotionControl, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_manualMotionControl->AddPage(m_panel5187, _("Navigator"), false);
     
-    wxFlexGridSizer* flexGridSizer5204 = new wxFlexGridSizer(5, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer5204 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer5204->SetFlexibleDirection( wxBOTH );
     flexGridSizer5204->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5204->AddGrowableCol(0);
     m_panel5187->SetSizer(flexGridSizer5204);
-    
-    m_staticLine5554 = new wxStaticLine(m_panel5187, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer5204->Add(m_staticLine5554, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer5519 = new wxFlexGridSizer(1, 6, 0, 0);
     flexGridSizer5519->SetFlexibleDirection( wxBOTH );
@@ -1245,7 +1242,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5204->Add(m_staticLine5550, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer5206 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer5206 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer5206->SetFlexibleDirection( wxBOTH );
     flexGridSizer5206->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5206->AddGrowableCol(0);
@@ -1259,21 +1256,53 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5206->Add(m_cbStepSensitivityText, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
+    wxFlexGridSizer* flexGridSizer5834 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer5834->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5834->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5206->Add(flexGridSizer5834, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxArrayString m_rbStepSensitivityArr;
+    m_rbStepSensitivityArr.Add(_("One Step:"));
+    m_rbStepSensitivityArr.Add(_("Finest:"));
+    m_rbStepSensitivityArr.Add(_("Fine:"));
+    m_rbStepSensitivityArr.Add(_("Medium:"));
+    m_rbStepSensitivityArr.Add(_("Rough:"));
+    m_rbStepSensitivityArr.Add(_("Roughest:"));
+    m_rbStepSensitivity = new wxRadioBox(m_panel5187, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), m_rbStepSensitivityArr, 1, 0);
+    wxFont m_rbStepSensitivityFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_rbStepSensitivity->SetFont(m_rbStepSensitivityFont);
+    m_rbStepSensitivity->SetSelection(1);
+    
+    flexGridSizer5834->Add(m_rbStepSensitivity, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5836 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5836->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5836->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5834->Add(flexGridSizer5836, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText5838 = new wxStaticText(m_panel5187, wxID_ANY, _("Short key help:"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
+    wxFont m_staticText5838Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5838->SetFont(m_staticText5838Font);
+    
+    flexGridSizer5836->Add(m_staticText5838, 0, wxALL, WXC_FROM_DIP(5));
+    
     wxFlexGridSizer* flexGridSizer5544 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer5544->SetFlexibleDirection( wxBOTH );
     flexGridSizer5544->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5544->AddGrowableCol(1);
     flexGridSizer5544->AddGrowableRow(0);
     
-    flexGridSizer5206->Add(flexGridSizer5544, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer5836->Add(flexGridSizer5544, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
-    m_staticText533816 = new wxStaticText(m_panel5187, wxID_ANY, _("Finest:\nFine:\nMedium:\nRough:\nRoughest:"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
+    m_staticText533816 = new wxStaticText(m_panel5187, wxID_ANY, _("OneStep:\nFinest:\nFine:\nMedium:\nRough:\nRoughest:"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     wxFont m_staticText533816Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText533816->SetFont(m_staticText533816Font);
     
     flexGridSizer5544->Add(m_staticText533816, 0, wxALL, WXC_FROM_DIP(2));
     
-    m_staticText5338 = new wxStaticText(m_panel5187, wxID_ANY, _("<Default>\n+ ALT\n+ SHIFT\n+ CTRL\n+ SHIFT + CTRL"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
+    m_staticText5338 = new wxStaticText(m_panel5187, wxID_ANY, _("+ AltGr\n<Default>\n+ Alt\n+ Shift\n+ Ctrl\n+ Shift + Ctrl"), wxDefaultPosition, wxDLG_UNIT(m_panel5187, wxSize(-1,-1)), 0);
     m_staticText5338->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
     wxFont m_staticText5338Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText5338->SetFont(m_staticText5338Font);
@@ -1285,29 +1314,39 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer5204->Add(m_staticLine5552, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer1163 = new wxFlexGridSizer(0, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer1163 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1163->SetFlexibleDirection( wxBOTH );
     flexGridSizer1163->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1163->AddGrowableCol(0);
+    flexGridSizer1163->AddGrowableRow(2);
     
     flexGridSizer1393->Add(flexGridSizer1163, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText1156 = new wxStaticText(m_mainBookReference, wxID_ANY, _(" Position Mangement:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    wxFont m_staticText1156Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText1156->SetFont(m_staticText1156Font);
+    
+    flexGridSizer1163->Add(m_staticText1156, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_staticLine1158 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer1163->Add(m_staticLine1158, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_positionManagement = new wxNotebook(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxBK_DEFAULT);
+    wxFont m_positionManagementFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_positionManagement->SetFont(m_positionManagementFont);
+    m_positionManagement->SetName(wxT("m_positionManagement"));
+    
+    flexGridSizer1163->Add(m_positionManagement, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
+    
+    m_predefinedPositions = new wxPanel(m_positionManagement, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionManagement, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_positionManagement->AddPage(m_predefinedPositions, _("Predefined Positions"), false);
     
     wxFlexGridSizer* flexGridSizer1152 = new wxFlexGridSizer(9, 1, 0, 0);
     flexGridSizer1152->SetFlexibleDirection( wxBOTH );
     flexGridSizer1152->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1152->AddGrowableCol(0);
-    
-    flexGridSizer1163->Add(flexGridSizer1152, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
-    
-    m_staticText1156 = new wxStaticText(m_mainBookReference, wxID_ANY, _(" Predefined Positions:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
-    wxFont m_staticText1156Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText1156->SetFont(m_staticText1156Font);
-    
-    flexGridSizer1152->Add(m_staticText1156, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_staticLine1158 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer1152->Add(m_staticLine1158, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    m_predefinedPositions->SetSizer(flexGridSizer1152);
     
     wxFlexGridSizer* flexGridSizer1165 = new wxFlexGridSizer(0, 2, 0, 0);
     flexGridSizer1165->SetFlexibleDirection( wxBOTH );
@@ -1316,7 +1355,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1152->Add(flexGridSizer1165, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticText1171 = new wxStaticText(m_mainBookReference, wxID_ANY, _("Home:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    m_staticText1171 = new wxStaticText(m_predefinedPositions, wxID_ANY, _("Home:"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), 0);
     m_staticText1171->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_staticText1171Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1171Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -1324,7 +1363,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(m_staticText1171, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_staticText1173 = new wxStaticText(m_mainBookReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    m_staticText1173 = new wxStaticText(m_predefinedPositions, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), 0);
     
     flexGridSizer1165->Add(m_staticText1173, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -1333,22 +1372,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_homeDefintionArr.Add(wxT("b) X(max), Y(max), Z(Top)"));
     m_homeDefintionArr.Add(wxT("c) X(mid), Y(mid), Z(Top)"));
     m_homeDefintionArr.Add(wxT("d) X(mid), Y(mid), Z(mid)"));
-    m_homeDefintion = new wxComboBox(m_mainBookReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), m_homeDefintionArr, wxCB_READONLY);
+    m_homeDefintion = new wxComboBox(m_predefinedPositions, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), m_homeDefintionArr, wxCB_READONLY);
     m_homeDefintion->SetSelection(0);
     
     flexGridSizer1165->Add(m_homeDefintion, 0, wxALL, WXC_FROM_DIP(2));
     
-    m_moveHome = new wxButton(m_mainBookReference, wxID_ANY, _("Move to Home"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(110,-1)), 0);
+    m_moveHome = new wxButton(m_predefinedPositions, wxID_ANY, _("Move to Home"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(110,-1)), 0);
     m_moveHome->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
     flexGridSizer1165->Add(m_moveHome, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveHome->SetMinSize(wxSize(110,-1));
     
-    m_staticLine2177 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine2177 = new wxStaticLine(m_predefinedPositions, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer1165->Add(m_staticLine2177, 0, wxALL|wxEXPAND, WXC_FROM_DIP(4));
     
-    m_staticLine2179 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine2179 = new wxStaticLine(m_predefinedPositions, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer1165->Add(m_staticLine2179, 0, wxALL|wxEXPAND, WXC_FROM_DIP(4));
     
@@ -1360,7 +1399,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(flexGridSizer2180, 0, wxALL, WXC_FROM_DIP(0));
     
-    m_staticText2182 = new wxStaticText(m_mainBookReference, wxID_ANY, _("Move Mode:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(114,-1)), 0);
+    m_staticText2182 = new wxStaticText(m_predefinedPositions, wxID_ANY, _("Move Mode:"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(114,-1)), 0);
     
     flexGridSizer2180->Add(m_staticText2182, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(5));
     m_staticText2182->SetMinSize(wxSize(114,-1));
@@ -1368,13 +1407,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     wxArrayString m_zeroMoveModeXYArr;
     m_zeroMoveModeXYArr.Add(wxT("1D"));
     m_zeroMoveModeXYArr.Add(wxT("2D"));
-    m_zeroMoveModeXY = new wxComboBox(m_mainBookReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), m_zeroMoveModeXYArr, wxCB_READONLY);
+    m_zeroMoveModeXY = new wxComboBox(m_predefinedPositions, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), m_zeroMoveModeXYArr, wxCB_READONLY);
     m_zeroMoveModeXY->SetToolTip(_("1D: Each axis moves separatly\n2D: X and Y moves simultaneously"));
     m_zeroMoveModeXY->SetSelection(0);
     
     flexGridSizer2180->Add(m_zeroMoveModeXY, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    m_moveXYtoZero = new wxButton(m_mainBookReference, wxID_ANY, _("Move XY to Zero"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(110,-1)), 0);
+    m_moveXYtoZero = new wxButton(m_predefinedPositions, wxID_ANY, _("Move XY to Zero"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(110,-1)), 0);
     m_moveXYtoZero->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
     flexGridSizer1165->Add(m_moveXYtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
@@ -1388,7 +1427,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(flexGridSizer218027, 0, wxALL, WXC_FROM_DIP(0));
     
-    m_staticText218228 = new wxStaticText(m_mainBookReference, wxID_ANY, _("Move Mode:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(114,-1)), 0);
+    m_staticText218228 = new wxStaticText(m_predefinedPositions, wxID_ANY, _("Move Mode:"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(114,-1)), 0);
     
     flexGridSizer218027->Add(m_staticText218228, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(5));
     m_staticText218228->SetMinSize(wxSize(114,-1));
@@ -1397,13 +1436,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zeroMoveModeXYZArr.Add(wxT("1D"));
     m_zeroMoveModeXYZArr.Add(wxT("2D"));
     m_zeroMoveModeXYZArr.Add(wxT("3D"));
-    m_zeroMoveModeXYZ = new wxComboBox(m_mainBookReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), m_zeroMoveModeXYZArr, wxCB_READONLY);
+    m_zeroMoveModeXYZ = new wxComboBox(m_predefinedPositions, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), m_zeroMoveModeXYZArr, wxCB_READONLY);
     m_zeroMoveModeXYZ->SetToolTip(_("1D: Each axis moves separatly\n2D: Z moves separatly as well as X and Y moves simultaneously\n3D: X, Y and Z moves simultaneously"));
     m_zeroMoveModeXYZ->SetSelection(0);
     
     flexGridSizer218027->Add(m_zeroMoveModeXYZ, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    m_moveXYZtoZero = new wxButton(m_mainBookReference, wxID_ANY, _("Move XYZ to Zero"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(110,-1)), 0);
+    m_moveXYZtoZero = new wxButton(m_predefinedPositions, wxID_ANY, _("Move XYZ to Zero"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(110,-1)), 0);
     m_moveXYZtoZero->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
     flexGridSizer1165->Add(m_moveXYZtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
@@ -1417,34 +1456,34 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(flexGridSizer21802730, 0, wxALL, WXC_FROM_DIP(0));
     
-    m_staticText21822831 = new wxStaticText(m_mainBookReference, wxID_ANY, _("Move Mode:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(114,-1)), 0);
+    m_staticText21822831 = new wxStaticText(m_predefinedPositions, wxID_ANY, _("Move Mode:"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(114,-1)), 0);
     
     flexGridSizer21802730->Add(m_staticText21822831, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(5));
     m_staticText21822831->SetMinSize(wxSize(114,-1));
     
     wxArrayString m_zeroMoveModeZArr;
     m_zeroMoveModeZArr.Add(wxT("1D"));
-    m_zeroMoveModeZ = new wxComboBox(m_mainBookReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), m_zeroMoveModeZArr, wxCB_READONLY);
+    m_zeroMoveModeZ = new wxComboBox(m_predefinedPositions, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), m_zeroMoveModeZArr, wxCB_READONLY);
     m_zeroMoveModeZ->SetToolTip(_("1D: Each axis moves separatly"));
     m_zeroMoveModeZ->SetSelection(0);
     
     flexGridSizer21802730->Add(m_zeroMoveModeZ, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    m_moveZtoZero = new wxButton(m_mainBookReference, wxID_ANY, _("Move Z to Zero"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(110,-1)), 0);
+    m_moveZtoZero = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Z to Zero"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(110,-1)), 0);
     m_moveZtoZero->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
     
     flexGridSizer1165->Add(m_moveZtoZero, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     m_moveZtoZero->SetMinSize(wxSize(110,-1));
     
-    m_staticLine2191 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine2191 = new wxStaticLine(m_predefinedPositions, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer1165->Add(m_staticLine2191, 0, wxALL|wxEXPAND, WXC_FROM_DIP(6));
     
-    m_staticLine2193 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine2193 = new wxStaticLine(m_predefinedPositions, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer1165->Add(m_staticLine2193, 0, wxALL|wxEXPAND, WXC_FROM_DIP(6));
     
-    m_staticText1177233 = new wxStaticText(m_mainBookReference, wxID_ANY, _("XY Axis:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    m_staticText1177233 = new wxStaticText(m_predefinedPositions, wxID_ANY, _("XY Axis:"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), 0);
     m_staticText1177233->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_staticText1177233Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1177233Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -1452,7 +1491,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(m_staticText1177233, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_staticText11772 = new wxStaticText(m_mainBookReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    m_staticText11772 = new wxStaticText(m_predefinedPositions, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), 0);
     
     flexGridSizer1165->Add(m_staticText11772, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
@@ -1462,7 +1501,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(flexGridSizer2439, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(0));
     
-    m_xToMax = new wxButton(m_mainBookReference, wxID_ANY, _("Move X Axis to Max"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_xToMax = new wxButton(m_predefinedPositions, wxID_ANY, _("Move X Axis to Max"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_xToMax->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     m_xToMax->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_xToMax->SetToolTip(_("Moves the X axis to the physical MAX position"));
@@ -1470,7 +1509,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2439->Add(m_xToMax, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(3));
     m_xToMax->SetMinSize(wxSize(140,-1));
     
-    m_xToMid = new wxButton(m_mainBookReference, wxID_ANY, _("Move X Axis to Mid"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_xToMid = new wxButton(m_predefinedPositions, wxID_ANY, _("Move X Axis to Mid"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_xToMid->SetBackgroundColour(wxColour(wxT("rgb(128,128,0)")));
     m_xToMid->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_xToMid->SetToolTip(_("Moves the X axis to the physical MID position"));
@@ -1478,7 +1517,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2439->Add(m_xToMid, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(3));
     m_xToMid->SetMinSize(wxSize(140,-1));
     
-    m_xToMin = new wxButton(m_mainBookReference, wxID_ANY, _("Move X Axis to Min"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_xToMin = new wxButton(m_predefinedPositions, wxID_ANY, _("Move X Axis to Min"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_xToMin->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     m_xToMin->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_xToMin->SetToolTip(_("Moves the X axis to the physical MIN position"));
@@ -1492,7 +1531,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(flexGridSizer2440, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
-    m_yToMax = new wxButton(m_mainBookReference, wxID_ANY, _("Move Y Axis to Max"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_yToMax = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Y Axis to Max"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_yToMax->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     m_yToMax->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_yToMax->SetToolTip(_("Moves the Y axis to the physical MAX position"));
@@ -1500,7 +1539,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2440->Add(m_yToMax, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(3));
     m_yToMax->SetMinSize(wxSize(140,-1));
     
-    m_yToMid = new wxButton(m_mainBookReference, wxID_ANY, _("Move Y Axis to Mid"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_yToMid = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Y Axis to Mid"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_yToMid->SetBackgroundColour(wxColour(wxT("rgb(128,128,0)")));
     m_yToMid->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_yToMid->SetToolTip(_("Moves the Y axis to the physical MID position"));
@@ -1508,7 +1547,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2440->Add(m_yToMid, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(3));
     m_yToMid->SetMinSize(wxSize(140,-1));
     
-    m_yToMin = new wxButton(m_mainBookReference, wxID_ANY, _("Move Y Axis to Min"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_yToMin = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Y Axis to Min"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_yToMin->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     m_yToMin->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_yToMin->SetToolTip(_("Moves the Y axis to the physical MIN position"));
@@ -1516,15 +1555,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2440->Add(m_yToMin, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(3));
     m_yToMin->SetMinSize(wxSize(140,-1));
     
-    m_staticLine2195 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine2195 = new wxStaticLine(m_predefinedPositions, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer1165->Add(m_staticLine2195, 0, wxALL|wxEXPAND, WXC_FROM_DIP(6));
     
-    m_staticLine2197 = new wxStaticLine(m_mainBookReference, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine2197 = new wxStaticLine(m_predefinedPositions, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer1165->Add(m_staticLine2197, 0, wxALL|wxEXPAND, WXC_FROM_DIP(6));
     
-    m_staticText1175 = new wxStaticText(m_mainBookReference, wxID_ANY, _("Z Axis:"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    m_staticText1175 = new wxStaticText(m_predefinedPositions, wxID_ANY, _("Z Axis:"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), 0);
     m_staticText1175->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_staticText1175Font = wxSystemSettings::GetFont(wxSYS_DEFAULT_GUI_FONT);
     m_staticText1175Font.SetWeight(wxFONTWEIGHT_BOLD);
@@ -1532,7 +1571,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(m_staticText1175, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_staticText1177 = new wxStaticText(m_mainBookReference, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(-1,-1)), 0);
+    m_staticText1177 = new wxStaticText(m_predefinedPositions, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(-1,-1)), 0);
     
     flexGridSizer1165->Add(m_staticText1177, 0, wxALL, WXC_FROM_DIP(1));
     
@@ -1542,7 +1581,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(flexGridSizer2434, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(0));
     
-    m_zToMax = new wxButton(m_mainBookReference, wxID_ANY, _("Move Z Axis to Max"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_zToMax = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Z Axis to Max"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_zToMax->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     m_zToMax->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_zToMax->SetToolTip(_("Moves the Z axis to the physical MAX position"));
@@ -1550,7 +1589,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2434->Add(m_zToMax, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(3));
     m_zToMax->SetMinSize(wxSize(140,-1));
     
-    m_zToMid = new wxButton(m_mainBookReference, wxID_ANY, _("Move Z Axis to Mid"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_zToMid = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Z Axis to Mid"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_zToMid->SetBackgroundColour(wxColour(wxT("rgb(128,128,0)")));
     m_zToMid->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_zToMid->SetToolTip(_("Moves the Z axis to the physical MID position"));
@@ -1558,7 +1597,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2434->Add(m_zToMid, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(3));
     m_zToMid->SetMinSize(wxSize(140,-1));
     
-    m_zToMin = new wxButton(m_mainBookReference, wxID_ANY, _("Move Z Axis to Min"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_zToMin = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Z Axis to Min"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_zToMin->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     m_zToMin->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_zToMin->SetToolTip(_("Moves the Z axis to the physical MIN position"));
@@ -1572,7 +1611,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1165->Add(flexGridSizer2435, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
-    m_zToTop = new wxButton(m_mainBookReference, wxID_ANY, _("Move Z Axis to Top"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_zToTop = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Z Axis to Top"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_zToTop->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     m_zToTop->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_zToTop->SetToolTip(_("Moves the Z axis to the logical MAX position.\nDepending on the current setup."));
@@ -1580,12 +1619,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer2435->Add(m_zToTop, 0, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(3));
     m_zToTop->SetMinSize(wxSize(140,-1));
     
-    m_staticText2438 = new wxStaticText(m_mainBookReference, wxID_ANY, _("-"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), wxALIGN_CENTRE);
+    m_staticText2438 = new wxStaticText(m_predefinedPositions, wxID_ANY, _("-"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), wxALIGN_CENTRE);
     
     flexGridSizer2435->Add(m_staticText2438, 0, wxALL, WXC_FROM_DIP(8));
     m_staticText2438->SetMinSize(wxSize(140,-1));
     
-    m_zToBottom = new wxButton(m_mainBookReference, wxID_ANY, _("Move Z Axis to Bottom"), wxDefaultPosition, wxDLG_UNIT(m_mainBookReference, wxSize(140,-1)), 0);
+    m_zToBottom = new wxButton(m_predefinedPositions, wxID_ANY, _("Move Z Axis to Bottom"), wxDefaultPosition, wxDLG_UNIT(m_predefinedPositions, wxSize(140,-1)), 0);
     m_zToBottom->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_GRAYTEXT));
     m_zToBottom->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_zToBottom->SetToolTip(_("Moves the Z axis to the logical MIN position.\nDepending on the current setup."));
@@ -3808,6 +3847,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1628->Add(m_mainFileViewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_scrollWinLogger = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_scrollWinLogger->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE));
     
     m_auimgrMain->AddPane(m_scrollWinLogger, wxAuiPaneInfo().Name(wxT("Logger")).Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,140).MinSize(100,140).MaxSize(100,140).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
@@ -3818,52 +3858,143 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer869->AddGrowableRow(0);
     m_scrollWinLogger->SetSizer(flexGridSizer869);
     
-    wxFlexGridSizer* flexGridSizer3158 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer3158 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer3158->SetFlexibleDirection( wxBOTH );
     flexGridSizer3158->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3158->AddGrowableCol(1);
+    flexGridSizer3158->AddGrowableCol(0);
     flexGridSizer3158->AddGrowableRow(0);
     
     flexGridSizer869->Add(flexGridSizer3158, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    wxFlexGridSizer* flexGridSizer1863 = new wxFlexGridSizer(0, 1, 0, 0);
-    flexGridSizer1863->SetFlexibleDirection( wxBOTH );
-    flexGridSizer1863->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer3158->Add(flexGridSizer1863, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_clearLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_clearLogger->SetToolTip(_("Clear Logger Panel"));
-    
-    flexGridSizer1863->Add(m_clearLogger, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_copyLogger = new wxBitmapButton(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("edit-copy-7")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxBU_AUTODRAW);
-    m_copyLogger->SetToolTip(_("Copy Logger Panel"));
-    
-    flexGridSizer1863->Add(m_copyLogger, 0, wxALL, WXC_FROM_DIP(1));
-    
-    m_showLoggerOnDemand = new wxCheckBox(m_scrollWinLogger, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0);
-    m_showLoggerOnDemand->SetValue(true);
-    m_showLoggerOnDemand->SetToolTip(_("Show on demand"));
-    
-    flexGridSizer1863->Add(m_showLoggerOnDemand, 0, wxALL, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer2520 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer2520 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer2520->SetFlexibleDirection( wxBOTH );
     flexGridSizer2520->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer2520->AddGrowableCol(0);
     flexGridSizer2520->AddGrowableRow(0);
     
-    flexGridSizer3158->Add(flexGridSizer2520, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer3158->Add(flexGridSizer2520, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_logger = new wxTextCtrl(m_scrollWinLogger, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL);
+    m_loggerNotebook = new wxNotebook(m_scrollWinLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_LEFT|wxBORDER_NONE);
+    wxFont m_loggerNotebookFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_loggerNotebook->SetFont(m_loggerNotebookFont);
+    m_loggerNotebook->SetName(wxT("m_loggerNotebook"));
+    wxImageList* m_loggerNotebook_il = new wxImageList(16, 16);
+    m_loggerNotebook->AssignImageList(m_loggerNotebook_il);
+    
+    flexGridSizer2520->Add(m_loggerNotebook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panel5878 = new wxPanel(m_loggerNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel5878->SetToolTip(_("Cnc Logger"));
+    int m_panel5878ImgIndex;
+    m_panel5878ImgIndex = m_loggerNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("dialog-information-3 (2)")));
+    m_loggerNotebook->AddPage(m_panel5878, wxT(""), false, m_panel5878ImgIndex);
+    
+    wxFlexGridSizer* flexGridSizer5880 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5880->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5880->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5880->AddGrowableCol(0);
+    flexGridSizer5880->AddGrowableRow(0);
+    m_panel5878->SetSizer(flexGridSizer5880);
+    
+    m_logger = new wxTextCtrl(m_panel5878, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL);
     m_logger->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     m_logger->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHTTEXT));
     wxFont m_loggerFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_logger->SetFont(m_loggerFont);
     m_logger->SetToolTip(_("Logger Output"));
     
-    flexGridSizer2520->Add(m_logger, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer5880->Add(m_logger, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer1863 = new wxFlexGridSizer(0, 1, 0, 0);
+    flexGridSizer1863->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1863->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5880->Add(flexGridSizer1863, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_clearLogger = new wxBitmapButton(m_panel5878, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_clearLogger->SetToolTip(_("Clear Logger Panel"));
+    
+    flexGridSizer1863->Add(m_clearLogger, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_copyLogger = new wxBitmapButton(m_panel5878, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("edit-copy-7")), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_copyLogger->SetToolTip(_("Copy Logger Panel"));
+    
+    flexGridSizer1863->Add(m_copyLogger, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_showLoggerOnDemand = new wxCheckBox(m_panel5878, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), 0);
+    m_showLoggerOnDemand->SetValue(true);
+    m_showLoggerOnDemand->SetToolTip(_("Show on demand"));
+    
+    flexGridSizer1863->Add(m_showLoggerOnDemand, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_panel5882 = new wxPanel(m_loggerNotebook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_loggerNotebook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_panel5882->SetToolTip(_("Gamepad"));
+    int m_panel5882ImgIndex;
+    m_panel5882ImgIndex = m_loggerNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")));
+    m_loggerNotebook->AddPage(m_panel5882, wxT(""), false, m_panel5882ImgIndex);
+    
+    wxFlexGridSizer* flexGridSizer5886 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5886->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5886->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5886->AddGrowableCol(0);
+    flexGridSizer5886->AddGrowableRow(0);
+    m_panel5882->SetSizer(flexGridSizer5886);
+    
+    m_gamepadStateController = new wxPanel(m_panel5882, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel5882, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_gamepadStateController->SetBackgroundColour(wxColour(wxT("rgb(255,255,128)")));
+    
+    flexGridSizer5886->Add(m_gamepadStateController, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5859 = new wxFlexGridSizer(7, 1, 0, 0);
+    flexGridSizer5859->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5859->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer2520->Add(flexGridSizer5859, 1, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText58651 = new wxStaticText(m_scrollWinLogger, wxID_ANY, _("Gamepad\nState:"), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxALIGN_CENTRE);
+    wxFont m_staticText58651Font(7, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText58651->SetFont(m_staticText58651Font);
+    
+    flexGridSizer5859->Add(m_staticText58651, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_gamepadState = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    m_gamepadState->SetToolTip(_("Gamepad Thread State"));
+    
+    flexGridSizer5859->Add(m_gamepadState, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    
+    m_staticText5865 = new wxStaticText(m_scrollWinLogger, wxID_ANY, _("Position\nMode:"), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxALIGN_CENTRE);
+    wxFont m_staticText5865Font(7, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText5865->SetFont(m_staticText5865Font);
+    
+    flexGridSizer5859->Add(m_staticText5865, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(0));
+    
+    m_gpBmp1 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_none-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5859->Add(m_gpBmp1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_gpBmp2 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lstick_all-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5859->Add(m_gpBmp2, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_gpBmp3 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5859->Add(m_gpBmp3, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    m_gpBmp4 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5859->Add(m_gpBmp4, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
+    
+    wxFlexGridSizer* flexGridSizer5888 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5888->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5888->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5888->AddGrowableCol(1);
+    flexGridSizer5888->AddGrowableRow(0);
+    
+    flexGridSizer869->Add(flexGridSizer5888, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticBitmap5890 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5888->Add(m_staticBitmap5890, 0, wxALL, WXC_FROM_DIP(2));
     
     m_tmpTraceInfo = new wxTextCtrl(m_scrollWinLogger, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,24)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP);
     m_tmpTraceInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
@@ -3872,7 +4003,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_tmpTraceInfo->SetFont(m_tmpTraceInfoFont);
     m_tmpTraceInfo->SetToolTip(_("Trace Information"));
     
-    flexGridSizer869->Add(m_tmpTraceInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer5888->Add(m_tmpTraceInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     m_tmpTraceInfo->SetMinSize(wxSize(-1,24));
     
     m_statusBar = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
@@ -5190,6 +5321,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(m_positionManagement)){
+        wxPersistenceManager::Get().RegisterAndRestore(m_positionManagement);
+    } else {
+        wxPersistenceManager::Get().Restore(m_positionManagement);
+    }
+    #endif
+    
+    #if wxVERSION_NUMBER >= 2900
     if(!wxPersistenceManager::Get().Find(m_testCaseBook)){
         wxPersistenceManager::Get().RegisterAndRestore(m_testCaseBook);
     } else {
@@ -5226,6 +5365,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
         wxPersistenceManager::Get().RegisterAndRestore(m_statisticBook);
     } else {
         wxPersistenceManager::Get().Restore(m_statisticBook);
+    }
+    #endif
+    
+    #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(m_loggerNotebook)){
+        wxPersistenceManager::Get().RegisterAndRestore(m_loggerNotebook);
+    } else {
+        wxPersistenceManager::Get().Restore(m_loggerNotebook);
     }
     #endif
     
@@ -5287,6 +5434,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rcStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
     m_btnEmergenyStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
     m_mainViewSelector->Connect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::mainViewSelectorSelected), NULL, this);
+    m_mainViewBook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::cncMainViewChanged), NULL, this);
     m_openSourceExtern->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSourceExtern), NULL, this);
     m_openSvgExtern->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSvgExtern), NULL, this);
     m_saveTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveTemplateFromButton), NULL, this);
@@ -5480,11 +5628,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
     m_lruList->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLruList), NULL, this);
-    m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
-    m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_logger->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLogger), NULL, this);
     m_logger->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickLogger), NULL, this);
+    m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
+    m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
+    m_gamepadState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_tmpTraceInfo->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_cmdDuration->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickDurationCount), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
@@ -5628,6 +5777,7 @@ MainFrameBClass::~MainFrameBClass()
     m_rcStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
     m_btnEmergenyStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
     m_mainViewSelector->Disconnect(wxEVT_COMMAND_CHOICE_SELECTED, wxCommandEventHandler(MainFrameBClass::mainViewSelectorSelected), NULL, this);
+    m_mainViewBook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(MainFrameBClass::cncMainViewChanged), NULL, this);
     m_openSourceExtern->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSourceExtern), NULL, this);
     m_openSvgExtern->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplateSvgExtern), NULL, this);
     m_saveTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveTemplateFromButton), NULL, this);
@@ -5821,11 +5971,12 @@ MainFrameBClass::~MainFrameBClass()
     m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
     m_lruList->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLruList), NULL, this);
-    m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
-    m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_logger->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::UpdateLogger), NULL, this);
     m_logger->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLogger), NULL, this);
     m_logger->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickLogger), NULL, this);
+    m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
+    m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
+    m_gamepadState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_cmdDuration->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickDurationCount), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
@@ -7119,98 +7270,6 @@ CncToolMagazineBase::~CncToolMagazineBase()
     
 }
 
-CncFilePreviewWndBase::CncFilePreviewWndBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-    : wxFrame(parent, id, title, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC9ED9InitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    // Set icon(s) to the application/dialog
-    wxIconBundle app_icons;
-    {
-        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("chart-line-edit"));
-        wxIcon icn;
-        icn.CopyFromBitmap(iconBmp);
-        app_icons.AddIcon( icn );
-    }
-    SetIcons( app_icons );
-
-    
-    wxFlexGridSizer* flexGridSizer3782 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer3782->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3782->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3782->AddGrowableCol(0);
-    flexGridSizer3782->AddGrowableRow(1);
-    this->SetSizer(flexGridSizer3782);
-    
-    wxFlexGridSizer* flexGridSizer3786 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer3786->SetFlexibleDirection( wxBOTH );
-    flexGridSizer3786->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer3786->AddGrowableCol(0);
-    
-    flexGridSizer3782->Add(flexGridSizer3786, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_previewFileName = new wxTextCtrl(this, wxID_ANY, wxT("File name"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), wxTE_READONLY);
-    m_previewFileName->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
-    m_previewFileName->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    wxFont m_previewFileNameFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_previewFileName->SetFont(m_previewFileNameFont);
-    #if wxVERSION_NUMBER >= 3000
-    m_previewFileName->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer3786->Add(m_previewFileName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_previewFileName->SetMinSize(wxSize(-1,20));
-    
-    m_previewFileType = new wxTextCtrl(this, wxID_ANY, wxT("Type"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), wxTE_READONLY|wxTE_CENTRE);
-    m_previewFileType->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    m_previewFileType->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    wxFont m_previewFileTypeFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_previewFileType->SetFont(m_previewFileTypeFont);
-    #if wxVERSION_NUMBER >= 3000
-    m_previewFileType->SetHint(wxT(""));
-    #endif
-    
-    flexGridSizer3786->Add(m_previewFileType, 0, wxALL, WXC_FROM_DIP(0));
-    m_previewFileType->SetMinSize(wxSize(-1,20));
-    
-    m_previewPlaceHolder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_previewPlaceHolder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    m_previewPlaceHolder->SetToolTip(_("Only a placeholder"));
-    
-    flexGridSizer3782->Add(m_previewPlaceHolder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    SetName(wxT("CncFilePreviewWndBase"));
-    SetSize(500,300);
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
-    }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
-    } else {
-        CentreOnScreen(wxBOTH);
-    }
-#if wxVERSION_NUMBER >= 2900
-    if(!wxPersistenceManager::Get().Find(this)) {
-        wxPersistenceManager::Get().RegisterAndRestore(this);
-    } else {
-        wxPersistenceManager::Get().Restore(this);
-    }
-#endif
-    // Connect events
-    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncFilePreviewWndBase::onClose), NULL, this);
-    
-}
-
-CncFilePreviewWndBase::~CncFilePreviewWndBase()
-{
-    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncFilePreviewWndBase::onClose), NULL, this);
-    
-}
-
 CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
     : wxPanel(parent, id, pos, size, style)
 {
@@ -7329,8 +7388,104 @@ CncFileViewBase::~CncFileViewBase()
     
 }
 
-CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-    : wxDialog(parent, id, title, pos, size, style)
+CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, long style)
+    : wxPanel(parent, id, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer5802 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5802->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5802->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5802->AddGrowableCol(0);
+    flexGridSizer5802->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer5802);
+    
+    wxFlexGridSizer* flexGridSizer5821 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5821->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5821->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5821->AddGrowableCol(0);
+    flexGridSizer5821->AddGrowableRow(0);
+    
+    flexGridSizer5802->Add(flexGridSizer5821, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_gamepadTrace = new wxTextCtrl(this, wxID_ANY, wxT("Gamepad state"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL);
+    m_gamepadTrace->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_CAPTIONTEXT));
+    m_gamepadTrace->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_gamepadTraceFont(8, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_gamepadTrace->SetFont(m_gamepadTraceFont);
+    
+    flexGridSizer5821->Add(m_gamepadTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5806 = new wxFlexGridSizer(4, 1, 0, 0);
+    flexGridSizer5806->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5806->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5802->Add(flexGridSizer5806, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText5894 = new wxStaticText(this, wxID_ANY, _("Some hints:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5894Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5894->SetFont(m_staticText5894Font);
+    
+    flexGridSizer5806->Add(m_staticText5894, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticLine5892 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5806->Add(m_staticLine5892, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5809 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5809->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5809->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5809->AddGrowableCol(1);
+    flexGridSizer5809->AddGrowableRow(0);
+    
+    flexGridSizer5806->Add(flexGridSizer5809, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticBitmap5811 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-square-dark-icon24")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5809->Add(m_staticBitmap5811, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticText5816 = new wxStaticText(this, wxID_ANY, _("Open Ref. Pos. Dialog"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5816Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText5816->SetFont(m_staticText5816Font);
+    
+    flexGridSizer5809->Add(m_staticText5816, 0, wxALL, WXC_FROM_DIP(4));
+    
+    wxFlexGridSizer* flexGridSizer580911 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer580911->SetFlexibleDirection( wxBOTH );
+    flexGridSizer580911->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer580911->AddGrowableCol(1);
+    flexGridSizer580911->AddGrowableRow(0);
+    
+    flexGridSizer5806->Add(flexGridSizer580911, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticBitmap58112 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-cross-dark-icon24")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer580911->Add(m_staticBitmap58112, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticText58163 = new wxStaticText(this, wxID_ANY, _("Select Step Sensitivity"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText58163Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText58163->SetFont(m_staticText58163Font);
+    
+    flexGridSizer580911->Add(m_staticText58163, 0, wxALL, WXC_FROM_DIP(4));
+    
+    SetName(wxT("CncGamepadControllerStateBase"));
+    SetSize(500,300);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+}
+
+CncGamepadControllerStateBase::~CncGamepadControllerStateBase()
+{
+}
+
+CncFilePreviewWndBase::CncFilePreviewWndBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxFrame(parent, id, title, pos, size, style)
 {
     if ( !bBitmapLoaded ) {
         // We need to initialise the default bitmap handler
@@ -7341,7 +7496,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     // Set icon(s) to the application/dialog
     wxIconBundle app_icons;
     {
-        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("snap-orto"));
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("chart-line-edit"));
         wxIcon icn;
         icn.CopyFromBitmap(iconBmp);
         app_icons.AddIcon( icn );
@@ -7349,483 +7504,52 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     SetIcons( app_icons );
 
     
-    wxFlexGridSizer* flexGridSizer5324 = new wxFlexGridSizer(11, 1, 0, 0);
-    flexGridSizer5324->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5324->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    this->SetSizer(flexGridSizer5324);
-    
-    wxFlexGridSizer* flexGridSizer5503 = new wxFlexGridSizer(1, 5, 0, 0);
-    flexGridSizer5503->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5503->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5324->Add(flexGridSizer5503, 1, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_staticText5505 = new wxStaticText(this, wxID_ANY, _("Navigation Panel:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5505Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5505->SetFont(m_staticText5505Font);
-    
-    flexGridSizer5503->Add(m_staticText5505, 0, wxALL, WXC_FROM_DIP(5));
-    
-    flexGridSizer5503->Add(100, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5507 = new wxStaticText(this, wxID_ANY, _("X / Y"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5507Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5507->SetFont(m_staticText5507Font);
-    
-    flexGridSizer5503->Add(m_staticText5507, 0, wxALL, WXC_FROM_DIP(5));
-    
-    flexGridSizer5503->Add(160, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5509 = new wxStaticText(this, wxID_ANY, _("Z"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5509Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5509->SetFont(m_staticText5509Font);
-    
-    flexGridSizer5503->Add(m_staticText5509, 0, wxALL, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer5314 = new wxFlexGridSizer(3, 6, 0, 0);
-    flexGridSizer5314->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5314->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5324->Add(flexGridSizer5314, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer5336 = new wxFlexGridSizer(4, 1, 0, 0);
-    flexGridSizer5336->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5336->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5314->Add(flexGridSizer5336, 0, wxALL, WXC_FROM_DIP(5));
-    
-    flexGridSizer5336->Add(0, 2, 1, wxALL, WXC_FROM_DIP(2));
-    
-    m_staticLine5357 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer5336->Add(m_staticLine5357, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText5355 = new wxStaticText(this, wxID_ANY, _("Sensitivity:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_staticText5355->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
-    wxFont m_staticText5355Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5355->SetFont(m_staticText5355Font);
-    
-    flexGridSizer5336->Add(m_staticText5355, 0, wxALL, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer5353 = new wxFlexGridSizer(0, 2, 0, 0);
-    flexGridSizer5353->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5353->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5336->Add(flexGridSizer5353, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_staticText533816 = new wxStaticText(this, wxID_ANY, _("Finest:\nFine:\nMedium:\nRough:\nRoughest:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText533816Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText533816->SetFont(m_staticText533816Font);
-    
-    flexGridSizer5353->Add(m_staticText533816, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_staticText5338 = new wxStaticText(this, wxID_ANY, _("<Default>\n+ ALT\n+ SHIFT\n+ CTRL\n+ SHIFT + CTRL"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_staticText5338->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
-    wxFont m_staticText5338Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText5338->SetFont(m_staticText5338Font);
-    m_staticText5338->SetToolTip(_("Press additionally a listed button\nto manuipulate the used speed"));
-    
-    flexGridSizer5353->Add(m_staticText5338, 0, wxALL, WXC_FROM_DIP(2));
-    
-    wxFlexGridSizer* flexGridSizer5302 = new wxFlexGridSizer(3, 3, 0, 0);
-    flexGridSizer5302->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5314->Add(flexGridSizer5302, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_btXNegYpos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btXNegYpos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XNegYPos")), wxLEFT);
-    m_btXNegYpos->SetBitmapMargins(2,2);
-    #endif
-    m_btXNegYpos->SetToolTip(_("-X +Y"));
-    
-    flexGridSizer5302->Add(m_btXNegYpos, 0, wxALL, WXC_FROM_DIP(2));
-    m_btXNegYpos->SetMinSize(wxSize(42,42));
-    
-    m_btYPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btYPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("Ypos")), wxLEFT);
-    m_btYPos->SetBitmapMargins(2,2);
-    #endif
-    m_btYPos->SetToolTip(_("+Y"));
-    
-    flexGridSizer5302->Add(m_btYPos, 0, wxALL, WXC_FROM_DIP(2));
-    m_btYPos->SetMinSize(wxSize(42,42));
-    
-    m_btXPosYPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btXPosYPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XPosYPos")), wxLEFT);
-    m_btXPosYPos->SetBitmapMargins(2,2);
-    #endif
-    wxFont m_btXPosYPosFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Wingdings"));
-    m_btXPosYPos->SetFont(m_btXPosYPosFont);
-    m_btXPosYPos->SetToolTip(_("+X +Y"));
-    
-    flexGridSizer5302->Add(m_btXPosYPos, 0, wxALL, WXC_FROM_DIP(2));
-    m_btXPosYPos->SetMinSize(wxSize(42,42));
-    
-    m_btXNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btXNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XNeg")), wxLEFT);
-    m_btXNeg->SetBitmapMargins(2,2);
-    #endif
-    m_btXNeg->SetToolTip(_("-X"));
-    
-    flexGridSizer5302->Add(m_btXNeg, 0, wxALL, WXC_FROM_DIP(2));
-    m_btXNeg->SetMinSize(wxSize(42,42));
-    
-    m_staticBitmap5501 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-fold@2x")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
-    
-    flexGridSizer5302->Add(m_staticBitmap5501, 0, wxALL, WXC_FROM_DIP(5));
-    
-    m_btXPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btXPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XPos")), wxLEFT);
-    m_btXPos->SetBitmapMargins(2,2);
-    #endif
-    m_btXPos->SetToolTip(_("+X"));
-    
-    flexGridSizer5302->Add(m_btXPos, 0, wxALL, WXC_FROM_DIP(2));
-    m_btXPos->SetMinSize(wxSize(42,42));
-    
-    m_btXNegYNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btXNegYNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XNegYNeg")), wxLEFT);
-    m_btXNegYNeg->SetBitmapMargins(2,2);
-    #endif
-    m_btXNegYNeg->SetToolTip(_("-X -Y"));
-    
-    flexGridSizer5302->Add(m_btXNegYNeg, 0, wxALL, WXC_FROM_DIP(2));
-    m_btXNegYNeg->SetMinSize(wxSize(42,42));
-    
-    m_btYNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btYNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("YNeg")), wxBOTTOM);
-    m_btYNeg->SetBitmapMargins(2,2);
-    #endif
-    m_btYNeg->SetToolTip(_("-Y"));
-    
-    flexGridSizer5302->Add(m_btYNeg, 0, wxALL, WXC_FROM_DIP(2));
-    m_btYNeg->SetMinSize(wxSize(42,42));
-    
-    m_btXPosYNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btXPosYNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XPosYNeg")), wxLEFT);
-    m_btXPosYNeg->SetBitmapMargins(2,2);
-    #endif
-    m_btXPosYNeg->SetToolTip(_("+X -Y"));
-    
-    flexGridSizer5302->Add(m_btXPosYNeg, 0, wxALL, WXC_FROM_DIP(2));
-    m_btXPosYNeg->SetMinSize(wxSize(42,42));
-    
-    flexGridSizer5314->Add(44, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticLine5516 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
-    
-    flexGridSizer5314->Add(m_staticLine5516, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    flexGridSizer5314->Add(44, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer5316 = new wxFlexGridSizer(3, 1, 0, 0);
-    flexGridSizer5316->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5316->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5314->Add(flexGridSizer5316, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_btZPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btZPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ZPos")), wxLEFT);
-    m_btZPos->SetBitmapMargins(2,2);
-    #endif
-    m_btZPos->SetToolTip(_("+Z"));
-    
-    flexGridSizer5316->Add(m_btZPos, 0, wxALL, WXC_FROM_DIP(2));
-    m_btZPos->SetMinSize(wxSize(42,42));
-    
-    flexGridSizer5316->Add(0, 42, 1, wxALL, WXC_FROM_DIP(2));
-    
-    m_btZNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btZNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ZNeg")), wxLEFT);
-    m_btZNeg->SetBitmapMargins(2,2);
-    #endif
-    m_btZNeg->SetToolTip(_("-Z"));
-    
-    flexGridSizer5316->Add(m_btZNeg, 0, wxALL, WXC_FROM_DIP(2));
-    m_btZNeg->SetMinSize(wxSize(42,42));
-    
-    m_staticLine5572 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer5324->Add(m_staticLine5572, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer5566 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer5566->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5566->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5566->AddGrowableCol(0);
-    flexGridSizer5566->AddGrowableRow(0);
-    
-    flexGridSizer5324->Add(flexGridSizer5566, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_textMessage = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,50)), wxTE_WORDWRAP|wxTE_READONLY|wxTE_MULTILINE|wxBORDER_NONE);
-    m_textMessage->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
-    wxFont m_textMessageFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_textMessage->SetFont(m_textMessageFont);
-    
-    flexGridSizer5566->Add(m_textMessage, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    m_textMessage->SetMinSize(wxSize(-1,50));
-    
-    m_staticLine535015 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer5324->Add(m_staticLine535015, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_staticText5340 = new wxStaticText(this, wxID_ANY, _("Reference Position Mode:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5340Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5340->SetFont(m_staticText5340Font);
-    
-    flexGridSizer5324->Add(m_staticText5340, 0, wxALL, WXC_FROM_DIP(7));
-    
-    wxFlexGridSizer* flexGridSizer5326 = new wxFlexGridSizer(1, 6, 0, 0);
-    flexGridSizer5326->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5326->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5324->Add(flexGridSizer5326, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer5456 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5456->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5456->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5326->Add(flexGridSizer5456, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5460 = new wxStaticText(this, wxID_ANY, _("1"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxALIGN_CENTRE);
-    wxFont m_staticText5460Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5460->SetFont(m_staticText5460Font);
-    
-    flexGridSizer5456->Add(m_staticText5460, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
-    
-    m_btMode1 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode1")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
-    m_btMode1->SetToolTip(_("Mode 1"));
-    m_btMode1->SetValue(false);
-    
-    flexGridSizer5456->Add(m_btMode1, 0, wxALL, WXC_FROM_DIP(5));
-    m_btMode1->SetMinSize(wxSize(64,64));
-    
-    wxFlexGridSizer* flexGridSizer5461 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5461->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5461->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5326->Add(flexGridSizer5461, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5467 = new wxStaticText(this, wxID_ANY, _("2"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5467Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5467->SetFont(m_staticText5467Font);
-    
-    flexGridSizer5461->Add(m_staticText5467, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
-    
-    m_btMode2 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode2")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), wxBU_BOTTOM);
-    m_btMode2->SetToolTip(_("Mode 2"));
-    m_btMode2->SetValue(false);
-    
-    flexGridSizer5461->Add(m_btMode2, 0, wxALL, WXC_FROM_DIP(5));
-    m_btMode2->SetMinSize(wxSize(64,64));
-    
-    wxFlexGridSizer* flexGridSizer5462 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5462->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5462->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5326->Add(flexGridSizer5462, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5469 = new wxStaticText(this, wxID_ANY, _("3"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5469Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5469->SetFont(m_staticText5469Font);
-    
-    flexGridSizer5462->Add(m_staticText5469, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
-    
-    m_btMode3 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
-    m_btMode3->SetToolTip(_("Mode 3"));
-    m_btMode3->SetValue(false);
-    
-    flexGridSizer5462->Add(m_btMode3, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
-    m_btMode3->SetMinSize(wxSize(64,64));
-    
-    wxFlexGridSizer* flexGridSizer5463 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5463->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5463->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5326->Add(flexGridSizer5463, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5471 = new wxStaticText(this, wxID_ANY, _("4"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5471Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5471->SetFont(m_staticText5471Font);
-    
-    flexGridSizer5463->Add(m_staticText5471, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
-    
-    m_btMode4 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode4")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
-    m_btMode4->SetToolTip(_("Mode 4"));
-    m_btMode4->SetValue(false);
-    
-    flexGridSizer5463->Add(m_btMode4, 0, wxALL, WXC_FROM_DIP(5));
-    m_btMode4->SetMinSize(wxSize(64,64));
-    
-    wxFlexGridSizer* flexGridSizer5464 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5464->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5464->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5326->Add(flexGridSizer5464, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5473 = new wxStaticText(this, wxID_ANY, _("5"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5473Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5473->SetFont(m_staticText5473Font);
-    
-    flexGridSizer5464->Add(m_staticText5473, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
-    
-    m_btMode5 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode5")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
-    m_btMode5->SetToolTip(_("Mode 5"));
-    m_btMode5->SetValue(false);
-    
-    flexGridSizer5464->Add(m_btMode5, 0, wxALL, WXC_FROM_DIP(5));
-    m_btMode5->SetMinSize(wxSize(64,64));
-    
-    wxFlexGridSizer* flexGridSizer5476 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5476->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5476->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5326->Add(flexGridSizer5476, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
-    
-    m_staticText5475 = new wxStaticText(this, wxID_ANY, _("6"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5475Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5475->SetFont(m_staticText5475Font);
-    
-    flexGridSizer5476->Add(m_staticText5475, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
-    
-    m_btMode6 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode6")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
-    m_btMode6->SetToolTip(_("Mode 6"));
-    m_btMode6->SetValue(false);
-    
-    flexGridSizer5476->Add(m_btMode6, 0, wxALL, WXC_FROM_DIP(5));
-    m_btMode6->SetMinSize(wxSize(64,64));
-    
-    m_staticLine53501 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer5324->Add(m_staticLine53501, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer5484 = new wxFlexGridSizer(1, 7, 0, 0);
-    flexGridSizer5484->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5484->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5324->Add(flexGridSizer5484, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_staticText5486 = new wxStaticText(this, wxID_ANY, _("Workpiece\nThickness"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5486Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText5486->SetFont(m_staticText5486Font);
-    
-    flexGridSizer5484->Add(m_staticText5486, 0, wxALL, WXC_FROM_DIP(3));
-    
-    m_workpiceThickness = new wxTextCtrl(this, wxID_ANY, wxT("0,00"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RIGHT);
+    wxFlexGridSizer* flexGridSizer3782 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer3782->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3782->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3782->AddGrowableCol(0);
+    flexGridSizer3782->AddGrowableRow(1);
+    this->SetSizer(flexGridSizer3782);
+    
+    wxFlexGridSizer* flexGridSizer3786 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer3786->SetFlexibleDirection( wxBOTH );
+    flexGridSizer3786->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer3786->AddGrowableCol(0);
+    
+    flexGridSizer3782->Add(flexGridSizer3786, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_previewFileName = new wxTextCtrl(this, wxID_ANY, wxT("File name"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), wxTE_READONLY);
+    m_previewFileName->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    m_previewFileName->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    wxFont m_previewFileNameFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_previewFileName->SetFont(m_previewFileNameFont);
     #if wxVERSION_NUMBER >= 3000
-    m_workpiceThickness->SetHint(wxT(""));
+    m_previewFileName->SetHint(wxT(""));
     #endif
     
-    flexGridSizer5484->Add(m_workpiceThickness, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer3786->Add(m_previewFileName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_previewFileName->SetMinSize(wxSize(-1,20));
     
-    m_staticText5497 = new wxStaticText(this, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5497Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText5497->SetFont(m_staticText5497Font);
-    
-    flexGridSizer5484->Add(m_staticText5497, 0, wxALL, WXC_FROM_DIP(7));
-    
-    flexGridSizer5484->Add(32, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5488 = new wxStaticText(this, wxID_ANY, _("Measure Plate\nThickness"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5488Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText5488->SetFont(m_staticText5488Font);
-    
-    flexGridSizer5484->Add(m_staticText5488, 0, wxALL, WXC_FROM_DIP(3));
-    
-    m_measurePlateThickness = new wxTextCtrl(this, wxID_ANY, wxT("0,21"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
-    m_measurePlateThickness->SetToolTip(_("Standard\nConfiguration Value"));
+    m_previewFileType = new wxTextCtrl(this, wxID_ANY, wxT("Type"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,20)), wxTE_READONLY|wxTE_CENTRE);
+    m_previewFileType->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    m_previewFileType->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    wxFont m_previewFileTypeFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_previewFileType->SetFont(m_previewFileTypeFont);
     #if wxVERSION_NUMBER >= 3000
-    m_measurePlateThickness->SetHint(wxT(""));
+    m_previewFileType->SetHint(wxT(""));
     #endif
     
-    flexGridSizer5484->Add(m_measurePlateThickness, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer3786->Add(m_previewFileType, 0, wxALL, WXC_FROM_DIP(0));
+    m_previewFileType->SetMinSize(wxSize(-1,20));
     
-    m_staticText5499 = new wxStaticText(this, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5499Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_staticText5499->SetFont(m_staticText5499Font);
+    m_previewPlaceHolder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_previewPlaceHolder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    m_previewPlaceHolder->SetToolTip(_("Only a placeholder"));
     
-    flexGridSizer5484->Add(m_staticText5499, 0, wxALL, WXC_FROM_DIP(7));
+    flexGridSizer3782->Add(m_previewPlaceHolder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_staticLine5350 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer5324->Add(m_staticLine5350, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    wxFlexGridSizer* flexGridSizer5342 = new wxFlexGridSizer(1, 3, 0, 0);
-    flexGridSizer5342->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5342->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5342->AddGrowableCol(0);
-    
-    flexGridSizer5324->Add(flexGridSizer5342, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer5447 = new wxFlexGridSizer(1, 3, 0, 0);
-    flexGridSizer5447->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5447->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5447->AddGrowableCol(1);
-    flexGridSizer5447->AddGrowableRow(0);
-    
-    flexGridSizer5342->Add(flexGridSizer5447, 0, wxALL, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer5453 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5453->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5453->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5447->Add(flexGridSizer5453, 0, wxALL, WXC_FROM_DIP(0));
-    
-    flexGridSizer5453->Add(0, 7, 1, wxALL, WXC_FROM_DIP(0));
-    
-    wxFlexGridSizer* flexGridSizer5450 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer5450->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5450->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    flexGridSizer5453->Add(flexGridSizer5450, 0, wxALL, WXC_FROM_DIP(0));
-    
-    m_staticText5449 = new wxStaticText(this, wxID_ANY, _("Mode:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5449Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5449->SetFont(m_staticText5449Font);
-    
-    flexGridSizer5450->Add(m_staticText5449, 0, wxALL, WXC_FROM_DIP(4));
-    
-    m_modeSelected = new wxStaticText(this, wxID_ANY, _("0"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_modeSelected->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
-    m_modeSelected->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
-    wxFont m_modeSelectedFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_modeSelected->SetFont(m_modeSelectedFont);
-    
-    flexGridSizer5450->Add(m_modeSelected, 0, wxALL, WXC_FROM_DIP(4));
-    
-    flexGridSizer5447->Add(6, 0, 1, wxALL, WXC_FROM_DIP(0));
-    
-    m_modeText = new wxStaticText(this, wxID_ANY, _("1\n2\n3"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_modeTextFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_modeText->SetFont(m_modeTextFont);
-    
-    flexGridSizer5447->Add(m_modeText, 0, wxALL, WXC_FROM_DIP(2));
-    
-    m_btSet = new wxButton(this, wxID_ANY, _("Set (0, 0, 0)"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_btSet->SetDefault();
-    wxFont m_btSetFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_btSet->SetFont(m_btSetFont);
-    m_btSet->SetToolTip(_("Set Reference Position\nand Reference Mode"));
-    
-    flexGridSizer5342->Add(m_btSet, 0, wxALL, WXC_FROM_DIP(7));
-    
-    m_btCancel = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    m_btCancel->SetToolTip(_("Abort"));
-    
-    flexGridSizer5342->Add(m_btCancel, 0, wxALL, WXC_FROM_DIP(7));
-    
-    SetName(wxT("CncReferencePositionBase"));
-    SetSize(-1,-1);
+    SetName(wxT("CncFilePreviewWndBase"));
+    SetSize(500,300);
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
@@ -7834,215 +7558,22 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     } else {
         CentreOnScreen(wxBOTH);
     }
-    // Connect events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncReferencePositionBase::init), NULL, this);
-    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncReferencePositionBase::show), NULL, this);
-    m_btXNegYpos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXNegYpos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNegYpos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXNegYpos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYPos), NULL, this);
-    m_btXNegYpos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btYPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYPos), NULL, this);
-    m_btYPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btYPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btYPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btYPos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXPosYPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYPos), NULL, this);
-    m_btXPosYPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXPosYPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXPosYPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNeg), NULL, this);
-    m_btXNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXPos->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
-    m_btXPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
-    m_btXPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXPos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXNegYNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYNeg), NULL, this);
-    m_btXNegYNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXNegYNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXNegYNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNegYNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btYNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYNeg), NULL, this);
-    m_btYNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btYNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btYNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btYNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXPosYNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYNeg), NULL, this);
-    m_btXPosYNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXPosYNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXPosYNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXPosYNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btZPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZPos), NULL, this);
-    m_btZPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btZPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btZPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btZPos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btZNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZNeg), NULL, this);
-    m_btZNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btZNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btZNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btZNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btMode1->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode1), NULL, this);
-    m_btMode2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode2), NULL, this);
-    m_btMode3->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode3), NULL, this);
-    m_btMode4->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode4), NULL, this);
-    m_btMode5->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode5), NULL, this);
-    m_btMode6->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode6), NULL, this);
-    m_btSet->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::set), NULL, this);
-    m_btCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::cancel), NULL, this);
-    
-}
-
-CncReferencePositionBase::~CncReferencePositionBase()
-{
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncReferencePositionBase::init), NULL, this);
-    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncReferencePositionBase::show), NULL, this);
-    m_btXNegYpos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXNegYpos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNegYpos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXNegYpos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYPos), NULL, this);
-    m_btXNegYpos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btYPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYPos), NULL, this);
-    m_btYPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btYPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btYPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btYPos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXPosYPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYPos), NULL, this);
-    m_btXPosYPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXPosYPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXPosYPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNeg), NULL, this);
-    m_btXNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXPos->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
-    m_btXPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
-    m_btXPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXPos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXNegYNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYNeg), NULL, this);
-    m_btXNegYNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXNegYNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXNegYNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXNegYNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btYNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYNeg), NULL, this);
-    m_btYNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btYNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btYNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btYNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btXPosYNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYNeg), NULL, this);
-    m_btXPosYNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btXPosYNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btXPosYNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btXPosYNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btZPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZPos), NULL, this);
-    m_btZPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btZPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btZPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btZPos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btZNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZNeg), NULL, this);
-    m_btZNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
-    m_btZNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
-    m_btZNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
-    m_btZNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
-    m_btMode1->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode1), NULL, this);
-    m_btMode2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode2), NULL, this);
-    m_btMode3->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode3), NULL, this);
-    m_btMode4->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode4), NULL, this);
-    m_btMode5->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode5), NULL, this);
-    m_btMode6->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode6), NULL, this);
-    m_btSet->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::set), NULL, this);
-    m_btCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::cancel), NULL, this);
-    
-}
-
-CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
-    : wxDialog(parent, id, title, pos, size, style)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxC9ED9InitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    
-    m_observeTimer = new wxTimer;
-    m_observeTimer->Start(5000, true);
-    
-    m_startupTimer = new wxTimer;
-    m_startupTimer->Start(100, true);
-    
-    wxBoxSizer* boxSizer5596 = new wxBoxSizer(wxVERTICAL);
-    this->SetSizer(boxSizer5596);
-    
-    wxFlexGridSizer* flexGridSizer5582 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer5582->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5582->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    
-    boxSizer5596->Add(flexGridSizer5582, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_staticBitmap5593 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-connected@2x")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
-    
-    flexGridSizer5582->Add(m_staticBitmap5593, 0, wxALL, WXC_FROM_DIP(1));
-    
-    wxFlexGridSizer* flexGridSizer5591 = new wxFlexGridSizer(2, 1, 0, 0);
-    flexGridSizer5591->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5591->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5591->AddGrowableCol(0);
-    flexGridSizer5591->AddGrowableRow(1);
-    
-    flexGridSizer5582->Add(flexGridSizer5591, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText5589 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial Port. . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
-    wxFont m_staticText5589Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText5589->SetFont(m_staticText5589Font);
-    
-    flexGridSizer5591->Add(m_staticText5589, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
-    
-    m_connectActivityPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(120,16)), wxTAB_TRAVERSAL);
-    m_connectActivityPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
-    
-    flexGridSizer5591->Add(m_connectActivityPanel, 0, wxALL, WXC_FROM_DIP(5));
-    m_connectActivityPanel->SetMinSize(wxSize(120,16));
-    
-    SetName(wxT("CncConnectProgressBase"));
-    SetSize(-1,-1);
-    if (GetSizer()) {
-         GetSizer()->Fit(this);
-    }
-    if(GetParent()) {
-        CentreOnParent(wxBOTH);
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
     } else {
-        CentreOnScreen(wxBOTH);
+        wxPersistenceManager::Get().Restore(this);
     }
+#endif
     // Connect events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncConnectProgressBase::initDialog), NULL, this);
-    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncConnectProgressBase::show), NULL, this);
-    m_observeTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::observeTimer), NULL, this);
-    m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::startupTimer), NULL, this);
+    this->Connect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncFilePreviewWndBase::onClose), NULL, this);
     
 }
 
-CncConnectProgressBase::~CncConnectProgressBase()
+CncFilePreviewWndBase::~CncFilePreviewWndBase()
 {
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncConnectProgressBase::initDialog), NULL, this);
-    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncConnectProgressBase::show), NULL, this);
-    m_observeTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::observeTimer), NULL, this);
-    m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::startupTimer), NULL, this);
+    this->Disconnect(wxEVT_CLOSE_WINDOW, wxCloseEventHandler(CncFilePreviewWndBase::onClose), NULL, this);
     
-    m_observeTimer->Stop();
-    wxDELETE( m_observeTimer );
-
-    m_startupTimer->Stop();
-    wxDELETE( m_startupTimer );
-
 }
 
 GL3DOptionsBase::GL3DOptionsBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
@@ -8438,6 +7969,750 @@ GL3DOptionsBase::~GL3DOptionsBase()
     
     m_timer4476->Stop();
     wxDELETE( m_timer4476 );
+
+}
+
+CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("snap-orto"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
+    
+    wxFlexGridSizer* flexGridSizer5324 = new wxFlexGridSizer(11, 1, 0, 0);
+    flexGridSizer5324->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5324->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    this->SetSizer(flexGridSizer5324);
+    
+    wxFlexGridSizer* flexGridSizer5503 = new wxFlexGridSizer(1, 5, 0, 0);
+    flexGridSizer5503->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5503->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5324->Add(flexGridSizer5503, 1, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText5505 = new wxStaticText(this, wxID_ANY, _("Navigation Panel:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5505Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5505->SetFont(m_staticText5505Font);
+    
+    flexGridSizer5503->Add(m_staticText5505, 0, wxALL, WXC_FROM_DIP(5));
+    
+    flexGridSizer5503->Add(100, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5507 = new wxStaticText(this, wxID_ANY, _("X / Y"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5507Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5507->SetFont(m_staticText5507Font);
+    
+    flexGridSizer5503->Add(m_staticText5507, 0, wxALL, WXC_FROM_DIP(5));
+    
+    flexGridSizer5503->Add(160, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5509 = new wxStaticText(this, wxID_ANY, _("Z"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5509Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5509->SetFont(m_staticText5509Font);
+    
+    flexGridSizer5503->Add(m_staticText5509, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5314 = new wxFlexGridSizer(3, 6, 0, 0);
+    flexGridSizer5314->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5314->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5324->Add(flexGridSizer5314, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5336 = new wxFlexGridSizer(4, 1, 0, 0);
+    flexGridSizer5336->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5336->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5314->Add(flexGridSizer5336, 0, wxALL, WXC_FROM_DIP(5));
+    
+    flexGridSizer5336->Add(0, 2, 1, wxALL, WXC_FROM_DIP(2));
+    
+    m_staticLine5357 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5336->Add(m_staticLine5357, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText5355 = new wxStaticText(this, wxID_ANY, _("Step Sensitivity:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_staticText5355->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
+    wxFont m_staticText5355Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5355->SetFont(m_staticText5355Font);
+    
+    flexGridSizer5336->Add(m_staticText5355, 0, wxALL, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5353 = new wxFlexGridSizer(0, 3, 0, 0);
+    flexGridSizer5353->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5353->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5336->Add(flexGridSizer5353, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_staticBitmap5844 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-cross-dark-icon24")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5353->Add(m_staticBitmap5844, 0, wxALL, WXC_FROM_DIP(2));
+    
+    wxArrayString m_rbStepSensitivityArr;
+    m_rbStepSensitivityArr.Add(_("One Step:"));
+    m_rbStepSensitivityArr.Add(_("Finest:"));
+    m_rbStepSensitivityArr.Add(_("Fine:"));
+    m_rbStepSensitivityArr.Add(_("Medium:"));
+    m_rbStepSensitivityArr.Add(_("Rough:"));
+    m_rbStepSensitivityArr.Add(_("Roughest:"));
+    m_rbStepSensitivity = new wxRadioBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_rbStepSensitivityArr, 1, 0);
+    wxFont m_rbStepSensitivityFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_rbStepSensitivity->SetFont(m_rbStepSensitivityFont);
+    m_rbStepSensitivity->SetSelection(1);
+    
+    flexGridSizer5353->Add(m_rbStepSensitivity, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    flexGridSizer5353->Add(10, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5302 = new wxFlexGridSizer(3, 3, 0, 0);
+    flexGridSizer5302->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5302->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5314->Add(flexGridSizer5302, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_btXNegYpos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btXNegYpos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XNegYPos")), wxLEFT);
+    m_btXNegYpos->SetBitmapMargins(2,2);
+    #endif
+    m_btXNegYpos->SetToolTip(_("-X +Y"));
+    
+    flexGridSizer5302->Add(m_btXNegYpos, 0, wxALL, WXC_FROM_DIP(2));
+    m_btXNegYpos->SetMinSize(wxSize(42,42));
+    
+    m_btYPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btYPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("Ypos")), wxLEFT);
+    m_btYPos->SetBitmapMargins(2,2);
+    #endif
+    m_btYPos->SetToolTip(_("+Y"));
+    
+    flexGridSizer5302->Add(m_btYPos, 0, wxALL, WXC_FROM_DIP(2));
+    m_btYPos->SetMinSize(wxSize(42,42));
+    
+    m_btXPosYPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btXPosYPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XPosYPos")), wxLEFT);
+    m_btXPosYPos->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btXPosYPosFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Wingdings"));
+    m_btXPosYPos->SetFont(m_btXPosYPosFont);
+    m_btXPosYPos->SetToolTip(_("+X +Y"));
+    
+    flexGridSizer5302->Add(m_btXPosYPos, 0, wxALL, WXC_FROM_DIP(2));
+    m_btXPosYPos->SetMinSize(wxSize(42,42));
+    
+    m_btXNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btXNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XNeg")), wxLEFT);
+    m_btXNeg->SetBitmapMargins(2,2);
+    #endif
+    m_btXNeg->SetToolTip(_("-X"));
+    
+    flexGridSizer5302->Add(m_btXNeg, 0, wxALL, WXC_FROM_DIP(2));
+    m_btXNeg->SetMinSize(wxSize(42,42));
+    
+    m_staticBitmap5501 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-fold@2x")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5302->Add(m_staticBitmap5501, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_btXPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btXPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XPos")), wxLEFT);
+    m_btXPos->SetBitmapMargins(2,2);
+    #endif
+    m_btXPos->SetToolTip(_("+X"));
+    
+    flexGridSizer5302->Add(m_btXPos, 0, wxALL, WXC_FROM_DIP(2));
+    m_btXPos->SetMinSize(wxSize(42,42));
+    
+    m_btXNegYNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btXNegYNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XNegYNeg")), wxLEFT);
+    m_btXNegYNeg->SetBitmapMargins(2,2);
+    #endif
+    m_btXNegYNeg->SetToolTip(_("-X -Y"));
+    
+    flexGridSizer5302->Add(m_btXNegYNeg, 0, wxALL, WXC_FROM_DIP(2));
+    m_btXNegYNeg->SetMinSize(wxSize(42,42));
+    
+    m_btYNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btYNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("YNeg")), wxBOTTOM);
+    m_btYNeg->SetBitmapMargins(2,2);
+    #endif
+    m_btYNeg->SetToolTip(_("-Y"));
+    
+    flexGridSizer5302->Add(m_btYNeg, 0, wxALL, WXC_FROM_DIP(2));
+    m_btYNeg->SetMinSize(wxSize(42,42));
+    
+    m_btXPosYNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btXPosYNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("XPosYNeg")), wxLEFT);
+    m_btXPosYNeg->SetBitmapMargins(2,2);
+    #endif
+    m_btXPosYNeg->SetToolTip(_("+X -Y"));
+    
+    flexGridSizer5302->Add(m_btXPosYNeg, 0, wxALL, WXC_FROM_DIP(2));
+    m_btXPosYNeg->SetMinSize(wxSize(42,42));
+    
+    flexGridSizer5314->Add(44, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticLine5516 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer5314->Add(m_staticLine5516, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    flexGridSizer5314->Add(44, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5316 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer5316->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5316->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5314->Add(flexGridSizer5316, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_btZPos = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btZPos->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ZPos")), wxLEFT);
+    m_btZPos->SetBitmapMargins(2,2);
+    #endif
+    m_btZPos->SetToolTip(_("+Z"));
+    
+    flexGridSizer5316->Add(m_btZPos, 0, wxALL, WXC_FROM_DIP(2));
+    m_btZPos->SetMinSize(wxSize(42,42));
+    
+    flexGridSizer5316->Add(0, 42, 1, wxALL, WXC_FROM_DIP(2));
+    
+    m_btZNeg = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(42,42)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btZNeg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ZNeg")), wxLEFT);
+    m_btZNeg->SetBitmapMargins(2,2);
+    #endif
+    m_btZNeg->SetToolTip(_("-Z"));
+    
+    flexGridSizer5316->Add(m_btZNeg, 0, wxALL, WXC_FROM_DIP(2));
+    m_btZNeg->SetMinSize(wxSize(42,42));
+    
+    m_staticLine5572 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5324->Add(m_staticLine5572, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5566 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer5566->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5566->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5566->AddGrowableCol(0);
+    flexGridSizer5566->AddGrowableRow(0);
+    
+    flexGridSizer5324->Add(flexGridSizer5566, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_textMessage = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,50)), wxTE_WORDWRAP|wxTE_READONLY|wxTE_MULTILINE|wxBORDER_NONE);
+    m_textMessage->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+    wxFont m_textMessageFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_textMessage->SetFont(m_textMessageFont);
+    
+    flexGridSizer5566->Add(m_textMessage, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    m_textMessage->SetMinSize(wxSize(-1,50));
+    
+    m_staticLine535015 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5324->Add(m_staticLine535015, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5845 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer5845->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5845->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5324->Add(flexGridSizer5845, 0, wxALL, WXC_FROM_DIP(0));
+    
+    flexGridSizer5845->Add(14, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticBitmap5847 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("playstation-circle-dark-icon24")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5845->Add(m_staticBitmap5847, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_staticText5340 = new wxStaticText(this, wxID_ANY, _("Reference Position Mode:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5340Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5340->SetFont(m_staticText5340Font);
+    
+    flexGridSizer5845->Add(m_staticText5340, 0, wxALL, WXC_FROM_DIP(7));
+    
+    wxFlexGridSizer* flexGridSizer5326 = new wxFlexGridSizer(1, 6, 0, 0);
+    flexGridSizer5326->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5326->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5324->Add(flexGridSizer5326, 1, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5456 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5456->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5456->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5326->Add(flexGridSizer5456, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5460 = new wxStaticText(this, wxID_ANY, _("1"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxALIGN_CENTRE);
+    wxFont m_staticText5460Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5460->SetFont(m_staticText5460Font);
+    
+    flexGridSizer5456->Add(m_staticText5460, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_btMode1 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode1")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
+    m_btMode1->SetToolTip(_("Mode 1"));
+    m_btMode1->SetValue(false);
+    
+    flexGridSizer5456->Add(m_btMode1, 0, wxALL, WXC_FROM_DIP(5));
+    m_btMode1->SetMinSize(wxSize(64,64));
+    
+    wxFlexGridSizer* flexGridSizer5461 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5461->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5461->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5326->Add(flexGridSizer5461, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5467 = new wxStaticText(this, wxID_ANY, _("2"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5467Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5467->SetFont(m_staticText5467Font);
+    
+    flexGridSizer5461->Add(m_staticText5467, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_btMode2 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode2")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), wxBU_BOTTOM);
+    m_btMode2->SetToolTip(_("Mode 2"));
+    m_btMode2->SetValue(false);
+    
+    flexGridSizer5461->Add(m_btMode2, 0, wxALL, WXC_FROM_DIP(5));
+    m_btMode2->SetMinSize(wxSize(64,64));
+    
+    wxFlexGridSizer* flexGridSizer5462 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5462->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5462->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5326->Add(flexGridSizer5462, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_staticText5469 = new wxStaticText(this, wxID_ANY, _("3"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5469Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5469->SetFont(m_staticText5469Font);
+    
+    flexGridSizer5462->Add(m_staticText5469, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_btMode3 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
+    m_btMode3->SetToolTip(_("Mode 3"));
+    m_btMode3->SetValue(false);
+    
+    flexGridSizer5462->Add(m_btMode3, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(5));
+    m_btMode3->SetMinSize(wxSize(64,64));
+    
+    wxFlexGridSizer* flexGridSizer5463 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5463->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5463->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5326->Add(flexGridSizer5463, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5471 = new wxStaticText(this, wxID_ANY, _("4"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5471Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5471->SetFont(m_staticText5471Font);
+    
+    flexGridSizer5463->Add(m_staticText5471, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_btMode4 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode4")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
+    m_btMode4->SetToolTip(_("Mode 4"));
+    m_btMode4->SetValue(false);
+    
+    flexGridSizer5463->Add(m_btMode4, 0, wxALL, WXC_FROM_DIP(5));
+    m_btMode4->SetMinSize(wxSize(64,64));
+    
+    wxFlexGridSizer* flexGridSizer5464 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5464->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5464->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5326->Add(flexGridSizer5464, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5473 = new wxStaticText(this, wxID_ANY, _("5"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5473Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5473->SetFont(m_staticText5473Font);
+    
+    flexGridSizer5464->Add(m_staticText5473, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_btMode5 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode5")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
+    m_btMode5->SetToolTip(_("Mode 5"));
+    m_btMode5->SetValue(false);
+    
+    flexGridSizer5464->Add(m_btMode5, 0, wxALL, WXC_FROM_DIP(5));
+    m_btMode5->SetMinSize(wxSize(64,64));
+    
+    wxFlexGridSizer* flexGridSizer5476 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5476->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5476->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5326->Add(flexGridSizer5476, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_staticText5475 = new wxStaticText(this, wxID_ANY, _("6"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5475Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5475->SetFont(m_staticText5475Font);
+    
+    flexGridSizer5476->Add(m_staticText5475, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
+    
+    m_btMode6 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("mode6")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(64,64)), 0);
+    m_btMode6->SetToolTip(_("Mode 6"));
+    m_btMode6->SetValue(false);
+    
+    flexGridSizer5476->Add(m_btMode6, 0, wxALL, WXC_FROM_DIP(5));
+    m_btMode6->SetMinSize(wxSize(64,64));
+    
+    m_staticLine53501 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5324->Add(m_staticLine53501, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5484 = new wxFlexGridSizer(1, 7, 0, 0);
+    flexGridSizer5484->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5484->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5324->Add(flexGridSizer5484, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticText5486 = new wxStaticText(this, wxID_ANY, _("Workpiece\nThickness"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5486Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText5486->SetFont(m_staticText5486Font);
+    
+    flexGridSizer5484->Add(m_staticText5486, 0, wxALL, WXC_FROM_DIP(3));
+    
+    m_workpiceThickness = new wxTextCtrl(this, wxID_ANY, wxT("0,00"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RIGHT);
+    #if wxVERSION_NUMBER >= 3000
+    m_workpiceThickness->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer5484->Add(m_workpiceThickness, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText5497 = new wxStaticText(this, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5497Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText5497->SetFont(m_staticText5497Font);
+    
+    flexGridSizer5484->Add(m_staticText5497, 0, wxALL, WXC_FROM_DIP(7));
+    
+    flexGridSizer5484->Add(32, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5488 = new wxStaticText(this, wxID_ANY, _("Measure Plate\nThickness"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5488Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText5488->SetFont(m_staticText5488Font);
+    
+    flexGridSizer5484->Add(m_staticText5488, 0, wxALL, WXC_FROM_DIP(3));
+    
+    m_measurePlateThickness = new wxTextCtrl(this, wxID_ANY, wxT("0,21"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTE_RIGHT|wxTE_READONLY);
+    m_measurePlateThickness->SetToolTip(_("Standard\nConfiguration Value"));
+    #if wxVERSION_NUMBER >= 3000
+    m_measurePlateThickness->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer5484->Add(m_measurePlateThickness, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_staticText5499 = new wxStaticText(this, wxID_ANY, _("mm"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5499Font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText5499->SetFont(m_staticText5499Font);
+    
+    flexGridSizer5484->Add(m_staticText5499, 0, wxALL, WXC_FROM_DIP(7));
+    
+    m_staticLine5350 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer5324->Add(m_staticLine5350, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    wxFlexGridSizer* flexGridSizer5342 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer5342->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5342->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5342->AddGrowableCol(0);
+    
+    flexGridSizer5324->Add(flexGridSizer5342, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5447 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer5447->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5447->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5447->AddGrowableCol(1);
+    flexGridSizer5447->AddGrowableRow(0);
+    
+    flexGridSizer5342->Add(flexGridSizer5447, 0, wxALL, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5453 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5453->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5453->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5447->Add(flexGridSizer5453, 0, wxALL, WXC_FROM_DIP(0));
+    
+    flexGridSizer5453->Add(0, 7, 1, wxALL, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer5450 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5450->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5450->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5453->Add(flexGridSizer5450, 0, wxALL, WXC_FROM_DIP(0));
+    
+    m_staticText5449 = new wxStaticText(this, wxID_ANY, _("Mode:"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5449Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5449->SetFont(m_staticText5449Font);
+    
+    flexGridSizer5450->Add(m_staticText5449, 0, wxALL, WXC_FROM_DIP(4));
+    
+    m_modeSelected = new wxStaticText(this, wxID_ANY, _("0"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_modeSelected->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+    m_modeSelected->SetForegroundColour(wxColour(wxT("rgb(0,0,128)")));
+    wxFont m_modeSelectedFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_modeSelected->SetFont(m_modeSelectedFont);
+    
+    flexGridSizer5450->Add(m_modeSelected, 0, wxALL, WXC_FROM_DIP(4));
+    
+    flexGridSizer5447->Add(6, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_modeText = new wxStaticText(this, wxID_ANY, _("1\n2\n3"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_modeTextFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_modeText->SetFont(m_modeTextFont);
+    
+    flexGridSizer5447->Add(m_modeText, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_btSet = new wxButton(this, wxID_ANY, _("Set (0, 0, 0)"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_btSet->SetDefault();
+    #if wxVERSION_NUMBER >= 2904
+    m_btSet->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("playstation-square-dark-icon16")), wxLEFT);
+    m_btSet->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btSetFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btSet->SetFont(m_btSetFont);
+    m_btSet->SetToolTip(_("Set Reference Position\nand Reference Mode"));
+    
+    flexGridSizer5342->Add(m_btSet, 0, wxALL, WXC_FROM_DIP(7));
+    
+    m_btCancel = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btCancel->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("playstation-triangle-dark-icon16")), wxLEFT);
+    m_btCancel->SetBitmapMargins(2,2);
+    #endif
+    m_btCancel->SetToolTip(_("Abort"));
+    
+    flexGridSizer5342->Add(m_btCancel, 0, wxALL, WXC_FROM_DIP(7));
+    
+    SetName(wxT("CncReferencePositionBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncReferencePositionBase::init), NULL, this);
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncReferencePositionBase::show), NULL, this);
+    m_rbStepSensitivity->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncReferencePositionBase::selectStepSensitivity), NULL, this);
+    m_btXNegYpos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXNegYpos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNegYpos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXNegYpos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYPos), NULL, this);
+    m_btXNegYpos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btYPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYPos), NULL, this);
+    m_btYPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btYPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btYPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btYPos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXPosYPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYPos), NULL, this);
+    m_btXPosYPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXPosYPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXPosYPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNeg), NULL, this);
+    m_btXNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXPos->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
+    m_btXPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
+    m_btXPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXPos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXNegYNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYNeg), NULL, this);
+    m_btXNegYNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXNegYNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXNegYNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNegYNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btYNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYNeg), NULL, this);
+    m_btYNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btYNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btYNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btYNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXPosYNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYNeg), NULL, this);
+    m_btXPosYNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXPosYNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXPosYNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXPosYNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btZPos->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZPos), NULL, this);
+    m_btZPos->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btZPos->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btZPos->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btZPos->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btZNeg->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZNeg), NULL, this);
+    m_btZNeg->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btZNeg->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btZNeg->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btZNeg->Connect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btMode1->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode1), NULL, this);
+    m_btMode2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode2), NULL, this);
+    m_btMode3->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode3), NULL, this);
+    m_btMode4->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode4), NULL, this);
+    m_btMode5->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode5), NULL, this);
+    m_btMode6->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode6), NULL, this);
+    m_btSet->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::set), NULL, this);
+    m_btCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::cancel), NULL, this);
+    
+}
+
+CncReferencePositionBase::~CncReferencePositionBase()
+{
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncReferencePositionBase::init), NULL, this);
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncReferencePositionBase::show), NULL, this);
+    m_rbStepSensitivity->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncReferencePositionBase::selectStepSensitivity), NULL, this);
+    m_btXNegYpos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXNegYpos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNegYpos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXNegYpos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYPos), NULL, this);
+    m_btXNegYpos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btYPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYPos), NULL, this);
+    m_btYPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btYPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btYPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btYPos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXPosYPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYPos), NULL, this);
+    m_btXPosYPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXPosYPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXPosYPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNeg), NULL, this);
+    m_btXNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXPos->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
+    m_btXPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPos), NULL, this);
+    m_btXPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXPos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXNegYNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXNegYNeg), NULL, this);
+    m_btXNegYNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXNegYNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXNegYNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXNegYNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btYNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateYNeg), NULL, this);
+    m_btYNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btYNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btYNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btYNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btXPosYNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateXPosYNeg), NULL, this);
+    m_btXPosYNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btXPosYNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btXPosYNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btXPosYNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btZPos->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZPos), NULL, this);
+    m_btZPos->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btZPos->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btZPos->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btZPos->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btZNeg->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncReferencePositionBase::navigateZNeg), NULL, this);
+    m_btZNeg->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncReferencePositionBase::navigateLeftUp), NULL, this);
+    m_btZNeg->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(CncReferencePositionBase::navigateDClick), NULL, this);
+    m_btZNeg->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncReferencePositionBase::navigateLeave), NULL, this);
+    m_btZNeg->Disconnect(wxEVT_KILL_FOCUS, wxFocusEventHandler(CncReferencePositionBase::navigateKillFocus), NULL, this);
+    m_btMode1->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode1), NULL, this);
+    m_btMode2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode2), NULL, this);
+    m_btMode3->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode3), NULL, this);
+    m_btMode4->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode4), NULL, this);
+    m_btMode5->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode5), NULL, this);
+    m_btMode6->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::mode6), NULL, this);
+    m_btSet->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::set), NULL, this);
+    m_btCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::cancel), NULL, this);
+    
+}
+
+CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    m_observeTimer = new wxTimer;
+    m_observeTimer->Start(5000, true);
+    
+    m_startupTimer = new wxTimer;
+    m_startupTimer->Start(100, true);
+    
+    wxBoxSizer* boxSizer5596 = new wxBoxSizer(wxVERTICAL);
+    this->SetSizer(boxSizer5596);
+    
+    wxFlexGridSizer* flexGridSizer5582 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer5582->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5582->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    boxSizer5596->Add(flexGridSizer5582, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_staticBitmap5593 = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("24-connected@2x")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer5582->Add(m_staticBitmap5593, 0, wxALL, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer5591 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5591->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5591->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5591->AddGrowableCol(0);
+    flexGridSizer5591->AddGrowableRow(1);
+    
+    flexGridSizer5582->Add(flexGridSizer5591, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText5589 = new wxStaticText(this, wxID_ANY, _("Connecting the Serial Port. . ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    wxFont m_staticText5589Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText5589->SetFont(m_staticText5589Font);
+    
+    flexGridSizer5591->Add(m_staticText5589, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_connectActivityPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(120,16)), wxTAB_TRAVERSAL);
+    m_connectActivityPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    
+    flexGridSizer5591->Add(m_connectActivityPanel, 0, wxALL, WXC_FROM_DIP(5));
+    m_connectActivityPanel->SetMinSize(wxSize(120,16));
+    
+    SetName(wxT("CncConnectProgressBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncConnectProgressBase::initDialog), NULL, this);
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncConnectProgressBase::show), NULL, this);
+    m_observeTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::observeTimer), NULL, this);
+    m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::startupTimer), NULL, this);
+    
+}
+
+CncConnectProgressBase::~CncConnectProgressBase()
+{
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncConnectProgressBase::initDialog), NULL, this);
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncConnectProgressBase::show), NULL, this);
+    m_observeTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::observeTimer), NULL, this);
+    m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncConnectProgressBase::startupTimer), NULL, this);
+    
+    m_observeTimer->Stop();
+    wxDELETE( m_observeTimer );
+
+    m_startupTimer->Stop();
+    wxDELETE( m_startupTimer );
 
 }
 
@@ -10610,5 +10885,101 @@ ImageLibSpeed::ImageLibSpeed()
 }
 
 ImageLibSpeed::~ImageLibSpeed()
+{
+}
+
+ImageLibGamepad::ImageLibGamepad()
+    : wxImageList(16, 16, true)
+    , m_imagesWidth(16)
+    , m_imagesHeight(16)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_DEACTIVATED"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_DEACTIVATED"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_ACTIVATED"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_ACTIVATED"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_XY"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_XY"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_NAVI_Z"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_NAVI_Z"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_LEFT"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_LEFT"), bmp));
+        }
+    }
+    
+    {
+        wxBitmap bmp;
+        wxIcon icn;
+        bmp = wxXmlResource::Get()->LoadBitmap(wxT("BMP_STICK_RIGHT"));
+        if(bmp.IsOk()) {
+            if((m_imagesWidth == bmp.GetWidth()) && (m_imagesHeight == bmp.GetHeight())){
+                icn.CopyFromBitmap(bmp);
+                this->Add(icn);
+            }
+            m_bitmaps.insert(std::make_pair(wxT("BMP_STICK_RIGHT"), bmp));
+        }
+    }
+    
+}
+
+ImageLibGamepad::~ImageLibGamepad()
 {
 }

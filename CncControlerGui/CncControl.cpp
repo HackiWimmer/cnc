@@ -1734,6 +1734,9 @@ void CncControl::manualContinuousMoveStop() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool corrcetLimit) {
 ///////////////////////////////////////////////////////////////////
+	
+	
+	
 	const double SSF = (double)STEP_SENSITIVITY_FACTOR;
 	
 	// Setup

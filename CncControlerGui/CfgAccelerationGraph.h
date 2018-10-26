@@ -2,7 +2,7 @@
 #define CfgAccelerationGraph_H
 
 #include <wx/panel.h>
-#include "CncArduino.h"
+#include "CncSpeedController.h"
 
 class CfgAccelerationGraph : public wxPanel {
 	

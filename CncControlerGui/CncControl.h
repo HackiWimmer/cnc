@@ -316,6 +316,7 @@ class CncControl {
 		
 		bool manualContinuousMoveStart(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit=true);
 		void manualContinuousMoveStop();
+		bool isContinuousMoveActive() { return runContinuousMove; }
 		
 		bool manualSimpleMoveSteps(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);
 		bool manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool alreadyRendered = false);

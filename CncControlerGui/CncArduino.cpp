@@ -44,7 +44,7 @@ void ArduinoCMDs::init() {
 	
 	cmds[CMD_MOVE]                  = "Push 3D Move";
 	cmds[CMD_RENDER_AND_MOVE]       = "Push Render and 3D Move";
-	
+	cmds[CMD_MOVE_UNIT_SIGNAL]      = "Push Render and 3D Move until Signal";
 
 	cmds[CMD_PRINT_CONFIG]          = "Pull Configuration";
 	cmds[CMD_PRINT_VERSION]         = "Pull Version";

@@ -8,8 +8,15 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
-    <File Name="SecureRun.h"/>
-    <File Name="SecureRun.cpp"/>
+    <VirtualDirectory Name="GamePad">
+      <File Name="CncGamePad.cpp"/>
+      <VirtualDirectory Name="OSD">
+        <File Name="CncGamePadOSD.h"/>
+        <File Name="CncGamePadMsw.cpp"/>
+        <File Name="CncGamePadMsw.h"/>
+      </VirtualDirectory>
+      <File Name="CncGamePad.h"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="Clipper">
       <File Name="Clipper/clipper.hpp"/>
       <File Name="Clipper/clipper.cpp"/>
@@ -156,6 +163,9 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncGamepadControllerState.h"/>
+      <File Name="CncGamepadControllerState.cpp"/>
+      <File Name="CncSpeedController.h"/>
       <File Name="CncConfigCommon.h"/>
       <File Name="CncReferencePosition.h"/>
       <File Name="CncReferencePosition.cpp"/>
@@ -226,6 +236,10 @@
       <File Name="wxcrafter.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
+      <File Name="SecureRun.h"/>
+      <File Name="SecureRun.cpp"/>
+      <File Name="GamepadThread.cpp"/>
+      <File Name="GamepadThread.h"/>
       <File Name="main.cpp"/>
       <File Name="MainFrame.cpp"/>
       <File Name="MainFrame.h"/>
@@ -353,6 +367,9 @@
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
+  <Dependencies Name="release2"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -382,6 +399,7 @@
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
+        <Library Value="Xinput9_1_0"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -437,6 +455,7 @@
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
+        <Library Value="Xinput9_1_0"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D NDEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -490,6 +509,7 @@
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
+        <Library Value="Xinput9_1_0"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -528,7 +548,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
-  <Dependencies Name="release2"/>
 </CodeLite_Project>

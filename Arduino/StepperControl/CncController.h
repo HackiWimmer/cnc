@@ -68,7 +68,7 @@ class CncController {
     void setupAccelProfile(int32_t v1, int32_t v2, int32_t v3, int32_t v4, int32_t v5, int32_t v6);
 
     const CncSpeedController& getSpeedController() const { return speedController; }
-    void setSpeedValue(double fm);
+    void setSpeedValue(double fm, bool activateAcceleration=true);
  
     //////////////////////////////////////////////////////////////////////////////
     // this method id used by the CNC stepper to broadbast the current stepper limit information

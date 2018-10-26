@@ -14,9 +14,11 @@ class CncReferencePosition : public CncReferencePositionBase
 		void setMeasurePlateThickness(const double mpt);
 
 		CncRefPositionMode getReferenceMode();
+		void shiftReferenceMode();
 		double getWorkpieceThickness();
 	
 	protected:
+    virtual void selectStepSensitivity(wxCommandEvent& event);
 		virtual void init(wxInitDialogEvent& event);
 		virtual void show(wxShowEvent& event);
 		virtual void cancel(wxCommandEvent& event);

@@ -19,6 +19,9 @@ RenderAndMove/Debug/**
 UnitTests/Release/**
 UnitTests/Debug/**
 
+GameController/Release/**
+GameController/Debug/**
+
 #*.exe
 #*.txt
 #*.bat

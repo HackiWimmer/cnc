@@ -4,6 +4,7 @@
   <Project Name="FreeGlutWorkspace" Path="FreeGlutWorkspace/FreeGlutWorkspace.project" Active="No"/>
   <Project Name="UnitTests" Path="UnitTests/UnitTests.project" Active="No"/>
   <Project Name="RenderAndMove" Path="RenderAndMove/RenderAndMove.project" Active="No"/>
+  <Project Name="GameController" Path="GameController/GameController.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
@@ -11,6 +12,7 @@
       <Project Name="FreeGlutWorkspace" ConfigName="Release"/>
       <Project Name="UnitTests" ConfigName="Release"/>
       <Project Name="RenderAndMove" ConfigName="Release"/>
+      <Project Name="GameController" ConfigName="Release"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Debug" Selected="yes">
       <Environment/>
@@ -19,6 +21,7 @@
       <Project Name="UnitTests" ConfigName="Debug"/>
       <Project Name="StepperControl" ConfigName="Debug"/>
       <Project Name="RenderAndMove" ConfigName="Debug"/>
+      <Project Name="GameController" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

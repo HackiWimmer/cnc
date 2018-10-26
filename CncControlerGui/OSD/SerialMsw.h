@@ -4,7 +4,6 @@
 	#ifdef __WXMSW__
 	
 		#include <windef.h>
-
 		
 		class SerialMsw {
 			
