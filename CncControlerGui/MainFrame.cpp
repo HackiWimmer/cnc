@@ -74,6 +74,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncConfigProperty.h"
 #include "SecureRun.h"
 #include "CncReferencePosition.h"
+#include "CncUsbConnectionDetected.h"
 #include "CncConnectProgress.h"
 #include "MainFrame.h"
 
@@ -1373,14 +1374,19 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 		if ( wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE )
 			decoratePortSelector();
 		
+		static CncUsbConnectionDetected* dlg = new CncUsbConnectionDetected(this);
 		switch ( wParam ) {
 			// ask for connect - on demand . . . 
 			case DBT_DEVICEARRIVAL:	{
 				if ( isProcessing() == false ) {
-					wxString msg("Should a connection established to port: ");
-					msg.append(portName);
-					wxMessageDialog dlg(this, msg, _T("New connection available. Try to connect  . . . "), wxYES|wxNO|wxCENTRE|wxICON_QUESTION);
-					if ( dlg.ShowModal() == wxID_YES ) {
+					
+					if ( dlg->IsShown() ) {
+						dlg->setPortName(portName);
+						return ret;
+					}
+					
+					dlg->setPortName(portName);
+					if ( dlg->ShowModal() == wxID_YES ) {
 						m_portSelector->SetStringSelection(portName);
 						connectSerialPortDialog();
 					}
@@ -1399,6 +1405,11 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 						std::cerr << "Connection brocken" << std::endl;
 						cnc::trc.logWarning("Connection broken . . ."); 
 					}
+					
+					if ( dlg->IsShown() ) {
+						dlg->EndModal(wxID_NO);
+					}
+					
 				break;
 			}
 			
@@ -1562,6 +1573,8 @@ void MainFrame::initialize(void) {
 	toggleMonitorStatistics(false);
 	changeManuallySpeedValue();
 	initSpeedConfigPlayground();
+	
+	m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
 	
 	perspectiveHandler.setupUserPerspectives();
 	
@@ -1952,12 +1965,14 @@ bool MainFrame::connectSerialPort() {
 		cs.assign("dev/null");
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
 		
 	} else if ( sel == _portSimulatorNULL ) {
 		cnc = new CncControl(CncPORT_SIMU);
 		cs.assign(_portSimulatorNULL);
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
 		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
@@ -1967,6 +1982,7 @@ bool MainFrame::connectSerialPort() {
 		showSVGEmuResult();
 		enableMenuItem(m_miSaveEmuOutput, true);
 		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
 		
 	} else {
 		cnc = new CncControl(CncPORT);
@@ -1974,6 +1990,7 @@ bool MainFrame::connectSerialPort() {
 		cs.append(sel);
 		GBL_CONFIG->setProbeMode(false);
 		decorateSecureDlgChoice(true);
+		decorateSpeedControlBtn(true);
 	}
 	
 	if ( cnc == NULL || cnc->getSerial() == NULL )
@@ -2983,11 +3000,14 @@ void MainFrame::activateGamepadNotifications(bool state) {
 	
 	decorateGamepadState(gamepadThread->IsRunning());
 	
-	
+	if ( changed == false)
+		;
+	/*
 	//if ( gamepadThread->IsPaused() )	cnc::trc.logInfoMessage( changed ? "Gamepad thread deactivated" : "Gamepad thread stays deactivated");
 	//else								cnc::trc.logInfoMessage( changed ? "Gamepad thread activated"   : "Gamepad thread stays activated");
 	if ( gamepadThread->IsPaused() )	std::cout << ( changed ? "Gamepad thread deactivated" : "Gamepad thread stays deactivated") << std::endl;
 	else								std::cout << ( changed ? "Gamepad thread activated"   : "Gamepad thread stays activated") << std::endl;
+	*/
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processSVGTemplate() {
@@ -7453,18 +7473,15 @@ void MainFrame::manualContinuousMoveStart(const CncLinearDirection x, const CncL
 	if ( cnc->isContinuousMoveActive() )
 		return;
 	
-	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
-	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
-	bool altKey = CncAsyncKeyboardState::isAltPressed();
-	
 	CncControl::StepSensitivity stepSensitivity = CncControl::StepSensitivity::FINEST;
-	if ( shtKey || ctlKey || altKey ) {
-		
-		if ( shtKey && ctlKey )			stepSensitivity = CncControl::StepSensitivity::ROUGHEST;
-		else if ( ctlKey )				stepSensitivity = CncControl::StepSensitivity::ROUGH;
-		else if ( shtKey )				stepSensitivity = CncControl::StepSensitivity::MEDIUM;
-		else if ( altKey )				stepSensitivity = CncControl::StepSensitivity::FINE;
-	} 
+	unsigned int sel = m_rbStepSensitivity->GetSelection();
+	switch ( sel ) {
+		case 0: stepSensitivity = CncControl::StepSensitivity::FINEST;		break;
+		case 1: stepSensitivity = CncControl::StepSensitivity::FINE; 		break;
+		case 2: stepSensitivity = CncControl::StepSensitivity::MEDIUM; 		break;
+		case 3: stepSensitivity = CncControl::StepSensitivity::ROUGH; 		break;
+		case 4: stepSensitivity = CncControl::StepSensitivity::ROUGHEST; 	break;
+	}
 	
 	cnc->manualContinuousMoveStop();
 	
@@ -7686,6 +7703,7 @@ void MainFrame::decorateGamepadState(bool state) {
 		m_gpBmp2->Show(false);
 		m_gpBmp3->Show(false);
 		m_gpBmp4->Show(false);
+		cncGamepadState->GetGamepadTrace()->ChangeValue("Gamepad state not available");
 	}
 	
 	m_gamepadState->Refresh();

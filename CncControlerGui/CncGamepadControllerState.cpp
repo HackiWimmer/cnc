@@ -23,6 +23,7 @@ void CncGamepadControllerState::update(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 	running = true;
 		processTrace(state);
+		processReferencePage(state);
 		processRefPositionDlg(state);
 		processPositionControlMode(state);
 		processPosition(state);
@@ -63,6 +64,14 @@ void CncGamepadControllerState::processPositionControlMode(const GamepadEvent& s
 	mangageMainView(state);
 }
 ///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::processReferencePage(const GamepadEvent& state) {
+///////////////////////////////////////////////////////////////////
+	if ( state.data.buttonStart ) {
+		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
+		wxPostEvent(mainFrame->GetBtSelectReferences(), evt);
+	}
+}
+///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 	if ( mainFrame == NULL )
@@ -79,20 +88,16 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 			return;
 		}
 		
-		// select step sensitivity
+		// select step sensitivity - main frame
 		if ( state.data.buttonA ) { 
 			unsigned int sel = mainFrame->GetRbStepSensitivity()->GetSelection();
-			switch ( sel ) {
-				case 0:	mainFrame->GetRbStepSensitivity()->SetSelection(1); break;
-				case 1:	mainFrame->GetRbStepSensitivity()->SetSelection(2); break;
-				case 2:	mainFrame->GetRbStepSensitivity()->SetSelection(3); break;
-				case 3:	mainFrame->GetRbStepSensitivity()->SetSelection(4); break;
-				case 4:	mainFrame->GetRbStepSensitivity()->SetSelection(5); break;
-				case 5:	mainFrame->GetRbStepSensitivity()->SetSelection(0); break;
-			}
+			unsigned int cnt = mainFrame->GetRbStepSensitivity()->GetCount();
+		
+			if ( sel + 1 >= cnt ) 	mainFrame->GetRbStepSensitivity()->SetSelection(0);
+			else					mainFrame->GetRbStepSensitivity()->SetSelection(sel +1);
 		}
 		
-		// alway return here
+		// always return here
 		return;
 	}
 	
@@ -241,4 +246,6 @@ void CncGamepadControllerState::mangageMainView(const GamepadEvent& state) {
 	mainFrame->GetGpBmp2()->Refresh();
 	mainFrame->GetGpBmp3()->Refresh();
 	mainFrame->GetGpBmp4()->Refresh();
+	
+	mainFrame->GetGpBmp1()->GetParent()->Layout();
 }

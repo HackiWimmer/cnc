@@ -130,4 +130,13 @@ class TestBookSelection {
 		};
 };
 
+
+class LoggerSelection {
+	public:
+		enum VAL {
+			CNC							= 0,
+			GAMEPAD						= 1
+		};
+};
+
 #endif

@@ -21,11 +21,10 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		inline bool isRefPosDlgMode();
 		
 		inline void processTrace(const GamepadEvent& state);
+		inline void processReferencePage(const GamepadEvent& state);
 		inline void processPositionControlMode(const GamepadEvent& state);
 		inline void processRefPositionDlg(const GamepadEvent& state);
 		inline void processPosition(const GamepadEvent& state);
-		
-		
 		
 		inline void managePositionViaStick(const GamepadEvent& state);
 		inline void managePositionViaNavi(const GamepadEvent& state);

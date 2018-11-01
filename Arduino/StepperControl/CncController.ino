@@ -758,16 +758,16 @@ unsigned char CncController::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
 unsigned char CncController::moveUntilSignal(const int32_t dx, const int32_t dy, const int32_t dz) {
 /////////////////////////////////////////////////////////////////////////////////////
   // speed setup
+  const double START_SPEED = speedController.getStartSpeed_MM_MIN() * 0.5;
   const double MAX_SPEED   = speedController.getMaxFeedSpeed_MM_MIN();
-  
-  const double SPEED_STEP1 = MAX_SPEED * 0.05;  const unsigned int TIMESPAN_STEP1  =  500; // ms
-  const double SPEED_STEP2 = MAX_SPEED * 0.25;  const unsigned int TIMESPAN_STEP2  = 1000; // ms
-  const double SPEED_STEP3 = MAX_SPEED * 0.50;  const unsigned int TIMESPAN_STEP3  = 1500; // ms
-  const double SPEED_STEP4 = MAX_SPEED * 0.75;  const unsigned int TIMESPAN_STEP4  = 2000; // ms
-  const double SPEED_STEP5 = MAX_SPEED;
+  const double DIFF_SPEED  = MAX_SPEED - START_SPEED;
 
-  double currentSpeed = SPEED_STEP1;
-  setSpeedValue(currentSpeed);
+  const unsigned short accelPeriod = 2500; // ms
+
+  if ( DIFF_SPEED < 0.0 )
+    return RET_ERROR;
+    
+  setSpeedValue(START_SPEED);
   
   unsigned char ret = RET_OK;
   unsigned long tsStart = millis();
@@ -801,22 +801,20 @@ unsigned char CncController::moveUntilSignal(const int32_t dx, const int32_t dy,
       // like SIG_QUIT, or SIG_HALT and renderAndStepAxisXYZ()
       // return != RET_OK
 
-      if ( (millis() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
-        { currentSpeed = SPEED_STEP2; setSpeedValue(currentSpeed, false); }
-  
-      if ( (millis() - tsStart) > TIMESPAN_STEP2 && currentSpeed < SPEED_STEP3 )
-        { currentSpeed = SPEED_STEP3; setSpeedValue(currentSpeed, false); }
+      unsigned diff = millis() - tsStart;
+      if ( diff > accelPeriod ) {
+        setSpeedValue(MAX_SPEED, false);
         
-      if ( (millis() - tsStart) > TIMESPAN_STEP3 && currentSpeed < SPEED_STEP4 )
-        { currentSpeed = SPEED_STEP4; setSpeedValue(currentSpeed, false); }
+      } else {
+        setSpeedValue(START_SPEED + DIFF_SPEED / accelPeriod * diff, false);
         
-      if ( (millis() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
-        { currentSpeed = SPEED_STEP5; setSpeedValue(currentSpeed, false); }
+      }
     }
   }
 
   speedController.enableAccelerationXYZ(true);
   return ret;
+ 
 }
 /////////////////////////////////////////////////////////////////////////////////////
 void CncController::setSpeedValue(double fm, bool activateAcceleration) { 

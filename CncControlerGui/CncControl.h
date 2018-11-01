@@ -34,7 +34,6 @@ class CncControl {
 	private:
 		long currentClientId;
 		bool runContinuousMove;
-		bool continuousMoveAppBased;
 		
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
@@ -146,7 +145,6 @@ class CncControl {
 		inline void postAppPosition(unsigned char pid);
 		inline void postCtlPosition(unsigned char pid);
 		
-		bool manualContinuousMoveStart_AppBased(const double x, const double y, const double z, bool correctLimit=true);
 		bool manualContinuousMoveStart_CtrlBased(const double x, const double y, const double z, bool correctLimit=true);
 		
 	public:
@@ -314,6 +312,7 @@ class CncControl {
 		bool moveYToMid();
 		bool moveZToMid();
 		
+		bool manualMoveFinest(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit=true);
 		bool manualContinuousMoveStart(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit=true);
 		void manualContinuousMoveStop();
 		bool isContinuousMoveActive() { return runContinuousMove; }

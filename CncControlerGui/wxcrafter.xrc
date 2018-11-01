@@ -1729,7 +1729,7 @@
                                       <style>wxTAB_TRAVERSAL</style>
                                       <object class="wxFlexGridSizer">
                                         <cols>1</cols>
-                                        <rows>4</rows>
+                                        <rows>5</rows>
                                         <vgap>0</vgap>
                                         <hgap>0</hgap>
                                         <growablecols>0</growablecols>
@@ -2002,20 +2002,43 @@
                                             <hgap>0</hgap>
                                             <growablecols>0</growablecols>
                                             <growablerows>1</growablerows>
-                                            <object class="sizeritem">
+                                            <object class="sizeritem" name="flexGridSizer5899">
                                               <flag>wxALL|wxEXPAND</flag>
                                               <border>3</border>
-                                              <object class="wxStaticText" name="m_cbStepSensitivityText">
-                                                <label>Step Sensitivity:</label>
-                                                <style/>
-                                                <font>
-                                                  <size>9</size>
-                                                  <style>normal</style>
-                                                  <weight>bold</weight>
-                                                  <family>swiss</family>
-                                                  <underlined>0</underlined>
-                                                  <face>Segoe UI</face>
-                                                </font>
+                                              <object class="wxFlexGridSizer">
+                                                <cols>3</cols>
+                                                <rows>1</rows>
+                                                <vgap>0</vgap>
+                                                <hgap>0</hgap>
+                                                <growablecols/>
+                                                <growablerows/>
+                                                <object class="sizeritem">
+                                                  <flag>wxALL</flag>
+                                                  <border>1</border>
+                                                  <object class="wxStaticBitmap" name="m_staticBitmap5901">
+                                                    <bitmap>bitmaps/gamepad/playstation-cross-dark-icon16.png</bitmap>
+                                                  </object>
+                                                </object>
+                                                <object class="spacer" name="Spacer5903">
+                                                  <size>4,0</size>
+                                                  <flag>wxALL</flag>
+                                                  <option>1</option>
+                                                </object>
+                                                <object class="sizeritem">
+                                                  <flag>wxALL|wxEXPAND</flag>
+                                                  <object class="wxStaticText" name="m_cbStepSensitivityText">
+                                                    <label>Step Sensitivity:</label>
+                                                    <style/>
+                                                    <font>
+                                                      <size>9</size>
+                                                      <style>normal</style>
+                                                      <weight>bold</weight>
+                                                      <family>swiss</family>
+                                                      <underlined>0</underlined>
+                                                      <face>Segoe UI</face>
+                                                    </font>
+                                                  </object>
+                                                </object>
                                               </object>
                                             </object>
                                             <object class="sizeritem" name="flexGridSizer5834">
@@ -2045,7 +2068,6 @@
                                                     <dimension>1</dimension>
                                                     <selection>1</selection>
                                                     <content>
-                                                      <item>One Step:</item>
                                                       <item>Finest:</item>
                                                       <item>Fine:</item>
                                                       <item>Medium:</item>
@@ -2096,8 +2118,7 @@
                                                           <flag>wxALL</flag>
                                                           <border>2</border>
                                                           <object class="wxStaticText" name="m_staticText533816">
-                                                            <label>OneStep:
-Finest:
+                                                            <label>Finest:
 Fine:
 Medium:
 Rough:
@@ -2151,6 +2172,39 @@ Roughest:</label>
                                           <border>1</border>
                                           <object class="wxStaticLine" name="m_staticLine5552">
                                             <style>wxLI_HORIZONTAL</style>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem" name="flexGridSizer5905">
+                                          <flag>wxALL|wxEXPAND</flag>
+                                          <border>5</border>
+                                          <option>1</option>
+                                          <object class="wxFlexGridSizer">
+                                            <cols>3</cols>
+                                            <rows>1</rows>
+                                            <vgap>0</vgap>
+                                            <hgap>0</hgap>
+                                            <growablecols/>
+                                            <growablerows/>
+                                            <object class="sizeritem">
+                                              <flag>wxALL</flag>
+                                              <border>1</border>
+                                              <object class="wxStaticBitmap" name="m_staticBitmap5907">
+                                                <bitmap>bitmaps/gamepad/playstation-square-dark-icon16.png</bitmap>
+                                              </object>
+                                            </object>
+                                            <object class="spacer" name="Spacer5911">
+                                              <size>4,0</size>
+                                              <flag>wxALL</flag>
+                                              <option>1</option>
+                                            </object>
+                                            <object class="sizeritem">
+                                              <flag>wxALL</flag>
+                                              <border>1</border>
+                                              <object class="wxStaticText" name="m_staticText5909">
+                                                <label>Open Reference Position Dialog</label>
+                                                <style/>
+                                              </object>
+                                            </object>
                                           </object>
                                         </object>
                                       </object>
@@ -10832,7 +10886,7 @@ State</label>
     <size>500,300</size>
     <style>wxTAB_TRAVERSAL</style>
     <object class="wxFlexGridSizer">
-      <cols>2</cols>
+      <cols>1</cols>
       <rows>1</rows>
       <vgap>0</vgap>
       <hgap>0</hgap>
@@ -10840,7 +10894,6 @@ State</label>
       <growablerows>0</growablerows>
       <object class="sizeritem" name="flexGridSizer5821">
         <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
         <object class="wxFlexGridSizer">
           <cols>1</cols>
           <rows>1</rows>
@@ -10850,124 +10903,19 @@ State</label>
           <growablerows>0</growablerows>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
-            <border>1</border>
             <object class="wxTextCtrl" name="m_gamepadTrace">
-              <style>wxTE_READONLY|wxTE_MULTILINE|wxALWAYS_SHOW_SB|wxHSCROLL|wxVSCROLL</style>
+              <style>wxTE_READONLY|wxTE_MULTILINE</style>
               <bg>wxSYS_COLOUR_CAPTIONTEXT</bg>
               <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
               <font>
-                <size>8</size>
+                <size>10</size>
                 <style>normal</style>
                 <weight>normal</weight>
                 <family>modern</family>
                 <underlined>0</underlined>
                 <face>Consolas</face>
               </font>
-              <value>Gamepad state</value>
-            </object>
-          </object>
-        </object>
-      </object>
-      <object class="sizeritem" name="flexGridSizer5806">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
-        <option>1</option>
-        <object class="wxFlexGridSizer">
-          <cols>1</cols>
-          <rows>4</rows>
-          <vgap>0</vgap>
-          <hgap>0</hgap>
-          <growablecols/>
-          <growablerows/>
-          <object class="sizeritem">
-            <flag>wxALL</flag>
-            <border>1</border>
-            <object class="wxStaticText" name="m_staticText5894">
-              <label>Some hints:</label>
-              <style/>
-              <font>
-                <size>9</size>
-                <style>normal</style>
-                <weight>bold</weight>
-                <family>swiss</family>
-                <underlined>0</underlined>
-                <face>Segoe UI</face>
-              </font>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
-            <object class="wxStaticLine" name="m_staticLine5892">
-              <style>wxLI_HORIZONTAL</style>
-            </object>
-          </object>
-          <object class="sizeritem" name="flexGridSizer5809">
-            <flag>wxALL</flag>
-            <object class="wxFlexGridSizer">
-              <cols>2</cols>
-              <rows>1</rows>
-              <vgap>0</vgap>
-              <hgap>0</hgap>
-              <growablecols>1</growablecols>
-              <growablerows>0</growablerows>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>1</border>
-                <object class="wxStaticBitmap" name="m_staticBitmap5811">
-                  <bitmap>bitmaps/gamepad/playstation-square-dark-icon24.png</bitmap>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>4</border>
-                <object class="wxStaticText" name="m_staticText5816">
-                  <label>Open Ref. Pos. Dialog</label>
-                  <style/>
-                  <font>
-                    <size>9</size>
-                    <style>normal</style>
-                    <weight>normal</weight>
-                    <family>swiss</family>
-                    <underlined>0</underlined>
-                    <face>Segoe UI</face>
-                  </font>
-                </object>
-              </object>
-            </object>
-          </object>
-          <object class="sizeritem" name="flexGridSizer580911">
-            <flag>wxALL</flag>
-            <object class="wxFlexGridSizer">
-              <cols>2</cols>
-              <rows>1</rows>
-              <vgap>0</vgap>
-              <hgap>0</hgap>
-              <growablecols>1</growablecols>
-              <growablerows>0</growablerows>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>1</border>
-                <object class="wxStaticBitmap" name="m_staticBitmap58112">
-                  <bitmap>bitmaps/gamepad/playstation-cross-dark-icon24.png</bitmap>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL</flag>
-                <border>4</border>
-                <object class="wxStaticText" name="m_staticText58163">
-                  <label>Select Step Sensitivity</label>
-                  <style/>
-                  <font>
-                    <size>9</size>
-                    <style>normal</style>
-                    <weight>normal</weight>
-                    <family>swiss</family>
-                    <underlined>0</underlined>
-                    <face>Segoe UI</face>
-                  </font>
-                </object>
-              </object>
+              <value>Gamepad state not available</value>
             </object>
           </object>
         </object>
@@ -11700,7 +11648,6 @@ State</label>
                       <dimension>1</dimension>
                       <selection>1</selection>
                       <content>
-                        <item>One Step:</item>
                         <item>Finest:</item>
                         <item>Fine:</item>
                         <item>Medium:</item>
@@ -12601,6 +12548,123 @@ Thickness</label>
                   <bg>wxSYS_COLOUR_BTNFACE</bg>
                 </object>
               </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxDialog" name="CncUsbConnectionDetectedBase">
+    <title>New controller connection is available . . .</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE</style>
+    <focused>1</focused>
+    <size>500,300</size>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>1</growablerows>
+      <object class="sizeritem" name="flexGridSizer5917">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>2</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols/>
+          <growablerows/>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxStaticBitmap" name="m_staticBitmap5919">
+              <bitmap>bitmaps/24-help@2x.png</bitmap>
+            </object>
+          </object>
+          <object class="sizeritem" name="flexGridSizer5930">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>2</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols>0</growablecols>
+              <growablerows>1</growablerows>
+              <object class="sizeritem">
+                <flag>wxALL|wxEXPAND</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="m_staticText5921">
+                  <label>Should a connection established to port:</label>
+                  <style/>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL|wxALIGN_RIGHT</flag>
+                <border>5</border>
+                <object class="wxStaticText" name="m_portName">
+                  <label>PORT</label>
+                  <style/>
+                  <fg>#004080</fg>
+                  <font>
+                    <size>14</size>
+                    <style>normal</style>
+                    <weight>bold</weight>
+                    <family>swiss</family>
+                    <underlined>0</underlined>
+                    <face>Segoe UI</face>
+                  </font>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer5923">
+        <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+        <border>5</border>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>2</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0,1</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+            <border>5</border>
+            <minsize>120,-1</minsize>
+            <object class="wxButton" name="m_ignore">
+              <label>Ignore</label>
+              <style/>
+              <bitmap>bitmaps/16-x-close@2x.png</bitmap>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+            <border>5</border>
+            <minsize>120,-1</minsize>
+            <object class="wxButton" name="m_connect">
+              <label>Connect</label>
+              <style/>
+              <font>
+                <size>9</size>
+                <style>normal</style>
+                <weight>bold</weight>
+                <family>swiss</family>
+                <underlined>0</underlined>
+                <face>Segoe UI</face>
+              </font>
+              <bitmap>bitmaps/16-connected@2x.png</bitmap>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>1</default>
             </object>
           </object>
         </object>

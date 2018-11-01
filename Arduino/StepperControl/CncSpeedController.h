@@ -378,8 +378,9 @@ class CncSpeedController {
 
   protected:
     
-	double configuredFeedSpeed_MM_SEC;
+	  double configuredFeedSpeed_MM_SEC;
     double realtimeFeedSpeed_MM_SEC;
+    double startSpeed_MM_SEC;
 
   public:
     
@@ -389,6 +390,7 @@ class CncSpeedController {
     CncSpeedController()
     : configuredFeedSpeed_MM_SEC(0.0)
     , realtimeFeedSpeed_MM_SEC(0.0)
+    , startSpeed_MM_SEC(5.0)
     , X('X')
     , Y('Y')
     , Z('Z')
@@ -406,6 +408,15 @@ class CncSpeedController {
 
     //////////////////////////////////////////////////////////////////////////
     virtual void completeMove() {}
+
+    //////////////////////////////////////////////////////////////////////////
+    double updateStartSpeed(double s) {
+
+      if ( s < startSpeed_MM_SEC)
+        startSpeed_MM_SEC = s;
+
+      return startSpeed_MM_SEC;
+    }
 
     //////////////////////////////////////////////////////////////////////////
     unsigned int getNextAccelDelayX()            { return X.AP.getNextAccelDelay(); }
@@ -434,12 +445,18 @@ class CncSpeedController {
     double getRealtimeFeedSpeed_MM_MIN()   const { return realtimeFeedSpeed_MM_SEC * 60; }
     double getRealtimeFeedSpeed_MM_SEC()   const { return realtimeFeedSpeed_MM_SEC; }
     void setRealtimeFeedSpeed_MM_SEC(const double s) { realtimeFeedSpeed_MM_SEC = (s > 0 ? s : 0.0); } 
-       
+
+    //////////////////////////////////////////////////////////////////
+    double getStartSpeed_MM_MIN() const { return startSpeed_MM_SEC * 60; }
+    double getStartSpeed_MM_SEC() const { return startSpeed_MM_SEC; }
+    
     //////////////////////////////////////////////////////////////////
     void setup(const char axis, unsigned int s, double p, 
                unsigned int oR, unsigned int oS, unsigned int tPW,
                int32_t startSpeed_MM_SEC = 5, int32_t stopSpeed_MM_SEC = 5) 
     {
+      updateStartSpeed(startSpeed_MM_SEC);
+      
       Axis AccelCalcStart, AccelCalcStop;
       AccelCalcStart.setup(s, p, oR, oS, tPW);
       AccelCalcStop.setup(s, p, oR, oS, tPW);

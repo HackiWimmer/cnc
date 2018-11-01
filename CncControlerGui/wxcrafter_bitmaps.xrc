@@ -13,6 +13,7 @@
   <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
   <object class="wxBitmap" name="16-cscope">bitmaps\16-cscope.png</object>
@@ -72,7 +73,9 @@
   <object class="wxBitmap" name="16-whole-word@2x">bitmaps\16-whole-word@2x.png</object>
   <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
   <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
+  <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-connected@2x">bitmaps\24-connected@2x.png</object>
+  <object class="wxBitmap" name="24-help@2x">bitmaps\24-help@2x.png</object>
   <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\build-animation-sprite.png</object>
   <object class="wxBitmap" name="BMP_ACTIVATED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="BMP_APP_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\application-view-gallery.png</object>
@@ -331,9 +334,9 @@
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
   <object class="wxBitmap" name="playstation-circle-dark-icon24">bitmaps\gamepad\playstation-circle-dark-icon24.png</object>
+  <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-cross-dark-icon24">bitmaps\gamepad\playstation-cross-dark-icon24.png</object>
   <object class="wxBitmap" name="playstation-square-dark-icon16">bitmaps\gamepad\playstation-square-dark-icon16.png</object>
-  <object class="wxBitmap" name="playstation-square-dark-icon24">bitmaps\gamepad\playstation-square-dark-icon24.png</object>
   <object class="wxBitmap" name="playstation-triangle-dark-icon16">bitmaps\gamepad\playstation-triangle-dark-icon16.png</object>
   <object class="wxBitmap" name="plugin-add">bitmaps\plugin-add.png</object>
   <object class="wxBitmap" name="plugin-delete">bitmaps\plugin-delete.png</object>

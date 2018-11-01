@@ -28,7 +28,6 @@ static CommandTemplates CMDTPL;
 CncControl::CncControl(CncPortType pt) 
 : currentClientId(-1)
 , runContinuousMove(false)
-, continuousMoveAppBased(false)
 , setterMap()
 , portType(pt)
 , serialPort(NULL)
@@ -1723,30 +1722,50 @@ bool CncControl::moveZToMid() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
+bool CncControl::manualMoveFinest(StepSensitivity s,  const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit) {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	const double xDim = 0.1 * x; // ~ 0.1 mm
+	const double yDim = 0.1 * y; // ~ 0.1 mm
+	const double zDim = 0.1 * z; // ~ 0.1 mm
+	
+	//TODO
+	changeCurrentFeedSpeedXYZ_MM_SEC(10.0);
+	
+	if ( prepareSimpleMove() == true ) {
+		ret = moveRelLinearMetricXYZ(xDim, yDim, zDim, false);
+		//WAIT
+		if ( ret == false && limitStates.hasLimit() && correctLimit )
+			ret = correctLimitPositions();
+	}
+	
+	reconfigureSimpleMove(ret);
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
 void CncControl::manualContinuousMoveStop() {
 ///////////////////////////////////////////////////////////////////
-	if ( continuousMoveAppBased == false ) 	
-		if ( runContinuousMove == true )
-			getSerial()->sendSignal(SIG_QUIT_MOVE);
+	if ( runContinuousMove == true )
+		getSerial()->sendSignal(SIG_QUIT_MOVE);
 	
 	runContinuousMove = false;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool corrcetLimit) {
+bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z, bool correctLimit) {
 ///////////////////////////////////////////////////////////////////
-	
-	
-	
 	const double SSF = (double)STEP_SENSITIVITY_FACTOR;
+	
+	// redirect on demand
+	if ( s == FINEST ) 
+		return manualMoveFinest(s, x, y, z, correctLimit);
 	
 	// Setup
 	const double xDim = s/SSF * x;
 	const double yDim = s/SSF * y;
 	const double zDim = s/SSF * z;
 	
-	bool ret = false;
-	if ( continuousMoveAppBased == true ) 	ret = manualContinuousMoveStart_AppBased(xDim, yDim, zDim, corrcetLimit);
-	else									ret = manualContinuousMoveStart_CtrlBased(xDim, yDim, zDim, corrcetLimit);
+	bool ret = manualContinuousMoveStart_CtrlBased(xDim, yDim, zDim, correctLimit);
 	
 	// adjust the pc position
 	if ( ret == true )
@@ -1755,78 +1774,7 @@ bool CncControl::manualContinuousMoveStart(StepSensitivity s, const CncLinearDir
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart_AppBased(const double xDim, const double yDim, const double zDim, bool corrcetLimit) {
-///////////////////////////////////////////////////////////////////
-	if ( getSerial()->isCommandActive() == true )
-		return false;
-		
-	// Always disable probe mode here, otherwise very long move distances appear
-	const bool probeModeBefore = GBL_CONFIG->isProbeMode();
-	if ( enableProbeMode(false) == false ) {
-		std::cerr << " Cant disable probe mode. Manual continous move aborted" << std::endl;
-		return false;
-	}
-	GBL_CONFIG->setProbeMode(false);
-	
-	// speed setup
-	const double MAX_SPEED   = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
-	
-	const double SPEED_STEP1 = MAX_SPEED * 0.05;	const unsigned int TIMESPAN_STEP1  =  500; // ms
-	const double SPEED_STEP2 = MAX_SPEED * 0.25;	const unsigned int TIMESPAN_STEP2  = 1000; // ms
-	const double SPEED_STEP3 = MAX_SPEED * 0.50;	const unsigned int TIMESPAN_STEP3  = 1500; // ms
-	const double SPEED_STEP4 = MAX_SPEED * 0.75;	const unsigned int TIMESPAN_STEP4  = 2000; // ms
-	const double SPEED_STEP5 = MAX_SPEED;
-	
-	double currentSpeed = SPEED_STEP1;
-	changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed);
-	
-	// Move preparation
-	initNextDuration();
-	GBL_CONFIG->setAllowEventHandling(true);
-	activatePositionCheck(false);
-	enableStepperMotors(true);
-	
-	// Move loop
-	runContinuousMove = true;
-	CncMilliTimestamp tsStart = CncTimeFunctions::getMilliTimestamp();
-	while ( runContinuousMove ) {
-		
-		if ( moveRelLinearMetricXYZ(xDim, yDim, zDim, false) == false )  {
-			if ( limitStates.hasLimit() && corrcetLimit)
-				correctLimitPositions();
-			break;
-		}
-		
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
-			{ currentSpeed = SPEED_STEP2; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
-
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP2 && currentSpeed < SPEED_STEP3 )
-			{ currentSpeed = SPEED_STEP3; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
-			
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP3 && currentSpeed < SPEED_STEP4 )
-			{ currentSpeed = SPEED_STEP4; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
-			
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
-			{ currentSpeed = SPEED_STEP5; changeCurrentFeedSpeedXYZ_MM_MIN(currentSpeed); }
-			
-		THE_APP->dispatchAll();
-	}
-	
-	// Move touch up
-	enableStepperMotors(false);
-	activatePositionCheck(true);
-	resetDurationCounter();
-	
-	// reactivate configured probe mode state
-	bool ret = false;
-	if ( (ret = enableProbeMode(probeModeBefore)) == false ) {
-		std::cerr << " Cant reactivate probe mode." << std::endl;
-	}
-	
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const double yDim, const double zDim, bool corrcetLimit) {
+bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const double yDim, const double zDim, bool correctLimit) {
 ///////////////////////////////////////////////////////////////////
 	if ( getSerial()->isCommandActive() == true )
 		return false;
@@ -1859,7 +1807,7 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	bool ret = getSerial()->processMoveUntilSignal(sizeof(values)/sizeof(int32_t), values, curAppPos);
 	if ( ret == false ) {
 		
-		if ( limitStates.hasLimit() && corrcetLimit)
+		if ( limitStates.hasLimit() && correctLimit)
 			ret = correctLimitPositions();
 	}
 	

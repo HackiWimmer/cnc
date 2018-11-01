@@ -220,12 +220,15 @@ protected:
     wxStaticText* m_staticText5559;
     wxButton* m_cmZneg;
     wxStaticLine* m_staticLine5550;
+    wxStaticBitmap* m_staticBitmap5901;
     wxStaticText* m_cbStepSensitivityText;
     wxRadioBox* m_rbStepSensitivity;
     wxStaticText* m_staticText5838;
     wxStaticText* m_staticText533816;
     wxStaticText* m_staticText5338;
     wxStaticLine* m_staticLine5552;
+    wxStaticBitmap* m_staticBitmap5907;
+    wxStaticText* m_staticText5909;
     wxStaticText* m_staticText1156;
     wxStaticLine* m_staticLine1158;
     wxNotebook* m_positionManagement;
@@ -1123,12 +1126,15 @@ public:
     wxStaticText* GetStaticText5559() { return m_staticText5559; }
     wxButton* GetCmZneg() { return m_cmZneg; }
     wxStaticLine* GetStaticLine5550() { return m_staticLine5550; }
+    wxStaticBitmap* GetStaticBitmap5901() { return m_staticBitmap5901; }
     wxStaticText* GetCbStepSensitivityText() { return m_cbStepSensitivityText; }
     wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
     wxStaticText* GetStaticText5838() { return m_staticText5838; }
     wxStaticText* GetStaticText533816() { return m_staticText533816; }
     wxStaticText* GetStaticText5338() { return m_staticText5338; }
     wxStaticLine* GetStaticLine5552() { return m_staticLine5552; }
+    wxStaticBitmap* GetStaticBitmap5907() { return m_staticBitmap5907; }
+    wxStaticText* GetStaticText5909() { return m_staticText5909; }
     wxPanel* GetPanel5187() { return m_panel5187; }
     wxNotebook* GetManualMotionControl() { return m_manualMotionControl; }
     wxStaticText* GetStaticText1156() { return m_staticText1156; }
@@ -1865,23 +1871,11 @@ class CncGamepadControllerStateBase : public wxPanel
 {
 protected:
     wxTextCtrl* m_gamepadTrace;
-    wxStaticText* m_staticText5894;
-    wxStaticLine* m_staticLine5892;
-    wxStaticBitmap* m_staticBitmap5811;
-    wxStaticText* m_staticText5816;
-    wxStaticBitmap* m_staticBitmap58112;
-    wxStaticText* m_staticText58163;
 
 protected:
 
 public:
     wxTextCtrl* GetGamepadTrace() { return m_gamepadTrace; }
-    wxStaticText* GetStaticText5894() { return m_staticText5894; }
-    wxStaticLine* GetStaticLine5892() { return m_staticLine5892; }
-    wxStaticBitmap* GetStaticBitmap5811() { return m_staticBitmap5811; }
-    wxStaticText* GetStaticText5816() { return m_staticText5816; }
-    wxStaticBitmap* GetStaticBitmap58112() { return m_staticBitmap58112; }
-    wxStaticText* GetStaticText58163() { return m_staticText58163; }
     CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncGamepadControllerStateBase();
 };
@@ -2157,6 +2151,31 @@ public:
     wxPanel* GetConnectActivityPanel() { return m_connectActivityPanel; }
     CncConnectProgressBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Serial Connect Progress"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP|wxCAPTION);
     virtual ~CncConnectProgressBase();
+};
+
+
+class CncUsbConnectionDetectedBase : public wxDialog
+{
+protected:
+    wxStaticBitmap* m_staticBitmap5919;
+    wxStaticText* m_staticText5921;
+    wxStaticText* m_portName;
+    wxButton* m_ignore;
+    wxButton* m_connect;
+
+protected:
+    virtual void initDilaog(wxInitDialogEvent& event) { event.Skip(); }
+    virtual void ignore(wxCommandEvent& event) { event.Skip(); }
+    virtual void connect(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticBitmap* GetStaticBitmap5919() { return m_staticBitmap5919; }
+    wxStaticText* GetStaticText5921() { return m_staticText5921; }
+    wxStaticText* GetPortName() { return m_portName; }
+    wxButton* GetIgnore() { return m_ignore; }
+    wxButton* GetConnect() { return m_connect; }
+    CncUsbConnectionDetectedBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("New controller connection is available . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~CncUsbConnectionDetectedBase();
 };
 
 
