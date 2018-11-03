@@ -18,18 +18,43 @@ typedef std::map<unsigned char, GetterValues> 		GetterListValues;
 
 class CncControl;
 
+class SerialCommandLocker {
+	
+	private:
+		static unsigned char lockedCommand;
+		
+		bool locking;
+		unsigned char command;
+		
+	public:
+		SerialCommandLocker(unsigned char cmd) 
+		: locking(false)
+		, command(cmd)
+		{}
+		
+		~SerialCommandLocker() {
+			if ( locking == true )
+				lockedCommand = CMD_INVALID;
+		}
+		
+		bool lock(CncControl* cnc);
+		
+		static unsigned char getLockedCommand() { return lockedCommand; }
+		static bool isCommandActive()			{ return lockedCommand != CMD_INVALID; }
+};
+
 struct LastSerialResult {
-	unsigned char cmd 				    = '\0';
+	unsigned char cmd 				    = CMD_INVALID;
 	unsigned char ret				    = RET_NULL;
 	
 	void reset() { 
-		cmd 				 			= '\0';
+		cmd 				 			= CMD_INVALID;
 		ret								= RET_NULL;
 	}
 };
 
 struct SerialFetchInfo {
-	unsigned char command				= '\0';
+	unsigned char command				= CMD_INVALID;
 	unsigned char multiByteResult[2048];
 
 	unsigned int singleFetchTimeout 	= 2000;
@@ -143,8 +168,6 @@ class Serial : public SerialOSD {
 		
 	private:
 		
-		bool canIdle;
-		
 		// total distance
 		double totalDistance[4];
 		double totalDistanceRef;
@@ -155,14 +178,13 @@ class Serial : public SerialOSD {
 		CncNanoTimestamp tsMeasurementLast;
 		
 	protected:
+	
 		//cnc control object
 		CncControl* cncControl;
 		// Measurement status
 		bool measurementActive;
 		// for com porst this should always false
 		bool writeOnlyMoveCommands;
-		// flag if the comand evaluation routine currently runs
-		bool isCommandRunning;
 		// Port name
 		std::string portName;
 		// last fetch result
@@ -233,7 +255,9 @@ class Serial : public SerialOSD {
 		bool sendSerialControllerCallback(ContollerInfo& ci);
 		
 		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command, CncLongPosition& pos);
+		inline bool convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
 		
+		friend class SerialCommandLocker;
 	public:
 		//Initialize Serial communication without an acitiv connection 
 		Serial(CncControl* cnc);
@@ -264,6 +288,7 @@ class Serial : public SerialOSD {
 		virtual int readData(void *buffer, unsigned int nbByte);
 		//Writes data from a buffer through the Serial connection
 		//return true on success.
+		bool writeData(unsigned char cmd);
 		virtual bool writeData(void *buffer, unsigned int nbByte);
 		// will be released periodically be the main thread
 		virtual void onPeriodicallyAppEvent(bool interrupted) {}
@@ -274,30 +299,33 @@ class Serial : public SerialOSD {
 		bool isSpyOutputOn() { return traceSpyInfo; }
 		virtual void setSpyMode(Serial::SypMode sm);
 		Serial::SypMode getSpyMode() { return spyMode; };
+		
+		// indicates if idle message can be requested
+		virtual bool canProcessIdle() { return true; }
+		
 		// reurn the current command flag
-		bool isCommandActive() { return isCommandRunning; }
-		// signals
-		bool sendSignal(const unsigned char cmd);
+		bool isCommandActive() { return SerialCommandLocker::isCommandActive(); }
+		bool isIdleActive()    { return SerialCommandLocker::getLockedCommand() == CMD_IDLE; }
+		
 		// port writting
+		bool processIdle();
+		
 		bool processGetter(unsigned char pid, GetterValues& ret);
 		bool processGetterList(PidList pidList, GetterListValues& ret);
 		bool processSetter(unsigned char pid, int32_t value);
 		bool processSetter(unsigned char pid, const SetterValueList& values);
-		// indicates if idle message can be requested
-		virtual bool canProcessIdle() { return true; }
-		bool processIdle();
 		
 		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
-		bool processCommand(const char* cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
 		
-		bool convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
+		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos);
+		bool processMoveUntilSignal(unsigned int size, const int32_t (&values)[3], CncLongPosition& pos);
 		
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos);
 		
-		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos);
-		bool processMoveUntilSignal(unsigned int size, const int32_t (&values)[3], CncLongPosition& pos);
+		// signals
+		bool sendSignal(const unsigned char cmd);
 		
 		bool sendInterrupt() 		{ return sendSignal(SIG_INTERRUPPT);     }
 		bool sendHalt() 			{ return sendSignal(SIG_HALT);           }
@@ -306,16 +334,7 @@ class Serial : public SerialOSD {
 		bool sendQuitMove()			{ return sendSignal(SIG_QUIT_MOVE);      }
 		bool sendSoftwareReset() 	{ return sendSignal(SIG_SOFTWARE_RESET); }
 		
-		// position movement counting
-		virtual void resetPositionCounter();
-		virtual size_t getPositionCounter();
 
-		virtual void resetStepCounter();
-		size_t requestStepCounter(unsigned char pid);
-		virtual size_t getStepCounter();
-		virtual size_t getStepCounterX();
-		virtual size_t getStepCounterY();
-		virtual size_t getStepCounterZ();
 				
 		//SVG path handling
 		virtual void setSVGOutputParameters(const SvgOutputParameters& sp) {}
@@ -331,19 +350,27 @@ class Serial : public SerialOSD {
 		virtual void rebuildSVG() {}
 		virtual void writeOrigPath(const SvgOriginalPathInfo& sopi) {}
 		
-		// sends the Test Suite end flag 't'
-		bool sendTestSuiteEndFlag();
+		// position movement counting
+		virtual void resetPositionCounter();
+		virtual size_t getPositionCounter();
+
+		virtual void resetStepCounter();
+		size_t requestStepCounter(unsigned char pid);
+		virtual size_t getStepCounter();
+		virtual size_t getStepCounterX();
+		virtual size_t getStepCounterY();
+		virtual size_t getStepCounterZ();
+		
+		double getTotalDistanceX() { return totalDistance[0]; }
+		double getTotalDistanceY() { return totalDistance[1]; }
+		double getTotalDistanceZ() { return totalDistance[2]; }
+		double getTotalDistance()  { return totalDistance[3]; }
 		
 		void startMeasurement();
 		void stopMeasurement();
 		bool isMeasurementActive() const { return measurementActive; }
 		CncNanoTimespan getMeasurementNanoTimeSpanTotal() const;
 		CncNanoTimespan getMeasurementNanoTimeSpanLastRef() const;
-		
-		double getTotalDistanceX() { return totalDistance[0]; }
-		double getTotalDistanceY() { return totalDistance[1]; }
-		double getTotalDistanceZ() { return totalDistance[2]; }
-		double getTotalDistance()  { return totalDistance[3]; }
 		
 		virtual void traceSpeedInformation() {}
 };

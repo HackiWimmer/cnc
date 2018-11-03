@@ -965,6 +965,7 @@ protected:
     virtual void defineDebugSerial(wxCommandEvent& event) { event.Skip(); }
     virtual void defineMinMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void defineNormalMonitoring(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleIdleRequests(wxCommandEvent& event) { event.Skip(); }
     virtual void requestVersion(wxCommandEvent& event) { event.Skip(); }
     virtual void requestHeartbeat(wxCommandEvent& event) { event.Skip(); }
     virtual void requestConfig(wxCommandEvent& event) { event.Skip(); }

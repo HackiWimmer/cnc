@@ -83,7 +83,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void cncMainViewChanged(wxNotebookEvent& event);
+		virtual void toggleIdleRequests(wxCommandEvent& event);
+		virtual void cncMainViewChanged(wxNotebookEvent& event);
 		virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
 		virtual void clickSpeedControl(wxCommandEvent& event);
 		virtual void rcSecureDlg(wxCommandEvent& event);
@@ -483,6 +484,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		GamepadThread* gamepadThread;
 		wxCriticalSection pGamepadThreadCS;
 		
+		CncControl* getCncControl() { return cnc; }
+		
 		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		void manualContinuousMoveStop();
 		
@@ -493,11 +496,14 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void decorateGamepadState(bool state);
 		
+		void decorateIdleState(bool state);
+		
 		void initSpeedConfigPlayground();
 		void updateSpeedConfigPlayground();
 		
 		friend class CncConfig;
 		friend class CncGampadDeactivator;
+		friend class CncTransactionLock;
 		friend class CncReferencePosition;
 		friend class CncGamepadControllerState;
 		friend class CncConnectProgress;
@@ -800,6 +806,64 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		bool connectSerialPortDialog();
 		
+};
+
+////////////////////////////////////////////////////////////////////
+class CncTransactionLock {
+	
+	private:
+		static unsigned int referenceCounter;
+		
+		MainFrame* parent;
+		bool prevCheckState;
+		bool prevEnableState;
+		bool errorMode;
+		
+	public:
+		explicit CncTransactionLock(MainFrame* p) 
+		: parent(p)
+		, prevCheckState(false)
+		, prevEnableState(false)
+		, errorMode(false)
+		{
+			wxASSERT(parent);
+			referenceCounter++;
+			
+			prevCheckState  = parent->m_miRqtIdleMessages->IsCheck();
+			prevEnableState = parent->m_miRqtIdleMessages->IsEnabled();
+			parent->m_miRqtIdleMessages->Check(false);
+			parent->m_miRqtIdleMessages->Enable(false);
+			
+			CncControl* cnc = parent->getCncControl();
+			if ( cnc != NULL && cnc->getSerial()->isCommandActive() ) {
+				
+				unsigned counter = 0;
+				while ( cnc->getSerial()->isIdleActive() ) {
+					parent->waitActive(10);
+					
+					if ( counter++ > 15 ) {
+						//  this should not appear
+						std::cerr << "CncTransactionLock: Idle still active!" << std::endl;
+						break;
+					}
+				}
+			}
+			
+			parent->decorateIdleState(false);
+		}
+		
+		~CncTransactionLock() {
+			if ( errorMode == true )	parent->m_miRqtIdleMessages->Check(false);
+			else						parent->m_miRqtIdleMessages->Check(prevCheckState);
+			
+			parent->m_miRqtIdleMessages->Enable(prevEnableState);
+			
+			referenceCounter--;
+		}
+		
+		void setErrorMode() {
+			errorMode = true;
+		}
 };
 
 ////////////////////////////////////////////////////////////////////

@@ -195,10 +195,9 @@ class CncControl {
 		bool sendResume() 		{ wxASSERT(serialPort); return serialPort->sendResume(); }
 		
 		// comand wrapper
-		bool processCommand(const char* cmd, std::ostream& txtCtl);
 		bool processCommand(const unsigned char c, std::ostream& txtCtl);
 		
-		// cgetter list wrapper	
+		// getter list wrapper
 		bool displayGetterList(const PidList& pidlist);
 
 		// wrapper
@@ -224,6 +223,8 @@ class CncControl {
 		bool moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered);
 		
 		bool correctLimitPositions();
+		
+		void waitActive(unsigned int millis);
 		
 		// Callback from Serial
 		bool SerialCallback();

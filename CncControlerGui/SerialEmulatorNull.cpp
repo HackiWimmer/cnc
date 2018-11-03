@@ -443,7 +443,8 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 		lastCommand.Serial.write(RET_SOH);
 		lastCommand.Serial.write(PID_LIMIT);
 		lastCommand.Serial.write(limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
-		lastCommand.Serial.write(lastCommand.ret);
+		//lastCommand.Serial.write(lastCommand.ret);
+		lastCommand.Serial.write(RET_LIMIT);
 	}
 	
 	// support the first byte

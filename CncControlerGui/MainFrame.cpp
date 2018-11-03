@@ -100,6 +100,7 @@ const char* _copyRight			= "invented by Hacki Wimmer 2016 - 2018";
 
 ////////////////////////////////////////////////////////////////////
 unsigned int CncGampadDeactivator::referenceCounter = 0;
+unsigned int CncTransactionLock::referenceCounter   = 0;
 
 ////////////////////////////////////////////////////////////////////
 // user defined scintila style options
@@ -799,8 +800,21 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	
 	// idle handling
 	if ( m_miRqtIdleMessages->IsChecked() == true ) {
+		
+		// stop the time to avoid overlapping idle request
 		m_serialTimer->Stop();
+		
+		// it's very important to avoid event handling during the idle processing
+		// to prevent the start of furter commands
+		GBL_CONFIG->setAllowEventHandling(false);
+		
+		// request the idle information
 		cnc->sendIdleMessage();
+		
+		// reconstructed the previous event handling mode
+		GBL_CONFIG->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
+		
+		// restart due to the previous Stop() command
 		m_serialTimer->Start();
 	}
 }
@@ -1005,9 +1019,9 @@ void MainFrame::onGamepdThreadCompletion(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onGamepdThreadHeartbeat(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	decorateGamepadState(event.data.connected);
+	
 	if ( event.data.connectionStateChanged == true ) {
-		decorateGamepadState(event.data.connected);
-		
 		if ( event.data.connected == false )	cnc::trc.logWarning(" Gamepad disconnected");
 		else									cnc::trc.logWarning(" Gamepad connected");
 	}
@@ -3674,8 +3688,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	CncRunEventFilter cef;
 	
 	// deactivate idle requests
-	bool idleMsgStateBefore = m_miRqtIdleMessages->IsChecked();
-	m_miRqtIdleMessages->Check(false);
+	CncTransactionLock ctl(this);
 	
 	// it's very import to deactivate the notifications during a run
 	// because instead every config change (sc()) will release a notification
@@ -3717,10 +3730,9 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	if ( ret == false) {
 		wxString hint("not successfully");
 		cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
+		ctl.setErrorMode();
 		
 	} else {
-		// restore idle requests as before
-		m_miRqtIdleMessages->Check(idleMsgStateBefore);
 		std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
 	}
 	
@@ -6426,7 +6438,7 @@ void MainFrame::requestControllerPinsFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::requestPins(wxCommandEvent& event) {
 	wxASSERT(cnc);
-	cnc->processCommand("Q", std::clog);
+	cnc->processCommand(CMD_PRINT_PIN_REPORT, std::clog);
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_PIN_PANEL);
 }
@@ -7483,14 +7495,13 @@ void MainFrame::manualContinuousMoveStart(const CncLinearDirection x, const CncL
 		case 4: stepSensitivity = CncControl::StepSensitivity::ROUGHEST; 	break;
 	}
 	
+	CncTransactionLock ctl(this);
+	
 	cnc->manualContinuousMoveStop();
 	
 	motionMonitor->pushProcessMode();
 	cnc->manualContinuousMoveStart(stepSensitivity, x, y, z);
 	motionMonitor->popProcessMode();
-	
-	// clear bufferd events
-	dispatchAll();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::manualContinuousMoveStop() {
@@ -7727,6 +7738,22 @@ void MainFrame::cncMainViewChanged(wxNotebookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	activateGamepadNotificationsOnDemand(true);
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::decorateIdleState(bool state) {
+/////////////////////////////////////////////////////////////////////
+	if ( state == false )
+		m_heartbeatState->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_INACTIVE"));
+		
+	// if it is active the state will be handled by 
+	// SerialControllerCallback(const ContollerInfo& ci) and ci == CITHeartbeat
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	decorateIdleState(m_miRqtIdleMessages->IsCheck());
+}
+
+
 
 
 

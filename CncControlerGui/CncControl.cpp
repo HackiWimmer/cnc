@@ -412,15 +412,6 @@ bool CncControl::processCommand(const unsigned char c, std::ostream& txtCtl) {
 	return serialPort->processCommand(c, txtCtl, curAppPos);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::processCommand(const char* cmd, std::ostream& txtCtl) {
-///////////////////////////////////////////////////////////////////
-	if ( isInterrupted() == true )
-		return false;
-
-	wxASSERT(serialPort);
-	return serialPort->processCommand(cmd, txtCtl, curAppPos);
-}
-///////////////////////////////////////////////////////////////////
 bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	if ( isInterrupted() == true )
@@ -944,6 +935,11 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 	}
 
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::waitActive(unsigned int millis) {
+///////////////////////////////////////////////////////////////////
+	THE_APP->waitActive(millis, true);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialCallback() {
@@ -1746,8 +1742,11 @@ bool CncControl::manualMoveFinest(StepSensitivity s,  const CncLinearDirection x
 ///////////////////////////////////////////////////////////////////
 void CncControl::manualContinuousMoveStop() {
 ///////////////////////////////////////////////////////////////////
-	if ( runContinuousMove == true )
-		getSerial()->sendSignal(SIG_QUIT_MOVE);
+	if ( runContinuousMove == true ) {
+		if ( getSerial()->sendSignal(SIG_QUIT_MOVE) == false ) {
+			std::cerr << "CncControl::manualContinuousMoveStop(): sendSignal(SIG_QUIT_MOVE) failed" << std::endl;
+		}
+	}
 	
 	runContinuousMove = false;
 }

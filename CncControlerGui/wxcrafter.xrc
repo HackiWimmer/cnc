@@ -12558,6 +12558,9 @@ Thickness</label>
     <title>New controller connection is available . . .</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE</style>
+    <tooltip>
+      <![CDATA[zzu]]>
+    </tooltip>
     <focused>1</focused>
     <size>500,300</size>
     <object class="wxFlexGridSizer">
