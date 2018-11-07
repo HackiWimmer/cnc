@@ -3,7 +3,6 @@
 #include "MainFrame.h"
 #include "wxcrafter.h"
 #include "CncConfigCommon.h"
-#include "CncCommon.h"
 #include "CncConfig.h"
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
@@ -11,8 +10,9 @@ wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 ////////////////////////////////////////////////////////////////////////
 // init static members
 unsigned int CncConfig::globalPropertyCounter	= 0;
-CncConfig* CncConfig::globalCncConfig 			= NULL;
-wxComboBox* CncConfig::gblCurveLibSelector 		= NULL; 
+CncConfig*   CncConfig::globalCncConfig 		= NULL;
+wxComboBox*  CncConfig::gblCurveLibSelector 	= NULL; 
+float        CncConfig::curveLibIncrement 		= 0.01;
 
 ////////////////////////////////////////////////////////////////////////
 // global variables - uses in dedicated pages
@@ -793,25 +793,39 @@ void CncConfig::calculateThresholds() {
 ////////////////////////////////////////////////////////////////////////
 float CncConfig::getDefaultCurveLibResolution() {
 ////////////////////////////////////////////////////////////////////////
-	return CncSvgCurveLib::getDefaultResolution();
+	return SvgUnitCalculator::getDPI();
 }
 ////////////////////////////////////////////////////////////////////////
 float CncConfig::getCurveLibIncrement() { 
 ////////////////////////////////////////////////////////////////////////
-	return CncSvgCurveLib::getIncement(); 
+	return curveLibIncrement; 
+}
+////////////////////////////////////////////////////////////////////////
+float CncConfig::calcCurveLibIncrement(SVGUnit unit, float pathLength) {
+////////////////////////////////////////////////////////////////////////
+	
+	//std::cout << pathLength << ", ";
+	
+	pathLength *= (float)SvgUnitCalculator::getFactorMM2Unit(unit);
+	
+	
+	
+	
+	//std::cout << pathLength << ", " <<  1/curveLibIncrement << ", " << 1/(pathLength * 1/curveLibIncrement) *SvgUnitCalculator::getDPI() << std::endl;
+	
+	return 1/(pathLength * 1/curveLibIncrement) * SvgUnitCalculator::getDPI();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setCurveLibIncrement(double v) { 
 ////////////////////////////////////////////////////////////////////////
-	CncSvgCurveLib::setIncrement((float)v); 
+	curveLibIncrement = (float)v; 
 	updateCurveLibIncrementSelector();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::updateCurveLibIncrementSelector() { 
 ////////////////////////////////////////////////////////////////////////
-	if ( CncConfig::gblCurveLibSelector != NULL ) {
-		CncConfig::gblCurveLibSelector->SetStringSelection(wxString::Format("%.3f", CncSvgCurveLib::getIncement()));
-	}
+	if ( CncConfig::gblCurveLibSelector != NULL )
+		CncConfig::gblCurveLibSelector->SetStringSelection(wxString::Format("%.3f", CncConfig::curveLibIncrement));
 }
 ////////////////////////////////////////////////////////////////////////
 // config getters

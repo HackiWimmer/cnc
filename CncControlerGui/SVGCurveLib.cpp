@@ -22,6 +22,27 @@ const float PI = 3.14159265359f;
 
 #include <vector>
 
+//////////////////////////////////////////////////////////////////
+SVGCurveLib::PointGeneric<> SVGCurveLib::PointOnLine(const Arguments& args, float t) {
+//////////////////////////////////////////////////////////////////
+	return PointOnLine(args.p0, args.p1, t);
+}
+//////////////////////////////////////////////////////////////////
+SVGCurveLib::PointGeneric<> SVGCurveLib::PointOnQuadraticBezierCurve(const Arguments& args, float t) {
+//////////////////////////////////////////////////////////////////
+	return PointOnQuadraticBezierCurve(args.p0, args.p1, args.p2, t);
+}
+//////////////////////////////////////////////////////////////////
+SVGCurveLib::PointGeneric<> SVGCurveLib::PointOnCubicBezierCurve(const Arguments& args, float t) {
+//////////////////////////////////////////////////////////////////
+	return PointOnCubicBezierCurve(args.p0, args.p1, args.p2, args.p3, t);
+}
+//////////////////////////////////////////////////////////////////
+SVGCurveLib::PointWithEllipticalArcInfo SVGCurveLib::PointOnEllipticalArc(const Arguments& args, float t) {
+//////////////////////////////////////////////////////////////////
+	return PointOnEllipticalArc(args.p0, args.rx, args.ry, args.xAxisRotation, args.largeArcFlag, args.sweepFlag, args.p1, t);
+}
+
 
 SVGCurveLib::PointGeneric<> SVGCurveLib::PointOnLine(SVGCurveLib::PointGeneric<> p0, SVGCurveLib::PointGeneric<> p1, float t) {
 	auto calculateLinearLineParameter = [](float x0, float x1, float t) {
@@ -291,6 +312,7 @@ SVGCurveLib::LinearCurve::LinearCurve(unsigned int resolution, SVGCurveLib::Poin
 
 	this->resultantInfo = SVGCurveLib::ApproximateArcLengthOfCurve(resolution, pointOnCurveFunc);
 };
+
 // Transforms `u`[0-1] into a corresponding point along the curve. `u * arcLength`
 SVGCurveLib::PointGeneric<> SVGCurveLib::LinearCurve::PointOnLinearCurve(float u) {
 	u = SVGCurveLib::Clamp(u, 0.0f, 1.0f);
@@ -330,12 +352,6 @@ SVGCurveLib::PointGeneric<> SVGCurveLib::LinearCurve::PointOnLinearCurve(float u
 
 	return pointOnCurveFunc(resultantT);
 };
-
-
-
-
-
-
 
 
 // We expect you to pass in some form of number

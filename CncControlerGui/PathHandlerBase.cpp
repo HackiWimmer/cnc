@@ -1,4 +1,5 @@
 #include <iostream>
+#include "SVGUnitCalculator.h"
 #include "SVGCurveLib.h"
 #include "CncConfig.h"
 #include "FileParser.h"
@@ -98,7 +99,7 @@ void PathHandlerBase::traceCurrentPosition() {
 bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
-		std::cerr << "PathHandlerBase::processMove: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processMove: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("Move",c);
@@ -159,7 +160,7 @@ bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 0 ) {
-		std::cerr << "PathHandlerBase::processClose: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processClose: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("Close",c);
@@ -180,7 +181,7 @@ bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) 
 bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
-		std::cerr << "PathHandlerBase::processLine: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processLine: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("Line",c);
@@ -203,7 +204,7 @@ bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
-		std::cerr << "PathHandlerBase::processHLine: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processHLine: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	// Redirect to lineto command
@@ -217,7 +218,7 @@ bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) 
 bool PathHandlerBase::processVLine(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
-		std::cerr << "PathHandlerBase::processVLine: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processVLine: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	// Redirect to lineto command
@@ -242,172 +243,219 @@ inline bool PathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p)
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
+	struct Arguments {
+		 SVGCurveLib::PointGeneric<> p0;
+		 SVGCurveLib::PointGeneric<> p1;
+		 double rx;
+		 double ry;
+		 double xAxisRotation;
+		 bool largeArcFlag;
+		 bool sweepFlag;
+	};
+	
+	static Arguments args;
+	
 	if ( count != 7 ) {
-		std::cerr << "PathHandlerBase::processARC: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processARC: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
-	appendDebugValueDetail("EllipticalARC",c);
 	
-	// p0 (startPos) for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())}; 
+	appendDebugValueDetail("EllipticalARC", c);
 	
-	// p1 (endPos) for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p1 = p0;
+	// define parameters
+	//  - p0 (startPos) for curve lib is always absolute
+	//  - p1 (endPos) for curve lib is always absolute
+	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())};
+	SVGCurveLib::PointGeneric<> p1;
+	
 	switch ( c ) {
 		case 'a': 	p1 = {(float)(values[5] + p0.x), (float)(values[6] + p0.y)}; 
 					break;
 					
 		case 'A':	p1 = {(float)values[5], (float)values[6]};
 					break;
+					
+		default:	p1 = p0;
 	}
 	
-	if ( CncSvgCurveLib::useCncSvgCurveLib == true ) {
-		
-		CncSvgCurveLib::LinearArcCurve lac(p0, values[0], values[1], values[2], (bool)values[3], (bool)values[4], p1);
-		SVGCurveLib::LinearCurve lc = SVGCurveLib::LinearCurve(CncSvgCurveLib::getDefaultResolution(), CncSvgCurveLib::AP.pointOnCurveFunc);
-		CurveInfo ci = CncSvgCurveLib::getCurveInfo(lc);
-		appendDebugValueDetail("CurveLibResAuto", 	ci.increment);
-		appendDebugValueDetail("CurveLength", 		ci.length);
-		
-		// First process the curve
-		for( float t=0; t<1; t+=ci.increment ) {
-			if ( processCurveLibPoint(lc.PointOnLinearCurve(t)) == false )
-				return false;
+	args.p0				= p0;
+	args.p1				= p1;
+	args.rx				= values[0];
+	args.ry				= values[1];
+	args.xAxisRotation	= values[2];
+	args.largeArcFlag	= (bool)values[3];
+	args.sweepFlag		= (bool)values[4];
+	
+	// define the curve lib function
+	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
+		SvgUnitCalculator::getDPI(), 
+		[&](float t) {
+			return SVGCurveLib::PointOnEllipticalArc(args.p0, 
+			                                         args.rx, 
+													 args.ry, 
+													 args.xAxisRotation, 
+													 args.largeArcFlag, 
+													 args.sweepFlag, 
+													 args.p1, 
+													 t).point;
 		}
-		// Last stretch to the endpoint
-		if ( processCurveLibPoint(lc.PointOnLinearCurve(1.0f)) == false )
-			return false;
-
-	} else {
-		// First process the curve
-		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibIncrement());
-		for (float t=0; t<1; t+=CncConfig::getCurveLibIncrement() ) {
-			if ( processCurveLibPoint(SVGCurveLib::PointOnEllipticalArc(p0, values[0], values[1], values[2], (bool)values[3], (bool)values[4], p1, t).point) == false )
-				return false;
-		}
-		// Last stretch to the endpoint
-		if ( processCurveLibPoint(SVGCurveLib::PointOnEllipticalArc(p0, values[0], values[1], values[2], (bool)values[3], (bool)values[4], p1, 1.0f).point) == false )
+	);
+	
+	// process the curve
+	float increment = CncConfig::CncConfig::calcCurveLibIncrement(px, linearCurve.resultantInfo.arcLength);
+	appendDebugValueDetail("CurveLibRes", increment);
+	
+	for ( float t = 0.0f; t <= 1.0f; t += increment ) {
+		if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(t)) == false )
 			return false;
 	}
-	
+	// stretch curve to end point
+	if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(1.0f)) == false )
+		return false;
+		
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
+	struct Arguments {
+		SVGCurveLib::PointGeneric<> p0;
+		SVGCurveLib::PointGeneric<> p1;
+		SVGCurveLib::PointGeneric<> p2;
+	};
+	
+	static Arguments args;
+	
 	if ( count != 4 ) {
-		std::cerr << "PathHandlerBase::processQuadraticBezier: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processQuadraticBezier: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
+	
 	appendDebugValueDetail("QuadraticBezier",c);
 	
-	// p0 (startPos) for curve lib is always absolute
+	// define parameters
+	//  - p0 (startPos) for curve lib is always absolute
+	//  - p1 - p2 for curve lib is always absolute
 	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())}; 
+	SVGCurveLib::PointGeneric<> p1, p2;
 	
-	// p1 - p2 for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p1 = p0; 
-	SVGCurveLib::PointGeneric<> p2 = p0;
-
 	switch ( c ) {
 		case 'q': 	p1 = {(float)(values[0] + p0.x), (float)(values[1] + p0.y)}; 
 					p2 = {(float)(values[2] + p0.x), (float)(values[3] + p0.y)}; 
 					break;
+					
 		case 'Q':	p1 = {(float)values[0], (float)values[1]};
 					p2 = {(float)values[2], (float)values[3]};
 					break;
+					
+		default:	p1 = p0;
+					p2 = p0; 
 	}
 	
-	if ( CncSvgCurveLib::useCncSvgCurveLib == true ) {
-		
-		CncSvgCurveLib::LinearQuadraticBezierCurve lqbc(p0, p1, p2);
-		SVGCurveLib::LinearCurve lc = SVGCurveLib::LinearCurve(CncSvgCurveLib::getDefaultResolution(), CncSvgCurveLib::QP.pointOnCurveFunc);
-		CurveInfo ci = CncSvgCurveLib::getCurveInfo(lc);
-		appendDebugValueDetail("CurveLibResAuto", 	ci.increment);
-		appendDebugValueDetail("CurveLength", 		ci.length);
-		
-		// First process the curve
-		for( float t=0; t<1; t+=ci.increment ) {
-			if ( processCurveLibPoint(lc.PointOnLinearCurve(t)) == false )
-				return false;
+	args.p0 = p0;
+	args.p1 = p1;
+	args.p2 = p2;
+	
+	// define the curve lib function
+	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
+		SvgUnitCalculator::getDPI(), 
+		[&](float t) 
+		{
+			return SVGCurveLib::PointOnQuadraticBezierCurve(args.p0, 
+														    args.p1, 
+															args.p2, 
+															t);
 		}
-		// Last stretch to the endpoint
-		if ( processCurveLibPoint(lc.PointOnLinearCurve(1.0f)) == false )
-			return false;
-			
-	} else {
-		// First process the curve
-		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibIncrement());
-		for (float t=0; t<1; t+=CncConfig::getCurveLibIncrement() ) {
-			if ( processCurveLibPoint(SVGCurveLib::PointOnQuadraticBezierCurve(p0, p1, p2, t)) == false )
-				return false;
-		}
-		// Last stretch to the endpoint
-		if ( processCurveLibPoint(SVGCurveLib::PointOnQuadraticBezierCurve(p0, p1, p2, 1.0f)) == false )
+	);
+	
+	// process the curve
+	float increment = CncConfig::CncConfig::calcCurveLibIncrement(px, linearCurve.resultantInfo.arcLength);
+	appendDebugValueDetail("CurveLibRes", increment);
+	
+	for ( float t = 0.0f; t < 1.0f; t += increment ) {
+		if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(t)) == false )
 			return false;
 	}
-	
+	// stretch curve to end point
+	if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(1.0f)) == false )
+		return false;
+		
 	// Store the last control point
 	SVGCurveLib::PointGeneric<> cp{(float)currentPos.getX(), (float)currentPos.getY()};
-	lastControlPoint.setLastQuadraticBezierControlPoint(cp, p1);
+	lastControlPoint.setLastQuadraticBezierControlPoint(cp, args.p1);
 	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
+	struct Arguments {
+		SVGCurveLib::PointGeneric<> p0;
+		SVGCurveLib::PointGeneric<> p1;
+		SVGCurveLib::PointGeneric<> p2;
+		SVGCurveLib::PointGeneric<> p3;
+	};
+	
+	static Arguments args;
+	
 	if ( count != 6 ) {
-		std::cerr << "PathHandlerBase::processCubicBezier: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processCubicBezier: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
+	
 	appendDebugValueDetail("CubicBezier",c);
 	
-	// p0 (startPos) for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())}; 
-	
-	// p1 - p3 for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p1 = p0; 
-	SVGCurveLib::PointGeneric<> p2 = p0;
-	SVGCurveLib::PointGeneric<> p3 = p0;
+	// define parameters
+	//  - p0 (startPos) for curve lib is always absolute
+	//  - p1 - p3 for curve lib is always absolute
+	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())};
+	SVGCurveLib::PointGeneric<> p1, p2, p3;
 	
 	switch ( c ) {
 		case 'c': 	p1 = {(float)(values[0] + p0.x), (float)(values[1] + p0.y)}; 
 					p2 = {(float)(values[2] + p0.x), (float)(values[3] + p0.y)}; 
 					p3 = {(float)(values[4] + p0.x), (float)(values[5] + p0.y)}; 
 					break;
+					
 		case 'C':	p1 = {(float)values[0], (float)values[1]};
 					p2 = {(float)values[2], (float)values[3]};
 					p3 = {(float)values[4], (float)values[5]};
 					break;
+					
+		default:	p1 = p0; 
+					p2 = p0;
+					p3 = p0;
 	}
 	
-	if ( CncSvgCurveLib::useCncSvgCurveLib == true ) {
-		
-		CncSvgCurveLib::LinearCubicBezierCurve lcbc(p0, p1, p2, p3);
-		SVGCurveLib::LinearCurve lc = SVGCurveLib::LinearCurve(CncSvgCurveLib::getDefaultResolution(), CncSvgCurveLib::CP.pointOnCurveFunc);
-		CurveInfo ci = CncSvgCurveLib::getCurveInfo(lc);
-		appendDebugValueDetail("CurveLibResAuto", 	ci.increment);
-		appendDebugValueDetail("CurveLength", 		ci.length);
-		
-		// First process the curve
-		for( float t=0; t<1; t+=ci.increment ) {
-			if ( processCurveLibPoint(lc.PointOnLinearCurve(t)) == false )
-				return false;
+	args.p0 = p0;
+	args.p1 = p1;
+	args.p2 = p2;
+	args.p3 = p3;
+	
+	// define the curve lib function
+	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
+		SvgUnitCalculator::getDPI(), 
+		[&](float t) 
+		{
+			return SVGCurveLib::PointOnCubicBezierCurve(args.p0, 
+														args.p1, 
+														args.p2, 
+														args.p3, 
+														t);
 		}
-		// Last stretch to the endpoint
-		if ( processCurveLibPoint(lc.PointOnLinearCurve(1.0f)) == false )
-			return false;
-			
-	} else {
-		// First process the curve
-		appendDebugValueDetail("CurveLibRes", CncConfig::getCurveLibIncrement());
-		for (float t=0; t<1; t+=CncConfig::getCurveLibIncrement() ) {
-			if ( processCurveLibPoint(SVGCurveLib::PointOnCubicBezierCurve(p0, p1, p2, p3, t)) == false )
-				return false;
-		}
-		// Last stretch to the endpoint
-		if ( processCurveLibPoint(SVGCurveLib::PointOnCubicBezierCurve(p0, p1, p2, p3, 1.0f)) == false )
+	);
+	
+	// process the curve
+	float increment = CncConfig::calcCurveLibIncrement(px, linearCurve.resultantInfo.arcLength);
+	appendDebugValueDetail("CurveLibRes", increment);
+	
+	for ( float t = 0.0f; t < 1.0f; t += increment ) {
+		if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(t)) == false )
 			return false;
 	}
+	// stretch curve to end point
+	if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(1.0f)) == false )
+		return false;
 	
 	// Store the last control point
 	SVGCurveLib::PointGeneric<> cp{(float)currentPos.getX(), (float)currentPos.getY()};
@@ -419,7 +467,7 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
-		std::cerr << "PathHandlerBase::processQuadraticBezierSmooth: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processQuadraticBezierSmooth: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("QuadraticBezierSmooth",c);
@@ -442,7 +490,7 @@ bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, d
 bool PathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 4 ) {
-		std::cerr << "PathHandlerBase::processCubicBezierSmooth: Invalid command count: " << count << std::endl;
+		std::cerr << "PathHandlerBase::processCubicBezierSmooth: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	appendDebugValueDetail("CubicBezierSmooth",c);

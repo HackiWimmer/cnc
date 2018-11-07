@@ -46,9 +46,6 @@
 template<class T>
 using decay_t = typename std::decay<T>::type;
 
-
-
-
 class SVGCurveLib
 {
 	public:
@@ -160,6 +157,23 @@ class SVGCurveLib
 				return this->point;
 			};
 		};
+		
+		struct Arguments {
+			SVGCurveLib::PointGeneric<> p0;
+			SVGCurveLib::PointGeneric<> p1;
+			SVGCurveLib::PointGeneric<> p2;
+			SVGCurveLib::PointGeneric<> p3;
+			double rx;
+			double ry;
+			double xAxisRotation;
+			bool largeArcFlag;
+			bool sweepFlag;
+		};
+
+		static SVGCurveLib::PointGeneric<> PointOnLine(const Arguments& args, float t);
+		static SVGCurveLib::PointGeneric<> PointOnQuadraticBezierCurve(const Arguments& args, float t);
+		static SVGCurveLib::PointGeneric<> PointOnCubicBezierCurve(const Arguments& args, float t);
+		static SVGCurveLib::PointWithEllipticalArcInfo PointOnEllipticalArc(const Arguments& args, float t);
 
 		static SVGCurveLib::PointGeneric<> PointOnLine(SVGCurveLib::PointGeneric<> p0, SVGCurveLib::PointGeneric<> p1, float t);
 		static SVGCurveLib::PointGeneric<> PointOnQuadraticBezierCurve(SVGCurveLib::PointGeneric<> p0, SVGCurveLib::PointGeneric<> p1, SVGCurveLib::PointGeneric<> p2, float t);
@@ -195,7 +209,6 @@ class SVGCurveLib
 
 		struct LinearCurve {
 			SVGCurveLib::ArcLengthInfo resultantInfo;
-				
 			LinearCurve(unsigned int resolution, SVGCurveLib::PointGeneric<> (*pointOnCurveFunc)(float));
 			SVGCurveLib::PointGeneric<> PointOnLinearCurve(float u);
 
@@ -203,8 +216,7 @@ class SVGCurveLib
 				SVGCurveLib::PointGeneric<> (*pointOnCurveFunc)(float);
 
 		};
-
-
+		
 	private:
 		// Some utility functions used throughout
 

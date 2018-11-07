@@ -737,7 +737,7 @@ void SerialSimulatorThread::processNextCommand() {
 										ret = RET_OK;
 										break;
 										
-										#warning move to setter
+										
 										/*
 										 * #warning move to setter
 		case CMD_ENABLE_PROBE_MODE:		probeMode = true;
@@ -780,5 +780,5 @@ void SerialSimulatorThread::processNextCommand() {
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorThread::traceSpeedInformation() {
 ///////////////////////////////////////////////////////////////////
-	#warning todo
+	//#warning todo
 }

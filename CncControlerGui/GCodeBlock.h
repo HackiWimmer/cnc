@@ -1,8 +1,9 @@
 #ifndef GCODE_BLOCK_H
 #define GCODE_BLOCK_H
 
-#include "SvgUnitCalculator.h"
+#include "CncUnitCalculator.h"
 #include "DataControlModel.h"
+#include "CncUnitCalculator.h"
 #include "CncPosition.h"
 #include "GCodeField.h"
 #include "GCodeCommands.h"
@@ -56,7 +57,7 @@ class GCodeBlock {
 		wxString			nodeName;
 		wxString			block;
 		
-		SVGUnit				unit			= mm;
+		cnc::unit			unit			= cnc::unit::mm;
 		GCodePositioning	posModeXYZ		= GC_Absolute;
 		GCodePositioning	posModeIJ		= GC_Absolute;
 		
@@ -145,10 +146,10 @@ class GCodeBlock {
 		const double getZMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(z, curPos.getZ()); }
 		
 		const double ensureUnit(double value) {
-			if ( unit == in )
-				return value * 25.4;
+			if ( unit == cnc::unit::in )
+				return value * CncUnitCalculatorBase::getFact_in2mm();
 			
-			wxASSERT( unit == mm );
+			wxASSERT( unit == cnc::unit::mm );
 			return value;
 		}
 		
@@ -166,7 +167,7 @@ class GCodeBlock {
 		void trace(DcmItemList& rows);
 		
 		//////////////////////////////////////////////////////////////////
-		const char* getUnitAsString() { return SvgUnitCalculator::getUnitAsStr(unit); }
+		const char* getUnitAsString() { return CncUnitCalculatorBase::getUnitAsStr(unit); }
 		const char* getPositioningAsString(GCodePositioning p) {
 			switch (p) {
 				case GC_Relative: 	return "relative";

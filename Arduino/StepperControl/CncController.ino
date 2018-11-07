@@ -762,8 +762,6 @@ unsigned char CncController::moveUntilSignal(const int32_t dx, const int32_t dy,
   const double MAX_SPEED   = speedController.getMaxFeedSpeed_MM_MIN();
   const double DIFF_SPEED  = MAX_SPEED - START_SPEED;
 
-  const unsigned short accelPeriod = 2500; // ms
-
   if ( DIFF_SPEED < 0.0 )
     return RET_ERROR;
     
@@ -777,36 +775,16 @@ unsigned char CncController::moveUntilSignal(const int32_t dx, const int32_t dy,
   if ( dx != 0 || dy != 0 || dz !=0 ) {
     while ( (ret = renderAndStepAxisXYZ(dx, dy, dz)) == RET_OK ) {
   
-      // break by interrupt
-      if (    X->isInterrupted() 
-           || Y->isInterrupted() 
-           || Z->isInterrupted() 
-         )
-      { 
-        ret = RET_INTERRUPT; 
-        break;
-      }
-
-      // break by limit
-      if (    X->getLimitState() != LimitSwitch::LIMIT_UNSET 
-           || Y->getLimitState() != LimitSwitch::LIMIT_UNSET 
-           || Z->getLimitState() != LimitSwitch::LIMIT_UNSET 
-         )
-      { 
-        ret =  RET_LIMIT; 
-        break;
-      }
-
       // mormally this loop will be broken by signals
       // like SIG_QUIT, or SIG_HALT and renderAndStepAxisXYZ()
       // return != RET_OK
 
-      unsigned diff = millis() - tsStart;
-      if ( diff > accelPeriod ) {
+      unsigned int diff = millis() - tsStart;
+      if ( diff > moveUntilAccelPeriod ) {
         setSpeedValue(MAX_SPEED, false);
         
       } else {
-        setSpeedValue(START_SPEED + DIFF_SPEED / accelPeriod * diff, false);
+        setSpeedValue(START_SPEED + DIFF_SPEED / moveUntilAccelPeriod * diff, false);
         
       }
     }

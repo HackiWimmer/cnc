@@ -8,10 +8,10 @@
 #include <wx/valnum.h>
 #include <wx/combobox.h>
 #include <wx/propgrid/propgrid.h>
+#include "SvgUnitCalculator.h"
 #include "CncArduino.h"
 #include "DataControlModel.h"
 #include "CncCommon.h"
-#include "CncSvgCurveLib.h"
 
 //////////////////////////////////////////////////////////////////////////////
 typedef void (*PropertyEventFunc)(wxPropertyGridEvent& event);
@@ -156,6 +156,7 @@ class CncConfig {
 		// global config pointer - don't use this directly
 		static CncConfig* globalCncConfig;
 		static wxComboBox* gblCurveLibSelector;
+		static float curveLibIncrement;
 		
 		ToolMagazine& getToolMagazine() { return toolMagazine; }
 		ToolMagazineParameter& getToolMagazineParameter() { return toolMagazineParameter; }
@@ -182,6 +183,9 @@ class CncConfig {
 		// curve lib utils
 		static float getDefaultCurveLibResolution();
 		static float getCurveLibIncrement();
+		
+		static float calcCurveLibIncrement(SVGUnit unit, float pathLength);
+		
 		static void setCurveLibIncrement(double v);
 		static void updateCurveLibIncrementSelector();
 		

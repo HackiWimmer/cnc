@@ -323,12 +323,12 @@ bool GCodeFileParser::processG(GCodeBlock& gcb) {
 		//....................................................
 		case 20:	// GC_G: Set Units To Inches
 		{
-			gcb.unit = in; 
+			gcb.unit = cnc::unit::in; 
 			return true;
 		} //....................................................
 		case 21:	// GC_G_SetUnitsToMillimeters
 		{	
-			gcb.unit = mm; 
+			gcb.unit = cnc::unit::mm; 
 			return true;
 		} //....................................................
 		case 17: 	// GC_G: XY Plane Select

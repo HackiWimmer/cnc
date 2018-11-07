@@ -58,7 +58,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "SerialPort.h"
 #include "CncPosition.h"
 #include "CncPatternDefinitions.h"
-#include "SvgUnitCalculator.h"
+#include "CncUnitCalculator.h"
 #include "CncFileNameService.h"
 #include "CncFilePreviewWnd.h"
 #include "SVGPathHandlerCnc.h"
@@ -93,9 +93,9 @@ const char* _programTitel 		= "Woodworking CNC Controller";
 const char* _copyRight			= "invented by Hacki Wimmer 2016 - 2018";
 
 #ifdef DEBUG
-	const char* _programVersion = "0.8.8.d";
+	const char* _programVersion = "0.8.9.d";
 #else
-	const char* _programVersion = "0.8.8.r";
+	const char* _programVersion = "0.8.9.r";
 #endif
 
 ////////////////////////////////////////////////////////////////////
@@ -662,12 +662,15 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	cnc->processCommand('9', std::cout);
+	
+	std::cout << UC::CNV_PX_TO_MM(96) << std::endl;
+	std::cout << *UC::PX_TO_MM << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	CncUnitCalculatorTest::test();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1639,7 +1642,7 @@ void MainFrame::initialize(void) {
 	
 	// curve lib resulotion
 	CncConfig::gblCurveLibSelector = m_cbCurveLibResolution;
-	CncConfig::setCurveLibIncrement(CncSvgCurveLib::defaultIncrement);
+	CncConfig::setCurveLibIncrement(0.03f);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeCncControl() {
@@ -2215,6 +2218,8 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 		updateCncConfigTrace();
 		
 		setZero();
+		motionMonitor->clear();
+		
 	} else {
 		cnc::cex1 << " Set reference position aborted . . . " << endl;
 	}
@@ -4438,6 +4443,14 @@ c) X(mid), Y(mid), Z(Top)
 d) X(mid), Y(mid), Z(mid)
 */
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+	
+	if ( isZeroReferenceValid == false ) {
+		cnc::trc.logError("The current reference position isn't valid. Therefore, cant move home");
+		return;
+	}
+	
 	disableControls();
 	selectMonitorBookCncPanel();
 
@@ -4468,6 +4481,8 @@ d) X(mid), Y(mid), Z(mid)
 void MainFrame::moveXToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+	
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4478,8 +4493,9 @@ void MainFrame::moveXToMid(wxCommandEvent& event) {
 void MainFrame::moveYToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
-	selectMonitorBookCncPanel();
+	CncTransactionLock ctl(this);
 	
+	selectMonitorBookCncPanel();
 	
 	disableControls();
 	cnc->moveYToMid();
@@ -4489,6 +4505,8 @@ void MainFrame::moveYToMid(wxCommandEvent& event) {
 void MainFrame::moveZToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+	
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4498,6 +4516,9 @@ void MainFrame::moveZToMid(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroXY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	wxString sel = m_zeroMoveModeXY->GetStringSelection();
@@ -4515,6 +4536,9 @@ void MainFrame::moveToZeroXY(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	wxString sel = m_zeroMoveModeXYZ->GetStringSelection();
@@ -4533,6 +4557,9 @@ void MainFrame::moveToZeroXYZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveToZeroZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4542,6 +4569,9 @@ void MainFrame::moveToZeroZ(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveXToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4551,6 +4581,9 @@ void MainFrame::moveXToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveXToMax(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4560,6 +4593,9 @@ void MainFrame::moveXToMax(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4569,6 +4605,9 @@ void MainFrame::moveYToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveYToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4578,6 +4617,9 @@ void MainFrame::moveYToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4587,8 +4629,8 @@ void MainFrame::moveZToMin(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
-	
-	
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
 	
 	selectMonitorBookCncPanel();
 	
@@ -4599,6 +4641,9 @@ void MainFrame::moveZToMax(wxCommandEvent& event){
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToTop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -4608,6 +4653,9 @@ void MainFrame::moveZToTop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::moveZToBottom(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT( cnc );
+	CncTransactionLock ctl(this);
+
 	selectMonitorBookCncPanel();
 	
 	disableControls();
@@ -6771,8 +6819,10 @@ void MainFrame::selectUCUnitTo(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	SVGUnit from 	= SvgUnitCalculator::determineUnit(m_cbUCUnitFrom->GetStringSelection());
-	SVGUnit to		= SvgUnitCalculator::determineUnit(m_cbUCUnitTo->GetStringSelection());
+	typedef CncUnitCalculatorBase::Unit Unit;
+	
+	Unit from 	= CncUnitCalculatorBase::determineUnit(m_cbUCUnitFrom->GetStringSelection());
+	Unit to		= CncUnitCalculatorBase::determineUnit(m_cbUCUnitTo->GetStringSelection());
 	wxString line	= m_cbUCValueFrom->GetValue();
 	
 	m_cbUCValueTo->Clear();
@@ -6789,7 +6839,8 @@ void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
 		double vFrom, vTo;
 		token.ToDouble(&vFrom);
 		
-		vTo = SvgUnitCalculator::convertUnit2Unit(from, to, vFrom);
+		CncUnitCalculator<double> uc(from, to);
+		vTo = uc.convert(vFrom);
 		
 		m_cbUCValueTo->AppendText(wxString::Format("%.3lf", vTo));
 		m_cbUCValueTo->AppendText(wxString(tokenizer.GetLastDelimiter()));
@@ -7744,13 +7795,15 @@ void MainFrame::decorateIdleState(bool state) {
 	if ( state == false )
 		m_heartbeatState->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_INACTIVE"));
 		
-	// if it is active the state will be handled by 
+	m_heartbeatState->Refresh();
+	
+	// in case the state is true, here is nothing to do, because this state will be handled by 
 	// SerialControllerCallback(const ContollerInfo& ci) and ci == CITHeartbeat
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	decorateIdleState(m_miRqtIdleMessages->IsCheck());
+	decorateIdleState(event.IsChecked());
 }
 
 

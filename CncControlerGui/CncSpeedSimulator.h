@@ -50,6 +50,7 @@ class CncSpeedSimulator : public CncSpeedController {
 						  
 		virtual ~CncSpeedSimulator();
 		
+		bool getTraceFlag() { return traceFlag; }
 		void trace(std::ostream& out);
 		
 		void simulateSteppingX(unsigned int dx);

@@ -32,8 +32,8 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		wxXmlNode* debugPath;
 		wxXmlNode* debugDetail;
 		
-		bool setSVGWH(wxString w, wxString h);
-		bool setSVGViewBox(wxString vb);
+		bool setSVGWH(const wxString& w, const wxString& h);
+		bool setSVGViewBox(const wxString& vb);
 		
 		SVGUnit determineUnit (wxString uw, wxString uh);
 		

@@ -117,7 +117,7 @@ CncSpeedSimulator::CncSpeedSimulator(
  double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
  double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ)
 : CncSpeedController() 
-, traceFlag(true)
+, traceFlag(false)
 , traceInfo()
 , curTsInfo()
 , totalAccumulatedOffset(0LL)
@@ -251,7 +251,6 @@ void CncSpeedSimulator::trace(std::ostream& out) {
 void CncSpeedSimulator::initMove(int32_t dx, int32_t dy, int32_t dz) {
 //////////////////////////////////////////////////////////////////////////
 	// currently noting to do
-	#warning
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::completeMove() {

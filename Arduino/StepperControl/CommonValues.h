@@ -389,7 +389,7 @@ struct I2CData {
 //
 // .....................................................................
 
-  #define FIRMWARE_VERSION                              "0.9.5"
+  #define FIRMWARE_VERSION                              "0.9.6"
 
   #define UNKNOWN_PIN                                    0xFF
 
@@ -419,6 +419,7 @@ struct I2CData {
   const char TEXT_CLOSE                                  = '\n';
   const char TEXT_SEPARATOR                              = ':';
 
+  const unsigned short moveUntilAccelPeriod              = 2500; // ms
   const int16_t cncHeartbeatInterval                     = 2000; // milli seconds
 
   const int32_t NORMALIZED_INCREMENT_DIRECTION_VALUE     = 1;

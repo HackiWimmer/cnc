@@ -472,7 +472,6 @@ protected:
     wxButton* m_3D_Trace4;
     wxButton* m_3D_Trace;
     wxListCtrl* m_vectiesListCtrl;
-    wxPanel* m_panel5165;
     wxButton* m_3D_Top;
     wxButton* m_3D_Bottom;
     wxButton* m_3D_Front;
@@ -1377,7 +1376,6 @@ public:
     wxButton* Get3D_Trace() { return m_3D_Trace; }
     wxListCtrl* GetVectiesListCtrl() { return m_vectiesListCtrl; }
     wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
-    wxPanel* GetPanel5165() { return m_panel5165; }
     wxNotebook* GetStatisticBook() { return m_statisticBook; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
     wxButton* Get3D_Top() { return m_3D_Top; }

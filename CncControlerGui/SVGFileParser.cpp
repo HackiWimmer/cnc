@@ -6,8 +6,9 @@
 #include <wx/filename.h>
 #include "OSD/webviewOSD.h"
 #include "SvgEditPopup.h"
+#include "SVGViewbox.h"
 #include "SVGElementConverter.h"
-#include "SvgUnitCalculator.h"
+#include "CncUnitCalculator.h"
 #include "CncFileNameService.h"
 #include "CncControl.h"
 #include "SVGPathHandlerCnc.h"
@@ -129,17 +130,17 @@ bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) 
 //////////////////////////////////////////////////////////////////
 SVGUnit SVGFileParser::determineUnit (wxString uw, wxString uh) {
 //////////////////////////////////////////////////////////////////
-	SVGUnit unitW = SvgUnitCalculator::determineUnit(uw);
-	SVGUnit unitH = SvgUnitCalculator::determineUnit(uh);
+	cnc::unit unitW = CncUnitCalculatorBase::determineUnit(uw);
+	cnc::unit unitH = CncUnitCalculatorBase::determineUnit(uh);
 
 	if ( unitW == unitH)
-		return unitH;
+		return (SVGUnit)unitH;
 		
 	std::cerr << "unitW(" << unitW << ") != unitH(" << unitH << ")" << std::endl;
-	return unknown;
+	return px;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::setSVGWH(wxString w, wxString h) {
+bool SVGFileParser::setSVGWH(const wxString& w, const wxString& h) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
@@ -190,8 +191,13 @@ bool SVGFileParser::setSVGWH(wxString w, wxString h) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::setSVGViewBox(wxString vb) {
+bool SVGFileParser::setSVGViewBox(const wxString& vb) {
 //////////////////////////////////////////////////////////////////
+	double w = pathHandler->getW();
+	double h = pathHandler->getH();
+	
+	SVGViewbox viewbox(vb, w, h);
+	
 	pathHandler->setViewBox(vb);
 	return true;
 }
@@ -469,6 +475,8 @@ bool SVGFileParser::preprocess() {
 		std::cerr << "SVGFileParser: Unknown unit\n";
 		return false;
 	}
+	
+	// has always to be done after setSVGWH
 	if ( setSVGViewBox(v) == false ) {
 		std::cerr << "SVGFileParser: Erorr while processing setSVGViewBox\n";
 		return false;

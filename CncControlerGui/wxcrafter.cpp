@@ -3494,11 +3494,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4915->Add(m_vectiesListCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_panel5165 = new wxPanel(m_statisticBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statisticBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    int m_panel5165ImgIndex;
-    m_panel5165ImgIndex = m_statisticBook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("sports-shuttlecock")));
-    m_statisticBook->AddPage(m_panel5165, _("Speed Simulator Trace"), false, m_panel5165ImgIndex);
-    
     wxFlexGridSizer* flexGridSizer2311 = new wxFlexGridSizer(30, 1, 0, 0);
     flexGridSizer2311->SetFlexibleDirection( wxBOTH );
     flexGridSizer2311->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );

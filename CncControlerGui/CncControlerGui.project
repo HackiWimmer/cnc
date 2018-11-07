@@ -11,6 +11,7 @@
     <VirtualDirectory Name="GamePad">
       <File Name="CncGamePad.cpp"/>
       <VirtualDirectory Name="OSD">
+        <File Name="CncGamePadGtk.h"/>
         <File Name="CncGamePadOSD.h"/>
         <File Name="CncGamePadMsw.cpp"/>
         <File Name="CncGamePadMsw.h"/>
@@ -163,6 +164,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncUnitCalculator.cpp"/>
+      <File Name="CncUnitCalculator.h"/>
       <File Name="CncUsbConnectionDetected.h"/>
       <File Name="CncUsbConnectionDetected.cpp"/>
       <File Name="CncGamepadControllerState.h"/>
@@ -191,7 +194,6 @@
       <File Name="CncArduino.cpp"/>
       <File Name="CncControl.cpp"/>
       <File Name="CncFileNameService.cpp"/>
-      <File Name="CncSvgCurveLib.cpp"/>
       <File Name="CncToolCorrection.cpp"/>
       <File Name="CncToolStateControl.cpp"/>
       <File Name="CncArduino.h"/>
@@ -202,7 +204,6 @@
       <File Name="CncPathListEntry.h"/>
       <File Name="CncPosition.h"/>
       <File Name="CncStreamBuffers.h"/>
-      <File Name="CncSvgCurveLib.h"/>
       <File Name="CncToolCorrection.h"/>
       <File Name="CncToolStateControl.h"/>
       <File Name="CommandTemplates.h"/>

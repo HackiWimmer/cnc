@@ -80,6 +80,12 @@ class SvgUnitCalculator {
 		}
 		
 		/////////////////////////////////////////////////////////////////////
+		static float convertUnit2MM(const SVGUnit& from, float& value) {
+			value *= 1/getFactorMM2Input(from);
+			return value;
+		}
+		
+		/////////////////////////////////////////////////////////////////////
 		static double convertMM2Unit(const SVGUnit& from, double& value) {
 			value *= getFactorMM2Input(from);
 			return value;

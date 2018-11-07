@@ -6133,14 +6133,6 @@ Interval [ms]:</label>
                                                           </object>
                                                         </object>
                                                       </object>
-                                                      <object class="notebookpage">
-                                                        <label>Speed Simulator Trace</label>
-                                                        <bitmap>bitmaps/sports-shuttlecock.png</bitmap>
-                                                        <selected>0</selected>
-                                                        <object class="wxPanel" name="m_panel5165">
-                                                          <style>wxTAB_TRAVERSAL</style>
-                                                        </object>
-                                                      </object>
                                                     </object>
                                                   </object>
                                                 </object>

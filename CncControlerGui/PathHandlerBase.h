@@ -6,8 +6,8 @@
 #include <wx/gdicmn.h>
 #include <wx/string.h>
 #include "SvgTransformMatrix.h"
-#include "CncSvgCurveLib.h"
 #include "CncPosition.h"
+#include "SvgCurveLib.h"
 #include "CncPathListManager.h"
 
 #define TRACE_FUNCTION_CALL(fn)

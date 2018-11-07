@@ -742,16 +742,14 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, u
 	// this is already done by the application
 	
 	// speed setup
+	const double START_SPEED = speedSimulator->getStartSpeed_MM_MIN() * 0.5;
 	const double MAX_SPEED   = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+	const double DIFF_SPEED  = MAX_SPEED - START_SPEED;
 	
-	const double SPEED_STEP1 = MAX_SPEED * 0.05;	const unsigned int TIMESPAN_STEP1  =  500; // ms
-	const double SPEED_STEP2 = MAX_SPEED * 0.25;	const unsigned int TIMESPAN_STEP2  = 1000; // ms
-	const double SPEED_STEP3 = MAX_SPEED * 0.50;	const unsigned int TIMESPAN_STEP3  = 1500; // ms
-	const double SPEED_STEP4 = MAX_SPEED * 0.75;	const unsigned int TIMESPAN_STEP4  = 2000; // ms
-	const double SPEED_STEP5 = MAX_SPEED;
+	if ( DIFF_SPEED < 0.0 )
+		return false;
 	
-	double currentSpeed = SPEED_STEP1;
-	speedSimulator->setFeedSpeed_MM_MIN(currentSpeed);
+	speedSimulator->setFeedSpeed_MM_MIN(START_SPEED);
 	
 	bool ret = false;
 	CncMilliTimestamp tsStart = CncTimeFunctions::getMilliTimestamp();
@@ -760,18 +758,15 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, u
 		// important because in case of SIG_QUIT_MOVE renderMove returns true
 		if ( lastCommand.ret != RET_OK )
 			break;
-	
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP1 && currentSpeed < SPEED_STEP2 )
-			{ currentSpeed = SPEED_STEP2; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
-
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP2 && currentSpeed < SPEED_STEP3 )
-			{ currentSpeed = SPEED_STEP3; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
 			
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP3 && currentSpeed < SPEED_STEP4 )
-			{ currentSpeed = SPEED_STEP4; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
+		unsigned int diff = CncTimeFunctions::getMilliTimestamp() - tsStart;
+		if ( diff > moveUntilAccelPeriod ) {
+			speedSimulator->setFeedSpeed_MM_MIN(MAX_SPEED);
 			
-		if ( (CncTimeFunctions::getMilliTimestamp() - tsStart) > TIMESPAN_STEP4 && currentSpeed < SPEED_STEP5 )
-			{ currentSpeed = SPEED_STEP5; speedSimulator->setFeedSpeed_MM_MIN(currentSpeed); }
+		} else {
+			speedSimulator->setFeedSpeed_MM_MIN(START_SPEED + DIFF_SPEED / moveUntilAccelPeriod * diff);
+			
+		}
 	}
 	
 	// adjust last callback position
@@ -1095,13 +1090,14 @@ void SerialEmulatorNULL::traceSpeedInformation() {
 	if ( speedSimulator == NULL )
 		return;
 		
-	#warning currently only a hack
-	wxString fn(wxString::Format("c:\\temp\\speed.%s.csv", wxDateTime::Now().Format("%Y%m%d-%H%M%S")));
-	std::filebuf fb;
-	fb.open (fn,std::ios::out);
-	std::ostream os(&fb);
-
-	speedSimulator->trace(os);
-
-	fb.close();
+	if ( speedSimulator->getTraceFlag() == true ) {
+		wxString fn(wxString::Format("c:\\temp\\speed.%s.csv", wxDateTime::Now().Format("%Y%m%d-%H%M%S")));
+		std::filebuf fb;
+		fb.open (fn,std::ios::out);
+		std::ostream os(&fb);
+		
+		speedSimulator->trace(os);
+		
+		fb.close();
+	}
 }
