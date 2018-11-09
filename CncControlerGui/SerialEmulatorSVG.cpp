@@ -41,7 +41,7 @@ void SerialEmulatorSVG::beginSVG(SVGUnit u, double w, double h, const wxString& 
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorSVG::streamSvgHeader(std::fstream& fs) {
 ///////////////////////////////////////////////////////////////////
-	SVGViewbox svgViewBox(viewBox, width, height);
+	SVGViewbox svgViewBox(viewBox);
 
 	fs << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>" << std::endl;
 	fs << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"" << std::endl;

@@ -522,6 +522,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1506->AddGrowableRow(0);
     m_panelTplUserAgent->SetSizer(flexGridSizer1506);
     
+    wxFlexGridSizer* flexGridSizer5933 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer5933->SetFlexibleDirection( wxBOTH );
+    flexGridSizer5933->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer5933->AddGrowableCol(0);
+    flexGridSizer5933->AddGrowableRow(1);
+    
+    flexGridSizer1506->Add(flexGridSizer5933, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_svgRootNode = new wxTextCtrl(m_panelTplUserAgent, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplUserAgent, wxSize(-1,-1)), wxTE_READONLY);
+    m_svgRootNode->SetToolTip(_("SVG Root Node (interpreted)"));
+    #if wxVERSION_NUMBER >= 3000
+    m_svgRootNode->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer5933->Add(m_svgRootNode, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
     wxFlexGridSizer* flexGridSizer1488 = new wxFlexGridSizer(2, 3, 0, 0);
     flexGridSizer1488->SetFlexibleDirection( wxBOTH );
     flexGridSizer1488->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -531,7 +547,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1488->AddGrowableRow(0);
     flexGridSizer1488->AddGrowableRow(1);
     
-    flexGridSizer1506->Add(flexGridSizer1488, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer5933->Add(flexGridSizer1488, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer1490 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer1490->SetFlexibleDirection( wxBOTH );

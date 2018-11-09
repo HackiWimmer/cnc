@@ -24,6 +24,8 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		ManuallyPathHandlerCnc(CncControl* cnc);
 		virtual ~ManuallyPathHandlerCnc();
 		
+		virtual const char* getName() { return "ManuallyPathHandlerCnc"; }
+		
 		virtual void logMeasurementStart();
 		virtual void logMeasurementEnd();
 		

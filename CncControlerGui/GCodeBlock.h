@@ -10,7 +10,9 @@
 
 /////////////////////////////////////////////////////////////
 class GCodeBlock {
-		
+	
+	typedef CncUnitCalculatorBase::Unit Unit;
+	
 	private:
 		/////////////////////////////////////////////////////
 		inline double getMoveRelative(double thisValue, double currentAxisValue) {
@@ -57,7 +59,7 @@ class GCodeBlock {
 		wxString			nodeName;
 		wxString			block;
 		
-		cnc::unit			unit			= cnc::unit::mm;
+		Unit				unit			= Unit::mm;
 		GCodePositioning	posModeXYZ		= GC_Absolute;
 		GCodePositioning	posModeIJ		= GC_Absolute;
 		
@@ -146,10 +148,10 @@ class GCodeBlock {
 		const double getZMoveAbsolute(const CncDoublePosition& curPos) { return getMoveAbsolute(z, curPos.getZ()); }
 		
 		const double ensureUnit(double value) {
-			if ( unit == cnc::unit::in )
+			if ( unit == Unit::in )
 				return value * CncUnitCalculatorBase::getFact_in2mm();
 			
-			wxASSERT( unit == cnc::unit::mm );
+			wxASSERT( unit == Unit::mm );
 			return value;
 		}
 		

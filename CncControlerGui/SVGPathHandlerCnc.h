@@ -1,21 +1,24 @@
 #ifndef SVG_PATH_HANDLER_CNC_H
 #define SVG_PATH_HANDLER_CNC_H
 
-#include "PathHandlerBase.h"
+#include "SVGPathHandlerBase.h"
 #include "SerialPort.h"
 #include "CncToolCorrection.h"
+#include "CncUnitCalculator.h"
 #include "SvgCncParameters.h"
+#include "SvgViewBox.h"
 #include "CncCommon.h"
 
 class CncControl;
 
 //////////////////////////////////////////////////////////////////
-class SVGPathHandlerCnc : public PathHandlerBase {
+class SVGPathHandlerCnc : public SVGPathHandlerBase {
 //////////////////////////////////////////////////////////////////
-
-	private:
 	
-		SVGUnit 			unit;
+	private:
+		
+		typedef CncUnitCalculatorBase::Unit Unit;
+		
 		CncControl* 		cncControl;
 		SvgOriginalPathInfo origPathInfo;
 		double 				toolRadius;
@@ -23,8 +26,8 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		bool 				initialized;
 		bool 				debugState;
 		double 				width, height;
-		wxString 			viewBox;
-		SvgCncParameters currentCncParameters;
+		SvgCncParameters 	currentCncParameters;
+		SVGRootNode			svgRootNode;
 		
 		// spool path to cnc control
 		bool moveLinearXY(double x, double y, bool alreadyRendered);
@@ -37,8 +40,6 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		
 	protected:
 	
-		virtual bool shouldConvertRefToMM() const { return true; }
-		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
 		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
@@ -57,16 +58,17 @@ class SVGPathHandlerCnc : public PathHandlerBase {
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
 		
+		virtual const char* getName() { return "SVGPathHandlerCnc"; }
+		
 		virtual void initNextClientId(long id);
 		
 		// Getter and setter
-		void setMaxDimensions(SVGUnit u, double width, double height);
-		void setViewBox(const wxString& vb);
+		void setSvgRootNode(const SVGRootNode& srn);
 		
-		SVGUnit getSVGUnit() { return unit; }
-		double getW() { return width; }
-		double getH() { return height; }
-		const char* getViewBox() { return viewBox.c_str(); }
+		Unit getUnit() 				{ return svgRootNode.getOutputUnit(); }
+		double getW() 				{ return svgRootNode.getWidth();      }
+		double getH() 				{ return svgRootNode.getHeight();     }
+		const char* getViewBox() 	{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
 
 		SvgCncParameters& getSvgCncParameters();
 		void setCncWorkingParameters(SvgCncParameters& cwp);

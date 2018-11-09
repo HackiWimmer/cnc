@@ -444,6 +444,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void openPathGen();
 		void regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
 		void openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
+		void openCurrentTemplateInBrowser();
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		void displayNotification(const char type, wxString title, wxString message, unsigned int timeout = 3);

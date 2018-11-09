@@ -5927,6 +5927,8 @@ bool MainFrame::openFileExtern(const wxString& tool, wxString& file) {
 		cmd += "\"";
 	}
 	
+	cnc::trc.logInfoMessage(wxString::Format("Open: %s", cmd));
+	
 	wxExecute(cmd);
 	wxASSERT(cnc);
 	waitActive(1500);
@@ -6670,6 +6672,12 @@ void MainFrame::openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, co
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::openCurrentTemplateInBrowser() {
+///////////////////////////////////////////////////////////////////
+	wxString ret;
+	openFileExtern(GBL_CONFIG->getBrowser(ret), getCurrentTemplatePathFileName());
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node) {
 ///////////////////////////////////////////////////////////////////
 	if ( ctl == NULL )
@@ -6821,8 +6829,15 @@ void MainFrame::selectUCChangeFrom(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	typedef CncUnitCalculatorBase::Unit Unit;
 	
-	Unit from 	= CncUnitCalculatorBase::determineUnit(m_cbUCUnitFrom->GetStringSelection());
-	Unit to		= CncUnitCalculatorBase::determineUnit(m_cbUCUnitTo->GetStringSelection());
+	Unit from = Unit::px;
+	Unit to   = Unit::px;
+	
+	if ( CncUnitCalculatorBase::determineUnit(m_cbUCUnitFrom->GetStringSelection(), from) == false )
+		return;
+	
+	if ( CncUnitCalculatorBase::determineUnit(m_cbUCUnitTo->GetStringSelection(),     to) == false )
+		return;
+
 	wxString line	= m_cbUCValueFrom->GetValue();
 	
 	m_cbUCValueTo->Clear();

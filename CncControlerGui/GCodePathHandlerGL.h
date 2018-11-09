@@ -11,6 +11,8 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		GCodePathHandlerGL(CncGCodePreview* gl);
 		virtual ~GCodePathHandlerGL();
 		
+		virtual const char* getName() { return "GCodePathHandlerGL"; }
+		
 		virtual void switchToolState(bool state) {}
 		virtual bool shouldAToolChangeProcessed() { return false; }
 		

@@ -6,22 +6,19 @@
 #include "SerialPort.h"
 #include "CncControl.h"
 #include "FileParser.h"
-#include "SvgUnitCalculator.h"
 #include "CncToolCorrection.h"
 #include "SVGPathHandlerCnc.h"
 
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc) 
-: PathHandlerBase()
-, unit(px)
+: SVGPathHandlerBase()
 , cncControl(cnc)
 , toolRadius(0.0)
 , zAxisDown(false)
 , initialized(false)
 , debugState(false)
-, width(0.0)
-, height(0.0)
-, viewBox("")
+, currentCncParameters()
+, svgRootNode()
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
@@ -87,18 +84,12 @@ void SVGPathHandlerCnc::setCncWorkingParameters(SvgCncParameters& cwp) {
 	currentCncParameters = cwp;
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::setMaxDimensions(SVGUnit u, double w, double h) {
+void SVGPathHandlerCnc::setSvgRootNode(const SVGRootNode& srn) {
 //////////////////////////////////////////////////////////////////
-	unit 		= u;
-	initialized = SvgUnitCalculator::isUnitValid(u);
+	svgRootNode = srn;
+	changeInputUnit(srn.getInputUnit());
 
-	width  = w;
-	height = h;
-}
-//////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::setViewBox(const wxString& vb) {
-//////////////////////////////////////////////////////////////////
-	viewBox = vb;
+	initialized = true;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveLinearXY(double x, double y, bool alreadyRendered) {
@@ -375,7 +366,9 @@ void SVGPathHandlerCnc::prepareWork() {
 	startPos.resetWatermarks();
 	
 	//svg output handling
-	cncControl->getSerial()->beginSVG(getSVGUnit(), getW(), getH(), getViewBox());
+	#warning cast
+	cncControl->getSerial()->beginSVG((SVGUnit)getUnit(), getW(), getH(), getViewBox());
+	
 	// controller handling
 	if ( isZAxisDown() == true )
 		moveUpZ();

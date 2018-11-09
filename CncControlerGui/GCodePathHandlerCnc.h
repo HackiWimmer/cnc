@@ -11,6 +11,8 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase {
 		GCodePathHandlerCnc(CncControl* cnc);
 		virtual ~GCodePathHandlerCnc();
 		
+		virtual const char* getName() { return "GCodePathHandlerCnc"; }
+		
 		virtual void initNextClientId(long id);
 		virtual void switchToolState(bool state);
 		

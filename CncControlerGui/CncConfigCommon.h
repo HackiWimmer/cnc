@@ -81,6 +81,7 @@
 	#define CncApplication_Tool_SVG_FILE_VIEWER 	"CncApplication.Tools/SVG_FILE_VIEWER"
 	#define CncApplication_Tool_GCODE_FILE_VIEWER 	"CncApplication.Tools/GCODE_FILE_VIEWER"
 	#define CncApplication_Tool_XML_FILE_VIEWER 	"CncApplication.Tools/XML_FILE_VIEWER"
+	#define CncApplication_Tool_BROWSER			 	"CncApplication.Tools/BROWSER"
 	#define CncApplication_Tool_EXTERNAL_EDITOR 	"CncApplication.Tools/EXTERNAL_EDITOR"
 	#define CncApplication_Tool_PY_CAM 				"CncApplication.Tools/PY_CAM"
 	

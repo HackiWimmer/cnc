@@ -146,6 +146,7 @@ protected:
     wxTextCtrl* m_svgEditStatus;
     wxStaticText* m_editMode;
     wxPanel* m_panelTplUserAgent;
+    wxTextCtrl* m_svgRootNode;
     wxStaticText* m_staticText1498;
     wxDataViewListCtrl* m_dvListCtrlSvgUAInboundPathList;
     wxStaticText* m_staticText14983;
@@ -1052,6 +1053,7 @@ public:
     wxTextCtrl* GetSvgEditStatus() { return m_svgEditStatus; }
     wxStaticText* GetEditMode() { return m_editMode; }
     wxPanel* GetPanelTplEdit() { return m_panelTplEdit; }
+    wxTextCtrl* GetSvgRootNode() { return m_svgRootNode; }
     wxStaticText* GetStaticText1498() { return m_staticText1498; }
     wxDataViewListCtrl* GetDvListCtrlSvgUAInboundPathList() { return m_dvListCtrlSvgUAInboundPathList; }
     wxStaticText* GetStaticText14983() { return m_staticText14983; }

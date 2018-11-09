@@ -14,6 +14,8 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		GCodePathHandlerBase();
 		virtual ~GCodePathHandlerBase();
 		
+		virtual const char* getName() { return "GCodePathHandlerBase"; }
+		
 		GCodePathHandlerBase::CutterCompensation getCutterCompensationMode() { return cutterCompMode; }
 		void setCutterCompensationMode(GCodePathHandlerBase::CutterCompensation ccm) { cutterCompMode = ccm; }
 		

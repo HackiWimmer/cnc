@@ -17,6 +17,8 @@ class wxWebView;
 class wxXmlAttribute;
 class wxMenuItem;
 
+typedef CncUnitCalculatorBase::Unit Unit;
+
 /////////////////////////////////////////////////////////////////////////////
 class SVGFileParser : public SVGNodeParser, public FileParser {
 	
@@ -32,10 +34,8 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		wxXmlNode* debugPath;
 		wxXmlNode* debugDetail;
 		
-		bool setSVGWH(const wxString& w, const wxString& h);
-		bool setSVGViewBox(const wxString& vb);
-		
-		SVGUnit determineUnit (wxString uw, wxString uh);
+		bool setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb);
+		bool determineUnit (const wxString& uw, const wxString& uh, Unit& u);
 		
 		virtual bool preprocess();
 		virtual bool postprocess() { return true; }

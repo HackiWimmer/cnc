@@ -315,6 +315,7 @@ class CncConfig {
 		const wxString& getSVGFileViewer(wxString& ret);
 		const wxString& getGCodeFileViewer(wxString& ret);
 		const wxString& getXMLFileViewer(wxString& ret);
+		const wxString& getBrowser(wxString& ret);
 		const wxString& getEditorTool(wxString& ret);
 		const wxString& getPyCamTool(wxString& ret);
 		const wxString& getDefaultSpeedModeXYZ(wxString& ret);

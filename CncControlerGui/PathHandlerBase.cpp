@@ -13,6 +13,9 @@ PathHandlerBase::PathHandlerBase()
 , startPos({0.0, 0.0, 0.0})
 , currentPos({0.0, 0.0, 0.0})
 , totalLength(0.0)
+, lastControlPoint()
+, pathListMgr()
+, unitCalculator(Unit::mm, Unit::mm)
 {
 //////////////////////////////////////////////////////////////////
 }
@@ -607,19 +610,28 @@ void PathHandlerBase::finishWork() {
 	// currently nothing to do;
 }
 //////////////////////////////////////////////////////////////////
+void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
+//////////////////////////////////////////////////////////////////
+	unitCalculator.changeInputUnit(u);
+	
+	if ( trace == true )
+		std::cout << " " << getName() << ": Setup " << unitCalculator << std::endl;
+}
+//////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
 	double newPosAbsX = currentPos.getX();
 	double newPosAbsY = currentPos.getY();
 	
 	// first perform the transformations . . .
-	currentSvgTransformMatrix.transform(newPosAbsX, newPosAbsY);
+	#warning
+	//std::cout << newPosAbsX << ", " << newPosAbsY;
+	transform(newPosAbsX, newPosAbsY);
+	//std::cout << " | " << newPosAbsX << ", " << newPosAbsY << std::endl;
 	
-	//  . . . then convert the input unit to mm . . .newPosAbsX
-	if ( shouldConvertRefToMM() == true ) {
-		newPosAbsX = SvgUnitCalculator::convertReferenceUnit2MM(newPosAbsX);
-		newPosAbsY = SvgUnitCalculator::convertReferenceUnit2MM(newPosAbsY);
-	}
+	//  . . . then convert the input unit to mm . . 
+	newPosAbsX = unitCalculator.convert(newPosAbsX);
+	newPosAbsY = unitCalculator.convert(newPosAbsY);
 	
 	// append
 	const CncPathListEntry cpe = pathListMgr.calculateAndAddEntry(newPosAbsX, newPosAbsY, alreadyRendered, isZAxisDown());

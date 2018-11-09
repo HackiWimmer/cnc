@@ -24,8 +24,6 @@ class SVGUserAgent{
 ////////////////////////////////////////////////////////////////
 
 	private:
-		SVGUnit unit;
-		CncXYDoubleDimension dimension;
 		wxString nodeName;
 		wxString elementId;
 		
@@ -112,10 +110,7 @@ class SVGUserAgent{
 		}
 		
 		/////////////////////////////////////////////////////////
-		void initalize(SVGUnit u, const CncXYDoubleDimension& d) {
-			unit = u;
-			dimension = d;
-			
+		void initalize() {
 			userAgent.clear();
 			collectedIds.clear();
 			collectedAttributes.clear();

@@ -3,13 +3,13 @@
 
 #include <wx/variant.h>
 #include "CncPathListEntry.h"
-#include "PathHandlerBase.h"
+#include "SVGPathHandlerBase.h"
 
 /////////////////////////////////////////////////////////////////////////////
 class SVGNodeParser {
 	
 	private:
-		PathHandlerBase* pathHandler;
+		SVGPathHandlerBase* pathHandler;
 		
 	protected:
 		
@@ -25,7 +25,7 @@ class SVGNodeParser {
 	
 		////////////////////////////////////////////////////////////////////
 		SVGNodeParser();
-		SVGNodeParser(PathHandlerBase* ph);
+		SVGNodeParser(SVGPathHandlerBase* ph);
 		virtual ~SVGNodeParser();
 		
 		////////////////////////////////////////////////////////////////////

@@ -1,13 +1,13 @@
-#ifndef SVG_PATH_HANDLER_BASE_H
-#define SVG_PATH_HANDLER_BASE_H
+#ifndef PATH_HANDLER_BASE_H
+#define PATH_HANDLER_BASE_H
 
 #include <vector>
 #include <wx/variant.h>
 #include <wx/gdicmn.h>
 #include <wx/string.h>
-#include "SvgTransformMatrix.h"
 #include "CncPosition.h"
 #include "SvgCurveLib.h"
+#include "CncUnitCalculator.h"
 #include "CncPathListManager.h"
 
 #define TRACE_FUNCTION_CALL(fn)
@@ -37,6 +37,8 @@ class FileParser;
 //////////////////////////////////////////////////////////////////
 class PathHandlerBase {
 //////////////////////////////////////////////////////////////////
+	public:
+		typedef CncUnitCalculatorBase::Unit Unit;
 
 	protected:
 	
@@ -101,15 +103,15 @@ class PathHandlerBase {
 		};
 
 		// members
-		FileParser*			fileParser;
-		bool 				firstPath;
-		bool 				newPath;
-		CncDoublePosition	startPos;
-		CncDoublePosition	currentPos;
-		double				totalLength;
-		LastControlPoint 	lastControlPoint;
-		CncPathListManager 	pathListMgr;
-		SVGTransformMatrix  currentSvgTransformMatrix;
+		FileParser*					fileParser;
+		bool 						firstPath;
+		bool 						newPath;
+		CncDoublePosition			startPos;
+		CncDoublePosition			currentPos;
+		double						totalLength;
+		LastControlPoint 			lastControlPoint;
+		CncPathListManager 			pathListMgr;
+		CncUnitCalculator<float>	unitCalculator;
 		
 		// trace functions
 		void traceCurveLibPoint(const char* userPerspectivePrefix, SVGCurveLib::PointGeneric<>& p);
@@ -121,8 +123,7 @@ class PathHandlerBase {
 		// curvel lib helper
 		bool processCurveLibPoint(SVGCurveLib::PointGeneric<> p);
 		
-		// store CncPathList
-		virtual bool shouldConvertRefToMM() const { return false; }
+		// 
 		virtual bool processLinearMove(bool alreadyRendered);
 		
 		// debug functions
@@ -143,16 +144,19 @@ class PathHandlerBase {
 		
 		virtual bool isInitialized();
 		
-		// svg path habdler helper - only used from this class
-		virtual void simulateZAxisUp() 		{}
-		virtual void simulateZAxisDown() 	{}
-		virtual bool isZAxisUp() 			{ return true; }
-		virtual bool isZAxisDown() 			{ return false; }
+		// svg path handler helper
+		virtual void simulateZAxisUp() 						{}
+		virtual void simulateZAxisDown() 					{}
+		virtual bool isZAxisUp() 							{ return true; }
+		virtual bool isZAxisDown() 							{ return false; }
+		virtual void transform(double& xAbs, double& yAbs) 	{}
 		
 	public:
 	
 		PathHandlerBase();
 		virtual ~PathHandlerBase();
+		
+		virtual const char* getName() { return "PathHandlerBase"; }
 		
 		virtual void initNextClientId(long id) {}
 		
@@ -164,8 +168,6 @@ class PathHandlerBase {
 		
 		void initCurrentPos(const CncDoublePosition& pos);
 		
-		// getter
-		SVGTransformMatrix& getSvgTransformMatrix() { return currentSvgTransformMatrix; }
 		unsigned int getDataPointCount() const { return pathListMgr.getPathListSize(); }
 		const CncPathListManager& getPathList() { return pathListMgr; }
 		
@@ -204,6 +206,9 @@ class PathHandlerBase {
 		// path modifiers
 		bool reversePath() { return pathListMgr.reversePath(); }
 		bool centerPath() { return pathListMgr.centerPath(); }
+		
+		// unit calculation functions
+		void changeInputUnit(const Unit u, bool trace=true);
 		
 };
 

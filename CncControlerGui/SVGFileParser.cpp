@@ -9,7 +9,9 @@
 #include "SVGViewbox.h"
 #include "SVGElementConverter.h"
 #include "CncUnitCalculator.h"
+#include "MainFrame.h"
 #include "CncFileNameService.h"
+#include "CncConfig.h"
 #include "CncControl.h"
 #include "SVGPathHandlerCnc.h"
 #include "SVGFileParser.h"
@@ -128,19 +130,27 @@ bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) 
 	return svgUserAgent.addPathElement(c, count, values);
 }
 //////////////////////////////////////////////////////////////////
-SVGUnit SVGFileParser::determineUnit (wxString uw, wxString uh) {
+bool SVGFileParser::determineUnit(const wxString& uw, const wxString& uh, Unit& u) {
 //////////////////////////////////////////////////////////////////
-	cnc::unit unitW = CncUnitCalculatorBase::determineUnit(uw);
-	cnc::unit unitH = CncUnitCalculatorBase::determineUnit(uh);
+	Unit unitW = Unit::px; 
+	Unit unitH = Unit::px; 
 
-	if ( unitW == unitH)
-		return (SVGUnit)unitH;
+	if ( CncUnitCalculatorBase::determineUnit(uw, unitW) == false )
+		return false;
+		
+	if ( CncUnitCalculatorBase::determineUnit(uh, unitH) == false )
+		return false;
+		
+	if ( unitW == unitH ) {
+		u = unitH;
+		return true;
+	}
 		
 	std::cerr << "unitW(" << unitW << ") != unitH(" << unitH << ")" << std::endl;
-	return px;
+	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::setSVGWH(const wxString& w, const wxString& h) {
+bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(pathHandler);
 	
@@ -180,25 +190,23 @@ bool SVGFileParser::setSVGWH(const wxString& w, const wxString& h) {
 			unitH = "px";
 	}
 	
-	SVGUnit unit = determineUnit(unitW, unitH);
-	
-	if ( unit == unknown )
+	Unit unit;
+	if ( determineUnit(unitW, unitH, unit) == false )
 		return false;
 	
-	pathHandler->setMaxDimensions(unit, width, height);
-	svgUserAgent.initalize(unit, CncXYDoubleDimension(width, height));
+	SVGRootNode svgRootNode(width, height, unit, vb);
 	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGFileParser::setSVGViewBox(const wxString& vb) {
-//////////////////////////////////////////////////////////////////
-	double w = pathHandler->getW();
-	double h = pathHandler->getH();
+	if ( THE_APP != NULL ) {
+		stringstream ss; ss << svgRootNode;
+		THE_APP->GetSvgRootNode()->ChangeValue(ss.str());
+	}
 	
-	SVGViewbox viewbox(vb, w, h);
+	pathHandler->setSvgRootNode(svgRootNode);
 	
-	pathHandler->setViewBox(vb);
+	wxString ret;
+	svgUserAgent.initalize();
+	svgUserAgent.addTransform(svgRootNode.getRootTransformation(ret));
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -471,14 +479,8 @@ bool SVGFileParser::preprocess() {
 	wxString h = doc.GetRoot()->GetAttribute("height");
 	wxString v = doc.GetRoot()->GetAttribute("viewBox");
 	
-	if ( setSVGWH(w, h) == false ) {
-		std::cerr << "SVGFileParser: Unknown unit\n";
-		return false;
-	}
-	
-	// has always to be done after setSVGWH
-	if ( setSVGViewBox(v) == false ) {
-		std::cerr << "SVGFileParser: Erorr while processing setSVGViewBox\n";
+	if ( setSVGRootNode(w, h, v) == false ) {
+		std::cerr << "SVGFileParser: setSVGRootNode() failed\n";
 		return false;
 	}
 	

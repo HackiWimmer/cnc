@@ -226,6 +226,8 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 	popup->AppendSeparator();
 	popup->Append(idOffset + STC_PM_CUT, 					wxT("Cut"));
 	popup->Append(idOffset + STC_PM_DELETE, 				wxT("Delete"));
+	popup->AppendSeparator();
+	popup->Append(idOffset + STC_OPEN_IN_BROWSER, 			wxT("Open with browser"));
 	
 
 	//............................................
@@ -477,6 +479,19 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 			GBL_CONFIG->getTheApp()->openPathGenWithCurrentSvgNodeFromPopup(ctl, node);
 			
 	 }, idOffset + STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
+	 
+	//............................................
+	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
+	 [](wxCommandEvent& event) {
+			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
+			wxASSERT(ctl);
+			
+			if ( GBL_CONFIG->getTheApp() == NULL )
+				return;
+			
+			GBL_CONFIG->getTheApp()->openCurrentTemplateInBrowser();
+			
+	 }, idOffset + STC_OPEN_IN_BROWSER, wxID_ANY, ctl);
 	
 	return popup;
 }

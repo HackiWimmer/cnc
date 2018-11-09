@@ -33,7 +33,8 @@ enum {
 	STC_PM_REDO,
 	STC_PM_SELECT_ALL,
 	STC_PM_CUT,
-	STC_PM_DELETE
+	STC_PM_DELETE,
+	STC_OPEN_IN_BROWSER
 };
 
 class SvgNodeTemplates {

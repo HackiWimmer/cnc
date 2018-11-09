@@ -152,6 +152,12 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			registerProperty(CncApplication_Tool_XML_FILE_VIEWER, prop);
 			
 			//...............
+			prop = tools->AppendChild( new wxFileProperty("Browser", NEXT_PROP_ID, "notepad"));
+			prop->Enable(true);
+			prop->SetHelpString("");
+			registerProperty(CncApplication_Tool_BROWSER, prop);
+			
+			//...............
 			prop = tools->AppendChild( new wxFileProperty("External Text Editor", NEXT_PROP_ID, "notepad"));
 			prop->Enable(true);
 			prop->SetHelpString("");

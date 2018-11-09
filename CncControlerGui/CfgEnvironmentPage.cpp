@@ -1,6 +1,6 @@
 #include "wxcrafter.h"
 #include "CncFileNameService.h"
-#include "SvgUnitCalculator.h"
+#include "CncUnitCalculator.h"
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
 
@@ -202,13 +202,13 @@ void CncConfig::setupEnvironmentCfgPage(wxConfigBase& config) {
 		
 		//...................
 		wxPGProperty* unitCalc = NULL;
-		curCatName.assign("SvgUnitCalculator");
+		curCatName.assign("CncUnitCalculator");
 		unitCalc = root->AppendChild( new wxPropertyCategory(curCatName));
 		registerCategory(curCatName, unitCalc);
 		{
 			//...............
 			std::stringstream stream;
-			SvgUnitCalculator::trace(stream);
+			CncUnitCalculatorBase::trace(stream);
 			wxString fns(stream.str().c_str());
 			{
 				wxStringTokenizer lines(fns, "\n");
@@ -229,6 +229,7 @@ void CncConfig::setupEnvironmentCfgPage(wxConfigBase& config) {
 				}
 			}
 		}
+
 	}
 }
 ////////////////////////////////////////////////////////////////////////

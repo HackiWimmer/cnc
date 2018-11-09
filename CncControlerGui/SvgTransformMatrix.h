@@ -27,9 +27,11 @@ class SVGTransformMatrix {
 			wxStringTokenizer tokenizer(pStr, " ,");
 			while ( tokenizer.HasMoreTokens() ) {
 				wxString s = tokenizer.GetNextToken();
-				double d;
-				s.ToDouble(&d);
-				p.push_back(d);
+				if ( s.IsEmpty() == false ) {
+					double d;
+					s.ToDouble(&d);
+					p.push_back(d);
+				}
 			}
 
 			return p.size();
@@ -276,13 +278,15 @@ class SVGTransformMatrix {
 					if ( cmd != "" ) {
 						param = tokenizerClips.GetNextToken().Trim(true).Trim(false);
 						
-						++transformCount;
-						
-						TransformParameterList parameters;
-						if ( evaluateTransformParameters(param, parameters)	> 0 ) {
-							ret = performTransform(cmd, parameters);
-							if ( ret == false ) {
-								break;
+						if ( param.IsEmpty() == false ) {
+							++transformCount;
+							
+							TransformParameterList parameters;
+							if ( evaluateTransformParameters(param, parameters)	> 0 ) {
+								ret = performTransform(cmd, parameters);
+								if ( ret == false ) {
+									break;
+								}
 							}
 						}
 					}

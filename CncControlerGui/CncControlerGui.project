@@ -288,10 +288,13 @@
         <File Name="SVGNodeParser.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="PathHandler">
+        <File Name="SVGPathHandlerBase.cpp"/>
+        <File Name="SVGPathHandlerBase.h"/>
         <File Name="SVGPathHandlerCnc.cpp"/>
         <File Name="SVGPathHandlerCnc.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Utils">
+        <File Name="SvgViewBox.cpp"/>
         <File Name="SvgTransformMatrix.h"/>
         <File Name="SvgCncParameters.h"/>
         <File Name="SVGCurveLib.cpp"/>
