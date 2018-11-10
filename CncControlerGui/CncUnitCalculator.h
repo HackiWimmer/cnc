@@ -121,7 +121,7 @@ class CncUnitCalculatorBase {
 				case ft: 		return  FACT_px2ft;
 			}
 
-			// should not happen
+			// didn't happen
 			return 1.0f;
 		}
 
@@ -139,7 +139,7 @@ class CncUnitCalculatorBase {
 				case ft: 		return  FACT_ft2px;
 			}
 
-			// should not happen
+			// didn't happen
 			return 1.0f;
 		}
 
@@ -157,7 +157,7 @@ class CncUnitCalculatorBase {
 				case ft: 		return "ft";
 			}
 
-			// should not happen
+			// didn't happen
 			return "";
 		}
 
@@ -174,26 +174,25 @@ class CncUnitCalculatorBase {
 			else if ( strncmp (u, "m" , 1) == 0) { unit = m;	return true; }
 			else if ( strncmp (u, "in", 2) == 0) { unit = in; 	return true; }
 			else if ( strncmp (u, "ft", 2) == 0) { unit = ft; 	return true; }
-
-
+			
 			std::cerr 	<< "CncUnitCalculator::determineUnit: Unsupported unit: "
 						<< u
 						<< std::endl;
-
+			
 			return false;
 		}
-
+		
 		///////////////////////////////////////////////////////////////////
 		static unsigned int getDefaultPPI()					 		{ return DEFAULT_PPI; }
-
+		
 		///////////////////////////////////////////////////////////////////
 		unsigned int getPPI()	 							const 	{ return PPI; }
 		float getFactor()									const 	{ return getFactor_UnitToPx(iUnit) * getFactor_PxToUnit(oUnit); }
-
+		
 		///////////////////////////////////////////////////////////////////
 		const CncUnitCalculatorBase::Unit getInputUnit() 	const	{ return iUnit; }
 		const CncUnitCalculatorBase::Unit getOutputUnit() 	const	{ return oUnit; }
-
+		
 		///////////////////////////////////////////////////////////////////
 		const char* getInputUnitAsStr() 					const 	{ return getUnitAsStr(iUnit); }
 		const char* getOutputUnitAsStr()				 	const	{ return getUnitAsStr(oUnit); }
@@ -329,93 +328,79 @@ struct UC {
 	static float CNV_MM_TO_IN(const float v) { wxASSERT(MM_TO_IN); return MM_TO_IN->convert(v); }
 };
 
+////////////////////////////////////////////////////////////////////////
+class CncResolutionCalculator {
+	
+	public:
+		
+		/////////////////////////////////////////////////////////////////////
+		static unsigned int getPointsPerInchForUnit(const CncUnitCalculatorBase::Unit unit, float res) {
+			typedef CncUnitCalculatorBase::Unit Unit;
+			
+			res = res < 0.0001 ? 0.0001 : res;
+			res = res > 1.0    ? 1.0    : res;
+			
+			
+			// ret = 1 / res * 1inch representation
+			switch( unit ) {
+				// important: for px, pc and pc the inch representation is calculated 
+				// with the default PPI of CncUnitCalculatorBase
+//				case Unit::px: 		return 1.0 / res * uc.getFactor_UnitToPx(Unit::px) * uc.getFactor_PxToUnit(Unit::in);
+//				case Unit::pt:		return 1.0 / res * uc.getFactor_UnitToPx(Unit::pt) * uc.getFactor_PxToUnit(Unit::in);
+//				case Unit::pc:		return 1.0 / res * uc.getFactor_UnitToPx(Unit::pc) * uc.getFactor_PxToUnit(Unit::in);
+
+				case Unit::px:
+				case Unit::pt:
+				case Unit::pc:	{	CncUnitCalculator<float> uc(unit, Unit::in); 
+									return uc.convert(1.0) / res;
+								}
+
+				case Unit::mm: 		return 25.4f	/	res;
+				case Unit::cm: 		return  2.54f	/	res;
+				case Unit::m: 		return  0.0254f	/	res;
+				case Unit::in: 		return  1.0f	/	res;
+				case Unit::ft: 		return 12.0f	/	res;
+			}
+			
+			// didn't happen
+			return 1;
+		}
+		
+		/////////////////////////////////////////////////////////////////////
+		static float getResolutionForUnit(const CncUnitCalculatorBase::Unit unit, unsigned int ppi) {
+			typedef CncUnitCalculatorBase::Unit Unit;
+			
+			// ret = 1in representation / ppi;
+			switch( unit ) {
+				// important: for px, pc and pc the inch representation is calculated 
+				// with the default PPI of CncUnitCalculatorBase
+				case Unit::px:
+				case Unit::pt:
+				case Unit::pc:	{ 
+									CncUnitCalculator<float> uc(unit, Unit::in, ppi); 
+									return uc.convert(1.0) / ppi;
+								}
+
+				case Unit::mm: 		return 25.4f 		/ ppi;
+				case Unit::cm: 		return  2.54f 		/ ppi;
+				case Unit::m: 		return  0.0254f 	/ ppi;
+				case Unit::in: 		return  1.0f 		/ ppi;
+				case Unit::ft: 		return 12.0f 		/ ppi;
+			}
+			
+			// didn't happen
+			return 1.0f;
+		}
+};
 
 ////////////////////////////////////////////////////////////////////////
 struct CncUnitCalculatorTest {
+	static void test();
+};
 
-	static void test() {
-
-		#define CONVERT_AND_TRACE(value) \
-			std::cout << value << uc.getInputUnitAsStr() << "\t=\t" << uc.convert(value) << uc.getOutputUnitAsStr() << std::endl; 
-
-		typedef CncUnitCalculatorBase::Unit Unit;
-
-		{
-			CncUnitCalculator<double> uc(Unit::px, Unit::mm);
-			std::cout << uc << std::endl;;
-			CONVERT_AND_TRACE(  1.0)
-			CONVERT_AND_TRACE( 10.0)
-			CONVERT_AND_TRACE(112.0)
-			CONVERT_AND_TRACE(  2.4)
-		}
-		{
-			CncUnitCalculator<float> uc(Unit::px, Unit::mm);
-			std::cout << uc << std::endl;;
-			CONVERT_AND_TRACE(  1.0)
-			CONVERT_AND_TRACE( 10.0)
-			CONVERT_AND_TRACE(112.0)
-			CONVERT_AND_TRACE(  2.4)
-		}
-		{
-			CncUnitCalculator<float> uc(Unit::mm, Unit::cm);
-			std::cout << uc << std::endl;;
-			CONVERT_AND_TRACE(  1.0)
-			CONVERT_AND_TRACE( 10.0)
-			CONVERT_AND_TRACE(112.0)
-			CONVERT_AND_TRACE(  2.4)
-		}
-		{
-			CncUnitCalculator<float> uc(Unit::mm, Unit::mm);
-			std::cout << uc << std::endl;;
-			CONVERT_AND_TRACE(  1.0)
-			CONVERT_AND_TRACE( 10.0)
-			CONVERT_AND_TRACE(112.0)
-			CONVERT_AND_TRACE(  2.4)
-		}
-		{
-			CncUnitCalculator<float> uc = *UC::PX_TO_MM;
-			std::cout << uc << std::endl;
-			CONVERT_AND_TRACE((double)  1.0)
-			CONVERT_AND_TRACE((double) 10.0)
-			CONVERT_AND_TRACE((double)112.0)
-			CONVERT_AND_TRACE((double)  2.4)
-		}
-		{
-			CncUnitCalculator<double> uc(Unit::px, Unit::mm);
-			std::cout << uc << std::endl;
-			CONVERT_AND_TRACE((double)  1.0)
-			CONVERT_AND_TRACE((double) 10.0)
-			CONVERT_AND_TRACE((double)112.0)
-			CONVERT_AND_TRACE((double)  2.4)
-			
-			uc.changeOutputUnit(Unit::in);
-			std::cout << uc << std::endl;
-			CONVERT_AND_TRACE((double) 96.0)
-			CONVERT_AND_TRACE((double) 10.0)
-			CONVERT_AND_TRACE((double)112.0)
-			CONVERT_AND_TRACE((double)  2.4)
-			
-			uc.changeOutputUnit(Unit::px);
-			std::cout << uc << std::endl;
-			CONVERT_AND_TRACE((double)  1.0)
-			CONVERT_AND_TRACE((double) 10.0)
-			CONVERT_AND_TRACE((double)112.0)
-			CONVERT_AND_TRACE((double)  2.4)
-			
-			uc.changeInputUnit(Unit::in);
-			std::cout << uc << std::endl;
-			CONVERT_AND_TRACE((double)  1.0)
-			CONVERT_AND_TRACE((double) 10.0)
-			CONVERT_AND_TRACE((double)112.0)
-			CONVERT_AND_TRACE((double)  2.4)
-		}
-		{
-			std::cout << std::endl;
-			std::cout << UC::CNV_PX_TO_MM(96) << std::endl;
-		}
-
-		#undef CONVERT_AND_TRACE
-	}
+////////////////////////////////////////////////////////////////////////
+struct CncResolutionCalculatorTest {
+	static void test();
 };
 
 #endif

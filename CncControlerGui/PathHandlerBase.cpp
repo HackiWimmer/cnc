@@ -1,5 +1,5 @@
 #include <iostream>
-#include "SVGUnitCalculator.h"
+#include "CncUnitCalculator.h"
 #include "SVGCurveLib.h"
 #include "CncConfig.h"
 #include "FileParser.h"
@@ -32,7 +32,9 @@ void PathHandlerBase::initCurrentPos(const CncDoublePosition& pos) {
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::setCurveLibResolution(float res) { 
 //////////////////////////////////////////////////////////////////
-	CncConfig::setCurveLibIncrement(res); 
+	std::cerr << "PathHandlerBase::setCurveLibResolution is obsolete" << std::endl;
+	#warning
+	//CncConfig::setCurveLibIncrement(res); 
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::setPathList(const CncPathListManager& newPathList) {
@@ -291,7 +293,7 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 	
 	// define the curve lib function
 	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
-		SvgUnitCalculator::getDPI(), 
+		CncUnitCalculatorBase::getDefaultPPI(),
 		[&](float t) {
 			return SVGCurveLib::PointOnEllipticalArc(args.p0, 
 			                                         args.rx, 
@@ -305,7 +307,7 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 	);
 	
 	// process the curve
-	float increment = CncConfig::CncConfig::calcCurveLibIncrement(px, linearCurve.resultantInfo.arcLength);
+	float increment = GBL_CONFIG->calcCurveLibIncrement(unitCalculator.getInputUnit(), linearCurve.resultantInfo.arcLength);
 	appendDebugValueDetail("CurveLibRes", increment);
 	
 	for ( float t = 0.0f; t <= 1.0f; t += increment ) {
@@ -361,7 +363,7 @@ bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double 
 	
 	// define the curve lib function
 	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
-		SvgUnitCalculator::getDPI(), 
+		CncUnitCalculatorBase::getDefaultPPI(),
 		[&](float t) 
 		{
 			return SVGCurveLib::PointOnQuadraticBezierCurve(args.p0, 
@@ -372,7 +374,7 @@ bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double 
 	);
 	
 	// process the curve
-	float increment = CncConfig::CncConfig::calcCurveLibIncrement(px, linearCurve.resultantInfo.arcLength);
+	float increment = GBL_CONFIG->calcCurveLibIncrement(unitCalculator.getInputUnit(), linearCurve.resultantInfo.arcLength);
 	appendDebugValueDetail("CurveLibRes", increment);
 	
 	for ( float t = 0.0f; t < 1.0f; t += increment ) {
@@ -437,7 +439,7 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 	
 	// define the curve lib function
 	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
-		SvgUnitCalculator::getDPI(), 
+		CncUnitCalculatorBase::getDefaultPPI(),
 		[&](float t) 
 		{
 			return SVGCurveLib::PointOnCubicBezierCurve(args.p0, 
@@ -449,7 +451,7 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 	);
 	
 	// process the curve
-	float increment = CncConfig::calcCurveLibIncrement(px, linearCurve.resultantInfo.arcLength);
+	float increment = GBL_CONFIG->calcCurveLibIncrement(unitCalculator.getInputUnit(), linearCurve.resultantInfo.arcLength);
 	appendDebugValueDetail("CurveLibRes", increment);
 	
 	for ( float t = 0.0f; t < 1.0f; t += increment ) {
@@ -624,10 +626,7 @@ bool PathHandlerBase::processLinearMove(bool alreadyRendered) {
 	double newPosAbsY = currentPos.getY();
 	
 	// first perform the transformations . . .
-	#warning
-	//std::cout << newPosAbsX << ", " << newPosAbsY;
 	transform(newPosAbsX, newPosAbsY);
-	//std::cout << " | " << newPosAbsX << ", " << newPosAbsY << std::endl;
 	
 	//  . . . then convert the input unit to mm . . 
 	newPosAbsX = unitCalculator.convert(newPosAbsX);

@@ -198,7 +198,7 @@ class SVGUserAgent{
 
 		/////////////////////////////////////////////////////////
 		bool addID(const wxString& id, const char* nodeName = "") {
-			if ( id != "" ) {
+			if ( id.IsEmpty() == false ) {
 				collectedIds[id] = nodeName;
 				return true;
 			}
@@ -206,15 +206,16 @@ class SVGUserAgent{
 		}
 		/////////////////////////////////////////////////////////
 		bool addTransform(const wxString& cmd) {
-			if ( cmd != "" ) {
+			if ( cmd.IsEmpty() == false ) {
 				collectedTransforms.push_back(cmd);
 				return true;
 			}
+			
 			return false;
 		}
 		/////////////////////////////////////////////////////////
 		bool addStyle(const wxString& s) {
-			if ( s != "" ) {
+			if ( s.IsEmpty() == false ) {
 				collectedStyles.push_back(s);
 				return true;
 			}
@@ -257,12 +258,9 @@ class SVGUserAgent{
 				addID(attribute->GetValue(), "#elem");
 				elementId = attribute->GetValue();
 			}
-				
-			if ( attribute->GetName() == "transform" )
-				addTransform(attribute->GetValue());
-
+			
 			collectedAttributes[attribute->GetName()] = attribute->GetValue();
-
+			
 			// recursion call to get the compelete depth
 			return addXMLAttributes(attribute->GetNext());
 		}

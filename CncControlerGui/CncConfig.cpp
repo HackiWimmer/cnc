@@ -3,6 +3,7 @@
 #include "MainFrame.h"
 #include "wxcrafter.h"
 #include "CncConfigCommon.h"
+#include "CncUnitCalculator.h"
 #include "CncConfig.h"
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
@@ -11,8 +12,6 @@ wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 // init static members
 unsigned int CncConfig::globalPropertyCounter	= 0;
 CncConfig*   CncConfig::globalCncConfig 		= NULL;
-wxComboBox*  CncConfig::gblCurveLibSelector 	= NULL; 
-float        CncConfig::curveLibIncrement 		= 0.01;
 
 ////////////////////////////////////////////////////////////////////////
 // global variables - uses in dedicated pages
@@ -20,6 +19,8 @@ wxPropertyGridManager* globlSetupGrid 	= NULL;
 
 ConfigPGEventMap  globalPGEventMap;
 ConfigPropertyMap globalPropertyMap;
+
+const wxString    renderSelectorFormat("%0.2lf mm");
 
 ////////////////////////////////////////////////////////////////////////
 const wxString& CncConfig::ToolMagazineEntry::serialize(wxString& ret ) {
@@ -77,6 +78,7 @@ CncConfig::CncConfig(MainFrame* app)
 , onlineUpdateDrawPane(true)
 , allowEventHandling(true)
 , updateInterval(100)
+, renderResolutionMM(0.1)
 ////////////////////////////////////////////////////////////////////////
 {
 	registerWindowForConfigNotification(app);
@@ -790,43 +792,99 @@ void CncConfig::calculateThresholds() {
 	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y)->SetValue((int)replyThresholdY);
 	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z)->SetValue((int)replyThresholdZ);
 }
+
+
+
+
+
 ////////////////////////////////////////////////////////////////////////
-float CncConfig::getDefaultCurveLibResolution() {
+float CncConfig::calcCurveLibIncrement(Unit unit, float pathLength) {
 ////////////////////////////////////////////////////////////////////////
-	return SvgUnitCalculator::getDPI();
+	
+	#warning move this to PathHandlerBase
+	
+	CncUnitCalculator<float> uc(Unit::mm, unit);
+
+	switch( unit ) {
+		case Unit::px: 		return  1.0f   * renderResolutionMM;
+		case Unit::pt:		return  0.75f  * renderResolutionMM;
+		case Unit::pc:		return  0.065f * renderResolutionMM;
+
+		case Unit::mm:		return renderResolutionMM;
+		case Unit::cm:
+		case Unit::m:
+		case Unit::in:
+		case Unit::ft: 		return uc.convert(renderResolutionMM);
+	}
+	
+	
+	
+	return 1.0;
 }
 ////////////////////////////////////////////////////////////////////////
-float CncConfig::getCurveLibIncrement() { 
+void CncConfig::setRenderResolution(double res) {
 ////////////////////////////////////////////////////////////////////////
-	return curveLibIncrement; 
+	renderResolutionMM = res < 0.01 ? 0.01 : res;
+	renderResolutionMM = res > 1.0  ? 1.0  : renderResolutionMM;
+	
+	if ( THE_APP == NULL )
+		return;
+		
+	wxComboBox* cb = THE_APP->GetCbRenderResolution();
+	wxString item(wxString::Format(renderSelectorFormat, renderResolutionMM));
+
+	int itemExits  = cb->FindString(item);
+	if ( itemExits < 0 )
+		cb->Append(item);
+		
+	cb->SetStringSelection(item);
+	
+	typedef CncUnitCalculatorBase::Unit Unit;
+	unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
+	THE_APP->GetTxRenderPPI()->ChangeValue(wxString::Format("%u PPI", ppi));
 }
 ////////////////////////////////////////////////////////////////////////
-float CncConfig::calcCurveLibIncrement(SVGUnit unit, float pathLength) {
+void CncConfig::setRenderResolution(const wxString& sel) {
 ////////////////////////////////////////////////////////////////////////
+	int pos = sel.First('m'); // from mm
+	if ( pos <= 0 )
+		pos = sel.length();
 	
-	//std::cout << pathLength << ", ";
+	wxString selection = sel.SubString(0, pos - 1);
+	double resolution; selection.ToDouble(&resolution);
 	
-	pathLength *= (float)SvgUnitCalculator::getFactorMM2Unit(unit);
-	
-	
-	
-	
-	//std::cout << pathLength << ", " <<  1/curveLibIncrement << ", " << 1/(pathLength * 1/curveLibIncrement) *SvgUnitCalculator::getDPI() << std::endl;
-	
-	return 1/(pathLength * 1/curveLibIncrement) * SvgUnitCalculator::getDPI();
+	setRenderResolution(resolution);
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::setCurveLibIncrement(double v) { 
+void CncConfig::setupSelectorRenderResolution() {
 ////////////////////////////////////////////////////////////////////////
-	curveLibIncrement = (float)v; 
-	updateCurveLibIncrementSelector();
+	if ( THE_APP != NULL ) {
+		wxComboBox* cb = THE_APP->GetCbRenderResolution();
+		cb->Clear();
+		
+		cb->Append(wxString::Format(renderSelectorFormat, 0.01));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.02));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.03));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.04));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.05));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.06));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.07));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.08));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.09));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.10));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.20));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.30));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.40));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.50));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.60));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.70));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.80));
+		cb->Append(wxString::Format(renderSelectorFormat, 0.90));
+		
+		setRenderResolution(0.2);
+	}
 }
-////////////////////////////////////////////////////////////////////////
-void CncConfig::updateCurveLibIncrementSelector() { 
-////////////////////////////////////////////////////////////////////////
-	if ( CncConfig::gblCurveLibSelector != NULL )
-		CncConfig::gblCurveLibSelector->SetStringSelection(wxString::Format("%.3f", CncConfig::curveLibIncrement));
-}
+
 ////////////////////////////////////////////////////////////////////////
 // config getters
 #define PROPERTY( id ) wxPGProperty* p = getProperty(id); wxASSERT(p); 

@@ -83,6 +83,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void motionMonitorPostionMarker(wxCommandEvent& event);
+    virtual void motionMonitorFlyPath(wxCommandEvent& event);
+		virtual void updateRenderResolution(wxCommandEvent& event);
 		virtual void toggleIdleRequests(wxCommandEvent& event);
 		virtual void cncMainViewChanged(wxNotebookEvent& event);
 		virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event);
@@ -345,7 +348,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void viewMonitor(wxCommandEvent& event);
 		virtual void hideAllAuiPanes(wxCommandEvent& event);
 		virtual void viewAllAuiPanes(wxCommandEvent& event);
-		virtual void updateCurveLibResolution(wxCommandEvent& event);
 		virtual void testFunction1(wxCommandEvent& event);
 		virtual void testFunction2(wxCommandEvent& event);
 		virtual void testFunction3(wxCommandEvent& event);
@@ -640,7 +642,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void updateStepDelay();
 		void updateUnit();
 		void updateFileContentPosition();
-		void updateCurveLibResolution();
+		void updateRenderResolution();
 		
 		void decorateSearchButton();
 		void decoratePosSpyConnectButton(bool state);

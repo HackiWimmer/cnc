@@ -245,7 +245,9 @@ void CncReferencePosition::mode6(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::init(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxPoint pos = {10, 60};
+	wxPoint pos = parentFrame->GetScreenPosition();
+	pos.x += 16;
+	pos.y += 60;
 	SetPosition(pos);
 	
 	SetAffirmativeId(m_btSet->GetId());

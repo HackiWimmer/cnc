@@ -340,7 +340,7 @@ bool SVGFileParser::performPath(SVGUserAgentInfo& uai) {
 		pathHandler->getSvgTransformMatrix().unchanged();
 		
 		if ( uai.hasTransform() ) {
-			// transfrom collected transformations
+			// transform collected transformations
 			if ( performTransform(uai) == false )
 				return false;
 		}
@@ -634,17 +634,17 @@ bool SVGFileParser::processXMLNode(wxXmlNode *child) {
 		// close the id, transform and style attribute (on demand)
 		if ( last != NULL ) {
 			wxString a(last->GetAttribute("id", ""));
-			if ( a != "" )
+			if ( a.IsEmpty() == false )
 				svgUserAgent.removeId(a);
 				
 			a.assign(last->GetAttribute("transform", ""));
-			if ( a != "" )
+			if ( a.IsEmpty() == false )
 				svgUserAgent.removeLastTransform();
 			
 			// only style attributes frmom <g> are colleted before
 			if ( last->GetName().Upper() == "G" ) {
 				a.assign(last->GetAttribute("style", ""));
-				if ( a != "" )
+				if ( a.IsEmpty() == false )
 					svgUserAgent.removeLastStyle();
 			}
 		}

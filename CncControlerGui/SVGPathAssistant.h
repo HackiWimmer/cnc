@@ -13,25 +13,20 @@ class SVGPathAssistant {
 		SVGPathHandlerBase* pathHandler;
 		SVGNodeParser parser;
 		
-		float prevCurveLibResoluton;
-		
 	public:
 		////////////////////////////////////////////////////////////
 		SVGPathAssistant()
 		: pathHandler(new SVGPathHandlerBase())
 		, parser(pathHandler)
-		, prevCurveLibResoluton(CncConfig::getCurveLibIncrement())
 		{
-			pathHandler->setCurveLibResolution(CncConfig::getDefaultCurveLibResolution());
 			pathHandler->prepareWork();
 		}
 		
 		////////////////////////////////////////////////////////////
 		~SVGPathAssistant() {
-			CncConfig::setCurveLibIncrement(prevCurveLibResoluton);
 		}
 		
-		void setCurveLibResolution(float res) { pathHandler->setCurveLibResolution(res); }
+		void setCurveLibResolution(float res) { std::cerr << "SVGPathAssistant:: setCurveLibResolution is obsolete" << std::endl; pathHandler->setCurveLibResolution(res); }
 		
 		void setPathList(const CncPathListManager& newPathList) { pathHandler->setPathList(newPathList); }
 		const CncPathListManager& getPathList() { return pathHandler->getPathList(); }

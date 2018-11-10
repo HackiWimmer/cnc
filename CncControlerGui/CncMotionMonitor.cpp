@@ -277,6 +277,7 @@ void CncMotionMonitor::onPaint() {
 	
 	if ( isShown )	monitor->reshape(cs.GetWidth(), cs.GetHeight());
 	else 			monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
+	
 	monitor->display();
 	
 	// update additional controls
@@ -395,7 +396,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 	}
 	
 	// move origin
-	if ( event.ControlDown() == true ) {
+	if ( event.ControlDown() == false ) {
 		static int lx = 0, ly = 0;
 		static int mx = 0, my = 0;
 		

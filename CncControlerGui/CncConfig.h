@@ -8,7 +8,7 @@
 #include <wx/valnum.h>
 #include <wx/combobox.h>
 #include <wx/propgrid/propgrid.h>
-#include "SvgUnitCalculator.h"
+#include "CncUnitCalculator.h"
 #include "CncArduino.h"
 #include "DataControlModel.h"
 #include "CncCommon.h"
@@ -37,10 +37,11 @@ typedef std::map<wxWindow*, wxWindow*> RegisteredWindows;
 static const int TOOL_MAGAZINE_MIN_ID = -1;
 static const int TOOL_MAGAZINE_MAX_ID = 999;
 
-
 class CncConfig {
 	
 	public:
+		typedef CncUnitCalculatorBase::Unit Unit;
+		
 		struct ToolMagazineEntry {
 		
 			double diameter 	= 0.0;
@@ -95,6 +96,7 @@ class CncConfig {
 		bool onlineUpdateDrawPane;
 		bool allowEventHandling;
 		int updateInterval;
+		double renderResolutionMM;
 		
 		const wxString defaultConfigValue = "";
 		static unsigned int globalPropertyCounter;
@@ -140,6 +142,8 @@ class CncConfig {
 		unsigned int calculateThreshold(double pitch, unsigned int steps);
 		void calculateThresholds();
 		
+		
+		
 		void sc();
 		void rc();
 		
@@ -155,8 +159,6 @@ class CncConfig {
 		
 		// global config pointer - don't use this directly
 		static CncConfig* globalCncConfig;
-		static wxComboBox* gblCurveLibSelector;
-		static float curveLibIncrement;
 		
 		ToolMagazine& getToolMagazine() { return toolMagazine; }
 		ToolMagazineParameter& getToolMagazineParameter() { return toolMagazineParameter; }
@@ -181,13 +183,16 @@ class CncConfig {
 		};
 		
 		// curve lib utils
-		static float getDefaultCurveLibResolution();
-		static float getCurveLibIncrement();
+		const unsigned int getRenderResolution() const { return renderResolutionMM; }
+		void setRenderResolution(double res);
+		void setRenderResolution(const wxString& sel);
 		
-		static float calcCurveLibIncrement(SVGUnit unit, float pathLength);
 		
-		static void setCurveLibIncrement(double v);
-		static void updateCurveLibIncrementSelector();
+		
+		float calcCurveLibIncrement(Unit unit, float pathLength);
+		
+		// curve lib gui utils
+		void setupSelectorRenderResolution();
 		
 		// user events
 		void loadConfiguration(wxConfigBase& config);

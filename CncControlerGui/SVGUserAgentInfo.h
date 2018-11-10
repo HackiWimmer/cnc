@@ -46,7 +46,7 @@ struct SVGUserAgentInfo {
 						return true;
 				}
 			} else {
-				for (DoubleStringMap::iterator it=ids.begin(); it!=ids.end(); ++it) {
+				for (auto it=ids.begin(); it!=ids.end(); ++it) {
 					if ( it->second == type )
 						return true;
 				}
@@ -110,7 +110,7 @@ struct SVGUserAgentInfo {
 		
 		/////////////////////////////////////////////////////////
 		void debug(DoubleStringMap& dsm, std::ostream& out) {
-			for (DoubleStringMap::iterator it=dsm.begin(); it!=dsm.end(); ++it) {
+			for (auto it=dsm.begin(); it!=dsm.end(); ++it) {
 				out << it->first;
 				out << "=";
 				out << it->second;
@@ -134,7 +134,7 @@ struct SVGUserAgentInfo {
 				cncParameters.getParameterList(rows);
 				
 				value.clear();
-				for (DoubleStringMap::iterator it=attributes.begin(); it!=attributes.end(); ++it) {
+				for (auto it=attributes.begin(); it!=attributes.end(); ++it) {
 					value += it->first;
 					value += "=";
 					value += it->second;
@@ -144,7 +144,7 @@ struct SVGUserAgentInfo {
 
 				value.clear();
 				DataControlModel::addKeyValueRow(rows, "IDs", (int)ids.size());
-				for (DoubleStringMap::iterator it=ids.begin(); it!=ids.end(); ++it) {
+				for (auto it=ids.begin(); it!=ids.end(); ++it) {
 					value  = it->second;
 					value += "(";
 					value += it->first;
@@ -153,12 +153,12 @@ struct SVGUserAgentInfo {
 				}
 				
 				DataControlModel::addKeyValueRow(rows, "transform", (int)transformList.size());
-				for (TransformVector::iterator it=transformList.begin(); it!=transformList.end(); ++it) {
+				for (auto it=transformList.begin(); it!=transformList.end(); ++it) {
 					DataControlModel::addKeyValueRow(rows, "  cmd", *it);
 				}
 				
 				DataControlModel::addKeyValueRow(rows, "style", (int)styleList.size());
-				for (StyleVector::iterator it=styleList.begin(); it!=styleList.end(); ++it) {
+				for (auto it=styleList.begin(); it!=styleList.end(); ++it) {
 					DataControlModel::addKeyValueRow(rows, "  style", *it);
 				}
 			}
@@ -167,7 +167,7 @@ struct SVGUserAgentInfo {
 		/////////////////////////////////////////////////////////
 		const char* getTransformInfoAsString() {
 			transformInfoString.clear();
-			for (TransformVector::iterator it=transformList.begin(); it!=transformList.end(); ++it) {
+			for (auto it=transformList.begin(); it!=transformList.end(); ++it) {
 				transformInfoString.append(*it);
 				transformInfoString.append(" ");
 			}
@@ -178,7 +178,7 @@ struct SVGUserAgentInfo {
 		/////////////////////////////////////////////////////////
 		const char* getStyleInfoAsString() {
 			styleInfoString.clear();
-			for (StyleVector::iterator it=styleList.begin(); it!=styleList.end(); ++it) {
+			for (auto it=styleList.begin(); it!=styleList.end(); ++it) {
 				styleInfoString.append(*it);
 				styleInfoString.append(" ");
 			}
@@ -205,7 +205,7 @@ struct SVGUserAgentInfo {
 				return;
 				
 			DataControlModel::addKeyValueRow(rows, "Path", originalPath);
-			for ( PathInfoVector::iterator it=pathInfoList.begin(); it!=pathInfoList.end(); ++it ) {
+			for ( auto it=pathInfoList.begin(); it!=pathInfoList.end(); ++it ) {
 				PathInfo pi = *it;
 				wxString command;
 				command << pi.cmd;

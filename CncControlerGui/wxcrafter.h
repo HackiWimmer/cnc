@@ -25,19 +25,19 @@
 #include <wx/stattext.h>
 #include <wx/bmpcbox.h>
 #include <wx/slider.h>
+#include <wx/combobox.h>
+#include <wx/arrstr.h>
+#include <wx/textctrl.h>
 #include <wx/tglbtn.h>
 #include <wx/button.h>
 #include <wx/panel.h>
 #include <wx/choice.h>
-#include <wx/arrstr.h>
 #include <wx/simplebook.h>
 #include <wx/imaglist.h>
 #include <wx/statline.h>
 #include <wx/notebook.h>
 #include <wx/statbmp.h>
-#include <wx/combobox.h>
 #include <wx/stc/stc.h>
-#include <wx/textctrl.h>
 #include <wx/dataview.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
@@ -95,7 +95,6 @@ protected:
     wxBitmapButton* m_btSelectInboundPreview;
     wxBitmapButton* m_btSelectCncPreview;
     wxBitmapButton* m_btSelectTemplatePreview;
-    wxStaticText* m_staticText1748;
     wxMenu* m_configStepDelayMenu;
     wxMenuItem* m_miCfgStepDelayMin;
     wxMenuItem* m_miCfgStepDelayMax;
@@ -103,6 +102,9 @@ protected:
     wxMenuItem* m_miCfgCustom;
     wxSlider* m_stepDelay;
     wxStaticText* m_stepDelayValue;
+    wxStaticText* m_staticText16032;
+    wxComboBox* m_cbRenderResolution;
+    wxTextCtrl* m_txRenderPPI;
     wxBitmapButton* m_rcReset;
     wxBitmapToggleButton* m_btProbeMode;
     wxBitmapToggleButton* m_btSpeedControl;
@@ -430,15 +432,14 @@ protected:
     wxTextCtrl* m_controllerMsgHistory;
     wxPanel* m_3DPane;
     wxPanel* m_placeholderPanel;
+    wxBitmapToggleButton* m_bmpToggleBtn59541;
+    wxBitmapToggleButton* m_bmpToggleBtn5954;
     wxStaticLine* m_staticLine5016;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
     wxButton* m_3D_Refreh;
     wxButton* m_3D_Clear;
     wxStaticLine* m_staticLine47803;
-    wxStaticText* m_staticText16032;
-    wxComboBox* m_cbCurveLibResolution;
-    wxStaticLine* m_staticLine4780;
     wxStaticText* m_staticText32334;
     wxSlider* m_displayInterval;
     wxPanel* m_3DOutboundControl;
@@ -743,6 +744,7 @@ protected:
     virtual void cfgStepDelayArduino(wxCommandEvent& event) { event.Skip(); }
     virtual void stepDelayChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void stepDelayThumbtrack(wxScrollEvent& event) { event.Skip(); }
+    virtual void updateRenderResolution(wxCommandEvent& event) { event.Skip(); }
     virtual void rcReset(wxCommandEvent& event) { event.Skip(); }
     virtual void clickProbeMode(wxCommandEvent& event) { event.Skip(); }
     virtual void clickSpeedControl(wxCommandEvent& event) { event.Skip(); }
@@ -865,10 +867,11 @@ protected:
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
+    virtual void motionMonitorPostionMarker(wxCommandEvent& event) { event.Skip(); }
+    virtual void motionMonitorFlyPath(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void refreshMotionMonitor(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMotionMonitor(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateCurveLibResolution(wxCommandEvent& event) { event.Skip(); }
     virtual void displayIntervalThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
@@ -1009,9 +1012,11 @@ public:
     wxBitmapButton* GetBtSelectInboundPreview() { return m_btSelectInboundPreview; }
     wxBitmapButton* GetBtSelectCncPreview() { return m_btSelectCncPreview; }
     wxBitmapButton* GetBtSelectTemplatePreview() { return m_btSelectTemplatePreview; }
-    wxStaticText* GetStaticText1748() { return m_staticText1748; }
     wxSlider* GetStepDelay() { return m_stepDelay; }
     wxStaticText* GetStepDelayValue() { return m_stepDelayValue; }
+    wxStaticText* GetStaticText16032() { return m_staticText16032; }
+    wxComboBox* GetCbRenderResolution() { return m_cbRenderResolution; }
+    wxTextCtrl* GetTxRenderPPI() { return m_txRenderPPI; }
     wxBitmapButton* GetRcReset() { return m_rcReset; }
     wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
     wxBitmapToggleButton* GetBtSpeedControl() { return m_btSpeedControl; }
@@ -1337,15 +1342,14 @@ public:
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
     wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
+    wxBitmapToggleButton* GetBmpToggleBtn59541() { return m_bmpToggleBtn59541; }
+    wxBitmapToggleButton* GetBmpToggleBtn5954() { return m_bmpToggleBtn5954; }
     wxStaticLine* GetStaticLine5016() { return m_staticLine5016; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
     wxButton* Get3D_Refreh() { return m_3D_Refreh; }
     wxButton* Get3D_Clear() { return m_3D_Clear; }
     wxStaticLine* GetStaticLine47803() { return m_staticLine47803; }
-    wxStaticText* GetStaticText16032() { return m_staticText16032; }
-    wxComboBox* GetCbCurveLibResolution() { return m_cbCurveLibResolution; }
-    wxStaticLine* GetStaticLine4780() { return m_staticLine4780; }
     wxStaticText* GetStaticText32334() { return m_staticText32334; }
     wxSlider* GetDisplayInterval() { return m_displayInterval; }
     wxPanel* GetRotatePaneZ3D() { return m_rotatePaneZ3D; }

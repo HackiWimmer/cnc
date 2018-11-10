@@ -45,14 +45,14 @@ class SVGTransformMatrix {
 			
 			if ( trace ) std::clog << cmd.c_str() << std::endl;
 			
-			if (      cmd == "translate" ) 	ret = tmp.translate(parameters);
-			else if ( cmd == "scale" )		ret = tmp.scale(parameters);
-			else if ( cmd == "rotate" ) 	ret = tmp.rotate(parameters);
-			else if ( cmd == "skewX" ) 		ret = tmp.skewX(parameters);
-			else if ( cmd == "skewY" ) 		ret = tmp.skewY(parameters);
-			else if ( cmd == "matrix" )		ret = tmp.matrix(parameters);
+			if (      cmd == "translate" ) 	ret = tmp.translate (parameters);
+			else if ( cmd == "scale" )		ret = tmp.scale     (parameters);
+			else if ( cmd == "rotate" ) 	ret = tmp.rotate    (parameters);
+			else if ( cmd == "skewX" ) 		ret = tmp.skewX     (parameters);
+			else if ( cmd == "skewY" ) 		ret = tmp.skewY     (parameters);
+			else if ( cmd == "matrix" )		ret = tmp.matrix    (parameters);
 			else {
-				std::cerr << "SVGFileParser::performTransform: " << cmd.c_str() << " is currently not supported" << std::endl;
+				std::cerr << "SVGTransformMatrix::performTransform: " << cmd.c_str() << " is currently not supported" << std::endl;
 			}
 			
 			if ( ret == true ) {
@@ -62,7 +62,7 @@ class SVGTransformMatrix {
 			}
 			
 			if ( ret == false ) {
-				std::cerr << "SVGFileParser::performTransform: Failed" << std::endl;
+				std::cerr << "SVGTransformMatrix::performTransform: Failed" << std::endl;
 				std::cerr << "Command: " << cmd.c_str() << std::endl;
 				for (TransformParameterList::iterator it=parameters.begin(); it!=parameters.end(); ++it) {
 					std::cerr << " Para  : " << *it << std::endl;

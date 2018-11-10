@@ -517,7 +517,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_btSelectInboundPreview);
 	registerGuiControl(m_btSelectCncPreview);
 	registerGuiControl(m_btSelectTemplatePreview);
-	registerGuiControl(m_cbCurveLibResolution);
+	registerGuiControl(m_cbRenderResolution);
 	registerGuiControl(m_3D_Refreh);
 	registerGuiControl(m_3D_Clear);
 	registerGuiControl(m_cbContentPosSpy);
@@ -663,14 +663,15 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	std::cout << UC::CNV_PX_TO_MM(96) << std::endl;
-	std::cout << *UC::PX_TO_MM << std::endl;
+	GBL_CONFIG->setRenderResolution(0.44);
+	GBL_CONFIG->setRenderResolution(1.4444);
+	GBL_CONFIG->setRenderResolution(0.0);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	CncUnitCalculatorTest::test();
+	CncResolutionCalculatorTest::test();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -1641,8 +1642,7 @@ void MainFrame::initialize(void) {
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
 	
 	// curve lib resulotion
-	CncConfig::gblCurveLibSelector = m_cbCurveLibResolution;
-	CncConfig::setCurveLibIncrement(0.03f);
+	GBL_CONFIG->setupSelectorRenderResolution();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeCncControl() {
@@ -3600,7 +3600,7 @@ void MainFrame::collectSummary() {
 	cncSummaryListCtrl->addHeadline(PT::PT_HEADLINE, "Common Settings");
 	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Tool", 					cc->getDefaultToolParamAsString(),												"-");
 	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Workpiece thickness", 				wxString::Format("%4.3f", 	cc->getWorkpieceThickness()),						"mm");
-	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Curve lib resolution", 			wxString::Format("%.3lf", 	CncConfig::getCurveLibIncrement()),					"-");
+	//cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Curve lib resolution", 			wxString::Format("%0.3f", 	cc->getRenderResolution()),							"-");
 	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Papid speed", 				wxString::Format("%4.3f", 	cc->getDefaultRapidSpeed_MM_MIN()),					"mm/min");
 	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Default Work speed", 				wxString::Format("%4.3f", 	cc->getDefaultWorkSpeed_MM_MIN()),					"mm/min");
 	cncSummaryListCtrl->addParameter(PT::PT_COMMON, "Reply Threshold", 					wxString::Format("%4.3f",	cc->getReplyThresholdMetric()),						"mm");
@@ -5010,19 +5010,15 @@ void MainFrame::selectUAUseDirectiveList(wxDataViewEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::updateCurveLibResolution(wxCommandEvent& event) {
+void MainFrame::updateRenderResolution() {
 ///////////////////////////////////////////////////////////////////
-	updateCurveLibResolution();
+	GBL_CONFIG->setRenderResolution(m_cbRenderResolution->GetStringSelection());
+	updateCncConfigTrace();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::updateCurveLibResolution() {
+void MainFrame::updateRenderResolution(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString sel = m_cbCurveLibResolution->GetStringSelection();
-	double v = 1.0;
-	sel.ToDouble(&v);
-	
-	CncConfig::setCurveLibIncrement(v);
-	updateCncConfigTrace();
+	updateRenderResolution();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
@@ -7820,6 +7816,30 @@ void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	decorateIdleState(event.IsChecked());
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorFlyPath(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	if ( motionMonitor->getFlags().drawFlyPath )	motionMonitor->getFlags().drawFlyPath = false;
+	else											motionMonitor->getFlags().drawFlyPath = true;
+	
+	motionMonitor->reconstruct();
+	
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+
+	if ( motionMonitor->getFlags().positionMarker )	motionMonitor->getFlags().positionMarker = false;
+	else											motionMonitor->getFlags().positionMarker = true;
+	
+	motionMonitor->reconstruct();
+
+}
 
 
 
@@ -7829,6 +7849,5 @@ void MainFrame::toggleIdleRequests(wxCommandEvent& event) {
 void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 }
-
 
 

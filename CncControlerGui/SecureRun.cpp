@@ -25,10 +25,12 @@ void SecureRun::enableControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 void SecureRun::initDialog(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxPoint pos = parentFrame->GetRcReset()->GetPosition();
-	pos.x -= 38;
-	SetPosition(pos);
-	
+	wxPoint orignPos = parentFrame->GetScreenPosition();
+	wxPoint pos      = parentFrame->GetRcReset()->GetPosition();
+	orignPos.x += pos.x -38;
+	orignPos.y += pos.y;
+	SetPosition(orignPos);
+
 	SetEscapeId(m_btEmergengy->GetId());
 }
 ///////////////////////////////////////////////////////////////////

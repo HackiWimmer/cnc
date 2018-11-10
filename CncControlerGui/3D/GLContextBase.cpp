@@ -525,6 +525,11 @@ void GLContextBase::determineCameraPosition() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::reshape(int w, int h) {
 /////////////////////////////////////////////////////////////////
+	if ( lastReshapeX == 0 && lastReshapeY == 0 ) {
+		lastReshapeX = w/2;
+		lastReshapeY = h/2;
+	}
+
 	determineViewPort(w, h, lastReshapeX, lastReshapeY);
 	determineProjection(w, h);
 }

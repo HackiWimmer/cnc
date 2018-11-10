@@ -366,7 +366,7 @@ void SVGPathHandlerCnc::prepareWork() {
 	startPos.resetWatermarks();
 	
 	//svg output handling
-	#warning cast
+	#warning SVGUnit cast
 	cncControl->getSerial()->beginSVG((SVGUnit)getUnit(), getW(), getH(), getViewBox());
 	
 	// controller handling
