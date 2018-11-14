@@ -43,6 +43,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
 		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
+		virtual void appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
 		
 		virtual bool isInitialized();
 		
@@ -57,9 +58,7 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 	public:
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
-		
 		virtual const char* getName() { return "SVGPathHandlerCnc"; }
-		
 		virtual void initNextClientId(long id);
 		
 		// Getter and setter

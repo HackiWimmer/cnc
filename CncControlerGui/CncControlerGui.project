@@ -164,6 +164,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncCurveLib.cpp"/>
+      <File Name="CncCurveLib.h"/>
       <File Name="CncUnitCalculator.cpp"/>
       <File Name="CncUnitCalculator.h"/>
       <File Name="CncUsbConnectionDetected.h"/>
@@ -297,8 +299,6 @@
         <File Name="SvgViewBox.cpp"/>
         <File Name="SvgTransformMatrix.h"/>
         <File Name="SvgCncParameters.h"/>
-        <File Name="SVGCurveLib.cpp"/>
-        <File Name="SVGCurveLib.h"/>
         <File Name="SvgEditPopup.cpp"/>
         <File Name="SvgEditPopup.h"/>
         <File Name="SVGElementConverter.cpp"/>

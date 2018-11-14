@@ -96,7 +96,7 @@ class CncConfig {
 		bool onlineUpdateDrawPane;
 		bool allowEventHandling;
 		int updateInterval;
-		double renderResolutionMM;
+		float renderResolutionMM;
 		
 		const wxString defaultConfigValue = "";
 		static unsigned int globalPropertyCounter;
@@ -183,13 +183,9 @@ class CncConfig {
 		};
 		
 		// curve lib utils
-		const unsigned int getRenderResolution() const { return renderResolutionMM; }
+		const float getRenderResolutionMM() const { return renderResolutionMM; }
 		void setRenderResolution(double res);
 		void setRenderResolution(const wxString& sel);
-		
-		
-		
-		float calcCurveLibIncrement(Unit unit, float pathLength);
 		
 		// curve lib gui utils
 		void setupSelectorRenderResolution();

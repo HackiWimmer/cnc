@@ -106,6 +106,28 @@ inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncPathListEntry& cp
 	appendDebugValueDetail((wxString("Point ") << pathListMgr.getPathListSize()), cpe.getPointAsString());
 }
 //////////////////////////////////////////////////////////////////
+inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncCurveLib::ParameterSet& ps) {
+//////////////////////////////////////////////////////////////////
+	if ( debugState == false )
+		return;
+	
+	appendDebugValueDetail("Curve length", 		wxString::Format("%.5lf", 	ps.RI.curveLength));
+	appendDebugValueDetail("Render samples",	wxString::Format("%u", 		ps.RI.samples));
+	appendDebugValueDetail("Render steps",		wxString::Format("%u", 		ps.RI.steps));
+	appendDebugValueDetail("Render increment",	wxString::Format("%.5lf", 	ps.RI.increment));
+	appendDebugValueDetail("Render resolution",	wxString::Format("%.5lf", 	ps.RI.resolution));
+	
+	/*
+	#warning
+	std::cout << std::endl;
+	std::cout << "Curve length       : "<< 	wxString::Format("%.5lf", 	ps.RI.curveLength) 	<< std::endl;
+	std::cout << "Render samples     : " <<	wxString::Format("%u", 		ps.RI.samples) 		<< std::endl;
+	std::cout << "Render steps       : " <<	wxString::Format("%u", 		ps.RI.steps) 		<< std::endl;
+	std::cout << "Render increment   : " <<	wxString::Format("%.5lf", 	ps.RI.increment)	<< std::endl;
+	std::cout << "Render resolution  : " <<	wxString::Format("%.5lf", 	ps.RI.resolution)	<< std::endl;
+	*/
+}
+//////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
 	SvgOriginalPathInfo sopi;
@@ -468,3 +490,4 @@ bool SVGPathHandlerCnc::moveDownZ() {
 	
 	return ret;
 }
+

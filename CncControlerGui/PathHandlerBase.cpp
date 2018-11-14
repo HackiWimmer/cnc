@@ -1,6 +1,5 @@
 #include <iostream>
 #include "CncUnitCalculator.h"
-#include "SVGCurveLib.h"
 #include "CncConfig.h"
 #include "FileParser.h"
 #include "OSD/CncTimeFunctions.h"
@@ -8,7 +7,8 @@
 
 //////////////////////////////////////////////////////////////////
 PathHandlerBase::PathHandlerBase() 
-: firstPath(true)
+: CncCurveLib::Caller()
+, firstPath(true)
 , newPath(false)
 , startPos({0.0, 0.0, 0.0})
 , currentPos({0.0, 0.0, 0.0})
@@ -16,8 +16,21 @@ PathHandlerBase::PathHandlerBase()
 , lastControlPoint()
 , pathListMgr()
 , unitCalculator(Unit::mm, Unit::mm)
+, lineCurve(this)
+, ellipticalCurve(this)
+, quadraticBezierCurve(this)
+, cubicBezierCurve(this)
 {
 //////////////////////////////////////////////////////////////////
+	// init default setup
+	CncCurveLib::Setup s;
+	s.approximation.samples = 50;
+	s.resolution.size 		= 0.02;
+	
+	lineCurve.init(s);
+	ellipticalCurve.init(s);
+	quadraticBezierCurve.init(s);
+	cubicBezierCurve.init(s);
 }
 //////////////////////////////////////////////////////////////////
 PathHandlerBase::~PathHandlerBase() {
@@ -57,11 +70,9 @@ void PathHandlerBase::appendDebugValueDetail(const CncPathListEntry& cpe) {
 	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::traceCurveLibPoint(const char* userPerspectivePrefix, SVGCurveLib::PointGeneric<>& p) {
+void PathHandlerBase::appendDebugValueDetail(const CncCurveLib::ParameterSet& ps) {
 //////////////////////////////////////////////////////////////////
-	if ( true ) {
-		std::clog << userPerspectivePrefix << ":" << p.x << "," << p.y << std::endl;
-	}
+	// currently nothing to do
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::traceFunctionCall(const char* fn) {
@@ -107,6 +118,7 @@ bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 		std::cerr << "PathHandlerBase::processMove: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
+	
 	appendDebugValueDetail("Move",c);
 	
 	bool ret = false;
@@ -129,7 +141,7 @@ bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 		//the first move is always absolute!
 		currentPos.setX(startPos.getX());
 		currentPos.setY(startPos.getY());
-
+		
 		simulateZAxisUp();
 		ret = processLinearMove(false);
 		simulateZAxisDown();
@@ -168,6 +180,7 @@ bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) 
 		std::cerr << "PathHandlerBase::processClose: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
+	
 	appendDebugValueDetail("Close",c);
 	
 	switch ( c ) {
@@ -178,9 +191,8 @@ bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) 
 			break;
 		default: ; // Do nothing, already checked before
 	}
-	bool ret = processLinearMove(false);
-
-	return ret;
+	
+	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
@@ -189,8 +201,9 @@ bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 		std::cerr << "PathHandlerBase::processLine: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
+	
 	appendDebugValueDetail("Line",c);
-
+	
 	switch ( c ) {
 		case 'l':
 			currentPos.incX(values[0]);
@@ -202,7 +215,7 @@ bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 			break;
 		default: ; // Do nothing, already checked before
 	}
-
+	
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
@@ -234,7 +247,7 @@ bool PathHandlerBase::processVLine(char c, unsigned int count, double values[]) 
 	return processLine(cmd, count + 1, values);
 }
 //////////////////////////////////////////////////////////////////
-inline bool PathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p) {
+bool PathHandlerBase::callback(const CncCurveLib::Point& p) {
 //////////////////////////////////////////////////////////////////
 	currentPos.setX(p.x);
 	currentPos.setY(p.y);
@@ -248,225 +261,167 @@ inline bool PathHandlerBase::processCurveLibPoint(SVGCurveLib::PointGeneric<> p)
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
-	struct Arguments {
-		 SVGCurveLib::PointGeneric<> p0;
-		 SVGCurveLib::PointGeneric<> p1;
-		 double rx;
-		 double ry;
-		 double xAxisRotation;
-		 bool largeArcFlag;
-		 bool sweepFlag;
-	};
-	
-	static Arguments args;
-	
 	if ( count != 7 ) {
 		std::cerr << "PathHandlerBase::processARC: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	
 	appendDebugValueDetail("EllipticalARC", c);
+	appendDebugValueDetail("Input Unit", CncUnitCalculatorBase::getUnitAsStr(unitCalculator.getInputUnit()));
 	
 	// define parameters
 	//  - p0 (startPos) for curve lib is always absolute
 	//  - p1 (endPos) for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())};
-	SVGCurveLib::PointGeneric<> p1;
+	CncCurveLib::ParameterSet ps;
+	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY());
 	
 	switch ( c ) {
-		case 'a': 	p1 = {(float)(values[5] + p0.x), (float)(values[6] + p0.y)}; 
+		case 'a': 	ps.p1 = transformCurveLibPoint(values[5] + currentPos.getX(), values[6] + currentPos.getY()); 
+					
+					// set current pos and control point without transformation
+					currentPos.setX(values[5] + currentPos.getX());
+					currentPos.setY(values[6] + currentPos.getY());
 					break;
 					
-		case 'A':	p1 = {(float)values[5], (float)values[6]};
-					break;
-					
-		default:	p1 = p0;
-	}
-	
-	args.p0				= p0;
-	args.p1				= p1;
-	args.rx				= values[0];
-	args.ry				= values[1];
-	args.xAxisRotation	= values[2];
-	args.largeArcFlag	= (bool)values[3];
-	args.sweepFlag		= (bool)values[4];
-	
-	// define the curve lib function
-	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
-		CncUnitCalculatorBase::getDefaultPPI(),
-		[&](float t) {
-			return SVGCurveLib::PointOnEllipticalArc(args.p0, 
-			                                         args.rx, 
-													 args.ry, 
-													 args.xAxisRotation, 
-													 args.largeArcFlag, 
-													 args.sweepFlag, 
-													 args.p1, 
-													 t).point;
-		}
-	);
-	
-	// process the curve
-	float increment = GBL_CONFIG->calcCurveLibIncrement(unitCalculator.getInputUnit(), linearCurve.resultantInfo.arcLength);
-	appendDebugValueDetail("CurveLibRes", increment);
-	
-	for ( float t = 0.0f; t <= 1.0f; t += increment ) {
-		if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(t)) == false )
-			return false;
-	}
-	// stretch curve to end point
-	if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(1.0f)) == false )
-		return false;
+		case 'A':	ps.p1 = transformCurveLibPoint(values[5], values[6]);
 		
-	return true;
+					// set current pos and control point without transformation
+					currentPos.setX(values[5]);
+					currentPos.setY(values[6]);
+					break;
+					
+		default:	ps.p1 = ps.p0;
+		
+					// current leaves unchanged
+	}
+	
+	ps.rx				= values[0];
+	ps.ry				= values[1];
+	ps.xAxisRotation	= values[2];
+	ps.largeArcFlag		= (bool)values[3];
+	ps.sweepFlag		= (bool)values[4];
+	
+	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
+	bool ret = ellipticalCurve.render(ps);
+	appendDebugValueDetail(ps);
+	
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
-	struct Arguments {
-		SVGCurveLib::PointGeneric<> p0;
-		SVGCurveLib::PointGeneric<> p1;
-		SVGCurveLib::PointGeneric<> p2;
-	};
-	
-	static Arguments args;
-	
 	if ( count != 4 ) {
 		std::cerr << "PathHandlerBase::processQuadraticBezier: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	
 	appendDebugValueDetail("QuadraticBezier",c);
+	appendDebugValueDetail("Input Unit", CncUnitCalculatorBase::getUnitAsStr(unitCalculator.getInputUnit()));
 	
 	// define parameters
 	//  - p0 (startPos) for curve lib is always absolute
 	//  - p1 - p2 for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())}; 
-	SVGCurveLib::PointGeneric<> p1, p2;
+	CncCurveLib::ParameterSet ps;
+	CncCurveLib::Point pCtl;
+	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY()); 
 	
 	switch ( c ) {
-		case 'q': 	p1 = {(float)(values[0] + p0.x), (float)(values[1] + p0.y)}; 
-					p2 = {(float)(values[2] + p0.x), (float)(values[3] + p0.y)}; 
+		case 'q': 	ps.p1 = transformCurveLibPoint(values[0] + currentPos.getX(), values[1] + currentPos.getY()); 
+					ps.p2 = transformCurveLibPoint(values[2] + currentPos.getX(), values[3] + currentPos.getY()); 
+					
+					// set current pos and control point without transformation
+					currentPos.setX(values[2] + currentPos.getX());
+					currentPos.setY(values[3] + currentPos.getY());
+					
+					pCtl = {values[0] + currentPos.getX(), values[1] + currentPos.getY()};
 					break;
 					
-		case 'Q':	p1 = {(float)values[0], (float)values[1]};
-					p2 = {(float)values[2], (float)values[3]};
+		case 'Q':	ps.p1 = transformCurveLibPoint(values[0], values[1]);
+					ps.p2 = transformCurveLibPoint(values[2], values[3]);
+					
+					// set current pos and control point without transformation
+					currentPos.setX(values[2]);
+					currentPos.setY(values[3]);
+					
+					pCtl = {values[0], values[1]};
 					break;
 					
-		default:	p1 = p0;
-					p2 = p0; 
+		default:	ps.p1 = ps.p0;
+					ps.p2 = ps.p0;
+					
+					// current leaves unchanged
+					pCtl = ps.p1;
 	}
 	
-	args.p0 = p0;
-	args.p1 = p1;
-	args.p2 = p2;
+	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
+	bool ret = quadraticBezierCurve.render(ps);
+	appendDebugValueDetail(ps);
 	
-	// define the curve lib function
-	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
-		CncUnitCalculatorBase::getDefaultPPI(),
-		[&](float t) 
-		{
-			return SVGCurveLib::PointOnQuadraticBezierCurve(args.p0, 
-														    args.p1, 
-															args.p2, 
-															t);
-		}
-	);
-	
-	// process the curve
-	float increment = GBL_CONFIG->calcCurveLibIncrement(unitCalculator.getInputUnit(), linearCurve.resultantInfo.arcLength);
-	appendDebugValueDetail("CurveLibRes", increment);
-	
-	for ( float t = 0.0f; t < 1.0f; t += increment ) {
-		if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(t)) == false )
-			return false;
-	}
-	// stretch curve to end point
-	if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(1.0f)) == false )
-		return false;
-		
 	// Store the last control point
-	SVGCurveLib::PointGeneric<> cp{(float)currentPos.getX(), (float)currentPos.getY()};
-	lastControlPoint.setLastQuadraticBezierControlPoint(cp, args.p1);
+	CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
+	lastControlPoint.setLastQuadraticBezierControlPoint(cp, pCtl);
 	
-	return true;
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
-	struct Arguments {
-		SVGCurveLib::PointGeneric<> p0;
-		SVGCurveLib::PointGeneric<> p1;
-		SVGCurveLib::PointGeneric<> p2;
-		SVGCurveLib::PointGeneric<> p3;
-	};
-	
-	static Arguments args;
-	
 	if ( count != 6 ) {
 		std::cerr << "PathHandlerBase::processCubicBezier: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	
 	appendDebugValueDetail("CubicBezier",c);
+	appendDebugValueDetail("Input Unit", CncUnitCalculatorBase::getUnitAsStr(unitCalculator.getInputUnit()));
 	
 	// define parameters
 	//  - p0 (startPos) for curve lib is always absolute
 	//  - p1 - p3 for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())};
-	SVGCurveLib::PointGeneric<> p1, p2, p3;
+	CncCurveLib::ParameterSet ps;
+	CncCurveLib::Point pCtl;
+	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY());
 	
 	switch ( c ) {
-		case 'c': 	p1 = {(float)(values[0] + p0.x), (float)(values[1] + p0.y)}; 
-					p2 = {(float)(values[2] + p0.x), (float)(values[3] + p0.y)}; 
-					p3 = {(float)(values[4] + p0.x), (float)(values[5] + p0.y)}; 
+		case 'c': 	ps.p1 = transformCurveLibPoint(values[0] + currentPos.getX(), values[1] + currentPos.getY()); 
+					ps.p2 = transformCurveLibPoint(values[2] + currentPos.getX(), values[3] + currentPos.getY()); 
+					ps.p3 = transformCurveLibPoint(values[4] + currentPos.getX(), values[5] + currentPos.getY()); 
+					
+					// set current pos and control point without transformation
+					currentPos.setX(values[4] + currentPos.getX());
+					currentPos.setY(values[5] + currentPos.getY());
+					
+					pCtl = {values[2] + currentPos.getX(), values[3] + currentPos.getY()};
 					break;
 					
-		case 'C':	p1 = {(float)values[0], (float)values[1]};
-					p2 = {(float)values[2], (float)values[3]};
-					p3 = {(float)values[4], (float)values[5]};
+		case 'C':	ps.p1 = transformCurveLibPoint(values[0], values[1]);
+					ps.p2 = transformCurveLibPoint(values[2], values[3]);
+					ps.p3 = transformCurveLibPoint(values[4], values[5]);
+					
+					// set current pos and control point without transformation
+					currentPos.setX(values[4]);
+					currentPos.setY(values[5]);
+					
+					pCtl = {values[2], values[3]};
+					
 					break;
 					
-		default:	p1 = p0; 
-					p2 = p0;
-					p3 = p0;
+		default:	ps.p1 = ps.p0; 
+					ps.p2 = ps.p0;
+					ps.p3 = ps.p0;
+					
+					// current leaves unchanged
+					pCtl = ps.p2;
 	}
 	
-	args.p0 = p0;
-	args.p1 = p1;
-	args.p2 = p2;
-	args.p3 = p3;
-	
-	// define the curve lib function
-	SVGCurveLib::LinearCurve linearCurve = SVGCurveLib::LinearCurve(
-		CncUnitCalculatorBase::getDefaultPPI(),
-		[&](float t) 
-		{
-			return SVGCurveLib::PointOnCubicBezierCurve(args.p0, 
-														args.p1, 
-														args.p2, 
-														args.p3, 
-														t);
-		}
-	);
-	
-	// process the curve
-	float increment = GBL_CONFIG->calcCurveLibIncrement(unitCalculator.getInputUnit(), linearCurve.resultantInfo.arcLength);
-	appendDebugValueDetail("CurveLibRes", increment);
-	
-	for ( float t = 0.0f; t < 1.0f; t += increment ) {
-		if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(t)) == false )
-			return false;
-	}
-	// stretch curve to end point
-	if ( processCurveLibPoint(linearCurve.PointOnLinearCurve(1.0f)) == false )
-		return false;
+	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
+	bool ret = cubicBezierCurve.render(ps);
+	appendDebugValueDetail(ps);
 	
 	// Store the last control point
-	SVGCurveLib::PointGeneric<> cp{(float)currentPos.getX(), (float)currentPos.getY()};
-	lastControlPoint.setLastCubicBezierControlPoint(cp, p2);
+	CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
+	lastControlPoint.setLastCubicBezierControlPoint(cp, pCtl);
 	
-	return true;
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, double values[]) {
@@ -478,7 +433,7 @@ bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, d
 	appendDebugValueDetail("QuadraticBezierSmooth",c);
 	
 	// p0 (startPos) for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())};
+	CncCurveLib::Point p0 = {currentPos.getX(), currentPos.getY()};
 	values[3] = values[1];
 	values[2] = values[0];
 	values[1] = lastControlPoint.getLastQuadraticBezierControlPoint(p0).y; // todo abs or rel???
@@ -501,7 +456,7 @@ bool PathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, doubl
 	appendDebugValueDetail("CubicBezierSmooth",c);
 	
 	// p0 (startPos) for curve lib is always absolute
-	SVGCurveLib::PointGeneric<> p0 = {(float)(currentPos.getX()), (float)(currentPos.getY())};
+	CncCurveLib::Point p0 = {currentPos.getX(), currentPos.getY()};
 	values[5] = values[3];
 	values[4] = values[2];
 	values[3] = values[1];
@@ -616,27 +571,18 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 //////////////////////////////////////////////////////////////////
 	unitCalculator.changeInputUnit(u);
 	
+	CncUnitCalculator<float> uc(Unit::mm, u);
+	
+	CncCurveLib::Setup s;
+	s.resolution.size = uc.convert(GBL_CONFIG->getRenderResolutionMM());
+	
+	lineCurve.init(s);
+	ellipticalCurve.init(s);
+	quadraticBezierCurve.init(s);
+	cubicBezierCurve.init(s);
+	
 	if ( trace == true )
 		std::cout << " " << getName() << ": Setup " << unitCalculator << std::endl;
-}
-//////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processLinearMove(bool alreadyRendered) {
-//////////////////////////////////////////////////////////////////
-	double newPosAbsX = currentPos.getX();
-	double newPosAbsY = currentPos.getY();
-	
-	// first perform the transformations . . .
-	transform(newPosAbsX, newPosAbsY);
-	
-	//  . . . then convert the input unit to mm . . 
-	newPosAbsX = unitCalculator.convert(newPosAbsX);
-	newPosAbsY = unitCalculator.convert(newPosAbsY);
-	
-	// append
-	const CncPathListEntry cpe = pathListMgr.calculateAndAddEntry(newPosAbsX, newPosAbsY, alreadyRendered, isZAxisDown());
-	appendDebugValueDetail(cpe);
-	
-	return true;
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::tracePathList(std::ostream &ostr) {

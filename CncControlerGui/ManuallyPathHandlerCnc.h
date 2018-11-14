@@ -34,6 +34,7 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 		virtual void prepareWork(); 
 		virtual void finishWork();
 		
+		virtual bool processLinearMove(bool alreadyRendered);
 		bool processLinearMove(const MoveDefinition& md);
 		
 		void swichtToolOn()  { switchToolState(true); }

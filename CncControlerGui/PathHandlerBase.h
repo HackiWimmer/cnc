@@ -6,8 +6,8 @@
 #include <wx/gdicmn.h>
 #include <wx/string.h>
 #include "CncPosition.h"
-#include "SvgCurveLib.h"
 #include "CncUnitCalculator.h"
+#include "CncCurveLib.h"
 #include "CncPathListManager.h"
 
 #define TRACE_FUNCTION_CALL(fn)
@@ -35,7 +35,7 @@
 class FileParser;
 
 //////////////////////////////////////////////////////////////////
-class PathHandlerBase {
+class PathHandlerBase : public CncCurveLib::Caller {
 //////////////////////////////////////////////////////////////////
 	public:
 		typedef CncUnitCalculatorBase::Unit Unit;
@@ -44,25 +44,24 @@ class PathHandlerBase {
 	
 		class LastControlPoint {
 			private:	
-				SVGCurveLib::PointGeneric<> lastQuadraticBezierControlPoint;
-				SVGCurveLib::PointGeneric<> lastCubicBezierControlPoint;
+				CncCurveLib::Point lastQuadraticBezierControlPoint;
+				CncCurveLib::Point lastCubicBezierControlPoint;
 				bool lastQuadraticBezierControlPointValid;
 				bool lastCubicBezierControlPointValid;
 			
 			public:
 				LastControlPoint() 
-				: lastQuadraticBezierControlPoint({0,0})
-				, lastCubicBezierControlPoint({0,0})
+				: lastQuadraticBezierControlPoint(0.0, 0.0)
+				, lastCubicBezierControlPoint(0.0, 0.0)
 				, lastQuadraticBezierControlPointValid(false)
 				, lastCubicBezierControlPointValid(false)
-				{
-				}
-				virtual ~LastControlPoint() {}
+				{}
+				~LastControlPoint() {}
 				
 				bool hasLastQuadraticBezierControlPoint() 	{ return lastQuadraticBezierControlPointValid; }
 				bool hasLastCubicBezierControlPoint() 		{ return lastCubicBezierControlPointValid; }
 				
-				void setLastQuadraticBezierControlPoint(SVGCurveLib::PointGeneric<> currentPoint, SVGCurveLib::PointGeneric<> p) { 
+				void setLastQuadraticBezierControlPoint(const CncCurveLib::Point& currentPoint, const CncCurveLib::Point& p) { 
 					lastQuadraticBezierControlPointValid = true;
 					//The first control point is assumed to be the reflection of the last control point 
 					//on the previous command relative to the current point.  
@@ -70,7 +69,7 @@ class PathHandlerBase {
 											           (currentPoint.y + (currentPoint.y - p.y))}; 
 				}
 				
-				void setLastCubicBezierControlPoint(SVGCurveLib::PointGeneric<> currentPoint, SVGCurveLib::PointGeneric<> p) { 
+				void setLastCubicBezierControlPoint(const CncCurveLib::Point& currentPoint, const CncCurveLib::Point& p) { 
 					lastCubicBezierControlPointValid = true;
 					//The first control point is assumed to be the reflection of the last control point 
 					//on the previous command relative to the current point.  
@@ -79,13 +78,13 @@ class PathHandlerBase {
 				}
 				
 				void reset() { 
-					lastQuadraticBezierControlPointValid = false;
-					lastCubicBezierControlPointValid = false;
-					lastQuadraticBezierControlPoint = {0,0}; 
-					lastCubicBezierControlPoint = {0,0};
+					lastQuadraticBezierControlPointValid 	= false;
+					lastCubicBezierControlPointValid 		= false;
+					lastQuadraticBezierControlPoint 		= {0.0, 0.0}; 
+					lastCubicBezierControlPoint 			= {0.0, 0.0};
 				}
 				
-				SVGCurveLib::PointGeneric<> getLastQuadraticBezierControlPoint(SVGCurveLib::PointGeneric<> currentPoint) {
+				const CncCurveLib::Point& getLastQuadraticBezierControlPoint(const CncCurveLib::Point& currentPoint) {
 					if ( hasLastQuadraticBezierControlPoint() )
 						return lastQuadraticBezierControlPoint;
 					//If there is no previous command or if the previous command was not an beziert+ curve, 
@@ -93,7 +92,7 @@ class PathHandlerBase {
 					return currentPoint;
 				}
 				
-				SVGCurveLib::PointGeneric<> getLastCubicBezierControlPoint(SVGCurveLib::PointGeneric<> currentPoint) {
+				const CncCurveLib::Point& getLastCubicBezierControlPoint(const CncCurveLib::Point& currentPoint) {
 					if ( hasLastCubicBezierControlPoint() )
 						return lastCubicBezierControlPoint;
 					//If there is no previous command or if the previous command was not an beziert+ curve, 
@@ -113,22 +112,25 @@ class PathHandlerBase {
 		CncPathListManager 			pathListMgr;
 		CncUnitCalculator<float>	unitCalculator;
 		
+		CncLineCurve				lineCurve;
+		CncEllipticalCurve			ellipticalCurve;
+		CncQuadraticBezierCurve		quadraticBezierCurve;
+		CncCubicBezierCurve			cubicBezierCurve;
+		
 		// trace functions
-		void traceCurveLibPoint(const char* userPerspectivePrefix, SVGCurveLib::PointGeneric<>& p);
 		void traceFunctionCall(const char* fn);
 		void traceCurrentPosition();
 		void tracePositions(const char* userPerspectivePrefix);
 		void traceFirstMove(double moveX, double moveY);
 		
-		// curvel lib helper
-		bool processCurveLibPoint(SVGCurveLib::PointGeneric<> p);
-		
 		// 
-		virtual bool processLinearMove(bool alreadyRendered);
+		virtual bool callback(const CncCurveLib::Point& p);
+		virtual bool processLinearMove(bool alreadyRendered) = 0;
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
 		virtual void appendDebugValueDetail(const CncPathListEntry& cpe);
+		virtual void appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
 		
 		//render functions
 		bool processMove(char c, unsigned int count, double values[]);
@@ -149,7 +151,14 @@ class PathHandlerBase {
 		virtual void simulateZAxisDown() 					{}
 		virtual bool isZAxisUp() 							{ return true; }
 		virtual bool isZAxisDown() 							{ return false; }
+		
+		// transformation
 		virtual void transform(double& xAbs, double& yAbs) 	{}
+		
+		const CncCurveLib::Point transformCurveLibPoint(double xAbs, double yAbs) {
+			transform(xAbs, yAbs);
+			return CncCurveLib::Point(xAbs, yAbs);
+		}
 		
 	public:
 	
@@ -157,7 +166,6 @@ class PathHandlerBase {
 		virtual ~PathHandlerBase();
 		
 		virtual const char* getName() { return "PathHandlerBase"; }
-		
 		virtual void initNextClientId(long id) {}
 		
 		void setFileParser(FileParser* fp) { fileParser = fp; }

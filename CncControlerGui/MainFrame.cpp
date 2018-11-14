@@ -663,9 +663,36 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	GBL_CONFIG->setRenderResolution(0.44);
-	GBL_CONFIG->setRenderResolution(1.4444);
-	GBL_CONFIG->setRenderResolution(0.0);
+	/*
+	SC_HANDLE hScMIPHilfsdienst = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+	if ( hScMIPHilfsdienst == NULL )
+	{
+		DWORD error = GetLastError();
+		//LPCTSTR errormsg =  "#1 - " + error;
+		//SetWindowText(hInfobox, (LPCTSTR) error);
+		std::cout << "e1: " << (long)error << std::endl;
+		return;
+	}
+	
+	SC_HANDLE hIPHilfsdienst = OpenService(hScMIPHilfsdienst, wxString("Ds3Service") , SC_MANAGER_ALL_ACCESS);
+	if (hIPHilfsdienst == NULL)
+	{
+		DWORD error = GetLastError();
+		//LPCTSTR errormsg =  "#2 - " + error;
+		//SetWindowText(hInfobox, (LPCTSTR) error);
+		std::cout << "e2: " << (long)error << std::endl;
+		return;
+	}
+	
+	SERVICE_STATUS sInfo;
+	ControlService(hIPHilfsdienst, SERVICE_CONTROL_INTERROGATE, &sInfo);
+	if (sInfo.dwCurrentState == SERVICE_STOPPED)
+	{
+		std::cout << "off" << std::endl;
+	}else{
+		std::cout << "on" << std::endl;
+	}
+	 * */
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {

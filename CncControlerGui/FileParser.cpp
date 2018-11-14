@@ -365,7 +365,7 @@ bool FileParser::process() {
 	if ( ret == true )
 		ret = postprocess();
 	
-	// at the end rest the selection
+	// at the end reset the selection
 	if ( inboundSourceControl ) {
 		inboundSourceControl->GotoPos(0);
 		inboundSourceControl->SetSelection(0, 0);

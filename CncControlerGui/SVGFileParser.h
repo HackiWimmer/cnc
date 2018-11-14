@@ -61,7 +61,7 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		
 		inline bool performPath(SVGUserAgentInfo& uai);
 		inline bool performPathByIds(SVGUserAgentInfo& uai);
-		inline bool performTransform(SVGUserAgentInfo& uai);
+		inline bool prepareTransformMatrix(SVGUserAgentInfo& uai);
 		inline bool performUse(SVGUserAgentInfo& uai, UseDirective& ud);
 		inline bool spoolPath(SVGUserAgentInfo& uai, const wxString& transform = "");
 		

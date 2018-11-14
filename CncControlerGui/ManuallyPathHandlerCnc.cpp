@@ -8,6 +8,7 @@ ManuallyPathHandlerCnc::ManuallyPathHandlerCnc(CncControl* cnc)
 , lastSpeedValue(0.0)
 /////////////////////////////////////////////////////////////
 {
+	changeInputUnit(Unit::mm);
 }
 /////////////////////////////////////////////////////////////
 ManuallyPathHandlerCnc::~ManuallyPathHandlerCnc() {
@@ -65,7 +66,7 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 		currentPos.incZ(md.z);
 	}
 	
-	bool ret = cncControl->moveAbsLinearMetricXYZ(currentPos.getX(), currentPos.getY(), currentPos.getZ(), false);
+	bool ret = processLinearMove(false);
 	if ( ret == false && md.correctLimit == true ) {
 		ret = cncControl->correctLimitPositions();
 	}
@@ -73,4 +74,9 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 	switchToolState(false);
 	
 	return ret;
+}
+//////////////////////////////////////////////////////////////////
+bool ManuallyPathHandlerCnc::processLinearMove(bool alreadyRendered) {
+//////////////////////////////////////////////////////////////////
+	return cncControl->moveAbsLinearMetricXYZ(currentPos.getX(), currentPos.getY(), currentPos.getZ(), alreadyRendered);
 }

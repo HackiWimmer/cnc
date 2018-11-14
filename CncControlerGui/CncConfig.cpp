@@ -792,35 +792,6 @@ void CncConfig::calculateThresholds() {
 	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y)->SetValue((int)replyThresholdY);
 	getProperty(CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z)->SetValue((int)replyThresholdZ);
 }
-
-
-
-
-
-////////////////////////////////////////////////////////////////////////
-float CncConfig::calcCurveLibIncrement(Unit unit, float pathLength) {
-////////////////////////////////////////////////////////////////////////
-	
-	#warning move this to PathHandlerBase
-	
-	CncUnitCalculator<float> uc(Unit::mm, unit);
-
-	switch( unit ) {
-		case Unit::px: 		return  1.0f   * renderResolutionMM;
-		case Unit::pt:		return  0.75f  * renderResolutionMM;
-		case Unit::pc:		return  0.065f * renderResolutionMM;
-
-		case Unit::mm:		return renderResolutionMM;
-		case Unit::cm:
-		case Unit::m:
-		case Unit::in:
-		case Unit::ft: 		return uc.convert(renderResolutionMM);
-	}
-	
-	
-	
-	return 1.0;
-}
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setRenderResolution(double res) {
 ////////////////////////////////////////////////////////////////////////
@@ -862,24 +833,28 @@ void CncConfig::setupSelectorRenderResolution() {
 		wxComboBox* cb = THE_APP->GetCbRenderResolution();
 		cb->Clear();
 		
-		cb->Append(wxString::Format(renderSelectorFormat, 0.01));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.02));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.03));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.04));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.05));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.06));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.07));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.08));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.09));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.10));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.20));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.30));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.40));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.50));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.60));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.70));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.80));
-		cb->Append(wxString::Format(renderSelectorFormat, 0.90));
+		auto appendList = [&](float resolution) {
+			cb->Append(wxString::Format(renderSelectorFormat, resolution));
+		};
+		
+		appendList(0.01);
+		appendList(0.02);
+		appendList(0.03);
+		appendList(0.04);
+		appendList(0.05);
+		appendList(0.06);
+		appendList(0.07);
+		appendList(0.08);
+		appendList(0.09);
+		appendList(0.10);
+		appendList(0.20);
+		appendList(0.30);
+		appendList(0.40);
+		appendList(0.50);
+		appendList(0.60);
+		appendList(0.70);
+		appendList(0.80);
+		appendList(0.90);
 		
 		setRenderResolution(0.2);
 	}

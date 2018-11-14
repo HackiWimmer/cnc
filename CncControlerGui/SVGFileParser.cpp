@@ -127,6 +127,8 @@ void SVGFileParser::setPathHandler(PathHandlerBase* ph) {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
+	// part of preprocessing
+	// append to user agent only
 	return svgUserAgent.addPathElement(c, count, values);
 }
 //////////////////////////////////////////////////////////////////
@@ -336,12 +338,13 @@ bool SVGFileParser::performPath(SVGUserAgentInfo& uai) {
 		
 	// First prepare element
 	} else {
-		// reset current svg matrix
+		
+		// always reset the svg matrix
 		pathHandler->getSvgTransformMatrix().unchanged();
 		
 		if ( uai.hasTransform() ) {
 			// transform collected transformations
-			if ( performTransform(uai) == false )
+			if ( prepareTransformMatrix(uai) == false )
 				return false;
 		}
 	} 
@@ -361,7 +364,7 @@ bool SVGFileParser::performPath(SVGUserAgentInfo& uai) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool SVGFileParser::performTransform(SVGUserAgentInfo& uai) {
+bool SVGFileParser::prepareTransformMatrix(SVGUserAgentInfo& uai) {
 //////////////////////////////////////////////////////////////////
 	for (TransformVector::iterator it=uai.transformList.begin(); it!=uai.transformList.end(); ++it) {
 		if ( pathHandler->getSvgTransformMatrix().performTransformAsStringList(*it) == false ) {
@@ -399,15 +402,16 @@ bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
 	it = ud.attributes.find("transform");
 	
 	if ( it != ud.attributes.end() ) {
-		// reset current svg matrix
+		
+		// reset the svg matrix
 		pathHandler->getSvgTransformMatrix().unchanged();
 		
 		// first transform from use directive
-		if ( pathHandler->getSvgTransformMatrix().performTransformAsStringList(it->second) == false ) {
+		if ( pathHandler->getSvgTransformMatrix().performTransformAsStringList(it->second) == false )
 			return false;
-		}
+		
 		// second transform rest
-		if ( performTransform(uai) == false )
+		if ( prepareTransformMatrix(uai) == false )
 			return false;
 		
 		//spool path 
@@ -415,6 +419,7 @@ bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
 			return false;
 			
 	} else {
+		
 		//spool path 
 		if ( spoolPath(uai, "") == false )
 			return false;
@@ -450,6 +455,7 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	
 	if ( pathHandler->finishCurrentPath() == false )
 		return false;
+		
 		
 	// path is now recorded and tried out, now run the controller 
 	if ( pathHandler->runCurrentPath() == false )

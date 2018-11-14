@@ -23,41 +23,33 @@ SVGNodeParser::~SVGNodeParser() {
 }
 ///////////////////////////////////////////////////////////////////////
 inline int SVGNodeParser::getCommandParaCount(char c) {
-/*
- Folgende Buchstaben bzw. Pfadverläufe sind möglich:
-
-    moveto: M, m - Startpunkt (das Aufsetzen des imaginären Stiftes)
-    lineto: L, l und H, h und V, v - eine gerade Linie
-    closepath: Z, z - eine Pfad schließen
-    cubic Bézier curve: C, c und S, s - eine kubische Bézier-Kurve
-    quadratic Bézier curve: Q, q und T, t - eine quadratische Bézier-Kurve
-    elliptical arc curve: A, a - einen elliptischen Bogen
-*/
 	int ret = -1;
+	
 	switch ( c ) {
 		case 'z':
-		case 'Z': ret = 0; break;
+		case 'Z': 	ret = 0; break;
 		case 'h':
 		case 'H':
 		case 'v':
-		case 'V': ret = 1; break;
+		case 'V': 	ret = 1; break;
 		case 'm':
 		case 'M':
 		case 'l':
 		case 'L':
 		case 't': 
-		case 'T': ret = 2; break;
+		case 'T': 	ret = 2; break;
 		case 'q':
 		case 'Q':
 		case 's':
-		case 'S': ret = 4; break;
+		case 'S': 	ret = 4; break;
 		case 'c':
-		case 'C': ret = 6; break;
+		case 'C': 	ret = 6; break;
 		case 'a':
-		case 'A': ret = 7; break;
+		case 'A': 	ret = 7; break;
 
-		default: ret = -1;
-	} 
+		default: 	ret = -1;
+	}
+ 
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
@@ -178,6 +170,20 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
+bool SVGNodeParser::addPathElement(char c, unsigned int count, double values[]) {
+//////////////////////////////////////////////////////////////////
+	if ( pathHandler == NULL ) {
+		cerr << "SVGParser::addPathElement: Failed: Member pathHandler is NULL " << endl;
+		return false;
+	}
+	
+	// Please note: The following command will process the current path directly, 
+	// b u t  this method is virtual and possibly overriden!
+	
+	return pathHandler->process(c, count, values);
+}
+
+//////////////////////////////////////////////////////////////////
 bool SVGNodeParser::processSvgNode(const wxString& node) {
 //////////////////////////////////////////////////////////////////
 	if ( pathHandler == NULL ) {
@@ -215,14 +221,4 @@ bool SVGNodeParser::processSvgNode(const wxString& node) {
 	SVGElementConverter::resetErrorInfo();
 	
 	return false;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGNodeParser::addPathElement(char c, unsigned int count, double values[]) {
-//////////////////////////////////////////////////////////////////
-	if ( pathHandler == NULL ) {
-		cerr << "SVGParser::addPathElement: Failed: Member pathHandler is NULL " << endl;
-		return false;
-	}
-
-	return pathHandler->process(c, count, values);
 }
