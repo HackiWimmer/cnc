@@ -10,7 +10,7 @@ class SerialEmulatorFile : public SerialEmulatorNULL
 		std::fstream fileStream;
 		std::ios_base::openmode fileFlags;
 		
-		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte);
+		virtual bool writeMoveCmdRendered(int32_t x , int32_t y , int32_t z);
 		
 	public:
 	

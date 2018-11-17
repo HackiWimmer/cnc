@@ -8,6 +8,22 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
+    <VirtualDirectory Name="Inbound - Binary">
+      <VirtualDirectory Name="PathHandler">
+        <File Name="BinaryPathHandlerCnc.cpp"/>
+        <File Name="BinaryPathHandlerCnc.h"/>
+        <File Name="BinaryPathHandlerBase.cpp"/>
+        <File Name="BinaryPathHandlerBase.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Utils">
+        <File Name="CncBinaryTemplateStreamer.cpp"/>
+        <File Name="CncBinaryTemplateStreamer.h"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="Parser">
+        <File Name="BinaryFileParser.h"/>
+        <File Name="BinaryFileParser.cpp"/>
+      </VirtualDirectory>
+    </VirtualDirectory>
     <VirtualDirectory Name="GamePad">
       <File Name="CncGamePad.cpp"/>
       <VirtualDirectory Name="OSD">
@@ -144,6 +160,8 @@
       <File Name="SerialSimulatorFacade.cpp"/>
       <File Name="SerialSimulatorFacade.h"/>
       <VirtualDirectory Name="Native">
+        <File Name="SerialEmulatorStreamer.cpp"/>
+        <File Name="SerialEmulatorStreamer.h"/>
         <File Name="SerialEmulatorSVG.h"/>
         <File Name="SerialEmulatorSVG.cpp"/>
         <File Name="SerialEmulatorNull.h"/>
@@ -164,6 +182,9 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncCommandDecoder.cpp"/>
+      <File Name="CncCommandDecoder.h"/>
+      <File Name="CncSha1Wrapper.h"/>
       <File Name="CncCurveLib.cpp"/>
       <File Name="CncCurveLib.h"/>
       <File Name="CncUnitCalculator.cpp"/>
@@ -253,6 +274,8 @@
       <File Name="UpdateManagerThread.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="sha1.cpp"/>
+      <File Name="sha1.h"/>
       <File Name="DataControlModel.cpp"/>
       <File Name="GuiControlSetup.h"/>
       <File Name="PenHandler.h"/>

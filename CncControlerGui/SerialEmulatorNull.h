@@ -184,7 +184,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		CncLongPosition targetMajorPos;
 		CncLongPosition curEmulatorPos;
 		
-		inline bool writeMoveCmd(unsigned char *buffer, unsigned int nbByte);
+		inline bool writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte);
 		
 		inline bool moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte);
 		inline bool renderMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte);
@@ -207,27 +207,27 @@ class SerialEmulatorNULL : public SerialSpyPort
 		LastCommand lastCommand;
 		unsigned char lastSignal;
 		
-		void addErrorInfo(unsigned char eid, const wxString& text);
-		
-		virtual void waitDuringRead(unsigned int millis); 
-		virtual void sleepMilliseconds(unsigned int millis);
-		
-		unsigned char getLastSignal() { return lastSignal; }
-		
+		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) 	{ return true; }
+		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) 		{ return true; }
+		virtual bool writeMoveRenderedCallback(int32_t x , int32_t y , int32_t z) 			{ return true; }
+
 		virtual bool writeHeartbeat(unsigned char *buffer, unsigned int nbByte);
-		
 		virtual bool writeGetter(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeSetter(unsigned char *buffer, unsigned int nbByte);
-		virtual bool writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte);
-			
-		virtual int performSerialBytes(unsigned char *buffer, unsigned int nbByte);
 		
+		virtual int performSerialBytes(unsigned char *buffer, unsigned int nbByte);
 		virtual int performConfiguration(unsigned char *buffer, unsigned int nbByte);
 		
 		virtual int performText(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMsg(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMajorMove(unsigned char *buffer, unsigned int nbByte);
 		
+		void addErrorInfo(unsigned char eid, const wxString& text);
+		
+		virtual void waitDuringRead(unsigned int millis); 
+		virtual void sleepMilliseconds(unsigned int millis);
+		unsigned char getLastSignal() { return lastSignal; }
+
 		virtual bool evaluatePositions(std::vector<int32_t>& ret);
 		virtual bool evaluateLimitStates(std::vector<int32_t>& ret);
 		virtual bool evaluateLimitStates();

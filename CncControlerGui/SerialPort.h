@@ -8,6 +8,7 @@
 #include "OSD/SerialOSD.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
+#include "CncBinaryTemplateStreamer.h"
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
 
@@ -160,6 +161,17 @@ struct SvgOriginalPathInfo {
 class Serial : public SerialOSD {
 	public:
 		
+		struct Trigger {
+			struct BeginRun {
+				CncBinaryTemplateStreamer::ParameterSet parameter;
+			};
+			
+			struct EndRun {
+				bool succcess = false;
+			};
+			
+		};
+		
 		// SerialSyPort parameter
 		enum SypMode { SM_NONE = 0, SM_READ = 1, SM_WRITE = 2, SM_ALL = 3 };
 		
@@ -290,20 +302,18 @@ class Serial : public SerialOSD {
 		//return true on success.
 		bool writeData(unsigned char cmd);
 		virtual bool writeData(void *buffer, unsigned int nbByte);
-		// will be released periodically be the main thread
-		virtual void onPeriodicallyAppEvent(bool interrupted) {}
-		// returns the port name
-		virtual const char* getPortName() { return portName.c_str(); }
-		// set spy mode
-		void enableSpyOutput(bool show=true) { traceSpyInfo = show;}
-		bool isSpyOutputOn() { return traceSpyInfo; }
+
+		virtual void onPeriodicallyAppEvent(bool interrupted) 	{}
+		virtual const char* getPortName() 						{ return portName.c_str(); }
+		virtual bool canProcessIdle() 							{ return true; }
+		virtual bool isOutputAsTemplateAvailable()				{ return false; }
 		virtual void setSpyMode(Serial::SypMode sm);
-		Serial::SypMode getSpyMode() { return spyMode; };
+
+		void enableSpyOutput(bool show=true) 					{ traceSpyInfo = show;}
+		bool isSpyOutputOn() 									{ return traceSpyInfo; }
+		Serial::SypMode getSpyMode() 							{ return spyMode; };
 		
-		// indicates if idle message can be requested
-		virtual bool canProcessIdle() { return true; }
-		
-		// reurn the current command flag
+		// return the current command flag
 		bool isCommandActive() { return SerialCommandLocker::isCommandActive(); }
 		bool isIdleActive()    { return SerialCommandLocker::getLockedCommand() == CMD_IDLE; }
 		
@@ -324,6 +334,8 @@ class Serial : public SerialOSD {
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos);
 		bool processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos);
 		
+		bool execute(const unsigned char* buffer, unsigned int nbByte);
+		
 		// signals
 		bool sendSignal(const unsigned char cmd);
 		
@@ -334,8 +346,10 @@ class Serial : public SerialOSD {
 		bool sendQuitMove()			{ return sendSignal(SIG_QUIT_MOVE);      }
 		bool sendSoftwareReset() 	{ return sendSignal(SIG_SOFTWARE_RESET); }
 		
-
-				
+		// trigger
+		virtual void processTrigger(const Serial::Trigger::BeginRun& tr)	{}
+		virtual void processTrigger(const Serial::Trigger::EndRun& tr)		{}
+		
 		//SVG path handling
 		virtual void setSVGOutputParameters(const SvgOutputParameters& sp) {}
 		virtual void beginSVG(SVGUnit u, double width, double heigth, const wxString& viewBox = "" ) {}

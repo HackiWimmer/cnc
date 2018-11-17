@@ -15,7 +15,7 @@ class CncFileNameService {
 		static wxString _homeDirectory;
 		static wxString _tempDirectory;
 		static wxString _configDir;
-		
+		static wxString _session;
 		static wxString _configFileName;
 		static wxString _lruFileName;
 		static wxString _preconfiguredSpeedConfigFileName;
@@ -23,6 +23,7 @@ class CncFileNameService {
 		static void deleteFile(wxString fn);
 	
 	public:
+		
 		static void init();
 		static void trace(std::ostream& os);
 		static const wxString& getConfigFileName()				{ _ret = _configDir + _configFileName; return _ret; }
@@ -34,10 +35,13 @@ class CncFileNameService {
 		static const wxString& getTempDir() 					{ return _tempDirectory; }
 		static const wxString& getConfigDir()					{ return _configDir; }
 		
+		static const char* getSession()							{ return _session; }
+		
 		static const char* getTempFileName(TemplateFormat f);
 		static const char* getCncTemplatePreviewFileName(TemplateFormat f);
 	
 		static const char* getCncOutboundSvgFileName() 			{ _ret = _tempDirectory + "CncOutboundEmu.svg"; 	return _ret; }
+		static const char* getCncOutboundBinFileName() 			{ _ret = _tempDirectory + "CncOutboundEmu.bct"; 	return _ret; }
 		static const char* getCncOutboundTempFileName()			{ _ret = _tempDirectory + "CncOutboundTempEmu.xml"; return _ret; }
 		static const char* getCncDrawPaneTraceFileName() 		{ _ret = _tempDirectory + "CncDrawPaneTrace.txt"; 	return _ret; }
 		

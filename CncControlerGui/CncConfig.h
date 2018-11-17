@@ -313,6 +313,7 @@ class CncConfig {
 		const double getMaxZDistance()							{ return maxZDistance; }
 		const double getCurZDistance() 							{ return getWorkpieceThickness() + workpieceOffset; }
 		
+		const wxString& getFileBrowser(wxString& ret);
 		const wxString& getSVGFileViewer(wxString& ret);
 		const wxString& getGCodeFileViewer(wxString& ret);
 		const wxString& getXMLFileViewer(wxString& ret);

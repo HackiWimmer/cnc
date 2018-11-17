@@ -14,6 +14,7 @@
 #include "SerialPort.h"
 #include "SerialSimulatorFacade.h"
 #include "SerialEmulatorNull.h"
+#include "SerialEmulatorStreamer.h"
 #include "SerialEmulatorFile.h"
 #include "SerialEmulatorSVG.h"
 #include "CncMotionMonitor.h"
@@ -58,6 +59,7 @@ CncControl::CncControl(CncPortType pt)
 	else if ( pt == CncPORT_SIMU )		serialPort = new SerialSimulatorFacade(this);
 	else if ( pt == CncEMU_NULL )		serialPort = new SerialEmulatorNULL(this);
 	else if ( pt == CncEMU_SVG )		serialPort = new SerialEmulatorSVG(this);
+	else if ( pt == CncEMU_BIN )		serialPort = new SerialEmulatorStreamer(this);
 	else 								serialPort = new SerialSpyPort(this);
 	
 	serialPort->enableSpyOutput();
@@ -198,6 +200,7 @@ bool CncControl::processSetter(unsigned char pid, const SetterValueList& values)
 			std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)pid) << std::endl;
 			std::cerr << " Value(s): ";
 			traceSetterValueList(std::cerr, values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
+			std::cerr << std::endl;
 			return false;
 		}
 		

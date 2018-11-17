@@ -65,6 +65,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "ManuallyParser.h"
 #include "SVGFileParser.h"
 #include "GCodeFileParser.h"
+#include "BinaryPathHandlerCnc.h"
 #include "CncArduino.h"
 #include "SvgEditPopup.h"
 #include "HexDecoder.h"
@@ -76,6 +77,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncReferencePosition.h"
 #include "CncUsbConnectionDetected.h"
 #include "CncConnectProgress.h"
+#include "CncSha1Wrapper.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -698,7 +700,12 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	CncResolutionCalculatorTest::test();
+	
+	wxString ret;
+	std::cout << CncStringSha1::checksum("Stefan", ret) << std::endl;
+	std::cout << CncFileSha1::checksum("Stefan", ret) << std::endl;
+	
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -765,6 +772,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	perspectiveHandler.loadPerspective("Default");
 	decorateViewMenu();
 	
+	std::clog << "Woodworking Session ID: " << CncFileNameService::getSession() << std::endl;
+	
 	// Version infos
 	std::clog << "Version Information:" << std::endl;
 	traceGccVersion(std::cout);
@@ -777,7 +786,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
 		connectSerialPortDialog();
 		
-		// Auto process ?
+	// Auto process ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
 		defineMinMonitoring();
 		processTemplateWrapper();
@@ -1294,13 +1303,11 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 	ctl->SetMarginType(MARGIN_BREAKPOINT, wxSTC_MARGIN_TEXT);
 	ctl->SetMarginMask(MARGIN_BREAKPOINT, 0);
 	ctl->SetMarginSensitive(MARGIN_BREAKPOINT, true);
-
 	
 	// Enable edit style - file content marker
 	ctl->SetMarginWidth(MARGIN_EDIT_TRACKER, 3);
 	ctl->SetMarginType(MARGIN_EDIT_TRACKER, wxSTC_MARGIN_SYMBOL); 
 	ctl->SetMarginMask(MARGIN_EDIT_TRACKER, 0);
-
 	
 	// Configure caret style
 	ctl->SetCaretForeground(clCaretFgd);
@@ -1352,29 +1359,90 @@ void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat form
 			break;
 			
 		case TplGcode:
-#ifdef CNC_GCODE_LEXER
-			ctl->SetLexer(wxSTC_LEX_GCODE);
-			
-			// setup highlight colours
-			ctl->StyleSetForeground (wxSTC_GCODE_OPERATOR,		clOperator);
-			ctl->StyleSetForeground (wxSTC_GCODE_NUMBER,		clNumber);
-			ctl->StyleSetForeground (wxSTC_GCODE_IDENTIFIER,	clIdentifier);
-			ctl->StyleSetForeground (wxSTC_GCODE_PARAM,			clAttribute);
-			ctl->StyleSetForeground (wxSTC_GCODE_COMMENT,		clComment);
-			ctl->StyleSetForeground (wxSTC_GCODE_COMMENT_LINE,	clComment);
-			ctl->StyleSetForeground (wxSTC_GCODE_DIRECTIVE,		clComment);
+			#ifdef CNC_GCODE_LEXER
+				ctl->SetLexer(wxSTC_LEX_GCODE);
+				
+				// setup highlight colours
+				ctl->StyleSetForeground (wxSTC_GCODE_OPERATOR,		clOperator);
+				ctl->StyleSetForeground (wxSTC_GCODE_NUMBER,		clNumber);
+				ctl->StyleSetForeground (wxSTC_GCODE_IDENTIFIER,	clIdentifier);
+				ctl->StyleSetForeground (wxSTC_GCODE_PARAM,			clAttribute);
+				ctl->StyleSetForeground (wxSTC_GCODE_COMMENT,		clComment);
+				ctl->StyleSetForeground (wxSTC_GCODE_COMMENT_LINE,	clComment);
+				ctl->StyleSetForeground (wxSTC_GCODE_DIRECTIVE,		clComment);
 
-			font = (ctl->StyleGetFont(wxSTC_GCODE_IDENTIFIER)).Bold();
-			ctl->StyleSetFont(wxSTC_GCODE_IDENTIFIER, font);
+				font = (ctl->StyleGetFont(wxSTC_GCODE_IDENTIFIER)).Bold();
+				ctl->StyleSetFont(wxSTC_GCODE_IDENTIFIER, font);
+				
+				font = (ctl->StyleGetFont(wxSTC_GCODE_PARAM)).Bold();
+				ctl->StyleSetFont(wxSTC_GCODE_PARAM, font);
+			#endif
+			break;
 			
-			font = (ctl->StyleGetFont(wxSTC_GCODE_PARAM)).Bold();
-			ctl->StyleSetFont(wxSTC_GCODE_PARAM, font);
-#endif
+		case TplBinary:
+			ctl->SetLexer(wxSTC_LEX_CPP);
+			
+			for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++)
+				ctl->StyleSetFont(i, staticFont);
+				
+/*
+	wxColour clComment(150, 150, 150);
+	wxColour clIdentifier(135, 206, 250);
+	wxColour clAttribute(128, 139, 237);
+	wxColour clNumber(128,255,128);
+	wxColour clOperator(255,128,128);
+
+	#define wxSTC_C_DEFAULT 0
+	#define wxSTC_C_COMMENT 1
+	#define wxSTC_C_COMMENTLINE 2
+	#define wxSTC_C_COMMENTDOC 3
+	#define wxSTC_C_NUMBER 4
+	#define wxSTC_C_WORD 5
+	#define wxSTC_C_STRING 6
+	#define wxSTC_C_CHARACTER 7
+	#define wxSTC_C_UUID 8
+	#define wxSTC_C_PREPROCESSOR 9
+	#define wxSTC_C_OPERATOR 10
+	#define wxSTC_C_IDENTIFIER 11
+	#define wxSTC_C_STRINGEOL 12
+	#define wxSTC_C_VERBATIM 13
+	#define wxSTC_C_REGEX 14
+	#define wxSTC_C_COMMENTLINEDOC 15
+	#define wxSTC_C_WORD2 16
+	#define wxSTC_C_COMMENTDOCKEYWORD 17
+	#define wxSTC_C_COMMENTDOCKEYWORDERROR 18
+	#define wxSTC_C_GLOBALCLASS 19
+	#define wxSTC_C_STRINGRAW 20
+	#define wxSTC_C_TRIPLEVERBATIM 21
+	#define wxSTC_C_HASHQUOTEDSTRING 22
+	#define wxSTC_C_PREPROCESSORCOMMENT 23
+	#define wxSTC_C_PREPROCESSORCOMMENTDOC 24
+	#define wxSTC_C_USERLITERAL 25
+	#define wxSTC_C_TASKMARKER 26
+	#define wxSTC_C_ESCAPESEQUENCE 27
+*/		
+			ctl->StyleSetForeground(wxSTC_C_COMMENT, 		clComment);
+			ctl->StyleSetForeground(wxSTC_C_COMMENTLINE, 	clComment);
+			ctl->StyleSetForeground(wxSTC_C_COMMENTDOC, 	clComment);
+			ctl->StyleSetFont(wxSTC_C_COMMENT, 				defaultFont);
+			ctl->StyleSetFont(wxSTC_C_COMMENTLINE, 			defaultFont);
+			ctl->StyleSetFont(wxSTC_C_COMMENTDOC, 			defaultFont);
+	
+			ctl->StyleSetForeground(wxSTC_C_NUMBER, 		clNumber);
+			ctl->StyleSetFont(wxSTC_C_NUMBER, 				staticFont);
+			
+			ctl->StyleSetForeground(wxSTC_C_NUMBER, 		clIdentifier);
+			ctl->StyleSetFont(wxSTC_C_IDENTIFIER, 			defaultFont);
+
+			ctl->SetReadOnly(true);
+			
 			break;
 			
 		default:
 			;// do nothing
 	}	
+	
+	
 }
 #ifdef __WXMSW__
 ///////////////////////////////////////////////////////////////////
@@ -1493,6 +1561,10 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
+	if ( lastPortName == _portEmulatorBIN )		m_portSelector->Append(_portEmulatorBIN, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorBIN, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+
+
 	/*
 	if ( lastPortName == _portEmulatorSVG )		m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
@@ -1618,6 +1690,7 @@ void MainFrame::initialize(void) {
 	toggleMonitorStatistics(false);
 	changeManuallySpeedValue();
 	initSpeedConfigPlayground();
+	decorateOutboundSaveControls(false);
 	
 	m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
 	
@@ -1736,6 +1809,7 @@ bool MainFrame::initializeLruMenu() {
 		openFile();
 		prepareAndShowMonitorTemplatePreview();
 		introduceCurrentFile();
+		
 	} else {
 		cncConfig->getDefaultTplDir(value);
 		fileView->openDirectory(value);
@@ -2020,11 +2094,16 @@ bool MainFrame::connectSerialPort() {
 		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
-		wxString val;
 		cs.assign(CncFileNameService::getCncOutboundSvgFileName());
 		GBL_CONFIG->setProbeMode(true);
 		showSVGEmuResult();
-		enableMenuItem(m_miSaveEmuOutput, true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
+		
+	} else if ( sel == _portEmulatorBIN) {
+		cnc = new CncControl(CncEMU_BIN);
+		cs.assign(CncFileNameService::getCncOutboundBinFileName());
+		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
 		
@@ -2162,13 +2241,23 @@ void MainFrame::enableControls(bool state) {
 	}
 		
 	// enable template editor
-	m_stcFileContent->SetReadOnly(!state);
-	if ( state == true )	m_editMode->SetLabel("Edit mode");
-	else					m_editMode->SetLabel("Readonly");
+	enableMainFileEditor(state);
 	
 	// run control
 	enableRunControls(state);
 	
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::enableMainFileEditor(bool state, bool force) {
+///////////////////////////////////////////////////////////////////
+	if ( force == false && getCurrentTemplateFormat() == TplBinary )
+		state = false; // always
+		
+	// enable template editor
+	m_stcFileContent->SetReadOnly(!state);
+	
+	if ( state == true )	m_editMode->SetLabel("Edit mode");
+	else					m_editMode->SetLabel("Read only");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -2441,6 +2530,26 @@ void MainFrame::refreshSvgEmuSourceFile(bool blank) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+const char* MainFrame::getCurrentTemplateFormatName(const char* fileName) {
+///////////////////////////////////////////////////////////////////
+	switch ( getCurrentTemplateFormat(fileName) ) {
+		case TplManual:
+		case TplTest:	return "";
+		
+		default: 	{
+						wxFileName fn;
+						if ( fileName == NULL )	fn.Assign(getCurrentTemplatePathFileName());
+						else					fn.Assign(fileName);
+						
+						wxString ext(fn.GetExt());
+						ext.MakeUpper();
+						return ext;
+					}
+	}
+	
+	return "";
+}
+///////////////////////////////////////////////////////////////////
 TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int sel = m_mainViewSelector->GetSelection();
@@ -2460,6 +2569,7 @@ TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 	if      ( ext == "SVG" )	return TplSvg;
 	else if ( ext == "GCODE") 	return TplGcode;
 	else if ( ext == "NGC") 	return TplGcode;
+	else if ( ext == "BCT") 	return TplBinary;
 
 	return TplUnknown;
 }
@@ -2493,6 +2603,60 @@ void MainFrame::showSvgExtPages(bool show) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::fillFileDetails(bool fileLoaded) {
+///////////////////////////////////////////////////////////////////
+	wxString details, parameter, source;
+	
+	if ( fileLoaded == true ) {
+		wxString fileName(getCurrentTemplatePathFileName());
+		wxFileName file(fileName);
+		details.append(wxString::Format("Full Name       : %s\n", file.GetFullPath()));
+		details.append(wxString::Format("Change Datetime : %s\n", file.GetModificationTime().FormatISOCombined(' ')));
+		details.append(wxString::Format("File Size       : %s\n", file.GetHumanReadableSize()));
+		
+		if ( getCurrentTemplateFormat() == TplBinary ) {
+			BinaryFileParser::extractSourceContentAsString(fileName, source);
+			BinaryFileParser::extractDataHeaderAsString(fileName, parameter);
+		}
+	}
+	
+	m_filePreviewDetails->ChangeValue(details);
+	m_filePreviewParameter->ChangeValue(parameter);
+	m_filePreviewSource->ChangeValue(source);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectEditorToolBox(bool fileLoaded) {
+///////////////////////////////////////////////////////////////////
+	wxFlexGridSizer* sizer = static_cast<wxFlexGridSizer*>(m_editorToolBox->GetContainingSizer());
+	if ( sizer == NULL )
+		return;
+
+	bool show = true;
+	if ( fileLoaded == false ) {
+		show = false;
+		
+	} else {
+		switch ( getCurrentTemplateFormat() ) {
+			case TplSvg:		m_editorToolBox->SetSelection(0);
+								show = false;
+								break;
+								
+			case TplGcode:		m_editorToolBox->SetSelection(1);
+								show = false;
+								break;
+								
+			case TplBinary:		m_editorToolBox->SetSelection(2);
+								show = true;
+								break;
+								
+			default:			show = false;
+		}
+	}
+	
+	m_editorToolBox->Show(show);
+	sizer->Layout();
+}
+///////////////////////////////////////////////////////////////////
 bool MainFrame::openFile(int pageToSelect) {
 ///////////////////////////////////////////////////////////////////
 	// First select the template page to get the rigth result 
@@ -2512,10 +2676,17 @@ bool MainFrame::openFile(int pageToSelect) {
 						hideSvgExtPages();
 						break;
 						
+		case TplBinary:	ret = openBinaryFile(getCurrentBinaryViewMode());
+						hideSvgExtPages();
+						break;
+						
 		default:		hideSvgExtPages();
 						std::cerr << "MainFrame::openFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
 						ret = false;
 	}
+	
+	selectEditorToolBox(ret);
+	fillFileDetails(ret);
 	
 	if ( ret == true ) {
 		evaluateTemplateModificationTimeStamp();
@@ -2554,7 +2725,7 @@ void MainFrame::introduceCurrentFile() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openTextFile() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(m_inputFileName);
+	enableMainFileEditor(true, true);
 	
 	wxFileInputStream input(getCurrentTemplatePathFileName());
 	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
@@ -2573,6 +2744,23 @@ bool MainFrame::openTextFile() {
 	
 	std::cerr << "Error while open file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
 	return false;
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::openBinaryFile(BinaryFileParser::ViewType vt) {
+///////////////////////////////////////////////////////////////////
+	enableMainFileEditor(true, true);
+	
+	m_stcFileContent->ClearAll();
+	
+	wxString viewContent;
+	if ( BinaryFileParser::extractViewAsString(vt, getCurrentTemplatePathFileName(), viewContent) == false )
+		return false;
+		
+	m_stcFileContent->AppendText(viewContent);
+	m_stcFileContent->DiscardEdits();
+	
+	enableMainFileEditor(false, true);
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::prepareNewTemplateFile() {
@@ -2659,7 +2847,7 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 								_("Open Template File"), 
 								templateName,
 								"",
-                                "SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode", 
+                                "SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode|Binary Tpl Files (*.bct)|*.bct", 
 								wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
 	if ( openFileDialog.ShowModal() == wxID_CANCEL ) 
@@ -3054,6 +3242,17 @@ void MainFrame::activateGamepadNotifications(bool state) {
 	if ( gamepadThread->IsPaused() )	std::cout << ( changed ? "Gamepad thread deactivated" : "Gamepad thread stays deactivated") << std::endl;
 	else								std::cout << ( changed ? "Gamepad thread activated"   : "Gamepad thread stays activated") << std::endl;
 	*/
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::processBinaryTemplate() {
+///////////////////////////////////////////////////////////////////
+	if ( inboundFileParser != NULL )
+		delete inboundFileParser;
+		
+	CncGampadDeactivator cpd(this);
+		
+	inboundFileParser = new BinaryFileParser(getCurrentTemplatePathFileName().c_str(), new BinaryPathHandlerCnc(cnc));
+	return processVirtualTemplate();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processSVGTemplate() {
@@ -3729,6 +3928,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	// as a result the processing slows down significantly.
 	CncConfig::NotificationDeactivator cfgNotDeactivation;
 	
+	decorateOutboundSaveControls(false);
+	
 	wxString fn (getCurrentTemplatePathFileName());
 	if ( fn.IsEmpty() == true )
 		return false;
@@ -3770,6 +3971,12 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	
 	cnc->getSerial()->traceSpeedInformation();
 	
+	Serial::Trigger::EndRun endRun;
+	endRun.succcess = ret;
+	cnc->getSerial()->processTrigger(endRun);
+	
+	decorateOutboundSaveControls(cnc->getSerial()->isOutputAsTemplateAvailable());
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -3777,6 +3984,15 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 bool MainFrame::processTemplateIntern() {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
+	
+	Serial::Trigger::BeginRun begRun;
+		begRun.parameter.SRC.fileName		= getCurrentTemplatePathFileName();
+		begRun.parameter.SRC.fileType		= getCurrentTemplateFormatName();
+		begRun.parameter.SET.hardwareResX 	= GBL_CONFIG->getDisplayFactX();
+		begRun.parameter.SET.hardwareResY 	= GBL_CONFIG->getDisplayFactY();
+		begRun.parameter.SET.hardwareResZ 	= GBL_CONFIG->getDisplayFactZ();
+		begRun.parameter.PRC.user			= "Hacki Wimmer";
+	cnc->getSerial()->processTrigger(begRun);
 	
 	if ( m_clearSerialSpyBeforNextRun->IsChecked() )
 		clearSerialSpy();
@@ -3812,6 +4028,15 @@ bool MainFrame::processTemplateIntern() {
 	
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
+		
+		case TplBinary:
+			if ( checkIfTemplateIsModified() == false )
+				break;
+			clearMotionMonitor();
+			// measurement handling will be done by the corespondinf file parser
+			ret = processBinaryTemplate();
+			break;
+			
 		case TplSvg:
 			if ( checkIfTemplateIsModified() == false )
 				break;
@@ -3819,6 +4044,7 @@ bool MainFrame::processTemplateIntern() {
 			// measurement handling will be done by the corespondinf file parser
 			ret = processSVGTemplate();
 			break;
+			
 		case TplGcode:
 			if ( checkIfTemplateIsModified() == false )
 				break;
@@ -3826,15 +4052,18 @@ bool MainFrame::processTemplateIntern() {
 			// measurement handling will be done by the corespondinf file parser
 			ret = processGCodeTemplate();
 			break;
+			
 		case TplManual:
 			ret = processManualTemplate();
 			break;
+			
 		case TplTest:
 			clearMotionMonitor();
 			cnc->getSerial()->startMeasurement();
 			ret = processTestTemplate();
 			cnc->getSerial()->stopMeasurement();
 			break;
+			
 		default:
 			; // do nothing
 	}
@@ -4055,11 +4284,18 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 							
 		case TplGcode:		tfn.append(".gcode");
 							break;
-		
+							
+		case TplBinary:		tfn.append(".gcode");
+							if ( BinaryFileParser::extractSourceContentAsFile(getCurrentTemplatePathFileName(), tfn) == true ) {
+								openMonitorPreview(tfn);
+								// no furter copy necessay
+								return;
+							}
+							
 		default:			// do nothing;
 							break;
 	}
-		
+	
 	// create a copy to avoid a modification of m_stcFileContent
 	wxTextFile file(tfn);
 	if ( !file.Exists() )
@@ -4251,52 +4487,6 @@ void MainFrame::requestInterrupt(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	cnc->getSerial()->sendSignal(SIG_INTERRUPPT);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::saveEmuOutput(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString filePattern;
-	
-	switch ( cnc->getPortType() ) {
-		case CncEMU_SVG: 	filePattern = "SVG Files (*.svg)|*.svg";  
-						break;
-		default:		std::clog << "No Emulator output available . . ." << std::endl;
-						return;
-	}
-
-	wxFileDialog saveFileDialog(this, 
-	                            _("Save Emulator Output as Template"), 
-								getCurrentTemplatePathFileName(), 
-								"",
-								filePattern,
-								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
-								
-	if ( saveFileDialog.ShowModal() == wxID_CANCEL ) { 
-		return;
-	}
-
-	if ( wxCopyFile(cnc->getSerial()->getPortName(), saveFileDialog.GetPath(), true) == false ) {
-		std::cerr << "File copy failed:" << std::endl;
-		std::cerr << " from:" << cnc->getSerial()->getPortName()<< std::endl;
-		std::cerr << " to:" << saveFileDialog.GetPath() << std::endl;
-		return;
-	}
-	
-	wxString msg;
-	msg << "Should it opened directly as template?";
-	wxMessageDialog dlg(this, msg, _T("Save Emulator Output as Template"), 
-						wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
-
-	if ( dlg.ShowModal() == wxID_YES ) {
-		m_inputFileName->SetValue(saveFileDialog.GetFilename());
-		m_inputFileName->SetHint(saveFileDialog.GetPath());
-		
-		if ( !openFile() ) {
-			std::cerr << "Error while open file: " << saveFileDialog.GetPath().c_str() << std::endl;
-		}
-		
-		prepareAndShowMonitorTemplatePreview(true);
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::svgEmuClear(wxCommandEvent& event) {
@@ -5062,6 +5252,15 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 							
 		case TplGcode:		ctrl->selectGCodePreview(fn);
 							break;
+							
+		case TplBinary:		{
+								wxString tmpSourceFileName;
+								if ( BinaryFileParser::extractSourceContentAsFile(fn, tmpSourceFileName) ) {
+									openPreview(ctrl, tmpSourceFileName);
+								}
+								
+								break;
+							}
 		
 		default:			if ( fn.IsEmpty() == false )
 								cnc::trc.logError(wxString::Format("Cant preview: '%s'", fn));
@@ -5106,6 +5305,9 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 void MainFrame::lruListItemLeave(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( m_keepFileManagerPreview->IsChecked() )
+		return;
+	
+	if ( CncAsyncKeyboardState::isControlPressed() )
 		return;
 		
 	if ( m_mainViewBook->GetSelection() != MainBookSelection::VAL::PREVIEW_PANEL )
@@ -5683,6 +5885,12 @@ void MainFrame::createStcFileControlPopupMenu() {
 		return;
 
 	stcFileContentPopupMenu = SvgEditPopup::createMenu(m_stcFileContent, stcFileContentPopupMenu, true);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::decorateOutboundSaveControls(bool state) {
+///////////////////////////////////////////////////////////////////
+	m_miSaveEmuOutput->Enable(state);
+	m_btSaveOutboundAsTemplate->Enable(state);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
@@ -7454,7 +7662,7 @@ void MainFrame::toggleMonitorStatistics(bool shown) {
 		
 	wxASSERT(sizer->GetItemCount() == 2);
 	
-	const int monitorId = 0;
+	const int monitorId   = 0;
 	const int statisticId = 1;
 
 	if ( sizer->IsRowGrowable(monitorId))	sizer->RemoveGrowableRow(monitorId);
@@ -7867,6 +8075,174 @@ void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
 	motionMonitor->reconstruct();
 
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::openSessionDialog(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString ret;
+	openFileExtern(GBL_CONFIG->getFileBrowser(ret), CncFileNameService::getTempDir());
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::traceSessionId(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	std::clog << " Woodworking Session ID: " << CncFileNameService::getSession() << std::endl;
+}
+/////////////////////////////////////////////////////////////////////
+BinaryFileParser::ViewType MainFrame::getCurrentBinaryViewMode() {
+/////////////////////////////////////////////////////////////////////
+	unsigned int sel = m_cbBinaryViewMode->GetSelection();
+	switch ( sel ) {
+		case 0:		return BinaryFileParser::ViewType::HexRaw;
+		case 1:		return BinaryFileParser::ViewType::HexCStyle;
+		case 2:		return BinaryFileParser::ViewType::ReadableSteps;
+		
+		default:	return BinaryFileParser::ViewType::ReadableMetric;
+	}
+	
+	return BinaryFileParser::ViewType::ReadableMetric;
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::selectBinaryEditorViewMode(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	unsigned int sel = m_cbBinaryViewMode->GetSelection();
+	
+	BinaryFileParser::ViewType vt;
+	switch ( sel ) {
+		case 0:		vt = BinaryFileParser::ViewType::HexRaw; 			break;
+		case 1:		vt = BinaryFileParser::ViewType::HexCStyle; 		break;
+		case 2:		vt = BinaryFileParser::ViewType::ReadableSteps; 	break;
+		
+		default:	vt = BinaryFileParser::ViewType::ReadableMetric;
+	}
+	
+	openBinaryFile(vt);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxString outboundFile(cnc->getSerial()->getPortName());
+	
+	if ( wxFile::Exists(outboundFile) == false ) {
+		std::cerr << "MainFrame::saveOutboundAsNewTemplate: Can't found '" << outboundFile << "'" << std::endl;
+		return;
+	}
+	
+	wxString headline("Save Outbound as new Template");
+	wxString inboundFile(getCurrentTemplatePathFileName());
+	inboundFile.append(".bct");
+	
+	wxFileDialog saveFileDialog(this, 
+	                            headline, 
+								inboundFile, 
+								inboundFile,
+								"",
+								wxFD_SAVE);
+								
+	if ( saveFileDialog.ShowModal() == wxID_CANCEL ) { 
+		return;
+	}
+	
+	wxString newFile(saveFileDialog.GetPath());
+	if ( wxFile::Exists(newFile) == true ) {
+		
+		wxString msg(wxString::Format("Template '%s'\nalready exists. Overide it?", newFile));
+		wxMessageDialog dlg(this, msg, headline, wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
+		
+		if ( dlg.ShowModal() == wxID_NO ) 
+			return;
+	}
+	
+	if ( wxCopyFile(outboundFile, saveFileDialog.GetPath(), true) == false ) {
+		
+		std::cerr << "File copy failed:"                         << std::endl;
+		std::cerr << " from:" << cnc->getSerial()->getPortName() << std::endl;
+		std::cerr << " to:"   << saveFileDialog.GetPath()        << std::endl;
+		return;
+	}
+	
+	wxString msg("Should the new template opened directly into the editor?");
+	wxMessageDialog dlg(this, msg, headline, wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
+
+	if ( dlg.ShowModal() == wxID_YES ) {
+		
+		wxFileName x(outboundFile);
+		m_inputFileName->SetValue(x.GetFullName());
+		m_inputFileName->SetHint(x.GetFullPath());
+		
+		if ( !openFile() ) {
+			std::cerr << "Error while open file: " << outboundFile << std::endl;
+			return;
+		}
+		
+		prepareAndShowMonitorTemplatePreview(true);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::saveOutboundAsNewTplFromMenu(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	saveOutboundAsNewTplFromButton(event);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	BinaryFileParser parser(getCurrentTemplatePathFileName());
+	if ( parser.preview() == false ) {
+		#warning
+		return;
+	}
+	
+	wxString origType, origName;
+	parser.getSourceParameter(XMLSourceNode_AttribFile, origName);
+	parser.getSourceParameter(XMLSourceNode_AttribType, origType);
+	
+	wxFileName newFile(origName);
+	newFile.ClearExt();
+	
+	wxString newName(newFile.GetFullName());
+	newName.append("_Copy.");
+	newName.append(origType);
+	
+	wxString defaultDir;
+	GBL_CONFIG->getDefaultTplDir(defaultDir);
+		
+	wxString headline("Save nested source as new Template");
+	
+	wxFileDialog saveFileDialog(this, 
+								headline, 
+								defaultDir, 
+								newName,
+								"",
+								wxFD_SAVE|wxFD_OVERWRITE_PROMPT);
+								
+	if ( saveFileDialog.ShowModal() == wxID_CANCEL ) { 
+		return;
+	}
+	
+	std::ofstream out(saveFileDialog.GetPath());
+	if ( out.good() == false ) {
+		#warning
+		return;
+	}
+	
+	wxString content;
+	out << parser.getSourceContent(content);
+	out.close();
+	
+	wxFileName x(saveFileDialog.GetPath());
+	m_inputFileName->SetValue(x.GetFullName());
+	m_inputFileName->SetHint(x.GetFullPath());
+
+	if ( !openFile() ) {
+		std::cerr << "Error while open file: " << saveFileDialog.GetPath() << std::endl;
+		return;
+	}
+	
+	prepareAndShowMonitorTemplatePreview(true);
+}
+
+
+
+
+
 
 
 
@@ -7875,6 +8251,7 @@ void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
 
 void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
+	std::cout << "todo" << std::endl;
 }
 
 

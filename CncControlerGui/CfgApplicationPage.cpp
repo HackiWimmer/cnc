@@ -134,6 +134,12 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		registerCategory(curCatName, tools);
 		{
 			//...............
+			prop = tools->AppendChild( new wxFileProperty("File Browser", NEXT_PROP_ID, ""));
+			prop->Enable(true);
+			prop->SetHelpString("");
+			registerProperty(CncApplication_Tool_FILE_BROWSER, prop);
+
+			//...............
 			prop = tools->AppendChild( new wxFileProperty("SVG File Viewer", NEXT_PROP_ID, "notepad"));
 			prop->Enable(true);
 			prop->SetHelpString("");

@@ -20,7 +20,7 @@ wxPropertyGridManager* globlSetupGrid 	= NULL;
 ConfigPGEventMap  globalPGEventMap;
 ConfigPropertyMap globalPropertyMap;
 
-const wxString    renderSelectorFormat("%0.2lf mm");
+const wxString    renderSelectorFormat("%0.3lf mm - %u PPI");
 
 ////////////////////////////////////////////////////////////////////////
 const wxString& CncConfig::ToolMagazineEntry::serialize(wxString& ret ) {
@@ -802,17 +802,14 @@ void CncConfig::setRenderResolution(double res) {
 		return;
 		
 	wxComboBox* cb = THE_APP->GetCbRenderResolution();
-	wxString item(wxString::Format(renderSelectorFormat, renderResolutionMM));
+	unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
+	wxString item(wxString::Format(renderSelectorFormat, renderResolutionMM, ppi));
 
 	int itemExits  = cb->FindString(item);
 	if ( itemExits < 0 )
 		cb->Append(item);
 		
 	cb->SetStringSelection(item);
-	
-	typedef CncUnitCalculatorBase::Unit Unit;
-	unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, renderResolutionMM);
-	THE_APP->GetTxRenderPPI()->ChangeValue(wxString::Format("%u PPI", ppi));
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setRenderResolution(const wxString& sel) {
@@ -834,7 +831,9 @@ void CncConfig::setupSelectorRenderResolution() {
 		cb->Clear();
 		
 		auto appendList = [&](float resolution) {
-			cb->Append(wxString::Format(renderSelectorFormat, resolution));
+			
+			unsigned int ppi = CncResolutionCalculator::getPointsPerInchForUnit(Unit::mm, resolution);
+			cb->Append(wxString::Format(renderSelectorFormat, resolution, ppi));
 		};
 		
 		appendList(0.01);
@@ -848,6 +847,7 @@ void CncConfig::setupSelectorRenderResolution() {
 		appendList(0.09);
 		appendList(0.10);
 		appendList(0.20);
+		appendList(0.262);
 		appendList(0.30);
 		appendList(0.40);
 		appendList(0.50);
@@ -856,7 +856,7 @@ void CncConfig::setupSelectorRenderResolution() {
 		appendList(0.80);
 		appendList(0.90);
 		
-		setRenderResolution(0.2);
+		setRenderResolution(0.262);
 	}
 }
 
@@ -917,6 +917,7 @@ const CncUnit CncConfig::getDisplayUnit() 							{ return currentUnit; }
 const CncUnit CncConfig::getDefaultDisplayUnit()					{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? CncMetric : CncSteps ); }
 const char*  CncConfig::getDefaultDisplayUnitAsStr()				{ PROPERTY(CncApplication_DEF_DISPLAY_UNIT) 			return ( p->GetValueAsString() == "mm" ? "mm" : "steps" ); }
 
+const wxString& CncConfig::getFileBrowser(wxString& ret)			{ PROPERTY(CncApplication_Tool_FILE_BROWSER) 			ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getSVGFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_SVG_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getGCodeFileViewer(wxString& ret)		{ PROPERTY(CncApplication_Tool_GCODE_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_XML_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }

@@ -89,7 +89,7 @@ const CncCurveLib::Point CncCurveLib::getPointOnEllipticalArc(CncCurveLib::Param
 	float xAxisRotationRadians = CncCurveLib::toRadians(ps.xAxisRotation);
 
 	// If the endpoints are identical, then this is equivalent to omitting the elliptical arc segment entirely.
-	if(ps.p0 == ps.p1) return ps.p0;
+	if( ps.p0 == ps.p1 ) return ps.p0;
 
 	// If rx = 0 or ry = 0 then this arc is treated as a straight line segment joining the endpoints.
 	if( ps.rx == 0 || ps.ry == 0) return getPointOnLine(ps, t);
@@ -163,7 +163,7 @@ const CncCurveLib::Point CncCurveLib::getPointOnEllipticalArc(CncCurveLib::Param
 	double ellipseComponentY = ps.ry * sin(angle);
 
 	// Attach some extra info to use
-	ps.EARI.ellipticalArcCenter 	= CncCurveLib::Point(float(center.x), float(center.y));
+	ps.EARI.ellipticalArcCenter 	= CncCurveLib::Point(center.x, center.y);
 	ps.EARI.ellipticalArcStartAngle = startAngle;
 	ps.EARI.ellipticalArcEndAngle 	= startAngle + sweepAngle;
 	ps.EARI.ellipticalArcAngle 		= angle;
@@ -188,6 +188,12 @@ bool CncCurveLib::callback(const CncCurveLib::Point& p) {
 //////////////////////////////////////////////////////////////////
 bool CncCurveLib::render(CncCurveLib::ParameterSet& ps) {
 //////////////////////////////////////////////////////////////////
+	if ( ps.getType() != type ) {
+		std::cerr << "Incompatible parameter set: ["
+				  << type << " != " << ps.getType() << "]"
+				  << std::endl;
+		return false;
+	}
 
 	// step 1: approximate the curve length
 		ps.RI.curveLength = 0.0;
@@ -210,15 +216,15 @@ bool CncCurveLib::render(CncCurveLib::ParameterSet& ps) {
 
 	// step 2: determine the render increment
 		ps.RI.steps = ps.RI.curveLength / setup.resolution.size ? ps.RI.curveLength / setup.resolution.size : 1;
-		
+
 		if ( ps.RI.steps > 1 )	ps.RI.increment = clamp(1.0 / ps.RI.steps, 0.0001, 0.99);
 		else					ps.RI.increment = 1.0;
-		
+
 		ps.RI.resolution = setup.resolution.size;
 
 	// step 3: render the function
 		Point p;
-		
+
 		for ( float t = 0.0f; t <1.0f; t += ps.RI.increment ) {
 			p = (this->*renderFunc)(ps, t);
 			callback(p);

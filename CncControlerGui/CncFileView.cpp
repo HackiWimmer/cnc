@@ -1,6 +1,7 @@
 #include <iostream>
 #include <wx/dir.h>
 #include <wx/filename.h>
+#include "OSD/CncAsyncKeyboardState.h"
 #include "MainFrame.h"
 #include "CncFileView.h"
 
@@ -14,6 +15,7 @@ const char* ALL_FILES 		= "*.*";
 const char* SVG_FILES 		= "*.svg";
 const char* GCODE_FILES1 	= "*.gcode";
 const char* GCODE_FILES2 	= "*.ngc";
+const char* BIN_FILES 		= "*.bct";
 
 /////////////////////////////////////////////////////////////////
 CncFileView::CncFileView(MainFrame* parent)
@@ -40,6 +42,7 @@ CncFileView::CncFileView(MainFrame* parent)
 	filterList.push_back(SVG_FILES);
 	filterList.push_back(GCODE_FILES1);
 	filterList.push_back(GCODE_FILES2);
+	filterList.push_back(BIN_FILES);
 	
 	for ( auto it = filterList.begin(); it != filterList.end(); ++it )
 		m_filterExtention->Append(*it);
@@ -193,6 +196,9 @@ void CncFileView::fileListLeave(wxMouseEvent& event) {
 		return;
 		
 	if ( mainFrame->GetKeepFileManagerPreview()->IsChecked() == true )
+		return;
+		
+	if ( CncAsyncKeyboardState::isControlPressed() )
 		return;
 		
 	mainFrame->selectMainBookSourcePanel();

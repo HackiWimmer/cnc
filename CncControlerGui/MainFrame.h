@@ -9,6 +9,7 @@
 #include "NotebookInfo.h"
 #include "LruFileList.h"
 #include "FileParser.h"
+#include "BinaryFileParser.h"
 #include "PathGeneratorFrame.h"
 #include "UpdateManagerThread.h"
 #include "GamepadThread.h"
@@ -83,8 +84,14 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void motionMonitorPostionMarker(wxCommandEvent& event);
-    virtual void motionMonitorFlyPath(wxCommandEvent& event);
+		virtual void extractSourceAsNewTpl(wxCommandEvent& event);
+		virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event);
+		virtual void saveOutboundAsNewTplFromMenu(wxCommandEvent& event);
+		virtual void selectBinaryEditorViewMode(wxCommandEvent& event);
+		virtual void traceSessionId(wxCommandEvent& event);
+		virtual void openSessionDialog(wxCommandEvent& event);
+		virtual void motionMonitorPostionMarker(wxCommandEvent& event);
+		virtual void motionMonitorFlyPath(wxCommandEvent& event);
 		virtual void updateRenderResolution(wxCommandEvent& event);
 		virtual void toggleIdleRequests(wxCommandEvent& event);
 		virtual void cncMainViewChanged(wxNotebookEvent& event);
@@ -293,7 +300,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void fileContentKeyDown(wxKeyEvent& event);
 		virtual void svgEmuClear(wxCommandEvent& event);
 		virtual void selectPort(wxCommandEvent& event);
-		virtual void saveEmuOutput(wxCommandEvent& event);
 		virtual void requestVersion(wxCommandEvent& event);
 		virtual void requestCurrentPos(wxCommandEvent& event);
 		virtual void requestCurrentLimitState(wxCommandEvent& event);
@@ -618,14 +624,18 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		const char* getErrorHtmlPage(const wxString& errorInfo);
 		
 		TemplateFormat getCurrentTemplateFormat(const char* fn = NULL);
+		const char* getCurrentTemplateFormatName(const char* fn = NULL);
 		const wxString& getCurrentTemplateFileName();
 		const wxString& getCurrentTemplatePathFileName();
 		
 		
 		bool checkIfTemplateIsModified();
+
+		BinaryFileParser::ViewType getCurrentBinaryViewMode();
 		
 		bool openFile(int pageToSelect = -1);
 		bool openTextFile();
+		bool openBinaryFile(BinaryFileParser::ViewType vt = BinaryFileParser::ViewType::HexCStyle);
 		bool saveFile();
 		bool saveTextFile();
 		bool saveTextFileAs();
@@ -645,6 +655,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void updateRenderResolution();
 		
 		void decorateSearchButton();
+		void decorateOutboundSaveControls(bool state);
 		void decoratePosSpyConnectButton(bool state);
 		void decorateSpeedControlBtn(bool useSpeedCfg);
 		
@@ -683,6 +694,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool processVirtualTemplate();
 		bool processTemplateIntern();
 		bool processTemplateWrapper(bool confirm=true);
+		bool processBinaryTemplate();
 		bool processSVGTemplate();
 		bool processGCodeTemplate();
 		bool processManualTemplate();
@@ -732,6 +744,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void enableRunControls(bool state = true);
 		void disableRunControls() { enableRunControls(false); }
 		
+		void enableMainFileEditor(bool state = true, bool force=false);
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 
@@ -763,6 +776,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void startAnimationControl();
 		void stopAnimationControl();
 		
+		void selectEditorToolBox(bool fileLoaded);
+		void fillFileDetails(bool fileLoaded);
 		void prepareNewTemplateFile();
 		void showSvgExtPages(bool show = true);
 		void hideSvgExtPages() { showSvgExtPages(false); }

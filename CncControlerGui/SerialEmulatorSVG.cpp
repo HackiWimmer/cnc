@@ -328,7 +328,7 @@ void SerialEmulatorSVG::disconnect(void) {
 	SerialEmulatorFile::disconnect();
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorSVG::writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *b, unsigned int nbByte) {
+bool SerialEmulatorSVG::writeMoveCmdRendered(int32_t x , int32_t y , int32_t z) {
 ///////////////////////////////////////////////////////////////////
 	if ( writeState == false )
 		return true;

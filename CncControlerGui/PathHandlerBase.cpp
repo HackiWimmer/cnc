@@ -272,7 +272,7 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 	// define parameters
 	//  - p0 (startPos) for curve lib is always absolute
 	//  - p1 (endPos) for curve lib is always absolute
-	CncCurveLib::ParameterSet ps;
+	CncCurveLib::ParameterElliptical& ps = ellipticalCurve.getParameterSet();
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY());
 	
 	switch ( c ) {
@@ -292,7 +292,7 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 					
 		default:	ps.p1 = ps.p0;
 		
-					// current leaves unchanged
+					// current pos leaves unchanged
 	}
 	
 	ps.rx				= values[0];
@@ -321,7 +321,7 @@ bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double 
 	// define parameters
 	//  - p0 (startPos) for curve lib is always absolute
 	//  - p1 - p2 for curve lib is always absolute
-	CncCurveLib::ParameterSet ps;
+	CncCurveLib::ParameterQuadraticBezier& ps = quadraticBezierCurve.getParameterSet();
 	CncCurveLib::Point pCtl;
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY()); 
 	
@@ -349,7 +349,7 @@ bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double 
 		default:	ps.p1 = ps.p0;
 					ps.p2 = ps.p0;
 					
-					// current leaves unchanged
+					// current pos leaves unchanged
 					pCtl = ps.p1;
 	}
 	
@@ -377,7 +377,7 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 	// define parameters
 	//  - p0 (startPos) for curve lib is always absolute
 	//  - p1 - p3 for curve lib is always absolute
-	CncCurveLib::ParameterSet ps;
+	CncCurveLib::ParameterCubicBezier& ps = cubicBezierCurve.getParameterSet();
 	CncCurveLib::Point pCtl;
 	ps.p0 = transformCurveLibPoint(currentPos.getX(), currentPos.getY());
 	
@@ -409,7 +409,7 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 					ps.p2 = ps.p0;
 					ps.p3 = ps.p0;
 					
-					// current leaves unchanged
+					// current pos leaves unchanged
 					pCtl = ps.p2;
 	}
 	

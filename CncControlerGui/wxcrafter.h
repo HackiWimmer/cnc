@@ -27,7 +27,6 @@
 #include <wx/slider.h>
 #include <wx/combobox.h>
 #include <wx/arrstr.h>
-#include <wx/textctrl.h>
 #include <wx/tglbtn.h>
 #include <wx/button.h>
 #include <wx/panel.h>
@@ -38,6 +37,7 @@
 #include <wx/notebook.h>
 #include <wx/statbmp.h>
 #include <wx/stc/stc.h>
+#include <wx/textctrl.h>
 #include <wx/dataview.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
@@ -104,7 +104,6 @@ protected:
     wxStaticText* m_stepDelayValue;
     wxStaticText* m_staticText16032;
     wxComboBox* m_cbRenderResolution;
-    wxTextCtrl* m_txRenderPPI;
     wxBitmapButton* m_rcReset;
     wxBitmapToggleButton* m_btProbeMode;
     wxBitmapToggleButton* m_btSpeedControl;
@@ -143,6 +142,12 @@ protected:
     wxComboBox* m_svgEditSearch;
     wxButton* m_svgEditFind;
     wxButton* m_svgEditFindPrev;
+    wxSimplebook* m_editorToolBox;
+    wxPanel* m_panelToolBoxSvg;
+    wxPanel* m_panelToolBoxGcode;
+    wxPanel* m_panelToolBoxBinary;
+    wxComboBox* m_cbBinaryViewMode;
+    wxButton* m_btExtractSourceAsNewTpl;
     wxStyledTextCtrl* m_stcFileContent;
     wxStaticText* m_filePosition;
     wxTextCtrl* m_svgEditStatus;
@@ -393,7 +398,17 @@ protected:
     wxStaticLine* m_staticLine225337;
     wxToggleButton* m_testToggleTool;
     wxPanel* m_mainBookPreviewPanel;
+    wxSplitterWindow* m_splitter6005;
+    wxPanel* m_splitterPage6009;
     wxPanel* m_filePreviewPlaceholder;
+    wxPanel* m_splitterPage6013;
+    wxNotebook* m_notebook5987;
+    wxPanel* m_panel5989;
+    wxTextCtrl* m_filePreviewDetails;
+    wxPanel* m_panel5993;
+    wxTextCtrl* m_filePreviewParameter;
+    wxPanel* m_panel5995;
+    wxTextCtrl* m_filePreviewSource;
     wxPanel* m_panel4398;
     wxStaticText* m_staticText4402;
     wxTextCtrl* m_currentFileMangerPreviewFileName;
@@ -431,6 +446,7 @@ protected:
     wxButton* m_btClearMsgHistory;
     wxTextCtrl* m_controllerMsgHistory;
     wxPanel* m_3DPane;
+    wxBitmapToggleButton* m_btSaveOutboundAsTemplate;
     wxPanel* m_placeholderPanel;
     wxBitmapToggleButton* m_bmpToggleBtn59541;
     wxBitmapToggleButton* m_bmpToggleBtn5954;
@@ -510,6 +526,7 @@ protected:
     wxTextCtrl* m_currentInboundFilePreviewFileName;
     wxPanel* m_scrollWinFile;
     wxCheckBox* m_keepFileManagerPreview;
+    wxStaticText* m_staticText6018;
     wxListCtrl* m_lruList;
     wxStaticLine* m_staticLine4345;
     wxPanel* m_mainFileViewPlaceholder;
@@ -712,6 +729,9 @@ protected:
     wxMenuItem* m_miTest3;
     wxMenuItem* m_miTest4;
     wxMenu* m_menuAbout;
+    wxMenuItem* m_menuItem5965;
+    wxMenuItem* m_miOpenSessionDlg;
+    wxMenuItem* m_menuItem5961;
     wxMenuItem* m_menuItem309;
     wxTimer* m_startupTimer;
     wxTimer* m_serialTimer;
@@ -773,6 +793,8 @@ protected:
     virtual void svgEditSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditFind(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditFindPrev(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectBinaryEditorViewMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void extractSourceAsNewTpl(wxCommandEvent& event) { event.Skip(); }
     virtual void fileContentKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void fileContentLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void fileContentLeftUp(wxMouseEvent& event) { event.Skip(); }
@@ -867,6 +889,7 @@ protected:
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
+    virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorPostionMarker(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorFlyPath(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
@@ -940,7 +963,7 @@ protected:
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplateAs(wxCommandEvent& event) { event.Skip(); }
-    virtual void saveEmuOutput(wxCommandEvent& event) { event.Skip(); }
+    virtual void saveOutboundAsNewTplFromMenu(wxCommandEvent& event) { event.Skip(); }
     virtual void OnExit(wxCommandEvent& event) { event.Skip(); }
     virtual void viewToolbar(wxCommandEvent& event) { event.Skip(); }
     virtual void viewStatusbar(wxCommandEvent& event) { event.Skip(); }
@@ -992,6 +1015,8 @@ protected:
     virtual void testFunction2(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction3(wxCommandEvent& event) { event.Skip(); }
     virtual void testFunction4(wxCommandEvent& event) { event.Skip(); }
+    virtual void traceSessionId(wxCommandEvent& event) { event.Skip(); }
+    virtual void openSessionDialog(wxCommandEvent& event) { event.Skip(); }
     virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
     virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
     virtual void serialTimer(wxTimerEvent& event) { event.Skip(); }
@@ -1016,7 +1041,6 @@ public:
     wxStaticText* GetStepDelayValue() { return m_stepDelayValue; }
     wxStaticText* GetStaticText16032() { return m_staticText16032; }
     wxComboBox* GetCbRenderResolution() { return m_cbRenderResolution; }
-    wxTextCtrl* GetTxRenderPPI() { return m_txRenderPPI; }
     wxBitmapButton* GetRcReset() { return m_rcReset; }
     wxBitmapToggleButton* GetBtProbeMode() { return m_btProbeMode; }
     wxBitmapToggleButton* GetBtSpeedControl() { return m_btSpeedControl; }
@@ -1053,6 +1077,12 @@ public:
     wxComboBox* GetSvgEditSearch() { return m_svgEditSearch; }
     wxButton* GetSvgEditFind() { return m_svgEditFind; }
     wxButton* GetSvgEditFindPrev() { return m_svgEditFindPrev; }
+    wxPanel* GetPanelToolBoxSvg() { return m_panelToolBoxSvg; }
+    wxPanel* GetPanelToolBoxGcode() { return m_panelToolBoxGcode; }
+    wxComboBox* GetCbBinaryViewMode() { return m_cbBinaryViewMode; }
+    wxButton* GetBtExtractSourceAsNewTpl() { return m_btExtractSourceAsNewTpl; }
+    wxPanel* GetPanelToolBoxBinary() { return m_panelToolBoxBinary; }
+    wxSimplebook* GetEditorToolBox() { return m_editorToolBox; }
     wxStyledTextCtrl* GetStcFileContent() { return m_stcFileContent; }
     wxStaticText* GetFilePosition() { return m_filePosition; }
     wxTextCtrl* GetSvgEditStatus() { return m_svgEditStatus; }
@@ -1306,6 +1336,16 @@ public:
     wxListbook* GetTestCaseBook() { return m_testCaseBook; }
     wxPanel* GetMainBookTest() { return m_mainBookTest; }
     wxPanel* GetFilePreviewPlaceholder() { return m_filePreviewPlaceholder; }
+    wxPanel* GetSplitterPage6009() { return m_splitterPage6009; }
+    wxTextCtrl* GetFilePreviewDetails() { return m_filePreviewDetails; }
+    wxPanel* GetPanel5989() { return m_panel5989; }
+    wxTextCtrl* GetFilePreviewParameter() { return m_filePreviewParameter; }
+    wxPanel* GetPanel5993() { return m_panel5993; }
+    wxTextCtrl* GetFilePreviewSource() { return m_filePreviewSource; }
+    wxPanel* GetPanel5995() { return m_panel5995; }
+    wxNotebook* GetNotebook5987() { return m_notebook5987; }
+    wxPanel* GetSplitterPage6013() { return m_splitterPage6013; }
+    wxSplitterWindow* GetSplitter6005() { return m_splitter6005; }
     wxStaticText* GetStaticText4402() { return m_staticText4402; }
     wxPanel* GetPanel4398() { return m_panel4398; }
     wxTextCtrl* GetCurrentFileMangerPreviewFileName() { return m_currentFileMangerPreviewFileName; }
@@ -1341,6 +1381,7 @@ public:
     wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
+    wxBitmapToggleButton* GetBtSaveOutboundAsTemplate() { return m_btSaveOutboundAsTemplate; }
     wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
     wxBitmapToggleButton* GetBmpToggleBtn59541() { return m_bmpToggleBtn59541; }
     wxBitmapToggleButton* GetBmpToggleBtn5954() { return m_bmpToggleBtn5954; }
@@ -1421,6 +1462,7 @@ public:
     wxSimplebook* GetMonitorViewBook() { return m_monitorViewBook; }
     wxScrolledWindow* GetScrollWinMonitor() { return m_scrollWinMonitor; }
     wxCheckBox* GetKeepFileManagerPreview() { return m_keepFileManagerPreview; }
+    wxStaticText* GetStaticText6018() { return m_staticText6018; }
     wxListCtrl* GetLruList() { return m_lruList; }
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }

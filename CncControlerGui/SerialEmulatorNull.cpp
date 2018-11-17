@@ -6,6 +6,7 @@
 #include "CncCommon.h"
 #include "CncControl.h"
 #include "MainFrame.h"
+#include "CncCommandDecoder.h"
 #include "SerialEmulatorNull.h"
 
 static const short POINT_LENGTH = 3;
@@ -486,7 +487,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case CMD_MOVE:
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE_UNIT_SIGNAL:	lastCommand.cmd = cmd;
-									return writeMoveCmd(buffer, nbByte);
+									return writeMoveCmdIntern(buffer, nbByte);
 		
 		default:					lastCommand.cmd = cmd;
 	}
@@ -582,6 +583,10 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	if ( writeSetterRawCallback(buffer, nbByte) == false ) {
+		return false;
+	}
+
 	const unsigned int offset = 3; // CMD + PID + COUNT
 	unsigned int valueSize  = nbByte - offset;
 	
@@ -643,8 +648,12 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::writeMoveCmd(unsigned char *buffer, unsigned int nbByte) {
+bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	if ( writeMoveRawCallback(buffer, nbByte)  == false ) {
+		return false;
+	}
+	
 	int32_t x = 0L, y = 0L, z = 0L;
 	
 	if (    lastCommand.cmd == CMD_RENDER_AND_MOVE 
@@ -655,58 +664,8 @@ bool SerialEmulatorNULL::writeMoveCmd(unsigned char *buffer, unsigned int nbByte
 		// update the current emulator position
 		curEmulatorPos.set(cncControl->getCurPos());
 		
-		// Move cmd format
-		// M....;			[len =  5]; only z axis
-		// M........;		[len =  9]; x and y axis
-		// M............;	[len = 13]; x, y and z axis
-		
-		unsigned int idx = 1;
-		unsigned char buf[4];
-
-		switch ( nbByte ) {
-			case  5:	buf[3] = buffer[idx++];
-						buf[2] = buffer[idx++];
-						buf[1] = buffer[idx++];
-						buf[0] = buffer[idx++];
-						memcpy(&z, buf, LONG_BUF_SIZE);
-						break;
-						
-			case 9:		buf[3] = buffer[idx++];
-						buf[2] = buffer[idx++];
-						buf[1] = buffer[idx++];
-						buf[0] = buffer[idx++];
-						memcpy(&x, buf, LONG_BUF_SIZE);
-						
-						buf[3] = buffer[idx++];
-						buf[2] = buffer[idx++];
-						buf[1] = buffer[idx++];
-						buf[0] = buffer[idx++];
-						memcpy(&y, buf, LONG_BUF_SIZE);
-						break;
-						
-			case 13:	buf[3] = buffer[idx++];
-						buf[2] = buffer[idx++];
-						buf[1] = buffer[idx++];
-						buf[0] = buffer[idx++];
-						memcpy(&x, buf, LONG_BUF_SIZE);
-						
-						buf[3] = buffer[idx++];
-						buf[2] = buffer[idx++];
-						buf[1] = buffer[idx++];
-						buf[0] = buffer[idx++];
-						memcpy(&y, buf, LONG_BUF_SIZE);
-						
-						buf[3] = buffer[idx++];
-						buf[2] = buffer[idx++];
-						buf[1] = buffer[idx++];
-						buf[0] = buffer[idx++];
-						memcpy(&z, buf, LONG_BUF_SIZE);
-						break;
-			default:
-						std::cerr << "SerialEmulatorNULL::handleMoveCmd error." << std::endl;
-						std::cerr << " Invalid byte count: " << nbByte << std::endl;
-						return false;
-		}
+		if ( CncCommandDecoder::decodeMove(buffer, nbByte, x, y, z) == false ) 
+			return false;
 	}
 	
 	bool ret = false;
@@ -953,7 +912,7 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 	}
 	
 	// do something with this coordinates
-	bool ret = writeMoveCmd(dx, dy, dz, buffer, nbByte);
+	bool ret = writeMoveRenderedCallback(dx, dy, dz);
 	
 	// copy point A into point B
 	memcpy(pointB, pointA, sizeof(pointA));
@@ -1008,12 +967,6 @@ unsigned char SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
 	}
 	
 	return RET_OK;
-}
-///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::writeMoveCmd(int32_t x, int32_t y, int32_t z, unsigned char *buffer, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	// inheried classes do the work here
-	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::resetEmuPositionCounter() {

@@ -283,6 +283,7 @@
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
+  <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
@@ -307,6 +308,9 @@
   <object class="wxBitmap" name="executable">bitmaps\executable.png</object>
   <object class="wxBitmap" name="feed">bitmaps\feed.png</object>
   <object class="wxBitmap" name="filepreview">bitmaps\filepreview.png</object>
+  <object class="wxBitmap" name="folder-development">bitmaps\folder-development.png</object>
+  <object class="wxBitmap" name="folder-document">bitmaps\folder-document.png</object>
+  <object class="wxBitmap" name="folder-image">bitmaps\folder-image.png</object>
   <object class="wxBitmap" name="gamepad-active">bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="git-reset">bitmaps\git-reset.png</object>
   <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>
@@ -315,6 +319,7 @@
   <object class="wxBitmap" name="go-first-view">bitmaps\go-first-view.png</object>
   <object class="wxBitmap" name="go-last-view">bitmaps\go-last-view.png</object>
   <object class="wxBitmap" name="go-next-2">bitmaps\go-next-2.png</object>
+  <object class="wxBitmap" name="go-next-context">bitmaps\go-next-context.png</object>
   <object class="wxBitmap" name="go-up-7">bitmaps\go-up-7.png</object>
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>

@@ -26,6 +26,7 @@ bool CncFilePreview::selectSVGPreview(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( m_previewBook->GetPageCount() > 0 );
 	m_previewBook->SetSelection(0);
+	
 	m_svgPreview->LoadURL(fileName);
 	m_svgPreview->Update();
 	

@@ -31,7 +31,7 @@ void SerialEmulatorFile::disconnect(void) {
 	setConnected(false);
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorFile::writeMoveCmd(int32_t x , int32_t y , int32_t z, unsigned char *buffer, unsigned int nbByte) {
+bool SerialEmulatorFile::writeMoveCmdRendered(int32_t x , int32_t y , int32_t z) {
 ///////////////////////////////////////////////////////////////////
 	if ( isMoveCommand(lastCommand.cmd) == false )
 		return true;

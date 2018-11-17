@@ -3,11 +3,13 @@
 
 #include <iostream>
 
+/////////////////////////////////////////////////////////////////////////////
 class CncCurveLib {
 
 	public:
 
 		const float PI = 3.14159265359f;
+		enum Type {Line, Elliptical, QuadraticBezier, CubicBezier};
 
 		struct Point{
 
@@ -30,39 +32,54 @@ class CncCurveLib {
 
 		struct ParameterSet {
 
-			Point	p0;
-			Point 	p1;
-			Point 	p2;
-			Point 	p3;
+			protected:
 
-			double 	rx;
-			double 	ry;
-			double 	xAxisRotation;
+				Type type = Type::Line;
 
-			bool 	largeArcFlag;
-			bool 	sweepFlag;
+			public:
 
-			struct EllipticalArcReturnInfo {
+				Point	p0;
+				Point 	p1;
+				Point 	p2;
+				Point 	p3;
 
-				CncCurveLib::Point ellipticalArcCenter;
+				double 	rx;
+				double 	ry;
+				double 	xAxisRotation;
 
-				float ellipticalArcStartAngle 	=   0;
-				float ellipticalArcEndAngle 	=   0;
-				float ellipticalArcAngle 		=   0;
-				float resultantRx 				=   0;
-				float resultantRy 				=   0;
+				bool 	largeArcFlag;
+				bool 	sweepFlag;
 
-			} EARI;
+				const Type getType() const { return type; }
 
-			struct RenderInfo {
-				float curveLength				=   0;
-				unsigned int samples			=   0;
-				unsigned int steps				=   0;
-				float increment					= 0.0;
-				float resolution				= 1.0;
-			} RI;
+				struct EllipticalArcReturnInfo {
+
+					CncCurveLib::Point ellipticalArcCenter;
+
+					float ellipticalArcStartAngle 	=   0;
+					float ellipticalArcEndAngle 	=   0;
+					float ellipticalArcAngle 		=   0;
+					float resultantRx 				=   0;
+					float resultantRy 				=   0;
+
+				} EARI;
+
+				struct RenderInfo {
+					float curveLength				=   0;
+					unsigned int samples			=   0;
+					unsigned int steps				=   0;
+					float increment					= 0.0;
+					float resolution				= 1.0;
+				} RI;
 
 		};
+
+	public:
+
+		struct ParameterLine 				: public ParameterSet { ParameterLine           () {type = Type::Line; }            };
+		struct ParameterElliptical 			: public ParameterSet { ParameterElliptical     () {type = Type::Elliptical; }      };
+		struct ParameterQuadraticBezier 	: public ParameterSet { ParameterQuadraticBezier() {type = Type::QuadraticBezier; } };
+		struct ParameterCubicBezier 		: public ParameterSet { ParameterCubicBezier    () {type = Type::CubicBezier; }     };
 
 		struct Setup {
 
@@ -82,21 +99,13 @@ class CncCurveLib {
 			public:
 				Caller() {}
 				virtual ~Caller() {}
-				
+
 				friend CncCurveLib;
-				
+
 			protected:
 				virtual bool callback(const CncCurveLib::Point& p) = 0;
-		
+
 		};
-
-		CncCurveLib(Caller* c)
-		: caller(c)
-		{
-			renderFunc = &CncCurveLib::getPointOnLine;
-		}
-
-		virtual ~CncCurveLib() {}
 
 		// common interface
 		void init(const CncCurveLib::Setup& s);
@@ -112,7 +121,17 @@ class CncCurveLib {
 
 	protected:
 
+		CncCurveLib(Caller* c)
+		: caller(c)
+		, type(Type::Line)
+		{
+			renderFunc = &CncCurveLib::getPointOnLine;
+		}
+
+		virtual ~CncCurveLib() {}
+
 		Caller* caller;
+		Type type;
 
 		const Point (CncCurveLib::*renderFunc) 	   (CncCurveLib::ParameterSet& ps, float t);
 
@@ -125,50 +144,78 @@ class CncCurveLib {
 
 };
 
-
+/////////////////////////////////////////////////////////////////////////////
 class CncLineCurve : public CncCurveLib {
+
+	private:
+
+		ParameterLine parameter;
 
 	public:
 		CncLineCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnLine;
+			type = Type::Line;
 		}
 		virtual ~CncLineCurve() {}
 
+		ParameterLine& getParameterSet() { return parameter; }
 };
 
+/////////////////////////////////////////////////////////////////////////////
 class CncEllipticalCurve : public CncCurveLib {
+
+	private:
+
+		ParameterElliptical parameter;
 
 	public:
 		CncEllipticalCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnEllipticalArc;
+			type = Type::Elliptical;
 		}
 		virtual ~CncEllipticalCurve() {}
 
+		ParameterElliptical& getParameterSet() { return parameter; }
 };
 
+/////////////////////////////////////////////////////////////////////////////
 class CncQuadraticBezierCurve : public CncCurveLib {
+
+	private:
+
+		ParameterQuadraticBezier parameter;
 
 	public:
 		CncQuadraticBezierCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnQuadraticBezierCurve;
+			type = Type::QuadraticBezier;
 		}
 		virtual ~CncQuadraticBezierCurve() {}
 
+		ParameterQuadraticBezier& getParameterSet() { return parameter; }
+
 };
 
+/////////////////////////////////////////////////////////////////////////////
 class CncCubicBezierCurve : public CncCurveLib {
+
+	private:
+
+		ParameterCubicBezier parameter;
 
 	public:
 		CncCubicBezierCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnCubicBezierCurve;
+			type = Type::CubicBezier;
 		}
 		virtual ~CncCubicBezierCurve() {}
 
-};
+		ParameterCubicBezier& getParameterSet() { return parameter; }
 
+};
 
 #endif

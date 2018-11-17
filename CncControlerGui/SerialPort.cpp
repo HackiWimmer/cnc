@@ -888,6 +888,55 @@ bool Serial::sendSignal(const unsigned char cmd) {
 	return  writeData(cmd);
 }
 ///////////////////////////////////////////////////////////////////
+bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) { 
+///////////////////////////////////////////////////////////////////
+	if ( nbByte <=0 || buffer == NULL )
+		return true;
+	
+	CncLongPosition dummy(0,0,0);
+	
+	#warning
+	
+	unsigned char cmd = buffer[0];
+	bool ret = false;
+	switch ( cmd ) {
+		case CMD_SETTER:			{
+											if ( writeData((void*)buffer, nbByte) ) {
+												// only a dummy here
+												SerialFetchInfo sfi;
+												sfi.command = cmd;
+												
+												ret = evaluateResultWrapper(sfi, std::cout, dummy);
+											}
+											break;
+									}
+		
+		case CMD_RENDER_AND_MOVE:
+		case CMD_MOVE:				{
+			
+											if ( writeData((void*)buffer, nbByte) ) {
+												SerialFetchInfo sfi;
+												sfi.command 			= cmd;
+												sfi.singleFetchTimeout 	= 3000;
+												sfi.Mc.size 			= 3;
+												sfi.Mc.value1			= 0;
+												sfi.Mc.value2			= 0;
+												sfi.Mc.value3			= 0;
+												
+												ret = evaluateResultWrapper(sfi, std::cout, dummy);
+												
+												// latest log this move
+												logMeasurementLastTs();
+											}
+											break;
+									}
+									
+		default:					;
+	}
+
+	return ret; //writeData((void*)buffer, nbByte)
+}
+///////////////////////////////////////////////////////////////////
 bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
