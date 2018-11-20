@@ -1,7 +1,6 @@
 #ifndef CNC_BIN_TPL_PARSER_H
 #define CNC_BIN_TPL_PARSER_H
 
-#include <map>
 #include <wx/xml/xml.h>
 #include "FileParser.h"
 #include "BinaryPathHandlerBase.h"
@@ -15,12 +14,22 @@ class BinaryFileParser : protected CncBinaryTemplateStreamer
 	
 	public:
 	
+		struct ViewInfo {
+			wxString 					content;
+			
+			wxString					file;
+			wxString					type;
+			wxString					checksum;
+			
+			cnc::LineNumberTranslater	lineNumberTranslater;
+		};
+		
 		enum ViewType { HexRaw, HexCStyle, ReadableSteps, ReadableMetric };
 		
 		BinaryFileParser(const char* fullFileName, BinaryPathHandlerBase* ph = NULL);
 		virtual ~BinaryFileParser();
 		
-		bool preview() { return preprocess(); }
+		bool preface() { return preprocess(); }
 		
 		const wxString& getSourceContent(wxString& content);
 		const wxString& getDataHeaderContent(wxString& content);
@@ -33,12 +42,17 @@ class BinaryFileParser : protected CncBinaryTemplateStreamer
 		
 		static bool extractSourceContentAsString(const wxString& binFileName, wxString& content);
 		static bool extractDataHeaderAsString(const wxString& binFileName, wxString& content);
-		static bool extractViewAsString(ViewType vt,  const wxString& binFileName, wxString& content);
+		static bool extractViewInfo(ViewType vt,  const wxString& binFileName, ViewInfo& vi);
 		static bool extractSourceContentAsFile(const wxString& binFileName, wxString& sourceFileName);
+		
+		const LineNumberTranslater& getLineNumberTranslater() { wxASSERT(pathHandler); return pathHandler->getLineNumberTranslater(); }
+		
+		void disableHardwareDifferenceReport() { reportHardwareDifference = false ; }
 		
 	protected:
 		
 		BinaryPathHandlerBase* pathHandler;
+		bool reportHardwareDifference;
 		
 		virtual bool preprocess();
 		virtual bool spool();
@@ -56,9 +70,9 @@ class BinaryFileParser : protected CncBinaryTemplateStreamer
 		ParameterMap parameterMap;
 		
 		wxXmlDocument* xmlParameter;
-		std::string outputFileName;
-		std::string sourceContent;
-		std::string dataHeaderContent;
+		wxString outputFileName;
+		wxString sourceContent;
+		wxString dataHeaderContent;
 		
 		uint32_t totalFileLength;
 		uint32_t sourceContentOffset;
@@ -67,7 +81,9 @@ class BinaryFileParser : protected CncBinaryTemplateStreamer
 		
 		void expandXmlParameter();
 		
+		bool checkHardwareSetup();
 		bool checkFileSignature(unsigned char* fileSignature);
+		
 		unsigned int readBytes(InputStream& is, unsigned char* buffer, unsigned int nbBytes);
 		unsigned int readDataBlock(InputStream& is);
 		

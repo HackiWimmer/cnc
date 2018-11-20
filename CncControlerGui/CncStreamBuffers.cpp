@@ -29,6 +29,9 @@ int CncCspyBuf::overflow (int c) {
 ///////////////////////////////////////////////////////////
 int CncCspyBuf::insertLineNumber(bool first) {
 ///////////////////////////////////////////////////////////
+	if ( ctl == NULL )
+		return 0; 
+
 	ctl->SetDefaultStyle(CncCspyBuf::lineNumberAttr);
 	
 	if ( first == true ) 	ctl->AppendText(wxString::Format("%s%06d ", "",   (ctl->GetNumberOfLines())%100000));

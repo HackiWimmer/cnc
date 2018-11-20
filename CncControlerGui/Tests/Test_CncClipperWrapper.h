@@ -44,7 +44,7 @@ class TEST_CNC_CLIPPER_WRAPPER : public TEST_BASE {
 			*/
 			
 			CncPolygonPoints cpp;
-			clog << cpp << endl;
+			std::clog << cpp << std::endl;
 			
 			cpp.append(348,257);
 			cpp.append(364,148);

@@ -1,5 +1,5 @@
 
-#include <wx/stc/stc.h>
+#include "CncSourceEditor.h"
 #include <wx/menu.h>
 #include <wx/evtloop.h>
 #include <wx/dataview.h>
@@ -366,10 +366,8 @@ bool FileParser::process() {
 		ret = postprocess();
 	
 	// at the end reset the selection
-	if ( inboundSourceControl ) {
-		inboundSourceControl->GotoPos(0);
-		inboundSourceControl->SetSelection(0, 0);
-	}
+	if ( inboundSourceControl )
+		inboundSourceControl->gotoBegin();
 	
 	debuggerConfigurationPropertyGrid->Refresh();
 	debuggerConfigurationPropertyGrid->Update();
@@ -476,20 +474,12 @@ void FileParser::debugFinish() {
 	broadcastDebugState(false);
 }
 ////////////////////////////////////////////////////////////////////////////
-void FileParser::selectSourceControl(unsigned long pos) {
+void FileParser::selectSourceControl(unsigned long ln) {
 ////////////////////////////////////////////////////////////////////////////
 	if ( inboundSourceControl == NULL ) 
 		return;
 	
-	inboundSourceControl->GotoLine(pos);
-	
-	if ( pos == 0 ) {
-		inboundSourceControl->SetSelectionStart(0);
-		inboundSourceControl->SetSelectionEnd(0);
-	} else {
-		inboundSourceControl->SetSelectionStart(inboundSourceControl->GetCurrentPos());
-		inboundSourceControl->SetSelectionEnd(inboundSourceControl->GetLineEndPosition(pos));
-	}
+	inboundSourceControl->selectLineNumber(ln);
 }
 //////////////////////////////////////////////////////////////////
 bool FileParser::evaluateProcessingState() {

@@ -267,7 +267,7 @@ bool PGenPolygon::inlayPolygonA(SvgPathGroup& spg,
 	
 	// first spool the given polygon
 	polygonInData.closePolygon();
-	clog << "D:"<< wxString(polygonInData.getAsSvgPathRepresentation(mm, false)).SubString(0,40) << endl;
+	std::clog << "D:"<< wxString(polygonInData.getAsSvgPathRepresentation(mm, false)).SubString(0,40) << std::endl;
 	spoolPolygon(spg, polygonInData);
 	
 	// prepare the path input incl. the corresponding holes
@@ -288,12 +288,12 @@ bool PGenPolygon::inlayPolygonA(SvgPathGroup& spg,
 		return false;
 	}
 	
-	clog << callDepth << ":" << endl;
-	results.trace(clog);
+	std::clog << callDepth << ":" << std::endl;
+	results.trace(std::clog);
 	
 	// generate the output 
 	if ( results.size() == 0 ) {
-		clog << "0:"<< wxString(polygonToSpool.getAsSvgPathRepresentation(mm, false)).SubString(0,40) << endl;
+		std::clog << "0:"<< wxString(polygonToSpool.getAsSvgPathRepresentation(mm, false)).SubString(0,40) << std::endl;
 		spoolPolygon(spg, polygonToSpool);
 		return true;
 	}
@@ -399,7 +399,7 @@ bool PGenPolygon::inlayPolygonB(SvgPathGroup& spg,
 		}
 		
 		wxString xxx(' ', callDepth);
-		clog << xxx << callDepth << " duration count: " << cnt << "; result size: "<< results.size() << endl;
+		std::clog << xxx << callDepth << " duration count: " << cnt << "; result size: "<< results.size() << std::endl;
 		
 		//MessageBoxA(0, wxString::Format("%d", results.getOuterCount()),"",0);
 		
@@ -502,7 +502,7 @@ void PGenPolygon::inlayPolygonOld(SvgPathGroup& spg, CncPolygonPoints& polygon, 
 		}
 		
 		wxString xxx(' ', callDepth);
-		clog << xxx << callDepth << " duration count: " << cnt << "; result size: "<< results.size() << endl;
+		std::clog << xxx << callDepth << " duration count: " << cnt << "; result size: "<< results.size() << std::endl;
 		
 		// nothing more to do
 		if ( results.size() == 0 )

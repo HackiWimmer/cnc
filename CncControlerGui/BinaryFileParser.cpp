@@ -2,6 +2,7 @@
 #include <wx/file.h>
 #include <wx/sstream.h>
 #include <wx/log.h>
+#include "CncConfig.h"
 #include "CncFileNameService.h"
 #include "BinaryFileParser.h"
 
@@ -10,6 +11,7 @@ BinaryFileParser::BinaryFileParser(const char* fullFileName, BinaryPathHandlerBa
 : CncBinaryTemplateStreamer()
 , FileParser(fullFileName)
 , pathHandler(ph)
+, reportHardwareDifference(true)
 , parameterMap()
 , xmlParameter(NULL)
 , outputFileName(fullFileName)
@@ -41,15 +43,41 @@ bool BinaryFileParser::checkFileSignature(unsigned char* fileSignature) {
 		return false;
 	}
 	
-	std::string fs((char*)fileSignature);
-	bool ret = fs.compare(fileSignatureRef);
-	
-	if ( ret == false ) {
+	wxString fs((char*)fileSignature);
+	if ( fs != fileSignatureRef ) {
 		std::cerr << "Required: " << fileSignatureRef 	<< std::endl;
 		std::cerr << "Received: " << fileSignature 		<< std::endl;
+		return false;
 	}
 	
-	return ret;
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool BinaryFileParser::checkHardwareSetup() {
+//////////////////////////////////////////////////////////////////
+	wxString x, y, z;
+	getSetupParameter("HARDWARE_RESOLUTION_AXIS_X", x);
+	getSetupParameter("HARDWARE_RESOLUTION_AXIS_X", y);
+	getSetupParameter("HARDWARE_RESOLUTION_AXIS_X", z);
+	
+	double dx, dy, dz;
+	x.ToDouble(&dx);
+	y.ToDouble(&dy);
+	z.ToDouble(&dz);
+	
+	if (	   cnc::dblCompare(GBL_CONFIG->getDisplayFactX(), dx) == false
+			|| cnc::dblCompare(GBL_CONFIG->getDisplayFactY(), dy) == false
+			|| cnc::dblCompare(GBL_CONFIG->getDisplayFactZ(), dz) == false
+	) {
+		std::cerr << "BinaryFileParser::checkHardwareSetup(): Hardware setup difference:" 	<< std::endl
+				  << " File        : " << dx << ", " << dy << ", " << dz					<< std::endl
+				  << " Application : " << GBL_CONFIG->getDisplayFactX() 					<< ", " 
+									   << GBL_CONFIG->getDisplayFactY() 					<< ", " 
+									   << GBL_CONFIG->getDisplayFactZ() 					<< std::endl;
+		return false;
+	}
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool BinaryFileParser::read_unit32_t(InputStream& is, uint32_t& ret) {
@@ -122,10 +150,16 @@ bool BinaryFileParser::readDataBody(InputStream& is) {
 	// set pos. back to body start
 	is.seekg(bodyStartPos, is.beg);
 	
+	setCurrentLineNumber(0);
 	// parse body - read to file end, block by block
 	bool ret = true;
 	while ( is.good() ) {
-	
+		
+		if ( evaluateDebugState() == false )
+			return false;
+			
+		incCurrentLineNumber();
+		
 		unsigned int datLen = readDataBlock(is);
 		if ( datLen > 0 ) {
 			// always is fine
@@ -190,34 +224,44 @@ bool BinaryFileParser::preprocess() {
 	totalFileLength = inputStream.tellg();
 	inputStream.seekg(0, inputStream.beg);
 
-	unsigned char fileSignature[lenFileSignature];
+	unsigned char fileSignature[lenFileSignature + 1];
 	if ( readBytes(inputStream, fileSignature, lenFileSignature) < lenFileSignature ) {
 		std::cerr << "Error while reading file signature: File '" << outputFileName << "'" << std::endl;
 		return false;
 	}
-
+	fileSignature[lenFileSignature] = '\0';
+	
 	if ( checkFileSignature(fileSignature) == false ) {
 		std::cerr << "Invalid file signature: File '" << outputFileName << "'" << std::endl;
 		return false;
 	}
-
+	
+	// ..........................................................................................
 	// determine version
 	uint32_t version = 0;
 	if ( read_unit32_t(inputStream, version) == false) {
-		std::cerr << "BinaryFileParser::preprocess(): Error while reading source content offset" << std::endl;
+		std::cerr << "BinaryFileParser::preprocess(): Error while reading version" << std::endl;
 		return false;
 	}
-
+	
 	if ( version != this->version ) {
-		std::cerr << "BinaryFileParser::preprocess(): Version mismatch: "
+		std::cerr << "BinaryFileParser::preprocess(): Version mismatch: " 	<< std::endl
 				  << "Received version   : "
-				  << version
+				  << version 												<< std::endl
 				  << "Implemented version: "
-				  << this->version
-				  << std::endl;
+				  << this->version											<< std::endl;
 		return false;
 	}
-
+	
+	// ..........................................................................................
+	// determine cpmpression
+	uint32_t compression = 0;
+	if ( read_unit32_t(inputStream, compression) == false) {
+		std::cerr << "BinaryFileParser::preprocess(): Error while reading compression flag" << std::endl;
+		return false;
+	}
+	
+	// ..........................................................................................
 	// determine offsets
 	if ( read_unit32_t(inputStream, sourceContentOffset) == false) {
 		std::cerr << "BinaryFileParser::preprocess(): Error while reading source content offset" << std::endl;
@@ -264,60 +308,85 @@ bool BinaryFileParser::preprocess() {
 		return false;
 	}
 
-
+	// ..........................................................................................
 	// calculate block sizes
 	const uint32_t sourceContentSize = dataHeaderOffset - sourceContentOffset;
 	const uint32_t dataHeaderSize    = dataBodyOffset   - dataHeaderOffset;
 	char* buffer = NULL;
 
 	if ( false ) {
-		std::cout << sourceContentOffset << "->" << sourceContentSize << std::endl;
-		std::cout << dataHeaderOffset << "->" << dataHeaderSize << std::endl;
-		std::cout << dataBodyOffset << "-> EOF" << std::endl;
+		std::cout << sourceContentOffset 	<< "->" 	<< sourceContentSize << std::endl;
+		std::cout << dataHeaderOffset 		<< "->" 	<< dataHeaderSize << std::endl;
+		std::cout << dataBodyOffset 		<< "-> EOF" << std::endl;
 	}
 
-	inputStream.seekg(sourceContentOffset, inputStream.beg);
-	if ( inputStream.good() == false ) {
-		std::cerr << "BinaryFileParser::preprocess(): Error while set source content offset" << std::endl;
-		return false;
-	}
-	
+	// ..........................................................................................
 	// read source content
-	buffer = new char[sourceContentSize + 1];
-	inputStream.read(buffer, sourceContentSize);
-	buffer[sourceContentSize] = '\0';
-	sourceContent.assign(buffer);
-	delete []buffer;
-	
-	// read data header content
-	inputStream.seekg(dataHeaderOffset, inputStream.beg);
-	if ( inputStream.good() == false) {
-		std::cerr << "BinaryFileParser::preprocess(): Error while set data header content offset" << std::endl;
-		return false;
+	{
+		inputStream.seekg(sourceContentOffset, inputStream.beg);
+		if ( inputStream.good() == false ) {
+			std::cerr << "BinaryFileParser::preprocess(): Error while set source content offset" << std::endl;
+			return false;
+		}
+		
+		buffer = new char[sourceContentSize + 1];
+		inputStream.read(buffer, sourceContentSize);
+		buffer[sourceContentSize] = '\0';
+		
+		bool ret = true;
+		if ( compression != 0 ) 	ret = uncompress(buffer, sourceContentSize + 1, sourceContent);
+		else 						sourceContent.assign(buffer);
+		
+		delete [] buffer;
+		
+		if ( ret == false ) {
+			std::cerr << "BinaryFileParser::preprocess(): Error while uncompressing source content" << std::endl;
+			return false;
+		}
 	}
 	
+	// ..........................................................................................
 	// read data header content
-	buffer = new char[dataHeaderSize + 1];
-	inputStream.read(buffer, dataHeaderSize);
-	buffer [dataHeaderSize] = '\0';
-	dataHeaderContent.assign(buffer);
-	delete []buffer;
-	
-	// Evaluate XML part
-	if ( xmlParameter != NULL )
-		delete xmlParameter;
+	{
+		inputStream.seekg(dataHeaderOffset, inputStream.beg);
+		if ( inputStream.good() == false) {
+			std::cerr << "BinaryFileParser::preprocess(): Error while set data header content offset" << std::endl;
+			return false;
+		}
 		
-	xmlParameter = new wxXmlDocument();
-	wxStringInputStream xmlStream(dataHeaderContent.c_str());
-	wxLogNull dummyToSuppressXmlDocErrorMessages;
-	if ( xmlParameter->Load(xmlStream) == false ) {
-		std::cerr << "BinaryFileParser::preprocess(): Error while creating xml data" << std::endl;
-		return false;
+		// read data header content
+		buffer = new char[dataHeaderSize + 1];
+		inputStream.read(buffer, dataHeaderSize);
+		buffer[dataHeaderSize] = '\0';
+		
+		bool ret = true;
+		if ( compression != 0 ) 	ret = uncompress(buffer, dataHeaderSize + 1, dataHeaderContent);
+		else 						dataHeaderContent.assign(buffer);
+		
+		delete [] buffer;
+		if ( ret == false ) {
+			std::cerr << "BinaryFileParser::preprocess(): Error while uncompressing data header" << std::endl;
+			return false;
+		}
+	}
+	
+	// ..........................................................................................
+	// Evaluate XML part
+	{
+		if ( xmlParameter != NULL )
+			delete xmlParameter;
+			
+		xmlParameter = new wxXmlDocument();
+		wxStringInputStream xmlStream(dataHeaderContent.c_str());
+		wxLogNull dummyToSuppressXmlDocErrorMessages;
+		if ( xmlParameter->Load(xmlStream) == false ) {
+			std::cerr << "BinaryFileParser::preprocess(): Error while creating xml data" << std::endl;
+			return false;
+		}
 	}
 	
 	expandXmlParameter();
-	
-	return true;
+	return checkHardwareSetup();
 }
 //////////////////////////////////////////////////////////////////
 bool BinaryFileParser::spool() {
@@ -474,6 +543,7 @@ bool BinaryFileParser::extractSourceContentAsString(const wxString& binFileName,
 		return false;
 	
 	BinaryFileParser parser(binFileName);
+	parser.disableHardwareDifferenceReport();
 	if ( parser.preprocess() == false )
 		return false;
 		
@@ -494,6 +564,8 @@ bool BinaryFileParser::extractSourceContentAsFile(const wxString& binFileName, w
 		return false;
 	
 	BinaryFileParser parser(binFileName);
+	parser.disableHardwareDifferenceReport();
+	
 	if ( parser.preprocess() == false )
 		return false;
 		
@@ -521,9 +593,9 @@ bool BinaryFileParser::extractSourceContentAsFile(const wxString& binFileName, w
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool BinaryFileParser::extractViewAsString(ViewType vt, const wxString& binFileName, wxString& content) {
+bool BinaryFileParser::extractViewInfo(ViewType vt, const wxString& binFileName, ViewInfo& vi) {
 //////////////////////////////////////////////////////////////////
-	content.clear();
+	vi.content.clear();
 	
 	if ( wxFile::Exists(binFileName) == false )
 		return false;
@@ -546,10 +618,17 @@ bool BinaryFileParser::extractViewAsString(ViewType vt, const wxString& binFileN
 	wxASSERT( ph != NULL );
 	
 	BinaryFileParser parser(binFileName, ph);
+	parser.disableHardwareDifferenceReport();
+
 	if ( parser.processRelease() == false )
 		return false;
+		
+	vi.lineNumberTranslater = parser.getLineNumberTranslater();
+	 
+	parser.getSourceParameter(XMLSourceNode_AttribFile, 	vi.file);
+	parser.getSourceParameter(XMLSourceNode_AttribType, 	vi.type);
+	parser.getSourceParameter(XMLSourceNode_AttribCheckSum, vi.checksum);
+	parser.getDataBodyView(vi.content);
 	
-	parser.getDataBodyView(content);
 	return true;
 }
-

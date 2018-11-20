@@ -30,7 +30,7 @@ class CncBinaryTemplateStreamer {
 		const char* fileSignatureRef  			= "CncBinaryTemplateFile...........................................";
 		const unsigned short lenFileSignature 	= 64;
 		const unsigned short lenBuffSize 		= sizeof(uint32_t);
-		const uint32_t version					= 1000;
+		const uint32_t version					= 1001;
 		
 		bool fileExists(const char*);
 
@@ -67,10 +67,13 @@ class CncBinaryTemplateStreamer {
 		bool isReadyToStream() { return readyToStream; }
 		
 		const char* getOutboundFileName() { return parameter.fullFileName.c_str(); }
+		
+		static bool uncompress(char* buf, int32_t size, wxString& content);
 	
 	private:
 	
 		bool readyToStream;
+		bool compress;
 		ParameterSet parameter;
 		std::string tmpFileNameDataBody;
 		
@@ -80,9 +83,12 @@ class CncBinaryTemplateStreamer {
 		struct DataContainer {
 			
 			std::string signature;
-			std::string sourceContent;
-			std::string dataHeader;
 			
+			char* sourceContent				= NULL;
+			char* dataHeader				= NULL;
+			uint32_t sourceContentSize		= 0;
+			uint32_t dataHeaderSize			= 0;
+
 			uint32_t sourceContentOffset	= 0;
 			uint32_t dataHeaderOffset		= 0;
 			uint32_t dataBodyOffset			= 0;
@@ -94,14 +100,14 @@ class CncBinaryTemplateStreamer {
 		inline void write_uint32_t(OutputStream& o, const uint32_t value);
 		
 		inline bool prepareDataContainer(DataContainer& dc);
-		inline bool appendFileHeader(const DataContainer& dc);
-		inline bool appendFileSource(const DataContainer& dc);
-		inline bool appendBodyHeader(const DataContainer& dc);
+		inline bool appendFileSource(DataContainer& dc);
+		inline bool appendBodyHeader(DataContainer& dc);
+		inline bool appendFileHeader(DataContainer& dc);
 		
-		inline bool evaluateSourceContent(std::string& content);
-		inline bool evaluateDataHeader(std::string& content);
+		inline bool evaluateSourceContent(DataContainer& dc);
+		inline bool evaluateDataHeader(DataContainer& dc);
 		
-		inline bool encode(std::string& content);
+		
 		
 };
 

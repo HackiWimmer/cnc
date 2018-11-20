@@ -709,14 +709,14 @@ Resolution:</label>
                                       <flag>wxALL</flag>
                                       <border>5</border>
                                       <minsize>20,-1</minsize>
-                                      <object class="wxStaticBitmap" name="m_svgEditSearchState">
+                                      <object class="wxStaticBitmap" name="m_sourceEditSearchState">
                                         <size>20,-1</size>
                                       </object>
                                     </object>
                                     <object class="sizeritem">
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>1</border>
-                                      <object class="wxComboBox" name="m_svgEditSearch">
+                                      <object class="wxComboBox" name="m_sourceEditSearch">
                                         <style/>
                                         <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                         <tooltip>
@@ -879,7 +879,7 @@ Resolution:</label>
                                     <object class="sizeritem">
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>1</border>
-                                      <object class="wxTextCtrl" name="m_svgEditStatus">
+                                      <object class="wxTextCtrl" name="m_sourceEditStatus">
                                         <style>wxTE_READONLY|wxBORDER_NONE</style>
                                         <bg>wxSYS_COLOUR_3DLIGHT</bg>
                                         <font>
@@ -11169,7 +11169,7 @@ State</label>
       <object class="sizeritem" name="flexGridSizer5821">
         <flag>wxALL|wxEXPAND</flag>
         <object class="wxFlexGridSizer">
-          <cols>1</cols>
+          <cols>2</cols>
           <rows>1</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
@@ -11190,6 +11190,50 @@ State</label>
                 <face>Consolas</face>
               </font>
               <value>Gamepad state not available</value>
+            </object>
+          </object>
+          <object class="sizeritem" name="flexGridSizer6026">
+            <flag>wxALL|wxEXPAND</flag>
+            <option>1</option>
+            <object class="wxFlexGridSizer">
+              <cols>1</cols>
+              <rows>2</rows>
+              <vgap>0</vgap>
+              <hgap>0</hgap>
+              <growablecols/>
+              <growablerows/>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>1</border>
+                <minsize>26,26</minsize>
+                <object class="wxButton" name="m_btStartGamepadService">
+                  <label/>
+                  <style/>
+                  <size>26,26</size>
+                  <tooltip>
+                    <![CDATA[Start the underlying Service]]>
+                  </tooltip>
+                  <bitmap>bitmaps/system-run-3.png</bitmap>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>1</border>
+                <minsize>26,26</minsize>
+                <object class="wxButton" name="m_btStopGamepadService">
+                  <label/>
+                  <style/>
+                  <size>26,26</size>
+                  <tooltip>
+                    <![CDATA[Stop the underlying Service]]>
+                  </tooltip>
+                  <bitmap>bitmaps/16-execute_stop.png</bitmap>
+                  <bitmapposition>wxLEFT</bitmapposition>
+                  <default>0</default>
+                </object>
+              </object>
             </object>
           </object>
         </object>

@@ -249,3 +249,40 @@ void CncGamepadControllerState::mangageMainView(const GamepadEvent& state) {
 	
 	mainFrame->GetGpBmp1()->GetParent()->Layout();
 }
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::startGamepadService(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxArrayString output;
+	wxArrayString errors;
+	
+	wxExecute("net start Ds3Service", output, errors);
+	
+	if ( output.GetCount() > 0 ) {
+		for (int i = 0; i < output.GetCount(); i++)
+			m_gamepadTrace->AppendText(output[i]);
+	}
+	
+	if ( errors.GetCount() > 0 ) {
+		for (int i = 0; i < errors.GetCount(); i++)
+			m_gamepadTrace->AppendText(errors[i]);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::stopGamepadService(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxArrayString output;
+	wxArrayString errors;
+	
+	wxExecute("net stop Ds3Service", output, errors);
+	
+	if ( output.GetCount() > 0 ) {
+		for (unsigned int i = 0; i < output.GetCount(); i++)
+			m_gamepadTrace->AppendText(output[i]);
+	}
+	
+	if ( errors.GetCount() > 0 ) {
+		for (unsigned int i = 0; i < errors.GetCount(); i++)
+			m_gamepadTrace->AppendText(errors[i]);
+	}
+
+}

@@ -404,14 +404,14 @@ bool CncClipperWrapper::correctEndPoints(CncPolygonPoints& in, double offset) {
 		
 		// check durations - safty
 		if ( cnt > 1000 ) {
-			std::cerr << "CncClipperWrapper::correctEndPoints: Too mutch durations: " << cnt << endl;
+			std::cerr << "CncClipperWrapper::correctEndPoints: Too mutch durations: " << cnt << std::endl;
 			ret = false;
 			break;
 		}
 		
 		// check CncPolygonPoints size - safty
 		if ( in.size() < 2 ) {
-			std::cerr << "CncClipperWrapper::correctEndPoints: Invalid size: " << in.size() << ". Duration: " << cnt << endl;
+			std::cerr << "CncClipperWrapper::correctEndPoints: Invalid size: " << in.size() << ". Duration: " << cnt << std::endl;
 			ret = false;
 			break;
 		}
@@ -483,11 +483,11 @@ bool CncClipperWrapper::offsetPath(const PolygonList& inList, CncPolygons& out, 
 		co.Execute(out, offset * CncPolygonPoints::doubleToIntFactor);
 		
 	} catch (std::runtime_error e ) {
-		std::cerr << "CncClipperWrapper::offsetPath: Runtime error: " << e.what() << endl;
+		std::cerr << "CncClipperWrapper::offsetPath: Runtime error: " << e.what() << std::endl;
 		return false;
 		
 	} catch(...) {
-		std::cerr << "CncClipperWrapper::offsetPath: Unkown exception" << endl;
+		std::cerr << "CncClipperWrapper::offsetPath: Unkown exception" << std::endl;
 		return false;
 	}
 	

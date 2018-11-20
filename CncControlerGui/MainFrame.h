@@ -30,6 +30,7 @@
 
 ////////////////////////////////////////////////////////////////////
 // forward declarations
+class CncSourceEditor;
 class wxFileConfig;
 class CncFilePreviewWnd;
 class CncFilePreview;
@@ -253,7 +254,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void renderAuiPane(wxAuiManagerEvent& event);
 		virtual void restoreAuiPane(wxAuiManagerEvent& event);
 		virtual void maximizeAuiPane(wxAuiManagerEvent& event);
-		virtual void fileContentKeyUp(wxKeyEvent& event);
 		virtual void saveTemplateFromButton(wxCommandEvent& event);
 		virtual void marginClickEmuSource(wxStyledTextEvent& event);
 		virtual void marginClickFileContent(wxStyledTextEvent& event);
@@ -270,7 +270,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void svgEditSearchTextChanged(wxCommandEvent& event);
 		virtual void svgEditFind(wxCommandEvent& event);
 		virtual void svgEditFindPrev(wxCommandEvent& event);
-		virtual void fileContentRightDown(wxMouseEvent& event);
 		virtual void dclickDurationCount(wxMouseEvent& event);
 		virtual void stepDelayThumbtrack(wxScrollEvent& event);
 		virtual void stepDelayChanged(wxScrollEvent& event);
@@ -295,9 +294,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void openConfigurationFile(wxCommandEvent& event);
 		virtual void openExternalEditor(wxCommandEvent& event);
 		virtual void openCalculator(wxCommandEvent& event);
-		virtual void fileContentLeftUp(wxMouseEvent& event);
-		virtual void fileContentLeftDown(wxMouseEvent& event);
-		virtual void fileContentKeyDown(wxKeyEvent& event);
 		virtual void svgEmuClear(wxCommandEvent& event);
 		virtual void selectPort(wxCommandEvent& event);
 		virtual void requestVersion(wxCommandEvent& event);
@@ -510,6 +506,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initSpeedConfigPlayground();
 		void updateSpeedConfigPlayground();
 		
+		friend class CncSourceEditor;
 		friend class CncConfig;
 		friend class CncGampadDeactivator;
 		friend class CncTransactionLock;
@@ -539,6 +536,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxString defaultPortName;
 	
 		CncControl* cnc;
+		CncSourceEditor* sourceEditor;
 		CncMotionMonitor* motionMonitor;
 		CncSpyControl* serialSpy;
 		CncFileView* fileView;
@@ -634,8 +632,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		BinaryFileParser::ViewType getCurrentBinaryViewMode();
 		
 		bool openFile(int pageToSelect = -1);
-		bool openTextFile();
-		bool openBinaryFile(BinaryFileParser::ViewType vt = BinaryFileParser::ViewType::HexCStyle);
 		bool saveFile();
 		bool saveTextFile();
 		bool saveTextFileAs();
@@ -651,7 +647,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		// configuration
 		void updateStepDelay();
 		void updateUnit();
-		void updateFileContentPosition();
+		void updateFileContentPosition(long x, long y);
 		void updateRenderResolution();
 		
 		void decorateSearchButton();
@@ -666,8 +662,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initializeUpdateManagerThread();
 		void initializeGamepadThread();
 		bool initializeLruMenu();
-		void initTemplateEditStyle();
-		void initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat format);
 		
 		void createAnimationControl();
 		void createStcFileControlPopupMenu();
@@ -723,15 +717,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// control handling
-		/*
-		int getNextUserPerspectiveInsertIndex(unsigned int sepIndex);
-		bool getAllUserPerspectiveNamesFromMenuLabels(wxArrayString& items);
-		bool checkIfPerspectiveAlreadyExists(const wxString& name);
-		bool isUserPerspective(const wxString& menuLabel);
-		bool insertNextUserPerspective(const wxString& newLabel);
-		bool renameUserPerspective(const wxString& from, const wxString& to);
-		*/
-		
 		void selectSourceControlLineNumber(long ln);
 			
 		void decoratePortSelector(bool list=false);
@@ -744,7 +729,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void enableRunControls(bool state = true);
 		void disableRunControls() { enableRunControls(false); }
 		
-		void enableMainFileEditor(bool state = true, bool force=false);
+		void enableMainFileEditor(bool state = true);
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 
@@ -808,7 +793,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// misc
-				
+		void traceSessionId();
 		void setZero();
 		void requestReset();
 		

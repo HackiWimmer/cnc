@@ -38,7 +38,7 @@ class CncControl {
 		///////////////////////////////////////////////////////////////////
 		struct SetterTuple {
 			unsigned char 	pid;
-			SetterValueList values;
+			cnc::SetterValueList values;
 			
 			SetterTuple(unsigned char i, int32_t v)
 			: pid(i)
@@ -47,7 +47,7 @@ class CncControl {
 				values.push_back(v);
 			}
 			
-			SetterTuple(unsigned char i, SetterValueList v)
+			SetterTuple(unsigned char i, cnc::SetterValueList v)
 			: pid(i)
 			, values(v)
 			{}
@@ -269,8 +269,9 @@ class CncControl {
 		const CncLongPosition getCurCtlPos() { return curCtlPos; }
 		
 		// returns the correponding pc postions
-		const CncLongPosition getStartPos() { return startPos; }
-		const CncLongPosition getCurPos()   { return curAppPos; }
+		CncLongPosition& getCurAppPosAsReference()		{ return curAppPos; }
+		const CncLongPosition getCurPos()				{ return curAppPos; }
+		const CncLongPosition getStartPos() 			{ return startPos; }
 		const CncDoublePosition getStartPosMetric();
 		const CncDoublePosition getCurPosMetric();
 		const CncLongPosition getMinPositions();
@@ -288,7 +289,7 @@ class CncControl {
 		bool validateAppAgainstCtlPosition();
 		// processing the given setter values
 		bool processSetter(unsigned char pid, int32_t value);
-		bool processSetter(unsigned char pid, const SetterValueList& values);
+		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
 		bool processSetterList(const Setters& setup);
 		// Change the current speed parameter
 		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeed s = CncSpeedUserDefined);

@@ -182,6 +182,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncSourceEditor.cpp"/>
+      <File Name="CncSourceEditor.h"/>
       <File Name="CncCommandDecoder.cpp"/>
       <File Name="CncCommandDecoder.h"/>
       <File Name="CncSha1Wrapper.h"/>

@@ -206,7 +206,7 @@ void UpdateManagerThread::popAndFormatSetterQueue() {
 			setterRow.updateItem(CncSetterListCtrl::COL_UNIT, 		wxString::Format("%s", 			ArduinoPIDs::getPIDUnit((int)pid, retVal)));
 
 			std::stringstream ss;
-			traceSetterValueList(ss, lste.set.values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
+			cnc::traceSetterValueList(ss, lste.set.values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
 			setterRow.updateItem(CncSetterListCtrl::COL_VAL, wxString::Format("%s", ss.str()));
 		}
 		

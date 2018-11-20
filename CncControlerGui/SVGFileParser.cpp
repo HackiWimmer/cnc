@@ -2,7 +2,7 @@
 #include <wx/string.h>
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
-#include <wx/stc/stc.h>
+#include "CncSourceEditor.h"
 #include <wx/filename.h>
 #include "OSD/webviewOSD.h"
 #include "SvgEditPopup.h"
@@ -67,62 +67,13 @@ void SVGFileParser::selectSourceControl(unsigned long pos) {
 		return;
 	}
 	
-	// debug only
-	bool debug = false;
-	if ( debug ) {
-		std::clog << pos << ": "<< currentNodeName << std::endl;
-		std::clog << inboundSourceControl->GetCurrentPos() << std::endl;
-		std::clog << inboundSourceControl->GetLine(pos) << std::endl;
-	}
-	
-	bool ok = false;
-	
-	long backStep = 1;
-	wxString searchStart(currentNodeName);
-	
-	// only if the currentNodeName exists use it as serach start point
-	// this is only the case if the parser runs preprocess() or spool()
-	if ( inboundSourceControl->GetLine(pos).Contains(currentNodeName) == false ) {
-		backStep = 0;
-		searchStart.assign("<");
-	}
-	
-	// sets the position to the start of the given line
-	inboundSourceControl->GotoLine(pos);
-	inboundSourceControl->Home();
-	inboundSourceControl->SearchAnchor();
-	// find start
-	long sp = inboundSourceControl->SearchNext(0, searchStart);
-	long ep = wxNOT_FOUND;
-	
-	if ( sp != wxNOT_FOUND ) {
-		inboundSourceControl->SetCurrentPos(sp);
-		inboundSourceControl->SearchAnchor();
-		// find end
-		ep = inboundSourceControl->SearchNext(0, ">");
-		
-		if ( ep != wxNOT_FOUND ) {
-			// make the end visible
-			inboundSourceControl->GotoPos(ep);
-			// select
-			inboundSourceControl->SetSelection(sp - backStep, ep + 1);
-			ok = true;
-		}
-	}
-	
-	// debug only
-	if ( debug )
-		std::clog << sp << ", " << ep << "\n";
-	
-	// on error use the default handling
-	if ( ok == false )
-		FileParser::selectSourceControl(pos);
+	inboundSourceControl->selectLineNumber(pos, currentNodeName);
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::setPathHandler(PathHandlerBase* ph) {
 //////////////////////////////////////////////////////////////////
-	std::cerr << "SVGFileParser::setPathHandler: Invalid call, this class didn't support this method!" << endl;
-	std::cerr << "Nothig will be set." << endl;
+	std::cerr << "SVGFileParser::setPathHandler: Invalid call, this class didn't support this method!" << std::endl;
+	std::cerr << "Nothig will be set." << std::endl;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::addPathElement(char c, unsigned int count, double values[]) {
@@ -199,7 +150,7 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 	SVGRootNode svgRootNode(width, height, unit, vb);
 	
 	if ( THE_APP != NULL ) {
-		stringstream ss; ss << svgRootNode;
+		std::stringstream ss; ss << svgRootNode;
 		THE_APP->GetSvgRootNode()->ChangeValue(ss.str());
 	}
 	

@@ -36,5 +36,10 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		
 		bool isRunning() { return running; }
 		void update(const GamepadEvent& state);
+
+	protected:
+		virtual void startGamepadService(wxCommandEvent& event);
+		virtual void stopGamepadService(wxCommandEvent& event);
+		
 };
 #endif // CNCGAMEPADCONTROLLERSTATE_H

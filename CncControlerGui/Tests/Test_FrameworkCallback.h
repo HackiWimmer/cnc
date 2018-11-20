@@ -37,7 +37,7 @@ class TEST_FRAMEWORK_CALLBACK : public TEST_BASE {
 			std::clog << "Received '" << fci.sc.out.result << "' from choice dialog" << std::endl;
 			
 			if ( fci.sc.out.result < 0 ) {
-				std::clog << "Test cancled" << endl;
+				std::clog << "Test cancled" << std::endl;
 				return true;
 			}
 			

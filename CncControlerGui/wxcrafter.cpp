@@ -416,20 +416,20 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1809->Add(m_tbHighLight, 0, wxALL, WXC_FROM_DIP(1));
     m_tbHighLight->SetMinSize(wxSize(26,26));
     
-    m_svgEditSearchState = new wxStaticBitmap(m_panelTplEdit, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(20,-1)), 0 );
+    m_sourceEditSearchState = new wxStaticBitmap(m_panelTplEdit, wxID_ANY, wxNullBitmap, wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(20,-1)), 0 );
     
-    flexGridSizer1809->Add(m_svgEditSearchState, 0, wxALL, WXC_FROM_DIP(5));
-    m_svgEditSearchState->SetMinSize(wxSize(20,-1));
+    flexGridSizer1809->Add(m_sourceEditSearchState, 0, wxALL, WXC_FROM_DIP(5));
+    m_sourceEditSearchState->SetMinSize(wxSize(20,-1));
     
-    wxArrayString m_svgEditSearchArr;
-    m_svgEditSearch = new wxComboBox(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), m_svgEditSearchArr, 0);
-    m_svgEditSearch->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
-    m_svgEditSearch->SetToolTip(_("Search pattern"));
+    wxArrayString m_sourceEditSearchArr;
+    m_sourceEditSearch = new wxComboBox(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), m_sourceEditSearchArr, 0);
+    m_sourceEditSearch->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+    m_sourceEditSearch->SetToolTip(_("Search pattern"));
     #if wxVERSION_NUMBER >= 3000
-    m_svgEditSearch->SetHint(wxT(""));
+    m_sourceEditSearch->SetHint(wxT(""));
     #endif
     
-    flexGridSizer1809->Add(m_svgEditSearch, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer1809->Add(m_sourceEditSearch, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_svgEditFind = new wxButton(m_panelTplEdit, wxID_ANY, _("Find"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,26)), 0);
     #if wxVERSION_NUMBER >= 2904
@@ -553,15 +553,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer713->Add(m_filePosition, 0, wxALL, WXC_FROM_DIP(1));
     m_filePosition->SetMinSize(wxSize(100,-1));
     
-    m_svgEditStatus = new wxTextCtrl(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
-    m_svgEditStatus->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
-    wxFont m_svgEditStatusFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-    m_svgEditStatus->SetFont(m_svgEditStatusFont);
+    m_sourceEditStatus = new wxTextCtrl(m_panelTplEdit, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
+    m_sourceEditStatus->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_sourceEditStatusFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_sourceEditStatus->SetFont(m_sourceEditStatusFont);
     #if wxVERSION_NUMBER >= 3000
-    m_svgEditStatus->SetHint(wxT(""));
+    m_sourceEditStatus->SetHint(wxT(""));
     #endif
     
-    flexGridSizer713->Add(m_svgEditStatus, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer713->Add(m_sourceEditStatus, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_editMode = new wxStaticText(m_panelTplEdit, wxID_ANY, _("edit mode"), wxDefaultPosition, wxDLG_UNIT(m_panelTplEdit, wxSize(-1,-1)), 0);
     m_editMode->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
@@ -5681,20 +5681,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_tbCaseSensitive->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
-    m_svgEditSearch->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::svgEditSearchTextChanged), NULL, this);
-    m_svgEditSearch->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::svgEditSelected), NULL, this);
+    m_sourceEditSearch->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::svgEditSearchTextChanged), NULL, this);
+    m_sourceEditSearch->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::svgEditSelected), NULL, this);
     m_svgEditFind->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFind), NULL, this);
     m_svgEditFindPrev->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFindPrev), NULL, this);
     m_cbBinaryViewMode->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectBinaryEditorViewMode), NULL, this);
     m_btExtractSourceAsNewTpl->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::extractSourceAsNewTpl), NULL, this);
-    m_stcFileContent->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::fileContentKeyDown), NULL, this);
-    m_stcFileContent->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::fileContentLeftDown), NULL, this);
-    m_stcFileContent->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::fileContentLeftUp), NULL, this);
-    m_stcFileContent->Connect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainFrameBClass::fileContentRightDown), NULL, this);
     m_stcFileContent->Connect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(MainFrameBClass::marginClickFileContent), NULL, this);
-    m_stcFileContent->Connect(wxEVT_KEY_UP, wxKeyEventHandler(MainFrameBClass::fileContentKeyUp), NULL, this);
     m_stcFileContent->Connect(wxEVT_STC_CHANGE, wxStyledTextEventHandler(MainFrameBClass::fileContentChange), NULL, this);
-    m_stcFileContent->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::fileContentDClick), NULL, this);
     m_dvListCtrlSvgUAInboundPathList->Connect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAInboundPathList), NULL, this);
     m_dvListCtrlSvgUAUseDirective->Connect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAUseDirectiveList), NULL, this);
     m_dvListCtrlSvgUADetailInfo->Connect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUADetailInfo), NULL, this);
@@ -6032,20 +6026,14 @@ MainFrameBClass::~MainFrameBClass()
     m_tbCaseSensitive->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
-    m_svgEditSearch->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::svgEditSearchTextChanged), NULL, this);
-    m_svgEditSearch->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::svgEditSelected), NULL, this);
+    m_sourceEditSearch->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::svgEditSearchTextChanged), NULL, this);
+    m_sourceEditSearch->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::svgEditSelected), NULL, this);
     m_svgEditFind->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFind), NULL, this);
     m_svgEditFindPrev->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::svgEditFindPrev), NULL, this);
     m_cbBinaryViewMode->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectBinaryEditorViewMode), NULL, this);
     m_btExtractSourceAsNewTpl->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::extractSourceAsNewTpl), NULL, this);
-    m_stcFileContent->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::fileContentKeyDown), NULL, this);
-    m_stcFileContent->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(MainFrameBClass::fileContentLeftDown), NULL, this);
-    m_stcFileContent->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(MainFrameBClass::fileContentLeftUp), NULL, this);
-    m_stcFileContent->Disconnect(wxEVT_RIGHT_DOWN, wxMouseEventHandler(MainFrameBClass::fileContentRightDown), NULL, this);
     m_stcFileContent->Disconnect(wxEVT_STC_MARGINCLICK, wxStyledTextEventHandler(MainFrameBClass::marginClickFileContent), NULL, this);
-    m_stcFileContent->Disconnect(wxEVT_KEY_UP, wxKeyEventHandler(MainFrameBClass::fileContentKeyUp), NULL, this);
     m_stcFileContent->Disconnect(wxEVT_STC_CHANGE, wxStyledTextEventHandler(MainFrameBClass::fileContentChange), NULL, this);
-    m_stcFileContent->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::fileContentDClick), NULL, this);
     m_dvListCtrlSvgUAInboundPathList->Disconnect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAInboundPathList), NULL, this);
     m_dvListCtrlSvgUAUseDirective->Disconnect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUAUseDirectiveList), NULL, this);
     m_dvListCtrlSvgUADetailInfo->Disconnect(wxEVT_COMMAND_DATAVIEW_SELECTION_CHANGED, wxDataViewEventHandler(MainFrameBClass::selectUADetailInfo), NULL, this);
@@ -7655,7 +7643,7 @@ CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent, w
     flexGridSizer5802->AddGrowableRow(0);
     this->SetSizer(flexGridSizer5802);
     
-    wxFlexGridSizer* flexGridSizer5821 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer5821 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer5821->SetFlexibleDirection( wxBOTH );
     flexGridSizer5821->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5821->AddGrowableCol(0);
@@ -7671,15 +7659,48 @@ CncGamepadControllerStateBase::CncGamepadControllerStateBase(wxWindow* parent, w
     
     flexGridSizer5821->Add(m_gamepadTrace, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
+    wxFlexGridSizer* flexGridSizer6026 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer6026->SetFlexibleDirection( wxBOTH );
+    flexGridSizer6026->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer5821->Add(flexGridSizer6026, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_btStartGamepadService = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btStartGamepadService->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("system-run-3")), wxLEFT);
+    m_btStartGamepadService->SetBitmapMargins(2,2);
+    #endif
+    m_btStartGamepadService->SetToolTip(_("Start the underlying Service"));
+    
+    flexGridSizer6026->Add(m_btStartGamepadService, 0, wxALL, WXC_FROM_DIP(1));
+    m_btStartGamepadService->SetMinSize(wxSize(26,26));
+    
+    m_btStopGamepadService = new wxButton(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btStopGamepadService->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-execute_stop")), wxLEFT);
+    m_btStopGamepadService->SetBitmapMargins(2,2);
+    #endif
+    m_btStopGamepadService->SetToolTip(_("Stop the underlying Service"));
+    
+    flexGridSizer6026->Add(m_btStopGamepadService, 0, wxALL, WXC_FROM_DIP(1));
+    m_btStopGamepadService->SetMinSize(wxSize(26,26));
+    
     SetName(wxT("CncGamepadControllerStateBase"));
     SetSize(500,300);
     if (GetSizer()) {
          GetSizer()->Fit(this);
     }
+    // Connect events
+    m_btStartGamepadService->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::startGamepadService), NULL, this);
+    m_btStopGamepadService->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::stopGamepadService), NULL, this);
+    
 }
 
 CncGamepadControllerStateBase::~CncGamepadControllerStateBase()
 {
+    m_btStartGamepadService->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::startGamepadService), NULL, this);
+    m_btStopGamepadService->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncGamepadControllerStateBase::stopGamepadService), NULL, this);
+    
 }
 
 CncFilePreviewWndBase::CncFilePreviewWndBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)

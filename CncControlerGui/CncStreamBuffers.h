@@ -8,8 +8,12 @@
 class LoggerStreamBuf : public std::streambuf {
 	
 	protected:
+		
 		wxTextCtrl* ctl;
 		wxTextAttr textAttr;
+		
+		wxString buffer;
+		bool first;
 		
 	public:
 	
@@ -19,6 +23,8 @@ class LoggerStreamBuf : public std::streambuf {
 		LoggerStreamBuf(wxTextCtrl* c, wxTextAttr ta) 
 		: ctl(c)
 		, textAttr(ta)
+		, buffer()
+		, first(true)
 		{
 			setTextAttr(textAttr);
 		}
@@ -30,8 +36,19 @@ class LoggerStreamBuf : public std::streambuf {
 		virtual int overflow (int c = EOF) {
 			
 			if ( ctl != NULL ) {
+				
+				if ( first == true ) {
+					first = false;
+					ctl->AppendText(buffer);
+					buffer.clear();
+				}
+				
 				ctl->SetDefaultStyle(textAttr);
 				ctl->AppendText((wxChar)c);
+				
+			} else {
+				buffer.append((wxChar)c);
+				
 			}
 			
 			// return something different from EOF
@@ -41,7 +58,8 @@ class LoggerStreamBuf : public std::streambuf {
 		///////////////////////////////////////////////////////////
 		void setTextAttr(const wxTextAttr& ta) {
 			textAttr = ta;
-			ctl->SetDefaultStyle(textAttr);
+			if ( ctl != NULL )
+				ctl->SetDefaultStyle(textAttr);
 		}
 		
 		///////////////////////////////////////////////////////////

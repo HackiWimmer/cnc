@@ -2,7 +2,7 @@
 #define SVG_CONTROL_POPUP_H
 
 #include <wx/menu.h>
-#include <wx/stc/stc.h>
+#include "CncSourceEditor.h"
 
 enum {
 	STC_PM_COMMENT = 0,

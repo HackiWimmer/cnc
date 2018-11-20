@@ -3,7 +3,7 @@
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
-#include <wx/stc/stc.h>
+#include "CncSourceEditor.h"
 #include "GCodePathHandlerBase.h"
 #include "GCodeFileParser.h"
 

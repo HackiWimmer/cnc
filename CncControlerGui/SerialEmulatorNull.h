@@ -203,6 +203,8 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline void writerGetterValues(unsigned char pid, int32_t v1, int32_t v2);
 		inline void writerGetterValues(unsigned char pid, int32_t v1, int32_t v2, int32_t v3);
 		
+		inline void replyPosition(bool force);
+		
 	protected:
 		LastCommand lastCommand;
 		unsigned char lastSignal;

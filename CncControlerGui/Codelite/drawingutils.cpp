@@ -30,7 +30,7 @@
 #include <wx/graphics.h>
 #include <wx/dcclient.h>
 #include <wx/dcmemory.h>
-#include <wx/stc/stc.h>
+#include "CncSourceEditor.h"
 
 #ifdef __WXMSW__
 #include <wx/msw/registry.h>

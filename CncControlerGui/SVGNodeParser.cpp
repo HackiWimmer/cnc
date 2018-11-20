@@ -173,7 +173,7 @@ bool SVGNodeParser::processPathCommand(const wxString& para) {
 bool SVGNodeParser::addPathElement(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( pathHandler == NULL ) {
-		cerr << "SVGParser::addPathElement: Failed: Member pathHandler is NULL " << endl;
+		std::cerr << "SVGParser::addPathElement: Failed: Member pathHandler is NULL " << std::endl;
 		return false;
 	}
 	
@@ -187,7 +187,7 @@ bool SVGNodeParser::addPathElement(char c, unsigned int count, double values[]) 
 bool SVGNodeParser::processSvgNode(const wxString& node) {
 //////////////////////////////////////////////////////////////////
 	if ( pathHandler == NULL ) {
-		cerr << "SVGParser::processSvgNode: Failed: Member pathHandler is NULL " << endl;
+		std::cerr << "SVGParser::processSvgNode: Failed: Member pathHandler is NULL " << std::endl;
 		return false;
 	}
 
@@ -215,9 +215,9 @@ bool SVGNodeParser::processSvgNode(const wxString& node) {
 		return ret;
 	}
 
-	cerr << "SVGParser::processSvgNode: Failed: "<< endl;
-	cerr << SVGElementConverter::getErrorInfo() << endl;
-	cerr << "Node: " << node << endl;
+	std::cerr << "SVGParser::processSvgNode: Failed: "	<< std::endl;
+	std::cerr << SVGElementConverter::getErrorInfo() 	<< std::endl;
+	std::cerr << "Node: " << node 						<< std::endl;
 	SVGElementConverter::resetErrorInfo();
 	
 	return false;

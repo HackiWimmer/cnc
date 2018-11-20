@@ -1,15 +1,23 @@
 #include "CncCommon.h"
 
 //////////////////////////////////////////////////////////////
-void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor) {
+void cnc::traceSetterValueList(std::ostream& s, const cnc::SetterValueList& values, int32_t factor) {
 //////////////////////////////////////////////////////////////
 	unsigned int counter = 0;
-	for ( auto it=values.begin(); it != values.end(); it++) {
+	for ( auto it = values.begin(); it != values.end(); it++) {
+		
 		if ( factor == 1 ) 	s << wxString::Format("%ld",   *it);
 		else				s << wxString::Format("%.2lf", (double)(*it)/factor);
 		
 		if ( ++counter != values.size() )
 			s << ", ";
+	}
+}
+//////////////////////////////////////////////////////////////
+void cnc::traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater& lnt) {
+//////////////////////////////////////////////////////////////
+	for ( auto it = lnt.begin(); it != lnt.end(); it++) {
+		s << wxString::Format("%u -> %u\n",  it->first, it->second);
 	}
 }
 //////////////////////////////////////////////////////////////
@@ -55,6 +63,21 @@ const char cnc::getCncSpeedTypeAsCharacter(CncSpeed s) {
 	
 	return cnc::USER_DEFIND_SPEED_CHAR;
 }
+//////////////////////////////////////////////////////////////
+const char* cnc::getTemplateFormatAsString(const TemplateFormat tf) {
+//////////////////////////////////////////////////////////////
+	switch ( tf ) {
+		case TplUnknown:	return "UNKNOWN";
+		case TplSvg:		return "SVG";
+		case TplGcode:		return "GCODE";
+		case TplBinary:		return "BIN"; 
+		case TplManual:		return "MANUAL"; 
+		case TplTest:		return "TEST"; 
+	}
+	
+	return "????";
+}
+
 //////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream& os, const wxPoint& p) {
 //////////////////////////////////////////////////////////////

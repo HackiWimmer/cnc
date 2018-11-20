@@ -2,6 +2,9 @@
 #include <sstream> 
 #include <wx/file.h>
 #include <wx/datetime.h>
+#include <wx/mstream.h>
+#include <wx/sstream.h>
+#include <wx/zstream.h>
 #include "CncSha1Wrapper.h"
 #include "CncFileNameService.h"
 #include "CncBinaryTemplateStreamer.h"
@@ -9,6 +12,7 @@
 //////////////////////////////////////////////////////////////////
 CncBinaryTemplateStreamer::CncBinaryTemplateStreamer()
 : readyToStream(false)
+, compress(true)
 , parameter()
 , tmpFileNameDataBody("")
 //////////////////////////////////////////////////////////////////
@@ -97,7 +101,8 @@ bool CncBinaryTemplateStreamer::finalize() {
 	std::ifstream b(tmpFileNameDataBody.c_str(), 	std::ifstream::in  | std::ifstream::binary);
 
 	if ( a.good() && b.good() ) {
-		a << b.rdbuf() ;
+		a << b.rdbuf();
+		
 	} else {
 		std::cerr << "CncBinaryTemplateStreamer::finalize(): Error while concatenation"
 				  << std::endl;
@@ -120,12 +125,12 @@ void CncBinaryTemplateStreamer::write_uint32_t(OutputStream& o, const uint32_t v
 bool CncBinaryTemplateStreamer::prepareDataContainer(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
 	dc.signature = fileSignatureRef;
-	if ( evaluateSourceContent(dc.sourceContent) == false ) {
+	if ( evaluateSourceContent(dc) == false ) {
 		std::cerr << "CncBinaryTemplateStreamer::prepareDataContainer(): evaluate source content failed" << std::endl;
 		return false;
 	}
 
-	if ( evaluateDataHeader(dc.dataHeader) == false ) {
+	if ( evaluateDataHeader(dc) == false ) {
 		std::cerr << "CncBinaryTemplateStreamer::prepareDataContainer(): evaluate data header failed" << std::endl;
 		return false;
 	}
@@ -133,22 +138,23 @@ bool CncBinaryTemplateStreamer::prepareDataContainer(DataContainer& dc) {
 	uint32_t offset = 0;
 	offset += lenFileSignature;
 	offset += sizeof(uint32_t);	// version
+	offset += sizeof(uint32_t);	// compression flag
 	offset += sizeof(uint32_t);	// offset to source
 	offset += sizeof(uint32_t);	// offset to data header
 	offset += sizeof(uint32_t); // offset to data body
 
 	dc.sourceContentOffset 	= offset;
-	dc.dataHeaderOffset		= dc.sourceContentOffset + dc.sourceContent.length();
-	dc.dataBodyOffset		= dc.dataHeaderOffset    + dc.dataHeader.length();
+	dc.dataHeaderOffset		= dc.sourceContentOffset + dc.sourceContentSize;
+	dc.dataBodyOffset		= dc.dataHeaderOffset    + dc.dataHeaderSize;
 
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncBinaryTemplateStreamer::appendFileHeader(const DataContainer& dc) {
+bool CncBinaryTemplateStreamer::appendFileHeader(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
 	fileStream.write(dc.signature.c_str(), lenFileSignature);
 	write_uint32_t(fileStream, version);
-
+	write_uint32_t(fileStream, (uint32_t)compress);
 	write_uint32_t(fileStream, dc.sourceContentOffset);
 	write_uint32_t(fileStream, dc.dataHeaderOffset);
 	write_uint32_t(fileStream, dc.dataBodyOffset);
@@ -162,15 +168,37 @@ bool CncBinaryTemplateStreamer::appendFileHeader(const DataContainer& dc) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncBinaryTemplateStreamer::appendFileSource(const DataContainer& dc) {
+bool CncBinaryTemplateStreamer::appendFileSource(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
-	fileStream.write(dc.sourceContent.c_str(), dc.sourceContent.length());
+	if ( dc.sourceContent == NULL ) {
+		std::cerr << "CncBinaryTemplateStreamer::appendFileSource(): Empty content" << std::endl;
+		return false;
+	}
+	
+	fileStream.write(dc.sourceContent, dc.sourceContentSize);
+	fileStream.flush();
+	
+	delete [] dc.sourceContent;
+	dc.sourceContent     = NULL;
+	dc.sourceContentSize = 0;
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncBinaryTemplateStreamer::appendBodyHeader(const DataContainer& dc) {
+bool CncBinaryTemplateStreamer::appendBodyHeader(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
-	fileStream.write(dc.dataHeader.c_str(), dc.dataHeader.length());
+	if ( dc.dataHeader == NULL ) {
+		std::cerr << "CncBinaryTemplateStreamer::appendBodyHeader(): Empty content" << std::endl;
+		return false;
+	}
+	
+	fileStream.write(dc.dataHeader, dc.dataHeaderSize);
+	fileStream.flush();
+	
+	delete [] dc.dataHeader;
+	dc.dataHeader = NULL;
+	dc.dataHeader = 0;
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -199,24 +227,50 @@ bool CncBinaryTemplateStreamer::appendDataBlock(unsigned char* buffer, uint32_t 
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncBinaryTemplateStreamer::evaluateSourceContent(std::string& content) {
+bool CncBinaryTemplateStreamer::evaluateSourceContent(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
 	std::ifstream sourceContent(parameter.SRC.fileName, std::ifstream::in);
+	
+	wxString content;
 	if ( sourceContent.good() ) {
 		std::stringstream ss;
 		ss << sourceContent.rdbuf();
 		content.assign(ss.str());
-
+	
 	} else {
 		content.assign("SourceFile: '");
 		content.append(parameter.SRC.fileName);
 		content.append("' could not be found");
 	}
-
-	return encode(content);
+	
+	// prepare buffer
+	if ( dc.sourceContent != NULL )
+		delete [] dc.sourceContent;
+	
+	if ( compress == true ) {
+		wxMemoryOutputStream out;
+		wxZlibOutputStream zlib(out);
+		zlib.Write(content.c_str(), content.length());
+		zlib.Close();
+		
+		uint32_t size = out.GetLength();
+		dc.sourceContent = new char[size + 1];
+		out.CopyTo(dc.sourceContent, size);
+		dc.sourceContent[size] = '\0';
+		dc.sourceContentSize   = size;
+		
+	} else {
+		uint32_t size = content.length();
+		dc.sourceContent = new char[size + 1];
+		strcpy(dc.sourceContent, content.c_str());
+		dc.sourceContent[size] = '\0';
+		dc.sourceContentSize   = size;
+	}
+	
+	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncBinaryTemplateStreamer::evaluateDataHeader(std::string& content) {
+bool CncBinaryTemplateStreamer::evaluateDataHeader(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 
@@ -259,13 +313,53 @@ bool CncBinaryTemplateStreamer::evaluateDataHeader(std::string& content) {
 		serializeSetup(ss);
 		serializeProcess(ss);
 	ss << "</root>\n";
+	
+	// prepare buffer
+	if ( dc.dataHeader != NULL )
+		delete [] dc.dataHeader;
+	
+	if ( compress == true ) {
+		wxMemoryOutputStream out;
+		wxZlibOutputStream zlib(out);
+		zlib.Write(ss.str().c_str(), strlen(ss.str().c_str()));
+		zlib.Close();
+		
+		uint32_t size = out.GetLength();
+		dc.dataHeader = new char[size + 1];
+		out.CopyTo(dc.dataHeader, size);
+		dc.dataHeader[size] = '\0';
+		dc.dataHeaderSize = size;
 
-	content.assign(ss.str());
-	return encode(content);
+	} else {
+		uint32_t size = strlen(ss.str().c_str());
+		dc.dataHeader = new char[size + 1];
+		strcpy(dc.dataHeader, ss.str().c_str());
+		dc.dataHeader[size] = '\0';
+		dc.dataHeaderSize = size;
+		
+	}
+	
+	return true;
 }
+
+
+
 //////////////////////////////////////////////////////////////////
-bool CncBinaryTemplateStreamer::encode(std::string& content) {
+bool CncBinaryTemplateStreamer::uncompress(char* buf, int32_t size, wxString& content) {
 //////////////////////////////////////////////////////////////////
-	// TODO compress content
+	if ( buf == NULL ) {
+		#warning
+		return false;
+	}
+	
+	wxMemoryInputStream in(buf, size);
+	wxZlibInputStream zlib(in);
+	
+	char dataBlock[1024];
+	size_t n;
+
+	while ( ( n = zlib.Read(dataBlock, sizeof(dataBlock)).LastRead() ) > 0 )
+		content.Append(dataBlock, n);
+
 	return true;
 }

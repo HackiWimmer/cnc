@@ -12,10 +12,10 @@
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
 
-typedef std::map<unsigned char, SetterValueList> 	SetterMap;
-typedef std::vector<unsigned char> 					PidList;
-typedef std::vector<int32_t> 						GetterValues;
-typedef std::map<unsigned char, GetterValues> 		GetterListValues;
+typedef std::map<unsigned char, cnc::SetterValueList> 	SetterMap;
+typedef std::vector<unsigned char> 						PidList;
+typedef std::vector<int32_t> 							GetterValues;
+typedef std::map<unsigned char, GetterValues> 			GetterListValues;
 
 class CncControl;
 
@@ -126,6 +126,7 @@ struct ContollerInfo {
 	unsigned char supportStateValue		= 0;
 	
 	unsigned char posType				= '\0';
+	bool synchronizeAppPos					= false;
 	int32_t xCtrlPos					= 0;
 	int32_t yCtrlPos					= 0;
 	int32_t zCtrlPos					= 0;
@@ -190,7 +191,25 @@ class Serial : public SerialOSD {
 		CncNanoTimestamp tsMeasurementLast;
 		
 	protected:
-	
+		
+		class ControllerCallbackShouldSynchronizeAppPosition {
+			private:
+				Serial* serial;
+				
+			public:
+				ControllerCallbackShouldSynchronizeAppPosition(Serial* s)
+				: serial(s) 
+				{ 
+					if ( serial != NULL )
+						serial->shouldCallbackSynchronizeAppPosition = true; 
+				}
+				
+				~ ControllerCallbackShouldSynchronizeAppPosition() {
+					if ( serial != NULL )
+						serial->shouldCallbackSynchronizeAppPosition = false; 
+				}
+		};
+		
 		//cnc control object
 		CncControl* cncControl;
 		// Measurement status
@@ -206,6 +225,7 @@ class Serial : public SerialOSD {
 		Serial::SypMode spyMode;
 		bool spyRead;
 		bool spyWrite;
+		bool shouldCallbackSynchronizeAppPosition;
 		
 		// display factors
 		double factorX;
@@ -218,6 +238,8 @@ class Serial : public SerialOSD {
 		
 		virtual void waitDuringRead(unsigned int millis); 
 		virtual void sleepMilliseconds(unsigned int millis);
+		
+		bool shouldCallbackAlsoSynchronizeAppPosition() { return shouldCallbackSynchronizeAppPosition; }
 		
 		// decodes the given controler msg
 		inline void decodeMessage(const int bytes, const unsigned char* mutliByteStream, std::ostream& message);
@@ -232,17 +254,17 @@ class Serial : public SerialOSD {
 		// reads data from controller until a MBYTE_CLOSE wa received or maxDelay was reached
 		inline int readDataUntilMultyByteClose(unsigned char *buffer, unsigned int nbByte);
 		// main handler for controller results
-		inline bool evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		inline bool evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
+		inline bool evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		// handle receiving data from controller
-		inline bool RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		inline bool RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		inline bool RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		inline bool RET_HALT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		inline bool RET_QUIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
-		inline bool RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);	
+		inline bool RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
+		inline bool RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
+		inline bool RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
+		inline bool RET_HALT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
+		inline bool RET_QUIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
+		inline bool RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		// handle receiving binary data from controller
-		inline bool RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		// decodes the give fetch result
 		inline bool decodeGetter(SerialFetchInfo& sfi);
 		inline bool decodeText(unsigned char pid, SerialFetchInfo& sfi, std::ostream& mutliByteStream);
@@ -266,8 +288,8 @@ class Serial : public SerialOSD {
 		
 		bool sendSerialControllerCallback(ContollerInfo& ci);
 		
-		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command, CncLongPosition& pos);
-		inline bool convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
+		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command);
+		inline bool convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream);
 		
 		friend class SerialCommandLocker;
 	public:
@@ -323,16 +345,16 @@ class Serial : public SerialOSD {
 		bool processGetter(unsigned char pid, GetterValues& ret);
 		bool processGetterList(PidList pidList, GetterListValues& ret);
 		bool processSetter(unsigned char pid, int32_t value);
-		bool processSetter(unsigned char pid, const SetterValueList& values);
+		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
 		
-		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos);
+		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream);
 		
-		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos);
-		bool processMoveUntilSignal(unsigned int size, const int32_t (&values)[3], CncLongPosition& pos);
+		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered);
+		bool processMoveUntilSignal(unsigned int size, const int32_t (&values)[3]);
 		
-		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered, CncLongPosition& pos);
-		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos);
-		bool processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos);
+		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
+		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered);
+		bool processMoveZ(int32_t z1, bool alreadyRendered);
 		
 		bool execute(const unsigned char* buffer, unsigned int nbByte);
 		

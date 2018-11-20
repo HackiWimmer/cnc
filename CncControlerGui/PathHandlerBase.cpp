@@ -46,7 +46,7 @@ void PathHandlerBase::initCurrentPos(const CncDoublePosition& pos) {
 void PathHandlerBase::setCurveLibResolution(float res) { 
 //////////////////////////////////////////////////////////////////
 	std::cerr << "PathHandlerBase::setCurveLibResolution is obsolete" << std::endl;
-	#warning
+	#warning CncConfig::setCurveLibIncrement(res) is obsolete here 
 	//CncConfig::setCurveLibIncrement(res); 
 }
 //////////////////////////////////////////////////////////////////

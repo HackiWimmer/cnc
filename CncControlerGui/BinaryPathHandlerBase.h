@@ -1,15 +1,25 @@
 #ifndef BIN_PARSE_HANDLER_BASE_H
 #define BIN_PARSE_HANDLER_BASE_H
 
+#include <map>
 #include <sstream>
+#include "CncCommon.h"
 #include "PathHandlerBase.h"
+
+typedef cnc::LineNumberTranslater LineNumberTranslater;
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 class BinaryPathHandlerBase : public PathHandlerBase {
 	
-	protected:
+	private:
+		LineNumberTranslater lineNumberTranslater;
+		unsigned long totalLineNumberOffset;
+		unsigned long lineNumberCounter;
 		
+	protected:
 		virtual bool processLinearMove(bool alreadyRendered) { return true; }
+		void resetLineNumberTranslation();
+		void translateLineNumber(unsigned long offset);
 		
 	public:
 		BinaryPathHandlerBase();
@@ -21,8 +31,8 @@ class BinaryPathHandlerBase : public PathHandlerBase {
 		virtual bool processCommand(const unsigned char* buffer, int nbBytes) { return true; };
 
 		// view interface
-		virtual const wxString& getViewContent(wxString& content) { return content; }
-		
+		virtual const wxString& getViewContent(wxString& content) 		{ return content; }
+		const cnc::LineNumberTranslater& getLineNumberTranslater() 		{ return lineNumberTranslater; }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////

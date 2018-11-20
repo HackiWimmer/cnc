@@ -360,6 +360,7 @@
   <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="software-update-available-3 (2)">bitmaps\software-update-available-3 (2).png</object>
   <object class="wxBitmap" name="software-update-inactive (2)">bitmaps\software-update-inactive (2).png</object>
+  <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>

@@ -337,7 +337,7 @@ void PathGeneratorFrame::setupPreDefinfedValues(int id, const wxString& name) {
 		wxPGProperty* prop = m_pgCatPath->Item(it->first);
 		if ( prop != NULL ) {
 			if ( pgb->setPropertyValue(prop, it->second) == false )
-				std::cerr << "PathGeneratorFrame::setupPreDefinfedValues: setPropertyValue failed! Index: " << it->first << ", Value: " << it->second.GetString() << endl;
+				std::cerr << "PathGeneratorFrame::setupPreDefinfedValues: setPropertyValue failed! Index: " << it->first << ", Value: " << it->second.GetString() << std::endl;
 		}
 	}
 }

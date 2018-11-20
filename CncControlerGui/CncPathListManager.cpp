@@ -19,7 +19,8 @@ bool CncPathListManager::overAllBoostWktEntriesSample() {
 		
 		switch ( getWktType() ) {
 			case CncPathListManager::WKT_EMPTY: 
-			case CncPathListManager::WKT_POINT:			// nothing should happen
+			case CncPathListManager::WKT_POINT:
+									// nothing should happen
 									return true;
 									
 			case CncPathListManager::WKT_POLYGON:
@@ -40,7 +41,7 @@ bool CncPathListManager::overAllBoostWktEntriesSample() {
 										
 									break;
 									
-			default:				std::cerr << "reversePath(): Unknown wkt type: " << getWktTypeAsString() << endl;
+			default:				std::cerr << "reversePath(): Unknown wkt type: " << getWktTypeAsString() << std::endl;
 									return false;
 			
 		}
@@ -197,7 +198,7 @@ bool CncPathListManager::getCentroid(wxRealPoint& centroid) {
 									boost::geometry::centroid(linestringType, p);
 									break;
 									
-			default:				std::cerr << "determineCentroid(): Unknown wkt type: " << getWktTypeAsString() << endl;
+			default:				std::cerr << "determineCentroid(): Unknown wkt type: " << getWktTypeAsString() << std::endl;
 									return false;
 			
 		}
@@ -233,10 +234,8 @@ bool CncPathListManager::centerPath() {
 		return true;
 
 	wxRealPoint cp; getCentroid(cp);
-	clog << "RefPoint: " << getReferencePos() << endl;
-	clog << "Centroid: " << cp << endl;
-	
-	
+	std::clog << "RefPoint: " << getReferencePos() << std::endl;
+	std::clog << "Centroid: " << cp << std::endl;
 	
 	//todo
 	return true;

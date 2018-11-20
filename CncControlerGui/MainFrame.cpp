@@ -41,7 +41,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include <wx/msgdlg.h>
 #include <wx/evtloop.h>
 #include <wx/dataview.h>
-#include <wx/stc/stc.h>
+#include "CncSourceEditor.h"
 #include <wx/wfstream.h>
 #include <wx/datstrm.h>
 #include <wx/txtstrm.h>
@@ -86,7 +86,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 	#include <windows.h>
 	#include <dbt.h>
 	
-	#define CNC_GCODE_LEXER
 #endif
 
 ////////////////////////////////////////////////////////////////////
@@ -105,23 +104,6 @@ unsigned int CncGampadDeactivator::referenceCounter = 0;
 unsigned int CncTransactionLock::referenceCounter   = 0;
 
 ////////////////////////////////////////////////////////////////////
-// user defined scintila style options
-	enum {
-			MARGIN_LINE_NUMBERS, 
-			MARGIN_EDIT_TRACKER,
-			MARGIN_BREAKPOINT,
-			MARGIN_FOLD
-	};
-
-	enum {
-			TE_DEFAULT_STYLE = 242,
-			TE_BREAKPOINT_STYLE,
-			TE_LINE_MODIFIED_STYLE,
-			TE_LINE_SAVED_STYLE
-	};
-////////////////////////////////////////////////////////////////////
-
-////////////////////////////////////////////////////////////////////
 // app defined events
 	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD, 			UpdateManagerEvent);
 	wxDEFINE_EVENT(wxEVT_GAMEPAD_THREAD, 					GamepadEvent);
@@ -133,15 +115,13 @@ unsigned int CncTransactionLock::referenceCounter   = 0;
 
 ////////////////////////////////////////////////////////////////////
 // app defined event table
-wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
-	EVT_CLOSE(MainFrame::onClose)
-	
-	EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, 	MainFrame::configurationUpdated)
-	
-	EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, 							MainFrame::onPerspectiveTimer)
-	EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 				MainFrame::onDebugUserNotificationTimer)
-	
-wxEND_EVENT_TABLE()
+	wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
+		EVT_CLOSE(MainFrame::onClose)
+		EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, 	MainFrame::configurationUpdated)
+		EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, 							MainFrame::onPerspectiveTimer)
+		EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 				MainFrame::onDebugUserNotificationTimer)
+		
+	wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -198,7 +178,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
-, pathGenerator(new PathGeneratorFrame(this, m_stcFileContent))
+, pathGenerator(new PathGeneratorFrame(this, sourceEditor))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
 , lruFileList(LruFileList(16))
@@ -218,9 +198,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , refPositionDlg(new CncReferencePosition(this))
 {
 ///////////////////////////////////////////////////////////////////
-	// determine assert handler
-	wxSetDefaultAssertHandler();
-	
 	// init the specialized wxGrid editor
 	CncTextCtrlEditor::init();
 			
@@ -451,6 +428,10 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_drawPane3D, motionMonitor);
 	activate3DPerspectiveButton(m_3D_Perspective1);
 	
+	// Source Editor
+	sourceEditor = new CncSourceEditor(this);
+	GblFunc::replaceControl(m_stcFileContent, sourceEditor);
+	
 	//Spy
 	serialSpy = new CncSpyControl(this, wxID_ANY, m_serialSpyDetails);
 	GblFunc::replaceControl(m_serialSpy, serialSpy);
@@ -665,47 +646,13 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	/*
-	SC_HANDLE hScMIPHilfsdienst = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
-	if ( hScMIPHilfsdienst == NULL )
-	{
-		DWORD error = GetLastError();
-		//LPCTSTR errormsg =  "#1 - " + error;
-		//SetWindowText(hInfobox, (LPCTSTR) error);
-		std::cout << "e1: " << (long)error << std::endl;
-		return;
-	}
-	
-	SC_HANDLE hIPHilfsdienst = OpenService(hScMIPHilfsdienst, wxString("Ds3Service") , SC_MANAGER_ALL_ACCESS);
-	if (hIPHilfsdienst == NULL)
-	{
-		DWORD error = GetLastError();
-		//LPCTSTR errormsg =  "#2 - " + error;
-		//SetWindowText(hInfobox, (LPCTSTR) error);
-		std::cout << "e2: " << (long)error << std::endl;
-		return;
-	}
-	
-	SERVICE_STATUS sInfo;
-	ControlService(hIPHilfsdienst, SERVICE_CONTROL_INTERROGATE, &sInfo);
-	if (sInfo.dwCurrentState == SERVICE_STOPPED)
-	{
-		std::cout << "off" << std::endl;
-	}else{
-		std::cout << "on" << std::endl;
-	}
-	 * */
+	wxASSERT(0);
+	wxLogWarning("%s", "Stefan");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	
-	wxString ret;
-	std::cout << CncStringSha1::checksum("Stefan", ret) << std::endl;
-	std::cout << CncFileSha1::checksum("Stefan", ret) << std::endl;
-	
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -772,8 +719,6 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	perspectiveHandler.loadPerspective("Default");
 	decorateViewMenu();
 	
-	std::clog << "Woodworking Session ID: " << CncFileNameService::getSession() << std::endl;
-	
 	// Version infos
 	std::clog << "Version Information:" << std::endl;
 	traceGccVersion(std::cout);
@@ -781,6 +726,8 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	traceBoostVersion(std::cout);
 	GLContextBase::traceOpenGLVersionInfo(std::cout);
 	traceWoodworkingCncVersion(std::cout);
+	traceSessionId();
+	std::cout << std::endl;
 	
 	// Auto connect ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
@@ -1218,232 +1165,6 @@ void MainFrame::dispatchAll() {
 	while ( evtLoop->Pending() )
 		evtLoop->Dispatch();
 }
-///////////////////////////////////////////////////////////////////
-void MainFrame::initTemplateEditStyle() {
-///////////////////////////////////////////////////////////////////
-	initTemplateEditStyle(m_stcFileContent, getCurrentTemplateFormat());
-	initTemplateEditStyle(m_stcEmuSource, TplSvg);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::initTemplateEditStyle(wxStyledTextCtrl* ctl, TemplateFormat format) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(ctl);
-	
-	// Define used fonts
-	wxFont defaultFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-	wxFont staticFont  = wxSystemSettings::GetFont(wxSYS_ANSI_FIXED_FONT);
-	wxFont font;
-	
-	//define colours
-	wxColour clDefaultBck(0, 0, 0);
-	wxColour clDefaultFgd(175, 175, 175);
-	
-	wxColour clCaretBck(64, 64, 64);
-	wxColour clCaretFgd(*wxWHITE);
-	
-	wxColour clComment(150, 150, 150);
-	wxColour clIdentifier(135, 206, 250);
-	wxColour clAttribute(128, 139, 237);
-	wxColour clNumber(128,255,128);
-	wxColour clOperator(255,128,128);
-	
-	// Reset all sytles
-	ctl->StyleClearAll();
-
-	// setup black background as default
-	for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++) {
-		ctl->StyleSetBackground (i, clDefaultBck);
-	}
-	
-	// setup gray foreground as default
-	for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++) {
-		ctl->StyleSetForeground (i, clDefaultFgd);
-	}
-	
-	// setup default font
-	for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++) {
-		ctl->StyleSetFont(i, defaultFont);
-	}
-
-	// Reset folding
-	ctl->SetProperty(wxT("xml.auto.close.tags"), 		wxT("0"));
-	ctl->SetProperty(wxT("lexer.xml.allow.scripts"), 	wxT("0"));
-	ctl->SetProperty(wxT("fold"), 						wxT("0"));
-	ctl->SetProperty(wxT("fold.comment"),				wxT("0"));
-	ctl->SetProperty(wxT("fold.compact"), 				wxT("0"));
-	ctl->SetProperty(wxT("fold.preprocessor"), 			wxT("0"));
-	ctl->SetProperty(wxT("fold.html"), 					wxT("0"));
-	ctl->SetProperty(wxT("fold.html.preprocessor"), 	wxT("0"));
-	ctl->SetMarginMask(MARGIN_FOLD, wxSTC_MASK_FOLDERS);
-	ctl->SetMarginWidth(MARGIN_FOLD, 0);
-	ctl->SetMarginSensitive(MARGIN_FOLD, false);
-	ctl->SetFoldMarginColour(true, wxColour(73, 73, 73));
-	ctl->SetFoldMarginHiColour(true, *wxBLACK);
-	
-	// Set default styles 
-	ctl->StyleSetForeground(TE_DEFAULT_STYLE, clDefaultFgd);
-	ctl->StyleSetBackground(TE_DEFAULT_STYLE, wxColour(73, 73, 73));
-	ctl->StyleSetBackground(TE_BREAKPOINT_STYLE, wxColour(128, 0, 0));
-	ctl->StyleSetForeground(TE_BREAKPOINT_STYLE, *wxWHITE);
-	ctl->StyleSetBackground(TE_LINE_SAVED_STYLE, wxColour(wxT("FOREST GREEN")));
-	ctl->StyleSetBackground(TE_LINE_MODIFIED_STYLE, wxColour(wxT("ORANGE")));
-	ctl->StyleSetForeground(wxSTC_STYLE_LINENUMBER, clDefaultFgd);
-	ctl->StyleSetBackground(wxSTC_STYLE_LINENUMBER, wxColour(73, 73, 73));
-	ctl->SetTabWidth(4);
-	ctl->SetWrapMode(wxSTC_WRAP_NONE);
-	ctl->SetReadOnly(false);
-	
-	// Enable line numbers
-	ctl->SetMarginWidth(MARGIN_LINE_NUMBERS, 35);
-	ctl->SetMarginType(MARGIN_LINE_NUMBERS, wxSTC_MARGIN_NUMBER);
-	ctl->SetMarginSensitive(MARGIN_LINE_NUMBERS, true);
-	
-	// Enable breakpoint
-	ctl->SetMarginWidth(MARGIN_BREAKPOINT, 8);
-	ctl->SetMarginType(MARGIN_BREAKPOINT, wxSTC_MARGIN_TEXT);
-	ctl->SetMarginMask(MARGIN_BREAKPOINT, 0);
-	ctl->SetMarginSensitive(MARGIN_BREAKPOINT, true);
-	
-	// Enable edit style - file content marker
-	ctl->SetMarginWidth(MARGIN_EDIT_TRACKER, 3);
-	ctl->SetMarginType(MARGIN_EDIT_TRACKER, wxSTC_MARGIN_SYMBOL); 
-	ctl->SetMarginMask(MARGIN_EDIT_TRACKER, 0);
-	
-	// Configure caret style
-	ctl->SetCaretForeground(clCaretFgd);
-	ctl->SetSelBackground(true, clCaretBck);
-	
-	// Configure selection colours
-	//ctl->SetSelForeground(true, wxColour(255,201,14));
-	ctl->SetSelBackground(true, wxColour(83,83,83));
-	
-	// Set specific styles
-	switch ( format ) {
-		case TplSvg:
-
-			ctl->SetLexer(wxSTC_LEX_HTML);
-			
-			// setup highlight colours
-			ctl->StyleSetForeground(wxSTC_H_DOUBLESTRING,		wxColour(255, 	205, 	139));
-			ctl->StyleSetForeground(wxSTC_H_SINGLESTRING,		wxColour(255,	205, 	139));
-			ctl->StyleSetForeground(wxSTC_H_ENTITY,				wxColour(255,	0, 		0));
-			ctl->StyleSetForeground(wxSTC_H_TAGUNKNOWN,			wxColour(0,		150, 	0));
-			ctl->StyleSetForeground(wxSTC_H_ATTRIBUTEUNKNOWN,	wxColour(0,		0, 		150));
-			ctl->StyleSetForeground(wxSTC_H_ATTRIBUTE,			clAttribute);
-			ctl->StyleSetForeground(wxSTC_H_TAG,				clIdentifier);
-			ctl->StyleSetForeground(wxSTC_H_COMMENT,			clComment);
-			
-			// setup folding
-			ctl->SetProperty(wxT("xml.auto.close.tags"), 		wxT("1"));
-			ctl->SetProperty(wxT("lexer.xml.allow.scripts"), 	wxT("1"));
-			ctl->SetProperty(wxT("fold"), 						wxT("1"));
-			ctl->SetProperty(wxT("fold.comment"),				wxT("1"));
-			ctl->SetProperty(wxT("fold.compact"), 				wxT("1"));
-			ctl->SetProperty(wxT("fold.preprocessor"), 			wxT("1"));
-			ctl->SetProperty(wxT("fold.html"), 					wxT("1"));
-			ctl->SetProperty(wxT("fold.html.preprocessor"), 	wxT("1"));
-			
-			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDER,        		wxSTC_MARK_BOXPLUS, 			clDefaultBck, clDefaultFgd);
-			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPEN,    		wxSTC_MARK_BOXMINUS, 			clDefaultBck, clDefaultFgd);
-			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDERSUB,    		wxSTC_MARK_VLINE,    			clDefaultBck, clDefaultFgd);
-			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDEREND,     		wxSTC_MARK_BOXPLUSCONNECTED,	clDefaultBck, clDefaultFgd);
-			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDEROPENMID, 		wxSTC_MARK_BOXMINUSCONNECTED, 	clDefaultBck, clDefaultFgd);
-			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDERMIDTAIL,		wxSTC_MARK_TCORNER,     		clDefaultBck, clDefaultFgd);
-			ctl->MarkerDefine(wxSTC_MARKNUM_FOLDERTAIL,    		wxSTC_MARK_LCORNER,     		clDefaultBck, clDefaultFgd);
-
-			ctl->SetMarginMask(MARGIN_FOLD, wxSTC_MASK_FOLDERS);
-			ctl->SetMarginWidth(MARGIN_FOLD, 32);
-			ctl->SetMarginSensitive(MARGIN_FOLD, true);
-			ctl->SetFoldFlags(wxSTC_FOLDFLAG_LINEBEFORE_CONTRACTED | wxSTC_FOLDFLAG_LINEAFTER_CONTRACTED | 16);
-			
-			break;
-			
-		case TplGcode:
-			#ifdef CNC_GCODE_LEXER
-				ctl->SetLexer(wxSTC_LEX_GCODE);
-				
-				// setup highlight colours
-				ctl->StyleSetForeground (wxSTC_GCODE_OPERATOR,		clOperator);
-				ctl->StyleSetForeground (wxSTC_GCODE_NUMBER,		clNumber);
-				ctl->StyleSetForeground (wxSTC_GCODE_IDENTIFIER,	clIdentifier);
-				ctl->StyleSetForeground (wxSTC_GCODE_PARAM,			clAttribute);
-				ctl->StyleSetForeground (wxSTC_GCODE_COMMENT,		clComment);
-				ctl->StyleSetForeground (wxSTC_GCODE_COMMENT_LINE,	clComment);
-				ctl->StyleSetForeground (wxSTC_GCODE_DIRECTIVE,		clComment);
-
-				font = (ctl->StyleGetFont(wxSTC_GCODE_IDENTIFIER)).Bold();
-				ctl->StyleSetFont(wxSTC_GCODE_IDENTIFIER, font);
-				
-				font = (ctl->StyleGetFont(wxSTC_GCODE_PARAM)).Bold();
-				ctl->StyleSetFont(wxSTC_GCODE_PARAM, font);
-			#endif
-			break;
-			
-		case TplBinary:
-			ctl->SetLexer(wxSTC_LEX_CPP);
-			
-			for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++)
-				ctl->StyleSetFont(i, staticFont);
-				
-/*
-	wxColour clComment(150, 150, 150);
-	wxColour clIdentifier(135, 206, 250);
-	wxColour clAttribute(128, 139, 237);
-	wxColour clNumber(128,255,128);
-	wxColour clOperator(255,128,128);
-
-	#define wxSTC_C_DEFAULT 0
-	#define wxSTC_C_COMMENT 1
-	#define wxSTC_C_COMMENTLINE 2
-	#define wxSTC_C_COMMENTDOC 3
-	#define wxSTC_C_NUMBER 4
-	#define wxSTC_C_WORD 5
-	#define wxSTC_C_STRING 6
-	#define wxSTC_C_CHARACTER 7
-	#define wxSTC_C_UUID 8
-	#define wxSTC_C_PREPROCESSOR 9
-	#define wxSTC_C_OPERATOR 10
-	#define wxSTC_C_IDENTIFIER 11
-	#define wxSTC_C_STRINGEOL 12
-	#define wxSTC_C_VERBATIM 13
-	#define wxSTC_C_REGEX 14
-	#define wxSTC_C_COMMENTLINEDOC 15
-	#define wxSTC_C_WORD2 16
-	#define wxSTC_C_COMMENTDOCKEYWORD 17
-	#define wxSTC_C_COMMENTDOCKEYWORDERROR 18
-	#define wxSTC_C_GLOBALCLASS 19
-	#define wxSTC_C_STRINGRAW 20
-	#define wxSTC_C_TRIPLEVERBATIM 21
-	#define wxSTC_C_HASHQUOTEDSTRING 22
-	#define wxSTC_C_PREPROCESSORCOMMENT 23
-	#define wxSTC_C_PREPROCESSORCOMMENTDOC 24
-	#define wxSTC_C_USERLITERAL 25
-	#define wxSTC_C_TASKMARKER 26
-	#define wxSTC_C_ESCAPESEQUENCE 27
-*/		
-			ctl->StyleSetForeground(wxSTC_C_COMMENT, 		clComment);
-			ctl->StyleSetForeground(wxSTC_C_COMMENTLINE, 	clComment);
-			ctl->StyleSetForeground(wxSTC_C_COMMENTDOC, 	clComment);
-			ctl->StyleSetFont(wxSTC_C_COMMENT, 				defaultFont);
-			ctl->StyleSetFont(wxSTC_C_COMMENTLINE, 			defaultFont);
-			ctl->StyleSetFont(wxSTC_C_COMMENTDOC, 			defaultFont);
-	
-			ctl->StyleSetForeground(wxSTC_C_NUMBER, 		clNumber);
-			ctl->StyleSetFont(wxSTC_C_NUMBER, 				staticFont);
-			
-			ctl->StyleSetForeground(wxSTC_C_NUMBER, 		clIdentifier);
-			ctl->StyleSetFont(wxSTC_C_IDENTIFIER, 			defaultFont);
-
-			ctl->SetReadOnly(true);
-			
-			break;
-			
-		default:
-			;// do nothing
-	}	
-	
-	
-}
 #ifdef __WXMSW__
 ///////////////////////////////////////////////////////////////////
 WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) {
@@ -1686,7 +1407,6 @@ void MainFrame::initialize(void) {
 	decoratePosSpyConnectButton(true);
 	decorateSecureDlgChoice(true);
 	registerGuiControls();
-	initTemplateEditStyle();
 	toggleMonitorStatistics(false);
 	changeManuallySpeedValue();
 	initSpeedConfigPlayground();
@@ -2248,13 +1968,10 @@ void MainFrame::enableControls(bool state) {
 	
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::enableMainFileEditor(bool state, bool force) {
+void MainFrame::enableMainFileEditor(bool state) {
 ///////////////////////////////////////////////////////////////////
-	if ( force == false && getCurrentTemplateFormat() == TplBinary )
-		state = false; // always
-		
 	// enable template editor
-	m_stcFileContent->SetReadOnly(!state);
+	sourceEditor->Enable(state);
 	
 	if ( state == true )	m_editMode->SetLabel("Edit mode");
 	else					m_editMode->SetLabel("Read only");
@@ -2337,7 +2054,7 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 		motionMonitor->clear();
 		
 	} else {
-		cnc::cex1 << " Set reference position aborted . . . " << endl;
+		cnc::cex1 << " Set reference position aborted . . . " << std::endl;
 	}
 	
 	//selectMonitorBookCncPanel();
@@ -2559,19 +2276,11 @@ TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 	if ( sel == (unsigned int)MainBookSelection::VAL::TEST_PANEL )
 		return TplTest;
 		
-	wxFileName fn;
-	if ( fileName == NULL )	fn.Assign(getCurrentTemplatePathFileName());
-	else					fn.Assign(fileName);
+	wxString fn;
+	if ( fileName == NULL )	fn.assign(getCurrentTemplatePathFileName());
+	else					fn.assign(fileName);
 	
-	wxString ext(fn.GetExt());
-	ext.MakeUpper();
-	
-	if      ( ext == "SVG" )	return TplSvg;
-	else if ( ext == "GCODE") 	return TplGcode;
-	else if ( ext == "NGC") 	return TplGcode;
-	else if ( ext == "BCT") 	return TplBinary;
-
-	return TplUnknown;
+	return CncSourceEditor::evaluateTemplateFormatFromFileName(fn);
 }
 ///////////////////////////////////////////////////////////////////
 const wxString& MainFrame::getCurrentTemplateFileName() {
@@ -2667,16 +2376,16 @@ bool MainFrame::openFile(int pageToSelect) {
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
 		
-		case TplSvg:	ret = openTextFile();
+		case TplSvg:	ret = sourceEditor->openFile(getCurrentTemplatePathFileName());
 						if ( ret == true )
 							showSvgExtPages();
 						break;
 		
-		case TplGcode:	ret = openTextFile();
+		case TplGcode:	ret = sourceEditor->openFile(getCurrentTemplatePathFileName());
 						hideSvgExtPages();
 						break;
 						
-		case TplBinary:	ret = openBinaryFile(getCurrentBinaryViewMode());
+		case TplBinary:	ret = sourceEditor->openFile(getCurrentTemplatePathFileName());
 						hideSvgExtPages();
 						break;
 						
@@ -2691,10 +2400,6 @@ bool MainFrame::openFile(int pageToSelect) {
 	if ( ret == true ) {
 		evaluateTemplateModificationTimeStamp();
 		
-		initTemplateEditStyle();
-		m_stcFileContent->DiscardEdits();
-		m_stcFileContent->EmptyUndoBuffer();
-		
 		if ( inboundFileParser != NULL )
 			inboundFileParser->clearControls();
 		
@@ -2704,7 +2409,7 @@ bool MainFrame::openFile(int pageToSelect) {
 		introduceCurrentFile();
 	}
 	
-	updateFileContentPosition();
+	updateFileContentPosition(0, 0);
 	templateFileLoading = false;
 	return ret;
 }
@@ -2716,88 +2421,17 @@ void MainFrame::introduceCurrentFile() {
 	selectMainBookSourcePanel();
 	
 	// publish model type
-	GLContextBase::ModelType mt = GLContextBase::ModelType::MT_RIGHT_HAND;
-	if ( getCurrentTemplateFormat() == TplSvg )
-		mt = GLContextBase::ModelType::MT_LEFT_HAND;
-		
+	const GLContextBase::ModelType mt = sourceEditor->getModelType();
 	motionMonitor->setModelType(mt);
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::openTextFile() {
-///////////////////////////////////////////////////////////////////
-	enableMainFileEditor(true, true);
-	
-	wxFileInputStream input(getCurrentTemplatePathFileName());
-	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
-	
-	if ( input.IsOk() ) {
-		m_stcFileContent->ClearAll();
-
-		while( input.IsOk() && !input.Eof() ) {
-			wxString line=text.ReadLine();
-			m_stcFileContent->AppendText(line);
-			m_stcFileContent->AppendText(_T("\r\n"));
-		}
-		
-		return true;
-	}
-	
-	std::cerr << "Error while open file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
-	return false;
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::openBinaryFile(BinaryFileParser::ViewType vt) {
-///////////////////////////////////////////////////////////////////
-	enableMainFileEditor(true, true);
-	
-	m_stcFileContent->ClearAll();
-	
-	wxString viewContent;
-	if ( BinaryFileParser::extractViewAsString(vt, getCurrentTemplatePathFileName(), viewContent) == false )
-		return false;
-		
-	m_stcFileContent->AppendText(viewContent);
-	m_stcFileContent->DiscardEdits();
-	
-	enableMainFileEditor(false, true);
-	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::prepareNewTemplateFile() {
 ///////////////////////////////////////////////////////////////////
-	m_stcFileContent->ClearAll();
-	
-	wxFileName fn(getCurrentTemplateFileName());
-	TemplateFormat tf = getCurrentTemplateFormat();
-	
-	if ( tf == TplSvg ) {
-		m_stcFileContent->AppendText("<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\r\n");
-		m_stcFileContent->AppendText("<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\r\n");
-		m_stcFileContent->AppendText("\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\r\n");
-		m_stcFileContent->AppendText("<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100mm\" height=\"100mm\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\r\n");
-		m_stcFileContent->AppendText("<title>CNC Woodworking standard template</title>\r\n");
-		m_stcFileContent->AppendText("<desc>....</desc>\r\n");
-		
-		m_stcFileContent->AppendText(SvgNodeTemplates::getSamplesAsString());
-	
-		m_stcFileContent->AppendText("\r\n");
-		m_stcFileContent->AppendText("</svg>\r\n");
-		
-	} else if ( tf == TplGcode ) {
-		m_stcFileContent->AppendText("(<1: Programmanfang>)\n");
-		m_stcFileContent->AppendText("G17 G40\n");
-		m_stcFileContent->AppendText("G80\n");
-		m_stcFileContent->AppendText("G90\n");
-		
-		m_stcFileContent->AppendText("T01 M6\n");
-		m_stcFileContent->AppendText("S0 F700 M3\n");
-		m_stcFileContent->AppendText("G43 H07\n");
-		m_stcFileContent->AppendText("\n\n\n");
-		m_stcFileContent->AppendText("M2\n");
-		
-	} else {
-		//Curently do nothing
-	}
+	const TemplateFormat tf = getCurrentTemplateFormat();
+
+	sourceEditor->SetReadOnly(false);
+	sourceEditor->ClearAll();
+	sourceEditor->prepareNewTemplateFile(tf);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::newTemplate(wxCommandEvent& event) {
@@ -2912,8 +2546,8 @@ void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
 		fileView->update();
 		
 		// clear source editor an motion monitor
-		m_stcFileContent->ClearAll();
-		m_stcFileContent->DiscardEdits();
+		sourceEditor->ClearAll();
+		sourceEditor->DiscardEdits();
 		
 		clearMotionMonitor();
 		m_inputFileName->SetValue("");
@@ -3083,8 +2717,8 @@ bool MainFrame::saveFile() {
 			m_templateNotebook->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
 		}
 		
-		m_stcFileContent->DiscardEdits();
-		m_stcFileContent->EmptyUndoBuffer();
+		sourceEditor->DiscardEdits();
+		sourceEditor->EmptyUndoBuffer();
 		evaluateTemplateModificationTimeStamp();
 		prepareAndShowMonitorTemplatePreview(true);
 	}
@@ -3095,7 +2729,7 @@ bool MainFrame::saveFile() {
 bool MainFrame::saveTextFile() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(m_inputFileName);
-	wxASSERT(m_stcFileContent);
+	wxASSERT(sourceEditor);
 	
 	wxTextFile file(getCurrentTemplatePathFileName());
 	if ( !file.Exists() )
@@ -3104,8 +2738,8 @@ bool MainFrame::saveTextFile() {
 	if ( file.Open() ) {
 		file.Clear();
 		
-		for (long i=0; i<m_stcFileContent->GetNumberOfLines(); i++) {
-			wxString line = m_stcFileContent->GetLineText(i);
+		for (long i=0; i<sourceEditor->GetNumberOfLines(); i++) {
+			wxString line = sourceEditor->GetLineText(i);
 			file.AddLine(line);
 		}
 		
@@ -3145,7 +2779,7 @@ bool MainFrame::saveTextFileAs() {
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
 	} else {
-		m_stcFileContent->DiscardEdits();
+		sourceEditor->DiscardEdits();
 		introduceCurrentFile();
 		ret = true;
 	}
@@ -3187,7 +2821,7 @@ bool MainFrame::processVirtualTemplate() {
 	if ( m_menuItemDisplayUserAgent->IsChecked() == true )
 		inboundFileParser->setUserAgentControls(oc);
 		
-	inboundFileParser->setInboundSourceControl(m_stcFileContent);
+	inboundFileParser->setInboundSourceControl(sourceEditor);
 	if ( isDebugMode == true ) 	ret = inboundFileParser->processDebug();
 	else 						ret = inboundFileParser->processRelease();
 	
@@ -4245,7 +3879,7 @@ bool MainFrame::checkIfTemplateIsModified() {
 ///////////////////////////////////////////////////////////////////
 	wxString msg(wxString::Format("The current template file\n\n '%s'\n\nwas modified. Save it?", getCurrentTemplatePathFileName()));
 	
-	if ( m_stcFileContent->IsModified() == true ) {
+	if ( sourceEditor->IsModified() == true ) {
 		wxMessageDialog dlg(this, msg, _T("Save template . . . "), 
 		                    wxYES|wxNO|wxCANCEL|wxICON_QUESTION|wxCENTRE);
  	
@@ -4267,7 +3901,7 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 		lastTemplateFileNameForPreview.clear();
 
 	// check if a preview update is necessary
-	if ( lastTemplateFileNameForPreview == getCurrentTemplatePathFileName() && m_stcFileContent->GetModify() == false)
+	if ( lastTemplateFileNameForPreview == getCurrentTemplatePathFileName() && sourceEditor->GetModify() == false)
 		return;
 		
 	lastTemplateFileNameForPreview = getCurrentTemplatePathFileName();
@@ -4285,18 +3919,27 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 		case TplGcode:		tfn.append(".gcode");
 							break;
 							
-		case TplBinary:		tfn.append(".gcode");
-							if ( BinaryFileParser::extractSourceContentAsFile(getCurrentTemplatePathFileName(), tfn) == true ) {
+		case TplBinary:		if ( BinaryFileParser::extractSourceContentAsFile(getCurrentTemplatePathFileName(), tfn) == true ) {
 								openMonitorPreview(tfn);
-								// no furter copy necessay
+								// no further copy necessay
 								return;
+								
+							} else {
+								std::cerr << "MainFrame::prepareAndShowMonitorTemplatePreview(): Can't create preview!" << std::endl;
+								return;
+								
 							}
 							
 		default:			// do nothing;
 							break;
 	}
 	
-	// create a copy to avoid a modification of m_stcFileContent
+	if ( tfn.IsEmpty() ) {
+		std::cerr << "MainFrame::prepareAndShowMonitorTemplatePreview(): Invalid file name!" << std::endl;
+		return;
+	}
+	
+	// create a copy to avoid a modification of sourceEditor
 	wxTextFile file(tfn);
 	if ( !file.Exists() )
 		file.Create();
@@ -4304,8 +3947,8 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 	if ( file.Open() ) {
 		file.Clear();
 		
-		for (long i=0; i<m_stcFileContent->GetNumberOfLines(); i++) {
-			wxString line = m_stcFileContent->GetLineText(i);
+		for (long i=0; i<sourceEditor->GetNumberOfLines(); i++) {
+			wxString line = sourceEditor->GetLineText(i);
 			file.AddLine(line);
 		}
 		
@@ -4496,145 +4139,12 @@ void MainFrame::svgEmuClear(wxCommandEvent& event) {
 	refreshSvgEmuFile(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::fileContentKeyDown(wxKeyEvent& event){
+void MainFrame::updateFileContentPosition(long x, long y) {
 ///////////////////////////////////////////////////////////////////
-	updateFileContentPosition();
-	
-	// update tab label
-	wxString name(m_templateNotebook->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
-	if ( name.StartsWith("*") == false ) {
-		name.Prepend("*");
-		m_templateNotebook->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
-	}
-	
-	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
-	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
-	int c = event.GetUnicodeKey();
-	
-	wxString find(m_stcFileContent->GetSelectedText());
-	
-	// run
-	if      ( c == 'R' && ctlKey == true && shtKey == true) {
-		wxCommandEvent dummy;
-		rcRun(dummy);
-		
-	// debug
-	} if      ( c == 'D' && ctlKey == true && shtKey == true) {
-		wxCommandEvent dummy;
-		rcDebug(dummy);
-		
-	// find
-	} else if ( c == 'F' && ctlKey == true ) {
-		event.Skip(false);
-		
-		if ( find.IsEmpty() == false ) 
-			m_svgEditSearch->SetValue(find);
-			
-		m_svgEditSearch->SetFocus();
-		return;
-		
-	// goto line
-	} else if ( c == 'G' && ctlKey == true ) {
-		wxTextEntryDialog dlg(this, "Line Number:", "Go to line . . .", "");
-		dlg.SetMaxLength(8);
-		dlg.SetTextValidator(wxFILTER_DIGITS);
-		if ( dlg.ShowModal() == wxID_OK  ) {
-			wxString s = dlg.GetValue();
-			s.Trim(true).Trim(false);
-			if ( s.IsEmpty() == false ) {
-				long ln;
-				s.ToLong(&ln);
-				if ( ln >= 0 && ln <= m_stcFileContent->GetNumberOfLines() )
-					m_stcFileContent->GotoLine(ln-1);
-				else
-					std::clog << "Template Source: Invalid line numer: " << ln << std::endl;
-			}
-		}
-		
-	// Undo
-	} else if ( c == 'Z' && ctlKey == true ) {
-		m_stcFileContent->Undo();
-	
-	// Redo
-	} else if ( c == 'Y' && ctlKey == true ) {
-		m_stcFileContent->Redo();
-		
-	// save
-	} else if ( c == 'S' && ctlKey == true ) {
-		saveFile();
-		
-	// goto home
-	} else if ( c == WXK_HOME && ctlKey == true ) {
-		m_stcFileContent->GotoLine(0);
-		m_stcFileContent->Home();
-		
-	// goto end
-	} else if ( c == WXK_END && ctlKey == true ) {
-		m_stcFileContent->GotoLine(m_stcFileContent->GetLineCount() - 1);
-		m_stcFileContent->LineEnd();
-		
-	// select cur pos to home
-	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
-		m_stcFileContent->SetSelection(m_stcFileContent->GetCurrentPos(), 0);
-		
-	// select cur pos to end
-	} else if ( c == WXK_HOME && ctlKey == true && shtKey == true ) {
-		m_stcFileContent->SetSelection(m_stcFileContent->GetCurrentPos(), 
-		                               m_stcFileContent->GetLastPosition());
-	}
-	
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::fileContentKeyUp(wxKeyEvent& event) {
-///////////////////////////////////////////////////////////////////
-	updateFileContentPosition();
-	event.Skip(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::fileContentLeftUp(wxMouseEvent& event){
-///////////////////////////////////////////////////////////////////
-	event.Skip(true);
-	updateFileContentPosition();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::fileContentLeftDown(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	event.Skip(true);
-	updateFileContentPosition();
-	
-	wxASSERT(pathGenerator);
-	pathGenerator->updateEditControlCanReplaceState(true);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateFileContentPosition() {
-///////////////////////////////////////////////////////////////////
-	long x, y;
-	m_stcFileContent->PositionToXY(m_stcFileContent->GetInsertionPoint(), &x, &y);
-	wxString label = "Column: ";
-	label << x + 1;
-	m_filePosition->SetLabel(label);
-	
 	// try to select current  line as client id
 	if ( motionMonitor != NULL ) {
 		motionMonitor->setCurrentClientId(y);
 		motionMonitor->display();
-	}
-	
-	// display gcode help hint
-	m_svgEditStatus->SetValue("");
-	if ( getCurrentTemplateFormat() == TplGcode ) {
-		int col = m_stcFileContent->GetColumn(m_stcFileContent->GetCurrentPos());
-		wxString cl = m_stcFileContent->GetLine(y);
-		
-		// find first blank on left
-		for ( int i=col - 1; i>=0; i-- ) {
-			if ( cl[i] == ' ' || cl[i] == '\t' ) {
-				cl = cl.Mid(i+1);
-				break;
-			}
-		}
-		m_svgEditStatus->SetValue(GCodeCommands::getGCodeHelpHint(cl));
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -5204,7 +4714,6 @@ void MainFrame::selectUAInboundPathList(wxDataViewEvent& event) {
 			
 			wxVariant val;
 			m_dvListCtrlSvgUAInboundPathList->GetValue(val, sel, 0);
-			//inboundFileParser->selectSourceControl(val.GetInteger() - 1);
 		}
 	}
 	
@@ -5850,18 +5359,6 @@ void MainFrame::dclickDurationCount(wxMouseEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::fileContentRightDown(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( getCurrentTemplateFormat() != TplSvg )
-		return;
-	
-	// Show popupmenu at position
-	if ( stcFileContentPopupMenu != NULL ) {
-		SvgEditPopup::enablePathGeneratorMenuItem(stcFileContentPopupMenu);
-		m_stcFileContent->PopupMenu(stcFileContentPopupMenu);
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::emuContentRightDown(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// Show popupmenu at position
@@ -5884,7 +5381,7 @@ void MainFrame::createStcFileControlPopupMenu() {
 	if ( stcFileContentPopupMenu != NULL )
 		return;
 
-	stcFileContentPopupMenu = SvgEditPopup::createMenu(m_stcFileContent, stcFileContentPopupMenu, true);
+	stcFileContentPopupMenu = SvgEditPopup::createMenu(sourceEditor, stcFileContentPopupMenu, true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateOutboundSaveControls(bool state) {
@@ -5897,7 +5394,7 @@ void MainFrame::decorateSearchButton() {
 ///////////////////////////////////////////////////////////////////
 	wxBitmap bmp = ImageLib16().Bitmap("BMP_OK16");
 	if ( bmp.IsOk() )
-		m_svgEditSearchState->SetBitmap(bmp);
+		m_sourceEditSearchState->SetBitmap(bmp);
 }
 ///////////////////////////////////////////////////////////////////
 int MainFrame::getSvgEditSearchFlags() {
@@ -5913,34 +5410,34 @@ int MainFrame::getSvgEditSearchFlags() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateSvgSearchControl() {
 ///////////////////////////////////////////////////////////////////
-	wxString find = m_svgEditSearch->GetValue();
+	wxString find = m_sourceEditSearch->GetValue();
 	
-	int pos = m_svgEditSearch->FindString(find);
+	int pos = m_sourceEditSearch->FindString(find);
 	if ( pos >= 0 ) {
-		m_svgEditSearch->Delete((unsigned int)pos);
+		m_sourceEditSearch->Delete((unsigned int)pos);
 	}
 	
-	m_svgEditSearch->Insert(find, 0);
-	m_svgEditSearch->ChangeValue(find);
+	m_sourceEditSearch->Insert(find, 0);
+	m_sourceEditSearch->ChangeValue(find);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::svgEditFind(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_svgEditSearch->GetValue().IsEmpty() )
+	if ( m_sourceEditSearch->GetValue().IsEmpty() )
 		return;
 
-	wxString find = m_svgEditSearch->GetValue();
+	wxString find = m_sourceEditSearch->GetValue();
 	fixRegexParen(find);
 	
 	updateSvgSearchControl();
 	
-	m_stcFileContent->SetCurrentPos(m_stcFileContent->GetCurrentPos() + m_svgEditSearch->GetValue().Len() + 1);
-	m_stcFileContent->SearchAnchor();
-	int ret = m_stcFileContent->SearchNext(getSvgEditSearchFlags(), find);
+	sourceEditor->SetCurrentPos(sourceEditor->GetCurrentPos() + m_sourceEditSearch->GetValue().Len() + 1);
+	sourceEditor->SearchAnchor();
+	int ret = sourceEditor->SearchNext(getSvgEditSearchFlags(), find);
 	
 	if ( ret == wxNOT_FOUND ) {
-		m_stcFileContent->ClearSelections();
-		m_stcFileContent->SearchAnchor();
+		sourceEditor->ClearSelections();
+		sourceEditor->SearchAnchor();
 	} else {
 		ensureSvgEditLineIsVisible(ret);
 	}
@@ -5948,25 +5445,25 @@ void MainFrame::svgEditFind(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::svgEditFindPrev(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_svgEditSearch->GetValue().IsEmpty() )
+	if ( m_sourceEditSearch->GetValue().IsEmpty() )
 		return;
 		
-	wxString find = m_svgEditSearch->GetValue();
+	wxString find = m_sourceEditSearch->GetValue();
 	fixRegexParen(find);
 
 	updateSvgSearchControl();
 	
-	int ncp = m_stcFileContent->GetCurrentPos() - m_svgEditSearch->GetValue().Len() - 1;
+	int ncp = sourceEditor->GetCurrentPos() - m_sourceEditSearch->GetValue().Len() - 1;
 	if( ncp < 0 )
-		ncp = m_stcFileContent->GetLastPosition();
+		ncp = sourceEditor->GetLastPosition();
 		
-	m_stcFileContent->SetCurrentPos(ncp);
-	m_stcFileContent->SearchAnchor();
-	int ret = m_stcFileContent->SearchPrev(getSvgEditSearchFlags(), find);
+	sourceEditor->SetCurrentPos(ncp);
+	sourceEditor->SearchAnchor();
+	int ret = sourceEditor->SearchPrev(getSvgEditSearchFlags(), find);
 	
 	if ( ret == wxNOT_FOUND ) {
-		m_stcFileContent->ClearSelections();
-		m_stcFileContent->SearchAnchor();
+		sourceEditor->ClearSelections();
+		sourceEditor->SearchAnchor();
 	} else {
 		ensureSvgEditLineIsVisible(ret);
 	}
@@ -5979,19 +5476,19 @@ void MainFrame::svgEditSearchTextChanged(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::searchConditionsChanged() {
 ///////////////////////////////////////////////////////////////////
-	wxString find = m_svgEditSearch->GetValue();
+	wxString find = m_sourceEditSearch->GetValue();
 	wxString toolTip("");
 	wxBitmap bmp = ImageLib16().Bitmap("BMP_OK16");
-	m_svgEditSearchState->SetBitmap(bmp);
+	m_sourceEditSearchState->SetBitmap(bmp);
 	
 	fixRegexParen(find);
-	m_stcFileContent->SearchAnchor();
-	int ret = m_stcFileContent->SearchNext(getSvgEditSearchFlags(), find);
+	sourceEditor->SearchAnchor();
+	int ret = sourceEditor->SearchNext(getSvgEditSearchFlags(), find);
 	
 	if( ret == wxNOT_FOUND ) {
-		m_stcFileContent->ClearSelections();
+		sourceEditor->ClearSelections();
 		bmp = ImageLib16().Bitmap("BMP_WARNING16");
-		m_svgEditSearchState->SetBitmap(bmp);
+		m_sourceEditSearchState->SetBitmap(bmp);
 
 		toolTip << "'";
 		toolTip << find;
@@ -6000,10 +5497,11 @@ void MainFrame::searchConditionsChanged() {
 	} else {
 		ensureSvgEditLineIsVisible(ret);
 	}
-	m_svgEditSearchState->Show();
-	m_svgEditSearchState->Refresh();
-	m_svgEditStatus->SetLabel(toolTip);
-	m_svgEditSearchState->SetToolTip(toolTip);
+	
+	m_sourceEditSearchState->Show();
+	m_sourceEditSearchState->Refresh();
+	m_sourceEditSearchState->SetToolTip(toolTip);
+	m_sourceEditStatus->SetLabel(toolTip);
 }
 ///////////////////////////////////////////////////////////////////
 wxString& MainFrame::fixRegexParen(wxString& find) {
@@ -6034,33 +5532,33 @@ void MainFrame::svgEditSelected(wxCommandEvent& event) {
 void MainFrame::ensureSvgEditLineIsVisible(int line) {
 ///////////////////////////////////////////////////////////////////
 	if( line == wxNOT_FOUND ) {
-		line = m_stcFileContent->LineFromPosition(m_stcFileContent->GetSelectionStart());
+		line = sourceEditor->LineFromPosition(sourceEditor->GetSelectionStart());
 	}
 	
-	int linesOnScreen = m_stcFileContent->LinesOnScreen();
-	if(!((line > m_stcFileContent->GetFirstVisibleLine()) && (line < (m_stcFileContent->GetFirstVisibleLine() + linesOnScreen)))) {
+	int linesOnScreen = sourceEditor->LinesOnScreen();
+	if(!((line > sourceEditor->GetFirstVisibleLine()) && (line < (sourceEditor->GetFirstVisibleLine() + linesOnScreen)))) {
 		// To place our line in the middle, the first visible line should be
 		// the: line - (linesOnScreen / 2)
 		int firstVisibleLine = line - (linesOnScreen / 2);
 		if( firstVisibleLine < 0 ) {
 			firstVisibleLine = 0;
 		}
-		m_stcFileContent->SetFirstVisibleLine(firstVisibleLine);
+		sourceEditor->SetFirstVisibleLine(firstVisibleLine);
 	}
 	
-	m_stcFileContent->EnsureVisible(line);
-	m_stcFileContent->ScrollToColumn(0);
+	sourceEditor->EnsureVisible(line);
+	sourceEditor->ScrollToColumn(0);
 	
-	int xScrollPosBefore = m_stcFileContent->GetScrollPos(wxHORIZONTAL);
-	m_stcFileContent->EnsureCaretVisible();
-	int xScrollPosAfter = m_stcFileContent->GetScrollPos(wxHORIZONTAL);
+	int xScrollPosBefore = sourceEditor->GetScrollPos(wxHORIZONTAL);
+	sourceEditor->EnsureCaretVisible();
+	int xScrollPosAfter = sourceEditor->GetScrollPos(wxHORIZONTAL);
 	
 	if( xScrollPosBefore != xScrollPosAfter ) {
 		// EnsureCaretVisible scrolled the page
 		// scroll it a bit more
-		int scrollToPos = m_stcFileContent->GetSelectionStart();
+		int scrollToPos = sourceEditor->GetSelectionStart();
 		if(	scrollToPos != wxNOT_FOUND	) {
-			m_stcFileContent->ScrollToColumn(m_stcFileContent->GetColumn(scrollToPos));
+			sourceEditor->ScrollToColumn(sourceEditor->GetColumn(scrollToPos));
 		}
 	}
 }
@@ -6123,7 +5621,7 @@ void MainFrame::svgEmuZoomPlus(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::svgEmuZoomHome(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	clog << "Currently not supported" << endl;
+	std::clog << "Currently not supported" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::copyLogger(wxCommandEvent& event) {
@@ -6175,31 +5673,31 @@ void MainFrame::toggleEmuWordWrapMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::toggleTemplateWordWrapMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_stcFileContent->SetWrapMode(!m_btSvgToggleWordWrap->GetValue());
+	sourceEditor->SetWrapMode(!m_btSvgToggleWordWrap->GetValue());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::marginClickFileContent(wxStyledTextEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	//folding
 	if ( event.GetMargin() == MARGIN_FOLD ) {
-		int lineClick = m_stcFileContent->LineFromPosition(event.GetPosition());
-		int levelClick = m_stcFileContent->GetFoldLevel(lineClick);
+		int lineClick = sourceEditor->LineFromPosition(event.GetPosition());
+		int levelClick = sourceEditor->GetFoldLevel(lineClick);
 		
 		if ( (levelClick & wxSTC_FOLDLEVELHEADERFLAG ) > 0) {
-			m_stcFileContent->ToggleFold(lineClick);
+			sourceEditor->ToggleFold(lineClick);
 		}
 	}
 	
 	// break points
 	if ( event.GetMargin() == MARGIN_BREAKPOINT || event.GetMargin() == MARGIN_LINE_NUMBERS ) {
-		int lineClick = m_stcFileContent->LineFromPosition(event.GetPosition());
+		int lineClick = sourceEditor->LineFromPosition(event.GetPosition());
 
-		if ( m_stcFileContent->MarginGetText(lineClick) == "B" ) {
-			m_stcFileContent->MarginSetText(lineClick, wxT(" "));
-			m_stcFileContent->MarginSetStyle(lineClick, TE_DEFAULT_STYLE);
+		if ( sourceEditor->MarginGetText(lineClick) == "B" ) {
+			sourceEditor->MarginSetText(lineClick, wxT(" "));
+			sourceEditor->MarginSetStyle(lineClick, TE_DEFAULT_STYLE);
 		} else {
-			m_stcFileContent->MarginSetText(lineClick, wxT("B"));
-			m_stcFileContent->MarginSetStyle(lineClick, TE_BREAKPOINT_STYLE);
+			sourceEditor->MarginSetText(lineClick, wxT("B"));
+			sourceEditor->MarginSetStyle(lineClick, TE_BREAKPOINT_STYLE);
 		}
 	}
 	
@@ -6220,7 +5718,7 @@ void MainFrame::marginClickEmuSource(wxStyledTextEvent& event) {
 const char* MainFrame::getBlankHtmlPage() {
 ///////////////////////////////////////////////////////////////////
 	wxFileName fn(CncFileNameService::getBlankHtmlPageFileName());
-	fstream html;
+	std::fstream html;
 	
 	html.open(fn.GetFullPath(), std::ios::out | std::ios::trunc);
 	if ( html.is_open() ) {
@@ -6267,7 +5765,7 @@ const char* MainFrame::getCurrentPortName(wxString& ret) {
 const char* MainFrame::getErrorHtmlPage(const wxString& errorInfo) {
 ///////////////////////////////////////////////////////////////////
 	wxFileName fn(CncFileNameService::getErrorHtmlPageFileName());
-	fstream html;
+	std::fstream html;
 	
 	wxString ei(errorInfo);
 	if ( errorInfo.IsEmpty() )
@@ -6742,16 +6240,16 @@ void MainFrame::fileContentChange(wxStyledTextEvent& event) {
 		
 		// ignore this event incase we are in the middle of file reloading
 		if( templateFileLoading == false/*GetReloadingFile() == false && GetMarginWidth(EDIT_TRACKER_MARGIN_ID */) /* margin is visible */ {
-			int curline(m_stcFileContent->LineFromPosition(event.GetPosition()));
+			int curline(sourceEditor->LineFromPosition(event.GetPosition()));
 
 			if(numlines == 0) {
 				// probably only the current line was modified
-				m_stcFileContent->MarginSetText(curline, wxT(" "));
-				m_stcFileContent->MarginSetStyle(curline, TE_LINE_MODIFIED_STYLE);
+				sourceEditor->MarginSetText(curline, wxT(" "));
+				sourceEditor->MarginSetStyle(curline, TE_LINE_MODIFIED_STYLE);
 			} else {
 				for(int i = 0; i <= numlines; i++) {
-					m_stcFileContent->MarginSetText(curline + i, wxT(" "));
-					m_stcFileContent->MarginSetStyle(curline + i, TE_LINE_MODIFIED_STYLE);
+					sourceEditor->MarginSetText(curline + i, wxT(" "));
+					sourceEditor->MarginSetStyle(curline + i, TE_LINE_MODIFIED_STYLE);
 				}
 			}
 			 
@@ -7033,7 +6531,7 @@ void MainFrame::decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::fileContentDClick(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	decodeSvgFragment(event, m_stcFileContent);
+	decodeSvgFragment(event, sourceEditor);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::emuContentDClick(wxMouseEvent& event) {
@@ -7346,22 +6844,8 @@ void MainFrame::selectSourceControlLineNumber(long ln) {
 /////////////////////////////////////////////////////////////////////
 	if ( ln <= 0L )
 		return;
-
-	// select source control - try to find ref as line number
-	if ( inboundFileParser != NULL ) {
-		inboundFileParser->selectSourceControl(ln);
-	} else {
-		// select editor directly
-		m_stcFileContent->GotoLine(ln);
-		
-		if ( ln == 0 ) {
-			m_stcFileContent->SetSelectionStart(0);
-			m_stcFileContent->SetSelectionEnd(0);
-		} else {
-			m_stcFileContent->SetSelectionStart(m_stcFileContent->GetCurrentPos());
-			m_stcFileContent->SetSelectionEnd(m_stcFileContent->GetLineEndPosition(ln));
-		}
-	}
+	
+	sourceEditor->selectLineNumber(ln);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectPositionSpy(wxListEvent& event) {
@@ -7545,7 +7029,7 @@ void MainFrame::goPosSypPrevId(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::searchPosSpy(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	clog << "todo" << endl;
+	std::clog << "todo" << std::endl;
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectSerialSpyMode() {
@@ -8011,6 +7495,7 @@ void MainFrame::decorateGamepadState(bool state) {
 		m_gpBmp2->Show(false);
 		m_gpBmp3->Show(false);
 		m_gpBmp4->Show(false);
+		
 		cncGamepadState->GetGamepadTrace()->ChangeValue("Gamepad state not available");
 	}
 	
@@ -8084,6 +7569,11 @@ void MainFrame::openSessionDialog(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::traceSessionId(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	traceSessionId();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::traceSessionId() {
+/////////////////////////////////////////////////////////////////////
 	std::clog << " Woodworking Session ID: " << CncFileNameService::getSession() << std::endl;
 }
 /////////////////////////////////////////////////////////////////////
@@ -8114,7 +7604,7 @@ void MainFrame::selectBinaryEditorViewMode(wxCommandEvent& event) {
 		default:	vt = BinaryFileParser::ViewType::ReadableMetric;
 	}
 	
-	openBinaryFile(vt);
+	sourceEditor->changeBinaryViewType(vt);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
@@ -8185,8 +7675,10 @@ void MainFrame::saveOutboundAsNewTplFromMenu(wxCommandEvent& event) {
 void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	BinaryFileParser parser(getCurrentTemplatePathFileName());
-	if ( parser.preview() == false ) {
-		#warning
+	if ( parser.preface() == false ) {
+		std::cerr << "MainFrame::extractSourceAsNewTpl(): Error while prefacing file '" 
+				  << getCurrentTemplatePathFileName()
+				  << "'" << std::endl;
 		return;
 	}
 	
@@ -8219,7 +7711,9 @@ void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 	
 	std::ofstream out(saveFileDialog.GetPath());
 	if ( out.good() == false ) {
-		#warning
+		std::cerr << "MainFrame::extractSourceAsNewTpl(): Error while creating file '" 
+				  << saveFileDialog.GetPath()
+				  << "'" << std::endl;
 		return;
 	}
 	

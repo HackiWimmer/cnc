@@ -58,6 +58,7 @@ Serial::Serial(CncControl* cnc)
 , spyMode(Serial::SypMode::SM_NONE)
 , spyRead(false)
 , spyWrite(false)
+, shouldCallbackSynchronizeAppPosition(false)
 , factorX(GBL_CONFIG->getDisplayFactX())
 , factorY(GBL_CONFIG->getDisplayFactY())
 , factorZ(GBL_CONFIG->getDisplayFactZ())
@@ -83,6 +84,7 @@ Serial::Serial(const char *portName)
 , spyMode(Serial::SypMode::SM_NONE)
 , spyRead(false)
 , spyWrite(false)
+, shouldCallbackSynchronizeAppPosition(false)
 , factorX(GBL_CONFIG->getDisplayFactX())
 , factorY(GBL_CONFIG->getDisplayFactY())
 , factorZ(GBL_CONFIG->getDisplayFactZ())
@@ -216,7 +218,7 @@ void Serial::incTotalDistance(unsigned int size, const int32_t (&values)[3]) {
 		case 1:		incTotalDistance(0,         0,         values[0]);	break;
 		case 2:		incTotalDistance(values[0], values[1], 0        ); 	break;
 		case 3:		incTotalDistance(values[0], values[1], values[2]); 	break;
-		default:	std::cerr << "Serial::incTotalDistance: Invalid size: " << size << endl;
+		default:	std::cerr << "Serial::incTotalDistance: Invalid size: " << size << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -685,13 +687,10 @@ bool Serial::processIdle() {
 	}
 		
 	if ( writeData(cmd) ) {
-		// only a dummy here
-		CncLongPosition pos(0,0,0);
-		
 		SerialFetchInfo sfi;
 		sfi.command 		= cmd;
 
-		bool ret = evaluateResultWrapper(sfi, std::cout, pos);
+		bool ret = evaluateResultWrapper(sfi, std::cout);
 		if ( ret == false ) {
 			//std::cerr << "Error while processing idle: " << std::endl;
 			//std::cerr << "Request \"Error Info\" for more details." << std::endl;
@@ -715,7 +714,7 @@ bool Serial::processSetter(unsigned char pid, int32_t value) {
 	return processSetter(pid, values);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processSetter(unsigned char pid, const SetterValueList& values) {
+bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
 		std::cerr << "SERIAL::processSetter()::ERROR: Not connected\n";
@@ -757,13 +756,13 @@ bool Serial::processSetter(unsigned char pid, const SetterValueList& values) {
 			std::clog << " This Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 	<< "]"
 												 <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
 												 <<   "["; 
-												 traceSetterValueList(std::clog, values, 1);
+												 cnc::traceSetterValueList(std::clog, values, 1);
 			std::clog                            << "]\n";
 		} else {
 			std::clog << " This Command: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 	<< "]"
 			                                     <<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 	<< "]"
 												 <<   "[";
-												 traceSetterValueList(std::clog, values, DBL_FACT);
+												 cnc::traceSetterValueList(std::clog, values, DBL_FACT);
 			std::clog                            << "]\n";
 		}
 		return true;
@@ -776,13 +775,13 @@ bool Serial::processSetter(unsigned char pid, const SetterValueList& values) {
 			cnc::spy << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
 												<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 		<< "]"
 												<<   "[";
-												traceSetterValueList(cnc::spy, values, 1);
+												cnc::traceSetterValueList(cnc::spy, values, 1);
 			cnc::spy							<< "]\n";
 		} else {
 			cnc::spy << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
 												<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 		<< "]"
 												<<   "[";
-												traceSetterValueList(cnc::spy, values, DBL_FACT);
+												cnc::traceSetterValueList(cnc::spy, values, DBL_FACT);
 			cnc::spy							<< "]\n";
 		}
 	}
@@ -790,13 +789,10 @@ bool Serial::processSetter(unsigned char pid, const SetterValueList& values) {
 	bool ret = false;
 	
 	if ( writeData(cmd, idx) ) {
-		// only a dummy here
-		CncLongPosition pos(0,0,0);
-		
 		SerialFetchInfo sfi;
 		sfi.command = cmd[0];
 		
-		ret = evaluateResultWrapper(sfi, std::cout, pos);
+		ret = evaluateResultWrapper(sfi, std::cout);
 		
 	} else {
 		std::cerr << "Serial::processSetter: Unable to write data" << std::endl;
@@ -839,15 +835,12 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 	bool ret = false;
 	
 	if ( writeData((char*)cmd, sizeof(cmd)) ) {
-		// only a dummy here
-		CncLongPosition pos(0,0,0);
-		
 		SerialFetchInfo sfi;
 		sfi.command = cmd[0];
 		sfi.singleFetchTimeout = 1000;
 		sfi.Gc.list = &list;
 
-		ret =  evaluateResultWrapper(sfi, std::cout, pos);
+		ret =  evaluateResultWrapper(sfi, std::cout);
 		
 	} else {
 		std::cerr << "Serial::processGetter: Unable to write data" << std::endl;
@@ -892,52 +885,53 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( nbByte <=0 || buffer == NULL )
 		return true;
-	
-	CncLongPosition dummy(0,0,0);
-	
-	#warning
+		
+	// activate this during the execute command
+	ControllerCallbackShouldSynchronizeAppPosition instance(this);
+
+	#warning - centralize evaluateResultWrapper() handling
 	
 	unsigned char cmd = buffer[0];
 	bool ret = false;
 	switch ( cmd ) {
 		case CMD_SETTER:			{
-											if ( writeData((void*)buffer, nbByte) ) {
-												// only a dummy here
-												SerialFetchInfo sfi;
-												sfi.command = cmd;
-												
-												ret = evaluateResultWrapper(sfi, std::cout, dummy);
-											}
-											break;
+										if ( writeData((void*)buffer, nbByte) ) {
+											
+											SerialFetchInfo sfi;
+											sfi.command = cmd;
+											
+											ret = evaluateResultWrapper(sfi, std::cout);
+										}
+										break;
 									}
 		
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:				{
 			
-											if ( writeData((void*)buffer, nbByte) ) {
-												SerialFetchInfo sfi;
-												sfi.command 			= cmd;
-												sfi.singleFetchTimeout 	= 3000;
-												sfi.Mc.size 			= 3;
-												sfi.Mc.value1			= 0;
-												sfi.Mc.value2			= 0;
-												sfi.Mc.value3			= 0;
-												
-												ret = evaluateResultWrapper(sfi, std::cout, dummy);
-												
-												// latest log this move
-												logMeasurementLastTs();
-											}
-											break;
+										if ( writeData((void*)buffer, nbByte) ) {
+											SerialFetchInfo sfi;
+											sfi.command 			= cmd;
+											sfi.singleFetchTimeout 	= 3000;
+											sfi.Mc.size 			= 3;
+											sfi.Mc.value1			= 0;
+											sfi.Mc.value2			= 0;
+											sfi.Mc.value3			= 0;
+											
+											ret = evaluateResultWrapper(sfi, std::cout);
+											
+											// latest log this move
+											logMeasurementLastTs();
+										}
+										break;
 									}
 									
 		default:					;
 	}
-
+	
 	return ret; //writeData((void*)buffer, nbByte)
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
 		std::cout << "SERIAL::processCommand(" << cmd << ")::ERROR: Not connected\n";
@@ -967,7 +961,7 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 		case CMD_NEG_STEP_Y:
 		case CMD_POS_STEP_Y:
 		case CMD_NEG_STEP_Z:
-		case CMD_POS_STEP_Z: 	if ( convertToMoveCommandAndProcess(cmd, mutliByteStream, pos) == false ) {
+		case CMD_POS_STEP_Z: 	if ( convertToMoveCommandAndProcess(cmd, mutliByteStream) == false ) {
 									std::cerr << "Serial::processCommand(" << cmd << "): convertToMoveCommandAndProcess failed!" << std::endl;
 									return false;
 								}
@@ -984,7 +978,7 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 		SerialFetchInfo sfi;
 		sfi.command = cmd;
 		
-		ret = evaluateResultWrapper(sfi, mutliByteStream, pos);
+		ret = evaluateResultWrapper(sfi, mutliByteStream);
 	
 	} else {
 		std::cerr << "Serial::processCommand(" << cmd << "): Unable to write data" << std::endl;
@@ -995,7 +989,7 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	bool ret = false;
 	
@@ -1007,12 +1001,12 @@ bool Serial::convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mut
 	values[Z] = 0;
 	
 	switch ( cmd ) {
-		case CMD_NEG_STEP_X:	values[X] = -1; ret = processMove(size, values, false, pos); break;
-		case CMD_POS_STEP_X:	values[X] = +1; ret = processMove(size, values, false, pos); break;
-		case CMD_NEG_STEP_Y:	values[Y] = -1; ret = processMove(size, values, false, pos); break;
-		case CMD_POS_STEP_Y:	values[Y] = +1; ret = processMove(size, values, false, pos); break;
-		case CMD_NEG_STEP_Z:	values[Z] = -1; ret = processMove(size, values, false, pos); break;
-		case CMD_POS_STEP_Z: 	values[Z] = +1; ret = processMove(size, values, false, pos); break;
+		case CMD_NEG_STEP_X:	values[X] = -1; ret = processMove(size, values, false); break;
+		case CMD_POS_STEP_X:	values[X] = +1; ret = processMove(size, values, false); break;
+		case CMD_NEG_STEP_Y:	values[Y] = -1; ret = processMove(size, values, false); break;
+		case CMD_POS_STEP_Y:	values[Y] = +1; ret = processMove(size, values, false); break;
+		case CMD_NEG_STEP_Z:	values[Z] = -1; ret = processMove(size, values, false); break;
+		case CMD_POS_STEP_Z: 	values[Z] = +1; ret = processMove(size, values, false); break;
 		default:				std::cerr << "Serial::convertToMoveCommandAndProcess: Invalid command: " << cmd << std::endl;
 								ret = false;
 	}
@@ -1020,7 +1014,7 @@ bool Serial::convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mut
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos) {
+bool Serial::processMoveZ(int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = 1;
 	static int32_t values[3];
@@ -1028,10 +1022,10 @@ bool Serial::processMoveZ(int32_t z1, bool alreadyRendered, CncLongPosition& pos
 	values[1] = 0;
 	values[2] = 0;
 
-	return processMove(size, values, alreadyRendered, pos);
+	return processMove(size, values, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLongPosition& pos) {
+bool Serial::processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = 2;
 	static int32_t values[3];
@@ -1039,10 +1033,10 @@ bool Serial::processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered, CncLong
 	values[1] = y1;
 	values[2] = 0;
 
-	return processMove(size, values, alreadyRendered, pos);
+	return processMove(size, values, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered, CncLongPosition& pos) {
+bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int size = 3;
 	static int32_t values[3];
@@ -1050,22 +1044,22 @@ bool Serial::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRend
 	values[1] = y1;
 	values[2] = z1;
 
-	return processMove(size, values, alreadyRendered, pos);
+	return processMove(size, values, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMoveUntilSignal(unsigned int size, const int32_t (&values)[3], CncLongPosition& pos) {
+bool Serial::processMoveUntilSignal(unsigned int size, const int32_t (&values)[3]) {
 ///////////////////////////////////////////////////////////////////
-	bool ret = processMoveInternal(size, values, CMD_MOVE_UNIT_SIGNAL, pos);
+	bool ret = processMoveInternal(size, values, CMD_MOVE_UNIT_SIGNAL);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered, CncLongPosition& pos) {
+bool Serial::processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
 	unsigned char cmdType = alreadyRendered == true ? CMD_MOVE : CMD_RENDER_AND_MOVE;
-	return processMoveInternal(size, values, cmdType, pos);
+	return processMoveInternal(size, values, cmdType);
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char cmdType, CncLongPosition& pos) {
+bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char cmdType) {
 ///////////////////////////////////////////////////////////////////
 	if ( isConnected() == false ) {
 		std::cerr << "SERIAL::processMoveXY()::ERROR: Not connected\n";
@@ -1107,7 +1101,7 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	}
 	
 	// to provide a time an pos reference for the speed calculation
-	logMeasurementRefTs(pos);
+	logMeasurementRefTs(cncControl->getCurPos());
 	
 	bool ret = false;
 	
@@ -1120,7 +1114,7 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 		sfi.Mc.value2			= values[1];
 		sfi.Mc.value3			= values[2];
 		
-		ret = evaluateResultWrapper(sfi, std::cout, pos);
+		ret = evaluateResultWrapper(sfi, std::cout);
 		// latest log this move
 		logMeasurementLastTs();
 		
@@ -1151,12 +1145,12 @@ const char* Serial::decodeContollerResult(int ret) {
 	return "";
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	if ( cncControl->isInterrupted() )
 		return false;
 	
-	bool ret = evaluateResult(sfi, mutliByteStream, pos);
+	bool ret = evaluateResult(sfi, mutliByteStream);
 	
 	if ( cncControl->isInterrupted() ) {
 		sendInterrupt();
@@ -1166,7 +1160,7 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	#define LOG_HANDSHAKE( ret ) \
 		lastFetchResult.reset(); \
@@ -1190,42 +1184,42 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			{
 				LOG_HANDSHAKE(ret)
 				// always break the fetch loop
-				return RET_OK_Handler(sfi, mutliByteStream, pos);
+				return RET_OK_Handler(sfi, mutliByteStream);
 			}
 			//evaluateResult..........................................
 			case RET_ERROR:
 			{
 				LOG_HANDSHAKE(ret)
 				// always break the fetch loop
-				return RET_ERROR_Handler(sfi, mutliByteStream, pos);
+				return RET_ERROR_Handler(sfi, mutliByteStream);
 			}
 			//evaluateResult..........................................
 			case RET_INTERRUPT:
 			{
 				LOG_HANDSHAKE(ret)
 				// always break the fetch loop
-				return RET_INTERRUPT_Handler(sfi, mutliByteStream, pos);
+				return RET_INTERRUPT_Handler(sfi, mutliByteStream);
 			}
 			//evaluateResult..........................................
 			case RET_HALT:
 			{
 				LOG_HANDSHAKE(ret)
 				// always break the fetch loop
-				return RET_HALT_Handler(sfi, mutliByteStream, pos);
+				return RET_HALT_Handler(sfi, mutliByteStream);
 			}
 			//evaluateResult..........................................
 			case RET_QUIT:
 			{
 				LOG_HANDSHAKE(ret)
 				/// always break the fetch loop
-				return RET_QUIT_Handler(sfi, mutliByteStream, pos);
+				return RET_QUIT_Handler(sfi, mutliByteStream);
 			}
 			//evaluateResult..........................................
 			case RET_LIMIT:
 			{
 				LOG_HANDSHAKE(ret)
 				/// always break the fetch loop
-				return RET_LIMIT_Handler(sfi, mutliByteStream, pos);
+				return RET_LIMIT_Handler(sfi, mutliByteStream);
 			}
 			
 			// -----------------------------------------------------------
@@ -1236,7 +1230,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 			{
 				cncControl->SerialCallback();
 				
-				if ( RET_SOH_Handler(sfi, mutliByteStream, pos) == true ) {
+				if ( RET_SOH_Handler(sfi, mutliByteStream) == true ) {
 					
 					// check for interrupt
 					if ( cncControl->isInterrupted() ) {
@@ -1284,8 +1278,11 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 	#undef LOG_HANDSHAKE
 }
 //////////////////////////////////////////////////////////////////
-bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
+	#warning - thinking about cncControl->getCurAppPosAsReference() here
+
+	CncLongPosition& pos = cncControl->getCurAppPosAsReference();
 	switch ( sfi.command ) {
 
 		//RET_OK_Handler...........................................
@@ -1309,7 +1306,6 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 					break;
 			}
 			
-			// outer switch
 			break;
 		}
 		
@@ -1330,7 +1326,7 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream,
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	std::cerr << "Serial::evaluateResult: " << decodeContollerResult(RET_ERROR) 
 			  << " while processing: "      << ArduinoCMDs::getCMDLabel((int)sfi.command) 
@@ -1339,7 +1335,7 @@ bool Serial::RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStre
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	std::cerr << "Serial::evaluateResult: " << decodeContollerResult(RET_INTERRUPT) 
 			  << " while processing: "      << ArduinoCMDs::getCMDLabel((int)sfi.command) 
@@ -1348,7 +1344,7 @@ bool Serial::RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByte
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::RET_HALT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::RET_HALT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	cnc::cex1 << "Serial::evaluateResult: " << decodeContollerResult(RET_HALT) 
 			  << " while processing: "      << ArduinoCMDs::getCMDLabel((int)sfi.command) 
@@ -1357,12 +1353,12 @@ bool Serial::RET_HALT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStrea
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::RET_QUIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::RET_QUIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	std::cout << "Serial::evaluateResult: " 
 			  << decodeContollerResult(RET_LIMIT) 
@@ -1372,7 +1368,7 @@ bool Serial::RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStre
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream, CncLongPosition& pos) {
+bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	static wxString msg;
 	

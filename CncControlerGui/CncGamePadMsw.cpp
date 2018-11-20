@@ -2,6 +2,58 @@
 #include <iostream>
 #include "CncGamePadMsw.h"
 
+
+#include <Windows.h>
+
+///////////////////////////////////////////////////////////////////
+bool CncGamepadMsw::isServiceRuning() {
+///////////////////////////////////////////////////////////////////
+	const char* name = "Ds3Service";
+	
+	SC_HANDLE theService, scm;
+	SERVICE_STATUS_PROCESS ssStatus;
+	DWORD dwBytesNeeded;
+	
+	scm = OpenSCManager( nullptr, nullptr, SC_MANAGER_ENUMERATE_SERVICE );
+	if( !scm ) {
+		return false;
+	}
+	
+	theService = OpenService( scm, name, SERVICE_QUERY_STATUS );
+	if( !theService ) {
+		CloseServiceHandle( scm );
+		return false;
+	}
+	
+	auto result = QueryServiceStatusEx( theService, SC_STATUS_PROCESS_INFO,
+		reinterpret_cast<LPBYTE>( &ssStatus ), sizeof( SERVICE_STATUS_PROCESS ),
+		&dwBytesNeeded );
+	
+	CloseServiceHandle( theService );
+	CloseServiceHandle( scm );
+	
+	if( result == 0 ) {
+		return false;
+	}
+
+	if ( ssStatus.dwCurrentState != SERVICE_RUNNING ) {
+		
+		std::clog << "Servie status report for: " << name << std::endl;
+		switch ( ssStatus.dwCurrentState ) {
+			case SERVICE_CONTINUE_PENDING:		std::clog << "The service is about to continue."; 	break;
+			case SERVICE_PAUSE_PENDING:			std::clog << "The service is pausing.";				break;
+			case SERVICE_PAUSED:				std::clog << "The service is paused."; 				break;
+			case SERVICE_RUNNING:				std::clog << "The service is running."; 			break;
+			case SERVICE_START_PENDING:			std::clog << "The service is starting."; 			break;
+			case SERVICE_STOP_PENDING:			std::clog << "The service is stopping."; 			break;
+			case SERVICE_STOPPED:				std::clog << "The service has stopped."; 			break;
+		}
+		
+		std::clog << std::endl;
+	}
+	
+	return ( ssStatus.dwCurrentState == SERVICE_RUNNING );
+}
 ///////////////////////////////////////////////////////////////////
 int CncGamepadMsw::getPort() {
 ///////////////////////////////////////////////////////////////////

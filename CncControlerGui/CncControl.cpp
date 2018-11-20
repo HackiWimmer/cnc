@@ -1,4 +1,3 @@
-
 #include <iostream>
 #include <sstream>
 #include <cfloat>
@@ -199,7 +198,7 @@ bool CncControl::processSetter(unsigned char pid, const SetterValueList& values)
 			std::cerr << std::endl << "CncControl::processSetter: Setter failed." << std::endl;
 			std::cerr << " Id:    " << ArduinoPIDs::getPIDLabel((int)pid) << std::endl;
 			std::cerr << " Value(s): ";
-			traceSetterValueList(std::cerr, values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
+			cnc::traceSetterValueList(std::cerr, values, pid < PID_DOUBLE_RANG_START ? 1 : DBL_FACT);
 			std::cerr << std::endl;
 			return false;
 		}
@@ -412,7 +411,7 @@ bool CncControl::processCommand(const unsigned char c, std::ostream& txtCtl) {
 		return false;
 	
 	wxASSERT(serialPort);
-	return serialPort->processCommand(c, txtCtl, curAppPos);
+	return serialPort->processCommand(c, txtCtl);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
@@ -421,7 +420,7 @@ bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool already
 		return false;
 
 	wxASSERT(serialPort);
-	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curAppPos);
+	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::resetDrawControlInfo() {
@@ -912,15 +911,29 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		case CITPosition:
 			// update controller position
 			switch ( ci.posType ) {
-				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); break;
-				case PID_Y_POS: 		curCtlPos.setY(ci.yCtrlPos); break;
-				case PID_Z_POS: 		curCtlPos.setZ(ci.zCtrlPos); break;
+				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); 
+										if ( ci.synchronizeAppPos == true ) 
+											curAppPos.setX(ci.xCtrlPos);
+										break;
+										
+				case PID_Y_POS: 		curCtlPos.setY(ci.yCtrlPos); 
+										if ( ci.synchronizeAppPos == true ) 
+											curAppPos.setY(ci.yCtrlPos);
+										break;
+				
+				case PID_Z_POS: 		curCtlPos.setZ(ci.zCtrlPos); 
+										if ( ci.synchronizeAppPos == true ) 
+											curAppPos.setZ(ci.zCtrlPos);
+										break;
 				
 				case PID_XYZ_POS:
 				case PID_XYZ_POS_MAJOR:
 				case PID_XYZ_POS_DETAIL:
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 										realtimeFeedSpeed_MM_MIN = ci.feedSpeed;
+										
+										if ( ci.synchronizeAppPos == true )
+											curAppPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 			}
 			
 			// display controller coordinates
@@ -1139,7 +1152,7 @@ bool CncControl::moveRelStepsZ(int32_t z) {
 		return true;
 	// z moves are always linear, as a consequence alreadyRendered can be true
 	// but to see the detail positions use false
-	return serialPort->processMoveZ(z, false, curAppPos);
+	return serialPort->processMoveZ(z, false);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRendered) {
@@ -1148,7 +1161,7 @@ bool CncControl::moveRelLinearStepsXY(int32_t x1, int32_t y1, bool alreadyRender
 	if ( x1 == 0 && y1 == 0 )
 		return true;
 	
-	return serialPort->processMoveXY(x1, y1, alreadyRendered, curAppPos);
+	return serialPort->processMoveXY(x1, y1, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered) {
@@ -1157,7 +1170,7 @@ bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool 
 	if ( x1 == 0 && y1 == 0 && z1 == 0 )
 		return true;
 	
-	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered, curAppPos);
+	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelMetricZ(double z) {
@@ -1806,7 +1819,7 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	
 	// move loop
 	runContinuousMove = true;
-	bool ret = getSerial()->processMoveUntilSignal(sizeof(values)/sizeof(int32_t), values, curAppPos);
+	bool ret = getSerial()->processMoveUntilSignal(sizeof(values)/sizeof(int32_t), values);
 	if ( ret == false ) {
 		
 		if ( limitStates.hasLimit() && correctLimit)

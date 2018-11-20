@@ -9,6 +9,10 @@ class BinaryPathHandlerCnc : public BinaryPathHandlerBase {
 	protected:
 		CncControl* cncControl;
 		
+		void initNextClientId(long id);
+		void logMeasurementStart();
+		void logMeasurementEnd();
+			
 	public:
 		BinaryPathHandlerCnc(CncControl* cnc);
 		virtual ~BinaryPathHandlerCnc();

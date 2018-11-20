@@ -1,5 +1,6 @@
 #include <sstream>
 #include <wx/app.h>
+#include <wx/log.h>
 #include <wx/image.h>
 #include <wx/intl.h>
 #include <wx/config.h>
@@ -80,25 +81,25 @@ void installStreamRedirection(MainFrame* mainFrame) {
 	// redirect ext1 buffer
 	psbufCex1 = new CncCex1Buf(mainFrame->getLogger());
 	sbOldCex1 = cnc::cex1.rdbuf();
-	((iostream*)&cnc::cex1)->rdbuf(psbufCex1);
+	((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
 	cnc::cex1.setLogStreamBuffer(psbufCex1);
 	
 	// redirect trace buffer
 	psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
 	sbOldCtrc = cnc::trc.rdbuf();
-	((iostream*)&cnc::trc)->rdbuf(psbufCtrc);
+	((std::iostream*)&cnc::trc)->rdbuf(psbufCtrc);
 	cnc::trc.setLogStreamBuffer(psbufCtrc);
 	
 	// redirect controller message buffer
 	psbufCmsg = new CncCmsgBuf(mainFrame->getCtrlMessageHistory());
 	sbOldCmsg = cnc::msg.rdbuf();
-	((iostream*)&cnc::msg)->rdbuf(psbufCmsg);
+	((std::iostream*)&cnc::msg)->rdbuf(psbufCmsg);
 	cnc::msg.setLogStreamBuffer(psbufCmsg);
 	
 	// redirect serial spy buffer
 	psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
 	sbOldCspy = cnc::spy.rdbuf();
-	((iostream*)&cnc::spy)->rdbuf(psbufCspy);
+	((std::iostream*)&cnc::spy)->rdbuf(psbufCspy);
 	cnc::spy.setLogStreamBuffer(psbufCspy);
 }
 
@@ -120,10 +121,10 @@ void resetStreamRedirection() {
 	std::cout.rdbuf(sbOldCout);
 	std::cerr.rdbuf(sbOldClog);
 	std::cerr.rdbuf(sbOldCerr);
-	((iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
-	((iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
-	((iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
-	((iostream*)&cnc::spy)->rdbuf(sbOldCspy);
+	((std::iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
+	((std::iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
+	((std::iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
+	((std::iostream*)&cnc::spy)->rdbuf(sbOldCspy);
 	
 	// delete stream buffers
 	delete psbufCout;
@@ -134,6 +135,50 @@ void resetStreamRedirection() {
 	delete psbufCmsg;
 	delete psbufCspy;
 }
+
+///////////////////////////////////////////////////////////////////
+class MainLogger : public wxLog {
+///////////////////////////////////////////////////////////////////
+	
+	public:
+		
+		MainLogger() : wxLog() {}
+		virtual ~MainLogger()  {}
+		
+	protected:
+		
+		const char* getLogLevelAsStr(wxLogLevel level) {
+			switch ( level ) {
+				case wxLOG_FatalError:	return "FatalError";
+				case wxLOG_Error:		return "Error";
+				case wxLOG_Warning:		return "Warning";
+				case wxLOG_Message:		return "Message";
+				case wxLOG_Status:		return "Status";
+				case wxLOG_Info:		return "Info";
+				case wxLOG_Debug:		return "Debug";
+				case wxLOG_Trace:		return "Trace";
+				case wxLOG_Progress:	return "Progress";
+				case wxLOG_User:		return "User";
+				default:				return "????";
+			}
+			
+			return "????";
+		}
+		
+		void DoLogRecord(wxLogLevel level, const wxString &msg, const wxLogRecordInfo &info) {
+			
+			switch ( level ) {
+				case wxLOG_Warning:		cnc::cex1 << msg << std::endl;
+										break;
+				case wxLOG_Message:
+				case wxLOG_Info:
+				case wxLOG_Status:		std::cout << msg << std::endl;
+										break;
+										
+				default:				std::cerr << msg << std::endl;
+			}
+		}
+};
 
 ///////////////////////////////////////////////////////////////////
 class MainApp : public wxApp {
@@ -159,7 +204,7 @@ class MainApp : public wxApp {
 			
 			// determine assert handler
 			// this show a lot of sizer assert
-			//wxSetDefaultAssertHandler();
+			wxSetDefaultAssertHandler();
 		}
 		
 		///////////////////////////////////////////////////////////
@@ -209,7 +254,6 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////////////
 		void displaySplashImage(MainFrame* mainFrame) {
 		///////////////////////////////////////////////////////////////////
-//			return;
 			#ifdef APP_USE_SPLASH
 				wxBitmap bmp;
 				wxBitmap b;
@@ -306,6 +350,7 @@ class MainApp : public wxApp {
 				displaySplashImage(mainFrame);
 				
 			// redirect std streams
+			wxLog::SetActiveTarget(new MainLogger());
 			installStreamRedirection(mainFrame);
 			
 			// last but not least call initialize
@@ -313,6 +358,20 @@ class MainApp : public wxApp {
 			
 			SetTopWindow(mainFrame);
 			return GetTopWindow()->Show();
+		}
+		
+		///////////////////////////////////////////////////////////
+		void OnAssertFailure(const wxChar *file, int line, const wxChar *func, const wxChar *cond, const wxChar *msg) {
+		///////////////////////////////////////////////////////////
+			std::cerr << std::endl
+					  << "Assertion: " 
+					  << wxString(file) << ": "
+					  << wxString(func) << ": "
+					  << std::endl
+					  << "  Condition : " << wxString(cond)
+					  << std::endl
+					  << "  Message   : " << wxString(msg)
+					  << std::endl;
 		}
 		
 		///////////////////////////////////////////////////////////

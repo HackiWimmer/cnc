@@ -8,7 +8,7 @@
 
 class wxStaticText;
 class wxBitmapButton;
-class wxStyledTextCtrl;
+class CncSourceEditor;
 class wxDataViewListCtrl;
 
 class wxPropertyGridManager;
@@ -80,7 +80,7 @@ class FileParser {
 		virtual void clearControls();
 		virtual int getCurrentLineNumber() { return currentLineNumber; };
 		
-		void setInboundSourceControl(wxStyledTextCtrl* stc) { inboundSourceControl = stc; }
+		void setInboundSourceControl(CncSourceEditor* stc) { inboundSourceControl = stc; }
 		
 		void appendDebugValueBase(const char* key, wxVariant value);
 		void appendDebugValuePath(const char* key, wxVariant value);
@@ -109,7 +109,7 @@ class FileParser {
 		bool waitingForUserEvents;
 
 		DebugCtrl debugControls;
-		wxStyledTextCtrl* inboundSourceControl;
+		CncSourceEditor* inboundSourceControl;
 		
 		virtual bool process();
 		virtual bool preprocess() = 0;

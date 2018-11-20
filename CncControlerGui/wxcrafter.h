@@ -138,8 +138,8 @@ protected:
     wxBitmapToggleButton* m_tbWholeWord;
     wxBitmapToggleButton* m_tbRegEx;
     wxBitmapToggleButton* m_tbHighLight;
-    wxStaticBitmap* m_svgEditSearchState;
-    wxComboBox* m_svgEditSearch;
+    wxStaticBitmap* m_sourceEditSearchState;
+    wxComboBox* m_sourceEditSearch;
     wxButton* m_svgEditFind;
     wxButton* m_svgEditFindPrev;
     wxSimplebook* m_editorToolBox;
@@ -150,7 +150,7 @@ protected:
     wxButton* m_btExtractSourceAsNewTpl;
     wxStyledTextCtrl* m_stcFileContent;
     wxStaticText* m_filePosition;
-    wxTextCtrl* m_svgEditStatus;
+    wxTextCtrl* m_sourceEditStatus;
     wxStaticText* m_editMode;
     wxPanel* m_panelTplUserAgent;
     wxTextCtrl* m_svgRootNode;
@@ -795,14 +795,8 @@ protected:
     virtual void svgEditFindPrev(wxCommandEvent& event) { event.Skip(); }
     virtual void selectBinaryEditorViewMode(wxCommandEvent& event) { event.Skip(); }
     virtual void extractSourceAsNewTpl(wxCommandEvent& event) { event.Skip(); }
-    virtual void fileContentKeyDown(wxKeyEvent& event) { event.Skip(); }
-    virtual void fileContentLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void fileContentLeftUp(wxMouseEvent& event) { event.Skip(); }
-    virtual void fileContentRightDown(wxMouseEvent& event) { event.Skip(); }
     virtual void marginClickFileContent(wxStyledTextEvent& event) { event.Skip(); }
-    virtual void fileContentKeyUp(wxKeyEvent& event) { event.Skip(); }
     virtual void fileContentChange(wxStyledTextEvent& event) { event.Skip(); }
-    virtual void fileContentDClick(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUAInboundPathList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUAUseDirectiveList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUADetailInfo(wxDataViewEvent& event) { event.Skip(); }
@@ -1073,8 +1067,8 @@ public:
     wxBitmapToggleButton* GetTbWholeWord() { return m_tbWholeWord; }
     wxBitmapToggleButton* GetTbRegEx() { return m_tbRegEx; }
     wxBitmapToggleButton* GetTbHighLight() { return m_tbHighLight; }
-    wxStaticBitmap* GetSvgEditSearchState() { return m_svgEditSearchState; }
-    wxComboBox* GetSvgEditSearch() { return m_svgEditSearch; }
+    wxStaticBitmap* GetSourceEditSearchState() { return m_sourceEditSearchState; }
+    wxComboBox* GetSourceEditSearch() { return m_sourceEditSearch; }
     wxButton* GetSvgEditFind() { return m_svgEditFind; }
     wxButton* GetSvgEditFindPrev() { return m_svgEditFindPrev; }
     wxPanel* GetPanelToolBoxSvg() { return m_panelToolBoxSvg; }
@@ -1085,7 +1079,7 @@ public:
     wxSimplebook* GetEditorToolBox() { return m_editorToolBox; }
     wxStyledTextCtrl* GetStcFileContent() { return m_stcFileContent; }
     wxStaticText* GetFilePosition() { return m_filePosition; }
-    wxTextCtrl* GetSvgEditStatus() { return m_svgEditStatus; }
+    wxTextCtrl* GetSourceEditStatus() { return m_sourceEditStatus; }
     wxStaticText* GetEditMode() { return m_editMode; }
     wxPanel* GetPanelTplEdit() { return m_panelTplEdit; }
     wxTextCtrl* GetSvgRootNode() { return m_svgRootNode; }
@@ -1918,11 +1912,17 @@ class CncGamepadControllerStateBase : public wxPanel
 {
 protected:
     wxTextCtrl* m_gamepadTrace;
+    wxButton* m_btStartGamepadService;
+    wxButton* m_btStopGamepadService;
 
 protected:
+    virtual void startGamepadService(wxCommandEvent& event) { event.Skip(); }
+    virtual void stopGamepadService(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxTextCtrl* GetGamepadTrace() { return m_gamepadTrace; }
+    wxButton* GetBtStartGamepadService() { return m_btStartGamepadService; }
+    wxButton* GetBtStopGamepadService() { return m_btStopGamepadService; }
     CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncGamepadControllerStateBase();
 };

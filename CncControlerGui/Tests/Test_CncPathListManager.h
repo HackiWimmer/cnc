@@ -39,7 +39,7 @@ class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {
 				plm.calculateAndAddEntry({plm.getStartPos().x + i*10.0, plm.getStartPos().y + i*20.0}, true, (i!=0));
 			
 			// trace initial behaviour
-			clog << plm << endl;
+			std::clog << plm << std::endl;
 			
 			/*
 			PARAGRAPH();
@@ -93,11 +93,11 @@ class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {
 		
 			PARAGRAPH();
 			size = plm.getPathListSize();
-			clog << "center path: " << plm.centerPath() << endl;
+			std::clog << "center path: " << plm.centerPath() << std::endl;
 			if ( plm.getPathListSize() != size )
-				cerr << "Somthing is lost . . ." << endl;
+				std::cerr << "Somthing is lost . . ." << std::endl;
 				
-			clog << plm << endl;
+			std::clog << plm << std::endl;
 			
 			return true;
 		}

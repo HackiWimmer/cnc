@@ -32,7 +32,7 @@ class HexDecoder {
 		/////////////////////////////////////////////////////////
 		static const wxString& reorderHexInt32String(wxString& hexToken) {
 			if ( hexToken.length() > 8 ) {
-				cerr << "HexDecoder::reorderHexInt32String: Length error: " << hexToken.length() << " - " << hexToken << endl;
+				std::cerr << "HexDecoder::reorderHexInt32String: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
 				return _T("00000000");
 			}
 			
@@ -58,13 +58,13 @@ class HexDecoder {
 		static int32_t decodeHexValueAsInt32(const wxString& hexToken) {
 			//  examples are: 00000000,  2C010000,  FAF4FFFF
 			if ( hexToken.length() > 8 ) {
-				cerr << "HexDecoder::decodeHexValueAsInteger: Length error: " << hexToken.length() << " - " << hexToken << endl;
+				std::cerr << "HexDecoder::decodeHexValueAsInteger: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
 				return 0;
 			}
 			
 			for ( unsigned int i = 0; i < hexToken.length(); i++ ) {
 				if ( isxdigit((char)(hexToken[i])) == 0 ) {
-					cerr << "HexDecoder::decodeHexValueAsInteger: Digit error at pos: " << i << " - " << hexToken << endl;
+					std::cerr << "HexDecoder::decodeHexValueAsInteger: Digit error at pos: " << i << " - " << hexToken << std::endl;
 					return 0;
 				}
 			}

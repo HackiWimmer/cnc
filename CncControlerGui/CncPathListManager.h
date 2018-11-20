@@ -97,7 +97,7 @@ class CncPathListManager {
 			
 			ostr << " path list:" << std::endl;
 			for ( auto it=a.getPathList().begin(); it!=a.getPathList().end(); ++it )
-				ostr << it->getPointAsString() <<  " | zDown: " << it->zAxisDown <<  " | rendered: " << it->alreadyRendered << endl;
+				ostr << it->getPointAsString() <<  " | zDown: " << it->zAxisDown <<  " | rendered: " << it->alreadyRendered << std::endl;
 
 			return ostr;
 		}

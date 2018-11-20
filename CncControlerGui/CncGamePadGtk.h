@@ -32,6 +32,8 @@ class CncGamepadGtk
 		virtual ~CncGamepadMsw()
 		{}
 		
+		virtual bool isServiceRuning()				{ return false; }
+		
 		virtual void setConnected()					{ connected = false; }
 		virtual void setDisconnected()				{ connected = false; }
 		virtual bool wasConnected()					{ return connected; }

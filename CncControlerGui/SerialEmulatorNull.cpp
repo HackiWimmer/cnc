@@ -269,7 +269,7 @@ int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int n
 		// debug only
 		bool debug = false;
 		if ( debug ) {
-			cout << "performSerialBytes: " << "index: " << lastCommand.index << ", nbByte: " << nbByte << ", length: " << lastCommand.Serial.length() << ", bytes: ";
+			std::cout << "performSerialBytes: " << "index: " << lastCommand.index << ", nbByte: " << nbByte << ", length: " << lastCommand.Serial.length() << ", bytes: ";
 			lastCommand.Serial.trace(std::clog);
 		}
 		
@@ -286,13 +286,13 @@ int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int n
 			
 			// prevent an overflow of bytesToCopy which is unsigned
 			if ( lastCommand.Serial.length() - lastCommand.index < 0 ) {
-				cerr << "SerialEmulatorNULL::performSerialBytes Determine bytesToCopy failed!"
+				std::cerr << "SerialEmulatorNULL::performSerialBytes Determine bytesToCopy failed!"
 				<< "  Current index:  " << lastCommand.index
 				<< ", Bytes to copy: "  << bytesToCopy
 				<< ", Total length: "   << lastCommand.Serial.length()
 				<< std::endl;
 				
-				cerr << "Current command will be aborted!"
+				std::cerr << "Current command will be aborted!"
 				<< std::endl;
 				
 				lastCommand.restLastCmd();
@@ -311,19 +311,19 @@ int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int n
 			last = true;
 		
 		if ( debug ) {
-			clog << "bytesToCopy: "<< bytesToCopy << endl;
+			std::clog << "bytesToCopy: "<< bytesToCopy << std::endl;
 		}
 		
 		if ( bytesToCopy > 0 ) {
 			// read bytes to copy from serial
 			if ( lastCommand.Serial.getBytes(buffer, lastCommand.index, bytesToCopy) == false ) {
-				cerr << "SerialEmulatorNULL::performSerialBytes getBytes(...) failed!"
+				std::cerr << "SerialEmulatorNULL::performSerialBytes getBytes(...) failed!"
 				<< "  Current index:  " << lastCommand.index
-				<< ", Bytes to copy: " << bytesToCopy
-				<< ", Total length: " << lastCommand.Serial.length()
+				<< ", Bytes to copy: "  << bytesToCopy
+				<< ", Total length: "   << lastCommand.Serial.length()
 				<< std::endl;
 			
-				cerr << "Current command will be aborted!"
+				std::cerr << "Current command will be aborted!"
 				<< std::endl;
 			
 				lastCommand.restLastCmd();
@@ -335,7 +335,7 @@ int SerialEmulatorNULL::performSerialBytes(unsigned char *buffer, unsigned int n
 		}
 		
 		if ( debug ) {
-			clog << "last: "<< last << endl;
+			std::clog << "last: "<< last << std::endl;
 		}
 
 		// close/finalize the last command
@@ -655,18 +655,8 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	}
 	
 	int32_t x = 0L, y = 0L, z = 0L;
-	
-	if (    lastCommand.cmd == CMD_RENDER_AND_MOVE 
-	     || lastCommand.cmd == CMD_MOVE
-		 || lastCommand.cmd == CMD_MOVE_UNIT_SIGNAL
-		) {
-		
-		// update the current emulator position
-		curEmulatorPos.set(cncControl->getCurPos());
-		
-		if ( CncCommandDecoder::decodeMove(buffer, nbByte, x, y, z) == false ) 
-			return false;
-	}
+	if ( CncCommandDecoder::decodeMove(buffer, nbByte, x, y, z) == false ) 
+		return false;
 	
 	bool ret = false;
 	if ( lastCommand.cmd == CMD_MOVE_UNIT_SIGNAL ) {
@@ -674,7 +664,7 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 	
 	} else {
 		// determine the target major position, this is the current pos + the given move
-		targetMajorPos.set(cncControl->getCurPos());
+		targetMajorPos.set(curEmulatorPos);
 		targetMajorPos.inc(x, y, z);
 		
 		// the emulator function readData and writeData runs in the same thread.
@@ -686,6 +676,8 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 		// the following linear rendering is only to support a more detailed writeMoveCmd(...)
 		ret = renderMove(x, y, z, buffer, nbByte);
 	}
+	
+	replyPosition(true);
 	
 	// reset last signal
 	lastSignal = CMD_INVALID;
@@ -868,6 +860,20 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 	if ( (retVal = stepAxis('Z', dz)) != RET_OK ) return translateStepAxisRetValue(retVal);
 	
 	// simulate a direct controller callback.
+	replyPosition(force);
+	
+	// do something with this coordinates
+	bool ret = writeMoveRenderedCallback(dx, dy, dz);
+	
+	// copy point A into point B
+	memcpy(pointB, pointA, sizeof(pointA));
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::replyPosition(bool force) {
+///////////////////////////////////////////////////////////////////
+	// simulate a direct controller callback.
 	static CncLongPosition lastReplyPos;
 	CncLongPosition diff(curEmulatorPos - lastReplyPos);
 	
@@ -881,43 +887,33 @@ bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsig
 		 absolute( diff.getZ() ) >= posReplyThresholdZ ||
 		 force == true ) 
 	{
-		if ( curEmulatorPos != targetMajorPos ) {
-			// due to the fact, that the emulators runs in the 
-			// same thread as the main loop it makes not sense 
-			// to write here someting to the serial. This is 
-			// because the first main lool readData(...) call 
-			// is at the earliest if this writeMove(...) call is 
-			// totally finished. So, the one and only way to 
-			// communicate continous with the cnc control is to call 
-			// the SerialControllrCallback directly. Otherwise the 
-			// complete serial data will be fetch in one block 
-			// at the end if this writeMove(...) call was finalized.
-			
-			wxASSERT( speedSimulator != NULL );
-			
-			ContollerInfo ci;
-			ci.infoType  = CITPosition;
-			ci.command   = lastCommand.cmd;
-			ci.posType   = PID_XYZ_POS_DETAIL;
-			
-			ci.xCtrlPos  = curEmulatorPos.getX();
-			ci.yCtrlPos  = curEmulatorPos.getY();
-			ci.zCtrlPos  = curEmulatorPos.getZ();
-			
-			ci.feedSpeed = speedSimulator->getRealtimeFeedSpeed_MM_MIN();
-			
-			sendSerialControllerCallback(ci);
-			lastReplyPos.set(curEmulatorPos);
-		}
+		// due to the fact, that the emulators runs in the 
+		// same thread as the main loop it makes not sense 
+		// to write here someting to the serial. This is 
+		// because the first main lool readData(...) call 
+		// is at the earliest if this writeMove(...) call is 
+		// totally finished. So, the one and only way to 
+		// communicate continous with the cnc control is to call 
+		// the SerialControllrCallback directly. Otherwise the 
+		// complete serial data will be fetch in one block 
+		// at the end if this writeMove(...) call was finalized.
+		
+		wxASSERT( speedSimulator != NULL );
+		
+		ContollerInfo ci;
+		ci.infoType  			= CITPosition;
+		ci.posType   			= curEmulatorPos != targetMajorPos ? PID_XYZ_POS_DETAIL : PID_XYZ_POS_MAJOR;
+		ci.synchronizeAppPos 	= shouldCallbackAlsoSynchronizeAppPosition();
+		ci.command   			= lastCommand.cmd;
+		ci.xCtrlPos  			= curEmulatorPos.getX();
+		ci.yCtrlPos  			= curEmulatorPos.getY();
+		ci.zCtrlPos  			= curEmulatorPos.getZ();
+		
+		ci.feedSpeed 			= speedSimulator->getRealtimeFeedSpeed_MM_MIN();
+		
+		sendSerialControllerCallback(ci);
+		lastReplyPos.set(curEmulatorPos);
 	}
-	
-	// do something with this coordinates
-	bool ret = writeMoveRenderedCallback(dx, dy, dz);
-	
-	// copy point A into point B
-	memcpy(pointB, pointA, sizeof(pointA));
-	
-	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 unsigned char SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
