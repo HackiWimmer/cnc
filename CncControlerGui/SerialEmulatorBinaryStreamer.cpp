@@ -2,8 +2,8 @@
 #include "SerialEmulatorBinaryStreamer.h"
 
 ///////////////////////////////////////////////////////////////////
-SerialEmulatorStreamer::SerialEmulatorStreamer(CncControl* cnc)
-: SerialEmulatorNULL(cnc) 
+SerialEmulatorBinaryStreamer::SerialEmulatorBinaryStreamer(CncControl* cnc)
+: SerialEmulatorNULL(cnc)
 , CncBinaryTemplateStreamer()
 , fileName("")
 ///////////////////////////////////////////////////////////////////
@@ -11,19 +11,19 @@ SerialEmulatorStreamer::SerialEmulatorStreamer(CncControl* cnc)
 }
 ///////////////////////////////////////////////////////////////////
 //Initialize Serial communication with the given COM port
-SerialEmulatorStreamer::SerialEmulatorStreamer(const char *fileName)
-: SerialEmulatorNULL(fileName) 
+SerialEmulatorBinaryStreamer::SerialEmulatorBinaryStreamer(const char* fileName) 
+: SerialEmulatorNULL(fileName)
 , CncBinaryTemplateStreamer()
 , fileName("")
 ///////////////////////////////////////////////////////////////////
 {
 }
 ///////////////////////////////////////////////////////////////////
-SerialEmulatorStreamer::~SerialEmulatorStreamer() {
+SerialEmulatorBinaryStreamer::~SerialEmulatorBinaryStreamer() {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorStreamer::isOutputAsTemplateAvailable() { 
+bool SerialEmulatorBinaryStreamer::isOutputAsTemplateAvailable() {
 ///////////////////////////////////////////////////////////////////
 	if ( wxFile::Exists(getPortName()) == true )
 		return true;
@@ -31,7 +31,7 @@ bool SerialEmulatorStreamer::isOutputAsTemplateAvailable() {
 	return false; 
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorStreamer::connect(const char* fileName) {
+bool SerialEmulatorBinaryStreamer::connect(const char* fileName) {
 ///////////////////////////////////////////////////////////////////
 	this->fileName.assign(fileName);
 	
@@ -39,22 +39,22 @@ bool SerialEmulatorStreamer::connect(const char* fileName) {
 	return isConnected();
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorStreamer::disconnect(void) {
-///////////////////////////////////////////////////////////////////
+void SerialEmulatorBinaryStreamer::disconnect() {
+/////////////////////////////////////////////////////////////////
 	setConnected(false);
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorStreamer::writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) {
+bool SerialEmulatorBinaryStreamer::writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	return appendDataBlock(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorStreamer::writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) {
+bool SerialEmulatorBinaryStreamer::writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	return appendDataBlock(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorStreamer::processTrigger(const Serial::Trigger::BeginRun& tr) {
+void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	if ( isReadyToStream() )
 		finalize();
@@ -68,7 +68,7 @@ void SerialEmulatorStreamer::processTrigger(const Serial::Trigger::BeginRun& tr)
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorStreamer::processTrigger(const Serial::Trigger::EndRun& tr) {
+void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	if ( finalize() == false ) {
 		std::cerr << "SerialEmulatorStreamer::processTrigger(TrEndRun): finalize() failed" << std::endl;

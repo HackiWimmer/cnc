@@ -279,12 +279,13 @@ struct I2CData {
   const unsigned char PID_INCREMENT_DIRECTION_VALUE_Z     =  83;
 
   const unsigned char PID_SPEED_CONTROLLER                =  90;
-  const unsigned char PID_SPEED_CTRL_INITIALIZED          =  91;
-  const unsigned char PID_SPEED_CTRL_TOTAL_OFFSET         =  92;
-  const unsigned char PID_SPEED_CTRL_RPM                  =  93;
-  const unsigned char PID_SPEED_CTRL_SYNTH_SPEED_DELAY    =  94;
-  const unsigned char PID_SPEED_CTRL_MAX_SPEED            =  95;
-  const unsigned char PID_SPEED_CTRL_CFG_SPEED            =  96;
+  const unsigned char PID_SPEED_FEED_MODE                 =  91;
+  const unsigned char PID_SPEED_CTRL_INITIALIZED          =  92;
+  const unsigned char PID_SPEED_CTRL_TOTAL_OFFSET         =  93;
+  const unsigned char PID_SPEED_CTRL_RPM                  =  94;
+  const unsigned char PID_SPEED_CTRL_SYNTH_SPEED_DELAY    =  95;
+  const unsigned char PID_SPEED_CTRL_MAX_SPEED            =  96;
+  const unsigned char PID_SPEED_CTRL_CFG_SPEED            =  97;
   
   const unsigned char PID_PULSE_WIDTH_OFFSET_DIR          = 100;
   const unsigned char PID_PULSE_WIDTH_OFFSET_LOW          = 101;

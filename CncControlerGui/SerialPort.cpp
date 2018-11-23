@@ -12,6 +12,7 @@
 #include "CncControl.h"
 #include "CncCommon.h"
 #include "CncArduino.h"
+#include "CncCommandDecoder.h"
 #include "SerialPort.h"
 #include "MainFrame.h"
 
@@ -193,6 +194,14 @@ bool Serial::sendSerialControllerCallback(ContollerInfo& ci) {
 		incTotalDistance(measurementRefPos, ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 	
 	return cncControl->SerialControllerCallback(ci);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::sendSerialControllerCallback(ContollerExecuteInfo& cei) {
+///////////////////////////////////////////////////////////////////
+	if ( cncControl == NULL )
+		return false;
+		
+	return cncControl->SerialExecuteControllerCallback(cei);
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::incTotalDistance(int32_t dx, int32_t dy, int32_t dz) {
@@ -894,41 +903,52 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 	unsigned char cmd = buffer[0];
 	bool ret = false;
 	switch ( cmd ) {
-		case CMD_SETTER:			{
-										if ( writeData((void*)buffer, nbByte) ) {
-											
-											SerialFetchInfo sfi;
-											sfi.command = cmd;
-											
-											ret = evaluateResultWrapper(sfi, std::cout);
-										}
-										break;
-									}
 		
-		case CMD_RENDER_AND_MOVE:
-		case CMD_MOVE:				{
+		// --------------------------------------------------------
+		case CMD_SETTER:
+		{
+			CncCommandDecoder::SetterInfo si;
+			CncCommandDecoder::decodeSetter(buffer, nbByte, si);
+			ContollerExecuteInfo cei;
+			cei.infoType 		= CEITSetter;
+			cei.setterPid		= si.pid;
+			cei.setterValueList = si.values;
 			
-										if ( writeData((void*)buffer, nbByte) ) {
-											SerialFetchInfo sfi;
-											sfi.command 			= cmd;
-											sfi.singleFetchTimeout 	= 3000;
-											sfi.Mc.size 			= 3;
-											sfi.Mc.value1			= 0;
-											sfi.Mc.value2			= 0;
-											sfi.Mc.value3			= 0;
-											
-											ret = evaluateResultWrapper(sfi, std::cout);
-											
-											// latest log this move
-											logMeasurementLastTs();
-										}
-										break;
-									}
-									
-		default:					;
+			sendSerialControllerCallback(cei);
+				
+			if ( writeData((void*)buffer, nbByte) ) {
+				
+				SerialFetchInfo sfi;
+				sfi.command = cmd;
+				
+				ret = evaluateResultWrapper(sfi, std::cout);
+			}
+			break;
+		}
+		
+		// --------------------------------------------------------
+		case CMD_RENDER_AND_MOVE:
+		case CMD_MOVE:
+		{
+			if ( writeData((void*)buffer, nbByte) ) {
+				SerialFetchInfo sfi;
+				sfi.command 			= cmd;
+				sfi.singleFetchTimeout 	= 3000;
+				sfi.Mc.size 			= 3;
+				sfi.Mc.value1			= 0;
+				sfi.Mc.value2			= 0;
+				sfi.Mc.value3			= 0;
+				
+				ret = evaluateResultWrapper(sfi, std::cout);
+				
+				// latest log this move
+				logMeasurementLastTs();
+			}
+			break;
+		}
 	}
 	
-	return ret; //writeData((void*)buffer, nbByte)
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStream) {
@@ -1557,7 +1577,7 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 
 	//fetch 3 int32_t values
 	ContollerInfo ci;
-	ci.infoType = CITLimitInfo;
+	ci.infoType = CITLimit;
 	ci.command  = sfi.command;
 	
 	sfi.Lc.p = sfi.Lc.result;

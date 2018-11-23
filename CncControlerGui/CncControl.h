@@ -81,7 +81,7 @@ class CncControl {
 		double defaultFeedSpeedWork_MM_MIN;
 
 		// actual configured speed type and value
-		CncSpeed configuredSpeedType;
+		CncSpeedMode configuredSpeedMode;
 		double configuredFeedSpeed_MM_MIN;
 
 		// Duration counter
@@ -110,12 +110,8 @@ class CncControl {
 		//struct timeb endTime, startTime;
 		// Flag to indicatate if a positions check aplies
 		bool positionCheck;
-		// Pen handler
-		PenHandler penHandler;
 		// margin of the draw pane
 		unsigned int drawPaneMargin;
-		// determine the speed mode 
-		DimensionMode speedMonitorMode;
 		//sets a value into the given text control
 		void setValue(wxTextCtrl *ctl, int32_t val);
 		void setValue(wxTextCtrl *ctl, double val);
@@ -176,17 +172,21 @@ class CncControl {
 		
 		//Make Serial available
 		Serial* getSerial() { return serialPort; }
-		//speed
-		CncSpeed getConfiguredSpeedType() { return configuredSpeedType; }
 		
-		double getRealtimeFeedSpeed_MM_MIN();
+		// Get the current speed parameter
+		CncSpeedMode getConfiguredSpeedMode() 		{ return configuredSpeedMode; }
+		double getRealtimeFeedSpeed_MM_SEC()		{ return realtimeFeedSpeed_MM_MIN / 60.0; }
+		double getRealtimeFeedSpeed_MM_MIN()		{ return realtimeFeedSpeed_MM_MIN; }
+		double getConfiguredFeedSpeed_MM_SEC() 		{ return configuredFeedSpeed_MM_MIN / 60.0; }
+		double getConfiguredFeedSpeed_MM_MIN() 		{ return configuredFeedSpeed_MM_MIN; }
 		
-		double getConfiguredFeedSpeed_MM_SEC() { return configuredFeedSpeed_MM_MIN / 60; }
-		double getConfiguredFeedSpeed_MM_MIN() { return configuredFeedSpeed_MM_MIN; }
-		
-		void changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s);
+		// Change the current speed parameter
+		void changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s);
 		void setDefaultRapidSpeed_MM_MIN(double s);
 		void setDefaultWorkSpeed_MM_MIN(double s);
+		
+		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
+		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
 		
 		// signal wrapper
 		bool sendInterrupt() 	{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
@@ -199,7 +199,11 @@ class CncControl {
 		
 		// getter list wrapper
 		bool displayGetterList(const PidList& pidlist);
-
+		
+		void displayToolState(const bool state);
+		void displaySpeedValue(const double value);
+		void displaySpeedMode(const CncSpeedMode mode);
+		
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		// Zero positioning
@@ -230,6 +234,8 @@ class CncControl {
 		bool SerialCallback();
 		// Callback from Serial with controller content
 		bool SerialControllerCallback(const ContollerInfo& ci);
+		bool SerialExecuteControllerCallback(const ContollerExecuteInfo& cei);
+		
 		// Callback fromS Serial with a controller message
 		bool SerialMessageCallback(const ControllerMsgInfo& cmi);
 		//interrupt the processing
@@ -245,7 +251,6 @@ class CncControl {
 		void setGuiControls(GuiControlSetup* guiCtlSetup);
 		//handle draw control
 		unsigned int getDrawPaneMargin() { return drawPaneMargin; }
-		void resetDrawControlInfo();
 		void updateDrawControl();
 		// Duration management
 		unsigned int getDurationCount();
@@ -291,9 +296,6 @@ class CncControl {
 		bool processSetter(unsigned char pid, int32_t value);
 		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
 		bool processSetterList(const Setters& setup);
-		// Change the current speed parameter
-		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeed s = CncSpeedUserDefined);
-		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeed s = CncSpeedUserDefined);
 		// Sets a flag that the postions x/y min/max should be checked within the Serial callback
 		void activatePositionCheck(bool a) { positionCheck = a; }
 		// Sets the enable pin HIGH (s == false) or LOW ( s == true)

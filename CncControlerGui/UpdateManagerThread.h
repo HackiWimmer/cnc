@@ -179,7 +179,7 @@ class UpdateManagerThread : public wxThread {
 					pos.set({0, 0, 0});
 				}
 				
-				void set(unsigned char pid, long id, CncSpeed speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
+				void set(unsigned char pid, long id, CncSpeedMode speedMode, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					set(pid, id, cnc::getCncSpeedTypeAsCharacter(speedMode), cfgSpeedValue, curSpeedValue, p);
 				}
 				
@@ -194,7 +194,7 @@ class UpdateManagerThread : public wxThread {
 				
 			} pos;
 			
-				inline const Event& AppPosEvent(unsigned char pid, long i, CncSpeed sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
+				inline const Event& AppPosEvent(unsigned char pid, long i, CncSpeedMode sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= APP_POS_UPD;
 					processed    	= false;
 					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
@@ -208,7 +208,7 @@ class UpdateManagerThread : public wxThread {
 					return *this;
 				}
 
-				inline const Event& CtlPosEvent(unsigned char pid, long i, CncSpeed sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
+				inline const Event& CtlPosEvent(unsigned char pid, long i, CncSpeedMode sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
 					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);

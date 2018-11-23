@@ -31,6 +31,7 @@
 ////////////////////////////////////////////////////////////////////
 // forward declarations
 class CncSourceEditor;
+class CncOutboundEditor;
 class wxFileConfig;
 class CncFilePreviewWnd;
 class CncFilePreview;
@@ -190,7 +191,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void selectUCUnitTo(wxCommandEvent& event);
 		virtual void closeUnitCalculator(wxCommandEvent& event);
 		virtual void emuContentDClick(wxMouseEvent& event);
-		virtual void fileContentDClick(wxMouseEvent& event);
 		virtual void viewUnitCalculator(wxCommandEvent& event);
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
@@ -249,14 +249,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void rcDebug(wxCommandEvent& event);
 		virtual void rcStop(wxCommandEvent& event);
 		virtual void switchMonitoring(wxCommandEvent& event);
-		virtual void fileContentChange(wxStyledTextEvent& event);
 		virtual void viewToolbar(wxCommandEvent& event);
 		virtual void renderAuiPane(wxAuiManagerEvent& event);
 		virtual void restoreAuiPane(wxAuiManagerEvent& event);
 		virtual void maximizeAuiPane(wxAuiManagerEvent& event);
 		virtual void saveTemplateFromButton(wxCommandEvent& event);
 		virtual void marginClickEmuSource(wxStyledTextEvent& event);
-		virtual void marginClickFileContent(wxStyledTextEvent& event);
 		virtual void emuContentRightDown(wxMouseEvent& event);
 		virtual void toggleEmuWordWrapMode(wxCommandEvent& event);
 		virtual void toggleTemplateWordWrapMode(wxCommandEvent& event);
@@ -506,7 +504,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initSpeedConfigPlayground();
 		void updateSpeedConfigPlayground();
 		
+		friend class CncBaseEditor;
 		friend class CncSourceEditor;
+		friend class CncOutboundEditor;
 		friend class CncConfig;
 		friend class CncGampadDeactivator;
 		friend class CncTransactionLock;
@@ -525,7 +525,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool canClose;
 		bool useSecureRunDlg;
 		bool evaluatePositions;
-		bool templateFileLoading;
 		bool ignoreDirControlEvents;
 		
 		RunConfirmationInfo  runConfirmationInfo;
@@ -537,10 +536,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 	
 		CncControl* cnc;
 		CncSourceEditor* sourceEditor;
+		CncOutboundEditor* outboundEditor;
 		CncMotionMonitor* motionMonitor;
 		CncSpyControl* serialSpy;
 		CncFileView* fileView;
 		CncFilePreview* mainFilePreview;
+		CncFilePreview* outboundFilePreview;
 		CncFilePreview* monitorFilePreview;
 		CncToolMagazine* toolMagaizne;
 		CncPosSpyListCtrl* positionSpy;
@@ -664,9 +665,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool initializeLruMenu();
 		
 		void createAnimationControl();
-		void createStcFileControlPopupMenu();
-		void createStcEmuControlPopupMenu();
-		
 		int showReferencePositionDlg(wxString msg);
 		
 		void decorateSwitchToolOnOff(bool state);
@@ -752,6 +750,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void clearPositionSpy();
 		void clearMotionMonitor();
+		void prepareMotionMonitorViewType(const CncDimensions type);
 
 		wxWindow* getAUIPaneByName(const wxString& name);
 		wxMenuItem* getAUIMenuByName(const wxString& name);
@@ -764,8 +763,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void selectEditorToolBox(bool fileLoaded);
 		void fillFileDetails(bool fileLoaded);
 		void prepareNewTemplateFile();
-		void showSvgExtPages(bool show = true);
-		void hideSvgExtPages() { showSvgExtPages(false); }
+		void decorateExtTemplatePages(TemplateFormat tf);
 		void prepareAndShowMonitorTemplatePreview(bool force=false);
 		void refreshSvgEmuFile(bool blank=false);
 		void refreshSvgEmuSourceFile(bool blank=false);
@@ -805,8 +803,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void resetMinMaxPositions();
 		void setRefPostionState(bool state);
-		void decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl);
-		
 		bool connectSerialPortDialog();
 		
 };

@@ -1,0 +1,51 @@
+#include <wx/file.h>
+#include "SerialEmulatorSvgStreamer.h"
+
+///////////////////////////////////////////////////////////////////
+SerialEmulatorSvgStreamer::SerialEmulatorSvgStreamer(CncControl* cnc)
+: SerialEmulatorTextStreamer(cnc)
+///////////////////////////////////////////////////////////////////
+{
+}
+///////////////////////////////////////////////////////////////////
+//Initialize Serial communication with the given COM port
+SerialEmulatorSvgStreamer::SerialEmulatorSvgStreamer(const char* fileName) 
+: SerialEmulatorTextStreamer(fileName)
+///////////////////////////////////////////////////////////////////
+{
+}
+///////////////////////////////////////////////////////////////////
+SerialEmulatorSvgStreamer::~SerialEmulatorSvgStreamer() {
+///////////////////////////////////////////////////////////////////
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorSvgStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
+///////////////////////////////////////////////////////////////////
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorSvgStreamer::writeEncodedSetterCallback(const SetterInfo& si) {
+///////////////////////////////////////////////////////////////////
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorSvgStreamer::initializeFile(const Serial::Trigger::BeginRun& tr) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << "<!-- File start  -->\n";
+	
+	bodyStream << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>\n";
+	bodyStream << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"\n";
+	bodyStream << "\"http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd\">\n";
+	bodyStream << "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"100mm\" height=\"100mm\" xmlns:xlink=\"http://www.w3.org/1999/xlink\">\n";
+	bodyStream << "\t<title>CNC Woodworking streaming template</title>\n";
+	bodyStream << "\t<desc>....</desc>\n";
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorSvgStreamer::finalizeFile(const Serial::Trigger::EndRun& tr) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << "\/svg>\n";
+	bodyStream << "<!-- File end  -->\n";
+}
+

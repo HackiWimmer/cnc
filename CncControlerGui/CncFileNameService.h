@@ -40,8 +40,11 @@ class CncFileNameService {
 		static const char* getTempFileName(TemplateFormat f);
 		static const char* getCncTemplatePreviewFileName(TemplateFormat f);
 	
+		static const char* getCncOutboundTxtFileName() 			{ _ret = _tempDirectory + "CncOutboundEmu.txt"; 	return _ret; }
 		static const char* getCncOutboundSvgFileName() 			{ _ret = _tempDirectory + "CncOutboundEmu.svg"; 	return _ret; }
+		static const char* getCncOutboundGCodeFileName() 		{ _ret = _tempDirectory + "CncOutboundEmu.gcode"; 	return _ret; }
 		static const char* getCncOutboundBinFileName() 			{ _ret = _tempDirectory + "CncOutboundEmu.bct"; 	return _ret; }
+		
 		static const char* getCncOutboundTempFileName()			{ _ret = _tempDirectory + "CncOutboundTempEmu.xml"; return _ret; }
 		static const char* getCncDrawPaneTraceFileName() 		{ _ret = _tempDirectory + "CncDrawPaneTrace.txt"; 	return _ret; }
 		

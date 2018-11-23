@@ -919,6 +919,7 @@ const char*  CncConfig::getDefaultDisplayUnitAsStr()				{ PROPERTY(CncApplicatio
 
 const wxString& CncConfig::getFileBrowser(wxString& ret)			{ PROPERTY(CncApplication_Tool_FILE_BROWSER) 			ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getSVGFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_SVG_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
+const wxString& CncConfig::getBINFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_BIN_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getGCodeFileViewer(wxString& ret)		{ PROPERTY(CncApplication_Tool_GCODE_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getXMLFileViewer(wxString& ret)			{ PROPERTY(CncApplication_Tool_XML_FILE_VIEWER) 		ret.assign(p->GetValueAsString()); return ret; }
 const wxString& CncConfig::getBrowser(wxString& ret)				{ PROPERTY(CncApplication_Tool_BROWSER) 				ret.assign(p->GetValueAsString()); return ret; }

@@ -39,9 +39,9 @@
 #include <wx/stc/stc.h>
 #include <wx/textctrl.h>
 #include <wx/dataview.h>
+#include <wx/splitter.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
-#include <wx/splitter.h>
 #include <wx/radiobox.h>
 #include <wx/checkbox.h>
 #include <wx/listbook.h>
@@ -146,12 +146,17 @@ protected:
     wxPanel* m_panelToolBoxSvg;
     wxPanel* m_panelToolBoxGcode;
     wxPanel* m_panelToolBoxBinary;
+    wxStaticText* m_staticText6074;
     wxComboBox* m_cbBinaryViewMode;
     wxButton* m_btExtractSourceAsNewTpl;
     wxStyledTextCtrl* m_stcFileContent;
     wxStaticText* m_filePosition;
     wxTextCtrl* m_sourceEditStatus;
     wxStaticText* m_editMode;
+    wxPanel* m_panelTplSourceExt;
+    wxSimplebook* m_simpleBookSourceExt;
+    wxPanel* m_panelTplNull;
+    wxStaticText* m_staticText6112;
     wxPanel* m_panelTplUserAgent;
     wxTextCtrl* m_svgRootNode;
     wxStaticText* m_staticText1498;
@@ -161,6 +166,12 @@ protected:
     wxStaticText* m_staticText1500;
     wxDataViewListCtrl* m_dvListCtrlSvgUADetailInfo;
     wxTextCtrl* m_selectedUAInfo;
+    wxPanel* m_panelTplNestedInfo;
+    wxSplitterWindow* m_splitter6082;
+    wxPanel* m_splitterPage6086;
+    wxTextCtrl* m_nestedDataHeader;
+    wxPanel* m_splitterPage6090;
+    wxTextCtrl* m_nestedSource;
     wxPanel* m_mainBookSetup;
     wxStaticText* m_staticText5137;
     wxButton* m_loadConfiguration;
@@ -503,6 +514,12 @@ protected:
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
     wxButton* m_motionMonitorOptionDlg;
+    wxPanel* m_cncFile;
+    wxStaticText* m_staticText6138;
+    wxStyledTextCtrl* m_outboundFileSource;
+    wxPanel* m_cncPreview;
+    wxStaticText* m_staticText6140;
+    wxPanel* m_outboundPreviewPlaceholder;
     wxPanel* m_svgEmuResult;
     wxButton* m_svgEmuOpenFileAsSource;
     wxButton* m_svgEmuOpenFileAsSvg;
@@ -569,7 +586,9 @@ protected:
     wxStaticLine* m_staticLine680;
     wxStaticText* LableF;
     wxTextCtrl* m_configuredFeedSpeed;
+    wxTextCtrl* m_configuredFeedSpeedMode;
     wxTextCtrl* m_realtimeFeedSpeed;
+    wxTextCtrl* m_realtimeFeedSpeedMode;
     wxStaticLine* m_staticLine602341127;
     wxStaticText* m_staticText5651;
     wxStaticBitmap* m_refPosState;
@@ -795,8 +814,6 @@ protected:
     virtual void svgEditFindPrev(wxCommandEvent& event) { event.Skip(); }
     virtual void selectBinaryEditorViewMode(wxCommandEvent& event) { event.Skip(); }
     virtual void extractSourceAsNewTpl(wxCommandEvent& event) { event.Skip(); }
-    virtual void marginClickFileContent(wxStyledTextEvent& event) { event.Skip(); }
-    virtual void fileContentChange(wxStyledTextEvent& event) { event.Skip(); }
     virtual void selectUAInboundPathList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUAUseDirectiveList(wxDataViewEvent& event) { event.Skip(); }
     virtual void selectUADetailInfo(wxDataViewEvent& event) { event.Skip(); }
@@ -1073,6 +1090,7 @@ public:
     wxButton* GetSvgEditFindPrev() { return m_svgEditFindPrev; }
     wxPanel* GetPanelToolBoxSvg() { return m_panelToolBoxSvg; }
     wxPanel* GetPanelToolBoxGcode() { return m_panelToolBoxGcode; }
+    wxStaticText* GetStaticText6074() { return m_staticText6074; }
     wxComboBox* GetCbBinaryViewMode() { return m_cbBinaryViewMode; }
     wxButton* GetBtExtractSourceAsNewTpl() { return m_btExtractSourceAsNewTpl; }
     wxPanel* GetPanelToolBoxBinary() { return m_panelToolBoxBinary; }
@@ -1082,6 +1100,8 @@ public:
     wxTextCtrl* GetSourceEditStatus() { return m_sourceEditStatus; }
     wxStaticText* GetEditMode() { return m_editMode; }
     wxPanel* GetPanelTplEdit() { return m_panelTplEdit; }
+    wxStaticText* GetStaticText6112() { return m_staticText6112; }
+    wxPanel* GetPanelTplNull() { return m_panelTplNull; }
     wxTextCtrl* GetSvgRootNode() { return m_svgRootNode; }
     wxStaticText* GetStaticText1498() { return m_staticText1498; }
     wxDataViewListCtrl* GetDvListCtrlSvgUAInboundPathList() { return m_dvListCtrlSvgUAInboundPathList; }
@@ -1091,6 +1111,14 @@ public:
     wxDataViewListCtrl* GetDvListCtrlSvgUADetailInfo() { return m_dvListCtrlSvgUADetailInfo; }
     wxTextCtrl* GetSelectedUAInfo() { return m_selectedUAInfo; }
     wxPanel* GetPanelTplUserAgent() { return m_panelTplUserAgent; }
+    wxTextCtrl* GetNestedDataHeader() { return m_nestedDataHeader; }
+    wxPanel* GetSplitterPage6086() { return m_splitterPage6086; }
+    wxTextCtrl* GetNestedSource() { return m_nestedSource; }
+    wxPanel* GetSplitterPage6090() { return m_splitterPage6090; }
+    wxSplitterWindow* GetSplitter6082() { return m_splitter6082; }
+    wxPanel* GetPanelTplNestedInfo() { return m_panelTplNestedInfo; }
+    wxSimplebook* GetSimpleBookSourceExt() { return m_simpleBookSourceExt; }
+    wxPanel* GetPanelTplSourceExt() { return m_panelTplSourceExt; }
     wxNotebook* GetTemplateNotebook() { return m_templateNotebook; }
     wxPanel* GetMainBookSourcePanel() { return m_mainBookSourcePanel; }
     wxStaticText* GetStaticText5137() { return m_staticText5137; }
@@ -1433,6 +1461,12 @@ public:
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
     wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
     wxPanel* Get3DPane() { return m_3DPane; }
+    wxStaticText* GetStaticText6138() { return m_staticText6138; }
+    wxStyledTextCtrl* GetOutboundFileSource() { return m_outboundFileSource; }
+    wxPanel* GetCncFile() { return m_cncFile; }
+    wxStaticText* GetStaticText6140() { return m_staticText6140; }
+    wxPanel* GetOutboundPreviewPlaceholder() { return m_outboundPreviewPlaceholder; }
+    wxPanel* GetCncPreview() { return m_cncPreview; }
     wxButton* GetSvgEmuOpenFileAsSource() { return m_svgEmuOpenFileAsSource; }
     wxButton* GetSvgEmuOpenFileAsSvg() { return m_svgEmuOpenFileAsSvg; }
     wxButton* GetSvgEmuReload() { return m_svgEmuReload; }
@@ -1499,7 +1533,9 @@ public:
     wxStaticLine* GetStaticLine680() { return m_staticLine680; }
     wxStaticText* GetLableF() { return LableF; }
     wxTextCtrl* GetConfiguredFeedSpeed() { return m_configuredFeedSpeed; }
+    wxTextCtrl* GetConfiguredFeedSpeedMode() { return m_configuredFeedSpeedMode; }
     wxTextCtrl* GetRealtimeFeedSpeed() { return m_realtimeFeedSpeed; }
+    wxTextCtrl* GetRealtimeFeedSpeedMode() { return m_realtimeFeedSpeedMode; }
     wxStaticLine* GetStaticLine602341127() { return m_staticLine602341127; }
     wxStaticText* GetStaticText5651() { return m_staticText5651; }
     wxStaticBitmap* GetRefPosState() { return m_refPosState; }
@@ -1911,18 +1947,38 @@ public:
 class CncGamepadControllerStateBase : public wxPanel
 {
 protected:
+    wxSplitterWindow* m_splitter6032;
+    wxPanel* m_splitterPage6036;
+    wxStaticText* m_staticText6053;
     wxTextCtrl* m_gamepadTrace;
+    wxPanel* m_splitterPage6040;
+    wxStaticText* m_staticText6055;
+    wxTextCtrl* m_gamepadServiceTrace;
+    wxButton* m_btQueryGamepadService;
+    wxStaticLine* m_staticLine6051;
     wxButton* m_btStartGamepadService;
     wxButton* m_btStopGamepadService;
+    wxButton* m_btClearGamepadServiceTrace;
 
 protected:
+    virtual void queryGamepadService(wxCommandEvent& event) { event.Skip(); }
     virtual void startGamepadService(wxCommandEvent& event) { event.Skip(); }
     virtual void stopGamepadService(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearGamepadServiceTrace(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxStaticText* GetStaticText6053() { return m_staticText6053; }
     wxTextCtrl* GetGamepadTrace() { return m_gamepadTrace; }
+    wxPanel* GetSplitterPage6036() { return m_splitterPage6036; }
+    wxStaticText* GetStaticText6055() { return m_staticText6055; }
+    wxTextCtrl* GetGamepadServiceTrace() { return m_gamepadServiceTrace; }
+    wxPanel* GetSplitterPage6040() { return m_splitterPage6040; }
+    wxSplitterWindow* GetSplitter6032() { return m_splitter6032; }
+    wxButton* GetBtQueryGamepadService() { return m_btQueryGamepadService; }
+    wxStaticLine* GetStaticLine6051() { return m_staticLine6051; }
     wxButton* GetBtStartGamepadService() { return m_btStartGamepadService; }
     wxButton* GetBtStopGamepadService() { return m_btStopGamepadService; }
+    wxButton* GetBtClearGamepadServiceTrace() { return m_btClearGamepadServiceTrace; }
     CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncGamepadControllerStateBase();
 };

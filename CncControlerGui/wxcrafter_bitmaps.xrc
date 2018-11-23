@@ -275,6 +275,7 @@
   <object class="wxBitmap" name="book-add">bitmaps\book-add.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="book_green">bitmaps\book_green.png</object>
+  <object class="wxBitmap" name="book_red">bitmaps\book_red.png</object>
   <object class="wxBitmap" name="bookmark-2">bitmaps\bookmark-2.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bricks">bitmaps\bricks.png</object>
@@ -282,6 +283,7 @@
   <object class="wxBitmap" name="car">bitmaps\car.png</object>
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
+  <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
@@ -289,12 +291,14 @@
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
   <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="dialog-information-3 (2)">bitmaps\dialog-information-3 (2).png</object>
+  <object class="wxBitmap" name="dialog-question-2 (2)">bitmaps\dialog-question-2 (2).png</object>
   <object class="wxBitmap" name="dialog-warning-3 (2)">bitmaps\dialog-warning-3 (2).png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
   <object class="wxBitmap" name="document-open-5">bitmaps\document-open-5.png</object>
   <object class="wxBitmap" name="document-preview">bitmaps\document-preview.png</object>
+  <object class="wxBitmap" name="document-print-preview-3">bitmaps\document-print-preview-3.png</object>
   <object class="wxBitmap" name="document-save-3">bitmaps\document-save-3.png</object>
   <object class="wxBitmap" name="document-save-6">bitmaps\document-save-6.png</object>
   <object class="wxBitmap" name="document-save-as (2)">bitmaps\document-save-as (2).png</object>

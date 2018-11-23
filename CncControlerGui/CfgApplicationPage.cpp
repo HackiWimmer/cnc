@@ -140,6 +140,12 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 			registerProperty(CncApplication_Tool_FILE_BROWSER, prop);
 
 			//...............
+			prop = tools->AppendChild( new wxFileProperty("Binary File Viewer", NEXT_PROP_ID, "notepad"));
+			prop->Enable(true);
+			prop->SetHelpString("");
+			registerProperty(CncApplication_Tool_BIN_FILE_VIEWER, prop);
+			
+			//...............
 			prop = tools->AppendChild( new wxFileProperty("SVG File Viewer", NEXT_PROP_ID, "notepad"));
 			prop->Enable(true);
 			prop->SetHelpString("");

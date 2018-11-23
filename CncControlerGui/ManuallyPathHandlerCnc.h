@@ -10,10 +10,10 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 	public:
 		
 		struct MoveDefinition {
-			CncSpeed speedType 	= CncSpeedRapid;
-			bool absoluteMove 	= false;
-			bool toolState 		= false;
-			bool correctLimit   = true;
+			CncSpeedMode speedMode	= CncSpeedMode::CncSpeedRapid;
+			bool absoluteMove 		= false;
+			bool toolState 			= false;
+			bool correctLimit   	= true;
 			
 			double f = 0.0;
 			double x = 0.0;
@@ -43,7 +43,7 @@ class ManuallyPathHandlerCnc : public PathHandlerBase {
 	private:
 		CncControl* cncControl;
 		
-		CncSpeed lastSpeedType; 
+		CncSpeedMode lastSpeedMode; 
 		double lastSpeedValue;
 };
 

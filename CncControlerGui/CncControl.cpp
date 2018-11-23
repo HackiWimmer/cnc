@@ -13,9 +13,10 @@
 #include "SerialPort.h"
 #include "SerialSimulatorFacade.h"
 #include "SerialEmulatorNull.h"
-#include "SerialEmulatorStreamer.h"
-#include "SerialEmulatorFile.h"
-#include "SerialEmulatorSVG.h"
+#include "SerialEmulatorTextStreamer.h"
+#include "SerialEmulatorSvgStreamer.h"
+#include "SerialEmulatorGCodeStreamer.h"
+#include "SerialEmulatorBinaryStreamer.h"
 #include "CncMotionMonitor.h"
 #include "CncCommon.h"
 #include "CncControl.h"
@@ -39,7 +40,7 @@ CncControl::CncControl(CncPortType pt)
 , realtimeFeedSpeed_MM_MIN(MAX_FEED_SPEED_VALUE)
 , defaultFeedSpeedRapid_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , defaultFeedSpeedWork_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
-, configuredSpeedType(CncSpeedRapid)
+, configuredSpeedMode(CncSpeedRapid)
 , configuredFeedSpeed_MM_MIN(0.0)
 , durationCounter(0)
 , interruptState(false)
@@ -51,23 +52,22 @@ CncControl::CncControl(CncPortType pt)
 , guiCtlSetup(NULL)
 , positionCheck(true)
 , drawPaneMargin(30)
-, speedMonitorMode(DM_2D)
 {
 //////////////////////////////////////////////////////////////////
+	// Serial factory
 	if      ( pt == CncPORT ) 			serialPort = new SerialSpyPort(this);
 	else if ( pt == CncPORT_SIMU )		serialPort = new SerialSimulatorFacade(this);
 	else if ( pt == CncEMU_NULL )		serialPort = new SerialEmulatorNULL(this);
-	else if ( pt == CncEMU_SVG )		serialPort = new SerialEmulatorSVG(this);
-	else if ( pt == CncEMU_BIN )		serialPort = new SerialEmulatorStreamer(this);
+	else if ( pt == CncEMU_TXT)			serialPort = new SerialEmulatorTextStreamer(this);
+	else if ( pt == CncEMU_SVG)			serialPort = new SerialEmulatorSvgStreamer(this);
+	else if ( pt == CncEMU_GCODE)		serialPort = new SerialEmulatorGCodeStreamer(this);
+	else if ( pt == CncEMU_BIN )		serialPort = new SerialEmulatorBinaryStreamer(this);
 	else 								serialPort = new SerialSpyPort(this);
 	
 	serialPort->enableSpyOutput();
 	
 	// create default config
 	cncConfig = CncConfig::getGlobalCncConfig();
-	
-	// init pen handler
-	penHandler.reset();
 }
 ///////////////////////////////////////////////////////////////////
 CncControl::~CncControl() {
@@ -423,11 +423,6 @@ bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool already
 	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::resetDrawControlInfo() {
-///////////////////////////////////////////////////////////////////	
-	penHandler.reset();
-}
-///////////////////////////////////////////////////////////////////
 void CncControl::updateDrawControl() {
 ///////////////////////////////////////////////////////////////////
 	updatePreview3D(true); 
@@ -610,8 +605,7 @@ void CncControl::resetDurationCounter() {
 	wxASSERT(guiCtlSetup);
 	
 	durationCounter = 0;
-	penHandler.reset();
-	
+
 	if ( GET_GUI_CTL(passingTrace) && toolUpdateState == true )
 		GET_GUI_CTL(passingTrace)->SetValue(wxString() << durationCounter);
 }
@@ -620,7 +614,6 @@ void CncControl::initNextDuration() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
 	
-	penHandler.initNextDuration();
 	getSerial()->beginDuration(getDurationCounter());
 	
 	durationCounter++;
@@ -686,40 +679,46 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value, CncSpeed s) {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 	changeCurrentFeedSpeedXYZ_MM_MIN(value * 60, s);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeed s) {
+void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 	// always reset the realtime speed value
 	realtimeFeedSpeed_MM_MIN = MAX_FEED_SPEED_VALUE;
 	
-	const double maxValue = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
-	
 	// safety checks 
-	if ( value <= 0.0 )			value = maxValue;
+	const double maxValue = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+	if ( value <= 0.0 )			value = 0.0;
 	if ( value > maxValue )		value = maxValue;
 
-	//avoid the setter below if nothing will change
-	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) )
-		return;
+	// avoid the setter below if nothing will change
+	if ( configuredSpeedMode != s ) {
+		configuredSpeedMode = s;
 		
-	configuredSpeedType = s;
-	configuredFeedSpeed_MM_MIN = value;
+		displaySpeedMode(configuredSpeedMode);
+		
+		if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) 
+			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
+	}
 	
-	if ( THE_APP != NULL && THE_APP->GetBtSpeedControl()->GetValue() == false)
-		configuredFeedSpeed_MM_MIN = 0.0;
-	
-	if ( GET_GUI_CTL(configuredFeedSpeed) )
-		GET_GUI_CTL(configuredFeedSpeed)->ChangeValue(wxString::Format("%3.1lf", value));
-	
-	if ( processSetter(PID_SPEED_MM_MIN, (long)(configuredFeedSpeed_MM_MIN * DBL_FACT)) == false ) 
-		std::cerr << "changeCurrentFeedSpeedXYZ_MM_MIN: processSetter failed" << std::endl;
+	// avoid the setter below if nothing will change
+	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false ) {
+		configuredFeedSpeed_MM_MIN = value;
+		
+		if ( THE_APP != NULL && THE_APP->GetBtSpeedControl()->GetValue() == false)
+			configuredFeedSpeed_MM_MIN = 0.0;
+		
+		displaySpeedValue(value);
+			
+		if ( processSetter(PID_SPEED_MM_MIN, (int32_t)(configuredFeedSpeed_MM_MIN * DBL_FACT)) == false ) 
+			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_MM_MIN) failed" << std::endl;
+	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeed s) {
+void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 	double value = 0.0;
 	
@@ -801,7 +800,7 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 	if ( pos != prevPos ) {
 		
 		if ( IS_GUI_CTL_VALID(motionMonitor) ) {
-			vd.setVertice(getClientId(), getConfiguredSpeedType(), pos);
+			vd.setVertice(getClientId(), getConfiguredSpeedMode(), pos);
 			GET_GUI_CTL(motionMonitor)->appendVertice(vd);
 			
 			updatePreview3D(false);
@@ -809,7 +808,7 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 		
 		prevPos = pos;
 		
-#warning - to do: move flag to configuration
+		#warning - to do: move flag to configuration
 		if ( false ) {
 			if ( isPositionOutOfRange(pos, true) == true )
 				interrupt();
@@ -901,14 +900,19 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			//cnc::trc.logInfoMessage(ss);
 			break;
 		}
+		
 		// --------------------------------------------------------
-		case CITLimitInfo:
+		case CITLimit:
+		{
 			//std::clog << "::L: " << ci.xLimit << ", " << ci.yLimit << ", " << ci.zLimit << std::endl;
 			displayLimitStates(ci.xLimit, ci.yLimit, ci.zLimit);
 			
 			break;
+		}
+		
 		// --------------------------------------------------------
 		case CITPosition:
+		{
 			// update controller position
 			switch ( ci.posType ) {
 				case PID_X_POS: 		curCtlPos.setX(ci.xCtrlPos); 
@@ -943,13 +947,75 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			monitorPosition(curCtlPos);
 			
 			break;
-			
+		}
+		
 		// --------------------------------------------------------
 		default:
 			std::cerr << "CncControl::SerialControllerCallback:" << std::endl;
 			std::cerr << " No handler defined for controller info type:" << ci.infoType << std::endl;
 	}
 
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::SerialExecuteControllerCallback(const ContollerExecuteInfo& cei) {
+///////////////////////////////////////////////////////////////////
+	
+	auto checkSetterCount = [](unsigned char pid, size_t count, size_t ref) {
+		bool ret = (count == ref);
+		
+		if ( ret == false ) {
+			std::cerr << "CncControl::SerialExecuteControllerCallback(): Invalid Setter(" << ArduinoPIDs::getPIDLabel(pid) << ") value count: " 
+					  << "Given: " << count << ", Reference: " << ref
+					  << std::endl;
+		}
+		
+		return ret;
+	};
+	
+	switch ( cei.infoType ) {
+		// --------------------------------------------------------
+		case CEITSetter:
+		{
+			size_t size = cei.setterValueList.size();
+			
+			switch ( cei.setterPid ) {
+				case PID_TOOL_SWITCH:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
+												return false;
+												
+											powerOn = (bool)cei.setterValueList.front();
+											displayToolState(powerOn);
+											break;
+											
+				case PID_SPEED_FEED_MODE:	if ( checkSetterCount(cei.setterPid, size, 1) == false )
+												return false;
+											
+											configuredSpeedMode = (CncSpeedMode)(cei.setterValueList.front());
+											displaySpeedMode(configuredSpeedMode);
+											break;
+											
+				case PID_SPEED_MM_MIN:		if ( checkSetterCount(cei.setterPid, size, 1) == false )
+												return false;
+												
+											displaySpeedValue(cei.setterValueList.front() / DBL_FACT);
+											break;
+											
+				case PID_ENABLE_STEPPERS:	// nothing to do here
+											break;
+											
+				default:					std::cerr << "CncControl::SerialExecuteControllerCallback(): Not registered Setter PID: " 
+				                                      << ArduinoPIDs::getPIDLabel(cei.setterPid) 
+													  << std::endl;
+			}
+			
+			break;
+		}
+		
+		// --------------------------------------------------------
+		default:
+			std::cerr << "CncControl::SerialExecuteControllerCallback:"  << std::endl;
+			std::cerr << " No handler defined for controller info type:" << cei.infoType << std::endl;
+	}
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -985,11 +1051,6 @@ bool CncControl::SerialCallback() {
 	return !isInterrupted();
 }
 ///////////////////////////////////////////////////////////////////
-double CncControl::getRealtimeFeedSpeed_MM_MIN() {
-///////////////////////////////////////////////////////////////////
-	return realtimeFeedSpeed_MM_MIN;
-}
-///////////////////////////////////////////////////////////////////
 void CncControl::postAppPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	static CncLongPosition lastAppPos;
@@ -1007,7 +1068,7 @@ void CncControl::postAppPosition(unsigned char pid) {
 			if ( GET_GUI_CTL(mainFrame) )
 				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, 
 				                                                    getClientId(), 
-				                                                    configuredSpeedType, 
+				                                                    configuredSpeedMode, 
 				                                                    getConfiguredFeedSpeed_MM_MIN(), 
 				                                                    getRealtimeFeedSpeed_MM_MIN(), 
 				                                                    curAppPos)
@@ -1030,7 +1091,7 @@ void CncControl::postCtlPosition(unsigned char pid) {
 		if ( GET_GUI_CTL(mainFrame) )
 			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, 
 			                                                    getClientId(), 
-			                                                    configuredSpeedType, 
+			                                                    configuredSpeedMode, 
 			                                                    getConfiguredFeedSpeed_MM_MIN(), 
 			                                                    getRealtimeFeedSpeed_MM_MIN(), 
 			                                                    curCtlPos)
@@ -1243,11 +1304,8 @@ void CncControl::setToolState(bool defaultStyle) {
 		toolState.setState(CncToolStateControl::red);
 	} else {
 		if ( toolUpdateState == true ) {
-			if ( powerOn == true ) {
-				toolState.setState(CncToolStateControl::green);
-			} else {
-				toolState.setState(CncToolStateControl::red);
-			}
+			if ( powerOn == true ) 	toolState.setState(CncToolStateControl::green);
+			else 					toolState.setState(CncToolStateControl::red);
 		}
 	}
 }
@@ -1260,9 +1318,7 @@ void CncControl::switchToolOn() {
 	if ( powerOn == false ) { 
 		if ( processSetter(PID_TOOL_SWITCH, 1) ) {
 			powerOn = true;
-			if ( GET_GUI_CTL(testToggleTool) )
-				GET_GUI_CTL(testToggleTool)->SetValue(powerOn);
-			setToolState();
+			displayToolState(powerOn);
 		}
 	}
 }
@@ -1275,11 +1331,29 @@ void CncControl::switchToolOff(bool force) {
 	if ( powerOn == true || force == true ) {
 		if ( processSetter(PID_TOOL_SWITCH, 0) ) {
 			powerOn = false;
-			if ( GET_GUI_CTL(testToggleTool) )
-				GET_GUI_CTL(testToggleTool)->SetValue(powerOn);
-			setToolState();
+			displayToolState(powerOn);
 		}
 	}
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::displayToolState(const bool state) {
+///////////////////////////////////////////////////////////////////
+	if ( GET_GUI_CTL(testToggleTool) )
+		GET_GUI_CTL(testToggleTool)->SetValue(state);
+		
+	setToolState();
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::displaySpeedValue(const double value) {
+///////////////////////////////////////////////////////////////////
+	if ( THE_APP != NULL )
+		THE_APP->GetConfiguredFeedSpeed()->ChangeValue(wxString::Format("%3.1lf", value));
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::displaySpeedMode(const CncSpeedMode mode) {
+///////////////////////////////////////////////////////////////////
+	if ( THE_APP != NULL )
+		THE_APP->GetConfiguredFeedSpeedMode()->ChangeValue(wxString::Format("%c", cnc::getCncSpeedTypeAsCharacter(mode)));
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::displayGetterList(const PidList& pidList) {

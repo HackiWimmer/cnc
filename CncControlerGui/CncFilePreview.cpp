@@ -48,5 +48,22 @@ bool CncFilePreview::selectGCodePreview(const wxString& fileName) {
 	gfp.setDisplayWarnings(false);
 	return gfp.processRelease();
 }
-
-
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::selectPreview(const wxString& fileName) {
+///////////////////////////////////////////////////////////////////
+	TemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
+	
+	switch ( tf ) {
+		case TplSvg:		selectSVGPreview(fileName);
+							break;
+							
+		case TplGcode:		selectGCodePreview(fileName);
+							break;
+							
+		default:			std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 
+									  << cnc::getTemplateFormatAsString(tf)
+									  << std::endl;
+	}
+	
+	return true;
+}

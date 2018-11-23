@@ -4,7 +4,7 @@
 GCodePathHandlerGL::GCodePathHandlerGL(CncGCodePreview* gl) 
 : GCodePathHandlerBase()
 , glControl(gl)
-, currentSpeed(CncSpeed::CncSpeedRapid)
+, currentSpeed(CncSpeedMode::CncSpeedRapid)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(glControl);
@@ -37,9 +37,9 @@ bool GCodePathHandlerGL::processLinearMove(bool alreadyRendered) {
 	return true; 
 }
 //////////////////////////////////////////////////////////////////
-bool GCodePathHandlerGL::changeCurrentFeedSpeedXYZ(CncSpeed s, double value) {
+bool GCodePathHandlerGL::changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value) {
 //////////////////////////////////////////////////////////////////
-	currentSpeed = s;
+	currentSpeed = sm;
 	return true;
 }
 

@@ -46,7 +46,7 @@ namespace GLI {
 			}
 			
 			//////////////////////////////////////////////
-			void setVertice(long id, CncSpeed speedType, const CncPosition<T>& cp) {
+			void setVertice(long id, CncSpeedMode speedType, const CncPosition<T>& cp) {
 				_id = id;
 				
 				_x = cp.getX();

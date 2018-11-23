@@ -250,39 +250,68 @@ void CncGamepadControllerState::mangageMainView(const GamepadEvent& state) {
 	mainFrame->GetGpBmp1()->GetParent()->Layout();
 }
 ///////////////////////////////////////////////////////////////////
-void CncGamepadControllerState::startGamepadService(wxCommandEvent& event) {
+void CncGamepadControllerState::executeCommand(const wxString& cmd) {
 ///////////////////////////////////////////////////////////////////
 	wxArrayString output;
 	wxArrayString errors;
 	
-	wxExecute("net start Ds3Service", output, errors);
+	wxExecute(cmd, output, errors);
 	
 	if ( output.GetCount() > 0 ) {
-		for (int i = 0; i < output.GetCount(); i++)
-			m_gamepadTrace->AppendText(output[i]);
+		for (size_t i = 0; i < output.GetCount(); i++)
+			m_gamepadServiceTrace->AppendText(wxString::Format("  %s\n", output[i]));
 	}
 	
 	if ( errors.GetCount() > 0 ) {
-		for (int i = 0; i < errors.GetCount(); i++)
-			m_gamepadTrace->AppendText(errors[i]);
+		
+		const wxTextAttr defaultAttri = m_gamepadServiceTrace->GetDefaultStyle();
+		
+		wxTextAttr errorAttri = defaultAttri;
+		errorAttri.SetTextColour(wxColour(241, 75, 84));
+		m_gamepadServiceTrace->SetDefaultStyle(errorAttri);
+		
+		for (size_t i = 0; i < errors.GetCount(); i++)
+			m_gamepadServiceTrace->AppendText(wxString::Format("  %s\n", errors[i]));
+			
+		m_gamepadServiceTrace->SetDefaultStyle(defaultAttri);
 	}
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::startGamepadService(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_gamepadServiceTrace->AppendText(wxString::Format("%s\n", "Try to start the service . . ."));
+	
+	//services.msc
+	#ifdef __WXMSW__
+		executeCommand("net start Ds3Service");
+	#else
+		m_gamepadServiceTrace->AppendText("Start Gamepad Service isn't supported");
+	#endif
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::stopGamepadService(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxArrayString output;
-	wxArrayString errors;
+	m_gamepadServiceTrace->AppendText(wxString::Format("%s\n", "Try to stop the service . . ."));
 	
-	wxExecute("net stop Ds3Service", output, errors);
+	#ifdef __WXMSW__
+		executeCommand("net stop Ds3Service");
+	#else
+		m_gamepadServiceTrace->AppendText("Stop Gamepad Service isn't supported");
+	#endif
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::queryGamepadService(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_gamepadServiceTrace->AppendText(wxString::Format("%s\n", "Query the service state . . ."));
 	
-	if ( output.GetCount() > 0 ) {
-		for (unsigned int i = 0; i < output.GetCount(); i++)
-			m_gamepadTrace->AppendText(output[i]);
-	}
-	
-	if ( errors.GetCount() > 0 ) {
-		for (unsigned int i = 0; i < errors.GetCount(); i++)
-			m_gamepadTrace->AppendText(errors[i]);
-	}
-
+	#ifdef __WXMSW__
+		executeCommand("sc query Ds3Service");
+	#else
+		m_gamepadServiceTrace->AppendText("Query Gamepad Service isn't supported");
+	#endif
+}
+///////////////////////////////////////////////////////////////////
+void CncGamepadControllerState::clearGamepadServiceTrace(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_gamepadServiceTrace->Clear();
 }

@@ -315,6 +315,7 @@ class CncConfig {
 		
 		const wxString& getFileBrowser(wxString& ret);
 		const wxString& getSVGFileViewer(wxString& ret);
+		const wxString& getBINFileViewer(wxString& ret);
 		const wxString& getGCodeFileViewer(wxString& ret);
 		const wxString& getXMLFileViewer(wxString& ret);
 		const wxString& getBrowser(wxString& ret);

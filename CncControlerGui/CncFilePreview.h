@@ -13,6 +13,8 @@ class CncFilePreview : public CncFilePreviewBase
 		bool selectSVGPreview(const wxString& fileName);
 		bool selectGCodePreview(const wxString& fileName);
 		
+		bool selectPreview(const wxString& fileName);
+		
 	private:
 		CncGCodePreview* gcodePreview;
 		

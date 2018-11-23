@@ -38,6 +38,10 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		void update(const GamepadEvent& state);
 
 	protected:
+    virtual void clearGamepadServiceTrace(wxCommandEvent& event);
+		void executeCommand(const wxString& cmd);
+		
+		virtual void queryGamepadService(wxCommandEvent& event);
 		virtual void startGamepadService(wxCommandEvent& event);
 		virtual void stopGamepadService(wxCommandEvent& event);
 		

@@ -595,7 +595,9 @@ bool BinaryFileParser::extractSourceContentAsFile(const wxString& binFileName, w
 //////////////////////////////////////////////////////////////////
 bool BinaryFileParser::extractViewInfo(ViewType vt, const wxString& binFileName, ViewInfo& vi) {
 //////////////////////////////////////////////////////////////////
-	vi.content.clear();
+	vi.viewContent.clear();
+	vi.dataHeader.clear();
+	vi.sourceContent.clear();
 	
 	if ( wxFile::Exists(binFileName) == false )
 		return false;
@@ -628,7 +630,10 @@ bool BinaryFileParser::extractViewInfo(ViewType vt, const wxString& binFileName,
 	parser.getSourceParameter(XMLSourceNode_AttribFile, 	vi.file);
 	parser.getSourceParameter(XMLSourceNode_AttribType, 	vi.type);
 	parser.getSourceParameter(XMLSourceNode_AttribCheckSum, vi.checksum);
-	parser.getDataBodyView(vi.content);
+	
+	parser.getSourceContent(vi.sourceContent);
+	parser.getDataHeaderContent(vi.dataHeader);
+	parser.getDataBodyView(vi.viewContent);
 	
 	return true;
 }

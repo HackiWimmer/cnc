@@ -80,6 +80,7 @@
 	#define CncApplication_Tpl_DEFALT_FILE 			"CncApplication.Template/DEFAULT_FILE"
 	#define CncApplication_Tool_FILE_BROWSER		"CncApplication.Tools/FILE_BROWSER"
 	#define CncApplication_Tool_SVG_FILE_VIEWER 	"CncApplication.Tools/SVG_FILE_VIEWER"
+	#define CncApplication_Tool_BIN_FILE_VIEWER 	"CncApplication.Tools/BIN_FILE_VIEWER"
 	#define CncApplication_Tool_GCODE_FILE_VIEWER 	"CncApplication.Tools/GCODE_FILE_VIEWER"
 	#define CncApplication_Tool_XML_FILE_VIEWER 	"CncApplication.Tools/XML_FILE_VIEWER"
 	#define CncApplication_Tool_BROWSER			 	"CncApplication.Tools/BROWSER"

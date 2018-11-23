@@ -58,7 +58,7 @@ bool GCodePathHandlerCnc::processLinearMove(bool alreadyRendered) {
 	return cncControl->moveAbsLinearMetricXYZ(currentPos.getX(), currentPos.getY(), currentPos.getZ(), alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////
-bool GCodePathHandlerCnc::changeCurrentFeedSpeedXYZ(CncSpeed s, double value) {
+bool GCodePathHandlerCnc::changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
 	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(value, s);

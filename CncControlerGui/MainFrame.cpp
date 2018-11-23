@@ -41,7 +41,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include <wx/msgdlg.h>
 #include <wx/evtloop.h>
 #include <wx/dataview.h>
-#include "CncSourceEditor.h"
 #include <wx/wfstream.h>
 #include <wx/datstrm.h>
 #include <wx/txtstrm.h>
@@ -53,6 +52,8 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
+#include "CncSourceEditor.h"
+#include "CncOutboundEditor.h"
 #include "CncNumberFormatter.h"
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
@@ -156,17 +157,19 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , canClose(true)
 , useSecureRunDlg(true)
 , evaluatePositions(true)
-, templateFileLoading(false)
 , ignoreDirControlEvents(false)
 , runConfirmationInfo(RunConfirmationInfo::Wait)
 , traceTimerCounter(0)
 , lastPortName(wxT(""))
 , defaultPortName(wxT(""))
 , cnc(new CncControl(CncEMU_NULL))
+, sourceEditor(NULL)
+, outboundEditor(NULL)
 , motionMonitor(NULL)
 , serialSpy(NULL)
 , fileView(NULL)
 , mainFilePreview(NULL)
+, outboundFilePreview(NULL)
 , monitorFilePreview(NULL)
 , toolMagaizne(NULL)
 , positionSpy(NULL)
@@ -432,6 +435,10 @@ void MainFrame::installCustControls() {
 	sourceEditor = new CncSourceEditor(this);
 	GblFunc::replaceControl(m_stcFileContent, sourceEditor);
 	
+	// Outbound Editor
+	outboundEditor = new CncOutboundEditor(this);
+	GblFunc::replaceControl(m_outboundFileSource, outboundEditor);
+	
 	//Spy
 	serialSpy = new CncSpyControl(this, wxID_ANY, m_serialSpyDetails);
 	GblFunc::replaceControl(m_serialSpy, serialSpy);
@@ -440,10 +447,14 @@ void MainFrame::installCustControls() {
 	fileView = new CncFileView(this);
 	GblFunc::replaceControl(m_mainFileViewPlaceholder, fileView);
 	
-	// File Preview
+	// Inbound File Preview
 	mainFilePreview = new CncFilePreview(this);
 	GblFunc::replaceControl(m_filePreviewPlaceholder, mainFilePreview);
 	
+	// Outbound File Preview
+	outboundFilePreview = new CncFilePreview(this);
+	GblFunc::replaceControl(m_outboundPreviewPlaceholder, outboundFilePreview);
+
 	// File Preview
 	monitorFilePreview = new CncFilePreview(this);
 	GblFunc::replaceControl(m_monitorTemplatePreviewPlaceHolder, monitorFilePreview);
@@ -485,6 +496,7 @@ void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(outboundEditor);
 	registerGuiControl(m_checkBoxToolEnabled);
 	registerGuiControl(m_manuallyCorrectLimitPos);
 	registerGuiControl(m_rcSecureDlg);
@@ -1279,22 +1291,22 @@ void MainFrame::decoratePortSelector(bool list) {
 	m_portSelector->Clear();
 	
 	// add default ports
-	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorBIN )		m_portSelector->Append(_portEmulatorBIN, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorBIN, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
-
-
-	/*
-	if ( lastPortName == _portEmulatorSVG )		m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorSVG, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorTEXT )	m_portSelector->Append(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portSimulatorNULL )	m_portSelector->Append(_portSimulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portSimulatorNULL, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
-	*/
+	if ( lastPortName == _portEmulatorSVG )		m_portSelector->Append(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	// add com ports
+	if ( lastPortName == _portEmulatorGCODE )	m_portSelector->Append(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
+	if ( lastPortName == _portEmulatorBIN )		m_portSelector->Append(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										m_portSelector->Append(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
+	// add com ports (10)
 	int pStart 	= 0;
 	int pEnd 	= 256;
 	
@@ -1398,8 +1410,6 @@ void MainFrame::initialize(void) {
 	lruFileList.setListControl(m_lruList);
 	
 	createAnimationControl();
-	createStcFileControlPopupMenu();
-	createStcEmuControlPopupMenu();
 	decorateSearchButton();
 	decorateSpeedControlBtn(true);
 	switchMonitorButton(true);
@@ -1551,8 +1561,6 @@ void MainFrame::determineCncOutputControls() {
 	guiCtlSetup->testToggleTool			= m_testToggleTool;
 	
 	guiCtlSetup->passingTrace			= m_passingCount;
-	
-	guiCtlSetup->configuredFeedSpeed	= m_configuredFeedSpeed;
 	
 	guiCtlSetup->toolState 				= m_toolState;
 	
@@ -1812,11 +1820,25 @@ bool MainFrame::connectSerialPort() {
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
 		
+	} else if ( sel == _portEmulatorTEXT ) {
+		cnc = new CncControl(CncEMU_TXT);
+		cs.assign(CncFileNameService::getCncOutboundTxtFileName());
+		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
+		
 	} else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
 		cs.assign(CncFileNameService::getCncOutboundSvgFileName());
 		GBL_CONFIG->setProbeMode(true);
 		showSVGEmuResult();
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
+		
+	} else if ( sel == _portEmulatorGCODE ) {
+		cnc = new CncControl(CncEMU_GCODE);
+		cs.assign(CncFileNameService::getCncOutboundGCodeFileName());
+		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
 		
@@ -1946,8 +1968,6 @@ void MainFrame::enableControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 	// set global state
 	canClose = state;
-	
-	//ShowFullScreen(!state);
 	
 	// enable all relevant controls
 	enableGuiControls(state);
@@ -2280,7 +2300,7 @@ TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
 	if ( fileName == NULL )	fn.assign(getCurrentTemplatePathFileName());
 	else					fn.assign(fileName);
 	
-	return CncSourceEditor::evaluateTemplateFormatFromFileName(fn);
+	return cnc::getTemplateFormatFromFileName(fn);
 }
 ///////////////////////////////////////////////////////////////////
 const wxString& MainFrame::getCurrentTemplateFileName() {
@@ -2297,24 +2317,34 @@ const wxString& MainFrame::getCurrentTemplatePathFileName() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::showSvgExtPages(bool show) {
+void MainFrame::decorateExtTemplatePages(TemplateFormat tf) {
 ///////////////////////////////////////////////////////////////////
-	if ( show == false ) {
-		if (m_templateNotebook->FindPage(m_panelTplUserAgent) != wxNOT_FOUND )
-			m_templateNotebook->RemovePage(m_templateNotebook->FindPage(m_panelTplUserAgent));
-			
-	} else {
-		// correct insert order is very important
-		if (m_templateNotebook->FindPage(m_panelTplUserAgent) == wxNOT_FOUND ) {
-			m_templateNotebook->InsertPage(TemplateBookSelection::VAL::USER_AGENT_PANEL, m_panelTplUserAgent, "", false);
-			templateNbInfo->decorate(TemplateBookSelection::VAL::USER_AGENT_PANEL);
-		}
+	switch ( tf ) {
+		case TplSvg:		m_simpleBookSourceExt->SetSelection(SourceExtBookSelection::VAL::USER_AGENT_PANEL);
+							break;
+							
+		case TplBinary:		m_simpleBookSourceExt->SetSelection(SourceExtBookSelection::VAL::NESTED_INFO_PANEL);
+							break;
+							
+		default:			m_simpleBookSourceExt->SetSelection(SourceExtBookSelection::VAL::NULL_PANEL);
 	}
+	
+	wxImageList* soureImgList = m_simpleBookSourceExt->GetImageList();
+	wxASSERT(soureImgList);
+	wxIcon   ico(soureImgList->GetIcon(m_simpleBookSourceExt->GetSelection()));
+	wxString txt(m_simpleBookSourceExt->GetPageText(m_simpleBookSourceExt->GetSelection()));
+	
+	wxImageList* destImgList  = m_templateNotebook->GetImageList();
+	wxASSERT(destImgList);
+	destImgList->Replace(TemplateBookSelection::VAL::EXT_INFO_PANEL, ico);
+	
+	m_templateNotebook->SetPageImage(TemplateBookSelection::VAL::EXT_INFO_PANEL, TemplateBookSelection::VAL::EXT_INFO_PANEL);
+	m_templateNotebook->SetPageText(TemplateBookSelection::VAL::EXT_INFO_PANEL,  txt);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::fillFileDetails(bool fileLoaded) {
 ///////////////////////////////////////////////////////////////////
-	wxString details, parameter, source;
+	wxString details, dataHeader, sourceContent;
 	
 	if ( fileLoaded == true ) {
 		wxString fileName(getCurrentTemplatePathFileName());
@@ -2324,14 +2354,20 @@ void MainFrame::fillFileDetails(bool fileLoaded) {
 		details.append(wxString::Format("File Size       : %s\n", file.GetHumanReadableSize()));
 		
 		if ( getCurrentTemplateFormat() == TplBinary ) {
-			BinaryFileParser::extractSourceContentAsString(fileName, source);
-			BinaryFileParser::extractDataHeaderAsString(fileName, parameter);
+			BinaryFileParser::ViewInfo vi;
+			if ( BinaryFileParser::extractViewInfo(BinaryFileParser::ViewType::HexRaw, fileName, vi) == true ) {
+				dataHeader.assign(vi.dataHeader);
+				sourceContent.assign(vi.sourceContent);
+				
+			} else {
+				std::cerr << "MainFrame::fillFileDetails(): Can't read external information" << std::endl;
+			}
 		}
 	}
 	
 	m_filePreviewDetails->ChangeValue(details);
-	m_filePreviewParameter->ChangeValue(parameter);
-	m_filePreviewSource->ChangeValue(source);
+	m_filePreviewParameter->ChangeValue(dataHeader);
+	m_filePreviewSource->ChangeValue(sourceContent);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectEditorToolBox(bool fileLoaded) {
@@ -2372,25 +2408,19 @@ bool MainFrame::openFile(int pageToSelect) {
 	// from getCurrentTemplateFormat
 	selectMainBookSourcePanel();
 
-	templateFileLoading = true;
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
 		
 		case TplSvg:	ret = sourceEditor->openFile(getCurrentTemplatePathFileName());
-						if ( ret == true )
-							showSvgExtPages();
 						break;
 		
 		case TplGcode:	ret = sourceEditor->openFile(getCurrentTemplatePathFileName());
-						hideSvgExtPages();
 						break;
 						
 		case TplBinary:	ret = sourceEditor->openFile(getCurrentTemplatePathFileName());
-						hideSvgExtPages();
 						break;
 						
-		default:		hideSvgExtPages();
-						std::cerr << "MainFrame::openFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
+		default:		std::cerr << "MainFrame::openFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
 						ret = false;
 	}
 	
@@ -2398,20 +2428,31 @@ bool MainFrame::openFile(int pageToSelect) {
 	fillFileDetails(ret);
 	
 	if ( ret == true ) {
+		decorateExtTemplatePages(getCurrentTemplateFormat());
 		evaluateTemplateModificationTimeStamp();
 		
 		if ( inboundFileParser != NULL )
 			inboundFileParser->clearControls();
 		
 		clearMotionMonitor();
+		
 		cnc->getSerial()->clearSVG();
 		
 		introduceCurrentFile();
 	}
 	
 	updateFileContentPosition(0, 0);
-	templateFileLoading = false;
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::prepareMotionMonitorViewType(const CncDimensions type) {
+///////////////////////////////////////////////////////////////////
+	switch ( type ) {
+		case CncDimensions::CncDimension2D:		motionMonitor->viewTop();
+												break;
+												
+		default:								motionMonitor->viewIso1();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::introduceCurrentFile() {
@@ -2423,6 +2464,8 @@ void MainFrame::introduceCurrentFile() {
 	// publish model type
 	const GLContextBase::ModelType mt = sourceEditor->getModelType();
 	motionMonitor->setModelType(mt);
+	
+	prepareMotionMonitorViewType(sourceEditor->getModelViewType());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::prepareNewTemplateFile() {
@@ -2610,11 +2653,15 @@ void MainFrame::renameTemplateFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplateSourceExtern(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	saveFile();
+	wxString externalFile(getCurrentTemplatePathFileName());
+	wxString tool; CncConfig::getGlobalCncConfig()->getEditorTool(tool);
 	
-	wxString tool;
-	CncConfig::getGlobalCncConfig()->getEditorTool(tool);
-	openFileExtern(tool, getCurrentTemplatePathFileName());
+	if ( getCurrentTemplateFormat() == TplBinary)
+		BinaryFileParser::extractSourceContentAsFile(getCurrentTemplatePathFileName(), externalFile);
+	else
+		saveFile();
+	
+	openFileExtern(tool, externalFile);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openTemplateSvgExtern(wxCommandEvent& event) {
@@ -2622,18 +2669,28 @@ void MainFrame::openTemplateSvgExtern(wxCommandEvent& event) {
 	wxString tool;
 	
 	switch ( getCurrentTemplateFormat() ) {
+		case TplBinary:
+					// binary files are readonly, thereforenow saveFile() necessary here
+					CncConfig::getGlobalCncConfig()->getBINFileViewer(tool);
+					openFileExtern(tool, getCurrentTemplatePathFileName());
+					break;
+					
 		case TplSvg:
 					saveFile();
 					CncConfig::getGlobalCncConfig()->getSVGFileViewer(tool);
 					openFileExtern(tool, getCurrentTemplatePathFileName());
 					break;
+					
 		case TplGcode:
 					saveFile();
 					CncConfig::getGlobalCncConfig()->getGCodeFileViewer(tool);
 					openFileExtern(tool, getCurrentTemplatePathFileName());
 					break;
+					
 		default:
-					std::clog << "No external editor availiable for current file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
+					std::clog << "No external editor availiable for current file: " 
+					          << getCurrentTemplatePathFileName().c_str() 
+							  << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2933,7 +2990,7 @@ bool MainFrame::processManualTemplate() {
 	inboundFileParser = p;
 
 	ManuallyPathHandlerCnc::MoveDefinition move;
-	move.speedType 		= CncSpeedUserDefined;
+	move.speedMode 		= CncSpeedUserDefined;
 	move.absoluteMove	= ( m_mmRadioCoordinates->GetSelection() == 0 );
 	move.toolState		= m_checkBoxToolEnabled->GetValue();
 	move.correctLimit   = m_manuallyCorrectLimitPos->GetValue();
@@ -4756,10 +4813,10 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 		
 	TemplateFormat tf = getCurrentTemplateFormat(fn);
 	switch ( tf ) {
-		case TplSvg:		ctrl->selectSVGPreview(fn);
+		case TplSvg:		ctrl->selectPreview(fn);
 							break;
 							
-		case TplGcode:		ctrl->selectGCodePreview(fn);
+		case TplGcode:		ctrl->selectPreview(fn);
 							break;
 							
 		case TplBinary:		{
@@ -5368,26 +5425,18 @@ void MainFrame::emuContentRightDown(wxMouseEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::createStcEmuControlPopupMenu() {
-///////////////////////////////////////////////////////////////////
-	if ( stcEmuContentPopupMenu != NULL )
-		return;
-
-	stcEmuContentPopupMenu = SvgEditPopup::createMenu(m_stcEmuSource, stcEmuContentPopupMenu, false);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::createStcFileControlPopupMenu() {
-///////////////////////////////////////////////////////////////////
-	if ( stcFileContentPopupMenu != NULL )
-		return;
-
-	stcFileContentPopupMenu = SvgEditPopup::createMenu(sourceEditor, stcFileContentPopupMenu, true);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::decorateOutboundSaveControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 	m_miSaveEmuOutput->Enable(state);
 	m_btSaveOutboundAsTemplate->Enable(state);
+	
+	if ( state == true ) {
+		wxString outboundFile(cnc->getSerial()->getPortName());
+		outboundEditor->openFile(outboundFile);
+		
+		#warning
+		outboundFilePreview->selectPreview(outboundFile);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateSearchButton() {
@@ -5674,33 +5723,6 @@ void MainFrame::toggleEmuWordWrapMode(wxCommandEvent& event) {
 void MainFrame::toggleTemplateWordWrapMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	sourceEditor->SetWrapMode(!m_btSvgToggleWordWrap->GetValue());
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::marginClickFileContent(wxStyledTextEvent& event) {
-///////////////////////////////////////////////////////////////////
-	//folding
-	if ( event.GetMargin() == MARGIN_FOLD ) {
-		int lineClick = sourceEditor->LineFromPosition(event.GetPosition());
-		int levelClick = sourceEditor->GetFoldLevel(lineClick);
-		
-		if ( (levelClick & wxSTC_FOLDLEVELHEADERFLAG ) > 0) {
-			sourceEditor->ToggleFold(lineClick);
-		}
-	}
-	
-	// break points
-	if ( event.GetMargin() == MARGIN_BREAKPOINT || event.GetMargin() == MARGIN_LINE_NUMBERS ) {
-		int lineClick = sourceEditor->LineFromPosition(event.GetPosition());
-
-		if ( sourceEditor->MarginGetText(lineClick) == "B" ) {
-			sourceEditor->MarginSetText(lineClick, wxT(" "));
-			sourceEditor->MarginSetStyle(lineClick, TE_DEFAULT_STYLE);
-		} else {
-			sourceEditor->MarginSetText(lineClick, wxT("B"));
-			sourceEditor->MarginSetStyle(lineClick, TE_BREAKPOINT_STYLE);
-		}
-	}
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::marginClickEmuSource(wxStyledTextEvent& event) {
@@ -6164,8 +6186,6 @@ void MainFrame::traceMotionMonitorVecties(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor() {
 ///////////////////////////////////////////////////////////////////
-	cnc->resetDrawControlInfo();
-	
 	motionMonitor->clear();
 	vectiesListCtrl->clear();
 	statisticSummaryListCtrl->resetValues();
@@ -6225,36 +6245,6 @@ void MainFrame::requestPins(wxCommandEvent& event) {
 void MainFrame::clearControllerMsgHistory(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_controllerMsgHistory->Clear();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::fileContentChange(wxStyledTextEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// todo currently not tested
-	event.Skip();
-	
-	bool isInsert = event.GetModificationType() & wxSTC_MOD_INSERTTEXT;
-	bool isDelete = event.GetModificationType() & wxSTC_MOD_DELETETEXT;
-	
-	if ( isInsert || isDelete) {
-		int numlines(event.GetLinesAdded());
-		
-		// ignore this event incase we are in the middle of file reloading
-		if( templateFileLoading == false/*GetReloadingFile() == false && GetMarginWidth(EDIT_TRACKER_MARGIN_ID */) /* margin is visible */ {
-			int curline(sourceEditor->LineFromPosition(event.GetPosition()));
-
-			if(numlines == 0) {
-				// probably only the current line was modified
-				sourceEditor->MarginSetText(curline, wxT(" "));
-				sourceEditor->MarginSetStyle(curline, TE_LINE_MODIFIED_STYLE);
-			} else {
-				for(int i = 0; i <= numlines; i++) {
-					sourceEditor->MarginSetText(curline + i, wxT(" "));
-					sourceEditor->MarginSetStyle(curline + i, TE_LINE_MODIFIED_STYLE);
-				}
-			}
-			 
-		}
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearSerialSpy() {
@@ -6487,56 +6477,8 @@ bool MainFrame::verifyPathGenertorNode(wxXmlDocument& xmlDoc, const wxString& no
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::decodeSvgFragment(wxMouseEvent& event, wxStyledTextCtrl* ctl) {
-///////////////////////////////////////////////////////////////////
-	if ( event.CmdDown() == false ) {
-		event.Skip(true);
-		return;
-	}
-	
-	if ( ctl == NULL ) {
-		event.Skip(true);
-		return;
-	}
-
-	int prevCp = ctl->GetCurrentPos();
-	int curPos = prevCp;
-	
-	// find left numeric fence
-	char c = (char)ctl->GetCharAt(curPos);
-	while ( isdigit(c) != 0 || c == '.' || c == ',' || c == ' ' || c == '+' || c == '-' )
-		c = (char)ctl->GetCharAt(curPos--);
-	
-	int start = curPos + 2;
-	curPos = prevCp;
-	
-	// find right numeric fence
-	c = (char)ctl->GetCharAt(curPos--);
-	while ( isdigit(c) != 0 || c == '.' || c == ',' || c == ' ' || c == '+' || c == '-' )
-		c = (char)ctl->GetCharAt(curPos++);
-	
-	int end = curPos - 1;
-	
-	// check is something numeric is found
-	if ( start >= end ) {
-		event.Skip(true);
-		return;
-	}
-		
-	// process
-	event.Skip(false);
-	ctl->SetSelection(start, end);
-	m_cbUCValueFrom->SetValue(ctl->GetTextRange(start, end));
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::fileContentDClick(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	decodeSvgFragment(event, sourceEditor);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::emuContentDClick(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	decodeSvgFragment(event, m_stcEmuSource);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::closeUnitCalculator(wxCommandEvent& event) {
@@ -7607,6 +7549,11 @@ void MainFrame::selectBinaryEditorViewMode(wxCommandEvent& event) {
 	sourceEditor->changeBinaryViewType(vt);
 }
 /////////////////////////////////////////////////////////////////////
+void MainFrame::saveOutboundAsNewTplFromMenu(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	saveOutboundAsNewTplFromButton(event);
+}
+/////////////////////////////////////////////////////////////////////
 void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxString outboundFile(cnc->getSerial()->getPortName());
@@ -7620,32 +7567,39 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 	wxString inboundFile(getCurrentTemplatePathFileName());
 	inboundFile.append(".bct");
 	
-	wxFileDialog saveFileDialog(this, 
-	                            headline, 
-								inboundFile, 
-								inboundFile,
-								"",
-								wxFD_SAVE);
-								
-	if ( saveFileDialog.ShowModal() == wxID_CANCEL ) { 
-		return;
-	}
-	
-	wxString newFile(saveFileDialog.GetPath());
-	if ( wxFile::Exists(newFile) == true ) {
-		
-		wxString msg(wxString::Format("Template '%s'\nalready exists. Overide it?", newFile));
-		wxMessageDialog dlg(this, msg, headline, wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
-		
-		if ( dlg.ShowModal() == wxID_NO ) 
+	wxString newFile;
+	while ( true ) {
+		wxFileDialog saveFileDialog(this, 
+									headline, 
+									inboundFile, 
+									inboundFile,
+									"",
+									wxFD_SAVE);
+									
+		if ( saveFileDialog.ShowModal() == wxID_CANCEL ) { 
 			return;
+		}
+		
+		newFile.assign(saveFileDialog.GetPath());
+		if ( wxFile::Exists(newFile) == true ) {
+			
+			wxString msg(wxString::Format("Template '%s'\nalready exists. Overide it?", newFile));
+			wxMessageDialog dlg(this, msg, headline, wxYES|wxNO|wxICON_QUESTION|wxCENTRE);
+			
+			if ( dlg.ShowModal() == wxID_YES ) 
+				break; //while
+				
+		} else {
+			break; //while
+			
+		}
 	}
 	
-	if ( wxCopyFile(outboundFile, saveFileDialog.GetPath(), true) == false ) {
+	if ( wxCopyFile(outboundFile, newFile, true) == false ) {
 		
 		std::cerr << "File copy failed:"                         << std::endl;
 		std::cerr << " from:" << cnc->getSerial()->getPortName() << std::endl;
-		std::cerr << " to:"   << saveFileDialog.GetPath()        << std::endl;
+		std::cerr << " to:"   << newFile				         << std::endl;
 		return;
 	}
 	
@@ -7654,9 +7608,9 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 
 	if ( dlg.ShowModal() == wxID_YES ) {
 		
-		wxFileName x(outboundFile);
-		m_inputFileName->SetValue(x.GetFullName());
-		m_inputFileName->SetHint(x.GetFullPath());
+		wxFileName tpl(newFile);
+		m_inputFileName->SetValue(tpl.GetFullName());
+		m_inputFileName->SetHint(tpl.GetFullPath());
 		
 		if ( !openFile() ) {
 			std::cerr << "Error while open file: " << outboundFile << std::endl;
@@ -7665,11 +7619,6 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 		
 		prepareAndShowMonitorTemplatePreview(true);
 	}
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::saveOutboundAsNewTplFromMenu(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	saveOutboundAsNewTplFromButton(event);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {

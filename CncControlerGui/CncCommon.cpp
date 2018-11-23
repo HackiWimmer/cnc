@@ -1,3 +1,4 @@
+#include <wx/filename.h>
 #include "CncCommon.h"
 
 //////////////////////////////////////////////////////////////
@@ -52,7 +53,7 @@ const wxString& cnc::dblFormat3(double d1, double d2, double d3, const wxString&
 	return s;
 }
 //////////////////////////////////////////////////////////////
-const char cnc::getCncSpeedTypeAsCharacter(CncSpeed s) {
+const char cnc::getCncSpeedTypeAsCharacter(CncSpeedMode s) {
 //////////////////////////////////////////////////////////////
 	switch( s ) {
 		case CncSpeedWork: 			return cnc::WORK_SPEED_CHAR; 			break;
@@ -68,6 +69,7 @@ const char* cnc::getTemplateFormatAsString(const TemplateFormat tf) {
 //////////////////////////////////////////////////////////////
 	switch ( tf ) {
 		case TplUnknown:	return "UNKNOWN";
+		case TplText:		return "TXT";
 		case TplSvg:		return "SVG";
 		case TplGcode:		return "GCODE";
 		case TplBinary:		return "BIN"; 
@@ -77,7 +79,34 @@ const char* cnc::getTemplateFormatAsString(const TemplateFormat tf) {
 	
 	return "????";
 }
-
+//////////////////////////////////////////////////////////////
+const TemplateFormat cnc::getTemplateFormatFromExtention(const char* extention) {
+//////////////////////////////////////////////////////////////
+	if ( extention == NULL )
+		return TplUnknown;
+	
+	wxString e(extention);
+	e.MakeUpper();
+	
+	if      ( e == "SVG" )		return TplSvg;
+	else if ( e == "GCODE") 	return TplGcode;
+	else if ( e == "NGC") 		return TplGcode;
+	else if ( e == "BCT") 		return TplBinary;
+	else if ( e == "TXT") 		return TplText;
+	
+	return TplUnknown;
+}
+//////////////////////////////////////////////////////////////
+const TemplateFormat cnc::getTemplateFormatFromFileName(const char* fileName) {
+//////////////////////////////////////////////////////////////
+	if ( fileName == NULL )
+		return TplUnknown;
+		
+	wxFileName fn(fileName);
+	wxString ext(fn.GetExt());
+	
+	return cnc::getTemplateFormatFromExtention(ext);
+}
 //////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream& os, const wxPoint& p) {
 //////////////////////////////////////////////////////////////

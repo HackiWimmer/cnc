@@ -1,11 +1,11 @@
-#ifndef SERIAL_EMULATOR_STREAMER_CLASS
-#define SERIAL_EMULATOR_STREAMER_CLASS
+#ifndef SERIAL_EMULATOR_BIN_STREAMER_CLASS
+#define SERIAL_EMULATOR_BIN_STREAMER_CLASS
 
 #include "CncBinaryTemplateStreamer.h"
 #include "SerialEmulatorNull.h"
 
-class SerialEmulatorStreamer : public SerialEmulatorNULL 
-                             , public CncBinaryTemplateStreamer 
+class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL 
+                                   , public CncBinaryTemplateStreamer 
 {
 	protected:
 	
@@ -16,22 +16,21 @@ class SerialEmulatorStreamer : public SerialEmulatorNULL
 		
 	public:
 	
-		explicit SerialEmulatorStreamer(CncControl* cnc);
-		explicit SerialEmulatorStreamer(const char *fileName);
-		virtual ~SerialEmulatorStreamer();
+		explicit SerialEmulatorBinaryStreamer(CncControl* cnc);
+		explicit SerialEmulatorBinaryStreamer(const char *fileName);
+		virtual ~SerialEmulatorBinaryStreamer();
 		
 		// returns the class name
-		virtual const char* getClassName() { return "SerialEmulatorStreamer"; }
-		
+		virtual const char* getClassName() { return "SerialEmulatorBinaryStreamer"; }
 		virtual const char* getPortName()  { return getOutboundFileName(); }
 		
 		//Open file
 		virtual bool connect(const char* fileName);
 		//Close file
-		virtual void disconnect(void);
+		virtual void disconnect();
 		
 		virtual bool isOutputAsTemplateAvailable();
-
+		
 		// trigger
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr);
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr);

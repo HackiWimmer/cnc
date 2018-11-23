@@ -15,7 +15,9 @@ class BinaryFileParser : protected CncBinaryTemplateStreamer
 	public:
 	
 		struct ViewInfo {
-			wxString 					content;
+			wxString 					viewContent;
+			wxString					dataHeader;
+			wxString					sourceContent;
 			
 			wxString					file;
 			wxString					type;

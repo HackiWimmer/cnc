@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include "CncCommon.h"
 
 struct CncCommandDecoder {
 	
@@ -10,7 +11,7 @@ struct CncCommandDecoder {
 		unsigned char pid;
 		unsigned int count;
 		
-		std::vector<int32_t> values;
+		cnc::SetterValueList values;
 	};
 
 	static bool decodeMove(const unsigned char *buffer, unsigned int nbByte, int32_t& dx , int32_t& dy , int32_t& dz);

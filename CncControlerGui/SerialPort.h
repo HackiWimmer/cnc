@@ -12,6 +12,7 @@
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
 
+//------------------------------------------------------------
 typedef std::map<unsigned char, cnc::SetterValueList> 	SetterMap;
 typedef std::vector<unsigned char> 						PidList;
 typedef std::vector<int32_t> 							GetterValues;
@@ -19,6 +20,7 @@ typedef std::map<unsigned char, GetterValues> 			GetterListValues;
 
 class CncControl;
 
+//------------------------------------------------------------
 class SerialCommandLocker {
 	
 	private:
@@ -44,6 +46,7 @@ class SerialCommandLocker {
 		static bool isCommandActive()			{ return lockedCommand != CMD_INVALID; }
 };
 
+//------------------------------------------------------------
 struct LastSerialResult {
 	unsigned char cmd 				    = CMD_INVALID;
 	unsigned char ret				    = RET_NULL;
@@ -54,6 +57,7 @@ struct LastSerialResult {
 	}
 };
 
+//------------------------------------------------------------
 struct SerialFetchInfo {
 	unsigned char command				= CMD_INVALID;
 	unsigned char multiByteResult[2048];
@@ -114,7 +118,8 @@ struct SerialFetchInfo {
 	} Tc;
 };
 
-enum ControllerInfoType {CITUnknown, CITHeartbeat, CITPosition, CITLimitInfo};
+//------------------------------------------------------------
+enum ControllerInfoType { CITUnknown, CITHeartbeat, CITPosition, CITLimit };
 struct ContollerInfo {
 	ControllerInfoType infoType			= CITUnknown;
 	unsigned char command				= '\0';
@@ -126,15 +131,12 @@ struct ContollerInfo {
 	unsigned char supportStateValue		= 0;
 	
 	unsigned char posType				= '\0';
-	bool synchronizeAppPos					= false;
+	bool synchronizeAppPos				= false;
 	int32_t xCtrlPos					= 0;
 	int32_t yCtrlPos					= 0;
 	int32_t zCtrlPos					= 0;
 	
 	double feedSpeed					= MIN_LONG;
-	
-	int setterId						= 0;
-	int32_t	setterValue					= 0L;
 	
 	int32_t xLimit						= 0L;
 	int32_t yLimit						= 0L;
@@ -143,10 +145,21 @@ struct ContollerInfo {
 	bool hasSpeedInformation() { return feedSpeed > 0.0; }
 };
 
+//------------------------------------------------------------
+enum ControllerExecuteInfoType { CEITUnknown, CEITSetter };
+struct ContollerExecuteInfo {
+
+	ControllerExecuteInfoType infoType	= CEITUnknown;
+	unsigned char setterPid				= PID_UNKNOWN;
+	cnc::SetterValueList setterValueList;
+};
+
+//------------------------------------------------------------
 struct ControllerMsgInfo {
 	std::stringstream message;
 };
 
+//------------------------------------------------------------
 struct SvgOutputParameters  {
 	double 				zoomFactor 			= 1.0;
 	bool 				copyOrigPath 		= true;
@@ -287,6 +300,7 @@ class Serial : public SerialOSD {
 		virtual void stopMeasurementIntern() {}
 		
 		bool sendSerialControllerCallback(ContollerInfo& ci);
+		bool sendSerialControllerCallback(ContollerExecuteInfo& cei);
 		
 		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command);
 		inline bool convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream);

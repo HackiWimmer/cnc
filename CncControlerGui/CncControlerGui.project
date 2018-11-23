@@ -8,6 +8,14 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
+    <VirtualDirectory Name="Editor">
+      <File Name="CncBaseEditor.cpp"/>
+      <File Name="CncBaseEditor.h"/>
+      <File Name="CncOutboundEditor.cpp"/>
+      <File Name="CncOutboundEditor.h"/>
+      <File Name="CncSourceEditor.cpp"/>
+      <File Name="CncSourceEditor.h"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="Inbound - Binary">
       <VirtualDirectory Name="PathHandler">
         <File Name="BinaryPathHandlerCnc.cpp"/>
@@ -160,14 +168,16 @@
       <File Name="SerialSimulatorFacade.cpp"/>
       <File Name="SerialSimulatorFacade.h"/>
       <VirtualDirectory Name="Native">
-        <File Name="SerialEmulatorStreamer.cpp"/>
-        <File Name="SerialEmulatorStreamer.h"/>
-        <File Name="SerialEmulatorSVG.h"/>
-        <File Name="SerialEmulatorSVG.cpp"/>
+        <File Name="SerialEmulatorGCodeStreamer.cpp"/>
+        <File Name="SerialEmulatorGCodeStreamer.h"/>
+        <File Name="SerialEmulatorSvgStreamer.cpp"/>
+        <File Name="SerialEmulatorSvgStreamer.h"/>
+        <File Name="SerialEmulatorTextStreamer.cpp"/>
+        <File Name="SerialEmulatorBinaryStreamer.cpp"/>
+        <File Name="SerialEmulatorBinaryStreamer.h"/>
+        <File Name="SerialEmulatorTextStreamer.h"/>
         <File Name="SerialEmulatorNull.h"/>
         <File Name="SerialEmulatorNull.cpp"/>
-        <File Name="SerialEmulatorFile.h"/>
-        <File Name="SerialEmulatorFile.cpp"/>
       </VirtualDirectory>
       <File Name="SerialPort.cpp"/>
       <VirtualDirectory Name="Simulators">
@@ -182,8 +192,6 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
-      <File Name="CncSourceEditor.cpp"/>
-      <File Name="CncSourceEditor.h"/>
       <File Name="CncCommandDecoder.cpp"/>
       <File Name="CncCommandDecoder.h"/>
       <File Name="CncSha1Wrapper.h"/>

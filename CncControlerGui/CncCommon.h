@@ -15,11 +15,15 @@ std::ostream& operator<<(std::ostream& os, const wxPoint& p);
 std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 
 // global strings
-#define _portSimulatorNULL	"<PortSimulator(dev/null)>"
-#define _portEmulatorNULL 	"<PortEmulator(dev/null)>"
-#define _portEmulatorSVG  	"<PortEmulator(SVGFile)>"
-#define _portEmulatorBIN  	"<PortEmulator(Binary)>"
 #define _maxSpeedLabel		"<MAX>"
+
+	#define _portSimulatorNULL	"<PortSimulator(dev/null)>"
+
+#define _portEmulatorNULL 	"<PortEmulator(dev/null)>"
+#define _portEmulatorTEXT  	"<PortEmulator(File::Text)>"
+#define _portEmulatorSVG  	"<PortEmulator(File::SVG)>"
+#define _portEmulatorGCODE	"<PortEmulator(File::GCode)>"
+#define _portEmulatorBIN  	"<PortEmulator(File::Binary)>"
 
 // make std globally available
 //using namespace std;
@@ -32,12 +36,12 @@ static const int 	UNDEFINED_LINE_NUMBER 				= -1;
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
 enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
-enum CncSpeed 					{ CncSpeedWork, CncSpeedRapid, CncSpeedMax, CncSpeedUserDefined };
-enum CncPortType 				{ CncPORT, CncPORT_SIMU, CncEMU_NULL, CncEMU_SVG, CncEMU_BIN };
+enum CncSpeedMode				{ CncSpeedWork, CncSpeedRapid, CncSpeedMax, CncSpeedUserDefined };
+enum CncPortType 				{ CncPORT, CncPORT_SIMU, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
 enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
 enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4 };
-enum TemplateFormat 			{ TplUnknown, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
+enum TemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
 enum CncRefPositionMode 		{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6 };
 
@@ -50,7 +54,7 @@ namespace cnc {
 	const char WORK_SPEED_CHAR			= 'W';
 	const char MAX_SPEED_CHAR 			= 'M';
 	const char USER_DEFIND_SPEED_CHAR 	= 'U';
-	const char getCncSpeedTypeAsCharacter(CncSpeed s);
+	const char getCncSpeedTypeAsCharacter(CncSpeedMode s);
 	
 	extern CncBasicLogStream  cex1;
 	extern CncTraceLogStream  trc;
@@ -63,6 +67,8 @@ namespace cnc {
 	const wxString& dblFormat2(double d1, double d2, const wxString& delimiter = _T(","));
 	const wxString& dblFormat3(double d1, double d2, double d3, const wxString& delimiter = _T(","));
 	
+	const TemplateFormat getTemplateFormatFromFileName(const char* fileName);
+	const TemplateFormat getTemplateFormatFromExtention(const char* extention);
 	const char* getTemplateFormatAsString(const TemplateFormat tf);
 	
 	void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor = 1);
@@ -70,6 +76,7 @@ namespace cnc {
 
 };
 
+//-----------------------------------------------------------------
 class MainBookSelection {
 	public:
 		enum VAL {
@@ -82,6 +89,7 @@ class MainBookSelection {
 		};
 };
 
+//-----------------------------------------------------------------
 class MonitorBookSelection {
 	public:
 		enum VAL {
@@ -90,24 +98,40 @@ class MonitorBookSelection {
 		};
 };
 
+//-----------------------------------------------------------------
 class TemplateBookSelection {
 	public:
 		enum VAL {
 			SOURCE_PANEL				= 0,
-			USER_AGENT_PANEL			= 1
+			EXT_INFO_PANEL				= 1
 		};
 };
 
+//-----------------------------------------------------------------
+class SourceExtBookSelection {
+	public:
+		enum VAL {
+			NULL_PANEL					= 0,
+			USER_AGENT_PANEL			= 1,
+			NESTED_INFO_PANEL			= 2
+		};
+};
+
+//-----------------------------------------------------------------
 class OutboundSelection{
 	public:
 		enum VAL {
 			SUMMARY_PANEL				= 0,
 			MOTION_MONITOR_PANAL		= 1,
-			SVG_OUTPUT_PANEL			= 2,
-			SVG_SOURCE_PANEL			= 3
+			FILE_PANEL					= 2,
+			PREVIEW_PANEL				= 3,
+			
+				SVG_OUTPUT_PANEL			= 4, // to del
+				SVG_SOURCE_PANEL			= 5
 		};
 };
 
+//-----------------------------------------------------------------
 class StatisticSelection{
 	public:
 		enum VAL {
@@ -116,6 +140,7 @@ class StatisticSelection{
 		};
 };
 
+//-----------------------------------------------------------------
 class OutboundCfgSelection{
 	public:
 		enum VAL {
@@ -127,6 +152,7 @@ class OutboundCfgSelection{
 		};
 };
 
+//-----------------------------------------------------------------
 class TestBookSelection {
 	public:
 		enum VAL {
@@ -137,6 +163,7 @@ class TestBookSelection {
 		};
 };
 
+//-----------------------------------------------------------------
 class LoggerSelection {
 	public:
 		enum VAL {

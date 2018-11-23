@@ -330,6 +330,10 @@ inline unsigned char processSetter() {
                                   break;
 
     // processSetter() ............................................
+    case PID_SPEED_FEED_MODE:     // currently nothing to do
+                                  break;
+
+    // processSetter() ............................................
     case PID_ACCEL_PROFILE:       // todo
                                   controller.setupAccelProfile(values[0].l,
                                                                values[1].l,
