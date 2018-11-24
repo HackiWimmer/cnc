@@ -66,6 +66,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		bool selectLineNumber(unsigned long ln, const char* searchKey = NULL);
 		
+		void clearContent();
 		void prepareNewTemplateFile(TemplateFormat tf);
 		bool openFile(const wxString& fileName);
 		
@@ -96,9 +97,19 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			wxColour clOperator		= wxColour(255,128,128);
 		};
 		
-		Styles styles;
-		FileInfo fileInfo;
-		wxMenu* svgPopupMenu;
+		struct Flags {
+			bool handleBreakpoints		= true;
+			bool handleKeyCommands		= true;
+		};
+		
+		Styles 			styles;
+		Flags			flags;
+		FileInfo 		fileInfo;
+		wxMenu* 		svgPopupMenu;
+		wxStaticText* 	ctlEditMode;
+		wxStaticText* 	ctlColunmPostion;
+		wxTextCtrl*		ctlStatus;
+		
 		bool fileLoadingActive;
 		
 		virtual void initialize() = 0;
@@ -129,6 +140,11 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		virtual void onLeftUp(wxMouseEvent& event);
 		virtual void onLeftDClick(wxMouseEvent& event);
 		virtual void onRightDown(wxMouseEvent& event);
+		
+		
+		wxStaticText* 	getCtlEditMode() 	{ wxASSERT(ctlEditMode); 		return ctlEditMode; }
+		wxStaticText* 	getCtlColumnPos() 	{ wxASSERT(ctlColunmPostion); 	return ctlColunmPostion; }
+		wxTextCtrl*		getCtlStatus() 		{ wxASSERT(ctlStatus); 			return ctlStatus; }
 		
 		wxDECLARE_EVENT_TABLE();
 };

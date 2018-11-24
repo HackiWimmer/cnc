@@ -1,5 +1,6 @@
 #include <iostream>
 #include "SvgEditPopup.h"
+#include "MainFrame.h"
 #include "CncSourceEditor.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -16,5 +17,11 @@ CncSourceEditor::~CncSourceEditor() {
 ///////////////////////////////////////////////////////////////////
 void CncSourceEditor::initialize() {
 ///////////////////////////////////////////////////////////////////
-	svgPopupMenu = SvgEditPopup::createMenu(this, svgPopupMenu, true);
+	flags.handleBreakpoints		= true;
+	flags.handleKeyCommands		= true;
+
+	svgPopupMenu				= SvgEditPopup::createMenu(this, svgPopupMenu, true);
+	ctlEditMode					= THE_APP->GetFilePosition();
+	ctlColunmPostion			= THE_APP->GetFilePosition();
+	ctlStatus					= THE_APP->GetSourceEditStatus();
 }

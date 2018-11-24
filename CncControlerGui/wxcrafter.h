@@ -49,9 +49,9 @@
 #include "CncZView.h"
 #include <wx/scrolwin.h>
 #include <wx/listctrl.h>
-#include <wx/webview.h>
 #include <wx/timer.h>
 #include <wx/treectrl.h>
+#include <wx/webview.h>
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/collpane.h>
@@ -416,10 +416,6 @@ protected:
     wxNotebook* m_notebook5987;
     wxPanel* m_panel5989;
     wxTextCtrl* m_filePreviewDetails;
-    wxPanel* m_panel5993;
-    wxTextCtrl* m_filePreviewParameter;
-    wxPanel* m_panel5995;
-    wxTextCtrl* m_filePreviewSource;
     wxPanel* m_panel4398;
     wxStaticText* m_staticText4402;
     wxTextCtrl* m_currentFileMangerPreviewFileName;
@@ -456,8 +452,8 @@ protected:
     wxStaticText* m_staticText1283132;
     wxButton* m_btClearMsgHistory;
     wxTextCtrl* m_controllerMsgHistory;
-    wxPanel* m_3DPane;
-    wxBitmapToggleButton* m_btSaveOutboundAsTemplate;
+    wxPanel* m_cnc3DPane;
+    wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
     wxPanel* m_placeholderPanel;
     wxBitmapToggleButton* m_bmpToggleBtn59541;
     wxBitmapToggleButton* m_bmpToggleBtn5954;
@@ -516,26 +512,15 @@ protected:
     wxButton* m_motionMonitorOptionDlg;
     wxPanel* m_cncFile;
     wxStaticText* m_staticText6138;
+    wxBitmapToggleButton* m_btSaveOutboundAsTemplate2;
+    wxBitmapToggleButton* m_btToggleOutboundEditorWordWrap;
     wxStyledTextCtrl* m_outboundFileSource;
+    wxStaticText* m_outboundPosition;
+    wxTextCtrl* m_outboundEditStatus;
+    wxStaticText* m_outboundEditMode;
     wxPanel* m_cncPreview;
     wxStaticText* m_staticText6140;
     wxPanel* m_outboundPreviewPlaceholder;
-    wxPanel* m_svgEmuResult;
-    wxButton* m_svgEmuOpenFileAsSource;
-    wxButton* m_svgEmuOpenFileAsSvg;
-    wxButton* m_svgEmuReload;
-    wxButton* m_svgEmuClear;
-    wxButton* m_svgEmuToggleOrigPath;
-    wxButton* m_svgEmuZoomHome;
-    wxButton* m_svgEmuZoomMinus;
-    wxButton* m_svgEmuZoomPlus;
-#if wxUSE_WEBVIEW
-    wxWebView* m_svgView;
-#endif // wxUSE_WEBVIEW
-
-    wxPanel* m_svgEmuSource;
-    wxBitmapToggleButton* m_svgEmuToggleWordWrap;
-    wxStyledTextCtrl* m_stcEmuSource;
     wxPanel* m_monitorTemplatePanel;
     wxPanel* m_monitorTemplatePreviewPlaceHolder;
     wxPanel* m_panel5144;
@@ -921,20 +906,7 @@ protected:
     virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void openMotionMonitorOptionDlg(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuOpenFileAsSource(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuReload(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuClear(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuToogleOriginalPath(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuZoomHome(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuZoomMinus(wxCommandEvent& event) { event.Skip(); }
-    virtual void svgEmuZoomPlus(wxCommandEvent& event) { event.Skip(); }
-    #if wxUSE_WEBVIEW
-    #endif // wxUSE_WEBVIEW
-    virtual void toggleEmuWordWrapMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void emuContentRightDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void marginClickEmuSource(wxStyledTextEvent& event) { event.Skip(); }
-    virtual void emuContentDClick(wxMouseEvent& event) { event.Skip(); }
+    virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
     virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
@@ -1361,10 +1333,6 @@ public:
     wxPanel* GetSplitterPage6009() { return m_splitterPage6009; }
     wxTextCtrl* GetFilePreviewDetails() { return m_filePreviewDetails; }
     wxPanel* GetPanel5989() { return m_panel5989; }
-    wxTextCtrl* GetFilePreviewParameter() { return m_filePreviewParameter; }
-    wxPanel* GetPanel5993() { return m_panel5993; }
-    wxTextCtrl* GetFilePreviewSource() { return m_filePreviewSource; }
-    wxPanel* GetPanel5995() { return m_panel5995; }
     wxNotebook* GetNotebook5987() { return m_notebook5987; }
     wxPanel* GetSplitterPage6013() { return m_splitterPage6013; }
     wxSplitterWindow* GetSplitter6005() { return m_splitter6005; }
@@ -1403,7 +1371,7 @@ public:
     wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
-    wxBitmapToggleButton* GetBtSaveOutboundAsTemplate() { return m_btSaveOutboundAsTemplate; }
+    wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
     wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
     wxBitmapToggleButton* GetBmpToggleBtn59541() { return m_bmpToggleBtn59541; }
     wxBitmapToggleButton* GetBmpToggleBtn5954() { return m_bmpToggleBtn5954; }
@@ -1460,26 +1428,18 @@ public:
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
     wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
-    wxPanel* Get3DPane() { return m_3DPane; }
+    wxPanel* GetCnc3DPane() { return m_cnc3DPane; }
     wxStaticText* GetStaticText6138() { return m_staticText6138; }
+    wxBitmapToggleButton* GetBtSaveOutboundAsTemplate2() { return m_btSaveOutboundAsTemplate2; }
+    wxBitmapToggleButton* GetBtToggleOutboundEditorWordWrap() { return m_btToggleOutboundEditorWordWrap; }
     wxStyledTextCtrl* GetOutboundFileSource() { return m_outboundFileSource; }
+    wxStaticText* GetOutboundPosition() { return m_outboundPosition; }
+    wxTextCtrl* GetOutboundEditStatus() { return m_outboundEditStatus; }
+    wxStaticText* GetOutboundEditMode() { return m_outboundEditMode; }
     wxPanel* GetCncFile() { return m_cncFile; }
     wxStaticText* GetStaticText6140() { return m_staticText6140; }
     wxPanel* GetOutboundPreviewPlaceholder() { return m_outboundPreviewPlaceholder; }
     wxPanel* GetCncPreview() { return m_cncPreview; }
-    wxButton* GetSvgEmuOpenFileAsSource() { return m_svgEmuOpenFileAsSource; }
-    wxButton* GetSvgEmuOpenFileAsSvg() { return m_svgEmuOpenFileAsSvg; }
-    wxButton* GetSvgEmuReload() { return m_svgEmuReload; }
-    wxButton* GetSvgEmuClear() { return m_svgEmuClear; }
-    wxButton* GetSvgEmuToggleOrigPath() { return m_svgEmuToggleOrigPath; }
-    wxButton* GetSvgEmuZoomHome() { return m_svgEmuZoomHome; }
-    wxButton* GetSvgEmuZoomMinus() { return m_svgEmuZoomMinus; }
-    wxButton* GetSvgEmuZoomPlus() { return m_svgEmuZoomPlus; }
-    wxWebView* GetSvgView() { return m_svgView; }
-    wxPanel* GetSvgEmuResult() { return m_svgEmuResult; }
-    wxBitmapToggleButton* GetSvgEmuToggleWordWrap() { return m_svgEmuToggleWordWrap; }
-    wxStyledTextCtrl* GetStcEmuSource() { return m_stcEmuSource; }
-    wxPanel* GetSvgEmuSource() { return m_svgEmuSource; }
     wxNotebook* GetOutboundNotebook() { return m_outboundNotebook; }
     wxPanel* GetMonitorBookCncPanel() { return m_monitorBookCncPanel; }
     wxPanel* GetMonitorTemplatePreviewPlaceHolder() { return m_monitorTemplatePreviewPlaceHolder; }

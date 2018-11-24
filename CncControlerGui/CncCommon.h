@@ -36,7 +36,7 @@ static const int 	UNDEFINED_LINE_NUMBER 				= -1;
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
 enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
-enum CncSpeedMode				{ CncSpeedWork, CncSpeedRapid, CncSpeedMax, CncSpeedUserDefined };
+enum CncSpeedMode				{ CncSpeedWork = 0, CncSpeedRapid = 1, CncSpeedMax = 2, CncSpeedUserDefined = 3 }; // dont change the values
 enum CncPortType 				{ CncPORT, CncPORT_SIMU, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
 enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
@@ -124,10 +124,7 @@ class OutboundSelection{
 			SUMMARY_PANEL				= 0,
 			MOTION_MONITOR_PANAL		= 1,
 			FILE_PANEL					= 2,
-			PREVIEW_PANEL				= 3,
-			
-				SVG_OUTPUT_PANEL			= 4, // to del
-				SVG_SOURCE_PANEL			= 5
+			PREVIEW_PANEL				= 3
 		};
 };
 

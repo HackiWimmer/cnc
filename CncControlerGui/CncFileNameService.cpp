@@ -6,7 +6,6 @@
 #include "CncSha1Wrapper.h"
 #include "CncFileNameService.h"
 
-
 #ifdef __WXMSW__
 	wxString CncFileNameService::_configFileName("CncController.windows.ini");
 #endif
@@ -24,7 +23,9 @@ wxString CncFileNameService::_ret(wxT(""));
 wxString CncFileNameService::_executablePath(wxT(""));
 wxString CncFileNameService::_homeDirectory(wxT(""));
 wxString CncFileNameService::_tempDirectory(wxT(""));
-wxString CncFileNameService::_configDir(wxT(""));
+wxString CncFileNameService::_configDirectory(wxT(""));
+wxString CncFileNameService::_baseDirectory(wxT(""));
+wxString CncFileNameService::_databaseDirectory(wxT(""));
 wxString CncFileNameService::_session(wxT(""));
 
 wxString globalSessionString;
@@ -73,6 +74,8 @@ void CncFileNameService::init() {
 	
 	if ( _session.IsEmpty() )
 		_session.assign("Default");
+		
+	wxString sep(wxFileName::GetPathSeparator());
 	
 	wxString exe = wxStandardPaths::Get().GetExecutablePath();
 	wxFileName f(exe);
@@ -81,29 +84,32 @@ void CncFileNameService::init() {
 		_executablePath = f.GetVolume() + wxFileName::GetVolumeSeparator();
  
 	_executablePath += f.GetPath(wxPATH_GET_SEPARATOR);
-	
-	_homeDirectory = wxFileName::GetHomeDir() + wxFileName::GetPathSeparator();
-	_tempDirectory = wxFileName::GetTempDir() + wxFileName::GetPathSeparator() + _appTempDir + wxFileName::GetPathSeparator();
+	_homeDirectory 	 = wxFileName::GetHomeDir() + sep;
+	_tempDirectory 	 = wxFileName::GetTempDir() + sep + _appTempDir + sep;
 		
 	if ( wxFileName::DirExists(_tempDirectory) == false )
 		wxFileName::Mkdir(_tempDirectory); 
 		
-	_tempDirectory = wxFileName::GetTempDir() + wxFileName::GetPathSeparator() + _appTempDir + wxFileName::GetPathSeparator() + _session + wxFileName::GetPathSeparator();
+	_tempDirectory = wxFileName::GetTempDir() + sep + _appTempDir + sep + _session + sep;
 	if ( wxFileName::DirExists(_tempDirectory) == false )
 		wxFileName::Mkdir(_tempDirectory); 
 
-	
 	wxFileName cfg(_executablePath + _configFileName);
-	if ( cfg.Exists( ) )	_configDir = _executablePath;
-	else					_configDir = _executablePath + ".." + wxFileName::GetPathSeparator();
+	if ( cfg.Exists( ) )	_configDirectory = _executablePath;
+	else					_configDirectory = _executablePath + ".." + sep;
+	
+	_baseDirectory 		= _configDirectory;
+	_databaseDirectory 	= _baseDirectory + "Database" + sep;
 }
 ///////////////////////////////////////////////////////////////////
 void CncFileNameService::trace(std::ostream& os) {
 ///////////////////////////////////////////////////////////////////
 	os << "Executable Dir                   : " << CncFileNameService::getExecutableDir() 							<< std::endl;
+	os << "Base Dir                         : " << CncFileNameService::getBaseDir()									<< std::endl;
+	os << "Databse Dir                      : " << CncFileNameService::getDatabaseDir()								<< std::endl;
 	os << "Config Dir                       : " << CncFileNameService::getConfigDir() 								<< std::endl;
-	os << "Home Dir                         : " << CncFileNameService::getHomeDir() 								<< std::endl;
-	os << "Temp Dir                         : " << CncFileNameService::getTempDir() 								<< std::endl;
+	os << "Users Home Dir                   : " << CncFileNameService::getHomeDir() 								<< std::endl;
+	os << "Useres Temp Dir                  : " << CncFileNameService::getTempDir() 								<< std::endl;
 	os << "Outbound Binary Filename         : " << CncFileNameService::getCncOutboundBinFileName() 					<< std::endl;
 	os << "Outbound SVG Filename            : " << CncFileNameService::getCncOutboundSvgFileName() 					<< std::endl;
 	os << "Outbound Temp Filename           : " << CncFileNameService::getCncOutboundTempFileName() 				<< std::endl;

@@ -86,6 +86,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event);
 		virtual void extractSourceAsNewTpl(wxCommandEvent& event);
 		virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event);
 		virtual void saveOutboundAsNewTplFromMenu(wxCommandEvent& event);
@@ -190,7 +191,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void selectUCUnitFrom(wxCommandEvent& event);
 		virtual void selectUCUnitTo(wxCommandEvent& event);
 		virtual void closeUnitCalculator(wxCommandEvent& event);
-		virtual void emuContentDClick(wxMouseEvent& event);
 		virtual void viewUnitCalculator(wxCommandEvent& event);
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
@@ -254,15 +254,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void restoreAuiPane(wxAuiManagerEvent& event);
 		virtual void maximizeAuiPane(wxAuiManagerEvent& event);
 		virtual void saveTemplateFromButton(wxCommandEvent& event);
-		virtual void marginClickEmuSource(wxStyledTextEvent& event);
-		virtual void emuContentRightDown(wxMouseEvent& event);
-		virtual void toggleEmuWordWrapMode(wxCommandEvent& event);
 		virtual void toggleTemplateWordWrapMode(wxCommandEvent& event);
 		virtual void copyLogger(wxCommandEvent& event);
 		virtual void closeAuiPane(wxAuiManagerEvent& evt);
-		virtual void svgEmuZoomHome(wxCommandEvent& event);
-		virtual void svgEmuZoomMinus(wxCommandEvent& event);
-		virtual void svgEmuZoomPlus(wxCommandEvent& event);
 		virtual void toogleSvgEditSearchFlag(wxCommandEvent& event);
 		virtual void svgEditSelected(wxCommandEvent& event);
 		virtual void svgEditSearchTextChanged(wxCommandEvent& event);
@@ -271,7 +265,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void dclickDurationCount(wxMouseEvent& event);
 		virtual void stepDelayThumbtrack(wxScrollEvent& event);
 		virtual void stepDelayChanged(wxScrollEvent& event);
-		virtual void svgEmuToogleOriginalPath(wxCommandEvent& event);
 		virtual void displayUserAgent(wxCommandEvent& event);
 		virtual void updateToolControls(wxCommandEvent& event);
 		virtual void serialTimer(wxTimerEvent& event);
@@ -292,7 +285,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void openConfigurationFile(wxCommandEvent& event);
 		virtual void openExternalEditor(wxCommandEvent& event);
 		virtual void openCalculator(wxCommandEvent& event);
-		virtual void svgEmuClear(wxCommandEvent& event);
 		virtual void selectPort(wxCommandEvent& event);
 		virtual void requestVersion(wxCommandEvent& event);
 		virtual void requestCurrentPos(wxCommandEvent& event);
@@ -316,9 +308,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void defineUpdateCoordinates(wxCommandEvent& event);
 		virtual void defineAllowEvents(wxCommandEvent& event);
 		virtual void defineOnlineDrawing(wxCommandEvent& event);
-		virtual void svgEmuOpenFileAsSource(wxCommandEvent& event);
-		virtual void svgEmuOpenFileAsSvg(wxCommandEvent& event);
-		virtual void svgEmuReload(wxCommandEvent& event);
 		virtual void selectUnit(wxCommandEvent& event);
 		virtual void clearLogger(wxCommandEvent& event);
 		virtual void connect(wxCommandEvent& event);
@@ -565,7 +554,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		LruFileList lruFileList;
 		
 		wxDateTime lastTemplateModification;
-		wxDateTime lastSvgEmuModification;
 		
 		long processLastDuartion;
 		wxDateTime processStartTime;
@@ -605,16 +593,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		///////////////////////////////////////////////////////////////
 		// File handling
 		void evaluateTemplateModificationTimeStamp();
-		void evaluateSvgEmuModificationTimeStamp();
-		
 		void introduceCurrentFile();
 		
 		void openPreview(CncFilePreview* ctrl, const wxString& fn);
 		void openMainPreview(const wxString& fn);
 		void openMonitorPreview(const wxString& fn);
 		void openFileFromFileManager(const wxString& fn);
-		
-		const char* getSvgEmuFileName(wxString& ret);
 		
 		bool openFileExtern(const wxString& tool, const char* file);
 		bool openFileExtern(const wxString& tool, wxString& file);
@@ -727,7 +711,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void enableRunControls(bool state = true);
 		void disableRunControls() { enableRunControls(false); }
 		
-		void enableMainFileEditor(bool state = true);
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 
@@ -761,14 +744,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void stopAnimationControl();
 		
 		void selectEditorToolBox(bool fileLoaded);
-		void fillFileDetails(bool fileLoaded);
+		void fillFileDetails(bool fileLoaded, const char* extFileName = NULL);
 		void prepareNewTemplateFile();
 		void decorateExtTemplatePages(TemplateFormat tf);
 		void prepareAndShowMonitorTemplatePreview(bool force=false);
-		void refreshSvgEmuFile(bool blank=false);
-		void refreshSvgEmuSourceFile(bool blank=false);
-		void showSVGEmuResult(bool show = true);
-		void hideSVGEmuResult() { showSVGEmuResult(false); }
 		
 		void registerGuiControl(wxWindow* ctl); 
 		void disableGuiControls();

@@ -192,9 +192,9 @@ class CncPosition {
 		T getY() const { return yPos; } 
 		T getZ() const { return zPos; }
 		////////////////////////////////////////////////////////////////
-		T setX(T x) { xPos = x; return xPos; }
-		T setY(T y) { yPos = y; return yPos; }
-		T setZ(T z) { zPos = z; return zPos; }
+		T setX(T x) { xPos = x; evaluateWatermarks(); return xPos; }
+		T setY(T y) { yPos = y; evaluateWatermarks(); return yPos; }
+		T setZ(T z) { zPos = z; evaluateWatermarks(); return zPos; }
 		////////////////////////////////////////////////////////////////
 		const CncPosition<T>& setXYZ(T x, T y, T z) {
 			xPos = x;

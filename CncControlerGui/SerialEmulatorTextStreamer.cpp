@@ -8,6 +8,7 @@
 SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(CncControl* cnc)
 : SerialEmulatorNULL(cnc)
 , fileName("")
+, currentSpeedMode(CncSpeedUserDefined)
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -16,6 +17,7 @@ SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(CncControl* cnc)
 SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(const char* fileName) 
 : SerialEmulatorNULL(fileName)
 , fileName("")
+, currentSpeedMode(CncSpeedUserDefined)
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -62,6 +64,30 @@ bool SerialEmulatorTextStreamer::writeSetterRawCallback(unsigned char *buffer, u
 	si.pid 		= csi.pid;
 	si.values	= csi.values;
 	
+	if ( si.pid == PID_SPEED_FEED_MODE ) {
+		si.values	= csi.values;
+		
+		auto checkValue = [&]() {
+			if ( si.values.size() <= 0 ) {
+				std::cerr << "SerialEmulatorTextStreamer::writeSetterRawCallback(): Empty setter values!" << std::endl;
+				return false;
+			}
+			
+			int32_t value = si.values.front();
+			if ( value < CncSpeedWork || value > CncSpeedUserDefined ) {
+				std::cerr << "SerialEmulatorTextStreamer::writeSetterRawCallback(): Invalid setter value: '" 
+				          << value
+				          << "'" << std::endl;
+				return false;
+			}
+			
+			return true;
+		};
+		
+		if ( checkValue() == true )
+			currentSpeedMode = (CncSpeedMode)si.values.front();
+	}
+	
 	return writeEncodedSetterCallback(si);
 }
 ///////////////////////////////////////////////////////////////////
@@ -73,16 +99,17 @@ bool SerialEmulatorTextStreamer::writeMoveRawCallback(unsigned char *buffer, uns
 	}
 	
 	MoveInfo mi;
-	mi.cmd = buffer[0];
+	mi.speedMode 	= currentSpeedMode;
+	mi.cmd 			= buffer[0];
 	
 	if ( CncCommandDecoder::decodeMove(buffer, nbByte, mi.sdx, mi.sdy, mi.sdz) == false ) {
 		std::cerr << "SerialEmulatorTextStreamer::writeMoveRawCallback(): Decode failed!" << std::endl;
 		return false;
 	}
 	
-	mi.mdx = mi.sdx * GBL_CONFIG->getCalculationFactX();
-	mi.mdy = mi.sdy * GBL_CONFIG->getCalculationFactY();
-	mi.mdz = mi.sdz * GBL_CONFIG->getCalculationFactZ();
+	mi.mdx = GBL_CONFIG->convertStepsToMetricX(mi.sdx);
+	mi.mdy = GBL_CONFIG->convertStepsToMetricX(mi.sdy);
+	mi.mdz = GBL_CONFIG->convertStepsToMetricX(mi.sdz);
 	
 	return writeEncodedMoveCallback(mi);
 }

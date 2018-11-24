@@ -14,18 +14,21 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		};
 		
 		struct MoveInfo {
-			unsigned char cmd 	= CMD_INVALID;
-			int32_t sdx			= 0;
-			int32_t sdy			= 0;
-			int32_t sdz			= 0;
+			CncSpeedMode speedMode	= CncSpeedUserDefined;
 			
-			double mdx			= 0.0;
-			double mdy			= 0.0;
-			double mdz			= 0.0;
+			unsigned char cmd 		= CMD_INVALID;
+			int32_t sdx				= 0;
+			int32_t sdy				= 0;
+			int32_t sdz				= 0;
+			
+			double mdx				= 0.0;
+			double mdy				= 0.0;
+			double mdz				= 0.0;
 		};
 		
 		std::stringstream bodyStream;
 		wxString fileName;
+		CncSpeedMode currentSpeedMode;
 		
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte);

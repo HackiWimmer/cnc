@@ -1,6 +1,8 @@
 #include "GlobalFunctions.h"
+#include "BinaryFileParser.h"
 #include "GCodePathHandlerGL.h"
 #include "GCodeFileParser.h"
+#include "CncFileNameService.h"
 #include "CncFilePreview.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -20,6 +22,21 @@ void CncFilePreview::installContent() {
 ///////////////////////////////////////////////////////////////////
 	gcodePreview = new CncGCodePreview(this);
 	GblFunc::replaceControl(m_gcodePreviewPlaceholder, gcodePreview);
+}
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::selectEmptyPreview() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( m_previewBook->GetPageCount() > 0 );
+	m_previewBook->SetSelection(0);
+	
+	wxString fileName(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoPreviewAvailable.svg"));
+	if ( wxFileName::Exists(fileName) == false )
+		fileName.assign("about:blank");
+	
+	m_svgPreview->LoadURL(fileName);
+	m_svgPreview->Update();
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectSVGPreview(const wxString& fileName) {
@@ -49,6 +66,19 @@ bool CncFilePreview::selectGCodePreview(const wxString& fileName) {
 	return gfp.processRelease();
 }
 ///////////////////////////////////////////////////////////////////
+bool CncFilePreview::selectBinaryPreview(const wxString& fileName) {
+///////////////////////////////////////////////////////////////////
+	wxString externalFile;
+	if ( BinaryFileParser::extractSourceContentAsFile(fileName, externalFile) == false ) {
+		std::cerr << "CncFilePreview::selectBinaryPreview(): Can't create preview for file: '" 
+				  << fileName
+				  << "'" << std::endl;
+		return false;
+	}
+	
+	return selectPreview(externalFile);
+}
+///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectPreview(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
 	TemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
@@ -58,6 +88,9 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 							break;
 							
 		case TplGcode:		selectGCodePreview(fileName);
+							break;
+							
+		case TplBinary:		selectBinaryPreview(fileName);
 							break;
 							
 		default:			std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 

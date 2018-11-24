@@ -14,7 +14,9 @@ class CncFileNameService {
 		static wxString _executablePath;
 		static wxString _homeDirectory;
 		static wxString _tempDirectory;
-		static wxString _configDir;
+		static wxString _configDirectory;
+		static wxString _baseDirectory;
+		static wxString _databaseDirectory;
 		static wxString _session;
 		static wxString _configFileName;
 		static wxString _lruFileName;
@@ -26,14 +28,16 @@ class CncFileNameService {
 		
 		static void init();
 		static void trace(std::ostream& os);
-		static const wxString& getConfigFileName()				{ _ret = _configDir + _configFileName; return _ret; }
-		static const wxString& getLruFileName()					{ _ret = _configDir + _lruFileName; return _ret; }
-		static const wxString& getSpeedConfigFileName()			{ _ret = _configDir + _preconfiguredSpeedConfigFileName; return _ret; }
+		static const wxString& getConfigFileName()				{ _ret = _configDirectory + _configFileName; return _ret; }
+		static const wxString& getLruFileName()					{ _ret = _configDirectory + _lruFileName; return _ret; }
+		static const wxString& getSpeedConfigFileName()			{ _ret = _configDirectory + _preconfiguredSpeedConfigFileName; return _ret; }
 		
 		static const wxString& getExecutableDir() 				{ return _executablePath; }
 		static const wxString& getHomeDir() 					{ return _homeDirectory; }
+		static const wxString& getBaseDir() 					{ return _baseDirectory; }
 		static const wxString& getTempDir() 					{ return _tempDirectory; }
-		static const wxString& getConfigDir()					{ return _configDir; }
+		static const wxString& getConfigDir()					{ return _configDirectory; }
+		static const wxString& getDatabaseDir() 				{ return _databaseDirectory; }
 		
 		static const char* getSession()							{ return _session; }
 		

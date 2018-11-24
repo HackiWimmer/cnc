@@ -30,8 +30,12 @@ wxEND_EVENT_TABLE()
 CncBaseEditor::CncBaseEditor(wxWindow *parent) 
 : wxStyledTextCtrl(parent)
 , styles()
+, flags()
 , fileInfo()
 , svgPopupMenu(NULL)
+, ctlEditMode(NULL)
+, ctlColunmPostion(NULL)
+, ctlStatus(NULL)
 , fileLoadingActive(false)
 ///////////////////////////////////////////////////////////////////
 {
@@ -55,15 +59,17 @@ void CncBaseEditor::onMarginClick(wxStyledTextEvent& event) {
 	}
 	
 	// break points
-	if ( event.GetMargin() == MARGIN_BREAKPOINT || event.GetMargin() == MARGIN_LINE_NUMBERS ) {
-		int lineClick = LineFromPosition(event.GetPosition());
+	if ( flags.handleBreakpoints == true ) {
+		if ( event.GetMargin() == MARGIN_BREAKPOINT || event.GetMargin() == MARGIN_LINE_NUMBERS ) {
+			int lineClick = LineFromPosition(event.GetPosition());
 
-		if ( MarginGetText(lineClick) == "B" ) {
-			MarginSetText(lineClick, wxT(" "));
-			MarginSetStyle(lineClick, TE_DEFAULT_STYLE);
-		} else {
-			MarginSetText(lineClick, wxT("B"));
-			MarginSetStyle(lineClick, TE_BREAKPOINT_STYLE);
+			if ( MarginGetText(lineClick) == "B" ) {
+				MarginSetText(lineClick, wxT(" "));
+				MarginSetStyle(lineClick, TE_DEFAULT_STYLE);
+			} else {
+				MarginSetText(lineClick, wxT("B"));
+				MarginSetStyle(lineClick, TE_BREAKPOINT_STYLE);
+			}
 		}
 	}
 }
@@ -100,6 +106,9 @@ void CncBaseEditor::onChange(wxStyledTextEvent& event) {
 void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	onUpdateFilePosition();
+	
+	if ( flags.handleKeyCommands == false )
+		return;
 	
 	// update tab label
 	wxString name(THE_APP->GetTemplateNotebook()->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
@@ -233,13 +242,13 @@ void CncBaseEditor::onUpdateFilePosition() {
 	PositionToXY(GetInsertionPoint(), &x, &y);
 	
 	wxString label(wxString::Format("Column: %ld", x + 1));
-	THE_APP->GetFilePosition()->SetLabel(label);
+	getCtlColumnPos()->SetLabel(label);
 	
 	// try to select current  line as client id
 	THE_APP->updateFileContentPosition(x, y);
 	
 	// display gcode help hint
-	THE_APP->GetSourceEditStatus()->SetValue("");
+	getCtlStatus()->SetValue("");
 	
 	if ( fileInfo.format == TplGcode ) {
 		int col = GetColumn(GetCurrentPos());
@@ -253,7 +262,7 @@ void CncBaseEditor::onUpdateFilePosition() {
 			}
 		}
 		
-		THE_APP->GetSourceEditStatus()->SetValue(GCodeCommands::getGCodeHelpHint(cl));
+		getCtlStatus()->SetValue(GCodeCommands::getGCodeHelpHint(cl));
 	}
 	
 }
@@ -262,13 +271,16 @@ bool CncBaseEditor::Enable(bool enable) {
 ///////////////////////////////////////////////////////////////////
 	if ( hasEditMode() == false ) {
 		SetReadOnly(true);
-		return false;
-	}
-
-	if ( fileInfo.format == TplBinary ) 	SetReadOnly(true);
-	else									SetReadOnly(!enable);
+		
+	} else {
+		
+		if ( fileInfo.format == TplBinary ) 	SetReadOnly(true);
+		else									SetReadOnly(!enable);
 	
-	return enable;
+	}
+	
+	getCtlEditMode()->SetLabel( IsEditable() ? "Edit mode" : "Read only");
+	return IsEditable();
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::gotoBegin() {
@@ -586,6 +598,13 @@ void CncBaseEditor::setupBinaryStyle() {
 	SetKeyWords(1, "int exec");
 	
 	SetReadOnly(true);
+}
+///////////////////////////////////////////////////////////////////
+void CncBaseEditor::clearContent() {
+///////////////////////////////////////////////////////////////////
+	SetReadOnly(false);
+	ClearAll();
+	SetReadOnly(!hasEditMode());
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::prepareNewTemplateFile(TemplateFormat tf) {

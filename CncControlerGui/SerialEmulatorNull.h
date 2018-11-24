@@ -209,6 +209,8 @@ class SerialEmulatorNULL : public SerialSpyPort
 		LastCommand lastCommand;
 		unsigned char lastSignal;
 		
+		const CncLongPosition& getCurrentEmulatorPosition() 								{ return curEmulatorPos; }
+		
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) 	{ return true; }
 		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) 		{ return true; }
 		virtual bool writeMoveRenderedCallback(int32_t x , int32_t y , int32_t z) 			{ return true; }

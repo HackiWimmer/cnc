@@ -1,3 +1,4 @@
+#include "MainFrame.h"
 #include "CncOutboundEditor.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -15,4 +16,12 @@ CncOutboundEditor::~CncOutboundEditor() {
 void CncOutboundEditor::initialize() {
 ///////////////////////////////////////////////////////////////////
 	SetReadOnly(true);
+	
+	flags.handleBreakpoints		= false;
+	flags.handleKeyCommands		= false;
+	
+	ctlEditMode					= THE_APP->GetOutboundEditMode();
+	ctlColunmPostion			= THE_APP->GetOutboundPosition();
+	ctlStatus					= THE_APP->GetOutboundEditStatus();
+	
 }

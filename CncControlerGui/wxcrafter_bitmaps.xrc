@@ -36,8 +36,6 @@
   <object class="wxBitmap" name="16-file_reload@2x">bitmaps\16-file_reload@2x.png</object>
   <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
   <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
-  <object class="wxBitmap" name="16-find_and_replace">bitmaps\16-find_and_replace.png</object>
-  <object class="wxBitmap" name="16-find_and_replace@2x">bitmaps\16-find_and_replace@2x.png</object>
   <object class="wxBitmap" name="16-fold">bitmaps\16-fold.png</object>
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
@@ -45,8 +43,6 @@
   <object class="wxBitmap" name="16-globals@2x">bitmaps\16-globals@2x.png</object>
   <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>
   <object class="wxBitmap" name="16-gtk@2x">bitmaps\16-gtk@2x.png</object>
-  <object class="wxBitmap" name="16-home">bitmaps\16-home.png</object>
-  <object class="wxBitmap" name="16-home@2x">bitmaps\16-home@2x.png</object>
   <object class="wxBitmap" name="16-info">bitmaps\16-info.png</object>
   <object class="wxBitmap" name="16-info@2x">bitmaps\16-info@2x.png</object>
   <object class="wxBitmap" name="16-marker">bitmaps\16-marker.png</object>
@@ -313,8 +309,6 @@
   <object class="wxBitmap" name="feed">bitmaps\feed.png</object>
   <object class="wxBitmap" name="filepreview">bitmaps\filepreview.png</object>
   <object class="wxBitmap" name="folder-development">bitmaps\folder-development.png</object>
-  <object class="wxBitmap" name="folder-document">bitmaps\folder-document.png</object>
-  <object class="wxBitmap" name="folder-image">bitmaps\folder-image.png</object>
   <object class="wxBitmap" name="gamepad-active">bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="git-reset">bitmaps\git-reset.png</object>
   <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>
@@ -328,7 +322,6 @@
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
-  <object class="wxBitmap" name="layer-novisible">bitmaps\layer-novisible.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>

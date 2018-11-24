@@ -6,7 +6,9 @@
 class SerialEmulatorSvgStreamer : public SerialEmulatorTextStreamer
 {
 	protected:
-	
+		
+		std::stringstream svgStream;
+		
 		virtual bool writeEncodedSetterCallback(const SetterInfo& si);
 		virtual bool writeEncodedMoveCallback(const MoveInfo& mi);
 		

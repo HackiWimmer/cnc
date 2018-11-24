@@ -186,7 +186,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
 , lruFileList(LruFileList(16))
 , lastTemplateModification(wxDateTime::UNow())
-, lastSvgEmuModification(wxDateTime::UNow())
 , processLastDuartion(0L)
 , processStartTime(wxDateTime::UNow())
 , processEndTime(wxDateTime::UNow())
@@ -496,7 +495,11 @@ void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(sourceEditor);
 	registerGuiControl(outboundEditor);
+	registerGuiControl(fileView);
+
+	registerGuiControl(m_btToggleOutboundEditorWordWrap);
 	registerGuiControl(m_checkBoxToolEnabled);
 	registerGuiControl(m_manuallyCorrectLimitPos);
 	registerGuiControl(m_rcSecureDlg);
@@ -550,29 +553,14 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_zeroMoveModeZ);
 	registerGuiControl(m_clearLogger);
 	registerGuiControl(m_displayInterval);
-	registerGuiControl(m_svgEmuOpenFileAsSvg);
-	registerGuiControl(m_svgEmuOpenFileAsSource);
-	registerGuiControl(m_svgEmuReload);
-	registerGuiControl(m_svgEmuClear);
 	registerGuiControl(m_reloadTemplate);
 	registerGuiControl(m_openSourceExtern);
 	registerGuiControl(m_openSvgExtern);
 	registerGuiControl(m_btRequestCtlConfig);
 	registerGuiControl(m_btRequestControllerPins);
 	registerGuiControl(m_lruList);
-	registerGuiControl(fileView);
-	registerGuiControl(m_svgEmuResult);
-	registerGuiControl(m_svgEmuOpenFileAsSvg);
-	registerGuiControl(m_svgEmuReload);
-	registerGuiControl(m_svgEmuClear);
-	registerGuiControl(m_svgEmuToggleOrigPath);
-	registerGuiControl(m_svgEmuZoomHome);
-	registerGuiControl(m_svgEmuZoomMinus);
-	registerGuiControl(m_svgEmuZoomPlus);
 	registerGuiControl(m_copyLogger);
 	registerGuiControl(m_btSvgToggleWordWrap);
-	registerGuiControl(m_svgEmuToggleWordWrap);
-	registerGuiControl(m_svgEmuToggleOrigPath);
 	registerGuiControl(m_switchMonitoing);
 	registerGuiControl(m_saveTemplate);
 	registerGuiControl(m_testCountX);
@@ -609,7 +597,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_manuallySpeedSlider);
 	registerGuiControl(m_manuallySpeedValue);
 	registerGuiControl(m_mmRadioCoordinates);
-	
 	registerGuiControl(m_cmXneg);
 	registerGuiControl(m_cmXpos);
 	registerGuiControl(m_cmYneg);
@@ -1731,34 +1718,8 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 	::wxAboutBox(info);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::showSVGEmuResult(bool show) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(outboundNbInfo);
-	
-	if ( show == false ) {
-		
-		if (m_outboundNotebook->FindPage(m_svgEmuResult) != wxNOT_FOUND )
-			m_outboundNotebook->RemovePage(m_outboundNotebook->FindPage(m_svgEmuResult));
-
-		if (m_outboundNotebook->FindPage(m_svgEmuSource) != wxNOT_FOUND )
-			m_outboundNotebook->RemovePage(m_outboundNotebook->FindPage(m_svgEmuSource));
-
-	} else {
-
-		if (m_outboundNotebook->FindPage(m_svgEmuResult) == wxNOT_FOUND ) {
-			m_outboundNotebook->InsertPage(OutboundSelection::VAL::SVG_OUTPUT_PANEL, m_svgEmuResult,  "", false);
-			outboundNbInfo->decorate(OutboundSelection::VAL::SVG_OUTPUT_PANEL);
-		}
-		
-		if (m_outboundNotebook->FindPage(m_svgEmuSource) == wxNOT_FOUND ) {
-			m_outboundNotebook->InsertPage(OutboundSelection::VAL::SVG_SOURCE_PANEL, m_svgEmuSource, "", false);
-			outboundNbInfo->decorate(OutboundSelection::VAL::SVG_SOURCE_PANEL);
-		}
-		
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::selectPort(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
 	if ( lastPortName != m_portSelector->GetStringSelection() ) {
 		connectSerialPortDialog();
 	}
@@ -1795,7 +1756,9 @@ bool MainFrame::connectSerialPort() {
 	wxString cs;
 	
 	disableControls();
-	hideSVGEmuResult();
+	
+	outboundEditor->clearContent();
+	outboundFilePreview->selectEmptyPreview();
 	
 	m_miRqtIdleMessages->Check(false);
 	m_miRqtIdleMessages->Enable(false);
@@ -1831,7 +1794,6 @@ bool MainFrame::connectSerialPort() {
 		cnc = new CncControl(CncEMU_SVG);
 		cs.assign(CncFileNameService::getCncOutboundSvgFileName());
 		GBL_CONFIG->setProbeMode(true);
-		showSVGEmuResult();
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
 		
@@ -1979,22 +1941,9 @@ void MainFrame::enableControls(bool state) {
 	for (unsigned int i=0; i<m_menuBar->GetMenuCount(); i++) {
 		m_menuBar->EnableTop(i, state);
 	}
-		
-	// enable template editor
-	enableMainFileEditor(state);
 	
 	// run control
 	enableRunControls(state);
-	
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::enableMainFileEditor(bool state) {
-///////////////////////////////////////////////////////////////////
-	// enable template editor
-	sourceEditor->Enable(state);
-	
-	if ( state == true )	m_editMode->SetLabel("Edit mode");
-	else					m_editMode->SetLabel("Read only");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -2020,35 +1969,6 @@ void MainFrame::setZero() {
 void MainFrame::selectUnit(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateUnit();
-}
-///////////////////////////////////////////////////////////////////
-const char* MainFrame::getSvgEmuFileName(wxString& ret) {
-///////////////////////////////////////////////////////////////////
-	if ( cnc && cnc->getSerial() ) {
-		ret = cnc->getSerial()->getPortName();
-		return ret.c_str();
-	}
-	
-	return "";
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuReload(wxCommandEvent& event) {
-	refreshSvgEmuFile(false);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuOpenFileAsSource(wxCommandEvent& event) {
-	wxString tool, svgFile;
-	CncConfig::getGlobalCncConfig()->getEditorTool(tool);
-	getSvgEmuFileName(svgFile);
-	openFileExtern(tool, svgFile);
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuOpenFileAsSvg(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxString tool, svgFile;
-		CncConfig::getGlobalCncConfig()->getSVGFileViewer(tool);
-	getSvgEmuFileName(svgFile);
-	openFileExtern(tool, svgFile);
 }
 ///////////////////////////////////////////////////////////////////
 int MainFrame::showReferencePositionDlg(wxString msg) {
@@ -2219,54 +2139,6 @@ void MainFrame::updateMonitoring() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::refreshSvgEmuFile(bool blank) {
-///////////////////////////////////////////////////////////////////
-	wxString svgFile(getBlankHtmlPage());
-	
-	if ( cnc->getPortType() != CncEMU_SVG )
-		return;
-		
-	if ( blank == false ) {
-		getSvgEmuFileName(svgFile);
-		
-		wxFileName check(svgFile);
-		if ( !check.Exists() ) {
-			wxString ei(wxString::Format("MainFrame::refreshSvgEmuFile: File: %s does not exists!", svgFile));
-			svgFile = getErrorHtmlPage(ei);
-		}
-	}
-	
-	refreshSvgEmuSourceFile(blank);
-	m_svgView->LoadURL(svgFile);
-	m_svgView->Update();
-}
-
-///////////////////////////////////////////////////////////////////
-void MainFrame::refreshSvgEmuSourceFile(bool blank) {
-///////////////////////////////////////////////////////////////////
-	wxString svgFile;
-	getSvgEmuFileName(svgFile);
-	unsigned int cl = m_stcEmuSource->GetCurrentLine();
-	
-	if ( blank == true ) {
-		m_stcEmuSource->ClearAll();
-		m_stcEmuSource->LoadFile(getBlankHtmlPage());
-		m_stcEmuSource->SaveFile(svgFile);
-		evaluateSvgEmuModificationTimeStamp();
-		return;
-	}
-	
-	wxFileName emuFile(svgFile);
-	if ( emuFile.Exists() == true ) {
-		wxDateTime dt = emuFile.GetModificationTime();
-		
-		if ( dt != lastSvgEmuModification ) {
-			m_stcEmuSource->LoadFile(getSvgEmuFileName(svgFile));
-			m_stcEmuSource->GotoLine(cl);
-		}
-	}
-}
-///////////////////////////////////////////////////////////////////
 const char* MainFrame::getCurrentTemplateFormatName(const char* fileName) {
 ///////////////////////////////////////////////////////////////////
 	switch ( getCurrentTemplateFormat(fileName) ) {
@@ -2342,32 +2214,29 @@ void MainFrame::decorateExtTemplatePages(TemplateFormat tf) {
 	m_templateNotebook->SetPageText(TemplateBookSelection::VAL::EXT_INFO_PANEL,  txt);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::fillFileDetails(bool fileLoaded) {
+void MainFrame::fillFileDetails(bool fileLoaded, const char* extFileName) {
 ///////////////////////////////////////////////////////////////////
-	wxString details, dataHeader, sourceContent;
+	wxString details;
 	
 	if ( fileLoaded == true ) {
-		wxString fileName(getCurrentTemplatePathFileName());
-		wxFileName file(fileName);
-		details.append(wxString::Format("Full Name       : %s\n", file.GetFullPath()));
-		details.append(wxString::Format("Change Datetime : %s\n", file.GetModificationTime().FormatISOCombined(' ')));
-		details.append(wxString::Format("File Size       : %s\n", file.GetHumanReadableSize()));
+		bool evaluate = true;
 		
-		if ( getCurrentTemplateFormat() == TplBinary ) {
-			BinaryFileParser::ViewInfo vi;
-			if ( BinaryFileParser::extractViewInfo(BinaryFileParser::ViewType::HexRaw, fileName, vi) == true ) {
-				dataHeader.assign(vi.dataHeader);
-				sourceContent.assign(vi.sourceContent);
-				
-			} else {
-				std::cerr << "MainFrame::fillFileDetails(): Can't read external information" << std::endl;
-			}
+		wxString fileName(getCurrentTemplatePathFileName());
+		if ( extFileName != NULL ) {
+			if ( wxFileName::Exists(extFileName) == true )	fileName.assign(extFileName);
+			else											evaluate = false;
+		}
+		
+		if ( evaluate == true ) {
+			
+			wxFileName file(fileName);
+			details.append(wxString::Format("Full Name       : %s\n", file.GetFullPath()));
+			details.append(wxString::Format("Change Datetime : %s\n", file.GetModificationTime().FormatISOCombined(' ')));
+			details.append(wxString::Format("File Size       : %s\n", file.GetHumanReadableSize()));
 		}
 	}
 	
 	m_filePreviewDetails->ChangeValue(details);
-	m_filePreviewParameter->ChangeValue(dataHeader);
-	m_filePreviewSource->ChangeValue(sourceContent);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectEditorToolBox(bool fileLoaded) {
@@ -2430,6 +2299,7 @@ bool MainFrame::openFile(int pageToSelect) {
 	if ( ret == true ) {
 		decorateExtTemplatePages(getCurrentTemplateFormat());
 		evaluateTemplateModificationTimeStamp();
+		outboundFilePreview->selectEmptyPreview();
 		
 		if ( inboundFileParser != NULL )
 			inboundFileParser->clearControls();
@@ -2473,7 +2343,7 @@ void MainFrame::prepareNewTemplateFile() {
 	const TemplateFormat tf = getCurrentTemplateFormat();
 
 	sourceEditor->SetReadOnly(false);
-	sourceEditor->ClearAll();
+	sourceEditor->clearContent();
 	sourceEditor->prepareNewTemplateFile(tf);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2589,7 +2459,7 @@ void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
 		fileView->update();
 		
 		// clear source editor an motion monitor
-		sourceEditor->ClearAll();
+		sourceEditor->clearContent();
 		sourceEditor->DiscardEdits();
 		
 		clearMotionMonitor();
@@ -2705,18 +2575,6 @@ void MainFrame::evaluateTemplateModificationTimeStamp() {
 	lastTemplateModification = tplFile.GetModificationTime();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::evaluateSvgEmuModificationTimeStamp() {
-///////////////////////////////////////////////////////////////////
-	wxString svgFile;
-	getSvgEmuFileName(svgFile);
-	wxFileName emuFile(svgFile);
-	
-	if ( emuFile.Exists() == false )
-		return;
-		
-	lastSvgEmuModification = emuFile.GetModificationTime();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::activateMainWindow(wxActivateEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxString fn(getCurrentTemplatePathFileName());
@@ -2731,18 +2589,6 @@ void MainFrame::activateMainWindow(wxActivateEvent& event) {
 					std::cerr << "MainFrame::activateMainWindow: Error while open file: " << fn.c_str() << std::endl;
 			}
 			prepareAndShowMonitorTemplatePreview(true);
-		}
-	}
-	
-	wxString svgFile;
-	getSvgEmuFileName(svgFile);
-	wxFileName emuFile(svgFile);
-	
-	if ( emuFile.Exists() == true ) {
-		wxDateTime dt = emuFile.GetModificationTime();
-		
-		if ( dt != lastSvgEmuModification ) {
-			refreshSvgEmuFile();
 		}
 	}
 	
@@ -2864,7 +2710,6 @@ bool MainFrame::processVirtualTemplate() {
 	wxASSERT(m_inputFileName);
 
 	bool ret;
-	refreshSvgEmuFile(true);
 	cnc->getSerial()->clearSVG();
 	
 	SvgOutputParameters sop;
@@ -2881,8 +2726,6 @@ bool MainFrame::processVirtualTemplate() {
 	inboundFileParser->setInboundSourceControl(sourceEditor);
 	if ( isDebugMode == true ) 	ret = inboundFileParser->processDebug();
 	else 						ret = inboundFileParser->processRelease();
-	
-	refreshSvgEmuFile();
 	
 	return ret;
 }
@@ -3146,10 +2989,7 @@ bool MainFrame::processTestInterval() {
 	cnc->getSerial()->closePath();
 	cnc->getSerial()->closeSVG();
 	
-	refreshSvgEmuFile();
-	
 	return true;
-
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processTestDimensions() {
@@ -4189,13 +4029,6 @@ void MainFrame::requestInterrupt(wxCommandEvent& event) {
 	cnc->getSerial()->sendSignal(SIG_INTERRUPPT);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuClear(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc && cnc->getSerial());
-	cnc->getSerial()->clearSVG();
-	refreshSvgEmuFile(true);
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::updateFileContentPosition(long x, long y) {
 ///////////////////////////////////////////////////////////////////
 	// try to select current  line as client id
@@ -4830,8 +4663,12 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 		
 		default:			if ( fn.IsEmpty() == false )
 								cnc::trc.logError(wxString::Format("Cant preview: '%s'", fn));
-							break;
+								
+							fillFileDetails(false);
+							return;
 	}
+	
+	fillFileDetails(true, fn);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMainPreview(const wxString& fn) {
@@ -5263,15 +5100,12 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 		switch ( sel ) {
 			
-			case OutboundSelection::VAL::SVG_OUTPUT_PANEL:
-									m_svgEmuToggleOrigPath->Enable( CncConfig::getGlobalCncConfig()->getSvgResultWithOrigPathFlag() );
-									break;
-									
 			case OutboundSelection::VAL::MOTION_MONITOR_PANAL:
 									if ( cnc )
 										cnc->updatePreview3D();
 									break;
 		}
+		
 	} else if ( (wxWindow*)event.GetEventObject() == m_statisticBook ) {
 		switch ( sel ) {
 			case StatisticSelection::VAL::SUMMARY_PANEL:
@@ -5286,21 +5120,10 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::outboundBookChanging(wxNotebookEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	unsigned int sel = event.GetSelection();
-	wxString svgFile;
-	
-	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
-		switch ( sel ) {
-			case OutboundSelection::VAL::SVG_SOURCE_PANEL: 
-			
-					if ( m_stcEmuSource->IsModified() ) {
-						m_stcEmuSource->SaveFile(getSvgEmuFileName(svgFile));
-						evaluateSvgEmuModificationTimeStamp();
-						refreshSvgEmuFile();
-					}
-					break;
-		}
-	}
+	// currently nothing to do
+	// unsigned int sel = event.GetSelection();
+	// if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
+	// }
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateStatisticPanel() {
@@ -5335,11 +5158,7 @@ void MainFrame::updateToolControls(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	updateMonitoring();
 }
-///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuToogleOriginalPath(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_svgView->RunScript("toggleOrigPath();");
-}
+
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateStepDelay() {
 ///////////////////////////////////////////////////////////////////
@@ -5416,26 +5235,19 @@ void MainFrame::dclickDurationCount(wxMouseEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::emuContentRightDown(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	// Show popupmenu at position
-	if ( stcEmuContentPopupMenu != NULL ) {
-		SvgEditPopup::enablePathGeneratorMenuItem(stcEmuContentPopupMenu);
-		m_stcEmuSource->PopupMenu(stcEmuContentPopupMenu);
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::decorateOutboundSaveControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 	m_miSaveEmuOutput->Enable(state);
-	m_btSaveOutboundAsTemplate->Enable(state);
+	m_btSaveOutboundAsTemplate1->Enable(state);
+	m_btSaveOutboundAsTemplate2->Enable(state);
 	
 	if ( state == true ) {
 		wxString outboundFile(cnc->getSerial()->getPortName());
 		outboundEditor->openFile(outboundFile);
-		
-		#warning
 		outboundFilePreview->selectPreview(outboundFile);
+	} else {
+		outboundEditor->clearContent();
+		outboundFilePreview->selectEmptyPreview();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -5632,47 +5444,6 @@ void MainFrame::toogleSvgEditSearchFlag(wxCommandEvent& event) {
 	searchConditionsChanged();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuZoomMinus(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_svgView->SetZoomType(wxWEBVIEW_ZOOM_TYPE_LAYOUT);
-
-	switch ( m_svgView->GetZoom() ) {
-		case wxWEBVIEW_ZOOM_TINY: 		// Do nothing
-										break;
-		case wxWEBVIEW_ZOOM_SMALL:		m_svgView->SetZoom(wxWEBVIEW_ZOOM_TINY);
-										break;
-		case wxWEBVIEW_ZOOM_MEDIUM:		m_svgView->SetZoom(wxWEBVIEW_ZOOM_SMALL);
-										break;
-		case wxWEBVIEW_ZOOM_LARGE:		m_svgView->SetZoom(wxWEBVIEW_ZOOM_MEDIUM);
-										break;
-		case wxWEBVIEW_ZOOM_LARGEST:	m_svgView->SetZoom(wxWEBVIEW_ZOOM_LARGE);
-										break;
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuZoomPlus(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_svgView->SetZoomType(wxWEBVIEW_ZOOM_TYPE_LAYOUT);
-	
-	switch ( m_svgView->GetZoom() ) {
-		case wxWEBVIEW_ZOOM_TINY: 		m_svgView->SetZoom(wxWEBVIEW_ZOOM_SMALL);
-										break;
-		case wxWEBVIEW_ZOOM_SMALL:		m_svgView->SetZoom(wxWEBVIEW_ZOOM_MEDIUM);
-										break;
-		case wxWEBVIEW_ZOOM_MEDIUM:		m_svgView->SetZoom(wxWEBVIEW_ZOOM_LARGE);
-										break;
-		case wxWEBVIEW_ZOOM_LARGE:		m_svgView->SetZoom(wxWEBVIEW_ZOOM_LARGEST);
-										break;
-		case wxWEBVIEW_ZOOM_LARGEST:	// Do nothing
-										break;
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::svgEmuZoomHome(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	std::clog << "Currently not supported" << std::endl;
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::copyLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_logger->SelectAll();
@@ -5715,30 +5486,36 @@ bool MainFrame::openFileExtern(const wxString& tool, wxString& file) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::toggleEmuWordWrapMode(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	m_stcEmuSource->SetWrapMode(!m_svgEmuToggleWordWrap->GetValue());
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::toggleTemplateWordWrapMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	sourceEditor->SetWrapMode(!m_btSvgToggleWordWrap->GetValue());
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::marginClickEmuSource(wxStyledTextEvent& event) {
+void MainFrame::toggleOutboundEditorWordWrap(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( event.GetMargin() == MARGIN_FOLD ) {
-		int lineClick = m_stcEmuSource->LineFromPosition(event.GetPosition());
-		int levelClick = m_stcEmuSource->GetFoldLevel(lineClick);
-		
-		if ( (levelClick & wxSTC_FOLDLEVELHEADERFLAG ) > 0) {
-			m_stcEmuSource->ToggleFold(lineClick);
-		}
-	}
+	outboundEditor->SetWrapMode(!m_btToggleOutboundEditorWordWrap->GetValue());
 }
+///////////////////////////////////////////////////////////////////
+const char* MainFrame::getCurrentPortName(wxString& ret) {
+///////////////////////////////////////////////////////////////////
+	ret.assign("Unknown Port Name");
+	if ( cnc != NULL ) {
+		wxString cn(cnc->getSerial()->getClassName());
+		wxString pn(cnc->getSerial()->getPortName());
+		pn.Replace("\\","",true);
+		pn.Replace(".","",true);
+		
+		if ( pn.IsEmpty() )	ret.assign(wxString::Format("%s", cn));
+		else				ret.assign(wxString::Format("%s", pn));
+	}
+	
+	return ret;
+}
+
 ///////////////////////////////////////////////////////////////////
 const char* MainFrame::getBlankHtmlPage() {
 ///////////////////////////////////////////////////////////////////
+#warning
 	wxFileName fn(CncFileNameService::getBlankHtmlPageFileName());
 	std::fstream html;
 	
@@ -5768,24 +5545,9 @@ const char* MainFrame::getBlankHtmlPage() {
 	return fn.GetFullPath();
 }
 ///////////////////////////////////////////////////////////////////
-const char* MainFrame::getCurrentPortName(wxString& ret) {
-///////////////////////////////////////////////////////////////////
-	ret.assign("Unknown Port Name");
-	if ( cnc != NULL ) {
-		wxString cn(cnc->getSerial()->getClassName());
-		wxString pn(cnc->getSerial()->getPortName());
-		pn.Replace("\\","",true);
-		pn.Replace(".","",true);
-		
-		if ( pn.IsEmpty() )	ret.assign(wxString::Format("%s", cn));
-		else				ret.assign(wxString::Format("%s", pn));
-	}
-	
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
 const char* MainFrame::getErrorHtmlPage(const wxString& errorInfo) {
 ///////////////////////////////////////////////////////////////////
+#warning
 	wxFileName fn(CncFileNameService::getErrorHtmlPageFileName());
 	std::fstream html;
 	
@@ -6189,6 +5951,9 @@ void MainFrame::clearMotionMonitor() {
 	motionMonitor->clear();
 	vectiesListCtrl->clear();
 	statisticSummaryListCtrl->resetValues();
+	
+	outboundEditor->clearContent();
+	outboundFilePreview->selectEmptyPreview();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor(wxCommandEvent& event) {
@@ -6475,10 +6240,6 @@ bool MainFrame::verifyPathGenertorNode(wxXmlDocument& xmlDoc, const wxString& no
 	}
 	
 	return true;
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::emuContentDClick(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::closeUnitCalculator(wxCommandEvent& event) {
@@ -7681,12 +7442,6 @@ void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 	
 	prepareAndShowMonitorTemplatePreview(true);
 }
-
-
-
-
-
-
 
 
 

@@ -198,6 +198,7 @@ class Serial : public SerialOSD {
 		double totalDistance[4];
 		double totalDistanceRef;
 		double currentFeedSpeed;
+		
 		CncLongPosition measurementRefPos;
 		CncNanoTimestamp tsMeasurementStart;
 		CncNanoTimestamp tsMeasurementRef;

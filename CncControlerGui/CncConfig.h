@@ -8,6 +8,7 @@
 #include <wx/valnum.h>
 #include <wx/combobox.h>
 #include <wx/propgrid/propgrid.h>
+#include "CncPosition.h"
 #include "CncUnitCalculator.h"
 #include "CncArduino.h"
 #include "DataControlModel.h"
@@ -225,6 +226,15 @@ class CncConfig {
 		CncConfig& setAllowEventHandling(bool b) 				{ sc(); allowEventHandling=b; return *this; }
 		CncConfig& setUpdateInterval(int i) 					{ sc(); updateInterval=i; return *this; }
 		
+		const CncDoublePosition& convertStepsToMetric(CncDoublePosition& ret, const CncLongPosition& pos);
+		const double			 convertStepsToMetricX(int32_t val);
+		const double			 convertStepsToMetricY(int32_t val);
+		const double			 convertStepsToMetricZ(int32_t val);
+		
+		const CncLongPosition&   convertMetricToSteps(CncLongPosition& ret,   const CncDoublePosition& pos);
+		const int32_t			 convertMetricToStepsX(double val);
+		const int32_t			 convertMetricToStepsY(double val);
+		const int32_t			 convertMetricToStepsZ(double val);
 		
 		bool checkToolExists(int toolId=-1);
 		int translateToolId(int toolId=-1);

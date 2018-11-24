@@ -5051,75 +5051,7 @@ Roughest:</label>
                                                 <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                                 <fg>wxSYS_COLOUR_BTNFACE</fg>
                                                 <font>
-                                                  <size>9</size>
-                                                  <style>normal</style>
-                                                  <weight>normal</weight>
-                                                  <family>modern</family>
-                                                  <underlined>0</underlined>
-                                                  <face>Consolas</face>
-                                                </font>
-                                              </object>
-                                            </object>
-                                          </object>
-                                        </object>
-                                      </object>
-                                      <object class="notebookpage">
-                                        <label>Parameter</label>
-                                        <bitmap>bitmaps/folder-document.png</bitmap>
-                                        <selected>0</selected>
-                                        <object class="wxPanel" name="m_panel5993">
-                                          <style>wxTAB_TRAVERSAL</style>
-                                          <object class="wxFlexGridSizer">
-                                            <cols>1</cols>
-                                            <rows>1</rows>
-                                            <vgap>0</vgap>
-                                            <hgap>0</hgap>
-                                            <growablecols>0</growablecols>
-                                            <growablerows>0</growablerows>
-                                            <object class="sizeritem">
-                                              <flag>wxALL|wxEXPAND</flag>
-                                              <minsize>-1,100</minsize>
-                                              <object class="wxTextCtrl" name="m_filePreviewParameter">
-                                                <style>wxTE_READONLY|wxTE_MULTILINE</style>
-                                                <size>-1,100</size>
-                                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                <fg>wxSYS_COLOUR_BTNFACE</fg>
-                                                <font>
-                                                  <size>9</size>
-                                                  <style>normal</style>
-                                                  <weight>normal</weight>
-                                                  <family>modern</family>
-                                                  <underlined>0</underlined>
-                                                  <face>Consolas</face>
-                                                </font>
-                                              </object>
-                                            </object>
-                                          </object>
-                                        </object>
-                                      </object>
-                                      <object class="notebookpage">
-                                        <label>Nested Source</label>
-                                        <bitmap>bitmaps/folder-image.png</bitmap>
-                                        <selected>0</selected>
-                                        <object class="wxPanel" name="m_panel5995">
-                                          <style>wxTAB_TRAVERSAL</style>
-                                          <object class="wxFlexGridSizer">
-                                            <cols>1</cols>
-                                            <rows>1</rows>
-                                            <vgap>0</vgap>
-                                            <hgap>0</hgap>
-                                            <growablecols>0</growablecols>
-                                            <growablerows>0</growablerows>
-                                            <object class="sizeritem">
-                                              <flag>wxALL|wxEXPAND</flag>
-                                              <minsize>-1,100</minsize>
-                                              <object class="wxTextCtrl" name="m_filePreviewSource">
-                                                <style>wxTE_READONLY|wxTE_MULTILINE</style>
-                                                <size>-1,100</size>
-                                                <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                                                <fg>wxSYS_COLOUR_BTNFACE</fg>
-                                                <font>
-                                                  <size>9</size>
+                                                  <size>8</size>
                                                   <style>normal</style>
                                                   <weight>normal</weight>
                                                   <family>modern</family>
@@ -5772,7 +5704,7 @@ Roughest:</label>
                             <label>CNC Motion Monitor</label>
                             <bitmap>bitmaps/package-x-generic1.png</bitmap>
                             <selected>0</selected>
-                            <object class="wxPanel" name="m_3DPane">
+                            <object class="wxPanel" name="m_cnc3DPane">
                               <style>wxTAB_TRAVERSAL</style>
                               <object class="wxFlexGridSizer">
                                 <cols>1</cols>
@@ -5804,7 +5736,7 @@ Roughest:</label>
                                         <object class="sizeritem">
                                           <flag>wxALL</flag>
                                           <minsize>24,24</minsize>
-                                          <object class="wxBitmapToggleButton" name="m_btSaveOutboundAsTemplate">
+                                          <object class="wxBitmapToggleButton" name="m_btSaveOutboundAsTemplate1">
                                             <style/>
                                             <size>24,24</size>
                                             <bitmap>bitmaps/16-file_save.png</bitmap>
@@ -6751,7 +6683,7 @@ Interval [ms]:</label>
                               <style>wxTAB_TRAVERSAL</style>
                               <object class="wxFlexGridSizer">
                                 <cols>1</cols>
-                                <rows>2</rows>
+                                <rows>3</rows>
                                 <vgap>0</vgap>
                                 <hgap>0</hgap>
                                 <growablecols>0</growablecols>
@@ -6762,16 +6694,16 @@ Interval [ms]:</label>
                                   <option>1</option>
                                   <object class="wxFlexGridSizer">
                                     <cols>2</cols>
-                                    <rows>0</rows>
+                                    <rows>1</rows>
                                     <vgap>0</vgap>
                                     <hgap>0</hgap>
-                                    <growablecols/>
-                                    <growablerows/>
+                                    <growablecols>1</growablecols>
+                                    <growablerows>0</growablerows>
                                     <object class="sizeritem">
                                       <flag>wxALL</flag>
-                                      <border>5</border>
+                                      <border>3</border>
                                       <object class="wxStaticText" name="m_staticText6138">
-                                        <label>Serial Outbound File Content</label>
+                                        <label>Serial Outbound File Content:</label>
                                         <style/>
                                         <font>
                                           <size>12</size>
@@ -6783,6 +6715,45 @@ Interval [ms]:</label>
                                         </font>
                                       </object>
                                     </object>
+                                    <object class="sizeritem" name="flexGridSizer6157">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <border>5</border>
+                                      <option>1</option>
+                                      <object class="wxFlexGridSizer">
+                                        <cols>2</cols>
+                                        <rows>1</rows>
+                                        <vgap>0</vgap>
+                                        <hgap>0</hgap>
+                                        <growablecols>0</growablecols>
+                                        <growablerows>0</growablerows>
+                                        <object class="sizeritem">
+                                          <flag>wxALL|wxALIGN_RIGHT</flag>
+                                          <minsize>24,24</minsize>
+                                          <object class="wxBitmapToggleButton" name="m_btSaveOutboundAsTemplate2">
+                                            <style/>
+                                            <size>24,24</size>
+                                            <bitmap>bitmaps/16-file_save.png</bitmap>
+                                            <tooltip>
+                                              <![CDATA[Save current outbound as new Template]]>
+                                            </tooltip>
+                                            <checked>1</checked>
+                                          </object>
+                                        </object>
+                                        <object class="sizeritem">
+                                          <flag>wxALL</flag>
+                                          <minsize>24,24</minsize>
+                                          <object class="wxBitmapToggleButton" name="m_btToggleOutboundEditorWordWrap">
+                                            <style/>
+                                            <size>24,24</size>
+                                            <bitmap>bitmaps/16-word_wrap.png</bitmap>
+                                            <tooltip>
+                                              <![CDATA[Toggle Word Wrap]]>
+                                            </tooltip>
+                                            <checked>1</checked>
+                                          </object>
+                                        </object>
+                                      </object>
+                                    </object>
                                   </object>
                                 </object>
                                 <object class="sizeritem">
@@ -6790,6 +6761,70 @@ Interval [ms]:</label>
                                   <object class="unknown" name="m_outboundFileSource">
                                     <bg/>
                                     <fg/>
+                                  </object>
+                                </object>
+                                <object class="sizeritem" name="flexGridSizer7131">
+                                  <flag>wxALL|wxEXPAND</flag>
+                                  <border>1</border>
+                                  <object class="wxFlexGridSizer">
+                                    <cols>3</cols>
+                                    <rows>1</rows>
+                                    <vgap>0</vgap>
+                                    <hgap>0</hgap>
+                                    <growablecols>1</growablecols>
+                                    <growablerows/>
+                                    <object class="sizeritem">
+                                      <flag>wxALL</flag>
+                                      <border>1</border>
+                                      <minsize>100,-1</minsize>
+                                      <object class="wxStaticText" name="m_outboundPosition">
+                                        <label/>
+                                        <style/>
+                                        <size>100,-1</size>
+                                        <bg>wxSYS_COLOUR_3DLIGHT</bg>
+                                        <font>
+                                          <size>8</size>
+                                          <style>normal</style>
+                                          <weight>normal</weight>
+                                          <family>swiss</family>
+                                          <underlined>0</underlined>
+                                          <face>Segoe UI</face>
+                                        </font>
+                                      </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL|wxEXPAND</flag>
+                                      <border>1</border>
+                                      <object class="wxTextCtrl" name="m_outboundEditStatus">
+                                        <style>wxTE_READONLY|wxBORDER_NONE</style>
+                                        <bg>wxSYS_COLOUR_3DLIGHT</bg>
+                                        <font>
+                                          <size>8</size>
+                                          <style>normal</style>
+                                          <weight>normal</weight>
+                                          <family>swiss</family>
+                                          <underlined>0</underlined>
+                                          <face>Segoe UI</face>
+                                        </font>
+                                      </object>
+                                    </object>
+                                    <object class="sizeritem">
+                                      <flag>wxALL</flag>
+                                      <border>1</border>
+                                      <object class="wxStaticText" name="m_outboundEditMode">
+                                        <label>edit mode</label>
+                                        <style/>
+                                        <bg>wxSYS_COLOUR_3DLIGHT</bg>
+                                        <font>
+                                          <size>8</size>
+                                          <style>normal</style>
+                                          <weight>normal</weight>
+                                          <family>swiss</family>
+                                          <underlined>0</underlined>
+                                          <face>Segoe UI</face>
+                                        </font>
+                                      </object>
+                                    </object>
                                   </object>
                                 </object>
                               </object>
@@ -6820,9 +6855,9 @@ Interval [ms]:</label>
                                     <growablerows/>
                                     <object class="sizeritem">
                                       <flag>wxALL</flag>
-                                      <border>5</border>
+                                      <border>3</border>
                                       <object class="wxStaticText" name="m_staticText6140">
-                                        <label>Serial Outbound File Preview</label>
+                                        <label>Serial Outbound File Preview:</label>
                                         <style/>
                                         <font>
                                           <size>12</size>
@@ -6841,226 +6876,6 @@ Interval [ms]:</label>
                                   <object class="wxPanel" name="m_outboundPreviewPlaceholder">
                                     <style>wxTAB_TRAVERSAL</style>
                                     <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-                                  </object>
-                                </object>
-                              </object>
-                            </object>
-                          </object>
-                          <object class="notebookpage">
-                            <label>SVG Output</label>
-                            <bitmap>bitmaps/layer-novisible.png</bitmap>
-                            <selected>0</selected>
-                            <object class="wxPanel" name="m_svgEmuResult">
-                              <style/>
-                              <bg>wxSYS_COLOUR_BTNFACE</bg>
-                              <object class="wxFlexGridSizer">
-                                <cols>2</cols>
-                                <rows>1</rows>
-                                <vgap>0</vgap>
-                                <hgap>0</hgap>
-                                <growablecols>1</growablecols>
-                                <growablerows>0</growablerows>
-                                <object class="sizeritem" name="flexGridSizer766">
-                                  <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
-                                  <border>1</border>
-                                  <option>1</option>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>1</cols>
-                                    <rows>0</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols/>
-                                    <growablerows/>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuOpenFileAsSource">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Open SVG extern as Source]]>
-                                        </tooltip>
-                                        <bitmap stock_id="wxART_FILE_OPEN" stock_client="wxART_BUTTON"/>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuOpenFileAsSvg">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Open SVG extern as SVG]]>
-                                        </tooltip>
-                                        <bitmap>bitmaps/16-gtk.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuReload">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Reload SVG]]>
-                                        </tooltip>
-                                        <bitmap>bitmaps/16-debugger_restart.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuClear">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Clear SVG]]>
-                                        </tooltip>
-                                        <bitmap>bitmaps/16-clean.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="spacer" name="Spacer17463">
-                                      <size>0,10</size>
-                                      <flag>wxALL</flag>
-                                      <border>5</border>
-                                      <option>1</option>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuToggleOrigPath">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Show/Hide Original Path]]>
-                                        </tooltip>
-                                        <bitmap>bitmaps/16-find_and_replace.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="spacer" name="Spacer17466">
-                                      <size>0,20</size>
-                                      <flag>wxALL</flag>
-                                      <border>5</border>
-                                      <option>1</option>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuZoomHome">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Home]]>
-                                        </tooltip>
-                                        <bitmap>bitmaps/16-home.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuZoomMinus">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Zoom -]]>
-                                        </tooltip>
-                                        <bitmap>bitmaps/16-minus.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxButton" name="m_svgEmuZoomPlus">
-                                        <label/>
-                                        <style/>
-                                        <size>24,24</size>
-                                        <tooltip>
-                                          <![CDATA[Zoom +]]>
-                                        </tooltip>
-                                        <bitmap>bitmaps/16-plus.png</bitmap>
-                                        <bitmapposition>wxLEFT</bitmapposition>
-                                        <default>0</default>
-                                      </object>
-                                    </object>
-                                  </object>
-                                </object>
-                                <object class="sizeritem">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <border>1</border>
-                                  <option>1</option>
-                                  <object class="unknown" name="m_svgView">
-                                    <bg>wxSYS_COLOUR_BTNHIGHLIGHT</bg>
-                                  </object>
-                                </object>
-                              </object>
-                            </object>
-                          </object>
-                          <object class="notebookpage">
-                            <label>SVG Source</label>
-                            <bitmap>bitmaps/script-code.png</bitmap>
-                            <selected>0</selected>
-                            <object class="wxPanel" name="m_svgEmuSource">
-                              <style>wxTAB_TRAVERSAL</style>
-                              <object class="wxFlexGridSizer">
-                                <cols>2</cols>
-                                <rows>1</rows>
-                                <vgap>0</vgap>
-                                <hgap>0</hgap>
-                                <growablecols>1</growablecols>
-                                <growablerows>0</growablerows>
-                                <object class="sizeritem" name="flexGridSizer1899">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <border>1</border>
-                                  <option>1</option>
-                                  <object class="wxFlexGridSizer">
-                                    <cols>2</cols>
-                                    <rows>0</rows>
-                                    <vgap>0</vgap>
-                                    <hgap>0</hgap>
-                                    <growablecols/>
-                                    <growablerows/>
-                                    <object class="sizeritem">
-                                      <flag>wxALL</flag>
-                                      <minsize>24,24</minsize>
-                                      <object class="wxBitmapToggleButton" name="m_svgEmuToggleWordWrap">
-                                        <style/>
-                                        <size>24,24</size>
-                                        <bitmap>bitmaps/16-word_wrap.png</bitmap>
-                                        <tooltip>
-                                          <![CDATA[Toggle Word Wrap Mode]]>
-                                        </tooltip>
-                                        <checked>1</checked>
-                                      </object>
-                                    </object>
-                                  </object>
-                                </object>
-                                <object class="sizeritem">
-                                  <flag>wxALL|wxEXPAND</flag>
-                                  <border>1</border>
-                                  <object class="unknown" name="m_stcEmuSource">
-                                    <bg/>
-                                    <fg/>
                                   </object>
                                 </object>
                               </object>
