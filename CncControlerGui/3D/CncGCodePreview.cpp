@@ -32,7 +32,7 @@ wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////
 CncGCodePreview::CncGCodePreview(wxWindow *parent, int *attribList) 
-: wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
+: CncGlCanvas(parent, attribList)
 , preview(new GLContextGCodePreview(this))
 , maxDimension(400.0)
 , isShown(false)
@@ -40,7 +40,10 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, int *attribList)
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
 	preview->init();
-
+	
+	// Important: initialize the CncGlCanvas context
+	context = preview;
+	
 	// publish initial zoom factor
 	preview->setZoomFactor(2.0);
 	preview->setViewMode(GLContextBase::ViewMode::V3D_ISO1);
@@ -50,6 +53,11 @@ CncGCodePreview::~CncGCodePreview() {
 //////////////////////////////////////////////////
 	if ( preview != NULL ) 
 		delete preview;
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::display() {
+//////////////////////////////////////////////////
+	preview->display();
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::onPaint(wxPaintEvent& event) {
@@ -63,7 +71,7 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 	
 	if ( isShown )	preview->reshape(cs.GetWidth(), cs.GetHeight());
 	else 			preview->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
-	preview->display();
+	display();
 	
 	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
 	// later this should not appear to support custom origin positions
@@ -86,28 +94,8 @@ void CncGCodePreview::onEraseBackground(wxEraseEvent& event) {
 //////////////////////////////////////////////////
 void CncGCodePreview::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
-	const wxSize cs = GetClientSize();
-
-	// activate the keyboard focus for this frame
-	this->SetFocusFromKbd();
-	
-	// wheel
-	int rot = event.GetWheelRotation();
-	if ( rot != 0 ) {
-		if (rot < 0 ) 	preview->getModelScale().decScale();
-		else 			preview->getModelScale().incScale();
-		Refresh(false);
-	}
-	
-	// left button
-	if ( event.LeftIsDown() == true ) {
-		// reverse y because the opengl viewport origin (0,0) is at left/bottom
-		int x = event.GetX();
-		int y = cs.GetHeight() - event.GetY();
-		
-		preview->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
-		Refresh(false);
-	}
+	CncGlCanvas::onMouse(event);
+	Refresh();
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::onKeyDown(wxKeyEvent& event) {

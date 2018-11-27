@@ -88,6 +88,7 @@
       <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;release2"/>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
+      <File Name="CncGLCanvas.h"/>
       <VirtualDirectory Name="Base">
         <File Name="3D/GLContextBase.cpp"/>
         <File Name="3D/GLContextBase.h"/>
@@ -113,6 +114,7 @@
       <File Name="GL3DOptions.h"/>
       <File Name="3D/CncGCodePreview.h"/>
       <VirtualDirectory Name="Utils">
+        <File Name="3D/CncGLCanvas.cpp"/>
         <File Name="3D/VerticeData.h"/>
       </VirtualDirectory>
       <File Name="3D/CncGCodePreview.cpp"/>

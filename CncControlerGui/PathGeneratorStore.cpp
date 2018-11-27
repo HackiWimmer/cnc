@@ -191,7 +191,7 @@ bool PathGeneratorStore::regenerateSvgBlock(RegenerateParameter& rp) {
 	 
 	PathGeneratorBase* pGen = getPathGenerator(result.tplName);
 	if ( pGen == NULL) {
-		rp.out.errorInfo << "Cant find Template Generator: " << result.tplName << "\n";
+		rp.out.errorInfo << "Can't find Template Generator: " << result.tplName << "\n";
 		return false;
 	}
 	

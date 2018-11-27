@@ -49,9 +49,9 @@
 #include "CncZView.h"
 #include <wx/scrolwin.h>
 #include <wx/listctrl.h>
+#include <wx/webview.h>
 #include <wx/timer.h>
 #include <wx/treectrl.h>
-#include <wx/webview.h>
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/collpane.h>
@@ -409,15 +409,11 @@ protected:
     wxStaticLine* m_staticLine225337;
     wxToggleButton* m_testToggleTool;
     wxPanel* m_mainBookPreviewPanel;
-    wxSplitterWindow* m_splitter6005;
-    wxPanel* m_splitterPage6009;
     wxPanel* m_filePreviewPlaceholder;
-    wxPanel* m_splitterPage6013;
-    wxNotebook* m_notebook5987;
-    wxPanel* m_panel5989;
-    wxTextCtrl* m_filePreviewDetails;
     wxPanel* m_panel4398;
     wxStaticText* m_staticText4402;
+    wxPanel* m_panel6173;
+    wxTextCtrl* m_filePreviewDetails;
     wxTextCtrl* m_currentFileMangerPreviewFileName;
     wxPanel* m_panelZView;
     CncZView* m_zView;
@@ -514,13 +510,21 @@ protected:
     wxStaticText* m_staticText6138;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate2;
     wxBitmapToggleButton* m_btToggleOutboundEditorWordWrap;
+    wxSimplebook* m_simpleBookOutBoundEditor;
+    wxPanel* m_panel6208;
     wxStyledTextCtrl* m_outboundFileSource;
+    wxPanel* m_panel6210;
+#if wxUSE_WEBVIEW
+    wxWebView* m_outboundEditorWebView;
+#endif // wxUSE_WEBVIEW
+
     wxStaticText* m_outboundPosition;
     wxTextCtrl* m_outboundEditStatus;
     wxStaticText* m_outboundEditMode;
     wxPanel* m_cncPreview;
     wxStaticText* m_staticText6140;
     wxPanel* m_outboundPreviewPlaceholder;
+    wxStaticText* m_staticText6218;
     wxPanel* m_monitorTemplatePanel;
     wxPanel* m_monitorTemplatePreviewPlaceHolder;
     wxPanel* m_panel5144;
@@ -907,6 +911,8 @@ protected:
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
     virtual void openMotionMonitorOptionDlg(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
+    #if wxUSE_WEBVIEW
+    #endif // wxUSE_WEBVIEW
     virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
@@ -1330,13 +1336,9 @@ public:
     wxListbook* GetTestCaseBook() { return m_testCaseBook; }
     wxPanel* GetMainBookTest() { return m_mainBookTest; }
     wxPanel* GetFilePreviewPlaceholder() { return m_filePreviewPlaceholder; }
-    wxPanel* GetSplitterPage6009() { return m_splitterPage6009; }
-    wxTextCtrl* GetFilePreviewDetails() { return m_filePreviewDetails; }
-    wxPanel* GetPanel5989() { return m_panel5989; }
-    wxNotebook* GetNotebook5987() { return m_notebook5987; }
-    wxPanel* GetSplitterPage6013() { return m_splitterPage6013; }
-    wxSplitterWindow* GetSplitter6005() { return m_splitter6005; }
     wxStaticText* GetStaticText4402() { return m_staticText4402; }
+    wxPanel* GetPanel6173() { return m_panel6173; }
+    wxTextCtrl* GetFilePreviewDetails() { return m_filePreviewDetails; }
     wxPanel* GetPanel4398() { return m_panel4398; }
     wxTextCtrl* GetCurrentFileMangerPreviewFileName() { return m_currentFileMangerPreviewFileName; }
     wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
@@ -1433,12 +1435,17 @@ public:
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate2() { return m_btSaveOutboundAsTemplate2; }
     wxBitmapToggleButton* GetBtToggleOutboundEditorWordWrap() { return m_btToggleOutboundEditorWordWrap; }
     wxStyledTextCtrl* GetOutboundFileSource() { return m_outboundFileSource; }
+    wxPanel* GetPanel6208() { return m_panel6208; }
+    wxWebView* GetOutboundEditorWebView() { return m_outboundEditorWebView; }
+    wxPanel* GetPanel6210() { return m_panel6210; }
+    wxSimplebook* GetSimpleBookOutBoundEditor() { return m_simpleBookOutBoundEditor; }
     wxStaticText* GetOutboundPosition() { return m_outboundPosition; }
     wxTextCtrl* GetOutboundEditStatus() { return m_outboundEditStatus; }
     wxStaticText* GetOutboundEditMode() { return m_outboundEditMode; }
     wxPanel* GetCncFile() { return m_cncFile; }
     wxStaticText* GetStaticText6140() { return m_staticText6140; }
     wxPanel* GetOutboundPreviewPlaceholder() { return m_outboundPreviewPlaceholder; }
+    wxStaticText* GetStaticText6218() { return m_staticText6218; }
     wxPanel* GetCncPreview() { return m_cncPreview; }
     wxNotebook* GetOutboundNotebook() { return m_outboundNotebook; }
     wxPanel* GetMonitorBookCncPanel() { return m_monitorBookCncPanel; }
@@ -1764,15 +1771,44 @@ protected:
 
     wxPanel* m_panel3766;
     wxPanel* m_gcodePreviewPlaceholder;
+    wxButton* m_3D_Top;
+    wxButton* m_3D_Bottom;
+    wxButton* m_3D_Front;
+    wxButton* m_3D_Rear;
+    wxButton* m_3D_Left;
+    wxButton* m_3D_Right;
+    wxStaticLine* m_staticLine3483;
+    wxButton* m_3D_Perspective1;
+    wxButton* m_3D_Perspective2;
+    wxButton* m_3D_Perspective3;
+    wxButton* m_3D_Perspective4;
 
 protected:
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
+    virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromRear3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void show3D(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxWebView* GetSvgPreview() { return m_svgPreview; }
     wxPanel* GetPanel3764() { return m_panel3764; }
     wxPanel* GetGcodePreviewPlaceholder() { return m_gcodePreviewPlaceholder; }
+    wxButton* Get3D_Top() { return m_3D_Top; }
+    wxButton* Get3D_Bottom() { return m_3D_Bottom; }
+    wxButton* Get3D_Front() { return m_3D_Front; }
+    wxButton* Get3D_Rear() { return m_3D_Rear; }
+    wxButton* Get3D_Left() { return m_3D_Left; }
+    wxButton* Get3D_Right() { return m_3D_Right; }
+    wxStaticLine* GetStaticLine3483() { return m_staticLine3483; }
+    wxButton* Get3D_Perspective1() { return m_3D_Perspective1; }
+    wxButton* Get3D_Perspective2() { return m_3D_Perspective2; }
+    wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
+    wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxPanel* GetPanel3766() { return m_panel3766; }
     wxSimplebook* GetPreviewBook() { return m_previewBook; }
     CncFilePreviewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);

@@ -7,8 +7,6 @@ class SerialEmulatorSvgStreamer : public SerialEmulatorTextStreamer
 {
 	protected:
 		
-		std::stringstream svgStream;
-		
 		virtual bool writeEncodedSetterCallback(const SetterInfo& si);
 		virtual bool writeEncodedMoveCallback(const MoveInfo& mi);
 		
@@ -20,6 +18,8 @@ class SerialEmulatorSvgStreamer : public SerialEmulatorTextStreamer
 		explicit SerialEmulatorSvgStreamer(CncControl* cnc);
 		explicit SerialEmulatorSvgStreamer(const char *fileName);
 		virtual ~SerialEmulatorSvgStreamer();
+		
+		virtual bool isOutputAsTemplateAvailable();
 		
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulatorSvgStreamer"; }

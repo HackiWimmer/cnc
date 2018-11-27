@@ -279,10 +279,10 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_INVALID_PARAM_ID]                   = "Arduino::setValue(): Invalid parameter ID"; 
 	errorCodes[E_INVALID_PARAM_STREAM]               = "Arduino::setValue(): Noting to read";
 	errorCodes[E_INVALID_PARAM_STREAM_LEN]           = "Arduino::setValue(): Invalid stream length";
-	errorCodes[E_GETTER_ID_NOT_FOUND]                = "Arduino::getValue(): Cant read getter id";
+	errorCodes[E_GETTER_ID_NOT_FOUND]                = "Arduino::getValue(): Can't read getter id";
 	errorCodes[E_INVALID_GETTER_ID]                  = "Arduino::getValue(): Getter id not known"; 
 	errorCodes[E_INVALID_GETTER_LIST_COUNT]          = "Arduino::getValues(): Getter list count not available";
-	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Cant read long from Serial: invalid size: ";
+	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Can't read long from Serial: invalid size: ";
 	
 	errorCodes[E_STEPPER_NOT_ENALED]                 = "Arduino::stepAxisXYZ: Stepper not enaled";
 	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxisXYZ: Stepper not initialized";

@@ -8,6 +8,9 @@ class CncOutboundEditor : public CncBaseEditor {
 	public:
 		CncOutboundEditor(wxWindow *parent);
 		virtual ~CncOutboundEditor();
+		virtual void clearContent();
+		
+		const char* getExtention();
 		
 	protected:
 		virtual void initialize();

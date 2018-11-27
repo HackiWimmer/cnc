@@ -378,7 +378,7 @@ bool BinaryFileParser::preprocess() {
 			
 		xmlParameter = new wxXmlDocument();
 		wxStringInputStream xmlStream(dataHeaderContent.c_str());
-		wxLogNull dummyToSuppressXmlDocErrorMessages;
+		//wxLogNull dummyToSuppressXmlDocErrorMessages;
 		if ( xmlParameter->Load(xmlStream) == false ) {
 			std::cerr << "BinaryFileParser::preprocess(): Error while creating xml data" << std::endl;
 			return false;

@@ -171,7 +171,7 @@ bool PathGeneratorBase::decodeXmlPattern(const wxString& pattern, XmlPatternResu
 	wxXmlNode* root = xmlDoc.GetRoot();
 	
 	if ( root == NULL ) {
-		result.errorInfo << "Cant evaluate XML root node:\n";
+		result.errorInfo << "Can't evaluate XML root node:\n";
 		result.errorInfo << p;
 		return false;
 	}

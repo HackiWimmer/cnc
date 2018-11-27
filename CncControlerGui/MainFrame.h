@@ -485,6 +485,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void decorateProbeMode(bool probeMode);
 		void decorateSecureDlgChoice(bool useDlg);
+		void decorateOutboundEditor(const char* fileName = NULL);
 		
 		void decorateGamepadState(bool state);
 		
@@ -575,6 +576,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncReferencePosition* refPositionDlg;
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
+		
+		const wxString& createCncControl(const wxString& sel, wxString& name);
 		
 		void setIcons();
 		

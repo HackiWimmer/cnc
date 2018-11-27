@@ -264,7 +264,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual ~SerialEmulatorNULL();
 		
 		// returns the class name
-		virtual const char* getClassName() { return "SerialEmulatorNULL"; }
+		virtual const char* getClassName() { return "SerialEmulator(dev/null)"; }
 		// returns the emulator type
 		virtual bool isEmulator() const { return true; }
 		// return the port type

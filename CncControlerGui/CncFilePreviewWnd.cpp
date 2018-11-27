@@ -45,7 +45,7 @@ bool CncFilePreviewWnd::previewFile(const wxString& fileName, PreviewType pt) {
 	
 	bool ret = false;
 	switch ( pt ) {
-		case PT_AUTO: 	std::cerr << "CncFilePreviewWnd::previewFile: Cant detect file type for: '" << fileName << "'!" << std::endl;
+		case PT_AUTO: 	std::cerr << "CncFilePreviewWnd::previewFile: Can't detect file type for: '" << fileName << "'!" << std::endl;
 						m_previewFileType->SetValue("???");
 						ret = false;
 						break;

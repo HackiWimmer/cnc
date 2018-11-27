@@ -257,7 +257,7 @@ void CncToolMagazine::editTool(wxCommandEvent& event) {
 	wxString cell;
 	cell.assign(m_toolMagazineId->GetValue());
 	if ( cell.IsEmpty() ) {
-		cnc::trc.logError(wxString::Format("Tool Id cant be empty!"));
+		cnc::trc.logError(wxString::Format("Tool Id can't be empty!"));
 		return;
 	}
 	

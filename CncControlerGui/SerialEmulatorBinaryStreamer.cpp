@@ -15,6 +15,7 @@ SerialEmulatorBinaryStreamer::SerialEmulatorBinaryStreamer(const char* fileName)
 : SerialEmulatorNULL(fileName)
 , CncBinaryTemplateStreamer()
 , fileName("")
+, inboundFormat(TplUnknown)
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -25,8 +26,14 @@ SerialEmulatorBinaryStreamer::~SerialEmulatorBinaryStreamer() {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorBinaryStreamer::isOutputAsTemplateAvailable() {
 ///////////////////////////////////////////////////////////////////
-	if ( wxFile::Exists(getPortName()) == true )
-		return true;
+	switch ( inboundFormat ) {
+		case TplBinary:
+		case TplUnknown:
+		case TplTest:		return false;
+		
+		default:			if ( wxFile::Exists(getPortName()) == true )
+								return true;
+	}
 	
 	return false; 
 }
@@ -61,6 +68,8 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::BeginRu
 	
 	CncBinaryTemplateStreamer::ParameterSet ps = tr.parameter;
 	ps.fullFileName = fileName;
+	
+	inboundFormat = cnc::getTemplateFormatFromExtention(ps.SRC.fileType);
 	
 	if ( initNextSourceTemplateFileName(ps) == false) {
 		std::cerr << "SerialEmulatorStreamer::processTrigger(BeginRun): initNextSourceTemplateFileName failed" << std::endl;

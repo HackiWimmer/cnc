@@ -289,7 +289,7 @@ bool CncPerspective::addUserPerspective() {
 	
 	// insert
 	if ( insertNextUserPerspective(newLabel) == false ) {
-		std::cerr << "Cant insert the user perspective '" << newLabel << "'. insert failed!" << std::endl;
+		std::cerr << "Can't insert the user perspective '" << newLabel << "'. insert failed!" << std::endl;
 		return false;
 	}
 	

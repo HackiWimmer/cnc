@@ -1,6 +1,13 @@
 #include <wx/filename.h>
 #include "CncCommon.h"
 
+namespace cnc {
+	const char* RAPID_SPEED_CHAR_DESC			= "Rappid speed";
+	const char* WORK_SPEED_CHAR_DESC			= "Work speed";
+	const char* MAX_SPEED_CHAR_DESC				= "Max speed";
+	const char* USER_DEFIND_SPEED_CHAR_DESC		= "Userdefined speed";
+};
+
 //////////////////////////////////////////////////////////////
 void cnc::traceSetterValueList(std::ostream& s, const cnc::SetterValueList& values, int32_t factor) {
 //////////////////////////////////////////////////////////////
@@ -65,6 +72,19 @@ const char cnc::getCncSpeedTypeAsCharacter(CncSpeedMode s) {
 	return cnc::USER_DEFIND_SPEED_CHAR;
 }
 //////////////////////////////////////////////////////////////
+const char* cnc::getCncSpeedTypeAsString(CncSpeedMode s) {
+//////////////////////////////////////////////////////////////
+	switch( s ) {
+		case CncSpeedWork: 			return cnc::WORK_SPEED_CHAR_DESC; 			break;
+		case CncSpeedRapid:			return cnc::RAPID_SPEED_CHAR_DESC;			break;
+		case CncSpeedMax:			return cnc::MAX_SPEED_CHAR_DESC; 			break;
+		case CncSpeedUserDefined:	return cnc::USER_DEFIND_SPEED_CHAR_DESC; 	break;
+	}
+	
+	return "Unknown Speed mode";
+
+}
+//////////////////////////////////////////////////////////////
 const char* cnc::getTemplateFormatAsString(const TemplateFormat tf) {
 //////////////////////////////////////////////////////////////
 	switch ( tf ) {
@@ -78,6 +98,21 @@ const char* cnc::getTemplateFormatAsString(const TemplateFormat tf) {
 	}
 	
 	return "????";
+}
+//////////////////////////////////////////////////////////////
+const char* cnc::getExtention(const TemplateFormat tf) {
+//////////////////////////////////////////////////////////////
+	switch ( tf ) {
+		case TplUnknown:	return "unknown";
+		case TplText:		return "txt";
+		case TplSvg:		return "svg";
+		case TplGcode:		return "gcode";
+		case TplBinary:		return "bct"; 
+		case TplManual:		return "unknown"; 
+		case TplTest:		return "unknown"; 
+	}
+	
+	return "unknown";
 }
 //////////////////////////////////////////////////////////////
 const TemplateFormat cnc::getTemplateFormatFromExtention(const char* extention) {

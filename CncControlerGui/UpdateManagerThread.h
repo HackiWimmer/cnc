@@ -135,6 +135,7 @@ class UpdateManagerThread : public wxThread {
 					processed    = false;
 					set.id       = i;
 					set.values   = v;
+					
 					return *this;
 				}
 			

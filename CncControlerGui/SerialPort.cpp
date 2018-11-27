@@ -1526,7 +1526,7 @@ bool Serial::decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi) {
 	}
 	
 	if ( sfi.Mc.bytes%4 != 0 ) {
-		std::cerr << "ERROR while reading position value(s). Result cant broken down to int32_t values. Byte count: " << sfi.Mc.bytes << std::endl;
+		std::cerr << "ERROR while reading position value(s). Result can't broken down to int32_t values. Byte count: " << sfi.Mc.bytes << std::endl;
 		return false;
 	}
 
@@ -1571,7 +1571,7 @@ bool Serial::decodeLimitInfo(SerialFetchInfo& sfi) {
 	}
 	
 	if ( sfi.Lc.bytes%4 != 0 ) {
-		std::cerr << "ERROR while reading limit values. Result cant broken down to int32_t values. Byte count: " << sfi.Lc.bytes << std::endl;
+		std::cerr << "ERROR while reading limit values. Result can't broken down to int32_t values. Byte count: " << sfi.Lc.bytes << std::endl;
 		return false;
 	}
 

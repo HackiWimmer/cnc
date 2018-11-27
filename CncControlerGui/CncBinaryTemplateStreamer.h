@@ -41,8 +41,8 @@ class CncBinaryTemplateStreamer {
 			std::string fullFileName;
 			
 			struct Source {
-				std::string fileName;
-				std::string fileType;
+				wxString fileName;
+				wxString fileType;
 			} SRC;
 
 			struct Setup {

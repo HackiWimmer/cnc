@@ -131,7 +131,7 @@ bool CncFileView::openDirectory(const wxString& dirName) {
 	
 	wxDir dir(dn);
 	if ( !dir.IsOpened() ) {
-		std::cerr << "CncFileView::openDirectory: Cant open directory: " << dirName << std::endl;
+		std::cerr << "CncFileView::openDirectory: Can't open directory: " << dirName << std::endl;
 		m_fileList->InsertItem(m_fileList->GetItemCount(), dirName, FileListImage::FTI_ERROR);
 		return false;
 	}

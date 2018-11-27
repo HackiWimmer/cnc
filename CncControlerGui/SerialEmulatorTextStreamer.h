@@ -8,6 +8,19 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 {
 	protected:
 		
+		struct MetricBoundbox {
+			double minX				= 0.0;
+			double maxX				= 0.0;
+			double minY				= 0.0;
+			double maxY				= 0.0;
+			double minZ				= 0.0;
+			double maxZ				= 0.0;
+			
+			double distanceX		= 0.0;
+			double distanceY		= 0.0;
+			double distanceZ		= 0.0;
+		};
+		
 		struct SetterInfo {
 			unsigned char pid = PID_UNKNOWN;
 			cnc::SetterValueList values;
@@ -15,6 +28,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		
 		struct MoveInfo {
 			CncSpeedMode speedMode	= CncSpeedUserDefined;
+			double speedValue		= 0.0;
 			
 			unsigned char cmd 		= CMD_INVALID;
 			int32_t sdx				= 0;
@@ -26,9 +40,15 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 			double mdz				= 0.0;
 		};
 		
-		std::stringstream bodyStream;
-		wxString fileName;
-		CncSpeedMode currentSpeedMode;
+		std::stringstream 	headerStream;
+		std::stringstream 	bodyStream;
+		std::stringstream 	footerStream;
+		
+		wxString 			fileName;
+		CncDoublePosition	startPos;
+		CncSpeedMode 		currentSpeedMode;
+		double				currentSpeedValue;
+		MetricBoundbox 		metricBoundbox;
 		
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte);
@@ -38,6 +58,11 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		
 		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
 		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
+		
+		virtual const wxString& formatPosition(const int32_t value)          const;
+		virtual const wxString& formatPosition(const double value)           const;
+		virtual const wxString& formatPosition(const CncLongPosition& pos)   const;
+		virtual const wxString& formatPosition(const CncDoublePosition& pos) const;
 		
 	public:
 	

@@ -521,7 +521,7 @@ bool SvgEditPopup::searchCurrentNode(wxStyledTextCtrl* ctl, EditSearchParam& par
 		}
 	}
 	
-	cnc::trc.logError(wxString::Format("Cant find '%s' and/or '%s'!", parameter.in.searchStart, parameter.in.searchEnd));
+	cnc::trc.logError(wxString::Format("Can't find '%s' and/or '%s'!", parameter.in.searchStart, parameter.in.searchEnd));
 	ctl->SetCurrentPos(cp);
 	return false;
 }
@@ -576,7 +576,7 @@ bool SvgEditPopup::commentCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		}
 	}
 	
-	cnc::trc.logError("Cant find '<' and/or '>'!");
+	cnc::trc.logError("Can't find '<' and/or '>'!");
 	ctl->SetCurrentPos(cp);
 	return false;
 }
@@ -613,7 +613,7 @@ bool SvgEditPopup::uncommentCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		}
 	}
 	
-	cnc::trc.logError("Cant find '<' and/or '>'!");
+	cnc::trc.logError("Can't find '<' and/or '>'!");
 	ctl->SetCurrentPos(cp);
 	return false;
 }
@@ -641,7 +641,7 @@ bool SvgEditPopup::selectCurrentSvgNode(wxStyledTextCtrl* ctl) {
 		}
 	}
 	
-	cnc::trc.logError("Cant find '<' and/or '>'!");
+	cnc::trc.logError("Can't find '<' and/or '>'!");
 	ctl->SetCurrentPos(cp);
 	return false;
 }

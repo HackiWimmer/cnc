@@ -22,6 +22,18 @@ class CncFilePreview : public CncFilePreviewBase
 		
 		void installContent();
  
+	protected:
+		
+		virtual void show3D(wxCommandEvent& event);
+		virtual void showFromBottom3D(wxCommandEvent& event);
+		virtual void showFromFront3D(wxCommandEvent& event);
+		virtual void showFromLeft3D(wxCommandEvent& event);
+		virtual void showFromRear3D(wxCommandEvent& event);
+		virtual void showFromRight3D(wxCommandEvent& event);
+		virtual void showFromTop3D(wxCommandEvent& event);
+		
+		
+		void activate3DPerspectiveButton(wxButton* bt);
 };
 
 #endif // CNCFILEPREVIEW_H

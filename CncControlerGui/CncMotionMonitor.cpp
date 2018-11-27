@@ -57,8 +57,7 @@ wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////
 CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList) 
-: wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, 
-	         wxFULL_REPAINT_ON_RESIZE)
+: CncGlCanvas(parent, attribList)
 , flags()
 , monitor(new GLContextCncPath(this))
 , testCube(new GLContextTestCube(this))
@@ -67,7 +66,6 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
 , isShown(false)
-, mouseMoveMode(false)
 , zoom(2.0f)
 , currentClientID(-1L)
 {
@@ -75,6 +73,9 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	GLContextBase::globalInit(); 
 	monitor->init();
 	testCube->init();
+	
+	// Important: initialize the CncGlCanvas context
+	context = monitor;
 	
 	// bind
 	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneX3D, 	this);
@@ -245,16 +246,6 @@ void CncMotionMonitor::appendVertice(long id, float x, float y, float z, GLI::GL
 	static GLI::GLCncPathVertices d;
 	monitor->appendPathData(d.set(id, x, y, z, colour, formatType, cm)); 
 }
-//////////////////////////////////////////////////
-void CncMotionMonitor::view(GLContextBase::ViewMode fm) {
-//////////////////////////////////////////////////
-	monitor->setViewMode(fm);
-	
-	const wxSize cs = GetClientSize();
-	monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
-	
-	display();
-}
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::centerViewport() {
 /////////////////////////////////////////////////////////////////
@@ -382,64 +373,7 @@ void CncMotionMonitor::onLeave(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
-	const wxSize cs = GetClientSize();
-
-	// activate the keyboard focus for this frame
-	this->SetFocusFromKbd();
-	
-	// wheel
-	const int rot = event.GetWheelRotation();
-	if ( rot != 0 ) {
-		if (rot < 0 ) 	monitor->getModelScale().decScale();
-		else 			monitor->getModelScale().incScale();
-		display();
-	}
-	
-	// move origin
-	if ( event.ControlDown() == false ) {
-		static int lx = 0, ly = 0;
-		static int mx = 0, my = 0;
-		
-		if ( event.LeftDown() == true && mouseMoveMode == false ) {
-			lx = monitor->getLastReshapeX();
-			ly = cs.GetHeight() - monitor->getLastReshapeY();
-			
-			mx = event.GetX();
-			my = event.GetY();
-			
-			mouseMoveMode = true;
-		}
-		
-		// calculate new origin
-		if ( mouseMoveMode == true ) {
-			const int dx = event.GetX() - mx;
-			const int dy = event.GetY() - my;
-			
-			const int nx = lx + dx;
-			const int ny = cs.GetHeight() - ly - dy;
-			
-			monitor->reshape(cs.GetWidth(), cs.GetHeight(), nx, ny);
-			display();
-		}
-		
-		// reset move mode
-		if ( event.LeftUp() == true ) {
-			mouseMoveMode = false;
-		}
-
-	// set origin
-	} else {
-		
-		// left button
-		if ( event.LeftIsDown() == true ) {
-			// reverse y because the opengl viewport origin (0,0) is at left/bottom
-			const int x = event.GetX();
-			const int y = cs.GetHeight() - event.GetY();
-			
-			monitor->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
-			display();
-		}
-	}
+	CncGlCanvas::onMouse(event);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {

@@ -139,7 +139,7 @@ void SerialSimulatorFacade::createSerialThread() {
 		serialThread = new SerialSimulatorDevNull(this);
 	
 	if ( serialThread == NULL ) {
-		std::cerr << "SerialSimulatorFacade::createSerialThread: Cant select a SerialSimulator for: " << getPortName() << std::endl;
+		std::cerr << "SerialSimulatorFacade::createSerialThread: Can't select a SerialSimulator for: " << getPortName() << std::endl;
 		return;
 	}
 	

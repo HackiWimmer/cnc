@@ -325,19 +325,19 @@ void MainFrame::umPostEvent(const UpdateManagerThread::Event& evt) {
 ///////////////////////////////////////////////////////////////////
 	if ( updateManagerThread == NULL ) 
 		return;
-	
+		
 	if ( updateManagerThread->IsPaused() == true ) {
 		wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 		updateManagerThread->Resume();
 	}
 	
-	//clog << "MainFrame::umPostEvent " << evt.getTypeAsString() << endl;
+	//std::clog << "MainFrame::umPostEvent " << evt.getTypeAsString() << std::endl;
 	updateManagerThread->postEvent(evt); 
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	// overides the from wxcrafter generted method
+	// overides the wxcrafter generted method
 	event.Skip();
 	
 	if (event.IsDropDownClicked()) {
@@ -352,7 +352,7 @@ void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
 					wxPoint pt = event.GetItemRect().GetBottomLeft();
 					pt.y++;
 					
-					// dont use the toolbar event handler because this will generate a crash will cnc::waitActive is in action!
+					// dont use the toolbar event handler because this will generate a crash while cnc::waitActive is in action!
 					// toolbar->PopupMenu(iter->second, pt);
 					this->PopupMenu(iter->second, pt);
 					
@@ -1752,74 +1752,15 @@ bool MainFrame::connectSerialPort() {
 	if ( sel.IsEmpty() ) 
 		return false;
 	
-	bool ret = false;
-	wxString cs;
-	
 	disableControls();
-	
-	outboundEditor->clearContent();
-	outboundFilePreview->selectEmptyPreview();
+	decorateOutboundSaveControls(false);
+	decorateOutboundEditor();
 	
 	m_miRqtIdleMessages->Check(false);
 	m_miRqtIdleMessages->Enable(false);
 	
-	// disconnect and delete the current cnc control
-	if ( cnc != NULL ) {
-		cnc->disconnect();
-		delete cnc;
-	}
-	
-	if ( sel == _portEmulatorNULL ) {
-		cnc = new CncControl(CncEMU_NULL);
-		cs.assign("dev/null");
-		GBL_CONFIG->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
-		
-	} else if ( sel == _portSimulatorNULL ) {
-		cnc = new CncControl(CncPORT_SIMU);
-		cs.assign(_portSimulatorNULL);
-		GBL_CONFIG->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
-		
-	} else if ( sel == _portEmulatorTEXT ) {
-		cnc = new CncControl(CncEMU_TXT);
-		cs.assign(CncFileNameService::getCncOutboundTxtFileName());
-		GBL_CONFIG->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
-		
-	} else if ( sel == _portEmulatorSVG ) {
-		cnc = new CncControl(CncEMU_SVG);
-		cs.assign(CncFileNameService::getCncOutboundSvgFileName());
-		GBL_CONFIG->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
-		
-	} else if ( sel == _portEmulatorGCODE ) {
-		cnc = new CncControl(CncEMU_GCODE);
-		cs.assign(CncFileNameService::getCncOutboundGCodeFileName());
-		GBL_CONFIG->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
-		
-	} else if ( sel == _portEmulatorBIN) {
-		cnc = new CncControl(CncEMU_BIN);
-		cs.assign(CncFileNameService::getCncOutboundBinFileName());
-		GBL_CONFIG->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
-		
-	} else {
-		cnc = new CncControl(CncPORT);
-		cs.assign("\\\\.\\");
-		cs.append(sel);
-		GBL_CONFIG->setProbeMode(false);
-		decorateSecureDlgChoice(true);
-		decorateSpeedControlBtn(true);
-	}
-	
+	wxString serialFileName;
+	createCncControl(sel, serialFileName);
 	if ( cnc == NULL || cnc->getSerial() == NULL )
 		return false;
 	
@@ -1827,7 +1768,9 @@ bool MainFrame::connectSerialPort() {
 	selectSerialSpyMode();
 	
 	lastPortName.clear();
-	if ( (ret = cnc->connect(cs)) == true )  {
+
+	bool ret = false;
+	if ( (ret = cnc->connect(serialFileName)) == true )  {
 		lastPortName.assign(sel);
 		clearMotionMonitor();
 		
@@ -1850,10 +1793,107 @@ bool MainFrame::connectSerialPort() {
 	decoratePortSelector();
 	m_connect->Refresh();
 	m_connect->Update();
+	
 	stopAnimationControl();
 	enableControls();
 	
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+const wxString& MainFrame::createCncControl(const wxString& sel, wxString& serialFileName) {
+///////////////////////////////////////////////////////////////////
+	// disconnect and delete the current cnc control
+	if ( cnc != NULL ) {
+		cnc->disconnect();
+		delete cnc;
+	}
+	
+	serialFileName.clear();
+	cnc = NULL;
+	
+	if ( sel == _portEmulatorNULL ) {
+		cnc = new CncControl(CncEMU_NULL);
+		serialFileName.assign("dev/null");
+		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
+		
+	} else if ( sel == _portSimulatorNULL ) {
+		cnc = new CncControl(CncPORT_SIMU);
+		serialFileName.assign(_portSimulatorNULL);
+		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(false);
+		
+	} else if ( sel == _portEmulatorTEXT ) {
+		cnc = new CncControl(CncEMU_TXT);
+		serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
+		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(true);
+		
+	} else if ( sel == _portEmulatorSVG ) {
+		cnc = new CncControl(CncEMU_SVG);
+		serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
+		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(true);
+		
+	} else if ( sel == _portEmulatorGCODE ) {
+		cnc = new CncControl(CncEMU_GCODE);
+		serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
+		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(true);
+		
+	} else if ( sel == _portEmulatorBIN) {
+		cnc = new CncControl(CncEMU_BIN);
+		serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
+		GBL_CONFIG->setProbeMode(true);
+		decorateSecureDlgChoice(false);
+		decorateSpeedControlBtn(true);
+		
+	} else {
+		cnc = new CncControl(CncPORT);
+		serialFileName.assign("\\\\.\\");
+		serialFileName.append(sel);
+		GBL_CONFIG->setProbeMode(false);
+		decorateSecureDlgChoice(true);
+		decorateSpeedControlBtn(true);
+	}
+	
+	return serialFileName;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::decorateOutboundEditor(const char* fileName) {
+///////////////////////////////////////////////////////////////////
+	wxString url(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialContentAvailable.svg"));
+	if ( wxFileName::Exists(url) == false )
+		url.assign("about:blank");
+
+	if ( fileName == NULL ) {
+		m_outboundEditorWebView->LoadURL(url);
+		m_simpleBookOutBoundEditor->SetSelection(1);
+		
+		outboundEditor->clearContent();
+		outboundFilePreview->selectEmptyPreview();
+		
+		return;
+	}
+	
+	if ( wxFileName::Exists(fileName) == false ) {
+		m_outboundEditorWebView->LoadURL(url);
+		m_simpleBookOutBoundEditor->SetSelection(1);
+		
+		std::cerr << "MainFrame::decorateOutboundEditor(): Can't open file: '" 
+		          << fileName 
+		          << "'" << std::endl;
+		return;
+	}
+
+	m_simpleBookOutBoundEditor->SetSelection(0);
+	outboundEditor->openFile(fileName);
+	outboundFilePreview->selectPreview(fileName);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableMenu(wxMenu* m, bool state) {
@@ -2230,9 +2270,8 @@ void MainFrame::fillFileDetails(bool fileLoaded, const char* extFileName) {
 		if ( evaluate == true ) {
 			
 			wxFileName file(fileName);
-			details.append(wxString::Format("Full Name       : %s\n", file.GetFullPath()));
-			details.append(wxString::Format("Change Datetime : %s\n", file.GetModificationTime().FormatISOCombined(' ')));
-			details.append(wxString::Format("File Size       : %s\n", file.GetHumanReadableSize()));
+			details.append(wxString::Format("%s\n", file.GetModificationTime().FormatISOCombined(' ')));
+			details.append(wxString::Format("%s",   file.GetHumanReadableSize()));
 		}
 	}
 	
@@ -2434,7 +2473,7 @@ void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
 	wxFileName tplFile(fn);
 	
 	if ( tplFile.Exists() == false ) {
-		std::cerr << "MainFrame::removeTemplateFromButton: Cant find: " << fn << std::endl;
+		std::cerr << "MainFrame::removeTemplateFromButton: Can't find: " << fn << std::endl;
 		return;
 	}
 	
@@ -2474,7 +2513,7 @@ void MainFrame::renameTemplateFromButton(wxCommandEvent& event) {
 	wxFileName tplFile(oldFileName);
 	
 	if ( tplFile.Exists() == false ) {
-		std::cerr << "MainFrame::renameTemplateFromButton: Cant find: " << oldFileName << std::endl;
+		std::cerr << "MainFrame::renameTemplateFromButton: Can't find: " << oldFileName << std::endl;
 		return;
 	}
 	
@@ -2485,7 +2524,7 @@ void MainFrame::renameTemplateFromButton(wxCommandEvent& event) {
 	
 	// search again - if the dialog was a long time opened the file may be removed otherwise
 	if ( tplFile.Exists() == false ) {
-		std::cerr << "MainFrame::renameTemplateFromButton: Cant find: " << oldFileName << std::endl;
+		std::cerr << "MainFrame::renameTemplateFromButton: Can't find: " << oldFileName << std::endl;
 		return;
 	}
 	
@@ -2651,7 +2690,7 @@ bool MainFrame::saveTextFile() {
 		
 		return true;
 	} else {
-		std::cerr << "Cant save file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
+		std::cerr << "Can't save file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
 	}
 	
 	return false;
@@ -3387,11 +3426,15 @@ void MainFrame::updateSetterList() {
 	if ( setterList->IsFrozen() == false )
 		setterList->Freeze();
 		
+	int sizeBefore = setterList->getItemCount();
 	if ( updateManagerThread->fillSetterList(setterList) > 0 ) {
-		setterList->updateColumnWidth();
-		setterList->Refresh();
+		if ( sizeBefore == 0 )
+			setterList->updateColumnWidth();
 		
-		setterList->EnsureVisible(0L);
+		if ( setterList->IsShownOnScreen() ) {
+			setterList->Refresh();
+			setterList->EnsureVisible(0L);
+		}
 	}
 
 	if ( setterList->IsFrozen() == true )
@@ -4064,7 +4107,7 @@ d) X(mid), Y(mid), Z(mid)
 	CncTransactionLock ctl(this);
 	
 	if ( isZeroReferenceValid == false ) {
-		cnc::trc.logError("The current reference position isn't valid. Therefore, cant move home");
+		cnc::trc.logError("The current reference position isn't valid. Therefore, can't move home");
 		return;
 	}
 	
@@ -4662,7 +4705,7 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 							}
 		
 		default:			if ( fn.IsEmpty() == false )
-								cnc::trc.logError(wxString::Format("Cant preview: '%s'", fn));
+								cnc::trc.logError(wxString::Format("Can't preview: '%s'", fn));
 								
 							fillFileDetails(false);
 							return;
@@ -5243,11 +5286,10 @@ void MainFrame::decorateOutboundSaveControls(bool state) {
 	
 	if ( state == true ) {
 		wxString outboundFile(cnc->getSerial()->getPortName());
-		outboundEditor->openFile(outboundFile);
-		outboundFilePreview->selectPreview(outboundFile);
+		decorateOutboundEditor(outboundFile);
+		
 	} else {
-		outboundEditor->clearContent();
-		outboundFilePreview->selectEmptyPreview();
+		decorateOutboundEditor();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -5502,11 +5544,22 @@ const char* MainFrame::getCurrentPortName(wxString& ret) {
 	if ( cnc != NULL ) {
 		wxString cn(cnc->getSerial()->getClassName());
 		wxString pn(cnc->getSerial()->getPortName());
-		pn.Replace("\\","",true);
-		pn.Replace(".","",true);
 		
-		if ( pn.IsEmpty() )	ret.assign(wxString::Format("%s", cn));
-		else				ret.assign(wxString::Format("%s", pn));
+		ret.assign(wxString::Format("%s", cn));
+		
+		if ( pn.IsEmpty() == false ) {
+			wxFileName fn(pn);
+			if ( fn.HasExt() ) {
+				pn.assign(fn.GetFullName());
+				
+			} else {
+				pn.Replace("\\","",true);
+				pn.Replace(".","",true);
+				
+			}
+			
+			ret.append(wxString::Format("::%s", pn));
+		}
 	}
 	
 	return ret;
@@ -5885,7 +5938,7 @@ void MainFrame::showFromRight3D(wxCommandEvent& event) {
 void MainFrame::show3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxButton* bt = (wxButton*)event.GetEventObject();
-
+	
 	if ( bt == m_3D_Perspective1 ) {
 		activate3DPerspectiveButton(bt);
 		motionMonitor->viewIso1();
@@ -5952,8 +6005,7 @@ void MainFrame::clearMotionMonitor() {
 	vectiesListCtrl->clear();
 	statisticSummaryListCtrl->resetValues();
 	
-	outboundEditor->clearContent();
-	outboundFilePreview->selectEmptyPreview();
+	decorateOutboundEditor();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor(wxCommandEvent& event) {
@@ -6211,7 +6263,7 @@ bool MainFrame::verifyPathGenertorNode(wxXmlDocument& xmlDoc, const wxString& no
 	
 	wxStringInputStream xmlStream(node);
 	if ( xmlDoc.Load(xmlStream) == false ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Cant create an XML document from received node!\n";
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Can't create an XML document from received node!\n";
 		errorInfo << "Please check the selection.\n";
 		errorInfo << "Nothing will be done!\n";
 		return false;
@@ -6219,7 +6271,7 @@ bool MainFrame::verifyPathGenertorNode(wxXmlDocument& xmlDoc, const wxString& no
 	
 	wxXmlNode* root = xmlDoc.GetRoot();
 	if ( root == NULL ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Cant evaluate a root node.\n";
+		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Can't evaluate a root node.\n";
 		errorInfo << "Please check the selection.\n";
 		errorInfo << "Nothing will be done!\n";
 		return false;
@@ -7326,7 +7378,8 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 	
 	wxString headline("Save Outbound as new Template");
 	wxString inboundFile(getCurrentTemplatePathFileName());
-	inboundFile.append(".bct");
+	inboundFile.append(".");
+	inboundFile.append(outboundEditor->getExtention());
 	
 	wxString newFile;
 	while ( true ) {

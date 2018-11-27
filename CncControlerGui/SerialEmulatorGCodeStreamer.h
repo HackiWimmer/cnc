@@ -19,6 +19,8 @@ class SerialEmulatorGCodeStreamer : public SerialEmulatorTextStreamer
 		explicit SerialEmulatorGCodeStreamer(const char *fileName);
 		virtual ~SerialEmulatorGCodeStreamer();
 		
+		virtual bool isOutputAsTemplateAvailable();
+		
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulatorGCodeStreamer"; }
 		

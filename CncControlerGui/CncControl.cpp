@@ -1871,7 +1871,7 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	// Always disable probe mode here, otherwise very long move distances appear
 	const bool probeModeBefore = GBL_CONFIG->isProbeMode();
 	if ( enableProbeMode(false) == false ) {
-		std::cerr << " Cant disable probe mode. Manual continous move aborted" << std::endl;
+		std::cerr << " Can't disable probe mode. Manual continous move aborted" << std::endl;
 		return false;
 	}
 	GBL_CONFIG->setProbeMode(false);
@@ -1907,7 +1907,7 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	
 	// reactivate configured probe mode state
 	if ( (ret = enableProbeMode(probeModeBefore)) == false ) {
-		std::cerr << " Cant reactivate probe mode." << std::endl;
+		std::cerr << " Can't reactivate probe mode." << std::endl;
 	}
 	GBL_CONFIG->setProbeMode(probeModeBefore);
 	

@@ -60,13 +60,13 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		virtual ~CncBaseEditor();
 		
 		virtual bool Enable(bool enable = true);
+		virtual void clearContent();
 		
 		void gotoBegin();
 		void gotoEnd();
 		
 		bool selectLineNumber(unsigned long ln, const char* searchKey = NULL);
 		
-		void clearContent();
 		void prepareNewTemplateFile(TemplateFormat tf);
 		bool openFile(const wxString& fileName);
 		

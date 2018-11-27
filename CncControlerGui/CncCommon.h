@@ -55,6 +55,7 @@ namespace cnc {
 	const char MAX_SPEED_CHAR 			= 'M';
 	const char USER_DEFIND_SPEED_CHAR 	= 'U';
 	const char getCncSpeedTypeAsCharacter(CncSpeedMode s);
+	const char* getCncSpeedTypeAsString(CncSpeedMode s);
 	
 	extern CncBasicLogStream  cex1;
 	extern CncTraceLogStream  trc;
@@ -70,6 +71,7 @@ namespace cnc {
 	const TemplateFormat getTemplateFormatFromFileName(const char* fileName);
 	const TemplateFormat getTemplateFormatFromExtention(const char* extention);
 	const char* getTemplateFormatAsString(const TemplateFormat tf);
+	const char* getExtention(const TemplateFormat tf);
 	
 	void traceSetterValueList(std::ostream& s, const SetterValueList& values, int32_t factor = 1);
 	void traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater& lnt);

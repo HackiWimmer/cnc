@@ -1,9 +1,9 @@
 #ifndef CNC_MOTION_MONITOR_H
 #define CNC_MOTION_MONITOR_H
 
-#include <wx/glcanvas.h>
 #include <wx/timer.h>
 
+#include "CncGLCanvas.h"
 #include "CncPosition.h"
 #include "CncCommon.h"
 #include "3D/VerticeData.h"
@@ -15,7 +15,7 @@ class GL3DOptions;
 class CncVectiesListCtrl;
 
 /////////////////////////////////////////////////////////////
-class CncMotionMonitor : public wxGLCanvas {
+class CncMotionMonitor : public CncGlCanvas {
 
 	public:
 
@@ -40,27 +40,16 @@ class CncMotionMonitor : public wxGLCanvas {
 		void onKeyDown(wxKeyEvent& event);
 		
 		// interface
+		virtual void display();
+		
 		void enable(bool state);
 		void decorateProbeMode(bool state);
 		void clear();
-		void display();
 		void appendVertice(const GLI::VerticeLongData& vd);
 		void centerViewport();
 		void resetRotation();
 		
 		void setModelType(const GLContextBase::ModelType mt);
-		
-		void viewTop() 		{ view(GLContextBase::ViewMode::V2D_TOP); }
-		void viewBottom() 	{ view(GLContextBase::ViewMode::V2D_BOTTOM); }
-		void viewLeft() 	{ view(GLContextBase::ViewMode::V2D_LEFT); }
-		void viewRight()	{ view(GLContextBase::ViewMode::V2D_RIGHT); }
-		void viewFront() 	{ view(GLContextBase::ViewMode::V2D_FRONT); }
-		void viewRear() 	{ view(GLContextBase::ViewMode::V2D_REAR); }
-
-		void viewIso1() 	{ view(GLContextBase::ViewMode::V3D_ISO1); }
-		void viewIso2() 	{ view(GLContextBase::ViewMode::V3D_ISO2); }
-		void viewIso3() 	{ view(GLContextBase::ViewMode::V3D_ISO3); }
-		void viewIso4() 	{ view(GLContextBase::ViewMode::V3D_ISO4); }
 		
 		void setAngleX(int a) { monitor->getModelRotation().setAngleX(a); display(); }
 		void setAngleY(int a) { monitor->getModelRotation().setAngleY(a); display(); }
@@ -133,7 +122,6 @@ class CncMotionMonitor : public wxGLCanvas {
 		int cameraRotationSpeed;
 		
 		bool isShown;
-		bool mouseMoveMode;
 		
 		float zoom;
 		
@@ -150,8 +138,6 @@ class CncMotionMonitor : public wxGLCanvas {
 		void onPaintRotatePaneY3D(wxPaintEvent& event);
 		void onPaintRotatePaneZ3D(wxPaintEvent& event);
 		void onPaintScalePane3D(wxPaintEvent& event);
-		
-		void view(GLContextBase::ViewMode fm);
 		
 	private:
 		

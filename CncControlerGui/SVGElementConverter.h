@@ -375,7 +375,7 @@ class SVGElementConverter {
 			if ( child->GetName().Upper() == "PATH" ) {
 				ret.assign(child->GetAttribute("d", ""));
 				if ( ret.IsEmpty() ) {
-					_errorInfo.append("Cant find the attribute 'd' or it is empty\n");
+					_errorInfo.append("Can't find the attribute 'd' or it is empty\n");
 					return false;
 				}
 				
@@ -409,7 +409,7 @@ class SVGElementConverter {
 		static bool convertNodeToPathData(const wxString& node, wxString& ret, SvgNodeAttributeMap& aMap) {
 			wxXmlDocument xmlDoc;
 			wxStringInputStream xmlStream(node);
-			wxLogNull dummyToSuppressXmlDocErrorMessages;
+			//wxLogNull dummyToSuppressXmlDocErrorMessages;
 			if ( xmlDoc.Load(xmlStream) == false ) {
 				_errorInfo.append("XmlDocument.Load failed\n");
 				return false;

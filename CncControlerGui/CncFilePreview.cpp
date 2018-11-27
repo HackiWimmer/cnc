@@ -29,7 +29,7 @@ bool CncFilePreview::selectEmptyPreview() {
 	wxASSERT( m_previewBook->GetPageCount() > 0 );
 	m_previewBook->SetSelection(0);
 	
-	wxString fileName(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoPreviewAvailable.svg"));
+	wxString fileName(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
 	if ( wxFileName::Exists(fileName) == false )
 		fileName.assign("about:blank");
 	
@@ -93,6 +93,9 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 		case TplBinary:		selectBinaryPreview(fileName);
 							break;
 							
+		case TplText:		selectEmptyPreview();
+							break;
+							
 		default:			std::cerr << "CncFilePreview::selectPreview(): No preview registered for: " 
 									  << cnc::getTemplateFormatAsString(tf)
 									  << std::endl;
@@ -100,3 +103,91 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 	
 	return true;
 }
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::activate3DPerspectiveButton(wxButton* bt) {
+///////////////////////////////////////////////////////////////////
+	static wxColour active(171, 171, 171);
+	static wxColour inactive(240, 240, 240);
+
+	m_3D_Top->SetBackgroundColour(inactive);
+	m_3D_Bottom->SetBackgroundColour(inactive);
+	m_3D_Front->SetBackgroundColour(inactive);
+	m_3D_Rear->SetBackgroundColour(inactive);
+	m_3D_Left->SetBackgroundColour(inactive);
+	m_3D_Right->SetBackgroundColour(inactive);
+	m_3D_Perspective1->SetBackgroundColour(inactive);
+	m_3D_Perspective2->SetBackgroundColour(inactive);
+	m_3D_Perspective3->SetBackgroundColour(inactive);
+	m_3D_Perspective4->SetBackgroundColour(inactive);
+	
+	if ( bt != NULL ) {
+		bt->SetBackgroundColour(active);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::show3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxButton* bt = (wxButton*)event.GetEventObject();
+	
+	if ( bt == m_3D_Perspective1 ) {
+		activate3DPerspectiveButton(bt);
+		gcodePreview->viewIso1();
+		
+	} else if ( bt == m_3D_Perspective2 ) {
+		activate3DPerspectiveButton(bt);
+		gcodePreview->viewIso2();
+		
+	} else if ( bt == m_3D_Perspective3 ) {
+		activate3DPerspectiveButton(bt);
+		gcodePreview->viewIso3();
+		
+	} else if ( bt == m_3D_Perspective4 ) {
+		activate3DPerspectiveButton(bt);
+		gcodePreview->viewIso4();
+		
+	}
+	
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::showFromBottom3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
+	gcodePreview->viewBottom();
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::showFromFront3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
+	gcodePreview->viewFront();
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::showFromLeft3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
+	gcodePreview->viewLeft();
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::showFromRear3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
+	gcodePreview->viewRear();
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::showFromRight3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
+	gcodePreview->viewRight();
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::showFromTop3D(wxCommandEvent& event) {
+	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
+	gcodePreview->viewTop();
+	Refresh();
+}
+

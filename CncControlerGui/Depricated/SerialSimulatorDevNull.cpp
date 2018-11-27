@@ -6,7 +6,7 @@
  *	Don't use std::cout|clog &Co directly in this thtead.
  *	Due to the fact that this will deadlock this thread,
  *  because the main thread sleeps in condition of
- * 	sleepMilliseconds(...) and the redirected streams cant
+ * 	sleepMilliseconds(...) and the redirected streams can't
  * 	be well solved.
  *
  *	Use instead:

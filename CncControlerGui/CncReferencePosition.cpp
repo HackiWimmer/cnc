@@ -275,7 +275,7 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 	if ( isWorkpieceThicknessNeeded() ) {
 		if ( cnc::dblCompareNull(getWorkpieceThickness()) == true ) {
 			wxMessageDialog dlg(this, 
-								_T("For the choosen mode workpiece thickness cant be 0.0"), 
+								_T("For the choosen mode workpiece thickness can't be 0.0"), 
 								_T("Invalid Workpiece Thickess  . . ."), 
 								wxOK|wxICON_ERROR|wxCENTRE);
 			dlg.ShowModal();
