@@ -88,8 +88,17 @@
       <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;release2"/>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
+      <File Name="GL3DDrawPane.h"/>
+      <File Name="GL3DDrawPane.cpp"/>
+      <File Name="Gl3DOptionPane.h"/>
+      <File Name="Gl3DOptionPane.cpp"/>
+      <File Name="3D/CncGLCanvas.cpp"/>
       <File Name="CncGLCanvas.h"/>
       <VirtualDirectory Name="Base">
+        <File Name="3D/GLLabelCluser.cpp"/>
+        <File Name="3D/GLLabelCluster.h"/>
+        <File Name="3D/GLLineCluster.cpp"/>
+        <File Name="3D/GLLineCluster.h"/>
         <File Name="3D/GLContextBase.cpp"/>
         <File Name="3D/GLContextBase.h"/>
         <File Name="3D/GLContextPathBase.cpp"/>
@@ -114,7 +123,6 @@
       <File Name="GL3DOptions.h"/>
       <File Name="3D/CncGCodePreview.h"/>
       <VirtualDirectory Name="Utils">
-        <File Name="3D/CncGLCanvas.cpp"/>
         <File Name="3D/VerticeData.h"/>
       </VirtualDirectory>
       <File Name="3D/CncGCodePreview.cpp"/>
@@ -194,6 +202,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncMonitorSplitterWindow.cpp"/>
+      <File Name="CncMonitorSplitterWindow.h"/>
       <File Name="CncCommandDecoder.cpp"/>
       <File Name="CncCommandDecoder.h"/>
       <File Name="CncSha1Wrapper.h"/>

@@ -18,12 +18,12 @@ class CncVectiesListCtrl;
 class CncMotionMonitor : public CncGlCanvas {
 
 	public:
-
+		
 		///////////////////////////////////////////////////
 		struct Flags {
-			bool positionMarker 	= true;
-			bool drawFlyPath		= true;
-			bool autoScaling		= true;
+			bool positionMarker 		= true;
+			bool autoScaling			= true;
+			bool drawFlyPath			= true;
 			
 			wxColour rapidColour		= *wxYELLOW;
 			wxColour workColour			= *wxWHITE;
@@ -87,27 +87,43 @@ class CncMotionMonitor : public CncGlCanvas {
 		void cameraRotationTimerHandler(CncMotionMonitor::CameraMode cm);
 		
 		// zoom handling
-		float getZoom() { return zoom; }
-		void setZoom(float z) { zoom = z; monitor->setZoomFactor(zoom); }
+		float getZoom() 		{ return zoom; }
+		void setZoom(float z) 	{ zoom = z; monitor->setZoomFactor(zoom); }
 		
 		// smoothing
-		bool isSmoothingEnabled() { return monitor->isSmoothingEnabled(); }
-		void enableSmoothing(bool state=true) { monitor->enableSmoothing(state); }
+		bool isSmoothingEnabled() 				{ return monitor->isSmoothingEnabled(); }
+		void enableSmoothing(bool state=true) 	{ monitor->enableSmoothing(state); }
 		
 		// draw type
-		GLContextCncPathBase::DrawType getDrawType() { return monitor->getDrawType(); }
-		void setDrawType(GLContextCncPathBase::DrawType t) { monitor->setDrawType(t); }
+		GLContextCncPathBase::DrawType getDrawType() 		{ return monitor->getDrawType(); }
+		void setDrawType(GLContextCncPathBase::DrawType t) 	{ monitor->setDrawType(t); }
 		
 		// bound box
-		bool isBoundBoxEnabled() { return monitor->isBoundBoxEnabled(); }
-		void enableBoundBox(bool enable) { monitor->enableBoundBox(enable); }
-		const wxColour& getBoundBoxColour() { return monitor->getBoundBoxColour(); }
-		void setBoundBoxColour(const wxColour& c) { monitor->setBoundBoxColour(c); }
+		bool isBoundBoxEnabled() 					{ return monitor->isBoundBoxEnabled(); }
+		void enableBoundBox(bool enable) 			{ monitor->enableBoundBox(enable); }
+		const wxColour& getBoundBoxColour() 		{ return monitor->getBoundBoxColour(); }
+		void setBoundBoxColour(const wxColour& c) 	{ monitor->setBoundBoxColour(c); }
 		
+		// origin
+		bool isOriginEnabled() 						{ return monitor->isDrawOriginEnabled(); }
+		void enableOrigin(bool enable)	 			{ monitor->enableDrawOrigin(); }
+
+		// ruler
+		bool isRulerEnabled() 						{ return monitor->isRulerEnabled(); }
+		void enableRuler(bool enable)	 			{ monitor->enableRuler(enable); }
+		
+		void createRuler();
+		
+		// help lines
+		bool isHelpLinesEnabled() 					{ return monitor->isHelpLinesEnabled(); }
+		void enableHelpLines(bool enable)	 		{ monitor->enableHelpLines(enable); }
+
 		// client id
-		long getCurrentClientId() { return currentClientID; }
-		void setCurrentClientId(long id) { currentClientID = id; monitor->setCurrentClientId(id); }
-		void resetCurrentClientId() { setCurrentClientId(-1L); }
+		long getCurrentClientId() 			{ return currentClientID; }
+		void setCurrentClientId(long id) 	{ currentClientID = id; monitor->setCurrentClientId(id); }
+		void resetCurrentClientId() 		{ setCurrentClientId(-1L); }
+		
+		void updateMonitor();
 		
 	protected:
 	

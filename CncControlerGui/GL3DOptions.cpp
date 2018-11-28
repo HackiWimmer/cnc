@@ -78,6 +78,15 @@ void GL3DOptions::restoreFlags() {
 	m_pgPropDrawBoundBox->SetValue(motionMonitor->isBoundBoxEnabled());
 	m_pgPropBoundBoxColour->SetValue(wxVariant(wxColourPropertyValue(motionMonitor->getBoundBoxColour())));
 	
+	// origin
+	m_pgPropDrawOrigin->SetValue(motionMonitor->isOriginEnabled());
+	
+	// ruler
+	m_pgPropDrawRuler->SetValue(motionMonitor->isRulerEnabled());
+	
+	// helpLines
+	m_pgPropDrawHelpLines->SetValue(motionMonitor->isHelpLinesEnabled());
+	
 	// smoothing
 	m_pgPropSmoothing->SetValue(motionMonitor->isSmoothingEnabled());
 	
@@ -119,6 +128,15 @@ void GL3DOptions::propertyChanged(wxPropertyGridEvent& event) {
 	// bound box
 	motionMonitor->enableBoundBox(m_pgPropDrawBoundBox->GetValue().GetBool());
 	motionMonitor->setBoundBoxColour(((wxSystemColourProperty*)m_pgPropBoundBoxColour)->GetVal().m_colour);
+	
+	// origin
+	motionMonitor->enableOrigin(m_pgPropDrawOrigin->GetValue().GetBool());
+	
+	// ruler
+	motionMonitor->enableRuler(m_pgPropDrawRuler->GetValue().GetBool());
+	
+	// helpLines
+	motionMonitor->enableHelpLines(m_pgPropDrawHelpLines->GetValue().GetBool());
 	
 	// zoom
 	motionMonitor->setZoom((float)m_pgPropZoom->GetValue().GetDouble());

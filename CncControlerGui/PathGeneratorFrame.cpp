@@ -421,6 +421,8 @@ void PathGeneratorFrame::toogleSize(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void PathGeneratorFrame::toogleTreeSize(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+
 	if ( m_mainSplitter->GetSashPosition() > m_mainSplitter->GetMinimumPaneSize() ) {
 		int pos = m_mainSplitter->GetSashPosition();
 		m_mainSplitter->SetSashPosition(m_mainSplitter->GetMinimumPaneSize());

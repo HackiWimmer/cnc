@@ -174,15 +174,17 @@ bool SerialEmulatorTextStreamer::writeEncodedSetterCallback(const SetterInfo& si
 ///////////////////////////////////////////////////////////////////
 	bodyStream << Streamer::indent1 << wxString::Format("<!-- %s -->", ArduinoPIDs::getPIDLabel(si.pid)) << std::endl;
 	bodyStream << Streamer::indent1 << wxString::Format("<Setter pid=\"%u\" description=\"%s\" ", (int)si.pid, ArduinoPIDs::getPIDLabel(si.pid));
+	
 	bodyStream << "Values=\"";
 	wxString values;
-	for ( auto it = si.values.begin(); it != si.values.end(); ++it)
-		values.append(wxString::Format("%ld ", *it ));
+	for ( auto it = si.values.begin(); it != si.values.end(); ++it) {
+		if ( si.pid >= PID_DOUBLE_RANG_START && si.pid <= PID_DOUBLE_RANG_END )		values.append(wxString::Format("%.3lf ", (double)(*it) / DBL_FACT));
+		else																		values.append(wxString::Format("%ld ",   (*it) ));
+	}
 		
 	values.assign(values.Trim(false).Trim(true));
-	bodyStream << values << "\"/";
-		
-	bodyStream << Streamer::indent1 << "/>\n";
+	bodyStream << values << "\"/>\n";
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////

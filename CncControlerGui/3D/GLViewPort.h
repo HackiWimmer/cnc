@@ -122,7 +122,7 @@ class GLViewPort {
 
 	private:
 
-		static const unsigned int margin = 10;
+		static const unsigned int margin = 100;
 
 		int x, y, w, h, n;
 		int windowWidth, windowHeigth;

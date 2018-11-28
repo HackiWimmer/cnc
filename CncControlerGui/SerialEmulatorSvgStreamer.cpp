@@ -49,7 +49,9 @@ bool SerialEmulatorSvgStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 		bodyStream << dPos.getX() << " ";
 		bodyStream << dPos.getY();
 		
-	bodyStream << "\"  stroke=\"black\" fill=\"none\" stroke-width=\"0.5\" />\n";
+		
+	if ( mi.speedMode == CncSpeedRapid )	bodyStream << "\"  stroke=\"yellow\" fill=\"none\" stroke-width=\"0.5\" stroke-dasharray=\"5,10,5\" />\n";
+	else									bodyStream << "\"  stroke=\"black\"  fill=\"none\" stroke-width=\"0.5\" />\n";
 	
 	return true;
 }

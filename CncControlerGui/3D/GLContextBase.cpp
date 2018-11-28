@@ -19,6 +19,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 : wxGLContext(canvas)
 , enabled(true)
 , initialized(false)
+, drawOrigin(true)
 , drawViewPortBounderies(true)
 , posMarker(true)
 , autoScale(true)
@@ -648,7 +649,6 @@ void GLContextBase::display() {
 	// draw additional things
 	glPushMatrix();
 	
-		// bounderies - todo
 		if ( drawViewPortBounderies == true )
 			determineViewPortBounderies();
 			
@@ -656,8 +656,9 @@ void GLContextBase::display() {
 	
 	// draw coordinate origin
 	glPushMatrix();
-	
- 		drawCoordinateOrigin();
+		
+ 		if ( drawOrigin == true )
+			drawCoordinateOrigin();
 		
 	glPopMatrix();
 	

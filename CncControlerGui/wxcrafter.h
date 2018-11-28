@@ -54,6 +54,7 @@
 #include <wx/treectrl.h>
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
+#include <wx/choicebk.h>
 #include <wx/collpane.h>
 #include <wx/dialog.h>
 #include <wx/bitmap.h>
@@ -451,8 +452,12 @@ protected:
     wxPanel* m_cnc3DPane;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
     wxPanel* m_placeholderPanel;
-    wxBitmapToggleButton* m_bmpToggleBtn59541;
-    wxBitmapToggleButton* m_bmpToggleBtn5954;
+    wxBitmapToggleButton* m_btnOrigin;
+    wxBitmapToggleButton* m_btnRuler;
+    wxBitmapToggleButton* m_btnHelpLines;
+    wxBitmapToggleButton* m_btnBoundBox;
+    wxBitmapToggleButton* m_btnPosMarker;
+    wxBitmapToggleButton* m_btnFlyPath;
     wxStaticLine* m_staticLine5016;
     wxBitmapToggleButton* m_switchMonitoing;
     wxStaticLine* m_staticLine3525;
@@ -461,15 +466,7 @@ protected:
     wxStaticLine* m_staticLine47803;
     wxStaticText* m_staticText32334;
     wxSlider* m_displayInterval;
-    wxPanel* m_3DOutboundControl;
-    wxPanel* m_rotatePaneZ3D;
-    wxStaticText* m_staticText487556;
-    wxPanel* m_rotatePaneY3D;
-    wxStaticText* m_staticText48755;
-    wxPanel* m_rotatePaneX3D;
-    wxStaticText* m_staticText4875;
-    wxPanel* m_drawPane3D;
-    wxPanel* m_scalePane3D;
+    wxPanel* m_3DSplitterPlaceholder;
     wxPanel* m_3DOutboundStatistics;
     wxButton* m_btShowHideStatistics;
     wxButton* m_bt2ShowHideStatistics;
@@ -493,6 +490,8 @@ protected:
     wxButton* m_3D_Trace4;
     wxButton* m_3D_Trace;
     wxListCtrl* m_vectiesListCtrl;
+    wxButton* m_motionMonitorOptionDlg;
+    wxStaticLine* m_staticLine34832;
     wxButton* m_3D_Top;
     wxButton* m_3D_Bottom;
     wxButton* m_3D_Front;
@@ -505,7 +504,7 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
-    wxButton* m_motionMonitorOptionDlg;
+    wxButton* m_motionMonitorOptionDlg1;
     wxPanel* m_cncFile;
     wxStaticText* m_staticText6138;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate2;
@@ -890,6 +889,10 @@ protected:
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void motionMonitorOrigin(wxCommandEvent& event) { event.Skip(); }
+    virtual void motionMonitorRuler(wxCommandEvent& event) { event.Skip(); }
+    virtual void motionMonitorHelpLines(wxCommandEvent& event) { event.Skip(); }
+    virtual void motionMonitorBoundBox(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorPostionMarker(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorFlyPath(wxCommandEvent& event) { event.Skip(); }
     virtual void switchMonitoring(wxCommandEvent& event) { event.Skip(); }
@@ -902,6 +905,7 @@ protected:
     virtual void clearMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
     virtual void copyMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
     virtual void traceMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleMotionMonitorOptionPlane(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -1375,8 +1379,12 @@ public:
     wxPanel* GetCncParameters() { return m_cncParameters; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
     wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
-    wxBitmapToggleButton* GetBmpToggleBtn59541() { return m_bmpToggleBtn59541; }
-    wxBitmapToggleButton* GetBmpToggleBtn5954() { return m_bmpToggleBtn5954; }
+    wxBitmapToggleButton* GetBtnOrigin() { return m_btnOrigin; }
+    wxBitmapToggleButton* GetBtnRuler() { return m_btnRuler; }
+    wxBitmapToggleButton* GetBtnHelpLines() { return m_btnHelpLines; }
+    wxBitmapToggleButton* GetBtnBoundBox() { return m_btnBoundBox; }
+    wxBitmapToggleButton* GetBtnPosMarker() { return m_btnPosMarker; }
+    wxBitmapToggleButton* GetBtnFlyPath() { return m_btnFlyPath; }
     wxStaticLine* GetStaticLine5016() { return m_staticLine5016; }
     wxBitmapToggleButton* GetSwitchMonitoing() { return m_switchMonitoing; }
     wxStaticLine* GetStaticLine3525() { return m_staticLine3525; }
@@ -1385,15 +1393,7 @@ public:
     wxStaticLine* GetStaticLine47803() { return m_staticLine47803; }
     wxStaticText* GetStaticText32334() { return m_staticText32334; }
     wxSlider* GetDisplayInterval() { return m_displayInterval; }
-    wxPanel* GetRotatePaneZ3D() { return m_rotatePaneZ3D; }
-    wxStaticText* GetStaticText487556() { return m_staticText487556; }
-    wxPanel* GetRotatePaneY3D() { return m_rotatePaneY3D; }
-    wxStaticText* GetStaticText48755() { return m_staticText48755; }
-    wxPanel* GetRotatePaneX3D() { return m_rotatePaneX3D; }
-    wxStaticText* GetStaticText4875() { return m_staticText4875; }
-    wxPanel* GetDrawPane3D() { return m_drawPane3D; }
-    wxPanel* GetScalePane3D() { return m_scalePane3D; }
-    wxPanel* Get3DOutboundControl() { return m_3DOutboundControl; }
+    wxPanel* Get3DSplitterPlaceholder() { return m_3DSplitterPlaceholder; }
     wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
     wxButton* GetBt2ShowHideStatistics() { return m_bt2ShowHideStatistics; }
     wxStaticLine* GetStaticLine50051() { return m_staticLine50051; }
@@ -1417,6 +1417,8 @@ public:
     wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
     wxNotebook* GetStatisticBook() { return m_statisticBook; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
+    wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
+    wxStaticLine* GetStaticLine34832() { return m_staticLine34832; }
     wxButton* Get3D_Top() { return m_3D_Top; }
     wxButton* Get3D_Bottom() { return m_3D_Bottom; }
     wxButton* Get3D_Front() { return m_3D_Front; }
@@ -1429,7 +1431,7 @@ public:
     wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
-    wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
+    wxButton* GetMotionMonitorOptionDlg1() { return m_motionMonitorOptionDlg1; }
     wxPanel* GetCnc3DPane() { return m_cnc3DPane; }
     wxStaticText* GetStaticText6138() { return m_staticText6138; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate2() { return m_btSaveOutboundAsTemplate2; }
@@ -1999,6 +2001,74 @@ public:
 };
 
 
+class GL3DOptionPaneBase : public wxPanel
+{
+protected:
+    wxChoicebook* m_choicebook6345;
+    wxPanel* m_panel3DOptions;
+    wxPropertyGridManager* m_pgMgr3543;
+    wxPGProperty* m_pgCatDisplayOptions;
+    wxPGProperty* m_pgPropDrawType;
+    wxPGProperty* m_pgPropAutoScaling;
+    wxPGProperty* m_pgPropDrawOrigin;
+    wxPGProperty* m_pgPropDrawFlyPath;
+    wxPGProperty* m_pgPropDrawRuler;
+    wxPGProperty* m_pgPropDrawHelpLines;
+    wxPGProperty* m_pgPropPositionMarker;
+    wxPGProperty* m_pgPropWorkColour;
+    wxPGProperty* m_pgPropFlyColour;
+    wxPGProperty* m_pgPropZoom;
+    wxPGProperty* m_pgCatBoundBox;
+    wxPGProperty* m_pgPropDrawBoundBox;
+    wxPGProperty* m_pgPropBoundBoxColour;
+    wxPGProperty* m_pgCatRenderOptions;
+    wxPGProperty* m_pgPropSmoothing;
+    wxCheckBox* m_cbAutoUpdate;
+    wxPanel* m_panel6349;
+
+protected:
+    virtual void propertyChanged(wxPropertyGridEvent& event) { event.Skip(); }
+    virtual void propertyChanging(wxPropertyGridEvent& event) { event.Skip(); }
+
+public:
+    wxPropertyGridManager* GetPgMgr3543() { return m_pgMgr3543; }
+    wxCheckBox* GetCbAutoUpdate() { return m_cbAutoUpdate; }
+    wxPanel* GetPanel3DOptions() { return m_panel3DOptions; }
+    wxPanel* GetPanel6349() { return m_panel6349; }
+    wxChoicebook* GetChoicebook6345() { return m_choicebook6345; }
+    GL3DOptionPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~GL3DOptionPaneBase();
+};
+
+
+class GL3DDrawPaneBase : public wxPanel
+{
+protected:
+    wxPanel* m_rotatePaneZ3D;
+    wxStaticText* m_staticText487556;
+    wxPanel* m_rotatePaneY3D;
+    wxStaticText* m_staticText48755;
+    wxPanel* m_rotatePaneX3D;
+    wxStaticText* m_staticText4875;
+    wxPanel* m_drawPane3DPlaceHolder;
+    wxPanel* m_scalePane3D;
+
+protected:
+
+public:
+    wxPanel* GetRotatePaneZ3D() { return m_rotatePaneZ3D; }
+    wxStaticText* GetStaticText487556() { return m_staticText487556; }
+    wxPanel* GetRotatePaneY3D() { return m_rotatePaneY3D; }
+    wxStaticText* GetStaticText48755() { return m_staticText48755; }
+    wxPanel* GetRotatePaneX3D() { return m_rotatePaneX3D; }
+    wxStaticText* GetStaticText4875() { return m_staticText4875; }
+    wxPanel* GetDrawPane3DPlaceHolder() { return m_drawPane3DPlaceHolder; }
+    wxPanel* GetScalePane3D() { return m_scalePane3D; }
+    GL3DDrawPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(200,200), long style = wxTAB_TRAVERSAL);
+    virtual ~GL3DDrawPaneBase();
+};
+
+
 class GL3DOptionsBase : public wxFrame
 {
 protected:
@@ -2007,7 +2077,10 @@ protected:
     wxPGProperty* m_pgCatDisplayOptions;
     wxPGProperty* m_pgPropDrawType;
     wxPGProperty* m_pgPropAutoScaling;
+    wxPGProperty* m_pgPropDrawOrigin;
     wxPGProperty* m_pgPropDrawFlyPath;
+    wxPGProperty* m_pgPropDrawRuler;
+    wxPGProperty* m_pgPropDrawHelpLines;
     wxPGProperty* m_pgPropPositionMarker;
     wxPGProperty* m_pgPropWorkColour;
     wxPGProperty* m_pgPropFlyColour;

@@ -79,6 +79,10 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncUsbConnectionDetected.h"
 #include "CncConnectProgress.h"
 #include "CncSha1Wrapper.h"
+#include "CncMonitorSplitterWindow.h"
+#include "GL3DOptionPane.h"
+#include "GL3DDrawPane.h"
+#include "GL3DOptions.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -177,6 +181,11 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , statisticSummaryListCtrl(NULL)
 , vectiesListCtrl(NULL)
 , cncSummaryListCtrl(NULL)
+, accelGraphPanel(NULL)
+, cncGamepadState(NULL)
+, optionPane3D(NULL)
+, drawPane3D(NULL)
+, cnc3DSplitterWindow(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
@@ -425,9 +434,17 @@ void MainFrame::enableGuiControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
+	// 3D splitter window
+	cnc3DSplitterWindow = new CncMonitorVSplitterWindow(this);
+	GblFunc::replaceControl(m_3DSplitterPlaceholder, cnc3DSplitterWindow);
+
+	drawPane3D    = new GL3DDrawPane(cnc3DSplitterWindow);
+	optionPane3D  = new GL3DOptionPane(cnc3DSplitterWindow);
+	cnc3DSplitterWindow->SplitVertically(drawPane3D, optionPane3D, 0);
+	
 	// Montion Monitor
 	motionMonitor = new CncMotionMonitor(this, NULL);
-	GblFunc::replaceControl(m_drawPane3D, motionMonitor);
+	GblFunc::replaceControl(drawPane3D->GetDrawPane3DPlaceHolder(), motionMonitor);
 	activate3DPerspectiveButton(m_3D_Perspective1);
 	
 	// Source Editor
@@ -1408,6 +1425,7 @@ void MainFrame::initialize(void) {
 	changeManuallySpeedValue();
 	initSpeedConfigPlayground();
 	decorateOutboundSaveControls(false);
+	toggleMotionMonitorOptionPlane(true);
 	
 	m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
 	
@@ -5568,7 +5586,7 @@ const char* MainFrame::getCurrentPortName(wxString& ret) {
 ///////////////////////////////////////////////////////////////////
 const char* MainFrame::getBlankHtmlPage() {
 ///////////////////////////////////////////////////////////////////
-#warning
+#warning - move this to preview
 	wxFileName fn(CncFileNameService::getBlankHtmlPageFileName());
 	std::fstream html;
 	
@@ -5600,7 +5618,7 @@ const char* MainFrame::getBlankHtmlPage() {
 ///////////////////////////////////////////////////////////////////
 const char* MainFrame::getErrorHtmlPage(const wxString& errorInfo) {
 ///////////////////////////////////////////////////////////////////
-#warning
+#warning - move this to preview
 	wxFileName fn(CncFileNameService::getErrorHtmlPageFileName());
 	std::fstream html;
 	
@@ -7301,7 +7319,6 @@ void MainFrame::motionMonitorFlyPath(wxCommandEvent& event) {
 	else											motionMonitor->getFlags().drawFlyPath = true;
 	
 	motionMonitor->reconstruct();
-	
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
@@ -7313,7 +7330,42 @@ void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
 	else											motionMonitor->getFlags().positionMarker = true;
 	
 	motionMonitor->reconstruct();
-
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorBoundBox(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	motionMonitor->enableBoundBox(!motionMonitor->isBoundBoxEnabled());
+	motionMonitor->updateMonitor();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorOrigin(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	motionMonitor->enableOrigin(!motionMonitor->isOriginEnabled());
+	motionMonitor->updateMonitor();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorRuler(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	motionMonitor->enableRuler(!motionMonitor->isRulerEnabled());
+	motionMonitor->updateMonitor();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::motionMonitorHelpLines(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( motionMonitor == NULL )
+		return;
+		
+	motionMonitor->enableHelpLines(!motionMonitor->isHelpLinesEnabled());
+	motionMonitor->updateMonitor();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::openSessionDialog(wxCommandEvent& event) {
@@ -7495,6 +7547,18 @@ void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 	
 	prepareAndShowMonitorTemplatePreview(true);
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMotionMonitorOptionPlane(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	toggleMotionMonitorOptionPlane(false);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMotionMonitorOptionPlane(bool forceHide) {
+/////////////////////////////////////////////////////////////////////
+	cnc3DSplitterWindow->toggleRightWindow();
+}
+
+
 
 
 
@@ -7504,5 +7568,4 @@ void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 	std::cout << "todo" << std::endl;
 }
-
 

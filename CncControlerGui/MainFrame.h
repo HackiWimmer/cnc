@@ -39,6 +39,9 @@ class wxMenu;
 class wxMenuItem;
 class SecureRun;
 class CncReferencePosition;
+class GL3DOptionPane;
+class GL3DDrawPane;
+class CncMonitorVSplitterWindow;
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -86,6 +89,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void toggleMotionMonitorOptionPlane(wxCommandEvent& event);
+		virtual void motionMonitorBoundBox(wxCommandEvent& event);
+		virtual void motionMonitorHelpLines(wxCommandEvent& event);
+		virtual void motionMonitorOrigin(wxCommandEvent& event);
+		virtual void motionMonitorRuler(wxCommandEvent& event);
 		virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event);
 		virtual void extractSourceAsNewTpl(wxCommandEvent& event);
 		virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event);
@@ -463,7 +471,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void dispatchAll();
 		
 		const char* getCurrentPortName(wxString& ret);
-
+		GL3DDrawPane* getDrawPane3D() { return drawPane3D; }
+		
 	protected:
  
 		// will be bind to this frame
@@ -541,6 +550,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncSummaryListCtrl* cncSummaryListCtrl;
 		CfgAccelerationGraph* accelGraphPanel; 
 		CncGamepadControllerState* cncGamepadState;
+		GL3DOptionPane* optionPane3D;
+		GL3DDrawPane* drawPane3D;
+		CncMonitorVSplitterWindow* cnc3DSplitterWindow;
 		
 		CncPerspective perspectiveHandler;
 		GuiControlSetup* guiCtlSetup;
@@ -702,6 +714,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// control handling
+		void toggleMotionMonitorOptionPlane(bool forceHide);
+		
 		void selectSourceControlLineNumber(long ln);
 			
 		void decoratePortSelector(bool list=false);

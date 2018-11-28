@@ -280,6 +280,7 @@
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
+  <object class="wxBitmap" name="cube_green">bitmaps\cube_green.png</object>
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
@@ -322,6 +323,7 @@
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
+  <object class="wxBitmap" name="insert-text-linespacing">bitmaps\insert-text-linespacing.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
@@ -348,6 +350,7 @@
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
   <object class="wxBitmap" name="roll">bitmaps\roll.png</object>
   <object class="wxBitmap" name="rstick_updown-small">bitmaps\gamepad\navi\rstick_updown-small.png</object>
+  <object class="wxBitmap" name="ruler2">bitmaps\ruler2.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
   <object class="wxBitmap" name="secureRunPause">bitmaps\secureRunPause.png</object>
   <object class="wxBitmap" name="secureRunStop">bitmaps\secureRunStop.png</object>
@@ -362,6 +365,7 @@
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="time-add">bitmaps\time-add.png</object>
+  <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
   <object class="wxBitmap" name="tools-sum">bitmaps\tools-sum.png</object>
   <object class="wxBitmap" name="trace">bitmaps\trace.png</object>

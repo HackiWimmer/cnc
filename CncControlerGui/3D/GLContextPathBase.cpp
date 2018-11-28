@@ -1,5 +1,6 @@
 #include <iostream>
 #include "3D/GLContextPathBase.h"
+#include "3D/GLLabelCluster.h"
 
 #ifdef __DARWIN__
     #include <OpenGL/glu.h>
@@ -81,10 +82,16 @@ static void drawBox(GLfloat size, GLenum type) {
 GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
 : GLContextBase(canvas)
 , cncPath()
+, ruler()
 , drawType(DT_LINE_STRIP)
 , currentClientId(-1L)
-, boundBox(true)
+, showBoundBox(true)
 , boundBoxColour(185, 127, 87)
+, showRuler(true)
+, showHelpLines(true)
+, rulerColourX(coordOriginInfo.colours.x)
+, rulerColourY(coordOriginInfo.colours.y)
+, rulerColourZ(coordOriginInfo.colours.z)
 /////////////////////////////////////////////////////////
 {
 	cncPath.reserve(1024 * 1024);
@@ -253,6 +260,7 @@ void GLContextCncPathBase::drawLineStrips() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::determineModel() {
 /////////////////////////////////////////////////////////////////
+	
 	if ( isEnabled() == false ) {
 		glPushMatrix();
 			glEnable(GL_TEXTURE_2D);
@@ -264,13 +272,16 @@ void GLContextCncPathBase::determineModel() {
 		return;
 	}
 	
+	if ( showRuler == true )
+		drawRuler();
+	
 	switch ( drawType ) {
 		case DT_POINTS:		drawPoints(); 		break;
 		case DT_LINES:		drawLines(); 		break;
 		case DT_LINE_STRIP:	drawLineStrips(); 	break;
 	}
 	
-	if ( boundBox == true )
+	if ( showBoundBox == true )
 		drawBoundBox();
 }
 /////////////////////////////////////////////////////////////////
@@ -295,4 +306,126 @@ void GLContextCncPathBase::drawBoundBox() {
 	}
 	
 	glDisable(GL_LINE_STIPPLE);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawRuler() {
+/////////////////////////////////////////////////////////////////
+	//...........................................................
+	auto skipIndex = [&](int counter, int fact = 1) {
+		const float sf = this->getCurrentScaleFactor();
+		
+		if      ( sf >= 0.00 && sf < 0.10 ) 	{ if ( counter % ( 50 * fact ) != 0 ) return true; }
+		else if ( sf >= 0.10 && sf < 0.25 ) 	{ if ( counter % ( 10 * fact ) != 0 ) return true; }
+		else if ( sf >= 0.25 && sf < 0.50 ) 	{ if ( counter % (  5 * fact ) != 0 ) return true; }
+		else if ( sf >= 0.50 && sf < 1.00 ) 	{ if ( counter % (  2 * fact ) != 0 ) return true; }
+		
+		return false;
+	};
+	
+	//...........................................................
+	auto drawRulerAxis = [&](const wxColour& colour, const GLI::GLLineCluster& ruler) {
+		
+		glColor4ub(colour.Red(), colour.Green(), colour.Blue(), 64);
+		
+		for ( auto it = ruler.begin(); it != ruler.end(); ++it ) {
+			const GLI::GLVectiesTuple vt = *it;
+			
+			glBegin(GL_LINES);
+				glVertex3f(vt.getX1(), vt.getY1(), vt.getZ1());
+				glVertex3f(vt.getX2(), vt.getY2(), vt.getZ2());
+			glEnd();
+		}
+	};
+	
+	//...........................................................
+	auto drawHelpLines = [&](const wxColour& colour, const GLI::GLLineCluster& lines) {
+		
+		glLineStipple(2, 0x00FF);
+		glEnable(GL_LINE_STIPPLE);
+		
+			glColor4ub(colour.Red(), colour.Green(), colour.Blue(), 32);
+			
+			int counter = 1;
+			for ( auto it = lines.begin(); it != lines.end(); ++it ) {
+				
+				if ( skipIndex( counter++ ) == true ) 
+					continue;
+				
+				glBegin(GL_LINES);
+					const GLI::GLVectiesTuple vt = *it;
+					glVertex3f(vt.getX1(), vt.getY1(), vt.getZ1());
+					glVertex3f(vt.getX2(), vt.getY2(), vt.getZ2());
+				glEnd();
+			}
+		
+		glDisable(GL_LINE_STIPPLE);
+	};
+
+	//...........................................................
+	auto drawRulerLabels = [&](const wxColour& colour, const GLI::GLLabelCluster& lables) {
+		
+		glColor4ub(colour.Red(), colour.Green(), colour.Blue(), 255);
+		
+		int counter = 0;
+		for ( auto it = lables.begin(); it != lables.end(); it++ ) {
+			if ( skipIndex( counter++ ) == true ) 
+				continue;
+			
+			const GLI::GLLabelInfo li = *it;
+			void* font = li.font;
+			if ( font == NULL )
+				font = GLUT_BITMAP_8_BY_13;
+			
+			this->renderBitmapString(li.x, li.y, li.z, font, li.label);
+		}
+	};
+	
+	// ensure the right model
+	glMatrixMode(GL_MODELVIEW);
+	
+	// first deterine what's needed
+	const short X  = 0, Y  = 1, Z  = 2, 
+	            XY = 0, XZ = 1, YZ = 2;
+				
+	bool showAxis[3]; 	showAxis[X]   = false;  showAxis[Y]   = false;  showAxis[Z]   = false;
+	bool showPlane[3];	showPlane[XY] = false;  showPlane[XZ] = false;  showPlane[YZ] = false;
+	
+	const GLContextBase::ViewMode vm = getViewMode();
+	switch ( vm ) {
+		case V2D_TOP:
+		case V2D_BOTTOM:			showAxis[X]   = true;  showAxis[Y]   = true;  showAxis[Z]   = false;
+									showPlane[XY] = true;  showPlane[XZ] = false; showPlane[YZ] = false;
+									break;
+		case V2D_LEFT:
+		case V2D_RIGHT: 			showAxis[X]   = false; showAxis[Y]   = true;  showAxis[Z]   = true;
+									showPlane[XY] = false; showPlane[XZ] = false; showPlane[YZ] = true;
+									break;
+		case V2D_FRONT:
+		case V2D_REAR:				showAxis[X]   = true;  showAxis[Y]   = false; showAxis[Z]   = true;
+									showPlane[XY] = false; showPlane[XZ] = true;  showPlane[YZ] = false;
+									break;
+		case V3D_ISO1:
+		case V3D_ISO2: 
+		case V3D_ISO3: 
+		case V3D_ISO4:
+		case V2D_CAM_ROT_XY_ZTOP: 	showAxis[X]   = true;  showAxis[Y]   = true;  showAxis[Z]   = true;
+									showPlane[XY] = true;  showPlane[XZ] = false;  showPlane[YZ] =false;
+									break;
+	}
+	
+	// draw the rulers
+	if ( showAxis[X] ) { drawRulerAxis(rulerColourX, ruler.xAxis.axisLines); }
+	if ( showAxis[Y] ) { drawRulerAxis(rulerColourY, ruler.yAxis.axisLines); }
+	if ( showAxis[Z] ) { drawRulerAxis(rulerColourZ, ruler.zAxis.axisLines); }
+	
+	if ( showAxis[X] ) { drawRulerLabels(rulerColourX, ruler.xAxis.axisLables); }
+	if ( showAxis[Y] ) { drawRulerLabels(rulerColourY, ruler.yAxis.axisLables); }
+	if ( showAxis[Z] ) { drawRulerLabels(rulerColourZ, ruler.zAxis.axisLables); }
+	
+	if ( showHelpLines == true ) {
+		wxColour colour(255, 255, 255);
+		if ( showPlane[XY] ) { drawHelpLines(colour, ruler.helpLinesXY); }
+		if ( showPlane[XZ] ) { drawHelpLines(colour, ruler.helpLinesXZ); }
+		if ( showPlane[YZ] ) { drawHelpLines(colour, ruler.helpLinesYZ); }
+	}
 }

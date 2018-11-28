@@ -2,6 +2,7 @@
 
 #include "3D/GLContextCncPath.h"
 #include "3D/GLContextTestCube.h"
+#include "GL3DDrawPane.h"
 #include "GL3DOptions.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
@@ -78,30 +79,32 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	context = monitor;
 	
 	// bind
-	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneX3D, 	this);
-	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneY3D, 	this);
-	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneZ3D, 	this);
-	GBL_CONFIG->getTheApp()->GetScalePane3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintScalePane3D, 		this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneX3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneX3D, 	this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneY3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneY3D, 	this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneZ3D()->Bind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneZ3D, 	this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetScalePane3D()->Bind(wxEVT_PAINT, 		&CncMotionMonitor::onPaintScalePane3D, 		this);
 
-	GBL_CONFIG->getTheApp()->GetScalePane3D()->SetBackgroundColour(*wxBLACK);
-	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->SetBackgroundColour(*wxBLACK);
-	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->SetBackgroundColour(*wxBLACK);
-	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->SetBackgroundColour(*wxBLACK);
-	
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetScalePane3D()->SetBackgroundColour(*wxBLACK);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneX3D()->SetBackgroundColour(*wxBLACK);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneY3D()->SetBackgroundColour(*wxBLACK);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneZ3D()->SetBackgroundColour(*wxBLACK);
+
 	// publish initial zoom factor
 	monitor->setZoomFactor(zoom);
 	
 	// deactivate process mode by default
 	popProcessMode();
+	
+	createRuler();
 }
 //////////////////////////////////////////////////
 CncMotionMonitor::~CncMotionMonitor() {
 //////////////////////////////////////////////////
 	// unbind
-	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneX3D, 	this);
-	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneY3D, 	this);
-	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneZ3D, 	this);
-	GBL_CONFIG->getTheApp()->GetScalePane3D()->Unbind(wxEVT_PAINT, 		&CncMotionMonitor::onPaintScalePane3D, 		this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneX3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneX3D, 	this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneY3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneY3D, 	this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneZ3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintRotatePaneZ3D, 	this);
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetScalePane3D()->Unbind(wxEVT_PAINT, 	&CncMotionMonitor::onPaintScalePane3D, 		this);
 
 	if ( monitor != NULL ) 
 		delete monitor;
@@ -159,6 +162,29 @@ void CncMotionMonitor::clear() {
 //////////////////////////////////////////////////
 	monitor->clearPathData();
 	display();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::createRuler() {
+//////////////////////////////////////////////////
+	CncMetricRulerSetup mrs;
+	
+	const double dimX = GBL_CONFIG->getMaxDimensionX();
+	const double dimY = GBL_CONFIG->getMaxDimensionY();
+	const double dimZ = GBL_CONFIG->getMaxDimensionZ();
+	
+	mrs.setupSize(-dimX, +dimX, 
+	              -dimY, +dimY, 
+	              -dimZ, +dimZ);
+	
+	mrs.createRulerOrigin(monitor->getRulerOrigin());
+	
+	mrs.createHelpLinesXY(monitor->getXYPlane());
+	mrs.createHelpLinesXZ(monitor->getXZPlane());
+	mrs.createHelpLinesYZ(monitor->getYZPlane());
+	
+	mrs.createRulerX(monitor->getRulerX());
+	mrs.createRulerY(monitor->getRulerY());
+	mrs.createRulerZ(monitor->getRulerZ());
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::tracePathData(std::ostream& s) {
@@ -272,11 +298,11 @@ void CncMotionMonitor::onPaint() {
 	monitor->display();
 	
 	// update additional controls
-	GBL_CONFIG->getTheApp()->GetScalePane3D()->Refresh();
-	GBL_CONFIG->getTheApp()->GetRotatePaneX3D()->Refresh();
-	GBL_CONFIG->getTheApp()->GetRotatePaneY3D()->Refresh();
-	GBL_CONFIG->getTheApp()->GetRotatePaneZ3D()->Refresh();
-	
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetScalePane3D()->Refresh();
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneX3D()->Refresh();
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneY3D()->Refresh();
+	GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneZ3D()->Refresh();
+
 	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
 	// later this should not appear to support custom origin positions
 	// see if above
@@ -287,17 +313,17 @@ void CncMotionMonitor::onPaint() {
 /////////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaintRotatePaneX3D(wxPaintEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	onPaintRotatePane3D('X', GBL_CONFIG->getTheApp()->GetRotatePaneX3D(), getAngleX());
+	onPaintRotatePane3D('X', GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneX3D(), getAngleX());
 }
 /////////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaintRotatePaneY3D(wxPaintEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	onPaintRotatePane3D('Y', GBL_CONFIG->getTheApp()->GetRotatePaneY3D(), getAngleY());
+	onPaintRotatePane3D('Y', GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneY3D(), getAngleY());
 }
 /////////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaintRotatePaneZ3D(wxPaintEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	onPaintRotatePane3D('Z', GBL_CONFIG->getTheApp()->GetRotatePaneZ3D(), getAngleZ());
+	onPaintRotatePane3D('Z', GBL_CONFIG->getTheApp()->getDrawPane3D()->GetRotatePaneZ3D(), getAngleZ());
 }
 /////////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaintRotatePane3D(const char axis, wxPanel* panel, int angle) {
@@ -329,7 +355,7 @@ void CncMotionMonitor::onPaintScalePane3D(wxPaintEvent& event) {
 	static wxBrush  brush(col);
 	static wxPen    pen(col, 1, wxSOLID);
 	
-	wxPanel* pane = GBL_CONFIG->getTheApp()->GetScalePane3D();
+	wxPanel* pane = GBL_CONFIG->getTheApp()->getDrawPane3D()->GetScalePane3D();
 	const wxSize size = pane->GetSize();
 	const int height = size.GetHeight();
 	const unsigned int pos = calculateScaleDisplay(height) * 2;  // hack: *2
@@ -467,6 +493,14 @@ void CncMotionMonitor::rotateCamera(int angle) {
 													 monitor->getCameraPosition().getEyeZ());
 	// redraw
 	display();
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::updateMonitor() {
+//////////////////////////////////////////////////
+	Refresh();
+	
+	if ( optionDlg != NULL && optionDlg->IsShownOnScreen() )
+		optionDlg->update();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::pushProcessMode() {

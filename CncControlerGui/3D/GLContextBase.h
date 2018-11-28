@@ -47,12 +47,11 @@ class GLContextBase : public wxGLContext {
 		static void traceOpenGLVersionInfo(std::ostream& s);
 		static void traceeOpenGLExtentionInfo(std::ostream& s);
 		
-		void enable(bool state = true) { enabled = state; } 
-		void disable() { enable(false); }
-		bool isEnabled() { return enabled; }
-		
+		void enable(bool state = true) 	{ enabled = state; } 
+		void disable() 					{ enable(false); }
+		bool isEnabled() 				{ return enabled; }
+		bool isProbeMode() 				{ return probeMode; }
 		void decorateProbeMode(bool state);
-		bool isProbeMode() { return probeMode; }
 		
 		void init();
 		void display();
@@ -73,12 +72,22 @@ class GLContextBase : public wxGLContext {
 		
 		// smoothing
 		void enableSmoothing(bool enable=true);
-		void disableSmoothing() { enableSmoothing(false); }
+		void disableSmoothing() 					{ enableSmoothing(false); }
 		bool isSmoothingEnabled();
+		
+		// origin
+		void enableDrawOrigin(bool enable=true)		{ drawOrigin = enable; }
+		void disableDrawOrigin()					{ enableDrawOrigin(false); }
+		bool isDrawOriginEnabled()					{ return drawOrigin; }
+
+		// vieport bounderies
+		void enableDrawPortBounds(bool enable=true)	{ drawViewPortBounderies = enable; }
+		void disableDrawViewPortBounds()			{ enableDrawPortBounds(false); }
+		bool isDrawViewPortBounds()					{ return drawViewPortBounderies; }
 		
 		// postion marker
 		void enablePositionMarker(bool enable=true) { posMarker = enable; }
-		bool isPositionMarkerEnabled() { return posMarker; }
+		bool isPositionMarkerEnabled()				{ return posMarker; }
 		
 		// viewPort
 		void centerViewport();
@@ -145,6 +154,7 @@ class GLContextBase : public wxGLContext {
 		
 		bool				enabled;
 		bool 				initialized;
+		bool				drawOrigin;
 		bool				drawViewPortBounderies;
 		bool				posMarker;
 		bool				autoScale;

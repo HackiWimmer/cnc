@@ -3,10 +3,61 @@
 
 #include <wx/glcanvas.h>
 #include "3D/GLContextCncPath.h"
+#include "CncPosition.h"
 
+///////////////////////////////////////////////////
+class CncMetricRulerSetup {
+	
+	public:
+		CncMetricRulerSetup();
+		~CncMetricRulerSetup();
+		
+		void setupSize(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax);
+		void setupOrigin(const CncDoublePosition& o);
+		
+		void createRulerOrigin(GLI::GLLabelCluster& origin);
+		
+		void createRulerX(GLI::GLAxisRuler& ruler);
+		void createRulerY(GLI::GLAxisRuler& ruler);
+		void createRulerZ(GLI::GLAxisRuler& ruler);
+		
+		void createHelpLinesXY(GLI::GLLineCluster& xyPlane);
+		void createHelpLinesXZ(GLI::GLLineCluster& xzPlane);
+		void createHelpLinesYZ(GLI::GLLineCluster& yzPlane);
+	
+	private:
+		
+		const double oMajor = 0.4;
+		const double oMinor = 0.2;
+		const double oScann = 0.1;
+		
+		double majorScanning;
+		double minorScanning;
+		
+		CncDoublePosition origin;
+		
+		float factorX;
+		float factorY;
+		float factorZ;
+		
+		double minX;
+		double maxX;
+		double minY;
+		double maxY;
+		double minZ;
+		double maxZ;
+		
+		inline void addLine(GLI::GLLineCluster& lines, double x1, double x2, double y1, double y2, double z1, double z2);
+		inline void addLabel(GLI::GLLabelCluster& labels, double x, double y, double z, void* font, const wxString label);
+		
+		inline float cnvX(double val) { return val * factorX; }
+		inline float cnvY(double val) { return val * factorY; }
+		inline float cnvZ(double val) { return val * factorZ; }
+};
+
+///////////////////////////////////////////////////
 class CncGlCanvas : public wxGLCanvas {
-	
-	
+		
 	public:
 		CncGlCanvas(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncGlCanvas();
