@@ -19,12 +19,7 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 : wxGLContext(canvas)
 , enabled(true)
 , initialized(false)
-, drawOrigin(true)
-, drawViewPortBounderies(true)
-, posMarker(true)
-, autoScale(true)
-, blending(true)
-, probeMode(false)
+, options()
 , zoom(1.0f)
 , viewMode(V2D_TOP)
 , coordOriginInfo()
@@ -567,13 +562,13 @@ void GLContextBase::reshapeViewMode() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::setAutoScaling(bool as) {
 /////////////////////////////////////////////////////////////////
-	autoScale = as;
+	options.autoScale = as;
 	normalizeScaling();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::normalizeScaling() {
 /////////////////////////////////////////////////////////////////
-	if ( autoScale == true )
+	if ( options.autoScale == true )
 		modelScale.resetScale();
 }
 /////////////////////////////////////////////////////////////////
@@ -611,7 +606,7 @@ float GLContextBase::getCurrentScaleFactor() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::decorateProbeMode(bool state) {
 /////////////////////////////////////////////////////////////////
-	probeMode = state;
+	options.probeMode = state;
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::display() {
@@ -641,7 +636,7 @@ void GLContextBase::display() {
 		determineModel();
 		
 		// draw the crosshair or whatever defined
-		if ( isPositionMarkerEnabled() )
+		if ( options.showPosMarker )
 			markCurrentPosition();
 		
 	glPopMatrix();
@@ -649,7 +644,7 @@ void GLContextBase::display() {
 	// draw additional things
 	glPushMatrix();
 	
-		if ( drawViewPortBounderies == true )
+		if ( options.showViewPortBounderies == true )
 			determineViewPortBounderies();
 			
 	glPopMatrix();
@@ -657,7 +652,7 @@ void GLContextBase::display() {
 	// draw coordinate origin
 	glPushMatrix();
 		
- 		if ( drawOrigin == true )
+ 		if ( options.showOrigin == true )
 			drawCoordinateOrigin();
 		
 	glPopMatrix();

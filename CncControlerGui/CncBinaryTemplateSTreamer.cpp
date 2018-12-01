@@ -341,14 +341,11 @@ bool CncBinaryTemplateStreamer::evaluateDataHeader(DataContainer& dc) {
 	
 	return true;
 }
-
-
-
 //////////////////////////////////////////////////////////////////
 bool CncBinaryTemplateStreamer::uncompress(char* buf, int32_t size, wxString& content) {
 //////////////////////////////////////////////////////////////////
 	if ( buf == NULL ) {
-		#warning
+		std::cerr << "CncBinaryTemplateStreamer::uncompress(); Invalid buffer!" << std::endl;
 		return false;
 	}
 	

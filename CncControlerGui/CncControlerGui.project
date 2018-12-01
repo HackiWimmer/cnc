@@ -119,8 +119,6 @@
       </VirtualDirectory>
       <File Name="CncMotionMonitor.h"/>
       <File Name="CncMotionMonitor.cpp"/>
-      <File Name="GL3DOptions.cpp"/>
-      <File Name="GL3DOptions.h"/>
       <File Name="3D/CncGCodePreview.h"/>
       <VirtualDirectory Name="Utils">
         <File Name="3D/VerticeData.h"/>
@@ -202,6 +200,7 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncPosition.cpp"/>
       <File Name="CncMonitorSplitterWindow.cpp"/>
       <File Name="CncMonitorSplitterWindow.h"/>
       <File Name="CncCommandDecoder.cpp"/>
@@ -284,6 +283,7 @@
       <File Name="wxcrafter.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
+      <File Name="GlobalStrings.h"/>
       <File Name="SecureRun.h"/>
       <File Name="SecureRun.cpp"/>
       <File Name="GamepadThread.cpp"/>

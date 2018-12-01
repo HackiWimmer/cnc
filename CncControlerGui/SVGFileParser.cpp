@@ -6,7 +6,7 @@
 #include <wx/filename.h>
 #include "OSD/webviewOSD.h"
 #include "SvgEditPopup.h"
-#include "SVGViewbox.h"
+#include "SvgViewBox.h"
 #include "SVGElementConverter.h"
 #include "CncUnitCalculator.h"
 #include "MainFrame.h"
@@ -454,6 +454,76 @@ bool SVGFileParser::preprocess() {
 		// fill the user agent controls
 		svgUserAgent.expand();
 	}
+	
+	return ret;
+}
+//////////////////////////////////////////////////////////////////
+bool SVGFileParser::postprocess() {
+//////////////////////////////////////////////////////////////////
+	#warning
+	return true;
+	
+	
+	if ( cncControl == NULL )
+		return true;
+	
+	const SVGRootNode& rn 	= pathHandler->getSvgRootNode();
+	CncUnitCalculator<float> to_mm(rn.getInputUnit(), Unit::mm);
+	
+	const CncDoublePosition min(cncControl->getMinPositionsMetric());
+	const CncDoublePosition max(cncControl->getMaxPositionsMetric());
+	
+	const double cncDistX 	= max.getX() - min.getX();
+	const double cncDistY 	= max.getY() - min.getY();
+	const double svgDistX 	= rn.getWidth_MM()  * rn.getScaleX();
+	const double svgDistY 	= rn.getHeight_MM() * rn.getScaleY();
+	
+	const double cncMinX	= min.getX();
+	const double cncMinY	= min.getY();
+	const double cncMaxX	= max.getX();
+	const double cncMaxY	= max.getY();
+	
+	const double svgMinX	= to_mm.convert(rn.getViewbox().getMinX());
+	const double svgMinY	= to_mm.convert(rn.getViewbox().getMinY());
+	const double svgMaxX	= to_mm.convert(rn.getViewbox().getMaxX());
+	const double svgMaxY	= to_mm.convert(rn.getViewbox().getMaxY());
+	
+	// ....
+	auto trace = [&](std::ostream& out) {
+		
+		out << " CNC distance x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", cncDistX, cncDistY) 	<< std::endl;
+		out << " SVG distance x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", svgDistX, svgDistY) 	<< std::endl;
+		out << " CNC min      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", cncMinX, cncMinY) 	<< std::endl;
+		out << " SVG min      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", svgMinX, svgMinY) 	<< std::endl;
+		out << " CNC max      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", cncMaxX, cncMaxY) 	<< std::endl;
+		out << " SVG max      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", svgMaxX, svgMaxY) 	<< std::endl;
+	};
+	
+	bool ret = true;
+	auto check_1_Less_2 = [&](double d1, double d2, std::ostream& out, const char* msg) {
+		if ( d1 > d2 ) {
+			out << msg 
+			    << wxString::Format("%4.3lf", d1)
+			    << " > " 
+				<< wxString::Format("%4.3lf", d2)
+			    << std::endl;
+				
+			ret = false;
+		}
+	};
+	
+	check_1_Less_2(cncDistX, svgDistX, std::cerr, " CNC distance X out of range: ");
+	check_1_Less_2(cncDistY, svgDistY, std::cerr, " CNC distance Y out of range: ");
+	check_1_Less_2(svgMinX,  cncMinX,  std::cerr, " CNC min bound X out of range: ");
+	check_1_Less_2(svgMinY,  cncMinY,  std::cerr, " CNC min bound Y out of range: ");
+	check_1_Less_2(cncMaxX,  svgMaxX,  std::cerr, " CNC max bound X out of range: ");
+	check_1_Less_2(cncMaxY,  svgMaxY,  std::cerr, " CNC max bound Y out of range: ");
+	
+	if ( ret == false ) 
+		std::cerr << "\n SVG post processing report: Error(s) detected" << std::endl;
+		
+	if ( ret == false ) 
+		trace( ret == true ? std::cout : std::cerr);
 	
 	return ret;
 }

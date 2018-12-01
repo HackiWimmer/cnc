@@ -17,7 +17,7 @@ bool BinaryPathHandlerCnc::processCommand(const unsigned char* buffer, int nbByt
 	if ( nbBytes <= 0 || buffer == NULL)
 		return true;
 
-	return cncControl->getSerial()->execute(buffer, nbBytes);
+	return cncControl->execute(buffer, nbBytes);
 }
 /////////////////////////////////////////////////////////////
 void BinaryPathHandlerCnc::initNextClientId(long id) {
@@ -29,13 +29,13 @@ void BinaryPathHandlerCnc::initNextClientId(long id) {
 void BinaryPathHandlerCnc::logMeasurementStart() {
 /////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->startMeasurement();
+	cncControl->startSerialMeasurement();
 }
 /////////////////////////////////////////////////////////////
 void BinaryPathHandlerCnc::logMeasurementEnd() {
 /////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->stopMeasurement();
+	cncControl->stopSerialMeasurement();
 }
 
 

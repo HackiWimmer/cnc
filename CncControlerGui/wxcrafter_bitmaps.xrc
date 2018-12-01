@@ -261,7 +261,6 @@
   <object class="wxBitmap" name="Zneg">bitmaps\ReferencePosition\Zneg.png</object>
   <object class="wxBitmap" name="Zpos">bitmaps\ReferencePosition\Zpos.png</object>
   <object class="wxBitmap" name="actionrun">bitmaps\actionrun.png</object>
-  <object class="wxBitmap" name="anonymous_simple_weather_symbols_5">bitmaps\anonymous_simple_weather_symbols_5.png</object>
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
   <object class="wxBitmap" name="application-view-gallery">bitmaps\application-view-gallery.png</object>
@@ -312,6 +311,7 @@
   <object class="wxBitmap" name="folder-development">bitmaps\folder-development.png</object>
   <object class="wxBitmap" name="gamepad-active">bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="git-reset">bitmaps\git-reset.png</object>
+  <object class="wxBitmap" name="git-reset-repo">bitmaps\git-reset-repo.png</object>
   <object class="wxBitmap" name="go-bottom">bitmaps\go-bottom.png</object>
   <object class="wxBitmap" name="go-down-2">bitmaps\go-down-2.png</object>
   <object class="wxBitmap" name="go-down-7">bitmaps\go-down-7.png</object>
@@ -323,7 +323,6 @@
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
-  <object class="wxBitmap" name="insert-text-linespacing">bitmaps\insert-text-linespacing.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
@@ -348,7 +347,6 @@
   <object class="wxBitmap" name="plugin-delete">bitmaps\plugin-delete.png</object>
   <object class="wxBitmap" name="plugin-edit">bitmaps\plugin-edit.png</object>
   <object class="wxBitmap" name="reload">bitmaps\reload.png</object>
-  <object class="wxBitmap" name="roll">bitmaps\roll.png</object>
   <object class="wxBitmap" name="rstick_updown-small">bitmaps\gamepad\navi\rstick_updown-small.png</object>
   <object class="wxBitmap" name="ruler2">bitmaps\ruler2.png</object>
   <object class="wxBitmap" name="script-code">bitmaps\script-code.png</object>
@@ -360,6 +358,7 @@
   <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="software-update-available-3 (2)">bitmaps\software-update-available-3 (2).png</object>
   <object class="wxBitmap" name="software-update-inactive (2)">bitmaps\software-update-inactive (2).png</object>
+  <object class="wxBitmap" name="start-here">bitmaps\start-here.png</object>
   <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
@@ -372,6 +371,7 @@
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>
+  <object class="wxBitmap" name="view-grid">bitmaps\view-grid.png</object>
   <object class="wxBitmap" name="view-orientation">bitmaps\view-orientation.png</object>
   <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
   <object class="wxBitmap" name="weather-lightning (2)">bitmaps\weather-lightning (2).png</object>

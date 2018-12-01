@@ -321,7 +321,23 @@ wxListItemAttr* CncLargeScaledListCtrl::OnGetItemColumnAttr(long item, long colu
 	// default behaviour
 	return OnGetItemAttr(item);
 }
-
+///////////////////////////////////////////////////////////////////
+long CncLargeScaledListCtrl::searchRow(const wxString& what, int searchColumn) {
+///////////////////////////////////////////////////////////////////
+	long ret     = -1;
+	long counter = 0;
+	for( auto it = rows.begin(); it != rows.end(); ++it ) {
+		
+		if ( it->getItem(searchColumn) == what ) {
+			ret = translateItem(counter);
+			break;
+		}
+		
+		counter++;
+	}
+	
+	return ret;
+}
 
 
 

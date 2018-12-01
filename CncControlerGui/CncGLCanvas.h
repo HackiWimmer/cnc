@@ -12,24 +12,25 @@ class CncMetricRulerSetup {
 		CncMetricRulerSetup();
 		~CncMetricRulerSetup();
 		
-		void setupSize(double xMin, double xMax, double yMin, double yMax, double zMin, double zMax);
+		void setupSize(double xDim, double yDim, double zDim);
 		void setupOrigin(const CncDoublePosition& o);
-		
-		void createRulerOrigin(GLI::GLLabelCluster& origin);
 		
 		void createRulerX(GLI::GLAxisRuler& ruler);
 		void createRulerY(GLI::GLAxisRuler& ruler);
 		void createRulerZ(GLI::GLAxisRuler& ruler);
 		
-		void createHelpLinesXY(GLI::GLLineCluster& xyPlane);
-		void createHelpLinesXZ(GLI::GLLineCluster& xzPlane);
-		void createHelpLinesYZ(GLI::GLLineCluster& yzPlane);
+		void createHelpLinesXY(GLI::GLLineCluster& xLines, GLI::GLLineCluster& yLines);
+		void createHelpLinesXZ(GLI::GLLineCluster& xLines, GLI::GLLineCluster& zLines);
+		void createHelpLinesYZ(GLI::GLLineCluster& yLines, GLI::GLLineCluster& zLines);
+		
+		bool check(GLContextCncPathBase* monitor, std::ostream& out);
+		void trace(GLContextCncPathBase* monitor, std::ostream& out);
 	
 	private:
 		
 		const double oMajor = 0.4;
-		const double oMinor = 0.2;
-		const double oScann = 0.1;
+		const double oMinor = 0.3;
+		const double oScann = 0.2;
 		
 		double majorScanning;
 		double minorScanning;

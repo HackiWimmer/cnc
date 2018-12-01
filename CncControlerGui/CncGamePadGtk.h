@@ -29,7 +29,7 @@ class CncGamepadGtk
 		, deadzoneX(dzX)
 		, deadzoneY(dzY) {}
 		
-		virtual ~CncGamepadMsw()
+		virtual ~CncGamepadGtk()
 		{}
 		
 		virtual bool isServiceRuning()				{ return false; }

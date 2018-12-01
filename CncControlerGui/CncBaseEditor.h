@@ -3,6 +3,7 @@
 
 #include <wx/stc/stc.h>
 #include <wx/filename.h>
+#include <wx/settings.h>
 #include "3D/GLContextBase.h"
 #include "BinaryFileParser.h"
 #include "CncCommon.h"

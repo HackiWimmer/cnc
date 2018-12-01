@@ -55,7 +55,6 @@
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/choicebk.h>
-#include <wx/collpane.h>
 #include <wx/dialog.h>
 #include <wx/bitmap.h>
 #include <wx/icon.h>
@@ -504,7 +503,6 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
-    wxButton* m_motionMonitorOptionDlg1;
     wxPanel* m_cncFile;
     wxStaticText* m_staticText6138;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate2;
@@ -537,6 +535,8 @@ protected:
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_scrollWinLogger;
     wxNotebook* m_loggerNotebook;
+    wxPanel* m_panelStartupTrace;
+    wxTextCtrl* m_startupTrace;
     wxPanel* m_panel5878;
     wxTextCtrl* m_logger;
     wxBitmapButton* m_clearLogger;
@@ -913,7 +913,6 @@ protected:
     virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
-    virtual void openMotionMonitorOptionDlg(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
@@ -1431,7 +1430,6 @@ public:
     wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
-    wxButton* GetMotionMonitorOptionDlg1() { return m_motionMonitorOptionDlg1; }
     wxPanel* GetCnc3DPane() { return m_cnc3DPane; }
     wxStaticText* GetStaticText6138() { return m_staticText6138; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate2() { return m_btSaveOutboundAsTemplate2; }
@@ -1464,6 +1462,8 @@ public:
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
     wxPanel* GetScrollWinFile() { return m_scrollWinFile; }
+    wxTextCtrl* GetStartupTrace() { return m_startupTrace; }
+    wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
     wxTextCtrl* GetLogger() { return m_logger; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
@@ -1762,6 +1762,25 @@ public:
 };
 
 
+class CncFilePreviewWndBase : public wxFrame
+{
+protected:
+    wxTextCtrl* m_previewFileName;
+    wxTextCtrl* m_previewFileType;
+    wxPanel* m_previewPlaceHolder;
+
+protected:
+    virtual void onClose(wxCloseEvent& event) { event.Skip(); }
+
+public:
+    wxTextCtrl* GetPreviewFileName() { return m_previewFileName; }
+    wxTextCtrl* GetPreviewFileType() { return m_previewFileType; }
+    wxPanel* GetPreviewPlaceHolder() { return m_previewPlaceHolder; }
+    CncFilePreviewWndBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc File Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
+    virtual ~CncFilePreviewWndBase();
+};
+
+
 class CncFilePreviewBase : public wxPanel
 {
 protected:
@@ -1982,25 +2001,6 @@ public:
 };
 
 
-class CncFilePreviewWndBase : public wxFrame
-{
-protected:
-    wxTextCtrl* m_previewFileName;
-    wxTextCtrl* m_previewFileType;
-    wxPanel* m_previewPlaceHolder;
-
-protected:
-    virtual void onClose(wxCloseEvent& event) { event.Skip(); }
-
-public:
-    wxTextCtrl* GetPreviewFileName() { return m_previewFileName; }
-    wxTextCtrl* GetPreviewFileType() { return m_previewFileType; }
-    wxPanel* GetPreviewPlaceHolder() { return m_previewPlaceHolder; }
-    CncFilePreviewWndBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc File Preview"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT);
-    virtual ~CncFilePreviewWndBase();
-};
-
-
 class GL3DOptionPaneBase : public wxPanel
 {
 protected:
@@ -2015,28 +2015,89 @@ protected:
     wxPGProperty* m_pgPropDrawRuler;
     wxPGProperty* m_pgPropDrawHelpLines;
     wxPGProperty* m_pgPropPositionMarker;
-    wxPGProperty* m_pgPropWorkColour;
-    wxPGProperty* m_pgPropFlyColour;
     wxPGProperty* m_pgPropZoom;
+    wxPGProperty* m_pgPropPathColour;
+    wxPGProperty* m_pgPropFlyColour;
+    wxPGProperty* m_pgPropWorkColour;
+    wxPGProperty* m_pgPropUserColour;
+    wxPGProperty* m_pgPropMaxColour;
+    wxPGProperty* m_pgPropHL3D;
+    wxPGProperty* m_pgPropHLXYPlane;
+    wxPGProperty* m_pgPropHLXZPlane;
+    wxPGProperty* m_pgPropHLYZPlane;
     wxPGProperty* m_pgCatBoundBox;
     wxPGProperty* m_pgPropDrawBoundBox;
     wxPGProperty* m_pgPropBoundBoxColour;
     wxPGProperty* m_pgCatRenderOptions;
     wxPGProperty* m_pgPropSmoothing;
     wxCheckBox* m_cbAutoUpdate;
-    wxPanel* m_panel6349;
+    wxPanel* m_panelAnimation;
+    wxStaticText* m_staticText6443;
+    wxBitmapButton* m_btResetCameraPos2;
+    wxSlider* m_sliderCameraRotation;
+    wxBitmapToggleButton* m_btCameraRotionClockwise;
+    wxBitmapToggleButton* m_btCameraRotionAnticlockwise;
+    wxStaticText* m_staticText3684;
+    wxSlider* m_sliderCameraRotationSpeed;
+    wxStaticLine* m_staticLine64453;
+    wxStaticText* m_staticText6441;
+    wxBitmapButton* m_btResetCameraPos1;
+    wxSlider* m_sliderModelRotationX;
+    wxButton* m_btModelRotationResetX;
+    wxSlider* m_sliderModelRotationY;
+    wxButton* m_btModelRotationResetY;
+    wxSlider* m_sliderModelRotationZ;
+    wxButton* m_btModelRotationResetZ;
+    wxStaticLine* m_staticLine6445345;
+    wxSlider* m_sliderModelRotationXYZ;
+    wxButton* m_btModelRotationResetXYZ;
+    wxStaticLine* m_staticLine644534;
 
 protected:
     virtual void propertyChanged(wxPropertyGridEvent& event) { event.Skip(); }
     virtual void propertyChanging(wxPropertyGridEvent& event) { event.Skip(); }
+    virtual void resetCameraPostion(wxCommandEvent& event) { event.Skip(); }
+    virtual void cameraRotationChanged(wxScrollEvent& event) { event.Skip(); }
+    virtual void autoCameraRotationClockwise(wxCommandEvent& event) { event.Skip(); }
+    virtual void autoCameraRotationAnticlockwise(wxCommandEvent& event) { event.Skip(); }
+    virtual void cameraRotationSpeedChanged(wxScrollEvent& event) { event.Skip(); }
+    virtual void resetModelPostion(wxCommandEvent& event) { event.Skip(); }
+    virtual void modelRotationXChanged(wxScrollEvent& event) { event.Skip(); }
+    virtual void resetModelRotationX(wxCommandEvent& event) { event.Skip(); }
+    virtual void modelRotationYChanged(wxScrollEvent& event) { event.Skip(); }
+    virtual void resetModelRotationY(wxCommandEvent& event) { event.Skip(); }
+    virtual void modelRotationZChanged(wxScrollEvent& event) { event.Skip(); }
+    virtual void resetModelRotationZ(wxCommandEvent& event) { event.Skip(); }
+    virtual void modelRotationXYZChanged(wxScrollEvent& event) { event.Skip(); }
+    virtual void resetModelRotationXYZ(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxPropertyGridManager* GetPgMgr3543() { return m_pgMgr3543; }
     wxCheckBox* GetCbAutoUpdate() { return m_cbAutoUpdate; }
     wxPanel* GetPanel3DOptions() { return m_panel3DOptions; }
-    wxPanel* GetPanel6349() { return m_panel6349; }
+    wxStaticText* GetStaticText6443() { return m_staticText6443; }
+    wxBitmapButton* GetBtResetCameraPos2() { return m_btResetCameraPos2; }
+    wxSlider* GetSliderCameraRotation() { return m_sliderCameraRotation; }
+    wxBitmapToggleButton* GetBtCameraRotionClockwise() { return m_btCameraRotionClockwise; }
+    wxBitmapToggleButton* GetBtCameraRotionAnticlockwise() { return m_btCameraRotionAnticlockwise; }
+    wxStaticText* GetStaticText3684() { return m_staticText3684; }
+    wxSlider* GetSliderCameraRotationSpeed() { return m_sliderCameraRotationSpeed; }
+    wxStaticLine* GetStaticLine64453() { return m_staticLine64453; }
+    wxStaticText* GetStaticText6441() { return m_staticText6441; }
+    wxBitmapButton* GetBtResetCameraPos1() { return m_btResetCameraPos1; }
+    wxSlider* GetSliderModelRotationX() { return m_sliderModelRotationX; }
+    wxButton* GetBtModelRotationResetX() { return m_btModelRotationResetX; }
+    wxSlider* GetSliderModelRotationY() { return m_sliderModelRotationY; }
+    wxButton* GetBtModelRotationResetY() { return m_btModelRotationResetY; }
+    wxSlider* GetSliderModelRotationZ() { return m_sliderModelRotationZ; }
+    wxButton* GetBtModelRotationResetZ() { return m_btModelRotationResetZ; }
+    wxStaticLine* GetStaticLine6445345() { return m_staticLine6445345; }
+    wxSlider* GetSliderModelRotationXYZ() { return m_sliderModelRotationXYZ; }
+    wxButton* GetBtModelRotationResetXYZ() { return m_btModelRotationResetXYZ; }
+    wxStaticLine* GetStaticLine644534() { return m_staticLine644534; }
+    wxPanel* GetPanelAnimation() { return m_panelAnimation; }
     wxChoicebook* GetChoicebook6345() { return m_choicebook6345; }
-    GL3DOptionPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    GL3DOptionPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(220,600), long style = wxTAB_TRAVERSAL);
     virtual ~GL3DOptionPaneBase();
 };
 
@@ -2066,101 +2127,6 @@ public:
     wxPanel* GetScalePane3D() { return m_scalePane3D; }
     GL3DDrawPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(200,200), long style = wxTAB_TRAVERSAL);
     virtual ~GL3DDrawPaneBase();
-};
-
-
-class GL3DOptionsBase : public wxFrame
-{
-protected:
-    wxCollapsiblePane* m_collPaneOptions;
-    wxPropertyGridManager* m_pgMgr3543;
-    wxPGProperty* m_pgCatDisplayOptions;
-    wxPGProperty* m_pgPropDrawType;
-    wxPGProperty* m_pgPropAutoScaling;
-    wxPGProperty* m_pgPropDrawOrigin;
-    wxPGProperty* m_pgPropDrawFlyPath;
-    wxPGProperty* m_pgPropDrawRuler;
-    wxPGProperty* m_pgPropDrawHelpLines;
-    wxPGProperty* m_pgPropPositionMarker;
-    wxPGProperty* m_pgPropWorkColour;
-    wxPGProperty* m_pgPropFlyColour;
-    wxPGProperty* m_pgPropZoom;
-    wxPGProperty* m_pgCatBoundBox;
-    wxPGProperty* m_pgPropDrawBoundBox;
-    wxPGProperty* m_pgPropBoundBoxColour;
-    wxPGProperty* m_pgCatRenderOptions;
-    wxPGProperty* m_pgPropSmoothing;
-    wxCheckBox* m_cbAutoUpdate;
-    wxCollapsiblePane* m_collPaneCameraRotation;
-    wxSlider* m_sliderCameraRotation;
-    wxBitmapButton* m_btResetCameraPos;
-    wxBitmapToggleButton* m_btCameraRotionClockwise;
-    wxBitmapToggleButton* m_btCameraRotionAnticlockwise;
-    wxStaticText* m_staticText3684;
-    wxSlider* m_sliderCameraRotationSpeed;
-    wxCollapsiblePane* m_collPaneModelRotation;
-    wxSlider* m_sliderModelRotationX;
-    wxButton* m_btModelRotationResetX;
-    wxStaticLine* m_staticLine364118;
-    wxSlider* m_sliderModelRotationY;
-    wxButton* m_btModelRotationResetY;
-    wxStaticLine* m_staticLine3641;
-    wxSlider* m_sliderModelRotationZ;
-    wxButton* m_btModelRotationResetZ;
-    wxStaticLine* m_staticLine36411719;
-    wxSlider* m_sliderModelRotationXYZ;
-    wxButton* m_btModelRotationResetXYZ;
-    wxStaticLine* m_staticLine364117;
-    wxTimer* m_timer4476;
-
-protected:
-    virtual void onCloseWindow(wxCloseEvent& event) { event.Skip(); }
-    virtual void onShowWindow(wxShowEvent& event) { event.Skip(); }
-    virtual void onActivate(wxActivateEvent& event) { event.Skip(); }
-    virtual void propertyChanged(wxPropertyGridEvent& event) { event.Skip(); }
-    virtual void propertyChanging(wxPropertyGridEvent& event) { event.Skip(); }
-    virtual void cameraRotationChanged(wxScrollEvent& event) { event.Skip(); }
-    virtual void resetCameraPostion(wxCommandEvent& event) { event.Skip(); }
-    virtual void autoCameraRotationClockwise(wxCommandEvent& event) { event.Skip(); }
-    virtual void autoCameraRotationAnticlockwise(wxCommandEvent& event) { event.Skip(); }
-    virtual void cameraRotationSpeedChanged(wxScrollEvent& event) { event.Skip(); }
-    virtual void modelRotationXChanged(wxScrollEvent& event) { event.Skip(); }
-    virtual void resetModelRotationX(wxCommandEvent& event) { event.Skip(); }
-    virtual void modelRotationYChanged(wxScrollEvent& event) { event.Skip(); }
-    virtual void resetModelRotationY(wxCommandEvent& event) { event.Skip(); }
-    virtual void modelRotationZChanged(wxScrollEvent& event) { event.Skip(); }
-    virtual void resetModelRotationZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void modelRotationXYZChanged(wxScrollEvent& event) { event.Skip(); }
-    virtual void resetModelRotationXYZ(wxCommandEvent& event) { event.Skip(); }
-    virtual void onUpdateTimer(wxTimerEvent& event) { event.Skip(); }
-
-public:
-    wxPropertyGridManager* GetPgMgr3543() { return m_pgMgr3543; }
-    wxCheckBox* GetCbAutoUpdate() { return m_cbAutoUpdate; }
-    wxCollapsiblePane* GetCollPaneOptions() { return m_collPaneOptions; }
-    wxSlider* GetSliderCameraRotation() { return m_sliderCameraRotation; }
-    wxBitmapButton* GetBtResetCameraPos() { return m_btResetCameraPos; }
-    wxBitmapToggleButton* GetBtCameraRotionClockwise() { return m_btCameraRotionClockwise; }
-    wxBitmapToggleButton* GetBtCameraRotionAnticlockwise() { return m_btCameraRotionAnticlockwise; }
-    wxStaticText* GetStaticText3684() { return m_staticText3684; }
-    wxSlider* GetSliderCameraRotationSpeed() { return m_sliderCameraRotationSpeed; }
-    wxCollapsiblePane* GetCollPaneCameraRotation() { return m_collPaneCameraRotation; }
-    wxSlider* GetSliderModelRotationX() { return m_sliderModelRotationX; }
-    wxButton* GetBtModelRotationResetX() { return m_btModelRotationResetX; }
-    wxStaticLine* GetStaticLine364118() { return m_staticLine364118; }
-    wxSlider* GetSliderModelRotationY() { return m_sliderModelRotationY; }
-    wxButton* GetBtModelRotationResetY() { return m_btModelRotationResetY; }
-    wxStaticLine* GetStaticLine3641() { return m_staticLine3641; }
-    wxSlider* GetSliderModelRotationZ() { return m_sliderModelRotationZ; }
-    wxButton* GetBtModelRotationResetZ() { return m_btModelRotationResetZ; }
-    wxStaticLine* GetStaticLine36411719() { return m_staticLine36411719; }
-    wxSlider* GetSliderModelRotationXYZ() { return m_sliderModelRotationXYZ; }
-    wxButton* GetBtModelRotationResetXYZ() { return m_btModelRotationResetXYZ; }
-    wxStaticLine* GetStaticLine364117() { return m_staticLine364117; }
-    wxCollapsiblePane* GetCollPaneModelRotation() { return m_collPaneModelRotation; }
-    wxTimer* GetTimer4476() { return m_timer4476; }
-    GL3DOptionsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("3D Options"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP);
-    virtual ~GL3DOptionsBase();
 };
 
 

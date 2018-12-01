@@ -1,7 +1,6 @@
 #include <wx/dcclient.h>
 
 #include "3D/CncGCodePreview.h"
-#include "GL3DOptions.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
 
@@ -124,12 +123,12 @@ void CncGCodePreview::setMaxDimension(double maxDim) {
 void CncGCodePreview::pushProcessMode() {
 //////////////////////////////////////////////////
 	clear();
-	preview->enablePositionMarker(false);
+	preview->getOptions().showPosMarker = false;
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::popProcessMode() {
 //////////////////////////////////////////////////
-	preview->enablePositionMarker(false);
+	preview->getOptions().showPosMarker = false;
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
@@ -141,7 +140,6 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	static PathVerticeType	formatType = PathVerticeType::FT_SOLID;
 	
 	// decorate
-	#warning define corect colours for max and ud
 	switch ( vd.getMode() ) {
 		case DataVerticeMode::CM_WORK:	
 										colour.Set(0, 0, 0);

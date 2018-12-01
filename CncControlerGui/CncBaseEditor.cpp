@@ -645,8 +645,10 @@ void CncBaseEditor::setupModelType() {
 	if ( tf == TplBinary )
 		tf = fileInfo.binaryOrigFomat;
 	
+	#warning
 	switch ( tf ) {
-		case TplSvg:		fileInfo.modelType 		= GLContextBase::ModelType::MT_LEFT_HAND;
+		case TplSvg:		fileInfo.modelType 		= GLContextBase::ModelType::MT_RIGHT_HAND;
+							//fileInfo.modelType 		= GLContextBase::ModelType::MT_LEFT_HAND;
 							fileInfo.modelViewType	= CncDimensions::CncDimension2D; 
 							break;
 							

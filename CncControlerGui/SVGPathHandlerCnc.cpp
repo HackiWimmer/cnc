@@ -40,13 +40,13 @@ SVGPathHandlerCnc::~SVGPathHandlerCnc() {
 void SVGPathHandlerCnc::logMeasurementStart() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->startMeasurement();
+	cncControl->startSerialMeasurement();
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->stopMeasurement();
+	cncControl->stopSerialMeasurement();
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::initNextClientId(long id) {
@@ -271,13 +271,6 @@ bool SVGPathHandlerCnc::closeCurrentPath() {
 		}
 	}
 	
-	cncControl->getSerial()->closePath();
-	cncControl->getSerial()->closeDuration();
-	
-	// write the original path only one time
-	if ( cncControl->getDurationCount() >= cncControl->getDurationCounter() )
-		cncControl->getSerial()->writeOrigPath(origPathInfo); 
-	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -330,8 +323,8 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 			if ( firstRun == true ) {
 				// this time the cnc controller isn't moved before
 				// so the local positions have to be alinged
-				currentPos.setX(cncControl->getCurPosMetric().getX());
-				currentPos.setY(cncControl->getCurPosMetric().getY());
+				currentPos.setX(cncControl->getCurAppPosMetric().getX());
+				currentPos.setY(cncControl->getCurAppPosMetric().getY());
 				startPos.setX(cncControl->getStartPosMetric().getX());
 				startPos.setY(cncControl->getStartPosMetric().getY());
 			}
@@ -355,27 +348,12 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 			if ( moveLinearXY(0, moveY, cpe.alreadyRendered) == false )
 				return false;
 		} else {
-			if ( isZAxisUp() == true )
-				cncControl->getSerial()->beginSubPath(moveX, moveY);
-				
 			if ( moveLinearXY(moveX, moveY, cpe.alreadyRendered) == false )
 				return false;
 		}
 		
-		// pure svg handling
-		if ( std::distance(pathListMgr.begin(), it) == 0 ) {
-			// this have to be defently done after the fist move above
-			// otherwise this move will be also recorded by the svg out file and
-			// serial->beginPath has a step to much
-			double sx = pathListMgr.getStartPos().x;
-			double sy = pathListMgr.getStartPos().y;
-			if ( reverseYAxis == true )
-				sy *= -1;
-				
-			cncControl->getSerial()->beginPath(sx, sy);
-		}
 	}
-
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -386,10 +364,6 @@ void SVGPathHandlerCnc::prepareWork() {
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
-	
-	//svg output handling
-	#warning SVGUnit cast
-	cncControl->getSerial()->beginSVG((SVGUnit)getUnit(), getW(), getH(), getViewBox());
 	
 	// controller handling
 	if ( isZAxisDown() == true )
@@ -410,7 +384,6 @@ void SVGPathHandlerCnc::finishWork() {
 	CncDoublePosition::Watermarks xyMax;
 	//currentPos.getWatermarks(xyMax); // sometimes not in mm
 	xyMax = cncControl->getWaterMarksMetric();
-	cncControl->getSerial()->closeSVG(xyMax);
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::simulateZAxisUp() {
@@ -436,7 +409,7 @@ bool SVGPathHandlerCnc::isZAxisDown() {
 bool SVGPathHandlerCnc::moveUpZ() {
 ///////////////////////////////////////////////////////////////////
 	double dist = CncConfig::getGlobalCncConfig()->getCurZDistance();
-	double curZPos = cncControl->getCurPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
+	double curZPos = cncControl->getCurAppPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
 	double moveZ = 0.0;
 	
 	if ( curZPos != dist ) {
@@ -468,7 +441,7 @@ bool SVGPathHandlerCnc::moveUpZ() {
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveDownZ() {
 ///////////////////////////////////////////////////////////////////
-	double curZPos = cncControl->getCurPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
+	double curZPos = cncControl->getCurAppPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
 	double newZPos = CncConfig::getGlobalCncConfig()->getDurationPositionAbs(cncControl->getDurationCounter());
 	double moveZ   = (curZPos - newZPos) * (-1);
 

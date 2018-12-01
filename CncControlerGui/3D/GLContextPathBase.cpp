@@ -85,10 +85,6 @@ GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
 , ruler()
 , drawType(DT_LINE_STRIP)
 , currentClientId(-1L)
-, showBoundBox(true)
-, boundBoxColour(185, 127, 87)
-, showRuler(true)
-, showHelpLines(true)
 , rulerColourX(coordOriginInfo.colours.x)
 , rulerColourY(coordOriginInfo.colours.y)
 , rulerColourZ(coordOriginInfo.colours.z)
@@ -272,8 +268,7 @@ void GLContextCncPathBase::determineModel() {
 		return;
 	}
 	
-	if ( showRuler == true )
-		drawRuler();
+	drawRuler();
 	
 	switch ( drawType ) {
 		case DT_POINTS:		drawPoints(); 		break;
@@ -281,7 +276,7 @@ void GLContextCncPathBase::determineModel() {
 		case DT_LINE_STRIP:	drawLineStrips(); 	break;
 	}
 	
-	if ( showBoundBox == true )
+	if ( options.showBoundBox == true )
 		drawBoundBox();
 }
 /////////////////////////////////////////////////////////////////
@@ -294,7 +289,7 @@ void GLContextCncPathBase::drawBoundBox() {
 	glLineStipple(1, 0xAAAA);
 	glEnable(GL_LINE_STIPPLE);
 	
-	glColor4ub(boundBoxColour.Red(), boundBoxColour.Green(), boundBoxColour.Blue(), 255);
+	glColor4ub(options.boundBoxColour.Red(), options.boundBoxColour.Green(), options.boundBoxColour.Blue(), 255);
 	
 	BoundBox bb = cncPath.getBoundBox();
 	for ( BoundBox::iterator it=bb.begin(); it!=bb.end(); ++it ) {
@@ -311,13 +306,16 @@ void GLContextCncPathBase::drawBoundBox() {
 void GLContextCncPathBase::drawRuler() {
 /////////////////////////////////////////////////////////////////
 	//...........................................................
-	auto skipIndex = [&](int counter, int fact = 1) {
+	auto skipIndex = [&](int counter) {
 		const float sf = this->getCurrentScaleFactor();
 		
-		if      ( sf >= 0.00 && sf < 0.10 ) 	{ if ( counter % ( 50 * fact ) != 0 ) return true; }
-		else if ( sf >= 0.10 && sf < 0.25 ) 	{ if ( counter % ( 10 * fact ) != 0 ) return true; }
-		else if ( sf >= 0.25 && sf < 0.50 ) 	{ if ( counter % (  5 * fact ) != 0 ) return true; }
-		else if ( sf >= 0.50 && sf < 1.00 ) 	{ if ( counter % (  2 * fact ) != 0 ) return true; }
+		// the mod operands below 'm u s t' be even - always
+		// otherwise the value of '0' isn't reached
+		if      ( sf >= 0.00 && sf < 0.05 ) 	{ if ( counter % ( 100 ) != 0 ) return true; }
+		if      ( sf >= 0.05 && sf < 0.10 ) 	{ if ( counter % (  50 ) != 0 ) return true; }
+		else if ( sf >= 0.10 && sf < 0.25 ) 	{ if ( counter % (  10 ) != 0 ) return true; }
+		else if ( sf >= 0.25 && sf < 0.50 ) 	{ if ( counter % (   4 ) != 0 ) return true; }
+		else if ( sf >= 0.50 && sf < 1.00 ) 	{ if ( counter % (   2 ) != 0 ) return true; }
 		
 		return false;
 	};
@@ -368,6 +366,7 @@ void GLContextCncPathBase::drawRuler() {
 		
 		int counter = 0;
 		for ( auto it = lables.begin(); it != lables.end(); it++ ) {
+			
 			if ( skipIndex( counter++ ) == true ) 
 				continue;
 			
@@ -409,23 +408,27 @@ void GLContextCncPathBase::drawRuler() {
 		case V3D_ISO3: 
 		case V3D_ISO4:
 		case V2D_CAM_ROT_XY_ZTOP: 	showAxis[X]   = true;  showAxis[Y]   = true;  showAxis[Z]   = true;
-									showPlane[XY] = true;  showPlane[XZ] = false;  showPlane[YZ] =false;
+									showPlane[XY] = options.helpLines3D_XYPlane;  
+									showPlane[XZ] = options.helpLines3D_XZPlane;
+									showPlane[YZ] = options.helpLines3D_YZPlane;
 									break;
 	}
 	
 	// draw the rulers
-	if ( showAxis[X] ) { drawRulerAxis(rulerColourX, ruler.xAxis.axisLines); }
-	if ( showAxis[Y] ) { drawRulerAxis(rulerColourY, ruler.yAxis.axisLines); }
-	if ( showAxis[Z] ) { drawRulerAxis(rulerColourZ, ruler.zAxis.axisLines); }
+	if ( options.showRuler == true ) {
+		if ( showAxis[X] ) { drawRulerAxis(rulerColourX, ruler.xAxis.axisLines); }
+		if ( showAxis[Y] ) { drawRulerAxis(rulerColourY, ruler.yAxis.axisLines); }
+		if ( showAxis[Z] ) { drawRulerAxis(rulerColourZ, ruler.zAxis.axisLines); }
+		
+		if ( showAxis[X] ) { drawRulerLabels(rulerColourX, ruler.xAxis.axisLables); }
+		if ( showAxis[Y] ) { drawRulerLabels(rulerColourY, ruler.yAxis.axisLables); }
+		if ( showAxis[Z] ) { drawRulerLabels(rulerColourZ, ruler.zAxis.axisLables); }
+	}
 	
-	if ( showAxis[X] ) { drawRulerLabels(rulerColourX, ruler.xAxis.axisLables); }
-	if ( showAxis[Y] ) { drawRulerLabels(rulerColourY, ruler.yAxis.axisLables); }
-	if ( showAxis[Z] ) { drawRulerLabels(rulerColourZ, ruler.zAxis.axisLables); }
-	
-	if ( showHelpLines == true ) {
+	if ( options.showHelpLines == true ) {
 		wxColour colour(255, 255, 255);
-		if ( showPlane[XY] ) { drawHelpLines(colour, ruler.helpLinesXY); }
-		if ( showPlane[XZ] ) { drawHelpLines(colour, ruler.helpLinesXZ); }
-		if ( showPlane[YZ] ) { drawHelpLines(colour, ruler.helpLinesYZ); }
+		if ( showPlane[XY] ) { drawHelpLines(colour, ruler.helpLinesXY.helpLinesX); drawHelpLines(colour, ruler.helpLinesXY.helpLinesY); }
+		if ( showPlane[XZ] ) { drawHelpLines(colour, ruler.helpLinesXZ.helpLinesX); drawHelpLines(colour, ruler.helpLinesXZ.helpLinesZ); }
+		if ( showPlane[YZ] ) { drawHelpLines(colour, ruler.helpLinesYZ.helpLinesY); drawHelpLines(colour, ruler.helpLinesYZ.helpLinesZ); }
 	}
 }

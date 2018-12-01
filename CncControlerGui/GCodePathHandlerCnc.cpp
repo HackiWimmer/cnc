@@ -18,13 +18,13 @@ GCodePathHandlerCnc::~GCodePathHandlerCnc() {
 void GCodePathHandlerCnc::logMeasurementStart() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->startMeasurement();
+	cncControl->startSerialMeasurement();
 }
 //////////////////////////////////////////////////////////////////
 void GCodePathHandlerCnc::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->stopMeasurement();
+	cncControl->stopSerialMeasurement();
 }
 //////////////////////////////////////////////////////////////////
 void GCodePathHandlerCnc::initNextClientId(long id) {

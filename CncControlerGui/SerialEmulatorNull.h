@@ -232,8 +232,8 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual void sleepMilliseconds(unsigned int millis);
 		unsigned char getLastSignal() { return lastSignal; }
 
-		virtual bool evaluatePositions(std::vector<int32_t>& ret);
-		virtual bool evaluateLimitStates(std::vector<int32_t>& ret);
+		virtual bool evaluatePositions(GetterValues& ret);
+		virtual bool evaluateLimitStates(GetterValues& ret);
 		virtual bool evaluateLimitStates();
 		
 		// position movement counting

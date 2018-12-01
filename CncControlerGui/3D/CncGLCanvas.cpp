@@ -28,26 +28,139 @@ void CncMetricRulerSetup::setupOrigin(const CncDoublePosition& o) {
 	origin.set(o);
 }
 ///////////////////////////////////////////////////
-void CncMetricRulerSetup::setupSize(double xMin, double xMax, 
-                                    double yMin, double yMax, 
-								    double zMin, double zMax) {
+void CncMetricRulerSetup::trace(GLContextCncPathBase* monitor, std::ostream& out) {
 ///////////////////////////////////////////////////
+	out << "\nCncMetricRulerSetup::trace:" << std::endl;
+	
+	out << " Origin         : " << origin.getX() << ", " << origin.getY() << ", " << origin.getZ() << std::endl;
+	
+	out << " X axis         : " << minX << " <-> " << maxX << std::endl;
+	out << " Y axis         : " << minY << " <-> " << maxY << std::endl;
+	out << " Z axis         : " << minZ << " <-> " << maxZ << std::endl;
+	
+	out << " X major label #: " << monitor->getRulerX().axisLables.size() << std::endl;
+	out << " Y major label #: " << monitor->getRulerY().axisLables.size() << std::endl;
+	out << " Z major label #: " << monitor->getRulerZ().axisLables.size() << std::endl;
+}
+///////////////////////////////////////////////////
+bool CncMetricRulerSetup::check(GLContextCncPathBase* monitor, std::ostream& out) {
+///////////////////////////////////////////////////
+	bool ret = true;
+	
+	auto checkSizes = [&](int enr, int s1, int s2, const char* m1, const char* m2) {
+		if ( s1 != s2 ) {
+			out << "CncMetricRulerSetup::checkSizes(" << enr << "): The following sizes aren't equal!" << std::endl;
+			out << " " << m1 << " : "  << s1 << std::endl;
+			out << " " << m2 << " : "  << s2 << std::endl;
+			
+			ret = false;
+		}
+	};
+	
+	/*
+	auto checkEven = [&](int enr, int val, const char* m) {
+		if ( val % 2 != 0 ) {
+			out << "CncMetricRulerSetup::checkEven(" << enr << "): The value '" << m << "' isn't even!" << std::endl;
+			
+			ret = false;
+		}
+	};
+	*/
+	auto checkOdd = [&](int enr, int val, const char* m) {
+		if ( val % 2 == 0 ) {
+			out << "CncMetricRulerSetup::checkOdd(" << enr << "): The value '" << m << "' isn't odd!" << std::endl;
+			
+			ret = false;
+		}
+	};
+	
+	auto checkTrue = [&](int enr, bool val, const char* m) {
+		if ( val != true ) {
+			out << "CncMetricRulerSetup::checkTrue(" << enr << "): The value '" << m << "' isn't true!" << std::endl;
+			
+			ret = false;
+		}
+	};
+
+	// helplines and labels are always aligned
+	checkSizes( 1000, monitor->getXYPlane().helpLinesX.size(), monitor->getRulerX().axisLables.size(), "helpLinesX.size()", "axisLables.size()");
+	checkSizes( 1001, monitor->getXYPlane().helpLinesY.size(), monitor->getRulerY().axisLables.size(), "helpLinesY.size()", "axisLables.size()");
+	
+	checkSizes( 1010, monitor->getXZPlane().helpLinesX.size(), monitor->getRulerX().axisLables.size(), "helpLinesX.size()", "axisLables.size()");
+	checkSizes( 1011, monitor->getXZPlane().helpLinesZ.size(), monitor->getRulerZ().axisLables.size(), "helpLinesZ.size()", "axisLables.size()");
+	
+	checkSizes( 1020, monitor->getYZPlane().helpLinesY.size(), monitor->getRulerY().axisLables.size(), "helpLinesY.size()", "axisLables.size()");
+	checkSizes( 1021, monitor->getYZPlane().helpLinesZ.size(), monitor->getRulerZ().axisLables.size(), "helpLinesZ.size()", "axisLables.size()");
+	
+	// to reach the null point always
+	checkOdd ( 3000, (int)(minX / majorScanning), "minX / majorScanning"); 
+	checkOdd ( 3001, (int)(minY / majorScanning), "minY / majorScanning");
+	checkOdd ( 3002, (int)(minZ / majorScanning), "minZ / majorScanning");
+	
+	// to reach the null point always
+	checkTrue( 4000, cnc::dblCompareNull(fmod(origin.getX(), majorScanning)), "cnc::dblCompareNull(fmod(origin.getX(), majorScanning))");
+	checkTrue( 4001, cnc::dblCompareNull(fmod(origin.getY(), majorScanning)), "cnc::dblCompareNull(fmod(origin.getY(), majorScanning))");
+	checkTrue( 4002, cnc::dblCompareNull(fmod(origin.getZ(), majorScanning)), "cnc::dblCompareNull(fmod(origin.getZ(), majorScanning))");
+	
+	return ret;
+}
+///////////////////////////////////////////////////
+void CncMetricRulerSetup::setupSize(double xDim, double yDim, double zDim) {
+///////////////////////////////////////////////////
+	double xMin = -fabs(xDim);
+	double xMax = +fabs(xDim);
+	double yMin = -fabs(yDim);
+	double yMax = +fabs(yDim);
+	double zMin = -fabs(zDim);
+	double zMax = +fabs(zDim);
+
 	// define min size
-	minX = fabs(xMin) > majorScanning ? xMin : +majorScanning; 
-	maxX = fabs(xMax) > majorScanning ? xMax : -majorScanning;
-	minY = fabs(yMin) > majorScanning ? yMin : +majorScanning;
-	maxY = fabs(yMax) > majorScanning ? yMax : -majorScanning;
-	minZ = fabs(zMin) > majorScanning ? zMin : +majorScanning;
-	maxZ = fabs(zMax) > majorScanning ? zMax : -majorScanning;
+	minX = fabs(xMin) > majorScanning ? xMin : -majorScanning; 
+	maxX = fabs(xMax) > majorScanning ? xMax : +majorScanning;
+	minY = fabs(yMin) > majorScanning ? yMin : -majorScanning;
+	maxY = fabs(yMax) > majorScanning ? yMax : +majorScanning;
+	minZ = fabs(zMin) > majorScanning ? zMin : -majorScanning;
+	maxZ = fabs(zMax) > majorScanning ? zMax : +majorScanning;
+	
+	wxASSERT(minX < maxX);
+	wxASSERT(minY < maxY);
+	wxASSERT(minZ < maxZ);
+	
+	// normalize (round) - now we have many times of majorScanning
+	minX = minX - fmod(minX, majorScanning);
+	maxX = maxX - fmod(maxX, majorScanning);
+	minY = minY - fmod(minY, majorScanning);
+	maxY = maxY - fmod(maxY, majorScanning);
+	minZ = minZ - fmod(minZ, majorScanning);
+	maxZ = maxZ - fmod(maxZ, majorScanning);
 	
 	// strech
-	unsigned int fact = 2;
-	minX += -( fact * majorScanning );
-	maxX += +( fact * majorScanning );
-	minY += -( fact * majorScanning );
-	maxY += +( fact * majorScanning );
-	minZ += -( fact * majorScanning );
-	maxZ += +( fact * majorScanning );
+	auto strechMin = [&](double min) {
+		unsigned int fact = 2;
+		min += -( fact * majorScanning );
+		
+		// the additional add is necessary to reach the '0' 
+		// always with the following code:
+		// for (int i = min; i <= max; i += majorScanning )
+		if ( (int)(min / majorScanning) % 2 == 0 )
+			min -= majorScanning;
+			
+		return min;
+	};
+	
+	auto strechMax = [&](double max) {
+		unsigned int fact = 2;
+		max += +( fact * majorScanning );
+		
+		return max;
+	};
+
+	minX = strechMin(minX);
+	maxX = strechMax(maxX);
+	minY = strechMin(minY);
+	maxY = strechMax(maxY);
+	minZ = strechMin(minZ);
+	maxZ = strechMax(maxZ);
 }
 ///////////////////////////////////////////////////
 void CncMetricRulerSetup::addLine(GLI::GLLineCluster& lines, double x1, double x2, 
@@ -80,56 +193,46 @@ void CncMetricRulerSetup::addLabel(GLI::GLLabelCluster& labels, double x,
 	labels.push_back(li);
 }
 ///////////////////////////////////////////////////
-void CncMetricRulerSetup::createRulerOrigin(GLI::GLLabelCluster& o) {
-///////////////////////////////////////////////////
-	addLabel(o, 
-			 origin.getX(), 
-			 origin.getY(), 
-			 origin.getZ(), 
-			 GLUT_BITMAP_8_BY_13, 
-			 wxString::Format("%d", 0));
-}
-///////////////////////////////////////////////////
-void CncMetricRulerSetup::createHelpLinesXY(GLI::GLLineCluster& xyPlane) {
+void CncMetricRulerSetup::createHelpLinesXY(GLI::GLLineCluster& xLines, GLI::GLLineCluster& yLines) {
 ///////////////////////////////////////////////////
 	// init with origin offset
 	const double z = origin.getZ(); 
 	
 	// help lines - x axis
 	for (double x = minX; x <= maxX; x += majorScanning )
-		addLine(xyPlane, x, x, minY, maxY, z, z);
+		addLine(xLines, x, x, minY, maxY, z, z);
 	
 	// help lines - y axis
 	for (double y = minY; y <= maxY; y += majorScanning )
-		addLine(xyPlane, minX, maxX, y, y, z, z);
+		addLine(yLines, minX, maxX, y, y, z, z);
 }
 ///////////////////////////////////////////////////
-void CncMetricRulerSetup::createHelpLinesXZ(GLI::GLLineCluster& xzPlane) {
+void CncMetricRulerSetup::createHelpLinesXZ(GLI::GLLineCluster& xLines, GLI::GLLineCluster& zLines) {
 ///////////////////////////////////////////////////
 	// init with origin offset
 	const double y = origin.getY(); 
 	
 	// help lines - x axis
 	for (double x = minX; x <= maxX; x += majorScanning )
-		addLine(xzPlane, x, x, y, y, minZ, maxZ);
+		addLine(xLines, x, x, y, y, minZ, maxZ);
 	
 	// help lines - y axis
-	for (double z = minX; z <= maxX; z += majorScanning )
-		addLine(xzPlane, minX, maxX, y, y, z, z);
+	for (double z = minZ; z <= maxZ; z += majorScanning )
+		addLine(zLines, minX, maxX, y, y, z, z);
 }
 ///////////////////////////////////////////////////
-void CncMetricRulerSetup::createHelpLinesYZ(GLI::GLLineCluster& yzPlane) {
+void CncMetricRulerSetup::createHelpLinesYZ(GLI::GLLineCluster& yLines, GLI::GLLineCluster& zLines) {
 ///////////////////////////////////////////////////
 	// init with origin offset
 	const double x = origin.getX(); 
 	
 	// help lines - x axis
 	for (double y = minY; y <= maxY; y += majorScanning )
-		addLine(yzPlane, x, x, y, y, minZ, maxZ);
+		addLine(yLines, x, x, y, y, minZ, maxZ);
 	
 	// help lines - y axis
-	for (double z = minX; z <= maxX; z += majorScanning )
-		addLine(yzPlane, x, x, minY, maxY, z, z);
+	for (double z = minZ; z <= maxZ; z += majorScanning )
+		addLine(zLines, x, x, minY, maxY, z, z);
 }
 ///////////////////////////////////////////////////
 void CncMetricRulerSetup::createRulerX(GLI::GLAxisRuler& ruler) {
@@ -225,11 +328,11 @@ void CncMetricRulerSetup::createRulerZ(GLI::GLAxisRuler& ruler) {
 			
 		} else if ( cnc::dblCompareNull(fmod(iz, minorScanning)) == true )  {
 			// add minor scanning line
-			addLine(ruler.axisLines, x - oMinor, x + oMinor, y, y, z - oMinor, z + oMinor);
+			addLine(ruler.axisLines, x - oMinor, x + oMinor, y - oMinor, y + oMinor, z, z);
 			
 		} else {
 			// add normal scanning line
-			addLine(ruler.axisLines, x - oScann, x + oScann, y, y, z - oScann, z + oScann);
+			addLine(ruler.axisLines, x - oScann, x + oScann, y - oScann, y + oScann, z, z);
 		}
 	}
 }

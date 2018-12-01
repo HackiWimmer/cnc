@@ -56,8 +56,8 @@ class SVGViewbox {
 			
 			// calculate further members
 			if ( isValid() ) {
-				minX = 0.0;
-				minY = 0.0;
+				minX = x;
+				minY = y;
 				maxX = x + w;
 				maxY = y + h;
 			}
@@ -115,6 +115,7 @@ class SVGRootNode {
 		
 		void setup();
 		void convertToUnit(const Unit unit);
+		void convertToMillimeter();
 		
 	public:
 		
@@ -137,8 +138,6 @@ class SVGRootNode {
 		const double getHeight_MM()			const { return unitCalculator.convert(height); }
 		
 		const wxString& getRootTransformation(wxString& ret) const;
-		
-		void convertToMillimeter();
 		
 		friend std::ostream &operator<< (std::ostream &ostr, const SVGRootNode &a) {
 			typedef CncUnitCalculator<float> UC;
@@ -165,3 +164,103 @@ struct SVGRootNodeTest {
 };
 
 #endif
+
+
+/*
+#include <iostream>
+
+
+struct ResultSet {
+	
+	//Unit 	unit;
+	
+	float 	minX;
+	float 	minY;
+	float 	maxX;
+	float 	maxY;
+	
+	float 	width;
+	float 	height;
+	
+	float	scaleX;
+	float	scaleY;
+};
+
+
+//------------------------------------------------------------------
+bool calculateResultSet(ResultSet& rs, float docW, float docH) {
+	return calculateResultSet(rs, docW, docH, 0, 0, docW, docH);
+}
+
+//------------------------------------------------------------------
+bool calculateResultSet(ResultSet& rs, float docW, float docH, float vbX, float vbY, float vbW, float vbH) {
+	
+	
+	std::cout << docW << ", ";
+	std::cout << docH << ", ";
+	std::cout << vbX << ", ";
+	std::cout << vbY << ", ";;
+	std::cout << vbW << ", ";
+	std::cout << vbH << "  ->  ";
+
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	rs.minX 	= vbX;
+	rs.minY 	= vbY;
+	
+	rs.width 	= vbW;
+	rs.height 	= vbH;
+	
+	rs.maxX 	= rs.minX + rs.width;
+	rs.maxY 	= rs.minY + rs.height;
+	
+	rs.scaleX 	= docW / vbW;
+	rs.scaleY 	= docH / vbH;
+	
+	
+	return true;
+}
+
+
+void print(const ResultSet& rs) {
+	
+	std::cout << rs.minX << ", ";
+	std::cout << rs.minY << ", ";
+	std::cout << rs.width << ", ";
+	std::cout << rs.width << ", ";
+	std::cout << rs.maxX << ", ";
+	std::cout << rs.maxY << ", ";
+	std::cout << rs.scaleX << ", ";
+	std::cout << rs.scaleY << std::endl;
+			
+}
+
+
+
+int main() {
+	
+	
+	ResultSet rs;
+	
+	
+	calculateResultSet(rs, 200, 100, 0, 0, 200, 100); print(rs);
+	calculateResultSet(rs, 200, 100, 0, 0, 400, 200); print(rs);
+	calculateResultSet(rs, 200, 100, 0, 0, 100,  50); print(rs);
+	calculateResultSet(rs, 200, 100, 0, 0, 100, 100); print(rs);
+	calculateResultSet(rs, 200, 100, 0, 0, 100, 100); print(rs);
+	calculateResultSet(rs, 200, 100, -10, -10, 100, 100); print(rs);
+	calculateResultSet(rs, 200, 100, 10, 10, 100, 100); print(rs);
+	
+	
+	
+	return 0;
+}
+*/

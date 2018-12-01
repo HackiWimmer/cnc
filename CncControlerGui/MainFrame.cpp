@@ -82,7 +82,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncMonitorSplitterWindow.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
-#include "GL3DOptions.h"
+#include "GlobalStrings.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -94,15 +94,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #endif
 
 ////////////////////////////////////////////////////////////////////
-// global strings
-const char* _programTitel 		= "Woodworking CNC Controller";
-const char* _copyRight			= "invented by Hacki Wimmer 2016 - 2018";
-
-#ifdef DEBUG
-	const char* _programVersion = "0.8.9.d";
-#else
-	const char* _programVersion = "0.8.9.r";
-#endif
+extern GlobalConstStringDatabase globalStrings;
 
 ////////////////////////////////////////////////////////////////////
 unsigned int CncGampadDeactivator::referenceCounter = 0;
@@ -437,14 +429,16 @@ void MainFrame::installCustControls() {
 	// 3D splitter window
 	cnc3DSplitterWindow = new CncMonitorVSplitterWindow(this);
 	GblFunc::replaceControl(m_3DSplitterPlaceholder, cnc3DSplitterWindow);
-
+	
 	drawPane3D    = new GL3DDrawPane(cnc3DSplitterWindow);
 	optionPane3D  = new GL3DOptionPane(cnc3DSplitterWindow);
 	cnc3DSplitterWindow->SplitVertically(drawPane3D, optionPane3D, 0);
 	
 	// Montion Monitor
-	motionMonitor = new CncMotionMonitor(this, NULL);
+	motionMonitor = new CncMotionMonitor(this);
 	GblFunc::replaceControl(drawPane3D->GetDrawPane3DPlaceHolder(), motionMonitor);
+	drawPane3D->setMotionMonitor(motionMonitor);
+	optionPane3D->setMotionMonitor(motionMonitor);
 	activate3DPerspectiveButton(m_3D_Perspective1);
 	
 	// Source Editor
@@ -515,7 +509,14 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(sourceEditor);
 	registerGuiControl(outboundEditor);
 	registerGuiControl(fileView);
-
+	
+	registerGuiControl(m_searchConnections);
+	registerGuiControl(m_btnOrigin);
+	registerGuiControl(m_btnRuler);
+	registerGuiControl(m_btnHelpLines);
+	registerGuiControl(m_btnBoundBox);
+	registerGuiControl(m_btnPosMarker);
+	registerGuiControl(m_btnFlyPath);
 	registerGuiControl(m_btToggleOutboundEditorWordWrap);
 	registerGuiControl(m_checkBoxToolEnabled);
 	registerGuiControl(m_manuallyCorrectLimitPos);
@@ -661,9 +662,6 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	wxASSERT(0);
-	wxLogWarning("%s", "Stefan");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -723,9 +721,9 @@ void MainFrame::traceBoostVersion(std::ostream& out) {
 void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 	out << " :: Programm version info: " 
-		<< _programTitel 
+		<< globalStrings.programTitel 
 		<< " "
-		<< _programVersion
+		<< globalStrings.programVersion
 		<< std::endl;
 }
 ///////////////////////////////////////////////////////////////////
@@ -868,15 +866,15 @@ void MainFrame::onThreadAppPosUpdate(UpdateManagerEvent& event) {
 	// update position
 	switch ( unit ) {
 		case CncSteps:	// update application position
-						m_xAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurPos().getX()));
-						m_yAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurPos().getY()));
-						m_zAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurPos().getZ()));
+						m_xAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurAppPos().getX()));
+						m_yAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurAppPos().getY()));
+						m_zAxis->ChangeValue(wxString::Format("%8ld", cnc->getCurAppPos().getZ()));
 						break;
 						
 		case CncMetric:	// update application position
-						m_xAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurPos().getX() * GBL_CONFIG->getDisplayFactX(unit)));
-						m_yAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurPos().getY() * GBL_CONFIG->getDisplayFactY(unit)));
-						m_zAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurPos().getZ() * GBL_CONFIG->getDisplayFactZ(unit)));
+						m_xAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurAppPos().getX() * GBL_CONFIG->getDisplayFactX(unit)));
+						m_yAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurAppPos().getY() * GBL_CONFIG->getDisplayFactY(unit)));
+						m_zAxis->ChangeValue(wxString::Format("%4.3lf", cnc->getCurAppPos().getZ() * GBL_CONFIG->getDisplayFactZ(unit)));
 						break;
 	}
 }
@@ -1433,7 +1431,7 @@ void MainFrame::initialize(void) {
 	
 	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
 	
-	this->SetTitle(wxString(_programTitel) + " " + _programVersion);
+	this->SetTitle(wxString(globalStrings.programTitel) + " " + globalStrings.programVersion);
 	
 	wxString cfgStr;
 	
@@ -1511,7 +1509,7 @@ bool MainFrame::initializeCncControl() {
 	updateCncConfigTrace();
 	
 	// z slider
-	m_zView->updateView(cnc->getControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
+	m_zView->updateView(cnc->requestControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
 	
 	//initilaize debug state
 	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
@@ -1726,13 +1724,13 @@ void MainFrame::OnAbout(wxCommandEvent& event) {
 	
 	wxUnusedVar(event);
 	wxAboutDialogInfo info;
-	info.SetName(_programTitel);
-	info.SetVersion(_programVersion);
+	info.SetName(globalStrings.programTitel);
+	info.SetVersion(globalStrings.programVersion);
 	info.SetLicence(_("GPL v2 or later"));
 	info.AddDeveloper("Hacki Wimmmer");
 	info.SetDescription(description);
 	info.SetIcon(icon);
-	info.SetCopyright(_copyRight);
+	info.SetCopyright(globalStrings.copyRight);
 	::wxAboutBox(info);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2066,7 +2064,7 @@ void MainFrame::updateCncConfigTrace() {
 	cnc->updateCncConfigTrace();
 	
 	m_infoToolDiameter->SetLabel(wxString::Format("%.3lf", GBL_CONFIG->getToolDiameter(GBL_CONFIG->getCurrentToolId())));
-	m_zView->updateView(cnc->getControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
+	m_zView->updateView(cnc->requestControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
 	collectSummary();
 }
 ///////////////////////////////////////////////////////////////////
@@ -2362,8 +2360,6 @@ bool MainFrame::openFile(int pageToSelect) {
 			inboundFileParser->clearControls();
 		
 		clearMotionMonitor();
-		
-		cnc->getSerial()->clearSVG();
 		
 		introduceCurrentFile();
 	}
@@ -2767,11 +2763,6 @@ bool MainFrame::processVirtualTemplate() {
 	wxASSERT(m_inputFileName);
 
 	bool ret;
-	cnc->getSerial()->clearSVG();
-	
-	SvgOutputParameters sop;
-	cnc->getSerial()->setSVGOutputParameters(evaluteSvgOutputParameters(sop));
-
 	FileParser::UserAgentOutputControls oc;
 	oc.detailInfo 		= m_dvListCtrlSvgUADetailInfo;
 	oc.inboundPathList 	= m_dvListCtrlSvgUAInboundPathList;
@@ -2906,7 +2897,7 @@ bool MainFrame::processManualTemplate() {
 		move.z *= GBL_CONFIG->getDisplayFactZ();
 	} 
 	
-	p->reset(cnc->getCurPosMetric());
+	p->reset(cnc->getCurAppPosMetric());
 	p->addMove(move);
 	
 	bool ret = false;
@@ -2950,13 +2941,6 @@ bool MainFrame::processTestInterval() {
 		return false;
 	}
 	
-	// SVG Serial Emulator Support
-	cnc->getSerial()->beginSVG(mm, 
-							   CncConfig::getGlobalCncConfig()->getMaxDimensionX(), 
-							   CncConfig::getGlobalCncConfig()->getMaxDimensionY());
-	cnc->getSerial()->beginPath(cnc->getCurPos().getX() * CncConfig::getGlobalCncConfig()->getDisplayFactX(), 
-								cnc->getCurPos().getY() * CncConfig::getGlobalCncConfig()->getDisplayFactY());
-								
 	wxString sel = m_testIntervalMode->GetStringSelection();
 	char mode = sel[0];
 	
@@ -3041,10 +3025,6 @@ bool MainFrame::processTestInterval() {
 					break;
 		default: ;// do nothing
 	}
-	
-	// SVG Serial Emulator Support
-	cnc->getSerial()->closePath();
-	cnc->getSerial()->closeSVG();
 	
 	return true;
 }
@@ -3237,21 +3217,17 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
-	// select summary page
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
-	
 	if ( evaluatePositions == true && cnc->validateAppAgainstCtlPosition() == false ) {
 		
 		wxString msg("Validate positions failed\n");
 		msg << "\nPC pos        : ";
-		msg << cnc->getCurPos().getX(); msg << ",";
-		msg << cnc->getCurPos().getY(); msg << ",";
-		msg << cnc->getCurPos().getZ();
+		msg << cnc->getCurAppPos().getX(); msg << ",";
+		msg << cnc->getCurAppPos().getY(); msg << ",";
+		msg << cnc->getCurAppPos().getZ();
 		msg << "\nController pos: ";
-		msg << cnc->getControllerPos().getX();  msg << ",";
-		msg << cnc->getControllerPos().getY();  msg << ",";
-		msg << cnc->getControllerPos().getZ();
+		msg << cnc->requestControllerPos().getX();  msg << ",";
+		msg << cnc->requestControllerPos().getY();  msg << ",";
+		msg << cnc->requestControllerPos().getZ();
 		msg << "\n\nThe run command will be aborted!";
 
 		wxMessageDialog dlg(this, msg, _T("CNC Position check . . . "), 
@@ -3265,6 +3241,7 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 	cnc->evaluateLimitState();
 	if ( cnc->isALimitSwitchActive() ) {
 		// always return false to reconfigure zero in this sitiuation
+		std::clog << "MainFrame::checkIfRunCanBeProcessed(): Limit switch detected" << std::endl;
 		return false;
 	}
 	
@@ -3534,6 +3511,9 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	if ( ret == true )
 		ret = checkIfRunCanBeProcessed(confirm);
 		
+	if ( ret == false )
+		std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed"<< std::endl;
+		
 	if ( ret == true ) {
 		
 		// process
@@ -3651,7 +3631,7 @@ bool MainFrame::processTemplateIntern() {
 			
 		case TplTest:
 			clearMotionMonitor();
-			cnc->getSerial()->startMeasurement();
+			cnc->startSerialMeasurement();
 			ret = processTestTemplate();
 			cnc->getSerial()->stopMeasurement();
 			break;
@@ -3664,8 +3644,8 @@ bool MainFrame::processTemplateIntern() {
 	if ( cnc->validateAppAgainstCtlPosition() == false ) {
 		if ( cnc->isInterrupted() == false ) {
 			std::cerr << "Validate positions failed" << std::endl;
-			std::cerr << "PC pos        : " << cnc->getCurPos() << std::endl;
-			std::cerr << "Controller pos: " << cnc->getControllerPos() << std::endl;
+			std::cerr << "PC pos        : " << cnc->getCurAppPos() << std::endl;
+			std::cerr << "Controller pos: " << cnc->requestControllerPos() << std::endl;
 			setRefPostionState(false);
 		}
 		
@@ -3726,7 +3706,7 @@ void MainFrame::logStatistics() {
 		
 	CncDoublePosition min(cnc->getMinPositionsMetric());
 	CncDoublePosition max(cnc->getMaxPositionsMetric());
-	CncNanoTimespan measurementTimeSpan = cnc->getSerial()->getMeasurementNanoTimeSpanTotal();
+	CncNanoTimespan measurementTimeSpan = cnc->getMeasurementNanoTimeSpanTotal();
 	
 	double elapsedTimeMSEC	= 0.0;
 	double elapsedTimeSEC	= 0.0;
@@ -3738,10 +3718,10 @@ void MainFrame::logStatistics() {
 	if ( measurementTimeSpan > 0L ) {
 		elapsedTimeMSEC = measurementTimeSpan / (1000.0 * 1000.0);
 		elapsedTimeSEC  = elapsedTimeMSEC / (1000.0);
-		speed_MM_SEC 	= cnc->getSerial()->getTotalDistance() / elapsedTimeSEC;
+		speed_MM_SEC 	= cnc->getTotalDistance() / elapsedTimeSEC;
 		speed_MM_MIN 	= speed_MM_SEC * 60;
 		
-		speed_SP_SEC    = cnc->getSerial()->getStepCounter() / elapsedTimeSEC;
+		speed_SP_SEC    = cnc->getStepCounter() / elapsedTimeSEC;
 		speed_RPM		= (speed_SP_SEC / GBL_CONFIG->getStepsXYZ() ) * 60;
 	}
 
@@ -3791,20 +3771,20 @@ void MainFrame::logStatistics() {
 															, CncNumberFormatter::toString(max.getY(), 3)
 															, CncNumberFormatter::toString(max.getZ(), 3));
 	
-	statisticSummaryListCtrl->updateValues(SKEY_STEP_CNT	, CncNumberFormatter::toString(cnc->getSerial()->getStepCounter())
-															, CncNumberFormatter::toString(cnc->getSerial()->getStepCounterX())
-															, CncNumberFormatter::toString(cnc->getSerial()->getStepCounterY())
-															, CncNumberFormatter::toString(cnc->getSerial()->getStepCounterZ()));
+	statisticSummaryListCtrl->updateValues(SKEY_STEP_CNT	, CncNumberFormatter::toString(cnc->getStepCounter())
+															, CncNumberFormatter::toString(cnc->getStepCounterX())
+															, CncNumberFormatter::toString(cnc->getStepCounterY())
+															, CncNumberFormatter::toString(cnc->getStepCounterZ()));
 	
 	statisticSummaryListCtrl->updateValues(SKEY_POS_CNT		, _("")
 															, _("")
 															, _("")
-															, CncNumberFormatter::toString(cnc->getSerial()->getPositionCounter()));
+															, CncNumberFormatter::toString(cnc->getPositionCounter()));
 	
-	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistance()),  3)
-															, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistanceX()), 3)
-															, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistanceY()), 3)
-															, CncNumberFormatter::toString((double)(cnc->getSerial()->getTotalDistanceZ()), 3));
+	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getTotalDistance()),  3)
+															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceX()), 3)
+															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceY()), 3)
+															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceZ()), 3));
 	
 	statisticSummaryListCtrl->updateValues(SKEY_TIME		, _("")
 															, _("")
@@ -4048,7 +4028,7 @@ void MainFrame::requestControllerConfigFromButton(wxCommandEvent& event) {
 void MainFrame::requestCurrentPos(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	CncLongPosition pos = cnc->getControllerPos();
+	CncLongPosition pos = cnc->requestControllerPos();
 	std::stringstream ss;
 	ss << "Current controller position: " << pos;
 	cnc::trc.logInfoMessage(ss.str().c_str());
@@ -5582,77 +5562,6 @@ const char* MainFrame::getCurrentPortName(wxString& ret) {
 	
 	return ret;
 }
-
-///////////////////////////////////////////////////////////////////
-const char* MainFrame::getBlankHtmlPage() {
-///////////////////////////////////////////////////////////////////
-#warning - move this to preview
-	wxFileName fn(CncFileNameService::getBlankHtmlPageFileName());
-	std::fstream html;
-	
-	html.open(fn.GetFullPath(), std::ios::out | std::ios::trunc);
-	if ( html.is_open() ) {
-		
-		html << "<HTML>" << std::endl;
-		html << "<HEAD>" << std::endl;
-		html << "<TITLE>Blank Page</TITLE>" << std::endl;
-		html << "</HEAD>" << std::endl;
-		html << "<BODY BGCOLOR=\"FFFFFF\">" << std::endl;
-		html << "<HR>" << std::endl;
-		html << "Default HTML Page" << std::endl;
-		html << "<H1>Empty Content (about:blank)</H1>" << std::endl;
-		html << "<H2>No further information available</H2>" << std::endl;
-		html << "<HR>" << std::endl;
-		html << "</BODY>" << std::endl;
-		html << "</HTML>" << std::endl;
-		
-		html.flush();
-		html.close();
-		
-	} else {
-		return "about:blank";
-	}
-
-	return fn.GetFullPath();
-}
-///////////////////////////////////////////////////////////////////
-const char* MainFrame::getErrorHtmlPage(const wxString& errorInfo) {
-///////////////////////////////////////////////////////////////////
-#warning - move this to preview
-	wxFileName fn(CncFileNameService::getErrorHtmlPageFileName());
-	std::fstream html;
-	
-	wxString ei(errorInfo);
-	if ( errorInfo.IsEmpty() )
-		ei = "No further information available";
-	
-	html.open(fn.GetFullPath(), std::ios::out | std::ios::trunc);
-	if ( html.is_open() ) {
-		
-		html << "<HTML>" << std::endl;
-		html << "<HEAD>" << std::endl;
-		html << "<TITLE>Error Page</TITLE>" << std::endl;
-		html << "</HEAD>" << std::endl;
-		html << "<BODY BGCOLOR=\"FFFFFF\">" << std::endl;
-		html << "<HR>" << std::endl;
-		html << "Default HTML Page" << std::endl;
-		html << "<H1>";
-		html << ei;
-		html << "/H1>" << std::endl;
-		html << "<H2>No further information availiable</H2>" << std::endl;
-		html << "<HR>" << std::endl;
-		html << "</BODY>" << std::endl;
-		html << "</HTML>" << std::endl;
-		
-		html.flush();
-		html.close();
-		
-	} else {
-		return "about:blank";
-	}
-
-	return fn.GetFullPath();
-}
 ///////////////////////////////////////////////////////////////////
 void MainFrame::decorateRunButton() {
 ///////////////////////////////////////////////////////////////////
@@ -6037,11 +5946,6 @@ void MainFrame::refreshMotionMonitor(wxCommandEvent& event) {
 		cnc->updatePreview3D();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::openMotionMonitorOptionDlg(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	motionMonitor->showOptionDialog();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int sel = event.GetSelection();
@@ -6053,6 +5957,7 @@ void MainFrame::testCaseBookChanged(wxListbookEvent& event) {
 		
 		case TestBookSelection::VAL::TOOL:		if ( cnc != NULL )
 													m_testToggleTool->SetValue(cnc->getToolState());
+													
 												decorateSwitchToolOnOff(m_testToggleTool->GetValue());
 												break;
 												
@@ -6802,7 +6707,25 @@ void MainFrame::goPosSypPrevId(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::searchPosSpy(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	std::clog << "todo" << std::endl;
+	wxTextEntryDialog dlg(this, "Reference:", "Search position spy reference:", "");
+	dlg.SetTextValidator(wxTextValidator(wxFILTER_NUMERIC));
+	dlg.SetMaxLength(16);
+	
+	if ( dlg.ShowModal() != wxID_OK )
+		return;
+		
+	wxString what(dlg.GetValue());
+	what.Trim().Trim(true);
+	
+	bool ret = false;
+	if ( what.IsEmpty() == false ) {
+		long ref; what.ToLong(&ref);
+		what.assign(wxString::Format(globalStrings.posSpyRefFormat, ref));
+		ret = positionSpy->searchReference(what);
+	}
+	
+	if ( ret == false ) 
+		cnc::trc.logWarning(wxString::Format("Position Spy Search: Nothing found for '%s'", what));
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectSerialSpyMode() {
@@ -7315,9 +7238,7 @@ void MainFrame::motionMonitorFlyPath(wxCommandEvent& event) {
 	if ( motionMonitor == NULL )
 		return;
 		
-	if ( motionMonitor->getFlags().drawFlyPath )	motionMonitor->getFlags().drawFlyPath = false;
-	else											motionMonitor->getFlags().drawFlyPath = true;
-	
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showFlyPath);
 	motionMonitor->reconstruct();
 }
 /////////////////////////////////////////////////////////////////////
@@ -7325,11 +7246,9 @@ void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( motionMonitor == NULL )
 		return;
-
-	if ( motionMonitor->getFlags().positionMarker )	motionMonitor->getFlags().positionMarker = false;
-	else											motionMonitor->getFlags().positionMarker = true;
 	
-	motionMonitor->reconstruct();
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showPosMarker);
+	motionMonitor->updateMonitor();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorBoundBox(wxCommandEvent& event) {
@@ -7337,7 +7256,7 @@ void MainFrame::motionMonitorBoundBox(wxCommandEvent& event) {
 	if ( motionMonitor == NULL )
 		return;
 		
-	motionMonitor->enableBoundBox(!motionMonitor->isBoundBoxEnabled());
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showBoundBox);
 	motionMonitor->updateMonitor();
 }
 /////////////////////////////////////////////////////////////////////
@@ -7346,7 +7265,7 @@ void MainFrame::motionMonitorOrigin(wxCommandEvent& event) {
 	if ( motionMonitor == NULL )
 		return;
 		
-	motionMonitor->enableOrigin(!motionMonitor->isOriginEnabled());
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showOrigin);
 	motionMonitor->updateMonitor();
 }
 /////////////////////////////////////////////////////////////////////
@@ -7354,8 +7273,8 @@ void MainFrame::motionMonitorRuler(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( motionMonitor == NULL )
 		return;
-		
-	motionMonitor->enableRuler(!motionMonitor->isRulerEnabled());
+	
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showRuler);
 	motionMonitor->updateMonitor();
 }
 /////////////////////////////////////////////////////////////////////
@@ -7364,7 +7283,7 @@ void MainFrame::motionMonitorHelpLines(wxCommandEvent& event) {
 	if ( motionMonitor == NULL )
 		return;
 		
-	motionMonitor->enableHelpLines(!motionMonitor->isHelpLinesEnabled());
+	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showHelpLines);
 	motionMonitor->updateMonitor();
 }
 /////////////////////////////////////////////////////////////////////

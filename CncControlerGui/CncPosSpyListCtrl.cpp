@@ -84,4 +84,13 @@ wxListItemAttr* CncPosSpyListCtrl::OnGetItemAttr(long item) const {
 	// this indicates to use the default style
 	return NULL;
 }
-
+/////////////////////////////////////////////////////////////
+bool CncPosSpyListCtrl::searchReference(const wxString& what) {
+/////////////////////////////////////////////////////////////
+	long ret = searchRow(what, COL_SEARCH);
+	
+	if ( ret >= 0 )
+		selectItem(ret);
+	
+	return (ret >= 0 );
+}

@@ -64,10 +64,11 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		// Getter and setter
 		void setSvgRootNode(const SVGRootNode& srn);
 		
-		Unit getUnit() 				{ return svgRootNode.getOutputUnit(); }
-		double getW() 				{ return svgRootNode.getWidth();      }
-		double getH() 				{ return svgRootNode.getHeight();     }
-		const char* getViewBox() 	{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
+		Unit getUnit() 						{ return svgRootNode.getOutputUnit(); }
+		double getW() 						{ return svgRootNode.getWidth();      }
+		double getH() 						{ return svgRootNode.getHeight();     }
+		const char* getViewBox() 			{ return svgRootNode.getViewbox().getViewBoxStr().c_str(); }
+		const SVGRootNode& getSvgRootNode()	{ return svgRootNode; }
 
 		SvgCncParameters& getSvgCncParameters();
 		void setCncWorkingParameters(SvgCncParameters& cwp);

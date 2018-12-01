@@ -7,84 +7,48 @@
 ///////////////////////////////////////////////////////////////////
 class LoggerStreamBuf : public std::streambuf {
 	
+	private:
+		char 				type;
+		
 	protected:
 		
-		wxTextCtrl* ctl;
-		wxTextAttr textAttr;
-		
-		wxString buffer;
-		bool first;
+		wxTextCtrl* 		ctl;
+		wxTextAttr 			textAttr;
 		
 	public:
-	
-		static wxTextAttr defaultAttr;
-	
-		///////////////////////////////////////////////////////////
-		LoggerStreamBuf(wxTextCtrl* c, wxTextAttr ta) 
-		: ctl(c)
-		, textAttr(ta)
-		, buffer()
-		, first(true)
-		{
-			setTextAttr(textAttr);
-		}
+		enum Type { STD = 'C', LOG = 'L', ERR = 'E', EX1 = '1', TRC = 'T', MSG = 'M', SPY = 'S' };
+		
+		static wxString 	startupBuffer;
+		static wxTextAttr 	defaultAttr;
 		
 		///////////////////////////////////////////////////////////
+		LoggerStreamBuf(char t, wxTextCtrl* c, const wxTextAttr& ta);
 		virtual ~LoggerStreamBuf() {}
 		
-		///////////////////////////////////////////////////////////
-		virtual int overflow (int c = EOF) {
-			
-			if ( ctl != NULL ) {
-				
-				if ( first == true ) {
-					first = false;
-					ctl->AppendText(buffer);
-					buffer.clear();
-				}
-				
-				ctl->SetDefaultStyle(textAttr);
-				ctl->AppendText((wxChar)c);
-				
-			} else {
-				buffer.append((wxChar)c);
-				
-			}
-			
-			// return something different from EOF
-			return 0;
-		}
+		virtual int overflow (int c = EOF);
 		
-		///////////////////////////////////////////////////////////
-		void setTextAttr(const wxTextAttr& ta) {
-			textAttr = ta;
-			if ( ctl != NULL )
-				ctl->SetDefaultStyle(textAttr);
-		}
+		void setTextAttr(const wxTextAttr& ta);
+		void setTextControl(wxTextCtrl* c);
 		
-		///////////////////////////////////////////////////////////
-		const wxTextAttr& getTextAttr() const {
-			return textAttr;
-		}
-		
-		///////////////////////////////////////////////////////////
-		wxTextCtrl* getTextControl() const {
-			return ctl;
-		}
-		
-		///////////////////////////////////////////////////////////
-		void ungregisterTextControl() {
-			ctl = NULL;
-		}
+		const wxTextAttr& getTextAttr() 	const 	{ return textAttr; }
+		wxTextCtrl* getTextControl()		const 	{ return ctl; }
+		void ungregisterTextControl() 				{ ctl = NULL; }
 };
 
+///////////////////////////////////////////////////////////
+namespace StartupBuffer {
+	
+	void append(LoggerStreamBuf::Type t, const char* text);
+	bool trace(wxTextCtrl* ctl);
+	
+};
 
 ///////////////////////////////////////////////////////////////////
 class CncCoutBuf : public LoggerStreamBuf {
 	public:
 		///////////////////////////////////////////////////////////
 		CncCoutBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, wxTextAttr(*wxLIGHT_GREY)) {}
+		: LoggerStreamBuf(LoggerStreamBuf::Type::STD, c, wxTextAttr(wxColour(232, 232, 232))) {}
 		virtual ~CncCoutBuf() {}
 };
 
@@ -92,7 +56,7 @@ class CncCoutBuf : public LoggerStreamBuf {
 class CncClogBuf : public LoggerStreamBuf {
 	public:
 		CncClogBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, wxTextAttr(*wxCYAN)) {}
+		: LoggerStreamBuf(LoggerStreamBuf::Type::LOG, c, wxTextAttr(wxColour(0, 157, 157))) {}
 		virtual ~CncClogBuf() {}
 };
 
@@ -100,7 +64,7 @@ class CncClogBuf : public LoggerStreamBuf {
 class CncCerrBuf : public LoggerStreamBuf {
 	public:
 		CncCerrBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, wxTextAttr(*wxRED)) {}
+		: LoggerStreamBuf(LoggerStreamBuf::Type::ERR, c, wxTextAttr(wxColour(255, 64, 64))) {}
 		virtual ~CncCerrBuf() {}
 };
 
@@ -108,7 +72,7 @@ class CncCerrBuf : public LoggerStreamBuf {
 class CncCex1Buf : public LoggerStreamBuf {
 	public:
 		CncCex1Buf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, wxTextAttr(wxColour(255, 201, 14))) {}
+		: LoggerStreamBuf(LoggerStreamBuf::Type::EX1, c, wxTextAttr(wxColour(255, 201, 14))) {}
 		virtual ~CncCex1Buf() {}
 };
 
@@ -116,7 +80,7 @@ class CncCex1Buf : public LoggerStreamBuf {
 class CncCtrcBuf : public LoggerStreamBuf {
 	public:
 		CncCtrcBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, LoggerStreamBuf::defaultAttr) {}
+		: LoggerStreamBuf(LoggerStreamBuf::Type::TRC, c, LoggerStreamBuf::defaultAttr) {}
 		virtual ~CncCtrcBuf() {}
 };
 
@@ -124,16 +88,8 @@ class CncCtrcBuf : public LoggerStreamBuf {
 class CncCmsgBuf : public LoggerStreamBuf {
 	public:
 		CncCmsgBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, LoggerStreamBuf::defaultAttr) {}
+		: LoggerStreamBuf(LoggerStreamBuf::Type::MSG, c, LoggerStreamBuf::defaultAttr) {}
 		virtual ~CncCmsgBuf() {}
-};
-
-///////////////////////////////////////////////////////////////////
-class CncCpgtBuf : public LoggerStreamBuf {
-	public:
-		CncCpgtBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, LoggerStreamBuf::defaultAttr) {}
-		virtual ~CncCpgtBuf() {}
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -144,7 +100,7 @@ class CncCspyBuf : public LoggerStreamBuf {
 		
 		//////////////////////////////////////////////////////////
 		CncCspyBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(c, LoggerStreamBuf::defaultAttr) {}
+		: LoggerStreamBuf(LoggerStreamBuf::Type::SPY, c, LoggerStreamBuf::defaultAttr) {}
 		
 		//////////////////////////////////////////////////////////
 		virtual ~CncCspyBuf() {}

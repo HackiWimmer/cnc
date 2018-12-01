@@ -387,20 +387,6 @@ class Serial : public SerialOSD {
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr)	{}
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr)		{}
 		
-		//SVG path handling
-		virtual void setSVGOutputParameters(const SvgOutputParameters& sp) {}
-		virtual void beginSVG(SVGUnit u, double width, double heigth, const wxString& viewBox = "" ) {}
-		virtual void beginDuration(unsigned int count) {}
-		virtual void beginPath(double xStartPos, double yStartPos) {}
-		virtual void beginSubPath(double xPos, double yPos) {}
-		virtual void closePath() {}
-		virtual void closeDuration() {}
-		virtual void closeSVG() {}
-		virtual void closeSVG(CncDoublePosition::Watermarks& wm) {}
-		virtual void clearSVG() {}
-		virtual void rebuildSVG() {}
-		virtual void writeOrigPath(const SvgOriginalPathInfo& sopi) {}
-		
 		// position movement counting
 		virtual void resetPositionCounter();
 		virtual size_t getPositionCounter();

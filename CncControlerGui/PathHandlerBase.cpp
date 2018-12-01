@@ -225,12 +225,20 @@ bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) 
 		std::cerr << "PathHandlerBase::processHLine: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
-	// Redirect to lineto command
-	// L - H is the same as l -h
-	char cmd = c + 'L' - 'H';
-	values[1] = 0.0;
 	
-	return processLine(cmd, count + 1, values);
+	appendDebugValueDetail("HLine",c);
+	
+	switch ( c ) {
+		case 'h':
+			currentPos.incX(values[0]);
+			break;
+		case 'H':
+			currentPos.setX(values[0]);
+			break;
+		default: ; // Do nothing, already checked before
+	}
+	
+	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processVLine(char c, unsigned int count, double values[]) {
@@ -239,12 +247,20 @@ bool PathHandlerBase::processVLine(char c, unsigned int count, double values[]) 
 		std::cerr << "PathHandlerBase::processVLine: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
-	// Redirect to lineto command
-	// V - L is the same as v - l
-	char cmd = c + 'V' - 'L';
-	values[1] = 0.0;
 	
-	return processLine(cmd, count + 1, values);
+	appendDebugValueDetail("VLine",c);
+	
+	switch ( c ) {
+		case 'v':
+			currentPos.incY(values[0]);
+			break;
+		case 'V':
+			currentPos.setY(values[0]);
+			break;
+		default: ; // Do nothing, already checked before
+	}
+	
+	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::callback(const CncCurveLib::Point& p) {

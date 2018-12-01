@@ -127,7 +127,8 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		bool goBackwardUnitlColumnChange(long item, long column);
 		
 	protected:
-		wxString getItemText(long item, long column) const;	
+		wxString getItemText(long item, long column) const;
+		long searchRow(const wxString& what, int searchColumn);
 	
 	private:
 		

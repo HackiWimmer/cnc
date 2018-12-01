@@ -18,13 +18,13 @@ ManuallyPathHandlerCnc::~ManuallyPathHandlerCnc() {
 void ManuallyPathHandlerCnc::logMeasurementStart() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->startMeasurement();
+	cncControl->startSerialMeasurement();
 }
 //////////////////////////////////////////////////////////////////
 void ManuallyPathHandlerCnc::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	cncControl->getSerial()->stopMeasurement();
+	cncControl->stopSerialMeasurement();
 }
 //////////////////////////////////////////////////////////////////
 void ManuallyPathHandlerCnc::prepareWork() {

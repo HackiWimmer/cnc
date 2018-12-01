@@ -11,10 +11,11 @@
 #include "CncFileNameService.h"
 #include "CncStreamBuffers.h"
 #include "OSD/CncTimeFunctions.h"
+#include "GlobalStrings.h"
 #include "MainFrame.h"
 
-extern const char* _programVersion;
-extern const char* _copyRight;
+////////////////////////////////////////////////////////////////////
+GlobalConstStringDatabase globalStrings;
 
 ///////////////////////////////////////////////////////////////////
 static const wxCmdLineEntryDesc cmdLineDesc[] = {
@@ -61,28 +62,61 @@ namespace cnc {
 };
 	
 ///////////////////////////////////////////////////////////////////
-void installStreamRedirection(MainFrame* mainFrame) {
+void preInstallStreamRedirection() {
 ///////////////////////////////////////////////////////////////////
 	//redirect std::cout
-	psbufCout = new CncCoutBuf(mainFrame->getLogger());
+	psbufCout = new CncCoutBuf(NULL);
 	sbOldCout = std::cout.rdbuf();
 	std::cout.rdbuf(psbufCout);
 	
 	//redirect std::clog
-	psbufClog = new CncClogBuf(mainFrame->getLogger());
+	psbufClog = new CncClogBuf(NULL);
 	sbOldClog = std::clog.rdbuf();
 	std::clog.rdbuf(psbufClog);
 	
 	//redirect std::cerr
-	psbufCerr = new CncCerrBuf(mainFrame->getLogger());
+	psbufCerr = new CncCerrBuf(NULL);
 	sbOldCerr = std::cerr.rdbuf();
 	std::cerr.rdbuf(psbufCerr);
 	
 	// redirect ext1 buffer
-	psbufCex1 = new CncCex1Buf(mainFrame->getLogger());
+	psbufCex1 = new CncCex1Buf(NULL);
 	sbOldCex1 = cnc::cex1.rdbuf();
 	((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
 	cnc::cex1.setLogStreamBuffer(psbufCex1);
+}
+///////////////////////////////////////////////////////////////////
+void installStreamRedirection(MainFrame* mainFrame) {
+///////////////////////////////////////////////////////////////////
+	// perform startup trace
+	wxTextCtrl* st = mainFrame->GetStartupTrace();
+	st->Clear();
+	
+	wxTextAttr ta(wxColour(192, 192, 192));
+	wxFont oldFont(st->GetFont());
+	wxFont newFont(oldFont);
+	newFont.SetWeight(wxFONTWEIGHT_BOLD);
+ 
+	ta.SetFont(newFont);
+	st->SetDefaultStyle(ta);
+	
+	st->AppendText("-------------------------------------------------------------------\n"
+	               " Startup stream trace . . .\n"
+	               "-------------------------------------------------------------------\n");
+	
+	ta.SetFont(oldFont);
+	st->SetDefaultStyle(ta);
+	bool hasLogOrErr = StartupBuffer::trace(st);
+	mainFrame->GetPanelStartupTrace()->SetName( hasLogOrErr == true ? ")-:" : "(-;" );
+	
+	st->SetInsertionPoint(st->XYToPosition(0, 0));
+	st->ShowPosition(st->XYToPosition(0, 0));
+	
+	// set the logger control
+	psbufCout->setTextControl(mainFrame->getLogger());
+	psbufClog->setTextControl(mainFrame->getLogger());
+	psbufCerr->setTextControl(mainFrame->getLogger());
+	psbufCex1->setTextControl(mainFrame->getLogger());
 	
 	// redirect trace buffer
 	psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
@@ -196,6 +230,8 @@ class MainApp : public wxApp {
 		: globalFileConfig(NULL)
 		{
 		///////////////////////////////////////////////////////////
+			preInstallStreamRedirection();
+			
 			// init file and dir names
 			CncFileNameService::init();
 			CncTimeFunctions::init();
@@ -263,7 +299,7 @@ class MainApp : public wxApp {
 						wxMemoryDC mdc(bmp);
 						mdc.SetFont(wxFontInfo(18).FaceName("Helvetica").Bold());
 						mdc.SetTextForeground(wxColor(255,255,255));
-						mdc.DrawText(_programVersion, {50,235});
+						mdc.DrawText(globalStrings.programVersion, {50,235});
 						
 						/*
 						//todo

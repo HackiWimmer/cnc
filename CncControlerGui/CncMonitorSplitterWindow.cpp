@@ -84,7 +84,7 @@ void CncMonitorVSplitterWindow::showRightWindow(bool show) {
 		SetSashPosition(splitterWidth * 10);
 		
 	} else {
-		SetMinimumPaneSize(1);
+		SetMinimumPaneSize(20);
 		
 		if ( lastRightWindowWidth < defaultRightWindowWidth / 4 )
 			lastRightWindowWidth = defaultRightWindowWidth;

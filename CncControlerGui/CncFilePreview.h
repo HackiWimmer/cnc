@@ -32,6 +32,8 @@ class CncFilePreview : public CncFilePreviewBase
 		virtual void showFromRight3D(wxCommandEvent& event);
 		virtual void showFromTop3D(wxCommandEvent& event);
 		
+		const char* getBlankHtmlPage();
+		const char* getErrorHtmlPage(const wxString& errorInfo);
 		
 		void activate3DPerspectiveButton(wxButton* bt);
 };

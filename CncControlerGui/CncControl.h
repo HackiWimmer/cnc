@@ -63,15 +63,13 @@ class CncControl {
 		// handels the cnc configuration
 		CncConfig* cncConfig;
 		// Defines the absolute zero pos as a reference pos 
-		CncLongPosition zeroPos;
+		CncLongPosition zeroAppPos;
 		// Defines the start postion of an object in relation to zeroPos 
-		CncLongPosition startPos;
+		CncLongPosition startAppPos;
 		// Defines the current pos
 		CncLongPosition curAppPos;
 		// Stores the lateset requested control positions
 		CncLongPosition curCtlPos;
-		// Stores the lateset requested control positions
-		CncLongPosition controllerPos;
 		// speed values
 		// actual rte (measured) speed value
 		double realtimeFeedSpeed_MM_MIN;
@@ -171,6 +169,7 @@ class CncControl {
 		void onPeriodicallyAppEvent();
 		
 		//Make Serial available
+		
 		Serial* getSerial() { return serialPort; }
 		
 		// Get the current speed parameter
@@ -271,27 +270,31 @@ class CncControl {
 		// Updates the config trace control
 		void updateCncConfigTrace();
 		
-		const CncLongPosition getCurCtlPos() { return curCtlPos; }
-		
 		// returns the correponding pc postions
-		CncLongPosition& getCurAppPosAsReference()		{ return curAppPos; }
-		const CncLongPosition getCurPos()				{ return curAppPos; }
-		const CncLongPosition getStartPos() 			{ return startPos; }
-		const CncDoublePosition getStartPosMetric();
-		const CncDoublePosition getCurPosMetric();
-		const CncLongPosition getMinPositions();
-		const CncDoublePosition getMinPositionsMetric();
-		const CncLongPosition getMaxPositions();
-		const CncDoublePosition getMaxPositionsMetric();
-		const CncLongPosition::Watermarks getWaterMarks();
+		CncLongPosition& getCurAppPosAsReference()					{ return curAppPos; }
+		const CncLongPosition 				getCurAppPos()			{ return curAppPos; }
+		const CncLongPosition 				getCurCtlPos() 			{ return curCtlPos; }
+		const CncLongPosition 				getAppStartPos() 		{ return startAppPos; }
+		const CncLongPosition 				getAppZeroPos() 		{ return zeroAppPos; }
+		
+		const CncDoublePosition 			getStartPosMetric();
+		const CncDoublePosition 			getCurAppPosMetric();
+		const CncDoublePosition 			getCurCtlPosMetric();
+		const CncLongPosition 				getMinPositions();
+		const CncDoublePosition 			getMinPositionsMetric();
+		const CncLongPosition 				getMaxPositions();
+		const CncDoublePosition 			getMaxPositionsMetric();
+		const CncLongPosition::Watermarks 	getWaterMarks();
 		const CncDoublePosition::Watermarks getWaterMarksMetric();
 		// query the current controller position
-		const CncLongPosition getControllerPos();
+		const CncLongPosition requestControllerPos();
 		// query the current controller limit state
-		const CncLongPosition getControllerLimitState();
+		const CncLongPosition requestControllerLimitState();
 		const CncLimitStates& getLimitState() { return limitStates; }
 		// validates pc and controller positions
 		bool validateAppAgainstCtlPosition();
+		// execute
+		bool execute(const unsigned char* buffer, unsigned int nbByte);
 		// processing the given setter values
 		bool processSetter(unsigned char pid, int32_t value);
 		bool processSetter(unsigned char pid, const cnc::SetterValueList& values);
@@ -360,6 +363,19 @@ class CncControl {
 		bool meassureYDimension(wxCheckBox* min, wxCheckBox* max, double& result) { return meassureDimension('Y', min, max, result); }
 		bool meassureZDimension(wxCheckBox* min, wxCheckBox* max, double& result) { return meassureDimension('Z', min, max, result); }
 		
+		void startSerialMeasurement() 									{ getSerial()->startMeasurement(); }
+		void stopSerialMeasurement()  									{ getSerial()->stopMeasurement(); }
+		const CncNanoTimespan getMeasurementNanoTimeSpanTotal()			{ return getSerial()->getMeasurementNanoTimeSpanTotal(); }
+		double getTotalDistanceX() 										{ return getSerial()->getTotalDistanceX(); }
+		double getTotalDistanceY() 										{ return getSerial()->getTotalDistanceY(); }
+		double getTotalDistanceZ() 										{ return getSerial()->getTotalDistanceZ(); }
+		double getTotalDistance()  										{ return getSerial()->getTotalDistance(); }
+		size_t getStepCounter()											{ return getSerial()->getStepCounter(); }
+		size_t getStepCounterX()										{ return getSerial()->getStepCounterX(); }
+		size_t getStepCounterY()										{ return getSerial()->getStepCounterY(); }
+		size_t getStepCounterZ()										{ return getSerial()->getStepCounterZ(); }
+		size_t getPositionCounter()										{ return getSerial()->getPositionCounter(); }
+
 		// 3D control
 		void updatePreview3D(bool force=false);
 		

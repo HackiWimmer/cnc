@@ -2,7 +2,11 @@
 #include <wx/intl.h>
 #include "CncNumberFormatter.h"
 #include "MainFrame.h"
+#include "GlobalStrings.h"
 #include "UpdateManagerThread.h"
+
+////////////////////////////////////////////////////////////////////
+extern GlobalConstStringDatabase globalStrings;
 
 ///////////////////////////////////////////////////////////////////
 UpdateManagerThread::UpdateManagerThread(MainFrame *handler)
@@ -138,6 +142,7 @@ void UpdateManagerThread::postError(const wxString& msg) {
 void UpdateManagerThread::popAndFormatPosSpyQueue() {
 ///////////////////////////////////////////////////////////////////
 	static wxString speedInfo("");
+	const  wxString rFormat(globalStrings.posSpyRefFormat);
 	unsigned long count = 0;
 	
 	while ( posSpyQueue.read_available() ) {
@@ -148,7 +153,7 @@ void UpdateManagerThread::popAndFormatPosSpyQueue() {
 		
 		switch ( unit ) {
 			case CncMetric:		posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 			lpse.pos.pid));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 		lpse.pos.id));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format(rFormat, 		lpse.pos.id));
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 			lpse.pos.speedMode));
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		speedInfo);
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%.3lf", 		lpse.pos.pos.getX() * displayFactX));
@@ -158,7 +163,7 @@ void UpdateManagerThread::popAndFormatPosSpyQueue() {
 								
 			case CncSteps:
 			default: 			posSpyRow.updateItem(CncPosSpyListCtrl::COL_PID, 	wxString::Format("%d", 			lpse.pos.pid));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format("%08ld", 		lpse.pos.id));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format(rFormat, 		lpse.pos.id));
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 			lpse.pos.speedMode));
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		speedInfo);
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%ld", 		lpse.pos.pos.getX()));

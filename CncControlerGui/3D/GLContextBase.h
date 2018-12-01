@@ -2,6 +2,7 @@
 #define OPENGL_CONTEXTBASE_H
 
 #include <ostream>
+#include <vector>
 #include <wx/colour.h>
 
 #include "3D/GLViewPort.h"
@@ -14,6 +15,71 @@
 #else
 	#include <wx/glcanvas.h>
 #endif
+
+
+/////////////////////////////////////////////////////////////////
+struct GLContextOptions {
+	
+	// .........................................................
+	// options
+	
+	bool autoScale						= true;
+	bool blending						= true;
+	bool probeMode						= false;
+	
+	bool showOrigin						= true;
+	bool showViewPortBounderies			= true;
+	bool showPosMarker					= true;
+	bool showFlyPath					= true;
+	bool showBoundBox					= true;
+	bool showRuler						= true;
+	bool showHelpLines					= true;
+	
+	bool helpLines3D_XYPlane			= true;
+	bool helpLines3D_XZPlane			= false;
+	bool helpLines3D_YZPlane			= false;
+	
+	wxColour boundBoxColour				= wxColour(185, 127, 87);
+	wxColour rapidColour				= *wxYELLOW;
+	wxColour workColour					= *wxWHITE;
+	wxColour maxColour					= *wxBLUE;
+	wxColour userColour					= *wxLIGHT_GREY;
+	
+	// .........................................................
+	// option interface
+	
+	bool toggleOption(bool& option) {
+		option = !option;
+		return option;
+	}
+
+	// .........................................................
+	// callback interface
+	
+	struct Callback {
+		Callback()          {}
+		virtual ~Callback() {}
+		
+		virtual void notifyChange(GLContextOptions& options) = 0;
+	};
+	
+	typedef std::vector<Callback*> CallbackVector;
+	CallbackVector callbackVector;
+	
+	void registerCallback(Callback* c) {
+		callbackVector.push_back(c);
+	}
+	
+	void notifyChange() {
+		for ( auto it = callbackVector.begin(); it != callbackVector.end(); ++it ) {
+			if ( *it != NULL )
+				(*it)->notifyChange(*this);
+		}
+	}
+};
+
+
+
 
 /////////////////////////////////////////////////////////////////
 class GLContextBase : public wxGLContext {
@@ -50,7 +116,7 @@ class GLContextBase : public wxGLContext {
 		void enable(bool state = true) 	{ enabled = state; } 
 		void disable() 					{ enable(false); }
 		bool isEnabled() 				{ return enabled; }
-		bool isProbeMode() 				{ return probeMode; }
+		bool isProbeMode() 				{ return options.probeMode; }
 		void decorateProbeMode(bool state);
 		
 		void init();
@@ -70,24 +136,12 @@ class GLContextBase : public wxGLContext {
 		void normalizeRotation();
 		void normalizeCamera();
 		
+		GLContextOptions& getOptions() 				{ return options; }
+		
 		// smoothing
 		void enableSmoothing(bool enable=true);
 		void disableSmoothing() 					{ enableSmoothing(false); }
 		bool isSmoothingEnabled();
-		
-		// origin
-		void enableDrawOrigin(bool enable=true)		{ drawOrigin = enable; }
-		void disableDrawOrigin()					{ enableDrawOrigin(false); }
-		bool isDrawOriginEnabled()					{ return drawOrigin; }
-
-		// vieport bounderies
-		void enableDrawPortBounds(bool enable=true)	{ drawViewPortBounderies = enable; }
-		void disableDrawViewPortBounds()			{ enableDrawPortBounds(false); }
-		bool isDrawViewPortBounds()					{ return drawViewPortBounderies; }
-		
-		// postion marker
-		void enablePositionMarker(bool enable=true) { posMarker = enable; }
-		bool isPositionMarkerEnabled()				{ return posMarker; }
 		
 		// viewPort
 		void centerViewport();
@@ -140,7 +194,7 @@ class GLContextBase : public wxGLContext {
 					wxColour x, y, z;
 					
 					Colours() 
-					: x(255, 0, 0), y(0, 0, 255), z(27, 139, 61)
+					: x(255, 64, 64), y(89, 89, 255), z(27, 139, 61)
 					{}
 				};
 			
@@ -154,12 +208,8 @@ class GLContextBase : public wxGLContext {
 		
 		bool				enabled;
 		bool 				initialized;
-		bool				drawOrigin;
-		bool				drawViewPortBounderies;
-		bool				posMarker;
-		bool				autoScale;
-		bool				blending;
-		bool				probeMode;
+		
+		GLContextOptions options;
 		
 		float				zoom;
 		
@@ -170,7 +220,6 @@ class GLContextBase : public wxGLContext {
 		GLI::ModelScale 	modelScale;
 		GLI::ModelRotate	modelRotate;
 		GLI::CameraPosition cameraPos;
-		
 		
 		virtual float getAutoScaleFactor() { return 1.0; }
 		

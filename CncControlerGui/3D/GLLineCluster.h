@@ -54,22 +54,51 @@ namespace GLI {
 			axisLables.clear();
 		}
 	};
-
+	
 	////////////////////////////////////////////////////////////////
-	struct GLXYZRuler {
-		GLLabelCluster 	origin;
-		
-		GLAxisRuler 	xAxis;
-		GLAxisRuler 	yAxis;
-		GLAxisRuler 	zAxis;
-		
-		GLLineCluster	helpLinesXY;
-		GLLineCluster	helpLinesXZ;
-		GLLineCluster	helpLinesYZ;
+	struct GLHelpLineXYPlane {
+		GLLineCluster	helpLinesX;
+		GLLineCluster	helpLinesY;
 		
 		void clear() {
-			origin.clear();
-			
+			helpLinesX.clear();
+			helpLinesY.clear();
+		}
+	};
+	
+	////////////////////////////////////////////////////////////////
+	struct GLHelpLineXZPlane {
+		GLLineCluster	helpLinesX;
+		GLLineCluster	helpLinesZ;
+		
+		void clear() {
+			helpLinesX.clear();
+			helpLinesZ.clear();
+		}
+	};
+	
+	////////////////////////////////////////////////////////////////
+	struct GLHelpLineYZPlane {
+		GLLineCluster	helpLinesY;
+		GLLineCluster	helpLinesZ;
+		
+		void clear() {
+			helpLinesY.clear();
+			helpLinesZ.clear();
+		}
+	};
+	
+	////////////////////////////////////////////////////////////////
+	struct GLXYZRuler {
+		GLAxisRuler 		xAxis;
+		GLAxisRuler 		yAxis;
+		GLAxisRuler 		zAxis;
+		
+		GLHelpLineXYPlane	helpLinesXY;
+		GLHelpLineXZPlane	helpLinesXZ;
+		GLHelpLineYZPlane	helpLinesYZ;
+		
+		void clear() {
 			xAxis.clear();
 			yAxis.clear();
 			zAxis.clear();

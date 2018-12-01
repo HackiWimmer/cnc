@@ -186,8 +186,77 @@ void CncFilePreview::showFromRight3D(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void CncFilePreview::showFromTop3D(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
 	activate3DPerspectiveButton((wxButton*)event.GetEventObject());
 	gcodePreview->viewTop();
 	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+const char* CncFilePreview::getBlankHtmlPage() {
+///////////////////////////////////////////////////////////////////
+	wxFileName fn(CncFileNameService::getBlankHtmlPageFileName());
+	std::fstream html;
+	
+	html.open(fn.GetFullPath(), std::ios::out | std::ios::trunc);
+	if ( html.is_open() ) {
+		
+		html << "<HTML>" << std::endl;
+		html << "<HEAD>" << std::endl;
+		html << "<TITLE>Blank Page</TITLE>" << std::endl;
+		html << "</HEAD>" << std::endl;
+		html << "<BODY BGCOLOR=\"FFFFFF\">" << std::endl;
+		html << "<HR>" << std::endl;
+		html << "Default HTML Page" << std::endl;
+		html << "<H1>Empty Content (about:blank)</H1>" << std::endl;
+		html << "<H2>No further information available</H2>" << std::endl;
+		html << "<HR>" << std::endl;
+		html << "</BODY>" << std::endl;
+		html << "</HTML>" << std::endl;
+		
+		html.flush();
+		html.close();
+		
+	} else {
+		return "about:blank";
+	}
+
+	return fn.GetFullPath();
+}
+///////////////////////////////////////////////////////////////////
+const char* CncFilePreview::getErrorHtmlPage(const wxString& errorInfo) {
+//////////////////////////////////////////////////////////////////
+	wxFileName fn(CncFileNameService::getErrorHtmlPageFileName());
+	std::fstream html;
+	
+	wxString ei(errorInfo);
+	if ( errorInfo.IsEmpty() )
+		ei = "No further information available";
+	
+	html.open(fn.GetFullPath(), std::ios::out | std::ios::trunc);
+	if ( html.is_open() ) {
+		
+		html << "<HTML>" << std::endl;
+		html << "<HEAD>" << std::endl;
+		html << "<TITLE>Error Page</TITLE>" << std::endl;
+		html << "</HEAD>" << std::endl;
+		html << "<BODY BGCOLOR=\"FFFFFF\">" << std::endl;
+		html << "<HR>" << std::endl;
+		html << "Default HTML Page" << std::endl;
+		html << "<H1>";
+		html << ei;
+		html << "/H1>" << std::endl;
+		html << "<H2>No further information availiable</H2>" << std::endl;
+		html << "<HR>" << std::endl;
+		html << "</BODY>" << std::endl;
+		html << "</HTML>" << std::endl;
+		
+		html.flush();
+		html.close();
+		
+	} else {
+		return "about:blank";
+	}
+
+	return fn.GetFullPath();
 }
 

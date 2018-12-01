@@ -60,6 +60,7 @@ void GL3DOptions::onShowWindow(wxShowEvent& event) {
 void GL3DOptions::restoreFlags() {
 /////////////////////////////////////////////////////////////////
 	// update option grid
+	/*
 	m_pgPropDrawFlyPath->SetValue(motionMonitor->getFlags().drawFlyPath);
 	m_pgPropPositionMarker->SetValue(motionMonitor->getFlags().positionMarker);
 	m_pgPropAutoScaling->SetValue(motionMonitor->getFlags().autoScaling);
@@ -101,6 +102,7 @@ void GL3DOptions::restoreFlags() {
 	m_sliderModelRotationX->SetValue(motionMonitor->getAngleX());
 	m_sliderModelRotationY->SetValue(motionMonitor->getAngleY());
 	m_sliderModelRotationZ->SetValue(motionMonitor->getAngleZ());
+	 */
 }
 /////////////////////////////////////////////////////////////////
 void GL3DOptions::propertyChanging(wxPropertyGridEvent& event) {
@@ -111,6 +113,7 @@ void GL3DOptions::propertyChanging(wxPropertyGridEvent& event) {
 void GL3DOptions::propertyChanged(wxPropertyGridEvent& event) { 
 /////////////////////////////////////////////////////////////////
 	// update all flags
+	/*
 	motionMonitor->getFlags().drawFlyPath 		= m_pgPropDrawFlyPath->GetValue().GetBool();
 	motionMonitor->getFlags().positionMarker	= m_pgPropPositionMarker->GetValue().GetBool();
 	motionMonitor->getFlags().autoScaling		= m_pgPropAutoScaling->GetValue().GetBool();
@@ -146,6 +149,7 @@ void GL3DOptions::propertyChanged(wxPropertyGridEvent& event) {
 	
 	// make shure the new properties are used
 	motionMonitor->reconstruct();
+	 */
 }
 /////////////////////////////////////////////////////////////////
 void GL3DOptions::modelRotationXChanged(wxScrollEvent& event) {

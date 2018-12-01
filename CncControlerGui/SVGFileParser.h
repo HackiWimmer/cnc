@@ -38,7 +38,7 @@ class SVGFileParser : public SVGNodeParser, public FileParser {
 		bool determineUnit (const wxString& uw, const wxString& uh, Unit& u);
 		
 		virtual bool preprocess();
-		virtual bool postprocess() { return true; }
+		virtual bool postprocess();
 		virtual void initNextRunPhase(FileParserRunInfo::RunPhase p);
 		virtual void initNextPath(const wxString& data);
 		virtual bool evaluateProcessingCallback();

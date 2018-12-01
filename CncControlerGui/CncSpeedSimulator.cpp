@@ -156,7 +156,7 @@ void CncSpeedSimulator::reset() {
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateSteppingX(unsigned int dx)  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterX += abs(dx);
+	stepCounterX += dx;
 	uint64_t v = dx * (X.synthSpeedDelay + X.totalOffset); 
 	totalAccumulatedOffsetX  += v;
 	currentAccumulatedOffset += v; 
@@ -164,7 +164,7 @@ void CncSpeedSimulator::simulateSteppingX(unsigned int dx)  {
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateSteppingY(unsigned int dy)  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterY += abs(dy);
+	stepCounterY += dy;
 	uint64_t v = dy * (Y.synthSpeedDelay + Y.totalOffset); 
 	totalAccumulatedOffsetY  += v; 
 	currentAccumulatedOffset += v; 
@@ -172,7 +172,7 @@ void CncSpeedSimulator::simulateSteppingY(unsigned int dy)  {
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateSteppingZ(unsigned int dz)  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterZ += abs(dz);
+	stepCounterZ += dz;
 	uint64_t v = dz * (Z.synthSpeedDelay + Z.totalOffset); 
 	totalAccumulatedOffsetZ  += v; 
 	currentAccumulatedOffset += v; 

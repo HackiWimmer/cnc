@@ -1121,7 +1121,7 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	}
 	
 	// to provide a time an pos reference for the speed calculation
-	logMeasurementRefTs(cncControl->getCurPos());
+	logMeasurementRefTs(cncControl->getCurAppPos());
 	
 	bool ret = false;
 	

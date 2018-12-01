@@ -33,10 +33,9 @@ CncControl::CncControl(CncPortType pt)
 , portType(pt)
 , serialPort(NULL)
 , cncConfig(NULL)
-, zeroPos(0,0,0)
-, startPos(0,0,0)
+, zeroAppPos(0,0,0)
+, startAppPos(0,0,0)
 , curAppPos(0,0,0)
-, controllerPos(0,0,0)
 , realtimeFeedSpeed_MM_MIN(MAX_FEED_SPEED_VALUE)
 , defaultFeedSpeedRapid_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
 , defaultFeedSpeedWork_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN())
@@ -86,18 +85,27 @@ CncControl::~CncControl() {
 const CncDoublePosition CncControl::getStartPosMetric() {
 //////////////////////////////////////////////////////////////////
 	CncDoublePosition retValue;
-	retValue.setXYZ(startPos.getX() * cncConfig->getDisplayFactX(),
-				    startPos.getY() * cncConfig->getDisplayFactY(),
-	                startPos.getZ() * cncConfig->getDisplayFactZ());
+	retValue.setXYZ(startAppPos.getX() * cncConfig->getDisplayFactX(),
+				    startAppPos.getY() * cncConfig->getDisplayFactY(),
+	                startAppPos.getZ() * cncConfig->getDisplayFactZ());
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
-const CncDoublePosition CncControl::getCurPosMetric() {
+const CncDoublePosition CncControl::getCurAppPosMetric() {
 //////////////////////////////////////////////////////////////////
 	CncDoublePosition retValue;
 	retValue.setXYZ(curAppPos.getX() * cncConfig->getDisplayFactX(),
 				    curAppPos.getY() * cncConfig->getDisplayFactY(),
 	                curAppPos.getZ() * cncConfig->getDisplayFactZ());
+	return retValue;
+}
+//////////////////////////////////////////////////////////////////
+const CncDoublePosition CncControl::getCurCtlPosMetric() {
+//////////////////////////////////////////////////////////////////
+	CncDoublePosition retValue;
+	retValue.setXYZ(curCtlPos.getX() * cncConfig->getDisplayFactX(),
+				    curCtlPos.getY() * cncConfig->getDisplayFactY(),
+	                curCtlPos.getZ() * cncConfig->getDisplayFactZ());
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
@@ -154,6 +162,11 @@ const CncDoublePosition::Watermarks CncControl::getWaterMarksMetric() {
 	retValue.zMax = xyz.zMax * cncConfig->getDisplayFactZ();
 
 	return retValue;
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::execute(const unsigned char* buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	return getSerial()->execute(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processSetter(unsigned char pid, int32_t value) {
@@ -460,8 +473,8 @@ void CncControl::setGuiControls(GuiControlSetup* gcs) {
 void CncControl::setZeroPosX() {
 ///////////////////////////////////////////////////////////////////
 	curAppPos.setX(0);
-	zeroPos.setX(0);
-	startPos.setX(0);
+	zeroAppPos.setX(0);
+	startAppPos.setX(0);
 	
 	postAppPosition(PID_XYZ_POS_MAJOR);
 }
@@ -469,8 +482,8 @@ void CncControl::setZeroPosX() {
 void CncControl::setZeroPosY() {
 ///////////////////////////////////////////////////////////////////
 	curAppPos.setY(0);
-	zeroPos.setY(0);
-	startPos.setY(0);
+	zeroAppPos.setY(0);
+	startAppPos.setY(0);
 	
 	postAppPosition(PID_XYZ_POS_MAJOR);
 }
@@ -485,8 +498,8 @@ void CncControl::setZeroPosZ() {
 		val = (long)round(cncConfig->getWorkpieceThickness() * cncConfig->getCalculationFactZ());
 	
 	curAppPos.setZ(val);
-	zeroPos.setZ(val);
-	startPos.setZ(val);
+	zeroAppPos.setZ(val);
+	startAppPos.setZ(val);
 	
 	postAppPosition(PID_XYZ_POS_MAJOR);
 }
@@ -500,7 +513,7 @@ void CncControl::setZeroPos() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::setStartPos() {
 ///////////////////////////////////////////////////////////////////
-	startPos = curAppPos;
+	startAppPos = curAppPos;
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::interrupt() {
@@ -547,11 +560,10 @@ void CncControl::resetInterrupt() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::resetWatermarks() {
 ///////////////////////////////////////////////////////////////////
-	zeroPos.resetWatermarks();
-	startPos.resetWatermarks();
+	zeroAppPos.resetWatermarks();
+	startAppPos.resetWatermarks();
 	curAppPos.resetWatermarks();
 	curCtlPos.resetWatermarks();
-	controllerPos.resetWatermarks();
 	
 	return true;
 }
@@ -580,7 +592,7 @@ bool CncControl::reset() {
 	// do this after the controller reset, because setZeroPos will determine a new controller position on demand
 	setZeroPos();
 	
-	curCtlPos = getControllerPos();
+	curCtlPos = requestControllerPos();
 	postCtlPosition(PID_XYZ_POS_MAJOR);
 	
 	evaluateLimitState();
@@ -613,8 +625,6 @@ void CncControl::resetDurationCounter() {
 void CncControl::initNextDuration() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(guiCtlSetup);
-	
-	getSerial()->beginDuration(getDurationCounter());
 	
 	durationCounter++;
 	
@@ -1132,10 +1142,10 @@ bool CncControl::simpleMoveZToZeroPos() {
 bool CncControl::moveXYToZeroPos(CncDimensions dim) {
 ///////////////////////////////////////////////////////////////////
 	bool ret = true;
-	if ( curAppPos != zeroPos ) {
+	if ( curAppPos != zeroAppPos ) {
 		int32_t moveX=0, moveY=0;
-		moveX = zeroPos.getX() - curAppPos.getX(); 
-		moveY = zeroPos.getY() - curAppPos.getY();
+		moveX = zeroAppPos.getX() - curAppPos.getX(); 
+		moveY = zeroAppPos.getY() - curAppPos.getY();
 		
 		if ( dim == CncDimension2D ) {
 			ret = moveRelLinearStepsXY(moveX, moveY, false);
@@ -1154,11 +1164,11 @@ bool CncControl::moveXYToZeroPos(CncDimensions dim) {
 bool CncControl::moveXYZToZeroPos(CncDimensions dim) {
 ///////////////////////////////////////////////////////////////////
 	bool ret = true;
-	if ( curAppPos != zeroPos ) {
+	if ( curAppPos != zeroAppPos ) {
 		int32_t moveX=0, moveY=0, moveZ=0;
-		moveX = zeroPos.getX() - curAppPos.getX(); 
-		moveY = zeroPos.getY() - curAppPos.getY();
-		moveZ = zeroPos.getZ() - curAppPos.getZ();
+		moveX = zeroAppPos.getX() - curAppPos.getX(); 
+		moveY = zeroAppPos.getY() - curAppPos.getY();
+		moveZ = zeroAppPos.getZ() - curAppPos.getZ();
 		
 		if ( dim == CncDimension3D ) {
 			ret = moveRelLinearStepsXYZ(moveX, moveY, moveZ, false);
@@ -1187,9 +1197,9 @@ bool CncControl::moveXYZToZeroPos(CncDimensions dim) {
 bool CncControl::moveZToZeroPos() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = true;
-	if ( curAppPos != zeroPos ) {
+	if ( curAppPos != zeroAppPos ) {
 		int32_t moveZ=0;
-		moveZ = zeroPos.getZ() - curAppPos.getZ();
+		moveZ = zeroAppPos.getZ() - curAppPos.getZ();
 		ret = moveRelLinearStepsXYZ(0, 0, moveZ, false);
 	}
 	return ret;
@@ -1198,10 +1208,10 @@ bool CncControl::moveZToZeroPos() {
 bool CncControl::moveToStartPos() {
 ///////////////////////////////////////////////////////////////////
 	bool ret = true;
-	if ( curAppPos != startPos ) {
+	if ( curAppPos != startAppPos ) {
 		int32_t moveX=0, moveY=0;
-		moveX = startPos.getX() - curAppPos.getX(); 
-		moveY = startPos.getY() - curAppPos.getY();
+		moveX = startAppPos.getX() - curAppPos.getX(); 
+		moveY = startAppPos.getY() - curAppPos.getY();
 		moveRelLinearStepsXY(moveX, moveY, false);
 	}
 	return ret;
@@ -1387,10 +1397,11 @@ bool CncControl::displayGetterList(const PidList& pidList) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-const CncLongPosition CncControl::getControllerPos() {
+const CncLongPosition CncControl::requestControllerPos() {
 ///////////////////////////////////////////////////////////////////
+	static CncLongPosition controllerPos;
 	std::vector<int32_t> list;
-
+	
 	if ( isConnected() == true && isInterrupted() == false )
 		getSerial()->processGetter(PID_XYZ_POS, list);
 		
@@ -1412,10 +1423,11 @@ const CncLongPosition CncControl::getControllerPos() {
 	return controllerPos;
 }
 ///////////////////////////////////////////////////////////////////
-const CncLongPosition CncControl::getControllerLimitState() {
+const CncLongPosition CncControl::requestControllerLimitState() {
 ///////////////////////////////////////////////////////////////////
-	std::vector<int32_t> list;
-
+	static CncLongPosition limitStates;
+	GetterValues list;
+	
 	if ( isInterrupted() == false )
 		getSerial()->processGetter(PID_LIMIT, list);
 	
@@ -1425,15 +1437,17 @@ const CncLongPosition CncControl::getControllerLimitState() {
 			std::cerr << " Received value count: " << list.size() << ", expected: 3" << std::endl;
 		}
 	} else {
-		return {list.at(0), list.at(1), list.at(2)};
+		limitStates.setXYZ(list.at(0), list.at(1), list.at(2));
+		return limitStates;
 	}
 	
-	return {0, 0, 0};
+	limitStates.setXYZ(0, 0, 0);
+	return limitStates;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::validateAppAgainstCtlPosition() {
 ///////////////////////////////////////////////////////////////////
-	CncLongPosition ctlPos = getControllerPos();
+	CncLongPosition ctlPos = requestControllerPos();
 	return ( curAppPos == ctlPos );
 }
 ///////////////////////////////////////////////////////////////////
@@ -1499,9 +1513,8 @@ wxString& CncControl::getLimitInfoString(wxString& ret) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::evaluateLimitState() {
 ///////////////////////////////////////////////////////////////////
-	CncLongPosition ls = getControllerLimitState();
+	CncLongPosition ls = requestControllerLimitState();
 	CncInterface::ILS::States states(ls.getX(), ls.getY(), ls.getZ());
-	
 	displayLimitStates(states);
 }
 ///////////////////////////////////////////////////////////////////
@@ -1938,7 +1951,7 @@ bool CncControl::correctLimitPositions() {
 		
 		// adjust position on demand
 		if ( validateAppAgainstCtlPosition() == false )
-			curAppPos = getControllerPos();
+			curAppPos = requestControllerPos();
 	}
 	
 	return ret;
@@ -2076,7 +2089,7 @@ void CncControl::reconfigureSimpleMove(bool correctPositions) {
 	resetDurationCounter();
 	
 	if ( validateAppAgainstCtlPosition() == false && correctPositions == true ) {
-		curAppPos = getControllerPos();
+		curAppPos = requestControllerPos();
 	}
 }
 ///////////////////////////////////////////////////////////////////

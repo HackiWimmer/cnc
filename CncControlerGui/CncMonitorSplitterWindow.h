@@ -18,7 +18,7 @@ class CncMonitorVSplitterWindow : public wxSplitterWindow {
 		
 	protected:
 	
-		const int defaultRightWindowWidth = 200;
+		const int defaultRightWindowWidth = 220;
 		int lastRightWindowWidth;
 		
 		virtual bool OnSashPositionChange (int newSashPosition);

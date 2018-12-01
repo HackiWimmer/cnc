@@ -1,6 +1,7 @@
 #ifndef CNC_MOTION_MONITOR_H
 #define CNC_MOTION_MONITOR_H
 
+#include <wx/panel.h>
 #include <wx/timer.h>
 
 #include "CncGLCanvas.h"
@@ -19,18 +20,37 @@ class CncMotionMonitor : public CncGlCanvas {
 
 	public:
 		
-		///////////////////////////////////////////////////
-		struct Flags {
-			bool positionMarker 		= true;
-			bool autoScaling			= true;
-			bool drawFlyPath			= true;
+		// .........................................................
+		// callback interface
+		
+		struct Callback {
+			Callback()          {}
+			virtual ~Callback() {}
 			
-			wxColour rapidColour		= *wxYELLOW;
-			wxColour workColour			= *wxWHITE;
-			wxColour maxColour			= *wxBLUE;
-			wxColour userDefinedColour	= *wxLIGHT_GREY;
-			// fill more flags here if neccessary
+			virtual void notifyChange(CncMotionMonitor& mm) = 0;
+			virtual void notifyCameraAngleChange(int angle) = 0;
 		};
+		
+		typedef std::vector<Callback*> CallbackVector;
+		CallbackVector callbackVector;
+		
+		void registerCallback(Callback* c) {
+			callbackVector.push_back(c);
+		}
+		
+		void notifyChange() {
+			for ( auto it = callbackVector.begin(); it != callbackVector.end(); ++it ) {
+				if ( *it != NULL )
+					(*it)->notifyChange(*this);
+			}
+		}
+		
+		void notifyCameraAngleChange(int angle) {
+			for ( auto it = callbackVector.begin(); it != callbackVector.end(); ++it ) {
+				if ( *it != NULL )
+					(*it)->notifyCameraAngleChange(angle);
+			}
+		}
 		
 		// constructor
 		CncMotionMonitor(wxWindow *parent, int *attribList = NULL);
@@ -65,16 +85,9 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 		long fillVectiesListCtr(long curCount, CncVectiesListCtrl* listCtrl);
 		
-		// usage:
-		// getFlags().positionMarker 	= false;
-		// getFlags().smoothing			= true;
-		CncMotionMonitor::Flags& getFlags() { return flags; }
-		
+		void normalizeMonitor();
 		void pushProcessMode();
 		void popProcessMode();
-		
-		void showOptionDialog();
-		
 		void reconstruct();
 		
 		void tracePathData(std::ostream& s);
@@ -98,26 +111,8 @@ class CncMotionMonitor : public CncGlCanvas {
 		GLContextCncPathBase::DrawType getDrawType() 		{ return monitor->getDrawType(); }
 		void setDrawType(GLContextCncPathBase::DrawType t) 	{ monitor->setDrawType(t); }
 		
-		// bound box
-		bool isBoundBoxEnabled() 					{ return monitor->isBoundBoxEnabled(); }
-		void enableBoundBox(bool enable) 			{ monitor->enableBoundBox(enable); }
-		const wxColour& getBoundBoxColour() 		{ return monitor->getBoundBoxColour(); }
-		void setBoundBoxColour(const wxColour& c) 	{ monitor->setBoundBoxColour(c); }
+		GLContextOptions& getContextOptions() 				{ return monitor->getOptions(); }
 		
-		// origin
-		bool isOriginEnabled() 						{ return monitor->isDrawOriginEnabled(); }
-		void enableOrigin(bool enable)	 			{ monitor->enableDrawOrigin(); }
-
-		// ruler
-		bool isRulerEnabled() 						{ return monitor->isRulerEnabled(); }
-		void enableRuler(bool enable)	 			{ monitor->enableRuler(enable); }
-		
-		void createRuler();
-		
-		// help lines
-		bool isHelpLinesEnabled() 					{ return monitor->isHelpLinesEnabled(); }
-		void enableHelpLines(bool enable)	 		{ monitor->enableHelpLines(enable); }
-
 		// client id
 		long getCurrentClientId() 			{ return currentClientID; }
 		void setCurrentClientId(long id) 	{ currentClientID = id; monitor->setCurrentClientId(id); }
@@ -127,11 +122,8 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 	protected:
 	
-		CncMotionMonitor::Flags		flags;
-		
 		GLContextCncPathBase* 		monitor;
 		GLContextCncPathBase* 		testCube;
-		GL3DOptions*				optionDlg;
 		
 		wxTimer cameraRotationTimer;
 		int cameraRotationStepWidth;
@@ -143,6 +135,8 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 		bool currentClientID;
 		
+		void createRuler();
+		
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);
@@ -150,17 +144,10 @@ class CncMotionMonitor : public CncGlCanvas {
 		void onEraseBackground(wxEraseEvent& event);
 		void onCameraRotationTimer(wxTimerEvent& event);
 		
-		void onPaintRotatePaneX3D(wxPaintEvent& event);
-		void onPaintRotatePaneY3D(wxPaintEvent& event);
-		void onPaintRotatePaneZ3D(wxPaintEvent& event);
-		void onPaintScalePane3D(wxPaintEvent& event);
-		
 	private:
 		
 		inline void appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
 		inline void onPaint();
-		
-		inline void onPaintRotatePane3D(const char axis, wxPanel* panel, int angle);
 		
 		wxDECLARE_NO_COPY_CLASS(CncMotionMonitor);
 		wxDECLARE_EVENT_TABLE();

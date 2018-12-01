@@ -24,8 +24,12 @@ class CncPosSpyListCtrl : public CncLargeScaledListCtrl {
 		
 		static const int TOTAL_COL_COUNT	= 7;
 		
+		static const int COL_SEARCH			= COL_REF;
+		
 		CncPosSpyListCtrl(wxWindow *parent, long style);
 		virtual ~CncPosSpyListCtrl();
+		
+		bool searchReference(const wxString& what);
 };
 
 #endif

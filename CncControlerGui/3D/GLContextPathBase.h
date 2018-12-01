@@ -63,30 +63,15 @@ class GLContextCncPathBase : public GLContextBase {
 		GLContextCncPathBase::DrawType getDrawType() 		{ return drawType; }
 		void setDrawType(GLContextCncPathBase::DrawType t) 	{ drawType = t; }
 		
-		// bound box
-		/////////////////////////////////////////////////////////
-		void enableBoundBox(bool enable=true) 		{ showBoundBox = enable; }
-		bool isBoundBoxEnabled() 					{ return showBoundBox; }
-		
-		void setBoundBoxColour(const wxColour& c) 	{ boundBoxColour = c; }
-		const wxColour& getBoundBoxColour() 		{ return boundBoxColour; }
-		
 		// ruler
 		/////////////////////////////////////////////////////////
-		void enableRuler(bool enable=true) 			{ showRuler = enable; }
-		bool isRulerEnabled() 						{ return showRuler; }
+		GLI::GLAxisRuler& getRulerX() 			{ return ruler.xAxis; }
+		GLI::GLAxisRuler& getRulerY() 			{ return ruler.yAxis; }
+		GLI::GLAxisRuler& getRulerZ() 			{ return ruler.zAxis; }
 		
-		void enableHelpLines(bool enable=true) 		{ showHelpLines = enable; }
-		bool isHelpLinesEnabled() 					{ return showHelpLines; }
-		
-		GLI::GLLabelCluster& getRulerOrigin() 		{ return ruler.origin; }
-		GLI::GLAxisRuler& getRulerX() 				{ return ruler.xAxis; }
-		GLI::GLAxisRuler& getRulerY() 				{ return ruler.yAxis; }
-		GLI::GLAxisRuler& getRulerZ() 				{ return ruler.zAxis; }
-		
-		GLI::GLLineCluster& getXYPlane()			{ return ruler.helpLinesXY; }
-		GLI::GLLineCluster& getXZPlane()			{ return ruler.helpLinesXZ; }
-		GLI::GLLineCluster& getYZPlane()			{ return ruler.helpLinesYZ; }
+		GLI::GLHelpLineXYPlane& getXYPlane()	{ return ruler.helpLinesXY; }
+		GLI::GLHelpLineXZPlane& getXZPlane()	{ return ruler.helpLinesXZ; }
+		GLI::GLHelpLineYZPlane& getYZPlane()	{ return ruler.helpLinesYZ; }
 		
 		// origin
 		/////////////////////////////////////////////////////////
@@ -94,22 +79,18 @@ class GLContextCncPathBase : public GLContextBase {
 		int getOriginY() { return ( viewPort != NULL ? viewPort->getY() : 0 ); }
 
 	protected:
+		
 		GLI::GLCncPath		cncPath;
 		GLI::GLXYZRuler		ruler;
 		DrawType 			drawType;
 		
 		long 				currentClientId;
 		
-		bool 				showBoundBox;
-		wxColour 			boundBoxColour;
-		
-		bool				showRuler;
-		bool				showHelpLines;
 		wxColour			rulerColourX;
 		wxColour			rulerColourY;
 		wxColour			rulerColourZ;
 		
-		virtual float getAutoScaleFactor() { return ( autoScale ? cncPath.getAutoScaleFact() : 1.0); }
+		virtual float getAutoScaleFactor() { return ( options.autoScale ? cncPath.getAutoScaleFact() : 1.0); }
 		
 		virtual void determineModel();
 		virtual void markCurrentPosition();

@@ -1100,7 +1100,7 @@ Resolution:</label>
                                                     <option>1</option>
                                                     <object class="wxFlexGridSizer">
                                                       <cols>1</cols>
-                                                      <rows>0</rows>
+                                                      <rows>2</rows>
                                                       <vgap>0</vgap>
                                                       <hgap>0</hgap>
                                                       <growablecols>0</growablecols>
@@ -1458,7 +1458,7 @@ Resolution:</label>
                                 <rows>2</rows>
                                 <vgap>0</vgap>
                                 <hgap>0</hgap>
-                                <growablecols>0,1</growablecols>
+                                <growablecols>0</growablecols>
                                 <growablerows>1</growablerows>
                                 <object class="sizeritem" name="flexGridSizer5673">
                                   <flag>wxALL|wxEXPAND</flag>
@@ -2050,7 +2050,7 @@ Resolution:</label>
                                                 <rows>3</rows>
                                                 <vgap>0</vgap>
                                                 <hgap>0</hgap>
-                                                <growablecols>0,1,3</growablecols>
+                                                <growablecols>0,1,2</growablecols>
                                                 <growablerows>0,1,2</growablerows>
                                                 <object class="sizeritem">
                                                   <flag>wxALL</flag>
@@ -3141,11 +3141,11 @@ Roughest:</label>
                   <object class="wxPanel" name="m_mainBookManual">
                     <style>wxTAB_TRAVERSAL</style>
                     <object class="wxFlexGridSizer">
-                      <cols>2</cols>
-                      <rows>0</rows>
+                      <cols>1</cols>
+                      <rows>1</rows>
                       <vgap>0</vgap>
                       <hgap>0</hgap>
-                      <growablecols>0,1</growablecols>
+                      <growablecols>0</growablecols>
                       <growablerows>0</growablerows>
                       <object class="sizeritem" name="flexGridSizer418">
                         <flag>wxALL|wxEXPAND</flag>
@@ -3561,7 +3561,7 @@ Roughest:</label>
                                       <vgap>0</vgap>
                                       <hgap>0</hgap>
                                       <growablecols>2</growablecols>
-                                      <growablerows>1</growablerows>
+                                      <growablerows>0</growablerows>
                                       <object class="sizeritem">
                                         <flag>wxALL</flag>
                                         <border>5</border>
@@ -3724,7 +3724,7 @@ Roughest:</label>
                                       <vgap>0</vgap>
                                       <hgap>0</hgap>
                                       <growablecols>2</growablecols>
-                                      <growablerows>1</growablerows>
+                                      <growablerows>0</growablerows>
                                       <object class="sizeritem">
                                         <flag>wxALL</flag>
                                         <border>5</border>
@@ -4800,7 +4800,7 @@ Roughest:</label>
                               <style>wxTAB_TRAVERSAL</style>
                               <object class="wxFlexGridSizer">
                                 <cols>1</cols>
-                                <rows>0</rows>
+                                <rows>2</rows>
                                 <vgap>0</vgap>
                                 <hgap>0</hgap>
                                 <growablecols>0</growablecols>
@@ -4814,7 +4814,7 @@ Roughest:</label>
                                     <vgap>0</vgap>
                                     <hgap>0</hgap>
                                     <growablecols>0</growablecols>
-                                    <growablerows/>
+                                    <growablerows>0</growablerows>
                                     <object class="sizeritem">
                                       <flag>wxALL|wxEXPAND</flag>
                                       <border>2</border>
@@ -4883,7 +4883,7 @@ Roughest:</label>
                               <style>wxTAB_TRAVERSAL</style>
                               <object class="wxFlexGridSizer">
                                 <cols>1</cols>
-                                <rows>0</rows>
+                                <rows>2</rows>
                                 <vgap>0</vgap>
                                 <hgap>0</hgap>
                                 <growablecols>0</growablecols>
@@ -5751,7 +5751,7 @@ Size</value>
                                           <object class="wxBitmapToggleButton" name="m_btnHelpLines">
                                             <style/>
                                             <size>24,24</size>
-                                            <bitmap>bitmaps/insert-text-linespacing.png</bitmap>
+                                            <bitmap>bitmaps/view-grid.png</bitmap>
                                             <tooltip>
                                               <![CDATA[Toggle: Show HelpLines]]>
                                             </tooltip>
@@ -6539,21 +6539,6 @@ Interval [ms]:</label>
                                                 <style>wxLI_HORIZONTAL</style>
                                               </object>
                                             </object>
-                                            <object class="sizeritem">
-                                              <flag>wxALL</flag>
-                                              <minsize>24,24</minsize>
-                                              <object class="wxButton" name="m_motionMonitorOptionDlg1">
-                                                <label/>
-                                                <style/>
-                                                <size>24,24</size>
-                                                <tooltip>
-                                                  <![CDATA[Option Dialog]]>
-                                                </tooltip>
-                                                <bitmap>bitmaps/roll.png</bitmap>
-                                                <bitmapposition>wxLEFT</bitmapposition>
-                                                <default>0</default>
-                                              </object>
-                                            </object>
                                           </object>
                                         </object>
                                       </object>
@@ -7076,9 +7061,46 @@ Interval [ms]:</label>
                           <face>Segoe UI</face>
                         </font>
                         <object class="notebookpage">
+                          <label>)-:</label>
+                          <bitmap>bitmaps/start-here.png</bitmap>
+                          <selected>0</selected>
+                          <object class="wxPanel" name="m_panelStartupTrace">
+                            <style>wxTAB_TRAVERSAL</style>
+                            <font>
+                              <sysfont>wxSYS_DEFAULT_GUI_FONT</sysfont>
+                              <style>normal</style>
+                              <weight>normal</weight>
+                              <underlined>0</underlined>
+                            </font>
+                            <object class="wxFlexGridSizer">
+                              <cols>1</cols>
+                              <rows>1</rows>
+                              <vgap>0</vgap>
+                              <hgap>0</hgap>
+                              <growablecols>0</growablecols>
+                              <growablerows>0</growablerows>
+                              <object class="sizeritem">
+                                <flag>wxALL|wxEXPAND</flag>
+                                <object class="wxTextCtrl" name="m_startupTrace">
+                                  <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE</style>
+                                  <bg>#000000</bg>
+                                  <font>
+                                    <size>10</size>
+                                    <style>normal</style>
+                                    <weight>normal</weight>
+                                    <family>modern</family>
+                                    <underlined>0</underlined>
+                                    <face>Consolas</face>
+                                  </font>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                        <object class="notebookpage">
                           <label/>
                           <bitmap>bitmaps/dialog-information-3 (2).png</bitmap>
-                          <selected>0</selected>
+                          <selected>1</selected>
                           <object class="wxPanel" name="m_panel5878">
                             <style>wxTAB_TRAVERSAL</style>
                             <tooltip>
@@ -7096,7 +7118,6 @@ Interval [ms]:</label>
                                 <object class="wxTextCtrl" name="m_logger">
                                   <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL</style>
                                   <bg>#000000</bg>
-                                  <fg>wxSYS_COLOUR_HIGHLIGHTTEXT</fg>
                                   <font>
                                     <size>10</size>
                                     <style>normal</style>
@@ -10635,6 +10656,80 @@ State</label>
       </object>
     </object>
   </object>
+  <object class="wxFrame" name="CncFilePreviewWndBase">
+    <title>Cnc File Preview</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT</style>
+    <size>500,300</size>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>1</growablerows>
+      <object class="sizeritem" name="flexGridSizer3786">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>2</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows/>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <minsize>-1,20</minsize>
+            <object class="wxTextCtrl" name="m_previewFileName">
+              <style>wxTE_READONLY</style>
+              <size>-1,20</size>
+              <bg>wxSYS_COLOUR_3DLIGHT</bg>
+              <fg>wxSYS_COLOUR_BTNTEXT</fg>
+              <font>
+                <size>8</size>
+                <style>normal</style>
+                <weight>bold</weight>
+                <family>swiss</family>
+                <underlined>0</underlined>
+                <face>Segoe UI</face>
+              </font>
+              <value>File name</value>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <minsize>-1,20</minsize>
+            <object class="wxTextCtrl" name="m_previewFileType">
+              <style>wxTE_READONLY|wxTE_CENTRE</style>
+              <size>-1,20</size>
+              <bg>wxSYS_COLOUR_BTNFACE</bg>
+              <fg>wxSYS_COLOUR_BTNTEXT</fg>
+              <font>
+                <size>8</size>
+                <style>normal</style>
+                <weight>bold</weight>
+                <family>swiss</family>
+                <underlined>0</underlined>
+                <face>Segoe UI</face>
+              </font>
+              <value>Type</value>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <object class="wxPanel" name="m_previewPlaceHolder">
+          <style>wxTAB_TRAVERSAL</style>
+          <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
+          <tooltip>
+            <![CDATA[Only a placeholder]]>
+          </tooltip>
+        </object>
+      </object>
+    </object>
+  </object>
   <object class="wxPanel" name="CncFilePreviewBase">
     <size>500,300</size>
     <style>wxTAB_TRAVERSAL</style>
@@ -11644,81 +11739,8 @@ State</label>
       </object>
     </object>
   </object>
-  <object class="wxFrame" name="CncFilePreviewWndBase">
-    <title>Cnc File Preview</title>
-    <centered>1</centered>
-    <style>wxDEFAULT_FRAME_STYLE|wxFRAME_FLOAT_ON_PARENT</style>
-    <size>500,300</size>
-    <object class="wxFlexGridSizer">
-      <cols>1</cols>
-      <rows>2</rows>
-      <vgap>0</vgap>
-      <hgap>0</hgap>
-      <growablecols>0</growablecols>
-      <growablerows>1</growablerows>
-      <object class="sizeritem" name="flexGridSizer3786">
-        <flag>wxALL|wxEXPAND</flag>
-        <option>1</option>
-        <object class="wxFlexGridSizer">
-          <cols>2</cols>
-          <rows>1</rows>
-          <vgap>0</vgap>
-          <hgap>0</hgap>
-          <growablecols>0</growablecols>
-          <growablerows/>
-          <object class="sizeritem">
-            <flag>wxALL|wxEXPAND</flag>
-            <minsize>-1,20</minsize>
-            <object class="wxTextCtrl" name="m_previewFileName">
-              <style>wxTE_READONLY</style>
-              <size>-1,20</size>
-              <bg>wxSYS_COLOUR_3DLIGHT</bg>
-              <fg>wxSYS_COLOUR_BTNTEXT</fg>
-              <font>
-                <size>8</size>
-                <style>normal</style>
-                <weight>bold</weight>
-                <family>swiss</family>
-                <underlined>0</underlined>
-                <face>Segoe UI</face>
-              </font>
-              <value>File name</value>
-            </object>
-          </object>
-          <object class="sizeritem">
-            <flag>wxALL</flag>
-            <minsize>-1,20</minsize>
-            <object class="wxTextCtrl" name="m_previewFileType">
-              <style>wxTE_READONLY|wxTE_CENTRE</style>
-              <size>-1,20</size>
-              <bg>wxSYS_COLOUR_BTNFACE</bg>
-              <fg>wxSYS_COLOUR_BTNTEXT</fg>
-              <font>
-                <size>8</size>
-                <style>normal</style>
-                <weight>bold</weight>
-                <family>swiss</family>
-                <underlined>0</underlined>
-                <face>Segoe UI</face>
-              </font>
-              <value>Type</value>
-            </object>
-          </object>
-        </object>
-      </object>
-      <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <object class="wxPanel" name="m_previewPlaceHolder">
-          <style>wxTAB_TRAVERSAL</style>
-          <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-          <tooltip>
-            <![CDATA[Only a placeholder]]>
-          </tooltip>
-        </object>
-      </object>
-    </object>
-  </object>
   <object class="wxPanel" name="GL3DOptionPaneBase">
+    <size>220,600</size>
     <style>wxTAB_TRAVERSAL</style>
     <object class="wxFlexGridSizer">
       <cols>1</cols>
@@ -11731,11 +11753,20 @@ State</label>
         <flag>wxALL|wxEXPAND</flag>
         <object class="wxChoicebook" name="m_choicebook6345">
           <style>wxBK_DEFAULT</style>
+          <font>
+            <size>9</size>
+            <style>normal</style>
+            <weight>bold</weight>
+            <family>swiss</family>
+            <underlined>0</underlined>
+            <face>Segoe UI</face>
+          </font>
           <object class="choicebookpage">
             <label>Options</label>
             <selected>0</selected>
             <object class="wxPanel" name="m_panel3DOptions">
               <style>wxTAB_TRAVERSAL</style>
+              <bg>wxSYS_COLOUR_3DLIGHT</bg>
               <object class="wxFlexGridSizer">
                 <cols>1</cols>
                 <rows>2</rows>
@@ -11782,17 +11813,513 @@ State</label>
             </object>
           </object>
           <object class="choicebookpage">
-            <label>Page 2</label>
+            <label>Animation</label>
             <selected>0</selected>
-            <object class="wxPanel" name="m_panel6349">
+            <object class="wxPanel" name="m_panelAnimation">
               <style>wxTAB_TRAVERSAL</style>
+              <bg>wxSYS_COLOUR_3DLIGHT</bg>
               <object class="wxFlexGridSizer">
-                <cols>2</cols>
-                <rows>0</rows>
+                <cols>1</cols>
+                <rows>4</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
                 <growablecols/>
                 <growablerows/>
+                <object class="sizeritem" name="flexGridSizer6457">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>1</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>1</growablecols>
+                    <growablerows>0</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText6443">
+                        <label>XY Pane Rotation (Z Top)</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>bold</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                      <border>1</border>
+                      <object class="wxBitmapButton" name="m_btResetCameraPos2">
+                        <bitmap>bitmaps/git-reset-repo.png</bitmap>
+                        <style>wxBU_AUTODRAW</style>
+                        <tooltip>
+                          <![CDATA[Normalize XY Pane Rotation]]>
+                        </tooltip>
+                        <default>0</default>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer6456">
+                  <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+                  <border>5</border>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>1</cols>
+                    <rows>3</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols/>
+                    <growablerows/>
+                    <object class="sizeritem" name="flexGridSizer3570">
+                      <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+                      <option>1</option>
+                      <object class="wxFlexGridSizer">
+                        <cols>6</cols>
+                        <rows>1</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols>0</growablecols>
+                        <growablerows>0</growablerows>
+                        <object class="sizeritem">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <border>5</border>
+                          <object class="wxSlider" name="m_sliderCameraRotation">
+                            <style>wxSL_LABELS|wxSL_HORIZONTAL</style>
+                            <font>
+                              <size>7</size>
+                              <style>normal</style>
+                              <weight>bold</weight>
+                              <family>swiss</family>
+                              <underlined>0</underlined>
+                              <face>Segoe UI</face>
+                            </font>
+                            <min>-360</min>
+                            <max>360</max>
+                            <value>0</value>
+                          </object>
+                        </object>
+                        <object class="sizeritem" name="flexGridSizer3678">
+                          <flag>wxALL</flag>
+                          <border>1</border>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols/>
+                            <growablerows/>
+                            <object class="sizeritem" name="flexGridSizer3679">
+                              <flag>wxALL</flag>
+                              <border>1</border>
+                              <object class="wxFlexGridSizer">
+                                <cols>2</cols>
+                                <rows>0</rows>
+                                <vgap>0</vgap>
+                                <hgap>0</hgap>
+                                <growablecols/>
+                                <growablerows/>
+                                <object class="sizeritem">
+                                  <flag>wxALL</flag>
+                                  <border>1</border>
+                                  <minsize>24,24</minsize>
+                                  <object class="wxBitmapToggleButton" name="m_btCameraRotionClockwise">
+                                    <style/>
+                                    <size>24,24</size>
+                                    <bitmap>bitmaps/arrow-rotate-clockwise.png</bitmap>
+                                    <tooltip>
+                                      <![CDATA[Auto Rotate Clockwise]]>
+                                    </tooltip>
+                                    <checked>0</checked>
+                                  </object>
+                                </object>
+                                <object class="sizeritem">
+                                  <flag>wxALL</flag>
+                                  <border>1</border>
+                                  <minsize>24,24</minsize>
+                                  <object class="wxBitmapToggleButton" name="m_btCameraRotionAnticlockwise">
+                                    <style/>
+                                    <size>24,24</size>
+                                    <bitmap>bitmaps/arrow-rotate-anticlockwise.png</bitmap>
+                                    <tooltip>
+                                      <![CDATA[Auto Rotate Counterclockwise]]>
+                                    </tooltip>
+                                    <checked>0</checked>
+                                  </object>
+                                </object>
+                              </object>
+                            </object>
+                            <object class="sizeritem" name="flexGridSizer3682">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <object class="wxFlexGridSizer">
+                                <cols>2</cols>
+                                <rows>1</rows>
+                                <vgap>0</vgap>
+                                <hgap>0</hgap>
+                                <growablecols/>
+                                <growablerows/>
+                                <object class="sizeritem">
+                                  <flag>wxALL</flag>
+                                  <border>1</border>
+                                  <object class="wxStaticText" name="m_staticText3684">
+                                    <label>Speed</label>
+                                    <style/>
+                                    <font>
+                                      <size>7</size>
+                                      <style>normal</style>
+                                      <weight>bold</weight>
+                                      <family>swiss</family>
+                                      <underlined>0</underlined>
+                                      <face>Segoe UI</face>
+                                    </font>
+                                  </object>
+                                </object>
+                                <object class="sizeritem">
+                                  <flag>wxALL</flag>
+                                  <minsize>46,-1</minsize>
+                                  <object class="wxSlider" name="m_sliderCameraRotationSpeed">
+                                    <style>wxSL_INVERSE|wxSL_HORIZONTAL</style>
+                                    <min>50</min>
+                                    <max>500</max>
+                                    <value>10</value>
+                                    <size>46,-1</size>
+                                  </object>
+                                </object>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                        <object class="spacer" name="Spacer3673">
+                          <size>3,0</size>
+                          <flag>wxALL</flag>
+                          <border>1</border>
+                          <option>1</option>
+                        </object>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>1</border>
+                      <object class="wxStaticLine" name="m_staticLine64453">
+                        <style>wxLI_HORIZONTAL</style>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer6453">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <border>5</border>
+                  <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>1</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>1</growablecols>
+                    <growablerows>0</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText6441">
+                        <label>Model Rotation:</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>bold</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxALIGN_RIGHT</flag>
+                      <border>1</border>
+                      <object class="wxBitmapButton" name="m_btResetCameraPos1">
+                        <bitmap>bitmaps/git-reset-repo.png</bitmap>
+                        <style>wxBU_AUTODRAW</style>
+                        <tooltip>
+                          <![CDATA[Normalize Model Rotation]]>
+                        </tooltip>
+                        <default>0</default>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer3580">
+                  <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+                  <border>5</border>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>1</cols>
+                    <rows>3</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>0</growablecols>
+                    <growablerows/>
+                    <object class="sizeritem" name="flexGridSizer6450">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>1</border>
+                      <object class="wxFlexGridSizer">
+                        <cols>3</cols>
+                        <rows>1</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols/>
+                        <growablerows/>
+                        <object class="sizeritem" name="flexGridSizer36288">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <border>1</border>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>0</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>1</border>
+                              <object class="wxSlider" name="m_sliderModelRotationX">
+                                <style>wxSL_LABELS|wxSL_VERTICAL</style>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <min>-360</min>
+                                <max>360</max>
+                                <value>0</value>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <minsize>50,-1</minsize>
+                              <object class="wxButton" name="m_btModelRotationResetX">
+                                <label>X</label>
+                                <style/>
+                                <size>50,-1</size>
+                                <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
+                                <bitmapposition>wxLEFT</bitmapposition>
+                                <default>0</default>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                        <object class="sizeritem" name="flexGridSizer36281114">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <border>1</border>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>0</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>1</border>
+                              <object class="wxSlider" name="m_sliderModelRotationY">
+                                <style>wxSL_LABELS|wxSL_VERTICAL</style>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <min>-360</min>
+                                <max>360</max>
+                                <value>0</value>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <minsize>50,-1</minsize>
+                              <object class="wxButton" name="m_btModelRotationResetY">
+                                <label>Y</label>
+                                <style/>
+                                <size>50,-1</size>
+                                <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <tooltip>
+                                  <![CDATA[Reset]]>
+                                </tooltip>
+                                <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
+                                <bitmapposition>wxLEFT</bitmapposition>
+                                <default>0</default>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                        <object class="sizeritem" name="flexGridSizer362811">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <border>1</border>
+                          <object class="wxFlexGridSizer">
+                            <cols>1</cols>
+                            <rows>2</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0</growablecols>
+                            <growablerows>0</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>1</border>
+                              <object class="wxSlider" name="m_sliderModelRotationZ">
+                                <style>wxSL_LABELS|wxSL_VERTICAL</style>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <min>-360</min>
+                                <max>360</max>
+                                <value>0</value>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL</flag>
+                              <border>5</border>
+                              <minsize>50,-1</minsize>
+                              <object class="wxButton" name="m_btModelRotationResetZ">
+                                <label>Z</label>
+                                <style/>
+                                <size>50,-1</size>
+                                <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <tooltip>
+                                  <![CDATA[Reset]]>
+                                </tooltip>
+                                <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
+                                <bitmapposition>wxLEFT</bitmapposition>
+                                <default>0</default>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                      </object>
+                    </object>
+                    <object class="sizeritem" name="flexGridSizer3628">
+                      <flag>wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL</flag>
+                      <border>1</border>
+                      <object class="wxFlexGridSizer">
+                        <cols>1</cols>
+                        <rows>2</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols>0</growablecols>
+                        <growablerows>1</growablerows>
+                        <object class="sizeritem">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <border>2</border>
+                          <object class="wxStaticLine" name="m_staticLine6445345">
+                            <style>wxLI_HORIZONTAL</style>
+                          </object>
+                        </object>
+                        <object class="sizeritem" name="flexGridSizer6452">
+                          <flag>wxALL|wxALIGN_CENTER_HORIZONTAL</flag>
+                          <border>1</border>
+                          <object class="wxFlexGridSizer">
+                            <cols>2</cols>
+                            <rows>1</rows>
+                            <vgap>0</vgap>
+                            <hgap>0</hgap>
+                            <growablecols>0,1</growablecols>
+                            <growablerows>0</growablerows>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND</flag>
+                              <border>1</border>
+                              <object class="wxSlider" name="m_sliderModelRotationXYZ">
+                                <style>wxSL_LABELS|wxSL_HORIZONTAL</style>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <min>-360</min>
+                                <max>360</max>
+                                <value>0</value>
+                              </object>
+                            </object>
+                            <object class="sizeritem">
+                              <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                              <border>5</border>
+                              <minsize>50,-1</minsize>
+                              <object class="wxButton" name="m_btModelRotationResetXYZ">
+                                <label>XYZ</label>
+                                <style/>
+                                <size>50,-1</size>
+                                <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                                <font>
+                                  <size>7</size>
+                                  <style>normal</style>
+                                  <weight>bold</weight>
+                                  <family>swiss</family>
+                                  <underlined>0</underlined>
+                                  <face>Segoe UI</face>
+                                </font>
+                                <tooltip>
+                                  <![CDATA[Reset]]>
+                                </tooltip>
+                                <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
+                                <bitmapposition>wxLEFT</bitmapposition>
+                                <default>0</default>
+                              </object>
+                            </object>
+                          </object>
+                        </object>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>1</border>
+                      <object class="wxStaticLine" name="m_staticLine644534">
+                        <style>wxLI_HORIZONTAL</style>
+                      </object>
+                    </object>
+                  </object>
+                </object>
               </object>
             </object>
           </object>
@@ -11936,492 +12463,6 @@ State</label>
               <style/>
               <size>5,-1</size>
               <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
-            </object>
-          </object>
-        </object>
-      </object>
-    </object>
-  </object>
-  <object class="wxFrame" name="GL3DOptionsBase">
-    <title>3D Options</title>
-    <centered>1</centered>
-    <style>wxDEFAULT_FRAME_STYLE|wxSTAY_ON_TOP</style>
-    <bg>wxSYS_COLOUR_3DLIGHT</bg>
-    <object class="wxFlexGridSizer">
-      <cols>1</cols>
-      <rows>3</rows>
-      <vgap>0</vgap>
-      <hgap>0</hgap>
-      <growablecols>0</growablecols>
-      <growablerows>0,1,2</growablerows>
-      <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
-        <object class="wxCollapsiblePane" name="m_collPaneOptions">
-          <label>Options</label>
-          <collapsed>1</collapsed>
-          <object class="panewindow" name="m_collpaneWin3648">
-            <bg/>
-            <fg/>
-            <style/>
-            <object class="wxFlexGridSizer">
-              <cols>1</cols>
-              <rows>2</rows>
-              <vgap>0</vgap>
-              <hgap>0</hgap>
-              <growablecols>0</growablecols>
-              <growablerows>0</growablerows>
-              <object class="sizeritem">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>1</border>
-                <object class="unknown" name="m_pgMgr3543"/>
-              </object>
-              <object class="sizeritem" name="flexGridSizer3653">
-                <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
-                <border>4</border>
-                <option>1</option>
-                <object class="wxFlexGridSizer">
-                  <cols>2</cols>
-                  <rows>1</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols/>
-                  <growablerows/>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <object class="wxCheckBox" name="m_cbAutoUpdate">
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <enabled>0</enabled>
-                      <style/>
-                      <label> Auto Update</label>
-                      <checked>1</checked>
-                    </object>
-                  </object>
-                </object>
-              </object>
-            </object>
-          </object>
-        </object>
-      </object>
-      <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
-        <minsize>300,-1</minsize>
-        <object class="wxCollapsiblePane" name="m_collPaneCameraRotation">
-          <label>XY Pane Rotation (Z Top)</label>
-          <collapsed>1</collapsed>
-          <object class="panewindow" name="m_collpaneWin3566">
-            <bg/>
-            <fg/>
-            <style/>
-            <object class="wxFlexGridSizer">
-              <cols>6</cols>
-              <rows>1</rows>
-              <vgap>0</vgap>
-              <hgap>0</hgap>
-              <growablecols>0</growablecols>
-              <growablerows>0</growablerows>
-              <object class="sizeritem">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-                <object class="wxSlider" name="m_sliderCameraRotation">
-                  <style>wxSL_LABELS|wxSL_HORIZONTAL</style>
-                  <font>
-                    <size>7</size>
-                    <style>normal</style>
-                    <weight>bold</weight>
-                    <family>swiss</family>
-                    <underlined>0</underlined>
-                    <face>Segoe UI</face>
-                  </font>
-                  <min>-360</min>
-                  <max>360</max>
-                  <value>0</value>
-                </object>
-              </object>
-              <object class="sizeritem" name="flexGridSizer3678">
-                <flag>wxALL</flag>
-                <border>1</border>
-                <object class="wxFlexGridSizer">
-                  <cols>1</cols>
-                  <rows>2</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols/>
-                  <growablerows/>
-                  <object class="sizeritem" name="flexGridSizer3679">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <object class="wxFlexGridSizer">
-                      <cols>3</cols>
-                      <rows>0</rows>
-                      <vgap>0</vgap>
-                      <hgap>0</hgap>
-                      <growablecols/>
-                      <growablerows/>
-                      <object class="sizeritem">
-                        <flag>wxALL</flag>
-                        <border>1</border>
-                        <object class="wxBitmapButton" name="m_btResetCameraPos">
-                          <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
-                          <style>wxBU_AUTODRAW</style>
-                          <tooltip>
-                            <![CDATA[Reset]]>
-                          </tooltip>
-                          <default>0</default>
-                        </object>
-                      </object>
-                      <object class="sizeritem">
-                        <flag>wxALL</flag>
-                        <border>1</border>
-                        <minsize>24,24</minsize>
-                        <object class="wxBitmapToggleButton" name="m_btCameraRotionClockwise">
-                          <style/>
-                          <size>24,24</size>
-                          <bitmap>bitmaps/arrow-rotate-clockwise.png</bitmap>
-                          <tooltip>
-                            <![CDATA[Auto Rotate Clockwise]]>
-                          </tooltip>
-                          <checked>0</checked>
-                        </object>
-                      </object>
-                      <object class="sizeritem">
-                        <flag>wxALL</flag>
-                        <border>1</border>
-                        <minsize>24,24</minsize>
-                        <object class="wxBitmapToggleButton" name="m_btCameraRotionAnticlockwise">
-                          <style/>
-                          <size>24,24</size>
-                          <bitmap>bitmaps/arrow-rotate-anticlockwise.png</bitmap>
-                          <tooltip>
-                            <![CDATA[Auto Rotate Counterclockwise]]>
-                          </tooltip>
-                          <checked>0</checked>
-                        </object>
-                      </object>
-                    </object>
-                  </object>
-                  <object class="sizeritem" name="flexGridSizer3682">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <object class="wxFlexGridSizer">
-                      <cols>2</cols>
-                      <rows>1</rows>
-                      <vgap>0</vgap>
-                      <hgap>0</hgap>
-                      <growablecols/>
-                      <growablerows/>
-                      <object class="sizeritem">
-                        <flag>wxALL</flag>
-                        <border>1</border>
-                        <object class="wxStaticText" name="m_staticText3684">
-                          <label>Speed</label>
-                          <style/>
-                          <font>
-                            <size>7</size>
-                            <style>normal</style>
-                            <weight>bold</weight>
-                            <family>swiss</family>
-                            <underlined>0</underlined>
-                            <face>Segoe UI</face>
-                          </font>
-                        </object>
-                      </object>
-                      <object class="sizeritem">
-                        <flag>wxALL</flag>
-                        <minsize>46,-1</minsize>
-                        <object class="wxSlider" name="m_sliderCameraRotationSpeed">
-                          <style>wxSL_INVERSE|wxSL_HORIZONTAL</style>
-                          <min>50</min>
-                          <max>500</max>
-                          <value>10</value>
-                          <size>46,-1</size>
-                        </object>
-                      </object>
-                    </object>
-                  </object>
-                </object>
-              </object>
-              <object class="spacer" name="Spacer3673">
-                <size>3,0</size>
-                <flag>wxALL</flag>
-                <border>1</border>
-                <option>1</option>
-              </object>
-            </object>
-          </object>
-        </object>
-      </object>
-      <object class="sizeritem">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
-        <minsize>300,-1</minsize>
-        <object class="wxCollapsiblePane" name="m_collPaneModelRotation">
-          <label>Model Rotation:</label>
-          <collapsed>1</collapsed>
-          <object class="panewindow" name="m_collpaneWin3568">
-            <bg/>
-            <fg/>
-            <style/>
-            <object class="wxFlexGridSizer">
-              <cols>8</cols>
-              <rows>1</rows>
-              <vgap>0</vgap>
-              <hgap>0</hgap>
-              <growablecols/>
-              <growablerows/>
-              <object class="sizeritem" name="flexGridSizer36288">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>1</border>
-                <object class="wxFlexGridSizer">
-                  <cols>1</cols>
-                  <rows>2</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols>0</growablecols>
-                  <growablerows>0</growablerows>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <object class="wxSlider" name="m_sliderModelRotationX">
-                      <style>wxSL_LABELS|wxSL_VERTICAL</style>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <min>-360</min>
-                      <max>360</max>
-                      <value>0</value>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <minsize>50,-1</minsize>
-                    <object class="wxButton" name="m_btModelRotationResetX">
-                      <label>X</label>
-                      <style/>
-                      <size>50,-1</size>
-                      <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>0</default>
-                    </object>
-                  </object>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-                <object class="wxStaticLine" name="m_staticLine364118">
-                  <style>wxLI_VERTICAL</style>
-                </object>
-              </object>
-              <object class="sizeritem" name="flexGridSizer36281114">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>1</border>
-                <object class="wxFlexGridSizer">
-                  <cols>1</cols>
-                  <rows>2</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols>0</growablecols>
-                  <growablerows>0</growablerows>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <object class="wxSlider" name="m_sliderModelRotationY">
-                      <style>wxSL_LABELS|wxSL_VERTICAL</style>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <min>-360</min>
-                      <max>360</max>
-                      <value>0</value>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <minsize>50,-1</minsize>
-                    <object class="wxButton" name="m_btModelRotationResetY">
-                      <label>Y</label>
-                      <style/>
-                      <size>50,-1</size>
-                      <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <tooltip>
-                        <![CDATA[Reset]]>
-                      </tooltip>
-                      <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>0</default>
-                    </object>
-                  </object>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-                <object class="wxStaticLine" name="m_staticLine3641">
-                  <style>wxLI_VERTICAL</style>
-                </object>
-              </object>
-              <object class="sizeritem" name="flexGridSizer362811">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>1</border>
-                <object class="wxFlexGridSizer">
-                  <cols>1</cols>
-                  <rows>2</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols>0</growablecols>
-                  <growablerows>0</growablerows>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <object class="wxSlider" name="m_sliderModelRotationZ">
-                      <style>wxSL_LABELS|wxSL_VERTICAL</style>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <min>-360</min>
-                      <max>360</max>
-                      <value>0</value>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <minsize>50,-1</minsize>
-                    <object class="wxButton" name="m_btModelRotationResetZ">
-                      <label>Z</label>
-                      <style/>
-                      <size>50,-1</size>
-                      <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <tooltip>
-                        <![CDATA[Reset]]>
-                      </tooltip>
-                      <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>0</default>
-                    </object>
-                  </object>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-                <object class="wxStaticLine" name="m_staticLine36411719">
-                  <style>wxLI_VERTICAL</style>
-                </object>
-              </object>
-              <object class="sizeritem" name="flexGridSizer3628">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>1</border>
-                <object class="wxFlexGridSizer">
-                  <cols>1</cols>
-                  <rows>2</rows>
-                  <vgap>0</vgap>
-                  <hgap>0</hgap>
-                  <growablecols>0</growablecols>
-                  <growablerows>0</growablerows>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>1</border>
-                    <object class="wxSlider" name="m_sliderModelRotationXYZ">
-                      <style>wxSL_LABELS|wxSL_VERTICAL</style>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <min>-360</min>
-                      <max>360</max>
-                      <value>0</value>
-                    </object>
-                  </object>
-                  <object class="sizeritem">
-                    <flag>wxALL</flag>
-                    <border>5</border>
-                    <minsize>50,-1</minsize>
-                    <object class="wxButton" name="m_btModelRotationResetXYZ">
-                      <label>XYZ</label>
-                      <style/>
-                      <size>50,-1</size>
-                      <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
-                      <font>
-                        <size>7</size>
-                        <style>normal</style>
-                        <weight>bold</weight>
-                        <family>swiss</family>
-                        <underlined>0</underlined>
-                        <face>Segoe UI</face>
-                      </font>
-                      <tooltip>
-                        <![CDATA[Reset]]>
-                      </tooltip>
-                      <bitmap>bitmaps/tools-equalizer-blue.png</bitmap>
-                      <bitmapposition>wxLEFT</bitmapposition>
-                      <default>0</default>
-                    </object>
-                  </object>
-                </object>
-              </object>
-              <object class="sizeritem">
-                <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
-                <object class="wxStaticLine" name="m_staticLine364117">
-                  <style>wxLI_VERTICAL</style>
-                </object>
-              </object>
             </object>
           </object>
         </object>

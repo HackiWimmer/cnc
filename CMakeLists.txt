@@ -171,8 +171,6 @@ set(SOURCE_FILES
         CncControlerGui/CncConfigProperty.h
         CncControlerGui/CncControl.cpp
         CncControlerGui/CncControl.h
-        CncControlerGui/CncControllerTestSuite.cpp
-        CncControlerGui/CncControllerTestSuite.h
         CncControlerGui/CncFileNameService.cpp
         CncControlerGui/CncFileNameService.h
         CncControlerGui/CncFilePreview.cpp
@@ -199,8 +197,6 @@ set(SOURCE_FILES
         CncControlerGui/CncSetterListCtrl.h
         CncControlerGui/CncSpeedSimulator.cpp
         CncControlerGui/CncSpeedSimulator.h
-        CncControlerGui/CncSpeedView.cpp
-        CncControlerGui/CncSpeedView.h
         CncControlerGui/CncSpyControl.cpp
         CncControlerGui/CncSpyControl.h
         CncControlerGui/CncStatisticSummaryListCtrl.cpp
@@ -209,8 +205,6 @@ set(SOURCE_FILES
         CncControlerGui/CncStreamBuffers.h
         CncControlerGui/CncSummaryListCtrl.cpp
         CncControlerGui/CncSummaryListCtrl.h
-        CncControlerGui/CncSvgCurveLib.cpp
-        CncControlerGui/CncSvgCurveLib.h
         CncControlerGui/CncToolCorrection.cpp
         CncControlerGui/CncToolCorrection.h
         CncControlerGui/CncToolMagazine.cpp
@@ -244,8 +238,6 @@ set(SOURCE_FILES
         CncControlerGui/GCodePathHandlerCnc.h
         CncControlerGui/GCodePathHandlerGL.cpp
         CncControlerGui/GCodePathHandlerGL.h
-        CncControlerGui/GL3DOptions.cpp
-        CncControlerGui/GL3DOptions.h
         CncControlerGui/GlobalFunctions.cpp
         CncControlerGui/GlobalFunctions.h
         CncControlerGui/GuiControlSetup.h
@@ -280,27 +272,15 @@ set(SOURCE_FILES
         CncControlerGui/OSD/SerialGtk.cpp
         CncControlerGui/Codelite/wxPNGAnimation.cpp
         CncControlerGui/Codelite/wxPNGAnimation.h
-        CncControlerGui/SerialEmulatorFile.cpp
-        CncControlerGui/SerialEmulatorFile.h
         CncControlerGui/SerialEmulatorNull.cpp
         CncControlerGui/SerialEmulatorNull.h
-        CncControlerGui/SerialEmulatorSVG.cpp
-        CncControlerGui/SerialEmulatorSVG.h
         CncControlerGui/SerialPort.cpp
         CncControlerGui/SerialPort.h
-        CncControlerGui/SerialSimulatorBase.cpp
-        CncControlerGui/SerialSimulatorBase.h
-        CncControlerGui/SerialSimulatorDevNull.cpp
-        CncControlerGui/SerialSimulatorDevNull.h
-        CncControlerGui/SerialSimulatorFacade.cpp
-        CncControlerGui/SerialSimulatorFacade.h
         CncControlerGui/SerialSpyPort.cpp
         CncControlerGui/SerialSpyPort.h
         CncControlerGui/StdStreamRedirector.h
         CncControlerGui/strsafe.h
         CncControlerGui/SvgCncParameters.h
-        CncControlerGui/SVGCurveLib.cpp
-        CncControlerGui/SVGCurveLib.h
         CncControlerGui/SvgEditPopup.cpp
         CncControlerGui/SvgEditPopup.h
         CncControlerGui/SVGElementConverter.cpp
@@ -332,6 +312,36 @@ set(SOURCE_FILES
         CncControlerGui/UpdateManagerThread.h
         CncControlerGui/wxcrafter.cpp
         CncControlerGui/wxcrafter.h
-        CncControlerGui/wxcrafter_bitmaps.cpp)
+        CncControlerGui/3D/CncGLCanvas.cpp
+        CncControlerGui/CncCurveLib.cpp
+        CncControlerGui/CncBaseEditor.cpp
+        CncControlerGui/CncSourceEditor.cpp
+        CncControlerGui/CncOutboundEditor.cpp
+		CncControlerGui/CncUnitCalculator.cpp
+		CncControlerGui/SvgViewBox.cpp
+		CncControlerGui/BinaryFileParser.cpp
+		CncControlerGui/CncMonitorSplitterWindow.cpp
+		CncControlerGui/3D/GLLabelCluser.cpp
+		CncControlerGui/3D/GLLineCluster.cpp
+		CncControlerGui/CncReferencePosition.cpp
+		CncControlerGui/CncConnectProgress.cpp
+		CncControlerGui/CfgAccelerationGraph.cpp
+		CncControlerGui/CncGamepadControllerState.cpp
+		CncControlerGui/GamepadThread.cpp
+		CncControlerGui/CncBinaryTemplateStreamer.cpp
+		CncControlerGui/SVGPathHandlerBase.cpp
+		CncControlerGui/SerialEmulatorBinaryStreamer.cpp
+		CncControlerGui/SerialEmulatorGCodeStreamer.cpp
+		CncControlerGui/SerialEmulatorSvgStreamer.cpp
+		CncControlerGui/SerialEmulatorTextStreamer.cpp
+        CncControlerGui/sha1.cpp
+        CncControlerGui/GL3DOptionPane.cpp
+        CncControlerGui/GL3DDrawPane.cpp
+		CncControlerGui/SecureRun.cpp
+        CncControlerGui/BinaryPathHandlerBase.cpp
+        CncControlerGui/BinaryPathHandlerCnc.cpp
+		CncControlerGui/CncCommandDecoder.cpp
+	    CncControlerGui/wxcrafter_bitmaps.cpp)
+
 
 add_executable(cnc ${SOURCE_FILES})

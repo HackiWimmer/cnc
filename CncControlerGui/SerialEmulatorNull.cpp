@@ -147,7 +147,7 @@ void SerialEmulatorNULL::resetCounter() {
 	resetStepCounter();
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::evaluatePositions(std::vector<int32_t>& ret) {
+bool SerialEmulatorNULL::evaluatePositions(GetterValues& ret) {
 ///////////////////////////////////////////////////////////////////
 	ret.push_back(targetMajorPos.getX());
 	ret.push_back(targetMajorPos.getY());
@@ -156,7 +156,7 @@ bool SerialEmulatorNULL::evaluatePositions(std::vector<int32_t>& ret) {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorNULL::evaluateLimitStates(std::vector<int32_t>& list) {
+bool SerialEmulatorNULL::evaluateLimitStates(GetterValues& list) {
 ///////////////////////////////////////////////////////////////////
 	bool ret = evaluateLimitStates();
 	
@@ -170,6 +170,9 @@ bool SerialEmulatorNULL::evaluateLimitStates(std::vector<int32_t>& list) {
 bool SerialEmulatorNULL::evaluateLimitStates() {
 ///////////////////////////////////////////////////////////////////
 	limitStates.reset();
+	
+	//#warning
+	//return true;
 	
 	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
 	
@@ -188,7 +191,7 @@ bool SerialEmulatorNULL::evaluateLimitStates() {
 	if ( (targetMajorPos.getZ())/cncConfig->getCalculationFactZ() <= -cncConfig->getMaxDimensionZ() )
 		limitStates.setZLimit(LimitSwitch::LIMIT_MIN);
 		
-	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactZ() >= +cncConfig->getMaxDimensionZ() )
+	if ( (targetMajorPos.getZ())/cncConfig->getCalculationFactZ() >= +cncConfig->getMaxDimensionZ() )
 		limitStates.setZLimit(LimitSwitch::LIMIT_MAX);
 		
 	return true;
@@ -687,7 +690,7 @@ bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int 
 bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	// determine the target major position, this is the current pos + ...
-	targetMajorPos.set(cncControl->getCurPos());
+	targetMajorPos.set(cncControl->getCurAppPos());
 	
 	// Always disable probe mode here, otherwise very long move distances appear
 	// this is already done by the application

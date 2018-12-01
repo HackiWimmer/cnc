@@ -190,7 +190,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void lruListItemLeave(wxMouseEvent& event);
 		virtual void lruListItemActivated(wxListEvent& event);
 		virtual void lruListItemSelected(wxListEvent& event);
-		virtual void openMotionMonitorOptionDlg(wxCommandEvent& event);
 		virtual void viewStatusbar(wxCommandEvent& event);
 		virtual void searchAvailiablePorts(wxCommandEvent& event);
 		virtual void unitTestFramework(wxCommandEvent& event);
@@ -471,7 +470,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void dispatchAll();
 		
 		const char* getCurrentPortName(wxString& ret);
-		GL3DDrawPane* getDrawPane3D() { return drawPane3D; }
 		
 	protected:
  
@@ -617,9 +615,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		bool openFileExtern(const wxString& tool, const char* file);
 		bool openFileExtern(const wxString& tool, wxString& file);
-		
-		const char* getBlankHtmlPage();
-		const char* getErrorHtmlPage(const wxString& errorInfo);
 		
 		TemplateFormat getCurrentTemplateFormat(const char* fn = NULL);
 		const char* getCurrentTemplateFormatName(const char* fn = NULL);
