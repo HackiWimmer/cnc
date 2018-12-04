@@ -57,7 +57,6 @@ class CncControl {
 		SetterMap setterMap;
 		
 	protected:
-		CncPortType portType;
 		// internal port object
 		Serial* serialPort;
 		// handels the cnc configuration
@@ -96,6 +95,8 @@ class CncControl {
 		unsigned int stepDelay;
 		// heartbeat value
 		int32_t lastCncHeartbeatValue;
+		
+		Serial* getSerial() { wxASSERT(serialPort); return serialPort; }
 		
 		// output controls
 		GuiControlSetup* guiCtlSetup;
@@ -151,8 +152,6 @@ class CncControl {
 		void setClientId(long id) { currentClientId = id; }
 		const long getClientId() const { return currentClientId; }
 		
-		//Get the current port type
-		CncPortType getPortType(void) { return portType; }
 		// Connection to portName
 		bool connect(const char * portName);
 		// Disconnection the serial connection
@@ -167,10 +166,6 @@ class CncControl {
 		bool isPositionOutOfRange(const CncLongPosition& pos, bool trace=true);
 		
 		void onPeriodicallyAppEvent();
-		
-		//Make Serial available
-		
-		Serial* getSerial() { return serialPort; }
 		
 		// Get the current speed parameter
 		CncSpeedMode getConfiguredSpeedMode() 		{ return configuredSpeedMode; }
@@ -188,10 +183,11 @@ class CncControl {
 		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
 		
 		// signal wrapper
-		bool sendInterrupt() 	{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
-		bool sendHalt() 		{ wxASSERT(serialPort); return serialPort->sendHalt(); }
-		bool sendPause() 		{ wxASSERT(serialPort); return serialPort->sendPause(); }
-		bool sendResume() 		{ wxASSERT(serialPort); return serialPort->sendResume(); }
+		bool sendInterrupt() 		{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
+		bool sendHalt() 			{ wxASSERT(serialPort); return serialPort->sendHalt(); }
+		bool sendPause() 			{ wxASSERT(serialPort); return serialPort->sendPause(); }
+		bool sendResume() 			{ wxASSERT(serialPort); return serialPort->sendResume(); }
+		bool sendSoftwareReset() 	{ wxASSERT(serialPort); return serialPort->sendSignal(SIG_SOFTWARE_RESET); }
 		
 		// comand wrapper
 		bool processCommand(const unsigned char c, std::ostream& txtCtl);
@@ -375,6 +371,21 @@ class CncControl {
 		size_t getStepCounterY()										{ return getSerial()->getStepCounterY(); }
 		size_t getStepCounterZ()										{ return getSerial()->getStepCounterZ(); }
 		size_t getPositionCounter()										{ return getSerial()->getPositionCounter(); }
+		
+		void enableSpyOutput(bool show=true) 							{ getSerial()->enableSpyOutput(); }
+		const char* getPortName() 										{ return getSerial()->getPortName(); }
+		const char* getClassName() 										{ return getSerial()->getClassName(); }
+		const CncPortType getPortType() 								{ return getSerial()->getPortType(); }
+		bool isCommandActive() 											{ return getSerial()->isCommandActive(); }
+		bool isOutputAsTemplateAvailable()								{ return getSerial()->isOutputAsTemplateAvailable(); }
+		bool isEmulator() 												{ return getSerial()->isEmulator(); }
+		bool canProcessIdle() 											{ return getSerial()->canProcessIdle(); }
+		bool isIdleActive()    											{ return getSerial()->isIdleActive(); }
+		
+		void traceSpeedInformation() 									{ getSerial()->traceSpeedInformation(); }
+		void setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
+		void processTrigger(const Serial::Trigger::BeginRun& tr)		{ getSerial()->processTrigger(tr); }
+		void processTrigger(const Serial::Trigger::EndRun& tr)			{ getSerial()->processTrigger(tr); }
 
 		// 3D control
 		void updatePreview3D(bool force=false);

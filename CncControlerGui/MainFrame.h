@@ -825,10 +825,10 @@ class CncTransactionLock {
 			parent->m_miRqtIdleMessages->Enable(false);
 			
 			CncControl* cnc = parent->getCncControl();
-			if ( cnc != NULL && cnc->getSerial()->isCommandActive() ) {
+			if ( cnc != NULL && cnc->isCommandActive() ) {
 				
 				unsigned counter = 0;
-				while ( cnc->getSerial()->isIdleActive() ) {
+				while ( cnc->isIdleActive() ) {
 					parent->waitActive(10);
 					
 					if ( counter++ > 15 ) {
