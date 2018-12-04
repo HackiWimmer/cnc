@@ -8,10 +8,11 @@
 #include <wx/valnum.h>
 #include <wx/combobox.h>
 #include <wx/propgrid/propgrid.h>
+#include "DataControlModel.h"
 #include "CncPosition.h"
 #include "CncUnitCalculator.h"
 #include "CncArduino.h"
-#include "DataControlModel.h"
+#include "CncOSDConfigList.h"
 #include "CncCommon.h"
 
 //////////////////////////////////////////////////////////////////////////////
@@ -63,14 +64,15 @@ class CncConfig {
 		typedef std::map<int, ToolMagazineEntry> ToolMagazine;
 		
 	private:
-		bool changed;
-		bool notificationActivated;
-		bool probeMode;
-		CncUnit currentUnit;
-		MainFrame* theApp;
-		ToolMagazine toolMagazine;
-		ToolMagazineParameter toolMagazineParameter;
-		RegisteredWindows registeredWindows;
+		bool 					changed;
+		bool 					notificationActivated;
+		bool 					probeMode;
+		CncOSDConfigList 		osdConfigList;
+		CncUnit 				currentUnit;
+		MainFrame* 				theApp;
+		ToolMagazine 			toolMagazine;
+		ToolMagazineParameter 	toolMagazineParameter;
+		RegisteredWindows 		registeredWindows;
 		
 		double dispFactX, dispFactY, dispFactZ;
 		double calcFactX, calcFactY, calcFactZ;
@@ -142,8 +144,6 @@ class CncConfig {
 		
 		unsigned int calculateThreshold(double pitch, unsigned int steps);
 		void calculateThresholds();
-		
-		
 		
 		void sc();
 		void rc();

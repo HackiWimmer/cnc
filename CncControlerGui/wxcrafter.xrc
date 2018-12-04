@@ -7061,7 +7061,7 @@ Interval [ms]:</label>
                           <face>Segoe UI</face>
                         </font>
                         <object class="notebookpage">
-                          <label>)-:</label>
+                          <label/>
                           <bitmap>bitmaps/start-here.png</bitmap>
                           <selected>0</selected>
                           <object class="wxPanel" name="m_panelStartupTrace">
@@ -9228,7 +9228,7 @@ State</label>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
                       <object class="wxListCtrl" name="m_positionSpy">
-                        <style/>
+                        <style>wxLC_VIRTUAL|wxLC_REPORT</style>
                         <tooltip>
                           <![CDATA[Only a placeholder]]>
                         </tooltip>

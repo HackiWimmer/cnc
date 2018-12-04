@@ -38,11 +38,11 @@ namespace StartupBuffer {
 				// over all format chars
 				switch ( (int)LoggerStreamBuf::startupBuffer[i] ) {
 					
-					case LoggerStreamBuf::Type::LOG:	containsLogOrErr = true;
+					case LoggerStreamBuf::Type::LOG:	//containsLogOrErr = true;
 														ta.SetTextColour(wxColour(0, 157, 157));
 														break;
 														
-					case LoggerStreamBuf::Type::ERR:	containsLogOrErr = true;
+					case LoggerStreamBuf::Type::ERR:	//containsLogOrErr = true;
 														ta.SetTextColour(wxColour(255, 64, 64));
 														break;
 														

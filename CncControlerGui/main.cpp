@@ -12,6 +12,8 @@
 #include "CncStreamBuffers.h"
 #include "OSD/CncTimeFunctions.h"
 #include "GlobalStrings.h"
+#include "GlobalFunctions.h"
+#include "CncCommon.h"
 #include "MainFrame.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -107,7 +109,7 @@ void installStreamRedirection(MainFrame* mainFrame) {
 	ta.SetFont(oldFont);
 	st->SetDefaultStyle(ta);
 	bool hasLogOrErr = StartupBuffer::trace(st);
-	mainFrame->GetPanelStartupTrace()->SetName( hasLogOrErr == true ? ")-:" : "(-;" );
+	mainFrame->GetLoggerNotebook()->SetPageText(LoggerSelection::VAL::STARTUP, (hasLogOrErr == true ? ")-:" : "(-;"));
 	
 	st->SetInsertionPoint(st->XYToPosition(0, 0));
 	st->ShowPosition(st->XYToPosition(0, 0));
@@ -210,6 +212,7 @@ class MainLogger : public wxLog {
 										break;
 										
 				default:				std::cerr << msg << std::endl;
+										GblFunc::stacktrace(std::cerr);
 			}
 		}
 };

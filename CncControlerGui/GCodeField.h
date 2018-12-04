@@ -57,8 +57,6 @@ class GCodeField {
 				wxString tt("");
 				setToken(tt);
 			}
-			
-			std::clog << cmd << "   " << num << std::endl;
 		}
 		////////////////////////////////////////////////////////
 		GCodeField(wxString& t) {

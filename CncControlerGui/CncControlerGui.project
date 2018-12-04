@@ -173,9 +173,7 @@
         <File Name="OSD/SerialGtk.h"/>
         <File Name="OSD/SerialGtk.cpp"/>
       </VirtualDirectory>
-      <File Name="SerialSimulatorFacade.cpp"/>
-      <File Name="SerialSimulatorFacade.h"/>
-      <VirtualDirectory Name="Native">
+      <VirtualDirectory Name="Emulator">
         <File Name="SerialEmulatorGCodeStreamer.cpp"/>
         <File Name="SerialEmulatorGCodeStreamer.h"/>
         <File Name="SerialEmulatorSvgStreamer.cpp"/>
@@ -188,13 +186,6 @@
         <File Name="SerialEmulatorNull.cpp"/>
       </VirtualDirectory>
       <File Name="SerialPort.cpp"/>
-      <VirtualDirectory Name="Simulators">
-        <File Name="SerialSimulatorDevNull.cpp"/>
-        <File Name="SerialSimulatorDevNull.h"/>
-        <File Name="SerialSimulatorBase.cpp"/>
-        <File Name="SerialSimulatorBase.h"/>
-        <File Name="SerialData.h"/>
-      </VirtualDirectory>
       <File Name="SerialPort.h"/>
       <File Name="SerialSpyPort.h"/>
       <File Name="SerialSpyPort.cpp"/>
@@ -215,7 +206,6 @@
       <File Name="CncGamepadControllerState.h"/>
       <File Name="CncGamepadControllerState.cpp"/>
       <File Name="CncSpeedController.h"/>
-      <File Name="CncConfigCommon.h"/>
       <File Name="CncReferencePosition.h"/>
       <File Name="CncReferencePosition.cpp"/>
       <File Name="CncConnectProgress.h"/>
@@ -283,7 +273,6 @@
       <File Name="wxcrafter.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
-      <File Name="GlobalStrings.h"/>
       <File Name="SecureRun.h"/>
       <File Name="SecureRun.cpp"/>
       <File Name="GamepadThread.cpp"/>
@@ -296,6 +285,7 @@
       <File Name="UpdateManagerThread.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="GlobalStrings.h"/>
       <File Name="sha1.cpp"/>
       <File Name="sha1.h"/>
       <File Name="DataControlModel.cpp"/>
@@ -357,6 +347,9 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Config">
+      <File Name="CncConfigCommon.h"/>
+      <File Name="CncOSDConfigList.cpp"/>
+      <File Name="CncOSDConfigList.h"/>
       <File Name="CncConfigProperty.cpp"/>
       <File Name="CncConfigProperty.h"/>
       <File Name="CncConfig.cpp"/>

@@ -6,27 +6,19 @@ use strict;
 
 use Class::Struct;
 
+my $tempDir = "/home/fw591/temp";
+my $wxFile  = "./CncControlerGui/wxcrafter.cpp";
 
-# newSizer.txt - example
-#	wxFlexGridSizer* flexGridSizer1809 = new wxFlexGridSizer(0, 8, 0, 0);
-#	wxFlexGridSizer* editorToolBoxSizer = new wxFlexGridSizer(2, 1, 0, 0);
-#	wxFlexGridSizer* flexGridSizer5976 = new wxFlexGridSizer(1, 10, 0, 0);
-#	wxFlexGridSizer* flexGridSizer713 = new wxFlexGridSizer(1, 3, 0, 0);
-#	wxFlexGridSizer* flexGridSizer1506 = new wxFlexGridSizer(2, 1, 0, 0);
-
-# addSizer.txt - example
-#    flexGridSizer5976->AddGrowableRow(0);
-#    flexGridSizer713->AddGrowableCol(1);
-#    flexGridSizer1506->AddGrowableCol(0);
-#    flexGridSizer1506->AddGrowableRow(0);
-#    flexGridSizer5933->AddGrowableCol(0);
-#    flexGridSizer5933->AddGrowableRow(1);
-
-
-
-my $newFile = "newSizer.txt";
-my $addFile = "addSizer.txt";
+my $newFile = $tempDir . "newSizer.txt";
+my $addFile = $tempDir . "addSizer.txt";
 my %newRegister;
+
+` grep Sizer $wxFile | grep 'new' | grep 'wxFlexGridSizer'  > $newFile`;
+` grep Sizer $wxFile | grep '>Add' > $addFile`;
+
+print "New File: ", $newFile, "\n";
+print "Add File: ", $addFile, "\n";
+
 
 struct Sizer => {
     row  => '$',
@@ -60,10 +52,10 @@ open (in, $newFile) || die $!;
 		
 		my @tokens2 = split(/\(/, $_);
 		my @tokens3 = split(/ /, $tokens2[1]);
-		print strip($tokens3[0]), "\n";
-		print strip($tokens3[1]), "\n";
-		print strip($tokens3[2]), "\n";
-		print strip($tokens3[3]), "\n";
+		#print strip($tokens3[0]), "\n";
+		#print strip($tokens3[1]), "\n";
+		#print strip($tokens3[2]), "\n";
+		#print strip($tokens3[3]), "\n";
 		
 		my $sizer = Sizer->new(); 
 		$sizer->row(strip($tokens3[0])); 

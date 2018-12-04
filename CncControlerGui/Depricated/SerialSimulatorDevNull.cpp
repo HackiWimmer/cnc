@@ -13,6 +13,12 @@
  * 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO|WARNING|ERROR);
  *		evt.SetString("<... message to log ...>");
  * 		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+ * 
+ *	Or one of the following functions:
+ *		void publishLogStreamAsInfoMsg();
+ *		void publishLogStreamAsWarningMsg();
+ *		void publishLogStreamAsErrorMsg();
+ *		void appendLogStreamToErrorInfo(unsigned char eid = E_PURE_TEXT_VALUE_ERROR);
 */
 
 ///////////////////////////////////////////////////////////////////
@@ -20,7 +26,7 @@ SerialSimulatorDevNull::SerialSimulatorDevNull(SerialSimulatorFacade* caller)
 : SerialSimulatorThread(caller)
 , targetMajorPos(0L, 0L, 0L)
 , curSimulatorPos(0L, 0L, 0L)
-, curLimitStates(LIMIT_UNSET, LIMIT_UNSET, LIMIT_UNSET)
+, curLimitStates(LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET)
 , speedSimulator(NULL)
 , posReplyThresholdX(0)
 , posReplyThresholdY(0)
@@ -31,7 +37,7 @@ SerialSimulatorDevNull::SerialSimulatorDevNull(SerialSimulatorFacade* caller)
 	memset(&renderPointB, 0, sizeof(renderPointB));
 	
 	// initial setup, will be initiated later with concret values
-	speedSimulator = new CncSpeedSimulator(	defaultLoopDuration,
+	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
 											0.0, 0, 0,
 											0.0, 0, 0,
 											0.0, 0, 0);
@@ -47,16 +53,15 @@ void SerialSimulatorDevNull::resetSerial() {
 ///////////////////////////////////////////////////////////////////
 	// to do something specialized things here
 	curSimulatorPos.setXYZ(0L, 0L, 0L);
-	curLimitStates.setXYZ(LIMIT_UNSET, LIMIT_UNSET, LIMIT_UNSET);
+	curLimitStates.setXYZ(LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET, LimitSwitch::LIMIT_UNSET);
 	
 	posReplyThresholdX = 0;
 	posReplyThresholdY = 0;
 	posReplyThresholdZ = 0;
 	
-	speedSimulator->setup(	defaultLoopDuration,
-							0.0, 0, 0,
-							0.0, 0, 0,
-							0.0, 0, 0);
+	speedSimulator->X.setup(0, 0.0, SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 0);
+	speedSimulator->Y.setup(0, 0.0, SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 0);
+	speedSimulator->Z.setup(0, 0.0, SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, 0);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorDevNull::performCurrentPositions(unsigned char pid) {
@@ -73,7 +78,11 @@ void SerialSimulatorDevNull::performCurrentPositions(unsigned char pid) {
 									
 		case PID_XYZ_POS: 
 		case PID_XYZ_POS_MAJOR: 
-		case PID_XYZ_POS_DETAIL: 	Serial_writeLongValues(pid, curSimulatorPos.getX(), curSimulatorPos.getY(), curSimulatorPos.getZ());
+		case PID_XYZ_POS_DETAIL: 	wxASSERT( speedSimulator != NULL);
+									Serial_writeLongValues(pid, curSimulatorPos.getX(),
+											                    curSimulatorPos.getY(),
+																curSimulatorPos.getZ(),
+																(int32_t)(speedSimulator->getRealtimeFeedSpeed_MM_MIN() * DBL_FACT));
 									break;
 									
 		default:					; // do nothing
@@ -92,14 +101,14 @@ void SerialSimulatorDevNull::performLimitStates() {
 	getSetterValueAsLong(PID_MAX_DIMENSION_Z, mz, 0);
 	
 	if ( mx != 0 && my != 0 && mz != 0 ) {
-		if ( curSimulatorPos.getX() <= -mx )	limitStateX = LIMIT_MIN;
-		if ( curSimulatorPos.getX() >= +mx )	limitStateX = LIMIT_MAX;
+		if ( curSimulatorPos.getX() <= -mx )	limitStateX = LimitSwitch::LIMIT_MIN;
+		if ( curSimulatorPos.getX() >= +mx )	limitStateX = LimitSwitch::LIMIT_MAX;
 
-		if ( curSimulatorPos.getY() <= -my )	limitStateY = LIMIT_MIN;
-		if ( curSimulatorPos.getY() >= +my )	limitStateY = LIMIT_MAX;
+		if ( curSimulatorPos.getY() <= -my )	limitStateY = LimitSwitch::LIMIT_MIN;
+		if ( curSimulatorPos.getY() >= +my )	limitStateY = LimitSwitch::LIMIT_MAX;
 
-		if ( curSimulatorPos.getZ() <= -mz )	limitStateZ = LIMIT_MIN;
-		if ( curSimulatorPos.getZ() >= +mz )	limitStateZ = LIMIT_MAX;
+		if ( curSimulatorPos.getZ() <= -mz )	limitStateZ = LimitSwitch::LIMIT_MIN;
+		if ( curSimulatorPos.getZ() >= +mz )	limitStateZ = LimitSwitch::LIMIT_MAX;
 	}
 	
 	curLimitStates.setX(limitStateX);
@@ -149,16 +158,30 @@ unsigned char SerialSimulatorDevNull::performSetterValue(unsigned char pid, int3
 		case PID_STEPS_X:
 		case PID_STEPS_Y:
 		case PID_STEPS_Z:
-		case PID_PULSE_WIDTH_OFFSET_X:
-		case PID_PULSE_WIDTH_OFFSET_Y:
-		case PID_PULSE_WIDTH_OFFSET_Z:	speedSimulator->setup(	defaultLoopDuration,
-																getSetterValueAsDouble(PID_PITCH_X, 0.0), getSetterValueAsLong(PID_STEPS_X, 0), 2 * getSetterValueAsLong(PID_PULSE_WIDTH_OFFSET_X, 0),
-																getSetterValueAsDouble(PID_PITCH_Y, 0.0), getSetterValueAsLong(PID_STEPS_Y, 0), 2 * getSetterValueAsLong(PID_PULSE_WIDTH_OFFSET_Y, 0),
-																getSetterValueAsDouble(PID_PITCH_Z, 0.0), getSetterValueAsLong(PID_STEPS_Z, 0), 2 * getSetterValueAsLong(PID_PULSE_WIDTH_OFFSET_Z, 0));
+		case PID_PULSE_WIDTH_LOW_X:
+		case PID_PULSE_WIDTH_LOW_Y:
+		case PID_PULSE_WIDTH_LOW_Z:
+		case PID_PULSE_WIDTH_HIGH_X:
+		case PID_PULSE_WIDTH_HIGH_Y:
+		case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->X.setup(getSetterValueAsLong(PID_STEPS_X, 0), 
+																getSetterValueAsDouble(PID_PITCH_X, 0.0), 
+																SPEED_MANAGER_CONST_STATIC_OFFSET_US, 
+																SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+																getSetterValueAsLong(PID_PULSE_WIDTH_LOW_X, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_X, 0));
+										speedSimulator->Y.setup(getSetterValueAsLong(PID_STEPS_Y, 0), 
+																getSetterValueAsDouble(PID_PITCH_Y, 0.0), 
+																SPEED_MANAGER_CONST_STATIC_OFFSET_US, 
+																SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+																getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Y, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Y, 0));
+										speedSimulator->Z.setup(getSetterValueAsLong(PID_STEPS_Z, 0), 
+																getSetterValueAsDouble(PID_PITCH_Z, 0.0), 
+																SPEED_MANAGER_CONST_STATIC_OFFSET_US, 
+																SPEED_MANAGER_CONST_LOOP_OFFSET_US, 
+																getSetterValueAsLong(PID_PULSE_WIDTH_LOW_Z, 0) + getSetterValueAsLong(PID_PULSE_WIDTH_HIGH_Z, 0));
 										break;
 		
 		
-		case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed((double)(value/DBL_FACT));
+		case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed_MM_MIN((double)(value/DBL_FACT));
 										break;
 										
 		case PID_POS_REPLY_THRESHOLD_X:	posReplyThresholdX = value; 
@@ -233,7 +256,7 @@ bool SerialSimulatorDevNull::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
 	// update speed simulator values
 	if ( isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
-		speedSimulator->setNextMove(dx, dy, dz);
+		speedSimulator->initMove(dx, dy, dz);
 	}
 	
 	// initialize
@@ -329,8 +352,8 @@ bool SerialSimulatorDevNull::renderAndStepAxisXYZ(int32_t dx, int32_t dy, int32_
 	if ( isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		//realeaseCondition();
-		speedSimulator->performCurrentOffsetThreadLocal(true);
-		speedSimulator->reset();
+		speedSimulator->performCurrentOffset(true);
+		speedSimulator->completeMove();
 	}
 	
 	return true;
@@ -342,7 +365,7 @@ bool SerialSimulatorDevNull::stepAxisXYZ(int32_t dx , int32_t dy , int32_t dz, b
 		return false;
 	
 	// statistic
-	incPosIstionCounter();
+	incPosistionCounter();
 	incStepCounterX(dx);
 	incStepCounterY(dy);
 	incStepCounterZ(dz);
@@ -421,7 +444,7 @@ bool SerialSimulatorDevNull::stepAxis(char axis, int32_t steps) {
 							return false;
 			}
 			
-			speedSimulator->performCurrentOffsetThreadLocal(false);
+			speedSimulator->performCurrentOffset(false);
 		}
 	}
 	

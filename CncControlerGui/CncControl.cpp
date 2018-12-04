@@ -11,7 +11,6 @@
 #include "OSD/CncAsyncKeyboardState.h"
 #include "DataControlModel.h"
 #include "SerialPort.h"
-#include "SerialSimulatorFacade.h"
 #include "SerialEmulatorNull.h"
 #include "SerialEmulatorTextStreamer.h"
 #include "SerialEmulatorSvgStreamer.h"
@@ -30,7 +29,6 @@ CncControl::CncControl(CncPortType pt)
 : currentClientId(-1)
 , runContinuousMove(false)
 , setterMap()
-, portType(pt)
 , serialPort(NULL)
 , cncConfig(NULL)
 , zeroAppPos(0,0,0)
@@ -55,7 +53,6 @@ CncControl::CncControl(CncPortType pt)
 //////////////////////////////////////////////////////////////////
 	// Serial factory
 	if      ( pt == CncPORT ) 			serialPort = new SerialSpyPort(this);
-	else if ( pt == CncPORT_SIMU )		serialPort = new SerialSimulatorFacade(this);
 	else if ( pt == CncEMU_NULL )		serialPort = new SerialEmulatorNULL(this);
 	else if ( pt == CncEMU_TXT)			serialPort = new SerialEmulatorTextStreamer(this);
 	else if ( pt == CncEMU_SVG)			serialPort = new SerialEmulatorSvgStreamer(this);

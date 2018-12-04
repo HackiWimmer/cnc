@@ -4,6 +4,17 @@
 #include "wx/string.h"
 
 ////////////////////////////////////////////////////////////////////
+namespace VersionInfo {
+
+	const wxString major			= "0";
+	const wxString minor			= "9";
+	const wxString index			= "0";
+
+	const wxString text 			= "";
+	const wxString number			= wxString::Format("%s.%s.%s", major, minor, index);
+};
+
+////////////////////////////////////////////////////////////////////
 struct GlobalConstStringDatabase {
 	
 	#ifdef DEBUG
@@ -12,11 +23,14 @@ struct GlobalConstStringDatabase {
 	const wxString buildFlag			= wxString("r");
 	#endif
 
+	// common
 	const wxString programTitel			= wxString("Woodworking CNC Controller");
 	const wxString copyRight			= wxString("invented by Hacki Wimmer 2016 - 2019");
-	const wxString versionNumber		= wxString("0.9.0");
+	const wxString versionNumber		= VersionInfo::number;
 	const wxString programVersion 		= wxString(wxString::Format("%s.%s", versionNumber, buildFlag));
 	
+
+	// position spy
 	const wxString posSpyRefFormat		= wxString("%08ld");
 	
 };

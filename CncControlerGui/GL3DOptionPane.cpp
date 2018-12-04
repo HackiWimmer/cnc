@@ -1,4 +1,4 @@
-#include "Gl3DOptionPane.h"
+#include "GL3DOptionPane.h"
 
 /////////////////////////////////////////////////////////////////
 GL3DOptionPane::GL3DOptionPane(wxWindow* parent)

@@ -2,12 +2,13 @@
 #define WEBVIEW_DUMMY_H
 
 #include "wx/defs.h"
-
 #include "wx/panel.h"
 #include "wx/event.h"
 #include "wx/sstream.h"
 #include "wx/sharedptr.h"
 #include "wx/vector.h"
+#include "wxSVG/svgctrl.h"
+
 
 
 #ifdef wxUSE_WEBVIEW
@@ -80,12 +81,15 @@ enum wxWebViewFindFlags
 #define wxWebViewBackendDefault  ""
 
 
-class wxWebView : public wxPanel {
+
+class wxWebView : public wxSVGCtrl /*wxPanel*/ {
 public:
     wxWebView() 
-    : wxPanel() {}
+    //: wxPanel() {}
+	: wxSVGCtrl() {}
     
-    wxWebView(wxWindow* parent, wxWindowID id, const wxString& url = "", const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize) 
+    wxWebView(wxWindow* parent, wxWindowID id, const wxString& url = "", const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize)
+    : wxSVGCtrl(parent, id)
     {}
        
     	
@@ -100,7 +104,7 @@ public:
            long style = 0,
            const wxString& name = "") {
         	
-        	wxPanel::Create(parent, id, pos, size);
+    		wxSVGCtrl::Create(parent, id, pos, size);
         }
 
 
@@ -137,7 +141,11 @@ public:
     virtual bool IsBusy() const { return false; }
     virtual bool IsContextMenuEnabled() const { return false; }
     virtual bool IsEditable() const { return false; }
-    virtual void LoadURL(const wxString& url) {}
+
+    virtual void LoadURL(const wxString& url) {Load(url); }
+
+
+
     virtual void Print() {}
     //virtual void RegisterHandler(wxSharedPtr<wxWebViewHandler> handler) {}
     virtual void Reload(wxWebViewReloadFlags flags = wxWEBVIEW_RELOAD_DEFAULT) {}

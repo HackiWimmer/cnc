@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeLite_Project Name="wxSVG" Version="10.0.0" InternalType="Library">
+  <Description/>
+  <Dependencies/>
+  <Settings Type="Dynamic Library">
+    <GlobalSettings>
+      <Compiler Options="" C_Options="" Assembler="">
+        <IncludePath Value="."/>
+      </Compiler>
+      <Linker Options="">
+        <LibraryPath Value="."/>
+      </Linker>
+      <ResourceCompiler Options=""/>
+    </GlobalSettings>
+    <Configuration Name="Debug" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="/Zi" C_Options="/Zi" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0"/>
+      <Linker Options="/DEF:$(ProjectName).def /DEBUG" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName).dll" IntermediateDirectory="Debug" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Dynamic Library" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="" C_Options="" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0"/>
+      <Linker Options="/DEF:$(ProjectName).def" Required="yes"/>
+      <ResourceCompiler Options="" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName).dll" IntermediateDirectory="Release" Command="" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="" PauseExecWhenProcTerminates="no" IsGUIProgram="no" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild/>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName/>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+  </Settings>
+  <VirtualDirectory Name="src">
+    <File Name="../../../../wxsvg-1.5.15/src/SVGVideoElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGUseElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGTransformList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGTransformable.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGTransform.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGTextElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGTextContentElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGTests.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGSVGElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGStylable.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGStringList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGRectElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGRect.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGRadialGradientElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPreserveAspectRatio.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPolylineElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPolygonElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPointList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPoint.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPathSegList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPathElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGPaint.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGNumberList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGMatrix.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGMarkerElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGLocatable.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGLineElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGLengthList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGLength.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGImageElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGFitToViewBox.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGFilterElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGFEGaussianBlurElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGEllipseElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGElementInstanceList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGDocument_CreateElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGDocument.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/svgctrl.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGColor.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGCircleElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGCanvasItem.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGCanvas.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGAnimationElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGAnimateTransformElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGAnimateMotionElement.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGAnimatedType.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/SVGAngle.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/NodeList.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/mediadec_ffmpeg.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/imagsvg.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/GetSVGDocument.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/ExifHandler.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/Elements_SetAttribute.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/Elements_HasAttribute.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/Elements_GetAttributes.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/Elements_GetAttribute.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/Elements_CopyConstructors.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/CSSValue.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/CSSStyleDeclaration.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/css_values.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/css_properties.cpp"/>
+    <File Name="../../../../wxsvg-1.5.15/src/css_colors.cpp"/>
+  </VirtualDirectory>
+  <VirtualDirectory Name="include"/>
+</CodeLite_Project>

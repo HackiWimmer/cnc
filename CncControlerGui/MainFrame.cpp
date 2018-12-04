@@ -929,7 +929,7 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 	}
 	
 	// feed speed control + feed speed panel
-	if ( cnc != NULL && cnc->getSerial() != NULL ) {
+	if ( cnc != NULL ) {
 		m_speedPanel->Refresh();
 		
 		wxString sValue(_maxSpeedLabel);
@@ -1512,8 +1512,8 @@ bool MainFrame::initializeCncControl() {
 	m_zView->updateView(cnc->requestControllerPos().getZ() * GBL_CONFIG->getDisplayFactZ(GBL_CONFIG->getDisplayUnit()));
 	
 	//initilaize debug state
-	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->getSerial()->enableSpyOutput(true);
-	else				    					cnc->getSerial()->enableSpyOutput(false); 
+	if ( m_menuItemDebugSerial->IsChecked() ) 	cnc->enableSpyOutput(true);
+	else				    					cnc->enableSpyOutput(false); 
 	
 	return true;
 }
@@ -1777,7 +1777,7 @@ bool MainFrame::connectSerialPort() {
 	
 	wxString serialFileName;
 	createCncControl(sel, serialFileName);
-	if ( cnc == NULL || cnc->getSerial() == NULL )
+	if ( cnc == NULL )
 		return false;
 	
 	initializeCncControl();
@@ -1791,14 +1791,14 @@ bool MainFrame::connectSerialPort() {
 		clearMotionMonitor();
 		
 		if ( (ret = cnc->setup()) == true ) {
-			cnc->getSerial()->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
+			cnc->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 			updateCncConfigTrace();
 			decorateSwitchToolOnOff(cnc->getToolState());
 			selectSerialSpyMode();
 			m_connect->SetBitmap(bmpC);
 			m_serialTimer->Start();
 			
-			if ( cnc->getSerial()->canProcessIdle() ) {
+			if ( cnc->canProcessIdle() ) {
 				m_miRqtIdleMessages->Check(true);
 				m_miRqtIdleMessages->Enable(true);
 			}
@@ -2181,7 +2181,7 @@ void MainFrame::updateMonitoring() {
 	CncConfig::getGlobalCncConfig()->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
 	CncConfig::getGlobalCncConfig()->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
 	CncConfig::getGlobalCncConfig()->setAllowEventHandling(m_menuItemDebugSerial->IsChecked());
-	cnc->getSerial()->enableSpyOutput(m_menuItemDebugSerial->IsChecked());
+	cnc->enableSpyOutput(m_menuItemDebugSerial->IsChecked());
 	cnc->setUpdateToolControlsState(m_menuItemToolControls->IsChecked());
 	
 	if ( m_menuItemDisplayUserAgent->IsChecked() == false ) {
@@ -3277,7 +3277,7 @@ bool MainFrame::showConfigSummaryAndConfirmRun() {
 		case 'A':	break;
 		
 		// Serial Port only
-		case 'S': 	if ( cnc->getSerial()->isEmulator() )
+		case 'S': 	if ( cnc->isEmulator() )
 						return true;
 						
 					break;
@@ -3541,13 +3541,13 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
 	}
 	
-	cnc->getSerial()->traceSpeedInformation();
+	cnc->traceSpeedInformation();
 	
 	Serial::Trigger::EndRun endRun;
 	endRun.succcess = ret;
-	cnc->getSerial()->processTrigger(endRun);
+	cnc->processTrigger(endRun);
 	
-	decorateOutboundSaveControls(cnc->getSerial()->isOutputAsTemplateAvailable());
+	decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
 	
 	return ret;
 }
@@ -3564,7 +3564,7 @@ bool MainFrame::processTemplateIntern() {
 		begRun.parameter.SET.hardwareResY 	= GBL_CONFIG->getDisplayFactY();
 		begRun.parameter.SET.hardwareResZ 	= GBL_CONFIG->getDisplayFactZ();
 		begRun.parameter.PRC.user			= "Hacki Wimmer";
-	cnc->getSerial()->processTrigger(begRun);
+	cnc->processTrigger(begRun);
 	
 	if ( m_clearSerialSpyBeforNextRun->IsChecked() )
 		clearSerialSpy();
@@ -3633,7 +3633,7 @@ bool MainFrame::processTemplateIntern() {
 			clearMotionMonitor();
 			cnc->startSerialMeasurement();
 			ret = processTestTemplate();
-			cnc->getSerial()->stopMeasurement();
+			cnc->stopSerialMeasurement();
 			break;
 			
 		default:
@@ -3728,7 +3728,7 @@ void MainFrame::logStatistics() {
 	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);
 	
 	bool setupSpeedValue = GBL_CONFIG->isProbeMode() == false;
-	if ( cnc->getSerial()->isEmulator() == false )
+	if ( cnc->isEmulator() == false )
 		setupSpeedValue = true;
 
 	if (  setupSpeedValue ) {
@@ -4067,7 +4067,7 @@ void MainFrame::requestReset() {
 void MainFrame::requestInterrupt(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	cnc->getSerial()->sendSignal(SIG_INTERRUPPT);
+	cnc->sendInterrupt();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateFileContentPosition(long x, long y) {
@@ -5283,7 +5283,7 @@ void MainFrame::decorateOutboundSaveControls(bool state) {
 	m_btSaveOutboundAsTemplate2->Enable(state);
 	
 	if ( state == true ) {
-		wxString outboundFile(cnc->getSerial()->getPortName());
+		wxString outboundFile(cnc->getPortName());
 		decorateOutboundEditor(outboundFile);
 		
 	} else {
@@ -5540,8 +5540,8 @@ const char* MainFrame::getCurrentPortName(wxString& ret) {
 ///////////////////////////////////////////////////////////////////
 	ret.assign("Unknown Port Name");
 	if ( cnc != NULL ) {
-		wxString cn(cnc->getSerial()->getClassName());
-		wxString pn(cnc->getSerial()->getPortName());
+		wxString cn(cnc->getClassName());
+		wxString pn(cnc->getPortName());
 		
 		ret.assign(wxString::Format("%s", cn));
 		
@@ -5613,7 +5613,7 @@ void MainFrame::rcRun() {
 	if ( isDebugMode == true ) {
 		
 		// check if the cuurent port is a cnc and no emulator port
-		if ( cnc->getSerial()->getPortType() == CncPORT ) {
+		if ( cnc->getPortType() == CncPORT ) {
 			
 			wxString msg("Do you really want to debug a COM port?");
 			wxMessageDialog dlg(this, msg, _T("Port Check . . . "), 
@@ -6732,9 +6732,9 @@ void MainFrame::selectSerialSpyMode() {
 /////////////////////////////////////////////////////////////////////
 	int sm = m_cbSerialSpyMode->GetSelection();
 	switch ( sm ) {
-		case 0:		cnc->getSerial()->setSpyMode(Serial::SypMode::SM_READ); 	break;
-		case 1:		cnc->getSerial()->setSpyMode(Serial::SypMode::SM_WRITE); 	break;
-		default:	cnc->getSerial()->setSpyMode(Serial::SypMode::SM_ALL);		break;
+		case 0:		cnc->setSpyMode(Serial::SypMode::SM_READ); 		break;
+		case 1:		cnc->setSpyMode(Serial::SypMode::SM_WRITE); 	break;
+		default:	cnc->setSpyMode(Serial::SypMode::SM_ALL);		break;
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -7084,7 +7084,7 @@ void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
 void MainFrame::warmStartController(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( cnc ) {
-		cnc->getSerial()->sendSoftwareReset();
+		cnc->sendSoftwareReset();
 		connectSerialPortDialog();
 	}
 }
@@ -7340,7 +7340,7 @@ void MainFrame::saveOutboundAsNewTplFromMenu(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	wxString outboundFile(cnc->getSerial()->getPortName());
+	wxString outboundFile(cnc->getPortName());
 	
 	if ( wxFile::Exists(outboundFile) == false ) {
 		std::cerr << "MainFrame::saveOutboundAsNewTemplate: Can't found '" << outboundFile << "'" << std::endl;
@@ -7382,9 +7382,9 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 	
 	if ( wxCopyFile(outboundFile, newFile, true) == false ) {
 		
-		std::cerr << "File copy failed:"                         << std::endl;
-		std::cerr << " from:" << cnc->getSerial()->getPortName() << std::endl;
-		std::cerr << " to:"   << newFile				         << std::endl;
+		std::cerr << "File copy failed:"            << std::endl;
+		std::cerr << " from:" << cnc->getPortName() << std::endl;
+		std::cerr << " to:"   << newFile	        << std::endl;
 		return;
 	}
 	

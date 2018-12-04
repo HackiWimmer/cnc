@@ -8,8 +8,6 @@
 class SerialSimulatorDevNull : public SerialSimulatorThread {
 	
 	public:
-		static const unsigned int defaultLoopDuration = 40;
-		
 		SerialSimulatorDevNull(SerialSimulatorFacade* facade);
 		virtual ~SerialSimulatorDevNull();
 		

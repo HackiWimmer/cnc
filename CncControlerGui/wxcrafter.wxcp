@@ -45023,7 +45023,7 @@
                   }, {
                    "type": "string",
                    "m_label": "Label:",
-                   "m_value": ")-:"
+                   "m_value": ""
                   }, {
                    "type": "bitmapPicker",
                    "m_label": "Bitmap File:",
@@ -55444,7 +55444,7 @@
                "border": 0,
                "gbSpan": "1,1",
                "gbPosition": "0,0",
-               "m_styles": [],
+               "m_styles": ["wxLC_VIRTUAL", "wxLC_REPORT"],
                "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                "m_properties": [{
                  "type": "winid",

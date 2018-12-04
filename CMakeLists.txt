@@ -43,9 +43,12 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-return-local-addr")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /home/fw591/local/lib/wx/include/gtk2-unicode-3.1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /home/fw591/local/include/wx-3.1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /home/fw591/local/include/")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D _FILE_OFFSET_BITS=64")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D WXUSINGDLL")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D __WXGTK__")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D BOOST_STACKTRACE_USE_BACKTRACE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D BOOST_STACKTRACE_USE_ADDR2LINE")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi ")
 
@@ -67,6 +70,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgtk-x11-2.0 -lgdk-x11-2.0 -latk-1.0 -l
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpangocairo-1.0 -lgdk_pixbuf-2.0 -lcairo -lpango-1.0 -lfreetype -lfontconfig")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 -lpng -lz -ljpeg")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwxregexu-3.1 -lwxexpat-3.1 -pthread")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwxsvg")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--version-script,/home/fw591/wxWidgets-3.1.0/gtk-build/version-script -lz -ldl -lm  -lz -ldl -lm")
 
 #[[
@@ -341,6 +345,7 @@ set(SOURCE_FILES
         CncControlerGui/BinaryPathHandlerBase.cpp
         CncControlerGui/BinaryPathHandlerCnc.cpp
 		CncControlerGui/CncCommandDecoder.cpp
+		CncControlerGui/CncOSDConfigList.cpp
 	    CncControlerGui/wxcrafter_bitmaps.cpp)
 
 

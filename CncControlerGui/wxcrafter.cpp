@@ -4092,7 +4092,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_panelStartupTrace->SetFont(m_panelStartupTraceFont);
     int m_panelStartupTraceImgIndex;
     m_panelStartupTraceImgIndex = m_loggerNotebook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("start-here")));
-    m_loggerNotebook->AddPage(m_panelStartupTrace, _(")-:"), false, m_panelStartupTraceImgIndex);
+    m_loggerNotebook->AddPage(m_panelStartupTrace, wxT(""), false, m_panelStartupTraceImgIndex);
     
     wxFlexGridSizer* flexGridSizer6474 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer6474->SetFlexibleDirection( wxBOTH );
@@ -5174,7 +5174,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4714->Add(flexGridSizer4711, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_positionSpy = new wxListCtrl(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), 0);
+    m_positionSpy = new wxListCtrl(m_positionMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_positionMonitorView, wxSize(-1,-1)), wxLC_VIRTUAL|wxLC_REPORT);
     m_positionSpy->SetToolTip(_("Only a placeholder"));
     
     flexGridSizer4711->Add(m_positionSpy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));

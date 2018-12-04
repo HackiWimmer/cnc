@@ -60,6 +60,8 @@ bool CncConfig::ToolMagazineEntry::deserialize(const wxString& input) {
 CncConfig::CncConfig(MainFrame* app) 
 : changed(true)
 , notificationActivated(true)
+, probeMode(true)
+, osdConfigList()
 , currentUnit(CncSteps)
 , theApp(app)
 , toolMagazine()
@@ -491,6 +493,14 @@ bool CncConfig::setPropertyValueFromConfig(const wxString& groupName, const wxSt
 		return loadNonGuiConfig(groupName, entryName, value);
 	
 	wxString propType(prop->GetValueType());
+	
+	if ( entryName.StartsWith("OSD_") == true ) {
+		// add the ODS list string
+		osdConfigList.add(groupName, entryName, val);
+		// get the correct OSD value
+		osdConfigList.get(groupName, entryName, val);
+	} 
+	
 	prop->SetValueFromString(val);
 	
 	/*
@@ -593,10 +603,20 @@ void CncConfig::saveConfiguration(wxConfigBase& config) {
 		wxPGProperty* p = it.GetProperty();
 		
 		if ( p != NULL && p->IsCategory() == false ) {
-			//std::clog << p->GetName() << "=" << p->GetValueAsString() << std::endl;
+			
 			wxString entry(p->GetName());
-			if ( entry.StartsWith("#") == false )
-				config.Write(wxString::Format("/%s", entry), p->GetValueAsString());
+			if ( entry.StartsWith("#") == false ) {
+				wxString val(p->GetValueAsString());
+				
+				if ( entry.Contains("OSD_") == true ) {
+					// add the ODS value string
+					osdConfigList.update(entry, val);
+					// get the complete OSD list
+					osdConfigList.getList(entry, val);
+				}
+				
+				config.Write(wxString::Format("/%s", entry), val);
+			}
 		}
 	}
 	

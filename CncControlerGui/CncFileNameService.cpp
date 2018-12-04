@@ -6,17 +6,10 @@
 #include "CncSha1Wrapper.h"
 #include "CncFileNameService.h"
 
-#ifdef __WXMSW__
-	wxString CncFileNameService::_configFileName("CncController.windows.ini");
-#endif
-
-#ifdef __WXGTK__
-	wxString CncFileNameService::_configFileName("CncController.unix.ini");
-#endif
-
+wxString CncFileNameService::_configFileName("CncController.ini");
 wxString CncFileNameService::_lruFileName("CncControllerLruStore.ini");
-wxString CncFileNameService::_preconfiguredSpeedConfigFileName(wxString("Database") + wxFileName::GetPathSeparator() + "PreconfiguredSpeedSetups.ini");
 
+wxString CncFileNameService::_preconfiguredSpeedConfigFileName(wxString("Database") + wxFileName::GetPathSeparator() + "PreconfiguredSpeedSetups.ini");
 wxString CncFileNameService::_appTempDir("CncGuiController-TempFiles");
 
 wxString CncFileNameService::_ret(wxT(""));
@@ -50,6 +43,7 @@ class CncWoodworkingSession {
 		}
 		
 		~CncWoodworkingSession() {
+			std::cout << "Housekeeping:" << std::endl;
 			
 			// remove session directory
 			wxFileName tmpDir(CncFileNameService::getTempDir());
@@ -58,10 +52,13 @@ class CncWoodworkingSession {
 			
 			if ( last.length() == 40 + wxString(sessionExt).length() ) {
 				
-				//std::cout << last << std::endl;
-				//std::cout << tmpDir.GetFullPath()<< std::endl;
-				
-				tmpDir.Rmdir(wxPATH_RMDIR_RECURSIVE);
+				#ifdef __WXMSW__
+					std::cout << " Remove: " << tmpDir.GetFullPath() << std::endl;
+					tmpDir.Rmdir(wxPATH_RMDIR_RECURSIVE);
+				#else 
+					std::cout << " Remove: " << tmpDir.GetFullPath() << std::endl;
+					std::cout << "  <currently not implmeneted> " << std::endl;
+				#endif
 			}
 		}
 	
