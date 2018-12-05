@@ -54,7 +54,7 @@ CncControl::CncControl(CncPortType pt)
 //////////////////////////////////////////////////////////////////
 	// Serial factory
 	if      ( pt == CncPORT ) 			serialPort = new SerialSpyPort(this);
-	else if ( pt == CncPORT_SIMU )		serialPort = new SerialSimulatorFacade(this);
+	//else if ( pt == CncPORT_SIMU )		serialPort = new SerialSimulatorFacade(this);
 	else if ( pt == CncEMU_NULL )		serialPort = new SerialEmulatorNULL(this);
 	else if ( pt == CncEMU_TXT)			serialPort = new SerialEmulatorTextStreamer(this);
 	else if ( pt == CncEMU_SVG)			serialPort = new SerialEmulatorSvgStreamer(this);
