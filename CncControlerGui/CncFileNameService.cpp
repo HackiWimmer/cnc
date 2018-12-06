@@ -51,6 +51,8 @@ class CncWoodworkingSession {
 		
 		~CncWoodworkingSession() {
 			
+			std::cout << "~CncWoodworkingSession() a)" << std::endl;
+			
 			// remove session directory
 			wxFileName tmpDir(CncFileNameService::getTempDir());
 			wxArrayString dirs 	= tmpDir.GetDirs();
@@ -58,10 +60,12 @@ class CncWoodworkingSession {
 			
 			if ( last.length() == 40 + wxString(sessionExt).length() ) {
 				
-				//std::cout << last << std::endl;
-				//std::cout << tmpDir.GetFullPath()<< std::endl;
+				std::cout << "Housekeeping: Delete Session: '" << tmpDir.GetFullPath() << "'" << std::endl;
+
+				//std::cout << "A: " << last << std::endl;
+				//std::cout << "B: " tmpDir.GetFullPath() << std::endl;
 				
-				tmpDir.Rmdir(wxPATH_RMDIR_RECURSIVE);
+				//tmpDir.Rmdir(wxPATH_RMDIR_RECURSIVE);
 			}
 		}
 	

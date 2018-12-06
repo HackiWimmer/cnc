@@ -100,13 +100,33 @@ class SVGViewbox {
 ////////////////////////////////////////////////////////////////////////////
 class SVGRootNode {
 	
-	private:
+	public:
+
 		typedef CncUnitCalculatorBase::Unit Unit;
-		
+
+		struct ResultSet {
+
+			Unit 	unit;
+
+			float 	minX;
+			float 	minY;
+			float 	maxX;
+			float 	maxY;
+
+			float 	width;
+			float 	height;
+
+			float	scaleX;
+			float	scaleY;
+		};
+
+	private:
+
 		double 		width;
 		double 		height;
 		
 		SVGViewbox 	viewBox;
+		ResultSet	resultSet;
 		
 		float 		scaleX;
 		float 		scaleY;
@@ -117,6 +137,9 @@ class SVGRootNode {
 		void convertToUnit(const Unit unit);
 		void convertToMillimeter();
 		
+		bool calculateResultSet(ResultSet& rs, float docW, float docH);
+		bool calculateResultSet(ResultSet& rs, float docW, float docH, float vbX, float vbY, float vbW, float vbH);
+
 	public:
 		
 		SVGRootNode();
@@ -128,11 +151,15 @@ class SVGRootNode {
 		const SVGViewbox& getViewbox()		const { return viewBox; }
 		const double getWidth()				const { return width;   }
 		const double getHeight()			const { return height;  }
+
+		const Unit getInputUnit()			const { return unitCalculator.getInputUnit();  }
+		const Unit getOutputUnit()			const { return unitCalculator.getOutputUnit(); }
+
+		const SVGRootNode::ResultSet& 		getResult();
+
 		const float getScaleX()				const { return scaleX;  }
 		const float getScaleY()				const { return scaleY;  }
 		
-		const Unit getInputUnit()			const { return unitCalculator.getInputUnit();  }
-		const Unit getOutputUnit()			const { return unitCalculator.getOutputUnit(); }
 		
 		const double getWidth_MM()			const { return unitCalculator.convert(width);  }
 		const double getHeight_MM()			const { return unitCalculator.convert(height); }
@@ -143,14 +170,12 @@ class SVGRootNode {
 			typedef CncUnitCalculator<float> UC;
 			
 			ostr 	<< " <svg"
-					<< " width=\""  << a.getWidth()		<< UC::getUnitAsStr(a.getOutputUnit()) << "\""
-					<< " height=\"" << a.getHeight()	<< UC::getUnitAsStr(a.getOutputUnit()) << "\"";
-			
+					<< " width=\""   << a.getWidth()	<< UC::getUnitAsStr(a.getOutputUnit()) << "\""
+					<< " height=\""  << a.getHeight()	<< UC::getUnitAsStr(a.getOutputUnit()) << "\"";
 			ostr 	<< " viewBox=\"" << a.getViewbox().getViewBoxStr() << "\"";
 
 			wxString ret;
 			ostr 	<< " transform=\"" << a.getRootTransformation(ret) << "\"";
-			
 			ostr	<< "/>";
 			
 			return ostr;
@@ -167,24 +192,6 @@ struct SVGRootNodeTest {
 
 
 /*
-#include <iostream>
-
-
-struct ResultSet {
-	
-	//Unit 	unit;
-	
-	float 	minX;
-	float 	minY;
-	float 	maxX;
-	float 	maxY;
-	
-	float 	width;
-	float 	height;
-	
-	float	scaleX;
-	float	scaleY;
-};
 
 
 //------------------------------------------------------------------
@@ -203,15 +210,6 @@ bool calculateResultSet(ResultSet& rs, float docW, float docH, float vbX, float 
 	std::cout << vbW << ", ";
 	std::cout << vbH << "  ->  ";
 
-
-	
-	
-	
-	
-	
-	
-	
-	
 	
 	rs.minX 	= vbX;
 	rs.minY 	= vbY;

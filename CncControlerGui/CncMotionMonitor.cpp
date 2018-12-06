@@ -265,6 +265,9 @@ void CncMotionMonitor::resetRotation() {
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaint() {
 /////////////////////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false )
+		return;
+		
 	monitor->SetCurrent(*this);
 	monitor->init();
 

@@ -5,6 +5,7 @@ SVGRootNode::SVGRootNode()
 : width(1000)
 , height(1000)
 , viewBox(wxString::Format("0 0 %lf %lf", width, height))
+, resultSet()
 , scaleX(1.0f)
 , scaleY(1.0f)
 , unitCalculator(Unit::px, Unit::px)
@@ -17,6 +18,7 @@ SVGRootNode::SVGRootNode(double svgWidth, double svgHeight, Unit unit)
 : width(svgWidth)
 , height(svgHeight)
 , viewBox(wxString::Format("0 0 %lf %lf", width, height))
+, resultSet()
 , scaleX(1.0f)
 , scaleY(1.0f)
 , unitCalculator(unit, unit)
@@ -29,6 +31,7 @@ SVGRootNode::SVGRootNode(double svgWidth, double svgHeight, Unit unit, const wxS
 : width(svgWidth)
 , height(svgHeight)
 , viewBox(vb.IsEmpty() ? wxString::Format("0 0 %lf %lf", width, height) : vb)
+, resultSet()
 , scaleX(1.0f)
 , scaleY(1.0f)
 , unitCalculator(unit, unit)
@@ -81,6 +84,44 @@ void SVGRootNode::convertToMillimeter() {
 //////////////////////////////////////////////////////////////////
 	convertToUnit(Unit::mm);
 }
+//////////////////////////////////////////////////////////////////
+const SVGRootNode::ResultSet& SVGRootNode::getResult() {
+//////////////////////////////////////////////////////////////////
+
+	static ResultSet rs;
+
+
+	return rs;
+}
+
+//////////////////////////////////////////////////////////////////
+bool SVGRootNode::calculateResultSet(ResultSet& rs, float docW, float docH) {
+//////////////////////////////////////////////////////////////////
+	return calculateResultSet(rs, docW, docH, 0, 0, docW, docH);
+}
+
+//////////////////////////////////////////////////////////////////
+bool SVGRootNode::calculateResultSet(ResultSet& rs, float docW, float docH, float vbX, float vbY, float vbW, float vbH) {
+//////////////////////////////////////////////////////////////////
+
+	rs.minX 	= vbX;
+	rs.minY 	= vbY;
+
+	rs.width 	= vbW;
+	rs.height 	= vbH;
+
+	rs.maxX 	= rs.minX + rs.width;
+	rs.maxY 	= rs.minY + rs.height;
+
+	rs.scaleX 	= vbW ? docW / vbW : 1.0;
+	rs.scaleY 	= vbH ? docH / vbH : 1.0;
+
+
+	return true;
+}
+
+
+
 
 
 
