@@ -1,3 +1,4 @@
+#include <boost/stacktrace.hpp>
 #include <wx/sizer.h>
 #include "GlobalFunctions.h"
 
@@ -23,4 +24,10 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	// remove the placeholder
 	oldCtrl->Destroy();
 	// do not delete oldCtrl this will be handled by wx... 
+}
+
+///////////////////////////////////////////////////////////////////
+static void GblFunc::stacktrace(std::ostream& o) {
+//////////////////////////////////////////////////////////////////
+	o << boost::stacktrace::stacktrace();
 }

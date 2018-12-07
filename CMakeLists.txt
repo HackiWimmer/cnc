@@ -46,6 +46,8 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /home/fw591/local/include/wx-3.1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D _FILE_OFFSET_BITS=64")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D WXUSINGDLL")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D __WXGTK__")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D BOOST_STACKTRACE_USE_BACKTRACE")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D BOOST_STACKTRACE_USE_ADDR2LINE")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ansi ")
 
@@ -341,6 +343,7 @@ set(SOURCE_FILES
         CncControlerGui/BinaryPathHandlerBase.cpp
         CncControlerGui/BinaryPathHandlerCnc.cpp
 		CncControlerGui/CncCommandDecoder.cpp
+		CncControlerGui/CncOSDConfigList.cpp
 	    CncControlerGui/wxcrafter_bitmaps.cpp)
 
 
