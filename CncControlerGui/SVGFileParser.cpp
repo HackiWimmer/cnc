@@ -464,7 +464,7 @@ bool SVGFileParser::preprocess() {
 bool SVGFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
 	#warning
-	return true;
+	//return true;
 	
 	
 	if ( cncControl == NULL )

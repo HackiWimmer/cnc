@@ -104,8 +104,9 @@ class MonitorBookSelection {
 class TemplateBookSelection {
 	public:
 		enum VAL {
-			SOURCE_PANEL				= 0,
-			EXT_INFO_PANEL				= 1
+			OBSERVER					= 0,
+			SOURCE_PANEL				= 1,
+			EXT_INFO_PANEL				= 2
 		};
 };
 

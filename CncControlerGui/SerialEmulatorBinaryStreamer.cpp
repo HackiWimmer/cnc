@@ -83,4 +83,9 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::EndRun&
 		std::cerr << "SerialEmulatorStreamer::processTrigger(TrEndRun): finalize() failed" << std::endl;
 	}
 }
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::NextPath& tr) {
+///////////////////////////////////////////////////////////////////
+	std::clog << "SerialEmulatorStreamer::processTrigger(TrNextPath)" << std::endl;
+}
 

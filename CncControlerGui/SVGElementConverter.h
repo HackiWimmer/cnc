@@ -88,8 +88,7 @@ class SVGElementConverter {
 			path << r   	<< " 0 0 1 -";
 			path << (rd*2)	<< ",0";
 			
-			#warning
-			std::cerr << path.c_str() << std::endl;
+			//std::cerr << path.c_str() << std::endl;
 			ret.assign(path);
 			return true;
 		}

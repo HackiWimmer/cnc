@@ -11,6 +11,8 @@ CncGamepadControllerState::CncGamepadControllerState(MainFrame* parent)
 , running(false)
 , xyNavigationActive(false)
 , zNavigationActive(false)
+, serviceShortName("Ds3Service")
+, serviceLongName("SCP DSx Service")
 ///////////////////////////////////////////////////////////////////
 {
 }
@@ -279,11 +281,11 @@ void CncGamepadControllerState::executeCommand(const wxString& cmd) {
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::startGamepadService(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_gamepadServiceTrace->AppendText(wxString::Format("%s\n", "Try to start the service . . ."));
+	m_gamepadServiceTrace->AppendText(wxString::Format("Try to start the service [ %s(\"%s\") ] . . . \n", serviceLongName, serviceShortName));
 	
-	//services.msc
 	#ifdef __WXMSW__
-		executeCommand("net start Ds3Service");
+		if ( false )	executeCommand("net start Ds3Service"); // only with admin rights possible
+		else			executeCommand("cmd /C services.msc");
 	#else
 		m_gamepadServiceTrace->AppendText("Start Gamepad Service isn't supported");
 	#endif
@@ -291,10 +293,11 @@ void CncGamepadControllerState::startGamepadService(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::stopGamepadService(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_gamepadServiceTrace->AppendText(wxString::Format("%s\n", "Try to stop the service . . ."));
+	m_gamepadServiceTrace->AppendText(wxString::Format("Try to stop the service  [ %s(\"%s\") ] . . . \n", serviceLongName, serviceShortName));
 	
 	#ifdef __WXMSW__
-		executeCommand("net stop Ds3Service");
+		if ( false )	executeCommand("net stop Ds3Service");  // only with admin rights possible
+		else			executeCommand("cmd /C services.msc");
 	#else
 		m_gamepadServiceTrace->AppendText("Stop Gamepad Service isn't supported");
 	#endif
@@ -302,7 +305,7 @@ void CncGamepadControllerState::stopGamepadService(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::queryGamepadService(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_gamepadServiceTrace->AppendText(wxString::Format("%s\n", "Query the service state . . ."));
+	m_gamepadServiceTrace->AppendText(wxString::Format("Query the service [ %s(\"%s\") ] . . . \n", serviceLongName, serviceShortName));
 	
 	#ifdef __WXMSW__
 		executeCommand("sc query Ds3Service");

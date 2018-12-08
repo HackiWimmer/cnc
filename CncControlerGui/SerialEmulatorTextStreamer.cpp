@@ -249,6 +249,11 @@ void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::EndRun& t
 	out.close();
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::NextPath& tr) {
+///////////////////////////////////////////////////////////////////
+	initializePath(tr);
+}
+///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::initializeFile(const Serial::Trigger::BeginRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	headerStream << "<File>\n";
@@ -256,6 +261,11 @@ void SerialEmulatorTextStreamer::initializeFile(const Serial::Trigger::BeginRun&
 	CncDoublePosition dPos;
 	GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 	startPos.set(dPos);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::initializePath(const Serial::Trigger::NextPath& tr) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent1 << wxString::Format("<Next Path />\n");
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::finalizeFile(const Serial::Trigger::EndRun& tr) {

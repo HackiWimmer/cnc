@@ -17,12 +17,13 @@ void CncOutboundEditor::clearContent() {
 ///////////////////////////////////////////////////////////////////
 	setupTextStyle();
 	
-	SetReadOnly(false);
+	Enable(true);
+	
 	ClearAll();
 	AppendText("<\n\tCurrently no serial outbound content available\n");
 	AppendText("/>\n");
 	
-	SetReadOnly(!hasEditMode());
+	Enable(hasEditMode());
 }
 ///////////////////////////////////////////////////////////////////
 const char* CncOutboundEditor::getExtention() {
@@ -32,13 +33,12 @@ const char* CncOutboundEditor::getExtention() {
 ///////////////////////////////////////////////////////////////////
 void CncOutboundEditor::initialize() {
 ///////////////////////////////////////////////////////////////////
-	SetReadOnly(true);
-	
 	flags.handleBreakpoints		= false;
 	flags.handleKeyCommands		= false;
+	
+	svgPopupMenu				= NULL;
 	
 	ctlEditMode					= THE_APP->GetOutboundEditMode();
 	ctlColunmPostion			= THE_APP->GetOutboundPosition();
 	ctlStatus					= THE_APP->GetOutboundEditStatus();
-	
 }

@@ -18,6 +18,9 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		bool xyNavigationActive;
 		bool zNavigationActive;
 		
+		wxString serviceShortName;
+		wxString serviceLongName;
+		
 		inline bool isRefPosDlgMode();
 		
 		inline void processTrace(const GamepadEvent& state);
@@ -38,7 +41,7 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		void update(const GamepadEvent& state);
 
 	protected:
-    virtual void clearGamepadServiceTrace(wxCommandEvent& event);
+		virtual void clearGamepadServiceTrace(wxCommandEvent& event);
 		void executeCommand(const wxString& cmd);
 		
 		virtual void queryGamepadService(wxCommandEvent& event);

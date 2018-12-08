@@ -386,6 +386,7 @@ class CncControl {
 		void setSpyMode(Serial::SypMode sm)								{ getSerial()->setSpyMode(sm); }
 		void processTrigger(const Serial::Trigger::BeginRun& tr)		{ getSerial()->processTrigger(tr); }
 		void processTrigger(const Serial::Trigger::EndRun& tr)			{ getSerial()->processTrigger(tr); }
+		void processTrigger(const Serial::Trigger::NextPath& tr)		{ getSerial()->processTrigger(tr); }
 
 		// 3D control
 		void updatePreview3D(bool force=false);

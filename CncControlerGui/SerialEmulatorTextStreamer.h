@@ -58,6 +58,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		
 		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
 		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
+		virtual void initializePath(const Serial::Trigger::NextPath& tr);
 		
 		virtual const wxString& formatPosition(const int32_t value)          const;
 		virtual const wxString& formatPosition(const double value)           const;
@@ -84,6 +85,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		// trigger
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr);
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr);
+		virtual void processTrigger(const Serial::Trigger::NextPath& tr);
 };
 
 #endif

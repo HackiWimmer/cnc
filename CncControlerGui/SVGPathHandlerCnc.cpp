@@ -144,6 +144,9 @@ bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 	
 	// Z depth management
 	wxASSERT(cncControl);
+	Serial::Trigger::NextPath tr;
+	cncControl->processTrigger(tr);
+	
 	CncConfig* cc = CncConfig::getGlobalCncConfig();
 	double zDepth = -currentCncParameters.getCurrentZDepth();
 	

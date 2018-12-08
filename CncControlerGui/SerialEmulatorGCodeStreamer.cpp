@@ -32,7 +32,7 @@ bool SerialEmulatorGCodeStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
 	wxString G("G1 ");
 	if ( mi.speedMode == CncSpeedRapid )
-		G.assign("\nG0 ");
+		G.assign("G0 ");
 		
 	bodyStream << G;
 
@@ -84,5 +84,10 @@ void SerialEmulatorGCodeStreamer::finalizeFile(const Serial::Trigger::EndRun& tr
 	footerStream << "(<Spooling end)\n";
 	footerStream << "M2\n";
 	footerStream << "(<File end>)\n";
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorGCodeStreamer::initializePath(const Serial::Trigger::NextPath& tr) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << "\n(<Next Path>)\n";
 }
 

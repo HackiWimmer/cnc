@@ -40,6 +40,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 ///////////////////////////////////////////////////////////////////
 {
 	setupStyle();
+	Enable(hasEditMode());
 }
 ///////////////////////////////////////////////////////////////////
 CncBaseEditor::~CncBaseEditor() {
@@ -110,12 +111,8 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 	if ( flags.handleKeyCommands == false )
 		return;
 	
-	// update tab label
-	wxString name(THE_APP->GetTemplateNotebook()->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
-	if ( name.StartsWith("*") == false ) {
-		name.Prepend("*");
-		THE_APP->GetTemplateNotebook()->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
-	}
+	// update tab label - on demand
+	decorateParentTabName(true);
 	
 	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
 	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
@@ -279,7 +276,18 @@ bool CncBaseEditor::Enable(bool enable) {
 	
 	}
 	
-	getCtlEditMode()->SetLabel( IsEditable() ? "Edit mode" : "Read only");
+	if ( getCtlEditMode() != NULL ) {
+		if ( IsEditable() == true ) {
+			getCtlEditMode()->SetForegroundColour(wxColour(0, 0, 0));
+			getCtlEditMode()->SetLabel("Editable  ");
+		} else {
+			getCtlEditMode()->SetForegroundColour(wxColour(255, 64, 64));
+			getCtlEditMode()->SetLabel("Read only ");
+		}
+	}
+	
+	setupStyle();
+	
 	return IsEditable();
 }
 ///////////////////////////////////////////////////////////////////
@@ -406,7 +414,8 @@ void CncBaseEditor::setupDefaultStyle() {
 	
 	// setup black background as default
 	for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++) {
-		StyleSetBackground (i, styles.clDefaultBck);
+		if ( IsEditable() == true )	StyleSetBackground (i, styles.clDefaultBck);
+		else						StyleSetBackground (i, styles.clDisabledBck);
 	}
 	
 	// setup gray foreground as default
@@ -446,7 +455,6 @@ void CncBaseEditor::setupDefaultStyle() {
 	StyleSetBackground(wxSTC_STYLE_LINENUMBER, 	wxColour(73, 73, 73));
 	SetTabWidth(4);
 	SetWrapMode(wxSTC_WRAP_NONE);
-	SetReadOnly(!hasEditMode());
 	
 	// Enable line numbers
 	SetMarginWidth(MARGIN_LINE_NUMBERS, 		35);
@@ -594,15 +602,13 @@ void CncBaseEditor::setupBinaryStyle() {
 	
 	SetKeyWords(0, "cnc size");
 	SetKeyWords(1, "int exec");
-	
-	SetReadOnly(true);
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::clearContent() {
 ///////////////////////////////////////////////////////////////////
-	SetReadOnly(false);
+	Enable(true);
 	ClearAll();
-	SetReadOnly(!hasEditMode());
+	Enable(hasEditMode());
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::prepareNewTemplateFile(TemplateFormat tf) {
@@ -693,6 +699,7 @@ bool CncBaseEditor::openFile(const wxString& fileName) {
 		setupModelType();
 		setupStyle();
 		DiscardEdits();
+		decorateParentTabName(false);
 		EmptyUndoBuffer();
 		
 		return true;
@@ -709,12 +716,13 @@ bool CncBaseEditor::openFile(const wxString& fileName) {
 bool CncBaseEditor::openTextFile() {
 ///////////////////////////////////////////////////////////////////
 	#define RETURN(val) \
-		SetReadOnly(!hasEditMode()); \
+		Enable(hasEditMode()); \
 		fileLoadingActive = false; \
 		return(val);
 	
 	fileLoadingActive = true;
 	
+	//Enable(true);
 	SetReadOnly(false);
 	
 	if ( LoadFile(fileInfo.fileName.GetFullPath()) == true ) 
@@ -731,12 +739,13 @@ bool CncBaseEditor::openTextFile() {
 bool CncBaseEditor::openBinaryFile() {
 ///////////////////////////////////////////////////////////////////
 	#define RETURN(val) \
-		SetReadOnly(!hasEditMode()); \
+		Enable(hasEditMode()); \
 		fileLoadingActive = false; \
 		return(val);
 
 	fileLoadingActive = true;
 	
+	//Enable(true);
 	SetReadOnly(false);
 	ClearAll();
 	
@@ -761,4 +770,47 @@ bool CncBaseEditor::openBinaryFile() {
 
 	RETURN(true);
 	#undef RETURN
+}
+///////////////////////////////////////////////////////////////////
+bool CncBaseEditor::save() {
+///////////////////////////////////////////////////////////////////
+	if ( hasEditMode() == false )
+		return false;
+
+	bool ret = false;
+	switch ( fileInfo.format ) {
+		case TplSvg:		
+		case TplGcode:		ret = SaveFile(fileInfo.fileName.GetFullPath()); 
+							break;
+							
+		default: 			ret = false;
+	}
+	
+	cnc::trc.logInfo(wxString::Format("File '%s' saved . . . ", fileInfo.fileName.GetFullPath()));
+	decorateParentTabName(false);
+	DiscardEdits();
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool CncBaseEditor::saveFile() {
+///////////////////////////////////////////////////////////////////
+	if ( IsModified() == false ) {
+		cnc::trc.logInfo(wxString::Format("Nothing to do. File '%s' is unchanged. . . ", fileInfo.fileName.GetFullPath()));
+		return true;
+	}
+		
+	return save();
+}
+///////////////////////////////////////////////////////////////////
+bool CncBaseEditor::saveFileAs(const wxString& fileName) {
+///////////////////////////////////////////////////////////////////
+	wxFileName fn(fileName);
+	if ( fn.DirExists() == false ) {
+		cnc::trc.logError(wxString::Format("Invalid directory for: '%s'", fileInfo.fileName.GetFullPath()));
+		return false;
+	}
+	
+	fileInfo.fileName.Assign(fileName);
+	return save();
 }

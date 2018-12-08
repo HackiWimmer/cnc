@@ -42,6 +42,7 @@ class CncReferencePosition;
 class GL3DOptionPane;
 class GL3DDrawPane;
 class CncMonitorVSplitterWindow;
+class CncTemplateObserver;
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -54,7 +55,23 @@ class CncMonitorVSplitterWindow;
 
 ////////////////////////////////////////////////////////////////////
 // global definitions
-typedef std::vector<wxWindow*> GuiControls;
+namespace CncApp {
+	
+	struct WindowInfo {
+		bool 		lastEnableState = true;
+		wxWindow* 	ctrl			= NULL;
+	};
+	typedef std::vector<WindowInfo> GuiControls;
+	
+	struct MenuInfo {
+		bool 		lastEnableState = true;
+		wxMenuItem* item			= NULL;
+	};
+	
+	typedef std::vector<MenuInfo> MenuItems;
+};
+
+
 class MainFrame;
 
 class GlobalConfigManager {
@@ -89,6 +106,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void selectMetricUnitFrom(wxCommandEvent& event);
+		virtual void selectMetricUnitFromValue(wxCommandEvent& event);
+		virtual void selectMetricUnitTo(wxCommandEvent& event);
 		virtual void toggleMotionMonitorOptionPlane(wxCommandEvent& event);
 		virtual void motionMonitorBoundBox(wxCommandEvent& event);
 		virtual void motionMonitorHelpLines(wxCommandEvent& event);
@@ -422,7 +442,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void umPostEvent(const UpdateManagerThread::Event& evt);
 		
 		//////////////////////////////////////////////////////////////////////////////////
-		void selectMainBookSourcePanel();
+		void selectMainBookSourcePanel(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
 		void selectMainBookPreviewPanel();
 		void selectMainBookSetupPanel();
 		void selectMainBookReferencePanel();
@@ -501,6 +521,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initSpeedConfigPlayground();
 		void updateSpeedConfigPlayground();
 		
+		void enableSourceEditorMenuItems(bool enable);
+		
 		friend class CncBaseEditor;
 		friend class CncSourceEditor;
 		friend class CncOutboundEditor;
@@ -514,6 +536,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class GamepadThread;
 		friend class CncPerspective;
 		friend class CncFileView;
+		friend class CncTemplateObserver;
 		
 	private:
 		// Member variables
@@ -532,25 +555,27 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxString defaultPortName;
 	
 		CncControl* cnc;
-		CncSourceEditor* sourceEditor;
-		CncOutboundEditor* outboundEditor;
-		CncMotionMonitor* motionMonitor;
-		CncSpyControl* serialSpy;
-		CncFileView* fileView;
-		CncFilePreview* mainFilePreview;
-		CncFilePreview* outboundFilePreview;
-		CncFilePreview* monitorFilePreview;
-		CncToolMagazine* toolMagaizne;
-		CncPosSpyListCtrl* positionSpy;
-		CncSetterListCtrl* setterList;
-		CncStatisticSummaryListCtrl* statisticSummaryListCtrl;
-		CncVectiesListCtrl* vectiesListCtrl;
-		CncSummaryListCtrl* cncSummaryListCtrl;
-		CfgAccelerationGraph* accelGraphPanel; 
-		CncGamepadControllerState* cncGamepadState;
-		GL3DOptionPane* optionPane3D;
-		GL3DDrawPane* drawPane3D;
-		CncMonitorVSplitterWindow* cnc3DSplitterWindow;
+		
+		CncSourceEditor* 				sourceEditor;
+		CncOutboundEditor* 				outboundEditor;
+		CncMotionMonitor* 				motionMonitor;
+		CncSpyControl* 					serialSpy;
+		CncFileView* 					fileView;
+		CncFilePreview* 				mainFilePreview;
+		CncFilePreview* 				outboundFilePreview;
+		CncFilePreview* 				monitorFilePreview;
+		CncToolMagazine* 				toolMagaizne;
+		CncPosSpyListCtrl* 				positionSpy;
+		CncSetterListCtrl* 				setterList;
+		CncStatisticSummaryListCtrl* 	statisticSummaryListCtrl;
+		CncVectiesListCtrl* 			vectiesListCtrl;
+		CncSummaryListCtrl* 			cncSummaryListCtrl;
+		CfgAccelerationGraph* 			accelGraphPanel; 
+		CncGamepadControllerState* 		cncGamepadState;
+		GL3DOptionPane* 				optionPane3D;
+		GL3DDrawPane* 					drawPane3D;
+		CncMonitorVSplitterWindow* 		cnc3DSplitterWindow;
+		CncTemplateObserver* 			templateObserver;
 		
 		CncPerspective perspectiveHandler;
 		GuiControlSetup* guiCtlSetup;
@@ -561,10 +586,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		NotebookInfo* outboundNbInfo;
 		NotebookInfo* templateNbInfo;
-
-		LruFileList lruFileList;
 		
-		wxDateTime lastTemplateModification;
+		LruFileList lruFileList;
 		
 		long processLastDuartion;
 		wxDateTime processStartTime;
@@ -580,7 +603,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxTimer perspectiveTimer;
 		wxTimer debugUserNotificationTime;
 		
-		GuiControls	guiControls;
+		CncApp::GuiControls	guiControls;
+		CncApp::MenuItems	menuItems;
 		
 		SecureRun* secureRunDlg;
 		CncReferencePosition* refPositionDlg;
@@ -605,8 +629,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		///////////////////////////////////////////////////////////////
 		// File handling
-		void evaluateTemplateModificationTimeStamp();
-		void introduceCurrentFile();
+		void reloadTemplate(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
+		void introduceCurrentFile(int sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL);
 		
 		void openPreview(CncFilePreview* ctrl, const wxString& fn);
 		void openMainPreview(const wxString& fn);
@@ -628,8 +652,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		bool openFile(int pageToSelect = -1);
 		bool saveFile();
-		bool saveTextFile();
-		bool saveTextFileAs();
+		bool saveFileAs();
 		
 		///////////////////////////////////////////////////////////////
 		// monitoring
@@ -761,9 +784,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void decorateExtTemplatePages(TemplateFormat tf);
 		void prepareAndShowMonitorTemplatePreview(bool force=false);
 		
+		void regiterAllMenuItems(bool initially = false);
 		void registerGuiControl(wxWindow* ctl); 
 		void disableGuiControls();
 		void enableGuiControls(bool state = true);
+		void enableMenuItems(bool state = true);
 		
 		void enableSerialSpy(bool state = true);
 		void disableSerialSpy() { enableSerialSpy(false); }

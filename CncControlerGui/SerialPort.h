@@ -184,6 +184,9 @@ class Serial : public SerialOSD {
 				bool succcess = false;
 			};
 			
+			struct NextPath {
+				
+			};
 		};
 		
 		// SerialSyPort parameter
@@ -386,6 +389,7 @@ class Serial : public SerialOSD {
 		// trigger
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr)	{}
 		virtual void processTrigger(const Serial::Trigger::EndRun& tr)		{}
+		virtual void processTrigger(const Serial::Trigger::NextPath& tr)	{}
 		
 		// position movement counting
 		virtual void resetPositionCounter();

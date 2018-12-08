@@ -22,6 +22,7 @@ class GCodePathHandlerGL : public GCodePathHandlerBase {
 		virtual bool changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value = 0.0);
 		virtual void prepareWorkImpl();
 		virtual void finishWorkImpl();
+		virtual bool initNextPath();
 		
 		virtual void logMeasurementStart() {}
 		virtual void logMeasurementEnd() {}

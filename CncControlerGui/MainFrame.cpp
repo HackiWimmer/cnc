@@ -80,6 +80,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncConnectProgress.h"
 #include "CncSha1Wrapper.h"
 #include "CncMonitorSplitterWindow.h"
+#include "CncTemplateObserver.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
 #include "GlobalStrings.h"
@@ -178,6 +179,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , optionPane3D(NULL)
 , drawPane3D(NULL)
 , cnc3DSplitterWindow(NULL)
+, templateObserver(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
@@ -186,7 +188,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
 , lruFileList(LruFileList(16))
-, lastTemplateModification(wxDateTime::UNow())
 , processLastDuartion(0L)
 , processStartTime(wxDateTime::UNow())
 , processEndTime(wxDateTime::UNow())
@@ -197,6 +198,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , inboundFileParser(NULL)
 , perspectiveTimer(this, wxEVT_PERSPECTIVE_TIMER)
 , debugUserNotificationTime(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
+, guiControls()
+, menuItems()
 , secureRunDlg(new SecureRun(this))
 , refPositionDlg(new CncReferencePosition(this))
 {
@@ -222,6 +225,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	
 	// debugger configuration
 	FileParser::installDebugConfigPage(m_debuggerPropertyManagerGrid);
+	
+	regiterAllMenuItems(true);
 	
 	// bind 
 	this->Bind(wxEVT_CHAR_HOOK, 					&MainFrame::globalKeyDownHook, 				this);
@@ -400,24 +405,92 @@ void MainFrame::setRefPostionState(bool state) {
 	m_statusBar->Update();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::registerGuiControl(wxWindow* ctl) {
-///////////////////////////////////////////////////////////////////
-	if ( ctl == NULL )
-		return;
-		
-	guiControls.push_back(ctl);
-}		
-///////////////////////////////////////////////////////////////////
 void MainFrame::disableGuiControls() {
 ///////////////////////////////////////////////////////////////////
 	enableGuiControls(false);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::regiterAllMenuItems(bool initially) {
+///////////////////////////////////////////////////////////////////
+	std::function<void(wxMenu* menu)> registerItem = [&](wxMenu* menu) {
+		if ( menu == NULL )
+			return;
+			
+		for ( unsigned int i = 0; i < menu->GetMenuItemCount (); i++ ) {
+			wxMenuItem* item = menu->FindItemByPosition(i);
+			if ( item->IsSubMenu() )
+				registerItem(item->GetSubMenu());
+			
+			if ( item->IsSeparator() )
+				continue;
+				
+			std::clog << item->GetItemLabelText() << std::endl;
+			
+			CncApp::MenuInfo mi;
+			mi.item 			= item;
+			mi.lastEnableState 	= initially ? true : item->IsEnabled();
+			
+			menuItems.push_back(mi);
+		}
+	};
+	
+	menuItems.clear();
+	
+	for ( unsigned int m = 0; m < m_menuBar->GetMenuCount(); m++) {
+		wxMenu* menu = m_menuBar->GetMenu(m);
+		registerItem(menu);
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::enableMenuItems(bool state) {
+///////////////////////////////////////////////////////////////////
+	for ( auto it = menuItems.begin(); it != menuItems.end(); ++it ) {
+		CncApp::MenuInfo mi = *it;
+		
+		if ( mi.item == NULL )
+			continue;
+			
+		if ( state == true ) {
+			mi.item->Enable(mi.lastEnableState);
+			
+		} else {
+			mi.lastEnableState = mi.item->IsEnabled();
+			mi.item->Enable(false);
+			
+			*it = mi;
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::registerGuiControl(wxWindow* ctrl) {
+///////////////////////////////////////////////////////////////////
+	if ( ctrl == NULL )
+		return;
+		
+	CncApp::WindowInfo wi;
+	wi.ctrl 			= ctrl;
+	wi.lastEnableState 	= ctrl->IsThisEnabled();
+		
+	guiControls.push_back(wi);
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::enableGuiControls(bool state) {
 ///////////////////////////////////////////////////////////////////
-	for ( GuiControls::iterator it = guiControls.begin(); it != guiControls.end(); ++it ) {
-		if ( (*it) != NULL )
-			(*it)->Enable(state);
+	for ( auto it = guiControls.begin(); it != guiControls.end(); ++it ) {
+		CncApp::WindowInfo wi = *it;
+		
+		if ( wi.ctrl == NULL )
+			continue;
+			
+		if ( state == true ) {
+			wi.ctrl->Enable(wi.lastEnableState);
+			
+		} else {
+			wi.lastEnableState = wi.ctrl->IsThisEnabled();
+			wi.ctrl->Enable(false);
+			
+			*it = wi;
+		}
 	}
 	
 	if ( state == true )
@@ -440,6 +513,10 @@ void MainFrame::installCustControls() {
 	drawPane3D->setMotionMonitor(motionMonitor);
 	optionPane3D->setMotionMonitor(motionMonitor);
 	activate3DPerspectiveButton(m_3D_Perspective1);
+	
+	// Template observer
+	templateObserver = new CncTemplateObserver(this);
+	GblFunc::replaceControl(m_panelTemplateObserverPlaceholder, templateObserver);
 	
 	// Source Editor
 	sourceEditor = new CncSourceEditor(this);
@@ -662,16 +739,46 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	GblFunc::stacktrace(std::cout);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	
+	m_btPathGenerator->Enable(!m_btPathGenerator->IsEnabled());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
+	
+	std::function<void(wxMenu* menu, bool state)> enableX = [&](wxMenu* menu, bool state) {
+		if ( menu == NULL )
+			return;
+			
+		for ( unsigned int i = 0; i < menu->GetMenuItemCount (); i++ ) {
+			wxMenuItem* item = menu->FindItemByPosition(i);
+			if ( item->IsSubMenu() )
+				enableX(item->GetSubMenu(), state);
+			
+			if ( item->IsSeparator() )
+				continue;
+				
+			//item->Enable(enable);
+			std::clog << item->GetItemLabelText() << std::endl;
+			 
+		}
+	};
+	
+	
+	for ( unsigned int m = 0; m < m_menuBar->GetMenuCount(); m++) {
+		wxMenu* menu = m_menuBar->GetMenu(m);
+		std::cout << m_menuBar->GetMenuLabel(m) << std::endl;
+		enableX(menu, true);
+		
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -1458,6 +1565,7 @@ void MainFrame::initialize(void) {
 	wxTextValidator tVal(wxFILTER_NUMERIC);
 	tVal.SetCharIncludes(", ");
 	m_cbUCValueFrom->SetValidator(tVal);
+	m_metricValueFrom->SetValidator(tVal);
 	
 	if ( CncConfig::getGlobalCncConfig()->getShowTestMenuFlag() == false )
 		m_menuBar->Remove(m_menuBar->FindMenu("Test"));
@@ -1987,6 +2095,9 @@ void MainFrame::enableControls(bool state) {
 	// set global state
 	canClose = state;
 	
+	// enable menu bar
+	enableMenuItems(state);
+	
 	// enable all relevant controls
 	enableGuiControls(state);
 	
@@ -1994,9 +2105,16 @@ void MainFrame::enableControls(bool state) {
 	enableTestControls(state);
 
 	// enable menu bar
+	#warning
+	/*
 	for (unsigned int i=0; i<m_menuBar->GetMenuCount(); i++) {
 		m_menuBar->EnableTop(i, state);
 	}
+	*/
+	// do this here to cover all dynamically 
+	// created or removed menu items
+	//regiterAllMenuItems();
+	
 	
 	// run control
 	enableRunControls(state);
@@ -2326,12 +2444,12 @@ void MainFrame::selectEditorToolBox(bool fileLoaded) {
 	sizer->Layout();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::openFile(int pageToSelect) {
+bool MainFrame::openFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 	// First select the template page to get the rigth result 
 	// from getCurrentTemplateFormat
-	selectMainBookSourcePanel();
-
+	selectMainBookSourcePanel(sourcePageToSelect);
+	
 	bool ret = false;
 	switch ( getCurrentTemplateFormat() ) {
 		
@@ -2353,7 +2471,6 @@ bool MainFrame::openFile(int pageToSelect) {
 	
 	if ( ret == true ) {
 		decorateExtTemplatePages(getCurrentTemplateFormat());
-		evaluateTemplateModificationTimeStamp();
 		outboundFilePreview->selectEmptyPreview();
 		
 		if ( inboundFileParser != NULL )
@@ -2361,7 +2478,7 @@ bool MainFrame::openFile(int pageToSelect) {
 		
 		clearMotionMonitor();
 		
-		introduceCurrentFile();
+		introduceCurrentFile(sourcePageToSelect);
 	}
 	
 	updateFileContentPosition(0, 0);
@@ -2378,11 +2495,12 @@ void MainFrame::prepareMotionMonitorViewType(const CncDimensions type) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::introduceCurrentFile() {
+void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 	lruFileList.addFile(getCurrentTemplatePathFileName());
 	fileView->selectFileInList(getCurrentTemplatePathFileName());
-	selectMainBookSourcePanel();
+	
+	selectMainBookSourcePanel(sourcePageToSelect);
 	
 	// publish model type
 	const GLContextBase::ModelType mt = sourceEditor->getModelType();
@@ -2467,18 +2585,21 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::reloadTemplate(wxCommandEvent& event) {
+void MainFrame::reloadTemplate(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
-	if ( !openFile() ) {
+	if ( !openFile(sourcePageToSelect) ) {
 		std::cerr << "Error while reloding template: " << getCurrentTemplateFileName().c_str() << std::endl;
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::reloadTemplate(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	reloadTemplate();
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::reloadTemplateFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( !openFile(TemplateBookSelection::VAL::SOURCE_PANEL) ) {
-		std::cerr << "Error while reloding template: " << getCurrentTemplateFileName().c_str() << std::endl;
-	}
+	reloadTemplate();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
@@ -2617,100 +2738,30 @@ void MainFrame::openTemplateSvgExtern(wxCommandEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::evaluateTemplateModificationTimeStamp() {
-///////////////////////////////////////////////////////////////////
-	wxString fn(getCurrentTemplatePathFileName());
-	wxFileName tplFile(fn);
-	
-	if ( tplFile.Exists() == false )
-		return;
-		
-	lastTemplateModification = tplFile.GetModificationTime();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::activateMainWindow(wxActivateEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString fn(getCurrentTemplatePathFileName());
-	wxFileName tplFile(fn);
-	
-	if ( tplFile.Exists() == true ) {
-		wxDateTime dt = tplFile.GetModificationTime();
-		
-		if ( dt != lastTemplateModification ) {
-			cnc::trc << "An externally template change is detected . . . template: " << fn.c_str() << " will be reloaded";
-			if ( !openFile() ) {
-					std::cerr << "MainFrame::activateMainWindow: Error while open file: " << fn.c_str() << std::endl;
-			}
-			prepareAndShowMonitorTemplatePreview(true);
-		}
-	}
-	
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::saveFile() {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT(sourceEditor);
+	
 	// First select the template page to get the rigth result 
 	// by getCurrentTemplateFormat
 	selectMainBookSourcePanel();
 	
-	bool ret = false;
-	switch ( getCurrentTemplateFormat() ) {
-		case TplSvg:
-		case TplGcode:		ret = saveTextFile();
-							break;
-							
-		///default:			std::cerr << "MainFrame::saveFile(): Unknown Type: " << getCurrentTemplateFormat() << std::endl;
-		default:			ret = saveTextFileAs();
-	}
+	// Deactivate observer
+	CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
 	
-	if( ret == true ) {
-		
-		// update tab label
-		wxString name(m_templateNotebook->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
-		if ( name.StartsWith("*") == true ) {
-			name = name.SubString(1, name.length() -1 );
-			m_templateNotebook->SetPageText(TemplateBookSelection::VAL::SOURCE_PANEL, name);
-		}
-		
-		sourceEditor->DiscardEdits();
-		sourceEditor->EmptyUndoBuffer();
-		evaluateTemplateModificationTimeStamp();
+	bool ret = sourceEditor->saveFile();
+	if ( ret == true )
 		prepareAndShowMonitorTemplatePreview(true);
-	}
-		
+	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::saveTextFile() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(m_inputFileName);
-	wxASSERT(sourceEditor);
-	
-	wxTextFile file(getCurrentTemplatePathFileName());
-	if ( !file.Exists() )
-		file.Create();
-		
-	if ( file.Open() ) {
-		file.Clear();
-		
-		for (long i=0; i<sourceEditor->GetNumberOfLines(); i++) {
-			wxString line = sourceEditor->GetLineText(i);
-			file.AddLine(line);
-		}
-		
-		file.Write();
-		file.Close();
-		
-		return true;
-	} else {
-		std::cerr << "Can't save file: " << getCurrentTemplatePathFileName().c_str() << std::endl;
-	}
-	
-	return false;
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::saveTextFileAs() {
+bool MainFrame::saveFileAs() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(m_inputFileName);
 	
@@ -2723,21 +2774,12 @@ bool MainFrame::saveTextFileAs() {
 								
 	if ( saveFileDialog.ShowModal() == wxID_CANCEL ) 
 		return true;
-
-	wxString ov = getCurrentTemplateFileName();
-	wxString oh = getCurrentTemplatePathFileName();
-	
-	m_inputFileName->SetValue(saveFileDialog.GetFilename());
-	m_inputFileName->SetHint(saveFileDialog.GetPath());
-	
-	bool ret = false;
-	if ( !saveFile() ) {
-		m_inputFileName->SetValue(ov);
-		m_inputFileName->SetHint(oh);
-	} else {
-		sourceEditor->DiscardEdits();
+		
+	bool ret = sourceEditor->saveFileAs(saveFileDialog.GetPath());
+	if ( ret == true ) {
+		m_inputFileName->SetValue(saveFileDialog.GetFilename());
+		m_inputFileName->SetHint(saveFileDialog.GetPath());
 		introduceCurrentFile();
-		ret = true;
 	}
 	
 	return ret;
@@ -2755,7 +2797,7 @@ void MainFrame::saveTemplateFromButton(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	saveTextFileAs();
+	saveFileAs();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processVirtualTemplate() {
@@ -3490,6 +3532,9 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	// deactivate idle requests
 	CncTransactionLock ctl(this);
 	
+	// Deactivate observer
+	CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
+	
 	// it's very import to deactivate the notifications during a run
 	// because instead every config change (sc()) will release a notification
 	// this will be the case for example if the SVG path handler changes
@@ -3528,6 +3573,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			ret = processTemplateIntern();
 			
 		}
+		
+		motionMonitor->updateMonitor();
 	}
 	
 	// prepare final statements
@@ -4785,12 +4832,15 @@ void MainFrame::lruListItemSelected(wxListEvent& event) {
 		openMainPreview(wxString(lruFileList.getFileName(info.m_itemId)));
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::selectMainBookSourcePanel() {
+void MainFrame::selectMainBookSourcePanel(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 	m_mainViewSelector->SetSelection(MainBookSelection::VAL::SOURCE_PANEL);
 	m_mainViewBook->SetSelection(MainBookSelection::VAL::SOURCE_PANEL);
 	
-	m_templateNotebook->SetSelection( TemplateBookSelection::VAL::SOURCE_PANEL);
+	if ( sourcePageToSelect < 0 || sourcePageToSelect > (int)(m_templateNotebook->GetPageCount() - 1) )
+		sourcePageToSelect = TemplateBookSelection::VAL::SOURCE_PANEL;
+	
+	m_templateNotebook->SetSelection(sourcePageToSelect);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookPreviewPanel() {
@@ -7475,6 +7525,51 @@ void MainFrame::toggleMotionMonitorOptionPlane(bool forceHide) {
 /////////////////////////////////////////////////////////////////////
 	cnc3DSplitterWindow->toggleRightWindow();
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::selectMetricUnitFrom(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	selectMetricUnitTo(event);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::selectMetricUnitFromValue(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	selectMetricUnitTo(event);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::selectMetricUnitTo(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	const wxString uFrom(m_cbMetricUnitFrom->GetStringSelection());
+	const wxString uTo(m_cbMetricUnitTo->GetStringSelection());
+	
+	const wxString valueFrom(m_metricValueFrom->GetValue());
+	double value;
+	valueFrom.ToDouble(&value);
+	
+	if      ( uFrom == "mm"      && uTo == "mm"     ) 		m_metricValueTo->ChangeValue(valueFrom);
+	else if ( uFrom == "mm"      && uTo == "stepsX" ) 		m_metricValueTo->ChangeValue(wxString::Format("%.6lf", GBL_CONFIG->convertX(CncMetric, CncSteps,  value)));
+	else if ( uFrom == "mm"      && uTo == "stepsY" ) 		m_metricValueTo->ChangeValue(wxString::Format("%.6lf", GBL_CONFIG->convertY(CncMetric, CncSteps,  value)));
+	else if ( uFrom == "mm"      && uTo == "stepsZ" ) 		m_metricValueTo->ChangeValue(wxString::Format("%.6lf", GBL_CONFIG->convertZ(CncMetric, CncSteps,  value)));
+	
+	else if ( uFrom == "stepsX"  && uTo == "stepsX" ) 		m_metricValueTo->ChangeValue(valueFrom);
+	else if ( uFrom == "stepsX"  && uTo == "mm"     ) 		m_metricValueTo->ChangeValue(wxString::Format("%.6lf", GBL_CONFIG->convertX(CncSteps,  CncMetric, value)));
+
+	else if ( uFrom == "stepsY"  && uTo == "stepsY" ) 		m_metricValueTo->ChangeValue(valueFrom);
+	else if ( uFrom == "stepsY"  && uTo == "mm"     ) 		m_metricValueTo->ChangeValue(wxString::Format("%.6lf", GBL_CONFIG->convertY(CncSteps,  CncMetric, value)));
+	
+	else if ( uFrom == "stepsZ"  && uTo == "stepsZ" ) 		m_metricValueTo->ChangeValue(valueFrom);
+	else if ( uFrom == "stepsZ"  && uTo == "mm"     ) 		m_metricValueTo->ChangeValue(wxString::Format("%.6lf", GBL_CONFIG->convertZ(CncSteps,  CncMetric, value)));
+	
+	else													m_metricValueTo->ChangeValue("-");
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::enableSourceEditorMenuItems(bool enable) {
+/////////////////////////////////////////////////////////////////////
+	m_miNewTemplate->Enable(enable);
+	m_miOpenTemplate->Enable(enable);
+	m_miReloadTemplate->Enable(enable);
+	m_miSaveTemplate->Enable(enable);
+	m_miSaveTemplateAs->Enable(enable);
+}
 
 
 
@@ -7486,4 +7581,20 @@ void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 	std::cout << "todo" << std::endl;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

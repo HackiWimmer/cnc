@@ -62,6 +62,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		virtual bool Enable(bool enable = true);
 		virtual void clearContent();
+		virtual void decorateParentTabName(bool changed) {}
 		
 		void gotoBegin();
 		void gotoEnd();
@@ -70,6 +71,8 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		void prepareNewTemplateFile(TemplateFormat tf);
 		bool openFile(const wxString& fileName);
+		bool saveFile();
+		bool saveFileAs(const wxString& fileName);
 		
 		void changeBinaryViewType(const BinaryFileParser::ViewType bvt);
 		
@@ -86,6 +89,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			
 			//define colours
 			wxColour clDefaultBck	= wxColour(0, 0, 0);
+			wxColour clDisabledBck	= wxColour(32, 32, 32);
 			wxColour clDefaultFgd	= wxColour(175, 175, 175);
 			
 			wxColour clCaretBck		= wxColour(64, 64, 64);
@@ -94,8 +98,8 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			wxColour clComment		= wxColour(150, 150, 150);
 			wxColour clIdentifier	= wxColour(135, 206, 250);
 			wxColour clAttribute	= wxColour(128, 139, 237);
-			wxColour clNumber		= wxColour(128,255,128);
-			wxColour clOperator		= wxColour(255,128,128);
+			wxColour clNumber		= wxColour(128, 255, 128);
+			wxColour clOperator		= wxColour(255, 128, 128);
 		};
 		
 		struct Flags {
@@ -130,6 +134,8 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		bool openTextFile();
 		bool openBinaryFile();
+		
+		bool save();
 		
 		void onUpdateFilePosition();
 		

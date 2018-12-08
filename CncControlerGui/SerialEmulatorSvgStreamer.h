@@ -12,6 +12,7 @@ class SerialEmulatorSvgStreamer : public SerialEmulatorTextStreamer
 		
 		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
 		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
+		virtual void initializePath(const Serial::Trigger::NextPath& tr);
 	
 	public:
 	

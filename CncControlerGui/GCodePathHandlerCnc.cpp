@@ -70,3 +70,11 @@ bool GCodePathHandlerCnc::processDwellIntern(int64_t microseconds) {
 	processWait(microseconds);
 	return true;
 }
+//////////////////////////////////////////////////////////////////
+bool GCodePathHandlerCnc::initNextPath() {
+//////////////////////////////////////////////////////////////////
+	Serial::Trigger::NextPath tr;
+	cncControl->processTrigger(tr);
+	
+	return true;
+}

@@ -42,4 +42,9 @@ bool GCodePathHandlerGL::changeCurrentFeedSpeedXYZ(CncSpeedMode sm, double value
 	currentSpeed = sm;
 	return true;
 }
+//////////////////////////////////////////////////////////////////
+bool GCodePathHandlerGL::initNextPath() {
+//////////////////////////////////////////////////////////////////
+	return true;
+}
 

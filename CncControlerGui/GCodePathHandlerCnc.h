@@ -24,6 +24,7 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase {
 		virtual bool processDwellIntern(int64_t microseconds);
 		virtual bool processLinearMove(bool alreadyRendered);
 		virtual bool changeCurrentFeedSpeedXYZ(CncSpeedMode s, double value = 0.0);
+		virtual bool initNextPath();
 		virtual void prepareWorkImpl();
 		virtual void finishWorkImpl();
 		

@@ -191,6 +191,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncTemplateObserver.h"/>
+      <File Name="CncTemplateObserver.cpp"/>
       <File Name="CncPosition.cpp"/>
       <File Name="CncMonitorSplitterWindow.cpp"/>
       <File Name="CncMonitorSplitterWindow.h"/>
@@ -432,6 +434,8 @@
         <IncludePath Value="C:\@Development\boost_1_65_0"/>
         <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="DEBUG"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="-pg;-mwindows;$(shell wx-config --libs)" Required="yes">
         <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
@@ -444,6 +448,7 @@
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
         <Library Value="Xinput9_1_0"/>
+        <Library Value="dbgeng"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -542,6 +547,8 @@
         <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="-mwindows;$(shell wx-config --libs)" Required="yes">
         <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
@@ -554,6 +561,7 @@
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
         <Library Value="Xinput9_1_0"/>
+        <Library Value="dbgeng"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>

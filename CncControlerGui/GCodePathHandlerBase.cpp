@@ -43,6 +43,8 @@ bool GCodePathHandlerBase::processRapidLinearMove(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
+		
+	initNextPath();
 	
 	// change to the maximum configured speed
 	changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedRapid, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());

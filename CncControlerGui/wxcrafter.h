@@ -133,6 +133,8 @@ protected:
     wxStaticLine* m_staticLine4474;
     wxButton* m_btPathGenerator;
     wxNotebook* m_templateNotebook;
+    wxPanel* m_panelTplObserver;
+    wxPanel* m_panelTemplateObserverPlaceholder;
     wxPanel* m_panelTplEdit;
     wxBitmapToggleButton* m_tbCaseSensitive;
     wxBitmapToggleButton* m_tbWholeWord;
@@ -530,8 +532,11 @@ protected:
     wxPanel* m_scrollWinFile;
     wxCheckBox* m_keepFileManagerPreview;
     wxStaticText* m_staticText6018;
-    wxListCtrl* m_lruList;
     wxStaticLine* m_staticLine4345;
+    wxSplitterWindow* m_splitter6478;
+    wxPanel* m_splitterPage6482;
+    wxListCtrl* m_lruList;
+    wxPanel* m_splitterPage6490;
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_scrollWinLogger;
     wxNotebook* m_loggerNotebook;
@@ -618,6 +623,11 @@ protected:
     wxComboBox* m_cbUCUnitTo;
     wxTextCtrl* m_cbUCValueFrom;
     wxTextCtrl* m_cbUCValueTo;
+    wxStaticLine* m_staticLine6549;
+    wxComboBox* m_cbMetricUnitFrom;
+    wxTextCtrl* m_metricValueFrom;
+    wxComboBox* m_cbMetricUnitTo;
+    wxTextCtrl* m_metricValueTo;
     wxButton* m_btUCClose;
     wxPanel* m_serialSpyView;
     wxButton* m_enableSerialSpy;
@@ -933,6 +943,9 @@ protected:
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCChangeFrom(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectMetricUnitFrom(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectMetricUnitFromValue(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectMetricUnitTo(wxCommandEvent& event) { event.Skip(); }
     virtual void closeUnitCalculator(wxCommandEvent& event) { event.Skip(); }
     virtual void leaveSerialSpy(wxMouseEvent& event) { event.Skip(); }
     virtual void leaveSerialSpy(wxMouseCaptureLostEvent& event) { event.Skip(); }
@@ -1061,6 +1074,8 @@ public:
     wxBitmapToggleButton* GetBtSvgToggleWordWrap() { return m_btSvgToggleWordWrap; }
     wxStaticLine* GetStaticLine4474() { return m_staticLine4474; }
     wxButton* GetBtPathGenerator() { return m_btPathGenerator; }
+    wxPanel* GetPanelTemplateObserverPlaceholder() { return m_panelTemplateObserverPlaceholder; }
+    wxPanel* GetPanelTplObserver() { return m_panelTplObserver; }
     wxBitmapToggleButton* GetTbCaseSensitive() { return m_tbCaseSensitive; }
     wxBitmapToggleButton* GetTbWholeWord() { return m_tbWholeWord; }
     wxBitmapToggleButton* GetTbRegEx() { return m_tbRegEx; }
@@ -1458,9 +1473,12 @@ public:
     wxScrolledWindow* GetScrollWinMonitor() { return m_scrollWinMonitor; }
     wxCheckBox* GetKeepFileManagerPreview() { return m_keepFileManagerPreview; }
     wxStaticText* GetStaticText6018() { return m_staticText6018; }
-    wxListCtrl* GetLruList() { return m_lruList; }
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
+    wxListCtrl* GetLruList() { return m_lruList; }
+    wxPanel* GetSplitterPage6482() { return m_splitterPage6482; }
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
+    wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
+    wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
     wxPanel* GetScrollWinFile() { return m_scrollWinFile; }
     wxTextCtrl* GetStartupTrace() { return m_startupTrace; }
     wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
@@ -1546,6 +1564,11 @@ public:
     wxComboBox* GetCbUCUnitTo() { return m_cbUCUnitTo; }
     wxTextCtrl* GetCbUCValueFrom() { return m_cbUCValueFrom; }
     wxTextCtrl* GetCbUCValueTo() { return m_cbUCValueTo; }
+    wxStaticLine* GetStaticLine6549() { return m_staticLine6549; }
+    wxComboBox* GetCbMetricUnitFrom() { return m_cbMetricUnitFrom; }
+    wxTextCtrl* GetMetricValueFrom() { return m_metricValueFrom; }
+    wxComboBox* GetCbMetricUnitTo() { return m_cbMetricUnitTo; }
+    wxTextCtrl* GetMetricValueTo() { return m_metricValueTo; }
     wxButton* GetBtUCClose() { return m_btUCClose; }
     wxPanel* GetSvgUnitCalulator() { return m_svgUnitCalulator; }
     wxButton* GetEnableSerialSpy() { return m_enableSerialSpy; }
@@ -1919,6 +1942,41 @@ public:
     wxButton* GetBtToolMagazineCancle() { return m_btToolMagazineCancle; }
     CncToolMagazineBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncToolMagazineBase();
+};
+
+
+class CncTemplateObserverBase : public wxPanel
+{
+protected:
+    wxStaticText* m_staticText6508;
+    wxCheckBox* m_observationMode;
+    wxStaticText* m_staticText6553;
+    wxRadioBox* m_actionSelection;
+    wxStaticText* m_staticText6521;
+    wxStaticText* m_staticText6527;
+    wxTextCtrl* m_lastTimestamp;
+    wxButton* m_button6532;
+    wxTextCtrl* m_observerTrace;
+    wxTimer* m_observeTimer;
+
+protected:
+    virtual void changeObservationMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearTrace(wxCommandEvent& event) { event.Skip(); }
+    virtual void observe(wxTimerEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText6508() { return m_staticText6508; }
+    wxCheckBox* GetObservationMode() { return m_observationMode; }
+    wxStaticText* GetStaticText6553() { return m_staticText6553; }
+    wxRadioBox* GetActionSelection() { return m_actionSelection; }
+    wxStaticText* GetStaticText6521() { return m_staticText6521; }
+    wxStaticText* GetStaticText6527() { return m_staticText6527; }
+    wxTextCtrl* GetLastTimestamp() { return m_lastTimestamp; }
+    wxButton* GetButton6532() { return m_button6532; }
+    wxTextCtrl* GetObserverTrace() { return m_observerTrace; }
+    wxTimer* GetObserveTimer() { return m_observeTimer; }
+    CncTemplateObserverBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncTemplateObserverBase();
 };
 
 
