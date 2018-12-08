@@ -354,6 +354,9 @@ bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
 	
 	if ( it != ud.attributes.end() ) {
 		
+		#warning - the use transformation didn't work correctly
+		
+		
 		// reset the svg matrix
 		pathHandler->getSvgTransformMatrix().unchanged();
 		

@@ -1906,7 +1906,7 @@ void MainFrame::decorateOutboundEditor(const char* fileName) {
 		          << "'" << std::endl;
 		return;
 	}
-
+	
 	m_simpleBookOutBoundEditor->SetSelection(0);
 	outboundEditor->openFile(fileName);
 	outboundFilePreview->selectPreview(fileName);
@@ -3546,9 +3546,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	Serial::Trigger::EndRun endRun;
 	endRun.succcess = ret;
 	cnc->processTrigger(endRun);
-	
+
 	decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
-	
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -5635,7 +5634,7 @@ void MainFrame::rcRun() {
 	
 	// process
 	processTemplateWrapper();
-
+	
 	// restore the interval
 	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
 }

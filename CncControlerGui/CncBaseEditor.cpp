@@ -714,22 +714,12 @@ bool CncBaseEditor::openTextFile() {
 		return(val);
 	
 	fileLoadingActive = true;
-	wxFileInputStream input(fileInfo.fileName.GetFullPath());
-	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
 	
-	if ( input.IsOk() ) {
-		SetReadOnly(false);
-		ClearAll();
-		
-		while( input.IsOk() && !input.Eof() ) {
-			wxString line=text.ReadLine();
-			AppendText(line);
-			AppendText(_T("\r\n"));
-		}
-		
+	SetReadOnly(false);
+	
+	if ( LoadFile(fileInfo.fileName.GetFullPath()) == true ) 
 		RETURN(true);
-	}
-	
+		
 	std::cerr << "CncBaseEditor::openTextFile(): Error while open file: '" 
 	          << fileInfo.fileName.GetFullPath()
 	          << "'" << std::endl;
