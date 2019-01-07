@@ -22,6 +22,9 @@ UnitTests/Debug/**
 GameController/Release/**
 GameController/Debug/**
 
+NavigatorPanel/Release/**
+NavigatorPanel/Debug/**
+
 #*.exe
 #*.txt
 #*.bat

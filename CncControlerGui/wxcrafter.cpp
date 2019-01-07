@@ -261,6 +261,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer706->AddGrowableCol(1);
     flexGridSizer706->AddGrowableRow(0);
     m_mainBookSourcePanel->SetSizer(flexGridSizer706);
+	
     
     wxFlexGridSizer* flexGridSizer1368 = new wxFlexGridSizer(0, 1, 0, 0);
     flexGridSizer1368->SetFlexibleDirection( wxBOTH );
@@ -9895,30 +9896,30 @@ SecureRunBase::SecureRunBase(wxWindow* parent, wxWindowID id, const wxString& ti
         bBitmapLoaded = true;
     }
     
-    m_startupTimer = new wxTimer;
-    m_startupTimer->Start(100, false);
+    wxFlexGridSizer* flexGridSizer6563 = new wxFlexGridSizer(4, 1, 0, 0);
+    flexGridSizer6563->SetFlexibleDirection( wxBOTH );
+    flexGridSizer6563->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer6563->AddGrowableCol(3);
+    flexGridSizer6563->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer6563);
     
-    m_blinkTimer = new wxTimer;
-    m_blinkTimer->Start(750, false);
+    wxFlexGridSizer* flexGridSizer6578 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer6578->SetFlexibleDirection( wxBOTH );
+    flexGridSizer6578->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    wxBoxSizer* boxSizer5282 = new wxBoxSizer(wxVERTICAL);
-    this->SetSizer(boxSizer5282);
-    
-    wxBoxSizer* boxSizer5289 = new wxBoxSizer(wxVERTICAL);
-    
-    boxSizer5282->Add(boxSizer5289, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer6563->Add(flexGridSizer6578, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_header = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(460,16)), wxTAB_TRAVERSAL);
     m_header->SetBackgroundColour(wxColour(wxT("rgb(0,0,255)")));
     
-    boxSizer5289->Add(m_header, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer6578->Add(m_header, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     m_header->SetMinSize(wxSize(460,16));
     
     wxFlexGridSizer* flexGridSizer5294 = new wxFlexGridSizer(1, 11, 0, 0);
     flexGridSizer5294->SetFlexibleDirection( wxBOTH );
     flexGridSizer5294->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
-    boxSizer5282->Add(flexGridSizer5294, 1, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    flexGridSizer6563->Add(flexGridSizer5294, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_staticLine527312 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL|wxLI_HORIZONTAL);
     
@@ -9985,6 +9986,88 @@ SecureRunBase::SecureRunBase(wxWindow* parent, wxWindowID id, const wxString& ti
     
     flexGridSizer5294->Add(m_staticLine5273, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
+    m_staticLine6571 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer6563->Add(m_staticLine6571, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    wxFlexGridSizer* flexGridSizer6558 = new wxFlexGridSizer(1, 20, 0, 0);
+    flexGridSizer6558->SetFlexibleDirection( wxBOTH );
+    flexGridSizer6558->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer6558->AddGrowableCol(9);
+    flexGridSizer6558->AddGrowableRow(0);
+    
+    flexGridSizer6563->Add(flexGridSizer6558, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btViewTop = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewUp")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewTop->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewTop, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewTop->SetMinSize(wxSize(26,26));
+    
+    m_btViewBottom = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewDown")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewBottom->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewBottom, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewBottom->SetMinSize(wxSize(26,26));
+    
+    m_btViewFront = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewFront")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewFront->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewFront, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewFront->SetMinSize(wxSize(26,26));
+    
+    m_btViewRear = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewButtom")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewRear->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewRear, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewRear->SetMinSize(wxSize(26,26));
+    
+    m_btViewLeft = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewLeft")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewLeft->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewLeft, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewLeft->SetMinSize(wxSize(26,26));
+    
+    m_btViewRight = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewRight")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewRight->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewRight, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewRight->SetMinSize(wxSize(26,26));
+    
+    m_btViewIso1 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewIso1")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewIso1->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewIso1, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewIso1->SetMinSize(wxSize(26,26));
+    
+    m_btViewIso2 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewIso2")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewIso2->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewIso2, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewIso2->SetMinSize(wxSize(26,26));
+    
+    m_btViewIso3 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewIso3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewIso3->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewIso3, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewIso3->SetMinSize(wxSize(26,26));
+    
+    m_btViewIso4 = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("ViewIso4")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(26,26)), 0);
+    m_btViewIso4->SetValue(false);
+    
+    flexGridSizer6558->Add(m_btViewIso4, 0, wxALL, WXC_FROM_DIP(1));
+    m_btViewIso4->SetMinSize(wxSize(26,26));
+    
+    m_slider6573 = new wxSlider(this, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxSL_HORIZONTAL);
+    
+    flexGridSizer6558->Add(m_slider6573, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_startupTimer = new wxTimer;
+    m_startupTimer->Start(100, false);
+    
+    m_blinkTimer = new wxTimer;
+    m_blinkTimer->Start(750, false);
+    
     SetName(wxT("SecureRunBase"));
     SetSize(-1,-1);
     if (GetSizer()) {
@@ -9998,11 +10081,21 @@ SecureRunBase::SecureRunBase(wxWindow* parent, wxWindowID id, const wxString& ti
     // Connect events
     this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(SecureRunBase::initDialog), NULL, this);
     this->Connect(wxEVT_SHOW, wxShowEventHandler(SecureRunBase::show), NULL, this);
-    m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::startupTimer), NULL, this);
-    m_blinkTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::blinkTimer), NULL, this);
     m_btPlay->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::play), NULL, this);
     m_btStop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
     m_btEmergengy->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::emergengy), NULL, this);
+    m_btViewTop->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewBottom->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewFront->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewRear->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewLeft->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewRight->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso1->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso3->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso4->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::startupTimer), NULL, this);
+    m_blinkTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::blinkTimer), NULL, this);
     
 }
 
@@ -10010,11 +10103,21 @@ SecureRunBase::~SecureRunBase()
 {
     this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(SecureRunBase::initDialog), NULL, this);
     this->Disconnect(wxEVT_SHOW, wxShowEventHandler(SecureRunBase::show), NULL, this);
-    m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::startupTimer), NULL, this);
-    m_blinkTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::blinkTimer), NULL, this);
     m_btPlay->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::play), NULL, this);
     m_btStop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::stop), NULL, this);
     m_btEmergengy->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::emergengy), NULL, this);
+    m_btViewTop->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewBottom->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewFront->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewRear->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewLeft->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewRight->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso1->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso3->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_btViewIso4->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(SecureRunBase::changeView), NULL, this);
+    m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::startupTimer), NULL, this);
+    m_blinkTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(SecureRunBase::blinkTimer), NULL, this);
     
     m_startupTimer->Stop();
     wxDELETE( m_startupTimer );

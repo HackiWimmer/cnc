@@ -14244,13 +14244,24 @@ Thickness</label>
     <title>Secure Run</title>
     <centered>1</centered>
     <style>wxSTAY_ON_TOP</style>
-    <object class="wxBoxSizer">
-      <orient>wxVERTICAL</orient>
-      <object class="sizeritem" name="boxSizer5289">
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>4</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>3</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem" name="flexGridSizer6578">
         <flag>wxALL|wxEXPAND</flag>
-        <border>1</border>
-        <object class="wxBoxSizer">
-          <orient>wxVERTICAL</orient>
+        <border>5</border>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols/>
+          <growablerows/>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
             <border>1</border>
@@ -14265,7 +14276,7 @@ Thickness</label>
       </object>
       <object class="sizeritem" name="flexGridSizer5294">
         <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
+        <border>1</border>
         <option>1</option>
         <object class="wxFlexGridSizer">
           <cols>11</cols>
@@ -14396,6 +14407,146 @@ Panel</label>
             <border>5</border>
             <object class="wxStaticLine" name="m_staticLine5273">
               <style>wxLI_VERTICAL|wxLI_HORIZONTAL</style>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>2</border>
+        <object class="wxStaticLine" name="m_staticLine6571">
+          <style>wxLI_HORIZONTAL</style>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer6558">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>1</border>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>20</cols>
+          <rows>1</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>9</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewTop">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewUp.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewBottom">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewDown.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewFront">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewFront.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewRear">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewButtom.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewLeft">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewLeft.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewRight">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewRight.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewIso1">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewIso1.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewIso2">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewIso2.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewIso3">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewIso3.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btViewIso4">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/ViewIso4.png</bitmap>
+              <checked>0</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>1</border>
+            <object class="wxSlider" name="m_slider6573">
+              <style>wxSL_HORIZONTAL</style>
+              <min>0</min>
+              <max>100</max>
+              <value>50</value>
             </object>
           </object>
         </object>

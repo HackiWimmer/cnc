@@ -113,6 +113,8 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 		GLContextOptions& getContextOptions() 				{ return monitor->getOptions(); }
 		
+		GLContextBase::ViewMode getViewMode() 				{ return monitor->getViewMode(); }
+		
 		// client id
 		long getCurrentClientId() 			{ return currentClientID; }
 		void setCurrentClientId(long id) 	{ currentClientID = id; monitor->setCurrentClientId(id); }

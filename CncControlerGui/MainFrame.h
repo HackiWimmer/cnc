@@ -43,6 +43,7 @@ class GL3DOptionPane;
 class GL3DDrawPane;
 class CncMonitorVSplitterWindow;
 class CncTemplateObserver;
+class SecureRun;
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -503,7 +504,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		GamepadThread* gamepadThread;
 		wxCriticalSection pGamepadThreadCS;
 		
-		CncControl* getCncControl() { return cnc; }
+		CncMotionMonitor* getMotionMonitor() 	{ return motionMonitor; }
+		CncControl* getCncControl() 			{ return cnc; }
 		
 		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		void manualContinuousMoveStop();
@@ -537,6 +539,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncPerspective;
 		friend class CncFileView;
 		friend class CncTemplateObserver;
+		friend class SecureRun;
 		
 	private:
 		// Member variables

@@ -2412,8 +2412,6 @@ public:
 class SecureRunBase : public wxDialog
 {
 protected:
-    wxTimer* m_startupTimer;
-    wxTimer* m_blinkTimer;
     wxPanel* m_header;
     wxStaticLine* m_staticLine527312;
     wxStaticText* m_staticText5271;
@@ -2423,19 +2421,32 @@ protected:
     wxStaticLine* m_staticLine52733;
     wxButton* m_btEmergengy;
     wxStaticLine* m_staticLine5273;
+    wxStaticLine* m_staticLine6571;
+    wxBitmapToggleButton* m_btViewTop;
+    wxBitmapToggleButton* m_btViewBottom;
+    wxBitmapToggleButton* m_btViewFront;
+    wxBitmapToggleButton* m_btViewRear;
+    wxBitmapToggleButton* m_btViewLeft;
+    wxBitmapToggleButton* m_btViewRight;
+    wxBitmapToggleButton* m_btViewIso1;
+    wxBitmapToggleButton* m_btViewIso2;
+    wxBitmapToggleButton* m_btViewIso3;
+    wxBitmapToggleButton* m_btViewIso4;
+    wxSlider* m_slider6573;
+    wxTimer* m_startupTimer;
+    wxTimer* m_blinkTimer;
 
 protected:
     virtual void initDialog(wxInitDialogEvent& event) { event.Skip(); }
     virtual void show(wxShowEvent& event) { event.Skip(); }
-    virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
-    virtual void blinkTimer(wxTimerEvent& event) { event.Skip(); }
     virtual void play(wxCommandEvent& event) { event.Skip(); }
     virtual void stop(wxCommandEvent& event) { event.Skip(); }
     virtual void emergengy(wxCommandEvent& event) { event.Skip(); }
+    virtual void changeView(wxCommandEvent& event) { event.Skip(); }
+    virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void blinkTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
-    wxTimer* GetStartupTimer() { return m_startupTimer; }
-    wxTimer* GetBlinkTimer() { return m_blinkTimer; }
     wxPanel* GetHeader() { return m_header; }
     wxStaticLine* GetStaticLine527312() { return m_staticLine527312; }
     wxStaticText* GetStaticText5271() { return m_staticText5271; }
@@ -2445,6 +2456,20 @@ public:
     wxStaticLine* GetStaticLine52733() { return m_staticLine52733; }
     wxButton* GetBtEmergengy() { return m_btEmergengy; }
     wxStaticLine* GetStaticLine5273() { return m_staticLine5273; }
+    wxStaticLine* GetStaticLine6571() { return m_staticLine6571; }
+    wxBitmapToggleButton* GetBtViewTop() { return m_btViewTop; }
+    wxBitmapToggleButton* GetBtViewBottom() { return m_btViewBottom; }
+    wxBitmapToggleButton* GetBtViewFront() { return m_btViewFront; }
+    wxBitmapToggleButton* GetBtViewRear() { return m_btViewRear; }
+    wxBitmapToggleButton* GetBtViewLeft() { return m_btViewLeft; }
+    wxBitmapToggleButton* GetBtViewRight() { return m_btViewRight; }
+    wxBitmapToggleButton* GetBtViewIso1() { return m_btViewIso1; }
+    wxBitmapToggleButton* GetBtViewIso2() { return m_btViewIso2; }
+    wxBitmapToggleButton* GetBtViewIso3() { return m_btViewIso3; }
+    wxBitmapToggleButton* GetBtViewIso4() { return m_btViewIso4; }
+    wxSlider* GetSlider6573() { return m_slider6573; }
+    wxTimer* GetStartupTimer() { return m_startupTimer; }
+    wxTimer* GetBlinkTimer() { return m_blinkTimer; }
     SecureRunBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Secure Run"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP);
     virtual ~SecureRunBase();
 };

@@ -12,6 +12,7 @@ class SecureRun : public SecureRunBase
 		void enableControls(bool state);
 		
 	protected:
+		virtual void changeView(wxCommandEvent& event);
 		virtual void blinkTimer(wxTimerEvent& event);
 		virtual void startupTimer(wxTimerEvent& event);
 		
@@ -29,5 +30,7 @@ class SecureRun : public SecureRunBase
 		bool       headerFlag;
 		
 		void hideDialog(int retValue);
+		void resetPerspectiveButtons();
 };
+
 #endif // SECURERUN_H
