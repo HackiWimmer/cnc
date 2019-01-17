@@ -35,6 +35,14 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     
     boxSizer1->Add(flexGridSizer12, 1, wxEXPAND, WXC_FROM_DIP(5));
     
+    m_notebook30 = new wxNotebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_notebook30->SetName(wxT("m_notebook30"));
+    
+    flexGridSizer12->Add(m_notebook30, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_panel32 = new wxPanel(m_notebook30, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebook30, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_notebook30->AddPage(m_panel32, _("Nav Panel"), false);
+    
     wxFlexGridSizer* flexGridSizer25 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer25->SetFlexibleDirection( wxBOTH );
     flexGridSizer25->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
@@ -42,23 +50,37 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     flexGridSizer25->AddGrowableCol(1);
     flexGridSizer25->AddGrowableCol(2);
     flexGridSizer25->AddGrowableRow(0);
+    m_panel32->SetSizer(flexGridSizer25);
     
-    flexGridSizer12->Add(flexGridSizer25, 1, wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_mainPanel1 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxBORDER_STATIC);
+    m_mainPanel1 = new wxPanel(m_panel32, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel32, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxBORDER_STATIC);
     m_mainPanel1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
     flexGridSizer25->Add(m_mainPanel1, 0, wxEXPAND, WXC_FROM_DIP(3));
     
-    m_mainPanel2 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxBORDER_STATIC);
+    m_mainPanel2 = new wxPanel(m_panel32, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel32, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxBORDER_STATIC);
     m_mainPanel2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
     flexGridSizer25->Add(m_mainPanel2, 0, wxEXPAND, WXC_FROM_DIP(3));
     
-    m_mainPanel3 = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxBORDER_STATIC);
+    m_mainPanel3 = new wxPanel(m_panel32, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel32, wxSize(-1,-1)), wxTAB_TRAVERSAL|wxBORDER_STATIC);
     m_mainPanel3->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
     flexGridSizer25->Add(m_mainPanel3, 0, wxEXPAND, WXC_FROM_DIP(3));
+    
+    m_panel34 = new wxPanel(m_notebook30, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebook30, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_notebook30->AddPage(m_panel34, _("Remote Ctrl"), false);
+    
+    wxFlexGridSizer* flexGridSizer36 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer36->SetFlexibleDirection( wxBOTH );
+    flexGridSizer36->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer36->AddGrowableCol(0);
+    flexGridSizer36->AddGrowableRow(0);
+    m_panel34->SetSizer(flexGridSizer36);
+    
+    m_remoteControl1 = new wxPanel(m_panel34, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel34, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_remoteControl1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    
+    flexGridSizer36->Add(m_remoteControl1, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer13 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer13->SetFlexibleDirection( wxBOTH );
@@ -157,6 +179,15 @@ MainFrameBaseClass::MainFrameBaseClass(wxWindow* parent, wxWindowID id, const wx
     
     m_mainToolbar = this->CreateToolBar(wxTB_FLAT, wxID_ANY);
     m_mainToolbar->SetToolBitmapSize(wxSize(16,16));
+    
+    
+    #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(m_notebook30)){
+        wxPersistenceManager::Get().RegisterAndRestore(m_notebook30);
+    } else {
+        wxPersistenceManager::Get().Restore(m_notebook30);
+    }
+    #endif
     
     SetName(wxT("MainFrameBaseClass"));
     SetSize(500,500);

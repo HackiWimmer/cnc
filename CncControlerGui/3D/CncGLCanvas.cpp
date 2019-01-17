@@ -344,6 +344,7 @@ CncGlCanvas::CncGlCanvas(wxWindow *parent, int *attribList)
 //////////////////////////////////////////////////
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
 , context(NULL)
+, lastReshape()
 , mouseMoveMode(false)
 {
 }
@@ -364,6 +365,32 @@ void CncGlCanvas::view(GLContextBase::ViewMode fm) {
 	display();
 }
 //////////////////////////////////////////////////
+void CncGlCanvas::incScale() {
+//////////////////////////////////////////////////
+	if ( context == NULL )
+		return;
+		
+	context->getModelScale().decScale();
+}
+//////////////////////////////////////////////////
+void CncGlCanvas::decScale() {
+//////////////////////////////////////////////////
+	if ( context == NULL )
+		return;
+		
+	context->getModelScale().incScale();
+}
+//////////////////////////////////////////////////
+void CncGlCanvas::reshapeRelative(int dx, int dy) {
+//////////////////////////////////////////////////
+	const wxSize cs = GetClientSize();
+	const int nx 	= lastReshape.x + dx;
+	const int ny 	= cs.GetHeight() - lastReshape.y - dy;
+	
+	context->reshape(cs.GetWidth(), cs.GetHeight(), nx, ny);
+	display();
+}
+//////////////////////////////////////////////////
 void CncGlCanvas::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 	if ( context == NULL )
@@ -377,19 +404,18 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	// wheel
 	const int rot = event.GetWheelRotation();
 	if ( rot != 0 ) {
-		if (rot < 0 ) 	context->getModelScale().decScale();
-		else 			context->getModelScale().incScale();
+		if (rot < 0 ) 	decScale();
+		else 			incScale();
 		display();
 	}
 	
 	// move origin
 	if ( event.ControlDown() == false ) {
-		static int lx = 0, ly = 0;
 		static int mx = 0, my = 0;
 		
 		if ( event.LeftDown() == true && mouseMoveMode == false ) {
-			lx = context->getLastReshapeX();
-			ly = cs.GetHeight() - context->getLastReshapeY();
+			lastReshape.x = context->getLastReshapeX();
+			lastReshape.y = cs.GetHeight() - context->getLastReshapeY();
 			
 			mx = event.GetX();
 			my = event.GetY();
@@ -402,11 +428,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 			const int dx = event.GetX() - mx;
 			const int dy = event.GetY() - my;
 			
-			const int nx = lx + dx;
-			const int ny = cs.GetHeight() - ly - dy;
-			
-			context->reshape(cs.GetWidth(), cs.GetHeight(), nx, ny);
-			display();
+			reshapeRelative(dx, dy);
 		}
 		
 		// reset move mode

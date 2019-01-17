@@ -22,9 +22,12 @@
 
 						#define PI 3.14159265
 
+
 // ----------------------------------------------------------------------------
 // CncNavigatorPanel Event Table
 // ----------------------------------------------------------------------------
+wxDEFINE_EVENT(wxEVT_CNC_NAVIGATOR_PANEL, CncNavigatorPanelEvent);
+
 wxBEGIN_EVENT_TABLE(CncNavigatorPanel, wxPanel)
 	EVT_PAINT					(CncNavigatorPanel::onPaint)
 	EVT_SIZE					(CncNavigatorPanel::onSize)
@@ -249,8 +252,8 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			dc.DrawLine(xi1, yi1, xo1, yo1);
 			dc.DrawLine(xi2, yi2, xo2, yo2);
 			
-			dc.DrawArc(xi1, yi1, xi2, yi2, 0.0, 0.0);
-			dc.DrawArc(xo1, yo1, xo2, yo2, 0.0, 0.0);
+			dc.DrawArc(xi1, yi1, xi2, yi2, 0, 0);
+			dc.DrawArc(xo1, yo1, xo2, yo2, 0, 0);
 			
 		}
 	};
@@ -280,7 +283,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	drawBounderies(true);
 	moveOrigin();
 	drawCenter(false);
-	drawOuterCircleBorders( current.acitvated ? wxPen(activatedColour, 2, wxSOLID) : wxPen(highlightColour, 2, wxSOLID), wxPen(defaultColour, 2, wxSOLID) );
+	drawOuterCircleBorders( current.acitvated ? wxPen(activatedColour, 1, wxSOLID) : wxPen(highlightColour, 1, wxSOLID), wxPen(defaultColour, 1, wxSOLID) );
 	drawInnerCircleBorders(2);
 
 
@@ -305,7 +308,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		
 		const int xm  = cos(ocr.midAngle   * PI / 180) * +midRadius;
 		const int ym  = sin(ocr.midAngle   * PI / 180) * -midRadius;
-
+/*
 		if ( ocr.direction == current.direction ) {
 			
 			if ( current.acitvated == false ) {
@@ -322,11 +325,11 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			dc.SetBrush(defaultColour);
 			dc.FloodFill(xm, ym, defaultColour, wxFLOOD_BORDER );
 		}
-
+*/
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	
 	dc.SetFont(font);
-	dc.DrawLabel("+X", wxRect(xm+10, ym+10, 300, 300));
+	dc.DrawLabel("+X", wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
 
 	}
 	
@@ -334,6 +337,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	//drawOuterCircleBorders(wxPen(*wxBLACK, 2, wxSOLID), wxPen(*wxBLACK, 2, wxSOLID));
 	
 	
+
 	
 	
 	
@@ -554,6 +558,7 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 	}
 	
 	evt.direction = current.direction;
+	SetToolTip(config.toolTipMap[current.direction]);
 	
 	if ( current.direction != UD ) {
 		

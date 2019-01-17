@@ -1,6 +1,7 @@
 #ifndef CNC_NAVIGATOR_PANEL_H
 #define CNC_NAVIGATOR_PANEL_H
 
+#include <map>
 #include <wx/panel.h>
 #include <wx/event.h>
 
@@ -14,6 +15,7 @@ class CncNavigatorPanel : public wxPanel {
 	public:
 		
 		enum Direction { UD, NN, SS, EE, WW, NW, NE, SW, SE, CP, CN };
+		typedef std::map<Direction, wxString> ToolTipMap;
 		
 		struct Config {
 			bool innerCircle 		= false;
@@ -25,6 +27,23 @@ class CncNavigatorPanel : public wxPanel {
 			wxColour colWW			= colEE;
 			wxColour colCP			= wxColour(27, 139, 61);
 			wxColour colCN			= colCP;
+			
+			ToolTipMap toolTipMap;
+			
+			Config() {
+				toolTipMap[UD] 	= "Undefined Region";
+				toolTipMap[NN] 	= "North";
+				toolTipMap[SS] 	= "South";
+				toolTipMap[WW] 	= "West";
+				toolTipMap[EE] 	= "East";
+				toolTipMap[NW] 	= "North West";
+				toolTipMap[NE] 	= "North East";
+				toolTipMap[SW] 	= "South West";
+				toolTipMap[SE] 	= "South East";
+				toolTipMap[CP] 	= "Center Positive";
+				toolTipMap[CN] 	= "Center Negative";
+			}
+
 		};
 		
 		CncNavigatorPanel(wxWindow *parent, const Config& cfg);
@@ -180,5 +199,7 @@ class CncNavigatorPanelEvent : public wxCommandEvent {
 		bool							activated;
 		
 };
+
+
 
 #endif

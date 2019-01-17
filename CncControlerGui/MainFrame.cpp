@@ -74,7 +74,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "UpdateManagerThread.h"
 #include "GamepadThread.h"
 #include "CncConfigProperty.h"
-#include "SecureRun.h"
+#include "CncSecureRun.h"
 #include "CncReferencePosition.h"
 #include "CncUsbConnectionDetected.h"
 #include "CncConnectProgress.h"
@@ -200,7 +200,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , debugUserNotificationTime(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
 , guiControls()
 , menuItems()
-, secureRunDlg(new SecureRun(this))
+, secureRunDlg(new CncSecureRun(this))
 , refPositionDlg(new CncReferencePosition(this))
 {
 ///////////////////////////////////////////////////////////////////
@@ -309,11 +309,17 @@ MainFrame::~MainFrame() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( secureRunDlg && secureRunDlg->IsShownOnScreen() )
-		wxPostEvent(secureRunDlg, event);
-	
-	if ( refPositionDlg && refPositionDlg->IsShownOnScreen() )
+	if ( refPositionDlg && refPositionDlg->IsShownOnScreen() ) {
 		wxPostEvent(refPositionDlg, event);
+		event.Skip(false);
+		return;
+	}
+	
+	if ( secureRunDlg->IsShownOnScreen() ) {
+		wxPostEvent(secureRunDlg, event);
+		event.Skip(false);
+		return;
+	}
 	
 	if ( motionMonitor && motionMonitor->IsShownOnScreen() ) {
 		// This is necessary to avoid the default notebook key handling

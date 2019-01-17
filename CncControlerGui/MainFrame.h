@@ -43,7 +43,7 @@ class GL3DOptionPane;
 class GL3DDrawPane;
 class CncMonitorVSplitterWindow;
 class CncTemplateObserver;
-class SecureRun;
+class CncSecureRun;
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -539,7 +539,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncPerspective;
 		friend class CncFileView;
 		friend class CncTemplateObserver;
-		friend class SecureRun;
+		friend class CncSecureRun;
 		
 	private:
 		// Member variables
@@ -609,7 +609,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncApp::GuiControls	guiControls;
 		CncApp::MenuItems	menuItems;
 		
-		SecureRun* secureRunDlg;
+		CncSecureRun* secureRunDlg;
 		CncReferencePosition* refPositionDlg;
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;

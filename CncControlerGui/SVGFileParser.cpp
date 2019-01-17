@@ -354,7 +354,7 @@ bool SVGFileParser::performUse(SVGUserAgentInfo& uai, UseDirective& ud) {
 	
 	if ( it != ud.attributes.end() ) {
 		
-		#warning - the use transformation didn't work correctly
+		#warning - the use transformation did not work correctly
 		
 		
 		// reset the svg matrix
@@ -463,10 +463,6 @@ bool SVGFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 bool SVGFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
-	#warning
-	//return true;
-	
-	
 	if ( cncControl == NULL )
 		return true;
 	

@@ -191,6 +191,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncMouseRemoteControl.h"/>
+      <File Name="CncMouseRemoteControl.cpp"/>
+      <File Name="CncSecureRun.h"/>
+      <File Name="CncSecureRun.cpp"/>
       <File Name="CncTemplateObserver.h"/>
       <File Name="CncTemplateObserver.cpp"/>
       <File Name="CncPosition.cpp"/>
@@ -275,8 +279,6 @@
       <File Name="wxcrafter.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
-      <File Name="SecureRun.h"/>
-      <File Name="SecureRun.cpp"/>
       <File Name="GamepadThread.cpp"/>
       <File Name="GamepadThread.h"/>
       <File Name="main.cpp"/>

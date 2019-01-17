@@ -1,1 +1,1 @@
-./Release/win_resources.rc.o ./Release/CncNavigatorPanel.cpp.o ./Release/main.cpp.o ./Release/wxcrafter.cpp.o ./Release/wxcrafter_bitmaps.cpp.o ./Release/MainFrame.cpp.o   
+./Release/win_resources.rc.o ./Release/wxcrafter_bitmaps.cpp.o ./Release/wxcrafter.cpp.o ./Release/CncMouseRemoteControl.cpp.o ./Release/CncNavigatorPanel.cpp.o ./Release/main.cpp.o ./Release/MainFrame.cpp.o   

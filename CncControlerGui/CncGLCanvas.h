@@ -77,9 +77,15 @@ class CncGlCanvas : public wxGLCanvas {
 		void viewIso3() 	{ view(GLContextBase::ViewMode::V3D_ISO3); }
 		void viewIso4() 	{ view(GLContextBase::ViewMode::V3D_ISO4); }
 		
+		void incScale();
+		void decScale();
+		
+		void reshapeRelative(int dx, int dy);
+		
 	protected:
-		GLContextCncPathBase* context;
-		bool mouseMoveMode;
+		GLContextCncPathBase* 	context;
+		wxPoint 				lastReshape;
+		bool 					mouseMoveMode;
 		
 		void onMouse(wxMouseEvent& event);
 		void view(GLContextBase::ViewMode fm);

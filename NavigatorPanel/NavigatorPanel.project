@@ -8,6 +8,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="CncMouseRemoteControl.cpp"/>
+    <File Name="CncMouseRemoteControl.h"/>
     <File Name="CncNavigatorPanel.cpp"/>
     <File Name="CncNavigatorPanel.h"/>
     <File Name="main.cpp"/>

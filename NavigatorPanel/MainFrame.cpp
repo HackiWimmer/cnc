@@ -33,19 +33,21 @@ void replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	wxASSERT( sizer != NULL );
 	
 	newCtrl->Reparent(parent);
-	newCtrl->SetPosition(oldCtrl->GetPosition());
+	//newCtrl->SetPosition(oldCtrl->GetPosition());
+	//newCtrl->SetClientSize(oldCtrl->GetClientSize());
 	
 	sizer->Replace(oldCtrl, newCtrl, true);
 	sizer->Layout();
+	
+	newCtrl->SetPosition(oldCtrl->GetPosition());
+	newCtrl->SetClientSize(oldCtrl->GetClientSize());
 	
 	// remove the placeholder
 	oldCtrl->Destroy();
 	// do not delete oldCtrl this will be handled by wx... 
 }
 
-
-wxDEFINE_EVENT(wxEVT_CNC_NAVIGATOR_PANEL, 			CncNavigatorPanelEvent);
-
+CncMouseRemoteControl* remoteControl = NULL;
 
 MainFrame::MainFrame(wxWindow* parent)
     : MainFrameBaseClass(parent)
@@ -56,6 +58,19 @@ MainFrame::MainFrame(wxWindow* parent)
 	CncNavigatorPanel::Config cfg;
 	cfg.innerCircle = true;
 	cfg.shortFormat = false;
+	
+	cfg.toolTipMap[CncNavigatorPanel::Direction::UD] 	= "";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::NN] 	= "+Y";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::SS] 	= "-Y";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::WW] 	= "-X";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::EE] 	= "+X";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::NW] 	= "+Y -X";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::NE] 	= "+Y +X";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::SW] 	= "-Y -X";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::SE] 	= "-Y +X";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::CP] 	= "+Z";
+	cfg.toolTipMap[CncNavigatorPanel::Direction::CN] 	= "-Z";
+	
 	CncNavigatorPanel* p1 = new CncNavigatorPanel(this, cfg);
 	
 	replaceControl(m_mainPanel1, p1);
@@ -71,14 +86,37 @@ MainFrame::MainFrame(wxWindow* parent)
 	CncNavigatorPanel* p3 = new CncNavigatorPanel(this, cfg);
 	
 	replaceControl(m_mainPanel3, p3);
-
-	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 		&MainFrame::onNavigatorPanel, 			this);
+	
+	CncMouseRemoteControl* m1 = new CncMouseRemoteControl(this);
+	CncMouseRemoteControl::Config& config = m1->getConfig();
+	config.colMouse_Center = *wxYELLOW;
+	
+	remoteControl = m1;
+	replaceControl(m_remoteControl1, m1);
+	
+	this->Bind(wxEVT_CHAR_HOOK, 					&MainFrame::globalKeyDownHook, 			this);
+	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 			&MainFrame::onNavigatorPanel, 			this);
+	this->Bind(wxEVT_CNC_MOUSE_REMOTE_CONTROL, 		&MainFrame::onRemoteControl, 			this);
 }
 
 
 MainFrame::~MainFrame()
 {
-	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, 	&MainFrame::onNavigatorPanel, 			this, 0);
+	this->Unbind(wxEVT_CHAR_HOOK, 					&MainFrame::globalKeyDownHook, 			this);
+	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, 		&MainFrame::onNavigatorPanel, 			this, 0);
+	this->Unbind(wxEVT_CNC_MOUSE_REMOTE_CONTROL, 	&MainFrame::onRemoteControl, 			this, 0);
+}
+
+void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
+	
+		if ( remoteControl && remoteControl->IsShownOnScreen() ) {
+		// This is necessary to avoid the default notebook key handling
+		if ( remoteControl->HasFocus() ) {
+			remoteControl->onKeyDown(event);
+			event.Skip(false);
+			return;
+		}
+	}
 }
 
 void MainFrame::onNavigatorPanel(CncNavigatorPanelEvent& event) {
@@ -101,6 +139,41 @@ void MainFrame::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 	
 }
 
+void MainFrame::onRemoteControl(CncMouseRemoteControlEvent& event) {
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_MOUSE )
+		return;
+		
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_RELEASE_LEFT_DOWN )
+		log("CMRC_RELEASE_LEFT_DOWN\n");
+
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_RELEASE_LEFT_UP )
+		log("CMRC_RELEASE_LEFT_UP\n");
+		
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_ENTER )
+		log("CMRC_ENTER\n");
+		
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_LEAVE )
+		log("CMRC_LEAVE\n");
+
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_SET_FOCUS )
+		log("CMRC_SET_FOUCS\n");
+		
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_KILL_FOCUS )
+		log("CMRC_KILL_FOUCS\n");
+	
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_MOUSE_MOVE ) {
+		log1(wxString::Format("%d",  	event.mouseMove.GetWidth()));
+		log2(wxString::Format("%d",  	event.mouseMove.GetHeight()));
+	}
+	
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_WHEEL_ROTATION ) {
+		log4(wxString::Format("%d",  	event.wheelRotation));
+	}
+	
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_KEY_DOWN ) {
+		log5(wxString::Format("%d",  	event.keyCode));
+	}
+}
 
 void MainFrame::OnExit(wxCommandEvent& event)
 {

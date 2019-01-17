@@ -2,6 +2,8 @@
 #define MAINFRAME_H
 
 #include "CncNavigatorPanel.h"
+#include "CncMouseRemoteControl.h"
+
 #include "wxcrafter.h"
 
 class MainFrame : public MainFrameBaseClass
@@ -14,6 +16,9 @@ public:
     void OnAbout(wxCommandEvent& event);
 	
 	void onNavigatorPanel(CncNavigatorPanelEvent& event);
+	void onRemoteControl(CncMouseRemoteControlEvent& event);
+	
+	void globalKeyDownHook(wxKeyEvent& event);
 
 protected:
 

@@ -14,7 +14,9 @@
 #include <wx/iconbndl.h>
 #include <wx/artprov.h>
 #include <wx/sizer.h>
+#include <wx/notebook.h>
 #include <wx/panel.h>
+#include <wx/imaglist.h>
 #include <wx/textctrl.h>
 #include <wx/menu.h>
 #include <wx/toolbar.h>
@@ -38,9 +40,13 @@
 class MainFrameBaseClass : public wxFrame
 {
 protected:
+    wxNotebook* m_notebook30;
+    wxPanel* m_panel32;
     wxPanel* m_mainPanel1;
     wxPanel* m_mainPanel2;
     wxPanel* m_mainPanel3;
+    wxPanel* m_panel34;
+    wxPanel* m_remoteControl1;
     wxTextCtrl* m_textCtr_01;
     wxTextCtrl* m_textCtr_02;
     wxTextCtrl* m_textCtr_03;
@@ -65,6 +71,10 @@ public:
     wxPanel* GetMainPanel1() { return m_mainPanel1; }
     wxPanel* GetMainPanel2() { return m_mainPanel2; }
     wxPanel* GetMainPanel3() { return m_mainPanel3; }
+    wxPanel* GetPanel32() { return m_panel32; }
+    wxPanel* GetRemoteControl1() { return m_remoteControl1; }
+    wxPanel* GetPanel34() { return m_panel34; }
+    wxNotebook* GetNotebook30() { return m_notebook30; }
     wxTextCtrl* GetTextCtr_01() { return m_textCtr_01; }
     wxTextCtrl* GetTextCtr_02() { return m_textCtr_02; }
     wxTextCtrl* GetTextCtr_03() { return m_textCtr_03; }

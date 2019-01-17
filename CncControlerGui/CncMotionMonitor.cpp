@@ -319,7 +319,7 @@ void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 	CncGlCanvas::onMouse(event);
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {
+void CncMotionMonitor::onKeyDown(int keyCode) {
 //////////////////////////////////////////////////
 	static const int delta = 10;
 	const wxSize cs = GetClientSize();
@@ -328,8 +328,8 @@ void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {
 	int oy = monitor->getLastReshapeY();
 	if ( ox == 0 )	ox = cs.GetWidth()/2;
 	if ( oy == 0 )	oy = cs.GetHeight()/2;
-		
-	switch ( event.GetKeyCode() ) {
+	
+	switch ( keyCode ) {
 		
 		case 'C':			monitor->centerViewport();
 							display();
@@ -353,6 +353,11 @@ void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {
 							display();
 							break;
 	}
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::onKeyDown(wxKeyEvent& event) {
+//////////////////////////////////////////////////
+	onKeyDown(event.GetKeyCode());
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::setCameraRotationSpeed(int speed) {

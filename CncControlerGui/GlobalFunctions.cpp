@@ -10,17 +10,27 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	wxASSERT( oldCtrl != NULL );
 	wxASSERT( newCtrl != NULL );
 	
-	wxWindow* parent = oldCtrl->GetParent();
-	wxSizer* sizer   = oldCtrl->GetContainingSizer();
+	wxWindow* parent 	= oldCtrl->GetParent();
+	wxSizer* sizer   	= oldCtrl->GetContainingSizer();
+	wxSize defSize		= oldCtrl->GetClientSize();
+	wxSize minSize		= oldCtrl->GetMinClientSize();
+	wxPoint pos			= oldCtrl->GetPosition();
 	
 	wxASSERT( parent != NULL );
-	wxASSERT( sizer != NULL );
+	wxASSERT( sizer  != NULL );
 	
 	newCtrl->Reparent(parent);
-	newCtrl->SetPosition(oldCtrl->GetPosition());
+	
+	newCtrl->SetPosition(pos);
+	newCtrl->SetClientSize(defSize);
+	newCtrl->SetMinClientSize(minSize);
 	
 	sizer->Replace(oldCtrl, newCtrl, true);
 	sizer->Layout();
+	
+	newCtrl->SetPosition(pos);
+	newCtrl->SetClientSize(defSize);
+	newCtrl->SetMinClientSize(minSize);
 	
 	// remove the placeholder
 	oldCtrl->Destroy();

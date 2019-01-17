@@ -58,6 +58,7 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 		// is used from global key down hook, that's the reason why it is public
 		void onKeyDown(wxKeyEvent& event);
+		void onKeyDown(int keyCode);
 		
 		// interface
 		virtual void display();
