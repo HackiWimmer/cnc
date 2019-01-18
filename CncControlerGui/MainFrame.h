@@ -66,10 +66,9 @@ namespace CncApp {
 	
 	struct MenuInfo {
 		bool 		lastEnableState = true;
-		wxMenuItem* item			= NULL;
 	};
 	
-	typedef std::vector<MenuInfo> MenuItems;
+	typedef std::map<wxMenuItem*, MenuInfo> MenuItems;
 };
 
 
@@ -787,7 +786,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void decorateExtTemplatePages(TemplateFormat tf);
 		void prepareAndShowMonitorTemplatePreview(bool force=false);
 		
-		void regiterAllMenuItems(bool initially = false);
+		void registerMenuItem(wxMenuItem* item);
+		void unregisterMenuItem(wxMenuItem* item);
+		void regiterAllMenuItems();
 		void registerGuiControl(wxWindow* ctl); 
 		void disableGuiControls();
 		void enableGuiControls(bool state = true);

@@ -115,13 +115,21 @@ void CncMouseRemoteControl::onPaint(wxPaintEvent& event) {
 	auto drawCrossHair = [&](const wxPen& pen, int x, int y) {
 		dc.SetPen(pen);
 		
-		dc.DrawLine(x - 20, y,      x + 20, y);
-		dc.DrawLine(x,      y - 20, x,      y + 20);
-		dc.DrawCircle(x, y, 15);
+		const int l1 = 20;
+		const int l2 = 0.75 * l1;
+		
+		dc.DrawLine(x - l1, y,      x + l1, y);
+		dc.DrawLine(x,      y - l1, x,      y + l1);
+		dc.DrawCircle(x, y, l2);
+		
+		dc.SetBrush(wxBrush(pen.GetColour()));
+		dc.DrawCircle(x, y, l2 * 0.5);
 	};
 	
 	if ( mouseMotion.leftDown == true ) drawCrossHair(wxPen(config.colMouse_Motion, 1, wxSOLID), normalizedCoord.x, normalizedCoord.y);
 	else								drawCrossHair(wxPen(config.colMouse_Center, 1, wxSOLID), 0, 0);
+	
+	dc.SetBrush(*wxTRANSPARENT_BRUSH);
 }
 ///////////////////////////////////////////////////////////////////
 void CncMouseRemoteControl::onMouse(wxMouseEvent& event) {

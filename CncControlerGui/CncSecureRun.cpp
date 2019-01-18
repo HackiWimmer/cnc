@@ -195,9 +195,12 @@ void CncSecureRun::onRemoteControl(CncMouseRemoteControlEvent& event) {
 		}
 	}
 	
+	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_RELEASE_LEFT_DOWN )
+		THE_APP->getMotionMonitor()->initReshape();
+		
 	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_MOUSE_MOVE )
 		THE_APP->getMotionMonitor()->reshapeRelative(event.mouseMove.GetWidth(), event.mouseMove.GetHeight());
-	
+		
 	if ( event.GetId() == CncMouseRemoteControlEvent::Id::CMRC_KEY_DOWN )
 		THE_APP->getMotionMonitor()->onKeyDown(event.keyCode);
 }

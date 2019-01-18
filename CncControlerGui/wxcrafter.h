@@ -116,7 +116,7 @@ protected:
     wxBitmapButton* m_rcPause;
     wxBitmapButton* m_rcStop;
     wxButton* m_btnEmergenyStop;
-    wxPanel* m_scrollWinMain;
+    wxPanel* m_winMainView;
     wxChoice* m_mainViewSelector;
     wxSimplebook* m_mainViewBook;
     wxPanel* m_mainBookSourcePanel;
@@ -419,7 +419,7 @@ protected:
     wxPanel* m_panelZView;
     CncZView* m_zView;
     wxStaticText* m_infoToolDiameter;
-    wxPanel* m_scrollWinFile;
+    wxPanel* m_winFileView;
     wxCheckBox* m_keepFileManagerPreview;
     wxStaticText* m_staticText6018;
     wxStaticLine* m_staticLine4345;
@@ -428,7 +428,7 @@ protected:
     wxListCtrl* m_lruList;
     wxPanel* m_splitterPage6490;
     wxPanel* m_mainFileViewPlaceholder;
-    wxPanel* m_scrollWinMonitor;
+    wxPanel* m_winMonitorView;
     wxChoice* m_monitorViewSelector;
     wxSimplebook* m_monitorViewBook;
     wxPanel* m_monitorBookCncPanel;
@@ -537,7 +537,7 @@ protected:
     wxPanel* m_panel5144;
     wxStaticText* m_staticText5142;
     wxTextCtrl* m_currentInboundFilePreviewFileName;
-    wxPanel* m_scrollWinLogger;
+    wxPanel* m_winLoggerView;
     wxNotebook* m_loggerNotebook;
     wxPanel* m_panelStartupTrace;
     wxTextCtrl* m_startupTrace;
@@ -1360,7 +1360,7 @@ public:
     wxTextCtrl* GetCurrentFileMangerPreviewFileName() { return m_currentFileMangerPreviewFileName; }
     wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
     wxSimplebook* GetMainViewBook() { return m_mainViewBook; }
-    wxPanel* GetScrollWinMain() { return m_scrollWinMain; }
+    wxPanel* GetWinMainView() { return m_winMainView; }
     CncZView* GetZView() { return m_zView; }
     wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
     wxPanel* GetPanelZView() { return m_panelZView; }
@@ -1372,7 +1372,7 @@ public:
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
     wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
     wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
-    wxPanel* GetScrollWinFile() { return m_scrollWinFile; }
+    wxPanel* GetWinFileView() { return m_winFileView; }
     wxChoice* GetMonitorViewSelector() { return m_monitorViewSelector; }
     wxStaticText* GetStaticText11481() { return m_staticText11481; }
     wxListCtrl* GetCncSummaryListCtrl() { return m_cncSummaryListCtrl; }
@@ -1478,7 +1478,7 @@ public:
     wxTextCtrl* GetCurrentInboundFilePreviewFileName() { return m_currentInboundFilePreviewFileName; }
     wxPanel* GetMonitorTemplatePanel() { return m_monitorTemplatePanel; }
     wxSimplebook* GetMonitorViewBook() { return m_monitorViewBook; }
-    wxPanel* GetScrollWinMonitor() { return m_scrollWinMonitor; }
+    wxPanel* GetWinMonitorView() { return m_winMonitorView; }
     wxTextCtrl* GetStartupTrace() { return m_startupTrace; }
     wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
     wxTextCtrl* GetLogger() { return m_logger; }
@@ -1498,7 +1498,7 @@ public:
     wxStaticBitmap* GetGpBmp4() { return m_gpBmp4; }
     wxStaticBitmap* GetStaticBitmap5890() { return m_staticBitmap5890; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
-    wxPanel* GetScrollWinLogger() { return m_scrollWinLogger; }
+    wxPanel* GetWinLoggerView() { return m_winLoggerView; }
     wxStaticText* GetStaticText395() { return m_staticText395; }
     wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
     wxStaticLine* GetStaticLine6021() { return m_staticLine6021; }

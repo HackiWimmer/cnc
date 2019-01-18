@@ -3412,7 +3412,7 @@
        "m_styles": ["wxTAB_TRAVERSAL"],
        "wxAuiPaneInfo": {
         "m_name": "SourceView",
-        "m_caption": "CNC Main View",
+        "m_caption": "CNC Template",
         "m_dockDirection": "wxAUI_DOCK_CENTER",
         "m_layer": 0,
         "m_row": 0,
@@ -3444,7 +3444,7 @@
         }, {
          "type": "string",
          "m_label": "Name:",
-         "m_value": "m_scrollWinMain"
+         "m_value": "m_winMainView"
         }, {
          "type": "multi-string",
          "m_label": "Tooltip:",
@@ -33317,7 +33317,7 @@
         }, {
          "type": "string",
          "m_label": "Name:",
-         "m_value": "m_scrollWinFile"
+         "m_value": "m_winFileView"
         }, {
          "type": "multi-string",
          "m_label": "Tooltip:",
@@ -34187,7 +34187,7 @@
         }, {
          "type": "string",
          "m_label": "Name:",
-         "m_value": "m_scrollWinMonitor"
+         "m_value": "m_winMonitorView"
         }, {
          "type": "multi-string",
          "m_label": "Tooltip:",
@@ -45210,7 +45210,7 @@
         }, {
          "type": "string",
          "m_label": "Name:",
-         "m_value": "m_scrollWinLogger"
+         "m_value": "m_winLoggerView"
         }, {
          "type": "multi-string",
          "m_label": "Tooltip:",

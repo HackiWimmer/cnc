@@ -160,11 +160,13 @@ bool CncPerspective::insertNextUserPerspective(const wxString& newLabel) {
 		mi = menu->Insert(idx1, wxID_ANY, wxString::Format("* User Perspective - '%s'", newLabel));
 		mi->SetBitmap(ImageLibPerspective().Bitmap("BMP_USER_PERSPECTIVE"));
 		mf->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::loadPerspective, mf, mi->GetId());
-
+		THE_APP->registerMenuItem(mi);
+		
 		mi = menu->Insert(idx2, wxID_ANY, wxString::Format("* Save User Perspective as '%s'", newLabel));
 		mi->SetBitmap(ImageLibPerspective().Bitmap("BMP_USER_PERSPECTIVE_SAVE"));
 		mf->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::savePerspective, mf, mi->GetId());
 		
+		THE_APP->registerMenuItem(mi);
 		ret = true;
 	}
 	
@@ -343,6 +345,7 @@ bool CncPerspective::removeUserPerspective() {
 			
 			// remove menu
 			menu->Remove(mi->GetId());
+			THE_APP->unregisterMenuItem(mi);
 			
 			// remove config
 			wxASSERT(config != NULL);
@@ -459,7 +462,7 @@ void CncPerspective::ensureRunPerspectiveMinimal() {
 /////////////////////////////////////////////////////////////////////
 	MainFrame* mf = GBL_CONFIG->getTheApp();
 	
-	if ( mf->m_scrollWinMonitor->IsShown() == false )
+	if ( mf->m_winMonitorView->IsShown() == false )
 		ensureAllPanesFromPerspectiveAreShown("Run");
 }
 /////////////////////////////////////////////////////////////////////
@@ -467,7 +470,7 @@ void CncPerspective::ensureDebugPerspectiveMinimal() {
 /////////////////////////////////////////////////////////////////////
 	MainFrame* mf = GBL_CONFIG->getTheApp();
 	
-	if ( mf->m_scrollWinMonitor->IsShown() == false || mf->m_debuggerView->IsShown() == false )
+	if ( mf->m_winMonitorView->IsShown() == false || mf->m_debuggerView->IsShown() == false )
 		ensureAllPanesFromPerspectiveAreShown("Debug");
 }
 /////////////////////////////////////////////////////////////////////

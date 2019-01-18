@@ -220,16 +220,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_auibarMain->AddControl(m_btnEmergenyStop);
     m_auibarMain->Realize();
     
-    m_scrollWinMain = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_winMainView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_scrollWinMain, wxAuiPaneInfo().Name(wxT("SourceView")).Caption(_("CNC Main View")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
+    m_auimgrMain->AddPane(m_winMainView, wxAuiPaneInfo().Name(wxT("SourceView")).Caption(_("CNC Template")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
     wxFlexGridSizer* flexGridSizer434 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer434->SetFlexibleDirection( wxBOTH );
     flexGridSizer434->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer434->AddGrowableCol(0);
     flexGridSizer434->AddGrowableRow(1);
-    m_scrollWinMain->SetSizer(flexGridSizer434);
+    m_winMainView->SetSizer(flexGridSizer434);
     
     wxArrayString m_mainViewSelectorArr;
     m_mainViewSelectorArr.Add(wxT("Source View"));
@@ -238,7 +238,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_mainViewSelectorArr.Add(wxT("Manuel Controller"));
     m_mainViewSelectorArr.Add(wxT("Test"));
     m_mainViewSelectorArr.Add(wxT("File Manager Preview"));
-    m_mainViewSelector = new wxChoice(m_scrollWinMain, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinMain, wxSize(-1,-1)), m_mainViewSelectorArr, wxBORDER_NONE);
+    m_mainViewSelector = new wxChoice(m_winMainView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMainView, wxSize(-1,-1)), m_mainViewSelectorArr, wxBORDER_NONE);
     wxFont m_mainViewSelectorFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_mainViewSelector->SetFont(m_mainViewSelectorFont);
     m_mainViewSelector->Hide();
@@ -246,7 +246,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer434->Add(m_mainViewSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_mainViewBook = new wxSimplebook(m_scrollWinMain, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinMain, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_mainViewBook = new wxSimplebook(m_winMainView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMainView, wxSize(-1,-1)), wxBK_DEFAULT);
     m_mainViewBook->SetName(wxT("m_mainViewBook"));
     m_mainViewBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -2938,16 +2938,16 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer3488->Add(0, 1, 1, wxALL, WXC_FROM_DIP(0));
     
-    m_scrollWinFile = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_winFileView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_scrollWinFile, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("Cnc File Manager")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(160,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_winFileView, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("Cnc File Manager")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(160,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     wxFlexGridSizer* flexGridSizer1628 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1628->SetFlexibleDirection( wxBOTH );
     flexGridSizer1628->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer1628->AddGrowableCol(0);
     flexGridSizer1628->AddGrowableRow(2);
-    m_scrollWinFile->SetSizer(flexGridSizer1628);
+    m_winFileView->SetSizer(flexGridSizer1628);
     
     wxFlexGridSizer* flexGridSizer6016 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer6016->SetFlexibleDirection( wxBOTH );
@@ -2957,7 +2957,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1628->Add(flexGridSizer6016, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_keepFileManagerPreview = new wxCheckBox(m_scrollWinFile, wxID_ANY, _("Keep Preview"), wxDefaultPosition, wxDLG_UNIT(m_scrollWinFile, wxSize(-1,-1)), 0);
+    m_keepFileManagerPreview = new wxCheckBox(m_winFileView, wxID_ANY, _("Keep Preview"), wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), 0);
     m_keepFileManagerPreview->SetValue(false);
     wxFont m_keepFileManagerPreviewFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_keepFileManagerPreview->SetFont(m_keepFileManagerPreviewFont);
@@ -2965,18 +2965,18 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer6016->Add(m_keepFileManagerPreview, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_staticText6018 = new wxStaticText(m_scrollWinFile, wxID_ANY, _(" + CTRL"), wxDefaultPosition, wxDLG_UNIT(m_scrollWinFile, wxSize(-1,-1)), 0);
+    m_staticText6018 = new wxStaticText(m_winFileView, wxID_ANY, _(" + CTRL"), wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), 0);
     m_staticText6018->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_staticText6018Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText6018->SetFont(m_staticText6018Font);
     
     flexGridSizer6016->Add(m_staticText6018, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
     
-    m_staticLine4345 = new wxStaticLine(m_scrollWinFile, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinFile, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    m_staticLine4345 = new wxStaticLine(m_winFileView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer1628->Add(m_staticLine4345, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
     
-    m_splitter6478 = new wxSplitterWindow(m_scrollWinFile, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinFile, wxSize(-1,-1)), wxSP_3D);
+    m_splitter6478 = new wxSplitterWindow(m_winFileView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), wxSP_3D);
     m_splitter6478->SetSashGravity(0.5);
     m_splitter6478->SetMinimumPaneSize(10);
     
@@ -3011,22 +3011,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer6492->Add(m_mainFileViewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_scrollWinMonitor = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_scrollWinMonitor->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    m_winMonitorView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_winMonitorView->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     
-    m_auimgrMain->AddPane(m_scrollWinMonitor, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(2).Position(0).BestSize(200,200).MinSize(10,10).MaxSize(200,200).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
+    m_auimgrMain->AddPane(m_winMonitorView, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(2).Position(0).BestSize(200,200).MinSize(10,10).MaxSize(200,200).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
     wxFlexGridSizer* flexGridSizer4348 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer4348->SetFlexibleDirection( wxBOTH );
     flexGridSizer4348->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4348->AddGrowableCol(0);
     flexGridSizer4348->AddGrowableRow(1);
-    m_scrollWinMonitor->SetSizer(flexGridSizer4348);
+    m_winMonitorView->SetSizer(flexGridSizer4348);
     
     wxArrayString m_monitorViewSelectorArr;
     m_monitorViewSelectorArr.Add(wxT("CNC Monitor"));
     m_monitorViewSelectorArr.Add(wxT("Template Preview"));
-    m_monitorViewSelector = new wxChoice(m_scrollWinMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinMonitor, wxSize(-1,-1)), m_monitorViewSelectorArr, wxBORDER_NONE);
+    m_monitorViewSelector = new wxChoice(m_winMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)), m_monitorViewSelectorArr, wxBORDER_NONE);
     wxFont m_monitorViewSelectorFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_monitorViewSelector->SetFont(m_monitorViewSelectorFont);
     m_monitorViewSelector->Hide();
@@ -3034,7 +3034,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4348->Add(m_monitorViewSelector, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_monitorViewBook = new wxSimplebook(m_scrollWinMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinMonitor, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_monitorViewBook = new wxSimplebook(m_winMonitorView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winMonitorView, wxSize(-1,-1)), wxBK_DEFAULT);
     m_monitorViewBook->SetName(wxT("m_monitorViewBook"));
     m_monitorViewBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -4090,17 +4090,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer4359->Add(m_currentInboundFilePreviewFileName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_scrollWinLogger = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_scrollWinLogger->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE));
+    m_winLoggerView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_winLoggerView->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_APPWORKSPACE));
     
-    m_auimgrMain->AddPane(m_scrollWinLogger, wxAuiPaneInfo().Name(wxT("Logger")).Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,140).MinSize(100,140).MaxSize(100,140).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_winLoggerView, wxAuiPaneInfo().Name(wxT("Logger")).Caption(_("CNC Logger")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(100,140).MinSize(100,140).MaxSize(100,140).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     wxFlexGridSizer* flexGridSizer869 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer869->SetFlexibleDirection( wxBOTH );
     flexGridSizer869->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer869->AddGrowableCol(0);
     flexGridSizer869->AddGrowableRow(0);
-    m_scrollWinLogger->SetSizer(flexGridSizer869);
+    m_winLoggerView->SetSizer(flexGridSizer869);
     
     wxFlexGridSizer* flexGridSizer3158 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer3158->SetFlexibleDirection( wxBOTH );
@@ -4118,7 +4118,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer3158->Add(flexGridSizer2520, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
-    m_loggerNotebook = new wxNotebook(m_scrollWinLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_LEFT|wxBORDER_NONE);
+    m_loggerNotebook = new wxNotebook(m_winLoggerView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_LEFT|wxBORDER_NONE);
     wxFont m_loggerNotebookFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_loggerNotebook->SetFont(m_loggerNotebookFont);
     m_loggerNotebook->SetName(wxT("m_loggerNotebook"));
@@ -4215,36 +4215,36 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer2520->Add(flexGridSizer5859, 1, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_staticText58651 = new wxStaticText(m_scrollWinLogger, wxID_ANY, _("Gamepad\nState:"), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_staticText58651 = new wxStaticText(m_winLoggerView, wxID_ANY, _("Gamepad\nState:"), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), wxALIGN_CENTRE);
     wxFont m_staticText58651Font(7, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText58651->SetFont(m_staticText58651Font);
     
     flexGridSizer5859->Add(m_staticText58651, 0, wxALL, WXC_FROM_DIP(0));
     
-    m_gamepadState = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    m_gamepadState = new wxStaticBitmap(m_winLoggerView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("gamepad-active")), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), 0 );
     m_gamepadState->SetToolTip(_("Gamepad Thread State"));
     
     flexGridSizer5859->Add(m_gamepadState, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
     
-    m_staticText5865 = new wxStaticText(m_scrollWinLogger, wxID_ANY, _("Position\nMode:"), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), wxALIGN_CENTRE);
+    m_staticText5865 = new wxStaticText(m_winLoggerView, wxID_ANY, _("Position\nMode:"), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), wxALIGN_CENTRE);
     wxFont m_staticText5865Font(7, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_staticText5865->SetFont(m_staticText5865Font);
     
     flexGridSizer5859->Add(m_staticText5865, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(0));
     
-    m_gpBmp1 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_none-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    m_gpBmp1 = new wxStaticBitmap(m_winLoggerView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dpad_none-small")), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), 0 );
     
     flexGridSizer5859->Add(m_gpBmp1, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
     
-    m_gpBmp2 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lstick_all-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    m_gpBmp2 = new wxStaticBitmap(m_winLoggerView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("lstick_all-small")), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), 0 );
     
     flexGridSizer5859->Add(m_gpBmp2, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
     
-    m_gpBmp3 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    m_gpBmp3 = new wxStaticBitmap(m_winLoggerView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), 0 );
     
     flexGridSizer5859->Add(m_gpBmp3, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
     
-    m_gpBmp4 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    m_gpBmp4 = new wxStaticBitmap(m_winLoggerView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("rstick_updown-small")), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), 0 );
     
     flexGridSizer5859->Add(m_gpBmp4, 0, wxALL|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(2));
     
@@ -4256,11 +4256,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer869->Add(flexGridSizer5888, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_staticBitmap5890 = new wxStaticBitmap(m_scrollWinLogger, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,-1)), 0 );
+    m_staticBitmap5890 = new wxStaticBitmap(m_winLoggerView, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dialog-information (2)")), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,-1)), 0 );
     
     flexGridSizer5888->Add(m_staticBitmap5890, 0, wxALL, WXC_FROM_DIP(2));
     
-    m_tmpTraceInfo = new wxTextCtrl(m_scrollWinLogger, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_scrollWinLogger, wxSize(-1,24)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP);
+    m_tmpTraceInfo = new wxTextCtrl(m_winLoggerView, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_winLoggerView, wxSize(-1,24)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxTE_DONTWRAP);
     m_tmpTraceInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
     m_tmpTraceInfo->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_tmpTraceInfoFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));

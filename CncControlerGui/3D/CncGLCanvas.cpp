@@ -381,6 +381,13 @@ void CncGlCanvas::decScale() {
 	context->getModelScale().incScale();
 }
 //////////////////////////////////////////////////
+void CncGlCanvas::initReshape() {
+//////////////////////////////////////////////////
+	const wxSize cs = GetClientSize();
+	lastReshape.x = context->getLastReshapeX();
+	lastReshape.y = cs.GetHeight() - context->getLastReshapeY();
+}
+//////////////////////////////////////////////////
 void CncGlCanvas::reshapeRelative(int dx, int dy) {
 //////////////////////////////////////////////////
 	const wxSize cs = GetClientSize();
@@ -414,8 +421,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 		static int mx = 0, my = 0;
 		
 		if ( event.LeftDown() == true && mouseMoveMode == false ) {
-			lastReshape.x = context->getLastReshapeX();
-			lastReshape.y = cs.GetHeight() - context->getLastReshapeY();
+			initReshape();
 			
 			mx = event.GetX();
 			my = event.GetY();

@@ -383,7 +383,7 @@ Resolution:</label>
         </object>
       </object>
       <object class="wxAuiPaneInfo" name="SourceView">
-        <caption>CNC Main View</caption>
+        <caption>CNC Template</caption>
         <caption_visible>1</caption_visible>
         <top_dockable>1</top_dockable>
         <left_dockable>1</left_dockable>
@@ -403,7 +403,7 @@ Resolution:</label>
         <minimize_button>1</minimize_button>
         <maximize_button>1</maximize_button>
         <pin_button>0</pin_button>
-        <object class="wxPanel" name="m_scrollWinMain">
+        <object class="wxPanel" name="m_winMainView">
           <style>wxTAB_TRAVERSAL</style>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
@@ -5195,7 +5195,7 @@ Size</value>
         <minimize_button>1</minimize_button>
         <maximize_button>1</maximize_button>
         <pin_button>1</pin_button>
-        <object class="wxPanel" name="m_scrollWinFile">
+        <object class="wxPanel" name="m_winFileView">
           <style>wxTAB_TRAVERSAL</style>
           <object class="wxFlexGridSizer">
             <cols>1</cols>
@@ -5333,7 +5333,7 @@ Size</value>
         <minimize_button>1</minimize_button>
         <maximize_button>1</maximize_button>
         <pin_button>0</pin_button>
-        <object class="wxPanel" name="m_scrollWinMonitor">
+        <object class="wxPanel" name="m_winMonitorView">
           <style>wxTAB_TRAVERSAL</style>
           <bg>wxSYS_COLOUR_BTNFACE</bg>
           <object class="wxFlexGridSizer">
@@ -7070,7 +7070,7 @@ Interval [ms]:</label>
         <minimize_button>1</minimize_button>
         <maximize_button>1</maximize_button>
         <pin_button>1</pin_button>
-        <object class="wxPanel" name="m_scrollWinLogger">
+        <object class="wxPanel" name="m_winLoggerView">
           <style>wxTAB_TRAVERSAL</style>
           <bg>wxSYS_COLOUR_APPWORKSPACE</bg>
           <object class="wxFlexGridSizer">

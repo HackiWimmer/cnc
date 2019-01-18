@@ -226,7 +226,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	// debugger configuration
 	FileParser::installDebugConfigPage(m_debuggerPropertyManagerGrid);
 	
-	regiterAllMenuItems(true);
+	regiterAllMenuItems();
 	
 	// bind 
 	this->Bind(wxEVT_CHAR_HOOK, 					&MainFrame::globalKeyDownHook, 				this);
@@ -416,7 +416,36 @@ void MainFrame::disableGuiControls() {
 	enableGuiControls(false);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::regiterAllMenuItems(bool initially) {
+void MainFrame::registerMenuItem(wxMenuItem* item) {
+///////////////////////////////////////////////////////////////////
+	if ( item == NULL )
+		return;
+	
+	if ( item->IsSeparator() )
+		return;
+		
+	if ( item->IsSubMenu() ) {
+		wxMenu* menu = item->GetSubMenu();
+		for ( unsigned int i = 0; i < menu->GetMenuItemCount (); i++ )
+			registerMenuItem(menu->FindItemByPosition(i));
+	}
+	
+	CncApp::MenuInfo mi;
+	mi.lastEnableState 	= true;
+	menuItems[item] = mi;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::unregisterMenuItem(wxMenuItem* item) {
+///////////////////////////////////////////////////////////////////
+	if ( item == NULL )
+		return;
+		
+	auto it = menuItems.find(item);
+	if ( it != menuItems.end() )
+		menuItems.erase (it);       
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::regiterAllMenuItems() {
 ///////////////////////////////////////////////////////////////////
 	std::function<void(wxMenu* menu)> registerItem = [&](wxMenu* menu) {
 		if ( menu == NULL )
@@ -429,14 +458,11 @@ void MainFrame::regiterAllMenuItems(bool initially) {
 			
 			if ( item->IsSeparator() )
 				continue;
-				
-			std::clog << item->GetItemLabelText() << std::endl;
 			
 			CncApp::MenuInfo mi;
-			mi.item 			= item;
-			mi.lastEnableState 	= initially ? true : item->IsEnabled();
+			mi.lastEnableState 	= true;
 			
-			menuItems.push_back(mi);
+			menuItems[item] = mi;
 		}
 	};
 	
@@ -451,19 +477,19 @@ void MainFrame::regiterAllMenuItems(bool initially) {
 void MainFrame::enableMenuItems(bool state) {
 ///////////////////////////////////////////////////////////////////
 	for ( auto it = menuItems.begin(); it != menuItems.end(); ++it ) {
-		CncApp::MenuInfo mi = *it;
+		CncApp::MenuInfo mi = it->second;
 		
-		if ( mi.item == NULL )
+		if ( it->first == NULL )
 			continue;
 			
 		if ( state == true ) {
-			mi.item->Enable(mi.lastEnableState);
+			it->first->Enable(mi.lastEnableState);
 			
 		} else {
-			mi.lastEnableState = mi.item->IsEnabled();
-			mi.item->Enable(false);
+			mi.lastEnableState = it->first->IsEnabled();
+			it->first->Enable(false);
 			
-			*it = mi;
+			menuItems[it->first] = mi;
 		}
 	}
 }
@@ -2109,18 +2135,6 @@ void MainFrame::enableControls(bool state) {
 	
 	//enable manually controls
 	enableTestControls(state);
-
-	// enable menu bar
-	#warning
-	/*
-	for (unsigned int i=0; i<m_menuBar->GetMenuCount(); i++) {
-		m_menuBar->EnableTop(i, state);
-	}
-	*/
-	// do this here to cover all dynamically 
-	// created or removed menu items
-	//regiterAllMenuItems();
-	
 	
 	// run control
 	enableRunControls(state);
@@ -4956,10 +4970,10 @@ void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
 wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 ///////////////////////////////////////////////////////////////////
 	if      ( name == "Toolbar" ) 			return m_auibarMain;
-	else if ( name == "SourceView")			return m_scrollWinMain;
-	else if ( name == "Logger")				return m_scrollWinLogger;
-	else if ( name == "Outbound")			return m_scrollWinMonitor;
-	else if ( name == "TemplateManager")	return m_scrollWinFile;
+	else if ( name == "SourceView")			return m_winMainView;
+	else if ( name == "Logger")				return m_winLoggerView;
+	else if ( name == "Outbound")			return m_winMonitorView;
+	else if ( name == "TemplateManager")	return m_winFileView;
 	else if ( name == "StatusBar")			return m_statusBar;
 	else if ( name == "SerialSpy")			return m_serialSpyView;
 	else if ( name == "UnitCalculator")		return m_svgUnitCalulator;
@@ -5126,7 +5140,7 @@ void MainFrame::onPerspectiveTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::maximizeAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( event.pane->window == m_scrollWinMonitor || event.pane->window == m_scrollWinMain )
+	if ( event.pane->window == m_winMonitorView || event.pane->window == m_winMainView )
 		perspectiveTimer.Start(20);
 		
 	event.Skip(true);

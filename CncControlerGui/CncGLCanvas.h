@@ -80,6 +80,7 @@ class CncGlCanvas : public wxGLCanvas {
 		void incScale();
 		void decScale();
 		
+		void initReshape();
 		void reshapeRelative(int dx, int dy);
 		
 	protected:
