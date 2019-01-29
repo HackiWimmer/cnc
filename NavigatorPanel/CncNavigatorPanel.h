@@ -18,16 +18,24 @@ class CncNavigatorPanel : public wxPanel {
 		typedef std::map<Direction, wxString> ToolTipMap;
 		
 		struct Config {
-			bool innerCircle 		= false;
-			bool shortFormat		= false;
+			bool innerCircle 			= false;
+			bool shortFormat			= false;
 			
-			wxColour colNN			= wxColour(89, 89, 255);
-			wxColour colSS			= colNN;
-			wxColour colEE			= wxColour(255, 64, 64);
-			wxColour colWW			= colEE;
-			wxColour colCP			= wxColour(27, 139, 61);
-			wxColour colCN			= colCP;
+			bool showToolTip			= false;
+			bool showRegionInfo			= true;
+			bool showRegionTip			= true;
 			
+			wxColour colNN				= wxColour(89, 89, 255);
+			wxColour colSS				= colNN;
+			wxColour colEE				= wxColour(255, 64, 64);
+			wxColour colWW				= colEE;
+			wxColour colCP				= wxColour(27, 139, 61);
+			wxColour colCN				= colCP;
+			
+			wxColour defaultColour		= wxColour(127, 127, 127);
+			wxColour highlightColour	= wxColour(  0, 162, 232);
+			wxColour activatedColour	= wxColour(  0, 255, 255);
+					
 			ToolTipMap toolTipMap;
 			
 			Config() {
@@ -43,7 +51,21 @@ class CncNavigatorPanel : public wxPanel {
 				toolTipMap[CP] 	= "Center Positive";
 				toolTipMap[CN] 	= "Center Negative";
 			}
-
+			
+			void initToolTipMapAsCoordSytem() {
+				toolTipMap[UD] 	= "";
+				toolTipMap[NN] 	= "+Y";
+				toolTipMap[SS] 	= "-Y";
+				toolTipMap[WW] 	= "-X";
+				toolTipMap[EE] 	= "+X";
+				toolTipMap[NW] 	= "+Y\n-X";
+				toolTipMap[NE] 	= "+Y\n+X";
+				toolTipMap[SW] 	= "-Y\n-X";
+				toolTipMap[SE] 	= "-Y\n+X";
+				toolTipMap[CP] 	= "+Z";
+				toolTipMap[CN] 	= "-Z";
+			}
+		
 		};
 		
 		CncNavigatorPanel(wxWindow *parent, const Config& cfg);
@@ -99,7 +121,8 @@ class CncNavigatorPanel : public wxPanel {
 		double adjustAngle(double angle, double dx, double dy);
 		void onMouse(const MouseInfo& mi);
 		void postEvent(const CncNavigatorPanelEvent& event);
-	
+		void drawToolTip(const Direction direction);
+		
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);

@@ -86,6 +86,6 @@ void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::EndRun&
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorBinaryStreamer::processTrigger(const Serial::Trigger::NextPath& tr) {
 ///////////////////////////////////////////////////////////////////
-	std::clog << "SerialEmulatorStreamer::processTrigger(TrNextPath)" << std::endl;
+	//std::clog << "SerialEmulatorStreamer::processTrigger(TrNextPath)" << std::endl;
 }
 

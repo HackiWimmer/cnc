@@ -58,25 +58,15 @@ MainFrame::MainFrame(wxWindow* parent)
 	CncNavigatorPanel::Config cfg;
 	cfg.innerCircle = true;
 	cfg.shortFormat = false;
-	
-	cfg.toolTipMap[CncNavigatorPanel::Direction::UD] 	= "";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::NN] 	= "+Y";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::SS] 	= "-Y";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::WW] 	= "-X";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::EE] 	= "+X";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::NW] 	= "+Y -X";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::NE] 	= "+Y +X";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::SW] 	= "-Y -X";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::SE] 	= "-Y +X";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::CP] 	= "+Z";
-	cfg.toolTipMap[CncNavigatorPanel::Direction::CN] 	= "-Z";
+	cfg.initToolTipMapAsCoordSytem();
 	
 	CncNavigatorPanel* p1 = new CncNavigatorPanel(this, cfg);
 	
 	replaceControl(m_mainPanel1, p1);
 
-	cfg.innerCircle = true;
-	cfg.shortFormat = true;
+	cfg.innerCircle 	= true;
+	cfg.shortFormat 	= true;
+	cfg.activatedColour = *wxRED;
 	CncNavigatorPanel* p2 = new CncNavigatorPanel(this, cfg);
 	
 	replaceControl(m_mainPanel2, p2);

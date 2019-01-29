@@ -193,6 +193,12 @@ void CncNavigatorPanel::onKillFocus(wxFocusEvent& event) {
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
+void CncNavigatorPanel::drawToolTip(const Direction direction) {
+///////////////////////////////////////////////////////////////////
+	if ( config.showToolTip == true )
+		SetToolTip(config.toolTipMap[current.direction]);
+}
+///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxAutoBufferedPaintDC dc(this);
@@ -200,11 +206,12 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	dc.SetBrush(*wxTRANSPARENT_BRUSH);
 	
 	// common parameters
-	const wxColour 		defaultColour  (127, 127, 127);
-	const wxColour 		highlightColour(  0, 162, 232);
-	const wxColour 		activatedColour(  0, 255, 255);
-	const double 		midRadius = ( outerRadius + innerRadius ) / 2;
-	
+	const double 		midRadius 	= ( outerRadius + innerRadius ) / 2;
+	const int 			minHeight 	= 160;
+	const int 			TRIANGLE 	= 3;
+	const int 			A 			= 0;
+	const int 			B 			= 1;
+	const int 			C 			= 2;
 	
 	// draw bounderies
 	auto drawBounderies = [&](bool draw) {
@@ -259,55 +266,191 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	};
 	
 	// draw navigator ( inner ) circle borders
-	auto drawInnerCircleBorders = [&](int penWidth) {
+	auto drawInnerCircleBorders = [&](const wxPen highlightPen, const wxPen defaultPen) {
 		if ( config.innerCircle == true ) {
 			
 			// top region
-			if ( current.direction == CP )	dc.SetPen(wxPen(highlightColour, penWidth, wxSOLID));
-			else							dc.SetPen(wxPen(defaultColour,   penWidth, wxSOLID));
+			if ( current.direction == CP )	dc.SetPen(highlightPen);
+			else							dc.SetPen(defaultPen);
 			
 			dc.DrawArc (+innerRadius * 0.85, -5.0, -innerRadius * 0.85, -5.0, 0.0, 0.0);
 			dc.DrawLine(-innerRadius * 0.85, -5.0, +innerRadius * 0.85, -5.0);
 			
 			// bottom region
-			if ( current.direction == CN )	dc.SetPen(wxPen(highlightColour, penWidth, wxSOLID));
-			else							dc.SetPen(wxPen(defaultColour,   penWidth, wxSOLID));
+			if ( current.direction == CN )	dc.SetPen(highlightPen);
+			else							dc.SetPen(defaultPen);
 			
 			dc.DrawArc (-innerRadius * 0.85, +5.0, +innerRadius * 0.85, +5.0, 0.0, 0.0);
 			dc.DrawLine(-innerRadius * 0.85, +5.0, +innerRadius * 0.85, +5.0);
 		}
 	};
+	
+	auto drawArrows = [&]() {
+		dc.SetPen(wxPen(*wxBLACK, 1, wxSOLID));
+		dc.SetBrush(*wxTRANSPARENT_BRUSH);
+		
+		// Arrows ( outer circle ) 
+		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
+			OuterCircleRegion ocr = *it;
+			wxColour col1;
+			wxColour col2;
+			
+			switch ( ocr.direction ) {
+				case NN: 	col1 = config.colNN; col2 = config.colNN; break;
+				case SS: 	col1 = config.colSS; col2 = config.colSS; break;
+				case WW: 	col1 = config.colWW; col2 = config.colWW; break;
+				case EE: 	col1 = config.colEE; col2 = config.colEE; break;
+				
+				case NE: 	col1 = config.colNN; col2 = config.colEE; break;
+				case NW: 	col1 = config.colWW; col2 = config.colNN; break;
+				case SE: 	col1 = config.colEE; col2 = config.colSS; break;
+				case SW: 	col1 = config.colSS; col2 = config.colWW; break;
+				default: 	continue;
+			}
+			
+			const double  hight = innerRadius * 0.18;
+			const double  width = innerRadius * ( config.shortFormat ? 0.18 :  0.14 );
+			
+			wxPoint dp1[TRIANGLE];
+			dp1[A].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius + hight));
+			dp1[A].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius + hight));
+			dp1[B].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius - hight));
+			dp1[B].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius - hight));
+			dp1[C].x = cos((ocr.midAngle + width) * PI / 180) * ( +(midRadius - hight));
+			dp1[C].y = sin((ocr.midAngle + width) * PI / 180) * ( -(midRadius - hight));
+			
+			wxPoint dp2[TRIANGLE];
+			dp2[A].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius + hight));
+			dp2[A].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius + hight));
+			dp2[B].x = cos((ocr.midAngle - width) * PI / 180) * ( +(midRadius - hight));
+			dp2[B].y = sin((ocr.midAngle - width) * PI / 180) * ( -(midRadius - hight));
+			dp2[C].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius - hight));
+			dp2[C].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius - hight));
+			
+			dc.SetPen(wxPen(col1, 1, wxSOLID));
+			dc.SetBrush(col1);
+			dc.DrawPolygon(TRIANGLE, dp1);
+			
+			dc.SetPen(wxPen(col2, 1, wxSOLID));
+			dc.SetBrush(col2);
+			dc.DrawPolygon(TRIANGLE, dp2);
+		}
 
+		// Arrow Center plus
+		if ( config.innerCircle == true ) {
+			dc.SetPen(wxPen(config.colCP, 1, wxSOLID));
+			dc.SetBrush(config.colCP);
+			
+			wxPoint dp[TRIANGLE];
+			dp[A].x = 0;
+			dp[A].y = -innerRadius * 0.8 / 2 - innerRadius * 0.18 - 5;
+			dp[B].x = -innerRadius * 0.25;
+			dp[B].y = -innerRadius * 0.8 / 2 + innerRadius * 0.18 - 5;
+			dp[C].x = +innerRadius * 0.25;
+			dp[C].y = -innerRadius * 0.8 / 2 + innerRadius * 0.18 - 5;
+			
+			dc.DrawPolygon(TRIANGLE, dp);
+		}
+		
+		// Arrow Center negative
+		if ( config.innerCircle == true ) {
+			dc.SetPen(wxPen(config.colCN, 1, wxSOLID));
+			dc.SetBrush(config.colCN);
+			
+			wxPoint dp[TRIANGLE];
+			dp[A].x = 0;
+			dp[A].y = +innerRadius * 0.8 / 2 + innerRadius * 0.18 + 5;
+			dp[B].x = +innerRadius * 0.25;
+			dp[B].y = +innerRadius * 0.8 / 2 - innerRadius * 0.18 + 5;
+			dp[C].x = -innerRadius * 0.25;
+			dp[C].y = +innerRadius * 0.8 / 2 - innerRadius * 0.18 + 5;
+			
+			dc.DrawPolygon(TRIANGLE, dp);
+		}
+	};
+	
+	// region info
+	auto drawRegionInfo = [&]() {
+		if ( config.showRegionInfo == true ) {
+			
+			int fontSize 		= navRectangle.GetWidth() < minHeight ? 6 : 8;
+			wxString prefix		= navRectangle.GetWidth() < minHeight ? "" : "Direction:\n";
+			wxString dirText	= config.toolTipMap[current.direction];
+			
+			if ( dirText.IsEmpty() == true )
+				return;
+			
+			wxFont font(fontSize, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+			
+			dc.SetFont(font);
+			dc.DrawLabel(wxString::Format("%s%s", prefix, dirText), 
+			             wxRect(navRectangle.GetWidth() / -2 + 5, 
+						        navRectangle.GetHeight() / -2 + 5, 
+								100, 
+								100), 
+						 wxALIGN_NOT );
+		}
+	};
+	
+	// region info
+	auto drawRegionTip = [&]() {
+		if ( config.showRegionTip == false )
+			return;
+			
+		if ( navRectangle.GetWidth() < minHeight )
+			return;
+			
+		wxFont font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+		dc.SetFont(font);
+		
+		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
+			OuterCircleRegion ocr = *it;
+			
+			const int xm  = -5 + cos(ocr.midAngle   * PI / 180) * +(innerRadius + 9);
+			const int ym  = -5 + sin(ocr.midAngle   * PI / 180) * -(innerRadius + 9);
+			
+			dc.DrawLabel(config.toolTipMap[ocr.direction], wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
+		}
+		
+		if ( config.innerCircle == true ) {
+			int xm  = cos(18 * PI / 180) * +(innerRadius -24);
+			int ym  = sin(18 * PI / 180) * -(innerRadius  -0);
+			dc.DrawLabel(config.toolTipMap[CP], wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
+			
+			xm  = cos(10 * PI / 180) * +(innerRadius -25);
+			ym  = sin(10 * PI / 180) * +(innerRadius  -0);
+			dc.DrawLabel(config.toolTipMap[CN], wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
+		}
+	};
 	
 	// draw command chain
+	const int borderSize 	= 1;
+	const wxPen penH		= current.acitvated ? wxPen(config.activatedColour, borderSize, wxSOLID) : wxPen(config.highlightColour, borderSize, wxSOLID);
+	const wxPen penD		= wxPen(config.defaultColour, borderSize, wxSOLID);
+	
 	drawBounderies(true);
 	moveOrigin();
+	
 	drawCenter(false);
-	drawOuterCircleBorders( current.acitvated ? wxPen(activatedColour, 1, wxSOLID) : wxPen(highlightColour, 1, wxSOLID), wxPen(defaultColour, 1, wxSOLID) );
-	drawInnerCircleBorders(2);
-
-
-
-	if ( current.direction == CP ) {
-		
-	} else {
-		
-	}
+	drawOuterCircleBorders(penH, penD);
+	drawInnerCircleBorders(penH, penD);
 	
-	if ( current.direction == CN ) {
-		
-	} else {
-		
-	}
+	dc.DrawCircle(0,0,outerRadius);
+	dc.DrawCircle(0,0,innerRadius);
 	
 	
+	drawArrows();
+	drawRegionInfo();
+	drawRegionTip();
+
+
 	for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
 		OuterCircleRegion ocr = *it;
 		
 		//dc.SetBrush(*wxTRANSPARENT_BRUSH);
 		
-		const int xm  = cos(ocr.midAngle   * PI / 180) * +midRadius;
-		const int ym  = sin(ocr.midAngle   * PI / 180) * -midRadius;
+		const int xm  = -5 + cos(ocr.midAngle   * PI / 180) * +(innerRadius + 9);
+		const int ym  = -5 + sin(ocr.midAngle   * PI / 180) * -(innerRadius + 9);
 /*
 		if ( ocr.direction == current.direction ) {
 			
@@ -326,10 +469,8 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			dc.FloodFill(xm, ym, defaultColour, wxFLOOD_BORDER );
 		}
 */
-	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-	
-	dc.SetFont(font);
-	dc.DrawLabel("+X", wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
+
+
 
 	}
 	
@@ -341,93 +482,9 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	
 	
 	
-	
-	const int TRIANGLE = 3;
-	const int A = 0;
-	const int B = 1;
-	const int C = 2;
-	
-	dc.SetPen(wxPen(*wxBLACK, 1, wxSOLID));
-	dc.SetBrush(*wxTRANSPARENT_BRUSH);
-	
-	// Arrows ( outer circle ) 
-	for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-		OuterCircleRegion ocr = *it;
-		wxColour col1;
-		wxColour col2;
-		
-		switch ( ocr.direction ) {
-			case NN: 	col1 = config.colNN; col2 = config.colNN; break;
-			case SS: 	col1 = config.colSS; col2 = config.colSS; break;
-			case WW: 	col1 = config.colWW; col2 = config.colWW; break;
-			case EE: 	col1 = config.colEE; col2 = config.colEE; break;
-			
-			case NE: 	col1 = config.colNN; col2 = config.colEE; break;
-			case NW: 	col1 = config.colWW; col2 = config.colNN; break;
-			case SE: 	col1 = config.colEE; col2 = config.colSS; break;
-			case SW: 	col1 = config.colSS; col2 = config.colWW; break;
-			default: 	continue;
-		}
-		
-		const double  hight = innerRadius * 0.18;
-		const double  width = innerRadius * ( config.shortFormat ? 0.18 :  0.14 );
-		
-		wxPoint dp1[TRIANGLE];
-		dp1[A].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius + hight));
-		dp1[A].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius + hight));
-		dp1[B].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius - hight));
-		dp1[B].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius - hight));
-		dp1[C].x = cos((ocr.midAngle + width) * PI / 180) * ( +(midRadius - hight));
-		dp1[C].y = sin((ocr.midAngle + width) * PI / 180) * ( -(midRadius - hight));
-		
-		wxPoint dp2[TRIANGLE];
-		dp2[A].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius + hight));
-		dp2[A].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius + hight));
-		dp2[B].x = cos((ocr.midAngle - width) * PI / 180) * ( +(midRadius - hight));
-		dp2[B].y = sin((ocr.midAngle - width) * PI / 180) * ( -(midRadius - hight));
-		dp2[C].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius - hight));
-		dp2[C].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius - hight));
-		
-		dc.SetPen(wxPen(col1, 1, wxSOLID));
-		dc.SetBrush(col1);
-		dc.DrawPolygon(TRIANGLE, dp1);
-		
-		dc.SetPen(wxPen(col2, 1, wxSOLID));
-		dc.SetBrush(col2);
-		dc.DrawPolygon(TRIANGLE, dp2);
-	}
 
-	// Arrow CP
-	if ( config.innerCircle == true ) {
-		dc.SetPen(wxPen(config.colCP, 1, wxSOLID));
-		dc.SetBrush(config.colCP);
-		
-		wxPoint dp[TRIANGLE];
-		dp[A].x = 0;
-		dp[A].y = -innerRadius * 0.8 / 2 - innerRadius * 0.18 - 5;
-		dp[B].x = -innerRadius * 0.25;
-		dp[B].y = -innerRadius * 0.8 / 2 + innerRadius * 0.18 - 5;
-		dp[C].x = +innerRadius * 0.25;
-		dp[C].y = -innerRadius * 0.8 / 2 + innerRadius * 0.18 - 5;
-		
-		dc.DrawPolygon(TRIANGLE, dp);
-	}
 	
-	// Arrow CN
-	if ( config.innerCircle == true ) {
-		dc.SetPen(wxPen(config.colCN, 1, wxSOLID));
-		dc.SetBrush(config.colCN);
-		
-		wxPoint dp[TRIANGLE];
-		dp[A].x = 0;
-		dp[A].y = +innerRadius * 0.8 / 2 + innerRadius * 0.18 + 5;
-		dp[B].x = +innerRadius * 0.25;
-		dp[B].y = +innerRadius * 0.8 / 2 - innerRadius * 0.18 + 5;
-		dp[C].x = -innerRadius * 0.25;
-		dp[C].y = +innerRadius * 0.8 / 2 - innerRadius * 0.18 + 5;
-		
-		dc.DrawPolygon(TRIANGLE, dp);
-	}
+
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
@@ -558,7 +615,7 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 	}
 	
 	evt.direction = current.direction;
-	SetToolTip(config.toolTipMap[current.direction]);
+	drawToolTip(current.direction);
 	
 	if ( current.direction != UD ) {
 		
