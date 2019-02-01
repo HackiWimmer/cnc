@@ -2,6 +2,7 @@
 #define OPENGL_CONTEXT_PATH_BASE_H
 
 #include <cfloat>
+#include <vector>
 #include "3D/GLCncPathData.h"
 #include "3D/GLLineCluster.h"
 #include "3D/GLContextBase.h"
@@ -77,7 +78,13 @@ class GLContextCncPathBase : public GLContextBase {
 		/////////////////////////////////////////////////////////
 		int getOriginX() { return ( viewPort != NULL ? viewPort->getX() : 0 ); }
 		int getOriginY() { return ( viewPort != NULL ? viewPort->getY() : 0 ); }
-
+		
+		long getPathItemCount()			{ return cncPath.size();      }
+		
+		void setVirtualEnd(long val) 	{ cncPath.setVirtualEnd(val); }
+		void resetVirtualEnd() 			{ cncPath.resetVirtualEnd();  }
+		long getVirtualEnd() 			{ return cncPath.getVirtualEnd(); }
+		
 	protected:
 		
 		GLI::GLCncPath		cncPath;

@@ -1,27 +1,8 @@
 #include <iostream>
 #include <wx/dcclient.h>
 #include <wx/dcbuffer.h>
+#include "CncCommon.h"
 #include "CncNavigatorPanel.h"
-
-						extern void log(const wxString& str);
-
-						namespace cnc {
-
-							bool dblCompare( double a, double b) {
-								double eps = std::numeric_limits<double>::epsilon();
-								return std::abs(a - b) <= eps; 
-							}
-							
-							bool dblCompareNull( double a) {
-								return dblCompare(a, 0.0);
-							}
-
-							
-						}
-
-
-						#define PI 3.14159265
-
 
 // ----------------------------------------------------------------------------
 // CncNavigatorPanel Event Table
@@ -468,67 +449,19 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	const wxPen penH		= current.acitvated ? wxPen(config.activatedColour, borderSize, wxSOLID) : wxPen(config.highlightColour, borderSize, wxSOLID);
 	const wxPen penD		= wxPen(config.defaultColour, borderSize, wxSOLID);
 	
-	drawBounderies(true);
+	drawBounderies(config.margin >= 1);
 	moveOrigin();
 	
 	drawCenter(false);
 	drawOuterCircleBorders(penH, penD, true);
 	drawInnerCircleBorders(penH, penD, true);
 	
-	//dc.SetPen(wxPen(*wxRED, 1, wxSOLID));
-	//dc.DrawCircle(0,0,outerRadius);
-	//dc.DrawCircle(0,0,innerRadius);
-	
-	
 	drawArrows();
 	drawRegionInfo();
 	drawRegionTip();
 	
-	
 	drawOuterCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
 	drawInnerCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
-
-/*
-	for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-		OuterCircleRegion ocr = *it;
-		
-		//dc.SetBrush(*wxTRANSPARENT_BRUSH);
-		
-		const int xm  = -5 + cos(ocr.midAngle   * PI / 180) * +(innerRadius + 9);
-		const int ym  = -5 + sin(ocr.midAngle   * PI / 180) * -(innerRadius + 9);
-
-		if ( ocr.direction == current.direction ) {
-			
-			if ( current.acitvated == false ) {
-				
-				dc.SetBrush(config.highlightColour);
-				dc.FloodFill(xm, ym, config.highlightColour, wxFLOOD_BORDER );
-				
-			} else {
-				dc.SetBrush(config.activatedColour);
-				dc.FloodFill(xm, ym, config.activatedColour, wxFLOOD_BORDER );
-			}
-			
-		} else {
-			dc.SetBrush(config.defaultColour);
-			dc.FloodFill(xm, ym, config.defaultColour, wxFLOOD_BORDER );
-		}
-
-
-
-
-	}*/
-	
-
-	
-	
-
-	
-	
-	
-
-	
-
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
@@ -564,19 +497,35 @@ void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
 void CncNavigatorPanel::onSize(wxSizeEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	const wxSize size = GetClientSize();
-	const int margin  = 15;
+	const int margin  = config.margin < 0 ? 0 : config.margin;
 	
 	int navQuarderLenght  = std::min(size.GetWidth(), size.GetHeight());
 	navQuarderLenght     -= (2 * margin);
 	navQuarderLenght     -= (navQuarderLenght % 2);
 	
-	navRectangle.SetX(margin);
-	navRectangle.SetY(margin);
+	if ( config.alignment == wxALIGN_INVALID )
+		config.alignment = wxALIGN_NOT;
+	
+	navRectangle.SetX(margin); // LEFT
+	navRectangle.SetY(margin); // TOP
+	
+	if ( config.alignment & wxALIGN_RIGHT )
+		navRectangle.SetX(size.GetWidth() - navQuarderLenght); 				// RIGHT
+		
+	if ( config.alignment &  wxALIGN_CENTER_HORIZONTAL )
+		navRectangle.SetX(size.GetWidth() / 2 - navQuarderLenght / 2 );  	// CENTER_HORIZONTAL
+	
+	if ( config.alignment & wxALIGN_BOTTOM )
+		navRectangle.SetY(size.GetHeight() - navQuarderLenght); 			// BOTTOM
+	
+	if ( config.alignment &  wxALIGN_CENTER_VERTICAL )
+		navRectangle.SetX(size.GetHeight() / 2 - navQuarderLenght / 2 );  	// CENTER_VERTICAL
+		
 	navRectangle.SetWidth(navQuarderLenght);
 	navRectangle.SetHeight(navQuarderLenght);
 	
-	innerRadius = 0.4 * navQuarderLenght / 2;
-	outerRadius = 0.9 * navQuarderLenght / 2;
+	innerRadius = 0.40 * navQuarderLenght / 2;
+	outerRadius = 0.95 * navQuarderLenght / 2;
 	
 	Refresh();
 }

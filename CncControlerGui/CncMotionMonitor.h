@@ -123,6 +123,12 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 		void updateMonitor();
 		
+		long getPathItemCount()			{ return monitor->getPathItemCount(); }
+		
+		void setVirtualEnd(long val) 	{ monitor->setVirtualEnd(val); }
+		void resetVirtualEnd() 			{ monitor->resetVirtualEnd();  }
+		long getVirtualEnd() 			{ return monitor->getVirtualEnd(); }
+		
 	protected:
 	
 		GLContextCncPathBase* 		monitor;

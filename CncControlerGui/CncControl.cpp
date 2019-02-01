@@ -393,7 +393,15 @@ bool CncControl::connect(const char * portName) {
 	wxASSERT(serialPort);
 	disconnect();
 	
-	std::clog << "Try to connect to: " << serialPort->getClassName() << "("<< portName << ")" << std::endl;
+	wxFileName fn(portName);
+	std::clog << "Try to connect to: " << serialPort->getClassName() 
+	                                   << "("
+									   << fn.GetFullName() 
+									   << ")" 
+									   << " - " 
+									   << CncFileNameService::getSession()
+									   << std::endl;
+									   
 	bool ret = serialPort->connect(portName);
 	if ( ret == true ) {
 		std::cout << " . . . Connection established -";

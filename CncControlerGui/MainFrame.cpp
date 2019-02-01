@@ -83,6 +83,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncTemplateObserver.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
+#include "CncStatisticsPane.h"
 #include "GlobalStrings.h"
 #include "MainFrame.h"
 
@@ -171,14 +172,14 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , toolMagaizne(NULL)
 , positionSpy(NULL)
 , setterList(NULL)
-, statisticSummaryListCtrl(NULL)
-, vectiesListCtrl(NULL)
 , cncSummaryListCtrl(NULL)
 , accelGraphPanel(NULL)
 , cncGamepadState(NULL)
 , optionPane3D(NULL)
 , drawPane3D(NULL)
-, cnc3DSplitterWindow(NULL)
+, statisticsPane(NULL)
+, cnc3DVSplitterWindow(NULL)
+, cnc3DHSplitterWindow(NULL)
 , templateObserver(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , guiCtlSetup(new GuiControlSetup())
@@ -242,6 +243,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
 	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadUpadte, 			this, MainFrame::EventId::GAMEPAD_STATE);
 	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadHeartbeat, 		this, MainFrame::EventId::GAMEPAD_HEARTBEAT);
+	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 			&MainFrame::onNavigatorPanel, 				this);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -265,6 +267,7 @@ MainFrame::~MainFrame() {
 	this->Unbind(wxEVT_TRACE_FROM_THREAD,	 		&MainFrame::onThreadPostError,	 			this, MainFrame::EventId::POST_ERROR);
 	this->Unbind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
 	this->Unbind(wxEVT_GAMEPAD_THREAD,	 			&MainFrame::onGamepdThreadCompletion,	 	this, MainFrame::EventId::COMPLETED);
+	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, 		&MainFrame::onNavigatorPanel, 				this);
 	
 	positionSpy->Unbind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
 	
@@ -315,7 +318,7 @@ void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 		return;
 	}
 	
-	if ( secureRunDlg->IsShownOnScreen() ) {
+	if ( secureRunDlg && secureRunDlg->IsShownOnScreen() ) {
 		wxPostEvent(secureRunDlg, event);
 		event.Skip(false);
 		return;
@@ -532,18 +535,23 @@ void MainFrame::enableGuiControls(bool state) {
 void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 	// 3D splitter window
-	cnc3DSplitterWindow = new CncMonitorVSplitterWindow(this);
-	GblFunc::replaceControl(m_3DSplitterPlaceholder, cnc3DSplitterWindow);
+	cnc3DHSplitterWindow 	= new CncMonitorHSplitterWindow(this);
+	GblFunc::replaceControl(m_3DSplitterPlaceholder, cnc3DHSplitterWindow);
 	
-	drawPane3D    = new GL3DDrawPane(cnc3DSplitterWindow);
-	optionPane3D  = new GL3DOptionPane(cnc3DSplitterWindow);
-	cnc3DSplitterWindow->SplitVertically(drawPane3D, optionPane3D, 0);
+	cnc3DVSplitterWindow 	= new CncMonitorVSplitterWindow(cnc3DHSplitterWindow);
+	drawPane3D    			= new GL3DDrawPane(cnc3DVSplitterWindow);
+	optionPane3D  			= new GL3DOptionPane(cnc3DVSplitterWindow);
+	cnc3DVSplitterWindow->SplitVertically(drawPane3D, optionPane3D, 0);
+	
+	statisticsPane 			= new CncStatisticsPane(cnc3DHSplitterWindow);
+	cnc3DHSplitterWindow->SplitHorizontally(cnc3DVSplitterWindow, statisticsPane, 0);
 	
 	// Montion Monitor
 	motionMonitor = new CncMotionMonitor(this);
 	GblFunc::replaceControl(drawPane3D->GetDrawPane3DPlaceHolder(), motionMonitor);
 	drawPane3D->setMotionMonitor(motionMonitor);
 	optionPane3D->setMotionMonitor(motionMonitor);
+	statisticsPane->setMotionMonitor(motionMonitor);
 	activate3DPerspectiveButton(m_3D_Perspective1);
 	
 	// Template observer
@@ -591,14 +599,6 @@ void MainFrame::installCustControls() {
 	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_setterList, setterList);
 	
-	// statistic summary
-	statisticSummaryListCtrl = new CncStatisticSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
-	GblFunc::replaceControl(m_statisticSummaryListCtrl, statisticSummaryListCtrl);
-	
-	// vecties list
-	vectiesListCtrl = new CncVectiesListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
-	GblFunc::replaceControl(m_vectiesListCtrl, vectiesListCtrl);
-	
 	// summary list
 	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
@@ -611,10 +611,20 @@ void MainFrame::installCustControls() {
 	cncGamepadState = new CncGamepadControllerState(this); 
 	GblFunc::replaceControl(m_gamepadStateController, cncGamepadState);
 	
+	// navigator panel
+	CncNavigatorPanel::Config cfg;
+	cfg.innerCircle = true;
+	cfg.shortFormat = false;
+	cfg.margin		= 0;
+	cfg.alignment	= wxALIGN_CENTER_HORIZONTAL;
+	cfg.initToolTipMapAsCoordSytem();
+	navigatorPanel = new CncNavigatorPanel(this, cfg); 
+	GblFunc::replaceControl(m_navigationPanelPlaceholder, navigatorPanel);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(navigatorPanel);
 	registerGuiControl(sourceEditor);
 	registerGuiControl(outboundEditor);
 	registerGuiControl(fileView);
@@ -724,16 +734,7 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_manuallySpeedSlider);
 	registerGuiControl(m_manuallySpeedValue);
 	registerGuiControl(m_mmRadioCoordinates);
-	registerGuiControl(m_cmXneg);
-	registerGuiControl(m_cmXpos);
-	registerGuiControl(m_cmYneg);
-	registerGuiControl(m_cmYpos);
-	registerGuiControl(m_cmZneg);
-	registerGuiControl(m_cmZpos);
-	registerGuiControl(m_cmXnegYneg);
-	registerGuiControl(m_cmXposYpos);
-	registerGuiControl(m_cmXnegYpos);
-	registerGuiControl(m_cmXposYneg);
+	
 	//...
 }
 ///////////////////////////////////////////////////////////////////
@@ -772,45 +773,23 @@ void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	GblFunc::stacktrace(std::cout);
+	
+	for ( long i=0; i<motionMonitor->getPathItemCount(); i++ ) {
+		motionMonitor->setVirtualEnd(i);
+		
+		if ( i%10 == 0 )
+			motionMonitor->display();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	
-	m_btPathGenerator->Enable(!m_btPathGenerator->IsEnabled());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	
-	std::function<void(wxMenu* menu, bool state)> enableX = [&](wxMenu* menu, bool state) {
-		if ( menu == NULL )
-			return;
-			
-		for ( unsigned int i = 0; i < menu->GetMenuItemCount (); i++ ) {
-			wxMenuItem* item = menu->FindItemByPosition(i);
-			if ( item->IsSubMenu() )
-				enableX(item->GetSubMenu(), state);
-			
-			if ( item->IsSeparator() )
-				continue;
-				
-			//item->Enable(enable);
-			std::clog << item->GetItemLabelText() << std::endl;
-			 
-		}
-	};
-	
-	
-	for ( unsigned int m = 0; m < m_menuBar->GetMenuCount(); m++) {
-		wxMenu* menu = m_menuBar->GetMenu(m);
-		std::cout << m_menuBar->GetMenuLabel(m) << std::endl;
-		enableX(menu, true);
-		
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -1060,12 +1039,8 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 	}
 	
 	// statistic
-	if (    m_checkBoxStatisticUpdate->IsChecked() == true 
-		 && isProcessing() 
-		 && statisticSummaryListCtrl->IsShownOnScreen() ) 
-	{
-		logStatistics();
-	}
+	if ( isProcessing() )
+		statisticsPane->logStatistics(false);
 	
 	// feed speed control + feed speed panel
 	if ( cnc != NULL ) {
@@ -1558,11 +1533,11 @@ void MainFrame::initialize(void) {
 	decoratePosSpyConnectButton(true);
 	decorateSecureDlgChoice(true);
 	registerGuiControls();
-	toggleMonitorStatistics(false);
 	changeManuallySpeedValue();
 	initSpeedConfigPlayground();
 	decorateOutboundSaveControls(false);
-	toggleMotionMonitorOptionPlane(true);
+	toggleMotionMonitorOptionPane(true);
+	toggleMotionMonitorStatisticPane(true);
 	
 	m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
 	
@@ -1919,6 +1894,8 @@ bool MainFrame::connectSerialPort() {
 	createCncControl(sel, serialFileName);
 	if ( cnc == NULL )
 		return false;
+		
+	statisticsPane->setCncControl(cnc);
 	
 	initializeCncControl();
 	selectSerialSpyMode();
@@ -3740,7 +3717,7 @@ bool MainFrame::processTemplateIntern() {
 		cnc->updateDrawControl();
 		
 	logTimeConsumed();
-	logStatistics();
+	statisticsPane->logStatistics();
 	displayReport(1);
 		
 	enableControls();
@@ -3760,115 +3737,6 @@ void MainFrame::logTimeConsumed() {
 	int h = (int) ((processLastDuartion / (1000 * 60 * 60)) % 24);
 	
 	m_cmdDuration->ChangeValue(wxString::Format("%02d:%02d:%02d.%03d", h, m, s, n));
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::logStatistics() {
-///////////////////////////////////////////////////////////////////
-	if ( cnc == NULL )
-		return;
-		
-	if ( vectiesListCtrl->IsShownOnScreen() )
-		updateStatisticPanel();
-		
-	CncDoublePosition min(cnc->getMinPositionsMetric());
-	CncDoublePosition max(cnc->getMaxPositionsMetric());
-	CncNanoTimespan measurementTimeSpan = cnc->getMeasurementNanoTimeSpanTotal();
-	
-	double elapsedTimeMSEC	= 0.0;
-	double elapsedTimeSEC	= 0.0;
-	double speed_MM_MIN		= 0.0;
-	double speed_MM_SEC		= 0.0;
-	long speed_SP_SEC		= 0;
-	long speed_RPM			= 0;
-	
-	if ( measurementTimeSpan > 0L ) {
-		elapsedTimeMSEC = measurementTimeSpan / (1000.0 * 1000.0);
-		elapsedTimeSEC  = elapsedTimeMSEC / (1000.0);
-		speed_MM_SEC 	= cnc->getTotalDistance() / elapsedTimeSEC;
-		speed_MM_MIN 	= speed_MM_SEC * 60;
-		
-		speed_SP_SEC    = cnc->getStepCounter() / elapsedTimeSEC;
-		speed_RPM		= (speed_SP_SEC / GBL_CONFIG->getStepsXYZ() ) * 60;
-	}
-
-	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);
-	
-	bool setupSpeedValue = GBL_CONFIG->isProbeMode() == false;
-	if ( cnc->isEmulator() == false )
-		setupSpeedValue = true;
-
-	if (  setupSpeedValue ) {
-		speedMMMIN.assign( CncNumberFormatter::toString(speed_MM_MIN, 1));
-		speedMMSEC.assign( CncNumberFormatter::toString(speed_MM_SEC, 1));
-		speedSPSEC.assign( CncNumberFormatter::toString(speed_SP_SEC));
-		speedRPM.assign(   CncNumberFormatter::toString(speed_RPM));
-	}
-	
-	// statistic keys
-	static const char* SKEY_MIN_BOUND	= "Boundaries - Min";
-	static const char* SKEY_MAX_BOUND	= "Boundaries - Max";
-	static const char* SKEY_STEP_CNT	= "Step count";
-	static const char* SKEY_POS_CNT		= "Position count";
-	static const char* SKEY_DISTANCE 	= "Distance";
-	static const char* SKEY_TIME 		= "Time consumend";
-	static const char* SKEY_SPEED 		= "Feed speed AVG";
-	static const char* SKEY_SPEED_EXT	= "Performance AVG";
-
-	// add rows - ones a time
-	if ( statisticSummaryListCtrl->getItemCount() == 0 ) {
-		statisticSummaryListCtrl->addKey(SKEY_MIN_BOUND, 	"X, Y, Z", 				"mm");
-		statisticSummaryListCtrl->addKey(SKEY_MAX_BOUND, 	"X, Y, Z", 				"mm");
-		statisticSummaryListCtrl->addKey(SKEY_STEP_CNT, 	"Total, X, Y, Z", 		"steps");
-		statisticSummaryListCtrl->addKey(SKEY_POS_CNT, 		"Total", 				"steps");
-		statisticSummaryListCtrl->addKey(SKEY_DISTANCE, 	"Total, X, Y, Z", 		"mm");
-		statisticSummaryListCtrl->addKey(SKEY_TIME, 		"Total, Stepping", 		"ms");
-		statisticSummaryListCtrl->addKey(SKEY_SPEED_EXT, 	"steps/sec, rpm", 		"unit");
-		statisticSummaryListCtrl->addKey(SKEY_SPEED, 		"mm/sec, mm/min", 		"mm/unit");
-	}
-	
-	// update statistic
-	statisticSummaryListCtrl->updateValues(SKEY_MIN_BOUND	, _("")
-															, CncNumberFormatter::toString(min.getX(), 3)
-															, CncNumberFormatter::toString(min.getY(), 3)
-															, CncNumberFormatter::toString(min.getZ(), 3));
-															
-	statisticSummaryListCtrl->updateValues(SKEY_MAX_BOUND	, _("")
-															, CncNumberFormatter::toString(max.getX(), 3)
-															, CncNumberFormatter::toString(max.getY(), 3)
-															, CncNumberFormatter::toString(max.getZ(), 3));
-	
-	statisticSummaryListCtrl->updateValues(SKEY_STEP_CNT	, CncNumberFormatter::toString(cnc->getStepCounter())
-															, CncNumberFormatter::toString(cnc->getStepCounterX())
-															, CncNumberFormatter::toString(cnc->getStepCounterY())
-															, CncNumberFormatter::toString(cnc->getStepCounterZ()));
-	
-	statisticSummaryListCtrl->updateValues(SKEY_POS_CNT		, _("")
-															, _("")
-															, _("")
-															, CncNumberFormatter::toString(cnc->getPositionCounter()));
-	
-	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getTotalDistance()),  3)
-															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceX()), 3)
-															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceY()), 3)
-															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceZ()), 3));
-	
-	statisticSummaryListCtrl->updateValues(SKEY_TIME		, _("")
-															, _("")
-															, CncNumberFormatter::toString((double)(processLastDuartion), 1)
-															, CncNumberFormatter::toString(elapsedTimeMSEC, 1));
-	
-	statisticSummaryListCtrl->updateValues(SKEY_SPEED_EXT	, _("")
-															, _("")
-															, speedSPSEC
-															, speedRPM);
-	
-	statisticSummaryListCtrl->updateValues(SKEY_SPEED		, _("")
-															, _("")
-															, speedMMSEC
-															, speedMMMIN);
-															
-	statisticSummaryListCtrl->Refresh();
-	statisticSummaryListCtrl->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::resetMinMaxPositions() {
@@ -5215,17 +5083,7 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 										cnc->updatePreview3D();
 									break;
 		}
-		
-	} else if ( (wxWindow*)event.GetEventObject() == m_statisticBook ) {
-		switch ( sel ) {
-			case StatisticSelection::VAL::SUMMARY_PANEL:
-									break;
-									
-			case StatisticSelection::VAL::VECTIES_PANAL:
-									updateStatisticPanel();
-									break;
-		}
-	} 
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::outboundBookChanging(wxNotebookEvent& event) {
@@ -5234,29 +5092,6 @@ void MainFrame::outboundBookChanging(wxNotebookEvent& event) {
 	// unsigned int sel = event.GetSelection();
 	// if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 	// }
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateStatisticPanel() {
-///////////////////////////////////////////////////////////////////
-	if ( isProcessing() )
-		return;
-		
-	if ( vectiesListCtrl == NULL )
-		return;
-	
-	if ( motionMonitor == NULL )
-		return;
-		
-	long ic = vectiesListCtrl->getItemCount();
-	
-	if ( vectiesListCtrl->IsFrozen() == false )
-		vectiesListCtrl->Freeze();
-		
-	motionMonitor->fillVectiesListCtr(ic, vectiesListCtrl);
-	vectiesListCtrl->SetToolTip(wxString::Format("Item count: %ld", vectiesListCtrl->getItemCount()));
-
-	if ( vectiesListCtrl->IsFrozen() == true )
-		vectiesListCtrl->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayUserAgent(wxCommandEvent& event) {
@@ -5954,52 +5789,10 @@ void MainFrame::show3D(wxCommandEvent& event) {
 	} 
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::clearMotionMonitorVecties(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	vectiesListCtrl->clear();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::copyMotionMonitorVecties(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( vectiesListCtrl->getItemCount() == 0 )
-		return;
-
-	// Write some text to the clipboard
-	if ( wxTheClipboard->Open() ) {
-		startAnimationControl();
-
-		wxString content;
-		content.reserve(1024 * 1024);
-		
-		for ( long i=0; i<vectiesListCtrl->getItemCount(); i++ )
-			vectiesListCtrl->getRow(i).trace(content);
-		
-		// This data objects are held by the clipboard,
-		// so do not delete them in the app.
-		wxTheClipboard->SetData( new wxTextDataObject(content) );
-		wxTheClipboard->Close();
-		
-		stopAnimationControl();
-	}
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::traceMotionMonitorVecties(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	std::clog << "Motion Monitor Data - ";
-	
-	std::stringstream ss;
-	motionMonitor->tracePathData(ss);
-	
-	m_logger->Freeze();
-	m_logger->AppendText(ss.str().c_str());
-	m_logger->Thaw();
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor() {
 ///////////////////////////////////////////////////////////////////
 	motionMonitor->clear();
-	vectiesListCtrl->clear();
-	statisticSummaryListCtrl->resetValues();
+	statisticsPane->clear();
 	
 	decorateOutboundEditor();
 }
@@ -6903,41 +6696,6 @@ void MainFrame::decorateSpeedControlBtn(bool useSpeedCfg) {
 	m_speedCtrlStateLabel->Refresh();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::toggleMonitorStatistics(bool shown) {
-/////////////////////////////////////////////////////////////////////
-	wxFlexGridSizer* sizer = static_cast<wxFlexGridSizer*>(m_3DOutboundStatistics->GetContainingSizer());
-	if ( sizer == NULL )
-		return;
-		
-	wxASSERT(sizer->GetItemCount() == 2);
-	
-	const int monitorId   = 0;
-	const int statisticId = 1;
-
-	if ( sizer->IsRowGrowable(monitorId))	sizer->RemoveGrowableRow(monitorId);
-	if ( sizer->IsRowGrowable(statisticId))	sizer->RemoveGrowableRow(statisticId);
-
-	if ( shown == false ) {
-		m_statisticBook->Show(false);
-		m_btShowHideStatistics->SetBitmap(ImageLibStatistics().Bitmap("BMP_HIDE"));
-
-		sizer->AddGrowableRow(monitorId,	0);
-	} else {
-		m_statisticBook->Show(true);
-		m_btShowHideStatistics->SetBitmap(ImageLibStatistics().Bitmap("BMP_SHOW"));
-
-		sizer->AddGrowableRow(monitorId,	3);
-		sizer->AddGrowableRow(statisticId,	1);
-		
-		if ( vectiesListCtrl->IsShownOnScreen() )
-			updateStatisticPanel();
-	}
-	
-	sizer->Layout();
-	m_btShowHideStatistics->Refresh();
-	m_btShowHideStatistics->Update();
-}
-/////////////////////////////////////////////////////////////////////
 void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	if ( updateManagerThread != NULL ) {
@@ -7056,98 +6814,71 @@ void MainFrame::manualContinuousMoveStop() {
 	cnc->manualContinuousMoveStop();
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::cmXnegLeftDown(wxMouseEvent& event) {
+void MainFrame::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmXposLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmYnegLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmYposLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmZnegLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmZposLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmXnegYnegLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmXnegYposLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmXposYnegLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmXposYposLeftDown(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmLeftDClick(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStop();
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmLeftUp(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStop();
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmKillFocus(wxFocusEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStop();
-	event.Skip(false);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::cmLeave(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	manualContinuousMoveStop();
-	event.Skip(false);
+	typedef CncNavigatorPanelEvent::Id Id;
+	const Id eventId = (Id)event.GetId();
+	
+	auto moveStart = [&]() {
+		CncLinearDirection x = CncLinearDirection::CncNoneDir;
+		CncLinearDirection y = CncLinearDirection::CncNoneDir;
+		CncLinearDirection z = CncLinearDirection::CncNoneDir;
+		
+		bool move = true;
+		switch ( event.direction ) {
+			case CncNavigatorPanel::Direction::EE: 	x = CncLinearDirection::CncPosDir; break;
+			case CncNavigatorPanel::Direction::WW: 	x = CncLinearDirection::CncNegDir; break;
+			
+			case CncNavigatorPanel::Direction::NN: 	y = CncLinearDirection::CncPosDir; break;
+			case CncNavigatorPanel::Direction::SS: 	y = CncLinearDirection::CncNegDir; break;
+			
+			case CncNavigatorPanel::Direction::CP: 	z = CncLinearDirection::CncPosDir; break;
+			case CncNavigatorPanel::Direction::CN: 	z = CncLinearDirection::CncNegDir; break;
+			
+			case CncNavigatorPanel::Direction::NW:	x = CncLinearDirection::CncNegDir; 
+													y = CncLinearDirection::CncPosDir;
+													break;
+													
+			case CncNavigatorPanel::Direction::NE:	x = CncLinearDirection::CncPosDir; 
+													y = CncLinearDirection::CncPosDir;
+													break;
+													
+			case CncNavigatorPanel::Direction::SW:	x = CncLinearDirection::CncNegDir; 
+													y = CncLinearDirection::CncNegDir;
+													break;
+													
+			case CncNavigatorPanel::Direction::SE:	x = CncLinearDirection::CncPosDir; 
+													y = CncLinearDirection::CncNegDir;
+													break;
+													
+			default:								move = false;
+		}
+		
+		if ( move == true )
+			manualContinuousMoveStart(x, y, z);
+	};
+	
+	auto moveStop = [&]() {
+		manualContinuousMoveStop();
+	};
+		
+	switch ( eventId ) {
+		case Id::CNP_ACTIVATE_REGION:	moveStart();
+										break;
+										
+		case Id::CNP_DEACTIVATE_REGION:
+		case Id::CNP_LEAVE_PANEL:
+		case Id::CNP_KILL_FOCUS:
+		case Id::CNP_LEAVE_REGION:
+										moveStop();
+										break;
+		default: ;
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setReferencePosition(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	showReferencePositionDlg("User defined call . . .");
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::toggleMonitorStatistics(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	toggleMonitorStatistics( m_statisticBook->IsShown() == false );
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::warmStartController(wxCommandEvent& event) {
@@ -7536,14 +7267,26 @@ void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 	prepareAndShowMonitorTemplatePreview(true);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::toggleMotionMonitorOptionPlane(wxCommandEvent& event) {
+void MainFrame::toggleMotionMonitorOptionPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	toggleMotionMonitorOptionPlane(false);
+	toggleMotionMonitorOptionPane(false);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::toggleMotionMonitorOptionPlane(bool forceHide) {
+void MainFrame::toggleMotionMonitorStatisticPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	cnc3DSplitterWindow->toggleRightWindow();
+	toggleMotionMonitorStatisticPane(false);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMotionMonitorOptionPane(bool forceHide) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc3DVSplitterWindow != NULL )
+		cnc3DVSplitterWindow->toggleRightWindow();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMotionMonitorStatisticPane(bool forceHide) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc3DHSplitterWindow != NULL )
+		cnc3DHSplitterWindow->toggleBottomWindow();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectMetricUnitFrom(wxCommandEvent& event) {
@@ -7594,12 +7337,47 @@ void MainFrame::enableSourceEditorMenuItems(bool enable) {
 
 
 
-
-
-
-void MainFrame::selectManuallyToolId(wxCommandEvent& event)
-{
-	std::cout << "todo" << std::endl;
+/////////////////////////////////////////////////////////////////////
+void MainFrame::monitorReplayStart(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->setVirtualEnd(1);
+	motionMonitor->display();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::monitorReplayPrev(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->setVirtualEnd(motionMonitor->getVirtualEnd() - 1);
+	motionMonitor->display();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::monitorReplayNext(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->setVirtualEnd(motionMonitor->getVirtualEnd() + 1);
+	motionMonitor->display();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::monitorReplayEnd(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	motionMonitor->setVirtualEnd(motionMonitor->getPathItemCount() - 1);
+	motionMonitor->display();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::monitorReplayPlay(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	for ( long i=0; i<motionMonitor->getPathItemCount(); i++ ) {
+		motionMonitor->setVirtualEnd(i);
+		
+		if ( i%10 == 0 )
+			motionMonitor->display();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::monitorReplayPause(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::monitorReplayStop(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
 }
 
 
@@ -7610,11 +7388,9 @@ void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 
 
 
-
-
-
-
-
-
-
+void MainFrame::selectManuallyToolId(wxCommandEvent& event)
+{
+	#warning selectManuallyToolId - can may be removed
+	std::cout << "todo" << std::endl;
+}
 

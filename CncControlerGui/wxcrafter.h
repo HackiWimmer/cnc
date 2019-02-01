@@ -223,29 +223,11 @@ protected:
     wxStaticLine* m_staticLine783;
     wxNotebook* m_manualMotionControl;
     wxPanel* m_panel5187;
-    wxStaticBitmap* m_staticBitmap5542;
-    wxButton* m_cmXnegYpos;
-    wxButton* m_cmYpos;
-    wxButton* m_cmXposYpos;
-    wxButton* m_cmXneg;
-    wxStaticText* m_staticText5556;
-    wxButton* m_cmXpos;
-    wxButton* m_cmXnegYneg;
-    wxButton* m_cmYneg;
-    wxButton* m_cmXposYneg;
-    wxStaticBitmap* m_staticBitmap5535;
-    wxStaticLine* m_staticLine5529;
-    wxStaticBitmap* m_staticBitmap55355;
-    wxButton* m_cmZpos;
-    wxStaticText* m_staticText5559;
-    wxButton* m_cmZneg;
+    wxPanel* m_navigationPanelPlaceholder;
     wxStaticLine* m_staticLine5550;
     wxStaticBitmap* m_staticBitmap5901;
     wxStaticText* m_cbStepSensitivityText;
     wxRadioBox* m_rbStepSensitivity;
-    wxStaticText* m_staticText5838;
-    wxStaticText* m_staticText533816;
-    wxStaticText* m_staticText5338;
     wxStaticLine* m_staticLine5552;
     wxStaticBitmap* m_staticBitmap5907;
     wxStaticText* m_staticText5909;
@@ -461,6 +443,15 @@ protected:
     wxPanel* m_cnc3DPane;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
     wxPanel* m_placeholderPanel;
+    wxStaticLine* m_staticLine50162;
+    wxButton* m_replayStart;
+    wxButton* m_replayPrev;
+    wxButton* m_replayNext;
+    wxButton* m_replayEnd;
+    wxButton* m_replayPlay;
+    wxButton* m_replayPause;
+    wxButton* m_replayStop;
+    wxStaticLine* m_staticLine50163;
     wxBitmapToggleButton* m_btnOrigin;
     wxBitmapToggleButton* m_btnRuler;
     wxBitmapToggleButton* m_btnHelpLines;
@@ -490,15 +481,6 @@ protected:
     wxTextCtrl* m_crossings;
     wxStaticText* m_staticText1966;
     wxTextCtrl* m_passingCount;
-    wxNotebook* m_statisticBook;
-    wxPanel* m_statisticPageSum;
-    wxListCtrl* m_statisticSummaryListCtrl;
-    wxCheckBox* m_checkBoxStatisticUpdate;
-    wxPanel* m_statisticPageVecties;
-    wxButton* m_3D_Trace3;
-    wxButton* m_3D_Trace4;
-    wxButton* m_3D_Trace;
-    wxListCtrl* m_vectiesListCtrl;
     wxButton* m_motionMonitorOptionDlg;
     wxStaticLine* m_staticLine34832;
     wxButton* m_3D_Top;
@@ -824,20 +806,6 @@ protected:
     virtual void changeSpeedConfigSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void updatedSpeedConfigSteps(wxCommandEvent& event) { event.Skip(); }
     virtual void updatedSpeedConfigAccelAxis(wxCommandEvent& event) { event.Skip(); }
-    virtual void cmKillFocus(wxFocusEvent& event) { event.Skip(); }
-    virtual void cmLeave(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmLeftUp(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmXnegYposLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmLeftDClick(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmYposLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmXposYposLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmXnegLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmXposLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmXnegYnegLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmYnegLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmXposYnegLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmZposLeftDown(wxMouseEvent& event) { event.Skip(); }
-    virtual void cmZnegLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void moveHome(wxCommandEvent& event) { event.Skip(); }
     virtual void moveToZeroXY(wxCommandEvent& event) { event.Skip(); }
     virtual void moveToZeroXYZ(wxCommandEvent& event) { event.Skip(); }
@@ -902,6 +870,13 @@ protected:
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void monitorReplayStart(wxCommandEvent& event) { event.Skip(); }
+    virtual void monitorReplayPrev(wxCommandEvent& event) { event.Skip(); }
+    virtual void monitorReplayNext(wxCommandEvent& event) { event.Skip(); }
+    virtual void monitorReplayEnd(wxCommandEvent& event) { event.Skip(); }
+    virtual void monitorReplayPlay(wxCommandEvent& event) { event.Skip(); }
+    virtual void monitorReplayPause(wxCommandEvent& event) { event.Skip(); }
+    virtual void monitorReplayStop(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorOrigin(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorRuler(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorHelpLines(wxCommandEvent& event) { event.Skip(); }
@@ -914,11 +889,8 @@ protected:
     virtual void displayIntervalThumbtrack(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
-    virtual void toggleMonitorStatistics(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
-    virtual void copyMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
-    virtual void traceMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
-    virtual void toggleMotionMonitorOptionPlane(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleMotionMonitorOptionPane(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -1163,29 +1135,11 @@ public:
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
     wxStaticLine* GetStaticLine783() { return m_staticLine783; }
-    wxStaticBitmap* GetStaticBitmap5542() { return m_staticBitmap5542; }
-    wxButton* GetCmXnegYpos() { return m_cmXnegYpos; }
-    wxButton* GetCmYpos() { return m_cmYpos; }
-    wxButton* GetCmXposYpos() { return m_cmXposYpos; }
-    wxButton* GetCmXneg() { return m_cmXneg; }
-    wxStaticText* GetStaticText5556() { return m_staticText5556; }
-    wxButton* GetCmXpos() { return m_cmXpos; }
-    wxButton* GetCmXnegYneg() { return m_cmXnegYneg; }
-    wxButton* GetCmYneg() { return m_cmYneg; }
-    wxButton* GetCmXposYneg() { return m_cmXposYneg; }
-    wxStaticBitmap* GetStaticBitmap5535() { return m_staticBitmap5535; }
-    wxStaticLine* GetStaticLine5529() { return m_staticLine5529; }
-    wxStaticBitmap* GetStaticBitmap55355() { return m_staticBitmap55355; }
-    wxButton* GetCmZpos() { return m_cmZpos; }
-    wxStaticText* GetStaticText5559() { return m_staticText5559; }
-    wxButton* GetCmZneg() { return m_cmZneg; }
+    wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
     wxStaticLine* GetStaticLine5550() { return m_staticLine5550; }
     wxStaticBitmap* GetStaticBitmap5901() { return m_staticBitmap5901; }
     wxStaticText* GetCbStepSensitivityText() { return m_cbStepSensitivityText; }
     wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
-    wxStaticText* GetStaticText5838() { return m_staticText5838; }
-    wxStaticText* GetStaticText533816() { return m_staticText533816; }
-    wxStaticText* GetStaticText5338() { return m_staticText5338; }
     wxStaticLine* GetStaticLine5552() { return m_staticLine5552; }
     wxStaticBitmap* GetStaticBitmap5907() { return m_staticBitmap5907; }
     wxStaticText* GetStaticText5909() { return m_staticText5909; }
@@ -1401,6 +1355,15 @@ public:
     wxPanel* GetCncParameters() { return m_cncParameters; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
     wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
+    wxStaticLine* GetStaticLine50162() { return m_staticLine50162; }
+    wxButton* GetReplayStart() { return m_replayStart; }
+    wxButton* GetReplayPrev() { return m_replayPrev; }
+    wxButton* GetReplayNext() { return m_replayNext; }
+    wxButton* GetReplayEnd() { return m_replayEnd; }
+    wxButton* GetReplayPlay() { return m_replayPlay; }
+    wxButton* GetReplayPause() { return m_replayPause; }
+    wxButton* GetReplayStop() { return m_replayStop; }
+    wxStaticLine* GetStaticLine50163() { return m_staticLine50163; }
     wxBitmapToggleButton* GetBtnOrigin() { return m_btnOrigin; }
     wxBitmapToggleButton* GetBtnRuler() { return m_btnRuler; }
     wxBitmapToggleButton* GetBtnHelpLines() { return m_btnHelpLines; }
@@ -1429,15 +1392,6 @@ public:
     wxTextCtrl* GetCrossings() { return m_crossings; }
     wxStaticText* GetStaticText1966() { return m_staticText1966; }
     wxTextCtrl* GetPassingCount() { return m_passingCount; }
-    wxListCtrl* GetStatisticSummaryListCtrl() { return m_statisticSummaryListCtrl; }
-    wxCheckBox* GetCheckBoxStatisticUpdate() { return m_checkBoxStatisticUpdate; }
-    wxPanel* GetStatisticPageSum() { return m_statisticPageSum; }
-    wxButton* Get3D_Trace3() { return m_3D_Trace3; }
-    wxButton* Get3D_Trace4() { return m_3D_Trace4; }
-    wxButton* Get3D_Trace() { return m_3D_Trace; }
-    wxListCtrl* GetVectiesListCtrl() { return m_vectiesListCtrl; }
-    wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
-    wxNotebook* GetStatisticBook() { return m_statisticBook; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
     wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
     wxStaticLine* GetStaticLine34832() { return m_staticLine34832; }
@@ -2187,28 +2141,49 @@ public:
 };
 
 
+class CncStatisticsPaneBase : public wxPanel
+{
+protected:
+    wxNotebook* m_statisticBook;
+    wxPanel* m_statisticPageSum;
+    wxListCtrl* m_statisticSummaryListCtrl;
+    wxCheckBox* m_checkBoxStatisticUpdate;
+    wxPanel* m_statisticPageVecties;
+    wxButton* m_3D_Trace3;
+    wxButton* m_3D_Trace4;
+    wxButton* m_3D_Trace;
+    wxListCtrl* m_vectiesListCtrl;
+
+protected:
+    virtual void statisticBookChanged(wxNotebookEvent& event) { event.Skip(); }
+    virtual void clearMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
+    virtual void copyMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
+    virtual void traceMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxListCtrl* GetStatisticSummaryListCtrl() { return m_statisticSummaryListCtrl; }
+    wxCheckBox* GetCheckBoxStatisticUpdate() { return m_checkBoxStatisticUpdate; }
+    wxPanel* GetStatisticPageSum() { return m_statisticPageSum; }
+    wxButton* Get3D_Trace3() { return m_3D_Trace3; }
+    wxButton* Get3D_Trace4() { return m_3D_Trace4; }
+    wxButton* Get3D_Trace() { return m_3D_Trace; }
+    wxListCtrl* GetVectiesListCtrl() { return m_vectiesListCtrl; }
+    wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
+    wxNotebook* GetStatisticBook() { return m_statisticBook; }
+    CncStatisticsPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~CncStatisticsPaneBase();
+};
+
+
 class CncReferencePositionBase : public wxDialog
 {
 protected:
     wxStaticText* m_staticText5505;
-    wxStaticText* m_staticText5507;
-    wxStaticText* m_staticText5509;
     wxStaticLine* m_staticLine5357;
     wxStaticText* m_staticText5355;
     wxStaticBitmap* m_staticBitmap5844;
     wxRadioBox* m_rbStepSensitivity;
-    wxButton* m_btXNegYpos;
-    wxButton* m_btYPos;
-    wxButton* m_btXPosYPos;
-    wxButton* m_btXNeg;
-    wxStaticBitmap* m_staticBitmap5501;
-    wxButton* m_btXPos;
-    wxButton* m_btXNegYNeg;
-    wxButton* m_btYNeg;
-    wxButton* m_btXPosYNeg;
-    wxStaticLine* m_staticLine5516;
-    wxButton* m_btZPos;
-    wxButton* m_btZNeg;
+    wxPanel* m_navigationPanelPlaceholder;
     wxStaticLine* m_staticLine5572;
     wxTextCtrl* m_textMessage;
     wxStaticLine* m_staticLine535015;
@@ -2244,21 +2219,6 @@ protected:
     virtual void init(wxInitDialogEvent& event) { event.Skip(); }
     virtual void show(wxShowEvent& event) { event.Skip(); }
     virtual void selectStepSensitivity(wxCommandEvent& event) { event.Skip(); }
-    virtual void navigateKillFocus(wxFocusEvent& event) { event.Skip(); }
-    virtual void navigateLeave(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateLeftUp(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateXNegYPos(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateDClick(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateYPos(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateXPosYPos(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateXNeg(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateXPos(wxCommandEvent& event) { event.Skip(); }
-    virtual void navigateXPos(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateXNegYNeg(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateYNeg(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateXPosYNeg(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateZPos(wxMouseEvent& event) { event.Skip(); }
-    virtual void navigateZNeg(wxMouseEvent& event) { event.Skip(); }
     virtual void mode1(wxCommandEvent& event) { event.Skip(); }
     virtual void mode2(wxCommandEvent& event) { event.Skip(); }
     virtual void mode3(wxCommandEvent& event) { event.Skip(); }
@@ -2270,24 +2230,11 @@ protected:
 
 public:
     wxStaticText* GetStaticText5505() { return m_staticText5505; }
-    wxStaticText* GetStaticText5507() { return m_staticText5507; }
-    wxStaticText* GetStaticText5509() { return m_staticText5509; }
     wxStaticLine* GetStaticLine5357() { return m_staticLine5357; }
     wxStaticText* GetStaticText5355() { return m_staticText5355; }
     wxStaticBitmap* GetStaticBitmap5844() { return m_staticBitmap5844; }
     wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
-    wxButton* GetBtXNegYpos() { return m_btXNegYpos; }
-    wxButton* GetBtYPos() { return m_btYPos; }
-    wxButton* GetBtXPosYPos() { return m_btXPosYPos; }
-    wxButton* GetBtXNeg() { return m_btXNeg; }
-    wxStaticBitmap* GetStaticBitmap5501() { return m_staticBitmap5501; }
-    wxButton* GetBtXPos() { return m_btXPos; }
-    wxButton* GetBtXNegYNeg() { return m_btXNegYNeg; }
-    wxButton* GetBtYNeg() { return m_btYNeg; }
-    wxButton* GetBtXPosYNeg() { return m_btXPosYNeg; }
-    wxStaticLine* GetStaticLine5516() { return m_staticLine5516; }
-    wxButton* GetBtZPos() { return m_btZPos; }
-    wxButton* GetBtZNeg() { return m_btZNeg; }
+    wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
     wxStaticLine* GetStaticLine5572() { return m_staticLine5572; }
     wxTextCtrl* GetTextMessage() { return m_textMessage; }
     wxStaticLine* GetStaticLine535015() { return m_staticLine535015; }

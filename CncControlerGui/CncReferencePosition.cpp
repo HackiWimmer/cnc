@@ -1,17 +1,32 @@
 #include "CncReferencePosition.h"
+#include "GlobalFunctions.h"
 #include "CncCommon.h"
 ///////////////////////////////////////////////////////////////////
 CncReferencePosition::CncReferencePosition(MainFrame* parent)
 : CncReferencePositionBase(parent)
 , parentFrame(parent)
+, navigationPanel(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	setMode(CncRefPositionMode::CncRM_Mode1);
 	setMeasurePlateThickness(0.0);
+	
+	//navigation panel control
+	CncNavigatorPanel::Config cfg;
+	cfg.innerCircle = true;
+	cfg.shortFormat = true;
+	cfg.alignment	= wxALIGN_RIGHT;
+	cfg.initToolTipMapAsCoordSytem();
+	
+	navigationPanel = new CncNavigatorPanel(this, cfg);
+	GblFunc::replaceControl(m_navigationPanelPlaceholder, navigationPanel);
+	
+	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 	&CncReferencePosition::onNavigatorPanel, 	this);
 }
 ///////////////////////////////////////////////////////////////////
 CncReferencePosition::~CncReferencePosition() {
 ///////////////////////////////////////////////////////////////////
+	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, &CncReferencePosition::onNavigatorPanel, 	this);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncReferencePosition::isWorkpieceThicknessNeeded() {
@@ -115,102 +130,63 @@ void CncReferencePosition::setMode(short mode) {
 	m_modeText->SetLabel(hint);
 }
 ///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateXPos(wxMouseEvent& event) {
+void CncReferencePosition::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateXNeg(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateYPos(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-//////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateYNeg(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateZPos(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncPosDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateZNeg(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNoneDir, CncLinearDirection::CncNoneDir, CncLinearDirection::CncNegDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateXNegYNeg(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateXNegYPos(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncNegDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateXPosYNeg(wxMouseEvent& event){
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncNegDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateXPosYPos(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStart(CncLinearDirection::CncPosDir, CncLinearDirection::CncPosDir, CncLinearDirection::CncNoneDir);
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateDClick(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStop();
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateKillFocus(wxFocusEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStop();
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateLeave(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStop();
-	event.Skip(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::navigateLeftUp(wxMouseEvent& event) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	parentFrame->manualContinuousMoveStop();
-	event.Skip(false);
+	typedef CncNavigatorPanelEvent::Id Id;
+	const Id eventId = (Id)event.GetId();
+	
+	auto moveStart = [&]() {
+		CncLinearDirection x = CncLinearDirection::CncNoneDir;
+		CncLinearDirection y = CncLinearDirection::CncNoneDir;
+		CncLinearDirection z = CncLinearDirection::CncNoneDir;
+		
+		bool move = true;
+		switch ( event.direction ) {
+			case CncNavigatorPanel::Direction::EE: 	x = CncLinearDirection::CncPosDir; break;
+			case CncNavigatorPanel::Direction::WW: 	x = CncLinearDirection::CncNegDir; break;
+			
+			case CncNavigatorPanel::Direction::NN: 	y = CncLinearDirection::CncPosDir; break;
+			case CncNavigatorPanel::Direction::SS: 	y = CncLinearDirection::CncNegDir; break;
+			
+			case CncNavigatorPanel::Direction::CP: 	z = CncLinearDirection::CncPosDir; break;
+			case CncNavigatorPanel::Direction::CN: 	z = CncLinearDirection::CncNegDir; break;
+			
+			default:								move = false;
+		}
+		
+		if ( move == true )
+			parentFrame->manualContinuousMoveStart(x, y, z);
+	};
+	
+	auto moveStop = [&]() {
+		parentFrame->manualContinuousMoveStop();
+	};
+	
+	/*
+		CNP_COORDINATES 		= 100,
+		CNP_ENTER_PANEL			= 200, 
+		CNP_LEAVE_PANEL			= 201,
+		CNP_SET_FOCUS			= 202, 
+		CNP_KILL_FOCUS			= 203,
+		CNP_ENTER_REGION		= 300, 
+		CNP_LEAVE_REGION		= 301,
+		CNP_LEFT_DOWN_REGION	= 400,
+		CNP_LEFT_UP_REGION		= 401,
+		CNP_ACTIVATE_REGION		= 500,
+		CNP_DEACTIVATE_REGION	= 501
+	*/
+	switch ( eventId ) {
+		case Id::CNP_ACTIVATE_REGION:	moveStart();
+										break;
+										
+		case Id::CNP_DEACTIVATE_REGION:
+		case Id::CNP_LEAVE_PANEL:
+		case Id::CNP_KILL_FOCUS:
+		case Id::CNP_LEAVE_REGION:
+										moveStop();
+										break;
+		default: ;
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::mode1(wxCommandEvent& event) {

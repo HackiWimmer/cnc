@@ -109,7 +109,7 @@ void GLContextCncPathBase::markCurrentPosition() {
 		return;
 		
 	// get the last/current vecties - it must be valid
-	GLI::GLCncPath::iterator it = cncPath.end() - 1;
+	GLI::GLCncPath::iterator it = cncPath.vEnd() - 1;
 	drawPosMarker(it->getX(), it->getY(), it->getZ());
 }
 /////////////////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ void GLContextCncPathBase::drawPoints() {
 	glBegin(GL_POINTS);
 	
 		int alpha = 255;
-		for( GLI::GLCncPath::iterator it = cncPath.begin(); it != cncPath.end(); it++ ) {
+		for( GLI::GLCncPath::iterator it = cncPath.vBegin(); it != cncPath.vEnd(); it++ ) {
 			// line stipple and colour depth
 			switch ( it->getFormatType() ) {
 				case FormatType::FT_SOLID: {
@@ -160,7 +160,7 @@ void GLContextCncPathBase::drawLines() {
 		GLI::GLCncPath::iterator prev = cncPath.begin();
 		
 		int alpha = 255;
-		for( GLI::GLCncPath::iterator curr = cncPath.begin() + 1; curr != cncPath.end(); curr++ ) {
+		for( GLI::GLCncPath::iterator curr = cncPath.vBegin() + 1; curr != cncPath.vEnd(); curr++ ) {
 			
 			// line stipple and colour depth
 			switch ( curr->getFormatType() ) {
@@ -225,7 +225,7 @@ void GLContextCncPathBase::drawLineStrips() {
 	glBegin(GL_LINE_STRIP);
 	
 		int alpha = 255;
-		for( GLI::GLCncPath::iterator it = cncPath.begin(); it != cncPath.end(); it++ ) {
+		for( GLI::GLCncPath::iterator it = cncPath.vBegin(); it != cncPath.vEnd(); it++ ) {
 			// line stipple and colour depth
 			switch ( it->getFormatType() ) {
 				case FormatType::FT_TRANSPARENT: {

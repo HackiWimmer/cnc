@@ -66,7 +66,7 @@ MainFrame::MainFrame(wxWindow* parent)
 
 	cfg.innerCircle 	= true;
 	cfg.shortFormat 	= true;
-	cfg.activatedColour = *wxRED;
+	//cfg.activatedColour = *wxRED;
 	CncNavigatorPanel* p2 = new CncNavigatorPanel(this, cfg);
 	
 	replaceControl(m_mainPanel2, p2);

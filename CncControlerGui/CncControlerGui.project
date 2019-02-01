@@ -191,6 +191,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncStatisticsPane.h"/>
+      <File Name="CncStatisticsPane.cpp"/>
+      <File Name="CncNavigatorPanel.h"/>
+      <File Name="CncNavigatorPanel.cpp"/>
       <File Name="CncMouseRemoteControl.h"/>
       <File Name="CncMouseRemoteControl.cpp"/>
       <File Name="CncSecureRun.h"/>

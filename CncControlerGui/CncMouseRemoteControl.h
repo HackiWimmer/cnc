@@ -16,6 +16,8 @@ class CncMouseRemoteControl : public wxPanel {
 		struct Config {
 			wxColour	colMouse_Center = wxColour(*wxBLUE);
 			wxColour	colMouse_Motion = wxColour(*wxRED);
+			
+			double mouseMoveFactor		= 5.0;
 		};
 		
 		Config& getConfig() { return config; }

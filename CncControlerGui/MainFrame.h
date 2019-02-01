@@ -23,10 +23,9 @@
 #include "CncSetterListCtrl.h"
 #include "CfgAccelerationGraph.h"
 #include "CncGamepadControllerState.h"
-#include "CncVectiesListCtrl.h"
 #include "CncSummaryListCtrl.h"
-#include "CncStatisticSummaryListCtrl.h"
 #include "Codelite/wxPNGAnimation.h"
+#include "CncNavigatorPanel.h"
 
 ////////////////////////////////////////////////////////////////////
 // forward declarations
@@ -42,8 +41,11 @@ class CncReferencePosition;
 class GL3DOptionPane;
 class GL3DDrawPane;
 class CncMonitorVSplitterWindow;
+class CncMonitorHSplitterWindow;
 class CncTemplateObserver;
 class CncSecureRun;
+class CncStatisticsPane;
+
 ////////////////////////////////////////////////////////////////////
 
 ////////////////////////////////////////////////////////////////////
@@ -106,10 +108,18 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void monitorReplayPause(wxCommandEvent& event);
+		virtual void monitorReplayStop(wxCommandEvent& event);
+		virtual void monitorReplayEnd(wxCommandEvent& event);
+		virtual void monitorReplayNext(wxCommandEvent& event);
+		virtual void monitorReplayPlay(wxCommandEvent& event);
+		virtual void monitorReplayPrev(wxCommandEvent& event);
+		virtual void monitorReplayStart(wxCommandEvent& event);
 		virtual void selectMetricUnitFrom(wxCommandEvent& event);
 		virtual void selectMetricUnitFromValue(wxCommandEvent& event);
 		virtual void selectMetricUnitTo(wxCommandEvent& event);
-		virtual void toggleMotionMonitorOptionPlane(wxCommandEvent& event);
+		virtual void toggleMotionMonitorOptionPane(wxCommandEvent& event);
+		virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event);
 		virtual void motionMonitorBoundBox(wxCommandEvent& event);
 		virtual void motionMonitorHelpLines(wxCommandEvent& event);
 		virtual void motionMonitorOrigin(wxCommandEvent& event);
@@ -136,24 +146,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void changeConfigToolbook(wxToolbookEvent& event);
 		virtual void warmStartController(wxCommandEvent& event);
 		virtual void setReferencePosition(wxCommandEvent& event);
-		virtual void cmXnegYnegLeftDown(wxMouseEvent& event);
-		virtual void cmXnegYposLeftDown(wxMouseEvent& event);
-		virtual void cmXposYnegLeftDown(wxMouseEvent& event);
-		virtual void cmXposYposLeftDown(wxMouseEvent& event);
 		virtual void testCaseBookChanged(wxListbookEvent& event);
 		virtual void requestInterrupt(wxCommandEvent& event);
 		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
-		virtual void cmLeftDClick(wxMouseEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
-		virtual void cmLeftUp(wxMouseEvent& event);
-		virtual void cmXnegLeftDown(wxMouseEvent& event);
-		virtual void cmXposLeftDown(wxMouseEvent& event);
-		virtual void cmYnegLeftDown(wxMouseEvent& event);
-		virtual void cmYposLeftDown(wxMouseEvent& event);
-		virtual void cmZnegLeftDown(wxMouseEvent& event);
-		virtual void cmZposLeftDown(wxMouseEvent& event);
-		virtual void cmKillFocus(wxFocusEvent& event);
-		virtual void cmLeave(wxMouseEvent& event);
 		virtual void keyDownLruList(wxKeyEvent& event);
 		virtual void dclickLogger(wxMouseEvent& event);
 		virtual void keyDownLogger(wxKeyEvent& event);
@@ -166,10 +162,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void onSelectTestPage(wxCommandEvent& event);
 		virtual void refreshSetterList(wxCommandEvent& event);
 		virtual void onPaintSpeedPanel(wxPaintEvent& event);
-		virtual void clearMotionMonitorVecties(wxCommandEvent& event);
-		virtual void copyMotionMonitorVecties(wxCommandEvent& event);
-		virtual void traceMotionMonitorVecties(wxCommandEvent& event);
-		virtual void toggleMonitorStatistics(wxCommandEvent& event);
 		virtual void clickProbeMode(wxCommandEvent& event);
 		virtual void displayIntervalKeyDown(wxKeyEvent& event);
 		virtual void displayIntervalChanged(wxScrollEvent& event);
@@ -393,6 +385,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void onGamepdThreadUpadte(GamepadEvent& event);
 		void onGamepdThreadHeartbeat(GamepadEvent& event);
 		
+		void onNavigatorPanel(CncNavigatorPanelEvent& event);
+		
 		void onPerspectiveTimer(wxTimerEvent& event);
 		void onDebugUserNotificationTimer(wxTimerEvent& event);
 		void configurationUpdated(wxCommandEvent& event);
@@ -524,6 +518,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void enableSourceEditorMenuItems(bool enable);
 		
+		void startAnimationControl();
+		void stopAnimationControl();
+		
+		long getProcessLastDuration() { return processLastDuartion; }
+		
 		friend class CncBaseEditor;
 		friend class CncSourceEditor;
 		friend class CncOutboundEditor;
@@ -539,6 +538,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncFileView;
 		friend class CncTemplateObserver;
 		friend class CncSecureRun;
+		friend class CncStatisticsPane;
 		
 	private:
 		// Member variables
@@ -569,14 +569,15 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncToolMagazine* 				toolMagaizne;
 		CncPosSpyListCtrl* 				positionSpy;
 		CncSetterListCtrl* 				setterList;
-		CncStatisticSummaryListCtrl* 	statisticSummaryListCtrl;
-		CncVectiesListCtrl* 			vectiesListCtrl;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
 		CfgAccelerationGraph* 			accelGraphPanel; 
 		CncGamepadControllerState* 		cncGamepadState;
+		CncNavigatorPanel*				navigatorPanel;
 		GL3DOptionPane* 				optionPane3D;
 		GL3DDrawPane* 					drawPane3D;
-		CncMonitorVSplitterWindow* 		cnc3DSplitterWindow;
+		CncStatisticsPane*				statisticsPane;
+		CncMonitorVSplitterWindow* 		cnc3DVSplitterWindow;
+		CncMonitorHSplitterWindow* 		cnc3DHSplitterWindow;
 		CncTemplateObserver* 			templateObserver;
 		
 		CncPerspective perspectiveHandler;
@@ -675,8 +676,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void decoratePosSpyConnectButton(bool state);
 		void decorateSpeedControlBtn(bool useSpeedCfg);
 		
-		void toggleMonitorStatistics(bool shown=false);
-		
 		void registerGuiControls();
 		bool initializeCncControl();
 		void initializeUpdateManagerThread();
@@ -714,7 +713,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		bool processTestDimensions();
 		
 		void logTimeConsumed();
-		void logStatistics();
 		
 		void determineRunMode();
 		
@@ -730,11 +728,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void collectSvgSpecificSummary();
 		void collectGCodeSpecificSummary();
 		
-		void updateStatisticPanel();
-		
 		///////////////////////////////////////////////////////////////
 		// control handling
-		void toggleMotionMonitorOptionPlane(bool forceHide);
+		void toggleMotionMonitorOptionPane(bool forceHide);
+		void toggleMotionMonitorStatisticPane(bool forceHide);
 		
 		void selectSourceControlLineNumber(long ln);
 			
@@ -776,9 +773,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxMenuItem* getAUIMenuByName(const wxString& name);
 		
 		void decorateViewMenu();
-		
-		void startAnimationControl();
-		void stopAnimationControl();
 		
 		void selectEditorToolBox(bool fileLoaded);
 		void fillFileDetails(bool fileLoaded, const char* extFileName = NULL);

@@ -185,11 +185,49 @@ namespace GLI {
 			: std::vector<GLCncPathVertices>()
 			, minVecties(FLT_MAX, FLT_MAX, FLT_MAX)
 			, maxVecties(FLT_MIN, FLT_MIN, FLT_MIN)
+			, virtualEnd(-1)
 			{}
 			
 			////////////////////////////////////////////
 			virtual ~GLCncPath() {
 			}
+			
+			////////////////////////////////////////////
+			iterator vBegin() 	{ return begin(); }
+			
+			////////////////////////////////////////////
+			iterator vEnd()		{ 
+				if ( virtualEnd <= 0 )
+					return end(); 
+					
+				if ( size() == 0 )
+					return end(); 
+					
+				if ( (unsigned long)virtualEnd > size() - 1 )
+					return end(); 
+					
+				return begin() + virtualEnd;
+			}
+			
+			////////////////////////////////////////////
+			void setVirtualEnd(long val) {
+				if ( val <= 0 )
+					return; 
+					
+				if ( size() == 0 )
+					return; 
+					
+				if ( (unsigned long)val > size() - 1 )
+					return;
+				
+				virtualEnd = val;
+			}
+			
+			////////////////////////////////////////////
+			void resetVirtualEnd() 	{ virtualEnd = -1; }
+			
+			////////////////////////////////////////////
+			long getVirtualEnd() 	{ return virtualEnd; }
 			
 			////////////////////////////////////////////
 			const GLCncPathVertices& getMin() const { return minVecties; }
@@ -257,6 +295,7 @@ namespace GLI {
 				maxVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
 				
 				std::vector<GLCncPathVertices>::clear();
+				resetVirtualEnd();
 			}
 			
 			////////////////////////////////////////////
@@ -276,6 +315,8 @@ namespace GLI {
 		private:
 			GLCncPathVertices 	minVecties;
 			GLCncPathVertices 	maxVecties;
+			
+			long 				virtualEnd;
 	};
 	
 }; // namespace GLI

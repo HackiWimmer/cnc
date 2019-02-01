@@ -38,7 +38,6 @@
   <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
   <object class="wxBitmap" name="16-fold">bitmaps\16-fold.png</object>
   <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
-  <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
   <object class="wxBitmap" name="16-globals">bitmaps\16-globals.png</object>
   <object class="wxBitmap" name="16-globals@2x">bitmaps\16-globals@2x.png</object>
   <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>
@@ -243,25 +242,6 @@
   <object class="wxBitmap" name="ViewLeft">bitmaps\ViewLeft.png</object>
   <object class="wxBitmap" name="ViewRight">bitmaps\ViewRight.png</object>
   <object class="wxBitmap" name="ViewUp">bitmaps\ViewUp.png</object>
-  <object class="wxBitmap" name="XNeg">bitmaps\ReferencePosition\XNeg.png</object>
-  <object class="wxBitmap" name="XNegYNeg">bitmaps\ReferencePosition\XNegYNeg.png</object>
-  <object class="wxBitmap" name="XNegYPos">bitmaps\ReferencePosition\XNegYPos.png</object>
-  <object class="wxBitmap" name="XPos">bitmaps\ReferencePosition\XPos.png</object>
-  <object class="wxBitmap" name="XPosYNeg">bitmaps\ReferencePosition\XPosYNeg.png</object>
-  <object class="wxBitmap" name="XPosYPos">bitmaps\ReferencePosition\XPosYPos.png</object>
-  <object class="wxBitmap" name="Xneg">bitmaps\ReferencePosition\Xneg.png</object>
-  <object class="wxBitmap" name="XnegYneg">bitmaps\ReferencePosition\XnegYneg.png</object>
-  <object class="wxBitmap" name="XnegYpos">bitmaps\ReferencePosition\XnegYpos.png</object>
-  <object class="wxBitmap" name="Xpos">bitmaps\ReferencePosition\Xpos.png</object>
-  <object class="wxBitmap" name="XposYneg">bitmaps\ReferencePosition\XposYneg.png</object>
-  <object class="wxBitmap" name="XposYpos">bitmaps\ReferencePosition\XposYpos.png</object>
-  <object class="wxBitmap" name="YNeg">bitmaps\ReferencePosition\YNeg.png</object>
-  <object class="wxBitmap" name="Yneg">bitmaps\ReferencePosition\Yneg.png</object>
-  <object class="wxBitmap" name="Ypos">bitmaps\ReferencePosition\Ypos.png</object>
-  <object class="wxBitmap" name="ZNeg">bitmaps\ReferencePosition\ZNeg.png</object>
-  <object class="wxBitmap" name="ZPos">bitmaps\ReferencePosition\ZPos.png</object>
-  <object class="wxBitmap" name="Zneg">bitmaps\ReferencePosition\Zneg.png</object>
-  <object class="wxBitmap" name="Zpos">bitmaps\ReferencePosition\Zpos.png</object>
   <object class="wxBitmap" name="actionrun">bitmaps\actionrun.png</object>
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
@@ -329,6 +309,12 @@
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
+  <object class="wxBitmap" name="media-playback-play-blue">bitmaps\media-playback-play-blue.png</object>
+  <object class="wxBitmap" name="media-playback-stop-blue">bitmaps\media-playback-stop-blue.png</object>
+  <object class="wxBitmap" name="media-seek-backward-blue">bitmaps\media-seek-backward-blue.png</object>
+  <object class="wxBitmap" name="media-seek-forward-blue">bitmaps\media-seek-forward-blue.png</object>
+  <object class="wxBitmap" name="media-skip-backward-blue">bitmaps\media-skip-backward-blue.png</object>
+  <object class="wxBitmap" name="media-skip-forward-blue">bitmaps\media-skip-forward-blue.png</object>
   <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="mode1">bitmaps\ReferencePosition\mode1.png</object>
   <object class="wxBitmap" name="mode2">bitmaps\ReferencePosition\mode2.png</object>
@@ -366,6 +352,7 @@
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
+  <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
   <object class="wxBitmap" name="time-add">bitmaps\time-add.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>

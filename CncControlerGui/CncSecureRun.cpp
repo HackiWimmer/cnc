@@ -85,6 +85,8 @@ void CncSecureRun::show(wxShowEvent& event) {
 		m_startupTimer->StartOnce(100);
 		m_blinkTimer->Start(750);
 	}
+	
+	remoteControl->SetFocusFromKbd();
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureRun::hideDialog(int retValue) {

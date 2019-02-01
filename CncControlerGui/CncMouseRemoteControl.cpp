@@ -172,8 +172,8 @@ void CncMouseRemoteControl::onMouse(wxMouseEvent& event) {
 		
 		if ( mouseDiff.x != 0 || mouseDiff.y != 0 ) {
 			evt.SetId(CncMouseRemoteControlEvent::Id::CMRC_MOUSE_MOVE);
-			evt.mouseMove.SetWidth(mouseDiff.x);
-			evt.mouseMove.SetHeight(mouseDiff.y);
+			evt.mouseMove.SetWidth(mouseDiff.x  * config.mouseMoveFactor);
+			evt.mouseMove.SetHeight(mouseDiff.y * config.mouseMoveFactor);
 			motion(evt);
 		}
 	}

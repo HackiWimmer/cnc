@@ -25,6 +25,9 @@ class CncNavigatorPanel : public wxPanel {
 			bool showRegionInfo			= true;
 			bool showRegionTip			= true;
 			
+			int margin 					= 10;
+			int alignment				= wxALIGN_NOT;
+			
 			wxColour colNN				= wxColour(89, 89, 255);
 			wxColour colSS				= colNN;
 			wxColour colEE				= wxColour(255, 64, 64);

@@ -3,6 +3,7 @@
 
 #include <wx/splitter.h>
 
+// ------------------------------------------------------------------------
 class CncMonitorVSplitterWindow : public wxSplitterWindow {
 	
 	public:
@@ -25,6 +26,33 @@ class CncMonitorVSplitterWindow : public wxSplitterWindow {
 		void onSize(wxSizeEvent& event);
 		
 		bool isRightWindowShown() { return GetSashGravity() < 1.0; }
+
+		wxDECLARE_EVENT_TABLE();
+};
+
+// ------------------------------------------------------------------------
+class CncMonitorHSplitterWindow : public wxSplitterWindow {
+	
+	public:
+		CncMonitorHSplitterWindow(wxWindow *parent);
+		virtual ~CncMonitorHSplitterWindow();
+		
+		virtual bool SplitHorizontally(wxWindow *window1, wxWindow *window2, int sashPosition = 0);
+		virtual bool SplitVertically(wxWindow *window1, wxWindow *window2, int sashPosition = 0);
+		
+		void toggleBottomWindow();
+		void showBottomWindow(bool show);
+		void hideBottomWindow() { showBottomWindow(false); }
+		
+	protected:
+	
+		const int defaultBottomWindowHeight = 220;
+		int lastBottomWindowHeight;
+		
+		virtual bool OnSashPositionChange (int newSashPosition);
+		void onSize(wxSizeEvent& event);
+		
+		bool isBottomWindowShown() { return GetSashGravity() < 1.0; }
 
 		wxDECLARE_EVENT_TABLE();
 };
