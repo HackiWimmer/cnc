@@ -16,8 +16,9 @@ class GL3DOptions;
 class CncVectiesListCtrl;
 
 /////////////////////////////////////////////////////////////
-class CncMotionMonitor : public CncGlCanvas {
-
+class CncMotionMonitor : public CncGlCanvas 
+                       , public GLI::GLCncPath::Callback 
+{
 	public:
 		
 		// .........................................................
@@ -50,6 +51,11 @@ class CncMotionMonitor : public CncGlCanvas {
 				if ( *it != NULL )
 					(*it)->notifyCameraAngleChange(angle);
 			}
+		}
+		
+		void registerMonitorCallback(GLI::GLCncPath::Callback* cb) {
+			wxASSERT(monitor != NULL);
+			monitor->registerCallback(cb);
 		}
 		
 		// constructor
@@ -123,11 +129,19 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 		void updateMonitor();
 		
-		long getPathItemCount()			{ return monitor->getPathItemCount(); }
+		long getPathItemCount()				{ return monitor->getPathItemCount(); }
 		
-		void setVirtualEnd(long val) 	{ monitor->setVirtualEnd(val); }
-		void resetVirtualEnd() 			{ monitor->resetVirtualEnd();  }
-		long getVirtualEnd() 			{ return monitor->getVirtualEnd(); }
+		void setVirtualEnd(long val) 		{ monitor->setVirtualEnd(val); }
+		void setVirtualEndToFirst() 		{ monitor->setVirtualEndToFirst(); }
+		void setVirtualEndToLast() 			{ monitor->setVirtualEndToLast(); }
+		
+		void incVirtualEnd() 				{ monitor->incVirtualEnd(); } 
+		void decVirtualEnd() 				{ monitor->decVirtualEnd(); }
+		void incVirtualEndById() 			{ monitor->incVirtualEndById(); }
+		void decVirtualEndById() 			{ monitor->decVirtualEndById(); }
+		
+		const long getVirtualEnd() 			{ return monitor->getVirtualEnd(); }
+		const long getVirtualEndAsId() 		{ return monitor->getVirtualEndAsId(); }
 		
 	protected:
 	
@@ -144,8 +158,9 @@ class CncMotionMonitor : public CncGlCanvas {
 		
 		bool currentClientID;
 		
-		void createRuler();
+		virtual void notifyCncPathChanged();
 		
+		void createRuler();
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);

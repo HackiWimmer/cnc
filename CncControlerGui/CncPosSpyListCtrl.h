@@ -30,6 +30,7 @@ class CncPosSpyListCtrl : public CncLargeScaledListCtrl {
 		virtual ~CncPosSpyListCtrl();
 		
 		bool searchReference(const wxString& what);
+		bool searchReferenceById(const long id);
 };
 
 #endif

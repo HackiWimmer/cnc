@@ -63,12 +63,6 @@ void CncTemplateObserver::activateSourecEditor(bool state) {
 //////////////////////////////////////////////////////////////
 void CncTemplateObserver::changeObservationMode(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////
-	#warning
-	if ( THE_APP->sourceEditor->IsModified() ) 
-		std::cout << "modifid" << std::endl;
-	
-	
-	
 	observationActive = m_observationMode->GetValue();
 	
 	activateSourecEditor(!observationActive);

@@ -62,8 +62,12 @@ void CncSourceEditor::decorateParentTabName(bool changed) {
 		
 	} else {
 		if ( IsEditable() == true ) {
-			if ( name.StartsWith(indicator) == false )
+			if ( name.StartsWith(indicator) == false ) {
 				name.Prepend(indicator);
+				
+				THE_APP->clearMotionMonitor();
+				THE_APP->clearPositionSpy();
+			}
 		}
 	}
 	

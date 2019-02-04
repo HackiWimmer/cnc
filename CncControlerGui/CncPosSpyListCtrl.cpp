@@ -1,8 +1,11 @@
 #include <iostream>
 #include <wx/imaglist.h>
 #include "wxcrafter.h"
+#include "GlobalStrings.h"
 #include "CncArduino.h"
 #include "CncPosSpyListCtrl.h"
+
+extern GlobalConstStringDatabase globalStrings;
 
 /////////////////////////////////////////////////////////////
 CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
@@ -93,4 +96,10 @@ bool CncPosSpyListCtrl::searchReference(const wxString& what) {
 		selectItem(ret);
 	
 	return (ret >= 0 );
+}
+/////////////////////////////////////////////////////////////
+bool CncPosSpyListCtrl::searchReferenceById(const long id) {
+/////////////////////////////////////////////////////////////
+	wxString what(wxString::Format(globalStrings.posSpyRefFormat, id));
+	return searchReference(what);
 }

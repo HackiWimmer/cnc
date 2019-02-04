@@ -42,6 +42,7 @@ class GL3DOptionPane;
 class GL3DDrawPane;
 class CncMonitorVSplitterWindow;
 class CncMonitorHSplitterWindow;
+class CncMonitorReplayPane;
 class CncTemplateObserver;
 class CncSecureRun;
 class CncStatisticsPane;
@@ -108,13 +109,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-		virtual void monitorReplayPause(wxCommandEvent& event);
-		virtual void monitorReplayStop(wxCommandEvent& event);
-		virtual void monitorReplayEnd(wxCommandEvent& event);
-		virtual void monitorReplayNext(wxCommandEvent& event);
-		virtual void monitorReplayPlay(wxCommandEvent& event);
-		virtual void monitorReplayPrev(wxCommandEvent& event);
-		virtual void monitorReplayStart(wxCommandEvent& event);
+    virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event);
 		virtual void selectMetricUnitFrom(wxCommandEvent& event);
 		virtual void selectMetricUnitFromValue(wxCommandEvent& event);
 		virtual void selectMetricUnitTo(wxCommandEvent& event);
@@ -523,6 +518,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		long getProcessLastDuration() { return processLastDuartion; }
 		
+		void enableControls(bool state = true);
+		void disableControls() { enableControls(false); }
+		
 		friend class CncBaseEditor;
 		friend class CncSourceEditor;
 		friend class CncOutboundEditor;
@@ -539,6 +537,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncTemplateObserver;
 		friend class CncSecureRun;
 		friend class CncStatisticsPane;
+		friend class CncMonitorReplayPane;
 		
 	private:
 		// Member variables
@@ -733,6 +732,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void toggleMotionMonitorOptionPane(bool forceHide);
 		void toggleMotionMonitorStatisticPane(bool forceHide);
 		
+		void tryToSelectClientId(long clientId);
 		void selectSourceControlLineNumber(long ln);
 			
 		void decoratePortSelector(bool list=false);
@@ -745,9 +745,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void enableRunControls(bool state = true);
 		void disableRunControls() { enableRunControls(false); }
 		
-		void enableControls(bool state = true);
-		void disableControls() { enableControls(false); }
-
 		void enableMenu(wxMenu* m, bool state = true);
 		void disableMenu(wxMenu* m) { enableMenu(m, false); }
 		

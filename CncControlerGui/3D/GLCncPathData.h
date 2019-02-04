@@ -180,12 +180,34 @@ namespace GLI {
 	class GLCncPath : public std::vector<GLCncPathVertices> {
 		
 		public:
+			
+			/////////////////////////////////////////////////////////
+			struct Callback {
+				
+				Callback() {}
+				virtual ~Callback() {}
+				
+				virtual void notifyCncPathChanged() = 0;
+			};
+			
+			void registerCallback(GLI::GLCncPath::Callback* cb) {
+				if ( cb == NULL )
+					return;
+					
+				callbacks.push_back(cb); 
+				
+				// release the first callback
+				cb->notifyCncPathChanged();
+			}
+			
 			////////////////////////////////////////////
 			GLCncPath() 
 			: std::vector<GLCncPathVertices>()
 			, minVecties(FLT_MAX, FLT_MAX, FLT_MAX)
 			, maxVecties(FLT_MIN, FLT_MIN, FLT_MIN)
 			, virtualEnd(-1)
+			, publishNotifications(true)
+			, callbacks()
 			{}
 			
 			////////////////////////////////////////////
@@ -210,7 +232,16 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
+			void setVirtualEndToFirst() 	{ setVirtualEnd(1); }
+			void setVirtualEndToLast() 		{ setVirtualEnd(size() - 1 ); }
+			
+			////////////////////////////////////////////
+			void incVirtualEnd()			{ setVirtualEnd(getVirtualEnd() + 1 ); }
+			void decVirtualEnd() 			{ setVirtualEnd(getVirtualEnd() - 1 ); }
+			
+			////////////////////////////////////////////
 			void setVirtualEnd(long val) {
+				/*
 				if ( val <= 0 )
 					return; 
 					
@@ -219,15 +250,59 @@ namespace GLI {
 					
 				if ( (unsigned long)val > size() - 1 )
 					return;
-				
+				*/
 				virtualEnd = val;
+				
+				publishNotifications = true;
+				notifyCncPathChanged();
 			}
 			
 			////////////////////////////////////////////
-			void resetVirtualEnd() 	{ virtualEnd = -1; }
+			void incVirtualEndById() {
+				long id = getVirtualEndAsId();
+				
+				publishNotifications = false;
+				
+					do {
+						incVirtualEnd();
+						
+						if ( virtualEnd >= std::distance(begin(), end()) - 1 )
+							break;
+							
+					} while ( id == getVirtualEndAsId() );
+					
+				publishNotifications = true;
+				notifyCncPathChanged();
+			}
 			
 			////////////////////////////////////////////
-			long getVirtualEnd() 	{ return virtualEnd; }
+			void decVirtualEndById() {
+				long id = getVirtualEndAsId();
+				
+				publishNotifications = false;
+					
+					do {
+						decVirtualEnd();
+						
+						if ( virtualEnd <= 1 )
+							break;
+							
+					} while ( id == getVirtualEndAsId() );
+				
+				publishNotifications = true;
+				notifyCncPathChanged();
+			}
+			
+			////////////////////////////////////////////
+			const long getVirtualEnd() const { return virtualEnd; }
+			
+			////////////////////////////////////////////
+			const long getVirtualEndAsId() {
+				if ( vEnd() == end() )
+					return -1;
+					
+				return vEnd()->getId();
+			}
 			
 			////////////////////////////////////////////
 			const GLCncPathVertices& getMin() const { return minVecties; }
@@ -295,7 +370,7 @@ namespace GLI {
 				maxVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
 				
 				std::vector<GLCncPathVertices>::clear();
-				resetVirtualEnd();
+				updateVirtualEnd();
 			}
 			
 			////////////////////////////////////////////
@@ -310,13 +385,36 @@ namespace GLI {
 				maxVecties.setZ(std::max(v.getZ(), maxVecties.getZ()));
 				
 				std::vector<GLCncPathVertices>::push_back(v);
+				updateVirtualEnd();
 			}
 		
 		private:
-			GLCncPathVertices 	minVecties;
-			GLCncPathVertices 	maxVecties;
+			GLCncPathVertices 						minVecties;
+			GLCncPathVertices 						maxVecties;
 			
-			long 				virtualEnd;
+			long 									virtualEnd;
+			
+			bool									publishNotifications;
+			std::vector<GLI::GLCncPath::Callback*> 	callbacks;
+			
+			////////////////////////////////////////////
+			void updateVirtualEnd() {
+				setVirtualEnd(std::distance(begin(), end()));
+			}
+			
+			////////////////////////////////////////////
+			void notifyCncPathChanged() {
+				
+				if ( publishNotifications == false )
+					return;
+				
+				for ( auto it = callbacks.begin(); it != callbacks.end(); it++ ) {
+					if ( (*it) == NULL )
+						continue;
+						
+					(*it)->notifyCncPathChanged();
+				}
+			}
 	};
 	
 }; // namespace GLI

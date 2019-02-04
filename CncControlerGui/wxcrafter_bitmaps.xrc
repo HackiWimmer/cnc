@@ -308,13 +308,14 @@
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
+  <object class="wxBitmap" name="media-playback-pause-7">bitmaps\media-playback-pause-7.png</object>
   <object class="wxBitmap" name="media-playback-pause-blue">bitmaps\media-playback-pause-blue.png</object>
-  <object class="wxBitmap" name="media-playback-play-blue">bitmaps\media-playback-play-blue.png</object>
-  <object class="wxBitmap" name="media-playback-stop-blue">bitmaps\media-playback-stop-blue.png</object>
-  <object class="wxBitmap" name="media-seek-backward-blue">bitmaps\media-seek-backward-blue.png</object>
-  <object class="wxBitmap" name="media-seek-forward-blue">bitmaps\media-seek-forward-blue.png</object>
-  <object class="wxBitmap" name="media-skip-backward-blue">bitmaps\media-skip-backward-blue.png</object>
-  <object class="wxBitmap" name="media-skip-forward-blue">bitmaps\media-skip-forward-blue.png</object>
+  <object class="wxBitmap" name="media-playback-start-7">bitmaps\media-playback-start-7.png</object>
+  <object class="wxBitmap" name="media-playback-stop-7">bitmaps\media-playback-stop-7.png</object>
+  <object class="wxBitmap" name="media-seek-backward-7">bitmaps\media-seek-backward-7.png</object>
+  <object class="wxBitmap" name="media-seek-forward-7">bitmaps\media-seek-forward-7.png</object>
+  <object class="wxBitmap" name="media-skip-backward-7">bitmaps\media-skip-backward-7.png</object>
+  <object class="wxBitmap" name="media-skip-forward-7">bitmaps\media-skip-forward-7.png</object>
   <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
   <object class="wxBitmap" name="mode1">bitmaps\ReferencePosition\mode1.png</object>
   <object class="wxBitmap" name="mode2">bitmaps\ReferencePosition\mode2.png</object>

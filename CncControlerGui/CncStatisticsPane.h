@@ -8,9 +8,10 @@
 
 class CncControl;
 class CncMotionMonitor;
+class CncMonitorReplayPane;
 
-class CncStatisticsPane : public CncStatisticsPaneBase
-{
+class CncStatisticsPane : public CncStatisticsPaneBase {
+	
 	public:
 		CncStatisticsPane(wxWindow* parent);
 		virtual ~CncStatisticsPane();
@@ -21,6 +22,8 @@ class CncStatisticsPane : public CncStatisticsPaneBase
 		void clear();
 		void logStatistics(bool force = true);
 		
+		void updateReplayPane();
+		
 	protected:
 		virtual void statisticBookChanged(wxNotebookEvent& event);
 		virtual void clearMotionMonitorVecties(wxCommandEvent& event);
@@ -29,6 +32,7 @@ class CncStatisticsPane : public CncStatisticsPaneBase
 		
 		CncControl* 					cnc;
 		CncMotionMonitor* 				motionMonitor;
+		CncMonitorReplayPane*			replayControl;
 		
 		CncStatisticSummaryListCtrl* 	statisticSummaryListCtrl;
 		CncVectiesListCtrl* 			vectiesListCtrl;

@@ -77,6 +77,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	
 	// publish initial zoom factor
 	monitor->setZoomFactor(zoom);
+	monitor->registerCallback(this);
 	
 	// deactivate process mode by default
 	popProcessMode();
@@ -91,6 +92,12 @@ CncMotionMonitor::~CncMotionMonitor() {
 	
 	if ( testCube != NULL ) 
 		delete testCube;
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::notifyCncPathChanged() {
+//////////////////////////////////////////////////
+	// currently nothing to do
+	// std::clog << "CncMotionMonitor::notifyCncPathChanged()" << std::endl;
 }
 //////////////////////////////////////////////////
 unsigned int CncMotionMonitor::calculateScaleDisplay(unsigned int height) {
@@ -199,6 +206,7 @@ void CncMotionMonitor::reconstruct() {
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::display() {
+//////////////////////////////////////////////////
 	onPaint();
 }
 //////////////////////////////////////////////////
@@ -299,6 +307,8 @@ void CncMotionMonitor::onSize(wxSizeEvent& event) {
 	
 	monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
 	monitor->display();
+	
+	event.Skip();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onEraseBackground(wxEraseEvent& event) {

@@ -74,6 +74,8 @@ class CncNavigatorPanel : public wxPanel {
 		CncNavigatorPanel(wxWindow *parent, const Config& cfg);
 		virtual ~CncNavigatorPanel();
 		
+		virtual bool Enable(bool enable=true);
+		
 		static const char* getDirectionAsString(const Direction d);
 		
 	protected:

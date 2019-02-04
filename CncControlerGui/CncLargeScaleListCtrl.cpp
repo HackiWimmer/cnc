@@ -169,6 +169,7 @@ bool CncLargeScaledListCtrl::isColumnValid(long column) const {
 }
 ///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
+///////////////////////////////////////////////////////////////////
 	if ( isItemValid(item) == false )
 		return false;
 		

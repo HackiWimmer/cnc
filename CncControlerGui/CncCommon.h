@@ -173,4 +173,13 @@ class LoggerSelection {
 		};
 };
 
+//-----------------------------------------------------------------
+class MontiorBottomContextSelection {
+	public:
+		enum VAL {
+			STATISTIC_PANEL				= 0,
+			REPLAY_PANEL				= 1,
+		};
+};
+
 #endif

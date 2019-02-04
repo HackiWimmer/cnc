@@ -6,6 +6,7 @@
 #include "CncMotionMonitor.h"
 #include "MainFrame.h"
 #include "CncConfig.h"
+#include "CncMonitorReplayPane.h"
 #include "CncStatisticsPane.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -13,6 +14,7 @@ CncStatisticsPane::CncStatisticsPane(wxWindow* parent)
 : CncStatisticsPaneBase(parent)
 , cnc(NULL)
 , motionMonitor(NULL)
+, replayControl(NULL)
 , statisticSummaryListCtrl(NULL)
 , vectiesListCtrl(NULL)
 ///////////////////////////////////////////////////////////////////
@@ -24,6 +26,10 @@ CncStatisticsPane::CncStatisticsPane(wxWindow* parent)
 	// vecties list
 	vectiesListCtrl = new CncVectiesListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_vectiesListCtrl, vectiesListCtrl);
+	
+		// replay control
+	replayControl = new CncMonitorReplayPane(this);
+	GblFunc::replaceControl(m_replayPlaceholder, replayControl);
 }
 ///////////////////////////////////////////////////////////////////
 CncStatisticsPane::~CncStatisticsPane() {
@@ -42,6 +48,15 @@ void CncStatisticsPane::setMotionMonitor(CncMotionMonitor* mm) {
 ///////////////////////////////////////////////////////////////////
 	motionMonitor	= mm;
 	wxASSERT(motionMonitor != NULL);
+	replayControl->setMotionMonitor(motionMonitor);
+}
+///////////////////////////////////////////////////////////////////
+void CncStatisticsPane::updateReplayPane() {
+///////////////////////////////////////////////////////////////////
+	if ( replayControl == NULL )
+		return;
+		
+	replayControl->updateControls();
 }
 ///////////////////////////////////////////////////////////////////
 void CncStatisticsPane::clearMotionMonitorVecties(wxCommandEvent& event) {

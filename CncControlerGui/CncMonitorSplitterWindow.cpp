@@ -1,4 +1,6 @@
 #include <iostream>
+#include "CncCommon.h"
+#include "CncStatisticsPane.h"
 #include "CncMonitorSplitterWindow.h"
 
 // ----------------------------------------------------------------------------
@@ -164,6 +166,28 @@ bool CncMonitorHSplitterWindow::OnSashPositionChange(int newSashPosition) {
 	return wxSplitterWindow::OnSashPositionChange(newSashPosition);
 }
 ///////////////////////////////////////////////////////////////////
+int CncMonitorHSplitterWindow::getCurrentButtomContext() {
+///////////////////////////////////////////////////////////////////
+	CncStatisticsPane* sp = static_cast<CncStatisticsPane*>(GetWindow2());
+	if ( sp == NULL )
+		return -1;
+		
+	return sp->GetContextBook()->GetSelection();
+}
+///////////////////////////////////////////////////////////////////
+void CncMonitorHSplitterWindow::selectBottomContext(int context) {
+///////////////////////////////////////////////////////////////////
+	CncStatisticsPane* sp = static_cast<CncStatisticsPane*>(GetWindow2());
+	if ( sp == NULL )
+		return;
+	
+	int pc = sp->GetContextBook()->GetPageCount();
+	if ( context < 0 || context > pc - 1 )
+		return;
+		
+	sp->GetContextBook()->SetSelection(context);
+}
+///////////////////////////////////////////////////////////////////
 void CncMonitorHSplitterWindow::toggleBottomWindow() {
 ///////////////////////////////////////////////////////////////////
 	showBottomWindow(!isBottomWindowShown());
@@ -179,14 +203,17 @@ void CncMonitorHSplitterWindow::showBottomWindow(bool show) {
 		SetSashPosition(splitterHeight * 10);
 		
 	} else {
+	
+		switch ( getCurrentButtomContext() ) {
+			case MontiorBottomContextSelection::VAL::REPLAY_PANEL:		lastBottomWindowHeight = 29; break;
+			case MontiorBottomContextSelection::VAL::STATISTIC_PANEL:	lastBottomWindowHeight = defaultBottomWindowHeight; break;
+			default:													lastBottomWindowHeight = defaultBottomWindowHeight;
+		}
+		
 		SetMinimumPaneSize(20);
 		
-		if ( lastBottomWindowHeight < defaultBottomWindowHeight / 4 )
-			lastBottomWindowHeight = defaultBottomWindowHeight;
-			
 		SetSashGravity((splitterHeight - lastBottomWindowHeight) / splitterHeight);
 		SetSashPosition(splitterHeight - lastBottomWindowHeight);
-		
 	}
 }
 

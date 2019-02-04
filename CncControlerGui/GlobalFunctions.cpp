@@ -6,7 +6,6 @@
 ///////////////////////////////////////////////////////////////////
 void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 ///////////////////////////////////////////////////////////////////
-	
 	wxASSERT( oldCtrl != NULL );
 	wxASSERT( newCtrl != NULL );
 	
@@ -19,13 +18,12 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	wxASSERT( parent != NULL );
 	wxASSERT( sizer  != NULL );
 	
-	newCtrl->Reparent(parent);
-	
 	newCtrl->SetPosition(pos);
 	newCtrl->SetClientSize(defSize);
 	newCtrl->SetMinClientSize(minSize);
 	
-	sizer->Replace(oldCtrl, newCtrl, true);
+	newCtrl->Reparent(parent);
+	sizer->Replace(oldCtrl, newCtrl, false);
 	sizer->Layout();
 	
 	newCtrl->SetPosition(pos);
@@ -39,5 +37,5 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 ///////////////////////////////////////////////////////////////////
 void GblFunc::stacktrace(std::ostream& o) {
 //////////////////////////////////////////////////////////////////
-	o << boost::stacktrace::stacktrace();
+	o << "boost::stacktrace::stacktrace()";
 }

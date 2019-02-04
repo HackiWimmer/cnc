@@ -132,6 +132,12 @@ void CncNavigatorPanel::postEvent(const CncNavigatorPanelEvent& event) {
 	wxPostEvent(GetParent(), event);
 }
 //////////////////////////////////////////////////
+bool CncNavigatorPanel::Enable(bool enable) {
+//////////////////////////////////////////////////
+	Refresh();
+	return wxPanel::Enable(enable);
+}
+//////////////////////////////////////////////////
 void CncNavigatorPanel::onEraseBackground(wxEraseEvent& event) {
 //////////////////////////////////////////////////
 	event.Skip();
@@ -224,6 +230,9 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
 			OuterCircleRegion ocr = *it;
 			
+			if ( IsEnabled() == false )
+				fill = false;
+			
 			if ( ocr.direction == current.direction ) {
 				dc.SetPen(highlightPen);
 				if ( fill == true ) 
@@ -268,6 +277,9 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			const int radius = innerRadius * 0.85;
 			const int offset = 3;
 			
+			if ( IsEnabled() == false )
+				fill = false;
+				
 			// top region
 			if ( current.direction == CP ) {
 				dc.SetPen(highlightPen);
@@ -306,6 +318,9 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	auto drawArrows = [&]() {
 		dc.SetPen(wxPen(*wxBLACK, 1, wxSOLID));
 		dc.SetBrush(*wxTRANSPARENT_BRUSH);
+		
+		//const int brushStyle = IsEnabled() ? wxBRUSHSTYLE_SOLID : wxBRUSHSTYLE_CROSS_HATCH; 
+		const int brushStyle = IsEnabled() ? wxBRUSHSTYLE_SOLID : wxBRUSHSTYLE_TRANSPARENT ; 
 		
 		// Arrows ( outer circle ) 
 		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
@@ -346,18 +361,18 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			dp2[C].y = sin( ocr.midAngle          * PI / 180) * ( -(midRadius - hight));
 			
 			dc.SetPen(wxPen(col1, 1, wxSOLID));
-			dc.SetBrush(col1);
+			dc.SetBrush(wxBrush(col1, brushStyle));
 			dc.DrawPolygon(TRIANGLE, dp1);
 			
 			dc.SetPen(wxPen(col2, 1, wxSOLID));
-			dc.SetBrush(col2);
+			dc.SetBrush(wxBrush(col2, brushStyle));
 			dc.DrawPolygon(TRIANGLE, dp2);
 		}
 
 		// Arrow Center plus
 		if ( config.innerCircle == true ) {
 			dc.SetPen(wxPen(config.colCP, 1, wxSOLID));
-			dc.SetBrush(config.colCP);
+			dc.SetBrush(wxBrush(config.colCP, brushStyle));
 			
 			wxPoint dp[TRIANGLE];
 			dp[A].x = 0;
@@ -373,7 +388,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		// Arrow Center negative
 		if ( config.innerCircle == true ) {
 			dc.SetPen(wxPen(config.colCN, 1, wxSOLID));
-			dc.SetBrush(config.colCN);
+			dc.SetBrush(wxBrush(config.colCN, brushStyle));
 			
 			wxPoint dp[TRIANGLE];
 			dp[A].x = 0;
@@ -457,11 +472,20 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	drawInnerCircleBorders(penH, penD, true);
 	
 	drawArrows();
-	drawRegionInfo();
-	drawRegionTip();
 	
-	drawOuterCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
-	drawInnerCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
+	if ( IsEnabled() == true ) {
+		drawRegionInfo();
+		drawRegionTip();
+		
+		drawOuterCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
+		drawInnerCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
+	} else {
+		drawOuterCircleBorders(wxPen(*wxLIGHT_GREY, 1, wxSOLID), wxPen(*wxLIGHT_GREY, 1, wxSOLID), false);
+		drawInnerCircleBorders(wxPen(*wxLIGHT_GREY, 1, wxSOLID), wxPen(*wxLIGHT_GREY, 1, wxSOLID), false);
+		
+	}
+	
+	
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
@@ -482,6 +506,9 @@ void CncNavigatorPanel::onMouse(wxMouseEvent& event) {
 		
 		return;
 	}
+	
+	if ( IsEnabled() == false )
+		return;
 	
 	// normalize to a centered right hand coord-system
 	MouseInfo mi;

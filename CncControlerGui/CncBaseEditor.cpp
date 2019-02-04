@@ -239,13 +239,15 @@ void CncBaseEditor::onUpdateFilePosition() {
 	PositionToXY(GetInsertionPoint(), &x, &y);
 	
 	wxString label(wxString::Format("Column: %ld", x + 1));
-	getCtlColumnPos()->SetLabel(label);
+	if ( getCtlColumnPos() != NULL )
+		getCtlColumnPos()->SetLabel(label);
 	
 	// try to select current  line as client id
 	THE_APP->updateFileContentPosition(x, y);
 	
 	// display gcode help hint
-	getCtlStatus()->SetValue("");
+	if ( getCtlStatus() != NULL )
+		getCtlStatus()->SetValue("");
 	
 	if ( fileInfo.format == TplGcode ) {
 		int col = GetColumn(GetCurrentPos());
@@ -259,7 +261,8 @@ void CncBaseEditor::onUpdateFilePosition() {
 			}
 		}
 		
-		getCtlStatus()->SetValue(GCodeCommands::getGCodeHelpHint(cl));
+		if ( getCtlStatus() != NULL )
+			getCtlStatus()->SetValue(GCodeCommands::getGCodeHelpHint(cl));
 	}
 	
 }
@@ -651,7 +654,7 @@ void CncBaseEditor::setupModelType() {
 	if ( tf == TplBinary )
 		tf = fileInfo.binaryOrigFomat;
 	
-	#warning
+	#warning  GLContextBase::ModelType::MT_LEFT_HAND ???
 	switch ( tf ) {
 		case TplSvg:		fileInfo.modelType 		= GLContextBase::ModelType::MT_RIGHT_HAND;
 							//fileInfo.modelType 		= GLContextBase::ModelType::MT_LEFT_HAND;

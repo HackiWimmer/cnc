@@ -54,6 +54,7 @@
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/choicebk.h>
+#include <wx/scrolwin.h>
 #include <wx/dialog.h>
 #include <wx/bitmap.h>
 #include <wx/icon.h>
@@ -86,9 +87,9 @@ protected:
     wxBitmapComboBox* m_portSelector;
     wxBitmapButton* m_connect;
     wxBitmapButton* m_refPosition;
+    wxBitmapButton* m_btSelectSetup;
     wxBitmapButton* m_btSelectReferences;
     wxBitmapButton* m_btSelectManuallyMove;
-    wxBitmapButton* m_btSelectSetup;
     wxBitmapButton* m_btSelectTemplate;
     wxBitmapButton* m_btSelectInboundTest;
     wxBitmapButton* m_btSelectInboundPreview;
@@ -443,14 +444,6 @@ protected:
     wxPanel* m_cnc3DPane;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
     wxPanel* m_placeholderPanel;
-    wxStaticLine* m_staticLine50162;
-    wxButton* m_replayStart;
-    wxButton* m_replayPrev;
-    wxButton* m_replayNext;
-    wxButton* m_replayEnd;
-    wxButton* m_replayPlay;
-    wxButton* m_replayPause;
-    wxButton* m_replayStop;
     wxStaticLine* m_staticLine50163;
     wxBitmapToggleButton* m_btnOrigin;
     wxBitmapToggleButton* m_btnRuler;
@@ -468,8 +461,9 @@ protected:
     wxSlider* m_displayInterval;
     wxPanel* m_3DSplitterPlaceholder;
     wxPanel* m_3DOutboundStatistics;
+    wxStaticLine* m_staticLine7091;
     wxButton* m_btShowHideStatistics;
-    wxButton* m_bt2ShowHideStatistics;
+    wxButton* m_btShowHideReplayPane;
     wxStaticLine* m_staticLine50051;
     wxStaticText* m_staticText5014;
     wxStaticBitmap* m_lableWorkpieceThickness;
@@ -748,9 +742,9 @@ protected:
     virtual void selectPort(wxCommandEvent& event) { event.Skip(); }
     virtual void connect(wxCommandEvent& event) { event.Skip(); }
     virtual void setReferencePosition(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectSetup(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectReferences(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectManuallyMove(wxCommandEvent& event) { event.Skip(); }
-    virtual void onSelectSetup(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectTestPage(wxCommandEvent& event) { event.Skip(); }
     virtual void onSelectInboundPreview(wxCommandEvent& event) { event.Skip(); }
@@ -870,13 +864,6 @@ protected:
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorReplayStart(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorReplayPrev(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorReplayNext(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorReplayEnd(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorReplayPlay(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorReplayPause(wxCommandEvent& event) { event.Skip(); }
-    virtual void monitorReplayStop(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorOrigin(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorRuler(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorHelpLines(wxCommandEvent& event) { event.Skip(); }
@@ -890,6 +877,7 @@ protected:
     virtual void displayIntervalChanged(wxScrollEvent& event) { event.Skip(); }
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorOptionPane(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
@@ -1005,9 +993,9 @@ public:
     wxBitmapComboBox* GetPortSelector() { return m_portSelector; }
     wxBitmapButton* GetConnect() { return m_connect; }
     wxBitmapButton* GetRefPosition() { return m_refPosition; }
+    wxBitmapButton* GetBtSelectSetup() { return m_btSelectSetup; }
     wxBitmapButton* GetBtSelectReferences() { return m_btSelectReferences; }
     wxBitmapButton* GetBtSelectManuallyMove() { return m_btSelectManuallyMove; }
-    wxBitmapButton* GetBtSelectSetup() { return m_btSelectSetup; }
     wxBitmapButton* GetBtSelectTemplate() { return m_btSelectTemplate; }
     wxBitmapButton* GetBtSelectInboundTest() { return m_btSelectInboundTest; }
     wxBitmapButton* GetBtSelectInboundPreview() { return m_btSelectInboundPreview; }
@@ -1355,14 +1343,6 @@ public:
     wxPanel* GetCncParameters() { return m_cncParameters; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
     wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
-    wxStaticLine* GetStaticLine50162() { return m_staticLine50162; }
-    wxButton* GetReplayStart() { return m_replayStart; }
-    wxButton* GetReplayPrev() { return m_replayPrev; }
-    wxButton* GetReplayNext() { return m_replayNext; }
-    wxButton* GetReplayEnd() { return m_replayEnd; }
-    wxButton* GetReplayPlay() { return m_replayPlay; }
-    wxButton* GetReplayPause() { return m_replayPause; }
-    wxButton* GetReplayStop() { return m_replayStop; }
     wxStaticLine* GetStaticLine50163() { return m_staticLine50163; }
     wxBitmapToggleButton* GetBtnOrigin() { return m_btnOrigin; }
     wxBitmapToggleButton* GetBtnRuler() { return m_btnRuler; }
@@ -1379,8 +1359,9 @@ public:
     wxStaticText* GetStaticText32334() { return m_staticText32334; }
     wxSlider* GetDisplayInterval() { return m_displayInterval; }
     wxPanel* Get3DSplitterPlaceholder() { return m_3DSplitterPlaceholder; }
+    wxStaticLine* GetStaticLine7091() { return m_staticLine7091; }
     wxButton* GetBtShowHideStatistics() { return m_btShowHideStatistics; }
-    wxButton* GetBt2ShowHideStatistics() { return m_bt2ShowHideStatistics; }
+    wxButton* GetBtShowHideReplayPane() { return m_btShowHideReplayPane; }
     wxStaticLine* GetStaticLine50051() { return m_staticLine50051; }
     wxStaticText* GetStaticText5014() { return m_staticText5014; }
     wxStaticBitmap* GetLableWorkpieceThickness() { return m_lableWorkpieceThickness; }
@@ -2043,6 +2024,7 @@ protected:
     wxPGProperty* m_pgPropSmoothing;
     wxCheckBox* m_cbAutoUpdate;
     wxPanel* m_panelAnimation;
+    wxScrolledWindow* m_scrollWin7039;
     wxStaticText* m_staticText6443;
     wxBitmapButton* m_btResetCameraPos2;
     wxSlider* m_sliderCameraRotation;
@@ -2106,9 +2088,10 @@ public:
     wxSlider* GetSliderModelRotationXYZ() { return m_sliderModelRotationXYZ; }
     wxButton* GetBtModelRotationResetXYZ() { return m_btModelRotationResetXYZ; }
     wxStaticLine* GetStaticLine644534() { return m_staticLine644534; }
+    wxScrolledWindow* GetScrollWin7039() { return m_scrollWin7039; }
     wxPanel* GetPanelAnimation() { return m_panelAnimation; }
     wxChoicebook* GetChoicebook6345() { return m_choicebook6345; }
-    GL3DOptionPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(220,600), long style = wxTAB_TRAVERSAL);
+    GL3DOptionPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~GL3DOptionPaneBase();
 };
 
@@ -2136,7 +2119,7 @@ public:
     wxStaticText* GetStaticText4875() { return m_staticText4875; }
     wxPanel* GetDrawPane3DPlaceHolder() { return m_drawPane3DPlaceHolder; }
     wxPanel* GetScalePane3D() { return m_scalePane3D; }
-    GL3DDrawPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(200,200), long style = wxTAB_TRAVERSAL);
+    GL3DDrawPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(200,-1), long style = wxTAB_TRAVERSAL);
     virtual ~GL3DDrawPaneBase();
 };
 
@@ -2144,6 +2127,8 @@ public:
 class CncStatisticsPaneBase : public wxPanel
 {
 protected:
+    wxSimplebook* m_contextBook;
+    wxPanel* m_panelStatistics;
     wxNotebook* m_statisticBook;
     wxPanel* m_statisticPageSum;
     wxListCtrl* m_statisticSummaryListCtrl;
@@ -2153,6 +2138,9 @@ protected:
     wxButton* m_3D_Trace4;
     wxButton* m_3D_Trace;
     wxListCtrl* m_vectiesListCtrl;
+    wxPanel* m_panelReplay;
+    wxPanel* m_panel7059;
+    wxPanel* m_replayPlaceholder;
 
 protected:
     virtual void statisticBookChanged(wxNotebookEvent& event) { event.Skip(); }
@@ -2170,8 +2158,68 @@ public:
     wxListCtrl* GetVectiesListCtrl() { return m_vectiesListCtrl; }
     wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
     wxNotebook* GetStatisticBook() { return m_statisticBook; }
+    wxPanel* GetPanelStatistics() { return m_panelStatistics; }
+    wxPanel* GetPanel7059() { return m_panel7059; }
+    wxPanel* GetReplayPlaceholder() { return m_replayPlaceholder; }
+    wxPanel* GetPanelReplay() { return m_panelReplay; }
+    wxSimplebook* GetContextBook() { return m_contextBook; }
     CncStatisticsPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
     virtual ~CncStatisticsPaneBase();
+};
+
+
+class CncMonitorReplayPaneBase : public wxPanel
+{
+protected:
+    wxComboBox* m_cbStepUnit;
+    wxStaticLine* m_staticLine7085;
+    wxButton* m_replayStart;
+    wxButton* m_replayPrev;
+    wxButton* m_replayNext;
+    wxButton* m_replayEnd;
+    wxStaticLine* m_staticLine7069;
+    wxButton* m_replayPlay;
+    wxButton* m_replayPause;
+    wxButton* m_replayStop;
+    wxTextCtrl* m_currentVertexId;
+    wxStaticText* m_staticText7081;
+    wxTextCtrl* m_currentVertex;
+    wxStaticText* m_staticText7075;
+    wxTextCtrl* m_totalVerties;
+
+protected:
+    virtual void replayStart(wxCommandEvent& event) { event.Skip(); }
+    virtual void replayLeftUpPrev(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayLeavePrev(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayLeftDownPrev(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayLeftDClickPrev(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayLeftUpNext(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayLeaveNext(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayLeftDownNext(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayLeftDClickNext(wxMouseEvent& event) { event.Skip(); }
+    virtual void replayEnd(wxCommandEvent& event) { event.Skip(); }
+    virtual void replayPlay(wxCommandEvent& event) { event.Skip(); }
+    virtual void replayPause(wxCommandEvent& event) { event.Skip(); }
+    virtual void replayStop(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxComboBox* GetCbStepUnit() { return m_cbStepUnit; }
+    wxStaticLine* GetStaticLine7085() { return m_staticLine7085; }
+    wxButton* GetReplayStart() { return m_replayStart; }
+    wxButton* GetReplayPrev() { return m_replayPrev; }
+    wxButton* GetReplayNext() { return m_replayNext; }
+    wxButton* GetReplayEnd() { return m_replayEnd; }
+    wxStaticLine* GetStaticLine7069() { return m_staticLine7069; }
+    wxButton* GetReplayPlay() { return m_replayPlay; }
+    wxButton* GetReplayPause() { return m_replayPause; }
+    wxButton* GetReplayStop() { return m_replayStop; }
+    wxTextCtrl* GetCurrentVertexId() { return m_currentVertexId; }
+    wxStaticText* GetStaticText7081() { return m_staticText7081; }
+    wxTextCtrl* GetCurrentVertex() { return m_currentVertex; }
+    wxStaticText* GetStaticText7075() { return m_staticText7075; }
+    wxTextCtrl* GetTotalVerties() { return m_totalVerties; }
+    CncMonitorReplayPaneBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);
+    virtual ~CncMonitorReplayPaneBase();
 };
 
 

@@ -2,7 +2,8 @@
 
 /////////////////////////////////////////////////////////////////
 GL3DOptionPane::GL3DOptionPane(wxWindow* parent)
-: GL3DOptionPaneBase(parent, wxID_ANY, wxDefaultPosition, wxSize(-1,-1),  wxTAB_TRAVERSAL)
+// wxSize(1, 1) is a hack to overrule the sizer management
+: GL3DOptionPaneBase(parent, wxID_ANY, wxDefaultPosition, wxSize(1, 1),  wxTAB_TRAVERSAL)
 , GLContextOptions::Callback()
 , CncMotionMonitor::Callback()
 , motionMonitor(NULL)

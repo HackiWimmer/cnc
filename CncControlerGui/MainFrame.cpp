@@ -83,6 +83,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncTemplateObserver.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
+#include "CncMonitorReplayPane.h"
 #include "CncStatisticsPane.h"
 #include "GlobalStrings.h"
 #include "MainFrame.h"
@@ -535,16 +536,18 @@ void MainFrame::enableGuiControls(bool state) {
 void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 	// 3D splitter window
-	cnc3DHSplitterWindow 	= new CncMonitorHSplitterWindow(this);
-	GblFunc::replaceControl(m_3DSplitterPlaceholder, cnc3DHSplitterWindow);
-	
+	wxWindow* parent 		= m_3DSplitterPlaceholder->GetParent();
+	cnc3DHSplitterWindow 	= new CncMonitorHSplitterWindow(parent);
 	cnc3DVSplitterWindow 	= new CncMonitorVSplitterWindow(cnc3DHSplitterWindow);
+	
+	statisticsPane 			= new CncStatisticsPane(cnc3DHSplitterWindow);
+	cnc3DHSplitterWindow->SplitHorizontally(cnc3DVSplitterWindow, statisticsPane, 0);
+	
 	drawPane3D    			= new GL3DDrawPane(cnc3DVSplitterWindow);
 	optionPane3D  			= new GL3DOptionPane(cnc3DVSplitterWindow);
 	cnc3DVSplitterWindow->SplitVertically(drawPane3D, optionPane3D, 0);
 	
-	statisticsPane 			= new CncStatisticsPane(cnc3DHSplitterWindow);
-	cnc3DHSplitterWindow->SplitHorizontally(cnc3DVSplitterWindow, statisticsPane, 0);
+	GblFunc::replaceControl(m_3DSplitterPlaceholder, cnc3DHSplitterWindow);
 	
 	// Montion Monitor
 	motionMonitor = new CncMotionMonitor(this);
@@ -772,14 +775,6 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	
-	for ( long i=0; i<motionMonitor->getPathItemCount(); i++ ) {
-		motionMonitor->setVirtualEnd(i);
-		
-		if ( i%10 == 0 )
-			motionMonitor->display();
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
@@ -2115,6 +2110,7 @@ void MainFrame::enableControls(bool state) {
 	
 	// run control
 	enableRunControls(state);
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -3572,6 +3568,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		}
 		
 		motionMonitor->updateMonitor();
+		statisticsPane->updateReplayPane();
 	}
 	
 	// prepare final statements
@@ -6231,6 +6228,7 @@ void MainFrame::clearPositionSpy() {
 	umPostEvent(evt.PosSpyResetEvent());
 	
 	positionSpy->clear();
+	motionMonitor->resetCurrentClientId();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clearPositionSpy(wxCommandEvent& event) {
@@ -6386,6 +6384,20 @@ void MainFrame::selectSourceControlLineNumber(long ln) {
 		return;
 	
 	sourceEditor->selectLineNumber(ln);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::tryToSelectClientId(long clientId) {
+/////////////////////////////////////////////////////////////////////
+	//std::cout << clientId << std::endl;
+	
+	if ( positionSpy == NULL || positionSpy->searchReferenceById(clientId) == false )
+		selectSourceControlLineNumber(clientId - 1 );
+	
+	// mark this id
+	if ( motionMonitor != NULL )
+		motionMonitor->setCurrentClientId(clientId);
+		
+	// motionMonitor->display has to be called separatly by the caller
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectPositionSpy(wxListEvent& event) {
@@ -6582,8 +6594,7 @@ void MainFrame::searchPosSpy(wxCommandEvent& event) {
 	bool ret = false;
 	if ( what.IsEmpty() == false ) {
 		long ref; what.ToLong(&ref);
-		what.assign(wxString::Format(globalStrings.posSpyRefFormat, ref));
-		ret = positionSpy->searchReference(what);
+		ret = positionSpy->searchReferenceById(ref);
 	}
 	
 	if ( ret == false ) 
@@ -7285,8 +7296,46 @@ void MainFrame::toggleMotionMonitorOptionPane(bool forceHide) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMotionMonitorStatisticPane(bool forceHide) {
 /////////////////////////////////////////////////////////////////////
-	if ( cnc3DHSplitterWindow != NULL )
-		cnc3DHSplitterWindow->toggleBottomWindow();
+	if ( cnc3DHSplitterWindow != NULL ) {
+		
+		const int nc = MontiorBottomContextSelection::VAL::STATISTIC_PANEL;
+		const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
+		
+		cnc3DHSplitterWindow->selectBottomContext(nc);
+		
+		if ( cnc3DHSplitterWindow->isBottomWindowShown() ) {
+			cnc3DHSplitterWindow->hideBottomWindow();
+			
+			if ( nc != cc)
+				cnc3DHSplitterWindow->showBottomWindow();
+				
+		} else {
+			cnc3DHSplitterWindow->toggleBottomWindow();
+			
+		}
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::toggleMotionMonitorReplayPane(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( cnc3DHSplitterWindow != NULL ) {
+		
+		const int nc = MontiorBottomContextSelection::VAL::REPLAY_PANEL;
+		const int cc = cnc3DHSplitterWindow->getCurrentButtomContext();
+		
+		cnc3DHSplitterWindow->selectBottomContext(nc);
+		
+		if ( cnc3DHSplitterWindow->isBottomWindowShown() ) {
+			cnc3DHSplitterWindow->hideBottomWindow();
+			
+			if ( nc != cc)
+				cnc3DHSplitterWindow->showBottomWindow();
+				
+		} else {
+			cnc3DHSplitterWindow->toggleBottomWindow();
+			
+		}
+	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectMetricUnitFrom(wxCommandEvent& event) {
@@ -7334,63 +7383,10 @@ void MainFrame::enableSourceEditorMenuItems(bool enable) {
 	m_miSaveTemplateAs->Enable(enable);
 }
 
-
-
-
-/////////////////////////////////////////////////////////////////////
-void MainFrame::monitorReplayStart(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	motionMonitor->setVirtualEnd(1);
-	motionMonitor->display();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::monitorReplayPrev(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	motionMonitor->setVirtualEnd(motionMonitor->getVirtualEnd() - 1);
-	motionMonitor->display();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::monitorReplayNext(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	motionMonitor->setVirtualEnd(motionMonitor->getVirtualEnd() + 1);
-	motionMonitor->display();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::monitorReplayEnd(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	motionMonitor->setVirtualEnd(motionMonitor->getPathItemCount() - 1);
-	motionMonitor->display();
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::monitorReplayPlay(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	for ( long i=0; i<motionMonitor->getPathItemCount(); i++ ) {
-		motionMonitor->setVirtualEnd(i);
-		
-		if ( i%10 == 0 )
-			motionMonitor->display();
-	}
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::monitorReplayPause(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::monitorReplayStop(wxCommandEvent& event) {
-/////////////////////////////////////////////////////////////////////
-}
-
-
-
-
-
-
-
-
-
 void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {
 	#warning selectManuallyToolId - can may be removed
 	std::cout << "todo" << std::endl;
 }
+
 

@@ -79,11 +79,21 @@ class GLContextCncPathBase : public GLContextBase {
 		int getOriginX() { return ( viewPort != NULL ? viewPort->getX() : 0 ); }
 		int getOriginY() { return ( viewPort != NULL ? viewPort->getY() : 0 ); }
 		
-		long getPathItemCount()			{ return cncPath.size();      }
+		long getPathItemCount()			{ return cncPath.size(); }
 		
 		void setVirtualEnd(long val) 	{ cncPath.setVirtualEnd(val); }
-		void resetVirtualEnd() 			{ cncPath.resetVirtualEnd();  }
-		long getVirtualEnd() 			{ return cncPath.getVirtualEnd(); }
+		void setVirtualEndToFirst() 	{ cncPath.setVirtualEndToFirst(); }
+		void setVirtualEndToLast() 		{ cncPath.setVirtualEndToLast(); }
+		
+		void incVirtualEnd() 			{ cncPath.incVirtualEnd(); } 
+		void decVirtualEnd() 			{ cncPath.decVirtualEnd(); }
+		void incVirtualEndById() 		{ cncPath.incVirtualEndById(); }
+		void decVirtualEndById() 		{ cncPath.decVirtualEndById(); }
+		
+		const long getVirtualEnd() 		{ return cncPath.getVirtualEnd(); }
+		const long getVirtualEndAsId()	{ return cncPath.getVirtualEndAsId(); }
+		
+		void registerCallback(GLI::GLCncPath::Callback* cb) { cncPath.registerCallback(cb); }
 		
 	protected:
 		

@@ -40,9 +40,12 @@ class CncMonitorHSplitterWindow : public wxSplitterWindow {
 		virtual bool SplitHorizontally(wxWindow *window1, wxWindow *window2, int sashPosition = 0);
 		virtual bool SplitVertically(wxWindow *window1, wxWindow *window2, int sashPosition = 0);
 		
+		int getCurrentButtomContext();
+		void selectBottomContext(int context);
 		void toggleBottomWindow();
-		void showBottomWindow(bool show);
-		void hideBottomWindow() { showBottomWindow(false); }
+		void showBottomWindow(bool show=true);
+		void hideBottomWindow() 	{ showBottomWindow(false); }
+		bool isBottomWindowShown() 	{ return GetSashGravity() < 1.0; }
 		
 	protected:
 	
@@ -51,8 +54,6 @@ class CncMonitorHSplitterWindow : public wxSplitterWindow {
 		
 		virtual bool OnSashPositionChange (int newSashPosition);
 		void onSize(wxSizeEvent& event);
-		
-		bool isBottomWindowShown() { return GetSashGravity() < 1.0; }
 
 		wxDECLARE_EVENT_TABLE();
 };

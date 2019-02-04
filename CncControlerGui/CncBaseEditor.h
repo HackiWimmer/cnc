@@ -149,9 +149,9 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		virtual void onRightDown(wxMouseEvent& event);
 		
 		
-		wxStaticText* 	getCtlEditMode() 	{ wxASSERT(ctlEditMode); 		return ctlEditMode; }
-		wxStaticText* 	getCtlColumnPos() 	{ wxASSERT(ctlColunmPostion); 	return ctlColunmPostion; }
-		wxTextCtrl*		getCtlStatus() 		{ wxASSERT(ctlStatus); 			return ctlStatus; }
+		wxStaticText* 	getCtlEditMode() 	{ return ctlEditMode; }
+		wxStaticText* 	getCtlColumnPos() 	{ return ctlColunmPostion; }
+		wxTextCtrl*		getCtlStatus() 		{ return ctlStatus; }
 		
 		wxDECLARE_EVENT_TABLE();
 };
