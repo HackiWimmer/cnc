@@ -22,7 +22,7 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 		
 	protected:
 		
-		virtual void notifyCncPathChanged();
+		virtual void selectReplayUnit(wxCommandEvent& event);
 		
 		virtual void replayLeftDClickNext(wxMouseEvent& event)	{ doAbort(); }
 		virtual void replayLeftDClickPrev(wxMouseEvent& event)	{ doAbort(); }
@@ -35,9 +35,16 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 		virtual void replayLeftDownPrev(wxMouseEvent& event);
 		virtual void replayEnd(wxCommandEvent& event);
 		virtual void replayPause(wxCommandEvent& event);
-		virtual void replayPlay(wxCommandEvent& event);
+		virtual void replayPlayAll(wxCommandEvent& event);
+		virtual void replayPlayCurrentId(wxCommandEvent& event);
 		virtual void replayStart(wxCommandEvent& event);
 		virtual void replayStop(wxCommandEvent& event);
+		
+	protected:
+	
+		enum UnitSelection { Unit_Id = 0, Unit_Vertex = 1 };
+		
+		virtual void notifyCncPathChanged();
 		
 		bool				abort;
 		bool				processing;
@@ -49,6 +56,8 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 		void doAbort() 					{ abort = true; }
 		
 		void setProcessing(bool state) 	{ processing = state; }
+		
+		void replayPlay(bool stopByIdChange = false);
 		
 		// ----------------------------------------------------
 		class Processing {
@@ -78,7 +87,8 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 					pane->GetReplayPrev()->Enable(false);
 					pane->GetReplayNext()->Enable(false);
 					pane->GetReplayEnd()->Enable(false);
-					pane->GetReplayPlay()->Enable(false);
+					pane->GetReplayPlayAll()->Enable(false);
+					pane->GetReplayPlayCurrentId()->Enable(false);
 					
 					pane->GetReplayPause()->Enable(true);
 					pane->GetReplayStop()->Enable(true);
@@ -96,7 +106,8 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 					pane->GetReplayStart()->Enable(false);
 					pane->GetReplayNext()->Enable(false);
 					pane->GetReplayEnd()->Enable(false);
-					pane->GetReplayPlay()->Enable(false);
+					pane->GetReplayPlayAll()->Enable(false);
+					pane->GetReplayPlayCurrentId()->Enable(false);
 					pane->GetReplayPause()->Enable(false);
 					
 					pane->GetReplayPrev()->Enable(true);
@@ -115,7 +126,9 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 					pane->GetReplayStart()->Enable(false);
 					pane->GetReplayPrev()->Enable(false);
 					pane->GetReplayEnd()->Enable(false);
-					pane->GetReplayPlay()->Enable(false);
+					pane->GetReplayPlayAll()->Enable(false);
+					pane->GetReplayPlayCurrentId()->Enable(false);
+
 					pane->GetReplayPause()->Enable(false);
 					
 					pane->GetReplayNext()->Enable(true);

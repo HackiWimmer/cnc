@@ -42,9 +42,10 @@
 #include <wx/splitter.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>
+#include <wx/listbook.h>
+#include <wx/scrolwin.h>
 #include <wx/radiobox.h>
 #include <wx/checkbox.h>
-#include <wx/listbook.h>
 #include <wx/spinctrl.h>
 #include "CncZView.h"
 #include <wx/listctrl.h>
@@ -54,7 +55,6 @@
 #include <wx/propgrid/property.h>
 #include <wx/propgrid/advprops.h>
 #include <wx/choicebk.h>
-#include <wx/scrolwin.h>
 #include <wx/dialog.h>
 #include <wx/bitmap.h>
 #include <wx/icon.h>
@@ -222,20 +222,9 @@ protected:
     wxPanel* m_mainBookReference;
     wxStaticText* m_staticText779;
     wxStaticLine* m_staticLine783;
-    wxNotebook* m_manualMotionControl;
-    wxPanel* m_panel5187;
-    wxPanel* m_navigationPanelPlaceholder;
-    wxStaticLine* m_staticLine5550;
-    wxStaticBitmap* m_staticBitmap5901;
-    wxStaticText* m_cbStepSensitivityText;
-    wxRadioBox* m_rbStepSensitivity;
-    wxStaticLine* m_staticLine5552;
-    wxStaticBitmap* m_staticBitmap5907;
-    wxStaticText* m_staticText5909;
-    wxStaticText* m_staticText1156;
-    wxStaticLine* m_staticLine1158;
-    wxNotebook* m_positionManagement;
+    wxListbook* m_listbook7170;
     wxPanel* m_predefinedPositions;
+    wxScrolledWindow* m_scrollWin7112;
     wxStaticText* m_staticText1171;
     wxStaticText* m_staticText1173;
     wxComboBox* m_homeDefintion;
@@ -271,6 +260,16 @@ protected:
     wxButton* m_zToTop;
     wxStaticText* m_staticText2438;
     wxButton* m_zToBottom;
+    wxPanel* m_panel7172;
+    wxPanel* m_navigator;
+    wxPanel* m_navigationPanelPlaceholder;
+    wxStaticLine* m_staticLine5550;
+    wxStaticBitmap* m_staticBitmap5901;
+    wxStaticText* m_cbStepSensitivityText;
+    wxRadioBox* m_rbStepSensitivity;
+    wxStaticLine* m_staticLine5552;
+    wxStaticBitmap* m_staticBitmap5907;
+    wxStaticText* m_staticText5909;
     wxPanel* m_mainBookManual;
     wxStaticText* m_staticText1160;
     wxStaticLine* m_staticLine1162;
@@ -1123,18 +1122,6 @@ public:
     wxPanel* GetMainBookSetup() { return m_mainBookSetup; }
     wxStaticText* GetStaticText779() { return m_staticText779; }
     wxStaticLine* GetStaticLine783() { return m_staticLine783; }
-    wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
-    wxStaticLine* GetStaticLine5550() { return m_staticLine5550; }
-    wxStaticBitmap* GetStaticBitmap5901() { return m_staticBitmap5901; }
-    wxStaticText* GetCbStepSensitivityText() { return m_cbStepSensitivityText; }
-    wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
-    wxStaticLine* GetStaticLine5552() { return m_staticLine5552; }
-    wxStaticBitmap* GetStaticBitmap5907() { return m_staticBitmap5907; }
-    wxStaticText* GetStaticText5909() { return m_staticText5909; }
-    wxPanel* GetPanel5187() { return m_panel5187; }
-    wxNotebook* GetManualMotionControl() { return m_manualMotionControl; }
-    wxStaticText* GetStaticText1156() { return m_staticText1156; }
-    wxStaticLine* GetStaticLine1158() { return m_staticLine1158; }
     wxStaticText* GetStaticText1171() { return m_staticText1171; }
     wxStaticText* GetStaticText1173() { return m_staticText1173; }
     wxComboBox* GetHomeDefintion() { return m_homeDefintion; }
@@ -1170,8 +1157,19 @@ public:
     wxButton* GetZToTop() { return m_zToTop; }
     wxStaticText* GetStaticText2438() { return m_staticText2438; }
     wxButton* GetZToBottom() { return m_zToBottom; }
+    wxScrolledWindow* GetScrollWin7112() { return m_scrollWin7112; }
+    wxPanel* GetPanel7172() { return m_panel7172; }
     wxPanel* GetPredefinedPositions() { return m_predefinedPositions; }
-    wxNotebook* GetPositionManagement() { return m_positionManagement; }
+    wxPanel* GetNavigationPanelPlaceholder() { return m_navigationPanelPlaceholder; }
+    wxStaticLine* GetStaticLine5550() { return m_staticLine5550; }
+    wxStaticBitmap* GetStaticBitmap5901() { return m_staticBitmap5901; }
+    wxStaticText* GetCbStepSensitivityText() { return m_cbStepSensitivityText; }
+    wxRadioBox* GetRbStepSensitivity() { return m_rbStepSensitivity; }
+    wxStaticLine* GetStaticLine5552() { return m_staticLine5552; }
+    wxStaticBitmap* GetStaticBitmap5907() { return m_staticBitmap5907; }
+    wxStaticText* GetStaticText5909() { return m_staticText5909; }
+    wxPanel* GetNavigator() { return m_navigator; }
+    wxListbook* GetListbook7170() { return m_listbook7170; }
     wxPanel* GetMainBookReference() { return m_mainBookReference; }
     wxStaticText* GetStaticText1160() { return m_staticText1160; }
     wxStaticLine* GetStaticLine1162() { return m_staticLine1162; }
@@ -2178,7 +2176,8 @@ protected:
     wxButton* m_replayNext;
     wxButton* m_replayEnd;
     wxStaticLine* m_staticLine7069;
-    wxButton* m_replayPlay;
+    wxButton* m_replayPlayAll;
+    wxButton* m_replayPlayCurrentId;
     wxButton* m_replayPause;
     wxButton* m_replayStop;
     wxTextCtrl* m_currentVertexId;
@@ -2188,6 +2187,7 @@ protected:
     wxTextCtrl* m_totalVerties;
 
 protected:
+    virtual void selectReplayUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void replayStart(wxCommandEvent& event) { event.Skip(); }
     virtual void replayLeftUpPrev(wxMouseEvent& event) { event.Skip(); }
     virtual void replayLeavePrev(wxMouseEvent& event) { event.Skip(); }
@@ -2198,7 +2198,8 @@ protected:
     virtual void replayLeftDownNext(wxMouseEvent& event) { event.Skip(); }
     virtual void replayLeftDClickNext(wxMouseEvent& event) { event.Skip(); }
     virtual void replayEnd(wxCommandEvent& event) { event.Skip(); }
-    virtual void replayPlay(wxCommandEvent& event) { event.Skip(); }
+    virtual void replayPlayAll(wxCommandEvent& event) { event.Skip(); }
+    virtual void replayPlayCurrentId(wxCommandEvent& event) { event.Skip(); }
     virtual void replayPause(wxCommandEvent& event) { event.Skip(); }
     virtual void replayStop(wxCommandEvent& event) { event.Skip(); }
 
@@ -2210,7 +2211,8 @@ public:
     wxButton* GetReplayNext() { return m_replayNext; }
     wxButton* GetReplayEnd() { return m_replayEnd; }
     wxStaticLine* GetStaticLine7069() { return m_staticLine7069; }
-    wxButton* GetReplayPlay() { return m_replayPlay; }
+    wxButton* GetReplayPlayAll() { return m_replayPlayAll; }
+    wxButton* GetReplayPlayCurrentId() { return m_replayPlayCurrentId; }
     wxButton* GetReplayPause() { return m_replayPause; }
     wxButton* GetReplayStop() { return m_replayStop; }
     wxTextCtrl* GetCurrentVertexId() { return m_currentVertexId; }

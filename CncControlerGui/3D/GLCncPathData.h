@@ -215,94 +215,39 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
-			iterator vBegin() 	{ return begin(); }
-			
-			////////////////////////////////////////////
-			iterator vEnd()		{ 
-				if ( virtualEnd <= 0 )
-					return end(); 
-					
-				if ( size() == 0 )
-					return end(); 
-					
-				if ( (unsigned long)virtualEnd > size() - 1 )
-					return end(); 
-					
-				return begin() + virtualEnd;
-			}
+			iterator vBegin();
+			iterator vEnd();
 			
 			////////////////////////////////////////////
 			void setVirtualEndToFirst() 	{ setVirtualEnd(1); }
 			void setVirtualEndToLast() 		{ setVirtualEnd(size() - 1 ); }
 			
 			////////////////////////////////////////////
+			bool hasNextVertex() const;
+			bool hasPreviousVertex() const;
+			
+			////////////////////////////////////////////
+			long previewNextVertexId();
+			long previewPreviousVertexId();
+			
+			////////////////////////////////////////////
 			void incVirtualEnd()			{ setVirtualEnd(getVirtualEnd() + 1 ); }
 			void decVirtualEnd() 			{ setVirtualEnd(getVirtualEnd() - 1 ); }
+			void incVirtualEndById();
+			void decVirtualEndById();
+			
+			void spoolVertiesForCurrentId();
 			
 			////////////////////////////////////////////
-			void setVirtualEnd(long val) {
-				/*
-				if ( val <= 0 )
-					return; 
-					
-				if ( size() == 0 )
-					return; 
-					
-				if ( (unsigned long)val > size() - 1 )
-					return;
-				*/
-				virtualEnd = val;
-				
-				publishNotifications = true;
-				notifyCncPathChanged();
-			}
-			
-			////////////////////////////////////////////
-			void incVirtualEndById() {
-				long id = getVirtualEndAsId();
-				
-				publishNotifications = false;
-				
-					do {
-						incVirtualEnd();
-						
-						if ( virtualEnd >= std::distance(begin(), end()) - 1 )
-							break;
-							
-					} while ( id == getVirtualEndAsId() );
-					
-				publishNotifications = true;
-				notifyCncPathChanged();
-			}
-			
-			////////////////////////////////////////////
-			void decVirtualEndById() {
-				long id = getVirtualEndAsId();
-				
-				publishNotifications = false;
-					
-					do {
-						decVirtualEnd();
-						
-						if ( virtualEnd <= 1 )
-							break;
-							
-					} while ( id == getVirtualEndAsId() );
-				
-				publishNotifications = true;
-				notifyCncPathChanged();
-			}
+			void setVirtualEnd(long val);
 			
 			////////////////////////////////////////////
 			const long getVirtualEnd() const { return virtualEnd; }
+			const long getVirtualEndAsId();
 			
 			////////////////////////////////////////////
-			const long getVirtualEndAsId() {
-				if ( vEnd() == end() )
-					return -1;
-					
-				return vEnd()->getId();
-			}
+			void activateNotifications(bool state = true) { publishNotifications = state; }
+			void deactivateNotifications() { activateNotifications(false); }
 			
 			////////////////////////////////////////////
 			const GLCncPathVertices& getMin() const { return minVecties; }

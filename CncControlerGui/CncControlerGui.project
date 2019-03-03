@@ -95,6 +95,7 @@
       <File Name="3D/CncGLCanvas.cpp"/>
       <File Name="CncGLCanvas.h"/>
       <VirtualDirectory Name="Base">
+        <File Name="3D/GLCncPathData.cpp"/>
         <File Name="3D/GLLabelCluser.cpp"/>
         <File Name="3D/GLLabelCluster.h"/>
         <File Name="3D/GLLineCluster.cpp"/>

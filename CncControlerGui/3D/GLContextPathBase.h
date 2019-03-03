@@ -85,13 +85,21 @@ class GLContextCncPathBase : public GLContextBase {
 		void setVirtualEndToFirst() 	{ cncPath.setVirtualEndToFirst(); }
 		void setVirtualEndToLast() 		{ cncPath.setVirtualEndToLast(); }
 		
+		long previewNextVertexId()		{ return cncPath.previewNextVertexId(); }
+		long previewPreviousVertexId()	{ return cncPath.previewPreviousVertexId(); }
+		
 		void incVirtualEnd() 			{ cncPath.incVirtualEnd(); } 
 		void decVirtualEnd() 			{ cncPath.decVirtualEnd(); }
 		void incVirtualEndById() 		{ cncPath.incVirtualEndById(); }
 		void decVirtualEndById() 		{ cncPath.decVirtualEndById(); }
 		
+		void spoolVertiesForCurrentId() { cncPath.spoolVertiesForCurrentId(); }
+		
 		const long getVirtualEnd() 		{ return cncPath.getVirtualEnd(); }
 		const long getVirtualEndAsId()	{ return cncPath.getVirtualEndAsId(); }
+		
+		void activateNotifications() 	{ cncPath.activateNotifications(); }
+		void deactivateNotifications() 	{ cncPath.deactivateNotifications(); }
 		
 		void registerCallback(GLI::GLCncPath::Callback* cb) { cncPath.registerCallback(cb); }
 		

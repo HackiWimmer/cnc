@@ -341,8 +341,8 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 				default: 	continue;
 			}
 			
-			const double  hight = innerRadius * 0.18;
-			const double  width = innerRadius * ( config.shortFormat ? 0.25 :  0.14 );
+			const double  hight = std::min(innerRadius * 0.18, 15.0);
+			const double  width = std::min(innerRadius * ( config.shortFormat ? 0.25 :  0.14 ), 15.0);
 			
 			wxPoint dp1[TRIANGLE];
 			dp1[A].x = cos( ocr.midAngle          * PI / 180) * ( +(midRadius + hight));
@@ -407,6 +407,8 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		if ( config.showRegionInfo == true ) {
 			
 			int fontSize 		= navRectangle.GetWidth() < minHeight ? 6 : 8;
+			fontSize 		    = navRectangle.GetWidth() > minHeight * 2 ? 12 : fontSize;
+			
 			wxString prefix		= navRectangle.GetWidth() < minHeight ? "" : "Direction:\n";
 			wxString dirText	= config.toolTipMap[current.direction];
 			
@@ -425,7 +427,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		}
 	};
 	
-	// region info
+	// region tip
 	auto drawRegionTip = [&]() {
 		if ( config.showRegionTip == false )
 			return;
@@ -433,7 +435,8 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		if ( navRectangle.GetWidth() < minHeight )
 			return;
 			
-		wxFont font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+		int fontSize = navRectangle.GetWidth() < minHeight ? 7 : 9;
+		wxFont font(fontSize, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
 		dc.SetFont(font);
 		
 		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {

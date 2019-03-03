@@ -443,10 +443,13 @@ void CncMotionMonitor::pushProcessMode() {
 	//set processing flags
 	normalizeMonitor();
 	resetCurrentClientId();
+	
+	monitor->deactivateNotifications();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::popProcessMode() {
 //////////////////////////////////////////////////
+	monitor->activateNotifications();
 }
 
 

@@ -81,7 +81,8 @@ void CncMonitorVSplitterWindow::showRightWindow(bool show) {
 	const int splitterWidth	= GetSize().GetWidth();
 	
 	if ( show == false ) {
-		SetMinimumPaneSize(0);
+		// Use a min pane size > 0, otherwise the pane may be disappears for ever
+		SetMinimumPaneSize(1);
 		SetSashGravity(1.0);
 		SetSashPosition(splitterWidth * 10);
 		
@@ -161,8 +162,8 @@ bool CncMonitorHSplitterWindow::SplitVertically(wxWindow *window1, wxWindow *win
 bool CncMonitorHSplitterWindow::OnSashPositionChange(int newSashPosition) {
 ///////////////////////////////////////////////////////////////////
 	const int splitterHeight = GetSize().GetHeight();
-	
 	lastBottomWindowHeight = splitterHeight - newSashPosition;
+	
 	return wxSplitterWindow::OnSashPositionChange(newSashPosition);
 }
 ///////////////////////////////////////////////////////////////////
@@ -198,7 +199,8 @@ void CncMonitorHSplitterWindow::showBottomWindow(bool show) {
 	const int splitterHeight	= GetSize().GetHeight();
 	
 	if ( show == false ) {
-		SetMinimumPaneSize(0);
+		// Use a min pane size > 0, otherwise the pane may be disappears for ever
+		SetMinimumPaneSize(1);
 		SetSashGravity(1.0);
 		SetSashPosition(splitterHeight * 10);
 		

@@ -344,7 +344,7 @@ bool CncBaseEditor::selectLineSvg(unsigned long ln, const char* searchKey) {
 	wxString currentNodeName;
 	if ( searchKey != NULL )
 		currentNodeName.assign(searchKey);
-	
+		
 	// debug only
 	bool debug = false;
 	if ( debug ) {
@@ -360,7 +360,7 @@ bool CncBaseEditor::selectLineSvg(unsigned long ln, const char* searchKey) {
 	
 	// only if the currentNodeName exists use it as serach start point
 	// this is only the case if the parser runs preprocess() or spool()
-	if ( GetLine(ln).Contains(currentNodeName) == false ) {
+	if ( currentNodeName.IsEmpty() || GetLine(ln).Contains(currentNodeName) == false ) {
 		backStep = 0;
 		searchStart.assign("<");
 	}

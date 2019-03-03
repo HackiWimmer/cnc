@@ -135,10 +135,15 @@ class CncMotionMonitor : public CncGlCanvas
 		void setVirtualEndToFirst() 		{ monitor->setVirtualEndToFirst(); }
 		void setVirtualEndToLast() 			{ monitor->setVirtualEndToLast(); }
 		
+		long previewNextVertexId()			{ return monitor->previewNextVertexId(); }
+		long previewPreviousVertexId()		{ return monitor->previewPreviousVertexId(); }
+
 		void incVirtualEnd() 				{ monitor->incVirtualEnd(); } 
 		void decVirtualEnd() 				{ monitor->decVirtualEnd(); }
 		void incVirtualEndById() 			{ monitor->incVirtualEndById(); }
 		void decVirtualEndById() 			{ monitor->decVirtualEndById(); }
+		
+		void spoolVertiesForCurrentId() 	{ monitor->spoolVertiesForCurrentId(); }
 		
 		const long getVirtualEnd() 			{ return monitor->getVirtualEnd(); }
 		const long getVirtualEndAsId() 		{ return monitor->getVirtualEndAsId(); }

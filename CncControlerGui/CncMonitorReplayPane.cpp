@@ -21,7 +21,8 @@ CncMonitorReplayPane::Decorate::~Decorate() {
 	pane->GetReplayPrev()->Enable(true);
 	pane->GetReplayNext()->Enable(true);
 	pane->GetReplayEnd()->Enable(true);
-	pane->GetReplayPlay()->Enable(true);
+	pane->GetReplayPlayAll()->Enable(true);
+	pane->GetReplayPlayCurrentId()->Enable(pane->GetCbStepUnit()->GetSelection() != Unit_Id);
 	pane->GetReplayPause()->Enable(true);
 	pane->GetReplayStop()->Enable(true);
 	
@@ -37,6 +38,8 @@ CncMonitorReplayPane::CncMonitorReplayPane(wxWindow* parent)
 , motionMonitor(NULL)
 ///////////////////////////////////////////////////////////////////
 {
+	m_cbStepUnit->SetSelection(Unit_Id);
+	m_replayPlayCurrentId->Enable(false);
 }
 ///////////////////////////////////////////////////////////////////
 CncMonitorReplayPane::~CncMonitorReplayPane() {
@@ -81,24 +84,33 @@ void CncMonitorReplayPane::display() {
 	motionMonitor->display();
 }
 ///////////////////////////////////////////////////////////////////
-void CncMonitorReplayPane::replayPlay(wxCommandEvent& event) {
+void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
 ///////////////////////////////////////////////////////////////////
 	if ( motionMonitor == NULL )
 		return;
 	
+	// decorate
 	Processing p(this);
 	DecoratePlay dp(this);
 	
 	abort = false;
-
+	
+	// define start position
 	long start = motionMonitor->getVirtualEnd();
 	if ( start >= motionMonitor->getPathItemCount() - 1 )
 		start = 0;
 	
 	motionMonitor->setVirtualEnd(start);
+	
+	// define start id
+	long id = motionMonitor->getVirtualEndAsId();
+	if ( id != motionMonitor->previewNextVertexId() )
+		id = motionMonitor->previewNextVertexId();
+	
+	// spool
 	while ( motionMonitor->getVirtualEnd() < motionMonitor->getPathItemCount() - 1 ) {
 		
-		const bool fine = GetCbStepUnit()->GetSelection() != 0;
+		const bool fine = GetCbStepUnit()->GetSelection() != Unit_Id;
 		if ( fine )	motionMonitor->incVirtualEnd();
 		else		motionMonitor->incVirtualEndById();
 		
@@ -106,9 +118,22 @@ void CncMonitorReplayPane::replayPlay(wxCommandEvent& event) {
 			
 		THE_APP->dispatchAll();
 		
+		if ( stopByIdChange == true )
+			if ( id != motionMonitor->previewNextVertexId() )
+				break;
+		
 		if ( abort == true )
 			break;
 	}
+}
+///////////////////////////////////////////////////////////////////
+void CncMonitorReplayPane::replayPlayAll(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	replayPlay(false);
+}
+///////////////////////////////////////////////////////////////////
+void CncMonitorReplayPane::replayPlayCurrentId(wxCommandEvent& event) {
+	replayPlay(true);
 }
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayPause(wxCommandEvent& event) {
@@ -122,8 +147,10 @@ void CncMonitorReplayPane::replayStop(wxCommandEvent& event) {
 	 
 	if ( motionMonitor == NULL )
 		return;
+		
+	if ( m_cbStepUnit->GetSelection() == Unit_Id ) 	motionMonitor->setVirtualEndToLast();
+	else											motionMonitor->spoolVertiesForCurrentId();
 	
-	motionMonitor->setVirtualEndToLast();
 	display();
 }
 ///////////////////////////////////////////////////////////////////
@@ -131,8 +158,13 @@ void CncMonitorReplayPane::replayStart(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( motionMonitor == NULL )
 		return;
-		
+	
 	motionMonitor->setVirtualEndToFirst();
+	
+	const bool fine = GetCbStepUnit()->GetSelection() != Unit_Id;
+	if ( fine == false )
+		motionMonitor->spoolVertiesForCurrentId();
+	
 	display();
 }
 ///////////////////////////////////////////////////////////////////
@@ -143,7 +175,7 @@ void CncMonitorReplayPane::replayLeftDownPrev(wxMouseEvent& event) {
 	
 	abort = false;
 	int count = 0;
-	while( decrement(GetCbStepUnit()->GetSelection() != 0) ) {
+	while( decrement(GetCbStepUnit()->GetSelection() != Unit_Id) ) {
 		
 		if      ( count < 1 ) { count++;	wxThread::This()->Sleep(350); }
 		else if ( count < 2 ) { count++;	wxThread::This()->Sleep(150); }
@@ -160,7 +192,7 @@ void CncMonitorReplayPane::replayLeftDownNext(wxMouseEvent& event) {
 	
 	abort = false;
 	int count = 0;
-	while( increment(GetCbStepUnit()->GetSelection() != 0) ) {
+	while( increment(GetCbStepUnit()->GetSelection() != Unit_Id) ) {
 		
 		if      ( count < 1 ) { count++;	wxThread::This()->Sleep(350); }
 		else if ( count < 2 ) { count++;	wxThread::This()->Sleep(150); }
@@ -199,8 +231,12 @@ bool CncMonitorReplayPane::increment(bool fine) {
 		motionMonitor->setVirtualEnd(1);
 		
 	// increment
-	if ( fine == true ) 	motionMonitor->incVirtualEnd();
-	else 					motionMonitor->incVirtualEndById();
+	if ( fine == true ) {
+		motionMonitor->incVirtualEnd();
+	} else {
+		motionMonitor->incVirtualEndById();
+		motionMonitor->spoolVertiesForCurrentId();
+	}
 	
 	display();
 	
@@ -228,4 +264,8 @@ bool CncMonitorReplayPane::decrement(bool fine) {
 	
 	return true;
 }
-
+///////////////////////////////////////////////////////////////////
+void CncMonitorReplayPane::selectReplayUnit(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_replayPlayCurrentId->Enable(m_cbStepUnit->GetSelection() != Unit_Id);
+}
