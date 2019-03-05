@@ -465,6 +465,9 @@ bool SVGFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
 	if ( cncControl == NULL )
 		return true;
+		
+	#warning
+	return true;
 	
 	const SVGRootNode& rn 	= pathHandler->getSvgRootNode();
 	CncUnitCalculator<float> to_mm(rn.getInputUnit(), Unit::mm);

@@ -57,8 +57,8 @@ void CncSourceEditor::decorateParentTabName(bool changed) {
 	wxString name(THE_APP->GetTemplateNotebook()->GetPageText(TemplateBookSelection::VAL::SOURCE_PANEL));
 	
 	if ( changed == false ) {
-		if ( name.StartsWith(indicator) == true )
-			name.Replace(indicator, "");
+		if ( name.StartsWith(indicator) == true )	name.Replace(indicator, "");
+		else										return;
 		
 	} else {
 		if ( IsEditable() == true ) {
@@ -67,6 +67,8 @@ void CncSourceEditor::decorateParentTabName(bool changed) {
 				
 				THE_APP->clearMotionMonitor();
 				THE_APP->clearPositionSpy();
+			} else {
+				return;
 			}
 		}
 	}

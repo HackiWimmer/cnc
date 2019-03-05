@@ -47,9 +47,9 @@
 #include <wx/radiobox.h>
 #include <wx/checkbox.h>
 #include <wx/spinctrl.h>
-#include "CncZView.h"
 #include <wx/listctrl.h>
 #include <wx/webview.h>
+#include "CncZView.h"
 #include <wx/timer.h>
 #include <wx/treectrl.h>
 #include <wx/propgrid/property.h>
@@ -398,18 +398,6 @@ protected:
     wxPanel* m_panel6173;
     wxTextCtrl* m_filePreviewDetails;
     wxTextCtrl* m_currentFileMangerPreviewFileName;
-    wxPanel* m_panelZView;
-    CncZView* m_zView;
-    wxStaticText* m_infoToolDiameter;
-    wxPanel* m_winFileView;
-    wxCheckBox* m_keepFileManagerPreview;
-    wxStaticText* m_staticText6018;
-    wxStaticLine* m_staticLine4345;
-    wxSplitterWindow* m_splitter6478;
-    wxPanel* m_splitterPage6482;
-    wxListCtrl* m_lruList;
-    wxPanel* m_splitterPage6490;
-    wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_winMonitorView;
     wxChoice* m_monitorViewSelector;
     wxSimplebook* m_monitorViewBook;
@@ -512,6 +500,18 @@ protected:
     wxPanel* m_panel5144;
     wxStaticText* m_staticText5142;
     wxTextCtrl* m_currentInboundFilePreviewFileName;
+    wxPanel* m_panelZView;
+    CncZView* m_zView;
+    wxStaticText* m_infoToolDiameter;
+    wxPanel* m_winFileView;
+    wxCheckBox* m_keepFileManagerPreview;
+    wxStaticText* m_staticText6018;
+    wxStaticLine* m_staticLine4345;
+    wxSplitterWindow* m_splitter6478;
+    wxPanel* m_splitterPage6482;
+    wxListCtrl* m_lruList;
+    wxPanel* m_splitterPage6490;
+    wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_winLoggerView;
     wxNotebook* m_loggerNotebook;
     wxPanel* m_panelStartupTrace;
@@ -847,10 +847,6 @@ protected:
     virtual void testDimTakeOverAll(wxCommandEvent& event) { event.Skip(); }
     virtual void testEndSwitchEvaluation(wxCommandEvent& event) { event.Skip(); }
     virtual void testSwitchToolOnOff(wxCommandEvent& event) { event.Skip(); }
-    virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
-    virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
-    virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
-    virtual void keyDownLruList(wxKeyEvent& event) { event.Skip(); }
     virtual void monitorViewSelectorSelected(wxCommandEvent& event) { event.Skip(); }
     virtual void outboundBookChanged(wxNotebookEvent& event) { event.Skip(); }
     virtual void outboundBookChanging(wxNotebookEvent& event) { event.Skip(); }
@@ -888,6 +884,10 @@ protected:
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
     #if wxUSE_WEBVIEW
     #endif // wxUSE_WEBVIEW
+    virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
+    virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
+    virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
+    virtual void keyDownLruList(wxKeyEvent& event) { event.Skip(); }
     virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void keyDownLogger(wxKeyEvent& event) { event.Skip(); }
     virtual void dclickLogger(wxMouseEvent& event) { event.Skip(); }
@@ -1301,18 +1301,6 @@ public:
     wxPanel* GetMainBookPreviewPanel() { return m_mainBookPreviewPanel; }
     wxSimplebook* GetMainViewBook() { return m_mainViewBook; }
     wxPanel* GetWinMainView() { return m_winMainView; }
-    CncZView* GetZView() { return m_zView; }
-    wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
-    wxPanel* GetPanelZView() { return m_panelZView; }
-    wxCheckBox* GetKeepFileManagerPreview() { return m_keepFileManagerPreview; }
-    wxStaticText* GetStaticText6018() { return m_staticText6018; }
-    wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
-    wxListCtrl* GetLruList() { return m_lruList; }
-    wxPanel* GetSplitterPage6482() { return m_splitterPage6482; }
-    wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
-    wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
-    wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
-    wxPanel* GetWinFileView() { return m_winFileView; }
     wxChoice* GetMonitorViewSelector() { return m_monitorViewSelector; }
     wxStaticText* GetStaticText11481() { return m_staticText11481; }
     wxListCtrl* GetCncSummaryListCtrl() { return m_cncSummaryListCtrl; }
@@ -1412,6 +1400,18 @@ public:
     wxPanel* GetMonitorTemplatePanel() { return m_monitorTemplatePanel; }
     wxSimplebook* GetMonitorViewBook() { return m_monitorViewBook; }
     wxPanel* GetWinMonitorView() { return m_winMonitorView; }
+    CncZView* GetZView() { return m_zView; }
+    wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
+    wxPanel* GetPanelZView() { return m_panelZView; }
+    wxCheckBox* GetKeepFileManagerPreview() { return m_keepFileManagerPreview; }
+    wxStaticText* GetStaticText6018() { return m_staticText6018; }
+    wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
+    wxListCtrl* GetLruList() { return m_lruList; }
+    wxPanel* GetSplitterPage6482() { return m_splitterPage6482; }
+    wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
+    wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
+    wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
+    wxPanel* GetWinFileView() { return m_winFileView; }
     wxTextCtrl* GetStartupTrace() { return m_startupTrace; }
     wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
     wxTextCtrl* GetLogger() { return m_logger; }
@@ -2473,6 +2473,27 @@ public:
     wxTimer* GetUnitTestStartupTimer() { return m_unitTestStartupTimer; }
     UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
     virtual ~UnitTestsBase();
+};
+
+
+class CncMessageDialogBase : public wxDialog
+{
+protected:
+    wxStaticBitmap* m_staticBitmap7188;
+    wxStaticText* m_headline;
+    wxTextCtrl* m_message;
+    wxButton* m_btClose;
+
+protected:
+    virtual void close(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticBitmap* GetStaticBitmap7188() { return m_staticBitmap7188; }
+    wxStaticText* GetHeadline() { return m_headline; }
+    wxTextCtrl* GetMessage() { return m_message; }
+    wxButton* GetBtClose() { return m_btClose; }
+    CncMessageDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Message Dialog"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    virtual ~CncMessageDialogBase();
 };
 
 

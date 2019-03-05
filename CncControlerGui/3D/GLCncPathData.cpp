@@ -67,9 +67,6 @@ void GLI::GLCncPath::incVirtualEndById() {
 ////////////////////////////////////////////
 	long id = getVirtualEndAsId();
 	
-	#warning
-	std::cout << "id: s" << id << std::endl;
-	
 	publishNotifications = false;
 		
 		do {
@@ -79,11 +76,6 @@ void GLI::GLCncPath::incVirtualEndById() {
 				break;
 				
 		} while ( id == getVirtualEndAsId() );
-		
-		
-		
-	#warning
-	std::cout << "id: e" << id << std::endl;
 		
 	publishNotifications = true;
 	notifyCncPathChanged();
@@ -95,9 +87,6 @@ void GLI::GLCncPath::decVirtualEndById() {
 	
 	publishNotifications = false;
 		
-	#warning
-	std::cout << "id: s" << id << std::endl;
-
 		do {
 			decVirtualEnd();
 			
@@ -106,9 +95,6 @@ void GLI::GLCncPath::decVirtualEndById() {
 				
 		} while ( id == getVirtualEndAsId() );
 	
-	#warning
-	std::cout << "id: e" << id << std::endl;
-
 	publishNotifications = true;
 	notifyCncPathChanged();
 }

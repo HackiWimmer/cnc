@@ -220,7 +220,7 @@ namespace GLI {
 			
 			////////////////////////////////////////////
 			void setVirtualEndToFirst() 	{ setVirtualEnd(1); }
-			void setVirtualEndToLast() 		{ setVirtualEnd(size() - 1 ); }
+			void setVirtualEndToLast() 		{ setVirtualEnd(size()); }
 			
 			////////////////////////////////////////////
 			bool hasNextVertex() const;

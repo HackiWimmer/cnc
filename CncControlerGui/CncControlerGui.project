@@ -192,6 +192,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncMessageDialog.h"/>
+      <File Name="CncMessageDialog.cpp"/>
       <File Name="CncMonitorReplayPane.h"/>
       <File Name="CncMonitorReplayPane.cpp"/>
       <File Name="CncStatisticsPane.h"/>

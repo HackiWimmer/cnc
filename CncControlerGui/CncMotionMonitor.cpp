@@ -425,7 +425,7 @@ void CncMotionMonitor::rotateCamera(int angle) {
 	display();
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::updateMonitor() {
+void CncMotionMonitor::updateMonitorAndOptions() {
 //////////////////////////////////////////////////
 	Refresh();
 	getContextOptions().notifyChange();

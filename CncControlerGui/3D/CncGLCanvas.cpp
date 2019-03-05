@@ -406,7 +406,8 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	const wxSize cs = GetClientSize();
 
 	// activate the keyboard focus for this frame
-	this->SetFocusFromKbd();
+	if ( event.LeftDown() )
+		this->SetFocusFromKbd();
 	
 	// wheel
 	const int rot = event.GetWheelRotation();

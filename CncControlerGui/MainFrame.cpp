@@ -775,11 +775,13 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	showAuiPane("TemplateManager", true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	hideAuiPane("TemplateManager", true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -3567,7 +3569,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			
 		}
 		
-		motionMonitor->updateMonitor();
+		motionMonitor->updateMonitorAndOptions();
 		statisticsPane->updateReplayPane();
 	}
 	
@@ -4800,36 +4802,32 @@ void MainFrame::showAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
 	if ( pane == NULL )
 		return;
 		
-	if ( GetAuimgrMain()->GetPane(pane).IsShown() == false ) {
-		GetAuimgrMain()->GetPane(pane).Show();
+	GetAuimgrMain()->GetPane(pane).Show();
+	
+	if ( menu != NULL )
+		menu->Check(true);
 		
-		if ( menu != NULL )
-			menu->Check(true);
-			
-		if ( update )
-			GetAuimgrMain()->Update();
-	}
+	if ( update )
+		GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::hideAuiPane(wxWindow* pane, wxMenuItem* menu, bool update) {
 ///////////////////////////////////////////////////////////////////
 	if ( pane == NULL )
 		return;
-
-	if ( GetAuimgrMain()->GetPane(pane).IsShown() == true ) {
-		GetAuimgrMain()->GetPane(pane).Hide();
-		GetAuimgrMain()->GetPane(pane).DestroyOnClose(false);
-		pane->Close(true);
 		
-		if ( pane == getAUIPaneByName("SerialSpy") )
-			enableSerialSpy(false);
+	GetAuimgrMain()->GetPane(pane).Hide();
+	GetAuimgrMain()->GetPane(pane).DestroyOnClose(false);
+	pane->Close(true);
+	
+	if ( pane == getAUIPaneByName("SerialSpy") )
+		enableSerialSpy(false);
+	
+	if ( menu != NULL )
+		menu->Check(false);
 		
-		if ( menu != NULL )
-			menu->Check(false);
-			
-		if ( update )
-			GetAuimgrMain()->Update();
-	}
+	if ( update )
+		GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
 wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
@@ -5005,10 +5003,14 @@ void MainFrame::onPerspectiveTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::maximizeAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( event.pane->window == m_winMonitorView || event.pane->window == m_winMainView )
+	// always do this
+	perspectiveHandler.logCurrentPerspective();
+	
+	if ( event.pane->window == m_winMonitorView || event.pane->window == m_winMainView ) {
 		perspectiveTimer.Start(20);
-		
-	event.Skip(true);
+	}
+
+	event.Skip(false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activateAuiPane(wxAuiManagerEvent& event) {
@@ -5018,16 +5020,22 @@ void MainFrame::activateAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::buttonAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	#define AUI_CLOSE_BTN_ID 	= 101;
-	#define AUI_MIN_MAX_BTN_ID 	= 102;
-	#define AUI_PIN_BTN_ID 		= 104;
+	enum { 
+		AUI_CLOSE_BTN_ID 	= 101,
+		AUI_MIN_MAX_BTN_ID 	= 102,
+		AUI_PIN_BTN_ID 		= 104
+	};
 	
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::restoreAuiPane(wxAuiManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	event.Skip(true);
+	// prevent the standard handling 
+	// the restore handling will be done be the code below
+	event.Veto(true);
+	
+	perspectiveHandler.restoreLoggedPerspective();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::renderAuiPane(wxAuiManagerEvent& event) {
@@ -7059,7 +7067,7 @@ void MainFrame::motionMonitorPostionMarker(wxCommandEvent& event) {
 		return;
 	
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showPosMarker);
-	motionMonitor->updateMonitor();
+	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorBoundBox(wxCommandEvent& event) {
@@ -7068,7 +7076,7 @@ void MainFrame::motionMonitorBoundBox(wxCommandEvent& event) {
 		return;
 		
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showBoundBox);
-	motionMonitor->updateMonitor();
+	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorOrigin(wxCommandEvent& event) {
@@ -7077,7 +7085,7 @@ void MainFrame::motionMonitorOrigin(wxCommandEvent& event) {
 		return;
 		
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showOrigin);
-	motionMonitor->updateMonitor();
+	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorRuler(wxCommandEvent& event) {
@@ -7086,7 +7094,7 @@ void MainFrame::motionMonitorRuler(wxCommandEvent& event) {
 		return;
 	
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showRuler);
-	motionMonitor->updateMonitor();
+	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::motionMonitorHelpLines(wxCommandEvent& event) {
@@ -7095,7 +7103,7 @@ void MainFrame::motionMonitorHelpLines(wxCommandEvent& event) {
 		return;
 		
 	motionMonitor->getContextOptions().toggleOption(motionMonitor->getContextOptions().showHelpLines);
-	motionMonitor->updateMonitor();
+	motionMonitor->updateMonitorAndOptions();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::openSessionDialog(wxCommandEvent& event) {

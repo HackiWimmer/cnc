@@ -73,6 +73,7 @@
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-connected@2x">bitmaps\24-connected@2x.png</object>
   <object class="wxBitmap" name="24-help@2x">bitmaps\24-help@2x.png</object>
+  <object class="wxBitmap" name="24-project@2x">bitmaps\24-project@2x.png</object>
   <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\build-animation-sprite.png</object>
   <object class="wxBitmap" name="BMP_ACTIVATED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="BMP_APP_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\application-view-gallery.png</object>
@@ -271,6 +272,7 @@
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
   <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="dialog-information-3 (2)">bitmaps\dialog-information-3 (2).png</object>
+  <object class="wxBitmap" name="dialog-ok">bitmaps\dialog-ok.png</object>
   <object class="wxBitmap" name="dialog-question-2 (2)">bitmaps\dialog-question-2 (2).png</object>
   <object class="wxBitmap" name="dialog-warning-3 (2)">bitmaps\dialog-warning-3 (2).png</object>
   <object class="wxBitmap" name="distribute-vertical-equal">bitmaps\distribute-vertical-equal.png</object>

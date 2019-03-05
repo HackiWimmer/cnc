@@ -111,9 +111,6 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 	if ( flags.handleKeyCommands == false )
 		return;
 	
-	// update tab label - on demand
-	decorateParentTabName(true);
-	
 	bool shtKey = CncAsyncKeyboardState::isShiftPressed();
 	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
 	int c       = event.GetUnicodeKey();
@@ -191,12 +188,15 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 	}
 	
 	event.Skip(true);
-
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onKeyUp(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	onUpdateFilePosition();
+	
+	// update tab label - on demand
+	decorateParentTabName(IsModified());
+	
 	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
@@ -242,8 +242,8 @@ void CncBaseEditor::onUpdateFilePosition() {
 	if ( getCtlColumnPos() != NULL )
 		getCtlColumnPos()->SetLabel(label);
 	
-	// try to select current  line as client id
-	THE_APP->updateFileContentPosition(x, y);
+	// try to select current line as client id
+	THE_APP->updateFileContentPosition(x, y + 1);
 	
 	// display gcode help hint
 	if ( getCtlStatus() != NULL )

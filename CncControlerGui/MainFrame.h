@@ -26,6 +26,7 @@
 #include "CncSummaryListCtrl.h"
 #include "Codelite/wxPNGAnimation.h"
 #include "CncNavigatorPanel.h"
+#include "CncMessageDialog.h"
 
 ////////////////////////////////////////////////////////////////////
 // forward declarations

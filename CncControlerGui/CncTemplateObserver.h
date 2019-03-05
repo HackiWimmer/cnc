@@ -78,12 +78,18 @@ class CncTemplateObserver : public CncTemplateObserverBase {
 					if ( observer == NULL )
 						return;
 						
+					if ( observer->observationActive == false )
+						return;
+						
 					observer->suspendObservation();
 					observer->enableControls(false);
 				}
 				
 				~Deactivator() {
 					if ( observer == NULL )
+						return;
+						
+					if ( observer->observationActive == false )
 						return;
 						
 					observer->reconstructObservation();

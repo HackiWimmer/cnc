@@ -7,6 +7,7 @@
 class CncPerspective {
 	
 	private:
+		
 		wxConfigBase* config;
 		wxMenu*	menu;
 		
@@ -26,6 +27,8 @@ class CncPerspective {
 		static const char* getUserPerspectivePrefix();
 		static const char* getPaneListSuffix();
 		
+		static const char* formatWxPerspectiveInfo(wxString& info);
+		
 		void setupUserPerspectives();
 		void destroyUserPerspectives();
 		
@@ -39,7 +42,38 @@ class CncPerspective {
 		void ensureRunPerspectiveMinimal();
 		void ensureDebugPerspectiveMinimal();
 		void ensureAllPanesFromPerspectiveAreShown(const wxString& name);
+		
+		void logCurrentPerspective();
+		void restoreLoggedPerspective();
 	
+	private:
+		
+		typedef std::map<wxString, bool> ActiveAuiPaneList;
+		struct PerspectiveBuffer {
+			wxString 			layoutInfo;
+			ActiveAuiPaneList	paneList;
+			
+			///////////////////////////////////////////////////////////
+			void clear() {
+				layoutInfo.clear();
+				paneList.clear();
+			}
+			
+			///////////////////////////////////////////////////////////
+			const char* trace(wxString& ret) {
+				wxString fli(layoutInfo);
+				formatWxPerspectiveInfo(fli);
+				ret.assign(fli);
+				ret.append("\n\n");
+				
+				for( auto it = paneList.begin(); it != paneList.end(); ++it )
+					ret.append(wxString::Format("%s = %d\n", it->first, (int)it->second));
+					
+				return ret;
+			}
+		};
+		
+		PerspectiveBuffer currentPerspectiveBuffer;
 };
 
 #endif

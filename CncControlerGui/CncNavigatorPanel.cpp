@@ -432,33 +432,39 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		if ( config.showRegionTip == false )
 			return;
 			
-		if ( navRectangle.GetWidth() < minHeight )
-			return;
+		if ( navRectangle.GetWidth() > minHeight ) {
+			int fontSize = navRectangle.GetWidth() < minHeight ? 7 : 9;
+			wxFont font(fontSize, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+			dc.SetFont(font);
 			
-		int fontSize = navRectangle.GetWidth() < minHeight ? 7 : 9;
-		wxFont font(fontSize, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-		dc.SetFont(font);
-		
-		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-			OuterCircleRegion ocr = *it;
-			
-			if ( ocr.direction > WW )
-				continue;
-			
-			const int xm  = -5 + cos(ocr.midAngle   * PI / 180) * +(innerRadius + 9);
-			const int ym  = -5 + sin(ocr.midAngle   * PI / 180) * -(innerRadius + 9);
-			
-			dc.DrawLabel(config.toolTipMap[ocr.direction], wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
+			// outer tips
+			for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
+				OuterCircleRegion ocr = *it;
+				
+				if ( ocr.direction > WW )
+					continue;
+				
+				const int xm  = -5 + cos(ocr.midAngle   * PI / 180) * +(innerRadius * 1.1);
+				const int ym  = -5 + sin(ocr.midAngle   * PI / 180) * -(innerRadius * 1.1);
+				
+				dc.DrawLabel(config.toolTipMap[ocr.direction], wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
+			}
 		}
 		
-		if ( config.innerCircle == true ) {
-			int xm  = cos(18 * PI / 180) * +(innerRadius -26);
-			int ym  = sin(18 * PI / 180) * -(innerRadius  -0);
-			dc.DrawLabel(config.toolTipMap[CP], wxRect(xm, ym, 10, 10), wxALIGN_RIGHT );
-			
-			xm  = cos(8 * PI / 180) * +(innerRadius -27);
-			ym  = sin(8 * PI / 180) * +(innerRadius  -0);
-			dc.DrawLabel(config.toolTipMap[CN], wxRect(xm, ym, 10, 10), wxALIGN_RIGHT );
+		// inner tips
+		if ( navRectangle.GetWidth() > minHeight * 1.5 ) {
+			if ( config.innerCircle == true ) {
+				
+				// positive
+				int xm  = cos(18 * PI / 180) * +(innerRadius * 0.64);
+				int ym  = sin(18 * PI / 180) * -(innerRadius * 0.64);
+				dc.DrawLabel(config.toolTipMap[CP], wxRect(xm, ym, 10, 10), wxALIGN_LEFT );
+				
+				// negitive
+				xm     = cos(18 * PI / 180) * +(innerRadius * 0.64);
+				ym     = sin(18 * PI / 180) * +(innerRadius * 0.64);
+				dc.DrawLabel(config.toolTipMap[CN], wxRect(xm, ym, 10, 10), wxALIGN_LEFT );
+			}
 		}
 	};
 	

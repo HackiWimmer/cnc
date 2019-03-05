@@ -14,6 +14,7 @@ const char  nameEnclose						= '\'';
 CncPerspective::CncPerspective(wxConfigBase* cfg, wxMenu* m) 
 : config(cfg)
 , menu(m)
+, currentPerspectiveBuffer()
 ///////////////////////////////////////////////////////////////////
 {
 	wxASSERT(menu != NULL);
@@ -153,18 +154,16 @@ bool CncPerspective::insertNextUserPerspective(const wxString& newLabel) {
 	int idx1 = getNextUserPerspectiveInsertIndex(1);
 	int idx2 = getNextUserPerspectiveInsertIndex(2) + 1; // + 1 because the new item above have to be considered too
 	
-	MainFrame* mf = GBL_CONFIG->getTheApp();
-	
 	wxMenuItem* mi = NULL;
 	if ( idx1 >=0 && idx2 > idx1 ) {
 		mi = menu->Insert(idx1, wxID_ANY, wxString::Format("* User Perspective - '%s'", newLabel));
 		mi->SetBitmap(ImageLibPerspective().Bitmap("BMP_USER_PERSPECTIVE"));
-		mf->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::loadPerspective, mf, mi->GetId());
+		THE_APP->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::loadPerspective, THE_APP, mi->GetId());
 		THE_APP->registerMenuItem(mi);
 		
 		mi = menu->Insert(idx2, wxID_ANY, wxString::Format("* Save User Perspective as '%s'", newLabel));
 		mi->SetBitmap(ImageLibPerspective().Bitmap("BMP_USER_PERSPECTIVE_SAVE"));
-		mf->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::savePerspective, mf, mi->GetId());
+		THE_APP->Bind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::savePerspective, THE_APP, mi->GetId());
 		
 		THE_APP->registerMenuItem(mi);
 		ret = true;
@@ -218,7 +217,7 @@ void CncPerspective::destroyUserPerspectives() {
 		if ( isUserPerspective(label) == false )
 			continue;
 			
-		MainFrame* mf = GBL_CONFIG->getTheApp();
+		MainFrame* mf = THE_APP;
 			
 		// unbind event
 		if ( label.Contains("Save Perspective") == true )	mf->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::savePerspective, mf, mi->GetId());
@@ -260,11 +259,9 @@ bool CncPerspective::renameUserPerspective(const wxString& from, const wxString&
 ///////////////////////////////////////////////////////////////////
 bool CncPerspective::addUserPerspective() {
 ///////////////////////////////////////////////////////////////////
-	MainFrame* mf = GBL_CONFIG->getTheApp();
-	
 	wxString newLabel;
 	do {
-		wxTextEntryDialog dlg(mf, "Name:", "Add User Perspective . . .");
+		wxTextEntryDialog dlg(THE_APP, "Name:", "Add User Perspective . . .");
 		dlg.SetMaxLength(32);
 		dlg.SetTextValidator(wxFILTER_ASCII);
 		dlg.SetValue(newLabel);
@@ -283,7 +280,7 @@ bool CncPerspective::addUserPerspective() {
 	
 		if ( checkIfPerspectiveAlreadyExists(newLabel) == true ) {
 			wxString msg(wxString::Format("A user perspective with the name '%s' already exists. Please choose a different name", newLabel));
-			wxMessageDialog dlg(mf, msg, _T("Add User Perspective failed. . ."), wxOK|wxCENTRE|wxICON_ERROR);
+			wxMessageDialog dlg(THE_APP, msg, _T("Add User Perspective failed. . ."), wxOK|wxCENTRE|wxICON_ERROR);
 			dlg.ShowModal();
 		}
 		
@@ -303,17 +300,16 @@ bool CncPerspective::addUserPerspective() {
 bool CncPerspective::removeUserPerspective() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( menu != NULL );
-	MainFrame* mf = GBL_CONFIG->getTheApp();
 
 	wxArrayString items;
 	if ( getAllUserPerspectiveNamesFromMenuLabels(items) == false ) {
 		wxString msg("No user perspectives available");
-		wxMessageDialog eDlg(mf, msg, _T("Remove User Perspective failed . . ."), wxOK|wxCENTRE|wxICON_ERROR);
+		wxMessageDialog eDlg(THE_APP, msg, _T("Remove User Perspective failed . . ."), wxOK|wxCENTRE|wxICON_ERROR);
 		eDlg.ShowModal();
 		return false;
 	}
 	
-	wxSingleChoiceDialog lDlg(mf, "Select perspective to remove:", "Remove User Perspective . . .", items);
+	wxSingleChoiceDialog lDlg(THE_APP, "Select perspective to remove:", "Remove User Perspective . . .", items);
 	
 	if ( lDlg.ShowModal() != wxID_OK )
 		return false; 
@@ -325,7 +321,7 @@ bool CncPerspective::removeUserPerspective() {
 		return false;
 	
 	wxString msg(wxString::Format("Do you really want to remove the the user perspective: '%s'", rmvLabel));
-	wxMessageDialog qDlg(mf, msg, _T("Remove User Perspective . . ."), wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
+	wxMessageDialog qDlg(THE_APP, msg, _T("Remove User Perspective . . ."), wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
 	if ( qDlg.ShowModal() != wxID_OK ) 
 		return false;
 	
@@ -340,8 +336,8 @@ bool CncPerspective::removeUserPerspective() {
 		
 		if ( mi->GetItemLabelText().Contains(search) == true ) {
 			// unbind event
-			if ( mi->GetItemLabelText().Contains("Save Perspective") == true )	mf->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::savePerspective, mf, mi->GetId());
-			else																mf->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::loadPerspective, mf, mi->GetId());
+			if ( mi->GetItemLabelText().Contains("Save Perspective") == true )	THE_APP->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::savePerspective, THE_APP, mi->GetId());
+			else																THE_APP->Unbind(wxEVT_COMMAND_MENU_SELECTED, &MainFrame::loadPerspective, THE_APP, mi->GetId());
 			
 			// remove menu
 			menu->Remove(mi->GetId());
@@ -359,18 +355,16 @@ bool CncPerspective::removeUserPerspective() {
 ///////////////////////////////////////////////////////////////////
 bool CncPerspective::renameUserPerspective() {
 ///////////////////////////////////////////////////////////////////
-	MainFrame* mf = GBL_CONFIG->getTheApp();
-	
 	wxArrayString items;
 	if ( getAllUserPerspectiveNamesFromMenuLabels(items) == false ) {
 		wxString msg("No user perspectives available");
-		wxMessageDialog eDlg(mf, msg, _T("Rename User Perspective failed . . ."), wxOK|wxCENTRE|wxICON_ERROR);
+		wxMessageDialog eDlg(THE_APP, msg, _T("Rename User Perspective failed . . ."), wxOK|wxCENTRE|wxICON_ERROR);
 		eDlg.ShowModal();
 		return false;
 	}
 	
 	// determine old name
-	wxSingleChoiceDialog lDlg(mf, "Select perspective to rename:", "Rename User Perspective . . .", items);
+	wxSingleChoiceDialog lDlg(THE_APP, "Select perspective to rename:", "Rename User Perspective . . .", items);
 	
 	if ( lDlg.ShowModal() != wxID_OK )
 		return false; 
@@ -384,7 +378,7 @@ bool CncPerspective::renameUserPerspective() {
 	// determine new name
 	wxString newLabel;
 	do {
-		wxTextEntryDialog nDlg(mf, "New name:", "Rename User Perspective . . .", "");
+		wxTextEntryDialog nDlg(THE_APP, "New name:", "Rename User Perspective . . .", "");
 		nDlg.SetMaxLength(32);
 		nDlg.SetTextValidator(wxFILTER_ASCII);
 		nDlg.SetValue(oldLabel);
@@ -403,7 +397,7 @@ bool CncPerspective::renameUserPerspective() {
 		
 		if ( checkIfPerspectiveAlreadyExists(newLabel) == true ) {
 			wxString msg("A user perspectives with this name already exists. Choose a different name.");
-			wxMessageDialog eDlg(mf, msg, _T("Rename User Perspective failed . . ."), wxOK|wxCENTRE|wxICON_ERROR);
+			wxMessageDialog eDlg(THE_APP, msg, _T("Rename User Perspective failed . . ."), wxOK|wxCENTRE|wxICON_ERROR);
 			eDlg.ShowModal();
 		}
 		
@@ -415,18 +409,16 @@ bool CncPerspective::renameUserPerspective() {
 /////////////////////////////////////////////////////////////////////
 bool CncPerspective::loadPerspective(const wxString& name) {
 /////////////////////////////////////////////////////////////////////
-	MainFrame* mf = GBL_CONFIG->getTheApp();
-	
 	wxString id(wxString::Format("%s/%s", CncPerspective::getConfigGroupName(), name));
 	wxString perspective;
 	
 	config->Read(id, &perspective, "");
 	bool ret = (perspective.IsEmpty() == false);
 	
-	if ( ret == false )	mf->viewAllAuiPanes();
-	else				mf->m_auimgrMain->LoadPerspective(perspective);
+	if ( ret == false )	THE_APP->viewAllAuiPanes();
+	else				THE_APP->m_auimgrMain->LoadPerspective(perspective);
 	
-	mf->decorateViewMenu();
+	THE_APP->decorateViewMenu();
 	
 	return ret;
 }
@@ -434,21 +426,20 @@ bool CncPerspective::loadPerspective(const wxString& name) {
 void CncPerspective::savePerspective(const wxString& name, bool withQuestion) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(config);
-	MainFrame* mf = GBL_CONFIG->getTheApp();
 	
 	if ( withQuestion == true ) {
 		wxString msg(wxString::Format("Do you really want to update the '%s' perspective?", name));
-		wxMessageDialog dlg(mf, msg, _T("Perspective save. . . "), wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
+		wxMessageDialog dlg(THE_APP, msg, _T("Perspective save. . . "), wxOK|wxCANCEL|wxCENTRE|wxICON_QUESTION);
 		
 		if ( dlg.ShowModal() != wxID_OK ) 
 			return;
 	}
 		
 	wxString id(wxString::Format("/%s/%s", CncPerspective::getConfigGroupName(), name));
-	config->Write(id, mf->m_auimgrMain->SavePerspective());
+	config->Write(id, THE_APP->m_auimgrMain->SavePerspective());
 	
 	// additional store a list of shown panes
-	wxAuiPaneInfoArray panes = mf->m_auimgrMain->GetAllPanes();
+	wxAuiPaneInfoArray panes = THE_APP->m_auimgrMain->GetAllPanes();
 	wxString list;
 	for (unsigned int i = 0; i < panes.GetCount(); ++i) {
 		if ( panes.Item(i).window->IsShown() )
@@ -460,24 +451,18 @@ void CncPerspective::savePerspective(const wxString& name, bool withQuestion) {
 /////////////////////////////////////////////////////////////////////
 void CncPerspective::ensureRunPerspectiveMinimal() {
 /////////////////////////////////////////////////////////////////////
-	MainFrame* mf = GBL_CONFIG->getTheApp();
-	
-	if ( mf->m_winMonitorView->IsShown() == false )
+	if ( THE_APP->m_winMonitorView->IsShown() == false )
 		ensureAllPanesFromPerspectiveAreShown("Run");
 }
 /////////////////////////////////////////////////////////////////////
 void CncPerspective::ensureDebugPerspectiveMinimal() {
 /////////////////////////////////////////////////////////////////////
-	MainFrame* mf = GBL_CONFIG->getTheApp();
-	
-	if ( mf->m_winMonitorView->IsShown() == false || mf->m_debuggerView->IsShown() == false )
+	if ( THE_APP->m_winMonitorView->IsShown() == false || THE_APP->m_debuggerView->IsShown() == false )
 		ensureAllPanesFromPerspectiveAreShown("Debug");
 }
 /////////////////////////////////////////////////////////////////////
 void CncPerspective::ensureAllPanesFromPerspectiveAreShown(const wxString& name) {
 /////////////////////////////////////////////////////////////////////
-	MainFrame* mf = GBL_CONFIG->getTheApp();
-	
 	wxString id(wxString::Format("%s/%s%s", CncPerspective::getConfigGroupName(), name, CncPerspective::getPaneListSuffix()));
 	wxString paneListSuffix;
 	
@@ -490,12 +475,55 @@ void CncPerspective::ensureAllPanesFromPerspectiveAreShown(const wxString& name)
 			
 			name.Trim(true).Trim(false);
 			if ( name.IsEmpty() == false ) {
-				mf->showAuiPane(name, false);
+				THE_APP->showAuiPane(name, false);
 			}
 		}
 		
-		mf->decorateViewMenu();
-		mf->GetAuimgrMain()->Update();
+		THE_APP->decorateViewMenu();
+		THE_APP->GetAuimgrMain()->Update();
 	}
 }
-
+/////////////////////////////////////////////////////////////////////
+void CncPerspective::logCurrentPerspective() {
+/////////////////////////////////////////////////////////////////////
+	currentPerspectiveBuffer.clear();
+	currentPerspectiveBuffer.layoutInfo.assign(THE_APP->m_auimgrMain->SavePerspective());
+	
+	wxAuiPaneInfoArray panes = THE_APP->GetAuimgrMain()->GetAllPanes();
+	for (unsigned int i = 0; i < panes.GetCount(); ++i)
+		currentPerspectiveBuffer.paneList[panes.Item(i).name] = panes.Item(i).window->IsShown();
+	
+	if ( false ) {
+		wxString debug;
+		CncMessageDialog md(THE_APP, currentPerspectiveBuffer.trace(debug), "Debug: CncPerspective::logCurrentPerspective()");
+		md.ShowModal();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void CncPerspective::restoreLoggedPerspective() {
+/////////////////////////////////////////////////////////////////////
+	if ( currentPerspectiveBuffer.layoutInfo.IsEmpty() == false ) {
+		THE_APP->m_auimgrMain->LoadPerspective(currentPerspectiveBuffer.layoutInfo);
+		
+		wxAuiPaneInfoArray panes = THE_APP->GetAuimgrMain()->GetAllPanes();
+		for (unsigned int i = 0; i < panes.GetCount(); ++i) {
+			
+			const wxString name = panes.Item(i).name;
+			auto it             = currentPerspectiveBuffer.paneList.find(name);
+			const bool show     = it != currentPerspectiveBuffer.paneList.end() ? it->second : false;
+						
+			if ( show == true )	THE_APP->showAuiPane(name, false);
+			else				THE_APP->hideAuiPane(name, false);
+		}
+		
+		THE_APP->decorateViewMenu();
+		THE_APP->GetAuimgrMain()->Update();
+	}
+}
+/////////////////////////////////////////////////////////////////////
+const char* CncPerspective::formatWxPerspectiveInfo(wxString& info) {
+/////////////////////////////////////////////////////////////////////
+	info.Replace("|", "\n ", true);
+	
+	return info;
+}
