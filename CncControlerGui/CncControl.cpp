@@ -921,7 +921,6 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 		{
 			//std::clog << "::L: " << ci.xLimit << ", " << ci.yLimit << ", " << ci.zLimit << std::endl;
 			displayLimitStates(ci.xLimit, ci.yLimit, ci.zLimit);
-			
 			break;
 		}
 		
@@ -1686,11 +1685,11 @@ bool CncControl::moveXToMinLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double maxSteps = cncConfig->getMaxDimensionX() * (-1);
+	const double distance = -cncConfig->getMaxDimensionX() - getCurCtlPosMetricX();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
+		ret = moveRelLinearMetricXY(distance, 0.0, true);
 		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(+endSwitchStepBackMertic, 0.0, true);
 	}
@@ -1703,11 +1702,11 @@ bool CncControl::moveXToMaxLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double maxSteps = cncConfig->getMaxDimensionX();
+	const double distance = +cncConfig->getMaxDimensionX() - getCurCtlPosMetricX();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
+		ret = moveRelLinearMetricXY(distance, 0.0, true);
 		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(-endSwitchStepBackMertic, 0.0, true);
 	}
@@ -1720,11 +1719,11 @@ bool CncControl::moveYToMinLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double maxSteps = cncConfig->getMaxDimensionY() * (-1);
+	const double distance = -cncConfig->getMaxDimensionY() - getCurCtlPosMetricY();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
+		ret = moveRelLinearMetricXY(0.0, distance, true);
 		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(0.0, +endSwitchStepBackMertic, true);
 	}
@@ -1737,11 +1736,11 @@ bool CncControl::moveYToMaxLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double maxSteps = cncConfig->getMaxDimensionY();
+	const double distance = +cncConfig->getMaxDimensionY() - getCurCtlPosMetricY();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
+		ret = moveRelLinearMetricXY(0.0, distance, true);
 		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelLinearMetricXY(0.0, -endSwitchStepBackMertic, true);
 	}
@@ -1754,10 +1753,11 @@ bool CncControl::moveZToMinLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	double maxSteps = cncConfig->getMaxDimensionZ() * (-1);
+	const double distance = -cncConfig->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelMetricZ(maxSteps);
+		ret = moveRelMetricZ(distance);
 		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelMetricZ(+endSwitchStepBackMertic);
 	}
@@ -1770,10 +1770,11 @@ bool CncControl::moveZToMaxLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	double maxSteps = cncConfig->getMaxDimensionZ();
+	const double distance = +cncConfig->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelMetricZ(maxSteps);
+		ret = moveRelMetricZ(distance);
 		if ( ret == false && limitStates.hasLimit() )
 			ret = moveRelMetricZ(-endSwitchStepBackMertic);
 	}
@@ -1783,14 +1784,13 @@ bool CncControl::moveZToMaxLimit() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double maxSteps = cncConfig->getMaxDimensionX();
+	const double distance = 5.0 + cncConfig->getMaxDimensionX() - getCurCtlPosMetricX();
+	
 	bool ret = false;
-
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(maxSteps, 0.0, true);
+		ret = moveRelLinearMetricXY(distance, 0.0, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(-maxSteps/2, 0.0, true);
+			ret = moveRelLinearMetricXY(-cncConfig->getMaxDimensionX() / 2, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1798,14 +1798,13 @@ bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double maxSteps = cncConfig->getMaxDimensionY();
-
+	const double distance = 5.0 + cncConfig->getMaxDimensionY() - getCurCtlPosMetricY();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelLinearMetricXY(0.0, maxSteps, true);
+		ret = moveRelLinearMetricXY(0.0, distance, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(0.0, -maxSteps/2, true);
+			ret = moveRelLinearMetricXY(0.0, -cncConfig->getMaxDimensionY() / 2, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1813,14 +1812,13 @@ bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToMid() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double maxSteps = cncConfig->getMaxDimensionZ();
-
+	const double distance = 5.0 + cncConfig->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
-		ret = moveRelMetricZ(maxSteps);
+		ret = moveRelMetricZ(distance);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelMetricZ(-maxSteps/2);
+			ret = moveRelMetricZ(-cncConfig->getMaxDimensionZ() / 2);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;

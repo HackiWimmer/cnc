@@ -194,7 +194,7 @@ int32_t CncStepper::getLimitState() {
 //////////////////////////////////////////////////////////////////////////////
 bool CncStepper::checkLimit(int dir) {
 //////////////////////////////////////////////////////////////////////////////
-  int val = digitalRead(limitPin);
+  const int val = digitalRead(limitPin);
   if ( val == LimitSwitch::LIMIT_SWITCH_ON ) {
 
     // unclear sitiuation avoid movement!

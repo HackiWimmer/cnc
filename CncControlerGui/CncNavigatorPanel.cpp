@@ -444,8 +444,8 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 				if ( ocr.direction > WW )
 					continue;
 				
-				const int xm  = -5 + cos(ocr.midAngle   * PI / 180) * +(innerRadius * 1.1);
-				const int ym  = -5 + sin(ocr.midAngle   * PI / 180) * -(innerRadius * 1.1);
+				const int xm  = cos(ocr.midAngle   * PI / 180) * +(innerRadius * 1.2);
+				const int ym  = sin(ocr.midAngle   * PI / 180) * -(innerRadius * 1.2);
 				
 				dc.DrawLabel(config.toolTipMap[ocr.direction], wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
 			}

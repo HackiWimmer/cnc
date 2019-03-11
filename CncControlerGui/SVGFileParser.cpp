@@ -466,7 +466,7 @@ bool SVGFileParser::postprocess() {
 	if ( cncControl == NULL )
 		return true;
 		
-	#warning
+	#warning activate this again
 	return true;
 	
 	const SVGRootNode& rn 	= pathHandler->getSvgRootNode();

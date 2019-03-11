@@ -3,6 +3,8 @@
 #include "MainFrame.h"
 #include "CncMonitorReplayPane.h"
 
+bool CncMonitorReplayPane::Processing::running = false;
+
 ///////////////////////////////////////////////////////////////////
 CncMonitorReplayPane::Decorate::Decorate(CncMonitorReplayPane* p) 
 : pane(p)
@@ -170,6 +172,9 @@ void CncMonitorReplayPane::replayStart(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayLeftDownPrev(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( Processing::isRunning() == true )
+		return;
+	
 	Processing p(this);
 	DecoratePrev dp(this);
 	
@@ -187,6 +192,9 @@ void CncMonitorReplayPane::replayLeftDownPrev(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayLeftDownNext(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	if ( Processing::isRunning() == true )
+		return;
+	
 	Processing p(this);
 	DecorateNext dn(this);
 	

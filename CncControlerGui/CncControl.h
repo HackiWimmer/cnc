@@ -282,6 +282,15 @@ class CncControl {
 		const CncDoublePosition 			getMaxPositionsMetric();
 		const CncLongPosition::Watermarks 	getWaterMarks();
 		const CncDoublePosition::Watermarks getWaterMarksMetric();
+		
+		const double 						getCurAppPosMetricX() { return curAppPos.getX() * cncConfig->getDisplayFactX(); }
+		const double 						getCurAppPosMetricY() { return curAppPos.getY() * cncConfig->getDisplayFactY(); }
+		const double 						getCurAppPosMetricZ() { return curAppPos.getZ() * cncConfig->getDisplayFactZ(); }
+		const double 						getCurCtlPosMetricX() { return curCtlPos.getX() * cncConfig->getDisplayFactX(); }
+		const double 						getCurCtlPosMetricY() { return curCtlPos.getY() * cncConfig->getDisplayFactY(); }
+		const double 						getCurCtlPosMetricZ() { return curCtlPos.getZ() * cncConfig->getDisplayFactZ(); }
+		
+		
 		// query the current controller position
 		const CncLongPosition requestControllerPos();
 		// query the current controller limit state

@@ -73,7 +73,13 @@
   <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
   <object class="wxBitmap" name="24-connected@2x">bitmaps\24-connected@2x.png</object>
   <object class="wxBitmap" name="24-help@2x">bitmaps\24-help@2x.png</object>
+  <object class="wxBitmap" name="24-info">bitmaps\24-info.png</object>
+  <object class="wxBitmap" name="24-info@2x">bitmaps\24-info@2x.png</object>
   <object class="wxBitmap" name="24-project@2x">bitmaps\24-project@2x.png</object>
+  <object class="wxBitmap" name="24-redo">bitmaps\24-redo.png</object>
+  <object class="wxBitmap" name="24-redo@2x">bitmaps\24-redo@2x.png</object>
+  <object class="wxBitmap" name="24-undo">bitmaps\24-undo.png</object>
+  <object class="wxBitmap" name="24-undo@2x">bitmaps\24-undo@2x.png</object>
   <object class="wxBitmap" name="ANIMATION_SPRITE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\build-animation-sprite.png</object>
   <object class="wxBitmap" name="BMP_ACTIVATED">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\gamepad-active.png</object>
   <object class="wxBitmap" name="BMP_APP_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\application-view-gallery.png</object>
@@ -259,6 +265,7 @@
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
   <object class="wxBitmap" name="bricks">bitmaps\bricks.png</object>
   <object class="wxBitmap" name="bug-go">bitmaps\bug-go.png</object>
+  <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
   <object class="wxBitmap" name="car">bitmaps\car.png</object>
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>

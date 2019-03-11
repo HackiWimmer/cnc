@@ -19,19 +19,29 @@ SerialSpyPort::~SerialSpyPort() {
 ///////////////////////////////////////////////////////////////////
 }
 ///////////////////////////////////////////////////////////////////
-void SerialSpyPort::spyReadData(int prevRet, void *buffer, unsigned int nbByte) {
+void SerialSpyPort::spyReadData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( traceSpyInfo == true ) {
-		if ( prevRet <= 0 )
+		if ( nbByte <= 0 )
 			return;
 
 		if ( spyRead == true ) {
-			cnc::spy << wxString::Format("Serial::<< {0x%02X} 0x[ ", getLastFetchResult().ret);
+			lastFetchResult.index += nbByte;
+			cnc::spy << wxString::Format(" Serial::<< {0x%02X %02X %04X} 0x[ ", lastFetchResult.ret, lastFetchResult.pid, lastFetchResult.index);
+			
 			const unsigned char* b = (const unsigned char*) buffer;
-			for ( int i=0; i<prevRet; i++ ) {
+			for ( unsigned int i=0; i<nbByte; i++ ) {
 				cnc::spy << wxString::Format("%02X ", b[i]);
 			}
-			cnc::spy << ']' << std::endl;
+			cnc::spy << ']';
+			
+			// special handling to show text messages
+			if ( nbByte == 1 && ( lastFetchResult.pid == PID_TEXT || lastFetchResult.pid == PID_MSG ) ) {
+				if ( b[0] >= 32 && b[0] <= 127 ) 
+					cnc::spy << wxString::Format(" '%c'", b[0]);
+			}
+			
+			cnc::spy << std::endl;
 		}
 	}
 }
@@ -43,7 +53,8 @@ void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 			return;
 			
 		if ( spyWrite == true ) {
-			cnc::spy << "Serial::>> {0xFF} 0x[ ";
+			cnc::spy << " Serial::>> {0xFF 01 0001} 0x[ ";
+			
 			const unsigned char* b = (const unsigned char*) buffer;
 			for ( unsigned int i=0; i<nbByte; i++ ) {
 				cnc::spy << wxString::Format("%02X ", b[i]);
@@ -59,7 +70,7 @@ void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 int SerialSpyPort::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	int ret = Serial::readData(buffer, nbByte);
-	spyReadData(ret, buffer, nbByte);
+	spyReadData(buffer, ret);
 	
 	return ret;
 }

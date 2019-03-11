@@ -13,16 +13,16 @@ class HexDecoder {
 		/////////////////////////////////////////////////////////
 		const char* decodeContollerResult(int ret) {
 			switch ( (const unsigned char)ret ) {
-				case RET_NULL:		return "Controller Fetch Result";
+				case RET_NULL:		return "Fetch Result";
 				case RET_SENT:		return "Sent data";
-				case RET_OK: 		
-				case RET_ERROR:		
-				case RET_SOT:		
-				case RET_SOH:		
+				case RET_SOH:		return "Fetch Data";
+
+				case RET_OK:
+				case RET_ERROR:
+				case RET_LIMIT:
 				case RET_INTERRUPT:
 				case RET_HALT:
-				case RET_QUIT:
-				case RET_MSG:		return ArduinoPIDs::getPIDLabel((const unsigned char)ret);
+				case RET_QUIT:		return ArduinoPIDs::getPIDLabel((const unsigned char)ret);
 			}
 			
 			static wxString s(wxString::Format("Unkonwn fetch result value(%d)", ret));
@@ -86,6 +86,16 @@ class HexDecoder {
 			return (char)decodeHexValueAsInteger(hexToken);
 		}
 		
+		/////////////////////////////////////////////////////////
+		static const char* decodeHexValueAsCharacterString(const wxString& hexToken, wxString& ret) {
+			int val = decodeHexValueAsInteger(hexToken); 
+			
+			if ( val >= 0 && val < 32 )	ret.assign(wxString::Format("'\%d'", val));
+			else						ret.assign(wxString::Format("'%c'",  decodeHexValueAsInteger(hexToken)));
+			
+			return ret;
+		}
+
 		/////////////////////////////////////////////////////////
 		static const char* decodeHexValueAsArduinoPID(const wxString& hexToken) {
 			int val = decodeHexValueAsInteger(hexToken);
@@ -181,141 +191,96 @@ class HexDecoder {
 			ret << "\n";
 			return ret;
 		}
-		
-		/////////////////////////////////////////////////////////
-		static const char* decodeHexStringAsSentData(const wxString& hexToken, wxString& ret, const char delimiter = ' ') {
-			std::string s(hexToken.c_str());
-			size_t n = std::count(s.begin(), s.end(), ' ') + 1;
-			
-			// Decode command
-			unsigned char cmd = '\0';
-			if ( n >= 1 ) {
-				cmd = decodeHexValueAsCharacter(hexToken);
-				ret << "Cmd: ";
-				ret << cmd;
-			}
-			
-			if ( n > 1 )  {
-				ret << ", ";
-				
-				// strip cmd token
-				wxString restToken(hexToken.SubString(3, hexToken.length()-1));
-				
-				// Decode setter type
-				if ( cmd == 'S' ) {
-					ret << decodeHexValueAsArduinoPID(restToken);
-					ret << ": ";
-					restToken = restToken.SubString(3, restToken.length()-1);
-				}
-				
-				// Recalc token count
-				s = restToken.c_str();
-				n = std::count(s.begin(), s.end(), ' ') + 1;
-				
-				if ( n%4 == 0 ) {
-					wxStringTokenizer tokenizer(restToken, wxString::Format("%c", delimiter));
-					unsigned int count = 0;
-					wxString value;
-
-					while ( tokenizer.HasMoreTokens() ) {
-						wxString token = tokenizer.GetNextToken();
-						
-						if ( token.IsEmpty() == false ) {
-							count++;
-							
-							switch ( count%4 ) {
-								case 1:	
-								case 2:
-								case 3: value << token; 
-										break;
-										
-								case 0: value << token;
-										if ( count > 4 )
-											ret << ", ";
-										ret << decodeHexValueAsInteger(value);
-										value.clear();
-										break;
-							}
-						}
-					}
-				} else {
-					decodeHexStringAsIntegers(restToken, ret, delimiter);
-				}
-			}
-			
-			ret << "\n";
-			return ret;
-		}
 };
 
 //////////////////////////////////////////////////////////////////
 class SpyHexDecoder : public HexDecoder {
 	
 	protected:
-		wxString returnValue;
-		wxString type;
 		wxString hexString;
 		
+		unsigned char context;
+		unsigned char pid;
+		unsigned int  index;
+		
+		const unsigned int IDX_PID			= 2;
+		const unsigned int IDX_MSG_TYPE		= 3;
+		const unsigned int IDX_SIZE			= 3;
+		
 	public:
+	
+		struct Details {
+			
+			enum Type { DT_UNKNOWN = 0, DT_INBOUND = 1, DT_OUTBOUND = 2};
+			Type type = DT_UNKNOWN;
+			
+			wxString 	context;
+			wxString	cmd;
+			wxString	pid;
+			wxString	index;
+			wxString	more;
+			
+			void clear() {
+				context.clear();
+				cmd.clear();
+				pid.clear();
+				index.clear();
+				more.clear();
+			}
+		};
+		
 		//////////////////////////////////////////////////////////
-		SpyHexDecoder(const wxString& t, const wxString& hs) 
+		SpyHexDecoder(const wxString& contextInfo, const wxString& hs) 
 		: HexDecoder()
-		, returnValue()
-		, type(t)
 		, hexString(hs)
+		, context(0)
+		, pid(0)
+		, index(0)
 		{
+			unsigned int counter = 0;
+			wxStringTokenizer tokenizer(contextInfo, " ");
+			while ( tokenizer.HasMoreTokens() ) {
+				wxString token = tokenizer.GetNextToken();
+				
+				switch ( counter ) {
+					case 0:	context = decodeHexValueAsInteger(token); break;
+					case 1: pid     = decodeHexValueAsInteger(token); break;
+					case 2: index   = decodeHexValueAsInteger(token); break;
+				}
+				
+				counter++;
+			}
 		}
 		
 		//////////////////////////////////////////////////////////
 		virtual ~SpyHexDecoder() {
-			
 		}
 		
 		//////////////////////////////////////////////////////////
-		const char* decode() {
-			returnValue.clear();
-			int t = decodeHexValueAsInteger(type);
-			returnValue << "Type: ";
-			returnValue << decodeContollerResult(t);
-			returnValue << "\n";
-			
-			wxString temp;
-			switch ( (const unsigned char)t ) {
-				case RET_NULL:	returnValue << "Read value: ";
-								returnValue << decodeContollerResult(decodeHexValueAsInteger(hexString));
-								break;
-				case RET_OK:
-				case RET_ERROR: returnValue << "Read value(s): ";
-								returnValue << decodeHexStringAsIntegers(hexString, temp);
-								break;
-								
-				case RET_SOT:	returnValue << "Read text: ";
-								returnValue << decodeHexStringAsCharacters(hexString, temp);
-								break;
-								
-				case RET_SOH:	returnValue << "Read value(s): ";
-								returnValue << decodeHexStringAsInt32s(hexString, temp);
-								break;
-								
-				case RET_MSG:	returnValue << "Read message: ";
-								returnValue << decodeHexStringAsCharacters(hexString, temp);
-								break;
-								
-				case RET_SENT:	returnValue << "Written value(s): ";
-								returnValue << decodeHexStringAsSentData(hexString, temp);
-								break;
-								
-				default:		returnValue << "Unknown fetch type: ";
-								returnValue << t;
-								returnValue << ", Value(s): ";
-								returnValue << decodeHexStringAsIntegers(hexString, temp);
+		void decode(SpyHexDecoder::Details& ret) {
+			if ( context == 0 )
+				return;
+				
+			switch ( ret.type ) {
+				case Details::DT_OUTBOUND:	decodeOutbound(ret);
+											break;
+									
+				case Details::DT_INBOUND:	decodeInbound(ret);
+											break;
+											
+				case Details::DT_UNKNOWN:
+				default:					ret.more.assign("decode(SpyHexDecoder::Details& ret): Unknown type, nothing will be done!");
+				
 			}
 			
-			while ( returnValue.IsEmpty() == false && returnValue.Last() == '\n' )
-				returnValue.assign(returnValue.SubString(0, returnValue.length() - 2));
-			
-			return returnValue;
+			ret.more.Replace("\n", "; ", true);
+			ret.more.Replace("; ;", "",  true);
+			return;
 		}
+		
+		//////////////////////////////////////////////////////////
+		void decodeOutbound(SpyHexDecoder::Details& ret);
+		void decodeInbound(SpyHexDecoder::Details& ret);
 };
 
 #endif

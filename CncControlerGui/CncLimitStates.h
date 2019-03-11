@@ -13,6 +13,8 @@ class CncLimitStates {
 		bool yMaxLimit;
 		bool zMinLimit;
 		bool zMaxLimit;
+		
+		bool previousHasLimit;
 	
 		///////////////////////////////////////////////////////////////////
 		void setLimit(int32_t v, bool &min, bool &max) {
@@ -107,6 +109,7 @@ class CncLimitStates {
 		, yMaxLimit(false)
 		, zMinLimit(false)
 		, zMaxLimit(false)
+		, previousHasLimit(false)
 		{}
 		
 		~CncLimitStates() 
@@ -127,6 +130,8 @@ class CncLimitStates {
 		
 		///////////////////////////////////////////////////////////////////
 		void reset() {
+			previousHasLimit = hasLimit();
+			
 			xMinLimit = false;
 			xMaxLimit = false;
 			yMinLimit = false;
@@ -134,7 +139,13 @@ class CncLimitStates {
 			zMinLimit = false;
 			zMaxLimit = false;
 		}
-				///////////////////////////////////////////////////////////////////
+		
+		///////////////////////////////////////////////////////////////////
+		const bool hasPreviousLimit() {
+			return previousHasLimit;
+		}
+		
+		///////////////////////////////////////////////////////////////////
 		const bool hasLimit() {
 			return (xMinLimit || xMaxLimit || yMinLimit || yMaxLimit || zMinLimit || zMaxLimit);
 		}
@@ -168,6 +179,10 @@ class CncLimitStates {
 		void setXLimit(int32_t v) { setLimit(v, xMinLimit, xMaxLimit); }
 		void setYLimit(int32_t v) { setLimit(v, yMinLimit, yMaxLimit); }
 		void setZLimit(int32_t v) { setLimit(v, zMinLimit, zMaxLimit); }
+		
+		void setLimitX(int32_t v) { setXLimit(v); }
+		void setLimitY(int32_t v) { setYLimit(v); }
+		void setLimitZ(int32_t v) { setZLimit(v); }
 		
 		///////////////////////////////////////////////////////////////////
 		void setXYZLimit(CncLongPosition limitInfo) {

@@ -7,13 +7,12 @@ class CncSpyControl : public wxTextCtrl {
 	
 	protected:
 		bool sytleChanged;
-		wxTextCtrl* detailCtrl;
-	
+		
 		void OnMouse(wxMouseEvent& event);
 		void decodeSerialSpyLine(const wxString& line, bool displayInfo = true);
 				
 	public:
-		CncSpyControl(wxWindow *parent, wxWindowID id, wxTextCtrl* dc);
+		CncSpyControl(wxWindow *parent, wxWindowID id);
 		virtual ~CncSpyControl();
 		
 		void addMarker(const wxString& mt);
@@ -23,6 +22,8 @@ class CncSpyControl : public wxTextCtrl {
 		virtual void AppendText(const wxChar & c);
 		
 		virtual void Clear();
+		
+		void clearDetails();
 		
 		// is used from global kex down hook
 		void OnKeyDown(wxKeyEvent& event);

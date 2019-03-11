@@ -205,11 +205,6 @@ struct I2CData {
   const unsigned char RET_HALT                            =   7;   // 
   const unsigned char RET_QUIT                            =   8;   // 
 
-  
-  const unsigned char RET_MSG                             =  10;   // depricated
-  const unsigned char RET_SOT                             =  11;   // depricated
-
-
 // .....................................................................
 // Please consider
 //

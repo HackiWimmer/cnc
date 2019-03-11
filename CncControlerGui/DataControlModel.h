@@ -116,6 +116,26 @@ class DataControlModel {
 			row.push_back("");
 			
 		}
+		
+		////////////////////////////////////////////////////////////////////////
+		static void addSpyDateilInfoRow(DcmRow& row, const char* more) {
+			row.push_back(more    == NULL ? "" : more);
+		}
+
+		////////////////////////////////////////////////////////////////////////
+		static void addSpyOutboundRow(DcmRow& row, const char* context, const char* cmd, const char* more) {
+			row.push_back(context == NULL ? "" : context);
+			row.push_back(cmd     == NULL ? "" : cmd);
+			row.push_back(more    == NULL ? "" : more);
+		}
+		
+		////////////////////////////////////////////////////////////////////////
+		static void addSpyInboundRow(DcmRow& row, const char* context, const char* pid, const char* index, const char* more) {
+			row.push_back(context == NULL ? "" : context);
+			row.push_back(pid     == NULL ? "" : pid);
+			row.push_back(index   == NULL ? "" : index);
+			row.push_back(more    == NULL ? "" : more);
+		}
 };
 
 #endif

@@ -1183,12 +1183,13 @@ bool Serial::evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByte
 bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	#define LOG_HANDSHAKE( ret ) \
-		lastFetchResult.reset(); \
 		lastFetchResult.cmd = sfi.command; \
 		lastFetchResult.ret = ret; \
 		cncControl->SerialCallback();
 	
 	// main fetch loop
+	lastFetchResult.reset(); 
+	
 	bool fetchMore = true;
 	while ( fetchMore ) {
 		
@@ -1231,7 +1232,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			case RET_QUIT:
 			{
 				LOG_HANDSHAKE(ret)
-				/// always break the fetch loop
+				// always break the fetch loop
 				return RET_QUIT_Handler(sfi, mutliByteStream);
 			}
 			//evaluateResult..........................................
@@ -1248,6 +1249,8 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			//evaluateResult..........................................
 			case RET_SOH:
 			{
+				LOG_HANDSHAKE(ret)
+				
 				cncControl->SerialCallback();
 				
 				if ( RET_SOH_Handler(sfi, mutliByteStream) == true ) {
@@ -1268,14 +1271,6 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 				
 				// should not occur
 				wxASSERT(0);
-			}
-			//evaluateResult..........................................
-			case RET_SOT:
-			{
-				cncControl->SerialCallback();
-				std::cerr << "Serial::evaluateResult(): RET_SOT is depricated: " << sfi.command << std::endl;
-				// break fetch loop
-				return false;
 			}
 			
 			// -----------------------------------------------------------
@@ -1341,7 +1336,7 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 	}
 	
 	if ( traceSpyInfo )
-		cnc::spy.finalizeOK();
+		cnc::spy.finalizeRET_OK();
 	
 	return true;
 }
@@ -1352,6 +1347,9 @@ bool Serial::RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStre
 			  << " while processing: "      << ArduinoCMDs::getCMDLabel((int)sfi.command) 
 			  << std::endl;
 	
+	if ( traceSpyInfo )
+		cnc::spy.finalizeRET_ERROR();
+	
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1360,7 +1358,10 @@ bool Serial::RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByte
 	std::cerr << "Serial::evaluateResult: " << decodeContollerResult(RET_INTERRUPT) 
 			  << " while processing: "      << ArduinoCMDs::getCMDLabel((int)sfi.command) 
 			  << std::endl;
-			  	
+	
+	if ( traceSpyInfo )
+		cnc::spy.finalizeRET_INTERRUPT();
+	
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1369,12 +1370,18 @@ bool Serial::RET_HALT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStrea
 	cnc::cex1 << "Serial::evaluateResult: " << decodeContollerResult(RET_HALT) 
 			  << " while processing: "      << ArduinoCMDs::getCMDLabel((int)sfi.command) 
 			  << std::endl;
-				
+	
+	if ( traceSpyInfo )
+		cnc::spy.finalizeRET_HALT();
+	
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::RET_QUIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
+	if ( traceSpyInfo )
+		cnc::spy.finalizeRET_QUIT();
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1384,7 +1391,10 @@ bool Serial::RET_LIMIT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStre
 			  << decodeContollerResult(RET_LIMIT) 
 			  << " while processing: " 
 			  << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl;
-
+	
+	if ( traceSpyInfo )
+		cnc::spy.finalizeRET_LIMIT();
+	
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1398,6 +1408,8 @@ bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 	// handle nested RET_SOH
 	if ( pid == RET_SOH )
 		return true;
+		
+	lastFetchResult.pid = pid;
 	
 	switch( pid ) {
 		//RET_SOH_Handler..........................................
@@ -1416,6 +1428,7 @@ bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 		case PID_XYZ_POS_DETAIL:	return decodePositionInfo(pid, sfi);
 		//RET_SOH_Handler..........................................
 		case PID_LIMIT:				return decodeLimitInfo(sfi);
+		
 		//RET_SOH_Handler..........................................
 		case RET_ERROR:
 		case RET_INTERRUPT:
@@ -1423,7 +1436,7 @@ bool Serial::RET_SOH_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream
 		case RET_QUIT:
 		case RET_LIMIT:				msg.assign(wxString::Format("Serial::RET_SOH_Handler: Received %s. Can't read content info", decodeContollerResult(pid)));
 									std::cerr << msg << std::endl;
-									cnc::spy.finalizeERROR(msg);
+									cnc::spy.finalizeRET_ERROR(msg);
 									return false;
 			
 		//RET_SOH_Handler..........................................

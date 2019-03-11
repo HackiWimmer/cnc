@@ -7,7 +7,7 @@ class SerialSpyPort : public Serial {
 	
 	protected:
 	
-		void spyReadData(int prevRet, void *buffer, unsigned int nbByte);
+		void spyReadData(void *buffer, unsigned int nbByte);
 		void spyWriteData(void *buffer, unsigned int nbByte);
 		
 	public:

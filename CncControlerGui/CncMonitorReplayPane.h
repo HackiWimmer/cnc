@@ -61,11 +61,15 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 		
 		// ----------------------------------------------------
 		class Processing {
+			static bool running;
+			
 			public:
 				CncMonitorReplayPane* pane;
 				
-				Processing(CncMonitorReplayPane* p) : pane(p) 	{ pane->setProcessing(true); }
-				~Processing() 									{ pane->setProcessing(false); }
+				Processing(CncMonitorReplayPane* p) : pane(p) 	{ running = true; pane->setProcessing(true); }
+				~Processing() 									{ running = false; pane->setProcessing(false); }
+				
+				static bool isRunning() { return running; }
 		};
 		
 		// ----------------------------------------------------

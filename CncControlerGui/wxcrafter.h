@@ -462,6 +462,9 @@ protected:
     wxTextCtrl* m_crossings;
     wxStaticText* m_staticText1966;
     wxTextCtrl* m_passingCount;
+    wxStaticLine* m_staticLine50083;
+    wxStaticText* m_staticText395;
+    wxTextCtrl* m_cmdDuration;
     wxButton* m_motionMonitorOptionDlg;
     wxStaticLine* m_staticLine34832;
     wxButton* m_3D_Top;
@@ -514,6 +517,8 @@ protected:
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_winLoggerView;
     wxNotebook* m_loggerNotebook;
+    wxPanel* m_panel5882;
+    wxPanel* m_gamepadStateController;
     wxPanel* m_panelStartupTrace;
     wxTextCtrl* m_startupTrace;
     wxPanel* m_panel5878;
@@ -521,8 +526,6 @@ protected:
     wxBitmapButton* m_clearLogger;
     wxBitmapButton* m_copyLogger;
     wxCheckBox* m_showLoggerOnDemand;
-    wxPanel* m_panel5882;
-    wxPanel* m_gamepadStateController;
     wxStaticText* m_staticText58651;
     wxStaticBitmap* m_gamepadState;
     wxStaticText* m_staticText5865;
@@ -533,14 +536,15 @@ protected:
     wxStaticBitmap* m_staticBitmap5890;
     wxTextCtrl* m_tmpTraceInfo;
     wxPanel* m_statusBar;
-    wxStaticText* m_staticText395;
-    wxTextCtrl* m_cmdDuration;
-    wxStaticLine* m_staticLine6021;
-    wxStaticBitmap* m_heartbeatState;
-    wxStaticLine* m_staticLine602;
-    wxTextCtrl* m_inputFileName;
-    wxStaticLine* m_staticLine6801;
     wxStaticText* m_svgParseMode;
+    wxStaticLine* m_staticLine6801;
+    wxTextCtrl* m_inputFileName;
+    wxStaticLine* m_staticLine602;
+    wxStaticBitmap* m_heartbeatState;
+    wxStaticLine* m_staticLine60214444;
+    wxStaticBitmap* m_staticBitmap7262;
+    wxTextCtrl* m_lastConfigNotification;
+    wxStaticLine* m_staticLine6021;
     wxPanel* m_activityPanel;
     wxStaticLine* m_staticLine680114;
     wxStaticText* m_staticText5656;
@@ -608,11 +612,20 @@ protected:
     wxButton* m_MarkSerialSpy;
     wxButton* m_clearSerialSpy;
     wxComboBox* m_cbSerialSpyMode;
-    wxSplitterWindow* m_splitter4728;
-    wxPanel* m_splitterPage4732;
     wxTextCtrl* m_serialSpy;
-    wxPanel* m_splitterPage4736;
-    wxTextCtrl* m_serialSpyDetails;
+    wxSimplebook* m_sypDetailsBook;
+    wxPanel* m_unknownPanel;
+    wxStaticText* m_staticText72374;
+    wxStaticBitmap* m_staticBitmap7230;
+    wxDataViewListCtrl* m_spyUnknownDetails;
+    wxPanel* m_inboundPanel;
+    wxStaticText* m_staticText72373;
+    wxStaticBitmap* m_staticBitmap7232;
+    wxDataViewListCtrl* m_spyInboundDetails;
+    wxPanel* m_outbundPanel;
+    wxStaticText* m_staticText7237;
+    wxStaticBitmap* m_staticBitmap7234;
+    wxDataViewListCtrl* m_spyOutboundDetails;
     wxCheckBox* m_clearSerialSpyOnConnect;
     wxCheckBox* m_clearSerialSpyBeforNextRun;
     wxPanel* m_debuggerView;
@@ -873,6 +886,7 @@ protected:
     virtual void displayIntervalKeyDown(wxKeyEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorStatisticPane(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event) { event.Skip(); }
+    virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
     virtual void toggleMotionMonitorOptionPane(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
@@ -895,7 +909,6 @@ protected:
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
-    virtual void dclickDurationCount(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void requestCurrentLimitStateIcon(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
@@ -1359,6 +1372,9 @@ public:
     wxTextCtrl* GetCrossings() { return m_crossings; }
     wxStaticText* GetStaticText1966() { return m_staticText1966; }
     wxTextCtrl* GetPassingCount() { return m_passingCount; }
+    wxStaticLine* GetStaticLine50083() { return m_staticLine50083; }
+    wxStaticText* GetStaticText395() { return m_staticText395; }
+    wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
     wxPanel* Get3DOutboundStatistics() { return m_3DOutboundStatistics; }
     wxButton* GetMotionMonitorOptionDlg() { return m_motionMonitorOptionDlg; }
     wxStaticLine* GetStaticLine34832() { return m_staticLine34832; }
@@ -1412,6 +1428,8 @@ public:
     wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
     wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
     wxPanel* GetWinFileView() { return m_winFileView; }
+    wxPanel* GetGamepadStateController() { return m_gamepadStateController; }
+    wxPanel* GetPanel5882() { return m_panel5882; }
     wxTextCtrl* GetStartupTrace() { return m_startupTrace; }
     wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
     wxTextCtrl* GetLogger() { return m_logger; }
@@ -1419,8 +1437,6 @@ public:
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
     wxCheckBox* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
     wxPanel* GetPanel5878() { return m_panel5878; }
-    wxPanel* GetGamepadStateController() { return m_gamepadStateController; }
-    wxPanel* GetPanel5882() { return m_panel5882; }
     wxNotebook* GetLoggerNotebook() { return m_loggerNotebook; }
     wxStaticText* GetStaticText58651() { return m_staticText58651; }
     wxStaticBitmap* GetGamepadState() { return m_gamepadState; }
@@ -1432,14 +1448,15 @@ public:
     wxStaticBitmap* GetStaticBitmap5890() { return m_staticBitmap5890; }
     wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
     wxPanel* GetWinLoggerView() { return m_winLoggerView; }
-    wxStaticText* GetStaticText395() { return m_staticText395; }
-    wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
-    wxStaticLine* GetStaticLine6021() { return m_staticLine6021; }
-    wxStaticBitmap* GetHeartbeatState() { return m_heartbeatState; }
-    wxStaticLine* GetStaticLine602() { return m_staticLine602; }
-    wxTextCtrl* GetInputFileName() { return m_inputFileName; }
-    wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }
     wxStaticText* GetSvgParseMode() { return m_svgParseMode; }
+    wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }
+    wxTextCtrl* GetInputFileName() { return m_inputFileName; }
+    wxStaticLine* GetStaticLine602() { return m_staticLine602; }
+    wxStaticBitmap* GetHeartbeatState() { return m_heartbeatState; }
+    wxStaticLine* GetStaticLine60214444() { return m_staticLine60214444; }
+    wxStaticBitmap* GetStaticBitmap7262() { return m_staticBitmap7262; }
+    wxTextCtrl* GetLastConfigNotification() { return m_lastConfigNotification; }
+    wxStaticLine* GetStaticLine6021() { return m_staticLine6021; }
     wxPanel* GetActivityPanel() { return m_activityPanel; }
     wxStaticLine* GetStaticLine680114() { return m_staticLine680114; }
     wxStaticText* GetStaticText5656() { return m_staticText5656; }
@@ -1508,10 +1525,19 @@ public:
     wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
     wxComboBox* GetCbSerialSpyMode() { return m_cbSerialSpyMode; }
     wxTextCtrl* GetSerialSpy() { return m_serialSpy; }
-    wxPanel* GetSplitterPage4732() { return m_splitterPage4732; }
-    wxTextCtrl* GetSerialSpyDetails() { return m_serialSpyDetails; }
-    wxPanel* GetSplitterPage4736() { return m_splitterPage4736; }
-    wxSplitterWindow* GetSplitter4728() { return m_splitter4728; }
+    wxStaticText* GetStaticText72374() { return m_staticText72374; }
+    wxStaticBitmap* GetStaticBitmap7230() { return m_staticBitmap7230; }
+    wxDataViewListCtrl* GetSpyUnknownDetails() { return m_spyUnknownDetails; }
+    wxPanel* GetUnknownPanel() { return m_unknownPanel; }
+    wxStaticText* GetStaticText72373() { return m_staticText72373; }
+    wxStaticBitmap* GetStaticBitmap7232() { return m_staticBitmap7232; }
+    wxDataViewListCtrl* GetSpyInboundDetails() { return m_spyInboundDetails; }
+    wxPanel* GetInboundPanel() { return m_inboundPanel; }
+    wxStaticText* GetStaticText7237() { return m_staticText7237; }
+    wxStaticBitmap* GetStaticBitmap7234() { return m_staticBitmap7234; }
+    wxDataViewListCtrl* GetSpyOutboundDetails() { return m_spyOutboundDetails; }
+    wxPanel* GetOutbundPanel() { return m_outbundPanel; }
+    wxSimplebook* GetSypDetailsBook() { return m_sypDetailsBook; }
     wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
     wxCheckBox* GetClearSerialSpyBeforNextRun() { return m_clearSerialSpyBeforNextRun; }
     wxPanel* GetSerialSpyView() { return m_serialSpyView; }

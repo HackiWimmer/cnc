@@ -175,12 +175,18 @@ class CncConfig {
 		// notifications
 		void registerWindowForConfigNotification(wxWindow* wnd);
 		void deactivateConfigNotification();
-		void activateConfigNotification();
+		void activateConfigNotification(bool notify=true);
 		
 		class NotificationDeactivator {
+			private:
+				bool notifyOnEnd;
+				
 			public:
-				NotificationDeactivator()  { GBL_CONFIG->deactivateConfigNotification(); }
-				~NotificationDeactivator() { GBL_CONFIG->activateConfigNotification(); }
+				NotificationDeactivator(bool noe = true) : notifyOnEnd(noe)  
+					{ GBL_CONFIG->deactivateConfigNotification(); }
+					
+				~NotificationDeactivator()
+					{ GBL_CONFIG->activateConfigNotification(notifyOnEnd); }
 		};
 		
 		// curve lib utils
@@ -299,6 +305,11 @@ class CncConfig {
 		const double getMaxDimensionX();
 		const double getMaxDimensionY();
 		const double getMaxDimensionZ();
+		
+		const int32_t getMaxDimensionStepsX()					{ return getMaxDimensionX() * getCalculationFactX(); }
+		const int32_t getMaxDimensionStepsY()					{ return getMaxDimensionY() * getCalculationFactY(); }
+		const int32_t getMaxDimensionStepsZ()					{ return getMaxDimensionZ() * getCalculationFactZ(); }
+	
 		const double getPitchX();
 		const double getPitchY();
 		const double getPitchZ();

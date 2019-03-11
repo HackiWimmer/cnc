@@ -123,16 +123,18 @@ void CncConfig::setProbeMode(bool state) {
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::deactivateConfigNotification() {
-	notificationActivated = false;
 ////////////////////////////////////////////////////////////////////////
+	notificationActivated = false;
 }
 ////////////////////////////////////////////////////////////////////////
-void CncConfig::activateConfigNotification() {
+void CncConfig::activateConfigNotification(bool notify) {
 ////////////////////////////////////////////////////////////////////////
 	notificationActivated = true;
 
-	// release always a notification after the (re)activation
-	broadcastConfigUpdateNotification();
+	if ( notify == true ) {
+		// release always a notification after the (re)activation
+		broadcastConfigUpdateNotification();
+	}
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::registerWindowForConfigNotification(wxWindow* wnd) {
@@ -148,10 +150,12 @@ void CncConfig::broadcastConfigUpdateNotification() {
 ////////////////////////////////////////////////////////////////////////
 	wxCommandEvent evt(wxEVT_CONFIG_UPDATE_NOTIFICATION);
 	
+	THE_APP->GetLastConfigNotification()->ChangeValue(wxDateTime::UNow().Format("%H:%M:%S"));
 	for ( auto it = registeredWindows.begin(); it != registeredWindows.end(); ++it ) {
 		wxWindow* wnd = it->first;
-		if ( wnd != NULL && wnd->GetEventHandler() != NULL )
-			wnd->GetEventHandler()->AddPendingEvent(evt);
+		if ( wnd != NULL ) {
+			wxPostEvent(wnd, evt);
+		}
 	}
 }
 ////////////////////////////////////////////////////////////////////////

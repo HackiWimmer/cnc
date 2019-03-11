@@ -111,7 +111,7 @@ int CncCspyBuf::overflow (int c) {
 	if ( c == '\n' )
 		return insertLineNumber(false);
 	
-	//ctl->SetDefaultStyle(textAttr);
+	ctl->SetDefaultStyle(textAttr);
 	ctl->AppendText((wxChar)c);
 	
 	// return something different from EOF
@@ -133,3 +133,80 @@ int CncCspyBuf::insertLineNumber(bool first) {
 	
 	return 0;
 }
+
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::finalizeRET_OK(const char* msg) {
+///////////////////////////////////////////////////////////
+	wxColour c = getTextColour();
+	green();
+	flush();
+	
+	if ( msg != NULL )
+		(*this) << msg;
+		
+	(*this) << "RET_OK\n";
+	(*this) <<  CncSerialSpyStream::hLine;
+	setTextColour(c);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::finalizeRET_ERROR(const char* msg) {
+///////////////////////////////////////////////////////////
+	wxColour c = getTextColour();
+	red();
+	
+	if ( msg != NULL )
+		(*this) << msg;
+		
+	(*this) << "RET_ERROR\n";
+	(*this) <<  CncSerialSpyStream::hLine;
+	setTextColour(c);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::finalizeRET_LIMIT(const char* msg) {
+///////////////////////////////////////////////////////////
+	wxColour c = getTextColour();
+	yellow();
+	if ( msg != NULL )
+		(*this) << msg;
+		
+	(*this) << "RET_LIMIT\n";
+	(*this) <<  CncSerialSpyStream::hLine;
+	setTextColour(c);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::finalizeRET_INTERRUPT(const char* msg) {
+///////////////////////////////////////////////////////////
+	wxColour c = getTextColour();
+	red();
+	if ( msg != NULL )
+		(*this) << msg;
+		
+	(*this) << "RET_INTERRUPT\n";
+	(*this) <<  CncSerialSpyStream::hLine;
+	setTextColour(c);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::finalizeRET_HALT(const char* msg) {
+///////////////////////////////////////////////////////////
+	wxColour c = getTextColour();
+	red();
+	if ( msg != NULL )
+		(*this) << msg;
+		
+	(*this) << "RET_HALT\n";
+	(*this) <<  CncSerialSpyStream::hLine;
+	setTextColour(c);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::finalizeRET_QUIT(const char* msg) {
+///////////////////////////////////////////////////////////
+	wxColour c = getTextColour();
+	yellow();
+	if ( msg != NULL )
+		(*this) << msg;
+		
+	(*this) << "RET_QUIT\n";
+	(*this) <<  CncSerialSpyStream::hLine;
+	setTextColour(c);
+}
+

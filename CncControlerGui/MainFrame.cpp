@@ -570,7 +570,7 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_outboundFileSource, outboundEditor);
 	
 	//Spy
-	serialSpy = new CncSpyControl(this, wxID_ANY, m_serialSpyDetails);
+	serialSpy = new CncSpyControl(this, wxID_ANY);
 	GblFunc::replaceControl(m_serialSpy, serialSpy);
 	
 	// File View
@@ -919,6 +919,11 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		
 		// stop the time to avoid overlapping idle request
 		m_serialTimer->Stop();
+		
+		// it's very import to deactivate the notifications during idle processing
+		// because instead every config change (sc()) will release a notification
+		// as a result the processing slows down significantly.
+		CncConfig::NotificationDeactivator cfgNotDeactivation(false);
 		
 		// it's very important to avoid event handling during the idle processing
 		// to prevent the start of furter commands
@@ -2113,6 +2118,9 @@ void MainFrame::enableControls(bool state) {
 	// run control
 	enableRunControls(state);
 	
+	// at least update motion monitor
+	if ( state == true )
+		motionMonitor->display();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -4064,8 +4072,9 @@ d) X(mid), Y(mid), Z(mid)
 					cnc->moveXToMid();
 					cnc->moveYToMid();
 					break;
-		default:std::cerr << "MainFrame::moveHome: invalid selection!" << std::endl;
+		default:	std::cerr << "MainFrame::moveHome: invalid selection!" << std::endl;
 	}
+	
 	enableControls();
 }
 ///////////////////////////////////////////////////////////////////
@@ -5157,13 +5166,15 @@ void MainFrame::startAnimationControl() {
 	
 	wxColor color(255,128,128);
 	m_cmdDuration->SetForegroundColour(color);
-	m_cmdDuration->GetParent()->Update();
+	m_cmdDuration->Refresh();
+	
 	processStartTime = wxDateTime::UNow();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::stopAnimationControl() {
 ///////////////////////////////////////////////////////////////////
-	m_cmdDuration->SetForegroundColour(*wxWHITE);
+	m_cmdDuration->SetForegroundColour(*wxBLACK);
+	m_cmdDuration->Refresh();
 	
 	if ( pngAnimation != NULL ) {
 		if ( pngAnimation->IsRunning() ) {
@@ -5486,8 +5497,10 @@ void MainFrame::determineRunMode() {
 		m_svgParseMode->SetForegroundColour(wxColor(255,128,128));
 	} else {
 		m_svgParseMode->SetLabel("Release");
-		m_svgParseMode->SetForegroundColour(wxColor(128,128,255));
+		m_svgParseMode->SetForegroundColour(wxColor(0,162,232));
 	}
+	
+	m_svgParseMode->Refresh();
 
 	decorateRunButton();
 }
@@ -5940,8 +5953,10 @@ void MainFrame::UpdateLogger(wxCommandEvent& event) {
 	if ( m_showLoggerOnDemand->IsChecked() == false )
 		return;
 	
-	if ( m_logger->IsShownOnScreen() == false )
+	if ( m_logger->IsShownOnScreen() == false ) {
 		showAuiPane("Logger");
+		m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
@@ -6915,7 +6930,7 @@ void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::leaveSerialSpy(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	m_serialSpyDetails->Clear();
+	serialSpy->clearDetails();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::initSpeedConfigPlayground() {

@@ -50,10 +50,16 @@ class SerialCommandLocker {
 struct LastSerialResult {
 	unsigned char cmd 				    = CMD_INVALID;
 	unsigned char ret				    = RET_NULL;
+	unsigned char pid				    = RET_NULL;
+	
+	unsigned int index					= 0;
 	
 	void reset() { 
 		cmd 				 			= CMD_INVALID;
 		ret								= RET_NULL;
+		pid								= RET_NULL;
+		
+		index							= 0;
 	}
 };
 
@@ -288,8 +294,6 @@ class Serial : public SerialOSD {
 		inline bool decodeHeartbeat(SerialFetchInfo& sfi);
 		inline bool decodeLimitInfo(SerialFetchInfo& sfi);
 		inline bool decodePositionInfo(unsigned char pid, SerialFetchInfo& sfi);
-		
-		const LastSerialResult& getLastFetchResult() const { return lastFetchResult; }
 		
 		void incTotalDistance(int32_t dx, int32_t dy, int32_t dz);
 		void incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy, int32_t cz);

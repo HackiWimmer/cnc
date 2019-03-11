@@ -172,6 +172,7 @@ class CncBasicLogStream : public std::stringstream {
 		void green() 	{ setTextColour(wxColour(0, 128, 64)); }
 		void white() 	{ setTextColour(*wxWHITE); }
 		void gray() 	{ setTextColour(*wxLIGHT_GREY); }
+		void yellow()	{ setTextColour(wxColour(255, 242, 0)); }
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -335,7 +336,7 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		///////////////////////////////////////////////////////////
 		virtual void logTime(bool lineFeed = true) {
 			wxDateTime now = wxDateTime::UNow();
-			(*this) << now.Format(":: %H:%M:%S.%l");
+			(*this) << now.Format("%H:%M:%S.%l: ");
 			
 			if ( lineFeed == true )
 				(*this) << '\n';
@@ -362,7 +363,7 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		///////////////////////////////////////////////////////////
 		void initializeResult() {
 			wxColour c = getTextColour();
-			blue();
+			gray();
 			logTime(true);
 			setTextColour(c);
 		}
@@ -401,29 +402,14 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		}
 		
 		///////////////////////////////////////////////////////////
-		void finalizeOK(const char* msg = NULL) {
-			wxColour c = getTextColour();
-			green();
-			if ( msg != NULL )
-				(*this) << msg;
-				
-			(*this) << "OK\n";
-			(*this) <<  CncSerialSpyStream::hLine;
-			setTextColour(c);
-		}
+		void finalizeRET_OK(const char* msg = NULL);
+		void finalizeRET_ERROR(const char* msg = NULL );
+		void finalizeRET_LIMIT(const char* msg = NULL );
 		
-		///////////////////////////////////////////////////////////
-		void finalizeERROR(const char* msg = NULL ) {
-			wxColour c = getTextColour();
-			red();
-			
-			if ( msg != NULL )
-				(*this) << msg;
-				
-			(*this) << "ERROR\n";
-			(*this) <<  CncSerialSpyStream::hLine;
-			setTextColour(c);
-		}
+		void finalizeRET_INTERRUPT(const char* msg = NULL );
+		void finalizeRET_HALT(const char* msg = NULL );
+		void finalizeRET_QUIT(const char* msg = NULL );
+
 };
 
 #endif

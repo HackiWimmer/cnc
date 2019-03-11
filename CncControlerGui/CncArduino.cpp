@@ -4,6 +4,7 @@
 std::string ArduinoCMDs::cmds[MAX_CMDS];
 std::string ArduinoCMDs::ret;
 
+const char* UNKNOWN_CMD = "Unknown CMD: ";
 /////////////////////////////////////////////////////////////////////////
 class ArduinoCMDsInitializer {
 	public:
@@ -16,7 +17,7 @@ class ArduinoCMDsInitializer {
 void ArduinoCMDs::init() {
 /////////////////////////////////////////////////////////////////////////
 	for (int i=0; i<MAX_CMDS -1;i++){
-		std::string s("Unknown Command: ");
+		std::string s(UNKNOWN_CMD);
 		s += std::to_string(i);
 		cmds[i]  = s.c_str();
 	}
@@ -50,9 +51,9 @@ void ArduinoCMDs::init() {
 	cmds[CMD_PRINT_VERSION]         = "Pull Version";
 	cmds[CMD_PRINT_PIN_REPORT]      = "Pull PIN Report";
 	
-	cmds[CMD_TEST_INFO_MESSAGE]     = "Pull Version";
-	cmds[CMD_TEST_WARN_MESSAGE]     = "Pull PIN Report";
-	cmds[CMD_TEST_ERROR_MESSAGE]    = "Pull Error Info";
+	cmds[CMD_TEST_INFO_MESSAGE]     = "Pull Test Info Message";
+	cmds[CMD_TEST_WARN_MESSAGE]     = "Pull Test Warning Message";
+	cmds[CMD_TEST_ERROR_MESSAGE]    = "Pull Test Error Message";
 	
 } 
 /////////////////////////////////////////////////////////////////////////
@@ -73,6 +74,24 @@ const char* ArduinoCMDs::getCMDLabel(unsigned int id, std::string& retVal) {
 	retVal.append("] is out of range");
 	
 	return ret.c_str();
+}
+/////////////////////////////////////////////////////////////////////////
+const char* ArduinoCMDs::getCMDLabelWithDefault(unsigned int id, const std::string& defaultValue) {
+/////////////////////////////////////////////////////////////////////////
+	if ( exists(id) == true )
+		return cmds[id].c_str();
+	
+	return defaultValue.c_str();
+}
+/////////////////////////////////////////////////////////////////////////
+bool ArduinoCMDs::exists(unsigned int cmd) {
+/////////////////////////////////////////////////////////////////////////
+	if ( cmd >= 0 && cmd < MAX_CMDS ) {
+		if ( cmds[cmd].find(UNKNOWN_CMD) == std::string::npos )
+			return true;
+	}
+	
+	return false;
 }
 
 ArduinoPIDs::PidInfo ArduinoPIDs::pids[MAX_PIDS];
@@ -100,16 +119,19 @@ void ArduinoPIDs::init() {
 	pids[RET_OK]                              .setup("RET_OK", "");
 	pids[RET_ERROR]                           .setup("RET_ERROR", "");
 	pids[RET_LIMIT]                           .setup("RET_LIMIT", "");
-	pids[RET_SOT]                             .setup("RET_SOT", "");
 	pids[RET_SOH]                             .setup("RET_SOH", "");
 	pids[RET_INTERRUPT]                       .setup("RET_INTERRUPT", ""); 
 	pids[RET_HALT]                            .setup("RET_HALT", ""); 
 	pids[RET_QUIT]                            .setup("RET_QUIT", "");
-	pids[RET_MSG]                             .setup("RET_MSG", "");
 	
 	pids[PID_UNKNOWN]                         .setup("Default PID", "");
-	pids[PID_STEPPER_INITIALIZED]             .setup("Stepper Initialize State", "bool");
+
+	pids[PID_HEARTBEAT]                       .setup("Hertbeat", "");
+	pids[PID_MSG]                             .setup("Message", "");
+	pids[PID_TEXT]                            .setup("Plain Text", "");
+	pids[PID_GETTER]                          .setup("Getter", "");
 	
+	pids[PID_STEPPER_INITIALIZED]             .setup("Stepper Initialize State", "bool");
 	pids[PID_QUERY_READY_TO_RUN]              .setup("Ready to run", "bool");
 	
 	pids[PID_STEPS_X]                         .setup("Steps X Axis", "steps");

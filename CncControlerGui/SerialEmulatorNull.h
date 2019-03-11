@@ -192,7 +192,10 @@ class SerialEmulatorNULL : public SerialSpyPort
 		
 		inline void reset();
 		inline void resetCounter();
-		inline unsigned char stepAxis(char axis, int32_t dist);
+		inline void simulateSteppingTimeX(int32_t dist);
+		inline void simulateSteppingTimeY(int32_t dist);
+		inline void simulateSteppingTimeZ(int32_t dist);
+		inline unsigned char signalHandling();
 		
 		inline bool translateStepAxisRetValue(unsigned char ret);
 		
@@ -206,8 +209,11 @@ class SerialEmulatorNULL : public SerialSpyPort
 		inline void replyPosition(bool force);
 		
 	protected:
-		LastCommand lastCommand;
-		unsigned char lastSignal;
+		LastCommand 	lastCommand;
+		unsigned char 	lastSignal;
+		int32_t 		maxDimStepsX;
+		int32_t 		maxDimStepsY;
+		int32_t 		maxDimStepsZ;
 		
 		const CncLongPosition& getCurrentEmulatorPosition() 								{ return curEmulatorPos; }
 		
@@ -233,14 +239,18 @@ class SerialEmulatorNULL : public SerialSpyPort
 		unsigned char getLastSignal() { return lastSignal; }
 
 		virtual bool evaluatePositions(GetterValues& ret);
-		virtual bool evaluateLimitStates(GetterValues& ret);
-		virtual bool evaluateLimitStates();
+		
+		inline bool evaluateLimitStates(GetterValues& ret);
+		inline bool evaluateLimitStates();
+		inline bool evaluateLimitStateX();
+		inline bool evaluateLimitStateY();
+		inline bool evaluateLimitStateZ();
 		
 		// position movement counting
-		void incPosistionCounter();
-		void incStepCounterX(int32_t dx);
-		void incStepCounterY(int32_t dy);
-		void incStepCounterZ(int32_t dz);
+		inline void incPosistionCounter();
+		inline void incStepCounterX(int32_t dx);
+		inline void incStepCounterY(int32_t dy);
+		inline void incStepCounterZ(int32_t dz);
 
 		void resetEmuPositionCounter();
 		int32_t getEmuPositionCounter() { return positionCounter; }

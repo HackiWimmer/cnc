@@ -33,6 +33,10 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , curEmulatorPos(0L, 0L, 0L)
 , lastCommand()
 , lastSignal(CMD_INVALID)
+, maxDimStepsX(GBL_CONFIG->getMaxDimensionStepsX())
+, maxDimStepsY(GBL_CONFIG->getMaxDimensionStepsY())
+, maxDimStepsZ(GBL_CONFIG->getMaxDimensionStepsZ())
+
 ///////////////////////////////////////////////////////////////////
 {
 	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
@@ -171,30 +175,62 @@ bool SerialEmulatorNULL::evaluateLimitStates() {
 ///////////////////////////////////////////////////////////////////
 	limitStates.reset();
 	
-	//#warning
-	//return true;
+	evaluateLimitStateX();
+	evaluateLimitStateY();
+	evaluateLimitStateZ();
 	
-	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
+	return limitStates.hasLimit();
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::evaluateLimitStateX() {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
 	
-	if ( (targetMajorPos.getX())/cncConfig->getCalculationFactX() <= -cncConfig->getMaxDimensionX() )
+	if ( curEmulatorPos.getX() <= -maxDimStepsX ) {
 		limitStates.setXLimit(LimitSwitch::LIMIT_MIN);
+		ret = true;
+	}
 		
-	if ( (targetMajorPos.getX())/cncConfig->getCalculationFactX() >= +cncConfig->getMaxDimensionX() )
+	if ( curEmulatorPos.getX() >= +maxDimStepsX ) {
 		limitStates.setXLimit(LimitSwitch::LIMIT_MAX);
+		ret = true;
+	}
 	
-	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactY() <= -cncConfig->getMaxDimensionY() )
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::evaluateLimitStateY() {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	if ( curEmulatorPos.getY() <= -(maxDimStepsY) ) {
 		limitStates.setYLimit(LimitSwitch::LIMIT_MIN);
+		ret = true;
+	}
 		
-	if ( (targetMajorPos.getY())/cncConfig->getCalculationFactY() >= +cncConfig->getMaxDimensionY() )
+	if ( curEmulatorPos.getY() >= +(maxDimStepsY) ) {
 		limitStates.setYLimit(LimitSwitch::LIMIT_MAX);
-		
-	if ( (targetMajorPos.getZ())/cncConfig->getCalculationFactZ() <= -cncConfig->getMaxDimensionZ() )
+		ret = true;
+	}
+
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorNULL::evaluateLimitStateZ() {
+///////////////////////////////////////////////////////////////////
+	bool ret = false;
+	
+	if ( curEmulatorPos.getZ() <= -(maxDimStepsZ) ) {
 		limitStates.setZLimit(LimitSwitch::LIMIT_MIN);
+		ret = true;
+	}
 		
-	if ( (targetMajorPos.getZ())/cncConfig->getCalculationFactZ() >= +cncConfig->getMaxDimensionZ() )
+	if ( curEmulatorPos.getZ() >= +(maxDimStepsZ) ) {
 		limitStates.setZLimit(LimitSwitch::LIMIT_MAX);
-		
-	return true;
+		ret = true;
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
@@ -260,7 +296,7 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 		}
 	}
 	
-	spyReadData(ret, buffer, nbByte);
+	spyReadData(buffer, ret);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -433,23 +469,21 @@ int SerialEmulatorNULL::performMajorMove(unsigned char *buffer, unsigned int nbB
 	if ( buffer == NULL )
 		return -1;
 	
-	// first write the major position
-	lastCommand.Serial.write(RET_SOH);
-	lastCommand.Serial.write(PID_XYZ_POS_MAJOR);
-	lastCommand.Serial.write(targetMajorPos.getX(),
-			                 targetMajorPos.getY(),
-							 targetMajorPos.getZ(),
-							 (int32_t)(speedSimulator->getRealtimeFeedSpeed_MM_MIN() * DBL_FACT));
-	lastCommand.Serial.write(lastCommand.ret);
-	
-	// secondary provide the limit information
-	if ( limitStates.hasLimit() ) {
+	// first publish the limit states on demand . . .
+	if ( limitStates.hasLimit() || limitStates.hasPreviousLimit() ) {
 		lastCommand.Serial.write(RET_SOH);
 		lastCommand.Serial.write(PID_LIMIT);
 		lastCommand.Serial.write(limitStates.getXLimit(), limitStates.getYLimit(), limitStates.getZLimit());
-		//lastCommand.Serial.write(lastCommand.ret);
-		lastCommand.Serial.write(RET_LIMIT);
 	}
+	
+	// secondary write the major position . . .
+	const int32_t speed = (int32_t)(speedSimulator->getRealtimeFeedSpeed_MM_MIN() * DBL_FACT);
+	lastCommand.Serial.write(RET_SOH);
+	lastCommand.Serial.write(PID_XYZ_POS_MAJOR);
+	lastCommand.Serial.write(targetMajorPos.getX(), targetMajorPos.getY(), targetMajorPos.getZ(), speed);
+	
+	// and last but not least finalize the command
+	lastCommand.Serial.write(lastCommand.ret);
 	
 	// support the first byte
 	return performSerialBytes(buffer, nbByte);
@@ -467,6 +501,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 	
 	switch ( cmd ) {
 		
+		// signals
 		case SIG_INTERRUPPT:
 		case SIG_HALT:
 		case SIG_PAUSE:
@@ -474,17 +509,22 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 		case SIG_QUIT_MOVE: 		lastSignal = cmd;
 									return true;
 									
+		// commands
 		case CMD_IDLE:				lastCommand.cmd = cmd;
+									lastCommand.ret = RET_OK;
 									return writeHeartbeat(buffer, nbByte);
 		
 		case CMD_RESET_CONTROLLER:	reset();
 									lastCommand.cmd = cmd;
+									lastCommand.ret = RET_OK;
 									return true;
 		
 		case CMD_GETTER:			lastCommand.cmd = cmd;
+									lastCommand.ret = RET_OK;
 									return writeGetter(buffer, nbByte);
 		
-		case CMD_SETTER:			lastCommand.cmd = cmd; 
+		case CMD_SETTER:			lastCommand.cmd = cmd;
+									lastCommand.ret = RET_OK;
 									return writeSetter(buffer, nbByte);
 		
 		case CMD_MOVE:
@@ -493,6 +533,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 									return writeMoveCmdIntern(buffer, nbByte);
 		
 		default:					lastCommand.cmd = cmd;
+									lastCommand.ret = RET_OK;
 	}
 	
 	return true;
@@ -501,39 +542,38 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 bool SerialEmulatorNULL::writeHeartbeat(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	unsigned char byteCount = sizeof(int32_t);
-
-  //writeLongValue(millis() % MAX_LONG);
-  
+	
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_HEARTBEAT);
 	lastCommand.Serial.write(byteCount);
 	lastCommand.Serial.write(42);
 	lastCommand.Serial.write(RET_OK);
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v) {
 ///////////////////////////////////////////////////////////////////
-    lastCommand.Serial.write(pid);
+	lastCommand.Serial.write(pid);
 	lastCommand.Serial.write((unsigned char)1);
-    lastCommand.Serial.write(v);
-    lastCommand.Serial.write(RET_OK);
+	lastCommand.Serial.write(v);
+	lastCommand.Serial.write(RET_OK);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v1, int32_t v2) {
 ///////////////////////////////////////////////////////////////////
-    lastCommand.Serial.write(pid);
+	lastCommand.Serial.write(pid);
 	lastCommand.Serial.write((unsigned char)2);
-    lastCommand.Serial.write(v1, v2);
-    lastCommand.Serial.write(RET_OK);
+	lastCommand.Serial.write(v1, v2);
+	lastCommand.Serial.write(RET_OK);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::writerGetterValues(unsigned char pid, int32_t v1, int32_t v2, int32_t v3) {
 ///////////////////////////////////////////////////////////////////
-    lastCommand.Serial.write(pid);
+	lastCommand.Serial.write(pid);
 	lastCommand.Serial.write((unsigned char)3);
-    lastCommand.Serial.write(v1, v2, v3);
-    lastCommand.Serial.write(RET_OK);
+	lastCommand.Serial.write(v1, v2, v3);
+	lastCommand.Serial.write(RET_OK);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte) {
@@ -577,6 +617,8 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 											} else {
 												addErrorInfo(E_GETTER_ID_NOT_FOUND, wxString::Format("Getter as int value: %03d", (int)pid));
 												writerGetterValues(PID_UNKNOWN, 0);
+												
+												lastCommand.ret = RET_ERROR;
 												return false;
 											}
 	}
@@ -587,6 +629,7 @@ bool SerialEmulatorNULL::writeGetter(unsigned char *buffer, unsigned int nbByte)
 bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( writeSetterRawCallback(buffer, nbByte) == false ) {
+		lastCommand.ret = RET_ERROR;
 		return false;
 	}
 
@@ -647,15 +690,17 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 		
 		return true;
 	}
-
+	
+	lastCommand.ret = RET_ERROR;
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( writeMoveRawCallback(buffer, nbByte)  == false ) {
+	limitStates.reset();
+	
+	if ( writeMoveRawCallback(buffer, nbByte)  == false )
 		return false;
-	}
 	
 	int32_t x = 0L, y = 0L, z = 0L;
 	if ( CncCommandDecoder::decodeMove(buffer, nbByte, x, y, z) == false ) 
@@ -741,7 +786,7 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 	}
 	
 	// presetup the move return value, 
-	// it will be overriden by stepAxis on demand
+	// it will be overriden by provideMove on demand
 	lastCommand.ret = RET_OK;
 	
 	// initialize
@@ -833,45 +878,70 @@ bool SerialEmulatorNULL::translateStepAxisRetValue(unsigned char ret) {
 	lastCommand.ret = ret;
 	
 	switch ( ret ) {
-		case RET_INTERRUPT:		return false;
+		case RET_INTERRUPT:
 		case RET_ERROR:			return false;
 		
-		case RET_HALT:			return true;
-		case RET_QUIT:			return true;
+		case RET_LIMIT:
+		case RET_HALT:
+		case RET_QUIT:
 		default:				return true;
 	}
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force) {
 ///////////////////////////////////////////////////////////////////
+	// always copy point A into point B
+	memcpy(pointB, pointA, sizeof(pointA));
+
 	// statistic counting
 	incPosistionCounter();
 	
-	incStepCounterX(dx);
-	incStepCounterY(dy);
-	incStepCounterZ(dz);
+	// stepping
+	lastCommand.ret = RET_OK;
 	
-	// position management
-	curEmulatorPos.incX(dx);
-	curEmulatorPos.incY(dy);
-	curEmulatorPos.incZ(dz);
+	#define INC_AXIS(axis, delta) \
+			{ \
+				int32_t d = delta; \
+				const int32_t newPos = curEmulatorPos.get##axis() + d; \
+				\
+				if ( newPos >= +maxDimSteps##axis ) { \
+					d = +maxDimSteps##axis - curEmulatorPos.get##axis(); \
+					limitStates.setLimit##axis(LimitSwitch::LIMIT_MAX); \
+					lastCommand.ret = RET_LIMIT; \
+				\
+				} else if ( newPos <= -maxDimSteps##axis ) { \
+					d = -maxDimSteps##axis - curEmulatorPos.get##axis(); \
+					limitStates.setLimit##axis(LimitSwitch::LIMIT_MIN); \
+					lastCommand.ret = RET_LIMIT; \
+				\
+				} else { \
+					limitStates.setLimit##axis(LimitSwitch::LIMIT_UNSET); \
+				} \
+				\
+				unsigned char retSig = RET_OK; \
+				if ( (retSig = signalHandling() ) != RET_OK )  { \
+					lastCommand.ret = retSig; \
+					return translateStepAxisRetValue(retSig); \
+				} \
+				\
+				curEmulatorPos.inc##axis(d); \
+				incStepCounter##axis(d); \
+				simulateSteppingTime##axis(d); \
+				\
+				if ( lastCommand.ret != RET_OK ) \
+					return translateStepAxisRetValue(lastCommand.ret); \
+			}
 	
-	// simulate speed
-	unsigned char retVal;
-	if ( (retVal = stepAxis('X', dx)) != RET_OK ) return translateStepAxisRetValue(retVal);
-	if ( (retVal = stepAxis('Y', dy)) != RET_OK ) return translateStepAxisRetValue(retVal);
-	if ( (retVal = stepAxis('Z', dz)) != RET_OK ) return translateStepAxisRetValue(retVal);
+	// do
+	INC_AXIS(X, dx)
+	INC_AXIS(Y, dy)
+	INC_AXIS(Z, dz)
 	
 	// simulate a direct controller callback.
 	replyPosition(force);
 	
 	// do something with this coordinates
-	bool ret = writeMoveRenderedCallback(dx, dy, dz);
-	
-	// copy point A into point B
-	memcpy(pointB, pointA, sizeof(pointA));
-	
-	return ret;
+	return writeMoveRenderedCallback(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::replyPosition(bool force) {
@@ -919,53 +989,71 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-unsigned char SerialEmulatorNULL::stepAxis(char axis, int32_t steps) {
+unsigned char SerialEmulatorNULL::signalHandling() {
 ///////////////////////////////////////////////////////////////////
-	for ( int32_t i = 0; i < absolute(steps); i++ ) {
-		// signal handling
-		switch ( lastSignal ) {
+	// signal handling
+	switch ( lastSignal ) {
+	
+		case SIG_INTERRUPPT:		return RET_INTERRUPT;
+		case SIG_HALT:				return RET_HALT;
+		case SIG_QUIT_MOVE:			return RET_QUIT;
 		
-			case SIG_INTERRUPPT:		return RET_INTERRUPT;
-			case SIG_HALT:				return RET_HALT;
-			case SIG_QUIT_MOVE:			return RET_QUIT;
-			
-			case SIG_PAUSE:				// pause handling
-										while ( lastSignal == SIG_PAUSE ) {
-											THE_APP->dispatchAll();
-											THE_APP->waitActive(25, true);
-										}
-										break;
-			
-			case SIG_RESUME:			lastSignal = CMD_INVALID; 
-										break;
-			
-			default:					; // Do nothing
-		}
+		case SIG_PAUSE:				// pause handling
+									while ( lastSignal == SIG_PAUSE ) {
+										THE_APP->dispatchAll();
+										THE_APP->waitActive(25, true);
+									}
+									break;
 		
-		// simulate speed
-		if ( GBL_CONFIG->isProbeMode() == false ) {
-			wxASSERT( speedSimulator != NULL );
-			const int32_t val = absolute(steps);
-			
-			switch ( axis ) {
-				case 'X':	if ( val > 0 ) speedSimulator->simulateSteppingX(val);
-							break;
-							
-				case 'Y':	if ( val > 0 ) speedSimulator->simulateSteppingY(val);
-							break;
-							
-				case 'Z':	if ( val > 0 ) speedSimulator->simulateSteppingZ(val);
-							break;
-							
-				default:	wxASSERT(axis != 'X' && axis != 'Y' && axis != 'Z');
-							return RET_ERROR;
-			}
-			
-			speedSimulator->performCurrentOffset(false);
-		}
+		case SIG_RESUME:			lastSignal = CMD_INVALID; 
+									break;
+		
+		default:					; // Do nothing
 	}
 	
 	return RET_OK;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::simulateSteppingTimeX(int32_t steps) {
+///////////////////////////////////////////////////////////////////
+	// simulate speed
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		wxASSERT( speedSimulator != NULL );
+		const int32_t val = absolute(steps);
+		
+		if ( val > 0 ) {
+			speedSimulator->simulateSteppingX(val);
+			speedSimulator->performCurrentOffset(false);
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::simulateSteppingTimeY(int32_t steps) {
+///////////////////////////////////////////////////////////////////
+	// simulate speed
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		wxASSERT( speedSimulator != NULL );
+		const int32_t val = absolute(steps);
+		
+		if ( val > 0 ) {
+			speedSimulator->simulateSteppingY(val);
+			speedSimulator->performCurrentOffset(false);
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::simulateSteppingTimeZ(int32_t steps) {
+///////////////////////////////////////////////////////////////////
+	// simulate speed
+	if ( GBL_CONFIG->isProbeMode() == false ) {
+		wxASSERT( speedSimulator != NULL );
+		const int32_t val = absolute(steps);
+		
+		if ( val > 0 ) {
+			speedSimulator->simulateSteppingZ(val);
+			speedSimulator->performCurrentOffset(false);
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::resetEmuPositionCounter() {

@@ -313,6 +313,7 @@
       <File Name="ConcurrentQueue.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Spy">
+      <File Name="HexDecoder.cpp"/>
       <File Name="CncSpyControl.h"/>
       <File Name="CncSpyControl.cpp"/>
       <File Name="HexDecoder.h"/>
@@ -368,8 +369,6 @@
       <File Name="CncConfig.cpp"/>
       <File Name="CncConfig.h"/>
       <VirtualDirectory Name="Pages">
-        <File Name="CfgAccelerationGraph.cpp"/>
-        <File Name="CfgAccelerationGraph.h"/>
         <File Name="CfgApplicationPage.cpp"/>
         <File Name="CfgEnvironmentPage.cpp"/>
         <File Name="CfgSVGOptionPage.cpp"/>
@@ -379,6 +378,8 @@
       </VirtualDirectory>
       <File Name="CncConfigExt.h"/>
       <VirtualDirectory Name="Tabs">
+        <File Name="CfgAccelerationGraph.cpp"/>
+        <File Name="CfgAccelerationGraph.h"/>
         <File Name="CncToolMagazine.cpp"/>
         <File Name="CncToolMagazine.h"/>
       </VirtualDirectory>
