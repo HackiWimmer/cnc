@@ -1,4 +1,5 @@
 #include <iostream>
+
 #include "3D/GLContextPathBase.h"
 #include "3D/GLContextTestCube.h"
 #include "3D/GLContextCncPath.h"
@@ -12,6 +13,8 @@
 	#include <GL/glut.h>
 	#include <GL/freeglut.h>
 #endif
+
+
 
 /////////////////////////////////////////////////////////////////
 // global vars
@@ -40,11 +43,11 @@ void fillDataVector() {
 	currentContext->clearPathData();
 	
 	GLI::GLCncPathVertices vertice;
-	currentContext->appendPathData(vertice.set(0.0f, 0.0f, 0.0f));
-	currentContext->appendPathData(vertice.set(1.0f, 0.0f, 0.0f));
-	currentContext->appendPathData(vertice.set(1.0f, 1.0f, 0.0f));
-	currentContext->appendPathData(vertice.set(0.0f, 1.0f, 0.0f));
-	currentContext->appendPathData(vertice.set(0.0f, 0.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(-1L, 0.0f, 0.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(-1L, 1.0f, 0.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(-1L, 1.0f, 1.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(-1L, 0.0f, 1.0f, 0.0f));
+	currentContext->appendPathData(vertice.set(-1L, 0.0f, 0.0f, 0.0f));
 }
 
 /////////////////////////////////////////////////////////////////

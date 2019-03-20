@@ -2,6 +2,7 @@
 #define CNCFILEPREVIEW_H
 
 #include "3D/CncGCodePreview.h"
+#include "CncSvgControl.h"
 #include "wxcrafter.h"
 
 class CncFilePreview : public CncFilePreviewBase
@@ -18,7 +19,8 @@ class CncFilePreview : public CncFilePreviewBase
 		bool selectPreview(const wxString& fileName);
 		
 	private:
-		CncGCodePreview* gcodePreview;
+		CncGCodePreview* 	gcodePreview;
+		CncSvgViewer* 		svgPreview;
 		
 		void installContent();
  

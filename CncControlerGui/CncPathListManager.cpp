@@ -46,7 +46,7 @@ bool CncPathListManager::overAllBoostWktEntriesSample() {
 			
 		}
 	}
-	catch (boost::geometry::centroid_exception e) {
+	catch (boost::geometry::centroid_exception& e) {
 		std::cerr << "reversePath(): Error while reverse path\n";
 		std::cerr << e.what();
 		std::cerr << std::endl;
@@ -206,7 +206,7 @@ bool CncPathListManager::getCentroid(wxRealPoint& centroid) {
 		centroid.x = (cnc::dblCompare(p.x(), 0.0, 0.001) == true ? 0.0 : p.x());
 		centroid.y = (cnc::dblCompare(p.y(), 0.0, 0.001) == true ? 0.0 : p.y());
 	}
-	catch (boost::geometry::centroid_exception e) {
+	catch (boost::geometry::centroid_exception& e) {
 		std::cerr << "determineCentroid(): Error while determine centroid\n";
 		std::cerr << e.what();
 		std::cerr << std::endl;

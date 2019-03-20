@@ -2,8 +2,8 @@
 #include <wx/string.h>
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
-#include "CncSourceEditor.h"
 #include <wx/filename.h>
+#include "CncSourceEditor.h"
 #include "OSD/webviewOSD.h"
 #include "SvgEditPopup.h"
 #include "SvgViewBox.h"

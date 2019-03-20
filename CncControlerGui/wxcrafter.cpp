@@ -3638,11 +3638,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer6214->AddGrowableRow(0);
     m_panel6210->SetSizer(flexGridSizer6214);
     
-    #if wxUSE_WEBVIEW
-    m_outboundEditorWebView = wxWebView::New(m_panel6210, wxID_ANY, _("about:blank"), wxDefaultPosition, wxDLG_UNIT(m_panel6210, wxSize(-1,-1)), wxWebViewBackendDefault, 0);
+    m_outboundEditorSvgViewPlaceholder = new wxPanel(m_panel6210, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel6210, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_outboundEditorSvgViewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     
-    flexGridSizer6214->Add(m_outboundEditorWebView, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    #endif // wxUSE_WEBVIEW
+    flexGridSizer6214->Add(m_outboundEditorSvgViewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer7131 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer7131->SetFlexibleDirection( wxBOTH );
@@ -5480,9 +5479,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_menuAbout = new wxMenu();
     m_menuBar->Append(m_menuAbout, _("Help"));
     
-    m_menuItem5965 = new wxMenuItem(m_menuAbout, wxID_ANY, _("Trace Session ID"), wxT(""), wxITEM_NORMAL);
-    m_menuItem5965->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("database-key")));
-    m_menuAbout->Append(m_menuItem5965);
+    m_miTraceSessionID = new wxMenuItem(m_menuAbout, wxID_ANY, _("Trace Session ID"), wxT(""), wxITEM_NORMAL);
+    m_miTraceSessionID->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("database-key")));
+    m_menuAbout->Append(m_miTraceSessionID);
     
     m_miOpenSessionDlg = new wxMenuItem(m_menuAbout, wxID_ANY, _("Open Session Directory"), wxT(""), wxITEM_NORMAL);
     m_miOpenSessionDlg->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("folder-development")));
@@ -5490,9 +5489,15 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_menuAbout->AppendSeparator();
     
-    m_menuItem309 = new wxMenuItem(m_menuAbout, wxID_ANY, _("About"), wxT(""), wxITEM_NORMAL);
-    m_menuItem309->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("help-about")));
-    m_menuAbout->Append(m_menuItem309);
+    m_miShowAppEnv = new wxMenuItem(m_menuAbout, wxID_ANY, _("Show Application Environment"), wxT(""), wxITEM_NORMAL);
+    m_miShowAppEnv->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("system-run-5")));
+    m_menuAbout->Append(m_miShowAppEnv);
+    
+    m_menuAbout->AppendSeparator();
+    
+    m_miAbout = new wxMenuItem(m_menuAbout, wxID_ANY, _("About"), wxT(""), wxITEM_NORMAL);
+    m_miAbout->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("help-about")));
+    m_menuAbout->Append(m_miAbout);
     
     m_startupTimer = new wxTimer;
     m_startupTimer->Start(100, true);
@@ -5809,9 +5814,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_3D_Perspective4->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     m_btSaveOutboundAsTemplate2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
-    #if wxUSE_WEBVIEW
-    
-    #endif // wxUSE_WEBVIEW
     m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(MainFrameBClass::lruListItemSelected), NULL, this);
     m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
@@ -5918,9 +5920,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miTest2->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction2), NULL, this);
     this->Connect(m_miTest3->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction3), NULL, this);
     this->Connect(m_miTest4->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction4), NULL, this);
-    this->Connect(m_menuItem5965->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::traceSessionId), NULL, this);
+    this->Connect(m_miTraceSessionID->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::traceSessionId), NULL, this);
     this->Connect(m_miOpenSessionDlg->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSessionDialog), NULL, this);
-    this->Connect(m_menuItem309->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnAbout), NULL, this);
+    this->Connect(m_miShowAppEnv->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::showOSEnvironment), NULL, this);
+    this->Connect(m_miAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnAbout), NULL, this);
     m_startupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::startupTimer), NULL, this);
     m_serialTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::serialTimer), NULL, this);
     m_traceTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::traceTimer), NULL, this);
@@ -6097,9 +6100,6 @@ MainFrameBClass::~MainFrameBClass()
     m_3D_Perspective4->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     m_btSaveOutboundAsTemplate2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
-    #if wxUSE_WEBVIEW
-    
-    #endif // wxUSE_WEBVIEW
     m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(MainFrameBClass::lruListItemSelected), NULL, this);
     m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
     m_lruList->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
@@ -6206,9 +6206,10 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miTest2->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction2), NULL, this);
     this->Disconnect(m_miTest3->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction3), NULL, this);
     this->Disconnect(m_miTest4->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::testFunction4), NULL, this);
-    this->Disconnect(m_menuItem5965->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::traceSessionId), NULL, this);
+    this->Disconnect(m_miTraceSessionID->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::traceSessionId), NULL, this);
     this->Disconnect(m_miOpenSessionDlg->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openSessionDialog), NULL, this);
-    this->Disconnect(m_menuItem309->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnAbout), NULL, this);
+    this->Disconnect(m_miShowAppEnv->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::showOSEnvironment), NULL, this);
+    this->Disconnect(m_miAbout->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::OnAbout), NULL, this);
     m_startupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::startupTimer), NULL, this);
     m_serialTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::serialTimer), NULL, this);
     m_traceTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(MainFrameBClass::traceTimer), NULL, this);
@@ -7175,12 +7176,10 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
     flexGridSizer3768->AddGrowableRow(0);
     m_panel3764->SetSizer(flexGridSizer3768);
     
-    #if wxUSE_WEBVIEW
-    m_svgPreview = wxWebView::New(m_panel3764, wxID_ANY, _("about:blank"), wxDefaultPosition, wxDLG_UNIT(m_panel3764, wxSize(-1,-1)), wxWebViewBackendDefault, 0);
-    m_svgPreview->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_svgPreviewPlaceholder = new wxPanel(m_panel3764, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel3764, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_svgPreviewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     
-    flexGridSizer3768->Add(m_svgPreview, 1, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    #endif // wxUSE_WEBVIEW
+    flexGridSizer3768->Add(m_svgPreviewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panel3766 = new wxPanel(m_previewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_previewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_previewBook->AddPage(m_panel3766, _("Page"), false);
@@ -7314,9 +7313,6 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
          GetSizer()->Fit(this);
     }
     // Connect events
-    #if wxUSE_WEBVIEW
-    
-    #endif // wxUSE_WEBVIEW
     m_3D_Top->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFilePreviewBase::showFromTop3D), NULL, this);
     m_3D_Bottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFilePreviewBase::showFromBottom3D), NULL, this);
     m_3D_Front->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFilePreviewBase::showFromFront3D), NULL, this);
@@ -7332,9 +7328,6 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
 
 CncFilePreviewBase::~CncFilePreviewBase()
 {
-    #if wxUSE_WEBVIEW
-    
-    #endif // wxUSE_WEBVIEW
     m_3D_Top->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFilePreviewBase::showFromTop3D), NULL, this);
     m_3D_Bottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFilePreviewBase::showFromBottom3D), NULL, this);
     m_3D_Front->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFilePreviewBase::showFromFront3D), NULL, this);
@@ -10202,6 +10195,321 @@ CncMessageDialogBase::CncMessageDialogBase(wxWindow* parent, wxWindowID id, cons
 CncMessageDialogBase::~CncMessageDialogBase()
 {
     m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncMessageDialogBase::close), NULL, this);
+    
+}
+
+CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC9ED9InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("system-run-5"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
+    
+    wxFlexGridSizer* flexGridSizer7301 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer7301->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7301->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7301->AddGrowableCol(0);
+    flexGridSizer7301->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer7301);
+    
+    m_listbook = new wxListbook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLB_DEFAULT|wxBK_DEFAULT);
+    m_listbook->SetName(wxT("m_listbook"));
+    wxImageList* m_listbook_il = new wxImageList(16, 16);
+    m_listbook->AssignImageList(m_listbook_il);
+    
+    flexGridSizer7301->Add(m_listbook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_panelOSEnvironment = new wxPanel(m_listbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_panelOSEnvironmentImgIndex;
+    m_panelOSEnvironmentImgIndex = m_listbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));
+    m_listbook->AddPage(m_panelOSEnvironment, _("OS\nEnvironment"), false, m_panelOSEnvironmentImgIndex);
+    
+    wxFlexGridSizer* flexGridSizer7276 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer7276->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7276->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7276->AddGrowableCol(0);
+    flexGridSizer7276->AddGrowableRow(0);
+    m_panelOSEnvironment->SetSizer(flexGridSizer7276);
+    
+    m_osEnvironmentList = new wxListCtrl(m_panelOSEnvironment, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelOSEnvironment, wxSize(-1,-1)), wxLC_VRULES|wxLC_REPORT);
+    m_osEnvironmentList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_osEnvironmentList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    wxFont m_osEnvironmentListFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_osEnvironmentList->SetFont(m_osEnvironmentListFont);
+    
+    flexGridSizer7276->Add(m_osEnvironmentList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer7288 = new wxFlexGridSizer(2, 2, 0, 0);
+    flexGridSizer7288->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7288->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7288->AddGrowableCol(1);
+    flexGridSizer7288->AddGrowableRow(0);
+    flexGridSizer7288->AddGrowableRow(1);
+    
+    flexGridSizer7276->Add(flexGridSizer7288, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText7294 = new wxStaticText(m_panelOSEnvironment, wxID_ANY, _("Parameter:"), wxDefaultPosition, wxDLG_UNIT(m_panelOSEnvironment, wxSize(-1,-1)), 0);
+    wxFont m_staticText7294Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText7294->SetFont(m_staticText7294Font);
+    
+    flexGridSizer7288->Add(m_staticText7294, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_osEnvParam = new wxTextCtrl(m_panelOSEnvironment, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelOSEnvironment, wxSize(-1,-1)), wxTE_READONLY);
+    wxFont m_osEnvParamFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_osEnvParam->SetFont(m_osEnvParamFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_osEnvParam->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer7288->Add(m_osEnvParam, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText7296 = new wxStaticText(m_panelOSEnvironment, wxID_ANY, _("Value:"), wxDefaultPosition, wxDLG_UNIT(m_panelOSEnvironment, wxSize(-1,-1)), 0);
+    wxFont m_staticText7296Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText7296->SetFont(m_staticText7296Font);
+    
+    flexGridSizer7288->Add(m_staticText7296, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_osEnvValue = new wxTextCtrl(m_panelOSEnvironment, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelOSEnvironment, wxSize(-1,-1)), wxTE_READONLY);
+    wxFont m_osEnvValueFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_osEnvValue->SetFont(m_osEnvValueFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_osEnvValue->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer7288->Add(m_osEnvValue, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_paneAppEnvironment = new wxPanel(m_listbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_paneAppEnvironmentImgIndex;
+    m_paneAppEnvironmentImgIndex = m_listbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("application-side-list")));
+    m_listbook->AddPage(m_paneAppEnvironment, _("App\nEnvironment"), false, m_paneAppEnvironmentImgIndex);
+    
+    wxFlexGridSizer* flexGridSizer7340 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer7340->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7340->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7340->AddGrowableCol(0);
+    flexGridSizer7340->AddGrowableRow(0);
+    m_paneAppEnvironment->SetSizer(flexGridSizer7340);
+    
+    m_appEnvironmentList = new wxListCtrl(m_paneAppEnvironment, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_paneAppEnvironment, wxSize(-1,-1)), wxLC_VRULES|wxLC_REPORT);
+    m_appEnvironmentList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_appEnvironmentList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_appEnvironmentListFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_appEnvironmentList->SetFont(m_appEnvironmentListFont);
+    
+    flexGridSizer7340->Add(m_appEnvironmentList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer72881 = new wxFlexGridSizer(2, 2, 0, 0);
+    flexGridSizer72881->SetFlexibleDirection( wxBOTH );
+    flexGridSizer72881->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer72881->AddGrowableCol(1);
+    flexGridSizer72881->AddGrowableRow(0);
+    flexGridSizer72881->AddGrowableRow(1);
+    
+    flexGridSizer7340->Add(flexGridSizer72881, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText72942 = new wxStaticText(m_paneAppEnvironment, wxID_ANY, _("Parameter:"), wxDefaultPosition, wxDLG_UNIT(m_paneAppEnvironment, wxSize(-1,-1)), 0);
+    wxFont m_staticText72942Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText72942->SetFont(m_staticText72942Font);
+    
+    flexGridSizer72881->Add(m_staticText72942, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_appEnvParam = new wxTextCtrl(m_paneAppEnvironment, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_paneAppEnvironment, wxSize(-1,-1)), wxTE_READONLY);
+    wxFont m_appEnvParamFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_appEnvParam->SetFont(m_appEnvParamFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_appEnvParam->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer72881->Add(m_appEnvParam, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText72964 = new wxStaticText(m_paneAppEnvironment, wxID_ANY, _("Value:"), wxDefaultPosition, wxDLG_UNIT(m_paneAppEnvironment, wxSize(-1,-1)), 0);
+    wxFont m_staticText72964Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText72964->SetFont(m_staticText72964Font);
+    
+    flexGridSizer72881->Add(m_staticText72964, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_appEnvValue = new wxTextCtrl(m_paneAppEnvironment, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_paneAppEnvironment, wxSize(-1,-1)), wxTE_READONLY);
+    wxFont m_appEnvValueFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_appEnvValue->SetFont(m_appEnvValueFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_appEnvValue->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer72881->Add(m_appEnvValue, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_panelModules = new wxPanel(m_listbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_panelModulesImgIndex;
+    m_panelModulesImgIndex = m_listbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("package-link")));
+    m_listbook->AddPage(m_panelModules, _("Loaded\nModules"), false, m_panelModulesImgIndex);
+    
+    wxFlexGridSizer* flexGridSizer7309 = new wxFlexGridSizer(3, 1, 0, 0);
+    flexGridSizer7309->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7309->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7309->AddGrowableCol(0);
+    flexGridSizer7309->AddGrowableRow(1);
+    m_panelModules->SetSizer(flexGridSizer7309);
+    
+    wxArrayString m_modulesSortedByArr;
+    m_modulesSortedByArr.Add(_("Name"));
+    m_modulesSortedByArr.Add(_("Path"));
+    m_modulesSortedBy = new wxRadioBox(m_panelModules, wxID_ANY, _("Items sorted by"), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), m_modulesSortedByArr, 1, wxRA_SPECIFY_ROWS);
+    wxFont m_modulesSortedByFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_modulesSortedBy->SetFont(m_modulesSortedByFont);
+    m_modulesSortedBy->SetSelection(0);
+    
+    flexGridSizer7309->Add(m_modulesSortedBy, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_moduleList = new wxListCtrl(m_panelModules, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), wxLC_VRULES|wxLC_REPORT);
+    m_moduleList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_moduleList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_moduleListFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_moduleList->SetFont(m_moduleListFont);
+    
+    flexGridSizer7309->Add(m_moduleList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer7313 = new wxFlexGridSizer(4, 2, 0, 0);
+    flexGridSizer7313->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7313->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7313->AddGrowableCol(1);
+    flexGridSizer7313->AddGrowableRow(0);
+    flexGridSizer7313->AddGrowableRow(1);
+    flexGridSizer7313->AddGrowableRow(2);
+    flexGridSizer7313->AddGrowableRow(3);
+    
+    flexGridSizer7309->Add(flexGridSizer7313, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText7315 = new wxStaticText(m_panelModules, wxID_ANY, _("Address:"), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), 0);
+    wxFont m_staticText7315Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText7315->SetFont(m_staticText7315Font);
+    
+    flexGridSizer7313->Add(m_staticText7315, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_modAddress = new wxTextCtrl(m_panelModules, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), wxTE_READONLY);
+    #if wxVERSION_NUMBER >= 3000
+    m_modAddress->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer7313->Add(m_modAddress, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText7319 = new wxStaticText(m_panelModules, wxID_ANY, _("Name"), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), 0);
+    wxFont m_staticText7319Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText7319->SetFont(m_staticText7319Font);
+    
+    flexGridSizer7313->Add(m_staticText7319, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_modName = new wxTextCtrl(m_panelModules, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), wxTE_READONLY);
+    #if wxVERSION_NUMBER >= 3000
+    m_modName->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer7313->Add(m_modName, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText7323 = new wxStaticText(m_panelModules, wxID_ANY, _("Version"), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), 0);
+    wxFont m_staticText7323Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText7323->SetFont(m_staticText7323Font);
+    
+    flexGridSizer7313->Add(m_staticText7323, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_modVersion = new wxTextCtrl(m_panelModules, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), wxTE_READONLY);
+    #if wxVERSION_NUMBER >= 3000
+    m_modVersion->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer7313->Add(m_modVersion, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText7327 = new wxStaticText(m_panelModules, wxID_ANY, _("Path"), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), 0);
+    wxFont m_staticText7327Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText7327->SetFont(m_staticText7327Font);
+    
+    flexGridSizer7313->Add(m_staticText7327, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_modPath = new wxTextCtrl(m_panelModules, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelModules, wxSize(-1,-1)), wxTE_READONLY);
+    #if wxVERSION_NUMBER >= 3000
+    m_modPath->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer7313->Add(m_modPath, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    wxFlexGridSizer* flexGridSizer7280 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer7280->SetFlexibleDirection( wxBOTH );
+    flexGridSizer7280->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer7280->AddGrowableCol(0);
+    flexGridSizer7280->AddGrowableRow(0);
+    
+    flexGridSizer7301->Add(flexGridSizer7280, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticLine7334 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer7280->Add(m_staticLine7334, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
+    
+    m_btClose = new wxButton(this, wxID_ANY, _("Close"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btClose->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-close")), wxLEFT);
+    m_btClose->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btCloseFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btClose->SetFont(m_btCloseFont);
+    m_btClose->SetToolTip(_("Close dialog"));
+    
+    flexGridSizer7280->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    
+    
+    #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(m_listbook)){
+        wxPersistenceManager::Get().RegisterAndRestore(m_listbook);
+    } else {
+        wxPersistenceManager::Get().Restore(m_listbook);
+    }
+    #endif
+    
+    SetName(wxT("CncOSEnvironmentDialogBase"));
+    SetSize(500,600);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    this->Connect(wxEVT_SIZE, wxSizeEventHandler(CncOSEnvironmentDialogBase::onSize), NULL, this);
+    m_osEnvironmentList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectOSEnvironmentItem), NULL, this);
+    m_appEnvironmentList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectAppEnvironmentItem), NULL, this);
+    m_modulesSortedBy->Connect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncOSEnvironmentDialogBase::sortModules), NULL, this);
+    m_moduleList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectModulesItem), NULL, this);
+    m_btClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncOSEnvironmentDialogBase::onClose), NULL, this);
+    
+}
+
+CncOSEnvironmentDialogBase::~CncOSEnvironmentDialogBase()
+{
+    this->Disconnect(wxEVT_SIZE, wxSizeEventHandler(CncOSEnvironmentDialogBase::onSize), NULL, this);
+    m_osEnvironmentList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectOSEnvironmentItem), NULL, this);
+    m_appEnvironmentList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectAppEnvironmentItem), NULL, this);
+    m_modulesSortedBy->Disconnect(wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler(CncOSEnvironmentDialogBase::sortModules), NULL, this);
+    m_moduleList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncOSEnvironmentDialogBase::selectModulesItem), NULL, this);
+    m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncOSEnvironmentDialogBase::onClose), NULL, this);
     
 }
 

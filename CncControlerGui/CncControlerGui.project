@@ -192,6 +192,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncOSEnvironmentDialog.h"/>
+      <File Name="CncOSEnvironmentDialog.cpp"/>
+      <File Name="CncSvgControl.h"/>
+      <File Name="CncSvgControl.cpp"/>
       <File Name="CncMessageDialog.h"/>
       <File Name="CncMessageDialog.cpp"/>
       <File Name="CncMonitorReplayPane.h"/>
@@ -277,10 +281,10 @@
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
       <File Name="Codelite/wxPNGAnimation.h"/>
-      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="release2;Debug;"/>
-      <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="release2;Debug;"/>
-      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="release2;Debug;"/>
-      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="release2;Debug;"/>
+      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="Release;Debug;release2;"/>
+      <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Release;Debug;release2;"/>
+      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="Release;Debug;release2;"/>
+      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Release;Debug;release2;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
       <File Name="wxcrafter.cpp"/>
@@ -401,7 +405,7 @@
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
     <File Name="wxcrafter.wxcp"/>
-    <File Name="win_resources.rc"/>
+    <File Name="win_resources.rc" ExcludeProjConfig=""/>
   </VirtualDirectory>
   <VirtualDirectory Name="wxcrafter">
     <VirtualDirectory Name="XRC">
@@ -432,35 +436,32 @@
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
         <IncludePath Value="."/>
-        <IncludePath Value="C:\@Development\boost\include\boost-1_64"/>
       </Compiler>
-      <Linker Options="">
-        <LibraryPath Value="."/>
-        <LibraryPath Value="C:\@Development\boost\lib"/>
-      </Linker>
+      <Linker Options=""/>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-pg;-g;-O0;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:\@Development\boost_1_65_0"/>
-        <IncludePath Value="C:\@Development\freeglut\include"/>
+        <IncludePath Value="C:/@Development/boost_1_69_0"/>
+        <IncludePath Value="C:/@Development/freeglut/include"/>
         <Preprocessor Value="DEBUG"/>
-        <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
-      <Linker Options="-pg;-mwindows;$(shell wx-config --libs)" Required="yes">
-        <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
+      <Linker Options="-mwindows;$(shell wx-config --libs)" Required="yes">
+        <LibraryPath Value="."/>
+        <LibraryPath Value="C:/@Development/freeglut/lib/x64"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
         <Library Value="libwxmsw31u_adv"/>
         <Library Value="libwxmsw31u_gl"/>
+        <Library Value="backtrace"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
         <Library Value="Xinput9_1_0"/>
-        <Library Value="dbgeng"/>
+        <Library Value="libbacktrace"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
@@ -474,7 +475,9 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
-        <Command Enabled="yes">rem gcc -E -dM CncControl.cpp</Command>
+        <Command Enabled="yes">where g++</Command>
+        <Command Enabled="yes">g++ -v</Command>
+        <Command Enabled="no">#gcc -E -dM CncControl.cpp</Command>
       </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
@@ -498,21 +501,38 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+    <Configuration Name="Release" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:\@Development\boost_1_65_0"/>
-        <IncludePath Value="C:\@Development\freeglut\include"/>
+        <IncludePath Value="C:/@Development/boost_1_69_0"/>
+        <IncludePath Value="C:/@Development/freeglut/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.16/include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_ADDR2LINE"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
-        <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
+        <LibraryPath Value="."/>
+        <LibraryPath Value="C:/@Development/freeglut/lib/x64"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
         <Library Value="libwxmsw31u_adv"/>
         <Library Value="libwxmsw31u_gl"/>
+        <Library Value="libwxsvg"/>
+        <Library Value="libcairo"/>
+        <Library Value="libavutil"/>
+        <Library Value="libavformat"/>
+        <Library Value="libavcodec"/>
+        <Library Value="libxvidcore"/>
+        <Library Value="libexpat"/>
+        <Library Value="libexif"/>
+        <Library Value="libswscale"/>
+        <Library Value="backtrace"/>
+        <Library Value="libdl"/>
+        <Library Value="dbgeng"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
@@ -529,65 +549,9 @@
         <PostConnectCommands/>
         <StartupCommands/>
       </Debugger>
-      <PreBuild/>
-      <PostBuild/>
-      <CustomBuild Enabled="no">
-        <RebuildCommand/>
-        <CleanCommand/>
-        <BuildCommand/>
-        <PreprocessFileCommand/>
-        <SingleFileCommand/>
-        <MakefileGenerationCommand/>
-        <ThirdPartyToolName>None</ThirdPartyToolName>
-        <WorkingDirectory/>
-      </CustomBuild>
-      <AdditionalRules>
-        <CustomPostBuild/>
-        <CustomPreBuild/>
-      </AdditionalRules>
-      <Completion EnableCpp11="yes" EnableCpp14="yes">
-        <ClangCmpFlagsC/>
-        <ClangCmpFlags/>
-        <ClangPP/>
-        <SearchPaths/>
-      </Completion>
-    </Configuration>
-    <Configuration Name="release2" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
-        <IncludePath Value="."/>
-        <IncludePath Value="C:\@Development\boost_1_65_0"/>
-        <IncludePath Value="C:\@Development\freeglut\include"/>
-        <Preprocessor Value="NDEBUG"/>
-        <Preprocessor Value="APP_USE_SPLASH"/>
-        <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
-        <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
-      </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs)" Required="yes">
-        <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
-        <Library Value="libwxmsw31u_stc"/>
-        <Library Value="libwxmsw31u_webview"/>
-        <Library Value="libwxmsw31u_propgrid"/>
-        <Library Value="libwxmsw31u_adv"/>
-        <Library Value="libwxmsw31u_gl"/>
-        <Library Value="opengl32"/>
-        <Library Value="glu32"/>
-        <Library Value="libfreeglut"/>
-        <Library Value="Xinput9_1_0"/>
-        <Library Value="dbgeng"/>
-      </Linker>
-      <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
-      <BuildSystem Name="Default"/>
-      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
-        <![CDATA[]]>
-      </Environment>
-      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
-        <DebuggerSearchPaths/>
-        <PostConnectCommands/>
-        <StartupCommands/>
-      </Debugger>
       <PreBuild>
-        <Command Enabled="no"># gcc -E -dM CncControl.cpp</Command>
+        <Command Enabled="yes">where g++</Command>
+        <Command Enabled="yes">g++ -v</Command>
       </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
@@ -604,7 +568,7 @@
         <CustomPostBuild/>
         <CustomPreBuild/>
       </AdditionalRules>
-      <Completion EnableCpp11="no" EnableCpp14="no">
+      <Completion EnableCpp11="yes" EnableCpp14="yes">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>

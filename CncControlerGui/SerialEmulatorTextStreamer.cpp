@@ -235,7 +235,7 @@ void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::EndRun& t
 		return;
 	}
 	
-	std::ofstream out(fileName, std::ofstream::out);
+	std::ofstream out(fileName.c_str().AsChar(), std::ofstream::out);
 	if ( out.good() == false ) {
 		std::cerr << "SerialEmulatorTextStreamer::processTrigger(): Can't create file: '" 
 				  << fileName

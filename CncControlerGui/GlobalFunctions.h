@@ -8,7 +8,9 @@ class GblFunc {
 	
 	public:
 		static void replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl);
+		
 		static void stacktrace(std::ostream& o);
+		static const wxString& stacktrace(wxString& ret);
 	
 };
 

@@ -134,7 +134,7 @@ const wxRealPoint& PGenPolygon::determineCentroid(wxRealPoint& cp, unsigned int 
 		cp.x = (cnc::dblCompare(p.x(), 0.0, 0.001) == true ? 0.0 : p.x());
 		cp.y = (cnc::dblCompare(p.y(), 0.0, 0.001) == true ? 0.0 : p.y());
 	}
-	catch (boost::geometry::centroid_exception e) {
+	catch (boost::geometry::centroid_exception& e) {
 		addErrorInfo("determineCentroid(): Error while determine centroid");
 		addErrorInfo(e.what());
 	}

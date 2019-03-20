@@ -13,7 +13,6 @@ class wxString;
 class wxXmlNode;
 class wxStaticText;
 class wxStyledTextCtrl;
-class wxWebView;
 class wxXmlAttribute;
 class wxMenuItem;
 

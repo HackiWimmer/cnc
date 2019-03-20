@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <wx/string.h>
+#include <wx/event.h>
 #include <wx/textentry.h>
 #include <wx/valnum.h>
 #include <wx/stdpaths.h>
@@ -915,7 +916,7 @@ void PathGeneratorFrame::updatePreview() {
 	} 
 	
 	std::fstream fs;
-	fs.open(pfn.c_str(), std::ios::in | std::ios::out | std::ios::trunc);
+	fs.open(pfn.c_str().AsChar(), std::ios::in | std::ios::out | std::ios::trunc);
 	if ( fs.is_open() ) {
 		fs << "<?xml version=\"1.0\" encoding=\"ISO-8859-1\" standalone=\"no\"?>" << std::endl;
 		fs << "<!DOCTYPE svg PUBLIC \"-//W3C//DTD SVG 20010904//EN\"" << std::endl;

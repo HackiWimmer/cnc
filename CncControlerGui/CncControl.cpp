@@ -9,6 +9,7 @@
 #include <wx/propgrid/manager.h>
 #include <wx/evtloop.h>
 #include "OSD/CncAsyncKeyboardState.h"
+#include "GlobalFunctions.h"
 #include "DataControlModel.h"
 #include "SerialPort.h"
 #include "SerialEmulatorNull.h"

@@ -1,5 +1,6 @@
 #include <iostream>
 #include <wx/string.h>
+#include <wx/event.h>
 #include <wx/textentry.h>
 #include <wx/valnum.h>
 #include "CncToolMagazine.h"

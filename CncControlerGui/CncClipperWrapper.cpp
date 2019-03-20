@@ -482,7 +482,7 @@ bool CncClipperWrapper::offsetPath(const PolygonList& inList, CncPolygons& out, 
 		
 		co.Execute(out, offset * CncPolygonPoints::doubleToIntFactor);
 		
-	} catch (std::runtime_error e ) {
+	} catch (std::runtime_error& e ) {
 		std::cerr << "CncClipperWrapper::offsetPath: Runtime error: " << e.what() << std::endl;
 		return false;
 		

@@ -9,7 +9,7 @@ GLI::GLCncPath::iterator GLI::GLCncPath::vBegin() {
 ////////////////////////////////////////////
 GLI::GLCncPath::iterator GLI::GLCncPath::vEnd() { 
 ////////////////////////////////////////////
-	if ( virtualEnd <= 0 )
+	if ( virtualEnd <= 0 ) 
 		return end(); 
 		
 	if ( size() == 0 )

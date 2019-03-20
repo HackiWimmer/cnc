@@ -33,6 +33,8 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include <wx/aboutdlg.h>
 #include <wx/fileconf.h>
 #include <wx/filedlg.h>
+#include <wx/event.h>
+#include <wx/utils.h> 
 #include <wx/textentry.h>
 #include <wx/valnum.h>
 #include <wx/dcclient.h>
@@ -85,6 +87,8 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "GL3DDrawPane.h"
 #include "CncMonitorReplayPane.h"
 #include "CncStatisticsPane.h"
+#include "CncSvgControl.h"
+#include "CncOSEnvironmentDialog.h"
 #include "GlobalStrings.h"
 #include "MainFrame.h"
 
@@ -304,7 +308,7 @@ MainFrame::~MainFrame() {
 	wxASSERT(templateNbInfo);
 	delete templateNbInfo;
 	
-	if ( cnc != NULL );
+	if ( cnc != NULL )
 		delete cnc;
 	
 	DeletePendingEvents();
@@ -614,6 +618,10 @@ void MainFrame::installCustControls() {
 	cncGamepadState = new CncGamepadControllerState(this); 
 	GblFunc::replaceControl(m_gamepadStateController, cncGamepadState);
 	
+	// Outbound editor svg viewer
+	outboundEditorSvgView = new CncSvgViewer(this); 
+	GblFunc::replaceControl(m_outboundEditorSvgViewPlaceholder, outboundEditorSvgView);
+
 	// navigator panel
 	CncNavigatorPanel::Config cfg;
 	cfg.innerCircle = true;
@@ -787,6 +795,7 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
+	GblFunc::stacktrace(std::clog);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -1361,19 +1370,19 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 			// check if current com connection is effected
 			case DBT_DEVICEREMOVECOMPLETE:	{
 				// check if the current connection is effected
-				if ( lastPortName == portName )
+				if ( lastPortName == portName ) {
 					if ( cnc && cnc->isConnected() ) {
 						cnc->interrupt();
 						cnc->disconnect();
 						lastPortName.clear();
 						std::cerr << "Connection brocken" << std::endl;
-						cnc::trc.logWarning("Connection broken . . ."); 
+						cnc::trc.logWarning("Connection broken . . .");
 					}
 					
 					if ( dlg->IsShown() ) {
 						dlg->EndModal(wxID_NO);
 					}
-					
+				}
 				break;
 			}
 			
@@ -2007,7 +2016,7 @@ void MainFrame::decorateOutboundEditor(const char* fileName) {
 		url.assign("about:blank");
 
 	if ( fileName == NULL ) {
-		m_outboundEditorWebView->LoadURL(url);
+		outboundEditorSvgView->loadFile(url);
 		m_simpleBookOutBoundEditor->SetSelection(1);
 		
 		outboundEditor->clearContent();
@@ -2017,7 +2026,7 @@ void MainFrame::decorateOutboundEditor(const char* fileName) {
 	}
 	
 	if ( wxFileName::Exists(fileName) == false ) {
-		m_outboundEditorWebView->LoadURL(url);
+		outboundEditorSvgView->loadFile(url);
 		m_simpleBookOutBoundEditor->SetSelection(1);
 		
 		std::cerr << "MainFrame::decorateOutboundEditor(): Can't open file: '" 
@@ -5196,7 +5205,7 @@ void MainFrame::dclickDurationCount(wxMouseEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::decorateOutboundSaveControls(bool state) {
+void MainFrame::decorateOutboundSaveControls(bool state) { 
 ///////////////////////////////////////////////////////////////////
 	m_miSaveEmuOutput->Enable(state);
 	m_btSaveOutboundAsTemplate1->Enable(state);
@@ -7277,7 +7286,7 @@ void MainFrame::extractSourceAsNewTpl(wxCommandEvent& event) {
 		return;
 	}
 	
-	std::ofstream out(saveFileDialog.GetPath());
+	std::ofstream out(saveFileDialog.GetPath().c_str().AsChar());
 	if ( out.good() == false ) {
 		std::cerr << "MainFrame::extractSourceAsNewTpl(): Error while creating file '" 
 				  << saveFileDialog.GetPath()
@@ -7405,6 +7414,15 @@ void MainFrame::enableSourceEditorMenuItems(bool enable) {
 	m_miSaveTemplate->Enable(enable);
 	m_miSaveTemplateAs->Enable(enable);
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::showOSEnvironment(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	CncOSEnvironmentDialog dlg(this);
+	dlg.ShowModal();
+}
+
+
+
 
 void MainFrame::selectManuallyToolId(wxCommandEvent& event)
 {

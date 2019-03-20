@@ -213,7 +213,7 @@ bool BinaryFileParser::preprocess() {
 	if ( inputStream.is_open() )
 		inputStream.close();
 
-	inputStream.open(outputFileName.c_str(), std::ifstream::binary);
+	inputStream.open(outputFileName.c_str().AsChar(), std::ifstream::binary);
 
 	if ( !inputStream.good() ) {
 		std::cerr << "Can't open file: '" << outputFileName << "'" << std::endl;
@@ -494,7 +494,7 @@ const wxString& BinaryFileParser::getXMLParameter(const wxString& section, const
 	value.clear();
 	wxString key(wxString::Format("%s.%s", section, name));
 	
-	if ( parameterMap.find(key) != parameterMap.end() );
+	if ( parameterMap.find(key) != parameterMap.end() )
 		value.assign(parameterMap[key]);
 		
 	return value;
@@ -581,7 +581,7 @@ bool BinaryFileParser::extractSourceContentAsFile(const wxString& binFileName, w
 	sourceFileName.append(".");
 	sourceFileName.append(parser.getXMLParameter(XMLSourceNodeName, XMLSourceNode_AttribType, parameter));
 	
-	std::ofstream out(sourceFileName);
+	std::ofstream out(sourceFileName.c_str().AsChar());
 	if ( !out.good() ) {
 		std::cerr << "BinaryFileParser::extractSourceContentAsFile(): Can't create temp file" << std::endl;
 		return false;

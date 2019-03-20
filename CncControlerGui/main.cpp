@@ -410,7 +410,11 @@ class MainApp : public wxApp {
 					  << "  Condition : " << wxString(cond)
 					  << std::endl
 					  << "  Message   : " << wxString(msg)
+					  << std::endl
+					  << "  Stacktrace:"
 					  << std::endl;
+					  
+			GblFunc::stacktrace(std::cerr);
 		}
 		
 		///////////////////////////////////////////////////////////

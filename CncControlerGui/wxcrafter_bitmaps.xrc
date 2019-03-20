@@ -14,6 +14,8 @@
   <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-console">bitmaps\16-console.png</object>
+  <object class="wxBitmap" name="16-console@2x">bitmaps\16-console@2x.png</object>
   <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
   <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
   <object class="wxBitmap" name="16-cscope">bitmaps\16-cscope.png</object>
@@ -252,6 +254,7 @@
   <object class="wxBitmap" name="actionrun">bitmaps\actionrun.png</object>
   <object class="wxBitmap" name="application-exit-4">bitmaps\application-exit-4.png</object>
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
+  <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
   <object class="wxBitmap" name="application-view-gallery">bitmaps\application-view-gallery.png</object>
   <object class="wxBitmap" name="arrow-out">bitmaps\arrow-out.png</object>
   <object class="wxBitmap" name="arrow-right-3">bitmaps\arrow-right-3.png</object>
@@ -276,6 +279,7 @@
   <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
   <object class="wxBitmap" name="db_update">bitmaps\db_update.png</object>
   <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
+  <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
   <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="dialog-information-3 (2)">bitmaps\dialog-information-3 (2).png</object>
@@ -337,6 +341,7 @@
   <object class="wxBitmap" name="network-wireless-full (2)">bitmaps\network-wireless-full (2).png</object>
   <object class="wxBitmap" name="network-wireless-low (2)">bitmaps\network-wireless-low (2).png</object>
   <object class="wxBitmap" name="network-wireless-medium (2)">bitmaps\network-wireless-medium (2).png</object>
+  <object class="wxBitmap" name="package-link">bitmaps\package-link.png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
   <object class="wxBitmap" name="playstation-circle-dark-icon24">bitmaps\gamepad\playstation-circle-dark-icon24.png</object>
@@ -362,6 +367,7 @@
   <object class="wxBitmap" name="start-here">bitmaps\start-here.png</object>
   <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>
+  <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>

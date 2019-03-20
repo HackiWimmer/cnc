@@ -13,7 +13,7 @@
 	#include <GL/freeglut.h>
 	#include <GL/glext.h>
 #endif
-
+ 
 /////////////////////////////////////////////////////////////////
 GLContextBase::GLContextBase(wxGLCanvas* canvas) 
 : wxGLContext(canvas)

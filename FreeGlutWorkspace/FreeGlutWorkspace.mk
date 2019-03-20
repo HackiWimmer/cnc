@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=10/10/2017
+Date                   :=20/03/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
 SharedObjectLinkerName :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -shared -fPIC
@@ -61,10 +61,7 @@ AS       := C:/@Development/Compilers/TDM-GCC-64/bin/as.exe
 ##
 ## User defined environment variables
 ##
-CodeLiteDir:=C:\Program Files\CodeLite
-WXWIN:=C:\@Development\wxWidgets-3.1.0
-WXCFG:=gcc_dll\mswu
-Objects0=$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix) 
 
 
 
@@ -95,53 +92,13 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/main.cpp$(ObjectSuffix): main.cpp $(IntermediateDirectory)/main.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/FreeGlutWorkspace/main.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/main.cpp$(DependSuffix): main.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/main.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/main.cpp$(DependSuffix) -MM main.cpp
+$(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix): Sample2.cpp $(IntermediateDirectory)/Sample2.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/FreeGlutWorkspace/Sample2.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/Sample2.cpp$(DependSuffix): Sample2.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/Sample2.cpp$(DependSuffix) -MM Sample2.cpp
 
-$(IntermediateDirectory)/main.cpp$(PreprocessSuffix): main.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/main.cpp$(PreprocessSuffix) main.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix): ../CncControlerGui/3D/GLContextCncPath.cpp $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLContextCncPath.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(DependSuffix): ../CncControlerGui/3D/GLContextCncPath.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(DependSuffix) -MM ../CncControlerGui/3D/GLContextCncPath.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(PreprocessSuffix): ../CncControlerGui/3D/GLContextCncPath.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextCncPath.cpp$(PreprocessSuffix) ../CncControlerGui/3D/GLContextCncPath.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(ObjectSuffix): ../CncControlerGui/3D/GLContextTestCube.cpp $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLContextTestCube.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(DependSuffix): ../CncControlerGui/3D/GLContextTestCube.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(DependSuffix) -MM ../CncControlerGui/3D/GLContextTestCube.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(PreprocessSuffix): ../CncControlerGui/3D/GLContextTestCube.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextTestCube.cpp$(PreprocessSuffix) ../CncControlerGui/3D/GLContextTestCube.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(ObjectSuffix): ../CncControlerGui/3D/GLContextBase.cpp $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLContextBase.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(DependSuffix): ../CncControlerGui/3D/GLContextBase.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(DependSuffix) -MM ../CncControlerGui/3D/GLContextBase.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(PreprocessSuffix): ../CncControlerGui/3D/GLContextBase.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextBase.cpp$(PreprocessSuffix) ../CncControlerGui/3D/GLContextBase.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(ObjectSuffix): ../CncControlerGui/3D/GLContextPathBase.cpp $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLContextPathBase.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(DependSuffix): ../CncControlerGui/3D/GLContextPathBase.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(DependSuffix) -MM ../CncControlerGui/3D/GLContextPathBase.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(PreprocessSuffix): ../CncControlerGui/3D/GLContextPathBase.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_3D_GLContextPathBase.cpp$(PreprocessSuffix) ../CncControlerGui/3D/GLContextPathBase.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(ObjectSuffix): ../CncControlerGui/3D/GLViewPort.cpp $(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLViewPort.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(DependSuffix): ../CncControlerGui/3D/GLViewPort.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(DependSuffix) -MM ../CncControlerGui/3D/GLViewPort.cpp
-
-$(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(PreprocessSuffix): ../CncControlerGui/3D/GLViewPort.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_3D_GLViewPort.cpp$(PreprocessSuffix) ../CncControlerGui/3D/GLViewPort.cpp
+$(IntermediateDirectory)/Sample2.cpp$(PreprocessSuffix): Sample2.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Sample2.cpp$(PreprocessSuffix) Sample2.cpp
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

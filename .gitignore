@@ -25,6 +25,9 @@ GameController/Debug/**
 NavigatorPanel/Release/**
 NavigatorPanel/Debug/**
 
+wxWidgetsTest/Release/**
+wxWidgetsTest/Debug/**
+
 #*.exe
 #*.txt
 #*.bat

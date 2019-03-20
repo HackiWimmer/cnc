@@ -1,7 +1,8 @@
+#include <sstream>
 #include <wx/sizer.h>
-#include "GlobalFunctions.h"
-
 #include <boost/stacktrace.hpp>
+
+#include "GlobalFunctions.h"
 
 ///////////////////////////////////////////////////////////////////
 void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
@@ -37,5 +38,14 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 ///////////////////////////////////////////////////////////////////
 void GblFunc::stacktrace(std::ostream& o) {
 //////////////////////////////////////////////////////////////////
-	o << "boost::stacktrace::stacktrace()";
+	o << boost::stacktrace::stacktrace(); 
+}
+//////////////////////////////////////////////////////////////////
+const wxString& GblFunc::stacktrace(wxString& ret) {
+//////////////////////////////////////////////////////////////////
+	std::stringstream ss;
+	stacktrace(ss);
+	
+	ret.assign(ss.str().c_str());
+	return ret;
 }

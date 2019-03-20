@@ -47,6 +47,7 @@ class CncMonitorReplayPane;
 class CncTemplateObserver;
 class CncSecureRun;
 class CncStatisticsPane;
+class CncSvgViewer;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -110,6 +111,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void showOSEnvironment(wxCommandEvent& event);
     virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event);
 		virtual void selectMetricUnitFrom(wxCommandEvent& event);
 		virtual void selectMetricUnitFromValue(wxCommandEvent& event);
@@ -572,6 +574,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
 		CfgAccelerationGraph* 			accelGraphPanel; 
 		CncGamepadControllerState* 		cncGamepadState;
+		CncSvgViewer*					outboundEditorSvgView;
 		CncNavigatorPanel*				navigatorPanel;
 		GL3DOptionPane* 				optionPane3D;
 		GL3DDrawPane* 					drawPane3D;

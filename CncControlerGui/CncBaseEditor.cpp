@@ -719,9 +719,11 @@ bool CncBaseEditor::openFile(const wxString& fileName) {
 bool CncBaseEditor::openTextFile() {
 ///////////////////////////////////////////////////////////////////
 	#define RETURN(val) \
+	{ \
 		Enable(hasEditMode()); \
 		fileLoadingActive = false; \
-		return(val);
+		return(val); \
+	}
 	
 	fileLoadingActive = true;
 	
@@ -729,7 +731,7 @@ bool CncBaseEditor::openTextFile() {
 	SetReadOnly(false);
 	
 	if ( LoadFile(fileInfo.fileName.GetFullPath()) == true ) 
-		RETURN(true);
+		RETURN(true)
 		
 	std::cerr << "CncBaseEditor::openTextFile(): Error while open file: '" 
 	          << fileInfo.fileName.GetFullPath()

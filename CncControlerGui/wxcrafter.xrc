@@ -6203,8 +6203,10 @@ Interval [ms]:</label>
                                               <object class="sizeritem">
                                                 <flag>wxALL|wxEXPAND</flag>
                                                 <border>1</border>
-                                                <option>1</option>
-                                                <object class="unknown" name="m_outboundEditorWebView"/>
+                                                <object class="wxPanel" name="m_outboundEditorSvgViewPlaceholder">
+                                                  <style>wxTAB_TRAVERSAL</style>
+                                                  <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
+                                                </object>
                                               </object>
                                             </object>
                                           </object>
@@ -9740,7 +9742,7 @@ State</label>
       <object class="wxMenu" name="m_menuAbout">
         <label>Help</label>
         <style/>
-        <object class="wxMenuItem" name="m_menuItem5965">
+        <object class="wxMenuItem" name="m_miTraceSessionID">
           <label>Trace Session ID</label>
           <bitmap>bitmaps/database-key.png</bitmap>
           <accel>
@@ -9755,7 +9757,15 @@ State</label>
           </accel>
         </object>
         <object class="separator"/>
-        <object class="wxMenuItem" name="m_menuItem309">
+        <object class="wxMenuItem" name="m_miShowAppEnv">
+          <label>Show Application Environment</label>
+          <bitmap>bitmaps/system-run-5.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
+        <object class="wxMenuItem" name="m_miAbout">
           <label>About</label>
           <bitmap>bitmaps/help-about.png</bitmap>
           <accel>
@@ -10671,10 +10681,9 @@ State</label>
                 <growablerows>0</growablerows>
                 <object class="sizeritem">
                   <flag>wxALL|wxEXPAND</flag>
-                  <border>1</border>
-                  <option>1</option>
-                  <object class="unknown" name="m_svgPreview">
-                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                  <object class="wxPanel" name="m_svgPreviewPlaceholder">
+                    <style>wxTAB_TRAVERSAL</style>
+                    <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                   </object>
                 </object>
               </object>
@@ -14762,6 +14771,440 @@ Thickness</label>
                   <default>1</default>
                 </object>
               </object>
+            </object>
+          </object>
+        </object>
+      </object>
+    </object>
+  </object>
+  <object class="wxDialog" name="CncOSEnvironmentDialogBase">
+    <title>Cnc Application Environment</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER</style>
+    <size>500,600</size>
+    <object class="wxFlexGridSizer">
+      <cols>1</cols>
+      <rows>2</rows>
+      <vgap>0</vgap>
+      <hgap>0</hgap>
+      <growablecols>0</growablecols>
+      <growablerows>0</growablerows>
+      <object class="sizeritem">
+        <flag>wxALL|wxEXPAND</flag>
+        <border>5</border>
+        <object class="wxListbook" name="m_listbook">
+          <style>wxLB_DEFAULT|wxBK_DEFAULT</style>
+          <object class="listbookpage">
+            <label>OS
+Environment</label>
+            <bitmap>bitmaps/16-console.png</bitmap>
+            <selected>0</selected>
+            <object class="wxPanel" name="m_panelOSEnvironment">
+              <style>wxTAB_TRAVERSAL</style>
+              <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>2</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxListCtrl" name="m_osEnvironmentList">
+                    <style>wxLC_VRULES|wxLC_REPORT</style>
+                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <fg>wxSYS_COLOUR_BTNFACE</fg>
+                    <font>
+                      <size>9</size>
+                      <style>normal</style>
+                      <weight>normal</weight>
+                      <family>modern</family>
+                      <underlined>0</underlined>
+                      <face>Consolas</face>
+                    </font>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer7288">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>2</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>1</growablecols>
+                    <growablerows>0,1</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText7294">
+                        <label>Parameter:</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_osEnvParam">
+                        <style>wxTE_READONLY</style>
+                        <font>
+                          <size>10</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>modern</family>
+                          <underlined>0</underlined>
+                          <face>Consolas</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText7296">
+                        <label>Value:</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_osEnvValue">
+                        <style>wxTE_READONLY</style>
+                        <font>
+                          <size>10</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>modern</family>
+                          <underlined>0</underlined>
+                          <face>Consolas</face>
+                        </font>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="listbookpage">
+            <label>App
+Environment</label>
+            <bitmap>bitmaps/application-side-list.png</bitmap>
+            <selected>0</selected>
+            <object class="wxPanel" name="m_paneAppEnvironment">
+              <style>wxTAB_TRAVERSAL</style>
+              <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>2</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxListCtrl" name="m_appEnvironmentList">
+                    <style>wxLC_VRULES|wxLC_REPORT</style>
+                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                    <font>
+                      <size>9</size>
+                      <style>normal</style>
+                      <weight>normal</weight>
+                      <family>modern</family>
+                      <underlined>0</underlined>
+                      <face>Consolas</face>
+                    </font>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer72881">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>2</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>1</growablecols>
+                    <growablerows>0,1</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText72942">
+                        <label>Parameter:</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_appEnvParam">
+                        <style>wxTE_READONLY</style>
+                        <font>
+                          <size>10</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>modern</family>
+                          <underlined>0</underlined>
+                          <face>Consolas</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText72964">
+                        <label>Value:</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_appEnvValue">
+                        <style>wxTE_READONLY</style>
+                        <font>
+                          <size>10</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>modern</family>
+                          <underlined>0</underlined>
+                          <face>Consolas</face>
+                        </font>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+          <object class="listbookpage">
+            <label>Loaded
+Modules</label>
+            <bitmap>bitmaps/package-link.png</bitmap>
+            <selected>0</selected>
+            <object class="wxPanel" name="m_panelModules">
+              <style>wxTAB_TRAVERSAL</style>
+              <object class="wxFlexGridSizer">
+                <cols>1</cols>
+                <rows>3</rows>
+                <vgap>0</vgap>
+                <hgap>0</hgap>
+                <growablecols>0</growablecols>
+                <growablerows>1</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxRadioBox" name="m_modulesSortedBy">
+                    <label>Items sorted by</label>
+                    <style>wxRA_SPECIFY_ROWS</style>
+                    <font>
+                      <size>9</size>
+                      <style>normal</style>
+                      <weight>bold</weight>
+                      <family>swiss</family>
+                      <underlined>0</underlined>
+                      <face>Segoe UI</face>
+                    </font>
+                    <dimension>1</dimension>
+                    <selection>0</selection>
+                    <content>
+                      <item>Name</item>
+                      <item>Path</item>
+                    </content>
+                  </object>
+                </object>
+                <object class="sizeritem">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <object class="wxListCtrl" name="m_moduleList">
+                    <style>wxLC_VRULES|wxLC_REPORT</style>
+                    <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                    <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                    <font>
+                      <size>9</size>
+                      <style>normal</style>
+                      <weight>normal</weight>
+                      <family>modern</family>
+                      <underlined>0</underlined>
+                      <face>Consolas</face>
+                    </font>
+                  </object>
+                </object>
+                <object class="sizeritem" name="flexGridSizer7313">
+                  <flag>wxALL|wxEXPAND</flag>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>4</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols>1</growablecols>
+                    <growablerows>0,1,2,3</growablerows>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText7315">
+                        <label>Address:</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_modAddress">
+                        <style>wxTE_READONLY</style>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText7319">
+                        <label>Name</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_modName">
+                        <style>wxTE_READONLY</style>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText7323">
+                        <label>Version</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_modVersion">
+                        <style>wxTE_READONLY</style>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <border>5</border>
+                      <object class="wxStaticText" name="m_staticText7327">
+                        <label>Path</label>
+                        <style/>
+                        <font>
+                          <size>9</size>
+                          <style>normal</style>
+                          <weight>normal</weight>
+                          <family>swiss</family>
+                          <underlined>0</underlined>
+                          <face>Segoe UI</face>
+                        </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL|wxEXPAND</flag>
+                      <border>2</border>
+                      <object class="wxTextCtrl" name="m_modPath">
+                        <style>wxTE_READONLY</style>
+                      </object>
+                    </object>
+                  </object>
+                </object>
+              </object>
+            </object>
+          </object>
+        </object>
+      </object>
+      <object class="sizeritem" name="flexGridSizer7280">
+        <flag>wxALL|wxEXPAND</flag>
+        <option>1</option>
+        <object class="wxFlexGridSizer">
+          <cols>1</cols>
+          <rows>2</rows>
+          <vgap>0</vgap>
+          <hgap>0</hgap>
+          <growablecols>0</growablecols>
+          <growablerows>0</growablerows>
+          <object class="sizeritem">
+            <flag>wxALL|wxEXPAND</flag>
+            <border>5</border>
+            <object class="wxStaticLine" name="m_staticLine7334">
+              <style>wxLI_HORIZONTAL</style>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL|wxALIGN_RIGHT</flag>
+            <border>5</border>
+            <object class="wxButton" name="m_btClose">
+              <label>Close</label>
+              <style/>
+              <font>
+                <size>9</size>
+                <style>normal</style>
+                <weight>bold</weight>
+                <family>swiss</family>
+                <underlined>0</underlined>
+                <face>Segoe UI</face>
+              </font>
+              <tooltip>
+                <![CDATA[Close dialog]]>
+              </tooltip>
+              <bitmap>bitmaps/dialog-close.png</bitmap>
+              <bitmapposition>wxLEFT</bitmapposition>
+              <default>0</default>
             </object>
           </object>
         </object>

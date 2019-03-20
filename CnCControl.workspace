@@ -6,15 +6,17 @@
   <Project Name="RenderAndMove" Path="RenderAndMove/RenderAndMove.project" Active="No"/>
   <Project Name="GameController" Path="GameController/GameController.project" Active="No"/>
   <Project Name="NavigatorPanel" Path="NavigatorPanel/NavigatorPanel.project" Active="No"/>
+  <Project Name="wxWidgetsTest" Path="wxWidgetsTest/wxWidgetsTest.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
-      <Project Name="CncConrollerGui" ConfigName="release2"/>
+      <Project Name="CncConrollerGui" ConfigName="Release"/>
       <Project Name="FreeGlutWorkspace" ConfigName="Release"/>
-      <Project Name="UnitTests" ConfigName="Release"/>
-      <Project Name="RenderAndMove" ConfigName="Release"/>
       <Project Name="GameController" ConfigName="Release"/>
       <Project Name="NavigatorPanel" ConfigName="Release"/>
+      <Project Name="RenderAndMove" ConfigName="Release"/>
+      <Project Name="UnitTests" ConfigName="Release"/>
+      <Project Name="wxWidgetsTest" ConfigName="Release"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
@@ -25,6 +27,7 @@
       <Project Name="RenderAndMove" ConfigName="Debug"/>
       <Project Name="GameController" ConfigName="Debug"/>
       <Project Name="NavigatorPanel" ConfigName="Debug"/>
+      <Project Name="wxWidgetsTest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

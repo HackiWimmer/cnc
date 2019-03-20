@@ -229,7 +229,7 @@ bool CncBinaryTemplateStreamer::appendDataBlock(unsigned char* buffer, uint32_t 
 //////////////////////////////////////////////////////////////////
 bool CncBinaryTemplateStreamer::evaluateSourceContent(DataContainer& dc) {
 //////////////////////////////////////////////////////////////////
-	std::ifstream sourceContent(parameter.SRC.fileName, std::ifstream::in);
+	std::ifstream sourceContent(parameter.SRC.fileName.c_str().AsChar(), std::ifstream::in);
 	
 	wxString content;
 	if ( sourceContent.good() ) {

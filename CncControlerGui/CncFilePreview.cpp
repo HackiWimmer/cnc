@@ -9,6 +9,7 @@
 CncFilePreview::CncFilePreview(wxWindow* parent)
 : CncFilePreviewBase(parent)
 , gcodePreview(NULL)
+, svgPreview(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	installContent();
@@ -22,6 +23,9 @@ void CncFilePreview::installContent() {
 ///////////////////////////////////////////////////////////////////
 	gcodePreview = new CncGCodePreview(this);
 	GblFunc::replaceControl(m_gcodePreviewPlaceholder, gcodePreview);
+	
+	svgPreview = new CncSvgViewer(this);
+	GblFunc::replaceControl(m_svgPreviewPlaceholder, svgPreview);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectEmptyPreview() {
@@ -33,8 +37,8 @@ bool CncFilePreview::selectEmptyPreview() {
 	if ( wxFileName::Exists(fileName) == false )
 		fileName.assign("about:blank");
 	
-	m_svgPreview->LoadURL(fileName);
-	m_svgPreview->Update();
+	svgPreview->loadFile(fileName);
+	svgPreview->Update();
 	
 	return true;
 }
@@ -44,8 +48,8 @@ bool CncFilePreview::selectSVGPreview(const wxString& fileName) {
 	wxASSERT( m_previewBook->GetPageCount() > 0 );
 	m_previewBook->SetSelection(0);
 	
-	m_svgPreview->LoadURL(fileName);
-	m_svgPreview->Update();
+	svgPreview->loadFile(fileName);
+	svgPreview->Update();
 	
 	return true;
 }
@@ -197,7 +201,7 @@ const char* CncFilePreview::getBlankHtmlPage() {
 	wxFileName fn(CncFileNameService::getBlankHtmlPageFileName());
 	std::fstream html;
 	
-	html.open(fn.GetFullPath(), std::ios::out | std::ios::trunc);
+	html.open(fn.GetFullPath().c_str().AsChar(), std::ios::out | std::ios::trunc);
 	if ( html.is_open() ) {
 		
 		html << "<HTML>" << std::endl;
@@ -232,7 +236,7 @@ const char* CncFilePreview::getErrorHtmlPage(const wxString& errorInfo) {
 	if ( errorInfo.IsEmpty() )
 		ei = "No further information available";
 	
-	html.open(fn.GetFullPath(), std::ios::out | std::ios::trunc);
+	html.open(fn.GetFullPath().c_str().AsChar(), std::ios::out | std::ios::trunc);
 	if ( html.is_open() ) {
 		
 		html << "<HTML>" << std::endl;

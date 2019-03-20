@@ -1133,7 +1133,7 @@ void SerialEmulatorNULL::traceSpeedInformation() {
 	if ( speedSimulator->getTraceFlag() == true ) {
 		wxString fn(wxString::Format("c:\\temp\\speed.%s.csv", wxDateTime::Now().Format("%Y%m%d-%H%M%S")));
 		std::filebuf fb;
-		fb.open (fn,std::ios::out);
+		fb.open (fn.c_str().AsChar(), std::ios::out);
 		std::ostream os(&fb);
 		
 		speedSimulator->trace(os);

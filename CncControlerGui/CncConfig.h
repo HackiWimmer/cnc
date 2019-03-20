@@ -4,6 +4,7 @@
 #include <map>
 #include <iostream>
 #include <wx/config.h>
+#include <wx/event.h>
 #include <wx/textentry.h>
 #include <wx/valnum.h>
 #include <wx/combobox.h>
