@@ -826,7 +826,6 @@ protected:
     virtual void moveZToMin(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToTop(wxCommandEvent& event) { event.Skip(); }
     virtual void moveZToBottom(wxCommandEvent& event) { event.Skip(); }
-    virtual void selectManuallyToolId(wxCommandEvent& event) { event.Skip(); }
     virtual void changeManuallySpeedSlider(wxScrollEvent& event) { event.Skip(); }
     virtual void minManuallyXSlider(wxCommandEvent& event) { event.Skip(); }
     virtual void updateMetricX(wxCommandEvent& event) { event.Skip(); }

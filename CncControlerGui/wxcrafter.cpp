@@ -1628,7 +1628,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_rbStepSensitivityArr.Add(_("Medium:"));
     m_rbStepSensitivityArr.Add(_("Rough:"));
     m_rbStepSensitivityArr.Add(_("Roughest:"));
-    m_rbStepSensitivity = new wxRadioBox(m_navigator, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_navigator, wxSize(-1,-1)), m_rbStepSensitivityArr, 1, 0);
+    m_rbStepSensitivity = new wxRadioBox(m_navigator, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_navigator, wxSize(-1,-1)), m_rbStepSensitivityArr, 1, wxRA_SPECIFY_COLS);
     wxFont m_rbStepSensitivityFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_rbStepSensitivity->SetFont(m_rbStepSensitivityFont);
     m_rbStepSensitivity->SetSelection(1);
@@ -4364,7 +4364,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizerPositions->Add(flexGridSizer5638, 0, wxALL, WXC_FROM_DIP(0));
     
     m_xAxis = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,11)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_xAxis->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DDKSHADOW));
+    m_xAxis->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
     m_xAxis->SetForegroundColour(wxColour(wxT("rgb(255,255,255)")));
     wxFont m_xAxisFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_xAxis->SetFont(m_xAxisFont);
@@ -4420,7 +4420,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5639->Add(m_yAxis, 0, wxALL, WXC_FROM_DIP(0));
     m_yAxis->SetMinSize(wxSize(50,11));
     
-    m_yAxisCtl = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,20)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
+    m_yAxisCtl = new wxTextCtrl(m_statusBar, wxID_ANY, wxT("0"), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(50,11)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
     m_yAxisCtl->SetBackgroundColour(wxColour(wxT("rgb(105,105,105)")));
     m_yAxisCtl->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     wxFont m_yAxisCtlFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
@@ -4431,7 +4431,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     #endif
     
     flexGridSizer5639->Add(m_yAxisCtl, 0, wxALL, WXC_FROM_DIP(0));
-    m_yAxisCtl->SetMinSize(wxSize(50,20));
+    m_yAxisCtl->SetMinSize(wxSize(50,11));
     
     m_staticLine6023489 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -4498,7 +4498,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer436->Add(m_staticLine60234, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizerLimit = new wxFlexGridSizer(1, 7, 0, 0);
+    wxFlexGridSizer* flexGridSizerLimit = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizerLimit->SetFlexibleDirection( wxBOTH );
     flexGridSizerLimit->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     
@@ -5738,7 +5738,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_zToMin->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToMin), NULL, this);
     m_zToTop->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
-    m_manuallyToolId->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectManuallyToolId), NULL, this);
     m_manuallySpeedSlider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
@@ -6024,7 +6023,6 @@ MainFrameBClass::~MainFrameBClass()
     m_zToMin->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToMin), NULL, this);
     m_zToTop->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToTop), NULL, this);
     m_zToBottom->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::moveZToBottom), NULL, this);
-    m_manuallyToolId->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectManuallyToolId), NULL, this);
     m_manuallySpeedSlider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
     m_manuallySpeedSlider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(MainFrameBClass::changeManuallySpeedSlider), NULL, this);
@@ -7355,6 +7353,7 @@ CncToolMagazineBase::CncToolMagazineBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer4592->SetFlexibleDirection( wxBOTH );
     flexGridSizer4592->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer4592->AddGrowableCol(0);
+    flexGridSizer4592->AddGrowableRow(0);
     this->SetSizer(flexGridSizer4592);
     
     m_toolMagazine = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,120)), wxLC_VRULES|wxLC_HRULES|wxLC_SINGLE_SEL|wxLC_REPORT|wxALWAYS_SHOW_SB|wxVSCROLL);
@@ -7691,7 +7690,7 @@ CncTemplateObserverBase::CncTemplateObserverBase(wxWindow* parent, wxWindowID id
     m_actionSelectionArr.Add(_("Update/Show Preview"));
     m_actionSelectionArr.Add(_("Process the template  - Auto Run"));
     m_actionSelectionArr.Add(_("Debug the template   - Auto Debug"));
-    m_actionSelection = new wxRadioBox(this, wxID_ANY, _("Actions to be done .  .  ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_actionSelectionArr, 1, 0);
+    m_actionSelection = new wxRadioBox(this, wxID_ANY, _("Actions to be done .  .  ."), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_actionSelectionArr, 1, wxRA_SPECIFY_COLS);
     wxFont m_actionSelectionFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_actionSelection->SetFont(m_actionSelectionFont);
     m_actionSelection->SetSelection(1);
@@ -9115,7 +9114,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     m_rbStepSensitivityArr.Add(_("Medium:"));
     m_rbStepSensitivityArr.Add(_("Rough:"));
     m_rbStepSensitivityArr.Add(_("Roughest:"));
-    m_rbStepSensitivity = new wxRadioBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_rbStepSensitivityArr, 1, 0);
+    m_rbStepSensitivity = new wxRadioBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_rbStepSensitivityArr, 1, wxRA_SPECIFY_COLS);
     wxFont m_rbStepSensitivityFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_rbStepSensitivity->SetFont(m_rbStepSensitivityFont);
     m_rbStepSensitivity->SetSelection(1);

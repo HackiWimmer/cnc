@@ -2714,7 +2714,7 @@ Panel</label>
                                               <border>1</border>
                                               <object class="wxRadioBox" name="m_rbStepSensitivity">
                                                 <label/>
-                                                <style/>
+                                                <style>wxRA_SPECIFY_COLS</style>
                                                 <font>
                                                   <size>8</size>
                                                   <style>normal</style>
@@ -7615,7 +7615,7 @@ State</label>
                       <object class="wxTextCtrl" name="m_xAxis">
                         <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
                         <size>50,11</size>
-                        <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+                        <bg>#696969</bg>
                         <fg>#FFFFFF</fg>
                         <font>
                           <size>8</size>
@@ -7714,10 +7714,10 @@ State</label>
                     </object>
                     <object class="sizeritem">
                       <flag>wxALL</flag>
-                      <minsize>50,20</minsize>
+                      <minsize>50,11</minsize>
                       <object class="wxTextCtrl" name="m_yAxisCtl">
                         <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
-                        <size>50,20</size>
+                        <size>50,11</size>
                         <bg>#696969</bg>
                         <fg>wxSYS_COLOUR_INACTIVECAPTION</fg>
                         <font>
@@ -7867,7 +7867,7 @@ State</label>
               <flag>wxALL</flag>
               <border>2</border>
               <object class="wxFlexGridSizer">
-                <cols>7</cols>
+                <cols>2</cols>
                 <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
@@ -10897,7 +10897,7 @@ State</label>
       <vgap>0</vgap>
       <hgap>0</hgap>
       <growablecols>0</growablecols>
-      <growablerows/>
+      <growablerows>0</growablerows>
       <object class="sizeritem">
         <flag>wxALL|wxEXPAND</flag>
         <border>1</border>
@@ -11408,7 +11408,7 @@ as readonly</label>
                 <border>5</border>
                 <object class="wxRadioBox" name="m_actionSelection">
                   <label>Actions to be done .  .  .</label>
-                  <style/>
+                  <style>wxRA_SPECIFY_COLS</style>
                   <font>
                     <size>9</size>
                     <style>normal</style>
@@ -13249,7 +13249,7 @@ as readonly</label>
                             <border>1</border>
                             <object class="wxRadioBox" name="m_rbStepSensitivity">
                               <label/>
-                              <style/>
+                              <style>wxRA_SPECIFY_COLS</style>
                               <font>
                                 <size>8</size>
                                 <style>normal</style>

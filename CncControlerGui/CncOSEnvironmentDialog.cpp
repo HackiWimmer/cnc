@@ -106,8 +106,16 @@ void CncOSEnvironmentDialog::evaluateLoadedModules() {
 	
 	wxDynamicLibraryDetailsArray modules = wxDynamicLibrary::ListLoaded();
 	const size_t count = modules.size();
-	if ( count <= 0 )
+	if ( count <= 0 ) {
+		unsigned int index = m_moduleList->GetItemCount();
+		m_moduleList->InsertItem(index, "");
+		m_moduleList->SetItem(index, MOD_COL_ADDR, 		"");
+		m_moduleList->SetItem(index, MOD_COL_NAME, 		"");
+		m_moduleList->SetItem(index, MOD_COL_VERSION, 	"");
+		m_moduleList->SetItem(index, MOD_COL_PATH, 		"Unable to evaluate loaded modules!");
+		
 		return;
+	}
 	
 	wxSortedArrayString keys;
 	const char separator = '|';

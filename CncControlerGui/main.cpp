@@ -414,7 +414,7 @@ class MainApp : public wxApp {
 					  << "  Stacktrace:"
 					  << std::endl;
 					  
-			GblFunc::stacktrace(std::cerr);
+			//GblFunc::stacktrace(std::cerr);
 		}
 		
 		///////////////////////////////////////////////////////////

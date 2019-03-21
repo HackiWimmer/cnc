@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=20/03/2019
+Date                   :=21/03/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/msys64/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
@@ -61,25 +61,25 @@ AS       := C:/msys64/mingw64/bin/as.exe
 ##
 ## User defined environment variables
 ##
-Objects0=$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgGeneratorBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGenerators_PGenPolygon.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgAccelerationGraph.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathString.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgGeneralPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgGCodeOptionPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGNodeParser.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/SVGFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_CncTimeFunctions.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_CncUsbPortScanner.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgEditPopup.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorTextStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathGroup.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorSvgStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorGCodeStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_SerialMsw.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextTestCube.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/3D_GLContextCncPath.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLViewPort.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgViewBox.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_SerialGtk.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextPathBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLLabelCluser.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLCncPathData.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerGL.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/OSD_CncAsyncKeyboardState.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeField.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgEnvironmentPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/ManuallyPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeCommands.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncBinaryTemplateStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/BinaryPathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamePadMsw.cpp$(ObjectSuffix) $(IntermediateDirectory)/FileParser.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/CncStatisticSummaryListCtrl.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/SvgGeneratorBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGenerators_PGenPolygon.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgAccelerationGraph.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathString.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgGeneralPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgGCodeOptionPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGNodeParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGFileParser.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/OSD_CncTimeFunctions.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_CncUsbPortScanner.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgEditPopup.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorTextStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathGroup.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorSvgStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorGCodeStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_SerialMsw.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextTestCube.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextCncPath.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/3D_GLViewPort.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgViewBox.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_SerialGtk.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextPathBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLLabelCluser.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLCncPathData.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerGL.cpp$(ObjectSuffix) $(IntermediateDirectory)/OSD_CncAsyncKeyboardState.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeField.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/CfgEnvironmentPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/ManuallyPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeCommands.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncBinaryTemplateStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/BinaryPathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamePadMsw.cpp$(ObjectSuffix) $(IntermediateDirectory)/FileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncStatisticSummaryListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix) \
+	
 
-Objects1=$(IntermediateDirectory)/BinaryFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncCurveLib.cpp$(ObjectSuffix) $(IntermediateDirectory)/Clipper_clipper.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncStatisticsPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncReferencePosition.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPosition.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncTemplateObserver.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncNavigatorPanel.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialSpyPort.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeBlock.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncUsbConnectionDetected.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialPort.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncOutboundEditor.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_CncGCodePreview.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamePad.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathFragment.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/CfgSVGOptionPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSourceEditor.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSvgControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolCorrection.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMessageDialog.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncFilePreview.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncBaseEditor.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgApplicationPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/GL3DDrawPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) \
-	$(IntermediateDirectory)/CncConfig.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolMagazine.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/Gl3DOptionPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorNull.cpp$(ObjectSuffix) $(IntermediateDirectory)/main.cpp$(ObjectSuffix) $(IntermediateDirectory)/HexDecoder.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/PgPropertyHelpInfos.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMonitorSplitterWindow.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncConfigProperty.cpp$(ObjectSuffix) 
+Objects1=$(IntermediateDirectory)/BinaryFileParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncCurveLib.cpp$(ObjectSuffix) $(IntermediateDirectory)/Clipper_clipper.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncStatisticsPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncReferencePosition.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPosition.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncTemplateObserver.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncNavigatorPanel.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialSpyPort.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodeBlock.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncUsbConnectionDetected.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialPort.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncOutboundEditor.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_CncGCodePreview.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamePad.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgPathFragment.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/CfgWorkingPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CfgSVGOptionPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSourceEditor.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSvgControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolCorrection.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMessageDialog.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncFilePreview.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncBaseEditor.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/CfgApplicationPage.cpp$(ObjectSuffix) $(IntermediateDirectory)/GL3DDrawPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/win_resources.rc$(ObjectSuffix) $(IntermediateDirectory)/CncConfig.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolMagazine.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/Gl3DOptionPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/SerialEmulatorNull.cpp$(ObjectSuffix) $(IntermediateDirectory)/main.cpp$(ObjectSuffix) \
+	
 
-Objects2=$(IntermediateDirectory)/3D_GLLineCluster.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncClipperWrapper.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSpeedSimulator.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncNumberFormatter.cpp$(ObjectSuffix) $(IntermediateDirectory)/SVGPathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncArduino.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncControl.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/ManuallyParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncFileNameService.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolStateControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgUnitCalculator.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamepadControllerState.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorStore.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMotionMonitor.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncConnectProgress.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncUnitCalculator.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncStreamBuffers.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/GlobalFunctions.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncCommon.cpp$(ObjectSuffix) $(IntermediateDirectory)/BinaryPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPathListManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/Tests_Test_Base.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncFileView.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSecureRun.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncFilePreviewWnd.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSummaryListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/GamepadThread.cpp$(ObjectSuffix) $(IntermediateDirectory)/MainFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPosSpyListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/UpdateManagerThread.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_CncGLCanvas.cpp$(ObjectSuffix) $(IntermediateDirectory)/Codelite_wxPNGAnimation.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncLargeScaleListCtrl.cpp$(ObjectSuffix) \
-	$(IntermediateDirectory)/sha1.cpp$(ObjectSuffix) $(IntermediateDirectory)/DataControlModel.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/UnitTestFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSpyControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncOSDConfigList.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextGCodePreview.cpp$(ObjectSuffix) 
+Objects2=$(IntermediateDirectory)/HexDecoder.cpp$(ObjectSuffix) $(IntermediateDirectory)/PgPropertyHelpInfos.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMonitorSplitterWindow.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncConfigProperty.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLLineCluster.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncClipperWrapper.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSpeedSimulator.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncNumberFormatter.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/SVGPathHandlerBase.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncArduino.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/ManuallyParser.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncFileNameService.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncToolStateControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/SvgUnitCalculator.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncGamepadControllerState.cpp$(ObjectSuffix) $(IntermediateDirectory)/PathGeneratorStore.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMotionMonitor.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/CncConnectProgress.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncUnitCalculator.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncStreamBuffers.cpp$(ObjectSuffix) $(IntermediateDirectory)/GlobalFunctions.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncCommon.cpp$(ObjectSuffix) $(IntermediateDirectory)/BinaryPathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPathListManager.cpp$(ObjectSuffix) $(IntermediateDirectory)/Tests_Test_Base.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncFileView.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSecureRun.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/CncFilePreviewWnd.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSummaryListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(ObjectSuffix) $(IntermediateDirectory)/GamepadThread.cpp$(ObjectSuffix) $(IntermediateDirectory)/MainFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncPosSpyListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/UpdateManagerThread.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_CncGLCanvas.cpp$(ObjectSuffix) $(IntermediateDirectory)/Codelite_wxPNGAnimation.cpp$(ObjectSuffix) \
+	$(IntermediateDirectory)/CncLargeScaleListCtrl.cpp$(ObjectSuffix) $(IntermediateDirectory)/sha1.cpp$(ObjectSuffix) $(IntermediateDirectory)/DataControlModel.cpp$(ObjectSuffix) $(IntermediateDirectory)/GCodePathHandlerCnc.cpp$(ObjectSuffix) $(IntermediateDirectory)/UnitTestFrame.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSpyControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncOSDConfigList.cpp$(ObjectSuffix) $(IntermediateDirectory)/3D_GLContextGCodePreview.cpp$(ObjectSuffix) 
 
-Objects3=$(IntermediateDirectory)/SVGElementConverter.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMouseRemoteControl.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix) \
+Objects3=$(IntermediateDirectory)/SVGElementConverter.cpp$(ObjectSuffix) $(IntermediateDirectory)/CncMouseRemoteControl.cpp$(ObjectSuffix) \
 	
 
 
@@ -118,14 +118,6 @@ PreBuild:
 ##
 ## Objects
 ##
-$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix): CncOSEnvironmentDialog.cpp $(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncOSEnvironmentDialog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(DependSuffix): CncOSEnvironmentDialog.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(DependSuffix) -MM CncOSEnvironmentDialog.cpp
-
-$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(PreprocessSuffix): CncOSEnvironmentDialog.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(PreprocessSuffix) CncOSEnvironmentDialog.cpp
-
 $(IntermediateDirectory)/SvgGeneratorBase.cpp$(ObjectSuffix): SvgGeneratorBase.cpp $(IntermediateDirectory)/SvgGeneratorBase.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SvgGeneratorBase.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SvgGeneratorBase.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/SvgGeneratorBase.cpp$(DependSuffix): SvgGeneratorBase.cpp
@@ -350,14 +342,6 @@ $(IntermediateDirectory)/GCodePathHandlerGL.cpp$(DependSuffix): GCodePathHandler
 $(IntermediateDirectory)/GCodePathHandlerGL.cpp$(PreprocessSuffix): GCodePathHandlerGL.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/GCodePathHandlerGL.cpp$(PreprocessSuffix) GCodePathHandlerGL.cpp
 
-$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix): GCodePathHandlerBase.cpp $(IntermediateDirectory)/GCodePathHandlerBase.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/GCodePathHandlerBase.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(DependSuffix): GCodePathHandlerBase.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(DependSuffix) -MM GCodePathHandlerBase.cpp
-
-$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(PreprocessSuffix): GCodePathHandlerBase.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/GCodePathHandlerBase.cpp$(PreprocessSuffix) GCodePathHandlerBase.cpp
-
 $(IntermediateDirectory)/OSD_CncAsyncKeyboardState.cpp$(ObjectSuffix): OSD/CncAsyncKeyboardState.cpp $(IntermediateDirectory)/OSD_CncAsyncKeyboardState.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/OSD/CncAsyncKeyboardState.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/OSD_CncAsyncKeyboardState.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/OSD_CncAsyncKeyboardState.cpp$(DependSuffix): OSD/CncAsyncKeyboardState.cpp
@@ -446,6 +430,14 @@ $(IntermediateDirectory)/CncStatisticSummaryListCtrl.cpp$(DependSuffix): CncStat
 $(IntermediateDirectory)/CncStatisticSummaryListCtrl.cpp$(PreprocessSuffix): CncStatisticSummaryListCtrl.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncStatisticSummaryListCtrl.cpp$(PreprocessSuffix) CncStatisticSummaryListCtrl.cpp
 
+$(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix): CncSetterListCtrl.cpp $(IntermediateDirectory)/CncSetterListCtrl.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncSetterListCtrl.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/CncSetterListCtrl.cpp$(DependSuffix): CncSetterListCtrl.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncSetterListCtrl.cpp$(DependSuffix) -MM CncSetterListCtrl.cpp
+
+$(IntermediateDirectory)/CncSetterListCtrl.cpp$(PreprocessSuffix): CncSetterListCtrl.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncSetterListCtrl.cpp$(PreprocessSuffix) CncSetterListCtrl.cpp
+
 $(IntermediateDirectory)/BinaryFileParser.cpp$(ObjectSuffix): BinaryFileParser.cpp $(IntermediateDirectory)/BinaryFileParser.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/BinaryFileParser.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/BinaryFileParser.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/BinaryFileParser.cpp$(DependSuffix): BinaryFileParser.cpp
@@ -478,14 +470,6 @@ $(IntermediateDirectory)/CncStatisticsPane.cpp$(DependSuffix): CncStatisticsPane
 $(IntermediateDirectory)/CncStatisticsPane.cpp$(PreprocessSuffix): CncStatisticsPane.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncStatisticsPane.cpp$(PreprocessSuffix) CncStatisticsPane.cpp
 
-$(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix): CncCommandDecoder.cpp $(IntermediateDirectory)/CncCommandDecoder.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncCommandDecoder.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/CncCommandDecoder.cpp$(DependSuffix): CncCommandDecoder.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncCommandDecoder.cpp$(DependSuffix) -MM CncCommandDecoder.cpp
-
-$(IntermediateDirectory)/CncCommandDecoder.cpp$(PreprocessSuffix): CncCommandDecoder.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncCommandDecoder.cpp$(PreprocessSuffix) CncCommandDecoder.cpp
-
 $(IntermediateDirectory)/CncReferencePosition.cpp$(ObjectSuffix): CncReferencePosition.cpp $(IntermediateDirectory)/CncReferencePosition.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncReferencePosition.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncReferencePosition.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/CncReferencePosition.cpp$(DependSuffix): CncReferencePosition.cpp
@@ -510,6 +494,14 @@ $(IntermediateDirectory)/CncTemplateObserver.cpp$(DependSuffix): CncTemplateObse
 $(IntermediateDirectory)/CncTemplateObserver.cpp$(PreprocessSuffix): CncTemplateObserver.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncTemplateObserver.cpp$(PreprocessSuffix) CncTemplateObserver.cpp
 
+$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix): SerialEmulatorBinaryStreamer.cpp $(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SerialEmulatorBinaryStreamer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(DependSuffix): SerialEmulatorBinaryStreamer.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(DependSuffix) -MM SerialEmulatorBinaryStreamer.cpp
+
+$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(PreprocessSuffix): SerialEmulatorBinaryStreamer.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(PreprocessSuffix) SerialEmulatorBinaryStreamer.cpp
+
 $(IntermediateDirectory)/CncNavigatorPanel.cpp$(ObjectSuffix): CncNavigatorPanel.cpp $(IntermediateDirectory)/CncNavigatorPanel.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncNavigatorPanel.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncNavigatorPanel.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/CncNavigatorPanel.cpp$(DependSuffix): CncNavigatorPanel.cpp
@@ -518,13 +510,29 @@ $(IntermediateDirectory)/CncNavigatorPanel.cpp$(DependSuffix): CncNavigatorPanel
 $(IntermediateDirectory)/CncNavigatorPanel.cpp$(PreprocessSuffix): CncNavigatorPanel.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncNavigatorPanel.cpp$(PreprocessSuffix) CncNavigatorPanel.cpp
 
-$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix): SerialEmulatorBinaryStreamer.cpp $(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SerialEmulatorBinaryStreamer.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(DependSuffix): SerialEmulatorBinaryStreamer.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(DependSuffix) -MM SerialEmulatorBinaryStreamer.cpp
+$(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix): CncCommandDecoder.cpp $(IntermediateDirectory)/CncCommandDecoder.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncCommandDecoder.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/CncCommandDecoder.cpp$(DependSuffix): CncCommandDecoder.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncCommandDecoder.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncCommandDecoder.cpp$(DependSuffix) -MM CncCommandDecoder.cpp
 
-$(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(PreprocessSuffix): SerialEmulatorBinaryStreamer.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/SerialEmulatorBinaryStreamer.cpp$(PreprocessSuffix) SerialEmulatorBinaryStreamer.cpp
+$(IntermediateDirectory)/CncCommandDecoder.cpp$(PreprocessSuffix): CncCommandDecoder.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncCommandDecoder.cpp$(PreprocessSuffix) CncCommandDecoder.cpp
+
+$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix): GCodePathHandlerBase.cpp $(IntermediateDirectory)/GCodePathHandlerBase.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/GCodePathHandlerBase.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(DependSuffix): GCodePathHandlerBase.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(DependSuffix) -MM GCodePathHandlerBase.cpp
+
+$(IntermediateDirectory)/GCodePathHandlerBase.cpp$(PreprocessSuffix): GCodePathHandlerBase.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/GCodePathHandlerBase.cpp$(PreprocessSuffix) GCodePathHandlerBase.cpp
+
+$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix): CncOSEnvironmentDialog.cpp $(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncOSEnvironmentDialog.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(DependSuffix): CncOSEnvironmentDialog.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(DependSuffix) -MM CncOSEnvironmentDialog.cpp
+
+$(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(PreprocessSuffix): CncOSEnvironmentDialog.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncOSEnvironmentDialog.cpp$(PreprocessSuffix) CncOSEnvironmentDialog.cpp
 
 $(IntermediateDirectory)/SerialSpyPort.cpp$(ObjectSuffix): SerialSpyPort.cpp $(IntermediateDirectory)/SerialSpyPort.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SerialSpyPort.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SerialSpyPort.cpp$(ObjectSuffix) $(IncludePath)
@@ -654,6 +662,22 @@ $(IntermediateDirectory)/CncBaseEditor.cpp$(DependSuffix): CncBaseEditor.cpp
 $(IntermediateDirectory)/CncBaseEditor.cpp$(PreprocessSuffix): CncBaseEditor.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncBaseEditor.cpp$(PreprocessSuffix) CncBaseEditor.cpp
 
+$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix): CncVectiesListCtrl.cpp $(IntermediateDirectory)/CncVectiesListCtrl.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncVectiesListCtrl.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(DependSuffix): CncVectiesListCtrl.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(DependSuffix) -MM CncVectiesListCtrl.cpp
+
+$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(PreprocessSuffix): CncVectiesListCtrl.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncVectiesListCtrl.cpp$(PreprocessSuffix) CncVectiesListCtrl.cpp
+
+$(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix): CncZView.cpp $(IntermediateDirectory)/CncZView.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncZView.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/CncZView.cpp$(DependSuffix): CncZView.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncZView.cpp$(DependSuffix) -MM CncZView.cpp
+
+$(IntermediateDirectory)/CncZView.cpp$(PreprocessSuffix): CncZView.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncZView.cpp$(PreprocessSuffix) CncZView.cpp
+
 $(IntermediateDirectory)/CfgApplicationPage.cpp$(ObjectSuffix): CfgApplicationPage.cpp $(IntermediateDirectory)/CfgApplicationPage.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CfgApplicationPage.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CfgApplicationPage.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/CfgApplicationPage.cpp$(DependSuffix): CfgApplicationPage.cpp
@@ -712,22 +736,6 @@ $(IntermediateDirectory)/Gl3DOptionPane.cpp$(DependSuffix): Gl3DOptionPane.cpp
 $(IntermediateDirectory)/Gl3DOptionPane.cpp$(PreprocessSuffix): Gl3DOptionPane.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/Gl3DOptionPane.cpp$(PreprocessSuffix) Gl3DOptionPane.cpp
 
-$(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix): CncPerspective.cpp $(IntermediateDirectory)/CncPerspective.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncPerspective.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/CncPerspective.cpp$(DependSuffix): CncPerspective.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncPerspective.cpp$(DependSuffix) -MM CncPerspective.cpp
-
-$(IntermediateDirectory)/CncPerspective.cpp$(PreprocessSuffix): CncPerspective.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncPerspective.cpp$(PreprocessSuffix) CncPerspective.cpp
-
-$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix): CncMonitorReplayPane.cpp $(IntermediateDirectory)/CncMonitorReplayPane.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncMonitorReplayPane.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(DependSuffix): CncMonitorReplayPane.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(DependSuffix) -MM CncMonitorReplayPane.cpp
-
-$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(PreprocessSuffix): CncMonitorReplayPane.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncMonitorReplayPane.cpp$(PreprocessSuffix) CncMonitorReplayPane.cpp
-
 $(IntermediateDirectory)/SerialEmulatorNull.cpp$(ObjectSuffix): SerialEmulatorNull.cpp $(IntermediateDirectory)/SerialEmulatorNull.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/SerialEmulatorNull.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/SerialEmulatorNull.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/SerialEmulatorNull.cpp$(DependSuffix): SerialEmulatorNull.cpp
@@ -775,6 +783,22 @@ $(IntermediateDirectory)/CncConfigProperty.cpp$(DependSuffix): CncConfigProperty
 
 $(IntermediateDirectory)/CncConfigProperty.cpp$(PreprocessSuffix): CncConfigProperty.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncConfigProperty.cpp$(PreprocessSuffix) CncConfigProperty.cpp
+
+$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix): CncMonitorReplayPane.cpp $(IntermediateDirectory)/CncMonitorReplayPane.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncMonitorReplayPane.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(DependSuffix): CncMonitorReplayPane.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(DependSuffix) -MM CncMonitorReplayPane.cpp
+
+$(IntermediateDirectory)/CncMonitorReplayPane.cpp$(PreprocessSuffix): CncMonitorReplayPane.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncMonitorReplayPane.cpp$(PreprocessSuffix) CncMonitorReplayPane.cpp
+
+$(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix): CncPerspective.cpp $(IntermediateDirectory)/CncPerspective.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncPerspective.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/CncPerspective.cpp$(DependSuffix): CncPerspective.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncPerspective.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncPerspective.cpp$(DependSuffix) -MM CncPerspective.cpp
+
+$(IntermediateDirectory)/CncPerspective.cpp$(PreprocessSuffix): CncPerspective.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncPerspective.cpp$(PreprocessSuffix) CncPerspective.cpp
 
 $(IntermediateDirectory)/3D_GLLineCluster.cpp$(ObjectSuffix): 3D/GLLineCluster.cpp $(IntermediateDirectory)/3D_GLLineCluster.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLLineCluster.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/3D_GLLineCluster.cpp$(ObjectSuffix) $(IncludePath)
@@ -976,22 +1000,6 @@ $(IntermediateDirectory)/CncFilePreviewWnd.cpp$(DependSuffix): CncFilePreviewWnd
 $(IntermediateDirectory)/CncFilePreviewWnd.cpp$(PreprocessSuffix): CncFilePreviewWnd.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncFilePreviewWnd.cpp$(PreprocessSuffix) CncFilePreviewWnd.cpp
 
-$(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix): CncZView.cpp $(IntermediateDirectory)/CncZView.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncZView.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/CncZView.cpp$(DependSuffix): CncZView.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncZView.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncZView.cpp$(DependSuffix) -MM CncZView.cpp
-
-$(IntermediateDirectory)/CncZView.cpp$(PreprocessSuffix): CncZView.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncZView.cpp$(PreprocessSuffix) CncZView.cpp
-
-$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix): CncVectiesListCtrl.cpp $(IntermediateDirectory)/CncVectiesListCtrl.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncVectiesListCtrl.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(DependSuffix): CncVectiesListCtrl.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(DependSuffix) -MM CncVectiesListCtrl.cpp
-
-$(IntermediateDirectory)/CncVectiesListCtrl.cpp$(PreprocessSuffix): CncVectiesListCtrl.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncVectiesListCtrl.cpp$(PreprocessSuffix) CncVectiesListCtrl.cpp
-
 $(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix): wxcrafter.cpp $(IntermediateDirectory)/wxcrafter.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/wxcrafter.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/wxcrafter.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/wxcrafter.cpp$(DependSuffix): wxcrafter.cpp
@@ -1143,14 +1151,6 @@ $(IntermediateDirectory)/CncMouseRemoteControl.cpp$(DependSuffix): CncMouseRemot
 
 $(IntermediateDirectory)/CncMouseRemoteControl.cpp$(PreprocessSuffix): CncMouseRemoteControl.cpp
 	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncMouseRemoteControl.cpp$(PreprocessSuffix) CncMouseRemoteControl.cpp
-
-$(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix): CncSetterListCtrl.cpp $(IntermediateDirectory)/CncSetterListCtrl.cpp$(DependSuffix)
-	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/CncSetterListCtrl.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix) $(IncludePath)
-$(IntermediateDirectory)/CncSetterListCtrl.cpp$(DependSuffix): CncSetterListCtrl.cpp
-	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/CncSetterListCtrl.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/CncSetterListCtrl.cpp$(DependSuffix) -MM CncSetterListCtrl.cpp
-
-$(IntermediateDirectory)/CncSetterListCtrl.cpp$(PreprocessSuffix): CncSetterListCtrl.cpp
-	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/CncSetterListCtrl.cpp$(PreprocessSuffix) CncSetterListCtrl.cpp
 
 
 -include $(IntermediateDirectory)/*$(DependSuffix)

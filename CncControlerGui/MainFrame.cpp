@@ -652,8 +652,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_manuallyCorrectLimitPos);
 	registerGuiControl(m_rcSecureDlg);
 	registerGuiControl(m_btSpeedControl);
-	registerGuiControl(m_removeTemplate);
-	registerGuiControl(m_renameTemplate);
 	registerGuiControl(m_btProbeMode);
 	registerGuiControl(m_btSelectReferences);
 	registerGuiControl(m_btSelectManuallyMove);
@@ -701,16 +699,12 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_zeroMoveModeZ);
 	registerGuiControl(m_clearLogger);
 	registerGuiControl(m_displayInterval);
-	registerGuiControl(m_reloadTemplate);
-	registerGuiControl(m_openSourceExtern);
-	registerGuiControl(m_openSvgExtern);
 	registerGuiControl(m_btRequestCtlConfig);
 	registerGuiControl(m_btRequestControllerPins);
 	registerGuiControl(m_lruList);
 	registerGuiControl(m_copyLogger);
 	registerGuiControl(m_btSvgToggleWordWrap);
 	registerGuiControl(m_switchMonitoing);
-	registerGuiControl(m_saveTemplate);
 	registerGuiControl(m_testCountX);
 	registerGuiControl(m_testCountY);
 	registerGuiControl(m_testCountZ);
@@ -747,6 +741,15 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_mmRadioCoordinates);
 	
 	//...
+	
+	// already managed by sourceEditor
+	//registerGuiControl(m_openSourceExtern);
+	//registerGuiControl(m_openSvgExtern);
+	//registerGuiControl(m_saveTemplate);
+	//registerGuiControl(m_reloadTemplate);
+	//registerGuiControl(m_removeTemplate);
+	//registerGuiControl(m_renameTemplate);
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::displayNotification(const char type, wxString title, wxString message, unsigned int timeout) {
@@ -801,6 +804,10 @@ void MainFrame::testFunction3(wxCommandEvent& event) {
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
+		
+	toggleMotionMonitorOptionPane(true);
+	toggleMotionMonitorStatisticPane(true);
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
@@ -845,8 +852,6 @@ void MainFrame::traceBoostVersion(std::ostream& out) {
 void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 	out << " :: Programm version info: " 
-		<< globalStrings.programTitel 
-		<< " "
 		<< globalStrings.programVersion
 		<< std::endl;
 }
@@ -862,6 +867,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	traceGccVersion(std::cout);
 	traceWxWidgetsVersion(std::cout);
 	traceBoostVersion(std::cout);
+	
 	GLContextBase::traceOpenGLVersionInfo(std::cout);
 	traceWoodworkingCncVersion(std::cout);
 	traceSessionId();
@@ -871,12 +877,24 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
 		connectSerialPortDialog();
 		
+	// wait intil the main windows is shown
+	// this is with respect to the toggle* calls below
+	{
+		while ( IsShown() == false )
+			dispatchAll();
+			
+		// GTK specific: This is to hide the correponding windows
+		toggleMotionMonitorOptionPane(true);
+		toggleMotionMonitorStatisticPane(true);
+	}
+		
 	// Auto process ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
 		defineMinMonitoring();
 		processTemplateWrapper();
 		defineNormalMonitoring();
 	}
+
 
 	//todo - only temp
 	//wxCommandEvent dummy;
@@ -1531,6 +1549,14 @@ void MainFrame::initializeGamepadThread() {
 	
 	activateGamepadNotifications(true);
 }
+/*
+///////////////////////////////////////////////////////////////////
+bool MainFrame::Show(bool show) {
+///////////////////////////////////////////////////////////////////
+	MainFrameBClass::Show(show);
+		
+	std::cout << "adsadasdasdasd\n";
+}*/
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
@@ -1912,7 +1938,7 @@ bool MainFrame::connectSerialPort() {
 	selectSerialSpyMode();
 	
 	lastPortName.clear();
-
+	
 	bool ret = false;
 	if ( (ret = cnc->connect(serialFileName)) == true )  {
 		lastPortName.assign(sel);
@@ -3471,7 +3497,7 @@ void MainFrame::updateSetterList() {
 		wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 		updateManagerThread->Resume();
 	}
-		
+	
 	if ( setterList->IsFrozen() == false )
 		setterList->Freeze();
 		
@@ -3489,7 +3515,7 @@ void MainFrame::updateSetterList() {
 	if ( setterList->IsFrozen() == true )
 		setterList->Thaw();
 
-	m_setterListCount->SetValue(wxString::Format("# %ld", setterList->GetItemCount()));
+	m_setterListCount->SetValue(wxString::Format("# %ld", (long)setterList->GetItemCount()));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
@@ -7143,7 +7169,8 @@ void MainFrame::traceSessionId(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::traceSessionId() {
 /////////////////////////////////////////////////////////////////////
-	std::clog << " Woodworking Session ID: " << CncFileNameService::getSession() << std::endl;
+	std::clog << "Woodworking Session:" << std::endl;
+	std::cout << " :: ID: " << CncFileNameService::getSession() << std::endl;
 }
 /////////////////////////////////////////////////////////////////////
 BinaryFileParser::ViewType MainFrame::getCurrentBinaryViewMode() {
@@ -7323,7 +7350,7 @@ void MainFrame::toggleMotionMonitorStatisticPane(wxCommandEvent& event) {
 void MainFrame::toggleMotionMonitorOptionPane(bool forceHide) {
 /////////////////////////////////////////////////////////////////////
 	if ( cnc3DVSplitterWindow != NULL )
-		cnc3DVSplitterWindow->toggleRightWindow();
+		forceHide == true ? cnc3DVSplitterWindow->hideRightWindow() : cnc3DVSplitterWindow->toggleRightWindow();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::toggleMotionMonitorStatisticPane(bool forceHide) {
@@ -7339,10 +7366,10 @@ void MainFrame::toggleMotionMonitorStatisticPane(bool forceHide) {
 			cnc3DHSplitterWindow->hideBottomWindow();
 			
 			if ( nc != cc)
-				cnc3DHSplitterWindow->showBottomWindow();
+				forceHide == true ? cnc3DHSplitterWindow->hideBottomWindow() : cnc3DHSplitterWindow->showBottomWindow();
 				
 		} else {
-			cnc3DHSplitterWindow->toggleBottomWindow();
+			forceHide == true ? cnc3DHSplitterWindow->hideBottomWindow() : cnc3DHSplitterWindow->toggleBottomWindow();
 			
 		}
 	}
@@ -7420,14 +7447,4 @@ void MainFrame::showOSEnvironment(wxCommandEvent& event) {
 	CncOSEnvironmentDialog dlg(this);
 	dlg.ShowModal();
 }
-
-
-
-
-void MainFrame::selectManuallyToolId(wxCommandEvent& event)
-{
-	#warning selectManuallyToolId - can may be removed
-	std::cout << "todo" << std::endl;
-}
-
 

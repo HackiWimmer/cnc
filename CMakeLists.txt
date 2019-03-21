@@ -114,6 +114,7 @@ set(SOURCE_FILES
         CncControlerGui/OSD/CncTimeFunctions.cpp
         CncControlerGui/3D/CncGCodePreview.cpp
         CncControlerGui/3D/CncGCodePreview.h
+        CncControlerGui/3D/GLCncPathData.cpp
         CncControlerGui/3D/GLCncPathData.h
         CncControlerGui/3D/GLContextBase.cpp
         CncControlerGui/3D/GLContextBase.h
@@ -245,6 +246,7 @@ set(SOURCE_FILES
         CncControlerGui/GlobalFunctions.cpp
         CncControlerGui/GlobalFunctions.h
         CncControlerGui/GuiControlSetup.h
+        CncControlerGui/HexDecoder.cpp
         CncControlerGui/HexDecoder.h
         CncControlerGui/LinearFunc.h
         CncControlerGui/LruFileList.h
@@ -267,7 +269,6 @@ set(SOURCE_FILES
         CncControlerGui/PenHandler.h
         CncControlerGui/PgPropertyHelpInfos.cpp
         CncControlerGui/PointAbs.h
-        CncControlerGui/SerialData.h
         CncControlerGui/CncPerspective.cpp
         CncControlerGui/CncPerspective.h
         CncControlerGui/OSD/CncAsyncKeyboardState.cpp
@@ -341,11 +342,18 @@ set(SOURCE_FILES
         CncControlerGui/sha1.cpp
         CncControlerGui/GL3DOptionPane.cpp
         CncControlerGui/GL3DDrawPane.cpp
-		CncControlerGui/SecureRun.cpp
+		CncControlerGui/CncSecureRun.cpp
         CncControlerGui/BinaryPathHandlerBase.cpp
         CncControlerGui/BinaryPathHandlerCnc.cpp
 		CncControlerGui/CncCommandDecoder.cpp
 		CncControlerGui/CncOSDConfigList.cpp
+		CncControlerGui/CncTemplateObserver.cpp
+		CncControlerGui/CncMonitorReplayPane.cpp
+		CncControlerGui/CncStatisticsPane.cpp
+		CncControlerGui/CncMouseRemoteControl.cpp
+		CncControlerGui/CncNavigatorPanel.cpp
+		CncControlerGui/CncOSEnvironmentDialog.cpp
+		CncControlerGui/CncSvgControl.cpp
 	    CncControlerGui/wxcrafter_bitmaps.cpp)
 
 

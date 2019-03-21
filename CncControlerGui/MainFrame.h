@@ -139,7 +139,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void rcSecureDlg(wxCommandEvent& event);
 		virtual void updatedSpeedConfigSteps(wxCommandEvent& event);
 		virtual void changeSpeedConfigSlider(wxScrollEvent& event);
-		virtual void selectManuallyToolId(wxCommandEvent& event);
 		virtual void leaveSerialSpy(wxMouseEvent& event);
 		virtual void changeConfigToolbook(wxToolbookEvent& event);
 		virtual void warmStartController(wxCommandEvent& event);

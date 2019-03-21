@@ -445,7 +445,11 @@
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_69_0"/>
         <IncludePath Value="C:/@Development/freeglut/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.16/include"/>
         <Preprocessor Value="DEBUG"/>
+        <Preprocessor Value="APP_USE_SPLASH"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_ADDR2LINE"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="-mwindows;$(shell wx-config --libs)" Required="yes">
@@ -456,15 +460,25 @@
         <Library Value="libwxmsw31u_propgrid"/>
         <Library Value="libwxmsw31u_adv"/>
         <Library Value="libwxmsw31u_gl"/>
+        <Library Value="libwxsvg"/>
+        <Library Value="libcairo"/>
+        <Library Value="libavutil"/>
+        <Library Value="libavformat"/>
+        <Library Value="libavcodec"/>
+        <Library Value="libxvidcore"/>
+        <Library Value="libexpat"/>
+        <Library Value="libexif"/>
+        <Library Value="libswscale"/>
         <Library Value="backtrace"/>
+        <Library Value="libdl"/>
+        <Library Value="dbgeng"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
         <Library Value="libfreeglut"/>
         <Library Value="Xinput9_1_0"/>
-        <Library Value="libbacktrace"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D DEBUG;" Required="no"/>
-      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Debug" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
       <BuildSystem Name="Default"/>
       <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
         <![CDATA[]]>

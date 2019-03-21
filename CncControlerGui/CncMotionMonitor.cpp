@@ -273,6 +273,9 @@ void CncMotionMonitor::resetRotation() {
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaint() {
 /////////////////////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false )
+		return;
+
 	monitor->SetCurrent(*this);
 	monitor->init();
 
@@ -291,7 +294,8 @@ void CncMotionMonitor::onPaint() {
 	// see if above
 	isShown = IsShownOnScreen();
 	
-	SwapBuffers();
+	if ( isShown )
+		SwapBuffers();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onPaint(wxPaintEvent& event) {

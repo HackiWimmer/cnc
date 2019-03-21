@@ -14,8 +14,9 @@ void cnc::traceSetterValueList(std::ostream& s, const cnc::SetterValueList& valu
 	unsigned int counter = 0;
 	for ( auto it = values.begin(); it != values.end(); it++) {
 		
-		if ( factor == 1 ) 	s << wxString::Format("%ld",   *it);
-		else				s << wxString::Format("%.2lf", (double)(*it)/factor);
+		
+		if ( factor == 1 ) 	s << wxString::Format("%ld",   (long)(*it));
+		else				s << wxString::Format("%.2lf", (double)((*it)/factor));
 		
 		if ( ++counter != values.size() )
 			s << ", ";

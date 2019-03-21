@@ -597,8 +597,11 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 	quadraticBezierCurve.init(s);
 	cubicBezierCurve.init(s);
 	
-	if ( trace == true )
-		std::cout << " " << getName() << ": Setup " << unitCalculator << std::endl;
+	if ( trace == true ) {
+		std::stringstream ss;
+		ss << " " << getName() << ": Setup " << unitCalculator;
+		cnc::trc.logInfo(ss.str().c_str()); 
+	}
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::tracePathList(std::ostream &ostr) {

@@ -78,9 +78,10 @@ void GLContextBase::globalInit() {
 void GLContextBase::traceOpenGLVersionInfo(std::ostream& s) {
 /////////////////////////////////////////////////////////////////
 	s << " :: OpenGL version info: ";
-	s << (char*)glGetString(GL_VERSION) 	<< "; ";
-	s << (char*)glGetString(GL_VENDOR) 		<< "; ";
-	s << (char*)glGetString(GL_RENDERER) 	<< std::endl;
+	s << ( glGetString(GL_VERSION)  ? (const char*)glGetString(GL_VERSION)  : "?" )	<< "; ";
+	s << ( glGetString(GL_VENDOR)   ? (const char*)glGetString(GL_VENDOR)   : "?" )	<< "; ";
+	s << ( glGetString(GL_RENDERER) ? (const char*)glGetString(GL_RENDERER) : "?" )	<< std::endl;
+		
 	//s << glGetString(GL_SHADING_LANGUAGE_VERSION​) << std::endl;
 }
 /////////////////////////////////////////////////////////////////

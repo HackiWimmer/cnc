@@ -18365,7 +18365,7 @@
                              "border": 1,
                              "gbSpan": "1,1",
                              "gbPosition": "0,0",
-                             "m_styles": [],
+                             "m_styles": ["wxRA_SPECIFY_COLS"],
                              "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                              "m_properties": [{
                                "type": "winid",
@@ -19488,14 +19488,7 @@
                            "m_label": "Value:",
                            "m_value": ""
                           }],
-                         "m_events": [{
-                           "m_eventName": "wxEVT_COMMAND_COMBOBOX_SELECTED",
-                           "m_eventClass": "wxCommandEvent",
-                           "m_eventHandler": "wxCommandEventHandler",
-                           "m_functionNameAndSignature": "selectManuallyToolId(wxCommandEvent& event)",
-                           "m_description": "Process a wxEVT_COMMAND_COMBOBOX_SELECTED event, when an item on the list is selected. Note that calling GetValue returns the new value of selection.",
-                           "m_noBody": false
-                          }],
+                         "m_events": [],
                          "m_children": []
                         }, {
                          "m_type": 4454,
@@ -47699,7 +47692,7 @@
                 }, {
                  "type": "colour",
                  "m_label": "Bg Colour:",
-                 "colour": "ControlDark"
+                 "colour": "(105,105,105)"
                 }, {
                  "type": "colour",
                  "m_label": "Fg Colour:",
@@ -48133,11 +48126,11 @@
                 }, {
                  "type": "string",
                  "m_label": "Size:",
-                 "m_value": "50,20"
+                 "m_value": "50,11"
                 }, {
                  "type": "string",
                  "m_label": "Minimum Size:",
-                 "m_value": "50,20"
+                 "m_value": "50,11"
                 }, {
                  "type": "string",
                  "m_label": "Name:",
@@ -48817,7 +48810,7 @@
             }, {
              "type": "string",
              "m_label": "# Columns:",
-             "m_value": "7"
+             "m_value": "2"
             }, {
              "type": "string",
              "m_label": "# Rows:",
@@ -70343,7 +70336,7 @@
       }, {
        "type": "string",
        "m_label": "Growable rows:",
-       "m_value": ""
+       "m_value": "0"
       }, {
        "type": "string",
        "m_label": "Horizontal gap:",
@@ -73860,7 +73853,7 @@
            "border": 5,
            "gbSpan": "1,1",
            "gbPosition": "0,0",
-           "m_styles": [],
+           "m_styles": ["wxRA_SPECIFY_COLS"],
            "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxALIGN_RIGHT"],
            "m_properties": [{
              "type": "winid",
@@ -86246,7 +86239,7 @@
                  "border": 1,
                  "gbSpan": "1,1",
                  "gbPosition": "0,0",
-                 "m_styles": [],
+                 "m_styles": ["wxRA_SPECIFY_COLS"],
                  "m_sizerFlags": ["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
                  "m_properties": [{
                    "type": "winid",
