@@ -154,7 +154,7 @@ CncNanoTimestamp CncTimeFunctions::getNanoTimestamp() {
 	struct timeval tv;
 	gettimeofday(&tv, NULL);
 	
-	return tv.tv_sec * 1000 * 1000 + tv.tv_usec;
+	return ( tv.tv_sec * 1000 * 1000 + tv.tv_usec ) * 1000;
 #endif
 }
 ////////////////////////////////////////////////////////////////
@@ -210,13 +210,11 @@ void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
 #endif
 
 #ifdef __WXGTK__
-/*
 	struct timespec req;
-	req.tv_sec  = micros/1000;
-	req.tv_nsec = micros%1000;
+	req.tv_sec  = micros / (1000 * 1000);
+	req.tv_nsec = micros % (1000 * 1000);
 	
-	nanosleep(req, NULL);
-*/
+	nanosleep(&req, NULL);
 #endif
 }
 ////////////////////////////////////////////////////////////////

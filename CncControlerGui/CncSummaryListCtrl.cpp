@@ -105,7 +105,7 @@ void CncSummaryListCtrl::addHeadline(ParameterType pt, const wxString& text) {
 	CncColumContainer cc(TOTAL_COL_COUNT);
 	cc.updateItem(COL_TYPE, 	wxString::Format("%d", pt));
 	cc.updateItem(COL_PARAM, 	text);
-
+	
 	appendItem(cc);
 }
 /////////////////////////////////////////////////////////////
@@ -116,7 +116,6 @@ void CncSummaryListCtrl::addParameter(ParameterType pt, const wxString& param, c
 	cc.updateItem(COL_PARAM, 	param);
 	cc.updateItem(COL_VALUE, 	value);
 	cc.updateItem(COL_UNIT, 	unit);
-
+	
 	appendItem(cc);
-
 }

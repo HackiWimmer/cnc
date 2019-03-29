@@ -47,7 +47,7 @@ CncControl::CncControl(CncPortType pt)
 , toolUpdateState(true)
 , stepDelay(0)
 , lastCncHeartbeatValue(0)
-, guiCtlSetup(NULL)
+, toolState()
 , positionCheck(true)
 , drawPaneMargin(30)
 {
@@ -60,6 +60,9 @@ CncControl::CncControl(CncPortType pt)
 	else if ( pt == CncEMU_GCODE)		serialPort = new SerialEmulatorGCodeStreamer(this);
 	else if ( pt == CncEMU_BIN )		serialPort = new SerialEmulatorBinaryStreamer(this);
 	else 								serialPort = new SerialSpyPort(this);
+	
+	toolState.setControl(THE_APP->GetToolState());
+	setToolState(true);
 	
 	serialPort->enableSpyOutput();
 	
@@ -215,22 +218,31 @@ bool CncControl::processSetter(unsigned char pid, const SetterValueList& values)
 		}
 		
 		// store
-		setterMap[pid] = values;
+		appendToSetterMap(pid, values);
 	}
 	
 	// publish setter event
 	typedef UpdateManagerThread::Event Event;
 	static Event evt;
-	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.SetterEvent(pid, values));
+	THE_APP->umPostEvent(evt.SetterEvent(pid, values));
 		
-	if ( THE_APP != NULL ) {
-		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-		wxPostEvent(THE_APP->GetBtRefreshSetterList(), evt);
-	}
-
+	wxCommandEvent comevt(wxEVT_COMMAND_BUTTON_CLICKED);
+	wxPostEvent(THE_APP->GetBtRefreshSetterList(), comevt);
+	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+void CncControl::appendToSetterMap(unsigned char pid, const SetterValueList& values) {
+///////////////////////////////////////////////////////////////////
+	// add all pids which are shouldn't stored 
+	switch ( pid ) {
+		case PID_X_POS:
+		case PID_Y_POS:
+		case PID_Z_POS:
+							return;
+	}
+	
+	setterMap[pid] = values;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::processSetterList(const Setters& setup) {
@@ -449,72 +461,89 @@ void CncControl::updateDrawControl() {
 ///////////////////////////////////////////////////////////////////
 inline void CncControl::setValue(wxTextCtrl *ctl, int32_t val) {
 ///////////////////////////////////////////////////////////////////
-	if ( ctl != NULL ) {
+	if ( ctl != NULL )
 		ctl->ChangeValue(wxString::Format(wxT("%i"),val));
-	}
 }
 ///////////////////////////////////////////////////////////////////
 inline void CncControl::setValue(wxTextCtrl *ctl, double val) {
 ///////////////////////////////////////////////////////////////////
-	if ( ctl != NULL ) {
+	if ( ctl != NULL )
 		ctl->ChangeValue(wxString::Format(wxT("%4.3f"),val));
-	}
 }
 ///////////////////////////////////////////////////////////////////
 inline void CncControl::setValue(wxTextCtrl *ctl, const char* val) {
 ///////////////////////////////////////////////////////////////////
-	if ( ctl != NULL ) {
+	if ( ctl != NULL )
 		ctl->ChangeValue(wxString::Format(wxT("%s"),val));
-	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::setGuiControls(GuiControlSetup* gcs) {
+void CncControl::setZeroPos(bool x, bool y, bool z) {
 ///////////////////////////////////////////////////////////////////
-	assert(gcs);
-	guiCtlSetup = gcs;
-	toolState.setControl(GET_GUI_CTL(toolState));
-	setToolState(true);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::setZeroPosX() {
-///////////////////////////////////////////////////////////////////
-	curAppPos.setX(0);
-	zeroAppPos.setX(0);
-	startAppPos.setX(0);
+	// -------------------------------------------------------------
+	auto setToZeroPosX =[&]() {
+		curAppPos.setX(0);
+		zeroAppPos.setX(0);
+		startAppPos.setX(0);
+		
+		if ( isConnected() == true ) {
+			if ( processSetter(PID_X_POS, (int32_t)(0)) == false ) {
+				std::cerr << "Can't zero controllers X position!" << std::endl;
+				return;
+			}
+		}
+		
+		curCtlPos.setX(0);
+	};
+	
+	// -------------------------------------------------------------
+	auto setToZeroPosY = [&]() {
+		curAppPos.setY(0);
+		zeroAppPos.setY(0);
+		startAppPos.setY(0);
+		
+		if ( isConnected() == true ) {
+			if ( processSetter(PID_Y_POS, (int32_t)(0)) == false ) {
+				std::cerr << "Can't zero controllers Y position!" << std::endl;
+				return;
+			}
+		}
+		
+		curCtlPos.setY(0);
+	};
+	
+	// -------------------------------------------------------------
+	auto setToZeroPosZ = [&]() {
+		int32_t val = 0L;
+		
+		if ( cncConfig->getReferenceIncludesWpt() == true )
+			val = (long)round(cncConfig->getWorkpieceThickness() * cncConfig->getCalculationFactZ());
+		
+		curAppPos.setZ(val);
+		zeroAppPos.setZ(val);
+		startAppPos.setZ(val);
+		
+		if ( isConnected() == true ) {
+			if ( processSetter(PID_Z_POS, (int32_t)(val)) == false ) {
+				std::cerr << "Can't zero controllers Z position!" << std::endl;
+				return;
+			}
+		}
+		
+		curCtlPos.setZ(val);
+	};
+	
+	// -------------------------------------------------------------
+	if ( x ) setToZeroPosX();
+	if ( y ) setToZeroPosY();
+	if ( z ) setToZeroPosZ();
 	
 	postAppPosition(PID_XYZ_POS_MAJOR);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::setZeroPosY() {
-///////////////////////////////////////////////////////////////////
-	curAppPos.setY(0);
-	zeroAppPos.setY(0);
-	startAppPos.setY(0);
-	
-	postAppPosition(PID_XYZ_POS_MAJOR);
-}
-///////////////////////////////////////////////////////////////////
-void CncControl::setZeroPosZ() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT( guiCtlSetup );
-	
-	int32_t val = 0L;
-	
-	if ( cncConfig->getReferenceIncludesWpt() == true )
-		val = (long)round(cncConfig->getWorkpieceThickness() * cncConfig->getCalculationFactZ());
-	
-	curAppPos.setZ(val);
-	zeroAppPos.setZ(val);
-	startAppPos.setZ(val);
-	
-	postAppPosition(PID_XYZ_POS_MAJOR);
+	postCtlPosition(PID_XYZ_POS_MAJOR);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setZeroPos() {
 ///////////////////////////////////////////////////////////////////
-	setZeroPosX();
-	setZeroPosY();
-	setZeroPosZ();
+	setZeroPos(true, true, true);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setStartPos() {
@@ -620,22 +649,18 @@ bool CncControl::hasNextDuration() {
 ///////////////////////////////////////////////////////////////////
 void CncControl::resetDurationCounter() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
 	durationCounter = 0;
-
-	if ( GET_GUI_CTL(passingTrace) && toolUpdateState == true )
-		GET_GUI_CTL(passingTrace)->SetValue(wxString() << durationCounter);
+	
+	if ( toolUpdateState == true )
+		THE_APP->GetPassingCount()->SetValue(wxString() << durationCounter);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::initNextDuration() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
 	durationCounter++;
 	
-	if ( GET_GUI_CTL(passingTrace) && toolUpdateState == true )
-		GET_GUI_CTL(passingTrace)->SetValue(wxString() << durationCounter);
+	if ( toolUpdateState == true )
+		THE_APP->GetPassingCount()->SetValue(wxString() << durationCounter);
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncControl::getDurationCounter() {
@@ -815,9 +840,9 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 
 	if ( pos != prevPos ) {
 		
-		if ( IS_GUI_CTL_VALID(motionMonitor) ) {
+		if ( THE_APP->getMotionMonitor() ) {
 			vd.setVertice(getClientId(), getConfiguredSpeedMode(), pos);
-			GET_GUI_CTL(motionMonitor)->appendVertice(vd);
+			THE_APP->getMotionMonitor()->appendVertice(vd);
 			
 			updatePreview3D(false);
 		}
@@ -842,8 +867,7 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 	char type = (char)msg[0];
 	msg = msg.SubString(1, msg.length());
 	
-	if ( GET_GUI_CTL(mainFrame) != NULL )
-		GET_GUI_CTL(mainFrame)->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
+	THE_APP->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
 	
 	switch ( type ) {
 		
@@ -886,13 +910,13 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 			std::stringstream ss;
 			ss << "Heartbeat received - Value: " << ci.heartbeatValue;
 			
-			if ( GET_GUI_CTL(heartbeatState) ) {
+			if ( THE_APP->GetHeartbeatState() ) {
 				static bool flag = false;
-				if ( flag )	{ flag = false; GET_GUI_CTL(heartbeatState)->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART")); }
-				else		{ flag = true;  GET_GUI_CTL(heartbeatState)->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
-
-				GET_GUI_CTL(heartbeatState)->GetParent()->Refresh();
-				GET_GUI_CTL(heartbeatState)->GetParent()->Update();
+				if ( flag )	{ flag = false; THE_APP->GetHeartbeatState()->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART")); }
+				else		{ flag = true;  THE_APP->GetHeartbeatState()->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
+				
+				THE_APP->GetHeartbeatState()->GetParent()->Refresh();
+				THE_APP->GetHeartbeatState()->GetParent()->Update();
 			}
 			
 			lastCncHeartbeatValue = ci.heartbeatValue;
@@ -1042,8 +1066,7 @@ void CncControl::waitActive(unsigned int millis) {
 bool CncControl::SerialCallback() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cncConfig);
-	wxASSERT(guiCtlSetup);
-
+	
 	if ( isInterrupted() ) {
 		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
 		return false;
@@ -1080,14 +1103,14 @@ void CncControl::postAppPosition(unsigned char pid) {
 		// the compairison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
 		if ( lastAppPos != curAppPos ) {
-			if ( GET_GUI_CTL(mainFrame) )
-				GET_GUI_CTL(mainFrame)->umPostEvent(evt.AppPosEvent(pid, 
-				                                                    getClientId(), 
-				                                                    configuredSpeedMode, 
-				                                                    getConfiguredFeedSpeed_MM_MIN(), 
-				                                                    getRealtimeFeedSpeed_MM_MIN(), 
-				                                                    curAppPos)
-				                                   );
+			THE_APP->umPostEvent(evt.AppPosEvent(pid, 
+												 getClientId(), 
+												 configuredSpeedMode, 
+												 getConfiguredFeedSpeed_MM_MIN(), 
+												 getRealtimeFeedSpeed_MM_MIN(), 
+												 curAppPos
+												)
+											   );
 		}
 	}
 	
@@ -1103,14 +1126,14 @@ void CncControl::postCtlPosition(unsigned char pid) {
 		
 		// a position compairsion isn't necessay here because the serialControllerCallback(...)
 		// call this method only on position changes
-		if ( GET_GUI_CTL(mainFrame) )
-			GET_GUI_CTL(mainFrame)->umPostEvent(evt.CtlPosEvent(pid, 
-			                                                    getClientId(), 
-			                                                    configuredSpeedMode, 
-			                                                    getConfiguredFeedSpeed_MM_MIN(), 
-			                                                    getRealtimeFeedSpeed_MM_MIN(), 
-			                                                    curCtlPos)
-			                                   );
+		THE_APP->umPostEvent(evt.CtlPosEvent(pid, 
+											 getClientId(), 
+											 configuredSpeedMode, 
+											 getConfiguredFeedSpeed_MM_MIN(), 
+											 getRealtimeFeedSpeed_MM_MIN(), 
+											 curCtlPos
+											)
+										   );
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1353,22 +1376,18 @@ void CncControl::switchToolOff(bool force) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::displayToolState(const bool state) {
 ///////////////////////////////////////////////////////////////////
-	if ( GET_GUI_CTL(testToggleTool) )
-		GET_GUI_CTL(testToggleTool)->SetValue(state);
-		
+	THE_APP->GetTestToggleTool()->SetValue(state);
 	setToolState();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::displaySpeedValue(const double value) {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_APP != NULL )
-		THE_APP->GetConfiguredFeedSpeed()->ChangeValue(wxString::Format("%3.1lf", value));
+	THE_APP->GetConfiguredFeedSpeed()->ChangeValue(wxString::Format("%3.1lf", value));
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::displaySpeedMode(const CncSpeedMode mode) {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_APP != NULL )
-		THE_APP->GetConfiguredFeedSpeedMode()->ChangeValue(wxString::Format("%c", cnc::getCncSpeedTypeAsCharacter(mode)));
+	THE_APP->GetConfiguredFeedSpeedMode()->ChangeValue(wxString::Format("%c", cnc::getCncSpeedTypeAsCharacter(mode)));
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::displayGetterList(const PidList& pidList) {
@@ -1461,14 +1480,11 @@ void CncControl::updateCncConfigTrace() {
 	typedef UpdateManagerThread::Event Event;
 	static Event evt;
 	
-	if ( GET_GUI_CTL(mainFrame) )
-		GET_GUI_CTL(mainFrame)->umPostEvent(evt.ConfigUpdateEvent());
+	THE_APP->umPostEvent(evt.ConfigUpdateEvent());
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::enableStepperMotors(bool s) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
 	if ( isInterrupted() )
 		return false;
 		
@@ -1482,16 +1498,13 @@ bool CncControl::enableStepperMotors(bool s) {
 		return false;
 	}
 	
-	if ( GET_GUI_CTL(motorState) )
-		GET_GUI_CTL(motorState)->Check(s);
+	THE_APP->GetMiMotorEnableState()->Check(s);
 		
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::enableProbeMode(bool s) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
 	if ( isInterrupted() )
 		return false;
 		
@@ -1505,8 +1518,7 @@ bool CncControl::enableProbeMode(bool s) {
 		return false;
 	}
 	
-	if ( GET_GUI_CTL(probeModeState) )
-		GET_GUI_CTL(probeModeState)->SetValue(s);
+	THE_APP->GetBtProbeMode()->SetValue(s);
 	
 	return true;
 }
@@ -1538,17 +1550,17 @@ void CncControl::displayLimitStates(const CncInterface::ILS::States& ls) {
 	limitStates.setZMinLimit(ls.zMin());
 	limitStates.setZMaxLimit(ls.zMax());
 	
-	displayLimitState(GET_GUI_CTL(xMinLimit), limitStates.getXMinLimit());
-	displayLimitState(GET_GUI_CTL(xMaxLimit), limitStates.getXMaxLimit());
-	displayLimitState(GET_GUI_CTL(yMinLimit), limitStates.getYMinLimit());
-	displayLimitState(GET_GUI_CTL(yMaxLimit), limitStates.getYMaxLimit());
-	displayLimitState(GET_GUI_CTL(zMinLimit), limitStates.getZMinLimit());
-	displayLimitState(GET_GUI_CTL(zMaxLimit), limitStates.getZMaxLimit());
+	displayLimitState(THE_APP->GetXMinLimit(), limitStates.getXMinLimit());
+	displayLimitState(THE_APP->GetXMaxLimit(), limitStates.getXMaxLimit());
+	displayLimitState(THE_APP->GetYMinLimit(), limitStates.getYMinLimit());
+	displayLimitState(THE_APP->GetYMaxLimit(), limitStates.getYMaxLimit());
+	displayLimitState(THE_APP->GetZMinLimit(), limitStates.getZMinLimit());
+	displayLimitState(THE_APP->GetZMaxLimit(), limitStates.getZMaxLimit());
 	
 	limitStates.displayLimitState();
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::displayLimitState(wxStaticText* ctl, bool value) {
+void CncControl::displayLimitState(wxWindow* ctl, bool value) {
 ///////////////////////////////////////////////////////////////////
 	if ( ctl != NULL ) {
 		if ( value == true ) {
@@ -2097,75 +2109,49 @@ void CncControl::reconfigureSimpleMove(bool correctPositions) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-bool CncControl::hasControllerConfigControl() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	return ( GET_GUI_CTL(controllerConfig) != NULL );
-}
-///////////////////////////////////////////////////////////////////
 void CncControl::clearControllerConfigControl() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( hasControllerConfigControl() ) 
-		GET_GUI_CTL(controllerConfig)->DeleteAllItems();
+	THE_APP->GetDvListCtrlControllerConfig()->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value, const char* unit) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( hasControllerConfigControl() ) {
-		DcmItemList rows;
+	DcmItemList rows;
 
-		DataControlModel::addNumKeyValueUnitRow(rows, pid, key, value, unit);
-		GET_GUI_CTL(controllerConfig)->Freeze();
-		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-			GET_GUI_CTL(controllerConfig)->AppendItem(*it);
-		}
-		GET_GUI_CTL(controllerConfig)->Thaw();
-	}
-}
-///////////////////////////////////////////////////////////////////
-bool CncControl::hasControllerPinControl() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
+	DataControlModel::addNumKeyValueUnitRow(rows, pid, key, value, unit);
+	THE_APP->GetDvListCtrlControllerConfig()->Freeze();
 	
-	return ( GET_GUI_CTL(controllerPinReport) != NULL );
+	for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) 
+		THE_APP->GetDvListCtrlControllerConfig()->AppendItem(*it);
+	
+	THE_APP->GetDvListCtrlControllerConfig()->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::clearControllerPinControl() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( hasControllerPinControl() )
-		GET_GUI_CTL(controllerPinReport)->DeleteAllItems();
+	THE_APP->GetDvListCtrlControllerPins()->DeleteAllItems();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::appendNumKeyValueToControllerPinInfo(const char* desc, int pin, int type, int mode, int value) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(guiCtlSetup);
-	
-	if ( hasControllerPinControl() ) {
-		DcmItemList rows;
+	DcmItemList rows;
 
-		DataControlModel::addPinReportRow(rows, desc, pin, type, mode, value);
-		GET_GUI_CTL(controllerPinReport)->Freeze();
-		for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it) {
-			GET_GUI_CTL(controllerPinReport)->AppendItem(*it);
-		}
-		GET_GUI_CTL(controllerPinReport)->Thaw();
-	}
+	DataControlModel::addPinReportRow(rows, desc, pin, type, mode, value);
+	THE_APP->GetDvListCtrlControllerPins()->Freeze();
+	
+	for (DcmItemList::iterator it = rows.begin(); it != rows.end(); ++it)
+		THE_APP->GetDvListCtrlControllerPins()->AppendItem(*it);
+	
+	THE_APP->GetDvListCtrlControllerPins()->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::updatePreview3D(bool force) {
 ///////////////////////////////////////////////////////////////////
-	if ( IS_GUI_CTL_NOT_VALID(motionMonitor) )
+	if ( THE_APP->getMotionMonitor() == NULL )
 		return;
 		
 	if ( force == true ) {
-		GET_GUI_CTL(motionMonitor)->display();
+		THE_APP->getMotionMonitor()->display();
 		return;
 	}
 	
@@ -2174,7 +2160,7 @@ void CncControl::updatePreview3D(bool force) {
 		static wxDateTime tsLastUpdate = wxDateTime::UNow();
 		
 		if ( (wxDateTime::UNow() - tsLastUpdate).GetMilliseconds() >= cncConfig->getUpdateInterval() ) {
-			GET_GUI_CTL(motionMonitor)->display();
+			THE_APP->getMotionMonitor()->display();
 			tsLastUpdate = wxDateTime::UNow();
 		}
 	}

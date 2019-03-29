@@ -6,6 +6,7 @@ CncReferencePosition::CncReferencePosition(MainFrame* parent)
 : CncReferencePositionBase(parent)
 , parentFrame(parent)
 , navigationPanel(NULL)
+, infoMessage()
 ///////////////////////////////////////////////////////////////////
 {
 	setMode(CncRefPositionMode::CncRM_Mode1);
@@ -37,11 +38,7 @@ bool CncReferencePosition::isWorkpieceThicknessNeeded() {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::setMessage(const wxString& msg) {
 ///////////////////////////////////////////////////////////////////
-	wxString m(msg);
-	if ( msg.IsEmpty() )
-		m.assign("No additional information available");
-		
-	m_textMessage->ChangeValue(m);
+	infoMessage.assign(msg);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::setMeasurePlateThickness(const double mpt) {
@@ -233,6 +230,13 @@ void CncReferencePosition::init(wxInitDialogEvent& event) {
 	val.SetRange(0.0, 100.0);
 	val.SetPrecision(2);
 	m_workpiceThickness->SetValidator(val);
+	
+	m_btZeroX->SetValue(true);
+	m_btZeroY->SetValue(true);
+	m_btZeroZ->SetValue(true);
+	determineZeroMode();
+	
+	showInformation(!infoMessage.IsEmpty());
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::show(wxShowEvent& event) {
@@ -242,8 +246,7 @@ void CncReferencePosition::show(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::cancel(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	SetReturnCode(wxID_CANCEL);
-	Show(false);
+	EndModal(wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::set(wxCommandEvent& event) {
@@ -259,8 +262,7 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 		}
 	}
 	
-	SetReturnCode(wxID_OK);
-	Show(false);
+	EndModal(wxID_OK);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::selectStepSensitivity(wxCommandEvent& event) {
@@ -269,4 +271,58 @@ void CncReferencePosition::selectStepSensitivity(wxCommandEvent& event) {
 		return;
 		
 	parentFrame->GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::showInformation(bool show) {
+///////////////////////////////////////////////////////////////////
+	enum selMode { SM_ZERO = 0, SM_INFO = 1 };
+	
+	m_infoBitmap->SetToolTip(infoMessage);
+	m_textMessage->ChangeValue(infoMessage);
+	m_textMessage->Enable(!infoMessage.IsEmpty());
+	
+	if ( show == false ) {
+		m_infoTimer->Stop();
+		m_infoResultBook->SetSelection(SM_ZERO);
+	}
+	else {
+		if ( m_infoResultBook->GetSelection() == SM_INFO ) {
+			showInformation(false);
+			return;
+		}
+			
+		m_infoTimer->Start(3500);
+		m_infoResultBook->SetSelection(SM_INFO);
+	}
+	
+	Refresh();
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::selectInformation(wxMouseEvent& event) {
+///////////////////////////////////////////////////////////////////
+	showInformation(!infoMessage.IsEmpty());
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::hideInformation(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	showInformation(false);
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::infoTimer(wxTimerEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//if ( m_textMessage->HasFocus() )
+	//	return;
+	
+	showInformation(false);
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::determineZeroMode() {
+///////////////////////////////////////////////////////////////////
+	auto evaluate = [&](wxBitmapToggleButton* bt) {
+		wxASSERT( bt != NULL );
+		return bt->GetValue() == true ? '0' : '-';
+	};
+	
+	m_btSet->SetLabel(wxString::Format("Zero (%c, %c, %c)", evaluate(m_btZeroX), evaluate(m_btZeroY), evaluate(m_btZeroZ)));
+	m_btSet->Enable(m_btZeroX->GetValue() == true || m_btZeroY->GetValue() == true || m_btZeroZ->GetValue() == true);
 }

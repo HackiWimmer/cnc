@@ -16,11 +16,11 @@
 #include "CncControl.h"
 #include "CncPerspective.h"
 #include "CncMotionMonitor.h"
-#include "CncSpyControl.h"
 #include "CncFileView.h"
 #include "CncToolMagazine.h"
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
+#include "CncSerialSpyListCtrl.h"
 #include "CfgAccelerationGraph.h"
 #include "CncGamepadControllerState.h"
 #include "CncSummaryListCtrl.h"
@@ -48,6 +48,7 @@ class CncTemplateObserver;
 class CncSecureRun;
 class CncStatisticsPane;
 class CncSvgViewer;
+class CncGameportController;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -111,8 +112,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void showOSEnvironment(wxCommandEvent& event);
-    virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event);
+		virtual void dclickHeartbeatState(wxMouseEvent& event);
+		virtual void openGameportController(wxCommandEvent& event);
+		virtual void showOSEnvironment(wxCommandEvent& event);
+		virtual void toggleMotionMonitorReplayPane(wxCommandEvent& event);
 		virtual void selectMetricUnitFrom(wxCommandEvent& event);
 		virtual void selectMetricUnitFromValue(wxCommandEvent& event);
 		virtual void selectMetricUnitTo(wxCommandEvent& event);
@@ -389,8 +392,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void configurationUpdated(wxCommandEvent& event);
 		
 		bool isGamepadNotificationActive();
+		bool isGamepadDialogShown();
 		void activateGamepadNotificationsOnDemand(bool state);
 		void activateGamepadNotifications(bool state);
+		void showGameportController(bool show);
 		
 		wxDECLARE_EVENT_TABLE();
 		
@@ -426,7 +431,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxTextCtrl* getTrace() 					{ return m_tmpTraceInfo; }
 		wxTextCtrl* getCtrlMessageHistory() 	{ return m_controllerMsgHistory; }
 		wxTextCtrl* getCtrlPathGeneratorTrace() { return pathGenerator->getPathTrace(); }
-		wxTextCtrl* getCtrlSerialSpy() 			{ return serialSpy; }
+		wxListCtrl* getCtrlSerialSpy() 			{ return serialSpyListCtrl; }
+		
+		CncMotionMonitor* getMotionMonitor() 	{ return motionMonitor; }
+		wxMenuItem* GetMiMotorEnableState()		{ return m_miMotorEnableState; }
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// this call is alread locked by the ConcurrentQueue class
@@ -494,7 +502,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		GamepadThread* gamepadThread;
 		wxCriticalSection pGamepadThreadCS;
 		
-		CncMotionMonitor* getMotionMonitor() 	{ return motionMonitor; }
 		CncControl* getCncControl() 			{ return cnc; }
 		
 		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
@@ -562,7 +569,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncSourceEditor* 				sourceEditor;
 		CncOutboundEditor* 				outboundEditor;
 		CncMotionMonitor* 				motionMonitor;
-		CncSpyControl* 					serialSpy;
 		CncFileView* 					fileView;
 		CncFilePreview* 				mainFilePreview;
 		CncFilePreview* 				outboundFilePreview;
@@ -571,8 +577,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncPosSpyListCtrl* 				positionSpy;
 		CncSetterListCtrl* 				setterList;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
+		CncSerialSpyListCtrl* 			serialSpyListCtrl;
 		CfgAccelerationGraph* 			accelGraphPanel; 
-		CncGamepadControllerState* 		cncGamepadState;
+		CncGameportController*			cncGameportDlg;
 		CncSvgViewer*					outboundEditorSvgView;
 		CncNavigatorPanel*				navigatorPanel;
 		GL3DOptionPane* 				optionPane3D;
@@ -583,7 +590,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncTemplateObserver* 			templateObserver;
 		
 		CncPerspective perspectiveHandler;
-		GuiControlSetup* guiCtlSetup;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
 		
@@ -606,7 +612,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		FileParser* inboundFileParser;
 		
 		wxTimer perspectiveTimer;
-		wxTimer debugUserNotificationTime;
+		wxTimer debugUserNotificationTimer;
 		
 		CncApp::GuiControls	guiControls;
 		CncApp::MenuItems	menuItems;
@@ -703,6 +709,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void rcPause();
 		
 		bool checkIfRunCanBeProcessed(bool confirm=true);
+		bool checkReferencePositionState();
 		bool processVirtualTemplate();
 		bool processTemplateIntern();
 		bool processTemplateWrapper(bool confirm=true);
@@ -741,8 +748,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void decoratePortSelector(bool list=false);
 		
 		void updateSetterList();
-		
-		void determineCncOutputControls();
 		
 		void decorateRunButton();
 		void enableRunControls(bool state = true);
@@ -806,7 +811,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		///////////////////////////////////////////////////////////////
 		// misc
 		void traceSessionId();
-		void setZero();
+		void setControllerZero(bool x, bool y, bool z);
 		void requestReset();
 		
 		void navigateX(CncDirection d);
@@ -842,7 +847,7 @@ class CncTransactionLock {
 			wxASSERT(parent);
 			referenceCounter++;
 			
-			prevCheckState  = parent->m_miRqtIdleMessages->IsCheck();
+			prevCheckState  = parent->m_miRqtIdleMessages->IsChecked();
 			prevEnableState = parent->m_miRqtIdleMessages->IsEnabled();
 			parent->m_miRqtIdleMessages->Check(false);
 			parent->m_miRqtIdleMessages->Enable(false);
@@ -888,23 +893,30 @@ class CncGampadDeactivator {
 		MainFrame* parent;
 		bool reconstructPrevState;
 		bool prevState;
+		bool stateDialogShown;
 		
 	public:
 		explicit CncGampadDeactivator(MainFrame* p, bool rps = false)
 		: parent(p)
 		, reconstructPrevState(rps)
 		, prevState(false)
+		, stateDialogShown(false)
 		{
 			wxASSERT(parent);
 			referenceCounter++;
 			
-			prevState = parent->isGamepadNotificationActive();
+			prevState 			= parent->isGamepadNotificationActive();
+			stateDialogShown	= parent->isGamepadDialogShown();
+			
+			parent->showGameportController(false);
 			parent->activateGamepadNotifications(false);
 		}
 		
 		~CncGampadDeactivator() {
 			if ( reconstructPrevState == true ) 	parent->activateGamepadNotifications(prevState);
 			else 									parent->activateGamepadNotifications(true);
+			
+			parent->showGameportController(stateDialogShown);
 			
 			referenceCounter--;
 		}

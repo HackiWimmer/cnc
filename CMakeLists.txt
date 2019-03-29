@@ -202,8 +202,8 @@ set(SOURCE_FILES
         CncControlerGui/CncSetterListCtrl.h
         CncControlerGui/CncSpeedSimulator.cpp
         CncControlerGui/CncSpeedSimulator.h
-        CncControlerGui/CncSpyControl.cpp
-        CncControlerGui/CncSpyControl.h
+        CncControlerGui/CncSerialSpyListCtrl.cpp
+        CncControlerGui/CncSerialSpyListCtrl.h
         CncControlerGui/CncStatisticSummaryListCtrl.cpp
         CncControlerGui/CncStatisticSummaryListCtrl.h
         CncControlerGui/CncStreamBuffers.cpp

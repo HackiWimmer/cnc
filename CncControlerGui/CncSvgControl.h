@@ -8,7 +8,6 @@
 	#ifdef WX_SVG_SUPPORT
 		#include <wxSVG/svgctrl.h>
 		#define SVG_VIEWER_CLASS_PARENT 		wxSVGCtrl
-		#define SVG_BUILDER_CLASS_PARENT 		wxSVGCtrl
 	#else
 		#ifdef WX_WEBVIEW_SUPPORT
 			#include <wx/webview.h>
@@ -16,8 +15,6 @@
 		#esle
 			#define SVG_VIEWER_CLASS_PARENT		wxPanel
 		#endif
-		
-		#define SVG_BUILDER_CLASS_PARENT		wxPanel
 	#endif
 
 //////////////////////////////////////////////////////////////////////////////
@@ -26,27 +23,37 @@ class CncSvgViewer : public SVG_VIEWER_CLASS_PARENT {
 	public:
 		CncSvgViewer(wxWindow* parent) 
 		: SVG_VIEWER_CLASS_PARENT(parent)
-		{}
+		{ 
+			init();
+		}
 		
 		~CncSvgViewer() {
 		}
 		
+		void clear();
 		bool loadFile(const wxString& filename);
+		
+	protected:
+		void OnMouse(wxMouseEvent& event);
+		
+	private:
+		void init();
+		
+	wxDECLARE_EVENT_TABLE();
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class CncSvgBuilder : public SVG_BUILDER_CLASS_PARENT {
+class CncSvgBuilder : public CncSvgViewer {
 	
 	public:
 		CncSvgBuilder(wxWindow* parent) 
-		: SVG_BUILDER_CLASS_PARENT(parent)
+		: CncSvgViewer(parent)
 		{
+			wxASSERT(IsKindOf(wxCLASSINFO(wxSVGCtrl)));
 		}
 		
 		~CncSvgBuilder() {
 		}
-		
-		// todo
 };
 
 #endif

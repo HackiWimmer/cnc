@@ -167,9 +167,8 @@ class TestBookSelection {
 class LoggerSelection {
 	public:
 		enum VAL {
-			GAMEPAD						= 0,
-			STARTUP						= 1,
-			CNC							= 2,
+			STARTUP						= 0,
+			CNC							= 1
 		};
 };
 

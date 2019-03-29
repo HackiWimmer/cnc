@@ -541,12 +541,13 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeHeartbeat(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	static int32_t counter = 0;
 	unsigned char byteCount = sizeof(int32_t);
 	
 	lastCommand.Serial.write(RET_SOH);
 	lastCommand.Serial.write(PID_HEARTBEAT);
 	lastCommand.Serial.write(byteCount);
-	lastCommand.Serial.write(42);
+	lastCommand.Serial.write(counter++ % INT32_MAX);
 	lastCommand.Serial.write(RET_OK);
 	
 	return true;
@@ -666,6 +667,10 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			
 			case PID_RESERT_POS_COUNTER:  		resetPositionCounter(); break;
 			case PID_RESERT_STEP_COUNTER: 		resetStepCounter(); 	break;
+			
+			case PID_X_POS:   					curEmulatorPos.setX(0); break;
+			case PID_Y_POS:   					curEmulatorPos.setY(0); break;
+			case PID_Z_POS:  					curEmulatorPos.setZ(0); break;
 			
 			case PID_PITCH_X:
 			case PID_PITCH_Y:

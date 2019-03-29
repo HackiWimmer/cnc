@@ -16,7 +16,6 @@
 #include "CncToolStateControl.h"
 #include "CncCommon.h"
 #include "PenHandler.h"
-#include "GuiControlSetup.h"
 #include "CncConfig.h"
 #include "SerialPort.h"
 #include "CncLimitStates.h"
@@ -55,6 +54,8 @@ class CncControl {
 		typedef std::vector<SetterTuple> Setters;
 		
 		SetterMap setterMap;
+		
+		void appendToSetterMap(unsigned char pid, const cnc::SetterValueList& values);
 		
 	protected:
 		// internal port object
@@ -98,11 +99,6 @@ class CncControl {
 		
 		Serial* getSerial() { wxASSERT(serialPort); return serialPort; }
 		
-		// output controls
-		GuiControlSetup* guiCtlSetup;
-		#define GET_GUI_CTL(ctl)           (guiCtlSetup->ctl)
-		#define IS_GUI_CTL_VALID(ctl)      (guiCtlSetup != NULL && guiCtlSetup->ctl != NULL)
-		#define IS_GUI_CTL_NOT_VALID(ctl)  (guiCtlSetup == NULL || guiCtlSetup->ctl == NULL)
 		// Tool state handling
 		CncToolStateControl toolState;
 		//measurements variables
@@ -121,7 +117,7 @@ class CncControl {
 		
 		// Limit management
 		CncLimitStates limitStates;
-		void displayLimitState(wxStaticText* ctl, bool value);
+		void displayLimitState(wxWindow* ctl, bool value);
 		void displayLimitStates(const int32_t x, const int32_t y, const int32_t z);
 		void displayLimitStates(const CncInterface::ILS::States& ls);
 		void displayUnknownSupportStates();
@@ -149,8 +145,9 @@ class CncControl {
 		
 		bool isReadyToRun();
 		
-		void setClientId(long id) { currentClientId = id; }
-		const long getClientId() const { return currentClientId; }
+		void setClientId(long id) 		{ currentClientId = id; }
+		void resetClientId()			{ setClientId(-1L); }
+		const long getClientId() const 	{ return currentClientId; }
 		
 		// Connection to portName
 		bool connect(const char * portName);
@@ -202,9 +199,7 @@ class CncControl {
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		// Zero positioning
-		void setZeroPosX();
-		void setZeroPosY();
-		void setZeroPosZ();
+		void setZeroPos(bool x, bool y, bool z);
 		void setZeroPos();
 		// Start positioning
 		void setStartPos();
@@ -242,8 +237,6 @@ class CncControl {
 		// Setup the cnc control
 		void resetSetterMap();
 		bool setup(bool reset = true);
-		// Sets the output controls for cooridinate infos
-		void setGuiControls(GuiControlSetup* guiCtlSetup);
 		//handle draw control
 		unsigned int getDrawPaneMargin() { return drawPaneMargin; }
 		void updateDrawControl();
@@ -348,12 +341,10 @@ class CncControl {
 		bool simpleMoveZToZeroPos();
 		
 		// controller configuration output
-		bool hasControllerConfigControl();
 		void clearControllerConfigControl();
 		void appendPidKeyValueToControllerConfig(int pid, const char* key, const char* value, const char* unit);
 		
 		// controller pin report
-		bool hasControllerPinControl();
 		void clearControllerPinControl();
 		void appendNumKeyValueToControllerPinInfo(const char* desc, int pin, int type, int mode, int value);
 		

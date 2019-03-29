@@ -1,8 +1,8 @@
+#include "CncSerialSpyListCtrl.h"
 #include "CncStreamBuffers.h"
 
 wxString   		LoggerStreamBuf::startupBuffer 		= wxString("");
 wxTextAttr  	LoggerStreamBuf::defaultAttr 		= wxTextAttr(wxColour(195, 195, 195));
-wxTextAttr  	CncCspyBuf::lineNumberAttr 			= wxTextAttr(wxColour(205, 201, 15));
 const char* 	CncSerialSpyStream::hLine			= "----------------------------------------------\n";
 const char* 	CncSerialSpyStream::mLine			= "***********************************************\n";
 
@@ -96,117 +96,188 @@ int LoggerStreamBuf::overflow(int c) {
 	return 0;
 }
 
-
 ///////////////////////////////////////////////////////////
 int CncCspyBuf::overflow (int c) {
 ///////////////////////////////////////////////////////////
-	if ( ctl == NULL )
-		return 0; 
+	buffer[bufferIndex++] = c;
 	
-	// first insertion
-	if ( ctl->GetLastPosition() == 0 )
-		return insertLineNumber(true);
-	
-	// line feed
-	if ( c == '\n' )
-		return insertLineNumber(false);
-	
-	ctl->SetDefaultStyle(textAttr);
-	ctl->AppendText((wxChar)c);
+	if ( c == '\n' || maxBufferSize - bufferIndex < 3 ) {
+		// remove the "\n"
+		bufferIndex--;
+		
+		flush();
+	}
 	
 	// return something different from EOF
 	return 0;
 }
-
 ///////////////////////////////////////////////////////////
-int CncCspyBuf::insertLineNumber(bool first) {
+void CncCspyBuf::flush() {
 ///////////////////////////////////////////////////////////
-	if ( ctl == NULL )
-		return 0; 
-
-	ctl->SetDefaultStyle(CncCspyBuf::lineNumberAttr);
+	if ( listCtrl == NULL )
+		return; 
 	
-	if ( first == true ) 	ctl->AppendText(wxString::Format("%s%06d ", "",   (ctl->GetNumberOfLines())%100000));
-	else 					ctl->AppendText(wxString::Format("%s%06d ", "\n", (ctl->GetNumberOfLines()+1)%100000));
+	buffer[bufferIndex] = '\0';
+	bufferIndex = 0;
 	
-	ctl->SetDefaultStyle(textAttr);
+	CncSerialSpyListCtrl* c = static_cast<CncSerialSpyListCtrl*>(listCtrl);
+	if ( c == NULL )
+		return;
 	
-	return 0;
+	c->addLine(buffer, CncSerialSpyListCtrl::LineType::LT_Default);
+}
+///////////////////////////////////////////////////////////
+void CncCspyBuf::addLine(const wxString& line, int type) {
+///////////////////////////////////////////////////////////
+	CncSerialSpyListCtrl* c = static_cast<CncSerialSpyListCtrl*>(listCtrl);
+	if ( c == NULL )
+		return;
+	c->addLine(line, (CncSerialSpyListCtrl::LineType)type);
 }
 
+
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::logCommand(const wxString& cmd) {
+///////////////////////////////////////////////////////////
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	
+	c->addLine(cmd, CncSerialSpyListCtrl::LineType::LT_Command);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::initializeResult(const char* msg) {
+///////////////////////////////////////////////////////////	
+	wxDateTime now = wxDateTime::UNow();
+	
+	if ( msg != NULL )	logCommand(wxString::Format("[%s]: %s", now.Format("%H:%M:%S.%l"), msg));
+	else				logCommand(wxString::Format("[%s]:",    now.Format("%H:%M:%S.%l")));
+}
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_OK(const char* msg) {
 ///////////////////////////////////////////////////////////
-	wxColour c = getTextColour();
-	green();
-	flush();
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
 	
 	if ( msg != NULL )
-		(*this) << msg;
+		c->addLine(msg, CncSerialSpyListCtrl::LineType::LT_ResultOk);
 		
-	(*this) << "RET_OK\n";
-	(*this) <<  CncSerialSpyStream::hLine;
-	setTextColour(c);
+	c->addLine("RET_OK", CncSerialSpyListCtrl::LineType::LT_ResultOk);
 }
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_ERROR(const char* msg) {
 ///////////////////////////////////////////////////////////
-	wxColour c = getTextColour();
-	red();
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
 	
 	if ( msg != NULL )
-		(*this) << msg;
+		c->addLine(msg, CncSerialSpyListCtrl::LineType::LT_ResultError);
 		
-	(*this) << "RET_ERROR\n";
-	(*this) <<  CncSerialSpyStream::hLine;
-	setTextColour(c);
+	c->addLine("RET_ERROR", CncSerialSpyListCtrl::LineType::LT_ResultError);
 }
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_LIMIT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	wxColour c = getTextColour();
-	yellow();
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	
 	if ( msg != NULL )
-		(*this) << msg;
+		c->addLine(msg, CncSerialSpyListCtrl::LineType::LT_ResultLimit);
 		
-	(*this) << "RET_LIMIT\n";
-	(*this) <<  CncSerialSpyStream::hLine;
-	setTextColour(c);
+	c->addLine("RET_LIMIT", CncSerialSpyListCtrl::LineType::LT_ResultLimit);
 }
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_INTERRUPT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	wxColour c = getTextColour();
-	red();
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	
 	if ( msg != NULL )
-		(*this) << msg;
+		c->addLine(msg, CncSerialSpyListCtrl::LineType::LT_ResultInterrupt);
 		
-	(*this) << "RET_INTERRUPT\n";
-	(*this) <<  CncSerialSpyStream::hLine;
-	setTextColour(c);
+	c->addLine("RET_INTERRUPT", CncSerialSpyListCtrl::LineType::LT_ResultInterrupt);
 }
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_HALT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	wxColour c = getTextColour();
-	red();
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	
 	if ( msg != NULL )
-		(*this) << msg;
+		c->addLine(msg, CncSerialSpyListCtrl::LineType::LT_ResultHalt);
 		
-	(*this) << "RET_HALT\n";
-	(*this) <<  CncSerialSpyStream::hLine;
-	setTextColour(c);
+	c->addLine("RET_HALT", CncSerialSpyListCtrl::LineType::LT_ResultHalt);
 }
 ///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_QUIT(const char* msg) {
 ///////////////////////////////////////////////////////////
-	wxColour c = getTextColour();
-	yellow();
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	
 	if ( msg != NULL )
-		(*this) << msg;
+		c->addLine(msg, CncSerialSpyListCtrl::LineType::LT_ResultQuit);
 		
-	(*this) << "RET_QUIT\n";
-	(*this) <<  CncSerialSpyStream::hLine;
-	setTextColour(c);
+	c->addLine("RET_QUIT", CncSerialSpyListCtrl::LineType::LT_ResultQuit);
 }
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::addMarker(const wxString& mt) {
+///////////////////////////////////////////////////////////
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+		
+	c->addLine(mt, CncSerialSpyListCtrl::LineType::LT_Marker);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::enableMessage(const char* additional) {
+///////////////////////////////////////////////////////////
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+
+	c->addLine("Serial Spy enabled . . .", CncSerialSpyListCtrl::LineType::LT_Enable);
+	
+	if ( additional != NULL )
+		c->addLine(additional, CncSerialSpyListCtrl::LineType::LT_Enable);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::disableMessage(const char* additional) {
+///////////////////////////////////////////////////////////
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+
+	c->addLine("Serial Spy disabled . . .", CncSerialSpyListCtrl::LineType::LT_Disable);
+	
+	if ( additional != NULL )
+		c->addLine(additional, CncSerialSpyListCtrl::LineType::LT_Disable);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::logMessage(const char* m) {
+///////////////////////////////////////////////////////////
+	if ( m == NULL )
+		return;
+	
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	c->addLine(m, CncSerialSpyListCtrl::LineType::LT_Default);
+}
+///////////////////////////////////////////////////////////
+void CncSerialSpyStream::logTime() {
+///////////////////////////////////////////////////////////
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	
+	wxDateTime now = wxDateTime::UNow();
+	c->addLine(now.Format("Time: %H:%M:%S.%l: "), CncSerialSpyListCtrl::LineType::LT_Time);
+}
+
 

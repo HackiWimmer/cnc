@@ -122,6 +122,7 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		long getLastSelection() { return lastSelection; }
 		bool setLastSelection(long item);
 		bool selectItem(long item, bool ensureVisible=true);
+		void deselectAll();
 		
 		bool goForwardUnitlColumnChange(long item, long column);
 		bool goBackwardUnitlColumnChange(long item, long column);

@@ -56,6 +56,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "OSD/webviewOSD.h"
 #include "CncSourceEditor.h"
 #include "CncOutboundEditor.h"
+#include "CncGameportController.h"
 #include "CncNumberFormatter.h"
 #include "GlobalFunctions.h"
 #include "SerialPort.h"
@@ -169,7 +170,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , sourceEditor(NULL)
 , outboundEditor(NULL)
 , motionMonitor(NULL)
-, serialSpy(NULL)
 , fileView(NULL)
 , mainFilePreview(NULL)
 , outboundFilePreview(NULL)
@@ -179,7 +179,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , setterList(NULL)
 , cncSummaryListCtrl(NULL)
 , accelGraphPanel(NULL)
-, cncGamepadState(NULL)
+, cncGameportDlg(new CncGameportController(this))
 , optionPane3D(NULL)
 , drawPane3D(NULL)
 , statisticsPane(NULL)
@@ -187,7 +187,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , cnc3DHSplitterWindow(NULL)
 , templateObserver(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
-, guiCtlSetup(new GuiControlSetup())
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , pathGenerator(new PathGeneratorFrame(this, sourceEditor))
@@ -203,7 +202,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , stcEmuContentPopupMenu(NULL)
 , inboundFileParser(NULL)
 , perspectiveTimer(this, wxEVT_PERSPECTIVE_TIMER)
-, debugUserNotificationTime(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
+, debugUserNotificationTimer(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
 , guiControls()
 , menuItems()
 , secureRunDlg(new CncSecureRun(this))
@@ -283,6 +282,9 @@ MainFrame::~MainFrame() {
 	if ( motionMonitor != NULL )
 		delete motionMonitor;
 	
+	if ( cncGameportDlg != NULL )
+		delete cncGameportDlg;
+
 	wxASSERT(lruStore);
 	lruFileList.save(lruStore);
 	lruStore->Flush();
@@ -295,9 +297,6 @@ MainFrame::~MainFrame() {
 	wxASSERT(pathGenerator);
 	pathGenerator->Destroy();
 	delete pathGenerator;
-
-	wxASSERT(guiCtlSetup);
-	delete guiCtlSetup;
 	
 	wxASSERT(secureRunDlg);
 	delete secureRunDlg;
@@ -573,10 +572,6 @@ void MainFrame::installCustControls() {
 	outboundEditor = new CncOutboundEditor(this);
 	GblFunc::replaceControl(m_outboundFileSource, outboundEditor);
 	
-	//Spy
-	serialSpy = new CncSpyControl(this, wxID_ANY);
-	GblFunc::replaceControl(m_serialSpy, serialSpy);
-	
 	// File View
 	fileView = new CncFileView(this);
 	GblFunc::replaceControl(m_mainFileViewPlaceholder, fileView);
@@ -610,13 +605,13 @@ void MainFrame::installCustControls() {
 	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
 	
+	// serial spy list control
+	serialSpyListCtrl = new CncSerialSpyListCtrl(this, wxLC_VRULES | wxLC_SINGLE_SEL); 
+	GblFunc::replaceControl(m_serialSpyPlaceholder, serialSpyListCtrl);
+	
 	// acceleration graph
 	accelGraphPanel = new CfgAccelerationGraph(this); 
 	GblFunc::replaceControl(m_accelGraphPanel, accelGraphPanel);
-	
-	// gamepad status
-	cncGamepadState = new CncGamepadControllerState(this); 
-	GblFunc::replaceControl(m_gamepadStateController, cncGamepadState);
 	
 	// Outbound editor svg viewer
 	outboundEditorSvgView = new CncSvgViewer(this); 
@@ -887,7 +882,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		toggleMotionMonitorOptionPane(true);
 		toggleMotionMonitorStatisticPane(true);
 	}
-		
+	
 	// Auto process ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
 		defineMinMonitoring();
@@ -1178,8 +1173,8 @@ void MainFrame::onGamepdThreadUpadte(GamepadEvent& event) {
 	if ( event.data.connected == false )
 		return;
 	
-	if ( cncGamepadState )
-		cncGamepadState->update(event);
+	if ( cncGameportDlg )
+		cncGameportDlg->update(event);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
@@ -1633,9 +1628,6 @@ void MainFrame::initialize(void) {
 bool MainFrame::initializeCncControl() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-
-	//Determine output controls
-	determineCncOutputControls();
 	
 	//Initialize the cnc configuartion
 	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
@@ -1657,7 +1649,7 @@ bool MainFrame::initializeCncControl() {
 	}
 	 
 	// initialize the postion controls
-	cnc->setZeroPos();
+	setControllerZero(true, true, true);
 	updateCncConfigTrace();
 	
 	// z slider
@@ -1704,37 +1696,6 @@ bool MainFrame::initializeLruMenu() {
 	}
 	
 	return true;
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::determineCncOutputControls() {
-///////////////////////////////////////////////////////////////////
-	//Determine output controls
-	guiCtlSetup->mainFrame				= this;
-	
-	guiCtlSetup->motionMonitor			= motionMonitor;
-	
-	guiCtlSetup->testToggleTool			= m_testToggleTool;
-	
-	guiCtlSetup->passingTrace			= m_passingCount;
-	
-	guiCtlSetup->toolState 				= m_toolState;
-	
-	guiCtlSetup->heartbeatState			= m_heartbeatState;
-	
-	guiCtlSetup->controllerConfig		= m_dvListCtrlControllerConfig;
-	guiCtlSetup->controllerPinReport	= m_dvListCtrlControllerPins;
-	
-	guiCtlSetup->motorState 			= m_miMotorEnableState;
-	guiCtlSetup->probeModeState			= m_btProbeMode;
-	
-	guiCtlSetup->xMinLimit 				= m_xMinLimit;
-	guiCtlSetup->xMaxLimit 				= m_xMaxLimit;
-	guiCtlSetup->yMinLimit 				= m_yMinLimit;
-	guiCtlSetup->yMaxLimit 				= m_yMaxLimit;
-	guiCtlSetup->zMinLimit 				= m_zMinLimit;
-	guiCtlSetup->zMaxLimit 				= m_zMaxLimit;
-	
-	cnc->setGuiControls(guiCtlSetup);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::updateUnit() {
@@ -1936,6 +1897,7 @@ bool MainFrame::connectSerialPort() {
 	
 	initializeCncControl();
 	selectSerialSpyMode();
+	clearPositionSpy();
 	
 	lastPortName.clear();
 	
@@ -1957,6 +1919,8 @@ bool MainFrame::connectSerialPort() {
 				m_miRqtIdleMessages->Enable(true);
 			}
 		}
+		
+		setControllerZero(true, true, true);
 	}
 	
 	updateSetterList();
@@ -1987,43 +1951,43 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
-		
-	} else if ( sel == _portSimulatorNULL ) {
+	} 
+	else if ( sel == _portSimulatorNULL ) {
 		cnc = new CncControl(CncPORT_SIMU);
 		serialFileName.assign(_portSimulatorNULL);
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
-		
-	} else if ( sel == _portEmulatorTEXT ) {
+	} 
+	else if ( sel == _portEmulatorTEXT ) {
 		cnc = new CncControl(CncEMU_TXT);
 		serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
-		
-	} else if ( sel == _portEmulatorSVG ) {
+	} 
+	else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
 		serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
-		
-	} else if ( sel == _portEmulatorGCODE ) {
+	}
+	else if ( sel == _portEmulatorGCODE ) {
 		cnc = new CncControl(CncEMU_GCODE);
 		serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
-		
-	} else if ( sel == _portEmulatorBIN) {
+	} 
+	else if ( sel == _portEmulatorBIN) {
 		cnc = new CncControl(CncEMU_BIN);
 		serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
 		GBL_CONFIG->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
-		
-	} else {
+	} 
+	else {
 		cnc = new CncControl(CncPORT);
 		serialFileName.assign("\\\\.\\");
 		serialFileName.append(sel);
@@ -2168,13 +2132,12 @@ void MainFrame::clearLogger(wxCommandEvent& event) {
 	m_logger->Clear();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::setZero() {
+void MainFrame::setControllerZero(bool x, bool y, bool z) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	
-	cnc->setup(true);
-	cnc->setZeroPos();
-	
+	clearPositionSpy();
+	cnc->resetClientId();
+	cnc->setZeroPos(x, y, z);
 	setRefPostionState(true);
 }
 ///////////////////////////////////////////////////////////////////
@@ -2202,10 +2165,15 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 		GBL_CONFIG->setReferencePositionMode(refPositionDlg->getReferenceMode());
 		updateCncConfigTrace();
 		
-		setZero();
 		motionMonitor->clear();
 		
-	} else {
+		setControllerZero(refPositionDlg->shouldZeroX(), 
+		                  refPositionDlg->shouldZeroY(), 
+						  refPositionDlg->shouldZeroZ()
+						 );
+						 
+	} 
+	else {
 		cnc::cex1 << " Set reference position aborted . . . " << std::endl;
 	}
 	
@@ -2866,6 +2834,12 @@ bool MainFrame::isGamepadNotificationActive() {
 	return gamepadThread->IsRunning();
 }
 ///////////////////////////////////////////////////////////////////
+bool MainFrame::isGamepadDialogShown() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cncGameportDlg);
+	return cncGameportDlg->IsShown();
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::activateGamepadNotificationsOnDemand(bool state) {
 ///////////////////////////////////////////////////////////////////
 	if ( CncGampadDeactivator::gamepadNotificationsAllowed() == false ) {
@@ -3325,22 +3299,26 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 		return false;
 	}
 	
+	return (confirm == true ? showConfigSummaryAndConfirmRun() : true);
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::checkReferencePositionState() {
+///////////////////////////////////////////////////////////////////
 	if ( isZeroReferenceValid == false ) {
-		
-		TemplateFormat tf = getCurrentTemplateFormat();
-		
+		const TemplateFormat tf = getCurrentTemplateFormat();
 		if ( tf != TplManual && tf != TplTest ) {
-			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n\n");
-			msg << "How to fix it:\n";
-			msg << "Please use the \"Set Current Position to Zero\" functionality on the \"References\" tab.";
+			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
 			
-			// means reference postion isn't set
-			if ( showReferencePositionDlg(msg) != wxID_OK )
-				return false;
+			showReferencePositionDlg(msg);
+			
+			// Safety: Always return false in this case because this will
+			// stopp the current startet run. 
+			// Clarify / fix the ref posuition and then restart the run again
+			return false;
 		}
 	}
 	
-	return (confirm == true ? showConfigSummaryAndConfirmRun() : true);
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::showConfigSummaryAndConfirmRun() {
@@ -3586,6 +3564,9 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	if ( fn.IsEmpty() == true )
 		return false;
 	
+	if ( checkReferencePositionState() == false )
+		return false;
+	
 	if ( cnc->isReadyToRun() == false ) {
 		std::cerr << "MainFrame::processTemplateWrapper: Controller isn't ready to run: Run was rejected!" << std::endl;
 		ret = false;
@@ -3593,9 +3574,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	
 	if ( ret == true )
 		ret = checkIfRunCanBeProcessed(confirm);
-		
-	if ( ret == false )
-		std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed"<< std::endl;
 		
 	if ( ret == true ) {
 		
@@ -3607,13 +3585,16 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 				
 			ret = (secureRunDlg->ShowModal() == wxID_OK);
 			
-		} else {
+		} 
+		else {
 			ret = processTemplateIntern();
-			
 		}
 		
 		motionMonitor->updateMonitorAndOptions();
 		statisticsPane->updateReplayPane();
+	}
+	else {
+		std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed"<< std::endl;
 	}
 	
 	// prepare final statements
@@ -3623,7 +3604,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
 		ctl.setErrorMode();
 		
-	} else {
+	} 
+	else {
 		std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
 	}
 	
@@ -5904,7 +5886,9 @@ void MainFrame::clearControllerMsgHistory(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearSerialSpy() {
 ///////////////////////////////////////////////////////////////////
-	serialSpy->Clear();
+	wxASSERT(serialSpyListCtrl);
+	serialSpyListCtrl->clear();
+	serialSpyListCtrl->clearDetails();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearSerialSpy(wxCommandEvent& event) {
@@ -5914,11 +5898,13 @@ void MainFrame::clearSerialSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::markSerialSpy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString defaultValue(wxString::Format("Marker::%06d", serialSpy->GetNumberOfLines()));
+	wxASSERT(serialSpyListCtrl);
+	wxString defaultValue(wxString::Format("Marker::%06d", serialSpyListCtrl->getItemCount()));
 	wxTextEntryDialog dlg(this, "Marker Label:", "Add Spy Marker . . .", defaultValue);
 	dlg.SetMaxLength(64);
-	dlg.ShowModal();
-	serialSpy->addMarker(dlg.GetValue());
+	
+	if ( dlg.ShowModal() == wxID_OK )
+		serialSpyListCtrl->addLine(dlg.GetValue(), CncSerialSpyListCtrl::LineType::LT_Marker);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::enableSerialSpy(wxCommandEvent& event) {
@@ -6264,8 +6250,8 @@ void MainFrame::startDebugUserNotification() {
 	m_rcNextStep->SetBackgroundColour(c);
 	m_rcFinish->SetBackgroundColour(c);
 	
-	if ( debugUserNotificationTime.IsRunning() == false )
-		debugUserNotificationTime.Start(1000);
+	if ( debugUserNotificationTimer.IsRunning() == false )
+		debugUserNotificationTimer.Start(1000);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::stopDebugUserNotification() {
@@ -6275,8 +6261,8 @@ void MainFrame::stopDebugUserNotification() {
 	m_rcNextStep->SetBackgroundColour(c);
 	m_rcFinish->SetBackgroundColour(c);
 	
-	if ( debugUserNotificationTime.IsRunning() == true )
-		debugUserNotificationTime.Stop();
+	if ( debugUserNotificationTimer.IsRunning() == true )
+		debugUserNotificationTimer.Stop();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clearPositionSpy() {
@@ -6947,7 +6933,7 @@ void MainFrame::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::setReferencePosition(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	showReferencePositionDlg("User defined call . . .");
+	showReferencePositionDlg("");
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::warmStartController(wxCommandEvent& event) {
@@ -6965,7 +6951,8 @@ void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::leaveSerialSpy(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	serialSpy->clearDetails();
+	wxASSERT(serialSpyListCtrl);
+	serialSpyListCtrl->clearDetails();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::initSpeedConfigPlayground() {
@@ -7061,7 +7048,8 @@ void MainFrame::decorateGamepadState(bool state) {
 		m_gpBmp3->Show(false);
 		m_gpBmp4->Show(false);
 		
-		cncGamepadState->GetGamepadTrace()->ChangeValue("Gamepad state not available");
+		if ( cncGameportDlg )
+			cncGameportDlg->trace("Gamepad state not available");
 	}
 	
 	m_gamepadState->Refresh();
@@ -7447,4 +7435,32 @@ void MainFrame::showOSEnvironment(wxCommandEvent& event) {
 	CncOSEnvironmentDialog dlg(this);
 	dlg.ShowModal();
 }
-
+/////////////////////////////////////////////////////////////////////
+void MainFrame::openGameportController(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	showGameportController(true);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::showGameportController(bool show) {
+/////////////////////////////////////////////////////////////////////
+	if ( cncGameportDlg == NULL )
+		cncGameportDlg = new CncGameportController(this);
+	
+	if ( show == true ) {
+		if ( cncGameportDlg->IsShown() == false )
+			cncGameportDlg->Show(true);
+	}
+	else {
+		if ( cncGameportDlg->IsShown() == true )
+			cncGameportDlg->Show(false);
+	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::dclickHeartbeatState(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( m_miRqtIdleMessages->IsEnabled() == false )
+		return;
+	
+	m_miRqtIdleMessages->Check(!m_miRqtIdleMessages->IsChecked());
+	decorateIdleState(m_miRqtIdleMessages->IsChecked());
+}

@@ -446,8 +446,7 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 
 	switch ( cmd ) {
 		case CMD_PRINT_CONFIG: 
-			if ( cncControl->hasControllerConfigControl() == true )
-				cncControl->clearControllerConfigControl();
+			cncControl->clearControllerConfigControl();
 				
 			while (getline(ss, s, '\n')) {
 				wxString key;
@@ -463,21 +462,13 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 					key += ArduinoPIDs::getPIDLabel((unsigned int)id);
 					
 					wxString unit = ArduinoPIDs::getPIDUnit((unsigned int)id);
-					
-					if ( cncControl->hasControllerConfigControl() == true ) {
-						cncControl->appendPidKeyValueToControllerConfig(id, key, s.substr(pos+1, s.length()-1).c_str(), unit);
-					} else {
-						mutliByteStream << key.c_str() /*<< "[" << id << "]"*/ << ": ";
-						mutliByteStream << s.substr(pos+1, s.length()-1).c_str() << std::endl;
-						mutliByteStream << "\n";
-					}
+					cncControl->appendPidKeyValueToControllerConfig(id, key, s.substr(pos+1, s.length()-1).c_str(), unit);
 				}
 			}
 			break;
 			
 		case CMD_PRINT_PIN_REPORT:
-			if ( cncControl->hasControllerPinControl() == true )
-				cncControl->clearControllerPinControl();
+			cncControl->clearControllerPinControl();
 			
 			while ( getline(ss, s, '\n') ) {
 				
@@ -502,15 +493,8 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 					value = atoi((s.substr(0,pos)).c_str());
 				
 				if ( pin != -1 && type != -1 && mode != -1 && value != -1 ) {
-					if ( cncControl->hasControllerPinControl() == true ) {
-						cncControl->appendNumKeyValueToControllerPinInfo((type == (int)'D' ? ArduinoDigitalPins::getPinLabel(pin) : ArduinoAnalogPins::getPinLabel(pin)),
-                                                                          pin, type, mode, value);
-					} else {
-						mutliByteStream << (char)type << ":" << (type == (int)'D' ? ArduinoDigitalPins::getPinLabel(pin) : ArduinoAnalogPins::getPinLabel(pin)) << ": ";
-						mutliByteStream	<< (char)type << ": ";
-						mutliByteStream << (char)mode << ": ";
-						mutliByteStream << value << "\n";
-					}
+					cncControl->appendNumKeyValueToControllerPinInfo((type == (int)'D' ? ArduinoDigitalPins::getPinLabel(pin) : ArduinoAnalogPins::getPinLabel(pin)),
+																	  pin, type, mode, value);
 				} else {
 					mutliByteStream << "Invalid format:\n";
 					mutliByteStream << (char)type << ":";
@@ -690,11 +674,9 @@ bool Serial::processIdle() {
 	if ( writeOnlyMoveCommands == true )
 		return true;
 	
-	if ( traceSpyInfo && spyWrite ) {
-		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << ArduinoCMDs::getCMDLabel(cmd) << "'\n";
-	}
-		
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%s'", ArduinoCMDs::getCMDLabel(cmd)));
+	
 	if ( writeData(cmd) ) {
 		SerialFetchInfo sfi;
 		sfi.command 		= cmd;
@@ -778,21 +760,23 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 	}
 	
 	if ( traceSpyInfo && spyWrite ) {
-		cnc::spy.initializeResult();
-		
+		std::stringstream ss;
 		if ( pid < PID_DOUBLE_RANG_START )	{
-			cnc::spy << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
-												<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 		<< "]"
-												<<   "[";
-												cnc::traceSetterValueList(cnc::spy, values, 1);
-			cnc::spy							<< "]\n";
-		} else {
-			cnc::spy << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 		<< "]"
-												<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 		<< "]"
-												<<   "[";
-												cnc::traceSetterValueList(cnc::spy, values, DBL_FACT);
-			cnc::spy							<< "]\n";
+			ss << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0])						<< "]"
+										<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 						<< "]"
+										<<   "[";
+										cnc::traceSetterValueList(ss, values, 1);
+			ss 							<<   "]";
+		} 
+		else {
+			ss << "Send: '" << cmd[0] 	<< "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) 						<< "]"
+										<<   "[" << ArduinoPIDs::getPIDLabel((int)pid) 						<< "]"
+										<<   "[";
+										cnc::traceSetterValueList(ss, values, DBL_FACT);
+			ss 							<<   "]";
 		}
+		
+		cnc::spy.initializeResult(ss.str().c_str());
 	}
 	
 	bool ret = false;
@@ -834,10 +818,8 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 		return true;
 	}
 	
-	if ( traceSpyInfo && spyWrite ) {
-		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << cmd[0] << "' [" << ArduinoCMDs::getCMDLabel(cmd[0]) << "][" << ArduinoPIDs::getPIDLabel((pid)) << "]\n";
-	}
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s][%s]", cmd[0], ArduinoCMDs::getCMDLabel(cmd[0]), ArduinoPIDs::getPIDLabel(pid)));
 	
 	list.clear();
 	
@@ -989,10 +971,8 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 								return true;
 	}
 	
-	if ( traceSpyInfo && spyWrite ) {
-		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << cmd << "' [" << ArduinoCMDs::getCMDLabel(cmd) << "]\n";
-	}
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd, ArduinoCMDs::getCMDLabel(cmd)));
 	
 	if ( writeData(cmd) ) {
 		SerialFetchInfo sfi;
@@ -1115,10 +1095,8 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 		p   += LONG_BUF_SIZE;
 	}
 	
-	if ( traceSpyInfo && spyWrite ) {
-		cnc::spy.initializeResult();
-		cnc::spy << "Send: '" << moveCommand[0] << "' [" << ArduinoCMDs::getCMDLabel(moveCommand[0]) << "]\n";
-	}
+	if ( traceSpyInfo && spyWrite )
+		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", moveCommand[0], ArduinoCMDs::getCMDLabel(moveCommand[0])));
 	
 	// to provide a time an pos reference for the speed calculation
 	logMeasurementRefTs(cncControl->getCurAppPos());

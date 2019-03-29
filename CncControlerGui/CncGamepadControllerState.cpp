@@ -4,9 +4,8 @@
 #include "CncGamepadControllerState.h"
 
 ///////////////////////////////////////////////////////////////////
-CncGamepadControllerState::CncGamepadControllerState(MainFrame* parent)
+CncGamepadControllerState::CncGamepadControllerState(wxWindow* parent)
 : CncGamepadControllerStateBase(parent)
-, mainFrame(parent)
 , posCtrlMode(PCM_STICKS)
 , running(false)
 , xyNavigationActive(false)
@@ -34,13 +33,10 @@ void CncGamepadControllerState::update(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 bool CncGamepadControllerState::isRefPosDlgMode() {
 ///////////////////////////////////////////////////////////////////
-	if ( mainFrame == NULL )
-		return false;
-		
-	if ( mainFrame->refPositionDlg == NULL )
+	if ( THE_APP->refPositionDlg == NULL )
 		return false;
 
-	return mainFrame->refPositionDlg->IsShown();
+	return THE_APP->refPositionDlg->IsShown();
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::processTrace(const GamepadEvent& state) {
@@ -70,33 +66,30 @@ void CncGamepadControllerState::processReferencePage(const GamepadEvent& state) 
 ///////////////////////////////////////////////////////////////////
 	if ( state.data.buttonStart ) {
 		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-		wxPostEvent(mainFrame->GetBtSelectReferences(), evt);
+		wxPostEvent(THE_APP->GetBtSelectReferences(), evt);
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	if ( mainFrame == NULL )
-		return;
-		
-	if ( mainFrame->refPositionDlg == NULL )
+	if ( THE_APP->refPositionDlg == NULL )
 		return;
 		
 	// check what to do
-	if ( mainFrame->refPositionDlg->IsShown() == false ) {
+	if ( THE_APP->refPositionDlg->IsShown() == false ) {
 		// open ref dialog - on demand
 		if ( state.data.buttonX ) {
-			mainFrame->showReferencePositionDlg("Opened by Gamepad");
+			THE_APP->showReferencePositionDlg("Opened by Gamepad");
 			return;
 		}
 		
 		// select step sensitivity - main frame
 		if ( state.data.buttonA ) { 
-			unsigned int sel = mainFrame->GetRbStepSensitivity()->GetSelection();
-			unsigned int cnt = mainFrame->GetRbStepSensitivity()->GetCount();
+			unsigned int sel = THE_APP->GetRbStepSensitivity()->GetSelection();
+			unsigned int cnt = THE_APP->GetRbStepSensitivity()->GetCount();
 		
-			if ( sel + 1 >= cnt ) 	mainFrame->GetRbStepSensitivity()->SetSelection(0);
-			else					mainFrame->GetRbStepSensitivity()->SetSelection(sel +1);
+			if ( sel + 1 >= cnt ) 	THE_APP->GetRbStepSensitivity()->SetSelection(0);
+			else					THE_APP->GetRbStepSensitivity()->SetSelection(sel +1);
 		}
 		
 		// always return here
@@ -107,7 +100,7 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 	
 	// sensitivity
 	if ( state.data.buttonA == true ) {
-		wxRadioBox* rbs  = mainFrame->refPositionDlg->GetRbStepSensitivity();
+		wxRadioBox* rbs  = THE_APP->refPositionDlg->GetRbStepSensitivity();
 		unsigned int sel = rbs->GetSelection();
 		unsigned int cnt = rbs->GetCount();
 		
@@ -116,26 +109,26 @@ void CncGamepadControllerState::processRefPositionDlg(const GamepadEvent& state)
 		else					rbs->SetSelection(sel +1);
 		
 		// select it at the main frame
-		rbs  = mainFrame->GetRbStepSensitivity();
+		rbs  = THE_APP->GetRbStepSensitivity();
 		if ( sel + 1 >= cnt ) 	rbs->SetSelection(0);
 		else					rbs->SetSelection(sel +1);
 	}
 	
 	// ref pos mode
 	if ( state.data.buttonB ) {
-		mainFrame->refPositionDlg->shiftReferenceMode();
+		THE_APP->refPositionDlg->shiftReferenceMode();
 	}
 	
 	// set and close
 	if ( state.data.buttonX ) {
 		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-		wxPostEvent(mainFrame->refPositionDlg->GetBtSet(), evt);
+		wxPostEvent(THE_APP->refPositionDlg->GetBtSet(), evt);
 	}
 	
 	// cancel and close
 	if ( state.data.buttonY ) {
 		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-		wxPostEvent(mainFrame->refPositionDlg->GetBtCancel(), evt);
+		wxPostEvent(THE_APP->refPositionDlg->GetBtCancel(), evt);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -148,17 +141,14 @@ void CncGamepadControllerState::processPosition(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::managePositionViaStick(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	if ( mainFrame == NULL )
-		return;
-		
 	typedef CncLinearDirection CLD;
 	
 	// z navigation
 	if ( state.data.rightStickY != 0.0f ) {
 		
 		zNavigationActive = true;
-		if ( state.data.rightStickY > 0.0f )		mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncPosDir);
-		if (  state.data.rightStickY < 0.0f )		mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncNegDir);
+		if ( state.data.rightStickY > 0.0f )		THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncPosDir);
+		if (  state.data.rightStickY < 0.0f )		THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncNegDir);
 			
 	} else {
 	
@@ -166,33 +156,30 @@ void CncGamepadControllerState::managePositionViaStick(const GamepadEvent& state
 		if ( state.data.leftStickX != 0.0f || state.data.leftStickY != 0.0f ) {
 			
 			xyNavigationActive = true;
-			if ( state.data.leftStickX > 0.0f )		mainFrame->manualContinuousMoveStart(CLD::CncPosDir,  CLD::CncNoneDir, CLD::CncNoneDir);
-			if (  state.data.leftStickX < 0.0f )	mainFrame->manualContinuousMoveStart(CLD::CncNegDir,  CLD::CncNoneDir, CLD::CncNoneDir);
-			if ( state.data.leftStickY > 0.0f )		mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncPosDir,  CLD::CncNoneDir);
-			if (  state.data.leftStickY < 0.0f )	mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNegDir,  CLD::CncNoneDir);
+			if ( state.data.leftStickX > 0.0f )		THE_APP->manualContinuousMoveStart(CLD::CncPosDir,  CLD::CncNoneDir, CLD::CncNoneDir);
+			if (  state.data.leftStickX < 0.0f )	THE_APP->manualContinuousMoveStart(CLD::CncNegDir,  CLD::CncNoneDir, CLD::CncNoneDir);
+			if ( state.data.leftStickY > 0.0f )		THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncPosDir,  CLD::CncNoneDir);
+			if (  state.data.leftStickY < 0.0f )	THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNegDir,  CLD::CncNoneDir);
 		}
 	}
 	
 	// stop move
 	if ( zNavigationActive == true ) {
 		if ( state.data.rightStickY == 0.0f && state.data.rightStickY == 0.0f )
-			mainFrame->manualContinuousMoveStop();
+			THE_APP->manualContinuousMoveStop();
 			
 	} else if ( xyNavigationActive == true ) {
 		if ( state.data.leftStickX  == 0.0f && state.data.leftStickY  == 0.0f )
-			mainFrame->manualContinuousMoveStop();
+			THE_APP->manualContinuousMoveStop();
 			
 	} else {
 		// safety
-		mainFrame->manualContinuousMoveStop();
+		THE_APP->manualContinuousMoveStop();
 	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::managePositionViaNavi(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	if ( mainFrame == NULL )
-		return;
-	
 	bool left 	= state.data.buttonLeft; 
 	bool right 	= state.data.buttonRight;
 	bool up 	= state.data.buttonUp;
@@ -201,55 +188,52 @@ void CncGamepadControllerState::managePositionViaNavi(const GamepadEvent& state)
 	typedef CncLinearDirection CLD;
 	
 	switch ( posCtrlMode ) {
-		case PCM_NAV_XY:	if ( left  == true ) 	{ mainFrame->manualContinuousMoveStart(CLD::CncNegDir,  CLD::CncNoneDir, CLD::CncNoneDir); }
-							if ( right == true ) 	{ mainFrame->manualContinuousMoveStart(CLD::CncPosDir,  CLD::CncNoneDir, CLD::CncNoneDir); }
-							if ( up    == true ) 	{ mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncPosDir,  CLD::CncNoneDir); }
-							if ( down  == true ) 	{ mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNegDir,  CLD::CncNoneDir); }
+		case PCM_NAV_XY:	if ( left  == true ) 	{ THE_APP->manualContinuousMoveStart(CLD::CncNegDir,  CLD::CncNoneDir, CLD::CncNoneDir); }
+							if ( right == true ) 	{ THE_APP->manualContinuousMoveStart(CLD::CncPosDir,  CLD::CncNoneDir, CLD::CncNoneDir); }
+							if ( up    == true ) 	{ THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncPosDir,  CLD::CncNoneDir); }
+							if ( down  == true ) 	{ THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNegDir,  CLD::CncNoneDir); }
 							break;
 							
-		case PCM_NAV_Z:		if ( up    == true ) 	{ mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncPosDir); }
-							if ( down  == true ) 	{ mainFrame->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncNegDir); }
+		case PCM_NAV_Z:		if ( up    == true ) 	{ THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncPosDir); }
+							if ( down  == true ) 	{ THE_APP->manualContinuousMoveStart(CLD::CncNoneDir, CLD::CncNoneDir, CLD::CncNegDir); }
 							break;
 							
 		default:			return;
 	}
 	 
 	if ( left == false && right == false && up == false && down == false )
-		mainFrame->manualContinuousMoveStop();
+		THE_APP->manualContinuousMoveStop();
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::mangageMainView(const GamepadEvent& state) {
 ///////////////////////////////////////////////////////////////////
-	if ( mainFrame == NULL )
-		return;
-		
-	mainFrame->GetGpBmp1()->Show(false);
-	mainFrame->GetGpBmp2()->Show(false);
-	mainFrame->GetGpBmp3()->Show(false);
-	mainFrame->GetGpBmp4()->Show(false);
+	THE_APP->GetGpBmp1()->Show(false);
+	THE_APP->GetGpBmp2()->Show(false);
+	THE_APP->GetGpBmp3()->Show(false);
+	THE_APP->GetGpBmp4()->Show(false);
 	
 	switch ( posCtrlMode ) {
-		case PCM_STICKS:	mainFrame->GetGpBmp1()->SetBitmap(ImageLibGamepad().Bitmap("BMP_STICK_LEFT"));
-							mainFrame->GetGpBmp2()->SetBitmap(ImageLibGamepad().Bitmap("BMP_STICK_RIGHT"));
-							mainFrame->GetGpBmp1()->Show();
-							mainFrame->GetGpBmp2()->Show();
+		case PCM_STICKS:	THE_APP->GetGpBmp1()->SetBitmap(ImageLibGamepad().Bitmap("BMP_STICK_LEFT"));
+							THE_APP->GetGpBmp2()->SetBitmap(ImageLibGamepad().Bitmap("BMP_STICK_RIGHT"));
+							THE_APP->GetGpBmp1()->Show();
+							THE_APP->GetGpBmp2()->Show();
 							break;
 							
-		case PCM_NAV_XY:	mainFrame->GetGpBmp1()->SetBitmap(ImageLibGamepad().Bitmap("BMP_NAVI_XY"));
-							mainFrame->GetGpBmp1()->Show();
+		case PCM_NAV_XY:	THE_APP->GetGpBmp1()->SetBitmap(ImageLibGamepad().Bitmap("BMP_NAVI_XY"));
+							THE_APP->GetGpBmp1()->Show();
 							break;
 							
-		case PCM_NAV_Z:		mainFrame->GetGpBmp1()->SetBitmap(ImageLibGamepad().Bitmap("BMP_NAVI_Z"));
-							mainFrame->GetGpBmp1()->Show();
+		case PCM_NAV_Z:		THE_APP->GetGpBmp1()->SetBitmap(ImageLibGamepad().Bitmap("BMP_NAVI_Z"));
+							THE_APP->GetGpBmp1()->Show();
 							break;
 	}
 	
-	mainFrame->GetGpBmp1()->Refresh();
-	mainFrame->GetGpBmp2()->Refresh();
-	mainFrame->GetGpBmp3()->Refresh();
-	mainFrame->GetGpBmp4()->Refresh();
+	THE_APP->GetGpBmp1()->Refresh();
+	THE_APP->GetGpBmp2()->Refresh();
+	THE_APP->GetGpBmp3()->Refresh();
+	THE_APP->GetGpBmp4()->Refresh();
 	
-	mainFrame->GetGpBmp1()->GetParent()->Layout();
+	THE_APP->GetGpBmp1()->GetParent()->Layout();
 }
 ///////////////////////////////////////////////////////////////////
 void CncGamepadControllerState::executeCommand(const wxString& cmd) {

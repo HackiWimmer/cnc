@@ -2,6 +2,7 @@
 #define CNC_STREAM_BUFFERS_H
 
 #include <sstream>
+#include <wx/listctrl.h>
 #include <wx/textctrl.h>
 
 ///////////////////////////////////////////////////////////////////
@@ -95,21 +96,29 @@ class CncCmsgBuf : public LoggerStreamBuf {
 ///////////////////////////////////////////////////////////////////
 class CncCspyBuf : public LoggerStreamBuf {
 	
+	private:
+		static const unsigned int maxBufferSize = 2048;
+		unsigned int bufferIndex;
+		char buffer[maxBufferSize];
+		
+		wxListCtrl* listCtrl;
+	
 	public:
-		static wxTextAttr lineNumberAttr;
-		
 		//////////////////////////////////////////////////////////
-		CncCspyBuf(wxTextCtrl* c) 
-		: LoggerStreamBuf(LoggerStreamBuf::Type::SPY, c, LoggerStreamBuf::defaultAttr) {}
+		CncCspyBuf(wxListCtrl* c) 
+		: LoggerStreamBuf(LoggerStreamBuf::Type::SPY, NULL, LoggerStreamBuf::defaultAttr) 
+		, bufferIndex(0)
+		, listCtrl(c)
+		{}
 		
-		//////////////////////////////////////////////////////////
-		virtual ~CncCspyBuf() {}
+		virtual ~CncCspyBuf() 
+		{}
 		
 		///////////////////////////////////////////////////////////
 		virtual int overflow (int c = EOF);
+		virtual void flush();
 		
-		///////////////////////////////////////////////////////////
-		int insertLineNumber(bool first = false);
+		void addLine(const wxString& line, int type);
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -325,22 +334,8 @@ class CncSerialSpyStream : public CncTraceLogStream {
 	
 	protected:
 		///////////////////////////////////////////////////////////
-		virtual void logMessage(const char* m) {
-			if ( m == NULL )
-				return;
-				
-			if ( getTextControl() != NULL )
-				getTextControl()->AppendText(m);
-		}
-		
-		///////////////////////////////////////////////////////////
-		virtual void logTime(bool lineFeed = true) {
-			wxDateTime now = wxDateTime::UNow();
-			(*this) << now.Format("%H:%M:%S.%l: ");
-			
-			if ( lineFeed == true )
-				(*this) << '\n';
-		}
+		virtual void logMessage(const char* m);
+		virtual void logTime();
 		
 	public:
 	
@@ -361,51 +356,17 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		}
 		
 		///////////////////////////////////////////////////////////
-		void initializeResult() {
-			wxColour c = getTextColour();
-			gray();
-			logTime(true);
-			setTextColour(c);
-		}
-		///////////////////////////////////////////////////////////
-		void addMarker(const wxString& mt) {
-			wxColour c = getTextColour();
-			red();
-			(*this) <<  CncSerialSpyStream::mLine;
-			(*this) << ":: " << mt << "\n";
-			(*this) <<  CncSerialSpyStream::mLine;
-			setTextColour(c);
-		}
+		void logCommand(const wxString& cmd);
+		void addMarker(const wxString& mt);
+		void enableMessage(const char* additional = NULL);
+		void disableMessage(const char* additional = NULL);
 		
 		///////////////////////////////////////////////////////////
-		void enableMessage(const char* additional = NULL) {
-			wxColour c = getTextColour();
-			blue();
-			(*this) <<  CncSerialSpyStream::hLine;
-			logTime(false);
-			(*this) << " Serial Spy enabled . . .\n";
-			if ( additional != NULL ) (*this) << additional;
-			(*this) <<  CncSerialSpyStream::hLine;
-			setTextColour(c);
-		}
+		void initializeResult(const char* msg = NULL);
 		
-		///////////////////////////////////////////////////////////
-		void disableMessage(const char* additional = NULL) {
-			wxColour c = getTextColour();
-			blue();
-			(*this) <<  CncSerialSpyStream::hLine;
-			logTime(false);
-			(*this) << " Serial Spy disabled . . .\n";
-			if ( additional != NULL ) (*this) << additional;
-			(*this) <<  CncSerialSpyStream::hLine;
-			setTextColour(c);
-		}
-		
-		///////////////////////////////////////////////////////////
 		void finalizeRET_OK(const char* msg = NULL);
 		void finalizeRET_ERROR(const char* msg = NULL );
 		void finalizeRET_LIMIT(const char* msg = NULL );
-		
 		void finalizeRET_INTERRUPT(const char* msg = NULL );
 		void finalizeRET_HALT(const char* msg = NULL );
 		void finalizeRET_QUIT(const char* msg = NULL );

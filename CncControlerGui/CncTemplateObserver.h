@@ -24,7 +24,7 @@ class CncTemplateObserver : public CncTemplateObserverBase {
 		
 		void changeObservation(bool state);
 		void logTimestamp();
-		
+		void logFileName();
 		void logTemplateModificationTimeStamp();
 		
 		bool isCurrentTemplateChanged();
@@ -32,6 +32,7 @@ class CncTemplateObserver : public CncTemplateObserverBase {
 		
 		void logInformation(const wxString& msg, const wxTextAttr ta);
 		void logInformation(const wxString& msg);
+
 		void logWarning(const wxString& msg);
 		void logError(const wxString& msg);
 		

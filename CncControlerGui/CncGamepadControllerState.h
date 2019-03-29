@@ -4,14 +4,11 @@
 #include "wxcrafter.h"
 #include "GamepadThread.h"
 
-class MainFrame;
-
 class CncGamepadControllerState : public CncGamepadControllerStateBase {
 	
 	private:
 		enum PosCtrlMode { PCM_STICKS = 0, PCM_NAV_XY = 1, PCM_NAV_Z = 2 };
 		
-		MainFrame* mainFrame;
 		PosCtrlMode posCtrlMode;
 		bool running;
 		
@@ -34,7 +31,7 @@ class CncGamepadControllerState : public CncGamepadControllerStateBase {
 		inline void mangageMainView(const GamepadEvent& state);
 		
 	public:
-		CncGamepadControllerState(MainFrame* parent);
+		CncGamepadControllerState(wxWindow* parent);
 		virtual ~CncGamepadControllerState();
 		
 		bool isRunning() { return running; }

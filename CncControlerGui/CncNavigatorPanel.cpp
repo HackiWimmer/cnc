@@ -444,8 +444,8 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 				if ( ocr.direction > WW )
 					continue;
 				
-				const int xm  = cos(ocr.midAngle   * PI / 180) * +(innerRadius * 1.2);
-				const int ym  = sin(ocr.midAngle   * PI / 180) * -(innerRadius * 1.2);
+				const int xm  = cos(ocr.midAngle   * PI / 180) * +(innerRadius * 1.2) - 5;
+				const int ym  = sin(ocr.midAngle   * PI / 180) * -(innerRadius * 1.2) - 5;
 				
 				dc.DrawLabel(config.toolTipMap[ocr.direction], wxRect(xm, ym, 10, 10), wxALIGN_CENTER );
 			}
@@ -456,13 +456,13 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 			if ( config.innerCircle == true ) {
 				
 				// positive
-				int xm  = cos(18 * PI / 180) * +(innerRadius * 0.64);
-				int ym  = sin(18 * PI / 180) * -(innerRadius * 0.64);
+				int xm  = cos(18 * PI / 180) * +(innerRadius * 0.64) - 5;
+				int ym  = sin(18 * PI / 180) * -(innerRadius * 0.64) - 5;
 				dc.DrawLabel(config.toolTipMap[CP], wxRect(xm, ym, 10, 10), wxALIGN_LEFT );
 				
-				// negitive
-				xm     = cos(18 * PI / 180) * +(innerRadius * 0.64);
-				ym     = sin(18 * PI / 180) * +(innerRadius * 0.64);
+				// negative
+				xm     = cos(18 * PI / 180) * +(innerRadius * 0.64) - 5;
+				ym     = sin(18 * PI / 180) * +(innerRadius * 0.64) - 5;
 				dc.DrawLabel(config.toolTipMap[CN], wxRect(xm, ym, 10, 10), wxALIGN_LEFT );
 			}
 		}
@@ -664,7 +664,7 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 		
 		if ( mi.leftUp == true ) {
 			evt.SetId(EID::CNP_LEFT_UP_REGION);
-			leftDownRegion(evt);
+			leftUpRegion(evt);
 			
 			if ( current.acitvated  == true ) {
 				evt.SetId(EID::CNP_DEACTIVATE_REGION);

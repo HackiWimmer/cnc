@@ -17,8 +17,15 @@ class CncReferencePosition : public CncReferencePositionBase
 		CncRefPositionMode getReferenceMode();
 		void shiftReferenceMode();
 		double getWorkpieceThickness();
+		
+		bool shouldZeroX() 	{ return m_btZeroX->GetValue(); }
+		bool shouldZeroY() 	{ return m_btZeroY->GetValue(); }
+		bool shouldZeroZ() 	{ return m_btZeroZ->GetValue(); }
 	
 	protected:
+		virtual void hideInformation(wxCommandEvent& event);
+		virtual void infoTimer(wxTimerEvent& event);
+		virtual void selectInformation(wxMouseEvent& event);
 		virtual void selectStepSensitivity(wxCommandEvent& event);
 		virtual void init(wxInitDialogEvent& event);
 		virtual void show(wxShowEvent& event);
@@ -31,6 +38,10 @@ class CncReferencePosition : public CncReferencePositionBase
 		virtual void mode5(wxCommandEvent& event);
 		virtual void mode6(wxCommandEvent& event);
 		
+		virtual void toggleZeroX(wxCommandEvent& event) 	{ determineZeroMode(); }
+		virtual void toggleZeroY(wxCommandEvent& event) 	{ determineZeroMode(); }
+		virtual void toggleZeroZ(wxCommandEvent& event) 	{ determineZeroMode(); }
+
 		void onNavigatorPanel(CncNavigatorPanelEvent& event);
 		
 		short evaluateMode();
@@ -40,7 +51,10 @@ class CncReferencePosition : public CncReferencePositionBase
 	
 		MainFrame* parentFrame;
 		CncNavigatorPanel* navigationPanel;
+		wxString infoMessage;
 		
 		bool isWorkpieceThicknessNeeded();
+		void determineZeroMode();
+		void showInformation(bool show);
 };
 #endif // CNCREFERENCEPOSITION_H

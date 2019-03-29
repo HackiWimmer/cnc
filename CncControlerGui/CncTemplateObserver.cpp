@@ -87,8 +87,8 @@ void CncTemplateObserver::enableObservationTimer(bool state) {
 //////////////////////////////////////////////////////////////
 void CncTemplateObserver::suspendObservation() {
 //////////////////////////////////////////////////////////////
-	wxString fn(THE_APP->getCurrentTemplatePathFileName());
-	logInformation(wxString::Format("Suspending observation for  : '%s'\n", fn), styles.taSuspend);
+	logInformation("Suspending observation . . .\n", styles.taSuspend);
+	logFileName();
 	
 	m_lastTimestamp->ChangeValue("Suspended");
 	enableObservationTimer(false);
@@ -97,9 +97,8 @@ void CncTemplateObserver::suspendObservation() {
 void CncTemplateObserver::reconstructObservation() {
 //////////////////////////////////////////////////////////////
 	if ( observationActive == true ) {
-		wxString fn(THE_APP->getCurrentTemplatePathFileName());
-		logInformation(wxString::Format("Reconstruct observation for : '%s'\n", fn), styles.taReconstruct);
-		
+		logInformation("Reconstruct observation . . .\n", styles.taReconstruct);
+		logFileName();
 		logTimestamp();
 		enableObservationTimer(true);
 	}
@@ -107,11 +106,9 @@ void CncTemplateObserver::reconstructObservation() {
 //////////////////////////////////////////////////////////////
 void CncTemplateObserver::startObservation() {
 //////////////////////////////////////////////////////////////
-	wxString fn(THE_APP->getCurrentTemplatePathFileName());
-	logInformation(wxString::Format("Starting observation for    : '%s'\n", fn), styles.taStart);
-	
+	logInformation("Starting observation . . .\n", styles.taStart);
+	logFileName();
 	logTemplateModificationTimeStamp();
-	
 	logTimestamp();
 	
 	THE_APP->reloadTemplate(TemplateBookSelection::VAL::OBSERVER);
@@ -122,8 +119,8 @@ void CncTemplateObserver::startObservation() {
 //////////////////////////////////////////////////////////////
 void CncTemplateObserver::stopObservation() {
 //////////////////////////////////////////////////////////////
-	wxString fn(THE_APP->getCurrentTemplatePathFileName());
-	logInformation(wxString::Format("Stopping observation for    : '%s'\n", fn), styles.taEnd);
+	logInformation("Stopping observation . . .\n", styles.taEnd);
+	logFileName();
 	
 	m_lastTimestamp->ChangeValue("Inactive");
 	enableObservationTimer(false);
@@ -135,9 +132,19 @@ void CncTemplateObserver::changeObservation(bool state) {
 	else								stopObservation();
 }
 ///////////////////////////////////////////////////////////////////
+void CncTemplateObserver::logFileName() {
+///////////////////////////////////////////////////////////////////
+	const wxString fn(THE_APP->getCurrentTemplatePathFileName());
+	GetCurTemplateName()->ChangeValue(fn);
+	
+	const wxFileName tplFile(fn);
+	GetCurTemplateTimestamp()->ChangeValue(tplFile.GetModificationTime().FormatISOCombined(' '));
+	GetCurTemplateSize()->ChangeValue(tplFile.GetHumanReadableSize());
+}
+///////////////////////////////////////////////////////////////////
 void CncTemplateObserver::logTemplateModificationTimeStamp() {
 ///////////////////////////////////////////////////////////////////
-	wxString fn(THE_APP->getCurrentTemplatePathFileName());
+	const wxString fn(THE_APP->getCurrentTemplatePathFileName());
 	wxFileName tplFile(fn);
 	
 	if ( tplFile.Exists() == false ) {
@@ -154,7 +161,7 @@ bool CncTemplateObserver::isCurrentTemplateChanged() {
 	wxFileName tplFile(fn);
 	
 	if ( tplFile.Exists() == false ) {
-		logWarning(wxString::Format("The template file '%s' didn'i exists!\n", fn));
+		logWarning("The template file didn'i exists!\n");
 		return false;
 	}
 	
@@ -162,11 +169,8 @@ bool CncTemplateObserver::isCurrentTemplateChanged() {
 	
 	bool ret = false;
 	if ( dt != lastTemplateModification ) {
-		logInformation(wxString::Format("An externally template change is detected . . .\n\t   Name              : %s\n\t   Last Modification : %s\n\t   File size         : %s\n",
-										 tplFile.GetFullPath(),
-										 tplFile.GetModificationTime().FormatISOCombined(' '),
-										 tplFile.GetHumanReadableSize()
-									   ), styles.taDetected);
+		logInformation("An externally template change is detectedn . . .\n", styles.taDetected);
+		logFileName();
 		
 		lastTemplateModification = dt;
 		ret = true;

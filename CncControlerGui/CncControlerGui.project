@@ -192,6 +192,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncGameportController.h"/>
+      <File Name="CncGameportController.cpp"/>
       <File Name="CncOSEnvironmentDialog.h"/>
       <File Name="CncOSEnvironmentDialog.cpp"/>
       <File Name="CncSvgControl.h"/>
@@ -306,7 +308,6 @@
       <File Name="sha1.cpp"/>
       <File Name="sha1.h"/>
       <File Name="DataControlModel.cpp"/>
-      <File Name="GuiControlSetup.h"/>
       <File Name="PenHandler.h"/>
       <File Name="DataControlModel.h"/>
       <File Name="LruFileList.h"/>
@@ -318,8 +319,6 @@
     </VirtualDirectory>
     <VirtualDirectory Name="Spy">
       <File Name="HexDecoder.cpp"/>
-      <File Name="CncSpyControl.h"/>
-      <File Name="CncSpyControl.cpp"/>
       <File Name="HexDecoder.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Inbound - Base">
@@ -389,6 +388,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncSerialSpyListCtrl.cpp"/>
+      <File Name="CncSerialSpyListCtrl.h"/>
       <File Name="CncSummaryListCtrl.cpp"/>
       <File Name="CncSummaryListCtrl.h"/>
       <File Name="CncLargeScaleListCtrl.cpp"/>

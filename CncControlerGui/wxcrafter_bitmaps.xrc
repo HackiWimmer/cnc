@@ -77,6 +77,7 @@
   <object class="wxBitmap" name="24-help@2x">bitmaps\24-help@2x.png</object>
   <object class="wxBitmap" name="24-info">bitmaps\24-info.png</object>
   <object class="wxBitmap" name="24-info@2x">bitmaps\24-info@2x.png</object>
+  <object class="wxBitmap" name="24-info@2x">bitmaps\24-info@2x.png</object>
   <object class="wxBitmap" name="24-project@2x">bitmaps\24-project@2x.png</object>
   <object class="wxBitmap" name="24-redo">bitmaps\24-redo.png</object>
   <object class="wxBitmap" name="24-redo@2x">bitmaps\24-redo@2x.png</object>
@@ -273,6 +274,7 @@
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
+  <object class="wxBitmap" name="color-swatch">bitmaps\color-swatch.png</object>
   <object class="wxBitmap" name="cube_green">bitmaps\cube_green.png</object>
   <object class="wxBitmap" name="database">bitmaps\database.png</object>
   <object class="wxBitmap" name="database-key">bitmaps\database-key.png</object>
@@ -280,6 +282,7 @@
   <object class="wxBitmap" name="db_update">bitmaps\db_update.png</object>
   <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
   <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
+  <object class="wxBitmap" name="dialog-close-2">bitmaps\dialog-close-2.png</object>
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
   <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="dialog-information-3 (2)">bitmaps\dialog-information-3 (2).png</object>
