@@ -49,6 +49,7 @@ class CncSecureRun;
 class CncStatisticsPane;
 class CncSvgViewer;
 class CncGameportController;
+class CncSpeedMonitor;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -534,6 +535,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncSourceEditor;
 		friend class CncOutboundEditor;
 		friend class CncConfig;
+		friend class CncContext;
 		friend class CncGampadDeactivator;
 		friend class CncTransactionLock;
 		friend class CncReferencePosition;
@@ -576,6 +578,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncToolMagazine* 				toolMagaizne;
 		CncPosSpyListCtrl* 				positionSpy;
 		CncSetterListCtrl* 				setterList;
+		CncSpeedMonitor*				speedMonitor;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
 		CncSerialSpyListCtrl* 			serialSpyListCtrl;
 		CfgAccelerationGraph* 			accelGraphPanel; 

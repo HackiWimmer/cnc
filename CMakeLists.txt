@@ -354,6 +354,8 @@ set(SOURCE_FILES
 		CncControlerGui/CncNavigatorPanel.cpp
 		CncControlerGui/CncOSEnvironmentDialog.cpp
 		CncControlerGui/CncSvgControl.cpp
+		CncControlerGui/CncSpeedMonitor.cpp
+		CncControlerGui/CncContext.cpp
 	    CncControlerGui/wxcrafter_bitmaps.cpp)
 
 

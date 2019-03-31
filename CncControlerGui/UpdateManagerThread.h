@@ -4,6 +4,7 @@
 #include <wx/thread.h>
 #include <wx/datetime.h>
 #include <boost/lockfree/spsc_queue.hpp>
+#include "OSD/CncTimeFunctions.h"
 #include "CncPosSpyListCtrl.h"
 #include "CncSetterListCtrl.h"
 #include "CncCommon.h"
@@ -86,9 +87,10 @@ class UpdateManagerThread : public wxThread {
 						SETTER_ADD
 					};
 			
-			Type type      = EMPTY_UPD;
-			wxDateTime ts  = wxDateTime::UNow();
-			bool processed = false;
+			Type type      		= EMPTY_UPD;
+			bool processed 		= false;
+			wxDateTime time		= wxDateTime::UNow();
+			CncNanoTimestamp ts = CncTimeFunctions::getNanoTimestamp();
 			
 			const char* getTypeAsString() const {
 				switch ( type ) {
@@ -131,7 +133,8 @@ class UpdateManagerThread : public wxThread {
 			
 				inline const Event& SetterEvent(unsigned char i, const cnc::SetterValueList& v) {
 					type         = SETTER_ADD;
-					ts           = wxDateTime::UNow();
+					time		 = wxDateTime::UNow();
+					ts           = CncTimeFunctions::getNanoTimestamp();
 					processed    = false;
 					set.id       = i;
 					set.values   = v;
@@ -144,6 +147,7 @@ class UpdateManagerThread : public wxThread {
 			
 				inline const Event& PosSpyResetEvent() {
 					type			= POSSPY_RESET;
+					ts 				= CncTimeFunctions::getNanoTimestamp();
 					processed    	= false;
 					return *this;
 				}
@@ -154,8 +158,9 @@ class UpdateManagerThread : public wxThread {
 			} cnt;
 			
 				inline const Event& PosSypContentEvent(UpdateManagerThread::SpyContent sc) {
-					type         = POS_TYP_UPD;
-					cnt.posSpyType   = sc;
+					type			= POS_TYP_UPD;
+					cnt.posSpyType	= sc;
+					ts 				= CncTimeFunctions::getNanoTimestamp();
 					return *this;
 				}
 
@@ -198,6 +203,7 @@ class UpdateManagerThread : public wxThread {
 				inline const Event& AppPosEvent(unsigned char pid, long i, CncSpeedMode sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= APP_POS_UPD;
 					processed    	= false;
+					ts 				= CncTimeFunctions::getNanoTimestamp();
 					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}
@@ -205,6 +211,7 @@ class UpdateManagerThread : public wxThread {
 				inline const Event& AppPosEvent(unsigned char pid, long i, const char sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= APP_POS_UPD;
 					processed    	= false;
+					ts 				= CncTimeFunctions::getNanoTimestamp();
 					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}
@@ -212,6 +219,7 @@ class UpdateManagerThread : public wxThread {
 				inline const Event& CtlPosEvent(unsigned char pid, long i, CncSpeedMode sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
+					ts 				= CncTimeFunctions::getNanoTimestamp();
 					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}
@@ -219,6 +227,7 @@ class UpdateManagerThread : public wxThread {
 				inline const Event& CtlPosEvent(unsigned char pid, long i, const char sm, double cfgSpeedValue, double curSpeedValue, const CncLongPosition& p) {
 					type			= CTL_POS_UPD;
 					processed    	= false;
+					ts 				= CncTimeFunctions::getNanoTimestamp();
 					pos.set(pid, i, sm, cfgSpeedValue, curSpeedValue, p);
 					return *this;
 				}

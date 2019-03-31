@@ -13,6 +13,7 @@
 #include "CncCommon.h"
 #include "CncArduino.h"
 #include "CncCommandDecoder.h"
+#include "CncContext.h"
 #include "SerialPort.h"
 #include "MainFrame.h"
 
@@ -142,7 +143,7 @@ void Serial::logMeasurementLastTs() {
 	tsMeasurementLast = CncTimeFunctions::getNanoTimestamp();
 	
 	// calculate current feed speed
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		const short T = 3;
 		CncNanoTimestamp tDiff = getMeasurementNanoTimeSpanLastRef();
 		double pDiff           = totalDistance[T] - totalDistanceRef;
@@ -167,7 +168,7 @@ void Serial::logMeasurementRefTs(const CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	tsMeasurementRef = CncTimeFunctions::getNanoTimestamp();
 	
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		const short T = 3;
 		totalDistanceRef = totalDistance[T];
 		measurementRefPos.set(pos);

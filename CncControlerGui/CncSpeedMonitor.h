@@ -1,0 +1,101 @@
+#ifndef CNCSPEEDMONITOR_H
+#define CNCSPEEDMONITOR_H
+
+#include "OSD/CncTimeFunctions.h"
+#include "wxcrafter.h"
+
+class CncSpeedMonitor : public CncSpeedMonitorBase {
+
+	public:
+		CncSpeedMonitor(wxWindow* parent);
+		virtual ~CncSpeedMonitor();
+		
+		void start(double maxSpeedValue_MM_MIN);
+		void stop();
+		void setCurrentFeedSpeedValue(double measured_MM_MIN, double configured_MM_MIN);
+		
+	protected:
+    virtual void changeIntervalSlider(wxScrollEvent& event);
+		virtual void toggleConfiguredAxis(wxCommandEvent& event);
+		virtual void toggleConnection(wxCommandEvent& event);
+		virtual void toggleMeasurePointsAxis(wxCommandEvent& event);
+		virtual void onLeftDown(wxMouseEvent& event);
+		virtual void onLeftUp(wxMouseEvent& event);
+		virtual void onMouseMotion(wxMouseEvent& event);
+		virtual void onTimer(wxTimerEvent& event);
+		virtual void onPaint(wxPaintEvent& event);
+		virtual void onSize(wxSizeEvent& event);
+		
+	private:
+		
+		static const unsigned int refreshInterval	=  100;
+		
+		static const unsigned int lMargin 			=   28;
+		static const unsigned int rMargin 			=   28;
+		static const unsigned int tMargin 			=    8;
+		static const unsigned int bMargin 			=    8;
+		
+		static const unsigned int MAX_VALUES 		= 4096;
+		
+		struct Axis {
+			bool fill	= false;
+			wxPen pen 	= wxPen(*wxWHITE, 1, wxSOLID);
+			int pos 	= wxRIGHT;
+			int yOffset	= 0;
+			
+			unsigned int height = 0;
+						
+			double minValue 	= 0.0;
+			double maxValue 	= 0.0;
+			
+			unsigned int values[MAX_VALUES];
+			
+			// --------------------------------------------------
+			Axis() {
+				for ( unsigned int i = 0; i < MAX_VALUES; i++ )
+					values[i] = 0;
+			}
+			
+			// --------------------------------------------------
+			unsigned int convert(double value) {
+				if ( maxValue <= 0.0 )
+					return 0;
+				
+				value -= minValue;
+				
+				if ( value <= minValue )
+					return 0;
+					
+				if ( value >= maxValue )
+					return height;
+				
+				return value * height / maxValue;
+			}
+			
+			// --------------------------------------------------
+			double convertToValue(unsigned int value) {
+				if ( height == 0 )
+					return 0;
+					
+				return value * maxValue / height;
+			}
+		};
+		
+		wxRect drawingArea;
+		wxFont valueFont;
+		wxFont labelFont;
+		wxPoint mouseLabel;
+		
+		Axis axisMeasurePoints;
+		Axis axisMeasuredSpeed;
+		Axis axisConfiguredSpeed;
+		
+		CncMilliTimestamp lastRefresh;
+		unsigned int timeIndex;
+		double currentMeasuredFeedSpeed_MM_MIN;
+		double currentConfiguredFeedSpeed_MM_MIN;
+		
+		void reset();
+	
+};
+#endif // CNCSPEEDMONITOR_H

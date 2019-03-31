@@ -6,6 +6,7 @@
 #include "CncMotionMonitor.h"
 #include "MainFrame.h"
 #include "CncConfig.h"
+#include "CncContext.h"
 #include "CncMonitorReplayPane.h"
 #include "CncStatisticsPane.h"
 
@@ -159,7 +160,7 @@ void CncStatisticsPane::logStatistics(bool force) {
 
 	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);
 	
-	bool setupSpeedValue = GBL_CONFIG->isProbeMode() == false;
+	bool setupSpeedValue = GBL_CONTEXT->isProbeMode() == false;
 	if ( cnc->isEmulator() == false )
 		setupSpeedValue = true;
 

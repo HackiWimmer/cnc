@@ -203,7 +203,7 @@ void UpdateManagerThread::popAndFormatSetterQueue() {
 			}
 			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		wxString::Format("%ld", 		(long)value));
 			setterRow.updateItem(CncSetterListCtrl::COL_KEY, 		label);
-			setterRow.updateItem(CncSetterListCtrl::COL_VAL, 		wxString::Format("%s.%03ld", 	lste.ts.FormatTime(), (long)lste.ts.GetMillisecond()));
+			setterRow.updateItem(CncSetterListCtrl::COL_VAL, 		wxString::Format("%s.%03ld", 	lste.time.FormatTime(), (long)lste.time.GetMillisecond()));
 			
 		} else {
 			setterRow.updateItem(CncSetterListCtrl::COL_TYPE, 		"");

@@ -627,6 +627,8 @@ protected:
     wxPanel* m_debuggerView;
     wxPropertyGridManager* m_debuggerPropertyManagerGrid;
     wxPanel* m_positionMonitorView;
+    wxNotebook* m_notebook7508;
+    wxPanel* m_panel7502;
     wxBitmapToggleButton* m_btTogglePosSpy;
     wxBitmapButton* m_btCopyPosSpy;
     wxBitmapButton* m_btSearchPosSpy;
@@ -635,11 +637,13 @@ protected:
     wxStaticText* m_staticText4526;
     wxTextCtrl* m_positionSpyCount;
     wxListCtrl* m_positionSpy;
-    wxPanel* m_speedPanel;
     wxBitmapButton* m_bmpButton47181;
     wxBitmapButton* m_bmpButton4718;
     wxBitmapButton* m_bmpButton47182;
     wxBitmapButton* m_bmpButton47183;
+    wxPanel* m_panel7504;
+    wxPanel* m_speedMonitorPlaceholder;
+    wxPanel* m_speedPanel;
     wxMenuBar* m_menuBar;
     wxMenu* m_menuFile;
     wxMenuItem* m_miNewTemplate;
@@ -926,11 +930,11 @@ protected:
     virtual void searchPosSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void selectPositionSpyContent(wxCommandEvent& event) { event.Skip(); }
-    virtual void onPaintSpeedPanel(wxPaintEvent& event) { event.Skip(); }
     virtual void goPosSypFirstId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypLastId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypPrevId(wxCommandEvent& event) { event.Skip(); }
     virtual void goPosSypNextId(wxCommandEvent& event) { event.Skip(); }
+    virtual void onPaintSpeedPanel(wxPaintEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
@@ -1549,11 +1553,15 @@ public:
     wxStaticText* GetStaticText4526() { return m_staticText4526; }
     wxTextCtrl* GetPositionSpyCount() { return m_positionSpyCount; }
     wxListCtrl* GetPositionSpy() { return m_positionSpy; }
-    wxPanel* GetSpeedPanel() { return m_speedPanel; }
     wxBitmapButton* GetBmpButton47181() { return m_bmpButton47181; }
     wxBitmapButton* GetBmpButton4718() { return m_bmpButton4718; }
     wxBitmapButton* GetBmpButton47182() { return m_bmpButton47182; }
     wxBitmapButton* GetBmpButton47183() { return m_bmpButton47183; }
+    wxPanel* GetPanel7502() { return m_panel7502; }
+    wxPanel* GetSpeedMonitorPlaceholder() { return m_speedMonitorPlaceholder; }
+    wxPanel* GetPanel7504() { return m_panel7504; }
+    wxNotebook* GetNotebook7508() { return m_notebook7508; }
+    wxPanel* GetSpeedPanel() { return m_speedPanel; }
     wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }
@@ -2245,6 +2253,42 @@ public:
     wxListbook* GetListbook7478() { return m_listbook7478; }
     CncGamepadControllerStateBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncGamepadControllerStateBase();
+};
+
+
+class CncSpeedMonitorBase : public wxPanel
+{
+protected:
+    wxBitmapToggleButton* m_btToggleConnection;
+    wxBitmapToggleButton* m_btToggleConfiguredAxis;
+    wxBitmapToggleButton* m_btToggleMeasurePointsAxis;
+    wxStaticText* m_staticText7534;
+    wxSlider* m_intervalSlider;
+    wxPanel* m_darwingArea;
+    wxTimer* m_refreshTimer;
+
+protected:
+    virtual void toggleConnection(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleMeasurePointsAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void changeIntervalSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void onSize(wxSizeEvent& event) { event.Skip(); }
+    virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
+    virtual void onMouseMotion(wxMouseEvent& event) { event.Skip(); }
+    virtual void onLeftDown(wxMouseEvent& event) { event.Skip(); }
+    virtual void onLeftUp(wxMouseEvent& event) { event.Skip(); }
+    virtual void onTimer(wxTimerEvent& event) { event.Skip(); }
+
+public:
+    wxBitmapToggleButton* GetBtToggleConnection() { return m_btToggleConnection; }
+    wxBitmapToggleButton* GetBtToggleConfiguredAxis() { return m_btToggleConfiguredAxis; }
+    wxBitmapToggleButton* GetBtToggleMeasurePointsAxis() { return m_btToggleMeasurePointsAxis; }
+    wxStaticText* GetStaticText7534() { return m_staticText7534; }
+    wxSlider* GetIntervalSlider() { return m_intervalSlider; }
+    wxPanel* GetDarwingArea() { return m_darwingArea; }
+    wxTimer* GetRefreshTimer() { return m_refreshTimer; }
+    CncSpeedMonitorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncSpeedMonitorBase();
 };
 
 

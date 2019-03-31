@@ -487,48 +487,6 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	
 	drawOuterCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
 	drawInnerCircleBorders(wxPen(*wxBLACK, 1, wxSOLID), wxPen(*wxBLACK, 1, wxSOLID), false);
-
-/*
-	for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-		OuterCircleRegion ocr = *it;
-		
-		//dc.SetBrush(*wxTRANSPARENT_BRUSH);
-		
-		const int xm  = -5 + cos(ocr.midAngle   * PI / 180) * +(innerRadius + 9);
-		const int ym  = -5 + sin(ocr.midAngle   * PI / 180) * -(innerRadius + 9);
-
-		if ( ocr.direction == current.direction ) {
-			
-			if ( current.acitvated == false ) {
-				
-				dc.SetBrush(config.highlightColour);
-				dc.FloodFill(xm, ym, config.highlightColour, wxFLOOD_BORDER );
-				
-			} else {
-				dc.SetBrush(config.activatedColour);
-				dc.FloodFill(xm, ym, config.activatedColour, wxFLOOD_BORDER );
-			}
-			
-		} else {
-			dc.SetBrush(config.defaultColour);
-			dc.FloodFill(xm, ym, config.defaultColour, wxFLOOD_BORDER );
-		}
-
-
-
-
-	}*/
-	
-
-	
-	
-
-	
-	
-	
-
-	
-
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onMouse(wxMouseEvent& event) {

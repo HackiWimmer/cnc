@@ -7,6 +7,7 @@
 #include "CncControl.h"
 #include "MainFrame.h"
 #include "CncCommandDecoder.h"
+#include "CncContext.h"
 #include "SerialEmulatorNull.h"
 
 static const short POINT_LENGTH = 3;
@@ -785,7 +786,7 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, u
 bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	// update speed simulator values
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->initMove(dx, dy, dz);
 	}
@@ -869,7 +870,7 @@ bool SerialEmulatorNULL::renderMove(int32_t dx , int32_t dy , int32_t dz, unsign
 		return false;
 	
 	// perform any rest offset
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->performCurrentOffset(true);
 		speedSimulator->completeMove();
@@ -1022,7 +1023,7 @@ unsigned char SerialEmulatorNULL::signalHandling() {
 void SerialEmulatorNULL::simulateSteppingTimeX(int32_t steps) {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		const int32_t val = absolute(steps);
 		
@@ -1036,7 +1037,7 @@ void SerialEmulatorNULL::simulateSteppingTimeX(int32_t steps) {
 void SerialEmulatorNULL::simulateSteppingTimeY(int32_t steps) {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		const int32_t val = absolute(steps);
 		
@@ -1050,7 +1051,7 @@ void SerialEmulatorNULL::simulateSteppingTimeY(int32_t steps) {
 void SerialEmulatorNULL::simulateSteppingTimeZ(int32_t steps) {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
-	if ( GBL_CONFIG->isProbeMode() == false ) {
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		const int32_t val = absolute(steps);
 		

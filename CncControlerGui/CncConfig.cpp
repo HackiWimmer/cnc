@@ -4,6 +4,7 @@
 #include "wxcrafter.h"
 #include "CncConfigCommon.h"
 #include "CncUnitCalculator.h"
+#include "CncContext.h"
 #include "CncConfig.h"
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
@@ -60,10 +61,10 @@ bool CncConfig::ToolMagazineEntry::deserialize(const wxString& input) {
 CncConfig::CncConfig(MainFrame* app) 
 : changed(true)
 , notificationActivated(true)
-, probeMode(true)
 , osdConfigList()
 , currentUnit(CncSteps)
 , theApp(app)
+, context(new CncContext())
 , toolMagazine()
 , registeredWindows()
 , dispFactX(1.0), dispFactY(1.0), dispFactZ(1.0)
@@ -113,13 +114,6 @@ void CncConfig::rc() {
 //rc = reset changed
 ////////////////////////////////////////////////////////////////////////
 	changed = false; 
-}
-////////////////////////////////////////////////////////////////////////
-void CncConfig::setProbeMode(bool state) { 
-////////////////////////////////////////////////////////////////////////
-	probeMode = state;
-	if ( THE_APP )
-		THE_APP->decorateProbeMode(probeMode);
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::deactivateConfigNotification() {

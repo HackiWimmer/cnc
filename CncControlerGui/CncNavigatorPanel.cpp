@@ -491,10 +491,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 	} else {
 		drawOuterCircleBorders(wxPen(*wxLIGHT_GREY, 1, wxSOLID), wxPen(*wxLIGHT_GREY, 1, wxSOLID), false);
 		drawInnerCircleBorders(wxPen(*wxLIGHT_GREY, 1, wxSOLID), wxPen(*wxLIGHT_GREY, 1, wxSOLID), false);
-		
 	}
-	
-	
 }
 ///////////////////////////////////////////////////////////////////
 void CncNavigatorPanel::onMouse(wxMouseEvent& event) {

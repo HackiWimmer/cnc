@@ -192,6 +192,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncSpeedMonitor.h"/>
+      <File Name="CncSpeedMonitor.cpp"/>
       <File Name="CncGameportController.h"/>
       <File Name="CncGameportController.cpp"/>
       <File Name="CncOSEnvironmentDialog.h"/>
@@ -364,6 +366,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="Config">
+      <File Name="CncContext.cpp"/>
+      <File Name="CncContext.h"/>
       <File Name="CncConfigCommon.h"/>
       <File Name="CncOSDConfigList.cpp"/>
       <File Name="CncOSDConfigList.h"/>

@@ -19,6 +19,7 @@
 #include "SerialEmulatorBinaryStreamer.h"
 #include "CncMotionMonitor.h"
 #include "CncCommon.h"
+#include "CncContext.h"
 #include "CncControl.h"
 #include "CncFileNameService.h"
 #include "MainFrame.h"
@@ -304,7 +305,7 @@ bool CncControl::setup(bool doReset) {
 	long logPos = logger->GetLastPosition();
 	
 	// setup probe mode
-	if ( enableProbeMode(GBL_CONFIG->isProbeMode()) == false ) {
+	if ( enableProbeMode(GBL_CONTEXT->isProbeMode()) == false ) {
 		std::cerr << " CncControl::setup: Probe mode configuration failed!\n";
 		return false;
 	}
@@ -1898,12 +1899,12 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 		return false;
 		
 	// Always disable probe mode here, otherwise very long move distances appear
-	const bool probeModeBefore = GBL_CONFIG->isProbeMode();
+	const bool probeModeBefore = GBL_CONTEXT->isProbeMode();
 	if ( enableProbeMode(false) == false ) {
 		std::cerr << " Can't disable probe mode. Manual continous move aborted" << std::endl;
 		return false;
 	}
-	GBL_CONFIG->setProbeMode(false);
+	GBL_CONTEXT->setProbeMode(false);
 	
 	// Move preparation
 	initNextDuration();
@@ -1938,7 +1939,7 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	if ( (ret = enableProbeMode(probeModeBefore)) == false ) {
 		std::cerr << " Can't reactivate probe mode." << std::endl;
 	}
-	GBL_CONFIG->setProbeMode(probeModeBefore);
+	GBL_CONTEXT->setProbeMode(probeModeBefore);
 	
 	return true;
 }

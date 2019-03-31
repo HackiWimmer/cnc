@@ -257,6 +257,7 @@
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
   <object class="wxBitmap" name="application-view-gallery">bitmaps\application-view-gallery.png</object>
+  <object class="wxBitmap" name="appointment-soon">bitmaps\appointment-soon.png</object>
   <object class="wxBitmap" name="arrow-out">bitmaps\arrow-out.png</object>
   <object class="wxBitmap" name="arrow-right-3">bitmaps\arrow-right-3.png</object>
   <object class="wxBitmap" name="arrow-rotate-anticlockwise">bitmaps\arrow-rotate-anticlockwise.png</object>
@@ -364,9 +365,11 @@
   <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="settings">bitmaps\settings.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
+  <object class="wxBitmap" name="snap-guideline">bitmaps\snap-guideline.png</object>
   <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="software-update-available-3 (2)">bitmaps\software-update-available-3 (2).png</object>
   <object class="wxBitmap" name="software-update-inactive (2)">bitmaps\software-update-inactive (2).png</object>
+  <object class="wxBitmap" name="sports-shuttlecock">bitmaps\sports-shuttlecock.png</object>
   <object class="wxBitmap" name="start-here">bitmaps\start-here.png</object>
   <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>

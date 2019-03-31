@@ -35,6 +35,8 @@ wxDECLARE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);
 
 //////////////////////////////////////////////////////////////////////////////
 class MainFrame;
+class CncContext;
+
 typedef std::map<wxWindow*, wxWindow*> RegisteredWindows;
 
 static const int TOOL_MAGAZINE_MIN_ID = -1;
@@ -67,10 +69,10 @@ class CncConfig {
 	private:
 		bool 					changed;
 		bool 					notificationActivated;
-		bool 					probeMode;
 		CncOSDConfigList 		osdConfigList;
 		CncUnit 				currentUnit;
 		MainFrame* 				theApp;
+		CncContext*				context;
 		ToolMagazine 			toolMagazine;
 		ToolMagazineParameter 	toolMagazineParameter;
 		RegisteredWindows 		registeredWindows;
@@ -156,8 +158,10 @@ class CncConfig {
 		
 		void init();
 		
-		MainFrame* getTheApp() { return theApp; }
+		MainFrame* getTheApp() { wxASSERT(theApp); return theApp; }
 		void destroyTheApp() { theApp = NULL; }
+		
+		CncContext* getContext() { wxASSERT(context); return context; }
 		
 		// global config pointer - don't use this directly
 		static CncConfig* globalCncConfig;
@@ -171,6 +175,7 @@ class CncConfig {
 		
 		// global shortcuts
 		#define GBL_CONFIG  CncConfig::getGlobalCncConfig()
+		#define GBL_CONTEXT GBL_CONFIG->getContext()
 		#define THE_APP     GBL_CONFIG->getTheApp()
 		
 		// notifications
@@ -215,9 +220,6 @@ class CncConfig {
 		// modification flag
 		const bool isModified() 		{ return changed; }
 		void discardModifications() 	{ changed = false; }
-		
-		void setProbeMode(bool state); 
-		bool isProbeMode() { return  probeMode; }
 		
 		double convertX(CncUnit oldUnit, CncUnit newUnit, double value);
 		double convertY(CncUnit oldUnit, CncUnit newUnit, double value);

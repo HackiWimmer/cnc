@@ -79,6 +79,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncConfigProperty.h"
 #include "CncSecureRun.h"
 #include "CncReferencePosition.h"
+#include "CncSpeedMonitor.h"
 #include "CncUsbConnectionDetected.h"
 #include "CncConnectProgress.h"
 #include "CncSha1Wrapper.h"
@@ -90,6 +91,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncStatisticsPane.h"
 #include "CncSvgControl.h"
 #include "CncOSEnvironmentDialog.h"
+#include "CncContext.h"
 #include "GlobalStrings.h"
 #include "MainFrame.h"
 
@@ -352,6 +354,13 @@ void MainFrame::umPostEvent(const UpdateManagerThread::Event& evt) {
 	
 	//std::clog << "MainFrame::umPostEvent " << evt.getTypeAsString() << std::endl;
 	updateManagerThread->postEvent(evt); 
+	
+	#warning
+	if ( evt.pos.currentSpeedValue != 0.0 ) {
+		speedMonitor->setCurrentFeedSpeedValue(evt.pos.currentSpeedValue, evt.pos.configuredSpeedValue);
+		//std::cout << evt.pos.currentSpeedValue << ", " << evt.pos.configuredSpeedValue<< std::endl;
+	}
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
@@ -533,7 +542,7 @@ void MainFrame::enableGuiControls(bool state) {
 	}
 	
 	if ( state == true )
-		m_btSpeedControl->Enable(GBL_CONFIG->isProbeMode());
+		m_btSpeedControl->Enable(GBL_CONTEXT->isProbeMode());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::installCustControls() {
@@ -600,6 +609,10 @@ void MainFrame::installCustControls() {
 	// pos spy control
 	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_setterList, setterList);
+	
+	// speed monitor control
+	speedMonitor = new CncSpeedMonitor(this); 
+	GblFunc::replaceControl(m_speedMonitorPlaceholder, speedMonitor);
 	
 	// summary list
 	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
@@ -1072,7 +1085,7 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 		
 		wxString sValue(_maxSpeedLabel);
 		
-		if ( GBL_CONFIG->isProbeMode() == false ) {	
+		if ( GBL_CONTEXT->isProbeMode() == false ) {	
 			
 			const double dValue = cnc->getRealtimeFeedSpeed_MM_MIN();
 			if ( dValue  < 0.0 ) sValue.assign(_maxSpeedLabel);
@@ -1948,42 +1961,42 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
 		serialFileName.assign("dev/null");
-		GBL_CONFIG->setProbeMode(true);
+		GBL_CONTEXT->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
 	} 
 	else if ( sel == _portSimulatorNULL ) {
 		cnc = new CncControl(CncPORT_SIMU);
 		serialFileName.assign(_portSimulatorNULL);
-		GBL_CONFIG->setProbeMode(true);
+		GBL_CONTEXT->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(false);
 	} 
 	else if ( sel == _portEmulatorTEXT ) {
 		cnc = new CncControl(CncEMU_TXT);
 		serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
-		GBL_CONFIG->setProbeMode(true);
+		GBL_CONTEXT->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
 	} 
 	else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
 		serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
-		GBL_CONFIG->setProbeMode(true);
+		GBL_CONTEXT->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
 	}
 	else if ( sel == _portEmulatorGCODE ) {
 		cnc = new CncControl(CncEMU_GCODE);
 		serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
-		GBL_CONFIG->setProbeMode(true);
+		GBL_CONTEXT->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
 	} 
 	else if ( sel == _portEmulatorBIN) {
 		cnc = new CncControl(CncEMU_BIN);
 		serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
-		GBL_CONFIG->setProbeMode(true);
+		GBL_CONTEXT->setProbeMode(true);
 		decorateSecureDlgChoice(false);
 		decorateSpeedControlBtn(true);
 	} 
@@ -1991,7 +2004,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncPORT);
 		serialFileName.assign("\\\\.\\");
 		serialFileName.append(sel);
-		GBL_CONFIG->setProbeMode(false);
+		GBL_CONTEXT->setProbeMode(false);
 		decorateSecureDlgChoice(true);
 		decorateSpeedControlBtn(true);
 	}
@@ -3543,6 +3556,10 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	wxASSERT(cnc);
 	bool ret = true;
 	
+	#warning
+	speedMonitor->start(GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
+	std::cout << GBL_CONFIG->getMaxSpeedXYZ_MM_MIN() << std::endl;
+	
 	CncRunEventFilter cef;
 	
 	// deactivate idle requests
@@ -3598,7 +3615,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	}
 	
 	// prepare final statements
-	wxString probeMode(GBL_CONFIG->isProbeMode() ? "ON" :"OFF");
+	wxString probeMode(GBL_CONTEXT->isProbeMode() ? "ON" :"OFF");
 	if ( ret == false) {
 		wxString hint("not successfully");
 		cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
@@ -6705,18 +6722,18 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 	m_btProbeMode->Update();
 	
 	if ( motionMonitor != NULL ) {
-		motionMonitor->decorateProbeMode(GBL_CONFIG->isProbeMode());
+		motionMonitor->decorateProbeMode(GBL_CONTEXT->isProbeMode());
 		motionMonitor->display();
 	}
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickProbeMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	GBL_CONFIG->setProbeMode(m_btProbeMode->GetValue());
+	GBL_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
 	cnc->enableProbeMode(m_btProbeMode->GetValue());
 	
-	m_btSpeedControl->Enable(GBL_CONFIG->isProbeMode());
-	if ( GBL_CONFIG->isProbeMode() )	decorateSpeedControlBtn(GBL_CONFIG->isProbeMode());
+	m_btSpeedControl->Enable(GBL_CONTEXT->isProbeMode());
+	if ( GBL_CONTEXT->isProbeMode() )	decorateSpeedControlBtn(GBL_CONTEXT->isProbeMode());
 	else								decorateSpeedControlBtn(true);
 }
 /////////////////////////////////////////////////////////////////////
