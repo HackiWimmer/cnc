@@ -294,6 +294,7 @@
   <object class="wxBitmap" name="document-export">bitmaps\document-export.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
   <object class="wxBitmap" name="document-open-5">bitmaps\document-open-5.png</object>
+  <object class="wxBitmap" name="document-open-6">bitmaps\document-open-6.png</object>
   <object class="wxBitmap" name="document-preview">bitmaps\document-preview.png</object>
   <object class="wxBitmap" name="document-print-preview-3">bitmaps\document-print-preview-3.png</object>
   <object class="wxBitmap" name="document-save-3">bitmaps\document-save-3.png</object>

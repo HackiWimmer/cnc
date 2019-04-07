@@ -15,6 +15,7 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 				
 		wxListItemAttr itemAttrDefault;
 		wxListItemAttr itemAttrResultOk;
+		wxListItemAttr itemAttrResultMore;
 		wxListItemAttr itemAttrResultError;
 		wxListItemAttr itemAttrResultWarning;
 		wxListItemAttr itemAttrResultLimit;
@@ -44,12 +45,13 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		static const int TOTAL_COL_COUNT	=  3;
 		
 		enum LineType {	LT_ResultOk			=  1,
-						LT_ResultError		=  2,
-						LT_ResultWarning	=  3,
-						LT_ResultLimit		=  4,
-						LT_ResultHalt		=  5,
-						LT_ResultQuit		=  6,
-						LT_ResultInterrupt	=  7,
+						LT_ResultMore		=  2,
+						LT_ResultError		=  3,
+						LT_ResultWarning	=  4,
+						LT_ResultLimit		=  5,
+						LT_ResultHalt		=  6,
+						LT_ResultQuit		=  7,
+						LT_ResultInterrupt	=  8,
 						
 						LT_Separator		= 10,
 						LT_Info				= 11,

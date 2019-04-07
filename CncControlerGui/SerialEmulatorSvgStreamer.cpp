@@ -28,6 +28,33 @@ bool SerialEmulatorSvgStreamer::isOutputAsTemplateAvailable() {
 	return false; 
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorSvgStreamer::notifySetter(const CncCommandDecoder::SetterInfo& si) {
+///////////////////////////////////////////////////////////////////
+	// to overrider the default behavior only
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorSvgStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
+///////////////////////////////////////////////////////////////////
+	// to overrider the default behavior only
+	#warning impl: SerialEmulatorSvgStreamer::notifyMove
+	bodyStream << wxString::Format("<!-- notifyMove(%ld, %ld, %ld) -->\n", (long)dx, (long)dy, (long)dz);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorSvgStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << wxString::Format("<!-- MoveSequenceBegin(cmd = '%c' - %s) -->\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorSvgStreamer::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << wxString::Format("<!-- MoveSequenceNext(cmd = '%c' - %s) -->\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorSvgStreamer::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << wxString::Format("<!-- MoveSequenceEnd(cmd = '%c' - %s) -->\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorSvgStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
 	CncDoublePosition dPos;

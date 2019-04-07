@@ -365,6 +365,7 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		void initializeResult(const char* msg = NULL);
 		
 		void finalizeRET_OK(const char* msg = NULL);
+		void finalizeRET_MORE(const char* msg = NULL);
 		void finalizeRET_ERROR(const char* msg = NULL );
 		void finalizeRET_LIMIT(const char* msg = NULL );
 		void finalizeRET_INTERRUPT(const char* msg = NULL );

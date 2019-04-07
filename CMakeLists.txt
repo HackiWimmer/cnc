@@ -245,7 +245,6 @@ set(SOURCE_FILES
         CncControlerGui/GCodePathHandlerGL.h
         CncControlerGui/GlobalFunctions.cpp
         CncControlerGui/GlobalFunctions.h
-        CncControlerGui/GuiControlSetup.h
         CncControlerGui/HexDecoder.cpp
         CncControlerGui/HexDecoder.h
         CncControlerGui/LinearFunc.h
@@ -356,6 +355,9 @@ set(SOURCE_FILES
 		CncControlerGui/CncSvgControl.cpp
 		CncControlerGui/CncSpeedMonitor.cpp
 		CncControlerGui/CncContext.cpp
+		CncControlerGui/CncGameportController.cpp
+		CncControlerGui/CncMessageDialog.cpp
+		CncControlerGui/CncMoveSequence.cpp
 	    CncControlerGui/wxcrafter_bitmaps.cpp)
 
 

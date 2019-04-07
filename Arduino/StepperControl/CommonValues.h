@@ -139,15 +139,11 @@ struct I2CData {
   const unsigned char CMD_SETTER                          =  'S';
   const unsigned char CMD_GETTER                          =  'G';
   
-  const unsigned char CMD_POS_STEP_X                      =  'X';
-  const unsigned char CMD_NEG_STEP_X                      =  'x';
-  const unsigned char CMD_POS_STEP_Y                      =  'Y';
-  const unsigned char CMD_NEG_STEP_Y                      =  'y';
-  const unsigned char CMD_POS_STEP_Z                      =  'Z';
-  const unsigned char CMD_NEG_STEP_Z                      =  'z';
-
   const unsigned char CMD_MOVE                            =  'm';
   const unsigned char CMD_RENDER_AND_MOVE                 =  'M';
+
+  const unsigned char CMD_MOVE_SEQUENCE                   =  '.';
+  const unsigned char CMD_RENDER_AND_MOVE_SEQUENCE        =  ':';
 
   const unsigned char CMD_MOVE_UNIT_SIGNAL                =  '>';
   
@@ -198,13 +194,13 @@ struct I2CData {
   const unsigned char RET_MBYTE_CLOSE                     =   0;   // reserved - see also MBYTE_CLOSE
   const unsigned char RET_NULL                            =   1;   // Invalid ret code
   const unsigned char RET_SOH                             =   2;   // Start of header
-  const unsigned char RET_OK                              =   3;   // Ack
-  const unsigned char RET_ERROR                           =   4;   // Nack
-  const unsigned char RET_LIMIT                           =   5;   //
-  const unsigned char RET_INTERRUPT                       =   6;   // 
-  const unsigned char RET_HALT                            =   7;   // 
-  const unsigned char RET_QUIT                            =   8;   // 
-
+  const unsigned char RET_MORE                            =   3;   // 
+  const unsigned char RET_OK                              =   4;   // Ack
+  const unsigned char RET_ERROR                           =   5;   // Nack
+  const unsigned char RET_LIMIT                           =   6;   //
+  const unsigned char RET_INTERRUPT                       =   7;   // 
+  const unsigned char RET_HALT                            =   8;   // 
+  const unsigned char RET_QUIT                            =   9;   // 
 // .....................................................................
 // Please consider
 //
@@ -299,6 +295,31 @@ struct I2CData {
   const unsigned char PID_GET_STEP_COUNTER_Y              = 114;
   const unsigned char PID_GET_STEP_COUNTER_Z              = 115;
 
+  const unsigned char PID_MV_SEQ_0_XYZ                    = 180;
+  const unsigned char PID_MV_SEQ_1_XYZ                    = 181;
+  const unsigned char PID_MV_SEQ_2_XYZ                    = 182;
+  const unsigned char PID_MV_SEQ_4_XYZ                    = 183;
+  
+  const unsigned char PID_MV_SEQ_0_XY                     = 184;
+  const unsigned char PID_MV_SEQ_1_XY                     = 185;
+  const unsigned char PID_MV_SEQ_2_XY                     = 186;
+  const unsigned char PID_MV_SEQ_4_XY                     = 187;
+  
+  const unsigned char PID_MV_SEQ_0_X                      = 188;
+  const unsigned char PID_MV_SEQ_1_X                      = 189;
+  const unsigned char PID_MV_SEQ_2_X                      = 190;
+  const unsigned char PID_MV_SEQ_4_X                      = 191;
+  
+  const unsigned char PID_MV_SEQ_0_Y                      = 192;
+  const unsigned char PID_MV_SEQ_1_Y                      = 193;
+  const unsigned char PID_MV_SEQ_2_Y                      = 194;
+  const unsigned char PID_MV_SEQ_4_Y                      = 195;
+  
+  const unsigned char PID_MV_SEQ_0_Z                      = 196;
+  const unsigned char PID_MV_SEQ_1_Z                      = 197;
+  const unsigned char PID_MV_SEQ_2_Z                      = 198;
+  const unsigned char PID_MV_SEQ_4_Z                      = 199;
+  
 // .....................................................................
 // end long pid range [PID_DOUBLE_RANG_END] 
 // .....................................................................
@@ -359,6 +380,7 @@ struct I2CData {
   const unsigned char E_INVALID_GETTER_ID                 =   6;
   const unsigned char E_INVALID_GETTER_LIST_COUNT         =   7;
   const unsigned char E_INVALID_MOVE_CMD                  =   8;
+  const unsigned char E_INVALID_PARAM_SIZE                =   9;
 
   const unsigned char E_STEPPER_NOT_ENALED                =  20;
   const unsigned char E_STEPPER_NOT_INITIALIZED           =  21;
@@ -385,7 +407,7 @@ struct I2CData {
 //
 // .....................................................................
 
-  #define FIRMWARE_VERSION                              "0.9.6"
+  #define FIRMWARE_VERSION                              "0.9.7"
 
   #define UNKNOWN_PIN                                    0xFF
 
@@ -424,15 +446,22 @@ struct I2CData {
   const int16_t SPEED_MANAGER_CONST_STATIC_OFFSET_US     = 0; // [us]
   const int16_t SPEED_MANAGER_CONST_LOOP_OFFSET_US       = 0; // [us]
 
+  // MAX_SERIAL_BUFFER_SIZE:
+  // - 64 byte is the standard UNO buffer sizes
+  // - Max 255
+  // - Attention: If the value is > than 64 possible data loss occures,
+  //              always the reader is slower the the writer
+  const int16_t MAX_SERIAL_BUFFER_SIZE                   = 64; 
   const int32_t BAUD_RATE                                = 115200; //300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 28800, 38400, 57600, or 115200
-
+    
   const int16_t DIRECTION_UNKNOWN                        =  0;
   const int16_t DIRECTION_INC                            = +1;
   const int16_t DIRECTION_DEC                            = -1;
 
+  
   const int16_t MAX_SETTER_VALUES                        = 16;
   const int16_t MAX_MOVE_CMD_SIZE                        = 16;
-  
+    
   const int32_t DBL_FACT                                 = 1000;
   const int32_t MIN_LONG                                 = -2147483648L;
   const int32_t MAX_LONG                                 = +2147483647L;

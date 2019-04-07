@@ -104,7 +104,8 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #endif
 
 ////////////////////////////////////////////////////////////////////
-extern GlobalConstStringDatabase globalStrings;
+extern GlobalConstStringDatabase 	globalStrings;
+extern void GlobalStreamRedirectionReset();
 
 ////////////////////////////////////////////////////////////////////
 unsigned int CncGampadDeactivator::referenceCounter = 0;
@@ -314,6 +315,8 @@ MainFrame::~MainFrame() {
 	
 	DeletePendingEvents();
 	GBL_CONFIG->destroyTheApp();
+	
+	GlobalStreamRedirectionReset();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
@@ -355,7 +358,8 @@ void MainFrame::umPostEvent(const UpdateManagerThread::Event& evt) {
 	//std::clog << "MainFrame::umPostEvent " << evt.getTypeAsString() << std::endl;
 	updateManagerThread->postEvent(evt); 
 	
-	#warning
+
+	#warning - think about the speedMonitor integration here
 	if ( evt.pos.currentSpeedValue != 0.0 ) {
 		speedMonitor->setCurrentFeedSpeedValue(evt.pos.currentSpeedValue, evt.pos.configuredSpeedValue);
 		//std::cout << evt.pos.currentSpeedValue << ", " << evt.pos.configuredSpeedValue<< std::endl;
@@ -806,7 +810,17 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	GblFunc::stacktrace(std::clog);
+	//GblFunc::stacktrace(std::clog);
+	
+	if ( cnc == NULL )
+		return;
+	
+	wxDateTime ts = wxDateTime::UNow();
+	std::cout << ts.FormatISOTime() << "." << ts.GetMillisecond() << std::endl;
+		bool ret = cnc->getSerialExtern()->test();
+		std::cout << "cnc->getSerial()->test() = " << ret  << std::endl;
+	ts = wxDateTime::UNow();
+	std::cout << ts.FormatISOTime() << "." << ts.GetMillisecond() << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -937,14 +951,22 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	static unsigned int counter = 0;
 	if ( updateManagerThread != NULL ) {
 		if ( updateManagerThread->IsPaused() == false ) {
-			if ( updateManagerThread->somethingLeftToDo() == false ) {
-				// a counter of 10 means 5 seconds
-				if ( ++counter > 10 ) {
-					wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
-					updateManagerThread->Pause();
-					
-					counter = 0;
+			
+			if ( m_positionSpy->IsShownOnScreen() == true ) {
+				
+				if ( updateManagerThread->somethingLeftToDo() == false ) {
+					// a counter of 10 means 5 seconds
+					if ( ++counter > 10 ) {
+						wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
+						updateManagerThread->Pause();
+						
+						counter = 0;
+					}
 				}
+			}
+			else {
+				// put it to bed if the posSpyList isn't visible
+				updateManagerThread->Pause();
 			}
 		}
 	}
@@ -1778,28 +1800,28 @@ void MainFrame::updateUnit() {
 		valueY *= GBL_CONFIG->getCalculationFactY();
 		valueZ *= GBL_CONFIG->getCalculationFactZ();
 		
-		m_metricX->SetValue(wxString::Format("%d", (long)valueX));
-		m_metricY->SetValue(wxString::Format("%d", (long)valueY));
-		m_metricZ->SetValue(wxString::Format("%d", (long)valueZ));
+		m_metricX->SetValue(wxString::Format("%ld", (long)valueX));
+		m_metricY->SetValue(wxString::Format("%ld", (long)valueY));
+		m_metricZ->SetValue(wxString::Format("%ld", (long)valueZ));
 		
 		double v; 
 		xAppPos.ToDouble(&v);
-		m_xAxis->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactX())));
+		m_xAxis->ChangeValue(wxString::Format("%ld",    (long)(v * GBL_CONFIG->getCalculationFactX())));
 		
 		yAppPos.ToDouble(&v);
-		m_yAxis->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactY())));
+		m_yAxis->ChangeValue(wxString::Format("%ld",    (long)(v * GBL_CONFIG->getCalculationFactY())));
 		
 		zAppPos.ToDouble(&v);
-		m_zAxis->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactZ())));
+		m_zAxis->ChangeValue(wxString::Format("%ld",    (long)(v * GBL_CONFIG->getCalculationFactZ())));
 		
 		xCtlPos.ToDouble(&v);
-		m_xAxisCtl->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactX())));
+		m_xAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * GBL_CONFIG->getCalculationFactX())));
 		
 		yCtlPos.ToDouble(&v);
-		m_yAxisCtl->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactY())));
+		m_yAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * GBL_CONFIG->getCalculationFactY())));
 		
 		zCtlPos.ToDouble(&v);
-		m_zAxisCtl->ChangeValue(wxString::Format("%d", (long)(v * GBL_CONFIG->getCalculationFactZ())));
+		m_zAxisCtl->ChangeValue(wxString::Format("%ld", (long)(v * GBL_CONFIG->getCalculationFactZ())));
 		
 		precision = 0;
 	}
@@ -1916,6 +1938,7 @@ bool MainFrame::connectSerialPort() {
 	
 	bool ret = false;
 	if ( (ret = cnc->connect(serialFileName)) == true )  {
+
 		lastPortName.assign(sel);
 		clearMotionMonitor();
 		
@@ -1928,7 +1951,9 @@ bool MainFrame::connectSerialPort() {
 			m_serialTimer->Start();
 			
 			if ( cnc->canProcessIdle() ) {
-				m_miRqtIdleMessages->Check(true);
+				#warning activate m_miRqtIdleMessages->Check(true) again
+				//m_miRqtIdleMessages->Check(true);
+				m_miRqtIdleMessages->Check(false);
 				m_miRqtIdleMessages->Enable(true);
 			}
 		}
@@ -1943,7 +1968,7 @@ bool MainFrame::connectSerialPort() {
 	
 	stopAnimationControl();
 	enableControls();
-	
+
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -3556,10 +3581,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	wxASSERT(cnc);
 	bool ret = true;
 	
-	#warning
 	speedMonitor->start(GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
-	std::cout << GBL_CONFIG->getMaxSpeedXYZ_MM_MIN() << std::endl;
-	
+
 	CncRunEventFilter cef;
 	
 	// deactivate idle requests
@@ -3607,6 +3630,9 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			ret = processTemplateIntern();
 		}
 		
+#warning remove cnc->getSerialExtern()->test() again
+cnc->getSerialExtern()->test();
+
 		motionMonitor->updateMonitorAndOptions();
 		statisticsPane->updateReplayPane();
 	}
@@ -6831,7 +6857,6 @@ void MainFrame::dclickLogger(wxMouseEvent& event) {
 		return;
 	
 	selectSourceControlLineNumber(lineNumber - 1);
-	//MessageBoxA(0,wxString::Format("%ld", lineNumber),"",0);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::keyDownLruList(wxKeyEvent& event) {
@@ -7480,4 +7505,36 @@ void MainFrame::dclickHeartbeatState(wxMouseEvent& event) {
 	
 	m_miRqtIdleMessages->Check(!m_miRqtIdleMessages->IsChecked());
 	decorateIdleState(m_miRqtIdleMessages->IsChecked());
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::openSpyDetailWindow(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxDataViewListCtrl* ctrl = NULL;
+	wxString headline;
+	if      ( m_spyUnknownDetails->IsShownOnScreen() )		{ ctrl = m_spyUnknownDetails;  headline.assign("Info"); }
+	else if ( m_spyInboundDetails->IsShownOnScreen() ) 		{ ctrl = m_spyInboundDetails;  headline.assign("Inbound Details"); }
+	else if ( m_spyOutboundDetails->IsShownOnScreen() )		{ ctrl = m_spyOutboundDetails; headline.assign("Outbound Details"); }
+	
+	if ( ctrl != NULL && ctrl->GetItemCount() > 0) {
+		
+		const int row = 0;
+		wxString details;
+		for ( unsigned int col = 0; col < ctrl->GetColumnCount(); col++ ) {
+			
+			wxDataViewColumn* dvc = ctrl->GetColumn(col);
+			wxVariant value;
+			ctrl->GetValue(value, row, col);
+			
+			if ( ctrl->GetColumnCount() > 1 && col == ctrl->GetColumnCount() - 1 ) {
+				details.append(wxString::Format("%s:\n%s", dvc->GetTitle(), value.GetString()));
+			}
+			else {
+				details.append(wxString::Format("%s: %s\n", dvc->GetTitle(), value.GetString()));
+			}
+		}
+		
+		CncMessageDialog md(this, details, headline, "Serial Spy Details");
+		md.SetSize(600, 800);
+		md.ShowModal();
+	}
 }

@@ -22,38 +22,34 @@ void ArduinoCMDs::init() {
 		cmds[i]  = s.c_str();
 	}
 	
-	cmds[CMD_INVALID]               = "Invalid Command";
+	cmds[CMD_INVALID]                          = "Invalid Command";
 	
-	cmds[SIG_INTERRUPPT]            = "Push Signal Interrupt";
-	cmds[SIG_HALT]                  = "Push Signal Pause";
-	cmds[SIG_PAUSE]                 = "Push Signal Pause";
-	cmds[SIG_RESUME]                = "Push Signal Resume";
-	cmds[SIG_QUIT_MOVE]             = "Push Signal Quit Move";
+	cmds[SIG_INTERRUPPT]                       = "Push Signal Interrupt";
+	cmds[SIG_HALT]                             = "Push Signal Pause";
+	cmds[SIG_PAUSE]                            = "Push Signal Pause";
+	cmds[SIG_RESUME]                           = "Push Signal Resume";
+	cmds[SIG_QUIT_MOVE]                        = "Push Signal Quit Move";
 	
-	cmds[CMD_IDLE]                  = "Pull Idle Callback";
-	cmds[CMD_RESET_CONTROLLER]      = "Push Reset Controller";
+	cmds[CMD_IDLE]                             = "Pull Idle Callback";
+	cmds[CMD_RESET_CONTROLLER]                 = "Push Reset Controller";
 	
-	cmds[CMD_SETTER]                = "Push Setter";
-	cmds[CMD_GETTER]                = "Pull Getter";
+	cmds[CMD_SETTER]                           = "Push Setter";
+	cmds[CMD_GETTER]                           = "Pull Getter";
 	
-	cmds[CMD_POS_STEP_X]            = "Push Positive X Step";
-	cmds[CMD_NEG_STEP_X]            = "Push Negative X Step";
-	cmds[CMD_POS_STEP_Y]            = "Push Positive Y Step";
-	cmds[CMD_NEG_STEP_Y]            = "Push Negative Y Step";
-	cmds[CMD_POS_STEP_Z]            = "Push Positive Z Step";
-	cmds[CMD_NEG_STEP_Z]            = "Push Negative Z Step";
+	cmds[CMD_MOVE]                             = "Push Move";
+	cmds[CMD_RENDER_AND_MOVE]                  = "Push Render and Move";
+	cmds[CMD_MOVE_UNIT_SIGNAL]                 = "Push Render and Move until Signal";
 	
-	cmds[CMD_MOVE]                  = "Push 3D Move";
-	cmds[CMD_RENDER_AND_MOVE]       = "Push Render and 3D Move";
-	cmds[CMD_MOVE_UNIT_SIGNAL]      = "Push Render and 3D Move until Signal";
-
-	cmds[CMD_PRINT_CONFIG]          = "Pull Configuration";
-	cmds[CMD_PRINT_VERSION]         = "Pull Version";
-	cmds[CMD_PRINT_PIN_REPORT]      = "Pull PIN Report";
+	cmds[CMD_MOVE_SEQUENCE]                    = "Push Move Sequence";
+	cmds[CMD_RENDER_AND_MOVE_SEQUENCE]         = "Push Render and Move Sequence";
 	
-	cmds[CMD_TEST_INFO_MESSAGE]     = "Pull Test Info Message";
-	cmds[CMD_TEST_WARN_MESSAGE]     = "Pull Test Warning Message";
-	cmds[CMD_TEST_ERROR_MESSAGE]    = "Pull Test Error Message";
+	cmds[CMD_PRINT_CONFIG]                     = "Pull Configuration";
+	cmds[CMD_PRINT_VERSION]                    = "Pull Version";
+	cmds[CMD_PRINT_PIN_REPORT]                 = "Pull PIN Report";
+	
+	cmds[CMD_TEST_INFO_MESSAGE]                = "Pull Test Info Message";
+	cmds[CMD_TEST_WARN_MESSAGE]                = "Pull Test Warning Message";
+	cmds[CMD_TEST_ERROR_MESSAGE]               = "Pull Test Error Message";
 	
 } 
 /////////////////////////////////////////////////////////////////////////
@@ -304,7 +300,8 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_GETTER_ID_NOT_FOUND]                = "Arduino::getValue(): Can't read getter id";
 	errorCodes[E_INVALID_GETTER_ID]                  = "Arduino::getValue(): Getter id not known"; 
 	errorCodes[E_INVALID_GETTER_LIST_COUNT]          = "Arduino::getValues(): Getter list count not available";
-	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Can't read long from Serial: invalid size: ";
+	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Can't read a int32_t value from Serial: invalid size: ";
+	errorCodes[E_INVALID_PARAM_SIZE]                 = "Arduino::decodeMoveSequence(): Can't read size (int32_t) from Serial: invalid size: ";
 	
 	errorCodes[E_STEPPER_NOT_ENALED]                 = "Arduino::stepAxisXYZ: Stepper not enaled";
 	errorCodes[E_STEPPER_NOT_INITIALIZED]            = "Arduino::stepAxisXYZ: Stepper not initialized";

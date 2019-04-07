@@ -1,3 +1,4 @@
+#define INLINE inline
 #define SKETCH_COMPILE = TRUE
 
 #include <SoftwareSerial.h>
@@ -11,7 +12,7 @@
 CncController controller;
 
 /////////////////////////////////////////////////////////////////////////////////////
-inline void printSketchVersion() {
+INLINE void printSketchVersion() {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOH);
     Serial.write(PID_TEXT);
@@ -19,7 +20,7 @@ inline void printSketchVersion() {
   Serial.write(MBYTE_CLOSE);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void printConfig() {
+INLINE void printConfig() {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOH);
     Serial.write(PID_TEXT);
@@ -31,7 +32,7 @@ inline void printConfig() {
   Serial.write(MBYTE_CLOSE);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void printPinReport() {
+INLINE void printPinReport() {
 /////////////////////////////////////////////////////////////////////////////////////
   const int I = 'I';
   const int O = 'O';
@@ -60,13 +61,13 @@ inline void printPinReport() {
   Serial.write(MBYTE_CLOSE);  
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline long isReadyToRun(){
+INLINE long isReadyToRun(){
 /////////////////////////////////////////////////////////////////////////////////////
   long ret = controller.isReadyToRun();
   return ret;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void switchOutputPinState(int pin, bool state) {
+INLINE void switchOutputPinState(int pin, bool state) {
 /////////////////////////////////////////////////////////////////////////////////////
   if ( getPinMode(pin) != OUTPUT )
     return;
@@ -79,7 +80,7 @@ inline void switchOutputPinState(int pin, bool state) {
   else                     digitalWrite(pin, state == true ? HIGH        : LOW);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void writeLimitGetter() {
+INLINE void writeLimitGetter() {
 /////////////////////////////////////////////////////////////////////////////////////  
   long x = LimitSwitch::LIMIT_UNKNOWN;
   long y = LimitSwitch::LIMIT_UNKNOWN;
@@ -89,7 +90,7 @@ inline void writeLimitGetter() {
   writeGetterValues(PID_LIMIT, x, y, z);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline unsigned char evaluateGetter(unsigned char pid) {
+INLINE unsigned char evaluateGetter(unsigned char pid) {
 /////////////////////////////////////////////////////////////////////////////////////
   
   switch ( pid ) {
@@ -153,17 +154,15 @@ inline unsigned char evaluateGetter(unsigned char pid) {
     default:                          writeGetterValue(PID_UNKNOWN, 0);
 
                                       LastErrorCodes::clear();
-                                      LastErrorCodes::gblErrorMessage = "[";
-                                      LastErrorCodes::gblErrorMessage.concat(pid);
-                                      LastErrorCodes::gblErrorMessage.concat("]");
-                                      pushErrorMessage(E_INVALID_GETTER_ID, LastErrorCodes::gblErrorMessage.c_str());
+                                      LastErrorCodes::register1Byte_A = pid;
+                                      pushErrorMessage(E_INVALID_GETTER_ID);
                                       return RET_ERROR;
   }
 
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline unsigned char processGetter() {
+INLINE unsigned char processGetter() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Wait a protion of time.
   // This is very importent for the next multibyte read
@@ -181,7 +180,7 @@ inline unsigned char processGetter() {
   return evaluateGetter(pid);
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline unsigned char processSetter() {
+INLINE unsigned char processSetter() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Wait a protion of time.
   // This is very importent for the next multibyte read
@@ -221,10 +220,8 @@ inline unsigned char processSetter() {
   // error handling
   if ( byteCount%sizeof(int32_t) != 0 || byteCount/sizeof(int32_t) > MAX_SETTER_VALUES ) {
     LastErrorCodes::clear();
-    LastErrorCodes::gblErrorMessage.concat('[');
-    LastErrorCodes::gblErrorMessage.concat(byteCount);
-    LastErrorCodes::gblErrorMessage.concat(']');
-    pushErrorMessage(E_INVALID_PARAM_STREAM_LEN, LastErrorCodes::gblErrorMessage.c_str());
+    LastErrorCodes::register4Byte_A = byteCount;
+    pushErrorMessage(E_INVALID_PARAM_STREAM_LEN);
     return RET_ERROR;
   }
 
@@ -364,10 +361,8 @@ inline unsigned char processSetter() {
                                   break;
     // processSetter() ............................................
     default:                      LastErrorCodes::clear();
-                                  LastErrorCodes::gblErrorMessage.concat('[');
-                                  LastErrorCodes::gblErrorMessage.concat(pid);
-                                  LastErrorCodes::gblErrorMessage.concat(']');
-                                  pushErrorMessage(E_INVALID_PARAM_ID, LastErrorCodes::gblErrorMessage.c_str());
+                                  LastErrorCodes::register1Byte_A = pid;
+                                  pushErrorMessage(E_INVALID_PARAM_ID);
                                   return RET_ERROR;
   }
 
@@ -377,7 +372,254 @@ inline unsigned char processSetter() {
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline unsigned char decodeMove(unsigned char cmd) {
+INLINE unsigned char decodeMoveSequence() {
+/////////////////////////////////////////////////////////////////////////////////////
+  byte b[4];
+  unsigned int size         = 0;
+  unsigned char pid         = 0;
+  unsigned char portionSize = 0;
+  int32_t positionIndex     = 0;
+  int32_t totalLength       = 0; 
+  int32_t remaining         = 0;
+  int32_t dx                = 0;
+  int32_t dy                = 0;
+  int32_t dz                = 0;
+
+  String x;
+
+  // ------------------------------------------------------------------------------
+  auto debugValues = [&](unsigned short idx) {
+      
+      x.concat("[");
+      x.concat(idx);
+      x.concat(COMMA);
+      x.concat(positionIndex);
+      x.concat(COMMA);
+      x.concat(portionSize);
+      x.concat(COMMA);
+      x.concat((int)pid);
+      x.concat(COMMA);
+      x.concat(size);
+      x.concat(COMMA);
+      x.concat(totalLength);
+      x.concat(COMMA);
+      x.concat(remaining);
+      x.concat("][");
+      x.concat(dx);
+      x.concat(COMMA);
+      x.concat(dy);
+      x.concat(COMMA);
+      x.concat(dz);
+      x.concat(']');
+      x.concat(Serial.available());
+  };
+
+  // ------------------------------------------------------------------------------
+  auto logInfo = [&](unsigned short idx, unsigned char eid) {
+      
+      debugValues(idx);
+      pushInfoMessage(eid, x.c_str());
+  };
+
+  // ------------------------------------------------------------------------------
+  auto logError = [&](unsigned short idx, unsigned char eid) {
+      
+      debugValues(idx);
+      pushErrorMessage(eid, x.c_str());
+      clearSerial();
+      return RET_ERROR;
+  };
+
+
+
+  
+
+  // first read global length 
+  size = readSerialBytesWithTimeout(b, sizeof(int32_t));
+
+  if ( size != sizeof(int32_t) )
+      return logError(77, E_INVALID_PARAM_SIZE);
+  
+  totalLength  = (int32_t)b[0] << 24;
+  totalLength += (int32_t)b[1] << 16;
+  totalLength += (int32_t)b[2] << 8;
+  totalLength += (int32_t)b[3];
+  remaining    = totalLength;
+
+  // over all position infos 
+  while ( remaining > 0 ) {
+    portionSize = readSerialByteWithTimeout();
+
+    //while ( Serial.available() < portionSize )
+      ;
+
+    byte bb[64];
+    size = readSerialBytesWithTimeout(bb, portionSize);
+  
+    if ( size != portionSize -1 )
+       ;// return logError(18, E_INVALID_MOVE_CMD);
+
+
+    remaining -= portionSize + 1;    
+    remaining -= size;    
+
+    if ( remaining > 0 ) {
+      Serial.write(RET_MORE);
+      Serial.flush();
+    }
+  }
+
+
+  return RET_OK;
+
+
+  // #############################################################################
+  // over all position infos 
+  while ( remaining > 0 ) {
+    
+    unsigned int valCount  = 0;
+    unsigned int byteCount = 0;
+
+    // determine paring rules
+    switch ( readSerialByteWithTimeout() ) {
+      
+      case PID_MV_SEQ_0_XYZ:  pid = PID_MV_SEQ_0_XYZ;  byteCount = 0; valCount = 3; break;
+      case PID_MV_SEQ_0_XY:   pid = PID_MV_SEQ_0_XY;   byteCount = 0; valCount = 2; break;
+      case PID_MV_SEQ_0_X:    pid = PID_MV_SEQ_0_X;    byteCount = 0; valCount = 1; break;
+      case PID_MV_SEQ_0_Y:    pid = PID_MV_SEQ_0_Y;    byteCount = 0; valCount = 1; break;
+      case PID_MV_SEQ_0_Z:    pid = PID_MV_SEQ_0_Z;    byteCount = 0; valCount = 1; break;
+
+      case PID_MV_SEQ_1_XYZ:  pid = PID_MV_SEQ_1_XYZ;  byteCount = 1; valCount = 3; break;
+      case PID_MV_SEQ_1_XY:   pid = PID_MV_SEQ_1_XY;   byteCount = 1; valCount = 2; break;
+      case PID_MV_SEQ_1_X:    pid = PID_MV_SEQ_1_X;    byteCount = 1; valCount = 1; break;
+      case PID_MV_SEQ_1_Y:    pid = PID_MV_SEQ_1_Y;    byteCount = 1; valCount = 1; break;
+      case PID_MV_SEQ_1_Z:    pid = PID_MV_SEQ_1_Z;    byteCount = 1; valCount = 1; break;
+
+      case PID_MV_SEQ_2_XYZ:  pid = PID_MV_SEQ_2_XYZ;  byteCount = 2; valCount = 3; break;
+      case PID_MV_SEQ_2_XY:   pid = PID_MV_SEQ_2_XY;   byteCount = 2; valCount = 2; break;
+      case PID_MV_SEQ_2_X:    pid = PID_MV_SEQ_2_X;    byteCount = 2; valCount = 1; break;
+      case PID_MV_SEQ_2_Y:    pid = PID_MV_SEQ_2_Y;    byteCount = 2; valCount = 1; break;
+      case PID_MV_SEQ_2_Z:    pid = PID_MV_SEQ_2_Z;    byteCount = 2; valCount = 1; break;
+
+      case PID_MV_SEQ_4_XYZ:  pid = PID_MV_SEQ_4_XYZ;  byteCount = 4; valCount = 3; break;
+      case PID_MV_SEQ_4_XY:   pid = PID_MV_SEQ_4_XY;   byteCount = 4; valCount = 2; break;
+      case PID_MV_SEQ_4_X:    pid = PID_MV_SEQ_4_X;    byteCount = 4; valCount = 1; break;
+      case PID_MV_SEQ_4_Y:    pid = PID_MV_SEQ_4_Y;    byteCount = 4; valCount = 1; break;
+      case PID_MV_SEQ_4_Z:    pid = PID_MV_SEQ_4_Z;    byteCount = 4; valCount = 1; break;
+
+      default:                return logError(3, E_INVALID_PARAM_ID);
+    }
+    remaining--;
+
+    // read dy, dy and/or dz depending on the pid  
+    int32_t v[3];
+    unsigned short count = 0;
+    
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    while ( count < valCount ) {
+
+      if ( byteCount > 0 ) {
+        size = readSerialBytesWithTimeout(b, byteCount);
+        if ( size != byteCount )
+          return logError(4, E_INVALID_MOVE_CMD);
+
+        remaining -= byteCount;  
+      }
+      else {
+        size = readSerialBytesWithTimeout(b, 1, minSerialReadTimeoutMicros * 20);
+        if ( size != 1 )
+          return logError(4, E_INVALID_MOVE_CMD);
+
+        remaining -= 1;
+      }
+      
+      // copy bytes
+      switch ( byteCount ){
+
+        // format:   bit: 78543210    
+        //                  zzyyxx
+        //                  -+-+-+ 
+        //                           bit     +               bit     -    0
+        case 0:   v[0] = bitRead(b[0], 0) ? +1 : bitRead(b[0], 1) ? -1 :  0;
+                  v[1] = bitRead(b[0], 2) ? +1 : bitRead(b[0], 3) ? -1 :  0;
+                  v[2] = bitRead(b[0], 4) ? +1 : bitRead(b[0], 5) ? -1 :  0;
+                  count += 3; // to break the while loop
+                  break;
+                  
+        case 1:   v[count]  =  (int8_t)b[0];
+                  break;
+
+        case 2:   v[count]  = (int16_t)b[0] <<  8;
+                  v[count] += (int16_t)b[1];
+                  break;
+
+        case 4:   v[count]  = (int32_t)b[0] << 24;
+                  v[count] += (int32_t)b[1] << 16;
+                  v[count] += (int32_t)b[2] <<  8;
+                  v[count] += (int32_t)b[3];
+                  break;
+                  
+        default:  v[count]  = 0;  
+      }
+      
+      count++;
+    }
+    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    
+    // assign x, y, z depending on given pid
+    switch ( pid ) {
+      case PID_MV_SEQ_0_XYZ:   
+      case PID_MV_SEQ_1_XYZ:   
+      case PID_MV_SEQ_2_XYZ:   
+      case PID_MV_SEQ_4_XYZ:  dx = v[0]; dy = v[1]; dz= v[2];  break;
+
+      case PID_MV_SEQ_0_XY:
+      case PID_MV_SEQ_1_XY:
+      case PID_MV_SEQ_2_XY:
+      case PID_MV_SEQ_4_XY:   dx = v[0]; dy = v[1]; dz = 0;    break;
+      
+      case PID_MV_SEQ_0_X:
+      case PID_MV_SEQ_1_X:
+      case PID_MV_SEQ_2_X:
+      case PID_MV_SEQ_4_X:    dx = v[0]; dy = 0;    dz = 0;    break;
+      
+      case PID_MV_SEQ_0_Y:
+      case PID_MV_SEQ_1_Y:
+      case PID_MV_SEQ_2_Y:
+      case PID_MV_SEQ_4_Y:    dx = 0;    dy = v[0]; dz = 0;    break;
+      
+      case PID_MV_SEQ_0_Z:
+      case PID_MV_SEQ_1_Z:
+      case PID_MV_SEQ_2_Z:
+      case PID_MV_SEQ_4_Z:    dx = 0;    dy = 0;    dz = v[0]; break;
+
+      default:                return logError(5, E_INVALID_PARAM_STREAM);
+    }
+
+    positionIndex++;
+
+    
+
+    //  do somiting with dx, dy, dz
+    auto something = [&](int32_t, int32_t, int32_t) {
+      controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
+      //logInfo(100, E_NO_ERROR);
+      return RET_OK;
+    };
+
+    if ( something(dx, dy, dz) != RET_OK ) {
+      pushErrorMessage(E_INVALID_MOVE_CMD);
+      return RET_ERROR;
+    }
+  }
+  // #############################################################################
+
+ // logInfo(42, E_NO_ERROR);
+
+  return RET_OK;
+}
+/////////////////////////////////////////////////////////////////////////////////////
+INLINE unsigned char decodeMove(unsigned char cmd) {
 /////////////////////////////////////////////////////////////////////////////////////
   // Wait a protion of time.
   // This is very importent for the next readBytes above
@@ -394,7 +636,7 @@ inline unsigned char decodeMove(unsigned char cmd) {
   while ( (size = Serial.available()) > 0 ) {
     size = Serial.readBytes(b, sizeof(int32_t));
         
-    if ( size != 4 ) {
+    if ( size != sizeof(int32_t) ) {
       pushErrorMessage(E_INVALID_MOVE_CMD);
       return RET_ERROR;
     }
@@ -427,17 +669,47 @@ inline unsigned char decodeMove(unsigned char cmd) {
   return RET_ERROR;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void clearSerial() {
+INLINE void clearSerial() {
 /////////////////////////////////////////////////////////////////////////////////////
-  delay(1);
+  //delay(1);
 
-  while ( Serial.available() > 0 ) {
+  while ( waitForSerialData() > 0 )
     Serial.read();
-    delay(1);
-  }
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline char reset() {
+INLINE void printSerial() {
+/////////////////////////////////////////////////////////////////////////////////////
+  /*
+  LastErrorCodes::clear();
+  
+  const short maxLen  = 256;
+  short byteCounter   = 0;
+  while ( waitForSerialData(20000) ) {
+    // 20000 => 20 ms
+
+    LastErrorCodes::gblErrorMessage.concat(Serial.read());
+    LastErrorCodes::gblErrorMessage.concat(' ');
+
+    #warning
+    //controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
+    //delay(1);
+    //waitActiveMilliseconds(1);
+    
+    if ( ++byteCounter >= maxLen ) {
+      byteCounter = 0;
+
+      pushInfoMessage(0, LastErrorCodes::gblErrorMessage.c_str());
+      LastErrorCodes::clear();
+    }
+  }
+  
+  if ( byteCounter != 0 ) {
+    pushInfoMessage(0, LastErrorCodes::gblErrorMessage.c_str());
+  }
+  */
+}
+/////////////////////////////////////////////////////////////////////////////////////
+INLINE char reset() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
   controller.switchToolState(TOOL_STATE_OFF, FORCE);
@@ -464,7 +736,7 @@ inline char reset() {
   return RET_OK;
 }
 /////////////////////////////////////////////////////////////////////////////////////
-inline void processInterrupt() {
+INLINE void processInterrupt() {
 /////////////////////////////////////////////////////////////////////////////////////
   // Turn off ...
   controller.switchToolState(TOOL_STATE_OFF, FORCE);
@@ -596,6 +868,19 @@ void loop() {
               controller.setPosReplyState(false);
               break;
 
+        case CMD_MOVE_SEQUENCE:
+        case CMD_RENDER_AND_MOVE_SEQUENCE:
+              controller.setPosReplyState(true);
+              
+              r = decodeMoveSequence();
+              
+              controller.getStepperX()->resetDirectionPin();
+              controller.getStepperY()->resetDirectionPin();
+              controller.getStepperZ()->resetDirectionPin();
+              controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
+              controller.setPosReplyState(false);
+              break;
+              
         // MB command - Parameter getter
         case CMD_GETTER:
               r = processGetter();
@@ -650,11 +935,8 @@ void loop() {
         // Unknown commands
         default:
               LastErrorCodes::clear();
-              LastErrorCodes::gblErrorMessage.concat('[');
-              LastErrorCodes::gblErrorMessage.concat(c);
-              LastErrorCodes::gblErrorMessage.concat(']');
-              
-              pushErrorMessage(E_UNKNOW_COMMAND, LastErrorCodes::gblErrorMessage.c_str());
+              LastErrorCodes::register1Byte_A = c;
+              pushErrorMessage(E_UNKNOW_COMMAND);
   }
 
   // hand shake
@@ -663,5 +945,6 @@ void loop() {
     Serial.flush();
   }
 }
+
 
 

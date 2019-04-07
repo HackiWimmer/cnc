@@ -11,6 +11,9 @@ CncMessageDialog::CncMessageDialog(wxWindow* parent, const wxString& msg, wxStri
 	setMessage(msg);
 	setHeadline(headline);
 	setTitle(title);
+	
+	m_btToggleWordWrap->SetValue(false) ;
+	m_message->SetReadOnly(true);
 }
 /////////////////////////////////////////////////////////////////////
 CncMessageDialog::~CncMessageDialog() {
@@ -37,10 +40,15 @@ void CncMessageDialog::setHeadline(const wxString& hl) {
 /////////////////////////////////////////////////////////////////////
 void CncMessageDialog::setMessage(const wxString& msg) {
 /////////////////////////////////////////////////////////////////////
-	m_message->ChangeValue(msg);
+	m_message->AppendText(msg);
 }
 /////////////////////////////////////////////////////////////////////
 void CncMessageDialog::close(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	Show(false);
+}
+/////////////////////////////////////////////////////////////////////
+void CncMessageDialog::onWordWrap(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_message->SetWrapMode(m_btToggleWordWrap->GetValue() == false ? wxSTC_WRAP_NONE : wxSTC_WRAP_WORD);
 }

@@ -614,14 +614,17 @@ protected:
     wxStaticText* m_staticText72374;
     wxStaticBitmap* m_staticBitmap7230;
     wxDataViewListCtrl* m_spyUnknownDetails;
+    wxButton* m_button7561;
     wxPanel* m_inboundPanel;
     wxStaticText* m_staticText72373;
     wxStaticBitmap* m_staticBitmap7232;
     wxDataViewListCtrl* m_spyInboundDetails;
+    wxButton* m_button75612;
     wxPanel* m_outbundPanel;
     wxStaticText* m_staticText7237;
     wxStaticBitmap* m_staticBitmap7234;
     wxDataViewListCtrl* m_spyOutboundDetails;
+    wxButton* m_button75611;
     wxCheckBox* m_clearSerialSpyOnConnect;
     wxCheckBox* m_clearSerialSpyBeforNextRun;
     wxPanel* m_debuggerView;
@@ -925,6 +928,7 @@ protected:
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void selectSerialSpyMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void openSpyDetailWindow(wxCommandEvent& event) { event.Skip(); }
     virtual void togglePositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void copyPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void searchPosSpy(wxCommandEvent& event) { event.Skip(); }
@@ -1530,14 +1534,17 @@ public:
     wxStaticText* GetStaticText72374() { return m_staticText72374; }
     wxStaticBitmap* GetStaticBitmap7230() { return m_staticBitmap7230; }
     wxDataViewListCtrl* GetSpyUnknownDetails() { return m_spyUnknownDetails; }
+    wxButton* GetButton7561() { return m_button7561; }
     wxPanel* GetUnknownPanel() { return m_unknownPanel; }
     wxStaticText* GetStaticText72373() { return m_staticText72373; }
     wxStaticBitmap* GetStaticBitmap7232() { return m_staticBitmap7232; }
     wxDataViewListCtrl* GetSpyInboundDetails() { return m_spyInboundDetails; }
+    wxButton* GetButton75612() { return m_button75612; }
     wxPanel* GetInboundPanel() { return m_inboundPanel; }
     wxStaticText* GetStaticText7237() { return m_staticText7237; }
     wxStaticBitmap* GetStaticBitmap7234() { return m_staticBitmap7234; }
     wxDataViewListCtrl* GetSpyOutboundDetails() { return m_spyOutboundDetails; }
+    wxButton* GetButton75611() { return m_button75611; }
     wxPanel* GetOutbundPanel() { return m_outbundPanel; }
     wxSimplebook* GetSypDetailsBook() { return m_sypDetailsBook; }
     wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
@@ -2260,32 +2267,51 @@ class CncSpeedMonitorBase : public wxPanel
 {
 protected:
     wxBitmapToggleButton* m_btToggleConnection;
+    wxStaticLine* m_staticLine75573;
     wxBitmapToggleButton* m_btToggleConfiguredAxis;
     wxBitmapToggleButton* m_btToggleMeasurePointsAxis;
+    wxStaticLine* m_staticLine7557;
+    wxBitmapToggleButton* m_btClear;
+    wxBitmapToggleButton* m_btSave;
     wxStaticText* m_staticText7534;
     wxSlider* m_intervalSlider;
+    wxPanel* m_leftAxis;
+    wxScrolledWindow* m_scrollWindow;
     wxPanel* m_darwingArea;
+    wxPanel* m_rightAxis;
     wxTimer* m_refreshTimer;
 
 protected:
     virtual void toggleConnection(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMeasurePointsAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void onClear(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSave(wxCommandEvent& event) { event.Skip(); }
     virtual void changeIntervalSlider(wxScrollEvent& event) { event.Skip(); }
+    virtual void onPaintLeftAxis(wxPaintEvent& event) { event.Skip(); }
+    virtual void onScrolledSize(wxSizeEvent& event) { event.Skip(); }
     virtual void onSize(wxSizeEvent& event) { event.Skip(); }
     virtual void onPaint(wxPaintEvent& event) { event.Skip(); }
     virtual void onMouseMotion(wxMouseEvent& event) { event.Skip(); }
     virtual void onLeftDown(wxMouseEvent& event) { event.Skip(); }
     virtual void onLeftUp(wxMouseEvent& event) { event.Skip(); }
-    virtual void onTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onPaintRightAxis(wxPaintEvent& event) { event.Skip(); }
+    virtual void onRefreshTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxBitmapToggleButton* GetBtToggleConnection() { return m_btToggleConnection; }
+    wxStaticLine* GetStaticLine75573() { return m_staticLine75573; }
     wxBitmapToggleButton* GetBtToggleConfiguredAxis() { return m_btToggleConfiguredAxis; }
     wxBitmapToggleButton* GetBtToggleMeasurePointsAxis() { return m_btToggleMeasurePointsAxis; }
+    wxStaticLine* GetStaticLine7557() { return m_staticLine7557; }
+    wxBitmapToggleButton* GetBtClear() { return m_btClear; }
+    wxBitmapToggleButton* GetBtSave() { return m_btSave; }
     wxStaticText* GetStaticText7534() { return m_staticText7534; }
     wxSlider* GetIntervalSlider() { return m_intervalSlider; }
+    wxPanel* GetLeftAxis() { return m_leftAxis; }
     wxPanel* GetDarwingArea() { return m_darwingArea; }
+    wxScrolledWindow* GetScrollWindow() { return m_scrollWindow; }
+    wxPanel* GetRightAxis() { return m_rightAxis; }
     wxTimer* GetRefreshTimer() { return m_refreshTimer; }
     CncSpeedMonitorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncSpeedMonitorBase();
@@ -2599,16 +2625,19 @@ class CncMessageDialogBase : public wxDialog
 protected:
     wxStaticBitmap* m_staticBitmap7188;
     wxStaticText* m_headline;
-    wxTextCtrl* m_message;
+    wxBitmapToggleButton* m_btToggleWordWrap;
+    wxStyledTextCtrl* m_message;
     wxButton* m_btClose;
 
 protected:
+    virtual void onWordWrap(wxCommandEvent& event) { event.Skip(); }
     virtual void close(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticBitmap* GetStaticBitmap7188() { return m_staticBitmap7188; }
     wxStaticText* GetHeadline() { return m_headline; }
-    wxTextCtrl* GetMessage() { return m_message; }
+    wxBitmapToggleButton* GetBtToggleWordWrap() { return m_btToggleWordWrap; }
+    wxStyledTextCtrl* GetMessage() { return m_message; }
     wxButton* GetBtClose() { return m_btClose; }
     CncMessageDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Message Dialog"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     virtual ~CncMessageDialogBase();

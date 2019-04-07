@@ -18,7 +18,7 @@ CncConnectProgress::~CncConnectProgress() {
 /////////////////////////////////////////////////////////////////////////
 void CncConnectProgress::initDialog(wxInitDialogEvent& event) {
 /////////////////////////////////////////////////////////////////////////
-startAnimationControl();
+	startAnimationControl();
 }
 /////////////////////////////////////////////////////////////////////////
 void CncConnectProgress::show(wxShowEvent& event) {
@@ -30,15 +30,13 @@ void CncConnectProgress::startupTimer(wxTimerEvent& event) {
 	wxASSERT(parentFrame);
 	bool ret = parentFrame->connectSerialPort();
 	
-	SetReturnCode( ret == true ? wxID_OK : wxID_CANCEL );
-	Show(false);
+	EndModal(ret == true ? wxID_OK : wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////
 void CncConnectProgress::observeTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	SetReturnCode( wxID_CANCEL );
 	std::cerr << " Connect progress aborted by observer. Timeout reached!" << std::endl;
-	Show(false);
+	EndModal(wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////
 void CncConnectProgress::createAnimationControl() {

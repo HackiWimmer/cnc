@@ -1,3 +1,4 @@
+#include <functional>
 #include <wx/filename.h>
 #include "CncCommon.h"
 

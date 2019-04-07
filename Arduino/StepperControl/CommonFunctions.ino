@@ -1,7 +1,15 @@
 #include <Wire.h>
 #include "CommonValues.h"
 
-String LastErrorCodes::gblErrorMessage = "";
+unsigned char  LastErrorCodes::register1Byte_A;
+unsigned char  LastErrorCodes::register1Byte_B;
+unsigned char  LastErrorCodes::register1Byte_C;
+unsigned char  LastErrorCodes::register1Byte_D;
+
+int32_t        LastErrorCodes::register4Byte_A;
+int32_t        LastErrorCodes::register4Byte_B;
+int32_t        LastErrorCodes::register4Byte_C;
+int32_t        LastErrorCodes::register4Byte_D;
 
 //////////////////////////////////////////////////////////////
 // "Software Reset" function
@@ -304,7 +312,29 @@ void pushMessage(const char type, const unsigned char mid, const char* msg) {
       Serial.write(MT_MID_FLAG);
       Serial.write(mid);
     }
-
+/*
+    if ( LastErrorCodes::hasInfos() == true ) {
+      char buf[128];
+      
+      if ( LastErrorCodes::has1ByteInfos() == true ) {
+        sprintf(buf, "\nReg1:[%d,%d,%d,%d]\n",     LastErrorCodes::register1Byte_A, 
+                                                   LastErrorCodes::register1Byte_B, 
+                                                   LastErrorCodes::register1Byte_C, 
+                                                   LastErrorCodes::register1Byte_D);
+        Serial.print(buf);
+      }
+      
+      if ( LastErrorCodes::has4ByteInfos() == true ) {
+        sprintf(buf, " Reg4:[%ld,%ld,%ld,%ld]\n", LastErrorCodes::register4Byte_A, 
+                                                   LastErrorCodes::register4Byte_B, 
+                                                   LastErrorCodes::register4Byte_C, 
+                                                   LastErrorCodes::register4Byte_D);
+        Serial.print(buf);
+      }
+     
+      LastErrorCodes::clear();
+    }
+*/
     if ( msg != NULL )
       Serial.print(msg);
     
@@ -374,8 +404,115 @@ bool checkSerialForPauseCommands(bool currentPauseState) {
 
     return ret;
 }
+///////////////////////////////////////////////////////////////
+void waitActiveMilliseconds(uint32_t milliseconds) {
+///////////////////////////////////////////////////////////////
+  if ( milliseconds == 0 )
+    return;
+    
+  uint32_t ts = millis();  
+  while ( true ) {
 
+    // The return value of millis() will overflow (go back to zero), 
+    // after approximately 50 days
+    // In this case restart 
+    if ( millis() < ts ) {
+      waitActiveMilliseconds(milliseconds);
+      break;
+    }
 
+    if ( millis() - ts > milliseconds )
+      break;
+  }
+}
+///////////////////////////////////////////////////////////////
+void waitActiveMicroseconds(uint32_t microseconds) {
+///////////////////////////////////////////////////////////////  
+  if ( microseconds == 0 )
+    return;
 
+  const uint32_t threshold  = 1000;
+  uint32_t milliseconds     = microseconds / threshold;
+ 
+  if ( milliseconds > 0 )
+    waitActiveMilliseconds(milliseconds);
 
+  uint32_t us = microseconds % threshold;
+  uint32_t ts = micros();  
+
+  if ( us <= 10 )
+    return;
+  
+  while ( true ) {
+
+    // The return value of millis() will overflow (go back to zero), 
+    // after approximately 50 days
+    // In this case restart 
+    if ( micros() < ts ) {
+      waitActiveMicroseconds(us);
+      break;
+    }
+
+    if ( micros() - ts > us )
+      break;
+  }
+}
+///////////////////////////////////////////////////////////////
+int waitForSerialData(uint32_t timeoutMicros) {
+///////////////////////////////////////////////////////////////
+  if ( Serial.available() > 0 )
+    return Serial.available();
+
+  const uint32_t timeout = max(timeoutMicros, minSerialReadTimeoutMicros);
+
+  uint32_t ts = micros();  
+  while ( Serial.available() == 0 ) {
+
+    // The return value of micros() will overflow (go back to zero), 
+    // after approximately 70 minutes.
+    // In this case restart 
+    if ( micros() < ts )
+      return waitForSerialData(timeoutMicros);
+
+    if ( micros() - ts > timeout )
+      return 0;
+  }
+
+  return Serial.available();
+}
+///////////////////////////////////////////////////////////////
+byte readSerialByteWithTimeout(uint32_t timeoutMicros) {
+////////////////////////////////////////////////////////////////
+  byte b[1];
+  return readSerialBytesWithTimeout(b, 1, timeoutMicros) == 1 ? b[0] : 0;
+}
+///////////////////////////////////////////////////////////////
+int readSerialBytesWithTimeout(byte* buffer, int length, uint32_t timeoutMicros) {
+////////////////////////////////////////////////////////////////
+  byte* internalPointer   = buffer;
+  int bytesAvailable      = 0;
+  int totallyPicked       = 0;
+
+  if ( buffer != NULL ) {
+    while ( totallyPicked < length ) {
+
+      // check timeout
+      if ( ( bytesAvailable = waitForSerialData(timeoutMicros) ) == 0 )
+        break;
+        
+      // counter management
+      const int stillToRead     = length - totallyPicked;
+      const int toReadNow       = min(stillToRead, bytesAvailable);
+
+      // read operation
+      const int currentlyPicked = Serial.readBytes(internalPointer, toReadNow);
+      
+      // position / counter management
+      internalPointer += currentlyPicked;
+      totallyPicked   += currentlyPicked;
+    }
+  }
+    
+  return totallyPicked;
+}
 

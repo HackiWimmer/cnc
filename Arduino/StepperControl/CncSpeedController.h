@@ -445,6 +445,7 @@ class CncSpeedController {
     double getRealtimeFeedSpeed_MM_MIN()   const { return realtimeFeedSpeed_MM_SEC * 60; }
     double getRealtimeFeedSpeed_MM_SEC()   const { return realtimeFeedSpeed_MM_SEC; }
     void setRealtimeFeedSpeed_MM_SEC(const double s) { realtimeFeedSpeed_MM_SEC = (s > 0 ? s : 0.0); } 
+	void setRealtimeFeedSpeed_MM_MIN(const double s) { setRealtimeFeedSpeed_MM_SEC(s / 60); } 
 
     //////////////////////////////////////////////////////////////////
     double getStartSpeed_MM_MIN() const { return startSpeed_MM_SEC * 60; }

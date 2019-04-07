@@ -12,7 +12,6 @@
 #include "CncControl.h"
 #include "CncCommon.h"
 #include "CncArduino.h"
-#include "CncCommandDecoder.h"
 #include "CncContext.h"
 #include "SerialPort.h"
 #include "MainFrame.h"
@@ -46,11 +45,13 @@ Serial::Serial(CncControl* cnc)
 : SerialOSD()
 , totalDistance{0.0, 0.0, 0.0, 0.0}
 , totalDistanceRef(0.0)
-, currentFeedSpeed(0.0)
+, accumulatedDistance(0.0)
+, currentFeedSpeed_MM_MIN(0.0)
 , measurementRefPos(0, 0, 0)
 , tsMeasurementStart(0LL)
 , tsMeasurementRef(0LL)
 , tsMeasurementLast(0LL)
+, accumulatedTimespan(0LL)
 , cncControl(cnc)
 , measurementActive(false)
 , writeOnlyMoveCommands(false)
@@ -73,11 +74,14 @@ Serial::Serial(const char *portName)
 : SerialOSD()
 , totalDistance{0.0, 0.0, 0.0, 0.0}
 , totalDistanceRef(0.0)
-, currentFeedSpeed(0.0)
+, accumulatedDistance(0.0)
+, currentFeedSpeed_MM_MIN(0.0)
 , measurementRefPos(0, 0, 0)
 , tsMeasurementStart(0LL)
 , tsMeasurementRef(0LL)
 , tsMeasurementLast(0LL)
+, accumulatedTimespan(0LL)
+, cncControl(NULL)
 , measurementActive(false)
 , writeOnlyMoveCommands(false)
 , portName()
@@ -121,9 +125,12 @@ void Serial::startMeasurement() {
 	resetStepCounter();
 	resetTotalDistance();
 	
-	tsMeasurementStart = CncTimeFunctions::getNanoTimestamp();
-	tsMeasurementRef   = tsMeasurementStart;
-	tsMeasurementLast  = tsMeasurementStart;
+	tsMeasurementStart  = CncTimeFunctions::getNanoTimestamp();
+	tsMeasurementRef    = tsMeasurementStart;
+	tsMeasurementLast   = tsMeasurementStart;
+	accumulatedTimespan = 0.0;
+	accumulatedDistance = 0.0;
+	
 	startMeasurementIntern();
 }
 ///////////////////////////////////////////////////////////////////
@@ -135,7 +142,7 @@ void Serial::stopMeasurement() {
 	logMeasurementLastTs();
 	
 	// reset calculated feed speed
-	currentFeedSpeed = 0.0;
+	currentFeedSpeed_MM_MIN 	= 0.0;
 }
 ///////////////////////////////////////////////////////////////////
 void Serial::logMeasurementLastTs() {
@@ -145,16 +152,19 @@ void Serial::logMeasurementLastTs() {
 	// calculate current feed speed
 	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		const short T = 3;
-		CncNanoTimestamp tDiff = getMeasurementNanoTimeSpanLastRef();
-		double pDiff           = totalDistance[T] - totalDistanceRef;
+		const CncNanoTimespan tDiff = getMeasurementNanoTimeSpanLastRef();
+		const double pDiff          = totalDistance[T] - totalDistanceRef;
+		
+		accumulatedTimespan += tDiff;
+		accumulatedDistance += pDiff;
 		
 		// to avoid miss caluclations on the basis of to short difference
 		// this is with respect, that windows can't sleep exactly
 		if ( tDiff > 0 && pDiff > 0.1 ) {
-			currentFeedSpeed  = pDiff;
-			currentFeedSpeed /= tDiff;
-			currentFeedSpeed *= std::nano::den;
-			currentFeedSpeed *= 60;
+			currentFeedSpeed_MM_MIN  = pDiff;
+			currentFeedSpeed_MM_MIN /= tDiff;
+			currentFeedSpeed_MM_MIN *= std::nano::den;
+			currentFeedSpeed_MM_MIN *= 60;
 		}
 	}
 }
@@ -289,15 +299,9 @@ void Serial::purge(void) {
 ///////////////////////////////////////////////////////////////////
 bool Serial::isMoveCommand(unsigned char cmd) {
 ///////////////////////////////////////////////////////////////////
-	if ( cmd == CMD_NEG_STEP_X 			|| 
-		 cmd == CMD_POS_STEP_X 			|| 
-		 cmd == CMD_NEG_STEP_Y 			|| 
-		 cmd == CMD_POS_STEP_Y 			|| 
-		 cmd == CMD_NEG_STEP_Z 			|| 
-		 cmd == CMD_POS_STEP_Z 			|| 
-		 cmd == CMD_MOVE       			|| 
+	if ( cmd == CMD_MOVE       			|| 
 		 cmd == CMD_MOVE_UNIT_SIGNAL 	||
-		 cmd == CMD_RENDER_AND_MOVE
+		 cmd == CMD_RENDER_AND_MOVE   
 	   ) {
 			return true;   
 	   }
@@ -957,21 +961,6 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 	if ( writeOnlyMoveCommands == true && isMoveCommand((unsigned char)cmd) == false )
 		return true;
 	
-	// redirect this command types
-	switch ( cmd ) {
-		case CMD_NEG_STEP_X:
-		case CMD_POS_STEP_X:
-		case CMD_NEG_STEP_Y:
-		case CMD_POS_STEP_Y:
-		case CMD_NEG_STEP_Z:
-		case CMD_POS_STEP_Z: 	if ( convertToMoveCommandAndProcess(cmd, mutliByteStream) == false ) {
-									std::cerr << "Serial::processCommand(" << cmd << "): convertToMoveCommandAndProcess failed!" << std::endl;
-									return false;
-								}
-								
-								return true;
-	}
-	
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", cmd, ArduinoCMDs::getCMDLabel(cmd)));
 	
@@ -985,31 +974,6 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 		std::cerr << "Serial::processCommand(" << cmd << "): Unable to write data" << std::endl;
 		cncControl->SerialCallback();
 		ret =  false;
-	}
-	
-	return ret;
-}
-///////////////////////////////////////////////////////////////////
-bool Serial::convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream) {
-///////////////////////////////////////////////////////////////////
-	bool ret = false;
-	
-	const unsigned int size = 3;
-	const short X=0, Y=1, Z=2;
-	int32_t values[size];
-	values[X] = 0;
-	values[Y] = 0;
-	values[Z] = 0;
-	
-	switch ( cmd ) {
-		case CMD_NEG_STEP_X:	values[X] = -1; ret = processMove(size, values, false); break;
-		case CMD_POS_STEP_X:	values[X] = +1; ret = processMove(size, values, false); break;
-		case CMD_NEG_STEP_Y:	values[Y] = -1; ret = processMove(size, values, false); break;
-		case CMD_POS_STEP_Y:	values[Y] = +1; ret = processMove(size, values, false); break;
-		case CMD_NEG_STEP_Z:	values[Z] = -1; ret = processMove(size, values, false); break;
-		case CMD_POS_STEP_Z: 	values[Z] = +1; ret = processMove(size, values, false); break;
-		default:				std::cerr << "Serial::convertToMoveCommandAndProcess: Invalid command: " << cmd << std::endl;
-								ret = false;
 	}
 	
 	return ret;
@@ -1180,6 +1144,13 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			// fetch type handshake
 			// -----------------------------------------------------------
 			//evaluateResult..........................................
+			case RET_MORE:
+			{
+				LOG_HANDSHAKE(ret)
+				// always break the fetch loop
+				return RET_MORE_Handler(sfi, mutliByteStream);
+			}
+			//evaluateResult..........................................
 			case RET_OK:
 			{
 				LOG_HANDSHAKE(ret)
@@ -1272,6 +1243,16 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 	#undef LOG_HANDSHAKE
 }
 //////////////////////////////////////////////////////////////////
+bool Serial::RET_MORE_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
+///////////////////////////////////////////////////////////////////
+	// currently nothing specific to do
+
+	if ( traceSpyInfo )
+		cnc::spy.finalizeRET_MORE();
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream) {
 ///////////////////////////////////////////////////////////////////
 	#warning - thinking about cncControl->getCurAppPosAsReference() here
@@ -1303,15 +1284,28 @@ bool Serial::RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			break;
 		}
 		
-		// these commads should not occur here, because
-		// they are translated to a MOVE comand within 
-		// the method processCommand()
-		case CMD_NEG_STEP_X: pos.decX(1); break;
-		case CMD_POS_STEP_X: pos.incX(1); break;
-		case CMD_NEG_STEP_Y: pos.decY(1); break;
-		case CMD_POS_STEP_Y: pos.incY(1); break;
-		case CMD_NEG_STEP_Z: pos.decZ(1); break;
-		case CMD_POS_STEP_Z: pos.incZ(1); break;
+		case CMD_MOVE_SEQUENCE:
+		case CMD_RENDER_AND_MOVE_SEQUENCE:
+		{
+			switch ( sfi.Msc.size ) {
+				case 1:
+					pos.incZ(sfi.Msc.value1);
+					break;
+
+				case 2:
+					pos.incX(sfi.Msc.value1);
+					pos.incY(sfi.Msc.value2);
+					break;
+
+				case 3:
+					pos.incX(sfi.Msc.value1);
+					pos.incY(sfi.Msc.value2);
+					pos.incZ(sfi.Msc.value3);
+					break;
+			}
+			
+			break;
+		}
 	}
 	
 	if ( traceSpyInfo )
@@ -1655,4 +1649,137 @@ bool Serial::decodeHeartbeat(SerialFetchInfo& sfi) {
 
 	sendSerialControllerCallback(ci);
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::processMoveSequence(CncMoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	if ( isConnected() == false ) {
+		std::cerr << "SERIAL::processMoveSequence()::ERROR: Not connected\n";
+		return false;
+	}
+	
+	SerialCommandLocker scl(sequence.getType());
+	if ( scl.lock(cncControl) == false ) {
+		std::clog << "SERIAL::processMoveSequence(): Serial is currently in fetching mode: This command will be rejected:" << std::endl;
+		return true;
+	}
+	
+	// Always log the start postion
+	cncControl->SerialCallback();
+	
+	// create move sequence write buffer
+	CncMoveSequence::FlushResult result;
+	if ( sequence.flush(result) == false ) {
+		std::clog << "SERIAL::processMoveSequence(): seqeunce.flush returned false." << std::endl;
+		return false;
+	}
+	
+	unsigned int totalFlushedSize	= sequence.getFlushedSize();
+	unsigned int currentFlushedSize	= *(sequence.getPortionIndex().begin());
+	unsigned char* moveSequence 	= result.buffer;
+	moveCommand[0] 					= moveSequence[0];
+	
+	// to provide a time and pos reference for the speed calculation
+	logMeasurementRefTs(cncControl->getCurAppPos());
+	
+	// over all portions
+	for ( auto it = sequence.getPortionIndex().begin(); it != sequence.getPortionIndex().end(); ++it ) {
+		const unsigned int portionCounter = std::distance(sequence.getPortionIndex().begin(), it);
+		
+		if ( traceSpyInfo && spyWrite )
+			cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]; portion=%u",	moveSequence[0],
+																						ArduinoCMDs::getCMDLabel(moveSequence[0]),
+																						portionCounter + 1
+									 ));
+		
+		const unsigned int portionStart		= *it;
+		const unsigned int portionLength	= (unsigned int)moveSequence[portionStart];
+		const unsigned int portionTotLength	= portionLength + 1;
+		
+		const unsigned int writeStart		= portionCounter > 0 ? portionStart  : 0;
+		const unsigned int writeLength		= portionCounter > 0 ? portionLength : portionLength + portionStart;
+		
+		if ( false ) {
+			std::cout << "Portion : " << portionStart << "->" << portionLength << std::endl;
+			std::clog << "Write   : " << writeStart   << "->" << writeLength  << std::endl;
+		}
+		 
+		// write ....
+		if ( writeData(moveSequence + writeStart, writeLength) ) {
+			currentFlushedSize += portionTotLength; 
+			
+			SerialFetchInfo sfi;
+			sfi.command 				= moveSequence[0];
+			sfi.singleFetchTimeout 		= 3000;
+			
+			sfi.Msc.size 				= 3;
+			sfi.Msc.value1				= result.sequenceData.targetX;
+			sfi.Msc.value2				= result.sequenceData.targetY;
+			sfi.Msc.value3				= result.sequenceData.targetZ;
+			
+			// evaluate handshake
+			bool handshake = evaluateResultWrapper(sfi, std::cout);
+			if ( handshake == false ) {
+				std::cerr << "SERIAL::processMoveSequence(" << portionCounter << "): Invalid handshake" << std::endl;
+				cncControl->SerialCallback();
+				return false;
+			}
+			
+			if ( lastFetchResult.ret != RET_MORE && lastFetchResult.ret != RET_OK ) {
+				std::clog << "SERIAL::processMoveSequence(" << portionCounter << "): lastFetchResult.ret != RET_MORE | RET OK" << std::endl;
+				break;
+			}
+			
+		} else {
+			std::cerr << "SERIAL::processMoveSequence(" << portionCounter << "): Unable to write data" << std::endl;
+			cncControl->SerialCallback();
+			return false;
+		}
+	}
+	
+	// final quality check
+	if ( totalFlushedSize != currentFlushedSize ) {
+		std::cerr << "SERIAL::processMoveSequence(final): totalFlushedSize != currentFlushedSize" << std::endl;
+		std::cerr << " - totalFlushedSize            : " << totalFlushedSize 	<< std::endl;
+		std::cerr << " - currentFlushedSize          : " << currentFlushedSize 	<< std::endl;
+		return false;
+	}
+	
+	// latest log this move
+	logMeasurementLastTs();
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::test() {
+///////////////////////////////////////////////////////////////////
+	CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+	
+	if ( false ) {
+		cms.addPosXYZ(1, 1, 1);
+		cms.addPosXYZ(11, 12, 13);
+		cms.addPosXYZ(11, 12, 13);
+		cms.addPosXYZ(1000, 2, 3);
+		cms.addPosXYZ(100000, 2, 3);
+		cms.addPosXYZ(1, 1, 1);
+	}
+	else {
+		for ( int i = 0; i<500; i++) {
+			if ( false ) {
+				if 		( i % 20 == 0 )	{ cms.addPosXYZ(100000, 1, -100000); }
+				else if	( i % 10 == 0 )	{ cms.addPosXYZ(-1000, 1, -1); }
+				else if	( i %  5 == 0 )	{ cms.addPosXYZ(11, -12, 13); }
+				else					{ cms.addPosXYZ(1, -1, 0); }
+			}
+			else {
+				cms.addPosXYZ(11, -12, 13);
+				//cms.addPosXYZ(1, -1, 1);
+			}
+		}
+	}
+	
+	std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
+	
+	bool ret = processMoveSequence(cms);
+	return ret;
 }

@@ -208,11 +208,18 @@ void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
 	WaitForSingleObject(timer, INFINITE); 
 	CloseHandle(timer); 
 #endif
-
+	
 #ifdef __WXGTK__
+	
 	struct timespec req;
-	req.tv_sec  = micros / (1000 * 1000);
-	req.tv_nsec = micros % (1000 * 1000);
+	if ( micros >= 1000 * 1000 ) {
+		req.tv_sec  = micros / (1000 * 1000);
+		req.tv_nsec = micros % (1000 * 1000);
+	}
+	else {
+		req.tv_sec  = 0;
+		req.tv_nsec = micros * 1000;
+	} 
 	
 	nanosleep(&req, NULL);
 #endif

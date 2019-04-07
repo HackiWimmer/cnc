@@ -394,6 +394,9 @@ class CncControl {
 		// idle handling
 		void sendIdleMessage();
 		
+		// for testing only
+		Serial* getSerialExtern() { wxASSERT(serialPort); return serialPort; }
+		
 };
 
 #endif

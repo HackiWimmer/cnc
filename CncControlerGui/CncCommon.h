@@ -61,7 +61,13 @@ namespace cnc {
 	extern CncTraceLogStream  trc;
 	extern CncMsgLogStream    msg;
 	extern CncSerialSpyStream spy;
+	
+	template <class T, class Compare>
+	bool between(T val, T lo, T hi, Compare comp) 	{ return comp(lo, val) && comp(val, hi); }
 
+	template<class T>
+	bool between(T val, T lo, T hi) 				{ return between( val, lo, hi, std::less<T>() ); }
+	
 	bool dblCompare(double a, double b, double eps = std::numeric_limits<double>::epsilon());
 	bool dblCompareNull(double a, double eps = std::numeric_limits<double>::epsilon());
 	const wxString& dblFormat1(double d);

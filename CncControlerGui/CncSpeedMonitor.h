@@ -10,19 +10,28 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		CncSpeedMonitor(wxWindow* parent);
 		virtual ~CncSpeedMonitor();
 		
+		void save();
+		void clear();
+		
 		void start(double maxSpeedValue_MM_MIN);
 		void stop();
+		
 		void setCurrentFeedSpeedValue(double measured_MM_MIN, double configured_MM_MIN);
 		
 	protected:
-    virtual void changeIntervalSlider(wxScrollEvent& event);
+		virtual void onClear(wxCommandEvent& event);
+		virtual void onSave(wxCommandEvent& event);
+		virtual void onRefreshTimer(wxTimerEvent& event);
+		virtual void onScrolledSize(wxSizeEvent& event);
+		virtual void changeIntervalSlider(wxScrollEvent& event);
 		virtual void toggleConfiguredAxis(wxCommandEvent& event);
 		virtual void toggleConnection(wxCommandEvent& event);
 		virtual void toggleMeasurePointsAxis(wxCommandEvent& event);
 		virtual void onLeftDown(wxMouseEvent& event);
 		virtual void onLeftUp(wxMouseEvent& event);
 		virtual void onMouseMotion(wxMouseEvent& event);
-		virtual void onTimer(wxTimerEvent& event);
+		virtual void onPaintLeftAxis(wxPaintEvent& event);
+		virtual void onPaintRightAxis(wxPaintEvent& event);
 		virtual void onPaint(wxPaintEvent& event);
 		virtual void onSize(wxSizeEvent& event);
 		
@@ -30,12 +39,12 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		
 		static const unsigned int refreshInterval	=  100;
 		
-		static const unsigned int lMargin 			=   28;
-		static const unsigned int rMargin 			=   28;
+		static const unsigned int lMargin 			=    8;
+		static const unsigned int rMargin 			=    8;
 		static const unsigned int tMargin 			=    8;
 		static const unsigned int bMargin 			=    8;
 		
-		static const unsigned int MAX_VALUES 		= 4096;
+		static const unsigned int MAX_VALUES 		= 4 * 1024;
 		
 		struct Axis {
 			bool fill	= false;
@@ -52,6 +61,11 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 			
 			// --------------------------------------------------
 			Axis() {
+				clear();
+			}
+			
+			// --------------------------------------------------
+			void clear() {
 				for ( unsigned int i = 0; i < MAX_VALUES; i++ )
 					values[i] = 0;
 			}
@@ -91,11 +105,13 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		Axis axisConfiguredSpeed;
 		
 		CncMilliTimestamp lastRefresh;
+		CncMilliTimestamp lastDataSet;
 		unsigned int timeIndex;
 		double currentMeasuredFeedSpeed_MM_MIN;
 		double currentConfiguredFeedSpeed_MM_MIN;
 		
 		void reset();
+		void setupSizes();
 	
 };
 #endif // CNCSPEEDMONITOR_H

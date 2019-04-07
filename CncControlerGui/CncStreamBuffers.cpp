@@ -166,6 +166,18 @@ void CncSerialSpyStream::finalizeRET_OK(const char* msg) {
 	c->addLine("RET_OK", CncSerialSpyListCtrl::LineType::LT_ResultOk);
 }
 ///////////////////////////////////////////////////////////
+void CncSerialSpyStream::finalizeRET_MORE(const char* msg) {
+///////////////////////////////////////////////////////////
+	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);
+	if ( c == NULL )
+		return;
+	
+	if ( msg != NULL )
+		c->addLine(msg, CncSerialSpyListCtrl::LineType::LT_ResultMore);
+		
+	c->addLine("RET_MORE", CncSerialSpyListCtrl::LineType::LT_ResultMore);
+}
+///////////////////////////////////////////////////////////
 void CncSerialSpyStream::finalizeRET_ERROR(const char* msg) {
 ///////////////////////////////////////////////////////////
 	CncCspyBuf* c = static_cast<CncCspyBuf*>(logStreamBuffer);

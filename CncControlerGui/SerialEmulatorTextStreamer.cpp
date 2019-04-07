@@ -47,7 +47,7 @@ bool SerialEmulatorTextStreamer::isOutputAsTemplateAvailable() {
 bool SerialEmulatorTextStreamer::connect(const char* fileName) {
 ///////////////////////////////////////////////////////////////////
 	this->fileName.assign(fileName);
-	
+
 	setConnected(true);
 	return isConnected();
 }
@@ -59,7 +59,8 @@ void SerialEmulatorTextStreamer::disconnect() {
 ///////////////////////////////////////////////////////////////////
 const wxString& SerialEmulatorTextStreamer::formatPosition(const int32_t value)          const {
 	static wxString ret;
-	ret.assign(wxString::Format("%ld", value));
+
+	ret.assign(wxString::Format("%d", (long)value));
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -72,7 +73,7 @@ const wxString& SerialEmulatorTextStreamer::formatPosition(const double value)  
 const wxString& SerialEmulatorTextStreamer::formatPosition(const CncLongPosition& pos)   const {
 ///////////////////////////////////////////////////////////////////
 	static wxString ret;
-	ret.assign(wxString::Format("%ld %ld %ld", pos.getX(), pos.getY(), pos.getZ()));
+	ret.assign(wxString::Format("%ld %ld %ld", (long)pos.getX(), (long)pos.getY(), (long)pos.getZ()));
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -81,6 +82,11 @@ const wxString& SerialEmulatorTextStreamer::formatPosition(const CncDoublePositi
 	static wxString ret;
 	ret.assign(wxString::Format("%.3lf %.3lf %.3lf", pos.getX(), pos.getY(), pos.getZ()));
 	return ret;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInfo& si) {
+///////////////////////////////////////////////////////////////////
+	// currently nothing to do
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorTextStreamer::writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) {
@@ -142,6 +148,33 @@ bool SerialEmulatorTextStreamer::writeSetterRawCallback(unsigned char *buffer, u
 	return writeEncodedSetterCallback(si);
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent3 << wxString::Format("<steps x=\"%ld\" y=\"%ld\" z=\"%ld\"/>\n",
+			                                            (long)dx, (long)dy, (long)dz);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceBegin cmd=\"%c\" description=\"%s\"/>\n",
+			                                            sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+
+
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceNext cmd=\"%c\" description=\"%s\"/>\n",
+			                                            sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceEnd cmd=\"%c\" description=\"%s\"/>\n",
+			                                            sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorTextStreamer::writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( buffer == NULL || nbByte == 0 ) {
@@ -164,10 +197,16 @@ bool SerialEmulatorTextStreamer::writeMoveRawCallback(unsigned char *buffer, uns
 	}
 	
 	mi.mdx = GBL_CONFIG->convertStepsToMetricX(mi.sdx);
-	mi.mdy = GBL_CONFIG->convertStepsToMetricX(mi.sdy);
-	mi.mdz = GBL_CONFIG->convertStepsToMetricX(mi.sdz);
+	mi.mdy = GBL_CONFIG->convertStepsToMetricY(mi.sdy);
+	mi.mdz = GBL_CONFIG->convertStepsToMetricZ(mi.sdz);
 		
 	return writeEncodedMoveCallback(mi);
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorTextStreamer::writeMoveSequenceRawCallback(unsigned char *buffer, unsigned int nbByte) {
+///////////////////////////////////////////////////////////////////
+	// Nothing to do here
+	return SerialEmulatorNULL::writeMoveSequenceRawCallback(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorTextStreamer::writeEncodedSetterCallback(const SetterInfo& si) {
@@ -179,7 +218,7 @@ bool SerialEmulatorTextStreamer::writeEncodedSetterCallback(const SetterInfo& si
 	wxString values;
 	for ( auto it = si.values.begin(); it != si.values.end(); ++it) {
 		if ( si.pid >= PID_DOUBLE_RANG_START && si.pid <= PID_DOUBLE_RANG_END )		values.append(wxString::Format("%.3lf ", (double)(*it) / DBL_FACT));
-		else																		values.append(wxString::Format("%ld ",   (*it) ));
+		else																		values.append(wxString::Format("%ld ",   (long)(*it) ));
 	}
 		
 	values.assign(values.Trim(false).Trim(true));
@@ -194,7 +233,7 @@ bool SerialEmulatorTextStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 	GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 	
 	bodyStream << Streamer::indent2 << wxString::Format("<Move cmd=\"%c\" description=\"%s\" speedMode=\"%c\"\n", mi.cmd, ArduinoCMDs::getCMDLabel(mi.cmd), cnc::getCncSpeedTypeAsCharacter(mi.speedMode));
-		bodyStream << Streamer::indent3 << wxString::Format("steps=\"%ld %ld %ld\"\n",				mi.sdx, mi.sdy, mi.sdz);
+		bodyStream << Streamer::indent3 << wxString::Format("steps=\"%ld %ld %ld\"\n",				(long)mi.sdx, (long)mi.sdy, (long)mi.sdz);
 		bodyStream << Streamer::indent3 << wxString::Format("metrixs=\"%.3lf %.3lf %.3lf\"\n", 		mi.mdx, mi.mdy, mi.mdz);
 		bodyStream << Streamer::indent3 << wxString::Format("posStart=\"%.3lf %.3lf %.3lf\"\n", 	dPos.getX(), dPos.getY(), dPos.getZ());
 		bodyStream << Streamer::indent3 << wxString::Format("posEnd=\"%.3lf %.3lf %.3lf\"\n", 		dPos.getX() + mi.mdx, dPos.getY() + mi.mdy, dPos.getZ() + mi.mdz);

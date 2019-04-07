@@ -5,6 +5,7 @@
 #include "SerialSpyPort.h"
 #include "CncLimitStates.h"
 #include "CncArduino.h"
+#include "CncCommandDecoder.h"
 #include "CncSpeedSimulator.h"
 
 struct LastCommand {
@@ -18,7 +19,26 @@ struct LastCommand {
 		ret 				= RET_ERROR;
 		index 				= 0;
 	}
+	
+	struct MOVE_SEQUENCE {
+		unsigned char cmd 	= CMD_INVALID;
+		unsigned char ret	= RET_ERROR;
+		
+		CncCommandDecoder::MoveSequence sequence;
+		
+		void reset() {
+			cmd 			= CMD_INVALID;
+			ret 			= RET_ERROR;
+			
+			sequence.reset();
+		}
+		
+		bool isActive() { 
+			return ( cmd == CMD_MOVE_SEQUENCE || cmd == CMD_RENDER_AND_MOVE_SEQUENCE );
+		}
 
+	} MoveSequence;
+	
 	struct SERIAL {
 		
 		private:
@@ -158,7 +178,8 @@ struct LastCommand {
 	} Serial;
 };
 
-class SerialEmulatorNULL : public SerialSpyPort
+class SerialEmulatorNULL : public SerialSpyPort,
+                           public CncCommandDecoder::CallbackInterface
 {
 	private:
 		
@@ -185,10 +206,15 @@ class SerialEmulatorNULL : public SerialSpyPort
 		CncLongPosition curEmulatorPos;
 		
 		inline bool writeMoveCmdIntern(unsigned char *buffer, unsigned int nbByte);
+		inline bool writeMoveSeqIntern(unsigned char *buffer, unsigned int nbByte);
 		
-		inline bool moveUntilSignal(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte);
-		inline bool renderMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte);
-		inline bool provideMove(int32_t dx , int32_t dy , int32_t dz, unsigned char *buffer, unsigned int nbByte, bool force=false);
+		// specialization wrapper --> call initRenderAndMove
+		inline bool moveUntilSignal(int32_t dx, int32_t dy, int32_t dz);
+		// init feed speed and calling renderAndMove
+		inline bool initRenderAndMove(int32_t dx, int32_t dy, int32_t dz);
+		// render and step axis
+		inline bool renderAndMove(int32_t dx, int32_t dy, int32_t dz);
+
 		
 		inline void reset();
 		inline void resetCounter();
@@ -215,11 +241,12 @@ class SerialEmulatorNULL : public SerialSpyPort
 		int32_t 		maxDimStepsY;
 		int32_t 		maxDimStepsZ;
 		
-		const CncLongPosition& getCurrentEmulatorPosition() 								{ return curEmulatorPos; }
+		const CncLongPosition& getCurrentEmulatorPosition() 									{ return curEmulatorPos; }
 		
-		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) 	{ return true; }
-		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) 		{ return true; }
-		virtual bool writeMoveRenderedCallback(int32_t x , int32_t y , int32_t z) 			{ return true; }
+		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) 		{ return true; }
+		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) 			{ return true; }
+		virtual bool writeMoveSequenceRawCallback(unsigned char *buffer, unsigned int nbByte)	{ return true; }
+		virtual bool writeMoveRenderedCallback(int32_t x , int32_t y , int32_t z) 				{ return true; }
 
 		virtual bool writeHeartbeat(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeGetter(unsigned char *buffer, unsigned int nbByte);
@@ -231,6 +258,7 @@ class SerialEmulatorNULL : public SerialSpyPort
 		virtual int performText(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMsg(unsigned char *buffer, unsigned int nbByte, const char* response);
 		virtual int performMajorMove(unsigned char *buffer, unsigned int nbByte);
+		virtual int performSequenceMove(unsigned char *buffer, unsigned int nbByte);
 		
 		void addErrorInfo(unsigned char eid, const wxString& text);
 		
@@ -265,6 +293,10 @@ class SerialEmulatorNULL : public SerialSpyPort
 		int32_t getEmuStepOverflowCounterY() { return stepOverflowCounterY; }
 		int32_t getEmuStepOverflowCounterZ() { return stepOverflowCounterZ; }
 
+		void initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz);
+		void completeFeedProfile();
+
+
 	public:
 		
 		//Initialize Serial communication without an acitiv connection 
@@ -273,6 +305,12 @@ class SerialEmulatorNULL : public SerialSpyPort
 		SerialEmulatorNULL(const char *portName);
 		virtual ~SerialEmulatorNULL();
 		
+		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
+		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence);
+
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulator(dev/null)"; }
 		// returns the emulator type

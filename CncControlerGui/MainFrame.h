@@ -113,6 +113,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void openSpyDetailWindow(wxCommandEvent& event);
 		virtual void dclickHeartbeatState(wxMouseEvent& event);
 		virtual void openGameportController(wxCommandEvent& event);
 		virtual void showOSEnvironment(wxCommandEvent& event);

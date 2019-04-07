@@ -52,6 +52,7 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte);
+		virtual bool writeMoveSequenceRawCallback(unsigned char *buffer, unsigned int nbByte);
 		
 		virtual bool writeEncodedSetterCallback(const SetterInfo& si);
 		virtual bool writeEncodedMoveCallback(const MoveInfo& mi);
@@ -71,6 +72,12 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		explicit SerialEmulatorTextStreamer(const char *fileName);
 		virtual ~SerialEmulatorTextStreamer();
 		
+		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
+		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence);
+
 		virtual bool isOutputAsTemplateAvailable();
 		
 		// returns the class name

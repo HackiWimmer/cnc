@@ -21,6 +21,7 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
 , itemAttrDefault()
 , itemAttrResultOk()
+, itemAttrResultMore()
 , itemAttrResultError()
 , itemAttrResultWarning()
 , itemAttrResultLimit()
@@ -60,6 +61,10 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 	itemAttrResultOk.SetFont(defaultFont);
 	itemAttrResultOk.SetTextColour(*wxWHITE);
 	
+	itemAttrResultMore.SetBackgroundColour(wxColour(4, 240, 104));
+	itemAttrResultMore.SetFont(defaultFont);
+	itemAttrResultMore.SetTextColour(*wxBLACK);
+
 	itemAttrResultError.SetBackgroundColour(wxColour(176, 0, 0));
 	itemAttrResultError.SetFont(defaultFont);
 	itemAttrResultError.SetTextColour(*wxWHITE);
@@ -118,6 +123,7 @@ wxListItemAttr* CncSerialSpyListCtrl::OnGetItemAttr(long item) const {
 	
 	switch ( type ) {
 		case LT_ResultOk:			return (wxListItemAttr*)(&itemAttrResultOk);
+		case LT_ResultMore:			return (wxListItemAttr*)(&itemAttrResultMore);
 		case LT_ResultError:		return (wxListItemAttr*)(&itemAttrResultError);
 		case LT_ResultWarning:		return (wxListItemAttr*)(&itemAttrResultWarning);
 		case LT_ResultLimit:		return (wxListItemAttr*)(&itemAttrResultLimit);

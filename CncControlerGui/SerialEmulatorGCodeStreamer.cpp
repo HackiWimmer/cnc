@@ -28,6 +28,33 @@ bool SerialEmulatorGCodeStreamer::isOutputAsTemplateAvailable() {
 	return false; 
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorGCodeStreamer::notifySetter(const CncCommandDecoder::SetterInfo& si) {
+///////////////////////////////////////////////////////////////////
+	// to overrider the default behavior only
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorGCodeStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
+///////////////////////////////////////////////////////////////////
+	// to overrider the default behavior only
+	#warning impl: SerialEmulatorGCodeStreamer::notifyMove
+	bodyStream << wxString::Format("(< notifyMove(%ld, %ld, %ld) >)\n", (long)dx, (long)dy, (long)dz);
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorGCodeStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << wxString::Format("(< MoveSequenceBegin(cmd = '%c' - %s) >)\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorGCodeStreamer::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << wxString::Format("(< MoveSequenceNext(cmd = '%c' - %s) >)\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorGCodeStreamer::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << wxString::Format("(< MoveSequenceEnd(cmd = '%c' - %s) >)\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorGCodeStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
 	wxString G("G1 ");

@@ -109,7 +109,7 @@ bool SerialMsw::connect(const char* portName) {
 	dcbSerialParams.fOutX         	= FALSE;
 	dcbSerialParams.fInX          	= FALSE;
 	dcbSerialParams.fAbortOnError 	= TRUE;
-	dcbSerialParams.fDtrControl   	= DTR_CONTROL_DISABLE;
+	dcbSerialParams.fDtrControl   	= DTR_CONTROL_ENABLE;
 	dcbSerialParams.fRtsControl   	= RTS_CONTROL_DISABLE;
 	
 	//Set the parameters and check for their proper application
@@ -171,9 +171,9 @@ void SerialMsw::purge(void) {
 int SerialMsw::readData(void *buffer, unsigned int nbChar) {
 ///////////////////////////////////////////////////////////////////
 	//Number of bytes we'll have read
-	DWORD bytesRead;
+	DWORD bytesRead 	= 0;
 	//Number of bytes we'll really ask to read
-	unsigned int toRead;
+	unsigned int toRead = 0;
 	
 	COMSTAT status;
 	DWORD errors;
@@ -186,17 +186,13 @@ int SerialMsw::readData(void *buffer, unsigned int nbChar) {
 		//Check if there is enough data to read the required number
 		//of characters, if not we'll read only the available characters to prevent
 		//locking of the application.
-		if( status.cbInQue > nbChar ) {
-			toRead = nbChar;
-		} else {
-			toRead = status.cbInQue;
-		}
-		
-		//Try to read the require number of chars, and return the number of read bytes on success
-		if( ReadFile(this->hSerial, buffer, toRead, &bytesRead, NULL) ) {
-			return bytesRead;
-		}
+		if( status.cbInQue > nbChar ) 	toRead = nbChar;
+		else							toRead = status.cbInQue;
 	}
+	
+	//Try to read the require number of chars, and return the number of read bytes on success
+	if( ReadFile(this->hSerial, buffer, toRead, &bytesRead, NULL) )
+		return bytesRead;
 	
 	//If nothing has been read, or that an error was detected return 0
 	return 0;
@@ -209,14 +205,14 @@ bool SerialMsw::writeData(void *buffer, unsigned int nbByte) {
 	COMSTAT status;
 	DWORD errors;
 		
-	if( !WriteFile(this->hSerial, (void *)buffer, nbByte, &bytesSend, 0) ) {
+	if( !WriteFile(this->hSerial, buffer, nbByte, &bytesSend, 0) ) {
+		std::cerr << "Serial::writeData(): WriteFile failed" << std::endl;
 		ClearCommError(this->hSerial, &errors, &status);
 		return false;
 	} 
 	
-	if ( nbByte != bytesSend ) {
-		std::cerr << "Serial::writeData nbByte != bytesSend" << std::endl;
-	}
+	if ( nbByte != bytesSend )
+		std::cerr << "Serial::writeData(): nbByte != bytesSend" << std::endl;
 	
 	return true;
 }

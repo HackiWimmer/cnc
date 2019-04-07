@@ -14,6 +14,8 @@ class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL
 		
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte);
+		virtual bool writeMoveSequenceRawCallback(unsigned char *buffer, unsigned int nbByte);
+
 		
 	public:
 	
@@ -21,6 +23,12 @@ class SerialEmulatorBinaryStreamer : public SerialEmulatorNULL
 		explicit SerialEmulatorBinaryStreamer(const char *fileName);
 		virtual ~SerialEmulatorBinaryStreamer();
 		
+		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
+		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence);
+
 		// returns the class name
 		virtual const char* getClassName() { return "SerialEmulatorBinaryStreamer"; }
 		virtual const char* getPortName()  { return getOutboundFileName(); }

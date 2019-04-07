@@ -15,6 +15,7 @@ class CncMessageDialog : public CncMessageDialogBase {
 		void setMessage(const wxString& msg);
 
 	protected:
+		virtual void onWordWrap(wxCommandEvent& event);
 		virtual void close(wxCommandEvent& event);
 };
 #endif // CNCMESSAGEDIALOG_H

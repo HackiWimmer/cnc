@@ -168,9 +168,9 @@
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
       <VirtualDirectory Name="OSD">
+        <File Name="OSD/SerialMsw.cpp"/>
         <File Name="OSD/SerialOSD.h"/>
         <File Name="OSD/SerialMsw.h"/>
-        <File Name="OSD/SerialMsw.cpp"/>
         <File Name="OSD/SerialGtk.h"/>
         <File Name="OSD/SerialGtk.cpp"/>
       </VirtualDirectory>
@@ -192,6 +192,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncMoveSequence.h"/>
+      <File Name="CncMoveSequence.cpp"/>
       <File Name="CncSpeedMonitor.h"/>
       <File Name="CncSpeedMonitor.cpp"/>
       <File Name="CncGameportController.h"/>

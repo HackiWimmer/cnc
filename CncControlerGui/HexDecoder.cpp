@@ -22,7 +22,7 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 		return;
 	
 	// reclacTokenCount
-	auto reclacTokenCount = [&]() {
+	auto recalcTokenCount = [&]() {
 		restToken.assign(restToken.SubString(3, restToken.length() - 1));
 		restToken.Trim(true).Trim(false);
 		
@@ -36,7 +36,7 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 	};
 	
 	// Recalc token count
-	byteCount = reclacTokenCount();
+	byteCount = recalcTokenCount();
 	
 	// default values processing
 	auto decodeValues = [&]() {
@@ -80,23 +80,37 @@ void SpyHexDecoder::decodeOutbound(SpyHexDecoder::Details& ret) {
 	
 	// command specific handling
 	switch ( cmd ) {
-		case CMD_GETTER:	ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(restToken), decodeHexValueAsArduinoPID(restToken));
-							
-							byteCount = reclacTokenCount();
-							decodeValues();
-							break;
-							
-		case CMD_SETTER:	ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(restToken), decodeHexValueAsArduinoPID(restToken));
-							ret.more << "; size = ";
-							
-							byteCount = reclacTokenCount();
-							ret.more << decodeHexValueAsInteger(restToken);
-							
-							byteCount = reclacTokenCount();
-							decodeValues();
-							break;
-
-		default: 			decodeValues();
+		case CMD_GETTER:
+				ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(restToken), decodeHexValueAsArduinoPID(restToken));
+				
+				byteCount = recalcTokenCount();
+				decodeValues();
+				break;
+				
+		case CMD_SETTER:
+				ret.more << wxString::Format("PID = [%03d] %s", decodeHexValueAsInteger(restToken), decodeHexValueAsArduinoPID(restToken));
+				ret.more << "; size = ";
+				
+				byteCount = recalcTokenCount();
+				ret.more << decodeHexValueAsInteger(restToken);
+				
+				byteCount = recalcTokenCount();
+				decodeValues();
+				break;
+				
+		case CMD_MOVE_SEQUENCE:
+				ret.more << "size = " << decodeHexValueAsInt32(restToken);
+				byteCount = recalcTokenCount();
+				decodeValues();
+				break;
+				
+		case CMD_RENDER_AND_MOVE_SEQUENCE:
+				ret.more << "size = " << decodeHexValueAsInt32(restToken);
+				byteCount = recalcTokenCount();
+				decodeValues();
+				break;
+		
+		default: decodeValues();
 	}
 }
 //////////////////////////////////////////////////////////

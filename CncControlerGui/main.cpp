@@ -63,115 +63,121 @@ namespace cnc {
 	CncBasicLogStream cex1;
 };
 	
-///////////////////////////////////////////////////////////////////
-void preInstallStreamRedirection() {
-///////////////////////////////////////////////////////////////////
-	//redirect std::cout
-	psbufCout = new CncCoutBuf(NULL);
-	sbOldCout = std::cout.rdbuf();
-	std::cout.rdbuf(psbufCout);
+///////////////////////////////////////////////////////////////////////////
+class GlobalStreamRedirection {
 	
-	//redirect std::clog
-	psbufClog = new CncClogBuf(NULL);
-	sbOldClog = std::clog.rdbuf();
-	std::clog.rdbuf(psbufClog);
+	public:
+		///////////////////////////////////////////////////////////////////
+		static void preInstall() {
+			
+			//redirect std::cout
+			psbufCout = new CncCoutBuf(NULL);
+			sbOldCout = std::cout.rdbuf();
+			std::cout.rdbuf(psbufCout);
+			
+			//redirect std::clog
+			psbufClog = new CncClogBuf(NULL);
+			sbOldClog = std::clog.rdbuf();
+			std::clog.rdbuf(psbufClog);
+			
+			//redirect std::cerr
+			psbufCerr = new CncCerrBuf(NULL);
+			sbOldCerr = std::cerr.rdbuf();
+			std::cerr.rdbuf(psbufCerr);
+			
+			// redirect ext1 buffer
+			psbufCex1 = new CncCex1Buf(NULL);
+			sbOldCex1 = cnc::cex1.rdbuf();
+			((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
+			cnc::cex1.setLogStreamBuffer(psbufCex1);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		static void install(MainFrame* mainFrame) {
+			
+			// perform startup trace
+			wxTextCtrl* st = mainFrame->GetStartupTrace();
+			st->Clear();
+			
+			wxTextAttr ta(wxColour(192, 192, 192));
+			wxFont oldFont(st->GetFont());
+			wxFont newFont(oldFont);
+			newFont.SetWeight(wxFONTWEIGHT_BOLD);
+		 
+			ta.SetFont(newFont);
+			st->SetDefaultStyle(ta);
+			
+			st->AppendText("-------------------------------------------------------------------\n"
+						   " Startup stream trace . . .\n"
+						   "-------------------------------------------------------------------\n");
+			
+			ta.SetFont(oldFont);
+			st->SetDefaultStyle(ta);
+			bool hasLogOrErr = StartupBuffer::trace(st);
+			mainFrame->GetLoggerNotebook()->SetPageText(LoggerSelection::VAL::STARTUP, (hasLogOrErr == true ? ")-:" : "(-;"));
+			
+			st->SetInsertionPoint(st->XYToPosition(0, 0));
+			st->ShowPosition(st->XYToPosition(0, 0));
+			
+			// set the logger control
+			psbufCout->setTextControl(mainFrame->getLogger());
+			psbufClog->setTextControl(mainFrame->getLogger());
+			psbufCerr->setTextControl(mainFrame->getLogger());
+			psbufCex1->setTextControl(mainFrame->getLogger());
+			
+			// redirect trace buffer
+			psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
+			sbOldCtrc = cnc::trc.rdbuf();
+			((std::iostream*)&cnc::trc)->rdbuf(psbufCtrc);
+			cnc::trc.setLogStreamBuffer(psbufCtrc);
+			
+			// redirect controller message buffer
+			psbufCmsg = new CncCmsgBuf(mainFrame->getCtrlMessageHistory());
+			sbOldCmsg = cnc::msg.rdbuf();
+			((std::iostream*)&cnc::msg)->rdbuf(psbufCmsg);
+			cnc::msg.setLogStreamBuffer(psbufCmsg);
+			
+			// redirect serial spy buffer
+			psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
+			sbOldCspy = cnc::spy.rdbuf();
+			((std::iostream*)&cnc::spy)->rdbuf(psbufCspy);
+			cnc::spy.setLogStreamBuffer(psbufCspy);
+		}
+		
+		///////////////////////////////////////////////////////////////////
+		static void reset() {
+			// deconstruct redirecting
+			
+			// ungregister text controls
+			psbufCout->ungregisterTextControl();
+			psbufClog->ungregisterTextControl();
+			psbufCerr->ungregisterTextControl();
+			psbufCex1->ungregisterTextControl();
+			psbufCtrc->ungregisterTextControl();
+			psbufCmsg->ungregisterTextControl();
+			psbufCspy->ungregisterTextControl();
+			
+			// redirect to old buf
+			std::cout.rdbuf(sbOldCout);
+			std::cerr.rdbuf(sbOldClog);
+			std::cerr.rdbuf(sbOldCerr);
+			((std::iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
+			((std::iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
+			((std::iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
+			((std::iostream*)&cnc::spy)->rdbuf(sbOldCspy);
+			
+			// delete stream buffers
+			delete psbufCout;
+			delete psbufClog;
+			delete psbufCerr;
+			delete psbufCex1;
+			delete psbufCtrc;
+			delete psbufCmsg;
+			delete psbufCspy;
+		}
+};
+void GlobalStreamRedirectionReset() { GlobalStreamRedirection::reset(); }
 	
-	//redirect std::cerr
-	psbufCerr = new CncCerrBuf(NULL);
-	sbOldCerr = std::cerr.rdbuf();
-	std::cerr.rdbuf(psbufCerr);
-	
-	// redirect ext1 buffer
-	psbufCex1 = new CncCex1Buf(NULL);
-	sbOldCex1 = cnc::cex1.rdbuf();
-	((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
-	cnc::cex1.setLogStreamBuffer(psbufCex1);
-}
-///////////////////////////////////////////////////////////////////
-void installStreamRedirection(MainFrame* mainFrame) {
-///////////////////////////////////////////////////////////////////
-	// perform startup trace
-	wxTextCtrl* st = mainFrame->GetStartupTrace();
-	st->Clear();
-	
-	wxTextAttr ta(wxColour(192, 192, 192));
-	wxFont oldFont(st->GetFont());
-	wxFont newFont(oldFont);
-	newFont.SetWeight(wxFONTWEIGHT_BOLD);
- 
-	ta.SetFont(newFont);
-	st->SetDefaultStyle(ta);
-	
-	st->AppendText("-------------------------------------------------------------------\n"
-	               " Startup stream trace . . .\n"
-	               "-------------------------------------------------------------------\n");
-	
-	ta.SetFont(oldFont);
-	st->SetDefaultStyle(ta);
-	bool hasLogOrErr = StartupBuffer::trace(st);
-	mainFrame->GetLoggerNotebook()->SetPageText(LoggerSelection::VAL::STARTUP, (hasLogOrErr == true ? ")-:" : "(-;"));
-	
-	st->SetInsertionPoint(st->XYToPosition(0, 0));
-	st->ShowPosition(st->XYToPosition(0, 0));
-	
-	// set the logger control
-	psbufCout->setTextControl(mainFrame->getLogger());
-	psbufClog->setTextControl(mainFrame->getLogger());
-	psbufCerr->setTextControl(mainFrame->getLogger());
-	psbufCex1->setTextControl(mainFrame->getLogger());
-	
-	// redirect trace buffer
-	psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
-	sbOldCtrc = cnc::trc.rdbuf();
-	((std::iostream*)&cnc::trc)->rdbuf(psbufCtrc);
-	cnc::trc.setLogStreamBuffer(psbufCtrc);
-	
-	// redirect controller message buffer
-	psbufCmsg = new CncCmsgBuf(mainFrame->getCtrlMessageHistory());
-	sbOldCmsg = cnc::msg.rdbuf();
-	((std::iostream*)&cnc::msg)->rdbuf(psbufCmsg);
-	cnc::msg.setLogStreamBuffer(psbufCmsg);
-	
-	// redirect serial spy buffer
-	psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
-	sbOldCspy = cnc::spy.rdbuf();
-	((std::iostream*)&cnc::spy)->rdbuf(psbufCspy);
-	cnc::spy.setLogStreamBuffer(psbufCspy);
-}
-
-///////////////////////////////////////////////////////////////////
-void resetStreamRedirection() {
-///////////////////////////////////////////////////////////////////
-	// deconstruct redirecting
-	
-	// ungregister text controls
-	psbufCout->ungregisterTextControl();
-	psbufClog->ungregisterTextControl();
-	psbufCerr->ungregisterTextControl();
-	psbufCex1->ungregisterTextControl();
-	psbufCtrc->ungregisterTextControl();
-	psbufCmsg->ungregisterTextControl();
-	psbufCspy->ungregisterTextControl();
-	
-	// redirect to old buf
-	std::cout.rdbuf(sbOldCout);
-	std::cerr.rdbuf(sbOldClog);
-	std::cerr.rdbuf(sbOldCerr);
-	((std::iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
-	((std::iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
-	((std::iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
-	((std::iostream*)&cnc::spy)->rdbuf(sbOldCspy);
-	
-	// delete stream buffers
-	delete psbufCout;
-	delete psbufClog;
-	delete psbufCerr;
-	delete psbufCex1;
-	delete psbufCtrc;
-	delete psbufCmsg;
-	delete psbufCspy;
-}
-
 ///////////////////////////////////////////////////////////////////
 class MainLogger : public wxLog {
 ///////////////////////////////////////////////////////////////////
@@ -231,9 +237,9 @@ class MainApp : public wxApp {
 		MainApp() 
 		//: locale(wxLANGUAGE_DEFAULT)
 		: globalFileConfig(NULL)
-		{
 		///////////////////////////////////////////////////////////
-			preInstallStreamRedirection();
+		{
+			GlobalStreamRedirection::preInstall();
 			
 			// init file and dir names
 			CncFileNameService::init();
@@ -390,7 +396,7 @@ class MainApp : public wxApp {
 				
 			// redirect std streams
 			wxLog::SetActiveTarget(new MainLogger());
-			installStreamRedirection(mainFrame);
+			GlobalStreamRedirection::install(mainFrame);
 			
 			// last but not least call initialize
 			mainFrame->initialize();
@@ -420,8 +426,6 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual int OnExit() {
 		///////////////////////////////////////////////////////////
-			
-			resetStreamRedirection();
 			return wxApp::OnExit();
 		}
 };

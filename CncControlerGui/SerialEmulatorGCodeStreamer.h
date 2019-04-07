@@ -20,6 +20,12 @@ class SerialEmulatorGCodeStreamer : public SerialEmulatorTextStreamer
 		explicit SerialEmulatorGCodeStreamer(const char *fileName);
 		virtual ~SerialEmulatorGCodeStreamer();
 		
+		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
+		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence);
+
 		virtual bool isOutputAsTemplateAvailable();
 		
 		// returns the class name

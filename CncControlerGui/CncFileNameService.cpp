@@ -101,20 +101,22 @@ void CncFileNameService::init() {
 ///////////////////////////////////////////////////////////////////
 void CncFileNameService::trace(std::ostream& os) {
 ///////////////////////////////////////////////////////////////////
-	os << "Executable Dir                   : " << CncFileNameService::getExecutableDir() 							<< std::endl;
-	os << "Base Dir                         : " << CncFileNameService::getBaseDir()									<< std::endl;
-	os << "Databse Dir                      : " << CncFileNameService::getDatabaseDir()								<< std::endl;
-	os << "Config Dir                       : " << CncFileNameService::getConfigDir() 								<< std::endl;
-	os << "Users Home Dir                   : " << CncFileNameService::getHomeDir() 								<< std::endl;
-	os << "Useres Temp Dir                  : " << CncFileNameService::getTempDir() 								<< std::endl;
-	os << "Outbound Binary Filename         : " << CncFileNameService::getCncOutboundBinFileName() 					<< std::endl;
-	os << "Outbound SVG Filename            : " << CncFileNameService::getCncOutboundSvgFileName() 					<< std::endl;
-	os << "Outbound Temp Filename           : " << CncFileNameService::getCncOutboundTempFileName() 				<< std::endl;
-	os << "Template SVG Preview Filename    : " << CncFileNameService::getCncTemplatePreviewFileName(TplSvg) 		<< std::endl;
-	os << "Template Defaut Preview Filename : " << CncFileNameService::getCncTemplatePreviewFileName(TplUnknown) 	<< std::endl;
-	os << "Draw Pane Trace Filename         : " << CncFileNameService::getCncDrawPaneTraceFileName() 				<< std::endl;
-	os << "LRU Filename                     : " << CncFileNameService::getLruFileName() 							<< std::endl;
-	os << "Speed Connfig Filename           : " << CncFileNameService::getSpeedConfigFileName() 					<< std::endl;
+	os << "Executable Dir                    : " << CncFileNameService::getExecutableDir() 							<< std::endl;
+	os << "Base Dir                          : " << CncFileNameService::getBaseDir()								<< std::endl;
+	os << "Databse Dir                       : " << CncFileNameService::getDatabaseDir()							<< std::endl;
+	os << "Config Dir                        : " << CncFileNameService::getConfigDir() 								<< std::endl;
+	os << "Users Home Dir                    : " << CncFileNameService::getHomeDir() 								<< std::endl;
+	os << "Useres Temp Dir                   : " << CncFileNameService::getTempDir() 								<< std::endl;
+	os << "Outbound Binary Filename          : " << CncFileNameService::getCncOutboundBinFileName() 				<< std::endl;
+	os << "Outbound TXT Filename             : " << CncFileNameService::getCncOutboundTxtFileName() 				<< std::endl;
+	os << "Outbound SVG Filename             : " << CncFileNameService::getCncOutboundSvgFileName() 				<< std::endl;
+	os << "Outbound GCODE Filename           : " << CncFileNameService::getCncOutboundGCodeFileName() 				<< std::endl;
+	os << "Outbound Temp Filename            : " << CncFileNameService::getCncOutboundTempFileName() 				<< std::endl;
+	os << "Template SVG Preview Filename     : " << CncFileNameService::getCncTemplatePreviewFileName(TplSvg) 		<< std::endl;
+	os << "Template Default Preview Filename : " << CncFileNameService::getCncTemplatePreviewFileName(TplUnknown) 	<< std::endl;
+	os << "Draw Pane Trace Filename          : " << CncFileNameService::getCncDrawPaneTraceFileName() 				<< std::endl;
+	os << "LRU Filename                      : " << CncFileNameService::getLruFileName() 							<< std::endl;
+	os << "Speed Config Filename             : " << CncFileNameService::getSpeedConfigFileName() 					<< std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void CncFileNameService::deleteFile(wxString fn) {

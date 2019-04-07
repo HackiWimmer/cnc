@@ -8,6 +8,8 @@
 #include "OSD/SerialOSD.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
+#include "CncMoveSequence.h"
+#include "CncCommandDecoder.h"
 #include "CncBinaryTemplateStreamer.h"
 #include "SvgUnitCalculator.h"
 #include "CncPosition.h"
@@ -99,6 +101,17 @@ struct SerialFetchInfo {
 		int32_t value3					= 0;
 	} Mc;
 	
+	struct MS {
+		unsigned char result[sizeof(int32_t) * 4];
+		unsigned char* p 				= NULL;
+		int32_t value 					= 0;
+		int bytes 						= -1;
+		unsigned int size				= -1;
+		int32_t value1					= 0;
+		int32_t value2					= 0;
+		int32_t value3					= 0;
+	} Msc;
+
 	struct L {
 		unsigned char result[sizeof(int32_t) * 3];
 		unsigned char* p 				= NULL;
@@ -206,12 +219,14 @@ class Serial : public SerialOSD {
 		// total distance
 		double totalDistance[4];
 		double totalDistanceRef;
-		double currentFeedSpeed;
+		double accumulatedDistance;
+		double currentFeedSpeed_MM_MIN;
 		
 		CncLongPosition measurementRefPos;
 		CncNanoTimestamp tsMeasurementStart;
 		CncNanoTimestamp tsMeasurementRef;
 		CncNanoTimestamp tsMeasurementLast;
+		CncNanoTimespan accumulatedTimespan;
 		
 	protected:
 		
@@ -280,6 +295,7 @@ class Serial : public SerialOSD {
 		inline bool evaluateResultWrapper(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		inline bool evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		// handle receiving data from controller
+		inline bool RET_MORE_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		inline bool RET_OK_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		inline bool RET_ERROR_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
 		inline bool RET_INTERRUPT_Handler(SerialFetchInfo& sfi, std::ostream& mutliByteStream);
@@ -311,7 +327,6 @@ class Serial : public SerialOSD {
 		bool sendSerialControllerCallback(ContollerExecuteInfo& cei);
 		
 		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command);
-		inline bool convertToMoveCommandAndProcess(unsigned char cmd, std::ostream& mutliByteStream);
 		
 		friend class SerialCommandLocker;
 	public:
@@ -371,9 +386,10 @@ class Serial : public SerialOSD {
 		
 		bool processCommand(const unsigned char cmd, std::ostream& mutliByteStream);
 		
-		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered);
 		bool processMoveUntilSignal(unsigned int size, const int32_t (&values)[3]);
+		bool processMoveSequence(CncMoveSequence& moveSequence);
 		
+		bool processMove(unsigned int size, const int32_t (&values)[3], bool alreadyRendered);
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
 		bool processMoveXY(int32_t x1, int32_t y1, bool alreadyRendered);
 		bool processMoveZ(int32_t z1, bool alreadyRendered);
@@ -417,7 +433,14 @@ class Serial : public SerialOSD {
 		CncNanoTimespan getMeasurementNanoTimeSpanTotal() const;
 		CncNanoTimespan getMeasurementNanoTimeSpanLastRef() const;
 		
+		double getAccumulatedDistance()				{ return accumulatedDistance; }
+		CncNanoTimespan getAccumulatedTimespan() 	{ return accumulatedTimespan; }
+		
+		double getMeasuredFeedSpeed_MM_MIN() { return currentFeedSpeed_MM_MIN; }
+		
 		virtual void traceSpeedInformation() {}
+		
+		virtual bool test();
 };
 
 #endif // SERIALCLASS_H_INCLUDED
