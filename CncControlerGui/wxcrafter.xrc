@@ -8530,11 +8530,11 @@ State</label>
               <flag>wxALL|wxEXPAND</flag>
               <option>1</option>
               <object class="wxFlexGridSizer">
-                <cols>4</cols>
+                <cols>5</cols>
                 <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
-                <growablecols/>
+                <growablecols>4</growablecols>
                 <growablerows>0</growablerows>
                 <object class="sizeritem">
                   <flag>wxALL</flag>
@@ -8608,13 +8608,52 @@ State</label>
                     </content>
                   </object>
                 </object>
+                <object class="sizeritem" name="flexGridSizer4706">
+                  <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                  <border>1</border>
+                  <option>1</option>
+                  <object class="wxFlexGridSizer">
+                    <cols>2</cols>
+                    <rows>1</rows>
+                    <vgap>0</vgap>
+                    <hgap>0</hgap>
+                    <growablecols/>
+                    <growablerows/>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <minsize>26,26</minsize>
+                      <object class="wxBitmapToggleButton" name="m_clearSerialSpyOnConnect">
+                        <style/>
+                        <size>26,26</size>
+                        <bitmap>bitmaps/brick-delete.png</bitmap>
+                        <tooltip>
+                          <![CDATA[Clear on Connect]]>
+                        </tooltip>
+                        <checked>1</checked>
+                      </object>
+                    </object>
+                    <object class="sizeritem">
+                      <flag>wxALL</flag>
+                      <minsize>26,26</minsize>
+                      <object class="wxBitmapToggleButton" name="m_clearSerialSpyBeforNextRun">
+                        <style/>
+                        <size>26,26</size>
+                        <bitmap>bitmaps/script-delete.png</bitmap>
+                        <tooltip>
+                          <![CDATA[Clear before next Run]]>
+                        </tooltip>
+                        <checked>0</checked>
+                      </object>
+                    </object>
+                  </object>
+                </object>
               </object>
             </object>
             <object class="sizeritem" name="flexGridSizer4704">
               <flag>wxALL|wxEXPAND</flag>
               <option>1</option>
               <object class="wxFlexGridSizer">
-                <cols>2</cols>
+                <cols>1</cols>
                 <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
@@ -8660,7 +8699,7 @@ State</label>
                                 <border>2</border>
                                 <object class="wxFlexGridSizer">
                                   <cols>1</cols>
-                                  <rows>2</rows>
+                                  <rows>3</rows>
                                   <vgap>0</vgap>
                                   <hgap>0</hgap>
                                   <growablecols/>
@@ -8679,6 +8718,23 @@ State</label>
                                         <underlined>0</underlined>
                                         <face>Segoe UI</face>
                                       </font>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <minsize>45,-1</minsize>
+                                    <object class="wxTextCtrl" name="m_lnUnkonwnDetails">
+                                      <style>wxTE_READONLY|wxBORDER_NONE</style>
+                                      <size>45,-1</size>
+                                      <font>
+                                        <size>7</size>
+                                        <style>normal</style>
+                                        <weight>normal</weight>
+                                        <family>swiss</family>
+                                        <underlined>0</underlined>
+                                        <face>Segoe UI</face>
+                                      </font>
+                                      <value>3333338</value>
                                     </object>
                                   </object>
                                   <object class="sizeritem">
@@ -8709,12 +8765,12 @@ State</label>
                                       <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                       <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                       <font>
-                                        <size>8</size>
+                                        <size>7</size>
                                         <style>normal</style>
-                                        <weight>normal</weight>
-                                        <family>modern</family>
+                                        <weight>bold</weight>
+                                        <family>swiss</family>
                                         <underlined>0</underlined>
-                                        <face>Consolas</face>
+                                        <face>Segoe UI</face>
                                       </font>
                                     </object>
                                   </object>
@@ -8755,7 +8811,7 @@ State</label>
                                 <border>2</border>
                                 <object class="wxFlexGridSizer">
                                   <cols>1</cols>
-                                  <rows>2</rows>
+                                  <rows>3</rows>
                                   <vgap>0</vgap>
                                   <hgap>0</hgap>
                                   <growablecols/>
@@ -8774,6 +8830,23 @@ State</label>
                                         <underlined>0</underlined>
                                         <face>Segoe UI</face>
                                       </font>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <minsize>45,-1</minsize>
+                                    <object class="wxTextCtrl" name="m_lnInboundDetails">
+                                      <style>wxTE_READONLY|wxBORDER_NONE</style>
+                                      <size>45,-1</size>
+                                      <font>
+                                        <size>7</size>
+                                        <style>normal</style>
+                                        <weight>normal</weight>
+                                        <family>swiss</family>
+                                        <underlined>0</underlined>
+                                        <face>Segoe UI</face>
+                                      </font>
+                                      <value>3333338</value>
                                     </object>
                                   </object>
                                   <object class="sizeritem">
@@ -8804,12 +8877,12 @@ State</label>
                                       <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                       <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                       <font>
-                                        <size>8</size>
+                                        <size>7</size>
                                         <style>normal</style>
-                                        <weight>normal</weight>
-                                        <family>modern</family>
+                                        <weight>bold</weight>
+                                        <family>swiss</family>
                                         <underlined>0</underlined>
-                                        <face>Consolas</face>
+                                        <face>Segoe UI</face>
                                       </font>
                                     </object>
                                   </object>
@@ -8850,7 +8923,7 @@ State</label>
                                 <border>2</border>
                                 <object class="wxFlexGridSizer">
                                   <cols>1</cols>
-                                  <rows>2</rows>
+                                  <rows>3</rows>
                                   <vgap>0</vgap>
                                   <hgap>0</hgap>
                                   <growablecols/>
@@ -8869,6 +8942,23 @@ State</label>
                                         <underlined>0</underlined>
                                         <face>Segoe UI</face>
                                       </font>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
+                                    <flag>wxALL</flag>
+                                    <minsize>45,-1</minsize>
+                                    <object class="wxTextCtrl" name="m_lnOutboundDetails">
+                                      <style>wxTE_READONLY|wxBORDER_NONE</style>
+                                      <size>45,-1</size>
+                                      <font>
+                                        <size>7</size>
+                                        <style>normal</style>
+                                        <weight>normal</weight>
+                                        <family>swiss</family>
+                                        <underlined>0</underlined>
+                                        <face>Segoe UI</face>
+                                      </font>
+                                      <value>3333338</value>
                                     </object>
                                   </object>
                                   <object class="sizeritem">
@@ -8899,12 +8989,12 @@ State</label>
                                       <bg>wxSYS_COLOUR_BTNTEXT</bg>
                                       <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                                       <font>
-                                        <size>8</size>
+                                        <size>7</size>
                                         <style>normal</style>
-                                        <weight>normal</weight>
-                                        <family>modern</family>
+                                        <weight>bold</weight>
+                                        <family>swiss</family>
                                         <underlined>0</underlined>
-                                        <face>Consolas</face>
+                                        <face>Segoe UI</face>
                                       </font>
                                     </object>
                                   </object>
@@ -8928,41 +9018,6 @@ State</label>
                             </object>
                           </object>
                         </object>
-                      </object>
-                    </object>
-                  </object>
-                </object>
-                <object class="sizeritem" name="flexGridSizer4706">
-                  <flag>wxALL|wxEXPAND</flag>
-                  <border>1</border>
-                  <option>1</option>
-                  <object class="wxFlexGridSizer">
-                    <cols>1</cols>
-                    <rows>0</rows>
-                    <vgap>0</vgap>
-                    <hgap>0</hgap>
-                    <growablecols/>
-                    <growablerows/>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <object class="wxCheckBox" name="m_clearSerialSpyOnConnect">
-                        <tooltip>
-                          <![CDATA[Clear on Connect]]>
-                        </tooltip>
-                        <style/>
-                        <label/>
-                        <checked>1</checked>
-                      </object>
-                    </object>
-                    <object class="sizeritem">
-                      <flag>wxALL</flag>
-                      <object class="wxCheckBox" name="m_clearSerialSpyBeforNextRun">
-                        <tooltip>
-                          <![CDATA[Clear before next Run]]>
-                        </tooltip>
-                        <style/>
-                        <label/>
-                        <checked>1</checked>
                       </object>
                     </object>
                   </object>
@@ -13440,11 +13495,13 @@ Interval:</label>
               <object class="sizeritem">
                 <flag>wxALL</flag>
                 <border>1</border>
+                <minsize>90,-1</minsize>
                 <object class="wxSlider" name="m_intervalSlider">
                   <style>wxSL_SELRANGE|wxSL_HORIZONTAL</style>
                   <min>5</min>
                   <max>250</max>
                   <value>50</value>
+                  <size>90,-1</size>
                 </object>
               </object>
             </object>
@@ -13488,7 +13545,7 @@ Interval:</label>
           <object class="sizeritem">
             <flag>wxALL|wxEXPAND</flag>
             <object class="wxScrolledWindow" name="m_scrollWindow">
-              <bg>wxSYS_COLOUR_3DDKSHADOW</bg>
+              <bg>wxSYS_COLOUR_BTNTEXT</bg>
               <style>wxALWAYS_SHOW_SB|wxHSCROLL</style>
               <scrollrate>5,5</scrollrate>
               <object class="wxFlexGridSizer">
@@ -15272,35 +15329,14 @@ Thickness</label>
     <size>500,300</size>
     <object class="wxFlexGridSizer">
       <minsize>500,300</minsize>
-      <cols>2</cols>
+      <cols>1</cols>
       <rows>1</rows>
       <vgap>0</vgap>
       <hgap>0</hgap>
-      <growablecols>1</growablecols>
+      <growablecols>0</growablecols>
       <growablerows>0</growablerows>
-      <object class="sizeritem" name="flexGridSizer7186">
-        <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
-        <option>1</option>
-        <object class="wxFlexGridSizer">
-          <cols>2</cols>
-          <rows>0</rows>
-          <vgap>0</vgap>
-          <hgap>0</hgap>
-          <growablecols/>
-          <growablerows/>
-          <object class="sizeritem">
-            <flag>wxALL</flag>
-            <border>5</border>
-            <object class="wxStaticBitmap" name="m_staticBitmap7188">
-              <bitmap>bitmaps/24-project@2x.png</bitmap>
-            </object>
-          </object>
-        </object>
-      </object>
       <object class="sizeritem" name="flexGridSizer7184">
         <flag>wxALL|wxEXPAND</flag>
-        <border>5</border>
         <option>1</option>
         <object class="wxFlexGridSizer">
           <cols>1</cols>
@@ -15311,15 +15347,37 @@ Thickness</label>
           <growablerows>1</growablerows>
           <object class="sizeritem" name="flexGridSizer7190">
             <flag>wxALL|wxEXPAND</flag>
-            <border>5</border>
+            <border>2</border>
             <option>1</option>
             <object class="wxFlexGridSizer">
-              <cols>2</cols>
+              <cols>3</cols>
               <rows>1</rows>
               <vgap>0</vgap>
               <hgap>0</hgap>
-              <growablecols>0</growablecols>
+              <growablecols>1</growablecols>
               <growablerows>0</growablerows>
+              <object class="sizeritem" name="flexGridSizer7591">
+                <flag>wxALL</flag>
+                <object class="wxFlexGridSizer">
+                  <cols>2</cols>
+                  <rows>0</rows>
+                  <vgap>0</vgap>
+                  <hgap>0</hgap>
+                  <growablecols/>
+                  <growablerows/>
+                  <object class="sizeritem">
+                    <flag>wxALL</flag>
+                    <object class="wxStaticBitmap" name="m_staticBitmap7188">
+                      <bitmap>bitmaps/16-gtk@2x.png</bitmap>
+                    </object>
+                  </object>
+                  <object class="spacer" name="Spacer7593">
+                    <size>5,0</size>
+                    <flag>wxALL</flag>
+                    <option>1</option>
+                  </object>
+                </object>
+              </object>
               <object class="sizeritem">
                 <flag>wxALL</flag>
                 <border>2</border>
@@ -15343,6 +15401,9 @@ Thickness</label>
                   <style/>
                   <size>26,26</size>
                   <bitmap>bitmaps/16-word_wrap.png</bitmap>
+                  <tooltip>
+                    <![CDATA[Toggle Word Wrap]]>
+                  </tooltip>
                   <checked>1</checked>
                 </object>
               </object>
@@ -15360,7 +15421,7 @@ Thickness</label>
               <growablerows>0</growablerows>
               <object class="sizeritem" name="flexGridSizer7576">
                 <flag>wxALL|wxEXPAND</flag>
-                <border>5</border>
+                <border>1</border>
                 <option>1</option>
                 <object class="wxFlexGridSizer">
                   <cols>1</cols>
@@ -15382,7 +15443,7 @@ Thickness</label>
           </object>
           <object class="sizeritem" name="flexGridSizer7192">
             <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
-            <border>5</border>
+            <border>1</border>
             <option>1</option>
             <object class="wxFlexGridSizer">
               <cols>2</cols>

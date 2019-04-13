@@ -608,25 +608,28 @@ protected:
     wxButton* m_MarkSerialSpy;
     wxButton* m_clearSerialSpy;
     wxComboBox* m_cbSerialSpyMode;
+    wxBitmapToggleButton* m_clearSerialSpyOnConnect;
+    wxBitmapToggleButton* m_clearSerialSpyBeforNextRun;
     wxPanel* m_serialSpyPlaceholder;
     wxSimplebook* m_sypDetailsBook;
     wxPanel* m_unknownPanel;
     wxStaticText* m_staticText72374;
+    wxTextCtrl* m_lnUnkonwnDetails;
     wxStaticBitmap* m_staticBitmap7230;
     wxDataViewListCtrl* m_spyUnknownDetails;
     wxButton* m_button7561;
     wxPanel* m_inboundPanel;
     wxStaticText* m_staticText72373;
+    wxTextCtrl* m_lnInboundDetails;
     wxStaticBitmap* m_staticBitmap7232;
     wxDataViewListCtrl* m_spyInboundDetails;
     wxButton* m_button75612;
     wxPanel* m_outbundPanel;
     wxStaticText* m_staticText7237;
+    wxTextCtrl* m_lnOutboundDetails;
     wxStaticBitmap* m_staticBitmap7234;
     wxDataViewListCtrl* m_spyOutboundDetails;
     wxButton* m_button75611;
-    wxCheckBox* m_clearSerialSpyOnConnect;
-    wxCheckBox* m_clearSerialSpyBeforNextRun;
     wxPanel* m_debuggerView;
     wxPropertyGridManager* m_debuggerPropertyManagerGrid;
     wxPanel* m_positionMonitorView;
@@ -928,7 +931,10 @@ protected:
     virtual void markSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void clearSerialSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void selectSerialSpyMode(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectSpyUnknownDetails(wxDataViewEvent& event) { event.Skip(); }
     virtual void openSpyDetailWindow(wxCommandEvent& event) { event.Skip(); }
+    virtual void onSelectSpyInboundDetails(wxDataViewEvent& event) { event.Skip(); }
+    virtual void onSelectSpyOutboundDetails(wxDataViewEvent& event) { event.Skip(); }
     virtual void togglePositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void copyPositionSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void searchPosSpy(wxCommandEvent& event) { event.Skip(); }
@@ -1530,25 +1536,28 @@ public:
     wxButton* GetMarkSerialSpy() { return m_MarkSerialSpy; }
     wxButton* GetClearSerialSpy() { return m_clearSerialSpy; }
     wxComboBox* GetCbSerialSpyMode() { return m_cbSerialSpyMode; }
+    wxBitmapToggleButton* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
+    wxBitmapToggleButton* GetClearSerialSpyBeforNextRun() { return m_clearSerialSpyBeforNextRun; }
     wxPanel* GetSerialSpyPlaceholder() { return m_serialSpyPlaceholder; }
     wxStaticText* GetStaticText72374() { return m_staticText72374; }
+    wxTextCtrl* GetLnUnkonwnDetails() { return m_lnUnkonwnDetails; }
     wxStaticBitmap* GetStaticBitmap7230() { return m_staticBitmap7230; }
     wxDataViewListCtrl* GetSpyUnknownDetails() { return m_spyUnknownDetails; }
     wxButton* GetButton7561() { return m_button7561; }
     wxPanel* GetUnknownPanel() { return m_unknownPanel; }
     wxStaticText* GetStaticText72373() { return m_staticText72373; }
+    wxTextCtrl* GetLnInboundDetails() { return m_lnInboundDetails; }
     wxStaticBitmap* GetStaticBitmap7232() { return m_staticBitmap7232; }
     wxDataViewListCtrl* GetSpyInboundDetails() { return m_spyInboundDetails; }
     wxButton* GetButton75612() { return m_button75612; }
     wxPanel* GetInboundPanel() { return m_inboundPanel; }
     wxStaticText* GetStaticText7237() { return m_staticText7237; }
+    wxTextCtrl* GetLnOutboundDetails() { return m_lnOutboundDetails; }
     wxStaticBitmap* GetStaticBitmap7234() { return m_staticBitmap7234; }
     wxDataViewListCtrl* GetSpyOutboundDetails() { return m_spyOutboundDetails; }
     wxButton* GetButton75611() { return m_button75611; }
     wxPanel* GetOutbundPanel() { return m_outbundPanel; }
     wxSimplebook* GetSypDetailsBook() { return m_sypDetailsBook; }
-    wxCheckBox* GetClearSerialSpyOnConnect() { return m_clearSerialSpyOnConnect; }
-    wxCheckBox* GetClearSerialSpyBeforNextRun() { return m_clearSerialSpyBeforNextRun; }
     wxPanel* GetSerialSpyView() { return m_serialSpyView; }
     wxPropertyGridManager* GetDebuggerPropertyManagerGrid() { return m_debuggerPropertyManagerGrid; }
     wxPanel* GetDebuggerView() { return m_debuggerView; }
@@ -2630,6 +2639,7 @@ protected:
     wxButton* m_btClose;
 
 protected:
+    virtual void onInitDialog(wxInitDialogEvent& event) { event.Skip(); }
     virtual void onWordWrap(wxCommandEvent& event) { event.Skip(); }
     virtual void close(wxCommandEvent& event) { event.Skip(); }
 

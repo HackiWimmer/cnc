@@ -1,116 +1,6 @@
 #include "CncSpeedSimulator.h"
 
 //////////////////////////////////////////////////////////////////////////
-CncSpeedSimulator::TimeStampInfo::TimeStampInfo() {
-//////////////////////////////////////////////////////////////////////////
-	reset();
-}
-//////////////////////////////////////////////////////////////////////////
-CncSpeedSimulator::TimeStampInfo::~TimeStampInfo() {
-//////////////////////////////////////////////////////////////////////////
-}
-//////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::TimeStampInfo::reset() {
-//////////////////////////////////////////////////////////////////////////
-	force                    = false;
-	waitPeriod               = 0LL;
-	beforeWait               = 0LL;
-	afterWait                = 0LL;
-
-	totalAccumulatedOffset   = 0LL;
-	totalAccumulatedOffsetX  = 0LL;
-	totalAccumulatedOffsetY  = 0LL;
-	totalAccumulatedOffsetZ  = 0LL;
-	currentAccumulatedOffset = 0LL;
-	stepCounterX             = 0L;
-	stepCounterY             = 0L;
-	stepCounterZ             = 0L;
-}
-//////////////////////////////////////////////////////////////////////////
-unsigned int CncSpeedSimulator::TimeStampInfo::getColumnCount() {
-//////////////////////////////////////////////////////////////////////////
-	std::stringstream ss;
-	headline(ss);
-	wxString s(ss.str().c_str());
-	
-	if ( s.length() == 0 )
-		return 0;
-	
-	unsigned int ret = 1;
-	for (unsigned int i=0; i<s.length(); i++ ) {
-		if ( (const char)s[i] == delim )
-			ret++;
-	}
-	
-	return ret;
-}
-//////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::TimeStampInfo::headline(std::ostream& out) {
-//////////////////////////////////////////////////////////////////////////
-	out 
-	<< "force"
-	<< delim
-	<< "waitPeriod"
-	<< delim
-	<< "beforeWait"
-	<< delim
-	<< "afterWait"
-	<< delim
-	<< "diff"
-	<< delim
-	<< "diff-period"
-	<< delim
-	<< "totalAccumulatedOffset"
-	<< delim
-	<< "currentAccumulatedOffset"
-	<< delim
-	<< "totalAccumulatedOffsetX" 
-	<< delim
-	<< "totalAccumulatedOffsetY" 
-	<< delim
-	<< "totalAccumulatedOffsetZ"
-	<< delim
-	<< "stepCounterX" 
-	<< delim
-	<< "stepCounterY" 
-	<< delim
-	<< "stepCounterZ"
-	<< std::endl;
-}
-//////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::TimeStampInfo::trace(std::ostream& out) {
-//////////////////////////////////////////////////////////////////////////
-	out
-	<< force
-	<< delim
-	<< waitPeriod
-	<< delim
-	<< beforeWait
-	<< delim
-	<< afterWait
-	<< delim
-	<< (afterWait - beforeWait) / 1000
-	<< delim
-	<< ((afterWait - beforeWait) / 1000) - waitPeriod
-	<< delim
-	<< totalAccumulatedOffset 
-	<< delim
-	<< currentAccumulatedOffset 
-	<< delim
-	<< totalAccumulatedOffsetX 
-	<< delim 
-	<< totalAccumulatedOffsetY 
-	<< delim 
-	<< totalAccumulatedOffsetZ
-	<< delim
-	<< stepCounterX
-	<< delim
-	<< stepCounterY 
-	<< delim
-	<< stepCounterZ
-	<< std::endl;
-}
-//////////////////////////////////////////////////////////////////////////
 CncSpeedSimulator::CncSpeedSimulator(
  unsigned int cStepStaticOffset, unsigned int cStepLoopOffset,
  double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
@@ -118,9 +8,6 @@ CncSpeedSimulator::CncSpeedSimulator(
  double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ)
 : CncSpeedController() 
 , traceFlag(false)
-, traceInfo()
-, curTsInfo()
-, totalAccumulatedOffset(0LL)
 , totalAccumulatedOffsetX(0LL)
 , totalAccumulatedOffsetY(0LL)
 , totalAccumulatedOffsetZ(0LL)
@@ -128,132 +15,122 @@ CncSpeedSimulator::CncSpeedSimulator(
 , stepCounterX(0L)
 , stepCounterY(0L)
 , stepCounterZ(0L)
-, tsAfterLastWait(0LL)
+, tsLastPerform(0LL)
 //////////////////////////////////////////////////////////////////////////
 {
-	traceInfo.reserve(1024 * 1024);
 }
 //////////////////////////////////////////////////////////////////////////
 CncSpeedSimulator::~CncSpeedSimulator()  {
 //////////////////////////////////////////////////////////////////////////
-	traceInfo.clear();
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::reset() {
 //////////////////////////////////////////////////////////////////////////
-	// totalAccumulatedOffsetstay still grows over 
-	// the whole life time of this object
-	
 	totalAccumulatedOffsetX  = 0LL;
 	totalAccumulatedOffsetY  = 0LL;
 	totalAccumulatedOffsetZ  = 0LL;
 	currentAccumulatedOffset = 0LL;
+	
+	tsLastPerform            = CncTimeFunctions::getNanoTimestamp();
 	
 	stepCounterX             = 0L;
 	stepCounterY             = 0L;
 	stepCounterZ             = 0L;
 }
 //////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::simulateSteppingX(unsigned int dx)  { 
+void CncSpeedSimulator::simulateOneStepX()  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterX += dx;
-	uint64_t v = dx * (X.synthSpeedDelay + X.totalOffset + getNextAccelDelayX()); 
+	// .totalOffset              [usec] :
+	// .synthSpeedDelay     [usec/step] :
+	// getNextAccelDelayX() :
+	
+	const unsigned int accelDelay = getNextAccelDelayX();
+	
+	stepCounterX++;
+	const uint64_t v = X.totalOffset + X.synthSpeedDelay + accelDelay; 
 	totalAccumulatedOffsetX  += v;
 	currentAccumulatedOffset += v; 
+	
+	#warning accel
+	if ( accelDelay )
+		;;//std::cout << accelDelay << std::endl;
+		
+		
+		
+
 }
 //////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::simulateSteppingY(unsigned int dy)  { 
+void CncSpeedSimulator::simulateOneStepY()  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterY += dy;
-	uint64_t v = dy * (Y.synthSpeedDelay + Y.totalOffset + getNextAccelDelayY()); 
+	stepCounterY++;
+	const uint64_t v = Y.totalOffset + Y.synthSpeedDelay + getNextAccelDelayY(); 
 	totalAccumulatedOffsetY  += v; 
 	currentAccumulatedOffset += v; 
 }
 //////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::simulateSteppingZ(unsigned int dz)  { 
+void CncSpeedSimulator::simulateOneStepZ()  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterZ += dz;
-	uint64_t v = dz * (Z.synthSpeedDelay + Z.totalOffset + getNextAccelDelayZ()); 
+	stepCounterZ++;
+	const uint64_t v = Z.totalOffset + Z.synthSpeedDelay + getNextAccelDelayZ(); 
 	totalAccumulatedOffsetZ  += v; 
 	currentAccumulatedOffset += v; 
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::performCurrentOffset(bool force) {
 //////////////////////////////////////////////////////////////////////////
-	long threshold = 20000L;
-	if ( force == true )
-		threshold = 0L;
+	const CncNanoTimespan threshold = force == false ? CncTimeFunctions::minWaitPeriod / 1000 : 0LL;
 	
 	// check if further accumulation is necessary
-	if ( currentAccumulatedOffset < threshold ) 
+	if ( currentAccumulatedOffset < threshold )
 		return;
 
 	// calc time elapsed since the last wait
-	CncNanoTimespan elapsedTime = 0LL;
-	if ( tsAfterLastWait > 0LL )
-		elapsedTime = (CncTimeFunctions::getNanoTimestamp() - tsAfterLastWait) / 1000;
+	const CncNanoTimestamp now        = CncTimeFunctions::getNanoTimestamp();
+	const CncNanoTimespan elapsedTime = tsLastPerform > 0LL ? now - tsLastPerform : 0LL;
 	
 	// reduce the accumulated offset by the time which is already gone
-	currentAccumulatedOffset -= elapsedTime;
-	tsAfterLastWait = CncTimeFunctions::getNanoTimestamp();
+//std::cout << currentAccumulatedOffset << "," << elapsedTime / 1000 << std::endl;
+	currentAccumulatedOffset -= ( elapsedTime / 1000 );
+	
+	if ( currentAccumulatedOffset < 0LL) {
+		//tsLastPerform = now;
+		//return;
+		
+		//currentAccumulatedOffset = 0LL;
+	}
+	
+	//tsAfterLastWait = CncTimeFunctions::getNanoTimestamp();
+	tsLastPerform = now;
 
 	// check if further accumulation is necessary
 	if ( currentAccumulatedOffset < threshold )
 		return;
 	
 	// sleep
-	CncNanoTimestamp tsBeforeWait = CncTimeFunctions::getNanoTimestamp();
+	//std::cout << currentAccumulatedOffset << std::endl;
 	CncTimeFunctions::sleepMircoseconds(currentAccumulatedOffset);
-	CncNanoTimestamp tsAfterWait = CncTimeFunctions::getNanoTimestamp();
 	
-	// accumulate
-	totalAccumulatedOffset += currentAccumulatedOffset;
-	
-	// trace
-	if ( traceFlag == true ) {
-		curTsInfo.force                    = force;
-		curTsInfo.waitPeriod               = currentAccumulatedOffset;
-		curTsInfo.beforeWait               = tsBeforeWait;
-		curTsInfo.afterWait                = tsAfterWait;
-		
-		curTsInfo.totalAccumulatedOffset   = totalAccumulatedOffset;
-		curTsInfo.currentAccumulatedOffset = currentAccumulatedOffset; 
-		curTsInfo.stepCounterX             = stepCounterX;
-		curTsInfo.totalAccumulatedOffsetX  = totalAccumulatedOffsetX;
-		curTsInfo.stepCounterY             = stepCounterY;
-		curTsInfo.totalAccumulatedOffsetY  = totalAccumulatedOffsetY;
-		curTsInfo.stepCounterZ             = stepCounterZ;
-		curTsInfo.totalAccumulatedOffsetZ  = totalAccumulatedOffsetZ;
-	}
-	
-	// reset the current offset - but consider the evaluated sleep deviation
-	currentAccumulatedOffset = (tsAfterWait - tsBeforeWait) / 1000;
-	
-	// trace
-	if ( traceFlag == true )
-		registerNextTsInfo();
-}
-//////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::registerNextTsInfo() {
-//////////////////////////////////////////////////////////////////////////
-	traceInfo.push_back(curTsInfo);
-	curTsInfo.reset();
-}
-//////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::trace(std::ostream& out) {
-//////////////////////////////////////////////////////////////////////////
-	CncSpeedSimulator::TimeStampInfo::headline(out);
-	for ( auto it = traceInfo.begin(); it != traceInfo.end(); ++it ) {
-		it->trace(out);
-	}
+	//currentAccumulatedOffset = 0LL;
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::initMove(int32_t dx, int32_t dy, int32_t dz) {
 //////////////////////////////////////////////////////////////////////////
-	// currently noting to do
+	CncSpeedController::initMove(dx, dy, dz);
+	
+	
+	#warning accel
+	//std::cout << X.AP << std::endl;
+	
+	
+	
+	enableAccelerationXYZ(false);
+	
+	
+	
+	reset();
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::completeMove() {
 //////////////////////////////////////////////////////////////////////////
-	reset();
+	// currently nothing to do
 }

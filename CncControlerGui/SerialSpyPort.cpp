@@ -27,7 +27,7 @@ void SerialSpyPort::spyReadData(void *buffer, unsigned int nbByte) {
 
 		if ( spyRead == true ) {
 			lastFetchResult.index += nbByte;
-			cnc::spy << wxString::Format(" Serial::<< {0x%02X %02X %04X} 0x[ ", lastFetchResult.ret, lastFetchResult.pid, lastFetchResult.index);
+			cnc::spy << wxString::Format(" Serial::<< 0x{%02X %02X %02X %04X} 0x[ ", lastFetchResult.cmd, lastFetchResult.ret, lastFetchResult.pid, lastFetchResult.index);
 			
 			const unsigned char* b = (const unsigned char*) buffer;
 			for ( unsigned int i=0; i<nbByte; i++ ) {
@@ -53,7 +53,7 @@ void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 			return;
 			
 		if ( spyWrite == true ) {
-			cnc::spy << " Serial::>> {0xFF 01 0001} 0x[ ";
+			cnc::spy << wxString::Format(" Serial::>> 0x{%02X FF 01 %04X} 0x[ ",  lastFetchResult.cmd, lastFetchResult.portion + 1);
 			
 			const unsigned char* b = (const unsigned char*) buffer;
 			for ( unsigned int i=0; i<nbByte; i++ ) {

@@ -13,9 +13,17 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		void save();
 		void clear();
 		
+		void init(double maxSpeedValue_MM_MIN);
 		void start(double maxSpeedValue_MM_MIN);
 		void stop();
 		
+		void activate(bool state=true);
+		void deactivate() { activate(false); }
+		
+		void toggleConnection();
+		void enableConnection(bool state=true);
+		void disableConnection() { enableConnection(false); }
+			
 		void setCurrentFeedSpeedValue(double measured_MM_MIN, double configured_MM_MIN);
 		
 	protected:
@@ -112,6 +120,8 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		
 		void reset();
 		void setupSizes();
+		
+		void decorateConnectBtn();
 	
 };
 #endif // CNCSPEEDMONITOR_H

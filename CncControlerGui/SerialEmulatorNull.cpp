@@ -717,11 +717,23 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 			case PID_PULSE_WIDTH_LOW_Z:
 			case PID_PULSE_WIDTH_HIGH_X:
 			case PID_PULSE_WIDTH_HIGH_Y:
-			case PID_PULSE_WIDTH_HIGH_Z:	speedSimulator->X.setup(GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
-											speedSimulator->Y.setup(GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
-											speedSimulator->Z.setup(GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
-											break;
-
+			case PID_PULSE_WIDTH_HIGH_Z:
+			case PID_ACCEL_PROFILE:
+			{
+				#warning consider PID_ACCEL_PROFILE values
+				
+				if ( true ) {
+					speedSimulator->setup('X', GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(), 5.0, 5.0);
+					speedSimulator->setup('Y', GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(), 5.0, 5.0);
+					speedSimulator->setup('Z', GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ(), 5.0, 5.0);
+				}
+				else {
+					speedSimulator->X.setup(GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
+					speedSimulator->Y.setup(GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
+					speedSimulator->Z.setup(GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
+				}
+				break;
+			}
 			
 			case PID_SPEED_MM_MIN: 			speedSimulator->setFeedSpeed_MM_MIN((double)(values.front()/DBL_FACT));
 											break;
@@ -778,6 +790,10 @@ bool SerialEmulatorNULL::writeMoveSeqIntern(unsigned char *buffer, unsigned int 
 
 	// determine handshake
 	lastCommand.MoveSequence.ret = RET_MORE;
+	
+	if ( false )
+		std::cout << lastCommand.MoveSequence.sequence.remainSize << std::endl;
+	
 	if ( lastCommand.MoveSequence.sequence.isEnd() )
 		lastCommand.MoveSequence.ret = RET_OK;
 	
@@ -887,6 +903,19 @@ void SerialEmulatorNULL::completeFeedProfile() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
+void SerialEmulatorNULL::updateRealtimeSpeed() {
+///////////////////////////////////////////////////////////////////
+	#warning
+	speedSimulator->setRealtimeFeedSpeed_MM_MIN(getMeasuredFeedSpeed_MM_MIN());
+	
+	if ( false ) {
+		std::cout << "Feed speed options: "
+				  << speedSimulator->getRealtimeFeedSpeed_MM_MIN() << ", "
+				  << getTotalDistance() / getMeasurementNanoTimeSpanTotal() *1000 * 1000 * 1000 * 60
+				  << std::endl;
+	}
+}
+///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::initRenderAndMove(int32_t dx , int32_t dy , int32_t dz) {
 ///////////////////////////////////////////////////////////////////
 	initializeFeedProfile(dx, dy, dz);
@@ -938,7 +967,8 @@ bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
 					\
 					curEmulatorPos.inc##axis(d); \
 					incStepCounter##axis(d); \
-					simulateSteppingTime##axis(d); \
+					if ( absolute(d) ) \
+						simulateOneStepTime##axis(); \
 					\
 					if ( lastCommand.ret != RET_OK ) \
 						return translateStepAxisRetValue(lastCommand.ret); \
@@ -951,7 +981,7 @@ bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
 
 		// simulate a direct controller callback.
 		replyPosition(force);
-
+		
 		// do something with this coordinates
 		return writeMoveRenderedCallback(dx, dy, dz);
 	};
@@ -1034,43 +1064,6 @@ bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
 	if ( moving(pointA[0] - pointB[0], pointA[1] - pointB[1], pointA[2] - pointB[2], true) == false )
 		return false;
 	
-	/*
-	 if ( speedController.isSpeedConfigured() ) {
-	    const unsigned long timeElapsed = micros() - tsStart;
-
-	    // micros(): Returns the number of microseconds since the Arduino board began
-	    // running the current program. This number will overflow (go back to zero),
-	    // after approximately 70 minutes.
-	    if ( timeElapsed > 3 ) {
-	      const double distance  = 0.0
-	                             + RS::xStepCount * speedController.X.gearing
-	                             + RS::yStepCount * speedController.Y.gearing
-	                             + RS::zStepCount * speedController.Z.gearing;
-
-	      if ( distance > 0.0 )
-	        speedController.setRealtimeFeedSpeed_MM_SEC((1000.0 * 1000.0 * distance) / ( timeElapsed + SPEED_MANAGER_CONST_STATIC_OFFSET_US ));
-	    }
-	  }
-	 */
-	#warning
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
-		wxASSERT( speedSimulator != NULL );
-
-		//const double speed_MM_SEC  = getTotalDistance() / getMeasurementNanoTimeSpanTotal() *1000 * 1000 * 1000;
-		//speedSimulator->setRealtimeFeedSpeed_MM_SEC(speed_MM_SEC);
-		
-		//const double speed_MM_MIN  = getMeasuredFeedSpeed_MM_MIN();
-		//speedSimulator->setRealtimeFeedSpeed_MM_MIN(speed_MM_MIN);
-		
-		const double speed_MM_SEC  = getAccumulatedDistance() / getAccumulatedTimespan() *1000 * 1000 * 1000;
-		speedSimulator->setRealtimeFeedSpeed_MM_SEC(speed_MM_SEC);
-		
-		std::cout << "Feed speed: " << speedSimulator->getRealtimeFeedSpeed_MM_MIN() << ", " 
-		                            << getMeasuredFeedSpeed_MM_MIN() << ", "
-									<< getTotalDistance() / getMeasurementNanoTimeSpanTotal() *1000 * 1000 * 1000 * 60 << std::endl;
-		
-	}
-
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1105,6 +1098,8 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 		 absolute( diff.getZ() ) >= posReplyThresholdZ ||
 		 force == true ) 
 	{
+		updateRealtimeSpeed();
+		
 		// due to the fact, that the emulators runs in the 
 		// same thread as the main loop it makes not sense 
 		// to write here someting to the serial. This is 
@@ -1159,45 +1154,33 @@ unsigned char SerialEmulatorNULL::signalHandling() {
 	return RET_OK;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::simulateSteppingTimeX(int32_t steps) {
+void SerialEmulatorNULL::simulateOneStepTimeX() {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
 	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
-		const int32_t val = absolute(steps);
-		
-		if ( val > 0 ) {
-			speedSimulator->simulateSteppingX(val);
-			speedSimulator->performCurrentOffset(false);
-		}
+		speedSimulator->simulateOneStepX();
+		speedSimulator->performCurrentOffset(false);
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::simulateSteppingTimeY(int32_t steps) {
+void SerialEmulatorNULL::simulateOneStepTimeY() {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
 	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
-		const int32_t val = absolute(steps);
-		
-		if ( val > 0 ) {
-			speedSimulator->simulateSteppingY(val);
-			speedSimulator->performCurrentOffset(false);
-		}
+		speedSimulator->simulateOneStepY();
+		speedSimulator->performCurrentOffset(false);
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::simulateSteppingTimeZ(int32_t steps) {
+void SerialEmulatorNULL::simulateOneStepTimeZ() {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
 	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
-		const int32_t val = absolute(steps);
-		
-		if ( val > 0 ) {
-			speedSimulator->simulateSteppingZ(val);
-			speedSimulator->performCurrentOffset(false);
-		}
+		speedSimulator->simulateOneStepZ();
+		speedSimulator->performCurrentOffset(false);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1274,15 +1257,6 @@ void SerialEmulatorNULL::traceSpeedInformation() {
 ///////////////////////////////////////////////////////////////////
 	if ( speedSimulator == NULL )
 		return;
-		
-	if ( speedSimulator->getTraceFlag() == true ) {
-		wxString fn(wxString::Format("c:\\temp\\speed.%s.csv", wxDateTime::Now().Format("%Y%m%d-%H%M%S")));
-		std::filebuf fb;
-		fb.open (fn.c_str().AsChar(), std::ios::out);
-		std::ostream os(&fb);
-		
-		speedSimulator->trace(os);
-		
-		fb.close();
-	}
+	
+	// currently nothing to do
 }

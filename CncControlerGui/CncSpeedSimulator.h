@@ -11,38 +11,6 @@ class CncSpeedSimulator : public CncSpeedController {
 	public:
 		
 		//////////////////////////////////////////////////////////////////////////
-		struct TimeStampInfo {
-			static const char delim = ';';
-			
-			bool force;
-			int64_t waitPeriod;
-			CncNanoTimestamp beforeWait;
-			CncNanoTimestamp afterWait;
-			
-			int64_t totalAccumulatedOffset;
-			int64_t totalAccumulatedOffsetX;
-			int64_t totalAccumulatedOffsetY;
-			int64_t totalAccumulatedOffsetZ;
-			int64_t currentAccumulatedOffset;
-			
-			long stepCounterX;
-			long stepCounterY;
-			long stepCounterZ;
-			
-			TimeStampInfo();
-			~TimeStampInfo();
-			
-			void reset();
-			void trace(std::ostream& out);
-			
-			static void headline(std::ostream& out);
-			unsigned int getColumnCount();
-			
-		};
-		typedef std::vector<TimeStampInfo> TraceInformation;
-		
-		
-		//////////////////////////////////////////////////////////////////////////
 		CncSpeedSimulator(unsigned int cStepStaticOffset, unsigned int cStepLoopOffset,
 						  double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
 						  double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
@@ -50,16 +18,12 @@ class CncSpeedSimulator : public CncSpeedController {
 						  
 		virtual ~CncSpeedSimulator();
 		
-		bool getTraceFlag() { return traceFlag; }
-		void trace(std::ostream& out);
-		
-		void simulateSteppingX(unsigned int dx);
-		void simulateSteppingY(unsigned int dy);
-		void simulateSteppingZ(unsigned int dz);
+		void simulateOneStepX();
+		void simulateOneStepY();
+		void simulateOneStepZ();
 		
 		void performCurrentOffset(bool force=false);
 		
-		int64_t getTotalAccumulatedOffset()  { return totalAccumulatedOffset; }
 		int64_t getTotalAccumulatedOffsetX() { return totalAccumulatedOffsetX; }
 		int64_t getTotalAccumulatedOffsetY() { return totalAccumulatedOffsetY; }
 		int64_t getTotalAccumulatedOffsetZ() { return totalAccumulatedOffsetZ; }
@@ -74,10 +38,7 @@ class CncSpeedSimulator : public CncSpeedController {
 	private:
 		
 		bool traceFlag;
-		TraceInformation traceInfo;
-		TimeStampInfo curTsInfo;
 		
-		int64_t totalAccumulatedOffset;
 		int64_t totalAccumulatedOffsetX;
 		int64_t totalAccumulatedOffsetY;
 		int64_t totalAccumulatedOffsetZ;
@@ -87,10 +48,9 @@ class CncSpeedSimulator : public CncSpeedController {
 		long stepCounterY;
 		long stepCounterZ;
 		
-		CncNanoTimestamp tsAfterLastWait;
+		CncNanoTimestamp tsLastPerform;
 		
 		void reset();
-		void registerNextTsInfo();
 };
 
 #endif

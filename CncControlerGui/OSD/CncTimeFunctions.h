@@ -75,14 +75,14 @@ class CncTimeFunctions {
 		typedef std::nano                                         period;
 		typedef std::chrono::duration<CncNanoTimestamp, period>   duration;
 		typedef std::chrono::time_point<CncTimeFunctions>         time_point;
-
+		
+		static const CncNanoTimespan minWaitPeriod = 1000 * 1000 * 20; // -> 20 ms;
+		
 		static void init();
 		
 		static int64_t getOPCFrequency();
 		static unsigned int geMaxtQPCResolutionNS();
-		
-		
-		
+				
 		static int getTimeOfDay(struct timeval *tv, void *tz = NULL);
 		static void sleepMilliseconds(unsigned int milliseconds);
 		static void sleepMircoseconds(int64_t micros);

@@ -218,9 +218,10 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		
 		inline void reset();
 		inline void resetCounter();
-		inline void simulateSteppingTimeX(int32_t dist);
-		inline void simulateSteppingTimeY(int32_t dist);
-		inline void simulateSteppingTimeZ(int32_t dist);
+		inline void simulateOneStepTimeX();
+		inline void simulateOneStepTimeY();
+		inline void simulateOneStepTimeZ();
+		
 		inline unsigned char signalHandling();
 		
 		inline bool translateStepAxisRetValue(unsigned char ret);
@@ -295,8 +296,9 @@ class SerialEmulatorNULL : public SerialSpyPort,
 
 		void initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz);
 		void completeFeedProfile();
-
-
+		
+		void updateRealtimeSpeed();
+		
 	public:
 		
 		//Initialize Serial communication without an acitiv connection 

@@ -50,18 +50,29 @@ class SerialCommandLocker {
 
 //------------------------------------------------------------
 struct LastSerialResult {
-	unsigned char cmd 				    = CMD_INVALID;
-	unsigned char ret				    = RET_NULL;
-	unsigned char pid				    = RET_NULL;
+	unsigned char cmd 		= CMD_INVALID;
+	unsigned char ret		= RET_NULL;
+	unsigned char pid		= RET_NULL;
 	
-	unsigned int index					= 0;
+	unsigned int index		= 0;
+	unsigned int portion	= 0;
 	
-	void reset() { 
-		cmd 				 			= CMD_INVALID;
-		ret								= RET_NULL;
-		pid								= RET_NULL;
+	void init(unsigned char command, unsigned int portionCount = 0) {
+		cmd 	= command;
+		portion = portionCount;
+		resetResult();
+	} 
+	
+	void resetAll() { 
+		cmd = CMD_INVALID;
+		resetResult();
+	}
+	
+	void resetResult() { 
+		ret		= RET_NULL;
+		pid		= RET_NULL;
 		
-		index							= 0;
+		index	= 0;
 	}
 };
 
@@ -219,14 +230,12 @@ class Serial : public SerialOSD {
 		// total distance
 		double totalDistance[4];
 		double totalDistanceRef;
-		double accumulatedDistance;
-		double currentFeedSpeed_MM_MIN;
+		double measuredFeedSpeed_MM_SEC;
 		
 		CncLongPosition measurementRefPos;
 		CncNanoTimestamp tsMeasurementStart;
 		CncNanoTimestamp tsMeasurementRef;
 		CncNanoTimestamp tsMeasurementLast;
-		CncNanoTimespan accumulatedTimespan;
 		
 	protected:
 		
@@ -316,7 +325,6 @@ class Serial : public SerialOSD {
 		void incTotalDistance(unsigned int size, const int32_t (&values)[3]);
 		
 		void resetTotalDistance() { totalDistance[0] = 0.0; totalDistance[1] = 0.0; totalDistance[2] = 0.0; totalDistance[3] = 0.0;}
-		void adjustMeasurementRefTs();
 		void logMeasurementRefTs(const CncLongPosition& pos);
 		void logMeasurementLastTs();
 				
@@ -433,13 +441,11 @@ class Serial : public SerialOSD {
 		CncNanoTimespan getMeasurementNanoTimeSpanTotal() const;
 		CncNanoTimespan getMeasurementNanoTimeSpanLastRef() const;
 		
-		double getAccumulatedDistance()				{ return accumulatedDistance; }
-		CncNanoTimespan getAccumulatedTimespan() 	{ return accumulatedTimespan; }
-		
-		double getMeasuredFeedSpeed_MM_MIN() { return currentFeedSpeed_MM_MIN; }
-		
-		virtual void traceSpeedInformation() {}
-		
+		double getMeasuredFeedSpeed_MM_MIN() 		{ return measuredFeedSpeed_MM_SEC * 60; }
+		double getMeasuredFeedSpeed_MM_SEC() 		{ return measuredFeedSpeed_MM_SEC; }
+		virtual void traceSpeedInformation() 		{}
+
+		// test behavior only
 		virtual bool test();
 };
 

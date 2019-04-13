@@ -202,8 +202,6 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		return ret;
 	};
 
-
-
 	// ------------------------------------------------------------------------
 	// process first portion
 	if ( sequence.isBegin() ) {
@@ -258,7 +256,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 
 	// ------------------------------------------------------------------------
 	// process portioon
-	unsigned int portionSize = buffer[idx];
+	unsigned int portionSize = buffer[idx] + 1;
 	if ( idx + portionSize != nbByte ) {
 		std::cerr << "CncCommandDecoder::decodeMoveSequence() Invalid portion size" << std::endl;
 		std::cerr << " - nbByte      : " << nbByte << std::endl;
@@ -294,7 +292,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	}
 
 	// update remaining size
-	sequence.remainSize -= idx;
+	sequence.remainSize -= (idx - 1);
 
 	if ( false )
 		std::cout << "sequence.remainSize = " << sequence.remainSize << std::endl;

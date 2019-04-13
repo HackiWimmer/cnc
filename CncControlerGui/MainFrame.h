@@ -113,6 +113,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
+    virtual void onSelectSpyOutboundDetails(wxDataViewEvent& event);
+    virtual void onSelectSpyUnknownDetails(wxDataViewEvent& event);
 		virtual void openSpyDetailWindow(wxCommandEvent& event);
 		virtual void dclickHeartbeatState(wxMouseEvent& event);
 		virtual void openGameportController(wxCommandEvent& event);
@@ -478,6 +481,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void changeWorkpieceThickness();
 		void changeCrossingThickness();
 		
+		void updateSpyDetailWindow();
+		
 		//////////////////////////////////////////////////////////////////////////////////
 #		ifdef __WXMSW__
 			virtual WXLRESULT MSWWindowProc(WXUINT, WXWPARAM, WXLPARAM);
@@ -592,6 +597,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncMonitorVSplitterWindow* 		cnc3DVSplitterWindow;
 		CncMonitorHSplitterWindow* 		cnc3DHSplitterWindow;
 		CncTemplateObserver* 			templateObserver;
+		CncMessageDialog*				spyDetailWindow;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

@@ -189,6 +189,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , cnc3DVSplitterWindow(NULL)
 , cnc3DHSplitterWindow(NULL)
 , templateObserver(NULL)
+, spyDetailWindow(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -354,17 +355,17 @@ void MainFrame::umPostEvent(const UpdateManagerThread::Event& evt) {
 		wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
 		updateManagerThread->Resume();
 	}
-	
-	//std::clog << "MainFrame::umPostEvent " << evt.getTypeAsString() << std::endl;
+
 	updateManagerThread->postEvent(evt); 
 	
+	// update speed monitor
+	if ( evt.hasFeedSpeedInfo() ) {
 
-	#warning - think about the speedMonitor integration here
-	if ( evt.pos.currentSpeedValue != 0.0 ) {
+		if ( false )
+			std::cout << "evt.hasFeedSpeedInfo(): " << evt.pos.currentSpeedValue << std::endl;
+
 		speedMonitor->setCurrentFeedSpeedValue(evt.pos.currentSpeedValue, evt.pos.configuredSpeedValue);
-		//std::cout << evt.pos.currentSpeedValue << ", " << evt.pos.configuredSpeedValue<< std::endl;
 	}
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::ShowAuiToolMenu(wxAuiToolBarEvent& event) {
@@ -827,9 +828,7 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
 		
-	toggleMotionMonitorOptionPane(true);
-	toggleMotionMonitorStatisticPane(true);
-	
+	GblFunc::stacktrace(std::clog, 7);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
@@ -952,7 +951,7 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 	if ( updateManagerThread != NULL ) {
 		if ( updateManagerThread->IsPaused() == false ) {
 			
-			if ( m_positionSpy->IsShownOnScreen() == true ) {
+			if ( positionSpy != NULL && positionSpy->IsShownOnScreen() == true ) {
 				
 				if ( updateManagerThread->somethingLeftToDo() == false ) {
 					// a counter of 10 means 5 seconds
@@ -1102,20 +1101,19 @@ void MainFrame::onThreadHeartbeat(UpdateManagerEvent& event) {
 		statisticsPane->logStatistics(false);
 	
 	// feed speed control + feed speed panel
-	if ( cnc != NULL ) {
-		m_speedPanel->Refresh();
-		
-		wxString sValue(_maxSpeedLabel);
-		
-		if ( GBL_CONTEXT->isProbeMode() == false ) {	
-			
+	m_speedPanel->Refresh();
+
+	wxString sValue(_maxSpeedLabel);
+
+	if ( GBL_CONTEXT->isProbeMode() == false ) {
+		if ( cnc != NULL ) {
 			const double dValue = cnc->getRealtimeFeedSpeed_MM_MIN();
 			if ( dValue  < 0.0 ) sValue.assign(_maxSpeedLabel);
 			else 				 sValue.assign(wxString::Format("%.1lf", dValue));
 		}
-		
-		m_realtimeFeedSpeed->ChangeValue(sValue);
 	}
+
+	m_realtimeFeedSpeed->ChangeValue(sValue);
 	
 	// update position syp
 	if ( updateManagerThread == NULL )
@@ -1606,6 +1604,8 @@ void MainFrame::initialize(void) {
 	toggleMotionMonitorOptionPane(true);
 	toggleMotionMonitorStatisticPane(true);
 	
+	speedMonitor->init(GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
+	
 	m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
 	
 	perspectiveHandler.setupUserPerspectives();
@@ -1909,7 +1909,7 @@ bool MainFrame::connectSerialPort() {
 	startAnimationControl();
 	m_serialTimer->Stop();
 	
-	if ( m_clearSerialSpyOnConnect->IsChecked() )
+	if ( m_clearSerialSpyOnConnect->GetValue() )
 		clearSerialSpy();
 		
 	const wxString sel(m_portSelector->GetStringSelection());
@@ -2033,6 +2033,10 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		decorateSecureDlgChoice(true);
 		decorateSpeedControlBtn(true);
 	}
+	
+	const bool probeMode = GBL_CONTEXT->isProbeMode();
+	if ( speedMonitor )
+		speedMonitor->activate(!probeMode);
 	
 	return serialFileName;
 }
@@ -3631,7 +3635,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		}
 		
 #warning remove cnc->getSerialExtern()->test() again
-cnc->getSerialExtern()->test();
+//cnc->getSerialExtern()->test();
 
 		motionMonitor->updateMonitorAndOptions();
 		statisticsPane->updateReplayPane();
@@ -3676,7 +3680,7 @@ bool MainFrame::processTemplateIntern() {
 		begRun.parameter.PRC.user			= "Hacki Wimmer";
 	cnc->processTrigger(begRun);
 	
-	if ( m_clearSerialSpyBeforNextRun->IsChecked() )
+	if ( m_clearSerialSpyBeforNextRun->GetValue() )
 		clearSerialSpy();
 	
 	clearPositionSpy();
@@ -6756,11 +6760,17 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 void MainFrame::clickProbeMode(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	GBL_CONTEXT->setProbeMode(m_btProbeMode->GetValue());
-	cnc->enableProbeMode(m_btProbeMode->GetValue());
 	
-	m_btSpeedControl->Enable(GBL_CONTEXT->isProbeMode());
-	if ( GBL_CONTEXT->isProbeMode() )	decorateSpeedControlBtn(GBL_CONTEXT->isProbeMode());
-	else								decorateSpeedControlBtn(true);
+	// update depending controls
+	const bool probeMode = GBL_CONTEXT->isProbeMode();
+	
+	cnc->enableProbeMode(probeMode);
+
+	m_btSpeedControl->Enable(probeMode);
+	decorateSpeedControlBtn(true);
+
+	if ( speedMonitor )
+		speedMonitor->activate(!probeMode);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::clickSpeedControl(wxCommandEvent& event) {
@@ -6994,7 +7004,8 @@ void MainFrame::changeConfigToolbook(wxToolbookEvent& event) {
 void MainFrame::leaveSerialSpy(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT(serialSpyListCtrl);
-	serialSpyListCtrl->clearDetails();
+	// currently nothing more to do
+	//serialSpyListCtrl->clearDetails();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::initSpeedConfigPlayground() {
@@ -7507,34 +7518,72 @@ void MainFrame::dclickHeartbeatState(wxMouseEvent& event) {
 	decorateIdleState(m_miRqtIdleMessages->IsChecked());
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::openSpyDetailWindow(wxCommandEvent& event) {
+void MainFrame::updateSpyDetailWindow() {
 /////////////////////////////////////////////////////////////////////
-	wxDataViewListCtrl* ctrl = NULL;
+	wxDataViewListCtrl* listCtrl = NULL;
 	wxString headline;
-	if      ( m_spyUnknownDetails->IsShownOnScreen() )		{ ctrl = m_spyUnknownDetails;  headline.assign("Info"); }
-	else if ( m_spyInboundDetails->IsShownOnScreen() ) 		{ ctrl = m_spyInboundDetails;  headline.assign("Inbound Details"); }
-	else if ( m_spyOutboundDetails->IsShownOnScreen() )		{ ctrl = m_spyOutboundDetails; headline.assign("Outbound Details"); }
+	if      ( m_spyUnknownDetails->IsShownOnScreen() )		{ listCtrl = m_spyUnknownDetails;  headline.assign("Info"); }
+	else if ( m_spyInboundDetails->IsShownOnScreen() ) 		{ listCtrl = m_spyInboundDetails;  headline.assign("Inbound Details"); }
+	else if ( m_spyOutboundDetails->IsShownOnScreen() )		{ listCtrl = m_spyOutboundDetails; headline.assign("Outbound Details"); }
 	
-	if ( ctrl != NULL && ctrl->GetItemCount() > 0) {
+	if ( listCtrl != NULL && listCtrl->GetItemCount() > 0) {
 		
 		const int row = 0;
 		wxString details;
-		for ( unsigned int col = 0; col < ctrl->GetColumnCount(); col++ ) {
+		for ( unsigned int col = 0; col < listCtrl->GetColumnCount(); col++ ) {
 			
-			wxDataViewColumn* dvc = ctrl->GetColumn(col);
+			wxDataViewColumn* dvc = listCtrl->GetColumn(col);
 			wxVariant value;
-			ctrl->GetValue(value, row, col);
+			listCtrl->GetValue(value, row, col);
 			
-			if ( ctrl->GetColumnCount() > 1 && col == ctrl->GetColumnCount() - 1 ) {
-				details.append(wxString::Format("%s:\n%s", dvc->GetTitle(), value.GetString()));
+			if ( listCtrl->GetColumnCount() > 1 && col == listCtrl->GetColumnCount() - 1 ) {
+				details.append(wxString::Format("\n%s:\n%s", dvc->GetTitle(), value.GetString()));
 			}
 			else {
-				details.append(wxString::Format("%s: %s\n", dvc->GetTitle(), value.GetString()));
+				const unsigned int size = 24;
+				wxString title(dvc->GetTitle().Left(size));
+				wxString spacer(' ',  ( listCtrl->GetColumnCount() > 1 ? size - title.Length() : 0 ));
+				details.append(wxString::Format("%s%s: %s\n", title, spacer, value.GetString()));
 			}
 		}
 		
-		CncMessageDialog md(this, details, headline, "Serial Spy Details");
-		md.SetSize(600, 800);
-		md.ShowModal();
+		details.Replace(" | ", "\n", true);
+		details.Replace(" |", "\n",  true);
+		details.Replace("| ", "\n",  true);
+		details.Replace("|", "\n", 	 true);
+		
+		if ( spyDetailWindow != NULL && spyDetailWindow->IsShownOnScreen() == true ) {
+			spyDetailWindow->setHeadline(headline);
+			spyDetailWindow->setMessage(details);
+		}
 	}
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::openSpyDetailWindow(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	if ( spyDetailWindow == NULL ) {
+		spyDetailWindow = new CncMessageDialog(this, "", "", "Serial Spy Details");
+		spyDetailWindow->SetSize(800, 900);
+		spyDetailWindow->setWordWrap(true);
+	}
+	
+	if ( spyDetailWindow->IsShownOnScreen() == false )
+		spyDetailWindow->Show();
+	
+	updateSpyDetailWindow();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSelectSpyInboundDetails(wxDataViewEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_spyInboundDetails->UnselectAll();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSelectSpyOutboundDetails(wxDataViewEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_spyOutboundDetails->UnselectAll();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onSelectSpyUnknownDetails(wxDataViewEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	m_spyUnknownDetails->UnselectAll();
 }

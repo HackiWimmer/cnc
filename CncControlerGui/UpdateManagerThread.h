@@ -107,6 +107,9 @@ class UpdateManagerThread : public wxThread {
 				return "Unknown event type";
 			}
 			
+			bool isPositionEvent() 	const { return type == APP_POS_UPD || type == CTL_POS_UPD; }
+			bool hasFeedSpeedInfo() const { return isPositionEvent() && pos.currentSpeedValue != 0.0; }
+
 			//////////////////////////////////////////////////////////////
 			// no data
 			

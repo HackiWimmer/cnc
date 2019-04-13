@@ -11,9 +11,10 @@
 wxDEFINE_EVENT(wxEVT_SERIAL_TIMER, 	wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncSerialSpyListCtrl, CncLargeScaledListCtrl)
-	EVT_SIZE(CncSerialSpyListCtrl::onSize)
-	EVT_TIMER(wxEVT_SERIAL_TIMER, CncSerialSpyListCtrl::onTimer)
-	EVT_LIST_ITEM_SELECTED(wxID_ANY, CncSerialSpyListCtrl::onSelectList)
+	EVT_SIZE(							CncSerialSpyListCtrl::onSize)
+	EVT_TIMER(wxEVT_SERIAL_TIMER, 		CncSerialSpyListCtrl::onTimer)
+	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncSerialSpyListCtrl::onSelectListItem)
+	EVT_LIST_ITEM_FOCUSED(wxID_ANY, 	CncSerialSpyListCtrl::onFocusListItem)
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
@@ -47,6 +48,8 @@ CncSerialSpyListCtrl::CncSerialSpyListCtrl(wxWindow *parent, long style)
 	
 	SetBackgroundColour(*wxBLACK);
 	SetForegroundColour(*wxWHITE);
+	
+	decodeSerialSpyLine(-1, "", true);
 	
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 	SetFont(font);
@@ -231,14 +234,21 @@ void CncSerialSpyListCtrl::onTimer(wxTimerEvent& event) {
 	refreshList();
 }
 /////////////////////////////////////////////////////////////////////
-void CncSerialSpyListCtrl::onSelectList(wxListEvent& event) {
+void CncSerialSpyListCtrl::onFocusListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////
+void CncSerialSpyListCtrl::onSelectListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	long item = event.m_itemIndex;
 	if ( item == wxNOT_FOUND )
 		return;
 	
 	setLastSelection(item);
-	decodeSerialSpyLine(getRow(item).getItem(COL_LINE));
+	
+	long ln;
+	getRow(item).getItem(COL_NUM).ToLong(&ln);
+	decodeSerialSpyLine(ln, getRow(item).getItem(COL_LINE));
 }
 ///////////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::clearDetails() {
@@ -249,10 +259,10 @@ void CncSerialSpyListCtrl::clearDetails() {
 	
 	THE_APP->GetSypDetailsBook()->SetSelection(SpyHexDecoder::Details::DT_UNKNOWN);
 	
-	decodeSerialSpyLine("", true);
+	decodeSerialSpyLine(-1, "", true);
 }
 ///////////////////////////////////////////////////////////////////
-void CncSerialSpyListCtrl::decodeSerialSpyLine(const wxString& line, bool displayInfo) {
+void CncSerialSpyListCtrl::decodeSerialSpyLine(long linenumber, const wxString& line, bool displayInfo) {
 ///////////////////////////////////////////////////////////////////
 	if ( IsFrozen() )
 		return;
@@ -260,12 +270,14 @@ void CncSerialSpyListCtrl::decodeSerialSpyLine(const wxString& line, bool displa
 	struct Details : public SpyHexDecoder::Details {
 		private:
 			DcmRow row;
+			long linenumber;
 			
 		public:
 			
 			///////////////////////////////////////////////////////////
-			Details() 
+			Details(long ln) 
 			: SpyHexDecoder::Details()
+			, linenumber(ln)
 			{
 				THE_APP->GetSpyInboundDetails()->DeleteAllItems();
 				THE_APP->GetSpyOutboundDetails()->DeleteAllItems();
@@ -278,12 +290,23 @@ void CncSerialSpyListCtrl::decodeSerialSpyLine(const wxString& line, bool displa
 			///////////////////////////////////////////////////////////
 			void display() {
 				
+				auto displayLinenumber = [&](wxTextCtrl* ctrl) {
+					if ( ctrl == NULL )
+						return;
+						
+					if ( linenumber > 0 )	ctrl->ChangeValue(wxString::Format("%ld", linenumber));
+					else					ctrl->ChangeValue("");
+					
+				};
+				
 				switch ( type ) {
 					case DT_INBOUND: 	DataControlModel::addSpyInboundRow(row, 
 																		   context, 
+																		   cmd,
 																		   pid, 
 																		   index, 
 																		   more);
+										displayLinenumber(THE_APP->GetLnInboundDetails());
 										THE_APP->GetSpyInboundDetails()->AppendItem(row);
 										THE_APP->GetSypDetailsBook()->SetSelection(DT_INBOUND);
 										break;
@@ -291,18 +314,23 @@ void CncSerialSpyListCtrl::decodeSerialSpyLine(const wxString& line, bool displa
 					case DT_OUTBOUND: 	DataControlModel::addSpyOutboundRow(row, 
 																			context,
 																			cmd,
+																			portion,
 																			more);
+										displayLinenumber(THE_APP->GetLnOutboundDetails());
 										THE_APP->GetSpyOutboundDetails()->AppendItem(row);
 										THE_APP->GetSypDetailsBook()->SetSelection(DT_OUTBOUND);
 										break;
 										
 					default:			DataControlModel::addSpyDateilInfoRow(row, more);
+										displayLinenumber(THE_APP->GetLnUnkonwnDetails());
 										THE_APP->GetSpyUnknownDetails()->AppendItem(row);
 										THE_APP->GetSypDetailsBook()->SetSelection(DT_UNKNOWN);
 				}
+				
+				THE_APP->updateSpyDetailWindow();
 			}
 		
-	} details;
+	} details(linenumber);
 	
 	// determine detail type
 	if 		( line.Contains("::<<") ) 	details.type = SpyHexDecoder::Details::DT_INBOUND;

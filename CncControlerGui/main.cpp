@@ -192,16 +192,16 @@ class MainLogger : public wxLog {
 		const char* getLogLevelAsStr(wxLogLevel level) {
 			switch ( level ) {
 				case wxLOG_FatalError:	return "FatalError";
-				case wxLOG_Error:		return "Error";
-				case wxLOG_Warning:		return "Warning";
-				case wxLOG_Message:		return "Message";
-				case wxLOG_Status:		return "Status";
-				case wxLOG_Info:		return "Info";
-				case wxLOG_Debug:		return "Debug";
-				case wxLOG_Trace:		return "Trace";
-				case wxLOG_Progress:	return "Progress";
-				case wxLOG_User:		return "User";
-				default:				return "????";
+				case wxLOG_Error:		return "Error     ";
+				case wxLOG_Warning:		return "Warning   ";
+				case wxLOG_Message:		return "Message   ";
+				case wxLOG_Status:		return "Status    ";
+				case wxLOG_Info:		return "Info      ";
+				case wxLOG_Debug:		return "Debug     ";
+				case wxLOG_Trace:		return "Trace     ";
+				case wxLOG_Progress:	return "Progress  ";
+				case wxLOG_User:		return "User      ";
+				default:				return "????      ";
 			}
 			
 			return "????";
@@ -420,7 +420,7 @@ class MainApp : public wxApp {
 					  << "  Stacktrace:"
 					  << std::endl;
 					  
-			GblFunc::stacktrace(std::cerr);
+			GblFunc::stacktrace(std::cerr, 6);
 		}
 		
 		///////////////////////////////////////////////////////////

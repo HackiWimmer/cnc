@@ -20,6 +20,9 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 , currentConfiguredFeedSpeed_MM_MIN(0.0)
 ////////////////////////////////////////////////////////////////
 {
+	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
+	m_btToggleConnection->SetBitmapDisabled(bmpOff);
+	
 	m_refreshTimer->Stop();
 	
 	// This has to be done to use wxAutoBufferedPaintDC 
@@ -56,6 +59,21 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 CncSpeedMonitor::~CncSpeedMonitor() {
 ////////////////////////////////////////////////////////////////
 	m_refreshTimer->Stop();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::activate(bool enable) {
+////////////////////////////////////////////////////////////////
+	enableConnection(enable);
+	
+	m_btToggleConnection->Enable(enable);
+	
+	m_btToggleConfiguredAxis->Enable(enable);
+	m_btToggleMeasurePointsAxis->Enable(enable);
+	
+	m_btClear->Enable(enable);
+	m_btSave->Enable(enable);
+	
+	m_intervalSlider->Enable(enable);
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::setupSizes() {
@@ -96,16 +114,23 @@ void CncSpeedMonitor::reset() {
 	m_scrollWindow->Scroll(m_scrollWindow->GetScrollRange(wxHORIZONTAL), 0);
 }
 ////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::init(double maxSpeedValue_MM_MIN) {
+////////////////////////////////////////////////////////////////
+	const double overSize =  maxSpeedValue_MM_MIN * 0.2;
+	
+	axisMeasuredSpeed.maxValue 		= maxSpeedValue_MM_MIN + overSize;
+	axisConfiguredSpeed.maxValue	= maxSpeedValue_MM_MIN + overSize;
+	
+	wxASSERT(axisMeasuredSpeed.maxValue   > axisMeasuredSpeed.minValue);
+	wxASSERT(axisConfiguredSpeed.maxValue > axisConfiguredSpeed.minValue);
+}
+////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::start(double maxSpeedValue_MM_MIN) {
 ////////////////////////////////////////////////////////////////
 	m_refreshTimer->Stop();
 	reset();
 		
-	axisMeasuredSpeed.maxValue 		= maxSpeedValue_MM_MIN + maxSpeedValue_MM_MIN * 0.1;
-	axisConfiguredSpeed.maxValue	= maxSpeedValue_MM_MIN + maxSpeedValue_MM_MIN * 0.1;
-	
-	wxASSERT(axisMeasuredSpeed.maxValue   > axisMeasuredSpeed.minValue);
-	wxASSERT(axisConfiguredSpeed.maxValue > axisConfiguredSpeed.minValue);
+	init(maxSpeedValue_MM_MIN);
 	
 	lastRefresh = CncTimeFunctions::getMilliTimestamp();
 	lastDataSet = CncTimeFunctions::getMilliTimestamp();
@@ -241,10 +266,7 @@ void CncSpeedMonitor::onPaint(wxPaintEvent& event) {
 	// --------------------------------------------------------
 	// drawing
 	drawBoundbox();
-	
-	if ( m_refreshTimer->IsRunning() && m_btToggleConnection->GetValue() == true )
-		drawValues();
-	
+	drawValues();
 	drawMouseLabel();
 }
 ////////////////////////////////////////////////////////////////
@@ -308,7 +330,9 @@ void CncSpeedMonitor::onMouseMotion(wxMouseEvent& event) {
 		return;
 		
 	mouseLabel = {event.GetX(), event.GetY()};
-	Refresh();
+	
+	if ( m_refreshTimer->IsRunning() == false )
+		m_darwingArea->Refresh();
 	
 	event.Skip();
 }
@@ -316,7 +340,7 @@ void CncSpeedMonitor::onMouseMotion(wxMouseEvent& event) {
 void CncSpeedMonitor::onLeftDown(wxMouseEvent& event) {
 ////////////////////////////////////////////////////////////////
 	mouseLabel = {event.GetX(), event.GetY()};
-	Refresh();
+	m_darwingArea->Refresh();
 	
 	event.Skip();
 }
@@ -324,22 +348,22 @@ void CncSpeedMonitor::onLeftDown(wxMouseEvent& event) {
 void CncSpeedMonitor::onLeftUp(wxMouseEvent& event) {
 ////////////////////////////////////////////////////////////////
 	mouseLabel = {-1, -1};
-	Refresh();
+	m_darwingArea->Refresh();
 	
 	event.Skip();
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::toggleConfiguredAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
-	Refresh();
+	m_darwingArea->Refresh();
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::toggleMeasurePointsAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
-	Refresh();
+	m_darwingArea->Refresh();
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::toggleConnection(wxCommandEvent& event) {
+void CncSpeedMonitor::decorateConnectBtn() {
 ////////////////////////////////////////////////////////////////
 	wxBitmap bmpOn  = ImageLib16().Bitmap("BMP_CONNECTED");
 	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
@@ -348,6 +372,22 @@ void CncSpeedMonitor::toggleConnection(wxCommandEvent& event) {
 	                                         : m_btToggleConnection->SetBitmap(bmpOff);
 	m_btToggleConnection->Refresh();
 	m_btToggleConnection->Update();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::enableConnection(bool state) {
+////////////////////////////////////////////////////////////////
+	m_btToggleConnection->SetValue(state);
+	decorateConnectBtn();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::toggleConnection() {
+////////////////////////////////////////////////////////////////
+	enableConnection(!m_btToggleConnection->GetValue());
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::toggleConnection(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	decorateConnectBtn();
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::changeIntervalSlider(wxScrollEvent& event) {

@@ -18,6 +18,7 @@ class HexDecoder {
 				case RET_SOH:		return "Fetch Data";
 
 				case RET_OK:
+				case RET_MORE:
 				case RET_ERROR:
 				case RET_LIMIT:
 				case RET_INTERRUPT:
@@ -57,14 +58,14 @@ class HexDecoder {
 		/////////////////////////////////////////////////////////
 		static int32_t decodeHexValueAsInt32(const wxString& hexToken) {
 			//  examples are: 00000000,  2C010000,  FAF4FFFF
-			if ( hexToken.length() > 8 ) {
-				std::cerr << "HexDecoder::decodeHexValueAsInteger: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
+			if ( hexToken.length() != 8 ) {
+				std::cerr << "HexDecoder::decodeHexValueAsInt32: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
 				return 0;
 			}
 			
 			for ( unsigned int i = 0; i < hexToken.length(); i++ ) {
 				if ( isxdigit((char)(hexToken[i])) == 0 ) {
-					std::cerr << "HexDecoder::decodeHexValueAsInteger: Digit error at pos: " << i << " - " << hexToken << std::endl;
+					std::cerr << "HexDecoder::decodeHexValueAsInt32: Digit error at pos: " << i << " - " << hexToken << std::endl;
 					return 0;
 				}
 			}
@@ -73,7 +74,48 @@ class HexDecoder {
 			sscanf(hexToken, "%8X", &ret);
 			return ret;
 		}
-
+		
+		/////////////////////////////////////////////////////////
+		static int16_t decodeHexValueAsInt16(const wxString& hexToken) {
+			//  examples are: 0000,  2C01,  FAF4
+			if ( hexToken.length() != 4 ) {
+				std::cerr << "HexDecoder::decodeHexValueAsInt16: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
+				return 0;
+			}
+			
+			for ( unsigned int i = 0; i < hexToken.length(); i++ ) {
+				if ( isxdigit((char)(hexToken[i])) == 0 ) {
+					std::cerr << "HexDecoder::decodeHexValueAsInt16: Digit error at pos: " << i << " - " << hexToken << std::endl;
+					return 0;
+				}
+			}
+			
+			int32_t ret = 0;
+			sscanf(hexToken, "%4X", &ret);
+			return (int16_t)ret;
+		}
+		
+		/////////////////////////////////////////////////////////
+		static int8_t decodeHexValueAsInt8(const wxString& hexToken) {
+			//  examples are: 00,  2C,  FA
+			if ( hexToken.length() != 2 ) {
+				std::cerr << "HexDecoder::decodeHexValueAsInt8: Length error: " << hexToken.length() << " - " << hexToken << std::endl;
+				return 0;
+			}
+			
+			for ( unsigned int i = 0; i < hexToken.length(); i++ ) {
+				if ( isxdigit((char)(hexToken[i])) == 0 ) {
+					std::cerr << "HexDecoder::decodeHexValueAsInt8: Digit error at pos: " << i << " - " << hexToken << std::endl;
+					return 0;
+				}
+			}
+			
+			int32_t ret = 0;
+			sscanf(hexToken, "%2X", &ret);
+			return (int8_t)ret;
+		}
+		
+		
 		/////////////////////////////////////////////////////////
 		static int decodeHexValueAsInteger(const wxString& hexToken) {
 			int ret = 0;
@@ -200,12 +242,20 @@ class SpyHexDecoder : public HexDecoder {
 		wxString hexString;
 		
 		unsigned char context;
+		unsigned char cmd;
 		unsigned char pid;
 		unsigned int  index;
+		unsigned int  portion;
 		
-		const unsigned int IDX_PID			= 2;
-		const unsigned int IDX_MSG_TYPE		= 3;
-		const unsigned int IDX_SIZE			= 3;
+		static const unsigned int IDX_DEF_PID				= 2;
+		static const unsigned int IDX_DEF_SIZE				= 3;
+		
+		static const unsigned int IDX_MSG_TYPE				= 3;
+		
+		static const unsigned int IDX_HB_SIZE				= 3;
+		
+		static const unsigned int IDX_GETTER_PID			= 3;
+		static const unsigned int IDX_GETTER_SIZE			= 4;
 		
 	public:
 	
@@ -218,6 +268,7 @@ class SpyHexDecoder : public HexDecoder {
 			wxString	cmd;
 			wxString	pid;
 			wxString	index;
+			wxString	portion;
 			wxString	more;
 			
 			void clear() {
@@ -225,6 +276,7 @@ class SpyHexDecoder : public HexDecoder {
 				cmd.clear();
 				pid.clear();
 				index.clear();
+				portion.clear();
 				more.clear();
 			}
 		};
@@ -234,8 +286,10 @@ class SpyHexDecoder : public HexDecoder {
 		: HexDecoder()
 		, hexString(hs)
 		, context(0)
+		, cmd(0)
 		, pid(0)
 		, index(0)
+		, portion(0)
 		{
 			unsigned int counter = 0;
 			wxStringTokenizer tokenizer(contextInfo, " ");
@@ -243,9 +297,18 @@ class SpyHexDecoder : public HexDecoder {
 				wxString token = tokenizer.GetNextToken();
 				
 				switch ( counter ) {
-					case 0:	context = decodeHexValueAsInteger(token); break;
-					case 1: pid     = decodeHexValueAsInteger(token); break;
-					case 2: index   = decodeHexValueAsInteger(token); break;
+					case 0:	cmd 	= decodeHexValueAsInteger(token); 
+							break;
+							
+					case 1:	context = decodeHexValueAsInteger(token); 
+							break;
+							
+					case 2: pid     = decodeHexValueAsInteger(token); 
+							break;
+							
+					case 3: index   = decodeHexValueAsInteger(token);
+							portion = decodeHexValueAsInteger(token); 
+							break;
 				}
 				
 				counter++;
@@ -278,9 +341,18 @@ class SpyHexDecoder : public HexDecoder {
 			return;
 		}
 		
-		//////////////////////////////////////////////////////////
+	private:
+		
+		unsigned int getByteCount(const wxString& hexValues);
+		bool readNextHexBytes(wxString& hexValues, unsigned int count, wxString& ret);
+		bool skipNextHexBytes(wxString& hexValues, unsigned int count);
+		
 		void decodeOutbound(SpyHexDecoder::Details& ret);
 		void decodeInbound(SpyHexDecoder::Details& ret);
+		
+		void decodeValuesDefault(SpyHexDecoder::Details& ret, wxString& restToken);
+		void decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString& restToken);
+
 };
 
 #endif

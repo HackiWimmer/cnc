@@ -378,7 +378,7 @@ class CncSpeedController {
 
   protected:
     
-	  double configuredFeedSpeed_MM_SEC;
+    double configuredFeedSpeed_MM_SEC;
     double realtimeFeedSpeed_MM_SEC;
     double startSpeed_MM_SEC;
 

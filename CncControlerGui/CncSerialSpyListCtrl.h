@@ -33,7 +33,7 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		 
 		void refreshList();
 		void startRefreshInterval() { serialTimer.Start(refreshInterval); }
-		void decodeSerialSpyLine(const wxString& line, bool displayInfo = true); 
+		void decodeSerialSpyLine(long linenumber, const wxString& line, bool displayInfo = true); 
 		
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
@@ -75,7 +75,8 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		
 		void onSize(wxSizeEvent& event);
 		void onTimer(wxTimerEvent& event);
-		void onSelectList(wxListEvent& event);
+		void onSelectListItem(wxListEvent& event);
+		void onFocusListItem(wxListEvent& event);
 		
 		wxDECLARE_NO_COPY_CLASS(CncSerialSpyListCtrl);
 		wxDECLARE_EVENT_TABLE();

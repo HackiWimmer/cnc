@@ -728,8 +728,10 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value, CncSpeedMode s) 
 ///////////////////////////////////////////////////////////////////
 void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
-	// always reset the realtime speed value
-	realtimeFeedSpeed_MM_MIN = MAX_FEED_SPEED_VALUE;
+	// always reset the realtime speed value, but don't
+	// use MAX_FEED_SPEED_VALUE here because it is declared as MIN_LONG
+	// realtimeFeedSpeed_MM_MIN = MAX_FEED_SPEED_VALUE;
+	realtimeFeedSpeed_MM_MIN = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	
 	// safety checks 
 	const double maxValue = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
@@ -750,7 +752,7 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) 
 	if ( cnc::dblCompare(configuredFeedSpeed_MM_MIN, value) == false ) {
 		configuredFeedSpeed_MM_MIN = value;
 		
-		if ( THE_APP != NULL && THE_APP->GetBtSpeedControl()->GetValue() == false)
+		if ( THE_APP->GetBtSpeedControl()->GetValue() == false)
 			configuredFeedSpeed_MM_MIN = 0.0;
 		
 		displaySpeedValue(value);
@@ -976,6 +978,9 @@ bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 				default:				curCtlPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 										realtimeFeedSpeed_MM_MIN = ci.feedSpeed;
 										
+										if ( false )
+											std::cout << "CITPosition: speed: " << realtimeFeedSpeed_MM_MIN << std::endl;
+
 										if ( ci.synchronizeAppPos == true )
 											curAppPos.setXYZ(ci.xCtrlPos, ci.yCtrlPos, ci.zCtrlPos);
 			}
