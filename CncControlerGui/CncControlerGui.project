@@ -523,15 +523,13 @@
       </Completion>
     </Configuration>
     <Configuration Name="Release" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
-      <Compiler Options="-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+      <Compiler Options="-g1;-fpic;-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_69_0"/>
         <IncludePath Value="C:/@Development/freeglut/include"/>
         <IncludePath Value="C:/@Development/wxsvg-1.5.16/include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
-        <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
-        <Preprocessor Value="BOOST_STACKTRACE_USE_ADDR2LINE"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">

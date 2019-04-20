@@ -84,7 +84,7 @@ bool CncLargeScaledListCtrl::appendItem(const CncColumContainer& cc ) {
 ///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::appendItems(unsigned int nsize, const CncColumContainer* ccp) {
 ///////////////////////////////////////////////////////////////////
-	if ( rows.size() == LONG_MAX - 1 - nsize) {
+	if ( rows.size() == (size_t)(INT_MAX - 1 - nsize)) {
 		std::cerr << "CncLargeScaledListCtrl::appendItems: Max size reached! Append was rejected" << std::endl;
 		return false;
 	}

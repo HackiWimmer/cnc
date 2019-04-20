@@ -148,10 +148,10 @@ bool SerialEmulatorTextStreamer::writeSetterRawCallback(unsigned char *buffer, u
 	return writeEncodedSetterCallback(si);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
+void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 ///////////////////////////////////////////////////////////////////
-	bodyStream << Streamer::indent3 << wxString::Format("<steps x=\"%ld\" y=\"%ld\" z=\"%ld\"/>\n",
-			                                            (long)dx, (long)dy, (long)dz);
+	bodyStream << Streamer::indent3 << wxString::Format("<steps x=\"%ld\" y=\"%ld\" z=\"%ld\" f=\"%ld\"/>\n",
+			                                            (long)dx, (long)dy, (long)dz, (long)f);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {

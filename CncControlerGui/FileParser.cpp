@@ -7,6 +7,7 @@
 #include <wx/propgrid/manager.h>
 #include "OSD/CncTimeFunctions.h"
 #include "OSD/webviewOSD.h"
+#include "CncContext.h"
 #include "CncConfigExt.h"
 #include "wxcrafter.h"
 #include "CncCommon.h"
@@ -351,19 +352,28 @@ bool FileParser::process() {
 
 	// first: preprocessing
 	initNextRunPhase(FileParserRunInfo::RP_Preprocesser);
+	GBL_CONTEXT->timestamps.logPreTimeStart();
 	bool ret = preprocess();
+	GBL_CONTEXT->timestamps.logPreTimeEnd();
 	
 	// second: spooling
 	if ( runInfo.processMore() && ret == true ) {
 		initNextRunPhase(FileParserRunInfo::RP_Spool);
 		
+		GBL_CONTEXT->timestamps.logSerialTimeStart();
 		logMeasurementStart();
+
 		ret = spool();
+
 		logMeasurementEnd();
+		GBL_CONTEXT->timestamps.logSerialTimeEnd();
 	} 
 	
-	if ( ret == true )
+	if ( ret == true ) {
+		GBL_CONTEXT->timestamps.logPostTimeStart();
 		ret = postprocess();
+		GBL_CONTEXT->timestamps.logPostTimeEnd();
+	}
 	
 	// at the end reset the selection
 	if ( inboundSourceControl )

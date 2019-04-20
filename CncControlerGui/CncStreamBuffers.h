@@ -192,6 +192,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		wxColour infoColour;
 		wxColour warningColour;
 		wxColour errorColour;
+		wxColour debugColour;
 		
 		///////////////////////////////////////////////////////////
 		virtual void logMessage(const char* m) {
@@ -223,6 +224,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		, infoColour(*wxWHITE)
 		, warningColour(255, 201, 14)
 		, errorColour(*wxRED)
+		, debugColour(128, 0, 255)
 		{}
 
 		///////////////////////////////////////////////////////////
@@ -231,6 +233,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		, infoColour(*wxWHITE)
 		, warningColour(255, 201, 14)
 		, errorColour(*wxRED)
+		, debugColour(128, 0, 255)
 		{}
 
 		///////////////////////////////////////////////////////////
@@ -269,22 +272,35 @@ class CncTraceLogStream : public CncBasicLogStream {
 		}
 		
 		///////////////////////////////////////////////////////////
+		void logDebugMessage(const char* m) {
+			if ( getTextControl() != NULL ) {
+				getTextControl()->SetDefaultStyle(wxTextAttr(debugColour));
+				logMessage(m);
+			}
+		}
+
+		///////////////////////////////////////////////////////////
 		void setInfoColour(const wxColour& c) 		{ infoColour = c; }
 		void setWarningColour(const wxColour& c) 	{ warningColour = c; }
 		void setErrorColour(const wxColour& c) 		{ errorColour = c; }
+		void setDebugColour(const wxColour& c) 		{ debugColour = c; }
 		
 		///////////////////////////////////////////////////////////
 		void logInfo(const char* m) 	{ logInfoMessage(m); }
 		void logWarning(const char* m) 	{ logWarningMessage(m); }
 		void logError(const char* m) 	{ logErrorMessage(m); }
+		void logDebug(const char* m) 	{ logDebugMessage(m); }
 		
 		///////////////////////////////////////////////////////////
 		void logInfoMessage(const std::stringstream& ss) 	{ logInfoMessage(ss.str().c_str()); }
 		void logWarningMessage(const std::stringstream& ss)	{ logWarningMessage(ss.str().c_str()); }
 		void logErrorMessage(const std::stringstream& ss) 	{ logErrorMessage(ss.str().c_str()); }
+		void logDebugMessage(const std::stringstream& ss) 	{ logDebugMessage(ss.str().c_str()); }
+		
 		void logInfo(const std::stringstream& ss) 			{ logInfoMessage(ss.str().c_str()); }
 		void logWarning(const std::stringstream& ss)		{ logWarningMessage(ss.str().c_str()); }
 		void logError(const std::stringstream& ss) 			{ logErrorMessage(ss.str().c_str()); }
+		void logDebug(const std::stringstream& ss) 			{ logDebugMessage(ss.str().c_str()); }
 		
 		///////////////////////////////////////////////////////////
 		const char* getCurrentMessage() const {
@@ -375,3 +391,4 @@ class CncSerialSpyStream : public CncTraceLogStream {
 };
 
 #endif
+

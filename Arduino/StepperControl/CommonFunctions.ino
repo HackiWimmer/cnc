@@ -1,15 +1,68 @@
 #include <Wire.h>
 #include "CommonValues.h"
 
+const char*    LastErrorCodes::messageText;
+
 unsigned char  LastErrorCodes::register1Byte_A;
 unsigned char  LastErrorCodes::register1Byte_B;
 unsigned char  LastErrorCodes::register1Byte_C;
 unsigned char  LastErrorCodes::register1Byte_D;
+unsigned char  LastErrorCodes::register1Byte_E;
+unsigned char  LastErrorCodes::register1Byte_F;
+unsigned char  LastErrorCodes::register1Byte_G;
+unsigned char  LastErrorCodes::register1Byte_H;
 
 int32_t        LastErrorCodes::register4Byte_A;
 int32_t        LastErrorCodes::register4Byte_B;
 int32_t        LastErrorCodes::register4Byte_C;
 int32_t        LastErrorCodes::register4Byte_D;
+int32_t        LastErrorCodes::register4Byte_E;
+int32_t        LastErrorCodes::register4Byte_F;
+int32_t        LastErrorCodes::register4Byte_G;
+int32_t        LastErrorCodes::register4Byte_H;
+
+//////////////////////////////////////////////////////////////
+void LastErrorCodes::writeSerialToSerial() {
+//////////////////////////////////////////////////////////////  
+  while ( waitForSerialData(20000) ) {
+    Serial.write(Serial.read());
+    Serial.print(BLANK);
+  }
+}
+//////////////////////////////////////////////////////////////
+void LastErrorCodes::writeToSerial() {
+//////////////////////////////////////////////////////////////
+  if ( has1ByteInfos() == true ) {
+      Serial.print('[');
+      Serial.print(register1Byte_A); Serial.print(COMMA);
+      Serial.print(register1Byte_B); Serial.print(COMMA);
+      Serial.print(register1Byte_C); Serial.print(COMMA);
+      Serial.print(register1Byte_D); Serial.print(COMMA);
+      Serial.print(register1Byte_E); Serial.print(COMMA);
+      Serial.print(register1Byte_F); Serial.print(COMMA);
+      Serial.print(register1Byte_G); Serial.print(COMMA);
+      Serial.print(register1Byte_H);
+      Serial.print(']');
+  }
+    
+  if ( has4ByteInfos() == true ) {
+      Serial.print('[');
+      Serial.print(register4Byte_A); Serial.print(COMMA);
+      Serial.print(register4Byte_B); Serial.print(COMMA);
+      Serial.print(register4Byte_C); Serial.print(COMMA);
+      Serial.print(register4Byte_D); Serial.print(COMMA);
+      Serial.print(register4Byte_E); Serial.print(COMMA);
+      Serial.print(register4Byte_F); Serial.print(COMMA);
+      Serial.print(register4Byte_G); Serial.print(COMMA);
+      Serial.print(register4Byte_H);
+      Serial.print(']');
+  }
+
+  if ( has1TextInfo() == true ) {
+    Serial.print(BLANK);
+    Serial.print(messageText);
+  }
+}
 
 //////////////////////////////////////////////////////////////
 // "Software Reset" function
@@ -298,78 +351,35 @@ void sendHeartbeat(unsigned char limitState, unsigned char supportState) {
   writeByteValue(255); // reserved
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void pushMessage(const char type, const unsigned char mid, const char* msg) {
+void pushMessage(const char type, const unsigned char eid, WriteFunctionType function) {
 /////////////////////////////////////////////////////////////////////////////////////
   Serial.write(RET_SOH);
+  
     Serial.write(PID_MSG);
     switch ( type ) {
       case MT_WARNING:  Serial.write(MT_WARNING); break;
       case MT_ERROR:    Serial.write(MT_ERROR);   break;
+      case MT_DEBUG:    Serial.write(MT_DEBUG);   break;
       default:          Serial.write(MT_INFO);    break; 
     }
 
-    if ( mid != E_NO_ERROR ) {
+    if ( eid != E_NO_ERROR ) {
       Serial.write(MT_MID_FLAG);
-      Serial.write(mid);
+      Serial.write(eid);
     }
-/*
-    if ( LastErrorCodes::hasInfos() == true ) {
-      char buf[128];
-      
-      if ( LastErrorCodes::has1ByteInfos() == true ) {
-        sprintf(buf, "\nReg1:[%d,%d,%d,%d]\n",     LastErrorCodes::register1Byte_A, 
-                                                   LastErrorCodes::register1Byte_B, 
-                                                   LastErrorCodes::register1Byte_C, 
-                                                   LastErrorCodes::register1Byte_D);
-        Serial.print(buf);
-      }
-      
-      if ( LastErrorCodes::has4ByteInfos() == true ) {
-        sprintf(buf, " Reg4:[%ld,%ld,%ld,%ld]\n", LastErrorCodes::register4Byte_A, 
-                                                   LastErrorCodes::register4Byte_B, 
-                                                   LastErrorCodes::register4Byte_C, 
-                                                   LastErrorCodes::register4Byte_D);
-        Serial.print(buf);
-      }
-     
-      LastErrorCodes::clear();
-    }
-*/
-    if ( msg != NULL )
-      Serial.print(msg);
-    
+
+    function();
+  
   Serial.write(MBYTE_CLOSE);
   Serial.flush();
 }
 /////////////////////////////////////////////////////////////////////////////////////
-void pushInfoMessage(const unsigned char mid, const char* msg) {
-/////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_INFO, mid, msg);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-void pushWarningMessage(const unsigned char mid, const char* msg) {
-/////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_WARNING, mid, msg);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-void pushErrorMessage(const unsigned char mid, const char* msg) {
-/////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_ERROR, mid, msg);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-void pushInfoMessage(const char* msg) {
-/////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_INFO, E_NO_ERROR, msg);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-void pushWarningMessage(const char* msg) {
-/////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_WARNING, E_NO_ERROR, msg);
-}
-/////////////////////////////////////////////////////////////////////////////////////
-void pushErrorMessage(const char* msg) {
-/////////////////////////////////////////////////////////////////////////////////////
-  pushMessage(MT_ERROR, E_NO_ERROR, msg);
+void pushTextMessage(const char type, const char* msg) {
+/////////////////////////////////////////////////////////////////////////////////////  
+  LastErrorCodes::clear();
+  LastErrorCodes::messageText = msg;
+  
+  pushMessage(type, E_NO_ERROR, LastErrorCodes::writeToSerial);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 bool peakSerial(unsigned char& c) {
@@ -515,4 +525,49 @@ int readSerialBytesWithTimeout(byte* buffer, int length, uint32_t timeoutMicros)
     
   return totallyPicked;
 }
+////////////////////////////////////////////////////////////////
+bool readInt8(int32_t& ret) {
+////////////////////////////////////////////////////////////////  
+  byte b[sizeof(int8_t)];
+  const unsigned int size      = sizeof(int8_t);
+  const unsigned int byteCount = readSerialBytesWithTimeout(b, size);
+  
+  if ( size != byteCount )
+    return false;
 
+  ret = (int8_t)b[0];
+
+  return true;  
+}
+////////////////////////////////////////////////////////////////
+bool readInt16(int32_t& ret) {
+////////////////////////////////////////////////////////////////  
+  byte b[sizeof(int16_t)];
+  const unsigned int size      = sizeof(int16_t);
+  const unsigned int byteCount = readSerialBytesWithTimeout(b, size);
+  
+  if ( size != byteCount )
+    return false;
+
+  ret  = (int16_t)b[0] << 8;
+  ret += (int16_t)b[1];
+
+  return true;  
+}
+////////////////////////////////////////////////////////////////
+bool readInt32(int32_t& ret) {
+////////////////////////////////////////////////////////////////  
+  byte b[sizeof(int32_t)];
+  const unsigned int size      = sizeof(int32_t);
+  const unsigned int byteCount = readSerialBytesWithTimeout(b, size);
+  
+  if ( size != byteCount )
+    return false;
+
+  ret  = (int32_t)b[0] << 24;
+  ret += (int32_t)b[1] << 16;
+  ret += (int32_t)b[2] << 8;
+  ret += (int32_t)b[3];
+
+  return true;  
+}

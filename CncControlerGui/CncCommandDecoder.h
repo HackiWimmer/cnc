@@ -52,7 +52,7 @@ struct CncCommandDecoder {
 			virtual ~CallbackInterface() {}
 
 			virtual void notifySetter(const SetterInfo& si) {}
-			virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz) {}
+			virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {}
 
 			virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {}
 			virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {}

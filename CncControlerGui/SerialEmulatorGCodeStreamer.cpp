@@ -33,11 +33,11 @@ void SerialEmulatorGCodeStreamer::notifySetter(const CncCommandDecoder::SetterIn
 	// to overrider the default behavior only
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
+void SerialEmulatorGCodeStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 ///////////////////////////////////////////////////////////////////
 	// to overrider the default behavior only
 	#warning impl: SerialEmulatorGCodeStreamer::notifyMove
-	bodyStream << wxString::Format("(< notifyMove(%ld, %ld, %ld) >)\n", (long)dx, (long)dy, (long)dz);
+	bodyStream << wxString::Format("(< notifyMove(%ld, %ld, %ld, %ld) >)\n", (long)dx, (long)dy, (long)dz, (long)f);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorGCodeStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {

@@ -110,10 +110,10 @@ bool CncController::evaluateI2CData() {
 /////////////////////////////////////////////////////////////////////////////////////
 int32_t CncController::isReadyToRun() {
 /////////////////////////////////////////////////////////////////////////////////////
-  if ( speedController.isInitialized() == false )   { pushErrorMessage(E_SPEED_MGMT_NOT_INITIALIZED);       return 0L; }
-  if ( X->isReadyToRun() == 0L )                    { pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN, "X");    return 0L; }
-  if ( Y->isReadyToRun() == 0L )                    { pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN, "Y");    return 0L; }
-  if ( Z->isReadyToRun() == 0L )                    { pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN, "Z");    return 0L; }
+  if ( speedController.isInitialized() == false )   { pushErrorMessage(E_SPEED_MGMT_NOT_INITIALIZED);  return 0L; }
+  if ( X->isReadyToRun() == 0L )                    { LastErrorCodes::clear(); LastErrorCodes::messageText = "X"; pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN);    return 0L; }
+  if ( Y->isReadyToRun() == 0L )                    { LastErrorCodes::clear(); LastErrorCodes::messageText = "Y"; pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN);    return 0L; }
+  if ( Z->isReadyToRun() == 0L )                    { LastErrorCodes::clear(); LastErrorCodes::messageText = "Z"; pushErrorMessage(E_STEPPER_NOT_READY_TO_RUN);    return 0L; }
   
   return 1L;
 }
@@ -817,5 +817,3 @@ void CncController::setSpeedValue(double fm, bool activateAcceleration) {
     speedController.enableAccelerationXYZ(false);
   }
 }
-
-

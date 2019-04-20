@@ -3,6 +3,7 @@
 #endif
 
 #include <iostream>
+#include <chrono>
 #include "CncConfig.h"
 #include "MainFrame.h"
 #include "CncTimeFunctions.h"
@@ -160,12 +161,22 @@ CncNanoTimestamp CncTimeFunctions::getNanoTimestamp() {
 ////////////////////////////////////////////////////////////////
 CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncTimeval& a, const CncTimeval& b) {
 ////////////////////////////////////////////////////////////////
-	return (a.tv_sec * 1000 * 1000 + a.tv_usec - (b.tv_sec * 1000 * 1000 + b.tv_usec));
+	return getTimeSpan( (a.tv_sec * 1000 * 1000 + a.tv_usec),
+			            (b.tv_sec * 1000 * 1000 + b.tv_usec));
 }
 ////////////////////////////////////////////////////////////////
 CncNanoTimespan CncTimeFunctions::getTimeSpan(const CncNanoTimestamp& a, const CncNanoTimestamp& b) {
 ////////////////////////////////////////////////////////////////
-	 return a - b;
+	static const CncNanoTimespan  epsilon  = 86400 / 2 * std::nano::den; // 12 h
+	static const CncNanoTimestamp midNight = 86400     * std::nano::den;
+	const CncNanoTimespan span 			   = a - b;
+
+	// . . . to support a timespan over one midnight
+	if ( span > epsilon )
+		//     before 00:00 + after 00:00
+		return midNight - b + a;
+
+	return span;
 }
 ////////////////////////////////////////////////////////////////
 void CncTimeFunctions::busyWaitMircoseconds(unsigned int micros) {
@@ -214,7 +225,7 @@ void CncTimeFunctions::sleepMircoseconds(int64_t micros) {
 	struct timespec req;
 	if ( micros >= 1000 * 1000 ) {
 		req.tv_sec  = micros / (1000 * 1000);
-		req.tv_nsec = micros % (1000 * 1000);
+		req.tv_nsec = micros % (1000 * 1000) * 1000;
 	}
 	else {
 		req.tv_sec  = 0;

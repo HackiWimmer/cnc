@@ -197,9 +197,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
 , lruFileList(LruFileList(16))
-, processLastDuartion(0L)
-, processStartTime(wxDateTime::UNow())
-, processEndTime(wxDateTime::UNow())
 , lastTemplateFileNameForPreview(wxT(""))
 , pngAnimation(NULL)
 , stcFileContentPopupMenu(NULL)
@@ -360,11 +357,13 @@ void MainFrame::umPostEvent(const UpdateManagerThread::Event& evt) {
 	
 	// update speed monitor
 	if ( evt.hasFeedSpeedInfo() ) {
-
-		if ( false )
-			std::cout << "evt.hasFeedSpeedInfo(): " << evt.pos.currentSpeedValue << std::endl;
-
-		speedMonitor->setCurrentFeedSpeedValue(evt.pos.currentSpeedValue, evt.pos.configuredSpeedValue);
+		
+		static CncSpeedMonitor::SpeedData sd;
+		sd.configured_MM_MIN = evt.pos.configuredSpeedValue;
+		sd.received_MM_MIN	 = evt.pos.currentSpeedValue;
+		sd.measured_MM_MIN	 = cnc != NULL ? cnc->getMeasuredFeedSpeed_MM_MIN() : 0.0; 
+		
+		speedMonitor->setCurrentFeedSpeedValue(sd);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -799,13 +798,22 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	showAuiPane("TemplateManager", true);
+
+	CncNanoTimestamp ts1 =  CncTimeFunctions::getNanoTimestamp();
+	CncTimeFunctions::sleepMircoseconds(300);
+	CncNanoTimestamp ts2 =  CncTimeFunctions::getNanoTimestamp();
+	std::cout << ( ts2 - ts1 ) / 1000 << std::endl;
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	hideAuiPane("TemplateManager", true);
+
+
+	std::cout << GBL_CONFIG->connvert_MM_SEC_TO_STP_SEC_X(45.0) << std::endl;
+	std::cout << GBL_CONFIG->connvert_STP_SEC_TO_MM_MIN_X(3000) << std::endl;
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
@@ -983,13 +991,13 @@ void MainFrame::serialTimer(wxTimerEvent& event) {
 		
 		// it's very important to avoid event handling during the idle processing
 		// to prevent the start of furter commands
-		GBL_CONFIG->setAllowEventHandling(false);
+		GBL_CONTEXT->setAllowEventHandling(false);
 		
 		// request the idle information
 		cnc->sendIdleMessage();
 		
 		// reconstructed the previous event handling mode
-		GBL_CONFIG->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
+		GBL_CONTEXT->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
 		
 		// restart due to the previous Stop() command
 		m_serialTimer->Start();
@@ -1664,23 +1672,20 @@ bool MainFrame::initializeCncControl() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	
-	//Initialize the cnc configuartion
-	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
-	
-	if ( cncConfig != NULL ) {
+	if ( GBL_CONFIG != NULL ) {
 		wxString value;
 		
 		// initialize display unit
-		m_unit->SetStringSelection(cncConfig->getDefaultDisplayUnitAsStr());
+		m_unit->SetStringSelection(GBL_CONFIG->getDefaultDisplayUnitAsStr());
 		updateUnit();
 		
 		// initialize com port
-		cncConfig->getDefaultPort(value);
+		GBL_CONFIG->getDefaultPort(value);
 		m_portSelector->SetStringSelection(value);
 		defaultPortName.assign(value);
 		
 		// initialize update interval
-		cncConfig->setUpdateInterval(m_displayInterval->GetValue());
+		GBL_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
 	}
 	 
 	// initialize the postion controls
@@ -2343,10 +2348,10 @@ void MainFrame::updateMonitoring() {
 		motionMonitor->display();
 	}
 	
-	CncConfig::getGlobalCncConfig()->setOnlineUpdateCoordinates(m_menuItemUpdCoors->IsChecked());
-	CncConfig::getGlobalCncConfig()->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
-	CncConfig::getGlobalCncConfig()->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
-	CncConfig::getGlobalCncConfig()->setAllowEventHandling(m_menuItemDebugSerial->IsChecked());
+	GBL_CONTEXT->setOnlineUpdateCoordinates(m_menuItemUpdCoors->IsChecked());
+	GBL_CONTEXT->setAllowEventHandling(m_menuItemAllowEvents->IsChecked());
+	GBL_CONTEXT->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
+	
 	cnc->enableSpyOutput(m_menuItemDebugSerial->IsChecked());
 	cnc->setUpdateToolControlsState(m_menuItemToolControls->IsChecked());
 	
@@ -3585,8 +3590,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	wxASSERT(cnc);
 	bool ret = true;
 	
-	speedMonitor->start(GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
-
 	CncRunEventFilter cef;
 	
 	// deactivate idle requests
@@ -3631,6 +3634,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			
 		} 
 		else {
+			CncSpeedMonitorRunner smr(speedMonitor, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
 			ret = processTemplateIntern();
 		}
 		
@@ -3663,6 +3667,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	cnc->processTrigger(endRun);
 
 	decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
+
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -3699,7 +3704,7 @@ bool MainFrame::processTemplateIntern() {
 		selectMainBookSourcePanel();
 	}
 	
-	processStartTime = wxDateTime::UNow();
+	GBL_CONTEXT->timestamps.logTotalTimeStart();
 	motionMonitor->pushProcessMode();
 	
 	updateStepDelay();
@@ -3707,7 +3712,7 @@ bool MainFrame::processTemplateIntern() {
 	resetMinMaxPositions();
 	updateCncConfigTrace();
 	
-	GBL_CONFIG->setAllowEventHandling(true);
+	GBL_CONTEXT->setAllowEventHandling(true);
 	cnc->resetSetterMap();
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RUN);
 	cnc->enableStepperMotors(true);
@@ -3799,15 +3804,13 @@ bool MainFrame::processTemplateIntern() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::logTimeConsumed() {
 ///////////////////////////////////////////////////////////////////
-	processEndTime = wxDateTime::UNow();
-	processLastDuartion = (processEndTime - processStartTime).GetMilliseconds().ToLong();
-	
-	int n = (int) ( processLastDuartion % 1000);
-	int s = (int) ( processLastDuartion / 1000) % 60 ;
-	int m = (int) ((processLastDuartion / (1000 * 60)) % 60);
-	int h = (int) ((processLastDuartion / (1000 * 60 * 60)) % 24);
-	
-	m_cmdDuration->ChangeValue(wxString::Format("%02d:%02d:%02d.%03d", h, m, s, n));
+	GBL_CONTEXT->timestamps.logTotalTimeEnd();
+	wxString value;
+	m_cmdDuration->ChangeValue(GBL_CONTEXT->timestamps.getTotalTimeConsumedFormated(value));
+
+	std::stringstream ss;
+	ss << GBL_CONTEXT->timestamps;
+	m_cmdDuration->SetToolTip(ss.str().c_str());
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::resetMinMaxPositions() {
@@ -5232,7 +5235,7 @@ void MainFrame::startAnimationControl() {
 	m_cmdDuration->SetForegroundColour(color);
 	m_cmdDuration->Refresh();
 	
-	processStartTime = wxDateTime::UNow();
+	GBL_CONTEXT->timestamps.logTotalTimeStart();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::stopAnimationControl() {
@@ -5244,7 +5247,8 @@ void MainFrame::stopAnimationControl() {
 		if ( pngAnimation->IsRunning() ) {
 			pngAnimation->Stop();
 			pngAnimation->Update();
-			processEndTime = wxDateTime::UNow();
+
+			GBL_CONTEXT->timestamps.logTotalTimeEnd();
 		}
 	}
 }
@@ -5594,7 +5598,7 @@ void MainFrame::rcRun() {
 	
 	// perform a run
 	// Store the current interval
-	int interval = CncConfig::getGlobalCncConfig()->getUpdateInterval();
+	int interval = GBL_CONTEXT->getUpdateInterval();
 	
 	if ( isDebugMode == true ) {
 		
@@ -5613,7 +5617,7 @@ void MainFrame::rcRun() {
 		perspectiveHandler.ensureDebugPerspectiveMinimal();
 		
 		// to see each line during the debug session
-		CncConfig::getGlobalCncConfig()->setUpdateInterval(1);
+		GBL_CONTEXT->setUpdateInterval(1);
 	} else {
 		
 		perspectiveHandler.ensureRunPerspectiveMinimal();
@@ -5623,7 +5627,7 @@ void MainFrame::rcRun() {
 	processTemplateWrapper();
 	
 	// restore the interval
-	CncConfig::getGlobalCncConfig()->setUpdateInterval(interval);
+	GBL_CONTEXT->setUpdateInterval(interval);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcDebug(wxCommandEvent& event) {
@@ -6016,9 +6020,9 @@ void MainFrame::cfgStepDelayDropDown(wxAuiToolBarEvent& event) {
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::UpdateLogger(wxCommandEvent& event) {
+void MainFrame::updateLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( m_showLoggerOnDemand->IsChecked() == false )
+	if ( m_showLoggerOnDemand->GetValue() == false )
 		return;
 	
 	if ( m_logger->IsShownOnScreen() == false ) {
@@ -6559,7 +6563,7 @@ void MainFrame::loopRepeatTest(wxCommandEvent& event) {
 	for ( unsigned int i=0; i<loopCount; i++) {
 		
 		bool ret = processTemplateWrapper( i == 0 );
-		duration += processLastDuartion;
+		duration += GBL_CONTEXT->timestamps.getTotalDurationMillis();
 
 		info.Printf("Loop Counter : % 6d [#]; AVG duration: % 10ld [ms]", i + 1, duration / ( i + 1 ));
 		SetTitle(wxString::Format("%s         [%s]", title, info));
@@ -6710,13 +6714,13 @@ void MainFrame::selectSerialSpyMode(wxCommandEvent& event) {
 void MainFrame::displayIntervalChanged(wxScrollEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	m_displayInterval->SetToolTip(wxString::Format("%d", m_displayInterval->GetValue()));
-	CncConfig::getGlobalCncConfig()->setUpdateInterval(m_displayInterval->GetValue());
+	GBL_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::displayIntervalThumbtrack(wxScrollEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	m_displayInterval->SetToolTip(wxString::Format("%d", m_displayInterval->GetValue()));
-	CncConfig::getGlobalCncConfig()->setUpdateInterval(m_displayInterval->GetValue());
+	GBL_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::displayIntervalKeyDown(wxKeyEvent& event) {
@@ -6724,7 +6728,7 @@ void MainFrame::displayIntervalKeyDown(wxKeyEvent& event) {
 	event.Skip(true);
 
 	m_displayInterval->SetToolTip(wxString::Format("%d", m_displayInterval->GetValue()));
-	CncConfig::getGlobalCncConfig()->setUpdateInterval(m_displayInterval->GetValue());
+	GBL_CONTEXT->setUpdateInterval(m_displayInterval->GetValue());
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::decorateProbeMode(bool probeMode) {
@@ -6817,11 +6821,25 @@ void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 void MainFrame::keyDownLogger(wxKeyEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
-	int c = event.GetUnicodeKey();
+	const int c = event.GetUnicodeKey();
 	
 	if ( c == 'C' && ctlKey == true ) {
+		bool unselect = false;
+		
+		if ( m_logger->HasSelection() == false ) {
+			m_logger->SelectAll();
+			unselect = true;
+		}
+		
 		m_logger->Copy();
+		
+		if ( unselect == true )
+			m_logger->SelectNone();
+			
+		m_logger->Refresh();
 	}
+	
+	event.Skip(true);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::dclickLogger(wxMouseEvent& event) {

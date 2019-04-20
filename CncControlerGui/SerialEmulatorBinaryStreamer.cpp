@@ -61,7 +61,7 @@ bool SerialEmulatorBinaryStreamer::writeSetterRawCallback(unsigned char *buffer,
 	return appendDataBlock(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorBinaryStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
+void SerialEmulatorBinaryStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 ///////////////////////////////////////////////////////////////////
 	// to overrider the default behavior only
 }

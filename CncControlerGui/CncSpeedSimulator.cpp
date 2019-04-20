@@ -1,136 +1,272 @@
+#include <fstream>
+#include <algorithm>
+#include "CncFileNameService.h"
 #include "CncSpeedSimulator.h"
 
+//#define TRACE_SPEED_FLOW
+#define CSE currentSleepEntry
+#define STA statistics
+
+/////////////////////////////////////////////////////////////
+void DelayAccumulator::SleepFlowEntry::traceHeadline(std::ostream& o) {
+/////////////////////////////////////////////////////////////
+	const char* delim = ",";
+	o << "tsNow" 				<< delim;
+	o << "tsRef"				<< delim;
+	o << "tsLast" 				<< delim;
+	o << "tsTarget" 			<< delim;
+	o << "elapsedMicros"		<< delim;
+	o << "incrementMicros" 		<< delim;
+	o << "accumulatedMicros" 	<< delim;
+	o << "sleepIntervalMicros" 	<< delim;
+	o << "stepCountX"			<< delim;
+	o << "stepCountY"			<< delim;
+	o << "stepCountZ"			<< delim;
+
+	o << std::endl;
+
+}
+/////////////////////////////////////////////////////////////
+void DelayAccumulator::SleepFlowEntry::trace(std::ostream& o) {
+/////////////////////////////////////////////////////////////
+	const char* delim = ",";
+	o << tsNow 					<< delim;
+	o << tsRef					<< delim;
+	o << tsLast 				<< delim;
+	o << tsTarget 				<< delim;
+	o << elapsedMicros			<< delim;
+	o << incrementMicros 		<< delim;
+	o << accumulatedMicros 		<< delim;
+	o << sleepIntervalMicros 	<< delim;
+	o << stepCountX				<< delim;
+	o << stepCountY				<< delim;
+	o << stepCountZ				<< delim;
+
+	o << std::endl;
+}
+/////////////////////////////////////////////////////////////
+DelayAccumulator::DelayAccumulator(CncSpeedSimulator* s)
+: simulator(s)
+, STA()
+, CSE()
+, sleepStatistics()
+/////////////////////////////////////////////////////////////
+{
+}
+/////////////////////////////////////////////////////////////
+DelayAccumulator::~DelayAccumulator() {
+/////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////
+void DelayAccumulator::trace(std::ostream& o) {
+/////////////////////////////////////////////////////////////
+	STA.trace(std::cout);
+
+	SleepFlowEntry::traceHeadline(o);
+	for ( auto it = sleepStatistics.begin(); it != sleepStatistics.end(); ++it )
+		it->trace(o);
+}
+/////////////////////////////////////////////////////////////
+void DelayAccumulator::initialize() {
+/////////////////////////////////////////////////////////////
+	CSE.reset();
+	CSE.accumulatedMicros	= 0LL;
+	CSE.tsRef	 			= CncTimeFunctions::getNanoTimestamp();
+	CSE.tsLast 				= CSE.tsRef;
+
+	STA.reset();
+}
+/////////////////////////////////////////////////////////////
+int64_t DelayAccumulator::perform(bool force) {
+/////////////////////////////////////////////////////////////
+	const int64_t ret = performB(force);
+
+	#ifdef TRACE_SPEED_FLOW
+
+		CSE.stepCountX	= simulator->X.AP.stepCounter;
+		CSE.stepCountY	= simulator->Y.AP.stepCounter;
+		CSE.stepCountZ	= simulator->Z.AP.stepCounter;
+
+		sleepStatistics.push_back(CSE);
+
+	#endif
+
+	CSE.next();
+
+	return ret;
+}
+/////////////////////////////////////////////////////////////
+int64_t DelayAccumulator::performA(bool force) {
+/////////////////////////////////////////////////////////////
+	return 0;
+}
+/////////////////////////////////////////////////////////////
+int64_t DelayAccumulator::performB(bool force) {
+/////////////////////////////////////////////////////////////
+	const CncNanoTimespan threshold = force == false ? DefaultThresholdMicros : 0LL;
+	CSE.tsNow         				= CncTimeFunctions::getNanoTimestamp();
+	CSE.elapsedMicros 				= CSE.tsRef > 0LL ? (CSE.tsNow - CSE.tsRef) / 1000 : 0LL;
+
+	// check if further accumulation is necessary
+	if ( CSE.accumulatedMicros < threshold )
+		return 0;
+
+	if ( CSE.elapsedMicros == 0LL ) {
+		CSE.tsRef = CSE.tsNow;
+		return 0;
+	}
+
+	// reduce the accumulated offset by the time which is already gone
+	CSE.accumulatedMicros -= ( CSE.elapsedMicros );
+
+	//tsRef = CncTimeFunctions::getNanoTimestamp();
+	CSE.tsRef = CSE.tsNow;
+
+	// check if further accumulation is necessary
+	if ( CSE.accumulatedMicros < threshold )
+		return 0;
+
+	// sleep
+	sleepMicros(CSE.accumulatedMicros);
+	return CSE.accumulatedMicros;
+}
+/////////////////////////////////////////////////////////////
+int64_t DelayAccumulator::performC(bool force) {
+/////////////////////////////////////////////////////////////
+	const CncNanoTimespan  thresholdMicros 	= force == false ? DefaultThresholdMicros : 0LL;
+	CSE.tsNow           		= CncTimeFunctions::getNanoTimestamp();
+	CSE.tsTarget	      		= CSE.tsRef  + CSE.accumulatedMicros * 1000;
+	CSE.elapsedMicros   		= (CSE.tsNow - CSE.tsLast) / 1000;
+
+	auto log = [&](int64_t ret) {
+		CSE.tsLast = CncTimeFunctions::getNanoTimestamp();
+		return ret;
+	};
+
+	if ( CSE.tsNow >= CSE.tsTarget ) {
+		STA.targetSmaller++;
+
+		// In this case the progress is to slow and
+		// we have to catch up time
+		CSE.accumulatedMicros = 0LL;
+		return log(-1LL);
+	}
+	else {
+		//
+		STA.targetLarger++;
+
+		const int64_t diffMicros = (CSE.tsTarget - CSE.tsNow) / 1000; //- elapsedMicros;
+
+		if ( diffMicros >= thresholdMicros ) {
+			CSE.accumulatedMicros = 0LL;
+			return log(sleepMicros(diffMicros));
+		}
+	}
+
+	return log(0LL);
+}
+/////////////////////////////////////////////////////////////
+bool DelayAccumulator::incMicros(int64_t micros){
+/////////////////////////////////////////////////////////////
+	if ( CSE.accumulatedMicros == 0LL ) {
+		CSE.tsRef  = CncTimeFunctions::getNanoTimestamp();
+		CSE.tsLast = CSE.tsRef;
+	}
+
+	CSE.incrementMicros    = micros;
+	CSE.accumulatedMicros += micros;
+
+	return ( CSE.accumulatedMicros >= DefaultThresholdMicros );
+}
+/////////////////////////////////////////////////////////////
+int64_t DelayAccumulator::sleepMicros(int64_t micros) {
+/////////////////////////////////////////////////////////////
+	if ( STA.minSleepInterval == 0 ) STA.minSleepInterval = micros;
+	else							 STA.minSleepInterval = std::min(STA.minSleepInterval, micros);
+
+	if ( STA.maxSleepInterval == 0 ) STA.maxSleepInterval = micros;
+	else							 STA.maxSleepInterval = std::max(STA.maxSleepInterval, micros);
+
+	STA.avgSleepInterval = ( statistics.avgSleepInterval + micros ) / 2;
+	STA.sleeped++;
+
+	CSE.sleepIntervalMicros = micros;
+	CncTimeFunctions::sleepMircoseconds(micros);
+
+	return micros;
+}
+
+
+
+
 //////////////////////////////////////////////////////////////////////////
-CncSpeedSimulator::CncSpeedSimulator(
- unsigned int cStepStaticOffset, unsigned int cStepLoopOffset,
- double pitchX, unsigned int stepsX, unsigned int pulseOffsetX,
- double pitchY, unsigned int stepsY, unsigned int pulseOffsetY,
- double pitchZ, unsigned int stepsZ, unsigned int pulseOffsetZ)
-: CncSpeedController() 
-, traceFlag(false)
-, totalAccumulatedOffsetX(0LL)
-, totalAccumulatedOffsetY(0LL)
-, totalAccumulatedOffsetZ(0LL)
-, currentAccumulatedOffset(0LL)
-, stepCounterX(0L)
-, stepCounterY(0L)
-, stepCounterZ(0L)
-, tsLastPerform(0LL)
+CncSpeedSimulator::CncSpeedSimulator()
+: CncSpeedController()
+, delayAccumulator(this)
 //////////////////////////////////////////////////////////////////////////
 {
+	X.AP.startPeriodStepsMin  = 250;
+    X.AP.stopPeriodStepsMin   = 250;
+	
+	delayAccumulator.initialize();
 }
 //////////////////////////////////////////////////////////////////////////
 CncSpeedSimulator::~CncSpeedSimulator()  {
 //////////////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////////////
-void CncSpeedSimulator::reset() {
-//////////////////////////////////////////////////////////////////////////
-	totalAccumulatedOffsetX  = 0LL;
-	totalAccumulatedOffsetY  = 0LL;
-	totalAccumulatedOffsetZ  = 0LL;
-	currentAccumulatedOffset = 0LL;
-	
-	tsLastPerform            = CncTimeFunctions::getNanoTimestamp();
-	
-	stepCounterX             = 0L;
-	stepCounterY             = 0L;
-	stepCounterZ             = 0L;
-}
-//////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateOneStepX()  { 
 //////////////////////////////////////////////////////////////////////////
-	// .totalOffset              [usec] :
-	// .synthSpeedDelay     [usec/step] :
-	// getNextAccelDelayX() :
-	
 	const unsigned int accelDelay = getNextAccelDelayX();
+	const int64_t d = X.totalOffset + X.synthSpeedDelay + accelDelay;
 	
-	stepCounterX++;
-	const uint64_t v = X.totalOffset + X.synthSpeedDelay + accelDelay; 
-	totalAccumulatedOffsetX  += v;
-	currentAccumulatedOffset += v; 
-	
-	#warning accel
-	if ( accelDelay )
-		;;//std::cout << accelDelay << std::endl;
-		
-		
-		
-
+	delayAccumulator.incMicros(d);
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateOneStepY()  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterY++;
-	const uint64_t v = Y.totalOffset + Y.synthSpeedDelay + getNextAccelDelayY(); 
-	totalAccumulatedOffsetY  += v; 
-	currentAccumulatedOffset += v; 
+	const unsigned int accelDelay = getNextAccelDelayY();
+	const int64_t d = Y.totalOffset + Y.synthSpeedDelay + accelDelay;
+
+	delayAccumulator.incMicros(d);
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::simulateOneStepZ()  { 
 //////////////////////////////////////////////////////////////////////////
-	stepCounterZ++;
-	const uint64_t v = Z.totalOffset + Z.synthSpeedDelay + getNextAccelDelayZ(); 
-	totalAccumulatedOffsetZ  += v; 
-	currentAccumulatedOffset += v; 
+	const unsigned int accelDelay = getNextAccelDelayZ();
+	const int64_t d = Z.totalOffset + Z.synthSpeedDelay + accelDelay;
+
+	delayAccumulator.incMicros(d);
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::performCurrentOffset(bool force) {
 //////////////////////////////////////////////////////////////////////////
-	const CncNanoTimespan threshold = force == false ? CncTimeFunctions::minWaitPeriod / 1000 : 0LL;
-	
-	// check if further accumulation is necessary
-	if ( currentAccumulatedOffset < threshold )
-		return;
-
-	// calc time elapsed since the last wait
-	const CncNanoTimestamp now        = CncTimeFunctions::getNanoTimestamp();
-	const CncNanoTimespan elapsedTime = tsLastPerform > 0LL ? now - tsLastPerform : 0LL;
-	
-	// reduce the accumulated offset by the time which is already gone
-//std::cout << currentAccumulatedOffset << "," << elapsedTime / 1000 << std::endl;
-	currentAccumulatedOffset -= ( elapsedTime / 1000 );
-	
-	if ( currentAccumulatedOffset < 0LL) {
-		//tsLastPerform = now;
-		//return;
-		
-		//currentAccumulatedOffset = 0LL;
-	}
-	
-	//tsAfterLastWait = CncTimeFunctions::getNanoTimestamp();
-	tsLastPerform = now;
-
-	// check if further accumulation is necessary
-	if ( currentAccumulatedOffset < threshold )
-		return;
-	
-	// sleep
-	//std::cout << currentAccumulatedOffset << std::endl;
-	CncTimeFunctions::sleepMircoseconds(currentAccumulatedOffset);
-	
-	//currentAccumulatedOffset = 0LL;
+	delayAccumulator.perform(force);
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::initMove(int32_t dx, int32_t dy, int32_t dz) {
 //////////////////////////////////////////////////////////////////////////
 	CncSpeedController::initMove(dx, dy, dz);
 	
-	
 	#warning accel
 	//std::cout << X.AP << std::endl;
 	
+
+	enableAccelerationXYZ(true);
+	//std::cout << this->X << std::endl;
 	
 	
-	enableAccelerationXYZ(false);
-	
-	
-	
-	reset();
+	delayAccumulator.initialize();
 }
 //////////////////////////////////////////////////////////////////////////
 void CncSpeedSimulator::completeMove() {
 //////////////////////////////////////////////////////////////////////////
-	// currently nothing to do
+	#ifdef TRACE_SPEED_FLOW
+	
+		wxString fn(wxString::Format("%s/tx.%lld.txt", CncFileNameService::getTempDir(), CncTimeFunctions::getNanoTimestamp()));
+		std::ofstream ofs (fn.c_str().AsChar(), std::ofstream::out);
+		delayAccumulator.trace(ofs);
+		ofs.close();
+		
+	#endif
 }

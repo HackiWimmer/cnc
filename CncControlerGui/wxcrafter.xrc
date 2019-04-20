@@ -5835,10 +5835,10 @@ Interval [ms]:</label>
                                                                   </object>
                                                                   <object class="sizeritem">
                                                                     <flag>wxALL</flag>
-                                                                    <minsize>70,14</minsize>
+                                                                    <minsize>86,14</minsize>
                                                                     <object class="wxTextCtrl" name="m_cmdDuration">
                                                                       <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
-                                                                      <size>70,14</size>
+                                                                      <size>86,14</size>
                                                                       <bg>wxSYS_COLOUR_INACTIVECAPTION</bg>
                                                                       <font>
                                                                         <size>8</size>
@@ -5851,7 +5851,7 @@ Interval [ms]:</label>
                                                                       <tooltip>
                                                                         <![CDATA[Total time consumed]]>
                                                                       </tooltip>
-                                                                      <value>00:00:00.000</value>
+                                                                      <value>00:00:00.123456</value>
                                                                     </object>
                                                                   </object>
                                                                 </object>
@@ -6707,14 +6707,14 @@ Interval [ms]:</label>
                         <font>
                           <size>7</size>
                           <style>normal</style>
-                          <weight>normal</weight>
+                          <weight>bold</weight>
                           <family>swiss</family>
                           <underlined>0</underlined>
-                          <face>Segoe UI</face>
+                          <face>Segoe UI Semibold</face>
                         </font>
                         <object class="notebookpage">
-                          <label/>
-                          <bitmap>bitmaps/start-here.png</bitmap>
+                          <label>S</label>
+                          <bitmap>bitmaps/go-jump-today.png</bitmap>
                           <selected>0</selected>
                           <object class="wxPanel" name="m_panelStartupTrace">
                             <style>wxTAB_TRAVERSAL</style>
@@ -6750,8 +6750,8 @@ Interval [ms]:</label>
                           </object>
                         </object>
                         <object class="notebookpage">
-                          <label/>
-                          <bitmap>bitmaps/dialog-information-3 (2).png</bitmap>
+                          <label>L</label>
+                          <bitmap>bitmaps/pencil-add.png</bitmap>
                           <selected>1</selected>
                           <object class="wxPanel" name="m_panel5878">
                             <style>wxTAB_TRAVERSAL</style>
@@ -6787,7 +6787,7 @@ Interval [ms]:</label>
                                 <flag>wxALL|wxEXPAND</flag>
                                 <object class="wxFlexGridSizer">
                                   <cols>1</cols>
-                                  <rows>0</rows>
+                                  <rows>5</rows>
                                   <vgap>0</vgap>
                                   <hgap>0</hgap>
                                   <growablecols/>
@@ -6795,8 +6795,10 @@ Interval [ms]:</label>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
                                     <border>1</border>
+                                    <minsize>26,26</minsize>
                                     <object class="wxBitmapButton" name="m_clearLogger">
                                       <bitmap>bitmaps/16-clean.png</bitmap>
+                                      <size>26,26</size>
                                       <style>wxBU_AUTODRAW</style>
                                       <tooltip>
                                         <![CDATA[Clear Logger Panel]]>
@@ -6807,8 +6809,10 @@ Interval [ms]:</label>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
                                     <border>1</border>
+                                    <minsize>26,26</minsize>
                                     <object class="wxBitmapButton" name="m_copyLogger">
                                       <bitmap>bitmaps/edit-copy-7.png</bitmap>
+                                      <size>26,26</size>
                                       <style>wxBU_AUTODRAW</style>
                                       <tooltip>
                                         <![CDATA[Copy Logger Panel]]>
@@ -6817,14 +6821,23 @@ Interval [ms]:</label>
                                     </object>
                                   </object>
                                   <object class="sizeritem">
+                                    <flag>wxALL|wxEXPAND</flag>
+                                    <border>1</border>
+                                    <object class="wxStaticLine" name="m_staticLine7605">
+                                      <style>wxLI_HORIZONTAL</style>
+                                    </object>
+                                  </object>
+                                  <object class="sizeritem">
                                     <flag>wxALL</flag>
-                                    <border>5</border>
-                                    <object class="wxCheckBox" name="m_showLoggerOnDemand">
-                                      <tooltip>
-                                        <![CDATA[Show on demand]]>
-                                      </tooltip>
+                                    <border>1</border>
+                                    <minsize>26,26</minsize>
+                                    <object class="wxBitmapToggleButton" name="m_showLoggerOnDemand">
                                       <style/>
-                                      <label/>
+                                      <size>26,26</size>
+                                      <bitmap>bitmaps/lightbulb-off.png</bitmap>
+                                      <tooltip>
+                                        <![CDATA[Show Logger on demand]]>
+                                      </tooltip>
                                       <checked>1</checked>
                                     </object>
                                   </object>
@@ -8777,7 +8790,7 @@ State</label>
                                   <object class="sizeritem">
                                     <flag>wxALL</flag>
                                     <minsize>26,60</minsize>
-                                    <object class="wxButton" name="m_button7561">
+                                    <object class="wxButton" name="m_btOpenSpyDetailWindow">
                                       <label/>
                                       <style/>
                                       <size>26, 60</size>
@@ -9099,11 +9112,19 @@ State</label>
             <growablerows>0</growablerows>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
-              <object class="wxNotebook" name="m_notebook7508">
+              <object class="wxNotebook" name="m_notebookSpeedMonitor">
                 <style>wxBK_RIGHT|wxBK_DEFAULT</style>
+                <font>
+                  <size>7</size>
+                  <style>normal</style>
+                  <weight>bold</weight>
+                  <family>swiss</family>
+                  <underlined>0</underlined>
+                  <face>Segoe UI Semibold</face>
+                </font>
                 <object class="notebookpage">
-                  <label/>
-                  <bitmap>bitmaps/snap-guideline.png</bitmap>
+                  <label>P</label>
+                  <bitmap>bitmaps/application-side-list.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panel7502">
                     <style>wxTAB_TRAVERSAL</style>
@@ -9355,7 +9376,7 @@ State</label>
                   </object>
                 </object>
                 <object class="notebookpage">
-                  <label/>
+                  <label>F</label>
                   <bitmap>bitmaps/sports-shuttlecock.png</bitmap>
                   <selected>0</selected>
                   <object class="wxPanel" name="m_panel7504">
@@ -13379,11 +13400,11 @@ Trace</label>
       <object class="sizeritem" name="flexGridSizer7523">
         <flag>wxALL|wxEXPAND</flag>
         <object class="wxFlexGridSizer">
-          <cols>8</cols>
+          <cols>11</cols>
           <rows>1</rows>
           <vgap>0</vgap>
           <hgap>0</hgap>
-          <growablecols>7</growablecols>
+          <growablecols>8</growablecols>
           <growablerows>0</growablerows>
           <object class="sizeritem">
             <flag>wxALL</flag>
@@ -13407,6 +13428,20 @@ Trace</label>
             <flag>wxALL</flag>
             <border>1</border>
             <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btToggleMeasurePointsAxis">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/appointment-new.png</bitmap>
+              <tooltip>
+                <![CDATA[Show Measure Points]]>
+              </tooltip>
+              <checked>1</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
             <object class="wxBitmapToggleButton" name="m_btToggleConfiguredAxis">
               <style/>
               <size>26,26</size>
@@ -13421,14 +13456,44 @@ Trace</label>
             <flag>wxALL</flag>
             <border>1</border>
             <minsize>26,26</minsize>
-            <object class="wxBitmapToggleButton" name="m_btToggleMeasurePointsAxis">
+            <object class="wxBitmapToggleButton" name="m_btToggleMeasuredSpeedAxis">
+              <style/>
+              <size>26,26</size>
+              <bitmap>bitmaps/appointment-new-5.png</bitmap>
+              <tooltip>
+                <![CDATA[Show Measured Speed]]>
+              </tooltip>
+              <checked>1</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>1</border>
+            <minsize>26,26</minsize>
+            <object class="wxBitmapToggleButton" name="m_btToggleReceivedSpeedAxis">
               <style/>
               <size>26,26</size>
               <bitmap>bitmaps/appointment-soon.png</bitmap>
               <tooltip>
-                <![CDATA[Show Measure Points]]>
+                <![CDATA[Show Received Speed]]>
               </tooltip>
               <checked>1</checked>
+            </object>
+          </object>
+          <object class="sizeritem">
+            <flag>wxALL</flag>
+            <border>5</border>
+            <object class="wxStaticText" name="m_staticText7610">
+              <label>[mm/min]</label>
+              <style/>
+              <font>
+                <size>7</size>
+                <style>normal</style>
+                <weight>bold</weight>
+                <family>swiss</family>
+                <underlined>0</underlined>
+                <face>Segoe UI</face>
+              </font>
             </object>
           </object>
           <object class="sizeritem">
@@ -13442,35 +13507,35 @@ Trace</label>
             <flag>wxALL</flag>
             <border>1</border>
             <minsize>26,26</minsize>
-            <object class="wxBitmapToggleButton" name="m_btClear">
-              <style/>
-              <size>26,26</size>
+            <object class="wxBitmapButton" name="m_btClear">
               <bitmap>bitmaps/16-clean.png</bitmap>
+              <size>26,26</size>
+              <style>wxBU_AUTODRAW</style>
               <tooltip>
-                <![CDATA[Clear]]>
+                <![CDATA[Clear Speed Monitor]]>
               </tooltip>
-              <checked>1</checked>
+              <default>0</default>
             </object>
           </object>
           <object class="sizeritem">
             <flag>wxALL</flag>
             <border>1</border>
             <minsize>26,26</minsize>
-            <object class="wxBitmapToggleButton" name="m_btSave">
-              <style/>
-              <size>26,26</size>
+            <object class="wxBitmapButton" name="m_btSave">
               <bitmap>bitmaps/16-file_save.png</bitmap>
+              <size>26,26</size>
+              <style>wxBU_AUTODRAW</style>
               <tooltip>
-                <![CDATA[Save]]>
+                <![CDATA[Save Speed Monitor]]>
               </tooltip>
-              <checked>1</checked>
+              <default>0</default>
             </object>
           </object>
           <object class="sizeritem" name="flexGridSizer7532">
             <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
             <border>1</border>
             <object class="wxFlexGridSizer">
-              <cols>2</cols>
+              <cols>3</cols>
               <rows>1</rows>
               <vgap>0</vgap>
               <hgap>0</hgap>
@@ -13502,6 +13567,22 @@ Interval:</label>
                   <max>250</max>
                   <value>50</value>
                   <size>90,-1</size>
+                </object>
+              </object>
+              <object class="sizeritem">
+                <flag>wxALL</flag>
+                <border>3</border>
+                <object class="wxStaticText" name="m_staticText7614">
+                  <label>[ms]</label>
+                  <style/>
+                  <font>
+                    <size>7</size>
+                    <style>normal</style>
+                    <weight>bold</weight>
+                    <family>swiss</family>
+                    <underlined>0</underlined>
+                    <face>Segoe UI</face>
+                  </font>
                 </object>
               </object>
             </object>

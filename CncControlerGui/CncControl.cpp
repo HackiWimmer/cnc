@@ -32,7 +32,6 @@ CncControl::CncControl(CncPortType pt)
 , runContinuousMove(false)
 , setterMap()
 , serialPort(NULL)
-, cncConfig(NULL)
 , zeroAppPos(0,0,0)
 , startAppPos(0,0,0)
 , curAppPos(0,0,0)
@@ -66,9 +65,6 @@ CncControl::CncControl(CncPortType pt)
 	setToolState(true);
 	
 	serialPort->enableSpyOutput();
-	
-	// create default config
-	cncConfig = CncConfig::getGlobalCncConfig();
 }
 ///////////////////////////////////////////////////////////////////
 CncControl::~CncControl() {
@@ -87,27 +83,27 @@ CncControl::~CncControl() {
 const CncDoublePosition CncControl::getStartPosMetric() {
 //////////////////////////////////////////////////////////////////
 	CncDoublePosition retValue;
-	retValue.setXYZ(startAppPos.getX() * cncConfig->getDisplayFactX(),
-				    startAppPos.getY() * cncConfig->getDisplayFactY(),
-	                startAppPos.getZ() * cncConfig->getDisplayFactZ());
+	retValue.setXYZ(startAppPos.getX() * GBL_CONFIG->getDisplayFactX(),
+				    startAppPos.getY() * GBL_CONFIG->getDisplayFactY(),
+	                startAppPos.getZ() * GBL_CONFIG->getDisplayFactZ());
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getCurAppPosMetric() {
 //////////////////////////////////////////////////////////////////
 	CncDoublePosition retValue;
-	retValue.setXYZ(curAppPos.getX() * cncConfig->getDisplayFactX(),
-				    curAppPos.getY() * cncConfig->getDisplayFactY(),
-	                curAppPos.getZ() * cncConfig->getDisplayFactZ());
+	retValue.setXYZ(curAppPos.getX() * GBL_CONFIG->getDisplayFactX(),
+				    curAppPos.getY() * GBL_CONFIG->getDisplayFactY(),
+	                curAppPos.getZ() * GBL_CONFIG->getDisplayFactZ());
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getCurCtlPosMetric() {
 //////////////////////////////////////////////////////////////////
 	CncDoublePosition retValue;
-	retValue.setXYZ(curCtlPos.getX() * cncConfig->getDisplayFactX(),
-				    curCtlPos.getY() * cncConfig->getDisplayFactY(),
-	                curCtlPos.getZ() * cncConfig->getDisplayFactZ());
+	retValue.setXYZ(curCtlPos.getX() * GBL_CONFIG->getDisplayFactX(),
+				    curCtlPos.getY() * GBL_CONFIG->getDisplayFactY(),
+	                curCtlPos.getZ() * GBL_CONFIG->getDisplayFactZ());
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
@@ -127,18 +123,18 @@ const CncLongPosition CncControl::getMaxPositions() {
 const CncDoublePosition CncControl::getMinPositionsMetric() {
 //////////////////////////////////////////////////////////////////
 	CncDoublePosition retValue;
-	retValue.setXYZ(curAppPos.getXMin() * cncConfig->getDisplayFactX(),
-					curAppPos.getYMin() * cncConfig->getDisplayFactY(),
-					curAppPos.getZMin() * cncConfig->getDisplayFactZ());
+	retValue.setXYZ(curAppPos.getXMin() * GBL_CONFIG->getDisplayFactX(),
+					curAppPos.getYMin() * GBL_CONFIG->getDisplayFactY(),
+					curAppPos.getZMin() * GBL_CONFIG->getDisplayFactZ());
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
 const CncDoublePosition CncControl::getMaxPositionsMetric() {
 //////////////////////////////////////////////////////////////////
 	CncDoublePosition retValue;
-	retValue.setXYZ(curAppPos.getXMax() * cncConfig->getDisplayFactX(),
-					curAppPos.getYMax() * cncConfig->getDisplayFactY(),
-					curAppPos.getZMax() * cncConfig->getDisplayFactZ());
+	retValue.setXYZ(curAppPos.getXMax() * GBL_CONFIG->getDisplayFactX(),
+					curAppPos.getYMax() * GBL_CONFIG->getDisplayFactY(),
+					curAppPos.getZMax() * GBL_CONFIG->getDisplayFactZ());
 	return retValue;
 }
 //////////////////////////////////////////////////////////////////
@@ -154,14 +150,14 @@ const CncDoublePosition::Watermarks CncControl::getWaterMarksMetric() {
 	CncDoublePosition::Watermarks retValue;
 
 	CncLongPosition::Watermarks xyz = CncControl::getWaterMarks();
-	retValue.xMin = xyz.xMin * cncConfig->getDisplayFactX();
-	retValue.xMax = xyz.xMax * cncConfig->getDisplayFactX();
+	retValue.xMin = xyz.xMin * GBL_CONFIG->getDisplayFactX();
+	retValue.xMax = xyz.xMax * GBL_CONFIG->getDisplayFactX();
 
-	retValue.yMin = xyz.yMin * cncConfig->getDisplayFactY();
-	retValue.yMax = xyz.yMax * cncConfig->getDisplayFactY();
+	retValue.yMin = xyz.yMin * GBL_CONFIG->getDisplayFactY();
+	retValue.yMax = xyz.yMax * GBL_CONFIG->getDisplayFactY();
 	
-	retValue.zMin = xyz.zMin * cncConfig->getDisplayFactZ();
-	retValue.zMax = xyz.zMax * cncConfig->getDisplayFactZ();
+	retValue.zMin = xyz.zMin * GBL_CONFIG->getDisplayFactZ();
+	retValue.zMax = xyz.zMax * GBL_CONFIG->getDisplayFactZ();
 
 	return retValue;
 }
@@ -267,7 +263,7 @@ void CncControl::resetSetterMap() {
 bool CncControl::setup(bool doReset) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(serialPort);
-	wxASSERT(cncConfig);
+	wxASSERT(GBL_CONFIG);
 	
 	// always reset the map here to definitly reinitianlize the controller
 	resetSetterMap();
@@ -312,20 +308,20 @@ bool CncControl::setup(bool doReset) {
 	
 	// process initial setters
 	Setters setup;
-	setup.push_back(SetterTuple(PID_STEPS_X, cncConfig->getStepsX()));
-	setup.push_back(SetterTuple(PID_STEPS_Y, cncConfig->getStepsY()));
-	setup.push_back(SetterTuple(PID_STEPS_Z, cncConfig->getStepsZ()));
+	setup.push_back(SetterTuple(PID_STEPS_X, GBL_CONFIG->getStepsX()));
+	setup.push_back(SetterTuple(PID_STEPS_Y, GBL_CONFIG->getStepsY()));
+	setup.push_back(SetterTuple(PID_STEPS_Z, GBL_CONFIG->getStepsZ()));
 	
-	setup.push_back(SetterTuple(PID_PITCH_X, convertDoubleToCtrlLong(PID_PITCH_X, cncConfig->getPitchX())));
-	setup.push_back(SetterTuple(PID_PITCH_Y, convertDoubleToCtrlLong(PID_PITCH_Y, cncConfig->getPitchY())));
-	setup.push_back(SetterTuple(PID_PITCH_Z, convertDoubleToCtrlLong(PID_PITCH_Z, cncConfig->getPitchZ())));
+	setup.push_back(SetterTuple(PID_PITCH_X, convertDoubleToCtrlLong(PID_PITCH_X, GBL_CONFIG->getPitchX())));
+	setup.push_back(SetterTuple(PID_PITCH_Y, convertDoubleToCtrlLong(PID_PITCH_Y, GBL_CONFIG->getPitchY())));
+	setup.push_back(SetterTuple(PID_PITCH_Z, convertDoubleToCtrlLong(PID_PITCH_Z, GBL_CONFIG->getPitchZ())));
 	
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_X,  cncConfig->getLowPulsWidthX()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Y,  cncConfig->getLowPulsWidthY()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Z,  cncConfig->getLowPulsWidthZ()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_X, cncConfig->getHighPulsWidthX()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Y, cncConfig->getHighPulsWidthY()));
-	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Z, cncConfig->getHighPulsWidthZ()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_X,  GBL_CONFIG->getLowPulsWidthX()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Y,  GBL_CONFIG->getLowPulsWidthY()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_LOW_Z,  GBL_CONFIG->getLowPulsWidthZ()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_X, GBL_CONFIG->getHighPulsWidthX()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Y, GBL_CONFIG->getHighPulsWidthY()));
+	setup.push_back(SetterTuple(PID_PULSE_WIDTH_HIGH_Z, GBL_CONFIG->getHighPulsWidthZ()));
 	
 	SetterValueList accelList;
 	accelList.push_back(GBL_CONFIG->getAccelStartSpeedX_MM_MIN()/60);
@@ -336,9 +332,9 @@ bool CncControl::setup(bool doReset) {
 	accelList.push_back(GBL_CONFIG->getAccelStopSpeedZ_MM_MIN()/60);
 	setup.push_back(SetterTuple(PID_ACCEL_PROFILE, accelList));
 	
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, cncConfig->getReplyThresholdStepsX()));
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, cncConfig->getReplyThresholdStepsY()));
-	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, cncConfig->getReplyThresholdStepsZ()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_X, GBL_CONFIG->getReplyThresholdStepsX()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, GBL_CONFIG->getReplyThresholdStepsY()));
+	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, GBL_CONFIG->getReplyThresholdStepsZ()));
 	
 	#warning move these flags to configuration
 	int32_t dirValueX = INVERSED_INCREMENT_DIRECTION_VALUE;
@@ -516,8 +512,8 @@ void CncControl::setZeroPos(bool x, bool y, bool z) {
 	auto setToZeroPosZ = [&]() {
 		int32_t val = 0L;
 		
-		if ( cncConfig->getReferenceIncludesWpt() == true )
-			val = (long)round(cncConfig->getWorkpieceThickness() * cncConfig->getCalculationFactZ());
+		if ( GBL_CONFIG->getReferenceIncludesWpt() == true )
+			val = (long)round(GBL_CONFIG->getWorkpieceThickness() * GBL_CONFIG->getCalculationFactZ());
 		
 		curAppPos.setZ(val);
 		zeroAppPos.setZ(val);
@@ -639,8 +635,7 @@ bool CncControl::reset() {
 ///////////////////////////////////////////////////////////////////
 unsigned int CncControl::getDurationCount() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	return cncConfig->getDurationCount();
+	return GBL_CONFIG->getDurationCount();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::hasNextDuration() {
@@ -681,9 +676,7 @@ bool CncControl::isLastDuration() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToBottom() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	
-	double curZPos = curAppPos.getZ() * cncConfig->getDisplayFactZ(); // we need it as mm
+	double curZPos = curAppPos.getZ() * GBL_CONFIG->getDisplayFactZ(); // we need it as mm
 	double moveZ   = curZPos * (-1);
 	
 	bool ret = true;
@@ -701,10 +694,8 @@ bool CncControl::moveZToBottom() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToTop() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	
-	double topZPos = cncConfig->getCurZDistance(); //cncConfig->getMaxZDistance();
-	double curZPos = curAppPos.getZ() * cncConfig->getDisplayFactZ(); // we need it as mm
+	double topZPos = GBL_CONFIG->getCurZDistance(); //GBL_CONFIG->getMaxZDistance();
+	double curZPos = curAppPos.getZ() * GBL_CONFIG->getDisplayFactZ(); // we need it as mm
 	double moveZ   = topZPos - curZPos;
 	
 	bool ret = true;
@@ -812,21 +803,21 @@ bool CncControl::isPositionOutOfRange(const CncLongPosition& pos, bool trace) {
 		CncLongPosition::Watermarks wm;
 		pos.getWatermarks(wm);
 		
-		if ( (wm.xMax - wm.xMin)/cncConfig->getCalculationFactX() > cncConfig->getMaxDimensionX() ) error = true;
-		if ( (wm.yMax - wm.yMin)/cncConfig->getCalculationFactY() > cncConfig->getMaxDimensionY() ) error = true;
-		if ( (wm.zMax - wm.zMin)/cncConfig->getCalculationFactZ() > cncConfig->getMaxDimensionZ() ) error = true;
+		if ( (wm.xMax - wm.xMin)/GBL_CONFIG->getCalculationFactX() > GBL_CONFIG->getMaxDimensionX() ) error = true;
+		if ( (wm.yMax - wm.yMin)/GBL_CONFIG->getCalculationFactY() > GBL_CONFIG->getMaxDimensionY() ) error = true;
+		if ( (wm.zMax - wm.zMin)/GBL_CONFIG->getCalculationFactZ() > GBL_CONFIG->getMaxDimensionZ() ) error = true;
 	
 		if ( error == true && trace == true ) {
 			std::cerr << "Position out of range!" << std::endl;
-			std::cerr << " Max valid X dimension: " << cncConfig->getMaxDimensionX() << std::endl;
-			std::cerr << " Max valid Y dimension: " << cncConfig->getMaxDimensionY() << std::endl;
-			std::cerr << " Max valid Z dimension: " << cncConfig->getMaxDimensionZ() << std::endl;
+			std::cerr << " Max valid X dimension: " << GBL_CONFIG->getMaxDimensionX() << std::endl;
+			std::cerr << " Max valid Y dimension: " << GBL_CONFIG->getMaxDimensionY() << std::endl;
+			std::cerr << " Max valid Z dimension: " << GBL_CONFIG->getMaxDimensionZ() << std::endl;
 			std::cerr << " Pos: " << pos << std::endl;
 			std::cerr << " Min Watermark: " << wm.xMin << "," << wm.yMin << "," << wm.zMin << "," << std::endl;
 			std::cerr << " Max Watermark: " << wm.xMax << "," << wm.yMax << "," << wm.zMax << "," << std::endl;
-			std::cerr << " Calculated spread X :" <<  (wm.xMax - wm.xMin)/cncConfig->getCalculationFactX() << std::endl;
-			std::cerr << " Calculated spread Y :" <<  (wm.yMax - wm.yMin)/cncConfig->getCalculationFactY() << std::endl;
-			std::cerr << " Calculated spread Z :" <<  (wm.zMax - wm.zMin)/cncConfig->getCalculationFactZ() << std::endl;
+			std::cerr << " Calculated spread X :" <<  (wm.xMax - wm.xMin)/GBL_CONFIG->getCalculationFactX() << std::endl;
+			std::cerr << " Calculated spread Y :" <<  (wm.yMax - wm.yMin)/GBL_CONFIG->getCalculationFactY() << std::endl;
+			std::cerr << " Calculated spread Z :" <<  (wm.zMax - wm.zMin)/GBL_CONFIG->getCalculationFactZ() << std::endl;
 			
 			return true;
 		}
@@ -870,7 +861,8 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 	char type = (char)msg[0];
 	msg = msg.SubString(1, msg.length());
 	
-	THE_APP->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
+	if ( type != 'D' )
+		THE_APP->displayNotification(type, "Controller Callback", msg, (type == 'E' ? 8 : 4));
 	
 	switch ( type ) {
 		
@@ -885,6 +877,11 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 					std::cerr << "Received the following CNC Controller Error:\n" << msg;
 					break;
 					
+		case 'D':	cnc::msg.logDebug(now.Format("Debug Message received: %H:%M:%S.%l\n"));
+					cnc::msg.logDebug(msg);
+					cnc::cex1 << "Serial Remote Debug: " << msg;
+					break;
+
 		default:	cnc::msg.logInfo(now.Format("Info Message received: %H:%M:%S.%l\n"));
 					cnc::msg.logInfo(msg);
 					std::cout << "Received the following CNC Controller Information:\n" << msg;
@@ -900,7 +897,7 @@ bool CncControl::SerialMessageCallback(const ControllerMsgInfo& cmi) {
 bool CncControl::SerialControllerCallback(const ContollerInfo& ci) {
 ///////////////////////////////////////////////////////////////////
 	// Event handling, enables the interrrpt functionality
-	if ( cncConfig->isAllowEventHandling() )
+	if ( GBL_CONTEXT->isAllowEventHandling() )
 		THE_APP->dispatchAll();
 		
 	if ( isInterrupted() )
@@ -1071,16 +1068,22 @@ void CncControl::waitActive(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::SerialCallback() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	
 	if ( isInterrupted() ) {
 		std::cerr << "SerialCallback: Interrupt detected"<< std::endl;
 		return false;
 	}
 
 	// Event handling, enables the interrupt functionallity
-	if ( cncConfig->isAllowEventHandling() )
-		THE_APP->dispatchAll();
+	static CncNanoTimestamp tsLastDispatch = 0;
+	static const CncNanoTimespan threshold = std::nano::den / 4; // 250 ms
+	if ( GBL_CONTEXT->isAllowEventHandling() ) {
+		const CncNanoTimespan span = CncTimeFunctions::getTimeSpan(CncTimeFunctions::getNanoTimestamp(), tsLastDispatch);
+
+		if ( span > threshold ) {
+			THE_APP->dispatchAll();
+			tsLastDispatch = CncTimeFunctions::getNanoTimestamp();
+		}
+	}
 	
 	// display application coordinates
 	postAppPosition(PID_XYZ_POS_MAJOR);
@@ -1099,7 +1102,7 @@ void CncControl::postAppPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 	static CncLongPosition lastAppPos;
 	
-	if ( cncConfig->isOnlineUpdateCoordinates() ) {
+	if ( GBL_CONTEXT->isOnlineUpdateCoordinates() ) {
 		// application position
 		typedef UpdateManagerThread::Event Event;
 		static Event evt;
@@ -1125,7 +1128,7 @@ void CncControl::postAppPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
 void CncControl::postCtlPosition(unsigned char pid) {
 ///////////////////////////////////////////////////////////////////
-	if ( cncConfig->isOnlineUpdateCoordinates() ) {
+	if ( GBL_CONTEXT->isOnlineUpdateCoordinates() ) {
 		// application position
 		typedef UpdateManagerThread::Event Event;
 		static Event evt;
@@ -1280,17 +1283,15 @@ bool CncControl::moveRelLinearStepsXYZ(int32_t x1, int32_t y1, int32_t z1, bool 
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelMetricZ(double z) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	const double sZ = z * cncConfig->getCalculationFactZ();
+	const double sZ = z * GBL_CONFIG->getCalculationFactZ();
 	
 	return moveRelStepsZ((int32_t)round(sZ));
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearMetricXY(double x1, double y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	const double sX1 = x1 * cncConfig->getCalculationFactX();
-	const double sY1 = y1 * cncConfig->getCalculationFactY();
+	const double sX1 = x1 * GBL_CONFIG->getCalculationFactX();
+	const double sY1 = y1 * GBL_CONFIG->getCalculationFactY();
 	
 	return moveRelLinearStepsXY((int32_t)round(sX1), 
 	                            (int32_t)round(sY1),
@@ -1299,10 +1300,9 @@ bool CncControl::moveRelLinearMetricXY(double x1, double y1, bool alreadyRendere
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveRelLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	const double sX1 = x1 * cncConfig->getCalculationFactX();
-	const double sY1 = y1 * cncConfig->getCalculationFactY();
-	const double sZ1 = z1 * cncConfig->getCalculationFactZ();
+	const double sX1 = x1 * GBL_CONFIG->getCalculationFactX();
+	const double sY1 = y1 * GBL_CONFIG->getCalculationFactY();
+	const double sZ1 = z1 * GBL_CONFIG->getCalculationFactZ();
 	
 	return moveRelLinearStepsXYZ((int32_t)round(sX1), 
 	                             (int32_t)round(sY1),
@@ -1312,17 +1312,15 @@ bool CncControl::moveRelLinearMetricXYZ(double x1, double y1, double z1, bool al
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveAbsMetricZ(double z) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	const double sZ = z * cncConfig->getCalculationFactZ();
+	const double sZ = z * GBL_CONFIG->getCalculationFactZ();
 	
 	return moveRelStepsZ( (int32_t)round(sZ) - curAppPos.getZ() );
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	const double sX1 = x1 * cncConfig->getCalculationFactX();
-	const double sY1 = y1 * cncConfig->getCalculationFactY();
+	const double sX1 = x1 * GBL_CONFIG->getCalculationFactX();
+	const double sY1 = y1 * GBL_CONFIG->getCalculationFactY();
 	
 	return moveRelLinearStepsXY((int32_t)round(sX1) - curAppPos.getX(), 
 	                            (int32_t)round(sY1) - curAppPos.getY(),
@@ -1331,10 +1329,9 @@ bool CncControl::moveAbsLinearMetricXY(double x1, double y1, bool alreadyRendere
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveAbsLinearMetricXYZ(double x1, double y1, double z1, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	const double sX1 = x1 * cncConfig->getCalculationFactX();
-	const double sY1 = y1 * cncConfig->getCalculationFactY();
-	const double sZ1 = z1 * cncConfig->getCalculationFactZ();
+	const double sX1 = x1 * GBL_CONFIG->getCalculationFactX();
+	const double sY1 = y1 * GBL_CONFIG->getCalculationFactY();
+	const double sZ1 = z1 * GBL_CONFIG->getCalculationFactZ();
 	
 	return moveRelLinearStepsXYZ((int32_t)round(sX1) - curAppPos.getX(),
 	                             (int32_t)round(sY1) - curAppPos.getY(),
@@ -1609,8 +1606,6 @@ void CncControl::displayUnknownSupportStates() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox* max, double& result) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	
 	double maxSteps 	= (axis != 'Z' ? -450.0 : -100.0); // mm
 	bool ret 			= false;
 	long minPos 		= 0l;
@@ -1683,13 +1678,13 @@ bool CncControl::meassureDimension(const char axis, wxCheckBox* min, wxCheckBox*
 		if ( ret ) {
 
 			switch ( axis ) {
-				case 'X': 	result = (maxPos - minPos) * cncConfig->getDisplayFactX();
+				case 'X': 	result = (maxPos - minPos) * GBL_CONFIG->getDisplayFactX();
 							break;
 							
-				case 'Y': 	result = (maxPos - minPos) * cncConfig->getDisplayFactY();
+				case 'Y': 	result = (maxPos - minPos) * GBL_CONFIG->getDisplayFactY();
 							break;
 							
-				case 'Z': 	result = (maxPos - minPos) * cncConfig->getDisplayFactZ();
+				case 'Z': 	result = (maxPos - minPos) * GBL_CONFIG->getDisplayFactZ();
 							break;
 			}
 		}
@@ -1704,7 +1699,7 @@ bool CncControl::moveXToMinLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -cncConfig->getMaxDimensionX() - getCurCtlPosMetricX();
+	const double distance = -GBL_CONFIG->getMaxDimensionX() - getCurCtlPosMetricX();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1721,7 +1716,7 @@ bool CncControl::moveXToMaxLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +cncConfig->getMaxDimensionX() - getCurCtlPosMetricX();
+	const double distance = +GBL_CONFIG->getMaxDimensionX() - getCurCtlPosMetricX();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1738,7 +1733,7 @@ bool CncControl::moveYToMinLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -cncConfig->getMaxDimensionY() - getCurCtlPosMetricY();
+	const double distance = -GBL_CONFIG->getMaxDimensionY() - getCurCtlPosMetricY();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1755,7 +1750,7 @@ bool CncControl::moveYToMaxLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +cncConfig->getMaxDimensionY() - getCurCtlPosMetricY();
+	const double distance = +GBL_CONFIG->getMaxDimensionY() - getCurCtlPosMetricY();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1772,7 +1767,7 @@ bool CncControl::moveZToMinLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = -cncConfig->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	const double distance = -GBL_CONFIG->getMaxDimensionZ() - getCurCtlPosMetricZ();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1789,7 +1784,7 @@ bool CncControl::moveZToMaxLimit() {
 // However, the PC and controller postions are not equal at the end!
 // the call of reconfigureSimpleMove(true) will correct that
 ///////////////////////////////////////////////////////////////////
-	const double distance = +cncConfig->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	const double distance = +GBL_CONFIG->getMaxDimensionZ() - getCurCtlPosMetricZ();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
@@ -1803,13 +1798,13 @@ bool CncControl::moveZToMaxLimit() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + cncConfig->getMaxDimensionX() - getCurCtlPosMetricX();
+	const double distance = 5.0 + GBL_CONFIG->getMaxDimensionX() - getCurCtlPosMetricX();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(distance, 0.0, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(-cncConfig->getMaxDimensionX() / 2, 0.0, true);
+			ret = moveRelLinearMetricXY(-GBL_CONFIG->getMaxDimensionX() / 2, 0.0, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1817,13 +1812,13 @@ bool CncControl::moveXToMid() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + cncConfig->getMaxDimensionY() - getCurCtlPosMetricY();
+	const double distance = 5.0 + GBL_CONFIG->getMaxDimensionY() - getCurCtlPosMetricY();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXY(0.0, distance, true);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelLinearMetricXY(0.0, -cncConfig->getMaxDimensionY() / 2, true);
+			ret = moveRelLinearMetricXY(0.0, -GBL_CONFIG->getMaxDimensionY() / 2, true);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1831,13 +1826,13 @@ bool CncControl::moveYToMid() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::moveZToMid() {
 ///////////////////////////////////////////////////////////////////
-	const double distance = 5.0 + cncConfig->getMaxDimensionZ() - getCurCtlPosMetricZ();
+	const double distance = 5.0 + GBL_CONFIG->getMaxDimensionZ() - getCurCtlPosMetricZ();
 	
 	bool ret = false;
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelMetricZ(distance);
 		if ( ret == false && limitStates.hasLimit() )
-			ret = moveRelMetricZ(-cncConfig->getMaxDimensionZ() / 2);
+			ret = moveRelMetricZ(-GBL_CONFIG->getMaxDimensionZ() / 2);
 	}
 	reconfigureSimpleMove(ret);
 	return ret;
@@ -1913,13 +1908,13 @@ bool CncControl::manualContinuousMoveStart_CtrlBased(const double xDim, const do
 	
 	// Move preparation
 	initNextDuration();
-	GBL_CONFIG->setAllowEventHandling(true);
+	GBL_CONTEXT->setAllowEventHandling(true);
 	activatePositionCheck(false);
 	enableStepperMotors(true);
 	
-	double sX = xDim * cncConfig->getCalculationFactX();
-	double sY = yDim * cncConfig->getCalculationFactY();
-	double sZ = zDim * cncConfig->getCalculationFactZ();
+	double sX = xDim * GBL_CONFIG->getCalculationFactX();
+	double sY = yDim * GBL_CONFIG->getCalculationFactY();
+	double sZ = zDim * GBL_CONFIG->getCalculationFactZ();
 	
 	int32_t values[3];
 	values[0] = (int32_t)round(sX);
@@ -1981,20 +1976,18 @@ bool CncControl::correctLimitPositions() {
 ///////////////////////////////////////////////////////////////////
 bool CncControl::manualSimpleMoveMetric(double x, double y, double z, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double sX = x * cncConfig->getCalculationFactX();
-	double sY = y * cncConfig->getCalculationFactY();
-	double sZ = z * cncConfig->getCalculationFactZ();
+	double sX = x * GBL_CONFIG->getCalculationFactX();
+	double sY = y * GBL_CONFIG->getCalculationFactY();
+	double sZ = z * GBL_CONFIG->getCalculationFactZ();
 	
 	return manualSimpleMoveSteps((int32_t)round(sX), (int32_t)round(sY), (int32_t)round(sZ), alreadyRendered);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::manualSimpleMoveMetric3D(double x, double y, double z, bool alreadyRendered) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cncConfig);
-	double sX = x * cncConfig->getCalculationFactX();
-	double sY = y * cncConfig->getCalculationFactY();
-	double sZ = z * cncConfig->getCalculationFactZ();
+	double sX = x * GBL_CONFIG->getCalculationFactX();
+	double sY = y * GBL_CONFIG->getCalculationFactY();
+	double sZ = z * GBL_CONFIG->getCalculationFactZ();
 	
 	return manualSimpleMoveSteps3D((int32_t)round(sX), (int32_t)round(sY), (int32_t)round(sZ), alreadyRendered);
 }
@@ -2096,7 +2089,7 @@ bool CncControl::manualSimpleMoveSteps3D(int32_t x, int32_t y, int32_t z, bool a
 bool CncControl::prepareSimpleMove(bool enaleEventHandling) {
 ///////////////////////////////////////////////////////////////////
 	initNextDuration();
-	cncConfig->setAllowEventHandling(enaleEventHandling);
+	GBL_CONTEXT->setAllowEventHandling(enaleEventHandling);
 	activatePositionCheck(false);
 	enableStepperMotors(true);
 	
@@ -2162,10 +2155,10 @@ void CncControl::updatePreview3D(bool force) {
 	}
 	
 	// Online drawing coordinates
-	if ( cncConfig->isOnlineUpdateDrawPane() ) {
+	if ( GBL_CONTEXT->isOnlineUpdateDrawPane() ) {
 		static wxDateTime tsLastUpdate = wxDateTime::UNow();
 		
-		if ( (wxDateTime::UNow() - tsLastUpdate).GetMilliseconds() >= cncConfig->getUpdateInterval() ) {
+		if ( (wxDateTime::UNow() - tsLastUpdate).GetMilliseconds() >= GBL_CONTEXT->getUpdateInterval() ) {
 			THE_APP->getMotionMonitor()->display();
 			tsLastUpdate = wxDateTime::UNow();
 		}

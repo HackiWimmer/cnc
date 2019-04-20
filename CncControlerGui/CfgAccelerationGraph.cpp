@@ -62,13 +62,13 @@ bool CfgAccelerationGraph::calculate(char axis, int32_t stm) {
 	speedController->initMove(dx, dy, dz);
 	
 	stepsToMove = abs(stm);
-	startMarker	= A->AP.getStartStepCountMark();
-	stopMarker	= A->AP.getStopStepCountMark();
+	startMarker	= A->AP.startStepCountMark;
+	stopMarker	= A->AP.stopStepCountMark;
 	
 	for ( uint32_t s = 0; s < stepsToMove; s++ ) {
 		
 		Point p;
-		p.value = A->AP.getNextAccelDelay() + A->synthSpeedDelay;
+		p.value = A->AP.getNextAccelDelay() + A->synthSpeedDelay + A->totalOffset;
 		p.step  = s;
 		graph.push_back(p);
 		

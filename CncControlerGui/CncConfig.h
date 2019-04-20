@@ -98,10 +98,6 @@ class CncConfig {
 		CncRefPositionMode referencePositionMode;
 		bool referenceIncludesWpt;
 		
-		bool onlineUpdateCoordinates;
-		bool onlineUpdateDrawPane;
-		bool allowEventHandling;
-		int updateInterval;
 		float renderResolutionMM;
 		
 		const wxString defaultConfigValue = "";
@@ -225,16 +221,6 @@ class CncConfig {
 		double convertY(CncUnit oldUnit, CncUnit newUnit, double value);
 		double convertZ(CncUnit oldUnit, CncUnit newUnit, double value);
 		
-		bool isOnlineUpdateCoordinates() 						{ return onlineUpdateCoordinates; }
-		bool isOnlineUpdateDrawPane() 							{ return onlineUpdateDrawPane; }
-		bool isAllowEventHandling() 							{ return allowEventHandling; }
-		int getUpdateInterval() 								{ return updateInterval; }
-		
-		CncConfig& setOnlineUpdateCoordinates(bool b) 			{ sc(); onlineUpdateCoordinates=b; return *this; }
-		CncConfig& setOnlineUpdateDrawPane(bool b) 				{ sc(); onlineUpdateDrawPane=b; return *this; }
-		CncConfig& setAllowEventHandling(bool b) 				{ sc(); allowEventHandling=b; return *this; }
-		CncConfig& setUpdateInterval(int i) 					{ sc(); updateInterval=i; return *this; }
-		
 		const CncDoublePosition& convertStepsToMetric(CncDoublePosition& ret, const CncLongPosition& pos);
 		const double			 convertStepsToMetricX(int32_t val);
 		const double			 convertStepsToMetricY(int32_t val);
@@ -244,6 +230,27 @@ class CncConfig {
 		const int32_t			 convertMetricToStepsX(double val);
 		const int32_t			 convertMetricToStepsY(double val);
 		const int32_t			 convertMetricToStepsZ(double val);
+		
+		int32_t connvert_MM_SEC_TO_STP_SEC(double speed, unsigned int steps, double pitch);
+		int32_t connvert_MM_MIN_TO_STP_SEC(double speed, unsigned int steps, double pitch);
+		double connvert_STP_SEC_TO_MM_SEC(int32_t speed, unsigned int steps, double pitch);
+		double connvert_STP_SEC_TO_MM_MIN(int32_t speed, unsigned int steps, double pitch);
+		
+		int32_t connvert_MM_SEC_TO_STP_SEC_X(double speed) 	{ return connvert_MM_SEC_TO_STP_SEC(speed, getStepsX(), getPitchX()); }
+		int32_t connvert_MM_SEC_TO_STP_SEC_Y(double speed) 	{ return connvert_MM_SEC_TO_STP_SEC(speed, getStepsY(), getPitchY()); }
+		int32_t connvert_MM_SEC_TO_STP_SEC_Z(double speed) 	{ return connvert_MM_SEC_TO_STP_SEC(speed, getStepsZ(), getPitchZ()); }
+		
+		int32_t connvert_MM_MIN_TO_STP_SEC_X(double speed)	{ return connvert_MM_MIN_TO_STP_SEC(speed, getStepsX(), getPitchX()); }
+		int32_t connvert_MM_MIN_TO_STP_SEC_Y(double speed)	{ return connvert_MM_MIN_TO_STP_SEC(speed, getStepsY(), getPitchY()); }
+		int32_t connvert_MM_MIN_TO_STP_SEC_Z(double speed)	{ return connvert_MM_MIN_TO_STP_SEC(speed, getStepsZ(), getPitchZ()); }
+		
+		double connvert_STP_SEC_TO_MM_SEC_X(int32_t speed)	{ return connvert_STP_SEC_TO_MM_SEC(speed, getStepsX(), getPitchX()); }
+		double connvert_STP_SEC_TO_MM_SEC_Y(int32_t speed)	{ return connvert_STP_SEC_TO_MM_SEC(speed, getStepsY(), getPitchY()); }
+		double connvert_STP_SEC_TO_MM_SEC_Z(int32_t speed)	{ return connvert_STP_SEC_TO_MM_SEC(speed, getStepsZ(), getPitchZ()); }
+		
+		double connvert_STP_SEC_TO_MM_MIN_X(int32_t speed)	{ return connvert_STP_SEC_TO_MM_MIN(speed, getStepsX(), getPitchX()); }
+		double connvert_STP_SEC_TO_MM_MIN_Y(int32_t speed)	{ return connvert_STP_SEC_TO_MM_MIN(speed, getStepsY(), getPitchY()); }
+		double connvert_STP_SEC_TO_MM_MIN_Z(int32_t speed)	{ return connvert_STP_SEC_TO_MM_MIN(speed, getStepsZ(), getPitchZ()); }
 		
 		bool checkToolExists(int toolId=-1);
 		int translateToolId(int toolId=-1);

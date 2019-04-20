@@ -17,6 +17,9 @@ typedef double      CncMilliTimestamp;
 typedef double      CncSecondTimestamp;
 
 typedef long long   CncNanoTimespan;
+typedef long long   CncMicroTimespan;
+typedef long        CncMilliTimespan;
+typedef long        CncSecondTimespan;
 
 struct CncTimeval : public timeval {
 	

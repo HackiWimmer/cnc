@@ -97,15 +97,15 @@ public:
 
 
     virtual bool Create(wxWindow* parent,
-           wxWindowID id,
-           const wxString& url = "",
-           const wxPoint& pos = wxDefaultPosition,
-           const wxSize& size = wxDefaultSize,
-           long style = 0,
-           const wxString& name = "") {
+		wxWindowID id,
+		const wxString& url = "",
+		const wxPoint& pos = wxDefaultPosition,
+		const wxSize& size = wxDefaultSize,
+		long style = 0,
+		const wxString& name = "") {
         	
-    		wxSVGCtrl::Create(parent, id, pos, size);
-        }
+   		return wxSVGCtrl::Create(parent, id, pos, size);
+    }
 
 
     // Factory methods allowing the use of custom factories registered with

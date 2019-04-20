@@ -151,7 +151,7 @@ void CncStatisticsPane::logStatistics(bool force) {
 	if ( measurementTimeSpan > 0L ) {
 		elapsedTimeMSEC = measurementTimeSpan / (1000.0 * 1000.0);
 		elapsedTimeSEC  = elapsedTimeMSEC / (1000.0);
-		speed_MM_SEC 	= cnc->getTotalDistance() / elapsedTimeSEC;
+		speed_MM_SEC 	= cnc->getTotalDistanceMetric() / elapsedTimeSEC;
 		speed_MM_MIN 	= speed_MM_SEC * 60;
 		
 		speed_SP_SEC    = cnc->getStepCounter() / elapsedTimeSEC;
@@ -198,30 +198,30 @@ void CncStatisticsPane::logStatistics(bool force) {
 															, CncNumberFormatter::toString(min.getX(), 3)
 															, CncNumberFormatter::toString(min.getY(), 3)
 															, CncNumberFormatter::toString(min.getZ(), 3));
-															
+	
 	statisticSummaryListCtrl->updateValues(SKEY_MAX_BOUND	, _("")
 															, CncNumberFormatter::toString(max.getX(), 3)
 															, CncNumberFormatter::toString(max.getY(), 3)
 															, CncNumberFormatter::toString(max.getZ(), 3));
 	
-	statisticSummaryListCtrl->updateValues(SKEY_STEP_CNT	, CncNumberFormatter::toString(cnc->getStepCounter())
-															, CncNumberFormatter::toString(cnc->getStepCounterX())
-															, CncNumberFormatter::toString(cnc->getStepCounterY())
-															, CncNumberFormatter::toString(cnc->getStepCounterZ()));
-	
+	statisticSummaryListCtrl->updateValues(SKEY_STEP_CNT	, CncNumberFormatter::toString(cnc->getTotalDistanceSteps())
+															, CncNumberFormatter::toString(cnc->getTotalDistanceStepsX())
+															, CncNumberFormatter::toString(cnc->getTotalDistanceStepsY())
+															, CncNumberFormatter::toString(cnc->getTotalDistanceStepsZ()));
+															
 	statisticSummaryListCtrl->updateValues(SKEY_POS_CNT		, _("")
 															, _("")
 															, _("")
 															, CncNumberFormatter::toString(cnc->getPositionCounter()));
 	
-	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getTotalDistance()),  3)
-															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceX()), 3)
-															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceY()), 3)
-															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceZ()), 3));
+	statisticSummaryListCtrl->updateValues(SKEY_DISTANCE	, CncNumberFormatter::toString((double)(cnc->getTotalDistanceMetric()),  3)
+															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceMetricX()), 3)
+															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceMetricY()), 3)
+															, CncNumberFormatter::toString((double)(cnc->getTotalDistanceMetricZ()), 3));
 	
 	statisticSummaryListCtrl->updateValues(SKEY_TIME		, _("")
 															, _("")
-															, CncNumberFormatter::toString((double)(THE_APP->getProcessLastDuration()), 1)
+															, CncNumberFormatter::toString((double)(GBL_CONTEXT->timestamps.getTotalDurationMillis()), 1)
 															, CncNumberFormatter::toString(elapsedTimeMSEC, 1));
 	
 	statisticSummaryListCtrl->updateValues(SKEY_SPEED_EXT	, _("")

@@ -7,6 +7,13 @@
 class CncSpeedMonitor : public CncSpeedMonitorBase {
 
 	public:
+	
+		struct SpeedData {
+			double configured_MM_MIN	= 0.0;
+			double measured_MM_MIN		= 0.0;
+			double received_MM_MIN		= 0.0; 
+		};
+		
 		CncSpeedMonitor(wxWindow* parent);
 		virtual ~CncSpeedMonitor();
 		
@@ -24,7 +31,7 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		void enableConnection(bool state=true);
 		void disableConnection() { enableConnection(false); }
 			
-		void setCurrentFeedSpeedValue(double measured_MM_MIN, double configured_MM_MIN);
+		void setCurrentFeedSpeedValue(const SpeedData& sd);
 		
 	protected:
 		virtual void onClear(wxCommandEvent& event);
@@ -35,6 +42,8 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		virtual void toggleConfiguredAxis(wxCommandEvent& event);
 		virtual void toggleConnection(wxCommandEvent& event);
 		virtual void toggleMeasurePointsAxis(wxCommandEvent& event);
+		virtual void toggleMeasuredSpeedAxis(wxCommandEvent& event);
+		virtual void toggleReceivedSpeedAxis(wxCommandEvent& event);
 		virtual void onLeftDown(wxMouseEvent& event);
 		virtual void onLeftUp(wxMouseEvent& event);
 		virtual void onMouseMotion(wxMouseEvent& event);
@@ -110,12 +119,14 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		
 		Axis axisMeasurePoints;
 		Axis axisMeasuredSpeed;
+		Axis axisReceivedSpeed;
 		Axis axisConfiguredSpeed;
 		
 		CncMilliTimestamp lastRefresh;
 		CncMilliTimestamp lastDataSet;
 		unsigned int timeIndex;
 		double currentMeasuredFeedSpeed_MM_MIN;
+		double currentReceivedFeedSpeed_MM_MIN;
 		double currentConfiguredFeedSpeed_MM_MIN;
 		
 		void reset();
@@ -124,4 +135,24 @@ class CncSpeedMonitor : public CncSpeedMonitorBase {
 		void decorateConnectBtn();
 	
 };
+
+class CncSpeedMonitorRunner {
+
+	private:
+		CncSpeedMonitor* monitor;
+
+	public:
+		CncSpeedMonitorRunner(CncSpeedMonitor* sm, double feedSpeed)
+		: monitor(sm)
+		{
+			if ( monitor )
+				monitor->start(feedSpeed);
+		}
+
+		~CncSpeedMonitorRunner() {
+			if ( monitor )
+				monitor->stop();
+		}
+};
+
 #endif // CNCSPEEDMONITOR_H

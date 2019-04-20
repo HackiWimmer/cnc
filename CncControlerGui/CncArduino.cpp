@@ -302,6 +302,7 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_INVALID_GETTER_ID]                  = "Arduino::getValue(): Getter id not known"; 
 	errorCodes[E_INVALID_GETTER_LIST_COUNT]          = "Arduino::getValues(): Getter list count not available";
 	errorCodes[E_INVALID_MOVE_CMD]                   = "Arduino::decodeMove(): Can't read a int32_t value from Serial: invalid size: ";
+	errorCodes[E_INVALID_MOVE_SEQUENCE]              = "Arduino::decodeMoveSequence(): Invalid byte chain";
 	errorCodes[E_INVALID_PARAM_SIZE]                 = "Arduino::decodeMoveSequence(): Can't read size (int32_t) from Serial: invalid size: ";
 	
 	errorCodes[E_STEPPER_NOT_ENALED]                 = "Arduino::stepAxisXYZ: Stepper not enaled";

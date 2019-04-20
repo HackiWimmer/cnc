@@ -228,8 +228,10 @@ class Serial : public SerialOSD {
 	private:
 		
 		// total distance
-		double totalDistance[4];
-		double totalDistanceRef;
+		size_t totalDistanceSteps[4];
+		double totalDistanceMetric[4];
+		double totalDistanceMetricRef;
+		
 		double measuredFeedSpeed_MM_SEC;
 		
 		CncLongPosition measurementRefPos;
@@ -324,7 +326,7 @@ class Serial : public SerialOSD {
 		void incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy, int32_t cz);
 		void incTotalDistance(unsigned int size, const int32_t (&values)[3]);
 		
-		void resetTotalDistance() { totalDistance[0] = 0.0; totalDistance[1] = 0.0; totalDistance[2] = 0.0; totalDistance[3] = 0.0;}
+		void resetTotalDistance(); 
 		void logMeasurementRefTs(const CncLongPosition& pos);
 		void logMeasurementLastTs();
 				
@@ -407,12 +409,12 @@ class Serial : public SerialOSD {
 		// signals
 		bool sendSignal(const unsigned char cmd);
 		
-		bool sendInterrupt() 		{ return sendSignal(SIG_INTERRUPPT);     }
-		bool sendHalt() 			{ return sendSignal(SIG_HALT);           }
-		bool sendPause() 			{ return sendSignal(SIG_PAUSE);          }
-		bool sendResume() 			{ return sendSignal(SIG_RESUME);         }
+		bool sendInterrupt()		{ return sendSignal(SIG_INTERRUPPT);     }
+		bool sendHalt()				{ return sendSignal(SIG_HALT);           }
+		bool sendPause()			{ return sendSignal(SIG_PAUSE);          }
+		bool sendResume()			{ return sendSignal(SIG_RESUME);         }
 		bool sendQuitMove()			{ return sendSignal(SIG_QUIT_MOVE);      }
-		bool sendSoftwareReset() 	{ return sendSignal(SIG_SOFTWARE_RESET); }
+		bool sendSoftwareReset()	{ return sendSignal(SIG_SOFTWARE_RESET); }
 		
 		// trigger
 		virtual void processTrigger(const Serial::Trigger::BeginRun& tr)	{}
@@ -430,10 +432,15 @@ class Serial : public SerialOSD {
 		virtual size_t getStepCounterY();
 		virtual size_t getStepCounterZ();
 		
-		double getTotalDistanceX() { return totalDistance[0]; }
-		double getTotalDistanceY() { return totalDistance[1]; }
-		double getTotalDistanceZ() { return totalDistance[2]; }
-		double getTotalDistance()  { return totalDistance[3]; }
+		size_t getTotalDistanceStepsX() { return totalDistanceSteps[0]; }
+		size_t getTotalDistanceStepsY() { return totalDistanceSteps[1]; }
+		size_t getTotalDistanceStepsZ() { return totalDistanceSteps[2]; }
+		size_t getTotalDistanceSteps()  { return totalDistanceSteps[3]; }
+
+		double getTotalDistanceMetricX() { return totalDistanceMetric[0]; }
+		double getTotalDistanceMetricY() { return totalDistanceMetric[1]; }
+		double getTotalDistanceMetricZ() { return totalDistanceMetric[2]; }
+		double getTotalDistanceMetric()  { return totalDistanceMetric[3]; }
 		
 		void startMeasurement();
 		void stopMeasurement();

@@ -14,6 +14,7 @@ wxBEGIN_EVENT_TABLE(CncSerialSpyListCtrl, CncLargeScaledListCtrl)
 	EVT_SIZE(							CncSerialSpyListCtrl::onSize)
 	EVT_TIMER(wxEVT_SERIAL_TIMER, 		CncSerialSpyListCtrl::onTimer)
 	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncSerialSpyListCtrl::onSelectListItem)
+	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncSerialSpyListCtrl::onActivateListItem)
 	EVT_LIST_ITEM_FOCUSED(wxID_ANY, 	CncSerialSpyListCtrl::onFocusListItem)
 wxEND_EVENT_TABLE()
 
@@ -234,8 +235,15 @@ void CncSerialSpyListCtrl::onTimer(wxTimerEvent& event) {
 	refreshList();
 }
 /////////////////////////////////////////////////////////////////////
+void CncSerialSpyListCtrl::onActivateListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
+	wxPostEvent(THE_APP->GetBtOpenSpyDetailWindow(), evt);
+}
+/////////////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::onFocusListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	//std::cout << "CncSerialSpyListCtrl::onFocusListItem" << std::endl;
 }
 /////////////////////////////////////////////////////////////////////
 void CncSerialSpyListCtrl::onSelectListItem(wxListEvent& event) {

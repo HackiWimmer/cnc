@@ -2,6 +2,7 @@
 #include <cfloat>
 #include <wx/dcclient.h>
 #include "CncCommon.h"
+#include "CncContext.h"
 #include "CncConfig.h"
 #include "CncZView.h"
 
@@ -144,7 +145,7 @@ void CncZView::setHighWaterMark(double val) {
 /////////////////////////////////////////////////////////////////////
 void CncZView::updateView(double val) {
 /////////////////////////////////////////////////////////////////////
-	if ( CncConfig::getGlobalCncConfig()->isOnlineUpdateCoordinates() == false )
+	if ( GBL_CONTEXT->isOnlineUpdateCoordinates() == false )
 		return;
 	
 	if ( cnc::dblCompare(maxValue, CncConfig::getGlobalCncConfig()->getMaxDimensionZ() * scale) == false ) {

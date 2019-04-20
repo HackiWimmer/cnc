@@ -77,6 +77,7 @@ class CncSerialSpyListCtrl : public CncLargeScaledListCtrl {
 		void onTimer(wxTimerEvent& event);
 		void onSelectListItem(wxListEvent& event);
 		void onFocusListItem(wxListEvent& event);
+		void onActivateListItem(wxListEvent& event);
 		
 		wxDECLARE_NO_COPY_CLASS(CncSerialSpyListCtrl);
 		wxDECLARE_EVENT_TABLE();

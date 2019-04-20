@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=15/04/2019
+Date                   :=23/04/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/msys64/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=$(PreprocessorSwitch)NDEBUG $(PreprocessorSwitch)APP_USE_SPLASH $(PreprocessorSwitch)BOOST_STACKTRACE_USE_WINDBG $(PreprocessorSwitch)BOOST_STACKTRACE_USE_ADDR2LINE $(PreprocessorSwitch)BOOST_STACKTRACE_USE_BACKTRACE 
+Preprocessors          :=$(PreprocessorSwitch)NDEBUG $(PreprocessorSwitch)APP_USE_SPLASH $(PreprocessorSwitch)BOOST_STACKTRACE_USE_BACKTRACE 
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -52,7 +52,7 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/@Developm
 AR       := C:/msys64/mingw64/bin/ar.exe rcu
 CXX      := C:/msys64/mingw64/bin/g++.exe
 CC       := C:/msys64/mingw64/bin/gcc.exe
-CXXFLAGS := -Wno-deprecated-declarations -O3 -std=c++17 -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
+CXXFLAGS := -Wno-deprecated-declarations -g1 -fpic -O3 -std=c++17 -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
 CFLAGS   :=  -O3 -Wall $(Preprocessors)
 ASFLAGS  := 
 AS       := C:/msys64/mingw64/bin/as.exe

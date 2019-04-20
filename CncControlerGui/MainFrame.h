@@ -113,9 +113,10 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
-    virtual void onSelectSpyOutboundDetails(wxDataViewEvent& event);
-    virtual void onSelectSpyUnknownDetails(wxDataViewEvent& event);
+		virtual void updateLogger(wxCommandEvent& event);
+		virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
+		virtual void onSelectSpyOutboundDetails(wxDataViewEvent& event);
+		virtual void onSelectSpyUnknownDetails(wxDataViewEvent& event);
 		virtual void openSpyDetailWindow(wxCommandEvent& event);
 		virtual void dclickHeartbeatState(wxMouseEvent& event);
 		virtual void openGameportController(wxCommandEvent& event);
@@ -219,7 +220,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void markSerialSpy(wxCommandEvent& event);
 		virtual void viewSpy(wxCommandEvent& event);
 		virtual void paintDrawPaneWindow(wxPaintEvent& event);
-		virtual void UpdateLogger(wxCommandEvent& event);
 		virtual void cfgStepDelayDropDown(wxAuiToolBarEvent& event);
 		virtual void cfgStepDelayArduino(wxCommandEvent& event);
 		virtual void cfgStepDelayMax(wxCommandEvent& event);
@@ -532,8 +532,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void startAnimationControl();
 		void stopAnimationControl();
 		
-		long getProcessLastDuration() { return processLastDuartion; }
-		
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 		
@@ -609,10 +607,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		NotebookInfo* templateNbInfo;
 		
 		LruFileList lruFileList;
-		
-		long processLastDuartion;
-		wxDateTime processStartTime;
-		wxDateTime processEndTime;
 		
 		wxString lastTemplateFileNameForPreview;
 		

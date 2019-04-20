@@ -279,6 +279,31 @@ inline int32_t absolute(int32_t x) {
   const unsigned char PID_GET_STEP_COUNTER_Y              = 114;
   const unsigned char PID_GET_STEP_COUNTER_Z              = 115;
 
+  const unsigned char PID_MV_SEQ_0_XYZ                    = 180;
+  const unsigned char PID_MV_SEQ_1_XYZ                    = 181;
+  const unsigned char PID_MV_SEQ_2_XYZ                    = 182;
+  const unsigned char PID_MV_SEQ_4_XYZ                    = 183;
+  
+  const unsigned char PID_MV_SEQ_0_XY                     = 184;
+  const unsigned char PID_MV_SEQ_1_XY                     = 185;
+  const unsigned char PID_MV_SEQ_2_XY                     = 186;
+  const unsigned char PID_MV_SEQ_4_XY                     = 187;
+  
+  const unsigned char PID_MV_SEQ_0_X                      = 188;
+  const unsigned char PID_MV_SEQ_1_X                      = 189;
+  const unsigned char PID_MV_SEQ_2_X                      = 190;
+  const unsigned char PID_MV_SEQ_4_X                      = 191;
+  
+  const unsigned char PID_MV_SEQ_0_Y                      = 192;
+  const unsigned char PID_MV_SEQ_1_Y                      = 193;
+  const unsigned char PID_MV_SEQ_2_Y                      = 194;
+  const unsigned char PID_MV_SEQ_4_Y                      = 195;
+  
+  const unsigned char PID_MV_SEQ_0_Z                      = 196;
+  const unsigned char PID_MV_SEQ_1_Z                      = 197;
+  const unsigned char PID_MV_SEQ_2_Z                      = 198;
+  const unsigned char PID_MV_SEQ_4_Z                      = 199;
+  
 // .....................................................................
 // end long pid range [PID_DOUBLE_RANG_END] 
 // .....................................................................
@@ -458,7 +483,7 @@ struct I2CData {
 struct ValueInfo {
 
   private:
-    enum Byte { L0=1, L1=2, L2=3, L4=4, F=5, X=6, Y=7, Z=8 };
+    enum Byte { L0=1, L1=2, L2=3, L4=4, X=6, Y=7, Z=8 };
     unsigned char type;
 
     //-------------------------------------------------------------
@@ -508,22 +533,18 @@ struct ValueInfo {
   public:  
     enum Size { One = 0, Int8 = 1, Int16 = 2, Int32 = 4, IntXX = -1};
 
-    static const unsigned short MaxValueCount = 4;
-    
     explicit ValueInfo(unsigned char t)
     : type(t)
     {
     }
 
-    ValueInfo(Size s, int32_t x, int32_t y, int32_t z, int32_t f)
+    ValueInfo(Size s, int32_t x, int32_t y, int32_t z)
     : type(0)
     {
       setBit(Byte::L0, s == Size::One);
       setBit(Byte::L1, s == Size::Int8);
       setBit(Byte::L2, s == Size::Int16);
       setBit(Byte::L4, s == Size::Int32);
-
-      setBit(Byte::F,  f != 0L);
       
       setBit(Byte::X,  x != 0L);
       setBit(Byte::Y,  y != 0L);
@@ -539,17 +560,13 @@ struct ValueInfo {
     bool hasY()   const { return getBit(Byte::Y); }
     bool hasZ()   const { return getBit(Byte::Z); }
 
-    bool hasF()   const { return getBit(Byte::F); }
-
     bool notX()   const { return !hasX(); }
     bool notY()   const { return !hasY(); }
     bool notZ()   const { return !hasZ(); }
 
-    bool notF()   const { return !hasF(); }
-
     unsigned char getType() const { return type; }
     
-    unsigned char getTypeAsPositionPid() const { 
+    unsigned char getTypeAsPid() const { 
       if      ( hasXYZ() )                    return PID_XYZ_POS;
       else if ( hasXY() && notZ())            return PID_XY_POS;
       else if ( hasX()  && notY() && notZ())  return PID_X_POS;
@@ -560,11 +577,11 @@ struct ValueInfo {
     }
 
     bool isValid() const { 
-      const short bc = getByteCount();
+      const char bc = getByteCount();
       return ( bc == 0 || bc == 1 || bc == 2 || bc == 4 );
     }
 
-    short getByteCount() const {
+    char getByteCount() const {
       if      ( getBit(Byte::L0) ) return 0;
       else if ( getBit(Byte::L1) ) return 1;
       else if ( getBit(Byte::L2) ) return 2;
@@ -573,26 +590,22 @@ struct ValueInfo {
       return -1;
     }
 
-    short getValueCount() const {
-      return (short)getBit(Byte::X) + (short)getBit(Byte::Y) + (short)getBit(Byte::Z) + (short)getBit(Byte::F);
+    char getValueCount() const {
+      return (char)getBit(Byte::X) + (char)getBit(Byte::Y) + (char)getBit(Byte::Z);
     }
 
-    short getNecessarySize() const {
-      const short bc = getByteCount();
-      
+    char getNecessarySize() const {
+      const char bc = getByteCount();
       if ( bc < 0 )
         return 0;
         
       if ( bc == 0 )
-        return 1 * getValueCount();
+        return getValueCount();
         
       return bc * getValueCount();
     }
     
-   #ifndef SKETCH_COMPILE
-
-    static const char* getBitDeclaration() { return "XYZF4210"; }
-   
+   #ifndef  SKETCH_COMPILE    
     friend std::ostream &operator<< (std::ostream& ostr, const ValueInfo& vi) {
       for ( unsigned char i=8; i>=1; i-- ) {
         const char x = vi.getBit(i) ? '1' : '0';

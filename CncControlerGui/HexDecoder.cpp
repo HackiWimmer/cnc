@@ -110,38 +110,20 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 	if ( readNextHexBytes(restToken, 1, value) == false ) return;
 	const int portionSize = decodeHexValueAsInteger(value);
 	ret.more.append(wxString::Format("Portion size = %d | | ", portionSize));
+	ret.more.append(wxString::Format(" [TYP][%s]            X           Y           Z           F  | ", ValueInfo::getBitDeclaration()));
+	ret.more.append(                 " ---------------------------------------------------------------------- | ");
 	
 	// ---------------------------------------------------
-	auto determineDataStructure = [](unsigned char pid, unsigned int& byteCount, unsigned int& valCount) {
-		bool ret = true;
-		switch ( pid ) {
-			case PID_MV_SEQ_0_XYZ:  byteCount = 0; valCount = 3; break;
-			case PID_MV_SEQ_0_XY:   byteCount = 0; valCount = 2; break;
-			case PID_MV_SEQ_0_X:    byteCount = 0; valCount = 1; break;
-			case PID_MV_SEQ_0_Y:    byteCount = 0; valCount = 1; break;
-			case PID_MV_SEQ_0_Z:    byteCount = 0; valCount = 1; break;
-
-			case PID_MV_SEQ_1_XYZ:  byteCount = 1; valCount = 3; break;
-			case PID_MV_SEQ_1_XY:   byteCount = 1; valCount = 2; break;
-			case PID_MV_SEQ_1_X:    byteCount = 1; valCount = 1; break;
-			case PID_MV_SEQ_1_Y:    byteCount = 1; valCount = 1; break;
-			case PID_MV_SEQ_1_Z:    byteCount = 1; valCount = 1; break;
-
-			case PID_MV_SEQ_2_XYZ:  byteCount = 2; valCount = 3; break;
-			case PID_MV_SEQ_2_XY:   byteCount = 2; valCount = 2; break;
-			case PID_MV_SEQ_2_X:    byteCount = 2; valCount = 1; break;
-			case PID_MV_SEQ_2_Y:    byteCount = 2; valCount = 1; break;
-			case PID_MV_SEQ_2_Z:    byteCount = 2; valCount = 1; break;
-
-			case PID_MV_SEQ_4_XYZ:  byteCount = 4; valCount = 3; break;
-			case PID_MV_SEQ_4_XY:   byteCount = 4; valCount = 2; break;
-			case PID_MV_SEQ_4_X:    byteCount = 4; valCount = 1; break;
-			case PID_MV_SEQ_4_Y:    byteCount = 4; valCount = 1; break;
-			case PID_MV_SEQ_4_Z:    byteCount = 4; valCount = 1; break;
-
-			default:				ret = false;
-		}
-		return ret;
+	auto determineDataStructure = [](unsigned char type, unsigned int& byteCount, unsigned int& valCount) {
+		ValueInfo vi(type);
+		
+		if ( vi.isValid() == false )
+			return false;
+		
+		byteCount = (unsigned int)(vi.getByteCount()); 
+		valCount  = (unsigned int)(vi.getValueCount());
+		
+		return true ;
 	};
 
 	// ---------------------------------------------------
@@ -151,11 +133,12 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 			if ( readNextHexBytes(restToken, 1, value) == false ) break;
 			const int v = decodeHexValueAsInteger(value);
 			
-			const int x = ( v &  1 ?  +1 : v &  2 ? -1 : 0 );
-			const int y = ( v &  4 ?  +1 : v &  8 ? -1 : 0 );
-			const int z = ( v & 16 ?  +1 : v & 32 ? -1 : 0 );
+			const int x = ( v &   1 ?  +1 : v &   2 ? -1 : 0 );
+			const int y = ( v &   4 ?  +1 : v &   8 ? -1 : 0 );
+			const int z = ( v &  16 ?  +1 : v &  32 ? -1 : 0 );
+			const int f = ( v &  64 ?  +1 : v & 128 ? -1 : 0 );
 			
-			ret.more.append(wxString::Format("%d, %d, %d | ", x, y, z));
+			ret.more.append(wxString::Format(" [---][11110001] = % 10d, % 10d, % 10d, % 10d | ", x, y, z, f));
 		}
 	};
 	
@@ -168,20 +151,20 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 		while ( remaining > 0 ) {
 			// pid 
 			if ( readNextHexBytes(restToken, 1, value) == false ) return;
-			const int pid = decodeHexValueAsInteger(value);
+			const int valueType = decodeHexValueAsInteger(value);
 			remaining--;
 			
 			// values
-			if ( determineDataStructure(pid, byteCount, valCount) ) {
+			if ( determineDataStructure(valueType, byteCount, valCount) ) {
 				
 				if ( false ) 
-					std::cout << "determineDataStructure: " << pid << ", " << byteCount << ", " << valCount << std::endl;
+					std::cout << "determineDataStructure: " << valueType << ", " << byteCount << ", " << valCount << std::endl;
 				
-				int32_t dx, dy, dz = 0;
+				int32_t dx, dy, dz, f = 0;
 				
 				if ( byteCount > 0 ) {
-					int32_t values[3];
-					wxASSERT( valCount <= 3 );
+					int32_t values[ValueInfo::MaxValueCount];
+					wxASSERT( valCount <= ValueInfo::MaxValueCount );
 					
 					// reading
 					for ( unsigned int i = 0 ; i < valCount; i++ ) {
@@ -197,56 +180,41 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 						remaining -= byteCount;
 					}
 					
-					// determine values
-					switch ( pid ) {
-						case PID_MV_SEQ_0_XYZ:   
-						case PID_MV_SEQ_1_XYZ:   
-						case PID_MV_SEQ_2_XYZ:   
-						case PID_MV_SEQ_4_XYZ:  dx = values[0]; dy = values[1]; dz= values[2];  break;
-						
-						case PID_MV_SEQ_0_XY:
-						case PID_MV_SEQ_1_XY:
-						case PID_MV_SEQ_2_XY:
-						case PID_MV_SEQ_4_XY:   dx = values[0]; dy = values[1]; dz = 0;         break;
-						
-						case PID_MV_SEQ_0_X:
-						case PID_MV_SEQ_1_X:
-						case PID_MV_SEQ_2_X:
-						case PID_MV_SEQ_4_X:    dx = values[0]; dy = 0;         dz = 0;         break;
-						
-						case PID_MV_SEQ_0_Y:
-						case PID_MV_SEQ_1_Y:
-						case PID_MV_SEQ_2_Y:
-						case PID_MV_SEQ_4_Y:    dx = 0;         dy = values[0]; dz = 0;         break;
-						
-						case PID_MV_SEQ_0_Z:
-						case PID_MV_SEQ_1_Z:
-						case PID_MV_SEQ_2_Z:
-						case PID_MV_SEQ_4_Z:    dx = 0;         dy = 0;         dz = values[0]; break;
-						
-						default:                return;
-					}
+					ValueInfo vi(valueType);
+					
+					const unsigned short p = vi.hasF() ? 1 : 0;
+					if ( vi.hasF() )
+						f = values[0];
+					
+					if 		( vi.hasXYZ() )	{ dx = values[p+0]; dy = values[p+1]; dz = values[p+2]; }
+					else if ( vi.hasXY()  ) { dx = values[p+0]; dy = values[p+1]; dz = 0;           }
+					else if ( vi.hasX()   ) { dx = values[p+0]; dy = values[p+1]; dz = 0;           }
+					else if ( vi.hasY()   ) { dx = 0;           dy = values[p+0]; dz = 0;           }
+					else if ( vi.hasZ()   ) { dx = 0;           dy = 0;           dz = values[p+0]; }
+					else					{ return;                                               }
 				}
 				else {
 					// one byte xyz format
 					if ( readNextHexBytes(restToken, 1, value) == false ) return;
 					const int v = decodeHexValueAsInteger(value);
 					
-					dx = ( v &  1 ?  +1 : v &  2 ? -1 : 0 );
-					dy = ( v &  4 ?  +1 : v &  8 ? -1 : 0 );
-					dz = ( v & 16 ?  +1 : v & 32 ? -1 : 0 );
+					dx = ( v &  1 ?  +1 : v &   2 ? -1 : 0 );
+					dy = ( v &  4 ?  +1 : v &   8 ? -1 : 0 );
+					dz = ( v & 16 ?  +1 : v &  32 ? -1 : 0 );
+					f  = ( v & 64 ?  +1 : v & 128 ? -1 : 0 );
 					
 					remaining--;
 				}
 				
 				// output
-				ret.more.append(wxString::Format(" x, y, z = %ld, %ld, %ld  | ", (long)dx, (long)dy, (long)dz));
+				ValueInfo vi(valueType);
+				std::stringstream ss; ss << vi;
+				ret.more.append(wxString::Format(" [%03d][%s] = % 10ld, % 10ld, % 10ld, % 10ld  | ", (int)valueType, ss.str().c_str(), (long)dx, (long)dy, (long)dz, (long)f));
 				
-				if ( false )
-					std::cout << portionSize << ", " << remaining << ", " << restToken << std::endl;
+				//std::cout << portionSize << ", " << remaining << ", " << restToken << std::endl;
 			}
 			else {
-				std::cerr << "SpyHexDecoder::decodeMoveSeqOutbound(): Invalid PID: " << pid << std::endl;
+				std::cerr << "SpyHexDecoder::decodeMoveSeqOutbound(): Invalid Type: " << valueType << std::endl;
 				break;
 			}
 		}

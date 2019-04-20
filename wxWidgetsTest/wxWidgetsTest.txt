@@ -1,1 +1,1 @@
-./Release/win_resources.rc.o ./Release/Clipper_clipper.cpp.o ./Release/main.cpp.o ./Release/wxcrafter.cpp.o ./Release/MainFrame.cpp.o ./Release/wxcrafter_bitmaps.cpp.o   
+./Debug/win_resources.rc.o ./Debug/Clipper_clipper.cpp.o ./Debug/main.cpp.o ./Debug/wxcrafter.cpp.o ./Debug/MainFrame.cpp.o ./Debug/wxcrafter_bitmaps.cpp.o   

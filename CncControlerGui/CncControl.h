@@ -60,8 +60,6 @@ class CncControl {
 	protected:
 		// internal port object
 		Serial* serialPort;
-		// handels the cnc configuration
-		CncConfig* cncConfig;
 		// Defines the absolute zero pos as a reference pos 
 		CncLongPosition zeroAppPos;
 		// Defines the start postion of an object in relation to zeroPos 
@@ -276,12 +274,12 @@ class CncControl {
 		const CncLongPosition::Watermarks 	getWaterMarks();
 		const CncDoublePosition::Watermarks getWaterMarksMetric();
 		
-		const double 						getCurAppPosMetricX() { return curAppPos.getX() * cncConfig->getDisplayFactX(); }
-		const double 						getCurAppPosMetricY() { return curAppPos.getY() * cncConfig->getDisplayFactY(); }
-		const double 						getCurAppPosMetricZ() { return curAppPos.getZ() * cncConfig->getDisplayFactZ(); }
-		const double 						getCurCtlPosMetricX() { return curCtlPos.getX() * cncConfig->getDisplayFactX(); }
-		const double 						getCurCtlPosMetricY() { return curCtlPos.getY() * cncConfig->getDisplayFactY(); }
-		const double 						getCurCtlPosMetricZ() { return curCtlPos.getZ() * cncConfig->getDisplayFactZ(); }
+		const double 						getCurAppPosMetricX() { return curAppPos.getX() * GBL_CONFIG->getDisplayFactX(); }
+		const double 						getCurAppPosMetricY() { return curAppPos.getY() * GBL_CONFIG->getDisplayFactY(); }
+		const double 						getCurAppPosMetricZ() { return curAppPos.getZ() * GBL_CONFIG->getDisplayFactZ(); }
+		const double 						getCurCtlPosMetricX() { return curCtlPos.getX() * GBL_CONFIG->getDisplayFactX(); }
+		const double 						getCurCtlPosMetricY() { return curCtlPos.getY() * GBL_CONFIG->getDisplayFactY(); }
+		const double 						getCurCtlPosMetricZ() { return curCtlPos.getZ() * GBL_CONFIG->getDisplayFactZ(); }
 		
 		
 		// query the current controller position
@@ -362,10 +360,16 @@ class CncControl {
 		void startSerialMeasurement() 									{ getSerial()->startMeasurement(); }
 		void stopSerialMeasurement()  									{ getSerial()->stopMeasurement(); }
 		const CncNanoTimespan getMeasurementNanoTimeSpanTotal()			{ return getSerial()->getMeasurementNanoTimeSpanTotal(); }
-		double getTotalDistanceX() 										{ return getSerial()->getTotalDistanceX(); }
-		double getTotalDistanceY() 										{ return getSerial()->getTotalDistanceY(); }
-		double getTotalDistanceZ() 										{ return getSerial()->getTotalDistanceZ(); }
-		double getTotalDistance()  										{ return getSerial()->getTotalDistance(); }
+		double getTotalDistanceMetricX()								{ return getSerial()->getTotalDistanceMetricX(); }
+		double getTotalDistanceMetricY()								{ return getSerial()->getTotalDistanceMetricY(); }
+		double getTotalDistanceMetricZ()								{ return getSerial()->getTotalDistanceMetricZ(); }
+		double getTotalDistanceMetric() 								{ return getSerial()->getTotalDistanceMetric();  }
+		size_t getTotalDistanceStepsX()									{ return getSerial()->getTotalDistanceStepsX(); }
+		size_t getTotalDistanceStepsY()									{ return getSerial()->getTotalDistanceStepsY(); }
+		size_t getTotalDistanceStepsZ()									{ return getSerial()->getTotalDistanceStepsZ(); }
+		size_t getTotalDistanceSteps() 									{ return getSerial()->getTotalDistanceSteps();  }
+		double getMeasuredFeedSpeed_MM_MIN() 							{ return getSerial()->getMeasuredFeedSpeed_MM_MIN(); }
+		double getMeasuredFeedSpeed_MM_SEC() 							{ return getSerial()->getMeasuredFeedSpeed_MM_SEC(); }
 		size_t getStepCounter()											{ return getSerial()->getStepCounter(); }
 		size_t getStepCounterX()										{ return getSerial()->getStepCounterX(); }
 		size_t getStepCounterY()										{ return getSerial()->getStepCounterY(); }

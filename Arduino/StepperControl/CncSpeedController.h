@@ -1,7 +1,7 @@
 #ifndef CNC_SPEED_CONTROLLER
 #define CNC_SPEED_CONTROLLER
 
-#ifndef SKETCH_COMPILE
+#ifndef  SKETCH_COMPILE
 
     #include <iostream>
     #include "CncCommon.h"
@@ -18,65 +18,40 @@
 
     
 //////////////////////////////////////////////////////////////////////
-#define  startPeriodStepsMin    250
-#define  stopPeriodStepsMin     250
-#define  periodStepsMin         startPeriodStepsMin + stopPeriodStepsMin
-  
-class AccelerationProfile {
+struct AccelerationProfile {
 
   private:
+    bool enabled;
 
+  public:  
     enum Period { P_INACTIVE, P_ACCEL, P_TARGET, P_DEACCEL };
     
-    bool enabled;
+    unsigned int startPeriodStepsMin  = 250;
+    unsigned int stopPeriodStepsMin   = 250;
     
-    unsigned int startSpeedDelay;
-    unsigned int stopSpeedDelay;
-    unsigned int feedSpeedDelay;
+    unsigned int startSpeedDelay      = 0;
+    unsigned int stopSpeedDelay       = 0;
+    unsigned int feedSpeedDelay       = 0;
 
-    unsigned int startDelayDelta;
-    unsigned int stopDelayDelta;
+    unsigned int startDelayDelta      = 0;
+    unsigned int stopDelayDelta       = 0;
 
-    int32_t startStepCountMark;
-    int32_t stopStepCountMark;
+    int32_t startStepCountMark        = -1;
+    int32_t stopStepCountMark         = -1;
 
-    int32_t stepsToMove;
-    int32_t stepCounter;
+    int32_t stepsToMove               = 0;
+    int32_t stepCounter               = 0;
 
-    Period period;
+    Period period                     = P_ACCEL;
 
-    
-    //////////////////////////////////////////////////////////////////
-    explicit AccelerationProfile(const AccelerationProfile&) 
-    {}
-    
-  public:
-  
     //////////////////////////////////////////////////////////////////
     AccelerationProfile() 
     : enabled(true)
-    , startSpeedDelay(0)
-    , stopSpeedDelay(0)
-    , feedSpeedDelay(0)
-    , startDelayDelta(0)
-    , stopDelayDelta(0)
-    , startStepCountMark(-1)
-    , stopStepCountMark(-1)
-    , stepsToMove(0)
-    , stepCounter(0)
-    , period(P_ACCEL)
     {}    
 
     //////////////////////////////////////////////////////////////////
-    ~AccelerationProfile(){
-    }
-
-    //////////////////////////////////////////////////////////////////
-    double getStartSpeedDelay() const { return startSpeedDelay; }
-    double getStopSpeedDelay()  const { return stopSpeedDelay;  }
-    double getFeedSpeedDelay()  const { return feedSpeedDelay;  }
-
-    int32_t getStepCounter()    const { return stepCounter;  }
+    ~AccelerationProfile()
+    {}
 
     //////////////////////////////////////////////////////////////////
     void enable(bool state = true)  { enabled = state; }
@@ -119,10 +94,6 @@ class AccelerationProfile {
     }
 
     //////////////////////////////////////////////////////////////////
-    int32_t getStartStepCountMark() const { return startStepCountMark; }
-    int32_t getStopStepCountMark()  const { return stopStepCountMark;  }
-    
-    //////////////////////////////////////////////////////////////////
     bool calculate(const int32_t stm) {
       
       if ( enabled == false )
@@ -134,6 +105,7 @@ class AccelerationProfile {
       stepCounter = 0;
 
       // total period long enough?
+      const int32_t periodStepsMin = startPeriodStepsMin + stopPeriodStepsMin;
       bool active = (stepsToMove > periodStepsMin && feedSpeedDelay > 0); 
       if ( active == true ) {
         
@@ -299,13 +271,14 @@ class CncSpeedController {
         speedConfigured = false;
         
         if ( speed_MM_SEC > 0.0 ) {
-           speedConfigured = true;
+          speedConfigured = true;
           
           stepsPerSec         = speed_MM_SEC       / gearing; 
           microSecPerStep     = (1000L * 1000L)    / stepsPerSec;
           rpm                 = (stepsPerSec * 60) / steps;
           synthSpeedDelay     = (microSecPerStep > totalOffset ? microSecPerStep - totalOffset : 0);
-        } else {
+        }
+        else {
           stepsPerSec         = 0; 
           microSecPerStep     = 0;
           rpm                 = 0;

@@ -521,7 +521,8 @@ protected:
     wxTextCtrl* m_logger;
     wxBitmapButton* m_clearLogger;
     wxBitmapButton* m_copyLogger;
-    wxCheckBox* m_showLoggerOnDemand;
+    wxStaticLine* m_staticLine7605;
+    wxBitmapToggleButton* m_showLoggerOnDemand;
     wxStaticText* m_staticText58651;
     wxStaticBitmap* m_gamepadState;
     wxStaticText* m_staticText5865;
@@ -617,7 +618,7 @@ protected:
     wxTextCtrl* m_lnUnkonwnDetails;
     wxStaticBitmap* m_staticBitmap7230;
     wxDataViewListCtrl* m_spyUnknownDetails;
-    wxButton* m_button7561;
+    wxButton* m_btOpenSpyDetailWindow;
     wxPanel* m_inboundPanel;
     wxStaticText* m_staticText72373;
     wxTextCtrl* m_lnInboundDetails;
@@ -633,7 +634,7 @@ protected:
     wxPanel* m_debuggerView;
     wxPropertyGridManager* m_debuggerPropertyManagerGrid;
     wxPanel* m_positionMonitorView;
-    wxNotebook* m_notebook7508;
+    wxNotebook* m_notebookSpeedMonitor;
     wxPanel* m_panel7502;
     wxBitmapToggleButton* m_btTogglePosSpy;
     wxBitmapButton* m_btCopyPosSpy;
@@ -909,7 +910,7 @@ protected:
     virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void keyDownLruList(wxKeyEvent& event) { event.Skip(); }
-    virtual void UpdateLogger(wxCommandEvent& event) { event.Skip(); }
+    virtual void updateLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void keyDownLogger(wxKeyEvent& event) { event.Skip(); }
     virtual void dclickLogger(wxMouseEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
@@ -1447,7 +1448,8 @@ public:
     wxTextCtrl* GetLogger() { return m_logger; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
-    wxCheckBox* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
+    wxStaticLine* GetStaticLine7605() { return m_staticLine7605; }
+    wxBitmapToggleButton* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
     wxPanel* GetPanel5878() { return m_panel5878; }
     wxNotebook* GetLoggerNotebook() { return m_loggerNotebook; }
     wxStaticText* GetStaticText58651() { return m_staticText58651; }
@@ -1543,7 +1545,7 @@ public:
     wxTextCtrl* GetLnUnkonwnDetails() { return m_lnUnkonwnDetails; }
     wxStaticBitmap* GetStaticBitmap7230() { return m_staticBitmap7230; }
     wxDataViewListCtrl* GetSpyUnknownDetails() { return m_spyUnknownDetails; }
-    wxButton* GetButton7561() { return m_button7561; }
+    wxButton* GetBtOpenSpyDetailWindow() { return m_btOpenSpyDetailWindow; }
     wxPanel* GetUnknownPanel() { return m_unknownPanel; }
     wxStaticText* GetStaticText72373() { return m_staticText72373; }
     wxTextCtrl* GetLnInboundDetails() { return m_lnInboundDetails; }
@@ -1576,7 +1578,7 @@ public:
     wxPanel* GetPanel7502() { return m_panel7502; }
     wxPanel* GetSpeedMonitorPlaceholder() { return m_speedMonitorPlaceholder; }
     wxPanel* GetPanel7504() { return m_panel7504; }
-    wxNotebook* GetNotebook7508() { return m_notebook7508; }
+    wxNotebook* GetNotebookSpeedMonitor() { return m_notebookSpeedMonitor; }
     wxPanel* GetSpeedPanel() { return m_speedPanel; }
     wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
@@ -2277,13 +2279,17 @@ class CncSpeedMonitorBase : public wxPanel
 protected:
     wxBitmapToggleButton* m_btToggleConnection;
     wxStaticLine* m_staticLine75573;
-    wxBitmapToggleButton* m_btToggleConfiguredAxis;
     wxBitmapToggleButton* m_btToggleMeasurePointsAxis;
+    wxBitmapToggleButton* m_btToggleConfiguredAxis;
+    wxBitmapToggleButton* m_btToggleMeasuredSpeedAxis;
+    wxBitmapToggleButton* m_btToggleReceivedSpeedAxis;
+    wxStaticText* m_staticText7610;
     wxStaticLine* m_staticLine7557;
-    wxBitmapToggleButton* m_btClear;
-    wxBitmapToggleButton* m_btSave;
+    wxBitmapButton* m_btClear;
+    wxBitmapButton* m_btSave;
     wxStaticText* m_staticText7534;
     wxSlider* m_intervalSlider;
+    wxStaticText* m_staticText7614;
     wxPanel* m_leftAxis;
     wxScrolledWindow* m_scrollWindow;
     wxPanel* m_darwingArea;
@@ -2292,8 +2298,10 @@ protected:
 
 protected:
     virtual void toggleConnection(wxCommandEvent& event) { event.Skip(); }
-    virtual void toggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleMeasurePointsAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleConfiguredAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleMeasuredSpeedAxis(wxCommandEvent& event) { event.Skip(); }
+    virtual void toggleReceivedSpeedAxis(wxCommandEvent& event) { event.Skip(); }
     virtual void onClear(wxCommandEvent& event) { event.Skip(); }
     virtual void onSave(wxCommandEvent& event) { event.Skip(); }
     virtual void changeIntervalSlider(wxScrollEvent& event) { event.Skip(); }
@@ -2310,13 +2318,17 @@ protected:
 public:
     wxBitmapToggleButton* GetBtToggleConnection() { return m_btToggleConnection; }
     wxStaticLine* GetStaticLine75573() { return m_staticLine75573; }
-    wxBitmapToggleButton* GetBtToggleConfiguredAxis() { return m_btToggleConfiguredAxis; }
     wxBitmapToggleButton* GetBtToggleMeasurePointsAxis() { return m_btToggleMeasurePointsAxis; }
+    wxBitmapToggleButton* GetBtToggleConfiguredAxis() { return m_btToggleConfiguredAxis; }
+    wxBitmapToggleButton* GetBtToggleMeasuredSpeedAxis() { return m_btToggleMeasuredSpeedAxis; }
+    wxBitmapToggleButton* GetBtToggleReceivedSpeedAxis() { return m_btToggleReceivedSpeedAxis; }
+    wxStaticText* GetStaticText7610() { return m_staticText7610; }
     wxStaticLine* GetStaticLine7557() { return m_staticLine7557; }
-    wxBitmapToggleButton* GetBtClear() { return m_btClear; }
-    wxBitmapToggleButton* GetBtSave() { return m_btSave; }
+    wxBitmapButton* GetBtClear() { return m_btClear; }
+    wxBitmapButton* GetBtSave() { return m_btSave; }
     wxStaticText* GetStaticText7534() { return m_staticText7534; }
     wxSlider* GetIntervalSlider() { return m_intervalSlider; }
+    wxStaticText* GetStaticText7614() { return m_staticText7614; }
     wxPanel* GetLeftAxis() { return m_leftAxis; }
     wxPanel* GetDarwingArea() { return m_darwingArea; }
     wxScrolledWindow* GetScrollWindow() { return m_scrollWindow; }

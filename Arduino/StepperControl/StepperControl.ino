@@ -9,7 +9,34 @@
 #include "CommonFunctions.h"
 
 // Global Parameters
+const char* testMessageText = "This is a test message.";
 CncController controller;
+
+struct MoveSequenceData {
+  
+  ValueInfo vi                 = ValueInfo(0);
+  unsigned char pid            = 0;
+  unsigned char portionSize    = 0;
+  unsigned char portionCounter = 0;
+  
+  int32_t totalLength          = 0; 
+  int32_t totalIndex           = 0;
+  int32_t totalRemaining       = 0;
+
+  int32_t lengthX              = 0; 
+  int32_t lengthY              = 0; 
+  int32_t lengthZ              = 0; 
+  
+  int32_t dx                   = 0;
+  int32_t dy                   = 0;
+  int32_t dz                   = 0;
+  int32_t f                    = 0;
+
+  void reset() {
+    *this = MoveSequenceData();
+  }
+  
+} msd;
 
 /////////////////////////////////////////////////////////////////////////////////////
 INLINE void printSketchVersion() {
@@ -374,247 +401,194 @@ INLINE unsigned char processSetter() {
 /////////////////////////////////////////////////////////////////////////////////////
 INLINE unsigned char decodeMoveSequence() {
 /////////////////////////////////////////////////////////////////////////////////////
-  byte b[4];
-  unsigned int size         = 0;
-  unsigned char pid         = 0;
-  unsigned char portionSize = 0;
-  int32_t positionIndex     = 0;
-  int32_t totalLength       = 0; 
-  int32_t remaining         = 0;
-  int32_t dx                = 0;
-  int32_t dy                = 0;
-  int32_t dz                = 0;
-
-  String x;
 
   // ------------------------------------------------------------------------------
   auto debugValues = [&](unsigned short idx) {
+
+      LastErrorCodes::clear();
+      LastErrorCodes::register1Byte_A = idx;
+      LastErrorCodes::register1Byte_B = msd.pid;
+      LastErrorCodes::register1Byte_C = msd.portionSize;
+      LastErrorCodes::register1Byte_D = msd.portionCounter;
+
+      LastErrorCodes::register1Byte_H = (unsigned char)Serial.available();
+
+      LastErrorCodes::register4Byte_A = msd.totalIndex;
+      LastErrorCodes::register4Byte_B = msd.totalLength;
+      LastErrorCodes::register4Byte_C = msd.totalRemaining;
       
-      x.concat("[");
-      x.concat(idx);
-      x.concat(COMMA);
-      x.concat(positionIndex);
-      x.concat(COMMA);
-      x.concat(portionSize);
-      x.concat(COMMA);
-      x.concat((int)pid);
-      x.concat(COMMA);
-      x.concat(size);
-      x.concat(COMMA);
-      x.concat(totalLength);
-      x.concat(COMMA);
-      x.concat(remaining);
-      x.concat("][");
-      x.concat(dx);
-      x.concat(COMMA);
-      x.concat(dy);
-      x.concat(COMMA);
-      x.concat(dz);
-      x.concat(']');
-      x.concat(Serial.available());
+      LastErrorCodes::register4Byte_E = msd.dx;
+      LastErrorCodes::register4Byte_F = msd.dy;
+      LastErrorCodes::register4Byte_G = msd.dz;
+      LastErrorCodes::register4Byte_H = msd.f;
   };
 
   // ------------------------------------------------------------------------------
-  auto logInfo = [&](unsigned short idx, unsigned char eid) {
-      
+  auto logInfo = [&](unsigned char idx, unsigned char eid) {
       debugValues(idx);
-      pushInfoMessage(eid, x.c_str());
+      pushMessage(MT_DEBUG, eid, LastErrorCodes::writeToSerial);
   };
 
   // ------------------------------------------------------------------------------
-  auto logError = [&](unsigned short idx, unsigned char eid) {
-      
+  auto logError = [&](unsigned char idx, unsigned char eid) {
       debugValues(idx);
-      pushErrorMessage(eid, x.c_str());
+      pushMessage(MT_ERROR, eid, LastErrorCodes::writeToSerial);
       clearSerial();
       return RET_ERROR;
   };
 
-
-
+  // ------------------------------------------------------------------------------
+  auto doMove = [&]() {
+    #warning
+    logInfo(100, E_NO_ERROR);
+    //controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
+  };
   
+  // ------------------------------------------------------------------------------
+  auto parseValues = [&]() {
+    
+    // determine pid and paring rules
+    msd.pid = readSerialByteWithTimeout();
+    msd.vi.set(msd.pid);
+    
+    if ( msd.vi.isValid() == false ) {
+      logError(40, E_INVALID_MOVE_SEQUENCE);
+      return -1;
+    }
+    
+    unsigned int byteCount = msd.vi.getByteCount();
+    unsigned int valCount  = msd.vi.getValueCount();
+    int totalSize          = 1 + ( byteCount != 0 ? valCount * byteCount : 1 );
+    int readIndex          = totalSize - 1;
 
-  // first read global length 
-  size = readSerialBytesWithTimeout(b, sizeof(int32_t));
-
-  if ( size != sizeof(int32_t) )
-      return logError(77, E_INVALID_PARAM_SIZE);
+    int32_t v[ValueInfo::MaxValueCount]; 
+    v[0] = v[1] = v[2] = 0; v[3] = 0;
+    
+    byte b;
+    unsigned short count = 0;
+    
+    while ( count < valCount ) {
+      
+      // copy bytes
+      switch ( byteCount ){
   
-  totalLength  = (int32_t)b[0] << 24;
-  totalLength += (int32_t)b[1] << 16;
-  totalLength += (int32_t)b[2] << 8;
-  totalLength += (int32_t)b[3];
-  remaining    = totalLength;
-
-  // over all position infos 
-  while ( remaining > 0 ) {
-    portionSize = readSerialByteWithTimeout();
-
-    //while ( Serial.available() < portionSize )
-      ;
-
-    byte bb[64];
-    size = readSerialBytesWithTimeout(bb, portionSize);
+        // format:   bit: 78543210    
+        //                  zzyyxx
+        //                  -+-+-+ 
+        //                          bit  +               bit  -     0
+        case 0:   b = readSerialByteWithTimeout();
+                  v[0] = bitRead(b, 6) ? +1 : bitRead(b, 7) ? -1 :  0;
+                  v[1] = bitRead(b, 0) ? +1 : bitRead(b, 1) ? -1 :  0;
+                  v[2] = bitRead(b, 2) ? +1 : bitRead(b, 3) ? -1 :  0;
+                  v[3] = bitRead(b, 4) ? +1 : bitRead(b, 5) ? -1 :  0;
+                  
+                  readIndex -= 1;
+                  count     += ValueInfo::MaxValueCount; // to break the while loop
+                  break;
+                  
+        case 1:   if ( readInt8(v[count]) == false ) {
+                    logError(42, E_INVALID_MOVE_SEQUENCE);
+                    return -1;
+                  }
+                  readIndex -= 1;
+                  break;
   
-    if ( size != portionSize -1 )
-       ;// return logError(18, E_INVALID_MOVE_CMD);
+        case 2:   if ( readInt16(v[count]) == false ) {
+                    logError(43, E_INVALID_MOVE_SEQUENCE);
+                    return -1;
+                  }
+                  readIndex -= 2;
+                  break;
+  
+        case 4:   if ( readInt32(v[count]) == false ) {
+                    logError(44, E_INVALID_MOVE_SEQUENCE);
+                    return -1;
+                  }
+                  readIndex -= 4;
+                  break;
+                  
+        default:  logError(45, E_INVALID_MOVE_SEQUENCE);
+                  return -1;
+      }
 
+      count++;
+    }
 
-    remaining -= portionSize + 1;    
-    remaining -= size;    
+    // assign x, y, z and f depending on given type
+    const unsigned short p = msd.vi.hasF() ? 1 : 0;
+    if ( msd.vi.hasF() )  msd.f = v[0];
+    else                  msd.f = 0;
+      
+    if      ( msd.vi.hasXYZ() ) { msd.dx = v[p+0]; msd.dy = v[p+1]; msd.dz = v[p+2]; }
+    else if ( msd.vi.hasXY()  ) { msd.dx = v[p+0]; msd.dy = v[p+1]; msd.dz = 0;      }
+    else if ( msd.vi.hasX()   ) { msd.dx = v[p+0]; msd.dy = 0;      msd.dz = 0;      }
+    else if ( msd.vi.hasY()   ) { msd.dx = 0;      msd.dy = v[p+0]; msd.dz = 0;      }
+    else if ( msd.vi.hasZ()   ) { msd.dx = 0;      msd.dy = 0;      msd.dz = v[p+0]; }
+    else                        { logError(46, E_INVALID_MOVE_SEQUENCE); return -1;  }
 
-    if ( remaining > 0 ) {
+    if ( readIndex != 0 ) {
+      logError(49, E_INVALID_MOVE_SEQUENCE);
+      return -1;
+    }
+
+    doMove();
+    return totalSize;
+  };
+  
+  // ------------------------------------------------------------------------------
+  auto parsePortion = [&]() {
+    msd.portionCounter++;
+
+    int portionIndex = msd.portionSize;
+    while ( portionIndex > 0 ) {
+      
+      const int valueSize = parseValues();
+      if ( valueSize <= 0 ) {
+        logError(30, E_INVALID_MOVE_SEQUENCE);
+        return -1;
+      }
+      
+      portionIndex        -= valueSize;  
+      msd.totalRemaining  -= valueSize;  
+    }  
+
+    return 0;
+  };
+
+  // ------------------------------------------------------------------------------
+  // start of parsing  
+  msd.reset();
+  
+  // first read header values
+  if ( readInt32(msd.totalLength) == false )  return logError(10, E_INVALID_MOVE_SEQUENCE);
+  if ( readInt32(msd.lengthX)     == false )  return logError(11, E_INVALID_MOVE_SEQUENCE);
+  if ( readInt32(msd.lengthY)     == false )  return logError(12, E_INVALID_MOVE_SEQUENCE);
+  if ( readInt32(msd.lengthZ)     == false )  return logError(13, E_INVALID_MOVE_SEQUENCE);
+
+  msd.totalRemaining = msd.totalLength;
+  msd.totalIndex     = msd.totalLength;
+  
+  // over all portions 
+  while ( msd.totalRemaining > 0 ) {
+    // wait max an extra frame of one second for the next portion
+    waitForSerialData(1000L * 1000L);
+    
+    msd.portionSize = readSerialByteWithTimeout();
+    
+    if ( msd.portionSize == 0 )
+      return logError(20, E_INVALID_MOVE_SEQUENCE);
+    
+    msd.totalRemaining--;
+    
+    if ( parsePortion() != 0 )
+      return logError(21, E_INVALID_MOVE_SEQUENCE);
+
+    // flush handshake
+    if ( msd.totalRemaining > 0 ) {
       Serial.write(RET_MORE);
       Serial.flush();
     }
   }
-
-
-  return RET_OK;
-
-
-  // #############################################################################
-  // over all position infos 
-  while ( remaining > 0 ) {
-    
-    unsigned int valCount  = 0;
-    unsigned int byteCount = 0;
-
-    // determine paring rules
-    switch ( readSerialByteWithTimeout() ) {
-      
-      case PID_MV_SEQ_0_XYZ:  pid = PID_MV_SEQ_0_XYZ;  byteCount = 0; valCount = 3; break;
-      case PID_MV_SEQ_0_XY:   pid = PID_MV_SEQ_0_XY;   byteCount = 0; valCount = 2; break;
-      case PID_MV_SEQ_0_X:    pid = PID_MV_SEQ_0_X;    byteCount = 0; valCount = 1; break;
-      case PID_MV_SEQ_0_Y:    pid = PID_MV_SEQ_0_Y;    byteCount = 0; valCount = 1; break;
-      case PID_MV_SEQ_0_Z:    pid = PID_MV_SEQ_0_Z;    byteCount = 0; valCount = 1; break;
-
-      case PID_MV_SEQ_1_XYZ:  pid = PID_MV_SEQ_1_XYZ;  byteCount = 1; valCount = 3; break;
-      case PID_MV_SEQ_1_XY:   pid = PID_MV_SEQ_1_XY;   byteCount = 1; valCount = 2; break;
-      case PID_MV_SEQ_1_X:    pid = PID_MV_SEQ_1_X;    byteCount = 1; valCount = 1; break;
-      case PID_MV_SEQ_1_Y:    pid = PID_MV_SEQ_1_Y;    byteCount = 1; valCount = 1; break;
-      case PID_MV_SEQ_1_Z:    pid = PID_MV_SEQ_1_Z;    byteCount = 1; valCount = 1; break;
-
-      case PID_MV_SEQ_2_XYZ:  pid = PID_MV_SEQ_2_XYZ;  byteCount = 2; valCount = 3; break;
-      case PID_MV_SEQ_2_XY:   pid = PID_MV_SEQ_2_XY;   byteCount = 2; valCount = 2; break;
-      case PID_MV_SEQ_2_X:    pid = PID_MV_SEQ_2_X;    byteCount = 2; valCount = 1; break;
-      case PID_MV_SEQ_2_Y:    pid = PID_MV_SEQ_2_Y;    byteCount = 2; valCount = 1; break;
-      case PID_MV_SEQ_2_Z:    pid = PID_MV_SEQ_2_Z;    byteCount = 2; valCount = 1; break;
-
-      case PID_MV_SEQ_4_XYZ:  pid = PID_MV_SEQ_4_XYZ;  byteCount = 4; valCount = 3; break;
-      case PID_MV_SEQ_4_XY:   pid = PID_MV_SEQ_4_XY;   byteCount = 4; valCount = 2; break;
-      case PID_MV_SEQ_4_X:    pid = PID_MV_SEQ_4_X;    byteCount = 4; valCount = 1; break;
-      case PID_MV_SEQ_4_Y:    pid = PID_MV_SEQ_4_Y;    byteCount = 4; valCount = 1; break;
-      case PID_MV_SEQ_4_Z:    pid = PID_MV_SEQ_4_Z;    byteCount = 4; valCount = 1; break;
-
-      default:                return logError(3, E_INVALID_PARAM_ID);
-    }
-    remaining--;
-
-    // read dy, dy and/or dz depending on the pid  
-    int32_t v[3];
-    unsigned short count = 0;
-    
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    while ( count < valCount ) {
-
-      if ( byteCount > 0 ) {
-        size = readSerialBytesWithTimeout(b, byteCount);
-        if ( size != byteCount )
-          return logError(4, E_INVALID_MOVE_CMD);
-
-        remaining -= byteCount;  
-      }
-      else {
-        size = readSerialBytesWithTimeout(b, 1, minSerialReadTimeoutMicros * 20);
-        if ( size != 1 )
-          return logError(4, E_INVALID_MOVE_CMD);
-
-        remaining -= 1;
-      }
-      
-      // copy bytes
-      switch ( byteCount ){
-
-        // format:   bit: 78543210    
-        //                  zzyyxx
-        //                  -+-+-+ 
-        //                           bit     +               bit     -    0
-        case 0:   v[0] = bitRead(b[0], 0) ? +1 : bitRead(b[0], 1) ? -1 :  0;
-                  v[1] = bitRead(b[0], 2) ? +1 : bitRead(b[0], 3) ? -1 :  0;
-                  v[2] = bitRead(b[0], 4) ? +1 : bitRead(b[0], 5) ? -1 :  0;
-                  count += 3; // to break the while loop
-                  break;
-                  
-        case 1:   v[count]  =  (int8_t)b[0];
-                  break;
-
-        case 2:   v[count]  = (int16_t)b[0] <<  8;
-                  v[count] += (int16_t)b[1];
-                  break;
-
-        case 4:   v[count]  = (int32_t)b[0] << 24;
-                  v[count] += (int32_t)b[1] << 16;
-                  v[count] += (int32_t)b[2] <<  8;
-                  v[count] += (int32_t)b[3];
-                  break;
-                  
-        default:  v[count]  = 0;  
-      }
-      
-      count++;
-    }
-    //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-    
-    // assign x, y, z depending on given pid
-    switch ( pid ) {
-      case PID_MV_SEQ_0_XYZ:   
-      case PID_MV_SEQ_1_XYZ:   
-      case PID_MV_SEQ_2_XYZ:   
-      case PID_MV_SEQ_4_XYZ:  dx = v[0]; dy = v[1]; dz= v[2];  break;
-
-      case PID_MV_SEQ_0_XY:
-      case PID_MV_SEQ_1_XY:
-      case PID_MV_SEQ_2_XY:
-      case PID_MV_SEQ_4_XY:   dx = v[0]; dy = v[1]; dz = 0;    break;
-      
-      case PID_MV_SEQ_0_X:
-      case PID_MV_SEQ_1_X:
-      case PID_MV_SEQ_2_X:
-      case PID_MV_SEQ_4_X:    dx = v[0]; dy = 0;    dz = 0;    break;
-      
-      case PID_MV_SEQ_0_Y:
-      case PID_MV_SEQ_1_Y:
-      case PID_MV_SEQ_2_Y:
-      case PID_MV_SEQ_4_Y:    dx = 0;    dy = v[0]; dz = 0;    break;
-      
-      case PID_MV_SEQ_0_Z:
-      case PID_MV_SEQ_1_Z:
-      case PID_MV_SEQ_2_Z:
-      case PID_MV_SEQ_4_Z:    dx = 0;    dy = 0;    dz = v[0]; break;
-
-      default:                return logError(5, E_INVALID_PARAM_STREAM);
-    }
-
-    positionIndex++;
-
-    
-
-    //  do somiting with dx, dy, dz
-    auto something = [&](int32_t, int32_t, int32_t) {
-      controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
-      //logInfo(100, E_NO_ERROR);
-      return RET_OK;
-    };
-
-    if ( something(dx, dy, dz) != RET_OK ) {
-      pushErrorMessage(E_INVALID_MOVE_CMD);
-      return RET_ERROR;
-    }
-  }
-  // #############################################################################
-
- // logInfo(42, E_NO_ERROR);
 
   return RET_OK;
 }
@@ -679,34 +653,8 @@ INLINE void clearSerial() {
 /////////////////////////////////////////////////////////////////////////////////////
 INLINE void printSerial() {
 /////////////////////////////////////////////////////////////////////////////////////
-  /*
   LastErrorCodes::clear();
-  
-  const short maxLen  = 256;
-  short byteCounter   = 0;
-  while ( waitForSerialData(20000) ) {
-    // 20000 => 20 ms
-
-    LastErrorCodes::gblErrorMessage.concat(Serial.read());
-    LastErrorCodes::gblErrorMessage.concat(' ');
-
-    #warning
-    //controller.sendCurrentPositions(PID_XYZ_POS_MAJOR, true);
-    //delay(1);
-    //waitActiveMilliseconds(1);
-    
-    if ( ++byteCounter >= maxLen ) {
-      byteCounter = 0;
-
-      pushInfoMessage(0, LastErrorCodes::gblErrorMessage.c_str());
-      LastErrorCodes::clear();
-    }
-  }
-  
-  if ( byteCounter != 0 ) {
-    pushInfoMessage(0, LastErrorCodes::gblErrorMessage.c_str());
-  }
-  */
+  pushMessage(MT_DEBUG, E_NO_ERROR, LastErrorCodes::writeSerialToSerial);
 }
 /////////////////////////////////////////////////////////////////////////////////////
 INLINE char reset() {
@@ -896,17 +844,17 @@ void loop() {
     // --------------------------------------------------------------------------
 
         case CMD_TEST_INFO_MESSAGE:
-              pushInfoMessage("This is a test message from type: 'INFO'");
+              pushInfoMessage(testMessageText);
               r = RET_OK;
               break;
 
         case CMD_TEST_WARN_MESSAGE:
-              pushWarningMessage("This is a test message from type: 'WARNING'");
+              pushWarningMessage(testMessageText);
               r = RET_OK;
               break;
 
         case CMD_TEST_ERROR_MESSAGE:
-              pushErrorMessage("This is a test message from type: 'ERROR'");
+              pushErrorMessage(testMessageText);
               r = RET_OK;
               break;
 
@@ -945,6 +893,3 @@ void loop() {
     Serial.flush();
   }
 }
-
-
-

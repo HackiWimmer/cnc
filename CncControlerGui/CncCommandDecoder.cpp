@@ -25,59 +25,41 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	unsigned int idx = 0;
 
 	// ------------------------------------------------------------------------
-	auto determineDataStructure = [](unsigned char pid, unsigned int& byteCount, unsigned int& valCount) {
-		bool ret = true;
-		switch ( pid ) {
-			case PID_MV_SEQ_0_XYZ:  byteCount = 0; valCount = 3; break;
-			case PID_MV_SEQ_0_XY:   byteCount = 0; valCount = 2; break;
-			case PID_MV_SEQ_0_X:    byteCount = 0; valCount = 1; break;
-			case PID_MV_SEQ_0_Y:    byteCount = 0; valCount = 1; break;
-			case PID_MV_SEQ_0_Z:    byteCount = 0; valCount = 1; break;
-
-			case PID_MV_SEQ_1_XYZ:  byteCount = 1; valCount = 3; break;
-			case PID_MV_SEQ_1_XY:   byteCount = 1; valCount = 2; break;
-			case PID_MV_SEQ_1_X:    byteCount = 1; valCount = 1; break;
-			case PID_MV_SEQ_1_Y:    byteCount = 1; valCount = 1; break;
-			case PID_MV_SEQ_1_Z:    byteCount = 1; valCount = 1; break;
-
-			case PID_MV_SEQ_2_XYZ:  byteCount = 2; valCount = 3; break;
-			case PID_MV_SEQ_2_XY:   byteCount = 2; valCount = 2; break;
-			case PID_MV_SEQ_2_X:    byteCount = 2; valCount = 1; break;
-			case PID_MV_SEQ_2_Y:    byteCount = 2; valCount = 1; break;
-			case PID_MV_SEQ_2_Z:    byteCount = 2; valCount = 1; break;
-
-			case PID_MV_SEQ_4_XYZ:  byteCount = 4; valCount = 3; break;
-			case PID_MV_SEQ_4_XY:   byteCount = 4; valCount = 2; break;
-			case PID_MV_SEQ_4_X:    byteCount = 4; valCount = 1; break;
-			case PID_MV_SEQ_4_Y:    byteCount = 4; valCount = 1; break;
-			case PID_MV_SEQ_4_Z:    byteCount = 4; valCount = 1; break;
-
-			default:				ret = false;
-		}
-		return ret;
+	auto determineDataStructure = [](unsigned char type, unsigned int& byteCount, unsigned int& valCount) {
+		ValueInfo vi(type);
+		
+		if ( vi.isValid() == false )
+			return false;
+		
+		byteCount = (unsigned int)(vi.getByteCount()); 
+		valCount  = (unsigned int)(vi.getValueCount());
+		
+		return true;
 	};
 
 	// ------------------------------------------------------------------------
-	auto readOneByteToPos = [&] (CncLongPosition& pos) {
+	auto readOneByteToPos = [&] (CncLongPosition& pos, int32_t& f) {
 		unsigned char buf[1];
 		buf[0] = buffer[idx++];
 
-		pos.setX( buf[0] &  1 ?  +1 : buf[0] &  2 ? -1 : 0 );
-		pos.setY( buf[0] &  4 ?  +1 : buf[0] &  8 ? -1 : 0 );
-		pos.setZ( buf[0] & 16 ?  +1 : buf[0] & 32 ? -1 : 0 );
+		pos.setX( buf[0] &   1 ?  +1 : buf[0] &   2 ? -1 : 0 );
+		pos.setY( buf[0] &   4 ?  +1 : buf[0] &   8 ? -1 : 0 );
+		pos.setZ( buf[0] &  16 ?  +1 : buf[0] &  32 ? -1 : 0 );
+		
+		f      =  buf[0] &  64 ?  +1 : buf[0] & 128 ? -1 : 0;
 
 		return 1;
  	};
 
 	// ------------------------------------------------------------------------
-	auto readOneByte = [&] (int32_t& x, int32_t& y, int32_t& z) {
+	auto readOneByte = [&] (int32_t& x, int32_t& y, int32_t& z, int32_t& f) {
 		unsigned char buf[1];
 		buf[0] = buffer[idx++];
 
-		x = buf[0] &  1 ?  +1 : buf[0] &  2 ? -1 : 0 ;
-		y = buf[0] &  4 ?  +1 : buf[0] &  8 ? -1 : 0 ;
-		z = buf[0] & 16 ?  +1 : buf[0] & 32 ? -1 : 0 ;
-
+		x = buf[0] &   1 ?  +1 : buf[0] &   2 ? -1 : 0 ;
+		y = buf[0] &   4 ?  +1 : buf[0] &   8 ? -1 : 0 ;
+		z = buf[0] &  16 ?  +1 : buf[0] &  32 ? -1 : 0 ;
+		f = buf[0] &  64 ?  +1 : buf[0] & 128 ? -1 : 0 ;
 		return 1;
 	};
 
@@ -116,26 +98,27 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	};
 
 	// ------------------------------------------------------------------------
-	auto readPosition = [&] (CncLongPosition& pos) {
+	auto readPosition = [&] (CncLongPosition& pos, int32_t& f) {
 
-		const unsigned char pid 	= buffer[idx++];
-		unsigned int byteCount 		= 0;
-		unsigned int valCount 		= 0;
-		determineDataStructure(pid, byteCount, valCount);
+		const unsigned char valueType 	= buffer[idx++];
+		unsigned int byteCount 			= 0;
+		unsigned int valCount 			= 0;
+		determineDataStructure(valueType, byteCount, valCount);
 
 		const bool trace = false;
 		if ( trace )
-			std::cout << "readPosition: " << (int)pid << ", " << byteCount << ", " << valCount << ", ";
+			std::cout << "readPosition: " << (int)valueType << ", " << byteCount << ", " << valCount << ", ";
 
 		unsigned int valCounter  = 0;
-		unsigned int byteCounter = 1; // consider pid
+		unsigned int byteCounter = 1; // consider type
 
-		int32_t values[3];
+		int32_t values[ValueInfo::MaxValueCount];
+		
 		while ( valCounter < valCount ) {
 			switch ( byteCount ) {
-				case 0:		readOneByte(values[0], values[1], values[2]);
+				case 0:		readOneByte(values[0], values[1], values[2], values[3]);
 							valCounter  += 3; 	// to break the while loop
-							byteCounter += 1;	// to override 0
+							byteCounter += 1;
 							break;
 
 				case 1:		values[valCounter] = readInt8();
@@ -151,43 +134,27 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 							break;
 
 				default: 	wxASSERT( byteCount != 0 && byteCount != 1 && byteCount != 2 && byteCount != 4 );
-							std::cerr << "byteCount = " << byteCount << std::endl;
+							std::cerr << "CncCommandDecoder::decodeMoveSequence::readPosition() Invalid byteCount = " << byteCount << std::endl;
 			}
 
 			valCounter++;
 		}
 
 		// assign x, y, z depending on given pid
-		switch ( pid ) {
-			case PID_MV_SEQ_0_XYZ:
-			case PID_MV_SEQ_1_XYZ:
-			case PID_MV_SEQ_2_XYZ:
-			case PID_MV_SEQ_4_XYZ:  pos.setX(values[0]); pos.setY(values[1]); pos.setZ(values[2]);
-									break;
-			case PID_MV_SEQ_0_XY:
-			case PID_MV_SEQ_1_XY:
-			case PID_MV_SEQ_2_XY:
-			case PID_MV_SEQ_4_XY:   pos.setX(values[0]); pos.setY(values[1]); pos.setZ(0);
-									break;
-			case PID_MV_SEQ_0_X:
-			case PID_MV_SEQ_1_X:
-			case PID_MV_SEQ_2_X:
-			case PID_MV_SEQ_4_X:    pos.setX(values[0]); pos.setY(0); pos.setZ(0);
-									break;
-			case PID_MV_SEQ_0_Y:
-			case PID_MV_SEQ_1_Y:
-			case PID_MV_SEQ_2_Y:
-			case PID_MV_SEQ_4_Y:    pos.setX(0); pos.setY(values[0]); pos.setZ(0);
-									break;
-			case PID_MV_SEQ_0_Z:
-			case PID_MV_SEQ_1_Z:
-			case PID_MV_SEQ_2_Z:
-			case PID_MV_SEQ_4_Z:    pos.setX(0); pos.setY(0); pos.setZ(values[0]);
-									break;
-		}
-
+		ValueInfo vi(valueType);
+		
+		const unsigned short p = vi.hasF() ? 1 : 0;
+		if ( vi.hasF() )
+			f = values[0];
+			
+		if 		( vi.hasXYZ() )	{ pos.setX(values[p+0]); pos.setY(values[p+1]); pos.setZ(values[p+2]); }
+		else if ( vi.hasXY()  ) { pos.setX(values[p+0]); pos.setY(values[p+1]); pos.setZ(0);           }
+		else if ( vi.hasX()   ) { pos.setX(values[p+0]); pos.setY(0);           pos.setZ(0);           }
+		else if ( vi.hasY()   ) { pos.setX(0);           pos.setY(values[p+0]); pos.setZ(0);           }
+		else if ( vi.hasZ()   ) { pos.setX(0);           pos.setY(0);           pos.setZ(values[p+0]); }
+		
 		if ( trace )
-			std::cout << "pos: " << pos << std::endl;
+			std::cout << "byteCounter: " << byteCounter << ", pos: " << pos << std::endl;
 
 		return byteCounter;
 	};
@@ -255,7 +222,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	}
 
 	// ------------------------------------------------------------------------
-	// process portioon
+	// process portion
 	unsigned int portionSize = buffer[idx] + 1;
 	if ( idx + portionSize != nbByte ) {
 		std::cerr << "CncCommandDecoder::decodeMoveSequence() Invalid portion size" << std::endl;
@@ -268,16 +235,20 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 
 	// over all positions
 	unsigned int byteCounter = 0;
-	while ( byteCounter < portionSize) {
+	while ( byteCounter < portionSize - 1) {
 
 		CncLongPosition pos;
+		int32_t f = 0;
 		if ( sequence.cmd == CMD_RENDER_AND_MOVE_SEQUENCE ) {
-			byteCounter += readPosition(pos);
+			
+			byteCounter += readPosition(pos, f);
 		}
 		else if ( sequence.cmd == CMD_MOVE_SEQUENCE ) {
-			byteCounter += readOneByteToPos(pos);
+			
+			byteCounter += readOneByteToPos(pos, f);
 		}
 		else {
+			
 			std::cerr << "CncCommandDecoder::decodeMoveSequence(portion) Invalid command = " << buffer[idx]
 			          << ". While reading portion" << std::endl;
 			return returnAndNotify(false);
@@ -285,17 +256,23 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 
 		// notfy
 		if ( caller != NULL )
-			caller->notifyMove(pos.getX(), pos.getY(), pos.getZ());
+			caller->notifyMove(pos.getX(), pos.getY(), pos.getZ(), f);
 
 		// store
 		sequence.positions.push_back(pos);
+		
+		// debug
+		if ( false ) {
+			std::cout << " portionSize         = " << portionSize << std::endl;
+			std::cout << " byteCounter         = " << byteCounter << std::endl;
+			std::cout << " idx                 = " << idx << std::endl;
+			std::cout << " sequence.remainSize = " << sequence.remainSize << std::endl;
+			
+		}
 	}
 
 	// update remaining size
-	sequence.remainSize -= (idx - 1);
-
-	if ( false )
-		std::cout << "sequence.remainSize = " << sequence.remainSize << std::endl;
+	sequence.remainSize -= idx;
 
 	return returnAndNotify(true);
 }
@@ -311,7 +288,7 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 	bool ret = CncCommandDecoder::decodeMove(buffer, nbByte, x , y , z);
 
 	if ( caller != NULL )
-		caller->notifyMove(x, y, z);
+		caller->notifyMove(x, y, z, 0);
 
 	return ret;
 }

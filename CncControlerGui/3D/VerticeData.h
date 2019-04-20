@@ -6,13 +6,13 @@
 
 namespace GLI {
 	
-	template <typename T, const int32_t T_MIN, const int32_t T_MAX> 
+	template <typename T>
 	class VerticeData {
 
 		public:
 			
 			//////////////////////////////////////////////
-			VerticeData<T, T_MIN, T_MAX>()
+			VerticeData<T>()
 			: _id(-1L)
 			, _x(0)
 			, _y(0)
@@ -21,7 +21,7 @@ namespace GLI {
 			{}
 
 			//////////////////////////////////////////////
-			virtual ~VerticeData<T, T_MIN, T_MAX>() {
+			virtual ~VerticeData<T>() {
 			}
 			
 			//////////////////////////////////////////////
@@ -46,7 +46,7 @@ namespace GLI {
 			}
 			
 			//////////////////////////////////////////////
-			void setVertice(long id, CncSpeedMode speedType, const CncPosition<T, T_MIN, T_MAX>& cp) {
+			void setVertice(long id, CncSpeedMode speedType, const CncPosition<T>& cp) {
 				_id = id;
 				
 				_x = cp.getX();
@@ -71,8 +71,8 @@ namespace GLI {
 			GLI::GLCncPathVertices::CncMode _mode;
 	};
 	
-	typedef VerticeData<int32_t, INT32_MIN, INT32_MAX> VerticeLongData;
-	typedef VerticeData<double,  INT32_MIN, INT32_MAX>  VerticeDoubleData;
+	typedef VerticeData<int32_t> VerticeLongData;
+	typedef VerticeData<double>  VerticeDoubleData;
 }
 	
 #endif

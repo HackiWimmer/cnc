@@ -36,8 +36,13 @@
     <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-O0;-Wall;$(shell wx-config --cflags) " C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
+        <IncludePath Value="C:/@Development/boost_1_69_0"/>
+        <IncludePath Value="C:/@Development/freeglut/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.16/include"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
+        <LibraryPath Value="C:/@Development/freeglut/lib/x64"/>
+        <LibraryPath Value="C:/msys64/mingw64/lib"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>

@@ -2,21 +2,21 @@
 ## Auto Generated makefile by CodeLite IDE
 ## any manual changes will be erased      
 ##
-## Release
+## Debug
 ProjectName            :=wxWidgetsTest
-ConfigurationName      :=Release
+ConfigurationName      :=Debug
 WorkspacePath          :=C:/@Development/@Projekte/c++/CNCGuiController
 ProjectPath            :=C:/@Development/@Projekte/c++/CNCGuiController/wxWidgetsTest
-IntermediateDirectory  :=./Release
+IntermediateDirectory  :=./Debug
 OutDir                 := $(IntermediateDirectory)
 CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=20/03/2019
+Date                   :=23/04/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
-LinkerName             :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe
-SharedObjectLinkerName :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe -shared -fPIC
+LinkerName             :=C:/msys64/mingw64/bin/g++.exe
+SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
@@ -28,7 +28,7 @@ LibraryPathSwitch      :=-L
 PreprocessorSwitch     :=-D
 SourceSwitch           :=-c 
 OutputFile             :=$(IntermediateDirectory)/$(ProjectName)
-Preprocessors          :=$(PreprocessorSwitch)NDEBUG $(PreprocessorSwitch)BOOST_STACKTRACE_USE_BACKTRACE 
+Preprocessors          :=
 ObjectSwitch           :=-o 
 ArchiveOutputSwitch    := 
 PreprocessOnlySwitch   :=-E
@@ -36,7 +36,7 @@ ObjectsFileList        :="wxWidgetsTest.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := $(shell wx-config --rcflags)
-RcCompilerName         :=C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/windres.exe
+RcCompilerName         :=C:/msys64/mingw64/bin/windres.exe
 LinkOptions            :=  $(shell wx-config --libs) -mwindows
 IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:/@Development/boost_1_69_0 $(IncludeSwitch)C:/@Development/freeglut/include $(IncludeSwitch)C:/@Development/wxsvg-1.5.16/include 
 IncludePCH             := 
@@ -49,13 +49,13 @@ LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:/@Developm
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
-AR       := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/ar.exe rcu
-CXX      := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/g++.exe
-CC       := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/gcc.exe
-CXXFLAGS := -Wno-deprecated-declarations -O3 -std=c++17 -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
-CFLAGS   :=  -O2 -Wall $(Preprocessors)
+AR       := C:/msys64/mingw64/bin/ar.exe rcu
+CXX      := C:/msys64/mingw64/bin/g++.exe
+CC       := C:/msys64/mingw64/bin/gcc.exe
+CXXFLAGS := -Wno-deprecated-declarations -g -O0 -Wall $(shell wx-config --cflags)  $(Preprocessors)
+CFLAGS   :=  -g -O0 -Wall $(Preprocessors)
 ASFLAGS  := 
-AS       := C:/@Development/Compilers/mingw-w64/x86_64-8.1.0-posix-seh-rt_v6-rev0/mingw64/bin/as.exe
+AS       := C:/msys64/mingw64/bin/as.exe
 
 
 ##
@@ -80,16 +80,13 @@ $(OutputFile): $(IntermediateDirectory)/.d $(Objects)
 	$(LinkerName) $(OutputSwitch)$(OutputFile) @$(ObjectsFileList) $(LibPath) $(Libs) $(LinkOptions)
 
 MakeIntermediateDirs:
-	@$(MakeDirCommand) "./Release"
+	@$(MakeDirCommand) "./Debug"
 
 
 $(IntermediateDirectory)/.d:
-	@$(MakeDirCommand) "./Release"
+	@$(MakeDirCommand) "./Debug"
 
 PreBuild:
-	@echo Executing Pre Build commands ...
-	g++ -v
-	@echo Done
 
 
 ##
@@ -143,6 +140,6 @@ $(IntermediateDirectory)/wxcrafter_bitmaps.cpp$(PreprocessSuffix): wxcrafter_bit
 ## Clean
 ##
 clean:
-	$(RM) -r ./Release/
+	$(RM) -r ./Debug/
 
 

@@ -45,6 +45,7 @@ int CncUsbPortScanner::isComPortAvailable(int port) {
 
 #ifdef __WXGTK__
 	#warning todo GTK implementation
+	return 0;
 #endif
 }
 ///////////////////////////////////////////////////////////////////

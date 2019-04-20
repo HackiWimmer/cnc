@@ -257,6 +257,8 @@
   <object class="wxBitmap" name="application-side-boxes">bitmaps\application-side-boxes.png</object>
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
   <object class="wxBitmap" name="application-view-gallery">bitmaps\application-view-gallery.png</object>
+  <object class="wxBitmap" name="appointment-new">bitmaps\appointment-new.png</object>
+  <object class="wxBitmap" name="appointment-new-5">bitmaps\appointment-new-5.png</object>
   <object class="wxBitmap" name="appointment-soon">bitmaps\appointment-soon.png</object>
   <object class="wxBitmap" name="arrow-out">bitmaps\arrow-out.png</object>
   <object class="wxBitmap" name="arrow-right-3">bitmaps\arrow-right-3.png</object>
@@ -287,7 +289,6 @@
   <object class="wxBitmap" name="dialog-close-2">bitmaps\dialog-close-2.png</object>
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
   <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
-  <object class="wxBitmap" name="dialog-information-3 (2)">bitmaps\dialog-information-3 (2).png</object>
   <object class="wxBitmap" name="dialog-ok">bitmaps\dialog-ok.png</object>
   <object class="wxBitmap" name="dialog-question-2 (2)">bitmaps\dialog-question-2 (2).png</object>
   <object class="wxBitmap" name="dialog-warning-3 (2)">bitmaps\dialog-warning-3 (2).png</object>
@@ -320,6 +321,7 @@
   <object class="wxBitmap" name="go-down-2">bitmaps\go-down-2.png</object>
   <object class="wxBitmap" name="go-down-7">bitmaps\go-down-7.png</object>
   <object class="wxBitmap" name="go-first-view">bitmaps\go-first-view.png</object>
+  <object class="wxBitmap" name="go-jump-today">bitmaps\go-jump-today.png</object>
   <object class="wxBitmap" name="go-last-view">bitmaps\go-last-view.png</object>
   <object class="wxBitmap" name="go-next-2">bitmaps\go-next-2.png</object>
   <object class="wxBitmap" name="go-next-context">bitmaps\go-next-context.png</object>
@@ -327,6 +329,7 @@
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="help-about">bitmaps\help-about.png</object>
+  <object class="wxBitmap" name="lightbulb-off">bitmaps\lightbulb-off.png</object>
   <object class="wxBitmap" name="link_editor">bitmaps\link_editor.png</object>
   <object class="wxBitmap" name="lstick_all-small">bitmaps\gamepad\navi\lstick_all-small.png</object>
   <object class="wxBitmap" name="media-playback-pause-7">bitmaps\media-playback-pause-7.png</object>
@@ -350,6 +353,7 @@
   <object class="wxBitmap" name="package-link">bitmaps\package-link.png</object>
   <object class="wxBitmap" name="package-supported">bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="package-x-generic1">bitmaps\package-x-generic1.png</object>
+  <object class="wxBitmap" name="pencil-add">bitmaps\pencil-add.png</object>
   <object class="wxBitmap" name="playstation-circle-dark-icon24">bitmaps\gamepad\playstation-circle-dark-icon24.png</object>
   <object class="wxBitmap" name="playstation-cross-dark-icon16">bitmaps\gamepad\playstation-cross-dark-icon16.png</object>
   <object class="wxBitmap" name="playstation-cross-dark-icon24">bitmaps\gamepad\playstation-cross-dark-icon24.png</object>
@@ -368,12 +372,10 @@
   <object class="wxBitmap" name="server-connect">bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="settings">bitmaps\settings.png</object>
   <object class="wxBitmap" name="snail">bitmaps\snail.png</object>
-  <object class="wxBitmap" name="snap-guideline">bitmaps\snap-guideline.png</object>
   <object class="wxBitmap" name="snap-orto">bitmaps\snap-orto.png</object>
   <object class="wxBitmap" name="software-update-available-3 (2)">bitmaps\software-update-available-3 (2).png</object>
   <object class="wxBitmap" name="software-update-inactive (2)">bitmaps\software-update-inactive (2).png</object>
   <object class="wxBitmap" name="sports-shuttlecock">bitmaps\sports-shuttlecock.png</object>
-  <object class="wxBitmap" name="start-here">bitmaps\start-here.png</object>
   <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
   <object class="wxBitmap" name="system-run-4">bitmaps\system-run-4.png</object>
   <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>

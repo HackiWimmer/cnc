@@ -83,8 +83,9 @@ void CncMessageDialog::setupDefaultStyle() {
 		m_message->StyleSetForeground (i, wxColour(175, 175, 175));
 	
 	// setup default font
+	wxFont font(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
 	for ( unsigned int i=0; i<wxSTC_STYLE_MAX; i++)
-		m_message->StyleSetFont(i, wxFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas")));
+		m_message->StyleSetFont(i, font);
 
 	// Reset folding
 	m_message->SetProperty(wxT("xml.auto.close.tags"), 		wxT("0"));

@@ -40,12 +40,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 
 ///////////////////////////////////////////////////////////////////
 {
-	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
-											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(),
-											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
-											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ()
-										  );
-	
+	speedSimulator = new CncSpeedSimulator();
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
@@ -71,11 +66,7 @@ SerialEmulatorNULL::SerialEmulatorNULL(const char *portName)
 , lastSignal(CMD_INVALID)
 ///////////////////////////////////////////////////////////////////
 {
-	speedSimulator = new CncSpeedSimulator(	SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US,
-											GBL_CONFIG->getPitchX(), GBL_CONFIG->getStepsX(), GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(),
-											GBL_CONFIG->getPitchY(), GBL_CONFIG->getStepsY(), GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(),
-											GBL_CONFIG->getPitchZ(), GBL_CONFIG->getStepsZ(), GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ()
-										   );
+	speedSimulator = new CncSpeedSimulator();
 	reset();
 }
 ///////////////////////////////////////////////////////////////////
@@ -695,16 +686,16 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 
 		// special handling for later use
 		switch ( pid ) {
-			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = values.front(); break;
-			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = values.front(); break;
-			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = values.front(); break;
+			case PID_POS_REPLY_THRESHOLD_X: posReplyThresholdX = ( values.size() > 0 ? values.front() : 0 ); break;
+			case PID_POS_REPLY_THRESHOLD_Y: posReplyThresholdY = ( values.size() > 0 ? values.front() : 0 ); break;
+			case PID_POS_REPLY_THRESHOLD_Z: posReplyThresholdZ = ( values.size() > 0 ? values.front() : 0 ); break;
 			
-			case PID_RESERT_POS_COUNTER:  		resetPositionCounter(); break;
-			case PID_RESERT_STEP_COUNTER: 		resetStepCounter(); 	break;
+			case PID_RESERT_POS_COUNTER:  	resetPositionCounter(); break;
+			case PID_RESERT_STEP_COUNTER: 	resetStepCounter(); 	break;
 			
-			case PID_X_POS:   					curEmulatorPos.setX(0); break;
-			case PID_Y_POS:   					curEmulatorPos.setY(0); break;
-			case PID_Z_POS:  					curEmulatorPos.setZ(0); break;
+			case PID_X_POS:   				curEmulatorPos.setX(( values.size() > 0 ? values.front() : 0 )); break;
+			case PID_Y_POS:   				curEmulatorPos.setY(( values.size() > 0 ? values.front() : 0 )); break;
+			case PID_Z_POS:  				curEmulatorPos.setZ(( values.size() > 0 ? values.front() : 0 )); break;
 			
 			case PID_PITCH_X:
 			case PID_PITCH_Y:
@@ -765,6 +756,12 @@ void SerialEmulatorNULL::notifyMoveSequenceNext(const CncCommandDecoder::MoveSeq
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
+	if ( lastCommand.MoveSequence.sequence.remainSize != 0 ) {
+		std::cerr 	<< "SerialEmulatorNULL::notifyMoveSequenceEnd: Quality check failed" << std::endl
+					<< " - lastCommand.MoveSequence.sequence.remainSize: " << lastCommand.MoveSequence.sequence.remainSize 
+					<< std::endl;
+	}
+
 	// perform any rest offset
 	completeFeedProfile();
 
@@ -772,9 +769,12 @@ void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequ
 	lastSignal = CMD_INVALID;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz) {
+void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 ///////////////////////////////////////////////////////////////////
-	//std::cout << "SerialEmulatorNULL::notify: " << dx << ", " << dy << ", " << dz << std::endl;
+	#warning do something with f
+	if ( f != 0 )
+		;//std::clog << "Feed speed change detected: value = " << f << std::endl;
+	
 	renderAndMove(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
@@ -785,14 +785,14 @@ bool SerialEmulatorNULL::writeMoveSeqIntern(unsigned char *buffer, unsigned int 
 			return false;
 	}
 
-	// this call will activate: notify(int32_t dx, int32_t dy, int32_t dz)
+	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f)
 	CncCommandDecoder::decodeMoveSequence(buffer, nbByte, lastCommand.MoveSequence.sequence, this);
 
 	// determine handshake
 	lastCommand.MoveSequence.ret = RET_MORE;
 	
 	if ( false )
-		std::cout << lastCommand.MoveSequence.sequence.remainSize << std::endl;
+		std::cout << "lastCommand.MoveSequence.sequence.remainSize: " << lastCommand.MoveSequence.sequence.remainSize << std::endl;
 	
 	if ( lastCommand.MoveSequence.sequence.isEnd() )
 		lastCommand.MoveSequence.ret = RET_OK;
@@ -905,15 +905,10 @@ void SerialEmulatorNULL::completeFeedProfile() {
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::updateRealtimeSpeed() {
 ///////////////////////////////////////////////////////////////////
-	#warning
-	speedSimulator->setRealtimeFeedSpeed_MM_MIN(getMeasuredFeedSpeed_MM_MIN());
-	
-	if ( false ) {
-		std::cout << "Feed speed options: "
-				  << speedSimulator->getRealtimeFeedSpeed_MM_MIN() << ", "
-				  << getTotalDistance() / getMeasurementNanoTimeSpanTotal() *1000 * 1000 * 1000 * 60
-				  << std::endl;
-	}
+	// to have some different from the measuered value
+	// the fakeFactor is used.
+	const double fakteFactor = 1.1;
+	speedSimulator->setRealtimeFeedSpeed_MM_MIN(getMeasuredFeedSpeed_MM_MIN() * fakteFactor);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::initRenderAndMove(int32_t dx , int32_t dy , int32_t dz) {
@@ -1085,18 +1080,12 @@ bool SerialEmulatorNULL::translateStepAxisRetValue(unsigned char ret) {
 void SerialEmulatorNULL::replyPosition(bool force) {
 ///////////////////////////////////////////////////////////////////
 	// simulate a direct controller callback.
-	static CncLongPosition lastReplyPos;
-	CncLongPosition diff(curEmulatorPos - lastReplyPos);
+	static int64_t lastReplyDistance = 0L;
+	const  int64_t stepCounter       = stepCounterX + stepCounterY + stepCounterZ;
+	const  int64_t posReplyThreshold = ( posReplyThresholdX + posReplyThresholdY + posReplyThresholdZ ) / 3;
+	const  int64_t diff              = stepCounter - lastReplyDistance;
 	
-	//std::cout << force << endl;
-	//std::cout << curEmulatorPos.getX() << ", " << lastReplyPos.getX() << "; " << posReplyThresholdX << ", " << diff.getX() << std::endl;
-	//std::cout << curEmulatorPos.getY() << ", " << lastReplyPos.getY() << "; " << posReplyThresholdY << ", " << diff.getY() << std::endl;
-	//std::cout << curEmulatorPos.getZ() << ", " << lastReplyPos.getZ() << "; " << posReplyThresholdZ << ", " << diff.getZ() << std::endl;
-	
-	if ( absolute( diff.getX() ) >= posReplyThresholdX || 
-	     absolute( diff.getY() ) >= posReplyThresholdY || 
-		 absolute( diff.getZ() ) >= posReplyThresholdZ ||
-		 force == true ) 
+	if ( diff >= posReplyThreshold || force == true )
 	{
 		updateRealtimeSpeed();
 		
@@ -1108,7 +1097,7 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 		// totally finished. So, the one and only way to 
 		// communicate continous with the cnc control is to call 
 		// the SerialControllrCallback directly. Otherwise the 
-		// complete serial data will be fetch in one block 
+		// complete serial data will be fetched in one block 
 		// at the end if this writeMove(...) call was finalized.
 		
 		wxASSERT( speedSimulator != NULL );
@@ -1125,7 +1114,8 @@ void SerialEmulatorNULL::replyPosition(bool force) {
 		ci.feedSpeed 			= speedSimulator->getRealtimeFeedSpeed_MM_MIN();
 		
 		sendSerialControllerCallback(ci);
-		lastReplyPos.set(curEmulatorPos);
+		
+		lastReplyDistance = stepCounter;
 	}
 }
 ///////////////////////////////////////////////////////////////////

@@ -13,10 +13,12 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 , mouseLabel(-1, -1)
 , axisMeasurePoints()
 , axisMeasuredSpeed()
+, axisReceivedSpeed()
 , axisConfiguredSpeed()
 , lastRefresh(CncTimeFunctions::getMilliTimestamp())
 , timeIndex(0)
 , currentMeasuredFeedSpeed_MM_MIN(0.0)
+, currentReceivedFeedSpeed_MM_MIN(0.0)
 , currentConfiguredFeedSpeed_MM_MIN(0.0)
 ////////////////////////////////////////////////////////////////
 {
@@ -36,19 +38,24 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 	m_rightAxis->SetBackgroundColour(*wxBLACK);
 	
 	// setup axises
-	axisMeasurePoints.pen 		= wxPen(wxColour(0, 190, 0), 	1, wxSOLID);
+	axisMeasurePoints.pen 		= wxPen(wxColour(0, 190, 0), 		1, wxSOLID);
 	axisMeasurePoints.pos 		= wxBOTTOM;
 	axisMeasurePoints.fill 		= true;
 	axisMeasurePoints.minValue	= 0.0;
 	axisMeasurePoints.maxValue	= 3.0;
 	axisMeasurePoints.yOffset 	= 5;
 	
-	axisMeasuredSpeed.pen 		= wxPen(wxColour(255, 80, 80), 	2, wxSOLID);
+	axisMeasuredSpeed.pen 		= wxPen(wxColour(255, 80, 80), 		2, wxSOLID);
 	axisMeasuredSpeed.pos 		= wxRIGHT;
 	axisMeasuredSpeed.fill 		= false;
 	axisMeasuredSpeed.yOffset 	= 0;
 	
-	axisConfiguredSpeed.pen		= wxPen(wxColour(64, 64, 64),	1, wxSOLID);
+	axisReceivedSpeed.pen 		= wxPen(wxColour(239, 228, 176),	1, wxSOLID);
+	axisReceivedSpeed.pos 		= wxRIGHT;
+	axisReceivedSpeed.fill 		= false;
+	axisReceivedSpeed.yOffset 	= 0;
+	
+	axisConfiguredSpeed.pen		= wxPen(wxColour(64, 64, 64),		1, wxSOLID);
 	axisConfiguredSpeed.pos		= wxLEFT;
 	axisConfiguredSpeed.fill 	= true;
 	axisMeasuredSpeed.yOffset 	= 0;
@@ -69,6 +76,8 @@ void CncSpeedMonitor::activate(bool enable) {
 	
 	m_btToggleConfiguredAxis->Enable(enable);
 	m_btToggleMeasurePointsAxis->Enable(enable);
+	m_btToggleMeasuredSpeedAxis->Enable(enable);
+	m_btToggleReceivedSpeedAxis->Enable(enable);
 	
 	m_btClear->Enable(enable);
 	m_btSave->Enable(enable);
@@ -93,6 +102,7 @@ void CncSpeedMonitor::setupSizes() {
 	drawingArea.width 			= std::min((int)MAX_VALUES, drawingArea.width);
 	
 	axisMeasuredSpeed.height 	= drawingArea.height;
+	axisReceivedSpeed.height 	= drawingArea.height;
 	axisConfiguredSpeed.height 	= drawingArea.height;
 }
 ////////////////////////////////////////////////////////////////
@@ -119,9 +129,11 @@ void CncSpeedMonitor::init(double maxSpeedValue_MM_MIN) {
 	const double overSize =  maxSpeedValue_MM_MIN * 0.2;
 	
 	axisMeasuredSpeed.maxValue 		= maxSpeedValue_MM_MIN + overSize;
+	axisReceivedSpeed.maxValue		= maxSpeedValue_MM_MIN + overSize;
 	axisConfiguredSpeed.maxValue	= maxSpeedValue_MM_MIN + overSize;
 	
 	wxASSERT(axisMeasuredSpeed.maxValue   > axisMeasuredSpeed.minValue);
+	wxASSERT(axisReceivedSpeed.maxValue   > axisMeasuredSpeed.minValue);
 	wxASSERT(axisConfiguredSpeed.maxValue > axisConfiguredSpeed.minValue);
 }
 ////////////////////////////////////////////////////////////////
@@ -144,10 +156,11 @@ void CncSpeedMonitor::stop() {
 		m_refreshTimer->Stop();
 }
 ////////////////////////////////////////////////////////////////
-void CncSpeedMonitor::setCurrentFeedSpeedValue(double measured_MM_MIN, double configured_MM_MIN) {
+void CncSpeedMonitor::setCurrentFeedSpeedValue(const SpeedData& sd) {
 ////////////////////////////////////////////////////////////////
-	currentMeasuredFeedSpeed_MM_MIN		= std::max(0.0, measured_MM_MIN);
-	currentConfiguredFeedSpeed_MM_MIN	= std::max(0.0, configured_MM_MIN);
+	currentMeasuredFeedSpeed_MM_MIN		= std::max(0.0, sd.measured_MM_MIN);
+	currentReceivedFeedSpeed_MM_MIN		= std::max(0.0, sd.received_MM_MIN);
+	currentConfiguredFeedSpeed_MM_MIN	= std::max(0.0, sd.configured_MM_MIN);
 	
 	// log that min one measure point exists
 	axisMeasurePoints.values[timeIndex] = axisMeasurePoints.maxValue;
@@ -174,6 +187,7 @@ void CncSpeedMonitor::onRefreshTimer(wxTimerEvent& event) {
 			timeIndex = 0;
 			
 		axisMeasuredSpeed.values[timeIndex] 	= axisMeasuredSpeed.convert(currentMeasuredFeedSpeed_MM_MIN);
+		axisReceivedSpeed.values[timeIndex] 	= axisMeasuredSpeed.convert(currentReceivedFeedSpeed_MM_MIN);
 		axisConfiguredSpeed.values[timeIndex] 	= axisConfiguredSpeed.convert(currentConfiguredFeedSpeed_MM_MIN);
 		
 		timeIndex++;
@@ -242,24 +256,26 @@ void CncSpeedMonitor::onPaint(wxPaintEvent& event) {
 		const unsigned int  pos = timeIndex;
 		unsigned int 		x = 0;
 		
+		// section A
 		for ( unsigned int i = pos; i <= (unsigned int)drawingArea.width; i++, x++ ) {
 			if ( i == 0 || x == 0 )
 				continue;
 
 			if ( m_btToggleConfiguredAxis->GetValue() )		draw(axisConfiguredSpeed, 	x ,i);
 			if ( m_btToggleMeasurePointsAxis->GetValue() ) 	draw(axisMeasurePoints,		x ,i);
-			
-			draw(axisMeasuredSpeed, x ,i);
+			if ( m_btToggleReceivedSpeedAxis->GetValue() )	draw(axisReceivedSpeed, 	x ,i);
+			if ( m_btToggleMeasuredSpeedAxis->GetValue() )	draw(axisMeasuredSpeed, 	x ,i);
 		}
 		
+		// section B
 		for ( unsigned int i = 0; i < pos; i++, x++ ) {
 			if ( i == 0 || x == 0 )
 				continue;
 				
 			if ( m_btToggleConfiguredAxis->GetValue() )		draw(axisConfiguredSpeed, 	x ,i);
 			if ( m_btToggleMeasurePointsAxis->GetValue() ) 	draw(axisMeasurePoints,		x ,i);
-			
-			draw(axisMeasuredSpeed, x ,i);
+			if ( m_btToggleReceivedSpeedAxis->GetValue() )	draw(axisReceivedSpeed, 	x ,i);
+			if ( m_btToggleMeasuredSpeedAxis->GetValue() )	draw(axisMeasuredSpeed, 	x ,i);
 		}
 	};
 	
@@ -359,6 +375,16 @@ void CncSpeedMonitor::toggleConfiguredAxis(wxCommandEvent& event) {
 }
 ////////////////////////////////////////////////////////////////
 void CncSpeedMonitor::toggleMeasurePointsAxis(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	m_darwingArea->Refresh();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::toggleMeasuredSpeedAxis(wxCommandEvent& event) {
+////////////////////////////////////////////////////////////////
+	m_darwingArea->Refresh();
+}
+////////////////////////////////////////////////////////////////
+void CncSpeedMonitor::toggleReceivedSpeedAxis(wxCommandEvent& event) {
 ////////////////////////////////////////////////////////////////
 	m_darwingArea->Refresh();
 }
@@ -464,4 +490,6 @@ void CncSpeedMonitor::clear() {
 		
 	if ( timerState == true )
 		m_refreshTimer->Start(m_intervalSlider->GetValue());
+
+	m_darwingArea->Refresh();
 }

@@ -13,80 +13,117 @@ class CncMoveSequence {
 			int32_t x;
 			int32_t y;
 			int32_t z;
+			int32_t f;
 
 			struct Parameter {
-				unsigned char 	pid				= 0;
+				unsigned char 	type			= 0;
 				unsigned int 	necessarySize	= 0;
 			} param;
 
-			SequencePoint() {
+			SequencePoint() 
+			: param()
+			{
 				this->x = 0;
 				this->y = 0;
 				this->z = 0;
+				this->f = 0;
 			}
 
-			explicit SequencePoint(int32_t z) {
+			explicit SequencePoint(int32_t z)
+			: param()
+			{
 				this->x = 0;
 				this->y = 0;
 				this->z = z;
+				this->f = 0;
 			}
 
-			SequencePoint(int32_t x, int32_t y) {
+			SequencePoint(int32_t x, int32_t y)
+			: param()
+			{
 				this->x = x;
 				this->y = y;
 				this->z = 0;
+				this->f = 0;
 			}
 
-			SequencePoint(int32_t x, int32_t y, int32_t z) {
+			SequencePoint(int32_t x, int32_t y, int32_t z)
+			: param()
+			{
 				this->x = x;
 				this->y = y;
 				this->z = z;
+				this->f = 0;
 			}
 
-			//                                       pid             + 3 * value
-			static const unsigned int MaxPointSize = sizeof(int32_t) + 3 * sizeof(int32_t);
+			SequencePoint(int32_t x, int32_t y, int32_t z, int32_t f)
+			: param()
+			{
+				this->x = x;
+				this->y = y;
+				this->z = z;
+				this->f = f;
+			}
+
+			//                                       pid             + 4                        * value
+			static const unsigned int MaxPointSize = sizeof(int32_t) + ValueInfo::MaxValueCount * sizeof(int32_t);
+
+			bool isOneByte() const { return ( cnc::between(x, -2, +2)               && cnc::between(y, -2, +2)               && cnc::between(z, -2, +2)               && cnc::between(f, -2, +2) ); } 
+			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   &&  cnc::between(z, INT8_MIN, INT8_MAX)  && cnc::between(f, INT8_MIN, INT8_MAX) ); } 
+			bool isInt16()   const { return ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX) && cnc::between(f, INT16_MIN, INT16_MAX) ); } 
+			bool isInt32()   const { return ( cnc::between(x, INT32_MIN, INT32_MAX) && cnc::between(y, INT32_MIN, INT32_MAX) && cnc::between(z, INT32_MIN, INT32_MAX) && cnc::between(f, INT32_MIN, INT32_MAX) ); } 
 
 			bool hasX() const { return x != 0; }
 			bool hasY() const { return y != 0; }
 			bool hasZ() const { return z != 0; }
-
-			void calculateParameters() {
-				param.pid 				= 0;
+			
+			bool hasF() const { return f != 0; }
+			
+			bool notX() const { return x == 0; }
+			bool notY() const { return y == 0; }
+			bool notZ() const { return z == 0; }
+			
+			bool notF() const { return f == 0; }
+			
+			void determineOneByte() {
+				param.type 				= 0;
+				param.necessarySize		= 1;
+			}
+			
+			void determineParameters(unsigned char cmd) {
+				if ( cmd == CMD_MOVE_SEQUENCE) {
+					param.type 				= 0;
+					param.necessarySize		= 1;
+					return;
+				}
+				
+				param.type 				= 0;
 				param.necessarySize		= 0;
-
+				
 				// cnc::between(x, -2, +2) means values [-1, 0, +1]
-				if      ( cnc::between(x, -2, +2)               && cnc::between(y, -2, +2)               && cnc::between(z, -2, +2) ) {
-					if 		( hasX() && hasY() && hasZ() )	{ param.pid = PID_MV_SEQ_0_XYZ;	param.necessarySize =  3; }
-					else if ( hasX() && hasY() )			{ param.pid = PID_MV_SEQ_0_XY;	param.necessarySize =  2; }
-					else if ( hasX() )						{ param.pid = PID_MV_SEQ_0_X;	param.necessarySize =  1; }
-					else if ( hasY() )						{ param.pid = PID_MV_SEQ_0_Y;	param.necessarySize =  1; }
-					else if ( hasZ() )						{ param.pid = PID_MV_SEQ_0_Z;	param.necessarySize =  1; }
-					else 									{ param.pid = 0;				param.necessarySize =  0; }
+				if      ( isOneByte() ) {
+					ValueInfo vi(ValueInfo::Size::One, x, y, z, f);
+					param.type 				= vi.getType();
+					param.necessarySize		= vi.getNecessarySize();
 				}
-				else if ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   && cnc::between(z, INT8_MIN, INT8_MAX) ) {
-					if 		( hasX() && hasY() && hasZ() )	{ param.pid = PID_MV_SEQ_1_XYZ;	param.necessarySize =  3; }
-					else if ( hasX() && hasY() )			{ param.pid = PID_MV_SEQ_1_XY;	param.necessarySize =  2; }
-					else if ( hasX() )						{ param.pid = PID_MV_SEQ_1_X;	param.necessarySize =  1; }
-					else if ( hasY() )						{ param.pid = PID_MV_SEQ_1_Y;	param.necessarySize =  1; }
-					else if ( hasZ() )						{ param.pid = PID_MV_SEQ_1_Z;	param.necessarySize =  1; }
-					else 									{ param.pid = 0;				param.necessarySize =  0; }
+				else if ( isInt8() ) {
+					ValueInfo vi(ValueInfo::Size::Int8, x, y, z, f);
+					param.type 				= vi.getType();
+					param.necessarySize		= vi.getNecessarySize();
 				}
-				else if ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX) ) {
-					if 		( hasX() && hasY() && hasZ() )	{ param.pid = PID_MV_SEQ_2_XYZ;	param.necessarySize =  6; }
-					else if ( hasX() && hasY() )			{ param.pid = PID_MV_SEQ_2_XY;	param.necessarySize =  4; }
-					else if ( hasX() )						{ param.pid = PID_MV_SEQ_2_X;	param.necessarySize =  2; }
-					else if ( hasY() )						{ param.pid = PID_MV_SEQ_2_Y;	param.necessarySize =  2; }
-					else if ( hasZ() )						{ param.pid = PID_MV_SEQ_2_Z;	param.necessarySize =  2; }
-					else 									{ param.pid = 0;				param.necessarySize =  0; }
+				else if ( isInt16() ) {
+					ValueInfo vi(ValueInfo::Size::Int16, x, y, z, f);
+					param.type 				= vi.getType();
+					param.necessarySize		= vi.getNecessarySize();
 				}
-				else {
-					if 		( hasX() && hasY() && hasZ() )	{ param.pid = PID_MV_SEQ_4_XYZ;	param.necessarySize = 12; }
-					else if ( hasX() && hasY() )			{ param.pid = PID_MV_SEQ_4_XY;	param.necessarySize =  8; }
-					else if ( hasX() )						{ param.pid = PID_MV_SEQ_4_X;	param.necessarySize =  4; }
-					else if ( hasY() )						{ param.pid = PID_MV_SEQ_4_Y;	param.necessarySize =  4; }
-					else if ( hasZ() )						{ param.pid = PID_MV_SEQ_4_Z;	param.necessarySize =  4; }
-					else 									{ param.pid = 0;				param.necessarySize =  0; }
+				else if ( isInt32() ) {
+					ValueInfo vi(ValueInfo::Size::Int32, x, y, z, f);
+					param.type 				= vi.getType();
+					param.necessarySize		= vi.getNecessarySize();
 				}
+				
+				wxASSERT( param.type 			!= 0 );
+				wxASSERT( param.necessarySize 	!= 0 );
 			}
 		};
 
@@ -97,9 +134,9 @@ class CncMoveSequence {
 			int32_t lengthY	= 0;
 			int32_t lengthZ	= 0;
 
-			int32_t targetX		= 0;
-			int32_t targetY		= 0;
-			int32_t targetZ		= 0;
+			int32_t targetX	= 0;
+			int32_t targetY	= 0;
+			int32_t targetZ	= 0;
 
 			void reset() {
 				lengthX	= lengthY = lengthZ	= 0;
@@ -111,9 +148,9 @@ class CncMoveSequence {
 				targetY += dy;
 				targetZ += dz;
 
-				lengthX	+= abs(dx);
-				lengthY	+= abs(dy);
-				lengthZ	+= abs(dz);
+				lengthX	+= absolute(dx);
+				lengthY	+= absolute(dy);
+				lengthZ	+= absolute(dz);
 			}
 		};
 
@@ -125,7 +162,9 @@ class CncMoveSequence {
 		MoveSequence	sequence;
 		ProtionIndex	portionIndex;
 		SequenceData	data;
-		unsigned char	type;
+		
+		unsigned int 	maxSerialSize;
+		unsigned char	moveCmd;
 		unsigned char*	moveSequenceBuffer;
 		unsigned int	moveSequenceBufferSize;
 		unsigned int 	moveSequenceFlushedSize;
@@ -161,14 +200,24 @@ class CncMoveSequence {
 		explicit CncMoveSequence(unsigned char pid);
 		~CncMoveSequence();
 
-		bool 					isValid() const						{ return (type == CMD_MOVE_SEQUENCE || type == CMD_RENDER_AND_MOVE_SEQUENCE); }
-		unsigned char			getType() const						{ return type; }
+		bool 					isValid() const						{ return (moveCmd == CMD_MOVE_SEQUENCE || moveCmd == CMD_RENDER_AND_MOVE_SEQUENCE); }
+		unsigned char			getType() const						{ return moveCmd; }
 
-		void 					addPosXYZ(int32_t dx, int32_t dy, int32_t dz);
-		void 					addPosXY (int32_t dx, int32_t dy)	{ addPosXYZ(dx, dy,  0); }
-		void 					addPosX  (int32_t dx)				{ addPosXYZ(dx,  0,  0); }
-		void 					addPosY  (int32_t dy)				{ addPosXYZ( 0, dy,  0); }
-		void 					addPosZ  (int32_t dz)				{ addPosXYZ( 0,  0, dz); }
+		void 					addPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f);
+		
+		void 					addPosXYZ (int32_t dx, int32_t dy, int32_t dz)	{ addPosXYZF(dx, dy,  0, 0); }
+		
+		void 					addPosXYF (int32_t dx, int32_t dy, int32_t f)	{ addPosXYZF(dx, dy,  0, f); }
+		void 					addPosXY  (int32_t dx, int32_t dy)				{ addPosXYZF(dx, dy,  0, 0); }
+		
+		void 					addPosXF  (int32_t dx, int32_t f)				{ addPosXYZF(dx,  0,  0, f); }
+		void 					addPosX   (int32_t dx)							{ addPosXYZF(dx,  0,  0, 0); }
+		
+		void 					addPosYF  (int32_t dy, int32_t f)				{ addPosXYZF( 0, dy,  0, f); }
+		void 					addPosY   (int32_t dy)							{ addPosXYZF( 0, dy,  0, 0); }
+		
+		void 					addPosZF  (int32_t dz, int32_t f)				{ addPosXYZF( 0,  0, dz, f); }
+		void 					addPosZ   (int32_t dz)							{ addPosXYZF( 0,  0, dz, 0); }
 
 		bool 					hasMore() const 					{ return getCount() > 0; }
 		unsigned int 			getCount() const;

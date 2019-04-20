@@ -308,7 +308,7 @@ class SerialEmulatorNULL : public SerialSpyPort,
 		virtual ~SerialEmulatorNULL();
 		
 		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
-		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz);
+		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f);
 		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence);
 		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence);
 		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence);

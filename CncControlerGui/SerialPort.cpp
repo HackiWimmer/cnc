@@ -43,8 +43,9 @@ bool SerialCommandLocker::lock(CncControl* cnc) {
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(CncControl* cnc)
 : SerialOSD()
-, totalDistance{0.0, 0.0, 0.0, 0.0}
-, totalDistanceRef(0.0)
+, totalDistanceSteps{0L, 0L, 0L, 0L}
+, totalDistanceMetric{0.0, 0.0, 0.0, 0.0}
+, totalDistanceMetricRef(0.0)
 , measuredFeedSpeed_MM_SEC(0.0)
 , measurementRefPos(0, 0, 0)
 , tsMeasurementStart(0LL)
@@ -70,8 +71,9 @@ Serial::Serial(CncControl* cnc)
 ///////////////////////////////////////////////////////////////////
 Serial::Serial(const char *portName)
 : SerialOSD()
-, totalDistance{0.0, 0.0, 0.0, 0.0}
-, totalDistanceRef(0.0)
+, totalDistanceSteps{0L, 0L, 0L, 0L}
+, totalDistanceMetric{0.0, 0.0, 0.0, 0.0}
+, totalDistanceMetricRef(0.0)
 , measuredFeedSpeed_MM_SEC(0.0)
 , measurementRefPos(0, 0, 0)
 , tsMeasurementStart(0LL)
@@ -150,9 +152,9 @@ void Serial::logMeasurementLastTs() {
 	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		const short T = 3;
 		const CncNanoTimespan tDiff = getMeasurementNanoTimeSpanLastRef();
-		const double pDiff          = totalDistance[T] - totalDistanceRef;
+		const double pDiff          = totalDistanceMetric[T] - totalDistanceMetricRef;
 		
-		// to avoid miss caluclations on the basis of to short difference
+		// to avoid totalDistanceMetric calculations on the basis of to short difference
 		// this is with respect, that windows can't sleep exactly
 		const CncNanoTimestamp tThreshold = CncTimeFunctions::minWaitPeriod;
 		const double           pThreshold = 0.5; // ->     mm
@@ -164,11 +166,6 @@ void Serial::logMeasurementLastTs() {
 			
 			measuredFeedSpeed_MM_SEC  = F;
 			
-			/*
-			measuredFeedSpeed_MM_SEC  = pDiff;
-			measuredFeedSpeed_MM_SEC /= tDiff;
-			measuredFeedSpeed_MM_SEC *= std::nano::den;
-			*/
 			if ( false ) {
 				std::cout   << "tpDiff: " << tDiff <<  ", " << tDiff /1000 /1000 /1000  <<  ", " 
 										  << pDiff <<  ", "
@@ -185,11 +182,11 @@ void Serial::logMeasurementRefTs(const CncLongPosition& pos) {
 	
 	if ( GBL_CONTEXT->isProbeMode() == false ) {
 		const short T = 3;
-		totalDistanceRef = totalDistance[T];
+		totalDistanceMetricRef = totalDistanceMetric[T];
 		measurementRefPos.set(pos);
 	}
 }
-///////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////
 CncNanoTimespan Serial::getMeasurementNanoTimeSpanTotal() const {
 ///////////////////////////////////////////////////////////////////
 	return CncTimeFunctions::getTimeSpan(tsMeasurementLast, tsMeasurementStart);
@@ -222,21 +219,31 @@ bool Serial::sendSerialControllerCallback(ContollerExecuteInfo& cei) {
 ///////////////////////////////////////////////////////////////////
 void Serial::incTotalDistance(int32_t dx, int32_t dy, int32_t dz) {
 ///////////////////////////////////////////////////////////////////
-	//dx, dy and dz acts as relative coordinates here
-	const short X 	= 0, Y = 1, Z = 2, T = 3;
-	const double x 	= (absolute(dx) * factorX);
-	const double y 	= (absolute(dy) * factorY);
-	const double z 	= (absolute(dz) * factorZ);
+//dx, dy and dz acts as relative coordinates here
+	const short    X = 0, Y = 1, Z = 2, T = 3;
+	
+	const int32_t ax = absolute(dx);
+	const int32_t ay = absolute(dy);
+	const int32_t az = absolute(dz);
 	
 	// Attention: Each axis are moved separately, therefore the 
 	// total distance is the addition of dx + dy + dz and not 
 	// the corresponding vector sqrt(x*x + y*y + z*z)!
-	const double t 	= x + y + z;
 	
-	totalDistance[X] 	+= x;
-	totalDistance[Y] 	+= y;
-	totalDistance[Z] 	+= z;
-	totalDistance[T] 	+= t;
+	totalDistanceSteps[X] 	+= ax;
+	totalDistanceSteps[Y] 	+= ay;
+	totalDistanceSteps[Z] 	+= az;
+	totalDistanceSteps[T] 	+= (ax + ay + az);
+	
+	const double x 	= (ax * factorX);
+	const double y 	= (ay * factorY);
+	const double z 	= (az * factorZ);
+	const double t 	= (x + y + z);
+	
+	totalDistanceMetric[X] 	+= x;
+	totalDistanceMetric[Y] 	+= y;
+	totalDistanceMetric[Z] 	+= z;
+	totalDistanceMetric[T] 	+= t;
 
 	logMeasurementLastTs();
 }
@@ -254,7 +261,7 @@ void Serial::incTotalDistance(unsigned int size, const int32_t (&values)[3]) {
 void Serial::incTotalDistance(const CncLongPosition& pos, int32_t cx, int32_t cy, int32_t cz) {
 ///////////////////////////////////////////////////////////////////
 	// pos acts as reference here
-	// cx, cy and cz are absolte coordinates
+	// cx, cy and cz are absolute coordinates
 	
 	// create relative deltas to make a increment possible
 	incTotalDistance(cx - pos.getX(), cy - pos.getY(), cz - pos.getZ());
@@ -349,6 +356,19 @@ size_t Serial::getPositionCounter() {
 void Serial::resetStepCounter() {
 ///////////////////////////////////////////////////////////////////
 	processSetter(PID_RESERT_STEP_COUNTER, 0);
+}
+///////////////////////////////////////////////////////////////////
+void Serial::resetTotalDistance() { 
+///////////////////////////////////////////////////////////////////
+	totalDistanceMetric[0] = 0.0;
+	totalDistanceMetric[1] = 0.0;
+	totalDistanceMetric[2] = 0.0;
+	totalDistanceMetric[3] = 0.0;
+	
+	totalDistanceSteps[0]  = 0L;
+	totalDistanceSteps[1]  = 0L;
+	totalDistanceSteps[2]  = 0L;
+	totalDistanceSteps[3]  = 0L;
 }
 ///////////////////////////////////////////////////////////////////
 size_t Serial::requestStepCounter(unsigned char pid) {
@@ -1255,7 +1275,10 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			//evaluateResult..........................................
 			default: {
 				
-				std::cerr << "Serial::evaluateResult: Invalid Acknowlege: \n Cmd: " << sfi.command << ", Acknowlege as integer: " << (int)ret << "\n";
+				std::cerr << "Serial::evaluateResult: Invalid Acknowlege:" << std::endl
+						  << " Command              : '" << sfi.command << "' - " << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl
+						  << " Acknowlege as integer: " << (int)ret << std::endl;
+						  
 				cncControl->SerialCallback();
 				
 				clearRemainingBytes(true);
@@ -1717,6 +1740,8 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 																						ArduinoCMDs::getCMDLabel(moveSequence[0]),
 																						portionCounter + 1
 									 ));
+		// notify
+		cncControl->SerialCallback();
 		
 		const unsigned int portionStart		= *it;
 		const unsigned int portionLength	= (unsigned int)moveSequence[portionStart];
@@ -1726,8 +1751,9 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 		const unsigned int writeLength		= portionCounter > 0 ? portionTotLength : portionStart + portionTotLength;
 		
 		if ( false ) {
-			std::cout << "Portion : " << portionStart << "->" << portionLength << std::endl;
-			std::clog << "Write   : " << writeStart   << "->" << writeLength  << std::endl;
+			std::cout << "portionCounter: " << portionCounter << std::endl;
+			std::cout << " - portion : " << portionStart << "->" << portionLength << std::endl;
+			std::clog << " - write   : " << writeStart   << "->" << writeLength   << std::endl;
 		}
 		 
 		// write ....
@@ -1757,6 +1783,9 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 				break;
 			}
 			
+			// notify
+			cncControl->SerialCallback();
+			
 		} else {
 			std::cerr << "SERIAL::processMoveSequence(" << portionCounter << "): Unable to write data" << std::endl;
 			cncControl->SerialCallback();
@@ -1780,32 +1809,72 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
 bool Serial::test() {
 ///////////////////////////////////////////////////////////////////
-	CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+	bool ret = false;
 	
 	if ( false ) {
-		cms.addPosXYZ(1, -1, 1);
-		cms.addPosXYZ(11, -12, 13);
-		cms.addPosXYZ(1000, 2, 3);
-		cms.addPosXYZ(100000, 2, 3);
-		cms.addPosXYZ(1, 1, 1);
-	}
-	else {
-		for ( int i = 0; i<500; i++) {
-			if ( true ) {
-				if 		( i % 20 == 0 )	{ cms.addPosXYZ(100000, 1, -100000); }
-				else if	( i % 10 == 0 )	{ cms.addPosXYZ(-1000, 1, -1); }
-				else if	( i %  5 == 0 )	{ cms.addPosXYZ(11, -12, 13); }
-				else					{ cms.addPosXYZ(1, -1, 0); }
+		CncMoveSequence cms(CMD_RENDER_AND_MOVE_SEQUENCE);
+		
+		bool fOneB  = true;
+		bool fInt8  = true;
+		bool fInt16 = true;
+		bool fInt32 = true;
+		
+		for ( int i = 0; i <50; i++ ) {
+			// one byte values
+			if ( fOneB ) {
+				cms.addPosXYZF(+1, -1, +1, 1234);
+				cms.addPosXYZ(-1, +1,  0);
+				cms.addPosXYZ(+1,  0,  0);
+				cms.addPosXYZ( 0, -1,  0);
+				cms.addPosXYZ( 0,  0, +1);
 			}
-			else {
-				cms.addPosXYZ(11, -12, 13);
-				//cms.addPosXYZ(1, -1, 1);
+			
+			// int8_t values
+			if ( fInt8 ) {
+				cms.addPosXYZF(+11, -12, +13, 1234);
+				cms.addPosXYZ(-11,  12,   0);
+				cms.addPosXYZ(-11,   0,   0);
+				cms.addPosXYZ(  0,  12,   0);
+				cms.addPosXYZ(  0,   0, -13);
+			}
+			
+			// int16_t values
+			if ( fInt16 ) {
+				cms.addPosXYZF(+1000, +2000, +30, 1234);
+				cms.addPosXYZ(+1000, +2000,   0);
+				cms.addPosXYZ(-1000,     0,   0);
+				cms.addPosXYZ(    0, -2000,   0);
+				cms.addPosXYZ(    0,     0, -30);
+			}
+			
+			// int32_t values
+			if ( fInt32 ) {
+				cms.addPosXYZF(+100000, +200000, +30, 1234);
+				cms.addPosXYZ(+100000, +200000,   0);
+				cms.addPosXYZ(-100000,       0,   0);
+				cms.addPosXYZ(      0, -200000,   0);
+				cms.addPosXYZ(      0,     0,   -30);
 			}
 		}
+		
+		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
+		ret = processMoveSequence(cms);
+	}
+	else {
+		CncMoveSequence cms(CMD_MOVE_SEQUENCE);
+		
+		for ( int i = 0; i < 500; i++ ) {
+			// one byte values
+			cms.addPosXYZF(+1, -1, +1, 1);
+			cms.addPosXYZ (-1, +1,  0);
+			cms.addPosXYZ (+1,  0,  0);
+			cms.addPosXYZ ( 0, -1,  0);
+			cms.addPosXYZ ( 0,  0, +1);
+		}
+		
+		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
+		ret = processMoveSequence(cms);
 	}
 	
-	std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
-	
-	bool ret = processMoveSequence(cms);
 	return ret;
 }

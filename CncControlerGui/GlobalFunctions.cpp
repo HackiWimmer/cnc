@@ -16,7 +16,8 @@ class StackTrace {
 		}
 		
 		~StackTrace() {
-			Database.clear();
+			// causes *** glibc detected *** cnc: double free or corruption (!prev): 0x000000000599d230 ***
+			// Database.clear();
 		}
 		
 } StackTraceInitializer;
