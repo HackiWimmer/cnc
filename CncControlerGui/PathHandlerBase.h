@@ -15,7 +15,7 @@
 #define TRACE_POSITIONS(p)
 #define TRACE_CURRENT_POSITION
 
-//#define ENABLE_TRACE_FUNCTIONS
+#define ENABLE_TRACE_FUNCTIONS
 #ifdef ENABLE_TRACE_FUNCTIONS
 	
 	#undef  TRACE_FUNCTION_CALL
@@ -146,12 +146,11 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		
 		virtual bool isInitialized();
 		
-		// svg path handler helper
-		virtual void simulateZAxisUp() 						{}
-		virtual void simulateZAxisDown() 					{}
-		virtual bool isZAxisUp() 							{ return true; }
-		virtual bool isZAxisDown() 							{ return false; }
-		
+		virtual bool isZAxisUp()   { return false; }
+		virtual bool isZAxisDown() { return false; }
+		virtual bool moveUpZ()	   { return true;  }
+		virtual bool moveDownZ()   { return true;  }
+
 		// transformation
 		virtual void transform(double& xAbs, double& yAbs) 	{}
 		
@@ -198,26 +197,17 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		
 		// get path repesentations
 		void tracePathList(std::ostream &ostr);
-		const char* getAsWktRepresentation() { return pathListMgr.getAsWktRepresentation(); }
-		const char* getAsSvgPathRepresentation(const wxString& style="") { return pathListMgr.getAsSvgPathRepresentation(style); }
 		
 		// path analytics
-		double getCurrentPathLength() { return pathListMgr.getXYLength(); }
-		double getTotalLength() { return totalLength; }
-		
-		bool isPathClosed() { return pathListMgr.isPathClosed(); }
-		bool getCentroid(wxRealPoint& centroid) { return pathListMgr.getCentroid(centroid); }
-		
-		const wxString& getWktTypeAsString() { return pathListMgr.getWktTypeAsString(); }
-		CncPathListManager::WktTypeInfo getWktType() { return pathListMgr.getWktType(); }
+		double getCurrentPathLength() 			{ return pathListMgr.getTotalDistance(); }
+		double getTotalLength() 				{ return totalLength; }
+		bool isPathClosed() 					{ return pathListMgr.isPathClosed(); }
 		
 		// path modifiers
-		bool reversePath() { return pathListMgr.reversePath(); }
-		bool centerPath() { return pathListMgr.centerPath(); }
+		bool reversePath() 						{ return pathListMgr.reversePath(); }
 		
 		// unit calculation functions
 		void changeInputUnit(const Unit u, bool trace=true);
-		
 };
 
 #endif

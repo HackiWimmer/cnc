@@ -171,7 +171,7 @@ class PGenEllipticalRing : public PGenSvgElementPolygon {
 				
 				CncPathListManager plm = pa.getPathList();
 				for ( auto it=plm.begin(); it!=plm.end(); ++it )
-					getPolygonData(i).append(CncPolygonPoints::convertToIntPoint(it->abs));
+					getPolygonData(i).append(CncPolygonPoints::convertToIntPoint(it->entryTarget));
 					
 				plm.getCentroid(centroid);
 				

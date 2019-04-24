@@ -7,7 +7,6 @@
 #include <wx/tokenzr.h>
 #include <wx/sstream.h>
 #include <wx/xml/xml.h>
-#include "CncClipperWrapper.h"
 
 typedef std::map<wxString, wxString> SvgNodeAttributeMap;
 
@@ -190,7 +189,7 @@ class SVGElementConverter {
 			}
 			return path;
 		} 
-		
+		/*
 		//////////////////////////////////////////////////////////////////
 		static bool convertPolygonToPathData(const CncPolygonPoints& points, SVGUnit inputUnit, wxString& ret) {
 			wxString dp;
@@ -204,7 +203,7 @@ class SVGElementConverter {
 			
 			return convertPolygonToPathData(dp, ret);
 		}
-		
+		*/
 		//////////////////////////////////////////////////////////////////
 		static bool convertPolygonToPathData(wxString& points, wxString& ret) {
 			wxXmlNode* n = getNewSvgElementNode("polygon");
@@ -226,7 +225,7 @@ class SVGElementConverter {
 			ret.assign(path);
 			return true;
 		}
-		
+		/*
 		//////////////////////////////////////////////////////////////////
 		static bool convertPolylineToPathData(const CncPolygonPoints& points, SVGUnit inputUnit, wxString& ret) {
 			wxString dp;
@@ -240,6 +239,7 @@ class SVGElementConverter {
 			
 			return convertPolylineToPathData(dp, ret);
 		}
+		*/
 		//////////////////////////////////////////////////////////////////
 		static bool convertPolylineToPathData(wxString& points, wxString& ret) {
 			wxXmlNode* n = getNewSvgElementNode("polyline");

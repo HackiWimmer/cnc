@@ -79,10 +79,10 @@ cInt CncPolygonPoints::convertToInt(double v) {
 	return v * doubleToIntFactor;
 }
 ///////////////////////////////////////////////////////////////////
-const IntPoint& CncPolygonPoints::convertToIntPoint(const wxRealPoint& p) {
+const IntPoint& CncPolygonPoints::convertToIntPoint(const CncDoublePosition& p) {
 ///////////////////////////////////////////////////////////////////
-	glbTempIntPointRetVal.X = p.x * doubleToIntFactor;
-	glbTempIntPointRetVal.Y = p.y * doubleToIntFactor;
+	glbTempIntPointRetVal.X = p.getX() * doubleToIntFactor;
+	glbTempIntPointRetVal.Y = p.getY() * doubleToIntFactor;
 	
 	return glbTempIntPointRetVal;
 }

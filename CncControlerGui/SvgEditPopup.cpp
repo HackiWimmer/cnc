@@ -136,7 +136,8 @@ void SvgEditPopup::enablePathGeneratorMenuItem(wxMenu* menu) {
 	if ( item == NULL )
 		return;
 		
-	item->Enable(PathGeneratorFrame::getCurrentGeneratedPath().IsEmpty() == false );
+	//item->Enable(PathGeneratorFrame::getCurrentGeneratedPath().IsEmpty() == false );
+	item->Enable(false);
 }
 //////////////////////////////////////////////////////////
 void SvgEditPopup::overAllMenuItems(wxMenu* menu) {
@@ -185,14 +186,6 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 	popup->Append(idOffset + STC_PM_SELECT_NODE,			wxT("Select current SVG Node"));
 	popup->Append(idOffset + STC_PM_SELECT_NODE_BLOCK,		wxT("Select current SVG Block"));
 	popup->AppendSeparator();
-	
-	if ( extended == true ) {
-		popup->Append(idOffset + STC_PM_PGEN_OPEN, 							wxT("PGen - Open Editor"));
-		popup->Append(idOffset + STC_PM_PGEN_INSERT_CURRENT_SVG_FRAGMENT,	wxT(svgPathGenItemString));
-		popup->Append(idOffset + STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK,	wxT("PGen - ReGenerate current SVG Pattern"));
-		popup->Append(idOffset + STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK,	wxT("PGen - Open Editor with current SVG Pattern"));
-		popup->AppendSeparator();
-	}
 	
 	wxMenu* cncMenu = new wxMenu("CNC Pattern");
 	popup->AppendSubMenu(cncMenu, "CNC Pattern . . .");
@@ -422,63 +415,6 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 			wxASSERT(ctl);
 			selectCurrentSvgNodeBlock(ctl);
 	 }, idOffset + STC_PM_SELECT_NODE_BLOCK, wxID_ANY, ctl);
-	 
-	 
-	//............................................
-	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->ReplaceSelection(PathGeneratorFrame::getCurrentGeneratedPath());
-			
-	 }, idOffset + STC_PM_PGEN_INSERT_CURRENT_SVG_FRAGMENT, wxID_ANY, ctl);
-	 
-	//............................................
-	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			
-			if ( GBL_CONFIG->getTheApp() == NULL )
-				return;
-			
-			if ( hasSelection(ctl) == false )
-				selectCurrentSvgNodeBlock(ctl);
-				
-			wxString node(ctl->GetSelectedText());
-			GBL_CONFIG->getTheApp()->regenerateCurrentSvgNodeFromPopup(ctl, node);
-			
-	 }, idOffset + STC_PM_PGEN_REGENERATE_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
-	 
-	//............................................
-	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-
-			if ( GBL_CONFIG->getTheApp() == NULL )
-				return;
-			
-			GBL_CONFIG->getTheApp()->openPathGen();
-			
-	 }, idOffset + STC_PM_PGEN_OPEN, wxID_ANY, ctl);
-	 
-	//............................................
-	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-
-			if ( GBL_CONFIG->getTheApp() == NULL )
-				return;
-			
-			if ( hasSelection(ctl) == false )
-				selectCurrentSvgNodeBlock(ctl);
-				
-			wxString node(ctl->GetSelectedText());
-			GBL_CONFIG->getTheApp()->openPathGenWithCurrentSvgNodeFromPopup(ctl, node);
-			
-	 }, idOffset + STC_PM_PGEN_OPEN_WITH_CURRENT_SVG_BLOCK, wxID_ANY, ctl);
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,

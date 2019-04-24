@@ -3,7 +3,7 @@
 
 #include "SVGPathHandlerBase.h"
 #include "SerialPort.h"
-#include "CncToolCorrection.h"
+//#include "CncToolCorrection.h"
 #include "CncUnitCalculator.h"
 #include "SvgCncParameters.h"
 #include "SvgViewBox.h"
@@ -21,8 +21,6 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		
 		CncControl* 		cncControl;
 		SvgOriginalPathInfo origPathInfo;
-		double 				toolRadius;
-		bool 				zAxisDown;
 		bool 				initialized;
 		bool 				debugState;
 		double 				width, height;
@@ -48,12 +46,10 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		virtual bool isInitialized();
 		
 		// z axis management
-		virtual void simulateZAxisUp();
-		virtual void simulateZAxisDown();
 		virtual bool isZAxisUp();
 		virtual bool isZAxisDown();
-		bool moveUpZ();
-		bool moveDownZ();
+		virtual bool moveUpZ();
+		virtual bool moveDownZ();
 		
 	public:
 		SVGPathHandlerCnc(CncControl* cnc);

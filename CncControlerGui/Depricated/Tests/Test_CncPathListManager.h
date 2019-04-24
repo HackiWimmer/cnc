@@ -23,25 +23,25 @@ class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {
 		////////////////////////////////////////////////////////////////////
 		virtual bool runTest() {
 			CncPathListManager plm;
-
+			unsigned int size = 0;
+			
+			// set the previous postion
+			wxRealPoint prevPos(5.0, 5.0);
 			/*
 			// set start position
 			plm.setStartPos({10.0, 15.0});
 			
 			// calculate first move
+			plm.setFirstMove({plm.getStartPos().x - prevPos.x, plm.getStartPos().y - prevPos.y});
 			*/
-			/*
 			// setup path points
 			for ( unsigned int i=0; i<10; i++ )
-				plm.calculateAndAddEntry({plm.getStartPos().getX() + i*10.0,
-				                          plm.getStartPos().getY() + i*20.0,
-										  plm.getStartPos().getZ() + i},
-										  true, (i != 0)
-										);
+				plm.calculateAndAddEntry({plm.getStartPos().x + i*10.0, plm.getStartPos().y + i*20.0}, true, (i!=0));
 			
 			// trace initial behaviour
 			std::clog << plm << std::endl;
 			
+			/*
 			PARAGRAPH();
 			size = plm.getPathListSize();
 			clog << "Erase first entry - result: " << plm.eraseEntryAndRecalcuate(plm.begin()) << endl;
@@ -90,6 +90,15 @@ class TEST_CNC_PATH_LIST_MANAGER : public TEST_BASE {
 				
 			clog << plm << endl;
 			*/
+		
+			PARAGRAPH();
+			size = plm.getPathListSize();
+			std::clog << "center path: " << plm.centerPath() << std::endl;
+			if ( plm.getPathListSize() != size )
+				std::cerr << "Somthing is lost . . ." << std::endl;
+				
+			std::clog << plm << std::endl;
+			
 			return true;
 		}
 };

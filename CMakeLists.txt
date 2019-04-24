@@ -113,6 +113,11 @@ file(MAKE_DIRECTORY "/home/fw591/dev/cnc/CncControlerGui/Release")
 set(EXECUTABLE_OUTPUT_PATH "/home/fw591/dev/cnc/CncControlerGui/Release")
 
 set(SOURCE_FILES
+	CncControlerGui/Tests/Test_Base.h
+	CncControlerGui/Tests/Test_Base.cpp
+	CncControlerGui/Tests/Test_CncPathListManager.h
+	CncControlerGui/Tests/Test_FrameworkCallback.h
+	CncControlerGui/Tests/Test_SVGNodeParser.h
         CncControlerGui/OSD/CncTimeFunctions.cpp
         CncControlerGui/3D/CncGCodePreview.cpp
         CncControlerGui/3D/CncGCodePreview.h
@@ -135,29 +140,6 @@ set(SOURCE_FILES
         CncControlerGui/3D/VerticeData.h
         CncControlerGui/Clipper/clipper.cpp
         CncControlerGui/Clipper/clipper.hpp
-        CncControlerGui/PathGenerators/PGenEllipticalArcPolygon.h
-        CncControlerGui/PathGenerators/PGenEllipticalRing.h
-        CncControlerGui/PathGenerators/PGenFreehandPolygon.h
-        CncControlerGui/PathGenerators/PGenFreehandPolyline.h
-        CncControlerGui/PathGenerators/PGenGenericElement.h
-        CncControlerGui/PathGenerators/PGenGenericPath.h
-        CncControlerGui/PathGenerators/PGenPolygon.cpp
-        CncControlerGui/PathGenerators/PGenPolygon.h
-        CncControlerGui/PathGenerators/PGenRectanglePolygon.h
-        CncControlerGui/PathGenerators/PGenRegularDiameterPolygon.h
-        CncControlerGui/PathGenerators/PGenRegularRadiusPolygon.h
-        CncControlerGui/PathGenerators/PGenRotaryKnob.h
-        CncControlerGui/PathGenerators/PGenSample.h
-        CncControlerGui/PathGenerators/PGenSimpleLine.h
-        CncControlerGui/PathGenerators/PGenSimplePoint.h
-        CncControlerGui/PathGenerators/PGenSvgElementPolygon.h
-        CncControlerGui/Tests/Test_Base.cpp
-        CncControlerGui/Tests/Test_Base.h
-        CncControlerGui/Tests/Test_CncClipperWrapper.h
-        CncControlerGui/Tests/Test_CncPathListManager.h
-        CncControlerGui/Tests/Test_FrameworkCallback.h
-        CncControlerGui/Tests/Test_SVGNodeParser.h
-        CncControlerGui/Tests/Test_SVGPathAssistant.h
         CncControlerGui/CfgApplicationPage.cpp
         CncControlerGui/CfgEnvironmentPage.cpp
         CncControlerGui/CfgGCodeOptionPage.cpp
@@ -166,8 +148,6 @@ set(SOURCE_FILES
         CncControlerGui/CfgWorkingPage.cpp
         CncControlerGui/CncArduino.cpp
         CncControlerGui/CncArduino.h
-        CncControlerGui/CncClipperWrapper.cpp
-        CncControlerGui/CncClipperWrapper.h
         CncControlerGui/CncCommon.cpp
         CncControlerGui/CncCommon.h
         CncControlerGui/CncConfig.cpp
@@ -212,8 +192,6 @@ set(SOURCE_FILES
         CncControlerGui/CncStreamBuffers.h
         CncControlerGui/CncSummaryListCtrl.cpp
         CncControlerGui/CncSummaryListCtrl.h
-        CncControlerGui/CncToolCorrection.cpp
-        CncControlerGui/CncToolCorrection.h
         CncControlerGui/CncToolMagazine.cpp
         CncControlerGui/CncToolMagazine.h
         CncControlerGui/CncToolStateControl.cpp
@@ -259,16 +237,9 @@ set(SOURCE_FILES
         CncControlerGui/ManuallyPathHandlerCnc.cpp
         CncControlerGui/ManuallyPathHandlerCnc.h
         CncControlerGui/NotebookInfo.h
-        CncControlerGui/PathGeneratorBase.cpp
-        CncControlerGui/PathGeneratorBase.h
-        CncControlerGui/PathGeneratorFrame.cpp
-        CncControlerGui/PathGeneratorFrame.h
-        CncControlerGui/PathGeneratorStore.cpp
-        CncControlerGui/PathGeneratorStore.h
         CncControlerGui/PathHandlerBase.cpp
         CncControlerGui/PathHandlerBase.h
         CncControlerGui/PenHandler.h
-        CncControlerGui/PgPropertyHelpInfos.cpp
         CncControlerGui/PointAbs.h
         CncControlerGui/CncPerspective.cpp
         CncControlerGui/CncPerspective.h
@@ -293,19 +264,10 @@ set(SOURCE_FILES
         CncControlerGui/SVGElementConverter.h
         CncControlerGui/SVGFileParser.cpp
         CncControlerGui/SVGFileParser.h
-        CncControlerGui/SvgGeneratorBase.cpp
-        CncControlerGui/SvgGeneratorBase.h
         CncControlerGui/SVGNodeParser.cpp
         CncControlerGui/SVGNodeParser.h
-        CncControlerGui/SVGPathAssistant.h
-        CncControlerGui/SvgPathFragment.cpp
-        CncControlerGui/SvgPathFragment.h
-        CncControlerGui/SvgPathGroup.cpp
-        CncControlerGui/SvgPathGroup.h
         CncControlerGui/SVGPathHandlerCnc.cpp
         CncControlerGui/SVGPathHandlerCnc.h
-        CncControlerGui/SvgPathString.cpp
-        CncControlerGui/SvgPathString.h
         CncControlerGui/SvgTransformMatrix.h
         CncControlerGui/SvgUnitCalculator.cpp
         CncControlerGui/SvgUnitCalculator.h
@@ -323,23 +285,23 @@ set(SOURCE_FILES
         CncControlerGui/CncBaseEditor.cpp
         CncControlerGui/CncSourceEditor.cpp
         CncControlerGui/CncOutboundEditor.cpp
-		CncControlerGui/CncUnitCalculator.cpp
-		CncControlerGui/SvgViewBox.cpp
-		CncControlerGui/BinaryFileParser.cpp
-		CncControlerGui/CncMonitorSplitterWindow.cpp
-		CncControlerGui/3D/GLLabelCluser.cpp
-		CncControlerGui/3D/GLLineCluster.cpp
-		CncControlerGui/CncReferencePosition.cpp
-		CncControlerGui/CncConnectProgress.cpp
-		CncControlerGui/CfgAccelerationGraph.cpp
-		CncControlerGui/CncGamepadControllerState.cpp
-		CncControlerGui/GamepadThread.cpp
-		CncControlerGui/CncBinaryTemplateStreamer.cpp
-		CncControlerGui/SVGPathHandlerBase.cpp
-		CncControlerGui/SerialEmulatorBinaryStreamer.cpp
-		CncControlerGui/SerialEmulatorGCodeStreamer.cpp
-		CncControlerGui/SerialEmulatorSvgStreamer.cpp
-		CncControlerGui/SerialEmulatorTextStreamer.cpp
+	CncControlerGui/CncUnitCalculator.cpp
+	CncControlerGui/SvgViewBox.cpp
+	CncControlerGui/BinaryFileParser.cpp
+	CncControlerGui/CncMonitorSplitterWindow.cpp
+	CncControlerGui/3D/GLLabelCluser.cpp
+	CncControlerGui/3D/GLLineCluster.cpp
+	CncControlerGui/CncReferencePosition.cpp
+	CncControlerGui/CncConnectProgress.cpp
+	CncControlerGui/CfgAccelerationGraph.cpp
+	CncControlerGui/CncGamepadControllerState.cpp
+	CncControlerGui/GamepadThread.cpp
+	CncControlerGui/CncBinaryTemplateStreamer.cpp
+	CncControlerGui/SVGPathHandlerBase.cpp
+	CncControlerGui/SerialEmulatorBinaryStreamer.cpp
+	CncControlerGui/SerialEmulatorGCodeStreamer.cpp
+	CncControlerGui/SerialEmulatorSvgStreamer.cpp
+	CncControlerGui/SerialEmulatorTextStreamer.cpp
         CncControlerGui/sha1.cpp
         CncControlerGui/GL3DOptionPane.cpp
         CncControlerGui/GL3DDrawPane.cpp

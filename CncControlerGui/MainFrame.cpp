@@ -193,7 +193,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
-, pathGenerator(new PathGeneratorFrame(this, sourceEditor))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
 , lruFileList(LruFileList(16))
@@ -294,10 +293,6 @@ MainFrame::~MainFrame() {
 	wxASSERT(config);
 	config->Flush();
 	delete config;
-	
-	wxASSERT(pathGenerator);
-	pathGenerator->Destroy();
-	delete pathGenerator;
 	
 	wxASSERT(secureRunDlg);
 	delete secureRunDlg;
@@ -677,7 +672,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_3D_Refreh);
 	registerGuiControl(m_3D_Clear);
 	registerGuiControl(m_cbContentPosSpy);
-	registerGuiControl(m_btPathGenerator);
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_portSelector);
@@ -923,11 +917,6 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		processTemplateWrapper();
 		defineNormalMonitoring();
 	}
-
-
-	//todo - only temp
-	//wxCommandEvent dummy;
-	//openSVGPathGenerator(dummy);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceTimer(wxTimerEvent& event) {
@@ -4087,14 +4076,6 @@ void MainFrame::updateFileContentPosition(long x, long y) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::openSVGPathGenerator(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( pathGenerator->IsIconized() )
-		pathGenerator->Maximize(false);
-	
-	pathGenerator->Show(!pathGenerator->IsShown());
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::requestEnableStepperMotors(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
@@ -6043,132 +6024,10 @@ void MainFrame::displayPGenErrorInfo(const wxString& errorInfo) {
 	dlg.ShowModal();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::openPathGen() {
-///////////////////////////////////////////////////////////////////
-	wxASSERT(pathGenerator);
-	if ( pathGenerator->IsShown() == false ) 
-		pathGenerator->Show();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node) {
-///////////////////////////////////////////////////////////////////
-	if ( pathGenerator == NULL )
-		return;
-	
-	wxXmlDocument xmlDoc;
-	wxString errorInfo;
-	
-	// check
-	if ( verifyPathGenertorNode(xmlDoc, node, errorInfo) == false ) {
-		displayPGenErrorInfo(errorInfo);
-		return;
-	}
-	
-	wxXmlNode* root = xmlDoc.GetRoot();
-	wxASSERT(root);
-	
-	// setup
-	wxASSERT(pathGenerator);
-	if ( pathGenerator->IsShown() == false ) 
-		pathGenerator->Show();
-	
-	//process
-	wxASSERT(cnc);
-	PathGeneratorStore::RegenerateParameter rp;
-	rp.in.editControl  = ctl;
-	rp.in.toolDiameter = CncConfig::getGlobalCncConfig()->getToolDiameter();
-	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
-	
-	if ( pathGenerator->regenerateSvgBlock(rp) == false ) {
-		displayPGenErrorInfo(rp.out.errorInfo);
-		return;
-	}
-}
-///////////////////////////////////////////////////////////////////
 void MainFrame::openCurrentTemplateInBrowser() {
 ///////////////////////////////////////////////////////////////////
 	wxString ret;
 	openFileExtern(GBL_CONFIG->getBrowser(ret), getCurrentTemplatePathFileName());
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node) {
-///////////////////////////////////////////////////////////////////
-	if ( ctl == NULL )
-		return;
-		
-	wxXmlDocument xmlDoc;
-	wxString errorInfo;
-	
-	// check
-	if ( verifyPathGenertorNode(xmlDoc, node, errorInfo) == false ) {
-		displayPGenErrorInfo(errorInfo);
-		return;
-	}
-	
-	wxXmlNode* root = xmlDoc.GetRoot();
-	wxASSERT(root);
-	
-	// setup
-	wxASSERT(cnc);
-	PathGeneratorStore::RegenerateParameter rp;
-	rp.in.editControl  = ctl;
-	rp.in.toolDiameter =CncConfig::getGlobalCncConfig()->getToolDiameter();
-	rp.in.cncPattern.assign(root->GetAttribute(CncPatternRootName, ""));
-	
-	// process
-	PathGeneratorStore store;
-	if ( store.regenerateSvgBlock(rp) == false ) {
-		displayPGenErrorInfo(rp.out.errorInfo);
-		return;
-	}
-	
-	// Replace select text
-	ctl->ReplaceSelection(rp.out.resultigSvgFragment);
-}
-///////////////////////////////////////////////////////////////////
-bool MainFrame::verifyPathGenertorNode(wxXmlDocument& xmlDoc, const wxString& node, wxString& errorInfo) {
-///////////////////////////////////////////////////////////////////
-	if ( node.IsEmpty() == true ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Empty node received, nothing will be done!\n";
-		return false;
-	}
-	
-	if ( node.Find(CncPatternRootName) == wxNOT_FOUND ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Current SVG block didn't contain a CncPattern, nothing will be done!\n";
-		return false;
-	}
-	
-	wxStringInputStream xmlStream(node);
-	if ( xmlDoc.Load(xmlStream) == false ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Can't create an XML document from received node!\n";
-		errorInfo << "Please check the selection.\n";
-		errorInfo << "Nothing will be done!\n";
-		return false;
-	}
-	
-	wxXmlNode* root = xmlDoc.GetRoot();
-	if ( root == NULL ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Can't evaluate a root node.\n";
-		errorInfo << "Please check the selection.\n";
-		errorInfo << "Nothing will be done!\n";
-		return false;
-	}
-	
-	if ( root->GetName() != "g" ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Selected svg fragment didn't start with a <g> element.\n";
-		errorInfo << "Please check the selection.\n";
-		errorInfo << "Nothing will be done!\n";
-		return false;
-	}
-	
-	if ( root->HasAttribute(CncPatternRootName) == false ) {
-		errorInfo << "MainFrame::regenerateCurrentSvgNodeFromPopup: Current <g> element didn't contain a " << CncPatternRootName << ".\n";
-		errorInfo << "Please check the selection.\n";
-		errorInfo << "Nothing will be done!\n";
-		return false;
-	}
-	
-	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::closeUnitCalculator(wxCommandEvent& event) {

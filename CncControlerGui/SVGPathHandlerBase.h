@@ -29,14 +29,16 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		virtual void transform(double& xAbs, double& yAbs)  { currentSvgTransformMatrix.transform(xAbs, yAbs); }
 		virtual bool callback(const CncCurveLib::Point& p);
 		virtual bool processLinearMove(bool alreadyRendered);
-	
+
 	private:
+		
 		struct LinearMoveParam {
 			bool alreadyRendered 	= false;
 			bool alreadyTransformed = false;
 			
 			double absX = 0.0;
 			double absY = 0.0;
+			double absZ = 0.0;
 		};
 		
 		inline bool processLinearMove(const LinearMoveParam& p);

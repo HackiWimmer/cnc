@@ -130,8 +130,6 @@ protected:
     wxButton* m_removeTemplate;
     wxStaticLine* m_staticLine4472;
     wxBitmapToggleButton* m_btSvgToggleWordWrap;
-    wxStaticLine* m_staticLine4474;
-    wxButton* m_btPathGenerator;
     wxNotebook* m_templateNotebook;
     wxPanel* m_panelTplObserver;
     wxPanel* m_panelTemplateObserverPlaceholder;
@@ -802,7 +800,6 @@ protected:
     virtual void renameTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void removeTemplateFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleTemplateWordWrapMode(wxCommandEvent& event) { event.Skip(); }
-    virtual void openSVGPathGenerator(wxCommandEvent& event) { event.Skip(); }
     virtual void toogleSvgEditSearchFlag(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditSearchTextChanged(wxCommandEvent& event) { event.Skip(); }
     virtual void svgEditSelected(wxCommandEvent& event) { event.Skip(); }
@@ -993,6 +990,7 @@ protected:
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
     virtual void requestInterrupt(wxCommandEvent& event) { event.Skip(); }
     virtual void warmStartController(wxCommandEvent& event) { event.Skip(); }
+    virtual void openSVGPathGenerator(wxCommandEvent& event) { event.Skip(); }
     virtual void openConfigurationFile(wxCommandEvent& event) { event.Skip(); }
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
@@ -1057,8 +1055,6 @@ public:
     wxButton* GetRemoveTemplate() { return m_removeTemplate; }
     wxStaticLine* GetStaticLine4472() { return m_staticLine4472; }
     wxBitmapToggleButton* GetBtSvgToggleWordWrap() { return m_btSvgToggleWordWrap; }
-    wxStaticLine* GetStaticLine4474() { return m_staticLine4474; }
-    wxButton* GetBtPathGenerator() { return m_btPathGenerator; }
     wxPanel* GetPanelTemplateObserverPlaceholder() { return m_panelTemplateObserverPlaceholder; }
     wxPanel* GetPanelTplObserver() { return m_panelTplObserver; }
     wxBitmapToggleButton* GetTbCaseSensitive() { return m_tbCaseSensitive; }

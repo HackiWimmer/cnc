@@ -1,71 +1,88 @@
-#include <list>
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
 #include "CncPathListManager.h"
 
+//////////////////////////////////////////////////////////////
+CncPathListManager::CncPathListManager()
+: list()
+, isFirstPath(false)
+, isCorrected(false)
+, referencePos()
+, minPosX(0.0)
+, minPosY(0.0)
+, minPosZ(0.0)
+, maxPosX(0.0)
+, maxPosY(0.0)
+, maxPosZ(0.0)
+, totalDistance(0.0)
 //////////////////////////////////////////////////////////////////
-bool CncPathListManager::overAllBoostWktEntriesSample() {
-//////////////////////////////////////////////////////////////////
-	try {
-		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
-		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
-		typedef boost::geometry::model::linestring<point_type> 	linestring_type;
-		
-		polygon_type 	polygonType;
-		linestring_type	linestringType;
-		
-		using boost::geometry::get;
-		
-		switch ( getWktType() ) {
-			case CncPathListManager::WKT_EMPTY: 
-			case CncPathListManager::WKT_POINT:
-									// nothing should happen
-									return true;
-									
-			case CncPathListManager::WKT_POLYGON:
-									boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
-									boost::geometry::reverse(polygonType);
-									
-									for(auto it = boost::begin(boost::geometry::exterior_ring(polygonType)); it != boost::end(boost::geometry::exterior_ring(polygonType)); ++it)
-										std::clog << get<0>(*it) << ", " <<  get<1>(*it) << std::endl;
-										
-									break;
-									
-			case CncPathListManager::WKT_LINESTRING:
-									boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
-									boost::geometry::reverse(linestringType);
-									
-									for(auto it = boost::begin(linestringType); it != boost::end(linestringType); ++it)
-										std::clog << get<0>(*it) << ", " <<  get<1>(*it) << std::endl;
-										
-									break;
-									
-			default:				std::cerr << "reversePath(): Unknown wkt type: " << getWktTypeAsString() << std::endl;
-									return false;
-			
-		}
-	}
-	catch (boost::geometry::centroid_exception& e) {
-		std::cerr << "reversePath(): Error while reverse path\n";
-		std::cerr << e.what();
-		std::cerr << std::endl;
-		return false;
-	}
-	catch (...) {
-		std::cerr << "reversePath(): Unknown Error while reverse path\n";
-		return false;
-	}
-	
-	return true;
+{
+	//preallocate memory
+	list.reserve(1000 * 1000);
+	reset();
 }
 //////////////////////////////////////////////////////////////////
-const wxRealPoint& CncPathListManager::getStartPos() const {
+CncPathListManager::~CncPathListManager() {
 //////////////////////////////////////////////////////////////////
-	static wxRealPoint p(0.0, 0.0);
-	if ( list.size() > 0 ) {
-		return const_begin()->abs;
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::reset() {
+//////////////////////////////////////////////////////////////////
+	if ( false ) {
+		std::cout << "CncPathListManager::reset() size = " << list.size() << std::endl;
+		for ( auto it = list.begin(); it != list.end(); ++it)
+			std::cout << (*it);
 	}
+
+	isFirstPath   						= false;
+	isCorrected 						= false;
+	referencePos						= CncPathListEntry::ZeroTarget;
+	totalDistance						= 0.0;
+
+	bool 		 initialize				= list.size() > 0;
+	long		 lastClientId			= CncPathListEntry::DefaultClientID;
+	double       lastSpeedValue			= CncPathListEntry::DefaultSpeedValue;
+	CncSpeedMode lastSpeedMode 			= CncPathListEntry::DefaultSpeedMode;
+	//CncDoublePosition lastEntryTarget	= CncPathListEntry::ZeroTarget;
+
+	if ( initialize == true ) {
+		lastClientId	= last()->clientId;
+
+		lastSpeedMode 	= last()->feedSpeedMode;
+		lastSpeedValue 	= last()->feedSpeed_MM_MIN;
+		
+	//	lastEntryTarget	= last()->entryTarget;
+	}
+
+	resetMinMax();
+	list.clear();
+
+	CncPathListEntry cpe;
+	cpe.pathListReference	= (CncTimeFunctions::getNanoTimestamp() + (initialize ? 1LL : 0LL));
+	cpe.clientId			= lastClientId;
+
+	cpe.feedSpeedMode		= lastSpeedMode;
+	cpe.feedSpeed_MM_MIN	= lastSpeedValue;
+	
+	//cpe.entryTarget			= lastEntryTarget;
+
+	appendEntry(cpe);
+}
+//////////////////////////////////////////////////////////////////
+void CncPathListManager::resetMinMax() {
+//////////////////////////////////////////////////////////////////
+	minPosX			= DBL_MAX;
+	minPosY			= DBL_MAX;
+	minPosZ			= DBL_MAX;
+
+	maxPosX			= DBL_MIN;
+	maxPosY			= DBL_MIN;
+	maxPosZ			= DBL_MIN;
+}
+//////////////////////////////////////////////////////////////////
+const CncDoublePosition& CncPathListManager::getStartPos() const {
+//////////////////////////////////////////////////////////////////
+	static CncDoublePosition p(0.0, 0.0, 0.0);
+	if ( list.size() > 0 )
+		return const_begin()->entryTarget;
 	
 	return p; 
 }
@@ -73,254 +90,134 @@ const wxRealPoint& CncPathListManager::getStartPos() const {
 bool CncPathListManager::isPathClosed() {
 //////////////////////////////////////////////////////////////////
 	if ( getPathListSize() > 0 ) {
-		CncPathList::iterator itFirst = begin(); 
-		CncPathList::iterator itLast  = end() - 1;
+		const CncPathList::iterator itFirst = begin();
+		const CncPathList::iterator itLast  = end() - 1;
 		
-		return ( cnc::dblCompare((*itFirst).abs.x, (*itLast).abs.x) && 
-				 cnc::dblCompare((*itFirst).abs.y, (*itLast).abs.y)
+		return ( cnc::dblCompare((*itFirst).entryTarget.getX(), (*itLast).entryTarget.getX()) &&
+				 cnc::dblCompare((*itFirst).entryTarget.getY(), (*itLast).entryTarget.getY()) &&
+				 cnc::dblCompare((*itFirst).entryTarget.getZ(), (*itLast).entryTarget.getZ())
 			   ); 
 	}
 	
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-CncPathListManager::WktTypeInfo CncPathListManager::getWktType() {
-//////////////////////////////////////////////////////////////////
-	switch ( getPathListSize() ) {
-		case 0:			return WKT_EMPTY;
-		case 1:			return WKT_POINT;
-		default:
-						if ( isPathClosed() )	return WKT_POLYGON;
-						else 					return WKT_LINESTRING;
-	}
-	
-	// should not appear
-	wxASSERT(NULL);
-	return WKT_UNKNOWN;
-}
-//////////////////////////////////////////////////////////////////
-const wxString& CncPathListManager::getWktTypeAsString() {
-//////////////////////////////////////////////////////////////////
-	static wxString s;
-	switch ( getWktType() ) {
-		case WKT_EMPTY:			s.assign("EMPTY"); 		break;
-		case WKT_POINT:			s.assign("POINT"); 		break;
-		case WKT_POLYGON:		s.assign("POLYGON"); 	break;
-		case WKT_LINESTRING:	s.assign("LINESTRING"); break;
-		default:				s.assign("UNKNOWN"); 	break;
-	}
-	
-	return s;
-}
-//////////////////////////////////////////////////////////////////
-const char* CncPathListManager::getAsWktRepresentation() {
-//////////////////////////////////////////////////////////////////
-	static wxString s;
-	
-	if ( getPathListSize() == 0 ) {
-		s.assign("");
-		
-	} else if ( getPathListSize() == 1 ) {
-		CncPathList::iterator itFirst = begin();
-		s.assign(wxString::Format("POINT(%.3lf %.3lf)", (*itFirst).abs.x, (*itFirst).abs.y));
-		
-	} else {
-		if ( isPathClosed() )	s.assign("POLYGON((");
-		else 					s.assign("LINESTRING(");
-		
-		unsigned int cnt = 0;
-		for (CncPathList::iterator it = begin(); it != end(); ++it) {
-			if ( cnt == 0 ) s.append(wxString::Format("%.3lf %.3lf", (*it).abs.x, (*it).abs.y));
-			else			s.append(wxString::Format(",%.3lf %.3lf", (*it).abs.x, (*it).abs.y));
-			cnt++;
-		}
-		
-		if ( isPathClosed() )	s.append("))");
-		else					s.append(")");
-	}
-	
-	return s.c_str();
-}
-//////////////////////////////////////////////////////////////////
-const char* CncPathListManager::getAsSvgPathRepresentation(const wxString& style) {
-//////////////////////////////////////////////////////////////////
-	static wxString s;
-	if ( getPathListSize() == 0 ) {
-		s.assign("");
-		return s.c_str();
-	}
-	
-	s.assign("<path d=\"M");
-	wxString x((getPathListSize() > 1 ? " L" : ""));
-		
-	unsigned int cnt = 0;
-	for (CncPathList::iterator it = begin(); it != end(); ++it) {
-		if ( cnt == 0 ) s.append(wxString::Format("%.3lf,%.3lf%s", (*it).abs.x, (*it).abs.y, x));
-		else			s.append(wxString::Format(" %.3lf,%.3lf",  (*it).abs.x, (*it).abs.y));
-		cnt++;
-	}
-	
-	s.append("\" ");
-	
-	if ( style.IsEmpty() == false ) 
-		s.append(style);
-	
-	s.append("/>");
-	return s.c_str();
-}
-//////////////////////////////////////////////////////////////////
-bool CncPathListManager::getCentroid(wxRealPoint& centroid) {
-//////////////////////////////////////////////////////////////////
-	try {
-		typedef boost::geometry::model::d2::point_xy<double> 	point_type;
-		typedef boost::geometry::model::polygon<point_type> 	polygon_type;
-		typedef boost::geometry::model::linestring<point_type> 	linestring_type;
-		
-		point_type p(0.0, 0.0);
-		
-		point_type		pointType;
-		polygon_type 	polygonType;
-		linestring_type	linestringType;
-		
-		switch ( getWktType() ) {
-			case CncPathListManager::WKT_POINT:
-									boost::geometry::read_wkt(getAsWktRepresentation(), pointType);
-									boost::geometry::centroid(pointType, p);
-									break;
-									
-			case CncPathListManager::WKT_POLYGON:
-									boost::geometry::read_wkt(getAsWktRepresentation(), polygonType);
-									boost::geometry::centroid(polygonType, p);
-									break;
-									
-			case CncPathListManager::WKT_LINESTRING:
-									boost::geometry::read_wkt(getAsWktRepresentation(), linestringType);
-									boost::geometry::centroid(linestringType, p);
-									break;
-									
-			default:				std::cerr << "determineCentroid(): Unknown wkt type: " << getWktTypeAsString() << std::endl;
-									return false;
-			
-		}
-		
-		centroid.x = (cnc::dblCompare(p.x(), 0.0, 0.001) == true ? 0.0 : p.x());
-		centroid.y = (cnc::dblCompare(p.y(), 0.0, 0.001) == true ? 0.0 : p.y());
-	}
-	catch (boost::geometry::centroid_exception& e) {
-		std::cerr << "determineCentroid(): Error while determine centroid\n";
-		std::cerr << e.what();
-		std::cerr << std::endl;
-		return false;
-	}
-	catch (...) {
-		std::cerr << "determineCentroid(): Unknown Error while determine centroid\n";
-		return false;
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool CncPathListManager::shiftPathStart() {
-//////////////////////////////////////////////////////////////////
-	//todo
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool CncPathListManager::centerPath() {
-//////////////////////////////////////////////////////////////////
-	// empty or single point, nothing should happen
-	// the size check is also very importent for the further implementation
-	if ( getPathListSize() < 2 )
-		return true;
-
-	wxRealPoint cp; getCentroid(cp);
-	std::clog << "RefPoint: " << getReferencePos() << std::endl;
-	std::clog << "Centroid: " << cp << std::endl;
-	
-	//todo
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool CncPathListManager::reversePath() {
-//////////////////////////////////////////////////////////////////
-	// empty or single point, nothing should happen
-	// the size check is also very importent for the further implementation
-	if ( getPathListSize() < 2 )
-		return true;
-
-	// reverse list
-	std::reverse(list.begin(), list.end());
-	
-	// correct new fientry
-	begin()->move 				= begin()->abs - referencePos;
-	begin()->alreadyRendered 	= true;
-	begin()->zAxisDown 			= false;
-	
-	// correct last entry;
-	last()->alreadyRendered 	= false; // not well known, false is always secure
-	last()->zAxisDown 			= true;
-	
-	// reset length - will be recalculate in next loop
-	xyLength = 0.0;
-	
-	// over all entries 
-	unsigned int cnt = 0;
-	for (CncPathList::iterator it = list.begin(); it != list.end(); ++it) {
-		if ( cnt > 0 ) {
-			// reverse relative move steps
-			(*it).move = it->abs - (it - 1)->abs;
-			
-			// recalculate distance
-			xyLength += sqrt(pow(it->move.x, 2) + pow(it->move.y, 2));
-			it->xyDistance = xyLength;
-			
-		} else {
-			it->xyDistance = 0.0;
-		}
-		
-		cnt++;
-	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
 void CncPathListManager::appendEntry(CncPathListEntry& cpe) {
 //////////////////////////////////////////////////////////////////
 	// additionally calculate length and distance
 	if ( list.size() > 0 ) {
-		xyLength += sqrt(pow(cpe.move.x, 2) + pow(cpe.move.y, 2));
-		cpe.xyDistance = xyLength;
+		totalDistance += sqrt(  pow(cpe.entryDistance.getX(), 2)
+				              + pow(cpe.entryDistance.getY(), 2)
+						      + pow(cpe.entryDistance.getZ(), 2)
+						 );
+
+		cpe.totalDistance = totalDistance;
 	}
-	
+
 	// addionally determine fences
-	minPosX = std::min(minPosX, cpe.abs.x);
-	minPosY = std::min(minPosY, cpe.abs.y);
-	maxPosX = std::max(maxPosX, cpe.abs.x);
-	maxPosY = std::max(maxPosY, cpe.abs.y);
+	minPosX = std::min(minPosX, cpe.entryTarget.getX());
+	minPosY = std::min(minPosY, cpe.entryTarget.getY());
+	minPosZ = std::min(minPosZ, cpe.entryTarget.getZ());
+
+	maxPosX = std::max(maxPosX, cpe.entryTarget.getX());
+	maxPosY = std::max(maxPosY, cpe.entryTarget.getY());
+	maxPosZ = std::max(maxPosZ, cpe.entryTarget.getZ());
 	
 	// store
 	list.push_back(cpe);
 }
 //////////////////////////////////////////////////////////////////
-const CncPathListEntry& CncPathListManager::calculateAndAddEntry(double newAbsPosX, 
-																 double newAbsPosY,
-																 bool alreadyRendered, 
-																 bool zAxisDown) {
+const CncPathListEntry& CncPathListManager::addEntryAdm(long clientId) {
 //////////////////////////////////////////////////////////////////
 	CncPathListEntry cpe;
-	cpe.zAxisDown		= zAxisDown;
-	cpe.alreadyRendered	= alreadyRendered;
-	cpe.abs.x 			= newAbsPosX;
-	cpe.abs.y 			= newAbsPosY;
+
+	cpe.type					= CncPathListEntry::CHG_CLIENTID;
+	cpe.clientId				= clientId;
+	cpe.entryDistance			= CncPathListEntry::NoDistance;
 
 	// calculate
 	if ( list.size() == 0 ) {
-		cpe.move.x = newAbsPosX;
-		cpe.move.y = newAbsPosY;
+		cpe.pathListReference	= CncPathListEntry::NoReference;
+
+		cpe.alreadyRendered		= CncPathListEntry::DefaultAlreadyRendered;
+		cpe.entryTarget			= CncPathListEntry::ZeroTarget;
+
+		cpe.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
+		cpe.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
+	}
+	else {
+		cpe.pathListReference	= list.back().pathListReference;
+
+		cpe.alreadyRendered		= list.back().alreadyRendered;
+		cpe.entryTarget			= list.back().entryTarget;
+
+		cpe.feedSpeedMode		= list.back().feedSpeedMode;
+		cpe.feedSpeed_MM_MIN	= list.back().feedSpeed_MM_MIN;
+	}
+
+	// append
+	appendEntry(cpe);
+	return list.back();
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN) {
+//////////////////////////////////////////////////////////////////
+	CncPathListEntry cpe;
+
+	cpe.type					= CncPathListEntry::CHG_SPEED;
+	cpe.feedSpeedMode			= mode;
+	cpe.feedSpeed_MM_MIN		= feedSpeed_MM_MIN;
+	cpe.entryDistance			= CncPathListEntry::NoDistance;
+
+	// calculate
+	if ( list.size() == 0 ) {
+		cpe.pathListReference	= CncPathListEntry::NoReference;
+		cpe.clientId			= CncPathListEntry::DefaultClientID;
+
+		cpe.alreadyRendered		= CncPathListEntry::DefaultAlreadyRendered;
+		cpe.entryTarget			= CncPathListEntry::ZeroTarget;
+	}
+	else {
+		cpe.pathListReference	= list.back().pathListReference;
+		cpe.clientId			= list.back().clientId;
+
+		cpe.alreadyRendered		= list.back().alreadyRendered;
+		cpe.entryTarget			= list.back().entryTarget;
+	}
+
+	// append
+	appendEntry(cpe);
+	return list.back();
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered) {
+//////////////////////////////////////////////////////////////////
+	CncPathListEntry cpe;
+
+	cpe.type					= CncPathListEntry::CHG_POSITION;
+	cpe.alreadyRendered			= alreadyRendered;
+	cpe.entryTarget				= {newAbsPosX, newAbsPosY, newAbsPosZ};
+
+	// calculate
+	if ( list.size() == 0 ) {
+		cpe.pathListReference	= CncPathListEntry::NoReference;
+		cpe.clientId			= CncPathListEntry::DefaultClientID;
 		
-	} else {
-		cpe.move.x = newAbsPosX - list.back().abs.x;
-		cpe.move.y = newAbsPosY - list.back().abs.y;
+		cpe.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
+		cpe.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
+
+		cpe.entryDistance		= {newAbsPosX, newAbsPosY, newAbsPosZ};
+	}
+	else {
+		cpe.pathListReference	= list.back().pathListReference;
+		cpe.clientId			= list.back().clientId;
+
+		cpe.feedSpeedMode		= list.back().feedSpeedMode;
+		cpe.feedSpeed_MM_MIN	= list.back().feedSpeed_MM_MIN;
+
+		cpe.entryDistance.setX(newAbsPosX - list.back().entryTarget.getX());
+		cpe.entryDistance.setY(newAbsPosY - list.back().entryTarget.getY());
+		cpe.entryDistance.setZ(newAbsPosZ - list.back().entryTarget.getZ());
 	}
 	
 	// append
@@ -328,12 +225,49 @@ const CncPathListEntry& CncPathListManager::calculateAndAddEntry(double newAbsPo
 	return list.back();
 }
 //////////////////////////////////////////////////////////////////
-const CncPathListEntry& CncPathListManager::calculateAndAddEntry(const wxRealPoint& newAbsPoint, 
-																 bool alreadyRendered, 
-																 bool zAxisDown) {
+const CncPathListEntry& CncPathListManager::addEntryRel(double newRelPosX, double newRelPosY, double newRelPosZ, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
+	CncPathListEntry cpe;
 	
-	return calculateAndAddEntry(newAbsPoint.x, newAbsPoint.y, alreadyRendered, zAxisDown);
+	cpe.type					= CncPathListEntry::CHG_POSITION;
+	cpe.alreadyRendered			= alreadyRendered;
+	cpe.entryDistance			= {newRelPosX, newRelPosY, newRelPosZ};
+
+	// calculate
+	if ( list.size() == 0 ) {
+		cpe.pathListReference	= CncPathListEntry::NoReference;
+		cpe.clientId			= CncPathListEntry::DefaultClientID;
+		
+		cpe.feedSpeedMode		= CncPathListEntry::DefaultSpeedMode;
+		cpe.feedSpeed_MM_MIN	= CncPathListEntry::DefaultSpeedValue;
+
+		cpe.entryTarget			= {newRelPosX, newRelPosY, newRelPosZ};
+		}
+	else {
+		cpe.pathListReference	= list.back().pathListReference;
+		cpe.clientId			= list.back().clientId;
+
+		cpe.feedSpeedMode		= list.back().feedSpeedMode;
+		cpe.feedSpeed_MM_MIN	= list.back().feedSpeed_MM_MIN;
+
+		cpe.entryTarget.setX(list.back().entryTarget.getX() + newRelPosX);
+		cpe.entryTarget.setY(list.back().entryTarget.getY() + newRelPosY);
+		cpe.entryTarget.setZ(list.back().entryTarget.getZ() + newRelPosZ);
+	}
+	
+	// append
+	appendEntry(cpe);
+	return list.back();
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntryAbs(const CncDoublePosition& newAbsPos, bool alreadyRendered) {
+//////////////////////////////////////////////////////////////////
+	return addEntryAbs(newAbsPos.getX(), newAbsPos.getY(),	newAbsPos.getZ(), alreadyRendered);
+}
+//////////////////////////////////////////////////////////////////
+const CncPathListEntry& CncPathListManager::addEntryRel(const CncDoublePosition& newRelPos, bool alreadyRendered) {
+//////////////////////////////////////////////////////////////////
+	return addEntryRel(newRelPos.getX(), newRelPos.getY(),	newRelPos.getZ(), alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListManager::eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase) {
@@ -348,9 +282,7 @@ bool CncPathListManager::eraseEntryAndRecalcuate(const CncPathList::iterator& it
 	CncPathListEntry entry = *itToErase;
 	
 	// check first position
-	bool first = false;
-	if ( itToErase == begin() )
-		first = true;
+	bool first = itToErase == begin() ? true : false;
 	
 	// remove entry
 	if ( list.erase(itToErase) == end() )
@@ -362,41 +294,112 @@ bool CncPathListManager::eraseEntryAndRecalcuate(const CncPathList::iterator& it
 	
 	// redetermine additional values
 	if ( first == true ) {
-		begin()->move 				= begin()->abs - referencePos;
+		begin()->entryDistance		= begin()->entryTarget - referencePos;
 		begin()->alreadyRendered 	= true;
-		begin()->zAxisDown 			= false;
 	}
 	
 	// set recalculateMinMax flag
 	bool recalculateMinMax = false;
-	if ( cnc::dblCompare(entry.abs.x, minPosX) || cnc::dblCompare(entry.abs.y, minPosY) || 
-		 cnc::dblCompare(entry.abs.x, maxPosX) || cnc::dblCompare(entry.abs.y, maxPosY) ) {
+	if ( cnc::dblCompare(entry.entryTarget.getX(), minPosX) ||
+		 cnc::dblCompare(entry.entryTarget.getY(), minPosY) ||
+		 cnc::dblCompare(entry.entryTarget.getZ(), minPosZ) ||
+
+		 cnc::dblCompare(entry.entryTarget.getY(), maxPosX) ||
+		 cnc::dblCompare(entry.entryTarget.getY(), maxPosY) ||
+	     cnc::dblCompare(entry.entryTarget.getZ(), maxPosZ)) {
 		
 		recalculateMinMax = true;
 		resetMinMax();
 	}
 
 	// recalculate length and min or max on demand
-	xyLength = 0.0;
+	totalDistance = 0.0;
 	unsigned int cnt = 0;
 	for ( auto it=begin(); it !=end(); ++it ) {
 		
 		if ( cnt > 0 ) {
-			xyLength += sqrt(pow(it->move.x, 2) + pow(it->move.y, 2));
-			it->xyDistance = xyLength;
-		} else {
-			it->xyDistance = 0.0;
+			totalDistance += sqrt(  pow(it->entryDistance.getX(), 2)
+					              + pow(it->entryDistance.getY(), 2)
+								  + pow(it->entryDistance.getZ(), 2)
+							 );
+
+
+
+			it->totalDistance = totalDistance;
+		}
+		else {
+
+			it->totalDistance = 0.0;
 		}
 		
 		if ( recalculateMinMax == true ) {
-			minPosX = std::min(minPosX, it->abs.x);
-			minPosY = std::min(minPosY, it->abs.y);
-			maxPosX = std::max(maxPosX, it->abs.x);
-			maxPosY = std::max(maxPosY, it->abs.y);
+			minPosX = std::min(minPosX, it->entryTarget.getX());
+			minPosY = std::min(minPosY, it->entryTarget.getY());
+			minPosZ = std::min(minPosZ, it->entryTarget.getZ());
+
+			maxPosX = std::max(maxPosX, it->entryTarget.getX());
+			maxPosY = std::max(maxPosY, it->entryTarget.getY());
+			maxPosZ = std::max(maxPosZ, it->entryTarget.getZ());
 		}
 		
 		cnt++;
 	}
 	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListManager::reversePath() {
+//////////////////////////////////////////////////////////////////
+	// empty or single point, nothing should happen
+	// the size check is also very importent for the further implementation
+	if ( getPathListSize() < 2 )
+		return true;
+
+	const CncSpeedMode oldStartMode = begin()->feedSpeedMode;
+	const double oldStartSpeed 		= begin()->feedSpeed_MM_MIN;
+	const bool oldStartRenderFlag   = begin()->alreadyRendered;
+
+	const CncSpeedMode oldStopMode  = last()->feedSpeedMode;
+	const double oldStopSpeed  		= last()->feedSpeed_MM_MIN;
+	const bool oldStopRenderFlag    = last()->alreadyRendered;
+
+	// reverse list
+	std::reverse(list.begin(), list.end());
+
+	// correct new first entry
+	begin()->entryDistance		= begin()->entryTarget - referencePos;
+	begin()->alreadyRendered 	= oldStopRenderFlag;
+	begin()->feedSpeed_MM_MIN	= oldStopSpeed;
+	begin()->feedSpeedMode		= oldStopMode;
+
+	// correct last entry;
+	last()->alreadyRendered 	= oldStartRenderFlag;
+	last()->feedSpeed_MM_MIN	= oldStartSpeed;
+	last()->feedSpeedMode		= oldStartMode;
+
+	// reset length - will be recalculate in next loop
+	totalDistance = 0.0;
+
+	// over all entries
+	for (CncPathList::iterator it = list.begin(); it != list.end(); ++it) {
+		if ( std::distance(list.begin(), it) > 0 ) {
+			// reverse relative move steps
+			(*it).entryDistance = it->entryTarget - (it - 1)->entryTarget;
+
+			// recalculate distance
+			totalDistance += sqrt(  pow(it->entryDistance.getX(), 2)
+					              + pow(it->entryDistance.getY(), 2)
+								  + pow(it->entryDistance.getZ(), 2)
+						     );
+
+			it->totalDistance = totalDistance;
+
+		}
+		else {
+
+			it->totalDistance = 0.0;
+		}
+	}
+
 	return true;
 }

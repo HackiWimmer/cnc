@@ -64,7 +64,7 @@ class CncPolygonPoints : public ClipperLib::Path {
 		const char* getDataPointsAsWktString(wxString& ret);
 		const char* getAsSvgPathRepresentation(SVGUnit inputUnit, bool withElement, const wxString& style="style=\"fill:none;stroke:#0000ff;stroke-width:1.0\"") const;
 		
-		static const IntPoint& convertToIntPoint(const wxRealPoint& p);
+		static const IntPoint& convertToIntPoint(const CncDoublePosition& p);
 		static const wxRealPoint& convertToRealPoint(const IntPoint& p);
 		
 		static double convertToDouble(const cInt& v);

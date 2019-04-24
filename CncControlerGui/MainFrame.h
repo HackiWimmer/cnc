@@ -10,7 +10,6 @@
 #include "LruFileList.h"
 #include "FileParser.h"
 #include "BinaryFileParser.h"
-#include "PathGeneratorFrame.h"
 #include "UpdateManagerThread.h"
 #include "GamepadThread.h"
 #include "CncControl.h"
@@ -305,7 +304,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void moveZToMin(wxCommandEvent& event);
 		virtual void moveZToBottom(wxCommandEvent& event);
 		virtual void moveZToTop(wxCommandEvent& event);
-		virtual void openSVGPathGenerator(wxCommandEvent& event);
 		virtual void openConfigurationFile(wxCommandEvent& event);
 		virtual void openExternalEditor(wxCommandEvent& event);
 		virtual void openCalculator(wxCommandEvent& event);
@@ -435,7 +433,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxTextCtrl* getLogger() 				{ return m_logger; }
 		wxTextCtrl* getTrace() 					{ return m_tmpTraceInfo; }
 		wxTextCtrl* getCtrlMessageHistory() 	{ return m_controllerMsgHistory; }
-		wxTextCtrl* getCtrlPathGeneratorTrace() { return pathGenerator->getPathTrace(); }
 		wxListCtrl* getCtrlSerialSpy() 			{ return serialSpyListCtrl; }
 		
 		CncMotionMonitor* getMotionMonitor() 	{ return motionMonitor; }
@@ -463,9 +460,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		//////////////////////////////////////////////////////////////////////////////////
 		// svg edit popup callbacks
-		void openPathGen();
-		void regenerateCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
-		void openPathGenWithCurrentSvgNodeFromPopup(wxStyledTextCtrl* ctl, const wxString& node);
 		void openCurrentTemplateInBrowser();
 		
 		//////////////////////////////////////////////////////////////////////////////////
@@ -600,8 +594,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
 		wxFileConfig* lruStore;
-		
-		PathGeneratorFrame* pathGenerator;
 		
 		NotebookInfo* outboundNbInfo;
 		NotebookInfo* templateNbInfo;

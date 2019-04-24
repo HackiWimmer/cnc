@@ -395,8 +395,7 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	if ( pathHandler->initNextPath(sopi) == false )
 		return false;
 		
-	//PathInfoVector piv = uai.pathInfoList;
-	for ( PathInfoVector::iterator itPiv = uai.pathInfoList.begin(); itPiv != uai.pathInfoList.end(); ++itPiv ) {
+	for ( auto itPiv = uai.pathInfoList.begin(); itPiv != uai.pathInfoList.end(); ++itPiv ) {
 		if ( pathHandler->process(itPiv->cmd, itPiv->count, itPiv->values) == false ) {
 			std::cerr << "SVGFileParser::spoolPath failed" << std::endl;
 			uai.debug(*itPiv, std::cerr);
@@ -409,7 +408,6 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	
 	if ( pathHandler->finishCurrentPath() == false )
 		return false;
-		
 		
 	// path is now recorded and tried out, now run the controller 
 	if ( pathHandler->runCurrentPath() == false )

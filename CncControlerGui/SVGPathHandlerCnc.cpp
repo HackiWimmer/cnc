@@ -6,15 +6,12 @@
 #include "SerialPort.h"
 #include "CncControl.h"
 #include "FileParser.h"
-#include "CncToolCorrection.h"
 #include "SVGPathHandlerCnc.h"
 
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc) 
 : SVGPathHandlerBase()
 , cncControl(cnc)
-, toolRadius(0.0)
-, zAxisDown(false)
 , initialized(false)
 , debugState(false)
 , currentCncParameters()
@@ -22,15 +19,6 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
-	
-	toolRadius = CncConfig::getGlobalCncConfig()->getToolDiameter();
-	toolRadius /= 2.0; 
-	
-	if ( toolRadius < 0 )
-		toolRadius *= (-1.0);
-		
-	if ( toolRadius > 0 )
-		cnc::trc.logInfoMessage(wxString::Format("Tool path correction will be activated: Radius: %.3lf", toolRadius));
 }
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::~SVGPathHandlerCnc() {
@@ -103,7 +91,8 @@ inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncPathListEntry& cp
 	if ( debugState == false )
 		return;
 
-	appendDebugValueDetail((wxString("Point ") << pathListMgr.getPathListSize()), cpe.getPointAsString());
+	wxString value;
+	appendDebugValueDetail((wxString("Point ") << pathListMgr.getPathListSize()), cpe.traceEntryToString(value));
 }
 //////////////////////////////////////////////////////////////////
 inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncCurveLib::ParameterSet& ps) {
@@ -185,29 +174,6 @@ bool SVGPathHandlerCnc::finishCurrentPath() {
 	
 	PathHandlerBase::finishCurrentPath();
 	
-	// if the tool radius > 0 the path have to be tool corrected
-	if ( toolRadius > 0 ) {
-		CncToolCorrection tc(toolRadius, currentCncParameters.getCorrectionType());
-		if ( tc.process(pathListMgr.getPathListtoModify()) == false ) 
-			return false;
-			
-		pathListMgr.setCorretedFlag(tc.getType() != CncCT_Center);
-		TRACE_POSITIONS("Corrected before");
-		
-		// correct the start posistion
-		/*
-		 * todo
-		if ( pathListMgr.getFirstPathFlag() == true ) {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.setStartPos({(*it).move.x, (*it).move.y});
-		} else {
-			CncPathList::iterator it = pathListMgr.begin();
-			pathListMgr.incStartPos(pathListMgr.getFirstMove() - (*it).move);
-		}*/
-		
-		TRACE_POSITIONS("Corrected after");
-	}
-	
 	// reverse path
 	if ( currentCncParameters.getReverseFlag() == true ) {
 		if ( pathListMgr.reversePath() == false )
@@ -284,7 +250,6 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 	
 	bool reverseYAxis = CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag();
 	
-	unsigned int cnt = 0;
 	// over one stored svg path <path M...../>
 	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
 
@@ -292,27 +257,18 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 			fileParser->evaluateDebugState();
 		
 		CncPathListEntry cpe = *it;
-		cnt++;
+		cpe.traceEntry(std::clog);
 		
-		if ( cpe.zAxisDown == false && isZAxisDown() == true ) {
-			if ( moveUpZ() == false )
-					return false;
-			/* todo
-			if ( cncControl->getDurationCounter() == 1 ) {
-				// If this will be done for further durations the z axis moves to top before moving to the depth of the next duration
-				if ( cncControl->moveUpZ() == false )
-					return false;
-			} else {
-				cncControl->simulateZAxisUp();
-			}*/
-
-		} else if ( cpe.zAxisDown == true && isZAxisUp() == true ) {
-			if ( moveDownZ() == false )
-				return false;
+		if ( cpe.isSpeedChange() == true ) {
+			cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(cpe.feedSpeed_MM_MIN, cpe.feedSpeedMode);
+			continue;
 		}
-		
-		double moveX = cpe.move.x;
-		double moveY = cpe.move.y;
+
+		if ( cpe.isPositionChange() == false )
+			continue;
+
+		double moveX = cpe.entryDistance.getX();
+		double moveY = cpe.entryDistance.getY();
 		bool firstListEntry = false;
 		
 		if ( reverseYAxis == true )
@@ -325,18 +281,20 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 
 			if ( firstRun == true ) {
 				// this time the cnc controller isn't moved before
-				// so the local positions have to be alinged
+				// so the local positions have to be aligned
 				currentPos.setX(cncControl->getCurAppPosMetric().getX());
 				currentPos.setY(cncControl->getCurAppPosMetric().getY());
+
 				startPos.setX(cncControl->getStartPosMetric().getX());
 				startPos.setY(cncControl->getStartPosMetric().getY());
 			}
-			// reconstuct the first move, this overrides moveX and moveY
+
+			// reconstruct the first move, this overrides moveX and moveY
 			// pathListMgr.getStartPos() is always absolute as well as currentPos
-			moveX = pathListMgr.getStartPos().x - currentPos.getX();
+			moveX = pathListMgr.getStartPos().getX() - currentPos.getX();
 			
-			if ( reverseYAxis == false )	moveY = +pathListMgr.getStartPos().y - currentPos.getY();
-			else 							moveY = -pathListMgr.getStartPos().y - currentPos.getY();
+			if ( reverseYAxis == false )	moveY = +pathListMgr.getStartPos().getY() - currentPos.getY();
+			else 							moveY = -pathListMgr.getStartPos().getY() - currentPos.getY();
 
 			TRACE_FIRST_MOVE(moveX, moveY);
 		}
@@ -350,11 +308,11 @@ bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
 
 			if ( moveLinearXY(0, moveY, cpe.alreadyRendered) == false )
 				return false;
-		} else {
+		}
+		else {
 			if ( moveLinearXY(moveX, moveY, cpe.alreadyRendered) == false )
 				return false;
 		}
-		
 	}
 	
 	return true;
@@ -367,10 +325,6 @@ void SVGPathHandlerCnc::prepareWork() {
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
-	
-	// controller handling
-	if ( isZAxisDown() == true )
-		moveUpZ();
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::finishWork() {
@@ -389,81 +343,67 @@ void SVGPathHandlerCnc::finishWork() {
 	xyMax = cncControl->getWaterMarksMetric();
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::simulateZAxisUp() {
-//////////////////////////////////////////////////////////////////
-	zAxisDown = false;
-}
-//////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::simulateZAxisDown() {
-//////////////////////////////////////////////////////////////////
-	zAxisDown = true;
-}
-//////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::isZAxisUp() {
 //////////////////////////////////////////////////////////////////
-	return !zAxisDown;
+	const double curZDist = CncConfig::getGlobalCncConfig()->getCurZDistance();
+	const double curZPos  = cncControl->getCurAppPosMetric().getZ(); 
+
+	return cnc::dblCompare(curZPos, curZDist);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::isZAxisDown() {
 //////////////////////////////////////////////////////////////////
-	return zAxisDown;
+	return !isZAxisUp();
 }
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveUpZ() {
 ///////////////////////////////////////////////////////////////////
-	double dist = CncConfig::getGlobalCncConfig()->getCurZDistance();
-	double curZPos = cncControl->getCurAppPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
+	const double curZDist = CncConfig::getGlobalCncConfig()->getCurZDistance();
+	const double curZPos  = cncControl->getCurAppPosMetric().getZ();
 	double moveZ = 0.0;
 	
-	if ( curZPos != dist ) {
-		moveZ = dist - curZPos;
-		// correct round deviations
-		if ( moveZ < 0.00001 )
-			moveZ = 0.0;
-	}
+	if ( cnc::dblCompare(curZPos, curZDist) == false )
+		moveZ = curZDist - curZPos;
 	
 	if ( (curZPos + moveZ) > CncConfig::getGlobalCncConfig()->getMaxZDistance() ) {
-		std::cerr << "CncControl::moveUpZ error:" << std::endl;
-		std::cerr << "Z(abs): " << curZPos + moveZ << std::endl;
-		std::cerr << "Z(cur): " << curZPos << std::endl;
-		std::cerr << "Z(mv):  " << moveZ << std::endl;
+		std::cerr << "CncControl::moveUpZ error:" 	<< std::endl;
+		std::cerr << "Z(abs): " << curZPos + moveZ 	<< std::endl;
+		std::cerr << "Z(cur): " << curZPos 			<< std::endl;
+		std::cerr << "Z(mv):  " << moveZ 			<< std::endl;
 		std::cerr << "Z(max): " << CncConfig::getGlobalCncConfig()->getMaxZDistance() << std::endl;
 		return false;
 	}
-	
-	bool ret = cncControl->moveRelMetricZ(moveZ);
-	if ( ret ) {
-		zAxisDown = false;
-		cncControl->changeSpeedToDefaultSpeed_MM_MIN(CncSpeedRapid);
-	} else {
-		std::cerr << "CncControl::moveUpZ() error: " << moveZ << ", " << curZPos << ", " << dist << std::endl;
-	}
 
-	return ret;
+	pathListMgr.addEntryAdm(CncSpeedWork,  GBL_CONFIG->getDefaultWorkSpeed_MM_MIN());
+	//pathListMgr.addEntryRel(0.0, 0.0, moveZ, false);
+	
+	currentPos.incZ(moveZ);
+	processLinearMove(false);
+	pathListMgr.addEntryAdm(CncSpeedRapid, GBL_CONFIG->getDefaultRapidSpeed_MM_MIN());
+
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveDownZ() {
 ///////////////////////////////////////////////////////////////////
-	double curZPos = cncControl->getCurAppPos().getZ() * CncConfig::getGlobalCncConfig()->getDisplayFactZ(); // we need it as mm
-	double newZPos = CncConfig::getGlobalCncConfig()->getDurationPositionAbs(cncControl->getDurationCounter());
-	double moveZ   = (curZPos - newZPos) * (-1);
+	const double curZPos = cncControl->getCurAppPosMetric().getZ();
+	const double newZPos = CncConfig::getGlobalCncConfig()->getDurationPositionAbs(cncControl->getDurationCounter());
+	double moveZ         = (curZPos - newZPos) * (-1);
 
 	if ( false ) {
 		std::clog << "moveDownZ:  " << std::endl;
-		std::clog << " zAxisDown  " << zAxisDown << std::endl;
-		std::clog << " curZPos:   " << curZPos << std::endl;
-		std::clog << " newZPos:   " << newZPos << std::endl;
-		std::clog << " moveZ:     "	<< moveZ << std::endl;
+		std::clog << " zAxisDown  " << isZAxisDown() 					<< std::endl;
+		std::clog << " curZPos:   " << curZPos 							<< std::endl;
+		std::clog << " newZPos:   " << newZPos 							<< std::endl;
+		std::clog << " moveZ:     "	<< moveZ 							<< std::endl;
 		std::clog << " duration:  "	<< cncControl->getDurationCounter() << std::endl;
 	}
+
+	pathListMgr.addEntryAdm(CncSpeedWork, GBL_CONFIG->getDefaultWorkSpeed_MM_MIN());
+	//pathListMgr.addEntryRel(0.0, 0.0, moveZ, false);
+	currentPos.incZ(moveZ);
+	processLinearMove(false);
 	
-	cncControl->changeSpeedToDefaultSpeed_MM_MIN(CncSpeedWork);
-	
-	bool ret = cncControl->moveRelMetricZ(moveZ);
-	if ( ret ) {
-		zAxisDown = true;
-	}
-	
-	return ret;
+	return true;
 }
 

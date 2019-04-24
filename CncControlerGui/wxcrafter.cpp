@@ -345,20 +345,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer1368->Add(m_btSvgToggleWordWrap, 0, wxALL, WXC_FROM_DIP(1));
     m_btSvgToggleWordWrap->SetMinSize(wxSize(26,26));
-    
-    m_staticLine4474 = new wxStaticLine(m_mainBookSourcePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
-    
-    flexGridSizer1368->Add(m_staticLine4474, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_btPathGenerator = new wxButton(m_mainBookSourcePanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(26,26)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_btPathGenerator->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-globals")), wxLEFT);
-    m_btPathGenerator->SetBitmapMargins(2,2);
-    #endif
-    m_btPathGenerator->SetToolTip(_("Open SVG Path Generator"));
-    
-    flexGridSizer1368->Add(m_btPathGenerator, 0, wxALL, WXC_FROM_DIP(1));
-    m_btPathGenerator->SetMinSize(wxSize(26,26));
     flexGridSizer1368->SetMinSize(wxSize(28,-1));
     
     m_templateNotebook = new wxNotebook(m_mainBookSourcePanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_mainBookSourcePanel, wxSize(-1,-1)), wxNB_NOPAGETHEME|wxBK_TOP|wxBK_DEFAULT);
@@ -5836,7 +5822,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_renameTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
     m_removeTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
     m_btSvgToggleWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
-    m_btPathGenerator->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     m_tbCaseSensitive->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
@@ -6123,7 +6108,6 @@ MainFrameBClass::~MainFrameBClass()
     m_renameTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::renameTemplateFromButton), NULL, this);
     m_removeTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::removeTemplateFromButton), NULL, this);
     m_btSvgToggleWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleTemplateWordWrapMode), NULL, this);
-    m_btPathGenerator->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openSVGPathGenerator), NULL, this);
     m_tbCaseSensitive->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbRegEx->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);
     m_tbHighLight->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toogleSvgEditSearchFlag), NULL, this);

@@ -93,23 +93,23 @@ void PathHandlerBase::tracePositions(const char* userPerspectivePrefix) {
 	
 	if ( pathListMgr.getPathListSize() > 0 ) {
 		CncPathList::iterator it = pathListMgr.begin();
-		std::cout << " PL.First.Pos  : " << (*it).move.x << "," << (*it).move.y << std::endl;
+		std::cout << " PL.First.Pos  : " << (*it).entryDistance << std::endl;
 		it = pathListMgr.end()-1;
-		std::cout << " PL.Last.Pos   : " << (*it).move.x << "," << (*it).move.y << std::endl;
+		std::cout << " PL.Last.Pos   : " << (*it).entryDistance << std::endl;
 	} else {
 		std::cout << " PL.First.Pos  : empty" << std::endl;
 		std::cout << " PL.Last.Pos   : empty" << std::endl;
 	}
-	std::cout << " PL.firstPath  : " << pathListMgr.getFirstPathFlag() << std::endl;
-	std::cout << " PL.Start Pos  : " << pathListMgr.getStartPos().x << "," << pathListMgr.getStartPos().y << std::endl;
+	std::cout << " PL.firstPath  : " << pathListMgr.getFirstPathFlag()   << std::endl;
+	std::cout << " PL.Start Pos  : " << pathListMgr.getStartPos().getX() << std::endl;
 
-	std::cout << " StartPos      : " << startPos.getX()   << "," << startPos.getY()   << std::endl;
-	std::cout << " CurrentPos    : " << currentPos.getX() << "," << currentPos.getY() << std::endl;
+	std::cout << " StartPos      : " << startPos   << std::endl;
+	std::cout << " CurrentPos    : " << currentPos << std::endl;
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::traceCurrentPosition() {
 //////////////////////////////////////////////////////////////////
-	std::clog << "CurrentPos: " << currentPos.getX() << "," << currentPos.getY() << std::endl;
+	std::clog << "CurrentPos: " << currentPos << std::endl;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
@@ -129,45 +129,49 @@ bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 		startPos.setY(values[1]);
 		
 		// first of all give the path list manager a reference from where we are coming 
-		pathListMgr.setReferencePos({currentPos.getX(), currentPos.getY()});
-				
+		pathListMgr.setReferencePos(currentPos);
+		pathListMgr.setFirstPathFlag(firstPath);
+		
 		if ( firstPath == true ) {
-			pathListMgr.setFirstPathFlag(true);
 			firstPath = false;
-		} else {
-			pathListMgr.setFirstPathFlag(false);
+			
+			if ( moveUpZ() == false )
+				return false;
 		}
-
+		
 		//the first move is always absolute!
 		currentPos.setX(startPos.getX());
 		currentPos.setY(startPos.getY());
-		
-		simulateZAxisUp();
 		ret = processLinearMove(false);
-		simulateZAxisDown();
 		
+		if ( moveDownZ() == false )
+			return false;
+
 		newPath = false;
 		
-	} else {
-		double moveX = 0, moveY = 0;
+	}
+	else {
+		double moveX = 0.0, moveY = 0.0;
+
 		if ( c == 'M' ) {
 			moveX = values[0] - currentPos.getX();
 			moveY = values[1] - currentPos.getY();
-		} else {
+		}
+		else {
 			moveX = values[0];
 			moveY = values[1];
 		}
 
 		currentPos.incX(moveX);
 		currentPos.incY(moveY);
+
 		startPos.setX(currentPos.getX());
 		startPos.setY(currentPos.getY());
 		
 		ret = true;
-		if ( cnc::dblCompareNull(moveX) == false || cnc::dblCompareNull(moveY) == false ) {
-			simulateZAxisUp();
+		if ( cnc::dblCompareNull(moveX) == false ||
+			 cnc::dblCompareNull(moveY) == false ) {
 			ret = processLinearMove(false);
-			simulateZAxisDown();
 		}
 	}
 	
@@ -606,10 +610,8 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::tracePathList(std::ostream &ostr) {
 //////////////////////////////////////////////////////////////////
-	unsigned int cnt = 0;
 	for (auto it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
-		ostr << wxString::Format("%04d | ", cnt ) << it->getPointAsString() << std::endl;
-		cnt++;
+		it->traceEntry(ostr);
 	}
 }
 //////////////////////////////////////////////////////////////////

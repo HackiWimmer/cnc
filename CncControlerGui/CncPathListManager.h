@@ -14,35 +14,26 @@ class CncPathListManager {
 		bool isFirstPath;			// stores if this path is the first path info
 		bool isCorrected;			// stores if this path is corrected
 		
-		wxRealPoint referencePos;	// reference postion - from where we are coming
+		CncDoublePosition referencePos;	// reference position - from where we are coming
 		
 		double minPosX;
 		double minPosY;
+		double minPosZ;
+
 		double maxPosX;
 		double maxPosY;
+		double maxPosZ;
 		
-		double xyLength;
+		double totalDistance;
 		
 		//////////////////////////////////////////////////////////////
 		void appendEntry(CncPathListEntry& cpe);
 		
 	public:
 		
-		// boost wkt types
-		enum WktTypeInfo { WKT_EMPTY, WKT_POINT, WKT_POLYGON, WKT_LINESTRING, WKT_UNKNOWN};
-			
 		//////////////////////////////////////////////////////////////
-		CncPathListManager() {
-			//preallocate memory
-			list.reserve(1000 * 1000);
-			
-			reset();
-		}
-		
-		//////////////////////////////////////////////////////////////
-		~CncPathListManager() {
-			reset();
-		}
+		CncPathListManager();
+		~CncPathListManager();
 		
 		//////////////////////////////////////////////////////////////
 		CncPathList& getPathListtoModify() { return list; }
@@ -61,18 +52,21 @@ class CncPathListManager {
 		void setCorretedFlag(bool state=true) { isCorrected = state; }
 		
 		//////////////////////////////////////////////////////////////
-		double getXYLength() const { return xyLength; }
+		double getTotalDistance() const { return totalDistance; }
 		
 		//////////////////////////////////////////////////////////////
 		double getMinPosX() const { return minPosX; }
 		double getMinPosY() const { return minPosY; }
+		double getMinPosZ() const { return minPosZ; }
+		
 		double getMaxPosX() const { return maxPosX; }
 		double getMaxPosY() const { return maxPosY; }
+		double getMaxPosZ() const { return maxPosZ; }
 		
 		//////////////////////////////////////////////////////////////
-		const wxRealPoint& getStartPos() const;
-		const wxRealPoint& getReferencePos() const { return referencePos; }
-		void setReferencePos(const wxRealPoint& p) { referencePos = p; }
+		const CncDoublePosition& getStartPos() const;
+		const CncDoublePosition& getReferencePos() const { return referencePos; }
+		void setReferencePos(const CncDoublePosition& p) { referencePos = p; }
 		
 		//////////////////////////////////////////////////////////////
 		const CncPathList::iterator begin() { return list.begin(); }
@@ -84,87 +78,47 @@ class CncPathListManager {
 		const CncPathList::const_iterator const_end()   const { return list.end(); }
 		const CncPathList::const_iterator const_last()  const { return list.end() - 1; }
 		
+		//////////////////////////////////////////////////////////////////
+		bool isPathClosed();
+
 		//////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const CncPathListManager &a) {
-			ostr << "CncPathListInfo entries : " << a.list.size() << std::endl;
-			ostr << " is correded            : " << a.isPathCorrected() << std::endl;
-			ostr << " is first path          : " << a.getFirstPathFlag() << std::endl;
-			ostr << " xy length              : " << cnc::dblFormat1(a.getXYLength()) << std::endl;
-			ostr << " minPos (x,y)           : " << cnc::dblFormat2(a.getMinPosX(), a.getMinPosY()) << std::endl;
-			ostr << " maxPos (X,Y)           : " << cnc::dblFormat2(a.getMaxPosX(), a.getMaxPosY()) << std::endl;
-			ostr << " referencePos           : " << a.getReferencePos() << std::endl;
-			ostr << " startPos               : " << a.getStartPos() << std::endl;
+			ostr << "CncPathListInfo entries : " << a.list.size() 													<< std::endl;
+			ostr << " is corrected           : " << a.isPathCorrected() 											<< std::endl;
+			ostr << " is first path          : " << a.getFirstPathFlag() 											<< std::endl;
+			ostr << " total distance         : " << cnc::dblFormat1(a.getTotalDistance()) 							<< std::endl;
+			ostr << " minPos (x, y, z)       : " << cnc::dblFormat3(a.getMinPosX(), a.getMinPosY(), a.getMinPosZ()) << std::endl;
+			ostr << " maxPos (X, Y, z)       : " << cnc::dblFormat3(a.getMaxPosX(), a.getMaxPosY(), a.getMaxPosZ()) << std::endl;
+			ostr << " referencePos           : " << a.getReferencePos() 											<< std::endl;
+			ostr << " startPos               : " << a.getStartPos() 												<< std::endl;
 			
 			ostr << " path list:" << std::endl;
 			for ( auto it=a.getPathList().begin(); it!=a.getPathList().end(); ++it )
-				ostr << it->getPointAsString() <<  " | zDown: " << it->zAxisDown <<  " | rendered: " << it->alreadyRendered << std::endl;
+				it->traceEntry(ostr);
 
 			return ostr;
 		}
 		
 		//////////////////////////////////////////////////////////////
-		void reset() {
-			isFirstPath   	= false;
-			isCorrected 	= false;
-			
-			referencePos	= {0, 0}; 
-			
-			resetMinMax();
-			
-			xyLength		= 0.0;
-			
-			list.clear();
-		}
-		
-		//////////////////////////////////////////////////////////////
-		void resetMinMax() {
-			minPosX			= DBL_MAX;
-			minPosY			= DBL_MAX;
-			maxPosX			= DBL_MIN;
-			maxPosY			= DBL_MIN;
-		}
-		
-		// demo function
-		bool overAllBoostWktEntriesSample();
-		
-		//////////////////////////////////////////////////////////////////
-		bool isPathClosed();
-		
-		//////////////////////////////////////////////////////////////////
-		const wxString& getWktTypeAsString();
-		CncPathListManager::WktTypeInfo getWktType();
-		
-		//////////////////////////////////////////////////////////////////
-		const char* getAsWktRepresentation();
-		
-		//////////////////////////////////////////////////////////////////
-		const char* getAsSvgPathRepresentation(const wxString& style);
-		
-		//////////////////////////////////////////////////////////////////
-		bool getCentroid(wxRealPoint& centroid);
-		
-		//////////////////////////////////////////////////////////////
-		bool shiftPathStart();
-		
-		//////////////////////////////////////////////////////////////
-		bool centerPath();
+		void reset();
+		void resetMinMax();
 		
 		//////////////////////////////////////////////////////////////
 		bool reversePath();
 		
 		//////////////////////////////////////////////////////////////
-		const CncPathListEntry& calculateAndAddEntry(double newAbsPosX, 
-		                                             double newAbsPosY,
-		                                             bool alreadyRendered=false, 
-		                                             bool zAxisDown= false) ;
+		const CncPathListEntry& addEntryAdm(long clientId);
+		const CncPathListEntry& addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN);
 		
-		//////////////////////////////////////////////////////////////
-		const CncPathListEntry& calculateAndAddEntry(const wxRealPoint& newAbsPoint, 
-		                                             bool alreadyRendered=false, 
-		                                             bool zAxisDown= false);
+		const CncPathListEntry& addEntryAbs(const CncDoublePosition& newAbsPos, bool alreadyRendered=false);
+		const CncPathListEntry& addEntryRel(const CncDoublePosition& newAbsPos, bool alreadyRendered=false);
+		
+		const CncPathListEntry& addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered=false);
+		const CncPathListEntry& addEntryRel(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered=false);
 		
 		//////////////////////////////////////////////////////////////
 		bool eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase);
 };
 
 #endif
+

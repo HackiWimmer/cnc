@@ -126,46 +126,6 @@
       </VirtualDirectory>
       <File Name="3D/CncGCodePreview.cpp"/>
     </VirtualDirectory>
-    <VirtualDirectory Name="PathGen">
-      <File Name="PathGeneratorFrame.h"/>
-      <File Name="PathGeneratorFrame.cpp"/>
-      <VirtualDirectory Name="Generators">
-        <VirtualDirectory Name="Dedicated Generators">
-          <File Name="PathGeneratorBase.h"/>
-          <File Name="PathGeneratorBase.cpp"/>
-          <File Name="PathGenerators/PGenEllipticalArcPolygon.h"/>
-          <File Name="PathGenerators/PGenEllipticalRing.h"/>
-          <File Name="PathGenerators/PGenFreehandPolygon.h"/>
-          <File Name="PathGenerators/PGenFreehandPolyline.h"/>
-          <File Name="PathGenerators/PGenGenericElement.h"/>
-          <File Name="PathGenerators/PGenGenericPath.h"/>
-          <File Name="PathGenerators/PGenPolygon.cpp"/>
-          <File Name="PathGenerators/PGenPolygon.h"/>
-          <File Name="PathGenerators/PGenRectanglePolygon.h"/>
-          <File Name="PathGenerators/PGenRegularDiameterPolygon.h"/>
-          <File Name="PathGenerators/PGenRegularRadiusPolygon.h"/>
-          <File Name="PathGenerators/PGenRotaryKnob.h"/>
-          <File Name="PathGenerators/PGenSample.h"/>
-          <File Name="PathGenerators/PGenSimpleLine.h"/>
-          <File Name="PathGenerators/PGenSimplePoint.h"/>
-          <File Name="PathGenerators/PGenSvgElementPolygon.h"/>
-        </VirtualDirectory>
-        <VirtualDirectory Name="SvgPathUtils">
-          <File Name="SvgGeneratorBase.cpp"/>
-          <File Name="SvgGeneratorBase.h"/>
-          <File Name="SvgPathFragment.cpp"/>
-          <File Name="SvgPathFragment.h"/>
-          <File Name="SvgPathGroup.cpp"/>
-          <File Name="SvgPathGroup.h"/>
-          <File Name="SvgPathString.cpp"/>
-          <File Name="SvgPathString.h"/>
-        </VirtualDirectory>
-      </VirtualDirectory>
-      <File Name="PgPropertyHelpInfos.cpp"/>
-      <File Name="PathGeneratorStore.h"/>
-      <File Name="PathGeneratorStore.cpp"/>
-      <File Name="CncPatternDefinitions.h"/>
-    </VirtualDirectory>
     <VirtualDirectory Name="Serial">
       <VirtualDirectory Name="OSD">
         <File Name="OSD/SerialMsw.cpp"/>
@@ -192,6 +152,7 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncPathListEntry.cpp"/>
       <File Name="CncMoveSequence.h"/>
       <File Name="CncMoveSequence.cpp"/>
       <File Name="CncSpeedMonitor.h"/>
@@ -253,7 +214,6 @@
       <File Name="CncArduino.cpp"/>
       <File Name="CncControl.cpp"/>
       <File Name="CncFileNameService.cpp"/>
-      <File Name="CncToolCorrection.cpp"/>
       <File Name="CncToolStateControl.cpp"/>
       <File Name="CncArduino.h"/>
       <File Name="CncCommon.h"/>
@@ -263,7 +223,6 @@
       <File Name="CncPathListEntry.h"/>
       <File Name="CncPosition.h"/>
       <File Name="CncStreamBuffers.h"/>
-      <File Name="CncToolCorrection.h"/>
       <File Name="CncToolStateControl.h"/>
       <File Name="CommandTemplates.h"/>
       <File Name="PointAbs.h"/>
@@ -273,8 +232,6 @@
       <File Name="CncCommon.cpp"/>
       <File Name="CncPathListManager.h"/>
       <File Name="CncPathListManager.cpp"/>
-      <File Name="CncClipperWrapper.h"/>
-      <File Name="CncClipperWrapper.cpp"/>
       <File Name="CncFilePreview.cpp"/>
       <File Name="CncFilePreview.h"/>
       <File Name="CncFileView.cpp"/>
@@ -359,7 +316,6 @@
         <File Name="SvgEditPopup.h"/>
         <File Name="SVGElementConverter.cpp"/>
         <File Name="SVGElementConverter.h"/>
-        <File Name="SVGPathAssistant.h"/>
         <File Name="SvgUnitCalculator.cpp"/>
         <File Name="SvgUnitCalculator.h"/>
         <File Name="SVGUserAgent.h"/>
@@ -427,7 +383,6 @@
     <VirtualDirectory Name="Tests">
       <File Name="Tests/Test_Base.h"/>
       <File Name="Tests/Test_SVGNodeParser.h"/>
-      <File Name="Tests/Test_SVGPathAssistant.h"/>
       <File Name="Tests/Test_Base.cpp"/>
       <File Name="Tests/Test_FrameworkCallback.h"/>
       <File Name="Tests/Test_CncPathListManager.h"/>

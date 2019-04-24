@@ -2,6 +2,7 @@
 #define TEST_FRAMEWORK_CALLBACK_H
 
 #include "Test_Base.h"
+#include "SVGPathAssistant.h"
 
 ////////////////////////////////////////////////////////////////////////////
 class TEST_FRAMEWORK_CALLBACK : public TEST_BASE {

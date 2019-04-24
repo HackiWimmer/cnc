@@ -6,6 +6,7 @@ bool SVGPathHandlerBase::processLinearMove(bool alreadyRendered) {
 	LinearMoveParam param;
 	param.absX 					= currentPos.getX();
 	param.absY 					= currentPos.getY();
+	param.absZ 					= currentPos.getZ();
 	param.alreadyTransformed 	= false;
 	param.alreadyRendered		= alreadyRendered;
 	
@@ -17,6 +18,7 @@ bool SVGPathHandlerBase::callback(const CncCurveLib::Point& p) {
 	LinearMoveParam param;
 	param.absX 					= p.x;
 	param.absY 					= p.y;
+	param.absZ 					= currentPos.getZ();
 	param.alreadyTransformed 	= true;
 	param.alreadyRendered		= true;
 	
@@ -29,7 +31,7 @@ bool SVGPathHandlerBase::processLinearMove(const LinearMoveParam& param) {
 	double newPosAbsY = param.absY;
 	
 	// first perform the transformations . . .
-	if ( param.alreadyRendered == false )
+	if ( param.alreadyTransformed == false )
 		transform(newPosAbsX, newPosAbsY);
 	
 	//  . . . then convert the input unit to mm . . 
@@ -37,9 +39,10 @@ bool SVGPathHandlerBase::processLinearMove(const LinearMoveParam& param) {
 	newPosAbsY = unitCalculator.convert(newPosAbsY);
 	
 	// append
-	const CncPathListEntry cpe = pathListMgr.calculateAndAddEntry(newPosAbsX, newPosAbsY, param.alreadyRendered , isZAxisDown());
+	const CncPathListEntry cpe =
+			 pathListMgr.addEntryAbs(newPosAbsX, newPosAbsY, param.absZ, param.alreadyRendered);
+								
 	appendDebugValueDetail(cpe);
-	
 	return true;
 }
 

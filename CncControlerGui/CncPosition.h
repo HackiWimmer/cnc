@@ -347,7 +347,11 @@ class CncPosition {
 		}
 };
 
-typedef CncPosition<int32_t> CncLongPosition;
-typedef CncPosition<double> CncDoublePosition;
+
+typedef CncPosition<int32_t> 	CncLongPosition;
+typedef CncPosition<double> 	CncDoublePosition;
+
+typedef CncPosition<int32_t> 	CncLongDistance;
+typedef CncPosition<double> 	CncDoubleDistance;
 
 #endif
