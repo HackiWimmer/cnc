@@ -1,4 +1,5 @@
 #include "CncArduino.h"
+#include "CncConfig.h"
 #include "CncMoveSequence.h"
 
 #ifdef __WXGTK__
@@ -89,7 +90,19 @@ unsigned int CncMoveSequence::determineSafeBufferSize() const {
 	return ( headerSize + dataSize + ( portionCount * 1 ) );
 }
 ///////////////////////////////////////////////////////////////////
-void CncMoveSequence::addPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f)  {
+void CncMoveSequence::addMetricPosXYZF(double dx, double dy, double dz, double f) {
+///////////////////////////////////////////////////////////////////
+	const double sx = dx * GBL_CONFIG->getCalculationFactX();
+	const double sy = dy * GBL_CONFIG->getCalculationFactY();
+	const double sz = dz * GBL_CONFIG->getCalculationFactZ();
+	
+	addStepPosXYZF( (int32_t)round(sx), 
+					(int32_t)round(sy),
+					(int32_t)round(sz),
+					0); // ???
+}
+///////////////////////////////////////////////////////////////////
+void CncMoveSequence::addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f)  {
 ///////////////////////////////////////////////////////////////////
 	if ( isValid() == false )
 		return;
@@ -277,7 +290,7 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	moveSequenceFlushedSize = byteCount;
 
 	// debug
-	if ( true ) {
+	if ( false ) {
 		std::cout << "byteOffset              : " << byteOffset					<< std::endl;
 		std::cout << "byteCount               : " << byteCount					<< std::endl;
 		std::cout << "flushedCount            : " << flushed					<< std::endl;

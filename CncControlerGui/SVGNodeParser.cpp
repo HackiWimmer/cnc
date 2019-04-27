@@ -180,9 +180,8 @@ bool SVGNodeParser::addPathElement(char c, unsigned int count, double values[]) 
 	// Please note: The following command will process the current path directly, 
 	// b u t  this method is virtual and possibly overriden!
 	
-	return pathHandler->process(c, count, values);
+	return pathHandler->processCommand_2DXY(c, count, values);
 }
-
 //////////////////////////////////////////////////////////////////
 bool SVGNodeParser::processSvgNode(const wxString& node) {
 //////////////////////////////////////////////////////////////////

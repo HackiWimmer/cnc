@@ -99,7 +99,11 @@
 	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Y		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Y"
 	#define CncWork_Ctl_REPLY_THRESHOLD_SETPS_Z		"CncWork.Controller/REPLAY_THRESHOLD_STEPS_Z"
 	#define CncWork_Ctl_AVOID_DUP_SETTER_VALUES		"CncWork.Controller/AVOID_DUP_SETTER_VALUES"
-
+	#define CncWork_Ctl_REQUEST_IDLE_REQUESTS		"CncWork.Controller/REQUEST_IDLE_REQUESTS"
+	#define CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE	"CncWork.Controller/INTERRUPT_BY_POS_OUTOFRANGE"
+	#define CncWork_Ctl_INVERSE_CTL_DIRECTION_X		"CncWork.Controller/INVERSE_CTL_DIRECTION_X"
+	#define CncWork_Ctl_INVERSE_CTL_DIRECTION_Y		"CncWork.Controller/INVERSE_CTL_DIRECTION_Y"
+	#define CncWork_Ctl_INVERSE_CTL_DIRECTION_Z		"CncWork.Controller/INVERSE_CTL_DIRECTION_Z"
 
 #define CncTEST_TEST					"CncTest.Test/DUMMY"
 

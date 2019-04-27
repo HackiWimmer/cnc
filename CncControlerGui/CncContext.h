@@ -2,6 +2,7 @@
 #define CNC_CONTEXT_H
 
 #include <wx/string.h>
+#include <wx/font.h>
 
 #include "OSD/CncTimeFunctions.h"
 
@@ -16,6 +17,8 @@ struct CncContext {
 		int updateInterval				= 100;
 
 	public:
+	
+		wxFont outboundListBookFont		= wxFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 
 		struct TsTplProcessing {
 

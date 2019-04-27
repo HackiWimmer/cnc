@@ -21,7 +21,7 @@ struct CncPathListEntry{
 
 	// -----------------------------------------------------------
 	// Data
-	enum Type {CHG_NOTHING=0, CHG_CLIENTID=1, CHG_POSITION=2, CHG_SPEED=3};
+	enum Type {CHG_NOTHING=0, CHG_CLIENTID=1, CHG_SPEED=2, CHG_POSITION=3};
 
 	Type				type				= CHG_NOTHING;
 	CncNanoTimestamp	pathListReference  	= NoReference;
@@ -39,69 +39,17 @@ struct CncPathListEntry{
 
 	// -----------------------------------------------------------
 	// Interface
+	bool isNothingChange()  const { return type == CHG_NOTHING; }
 	bool isClientIdChange() const { return type == CHG_CLIENTID; }
 	bool isPositionChange()	const { return type == CHG_POSITION; }
 	bool isSpeedChange() 	const { return type == CHG_SPEED; 	 }
 
+	void traceEntry(std::ostream& ostr) const;
+	const wxString& traceEntryToString(wxString& ret) const;
 
-	//////////////////////////////////////////////////////////////////
-	friend std::ostream &operator<< (std::ostream &ostr, const CncPathListEntry &a) {
-		ostr << "CncPathListEntry: " 								<< std::endl;
-		ostr << " PathList Reference : "	<< a.pathListReference 	<< std::endl;
-		ostr << " Type               : "	<< a.type      			<< std::endl;
-
-		ostr << " Client ID          : "	<< a.clientId		 	<< std::endl;
-		ostr << " Already rendered   : "	<< a.alreadyRendered 	<< std::endl;
-
-		ostr << " Entry Target       : "	<< a.entryTarget		<< std::endl;
-		ostr << " Entry Distance     : "	<< a.entryDistance 		<< std::endl;
-
-		ostr << " FeedSpeed Mode     : "	<< a.feedSpeedMode   	<< std::endl;
-		ostr << " FeedSpeed Value    : "	<< a.feedSpeed_MM_MIN	<< std::endl;
-
-		ostr << " Total Distance     : "	<< a.totalDistance 		<< std::endl;
-
-		return ostr;
-	}
-
-	//////////////////////////////////////////////////////////////////
-	void traceEntry(std::ostream& ostr) const {
-
-		if ( isClientIdChange() ) {
-			ostr << " PLE: "
-				 << pathListReference 	<< "("
-				 << " C "				<< "): "
-				 << clientId			<< std::endl;
-
-		}
-		else if ( isPositionChange() ) {
-			ostr << " PLE: "
-				 << pathListReference 	<< "("
-				 << " P "				<< "): "
-				 << entryDistance 		<< " > "
-				 << entryTarget 		<< " | "
-				 << alreadyRendered		<< std::endl;
-
-		}
-		else if ( isSpeedChange() ) {
-			ostr << " PLE: "
-				 << pathListReference 	<< "("
-				 << " S "				<< "): "
-				 << feedSpeedMode 		<< ", "
-				 << feedSpeed_MM_MIN	<< std::endl;
-		}
-		else {
-			//if ( type != CHG_NOTHING )
-				ostr << (*this);
-		}
-	}
-	//////////////////////////////////////////////////////////////////
-	const wxString& traceEntryToString(wxString& ret) const {
-		std::stringstream ss;
-		traceEntry(ss);
-		ret.assign(ss.str().c_str());
-
-		return ret;
+	std::ostream& outputOperator(std::ostream &ostr) const;
+	friend std::ostream &operator<<(std::ostream &ostr, const CncPathListEntry &a) {
+		return a.outputOperator(ostr);
 	}
 };
 

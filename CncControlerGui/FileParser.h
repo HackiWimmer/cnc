@@ -137,9 +137,8 @@ class FileParser {
 		bool setNextToolID(unsigned int id);
 		virtual bool shouldAToolChangeProcessed() { return false; }
 		
-		friend class SVGPathHandlerCnc;
-		friend class GCodePathHandlerCnc;
-		friend class GCodePathHandlerGL;
+		friend class CncPathListRunner;
+		friend class PathHandlerBase;
 		
 	private:
 		

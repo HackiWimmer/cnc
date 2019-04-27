@@ -105,6 +105,10 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		virtual ~CncLargeScaledListCtrl();
 		
 		// interface
+		
+		void freeze();
+		void thaw();
+		
 		bool clear();
 		bool appendItem(const CncColumContainer& cc);
 		bool appendItems(unsigned int nsize, const CncColumContainer* cc);
@@ -128,6 +132,17 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		bool goBackwardUnitlColumnChange(long item, long column);
 		
 	protected:
+		
+		bool blockSelectionEvent;
+		class SelectEventBlocker {
+			private:
+				CncLargeScaledListCtrl* list;
+				
+			public:
+				SelectEventBlocker(CncLargeScaledListCtrl* l) : list(l) { if ( list ) list->blockSelectionEvent = true; }
+				~SelectEventBlocker() 									{ if ( list ) list->blockSelectionEvent = false; }
+		};
+		
 		wxString getItemText(long item, long column) const;
 		long searchRow(const wxString& what, int searchColumn);
 	

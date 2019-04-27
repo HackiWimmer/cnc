@@ -972,7 +972,7 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 		case CMD_MOVE_SEQUENCE:
 		case CMD_RENDER_AND_MOVE_SEQUENCE:
 		{
-			#warning impl CMD_RENDER_AND_MOVE_SEQUENCE
+			#warning impl execute of CMD_RENDER_AND_MOVE_SEQUENCE
 			break;
 		}
 	}
@@ -1822,38 +1822,38 @@ bool Serial::test() {
 		for ( int i = 0; i <50; i++ ) {
 			// one byte values
 			if ( fOneB ) {
-				cms.addPosXYZF(+1, -1, +1, 1234);
-				cms.addPosXYZ(-1, +1,  0);
-				cms.addPosXYZ(+1,  0,  0);
-				cms.addPosXYZ( 0, -1,  0);
-				cms.addPosXYZ( 0,  0, +1);
+				cms.addStepPosXYZF(+1, -1, +1, 1234);
+				cms.addStepPosXYZ(-1, +1,  0);
+				cms.addStepPosXYZ(+1,  0,  0);
+				cms.addStepPosXYZ( 0, -1,  0);
+				cms.addStepPosXYZ( 0,  0, +1);
 			}
 			
 			// int8_t values
 			if ( fInt8 ) {
-				cms.addPosXYZF(+11, -12, +13, 1234);
-				cms.addPosXYZ(-11,  12,   0);
-				cms.addPosXYZ(-11,   0,   0);
-				cms.addPosXYZ(  0,  12,   0);
-				cms.addPosXYZ(  0,   0, -13);
+				cms.addStepPosXYZF(+11, -12, +13, 1234);
+				cms.addStepPosXYZ(-11,  12,   0);
+				cms.addStepPosXYZ(-11,   0,   0);
+				cms.addStepPosXYZ(  0,  12,   0);
+				cms.addStepPosXYZ(  0,   0, -13);
 			}
 			
 			// int16_t values
 			if ( fInt16 ) {
-				cms.addPosXYZF(+1000, +2000, +30, 1234);
-				cms.addPosXYZ(+1000, +2000,   0);
-				cms.addPosXYZ(-1000,     0,   0);
-				cms.addPosXYZ(    0, -2000,   0);
-				cms.addPosXYZ(    0,     0, -30);
+				cms.addStepPosXYZF(+1000, +2000, +30, 1234);
+				cms.addStepPosXYZ(+1000, +2000,   0);
+				cms.addStepPosXYZ(-1000,     0,   0);
+				cms.addStepPosXYZ(    0, -2000,   0);
+				cms.addStepPosXYZ(    0,     0, -30);
 			}
 			
 			// int32_t values
 			if ( fInt32 ) {
-				cms.addPosXYZF(+100000, +200000, +30, 1234);
-				cms.addPosXYZ(+100000, +200000,   0);
-				cms.addPosXYZ(-100000,       0,   0);
-				cms.addPosXYZ(      0, -200000,   0);
-				cms.addPosXYZ(      0,     0,   -30);
+				cms.addStepPosXYZF(+100000, +200000, +30, 1234);
+				cms.addStepPosXYZ(+100000, +200000,   0);
+				cms.addStepPosXYZ(-100000,       0,   0);
+				cms.addStepPosXYZ(      0, -200000,   0);
+				cms.addStepPosXYZ(      0,     0,   -30);
 			}
 		}
 		
@@ -1865,11 +1865,11 @@ bool Serial::test() {
 		
 		for ( int i = 0; i < 500; i++ ) {
 			// one byte values
-			cms.addPosXYZF(+1, -1, +1, 1);
-			cms.addPosXYZ (-1, +1,  0);
-			cms.addPosXYZ (+1,  0,  0);
-			cms.addPosXYZ ( 0, -1,  0);
-			cms.addPosXYZ ( 0,  0, +1);
+			cms.addStepPosXYZF(+1, -1, +1, 1);
+			cms.addStepPosXYZ (-1, +1,  0);
+			cms.addStepPosXYZ (+1,  0,  0);
+			cms.addStepPosXYZ ( 0, -1,  0);
+			cms.addStepPosXYZ ( 0,  0, +1);
 		}
 		
 		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;

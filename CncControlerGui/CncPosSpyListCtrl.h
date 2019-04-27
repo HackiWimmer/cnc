@@ -29,8 +29,15 @@ class CncPosSpyListCtrl : public CncLargeScaledListCtrl {
 		CncPosSpyListCtrl(wxWindow *parent, long style);
 		virtual ~CncPosSpyListCtrl();
 		
+		void onSelectListItem(wxListEvent& event);
+		void onActivateListItem(wxListEvent& event);
+		
 		bool searchReference(const wxString& what);
 		bool searchReferenceById(const long id);
+		
+		wxDECLARE_NO_COPY_CLASS(CncPosSpyListCtrl);
+		wxDECLARE_EVENT_TABLE();
+
 };
 
 #endif

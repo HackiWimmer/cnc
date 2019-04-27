@@ -19,7 +19,7 @@ class CncXYDimension {
 		: width(w)
 		, height(h)
 		{}
-		CncXYDimension<T>(const CncXYDimension<T>& cd) 
+		explicit CncXYDimension<T>(const CncXYDimension<T>& cd) 
 		: width(cd.getW())
 		, height(cd.getH())
 		{}		
@@ -49,7 +49,7 @@ class CncZDimension {
 		CncZDimension<T>()
 		: zDim(0)
 		{}		
-		CncZDimension<T>(T z)
+		explicit CncZDimension<T>(T z)
 		: zDim(z)
 		{}
 		virtual ~CncZDimension<T>() {}
@@ -137,7 +137,7 @@ class CncPosition {
 		{}
 		
 		////////////////////////////////////////////////////////////////
-		CncPosition<T>(const CncPosition& cp)
+		/*explicit*/ CncPosition<T>(const CncPosition<T>& cp)
 		: xMin(cp.getXMin()),   xMax(cp.getXMax())
 		, yMin(cp.getYMin()),   yMax(cp.getYMax())
 		, zMin(cp.getZMin()),   zMax(cp.getZMax())
@@ -147,6 +147,21 @@ class CncPosition {
 		////////////////////////////////////////////////////////////////
 		virtual ~CncPosition<T>() {}
 		
+		////////////////////////////////////////////////////////////////
+		const CncPosition<T>& operator= (const CncPosition<T>& cp) {
+			xMin = cp.getXMin();
+			xMax = cp.getXMax();
+			yMin = cp.getYMin();
+			yMax = cp.getYMax();
+			zMin = cp.getZMin();
+			zMax = cp.getZMax();
+			xPos = cp.getX();
+			yPos = cp.getY();
+			zPos = cp.getZ();
+			
+			return *this;
+		}
+
 		////////////////////////////////////////////////////////////////
 		const Watermarks& getWatermarks(Watermarks& wm) const {
 			wm.xMin = xMin; wm.yMin = yMin;

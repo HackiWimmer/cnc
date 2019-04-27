@@ -8,10 +8,8 @@
 /////////////////////////////////////////////////////////////////////////////
 class SVGNodeParser {
 	
-	private:
-		SVGPathHandlerBase* pathHandler;
-		
 	protected:
+		SVGPathHandlerBase* pathHandler;
 		
 		bool evaluatePath(const wxString& data);
 		bool processPathCommand(const wxString& para);
@@ -25,7 +23,7 @@ class SVGNodeParser {
 	
 		////////////////////////////////////////////////////////////////////
 		SVGNodeParser();
-		SVGNodeParser(SVGPathHandlerBase* ph);
+		explicit SVGNodeParser(SVGPathHandlerBase* ph);
 		virtual ~SVGNodeParser();
 		
 		////////////////////////////////////////////////////////////////////

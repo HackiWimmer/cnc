@@ -6,15 +6,15 @@
 //#include "CncToolCorrection.h"
 #include "CncUnitCalculator.h"
 #include "SvgCncParameters.h"
-#include "SvgViewBox.h"
+#include "CncPathListRunner.h"
 #include "CncCommon.h"
 
 class CncControl;
 
 //////////////////////////////////////////////////////////////////
-class SVGPathHandlerCnc : public SVGPathHandlerBase {
-//////////////////////////////////////////////////////////////////
-	
+class SVGPathHandlerCnc : public SVGPathHandlerBase
+						, public CncPathListRunner
+{
 	private:
 		
 		typedef CncUnitCalculatorBase::Unit Unit;
@@ -23,17 +23,16 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		SvgOriginalPathInfo origPathInfo;
 		bool 				initialized;
 		bool 				debugState;
-		double 				width, height;
 		SvgCncParameters 	currentCncParameters;
-		SVGRootNode			svgRootNode;
-		
+
 		// spool path to cnc control
-		bool moveLinearXY(double x, double y, bool alreadyRendered);
+		bool moveLinearZ  (double z);
+		bool moveLinearXY (double x, double y, bool alreadyRendered);
+		bool moveLinearXYZ(double x, double y, double z, bool alreadyRendered);
 		
 		// path handling
 		bool beginCurrentPath();
 		bool repeatCurrentPath();
-		bool spoolCurrentPath(bool firstRun);
 		bool closeCurrentPath();
 		
 	protected:
@@ -48,18 +47,18 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		// z axis management
 		virtual bool isZAxisUp();
 		virtual bool isZAxisDown();
-		virtual bool moveUpZ();
-		virtual bool moveDownZ();
-		
+		virtual bool physicallyMoveZAxisUp();
+		virtual bool physicallyMoveZAxisDown();
+
 	public:
 		SVGPathHandlerCnc(CncControl* cnc);
 		virtual ~SVGPathHandlerCnc();
+
 		virtual const char* getName() { return "SVGPathHandlerCnc"; }
 		virtual void initNextClientId(long id);
 		
-		// Getter and setter
-		void setSvgRootNode(const SVGRootNode& srn);
-		
+		virtual void setSvgRootNode(const SVGRootNode& srn);
+
 		Unit getUnit() 						{ return svgRootNode.getOutputUnit(); }
 		double getW() 						{ return svgRootNode.getWidth();      }
 		double getH() 						{ return svgRootNode.getHeight();     }
@@ -77,9 +76,6 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase {
 		virtual bool finishCurrentPath();
 		virtual bool runCurrentPath();
 		virtual void finishWork();
-		
-		virtual void logMeasurementStart();
-		virtual void logMeasurementEnd();
 };
 
 #endif

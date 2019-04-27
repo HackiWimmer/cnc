@@ -947,6 +947,11 @@ const bool CncConfig::getSvgResultWithOrigPathFlag()				{ PROPERTY(CncSvg_Emu_RS
 const bool CncConfig::getSvgResultOnlyFirstCrossingFlag()			{ PROPERTY(CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS) 		return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgReverseYAxisFlag()						{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getAvoidDupSetterValuesFlag()					{ PROPERTY(CncWork_Ctl_AVOID_DUP_SETTER_VALUES) 		return p->GetValue().GetBool(); }
+const bool CncConfig::getRequestIdleRequestFlag()					{ PROPERTY(CncWork_Ctl_REQUEST_IDLE_REQUESTS) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getInterruptByPosOutOfRangeFlag()				{ PROPERTY(CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE) 	return p->GetValue().GetBool(); }
+const bool CncConfig::getInverseCtrlDirectionXFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_X) 		return p->GetValue().GetBool(); }
+const bool CncConfig::getInverseCtrlDirectionYFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Y) 		return p->GetValue().GetBool(); }
+const bool CncConfig::getInverseCtrlDirectionZFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Z) 		return p->GetValue().GetBool(); }
 
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }

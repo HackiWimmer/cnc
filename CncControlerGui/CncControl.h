@@ -46,7 +46,7 @@ class CncControl {
 				values.push_back(v);
 			}
 			
-			SetterTuple(unsigned char i, cnc::SetterValueList v)
+			SetterTuple(unsigned char i, const cnc::SetterValueList& v)
 			: pid(i)
 			, values(v)
 			{}
@@ -196,6 +196,9 @@ class CncControl {
 		
 		// wrapper
 		bool processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool alreadyRendered);
+		
+		bool processMoveSequence(CncMoveSequence& moveSequence);
+		
 		// Zero positioning
 		void setZeroPos(bool x, bool y, bool z);
 		void setZeroPos();

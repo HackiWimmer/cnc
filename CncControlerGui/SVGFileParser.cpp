@@ -40,11 +40,13 @@ SVGFileParser::~SVGFileParser() {
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::logMeasurementStart() {
 //////////////////////////////////////////////////////////////////
+	wxASSERT(pathHandler);
 	pathHandler->logMeasurementStart();
 }
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::logMeasurementEnd() {
 //////////////////////////////////////////////////////////////////
+	wxASSERT(pathHandler);
 	pathHandler->logMeasurementEnd();
 }
 //////////////////////////////////////////////////////////////////
@@ -242,7 +244,7 @@ bool SVGFileParser::spool() {
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(uai.nodeName);
-		setCurrentLineNumber(uai.lineNumber);
+		initNextClientId(uai.lineNumber);
 		registerNextDebugNode(uai.nodeName);
 		
 		if ( runInfo.getCurrentDebugState() == true ) {
@@ -394,9 +396,12 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	
 	if ( pathHandler->initNextPath(sopi) == false )
 		return false;
+	
+	#warning
+	initNextClientId(uai.lineNumber);
 		
 	for ( auto itPiv = uai.pathInfoList.begin(); itPiv != uai.pathInfoList.end(); ++itPiv ) {
-		if ( pathHandler->process(itPiv->cmd, itPiv->count, itPiv->values) == false ) {
+		if ( pathHandler->processCommand_2DXY(itPiv->cmd, itPiv->count, itPiv->values) == false ) {
 			std::cerr << "SVGFileParser::spoolPath failed" << std::endl;
 			uai.debug(*itPiv, std::cerr);
 			return false;
@@ -464,7 +469,7 @@ bool SVGFileParser::postprocess() {
 	if ( cncControl == NULL )
 		return true;
 		
-	#warning activate this again
+	#warning activate SVGFileParser::postprocess() again
 	return true;
 	
 	const SVGRootNode& rn 	= pathHandler->getSvgRootNode();

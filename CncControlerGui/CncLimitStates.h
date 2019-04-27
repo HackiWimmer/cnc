@@ -185,7 +185,7 @@ class CncLimitStates {
 		void setLimitZ(int32_t v) { setZLimit(v); }
 		
 		///////////////////////////////////////////////////////////////////
-		void setXYZLimit(CncLongPosition limitInfo) {
+		void setXYZLimit(const CncLongPosition& limitInfo) {
 			setLimit(limitInfo.getX(), xMinLimit, xMaxLimit);
 			setLimit(limitInfo.getY(), yMinLimit, yMaxLimit);
 			setLimit(limitInfo.getZ(), zMinLimit, zMaxLimit);

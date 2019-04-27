@@ -136,6 +136,41 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_AVOID_DUP_SETTER_VALUES, prop);
 			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Position out of range -> Interrupt", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE, prop);
+			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Request idle requests", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_REQUEST_IDLE_REQUESTS, prop);
+			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Inverse direction X", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_INVERSE_CTL_DIRECTION_X, prop);
+			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Inverse direction Y", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_INVERSE_CTL_DIRECTION_Y, prop);
+			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Inverse direction Z", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_INVERSE_CTL_DIRECTION_Z, prop);
+			
 		}
 	}
 }

@@ -1,11 +1,21 @@
 #include <iostream>
 #include <wx/imaglist.h>
 #include "wxcrafter.h"
+#include "MainFrame.h"
 #include "GlobalStrings.h"
 #include "CncArduino.h"
 #include "CncPosSpyListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
+
+// ----------------------------------------------------------------------------
+// CncPathListEntryListCtrl Event Table
+// ----------------------------------------------------------------------------
+
+wxBEGIN_EVENT_TABLE(CncPosSpyListCtrl, CncLargeScaledListCtrl)
+	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncPosSpyListCtrl::onSelectListItem)
+	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncPosSpyListCtrl::onActivateListItem)
+wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
 CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
@@ -102,4 +112,24 @@ bool CncPosSpyListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
 	wxString what(wxString::Format(globalStrings.posSpyRefFormat, id));
 	return searchReference(what);
+}
+/////////////////////////////////////////////////////////////
+void CncPosSpyListCtrl::onSelectListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////
+	long item = event.m_itemIndex;
+	if ( item == wxNOT_FOUND )
+		return;
+	
+	setLastSelection(item);
+	
+	long ln;
+	getRow(item).getItem(COL_SEARCH).ToLong(&ln);
+	
+	SelectEventBlocker blocker(this);
+	THE_APP->tryToSelectClientId(ln, MainFrame::TemplateSelSource::TSS_POS_SPY);
+}
+/////////////////////////////////////////////////////////////
+void CncPosSpyListCtrl::onActivateListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////
+	// currently nothing todo
 }

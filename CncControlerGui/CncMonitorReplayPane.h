@@ -12,7 +12,7 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
                            , public GLI::GLCncPath::Callback   
 {
 	public:
-		CncMonitorReplayPane(wxWindow* parent);
+		explicit CncMonitorReplayPane(wxWindow* parent);
 		virtual ~CncMonitorReplayPane();
 		
 		void setMotionMonitor(CncMotionMonitor* mm);
@@ -66,8 +66,8 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 			public:
 				CncMonitorReplayPane* pane;
 				
-				Processing(CncMonitorReplayPane* p) : pane(p) 	{ running = true; pane->setProcessing(true); }
-				~Processing() 									{ running = false; pane->setProcessing(false); }
+				explicit Processing(CncMonitorReplayPane* p) : pane(p) 	{ running = true; pane->setProcessing(true); }
+				~Processing() 											{ running = false; pane->setProcessing(false); }
 				
 				static bool isRunning() { return running; }
 		};
@@ -77,14 +77,14 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 			protected:
 				CncMonitorReplayPane* pane;
 				
-				Decorate(CncMonitorReplayPane* p);
+				explicit Decorate(CncMonitorReplayPane* p);
 				virtual ~Decorate();
 		};
 		
 		// ----------------------------------------------------
 		class DecoratePlay : public Decorate {
 			public: 
-				DecoratePlay(CncMonitorReplayPane* pane) 
+				explicit DecoratePlay(CncMonitorReplayPane* pane) 
 				: Decorate(pane)
 				{
 					pane->GetReplayStart()->Enable(false);
@@ -104,7 +104,7 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 		// ----------------------------------------------------
 		class DecoratePrev : public Decorate {
 			public: 
-				DecoratePrev(CncMonitorReplayPane* pane) 
+				explicit DecoratePrev(CncMonitorReplayPane* pane) 
 				: Decorate(pane)
 				{
 					pane->GetReplayStart()->Enable(false);
@@ -124,7 +124,7 @@ class CncMonitorReplayPane : public CncMonitorReplayPaneBase
 		// ----------------------------------------------------
 		class DecorateNext : public Decorate {
 			public: 
-				DecorateNext(CncMonitorReplayPane* pane) 
+				explicit DecorateNext(CncMonitorReplayPane* pane) 
 				: Decorate(pane)
 				{
 					pane->GetReplayStart()->Enable(false);

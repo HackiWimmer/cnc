@@ -5,42 +5,34 @@
 #include <wx/dataview.h>
 #include "SerialPort.h"
 #include "CncControl.h"
+#include "CncPathListRunner.h"
 #include "FileParser.h"
 #include "SVGPathHandlerCnc.h"
 
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc) 
 : SVGPathHandlerBase()
+, CncPathListRunner(cnc)
 , cncControl(cnc)
 , initialized(false)
 , debugState(false)
 , currentCncParameters()
-, svgRootNode()
 {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(cncControl);
+	
+	CncPathListRunner::Setup& setup = getSetup();
+	setup.analyse		= false;
+	setup.fileParser	= fileParser;
 }
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::~SVGPathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::logMeasurementStart() {
-//////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl);
-	cncControl->startSerialMeasurement();
-}
-//////////////////////////////////////////////////////////////////
-void SVGPathHandlerCnc::logMeasurementEnd() {
-//////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl);
-	cncControl->stopSerialMeasurement();
-}
-//////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::initNextClientId(long id) {
 //////////////////////////////////////////////////////////////////
-	wxASSERT(cncControl);
-	cncControl->setClientId(id);
+	processClientId(id);
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::isInitialized() {
@@ -74,16 +66,25 @@ void SVGPathHandlerCnc::setCncWorkingParameters(SvgCncParameters& cwp) {
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::setSvgRootNode(const SVGRootNode& srn) {
 //////////////////////////////////////////////////////////////////
-	svgRootNode = srn;
+	SVGPathHandlerBase::setSvgRootNode(srn);
 	changeInputUnit(srn.getInputUnit());
 
 	initialized = true;
 }
 //////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::moveLinearZ(double z) {
+//////////////////////////////////////////////////////////////////
+	return cncControl->moveRelMetricZ(z);
+}
+//////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::moveLinearXY(double x, double y, bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
-	// unit is always converted to mm before
 	return cncControl->moveRelLinearMetricXY(x, y, alreadyRendered);
+}
+//////////////////////////////////////////////////////////////////
+bool SVGPathHandlerCnc::moveLinearXYZ(double x, double y, double z, bool alreadyRendered) {
+//////////////////////////////////////////////////////////////////
+	return cncControl->moveRelLinearMetricXYZ(x, y, z, alreadyRendered);
 }
 //////////////////////////////////////////////////////////////////
 inline void SVGPathHandlerCnc::appendDebugValueDetail(const CncPathListEntry& cpe) {
@@ -126,7 +127,6 @@ bool SVGPathHandlerCnc::initNextPath() {
 bool SVGPathHandlerCnc::initNextPath(const SvgOriginalPathInfo& sopi) {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("initNextPath");
-	newPath 			= true;
 	origPathInfo	 	= sopi;
 	
 	PathHandlerBase::initNextPath();
@@ -212,10 +212,10 @@ bool SVGPathHandlerCnc::repeatCurrentPath() {
 	if ( beginCurrentPath() == false )
 		return false;
 	
-	// spoolCurrentPath(false) --> means this isn't the first move
-	if ( spoolCurrentPath(cncControl->getDurationCounter() == 1) == false )
+	// spoolCurrentPath
+	if ( execute(pathListMgr) == false )
 		return false;
-		
+	
 	if ( closeCurrentPath() == false )
 		return false;
 
@@ -226,95 +226,22 @@ bool SVGPathHandlerCnc::beginCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("beginCurrentPath");
 	cncControl->initNextDuration();
+
+	if ( physicallyMoveZAxisDown() == false )
+		return false;
+
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::closeCurrentPath() {
 //////////////////////////////////////////////////////////////////
 	TRACE_FUNCTION_CALL("closeCurrentPath");
-	
+
 	if ( cncControl->isLastDuration() ) {
-		if ( isZAxisDown() == true ) {
-			if ( moveUpZ() == false )
-				return false;
-		}
+		if ( physicallyMoveZAxisUp() == false )
+			return false;
 	}
-	
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::spoolCurrentPath(bool firstRun) {
-//////////////////////////////////////////////////////////////////
-	TRACE_FUNCTION_CALL("spoolCurrentPath");
-	// firstRun = (cncControl->getDurationCounter() == 1)
-	
-	bool reverseYAxis = CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag();
-	
-	// over one stored svg path <path M...../>
-	for (CncPathList::iterator it = pathListMgr.begin(); it != pathListMgr.end(); ++it) {
 
-		if ( fileParser != NULL )
-			fileParser->evaluateDebugState();
-		
-		CncPathListEntry cpe = *it;
-		cpe.traceEntry(std::clog);
-		
-		if ( cpe.isSpeedChange() == true ) {
-			cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(cpe.feedSpeed_MM_MIN, cpe.feedSpeedMode);
-			continue;
-		}
-
-		if ( cpe.isPositionChange() == false )
-			continue;
-
-		double moveX = cpe.entryDistance.getX();
-		double moveY = cpe.entryDistance.getY();
-		bool firstListEntry = false;
-		
-		if ( reverseYAxis == true )
-			moveY *= -1;
-
-		// first path entry, always absolute
-		if ( std::distance(pathListMgr.begin(), it) == 0 ) {
-			TRACE_POSITIONS("spoolCurrentPath std::distance(pathList.begin(), it)");
-			firstListEntry = true;
-
-			if ( firstRun == true ) {
-				// this time the cnc controller isn't moved before
-				// so the local positions have to be aligned
-				currentPos.setX(cncControl->getCurAppPosMetric().getX());
-				currentPos.setY(cncControl->getCurAppPosMetric().getY());
-
-				startPos.setX(cncControl->getStartPosMetric().getX());
-				startPos.setY(cncControl->getStartPosMetric().getY());
-			}
-
-			// reconstruct the first move, this overrides moveX and moveY
-			// pathListMgr.getStartPos() is always absolute as well as currentPos
-			moveX = pathListMgr.getStartPos().getX() - currentPos.getX();
-			
-			if ( reverseYAxis == false )	moveY = +pathListMgr.getStartPos().getY() - currentPos.getY();
-			else 							moveY = -pathListMgr.getStartPos().getY() - currentPos.getY();
-
-			TRACE_FIRST_MOVE(moveX, moveY);
-		}
-		
-		currentPos.incX(moveX);
-		currentPos.incY(moveY);
-		
-		if ( firstListEntry == true ) {
-			if ( moveLinearXY(moveX, 0, cpe.alreadyRendered) == false )
-				return false;
-
-			if ( moveLinearXY(0, moveY, cpe.alreadyRendered) == false )
-				return false;
-		}
-		else {
-			if ( moveLinearXY(moveX, moveY, cpe.alreadyRendered) == false )
-				return false;
-		}
-	}
-	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -325,6 +252,10 @@ void SVGPathHandlerCnc::prepareWork() {
 	
 	currentPos.resetWatermarks();
 	startPos.resetWatermarks();
+
+	if ( physicallyMoveZAxisUp() == false ) {
+		std::cerr << "SVGPathHandlerCnc::prepareWork(): processZAxisUp() failed!" << std::endl;
+	}
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::finishWork() {
@@ -332,15 +263,23 @@ void SVGPathHandlerCnc::finishWork() {
 	TRACE_FUNCTION_CALL("finishWork");
 	PathHandlerBase::finishWork();
 	
-	cncControl->switchToolOff();
+	// secure Z axis is up
+	physicallyMoveZAxisUp();
 	
 	// controller handling
+	cncControl->switchToolOff();
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
 	cncControl->moveXYToZeroPos();
 	
 	//svg output handling
 	CncDoublePosition::Watermarks xyMax;
+
 	//currentPos.getWatermarks(xyMax); // sometimes not in mm
 	xyMax = cncControl->getWaterMarksMetric();
+
+	if ( physicallyMoveZAxisUp() == false ) {
+		std::cerr << "SVGPathHandlerCnc::prepareWork(): processZAxisUp() failed!" << std::endl;
+	}
 }
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::isZAxisUp() {
@@ -356,7 +295,7 @@ bool SVGPathHandlerCnc::isZAxisDown() {
 	return !isZAxisUp();
 }
 ///////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::moveUpZ() {
+bool SVGPathHandlerCnc::physicallyMoveZAxisUp() {
 ///////////////////////////////////////////////////////////////////
 	const double curZDist = CncConfig::getGlobalCncConfig()->getCurZDistance();
 	const double curZPos  = cncControl->getCurAppPosMetric().getZ();
@@ -374,17 +313,23 @@ bool SVGPathHandlerCnc::moveUpZ() {
 		return false;
 	}
 
-	pathListMgr.addEntryAdm(CncSpeedWork,  GBL_CONFIG->getDefaultWorkSpeed_MM_MIN());
-	//pathListMgr.addEntryRel(0.0, 0.0, moveZ, false);
-	
-	currentPos.incZ(moveZ);
-	processLinearMove(false);
-	pathListMgr.addEntryAdm(CncSpeedRapid, GBL_CONFIG->getDefaultRapidSpeed_MM_MIN());
+	// Due to the fact that an SVG path could be repeated the Z axis activities
+	// have to be organized outside the path list. This has to be done by
+	// SVGPathHandlerCnc::begin/closeCurrentPath(). Only then will it be possible
+	// to manage the z axis for svg files during each repetation.
+	const double prevSpeed 		= cncControl->getConfiguredFeedSpeed_MM_MIN();
+	const CncSpeedMode prevMode = cncControl->getConfiguredSpeedMode();
 
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork);
+	
+	if ( moveLinearZ(moveZ) == false )
+		return false;
+
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SVGPathHandlerCnc::moveDownZ() {
+bool SVGPathHandlerCnc::physicallyMoveZAxisDown() {
 ///////////////////////////////////////////////////////////////////
 	const double curZPos = cncControl->getCurAppPosMetric().getZ();
 	const double newZPos = CncConfig::getGlobalCncConfig()->getDurationPositionAbs(cncControl->getDurationCounter());
@@ -399,11 +344,19 @@ bool SVGPathHandlerCnc::moveDownZ() {
 		std::clog << " duration:  "	<< cncControl->getDurationCounter() << std::endl;
 	}
 
-	pathListMgr.addEntryAdm(CncSpeedWork, GBL_CONFIG->getDefaultWorkSpeed_MM_MIN());
-	//pathListMgr.addEntryRel(0.0, 0.0, moveZ, false);
-	currentPos.incZ(moveZ);
-	processLinearMove(false);
+	// Due to the fact that an SVG path could be repeated the Z axis activities
+	// have to be organized outside the path list. This has to be done by
+	// SVGPathHandlerCnc::begin/closeCurrentPath(). Only then will it be possible
+	// to manage the z axis for svg files during each repetation.
+	const double prevSpeed 		= cncControl->getConfiguredFeedSpeed_MM_MIN();
+	const CncSpeedMode prevMode = cncControl->getConfiguredSpeedMode();
+
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork);
+
+	if ( moveLinearZ(moveZ) == false )
+		return false;
 	
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
 	return true;
 }
 

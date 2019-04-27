@@ -203,21 +203,24 @@ class CncMoveSequence {
 		bool 					isValid() const						{ return (moveCmd == CMD_MOVE_SEQUENCE || moveCmd == CMD_RENDER_AND_MOVE_SEQUENCE); }
 		unsigned char			getType() const						{ return moveCmd; }
 
-		void 					addPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f);
+		void 					addMetricPosXYZF(double dx, double dy, double dz, double f);
+
+
+		void 					addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f);
 		
-		void 					addPosXYZ (int32_t dx, int32_t dy, int32_t dz)	{ addPosXYZF(dx, dy,  0, 0); }
+		void 					addStepPosXYZ (int32_t dx, int32_t dy, int32_t dz)	{ addStepPosXYZF(dx, dy,  0, 0); }
 		
-		void 					addPosXYF (int32_t dx, int32_t dy, int32_t f)	{ addPosXYZF(dx, dy,  0, f); }
-		void 					addPosXY  (int32_t dx, int32_t dy)				{ addPosXYZF(dx, dy,  0, 0); }
+		void 					addStepPosXYF (int32_t dx, int32_t dy, int32_t f)	{ addStepPosXYZF(dx, dy,  0, f); }
+		void 					addStepPosXY  (int32_t dx, int32_t dy)				{ addStepPosXYZF(dx, dy,  0, 0); }
 		
-		void 					addPosXF  (int32_t dx, int32_t f)				{ addPosXYZF(dx,  0,  0, f); }
-		void 					addPosX   (int32_t dx)							{ addPosXYZF(dx,  0,  0, 0); }
+		void 					addStepPosXF  (int32_t dx, int32_t f)				{ addStepPosXYZF(dx,  0,  0, f); }
+		void 					addStepPosX   (int32_t dx)							{ addStepPosXYZF(dx,  0,  0, 0); }
 		
-		void 					addPosYF  (int32_t dy, int32_t f)				{ addPosXYZF( 0, dy,  0, f); }
-		void 					addPosY   (int32_t dy)							{ addPosXYZF( 0, dy,  0, 0); }
+		void 					addStepPosYF  (int32_t dy, int32_t f)				{ addStepPosXYZF( 0, dy,  0, f); }
+		void 					addStepPosY   (int32_t dy)							{ addStepPosXYZF( 0, dy,  0, 0); }
 		
-		void 					addPosZF  (int32_t dz, int32_t f)				{ addPosXYZF( 0,  0, dz, f); }
-		void 					addPosZ   (int32_t dz)							{ addPosXYZF( 0,  0, dz, 0); }
+		void 					addStepPosZF  (int32_t dz, int32_t f)				{ addStepPosXYZF( 0,  0, dz, f); }
+		void 					addStepPosZ   (int32_t dz)							{ addStepPosXYZF( 0,  0, dz, 0); }
 
 		bool 					hasMore() const 					{ return getCount() > 0; }
 		unsigned int 			getCount() const;

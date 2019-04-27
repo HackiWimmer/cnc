@@ -121,7 +121,7 @@ class CncCurveLib {
 
 	protected:
 
-		CncCurveLib(Caller* c)
+		explicit CncCurveLib(Caller* c)
 		: caller(c)
 		, type(Type::Line)
 		{
@@ -142,6 +142,46 @@ class CncCurveLib {
 		float angleBetween(const CncCurveLib::Point& v0, const CncCurveLib::Point& v1);
 		float distance(const CncCurveLib::Point& p0, const CncCurveLib::Point& p1);
 
+	public:
+
+		class LastControlPoint {
+			private:
+				CncCurveLib::Point point;
+				bool valid;
+
+			public:
+				LastControlPoint()
+				: point(0.0, 0.0)
+				, valid(false)
+				{}
+
+				~LastControlPoint() {}
+
+				bool hasControlPoint() 	{ return valid; }
+
+				void setControlPoint(const CncCurveLib::Point& currentPoint, const CncCurveLib::Point& p) {
+					valid = true;
+
+					//The first control point is assumed to be the reflection of the last control point
+					//on the previous command relative to the current point.
+					point = {(currentPoint.x + (currentPoint.x - p.x)),
+						     (currentPoint.y + (currentPoint.y - p.y))};
+				}
+
+				void reset() {
+					valid 	= false;
+					point	= {0.0, 0.0};
+				}
+
+				const CncCurveLib::Point& getLastControlPoint(const CncCurveLib::Point& currentPoint) {
+					if ( hasControlPoint() )
+						return point;
+
+					// If there is no previous command or if the previous command was not an beziert + curve,
+					// assume the first control point is identically  with the current point
+					return currentPoint;
+				}
+		};
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -152,7 +192,7 @@ class CncLineCurve : public CncCurveLib {
 		ParameterLine parameter;
 
 	public:
-		CncLineCurve(Caller* c)
+		explicit CncLineCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnLine;
 			type = Type::Line;
@@ -170,7 +210,7 @@ class CncEllipticalCurve : public CncCurveLib {
 		ParameterElliptical parameter;
 
 	public:
-		CncEllipticalCurve(Caller* c)
+		explicit CncEllipticalCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnEllipticalArc;
 			type = Type::Elliptical;
@@ -188,7 +228,7 @@ class CncQuadraticBezierCurve : public CncCurveLib {
 		ParameterQuadraticBezier parameter;
 
 	public:
-		CncQuadraticBezierCurve(Caller* c)
+		explicit CncQuadraticBezierCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnQuadraticBezierCurve;
 			type = Type::QuadraticBezier;
@@ -207,7 +247,7 @@ class CncCubicBezierCurve : public CncCurveLib {
 		ParameterCubicBezier parameter;
 
 	public:
-		CncCubicBezierCurve(Caller* c)
+		explicit CncCubicBezierCurve(Caller* c)
 		: CncCurveLib(c) {
 			renderFunc = &CncCurveLib::getPointOnCubicBezierCurve;
 			type = Type::CubicBezier;

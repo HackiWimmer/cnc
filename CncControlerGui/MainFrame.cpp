@@ -1,6 +1,6 @@
 /*
-FYI: codelite win build options
-g++.exe -c  "...." 
+ * FYI: codelite win build options
+ * g++.exe -c  "...."
  * -Wno-deprecated-declarations -O3 -std=c++17 -std=c++14 -std=c++11 -Wall -mthreads -DHAVE_W32API_H -D__WXMSW__ -DNDEBUG -D_UNICODE 
  * -IC:/@Development/wxWidgets-3.1.0/lib/gcc_dll/mswu 
  * -IC:/@Development/wxWidgets-3.1.0/include 
@@ -87,7 +87,9 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncTemplateObserver.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
+#include "CncPreprocessor.h"
 #include "CncMonitorReplayPane.h"
+#include "CncGCodeSequenceListCtrl.h"
 #include "CncStatisticsPane.h"
 #include "CncSvgControl.h"
 #include "CncOSEnvironmentDialog.h"
@@ -180,6 +182,9 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , toolMagaizne(NULL)
 , positionSpy(NULL)
 , setterList(NULL)
+, speedMonitor(NULL)
+, cncPreprocessor(NULL)
+, gCodeSequenceList(NULL)
 , cncSummaryListCtrl(NULL)
 , accelGraphPanel(NULL)
 , cncGameportDlg(new CncGameportController(this))
@@ -248,6 +253,11 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadUpadte, 			this, MainFrame::EventId::GAMEPAD_STATE);
 	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadHeartbeat, 		this, MainFrame::EventId::GAMEPAD_HEARTBEAT);
 	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 			&MainFrame::onNavigatorPanel, 				this);
+	
+	const wxFont font = GBL_CONTEXT->outboundListBookFont;
+	m_notebookConfig->GetListView()->SetFont(font);
+	m_listbookMonitor->GetListView()->SetFont(font);
+	m_listbookPostProcessor->GetListView()->SetFont(font);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
@@ -272,8 +282,6 @@ MainFrame::~MainFrame() {
 	this->Unbind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
 	this->Unbind(wxEVT_GAMEPAD_THREAD,	 			&MainFrame::onGamepdThreadCompletion,	 	this, MainFrame::EventId::COMPLETED);
 	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, 		&MainFrame::onNavigatorPanel, 				this);
-	
-	positionSpy->Unbind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
 	
 	// explicit delete the motion monitor pointer here, beacause the motion monitor class
 	// considers the Mainframe GBL_CONFIG->getTheApp() pointer in its dtor 
@@ -603,7 +611,6 @@ void MainFrame::installCustControls() {
 	// pos spy control
 	positionSpy = new CncPosSpyListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_positionSpy, positionSpy);
-	positionSpy->Bind(wxEVT_COMMAND_LIST_ITEM_SELECTED, &MainFrame::selectPositionSpy, this);
 
 	// pos spy control
 	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
@@ -612,6 +619,10 @@ void MainFrame::installCustControls() {
 	// speed monitor control
 	speedMonitor = new CncSpeedMonitor(this); 
 	GblFunc::replaceControl(m_speedMonitorPlaceholder, speedMonitor);
+	
+	// preprocessor control
+	cncPreprocessor = new CncPreprocessor(this); 
+	GblFunc::replaceControl(m_preprocessorPlaceholder, cncPreprocessor);
 	
 	// summary list
 	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
@@ -628,6 +639,10 @@ void MainFrame::installCustControls() {
 	// Outbound editor svg viewer
 	outboundEditorSvgView = new CncSvgViewer(this); 
 	GblFunc::replaceControl(m_outboundEditorSvgViewPlaceholder, outboundEditorSvgView);
+	
+	// GCode Sequence control
+	gCodeSequenceList = new CncGCodeSequenceListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
+	GblFunc::replaceControl(m_gCodeSequenceListPlaceholder, gCodeSequenceList);
 
 	// navigator panel
 	CncNavigatorPanel::Config cfg;
@@ -776,6 +791,7 @@ void MainFrame::displayNotification(const char type, wxString title, wxString me
 void MainFrame::displayReport(int id) {
 ///////////////////////////////////////////////////////////////////
 	return;
+	
 	PidList pidList;
 	
 	switch ( id ) {
@@ -830,7 +846,10 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
 		
-	GblFunc::stacktrace(std::clog, 7);
+	GblFunc::stacktrace(std::clog);
+	GblFunc::stacktraceOnlyApp(std::clog, false);
+	GblFunc::stacktraceOnlyApp(std::clog, true);
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
@@ -1937,6 +1956,7 @@ bool MainFrame::connectSerialPort() {
 		clearMotionMonitor();
 		
 		if ( (ret = cnc->setup()) == true ) {
+			
 			cnc->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
 			updateCncConfigTrace();
 			decorateSwitchToolOnOff(cnc->getToolState());
@@ -1945,9 +1965,7 @@ bool MainFrame::connectSerialPort() {
 			m_serialTimer->Start();
 			
 			if ( cnc->canProcessIdle() ) {
-				#warning activate m_miRqtIdleMessages->Check(true) again
-				//m_miRqtIdleMessages->Check(true);
-				m_miRqtIdleMessages->Check(false);
+				m_miRqtIdleMessages->Check(GBL_CONFIG->getRequestIdleRequestFlag());
 				m_miRqtIdleMessages->Enable(true);
 			}
 		}
@@ -1977,57 +1995,88 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	serialFileName.clear();
 	cnc = NULL;
 	
+	struct InitialSetup {
+		wxString serialFileName		= "";
+		bool probeMode				= false;
+		bool secureDlg				= false;
+		bool speedControl			= false;
+		bool pathListEntries		= false;
+		bool moveSequences			= false;
+	} setup;
+	
 	if ( sel == _portEmulatorNULL ) {
 		cnc = new CncControl(CncEMU_NULL);
-		serialFileName.assign("dev/null");
-		GBL_CONTEXT->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
-	} 
-	else if ( sel == _portSimulatorNULL ) {
-		cnc = new CncControl(CncPORT_SIMU);
-		serialFileName.assign(_portSimulatorNULL);
-		GBL_CONTEXT->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(false);
+		
+		setup.serialFileName.assign("dev/null");
+		setup.probeMode			= true;
+		setup.secureDlg			= false;
+		setup.speedControl		= false;
+		setup.pathListEntries	= true;
+		setup.moveSequences		= true;
 	} 
 	else if ( sel == _portEmulatorTEXT ) {
 		cnc = new CncControl(CncEMU_TXT);
-		serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
-		GBL_CONTEXT->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(true);
+		
+		setup.serialFileName.assign(CncFileNameService::getCncOutboundTxtFileName());
+		setup.probeMode			= true;
+		setup.secureDlg			= false;
+		setup.speedControl		= true;
+		setup.pathListEntries	= true;
+		setup.moveSequences		= true;
 	} 
 	else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
-		serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
-		GBL_CONTEXT->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(true);
+		
+		setup.serialFileName.assign(CncFileNameService::getCncOutboundSvgFileName());
+		setup.probeMode			= true;
+		setup.secureDlg			= false;
+		setup.speedControl		= true;
+		setup.pathListEntries	= true;
+		setup.moveSequences		= true;
 	}
 	else if ( sel == _portEmulatorGCODE ) {
 		cnc = new CncControl(CncEMU_GCODE);
-		serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
-		GBL_CONTEXT->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(true);
+		
+		setup.serialFileName.assign(CncFileNameService::getCncOutboundGCodeFileName());
+		setup.probeMode			= true;
+		setup.secureDlg			= false;
+		setup.speedControl		= true;
+		setup.pathListEntries	= true;
+		setup.moveSequences		= true;
 	} 
 	else if ( sel == _portEmulatorBIN) {
 		cnc = new CncControl(CncEMU_BIN);
-		serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
-		GBL_CONTEXT->setProbeMode(true);
-		decorateSecureDlgChoice(false);
-		decorateSpeedControlBtn(true);
+		
+		setup.serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
+		setup.probeMode			= true;
+		setup.secureDlg			= false;
+		setup.speedControl		= true;
+		setup.pathListEntries	= true;
+		setup.moveSequences		= true;
 	} 
 	else {
 		cnc = new CncControl(CncPORT);
-		serialFileName.assign("\\\\.\\");
-		serialFileName.append(sel);
-		GBL_CONTEXT->setProbeMode(false);
-		decorateSecureDlgChoice(true);
-		decorateSpeedControlBtn(true);
+		
+		setup.serialFileName.assign(wxString::Format("\\\\.\\%s", sel));
+		setup.probeMode			= false;
+		setup.secureDlg			= true;
+		setup.speedControl		= true;
+		setup.pathListEntries	= false;
+		setup.moveSequences		= false;
 	}
 	
+	// config setup
+	serialFileName.assign(setup.serialFileName);
+	GBL_CONTEXT->setProbeMode(setup.probeMode);
+	decorateSecureDlgChoice(setup.secureDlg);
+	decorateSpeedControlBtn(setup.speedControl);
+	
+	if ( cncPreprocessor != NULL ) {
+		cncPreprocessor->enablePathListEntries(setup.pathListEntries);
+		cncPreprocessor->enableMoveSequences(setup.moveSequences);
+	}
+	
+	// add on
 	const bool probeMode = GBL_CONTEXT->isProbeMode();
 	if ( speedMonitor )
 		speedMonitor->activate(!probeMode);
@@ -2412,6 +2461,9 @@ void MainFrame::decorateExtTemplatePages(TemplateFormat tf) {
 							break;
 							
 		case TplBinary:		m_simpleBookSourceExt->SetSelection(SourceExtBookSelection::VAL::NESTED_INFO_PANEL);
+							break;
+							
+		case TplGcode:		m_simpleBookSourceExt->SetSelection(SourceExtBookSelection::VAL::GCODE_SEQUENCE_PANEL);
 							break;
 							
 		default:			m_simpleBookSourceExt->SetSelection(SourceExtBookSelection::VAL::NULL_PANEL);
@@ -3063,9 +3115,9 @@ bool MainFrame::processTestInterval() {
 	wxString firstY = m_testFirstY->GetStringSelection();
 	wxString firstZ = m_testFirstZ->GetStringSelection();
 	
-	firstX == "First +" ? xd = xd : xd *= -1;
-	firstY == "First +" ? yd = yd : yd *= -1;
-	firstZ == "First +" ? zd = zd : zd*= -1;
+	xd = (firstX == "First +" ? +xd : -xd);
+	yd = (firstY == "First +" ? +yd : -yd);
+	zd = (firstZ == "First +" ? +zd : -zd);
 	
 	m_testDurationCounterX->SetLabel("-");
 	m_testDurationCounterY->SetLabel("-");
@@ -3596,6 +3648,8 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	
 	decorateOutboundSaveControls(false);
 	
+	cncPreprocessor->clearAll();
+	
 	wxString fn (getCurrentTemplatePathFileName());
 	if ( fn.IsEmpty() == true )
 		return false;
@@ -3627,9 +3681,6 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			ret = processTemplateIntern();
 		}
 		
-#warning remove cnc->getSerialExtern()->test() again
-//cnc->getSerialExtern()->test();
-
 		motionMonitor->updateMonitorAndOptions();
 		statisticsPane->updateReplayPane();
 	}
@@ -4756,24 +4807,12 @@ void MainFrame::lruListItemLeave(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemActivated(wxListEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxListItem info;
-	info.m_itemId = event.m_itemIndex;
-	info.m_col = 1;
-	info.m_mask = wxLIST_MASK_TEXT;
-	
-	if ( m_lruList->GetItem(info) )
-		openFileFromFileManager(wxString(lruFileList.getFileName(info.m_itemId)));
+	openFileFromFileManager(wxString(lruFileList.getFileName(event.GetIndex())));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::lruListItemSelected(wxListEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxListItem info;
-	info.m_itemId = event.m_itemIndex;
-	info.m_col = 1;
-	info.m_mask = wxLIST_MASK_TEXT;
-	
-	if ( m_lruList->GetItem(info) )
-		openMainPreview(wxString(lruFileList.getFileName(info.m_itemId)));
+	openMainPreview(wxString(lruFileList.getFileName(event.GetIndex())));
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookSourcePanel(int sourcePageToSelect) {
@@ -6340,46 +6379,35 @@ void MainFrame::selectSourceControlLineNumber(long ln) {
 	sourceEditor->selectLineNumber(ln);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::tryToSelectClientId(long clientId) {
+void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
 /////////////////////////////////////////////////////////////////////
-	//std::cout << clientId << std::endl;
+	//std::cout << clientId << " from: " << tss << std::endl;
 	
-	if ( positionSpy == NULL || positionSpy->searchReferenceById(clientId) == false )
+	if ( tss != TSS_POS_SPY ) {
+		if ( positionSpy != NULL )
+			positionSpy->searchReferenceById(clientId);
+	}
+	
+	if ( tss != TSS_EDITOR ) {
 		selectSourceControlLineNumber(clientId - 1 );
+	}
 	
-	// mark this id
-	if ( motionMonitor != NULL )
-		motionMonitor->setCurrentClientId(clientId);
-		
-	// motionMonitor->display has to be called separatly by the caller
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::selectPositionSpy(wxListEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	long item = event.m_itemIndex;
-	if ( item == wxNOT_FOUND )
-		return;
-		
-	// importent because wxListCtrl didn't support a native method for that and
-	// otherwise outside this event this information was lost
-	positionSpy->setLastSelection(item);
-	
-	// determine line number
-	wxString lineNumber(positionSpy->getRow(item).getItem(CncPosSpyListCtrl::COL_REF));
-	
-	long ln =0L;
-	lineNumber.ToLong(&ln);
-	ln -= 1L;
-	
-	if ( ln <= 0L )
-		return;
-	
-	selectSourceControlLineNumber(ln);
-	
-	// mark this id
-	if ( motionMonitor != NULL ) {
-		motionMonitor->setCurrentClientId(ln + 1);
+	if ( tss != TSS_MONITOR ) {
+		if ( motionMonitor != NULL )
+			motionMonitor->setCurrentClientId(clientId);
+			
 		motionMonitor->display();
+		// motionMonitor->display has to be called separatly by the caller
+	}
+	
+	if ( tss != TSS_PATH_LIST ) {
+		if ( cncPreprocessor != NULL )
+			cncPreprocessor->selectClientId(clientId);
+	}
+	
+	if ( tss != TSS_GCODE_SEQ ) {
+		if ( gCodeSequenceList != NULL )
+			gCodeSequenceList->searchReferenceById(clientId);
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -6703,8 +6731,7 @@ void MainFrame::keyDownLogger(wxKeyEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::dclickLogger(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	long pos = -1, col = -1, row = -1;
-	pos = m_logger->GetInsertionPoint();
+	long pos = m_logger->GetInsertionPoint(), col = -1, row = -1;
 	if ( m_logger->PositionToXY(pos, &col, &row) == false )
 		return;
 		
@@ -7464,3 +7491,12 @@ void MainFrame::onSelectSpyUnknownDetails(wxDataViewEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	m_spyUnknownDetails->UnselectAll();
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::showStacktraceStore(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	CncFileContentDialog dlg(this, CncFileNameService::getStackTraceFileName(), "All collected stacktraces", "Stacktrace Store");
+	dlg.SetSize(800, 900);
+	dlg.setWordWrap(false);
+	dlg.ShowModal();
+}
+

@@ -7,7 +7,7 @@
 #include "CncSetterListCtrl.h"
 
 // ----------------------------------------------------------------------------
-// CncMotionMonitor Event Table
+// CncSetterListCtrl Event Table
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncSetterListCtrl, CncLargeScaledListCtrl)

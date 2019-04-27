@@ -336,10 +336,9 @@ bool CncControl::setup(bool doReset) {
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Y, GBL_CONFIG->getReplyThresholdStepsY()));
 	setup.push_back(SetterTuple(PID_POS_REPLY_THRESHOLD_Z, GBL_CONFIG->getReplyThresholdStepsZ()));
 	
-	#warning move these flags to configuration
-	int32_t dirValueX = INVERSED_INCREMENT_DIRECTION_VALUE;
-	int32_t dirValueY = NORMALIZED_INCREMENT_DIRECTION_VALUE;
-	int32_t dirValueZ = NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	int32_t dirValueX = GBL_CONFIG->getInverseCtrlDirectionXFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	int32_t dirValueY = GBL_CONFIG->getInverseCtrlDirectionYFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
+	int32_t dirValueZ = GBL_CONFIG->getInverseCtrlDirectionZFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
 
 	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_X, dirValueX));
 	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_Y, dirValueY));
@@ -449,6 +448,15 @@ bool CncControl::processMoveXYZ(int32_t x1, int32_t y1, int32_t z1, bool already
 
 	wxASSERT(serialPort);
 	return serialPort->processMoveXYZ(x1, y1, z1, alreadyRendered);
+}
+///////////////////////////////////////////////////////////////////
+bool CncControl::processMoveSequence(CncMoveSequence& moveSequence) {
+///////////////////////////////////////////////////////////////////
+	if ( isInterrupted() == true )
+		return false;
+
+	wxASSERT(serialPort);
+	return serialPort->processMoveSequence(moveSequence);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::updateDrawControl() {
@@ -843,11 +851,11 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 		
 		prevPos = pos;
 		
-		#warning - to do: move flag to configuration
-		if ( false ) {
+		if ( GBL_CONFIG->getInterruptByPosOutOfRangeFlag() == true ) {
 			if ( isPositionOutOfRange(pos, true) == true )
 				interrupt();
-		} else {
+		} 
+		else {
 			if ( isPositionOutOfRange(pos, false) == true )
 				positionOutOfRangeFlag = true;
 		}

@@ -46,6 +46,8 @@ class GCodeBlock {
 		enum GCodePlaneSelect	{GC_XY_PLANE, GC_ZX_PLANE, GC_YZ_PLANE};
 		
 		/////////////////////////////////////////////////////////////
+		long				clientID		= -1;
+		
 		char 				cmdCode			= INVALID_GCODE_COMMAND_CMD;
 		long		 		cmdNumber		= INVALID_GCODE_COMMAND_NUM;
 		long				cmdSubNumber	= INVALID_GCODE_COMMAND_NUM;
@@ -165,19 +167,26 @@ class GCodeBlock {
 		
 		//////////////////////////////////////////////////////////////////
 		friend std::ostream &operator<< (std::ostream &ostr, const GCodeBlock &a);
-		void trace(std::ostream &ostr);
-		void trace(DcmItemList& rows);
+		
+		const wxString getCmdAsString(wxString& ret) const;
+		
+		const std::ostream& trace(std::ostream &ostr) const;
+		const DcmItemList& trace(DcmItemList& rows) const;
+		
+		const std::ostream& traceMore(std::ostream& ostr) const;
+		const wxString& traceMore(wxString& ret) const;
 		
 		//////////////////////////////////////////////////////////////////
-		const char* getUnitAsString() { return CncUnitCalculatorBase::getUnitAsStr(unit); }
-		const char* getPositioningAsString(GCodePositioning p) {
+		const char* getUnitAsString() const { return CncUnitCalculatorBase::getUnitAsStr(unit); }
+		const char* getPositioningAsString(GCodePositioning p) const {
 			switch (p) {
 				case GC_Relative: 	return "relative";
 				case GC_Absolute:	return "absolute";
 			}
 			return "???";
 		}
-		const char* getPlaneAsString() {
+		
+		const char* getPlaneAsString() const {
 			switch (plane) {
 				case GC_XY_PLANE: 	return "XY";
 				case GC_ZX_PLANE:	return "ZX";

@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <limits>
 #include <map>
+#include <wx/msgdlg.h>
 
 #include "CncStreamBuffers.h"
 #include "StdStreamRedirector.h"
@@ -16,8 +17,6 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 
 // global strings
 #define _maxSpeedLabel		"<MAX>"
-
-	#define _portSimulatorNULL	"<PortSimulator(dev/null)>"
 
 #define _portEmulatorNULL 	"<PortEmulator(dev/null)>"
 #define _portEmulatorTEXT  	"<PortEmulator(File::Text)>"
@@ -68,11 +67,11 @@ namespace cnc {
 	template<class T>
 	bool between(T val, T lo, T hi) 				{ return between( val, lo, hi, std::less<T>() ); }
 	
-	bool dblCompare(double a, double b, double eps = std::numeric_limits<double>::epsilon());
-	bool dblCompareNull(double a, double eps = std::numeric_limits<double>::epsilon());
-	const wxString& dblFormat1(double d);
-	const wxString& dblFormat2(double d1, double d2, const wxString& delimiter = _T(","));
-	const wxString& dblFormat3(double d1, double d2, double d3, const wxString& delimiter = _T(","));
+	bool dblCompare(const double a, const double b, const double eps = std::numeric_limits<double>::epsilon());
+	bool dblCompareNull(const double a, const double eps = std::numeric_limits<double>::epsilon());
+	const wxString& dblFormat1(const double d);
+	const wxString& dblFormat2(const double d1, const double d2, const wxString& delimiter = _T(","));
+	const wxString& dblFormat3(const double d1, const double d2, const double d3, const wxString& delimiter = _T(","));
 	
 	const TemplateFormat getTemplateFormatFromFileName(const char* fileName);
 	const TemplateFormat getTemplateFormatFromExtention(const char* extention);
@@ -122,7 +121,8 @@ class SourceExtBookSelection {
 		enum VAL {
 			NULL_PANEL					= 0,
 			USER_AGENT_PANEL			= 1,
-			NESTED_INFO_PANEL			= 2
+			GCODE_SEQUENCE_PANEL		= 2,
+			NESTED_INFO_PANEL			= 3
 		};
 };
 
@@ -131,9 +131,17 @@ class OutboundSelection{
 	public:
 		enum VAL {
 			SUMMARY_PANEL				= 0,
-			MOTION_MONITOR_PANAL		= 1,
-			FILE_PANEL					= 2,
-			PREVIEW_PANEL				= 3
+			PREPOCESSOR_PANAL			= 1,
+			MOTION_MONITOR_PANAL		= 2,
+			POSTPOCESSOR_PANAL			= 3
+		};
+};
+
+//-----------------------------------------------------------------
+class OutboundMonitorSelection{
+	public:
+		enum VAL {
+			MOTION_MONITOR_PANAL		= 0
 		};
 };
 

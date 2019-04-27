@@ -15,7 +15,7 @@
 #define TRACE_POSITIONS(p)
 #define TRACE_CURRENT_POSITION
 
-#define ENABLE_TRACE_FUNCTIONS
+//#define ENABLE_TRACE_FUNCTIONS
 #ifdef ENABLE_TRACE_FUNCTIONS
 	
 	#undef  TRACE_FUNCTION_CALL
@@ -41,81 +41,30 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		typedef CncUnitCalculatorBase::Unit Unit;
 
 	protected:
-	
-		class LastControlPoint {
-			private:	
-				CncCurveLib::Point lastQuadraticBezierControlPoint;
-				CncCurveLib::Point lastCubicBezierControlPoint;
-				bool lastQuadraticBezierControlPointValid;
-				bool lastCubicBezierControlPointValid;
-			
-			public:
-				LastControlPoint() 
-				: lastQuadraticBezierControlPoint(0.0, 0.0)
-				, lastCubicBezierControlPoint(0.0, 0.0)
-				, lastQuadraticBezierControlPointValid(false)
-				, lastCubicBezierControlPointValid(false)
-				{}
-				~LastControlPoint() {}
-				
-				bool hasLastQuadraticBezierControlPoint() 	{ return lastQuadraticBezierControlPointValid; }
-				bool hasLastCubicBezierControlPoint() 		{ return lastCubicBezierControlPointValid; }
-				
-				void setLastQuadraticBezierControlPoint(const CncCurveLib::Point& currentPoint, const CncCurveLib::Point& p) { 
-					lastQuadraticBezierControlPointValid = true;
-					//The first control point is assumed to be the reflection of the last control point 
-					//on the previous command relative to the current point.  
-					lastQuadraticBezierControlPoint = {(currentPoint.x + (currentPoint.x - p.x)),
-											           (currentPoint.y + (currentPoint.y - p.y))}; 
-				}
-				
-				void setLastCubicBezierControlPoint(const CncCurveLib::Point& currentPoint, const CncCurveLib::Point& p) { 
-					lastCubicBezierControlPointValid = true;
-					//The first control point is assumed to be the reflection of the last control point 
-					//on the previous command relative to the current point.  
-					lastCubicBezierControlPoint = {(currentPoint.x + (currentPoint.x - p.x)), 
-												   (currentPoint.y + (currentPoint.y - p.y))}; 
-				}
-				
-				void reset() { 
-					lastQuadraticBezierControlPointValid 	= false;
-					lastCubicBezierControlPointValid 		= false;
-					lastQuadraticBezierControlPoint 		= {0.0, 0.0}; 
-					lastCubicBezierControlPoint 			= {0.0, 0.0};
-				}
-				
-				const CncCurveLib::Point& getLastQuadraticBezierControlPoint(const CncCurveLib::Point& currentPoint) {
-					if ( hasLastQuadraticBezierControlPoint() )
-						return lastQuadraticBezierControlPoint;
-					//If there is no previous command or if the previous command was not an beziert+ curve, 
-					//assume the first control point is coincident with the current point
-					return currentPoint;
-				}
-				
-				const CncCurveLib::Point& getLastCubicBezierControlPoint(const CncCurveLib::Point& currentPoint) {
-					if ( hasLastCubicBezierControlPoint() )
-						return lastCubicBezierControlPoint;
-					//If there is no previous command or if the previous command was not an beziert+ curve, 
-					//assume the first control point is coincident with the current point
-					return currentPoint;
-				}
-		};
+		CncPathListManager 				pathListMgr;
 
-		// members
-		FileParser*					fileParser;
-		bool 						firstPath;
-		bool 						newPath;
-		CncDoublePosition			startPos;
-		CncDoublePosition			currentPos;
-		double						totalLength;
-		LastControlPoint 			lastControlPoint;
-		CncPathListManager 			pathListMgr;
-		CncUnitCalculator<float>	unitCalculator;
+		FileParser*						fileParser;
+		bool 							firstPath;
+		bool 							nextPath;
+
+		CncDoublePosition				startPos;
+		CncDoublePosition				currentPos;
+
+		double							totalLength;
+
+		CncUnitCalculator<float>		unitCalculator;
+
+		CncLineCurve					lineCurve;
+		CncEllipticalCurve				ellipticalCurve;
+		CncQuadraticBezierCurve			quadraticBezierCurve;
+		CncCubicBezierCurve				cubicBezierCurve;
 		
-		CncLineCurve				lineCurve;
-		CncEllipticalCurve			ellipticalCurve;
-		CncQuadraticBezierCurve		quadraticBezierCurve;
-		CncCubicBezierCurve			cubicBezierCurve;
+		CncCurveLib::LastControlPoint 	lastQuadraticControlPoint;
+		CncCurveLib::LastControlPoint 	lastCubicControlPoint;
+		
+		virtual bool onPhysicallyClientIdChange(long idx, const CncPathListEntry& cpe) 			{  cnc::cex1 << "PathHandlerBase::onPhysicallyClientIdChange() " 	<< std::endl; return false; }
+		virtual bool onPhysicallySpeedChange(unsigned long idx, const CncPathListEntry& cpe) 	{  cnc::cex1 << "PathHandlerBase::onPhysicallySpeedChange() " 		<< std::endl; return false; }
+		virtual bool onPhysicallyMove(unsigned long idx, const CncPathListEntry& cpe) 			{  cnc::cex1 << "PathHandlerBase::onPhysicallyMove() " 				<< std::endl; return false; }
 		
 		// trace functions
 		void traceFunctionCall(const char* fn);
@@ -125,7 +74,10 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		
 		// 
 		virtual bool callback(const CncCurveLib::Point& p);
+
 		virtual bool processLinearMove(bool alreadyRendered) = 0;
+		void processClientId(long id);
+		void processSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN);
 		
 		// debug functions
 		virtual void appendDebugValueDetail(const char* key, wxVariant value);
@@ -133,23 +85,30 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual void appendDebugValueDetail(const CncCurveLib::ParameterSet& ps);
 		
 		//render functions
-		bool processMove(char c, unsigned int count, double values[]);
-		bool processLine(char c, unsigned int count, double values[]);
-		bool processHLine(char c, unsigned int count, double values[]);
-		bool processVLine(char c, unsigned int count, double values[]);
-		bool processClose(char c, unsigned int count, double values[]);
-		bool processARC(char c, unsigned int count, double values[]);
-		bool processQuadraticBezier(char c, unsigned int count, double values[]);
-		bool processQuadraticBezierSmooth(char c, unsigned int count, double values[]);
-		bool processCubicBezier(char c, unsigned int count, double values[]);
-		bool processCubicBezierSmooth(char c, unsigned int count, double values[]);
+		bool processMove_2DXY(char c, unsigned int count, double values[]);
+		bool processLine_2DXY(char c, unsigned int count, double values[]);
+		bool processHLine_2DXY(char c, unsigned int count, double values[]);
+		bool processVLine_2DXY(char c, unsigned int count, double values[]);
+		bool processClose_2DXY(char c, unsigned int count, double values[]);
+
+		bool processARC_2DXY(CncCurveLib::ParameterElliptical& ps);
+		bool processARC_2DXY(char c, unsigned int count, double values[]);
+
+		bool processQuadraticBezier_2DXY(CncCurveLib::ParameterQuadraticBezier& ps);
+		bool processQuadraticBezier_2DXY(char c, unsigned int count, double values[]);
+
+		bool processCubicBezier_2DXY(CncCurveLib::ParameterCubicBezier& ps);
+		bool processCubicBezier_2DXY(char c, unsigned int count, double values[]);
+
+		bool processQuadraticBezierSmooth_2DXY(char c, unsigned int count, double values[]);
+		bool processCubicBezierSmooth_2DXY(char c, unsigned int count, double values[]);
 		
 		virtual bool isInitialized();
 		
-		virtual bool isZAxisUp()   { return false; }
-		virtual bool isZAxisDown() { return false; }
-		virtual bool moveUpZ()	   { return true;  }
-		virtual bool moveDownZ()   { return true;  }
+		virtual bool isZAxisUp()   				{ return false; }
+		virtual bool isZAxisDown() 				{ return false; }
+		virtual bool physicallyMoveZAxisUp()	{ return true;  }
+		virtual bool physicallyMoveZAxisDown()	{ return true;  }
 
 		// transformation
 		virtual void transform(double& xAbs, double& yAbs) 	{}
@@ -168,20 +127,18 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		virtual void initNextClientId(long id) {}
 		
 		void setFileParser(FileParser* fp) { fileParser = fp; }
-		
-		// setter
-		void setCurveLibResolution(float res);
 		void setPathList(const CncPathListManager& newPathList);
-		
 		void initCurrentPos(const CncDoublePosition& pos);
 		
 		unsigned int getDataPointCount() const { return pathListMgr.getPathListSize(); }
 		const CncPathListManager& getPathList() { return pathListMgr; }
 		
 		// processing
-		void debugProcess(char c, unsigned int count, double values[]);
-		bool process(char c, unsigned int count, double values[]);
+		bool processCommand_2DXY(char c, unsigned int count, double values[]);
 		
+		bool isFirstPath() { return firstPath; }
+		bool isNextPath()  { return nextPath;  }
+
 		virtual void prepareWork();
 		virtual bool initNextPath();
 		virtual bool finishCurrentPath();
@@ -195,7 +152,7 @@ class PathHandlerBase : public CncCurveLib::Caller {
 		
 		virtual bool shouldAToolChangeProcessed() { return true; }
 		
-		// get path repesentations
+		// get path representations
 		void tracePathList(std::ostream &ostr);
 		
 		// path analytics

@@ -36,6 +36,12 @@ class CncGamepadMsw
 		, stickMode(STICK_MODE1)
 		, deadzoneX(0.05f)
 		, deadzoneY(0.02f) 
+		, leftStickX(0.0)
+		, leftStickY(0.0)
+		, rightStickX(0.0)
+		, rightStickY(0.0)
+		, leftTrigger(0.0)
+		, rightTrigger(0.0)
 		{}
 		
 		CncGamepadMsw(float dzX, float dzY) 
@@ -43,7 +49,14 @@ class CncGamepadMsw
 		, cId(-1)
 		, stickMode(STICK_MODE1)
 		, deadzoneX(dzX)
-		, deadzoneY(dzY) {}
+		, deadzoneY(dzY)
+		, leftStickX(0.0)
+		, leftStickY(0.0)
+		, rightStickX(0.0)
+		, rightStickY(0.0)
+		, leftTrigger(0.0)
+		, rightTrigger(0.0)
+		{}
 		
 		virtual ~CncGamepadMsw()
 		{}

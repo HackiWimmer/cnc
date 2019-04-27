@@ -22,6 +22,7 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		int getToolLengthOffsetId() { return toolLengthOffsetId; }
 		void setToolLengthOffsetId(int tloi) { toolLengthOffsetId = tloi; }
 		
+		virtual bool isPathListUsed() = 0;
 		virtual void prepareWork(); 
 		virtual void finishWork();
 		
@@ -31,9 +32,8 @@ class GCodePathHandlerBase : public PathHandlerBase {
 		bool processDwell(GCodeBlock& gcb);
 		bool moveToOrigin(GCodeBlock& gcb);
 		
-		virtual void switchToolState(bool state) = 0;
-		void swichtToolOn()  { switchToolState(true); }
-		void swichtToolOff() { switchToolState(false); }
+		virtual void switchToolState(bool state) 	{}
+		virtual bool initNextPathExt() 				{ return initNextPath(); }
 		
 	protected:
 		

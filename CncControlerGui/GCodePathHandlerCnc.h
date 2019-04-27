@@ -2,22 +2,22 @@
 #define GCODE_PATH_HANDLER_CNC_H
 
 #include "GCodePathHandlerBase.h"
-#include "CncControl.h"
-#include "CncPosition.h"
+#include "CncPathListRunner.h"
 
-class GCodePathHandlerCnc : public GCodePathHandlerBase {
-	
+class CncControl;
+
+class GCodePathHandlerCnc : public GCodePathHandlerBase
+                          , public CncPathListRunner
+{
 	public:
 		GCodePathHandlerCnc(CncControl* cnc);
 		virtual ~GCodePathHandlerCnc();
 		
 		virtual const char* getName() { return "GCodePathHandlerCnc"; }
 		
+		virtual bool isPathListUsed() { return true; }
 		virtual void initNextClientId(long id);
 		virtual void switchToolState(bool state);
-		
-		virtual void logMeasurementStart();
-		virtual void logMeasurementEnd();
 		
 	protected:
 		
@@ -28,9 +28,6 @@ class GCodePathHandlerCnc : public GCodePathHandlerBase {
 		virtual void prepareWorkImpl();
 		virtual void finishWorkImpl();
 		
-	private:
-		CncControl* cncControl;
-		CncDoublePosition	previousPos;
 };
 
 #endif

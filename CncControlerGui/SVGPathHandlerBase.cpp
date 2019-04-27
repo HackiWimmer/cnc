@@ -1,5 +1,11 @@
+#include "CncConfig.h"
 #include "SVGPathHandlerBase.h"
 
+//////////////////////////////////////////////////////////////////
+void SVGPathHandlerBase::setSvgRootNode(const SVGRootNode& srn) {
+//////////////////////////////////////////////////////////////////
+	svgRootNode = srn;
+}
 //////////////////////////////////////////////////////////////////
 bool SVGPathHandlerBase::processLinearMove(bool alreadyRendered) {
 //////////////////////////////////////////////////////////////////
@@ -37,6 +43,12 @@ bool SVGPathHandlerBase::processLinearMove(const LinearMoveParam& param) {
 	//  . . . then convert the input unit to mm . . 
 	newPosAbsX = unitCalculator.convert(newPosAbsX);
 	newPosAbsY = unitCalculator.convert(newPosAbsY);
+	
+	// shift the scene
+	if ( CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag() ) {
+		newPosAbsY *= -1;
+		newPosAbsY += 2* (svgRootNode.getHeight_MM());
+	}
 	
 	// append
 	const CncPathListEntry cpe =

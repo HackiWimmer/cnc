@@ -152,7 +152,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
-      <File Name="CncPathListEntry.cpp"/>
+      <File Name="CncPreprocessor.h"/>
+      <File Name="CncPreprocessor.cpp"/>
       <File Name="CncMoveSequence.h"/>
       <File Name="CncMoveSequence.cpp"/>
       <File Name="CncSpeedMonitor.h"/>
@@ -220,7 +221,6 @@
       <File Name="CncControl.h"/>
       <File Name="CncFileNameService.h"/>
       <File Name="CncLimitStates.h"/>
-      <File Name="CncPathListEntry.h"/>
       <File Name="CncPosition.h"/>
       <File Name="CncStreamBuffers.h"/>
       <File Name="CncToolStateControl.h"/>
@@ -230,8 +230,6 @@
       <File Name="CncStreamBuffers.cpp"/>
       <File Name="CncZView.cpp"/>
       <File Name="CncCommon.cpp"/>
-      <File Name="CncPathListManager.h"/>
-      <File Name="CncPathListManager.cpp"/>
       <File Name="CncFilePreview.cpp"/>
       <File Name="CncFilePreview.h"/>
       <File Name="CncFileView.cpp"/>
@@ -283,6 +281,12 @@
       <File Name="HexDecoder.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Inbound - Base">
+      <File Name="CncPathListManager.h"/>
+      <File Name="CncPathListManager.cpp"/>
+      <File Name="CncPathListEntry.h"/>
+      <File Name="CncPathListEntry.cpp"/>
+      <File Name="CncPathListRunner.cpp"/>
+      <File Name="CncPathListRunner.h"/>
       <VirtualDirectory Name="Parser">
         <File Name="FileParser.h"/>
         <File Name="FileParser.cpp"/>
@@ -350,6 +354,10 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncGCodeSequenceListCtrl.cpp"/>
+      <File Name="CncGCodeSequenceListCtrl.h"/>
+      <File Name="CncPathListEntryListCtrl.cpp"/>
+      <File Name="CncPathListEntryListCtrl.h"/>
       <File Name="CncSerialSpyListCtrl.cpp"/>
       <File Name="CncSerialSpyListCtrl.h"/>
       <File Name="CncSummaryListCtrl.cpp"/>

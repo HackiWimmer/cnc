@@ -5,10 +5,21 @@
 
 //////////////////////////////////////////////////////////////////
 class CncPathListManager {
-
+	
+	public:
+		struct Data {
+			
+			unsigned int posChgCounter		= 0;
+			unsigned int speedChgCounter	= 0;
+			
+			void reset() {
+				
+			}
+		};
+		
 	protected:
 	
-		// Path postion (CncPathListEntry) entries
+		// Path position (CncPathListEntry) entries
 		CncPathList list;
 		
 		bool isFirstPath;			// stores if this path is the first path info
@@ -26,6 +37,8 @@ class CncPathListManager {
 		
 		double totalDistance;
 		
+		Data data;
+		
 		//////////////////////////////////////////////////////////////
 		void appendEntry(CncPathListEntry& cpe);
 		
@@ -35,26 +48,20 @@ class CncPathListManager {
 		CncPathListManager();
 		~CncPathListManager();
 		
-		//////////////////////////////////////////////////////////////
 		CncPathList& getPathListtoModify() { return list; }
 		const CncPathList& getPathList() const { return list; }
 		void setPathList(const CncPathList& pl) { list = pl; }
 		
-		//////////////////////////////////////////////////////////////
 		unsigned int getPathListSize() const { return list.size(); }
 		
-		//////////////////////////////////////////////////////////////
 		bool getFirstPathFlag() const { return isFirstPath; }
 		void setFirstPathFlag(bool state=true) { isFirstPath = state; }
 		
-		//////////////////////////////////////////////////////////////
 		bool isPathCorrected() const { return isCorrected; }
 		void setCorretedFlag(bool state=true) { isCorrected = state; }
 		
-		//////////////////////////////////////////////////////////////
 		double getTotalDistance() const { return totalDistance; }
 		
-		//////////////////////////////////////////////////////////////
 		double getMinPosX() const { return minPosX; }
 		double getMinPosY() const { return minPosY; }
 		double getMinPosZ() const { return minPosZ; }
@@ -63,50 +70,27 @@ class CncPathListManager {
 		double getMaxPosY() const { return maxPosY; }
 		double getMaxPosZ() const { return maxPosZ; }
 		
-		//////////////////////////////////////////////////////////////
 		const CncDoublePosition& getStartPos() const;
 		const CncDoublePosition& getReferencePos() const { return referencePos; }
 		void setReferencePos(const CncDoublePosition& p) { referencePos = p; }
 		
-		//////////////////////////////////////////////////////////////
 		const CncPathList::iterator begin() { return list.begin(); }
 		const CncPathList::iterator end()   { return list.end(); }
 		const CncPathList::iterator last()  { return list.end() - 1; }
+		const CncPathList::iterator next(CncPathList::iterator& it)  { return ++it; }
 		
-		//////////////////////////////////////////////////////////////
-		const CncPathList::const_iterator const_begin() const { return list.begin(); }
-		const CncPathList::const_iterator const_end()   const { return list.end(); }
-		const CncPathList::const_iterator const_last()  const { return list.end() - 1; }
+		const CncPathList::const_iterator const_begin() const { return list.cbegin(); }
+		const CncPathList::const_iterator const_end()   const { return list.cend(); }
+		const CncPathList::const_iterator const_last()  const { return list.cend() - 1; }
 		
-		//////////////////////////////////////////////////////////////////
-		bool isPathClosed();
+		bool isPathClosed() const;
 
-		//////////////////////////////////////////////////////////////
-		friend std::ostream &operator<< (std::ostream &ostr, const CncPathListManager &a) {
-			ostr << "CncPathListInfo entries : " << a.list.size() 													<< std::endl;
-			ostr << " is corrected           : " << a.isPathCorrected() 											<< std::endl;
-			ostr << " is first path          : " << a.getFirstPathFlag() 											<< std::endl;
-			ostr << " total distance         : " << cnc::dblFormat1(a.getTotalDistance()) 							<< std::endl;
-			ostr << " minPos (x, y, z)       : " << cnc::dblFormat3(a.getMinPosX(), a.getMinPosY(), a.getMinPosZ()) << std::endl;
-			ostr << " maxPos (X, Y, z)       : " << cnc::dblFormat3(a.getMaxPosX(), a.getMaxPosY(), a.getMaxPosZ()) << std::endl;
-			ostr << " referencePos           : " << a.getReferencePos() 											<< std::endl;
-			ostr << " startPos               : " << a.getStartPos() 												<< std::endl;
-			
-			ostr << " path list:" << std::endl;
-			for ( auto it=a.getPathList().begin(); it!=a.getPathList().end(); ++it )
-				it->traceEntry(ostr);
-
-			return ostr;
-		}
-		
-		//////////////////////////////////////////////////////////////
+		void clear();
 		void reset();
 		void resetMinMax();
 		
-		//////////////////////////////////////////////////////////////
 		bool reversePath();
 		
-		//////////////////////////////////////////////////////////////
 		const CncPathListEntry& addEntryAdm(long clientId);
 		const CncPathListEntry& addEntryAdm(CncSpeedMode mode, double feedSpeed_MM_MIN);
 		
@@ -116,9 +100,14 @@ class CncPathListManager {
 		const CncPathListEntry& addEntryAbs(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered=false);
 		const CncPathListEntry& addEntryRel(double newAbsPosX, double newAbsPosY, double newAbsPosZ, bool alreadyRendered=false);
 		
-		//////////////////////////////////////////////////////////////
 		bool eraseEntryAndRecalcuate(const CncPathList::iterator& itToErase);
+		
+		std::ostream& outputOperator(std::ostream &ostr) const;
+		friend std::ostream& operator<<(std::ostream &ostr, const CncPathListManager &a) {
+			return a.outputOperator(ostr);
+		}
 };
 
 #endif
+
 

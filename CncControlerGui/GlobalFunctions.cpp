@@ -1,8 +1,10 @@
+#include <fstream>
 #include <sstream>
 #include <vector>
 #include <wx/sizer.h>
 #include <wx/tokenzr.h>
 #include <boost/stacktrace.hpp>
+#include "CncFileNameService.h"
 #include "GlobalFunctions.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -56,6 +58,21 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	// do not delete oldCtrl this will be handled by wx... 
 }
 ///////////////////////////////////////////////////////////////////
+void GblFunc::storeStacktrace(const wxString& st) {
+///////////////////////////////////////////////////////////////////
+	unsigned int id = StackTrace::Database.size();
+	StackTrace::Database.push_back(st);
+	
+	std::ofstream ofs (CncFileNameService::getStackTraceFileName(), std::ofstream::app);
+	if ( ofs.good() ) {
+		ofs << "Stacktrace #: " << id << std::endl
+			<< st
+			<< std::endl;
+	}
+	
+	ofs.close();
+}
+///////////////////////////////////////////////////////////////////
 bool GblFunc::getStacktraceFromDatabase(std::ostream& o, unsigned int number) {
 ///////////////////////////////////////////////////////////////////
 	if ( number > StackTrace::Database.size() -1 )
@@ -73,21 +90,68 @@ void GblFunc::traceStacktraceDatabase(std::ostream& o) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void GblFunc::stacktrace(std::ostream& o, int maxLines) {
-//////////////////////////////////////////////////////////////////
+const std::ostream& GblFunc::stacktraceOnlyApp(std::ostream& o, bool lastOnly) {
+///////////////////////////////////////////////////////////////////
+	std::stringstream ss;
+	ss << boost::stacktrace::stacktrace(); 
+	
+	o << "Stacktrace (App Only)#: " << StackTrace::Database.size() << std::endl;
+	storeStacktrace(ss.str());
+	
+	wxStringTokenizer tokenizer(ss.str().c_str(), "\n");
+	int counter = 0;
+	while ( tokenizer.HasMoreTokens() ) {
+		const wxString token(tokenizer.GetNextToken());
+		
+		// avoid printout of "main->globalFunctions->stacktrace"
+		if ( counter++ < 3 ) {
+			if ( token.Contains("stacktrace.hpp") || token.Contains("GlobalFunctions.cpp") || token.Contains("main.cpp") )
+				continue;
+		}
+
+		if ( token.Matches("* at *:*") ) {
+			o << token << std::endl;
+			
+			if ( lastOnly == true )
+				break;
+		}
+	}
+	
+	return o;
+}
+///////////////////////////////////////////////////////////////////
+const wxString& GblFunc::stacktraceOnlyApp(wxString& ret, bool lastOnly) {
+///////////////////////////////////////////////////////////////////
+	std::stringstream ss;
+	stacktraceOnlyApp(ss, lastOnly);
+	
+	ret.assign(ss.str().c_str());
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+const std::ostream& GblFunc::stacktrace(std::ostream& o, int maxLines) {
+///////////////////////////////////////////////////////////////////
 	std::stringstream ss;
 	ss << boost::stacktrace::stacktrace(); 
 	
 	o << "Stacktrace #: " << StackTrace::Database.size() << std::endl;
-	StackTrace::Database.push_back(ss.str());
+	storeStacktrace(ss.str());
 	
 	if ( maxLines > 0 ) {
 		wxStringTokenizer tokenizer(ss.str().c_str(), "\n");
 		int counter = 0;
 		while ( tokenizer.HasMoreTokens() ) {
-			o << tokenizer.GetNextToken() << std::endl;
+			const wxString token(tokenizer.GetNextToken());
 			
-			if ( ++counter >= maxLines ) {
+			// avoid printout of "main->globalFunctions->stacktrace"
+			if ( counter++ < 3 ) {
+				if ( token.Contains("stacktrace.hpp") || token.Contains("GlobalFunctions.cpp") || token.Contains("main.cpp") )
+					continue;
+			}
+			
+			o << token << std::endl;
+
+			if ( counter >= maxLines ) {
 				o << " ..." << std::endl;
 				break;
 			}
@@ -96,6 +160,8 @@ void GblFunc::stacktrace(std::ostream& o, int maxLines) {
 	else {
 		o << ss.str(); 
 	}
+	
+	return o;
 }
 //////////////////////////////////////////////////////////////////
 const wxString& GblFunc::stacktrace(wxString& ret, int maxLines) {

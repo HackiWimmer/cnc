@@ -1,3 +1,4 @@
+#include "CncCurveLib.h"
 #include "GCodePathHandlerBase.h"
 
 //////////////////////////////////////////////////////////////////
@@ -44,8 +45,6 @@ bool GCodePathHandlerBase::processRapidLinearMove(GCodeBlock& gcb) {
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
 		
-	initNextPath();
-	
 	// change to the maximum configured speed
 	changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedRapid, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
 	
@@ -58,7 +57,8 @@ bool GCodePathHandlerBase::processLinearMove(GCodeBlock& gcb) {
 	if ( gcb.hasOneOf_XYZ() == false )
 		return true;
 	
-	changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
+	if ( gcb.hasF() )
+		changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
 	
 	updateCurrentPosition(gcb);
 	return processLinearMove(false);
@@ -77,7 +77,8 @@ bool GCodePathHandlerBase::processArcMove(GCodeBlock& gcb, bool sweep) {
 		ey = currentPos.getY() + gcb.y;
 	}
 	
-	double values[7];
+	const unsigned int ValueCount = 7;
+	double values[ValueCount];
 	values[0] = r;
 	values[1] = r;
 	values[2] = 0.0;
@@ -86,11 +87,13 @@ bool GCodePathHandlerBase::processArcMove(GCodeBlock& gcb, bool sweep) {
 	values[5] = ex;
 	values[6] = ey;
 	
-	changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
+	if ( gcb.hasF() )
+		changeCurrentFeedSpeedXYZ(CncSpeedMode::CncSpeedWork, gcb.getCurrentFeedSpeed());
+		
 	// this renders the arc and releases the callback 
 	// GCodePathHandlerBase::processLinearMove(...)
 	// for each curve lib point
-	return process(cmd, 7, values);
+	return processCommand_2DXY(cmd, ValueCount, values);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerBase::processDwell(GCodeBlock& gcb) {

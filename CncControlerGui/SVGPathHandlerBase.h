@@ -2,6 +2,7 @@
 #define SVG_PATH_HANDLER_BASE_H
 
 #include "PathHandlerBase.h"
+#include "SvgViewBox.h"
 #include "SvgTransformMatrix.h"
 
 //////////////////////////////////////////////////////////////////
@@ -11,6 +12,7 @@ class SVGPathHandlerBase : public PathHandlerBase {
 	
 		SVGPathHandlerBase()
 		: PathHandlerBase()
+		, svgRootNode()
 		, currentSvgTransformMatrix()
 		{
 			unitCalculator.changeInputUnit(Unit::px);
@@ -21,10 +23,13 @@ class SVGPathHandlerBase : public PathHandlerBase {
 		
 		virtual const char* getName()  						{ return "SVGPathHandlerBase"; }
 		SVGTransformMatrix& getSvgTransformMatrix() 		{ return currentSvgTransformMatrix; }
+
+		virtual void setSvgRootNode(const SVGRootNode& srn);
 		
 	protected:
 		
-		SVGTransformMatrix currentSvgTransformMatrix;
+		SVGRootNode			svgRootNode;
+		SVGTransformMatrix 	currentSvgTransformMatrix;
 		
 		virtual void transform(double& xAbs, double& yAbs)  { currentSvgTransformMatrix.transform(xAbs, yAbs); }
 		virtual bool callback(const CncCurveLib::Point& p);

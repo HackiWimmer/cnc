@@ -16,11 +16,14 @@ class wxXmlNode;
 class wxXmlAttribute;
 class CncGCodePreview;
 
+typedef std::vector<GCodeBlock> GCodeSequence;
+
 /////////////////////////////////////////////////////////////////////
 class GCodeFileParser : public FileParser {
 	
 	protected:
 		GCodePathHandlerBase* pathHandler;
+		GCodeSequence gCodeSequence;
 		bool programEnd;
 		bool displayWarnings;
 		bool resumeOnError;
@@ -44,6 +47,7 @@ class GCodeFileParser : public FileParser {
 		void setDefaultParameters();
 		bool processBlock(wxString& block, GCodeBlock& gcb);
 		bool processField(const GCodeField& field, GCodeBlock& gcb);
+		bool prepareBlock(GCodeBlock&gcb);
 		bool performBlock(GCodeBlock&gcb);
 		
 		bool processG(GCodeBlock& gcb);

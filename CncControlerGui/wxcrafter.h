@@ -166,6 +166,9 @@ protected:
     wxStaticText* m_staticText1500;
     wxDataViewListCtrl* m_dvListCtrlSvgUADetailInfo;
     wxTextCtrl* m_selectedUAInfo;
+    wxPanel* m_panelTplGCodeSequence;
+    wxStaticText* m_staticText7796;
+    wxPanel* m_gCodeSequenceListPlaceholder;
     wxPanel* m_panelTplNestedInfo;
     wxSplitterWindow* m_splitter6082;
     wxPanel* m_splitterPage6086;
@@ -426,7 +429,11 @@ protected:
     wxStaticText* m_staticText1283132;
     wxButton* m_btClearMsgHistory;
     wxTextCtrl* m_controllerMsgHistory;
+    wxPanel* m_cncPrePorcessor;
+    wxPanel* m_preprocessorPlaceholder;
     wxPanel* m_cnc3DPane;
+    wxListbook* m_listbookMonitor;
+    wxPanel* m_panel7704;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
     wxPanel* m_placeholderPanel;
     wxStaticLine* m_staticLine50163;
@@ -477,7 +484,9 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
-    wxPanel* m_cncFile;
+    wxPanel* m_cncPostProcessor;
+    wxListbook* m_listbookPostProcessor;
+    wxPanel* m_panel7697;
     wxStaticText* m_staticText6138;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate2;
     wxBitmapToggleButton* m_btToggleOutboundEditorWordWrap;
@@ -490,7 +499,7 @@ protected:
     wxStaticText* m_outboundPosition;
     wxTextCtrl* m_outboundEditStatus;
     wxStaticText* m_outboundEditMode;
-    wxPanel* m_cncPreview;
+    wxPanel* m_panel7699;
     wxStaticText* m_staticText6140;
     wxPanel* m_outboundPreviewPlaceholder;
     wxStaticText* m_staticText6218;
@@ -723,7 +732,6 @@ protected:
     wxMenuItem* m_menuItem118311;
     wxMenuItem* m_miRqtWarmstart;
     wxMenu* m_menuTools;
-    wxMenuItem* m_miPathGenerator;
     wxMenuItem* m_miIniFile;
     wxMenuItem* m_miExternalEditor;
     wxMenuItem* m_miCalculator;
@@ -742,6 +750,7 @@ protected:
     wxMenu* m_menuAbout;
     wxMenuItem* m_miTraceSessionID;
     wxMenuItem* m_miOpenSessionDlg;
+    wxMenuItem* m_miShowStacktraceFile;
     wxMenuItem* m_menuItem59616;
     wxMenuItem* m_miShowAppEnv;
     wxMenuItem* m_menuItem5961;
@@ -990,7 +999,6 @@ protected:
     virtual void requestReset(wxCommandEvent& event) { event.Skip(); }
     virtual void requestInterrupt(wxCommandEvent& event) { event.Skip(); }
     virtual void warmStartController(wxCommandEvent& event) { event.Skip(); }
-    virtual void openSVGPathGenerator(wxCommandEvent& event) { event.Skip(); }
     virtual void openConfigurationFile(wxCommandEvent& event) { event.Skip(); }
     virtual void openExternalEditor(wxCommandEvent& event) { event.Skip(); }
     virtual void openCalculator(wxCommandEvent& event) { event.Skip(); }
@@ -1004,6 +1012,7 @@ protected:
     virtual void testFunction4(wxCommandEvent& event) { event.Skip(); }
     virtual void traceSessionId(wxCommandEvent& event) { event.Skip(); }
     virtual void openSessionDialog(wxCommandEvent& event) { event.Skip(); }
+    virtual void showStacktraceStore(wxCommandEvent& event) { event.Skip(); }
     virtual void showOSEnvironment(wxCommandEvent& event) { event.Skip(); }
     virtual void OnAbout(wxCommandEvent& event) { event.Skip(); }
     virtual void startupTimer(wxTimerEvent& event) { event.Skip(); }
@@ -1088,6 +1097,9 @@ public:
     wxDataViewListCtrl* GetDvListCtrlSvgUADetailInfo() { return m_dvListCtrlSvgUADetailInfo; }
     wxTextCtrl* GetSelectedUAInfo() { return m_selectedUAInfo; }
     wxPanel* GetPanelTplUserAgent() { return m_panelTplUserAgent; }
+    wxStaticText* GetStaticText7796() { return m_staticText7796; }
+    wxPanel* GetGCodeSequenceListPlaceholder() { return m_gCodeSequenceListPlaceholder; }
+    wxPanel* GetPanelTplGCodeSequence() { return m_panelTplGCodeSequence; }
     wxTextCtrl* GetNestedDataHeader() { return m_nestedDataHeader; }
     wxPanel* GetSplitterPage6086() { return m_splitterPage6086; }
     wxTextCtrl* GetNestedSource() { return m_nestedSource; }
@@ -1350,6 +1362,8 @@ public:
     wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
+    wxPanel* GetPreprocessorPlaceholder() { return m_preprocessorPlaceholder; }
+    wxPanel* GetCncPrePorcessor() { return m_cncPrePorcessor; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate1() { return m_btSaveOutboundAsTemplate1; }
     wxPanel* GetPlaceholderPanel() { return m_placeholderPanel; }
     wxStaticLine* GetStaticLine50163() { return m_staticLine50163; }
@@ -1400,6 +1414,8 @@ public:
     wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
+    wxPanel* GetPanel7704() { return m_panel7704; }
+    wxListbook* GetListbookMonitor() { return m_listbookMonitor; }
     wxPanel* GetCnc3DPane() { return m_cnc3DPane; }
     wxStaticText* GetStaticText6138() { return m_staticText6138; }
     wxBitmapToggleButton* GetBtSaveOutboundAsTemplate2() { return m_btSaveOutboundAsTemplate2; }
@@ -1413,11 +1429,13 @@ public:
     wxStaticText* GetOutboundPosition() { return m_outboundPosition; }
     wxTextCtrl* GetOutboundEditStatus() { return m_outboundEditStatus; }
     wxStaticText* GetOutboundEditMode() { return m_outboundEditMode; }
-    wxPanel* GetCncFile() { return m_cncFile; }
+    wxPanel* GetPanel7697() { return m_panel7697; }
     wxStaticText* GetStaticText6140() { return m_staticText6140; }
     wxPanel* GetOutboundPreviewPlaceholder() { return m_outboundPreviewPlaceholder; }
     wxStaticText* GetStaticText6218() { return m_staticText6218; }
-    wxPanel* GetCncPreview() { return m_cncPreview; }
+    wxPanel* GetPanel7699() { return m_panel7699; }
+    wxListbook* GetListbookPostProcessor() { return m_listbookPostProcessor; }
+    wxPanel* GetCncPostProcessor() { return m_cncPostProcessor; }
     wxNotebook* GetOutboundNotebook() { return m_outboundNotebook; }
     wxPanel* GetMonitorBookCncPanel() { return m_monitorBookCncPanel; }
     wxPanel* GetMonitorTemplatePreviewPlaceHolder() { return m_monitorTemplatePreviewPlaceHolder; }
@@ -2332,6 +2350,58 @@ public:
     wxTimer* GetRefreshTimer() { return m_refreshTimer; }
     CncSpeedMonitorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncSpeedMonitorBase();
+};
+
+
+class CncPreprocessorBase : public wxPanel
+{
+protected:
+    wxListbook* m_listbookPreProcessor;
+    wxPanel* m_panel7622;
+    wxStaticText* m_staticText61381;
+    wxBitmapToggleButton* m_btConnectPathListEntries;
+    wxStaticLine* m_staticLine78021113;
+    wxBitmapToggleButton* m_btToogleFormat;
+    wxStaticLine* m_staticLine780211;
+    wxBitmapToggleButton* m_btConsiderClientIdChanges;
+    wxBitmapToggleButton* m_btConsiderFeedSpeedChanges;
+    wxBitmapToggleButton* m_btConsiderPositionChanges;
+    wxStaticLine* m_staticLine7802;
+    wxBitmapButton* m_btClearPathListEntries;
+    wxListCtrl* m_pathListEntriesPlaceholder;
+    wxPanel* m_panel7630;
+    wxStaticText* m_staticText613814;
+    wxBitmapToggleButton* m_btConnectMoveSequences;
+    wxBitmapButton* m_btClearMoveSequences;
+    wxListCtrl* m_moveSequencesPlaceholder;
+
+protected:
+    virtual void connectPathListEntries(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearPathListEntries(wxCommandEvent& event) { event.Skip(); }
+    virtual void connectMoveSequences(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearMoveSequences(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText61381() { return m_staticText61381; }
+    wxBitmapToggleButton* GetBtConnectPathListEntries() { return m_btConnectPathListEntries; }
+    wxStaticLine* GetStaticLine78021113() { return m_staticLine78021113; }
+    wxBitmapToggleButton* GetBtToogleFormat() { return m_btToogleFormat; }
+    wxStaticLine* GetStaticLine780211() { return m_staticLine780211; }
+    wxBitmapToggleButton* GetBtConsiderClientIdChanges() { return m_btConsiderClientIdChanges; }
+    wxBitmapToggleButton* GetBtConsiderFeedSpeedChanges() { return m_btConsiderFeedSpeedChanges; }
+    wxBitmapToggleButton* GetBtConsiderPositionChanges() { return m_btConsiderPositionChanges; }
+    wxStaticLine* GetStaticLine7802() { return m_staticLine7802; }
+    wxBitmapButton* GetBtClearPathListEntries() { return m_btClearPathListEntries; }
+    wxListCtrl* GetPathListEntriesPlaceholder() { return m_pathListEntriesPlaceholder; }
+    wxPanel* GetPanel7622() { return m_panel7622; }
+    wxStaticText* GetStaticText613814() { return m_staticText613814; }
+    wxBitmapToggleButton* GetBtConnectMoveSequences() { return m_btConnectMoveSequences; }
+    wxBitmapButton* GetBtClearMoveSequences() { return m_btClearMoveSequences; }
+    wxListCtrl* GetMoveSequencesPlaceholder() { return m_moveSequencesPlaceholder; }
+    wxPanel* GetPanel7630() { return m_panel7630; }
+    wxListbook* GetListbookPreProcessor() { return m_listbookPreProcessor; }
+    CncPreprocessorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,700), long style = wxTAB_TRAVERSAL);
+    virtual ~CncPreprocessorBase();
 };
 
 
@@ -3251,6 +3321,35 @@ public:
     }
 
     virtual ~ImageLibGamepad();
+};
+
+
+class ImageLibPathList : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibPathList();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibPathList();
 };
 
 #endif

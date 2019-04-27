@@ -48,7 +48,7 @@ namespace StartupBuffer {
 class CncCoutBuf : public LoggerStreamBuf {
 	public:
 		///////////////////////////////////////////////////////////
-		CncCoutBuf(wxTextCtrl* c) 
+		explicit CncCoutBuf(wxTextCtrl* c) 
 		: LoggerStreamBuf(LoggerStreamBuf::Type::STD, c, wxTextAttr(wxColour(232, 232, 232))) {}
 		virtual ~CncCoutBuf() {}
 };
@@ -56,7 +56,7 @@ class CncCoutBuf : public LoggerStreamBuf {
 ///////////////////////////////////////////////////////////////////
 class CncClogBuf : public LoggerStreamBuf {
 	public:
-		CncClogBuf(wxTextCtrl* c) 
+		explicit CncClogBuf(wxTextCtrl* c) 
 		: LoggerStreamBuf(LoggerStreamBuf::Type::LOG, c, wxTextAttr(wxColour(0, 157, 157))) {}
 		virtual ~CncClogBuf() {}
 };
@@ -64,7 +64,7 @@ class CncClogBuf : public LoggerStreamBuf {
 ///////////////////////////////////////////////////////////////////
 class CncCerrBuf : public LoggerStreamBuf {
 	public:
-		CncCerrBuf(wxTextCtrl* c) 
+		explicit CncCerrBuf(wxTextCtrl* c) 
 		: LoggerStreamBuf(LoggerStreamBuf::Type::ERR, c, wxTextAttr(wxColour(255, 64, 64))) {}
 		virtual ~CncCerrBuf() {}
 };
@@ -72,7 +72,7 @@ class CncCerrBuf : public LoggerStreamBuf {
 ///////////////////////////////////////////////////////////////////
 class CncCex1Buf : public LoggerStreamBuf {
 	public:
-		CncCex1Buf(wxTextCtrl* c) 
+		explicit CncCex1Buf(wxTextCtrl* c) 
 		: LoggerStreamBuf(LoggerStreamBuf::Type::EX1, c, wxTextAttr(wxColour(255, 201, 14))) {}
 		virtual ~CncCex1Buf() {}
 };
@@ -80,7 +80,7 @@ class CncCex1Buf : public LoggerStreamBuf {
 ///////////////////////////////////////////////////////////////////
 class CncCtrcBuf : public LoggerStreamBuf {
 	public:
-		CncCtrcBuf(wxTextCtrl* c) 
+		explicit CncCtrcBuf(wxTextCtrl* c) 
 		: LoggerStreamBuf(LoggerStreamBuf::Type::TRC, c, LoggerStreamBuf::defaultAttr) {}
 		virtual ~CncCtrcBuf() {}
 };
@@ -88,7 +88,7 @@ class CncCtrcBuf : public LoggerStreamBuf {
 ///////////////////////////////////////////////////////////////////
 class CncCmsgBuf : public LoggerStreamBuf {
 	public:
-		CncCmsgBuf(wxTextCtrl* c) 
+		explicit CncCmsgBuf(wxTextCtrl* c) 
 		: LoggerStreamBuf(LoggerStreamBuf::Type::MSG, c, LoggerStreamBuf::defaultAttr) {}
 		virtual ~CncCmsgBuf() {}
 };
@@ -105,7 +105,7 @@ class CncCspyBuf : public LoggerStreamBuf {
 	
 	public:
 		//////////////////////////////////////////////////////////
-		CncCspyBuf(wxListCtrl* c) 
+		explicit CncCspyBuf(wxListCtrl* c) 
 		: LoggerStreamBuf(LoggerStreamBuf::Type::SPY, NULL, LoggerStreamBuf::defaultAttr) 
 		, bufferIndex(0)
 		, listCtrl(c)

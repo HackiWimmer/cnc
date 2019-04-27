@@ -6,6 +6,7 @@
 CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, wxWindowID id, const wxPoint &pos, const wxSize &size, 
 											   long style, const wxValidator &validator, const wxString &name)
 : wxListCtrl(parent, id, pos, size, (style | wxLC_REPORT | wxLC_VIRTUAL), validator, name)
+, blockSelectionEvent(false)
 , dummyRow(NULL)
 , rows()
 , listType(CncLargeScaledListCtrl::ListType::NORMAL)
@@ -17,6 +18,7 @@ CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, wxWindowID id, 
 ///////////////////////////////////////////////////////////////////
 CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, long style) 
 : wxListCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, (style | wxLC_REPORT | wxLC_VIRTUAL) )
+, blockSelectionEvent(false)
 , dummyRow(NULL)
 , rows()
 , listType(CncLargeScaledListCtrl::ListType::NORMAL)
@@ -53,6 +55,18 @@ CncColumContainer* CncLargeScaledListCtrl::createDummyRow(long item) {
 		dummyRow->updateItem(i, wxString::Format("!%ld.%ld", item, i));
 		
 	return dummyRow;
+}
+///////////////////////////////////////////////////////////////////
+void CncLargeScaledListCtrl::freeze() {
+///////////////////////////////////////////////////////////////////
+	if ( IsFrozen() == false )
+		Freeze();
+}
+///////////////////////////////////////////////////////////////////
+void CncLargeScaledListCtrl::thaw() {
+///////////////////////////////////////////////////////////////////
+	if ( IsFrozen() == true )
+		Thaw();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::clear() {
@@ -179,13 +193,17 @@ bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
 	if ( isItemValid(item) == false )
 		return false;
 		
-	// deselect
-	SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
+	const int itemState = GetItemState(item, wxLIST_STATE_SELECTED);
 	
-	// select
-	SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-	lastSelection = item;
+	if ( itemState != wxLIST_STATE_SELECTED && blockSelectionEvent == false ) {
+		// deselect
+		SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
 		
+		// select
+		SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
+		lastSelection = item;
+	}
+	
 	if ( ensureVisible == true )
 		EnsureVisible(item);
 		

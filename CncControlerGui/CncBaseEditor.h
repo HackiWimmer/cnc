@@ -107,6 +107,14 @@ class CncBaseEditor : public wxStyledTextCtrl {
 			bool handleKeyCommands		= true;
 		};
 		
+		class SelectEventBlocker {
+			private:
+				CncBaseEditor* editor;
+			public:
+				SelectEventBlocker(CncBaseEditor* e) : editor(e) { if ( editor != NULL) editor->blockSelectEvent = true; }
+				~SelectEventBlocker()							 { if ( editor != NULL) editor->blockSelectEvent = false; }
+		};
+		
 		Styles 			styles;
 		Flags			flags;
 		FileInfo 		fileInfo;
@@ -115,6 +123,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		wxStaticText* 	ctlColunmPostion;
 		wxTextCtrl*		ctlStatus;
 		
+		bool blockSelectEvent;
 		bool fileLoadingActive;
 		
 		virtual void initialize() = 0;

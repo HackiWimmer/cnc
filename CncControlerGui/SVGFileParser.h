@@ -19,12 +19,13 @@ class wxMenuItem;
 typedef CncUnitCalculatorBase::Unit Unit;
 
 /////////////////////////////////////////////////////////////////////////////
-class SVGFileParser : public SVGNodeParser, public FileParser {
-	
+class SVGFileParser : public SVGNodeParser
+                    , public FileParser 
+{
 	protected:
 	
 		CncControl* cncControl;
-		SVGPathHandlerCnc* pathHandler;
+		//SVGPathHandlerCnc* pathHandler;
 		SVGUserAgent svgUserAgent;
 		
 		wxString currentNodeName;

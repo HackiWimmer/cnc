@@ -1,9 +1,13 @@
 #include <iostream>
+#include <sstream>
 #include <wx/wfstream.h>
 #include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 #include <wx/xml/xml.h>
 #include "CncSourceEditor.h"
+#include "CncConfig.h"
+#include "MainFrame.h"
+#include "CncGCodeSequenceListCtrl.h"
 #include "GCodePathHandlerBase.h"
 #include "GCodeFileParser.h"
 
@@ -11,6 +15,7 @@
 GCodeFileParser::GCodeFileParser(const wxString& fn, GCodePathHandlerBase* ph) 
 : FileParser(fn)
 , pathHandler(ph)
+, gCodeSequence()
 , programEnd(false)
 , displayWarnings(true)
 , resumeOnError(true)
@@ -103,13 +108,10 @@ void GCodeFileParser::logMeasurementEnd() {
 bool GCodeFileParser::preprocess() {
 //////////////////////////////////////////////////////////////////
 	pathHandler->prepareWork();
-	return true;
-}
-//////////////////////////////////////////////////////////////////
-bool GCodeFileParser::spool() {
-//////////////////////////////////////////////////////////////////
+	
 	setDefaultParameters();
-
+	
+	// read the file content
 	wxFileInputStream input(fileName);
 	wxTextInputStream text(input, wxT("\x09"), wxConvUTF8 );
 	
@@ -137,26 +139,34 @@ bool GCodeFileParser::spool() {
 			if ( programEnd == true )
 				break;
 		}
-		
-		pathHandler->finishWork();
-		return true;
 	}
 	
-	return false;
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParser::spool() {
+//////////////////////////////////////////////////////////////////
+	if ( pathHandler->isPathListUsed() == false )
+		return true;
+	
+	// over all commands
+	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
+	ctrl->clear();
+	ctrl->freeze();
+	
+	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it) {
+		performBlock(*it);
+		ctrl->addBlock(*it);
+	}
+	
+	ctrl->thaw();
+
+	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
-	// currently nothing to do
-	
-	/*
-	// display the tool ID summary
-	std::cout << wxString::Format("Tool ID Summary (count = %d):", (int)toolIds.size());
-	for ( auto it = toolIds.begin(); it != toolIds.end(); ++it) {
-		std::cout << " '" << (*it) << "'";
-	}
-	std::cout << std::endl;
-	*/
+	pathHandler->finishWork();
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -181,7 +191,7 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 		GCodeField nextField(token);
 	
 		if ( gcb.isValid() && GCodeCommands::isBlockCommand(nextField.getCmd()) ) {
-			if ( performBlock(gcb) == false )
+			if ( prepareBlock(gcb) == false )
 				return false;
 			
 			gcb.reInit();
@@ -193,7 +203,7 @@ bool GCodeFileParser::processBlock(wxString& block, GCodeBlock& gcb) {
 			return false;
 	}
 	
-	return performBlock(gcb);
+	return prepareBlock(gcb);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
@@ -256,15 +266,17 @@ bool GCodeFileParser::processField(const GCodeField& field, GCodeBlock& gcb) {
 	return false;
 }
 //////////////////////////////////////////////////////////////////
-bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
+bool GCodeFileParser::prepareBlock(GCodeBlock& gcb) {
 //////////////////////////////////////////////////////////////////
+	gcb.clientID = getCurrentLineNumber();
+	
 	if ( gcb.isValid() == false && gcb.hasMoveCmd() == true ) {
 		gcb.copyPrevCmdToCmd();
 	}
 	
 	if ( gcb.isValid() == false ) {
 		if ( gcb.hasMoveCmd() ) {
-			std::cerr << "GCodeFileParser::processBlock: Invalid GCode block:" << std::endl;
+			std::cerr << "GCodeFileParser::prepareBlock: Invalid GCode block:" << std::endl;
 			std::cerr << " Command:     " << GCodeField(gcb.cmdCode, gcb.cmdNumber, gcb.cmdSubNumber) << std::endl;
 			std::cerr << " Block:       " << gcb  << std::endl;
 			std::cerr << " Line number: " << getCurrentLineNumber() << std::endl;
@@ -273,8 +285,26 @@ bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
 		return true;
 	}
 	
+	if ( pathHandler->isPathListUsed() ) {
+		gCodeSequence.push_back(gcb);
+		return true;
+	}
+	
+	return performBlock(gcb);
+}
+//////////////////////////////////////////////////////////////////
+bool GCodeFileParser::performBlock(GCodeBlock& gcb) {
+//////////////////////////////////////////////////////////////////
 	//gcb.trace(std::clog);
 	bool ret = false;
+	
+	// check the new path trigger and init it before 
+	// calling initNextClientId()
+	if ( gcb.cmdCode == 'G' && gcb.cmdNumber == 0 )
+		pathHandler->initNextPathExt();
+	
+	initNextClientId(gcb.clientID);
+	
 	switch ( gcb.cmdCode ) {
 		case 'G':	ret = processG(gcb);	break;
 		case 'M':	ret = processM(gcb);	break;
@@ -455,7 +485,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		//::::::::::::::::::::::::::::::::::::::::::::::::::::::
 		case 3: 	// GC_M_SpindleOnClockwise
 		{
-			pathHandler->swichtToolOn();
+			pathHandler->switchToolState(true);
 			return true;
 		}
 		case 4:		// GC_M_SpindleOnCounterClockwise
@@ -464,7 +494,7 @@ bool GCodeFileParser::processM(GCodeBlock& gcb) {
 		}
 		case 5:		// GC_M_SpindleOff
 		{
-			pathHandler->swichtToolOff();
+			pathHandler->switchToolState(false);
 			return true;
 		}
 		case 6:		// GC_M_ToolChange

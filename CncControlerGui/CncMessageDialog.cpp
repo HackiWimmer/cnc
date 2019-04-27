@@ -1,3 +1,4 @@
+#include <fstream>
 #include <wx/window.h>
 #include "CncMessageDialog.h"
 
@@ -112,4 +113,34 @@ void CncMessageDialog::setupDefaultStyle() {
 	// Configure selection colours
 	//ctl->SetSelForeground(true, wxColour(255,201,14));
 	m_message->SetSelBackground(true, wxColour(83,83,83));
+}
+
+
+/////////////////////////////////////////////////////////////////////
+CncFileContentDialog::CncFileContentDialog(wxWindow* parent, const wxString& fileName, wxString headline, wxString title)
+: CncMessageDialog(parent, "", headline, title)
+{
+/////////////////////////////////////////////////////////////////////
+	setFileName(fileName);
+}
+/////////////////////////////////////////////////////////////////////
+CncFileContentDialog::~CncFileContentDialog() {
+/////////////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileContentDialog::setFileName(const wxString& fileName) {
+/////////////////////////////////////////////////////////////////////
+	wxString msg;
+	if ( wxFileName::Exists(fileName) == true ) {
+		std::ifstream ifs (fileName.c_str().AsChar(), std::ifstream::in);
+		char c = ifs.get();
+		while ( ifs.good() ) {
+			msg.append(c);
+			c = ifs.get();
+		}
+		
+		ifs.close();
+	}
+	
+	setMessage(msg);
 }

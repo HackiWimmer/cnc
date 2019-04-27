@@ -1,4 +1,5 @@
 #include <iostream>
+#include <sstream>
 #include "GCodeBlock.h"
 
 //////////////////////////////////////////////////////////////////
@@ -56,28 +57,40 @@ void GCodeBlock::reInit() {
 	x 				= INVALID_GCODE_FIELD_VALUE;
 	y 				= INVALID_GCODE_FIELD_VALUE;
 	z 				= INVALID_GCODE_FIELD_VALUE;
+	f 				= INVALID_GCODE_FIELD_VALUE;
 	i 				= INVALID_GCODE_FIELD_VALUE;
 	j 				= INVALID_GCODE_FIELD_VALUE;
 	//....
 	
-	// keep e, f, etc.
+	// keep e, s, etc.
 }
 //////////////////////////////////////////////////////////////////
 std::ostream& operator<<(std::ostream &ostr, const GCodeBlock& a) {
 //////////////////////////////////////////////////////////////////
-	ostr         << "X=" << (a.hasX() ? wxString::Format("%f",a.x) : "-");
-	ostr << ", " << "Y=" << (a.hasY() ? wxString::Format("%f",a.y) : "-");
-	ostr << ", " << "Z=" << (a.hasZ() ? wxString::Format("%f",a.z) : "-");
-	ostr << ", " << "I=" << (a.hasI() ? wxString::Format("%f",a.i) : "-");
-	ostr << ", " << "J=" << (a.hasJ() ? wxString::Format("%f",a.j) : "-");
+	ostr         << "X=" << (a.hasX() ? wxString::Format("% 8.3f", a.x) : "-");
+	ostr << ", " << "Y=" << (a.hasY() ? wxString::Format("% 8.3f", a.y) : "-");
+	ostr << ", " << "Z=" << (a.hasZ() ? wxString::Format("% 8.3f", a.z) : "-");
+	ostr << ", " << "F=" << (a.hasF() ? wxString::Format("% 8.3f", a.f) : "-");
+	ostr << ", " << "I=" << (a.hasI() ? wxString::Format("% 8.3f", a.i) : "-");
+	ostr << ", " << "J=" << (a.hasJ() ? wxString::Format("% 8.3f", a.j) : "-");
 	return ostr;
 }
 //////////////////////////////////////////////////////////////////
-void GCodeBlock::trace(std::ostream &ostr) {
+const wxString GCodeBlock::getCmdAsString(wxString& ret) const {
 //////////////////////////////////////////////////////////////////
-	cmdCode			== INVALID_GCODE_COMMAND_CMD ? ostr << "?" : ostr << cmdCode;
-	cmdNumber		== INVALID_GCODE_COMMAND_NUM ? ostr << "-" : ostr << cmdNumber;
-	cmdSubNumber	== INVALID_GCODE_COMMAND_NUM ? ostr << ""  : ostr << cmdSubNumber;
+	ret.clear();
+	
+	cmdCode			== INVALID_GCODE_COMMAND_CMD ? ret << "?" : ret << cmdCode;
+	cmdNumber		== INVALID_GCODE_COMMAND_NUM ? ret << "-" : ret << cmdNumber;
+	cmdSubNumber	== INVALID_GCODE_COMMAND_NUM ? ret << ""  : ret << cmdSubNumber;
+	
+	return ret;
+}
+//////////////////////////////////////////////////////////////////
+const std::ostream& GCodeBlock::trace(std::ostream &ostr) const {
+//////////////////////////////////////////////////////////////////
+	wxString cmd;
+	ostr << getCmdAsString(cmd);
 	
 	if ( hasMoveCmd() ) {
 		ostr << ":";
@@ -85,9 +98,10 @@ void GCodeBlock::trace(std::ostream &ostr) {
 	}
 
 	ostr << std::endl;
+	return ostr;
 }
 //////////////////////////////////////////////////////////////////
-void GCodeBlock::trace(DcmItemList& rows) {
+const DcmItemList& GCodeBlock::trace(DcmItemList& rows) const {
 //////////////////////////////////////////////////////////////////
 	rows.clear();
 	
@@ -113,5 +127,31 @@ void GCodeBlock::trace(DcmItemList& rows) {
 		DataControlModel::addKeyValueRow(rows, "F", ( f != INVALID_GCODE_FIELD_VALUE ? wxString::Format("%lf", f) : "-"));
 	}
 	//...
-
+	
+	return rows;
+}
+//////////////////////////////////////////////////////////////////
+const std::ostream& GCodeBlock::traceMore(std::ostream& ostr) const{
+//////////////////////////////////////////////////////////////////
+	if ( hasOneOf_IJ() ) {
+		ostr << ( i != INVALID_GCODE_FIELD_VALUE ? wxString::Format("I=%lf", i) : "") << ", ";
+		ostr << ( j != INVALID_GCODE_FIELD_VALUE ? wxString::Format("J=%lf", j) : "");
+	}
+	
+	/*
+	if ( hasOneOf_SEF() ) {
+		ostr << ( s != INVALID_GCODE_FIELD_VALUE ? wxString::Format("S=%lf", s) : "") << ", ";
+		ostr << ( e != INVALID_GCODE_FIELD_VALUE ? wxString::Format("E=%lf", e) : "");
+	}
+	*/
+	return ostr;
+}
+//////////////////////////////////////////////////////////////////
+const wxString& GCodeBlock::traceMore(wxString& ret) const {
+//////////////////////////////////////////////////////////////////
+	std::stringstream ss;
+	traceMore(ss);
+	ret.assign(ss.str().c_str());
+	
+	return ret;
 }

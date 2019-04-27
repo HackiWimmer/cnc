@@ -8,7 +8,11 @@ namespace Streamer {
 	const char* indent1 = "\t";
 	const char* indent2 = "\t\t";
 	const char* indent3 = "\t\t\t";
+	
+	const unsigned int BUFFER_SIZE = 64 * 1024;
+	char buffer [BUFFER_SIZE];
 };
+
 ///////////////////////////////////////////////////////////////////
 SerialEmulatorTextStreamer::SerialEmulatorTextStreamer(CncControl* cnc)
 : SerialEmulatorNULL(cnc)
@@ -275,6 +279,7 @@ void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::EndRun& t
 	}
 	
 	std::ofstream out(fileName.c_str().AsChar(), std::ofstream::out);
+	out.rdbuf()->pubsetbuf(Streamer::buffer, Streamer::BUFFER_SIZE);
 	if ( out.good() == false ) {
 		std::cerr << "SerialEmulatorTextStreamer::processTrigger(): Can't create file: '" 
 				  << fileName

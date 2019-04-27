@@ -1,6 +1,12 @@
 #include <iostream>
 #include "CncUnitCalculator.h"
+
+#include "CncPathListRunner.h"
+
 #include "CncConfig.h"
+#include "CncPreprocessor.h"
+#include "MainFrame.h"
+
 #include "FileParser.h"
 #include "OSD/CncTimeFunctions.h"
 #include "PathHandlerBase.h"
@@ -8,18 +14,20 @@
 //////////////////////////////////////////////////////////////////
 PathHandlerBase::PathHandlerBase() 
 : CncCurveLib::Caller()
+, pathListMgr()
+, fileParser(NULL)
 , firstPath(true)
-, newPath(false)
+, nextPath(false)
 , startPos({0.0, 0.0, 0.0})
 , currentPos({0.0, 0.0, 0.0})
 , totalLength(0.0)
-, lastControlPoint()
-, pathListMgr()
 , unitCalculator(Unit::mm, Unit::mm)
 , lineCurve(this)
 , ellipticalCurve(this)
 , quadraticBezierCurve(this)
 , cubicBezierCurve(this)
+, lastQuadraticControlPoint()
+, lastCubicControlPoint()
 {
 //////////////////////////////////////////////////////////////////
 	// init default setup
@@ -43,14 +51,8 @@ void PathHandlerBase::initCurrentPos(const CncDoublePosition& pos) {
 	currentPos	= pos;
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::setCurveLibResolution(float res) { 
-//////////////////////////////////////////////////////////////////
-	std::cerr << "PathHandlerBase::setCurveLibResolution is obsolete" << std::endl;
-	#warning CncConfig::setCurveLibIncrement(res) is obsolete here 
-	//CncConfig::setCurveLibIncrement(res); 
-}
-//////////////////////////////////////////////////////////////////
 void PathHandlerBase::setPathList(const CncPathListManager& newPathList) {
+//////////////////////////////////////////////////////////////////
 	pathListMgr.reset();
 	pathListMgr = newPathList;
 }
@@ -112,18 +114,29 @@ void PathHandlerBase::traceCurrentPosition() {
 	std::clog << "CurrentPos: " << currentPos << std::endl;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
+void PathHandlerBase::processClientId(long id) {
+//////////////////////////////////////////////////////////////////
+	pathListMgr.addEntryAdm(id);
+}
+//////////////////////////////////////////////////////////////////
+void PathHandlerBase::processSpeed(CncSpeedMode mode, double feedSpeed_MM_MIN) {
+//////////////////////////////////////////////////////////////////
+	pathListMgr.addEntryAdm(mode, feedSpeed_MM_MIN);
+}
+//////////////////////////////////////////////////////////////////
+bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
 		std::cerr << "PathHandlerBase::processMove: Invalid parameter count: " << count << std::endl;
 		return false;
 	}
 	
-	appendDebugValueDetail("Move",c);
+	appendDebugValueDetail("Move", c);
 	
 	bool ret = false;
 	
-	if ( newPath == true ) {
+	if ( nextPath == true ) {
+		// Move to the path start
 		
 		startPos.setX(values[0]);
 		startPos.setY(values[1]);
@@ -132,25 +145,21 @@ bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 		pathListMgr.setReferencePos(currentPos);
 		pathListMgr.setFirstPathFlag(firstPath);
 		
-		if ( firstPath == true ) {
+		if ( firstPath == true )
 			firstPath = false;
-			
-			if ( moveUpZ() == false )
-				return false;
-		}
-		
+
 		//the first move is always absolute!
 		currentPos.setX(startPos.getX());
 		currentPos.setY(startPos.getY());
-		ret = processLinearMove(false);
-		
-		if ( moveDownZ() == false )
-			return false;
 
-		newPath = false;
+		processSpeed(CncSpeedRapid, GBL_CONFIG->getDefaultRapidSpeed_MM_MIN());
+		ret = processLinearMove(false);
+		processSpeed(CncSpeedWork, GBL_CONFIG->getDefaultWorkSpeed_MM_MIN());
 		
+		nextPath = false;
 	}
 	else {
+		// Moving the path
 		double moveX = 0.0, moveY = 0.0;
 
 		if ( c == 'M' ) {
@@ -167,18 +176,17 @@ bool PathHandlerBase::processMove(char c, unsigned int count, double values[]) {
 
 		startPos.setX(currentPos.getX());
 		startPos.setY(currentPos.getY());
-		
-		ret = true;
-		if ( cnc::dblCompareNull(moveX) == false ||
-			 cnc::dblCompareNull(moveY) == false ) {
-			ret = processLinearMove(false);
-		}
+
+		if ( cnc::dblCompareNull(moveX) == false || cnc::dblCompareNull(moveY) == false )
+			return true;
+
+		ret = processLinearMove(false);
 	}
 	
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processClose_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 0 ) {
 		std::cerr << "PathHandlerBase::processClose: Invalid parameter count: " << count << std::endl;
@@ -199,7 +207,7 @@ bool PathHandlerBase::processClose(char c, unsigned int count, double values[]) 
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processLine_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
 		std::cerr << "PathHandlerBase::processLine: Invalid parameter count: " << count << std::endl;
@@ -223,7 +231,7 @@ bool PathHandlerBase::processLine(char c, unsigned int count, double values[]) {
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processHLine_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
 		std::cerr << "PathHandlerBase::processHLine: Invalid parameter count: " << count << std::endl;
@@ -245,7 +253,7 @@ bool PathHandlerBase::processHLine(char c, unsigned int count, double values[]) 
 	return processLinearMove(false);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processVLine(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processVLine_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 1 ) {
 		std::cerr << "PathHandlerBase::processVLine: Invalid parameter count: " << count << std::endl;
@@ -279,7 +287,16 @@ bool PathHandlerBase::callback(const CncCurveLib::Point& p) {
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processARC_2DXY(CncCurveLib::ParameterElliptical& ps) {
+//////////////////////////////////////////////////////////////////
+	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
+	bool ret = ellipticalCurve.render(ps);
+	appendDebugValueDetail(ps);
+
+	return ret;
+}
+//////////////////////////////////////////////////////////////////
+bool PathHandlerBase::processARC_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 7 ) {
 		std::cerr << "PathHandlerBase::processARC: Invalid parameter count: " << count << std::endl;
@@ -321,14 +338,19 @@ bool PathHandlerBase::processARC(char c, unsigned int count, double values[]) {
 	ps.largeArcFlag		= (bool)values[3];
 	ps.sweepFlag		= (bool)values[4];
 	
+	return processARC_2DXY(ps);
+}
+//////////////////////////////////////////////////////////////////
+bool PathHandlerBase::processQuadraticBezier_2DXY(CncCurveLib::ParameterQuadraticBezier& ps) {
+//////////////////////////////////////////////////////////////////
 	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
-	bool ret = ellipticalCurve.render(ps);
+	bool ret = quadraticBezierCurve.render(ps);
 	appendDebugValueDetail(ps);
-	
+
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processQuadraticBezier_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 4 ) {
 		std::cerr << "PathHandlerBase::processQuadraticBezier: Invalid parameter count: " << count << std::endl;
@@ -373,18 +395,26 @@ bool PathHandlerBase::processQuadraticBezier(char c, unsigned int count, double 
 					pCtl = ps.p1;
 	}
 	
-	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
-	bool ret = quadraticBezierCurve.render(ps);
-	appendDebugValueDetail(ps);
-	
-	// Store the last control point
-	CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
-	lastControlPoint.setLastQuadraticBezierControlPoint(cp, pCtl);
-	
+	const bool ret = processQuadraticBezier_2DXY(ps);
+	if ( ret == true ) {
+		// Store the last control point
+		CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
+		lastQuadraticControlPoint.setControlPoint(cp, pCtl);
+	}
+
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCubicBezier_2DXY(CncCurveLib::ParameterCubicBezier& ps) {
+//////////////////////////////////////////////////////////////////
+	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
+	bool ret = cubicBezierCurve.render(ps);
+	appendDebugValueDetail(ps);
+
+	return ret;
+}
+//////////////////////////////////////////////////////////////////
+bool PathHandlerBase::processCubicBezier_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 6 ) {
 		std::cerr << "PathHandlerBase::processCubicBezier: Invalid parameter count: " << count << std::endl;
@@ -433,18 +463,17 @@ bool PathHandlerBase::processCubicBezier(char c, unsigned int count, double valu
 					pCtl = ps.p2;
 	}
 	
-	// render - releases PathHandlerBase::callback(const CncCurveLib::Point& p)
-	bool ret = cubicBezierCurve.render(ps);
-	appendDebugValueDetail(ps);
-	
-	// Store the last control point
-	CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
-	lastControlPoint.setLastCubicBezierControlPoint(cp, pCtl);
-	
+	const bool ret = processCubicBezier_2DXY(ps);
+	if ( ret == true ) {
+		// Store the last control point
+		CncCurveLib::Point cp{currentPos.getX(), currentPos.getY()};
+		lastCubicControlPoint.setControlPoint(cp, pCtl);
+	}
+
 	return ret;
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processQuadraticBezierSmooth_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 2 ) {
 		std::cerr << "PathHandlerBase::processQuadraticBezierSmooth: Invalid parameter count: " << count << std::endl;
@@ -456,18 +485,18 @@ bool PathHandlerBase::processQuadraticBezierSmooth(char c, unsigned int count, d
 	CncCurveLib::Point p0 = {currentPos.getX(), currentPos.getY()};
 	values[3] = values[1];
 	values[2] = values[0];
-	values[1] = lastControlPoint.getLastQuadraticBezierControlPoint(p0).y; // todo abs or rel???
-	values[0] = lastControlPoint.getLastQuadraticBezierControlPoint(p0).x; // todo abs or rel???
+	values[1] = lastQuadraticControlPoint.getLastControlPoint(p0).y; // todo abs or rel???
+	values[0] = lastQuadraticControlPoint.getLastControlPoint(p0).x; // todo abs or rel???
 	
 	switch ( c ) {
 		case 't': c = 'q'; break;
 		case 'T': c = 'Q'; break;
 	}
 	
-	return process(c, 4, values);
+	return processCommand_2DXY(c, 4, values);
 }
 //////////////////////////////////////////////////////////////////
-bool PathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCubicBezierSmooth_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( count != 4 ) {
 		std::cerr << "PathHandlerBase::processCubicBezierSmooth: Invalid parameter count: " << count << std::endl;
@@ -481,77 +510,85 @@ bool PathHandlerBase::processCubicBezierSmooth(char c, unsigned int count, doubl
 	values[4] = values[2];
 	values[3] = values[1];
 	values[2] = values[0];
-	values[1] = lastControlPoint.getLastCubicBezierControlPoint(p0).y; // todo abs or rel ???
-	values[0] = lastControlPoint.getLastCubicBezierControlPoint(p0).x; // todo abs or rel ???
+	values[1] = lastCubicControlPoint.getLastControlPoint(p0).y; // todo abs or rel ???
+	values[0] = lastCubicControlPoint.getLastControlPoint(p0).x; // todo abs or rel ???
 	
 	switch ( c ) {
 		case 's': c = 'C'; break;
 		case 'S': c = 'C'; break;
 	}
 	
-	return process(c, 6, values);
+	return processCommand_2DXY(c, 6, values);
 }
 //////////////////////////////////////////////////////////////////
-void PathHandlerBase::debugProcess(char c, unsigned int count, double values[]) {
-//////////////////////////////////////////////////////////////////
-	std::cout << " pcmd: " << c << "(" << count << ") ";
-	
-	for (unsigned int i=0; i<count; i++) {
-		std::cout << "[" << i << "]=" << values[i] << "\t";
-	}	
-	std::cout << "cp(" << currentPos.getX() << ", " << currentPos.getY() << ")" << std::endl;
-}
-//////////////////////////////////////////////////////////////////
-bool PathHandlerBase::process(char c, unsigned int count, double values[]) {
+bool PathHandlerBase::processCommand_2DXY(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 	if ( isInitialized() == false ) {
 		std::cerr << "PathHandlerBase not initialized "<< std::endl;
 		return false;
 	}
+	
+	//------------------------------------------------------------
+	/*
+	auto debug = [&](char c, unsigned int count, double values[]) {
+		std::cout << " pcmd: " << c << "(" << count << ") ";
+		
+		for (unsigned int i=0; i<count; i++)
+			std::cout << "[" << i << "]=" << values[i] << "\t";
+			
+		std::cout << "cp(" << currentPos.getX() << ", " << currentPos.getY() << ")" << std::endl;
+	};
 
 	// only to debug
-	//debugProcess(c, count, values);
-
+	debug(c, count, values);
+	*/
+	
 	bool ret = false;
 	switch ( c ) {
 		case 'm':
-		case 'M': 	lastControlPoint.reset(); 
-					ret = processMove(c, count, values); 
+		case 'M': 	lastQuadraticControlPoint.reset();
+					lastCubicControlPoint.reset();
+					ret = processMove_2DXY(c, count, values);
 					break;
 		case 'l':
-		case 'L': 	lastControlPoint.reset(); 
-					ret = processLine(c, count, values); 
+		case 'L': 	lastQuadraticControlPoint.reset();
+					lastCubicControlPoint.reset();
+					ret = processLine_2DXY(c, count, values);
 					break;
 		case 'h':
-		case 'H': 	lastControlPoint.reset(); 
-					ret = processHLine(c, count, values); 
+		case 'H': 	lastQuadraticControlPoint.reset();
+					lastCubicControlPoint.reset();
+					ret = processHLine_2DXY(c, count, values);
 					break;
 		case 'v':
-		case 'V': 	lastControlPoint.reset(); 
-					ret = processVLine(c, count, values); 
+		case 'V': 	lastQuadraticControlPoint.reset();
+					lastCubicControlPoint.reset();
+					ret = processVLine_2DXY(c, count, values);
 					break;
 		case 'z':
-		case 'Z': 	lastControlPoint.reset(); 
-					ret = processClose(c, count, values); 
+		case 'Z': 	lastQuadraticControlPoint.reset();
+					lastCubicControlPoint.reset();
+					ret = processClose_2DXY(c, count, values);
 					break;
 		case 'a':
-		case 'A': 	lastControlPoint.reset(); 
-					ret = processARC(c, count, values); 
+		case 'A': 	lastQuadraticControlPoint.reset();
+					lastCubicControlPoint.reset();
+					ret = processARC_2DXY(c, count, values);
 					break;
 		case 'c':
-		case 'C': 	ret = processCubicBezier(c, count, values); 
+		case 'C': 	ret = processCubicBezier_2DXY(c, count, values);
 					break;
 		case 's':
-		case 'S': 	ret = processCubicBezierSmooth(c, count, values); 
+		case 'S': 	ret = processCubicBezierSmooth_2DXY(c, count, values);
 					break;
 		case 'q':
-		case 'Q': 	ret = processQuadraticBezier(c, count, values); 
+		case 'Q': 	ret = processQuadraticBezier_2DXY(c, count, values);
 					break;
 		case 't':
-		case 'T': 	ret = processQuadraticBezierSmooth(c, count, values); 
+		case 'T': 	ret = processQuadraticBezierSmooth_2DXY(c, count, values);
 					break;
 		default: 
-			std::cerr << "PathHandlerBase: Unkown command: " << c << std::endl;
+			std::cerr << "PathHandlerBase::processRelease_2DXY() Unkown command: " << c << std::endl;
 			ret = false;
 	}
 	
@@ -560,12 +597,13 @@ bool PathHandlerBase::process(char c, unsigned int count, double values[]) {
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::prepareWork() {
 //////////////////////////////////////////////////////////////////
+	pathListMgr.clear();
 	totalLength = 0.0;
 }
 //////////////////////////////////////////////////////////////////
 bool PathHandlerBase::initNextPath() {
 //////////////////////////////////////////////////////////////////
-	newPath = true;
+	nextPath = true;
 	pathListMgr.reset();
 	return true;
 }

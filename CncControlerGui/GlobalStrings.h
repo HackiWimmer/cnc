@@ -32,6 +32,8 @@ struct GlobalConstStringDatabase {
 
 	// position spy
 	const wxString posSpyRefFormat		= wxString("%08ld");
+	const wxString pathListRefFormat	= wxString("%08ld");
+	const wxString gcodeSeqRefFormat	= wxString("%08ld");
 	
 };
 

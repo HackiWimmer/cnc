@@ -31,31 +31,31 @@ void cnc::traceLineNumberTranslater(std::ostream& s, const LineNumberTranslater&
 	}
 }
 //////////////////////////////////////////////////////////////
-bool cnc::dblCompare( double a, double b, double eps) {
+bool cnc::dblCompare(const double a, const double b, const double eps) {
 //////////////////////////////////////////////////////////////
 	return std::abs(a - b) <= eps; 
 }
 //////////////////////////////////////////////////////////////
-bool cnc::dblCompareNull( double a, double eps) {
+bool cnc::dblCompareNull(const double a, const double eps) {
 //////////////////////////////////////////////////////////////
 	return cnc::dblCompare(a, 0.0, eps);
 }
 //////////////////////////////////////////////////////////////
-const wxString& cnc::dblFormat1(double d1) {
+const wxString& cnc::dblFormat1(const double d1) {
 //////////////////////////////////////////////////////////////
 	static wxString s;
 	s.assign(wxString::Format("%10.3lf", d1));
 	return s;
 }
 //////////////////////////////////////////////////////////////
-const wxString& cnc::dblFormat2(double d1, double d2, const wxString& delimiter) {
+const wxString& cnc::dblFormat2(const double d1, const double d2, const wxString& delimiter) {
 //////////////////////////////////////////////////////////////
 	static wxString s;
 	s.assign(wxString::Format("%10.3lf%s%10.3lf", d1, delimiter, d2));
 	return s;
 }
 //////////////////////////////////////////////////////////////
-const wxString& cnc::dblFormat3(double d1, double d2, double d3, const wxString& delimiter) {
+const wxString& cnc::dblFormat3(const double d1, const double d2, const double d3, const wxString& delimiter) {
 //////////////////////////////////////////////////////////////
 	static wxString s;
 	s.assign(wxString::Format("%10.3lf%s%10.3lf%s%10.3lf", d1, delimiter, d2, delimiter, d3));

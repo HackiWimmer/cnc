@@ -74,7 +74,7 @@ class BinaryPathHandlerHumanReadableView : public BinaryPathHandlerBase {
 		
 	public:
 		
-		BinaryPathHandlerHumanReadableView(FormatType ft);
+		explicit BinaryPathHandlerHumanReadableView(FormatType ft);
 		virtual ~BinaryPathHandlerHumanReadableView() {}
 		
 		virtual void prepareWork(); 

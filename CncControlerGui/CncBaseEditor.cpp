@@ -36,6 +36,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 , ctlEditMode(NULL)
 , ctlColunmPostion(NULL)
 , ctlStatus(NULL)
+, blockSelectEvent(false)
 , fileLoadingActive(false)
 ///////////////////////////////////////////////////////////////////
 {
@@ -243,7 +244,8 @@ void CncBaseEditor::onUpdateFilePosition() {
 		getCtlColumnPos()->SetLabel(label);
 	
 	// try to select current line as client id
-	THE_APP->updateFileContentPosition(x, y + 1);
+	SelectEventBlocker b(this);
+	THE_APP->tryToSelectClientId(y + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
 	
 	// display gcode help hint
 	if ( getCtlStatus() != NULL )
@@ -654,10 +656,12 @@ void CncBaseEditor::setupModelType() {
 	if ( tf == TplBinary )
 		tf = fileInfo.binaryOrigFomat;
 	
-	#warning  GLContextBase::ModelType::MT_LEFT_HAND ???
 	switch ( tf ) {
 		case TplSvg:		fileInfo.modelType 		= GLContextBase::ModelType::MT_RIGHT_HAND;
-							//fileInfo.modelType 		= GLContextBase::ModelType::MT_LEFT_HAND;
+
+							if ( CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag() )
+								fileInfo.modelType 		= GLContextBase::ModelType::MT_LEFT_HAND;
+
 							fileInfo.modelViewType	= CncDimensions::CncDimension2D; 
 							break;
 							

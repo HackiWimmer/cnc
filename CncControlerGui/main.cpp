@@ -100,6 +100,7 @@ class GlobalStreamRedirection {
 			st->Clear();
 			
 			wxTextAttr ta(wxColour(192, 192, 192));
+			/*
 			wxFont oldFont(st->GetFont());
 			wxFont newFont(oldFont);
 			newFont.SetWeight(wxFONTWEIGHT_BOLD);
@@ -112,6 +113,7 @@ class GlobalStreamRedirection {
 						   "-------------------------------------------------------------------\n");
 			
 			ta.SetFont(oldFont);
+			*/
 			st->SetDefaultStyle(ta);
 			bool hasLogOrErr = StartupBuffer::trace(st);
 			mainFrame->GetLoggerNotebook()->SetPageText(LoggerSelection::VAL::STARTUP, (hasLogOrErr == true ? ")-:" : "(-;"));
@@ -410,17 +412,16 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 			std::cerr << std::endl
 					  << "Assertion: " 
-					  << wxString(file) << ": "
-					  << wxString(func) << ": "
-					  << std::endl
-					  << "  Condition : " << wxString(cond)
-					  << std::endl
-					  << "  Message   : " << wxString(msg)
-					  << std::endl
-					  << "  Stacktrace:"
-					  << std::endl;
+					  << wxString(file) 					<< ": "
+					  << wxString(func) 					<< ": "
+					  << wxString::Format("%d", line) 		<< ": "
+															<< std::endl
 					  
-			GblFunc::stacktrace(std::cerr, 6);
+					  << "  Condition : " << wxString(cond) << std::endl
+					  << "  Message   : " << wxString(msg) 	<< std::endl
+					  << "  Stacktrace:"  					<< std::endl;
+					  
+			GblFunc::stacktraceOnlyApp(std::cerr, true);
 		}
 		
 		///////////////////////////////////////////////////////////

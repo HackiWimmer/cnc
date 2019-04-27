@@ -49,6 +49,8 @@ class CncStatisticsPane;
 class CncSvgViewer;
 class CncGameportController;
 class CncSpeedMonitor;
+class CncPreprocessor;
+class CncGCodeSequenceListCtrl;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -112,6 +114,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void showStacktraceStore(wxCommandEvent& event);
 		virtual void updateLogger(wxCommandEvent& event);
 		virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
 		virtual void onSelectSpyOutboundDetails(wxDataViewEvent& event);
@@ -183,7 +186,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void clearSetterList(wxCommandEvent& event);
 		virtual void loopRepeatTest(wxCommandEvent& event);
 		virtual void selectPositionSpyContent(wxCommandEvent& event);
-		virtual void selectPositionSpy(wxListEvent& event);
 		virtual void copyPositionSpy(wxCommandEvent& event);
 		virtual void togglePositionSpy(wxCommandEvent& event);
 		virtual void activateAuiPane(wxAuiManagerEvent& event);
@@ -492,7 +494,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		const char* getCurrentPortName(wxString& ret);
 		
 	protected:
- 
+	
+		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5 };
+		void tryToSelectClientId(long clientId, TemplateSelSource tss);
+		void selectSourceControlLineNumber(long ln);
+
 		// will be bind to this frame
 		void globalKeyDownHook(wxKeyEvent& event);
  
@@ -504,6 +510,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		wxCriticalSection pGamepadThreadCS;
 		
 		CncControl* getCncControl() 			{ return cnc; }
+		CncPreprocessor* getCncPreProcessor()	{ return cncPreprocessor; }
+		
+		CncGCodeSequenceListCtrl* getGCodeSequenceList() { return gCodeSequenceList; }
 		
 		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		void manualContinuousMoveStop();
@@ -547,6 +556,12 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncSecureRun;
 		friend class CncStatisticsPane;
 		friend class CncMonitorReplayPane;
+		friend class PathHandlerBase;
+		friend class CncPathListEntryListCtrl;
+		friend class CncPosSpyListCtrl;
+		friend class GCodeFileParser;
+		friend class CncGCodeSequenceListCtrl;
+		friend class CncPathListRunner;
 		
 	private:
 		// Member variables
@@ -577,6 +592,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncPosSpyListCtrl* 				positionSpy;
 		CncSetterListCtrl* 				setterList;
 		CncSpeedMonitor*				speedMonitor;
+		CncPreprocessor*				cncPreprocessor;
+		CncGCodeSequenceListCtrl*		gCodeSequenceList;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
 		CncSerialSpyListCtrl* 			serialSpyListCtrl;
 		CfgAccelerationGraph* 			accelGraphPanel; 
@@ -738,9 +755,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void toggleMotionMonitorOptionPane(bool forceHide);
 		void toggleMotionMonitorStatisticPane(bool forceHide);
 		
-		void tryToSelectClientId(long clientId);
-		void selectSourceControlLineNumber(long ln);
-			
 		void decoratePortSelector(bool list=false);
 		
 		void updateSetterList();
