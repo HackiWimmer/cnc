@@ -229,7 +229,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		std::cerr << " - nbByte      : " << nbByte << std::endl;
 		std::cerr << " - idx         : " << idx << std::endl;
 		std::cerr << " - portionSize : " << portionSize << std::endl;
-		return returnAndNotify(false);;
+		return returnAndNotify(false);
 	}
 	idx++;
 

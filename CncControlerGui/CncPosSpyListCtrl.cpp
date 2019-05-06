@@ -25,9 +25,9 @@ CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("",	 			wxLIST_FORMAT_LEFT, 	 22);
-	AppendColumn("Reference", 		wxLIST_FORMAT_LEFT, 	 70);
-	AppendColumn("", 				wxLIST_FORMAT_CENTER, 	 22);
+	AppendColumn("Type", 			wxLIST_FORMAT_LEFT, 	 44);
+	AppendColumn("Reference", 		wxLIST_FORMAT_RIGHT, 	 70);
+	AppendColumn("Mode",			wxLIST_FORMAT_CENTER, 	 42);
 	AppendColumn("Speed [mm/min]", 	wxLIST_FORMAT_LEFT, 	100);
 	AppendColumn("X", 				wxLIST_FORMAT_RIGHT,	wxLIST_AUTOSIZE);
 	AppendColumn("Y", 				wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -39,7 +39,7 @@ CncPosSpyListCtrl::CncPosSpyListCtrl(wxWindow *parent, long style)
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
-	SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+	SetBackgroundColour(wxColour(191, 205, 219));
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();

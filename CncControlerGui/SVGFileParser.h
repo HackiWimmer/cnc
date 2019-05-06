@@ -24,15 +24,15 @@ class SVGFileParser : public SVGNodeParser
 {
 	protected:
 	
-		CncControl* cncControl;
-		//SVGPathHandlerCnc* pathHandler;
-		SVGUserAgent svgUserAgent;
+		CncControl* 		cncControl;
+		SVGPathHandlerCnc* 	pathHandler;
+		SVGUserAgent 		svgUserAgent;
 		
-		wxString currentNodeName;
+		wxString 			currentNodeName;
 		
-		wxXmlNode* debugBase;
-		wxXmlNode* debugPath;
-		wxXmlNode* debugDetail;
+		wxXmlNode* 			debugBase;
+		wxXmlNode* 			debugPath;
+		wxXmlNode* 			debugDetail;
 		
 		bool setSVGRootNode(const wxString& w, const wxString& h, const wxString& vb);
 		bool determineUnit (const wxString& uw, const wxString& uh, Unit& u);

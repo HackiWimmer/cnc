@@ -112,6 +112,8 @@ void SerialEmulatorNULL::reset() {
 	lastCommand.restLastCmd();
 	lastSignal = CMD_INVALID;
 	
+	lastCommand.MoveSequence.reset();
+	
 	posReplyThresholdX = 1;
 	posReplyThresholdY = 1;
 	posReplyThresholdZ = 1;
@@ -508,7 +510,7 @@ bool SerialEmulatorNULL::writeData(void *b, unsigned int nbByte) {
 	unsigned char cmd 		= buffer[0];
 	
 	// sequence handling
-	if ( lastCommand.MoveSequence.isActive() ) 
+	if ( lastCommand.MoveSequence.isActive() && cmd != CMD_RESET_CONTROLLER ) 
 		cmd = lastCommand.MoveSequence.cmd;
 	
 	switch ( cmd ) {
@@ -786,7 +788,8 @@ bool SerialEmulatorNULL::writeMoveSeqIntern(unsigned char *buffer, unsigned int 
 	}
 
 	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f)
-	CncCommandDecoder::decodeMoveSequence(buffer, nbByte, lastCommand.MoveSequence.sequence, this);
+	if ( CncCommandDecoder::decodeMoveSequence(buffer, nbByte, lastCommand.MoveSequence.sequence, this) == false )
+		return false;
 
 	// determine handshake
 	lastCommand.MoveSequence.ret = RET_MORE;

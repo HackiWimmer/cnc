@@ -495,7 +495,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 	protected:
 	
-		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5 };
+		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5, TSS_MOVE_SEQ=6 };
 		void tryToSelectClientId(long clientId, TemplateSelSource tss);
 		void selectSourceControlLineNumber(long ln);
 
@@ -561,7 +561,9 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncPosSpyListCtrl;
 		friend class GCodeFileParser;
 		friend class CncGCodeSequenceListCtrl;
+		friend class CncMoveSequenceListCtrl;
 		friend class CncPathListRunner;
+		friend class CncStartPositionResolver;
 		
 	private:
 		// Member variables

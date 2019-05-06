@@ -69,6 +69,9 @@ class SVGPathHandlerCnc : public SVGPathHandlerBase
 		void setCncWorkingParameters(SvgCncParameters& cwp);
 		void setDebugState(bool state) { debugState = state; }
 		
+		virtual void logMeasurementStart();
+		virtual void logMeasurementEnd();
+
 		// path handling
 		virtual void prepareWork();
 		virtual bool initNextPath();

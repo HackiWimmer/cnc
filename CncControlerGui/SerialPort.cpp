@@ -1714,7 +1714,8 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 	}
 	
 	// Always log the start postion
-	cncControl->SerialCallback();
+	if ( cncControl->SerialCallback() == false )
+		return false;
 	
 	// create move sequence write buffer
 	CncMoveSequence::FlushResult result;
@@ -1741,7 +1742,8 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 																						portionCounter + 1
 									 ));
 		// notify
-		cncControl->SerialCallback();
+		if ( cncControl->SerialCallback() == false )
+			return false;
 		
 		const unsigned int portionStart		= *it;
 		const unsigned int portionLength	= (unsigned int)moveSequence[portionStart];
@@ -1784,7 +1786,8 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 			}
 			
 			// notify
-			cncControl->SerialCallback();
+			if ( cncControl->SerialCallback() == false )
+				return false;
 			
 		} else {
 			std::cerr << "SERIAL::processMoveSequence(" << portionCounter << "): Unable to write data" << std::endl;

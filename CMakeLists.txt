@@ -324,6 +324,11 @@ set(SOURCE_FILES
 	CncControlerGui/CncMessageDialog.cpp
 	CncControlerGui/CncMoveSequence.cpp
 	CncControlerGui/CncPathListRunner.cpp
+	CncControlerGui/CncPreprocessor.cpp
+	CncControlerGui/CncPathListEntryListCtrl.cpp
+	CncControlerGui/CncGCodeSequenceListCtrl.cpp
+	CncControlerGui/CncMoveSequenceListCtrl.cpp
+	CncControlerGui/CncStartPositionResolver.cpp
 	CncControlerGui/wxcrafter_bitmaps.cpp
 )
 

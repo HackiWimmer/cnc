@@ -22,12 +22,22 @@ SVGPathHandlerCnc::SVGPathHandlerCnc(CncControl* cnc)
 	wxASSERT(cncControl);
 	
 	CncPathListRunner::Setup& setup = getSetup();
-	setup.analyse		= false;
+	setup.optAnalyse	= GBL_CONFIG->getPreProcessorAnalyseFlag();
 	setup.fileParser	= fileParser;
 }
 //////////////////////////////////////////////////////////////////
 SVGPathHandlerCnc::~SVGPathHandlerCnc() {
 //////////////////////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////////////////////
+void SVGPathHandlerCnc::logMeasurementStart() {
+//////////////////////////////////////////////////////////////////
+	CncPathListRunner::logMeasurementStart();
+}
+//////////////////////////////////////////////////////////////////
+void SVGPathHandlerCnc::logMeasurementEnd() {
+//////////////////////////////////////////////////////////////////
+	CncPathListRunner::logMeasurementEnd();
 }
 //////////////////////////////////////////////////////////////////
 void SVGPathHandlerCnc::initNextClientId(long id) {
@@ -213,7 +223,7 @@ bool SVGPathHandlerCnc::repeatCurrentPath() {
 		return false;
 	
 	// spoolCurrentPath
-	if ( execute(pathListMgr) == false )
+	if ( onPhysicallyExecute(pathListMgr) == false )
 		return false;
 	
 	if ( closeCurrentPath() == false )
@@ -320,13 +330,13 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisUp() {
 	const double prevSpeed 		= cncControl->getConfiguredFeedSpeed_MM_MIN();
 	const CncSpeedMode prevMode = cncControl->getConfiguredSpeedMode();
 
-	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork);
+	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
+		return false;
 	
 	if ( moveLinearZ(moveZ) == false )
 		return false;
 
-	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
-	return true;
+	return cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
 }
 ///////////////////////////////////////////////////////////////////
 bool SVGPathHandlerCnc::physicallyMoveZAxisDown() {
@@ -351,12 +361,12 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisDown() {
 	const double prevSpeed 		= cncControl->getConfiguredFeedSpeed_MM_MIN();
 	const CncSpeedMode prevMode = cncControl->getConfiguredSpeedMode();
 
-	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork);
+	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
+		return false;
 
 	if ( moveLinearZ(moveZ) == false )
 		return false;
 	
-	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
-	return true;
+	return cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
 }
 

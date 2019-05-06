@@ -2,11 +2,12 @@
 #define CNCCONTROLERGUI_CNC_MOVE_SEQUENCE_H
 
 #include <vector>
+#include "OSD/CncTimeFunctions.h"
 #include "CncCommon.h"
 
 class CncMoveSequence {
 
-	private:
+	public:
 
 		// -------------------------------------------------------------------------------
 		struct SequencePoint {
@@ -14,62 +15,24 @@ class CncMoveSequence {
 			int32_t y;
 			int32_t z;
 			int32_t f;
+			long 	clientID;
 
 			struct Parameter {
 				unsigned char 	type			= 0;
 				unsigned int 	necessarySize	= 0;
 			} param;
 
-			SequencePoint() 
-			: param()
-			{
-				this->x = 0;
-				this->y = 0;
-				this->z = 0;
-				this->f = 0;
-			}
-
-			explicit SequencePoint(int32_t z)
-			: param()
-			{
-				this->x = 0;
-				this->y = 0;
-				this->z = z;
-				this->f = 0;
-			}
-
-			SequencePoint(int32_t x, int32_t y)
-			: param()
-			{
-				this->x = x;
-				this->y = y;
-				this->z = 0;
-				this->f = 0;
-			}
-
-			SequencePoint(int32_t x, int32_t y, int32_t z)
-			: param()
-			{
-				this->x = x;
-				this->y = y;
-				this->z = z;
-				this->f = 0;
-			}
-
-			SequencePoint(int32_t x, int32_t y, int32_t z, int32_t f)
-			: param()
-			{
-				this->x = x;
-				this->y = y;
-				this->z = z;
-				this->f = f;
-			}
+			explicit SequencePoint(long clientID)                     				 : x(0), y(0), z(0), f(0), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t z)   								 : x(0), y(0), z(z), f(0), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t x, int32_t y)						 : x(x), y(y), z(0), f(0), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z)			 : x(x), y(y), z(z), f(0), clientID(clientID), param() {}
+			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z, int32_t f) : x(x), y(y), z(z), f(f), clientID(clientID), param() {}
 
 			//                                       pid             + 4                        * value
 			static const unsigned int MaxPointSize = sizeof(int32_t) + ValueInfo::MaxValueCount * sizeof(int32_t);
 
 			bool isOneByte() const { return ( cnc::between(x, -2, +2)               && cnc::between(y, -2, +2)               && cnc::between(z, -2, +2)               && cnc::between(f, -2, +2) ); } 
-			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   &&  cnc::between(z, INT8_MIN, INT8_MAX)  && cnc::between(f, INT8_MIN, INT8_MAX) ); } 
+			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   && cnc::between(z, INT8_MIN, INT8_MAX)  && cnc::between(f, INT8_MIN, INT8_MAX) ); }
 			bool isInt16()   const { return ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX) && cnc::between(f, INT16_MIN, INT16_MAX) ); } 
 			bool isInt32()   const { return ( cnc::between(x, INT32_MIN, INT32_MAX) && cnc::between(y, INT32_MIN, INT32_MAX) && cnc::between(z, INT32_MIN, INT32_MAX) && cnc::between(f, INT32_MIN, INT32_MAX) ); } 
 
@@ -127,7 +90,6 @@ class CncMoveSequence {
 			}
 		};
 
-	public:
 		// -------------------------------------------------------------------------------
 		struct SequenceData {
 			int32_t lengthX	= 0;
@@ -159,24 +121,31 @@ class CncMoveSequence {
 
 	private:
 
-		MoveSequence	sequence;
-		ProtionIndex	portionIndex;
-		SequenceData	data;
+		CncNanoTimestamp	reference;
+		MoveSequence		sequence;
+		ProtionIndex		portionIndex;
+		SequenceData		data;
 		
-		unsigned int 	maxSerialSize;
-		unsigned char	moveCmd;
-		unsigned char*	moveSequenceBuffer;
-		unsigned int	moveSequenceBufferSize;
-		unsigned int 	moveSequenceFlushedSize;
+		unsigned int 		maxSerialSize;
+		unsigned char		moveCmd;
+		unsigned char*		moveSequenceBuffer;
+		unsigned int		moveSequenceBufferSize;
+		unsigned int 		moveSequenceFlushedSize;
 
-		unsigned int 	getHeaderSize() const;
-		unsigned int 	getPointSize()  const;
-		unsigned int 	determineSafeBufferSize() const;
+		long 				curClientId;
+		long 				minClientId;
+		long 				maxClientId;
 
-		unsigned int 	calculateFlushPortionCount();
+		unsigned int 		getHeaderSize() const;
+		unsigned int 		getPointSize()  const;
+		unsigned int 		determineSafeBufferSize() const;
 
-		void 			createBuffer();
-		void 			destroyBuffer();
+		unsigned int 		calculateFlushPortionCount();
+
+		void 				createBuffer();
+		void 				destroyBuffer();
+
+		void 				addClientId(long id);
 
 	public:
 		struct FlushResult {
@@ -202,6 +171,9 @@ class CncMoveSequence {
 
 		bool 					isValid() const						{ return (moveCmd == CMD_MOVE_SEQUENCE || moveCmd == CMD_RENDER_AND_MOVE_SEQUENCE); }
 		unsigned char			getType() const						{ return moveCmd; }
+
+		CncNanoTimestamp		getReference() const				{ return reference; }
+		void					setClientId(long clientId)			{ curClientId = clientId; }
 
 		void 					addMetricPosXYZF(double dx, double dy, double dz, double f);
 
@@ -239,6 +211,9 @@ class CncMoveSequence {
 		int32_t 				getAccumulatedDeltaX()				{ return data.targetX; }
 		int32_t 				getAccumulatedDeltaY()				{ return data.targetY; }
 		int32_t 				getAccumulatedDeltaZ()				{ return data.targetZ; }
+
+		const MoveSequence::const_iterator const_begin() const { return sequence.cbegin(); }
+		const MoveSequence::const_iterator const_end()   const { return sequence.cend(); }
 
 	private:
 

@@ -2,15 +2,21 @@
 #define CNCPREPROCESSOR_H
 
 #include "wxcrafter.h"
+#include "CncMoveSequence.h"
 #include "CncPathListEntry.h"
-#include "CncPathListEntryListCtrl.h"
+
+class CncPathListEntryListCtrl;
+class CncMoveSequenceListCtrl;
 
 class CncPreprocessor : public CncPreprocessorBase {
 	
 	private:
 		CncPathListEntryListCtrl* pathListEntries;
+		CncMoveSequenceListCtrl* moveSequences;
 
 	public:
+		enum ListType{ LT_PATH_LIST, LT_MOVE_SEQUENCE};
+
 		CncPreprocessor(wxWindow* parent);
 		virtual ~CncPreprocessor();
 		
@@ -26,9 +32,10 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void addPathListEntry(const CncPathListEntry& cpe);
 		
 		void clearMoveSequences();
-		//addMoveSequence(...)
+		void addMoveSequenceStart(const CncMoveSequence& seq);
+		void addMoveSequence(const CncMoveSequence& seq);
 		
-		void selectClientId(long id);
+		void selectClientId(long id, ListType lt);
 		
 	protected:
 		virtual void clearMoveSequences(wxCommandEvent& event);

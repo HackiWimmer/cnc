@@ -28,9 +28,10 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 //using namespace std;
 
 // define globally const values
-static const float 	PI 									= 3.14159265;
-static const int 	MAX_PARAMETER_VALUES 				= 10;
+static const float 	PI 									=  3.14159265;
+static const int 	MAX_PARAMETER_VALUES 				=  10;
 static const int 	UNDEFINED_LINE_NUMBER 				= -1;
+static const long	INVALID_CLIENT_ID					= -1L;
 
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };

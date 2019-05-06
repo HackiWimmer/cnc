@@ -11,10 +11,13 @@ class CncPathListRunner {
 	
 	public:
 		struct Setup {
-			CncControl* cnc			= NULL;
-			FileParser*	fileParser	= NULL;
+			CncControl* cnc				= NULL;
+			FileParser*	fileParser		= NULL;
 			
-			bool analyse			= true;
+			bool optAnalyse				= true;
+			bool optSkipEmptyMoves		= true;
+			bool optCombineMoves		= true;
+			
 		};
 		
 		CncPathListRunner::Setup& getSetup() { return setup; }
@@ -27,7 +30,6 @@ class CncPathListRunner {
 		bool onPhysicallyClientIdChange(long idx, const CncPathListEntry& curr);
 		bool onPhysicallySpeedChange(unsigned long idx, const CncPathListEntry& curr);
 		bool onPhysicallyMoveRaw(unsigned long idx, const CncPathListEntry& curr);
-		
 		bool onPhysicallyMoveAnalysed(unsigned long idx, const CncPathListEntry* curr, const CncPathListEntry* next);
 		
 		bool destroyMoveSequence();
@@ -43,9 +45,8 @@ class CncPathListRunner {
 		void logMeasurementStart();
 		void logMeasurementEnd();
 		
-		void switchToolState(bool state);
-		
-		bool execute(const CncPathListManager& plm);
+		void onPhysicallySwitchToolState(bool state);
+		bool onPhysicallyExecute(const CncPathListManager& plm);
 };
 
 #endif

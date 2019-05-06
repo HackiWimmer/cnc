@@ -952,6 +952,15 @@ const bool CncConfig::getInterruptByPosOutOfRangeFlag()				{ PROPERTY(CncWork_Ct
 const bool CncConfig::getInverseCtrlDirectionXFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_X) 		return p->GetValue().GetBool(); }
 const bool CncConfig::getInverseCtrlDirectionYFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Y) 		return p->GetValue().GetBool(); }
 const bool CncConfig::getInverseCtrlDirectionZFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Z) 		return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorAnalyseFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_ANALYSE) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessoSkipEmptyFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorCombineMovesFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES) 		return p->GetValue().GetBool(); }
+
+	#define CncWork_Ctl_PRE_PROSSOR_ANALYSE			"CncWork.Controller/PRE_PROSSOR_ANALYSE"
+	#define CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY		"CncWork.Controller/PRE_PROSSOR_SKIP_EMPTY"
+#define CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES	"CncWork.Controller/PRE_PROSSOR_COMBINE_MOVES"	
+
+
 
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
@@ -1020,3 +1029,4 @@ CncConfig& CncConfig::setMaxDimensionY(const double val) 			{ PROPERTY(CncConfig
 CncConfig& CncConfig::setMaxDimensionZ(const double val) 			{ PROPERTY(CncConfig_MAX_DIMENSION_Z) 					p->SetValue(val); releaseChangedCallback(p); return *this; }
 
 #undef PROPERTY
+

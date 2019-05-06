@@ -152,6 +152,9 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncExceptions.h"/>
+      <File Name="CncStartPositionResolver.h"/>
+      <File Name="CncStartPositionResolver.cpp"/>
       <File Name="CncPreprocessor.h"/>
       <File Name="CncPreprocessor.cpp"/>
       <File Name="CncMoveSequence.h"/>
@@ -354,6 +357,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncMoveSequenceListCtrl.h"/>
+      <File Name="CncMoveSequenceListCtrl.cpp"/>
       <File Name="CncGCodeSequenceListCtrl.cpp"/>
       <File Name="CncGCodeSequenceListCtrl.h"/>
       <File Name="CncPathListEntryListCtrl.cpp"/>

@@ -8,8 +8,12 @@
 /////////////////////////////////////////////////////////////////////////////
 class SVGNodeParser {
 	
-	protected:
+	private:
+		// The path handler has to be compellingly declared private,
+		// to hide it for all derived classes
 		SVGPathHandlerBase* pathHandler;
+
+	protected:
 		
 		bool evaluatePath(const wxString& data);
 		bool processPathCommand(const wxString& para);

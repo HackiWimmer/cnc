@@ -13,7 +13,8 @@
 
 ///////////////////////////////////////////////////////////////////
 CncMoveSequence::CncMoveSequence(unsigned char cmd)
-: sequence()
+: reference(CncTimeFunctions::getNanoTimestamp())
+, sequence()
 , portionIndex()
 , data()
 , maxSerialSize(MAX_SERIAL_BUFFER_SIZE - 4)
@@ -21,6 +22,10 @@ CncMoveSequence::CncMoveSequence(unsigned char cmd)
 , moveSequenceBuffer(NULL)
 , moveSequenceBufferSize(0)
 , moveSequenceFlushedSize(0)
+, curClientId(INVALID_CLIENT_ID)
+, minClientId(INVALID_CLIENT_ID)
+, maxClientId(INVALID_CLIENT_ID)
+
 ///////////////////////////////////////////////////////////////////
 {
 	wxASSERT(isValid());
@@ -33,6 +38,9 @@ CncMoveSequence::~CncMoveSequence() {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::clear() {
 ///////////////////////////////////////////////////////////////////
+	minClientId = INVALID_CLIENT_ID;
+	maxClientId = INVALID_CLIENT_ID;
+
 	sequence.clear();
 	data.reset();
 	destroyBuffer();
@@ -41,6 +49,12 @@ void CncMoveSequence::clear() {
 unsigned int CncMoveSequence::getCount() const {
 ///////////////////////////////////////////////////////////////////
 	return sequence.size();
+}
+///////////////////////////////////////////////////////////////////
+void CncMoveSequence::addClientId(long id) {
+///////////////////////////////////////////////////////////////////
+	minClientId = std::min(id, minClientId);
+	maxClientId = std::min(id, maxClientId);
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncMoveSequence::calculateFlushPortionCount() {
@@ -110,7 +124,7 @@ void CncMoveSequence::addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t
 	if ( dx == 0 && dy == 0 && dz == 0 && f == 0 )
 		return;
 
-	sequence.push_back(SequencePoint(dx, dy, dz, f));
+	sequence.push_back(SequencePoint(curClientId, dx, dy, dz, f));
 	data.add(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
@@ -141,19 +155,22 @@ bool CncMoveSequence::flush(FlushResult& result) {
 
 	result.reset();
 
-	const unsigned int flushedCount = flushData(result);
-	if ( flushedCount == 0 )
-		return false;
+	if ( getCount() > 0 ) {
 
-	const unsigned int flushedSize = getFlushedSize();
-	if ( flushedSize == 0 )
-		return false;
+		const unsigned int flushedCount = flushData(result);
+		if ( flushedCount == 0 )
+			return false;
 
-	result.bufferSize	= getBufferSize();
-	result.flushedSize 	= flushedSize;
-	result.buffer		= (unsigned char*)getBuffer();
-	result.flushedCount	= flushedCount;
-	result.more			= hasMore();
+		const unsigned int flushedSize = getFlushedSize();
+		if ( flushedSize == 0 )
+			return false;
+
+		result.bufferSize	= getBufferSize();
+		result.flushedSize 	= flushedSize;
+		result.buffer		= (unsigned char*)getBuffer();
+		result.flushedCount	= flushedCount;
+		result.more			= hasMore();
+	}
 
 	return true;
 }
@@ -161,6 +178,9 @@ bool CncMoveSequence::flush(FlushResult& result) {
 unsigned int CncMoveSequence::flushData(FlushResult& result) {
 ///////////////////////////////////////////////////////////////////
 	if ( isValid() == false )
+		return 0;
+
+	if ( getCount() <= 0 )
 		return 0;
 
 	createBuffer();

@@ -280,6 +280,9 @@ class CncConfig {
 		const bool getInverseCtrlDirectionXFlag();
 		const bool getInverseCtrlDirectionYFlag();
 		const bool getInverseCtrlDirectionZFlag();
+		const bool getPreProcessorAnalyseFlag();
+		const bool getPreProcessoSkipEmptyFlag();
+		const bool getPreProcessorCombineMovesFlag();
 		
 		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
 		const double getWorkpieceThickness()					{ return workpieceThickness; }

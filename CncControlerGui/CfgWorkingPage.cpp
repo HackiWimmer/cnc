@@ -23,10 +23,24 @@ void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 		CncConfig::getGlobalCncConfig()->calculateThresholds();
 		app->releaseControllerSetupFromConfig();
 		
-	} else if ( name == CncWork_Wpt_MAX_THICKNESS_CROSS ) {
+	} 
+	else if ( name == CncWork_Wpt_MAX_THICKNESS_CROSS ) {
 		CncConfig::getGlobalCncConfig()->initZAxisValues();
 		app->changeCrossingThickness();
 		
+	}
+	else if ( name == CncWork_Ctl_PRE_PROSSOR_ANALYSE ) {
+		wxPGProperty* p = getProperty(CncWork_Ctl_PRE_PROSSOR_ANALYSE); 
+		wxASSERT(p); 
+		const bool analyse = p->GetValue().GetBool();
+		
+		p = getProperty(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY); 
+		wxASSERT(p); 
+		p->Enable(analyse);
+		
+		p = getProperty(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES); 
+		wxASSERT(p); 
+		p->Enable(analyse);
 	}
 }
 ////////////////////////////////////////////////////////////////////////
@@ -170,7 +184,34 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetHelpString(_T(""));
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_INVERSE_CTL_DIRECTION_Z, prop);
+		}
+		
+		//...................
+		ctl = NULL;
+		curCatName.assign("Preprocessor");
+		ctl = root->AppendChild( new wxPropertyCategory(curCatName));
+		registerCategory(curCatName, ctl);
+		{
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Analyse Pathes", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_ANALYSE, prop);
 			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Skip empty moves", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY, prop);
+			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Combine moves", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES, prop);
 		}
 	}
 }

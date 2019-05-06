@@ -166,9 +166,9 @@ void UpdateManagerThread::popAndFormatPosSpyQueue() {
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_REF, 	wxString::Format(rFormat, 		lpse.pos.id));
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_T, 		wxString::Format("%c", 			lpse.pos.speedMode));
 								posSpyRow.updateItem(CncPosSpyListCtrl::COL_F, 		speedInfo);
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%ld", 		(long)lpse.pos.pos.getX()));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%ld", 		(long)lpse.pos.pos.getY()));
-								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%ld", 		(long)lpse.pos.pos.getZ()));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_X, 		wxString::Format("%ld", 		(long)(lpse.pos.pos.getX())));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Y, 		wxString::Format("%ld", 		(long)(lpse.pos.pos.getY())));
+								posSpyRow.updateItem(CncPosSpyListCtrl::COL_Z, 		wxString::Format("%ld", 		(long)(lpse.pos.pos.getZ())));
 		}
 		
 		posSpyStringQueue.push(posSpyRow);

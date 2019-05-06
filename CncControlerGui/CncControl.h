@@ -170,12 +170,12 @@ class CncControl {
 		double getConfiguredFeedSpeed_MM_MIN() 		{ return configuredFeedSpeed_MM_MIN; }
 		
 		// Change the current speed parameter
-		void changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s);
+		bool changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s);
 		void setDefaultRapidSpeed_MM_MIN(double s);
 		void setDefaultWorkSpeed_MM_MIN(double s);
 		
-		void changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
-		void changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
+		bool changeCurrentFeedSpeedXYZ_MM_SEC(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
+		bool changeCurrentFeedSpeedXYZ_MM_MIN(double value = 0.0, CncSpeedMode s = CncSpeedUserDefined);
 		
 		// signal wrapper
 		bool sendInterrupt() 		{ wxASSERT(serialPort); return serialPort->sendInterrupt(); }
@@ -230,7 +230,7 @@ class CncControl {
 		// Callback fromS Serial with a controller message
 		bool SerialMessageCallback(const ControllerMsgInfo& cmi);
 		//interrupt the processing
-		void interrupt();
+		void interrupt(const char* why = NULL);
 		void resetInterrupt();
 		bool isInterrupted();
 		bool reset();

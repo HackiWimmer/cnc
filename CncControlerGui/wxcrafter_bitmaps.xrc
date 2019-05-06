@@ -284,6 +284,7 @@
   <object class="wxBitmap" name="bullet-wrench">bitmaps\bullet-wrench.png</object>
   <object class="wxBitmap" name="car">bitmaps\car.png</object>
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
+  <object class="wxBitmap" name="chart-line-error (2)">bitmaps\chart-line-error (2).png</object>
   <object class="wxBitmap" name="circle_red16">bitmaps\Icons\circle_red16.ico</object>
   <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
   <object class="wxBitmap" name="color-swatch">bitmaps\color-swatch.png</object>
@@ -395,6 +396,7 @@
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
+  <object class="wxBitmap" name="target-200">bitmaps\target-200.png</object>
   <object class="wxBitmap" name="time-add">bitmaps\time-add.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>

@@ -34,9 +34,11 @@ CncPathListRunner::~CncPathListRunner() {
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::destroyMoveSequence() {
 //////////////////////////////////////////////////////////////////	
+	bool ret = true;
+	
 	if ( currentSequence != NULL ) {
 		if ( currentSequence->getCount() > 0 ) {
-			publishMoveSequence();
+			ret = publishMoveSequence();
 			
 			//std::cerr << "CncPathListRunner::destroyMoveSequence(): Sequence isn't empty. Size = " << currentSequence->getCount() << std::endl;
 			//std::cerr << " Missing publishMoveSequence() before. All these entries are lost!" << std::endl;
@@ -45,38 +47,47 @@ bool CncPathListRunner::destroyMoveSequence() {
 		delete currentSequence;
 		currentSequence = NULL;
 	}
-	return true;
+
+	return ret;
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::initNextMoveSequence() {
 //////////////////////////////////////////////////////////////////
-	if ( destroyMoveSequence() == false ) {
-		std::cerr << "CncPathListRunner::initNextMoveSequence(): destroyMoveSequence faild!" << std::endl;
-		return false;
+	if ( setup.optAnalyse == true ) {
+		if ( destroyMoveSequence() == false ) {
+
+			std::cerr << "CncPathListRunner::initNextMoveSequence(): destroyMoveSequence failed!" << std::endl;
+			return false;
+		}
+
+		currentSequence = new CncMoveSequence(CMD_RENDER_AND_MOVE_SEQUENCE);
+		THE_APP->getCncPreProcessor()->addMoveSequenceStart(*currentSequence);
 	}
 	
-	currentSequence = new CncMoveSequence(CMD_RENDER_AND_MOVE_SEQUENCE);
 	return true;
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::publishMoveSequence() {
 //////////////////////////////////////////////////////////////////	
-	if ( currentSequence == NULL ) {
-		std::cerr << "CncPathListRunner::publishMoveSequence(): Invalid Sequence!" << std::endl;
-		return false;
-	}
-	
 	bool ret = true;
-	if ( currentSequence->getCount() > 0 ) {
-		wxASSERT( setup.cnc != NULL );
-		ret = setup.cnc->processMoveSequence(*currentSequence);
+	
+	if ( setup.optAnalyse == true ) {
 		
-		if ( ret == true )
-			currentSequence->clear();
+		if ( currentSequence == NULL ) {
+			std::cerr << "CncPathListRunner::publishMoveSequence(): Invalid Sequence!" << std::endl;
+			return false;
+		}
+
+		THE_APP->getCncPreProcessor()->addMoveSequence(*currentSequence);
+
+		if ( currentSequence->getCount() > 0 ) {
+			wxASSERT( setup.cnc != NULL );
+			ret = setup.cnc->processMoveSequence(*currentSequence);
+
+			if ( ret == true )
+				currentSequence->clear();
+		}
 	}
-		
-		
-		
 		
 	return ret;
 }
@@ -93,7 +104,7 @@ void CncPathListRunner::logMeasurementEnd() {
 	setup.cnc->stopSerialMeasurement();
 }
 //////////////////////////////////////////////////////////////////
-void CncPathListRunner::switchToolState(bool state) {
+void CncPathListRunner::onPhysicallySwitchToolState(bool state) {
 //////////////////////////////////////////////////////////////////
 	state == true ? getSetup().cnc->switchToolOn() 
 	              : getSetup().cnc->switchToolOff();
@@ -106,8 +117,18 @@ bool CncPathListRunner::onPhysicallyClientIdChange(long idx, const CncPathListEn
 		return false;
 	}
 	
+	if ( setup.optAnalyse == true ) {
+		if ( currentSequence != NULL )
+			currentSequence->setClientId(curr.clientId);
+	}
+
 	wxASSERT( setup.cnc != NULL );
+	
+	if ( setup.cnc->isInterrupted() == true )
+		return false;
+		
 	setup.cnc->setClientId(curr.clientId);
+	
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -118,16 +139,26 @@ bool CncPathListRunner::onPhysicallySpeedChange(unsigned long idx, const CncPath
 		return false;
 	}
 	
-	initNextMoveSequence();
-	
 	wxASSERT( setup.cnc != NULL );
-	setup.cnc->changeCurrentFeedSpeedXYZ_MM_MIN(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
-	return true;
+	
+	if ( setup.cnc->isInterrupted() == true )
+		return false;
+	
+	if ( initNextMoveSequence() == false ) {
+		std::cerr << "onPhysicallySpeedChange::onPhysicallySpeedChange(): initNextMoveSequence failed!" << std::endl;
+		return false;
+	}
+	
+	return setup.cnc->changeCurrentFeedSpeedXYZ_MM_MIN(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyMoveRaw(unsigned long idx, const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT( setup.cnc != NULL );
+	
+	if ( setup.cnc->isInterrupted() == true )
+		return false;
+		
 	return setup.cnc->moveRelLinearMetricXYZ(	curr.entryDistance.getX(), 
 												curr.entryDistance.getY(), 
 												curr.entryDistance.getZ(), 
@@ -158,14 +189,19 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, const CncPat
 										0.0);
 
 
+
+	//std::cout << curr->entryDistance << std::endl;
+
+
+	/*
 	if ( next == NULL )
-		publishMoveSequence();
+		;publishMoveSequence();
+	*/
 
-
-	return false;
+	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::execute(const CncPathListManager& plm) {
+bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 //////////////////////////////////////////////////////////////////
 	if ( setup.cnc == NULL ) {
 		std::cerr << "CncPathListRunner::execute(): Invalid cnc control!" << std::endl;
@@ -206,7 +242,7 @@ bool CncPathListRunner::execute(const CncPathListManager& plm) {
 		
 		// postion change
 		if ( curr.isPositionChange() == true ) {
-			if ( setup.analyse == false ) {
+			if ( setup.optAnalyse == false ) {
 				if ( onPhysicallyMoveRaw(distance, curr) == false ) {
 					return deFrost(false);
 				}
@@ -224,5 +260,5 @@ bool CncPathListRunner::execute(const CncPathListManager& plm) {
 		}
 	}
 	
-	return deFrost(true);
+	return deFrost(publishMoveSequence());
 }

@@ -85,7 +85,7 @@ void CncSummaryListCtrl::onSize(wxSizeEvent& event) {
 		Freeze();
 		
 	// first set default sizes depending on content
-	SetColumnWidth(COL_TYPE, 	 26);
+	SetColumnWidth(COL_TYPE, 	 36);
 	SetColumnWidth(COL_PARAM, 	wxLIST_AUTOSIZE);
 	SetColumnWidth(COL_VALUE, 	250);
 	SetColumnWidth(COL_UNIT, 	 80);
@@ -98,6 +98,8 @@ void CncSummaryListCtrl::onSize(wxSizeEvent& event) {
 		
 	if ( IsFrozen() == true )
 		Thaw();
+
+	event.Skip(true);
 }
 /////////////////////////////////////////////////////////////
 void CncSummaryListCtrl::addHeadline(ParameterType pt, const wxString& text) {

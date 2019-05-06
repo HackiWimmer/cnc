@@ -18,6 +18,7 @@
 #include "SerialEmulatorGCodeStreamer.h"
 #include "SerialEmulatorBinaryStreamer.h"
 #include "CncMotionMonitor.h"
+#include "CncExceptions.h"
 #include "CncCommon.h"
 #include "CncContext.h"
 #include "CncControl.h"
@@ -556,11 +557,14 @@ void CncControl::setStartPos() {
 	startAppPos = curAppPos;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::interrupt() {
+void CncControl::interrupt(const char* why) {
 ///////////////////////////////////////////////////////////////////
-	std::cerr << "CncControl: Interrupted" << std::endl;
+	std::cerr << wxString::Format("CncControl: Interrupted: %s", why ? why : "") << std::endl;
+	
 	interruptState = true;
 	switchToolOff(true);
+	
+	throw CncInterruption(why);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncControl::isReadyToRun() {
@@ -720,12 +724,12 @@ bool CncControl::moveZToTop() {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value, CncSpeedMode s) {
+bool CncControl::changeCurrentFeedSpeedXYZ_MM_SEC(double value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
-	changeCurrentFeedSpeedXYZ_MM_MIN(value * 60, s);
+	return changeCurrentFeedSpeedXYZ_MM_MIN(value * 60, s);
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) {
+bool CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 	// always reset the realtime speed value, but don't
 	// use MAX_FEED_SPEED_VALUE here because it is declared as MIN_LONG
@@ -743,8 +747,12 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) 
 		
 		displaySpeedMode(configuredSpeedMode);
 		
-		if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) 
-			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
+		if ( THE_APP->GetBtSpeedControl()->GetValue() == true ) {
+			if ( processSetter(PID_SPEED_FEED_MODE, (int32_t)(configuredSpeedMode)) == false ) {
+				std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_FEED_MODE) failed" << std::endl;
+				return false;
+			}
+		}
 	}
 	
 	// avoid the setter below if nothing will change
@@ -756,12 +764,16 @@ void CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(double value, CncSpeedMode s) 
 		
 		displaySpeedValue(value);
 			
-		if ( processSetter(PID_SPEED_MM_MIN, (int32_t)(configuredFeedSpeed_MM_MIN * DBL_FACT)) == false ) 
+		if ( processSetter(PID_SPEED_MM_MIN, (int32_t)(configuredFeedSpeed_MM_MIN * DBL_FACT)) == false ) {
 			std::cerr << "CncControl::changeCurrentFeedSpeedXYZ_MM_MIN(): processSetter(PID_SPEED_MM_MIN) failed" << std::endl;
+			return false;
+		}
 	}
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s) {
+bool CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s) {
 ///////////////////////////////////////////////////////////////////
 	double value = 0.0;
 	
@@ -769,10 +781,10 @@ void CncControl::changeSpeedToDefaultSpeed_MM_MIN(CncSpeedMode s) {
 		case CncSpeedWork: 			value = GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(); 	break;
 		case CncSpeedRapid:			value = GBL_CONFIG->getDefaultRapidSpeed_MM_MIN();	break;
 		case CncSpeedMax:			value = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();		break;
-		case CncSpeedUserDefined:	return;	
+		case CncSpeedUserDefined:	return true;
 	}
 	
-	changeCurrentFeedSpeedXYZ_MM_MIN(value, s);
+	return changeCurrentFeedSpeedXYZ_MM_MIN(value, s);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::setDefaultRapidSpeed_MM_MIN(double s) { 
@@ -853,7 +865,7 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 		
 		if ( GBL_CONFIG->getInterruptByPosOutOfRangeFlag() == true ) {
 			if ( isPositionOutOfRange(pos, true) == true )
-				interrupt();
+				interrupt("Position Out Of Range");
 		} 
 		else {
 			if ( isPositionOutOfRange(pos, false) == true )
@@ -1099,7 +1111,7 @@ bool CncControl::SerialCallback() {
 	if ( CncAsyncKeyboardState::isEscapePressed() != 0 ) {
 		if ( GBL_CONFIG->getTheApp()->GetBtnEmergenyStop()->IsEnabled() == true ) {
 			std::cerr << "SerialCallback: ESCAPE key detected" << std::endl;
-			interrupt();
+			interrupt("ESCAPE detected");
 		}
 	}
 	
@@ -1854,8 +1866,9 @@ bool CncControl::manualMoveFinest(StepSensitivity s,  const CncLinearDirection x
 	const double yDim = 0.1 * y; // ~ 0.1 mm
 	const double zDim = 0.1 * z; // ~ 0.1 mm
 	
-	//TODO
-	changeCurrentFeedSpeedXYZ_MM_SEC(10.0);
+	//TODO fix 10.0
+	if ( changeCurrentFeedSpeedXYZ_MM_SEC(10.0) == false )
+		return false;
 	
 	if ( prepareSimpleMove() == true ) {
 		ret = moveRelLinearMetricXYZ(xDim, yDim, zDim, false);

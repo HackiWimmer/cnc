@@ -2,6 +2,8 @@
 #include "GlobalStrings.h"
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "CncMoveSequenceListCtrl.h"
+#include "CncPathListEntryListCtrl.h"
 #include "CncPreprocessor.h"
 
 extern GlobalConstStringDatabase globalStrings;
@@ -16,6 +18,10 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 	pathListEntries = new CncPathListEntryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_pathListEntriesPlaceholder, pathListEntries);
 	
+	// move sequences control
+	moveSequences = new CncMoveSequenceListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_moveSequencesPlaceholder, moveSequences);
+
 	const wxFont font = GBL_CONTEXT->outboundListBookFont;
 	m_listbookPreProcessor->GetListView()->SetFont(font);
 }
@@ -37,7 +43,7 @@ void CncPreprocessor::clearPathListEntries() {
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearMoveSequences() {
 //////////////////////////////////////////////////////////////////
-	// todo
+	moveSequences->clear();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::freeze() {
@@ -82,6 +88,47 @@ void CncPreprocessor::enableMoveSequences(bool state) {
 	
 	if ( state == false )
 		clearMoveSequences();
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addMoveSequenceStart(const CncMoveSequence& seq) {
+//////////////////////////////////////////////////////////////////
+	if ( m_btConnectMoveSequences->GetValue() == false ) 
+		return;
+
+	CncColumContainer cc(CncMoveSequenceListCtrl::TOTAL_COL_COUNT);
+	static const wxString fmt(globalStrings.moveSeqRefFormat);
+
+	cc.updateItem(CncMoveSequenceListCtrl::COL_TYPE, wxString::Format("%d",   1));
+	cc.updateItem(CncMoveSequenceListCtrl::COL_REF,  wxString::Format("%lld", seq.getReference()));
+
+	moveSequences->appendItem(cc);
+}
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::addMoveSequence(const CncMoveSequence& seq) {
+//////////////////////////////////////////////////////////////////
+	if ( m_btConnectMoveSequences->GetValue() == false ) 
+		return;
+	
+	// over all entries (SequencePoints)
+	moveSequences->freeze();
+	for ( auto it = seq.const_begin(); it != seq.const_end(); ++it) {
+
+		CncColumContainer cc(CncMoveSequenceListCtrl::TOTAL_COL_COUNT);
+		static const wxString fmt(globalStrings.moveSeqRefFormat);
+
+		cc.updateItem(CncMoveSequenceListCtrl::COL_TYPE, 			wxString::Format("%d", 		3));
+		cc.updateItem(CncMoveSequenceListCtrl::COL_REF, 			wxString::Format("%lld", 	seq.getReference()));
+
+		const CncMoveSequence::SequencePoint sp = *it;
+		cc.updateItem(CncMoveSequenceListCtrl::COL_CLD_ID,			wxString::Format(fmt, 		sp.clientID));
+
+		cc.updateItem(CncMoveSequenceListCtrl::COL_DISTANCE_X,		wxString::Format("%10ld",	(long)sp.x));
+		cc.updateItem(CncMoveSequenceListCtrl::COL_DISTANCE_Y,		wxString::Format("%10ld", 	(long)sp.y));
+		cc.updateItem(CncMoveSequenceListCtrl::COL_DISTANCE_Z,		wxString::Format("%10ld", 	(long)sp.z));
+
+		moveSequences->appendItem(cc);
+	}
+	moveSequences->thaw();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::addPathListEntry(const CncPathListEntry& cpe) {
@@ -139,8 +186,10 @@ void CncPreprocessor::connectPathListEntries(wxCommandEvent& event) {
 	enablePathListEntries(m_btConnectPathListEntries->GetValue());
 }
 //////////////////////////////////////////////////////////////////
-void CncPreprocessor::selectClientId(long id) {
+void CncPreprocessor::selectClientId(long id, ListType lt) {
 //////////////////////////////////////////////////////////////////
-	pathListEntries->searchReferenceById(id);
-	// todo move sequences
+	switch ( lt ) {
+		case LT_PATH_LIST: 		pathListEntries->searchReferenceById(id); 	break;
+		case LT_MOVE_SEQUENCE:	moveSequences->searchReferenceById(id); 	break;
+	}
 }

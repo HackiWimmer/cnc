@@ -104,6 +104,9 @@
 	#define CncWork_Ctl_INVERSE_CTL_DIRECTION_X		"CncWork.Controller/INVERSE_CTL_DIRECTION_X"
 	#define CncWork_Ctl_INVERSE_CTL_DIRECTION_Y		"CncWork.Controller/INVERSE_CTL_DIRECTION_Y"
 	#define CncWork_Ctl_INVERSE_CTL_DIRECTION_Z		"CncWork.Controller/INVERSE_CTL_DIRECTION_Z"
+	#define CncWork_Ctl_PRE_PROSSOR_ANALYSE			"CncWork.Controller/PRE_PROSSOR_ANALYSE"
+	#define CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY		"CncWork.Controller/PRE_PROSSOR_SKIP_EMPTY"
+	#define CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES	"CncWork.Controller/PRE_PROSSOR_COMBINE_MOVES"
 
 #define CncTEST_TEST					"CncTest.Test/DUMMY"
 

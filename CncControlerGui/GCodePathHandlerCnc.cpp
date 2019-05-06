@@ -11,7 +11,7 @@ GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc)
 	changeInputUnit(Unit::mm);
 	
 	CncPathListRunner::Setup& setup = getSetup();
-	setup.analyse		= false;
+	setup.optAnalyse	= GBL_CONFIG->getPreProcessorAnalyseFlag();
 	setup.fileParser	= fileParser;
 }
 //////////////////////////////////////////////////////////////////
@@ -37,7 +37,7 @@ void GCodePathHandlerCnc::finishWorkImpl() {
 bool GCodePathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
 	// execute path list
-	if ( execute(pathListMgr) == false )
+	if ( onPhysicallyExecute(pathListMgr) == false )
 		return false;
 	
 	// default processing
@@ -52,7 +52,7 @@ bool GCodePathHandlerCnc::initNextPath() {
 //////////////////////////////////////////////////////////////////
 void GCodePathHandlerCnc::switchToolState(bool state) {
 //////////////////////////////////////////////////////////////////
-	CncPathListRunner::switchToolState(state);
+	CncPathListRunner::onPhysicallySwitchToolState(state);
 }
 //////////////////////////////////////////////////////////////////
 bool GCodePathHandlerCnc::processDwellIntern(int64_t microseconds) {

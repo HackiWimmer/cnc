@@ -4,7 +4,7 @@
 #include "MainFrame.h"
 #include "GlobalStrings.h"
 #include "CncConfig.h"
-#include "CncPathListEntryListCtrl.h"
+#include "CncMoveSequenceListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
 
@@ -12,13 +12,15 @@ extern GlobalConstStringDatabase globalStrings;
 // CncPathListEntryListCtrl Event Table
 // ----------------------------------------------------------------------------
 
-wxBEGIN_EVENT_TABLE(CncPathListEntryListCtrl, CncLargeScaledListCtrl)
-	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncPathListEntryListCtrl::onSelectListItem)
-	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncPathListEntryListCtrl::onActivateListItem)
+wxBEGIN_EVENT_TABLE(CncMoveSequenceListCtrl, CncLargeScaledListCtrl)
+	EVT_SIZE(CncMoveSequenceListCtrl::onSize)
+	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncMoveSequenceListCtrl::onSelectListItem)
+	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncMoveSequenceListCtrl::onActivateListItem)
 wxEND_EVENT_TABLE()
 
+
 /////////////////////////////////////////////////////////////
-CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
+CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 : CncLargeScaledListCtrl(parent, style)
 , defaultItemAttr()
 , initialItemAttr()
@@ -28,37 +30,30 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 {
 	// add colums
 	AppendColumn("Type",	 		wxLIST_FORMAT_LEFT, 	34);
-	AppendColumn("PathList ID",		wxLIST_FORMAT_LEFT, 	120);
-	AppendColumn("Client ID", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("F [mm/min]",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	
+	AppendColumn("Sequence ID",		wxLIST_FORMAT_LEFT, 	120);
+	AppendColumn("Client ID",	 	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+
 	AppendColumn("X-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Y-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Z-Distance",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	
-	AppendColumn("X-Target", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Y-Target", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Z-Target",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	
-	AppendColumn("Total Length",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	
+
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::NORMAL);
-	
+
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
 	
 	SetBackgroundColour(wxColour(191, 205, 219));
-	
+
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
 	imageList->Add(ImageLibPathList().Bitmap("BMP_NO_CHG"));	// 0
 	imageList->Add(ImageLibPathList().Bitmap("BMP_CLIENT_ID"));	// 1
 	imageList->Add(ImageLibPathList().Bitmap("BMP_SPEED"));		// 2
 	imageList->Add(ImageLibPathList().Bitmap("BMP_POSITION"));	// 3
-	
+
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
-	
+
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
 	defaultItemAttr.SetTextColour(GetTextColour());
@@ -76,22 +71,22 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	speedItemAttr.SetTextColour(GetTextColour());
 }
 /////////////////////////////////////////////////////////////
-CncPathListEntryListCtrl::~CncPathListEntryListCtrl() {
+CncMoveSequenceListCtrl::~CncMoveSequenceListCtrl() {
 /////////////////////////////////////////////////////////////
 }
 /////////////////////////////////////////////////////////////
-int CncPathListEntryListCtrl::OnGetItemColumnImage(long item, long column) const {
+int CncMoveSequenceListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 	//enum Type {CHG_NOTHING=0, CHG_CLIENTID=1, CHG_SPEED=2, CHG_POSITION=3};
 	//imageList->Add(ImageLibPathList().Bitmap("BMP_NO_CHG"));		// 0
 	//imageList->Add(ImageLibPathList().Bitmap("BMP_CLIENT_ID"));	// 1
 	//imageList->Add(ImageLibPathList().Bitmap("BMP_SPEED"));		// 2
 	//imageList->Add(ImageLibPathList().Bitmap("BMP_POSITION"));	// 3
-	
+
 	if ( column == COL_TYPE ) {
-		long type = 0; 
+		long type = 0;
 		getItemText(item, COL_TYPE).ToLong(&type);
-		
+
 		switch ( type ) {
 			case 0:			return 0;
 			case 1:			return 1;
@@ -99,11 +94,11 @@ int CncPathListEntryListCtrl::OnGetItemColumnImage(long item, long column) const
 			case 3:			return 3;
 		}
 	}
-	
+
 	return -1;
 }
 /////////////////////////////////////////////////////////////
-wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
+wxListItemAttr* CncMoveSequenceListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
 	//enum Type {CHG_NOTHING=0, CHG_CLIENTID=1, CHG_SPEED=2, CHG_POSITION=3};
 
@@ -115,39 +110,76 @@ wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
 	return (wxListItemAttr*)(&defaultItemAttr);
 }
 /////////////////////////////////////////////////////////////
-void CncPathListEntryListCtrl::onSelectListItem(wxListEvent& event) {
+void CncMoveSequenceListCtrl::onSelectListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 	long item = event.m_itemIndex;
 	if ( item == wxNOT_FOUND )
 		return;
-	
+
 	setLastSelection(item);
-	
+
 	long ln;
 	getRow(item).getItem(COL_SEARCH).ToLong(&ln);
-	
+
 	SelectEventBlocker blocker(this);
-	THE_APP->tryToSelectClientId(ln, MainFrame::TemplateSelSource::TSS_PATH_LIST);
+	THE_APP->tryToSelectClientId(ln, MainFrame::TemplateSelSource::TSS_MOVE_SEQ);
 }
 /////////////////////////////////////////////////////////////
-void CncPathListEntryListCtrl::onActivateListItem(wxListEvent& event) {
+void CncMoveSequenceListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 	// currently nothing todo
 }
 /////////////////////////////////////////////////////////////
-bool CncPathListEntryListCtrl::searchReference(const wxString& what) {
+void CncMoveSequenceListCtrl::onSize(wxSizeEvent& event) {
+/////////////////////////////////////////////////////////////
+	updateColumnWidth();
+}
+/////////////////////////////////////////////////////////////////////
+void CncMoveSequenceListCtrl::updateColumnWidth() {
+/////////////////////////////////////////////////////////////////////
+	if ( GetColumnCount() <= 0 )
+		return;
+		
+	// avoid flicker
+	if ( IsFrozen() == false )
+		Freeze();
+		
+	int colWidthSum = 0;
+	for ( int i = 0; i < GetColumnCount(); i++ ) {
+		if ( i == COL_STRECH )
+			continue;
+			
+		colWidthSum += GetColumnWidth(i);
+	}
+	
+	const int scrollbarWidth = 26;
+	int size = GetSize().GetWidth() 
+	         - colWidthSum
+			 - scrollbarWidth;
+			 
+	SetColumnWidth(COL_STRECH, size);
+
+	if ( IsFrozen() == true )
+		Thaw();
+}
+
+/////////////////////////////////////////////////////////////
+bool CncMoveSequenceListCtrl::searchReference(const wxString& what) {
 /////////////////////////////////////////////////////////////
 	long ret = searchRow(what, COL_SEARCH);
-	
+
 	if ( ret >= 0 )
 		selectItem(ret);
-	
+
 	return (ret >= 0 );
 }
 /////////////////////////////////////////////////////////////
-bool CncPathListEntryListCtrl::searchReferenceById(const long id) {
+bool CncMoveSequenceListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
 	wxString what(wxString::Format(globalStrings.pathListRefFormat, id));
 	return searchReference(what);
 }
+
+
+
 

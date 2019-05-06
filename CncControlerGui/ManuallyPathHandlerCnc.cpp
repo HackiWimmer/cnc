@@ -51,8 +51,10 @@ bool ManuallyPathHandlerCnc::processLinearMove(const MoveDefinition& md) {
 	switchToolState(md.toolState);
 	
 	// speed handling
-	if ( md.speedMode != lastSpeedMode || md.f != lastSpeedValue )
-		cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(md.f, md.speedMode);
+	if ( md.speedMode != lastSpeedMode || md.f != lastSpeedValue ) {
+		if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(md.f, md.speedMode) == false )
+			return false;
+	}
 	
 	// move
 	if ( md.absoluteMove == true ) {

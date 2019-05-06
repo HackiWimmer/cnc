@@ -56,6 +56,7 @@
 #include <wx/propgrid/advprops.h>
 #include <wx/choicebk.h>
 #include <wx/dialog.h>
+#include <wx/listbox.h>
 #include <wx/bitmap.h>
 #include <wx/icon.h>
 #if wxVERSION_NUMBER >= 2900
@@ -2799,6 +2800,62 @@ public:
     wxButton* GetBtClose() { return m_btClose; }
     CncOSEnvironmentDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Application Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
     virtual ~CncOSEnvironmentDialogBase();
+};
+
+
+class CncStartPositionResolverBase : public wxDialog
+{
+protected:
+    wxStaticBitmap* m_staticBitmap7832;
+    wxStaticText* m_staticText78442;
+    wxTextCtrl* m_currentPositionX;
+    wxTextCtrl* m_currentPositionY;
+    wxTextCtrl* m_currentPositionZ;
+    wxStaticText* m_staticText7874;
+    wxStaticText* m_staticText78464;
+    wxTextCtrl* m_referencePositionX;
+    wxTextCtrl* m_referencePositionY;
+    wxTextCtrl* m_referencePositionZ;
+    wxStaticText* m_staticText7879;
+    wxStaticText* m_staticText78486;
+    wxTextCtrl* m_distanceX;
+    wxTextCtrl* m_distanceY;
+    wxTextCtrl* m_distanceZ;
+    wxStaticText* m_staticText7885;
+    wxStaticText* m_staticText7857;
+    wxListBox* m_sequenceList;
+    wxStaticLine* m_staticLine7836;
+    wxButton* m_button7828;
+    wxButton* m_button7830;
+
+protected:
+    virtual void onOk(wxCommandEvent& event) { event.Skip(); }
+    virtual void onCancel(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticBitmap* GetStaticBitmap7832() { return m_staticBitmap7832; }
+    wxStaticText* GetStaticText78442() { return m_staticText78442; }
+    wxTextCtrl* GetCurrentPositionX() { return m_currentPositionX; }
+    wxTextCtrl* GetCurrentPositionY() { return m_currentPositionY; }
+    wxTextCtrl* GetCurrentPositionZ() { return m_currentPositionZ; }
+    wxStaticText* GetStaticText7874() { return m_staticText7874; }
+    wxStaticText* GetStaticText78464() { return m_staticText78464; }
+    wxTextCtrl* GetReferencePositionX() { return m_referencePositionX; }
+    wxTextCtrl* GetReferencePositionY() { return m_referencePositionY; }
+    wxTextCtrl* GetReferencePositionZ() { return m_referencePositionZ; }
+    wxStaticText* GetStaticText7879() { return m_staticText7879; }
+    wxStaticText* GetStaticText78486() { return m_staticText78486; }
+    wxTextCtrl* GetDistanceX() { return m_distanceX; }
+    wxTextCtrl* GetDistanceY() { return m_distanceY; }
+    wxTextCtrl* GetDistanceZ() { return m_distanceZ; }
+    wxStaticText* GetStaticText7885() { return m_staticText7885; }
+    wxStaticText* GetStaticText7857() { return m_staticText7857; }
+    wxListBox* GetSequenceList() { return m_sequenceList; }
+    wxStaticLine* GetStaticLine7836() { return m_staticLine7836; }
+    wxButton* GetButton7828() { return m_button7828; }
+    wxButton* GetButton7830() { return m_button7830; }
+    CncStartPositionResolverBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Start Position Resolver"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~CncStartPositionResolverBase();
 };
 
 

@@ -54,6 +54,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
+#include "CncExceptions.h"
 #include "CncSourceEditor.h"
 #include "CncOutboundEditor.h"
 #include "CncGameportController.h"
@@ -63,6 +64,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncPosition.h"
 #include "CncPatternDefinitions.h"
 #include "CncUnitCalculator.h"
+#include "CncStartPositionResolver.h"
 #include "CncFileNameService.h"
 #include "CncFilePreviewWnd.h"
 #include "SVGPathHandlerCnc.h"
@@ -820,6 +822,7 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 
+std::cout << wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION).GetAsString() << std::endl;
 
 	std::cout << GBL_CONFIG->connvert_MM_SEC_TO_STP_SEC_X(45.0) << std::endl;
 	std::cout << GBL_CONFIG->connvert_STP_SEC_TO_MM_MIN_X(3000) << std::endl;
@@ -1434,7 +1437,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 				// check if the current connection is effected
 				if ( lastPortName == portName ) {
 					if ( cnc && cnc->isConnected() ) {
-						cnc->interrupt();
+						cnc->interrupt("Serial Device Removed");
 						cnc->disconnect();
 						lastPortName.clear();
 						std::cerr << "Connection brocken" << std::endl;
@@ -3392,18 +3395,34 @@ bool MainFrame::checkIfRunCanBeProcessed(bool confirm) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::checkReferencePositionState() {
 ///////////////////////////////////////////////////////////////////
+	const CncDoublePosition refPos(CncStartPositionResolver::getReferencePosition());
+	const bool zero = ( cnc->getCurAppPosMetric() != refPos );
+
 	if ( isZeroReferenceValid == false ) {
 		const TemplateFormat tf = getCurrentTemplateFormat();
 		if ( tf != TplManual && tf != TplTest ) {
 			wxString msg("The current reference position isn't valid due to a setup change or it isn't not initialized yet.\n");
 			
-			showReferencePositionDlg(msg);
-			
-			// Safety: Always return false in this case because this will
-			// stopp the current startet run. 
-			// Clarify / fix the ref posuition and then restart the run again
-			return false;
+			const int ret = showReferencePositionDlg(msg);
+			if ( ret == wxID_OK && zero == false ) {
+				cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
+				
+				// Safety: Always return false in this case because this will
+				// stopp the current startet run. 
+				return false;
+			}
 		}
+	}
+	
+	// check current position
+	if ( zero ) {
+		CncStartPositionResolver dlg(this);
+		if ( dlg.ShowModal() == wxID_OK )
+			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
+		
+		// Safety: Always return false in this case because this will
+		// stopp the current startet run. 
+		return false;
 	}
 	
 	return true;
@@ -3628,87 +3647,105 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processTemplateWrapper(bool confirm) {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(cnc);
-	bool ret = true;
-	
-	CncRunEventFilter cef;
-	
-	// deactivate idle requests
-	CncTransactionLock ctl(this);
-	
-	// Deactivate observer
-	CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
-	
-	// it's very import to deactivate the notifications during a run
-	// because instead every config change (sc()) will release a notification
-	// this will be the case for example if the SVG path handler changes
-	// the z -axis values . . .
-	// as a result the processing slows down significantly.
-	CncConfig::NotificationDeactivator cfgNotDeactivation;
-	
-	decorateOutboundSaveControls(false);
-	
-	cncPreprocessor->clearAll();
-	
-	wxString fn (getCurrentTemplatePathFileName());
-	if ( fn.IsEmpty() == true )
-		return false;
-	
-	if ( checkReferencePositionState() == false )
-		return false;
-	
-	if ( cnc->isReadyToRun() == false ) {
-		std::cerr << "MainFrame::processTemplateWrapper: Controller isn't ready to run: Run was rejected!" << std::endl;
-		ret = false;
-	}
-	
-	if ( ret == true )
-		ret = checkIfRunCanBeProcessed(confirm);
+	try {
+		wxASSERT(cnc);
+		if ( cnc->isInterrupted() == true ) {
+			std::cerr << "MainFrame::processTemplateWrapper(): Interrupt detected!" << std::endl;
+			return false;
+		}
 		
-	if ( ret == true ) {
+		bool ret = true;
 		
-		// process
-		if ( useSecureRunDlg == true && isDebugMode == false ) {
-			wxASSERT(secureRunDlg);
-			if ( secureRunDlg->IsShown() )
-				secureRunDlg->Show(false);
+		CncRunEventFilter cef;
+		
+		// deactivate idle requests
+		CncTransactionLock ctl(this);
+		
+		// Deactivate observer
+		CncTemplateObserver::Deactivator observerDeactivator(templateObserver);
+		
+		// it's very import to deactivate the notifications during a run
+		// because instead every config change (sc()) will release a notification
+		// this will be the case for example if the SVG path handler changes
+		// the z -axis values . . .
+		// as a result the processing slows down significantly.
+		CncConfig::NotificationDeactivator cfgNotDeactivation;
+		
+		decorateOutboundSaveControls(false);
+		
+		cncPreprocessor->clearAll();
+		
+		wxString fn (getCurrentTemplatePathFileName());
+		if ( fn.IsEmpty() == true )
+			return false;
+		
+		if ( checkReferencePositionState() == false )
+			return false;
+		
+		if ( cnc->isReadyToRun() == false ) {
+			std::cerr << "MainFrame::processTemplateWrapper: Controller isn't ready to run: Run was rejected!" << std::endl;
+			ret = false;
+		}
+		
+		if ( ret == true )
+			ret = checkIfRunCanBeProcessed(confirm);
+			
+		if ( ret == true ) {
+			
+			// process
+			if ( useSecureRunDlg == true && isDebugMode == false ) {
+				wxASSERT(secureRunDlg);
+				if ( secureRunDlg->IsShown() )
+					secureRunDlg->Show(false);
+					
+				ret = (secureRunDlg->ShowModal() == wxID_OK);
 				
-			ret = (secureRunDlg->ShowModal() == wxID_OK);
+			} 
+			else {
+				CncSpeedMonitorRunner smr(speedMonitor, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
+				ret = processTemplateIntern();
+			}
+			
+			motionMonitor->updateMonitorAndOptions();
+			statisticsPane->updateReplayPane();
+		}
+		else {
+			std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed"<< std::endl;
+		}
+		
+		// prepare final statements
+		wxString probeMode(GBL_CONTEXT->isProbeMode() ? "ON" :"OFF");
+		if ( ret == false) {
+			wxString hint("not successfully");
+			cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
+			ctl.setErrorMode();
 			
 		} 
 		else {
-			CncSpeedMonitorRunner smr(speedMonitor, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
-			ret = processTemplateIntern();
+			std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
 		}
 		
-		motionMonitor->updateMonitorAndOptions();
-		statisticsPane->updateReplayPane();
-	}
-	else {
-		std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed"<< std::endl;
-	}
-	
-	// prepare final statements
-	wxString probeMode(GBL_CONTEXT->isProbeMode() ? "ON" :"OFF");
-	if ( ret == false) {
-		wxString hint("not successfully");
-		cnc::cex1 << wxString::Format("%s - Processing(probe mode = %s) finished %s . . .", wxDateTime::UNow().FormatISOTime(), probeMode, hint) << std::endl;
-		ctl.setErrorMode();
+		cnc->traceSpeedInformation();
 		
-	} 
-	else {
-		std::clog << wxString::Format("%s - Processing(probe mode = %s) finished successfully . . .", wxDateTime::UNow().FormatISOTime(), probeMode) << std::endl;
+		Serial::Trigger::EndRun endRun;
+		endRun.succcess = ret;
+		cnc->processTrigger(endRun);
+
+		decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
+
+		return ret;
+	}
+	catch (const CncInterruption& ex) {
+		std::cerr << "MainFrame::processTemplateWrapper(): Exception received:" 
+		          << std::endl
+				  << ex.what()
+				  << std::endl;
+	}
+	catch (...) {
+		std::cerr << "MainFrame::processTemplateWrapper(): Unhandled Exception!" << std::endl;
 	}
 	
-	cnc->traceSpeedInformation();
-	
-	Serial::Trigger::EndRun endRun;
-	endRun.succcess = ret;
-	cnc->processTrigger(endRun);
-
-	decorateOutboundSaveControls(cnc->isOutputAsTemplateAvailable());
-
-	return ret;
+	return false;
 }
 ///////////////////////////////////////////////////////////////////
 // don't call this method directly, instead use processTemplateWrapper
@@ -3952,7 +3989,7 @@ void MainFrame::emergencyStop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
 	std::cerr << "Emergency Stop detected" << std::endl;
-	cnc->interrupt();
+	cnc->interrupt("Emergency Stop detected");
 	setRefPostionState(false);
 }
 ///////////////////////////////////////////////////////////////////
@@ -6402,12 +6439,12 @@ void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
 	
 	if ( tss != TSS_PATH_LIST ) {
 		if ( cncPreprocessor != NULL )
-			cncPreprocessor->selectClientId(clientId);
+			cncPreprocessor->selectClientId(clientId, CncPreprocessor::LT_PATH_LIST);
 	}
 	
-	if ( tss != TSS_GCODE_SEQ ) {
-		if ( gCodeSequenceList != NULL )
-			gCodeSequenceList->searchReferenceById(clientId);
+	if ( tss != TSS_MOVE_SEQ ) {
+		if ( cncPreprocessor != NULL )
+			cncPreprocessor->selectClientId(clientId, CncPreprocessor::LT_MOVE_SEQUENCE);
 	}
 }
 /////////////////////////////////////////////////////////////////////
