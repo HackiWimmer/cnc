@@ -166,7 +166,7 @@ class CncMoveSequence {
 			}
 		};
 
-		explicit CncMoveSequence(unsigned char pid);
+		explicit CncMoveSequence(unsigned char pid = CMD_RENDER_AND_MOVE_SEQUENCE);
 		~CncMoveSequence();
 
 		bool 					isValid() const						{ return (moveCmd == CMD_MOVE_SEQUENCE || moveCmd == CMD_RENDER_AND_MOVE_SEQUENCE); }
@@ -174,6 +174,7 @@ class CncMoveSequence {
 
 		CncNanoTimestamp		getReference() const				{ return reference; }
 		void					setClientId(long clientId)			{ curClientId = clientId; }
+		long					getClientId()						{ return curClientId; }
 
 		void 					addMetricPosXYZF(double dx, double dy, double dz, double f);
 

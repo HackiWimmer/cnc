@@ -1144,7 +1144,7 @@ Resolution:</label>
                                       </object>
                                     </object>
                                     <object class="simplebookpage">
-                                      <label>Page</label>
+                                      <label>GCodes</label>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_panelTplGCodeSequence">
                                         <style>wxTAB_TRAVERSAL</style>
@@ -6180,10 +6180,12 @@ Source</label>
                                               <growablerows>0</growablerows>
                                               <object class="sizeritem">
                                                 <flag>wxALL</flag>
-                                                <border>3</border>
+                                                <border>1</border>
+                                                <minsize>-1,26</minsize>
                                                 <object class="wxStaticText" name="m_staticText6138">
                                                   <label>Serial Outbound File Content:</label>
                                                   <style/>
+                                                  <size>-1,26</size>
                                                   <font>
                                                     <size>12</size>
                                                     <style>normal</style>
@@ -6405,10 +6407,12 @@ Preview</label>
                                               <growablerows/>
                                               <object class="sizeritem">
                                                 <flag>wxALL</flag>
-                                                <border>3</border>
+                                                <border>1</border>
+                                                <minsize>-1,26</minsize>
                                                 <object class="wxStaticText" name="m_staticText6140">
                                                   <label>Serial Outbound File Preview:</label>
                                                   <style/>
+                                                  <size>-1,26</size>
                                                   <font>
                                                     <size>12</size>
                                                     <style>normal</style>
@@ -13796,7 +13800,7 @@ Entries</label>
                   <border>5</border>
                   <option>1</option>
                   <object class="wxFlexGridSizer">
-                    <cols>2</cols>
+                    <cols>3</cols>
                     <rows>1</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
@@ -13816,6 +13820,59 @@ Entries</label>
                           <underlined>0</underlined>
                           <face>Segoe UI</face>
                         </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem" name="flexGridSizer7889">
+                      <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                      <border>5</border>
+                      <option>1</option>
+                      <object class="wxFlexGridSizer">
+                        <cols>3</cols>
+                        <rows>0</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols/>
+                        <growablerows/>
+                        <object class="sizeritem">
+                          <flag>wxALL</flag>
+                          <border>2</border>
+                          <object class="wxStaticText" name="m_staticText7891">
+                            <label>Rows:</label>
+                            <style/>
+                            <font>
+                              <size>8</size>
+                              <style>normal</style>
+                              <weight>bold</weight>
+                              <family>swiss</family>
+                              <underlined>0</underlined>
+                              <face>Segoe UI</face>
+                            </font>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
+                          <flag>wxALL</flag>
+                          <border>2</border>
+                          <minsize>80,-1</minsize>
+                          <object class="wxTextCtrl" name="m_pathListRowCount">
+                            <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
+                            <size>80,-1</size>
+                            <font>
+                              <size>8</size>
+                              <style>normal</style>
+                              <weight>bold</weight>
+                              <family>swiss</family>
+                              <underlined>0</underlined>
+                              <face>Segoe UI</face>
+                            </font>
+                            <value>0</value>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <object class="wxStaticLine" name="m_staticLine7903">
+                            <style>wxLI_VERTICAL</style>
+                          </object>
+                        </object>
                       </object>
                     </object>
                     <object class="sizeritem" name="flexGridSizer7678">
@@ -13858,7 +13915,7 @@ Entries</label>
                             <size>26,26</size>
                             <bitmap>bitmaps/16-mark_word.png</bitmap>
                             <tooltip>
-                              <![CDATA[Toggle Format\nNew Run required]]>
+                              <![CDATA[Toggle Format]]>
                             </tooltip>
                             <checked>1</checked>
                           </object>
@@ -13879,7 +13936,7 @@ Entries</label>
                             <size>26,26</size>
                             <bitmap>bitmaps/dialog-password (2).png</bitmap>
                             <tooltip>
-                              <![CDATA[Consider ClientId Changes\nNew Run required]]>
+                              <![CDATA[Consider ClientId Changes]]>
                             </tooltip>
                             <checked>1</checked>
                           </object>
@@ -13893,7 +13950,7 @@ Entries</label>
                             <size>26,26</size>
                             <bitmap>bitmaps/sports-shuttlecock.png</bitmap>
                             <tooltip>
-                              <![CDATA[Consider FeedSpeed Changes\nNew Run required]]>
+                              <![CDATA[Consider FeedSpeed Changes]]>
                             </tooltip>
                             <checked>1</checked>
                           </object>
@@ -13907,7 +13964,7 @@ Entries</label>
                             <size>26,26</size>
                             <bitmap>bitmaps/draw-line-3.png</bitmap>
                             <tooltip>
-                              <![CDATA[Consider Position Changes\nNew Run required]]>
+                              <![CDATA[Consider Position Changes]]>
                             </tooltip>
                             <checked>1</checked>
                           </object>
@@ -13965,7 +14022,7 @@ Sequences</label>
                   <border>5</border>
                   <option>1</option>
                   <object class="wxFlexGridSizer">
-                    <cols>2</cols>
+                    <cols>3</cols>
                     <rows>1</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
@@ -13985,6 +14042,59 @@ Sequences</label>
                           <underlined>0</underlined>
                           <face>Segoe UI</face>
                         </font>
+                      </object>
+                    </object>
+                    <object class="sizeritem" name="flexGridSizer78891">
+                      <flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+                      <border>5</border>
+                      <option>1</option>
+                      <object class="wxFlexGridSizer">
+                        <cols>3</cols>
+                        <rows>0</rows>
+                        <vgap>0</vgap>
+                        <hgap>0</hgap>
+                        <growablecols/>
+                        <growablerows/>
+                        <object class="sizeritem">
+                          <flag>wxALL</flag>
+                          <border>2</border>
+                          <object class="wxStaticText" name="m_staticText78912">
+                            <label>Rows:</label>
+                            <style/>
+                            <font>
+                              <size>8</size>
+                              <style>normal</style>
+                              <weight>bold</weight>
+                              <family>swiss</family>
+                              <underlined>0</underlined>
+                              <face>Segoe UI</face>
+                            </font>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
+                          <flag>wxALL</flag>
+                          <border>2</border>
+                          <minsize>80,-1</minsize>
+                          <object class="wxTextCtrl" name="m_moveSequenceRowCount">
+                            <style>wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE</style>
+                            <size>80,-1</size>
+                            <font>
+                              <size>8</size>
+                              <style>normal</style>
+                              <weight>bold</weight>
+                              <family>swiss</family>
+                              <underlined>0</underlined>
+                              <face>Segoe UI</face>
+                            </font>
+                            <value>0</value>
+                          </object>
+                        </object>
+                        <object class="sizeritem">
+                          <flag>wxALL|wxEXPAND</flag>
+                          <object class="wxStaticLine" name="m_staticLine7901">
+                            <style>wxLI_VERTICAL</style>
+                          </object>
+                        </object>
                       </object>
                     </object>
                     <object class="sizeritem" name="flexGridSizer76786">
@@ -16411,7 +16521,7 @@ Modules</label>
                     <flag>wxALL</flag>
                     <border>3</border>
                     <object class="wxStaticText" name="m_staticText78442">
-                      <label>Current Position [mm]:</label>
+                      <label>Current Position [x, y, z]:</label>
                       <style/>
                     </object>
                   </object>
@@ -16456,7 +16566,7 @@ Modules</label>
                         <flag>wxALL</flag>
                         <border>5</border>
                         <object class="wxStaticText" name="m_staticText7874">
-                          <label>[x, y, z]</label>
+                          <label>[mm]</label>
                           <style/>
                           <font>
                             <size>9</size>
@@ -16474,7 +16584,7 @@ Modules</label>
                     <flag>wxALL</flag>
                     <border>3</border>
                     <object class="wxStaticText" name="m_staticText78464">
-                      <label>Reference [mm]:</label>
+                      <label>Reference Position [x, y, z]:</label>
                       <style/>
                     </object>
                   </object>
@@ -16519,7 +16629,7 @@ Modules</label>
                         <flag>wxALL</flag>
                         <border>5</border>
                         <object class="wxStaticText" name="m_staticText7879">
-                          <label>[x, y, z]</label>
+                          <label>[mm]</label>
                           <style/>
                           <font>
                             <size>9</size>
@@ -16537,7 +16647,7 @@ Modules</label>
                     <flag>wxALL</flag>
                     <border>3</border>
                     <object class="wxStaticText" name="m_staticText78486">
-                      <label>Distance:</label>
+                      <label>Distance [dx, dy, dz]:</label>
                       <style/>
                     </object>
                   </object>
@@ -16582,7 +16692,7 @@ Modules</label>
                         <flag>wxALL</flag>
                         <border>5</border>
                         <object class="wxStaticText" name="m_staticText7885">
-                          <label>[x, y, z]</label>
+                          <label>[mm]</label>
                           <style/>
                           <font>
                             <size>9</size>

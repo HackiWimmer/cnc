@@ -14,6 +14,9 @@ class CncPreprocessor : public CncPreprocessorBase {
 		CncPathListEntryListCtrl* pathListEntries;
 		CncMoveSequenceListCtrl* moveSequences;
 
+		void updatePathListContent(bool force = false);
+		void updateMoveSequenceListContent(bool force = false);
+		
 	public:
 		enum ListType{ LT_PATH_LIST, LT_MOVE_SEQUENCE};
 
@@ -32,12 +35,16 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void addPathListEntry(const CncPathListEntry& cpe);
 		
 		void clearMoveSequences();
-		void addMoveSequenceStart(const CncMoveSequence& seq);
+		void addMoveSequenceStart(const CncMoveSequence& seq, double value_MM_MIN, char mode);
 		void addMoveSequence(const CncMoveSequence& seq);
 		
 		void selectClientId(long id, ListType lt);
 		
+		void updateContent();
+
 	protected:
+	
+		virtual void moveSequenceChangeContent(wxCommandEvent& event);
 		virtual void clearMoveSequences(wxCommandEvent& event);
 		virtual void clearPathListEntries(wxCommandEvent& event);
 		virtual void connectMoveSequences(wxCommandEvent& event);

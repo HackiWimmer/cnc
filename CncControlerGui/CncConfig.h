@@ -268,6 +268,8 @@ class CncConfig {
 		const CncUnit getDefaultDisplayUnit(void);
 		const char* getDefaultDisplayUnitAsStr();
 		
+		const char getRunConfirmationModeAsChar();
+
 		const bool getAutoConnectFlag();
 		const bool getAutoProcessFlag();
 		const bool getShowTestMenuFlag();

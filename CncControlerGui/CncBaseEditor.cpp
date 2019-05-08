@@ -310,6 +310,9 @@ void CncBaseEditor::gotoEnd() {
 ///////////////////////////////////////////////////////////////////
 bool CncBaseEditor::selectLineNumber(unsigned long ln, const char* searchKey) {
 ///////////////////////////////////////////////////////////////////
+	if ( HasFocus() == true )
+		return false;
+	
 	switch ( fileInfo.format ) {
 		case TplSvg:		return selectLineSvg(ln, searchKey);
 		case TplBinary:		return selectLineBinary(ln);

@@ -937,6 +937,18 @@ void CncConfig::setupSelectorRenderResolution() {
 }
 
 ////////////////////////////////////////////////////////////////////////
+const char CncConfig::getRunConfirmationModeAsChar() {
+////////////////////////////////////////////////////////////////////////
+	wxString mode;
+	getRunConfirmationMode(mode);
+
+	if ( mode.IsEmpty() == true )
+		mode.assign("Always");
+
+	return (char)mode[0];
+}
+
+////////////////////////////////////////////////////////////////////////
 // config getters
 #define PROPERTY( id ) wxPGProperty* p = getProperty(id); wxASSERT(p); 
 

@@ -1622,18 +1622,19 @@ void MainFrame::initialize(void) {
 	decorateOutboundSaveControls(false);
 	toggleMotionMonitorOptionPane(true);
 	toggleMotionMonitorStatisticPane(true);
-	
+
+	// init config pages
+	GetConfigurationToolbook()->SetSelection(0);
+	m_pgMgrSetup->SelectPage(GetConfigurationToolbook()->GetSelection());
+
 	speedMonitor->init(GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
+	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
 	
 	m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
 	
 	perspectiveHandler.setupUserPerspectives();
 	
-	m_speedPanel->SetBackgroundColour(wxColour(234, 234, 234));
-	
 	this->SetTitle(wxString(globalStrings.programTitel) + " " + globalStrings.programVersion);
-	
-	wxString cfgStr;
 	
 	// setup cnc port selector box
 	decoratePortSelector();
@@ -3416,13 +3417,31 @@ bool MainFrame::checkReferencePositionState() {
 	
 	// check current position
 	if ( zero ) {
+		wxASSERT( cnc != NULL );
+
+		bool openDlg = false;
+		switch ( GBL_CONFIG->getRunConfirmationModeAsChar() ) {
+			// Always
+			case 'A':	openDlg = true; break;
+			// Serial Port only
+			case 'S': 	openDlg = !cnc->isEmulator(); break;
+			// Never
+			default:	openDlg = false;
+		}
+
 		CncStartPositionResolver dlg(this);
-		if ( dlg.ShowModal() == wxID_OK )
+		int ret = wxID_OK;
+
+		if ( openDlg == true ) 	ret = dlg.ShowModal();
+		else 					ret = dlg.resolve();
+
+		if ( ret == wxID_OK )
 			cnc::trc.logInfoMessage("Reference Position is fixed now. Please restart");
 		
 		// Safety: Always return false in this case because this will
 		// stopp the current startet run. 
-		return false;
+		if ( openDlg == true )
+			return false;
 	}
 	
 	return true;
@@ -3431,13 +3450,8 @@ bool MainFrame::checkReferencePositionState() {
 bool MainFrame::showConfigSummaryAndConfirmRun() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( cnc );
-	
-	wxString mode;
-	CncConfig::getGlobalCncConfig()->getRunConfirmationMode(mode);
-	if ( mode.IsEmpty() == true )
-		mode.assign("Always");
 		
-	switch ( (char)mode[0] ) {
+	switch ( GBL_CONFIG->getRunConfirmationModeAsChar() ) {
 		// Always
 		case 'A':	break;
 		
@@ -3650,7 +3664,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 	try {
 		wxASSERT(cnc);
 		if ( cnc->isInterrupted() == true ) {
-			std::cerr << "MainFrame::processTemplateWrapper(): Interrupt detected!" << std::endl;
+			std::cerr << "MainFrame::processTemplateWrapper(): Run aborted - Interrupt detected!" << std::endl;
 			return false;
 		}
 		
@@ -3671,13 +3685,14 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// as a result the processing slows down significantly.
 		CncConfig::NotificationDeactivator cfgNotDeactivation;
 		
-		decorateOutboundSaveControls(false);
-		
-		cncPreprocessor->clearAll();
 		
 		wxString fn (getCurrentTemplatePathFileName());
 		if ( fn.IsEmpty() == true )
 			return false;
+
+		clearMotionMonitor();
+		decorateOutboundSaveControls(false);
+		cncPreprocessor->clearAll();
 		
 		if ( checkReferencePositionState() == false )
 			return false;
@@ -5217,9 +5232,18 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 		switch ( sel ) {
 			
 			case OutboundSelection::VAL::MOTION_MONITOR_PANAL:
-									if ( cnc )
-										cnc->updatePreview3D();
-									break;
+			{
+				if ( cnc )
+					cnc->updatePreview3D();
+				break;
+			}
+
+			case OutboundSelection::VAL::PREPOCESSOR_PANAL:
+			{
+				cncPreprocessor->updateContent();
+				break;
+			}
+
 		}
 	}
 }
@@ -6430,11 +6454,10 @@ void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
 	}
 	
 	if ( tss != TSS_MONITOR ) {
-		if ( motionMonitor != NULL )
+		if ( motionMonitor != NULL ) {
 			motionMonitor->setCurrentClientId(clientId);
-			
-		motionMonitor->display();
-		// motionMonitor->display has to be called separatly by the caller
+			motionMonitor->display();
+		}
 	}
 	
 	if ( tss != TSS_PATH_LIST ) {

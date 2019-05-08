@@ -13,6 +13,7 @@ extern GlobalConstStringDatabase globalStrings;
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncPathListEntryListCtrl, CncLargeScaledListCtrl)
+	EVT_SIZE(							CncPathListEntryListCtrl::onSize)
 	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncPathListEntryListCtrl::onSelectListItem)
 	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncPathListEntryListCtrl::onActivateListItem)
 wxEND_EVENT_TABLE()
@@ -24,6 +25,7 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 , initialItemAttr()
 , clientIdItemAttr()
 , speedItemAttr()
+, pathLists()
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -115,6 +117,41 @@ wxListItemAttr* CncPathListEntryListCtrl::OnGetItemAttr(long item) const {
 	return (wxListItemAttr*)(&defaultItemAttr);
 }
 /////////////////////////////////////////////////////////////
+void CncPathListEntryListCtrl::onSize(wxSizeEvent& event) {
+/////////////////////////////////////////////////////////////
+	updateColumnWidth();
+
+	event.Skip(true);
+}
+/////////////////////////////////////////////////////////////////////
+void CncPathListEntryListCtrl::updateColumnWidth() {
+/////////////////////////////////////////////////////////////////////
+	if ( GetColumnCount() <= 0 )
+		return;
+
+	// avoid flicker
+	if ( IsFrozen() == false )
+		Freeze();
+
+	int colWidthSum = 0;
+	for ( int i = 0; i < GetColumnCount(); i++ ) {
+		if ( i == COL_STRECH )
+			continue;
+
+		colWidthSum += GetColumnWidth(i);
+	}
+
+	const int scrollbarWidth = 26;
+	int size = GetSize().GetWidth()
+	         - colWidthSum
+			 - scrollbarWidth;
+
+	SetColumnWidth(COL_STRECH, size);
+
+	if ( IsFrozen() == true )
+		Thaw();
+}
+/////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onSelectListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 	long item = event.m_itemIndex;
@@ -150,4 +187,62 @@ bool CncPathListEntryListCtrl::searchReferenceById(const long id) {
 	wxString what(wxString::Format(globalStrings.pathListRefFormat, id));
 	return searchReference(what);
 }
+/////////////////////////////////////////////////////////////
+void CncPathListEntryListCtrl::clearAll() {
+/////////////////////////////////////////////////////////////
+	pathLists.clear();
+	clear();
+}
+/////////////////////////////////////////////////////////////
+void CncPathListEntryListCtrl::addPathListEntry(const CncPathListEntry& cpe) {
+/////////////////////////////////////////////////////////////
+	pathLists.push_back(cpe);
+}
+/////////////////////////////////////////////////////////////
+void CncPathListEntryListCtrl::updateContent(const UpdateContentInfo& uci, bool force) {
+/////////////////////////////////////////////////////////////
+	if ( force == false && getItemCount() != 0 )
+		return;
+	
+	THE_APP->startAnimationControl();
+	freeze();
+	
+		clear();
+		for ( auto it = pathLists.begin(); it != pathLists.end(); ++it) {
+			const CncPathListEntry& cpe = *it;
 
+			if ( cpe.isNothingChange() 	== true && uci.format					== true )	continue;
+			if ( cpe.isClientIdChange()	== true && uci.considerClientIdChanges	== false )	continue;
+			if ( cpe.isSpeedChange() 	== true && uci.considerSpeedChanges		== false )	continue;
+			if ( cpe.isPositionChange() == true && uci.considerPositionChnages	== false )	continue;
+
+			CncColumContainer cc(CncPathListEntryListCtrl::TOTAL_COL_COUNT);
+			static const wxString fmt(globalStrings.pathListRefFormat);
+
+			const bool displaySpeed    = ( cpe.isSpeedChange()    == true || cpe.isNothingChange() == true );
+			const bool displayPosition = ( cpe.isPositionChange() == true || cpe.isNothingChange() == true );
+
+			cc.updateItem(CncPathListEntryListCtrl::COL_TYPE, 				wxString::Format("%d", 			cpe.type));
+			cc.updateItem(CncPathListEntryListCtrl::COL_REF, 				wxString::Format("%lld", 		cpe.pathListReference));
+			cc.updateItem(CncPathListEntryListCtrl::COL_CLD_ID,				wxString::Format(fmt, 			cpe.clientId));
+
+			if ( displaySpeed == true ) {
+				cc.updateItem(CncPathListEntryListCtrl::COL_F, 				wxString::Format("%4.1lf %c", 	cpe.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(cpe.feedSpeedMode)));
+			}
+
+			if ( displayPosition == true ) {
+				cc.updateItem(CncPathListEntryListCtrl::COL_DISTANCE_X, 	wxString::Format("%10.3lf", 	cpe.entryDistance.getX()));
+				cc.updateItem(CncPathListEntryListCtrl::COL_DISTANCE_Y, 	wxString::Format("%10.3lf", 	cpe.entryDistance.getY()));
+				cc.updateItem(CncPathListEntryListCtrl::COL_DISTANCE_Z, 	wxString::Format("%10.3lf", 	cpe.entryDistance.getZ()));
+				cc.updateItem(CncPathListEntryListCtrl::COL_TARGET_X, 		wxString::Format("%10.3lf", 	cpe.entryTarget.getX()));
+				cc.updateItem(CncPathListEntryListCtrl::COL_TARGET_Y, 		wxString::Format("%10.3lf", 	cpe.entryTarget.getY()));
+				cc.updateItem(CncPathListEntryListCtrl::COL_TARGET_Z, 		wxString::Format("%10.3lf", 	cpe.entryTarget.getZ()));
+				cc.updateItem(CncPathListEntryListCtrl::COL_TOTAL_DISTANCE, wxString::Format("%10.3lf", 	cpe.totalDistance));
+			}
+			
+			appendItem(cc);
+		}
+		
+	thaw();
+	THE_APP->stopAnimationControl();
+}

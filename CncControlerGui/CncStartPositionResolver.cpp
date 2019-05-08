@@ -27,6 +27,8 @@ CncStartPositionResolver::CncStartPositionResolver(wxWindow* parent)
 	format(cp,			m_currentPositionX, 	m_currentPositionY, 	m_currentPositionZ);
 	format(rf,			m_referencePositionX,	m_referencePositionY,	m_referencePositionZ);
 	format(distance, 	m_distanceX, 			m_distanceY, 			m_distanceZ);
+
+	m_sequenceList->SetFocus();
 }
 ///////////////////////////////////////////////////////////////////
 CncStartPositionResolver::~CncStartPositionResolver() {
@@ -39,6 +41,12 @@ void CncStartPositionResolver::onCancel(wxCommandEvent& event) {
 }
 ///////////////////////////////////////////////////////////////////
 void CncStartPositionResolver::onOk(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+
+	EndModal(resolve());
+}
+///////////////////////////////////////////////////////////////////
+int CncStartPositionResolver::resolve() {
 ///////////////////////////////////////////////////////////////////
 	const wxString sel(m_sequenceList->GetStringSelection().AfterFirst(':').Trim(false).Trim(true));
 	
@@ -56,11 +64,10 @@ void CncStartPositionResolver::onOk(wxCommandEvent& event) {
 			
 			if ( ret == false ) {
 				std::cerr << "CncStartPositionResolver::onOk(): Error while resolve '" << token << "'" << std::endl;
-				EndModal(wxID_ABORT);
-				return;
+				return wxID_ABORT;
 			}
 		}
 	}
 	
-	EndModal(wxID_OK);
+	return wxID_OK;
 }

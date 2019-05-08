@@ -1,6 +1,8 @@
 #ifndef CNC_PATH_LIST_ENTRY_LIST_CTRL_H
 #define CNC_PATH_LIST_ENTRY_LIST_CTRL_H
 
+#include <vector>
+#include "CncPathListEntry.h"
 #include "CncLargeScaleListCtrl.h"
 
 class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
@@ -11,10 +13,27 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		wxListItemAttr clientIdItemAttr;
 		wxListItemAttr speedItemAttr;
 		
+		typedef std::vector<CncPathListEntry> PathLists;
+		PathLists pathLists;
+
+		void updateColumnWidth();
+
+		void onSize(wxSizeEvent& event);
+		void onSelectListItem(wxListEvent& event);
+		void onActivateListItem(wxListEvent& event);
+
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		
 	public:
+
+		struct UpdateContentInfo {
+			bool format						= true;
+			bool considerClientIdChanges	= true;
+			bool considerSpeedChanges		= true;
+			bool considerPositionChnages	= true;
+		};
+
 		static const int COL_TYPE 			=  0;
 		static const int COL_REF 			=  1;
 		static const int COL_CLD_ID			=  2;
@@ -30,13 +49,16 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		static const int TOTAL_COL_COUNT	= 11;
 		
 		static const int COL_SEARCH			= COL_CLD_ID;
+		static const int COL_STRECH			= COL_REF;
 		
 		CncPathListEntryListCtrl(wxWindow *parent, long style);
 		virtual ~CncPathListEntryListCtrl();
 		
-		void onSelectListItem(wxListEvent& event);
-		void onActivateListItem(wxListEvent& event);
+		void addPathListEntry(const CncPathListEntry& cpe);
 		
+		void clearAll();
+		void updateContent(const UpdateContentInfo& uci, bool force = false);
+
 		bool searchReference(const wxString& what);
 		bool searchReferenceById(const long id);
 

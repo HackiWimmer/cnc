@@ -244,7 +244,6 @@ bool SVGFileParser::spool() {
 		// important! the current node name has to be set before setCurrentLineNumer() 
 		// to get a correct result in this overlaoded function
 		currentNodeName.assign(uai.nodeName);
-		initNextClientId(uai.lineNumber);
 		registerNextDebugNode(uai.nodeName);
 		
 		if ( runInfo.getCurrentDebugState() == true ) {
@@ -397,7 +396,6 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	if ( pathHandler->initNextPath(sopi) == false )
 		return false;
 	
-	#warning
 	initNextClientId(uai.lineNumber);
 		
 	for ( auto itPiv = uai.pathInfoList.begin(); itPiv != uai.pathInfoList.end(); ++itPiv ) {

@@ -2360,6 +2360,9 @@ protected:
     wxListbook* m_listbookPreProcessor;
     wxPanel* m_panel7622;
     wxStaticText* m_staticText61381;
+    wxStaticText* m_staticText7891;
+    wxTextCtrl* m_pathListRowCount;
+    wxStaticLine* m_staticLine7903;
     wxBitmapToggleButton* m_btConnectPathListEntries;
     wxStaticLine* m_staticLine78021113;
     wxBitmapToggleButton* m_btToogleFormat;
@@ -2372,18 +2375,25 @@ protected:
     wxListCtrl* m_pathListEntriesPlaceholder;
     wxPanel* m_panel7630;
     wxStaticText* m_staticText613814;
+    wxStaticText* m_staticText78912;
+    wxTextCtrl* m_moveSequenceRowCount;
+    wxStaticLine* m_staticLine7901;
     wxBitmapToggleButton* m_btConnectMoveSequences;
     wxBitmapButton* m_btClearMoveSequences;
     wxListCtrl* m_moveSequencesPlaceholder;
 
 protected:
     virtual void connectPathListEntries(wxCommandEvent& event) { event.Skip(); }
+    virtual void moveSequenceChangeContent(wxCommandEvent& event) { event.Skip(); }
     virtual void clearPathListEntries(wxCommandEvent& event) { event.Skip(); }
     virtual void connectMoveSequences(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMoveSequences(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText61381() { return m_staticText61381; }
+    wxStaticText* GetStaticText7891() { return m_staticText7891; }
+    wxTextCtrl* GetPathListRowCount() { return m_pathListRowCount; }
+    wxStaticLine* GetStaticLine7903() { return m_staticLine7903; }
     wxBitmapToggleButton* GetBtConnectPathListEntries() { return m_btConnectPathListEntries; }
     wxStaticLine* GetStaticLine78021113() { return m_staticLine78021113; }
     wxBitmapToggleButton* GetBtToogleFormat() { return m_btToogleFormat; }
@@ -2396,6 +2406,9 @@ public:
     wxListCtrl* GetPathListEntriesPlaceholder() { return m_pathListEntriesPlaceholder; }
     wxPanel* GetPanel7622() { return m_panel7622; }
     wxStaticText* GetStaticText613814() { return m_staticText613814; }
+    wxStaticText* GetStaticText78912() { return m_staticText78912; }
+    wxTextCtrl* GetMoveSequenceRowCount() { return m_moveSequenceRowCount; }
+    wxStaticLine* GetStaticLine7901() { return m_staticLine7901; }
     wxBitmapToggleButton* GetBtConnectMoveSequences() { return m_btConnectMoveSequences; }
     wxBitmapButton* GetBtClearMoveSequences() { return m_btClearMoveSequences; }
     wxListCtrl* GetMoveSequencesPlaceholder() { return m_moveSequencesPlaceholder; }

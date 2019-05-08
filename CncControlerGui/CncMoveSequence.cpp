@@ -124,6 +124,7 @@ void CncMoveSequence::addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t
 	if ( dx == 0 && dy == 0 && dz == 0 && f == 0 )
 		return;
 
+	//std::cout << "CncMoveSequence::addStepPosXYZF: " << curClientId << std::endl;
 	sequence.push_back(SequencePoint(curClientId, dx, dy, dz, f));
 	data.add(dx, dy, dz);
 }

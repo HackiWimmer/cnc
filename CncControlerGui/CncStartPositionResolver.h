@@ -9,6 +9,8 @@ class CncStartPositionResolver : public CncStartPositionResolverBase {
 		CncStartPositionResolver(wxWindow* parent);
 		virtual ~CncStartPositionResolver();
 		
+		int resolve();
+
 		static const CncDoublePosition& getReferencePosition() { return ReferencePosition; }
 		
 	protected:
