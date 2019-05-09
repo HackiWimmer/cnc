@@ -88,11 +88,6 @@ const wxString& SerialEmulatorTextStreamer::formatPosition(const CncDoublePositi
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInfo& si) {
-///////////////////////////////////////////////////////////////////
-	// currently nothing to do
-}
-///////////////////////////////////////////////////////////////////
 bool SerialEmulatorTextStreamer::writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
 	if ( buffer == NULL || nbByte == 0 ) {
@@ -106,6 +101,12 @@ bool SerialEmulatorTextStreamer::writeSetterRawCallback(unsigned char *buffer, u
 		return false;
 	}
 	
+	notifySetter(csi);
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+void SerialEmulatorTextStreamer::notifySetter(const CncCommandDecoder::SetterInfo& csi) {
+///////////////////////////////////////////////////////////////////
 	SetterInfo si;
 	si.pid 		= csi.pid;
 	si.values	= csi.values;
@@ -149,34 +150,74 @@ bool SerialEmulatorTextStreamer::writeSetterRawCallback(unsigned char *buffer, u
 			currentSpeedValue = (double)si.values.front() / DBL_FACT;
 	}
 	
-	return writeEncodedSetterCallback(si);
+	writeEncodedSetterCallback(si);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 ///////////////////////////////////////////////////////////////////
-	bodyStream << Streamer::indent3 << wxString::Format("<steps x=\"%ld\" y=\"%ld\" z=\"%ld\" f=\"%ld\"/>\n",
-			                                            (long)dx, (long)dy, (long)dz, (long)f);
+	MoveInfo mi;
+	mi.speedMode 	= currentSpeedMode;
+	mi.speedValue	= currentSpeedValue;
+	mi.cmd 			= '\0';
+	mi.sdx			= dx;
+	mi.sdy			= dy; 
+	mi.sdz			= dz;
+	mi.mdx 			= GBL_CONFIG->convertStepsToMetricX(mi.sdx);
+	mi.mdy 			= GBL_CONFIG->convertStepsToMetricY(mi.sdy);
+	mi.mdz 			= GBL_CONFIG->convertStepsToMetricZ(mi.sdz);
+	
+	if ( writeEncodedMoveSequenceCallback(mi) == true )
+		SerialEmulatorNULL::notifyMove(dx, dy, dz, f);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
-	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceBegin cmd=\"%c\" description=\"%s\"/>\n",
-			                                            sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
-
-
+	if ( writeEncodedMoveSequenceBeginCallback(sequence) == true )
+		SerialEmulatorNULL::notifyMoveSequenceBegin(sequence);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
-	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceNext cmd=\"%c\" description=\"%s\"/>\n",
-			                                            sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
-
+	if ( writeEncodedMoveSequenceNextCallback(sequence) == true )
+		SerialEmulatorNULL::notifyMoveSequenceNext(sequence);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorTextStreamer::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
+	if ( writeEncodedMoveSequenceEndCallback(sequence) == true )
+		SerialEmulatorNULL::notifyMoveSequenceEnd(sequence);
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceCallback(const MoveInfo& mi) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent3 << wxString::Format("<steps x=\"%ld\" y=\"%ld\" z=\"%ld\" f=\"%ld\"/>\n",
+														 (long)mi.sdx, (long)mi.sdy, (long)mi.sdz, (long)0.0);
+
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceBegin cmd=\"%c\" description=\"%s\"/>\n",
+														 sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
+	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceNext cmd=\"%c\" description=\"%s\"/>\n",
+														 sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence) {
+///////////////////////////////////////////////////////////////////
 	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceEnd cmd=\"%c\" description=\"%s\"/>\n",
-			                                            sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+														 sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorTextStreamer::writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte) {

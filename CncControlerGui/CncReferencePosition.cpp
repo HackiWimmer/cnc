@@ -1,3 +1,5 @@
+#include <wx/gdicmn.h>
+#include <wx/richtooltip.h>
 #include "CncReferencePosition.h"
 #include "GlobalFunctions.h"
 #include "CncCommon.h"
@@ -236,12 +238,14 @@ void CncReferencePosition::init(wxInitDialogEvent& event) {
 	m_btZeroZ->SetValue(true);
 	determineZeroMode();
 	
-	showInformation(!infoMessage.IsEmpty());
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::show(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	m_rbStepSensitivity->SetSelection(parentFrame->GetRbStepSensitivity()->GetSelection());
+	
+	if ( event.IsShown() ) 
+		m_infoTimer->Start(200);
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::cancel(wxCommandEvent& event) {
@@ -273,47 +277,31 @@ void CncReferencePosition::selectStepSensitivity(wxCommandEvent& event) {
 	parentFrame->GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
 }
 ///////////////////////////////////////////////////////////////////
-void CncReferencePosition::showInformation(bool show) {
+void CncReferencePosition::showInformation() {
 ///////////////////////////////////////////////////////////////////
-	enum selMode { SM_ZERO = 0, SM_INFO = 1 };
+	static wxBitmap bmp(m_infoBitmap->GetBitmap());
 	
-	m_infoBitmap->SetToolTip(infoMessage);
-	m_textMessage->ChangeValue(infoMessage);
-	m_textMessage->Enable(!infoMessage.IsEmpty());
-	
-	if ( show == false ) {
-		m_infoTimer->Stop();
-		m_infoResultBook->SetSelection(SM_ZERO);
-	}
+	if ( infoMessage.IsEmpty() == false ) {
+		m_infoBitmap->Enable(true);
+		m_infoBitmap->SetBitmap(bmp);
+		
+		wxRichToolTip tip("Additional information", infoMessage);
+		
+		tip.SetIcon(wxICON_INFORMATION);
+		tip.ShowFor(m_btSet);
+	} 
 	else {
-		if ( m_infoResultBook->GetSelection() == SM_INFO ) {
-			showInformation(false);
-			return;
-		}
-			
-		m_infoTimer->Start(3500);
-		m_infoResultBook->SetSelection(SM_INFO);
+		m_infoBitmap->Enable(false);
+		
+		wxBitmap disabled(bmp);
+		m_infoBitmap->SetBitmap(disabled.ConvertToDisabled());
 	}
-	
-	Refresh();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::selectInformation(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	showInformation(!infoMessage.IsEmpty());
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::hideInformation(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	showInformation(false);
-}
-///////////////////////////////////////////////////////////////////
-void CncReferencePosition::infoTimer(wxTimerEvent& event) {
-///////////////////////////////////////////////////////////////////
-	//if ( m_textMessage->HasFocus() )
-	//	return;
-	
-	showInformation(false);
+	if ( m_infoBitmap->IsEnabled() )
+		showInformation();
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::determineZeroMode() {
@@ -325,4 +313,9 @@ void CncReferencePosition::determineZeroMode() {
 	
 	m_btSet->SetLabel(wxString::Format("Zero (%c, %c, %c)", evaluate(m_btZeroX), evaluate(m_btZeroY), evaluate(m_btZeroZ)));
 	m_btSet->Enable(m_btZeroX->GetValue() == true || m_btZeroY->GetValue() == true || m_btZeroZ->GetValue() == true);
+}
+///////////////////////////////////////////////////////////////////
+void CncReferencePosition::onInfoTimer(wxTimerEvent& event) {
+	m_infoTimer->Stop();
+	showInformation();
 }

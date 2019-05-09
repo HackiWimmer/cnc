@@ -330,12 +330,16 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisUp() {
 	const double prevSpeed 		= cncControl->getConfiguredFeedSpeed_MM_MIN();
 	const CncSpeedMode prevMode = cncControl->getConfiguredSpeedMode();
 
+	long prevClientId = cncControl->getClientId();
+	cncControl->setClientId(CLIENT_ID.SVG_Z_UP);
+
 	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
 		return false;
 	
 	if ( moveLinearZ(moveZ) == false )
 		return false;
 
+	cncControl->setClientId(prevClientId);
 	return cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
 }
 ///////////////////////////////////////////////////////////////////
@@ -361,12 +365,18 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisDown() {
 	const double prevSpeed 		= cncControl->getConfiguredFeedSpeed_MM_MIN();
 	const CncSpeedMode prevMode = cncControl->getConfiguredSpeedMode();
 
+	long prevClientId = cncControl->getClientId();
+	cncControl->setClientId(CLIENT_ID.SVG_Z_DOWN);
+
 	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
 		return false;
 
 	if ( moveLinearZ(moveZ) == false )
 		return false;
 	
-	return cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
+	bool ret = cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(prevSpeed, prevMode);
+	cncControl->setClientId(prevClientId);
+
+	return ret;
 }
 

@@ -10,6 +10,11 @@ class SerialEmulatorGCodeStreamer : public SerialEmulatorTextStreamer
 		virtual bool writeEncodedSetterCallback(const SetterInfo& si);
 		virtual bool writeEncodedMoveCallback(const MoveInfo& mi);
 		
+		virtual bool writeEncodedMoveSequenceCallback(const MoveInfo& mi);
+		virtual bool writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence);
+		virtual bool writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence);
+		virtual bool writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence);
+
 		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
 		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
 		virtual void initializePath(const Serial::Trigger::NextPath& tr);
@@ -20,12 +25,6 @@ class SerialEmulatorGCodeStreamer : public SerialEmulatorTextStreamer
 		explicit SerialEmulatorGCodeStreamer(const char *fileName);
 		virtual ~SerialEmulatorGCodeStreamer();
 		
-		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
-		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f);
-		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence);
-		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence);
-		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence);
-
 		virtual bool isOutputAsTemplateAvailable();
 		
 		// returns the class name

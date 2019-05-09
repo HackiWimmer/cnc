@@ -23,7 +23,7 @@ CncSpeedMonitor::CncSpeedMonitor(wxWindow* parent)
 ////////////////////////////////////////////////////////////////
 {
 	wxBitmap bmpOff = ImageLib16().Bitmap("BMP_DISCONNECTED");
-	m_btToggleConnection->SetBitmapDisabled(bmpOff);
+	m_btToggleConnection->SetBitmapDisabled(bmpOff.ConvertToDisabled());
 	
 	m_refreshTimer->Stop();
 	

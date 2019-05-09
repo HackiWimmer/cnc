@@ -1,7 +1,6 @@
 #include <stdint.h>
 #include "CncConfig.h"
 #include "CncArduino.h"
-#include "CncCommandDecoder.h"
 #include "BinaryPathHandlerBase.h"
 
 //------------------------------------------------------------------------------------
@@ -87,6 +86,7 @@ bool BinaryPathHandlerHexView::processCommand(const unsigned char* buffer, int n
 /////////////////////////////////////////////////////////////
 BinaryPathHandlerHumanReadableView::BinaryPathHandlerHumanReadableView(FormatType ft) 
 : BinaryPathHandlerBase()
+, CncCommandDecoder::CallbackInterface()
 , formatType(ft)
 /////////////////////////////////////////////////////////////
 {
@@ -156,6 +156,24 @@ bool BinaryPathHandlerHumanReadableView::displayMetric(const unsigned char* buff
 	return true;
 }
 /////////////////////////////////////////////////////////////
+bool BinaryPathHandlerHumanReadableView::displayMoveSequence(const FormatType ft, const unsigned char* buffer, int nbBytes) {
+/////////////////////////////////////////////////////////////
+	#warning Impl. BinaryPathHandlerHumanReadableView::displayMoveSequence
+	
+	CncCommandDecoder::MoveSequence sequence;
+	
+	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f)
+	if ( CncCommandDecoder::decodeMoveSequence(buffer, nbBytes, sequence, this) == false )
+		return false;
+		
+		
+		
+		
+		
+		
+	return true;
+}
+/////////////////////////////////////////////////////////////
 bool BinaryPathHandlerHumanReadableView::displaySetter(const unsigned char* buffer, int nbBytes) {
 /////////////////////////////////////////////////////////////
 	CncCommandDecoder::SetterInfo si;
@@ -185,23 +203,59 @@ bool BinaryPathHandlerHumanReadableView::processCommand(const unsigned char* buf
 	
 	unsigned char cmd = buffer[0];
 	switch ( cmd ) {
-		case CMD_SETTER:			ret = displaySetter(buffer, nbBytes);
-									break;
+		case CMD_SETTER:
+		{	
+			ret = displaySetter(buffer, nbBytes);
+			break;
+		}
 		
 		case CMD_RENDER_AND_MOVE:
-		case CMD_MOVE:				{
-										switch ( formatType ) {
-											case Steps:		ret = displaySteps(buffer,  nbBytes); 	break;
-											case Metric:	ret = displayMetric(buffer, nbBytes);	break;
-										}
-										
-										break;
-									}
-									
-		default: 					readableContent << "No encoder specified for: " << cmd << std::endl;
-									translateLineNumber(0);
+		case CMD_MOVE:
+		{
+			switch ( formatType ) {
+				case Steps:		ret = displaySteps(buffer,  nbBytes); 	break;
+				case Metric:	ret = displayMetric(buffer, nbBytes);	break;
+			}
+			
+			break;
+		}
+		
+		case CMD_MOVE_SEQUENCE:
+		case CMD_RENDER_AND_MOVE_SEQUENCE:
+		{
+			ret = displayMoveSequence(formatType, buffer, nbBytes);
+			break;
+		}
+		
+		default:
+		{ 
+			readableContent << "No encoder specified for command: '" << cmd << "'" << std::endl;
+			translateLineNumber(0);
+		}
 	}
 	
 	return ret;
 }
-
+/////////////////////////////////////////////////////////////
+void BinaryPathHandlerHumanReadableView::notifySetter(const CncCommandDecoder::SetterInfo& si) {
+/////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////
+void BinaryPathHandlerHumanReadableView::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
+/////////////////////////////////////////////////////////////
+	#warning Impl. BinaryPathHandlerHumanReadableView::notifyMove
+	readableContent << "BinaryPathHandlerHumanReadableView::notifyMove" << std::endl;
+	translateLineNumber(1);
+}
+/////////////////////////////////////////////////////////////
+void BinaryPathHandlerHumanReadableView::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+/////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////
+void BinaryPathHandlerHumanReadableView::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+/////////////////////////////////////////////////////////////
+}
+/////////////////////////////////////////////////////////////
+void BinaryPathHandlerHumanReadableView::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
+/////////////////////////////////////////////////////////////
+}

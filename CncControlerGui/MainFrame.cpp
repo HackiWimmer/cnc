@@ -1498,14 +1498,9 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( lastPortName == _portEmulatorBIN )		m_portSelector->Append(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
 	else										m_portSelector->Append(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	// add com ports (10)
-	int pStart 	= 0;
-	int pEnd 	= 256;
-	
-	if ( list == true ) {
-		pStart 	= 1;
-		pEnd 	= 11;
-	}
+	// add com ports
+	int pStart = list == true ?  1 :  0;
+	int pEnd   = list == true ? 11 : 32;//256;
 	
 	for (int i=pStart; i<pEnd; i++) {
 		int ret = CncUsbPortScanner::isComPortAvailable(i);

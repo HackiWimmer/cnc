@@ -23,8 +23,7 @@ class CncReferencePosition : public CncReferencePositionBase
 		bool shouldZeroZ() 	{ return m_btZeroZ->GetValue(); }
 	
 	protected:
-		virtual void hideInformation(wxCommandEvent& event);
-		virtual void infoTimer(wxTimerEvent& event);
+    virtual void onInfoTimer(wxTimerEvent& event);
 		virtual void selectInformation(wxMouseEvent& event);
 		virtual void selectStepSensitivity(wxCommandEvent& event);
 		virtual void init(wxInitDialogEvent& event);
@@ -55,6 +54,6 @@ class CncReferencePosition : public CncReferencePositionBase
 		
 		bool isWorkpieceThicknessNeeded();
 		void determineZeroMode();
-		void showInformation(bool show);
+		void showInformation();
 };
 #endif // CNCREFERENCEPOSITION_H

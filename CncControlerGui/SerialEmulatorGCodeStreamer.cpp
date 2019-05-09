@@ -28,31 +28,24 @@ bool SerialEmulatorGCodeStreamer::isOutputAsTemplateAvailable() {
 	return false; 
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::notifySetter(const CncCommandDecoder::SetterInfo& si) {
+bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
-	// to overrider the default behavior only
+	return writeEncodedMoveCallback(mi);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
+bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
-	// to overrider the default behavior only
-	#warning impl: SerialEmulatorGCodeStreamer::notifyMove
-	bodyStream << wxString::Format("(< notifyMove(%ld, %ld, %ld, %ld) >)\n", (long)dx, (long)dy, (long)dz, (long)f);
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
-	bodyStream << wxString::Format("(< MoveSequenceBegin(cmd = '%c' - %s) >)\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence) {
 ///////////////////////////////////////////////////////////////////
-	bodyStream << wxString::Format("(< MoveSequenceNext(cmd = '%c' - %s) >)\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
-}
-///////////////////////////////////////////////////////////////////
-void SerialEmulatorGCodeStreamer::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
-///////////////////////////////////////////////////////////////////
-	bodyStream << wxString::Format("(< MoveSequenceEnd(cmd = '%c' - %s) >)\n", sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorGCodeStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {

@@ -22,9 +22,9 @@ CncMoveSequence::CncMoveSequence(unsigned char cmd)
 , moveSequenceBuffer(NULL)
 , moveSequenceBufferSize(0)
 , moveSequenceFlushedSize(0)
-, curClientId(INVALID_CLIENT_ID)
-, minClientId(INVALID_CLIENT_ID)
-, maxClientId(INVALID_CLIENT_ID)
+, curClientId(CLIENT_ID.INVALID)
+, minClientId(CLIENT_ID.INVALID)
+, maxClientId(CLIENT_ID.INVALID)
 
 ///////////////////////////////////////////////////////////////////
 {
@@ -38,8 +38,8 @@ CncMoveSequence::~CncMoveSequence() {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::clear() {
 ///////////////////////////////////////////////////////////////////
-	minClientId = INVALID_CLIENT_ID;
-	maxClientId = INVALID_CLIENT_ID;
+	minClientId = CLIENT_ID.INVALID;
+	maxClientId = CLIENT_ID.INVALID;
 
 	sequence.clear();
 	data.reset();

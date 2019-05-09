@@ -31,7 +31,12 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 static const float 	PI 									=  3.14159265;
 static const int 	MAX_PARAMETER_VALUES 				=  10;
 static const int 	UNDEFINED_LINE_NUMBER 				= -1;
-static const long	INVALID_CLIENT_ID					= -1L;
+
+static struct ClientIds {
+	const long	INVALID					=    -1L;
+	const long	SVG_Z_UP				= -1000L;
+	const long	SVG_Z_DOWN				= -2000L;
+} CLIENT_ID;
 
 enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };

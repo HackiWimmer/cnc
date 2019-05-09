@@ -10202,29 +10202,13 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer7452->Add(m_infoBitmap, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
     
-    m_infoResultBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
-    m_infoResultBook->SetName(wxT("m_infoResultBook"));
-    m_infoResultBook->SetEffect(wxSHOW_EFFECT_SLIDE_TO_LEFT);
-    
-    flexGridSizer7419->Add(m_infoResultBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_panel7418 = new wxPanel(m_infoResultBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_infoResultBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_infoResultBook->AddPage(m_panel7418, _("Page"), false);
-    
-    wxFlexGridSizer* flexGridSizer7429 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer7429->SetFlexibleDirection( wxBOTH );
-    flexGridSizer7429->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer7429->AddGrowableCol(0);
-    flexGridSizer7429->AddGrowableRow(0);
-    m_panel7418->SetSizer(flexGridSizer7429);
-    
     wxFlexGridSizer* flexGridSizer5342 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer5342->SetFlexibleDirection( wxBOTH );
     flexGridSizer5342->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer5342->AddGrowableCol(2);
     flexGridSizer5342->AddGrowableRow(0);
     
-    flexGridSizer7429->Add(flexGridSizer5342, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    flexGridSizer7419->Add(flexGridSizer5342, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
     wxFlexGridSizer* flexGridSizer7440 = new wxFlexGridSizer(2, 3, 0, 0);
     flexGridSizer7440->SetFlexibleDirection( wxBOTH );
@@ -10232,7 +10216,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer5342->Add(flexGridSizer7440, 0, wxALL|wxALIGN_TOP, WXC_FROM_DIP(2));
     
-    m_staticLine74384 = new wxStaticLine(m_panel7418, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(-1,-1)), wxLI_VERTICAL);
+    m_staticLine74384 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer7440->Add(m_staticLine74384, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
@@ -10242,50 +10226,50 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer7440->Add(flexGridSizer7449, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
     
-    m_staticText7442 = new wxStaticText(m_panel7418, wxID_ANY, _("X"), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(-1,-1)), 0);
+    m_staticText7442 = new wxStaticText(this, wxID_ANY, _("X"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText7442Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText7442->SetFont(m_staticText7442Font);
     
     flexGridSizer7449->Add(m_staticText7442, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
     
-    m_staticText7444 = new wxStaticText(m_panel7418, wxID_ANY, _("Y"), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(-1,-1)), 0);
+    m_staticText7444 = new wxStaticText(this, wxID_ANY, _("Y"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText7444Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText7444->SetFont(m_staticText7444Font);
     
     flexGridSizer7449->Add(m_staticText7444, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
     
-    m_staticText7446 = new wxStaticText(m_panel7418, wxID_ANY, _("Z"), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(-1,-1)), 0);
+    m_staticText7446 = new wxStaticText(this, wxID_ANY, _("Z"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     wxFont m_staticText7446Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText7446->SetFont(m_staticText7446Font);
     
     flexGridSizer7449->Add(m_staticText7446, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(0));
     
-    m_btZeroX = new wxBitmapToggleButton(m_panel7418, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(24,24)), 0);
+    m_btZeroX = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), 0);
     m_btZeroX->SetToolTip(_("Determie if 'X' axis will be zeroed"));
     m_btZeroX->SetValue(true);
     
     flexGridSizer7449->Add(m_btZeroX, 0, wxALL, WXC_FROM_DIP(2));
     m_btZeroX->SetMinSize(wxSize(24,24));
     
-    m_btZeroY = new wxBitmapToggleButton(m_panel7418, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(24,24)), 0);
+    m_btZeroY = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), 0);
     m_btZeroY->SetToolTip(_("Determie if 'Y' axis will be zeroed"));
     m_btZeroY->SetValue(true);
     
     flexGridSizer7449->Add(m_btZeroY, 0, wxALL, WXC_FROM_DIP(2));
     m_btZeroY->SetMinSize(wxSize(24,24));
     
-    m_btZeroZ = new wxBitmapToggleButton(m_panel7418, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(24,24)), 0);
+    m_btZeroZ = new wxBitmapToggleButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("snap-orto")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), 0);
     m_btZeroZ->SetToolTip(_("Determie if 'Z' axis will be zeroed"));
     m_btZeroZ->SetValue(true);
     
     flexGridSizer7449->Add(m_btZeroZ, 0, wxALL, WXC_FROM_DIP(2));
     m_btZeroZ->SetMinSize(wxSize(24,24));
     
-    m_staticLine7438 = new wxStaticLine(m_panel7418, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(-1,-1)), wxLI_VERTICAL);
+    m_staticLine7438 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer7440->Add(m_staticLine7438, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_btSet = new wxButton(m_panel7418, wxID_ANY, _("Set (0, 0, 0)"), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(-1,-1)), 0);
+    m_btSet = new wxButton(this, wxID_ANY, _("Set (0, 0, 0)"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     m_btSet->SetDefault();
     #if wxVERSION_NUMBER >= 2904
     m_btSet->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("playstation-square-dark-icon16")), wxLEFT);
@@ -10297,7 +10281,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer5342->Add(m_btSet, 0, wxALL|wxALIGN_BOTTOM, WXC_FROM_DIP(7));
     
-    m_btCancel = new wxButton(m_panel7418, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDLG_UNIT(m_panel7418, wxSize(-1,-1)), 0);
+    m_btCancel = new wxButton(this, wxID_ANY, _("Cancel"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_btCancel->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("playstation-triangle-dark-icon16")), wxLEFT);
     m_btCancel->SetBitmapMargins(2,2);
@@ -10306,36 +10290,11 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     
     flexGridSizer5342->Add(m_btCancel, 0, wxALL|wxALIGN_BOTTOM, WXC_FROM_DIP(7));
     
-    m_panel7416 = new wxPanel(m_infoResultBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_infoResultBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_infoResultBook->AddPage(m_panel7416, _("Page"), false);
-    
-    wxFlexGridSizer* flexGridSizer5566 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer5566->SetFlexibleDirection( wxBOTH );
-    flexGridSizer5566->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer5566->AddGrowableCol(0);
-    flexGridSizer5566->AddGrowableRow(0);
-    m_panel7416->SetSizer(flexGridSizer5566);
-    
-    m_textMessage = new wxTextCtrl(m_panel7416, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7416, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE|wxBORDER_NONE);
-    m_textMessage->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
-    
-    flexGridSizer5566->Add(m_textMessage, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
-    
-    m_button7425 = new wxButton(m_panel7416, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7416, wxSize(24,24)), 0);
-    #if wxVERSION_NUMBER >= 2904
-    m_button7425->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-close-2")), wxLEFT);
-    m_button7425->SetBitmapMargins(2,2);
-    #endif
-    
-    flexGridSizer5566->Add(m_button7425, 0, wxALL, WXC_FROM_DIP(0));
-    m_button7425->SetMinSize(wxSize(24,24));
-    
     m_staticLine7451 = new wxStaticLine(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
     flexGridSizer7428->Add(m_staticLine7451, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
     m_infoTimer = new wxTimer;
-    m_infoTimer->Start(3000, false);
     
     SetName(wxT("CncReferencePositionBase"));
     SetSize(-1,-1);
@@ -10363,8 +10322,7 @@ CncReferencePositionBase::CncReferencePositionBase(wxWindow* parent, wxWindowID 
     m_btZeroZ->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::toggleZeroZ), NULL, this);
     m_btSet->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::set), NULL, this);
     m_btCancel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::cancel), NULL, this);
-    m_button7425->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::hideInformation), NULL, this);
-    m_infoTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncReferencePositionBase::infoTimer), NULL, this);
+    m_infoTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncReferencePositionBase::onInfoTimer), NULL, this);
     
 }
 
@@ -10385,8 +10343,7 @@ CncReferencePositionBase::~CncReferencePositionBase()
     m_btZeroZ->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::toggleZeroZ), NULL, this);
     m_btSet->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::set), NULL, this);
     m_btCancel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::cancel), NULL, this);
-    m_button7425->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncReferencePositionBase::hideInformation), NULL, this);
-    m_infoTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncReferencePositionBase::infoTimer), NULL, this);
+    m_infoTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncReferencePositionBase::onInfoTimer), NULL, this);
     
     m_infoTimer->Stop();
     wxDELETE( m_infoTimer );

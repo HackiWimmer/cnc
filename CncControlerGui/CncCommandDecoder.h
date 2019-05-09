@@ -26,12 +26,7 @@ struct CncCommandDecoder {
 		int32_t	totLengthY	= 0;
 		int32_t	totLengthZ	= 0;
 		
-		typedef std::vector<CncLongPosition> Positions;
-		Positions positions;
-		
 		void reset() {
-			positions.clear();
-			
 			cmd			=  0;
 			totSeqSize	= -1;
 			remainSize	= -1;
@@ -51,7 +46,7 @@ struct CncCommandDecoder {
 			CallbackInterface() {}
 			virtual ~CallbackInterface() {}
 
-			virtual void notifySetter(const SetterInfo& si) {}
+			virtual void notifySetter(const CncCommandDecoder::SetterInfo& si) {}
 			virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {}
 
 			virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {}

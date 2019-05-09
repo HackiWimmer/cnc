@@ -53,7 +53,7 @@ bool CncPathListRunner::initNextMoveSequence(double value_MM_MIN, char mode) {
 //////////////////////////////////////////////////////////////////
 	if ( setup.optAnalyse == true ) {
 		// to hand over the client id to the next sequence
-		const long clientId = currentSequence != NULL ? currentSequence->getClientId(): INVALID_CLIENT_ID;
+		const long clientId = currentSequence != NULL ? currentSequence->getClientId(): CLIENT_ID.INVALID;
 
 		if ( destroyMoveSequence() == false ) {
 

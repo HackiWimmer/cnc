@@ -2473,8 +2473,6 @@ protected:
     wxStaticText* m_staticText5499;
     wxStaticLine* m_staticLine5350;
     wxStaticBitmap* m_infoBitmap;
-    wxSimplebook* m_infoResultBook;
-    wxPanel* m_panel7418;
     wxStaticLine* m_staticLine74384;
     wxStaticText* m_staticText7442;
     wxStaticText* m_staticText7444;
@@ -2485,9 +2483,6 @@ protected:
     wxStaticLine* m_staticLine7438;
     wxButton* m_btSet;
     wxButton* m_btCancel;
-    wxPanel* m_panel7416;
-    wxTextCtrl* m_textMessage;
-    wxButton* m_button7425;
     wxStaticLine* m_staticLine7451;
     wxTimer* m_infoTimer;
 
@@ -2507,8 +2502,7 @@ protected:
     virtual void toggleZeroZ(wxCommandEvent& event) { event.Skip(); }
     virtual void set(wxCommandEvent& event) { event.Skip(); }
     virtual void cancel(wxCommandEvent& event) { event.Skip(); }
-    virtual void hideInformation(wxCommandEvent& event) { event.Skip(); }
-    virtual void infoTimer(wxTimerEvent& event) { event.Skip(); }
+    virtual void onInfoTimer(wxTimerEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText5505() { return m_staticText5505; }
@@ -2553,11 +2547,6 @@ public:
     wxStaticLine* GetStaticLine7438() { return m_staticLine7438; }
     wxButton* GetBtSet() { return m_btSet; }
     wxButton* GetBtCancel() { return m_btCancel; }
-    wxPanel* GetPanel7418() { return m_panel7418; }
-    wxTextCtrl* GetTextMessage() { return m_textMessage; }
-    wxButton* GetButton7425() { return m_button7425; }
-    wxPanel* GetPanel7416() { return m_panel7416; }
-    wxSimplebook* GetInfoResultBook() { return m_infoResultBook; }
     wxStaticLine* GetStaticLine7451() { return m_staticLine7451; }
     wxTimer* GetInfoTimer() { return m_infoTimer; }
     CncReferencePositionBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Reference Position (0, 0, 0)"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP);

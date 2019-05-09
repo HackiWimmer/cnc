@@ -299,7 +299,6 @@
   <object class="wxBitmap" name="db_update">bitmaps\db_update.png</object>
   <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
   <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
-  <object class="wxBitmap" name="dialog-close-2">bitmaps\dialog-close-2.png</object>
   <object class="wxBitmap" name="dialog-error-5 (2)">bitmaps\dialog-error-5 (2).png</object>
   <object class="wxBitmap" name="dialog-information (2)">bitmaps\dialog-information (2).png</object>
   <object class="wxBitmap" name="dialog-ok">bitmaps\dialog-ok.png</object>

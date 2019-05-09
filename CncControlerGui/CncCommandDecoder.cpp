@@ -258,9 +258,6 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		if ( caller != NULL )
 			caller->notifyMove(pos.getX(), pos.getY(), pos.getZ(), f);
 
-		// store
-		sequence.positions.push_back(pos);
-		
 		// debug
 		if ( false ) {
 			std::cout << " portionSize         = " << portionSize << std::endl;
