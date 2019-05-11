@@ -83,6 +83,10 @@ struct SerialFetchInfo {
 
 	unsigned int singleFetchTimeout 	= 2000;
 	bool autoCallErrorInfo 				= false;
+	
+	explicit SerialFetchInfo(unsigned char cmd) 
+	: command(cmd)
+	{}
 
 	struct H {
 		unsigned char result[sizeof(int32_t) * 2];
@@ -330,16 +334,28 @@ class Serial : public SerialOSD {
 		void logMeasurementRefTs(const CncLongPosition& pos);
 		void logMeasurementLastTs();
 				
-		virtual void startMeasurementIntern() {}
-		virtual void stopMeasurementIntern() {}
-		
 		bool sendSerialControllerCallback(ContollerInfo& ci);
 		bool sendSerialControllerCallback(ContollerExecuteInfo& cei);
 		
 		inline bool processMoveInternal(unsigned int size, const int32_t (&values)[3], unsigned char command);
+
+		virtual void startMeasurementIntern() {}
+		virtual void stopMeasurementIntern() {}
+		
+		// physically serialize interface
+		virtual int readData(void *buffer, unsigned int nbByte);
+		virtual bool writeData(unsigned char cmd);
+		virtual bool writeData(void *buffer, unsigned int nbByte);
+		
+		virtual bool serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte);
+		virtual bool serializeMove(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte);
+		
+		virtual bool writeMoveSequenceRawCallback(unsigned char* buffer, unsigned int nbByte) { return true; }
 		
 		friend class SerialCommandLocker;
+		
 	public:
+	
 		//Initialize Serial communication without an acitiv connection 
 		Serial(CncControl* cnc);
 		//Initialize Serial communication with the given COM port
@@ -362,18 +378,10 @@ class Serial : public SerialOSD {
 		virtual void purge(void);
 		// read all remaining bytes from serial to /dev/null
 		virtual void clearRemainingBytes(bool trace=false);
-		//Read data in a buffer, if nbByte is greater than the
-		//maximum number of bytes available, it will return only the
-		//bytes available. The function return -1 when nothing could
-		//be read, the number of bytes actually read.
-		virtual int readData(void *buffer, unsigned int nbByte);
-		//Writes data from a buffer through the Serial connection
-		//return true on success.
-		bool writeData(unsigned char cmd);
-		virtual bool writeData(void *buffer, unsigned int nbByte);
+		
 
-		virtual void onPeriodicallyAppEvent(bool interrupted) 	{}
 		virtual const char* getPortName() 						{ return portName.c_str(); }
+		virtual void onPeriodicallyAppEvent(bool interrupted) 	{}
 		virtual bool canProcessIdle() 							{ return true; }
 		virtual bool isOutputAsTemplateAvailable()				{ return false; }
 		virtual void setSpyMode(Serial::SypMode sm);

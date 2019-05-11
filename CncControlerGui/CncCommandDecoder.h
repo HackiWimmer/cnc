@@ -6,10 +6,11 @@
 #include "CncPosition.h"
 #include "CncCommon.h"
 
-
+class CncMoveSequence;
 
 struct CncCommandDecoder {
 	
+	// ----------------------------------------------------------
 	struct SetterInfo {
 		unsigned char pid	= 0;
 		unsigned int count	= 0;
@@ -17,29 +18,38 @@ struct CncCommandDecoder {
 		cnc::SetterValueList values;
 	};
 	
-	struct MoveSequence {
-		unsigned char cmd	= 0;
-		int32_t totSeqSize	= 0;
-		int32_t remainSize	= 0;
+	// ----------------------------------------------------------
+	struct MoveSequenceInfo {
 		
-		int32_t	totLengthX	= 0;
-		int32_t	totLengthY	= 0;
-		int32_t	totLengthZ	= 0;
+		struct IN {
+				bool parseAllPortions = false;
+		} In;
 		
-		void reset() {
-			cmd			=  0;
-			totSeqSize	= -1;
-			remainSize	= -1;
+		struct OUT {
+			unsigned char cmd	= 0;
+			int32_t totSeqSize	= 0;
+			int32_t remainSize	= 0;
 			
-			totLengthX	=  0;
-			totLengthY	=  0;
-			totLengthZ	=  0;
-		}
+			int32_t	totLengthX	= 0;
+			int32_t	totLengthY	= 0;
+			int32_t	totLengthZ	= 0;
+			
+			void reset() {
+				cmd			=  0;
+				totSeqSize	= -1;
+				remainSize	= -1;
+				
+				totLengthX	=  0;
+				totLengthY	=  0;
+				totLengthZ	=  0;
+			}
 
-		bool isBegin() 	{ return (cmd 		 == 0); }
-		bool isEnd() 	{ return (remainSize == 0); }
+			bool isBegin() 	{ return (cmd 		 == 0); }
+			bool isEnd() 	{ return (remainSize == 0); }
+		} Out;
 	};
 
+	// ----------------------------------------------------------
 	class CallbackInterface {
 
 		public:
@@ -49,14 +59,31 @@ struct CncCommandDecoder {
 			virtual void notifySetter(const CncCommandDecoder::SetterInfo& si) {}
 			virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {}
 
-			virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {}
-			virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {}
-			virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {}
+			virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) {}
+			virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence) {}
+			virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence) {}
 	};
+	
+	// ----------------------------------------------------------
+	class MoveSequenceRecreator: public CallbackInterface {
+		
+		private:
+			CncMoveSequence* moveSequence;
+		
+		public:
+			MoveSequenceRecreator(CncMoveSequence* ms);
+			virtual ~MoveSequenceRecreator() {}
 
-
+			void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) final;
+			void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
+	};
+	
+	// ----------------------------------------------------------
 	static bool decodeMoveSequence(const unsigned char *buffer, unsigned int nbByte,
-			                       CncCommandDecoder::MoveSequence& sequence,
+								   CncMoveSequence* ret);
+	
+	static bool decodeMoveSequence(const unsigned char *buffer, unsigned int nbByte,
+			                       CncCommandDecoder::MoveSequenceInfo& sequence,
 								   CncCommandDecoder::CallbackInterface* caller);
 
 	static bool decodeMove(const unsigned char *buffer, unsigned int nbByte,

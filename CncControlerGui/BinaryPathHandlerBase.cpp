@@ -69,7 +69,7 @@ bool BinaryPathHandlerHexView::processCommand(const unsigned char* buffer, int n
 									translateLineNumber(0);
 									break;
 									
-		case FormatType::CStyle:	hexContent << "int size = " << wxString::Format("% 3d", nbBytes) << "; cnc->exec( ";
+		case FormatType::CStyle:	hexContent << "int size = " << wxString::Format("% 5d", nbBytes) << "; cnc->exec( ";
 									
 									for (int i = 0; i < nbBytes; i++)
 										hexContent << wxString::Format("0x%02X ",buffer[i]);
@@ -108,7 +108,7 @@ bool BinaryPathHandlerHumanReadableView::displaySteps(const unsigned char* buffe
 	if ( nbBytes <= 0 || buffer == NULL )
 		return true;
 
-	unsigned char cmd = buffer[0];
+	const unsigned char cmd = buffer[0];
 	switch ( cmd ) {
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:				{
@@ -130,7 +130,7 @@ bool BinaryPathHandlerHumanReadableView::displayMetric(const unsigned char* buff
 	if ( nbBytes <= 0 || buffer == NULL )
 		return true;
 
-	unsigned char cmd = buffer[0];
+	const unsigned char cmd = buffer[0];
 	switch ( cmd ) {
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:				{
@@ -156,20 +156,14 @@ bool BinaryPathHandlerHumanReadableView::displayMetric(const unsigned char* buff
 	return true;
 }
 /////////////////////////////////////////////////////////////
-bool BinaryPathHandlerHumanReadableView::displayMoveSequence(const FormatType ft, const unsigned char* buffer, int nbBytes) {
+bool BinaryPathHandlerHumanReadableView::displayMoveSequence(const unsigned char* buffer, int nbBytes) {
 /////////////////////////////////////////////////////////////
-	#warning Impl. BinaryPathHandlerHumanReadableView::displayMoveSequence
-	
-	CncCommandDecoder::MoveSequence sequence;
+	CncCommandDecoder::MoveSequenceInfo seqInfo;
+	seqInfo.In.parseAllPortions = true;
 	
 	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f)
-	if ( CncCommandDecoder::decodeMoveSequence(buffer, nbBytes, sequence, this) == false )
+	if ( CncCommandDecoder::decodeMoveSequence(buffer, nbBytes, seqInfo, this) == false )
 		return false;
-		
-		
-		
-		
-		
 		
 	return true;
 }
@@ -201,14 +195,15 @@ bool BinaryPathHandlerHumanReadableView::processCommand(const unsigned char* buf
 	
 	bool ret = false;
 	
-	unsigned char cmd = buffer[0];
+	const unsigned char cmd = buffer[0];
 	switch ( cmd ) {
+		//--------------------------------------------------
 		case CMD_SETTER:
 		{	
 			ret = displaySetter(buffer, nbBytes);
 			break;
 		}
-		
+		//--------------------------------------------------
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:
 		{
@@ -219,14 +214,14 @@ bool BinaryPathHandlerHumanReadableView::processCommand(const unsigned char* buf
 			
 			break;
 		}
-		
+		//--------------------------------------------------
 		case CMD_MOVE_SEQUENCE:
 		case CMD_RENDER_AND_MOVE_SEQUENCE:
 		{
-			ret = displayMoveSequence(formatType, buffer, nbBytes);
+			ret = displayMoveSequence(buffer, nbBytes);
 			break;
 		}
-		
+		//--------------------------------------------------
 		default:
 		{ 
 			readableContent << "No encoder specified for command: '" << cmd << "'" << std::endl;
@@ -237,25 +232,39 @@ bool BinaryPathHandlerHumanReadableView::processCommand(const unsigned char* buf
 	return ret;
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHumanReadableView::notifySetter(const CncCommandDecoder::SetterInfo& si) {
-/////////////////////////////////////////////////////////////
-}
-/////////////////////////////////////////////////////////////
 void BinaryPathHandlerHumanReadableView::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 /////////////////////////////////////////////////////////////
-	#warning Impl. BinaryPathHandlerHumanReadableView::notifyMove
-	readableContent << "BinaryPathHandlerHumanReadableView::notifyMove" << std::endl;
+	const double factX = GBL_CONFIG->getDisplayFactX();
+	const double factY = GBL_CONFIG->getDisplayFactY();
+	const double factZ = GBL_CONFIG->getDisplayFactZ();
+
+	switch ( formatType ) {
+		case Steps:		readableContent << wxString::Format("    cnc->seq->exec(%+ 10ld, %+ 10ld, %+ 8ld ); // Sequence Move\n", dx, dy, dz);
+						break;
+						
+		case Metric:	readableContent << wxString::Format("    cnc->seq->exec(%+ 10.3lf, %+ 10.3lf, %+ 8.3lf ); // Sequence Move\n", dx * factX, dy * factY, dz * factZ);
+						break;
+	}
+	
 	translateLineNumber(1);
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHumanReadableView::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+void BinaryPathHandlerHumanReadableView::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 /////////////////////////////////////////////////////////////
+	readableContent << "   cnc->nextMoveSequcence();\n";
+	readableContent << "   {\n";
+	translateLineNumber(2);
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHumanReadableView::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+void BinaryPathHandlerHumanReadableView::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 /////////////////////////////////////////////////////////////
+	readableContent << "   }\n";
+	readableContent << "   {\n";
+	translateLineNumber(2);
 }
 /////////////////////////////////////////////////////////////
-void BinaryPathHandlerHumanReadableView::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
+void BinaryPathHandlerHumanReadableView::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 /////////////////////////////////////////////////////////////
+	readableContent << "   }\n";
+	translateLineNumber(1);
 }

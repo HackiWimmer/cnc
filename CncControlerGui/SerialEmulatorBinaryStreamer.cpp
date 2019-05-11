@@ -61,8 +61,9 @@ bool SerialEmulatorBinaryStreamer::writeMoveRawCallback(unsigned char *buffer, u
 	return appendDataBlock(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorBinaryStreamer::writeMoveSequenceRawCallback(unsigned char *buffer, unsigned int nbByte) {
+bool SerialEmulatorBinaryStreamer::writeMoveSequenceRawCallback(unsigned char* buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	//std::cout << nbByte << " -> " << (int)buffer[0] << " " << (int)buffer[1] << " " << (int)buffer[2] << " " << (int)buffer[3] << " " << (int)buffer[4] << " " << std::endl;
 	return appendDataBlock(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////

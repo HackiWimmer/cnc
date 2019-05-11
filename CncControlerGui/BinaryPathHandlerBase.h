@@ -75,19 +75,18 @@ class BinaryPathHandlerHumanReadableView : public BinaryPathHandlerBase
 		bool displaySteps(const unsigned char* buffer, int nbBytes);
 		bool displayMetric(const unsigned char* buffer, int nbBytes);
 		
-		bool displayMoveSequence(const FormatType ft, const unsigned char* buffer, int nbBytes);
+		bool displayMoveSequence(const unsigned char* buffer, int nbBytes);
 		
 	public:
 		
 		explicit BinaryPathHandlerHumanReadableView(FormatType ft);
 		virtual ~BinaryPathHandlerHumanReadableView() {}
 		
-		virtual void notifySetter(const CncCommandDecoder::SetterInfo& si);
 		virtual void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f);
 
-		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence);
-		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence);
-		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence);
+		virtual void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence);
+		virtual void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence);
+		virtual void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence);
 
 		virtual void prepareWork(); 
 		virtual void finishWork();

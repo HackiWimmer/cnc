@@ -627,7 +627,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTplUserAgent = new wxPanel(m_simpleBookSourceExt, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_simpleBookSourceExt, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTplUserAgentImgIndex;
-    m_panelTplUserAgentImgIndex = m_simpleBookSourceExt_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_green")));
+    m_panelTplUserAgentImgIndex = m_simpleBookSourceExt_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-globals")));
     m_simpleBookSourceExt->AddPage(m_panelTplUserAgent, _("UserAgent"), false, m_panelTplUserAgentImgIndex);
     
     wxFlexGridSizer* flexGridSizer1506 = new wxFlexGridSizer(2, 1, 0, 0);
@@ -733,7 +733,9 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1506->Add(m_selectedUAInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
     m_panelTplGCodeSequence = new wxPanel(m_simpleBookSourceExt, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_simpleBookSourceExt, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_simpleBookSourceExt->AddPage(m_panelTplGCodeSequence, _("GCodes"), false);
+    int m_panelTplGCodeSequenceImgIndex;
+    m_panelTplGCodeSequenceImgIndex = m_simpleBookSourceExt_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-enumerator")));
+    m_simpleBookSourceExt->AddPage(m_panelTplGCodeSequence, _("GCodes"), false, m_panelTplGCodeSequenceImgIndex);
     
     wxFlexGridSizer* flexGridSizer7790 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer7790->SetFlexibleDirection( wxBOTH );
@@ -762,7 +764,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_panelTplNestedInfo = new wxPanel(m_simpleBookSourceExt, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_simpleBookSourceExt, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelTplNestedInfoImgIndex;
-    m_panelTplNestedInfoImgIndex = m_simpleBookSourceExt_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("book_red")));
+    m_panelTplNestedInfoImgIndex = m_simpleBookSourceExt_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("basket-3")));
     m_simpleBookSourceExt->AddPage(m_panelTplNestedInfo, _("Nested Information"), false, m_panelTplNestedInfoImgIndex);
     
     wxFlexGridSizer* flexGridSizer6080 = new wxFlexGridSizer(1, 1, 0, 0);

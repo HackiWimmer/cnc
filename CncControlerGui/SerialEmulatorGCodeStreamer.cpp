@@ -33,17 +33,17 @@ bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceCallback(const MoveInf
 	return writeEncodedMoveCallback(mi);
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorGCodeStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	return true;
 }

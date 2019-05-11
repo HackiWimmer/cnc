@@ -257,7 +257,7 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 	flushPortionSize(0);
 
 	for ( auto it = sequence.begin(); it != sequence.end(); ++it ) {
-		SequencePoint sp = *it;
+		SequencePoint& sp = *it;
 		sp.determineParameters(moveCmd);
 		
 		// switch portion

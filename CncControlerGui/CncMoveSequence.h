@@ -146,7 +146,12 @@ class CncMoveSequence {
 		void 				destroyBuffer();
 
 		void 				addClientId(long id);
-
+	
+	protected:
+		
+		void setType(unsigned char t) {  moveCmd = t; }
+		friend class CncCommandDecoder;
+		
 	public:
 		struct FlushResult {
 			unsigned char* 	buffer			= NULL;

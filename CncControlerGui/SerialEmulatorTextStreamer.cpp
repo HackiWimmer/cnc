@@ -170,19 +170,19 @@ void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, 
 		SerialEmulatorNULL::notifyMove(dx, dy, dz, f);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+void SerialEmulatorTextStreamer::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	if ( writeEncodedMoveSequenceBeginCallback(sequence) == true )
 		SerialEmulatorNULL::notifyMoveSequenceBegin(sequence);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+void SerialEmulatorTextStreamer::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	if ( writeEncodedMoveSequenceNextCallback(sequence) == true )
 		SerialEmulatorNULL::notifyMoveSequenceNext(sequence);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorTextStreamer::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
+void SerialEmulatorTextStreamer::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	if ( writeEncodedMoveSequenceEndCallback(sequence) == true )
 		SerialEmulatorNULL::notifyMoveSequenceEnd(sequence);
@@ -196,26 +196,26 @@ bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceCallback(const MoveInfo
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceBegin cmd=\"%c\" description=\"%s\"/>\n",
-														 sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+														 sequence.Out.cmd, ArduinoCMDs::getCMDLabel(sequence.Out.cmd));
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceNext cmd=\"%c\" description=\"%s\"/>\n",
-														 sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+														 sequence.Out.cmd, ArduinoCMDs::getCMDLabel(sequence.Out.cmd));
 	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorTextStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	bodyStream << Streamer::indent2 << wxString::Format("<MoveSequenceEnd cmd=\"%c\" description=\"%s\"/>\n",
-														 sequence.cmd, ArduinoCMDs::getCMDLabel(sequence.cmd));
+														 sequence.Out.cmd, ArduinoCMDs::getCMDLabel(sequence.Out.cmd));
 	
 	return true;
 }
@@ -246,12 +246,6 @@ bool SerialEmulatorTextStreamer::writeMoveRawCallback(unsigned char *buffer, uns
 	mi.mdz = GBL_CONFIG->convertStepsToMetricZ(mi.sdz);
 		
 	return writeEncodedMoveCallback(mi);
-}
-///////////////////////////////////////////////////////////////////
-bool SerialEmulatorTextStreamer::writeMoveSequenceRawCallback(unsigned char *buffer, unsigned int nbByte) {
-///////////////////////////////////////////////////////////////////
-	// Nothing to do here
-	return SerialEmulatorNULL::writeMoveSequenceRawCallback(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorTextStreamer::writeEncodedSetterCallback(const SetterInfo& si) {

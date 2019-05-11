@@ -420,11 +420,17 @@ size_t Serial::getStepCounterZ() {
 ///////////////////////////////////////////////////////////////////
 int Serial::readData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	//Read data in a buffer, if nbByte is greater than the
+	//maximum number of bytes available, it will return only the
+	//bytes available. The function return -1 when nothing could
+	//be read, the number of bytes actually read.
 	return SerialOSD::readData(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::writeData(void *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
+	//Writes data from a buffer through the Serial connection
+	//return true on success.
 	return SerialOSD::writeData(buffer, nbByte);
 }
 ///////////////////////////////////////////////////////////////////
@@ -714,8 +720,8 @@ bool Serial::processIdle() {
 	
 	lastFetchResult.init(cmd);
 	if ( writeData(cmd) ) {
-		SerialFetchInfo sfi;
-		sfi.command = lastFetchResult.cmd;
+		
+		SerialFetchInfo sfi(lastFetchResult.cmd);
 
 		bool ret = evaluateResultWrapper(sfi, std::cout);
 		if ( ret == false ) {
@@ -815,22 +821,13 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 		cnc::spy.initializeResult(ss.str().c_str());
 	}
 	
-	bool ret = false;
-	
-	lastFetchResult.init(cmd[0]);
-	if ( writeData(cmd, idx) ) {
-		SerialFetchInfo sfi;
-		sfi.command = lastFetchResult.cmd;
-		
-		ret = evaluateResultWrapper(sfi, std::cout);
-		
-	} else {
-		std::cerr << "Serial::processSetter: Unable to write data" << std::endl;
+	SerialFetchInfo sfi(cmd[0]);
+	if ( serializeSetter(sfi, cmd, idx) == false ) {
 		cncControl->SerialCallback();
-		ret = false;
+		return false;
 	}
 	
-	return ret;
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 bool Serial::processGetter(unsigned char pid, GetterValues& list) {
@@ -864,8 +861,8 @@ bool Serial::processGetter(unsigned char pid, GetterValues& list) {
 	
 	lastFetchResult.init(cmd[0]);
 	if ( writeData((char*)cmd, sizeof(cmd)) ) {
-		SerialFetchInfo sfi;
-		sfi.command = lastFetchResult.cmd;
+		
+		SerialFetchInfo sfi(lastFetchResult.cmd);
 		sfi.singleFetchTimeout = 1000;
 		sfi.Gc.list = &list;
 
@@ -919,61 +916,67 @@ bool Serial::execute(const unsigned char* buffer, unsigned int nbByte) {
 	// activate this during the execute command
 	ControllerCallbackShouldSynchronizeAppPosition instance(this);
 
-	#warning - centralize evaluateResultWrapper() handling
-	
-	unsigned char cmd = buffer[0];
+	const unsigned char cmd = buffer[0];
 	bool ret = false;
+	
 	switch ( cmd ) {
-		
 		// --------------------------------------------------------
 		case CMD_SETTER:
 		{
+			// log setter (for gui only)
 			CncCommandDecoder::SetterInfo si;
-			CncCommandDecoder::decodeSetter(buffer, nbByte, si);
-			ContollerExecuteInfo cei;
-			cei.infoType 		= CEITSetter;
-			cei.setterPid		= si.pid;
-			cei.setterValueList = si.values;
-			
-			sendSerialControllerCallback(cei);
+			if ( CncCommandDecoder::decodeSetter(buffer, nbByte, si) ) {
+				ContollerExecuteInfo cei;
+				cei.infoType 		= CEITSetter;
+				cei.setterPid		= si.pid;
+				cei.setterValueList = si.values;
+				sendSerialControllerCallback(cei);
 				
-			lastFetchResult.init(cmd);
-			if ( writeData((void*)buffer, nbByte) ) {
-				SerialFetchInfo sfi;
-				sfi.command = lastFetchResult.cmd;
-				
-				ret = evaluateResultWrapper(sfi, std::cout);
+				// serialize
+				SerialFetchInfo sfi(cmd);
+				ret = serializeSetter(sfi, buffer, nbByte);
 			}
+			else {
+				std::cerr << "Serial::execute(): CncCommandDecoder::decodeSetter() failed!" << std::endl;
+				ret = false;
+			}
+
 			break;
 		}
-		
 		// --------------------------------------------------------
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:
 		{
-			lastFetchResult.init(cmd);
-			if ( writeData((void*)buffer, nbByte) ) {
-				SerialFetchInfo sfi;
-				sfi.command 			= lastFetchResult.cmd;
-				sfi.singleFetchTimeout 	= 3000;
-				sfi.Mc.size 			= 3;
-				sfi.Mc.value1			= 0;
-				sfi.Mc.value2			= 0;
-				sfi.Mc.value3			= 0;
-				
-				ret = evaluateResultWrapper(sfi, std::cout);
-				
-				// latest log this move
-				logMeasurementLastTs();
-			}
+			SerialFetchInfo sfi(cmd);
+			sfi.singleFetchTimeout 	= 3000;
+			sfi.Mc.size 			= 3;
+			sfi.Mc.value1			= 0;
+			sfi.Mc.value2			= 0;
+			sfi.Mc.value3			= 0;
+			
+			ret = serializeMove(sfi, buffer, nbByte);
 			break;
 		}
-		
+		// --------------------------------------------------------
 		case CMD_MOVE_SEQUENCE:
 		case CMD_RENDER_AND_MOVE_SEQUENCE:
 		{
-			#warning impl execute of CMD_RENDER_AND_MOVE_SEQUENCE
+			CncMoveSequence retSeq(cmd);
+			if ( CncCommandDecoder::decodeMoveSequence(buffer, nbByte, &retSeq) ) {
+				ret = processMoveSequence(retSeq);
+			}
+			else {
+				std::cerr << "Serial::execute(): CncCommandDecoder::decodeMoveSequence() failed!" << std::endl;
+				ret = false;
+			}
+			
 			break;
+		}
+		// --------------------------------------------------------
+		default:
+		{
+			std::cerr << "Serial::execute(): No case for: '" << cmd << "'" << std::endl;
+			ret = false;
 		}
 	}
 	
@@ -1008,9 +1011,7 @@ bool Serial::processCommand(const unsigned char cmd, std::ostream& mutliByteStre
 	
 	lastFetchResult.init(cmd);
 	if ( writeData(cmd) ) {
-		SerialFetchInfo sfi;
-		sfi.command = lastFetchResult.cmd;
-		
+		SerialFetchInfo sfi(lastFetchResult.cmd);
 		ret = evaluateResultWrapper(sfi, mutliByteStream);
 	
 	} else {
@@ -1106,32 +1107,19 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	if ( traceSpyInfo && spyWrite )
 		cnc::spy.initializeResult(wxString::Format("Send: '%c' [%s]", moveCommand[0], ArduinoCMDs::getCMDLabel(moveCommand[0])));
 	
-	// to provide a time an pos reference for the speed calculation
-	logMeasurementRefTs(cncControl->getCurAppPos());
+	SerialFetchInfo sfi(moveCommand[0]);
+	sfi.singleFetchTimeout 	= 3000;
+	sfi.Mc.size 			= size;
+	sfi.Mc.value1			= values[0];
+	sfi.Mc.value2			= values[1];
+	sfi.Mc.value3			= values[2];
 	
-	bool ret = false;
-	
-	lastFetchResult.init(moveCommand[0]);
-	if ( writeData(moveCommand, idx) ) {
-		SerialFetchInfo sfi;
-		sfi.command 			= lastFetchResult.cmd;
-		sfi.singleFetchTimeout 	= 3000;
-		sfi.Mc.size 			= size;
-		sfi.Mc.value1			= values[0];
-		sfi.Mc.value2			= values[1];
-		sfi.Mc.value3			= values[2];
-		
-		ret = evaluateResultWrapper(sfi, std::cout);
-		// latest log this move
-		logMeasurementLastTs();
-		
-	} else {
-		std::cerr << "Serial::processMove: Unable to write data" << std::endl;
+	if ( serializeMove(sfi, moveCommand, idx) == false ) {
 		cncControl->SerialCallback();
-		ret =  false;
+		return false;
 	}
 	
-	return ret;
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 const char* Serial::decodeContollerResult(int ret) {
@@ -1716,11 +1704,16 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 	// Always log the start postion
 	if ( cncControl->SerialCallback() == false )
 		return false;
-	
+		
 	// create move sequence write buffer
 	CncMoveSequence::FlushResult result;
 	if ( sequence.flush(result) == false ) {
-		std::clog << "SERIAL::processMoveSequence(): seqeunce.flush returned false." << std::endl;
+		std::clog << "SERIAL::processMoveSequence(): seqeunce.flush failed" << std::endl;
+		return false;
+	}
+	
+	if ( writeMoveSequenceRawCallback( result.buffer, result.flushedSize) == false ) {
+		std::clog << "SERIAL::processMoveSequence(): writeMoveSequenceRawCallback failed" << std::endl;
 		return false;
 	}
 	
@@ -1763,8 +1756,7 @@ bool Serial::processMoveSequence(CncMoveSequence& sequence) {
 		if ( writeData(moveSequence + writeStart, writeLength) ) {
 			currentFlushedSize += portionTotLength; 
 			
-			SerialFetchInfo sfi;
-			sfi.command 				= lastFetchResult.cmd;
+			SerialFetchInfo sfi(lastFetchResult.cmd);
 			sfi.singleFetchTimeout 		= 3000;
 			
 			sfi.Msc.size 				= 3;
@@ -1878,6 +1870,52 @@ bool Serial::test() {
 		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;
 		ret = processMoveSequence(cms);
 	}
+	
+	return ret;
+}
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////
+bool Serial::serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte) { 
+///////////////////////////////////////////////////////////////////
+	if ( buffer == 0 || nbByte == 0 ) {
+		std::cerr << "Serial::serializeSetter(): Invalid buffer" << std::endl;
+		return false;
+	}
+	
+	lastFetchResult.init(buffer[0]);
+	
+	if ( writeData((void*)buffer, nbByte) == false ) {
+		std::cerr << "Serial::processSetter: Unable to write data" << std::endl;
+		return false;
+	}
+	
+	return evaluateResultWrapper(sfi, std::cout);
+}
+///////////////////////////////////////////////////////////////////
+bool Serial::serializeMove(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte) { 
+///////////////////////////////////////////////////////////////////
+	if ( buffer == 0 || nbByte == 0 ) {
+		std::cerr << "Serial::serializeMove(): Invalid buffer" << std::endl;
+		return false;
+	}
+
+	// to provide a time an pos reference for the speed calculation
+	logMeasurementRefTs(cncControl->getCurAppPos());
+	
+	lastFetchResult.init(buffer[0]);
+	
+	if ( writeData((void*)buffer, nbByte) == false) {
+		std::cerr << "Serial::processMove: Unable to write data" << std::endl;
+		return false;
+	}
+	
+	bool ret = evaluateResultWrapper(sfi, std::cout);
+	logMeasurementLastTs();
 	
 	return ret;
 }

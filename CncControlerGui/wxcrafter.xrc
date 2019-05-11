@@ -998,7 +998,7 @@ Resolution:</label>
                                     </object>
                                     <object class="simplebookpage">
                                       <label>UserAgent</label>
-                                      <bitmap>bitmaps/book_green.png</bitmap>
+                                      <bitmap>bitmaps/16-globals.png</bitmap>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_panelTplUserAgent">
                                         <style>wxTAB_TRAVERSAL</style>
@@ -1145,6 +1145,7 @@ Resolution:</label>
                                     </object>
                                     <object class="simplebookpage">
                                       <label>GCodes</label>
+                                      <bitmap>bitmaps/16-enumerator.png</bitmap>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_panelTplGCodeSequence">
                                         <style>wxTAB_TRAVERSAL</style>
@@ -1193,7 +1194,7 @@ Resolution:</label>
                                     </object>
                                     <object class="simplebookpage">
                                       <label>Nested Information</label>
-                                      <bitmap>bitmaps/book_red.png</bitmap>
+                                      <bitmap>bitmaps/basket-3.png</bitmap>
                                       <selected>0</selected>
                                       <object class="wxPanel" name="m_panelTplNestedInfo">
                                         <style>wxTAB_TRAVERSAL</style>

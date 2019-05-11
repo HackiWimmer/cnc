@@ -12,8 +12,39 @@
 #endif
 
 ///////////////////////////////////////////////////////////////////
+CncCommandDecoder::MoveSequenceRecreator::MoveSequenceRecreator(CncMoveSequence* ms) 
+: CallbackInterface()
+, moveSequence(ms)
+///////////////////////////////////////////////////////////////////
+{
+	wxASSERT( moveSequence != NULL );
+}
+///////////////////////////////////////////////////////////////////
+void CncCommandDecoder::MoveSequenceRecreator::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( moveSequence != NULL );
+	moveSequence->addStepPosXYZF(dx, dy, dz, f);
+}
+///////////////////////////////////////////////////////////////////
+void CncCommandDecoder::MoveSequenceRecreator::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& seqInfo) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( moveSequence != NULL );
+	moveSequence->setType(seqInfo.Out.cmd);
+}
+
+
+///////////////////////////////////////////////////////////////////
+bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned int nbByte, CncMoveSequence* retSeq) {
+///////////////////////////////////////////////////////////////////
+	CncCommandDecoder::MoveSequenceRecreator reCreator(retSeq);
+	CncCommandDecoder::MoveSequenceInfo seqInfo;
+	seqInfo.In.parseAllPortions = true;
+	
+	return CncCommandDecoder::decodeMoveSequence(buffer, nbByte, seqInfo, &reCreator);
+}
+///////////////////////////////////////////////////////////////////
 bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned int nbByte,
-                      	   	   	   	   	   CncCommandDecoder::MoveSequence& sequence,
+										   CncCommandDecoder::MoveSequenceInfo& sequence,
 										   CncCommandDecoder::CallbackInterface* caller)
 ///////////////////////////////////////////////////////////////////
 {
@@ -162,7 +193,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	// ------------------------------------------------------------------------
 	auto returnAndNotify = [&](bool ret) {
 		if ( caller != NULL ) {
-			if ( sequence.isEnd() )
+			if ( sequence.Out.isEnd() )
 				caller->notifyMoveSequenceEnd(sequence);
 		}
 
@@ -171,7 +202,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 
 	// ------------------------------------------------------------------------
 	// process first portion
-	if ( sequence.isBegin() ) {
+	if ( sequence.Out.isBegin() ) {
 		const unsigned int totHeaderLength = sizeof(unsigned char)		// pid
 				                           + 1 * sizeof(int32_t)		// totSeqSize
 										   + 3 * sizeof(int32_t);		// totLengthX,Y,Z
@@ -179,7 +210,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		// read header
 		switch ( buffer[0] ) {
 			case CMD_MOVE_SEQUENCE:
-			case CMD_RENDER_AND_MOVE_SEQUENCE: 	sequence.cmd = buffer[idx++];
+			case CMD_RENDER_AND_MOVE_SEQUENCE: 	sequence.Out.cmd = buffer[idx++];
 												break;
 
 			default:							std::cerr << "CncCommandDecoder::decodeMoveSequence(Begin) Invalid command = " << buffer[idx] << std::endl;
@@ -194,86 +225,125 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		//                      which is in all other cases at buffer[0]
 		if ( nbByte < totHeaderLength + 1) {
 			std::cerr << "CncCommandDecoder::decodeMoveSequence() Invalid header length. Buffer size = " << nbByte << std::endl;
-			return returnAndNotify(false);;
-		}
-
-		// read total length
-		sequence.totSeqSize = readInt32();
-
-		// read total path length
-		sequence.totLengthX = readInt32();
-		sequence.totLengthY = readInt32();
-		sequence.totLengthZ = readInt32();
-
-		if ( false ) {
-			std::cout << "totSeqSize: " << sequence.totSeqSize << std::endl;
-			std::cout << "totLengthX: " << sequence.totLengthX << std::endl;
-			std::cout << "totLengthY: " << sequence.totLengthY << std::endl;
-			std::cout << "totLengthZ: " << sequence.totLengthZ << std::endl;
-		}
-
-		// setup remaing size
-		sequence.remainSize = sequence.totSeqSize + totHeaderLength;
-	}
-	else {
-		// notify
-		if ( caller != NULL )
-			caller->notifyMoveSequenceNext(sequence);
-	}
-
-	// ------------------------------------------------------------------------
-	// process portion
-	unsigned int portionSize = buffer[idx] + 1;
-	if ( idx + portionSize != nbByte ) {
-		std::cerr << "CncCommandDecoder::decodeMoveSequence() Invalid portion size" << std::endl;
-		std::cerr << " - nbByte      : " << nbByte << std::endl;
-		std::cerr << " - idx         : " << idx << std::endl;
-		std::cerr << " - portionSize : " << portionSize << std::endl;
-		return returnAndNotify(false);
-	}
-	idx++;
-
-	// over all positions
-	unsigned int byteCounter = 0;
-	while ( byteCounter < portionSize - 1) {
-
-		CncLongPosition pos;
-		int32_t f = 0;
-		if ( sequence.cmd == CMD_RENDER_AND_MOVE_SEQUENCE ) {
-			
-			byteCounter += readPosition(pos, f);
-		}
-		else if ( sequence.cmd == CMD_MOVE_SEQUENCE ) {
-			
-			byteCounter += readOneByteToPos(pos, f);
-		}
-		else {
-			
-			std::cerr << "CncCommandDecoder::decodeMoveSequence(portion) Invalid command = " << buffer[idx]
-			          << ". While reading portion" << std::endl;
 			return returnAndNotify(false);
 		}
 
-		// notfy
-		if ( caller != NULL )
-			caller->notifyMove(pos.getX(), pos.getY(), pos.getZ(), f);
+		// read total length
+		sequence.Out.totSeqSize = readInt32();
 
-		// debug
+		// read total path length
+		sequence.Out.totLengthX = readInt32();
+		sequence.Out.totLengthY = readInt32();
+		sequence.Out.totLengthZ = readInt32();
+
 		if ( false ) {
-			std::cout << " portionSize         = " << portionSize << std::endl;
-			std::cout << " byteCounter         = " << byteCounter << std::endl;
-			std::cout << " idx                 = " << idx << std::endl;
-			std::cout << " sequence.remainSize = " << sequence.remainSize << std::endl;
-			
+			std::cout << "totSeqSize: " << sequence.Out.totSeqSize << std::endl;
+			std::cout << "totLengthX: " << sequence.Out.totLengthX << std::endl;
+			std::cout << "totLengthY: " << sequence.Out.totLengthY << std::endl;
+			std::cout << "totLengthZ: " << sequence.Out.totLengthZ << std::endl;
+		}
+
+		// setup remaing size
+		sequence.Out.remainSize = sequence.Out.totSeqSize + totHeaderLength;
+	}
+	else {
+		// single portion mode
+		if ( sequence.In.parseAllPortions == false ) {
+			// notify
+			if ( caller != NULL )
+				caller->notifyMoveSequenceNext(sequence);
 		}
 	}
+	
+	// ------------------------------------------------------------------------
+	auto processPortion = [&]() {
+		unsigned int portionSize = buffer[idx] + 1;
+		
+		// debug
+		if ( false ) {
+			std::clog << " idx               : " << idx << std::endl;
+			std::clog << " portionSize       : " << portionSize << std::endl;
+			std::clog << " idx + portionSize : " << idx + portionSize << std::endl;
+			std::clog << " nbByte            : " << nbByte << std::endl;
+			std::clog << " remainSize        : " << sequence.Out.remainSize << std::endl;
+		}
+		
+		if ( idx + portionSize > nbByte ) {
+			std::cerr << "CncCommandDecoder::decodeMoveSequence() Invalid portion size" << std::endl;
+			std::cerr << " - nbByte      : " << nbByte << std::endl;
+			std::cerr << " - idx         : " << idx << std::endl;
+			std::cerr << " - portionSize : " << portionSize << std::endl;
+			return false;
+		}
+		idx++;
 
-	// update remaining size
-	sequence.remainSize -= idx;
+		// over all positions
+		unsigned int byteCounter = 0;
+		while ( byteCounter < portionSize - 1) {
 
-	return returnAndNotify(true);
+			CncLongPosition pos;
+			int32_t f = 0;
+			if ( sequence.Out.cmd == CMD_RENDER_AND_MOVE_SEQUENCE ) {
+				
+				byteCounter += readPosition(pos, f);
+			}
+			else if ( sequence.Out.cmd == CMD_MOVE_SEQUENCE ) {
+				
+				byteCounter += readOneByteToPos(pos, f);
+			}
+			else {
+				
+				std::cerr << "CncCommandDecoder::decodeMoveSequence(portion) Invalid command = " << buffer[idx]
+						  << ". While reading portion" << std::endl;
+				return false;
+			}
+
+			// notify
+			if ( caller != NULL )
+				caller->notifyMove(pos.getX(), pos.getY(), pos.getZ(), f);
+
+			// debug
+			if ( false ) {
+				std::cout << " portionSize         = " << portionSize << std::endl;
+				std::cout << " byteCounter         = " << byteCounter << std::endl;
+				std::cout << " idx                 = " << idx << std::endl;
+				std::cout << " sequence.remainSize = " << sequence.Out.remainSize << std::endl;
+				
+			}
+		}
+
+		// update remaining size
+		sequence.Out.remainSize -= (byteCounter + 1);
+		//std::clog << portionSize << ", " << idx << ", " << nbByte << ": " << sequence.Out.remainSize << " - " << (nbByte - idx) << std::endl;
+		
+		return true;
+	};
+	
+	// perform header size
+	sequence.Out.remainSize -= idx;
+	//std::cout << 0 << ", " << idx << ", " << nbByte << ": " << sequence.Out.remainSize << " - " << (nbByte - idx) << std::endl;
+	
+	// over all portions
+	bool ret = false;
+	while ( sequence.Out.remainSize > 0 ) {
+		ret = processPortion();
+		if ( ret == false ) {
+			std::cerr << "CncCommandDecoder::decodeMoveSequence() processPortion() failed!" << std::endl;
+			break;
+		}
+		
+		// single portion mode
+		if ( sequence.In.parseAllPortions == false )
+			break;
+			
+		// notify
+		if ( sequence.Out.remainSize > 0 )
+			if ( caller != NULL )
+				caller->notifyMoveSequenceNext(sequence);
+	}
+	
+	return returnAndNotify(ret);
 }
-
 ///////////////////////////////////////////////////////////////////
 bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbByte,
 		                           CncCommandDecoder::CallbackInterface* caller)

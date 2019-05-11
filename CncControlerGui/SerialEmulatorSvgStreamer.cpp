@@ -52,17 +52,17 @@ bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceCallback(const MoveInfo&
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence) {
+bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	return true;
 }

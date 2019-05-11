@@ -739,28 +739,28 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 	return false;
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) {
+void SerialEmulatorNULL::notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	limitStates.reset();
 
-	const int32_t dx = sequence.totLengthX;
-	const int32_t dy = sequence.totLengthY;
-	const int32_t dz = sequence.totLengthZ;
+	const int32_t dx = sequence.Out.totLengthX;
+	const int32_t dy = sequence.Out.totLengthY;
+	const int32_t dz = sequence.Out.totLengthZ;
 
 	// update speed simulator values
 	initializeFeedProfile(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) {
+void SerialEmulatorNULL::notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
 	// currently nothing to do
 }
 ///////////////////////////////////////////////////////////////////
-void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) {
+void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence) {
 ///////////////////////////////////////////////////////////////////
-	if ( lastCommand.MoveSequence.sequence.remainSize != 0 ) {
+	if ( lastCommand.MoveSequence.sequence.Out.remainSize != 0 ) {
 		std::cerr 	<< "SerialEmulatorNULL::notifyMoveSequenceEnd: Quality check failed" << std::endl
-					<< " - lastCommand.MoveSequence.sequence.remainSize: " << lastCommand.MoveSequence.sequence.remainSize 
+					<< " - lastCommand.MoveSequence.sequence.remainSize: " << lastCommand.MoveSequence.sequence.Out.remainSize 
 					<< std::endl;
 	}
 
@@ -782,11 +782,6 @@ void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t 
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorNULL::writeMoveSeqIntern(unsigned char *buffer, unsigned int nbByte) {
 ///////////////////////////////////////////////////////////////////
-	if ( lastCommand.MoveSequence.sequence.isBegin() ) {
-		if ( writeMoveSequenceRawCallback(buffer, nbByte)  == false )
-			return false;
-	}
-
 	// this call will activate: notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f)
 	if ( CncCommandDecoder::decodeMoveSequence(buffer, nbByte, lastCommand.MoveSequence.sequence, this) == false )
 		return false;
@@ -795,9 +790,9 @@ bool SerialEmulatorNULL::writeMoveSeqIntern(unsigned char *buffer, unsigned int 
 	lastCommand.MoveSequence.ret = RET_MORE;
 	
 	if ( false )
-		std::cout << "lastCommand.MoveSequence.sequence.remainSize: " << lastCommand.MoveSequence.sequence.remainSize << std::endl;
+		std::cout << "lastCommand.MoveSequence.sequence.remainSize: " << lastCommand.MoveSequence.sequence.Out.remainSize << std::endl;
 	
-	if ( lastCommand.MoveSequence.sequence.isEnd() )
+	if ( lastCommand.MoveSequence.sequence.Out.isEnd() )
 		lastCommand.MoveSequence.ret = RET_OK;
 	
 	replyPosition(true);

@@ -52,15 +52,14 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		
 		virtual bool writeSetterRawCallback(unsigned char *buffer, unsigned int nbByte);
 		virtual bool writeMoveRawCallback(unsigned char *buffer, unsigned int nbByte);
-		virtual bool writeMoveSequenceRawCallback(unsigned char *buffer, unsigned int nbByte);
 		
 		virtual bool writeEncodedSetterCallback(const SetterInfo& si);
 		virtual bool writeEncodedMoveCallback(const MoveInfo& mi);
 		
 		virtual bool writeEncodedMoveSequenceCallback(const MoveInfo& mi);
-		virtual bool writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence);
-		virtual bool writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence);
-		virtual bool writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence);
+		virtual bool writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
+		virtual bool writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
+		virtual bool writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
 		
 		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
 		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
@@ -79,9 +78,9 @@ class SerialEmulatorTextStreamer : public SerialEmulatorNULL
 		
 		void notifySetter(const CncCommandDecoder::SetterInfo& si) final;
 		void notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) final;
-		void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequence& sequence) final;
-		void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequence& sequence) final;
-		void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequence& sequence) final;
+		void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
+		void notifyMoveSequenceNext(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
+		void notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
 
 		virtual bool isOutputAsTemplateAvailable();
 		

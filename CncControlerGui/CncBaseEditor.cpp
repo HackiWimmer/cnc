@@ -659,12 +659,10 @@ void CncBaseEditor::setupModelType() {
 	if ( tf == TplBinary )
 		tf = fileInfo.binaryOrigFomat;
 	
+	const bool r = CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag();
+	
 	switch ( tf ) {
-		case TplSvg:		fileInfo.modelType 		= GLContextBase::ModelType::MT_RIGHT_HAND;
-
-							if ( CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag() )
-								fileInfo.modelType 		= GLContextBase::ModelType::MT_LEFT_HAND;
-
+		case TplSvg:		fileInfo.modelType 		= r ? GLContextBase::ModelType::MT_LEFT_HAND : GLContextBase::ModelType::MT_RIGHT_HAND;
 							fileInfo.modelViewType	= CncDimensions::CncDimension2D; 
 							break;
 							

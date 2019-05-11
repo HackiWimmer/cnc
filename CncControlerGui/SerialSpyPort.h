@@ -10,6 +10,9 @@ class SerialSpyPort : public Serial {
 		void spyReadData(void *buffer, unsigned int nbByte);
 		void spyWriteData(void *buffer, unsigned int nbByte);
 		
+		virtual int readData(void *buffer, unsigned int nbByte);
+		virtual bool writeData(void *buffer, unsigned int nbByte);
+		
 	public:
 		SerialSpyPort(CncControl* cnc);
 		SerialSpyPort(const char *portName);
@@ -21,10 +24,6 @@ class SerialSpyPort : public Serial {
 		virtual bool isEmulator() const { return false; }
 		// return the port type
 		virtual const CncPortType getPortType() const { return CncPORT; }
-		
-		virtual int readData(void *buffer, unsigned int nbByte);
-		virtual bool writeData(void *buffer, unsigned int nbByte);
-		
 };
 
 

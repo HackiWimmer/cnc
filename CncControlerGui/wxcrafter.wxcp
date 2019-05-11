@@ -7411,7 +7411,7 @@
                           }, {
                            "type": "bitmapPicker",
                            "m_label": "Bitmap File:",
-                           "m_path": "bitmaps/book_green.png"
+                           "m_path": "bitmaps/16-globals.png"
                           }, {
                            "type": "bool",
                            "m_label": "Selected",
@@ -8616,7 +8616,7 @@
                           }, {
                            "type": "bitmapPicker",
                            "m_label": "Bitmap File:",
-                           "m_path": ""
+                           "m_path": "bitmaps/16-enumerator.png"
                           }, {
                            "type": "bool",
                            "m_label": "Selected",
@@ -8935,7 +8935,7 @@
                           }, {
                            "type": "bitmapPicker",
                            "m_label": "Bitmap File:",
-                           "m_path": "bitmaps/book_red.png"
+                           "m_path": "bitmaps/basket-3.png"
                           }, {
                            "type": "bool",
                            "m_label": "Selected",

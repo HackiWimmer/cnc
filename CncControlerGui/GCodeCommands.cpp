@@ -14,7 +14,7 @@ class CommandStoreInitializer {
 		int ig = CMD_DESRIPTION_INVALID_GROUP;
 		
 		//////////////////////////////////////////////////////////////////
-		inline void registerCommand(GCodeField field, const char type, const int group, const bool modal, const char* desc) {
+		inline void registerCommand(const GCodeField& field, const char type, const int group, const bool modal, const char* desc) {
 			CmdDescription cd;
 			cd.type 		= type;
 			cd.group		= group;

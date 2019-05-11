@@ -11,9 +11,9 @@ class SerialEmulatorSvgStreamer : public SerialEmulatorTextStreamer
 		virtual bool writeEncodedMoveCallback(const MoveInfo& mi);
 		
 		virtual bool writeEncodedMoveSequenceCallback(const MoveInfo& mi);
-		virtual bool writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequence& sequence);
-		virtual bool writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequence& sequence);
-		virtual bool writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequence& sequence);
+		virtual bool writeEncodedMoveSequenceBeginCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
+		virtual bool writeEncodedMoveSequenceNextCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
+		virtual bool writeEncodedMoveSequenceEndCallback(const CncCommandDecoder::MoveSequenceInfo& sequence);
 
 		virtual void initializeFile(const Serial::Trigger::BeginRun& tr);
 		virtual void finalizeFile(const Serial::Trigger::EndRun& tr);
