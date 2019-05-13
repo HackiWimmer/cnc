@@ -9,6 +9,7 @@
 #include "SVGUserAgentInfo.h"
 #include "SvgCncParameters.h"
 #include "DataControlModel.h"
+#include "CncConfig.h"
 #include "CncPosition.h"
 
 struct SvgUserAgentOutputControls {
@@ -91,7 +92,7 @@ class SVGUserAgent{
 			oCtl.detailInfo			= NULL;
 			
 			//preallocate space
-			userAgent.reserve(1000 * 1000);
+			userAgent.reserve(GBL_CONFIG->getConstRerserveCapacity());
 		}
 		
 		/////////////////////////////////////////////////////////

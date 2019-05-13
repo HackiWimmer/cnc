@@ -1,5 +1,6 @@
 #include <iostream>
 #include <climits>
+#include "CncConfig.h"
 #include "CncLargeScaleListCtrl.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -13,7 +14,7 @@ CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, wxWindowID id, 
 , lastSelection(wxNOT_FOUND)
 ///////////////////////////////////////////////////////////////////
 {
-	rows.reserve( 1024 * 1024);
+	rows.reserve( GBL_CONFIG->getConstRerserveCapacity() );
 }
 ///////////////////////////////////////////////////////////////////
 CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, long style) 
@@ -25,7 +26,7 @@ CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, long style)
 , lastSelection(wxNOT_FOUND)
 ///////////////////////////////////////////////////////////////////
 {
-	rows.reserve( 1024 * 1024);
+	rows.reserve( GBL_CONFIG->getConstRerserveCapacity() );
 }
 ///////////////////////////////////////////////////////////////////
 CncLargeScaledListCtrl::~CncLargeScaledListCtrl() {

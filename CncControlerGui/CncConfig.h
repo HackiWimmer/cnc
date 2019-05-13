@@ -66,16 +66,35 @@ class CncConfig {
 		
 		typedef std::map<int, ToolMagazineEntry> ToolMagazine;
 		
+		struct ContainerMemoryAllocation {
+			private:
+				unsigned int portion 	= 1024;
+				size_t capacity			=    1;
+				
+			public:
+				explicit ContainerMemoryAllocation(unsigned int f = 4) 
+				: capacity(portion * f)
+				{}
+				
+				explicit ContainerMemoryAllocation(const ContainerMemoryAllocation& cma) 
+				: capacity(cma.getCapacity())
+				{}
+				
+				void setup(unsigned int f = 4) 		{ *this = ContainerMemoryAllocation(f); }
+				const size_t getCapacity() const	{ return capacity; }
+		};
+		
 	private:
-		bool 					changed;
-		bool 					notificationActivated;
-		CncOSDConfigList 		osdConfigList;
-		CncUnit 				currentUnit;
-		MainFrame* 				theApp;
-		CncContext*				context;
-		ToolMagazine 			toolMagazine;
-		ToolMagazineParameter 	toolMagazineParameter;
-		RegisteredWindows 		registeredWindows;
+		bool 						changed;
+		bool 						notificationActivated;
+		CncOSDConfigList 			osdConfigList;
+		CncUnit 					currentUnit;
+		MainFrame* 					theApp;
+		CncContext*					context;
+		ToolMagazine 				toolMagazine;
+		ToolMagazineParameter 		toolMagazineParameter;
+		RegisteredWindows 			registeredWindows;
+		ContainerMemoryAllocation	contMemAllocation;
 		
 		double dispFactX, dispFactY, dispFactZ;
 		double calcFactX, calcFactY, calcFactZ;
@@ -190,6 +209,8 @@ class CncConfig {
 				~NotificationDeactivator()
 					{ GBL_CONFIG->activateConfigNotification(notifyOnEnd); }
 		};
+		
+		size_t getConstRerserveCapacity() const { return contMemAllocation.getCapacity(); }
 		
 		// curve lib utils
 		const float getRenderResolutionMM() const { return renderResolutionMM; }

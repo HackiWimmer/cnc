@@ -303,6 +303,11 @@ void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 	// This is required even though dc is not used otherwise.
 	wxPaintDC dc(this);
 	onPaint();
+	
+	
+	#warning
+	std::cout << monitor->getPathItemCount() << std::endl;
+	
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onSize(wxSizeEvent& event) {

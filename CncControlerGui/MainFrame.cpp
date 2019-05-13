@@ -502,7 +502,7 @@ void MainFrame::regiterAllMenuItems() {
 void MainFrame::enableMenuItems(bool state) {
 ///////////////////////////////////////////////////////////////////
 	for ( auto it = menuItems.begin(); it != menuItems.end(); ++it ) {
-		CncApp::MenuInfo mi = it->second;
+		CncApp::MenuInfo& mi = it->second;
 		
 		if ( it->first == NULL )
 			continue;
@@ -534,7 +534,7 @@ void MainFrame::registerGuiControl(wxWindow* ctrl) {
 void MainFrame::enableGuiControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 	for ( auto it = guiControls.begin(); it != guiControls.end(); ++it ) {
-		CncApp::WindowInfo wi = *it;
+		CncApp::WindowInfo& wi = *it;
 		
 		if ( wi.ctrl == NULL )
 			continue;

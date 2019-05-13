@@ -13,6 +13,8 @@
     <File Name="wxDummyCanvas.h"/>
     <File Name="Sample2.cpp" ExcludeProjConfig="Debug;"/>
   </VirtualDirectory>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -23,11 +25,10 @@
       </Linker>
       <ResourceCompiler Options=""/>
     </GlobalSettings>
-    <Configuration Name="Debug" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g;-O0;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui"/>
-        <IncludePath Value="C:\@Development\freeglut\include"/>
         <Preprocessor Value="_USE_WX_DUMMY_CANVAS"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs)" Required="yes">
@@ -71,20 +72,19 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="MinGW ( TDM-GCC-64 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Release" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-Ofast;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-Ofast;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui"/>
-        <IncludePath Value="C:\@Development\freeglut\include"/>
+        <IncludePath Value="C:\msys64\mingw64\x86_64-w64-mingw32\include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="_USE_WX_DUMMY_CANVAS"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs)" Required="yes">
-        <LibraryPath Value="C:\@Development\freeglut\lib\x64"/>
-        <Library Value="libwxmsw31u_stc"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
-        <Library Value="libfreeglut"/>
+        <Library Value="glew32"/>
+        <Library Value="freeglut"/>
       </Linker>
       <ResourceCompiler Options="" Required="no"/>
       <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Release" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="no" DebugArguments="" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="yes" IsGUIProgram="no" IsEnabled="yes"/>
@@ -121,6 +121,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

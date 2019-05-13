@@ -404,8 +404,6 @@
     <File Name="UnitTestFrame.cpp"/>
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
   <Dependencies Name="release2"/>
   <Settings Type="Executable">
     <GlobalSettings>
@@ -563,4 +561,6 @@
       </Completion>
     </Configuration>
   </Settings>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
 </CodeLite_Project>

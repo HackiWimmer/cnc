@@ -241,7 +241,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		dc.SetBrush(*wxTRANSPARENT_BRUSH);
 		
 		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-			OuterCircleRegion ocr = *it;
+			OuterCircleRegion& ocr = *it;
 			
 			if ( ocr.direction == current.direction ) {
 				dc.SetPen(highlightPen);
@@ -328,7 +328,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		
 		// Arrows ( outer circle ) 
 		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-			OuterCircleRegion ocr = *it;
+			OuterCircleRegion& ocr = *it;
 			wxColour col1;
 			wxColour col2;
 			
@@ -441,7 +441,7 @@ void CncNavigatorPanel::onPaint(wxPaintEvent& event) {
 		dc.SetFont(font);
 		
 		for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-			OuterCircleRegion ocr = *it;
+			OuterCircleRegion& ocr = *it;
 			
 			if ( ocr.direction > WW )
 				continue;
@@ -598,7 +598,7 @@ void CncNavigatorPanel::onMouse(const MouseInfo& mi) {
 		if (  radius >= innerRadius && radius <= outerRadius ) {
 			
 			for ( auto it =outerRegions.begin(); it != outerRegions.end(); ++it ) {
-				OuterCircleRegion ocr = *it;
+				OuterCircleRegion& ocr = *it;
 				
 				// Determine reagions angle boundings:
 				//  In this case the start- or stop- angel can defined greater as 360°

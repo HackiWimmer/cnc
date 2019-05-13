@@ -106,7 +106,6 @@ void GLContextBase::init() {
 		
 	viewPort = createViewPort();
 	initialized = true;
-	
 }
 /////////////////////////////////////////////////////////////////////
 void GLContextBase::checkGLError() {
@@ -612,7 +611,7 @@ void GLContextBase::decorateProbeMode(bool state) {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::display() {
 /////////////////////////////////////////////////////////////////
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	wxASSERT ( viewPort != NULL );
 
 	// initialize model matrix

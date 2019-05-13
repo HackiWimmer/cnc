@@ -13,10 +13,10 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=20/03/2019
+Date                   :=13/05/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
-LinkerName             :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
-SharedObjectLinkerName :=C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -shared -fPIC
+LinkerName             :=C:/msys64/mingw64/bin/g++.exe
+SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
 ObjectSuffix           :=.o
 DependSuffix           :=.o.d
 PreprocessSuffix       :=.i
@@ -36,26 +36,26 @@ ObjectsFileList        :="FreeGlutWorkspace.txt"
 PCHCompileFlags        :=
 MakeDirCommand         :=makedir
 RcCmpOptions           := 
-RcCompilerName         :=C:/@Development/Compilers/TDM-GCC-64/bin/windres.exe
+RcCompilerName         :=C:/msys64/mingw64/bin/windres.exe
 LinkOptions            :=  $(shell wx-config --libs)
-IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui $(IncludeSwitch)C:\@Development\freeglut\include 
+IncludePath            :=  $(IncludeSwitch). $(IncludeSwitch). $(IncludeSwitch)C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui $(IncludeSwitch)C:\msys64\mingw64\x86_64-w64-mingw32\include 
 IncludePCH             := 
 RcIncludePath          := 
-Libs                   := $(LibrarySwitch)wxmsw31u_stc $(LibrarySwitch)opengl32 $(LibrarySwitch)glu32 $(LibrarySwitch)freeglut 
-ArLibs                 :=  "libwxmsw31u_stc" "opengl32" "glu32" "libfreeglut" 
-LibPath                := $(LibraryPathSwitch). $(LibraryPathSwitch)C:\@Development\freeglut\lib\x64 
+Libs                   := $(LibrarySwitch)opengl32 $(LibrarySwitch)glu32 $(LibrarySwitch)glew32 $(LibrarySwitch)freeglut 
+ArLibs                 :=  "opengl32" "glu32" "glew32" "freeglut" 
+LibPath                := $(LibraryPathSwitch). 
 
 ##
 ## Common variables
 ## AR, CXX, CC, AS, CXXFLAGS and CFLAGS can be overriden using an environment variables
 ##
-AR       := C:/@Development/Compilers/TDM-GCC-64/bin/ar.exe rcu
-CXX      := C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe
-CC       := C:/@Development/Compilers/TDM-GCC-64/bin/gcc.exe
+AR       := C:/msys64/mingw64/bin/ar.exe rcu
+CXX      := C:/msys64/mingw64/bin/g++.exe
+CC       := C:/msys64/mingw64/bin/gcc.exe
 CXXFLAGS := -Wno-deprecated-declarations -Ofast -std=c++14 -std=c++11 -Wall $(shell wx-config --cflags) $(Preprocessors)
 CFLAGS   :=  -Ofast -Wall $(Preprocessors)
 ASFLAGS  := 
-AS       := C:/@Development/Compilers/TDM-GCC-64/bin/as.exe
+AS       := C:/msys64/mingw64/bin/as.exe
 
 
 ##

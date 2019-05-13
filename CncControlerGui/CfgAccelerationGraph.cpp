@@ -105,7 +105,7 @@ void CfgAccelerationGraph::onPaint(wxPaintEvent& event) {
 	
 	// draw graph
 	for ( auto it = graph.begin(); it != graph.end(); it++) {
-		Point p = *it;
+		Point& p = *it;
 		//std::cout << p.step << ", " << p.value << std::endl;
 		dc.DrawPoint(wxPoint(border + p.step  * w / stepsToMove, 
 		                     border + p.value * h / maxDiff));

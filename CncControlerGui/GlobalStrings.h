@@ -8,7 +8,7 @@ namespace VersionInfo {
 
 	const wxString major			= "0";
 	const wxString minor			= "9";
-	const wxString index			= "2";
+	const wxString index			= "5";
 
 	const wxString text 			= "";
 	const wxString number			= wxString::Format("%s.%s.%s", major, minor, index);

@@ -19,9 +19,7 @@ class GLContextCncPathBase : public GLContextBase {
 		virtual ~GLContextCncPathBase();
 		
 		/////////////////////////////////////////////////////////
-		void clearPathData() {
-			cncPath.clear();
-		}
+		void clearPathData();
 		
 		/////////////////////////////////////////////////////////
 		const GLI::GLCncPath& getPathData() {
@@ -43,19 +41,8 @@ class GLContextCncPathBase : public GLContextBase {
 		}
 		
 		/////////////////////////////////////////////////////////
-		void appendPathData(const GLI::GLCncPathVertices& cpv) {
-			cncPath.push_back(cpv);
-		}
-
-		/////////////////////////////////////////////////////////
-		void appendPathData(const GLI::GLCncPath& cp) {
-			if ( cp.size() > 0 ) {
-				for ( GLI::GLCncPath::const_iterator it = cp.begin(); it != cp.end() - 1; ++it )
-					cncPath.push_back(*it);
-			} else {
-				clearPathData();
-			}
-		}
+		void appendPathData(const GLI::GLCncPathVertices& cpv);
+		void appendPathData(const GLI::GLCncPath& cp);
 		
 		/////////////////////////////////////////////////////////
 		void setCurrentClientId(long id) { currentClientId = id; }
@@ -128,6 +115,11 @@ class GLContextCncPathBase : public GLContextBase {
 		void drawPoints();
 		void drawLines();
 		void drawLineStrips();
+		
+		void drawPoint(const GLI::GLCncPathVertices& vCurr);
+		void drawLine(const GLI::GLCncPathVertices& vCurr, const GLI::GLCncPathVertices& vPrev);
+		void drawLineStrip(const GLI::GLCncPathVertices& vCurr);
+
 };
 
 #endif

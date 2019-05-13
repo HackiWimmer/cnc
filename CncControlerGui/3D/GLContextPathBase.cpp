@@ -1,6 +1,7 @@
 #include <iostream>
 #include "3D/GLContextPathBase.h"
 #include "3D/GLLabelCluster.h"
+#include "CncConfig.h"
 
 #ifdef __DARWIN__
     #include <OpenGL/glu.h>
@@ -16,9 +17,9 @@
 #include "wxcrafter.h"
 
 GLuint theTexture = 0;
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 GLuint LoadBMP(const wxImage& img) {
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 	const unsigned char *data = img.GetData();
 	unsigned int width        = img.GetWidth();
 	unsigned int height       = img.GetHeight();
@@ -32,9 +33,9 @@ GLuint LoadBMP(const wxImage& img) {
 	
 	return texture;
 }
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 static void drawBox(GLfloat size, GLenum type) {
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 	static GLfloat n[6][3] =
 	{
 	{-1.0, 0.0, 0.0},
@@ -78,7 +79,7 @@ static void drawBox(GLfloat size, GLenum type) {
 	}
 }
 
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
 : GLContextBase(canvas)
 , cncPath()
@@ -88,22 +89,22 @@ GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
 , rulerColourX(coordOriginInfo.colours.x)
 , rulerColourY(coordOriginInfo.colours.y)
 , rulerColourZ(coordOriginInfo.colours.z)
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 {
-	cncPath.reserve(1024 * 1024);
+	cncPath.reserve(GBL_CONFIG->getConstRerserveCapacity());
 	
 	wxBitmap bmp = ImageLibBig().Bitmap("BMP_CNC");
 	wxImage img  = bmp.ConvertToImage();
 	theTexture   = LoadBMP(img);
 }
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 GLContextCncPathBase::~GLContextCncPathBase() {
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 	clearPathData();
 }
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::markCurrentPosition() {
-/////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////
 	// ensure cncPath.end() - 1 is valid
 	if ( cncPath.size() == 0 )
 		return;
@@ -112,6 +113,87 @@ void GLContextCncPathBase::markCurrentPosition() {
 	GLI::GLCncPath::iterator it = cncPath.vEnd() - 1;
 	drawPosMarker(it->getX(), it->getY(), it->getZ());
 }
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::clearPathData() {
+/////////////////////////////////////////////////////////////////
+	cncPath.clear();
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::appendPathData(const GLI::GLCncPathVertices& cpv) {
+/////////////////////////////////////////////////////////////////
+	#warning
+	drawPoint(cpv);
+		
+	glFlush();
+
+	
+	//std::clog << sizeof(GLI::GLCncPathVertices) << std::endl;
+	
+	
+	cncPath.push_back(cpv);
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::appendPathData(const GLI::GLCncPath& cp) {
+/////////////////////////////////////////////////////////////////
+	if ( cp.size() > 0 ) {
+		for ( GLI::GLCncPath::const_iterator it = cp.begin(); it != cp.end() - 1; ++it )
+			appendPathData(*it);
+	} 
+	else {
+		clearPathData();
+		determineModel();
+	}
+}
+
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawPoint(const GLI::GLCncPathVertices& vCurr) {
+/////////////////////////////////////////////////////////////////
+
+	// ensure the right model
+	glMatrixMode(GL_MODELVIEW);
+	
+	typedef GLI::GLCncPathVertices::FormatType FormatType;
+	
+	glBegin(GL_POINTS);
+	
+		int alpha = 255;
+		// line stipple and colour depth
+		switch ( vCurr.getFormatType() ) {
+			case FormatType::FT_SOLID: {
+					alpha = 255;
+					break;
+			}
+			case FormatType::FT_TRANSPARENT:
+			case FormatType::FT_DOT:
+			case FormatType::FT_LONG_DASH:
+			case FormatType::FT_SHORT_DASH:
+			case FormatType::FT_DOT_DASH: {
+					alpha = 0;
+					break;
+			}
+		}
+		
+		glColor4ub(vCurr.getColour(currentClientId).Red(), vCurr.getColour(currentClientId).Green(), vCurr.getColour(currentClientId).Blue(), alpha);
+		
+		// determine the vertice
+		glVertex3f(vCurr.getX(), vCurr.getY(), vCurr.getZ());
+		
+	glEnd();
+
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawLine(const GLI::GLCncPathVertices& vCurr, const GLI::GLCncPathVertices& vPrev) {
+	
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::drawLineStrip(const GLI::GLCncPathVertices& vCurr) {
+	
+}
+
+
+
+
+
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawPoints() {
 /////////////////////////////////////////////////////////////////
@@ -256,7 +338,6 @@ void GLContextCncPathBase::drawLineStrips() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::determineModel() {
 /////////////////////////////////////////////////////////////////
-	
 	if ( isEnabled() == false ) {
 		glPushMatrix();
 			glEnable(GL_TEXTURE_2D);
@@ -350,7 +431,7 @@ void GLContextCncPathBase::drawRuler() {
 					continue;
 				
 				glBegin(GL_LINES);
-					const GLI::GLVectiesTuple vt = *it;
+					const GLI::GLVectiesTuple& vt = *it;
 					glVertex3f(vt.getX1(), vt.getY1(), vt.getZ1());
 					glVertex3f(vt.getX2(), vt.getY2(), vt.getZ2());
 				glEnd();
@@ -370,7 +451,7 @@ void GLContextCncPathBase::drawRuler() {
 			if ( skipIndex( counter++ ) == true ) 
 				continue;
 			
-			const GLI::GLLabelInfo li = *it;
+			const GLI::GLLabelInfo& li = *it;
 			void* font = li.font;
 			if ( font == NULL )
 				font = GLUT_BITMAP_8_BY_13;

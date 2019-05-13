@@ -255,7 +255,7 @@ void CncMoveSequenceListCtrl::RowInfo::appendTo(CncMoveSequenceListCtrl* ctrl) {
 				cc.updateItem(CncMoveSequenceListCtrl::COL_TYPE, 		wxString::Format("%d", 		RIT_POS));
 				cc.updateItem(CncMoveSequenceListCtrl::COL_REF, 		wxString::Format("%lld", 	seq.getReference()));
 
-				const CncMoveSequence::SequencePoint sp = *it;
+				const CncMoveSequence::SequencePoint& sp = *it;
 				cc.updateItem(CncMoveSequenceListCtrl::COL_CLD_ID,		wxString::Format(fmt, 		sp.clientID));
 
 				cc.updateItem(CncMoveSequenceListCtrl::COL_DISTANCE_X,	wxString::Format("%10ld",	(long)sp.x));

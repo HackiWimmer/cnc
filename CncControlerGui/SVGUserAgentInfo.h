@@ -78,7 +78,7 @@ struct SVGUserAgentInfo {
 		/////////////////////////////////////////////////////////
 		SVGUserAgentInfo() {
 			//preallocate space
-			pathInfoList.reserve(1000);
+			pathInfoList.reserve(GBL_CONFIG->getConstRerserveCapacity());
 		}
 		
 		/////////////////////////////////////////////////////////
@@ -206,7 +206,7 @@ struct SVGUserAgentInfo {
 				
 			DataControlModel::addKeyValueRow(rows, "Path", originalPath);
 			for ( auto it=pathInfoList.begin(); it!=pathInfoList.end(); ++it ) {
-				PathInfo pi = *it;
+				PathInfo& pi = *it;
 				wxString command;
 				command << pi.cmd;
 				command << ", Count=";
