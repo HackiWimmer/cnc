@@ -8,6 +8,8 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="src">
+    <File Name="../CncControlerGui/3D/GLOpenGLPathBufferStore.h"/>
+    <File Name="../CncControlerGui/3D/GLOpenGLPathBufferStore.cpp"/>
     <File Name="main.cpp" ExcludeProjConfig="Release;"/>
     <File Name="Sample1.cpp" ExcludeProjConfig="Release;Debug;"/>
     <File Name="wxDummyCanvas.h"/>

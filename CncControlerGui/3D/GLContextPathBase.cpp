@@ -121,15 +121,6 @@ void GLContextCncPathBase::clearPathData() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::appendPathData(const GLI::GLCncPathVertices& cpv) {
 /////////////////////////////////////////////////////////////////
-	#warning
-	drawPoint(cpv);
-		
-	glFlush();
-
-	
-	//std::clog << sizeof(GLI::GLCncPathVertices) << std::endl;
-	
-	
 	cncPath.push_back(cpv);
 }
 /////////////////////////////////////////////////////////////////
@@ -144,56 +135,6 @@ void GLContextCncPathBase::appendPathData(const GLI::GLCncPath& cp) {
 		determineModel();
 	}
 }
-
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::drawPoint(const GLI::GLCncPathVertices& vCurr) {
-/////////////////////////////////////////////////////////////////
-
-	// ensure the right model
-	glMatrixMode(GL_MODELVIEW);
-	
-	typedef GLI::GLCncPathVertices::FormatType FormatType;
-	
-	glBegin(GL_POINTS);
-	
-		int alpha = 255;
-		// line stipple and colour depth
-		switch ( vCurr.getFormatType() ) {
-			case FormatType::FT_SOLID: {
-					alpha = 255;
-					break;
-			}
-			case FormatType::FT_TRANSPARENT:
-			case FormatType::FT_DOT:
-			case FormatType::FT_LONG_DASH:
-			case FormatType::FT_SHORT_DASH:
-			case FormatType::FT_DOT_DASH: {
-					alpha = 0;
-					break;
-			}
-		}
-		
-		glColor4ub(vCurr.getColour(currentClientId).Red(), vCurr.getColour(currentClientId).Green(), vCurr.getColour(currentClientId).Blue(), alpha);
-		
-		// determine the vertice
-		glVertex3f(vCurr.getX(), vCurr.getY(), vCurr.getZ());
-		
-	glEnd();
-
-}
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::drawLine(const GLI::GLCncPathVertices& vCurr, const GLI::GLCncPathVertices& vPrev) {
-	
-}
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::drawLineStrip(const GLI::GLCncPathVertices& vCurr) {
-	
-}
-
-
-
-
-
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawPoints() {
 /////////////////////////////////////////////////////////////////

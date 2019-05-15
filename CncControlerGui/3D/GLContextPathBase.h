@@ -115,11 +115,6 @@ class GLContextCncPathBase : public GLContextBase {
 		void drawPoints();
 		void drawLines();
 		void drawLineStrips();
-		
-		void drawPoint(const GLI::GLCncPathVertices& vCurr);
-		void drawLine(const GLI::GLCncPathVertices& vCurr, const GLI::GLCncPathVertices& vPrev);
-		void drawLineStrip(const GLI::GLCncPathVertices& vCurr);
-
 };
 
 #endif

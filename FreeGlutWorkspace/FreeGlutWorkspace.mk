@@ -13,7 +13,7 @@ CurrentFileName        :=
 CurrentFilePath        :=
 CurrentFileFullPath    :=
 User                   :=Hacki
-Date                   :=13/05/2019
+Date                   :=15/05/2019
 CodeLitePath           :="C:/Program Files/CodeLite"
 LinkerName             :=C:/msys64/mingw64/bin/g++.exe
 SharedObjectLinkerName :=C:/msys64/mingw64/bin/g++.exe -shared -fPIC
@@ -61,7 +61,7 @@ AS       := C:/msys64/mingw64/bin/as.exe
 ##
 ## User defined environment variables
 ##
-Objects0=$(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix) 
+Objects0=$(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(ObjectSuffix) $(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix) 
 
 
 
@@ -92,6 +92,14 @@ PreBuild:
 ##
 ## Objects
 ##
+$(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(ObjectSuffix): ../CncControlerGui/3D/GLOpenGLPathBufferStore.cpp $(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(DependSuffix)
+	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/CncControlerGui/3D/GLOpenGLPathBufferStore.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(ObjectSuffix) $(IncludePath)
+$(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(DependSuffix): ../CncControlerGui/3D/GLOpenGLPathBufferStore.cpp
+	@$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) -MG -MP -MT$(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(ObjectSuffix) -MF$(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(DependSuffix) -MM ../CncControlerGui/3D/GLOpenGLPathBufferStore.cpp
+
+$(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(PreprocessSuffix): ../CncControlerGui/3D/GLOpenGLPathBufferStore.cpp
+	$(CXX) $(CXXFLAGS) $(IncludePCH) $(IncludePath) $(PreprocessOnlySwitch) $(OutputSwitch) $(IntermediateDirectory)/up_CncControlerGui_3D_GLOpenGLPathBufferStore.cpp$(PreprocessSuffix) ../CncControlerGui/3D/GLOpenGLPathBufferStore.cpp
+
 $(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix): Sample2.cpp $(IntermediateDirectory)/Sample2.cpp$(DependSuffix)
 	$(CXX) $(IncludePCH) $(SourceSwitch) "C:/@Development/@Projekte/c++/CNCGuiController/FreeGlutWorkspace/Sample2.cpp" $(CXXFLAGS) $(ObjectSwitch)$(IntermediateDirectory)/Sample2.cpp$(ObjectSuffix) $(IncludePath)
 $(IntermediateDirectory)/Sample2.cpp$(DependSuffix): Sample2.cpp

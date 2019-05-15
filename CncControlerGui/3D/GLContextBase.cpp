@@ -85,7 +85,7 @@ void GLContextBase::traceOpenGLVersionInfo(std::ostream& s) {
 	//s << glGetString(GL_SHADING_LANGUAGE_VERSION​) << std::endl;
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::traceeOpenGLExtentionInfo(std::ostream& s) {
+void GLContextBase::traceOpenGLExtentionInfo(std::ostream& s) {
 /////////////////////////////////////////////////////////////////
 	s << "Extention list:" << std::endl;
 	wxString ext(glGetString(GL_EXTENSIONS));

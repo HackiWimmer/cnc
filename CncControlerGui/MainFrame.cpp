@@ -2405,6 +2405,8 @@ void MainFrame::updateMonitoring() {
 ///////////////////////////////////////////////////////////////////
 const char* MainFrame::getCurrentTemplateFormatName(const char* fileName) {
 ///////////////////////////////////////////////////////////////////
+	static wxString ext;
+
 	switch ( getCurrentTemplateFormat(fileName) ) {
 		case TplManual:
 		case TplTest:	return "";
@@ -2414,7 +2416,7 @@ const char* MainFrame::getCurrentTemplateFormatName(const char* fileName) {
 						if ( fileName == NULL )	fn.Assign(getCurrentTemplatePathFileName());
 						else					fn.Assign(fileName);
 						
-						wxString ext(fn.GetExt());
+						ext.assign(fn.GetExt());
 						ext.MakeUpper();
 						return ext;
 					}
@@ -3762,7 +3764,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 bool MainFrame::processTemplateIntern() {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
-	
+
 	Serial::Trigger::BeginRun begRun;
 		begRun.parameter.SRC.fileName		= getCurrentTemplatePathFileName();
 		begRun.parameter.SRC.fileType		= getCurrentTemplateFormatName();
@@ -7221,16 +7223,18 @@ void MainFrame::saveOutboundAsNewTplFromButton(wxCommandEvent& event) {
 	wxString inboundFile(getCurrentTemplatePathFileName());
 	inboundFile.append(".");
 	inboundFile.append(outboundEditor->getExtention());
-	
+
 	wxString newFile;
+	wxFileName fileName(inboundFile);
+
 	while ( true ) {
 		wxFileDialog saveFileDialog(this, 
 									headline, 
-									inboundFile, 
-									inboundFile,
+									fileName.GetPath(),
+									fileName.GetFullName(),
 									"",
 									wxFD_SAVE);
-									
+
 		if ( saveFileDialog.ShowModal() == wxID_CANCEL ) { 
 			return;
 		}

@@ -111,6 +111,8 @@
         <File Name="3D/GLHelperModel.h"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Impl">
+        <File Name="3D/GLOpenGLPathBufferStore.cpp"/>
+        <File Name="3D/GLOpenGLPathBufferStore.h"/>
         <File Name="3D/GLContextCncPath.cpp"/>
         <File Name="3D/GLContextCncPath.h"/>
         <File Name="3D/GLContextTestCube.cpp"/>

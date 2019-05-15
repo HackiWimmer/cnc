@@ -253,6 +253,7 @@ void CncMotionMonitor::appendVertice(long id, float x, float y, float z, GLI::GL
 												break;
 	}
 	
+	#warning
 	// append
 	// todo - avoid duplicates last != new
 	static GLI::GLCncPathVertices d;
@@ -303,11 +304,6 @@ void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 	// This is required even though dc is not used otherwise.
 	wxPaintDC dc(this);
 	onPaint();
-	
-	
-	#warning
-	std::cout << monitor->getPathItemCount() << std::endl;
-	
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onSize(wxSizeEvent& event) {

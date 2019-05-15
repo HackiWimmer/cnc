@@ -111,7 +111,7 @@ class GLContextBase : public wxGLContext {
 		
 		static void globalInit();
 		static void traceOpenGLVersionInfo(std::ostream& s);
-		static void traceeOpenGLExtentionInfo(std::ostream& s);
+		static void traceOpenGLExtentionInfo(std::ostream& s);
 		
 		void enable(bool state = true) 	{ enabled = state; } 
 		void disable() 					{ enable(false); }

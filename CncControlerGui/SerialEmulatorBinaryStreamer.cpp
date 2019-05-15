@@ -26,13 +26,14 @@ SerialEmulatorBinaryStreamer::~SerialEmulatorBinaryStreamer() {
 ///////////////////////////////////////////////////////////////////
 bool SerialEmulatorBinaryStreamer::isOutputAsTemplateAvailable() {
 ///////////////////////////////////////////////////////////////////
+
+	std::cout << getPortName() << " = "<< wxFile::Exists(getPortName()) << std::endl;
+
 	switch ( inboundFormat ) {
 		case TplBinary:
 		case TplUnknown:
 		case TplTest:		return false;
-		
-		default:			if ( wxFile::Exists(getPortName()) == true )
-								return true;
+		default:			return wxFile::Exists(getPortName());
 	}
 	
 	return false; 

@@ -3448,7 +3448,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_3D_Top = new wxButton(m_panel7704, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel7704, wxSize(26,26)), 0);
     #if wxVERSION_NUMBER >= 2904
     m_3D_Top->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewUp")), wxLEFT);
-    m_3D_Top->SetBitmapMargins(2,2);
+    m_3D_Top->SetBitmapMargins(0,0);
     #endif
     m_3D_Top->SetToolTip(_("Show from Top"));
     

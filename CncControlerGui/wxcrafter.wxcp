@@ -38648,7 +38648,7 @@
                                   }, {
                                    "type": "string",
                                    "m_label": "Margins:",
-                                   "m_value": "2,2"
+                                   "m_value": "0,0"
                                   }],
                                  "m_events": [{
                                    "m_eventName": "wxEVT_COMMAND_BUTTON_CLICKED",
