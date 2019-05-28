@@ -38,7 +38,7 @@ class CncPreprocessor : public CncPreprocessorBase {
 		void addMoveSequenceStart(const CncMoveSequence& seq, double value_MM_MIN, char mode);
 		void addMoveSequence(const CncMoveSequence& seq);
 		
-		void selectClientId(long id, ListType lt);
+		void selectClientId(long id, CncPreprocessor::ListType lt);
 		
 		void updateContent();
 

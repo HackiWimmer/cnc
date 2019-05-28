@@ -434,7 +434,7 @@ protected:
     wxPanel* m_preprocessorPlaceholder;
     wxPanel* m_cnc3DPane;
     wxListbook* m_listbookMonitor;
-    wxPanel* m_panel7704;
+    wxPanel* m_motionMonitor;
     wxBitmapToggleButton* m_btSaveOutboundAsTemplate1;
     wxPanel* m_placeholderPanel;
     wxStaticLine* m_staticLine50163;
@@ -485,6 +485,8 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
+    wxPanel* m_motionVertexTrace;
+    wxPanel* m_motionVertexPlaceholder;
     wxPanel* m_cncPostProcessor;
     wxListbook* m_listbookPostProcessor;
     wxPanel* m_panel7697;
@@ -702,8 +704,7 @@ protected:
     wxMenuItem* m_menuItemUpdCoors;
     wxMenuItem* m_menuItemUpdDraw;
     wxMenuItem* m_menuItemAllowEvents;
-    wxMenuItem* m_menuItemDisplayUserAgent;
-    wxMenuItem* m_menuItemToolControls;
+    wxMenuItem* m_menuItemDisplayParserDetails;
     wxMenuItem* m_menuSeparator726;
     wxMenuItem* m_menuItemDebugSerial;
     wxMenuItem* m_menuItemFreezeLogger;
@@ -888,6 +889,7 @@ protected:
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
+    virtual void changeMonitorListBook(wxListbookEvent& event) { event.Skip(); }
     virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorOrigin(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorRuler(wxCommandEvent& event) { event.Skip(); }
@@ -982,7 +984,6 @@ protected:
     virtual void defineOnlineDrawing(wxCommandEvent& event) { event.Skip(); }
     virtual void defineAllowEvents(wxCommandEvent& event) { event.Skip(); }
     virtual void displayUserAgent(wxCommandEvent& event) { event.Skip(); }
-    virtual void updateToolControls(wxCommandEvent& event) { event.Skip(); }
     virtual void defineDebugSerial(wxCommandEvent& event) { event.Skip(); }
     virtual void defineMinMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void defineNormalMonitoring(wxCommandEvent& event) { event.Skip(); }
@@ -1415,7 +1416,9 @@ public:
     wxButton* Get3D_Perspective3() { return m_3D_Perspective3; }
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
-    wxPanel* GetPanel7704() { return m_panel7704; }
+    wxPanel* GetMotionMonitor() { return m_motionMonitor; }
+    wxPanel* GetMotionVertexPlaceholder() { return m_motionVertexPlaceholder; }
+    wxPanel* GetMotionVertexTrace() { return m_motionVertexTrace; }
     wxListbook* GetListbookMonitor() { return m_listbookMonitor; }
     wxPanel* GetCnc3DPane() { return m_cnc3DPane; }
     wxStaticText* GetStaticText6138() { return m_staticText6138; }
@@ -2039,6 +2042,7 @@ protected:
     wxPGProperty* m_pgPropWorkColour;
     wxPGProperty* m_pgPropUserColour;
     wxPGProperty* m_pgPropMaxColour;
+    wxPGProperty* m_pgPropHighLightColour;
     wxPGProperty* m_pgPropHL3D;
     wxPGProperty* m_pgPropHLXYPlane;
     wxPGProperty* m_pgPropHLXZPlane;
@@ -2054,8 +2058,8 @@ protected:
     wxStaticText* m_staticText6443;
     wxBitmapButton* m_btResetCameraPos2;
     wxSlider* m_sliderCameraRotation;
-    wxBitmapToggleButton* m_btCameraRotionClockwise;
-    wxBitmapToggleButton* m_btCameraRotionAnticlockwise;
+    wxBitmapToggleButton* m_btCameraRotationClockwise;
+    wxBitmapToggleButton* m_btCameraRotationAnticlockwise;
     wxStaticText* m_staticText3684;
     wxSlider* m_sliderCameraRotationSpeed;
     wxStaticLine* m_staticLine64453;
@@ -2097,8 +2101,8 @@ public:
     wxStaticText* GetStaticText6443() { return m_staticText6443; }
     wxBitmapButton* GetBtResetCameraPos2() { return m_btResetCameraPos2; }
     wxSlider* GetSliderCameraRotation() { return m_sliderCameraRotation; }
-    wxBitmapToggleButton* GetBtCameraRotionClockwise() { return m_btCameraRotionClockwise; }
-    wxBitmapToggleButton* GetBtCameraRotionAnticlockwise() { return m_btCameraRotionAnticlockwise; }
+    wxBitmapToggleButton* GetBtCameraRotationClockwise() { return m_btCameraRotationClockwise; }
+    wxBitmapToggleButton* GetBtCameraRotationAnticlockwise() { return m_btCameraRotationAnticlockwise; }
     wxStaticText* GetStaticText3684() { return m_staticText3684; }
     wxSlider* GetSliderCameraRotationSpeed() { return m_sliderCameraRotationSpeed; }
     wxStaticLine* GetStaticLine64453() { return m_staticLine64453; }
@@ -2155,35 +2159,17 @@ class CncStatisticsPaneBase : public wxPanel
 protected:
     wxSimplebook* m_contextBook;
     wxPanel* m_panelStatistics;
-    wxNotebook* m_statisticBook;
-    wxPanel* m_statisticPageSum;
     wxListCtrl* m_statisticSummaryListCtrl;
     wxCheckBox* m_checkBoxStatisticUpdate;
-    wxPanel* m_statisticPageVecties;
-    wxButton* m_3D_Trace3;
-    wxButton* m_3D_Trace4;
-    wxButton* m_3D_Trace;
-    wxListCtrl* m_vectiesListCtrl;
     wxPanel* m_panelReplay;
     wxPanel* m_panel7059;
     wxPanel* m_replayPlaceholder;
 
 protected:
-    virtual void statisticBookChanged(wxNotebookEvent& event) { event.Skip(); }
-    virtual void clearMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
-    virtual void copyMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
-    virtual void traceMotionMonitorVecties(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxListCtrl* GetStatisticSummaryListCtrl() { return m_statisticSummaryListCtrl; }
     wxCheckBox* GetCheckBoxStatisticUpdate() { return m_checkBoxStatisticUpdate; }
-    wxPanel* GetStatisticPageSum() { return m_statisticPageSum; }
-    wxButton* Get3D_Trace3() { return m_3D_Trace3; }
-    wxButton* Get3D_Trace4() { return m_3D_Trace4; }
-    wxButton* Get3D_Trace() { return m_3D_Trace; }
-    wxListCtrl* GetVectiesListCtrl() { return m_vectiesListCtrl; }
-    wxPanel* GetStatisticPageVecties() { return m_statisticPageVecties; }
-    wxNotebook* GetStatisticBook() { return m_statisticBook; }
     wxPanel* GetPanelStatistics() { return m_panelStatistics; }
     wxPanel* GetPanel7059() { return m_panel7059; }
     wxPanel* GetReplayPlaceholder() { return m_replayPlaceholder; }
@@ -2416,6 +2402,36 @@ public:
     wxListbook* GetListbookPreProcessor() { return m_listbookPreProcessor; }
     CncPreprocessorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,700), long style = wxTAB_TRAVERSAL);
     virtual ~CncPreprocessorBase();
+};
+
+
+class CncMotionVertexTraceBase : public wxPanel
+{
+protected:
+    wxStaticText* m_staticText7928;
+    wxBitmapToggleButton* m_btConnectMotionVertex;
+    wxBitmapButton* m_btClearMotionVertex;
+    wxSplitterWindow* m_splitter7938;
+    wxPanel* m_vertexSplitterPageData;
+    wxPanel* m_motionVertexDataListPlaceholder;
+    wxPanel* m_vertexSplitterPageIndex;
+    wxPanel* m_motionVertexIndexListPlaceholder;
+
+protected:
+    virtual void connectMotionVertex(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearMotionVertex(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticText* GetStaticText7928() { return m_staticText7928; }
+    wxBitmapToggleButton* GetBtConnectMotionVertex() { return m_btConnectMotionVertex; }
+    wxBitmapButton* GetBtClearMotionVertex() { return m_btClearMotionVertex; }
+    wxPanel* GetMotionVertexDataListPlaceholder() { return m_motionVertexDataListPlaceholder; }
+    wxPanel* GetVertexSplitterPageData() { return m_vertexSplitterPageData; }
+    wxPanel* GetMotionVertexIndexListPlaceholder() { return m_motionVertexIndexListPlaceholder; }
+    wxPanel* GetVertexSplitterPageIndex() { return m_vertexSplitterPageIndex; }
+    wxSplitterWindow* GetSplitter7938() { return m_splitter7938; }
+    CncMotionVertexTraceBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncMotionVertexTraceBase();
 };
 
 
@@ -3409,6 +3425,35 @@ public:
     }
 
     virtual ~ImageLibPathList();
+};
+
+
+class ImageLibMotionVertex : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibMotionVertex();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibMotionVertex();
 };
 
 #endif

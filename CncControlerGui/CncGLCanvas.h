@@ -1,9 +1,10 @@
 #ifndef CNC_GL_CANVAS_H
 #define CNC_GL_CANVAS_H
 
-#include <wx/glcanvas.h>
 #include "3D/GLContextCncPath.h"
 #include "CncPosition.h"
+
+#include "3D/GLInclude.h"
 
 ///////////////////////////////////////////////////
 class CncMetricRulerSetup {

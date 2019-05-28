@@ -2,23 +2,49 @@
 #include "GLCncPathData.h"
 
 ////////////////////////////////////////////
-GLI::GLCncPath::iterator GLI::GLCncPath::vBegin() { 
+GLI::GLCncPath::GLCncPath() 
+: vectiesBuffer()
+, minVecties(FLT_MAX, FLT_MAX, FLT_MAX)
+, maxVecties(FLT_MIN, FLT_MIN, FLT_MIN)
+, virtualEnd(-1)
+, publishNotifications(true)
+, callbacks()
 ////////////////////////////////////////////
-	return begin(); 
+{
 }
 ////////////////////////////////////////////
-GLI::GLCncPath::iterator GLI::GLCncPath::vEnd() { 
+GLI::GLCncPath::~GLCncPath() {
 ////////////////////////////////////////////
-	if ( virtualEnd <= 0 ) 
-		return end(); 
-		
-	if ( size() == 0 )
-		return end(); 
-		
-	if ( (unsigned long)virtualEnd > size() - 1 )
-		return end(); 
-		
-	return begin() + virtualEnd;
+}
+////////////////////////////////////////////
+void GLI::GLCncPath::clear() {
+////////////////////////////////////////////
+	// reset boundings
+	minVecties.set(-1L, FLT_MAX, FLT_MAX, FLT_MAX);
+	maxVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
+	
+	vectiesBuffer.destroyBuffers();
+	updateVirtualEnd();
+}
+
+////////////////////////////////////////////
+void GLI::GLCncPath::appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex) {
+////////////////////////////////////////////
+	minVecties.setX(std::min(vertex.getX(), minVecties.getX()));
+	minVecties.setY(std::min(vertex.getY(), minVecties.getY()));
+	minVecties.setZ(std::min(vertex.getZ(), minVecties.getZ()));
+	
+	maxVecties.setX(std::max(vertex.getX(), maxVecties.getX()));
+	maxVecties.setY(std::max(vertex.getY(), maxVecties.getY()));
+	maxVecties.setZ(std::max(vertex.getZ(), maxVecties.getZ()));
+	
+	vectiesBuffer.appendVertex(vertex);
+	updateVirtualEnd();
+}
+////////////////////////////////////////////
+void GLI::GLCncPath::display(GLOpenGLPathBuffer::DisplayType dt) {
+////////////////////////////////////////////
+	vectiesBuffer.display(dt, virtualEnd);
 }
 ////////////////////////////////////////////
 void GLI::GLCncPath::setVirtualEnd(long val) {
@@ -29,15 +55,18 @@ void GLI::GLCncPath::setVirtualEnd(long val) {
 ////////////////////////////////////////////
 const long GLI::GLCncPath::getVirtualEndAsId() {
 ////////////////////////////////////////////
-	if ( vEnd() == end() )
+	if ( virtualEnd >= (long)(vectiesBuffer.getVertexCount() - 1) )
 		return -1;
 		
-	return vEnd()->getId();
+	GLOpenGLPathBuffer::CncVertex vertex;
+	vectiesBuffer.getVertex(vertex, virtualEnd);
+		
+	return vertex.getClientId();
 }
 ////////////////////////////////////////////
 bool GLI::GLCncPath::hasNextVertex() const {
 ////////////////////////////////////////////
-	return virtualEnd < std::distance(begin(), end());
+	return virtualEnd < (long)(vectiesBuffer.getVertexCount() - 1);
 }
 ////////////////////////////////////////////
 bool GLI::GLCncPath::hasPreviousVertex() const {
@@ -50,8 +79,9 @@ long GLI::GLCncPath::previewNextVertexId() {
 	if ( hasNextVertex() == false )
 		return -1;
 		
-	const auto it = vEnd() + 1;
-	return it->getId();
+	GLOpenGLPathBuffer::CncVertex vertex;
+	vectiesBuffer.getVertex(vertex, virtualEnd + 1);
+	return vertex.getClientId();
 }
 ////////////////////////////////////////////
 long GLI::GLCncPath::previewPreviousVertexId() {
@@ -59,8 +89,9 @@ long GLI::GLCncPath::previewPreviousVertexId() {
 	if ( hasPreviousVertex() == false )
 		return -1;
 		
-	const auto it = vEnd() - 1;
-	return it->getId();
+	GLOpenGLPathBuffer::CncVertex vertex;
+	vectiesBuffer.getVertex(vertex, virtualEnd - 1);
+	return vertex.getClientId();
 }
 ////////////////////////////////////////////
 void GLI::GLCncPath::incVirtualEndById() {
@@ -72,7 +103,7 @@ void GLI::GLCncPath::incVirtualEndById() {
 		do {
 			incVirtualEnd();
 			
-			if ( virtualEnd >= std::distance(begin(), end()) - 1 )
+			if ( virtualEnd >= (long)(vectiesBuffer.getVertexCount() - 1) )
 				break;
 				
 		} while ( id == getVirtualEndAsId() );
@@ -106,7 +137,7 @@ void GLI::GLCncPath::spoolVertiesForCurrentId() {
 	while ( id == previewNextVertexId() ) {
 		incVirtualEnd();
 		
-		if ( virtualEnd >= std::distance(begin(), end()) - 1 )
+		if ( virtualEnd >= (long)(vectiesBuffer.getVertexCount() - 1) )
 			break;
 	}
 }

@@ -88,8 +88,6 @@ class CncControl {
 		bool positionOutOfRangeFlag;
 		// power state
 		bool powerOn;
-		// flag for updating tools
-		bool toolUpdateState;
 		// Artificially Step Delay
 		unsigned int stepDelay;
 		// heartbeat value
@@ -348,8 +346,6 @@ class CncControl {
 		// controller pin report
 		void clearControllerPinControl();
 		void appendNumKeyValueToControllerPinInfo(const char* desc, int pin, int type, int mode, int value);
-		
-		void setUpdateToolControlsState(bool state) { toolUpdateState = state; }
 		
 		void setStepDelay(unsigned int d) { stepDelay = d; }
 		unsigned int getStepDelay() { return stepDelay; }

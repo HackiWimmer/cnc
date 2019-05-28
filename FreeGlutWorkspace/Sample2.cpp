@@ -14,7 +14,7 @@
 #include <GL/glext.h>
 #include <GL/glut.h>
 
-#include "../CncControlerGui/3D/GLOpenGLPathBufferStore.h"
+//#include "../CncControlerGui/3D/GLOpenGLPathBufferStore.h"
 
 /////////////////////////////////////////////////////////////////
 namespace OGL_DEBUG {
@@ -115,7 +115,7 @@ void Draw_Teapot (void)
 	glRotatef (turn, 0,1,0);
 
 	glColor3f (1.0, 0.5, 0.1);
-	glutSolidTeapot (1.0);
+	//glutSolidTeapot (1.0);
 
 	glLineWidth (2.0);
 	glColor3f (0.0, 0.2, 0.9);
@@ -125,7 +125,7 @@ void Draw_Teapot (void)
 }
 
 // -------------------------------------------------------------
-GLOpenGLPathBufferStore* pbs;
+//GLOpenGLPathBufferStore* pbs;
 void Draw_Test (void)
 {
 	glPushMatrix ();
@@ -136,7 +136,7 @@ void Draw_Test (void)
 	glScalef (0.25, 0.25, 0.25);
 
 	//DT_DOTS
-	pbs->display(GLOpenGLPathBuffer::DT_STRIPS);
+	//pbs->display(GLOpenGLPathBuffer::DT_STRIPS);
 		
 	glPopMatrix ();
 }
@@ -149,9 +149,9 @@ void display (void)
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	//Draw_Teapot ();
-	Draw_Axes ();
-	Draw_Test();
+	Draw_Teapot ();
+	//Draw_Axes ();
+	//Draw_Test();
 
 	glutSwapBuffers();
 	
@@ -161,7 +161,7 @@ void display (void)
 int main(int argc, char** argv)
 {
 	glutInit(&argc, argv);
-	glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
+	//glutInitDisplayMode (GLUT_SINGLE | GLUT_RGB);
 	glutInitWindowSize (600, 400);
 	glutInitWindowPosition (400, 300);
 	glutInitDisplayMode (GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGB);
@@ -181,7 +181,7 @@ int main(int argc, char** argv)
 	glutSpecialFunc (Turn);
 
 	//glEnable              ( GL_DEBUG_OUTPUT );
-	glDebugMessageCallback( GLOpenGLPathBuffer::MessageCallback, 0 );
+	//glDebugMessageCallback( GLOpenGLPathBuffer::MessageCallback, 0 );
 
 	glClearColor (0.1, 0.2, 0.1, 1.0);
 	glEnable (GL_DEPTH_TEST);
@@ -189,6 +189,7 @@ int main(int argc, char** argv)
 	gluPerspective (40.0, 1.5, 1.0, 10.0);
 	glMatrixMode (GL_MODELVIEW);
 	
+	/*
 	pbs = new GLOpenGLPathBufferStore();
 	
 	auto appendVertex = [&](GLOpenGLPathBuffer::CncVertex& v) {
@@ -215,31 +216,6 @@ int main(int argc, char** argv)
 	
 	std::cout << "highlight: " << pbs->highlightClientID(1) << std::endl;
 
-	//pbs->destroyBuffers();
-/*
-	{ GLOpenGLPathBuffer::CncVertex v('W', -1, +0.0f, +0.0f, +0.0f); appendVertex(v); }
-	{ GLOpenGLPathBuffer::CncVertex v('W', -1, +2.0f, +2.0f, +2.0f); appendVertex(v); }
-
-	{ GLOpenGLPathBuffer::CncVertex v('W', +1, +3.0f, -1.0f, -1.0f); appendVertex(v); }
-	{ GLOpenGLPathBuffer::CncVertex v('W', +1, +2.0f, +2.0f, -1.0f); appendVertex(v); }
-
-	{ GLOpenGLPathBuffer::CncVertex v('W', +2, -1.0f, +2.0f, -1.0f); appendVertex(v); }
-	{ GLOpenGLPathBuffer::CncVertex v('W', +2, +1.0f, -2.0f, -1.0f); appendVertex(v); }
-	{ GLOpenGLPathBuffer::CncVertex v('W', +2, +2.0f, -2.0f, -1.0f); appendVertex(v); }
-	{ GLOpenGLPathBuffer::CncVertex v('W', +2, +1.0f, -2.0f, -1.0f); appendVertex(v); }
-*/
-
-	/*
-	pbs->getVertex(0);
-	pbs->getVertex(1);
-	pbs->getVertex(2);
-	pbs->getVertex(3);
-	pbs->getVertex(4);
-	pbs->getVertex(5);
-	pbs->getVertex(6);
-	pbs->getVertex(14);
-	*/
-	
 	GLOpenGLPathBuffer::CncVertex v;
 	if ( pbs->getVertex(v, 8) ) {
 		std::cout << v << std::endl;
@@ -260,7 +236,7 @@ int main(int argc, char** argv)
 	std::cout << "Buffer size total: " << pbs->getTotalSize() << std::endl;
 
 	std::cout << *pbs;
-
+*/
 	glutMainLoop ();
 	return 0;
 } 

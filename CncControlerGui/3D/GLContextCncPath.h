@@ -1,7 +1,7 @@
 #ifndef OPENGL_CONTEXT_CNC_PATH_H
 #define OPENGL_CONTEXT_CNC_PATH_H
 
-#include "3D/GLContextPathBase.h"
+#include "3D/GLContextCncPathBase.h"
 
 /////////////////////////////////////////////////////////////////
 class GLContextCncPath : public GLContextCncPathBase {

@@ -210,7 +210,7 @@ class CncConfig {
 					{ GBL_CONFIG->activateConfigNotification(notifyOnEnd); }
 		};
 		
-		size_t getConstRerserveCapacity() const { return contMemAllocation.getCapacity(); }
+		size_t getConstReserveCapacity() const { return contMemAllocation.getCapacity(); }
 		
 		// curve lib utils
 		const float getRenderResolutionMM() const { return renderResolutionMM; }

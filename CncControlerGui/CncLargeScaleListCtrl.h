@@ -145,6 +145,8 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		
 		wxString getItemText(long item, long column) const;
 		long searchRow(const wxString& what, int searchColumn);
+		
+		virtual bool isItemValid(long item) const;
 	
 	private:
 		
@@ -155,7 +157,6 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		virtual wxListItemAttr* OnGetItemColumnAttr(long item, long column ) const;
 		
-		inline bool isItemValid(long item) const;
 		inline bool isColumnValid(long column) const;
 		inline long translateItem(long item) const;
 		

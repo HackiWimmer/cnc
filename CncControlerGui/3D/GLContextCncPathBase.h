@@ -12,42 +12,16 @@ class GLContextCncPathBase : public GLContextBase {
 	
 	public:
 	
-		enum DrawType { DT_POINTS, DT_LINES, DT_LINE_STRIP };
+		enum DrawType { DT_POINTS, DT_LINE_STRIP };
 		
 		/////////////////////////////////////////////////////////
 		GLContextCncPathBase(wxGLCanvas* canvas);
 		virtual ~GLContextCncPathBase();
 		
-		/////////////////////////////////////////////////////////
 		void clearPathData();
-		
-		/////////////////////////////////////////////////////////
-		const GLI::GLCncPath& getPathData() {
-			return cncPath;
-		}
-		
-		/////////////////////////////////////////////////////////
-		void tracePathData(std::ostream& out) {
-			out << "Size: " << cncPath.size() << std::endl;
-			unsigned long cnt = 0;
-			for( GLI::GLCncPath::iterator it = cncPath.begin(); it < cncPath.end(); ++it ) {
-				out << ' ';
-				out << wxString::Format("%6lu", cnt++) << ": ";
-				out << wxString::Format("%+.10lf", it->getX()) << ", ";
-				out << wxString::Format("%+.10lf", it->getY()) << ", ";
-				out << wxString::Format("%+.10lf", it->getZ());
-				out << std::endl;
-			}
-		}
-		
-		/////////////////////////////////////////////////////////
-		void appendPathData(const GLI::GLCncPathVertices& cpv);
-		void appendPathData(const GLI::GLCncPath& cp);
-		
-		/////////////////////////////////////////////////////////
+		const GLI::GLCncPath& getPathData() { return cncPath; }
+		void appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex);
 		void setCurrentClientId(long id) { currentClientId = id; }
-		
-		/////////////////////////////////////////////////////////
 		GLContextCncPathBase::DrawType getDrawType() 		{ return drawType; }
 		void setDrawType(GLContextCncPathBase::DrawType t) 	{ drawType = t; }
 		
@@ -88,7 +62,8 @@ class GLContextCncPathBase : public GLContextBase {
 		void activateNotifications() 	{ cncPath.activateNotifications(); }
 		void deactivateNotifications() 	{ cncPath.deactivateNotifications(); }
 		
-		void registerCallback(GLI::GLCncPath::Callback* cb) { cncPath.registerCallback(cb); }
+		GLOpenGLPathBufferStore* getVertexBufferStore()					{ return cncPath.getVertexBufferStore(); }
+		void registerCallback(GLI::GLCncPath::Callback* cb) 			{ cncPath.registerCallback(cb);   }
 		
 	protected:
 		
@@ -109,12 +84,6 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		void drawBoundBox();
 		void drawRuler();
-		
-	private:
-		
-		void drawPoints();
-		void drawLines();
-		void drawLineStrips();
 };
 
 #endif

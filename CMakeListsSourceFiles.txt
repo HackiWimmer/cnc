@@ -1,96 +1,3 @@
-cmake_minimum_required(VERSION 3.7)
-project(cnc)
-
-set(CMAKE_CXX_STANDARD 11)
-
-
-set(CMAKE_LIBRARY_PATH "${LD_LIBRARY_PATH}")
-set(CMAKE_CXX_COMPILER "/usr/bin/g++")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wno-deprecated-declarations")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wno-return-local-addr")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -Wall")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -O3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fpic")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -I /usr/local/lib/wx/include/gtk3-unicode-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -I /usr/local/include/wx-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -I /usr/local/include/")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -D _FILE_OFFSET_BITS=64")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -D WXUSINGDLL")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -D __WXGTK__")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -D BOOST_STACKTRACE_USE_BACKTRACE")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -D BOOST_STACKTRACE_USE_ADDR2LINE")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -pthread")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -ansi ")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/lib")
-
-#/usr/bin/ld: cannot find -lwxtiff-3.1
-#/usr/bin/ld: cannot find -lgtk-x11-2.0
-#/usr/bin/ld: cannot find -lgdk-x11-2.0
-#/usr/bin/ld: cannot find -ljpeg
-#/usr/bin/ld: cannot find -lwxregexu-3.1
-#/usr/bin/ld: cannot find -lwxexpat-3.1
-
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwx_gtk3u_gl-3.1 -lGL -lGLU -lwx_gtk3u_core-3.1 -lwx_baseu-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwx_baseu_xml-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwx_gtk3u_propgrid-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwx_gtk3u_stc-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwx_gtk3u_aui-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwx_gtk3u_xrc-3.1")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwxsvg")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwxregexu-3.1") 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwxexpat-3.1")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lwxtiff-3.1") 
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpng")
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ljpeg")
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lglut")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -latk-1.0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgio-2.0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpangoft2-1.0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lpangocairo-1.0")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lcairo -lpango-1.0") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lfreetype") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lfontconfig")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgtk-3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgdk-3")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgdk_pixbuf-2.0") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgobject-2.0") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgmodule-2.0") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgthread-2.0") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lglib-2.0") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lgobject-2.0") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lX11") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lXxf86vm") 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lSM")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pthread")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -lz -ldl -lm -lrt -lz -ldl -lm")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--version-script,/media/pi/space/wxWidgets-3.1.2/gtk-build/version-script")
-
-include_directories("/media/pi/space/boost_1_70_0")
-include_directories("/usr/local/include/wx-3.1")
-include_directories("/usr/include/GL")
-include_directories("/media/pi/space/cnc/CncControlerGui")
-
-link_directories("/usr/lib/arm-linux-gnueabihf")
-link_directories("/usr/lib")
-link_directories("/usr/local/lib")
-
-# to log all properties
-if ( false )
-    get_cmake_property(_variableNames VARIABLES)
-    foreach (_variableName ${_variableNames})
-        message(STATUS "${_variableName}=${${_variableName}}")
-    endforeach()
-
-endif()
-
-file(MAKE_DIRECTORY "/media/pi/space/cnc/CncControlerGui/Release")
-set(EXECUTABLE_OUTPUT_PATH "/media/pi/space/cnc/CncControlerGui/Release")
-
 set(SOURCE_FILES
 	CncControlerGui/Tests/Test_Base.h
 	CncControlerGui/Tests/Test_Base.cpp
@@ -117,6 +24,17 @@ set(SOURCE_FILES
 	CncControlerGui/3D/GLViewPort.cpp
 	CncControlerGui/3D/GLViewPort.h
 	CncControlerGui/3D/VerticeData.h
+	CncControlerGui/3D/GLLabelCluser.cpp
+	CncControlerGui/3D/GLLineCluster.cpp
+	CncControlerGui/3D/CncGLCanvas.cpp
+	CncControlerGui/3D/CncGLCanvas.cpp
+	CncControlerGui/3D/GLOpenGLPathBufferStore.cpp
+	CncControlerGui/OSD/CncUsbPortScanner.cpp
+	CncControlerGui/OSD/CncUsbPortScanner.h
+	CncControlerGui/OSD/CncAsyncKeyboardState.cpp
+	CncControlerGui/OSD/CncAsyncKeyboardState.h
+	CncControlerGui/OSD/SerialMsw.cpp
+	CncControlerGui/OSD/SerialGtk.cpp
 	CncControlerGui/Clipper/clipper.cpp
 	CncControlerGui/Clipper/clipper.hpp
 	CncControlerGui/CfgApplicationPage.cpp
@@ -176,8 +94,6 @@ set(SOURCE_FILES
 	CncControlerGui/CncToolMagazine.h
 	CncControlerGui/CncToolStateControl.cpp
 	CncControlerGui/CncToolStateControl.h
-	CncControlerGui/OSD/CncUsbPortScanner.cpp
-	CncControlerGui/OSD/CncUsbPortScanner.h
 	CncControlerGui/CncVectiesListCtrl.cpp
 	CncControlerGui/CncVectiesListCtrl.h
 	CncControlerGui/CncZView.cpp
@@ -223,10 +139,6 @@ set(SOURCE_FILES
 	CncControlerGui/PointAbs.h
 	CncControlerGui/CncPerspective.cpp
 	CncControlerGui/CncPerspective.h
-	CncControlerGui/OSD/CncAsyncKeyboardState.cpp
-	CncControlerGui/OSD/CncAsyncKeyboardState.h
-	CncControlerGui/OSD/SerialMsw.cpp
-	CncControlerGui/OSD/SerialGtk.cpp
 	CncControlerGui/Codelite/wxPNGAnimation.cpp
 	CncControlerGui/Codelite/wxPNGAnimation.h
 	CncControlerGui/SerialEmulatorNull.cpp
@@ -260,7 +172,6 @@ set(SOURCE_FILES
 	CncControlerGui/UpdateManagerThread.h
 	CncControlerGui/wxcrafter.cpp
 	CncControlerGui/wxcrafter.h
-	CncControlerGui/3D/CncGLCanvas.cpp
 	CncControlerGui/CncCurveLib.cpp
 	CncControlerGui/CncBaseEditor.cpp
 	CncControlerGui/CncSourceEditor.cpp
@@ -269,8 +180,6 @@ set(SOURCE_FILES
 	CncControlerGui/SvgViewBox.cpp
 	CncControlerGui/BinaryFileParser.cpp
 	CncControlerGui/CncMonitorSplitterWindow.cpp
-	CncControlerGui/3D/GLLabelCluser.cpp
-	CncControlerGui/3D/GLLineCluster.cpp
 	CncControlerGui/CncReferencePosition.cpp
 	CncControlerGui/CncConnectProgress.cpp
 	CncControlerGui/CfgAccelerationGraph.cpp
@@ -310,5 +219,3 @@ set(SOURCE_FILES
 	CncControlerGui/CncStartPositionResolver.cpp
 	CncControlerGui/wxcrafter_bitmaps.cpp
 )
-
-add_executable(cnc ${SOURCE_FILES})

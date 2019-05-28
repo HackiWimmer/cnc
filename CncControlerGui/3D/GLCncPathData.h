@@ -5,6 +5,7 @@
 #include <vector>
 #include <wx/colour.h>
 #include "CncCommon.h"
+#include "3D/GLOpenGLPathBufferStore.h"
 
 namespace GLI {
 	
@@ -78,6 +79,18 @@ namespace GLI {
 			
 			////////////////////////////////////////////
 			~GLCncPathVertices() {
+			}
+			
+			////////////////////////////////////////////
+			static const char getCncModeAsChar(CncMode m) {
+				static char ret;
+				switch( m ) {
+					case CM_WORK: 			ret = 'W'; break;
+					case CM_RAPID:			ret = 'R'; break;
+					case CM_MAX:			ret = 'M'; break;
+					case CM_USER_DEFINED:	ret = 'U'; break;
+				}
+				return ret;
 			}
 			
 			////////////////////////////////////////////
@@ -177,7 +190,7 @@ namespace GLI {
 	typedef std::vector<BoundBoxLine> BoundBox; 
 	
 	////////////////////////////////////////////////////////////////
-	class GLCncPath : public std::vector<GLCncPathVertices> {
+	class GLCncPath {
 		
 		public:
 			
@@ -201,26 +214,12 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
-			GLCncPath() 
-			: std::vector<GLCncPathVertices>()
-			, minVecties(FLT_MAX, FLT_MAX, FLT_MAX)
-			, maxVecties(FLT_MIN, FLT_MIN, FLT_MIN)
-			, virtualEnd(-1)
-			, publishNotifications(true)
-			, callbacks()
-			{}
-			
-			////////////////////////////////////////////
-			virtual ~GLCncPath() {
-			}
-			
-			////////////////////////////////////////////
-			iterator vBegin();
-			iterator vEnd();
+			GLCncPath();
+			virtual ~GLCncPath();
 			
 			////////////////////////////////////////////
 			void setVirtualEndToFirst() 	{ setVirtualEnd(1); }
-			void setVirtualEndToLast() 		{ setVirtualEnd(size()); }
+			void setVirtualEndToLast() 		{ setVirtualEnd(vectiesBuffer.getVertexCount()); }
 			
 			////////////////////////////////////////////
 			bool hasNextVertex() const;
@@ -259,7 +258,7 @@ namespace GLI {
 				bBox.clear();
 				
 				// a bound box of 2 or less points didn't make sense
-				if ( size() < 3 )
+				if ( vectiesBuffer.getVertexCount() < 3 )
 					return bBox;
 				
 				const float x = minVecties.getX(); float X = maxVecties.getX();
@@ -289,7 +288,7 @@ namespace GLI {
 			
 			////////////////////////////////////////////
 			const float getAutoScaleFact() {
-				if ( size() < 1 )
+				if ( vectiesBuffer.getVertexCount() < 1 )
 					return 0.1;
 					
 				const float x = minVecties.getX(); float X = maxVecties.getX();
@@ -309,31 +308,18 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
-			void clear() {
-				// reset boundings
-				minVecties.set(-1L, FLT_MAX, FLT_MAX, FLT_MAX);
-				maxVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
-				
-				std::vector<GLCncPathVertices>::clear();
-				updateVirtualEnd();
-			}
+			GLOpenGLPathBuffer::VertexColours& getColoursAsReference() 			{ return vectiesBuffer.getColoursAsReference(); }
+			GLOpenGLPathBufferStore* getVertexBufferStore()						{ return &vectiesBuffer; }
+			unsigned long size()										const	{ return vectiesBuffer.getVertexCount(); }
 			
-			////////////////////////////////////////////
-			void push_back(const GLCncPathVertices& v) {
-				
-				minVecties.setX(std::min(v.getX(), minVecties.getX()));
-				minVecties.setY(std::min(v.getY(), minVecties.getY()));
-				minVecties.setZ(std::min(v.getZ(), minVecties.getZ()));
-				
-				maxVecties.setX(std::max(v.getX(), maxVecties.getX()));
-				maxVecties.setY(std::max(v.getY(), maxVecties.getY()));
-				maxVecties.setZ(std::max(v.getZ(), maxVecties.getZ()));
-				
-				std::vector<GLCncPathVertices>::push_back(v);
-				updateVirtualEnd();
-			}
+			void setColours(const GLOpenGLPathBuffer::VertexColours& colours) 	{ vectiesBuffer.setColours(colours); }
+			void display(GLOpenGLPathBuffer::DisplayType dt);
+			void clear();
+			void appendPathData(const GLOpenGLPathBuffer::CncVertex& v);
+			
 		
 		private:
+			GLOpenGLPathBufferStore					vectiesBuffer;
 			GLCncPathVertices 						minVecties;
 			GLCncPathVertices 						maxVecties;
 			
@@ -344,7 +330,7 @@ namespace GLI {
 			
 			////////////////////////////////////////////
 			void updateVirtualEnd() {
-				setVirtualEnd(std::distance(begin(), end()));
+				setVirtualEnd(vectiesBuffer.getVertexCount());
 			}
 			
 			////////////////////////////////////////////

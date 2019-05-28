@@ -78,14 +78,7 @@ class SVGFileParser : public SVGNodeParser
 		virtual void clearControls();
 		
 		virtual void selectSourceControl(unsigned long pos);
-
-		virtual void setUserAgentControls(UserAgentOutputControls& oc) {
-			SvgUserAgentOutputControls soc;
-			soc.detailInfo 			= oc.detailInfo;
-			soc.inboundPathList		= oc.inboundPathList;
-			soc.useDirectiveList	= oc.useDirectiveList;
-			svgUserAgent.setOutputControls(soc);
-		}
+		virtual void enableUserAgentControls(bool state);
 		
 		virtual void displayUserAgentDetailInfo(unsigned int pos) {
 			svgUserAgent.displayDetailInfo(pos);

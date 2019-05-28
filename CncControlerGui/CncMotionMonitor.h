@@ -8,12 +8,11 @@
 #include "CncPosition.h"
 #include "CncCommon.h"
 #include "3D/VerticeData.h"
-#include "3D/GLContextPathBase.h"
+#include "3D/GLContextCncPathBase.h"
 
 wxDECLARE_EVENT(wxEVT_MOTION_MONITOR_TIMER, wxTimerEvent);
 
 class GL3DOptions;
-class CncVectiesListCtrl;
 
 /////////////////////////////////////////////////////////////
 class CncMotionMonitor : public CncGlCanvas 
@@ -72,7 +71,9 @@ class CncMotionMonitor : public CncGlCanvas
 		void enable(bool state);
 		void decorateProbeMode(bool state);
 		void clear();
-		void appendVertice(const GLI::VerticeLongData& vd);
+		void appendVertex(const GLI::VerticeLongData& vd);
+		void appendVertex(long clientId, CncSpeedMode sm, const CncLongPosition& pos);
+		
 		void centerViewport();
 		void resetRotation();
 		
@@ -90,14 +91,12 @@ class CncMotionMonitor : public CncGlCanvas
 		
 		unsigned int calculateScaleDisplay(unsigned int height);
 		
-		long fillVectiesListCtr(long curCount, CncVectiesListCtrl* listCtrl);
+		void initVertexListCtr();
 		
 		void normalizeMonitor();
 		void pushProcessMode();
 		void popProcessMode();
 		void reconstruct();
-		
-		void tracePathData(std::ostream& s);
 		
 		// camera handling
 		enum CameraMode{ CM_OFF, CM_CLOCKWISE, CM_COUNTER_CLOCKWISE};
@@ -175,7 +174,7 @@ class CncMotionMonitor : public CncGlCanvas
 		
 	private:
 		
-		inline void appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm);
+		inline void appendVertex(long id, CncSpeedMode sm, float x, float y, float z);
 		inline void onPaint();
 		
 		wxDECLARE_NO_COPY_CLASS(CncMotionMonitor);

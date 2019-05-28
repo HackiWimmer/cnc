@@ -51,13 +51,6 @@ class FileParser {
 			
 		};
 		
-		/////////////////////////////////////////////////////////////////////
-		struct UserAgentOutputControls {
-			wxDataViewListCtrl* inboundPathList 	= NULL;
-			wxDataViewListCtrl* useDirectiveList	= NULL;
-			wxDataViewListCtrl* detailInfo			= NULL;
-		};
-		
 	public:
 		FileParser(const wxString& fn);
 		virtual ~FileParser();
@@ -75,8 +68,9 @@ class FileParser {
 		void debugStop();
 		void debugFinish();
 		
-		virtual void setUserAgentControls(UserAgentOutputControls& oc) {}
+		virtual void enableUserAgentControls(bool state) {}
 		virtual void displayUserAgentDetailInfo(unsigned int pos) {}
+		
 		virtual void clearControls();
 		virtual int getCurrentLineNumber() { return currentLineNumber; };
 		

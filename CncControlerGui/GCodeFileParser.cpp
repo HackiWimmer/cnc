@@ -118,6 +118,9 @@ bool GCodeFileParser::preprocess() {
 	setCurrentLineNumber(0);
 	GCodeBlock gcb;
 	
+	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
+	ctrl->clear();
+	
 	if ( input.IsOk() ) {
 		while( input.IsOk() && !input.Eof() ) {
 			wxString line = text.ReadLine();
@@ -151,16 +154,16 @@ bool GCodeFileParser::spool() {
 	
 	// over all commands
 	CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
-	ctrl->clear();
 	ctrl->freeze();
 	
 	for ( auto it = gCodeSequence.begin(); it != gCodeSequence.end(); ++it) {
 		performBlock(*it);
-		ctrl->addBlock(*it);
+		
+		if ( THE_APP->isDisplayParserDetails() == true )
+			ctrl->addBlock(*it);
 	}
 	
 	ctrl->thaw();
-
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -288,6 +291,11 @@ bool GCodeFileParser::prepareBlock(GCodeBlock& gcb) {
 	if ( pathHandler->isPathListUsed() ) {
 		gCodeSequence.push_back(gcb);
 		return true;
+	}
+	
+	if ( THE_APP->isDisplayParserDetails() == true ) {
+		CncGCodeSequenceListCtrl* ctrl = THE_APP->getGCodeSequenceList();
+		ctrl->addBlock(gcb);
 	}
 	
 	return performBlock(gcb);

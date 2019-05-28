@@ -17,18 +17,13 @@ CncStatisticsPane::CncStatisticsPane(wxWindow* parent)
 , motionMonitor(NULL)
 , replayControl(NULL)
 , statisticSummaryListCtrl(NULL)
-, vectiesListCtrl(NULL)
 ///////////////////////////////////////////////////////////////////
 {
 	// statistic summary
 	statisticSummaryListCtrl = new CncStatisticSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_statisticSummaryListCtrl, statisticSummaryListCtrl);
 	
-	// vecties list
-	vectiesListCtrl = new CncVectiesListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
-	GblFunc::replaceControl(m_vectiesListCtrl, vectiesListCtrl);
-	
-		// replay control
+	// replay control
 	replayControl = new CncMonitorReplayPane(this);
 	GblFunc::replaceControl(m_replayPlaceholder, replayControl);
 }
@@ -36,7 +31,7 @@ CncStatisticsPane::CncStatisticsPane(wxWindow* parent)
 CncStatisticsPane::~CncStatisticsPane() {
 ///////////////////////////////////////////////////////////////////
 	delete statisticSummaryListCtrl;
-	delete vectiesListCtrl;
+	delete replayControl;
 }
 ///////////////////////////////////////////////////////////////////
 void CncStatisticsPane::setCncControl(CncControl* c) {
@@ -60,65 +55,9 @@ void CncStatisticsPane::updateReplayPane() {
 	replayControl->updateControls();
 }
 ///////////////////////////////////////////////////////////////////
-void CncStatisticsPane::clearMotionMonitorVecties(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	vectiesListCtrl->clear();
-}
-///////////////////////////////////////////////////////////////////
-void CncStatisticsPane::copyMotionMonitorVecties(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( vectiesListCtrl->getItemCount() == 0 )
-		return;
-
-	// Write some text to the clipboard
-	if ( wxTheClipboard->Open() ) {
-		THE_APP->startAnimationControl();
-
-		wxString content;
-		content.reserve(1024 * 1024);
-		
-		for ( long i=0; i<vectiesListCtrl->getItemCount(); i++ )
-			vectiesListCtrl->getRow(i).trace(content);
-		
-		// This data objects are held by the clipboard,
-		// so do not delete them in the app.
-		wxTheClipboard->SetData( new wxTextDataObject(content) );
-		wxTheClipboard->Close();
-		
-		THE_APP->stopAnimationControl();
-	}
-}
-///////////////////////////////////////////////////////////////////
-void CncStatisticsPane::traceMotionMonitorVecties(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	std::clog << "Motion Monitor Data - ";
-	
-	std::stringstream ss;
-	motionMonitor->tracePathData(ss);
-	
-	THE_APP->GetLogger()->Freeze();
-	THE_APP->GetLogger()->AppendText(ss.str().c_str());
-	THE_APP->GetLogger()->Thaw();
-}
-///////////////////////////////////////////////////////////////////
 void CncStatisticsPane::clear() {
 ///////////////////////////////////////////////////////////////////
-	vectiesListCtrl->clear();
 	statisticSummaryListCtrl->resetValues();
-}
-///////////////////////////////////////////////////////////////////
-void CncStatisticsPane::updateVectiesList() {
-///////////////////////////////////////////////////////////////////
-	long ic = vectiesListCtrl->getItemCount();
-	
-	if ( vectiesListCtrl->IsFrozen() == false )
-		vectiesListCtrl->Freeze();
-		
-	motionMonitor->fillVectiesListCtr(ic, vectiesListCtrl);
-	vectiesListCtrl->SetToolTip(wxString::Format("Item count: %ld", vectiesListCtrl->getItemCount()));
-
-	if ( vectiesListCtrl->IsFrozen() == true )
-		vectiesListCtrl->Thaw();
 }
 ///////////////////////////////////////////////////////////////////
 void CncStatisticsPane::logStatistics(bool force) {
@@ -130,9 +69,6 @@ void CncStatisticsPane::logStatistics(bool force) {
 		if ( statisticSummaryListCtrl->IsShownOnScreen() == false )
 			return;
 	}
-		
-	if ( vectiesListCtrl->IsShownOnScreen() )
-		updateVectiesList();
 		
 	if ( cnc == NULL )
 		return;
@@ -236,20 +172,4 @@ void CncStatisticsPane::logStatistics(bool force) {
 															
 	statisticSummaryListCtrl->Refresh();
 	statisticSummaryListCtrl->Update();
-}
-///////////////////////////////////////////////////////////////////
-void CncStatisticsPane::statisticBookChanged(wxNotebookEvent& event) {
-///////////////////////////////////////////////////////////////////	
-	unsigned int sel = event.GetSelection();
-	
-	if ( (wxWindow*)event.GetEventObject() == m_statisticBook ) {
-		switch ( sel ) {
-			case StatisticSelection::VAL::SUMMARY_PANEL:
-									break;
-									
-			case StatisticSelection::VAL::VECTIES_PANAL:
-									updateVectiesList();
-									break;
-		}
-	} 
 }

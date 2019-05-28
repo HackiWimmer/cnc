@@ -86,6 +86,7 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 #include "CncConnectProgress.h"
 #include "CncSha1Wrapper.h"
 #include "CncMonitorSplitterWindow.h"
+#include "CncMotionVertexTrace.h"
 #include "CncTemplateObserver.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
@@ -185,6 +186,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , positionSpy(NULL)
 , setterList(NULL)
 , speedMonitor(NULL)
+, motionVertexCtrl(NULL)
 , cncPreprocessor(NULL)
 , gCodeSequenceList(NULL)
 , cncSummaryListCtrl(NULL)
@@ -617,6 +619,10 @@ void MainFrame::installCustControls() {
 	// pos spy control
 	setterList = new CncSetterListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_setterList, setterList);
+	
+	// motion vertex list control
+	motionVertexCtrl = new CncMotionVertexTrace(this); 
+	GblFunc::replaceControl(m_motionVertexPlaceholder, motionVertexCtrl);
 	
 	// speed monitor control
 	speedMonitor = new CncSpeedMonitor(this); 
@@ -1056,7 +1062,7 @@ void MainFrame::onThreadAppPosUpdate(UpdateManagerEvent& event) {
 	if ( cnc == NULL )
 		return;
 		
-	CncUnit unit = GBL_CONFIG->getDisplayUnit();
+	const CncUnit unit = GBL_CONFIG->getDisplayUnit();
 	
 	// update position
 	switch ( unit ) {
@@ -1079,7 +1085,7 @@ void MainFrame::onThreadCtlPosUpdate(UpdateManagerEvent& event) {
 	if ( cnc == NULL )
 		return;
 		
-	CncUnit unit = GBL_CONFIG->getDisplayUnit();
+	const CncUnit unit = GBL_CONFIG->getDisplayUnit();
 	
 	// update position
 	switch ( unit ) {
@@ -1669,6 +1675,8 @@ void MainFrame::initialize(void) {
 	initializeCncControl();
 	
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
+	
 	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::SUMMARY_PANEL);
 	
 	// curve lib resulotion
@@ -2001,6 +2009,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		bool speedControl			= false;
 		bool pathListEntries		= false;
 		bool moveSequences			= false;
+		bool vertexTrace			= false;
 	} setup;
 	
 	if ( sel == _portEmulatorNULL ) {
@@ -2012,6 +2021,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.speedControl		= false;
 		setup.pathListEntries	= true;
 		setup.moveSequences		= true;
+		setup.vertexTrace		= true;
 	} 
 	else if ( sel == _portEmulatorTEXT ) {
 		cnc = new CncControl(CncEMU_TXT);
@@ -2022,6 +2032,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.speedControl		= true;
 		setup.pathListEntries	= true;
 		setup.moveSequences		= true;
+		setup.vertexTrace		= true;
 	} 
 	else if ( sel == _portEmulatorSVG ) {
 		cnc = new CncControl(CncEMU_SVG);
@@ -2032,6 +2043,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.speedControl		= true;
 		setup.pathListEntries	= true;
 		setup.moveSequences		= true;
+		setup.vertexTrace		= true;
 	}
 	else if ( sel == _portEmulatorGCODE ) {
 		cnc = new CncControl(CncEMU_GCODE);
@@ -2042,6 +2054,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.speedControl		= true;
 		setup.pathListEntries	= true;
 		setup.moveSequences		= true;
+		setup.vertexTrace		= true;
 	} 
 	else if ( sel == _portEmulatorBIN) {
 		cnc = new CncControl(CncEMU_BIN);
@@ -2052,6 +2065,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.speedControl		= true;
 		setup.pathListEntries	= true;
 		setup.moveSequences		= true;
+		setup.vertexTrace		= true;
 	} 
 	else {
 		cnc = new CncControl(CncPORT);
@@ -2062,6 +2076,20 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.speedControl		= true;
 		setup.pathListEntries	= false;
 		setup.moveSequences		= false;
+		setup.vertexTrace		= false;
+	}
+	
+	const bool startDisabled = true;
+	if ( startDisabled == true ) {
+		cnc::cex1 << "MainFrame::createCncControl(): Flag startDisabled is active!" << std::endl;
+		
+		setup.speedControl		= false;
+		setup.pathListEntries	= false;
+		setup.moveSequences		= false;
+		setup.vertexTrace		= false;
+		
+		decoratePosSpyConnectButton(false);
+		m_menuItemUpdCoors->Check(false);
 	}
 	
 	// config setup
@@ -2073,6 +2101,10 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 	if ( cncPreprocessor != NULL ) {
 		cncPreprocessor->enablePathListEntries(setup.pathListEntries);
 		cncPreprocessor->enableMoveSequences(setup.moveSequences);
+	}
+	
+	if ( motionVertexCtrl != NULL ) {
+		motionVertexCtrl->connect(setup.vertexTrace);
 	}
 	
 	// add on
@@ -2311,8 +2343,7 @@ void MainFrame::defineMinMonitoring() {
 	m_menuItemUpdCoors->Check(false);
 	m_menuItemUpdDraw->Check(false);
 	m_menuItemDebugSerial->Check(false);
-	m_menuItemDisplayUserAgent->Check(false);
-	m_menuItemToolControls->Check(false);
+	m_menuItemDisplayParserDetails->Check(false);
 	switchMonitorButton(false);
 	updateMonitoring();
 }
@@ -2327,8 +2358,7 @@ void MainFrame::defineNormalMonitoring() {
 	m_menuItemUpdCoors->Check(true);
 	m_menuItemUpdDraw->Check(true);
 	m_menuItemDebugSerial->Check(false);
-	m_menuItemDisplayUserAgent->Check(true);
-	m_menuItemToolControls->Check(true);
+	m_menuItemDisplayParserDetails->Check(true);
 	switchMonitorButton(true);
 	updateMonitoring();
 }
@@ -2390,9 +2420,8 @@ void MainFrame::updateMonitoring() {
 	GBL_CONTEXT->setOnlineUpdateDrawPane(m_menuItemUpdDraw->IsChecked());
 	
 	cnc->enableSpyOutput(m_menuItemDebugSerial->IsChecked());
-	cnc->setUpdateToolControlsState(m_menuItemToolControls->IsChecked());
 	
-	if ( m_menuItemDisplayUserAgent->IsChecked() == false ) {
+	if ( isDisplayParserDetails() == false ) {
 		m_dvListCtrlSvgUAInboundPathList->DeleteAllItems();
 		m_dvListCtrlSvgUAUseDirective->DeleteAllItems();
 		m_dvListCtrlSvgUADetailInfo->DeleteAllItems();
@@ -2400,6 +2429,8 @@ void MainFrame::updateMonitoring() {
 		m_dvListCtrlSvgUAInboundPathList->Update();
 		m_dvListCtrlSvgUAUseDirective->Update();
 		m_dvListCtrlSvgUADetailInfo->Update();
+		
+		THE_APP->getGCodeSequenceList()->clear();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2897,18 +2928,11 @@ void MainFrame::saveTemplateAs(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::processVirtualTemplate() {
 ///////////////////////////////////////////////////////////////////
-	wxASSERT(m_inputFileName);
-
 	bool ret;
-	FileParser::UserAgentOutputControls oc;
-	oc.detailInfo 		= m_dvListCtrlSvgUADetailInfo;
-	oc.inboundPathList 	= m_dvListCtrlSvgUAInboundPathList;
-	oc.useDirectiveList = m_dvListCtrlSvgUAUseDirective;
 	
-	if ( m_menuItemDisplayUserAgent->IsChecked() == true )
-		inboundFileParser->setUserAgentControls(oc);
-		
+	inboundFileParser->enableUserAgentControls(isDisplayParserDetails());
 	inboundFileParser->setInboundSourceControl(sourceEditor);
+	
 	if ( isDebugMode == true ) 	ret = inboundFileParser->processDebug();
 	else 						ret = inboundFileParser->processRelease();
 	
@@ -3784,6 +3808,7 @@ bool MainFrame::processTemplateIntern() {
 	
 	// select draw pane
 	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
 		
 	// select template Page
 	if ( m_mainViewSelector->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
@@ -5227,20 +5252,36 @@ void MainFrame::outboundBookChanged(wxNotebookEvent& event) {
 	
 	if ( (wxWindow*)event.GetEventObject() == m_outboundNotebook ) {
 		switch ( sel ) {
-			
 			case OutboundSelection::VAL::MOTION_MONITOR_PANAL:
 			{
 				if ( cnc )
 					cnc->updatePreview3D();
+					
 				break;
 			}
-
 			case OutboundSelection::VAL::PREPOCESSOR_PANAL:
 			{
 				cncPreprocessor->updateContent();
 				break;
 			}
 
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::changeMonitorListBook(wxListbookEvent& event) {
+///////////////////////////////////////////////////////////////////
+	unsigned int sel = event.GetSelection();
+	
+	if ( (wxWindow*)event.GetEventObject() == m_listbookMonitor ) {
+		switch ( sel ) {
+			case OutboundMonitorSelection::VAL::MOTION_VERTEX_TRACE:
+			{
+				startAnimationControl();
+				motionMonitor->initVertexListCtr();
+				stopAnimationControl();
+				break;
+			}
 		}
 	}
 }
@@ -6422,6 +6463,7 @@ void MainFrame::decoratePosSpyConnectButton(bool state) {
 	state == true ? m_btTogglePosSpy->SetBitmap(bmpOn) 						: m_btTogglePosSpy->SetBitmap(bmpOff);
 	state == true ? m_btTogglePosSpy->SetToolTip("Disable Position Spy")	: m_btTogglePosSpy->SetToolTip("Enable Position Spy");
 	
+	m_btTogglePosSpy->SetValue(state);
 	m_btTogglePosSpy->Refresh();
 	m_btTogglePosSpy->Update();
 	
@@ -6465,6 +6507,16 @@ void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
 	if ( tss != TSS_MOVE_SEQ ) {
 		if ( cncPreprocessor != NULL )
 			cncPreprocessor->selectClientId(clientId, CncPreprocessor::LT_MOVE_SEQUENCE);
+	}
+	
+	if ( tss != TSS_VERTEX_DATA_TRACE) {
+		if ( motionVertexCtrl != NULL )
+				motionVertexCtrl->selectClientId(clientId, CncMotionVertexTrace::LT_VERTEX_DATA_TRACE);
+	}
+	
+	if ( tss != TSS_VERTEX_INDEX_TRACE) {
+		if ( motionVertexCtrl != NULL )
+			motionVertexCtrl->selectClientId(clientId, CncMotionVertexTrace::LT_VERTEX_INDEX_TRACE);
 	}
 }
 /////////////////////////////////////////////////////////////////////

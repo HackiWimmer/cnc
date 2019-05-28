@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "3D/GLContextPathBase.h"
+#include "3D/GLContextCncPathBase.h"
 #include "3D/GLContextTestCube.h"
 #include "3D/GLContextCncPath.h"
 

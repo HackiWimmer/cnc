@@ -1,7 +1,7 @@
 #ifndef OPENGL_CONTEXT_TEST_CUBE_H
 #define OPENGL_CONTEXT_TEST_CUBE_H
 
-#include "3D/GLContextPathBase.h"
+#include "3D/GLContextCncPathBase.h"
 
 /////////////////////////////////////////////////////////////////
 class GLContextTestCube : public GLContextCncPathBase {

@@ -22,6 +22,7 @@
 #include "CncSerialSpyListCtrl.h"
 #include "CfgAccelerationGraph.h"
 #include "CncGamepadControllerState.h"
+#include "CncMotionMonitorVertexTrace.h"
 #include "CncSummaryListCtrl.h"
 #include "Codelite/wxPNGAnimation.h"
 #include "CncNavigatorPanel.h"
@@ -51,6 +52,7 @@ class CncGameportController;
 class CncSpeedMonitor;
 class CncPreprocessor;
 class CncGCodeSequenceListCtrl;
+class CncMotionVertexTrace;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -114,6 +116,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void changeMonitorListBook(wxListbookEvent& event);
 		virtual void showStacktraceStore(wxCommandEvent& event);
 		virtual void updateLogger(wxCommandEvent& event);
 		virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
@@ -493,9 +496,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		const char* getCurrentPortName(wxString& ret);
 		
+		bool isDisplayParserDetails() { return m_menuItemDisplayParserDetails->IsChecked(); }
+		
 	protected:
 	
-		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5, TSS_MOVE_SEQ=6 };
+		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5, TSS_MOVE_SEQ=6, TSS_VERTEX_DATA_TRACE=7, TSS_VERTEX_INDEX_TRACE=8 };
 		void tryToSelectClientId(long clientId, TemplateSelSource tss);
 		void selectSourceControlLineNumber(long ln);
 
@@ -509,10 +514,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		GamepadThread* gamepadThread;
 		wxCriticalSection pGamepadThreadCS;
 		
-		CncControl* getCncControl() 			{ return cnc; }
-		CncPreprocessor* getCncPreProcessor()	{ return cncPreprocessor; }
+		CncControl* getCncControl() 						{ return cnc; }
+		CncPreprocessor* getCncPreProcessor()				{ return cncPreprocessor; }
 		
-		CncGCodeSequenceListCtrl* getGCodeSequenceList() { return gCodeSequenceList; }
+		CncGCodeSequenceListCtrl* getGCodeSequenceList() 	{ return gCodeSequenceList; }
+		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
 		
 		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		void manualContinuousMoveStop();
@@ -555,6 +561,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class CncTemplateObserver;
 		friend class CncSecureRun;
 		friend class CncStatisticsPane;
+		friend class CncMotionMonitor;
 		friend class CncMonitorReplayPane;
 		friend class PathHandlerBase;
 		friend class CncPathListEntryListCtrl;
@@ -562,6 +569,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		friend class GCodeFileParser;
 		friend class CncGCodeSequenceListCtrl;
 		friend class CncMoveSequenceListCtrl;
+		friend class CncVertexTrace::DataListCtrl;
+		friend class CncVertexTrace::IndexListCtrl;
 		friend class CncPathListRunner;
 		friend class CncStartPositionResolver;
 		
@@ -594,6 +603,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncPosSpyListCtrl* 				positionSpy;
 		CncSetterListCtrl* 				setterList;
 		CncSpeedMonitor*				speedMonitor;
+		CncMotionVertexTrace* 			motionVertexCtrl;
 		CncPreprocessor*				cncPreprocessor;
 		CncGCodeSequenceListCtrl*		gCodeSequenceList;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;

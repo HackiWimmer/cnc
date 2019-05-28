@@ -2,7 +2,7 @@
 #define CNCMONITORREPLAYPANE_H
 
 #include "3D/VerticeData.h"
-#include "3D/GLContextPathBase.h"
+#include "3D/GLContextCncPathBase.h"
 
 #include "wxcrafter.h"
 

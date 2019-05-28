@@ -54,20 +54,20 @@ void UpdateManagerThread::stop() {
 ///////////////////////////////////////////////////////////////////
 wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
+	const unsigned int milliseconds = 1;
 	MainFrame::EventId posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
 	
-	unsigned int sleep = 1;
-	
 	// initialize 
-	unit = GBL_CONFIG->getDisplayUnit();
+	unit 		 = GBL_CONFIG->getDisplayUnit();
 	displayFactX = GBL_CONFIG->getDisplayFactX(unit);
 	displayFactY = GBL_CONFIG->getDisplayFactY(unit);
 	displayFactZ = GBL_CONFIG->getDisplayFactZ(unit);
 	
-	wxDateTime tsLast = wxDateTime::UNow();
+	wxDateTime tsLastData      = wxDateTime::UNow();
+	wxDateTime tsLastHeartbeat = wxDateTime::UNow();
 	
 	while ( !TestDestroy() ) {
-		this->Sleep(sleep);
+		this->Sleep(milliseconds);
 		
 		// recheck this here after the sleep
 		if ( TestDestroy() ) break;
@@ -78,31 +78,24 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 		popAndFormatPosSpyQueue();
 		
 		// --------------------------------------------------------------------
-		// format postion spy output
-		// do this at the call of fillSetterList(...) to get a better performance here
-		//popAndFormatSetterQueue();
-		
-		// --------------------------------------------------------------------
 		// process data update
-		if ( (wxDateTime::UNow() - tsLast).GetMilliseconds() >= 50 ) {
-			UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, posEvtId);
+		if ( (wxDateTime::UNow() - tsLastData).GetMilliseconds() >= 100 ) {
+			const UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, posEvtId);
 			
 			if ( posEvtId == MainFrame::EventId::APP_POS_UPDATE) 	posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
 			else													posEvtId = MainFrame::EventId::APP_POS_UPDATE;
 			
 			wxPostEvent(pHandler, evt);
+			tsLastData = wxDateTime::UNow();
 		}
 		
 		// --------------------------------------------------------------------
 		// process heartbeat
-		if ( (wxDateTime::UNow() - tsLast).GetMilliseconds() >= 500 ) {
-			UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, MainFrame::EventId::HEARTBEAT);
+		if ( (wxDateTime::UNow() - tsLastHeartbeat).GetMilliseconds() >= 500 ) {
+			const UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, MainFrame::EventId::HEARTBEAT);
+			
 			wxPostEvent(pHandler, evt);
-			
-			// debug only
-			//clog << posSpyStringQueue.read_available() << ", " << posSpyQueue.read_available() << endl;
-			
-			tsLast = wxDateTime::UNow();
+			tsLastHeartbeat = wxDateTime::UNow();
 		}
 	}
 	

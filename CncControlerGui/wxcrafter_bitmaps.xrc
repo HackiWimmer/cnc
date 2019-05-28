@@ -129,6 +129,7 @@
   <object class="wxBitmap" name="BMP_CONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-connected@2x.png</object>
   <object class="wxBitmap" name="BMP_COORD_BOTTOM_TOP">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\git-pull.png</object>
   <object class="wxBitmap" name="BMP_COORD_TOP_BOTTOM">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\git-push.png</object>
+  <object class="wxBitmap" name="BMP_DATA">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-table.png</object>
   <object class="wxBitmap" name="BMP_DB_CONFIGURATION">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\server-connect.png</object>
   <object class="wxBitmap" name="BMP_DB_PREPROCESSING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-orange.png</object>
   <object class="wxBitmap" name="BMP_DB_SPOOLING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\tag-blue.png</object>
@@ -152,6 +153,7 @@
   <object class="wxBitmap" name="BMP_HEART_MINUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\heart-delete.png</object>
   <object class="wxBitmap" name="BMP_HEART_PLUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\heart-add.png</object>
   <object class="wxBitmap" name="BMP_HIDE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_up.png</object>
+  <object class="wxBitmap" name="BMP_INDEX">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-key.png</object>
   <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\package-supported.png</object>
   <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\mill.png</object>
   <object class="wxBitmap" name="BMP_MINUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
@@ -314,8 +316,8 @@
   <object class="wxBitmap" name="document-save-6">bitmaps\document-save-6.png</object>
   <object class="wxBitmap" name="document-save-as (2)">bitmaps\document-save-as (2).png</object>
   <object class="wxBitmap" name="dpad_none-small">bitmaps\gamepad\navi\dpad_none-small.png</object>
+  <object class="wxBitmap" name="draw-bezier-curves">bitmaps\draw-bezier-curves.png</object>
   <object class="wxBitmap" name="draw-line-3">bitmaps\draw-line-3.png</object>
-  <object class="wxBitmap" name="draw-vector">bitmaps\draw-vector.png</object>
   <object class="wxBitmap" name="edit-copy-7">bitmaps\edit-copy-7.png</object>
   <object class="wxBitmap" name="edit-rename">bitmaps\edit-rename.png</object>
   <object class="wxBitmap" name="emergengy-button-klein">bitmaps\emergengy-button-klein.png</object>
@@ -399,8 +401,6 @@
   <object class="wxBitmap" name="time-add">bitmaps\time-add.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="tools-equalizer-blue">bitmaps\tools-equalizer-blue.png</object>
-  <object class="wxBitmap" name="tools-sum">bitmaps\tools-sum.png</object>
-  <object class="wxBitmap" name="trace">bitmaps\trace.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>
   <object class="wxBitmap" name="view-choose-3">bitmaps\view-choose-3.png</object>
   <object class="wxBitmap" name="view-close">bitmaps\view-close.png</object>

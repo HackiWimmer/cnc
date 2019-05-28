@@ -19,7 +19,7 @@ CncPathListManager::CncPathListManager()
 //////////////////////////////////////////////////////////////////
 {
 	//preallocate memory
-	list.reserve(GBL_CONFIG->getConstRerserveCapacity());
+	list.reserve(GBL_CONFIG->getConstReserveCapacity());
 	reset();
 }
 //////////////////////////////////////////////////////////////////

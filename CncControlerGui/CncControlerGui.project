@@ -95,6 +95,11 @@
       <File Name="3D/CncGLCanvas.cpp"/>
       <File Name="CncGLCanvas.h"/>
       <VirtualDirectory Name="Base">
+        <File Name="3D/GLCommon.cpp"/>
+        <File Name="3D/GLCommon.h"/>
+        <File Name="3D/GLContextCncPathBase.cpp"/>
+        <File Name="3D/GLContextCncPathBase.h"/>
+        <File Name="3D/GLInclude.h"/>
         <File Name="3D/GLCncPathData.cpp"/>
         <File Name="3D/GLLabelCluser.cpp"/>
         <File Name="3D/GLLabelCluster.h"/>
@@ -102,8 +107,6 @@
         <File Name="3D/GLLineCluster.h"/>
         <File Name="3D/GLContextBase.cpp"/>
         <File Name="3D/GLContextBase.h"/>
-        <File Name="3D/GLContextPathBase.cpp"/>
-        <File Name="3D/GLContextPathBase.h"/>
         <File Name="3D/GLCncPathData.h"/>
         <File Name="3D/GLViewPort.h"/>
         <File Name="3D/GLViewPort.cpp"/>
@@ -154,6 +157,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncMotionVertexTrace.h"/>
+      <File Name="CncMotionVertexTrace.cpp"/>
       <File Name="CncExceptions.h"/>
       <File Name="CncStartPositionResolver.h"/>
       <File Name="CncStartPositionResolver.cpp"/>
@@ -359,6 +364,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncMotionMonitorVertexTrace.cpp"/>
+      <File Name="CncMotionMonitorVertexTrace.h"/>
       <File Name="CncMoveSequenceListCtrl.h"/>
       <File Name="CncMoveSequenceListCtrl.cpp"/>
       <File Name="CncGCodeSequenceListCtrl.cpp"/>
@@ -375,8 +382,6 @@
       <File Name="CncPosSpyListCtrl.cpp"/>
       <File Name="CncSetterListCtrl.h"/>
       <File Name="CncSetterListCtrl.cpp"/>
-      <File Name="CncVectiesListCtrl.h"/>
-      <File Name="CncVectiesListCtrl.cpp"/>
       <File Name="CncStatisticSummaryListCtrl.h"/>
       <File Name="CncStatisticSummaryListCtrl.cpp"/>
     </VirtualDirectory>
@@ -407,6 +412,8 @@
     <File Name="UnitTestFrame.h"/>
   </VirtualDirectory>
   <Dependencies Name="release2"/>
+  <Dependencies Name="Debug"/>
+  <Dependencies Name="Release"/>
   <Settings Type="Executable">
     <GlobalSettings>
       <Compiler Options="-Wno-deprecated-declarations" C_Options="" Assembler="">
@@ -449,6 +456,7 @@
         <Library Value="dbgeng"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
+        <Library Value="glew32"/>
         <Library Value="libfreeglut"/>
         <Library Value="Xinput9_1_0"/>
       </Linker>
@@ -501,8 +509,6 @@
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
-        <LibraryPath Value="."/>
-        <LibraryPath Value="C:/@Development/freeglut/lib/x64"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
@@ -522,7 +528,8 @@
         <Library Value="dbgeng"/>
         <Library Value="opengl32"/>
         <Library Value="glu32"/>
-        <Library Value="libfreeglut"/>
+        <Library Value="glew32"/>
+        <Library Value="freeglut"/>
         <Library Value="Xinput9_1_0"/>
       </Linker>
       <ResourceCompiler Options="$(shell wx-config --rcflags);-D NDEBUG;" Required="no"/>
@@ -563,6 +570,4 @@
       </Completion>
     </Configuration>
   </Settings>
-  <Dependencies Name="Debug"/>
-  <Dependencies Name="Release"/>
 </CodeLite_Project>

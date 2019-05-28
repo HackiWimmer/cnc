@@ -35,6 +35,7 @@ struct GlobalConstStringDatabase {
 	const wxString pathListRefFormat	= wxString("%+08ld");
 	const wxString moveSeqRefFormat		= wxString("%+08ld");
 	const wxString gcodeSeqRefFormat	= wxString("%+08ld");
+	const wxString vertexTraceFormat	= wxString("%+08ld");
 	
 };
 

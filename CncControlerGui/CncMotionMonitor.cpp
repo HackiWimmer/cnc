@@ -2,25 +2,18 @@
 
 #include "3D/GLContextCncPath.h"
 #include "3D/GLContextTestCube.h"
+#include "3D/GLOpenGLPathBufferStore.h"
+#include "CncMotionVertexTrace.h"
 #include "GL3DDrawPane.h"
 #include "CncConfig.h"
 #include "CncCommon.h"
 #include "MainFrame.h"
-#include "CncVectiesListCtrl.h"
+#include "GlobalStrings.h"
 #include "CncMotionMonitor.h"
 
-#ifdef __DARWIN__
-    #include <OpenGL/glu.h>
-	#include <OpenGL/glut.h>
-#else
-    #include <GL/glu.h>
-	#include <GL/glut.h>
-	#include <GL/glext.h>
-#endif
+#include "3D/GLInclude.h"
 
-#if !wxUSE_GLCANVAS
-	#error "OpenGL required: set wxUSE_GLCANVAS to 1 and rebuild the library"
-#endif
+extern GlobalConstStringDatabase 	globalStrings;
 
 // ----------------------------------------------------------------------------
 // GlutInitManager
@@ -29,10 +22,14 @@ class GlutLibInitManager {
 	public:
 		//////////////////////////////////////////////////////
 		GlutLibInitManager() {
+			
 			// init glut lib a the startup
-			int   argc = 1;
-			char* argv[1] = { wxString("CncMotionMonitor").char_str() };
+			int   argc = 2;
+			char* argv[2] = { globalStrings.programTitel.char_str(), wxString("-gldebug").char_str() };
 			glutInit(&argc, argv);
+			/*
+			glutInitDisplayMode (GL_DOUBLE | GLUT_DEPTH | GLUT_RGB);
+			 */
 		}
 		//////////////////////////////////////////////////////
 		~GlutLibInitManager() {
@@ -107,29 +104,11 @@ unsigned int CncMotionMonitor::calculateScaleDisplay(unsigned int height) {
 	return (unsigned int)(fact * height);
 }
 //////////////////////////////////////////////////
-long CncMotionMonitor::fillVectiesListCtr(long curCount, CncVectiesListCtrl* listCtrl) {
+void CncMotionMonitor::initVertexListCtr() {
 //////////////////////////////////////////////////
-	if ( listCtrl == NULL )
-		return 0L;
-	
-	const GLI::GLCncPath& data = monitor->getPathData();
-	if ( (long)data.size() == curCount )
-		return 0L;
-		
-	listCtrl->clear();
-		
-	CncColumContainer cc(CncVectiesListCtrl::TOTAL_COL_COUNT);
-	for ( auto it = data.begin(); it != data.end(); ++it ) {
-		cc.updateItem(CncVectiesListCtrl::COL_REF, 	wxString::Format("%010ld", it->getId()));
-		cc.updateItem(CncVectiesListCtrl::COL_T, 	GLI::GLCncPathVertices::getCncModeAsString(it->getCncMode()));
-		cc.updateItem(CncVectiesListCtrl::COL_X, 	wxString::Format("%.6lf", it->getX()));
-		cc.updateItem(CncVectiesListCtrl::COL_Y, 	wxString::Format("%.6lf", it->getY()));
-		cc.updateItem(CncVectiesListCtrl::COL_Z, 	wxString::Format("%.6lf", it->getZ()));
-		
-		listCtrl->appendItem(cc);
-	}
-	
-	return data.size();
+	wxASSERT(THE_APP->getMotionVertexTrace());
+	THE_APP->getMotionVertexTrace()->getVertexDataList()->setVertexBufferStore(monitor->getVertexBufferStore());
+	THE_APP->getMotionVertexTrace()->getVertexIndexList()->setVertexBufferStore(monitor->getVertexBufferStore());
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::enable(bool state) {
@@ -172,11 +151,6 @@ void CncMotionMonitor::createRuler() {
 	//mrs.trace(monitor, std::cout);
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::tracePathData(std::ostream& s) {
-//////////////////////////////////////////////////
-	monitor->tracePathData(s);
-}
-//////////////////////////////////////////////////
 void CncMotionMonitor::setModelType(const GLContextBase::ModelType mt) {
 //////////////////////////////////////////////////
 	monitor->setModelType(mt);
@@ -186,6 +160,10 @@ void CncMotionMonitor::setModelType(const GLContextBase::ModelType mt) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::reconstruct() {
 //////////////////////////////////////////////////
+	display();
+	
+#warning reimpl. CncMotionMonitor::reconstruct
+/*
 	GLI::GLCncPath tmpPath, curPath = monitor->getPathData();
 	// copy the current path
 	tmpPath.swap(curPath);
@@ -203,6 +181,7 @@ void CncMotionMonitor::reconstruct() {
 		display();
 	
 	popProcessMode();
+	 */ 
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::display() {
@@ -210,54 +189,66 @@ void CncMotionMonitor::display() {
 	onPaint();
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::appendVertice(const GLI::VerticeLongData& vd) {
-//////////////////////////////////////////////////	
+void CncMotionMonitor::appendVertex(const GLI::VerticeLongData& vd) {
+//////////////////////////////////////////////////
 	// Convert the given steps (abs) to a glpos (rel):
 	
 	// To do this first we need to normalize the values for x, y and z 
 	// to a common unit like [mm], because [steps] are depends on 
 	// the corresponding pitch which is configured for each axis separatly 
-	float x = vd.getX() / GBL_CONFIG->getDispFactX3D(); 
-	float y = vd.getY() / GBL_CONFIG->getDispFactY3D();
-	float z = vd.getZ() / GBL_CONFIG->getDispFactZ3D();
+	const float x = vd.getX() / GBL_CONFIG->getDispFactX3D(); 
+	const float y = vd.getY() / GBL_CONFIG->getDispFactY3D();
+	const float z = vd.getZ() / GBL_CONFIG->getDispFactZ3D();
 	
-	appendVertice(vd.getId(), x, y, z, vd.getMode());
+	appendVertex(vd.getId(), vd.getSpeedMode(), x, y, z);
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::appendVertice(long id, float x, float y, float z, GLI::GLCncPathVertices::CncMode cm) {
+void CncMotionMonitor::appendVertex(long clientId, CncSpeedMode sm, const CncLongPosition& pos) {
+//////////////////////////////////////////////////
+	// Convert the given steps (abs) to a glpos (rel):
+	
+	// To do this first we need to normalize the values for x, y and z 
+	// to a common unit like [mm], because [steps] are depends on 
+	// the corresponding pitch which is configured for each axis separatly 
+	const float x = pos.getX() / GBL_CONFIG->getDispFactX3D(); 
+	const float y = pos.getY() / GBL_CONFIG->getDispFactY3D();
+	const float z = pos.getZ() / GBL_CONFIG->getDispFactZ3D();
+	
+	appendVertex(clientId, sm, x, y, z);
+}
+//////////////////////////////////////////////////
+void CncMotionMonitor::appendVertex(long id, CncSpeedMode sm, float x, float y, float z) {
 //////////////////////////////////////////////////
 	// x, y, z have to be given as glpos
-
 	typedef GLI::GLCncPathVertices::FormatType PathVerticeType;
-	typedef GLI::GLCncPathVertices::CncMode    DataVerticeMode;
 	
 	static wxColour 		colour;
 	static PathVerticeType	formatType;
-	
+	/*
 	// decorate
-	switch ( cm ) {
-		case DataVerticeMode::CM_WORK:			colour		= getContextOptions().workColour;
-												formatType	= PathVerticeType::FT_SOLID;
-												break;
+	switch ( sm ) {
+		case CncSpeedWork:			colour		= getContextOptions().workColour;
+									formatType	= PathVerticeType::FT_SOLID;
+									break;
 										
-		case DataVerticeMode::CM_RAPID:			colour 		= getContextOptions().rapidColour;
-												formatType	= ( getContextOptions().showFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT );
-												break;
+		case CncSpeedRapid:			colour 		= getContextOptions().rapidColour;
+									formatType	= ( getContextOptions().showFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT );
+									break;
 										
-		case DataVerticeMode::CM_MAX:			colour 		= getContextOptions().maxColour;
-												formatType	= PathVerticeType::FT_SOLID;
-												break;
+		case CncSpeedMax:			colour 		= getContextOptions().maxColour;
+									formatType	= PathVerticeType::FT_SOLID;
+									break;
 										
-		case DataVerticeMode::CM_USER_DEFINED:	colour 		= getContextOptions().userColour;
-												formatType	= PathVerticeType::FT_SOLID;
-												break;
+		case CncSpeedUserDefined:	colour 		= getContextOptions().userColour;
+									formatType	= PathVerticeType::FT_SOLID;
+									break;
 	}
-	
-	#warning
+	*/
+	#warning !!!!
 	// append
 	// todo - avoid duplicates last != new
-	static GLI::GLCncPathVertices d;
-	monitor->appendPathData(d.set(id, x, y, z, colour, formatType, cm)); 
+	static GLOpenGLPathBuffer::CncVertex vertex;
+	monitor->appendPathData(vertex.set('R', id, x, y, z)); 
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::centerViewport() {
@@ -302,7 +293,7 @@ void CncMotionMonitor::onPaint() {
 void CncMotionMonitor::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	// This is required even though dc is not used otherwise.
-	wxPaintDC dc(this);
+	const wxPaintDC dc(this);
 	onPaint();
 }
 //////////////////////////////////////////////////

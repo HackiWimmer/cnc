@@ -2,6 +2,7 @@
 #define VERTICE_DATA_H
 
 #include "CncPosition.h"
+#include "CncCommon.h"
 #include "3D/GLCncPathData.h"
 
 namespace GLI {
@@ -17,7 +18,7 @@ namespace GLI {
 			, _x(0)
 			, _y(0)
 			, _z(0)
-			, _mode(GLI::GLCncPathVertices::CncMode::CM_RAPID)
+			, _mode(CncSpeedRapid)
 			{}
 
 			//////////////////////////////////////////////
@@ -34,14 +35,27 @@ namespace GLI {
 			const T getZ() const { return _z; }
 			
 			//////////////////////////////////////////////
-			const GLI::GLCncPathVertices::CncMode getMode() const { return _mode; }
+			const CncSpeedMode getSpeedMode() const { return _mode; }
+			
+			//////////////////////////////////////////////
+			const GLI::GLCncPathVertices::CncMode getMode() const { 
+				typedef GLI::GLCncPathVertices::CncMode Mode;
+				switch ( _mode ) {
+					case CncSpeedWork: 			return Mode::CM_WORK;
+					case CncSpeedRapid: 		return Mode::CM_RAPID;
+					case CncSpeedMax: 			return Mode::CM_WORK;
+					case CncSpeedUserDefined: 	return Mode::CM_WORK;
+				}
+				
+				return Mode::CM_RAPID;
+			}
 			
 			//////////////////////////////////////////////
 			bool somethingDifferent(const VerticeData& toCompare) {
-				if ( _x != toCompare.getX() ) 			return true;
-				if ( _y != toCompare.getY() ) 			return true;
-				if ( _z != toCompare.getZ() ) 			return true;
-				if ( _mode != toCompare.getMode() ) 	return true;
+				if ( _x    != toCompare.getX() ) 			return true;
+				if ( _y    != toCompare.getY() ) 			return true;
+				if ( _z    != toCompare.getZ() ) 			return true;
+				if ( _mode != toCompare.getSpeedMode() ) 	return true;
 				return false;
 			}
 			
@@ -52,14 +66,8 @@ namespace GLI {
 				_x = cp.getX();
 				_y = cp.getY();
 				_z = cp.getZ();
-
-				typedef GLI::GLCncPathVertices::CncMode Mode;
-				switch ( speedType ) {
-					case CncSpeedWork: 			_mode = Mode::CM_WORK; 	break;
-					case CncSpeedRapid: 		_mode = Mode::CM_RAPID;	break;
-					case CncSpeedMax: 			_mode = Mode::CM_WORK;	break;
-					case CncSpeedUserDefined: 	_mode = Mode::CM_WORK;	break;
-				}
+				
+				_mode = speedType;
 			}
 		
 		protected:
@@ -68,7 +76,7 @@ namespace GLI {
 			T _x;
 			T _y;
 			T _z;
-			GLI::GLCncPathVertices::CncMode _mode;
+			CncSpeedMode _mode;
 	};
 	
 	typedef VerticeData<int32_t> VerticeLongData;

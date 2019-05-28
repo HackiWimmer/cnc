@@ -4,21 +4,10 @@
 #include "CncConfig.h"
 #include "CncCommon.h"
 
-#ifdef __DARWIN__
-    #include <OpenGL/glu.h>
-	#include <OpenGL/glut.h>
-#else
-    #include <GL/glu.h>
-	#include <GL/glut.h>
-	#include <GL/glext.h>
-#endif
-
-#if !wxUSE_GLCANVAS
-	#error "OpenGL required: set wxUSE_GLCANVAS to 1 and rebuild the library"
-#endif
+#include "3D/GLInclude.h"
 
 // ----------------------------------------------------------------------------
-// CncMotionMonitor Event Table
+// CncGCodePreview Event Table
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncGCodePreview, wxGLCanvas)
@@ -141,13 +130,11 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	
 	// decorate
 	switch ( vd.getMode() ) {
-		case DataVerticeMode::CM_WORK:	
-										colour.Set(0, 0, 0);
+		case DataVerticeMode::CM_WORK:	colour.Set(0, 0, 0);
 										formatType	= PathVerticeType::FT_SOLID;
 										break;
 										
-		case DataVerticeMode::CM_RAPID:	
-										colour.Set(255, 201, 14);
+		case DataVerticeMode::CM_RAPID:	colour.Set(255, 201, 14);
 										formatType	= PathVerticeType::FT_DOT;
 										break;
 										
@@ -161,10 +148,11 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 										break;
 	}
 	
-	double x = vd.getX() / (maxDimension / GBL_CONFIG->getCalculationFactX());
-	double y = vd.getY() / (maxDimension / GBL_CONFIG->getCalculationFactY());
-	double z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
+	const double x = vd.getX() / (maxDimension / GBL_CONFIG->getCalculationFactX());
+	const double y = vd.getY() / (maxDimension / GBL_CONFIG->getCalculationFactY());
+	const double z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
 	
+	#warning !!!!!
 	static GLI::GLCncPathVertices d;
-	preview->appendPathData(d.set(-1L, x, y, z, colour, formatType, vd.getMode())); 
+	//preview->appendPathData(d.set(-1L, x, y, z, colour, formatType, vd.getMode())); 
 }

@@ -1,0 +1,29 @@
+cmake_minimum_required(VERSION 3.7)
+project(cnc)
+
+set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+
+set(CNC_USER_HOME "")
+set(CNC_SPACE_HOME "/media/pi/space")
+set(CNC_BUILD_HOME "${CNC_SPACE_HOME}/cnc")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/local/lib/wx/include/gtk3-unicode-3.1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/local/include/wx-3.1")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/local/include/")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -L/usr/local/lib")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,-rpath,/usr/local/lib")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wl,--version-script,${CNC_SPACE_HOME}/wxWidgets-3.1.2/gtk-build/version-script")
+
+include_directories("${CNC_SPACE_HOME}/boost_1_70_0")
+include_directories("/usr/local/include/wx-3.1")
+include_directories("/usr/include/GL")
+include_directories("${CNC_BUILD_HOME}/CncControlerGui")
+
+link_directories("/usr/lib/arm-linux-gnueabihf")
+link_directories("/usr/lib")
+link_directories("/usr/local/lib")
+
+include(CMakeListsMain.txt)

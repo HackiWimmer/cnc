@@ -147,7 +147,8 @@ class OutboundSelection{
 class OutboundMonitorSelection{
 	public:
 		enum VAL {
-			MOTION_MONITOR_PANAL		= 0
+			MOTION_MONITOR_PANAL		= 0,
+			MOTION_VERTEX_TRACE			= 1
 		};
 };
 
@@ -155,8 +156,7 @@ class OutboundMonitorSelection{
 class StatisticSelection{
 	public:
 		enum VAL {
-			SUMMARY_PANEL				= 0,
-			VECTIES_PANAL				= 1,
+			SUMMARY_PANEL				= 0
 		};
 };
 

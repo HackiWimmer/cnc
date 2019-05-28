@@ -63,13 +63,13 @@ static void drawBox(GLfloat size, GLenum type) {
 	glBindTexture(GL_TEXTURE_2D, theTexture);
 	
 	for (i = 5; i >= 0; i--) {
-	glBegin(type);
-		glNormal3fv(&n[i][0]);
-		glTexCoord2f(0.0, 0.0); glVertex3fv(&v[faces[i][0]][0]);
-		glTexCoord2f(1.0, 0.0); glVertex3fv(&v[faces[i][1]][0]);
-		glTexCoord2f(1.0, 1.0); glVertex3fv(&v[faces[i][2]][0]);
-		glTexCoord2f(0.0, 1.0); glVertex3fv(&v[faces[i][3]][0]);
-	glEnd();
+		glBegin(type);
+			glNormal3fv(&n[i][0]);
+			glTexCoord2f(0.0, 0.0); glVertex3fv(&v[faces[i][0]][0]);
+			glTexCoord2f(1.0, 0.0); glVertex3fv(&v[faces[i][1]][0]);
+			glTexCoord2f(1.0, 1.0); glVertex3fv(&v[faces[i][2]][0]);
+			glTexCoord2f(0.0, 1.0); glVertex3fv(&v[faces[i][3]][0]);
+		glEnd();
 	}
 }
 
@@ -85,8 +85,6 @@ GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
 , rulerColourZ(coordOriginInfo.colours.z)
 /////////////////////////////////////////////////////////////////
 {
-	cncPath.reserve(GBL_CONFIG->getConstRerserveCapacity());
-	
 	wxBitmap bmp = ImageLibBig().Bitmap("BMP_CNC");
 	wxImage img  = bmp.ConvertToImage();
 	theTexture   = LoadBMP(img);
@@ -104,8 +102,10 @@ void GLContextCncPathBase::markCurrentPosition() {
 		return;
 		
 	// get the last/current vecties - it must be valid
-	GLI::GLCncPath::iterator it = cncPath.vEnd() - 1;
-	drawPosMarker(it->getX(), it->getY(), it->getZ());
+	GLOpenGLPathBuffer::CncVertex vertex;
+	#warning markCurrentPosition
+	//vectiesBuffer.getVertex(vertex, cncPath.getVirtualEnd() - 1);
+	drawPosMarker(vertex.getX(), vertex.getY(), vertex.getZ());
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::clearPathData() {
@@ -113,28 +113,21 @@ void GLContextCncPathBase::clearPathData() {
 	cncPath.clear();
 }
 /////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::appendPathData(const GLI::GLCncPathVertices& cpv) {
+void GLContextCncPathBase::appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex) {
 /////////////////////////////////////////////////////////////////
-	cncPath.push_back(cpv);
+	cncPath.appendPathData(vertex);
 }
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::appendPathData(const GLI::GLCncPath& cp) {
-/////////////////////////////////////////////////////////////////
-	if ( cp.size() > 0 ) {
-		for ( GLI::GLCncPath::const_iterator it = cp.begin(); it != cp.end() - 1; ++it )
-			appendPathData(*it);
-	} 
-	else {
-		clearPathData();
-		determineModel();
-	}
-}
+#warning !!!
+/*
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawPoints() {
 /////////////////////////////////////////////////////////////////
 	// ensure the right model
 	glMatrixMode(GL_MODELVIEW);
 	
+	cncPath.display(GLOpenGLPathBuffer::DT_DOTS);
+	return;
+
 	typedef GLI::GLCncPathVertices::FormatType FormatType;
 	
 	glBegin(GL_POINTS);
@@ -166,76 +159,15 @@ void GLContextCncPathBase::drawPoints() {
 	glEnd();
 }
 /////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::drawLines() {
-/////////////////////////////////////////////////////////////////
-	// ensure the right model
-	glMatrixMode(GL_MODELVIEW);
-	
-	typedef GLI::GLCncPathVertices::FormatType FormatType;
-	
-	if ( cncPath.size() > 1 ) {
-		GLI::GLCncPath::iterator prev = cncPath.begin();
-		
-		int alpha = 255;
-		for( GLI::GLCncPath::iterator curr = cncPath.vBegin() + 1; curr != cncPath.vEnd(); curr++ ) {
-			
-			// line stipple and colour depth
-			switch ( curr->getFormatType() ) {
-				case FormatType::FT_TRANSPARENT: {
-						alpha = 0;
-						break;
-				}
-				case FormatType::FT_SOLID: {
-						alpha = 255;
-						break;
-				}
-				case FormatType::FT_DOT: {
-						alpha = 255;
-						glLineStipple(1, 0xAAAA);
-						glEnable(GL_LINE_STIPPLE);
-						break;
-				}
-				case FormatType::FT_LONG_DASH: {
-						alpha = 255;
-						glLineStipple(2, 0x00FF);
-						glEnable(GL_LINE_STIPPLE);
-						break;
-				}
-				case FormatType::FT_SHORT_DASH: {
-						alpha = 255;
-						glLineStipple(3, 0xAAAA);
-						glEnable(GL_LINE_STIPPLE);
-						break;
-				}
-				case FormatType::FT_DOT_DASH: {
-						alpha = 255;
-						glLineStipple(1, 0x0C0F);
-						glEnable(GL_LINE_STIPPLE);
-						break;
-				}
-			}
-			
-			glColor4ub(curr->getColour(currentClientId).Red(), curr->getColour(currentClientId).Green(), curr->getColour(currentClientId).Blue(), alpha);
-			
-			glBegin(GL_LINES);
-				glVertex3f(prev->getX(), prev->getY(), prev->getZ());
-				glVertex3f(curr->getX(), curr->getY(), curr->getZ());
-			glEnd();
-			
-			if ( glIsEnabled(GL_LINE_STIPPLE) )
-				glDisable(GL_LINE_STIPPLE);
-			
-			prev = curr;
-		}
-	} else {
-		drawPoints();
-	}
-}
-/////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawLineStrips() {
 /////////////////////////////////////////////////////////////////
 	// ensure the right model
 	glMatrixMode(GL_MODELVIEW);
+	
+	cncPath.display(GLOpenGLPathBuffer::DT_STRIPS);
+	return;
+
+	
 	
 	typedef GLI::GLCncPathVertices::FormatType FormatType;
 	
@@ -270,10 +202,14 @@ void GLContextCncPathBase::drawLineStrips() {
 	
 	glEnd();
 }
+*/
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::determineModel() {
 /////////////////////////////////////////////////////////////////
 	if ( isEnabled() == false ) {
+		//drawTeapot();
+		
+		/*
 		glPushMatrix();
 			glEnable(GL_TEXTURE_2D);
 				glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
@@ -281,15 +217,16 @@ void GLContextCncPathBase::determineModel() {
 				drawBox(0.05, GL_QUADS);
 			glDisable(GL_TEXTURE_2D);
 		glPopMatrix();
+		*/
 		return;
 	}
+	
 	
 	drawRuler();
 	
 	switch ( drawType ) {
-		case DT_POINTS:		drawPoints(); 		break;
-		case DT_LINES:		drawLines(); 		break;
-		case DT_LINE_STRIP:	drawLineStrips(); 	break;
+		case DT_POINTS:		cncPath.display(GLOpenGLPathBuffer::DT_DOTS); 		break;
+		case DT_LINE_STRIP:	cncPath.display(GLOpenGLPathBuffer::DT_STRIPS); 	break;
 	}
 	
 	if ( options.showBoundBox == true )

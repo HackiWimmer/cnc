@@ -1,19 +1,9 @@
 #include <iostream>
 #include <sstream>
 #include <wx/tokenzr.h>
+#include "3D/GLCommon.h"
 #include "3D/GLContextBase.h"
 
-#ifdef __DARWIN__
-    #include <OpenGL/glu.h>
-	#include <OpenGL/glut.h>
-	#include <OpenGL/freeglut.h>
-#else
-    #include <GL/glu.h>
-	#include <GL/glut.h>
-	#include <GL/freeglut.h>
-	#include <GL/glext.h>
-#endif
- 
 /////////////////////////////////////////////////////////////////
 GLContextBase::GLContextBase(wxGLCanvas* canvas) 
 : wxGLContext(canvas)
@@ -77,10 +67,14 @@ void GLContextBase::globalInit() {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::traceOpenGLVersionInfo(std::ostream& s) {
 /////////////////////////////////////////////////////////////////
-	s << " :: OpenGL version info: ";
-	s << ( glGetString(GL_VERSION)  ? (const char*)glGetString(GL_VERSION)  : "?" )	<< "; ";
-	s << ( glGetString(GL_VENDOR)   ? (const char*)glGetString(GL_VENDOR)   : "?" )	<< "; ";
-	s << ( glGetString(GL_RENDERER) ? (const char*)glGetString(GL_RENDERER) : "?" )	<< std::endl;
+	s << " :: OpenGL version info: "
+	  << ( glGetString(GL_VERSION)  ? (const char*)glGetString(GL_VERSION)  : "?" )	<< "; "
+	  << ( glGetString(GL_VENDOR)   ? (const char*)glGetString(GL_VENDOR)   : "?" )	<< "; "
+	  << ( glGetString(GL_RENDERER) ? (const char*)glGetString(GL_RENDERER) : "?" )	<< std::endl;
+	
+	s << " :: OpenGL Extension Wrangler Library (GLEW) version info : "
+	  << (GLCommon::glewInitializedGlobalFlag ? glewGetString(GLEW_VERSION) : (const unsigned char*)"Glew isn't initialized!" )
+	  << std::endl;
 		
 	//s << glGetString(GL_SHADING_LANGUAGE_VERSION​) << std::endl;
 }
@@ -90,49 +84,48 @@ void GLContextBase::traceOpenGLExtentionInfo(std::ostream& s) {
 	s << "Extention list:" << std::endl;
 	wxString ext(glGetString(GL_EXTENSIONS));
 	wxStringTokenizer extentions(ext, " ");
+	
 	while ( extentions.HasMoreTokens() ) {
 		wxString token = extentions.GetNextToken();
 		s << " " << token << std::endl;
 	}
 }
 /////////////////////////////////////////////////////////////////
+void GLContextBase::initGlew() {
+/////////////////////////////////////////////////////////////////
+	GLenum err = glewInit();
+	if ( err != GLEW_OK ) {
+		
+		glewInitialized = false;
+		std::cerr << "(" << getContextName() << "): Error while initializing glew: " << glewGetErrorString(err) << std::endl;
+		
+		if ( GLCommon::glewInitializedGlobalFlag == true )
+			std::cerr << "(" << getContextName() << "): glewInitializedGlobalFlag wa previous true! " << std::endl;
+			
+		GLCommon::glewInitializedGlobalFlag 	= glewInitialized;
+	}
+	else {
+		glewInitialized 			= true;
+		GLCommon::glewInitializedGlobalFlag 	= glewInitialized;
+	}
+}
+/////////////////////////////////////////////////////////////////
 void GLContextBase::init() {
 /////////////////////////////////////////////////////////////////
+	glutInitDisplayMode (GL_DOUBLE | GLUT_DEPTH | GLUT_RGB);
+	
 	initContext();
 	
 	// call the initalization only one time
 	if ( initialized == true )
 		return;
-		
+	
+	//glDebugMessageCallback(GLContextBase::MessageCallback, 0);
+
+	initGlew();
+	
 	viewPort = createViewPort();
 	initialized = true;
-}
-/////////////////////////////////////////////////////////////////////
-void GLContextBase::checkGLError() {
-/////////////////////////////////////////////////////////////////////
-	GLenum errLast = GL_NO_ERROR;
-
-	for ( ;; )
-	{
-		GLenum err = glGetError();
-		if ( err == GL_NO_ERROR )
-			return;
-
-		// normally the error is reset by the call to glGetError() but if
-		// glGetError() itself returns an error, we risk looping forever here
-		// so check that we get a different error than the last time
-		if ( err == errLast )
-		{
-			std::cerr << "OpenGLContextBase::checkGLError(): OpenGL error state couldn't be reset." << std::endl;
-			return;
-		}
-
-		errLast = err;
- 
-		std::stringstream ss;
-		ss << gluErrorString(err);
-		std::cerr << "OpenGLContextBase::checkGLError(): " << wxString::Format("OpenGL error [ %d ]: %s", err, ss.str()) << std::endl;
-	}
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::enableSmoothing(bool enable) {
@@ -473,6 +466,25 @@ void GLContextBase::determineProjection(int w, int h) {
 	if ( isViewMode2D() )	glOrtho(  -1.0, 1.0, -1.0, 1.0, 0.1, 200.0);
 	else					glFrustum(-1.0, 1.0, -1.0, 1.0, 3.0, 100.0);
 }
+
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawTeapot(void) {
+/////////////////////////////////////////////////////////////////
+	if ( glewInitialized == false )
+		return;
+		
+	glPushMatrix();
+
+		glColor3f (1.0, 0.5, 0.1);
+		glutSolidTeapot (1.0);
+
+		//glLineWidth (2.0);
+		
+		//glColor3f (0.0, 0.2, 0.9);
+		//glutWireTeapot (1.01);
+
+	glPopMatrix();
+}
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineModel() {
 /////////////////////////////////////////////////////////////////
@@ -480,6 +492,9 @@ void GLContextBase::determineModel() {
 	
 	// this function has to be overridden by derived classes
 	// to define what is to draw
+	
+	// default funny behaviour
+	drawTeapot();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineCameraPosition() {
@@ -658,5 +673,5 @@ void GLContextBase::display() {
 	glPopMatrix();
 	
 	glFlush();
-	checkGLError();
+	GLCommon::checkGLError("GLContextBase::display()");
 }

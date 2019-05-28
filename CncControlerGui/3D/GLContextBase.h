@@ -6,16 +6,10 @@
 #include <wx/colour.h>
 
 #include "3D/GLViewPort.h"
-#include "3D/GLCncPathData.h"
 #include "3D/GLHelperModel.h"
 #include "3D/GLHelperCamera.h"
 
-#ifdef _USE_WX_DUMMY_CANVAS 
-	#include "wxDummyCanvas.h"
-#else
-	#include <wx/glcanvas.h>
-#endif
-
+#include "3D/GLInclude.h"
 
 /////////////////////////////////////////////////////////////////
 struct GLContextOptions {
@@ -183,9 +177,6 @@ class GLContextBase : public wxGLContext {
 			zoom = z;
 		}
 		
-		// error
-		void checkGLError();
-		
 	protected:
 		////////////////////////////////////////////////////
 		class CoordOrginInfo {
@@ -237,14 +228,19 @@ class GLContextBase : public wxGLContext {
 		virtual void determineCameraPosition();
 		virtual void determineModel();
 		
+		void drawTeapot(void);
 		void renderBitmapString(float x, float y, float z, void* font, const char* string);
 		 
 	private:
+		
+		bool glewInitialized;
 		
 		int lastReshapeX;
 		int lastReshapeY;
 		int lastReshapeW;
 		int lastReshapeH;
+		
+		void initGlew();
 		
 		void determineViewPortBounderies();
 		void drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);

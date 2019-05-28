@@ -12,69 +12,17 @@
 #include <wx/string.h>
 #include <wx/colour.h>
 
-#include <GL/glew.h>
-#include <GL/gl.h>
-#include <GL/glext.h>
-#include <GL/glut.h>
-
+#include "3D/GLInclude.h"
+#include "3D/GLCommon.h"
 
 //-------------------------------------------------------------
-
 class GLOpenGLPathBuffer {
 	
 	public:
 		
 		//-----------------------------------------------------
-		static unsigned int checkForOpenGlErrors() {
-			unsigned int ret = 0;
-
-			GLenum errLast = GL_NO_ERROR;
-
-			for ( ;; )
-			{
-				GLenum err = glGetError();
-				if ( err == GL_NO_ERROR )
-					return ret;
-
-				ret++;
-
-				// normally the error is reset by the call to glGetError() but if
-				// glGetError() itself returns an error, we risk looping forever here
-				// so check that we get a different error than the last time
-				if ( err == errLast )
-				{
-					std::cerr << "OpenGLContextBase::checkGLError(): OpenGL error state couldn't be reset." << std::endl;
-					return ret;
-				}
-
-				errLast = err;
-
-				std::stringstream ss;
-				ss << gluErrorString(err);
-				std::cerr << "OpenGLContextBase::checkGLError(): OpenGL error [" << err << " ]: " << ss.str() << std::endl;
-			}
-			return ret;
-		}
-
-		//-----------------------------------------------------
-		static void GLAPIENTRY
-		MessageCallback( GLenum source,
-		                 GLenum type,
-		                 GLuint id,
-		                 GLenum severity,
-		                 GLsizei length,
-		                 const GLchar* message,
-		                 const void* userParam )
-		{
-		  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-		           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-		            type, severity, message );
-		}
-
-
-		//-----------------------------------------------------
-		typedef std::map<unsigned int,bool> IndexList;
-		typedef std::map<long, IndexList>   ClientIdIndex;
+		typedef std::map<unsigned int, bool> IndexList;
+		typedef std::map<long, IndexList>    ClientIdIndex;
 
 		typedef GLfloat vertex_type;
 		typedef GLubyte colour_type;
@@ -122,10 +70,20 @@ class GLOpenGLPathBuffer {
 				//-------------------------------------------------
 				long getClientId()	const { return clientID; }
 				char getType()		const { return type; }
+				
+				float getX()		const { return vertex[CncVertexAxisX]; }
+				float getY()		const { return vertex[CncVertexAxisY]; }
+				float getZ()		const { return vertex[CncVertexAxisZ]; }
 
+				float getR()		const { return colour[CncVertexColourR]; }
+				float getG()		const { return colour[CncVertexColourG]; }
+				float getB()		const { return colour[CncVertexColourB]; }
+				float getA()		const { return colour[CncVertexColourA]; }
+				
 				//-------------------------------------------------
 				CncVertex()
-				: clientID(-1)
+				: type('R')
+				, clientID(-1)
 				{
 					memset(vertex,  0, CncVertexAxisValueCount   * sizeof(vertex_type));
 					memset(colour, 	0, CncVertexColourValueCount * sizeof(colour_type));
@@ -155,9 +113,25 @@ class GLOpenGLPathBuffer {
 					vertex[CncVertexAxisZ] = z;
 					memset(colour, 	0, CncVertexColourValueCount * sizeof(GLubyte));
 				}
-
+				
+				//-------------------------------------------------
+				const CncVertex& set(char type, long clientID, float x, float y, float z)
+				{
+					this->type 				= type;
+					this->clientID			= clientID;
+					vertex[CncVertexAxisX] 	= x;
+					vertex[CncVertexAxisY] 	= y;
+					vertex[CncVertexAxisZ] 	= z;
+					
+					//memset(colour, 	0, CncVertexColourValueCount * sizeof(GLubyte));
+					
+					updateColour(255,0,0,255);
+					
+					
+					return *this;
+				}
 			//-------------------------------------------------
-			friend std::ostream &operator<< (std::ostream &ostr, const CncVertex& a) {
+			friend std::ostream& operator<< (std::ostream &ostr, const CncVertex& a) {
 				ostr << '['
 					 << a.clientID
 					 << ']'
@@ -181,13 +155,6 @@ class GLOpenGLPathBuffer {
 			}
 		};
 		
-		static const GLuint 		vertexCountMax			= 4;
-		static const GLsizeiptr 	vertexBufferSize		= vertexCountMax * sizeof(CncVertex);
-		static const GLuint 		vertexAxisTypeSize		= sizeof(vertex_type);
-		static const GLuint 		vertexColourTypeSize	= sizeof(colour_type);
-		
-	private:
-
 		// --------------------------------------------------------------
 		struct VertexColours {
 			wxColour	rapid		= wxColour(255, 128,  64);
@@ -196,6 +163,13 @@ class GLOpenGLPathBuffer {
 			wxColour	user		= wxColour(  0,   0, 255);
 			wxColour	highlight	= wxColour(255, 255,   0);
 		};
+
+		static const GLuint 		vertexCountMax			= 1024 * 16;
+		static const GLsizeiptr 	vertexBufferSize		= vertexCountMax * sizeof(CncVertex);
+		static const GLuint 		vertexAxisTypeSize		= sizeof(vertex_type);
+		static const GLuint 		vertexColourTypeSize	= sizeof(colour_type);
+		
+	private:
 
 		// --------------------------------------------------------------
 		unsigned int 	vertexBufferID;
@@ -211,22 +185,30 @@ class GLOpenGLPathBuffer {
 			glBindBuffer(GL_ARRAY_BUFFER, 	vertexBufferID);
 			glBufferData(GL_ARRAY_BUFFER, 	vertexBufferSize, NULL, GL_DYNAMIC_DRAW);
 			
+			GLCommon::checkGLError("GLOpenGLPathBuffer::initBuffer() Type=A");
+
 			glGenVertexArrays(1, &vertexArrayID);
 			glBindVertexArray(vertexArrayID);
+
+			GLCommon::checkGLError("GLOpenGLPathBuffer::initBuffer() Type=B");
 
 			// vertex
 			char *offset = (char*)NULL;
 			glVertexPointer(CncVertexAxisValueCount, GL_FLOAT, sizeof(CncVertex), offset);
 			glEnableClientState(GL_VERTEX_ARRAY);
 
+			GLCommon::checkGLError("GLOpenGLPathBuffer::initBuffer() Type=C");
+
 			// color
 			offset = (char*)NULL + CncVertexAxisValueCount * sizeof(vertex_type);
 			glColorPointer(CncVertexColourValueCount, GL_UNSIGNED_BYTE, sizeof(CncVertex), offset);
 			glEnableClientState(GL_COLOR_ARRAY);
 
+			GLCommon::checkGLError("GLOpenGLPathBuffer::initBuffer() Type=D");
+			
 			glBindVertexArray(0);
 
-			GLOpenGLPathBuffer::checkForOpenGlErrors();
+			GLCommon::checkGLError("GLOpenGLPathBuffer::initBuffer() Type=E");
 		}
 
 		// --------------------------------------------------------------
@@ -294,31 +276,9 @@ class GLOpenGLPathBuffer {
 		
 	public:
 		
-		GLOpenGLPathBuffer()
-		: vertexBufferID(0)
-		, vertexArrayID(0)
-		, numVertices(0)
-		, clientIdIndex()
-		, vertexColours()
-		{
-			initBuffer();
-		}
-		
-		explicit GLOpenGLPathBuffer(const GLOpenGLPathBuffer& b)
-		: vertexBufferID(b.getBufferID())
-		, vertexArrayID(b.getArrayID())
-		, numVertices(b.getNumVerties())
-		, clientIdIndex(b.getClientIdIndex())
-		, vertexColours()
-		{
-			// don't call initBuffer() here, because in the openGL context
-			// the underlying buffers of the given GLOpenGLPathBuffer object
-			// are already initialized
-			// initBuffer();
-		}
-
-		~GLOpenGLPathBuffer()
-		{}
+		GLOpenGLPathBuffer();
+		explicit GLOpenGLPathBuffer(const GLOpenGLPathBuffer& b);
+		~GLOpenGLPathBuffer();
 		
 		// --------------------------------------------------------------
 		unsigned int			getBufferID() 				const { return vertexBufferID; }
@@ -331,104 +291,21 @@ class GLOpenGLPathBuffer {
 		
 		const ClientIdIndex& 	getClientIdIndex()			const { return clientIdIndex; }
 		const VertexColours& 	getColours() 				const {	return vertexColours; }
-
-		// --------------------------------------------------------------
-		bool getVertex(CncVertex& ret, unsigned int idx) const {
-			
-			if ( idx < numVertices ) {
-				
-				glBindVertexArray(vertexArrayID);
-				glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-			
-					const GLintptr vertexOffset = (idx) * sizeof(CncVertex);
-					glGetBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &ret);
-				
-				glBindVertexArray(0);
-				return true;
-			}
-			
-			return false;
-		}
 		
 		// --------------------------------------------------------------
-		void setColours(VertexColours& colours) {
-			vertexColours = colours; 
-		}
+		bool normalizeClientID(long clientId) 					{ return changeColourForClientID(clientId, '\0'); }
+		bool highlightClientID(long clientId) 					{ return changeColourForClientID(clientId,  'H'); }
 		
-		// --------------------------------------------------------------
-		bool updateVertex(const CncVertex& vertex, unsigned int idx) {
-			
-			if ( idx < numVertices ) {
-				
-				glBindVertexArray(vertexArrayID);
-				glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-			
-					const GLintptr vertexOffset = (idx) * sizeof(CncVertex);
-					glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &vertex);
-				
-				glBindVertexArray(0);
-				return true;
-			}
-			
-			return false;
-		}
+		long getFirstEntryForClientId(long clientId) const;
 
 		// --------------------------------------------------------------
-		bool normalizeClientID(long clientId) {	return changeColourForClientID(clientId, '\0'); }
-		bool highlightClientID(long clientId) {	return changeColourForClientID(clientId,  'H'); }
-
-		// --------------------------------------------------------------
-		bool appendVertex(CncVertex& vertex) {
-			if ( remainingVertiesCount() == 0 )
-				return false;
-				
-			// color synchronizarion
-			normalizeVertexColour(vertex);
-			
-			// buffer management
-			glBindVertexArray(vertexArrayID);
-			
-				const GLintptr vertexOffset = (numVertices) * sizeof(CncVertex);
-				glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-				glBufferSubData(GL_ARRAY_BUFFER, vertexOffset, sizeof(CncVertex), &vertex);
-			
-			glBindVertexArray(0);
-			
-			++numVertices;
-			updateIndex(vertex.getClientId());
-
-			return true;
-		}
-		
-		// --------------------------------------------------------------
-		void destroyBuffer() {
-			clientIdIndex.clear();
-
-			glDeleteVertexArrays(1, &vertexArrayID);
-			glDeleteBuffers(1, &vertexBufferID);
-		}
-		
-		// --------------------------------------------------------------
-		void display(DisplayType dt, int vertices = -1) {
-			const unsigned int displayCount = vertices >= 0 ? std::min((unsigned int)vertices, numVertices) : numVertices;
-			//std::cout << "ID[" << vertexBufferID<< "][" << vertexArrayID << "]: " << "displayCount: " << displayCount << std::endl;
-			
-			// select buffer
-			glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-			glBindVertexArray(vertexArrayID);
-			
-				// render data
-				glEnableClientState(GL_VERTEX_ARRAY);
-				glEnableClientState(GL_COLOR_ARRAY);
-	
-				const unsigned int displayOffset = 0;
-				glDrawArrays(dt, displayOffset, displayCount);
-				
-				glDisableClientState(GL_VERTEX_ARRAY);
-				glDisableClientState(GL_COLOR_ARRAY);
-			
-			glBindVertexArray(0);
-		}
+		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret);
+		bool getVertex(CncVertex& ret, unsigned int idx) const;
+		void setColours(const VertexColours& colours);
+		bool updateVertex(const CncVertex& vertex, unsigned int idx);
+		bool appendVertex(const CncVertex& vertex);
+		void destroyBuffer();
+		void display(DisplayType dt, int vertices = -1);
 
 		//-------------------------------------------------
 		friend std::ostream &operator<< (std::ostream &ostr, const GLOpenGLPathBuffer& b) {
@@ -476,155 +353,43 @@ class GLOpenGLPathBufferStore {
 	private:
 
 		typedef std::vector<GLOpenGLPathBuffer> 	BufferStore;
-			
-		BufferStore 					bufferStore;
-		GLOpenGLPathBuffer::CncVertex	lastVertex;
-
-		// --------------------------------------------------------------
-		void addBuffer() { 
-
-			GLOpenGLPathBuffer buffer;
-			
-			// start the new buffer with the last value of the prev buffer
-			// to connect the underlying GL_LINE_STRIPS
-			buffer.appendVertex(lastVertex);
-			
-			// add
-			bufferStore.push_back(buffer);
-		}
 		
+		bool								initialized;
+		BufferStore 						bufferStore;
+		GLOpenGLPathBuffer::VertexColours	colourStore;
+		GLOpenGLPathBuffer::CncVertex		lastVertex;
+
 		// --------------------------------------------------------------
-		int getBufferStoreIndex(unsigned long idx) const {
-			return idx / GLOpenGLPathBuffer::vertexCountMax;
-		}
+		void addBuffer();
+		int getBufferStoreIndex(unsigned long idx) const;
 		
 	public:
 		
 		// --------------------------------------------------------------
-		GLOpenGLPathBufferStore()
-		: bufferStore()
-		, lastVertex()
-
-		{
-			addBuffer();
-		}
+		GLOpenGLPathBufferStore();
+		~GLOpenGLPathBufferStore();
 		
-		// --------------------------------------------------------------
-		~GLOpenGLPathBufferStore()
-		{
-			destroyBuffers();
-		}
+		void init();
+		bool checkInitialized();
 		
-		// --------------------------------------------------------------
-		unsigned int getBufferCount() 	const { return bufferStore.size(); }
+		unsigned int getBufferCount() 	const;
+		unsigned int getTotalSize()		const;
+		unsigned long getVertexCount() 	const;
+		const GLOpenGLPathBuffer::CncVertex& getLastVertex() const;
+		bool getVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx) const;
 		
-		// --------------------------------------------------------------
-		unsigned int getTotalSize()		const { return bufferStore.size()
-				                                       * GLOpenGLPathBuffer::vertexBufferSize; }
-
-		// --------------------------------------------------------------
-		unsigned long getVertexCount() 	const { 
-
-			if ( getBufferCount() == 0 )
-				return 0L;
-				
-			return ( getBufferCount() - 1 ) * GLOpenGLPathBuffer::vertexCountMax
-			       + bufferStore.back().getNumVerties(); 
-		}
+		void destroyBuffers();
+		bool normalizeClientID(long clientId);
+		bool updateVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx);
+		unsigned long appendVertex(const GLOpenGLPathBuffer::CncVertex& vertex);
+		bool highlightClientID(long clientId);
+		void display(GLOpenGLPathBuffer::DisplayType dt, long vertices = -1);
+		long findFirstEntryForClientId(long cliendId);
+		GLOpenGLPathBuffer::VertexColours& getColoursAsReference();
+		void setColours(const GLOpenGLPathBuffer::VertexColours& colours);
 		
-		// --------------------------------------------------------------
-		const GLOpenGLPathBuffer::CncVertex& getLastVertex() const { return lastVertex; }
-
-		// --------------------------------------------------------------
-		bool getVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx) const {
-				
-			if ( idx < getVertexCount() ) {
-				const unsigned int bufferIdx  = getBufferStoreIndex(idx);
-				const unsigned long offset 	  = bufferIdx * GLOpenGLPathBuffer::vertexCountMax;
-				
-				if ( offset <= idx ) {
-					const unsigned int rest	  = idx - offset;
-					
-					bufferStore[bufferIdx].getVertex(ret, rest);
-					return true;
-				}
-			}
-			
-			return false;
-		}
+		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret);
 		
-		// --------------------------------------------------------------
-		void destroyBuffers() {
-			for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it)
-				it->destroyBuffer();
-				
-			bufferStore.clear();
-		}
-		
-		// --------------------------------------------------------------
-		bool normalizeClientID(long clientId) {	
-			bool ret = false;
-			
-			for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it)
-				if ( it->normalizeClientID(clientId) == true )
-					ret = true;
-					
-			return ret;
-		}
-		
-		// --------------------------------------------------------------
-		bool updateVertex(GLOpenGLPathBuffer::CncVertex& ret, unsigned long idx) {
-				
-			if ( idx < getVertexCount() ) {
-				const unsigned int bufferIdx  = getBufferStoreIndex(idx);
-				const unsigned long offset 	  = bufferIdx * GLOpenGLPathBuffer::vertexCountMax;
-				
-				if ( offset <= idx ) {
-					const unsigned int rest	  = idx - offset;
-					
-					bufferStore[bufferIdx].updateVertex(ret, rest);
-					return true;
-				}
-			}
-			
-			return false;
-		}
-
-		// --------------------------------------------------------------
-		unsigned long appendVertex(GLOpenGLPathBuffer::CncVertex& vertex) {
-			if ( bufferStore.size() == 0 )
-				addBuffer();
-			
-			if ( bufferStore.back().more() == false )
-				addBuffer();
-			
-			lastVertex = vertex;
-			return bufferStore.back().appendVertex(vertex) ? getVertexCount() : 0;
-		}
-
-		// --------------------------------------------------------------
-		bool highlightClientID(long clientId) {
-			bool ret = false;
-
-			for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
-				if ( it->highlightClientID(clientId) == true )
-					ret = true;
-			}
-
-			return ret;
-		}
-		
-		// --------------------------------------------------------------
-		void display(GLOpenGLPathBuffer::DisplayType dt, long vertices = -1) {
-			const unsigned int base = vertices < 0 ? bufferStore.size() : vertices / GLOpenGLPathBuffer::vertexCountMax;
-			const unsigned int rest = vertices < 0 ?                  0 : vertices % GLOpenGLPathBuffer::vertexCountMax;
-			
-			for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) {
-				if ( std::distance(bufferStore.begin(), it) < base )	it->display(dt);
-				else													it->display(dt, rest);
-			}
-		}
-
 		//-------------------------------------------------
 		friend std::ostream &operator<< (std::ostream &ostr, const GLOpenGLPathBufferStore& s) {
 

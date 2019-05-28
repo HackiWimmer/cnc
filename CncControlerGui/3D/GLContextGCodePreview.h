@@ -1,7 +1,7 @@
 #ifndef OPENGL_CONTEXT_GCODE_PREVIEW_H
 #define OPENGL_CONTEXT_GCODE_PREVIEW_H
 
-#include "3D/GLContextPathBase.h"
+#include "3D/GLContextCncPathBase.h"
 
 /////////////////////////////////////////////////////////////////
 class GLContextGCodePreview : public GLContextCncPathBase {

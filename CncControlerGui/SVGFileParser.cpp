@@ -71,6 +71,24 @@ void SVGFileParser::selectSourceControl(unsigned long pos) {
 	
 	inboundSourceControl->selectLineNumber(pos, currentNodeName);
 }
+////////////////////////////////////////////////////////////////////////////
+void SVGFileParser::enableUserAgentControls(bool state) {
+////////////////////////////////////////////////////////////////////////////
+	SvgUserAgentOutputControls soc;
+	
+	if ( state == true ) {
+		soc.detailInfo 			= THE_APP->GetDvListCtrlSvgUADetailInfo();
+		soc.inboundPathList		= THE_APP->GetDvListCtrlSvgUAInboundPathList();
+		soc.useDirectiveList	= THE_APP->GetDvListCtrlSvgUAUseDirective();
+	} 
+	else {
+		soc.detailInfo 			= NULL;
+		soc.inboundPathList		= NULL;
+		soc.useDirectiveList	= NULL;
+	}
+	
+	svgUserAgent.setOutputControls(soc);
+}
 //////////////////////////////////////////////////////////////////
 void SVGFileParser::setPathHandler(PathHandlerBase* ph) {
 //////////////////////////////////////////////////////////////////

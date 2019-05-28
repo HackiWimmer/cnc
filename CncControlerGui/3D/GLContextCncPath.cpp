@@ -1,15 +1,6 @@
 #include <iostream>
 #include "3D/GLContextCncPath.h"
-
-#ifdef __DARWIN__
-    #include <OpenGL/glu.h>
-	#include <OpenGL/glut.h>
-	#include <OpenGL/freeglut.h>
-#else
-    #include <GL/glu.h>
-	#include <GL/glut.h>
-	#include <GL/freeglut.h>
-#endif
+#include "3D/GLInclude.h"
 
 /////////////////////////////////////////////////////////////////
 GLContextCncPath::GLContextCncPath(wxGLCanvas* canvas) 
@@ -46,6 +37,14 @@ void GLContextCncPath::initContext() {
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); 
 		glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 	}
+	
+	GLOpenGLPathBuffer::VertexColours& colours = cncPath.getColoursAsReference();
+	colours.rapid 	= options.rapidColour;
+	colours.work 	= options.workColour;
+	colours.user 	= options.userColour;
+	colours.max 	= options.maxColour;
+	
+	cncPath.setColours(colours);
 	
 	// currently this didn't work correctly
 	//glEnable(GL_SCISSOR_TEST);

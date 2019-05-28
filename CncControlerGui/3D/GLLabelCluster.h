@@ -4,14 +4,7 @@
 #include <vector>
 #include "wx/string.h"
 
-#ifdef __DARWIN__
-    #include <OpenGL/glu.h>
-	#include <OpenGL/glut.h>
-#else
-    #include <GL/glu.h>
-	#include <GL/glut.h>
-	#include <GL/glext.h>
-#endif
+#include "3D/GLInclude.h"
 
 namespace GLI {
 	

@@ -66,8 +66,7 @@ void GL3DOptionPane::propertyChanged(wxPropertyGridEvent& event) {
 	// draw type
 	switch ( m_pgPropDrawType->GetValue().GetInteger() ) {
 		case 0:	motionMonitor->setDrawType(GLContextCncPathBase::DrawType::DT_POINTS); 		break;
-		case 1:	motionMonitor->setDrawType(GLContextCncPathBase::DrawType::DT_LINES); 		break;
-		case 2:	motionMonitor->setDrawType(GLContextCncPathBase::DrawType::DT_LINE_STRIP);	break;
+		case 1:	motionMonitor->setDrawType(GLContextCncPathBase::DrawType::DT_LINE_STRIP);	break;
 	}
 	
 	// other oiptions
@@ -104,8 +103,7 @@ void GL3DOptionPane::notifyChange(CncMotionMonitor& mm) {
 	// draw type
 	switch ( mm.getDrawType() ) {
 		case GLContextCncPathBase::DrawType::DT_POINTS:		m_pgPropDrawType->SetValue(0); break;
-		case GLContextCncPathBase::DrawType::DT_LINES:		m_pgPropDrawType->SetValue(1); break;
-		case GLContextCncPathBase::DrawType::DT_LINE_STRIP:	m_pgPropDrawType->SetValue(2); break;
+		case GLContextCncPathBase::DrawType::DT_LINE_STRIP:	m_pgPropDrawType->SetValue(1); break;
 	}
 	
 	// smoothing
@@ -234,9 +232,9 @@ void GL3DOptionPane::autoCameraRotationAnticlockwise(wxCommandEvent& event) {
 	if ( motionMonitor == NULL )
 		return;
 
-	bool b = m_btCameraRotionAnticlockwise->GetValue();
+	bool b = m_btCameraRotationAnticlockwise->GetValue();
 	m_sliderCameraRotation->Enable(!b);
-	m_btCameraRotionClockwise->SetValue(!b);
+	m_btCameraRotationClockwise->SetValue(!b);
 
 	if ( b ) 	motionMonitor->cameraRotationTimerHandler(CncMotionMonitor::CameraMode::CM_COUNTER_CLOCKWISE);
 	else 		motionMonitor->cameraRotationTimerHandler(CncMotionMonitor::CameraMode::CM_OFF);
@@ -247,9 +245,9 @@ void GL3DOptionPane::autoCameraRotationClockwise(wxCommandEvent& event) {
 	if ( motionMonitor == NULL )
 		return;
 
-	bool b = m_btCameraRotionClockwise->GetValue();
+	bool b = m_btCameraRotationClockwise->GetValue();
 	m_sliderCameraRotation->Enable(!b);
-	m_btCameraRotionAnticlockwise->SetValue(!b);
+	m_btCameraRotationAnticlockwise->SetValue(!b);
 	
 	if ( b )	motionMonitor->cameraRotationTimerHandler(CncMotionMonitor::CameraMode::CM_CLOCKWISE);
 	else 		motionMonitor->cameraRotationTimerHandler(CncMotionMonitor::CameraMode::CM_OFF);
@@ -261,8 +259,8 @@ void GL3DOptionPane::resetCameraPostion(wxCommandEvent& event) {
 		return;
 
 	m_sliderCameraRotation->SetValue(0);
-	m_btCameraRotionClockwise->SetValue(false);
-	m_btCameraRotionAnticlockwise->SetValue(false);
+	m_btCameraRotationClockwise->SetValue(false);
+	m_btCameraRotationAnticlockwise->SetValue(false);
 	m_sliderCameraRotation->Enable(true);
 	
 	motionMonitor->cameraRotationTimerHandler(CncMotionMonitor::CameraMode::CM_OFF);

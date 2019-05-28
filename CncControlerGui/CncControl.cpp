@@ -45,7 +45,6 @@ CncControl::CncControl(CncPortType pt)
 , interruptState(false)
 , positionOutOfRangeFlag(false)
 , powerOn(false)
-, toolUpdateState(true)
 , stepDelay(0)
 , lastCncHeartbeatValue(0)
 , toolState()
@@ -658,17 +657,13 @@ bool CncControl::hasNextDuration() {
 void CncControl::resetDurationCounter() {
 ///////////////////////////////////////////////////////////////////
 	durationCounter = 0;
-	
-	if ( toolUpdateState == true )
-		THE_APP->GetPassingCount()->SetValue(wxString() << durationCounter);
+	THE_APP->GetPassingCount()->SetValue(wxString() << durationCounter);
 }
 ///////////////////////////////////////////////////////////////////
 void CncControl::initNextDuration() {
 ///////////////////////////////////////////////////////////////////
 	durationCounter++;
-	
-	if ( toolUpdateState == true )
-		THE_APP->GetPassingCount()->SetValue(wxString() << durationCounter);
+	THE_APP->GetPassingCount()->SetValue(wxString() << durationCounter);
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncControl::getDurationCounter() {
@@ -851,17 +846,19 @@ void CncControl::monitorPosition(const CncLongPosition& pos) {
 	// motion monitor
 	static GLI::VerticeLongData vd;
 	static CncLongPosition prevPos;
-
+	
 	if ( pos != prevPos ) {
 		
 		if ( THE_APP->getMotionMonitor() ) {
 			vd.setVertice(getClientId(), getConfiguredSpeedMode(), pos);
-			THE_APP->getMotionMonitor()->appendVertice(vd);
+			
+			#warning !!!
+			THE_APP->getMotionMonitor()->appendVertex(vd);
 			
 			updatePreview3D(false);
 		}
 		
-		prevPos = pos;
+		prevPos.set(pos);
 		
 		if ( GBL_CONFIG->getInterruptByPosOutOfRangeFlag() == true ) {
 			if ( isPositionOutOfRange(pos, true) == true )
@@ -1127,7 +1124,7 @@ void CncControl::postAppPosition(unsigned char pid) {
 		typedef UpdateManagerThread::Event Event;
 		static Event evt;
 		
-		// app positions are always fron the type major
+		// app positions are always from type major
 		// so || pid == PID_XYZ_POS_MAJOR isn't necessary
 		// the compairison below is necessary, because this method is also called
 		// from the serialCallback(...) which not only detects pos changes
@@ -1364,10 +1361,8 @@ void CncControl::setToolState(bool defaultStyle) {
 	if ( defaultStyle == true ) {
 		toolState.setState(CncToolStateControl::red);
 	} else {
-		if ( toolUpdateState == true ) {
-			if ( powerOn == true ) 	toolState.setState(CncToolStateControl::green);
-			else 					toolState.setState(CncToolStateControl::red);
-		}
+		if ( powerOn == true ) 	toolState.setState(CncToolStateControl::green);
+		else 					toolState.setState(CncToolStateControl::red);
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -2177,11 +2172,11 @@ void CncControl::updatePreview3D(bool force) {
 	
 	// Online drawing coordinates
 	if ( GBL_CONTEXT->isOnlineUpdateDrawPane() ) {
-		static wxDateTime tsLastUpdate = wxDateTime::UNow();
+		static CncMilliTimestamp tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
 		
-		if ( (wxDateTime::UNow() - tsLastUpdate).GetMilliseconds() >= GBL_CONTEXT->getUpdateInterval() ) {
+		if ( (CncTimeFunctions::getMilliTimestamp() - tsLastUpdate) >= GBL_CONTEXT->getUpdateInterval() ) {
 			THE_APP->getMotionMonitor()->display();
-			tsLastUpdate = wxDateTime::UNow();
+			tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
 		}
 	}
 }

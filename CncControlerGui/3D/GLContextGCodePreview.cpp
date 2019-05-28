@@ -1,15 +1,6 @@
 #include <iostream>
 #include "3D/GLContextGCodePreview.h"
-
-#ifdef __DARWIN__
-    #include <OpenGL/glu.h>
-	#include <OpenGL/glut.h>
-	#include <OpenGL/freeglut.h>
-#else
-    #include <GL/glu.h>
-	#include <GL/glut.h>
-	#include <GL/freeglut.h>
-#endif
+#include "3D/GLInclude.h"
 
 /////////////////////////////////////////////////////////////////
 GLContextGCodePreview::GLContextGCodePreview(wxGLCanvas* canvas) 
