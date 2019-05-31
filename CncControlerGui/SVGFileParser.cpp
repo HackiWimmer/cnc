@@ -172,6 +172,19 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 	if ( THE_APP != NULL ) {
 		std::stringstream ss; ss << svgRootNode;
 		THE_APP->GetSvgRootNode()->ChangeValue(ss.str());
+		
+		// reporting
+		typedef CncUnitCalculator<float> UC;
+		THE_APP->getParsingSynopsisTrace()->addSeparator();
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("Translated RootNode: %s",  ss.str()));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Input Unit        : %s",  UC::getUnitAsStr(svgRootNode.getInputUnit())));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Output Unit       : %s",  UC::getUnitAsStr(svgRootNode.getOutputUnit())));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Width        [px] : %12.3lf", svgRootNode.getWidth()));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Heigth       [px] : %12.3lf", svgRootNode.getHeight()));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Width        [mm] : %12.3lf", svgRootNode.getWidth_MM()));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Heigth       [mm] : %12.3lf", svgRootNode.getHeight_MM()));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Scale X           : %12.3lf", svgRootNode.getScaleX()));
+		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Scale Y           : %12.3lf", svgRootNode.getScaleY()));
 	}
 	
 	pathHandler->setSvgRootNode(svgRootNode);
@@ -484,12 +497,9 @@ bool SVGFileParser::postprocess() {
 //////////////////////////////////////////////////////////////////
 	if ( cncControl == NULL )
 		return true;
-		
-	#warning activate SVGFileParser::postprocess() again
-	return true;
 	
 	const SVGRootNode& rn 	= pathHandler->getSvgRootNode();
-	CncUnitCalculator<float> to_mm(rn.getInputUnit(), Unit::mm);
+	CncUnitCalculator<float> to_mm(rn.getOutputUnit(), Unit::mm);
 	
 	const CncDoublePosition min(cncControl->getMinPositionsMetric());
 	const CncDoublePosition max(cncControl->getMaxPositionsMetric());
@@ -500,51 +510,50 @@ bool SVGFileParser::postprocess() {
 	const double svgDistY 	= rn.getHeight_MM() * rn.getScaleY();
 	
 	const double cncMinX	= min.getX();
-	const double cncMinY	= min.getY();
 	const double cncMaxX	= max.getX();
-	const double cncMaxY	= max.getY();
+
+	// if the Y axis will be reversed svg is also a right hand coord system
+	const bool cnv = CncConfig::getGlobalCncConfig()->getSvgConvertToRightHandFlag();
+	const double cncMinY	= min.getY() * (cnv ? +1 : -1);
+	const double cncMaxY	= max.getY() * (cnv ? +1 : -1);
 	
 	const double svgMinX	= to_mm.convert(rn.getViewbox().getMinX());
-	const double svgMinY	= to_mm.convert(rn.getViewbox().getMinY());
 	const double svgMaxX	= to_mm.convert(rn.getViewbox().getMaxX());
+	const double svgMinY	= to_mm.convert(rn.getViewbox().getMinY());
 	const double svgMaxY	= to_mm.convert(rn.getViewbox().getMaxY());
 	
-	// ....
-	auto trace = [&](std::ostream& out) {
-		
-		out << " CNC distance x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", cncDistX, cncDistY) 	<< std::endl;
-		out << " SVG distance x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", svgDistX, svgDistY) 	<< std::endl;
-		out << " CNC min      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", cncMinX, cncMinY) 	<< std::endl;
-		out << " SVG min      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", svgMinX, svgMinY) 	<< std::endl;
-		out << " CNC max      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", cncMaxX, cncMaxY) 	<< std::endl;
-		out << " SVG max      x, y  [mm]: " << wxString::Format("%4.3lf, %4.3lf", svgMaxX, svgMaxY) 	<< std::endl;
-	};
-	
 	bool ret = true;
-	auto check_1_Less_2 = [&](double d1, double d2, std::ostream& out, const char* msg) {
+	auto check_1_Less_2 = [&](double d1, double d2, const char* msg) {
 		if ( d1 > d2 ) {
-			out << msg 
-			    << wxString::Format("%4.3lf", d1)
-			    << " > " 
-				<< wxString::Format("%4.3lf", d2)
-			    << std::endl;
-				
+			if ( ret == true ) {
+				THE_APP->getParsingSynopsisTrace()->addSeparator();
+				THE_APP->getParsingSynopsisTrace()->addError("Post Processing Error Summary:");
+			}
+			
+			THE_APP->getParsingSynopsisTrace()->addError(wxString::Format("%s %12.3lf > %12.3lf", msg, d1, d2));
 			ret = false;
 		}
 	};
 	
-	check_1_Less_2(cncDistX, svgDistX, std::cerr, " CNC distance X out of range: ");
-	check_1_Less_2(cncDistY, svgDistY, std::cerr, " CNC distance Y out of range: ");
-	check_1_Less_2(svgMinX,  cncMinX,  std::cerr, " CNC min bound X out of range: ");
-	check_1_Less_2(svgMinY,  cncMinY,  std::cerr, " CNC min bound Y out of range: ");
-	check_1_Less_2(cncMaxX,  svgMaxX,  std::cerr, " CNC max bound X out of range: ");
-	check_1_Less_2(cncMaxY,  svgMaxY,  std::cerr, " CNC max bound Y out of range: ");
+	const char type = 'I';
+	THE_APP->getParsingSynopsisTrace()->addSeparator();
+	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format("Boundings:"));
+	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf", cncDistX, cncDistY));
+	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf", svgDistX, svgDistY));
+	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf", cncMinX, cncMinY));
+	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf", svgMinX, svgMinY));
+	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf", cncMaxX, cncMaxY));
+	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf", svgMaxX, svgMaxY));
+
+	check_1_Less_2(cncDistX, svgDistX, " CNC distance X out of range:  ");
+	check_1_Less_2(cncDistY, svgDistY, " CNC distance Y out of range:  ");
+	check_1_Less_2(svgMinX,  cncMinX,  " CNC min bound X out of range: ");
+	check_1_Less_2(svgMinY,  cncMinY,  " CNC min bound Y out of range: ");
+	check_1_Less_2(cncMaxX,  svgMaxX,  " CNC max bound X out of range: ");
+	check_1_Less_2(cncMaxY,  svgMaxY,  " CNC max bound Y out of range: ");
 	
-	if ( ret == false ) 
-		std::cerr << "\n SVG post processing report: Error(s) detected" << std::endl;
-		
-	if ( ret == false ) 
-		trace( ret == true ? std::cout : std::cerr);
+	if ( ret == false )  
+		std::cerr << "SVG post processing decteced error(s). For more details please visit the parsing synopsis trace\n";
 	
 	return ret;
 }

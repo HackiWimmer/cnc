@@ -297,7 +297,7 @@ bool CncControl::setup(bool doReset) {
 	evaluateLimitState();
 	
 	std::cout << " Starting controller initialization . . . \n";
-	wxTextCtrl* logger = GBL_CONFIG->getTheApp()->GetLogger(); wxASSERT( logger != NULL );
+	CncTextCtrl* logger = GBL_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
 	long logPos = logger->GetLastPosition();
 	
 	// setup probe mode
@@ -381,7 +381,7 @@ long CncControl::convertDoubleToCtrlLong(unsigned char id, double d) {
 bool CncControl::disconnect() {
 ///////////////////////////////////////////////////////////////////
 	if ( serialPort->isConnected() ) {
-		wxTextCtrl* logger = GBL_CONFIG->getTheApp()->GetLogger(); wxASSERT( logger != NULL );
+		CncTextCtrl* logger = GBL_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
 		
 		std::cout << " Disconnecting serial port . . .\n";
 		long logPos = logger->GetLastPosition();
@@ -617,7 +617,7 @@ bool CncControl::reset() {
 	resetInterrupt();
 	resetPositionOutOfRangeFlag();
 	
-	wxTextCtrl* logger = GBL_CONFIG->getTheApp()->GetLogger(); wxASSERT( logger != NULL );
+	CncTextCtrl* logger = GBL_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
 	std::cout << " Try to reset the controller . . .\n";
 	long logPos = logger->GetLastPosition();
 	
@@ -844,17 +844,12 @@ bool CncControl::isPositionOutOfRange(const CncLongPosition& pos, bool trace) {
 void CncControl::monitorPosition(const CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	// motion monitor
-	static GLI::VerticeLongData vd;
 	static CncLongPosition prevPos;
 	
 	if ( pos != prevPos ) {
 		
 		if ( THE_APP->getMotionMonitor() ) {
-			vd.setVertice(getClientId(), getConfiguredSpeedMode(), pos);
-			
-			#warning !!!
-			THE_APP->getMotionMonitor()->appendVertex(vd);
-			
+			THE_APP->getMotionMonitor()->appendVertex(getClientId(), getConfiguredSpeedMode(), pos);
 			updatePreview3D(false);
 		}
 		
@@ -2166,7 +2161,7 @@ void CncControl::updatePreview3D(bool force) {
 		return;
 		
 	if ( force == true ) {
-		THE_APP->getMotionMonitor()->display();
+		THE_APP->getMotionMonitor()->Refresh();
 		return;
 	}
 	
@@ -2175,7 +2170,7 @@ void CncControl::updatePreview3D(bool force) {
 		static CncMilliTimestamp tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
 		
 		if ( (CncTimeFunctions::getMilliTimestamp() - tsLastUpdate) >= GBL_CONTEXT->getUpdateInterval() ) {
-			THE_APP->getMotionMonitor()->display();
+			THE_APP->getMotionMonitor()->Refresh();
 			tsLastUpdate = CncTimeFunctions::getMilliTimestamp();
 		}
 	}

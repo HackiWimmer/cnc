@@ -1,4 +1,5 @@
 #include "GlobalFunctions.h"
+#include "MainFrame.h"
 #include "BinaryFileParser.h"
 #include "GCodePathHandlerGL.h"
 #include "GCodeFileParser.h"
@@ -6,32 +7,31 @@
 #include "CncFilePreview.h"
 
 ///////////////////////////////////////////////////////////////////
-CncFilePreview::CncFilePreview(wxWindow* parent)
+CncFilePreview::CncFilePreview(wxWindow* parent, wxString name)
 : CncFilePreviewBase(parent)
 , gcodePreview(NULL)
 , svgPreview(NULL)
+, previewName(name)
+, lastFileName()
 ///////////////////////////////////////////////////////////////////
 {
-	installContent();
-}
-///////////////////////////////////////////////////////////////////
-CncFilePreview::~CncFilePreview() {
-///////////////////////////////////////////////////////////////////
-}
-///////////////////////////////////////////////////////////////////
-void CncFilePreview::installContent() {
-///////////////////////////////////////////////////////////////////
-	gcodePreview = new CncGCodePreview(this);
+	gcodePreview = new CncGCodePreview(this, name);
 	GblFunc::replaceControl(m_gcodePreviewPlaceholder, gcodePreview);
 	
 	svgPreview = new CncSvgViewer(this);
 	GblFunc::replaceControl(m_svgPreviewPlaceholder, svgPreview);
 }
 ///////////////////////////////////////////////////////////////////
+CncFilePreview::~CncFilePreview() {
+///////////////////////////////////////////////////////////////////
+}
+///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectEmptyPreview() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( m_previewBook->GetPageCount() > 0 );
 	m_previewBook->SetSelection(0);
+	
+	lastFileName.clear();
 	
 	wxString fileName(wxString::Format("%s%s", CncFileNameService::getDatabaseDir(), "NoSerialPreviewAvailable.svg"));
 	if ( wxFileName::Exists(fileName) == false )
@@ -43,44 +43,89 @@ bool CncFilePreview::selectEmptyPreview() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncFilePreview::selectSVGPreview(const wxString& fileName) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT( m_previewBook->GetPageCount() > 0 );
-	m_previewBook->SetSelection(0);
-	
-	svgPreview->loadFile(fileName);
-	svgPreview->Update();
-	
-	return true;
-}
-///////////////////////////////////////////////////////////////////
-bool CncFilePreview::selectGCodePreview(const wxString& fileName) {
-///////////////////////////////////////////////////////////////////
-	wxASSERT( m_previewBook->GetPageCount() > 1 );
-	m_previewBook->SetSelection(1);
-	
-	wxFileName fn(fileName);
-	if ( fn.Exists() == false ) {
-		std::cerr << " CncFilePreview::selectGCodePreview: Invalid file: " << fileName << std::endl;
-		return false;
-	}
-	
-	GCodeFileParser gfp(fileName, new GCodePathHandlerGL(gcodePreview));
-	gfp.setDisplayWarnings(false);
-	return gfp.processRelease();
-}
-///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectBinaryPreview(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
 	wxString externalFile;
 	if ( BinaryFileParser::extractSourceContentAsFile(fileName, externalFile) == false ) {
-		std::cerr << "CncFilePreview::selectBinaryPreview(): Can't create preview for file: '" 
+		std::cerr << "CncFilePreview::selectBinaryPreview(): Can't create preview for file: '"
 				  << fileName
 				  << "'" << std::endl;
 		return false;
 	}
-	
+
 	return selectPreview(externalFile);
+}
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::selectSVGPreview() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( m_previewBook->GetPageCount() > SVG_TAB_PAGE );
+	m_previewBook->SetSelection(SVG_TAB_PAGE);
+	
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::selectGCodePreview() {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( m_previewBook->GetPageCount() > GCODE_TAB_PAGE );
+	m_previewBook->SetSelection(GCODE_TAB_PAGE);
+
+	// wait intil the main windows is shown
+	// this is with respect to the calls below
+	CncNanoTimestamp ts1 = CncTimeFunctions::getNanoTimestamp();
+	while ( gcodePreview->isAlreadyShown() == false ) {
+		THE_APP->dispatchAll(); 
+		
+		if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) { 
+			std::cerr << "CncFilePreview::selectGCodePreview(): Timeout reached for 'gcodePreview::IsShownScreen()'" << std::endl;
+			return false; 
+		}
+	}
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::initGCodePreview() {
+///////////////////////////////////////////////////////////////////
+	if ( IsShownOnScreen() == false )
+		return false;
+		
+	CncFilePreview::selectGCodePreview();
+	return gcodePreview->isContextValid();
+}
+///////////////////////////////////////////////////////////////////
+bool CncFilePreview::loadFile() {
+///////////////////////////////////////////////////////////////////
+	wxFileName fn(lastFileName);
+	
+	if ( lastFileName.IsEmpty() )
+		return true;
+	
+	if ( fn.Exists() == false ) {
+		std::cerr << " CncFilePreview::loadFile(): Invalid file: " << lastFileName << std::endl;
+		return false;
+	}
+	
+	bool ret = false;
+	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE ) {
+		
+		if ( gcodePreview->isAlreadyShown() ) {
+
+			gcodePreview->clear();
+			gcodePreview->Refresh();
+			
+			GCodeFileParser gfp(lastFileName, new GCodePathHandlerGL(gcodePreview));
+			gfp.setDisplayWarnings(false);
+			ret = gfp.processRelease();
+			
+			gcodePreview->Refresh();
+		}
+	} else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE ) {
+		
+		svgPreview->loadFile(lastFileName);
+		svgPreview->Update();
+		ret = true;
+	}
+	
+	return ret;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreview::selectPreview(const wxString& fileName) {
@@ -88,10 +133,10 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 	TemplateFormat tf = cnc::getTemplateFormatFromFileName(fileName);
 	
 	switch ( tf ) {
-		case TplSvg:		selectSVGPreview(fileName);
+		case TplSvg:		selectSVGPreview();
 							break;
 							
-		case TplGcode:		selectGCodePreview(fileName);
+		case TplGcode:		selectGCodePreview();
 							break;
 							
 		case TplBinary:		selectBinaryPreview(fileName);
@@ -105,14 +150,25 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 									  << std::endl;
 	}
 	
-	return true;
+	lastFileName.assign(fileName);
+	return loadFile();
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::previewBookChanged(wxNotebookEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//std::cout << "X: " << m_previewBook->GetSelection() << ", " << m_previewBook->IsShown() << ", " << m_previewBook->IsShownOnScreen() << std::endl;
+}
+///////////////////////////////////////////////////////////////////
+void CncFilePreview::previewBookPaint(wxPaintEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//std::cout << "Y: " << m_previewBook->GetSelection() << ", " << m_previewBook->IsShown() << ", " << m_previewBook->IsShownOnScreen() << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void CncFilePreview::activate3DPerspectiveButton(wxButton* bt) {
 ///////////////////////////////////////////////////////////////////
 	static wxColour active(171, 171, 171);
 	static wxColour inactive(240, 240, 240);
-
+	
 	m_3D_Top->SetBackgroundColour(inactive);
 	m_3D_Bottom->SetBackgroundColour(inactive);
 	m_3D_Front->SetBackgroundColour(inactive);

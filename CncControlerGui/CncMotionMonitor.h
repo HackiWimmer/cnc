@@ -4,15 +4,13 @@
 #include <wx/panel.h>
 #include <wx/timer.h>
 
-#include "CncGLCanvas.h"
+#include "3D/CncGLCanvas.h"
 #include "CncPosition.h"
 #include "CncCommon.h"
 #include "3D/VerticeData.h"
 #include "3D/GLContextCncPathBase.h"
 
 wxDECLARE_EVENT(wxEVT_MOTION_MONITOR_TIMER, wxTimerEvent);
-
-class GL3DOptions;
 
 /////////////////////////////////////////////////////////////
 class CncMotionMonitor : public CncGlCanvas 
@@ -66,8 +64,6 @@ class CncMotionMonitor : public CncGlCanvas
 		void onKeyDown(int keyCode);
 		
 		// interface
-		virtual void display();
-		
 		void enable(bool state);
 		void decorateProbeMode(bool state);
 		void clear();
@@ -79,9 +75,9 @@ class CncMotionMonitor : public CncGlCanvas
 		
 		void setModelType(const GLContextBase::ModelType mt);
 		
-		void setAngleX(int a) { monitor->getModelRotation().setAngleX(a); display(); }
-		void setAngleY(int a) { monitor->getModelRotation().setAngleY(a); display(); }
-		void setAngleZ(int a) { monitor->getModelRotation().setAngleZ(a); display(); }
+		void setAngleX(int a) { monitor->getModelRotation().setAngleX(a); Refresh(); }
+		void setAngleY(int a) { monitor->getModelRotation().setAngleY(a); Refresh(); }
+		void setAngleZ(int a) { monitor->getModelRotation().setAngleZ(a); Refresh(); }
 		
 		int getAngleX() { return monitor->getModelRotation().angleX(); }
 		int getAngleY() { return monitor->getModelRotation().angleY(); }
@@ -148,9 +144,7 @@ class CncMotionMonitor : public CncGlCanvas
 		const long getVirtualEndAsId() 		{ return monitor->getVirtualEndAsId(); }
 		
 	protected:
-	
 		GLContextCncPathBase* 		monitor;
-		GLContextCncPathBase* 		testCube;
 		
 		wxTimer cameraRotationTimer;
 		int cameraRotationStepWidth;
@@ -164,13 +158,16 @@ class CncMotionMonitor : public CncGlCanvas
 		
 		virtual void notifyCncPathChanged();
 		
-		void createRuler();
+		void createRuler(const GLContextBase::ModelType mt);
+
 		void onPaint(wxPaintEvent& event);
 		void onMouse(wxMouseEvent& event);
 		void onSize(wxSizeEvent& event);
 		void onLeave(wxMouseEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
 		void onCameraRotationTimer(wxTimerEvent& event);
+		
+		void performMouseToolTip();
 		
 	private:
 		

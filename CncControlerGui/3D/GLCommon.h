@@ -3,64 +3,67 @@
 
 #include <iostream>
 #include <sstream>
-#include "GlInclude.h"
+#include "GLInclude.h"
 
 struct GLCommon {
 	
-	static bool glewInitializedGlobalFlag;
-
-	/////////////////////////////////////////////////////////////////////
-	static bool isGlewAvailable() { return glewInitializedGlobalFlag; }
+	private:
+		static int  glTraceLevel;
+		static bool glInitializedGlobalFlag;
+		static bool glewInitializedGlobalFlag;
 	
-	/////////////////////////////////////////////////////////////////////
-	static void GLAPIENTRY MessageCallback(	 GLenum source,
-											 GLenum type,
-											 GLuint id,
-											 GLenum severity,
-											 GLsizei length,
-											 const GLchar* message,
-											 const void* userParam )
-	{
-		std::cerr << wxString::Format("GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-										(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-										type, 
-										severity, 
-										message 
-									 );
-	}
-	
-	/////////////////////////////////////////////////////////////////////
-	static void checkGLError(const char* cont) {
+		static bool initGlew();
+		
+		static void traceOpenGLVersionInfo();
+		static void traceOpenGLExtentionInfo();
+		
+	public:
 
-		GLenum errLast = GL_NO_ERROR;
+		static void setTraceLevel(int level)	{ glTraceLevel = level; }
+		static int  getTraceLevel()				{ return glTraceLevel; }
 
-		wxString context("");
-		if ( cont != NULL )
-			context.assign(cont);
-
-		for ( ;; )
-		{
-			GLenum err = glGetError();
-			if ( err == GL_NO_ERROR )
-				return;
-
-			// normally the error is reset by the call to glGetError() but if
-			// glGetError() itself returns an error, we risk looping forever here
-			// so check that we get a different error than the last time
-			if ( err == errLast )
-			{
-				std::cerr << "OpenGLContextBase::checkGLError(" << context << "): OpenGL error state couldn't be reset." << std::endl;
-				return;
-			}
-
-			errLast = err;
-	 
-			std::stringstream ss;
-			ss << gluErrorString(err);
-			std::cerr << "OpenGLContextBase::checkGLError(" << context << "): " << wxString::Format("OpenGL error [ %d ]: %s", err, ss.str()) << std::endl;
-		}
-	}
+		static bool isGlewAvailable() 			{ return glewInitializedGlobalFlag; }
+		
+		static bool initOpenGL();
+		static void GLAPIENTRY MessageCallback(	 GLenum source,
+												 GLenum type,
+												 GLuint id,
+												 GLenum severity,
+												 GLsizei length,
+												 const GLchar* message,
+												 const void* userParam);
+		
+		static int checkGLError(const char* file, unsigned int line, const char* funct);
 };
 
+// *****************************************************************
+// Logging start
+// *****************************************************************
+	// usage:
+	// GL_COMMON_CHECK_ERROR;
+	// 
+	// if ( GL_COMMON_CHECK_ERROR > 0 )
+	//	;
+	
+	#define GL_ERROR_TRACE_LEVEL 2
+	#if ( GL_ERROR_TRACE_LEVEL > 0 )
+		
+		#if ( GL_ERROR_TRACE_LEVEL > 1 )
+		#define GL_COMMON_CHECK_ERROR \
+				GLCommon::checkGLError(__FILE__, __LINE__, __PRETTY_FUNCTION__)
+		#else
+			#define GL_COMMON_CHECK_ERROR \
+				GLCommon::checkGLError(NULL, __LINE__, __PRETTY_FUNCTION__)
+		#endif
+		
+	#else
+
+		#define GL_COMMON_CHECK_ERROR 		0
+		
+	#endif
+	
+// *****************************************************************
+// Logging end
+// *****************************************************************
 
 #endif

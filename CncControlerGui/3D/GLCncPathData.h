@@ -214,7 +214,7 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
-			GLCncPath();
+			explicit GLCncPath(const wxString& instanceName);
 			virtual ~GLCncPath();
 			
 			////////////////////////////////////////////
@@ -301,6 +301,7 @@ namespace GLI {
 				
 				// range: -2 >= ret <= 2
 				float ret = std::max(std::max(totalDistZ, totalDistY), totalDistX);
+				
 				if ( ret < 0.1 )
 					return 0.1;
 				
@@ -308,15 +309,14 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
-			GLOpenGLPathBuffer::VertexColours& getColoursAsReference() 			{ return vectiesBuffer.getColoursAsReference(); }
-			GLOpenGLPathBufferStore* getVertexBufferStore()						{ return &vectiesBuffer; }
 			unsigned long size()										const	{ return vectiesBuffer.getVertexCount(); }
-			
+			GLOpenGLPathBufferStore* getOpenGLBufferStore() 					{ return &vectiesBuffer; }
+			void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt)	{ vectiesBuffer.reconstruct(opt); }
 			void setColours(const GLOpenGLPathBuffer::VertexColours& colours) 	{ vectiesBuffer.setColours(colours); }
 			void display(GLOpenGLPathBuffer::DisplayType dt);
+			
 			void clear();
 			void appendPathData(const GLOpenGLPathBuffer::CncVertex& v);
-			
 		
 		private:
 			GLOpenGLPathBufferStore					vectiesBuffer;
@@ -329,9 +329,7 @@ namespace GLI {
 			std::vector<GLI::GLCncPath::Callback*> 	callbacks;
 			
 			////////////////////////////////////////////
-			void updateVirtualEnd() {
-				setVirtualEnd(vectiesBuffer.getVertexCount());
-			}
+			inline void updateVirtualEnd() { setVirtualEnd(vectiesBuffer.getVertexCount()); }
 			
 			////////////////////////////////////////////
 			void notifyCncPathChanged() {

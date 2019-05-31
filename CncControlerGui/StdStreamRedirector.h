@@ -2,7 +2,7 @@
 #define STD_STREAM_REDIRECTOR_H
 
 #include <iostream>
-#include <wx/textctrl.h>
+#include "CncLoggerProxy.h"
 #include "CncStreamBuffers.h"
 
 //////////////////////////////////////////////////////////
@@ -23,7 +23,7 @@ class StdStreamRedirector {
 		
 	public:
 		//////////////////////////////////////////////////
-		StdStreamRedirector(wxTextCtrl* ctl) {
+		StdStreamRedirector(CncTextCtrl* ctl) {
 			if ( ctl != NULL ) {
 				//redirect std::cout
 				psbufCout = new CncCoutBuf(ctl);

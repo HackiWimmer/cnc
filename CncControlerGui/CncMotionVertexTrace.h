@@ -12,10 +12,6 @@ class CncMotionVertexTrace : public CncMotionVertexTraceBase {
 		CncMotionVertexTrace(wxWindow* parent);
 		virtual ~CncMotionVertexTrace();
 		
-		bool connect(bool state = true)						{ m_btConnectMotionVertex->SetValue(state); connectMotionVertex(state); return isConnected(); }
-		bool disconnect()									{ return connect(false); }
-		
-		bool isConnected() 									{ return m_btConnectMotionVertex->GetValue(); }
 		CncVertexTrace::DataListCtrl* getVertexDataList() 	{ return motionVertexDataList;  } 
 		CncVertexTrace::IndexListCtrl* getVertexIndexList() { return motionVertexIndexList; } 
 		
@@ -24,9 +20,6 @@ class CncMotionVertexTrace : public CncMotionVertexTraceBase {
 	protected:
 		CncVertexTrace::DataListCtrl* motionVertexDataList; 
 		CncVertexTrace::IndexListCtrl* motionVertexIndexList; 
-		
-		virtual void clearMotionVertex(wxCommandEvent& event);
-		virtual void connectMotionVertex(wxCommandEvent& event);
 		
 		void connectMotionVertex(bool state);
 };

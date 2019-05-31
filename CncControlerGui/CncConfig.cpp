@@ -956,9 +956,7 @@ const char CncConfig::getRunConfirmationModeAsChar() {
 const bool CncConfig::getAutoConnectFlag()							{ PROPERTY(CncApplication_AUTO_CONNECT) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getAutoProcessFlag()							{ PROPERTY(CncApplication_AUTO_PROCESS) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getShowTestMenuFlag()							{ PROPERTY(CncApplication_SHOW_TEST_MENU) 				return p->GetValue().GetBool(); }
-const bool CncConfig::getSvgResultWithOrigPathFlag()				{ PROPERTY(CncSvg_Emu_RSLT_WITH_ORIG_PATH) 				return p->GetValue().GetBool(); }
-const bool CncConfig::getSvgResultOnlyFirstCrossingFlag()			{ PROPERTY(CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS) 		return p->GetValue().GetBool(); }
-const bool CncConfig::getSvgReverseYAxisFlag()						{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 				return p->GetValue().GetBool(); }
+const bool CncConfig::getSvgConvertToRightHandFlag()				{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getAvoidDupSetterValuesFlag()					{ PROPERTY(CncWork_Ctl_AVOID_DUP_SETTER_VALUES) 		return p->GetValue().GetBool(); }
 const bool CncConfig::getRequestIdleRequestFlag()					{ PROPERTY(CncWork_Ctl_REQUEST_IDLE_REQUESTS) 			return p->GetValue().GetBool(); }
 const bool CncConfig::getInterruptByPosOutOfRangeFlag()				{ PROPERTY(CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE) 	return p->GetValue().GetBool(); }
@@ -968,12 +966,6 @@ const bool CncConfig::getInverseCtrlDirectionZFlag()				{ PROPERTY(CncWork_Ctl_I
 const bool CncConfig::getPreProcessorAnalyseFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_ANALYSE) 			return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessoSkipEmptyFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY) 			return p->GetValue().GetBool(); }
 const bool CncConfig::getPreProcessorCombineMovesFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES) 		return p->GetValue().GetBool(); }
-
-	#define CncWork_Ctl_PRE_PROSSOR_ANALYSE			"CncWork.Controller/PRE_PROSSOR_ANALYSE"
-	#define CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY		"CncWork.Controller/PRE_PROSSOR_SKIP_EMPTY"
-#define CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES	"CncWork.Controller/PRE_PROSSOR_COMBINE_MOVES"	
-
-
 
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }
@@ -990,7 +982,6 @@ const double CncConfig::getMaxDimension() 							{ return std::max(std::max(getM
 const double CncConfig::getMaxDimensionX() 							{ PROPERTY(CncConfig_MAX_DIMENSION_X)					return p->GetValue().GetDouble(); } 
 const double CncConfig::getMaxDimensionY() 							{ PROPERTY(CncConfig_MAX_DIMENSION_Y) 				 	return p->GetValue().GetDouble(); } 
 const double CncConfig::getMaxDimensionZ() 							{ PROPERTY(CncConfig_MAX_DIMENSION_Z) 					return p->GetValue().GetDouble(); } 
-const double CncConfig::getSvgEmulatorCopyFactor()					{ PROPERTY(CncSvg_Emu_COPY_FACTOR) 					 	return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchX() 								{ PROPERTY(CncConfig_PITCH_X) 						 	return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchY() 								{ PROPERTY(CncConfig_PITCH_Y)							return p->GetValue().GetDouble(); }
 const double CncConfig::getPitchZ() 								{ PROPERTY(CncConfig_PITCH_Z) 						 	return p->GetValue().GetDouble(); }

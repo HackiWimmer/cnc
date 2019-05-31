@@ -18,9 +18,9 @@ class CncFilePreviewWnd : public CncFilePreviewWndBase
 		CncFilePreview* preview;
 		
 		void installContent();
-		PreviewType autoDetectPreviewType(const wxString& fileName);
-protected:
-    virtual void onClose(wxCloseEvent& event);
+
+	protected:
+		virtual void onClose(wxCloseEvent& event);
 };
 
 #endif // CNCFILEPREVIEWWND_H

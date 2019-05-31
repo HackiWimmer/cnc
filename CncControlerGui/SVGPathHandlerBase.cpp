@@ -44,17 +44,10 @@ bool SVGPathHandlerBase::processLinearMove(const LinearMoveParam& param) {
 	newPosAbsX = unitCalculator.convert(newPosAbsX);
 	newPosAbsY = unitCalculator.convert(newPosAbsY);
 	
-	// shift the scene
-	if ( CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag() ) {
-		newPosAbsY *= -1;
-		newPosAbsY += 2* (svgRootNode.getHeight_MM());
-	}
+	// . . . and append
+	const CncPathListEntry cpe = pathListMgr.addEntryAbs(newPosAbsX, newPosAbsY, param.absZ, param.alreadyRendered);
 	
-	// append
-	const CncPathListEntry cpe =
-			 pathListMgr.addEntryAbs(newPosAbsX, newPosAbsY, param.absZ, param.alreadyRendered);
-								
-	appendDebugValueDetail(cpe);
+	//appendDebugValueDetail(cpe);
 	return true;
 }
 

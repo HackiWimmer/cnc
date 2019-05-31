@@ -26,6 +26,7 @@ class UnitTests : public UnitTestsBase {
 		
 	private:
 		TestStore testStore;
+		CncTextCtrl* testResultStream;
 		
 		int initialTestIdx;
 		bool autorun;

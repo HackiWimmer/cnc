@@ -1,5 +1,7 @@
 #include <wx/arrstr.h>
 #include <wx/dynlib.h>
+#include "CncConfig.h"
+#include "CncContext.h"
 #include "CncFileNameService.h"
 #include "CncOSEnvironmentDialog.h"
 
@@ -11,6 +13,7 @@ CncOSEnvironmentDialog::CncOSEnvironmentDialog(wxWindow* parent)
 	evaluateOSEnvrionemnt();
 	evaluateAppEnvrionemnt();
 	evaluateLoadedModules();
+	evaluateVersionInfo();
 	
 	m_listbook->SetSelection(PAGE_ENVIRONMENT);
 }
@@ -19,6 +22,23 @@ CncOSEnvironmentDialog::~CncOSEnvironmentDialog() {
 //////////////////////////////////////////////////////////////////////////////
 	m_osEnvironmentList->DeleteAllItems();
 	m_moduleList->DeleteAllItems();
+}
+//////////////////////////////////////////////////////////////////////////////
+void CncOSEnvironmentDialog::evaluateVersionInfo() {
+//////////////////////////////////////////////////////////////////////////////
+	if ( m_versionInfoList->GetColumnCount() == 0 ) {
+		m_versionInfoList->AppendColumn("Software", wxLIST_FORMAT_LEFT, 180);
+		m_versionInfoList->AppendColumn("Version", 	wxLIST_FORMAT_LEFT, 500);
+	}
+	
+	const VersionInfoMap& vim = GBL_CONTEXT->versionInfoMap;
+	for (auto it = vim.cbegin(); it != vim.cend(); ++it ) {
+		
+		const unsigned int index = m_versionInfoList->GetItemCount();
+		m_versionInfoList->InsertItem(index, "");
+		m_versionInfoList->SetItem(index, VER_COL_PARAM, it->first);
+		m_versionInfoList->SetItem(index, VER_COL_VALUE, it->second);
+	}
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncOSEnvironmentDialog::evaluateOSEnvrionemnt() {
@@ -47,7 +67,7 @@ void CncOSEnvironmentDialog::evaluateOSEnvrionemnt() {
 		wxString const& envvarName  = *it;
 		wxString const& envvarValue = envvars[*it];
 		
-		unsigned int index = m_osEnvironmentList->GetItemCount();
+		const unsigned int index = m_osEnvironmentList->GetItemCount();
 		m_osEnvironmentList->InsertItem(index, "");
 		m_osEnvironmentList->SetItem(index, ENV_COL_PARAM, envvarName);
 		m_osEnvironmentList->SetItem(index, ENV_COL_VALUE, envvarValue);
@@ -80,7 +100,7 @@ void CncOSEnvironmentDialog::evaluateAppEnvrionemnt() {
 		wxString entry(token.BeforeFirst(':'));
 		wxString value(token.AfterFirst(':'));
 		
-		unsigned int index = m_appEnvironmentList->GetItemCount();
+		const unsigned int index = m_appEnvironmentList->GetItemCount();
 		m_appEnvironmentList->InsertItem(index, "");
 		m_appEnvironmentList->SetItem(index, ENV_COL_PARAM, entry);
 		m_appEnvironmentList->SetItem(index, ENV_COL_VALUE, value);
@@ -107,7 +127,7 @@ void CncOSEnvironmentDialog::evaluateLoadedModules() {
 	wxDynamicLibraryDetailsArray modules = wxDynamicLibrary::ListLoaded();
 	const size_t count = modules.size();
 	if ( count <= 0 ) {
-		unsigned int index = m_moduleList->GetItemCount();
+		const unsigned int index = m_moduleList->GetItemCount();
 		m_moduleList->InsertItem(index, "");
 		m_moduleList->SetItem(index, MOD_COL_ADDR, 		"");
 		m_moduleList->SetItem(index, MOD_COL_NAME, 		"");
@@ -146,7 +166,7 @@ void CncOSEnvironmentDialog::evaluateLoadedModules() {
 		size_t len = 0;
 		dll.GetAddress(&addr, &len);
 		
-		unsigned int index = m_moduleList->GetItemCount();
+		const unsigned int index = m_moduleList->GetItemCount();
 		m_moduleList->InsertItem(index, "");
 		m_moduleList->SetItem(index, MOD_COL_ADDR, 		wxString::Format("%p:%p", addr, static_cast<void*>(static_cast<char*>(addr) + len)));
 		m_moduleList->SetItem(index, MOD_COL_NAME, 		wxFileName(dll.GetName()).GetFullName());

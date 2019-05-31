@@ -412,12 +412,6 @@ protected:
     wxListCtrl* m_cncSummaryListCtrl;
     wxButton* m_btCancelRun;
     wxButton* m_btConfirmRun;
-    wxPanel* m_cncSetters;
-    wxStaticText* m_staticText1150;
-    wxTextCtrl* m_setterListCount;
-    wxButton* m_btClearSetterList;
-    wxButton* m_btRefreshSetterList;
-    wxListCtrl* m_setterList;
     wxPanel* m_controllerConfiguration;
     wxStaticText* m_staticText12831;
     wxButton* m_btRequestCtlConfig;
@@ -426,10 +420,6 @@ protected:
     wxStaticText* m_staticText128313;
     wxButton* m_btRequestControllerPins;
     wxDataViewListCtrl* m_dvListCtrlControllerPins;
-    wxPanel* m_conrollerMessages;
-    wxStaticText* m_staticText1283132;
-    wxButton* m_btClearMsgHistory;
-    wxTextCtrl* m_controllerMsgHistory;
     wxPanel* m_cncPrePorcessor;
     wxPanel* m_preprocessorPlaceholder;
     wxPanel* m_cnc3DPane;
@@ -468,6 +458,11 @@ protected:
     wxTextCtrl* m_crossings;
     wxStaticText* m_staticText1966;
     wxTextCtrl* m_passingCount;
+    wxStaticLine* m_staticLine50084;
+    wxStaticText* m_staticText11283;
+    wxTextCtrl* m_mouseCoordX;
+    wxTextCtrl* m_mouseCoordY;
+    wxTextCtrl* m_mouseCoordZ;
     wxStaticLine* m_staticLine50083;
     wxStaticText* m_staticText395;
     wxTextCtrl* m_cmdDuration;
@@ -485,6 +480,18 @@ protected:
     wxButton* m_3D_Perspective3;
     wxButton* m_3D_Perspective4;
     wxStaticLine* m_staticLine2341;
+    wxPanel* m_motionSynopsis;
+    wxPanel* m_motionSynopsisPlaceholder;
+    wxPanel* m_cncSetters;
+    wxStaticText* m_staticText1150;
+    wxTextCtrl* m_setterListCount;
+    wxButton* m_btClearSetterList;
+    wxButton* m_btRefreshSetterList;
+    wxListCtrl* m_setterList;
+    wxPanel* m_conrollerMessages;
+    wxStaticText* m_staticText1283132;
+    wxButton* m_btClearMsgHistory;
+    wxTextCtrl* m_controllerMsgHistoryPlaceholder;
     wxPanel* m_motionVertexTrace;
     wxPanel* m_motionVertexPlaceholder;
     wxPanel* m_cncPostProcessor;
@@ -526,13 +533,15 @@ protected:
     wxPanel* m_winLoggerView;
     wxNotebook* m_loggerNotebook;
     wxPanel* m_panelStartupTrace;
-    wxTextCtrl* m_startupTrace;
+    wxTextCtrl* m_startupTracePlaceholder;
     wxPanel* m_panel5878;
-    wxTextCtrl* m_logger;
+    wxTextCtrl* m_loggerPlaceholder;
     wxBitmapButton* m_clearLogger;
     wxBitmapButton* m_copyLogger;
-    wxStaticLine* m_staticLine7605;
+    wxStaticLine* m_staticLine76051;
     wxBitmapToggleButton* m_showLoggerOnDemand;
+    wxStaticLine* m_staticLine7605;
+    wxBitmapToggleButton* m_freezeLogger;
     wxStaticText* m_staticText58651;
     wxStaticBitmap* m_gamepadState;
     wxStaticText* m_staticText5865;
@@ -541,7 +550,7 @@ protected:
     wxStaticBitmap* m_gpBmp3;
     wxStaticBitmap* m_gpBmp4;
     wxStaticBitmap* m_staticBitmap5890;
-    wxTextCtrl* m_tmpTraceInfo;
+    wxTextCtrl* m_tmpTraceInfoPlaceholder;
     wxPanel* m_statusBar;
     wxStaticText* m_svgParseMode;
     wxStaticLine* m_staticLine6801;
@@ -884,11 +893,8 @@ protected:
     virtual void nootebookConfigChanged(wxListbookEvent& event) { event.Skip(); }
     virtual void cancelRun(wxCommandEvent& event) { event.Skip(); }
     virtual void confirmRun(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
-    virtual void refreshSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerConfigFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void requestControllerPinsFromButton(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void changeMonitorListBook(wxListbookEvent& event) { event.Skip(); }
     virtual void saveOutboundAsNewTplFromButton(wxCommandEvent& event) { event.Skip(); }
     virtual void motionMonitorOrigin(wxCommandEvent& event) { event.Skip(); }
@@ -914,16 +920,18 @@ protected:
     virtual void showFromLeft3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromRight3D(wxCommandEvent& event) { event.Skip(); }
     virtual void show3D(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearSetterList(wxCommandEvent& event) { event.Skip(); }
+    virtual void refreshSetterList(wxCommandEvent& event) { event.Skip(); }
+    virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
     virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
     virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void keyDownLruList(wxKeyEvent& event) { event.Skip(); }
-    virtual void updateLogger(wxCommandEvent& event) { event.Skip(); }
-    virtual void keyDownLogger(wxKeyEvent& event) { event.Skip(); }
-    virtual void dclickLogger(wxMouseEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
+    virtual void onShowLoggerOnDemand(wxCommandEvent& event) { event.Skip(); }
+    virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event) { event.Skip(); }
     virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickHeartbeatState(wxMouseEvent& event) { event.Skip(); }
@@ -1344,12 +1352,6 @@ public:
     wxButton* GetBtCancelRun() { return m_btCancelRun; }
     wxButton* GetBtConfirmRun() { return m_btConfirmRun; }
     wxPanel* GetCncSummary() { return m_cncSummary; }
-    wxStaticText* GetStaticText1150() { return m_staticText1150; }
-    wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
-    wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
-    wxButton* GetBtRefreshSetterList() { return m_btRefreshSetterList; }
-    wxListCtrl* GetSetterList() { return m_setterList; }
-    wxPanel* GetCncSetters() { return m_cncSetters; }
     wxStaticText* GetStaticText12831() { return m_staticText12831; }
     wxButton* GetBtRequestCtlConfig() { return m_btRequestCtlConfig; }
     wxDataViewListCtrl* GetDvListCtrlControllerConfig() { return m_dvListCtrlControllerConfig; }
@@ -1358,10 +1360,6 @@ public:
     wxButton* GetBtRequestControllerPins() { return m_btRequestControllerPins; }
     wxDataViewListCtrl* GetDvListCtrlControllerPins() { return m_dvListCtrlControllerPins; }
     wxPanel* GetControllerPinReport() { return m_controllerPinReport; }
-    wxStaticText* GetStaticText1283132() { return m_staticText1283132; }
-    wxButton* GetBtClearMsgHistory() { return m_btClearMsgHistory; }
-    wxTextCtrl* GetControllerMsgHistory() { return m_controllerMsgHistory; }
-    wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
     wxListbook* GetNotebookConfig() { return m_notebookConfig; }
     wxPanel* GetCncParameters() { return m_cncParameters; }
     wxPanel* GetPreprocessorPlaceholder() { return m_preprocessorPlaceholder; }
@@ -1398,6 +1396,11 @@ public:
     wxTextCtrl* GetCrossings() { return m_crossings; }
     wxStaticText* GetStaticText1966() { return m_staticText1966; }
     wxTextCtrl* GetPassingCount() { return m_passingCount; }
+    wxStaticLine* GetStaticLine50084() { return m_staticLine50084; }
+    wxStaticText* GetStaticText11283() { return m_staticText11283; }
+    wxTextCtrl* GetMouseCoordX() { return m_mouseCoordX; }
+    wxTextCtrl* GetMouseCoordY() { return m_mouseCoordY; }
+    wxTextCtrl* GetMouseCoordZ() { return m_mouseCoordZ; }
     wxStaticLine* GetStaticLine50083() { return m_staticLine50083; }
     wxStaticText* GetStaticText395() { return m_staticText395; }
     wxTextCtrl* GetCmdDuration() { return m_cmdDuration; }
@@ -1417,6 +1420,18 @@ public:
     wxButton* Get3D_Perspective4() { return m_3D_Perspective4; }
     wxStaticLine* GetStaticLine2341() { return m_staticLine2341; }
     wxPanel* GetMotionMonitor() { return m_motionMonitor; }
+    wxPanel* GetMotionSynopsisPlaceholder() { return m_motionSynopsisPlaceholder; }
+    wxPanel* GetMotionSynopsis() { return m_motionSynopsis; }
+    wxStaticText* GetStaticText1150() { return m_staticText1150; }
+    wxTextCtrl* GetSetterListCount() { return m_setterListCount; }
+    wxButton* GetBtClearSetterList() { return m_btClearSetterList; }
+    wxButton* GetBtRefreshSetterList() { return m_btRefreshSetterList; }
+    wxListCtrl* GetSetterList() { return m_setterList; }
+    wxPanel* GetCncSetters() { return m_cncSetters; }
+    wxStaticText* GetStaticText1283132() { return m_staticText1283132; }
+    wxButton* GetBtClearMsgHistory() { return m_btClearMsgHistory; }
+    wxTextCtrl* GetControllerMsgHistoryPlaceholder() { return m_controllerMsgHistoryPlaceholder; }
+    wxPanel* GetConrollerMessages() { return m_conrollerMessages; }
     wxPanel* GetMotionVertexPlaceholder() { return m_motionVertexPlaceholder; }
     wxPanel* GetMotionVertexTrace() { return m_motionVertexTrace; }
     wxListbook* GetListbookMonitor() { return m_listbookMonitor; }
@@ -1461,13 +1476,15 @@ public:
     wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
     wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
     wxPanel* GetWinFileView() { return m_winFileView; }
-    wxTextCtrl* GetStartupTrace() { return m_startupTrace; }
+    wxTextCtrl* GetStartupTracePlaceholder() { return m_startupTracePlaceholder; }
     wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
-    wxTextCtrl* GetLogger() { return m_logger; }
+    wxTextCtrl* GetLoggerPlaceholder() { return m_loggerPlaceholder; }
     wxBitmapButton* GetClearLogger() { return m_clearLogger; }
     wxBitmapButton* GetCopyLogger() { return m_copyLogger; }
-    wxStaticLine* GetStaticLine7605() { return m_staticLine7605; }
+    wxStaticLine* GetStaticLine76051() { return m_staticLine76051; }
     wxBitmapToggleButton* GetShowLoggerOnDemand() { return m_showLoggerOnDemand; }
+    wxStaticLine* GetStaticLine7605() { return m_staticLine7605; }
+    wxBitmapToggleButton* GetFreezeLogger() { return m_freezeLogger; }
     wxPanel* GetPanel5878() { return m_panel5878; }
     wxNotebook* GetLoggerNotebook() { return m_loggerNotebook; }
     wxStaticText* GetStaticText58651() { return m_staticText58651; }
@@ -1478,7 +1495,7 @@ public:
     wxStaticBitmap* GetGpBmp3() { return m_gpBmp3; }
     wxStaticBitmap* GetGpBmp4() { return m_gpBmp4; }
     wxStaticBitmap* GetStaticBitmap5890() { return m_staticBitmap5890; }
-    wxTextCtrl* GetTmpTraceInfo() { return m_tmpTraceInfo; }
+    wxTextCtrl* GetTmpTraceInfoPlaceholder() { return m_tmpTraceInfoPlaceholder; }
     wxPanel* GetWinLoggerView() { return m_winLoggerView; }
     wxStaticText* GetSvgParseMode() { return m_svgParseMode; }
     wxStaticLine* GetStaticLine6801() { return m_staticLine6801; }
@@ -1826,6 +1843,8 @@ protected:
     wxButton* m_3D_Perspective4;
 
 protected:
+    virtual void previewBookChanged(wxNotebookEvent& event) { event.Skip(); }
+    virtual void previewBookPaint(wxPaintEvent& event) { event.Skip(); }
     virtual void showFromTop3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromBottom3D(wxCommandEvent& event) { event.Skip(); }
     virtual void showFromFront3D(wxCommandEvent& event) { event.Skip(); }
@@ -2033,17 +2052,20 @@ protected:
     wxPGProperty* m_pgPropAutoScaling;
     wxPGProperty* m_pgPropDrawOrigin;
     wxPGProperty* m_pgPropDrawFlyPath;
-    wxPGProperty* m_pgPropDrawRuler;
     wxPGProperty* m_pgPropDrawHelpLines;
     wxPGProperty* m_pgPropPositionMarker;
     wxPGProperty* m_pgPropZoom;
-    wxPGProperty* m_pgPropPathColour;
+    wxPGProperty* m_pgCatRuler;
+    wxPGProperty* m_pgPropDrawRuler;
+    wxPGProperty* m_pgPropRulerOffset;
+    wxPGProperty* m_pgCatPathColour;
+    wxPGProperty* m_pgPropFlyAlpha;
     wxPGProperty* m_pgPropFlyColour;
     wxPGProperty* m_pgPropWorkColour;
     wxPGProperty* m_pgPropUserColour;
     wxPGProperty* m_pgPropMaxColour;
     wxPGProperty* m_pgPropHighLightColour;
-    wxPGProperty* m_pgPropHL3D;
+    wxPGProperty* m_pgCatHL3D;
     wxPGProperty* m_pgPropHLXYPlane;
     wxPGProperty* m_pgPropHLXZPlane;
     wxPGProperty* m_pgPropHLYZPlane;
@@ -2409,29 +2431,43 @@ class CncMotionVertexTraceBase : public wxPanel
 {
 protected:
     wxStaticText* m_staticText7928;
-    wxBitmapToggleButton* m_btConnectMotionVertex;
-    wxBitmapButton* m_btClearMotionVertex;
     wxSplitterWindow* m_splitter7938;
     wxPanel* m_vertexSplitterPageData;
+    wxStaticText* m_staticText7954;
     wxPanel* m_motionVertexDataListPlaceholder;
     wxPanel* m_vertexSplitterPageIndex;
+    wxStaticText* m_staticText7956;
     wxPanel* m_motionVertexIndexListPlaceholder;
 
 protected:
-    virtual void connectMotionVertex(wxCommandEvent& event) { event.Skip(); }
-    virtual void clearMotionVertex(wxCommandEvent& event) { event.Skip(); }
 
 public:
     wxStaticText* GetStaticText7928() { return m_staticText7928; }
-    wxBitmapToggleButton* GetBtConnectMotionVertex() { return m_btConnectMotionVertex; }
-    wxBitmapButton* GetBtClearMotionVertex() { return m_btClearMotionVertex; }
+    wxStaticText* GetStaticText7954() { return m_staticText7954; }
     wxPanel* GetMotionVertexDataListPlaceholder() { return m_motionVertexDataListPlaceholder; }
     wxPanel* GetVertexSplitterPageData() { return m_vertexSplitterPageData; }
+    wxStaticText* GetStaticText7956() { return m_staticText7956; }
     wxPanel* GetMotionVertexIndexListPlaceholder() { return m_motionVertexIndexListPlaceholder; }
     wxPanel* GetVertexSplitterPageIndex() { return m_vertexSplitterPageIndex; }
     wxSplitterWindow* GetSplitter7938() { return m_splitter7938; }
     CncMotionVertexTraceBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
     virtual ~CncMotionVertexTraceBase();
+};
+
+
+class CncParsingSynopsisTraceBase : public wxPanel
+{
+protected:
+    wxStaticText* m_staticText7928;
+    wxPanel* m_parsingSynopsisListPlaceholder;
+
+protected:
+
+public:
+    wxStaticText* GetStaticText7928() { return m_staticText7928; }
+    wxPanel* GetParsingSynopsisListPlaceholder() { return m_parsingSynopsisListPlaceholder; }
+    CncParsingSynopsisTraceBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxTAB_TRAVERSAL);
+    virtual ~CncParsingSynopsisTraceBase();
 };
 
 
@@ -2699,7 +2735,7 @@ protected:
     wxComboBox* m_unitTestSelector;
     wxButton* m_btUnitTestClear;
     wxButton* m_btUnitTestRun;
-    wxTextCtrl* m_testResultStream;
+    wxTextCtrl* m_testResultStreamPlaceholder;
     wxStaticText* m_unitTestStatus;
     wxCheckBox* m_unitTestFreezeOutput;
     wxCheckBox* m_unitTestAutoRun;
@@ -2716,7 +2752,7 @@ public:
     wxComboBox* GetUnitTestSelector() { return m_unitTestSelector; }
     wxButton* GetBtUnitTestClear() { return m_btUnitTestClear; }
     wxButton* GetBtUnitTestRun() { return m_btUnitTestRun; }
-    wxTextCtrl* GetTestResultStream() { return m_testResultStream; }
+    wxTextCtrl* GetTestResultStreamPlaceholder() { return m_testResultStreamPlaceholder; }
     wxStaticText* GetUnitTestStatus() { return m_unitTestStatus; }
     wxCheckBox* GetUnitTestFreezeOutput() { return m_unitTestFreezeOutput; }
     wxCheckBox* GetUnitTestAutoRun() { return m_unitTestAutoRun; }
@@ -2778,6 +2814,9 @@ protected:
     wxTextCtrl* m_modVersion;
     wxStaticText* m_staticText7327;
     wxTextCtrl* m_modPath;
+    wxPanel* m_panelVersions;
+    wxStaticText* m_staticText7990;
+    wxListCtrl* m_versionInfoList;
     wxStaticLine* m_staticLine7334;
     wxButton* m_btClose;
 
@@ -2813,6 +2852,9 @@ public:
     wxStaticText* GetStaticText7327() { return m_staticText7327; }
     wxTextCtrl* GetModPath() { return m_modPath; }
     wxPanel* GetPanelModules() { return m_panelModules; }
+    wxStaticText* GetStaticText7990() { return m_staticText7990; }
+    wxListCtrl* GetVersionInfoList() { return m_versionInfoList; }
+    wxPanel* GetPanelVersions() { return m_panelVersions; }
     wxListbook* GetListbook() { return m_listbook; }
     wxStaticLine* GetStaticLine7334() { return m_staticLine7334; }
     wxButton* GetBtClose() { return m_btClose; }
@@ -3454,6 +3496,64 @@ public:
     }
 
     virtual ~ImageLibMotionVertex();
+};
+
+
+class ImageLibSynopsisTrace : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibSynopsisTrace();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibSynopsisTrace();
+};
+
+
+class ImageLibLogger : public wxImageList
+{
+protected:
+    // Maintain a map of all bitmaps representd by their name
+    std::map<wxString, wxBitmap> m_bitmaps;
+    // The requested image resolution (can be one of @2x, @1.5x, @1.25x or an empty string (the default)
+    wxString m_resolution;
+    int m_imagesWidth;
+    int m_imagesHeight;
+
+
+protected:
+
+public:
+    ImageLibLogger();
+    const wxBitmap& Bitmap(const wxString &name) const {
+        if ( !m_bitmaps.count(name + m_resolution) )
+            return wxNullBitmap;
+        return m_bitmaps.find(name + m_resolution)->second;
+    }
+
+    void SetBitmapResolution(const wxString &res = wxEmptyString) {
+        m_resolution = res;
+    }
+
+    virtual ~ImageLibLogger();
 };
 
 #endif

@@ -10,11 +10,6 @@
 #include "CncStreamBuffers.h"
 #include "StdStreamRedirector.h"
 
-
-// common ostream operators
-std::ostream& operator<<(std::ostream& os, const wxPoint& p);
-std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
-
 // global strings
 #define _maxSpeedLabel		"<MAX>"
 
@@ -23,6 +18,10 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 #define _portEmulatorSVG  	"<PortEmulator(File::SVG)>"
 #define _portEmulatorGCODE	"<PortEmulator(File::GCode)>"
 #define _portEmulatorBIN  	"<PortEmulator(File::Binary)>"
+
+// common ostream operators
+std::ostream& operator<<(std::ostream& os, const wxPoint& p);
+std::ostream& operator<<(std::ostream& os, const wxRealPoint& p);
 
 // make std globally available
 //using namespace std;
@@ -49,6 +48,21 @@ enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpe
 enum TemplateFormat 			{ TplUnknown, TplText, TplSvg, TplGcode, TplBinary, TplManual, TplTest };
 enum CncDimensions 				{ CncDimension1D = 1, CncDimension2D = 2, CncDimension3D = 3 };
 enum CncRefPositionMode 		{ CncRM_Unknown = 0, CncRM_Mode1 = 1, CncRM_Mode2 = 2, CncRM_Mode3 = 3, CncRM_Mode4 = 4, CncRM_Mode5 = 5, CncRM_Mode6 = 6 };
+
+namespace cnc {
+	
+	const wxString& lformat(wxString& str,   unsigned int len, char c = ' ');
+	const wxString& rformat(wxString& str,   unsigned int len, char c = ' ');
+	const wxString& lformat(const char* str, unsigned int len, char c = ' ');
+	const wxString& rformat(const char* str, unsigned int len, char c = ' ');
+	
+};
+
+#define CNC_LOG_FUNCT			wxString::Format( "[ %s ]", 	cnc::lformat(__PRETTY_FUNCTION__, 84) )
+#define CNC_LOG_FUNCT_A(msg)	wxString::Format( "[ %s: %s ]", cnc::lformat(__PRETTY_FUNCTION__, 84), msg)
+
+#define CNC_PRINT_FUNCT 		std::cout << CNC_LOG_FUNCT 			<< std::endl;
+#define CNC_PRINT_FUNCT_A(msg)	std::cout << CNC_LOG_FUNCT_A(msg) 	<< std::endl;
 
 namespace cnc {
 	
@@ -148,7 +162,10 @@ class OutboundMonitorSelection{
 	public:
 		enum VAL {
 			MOTION_MONITOR_PANAL		= 0,
-			MOTION_VERTEX_TRACE			= 1
+			CNC_PARSER_SYNOPSIS			= 1,
+			CNC_SETTER_PANEL			= 2,
+			CNC_MSG_HIST_PANEL			= 3,
+			MOTION_VERTEX_TRACE			= 4
 		};
 };
 
@@ -165,10 +182,8 @@ class OutboundCfgSelection{
 	public:
 		enum VAL {
 			SUMMARY_PANEL				= 0,
-			CNC_SETTER_PANEL			= 1,
-			CNC_CONFIG_PANEL			= 2,
-			CNC_PIN_PANEL				= 3,
-			CNC_MSG_HIST_PANEL			= 4
+			CNC_CONFIG_PANEL			= 1,
+			CNC_PIN_PANEL				= 2
 		};
 };
 
@@ -206,7 +221,7 @@ class MontiorBottomContextSelection {
 	public:
 		enum VAL {
 			STATISTIC_PANEL				= 0,
-			REPLAY_PANEL				= 1,
+			REPLAY_PANEL				= 1
 		};
 };
 

@@ -25,7 +25,7 @@ namespace StartupBuffer {
 	}
 	
 	//-------------------------------------------------------------------------
-	bool trace(wxTextCtrl* ctl) {
+	bool trace(CncTextCtrl* ctl) {
 		if ( ctl == NULL )
 			return false;
 		
@@ -62,7 +62,7 @@ namespace StartupBuffer {
 
 
 ///////////////////////////////////////////////////////////
-LoggerStreamBuf::LoggerStreamBuf(char t, wxTextCtrl* c, const wxTextAttr& ta) 
+LoggerStreamBuf::LoggerStreamBuf(char t, CncTextCtrl* c, const wxTextAttr& ta) 
 : type(t)
 , ctl(c)
 , textAttr(ta)
@@ -75,7 +75,7 @@ void LoggerStreamBuf::setTextAttr(const wxTextAttr& ta) {
 	textAttr = ta;
 }
 ///////////////////////////////////////////////////////////
-void LoggerStreamBuf::setTextControl(wxTextCtrl* c) {
+void LoggerStreamBuf::setTextControl(CncTextCtrl* c) {
 	wxASSERT(c);
 	ctl = c;
 }
@@ -84,7 +84,7 @@ int LoggerStreamBuf::overflow(int c) {
 ///////////////////////////////////////////////////////////
 	if ( ctl != NULL ) {
 		ctl->SetDefaultStyle(textAttr);
-		ctl->AppendText((wxChar)c);
+		ctl->AppendChar((char)c);
 		
 	} else {
 		startupBuffer.append(type);

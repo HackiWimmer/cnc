@@ -12,21 +12,9 @@ void CncConfig::pgChangedSvgCfgPage(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 	
-	MainFrame* app = CncConfig::getGlobalCncConfig()->getTheApp();
-	wxASSERT( app != NULL );
-		
-	wxString name(p->GetName());
-	
-	if        ( name == CncSvg_Emu_COPY_FACTOR ) {
-		app->releaseControllerSetupFromConfig();
-		
-	} else if ( name == CncSvg_Emu_RSLT_WITH_ORIG_PATH ) {
-		app->releaseControllerSetupFromConfig();
-		
-	} else if ( name == CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS ) {
-		app->releaseControllerSetupFromConfig();
-		
-	}
+	const wxString name(p->GetName());
+	if ( name == CncSvg_Parser_REVERSE_Y_AXIS ) 
+		THE_APP->prepareMotionMonitorViewType();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
@@ -75,50 +63,11 @@ void CncConfig::setupSvgCfgPage(wxConfigBase& config) {
 		registerCategory(curCatName, parser);
 		{
 			//...............
-			prop = parser->AppendChild( new wxBoolProperty("Reverse Y axis", NEXT_PROP_ID, true));
+			prop = parser->AppendChild( new wxBoolProperty("Convert to right hand coord", NEXT_PROP_ID, true));
 			prop->Enable(true);
-			prop->SetHelpString(_T(""));
+			prop->SetHelpString(_T("Template file reload + new run required"));
 			prop->SetEditor( wxT("CheckBox") );
 			registerProperty(CncSvg_Parser_REVERSE_Y_AXIS, prop);
-		}
-		
-		//...................
-		wxPGProperty* emu = NULL;
-		curCatName.assign("Outbound Emulator");
-		emu = root->AppendChild( new wxPropertyCategory(curCatName));
-		registerCategory(curCatName, emu);
-		{
-			//...............
-			pgParameterMgrArr.Clear();
-			pgParameterMgrIntArr.Clear();
-			pgParameterMgrArr.Add(_("0.25")); 
-			pgParameterMgrArr.Add(_("0.50"));
-			pgParameterMgrArr.Add(_("0.75"));
-			pgParameterMgrArr.Add(_("1.00"));
-			pgParameterMgrArr.Add(_("1.25"));
-			pgParameterMgrArr.Add(_("1.50"));
-			pgParameterMgrArr.Add(_("1.75"));
-			pgParameterMgrArr.Add(_("2.00"));
-			pgParameterMgrArr.Add(_("4.00"));
-			prop = emu->AppendChild( new wxEnumProperty("Copy factor", NEXT_PROP_ID, pgParameterMgrArr, pgParameterMgrIntArr, 3));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetEditor( wxT("ComboBox") );
-			registerProperty(CncSvg_Emu_COPY_FACTOR, prop);
-			
-			//...............
-			prop = emu->AppendChild( new wxBoolProperty("Result with original path", NEXT_PROP_ID, true));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetEditor( wxT("CheckBox") );
-			registerProperty(CncSvg_Emu_RSLT_WITH_ORIG_PATH, prop);
-			
-			//...............
-			prop = emu->AppendChild( new wxBoolProperty("Result only with first crossing", NEXT_PROP_ID, true));
-			prop->Enable(true);
-			prop->SetHelpString(_T(""));
-			prop->SetEditor( wxT("CheckBox") );
-			registerProperty(CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS, prop);
 		}
 	}
 }

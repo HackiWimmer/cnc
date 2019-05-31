@@ -4,7 +4,7 @@
 
 /////////////////////////////////////////////////////////////////
 GLContextTestCube::GLContextTestCube(wxGLCanvas* canvas) 
-: GLContextCncPathBase(canvas)
+: GLContextCncPathBase(canvas, "GLContextTestCube")
 {
 /////////////////////////////////////////////////////////////////
 	// do something here on demand

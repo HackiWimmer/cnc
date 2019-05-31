@@ -72,8 +72,6 @@
 	#define CncApplication_AUTO_CONNECT 			"CncApplication/AUTO_CONNECT"
 	#define CncApplication_AUTO_PROCESS 			"CncApplication/AUTO_PROCESS"
 	#define CncApplication_SHOW_TEST_MENU 			"CncApplication/SHOW_TEST_MENU"
-	#define CncApplication_USE_SETTER_LIST 			"CncApplication/USE_SETTER_LIST"
-	#define CncApplication_CLEAR_SETTER_LIST 		"CncApplication/CLEAR_SETTER_LIST"
 	#define CncApplication_CONFIRMATION_MODE		"CncApplication/CONFIRMATION_MODE"
 	#define CncApplication_Com_DEFALT_PORT 			"CncApplication.Port/DEFAULT_PORT"
 	#define CncApplication_Tpl_DEFALT_DIRECTORY		"CncApplication.Template/OSD_DEFAULT_DIRECTORY"
@@ -87,10 +85,7 @@
 	#define CncApplication_Tool_EXTERNAL_EDITOR 	"CncApplication.Tools/OSD_EXTERNAL_EDITOR"
 	#define CncApplication_Tool_PY_CAM 				"CncApplication.Tools/OSD_PY_CAM"
 	
-	#define CncSvg_Parser_REVERSE_Y_AXIS			"CncSvg.Parser/REVERSE_Y_AXIS"
-	#define CncSvg_Emu_COPY_FACTOR					"CncSvg.Emu/COPY_FACTOR"
-	#define CncSvg_Emu_RSLT_WITH_ORIG_PATH			"CncSvg.Emu/RESULT_WITH_ORIG_PATH"
-	#define CncSvg_Emu_RSLT_ONLY_WITH_FIRST_CROSS	"CncSvg.Emu/RESULT_ONLY_WITH_FIRST_CROSSING"
+	#define CncSvg_Parser_REVERSE_Y_AXIS			"CncSvg.Parser/CONVERT_TO_RIGHT_HAND"
 	
 	#define CncWork_Wpt_MAX_THICKNESS_CROSS			"CncWork.Workpiece/MAX_THICKNESS_PER_CROSSING"
 
@@ -108,7 +103,6 @@
 	#define CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY		"CncWork.Controller/PRE_PROSSOR_SKIP_EMPTY"
 	#define CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES	"CncWork.Controller/PRE_PROSSOR_COMBINE_MOVES"
 
-#define CncTEST_TEST					"CncTest.Test/DUMMY"
-
+	#define CncTEST_TEST					"CncTest.Test/DUMMY"
 
 #endif

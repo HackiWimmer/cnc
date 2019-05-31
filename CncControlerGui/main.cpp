@@ -8,6 +8,7 @@
 #include <wx/dcmemory.h>
 #include <wx/cmdline.h>
 #include <wx/intl.h>
+#include "CncLoggerProxy.h"
 #include "CncFileNameService.h"
 #include "CncStreamBuffers.h"
 #include "OSD/CncTimeFunctions.h"
@@ -96,7 +97,7 @@ class GlobalStreamRedirection {
 		static void install(MainFrame* mainFrame) {
 			
 			// perform startup trace
-			wxTextCtrl* st = mainFrame->GetStartupTrace();
+			CncTextCtrl* st = mainFrame->getStartupTrace();
 			st->Clear();
 			
 			wxTextAttr ta(wxColour(192, 192, 192));

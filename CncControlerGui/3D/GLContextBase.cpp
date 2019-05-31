@@ -1,14 +1,26 @@
 #include <iostream>
 #include <sstream>
 #include <wx/tokenzr.h>
+#include "wxcrafter.h"
+#include "CncConfig.h"
 #include "3D/GLCommon.h"
 #include "3D/GLContextBase.h"
 
 /////////////////////////////////////////////////////////////////
-GLContextBase::GLContextBase(wxGLCanvas* canvas) 
+int32_t GLContextBase::MouseVertexInfo::getAsStepsX (float scaleFactor) { return x / scaleFactor * GBL_CONFIG->getDispFactX3D(); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsY (float scaleFactor) { return y / scaleFactor * GBL_CONFIG->getDispFactY3D(); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsZ (float scaleFactor) { return z / scaleFactor * GBL_CONFIG->getDispFactZ3D(); }
+double  GLContextBase::MouseVertexInfo::getAsMetricX(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricX(getAsStepsX(scaleFactor)); }
+double  GLContextBase::MouseVertexInfo::getAsMetricY(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricY(getAsStepsY(scaleFactor)); }
+double  GLContextBase::MouseVertexInfo::getAsMetricZ(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricZ(getAsStepsZ(scaleFactor)); }
+
+/////////////////////////////////////////////////////////////////
+GLContextBase::GLContextBase(wxGLCanvas* canvas, wxString& name) 
 : wxGLContext(canvas)
+, contextName(name)
 , enabled(true)
 , initialized(false)
+, currentMouseVertexInfo()
 , options()
 , zoom(1.0f)
 , viewMode(V2D_TOP)
@@ -22,10 +34,13 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas)
 , lastReshapeY(0)
 , lastReshapeW(0)
 , lastReshapeH(0)
+, theTexture(0)
 {
 /////////////////////////////////////////////////////////////////
+	// With respect to the GTK implementation SetCurrent() isn't 
+	// possible valid before the canvas was already shown in screen
 	if ( canvas != NULL )
-		SetCurrent(*canvas);
+		;//SetCurrent(*canvas);
 	
 	// ensure the view mode and the model rotation is in line,
 	// for this the view mode here has to be different to the
@@ -65,64 +80,29 @@ void GLContextBase::globalInit() {
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::traceOpenGLVersionInfo(std::ostream& s) {
+bool GLContextBase::SetCurrent(const wxGLCanvas& win) const {
 /////////////////////////////////////////////////////////////////
-	s << " :: OpenGL version info: "
-	  << ( glGetString(GL_VERSION)  ? (const char*)glGetString(GL_VERSION)  : "?" )	<< "; "
-	  << ( glGetString(GL_VENDOR)   ? (const char*)glGetString(GL_VENDOR)   : "?" )	<< "; "
-	  << ( glGetString(GL_RENDERER) ? (const char*)glGetString(GL_RENDERER) : "?" )	<< std::endl;
-	
-	s << " :: OpenGL Extension Wrangler Library (GLEW) version info : "
-	  << (GLCommon::glewInitializedGlobalFlag ? glewGetString(GLEW_VERSION) : (const unsigned char*)"Glew isn't initialized!" )
-	  << std::endl;
-		
-	//s << glGetString(GL_SHADING_LANGUAGE_VERSION​) << std::endl;
-}
-/////////////////////////////////////////////////////////////////
-void GLContextBase::traceOpenGLExtentionInfo(std::ostream& s) {
-/////////////////////////////////////////////////////////////////
-	s << "Extention list:" << std::endl;
-	wxString ext(glGetString(GL_EXTENSIONS));
-	wxStringTokenizer extentions(ext, " ");
-	
-	while ( extentions.HasMoreTokens() ) {
-		wxString token = extentions.GetNextToken();
-		s << " " << token << std::endl;
+	if ( win.IsShown() == false )
+		return false;
+
+	if ( GLCommon::getTraceLevel() > 1 ) {
+		const char* name = getContextName() ? getContextName() : "NULL";
+		std::cout << "GLContextBase::SetCurrent(" << name << ")" << std::endl;
 	}
-}
-/////////////////////////////////////////////////////////////////
-void GLContextBase::initGlew() {
-/////////////////////////////////////////////////////////////////
-	GLenum err = glewInit();
-	if ( err != GLEW_OK ) {
-		
-		glewInitialized = false;
-		std::cerr << "(" << getContextName() << "): Error while initializing glew: " << glewGetErrorString(err) << std::endl;
-		
-		if ( GLCommon::glewInitializedGlobalFlag == true )
-			std::cerr << "(" << getContextName() << "): glewInitializedGlobalFlag wa previous true! " << std::endl;
-			
-		GLCommon::glewInitializedGlobalFlag 	= glewInitialized;
-	}
-	else {
-		glewInitialized 			= true;
-		GLCommon::glewInitializedGlobalFlag 	= glewInitialized;
-	}
+
+	return wxGLContext::SetCurrent(win);
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::init() {
 /////////////////////////////////////////////////////////////////
+	GLCommon::initOpenGL();
+
 	glutInitDisplayMode (GL_DOUBLE | GLUT_DEPTH | GLUT_RGB);
-	
 	initContext();
 	
 	// call the initalization only one time
 	if ( initialized == true )
 		return;
-	
-	//glDebugMessageCallback(GLContextBase::MessageCallback, 0);
-
-	initGlew();
 	
 	viewPort = createViewPort();
 	initialized = true;
@@ -424,7 +404,7 @@ void GLContextBase::drawPosMarker(float x, float y, float z) {
 		glDisable(GL_LINE_STIPPLE);
 
 	} else {
-
+		
 		glColor3ub (255, 201, 14);
 		glBegin(GL_LINES);
 
@@ -435,6 +415,14 @@ void GLContextBase::drawPosMarker(float x, float y, float z) {
 
 		glEnd();
 	}
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawCrossHair() {
+/////////////////////////////////////////////////////////////////
+	if ( isViewMode2D() )
+		drawPosMarker(currentMouseVertexInfo.x, currentMouseVertexInfo.y, currentMouseVertexInfo.z);
+		
+	currentMouseVertexInfo.reset();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::determineViewPort(int w, int h, int x, int y) {
@@ -470,7 +458,7 @@ void GLContextBase::determineProjection(int w, int h) {
 /////////////////////////////////////////////////////////////////
 void GLContextBase::drawTeapot(void) {
 /////////////////////////////////////////////////////////////////
-	if ( glewInitialized == false )
+	if ( GLCommon::isGlewAvailable() == false )
 		return;
 		
 	glPushMatrix();
@@ -641,37 +629,166 @@ void GLContextBase::display() {
 		// scale
 		float sf = getCurrentScaleFactor();
 		glScalef(sf, sf, sf);
+		if ( GL_COMMON_CHECK_ERROR > 0 )
+			return;
 				 
 		// rotate
 		glRotatef(modelRotate.angleX(), 1.0f, 0.0f, 0.0f);
 		glRotatef(modelRotate.angleY(), 0.0f, 1.0f, 0.0f);
 		glRotatef(modelRotate.angleZ(), 0.0f, 0.0f, 1.0f);
+		if ( GL_COMMON_CHECK_ERROR > 0 )
+			return;
 		
 		// draw the scene
 		determineModel();
+		if ( GL_COMMON_CHECK_ERROR > 0 ) 
+			return;
 		
 		// draw the crosshair or whatever defined
-		if ( options.showPosMarker )
+		if ( options.showPosMarker ) {
 			markCurrentPosition();
+			if ( GL_COMMON_CHECK_ERROR > 0 )
+				return;
+		}
 		
 	glPopMatrix();
 	
 	// draw additional things
 	glPushMatrix();
 	
-		if ( options.showViewPortBounderies == true )
+		if ( options.showViewPortBounderies == true ) {
 			determineViewPortBounderies();
+			if ( GL_COMMON_CHECK_ERROR > 0 )
+				return;
+		}
 			
 	glPopMatrix();
 	
 	// draw coordinate origin
 	glPushMatrix();
 		
- 		if ( options.showOrigin == true )
+ 		if ( options.showOrigin == true ) {
 			drawCoordinateOrigin();
+			if ( GL_COMMON_CHECK_ERROR > 0 )
+				return;
+		}
 		
 	glPopMatrix();
 	
+	// draw crosshair
+	glPushMatrix();
+	
+		if ( currentMouseVertexInfo.showCrossHair == true )
+			drawCrossHair();
+
+	glPopMatrix();
+
 	glFlush();
-	GLCommon::checkGLError("GLContextBase::display()");
+	GL_COMMON_CHECK_ERROR;
+	
+}
+////////////////////////////////////////////////////////////////
+void GLContextBase::delWinCoordsToVertex() {
+////////////////////////////////////////////////////////////////
+	currentMouseVertexInfo.reset();
+}
+////////////////////////////////////////////////////////////////
+bool GLContextBase::logWinCoordsToVertex(int winX, int winY) {
+////////////////////////////////////////////////////////////////
+	currentMouseVertexInfo.showCrossHair = convertWinCoordsToVertex(winX, 
+																	winY, 
+																	currentMouseVertexInfo.x, 
+																	currentMouseVertexInfo.y, 
+																	currentMouseVertexInfo.z
+																    );
+	//std::cout << wxString::Format(" logWinCoordsToVertex(%d): %9.6lf, %9.6lf, %9.6lf", currentMouseVertexInfo.showCrossHair, currentMouseVertexInfo.x, currentMouseVertexInfo.y, currentMouseVertexInfo.z) << std::endl;
+	return currentMouseVertexInfo.showCrossHair;
+}
+////////////////////////////////////////////////////////////////
+bool GLContextBase::convertWinCoordsToVertex(int winX, int winY, GLdouble & vX, GLdouble & vY, GLdouble & vZ) {
+/////////////////////////////////////////////////////////////////
+	GLint 	 glViewport[4];
+	GLdouble glModelview[16];
+	GLdouble glProjection[16];
+
+	if ( viewPort == NULL )
+		return false;
+
+	glGetDoublev( GL_MODELVIEW_MATRIX, 	glModelview );
+	glGetDoublev( GL_PROJECTION_MATRIX, glProjection );
+	glGetIntegerv( GL_VIEWPORT, 		glViewport );
+
+	GLfloat x = (float)winX;
+	GLfloat y = (float)viewPort->getCurrentWindowHeigth() - (float)winY;
+	GLfloat z = 0;
+	
+	glReadPixels(winX, (int)y, 1, 1, GL_DEPTH_COMPONENT, GL_FLOAT, &z );
+	return gluUnProject(x, y, z, glModelview, glProjection, glViewport, &vX, &vY, &vZ) == GLU_TRUE;
+}
+/////////////////////////////////////////////////////////////////
+GLuint GLContextBase::LoadBMP(const wxImage& img) {
+/////////////////////////////////////////////////////////////////
+	const unsigned char *data = img.GetData();
+	unsigned int width        = img.GetWidth();
+	unsigned int height       = img.GetHeight();
+	
+	GLuint texture;
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+	
+	return texture;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextBase::drawBox(GLfloat size, GLenum type) {
+/////////////////////////////////////////////////////////////////
+	static GLfloat n[6][3] =
+	{
+	{-1.0, 0.0, 0.0},
+	{0.0, 1.0, 0.0},
+	{1.0, 0.0, 0.0},
+	{0.0, -1.0, 0.0},
+	{0.0, 0.0, 1.0},
+	{0.0, 0.0, -1.0}
+	};
+	
+	static GLint faces[6][4] =
+	{
+	{0, 1, 2, 3},
+	{3, 2, 6, 7},
+	{7, 6, 5, 4},
+	{4, 5, 1, 0},
+	{5, 6, 2, 1},
+	{7, 4, 0, 3}
+	};
+	
+	if ( theTexture == 0 ) {
+		wxBitmap bmp = ImageLibBig().Bitmap("BMP_CNC");
+		wxImage img  = bmp.ConvertToImage();
+		theTexture   = LoadBMP(img);
+	}
+
+	GLfloat v[8][3];
+	GLint i;
+
+	v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
+	v[4][0] = v[5][0] = v[6][0] = v[7][0] = +size / 2;
+	v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
+	v[2][1] = v[3][1] = v[6][1] = v[7][1] = +size / 2;
+	v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
+	v[1][2] = v[2][2] = v[5][2] = v[6][2] = +size / 2;
+	
+	glBindTexture(GL_TEXTURE_2D, theTexture);
+	
+	for (i = 5; i >= 0; i--) {
+		glBegin(type);
+			glNormal3fv(&n[i][0]);
+			glTexCoord2f(0.0, 0.0); glVertex3fv(&v[faces[i][0]][0]);
+			glTexCoord2f(1.0, 0.0); glVertex3fv(&v[faces[i][1]][0]);
+			glTexCoord2f(1.0, 1.0); glVertex3fv(&v[faces[i][2]][0]);
+			glTexCoord2f(0.0, 1.0); glVertex3fv(&v[faces[i][3]][0]);
+		glEnd();
+	}
 }

@@ -11,12 +11,12 @@ set(SOURCE_FILES
 	CncControlerGui/3D/GLCncPathData.h
 	CncControlerGui/3D/GLContextBase.cpp
 	CncControlerGui/3D/GLContextBase.h
+	CncControlerGui/3D/GLContextCncPathBase.h
+	CncControlerGui/3D/GLContextCncPathBase.cpp
 	CncControlerGui/3D/GLContextCncPath.cpp
 	CncControlerGui/3D/GLContextCncPath.h
 	CncControlerGui/3D/GLContextGCodePreview.cpp
 	CncControlerGui/3D/GLContextGCodePreview.h
-	CncControlerGui/3D/GLContextPathBase.cpp
-	CncControlerGui/3D/GLContextPathBase.h
 	CncControlerGui/3D/GLContextTestCube.cpp
 	CncControlerGui/3D/GLContextTestCube.h
 	CncControlerGui/3D/GLHelperCamera.h
@@ -29,6 +29,7 @@ set(SOURCE_FILES
 	CncControlerGui/3D/CncGLCanvas.cpp
 	CncControlerGui/3D/CncGLCanvas.cpp
 	CncControlerGui/3D/GLOpenGLPathBufferStore.cpp
+	CncControlerGui/3D/GLCommon.cpp
 	CncControlerGui/OSD/CncUsbPortScanner.cpp
 	CncControlerGui/OSD/CncUsbPortScanner.h
 	CncControlerGui/OSD/CncAsyncKeyboardState.cpp
@@ -94,8 +95,6 @@ set(SOURCE_FILES
 	CncControlerGui/CncToolMagazine.h
 	CncControlerGui/CncToolStateControl.cpp
 	CncControlerGui/CncToolStateControl.h
-	CncControlerGui/CncVectiesListCtrl.cpp
-	CncControlerGui/CncVectiesListCtrl.h
 	CncControlerGui/CncZView.cpp
 	CncControlerGui/CncZView.h
 	CncControlerGui/CommandTemplates.h
@@ -217,5 +216,10 @@ set(SOURCE_FILES
 	CncControlerGui/CncGCodeSequenceListCtrl.cpp
 	CncControlerGui/CncMoveSequenceListCtrl.cpp
 	CncControlerGui/CncStartPositionResolver.cpp
+	CncControlerGui/CncMotionMonitorVertexTrace.cpp
+	CncControlerGui/CncMotionVertexTrace.cpp
+	CncControlerGui/CncParsingSynopsisTrace.cpp
+	CncControlerGui/CncParsingSynopsisTraceListCtrl.cpp	
+	CncControlerGui/CncLoggerProxy.cpp
 	CncControlerGui/wxcrafter_bitmaps.cpp
 )

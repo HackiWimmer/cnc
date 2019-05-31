@@ -1,82 +1,14 @@
 #include <iostream>
-
 #include "3D/GLContextCncPathBase.h"
 #include "3D/GLLabelCluster.h"
 #include "CncConfig.h"
-
 #include "3D/GLInclude.h"
-
 #include <wx/bitmap.h>
-#include "wxcrafter.h"
-
-
-GLuint theTexture = 0;
-/////////////////////////////////////////////////////////////////
-GLuint LoadBMP(const wxImage& img) {
-/////////////////////////////////////////////////////////////////
-	const unsigned char *data = img.GetData();
-	unsigned int width        = img.GetWidth();
-	unsigned int height       = img.GetHeight();
-	
-	GLuint texture;
-	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-	
-	return texture;
-}
-/////////////////////////////////////////////////////////////////
-static void drawBox(GLfloat size, GLenum type) {
-/////////////////////////////////////////////////////////////////
-	static GLfloat n[6][3] =
-	{
-	{-1.0, 0.0, 0.0},
-	{0.0, 1.0, 0.0},
-	{1.0, 0.0, 0.0},
-	{0.0, -1.0, 0.0},
-	{0.0, 0.0, 1.0},
-	{0.0, 0.0, -1.0}
-	};
-	
-	static GLint faces[6][4] =
-	{
-	{0, 1, 2, 3},
-	{3, 2, 6, 7},
-	{7, 6, 5, 4},
-	{4, 5, 1, 0},
-	{5, 6, 2, 1},
-	{7, 4, 0, 3}
-	};
-	
-	GLfloat v[8][3];
-	GLint i;
-
-	v[0][0] = v[1][0] = v[2][0] = v[3][0] = -size / 2;
-	v[4][0] = v[5][0] = v[6][0] = v[7][0] = +size / 2;
-	v[0][1] = v[1][1] = v[4][1] = v[5][1] = -size / 2;
-	v[2][1] = v[3][1] = v[6][1] = v[7][1] = +size / 2;
-	v[0][2] = v[3][2] = v[4][2] = v[7][2] = -size / 2;
-	v[1][2] = v[2][2] = v[5][2] = v[6][2] = +size / 2;
-	
-	glBindTexture(GL_TEXTURE_2D, theTexture);
-	
-	for (i = 5; i >= 0; i--) {
-		glBegin(type);
-			glNormal3fv(&n[i][0]);
-			glTexCoord2f(0.0, 0.0); glVertex3fv(&v[faces[i][0]][0]);
-			glTexCoord2f(1.0, 0.0); glVertex3fv(&v[faces[i][1]][0]);
-			glTexCoord2f(1.0, 1.0); glVertex3fv(&v[faces[i][2]][0]);
-			glTexCoord2f(0.0, 1.0); glVertex3fv(&v[faces[i][3]][0]);
-		glEnd();
-	}
-}
 
 /////////////////////////////////////////////////////////////////
-GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
-: GLContextBase(canvas)
-, cncPath()
+GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas, wxString name)
+: GLContextBase(canvas, name)
+, cncPath(getContextName())
 , ruler()
 , drawType(DT_LINE_STRIP)
 , currentClientId(-1L)
@@ -85,13 +17,13 @@ GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas)
 , rulerColourZ(coordOriginInfo.colours.z)
 /////////////////////////////////////////////////////////////////
 {
-	wxBitmap bmp = ImageLibBig().Bitmap("BMP_CNC");
-	wxImage img  = bmp.ConvertToImage();
-	theTexture   = LoadBMP(img);
 }
 /////////////////////////////////////////////////////////////////
 GLContextCncPathBase::~GLContextCncPathBase() {
 /////////////////////////////////////////////////////////////////
+	if ( GLCommon::getTraceLevel() > 0 )
+		std::cout << "GLContextCncPathBase::~GLContextCncPathBase()" << std::endl;
+		
 	clearPathData();
 }
 /////////////////////////////////////////////////////////////////
@@ -103,8 +35,10 @@ void GLContextCncPathBase::markCurrentPosition() {
 		
 	// get the last/current vecties - it must be valid
 	GLOpenGLPathBuffer::CncVertex vertex;
-	#warning markCurrentPosition
-	//vectiesBuffer.getVertex(vertex, cncPath.getVirtualEnd() - 1);
+	
+	if ( cncPath.getOpenGLBufferStore() != NULL )
+		cncPath.getOpenGLBufferStore()->getVertex(vertex, cncPath.getVirtualEnd() - 1);
+	
 	drawPosMarker(vertex.getX(), vertex.getY(), vertex.getZ());
 }
 /////////////////////////////////////////////////////////////////
@@ -117,96 +51,19 @@ void GLContextCncPathBase::appendPathData(const GLOpenGLPathBuffer::CncVertex& v
 /////////////////////////////////////////////////////////////////
 	cncPath.appendPathData(vertex);
 }
-#warning !!!
-/*
 /////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::drawPoints() {
+void GLContextCncPathBase::reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt) {
 /////////////////////////////////////////////////////////////////
-	// ensure the right model
-	glMatrixMode(GL_MODELVIEW);
-	
-	cncPath.display(GLOpenGLPathBuffer::DT_DOTS);
-	return;
-
-	typedef GLI::GLCncPathVertices::FormatType FormatType;
-	
-	glBegin(GL_POINTS);
-	
-		int alpha = 255;
-		for( GLI::GLCncPath::iterator it = cncPath.vBegin(); it != cncPath.vEnd(); it++ ) {
-			// line stipple and colour depth
-			switch ( it->getFormatType() ) {
-				case FormatType::FT_SOLID: {
-						alpha = 255;
-						break;
-				}
-				case FormatType::FT_TRANSPARENT:
-				case FormatType::FT_DOT:
-				case FormatType::FT_LONG_DASH:
-				case FormatType::FT_SHORT_DASH:
-				case FormatType::FT_DOT_DASH: {
-						alpha = 0;
-						break;
-				}
-			}
-			
-			glColor4ub(it->getColour(currentClientId).Red(), it->getColour(currentClientId).Green(), it->getColour(currentClientId).Blue(), alpha);
-			
-			// determine the vertice
-			glVertex3f(it->getX(), it->getY(), it->getZ());
-		}
-		
-	glEnd();
+	cncPath.reconstruct(opt);
 }
-/////////////////////////////////////////////////////////////////
-void GLContextCncPathBase::drawLineStrips() {
-/////////////////////////////////////////////////////////////////
-	// ensure the right model
-	glMatrixMode(GL_MODELVIEW);
-	
-	cncPath.display(GLOpenGLPathBuffer::DT_STRIPS);
-	return;
-
-	
-	
-	typedef GLI::GLCncPathVertices::FormatType FormatType;
-	
-	glBegin(GL_LINE_STRIP);
-	
-		int alpha = 255;
-		for( GLI::GLCncPath::iterator it = cncPath.vBegin(); it != cncPath.vEnd(); it++ ) {
-			// line stipple and colour depth
-			switch ( it->getFormatType() ) {
-				case FormatType::FT_TRANSPARENT: {
-						alpha = 0;
-						break;
-				}
-				case FormatType::FT_SOLID: {
-						alpha = 255;
-						break;
-				}
-				case FormatType::FT_DOT:
-				case FormatType::FT_LONG_DASH:
-				case FormatType::FT_SHORT_DASH:
-				case FormatType::FT_DOT_DASH: {
-						alpha = 100;
-						break;
-				}
-			}
-			
-			glColor4ub(it->getColour(currentClientId).Red(),it->getColour(currentClientId).Green(),it->getColour(currentClientId).Blue(), alpha);
-			
-			// determine the vertice
-			glVertex3f(it->getX(), it->getY(), it->getZ());
-		}
-	
-	glEnd();
-}
-*/
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::determineModel() {
 /////////////////////////////////////////////////////////////////
 	if ( isEnabled() == false ) {
+		
+		
+		std::cout  << " GLContextCncPathBase::determineModel(); false"<< std::endl;
+		
 		//drawTeapot();
 		
 		/*
@@ -229,12 +86,14 @@ void GLContextCncPathBase::determineModel() {
 		case DT_LINE_STRIP:	cncPath.display(GLOpenGLPathBuffer::DT_STRIPS); 	break;
 	}
 	
-	if ( options.showBoundBox == true )
-		drawBoundBox();
+	drawBoundBox();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::drawBoundBox() {
 /////////////////////////////////////////////////////////////////
+	if ( options.showBoundBox == false )
+		return; 
+		
 	// ensure the right model
 	glMatrixMode(GL_MODELVIEW);
 	typedef GLI::BoundBox BoundBox;

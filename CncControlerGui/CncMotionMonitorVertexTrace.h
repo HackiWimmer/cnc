@@ -28,20 +28,22 @@ namespace CncVertexTrace {
 		public:
 		
 			static const int COL_TYPE			=  0;
-			static const int COL_CLD_ID			=  1;
-			static const int COL_T				=  2;
-			static const int COL_X				=  3;
-			static const int COL_Y				=  4;
-			static const int COL_Z				=  5;
-			static const int COL_R				=  6;
-			static const int COL_G				=  7;
-			static const int COL_B				=  8;
-			static const int COL_A				=  9;
+			static const int COL_BUF_ID			=  1;
+			static const int COL_CLD_ID			=  2;
+			static const int COL_T				=  3;
+			static const int COL_X				=  4;
+			static const int COL_Y				=  5;
+			static const int COL_Z				=  6;
+			static const int COL_R				=  7;
+			static const int COL_G				=  8;
+			static const int COL_B				=  9;
+			static const int COL_A				= 10;
+			static const int COL_COLOUR			= 11;
 			
-			static const int TOTAL_COL_COUNT	= 10;
+			static const int TOTAL_COL_COUNT	= 12;
 			
 			static const int COL_SEARCH			= COL_CLD_ID;
-			static const int COL_STRECH			= COL_CLD_ID;
+			static const int COL_STRECH			= COL_COLOUR;
 			
 			DataListCtrl(wxWindow *parent, long style);
 			virtual ~DataListCtrl();
@@ -76,10 +78,11 @@ namespace CncVertexTrace {
 		public:
 		
 			static const int COL_TYPE			= 0;
-			static const int COL_CLD_ID			= 1;
-			static const int COL_INFO			= 2;
+			static const int COL_BUF_ID			= 1;
+			static const int COL_CLD_ID			= 2;
+			static const int COL_INFO			= 3;
 			
-			static const int TOTAL_COL_COUNT	= 3;
+			static const int TOTAL_COL_COUNT	= 4;
 			
 			static const int COL_SEARCH			= COL_CLD_ID;
 			static const int COL_STRECH			= COL_INFO;

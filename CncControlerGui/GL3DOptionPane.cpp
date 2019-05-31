@@ -55,8 +55,9 @@ void GL3DOptionPane::propertyChanged(wxPropertyGridEvent& event) {
 	motionMonitor->getContextOptions().helpLines3D_XYPlane	= m_pgPropHLXYPlane->GetValue().GetBool();
 	motionMonitor->getContextOptions().helpLines3D_XZPlane	= m_pgPropHLXZPlane->GetValue().GetBool();
 	motionMonitor->getContextOptions().helpLines3D_YZPlane	= m_pgPropHLYZPlane->GetValue().GetBool();
+	motionMonitor->getContextOptions().rulerOriginOffsetAbs	= m_pgPropRulerOffset->GetValue().GetInteger();
 	
-	// update all colors
+	motionMonitor->getContextOptions().rapidAlpha 			= m_pgPropFlyAlpha->GetValue().GetInteger();
 	motionMonitor->getContextOptions().rapidColour 			= ((wxSystemColourProperty*)m_pgPropFlyColour)->GetVal().m_colour;
 	motionMonitor->getContextOptions().workColour 			= ((wxSystemColourProperty*)m_pgPropWorkColour)->GetVal().m_colour;
 	motionMonitor->getContextOptions().userColour 			= ((wxSystemColourProperty*)m_pgPropUserColour)->GetVal().m_colour;
@@ -89,8 +90,10 @@ void GL3DOptionPane::notifyChange(GLContextOptions& options) {
 	m_pgPropHLXYPlane->SetValue(options.helpLines3D_XYPlane);
 	m_pgPropHLXZPlane->SetValue(options.helpLines3D_XZPlane);
 	m_pgPropHLYZPlane->SetValue(options.helpLines3D_YZPlane);
+	m_pgPropRulerOffset->SetValue((int)options.rulerOriginOffsetAbs);
 	
 	// update all colors
+	m_pgPropFlyAlpha->SetValue((int)options.rapidAlpha); 
 	m_pgPropFlyColour->SetValue(wxVariant(wxColourPropertyValue(options.rapidColour))); 
 	m_pgPropWorkColour->SetValue(wxVariant(wxColourPropertyValue(options.workColour))); 
 	m_pgPropBoundBoxColour->SetValue(wxVariant(wxColourPropertyValue(options.boundBoxColour)));

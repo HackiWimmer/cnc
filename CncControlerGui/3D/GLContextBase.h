@@ -33,6 +33,9 @@ struct GLContextOptions {
 	bool helpLines3D_XZPlane			= false;
 	bool helpLines3D_YZPlane			= false;
 	
+	unsigned int rulerOriginOffsetAbs	= 10;
+	unsigned int rapidAlpha				= 64;
+		
 	wxColour boundBoxColour				= wxColour(185, 127, 87);
 	wxColour rapidColour				= *wxYELLOW;
 	wxColour workColour					= *wxWHITE;
@@ -73,13 +76,11 @@ struct GLContextOptions {
 };
 
 
-
-
 /////////////////////////////////////////////////////////////////
 class GLContextBase : public wxGLContext {
 	
 	public:
-		GLContextBase(wxGLCanvas* canvas);
+		GLContextBase(wxGLCanvas* canvas, wxString& name);
 		virtual ~GLContextBase();
 		
 		enum ModelType { MT_LEFT_HAND, MT_RIGHT_HAND };
@@ -100,12 +101,12 @@ class GLContextBase : public wxGLContext {
 						};
 		
 		// common 
-		virtual const char* getContextName() = 0;
+		virtual bool SetCurrent (const wxGLCanvas &win) const;
+		const char* getContextName() const { return contextName; }
 		virtual void keyboardHandler(unsigned char c);
 		
 		static void globalInit();
-		static void traceOpenGLVersionInfo(std::ostream& s);
-		static void traceOpenGLExtentionInfo(std::ostream& s);
+
 		
 		void enable(bool state = true) 	{ enabled = state; } 
 		void disable() 					{ enable(false); }
@@ -177,7 +178,21 @@ class GLContextBase : public wxGLContext {
 			zoom = z;
 		}
 		
+		// Mouse vertex
+		bool convertWinCoordsToVertex(int winX, int winY, GLdouble& vX, GLdouble& vY, GLdouble& vZ);
+		bool logWinCoordsToVertex(int winX, int winY);
+		void delWinCoordsToVertex();
+		
+		int32_t getMouseVertexAsStepsX() { return currentMouseVertexInfo.getAsStepsX(getCurrentScaleFactor()); }
+		int32_t getMouseVertexAsStepsY() { return currentMouseVertexInfo.getAsStepsY(getCurrentScaleFactor()); }
+		int32_t getMouseVertexAsStepsZ() { return currentMouseVertexInfo.getAsStepsZ(getCurrentScaleFactor()); }
+		
+		double getMouseVertexAsMetricX() { return currentMouseVertexInfo.getAsMetricX(getCurrentScaleFactor()); }
+		double getMouseVertexAsMetricY() { return currentMouseVertexInfo.getAsMetricY(getCurrentScaleFactor()); }
+		double getMouseVertexAsMetricZ() { return currentMouseVertexInfo.getAsMetricZ(getCurrentScaleFactor()); }
+
 	protected:
+		
 		////////////////////////////////////////////////////
 		class CoordOrginInfo {
 			public:
@@ -197,10 +212,34 @@ class GLContextBase : public wxGLContext {
 				{}
 		};
 		
+		////////////////////////////////////////////////////
+		struct MouseVertexInfo {
+			bool showCrossHair 	= false;
+			GLdouble x 			= 0.0;
+			GLdouble y 			= 0.0;
+			GLdouble z 			= 0.0;
+			
+			void reset() {
+				showCrossHair 	= false;
+				x = y = z		= 0.0;
+			}
+			
+			int32_t getAsStepsX(float scaleFactor);
+			int32_t getAsStepsY(float scaleFactor);
+			int32_t getAsStepsZ(float scaleFactor);
+			
+			double getAsMetricX(float scaleFactor);
+			double getAsMetricY(float scaleFactor);
+			double getAsMetricZ(float scaleFactor);
+		};
+
+		wxString 			contextName;
+
 		bool				enabled;
 		bool 				initialized;
 		
-		GLContextOptions options;
+		MouseVertexInfo		currentMouseVertexInfo;
+		GLContextOptions 	options;
 		
 		float				zoom;
 		
@@ -214,6 +253,7 @@ class GLContextBase : public wxGLContext {
 		
 		virtual float getAutoScaleFactor() { return 1.0; }
 		
+		virtual void drawCrossHair();
 		virtual void drawCoordinateOrigin();
 		virtual void drawPosMarker(float x, float y, float z);
 		
@@ -230,17 +270,18 @@ class GLContextBase : public wxGLContext {
 		
 		void drawTeapot(void);
 		void renderBitmapString(float x, float y, float z, void* font, const char* string);
+		
+		GLuint LoadBMP(const wxImage& img);
+		void drawBox(GLfloat size, GLenum type);
 		 
 	private:
-		
-		bool glewInitialized;
 		
 		int lastReshapeX;
 		int lastReshapeY;
 		int lastReshapeW;
 		int lastReshapeH;
 		
-		void initGlew();
+		GLuint theTexture;
 		
 		void determineViewPortBounderies();
 		void drawSolidCone(GLdouble base, GLdouble height, GLint slices, GLint stacks);

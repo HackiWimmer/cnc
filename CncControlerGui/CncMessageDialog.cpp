@@ -144,3 +144,8 @@ void CncFileContentDialog::setFileName(const wxString& fileName) {
 	
 	setMessage(msg);
 }
+/////////////////////////////////////////////////////////////////////
+void CncFileContentDialog::scrollToEOF() {
+/////////////////////////////////////////////////////////////////////
+	m_message->GotoLine(m_message->GetLineCount() - 1);
+}

@@ -19,9 +19,10 @@ wxBEGIN_EVENT_TABLE(CncGCodePreview, wxGLCanvas)
 wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////
-CncGCodePreview::CncGCodePreview(wxWindow *parent, int *attribList) 
+CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribList) 
 : CncGlCanvas(parent, attribList)
-, preview(new GLContextGCodePreview(this))
+, previewName(name)
+, preview(new GLContextGCodePreview(this, name))
 , maxDimension(400.0)
 , isShown(false)
 {
@@ -39,33 +40,33 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, int *attribList)
 //////////////////////////////////////////////////
 CncGCodePreview::~CncGCodePreview() {
 //////////////////////////////////////////////////
-	if ( preview != NULL ) 
-		delete preview;
-}
-//////////////////////////////////////////////////
-void CncGCodePreview::display() {
-//////////////////////////////////////////////////
-	preview->display();
+	delete preview;
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	// This is required even though dc is not used otherwise.
 	wxPaintDC dc(this);
-	preview->SetCurrent(*this);
+	
+	// With respect to the GTK implementation SetCurrent() as well 
+	// as SwapBuffers() isn't possible valid before
+	if ( IsShownOnScreen() == false )
+		return;
+		
+	lastSetCurrent = preview->SetCurrent(*this);
 	preview->init();
 
 	const wxSize cs = GetClientSize();
 	
 	if ( isShown )	preview->reshape(cs.GetWidth(), cs.GetHeight());
 	else 			preview->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
-	display();
+	
+	preview->display();
 	
 	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
 	// later this should not appear to support custom origin positions
 	// see if above
-	isShown = IsShownOnScreen();
-	
+	isShown = IsShown();
 	SwapBuffers();
 }
 //////////////////////////////////////////////////
@@ -83,7 +84,6 @@ void CncGCodePreview::onEraseBackground(wxEraseEvent& event) {
 void CncGCodePreview::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
 	CncGlCanvas::onMouse(event);
-	Refresh();
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
@@ -97,8 +97,10 @@ void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
 void CncGCodePreview::clear() {
 //////////////////////////////////////////////////
+	if ( GLCommon:: getTraceLevel() > 0 )
+		std::cout << CNC_LOG_FUNCT << std::endl;
+
 	preview->clearPathData();
-	Refresh(false);
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::setMaxDimension(double maxDim) {
@@ -111,7 +113,6 @@ void CncGCodePreview::setMaxDimension(double maxDim) {
 //////////////////////////////////////////////////
 void CncGCodePreview::pushProcessMode() {
 //////////////////////////////////////////////////
-	clear();
 	preview->getOptions().showPosMarker = false;
 }
 //////////////////////////////////////////////////
@@ -122,37 +123,12 @@ void CncGCodePreview::popProcessMode() {
 //////////////////////////////////////////////////
 void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 //////////////////////////////////////////////////
-	typedef GLI::GLCncPathVertices::FormatType PathVerticeType;
-	typedef GLI::GLCncPathVertices::CncMode    DataVerticeMode;
+	static GLOpenGLPathBuffer::CncVertex vertex;
+
+	const float x = vd.getX() / (maxDimension / GBL_CONFIG->getCalculationFactX());
+	const float y = vd.getY() / (maxDimension / GBL_CONFIG->getCalculationFactY());
+	const float z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
+	const char sc = cnc::getCncSpeedTypeAsCharacter(vd.getSpeedMode());
 	
-	static wxColour 		colour(128,128,128);
-	static PathVerticeType	formatType = PathVerticeType::FT_SOLID;
-	
-	// decorate
-	switch ( vd.getMode() ) {
-		case DataVerticeMode::CM_WORK:	colour.Set(0, 0, 0);
-										formatType	= PathVerticeType::FT_SOLID;
-										break;
-										
-		case DataVerticeMode::CM_RAPID:	colour.Set(255, 201, 14);
-										formatType	= PathVerticeType::FT_DOT;
-										break;
-										
-		case DataVerticeMode::CM_MAX:	colour.Set(0, 255, 0);
-										formatType	= PathVerticeType::FT_SOLID;
-										break;
-										
-		case DataVerticeMode::CM_USER_DEFINED:
-										colour.Set(0, 0, 255);
-										formatType	= PathVerticeType::FT_SOLID;
-										break;
-	}
-	
-	const double x = vd.getX() / (maxDimension / GBL_CONFIG->getCalculationFactX());
-	const double y = vd.getY() / (maxDimension / GBL_CONFIG->getCalculationFactY());
-	const double z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
-	
-	#warning !!!!!
-	static GLI::GLCncPathVertices d;
-	//preview->appendPathData(d.set(-1L, x, y, z, colour, formatType, vd.getMode())); 
+	preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
 }

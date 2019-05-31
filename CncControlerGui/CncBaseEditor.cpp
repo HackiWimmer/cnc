@@ -205,11 +205,6 @@ void CncBaseEditor::onLeftDown(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip(true);
 	onUpdateFilePosition();
-	
-	/*
-	wxASSERT(pathGenerator);
-	pathGenerator->updateEditControlCanReplaceState(true);
-	*/
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onLeftUp(wxMouseEvent& event) {
@@ -659,10 +654,11 @@ void CncBaseEditor::setupModelType() {
 	if ( tf == TplBinary )
 		tf = fileInfo.binaryOrigFomat;
 	
-	const bool r = CncConfig::getGlobalCncConfig()->getSvgReverseYAxisFlag();
+	// if the Y axis will be reversed svg is also a right hand coord system
+	const bool cnv = GBL_CONFIG->getSvgConvertToRightHandFlag();
 	
 	switch ( tf ) {
-		case TplSvg:		fileInfo.modelType 		= r ? GLContextBase::ModelType::MT_LEFT_HAND : GLContextBase::ModelType::MT_RIGHT_HAND;
+		case TplSvg:		fileInfo.modelType 		= cnv ? GLContextBase::ModelType::MT_RIGHT_HAND : GLContextBase::ModelType::MT_LEFT_HAND;
 							fileInfo.modelViewType	= CncDimensions::CncDimension2D; 
 							break;
 							

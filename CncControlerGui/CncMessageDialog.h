@@ -33,6 +33,8 @@ class CncFileContentDialog : public CncMessageDialog {
 		virtual ~CncFileContentDialog();
 		
 		void setFileName(const wxString& fileName);
+		
+		void scrollToEOF();
 };
 
 #endif // CNCMESSAGEDIALOG_H

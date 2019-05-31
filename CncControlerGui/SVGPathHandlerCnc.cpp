@@ -77,8 +77,7 @@ void SVGPathHandlerCnc::setCncWorkingParameters(SvgCncParameters& cwp) {
 void SVGPathHandlerCnc::setSvgRootNode(const SVGRootNode& srn) {
 //////////////////////////////////////////////////////////////////
 	SVGPathHandlerBase::setSvgRootNode(srn);
-	changeInputUnit(srn.getInputUnit());
-
+	changeInputUnit(srn.getOutputUnit());
 	initialized = true;
 }
 //////////////////////////////////////////////////////////////////

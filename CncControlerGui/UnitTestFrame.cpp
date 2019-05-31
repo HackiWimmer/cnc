@@ -2,6 +2,7 @@
 #include <wx/msgdlg.h>
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>
+#include "GlobalFunctions.h"
 #include "Tests/Test_FrameworkCallback.h"
 #include "Tests/Test_SVGNodeParser.h"
 #include "Tests/Test_CncPathListManager.h"
@@ -11,12 +12,14 @@
 /////////////////////////////////////////////////////////////////////////////
 UnitTests::UnitTests(wxWindow* parent, int iti, bool ar)
 : UnitTestsBase(parent)
+, testResultStream(new CncTextCtrl(m_testResultStreamPlaceholder))
 , initialTestIdx(iti)
 , autorun(ar)
 , redirector(NULL)
 {
 /////////////////////////////////////////////////////////////////////////////
-	redirector = new StdStreamRedirector(m_testResultStream);
+	GblFunc::replaceControl(m_testResultStreamPlaceholder, testResultStream);
+	redirector = new StdStreamRedirector(testResultStream);
 	
 	// install tests
 	testStore.push_back(new TEST_FRAMEWORK_CALLBACK(this));
@@ -77,9 +80,9 @@ void UnitTests::onShow(wxShowEvent& event) {
 /////////////////////////////////////////////////////////////////////////////
 void UnitTests::runTest() {
 /////////////////////////////////////////////////////////////////////////////
-	m_testResultStream->Clear();
-	m_testResultStream->Refresh();
-	m_testResultStream->Update();
+	testResultStream->Clear();
+	testResultStream->Refresh();
+	testResultStream->Update();
 	
 	// to start scrolling immediately
 	for ( unsigned int i=0; i<50; i++ )
@@ -110,7 +113,7 @@ void UnitTests::onStartupTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////////////
 void UnitTests::clearView(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////////////
-	m_testResultStream->Clear();
+	testResultStream->Clear();
 }
 /////////////////////////////////////////////////////////////////////////////
 void UnitTests::enableControls(bool state) {
@@ -120,8 +123,8 @@ void UnitTests::enableControls(bool state) {
 	m_unitTestFreezeOutput->Enable(state);
 	
 	if ( m_unitTestFreezeOutput->IsChecked() ) {
-		if ( state == false ) 	m_testResultStream->Freeze();
-		else					m_testResultStream->Thaw();
+		if ( state == false ) 	testResultStream->Freeze();
+		else					testResultStream->Thaw();
 	}
 	
 	// connect and disconnect runTest here because m_btUnitTestRun->Enable(state)

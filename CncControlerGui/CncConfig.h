@@ -294,9 +294,7 @@ class CncConfig {
 		const bool getAutoConnectFlag();
 		const bool getAutoProcessFlag();
 		const bool getShowTestMenuFlag();
-		const bool getSvgResultWithOrigPathFlag();
-		const bool getSvgResultOnlyFirstCrossingFlag();
-		const bool getSvgReverseYAxisFlag();
+		const bool getSvgConvertToRightHandFlag();
 		const bool getAvoidDupSetterValuesFlag();
 		const bool getRequestIdleRequestFlag();
 		const bool getInterruptByPosOutOfRangeFlag();
@@ -354,7 +352,6 @@ class CncConfig {
 		const double getPitchX();
 		const double getPitchY();
 		const double getPitchZ();
-		const double getSvgEmulatorCopyFactor();
 		const double getMaxDurationThickness();
 		const double getDurationThickness(unsigned int duration);
 		const double getDurationPositionAbs(unsigned int duration);

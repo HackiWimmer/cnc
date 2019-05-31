@@ -3,9 +3,10 @@ project(cnc)
 
 set(CMAKE_CXX_COMPILER "/usr/bin/g++")
 
-set(CNC_USER_HOME "")
-set(CNC_SPACE_HOME "/media/pi/space")
-set(CNC_BUILD_HOME "${CNC_SPACE_HOME}/cnc")
+set(CNC_GTK_VERSION "3")
+set(CNC_USER_HOME   "")
+set(CNC_SPACE_HOME  "/media/pi/space")
+set(CNC_BUILD_HOME  "${CNC_SPACE_HOME}/cnc")
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/local/lib/wx/include/gtk3-unicode-3.1")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I /usr/local/include/wx-3.1")

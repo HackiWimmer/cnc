@@ -100,6 +100,8 @@ class CncTimeFunctions {
 		static CncNanoTimespan getTimeSpan(const CncTimeval& a, const CncTimeval& b);
 		static CncNanoTimespan getTimeSpan(const CncNanoTimestamp& a, const CncNanoTimestamp& b);
 		
+		static CncNanoTimespan getTimeSpanToNow(const CncNanoTimestamp& a);
+		
 };
 
 #endif

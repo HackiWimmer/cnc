@@ -23,6 +23,7 @@
 #include "CfgAccelerationGraph.h"
 #include "CncGamepadControllerState.h"
 #include "CncMotionMonitorVertexTrace.h"
+#include "CncParsingSynopsisTrace.h"
 #include "CncSummaryListCtrl.h"
 #include "Codelite/wxPNGAnimation.h"
 #include "CncNavigatorPanel.h"
@@ -111,14 +112,40 @@ class GlobalConfigManager {
 		}
 };
 
+///////////////////////////////////////////////////////////////////
+// This class is established because the containing controls have to be 
+// created as most as possible first. 
+// If we do so the creation is after the ctor of MainFrameBClass 
+// and before the ctor of MainFrame
+class MainFrameBase : public MainFrameBClass {
+	
+	private:
+		CncLoggerProxy* logger;
+		CncTextCtrl* 	startupTrace;
+		CncTextCtrl* 	tmpTraceInfo;
+		CncTextCtrl* 	controllerMsgHistory;
+		
+	public:
+		explicit MainFrameBase(wxWindow* parent);
+		virtual ~MainFrameBase();
+		
+		// global trace controls
+		CncLoggerProxy* getLogger() 			{ return logger; }
+		CncTextCtrl* 	getStartupTrace() 		{ return startupTrace; }
+		CncTextCtrl* 	getTrace() 				{ return tmpTraceInfo; }
+		CncTextCtrl* 	getCtrlMessageHistory() { return controllerMsgHistory; }
+		
+};
+
 ////////////////////////////////////////////////////////////////////
-class MainFrame : public MainFrameBClass, public GlobalConfigManager {
+class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void changeMonitorListBook(wxListbookEvent& event);
+		virtual void onShowLoggerOnDemand(wxCommandEvent& event);
+		virtual void freezeLogger(wxCommandEvent& event);
+		virtual void changeMonitorListBook(wxListbookEvent& event);
 		virtual void showStacktraceStore(wxCommandEvent& event);
-		virtual void updateLogger(wxCommandEvent& event);
 		virtual void onSelectSpyInboundDetails(wxDataViewEvent& event);
 		virtual void onSelectSpyOutboundDetails(wxDataViewEvent& event);
 		virtual void onSelectSpyUnknownDetails(wxDataViewEvent& event);
@@ -162,8 +189,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
 		virtual void keyDownLruList(wxKeyEvent& event);
-		virtual void dclickLogger(wxMouseEvent& event);
-		virtual void keyDownLogger(wxKeyEvent& event);
 		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void renameTemplateFromButton(wxCommandEvent& event);
 		virtual void removeTemplateFromButton(wxCommandEvent& event);
@@ -427,17 +452,11 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		MainFrame(wxWindow* parent, wxFileConfig* globalConfig);
 		virtual ~MainFrame();
 		
-		//////////////////////////////////////////////////////////////////////////////////
+		virtual bool Show(bool show);
+
 		void initialize(void);
-		
-		//////////////////////////////////////////////////////////////////////////////////
 		bool secureRun() { return processTemplateIntern(); }
 		
-		//////////////////////////////////////////////////////////////////////////////////
-		// global trace controls
-		wxTextCtrl* getLogger() 				{ return m_logger; }
-		wxTextCtrl* getTrace() 					{ return m_tmpTraceInfo; }
-		wxTextCtrl* getCtrlMessageHistory() 	{ return m_controllerMsgHistory; }
 		wxListCtrl* getCtrlSerialSpy() 			{ return serialSpyListCtrl; }
 		
 		CncMotionMonitor* getMotionMonitor() 	{ return motionMonitor; }
@@ -519,6 +538,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		CncGCodeSequenceListCtrl* getGCodeSequenceList() 	{ return gCodeSequenceList; }
 		CncMotionVertexTrace* getMotionVertexTrace() 		{ return motionVertexCtrl; } 
+		CncParsingSynopsisTrace* getParsingSynopsisTrace()	{ return parsingSynopisis; }
 		
 		void manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z);
 		void manualContinuousMoveStop();
@@ -544,6 +564,8 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 		
+		friend class CncLoggerProxy;
+		friend class SVGFileParser;
 		friend class CncBaseEditor;
 		friend class CncSourceEditor;
 		friend class CncOutboundEditor;
@@ -605,6 +627,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		CncSpeedMonitor*				speedMonitor;
 		CncMotionVertexTrace* 			motionVertexCtrl;
 		CncPreprocessor*				cncPreprocessor;
+		CncParsingSynopsisTrace*		parsingSynopisis;
 		CncGCodeSequenceListCtrl*		gCodeSequenceList;
 		CncSummaryListCtrl* 			cncSummaryListCtrl;
 		CncSerialSpyListCtrl* 			serialSpyListCtrl;
@@ -714,6 +737,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void initializeUpdateManagerThread();
 		void initializeGamepadThread();
 		bool initializeLruMenu();
+		bool openInitialTemplateFile();
 		
 		void createAnimationControl();
 		int showReferencePositionDlg(wxString msg);
@@ -794,7 +818,7 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		
 		void clearPositionSpy();
 		void clearMotionMonitor();
-		void prepareMotionMonitorViewType(const CncDimensions type);
+		void prepareMotionMonitorViewType();
 
 		wxWindow* getAUIPaneByName(const wxString& name);
 		wxMenuItem* getAUIMenuByName(const wxString& name);
@@ -839,8 +863,6 @@ class MainFrame : public MainFrameBClass, public GlobalConfigManager {
 		void navigateX(CncDirection d);
 		void navigateY(CncDirection d);
 		void navigateZ(CncDirection d);
-		
-		SvgOutputParameters& evaluteSvgOutputParameters(SvgOutputParameters& sop);
 		
 		void resetMinMaxPositions();
 		void setRefPostionState(bool state);

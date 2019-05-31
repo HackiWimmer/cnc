@@ -1,5 +1,6 @@
 #include <wx/dcclient.h>
 
+#include "OSD/CncAsyncKeyboardState.h"
 #include "3D/GLContextCncPath.h"
 #include "3D/GLContextTestCube.h"
 #include "3D/GLOpenGLPathBufferStore.h"
@@ -56,7 +57,6 @@ wxEND_EVENT_TABLE()
 CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList) 
 : CncGlCanvas(parent, attribList)
 , monitor(new GLContextCncPath(this))
-, testCube(new GLContextTestCube(this))
 , cameraRotationTimer(this, wxEVT_MONTION_MONITOR_TIMER)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
@@ -67,7 +67,6 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
 	monitor->init();
-	testCube->init();
 	
 	// Important: initialize the CncGlCanvas context
 	context = monitor;
@@ -79,16 +78,13 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	// deactivate process mode by default
 	popProcessMode();
 	
-	createRuler();
+	createRuler(GLContextBase::ModelType::MT_RIGHT_HAND);
 }
 //////////////////////////////////////////////////
 CncMotionMonitor::~CncMotionMonitor() {
 //////////////////////////////////////////////////
 	if ( monitor != NULL ) 
 		delete monitor;
-	
-	if ( testCube != NULL ) 
-		delete testCube;
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::notifyCncPathChanged() {
@@ -107,8 +103,8 @@ unsigned int CncMotionMonitor::calculateScaleDisplay(unsigned int height) {
 void CncMotionMonitor::initVertexListCtr() {
 //////////////////////////////////////////////////
 	wxASSERT(THE_APP->getMotionVertexTrace());
-	THE_APP->getMotionVertexTrace()->getVertexDataList()->setVertexBufferStore(monitor->getVertexBufferStore());
-	THE_APP->getMotionVertexTrace()->getVertexIndexList()->setVertexBufferStore(monitor->getVertexBufferStore());
+	THE_APP->getMotionVertexTrace()->getVertexDataList()->setVertexBufferStore(monitor->getOpenGLBufferStore());
+	THE_APP->getMotionVertexTrace()->getVertexIndexList()->setVertexBufferStore(monitor->getOpenGLBufferStore());
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::enable(bool state) {
@@ -123,18 +119,38 @@ void CncMotionMonitor::decorateProbeMode(bool state) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::clear() {
 //////////////////////////////////////////////////
+	if ( GLCommon:: getTraceLevel() > 0 )
+		std::cout << CNC_LOG_FUNCT << std::endl;
+
 	monitor->clearPathData();
-	display();
+	onPaint();
 }
 //////////////////////////////////////////////////
-void CncMotionMonitor::createRuler() {
+void CncMotionMonitor::createRuler(const GLContextBase::ModelType mt) {
 //////////////////////////////////////////////////
-	CncMetricRulerSetup mrs;
+	// cleanup
+	monitor->getXYPlane().helpLinesX.clear();
+	monitor->getXYPlane().helpLinesY.clear();
+	monitor->getXZPlane().helpLinesX.clear();
+	monitor->getXZPlane().helpLinesZ.clear();
+	monitor->getYZPlane().helpLinesY.clear();
+	monitor->getYZPlane().helpLinesZ.clear();
 	
+	monitor->getRulerX().clear();
+	monitor->getRulerY().clear();;
+	monitor->getRulerZ().clear();
+
+	// setup
 	const double dimX = GBL_CONFIG->getMaxDimensionX();
 	const double dimY = GBL_CONFIG->getMaxDimensionY();
 	const double dimZ = GBL_CONFIG->getMaxDimensionZ();
 	
+	CncMetricRulerSetup mrs;
+	
+	const double oo = 1.0 * getContextOptions().rulerOriginOffsetAbs;
+	if ( mt == GLContextBase::ModelType::MT_LEFT_HAND )	mrs.setupOrigin({-oo, +oo, -oo});
+	else												mrs.setupOrigin({-oo, -oo, -oo});
+
 	mrs.setupSize(dimX, dimY, dimZ);
 	
 	mrs.createHelpLinesXY(monitor->getXYPlane().helpLinesX, monitor->getXYPlane().helpLinesY);
@@ -146,47 +162,28 @@ void CncMotionMonitor::createRuler() {
 	mrs.createRulerZ(monitor->getRulerZ());
 	
 	mrs.check(monitor, std::cerr);
-	
-	//#warning
 	//mrs.trace(monitor, std::cout);
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::setModelType(const GLContextBase::ModelType mt) {
 //////////////////////////////////////////////////
+	createRuler(mt);
 	monitor->setModelType(mt);
-	monitor->setViewMode(GLContextBase::ViewMode::V3D_ISO1, true);
 	monitor->reshapeViewMode();
+	onPaint();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::reconstruct() {
 //////////////////////////////////////////////////
-	display();
-	
-#warning reimpl. CncMotionMonitor::reconstruct
-/*
-	GLI::GLCncPath tmpPath, curPath = monitor->getPathData();
-	// copy the current path
-	tmpPath.swap(curPath);
-	// clear the real monitor path data - keep in mind curPath is only a local copy
-	monitor->clearPathData();
-	
 	pushProcessMode();
-	
-		// reconstruct
-		GLI::GLCncPathVertices d;
-		for ( GLI::GLCncPath::iterator it = tmpPath.begin(); it != tmpPath.end(); ++it )
-			appendVertice(it->getId(), it->getX(), it->getY(), it->getZ(), it->getCncMode());
 		
-		// redraw the scene with new properties
-		display();
-	
+		GLOpenGLPathBuffer::ReconstructOptions opt;
+		opt.showRapidPathes = getContextOptions().showFlyPath;
+		
+		monitor->reconstruct(opt);
+		onPaint();
+		
 	popProcessMode();
-	 */ 
-}
-//////////////////////////////////////////////////
-void CncMotionMonitor::display() {
-//////////////////////////////////////////////////
-	onPaint();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::appendVertex(const GLI::VerticeLongData& vd) {
@@ -219,56 +216,32 @@ void CncMotionMonitor::appendVertex(long clientId, CncSpeedMode sm, const CncLon
 //////////////////////////////////////////////////
 void CncMotionMonitor::appendVertex(long id, CncSpeedMode sm, float x, float y, float z) {
 //////////////////////////////////////////////////
-	// x, y, z have to be given as glpos
-	typedef GLI::GLCncPathVertices::FormatType PathVerticeType;
-	
-	static wxColour 		colour;
-	static PathVerticeType	formatType;
-	/*
-	// decorate
-	switch ( sm ) {
-		case CncSpeedWork:			colour		= getContextOptions().workColour;
-									formatType	= PathVerticeType::FT_SOLID;
-									break;
-										
-		case CncSpeedRapid:			colour 		= getContextOptions().rapidColour;
-									formatType	= ( getContextOptions().showFlyPath == true ? PathVerticeType::FT_DOT : PathVerticeType::FT_TRANSPARENT );
-									break;
-										
-		case CncSpeedMax:			colour 		= getContextOptions().maxColour;
-									formatType	= PathVerticeType::FT_SOLID;
-									break;
-										
-		case CncSpeedUserDefined:	colour 		= getContextOptions().userColour;
-									formatType	= PathVerticeType::FT_SOLID;
-									break;
-	}
-	*/
-	#warning !!!!
-	// append
-	// todo - avoid duplicates last != new
 	static GLOpenGLPathBuffer::CncVertex vertex;
-	monitor->appendPathData(vertex.set('R', id, x, y, z)); 
+	
+	const char sc = cnc::getCncSpeedTypeAsCharacter(sm);
+	monitor->appendPathData(vertex.set(sc, id, x, y, z)); 
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::centerViewport() {
 /////////////////////////////////////////////////////////////////
 	monitor->centerViewport();
-	display();
+	onPaint();
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::resetRotation() {
 /////////////////////////////////////////////////////////////////
 	monitor->getModelRotation().reset2DDefaults();
-	display();
+	onPaint();
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::onPaint() {
 /////////////////////////////////////////////////////////////////
+	// With respect to the GTK implementation SetCurrent() as well 
+	// as SwapBuffers() isn't possible valid before
 	if ( IsShownOnScreen() == false )
 		return;
 
-	monitor->SetCurrent(*this);
+	lastSetCurrent = monitor->SetCurrent(*this);
 	monitor->init();
 
 	const wxSize cs = GetClientSize();
@@ -284,10 +257,8 @@ void CncMotionMonitor::onPaint() {
 	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
 	// later this should not appear to support custom origin positions
 	// see if above
-	isShown = IsShownOnScreen();
-	
-	if ( isShown )
-		SwapBuffers();
+	isShown = IsShown();
+	SwapBuffers();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onPaint(wxPaintEvent& event) {
@@ -302,17 +273,12 @@ void CncMotionMonitor::onSize(wxSizeEvent& event) {
 	const wxSize cs = GetClientSize();
 	
 	monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
-	monitor->display();
-	
 	event.Skip();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onEraseBackground(wxEraseEvent& event) {
 //////////////////////////////////////////////////
-	// update background 
-	monitor->display();
-	
-	// and avoid flashing on MSW
+	// update background and avoid flashing on MSW 
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::onLeave(wxMouseEvent& event) {
@@ -320,8 +286,75 @@ void CncMotionMonitor::onLeave(wxMouseEvent& event) {
 	mouseMoveMode = false;
 }
 //////////////////////////////////////////////////
+void CncMotionMonitor::performMouseToolTip() {
+//////////////////////////////////////////////////
+	typedef GLContextBase::ViewMode VT;
+	
+	wxString tt;
+	switch ( context->getViewMode() ) {
+		// xy plane
+		case VT::V2D_TOP:
+		case VT::V2D_BOTTOM:	tt.assign(wxString::Format("(X,Y) = %8.3lf, %8.3lf", 
+															context->getMouseVertexAsMetricX(), 
+															context->getMouseVertexAsMetricY()
+														  )
+								);
+								THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricX()));
+								THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricY()));
+								THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", 0.0));
+								break;
+		// yz plane
+		case VT::V2D_LEFT:
+		case VT::V2D_RIGHT:		tt.assign(wxString::Format("(Y,Z) = %8.3lf, %8.3lf", 
+															context->getMouseVertexAsMetricY(), 
+															context->getMouseVertexAsMetricZ()
+														  )
+								);
+								THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", 0.0));
+								THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricY()));
+								THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricZ()));
+								break;
+		// xz plane
+		case VT::V2D_FRONT:
+		case VT::V2D_REAR:		tt.assign(wxString::Format("(X,Z) = %8.3lf, %8.3lf", 
+															context->getMouseVertexAsMetricX(), 
+															context->getMouseVertexAsMetricZ()
+														  )
+								);
+								THE_APP->GetMouseCoordX()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricX()));
+								THE_APP->GetMouseCoordY()->ChangeValue(wxString::Format("%.3lf", 0.0));
+								THE_APP->GetMouseCoordZ()->ChangeValue(wxString::Format("%.3lf", context->getMouseVertexAsMetricZ()));
+								break;
+								
+		default:				tt.clear();
+	}
+	
+	if ( CncAsyncKeyboardState::isShiftPressed() == true ) 
+		SetToolTip(tt);
+}
+//////////////////////////////////////////////////
 void CncMotionMonitor::onMouse(wxMouseEvent& event) {
 //////////////////////////////////////////////////
+	// mouse crosshair
+	SetToolTip("");
+	THE_APP->GetMouseCoordX()->ChangeValue("");
+	THE_APP->GetMouseCoordY()->ChangeValue("");
+	THE_APP->GetMouseCoordZ()->ChangeValue("");
+	
+	if ( event.ControlDown() == true ) {
+		if ( context->logWinCoordsToVertex(event.GetX(), event.GetY()) )  {
+			Refresh();
+			
+			performMouseToolTip();
+		}
+	
+	} else {
+		context->delWinCoordsToVertex();
+		Refresh();
+		
+	}
+	
+	// default handling
 	CncGlCanvas::onMouse(event);
 }
 //////////////////////////////////////////////////
@@ -338,25 +371,25 @@ void CncMotionMonitor::onKeyDown(int keyCode) {
 	switch ( keyCode ) {
 		
 		case 'C':			monitor->centerViewport();
-							display();
+							onPaint();
 							break;
 					
 		case WXK_UP:		oy += delta; monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
-							display();
+							onPaint();
 							break;
 							
 		case WXK_DOWN:		oy -= delta; monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
-							display();
+							onPaint();
 							break;
 		
 		case WXK_LEFT:		ox -= delta; 
 							monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
-							display();
+							onPaint();
 							break;
 							
 		case WXK_RIGHT:		ox += delta; 
 							monitor->reshape(cs.GetWidth(), cs.GetHeight(), ox, oy);
-							display();
+							onPaint();
 							break;
 	}
 }
@@ -418,7 +451,7 @@ void CncMotionMonitor::rotateCamera(int angle) {
 													 monitor->getCameraPosition().getCurXYPlaneEyeRadius(),
 													 monitor->getCameraPosition().getEyeZ());
 	// redraw
-	display();
+	onPaint();
 }
 //////////////////////////////////////////////////
 void CncMotionMonitor::updateMonitorAndOptions() {

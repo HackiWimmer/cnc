@@ -1,14 +1,17 @@
 #ifndef CNC_CONTEXT_H
 #define CNC_CONTEXT_H
 
+#include <map>
 #include <wx/string.h>
 #include <wx/font.h>
-
 #include "OSD/CncTimeFunctions.h"
+
+typedef std::map<wxString, wxString> VersionInfoMap;
 
 struct CncContext {
 	
 	private:
+		
 		bool probeMode					= true;
 		bool onlineUpdateCoordinates	= true;
 		bool onlineUpdateDrawPane		= true;
@@ -111,6 +114,7 @@ struct CncContext {
 		~CncContext();
 		
 		TsTplProcessing timestamps								= TsTplProcessing();
+		VersionInfoMap	versionInfoMap;
 
 		void setProbeMode(bool state); 
 		bool isProbeMode() { return  probeMode; }

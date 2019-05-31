@@ -1,27 +1,3 @@
-/*
- * FYI: codelite win build options
- * g++.exe -c  "...."
- * -Wno-deprecated-declarations -O3 -std=c++17 -std=c++14 -std=c++11 -Wall -mthreads -DHAVE_W32API_H -D__WXMSW__ -DNDEBUG -D_UNICODE 
- * -IC:/@Development/wxWidgets-3.1.0/lib/gcc_dll/mswu 
- * -IC:/@Development/wxWidgets-3.1.0/include 
- * -DWXUSINGDLL 
- * -Wno-ctor-dtor-privacy 
- * -pipe 
- * -fmessage-length=0    
- * -DNDEBUG 
- * -DAPP_USE_SPLASH
- * -I. -IC:\@Development\boost\include\boost-1_64 
- * -I. 
- * -IC:\@Development\boost_1_65_0 
- * -IC:\@Development\freeglut\include
-
-C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..." 
-  * -L. -LC:\@Development\boost\lib -LC:\@Development\freeglut\lib\x64  -lwxmsw31u_stc -lwxmsw31u_webview -lwxmsw31u_propgrid -lwxmsw31u_adv -lwxmsw31u_gl 
-  * -lopengl32 -lglu32 -lfreeglut  -mwindows  -mthreads -LC:/@Development/wxWidgets-3.1.0/lib/gcc_dll -lwxmsw31u_richtext -lwxmsw31u_xrc -lwxmsw31u_aui 
-  * -lwxmsw31u_html -lwxmsw31u_adv -lwxmsw31u_core -lwxbase31u_xml -lwxbase31u_net -lwxbase31u -lwxscintilla -lwxtiff -lwxjpeg -lwxpng -lwxzlib -lwxregexu -lwxexpat 
-  * -lkernel32 -luser32 -lgdi32 -lcomdlg32 -lwxregexu -lwinspool -lwinmm -lshell32 -lcomctl32 -lversion -lshlwapi -lole32 -loleaut32 -luuid -lrpcrt4 -ladvapi32 -lwsock32
-*/
-
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -105,7 +81,6 @@ C:/@Development/Compilers/TDM-GCC-64/bin/g++.exe -o "..."
 	// they have to be at the end of the list to avoid compilation errors
 	#include <windows.h>
 	#include <dbt.h>
-	
 #endif
 
 ////////////////////////////////////////////////////////////////////
@@ -133,7 +108,6 @@ unsigned int CncTransactionLock::referenceCounter   = 0;
 		EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, 	MainFrame::configurationUpdated)
 		EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, 							MainFrame::onPerspectiveTimer)
 		EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 				MainFrame::onDebugUserNotificationTimer)
-		
 	wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
 
@@ -147,20 +121,48 @@ class CncRunEventFilter : public wxEventFilter {
 			wxEvtHandler::RemoveFilter(this);
 		}
 		
+		// currently no filter active
 		virtual int FilterEvent(wxEvent& event) {
-			// Update the last user activity
+			return Event_Skip;
+
 			//const wxEventType t = event.GetEventType();
 			//const wxWindow* wnd = (wxWindow*)event.GetEventObject();
-			
-			return Event_Skip;
 			//return Event_Ignore;
 		}
 };
 ////////////////////////////////////////////////////////////////////
 
+////////////////////////////////////////////////////////////////////
+MainFrameBase::MainFrameBase(wxWindow* parent)
+: MainFrameBClass(parent)
+//                                      Don't use the source controls as pointer here
+//                                      because this forces the special copy ctor
+, logger(				new CncLoggerProxy(*m_loggerPlaceholder)            )
+, startupTrace(			new CncTextCtrl(*m_startupTracePlaceholder)         )
+, tmpTraceInfo(			new CncTextCtrl(*m_tmpTraceInfoPlaceholder)         )
+, controllerMsgHistory(	new CncTextCtrl(*m_controllerMsgHistoryPlaceholder) )
+////////////////////////////////////////////////////////////////////
+{
+	GblFunc::replaceControl(m_loggerPlaceholder, 				logger);
+	GblFunc::replaceControl(m_startupTracePlaceholder, 			startupTrace);
+	GblFunc::replaceControl(m_tmpTraceInfoPlaceholder, 			tmpTraceInfo);
+	GblFunc::replaceControl(m_controllerMsgHistoryPlaceholder, 	controllerMsgHistory);
+}
+///////////////////////////////////////////////////////////////////
+MainFrameBase::~MainFrameBase() {
+///////////////////////////////////////////////////////////////////
+	// beautifying only
+	logger->GetParent()->SetBackgroundColour(*wxBLACK);
+
+	delete logger;
+	delete startupTrace;
+	delete tmpTraceInfo;
+	delete controllerMsgHistory;
+}
+
 ///////////////////////////////////////////////////////////////////
 MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
-: MainFrameBClass(parent)
+: MainFrameBase(parent)
 , GlobalConfigManager(this, GetPgMgrSetup(), globalConfig)
 , updateManagerThread(NULL)
 , gamepadThread(NULL)
@@ -188,6 +190,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , speedMonitor(NULL)
 , motionVertexCtrl(NULL)
 , cncPreprocessor(NULL)
+, parsingSynopisis(NULL)
 , gCodeSequenceList(NULL)
 , cncSummaryListCtrl(NULL)
 , accelGraphPanel(NULL)
@@ -317,6 +320,9 @@ MainFrame::~MainFrame() {
 	
 	if ( cnc != NULL )
 		delete cnc;
+	
+	// debug helper
+	//wxMessageBox("MainFrame::~MainFrame() Final break . . .");
 	
 	DeletePendingEvents();
 	GBL_CONFIG->destroyTheApp();
@@ -597,15 +603,15 @@ void MainFrame::installCustControls() {
 	GblFunc::replaceControl(m_mainFileViewPlaceholder, fileView);
 	
 	// Inbound File Preview
-	mainFilePreview = new CncFilePreview(this);
+	mainFilePreview = new CncFilePreview(this, "GLMainPreview");
 	GblFunc::replaceControl(m_filePreviewPlaceholder, mainFilePreview);
 	
 	// Outbound File Preview
-	outboundFilePreview = new CncFilePreview(this);
+	outboundFilePreview = new CncFilePreview(this, "GLOutboundPreview");
 	GblFunc::replaceControl(m_outboundPreviewPlaceholder, outboundFilePreview);
 
 	// File Preview
-	monitorFilePreview = new CncFilePreview(this);
+	monitorFilePreview = new CncFilePreview(this, "GLMontiorPreview");
 	GblFunc::replaceControl(m_monitorTemplatePreviewPlaceHolder, monitorFilePreview);
 	
 	// tool magazine
@@ -632,6 +638,10 @@ void MainFrame::installCustControls() {
 	cncPreprocessor = new CncPreprocessor(this); 
 	GblFunc::replaceControl(m_preprocessorPlaceholder, cncPreprocessor);
 	
+	// parsing synopsis
+	parsingSynopisis = new CncParsingSynopsisTrace(this); 
+	GblFunc::replaceControl(m_motionSynopsisPlaceholder, parsingSynopisis);
+
 	// summary list
 	cncSummaryListCtrl = new CncSummaryListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL); 
 	GblFunc::replaceControl(m_cncSummaryListCtrl, cncSummaryListCtrl);
@@ -816,39 +826,38 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	selectMonitorBookTemplatePanel();
+	
+	
+	
+	std::cout << "§asdadsadadadasdad"<< std::endl;
 
-	CncNanoTimestamp ts1 =  CncTimeFunctions::getNanoTimestamp();
-	CncTimeFunctions::sleepMircoseconds(300);
-	CncNanoTimestamp ts2 =  CncTimeFunctions::getNanoTimestamp();
-	std::cout << ( ts2 - ts1 ) / 1000 << std::endl;
+	//std::clog << "§asdadsadadadasdad"<< std::endl;
 
+	//CNC_PRINT_FUNCT;
+
+
+//#define CNC_LOG_FUNCT			wxString::Format( "[ %s ]", 	cnc::lformat(__PRETTY_FUNCTION__, 84).c_str() )
+//#define CNC_LOG_FUNCT_A(msg)	wxString::Format( "[ %s: %s ]", cnc::lformat(__PRETTY_FUNCTION__, 84).c_str(), msg)
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 
-std::cout << wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION).GetAsString() << std::endl;
-
-	std::cout << GBL_CONFIG->connvert_MM_SEC_TO_STP_SEC_X(45.0) << std::endl;
-	std::cout << GBL_CONFIG->connvert_STP_SEC_TO_MM_MIN_X(3000) << std::endl;
-
+	for (int i=0; i< 10000; i++)
+		getLogger()->AppendText('X');
+		
+	getLogger()->AppendChar('\n');
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	//GblFunc::stacktrace(std::clog);
 	
-	if ( cnc == NULL )
-		return;
-	
-	wxDateTime ts = wxDateTime::UNow();
-	std::cout << ts.FormatISOTime() << "." << ts.GetMillisecond() << std::endl;
-		bool ret = cnc->getSerialExtern()->test();
-		std::cout << "cnc->getSerial()->test() = " << ret  << std::endl;
-	ts = wxDateTime::UNow();
-	std::cout << ts.FormatISOTime() << "." << ts.GetMillisecond() << std::endl;
+	std::cerr << "Hallo\n";
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -863,8 +872,7 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	out << " :: g++ version info: " 
-		<< __GNUC__
+	out << __GNUC__
 		<< "."
 		<< __GNUC_MINOR__
 		<< "."
@@ -874,8 +882,7 @@ void MainFrame::traceGccVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceWxWidgetsVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	out << " :: wxWidgets version info: " 
-		<< wxMAJOR_VERSION
+	out << wxMAJOR_VERSION
 		<< "."
 		<< wxMINOR_VERSION
 		<< "."
@@ -891,8 +898,7 @@ void MainFrame::traceWxWidgetsVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceBoostVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	out << " :: Boost version info: " 
-		<< BOOST_VERSION / 100000
+	out << BOOST_VERSION / 100000
 		<< "."
 		<< BOOST_VERSION / 100 % 1000
 		<< "."
@@ -902,9 +908,7 @@ void MainFrame::traceBoostVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
-	out << " :: Programm version info: " 
-		<< globalStrings.programVersion
-		<< std::endl;
+	out << globalStrings.programVersion << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::startupTimer(wxTimerEvent& event) {
@@ -913,32 +917,93 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	perspectiveHandler.loadPerspective("Default");
 	decorateViewMenu();
 	
-	// Version infos
-	std::clog << "Version Information:" << std::endl;
-	traceGccVersion(std::cout);
-	traceWxWidgetsVersion(std::cout);
-	traceBoostVersion(std::cout);
-	
-	GLContextBase::traceOpenGLVersionInfo(std::cout);
-	traceWoodworkingCncVersion(std::cout);
-	traceSessionId();
-	std::cout << std::endl;
+	{
+		CncNanoTimestamp ts1 = 0;
+		
+		// force the OpenGL as well as GLEW initialization
+		{
+			// wait intil the main windows is shown
+			// this is with respect to the calls below
+			ts1 = CncTimeFunctions::getNanoTimestamp();
+			while ( IsShown() == false ) {
+				dispatchAll(); 
+				
+				if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) { 
+					std::cerr << "MainFrame::startupTimer(): Timeout reached for 'MainFrame::IsShown()'" << std::endl;
+					break; 
+				}
+			}
+		
+		}
+		
+		// GTK specific: This is to hide the corresponding windows
+		toggleMotionMonitorOptionPane(true);
+		toggleMotionMonitorStatisticPane(true);
+		
+		// wait until the mainframe is shown on screen
+		ts1 = CncTimeFunctions::getNanoTimestamp();
+		while ( IsShownOnScreen() == false ) {
+			dispatchAll(); 
+			
+			if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) { \
+				std::cerr 	<< "MainFrame::startupTimer(): Timeout reached for 'MainFrame::IsShownOnScreen()'" << std::endl;
+				break; 
+			}
+		}
+
+		// wait until the motion monitor is shown on screen
+		auto breakWait = [&]() {
+			return  motionMonitor->IsShown() && mainFilePreview->IsShown() && 
+					monitorFilePreview->IsShown() && outboundFilePreview->IsShown();
+		};
+		
+		ts1 = CncTimeFunctions::getNanoTimestamp();
+		while ( breakWait() == false ) {
+			dispatchAll();
+			
+			if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) {
+				std::cerr 	<< "MainFrame::startupTimer(): Timeout reached"  << std::endl
+							<< " motionMonitor       : " << motionMonitor->IsShown() << std::endl
+							<< " mainFilePreview     : " << mainFilePreview->IsShown() << std::endl
+							<< " monitorFilePreview  : " << monitorFilePreview->IsShown() << std::endl
+							<< " outboundFilePreview : " << outboundFilePreview->IsShown() << std::endl;
+				break; 
+			}
+		}
+		
+			selectMainBookPreviewPanel();
+			if ( mainFilePreview->initGCodePreview() == false )
+				std::cerr << "MainFrame::startupTimer(): Failed to init mainFilePreview!" << std::endl;
+
+			selectMonitorBookTemplatePanel();
+			if ( monitorFilePreview->initGCodePreview() == false)
+				std::cerr << "MainFrame::startupTimer(): Failed to init monitorFilePreview!" << std::endl;
+
+			selectMonitorBookCncPanel();
+			m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+			m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
+			if ( motionMonitor->isContextValid() == false )
+				std::cerr << "MainFrame::startupTimer(): Failed to init motionMonitor!" << std::endl;
+
+		GLCommon::initOpenGL();
+		
+		// Version infos
+		std::stringstream ss;
+		ss.str(""); traceGccVersion(ss); 			GBL_CONTEXT->versionInfoMap["gcc"] 			= ss.str().c_str();
+		ss.str(""); traceWxWidgetsVersion(ss); 		GBL_CONTEXT->versionInfoMap["wxWidgets"] 	= ss.str().c_str();
+		ss.str(""); traceBoostVersion(ss); 			GBL_CONTEXT->versionInfoMap["boost"] 		= ss.str().c_str();
+		ss.str(""); traceWoodworkingCncVersion(ss); GBL_CONTEXT->versionInfoMap["program"] 		= ss.str().c_str();
+		
+		traceSessionId();
+		std::cout << std::endl;
+	}
 	
 	// Auto connect ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
 		connectSerialPortDialog();
-		
-	// wait intil the main windows is shown
-	// this is with respect to the toggle* calls below
-	{
-		while ( IsShown() == false )
-			dispatchAll();
-			
-		// GTK specific: This is to hide the correponding windows
-		toggleMotionMonitorOptionPane(true);
-		toggleMotionMonitorStatisticPane(true);
-	}
-	
+
+	openInitialTemplateFile();
+
 	// Auto process ?
 	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
 		defineMinMonitoring();
@@ -950,12 +1015,12 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 void MainFrame::traceTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	// trace info handling
-	if ( m_tmpTraceInfo->GetValue().IsEmpty() ) traceTimerCounter = 0;
-	else 										traceTimerCounter += event.GetInterval();
+	if ( getTrace()->GetValue().IsEmpty() ) traceTimerCounter = 0;
+	else 									traceTimerCounter += event.GetInterval();
 	
 	if ( traceTimerCounter > 4000 ) {
 		traceTimerCounter = 0;
-		m_tmpTraceInfo->Clear();
+		getTrace()->Clear();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -1597,14 +1662,12 @@ void MainFrame::initializeGamepadThread() {
 	
 	activateGamepadNotifications(true);
 }
-/*
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::Show(bool show) {
 ///////////////////////////////////////////////////////////////////
-	MainFrameBClass::Show(show);
-		
-	std::cout << "adsadasdasdasd\n";
-}*/
+	bool ret = MainFrameBClass::Show(show);
+	return ret;
+}
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
@@ -1720,20 +1783,21 @@ bool MainFrame::initializeCncControl() {
 bool MainFrame::initializeLruMenu() {
 ///////////////////////////////////////////////////////////////////
 	//load lru list from config file
-	lruFileList.load(lruStore);
-	
-	CncConfig* cncConfig = CncConfig::getGlobalCncConfig();
-	
+	return lruFileList.load(lruStore);
+}
+///////////////////////////////////////////////////////////////////
+bool MainFrame::openInitialTemplateFile() {
+///////////////////////////////////////////////////////////////////
 	wxString value;
-	cncConfig->getDefaultTplDir(value);
+	GBL_CONFIG->getDefaultTplDir(value);
 	fileView->setDefaultPath(value);
 	fileView->selectDefaultPath();
 	
-	cncConfig->getDefaultTplFile(value);
+	GBL_CONFIG->getDefaultTplFile(value);
 	wxFileName fn;
 	if ( value.length() > 0 ) 	fn.Assign(value);
 	else 						fn.Assign(lruFileList.getFileName(0));
-	
+
 	if ( fn.Exists() ) {
 		m_inputFileName->SetValue(fn.GetFullName());
 		m_inputFileName->SetHint(fn.GetFullPath());
@@ -1743,7 +1807,7 @@ bool MainFrame::initializeLruMenu() {
 		introduceCurrentFile();
 		
 	} else {
-		cncConfig->getDefaultTplDir(value);
+		GBL_CONFIG->getDefaultTplDir(value);
 		fileView->openDirectory(value);
 		
 		selectMainBookSourcePanel();
@@ -2103,10 +2167,6 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cncPreprocessor->enableMoveSequences(setup.moveSequences);
 	}
 	
-	if ( motionVertexCtrl != NULL ) {
-		motionVertexCtrl->connect(setup.vertexTrace);
-	}
-	
 	// add on
 	const bool probeMode = GBL_CONTEXT->isProbeMode();
 	if ( speedMonitor )
@@ -2235,7 +2295,7 @@ void MainFrame::enableControls(bool state) {
 	
 	// at least update motion monitor
 	if ( state == true )
-		motionMonitor->display();
+		motionMonitor->Refresh();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::connect(wxCommandEvent& event) {
@@ -2245,7 +2305,7 @@ void MainFrame::connect(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_logger->Clear();
+	getLogger()->Clear();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::setControllerZero(bool x, bool y, bool z) {
@@ -2412,7 +2472,7 @@ void MainFrame::updateMonitoring() {
 	
 	if ( motionMonitor != NULL ) {
 		motionMonitor->enable(m_menuItemUpdDraw->IsChecked());
-		motionMonitor->display();
+		motionMonitor->Refresh();
 	}
 	
 	GBL_CONTEXT->setOnlineUpdateCoordinates(m_menuItemUpdCoors->IsChecked());
@@ -2611,14 +2671,19 @@ bool MainFrame::openFile(int sourcePageToSelect) {
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::prepareMotionMonitorViewType(const CncDimensions type) {
+void MainFrame::prepareMotionMonitorViewType() {
 ///////////////////////////////////////////////////////////////////
-	switch ( type ) {
+	const GLContextBase::ModelType mt = sourceEditor->getModelType();
+	motionMonitor->setModelType(mt);
+
+	switch ( sourceEditor->getModelViewType() ) {
 		case CncDimensions::CncDimension2D:		motionMonitor->viewTop();
 												break;
 												
 		default:								motionMonitor->viewIso1();
 	}
+	
+	motionMonitor->Refresh();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
@@ -2629,10 +2694,7 @@ void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 	selectMainBookSourcePanel(sourcePageToSelect);
 	
 	// publish model type
-	const GLContextBase::ModelType mt = sourceEditor->getModelType();
-	motionMonitor->setModelType(mt);
-	
-	prepareMotionMonitorViewType(sourceEditor->getModelViewType());
+	prepareMotionMonitorViewType();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::prepareNewTemplateFile() {
@@ -3657,10 +3719,6 @@ void MainFrame::nootebookConfigChanged(wxListbookEvent& event) {
 					collectSummary();
 					break;
 					
-			case OutboundCfgSelection::VAL::CNC_SETTER_PANEL:
-					updateSetterList();
-					break;
-					
 			case OutboundCfgSelection::VAL::CNC_PIN_PANEL:
 					if ( runActive == true ) {
 						cnc::trc.logWarning("During an active run controller requests are not possible! Ty it later again.");
@@ -3706,17 +3764,19 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		// as a result the processing slows down significantly.
 		CncConfig::NotificationDeactivator cfgNotDeactivation;
 		
-		
 		wxString fn (getCurrentTemplatePathFileName());
 		if ( fn.IsEmpty() == true )
 			return false;
 
+		// do this before the clearing opertions below, 
+		// because then the ref pos correction will be also removed
+		// as well as the previous drawing
+		if ( checkReferencePositionState() == false )
+			return false;
+		
 		clearMotionMonitor();
 		decorateOutboundSaveControls(false);
 		cncPreprocessor->clearAll();
-		
-		if ( checkReferencePositionState() == false )
-			return false;
 		
 		if ( cnc->isReadyToRun() == false ) {
 			std::cerr << "MainFrame::processTemplateWrapper: Controller isn't ready to run: Run was rejected!" << std::endl;
@@ -3727,8 +3787,10 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 			ret = checkIfRunCanBeProcessed(confirm);
 			
 		if ( ret == true ) {
+			// This instance starts and stops the speed monitor
+			CncSpeedMonitorRunner smr(speedMonitor, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
 			
-			// process
+			// process with or without the secure dialog
 			if ( useSecureRunDlg == true && isDebugMode == false ) {
 				wxASSERT(secureRunDlg);
 				if ( secureRunDlg->IsShown() )
@@ -3738,15 +3800,15 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 				
 			} 
 			else {
-				CncSpeedMonitorRunner smr(speedMonitor, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
 				ret = processTemplateIntern();
 			}
 			
+			// refresh some periphery
 			motionMonitor->updateMonitorAndOptions();
 			statisticsPane->updateReplayPane();
 		}
 		else {
-			std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed"<< std::endl;
+			std::cerr << "MainFrame::processTemplateWrapper(): checkIfRunCanBeProcessed() failed" << std::endl;
 		}
 		
 		// prepare final statements
@@ -4178,7 +4240,7 @@ void MainFrame::requestReset(wxCommandEvent& event) {
 void MainFrame::requestReset() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	m_logger->Clear();
+	getLogger()->Clear();
 	cnc->processSetter(PID_SEPARATOR, SEPARARTOR_RESET);
 	cnc->setup(true);
 	
@@ -4197,7 +4259,7 @@ void MainFrame::updateFileContentPosition(long x, long y) {
 	// try to select current  line as client id
 	if ( motionMonitor != NULL ) {
 		motionMonitor->setCurrentClientId(y);
-		motionMonitor->display();
+		motionMonitor->Refresh();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -4434,15 +4496,6 @@ void MainFrame::moveZToBottom(wxCommandEvent& event) {
 	disableControls();
 	cnc->moveZToBottom();
 	enableControls();
-}
-///////////////////////////////////////////////////////////////////
-SvgOutputParameters& MainFrame::evaluteSvgOutputParameters(SvgOutputParameters& sop) {
-///////////////////////////////////////////////////////////////////
-	sop.zoomFactor 			= CncConfig::getGlobalCncConfig()->getSvgEmulatorCopyFactor();
-	sop.copyOrigPath 		= CncConfig::getGlobalCncConfig()->getSvgResultWithOrigPathFlag();
-	sop.onlyFirstCrossing 	= CncConfig::getGlobalCncConfig()->getSvgResultOnlyFirstCrossingFlag();
-	
-	return sop;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openConfigurationFile(wxCommandEvent& event) {
@@ -4838,7 +4891,7 @@ void MainFrame::openMonitorPreview(const wxString& fn) {
 	// the call below creates an endlos loop
 	// because selectMonitorBookTemplatePanel 
 	// calls inderetly openMonitorPreview
-	// selectMonitorBookTemplatePanel();
+	//selectMonitorBookTemplatePanel();
 	
 	openPreview(monitorFilePreview, fn);
 }
@@ -5275,6 +5328,13 @@ void MainFrame::changeMonitorListBook(wxListbookEvent& event) {
 	
 	if ( (wxWindow*)event.GetEventObject() == m_listbookMonitor ) {
 		switch ( sel ) {
+			
+			case OutboundMonitorSelection::VAL::CNC_SETTER_PANEL:
+			{
+				updateSetterList();
+				break;
+			}
+			
 			case OutboundMonitorSelection::VAL::MOTION_VERTEX_TRACE:
 			{
 				startAnimationControl();
@@ -5593,9 +5653,9 @@ void MainFrame::toogleSvgEditSearchFlag(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::copyLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_logger->SelectAll();
-	m_logger->Copy();
-	m_logger->SelectNone();
+	getLogger()->SelectAll();
+	getLogger()->Copy();
+	getLogger()->SelectNone();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openFileExtern(const wxString& tool, const char* file) {
@@ -5996,8 +6056,12 @@ void MainFrame::show3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearMotionMonitor() {
 ///////////////////////////////////////////////////////////////////
+	if ( cnc )
+		cnc->resetClientId();
+
 	motionMonitor->clear();
 	statisticsPane->clear();
+	parsingSynopisis->clear();
 	
 	decorateOutboundEditor();
 }
@@ -6051,7 +6115,7 @@ void MainFrame::requestPins(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearControllerMsgHistory(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_controllerMsgHistory->Clear();
+	getCtrlMessageHistory()->Clear();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::clearSerialSpy() {
@@ -6137,17 +6201,6 @@ void MainFrame::cfgStepDelayDropDown(wxAuiToolBarEvent& event) {
 		cfgStepDelayMax(event);
 
 	event.Skip();
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::updateLogger(wxCommandEvent& event) {
-///////////////////////////////////////////////////////////////////
-	if ( m_showLoggerOnDemand->GetValue() == false )
-		return;
-	
-	if ( m_logger->IsShownOnScreen() == false ) {
-		showAuiPane("Logger");
-		m_loggerNotebook->SetSelection(LoggerSelection::VAL::CNC);
-	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::paintDrawPaneWindow(wxPaintEvent& event) {
@@ -6495,7 +6548,7 @@ void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
 	if ( tss != TSS_MONITOR ) {
 		if ( motionMonitor != NULL ) {
 			motionMonitor->setCurrentClientId(clientId);
-			motionMonitor->display();
+			motionMonitor->Refresh();
 		}
 	}
 	
@@ -6598,8 +6651,8 @@ void MainFrame::requestInfoMessage(wxCommandEvent& event) {
 		return;
 		
 	cnc->processCommand(CMD_TEST_INFO_MESSAGE, std::clog);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_MSG_HIST_PANEL);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::CNC_MSG_HIST_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::requestWarningMessage(wxCommandEvent& event) {
@@ -6608,8 +6661,8 @@ void MainFrame::requestWarningMessage(wxCommandEvent& event) {
 		return;
 		
 	cnc->processCommand(CMD_TEST_WARN_MESSAGE, std::clog);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_MSG_HIST_PANEL);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::CNC_MSG_HIST_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::requestErrorMessage(wxCommandEvent& event) {
@@ -6618,8 +6671,8 @@ void MainFrame::requestErrorMessage(wxCommandEvent& event) {
 		return;
 		
 	cnc->processCommand(CMD_TEST_ERROR_MESSAGE, std::clog);
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::SUMMARY_PANEL);
-	m_notebookConfig->SetSelection(OutboundCfgSelection::VAL::CNC_MSG_HIST_PANEL);
+	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::CNC_MSG_HIST_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::goPosSypFirstId(wxCommandEvent& event) {
@@ -6753,7 +6806,7 @@ void MainFrame::decorateProbeMode(bool probeMode) {
 	
 	if ( motionMonitor != NULL ) {
 		motionMonitor->decorateProbeMode(GBL_CONTEXT->isProbeMode());
-		motionMonitor->display();
+		motionMonitor->Refresh();
 	}
 }
 /////////////////////////////////////////////////////////////////////
@@ -6812,74 +6865,6 @@ void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 			updateManagerThread->Resume();
 		}
 	}
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::keyDownLogger(wxKeyEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
-	const int c = event.GetUnicodeKey();
-	
-	if ( c == 'C' && ctlKey == true ) {
-		bool unselect = false;
-		
-		if ( m_logger->HasSelection() == false ) {
-			m_logger->SelectAll();
-			unselect = true;
-		}
-		
-		m_logger->Copy();
-		
-		if ( unselect == true )
-			m_logger->SelectNone();
-			
-		m_logger->Refresh();
-	}
-	
-	event.Skip(true);
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::dclickLogger(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	long pos = m_logger->GetInsertionPoint(), col = -1, row = -1;
-	if ( m_logger->PositionToXY(pos, &col, &row) == false )
-		return;
-		
-	wxString line(m_logger->GetLineText(row));
-	line.Trim(false);
-	line.MakeUpper();
-	
-	if ( line.StartsWith('[') == true ) {
-		line.assign(line.BeforeFirst(']'));
-		line.assign(line.AfterFirst('['));
-		
-	} else if ( line.Contains("LINE") == true ) {
-		int p = line.Find("LINE");
-		bool start = false;
-		wxString ln;
-		for (unsigned int i=p; i<line.length(); i++ ) {
-			
-			if ( start == false && isdigit((char)line[i]) != 0 )
-				start = true;
-			
-			if ( start == true && isdigit((char)line[i]) == 0 )
-				break;
-				
-			if ( start == true )
-				ln.append(line[i]);
-		}
-		
-		line.assign(ln);
-		
-	} else {
-		
-		return;
-	}
-	
-	long lineNumber = -1;
-	if ( line.ToLong(&lineNumber) == false )
-		return;
-	
-	selectSourceControlLineNumber(lineNumber - 1);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::keyDownLruList(wxKeyEvent& event) {
@@ -7606,8 +7591,31 @@ void MainFrame::onSelectSpyUnknownDetails(wxDataViewEvent& event) {
 void MainFrame::showStacktraceStore(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	CncFileContentDialog dlg(this, CncFileNameService::getStackTraceFileName(), "All collected stacktraces", "Stacktrace Store");
+	dlg.scrollToEOF();
 	dlg.SetSize(800, 900);
 	dlg.setWordWrap(false);
 	dlg.ShowModal();
 }
-
+/////////////////////////////////////////////////////////////////////
+void MainFrame::freezeLogger(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	const bool isPrevFrozen = getLogger()->IsFrozen();
+	
+	const wxBitmap bmp = isPrevFrozen ? ImageLibLogger().Bitmap("BMP_FROZEN") : ImageLibLogger().Bitmap("BMP_THAW");
+	const wxString tip = isPrevFrozen ? "Freeze Logger" : "Thaw Logger";
+	const wxColour col = isPrevFrozen ? wxColour(0, 0, 0) : wxColour(80, 180, 180);
+	
+	if ( isPrevFrozen == true )		{ getLogger()->Thaw();		getLogger()->SetBackgroundColour(col); }
+	else							{ getLogger()->Freeze();	getLogger()->SetBackgroundColour(col); }
+	
+	m_freezeLogger->SetValue(!isPrevFrozen);
+	m_freezeLogger->SetToolTip(tip);
+	m_freezeLogger->SetBitmap(bmp);
+	m_freezeLogger->Refresh();
+	m_freezeLogger->Update();
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onShowLoggerOnDemand(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	getLogger()->setShowOnDemandState(m_showLoggerOnDemand->GetValue());
+}

@@ -3,7 +3,7 @@
 
 #include <wx/timer.h>
 
-#include "CncGLCanvas.h"
+#include "3D/CncGLCanvas.h"
 #include "CncPosition.h"
 #include "CncCommon.h"
 #include "3D/VerticeData.h"
@@ -15,10 +15,8 @@ class CncGCodePreview : public CncGlCanvas {
 	public:
 
 		// constructor
-		CncGCodePreview(wxWindow *parent, int *attribList = NULL);
+		CncGCodePreview(wxWindow *parent, wxString name, int *attribList = NULL);
 		virtual ~CncGCodePreview();
-		
-		virtual void display();
 		
 		// is used from global key down hook, that's the reason why it is public
 		void onKeyDown(wxKeyEvent& event);
@@ -36,9 +34,12 @@ class CncGCodePreview : public CncGlCanvas {
 		void onSize(wxSizeEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
 		
+		bool isAlreadyShown() { return isShown; }
+		
 	protected:
-	
-		GLContextCncPathBase* preview;
+		
+		wxString previewName;
+		GLContextGCodePreview* preview;
 		double maxDimension;
 		bool isShown;
 		

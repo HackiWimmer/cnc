@@ -1,5 +1,5 @@
 #include "CncConfig.h"
-#include "CncGLCanvas.h"
+#include "3D/CncGLCanvas.h"
 
 ///////////////////////////////////////////////////
 CncMetricRulerSetup::CncMetricRulerSetup() 
@@ -287,7 +287,9 @@ void CncMetricRulerSetup::createRulerY(GLI::GLAxisRuler& ruler) {
 		if ( cnc::dblCompareNull(fmod(iy, majorScanning)) == true ) {
 			// add label
 			const int label = majorScanning * ( y / majorScanning );
-			addLabel(ruler.axisLables, x, y, z, GLUT_BITMAP_8_BY_13, wxString::Format("%+d", label));
+			#warning ruler y !!!
+			//std::cout << x << std::endl;
+			addLabel(ruler.axisLables, x, y, z, GLUT_BITMAP_8_BY_13, wxString::Format("% +4d", label));
 			
 			// add major scanning line
 			addLine(ruler.axisLines, x - oMajor, x + oMajor, y, y, z - oMajor, z + oMajor);
@@ -345,6 +347,7 @@ CncGlCanvas::CncGlCanvas(wxWindow *parent, int *attribList)
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
 , context(NULL)
 , lastReshape()
+, lastSetCurrent(false)
 , mouseMoveMode(false)
 {
 }
@@ -362,7 +365,7 @@ void CncGlCanvas::view(GLContextBase::ViewMode fm) {
 	
 	const wxSize cs = GetClientSize();
 	context->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
-	display();
+	Refresh();
 }
 //////////////////////////////////////////////////
 void CncGlCanvas::incScale() {
@@ -395,7 +398,7 @@ void CncGlCanvas::reshapeRelative(int dx, int dy) {
 	const int ny 	= cs.GetHeight() - lastReshape.y - dy;
 	
 	context->reshape(cs.GetWidth(), cs.GetHeight(), nx, ny);
-	display();
+	Refresh();
 }
 //////////////////////////////////////////////////
 void CncGlCanvas::onMouse(wxMouseEvent& event) {
@@ -414,7 +417,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 	if ( rot != 0 ) {
 		if (rot < 0 ) 	decScale();
 		else 			incScale();
-		display();
+		Refresh();
 	}
 	
 	// move origin
@@ -453,7 +456,7 @@ void CncGlCanvas::onMouse(wxMouseEvent& event) {
 			const int y = cs.GetHeight() - event.GetY();
 			
 			context->reshape(cs.GetWidth(), cs.GetHeight(), x, y);
-			display();
+			Refresh();
 		}
 	}
 }

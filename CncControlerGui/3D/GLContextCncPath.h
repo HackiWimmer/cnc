@@ -10,8 +10,6 @@ class GLContextCncPath : public GLContextCncPathBase {
 		GLContextCncPath(wxGLCanvas* canvas);
 		virtual ~GLContextCncPath();
 		
-		virtual const char* getContextName() { return "GLContextCncPath"; };
-		
 	protected:
 		virtual void initContext();
 		virtual void determineProjection(int w, int h);

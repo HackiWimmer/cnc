@@ -15,15 +15,18 @@ class GLContextCncPathBase : public GLContextBase {
 		enum DrawType { DT_POINTS, DT_LINE_STRIP };
 		
 		/////////////////////////////////////////////////////////
-		GLContextCncPathBase(wxGLCanvas* canvas);
+		GLContextCncPathBase(wxGLCanvas* canvas, wxString contextName);
 		virtual ~GLContextCncPathBase();
 		
 		void clearPathData();
-		const GLI::GLCncPath& getPathData() { return cncPath; }
 		void appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex);
-		void setCurrentClientId(long id) { currentClientId = id; }
+		void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt);
+		
+		const GLI::GLCncPath& getPathData() 				{ return cncPath; }
+		void setCurrentClientId(long id) 					{ currentClientId = id; }
 		GLContextCncPathBase::DrawType getDrawType() 		{ return drawType; }
 		void setDrawType(GLContextCncPathBase::DrawType t) 	{ drawType = t; }
+		GLOpenGLPathBufferStore* getOpenGLBufferStore() 	{ return cncPath.getOpenGLBufferStore(); }
 		
 		// ruler
 		/////////////////////////////////////////////////////////
@@ -62,7 +65,6 @@ class GLContextCncPathBase : public GLContextBase {
 		void activateNotifications() 	{ cncPath.activateNotifications(); }
 		void deactivateNotifications() 	{ cncPath.deactivateNotifications(); }
 		
-		GLOpenGLPathBufferStore* getVertexBufferStore()					{ return cncPath.getVertexBufferStore(); }
 		void registerCallback(GLI::GLCncPath::Callback* cb) 			{ cncPath.registerCallback(cb);   }
 		
 	protected:
@@ -84,6 +86,8 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		void drawBoundBox();
 		void drawRuler();
+		
+		friend class CncMotionMonitor;
 };
 
 #endif

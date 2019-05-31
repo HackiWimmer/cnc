@@ -10,7 +10,7 @@ CMAKE_LIST_FILE=CMakeLists.$1.txt
 		echo "call cmake ."
 		cmake .
 	
-		rm CMakeLists.txt
+		#rm CMakeLists.txt
 	
 	else
 		echo "**************************************"

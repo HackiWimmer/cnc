@@ -10,8 +10,6 @@ class GLContextTestCube : public GLContextCncPathBase {
 		GLContextTestCube(wxGLCanvas* canvas);
 		virtual ~GLContextTestCube();
 		
-		virtual const char* getContextName() { return "GLContextTestCube"; };
-		
 	protected:
 		virtual void initContext();
 		virtual void determineProjection(int w, int h);

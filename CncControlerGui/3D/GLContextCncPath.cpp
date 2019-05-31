@@ -4,7 +4,7 @@
 
 /////////////////////////////////////////////////////////////////
 GLContextCncPath::GLContextCncPath(wxGLCanvas* canvas) 
-: GLContextCncPathBase(canvas)
+: GLContextCncPathBase(canvas, "GLContextCncPath")
 {
 /////////////////////////////////////////////////////////////////
 	// do something here on demand
@@ -24,6 +24,9 @@ GLViewPort* GLContextCncPath::createViewPort() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPath::initContext() {
 /////////////////////////////////////////////////////////////////
+	if ( GLCommon::getTraceLevel() > 1 )
+		std::cout << "GLContextCncPath::initContext()" << std::endl;
+	
 	// do context specific initalization here
 	if ( isProbeMode() )	glClearColor(0.0, 0.0, 0.0, 0.0);
 	else 					glClearColor(22.0/255.0, 22.0/255.0, 22.0/255.0, 0.0);
@@ -38,13 +41,13 @@ void GLContextCncPath::initContext() {
 		glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 	}
 	
-	GLOpenGLPathBuffer::VertexColours& colours = cncPath.getColoursAsReference();
-	colours.rapid 	= options.rapidColour;
-	colours.work 	= options.workColour;
-	colours.user 	= options.userColour;
-	colours.max 	= options.maxColour;
-	
-	cncPath.setColours(colours);
+	GLOpenGLPathBuffer::VertexColours colours =  GLOpenGLPathBuffer::getColours();
+	colours.rapid 		= options.rapidColour;
+	colours.work 		= options.workColour;
+	colours.user 		= options.userColour;
+	colours.max 		= options.maxColour;
+	colours.rapidAlpha	= options.rapidAlpha;
+	GLOpenGLPathBuffer::setColours(colours);
 	
 	// currently this didn't work correctly
 	//glEnable(GL_SCISSOR_TEST);

@@ -157,6 +157,10 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncLoggerProxy.cpp"/>
+      <File Name="CncLoggerProxy.h"/>
+      <File Name="CncParsingSynopsisTrace.h"/>
+      <File Name="CncParsingSynopsisTrace.cpp"/>
       <File Name="CncMotionVertexTrace.h"/>
       <File Name="CncMotionVertexTrace.cpp"/>
       <File Name="CncExceptions.h"/>
@@ -234,9 +238,6 @@
       <File Name="CncPosition.h"/>
       <File Name="CncStreamBuffers.h"/>
       <File Name="CncToolStateControl.h"/>
-      <File Name="CommandTemplates.h"/>
-      <File Name="PointAbs.h"/>
-      <File Name="LinearFunc.h"/>
       <File Name="CncStreamBuffers.cpp"/>
       <File Name="CncZView.cpp"/>
       <File Name="CncCommon.cpp"/>
@@ -268,11 +269,14 @@
       <File Name="main.cpp"/>
       <File Name="MainFrame.cpp"/>
       <File Name="MainFrame.h"/>
-      <File Name="StdStreamRedirector.h"/>
       <File Name="UpdateManagerThread.h"/>
       <File Name="UpdateManagerThread.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="PointAbs.h"/>
+      <File Name="LinearFunc.h"/>
+      <File Name="CommandTemplates.h"/>
+      <File Name="StdStreamRedirector.h"/>
       <File Name="GlobalStrings.h"/>
       <File Name="sha1.cpp"/>
       <File Name="sha1.h"/>
@@ -364,6 +368,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncParsingSynopsisTraceListCtrl.cpp"/>
+      <File Name="CncParsingSynopsisTraceListCtrl.h"/>
       <File Name="CncMotionMonitorVertexTrace.cpp"/>
       <File Name="CncMotionMonitorVertexTrace.h"/>
       <File Name="CncMoveSequenceListCtrl.h"/>

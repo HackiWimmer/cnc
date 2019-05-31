@@ -19,14 +19,8 @@ CncFilePreviewWnd::~CncFilePreviewWnd() {
 ///////////////////////////////////////////////////////////////////
 void CncFilePreviewWnd::installContent() {
 ///////////////////////////////////////////////////////////////////
-	preview = new CncFilePreview(this);
+	preview = new CncFilePreview(this, "CncFilePreviewWnd");
 	GblFunc::replaceControl(m_previewPlaceHolder, preview);
-}
-///////////////////////////////////////////////////////////////////
-CncFilePreviewWnd::PreviewType CncFilePreviewWnd::autoDetectPreviewType(const wxString& fileName) {
-///////////////////////////////////////////////////////////////////
-	//todo
-	return PT_AUTO;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncFilePreviewWnd::previewFile(const wxString& fileName, PreviewType pt) {
@@ -40,26 +34,7 @@ bool CncFilePreviewWnd::previewFile(const wxString& fileName, PreviewType pt) {
 	m_previewFileName->SetValue(fileName);
 	m_previewFileName->SetToolTip(fileName);
 	
-	if ( pt == PT_AUTO )
-		pt = autoDetectPreviewType(fileName);
-	
-	bool ret = false;
-	switch ( pt ) {
-		case PT_AUTO: 	std::cerr << "CncFilePreviewWnd::previewFile: Can't detect file type for: '" << fileName << "'!" << std::endl;
-						m_previewFileType->SetValue("???");
-						ret = false;
-						break;
-						
-		case PT_SVG:	ret = preview->selectSVGPreview(fileName);
-						m_previewFileType->SetValue("SVG");
-						break;
-						
-		case PT_GCODE:	ret = preview->selectGCodePreview(fileName);
-						m_previewFileType->SetValue("GCODE");
-						break;
-	}
-	
-	return ret;
+	return preview->selectPreview(fileName);
 }
 ///////////////////////////////////////////////////////////////////
 void CncFilePreviewWnd::onClose(wxCloseEvent& event) {

@@ -70,20 +70,6 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		registerProperty(CncApplication_SHOW_TEST_MENU, prop);
 		
 		//...............
-		prop = root->AppendChild( new wxBoolProperty("Use processed setter list", NEXT_PROP_ID, false));
-		prop->Enable(true);
-		prop->SetHelpString(_T(""));
-		prop->SetEditor( wxT("CheckBox") );
-		registerProperty(CncApplication_USE_SETTER_LIST, prop);
-		
-		//...............
-		prop = root->AppendChild( new wxBoolProperty("Clear processed setter list before each run", NEXT_PROP_ID, true));
-		prop->Enable(true);
-		prop->SetHelpString(_T(""));
-		prop->SetEditor( wxT("CheckBox") );
-		registerProperty(CncApplication_CLEAR_SETTER_LIST, prop);
-		
-		//...............
 		pgParameterMgrArr.Clear();
 		pgParameterMgrIntArr.Clear();
 		pgParameterMgrArr.Add(_("Always")); 

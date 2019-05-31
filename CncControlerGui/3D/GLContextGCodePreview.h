@@ -7,12 +7,12 @@
 class GLContextGCodePreview : public GLContextCncPathBase {
 	
 	public:
-		GLContextGCodePreview(wxGLCanvas* canvas);
+		GLContextGCodePreview(wxGLCanvas* canvas, wxString name);
 		virtual ~GLContextGCodePreview();
 		
-		virtual const char* getContextName() { return "GLContextGCodePreview"; };
-		
 	protected:
+		wxString previewName;
+		
 		virtual void initContext();
 		virtual void determineProjection(int w, int h);
 		virtual void determineModel();

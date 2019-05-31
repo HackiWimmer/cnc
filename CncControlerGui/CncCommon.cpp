@@ -10,6 +10,44 @@ namespace cnc {
 };
 
 //////////////////////////////////////////////////////////////
+const wxString& cnc::lformat(wxString& str, unsigned int len, char c) {
+//////////////////////////////////////////////////////////////
+	unsigned int l = 0;
+	if ( ( l = str.length() ) < len )
+		str.assign(wxString::Format("%s%s", str, wxString(c, len - l) ));
+	
+	return str;
+}
+//////////////////////////////////////////////////////////////
+const wxString& cnc::lformat(const char* str, unsigned int len, char c) {
+//////////////////////////////////////////////////////////////
+	if ( str != NULL ) {
+		wxString s(str);
+		return lformat(s, len, c);
+	}
+	
+	return _("");
+}
+//////////////////////////////////////////////////////////////
+const wxString& cnc::rformat(wxString& str, unsigned int len, char c) {
+//////////////////////////////////////////////////////////////
+	unsigned int l = 0;
+	if ( ( l = str.length() ) < len )
+		str.assign(wxString::Format("%s%s", wxString(c, len - l), str ));
+	
+	return str;
+}
+//////////////////////////////////////////////////////////////
+const wxString& cnc::rformat(const char* str, unsigned int len, char c) {
+//////////////////////////////////////////////////////////////
+	if ( str != NULL ) {
+		wxString s(str);
+		return rformat(s, len, c);
+	}
+	
+	return _("");
+}
+//////////////////////////////////////////////////////////////
 void cnc::traceSetterValueList(std::ostream& s, const cnc::SetterValueList& values, int32_t factor) {
 //////////////////////////////////////////////////////////////
 	unsigned int counter = 0;

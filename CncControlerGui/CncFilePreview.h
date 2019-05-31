@@ -8,23 +8,34 @@
 class CncFilePreview : public CncFilePreviewBase
 {
 	public:
-		CncFilePreview(wxWindow* parent);
+		const unsigned int SVG_TAB_PAGE 	= 0;
+		const unsigned int GCODE_TAB_PAGE 	= 1;
+		
+		CncFilePreview(wxWindow* parent, wxString name);
 		virtual ~CncFilePreview();
 		
+		bool initGCodePreview();
 		bool selectEmptyPreview();
-		bool selectSVGPreview(const wxString& fileName);
-		bool selectGCodePreview(const wxString& fileName);
-		bool selectBinaryPreview(const wxString& fileName);
-		
 		bool selectPreview(const wxString& fileName);
+		
+		friend class CncFilePreviewWnd;
 		
 	private:
 		CncGCodePreview* 	gcodePreview;
 		CncSvgViewer* 		svgPreview;
+		wxString			previewName;
+		wxString			lastFileName;
 		
-		void installContent();
- 
 	protected:
+		
+		bool loadFile();
+		
+		bool selectSVGPreview();
+		bool selectGCodePreview();
+		bool selectBinaryPreview(const wxString& fileName);
+
+		virtual void previewBookChanged(wxNotebookEvent& event);
+		virtual void previewBookPaint(wxPaintEvent& event);
 		
 		virtual void show3D(wxCommandEvent& event);
 		virtual void showFromBottom3D(wxCommandEvent& event);

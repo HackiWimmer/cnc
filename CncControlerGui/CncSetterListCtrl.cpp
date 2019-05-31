@@ -42,8 +42,8 @@ CncSetterListCtrl::CncSetterListCtrl(wxWindow *parent, long style)
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
-	imageList->Add(ImageLibSetterList().Bitmap("BMP_SETTER"));		// 0
-	imageList->Add(ImageLibSetterList().Bitmap("BMP_SEPARATOR"));	// 1
+	imageList->Add(ImageLibSetterList().Bitmap("BMP_SETTER_VALUE"));		// 0
+	imageList->Add(ImageLibSetterList().Bitmap("BMP_SETTER_SEPARATOR"));	// 1
 	
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 	

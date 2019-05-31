@@ -630,9 +630,8 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 //////////////////////////////////////////////////////////////////
 	unitCalculator.changeInputUnit(u);
 	
-	CncUnitCalculator<float> uc(Unit::mm, u);
-	
 	CncCurveLib::Setup s;
+	CncUnitCalculator<float> uc(Unit::mm, u);
 	s.resolution.size = uc.convert(GBL_CONFIG->getRenderResolutionMM());
 	
 	lineCurve.init(s);
@@ -640,11 +639,10 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 	quadraticBezierCurve.init(s);
 	cubicBezierCurve.init(s);
 	
-	if ( trace == true ) {
-		std::stringstream ss;
-		ss << " " << getName() << ": Setup " << unitCalculator;
-		cnc::trc.logInfo(ss.str().c_str()); 
-	}
+	std::stringstream ss;
+	ss << " " << getName() << ": Setup " << unitCalculator;
+	THE_APP->getParsingSynopsisTrace()->addSeparator();
+	THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("%s", ss.str()));
 }
 //////////////////////////////////////////////////////////////////
 void PathHandlerBase::tracePathList(std::ostream &ostr) {
