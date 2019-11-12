@@ -1,7 +1,6 @@
 #include <iostream>
 #include "3D/GLContextGCodePreview.h"
 #include "3D/GLInclude.h"
-
 /////////////////////////////////////////////////////////////////
 GLContextGCodePreview::GLContextGCodePreview(wxGLCanvas* canvas, wxString name) 
 : GLContextCncPathBase(canvas, name)
