@@ -543,7 +543,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": ""
+           "m_path": "bitmaps/CodeLite/16-mime-svg.png"
           }, {
            "type": "bool",
            "m_label": "Selected",
@@ -740,7 +740,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": ""
+           "m_path": "bitmaps/db.png"
           }, {
            "type": "bool",
            "m_label": "Selected",
@@ -937,7 +937,7 @@
           }, {
            "type": "bitmapPicker",
            "m_label": "Bitmap File:",
-           "m_path": ""
+           "m_path": "bitmaps/16-db-column.png"
           }, {
            "type": "bool",
            "m_label": "Selected",

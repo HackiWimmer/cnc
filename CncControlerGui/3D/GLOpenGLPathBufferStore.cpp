@@ -568,7 +568,7 @@ unsigned long GLOpenGLPathBufferStore::appendVertex(const GLOpenGLPathBuffer::Cn
 /////////////////////////////////////////////////////////////
 	if ( initialize() == false )
 		return 0;
-
+		
 	if ( bufferStore.size() == 0 )
 		addBuffer();
 		

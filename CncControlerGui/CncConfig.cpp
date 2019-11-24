@@ -1,7 +1,6 @@
 #include <sstream>
 #include <wx/msgdlg.h>
 #include "MainFrame.h"
-#include "wxcrafter.h"
 #include "CncConfigCommon.h"
 #include "CncUnitCalculator.h"
 #include "CncContext.h"

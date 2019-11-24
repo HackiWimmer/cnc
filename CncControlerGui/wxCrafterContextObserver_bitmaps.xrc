@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <resource xmlns="http://www.wxwidgets.org/wxxrc">
   <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-db-column">bitmaps\16-db-column.png</object>
+  <object class="wxBitmap" name="16-db-column@2x">bitmaps\16-db-column@2x.png</object>
+  <object class="wxBitmap" name="16-mime-svg">bitmaps\CodeLite\16-mime-svg.png</object>
+  <object class="wxBitmap" name="16-mime-svg@2x">bitmaps\CodeLite\16-mime-svg@2x.png</object>
+  <object class="wxBitmap" name="db">bitmaps\db.png</object>
   <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
   <object class="wxBitmap" name="layout-content">bitmaps\layout-content.png</object>
 </resource>

@@ -1,14 +1,14 @@
 #ifndef CNCREFERENCEPOSITION_H
 #define CNCREFERENCEPOSITION_H
-#include "wxcrafter.h"
+
+#include "wxCrafterReferencePosition.h"
 #include "CncControl.h"
 #include "CncNavigatorPanel.h"
-#include "MainFrame.h"
 
 class CncReferencePosition : public CncReferencePositionBase
 {
 	public:
-		CncReferencePosition(MainFrame* parent);
+		CncReferencePosition(wxWindow* parent);
 		virtual ~CncReferencePosition();
 		
 		void setMessage(const wxString& msg);
@@ -23,7 +23,7 @@ class CncReferencePosition : public CncReferencePositionBase
 		bool shouldZeroZ() 	{ return m_btZeroZ->GetValue(); }
 	
 	protected:
-    virtual void onInfoTimer(wxTimerEvent& event);
+		virtual void onInfoTimer(wxTimerEvent& event);
 		virtual void selectInformation(wxMouseEvent& event);
 		virtual void selectStepSensitivity(wxCommandEvent& event);
 		virtual void init(wxInitDialogEvent& event);
@@ -47,8 +47,7 @@ class CncReferencePosition : public CncReferencePositionBase
 		void setMode(short mode);
 		
 	private:
-	
-		MainFrame* parentFrame;
+		
 		CncNavigatorPanel* navigationPanel;
 		wxString infoMessage;
 		

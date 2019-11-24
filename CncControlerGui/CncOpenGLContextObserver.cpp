@@ -1,6 +1,5 @@
 #include "GlobalFunctions.h"
 #include "MainFrame.h"
-#include "wxcrafter.h"
 #include "CncOpenGLContextObserver.h"
 
 //////////////////////////////////////////////////////////////////

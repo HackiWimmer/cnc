@@ -1,6 +1,7 @@
 #ifndef CNCOSENVIRONMENTDIALOG_H
 #define CNCOSENVIRONMENTDIALOG_H
-#include "wxcrafter.h"
+
+#include "wxCrafterBaseDialogs.h"
 
 class CncOSEnvironmentDialog : public CncOSEnvironmentDialogBase {
 	

@@ -1,10 +1,10 @@
 #include "GlobalFunctions.h"
+#include "MainFrame.h"
 #include "CncSecureRun.h"
 
 ///////////////////////////////////////////////////////////////////
-CncSecureRun::CncSecureRun(MainFrame* parent)
+CncSecureRun::CncSecureRun(wxWindow* parent)
 : CncSecureRunBase(parent)
-, parentFrame(parent)
 , remoteControl(NULL)
 , isPause(false)
 , headerFlag(false)
@@ -53,8 +53,8 @@ void CncSecureRun::resetPerspectiveButtons() {
 ///////////////////////////////////////////////////////////////////
 void CncSecureRun::initDialog(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxPoint orignPos = parentFrame->GetScreenPosition();
-	wxPoint pos      = parentFrame->GetRcReset()->GetPosition();
+	wxPoint orignPos = THE_APP->GetScreenPosition();
+	wxPoint pos      = THE_APP->GetRcReset()->GetPosition();
 	orignPos.x += pos.x -38;
 	orignPos.y += pos.y;
 	SetPosition(orignPos);
@@ -97,7 +97,7 @@ void CncSecureRun::hideDialog(int retValue) {
 ///////////////////////////////////////////////////////////////////
 void CncSecureRun::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	bool ret = parentFrame->secureRun();
+	bool ret = THE_APP->secureRun();
 	hideDialog( ret == true ? wxID_OK : wxID_ABORT );
 }
 ///////////////////////////////////////////////////////////////////
@@ -118,13 +118,13 @@ void CncSecureRun::blinkTimer(wxTimerEvent& event) {
 void CncSecureRun::stop(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-	wxPostEvent(parentFrame->GetRcStop(), evt);
+	wxPostEvent(THE_APP->GetRcStop(), evt);
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureRun::emergengy(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-	wxPostEvent(parentFrame->GetBtnEmergenyStop(), evt);
+	wxPostEvent(THE_APP->GetBtnEmergenyStop(), evt);
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureRun::play(wxCommandEvent& event) {
@@ -146,7 +146,7 @@ void CncSecureRun::play(wxCommandEvent& event) {
 	m_btPlay->Update();
 	
 	wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-	wxPostEvent(parentFrame->GetRcPause(), evt);
+	wxPostEvent(THE_APP->GetRcPause(), evt);
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureRun::changeView(wxCommandEvent& event) {
@@ -157,23 +157,23 @@ void CncSecureRun::changeView(wxCommandEvent& event) {
 	resetPerspectiveButtons();
 	button->SetValue(true);
 	
-	if      ( button == m_btViewTop    )	{ evt.SetEventObject(m_btViewTop);							wxPostEvent(parentFrame->Get3D_Top(), 			evt); }
-	else if ( button == m_btViewBottom )	{ evt.SetEventObject(m_btViewBottom); 						wxPostEvent(parentFrame->Get3D_Bottom(), 		evt); }
-	else if ( button == m_btViewFront  )	{ evt.SetEventObject(m_btViewFront); 						wxPostEvent(parentFrame->Get3D_Front(), 		evt); }
-	else if ( button == m_btViewRear   )	{ evt.SetEventObject(m_btViewRear); 						wxPostEvent(parentFrame->Get3D_Rear(), 			evt); }
-	else if ( button == m_btViewLeft   )	{ evt.SetEventObject(m_btViewLeft); 						wxPostEvent(parentFrame->Get3D_Front(), 		evt); }
-	else if ( button == m_btViewRight  )	{ evt.SetEventObject(m_btViewRight);						wxPostEvent(parentFrame->Get3D_Rear(), 			evt); }
-	else if ( button == m_btViewIso1   )	{ evt.SetEventObject(parentFrame->Get3D_Perspective1());	wxPostEvent(parentFrame->Get3D_Perspective1(), 	evt); }
-	else if ( button == m_btViewIso2   )	{ evt.SetEventObject(parentFrame->Get3D_Perspective2());	wxPostEvent(parentFrame->Get3D_Perspective2(),	evt); }
-	else if ( button == m_btViewIso3   )	{ evt.SetEventObject(parentFrame->Get3D_Perspective3());	wxPostEvent(parentFrame->Get3D_Perspective3(), 	evt); }
-	else if ( button == m_btViewIso4   )	{ evt.SetEventObject(parentFrame->Get3D_Perspective4());	wxPostEvent(parentFrame->Get3D_Perspective4(), 	evt); }
+	if      ( button == m_btViewTop    )	{ evt.SetEventObject(m_btViewTop);							wxPostEvent(THE_APP->Get3D_Top(), 			evt); }
+	else if ( button == m_btViewBottom )	{ evt.SetEventObject(m_btViewBottom); 						wxPostEvent(THE_APP->Get3D_Bottom(), 		evt); }
+	else if ( button == m_btViewFront  )	{ evt.SetEventObject(m_btViewFront); 						wxPostEvent(THE_APP->Get3D_Front(), 		evt); }
+	else if ( button == m_btViewRear   )	{ evt.SetEventObject(m_btViewRear); 						wxPostEvent(THE_APP->Get3D_Rear(), 			evt); }
+	else if ( button == m_btViewLeft   )	{ evt.SetEventObject(m_btViewLeft); 						wxPostEvent(THE_APP->Get3D_Front(), 		evt); }
+	else if ( button == m_btViewRight  )	{ evt.SetEventObject(m_btViewRight);						wxPostEvent(THE_APP->Get3D_Rear(), 			evt); }
+	else if ( button == m_btViewIso1   )	{ evt.SetEventObject(THE_APP->Get3D_Perspective1());	wxPostEvent(THE_APP->Get3D_Perspective1(), 	evt); }
+	else if ( button == m_btViewIso2   )	{ evt.SetEventObject(THE_APP->Get3D_Perspective2());	wxPostEvent(THE_APP->Get3D_Perspective2(),	evt); }
+	else if ( button == m_btViewIso3   )	{ evt.SetEventObject(THE_APP->Get3D_Perspective3());	wxPostEvent(THE_APP->Get3D_Perspective3(), 	evt); }
+	else if ( button == m_btViewIso4   )	{ evt.SetEventObject(THE_APP->Get3D_Perspective4());	wxPostEvent(THE_APP->Get3D_Perspective4(), 	evt); }
 }
 ///////////////////////////////////////////////////////////////////
 void CncSecureRun::onKeyDown(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( event.GetKeyCode() == WXK_ESCAPE ) {
 		wxCommandEvent evt(wxEVT_COMMAND_BUTTON_CLICKED);
-		wxPostEvent(parentFrame->GetBtnEmergenyStop(), evt);
+		wxPostEvent(THE_APP->GetBtnEmergenyStop(), evt);
 		
 	} else {
 		if ( remoteControl->IsShownOnScreen() ) {

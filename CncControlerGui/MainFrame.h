@@ -1,7 +1,7 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
 #include <wx/wx.h>
 #include <wx/notifmsg.h>
 #include <wx/generic/notifmsg.h>

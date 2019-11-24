@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="dialog-cancel-3">bitmaps\dialog-cancel-3.png</object>
+  <object class="wxBitmap" name="plugin-add">bitmaps\plugin-add.png</object>
+  <object class="wxBitmap" name="plugin-delete">bitmaps\plugin-delete.png</object>
+  <object class="wxBitmap" name="plugin-edit">bitmaps\plugin-edit.png</object>
+</resource>

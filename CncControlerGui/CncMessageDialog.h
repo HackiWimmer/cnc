@@ -1,7 +1,7 @@
 #ifndef CNCMESSAGEDIALOG_H
 #define CNCMESSAGEDIALOG_H
 
-#include "wxcrafter.h"
+#include "wxCrafterMessageDialog.h"
 
 class CncMessageDialog : public CncMessageDialogBase {
 	

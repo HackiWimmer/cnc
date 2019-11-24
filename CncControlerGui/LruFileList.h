@@ -8,13 +8,14 @@
 #include <wx/listctrl.h>
 #include <wx/imaglist.h>
 #include <wx/string.h>
+#include "wxCrafterImages.h"
 
 typedef std::vector<wxFileName> LruList;
 class LruFileList {
 	
 	private:
 		const char* lruSection = "LRU_List";
-		const char* lruPrefix= "LRU_FILE_";
+		const char* lruPrefix  = "LRU_FILE_";
 		unsigned int size;
 		wxString ret;
 		wxListCtrl* listControl;

@@ -1,6 +1,6 @@
 #include <iostream>
 #include <wx/imaglist.h>
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
 #include "MainFrame.h"
 #include "GlobalStrings.h"
 #include "CncConfig.h"

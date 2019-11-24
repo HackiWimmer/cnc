@@ -1,14 +1,12 @@
 #ifndef SECURERUN_H
 #define SECURERUN_H
 
-#include "wxcrafter.h"
+#include "wxCrafterSecurityRun.h"
 #include "CncMouseRemoteControl.h"
-#include "MainFrame.h"
 
-class CncSecureRun : public CncSecureRunBase
-{
+class CncSecureRun : public CncSecureRunBase {
 	public:
-		CncSecureRun(MainFrame* parent);
+		CncSecureRun(wxWindow* parent);
 		virtual ~CncSecureRun();
 		
 		void enableControls(bool state);
@@ -31,7 +29,6 @@ class CncSecureRun : public CncSecureRunBase
 		void onRemoteControl(CncMouseRemoteControlEvent& event);
 		
 	private:
-		MainFrame* 				parentFrame;
 		CncMouseRemoteControl*	remoteControl;
 		bool       				isPause;
 		bool       				headerFlag;

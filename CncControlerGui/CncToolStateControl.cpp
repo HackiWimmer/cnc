@@ -1,4 +1,5 @@
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
+#include "wxCrafterImages.h"
 #include "CncToolStateControl.h"
 
 //////////////////////////////////////////////////////////////////

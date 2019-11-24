@@ -9,7 +9,7 @@
 #include "OSD/webviewOSD.h"
 #include "CncContext.h"
 #include "CncConfigExt.h"
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
 #include "CncCommon.h"
 #include "FileParser.h"
 

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-x-close">bitmaps\16-x-close.png</object>
+  <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
+  <object class="wxBitmap" name="clean">bitmaps\clean.png</object>
+  <object class="wxBitmap" name="color-swatch">bitmaps\color-swatch.png</object>
+  <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
+  <object class="wxBitmap" name="dialog-question-2 (2)">bitmaps\dialog-question-2 (2).png</object>
+  <object class="wxBitmap" name="gamepad-active">bitmaps\gamepad-active.png</object>
+  <object class="wxBitmap" name="system-run-3">bitmaps\system-run-3.png</object>
+</resource>

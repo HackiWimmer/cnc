@@ -5,6 +5,11 @@
       <![CDATA[00030001N0005Debug0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
     </Plugin>
   </Plugins>
+  <VirtualDirectory Name="wxcrafter">
+    <VirtualDirectory Name="XRC">
+      <File Name="wxCrafterImages.xrc"/>
+    </VirtualDirectory>
+  </VirtualDirectory>
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
@@ -263,12 +268,51 @@
       <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Release;Debug;release2;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterMotionMonitor_bitmaps.cpp"/>
+      <File Name="wxCrafterMotionMonitor.h"/>
+      <File Name="wxCrafterMotionMonitor.cpp"/>
+      <File Name="wxCrafterFileView_bitmaps.cpp"/>
+      <File Name="wxCrafterFileView.h"/>
+      <File Name="wxCrafterFileView.cpp"/>
+      <File Name="wxCrafterToolMagazine_bitmaps.cpp"/>
+      <File Name="wxCrafterToolMagazine.h"/>
+      <File Name="wxCrafterToolMagazine.cpp"/>
+      <File Name="wxCrafterBaseDialogs_bitmaps.cpp"/>
+      <File Name="wxCrafterBaseDialogs.h"/>
+      <File Name="wxCrafterBaseDialogs.cpp"/>
+      <File Name="wxCrafterReferencePosition_bitmaps.cpp"/>
+      <File Name="wxCrafterReferencePosition.h"/>
+      <File Name="wxCrafterReferencePosition.cpp"/>
+      <File Name="wxCrafterSpeedMonitor_bitmaps.cpp"/>
+      <File Name="wxCrafterSpeedMonitor.h"/>
+      <File Name="wxCrafterSpeedMonitor.cpp"/>
+      <File Name="wxCrafterUnitTest_bitmaps.cpp"/>
+      <File Name="wxCrafterUnitTest.h"/>
+      <File Name="wxCrafterUnitTest.cpp"/>
+      <File Name="wxCrafterTemplateObserver_bitmaps.cpp"/>
+      <File Name="wxCrafterTemplateObserver.h"/>
+      <File Name="wxCrafterTemplateObserver.cpp"/>
+      <File Name="wxCrafterSecurityRun_bitmaps.cpp"/>
+      <File Name="wxCrafterSecurityRun.h"/>
+      <File Name="wxCrafterSecurityRun.cpp"/>
+      <File Name="wxCrafterPathGenerator_bitmaps.cpp"/>
+      <File Name="wxCrafterPathGenerator.h"/>
+      <File Name="wxCrafterPathGenerator.cpp"/>
+      <File Name="wxCrafterMessageDialog_bitmaps.cpp"/>
+      <File Name="wxCrafterMessageDialog.h"/>
+      <File Name="wxCrafterMessageDialog.cpp"/>
+      <File Name="wxCrafterMainFrame_bitmaps.cpp"/>
+      <File Name="wxCrafterMainFrame.h"/>
+      <File Name="wxCrafterMainFrame.cpp"/>
+      <File Name="wxCrafterImages_bitmaps.cpp"/>
+      <File Name="wxCrafterImages.h"/>
+      <File Name="wxCrafterImages.cpp"/>
+      <File Name="wxCrafterGamePort_bitmaps.cpp"/>
+      <File Name="wxCrafterGamePort.h"/>
+      <File Name="wxCrafterGamePort.cpp"/>
       <File Name="wxCrafterContextObserver_bitmaps.cpp"/>
       <File Name="wxCrafterContextObserver.h"/>
       <File Name="wxCrafterContextObserver.cpp"/>
-      <File Name="wxcrafter.cpp"/>
-      <File Name="wxcrafter_bitmaps.cpp"/>
-      <File Name="wxcrafter.h"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
       <File Name="GamepadThread.cpp"/>
@@ -402,14 +446,22 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterMotionMonitor.wxcp"/>
+    <File Name="wxCrafterFileView.wxcp"/>
+    <File Name="wxCrafterToolMagazine.wxcp"/>
+    <File Name="wxCrafterBaseDialogs.wxcp"/>
+    <File Name="wxCrafterReferencePosition.wxcp"/>
+    <File Name="wxCrafterSpeedMonitor.wxcp"/>
+    <File Name="wxCrafterUnitTest.wxcp"/>
+    <File Name="wxCrafterTemplateObserver.wxcp"/>
+    <File Name="wxCrafterSecurityRun.wxcp"/>
+    <File Name="wxCrafterPathGenerator.wxcp"/>
+    <File Name="wxCrafterMessageDialog.wxcp"/>
+    <File Name="wxCrafterMainFrame.wxcp"/>
+    <File Name="wxCrafterImages.wxcp"/>
+    <File Name="wxCrafterGamePort.wxcp"/>
     <File Name="wxCrafterContextObserver.wxcp"/>
-    <File Name="wxcrafter.wxcp"/>
     <File Name="win_resources.rc" ExcludeProjConfig=""/>
-  </VirtualDirectory>
-  <VirtualDirectory Name="wxcrafter">
-    <VirtualDirectory Name="XRC">
-      <File Name="wxcrafter.xrc"/>
-    </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Config">
     <File Name="Commands1.txt"/>

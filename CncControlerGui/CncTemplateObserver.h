@@ -1,6 +1,6 @@
 #ifndef CNCTEMPLATEOBSERVER_H
 #define CNCTEMPLATEOBSERVER_H
-#include "wxcrafter.h"
+#include "wxCrafterTemplateObserver.h"
 
 class CncTemplateObserver : public CncTemplateObserverBase {
 	

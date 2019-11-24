@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="ViewButtom">bitmaps\ViewButtom.png</object>
+  <object class="wxBitmap" name="ViewDown">bitmaps\ViewDown.png</object>
+  <object class="wxBitmap" name="ViewFront">bitmaps\ViewFront.png</object>
+  <object class="wxBitmap" name="ViewIso1">bitmaps\ViewIso1.png</object>
+  <object class="wxBitmap" name="ViewIso2">bitmaps\ViewIso2.png</object>
+  <object class="wxBitmap" name="ViewIso3">bitmaps\ViewIso3.png</object>
+  <object class="wxBitmap" name="ViewIso4">bitmaps\ViewIso4.png</object>
+  <object class="wxBitmap" name="ViewLeft">bitmaps\ViewLeft.png</object>
+  <object class="wxBitmap" name="ViewRight">bitmaps\ViewRight.png</object>
+  <object class="wxBitmap" name="ViewUp">bitmaps\ViewUp.png</object>
+  <object class="wxBitmap" name="emergengy-button-klein">bitmaps\emergengy-button-klein.png</object>
+  <object class="wxBitmap" name="secureRunPause">bitmaps\secureRunPause.png</object>
+  <object class="wxBitmap" name="secureRunStop">bitmaps\secureRunStop.png</object>
+</resource>

@@ -1,6 +1,5 @@
 #include <iostream>
 #include <wx/imaglist.h>
-#include "wxcrafter.h"
 #include "MainFrame.h"
 #include "CncConfig.h"
 #include "CncArduino.h"

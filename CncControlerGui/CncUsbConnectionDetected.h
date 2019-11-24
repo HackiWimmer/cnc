@@ -1,6 +1,7 @@
 #ifndef CNCUSBCONNECTIONDETECTED_H
 #define CNCUSBCONNECTIONDETECTED_H
-#include "wxcrafter.h"
+
+#include "wxCrafterBaseDialogs.h"
 
 class CncUsbConnectionDetected : public CncUsbConnectionDetectedBase {
 	

@@ -2,7 +2,7 @@
 #define CNCSPEEDMONITOR_H
 
 #include "OSD/CncTimeFunctions.h"
-#include "wxcrafter.h"
+#include "wxCrafterSpeedMonitor.h"
 
 class CncSpeedMonitor : public CncSpeedMonitorBase {
 

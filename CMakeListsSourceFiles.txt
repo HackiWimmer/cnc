@@ -223,6 +223,30 @@ set(SOURCE_FILES
 	CncControlerGui/CncLargeScaleListCtrl.cpp
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp
+	CncControlerGui/wxCrafterTemplateObserver.cpp
+	CncControlerGui/wxCrafterTemplateObserver_bitmaps.cpp
+	CncControlerGui/wxCrafterUnitTest.cpp
+	CncControlerGui/wxCrafterUnitTest_bitmaps.cpp
+	CncControlerGui/wxCrafterPathGernerator.cpp
+	CncControlerGui/wxCrafterPathGernerator_bitmaps.cpp
+	CncControlerGui/wxCrafterSecurityRun.cpp
+	CncControlerGui/wxCrafterSecurityRun_bitmaps.cpp
+	CncControlerGui/wxCrafterMessageDialog.cpp
+	CncControlerGui/wxCrafterMessageDialog_bitmaps.cpp
+	CncControlerGui/wxCrafterGameport.cpp
+	CncControlerGui/wxCrafterGameport_bitmaps.cpp
+	CncControlerGui/wxCrafterSpeedMonitor.cpp
+	CncControlerGui/wxCrafterSpeedMonitor_bitmaps.cpp
+	CncControlerGui/wxCrafterReferencePosition.cpp
+	CncControlerGui/wxCrafterReferencePosition_bitmaps.cpp
+	CncControlerGui/wxCrafterBaseDialogs.cpp
+	CncControlerGui/wxCrafterBaseDialogs_bitmaps.cpp
+	CncControlerGui/wxCrafterToolMagazine.cpp
+	CncControlerGui/wxCrafterToolMagazine_bitmaps.cpp
+	CncControlerGui/wxCrafterFileView.cpp
+	CncControlerGui/wxCrafterFileView_bitmaps.cpp
+	CncControlerGui/wxCrafterMotionMonitor.cpp
+	CncControlerGui/wxCrafterMotionMonitor_bitmaps.cpp
 	CncControlerGui/wxcrafter.cpp
 	CncControlerGui/wxcrafter_bitmaps.cpp
 )

@@ -1,4 +1,3 @@
-#include "wxcrafter.h"
 #include "MainFrame.h"
 #include "CncConfigCommon.h"
 #include "CncConfig.h"

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="ViewButtom">bitmaps\ViewButtom.png</object>
+  <object class="wxBitmap" name="ViewDown">bitmaps\ViewDown.png</object>
+  <object class="wxBitmap" name="ViewFront">bitmaps\ViewFront.png</object>
+  <object class="wxBitmap" name="ViewIso1">bitmaps\ViewIso1.png</object>
+  <object class="wxBitmap" name="ViewIso2">bitmaps\ViewIso2.png</object>
+  <object class="wxBitmap" name="ViewIso3">bitmaps\ViewIso3.png</object>
+  <object class="wxBitmap" name="ViewIso4">bitmaps\ViewIso4.png</object>
+  <object class="wxBitmap" name="ViewLeft">bitmaps\ViewLeft.png</object>
+  <object class="wxBitmap" name="ViewRight">bitmaps\ViewRight.png</object>
+  <object class="wxBitmap" name="ViewUp">bitmaps\ViewUp.png</object>
+  <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
+  <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
+  <object class="wxBitmap" name="document-open-5">bitmaps\document-open-5.png</object>
+  <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
+  <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
+  <object class="wxBitmap" name="workspace">bitmaps\workspace.png</object>
+</resource>

@@ -68,11 +68,15 @@ CncOpenGLContextObserverBase::CncOpenGLContextObserverBase(wxWindow* parent, wxW
     wxFont m_notebookContextInformationFont(10, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_notebookContextInformation->SetFont(m_notebookContextInformationFont);
     m_notebookContextInformation->SetName(wxT("m_notebookContextInformation"));
+    wxImageList* m_notebookContextInformation_il = new wxImageList(16, 16);
+    m_notebookContextInformation->AssignImageList(m_notebookContextInformation_il);
     
     flexGridSizer8031->Add(m_notebookContextInformation, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelCurrent = new wxPanel(m_notebookContextInformation, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookContextInformation, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_notebookContextInformation->AddPage(m_panelCurrent, _("Current"), false);
+    int m_panelCurrentImgIndex;
+    m_panelCurrentImgIndex = m_notebookContextInformation_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-mime-svg")));
+    m_notebookContextInformation->AddPage(m_panelCurrent, _("Current"), false, m_panelCurrentImgIndex);
     
     wxFlexGridSizer* flexGridSizer8039 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer8039->SetFlexibleDirection( wxBOTH );
@@ -87,7 +91,9 @@ CncOpenGLContextObserverBase::CncOpenGLContextObserverBase(wxWindow* parent, wxW
     flexGridSizer8039->Add(m_currentContextListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelRegistered = new wxPanel(m_notebookContextInformation, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookContextInformation, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_notebookContextInformation->AddPage(m_panelRegistered, _("Registered"), false);
+    int m_panelRegisteredImgIndex;
+    m_panelRegisteredImgIndex = m_notebookContextInformation_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("db")));
+    m_notebookContextInformation->AddPage(m_panelRegistered, _("Registered"), false, m_panelRegisteredImgIndex);
     
     wxFlexGridSizer* flexGridSizer8045 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer8045->SetFlexibleDirection( wxBOTH );
@@ -102,7 +108,9 @@ CncOpenGLContextObserverBase::CncOpenGLContextObserverBase(wxWindow* parent, wxW
     flexGridSizer8045->Add(m_allContextListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_panelHistory = new wxPanel(m_notebookContextInformation, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_notebookContextInformation, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_notebookContextInformation->AddPage(m_panelHistory, _("History"), false);
+    int m_panelHistoryImgIndex;
+    m_panelHistoryImgIndex = m_notebookContextInformation_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-db-column")));
+    m_notebookContextInformation->AddPage(m_panelHistory, _("History"), false, m_panelHistoryImgIndex);
     
     wxFlexGridSizer* flexGridSizer8058 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer8058->SetFlexibleDirection( wxBOTH );

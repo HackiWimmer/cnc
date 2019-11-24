@@ -1,6 +1,7 @@
 #include <wx/dcbuffer.h>
 #include <wx/filedlg.h>
 #include <wx/msgdlg.h>
+#include "wxCrafterImages.h"
 #include "CncFileNameService.h"
 #include "CncSpeedMonitor.h"
 

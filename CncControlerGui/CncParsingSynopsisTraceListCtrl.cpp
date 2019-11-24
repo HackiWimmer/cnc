@@ -1,6 +1,7 @@
 #include <iostream>
 #include <wx/imaglist.h>
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
+#include "wxCrafterImages.h"
 #include "CncParsingSynopsisTraceListCtrl.h"
 
 // ----------------------------------------------------------------------------

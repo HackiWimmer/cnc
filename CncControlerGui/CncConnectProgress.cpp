@@ -1,10 +1,10 @@
 #include <iostream>
+#include "MainFrame.h"
 #include "CncConnectProgress.h"
 
 /////////////////////////////////////////////////////////////////////////
-CncConnectProgress::CncConnectProgress(MainFrame* parent)
+CncConnectProgress::CncConnectProgress(wxWindow* parent)
 : CncConnectProgressBase(parent)
-, parentFrame(parent)
 , pngAnimation(NULL)
 /////////////////////////////////////////////////////////////////////////
 {
@@ -27,8 +27,7 @@ void CncConnectProgress::show(wxShowEvent& event) {
 /////////////////////////////////////////////////////////////////////////
 void CncConnectProgress::startupTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////////
-	wxASSERT(parentFrame);
-	bool ret = parentFrame->connectSerialPort();
+	bool ret = THE_APP->connectSerialPort();
 	
 	EndModal(ret == true ? wxID_OK : wxID_CANCEL);
 }

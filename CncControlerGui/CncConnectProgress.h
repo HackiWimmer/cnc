@@ -1,14 +1,13 @@
 #ifndef CNCCONNECTPROGRESS_H
 #define CNCCONNECTPROGRESS_H
 
-#include "wxcrafter.h"
+#include "wxCrafterBaseDialogs.h"
 #include "Codelite/wxPNGAnimation.h"
-#include "MainFrame.h"
 
 class CncConnectProgress : public CncConnectProgressBase
 {
 	public:
-		CncConnectProgress(MainFrame* parent);
+		CncConnectProgress(wxWindow* parent);
 		virtual ~CncConnectProgress();
 		
 	protected:
@@ -18,7 +17,6 @@ class CncConnectProgress : public CncConnectProgressBase
 		virtual void show(wxShowEvent& event);
 		
 	private:
-		MainFrame*	parentFrame;
 		wxPNGAnimation* pngAnimation;
 		
 		void createAnimationControl();

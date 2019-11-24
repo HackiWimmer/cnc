@@ -3,7 +3,7 @@
 
 #include "CncMotionMonitor.h"
 #include "3D/GLContextBase.h"
-#include "wxcrafter.h"
+#include "wxCrafterMotionMonitor.h"
 
 class GL3DOptionPane : public GL3DOptionPaneBase 
                             , GLContextOptions::Callback

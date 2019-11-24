@@ -1,7 +1,7 @@
 #ifndef CNCPARSINGSYNOPSISTRACE_H
 #define CNCPARSINGSYNOPSISTRACE_H
 
-#include "wxcrafter.h"
+#include "wxCrafterMotionMonitor.h"
 #include "CncParsingSynopsisTraceListCtrl.h"
 
 class CncParsingSynopsisTrace : public CncParsingSynopsisTraceBase {

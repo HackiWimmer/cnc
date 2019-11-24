@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Workspace Name="CnCControl" Database="" Version="10.0.0">
   <Project Name="CncConrollerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
-  <Project Name="FreeGlutWorkspace" Path="FreeGlutWorkspace/FreeGlutWorkspace.project" Active="No"/>
-  <Project Name="GameController" Path="GameController/GameController.project" Active="No"/>
-  <Project Name="NavigatorPanel" Path="NavigatorPanel/NavigatorPanel.project" Active="No"/>
-  <Project Name="wxWidgetsTest" Path="wxWidgetsTest/wxWidgetsTest.project" Active="No"/>
   <BuildMatrix>
     <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>

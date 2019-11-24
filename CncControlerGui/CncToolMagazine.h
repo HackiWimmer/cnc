@@ -2,7 +2,7 @@
 #define CNC_TOOL_MAGAZINE_H
 
 #include "CncConfig.h"
-#include "wxcrafter.h"
+#include "wxCrafterToolMagazine.h"
 
 class CncToolMagazine : public CncToolMagazineBase {
 	

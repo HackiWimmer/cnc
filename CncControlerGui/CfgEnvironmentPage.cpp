@@ -1,4 +1,5 @@
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
+#include "wxCrafterImages.h"
 #include "CncFileNameService.h"
 #include "CncUnitCalculator.h"
 #include "CncConfigCommon.h"
@@ -18,7 +19,8 @@ void CncConfig::setupEnvironmentCfgPage(wxConfigBase& config) {
 	wxFloatingPointValidator<float> validator(3, NULL, wxNUM_VAL_DEFAULT);
 	
 	curCatName.assign("Environment");
-	page = globlSetupGrid->AddPage(curCatName, ImageLibConfig().Bitmap(_("BMP_ENV_CFG")));
+	page = globlSetupGrid->AddPage(curCatName, 
+	ImageLibConfig().Bitmap(_("BMP_ENV_CFG")));
 	root = page->Append( new wxPropertyCategory(curCatName) );
 	
 	PGFuncPtrStore fps;

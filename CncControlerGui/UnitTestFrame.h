@@ -3,10 +3,10 @@
 
 #include "Tests/Test_Base.h"
 #include "StdStreamRedirector.h"
-#include "wxcrafter.h"
+#include "wxCrafterUnitTest.h"
 
 //////////////////////////////////////////////////////////////////
-class UnitTests : public CncUnitTestsBase {
+class UnitTests : public CncUnitTestsBase{
 	
 	public:
 		UnitTests(wxWindow* parent, int initialTestIdx=-1, bool autoRun=false);

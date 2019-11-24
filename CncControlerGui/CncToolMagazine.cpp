@@ -3,6 +3,7 @@
 #include <wx/event.h>
 #include <wx/textentry.h>
 #include <wx/valnum.h>
+#include "wxCrafterImages.h"
 #include "CncToolMagazine.h"
 
 const unsigned int TM_COL_ID			= 1;

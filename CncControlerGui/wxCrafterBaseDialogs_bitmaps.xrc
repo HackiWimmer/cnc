@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
+  <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-console">bitmaps\16-console.png</object>
+  <object class="wxBitmap" name="16-console@2x">bitmaps\16-console@2x.png</object>
+  <object class="wxBitmap" name="16-x-close@2x">bitmaps\16-x-close@2x.png</object>
+  <object class="wxBitmap" name="24-connected@2x">bitmaps\24-connected@2x.png</object>
+  <object class="wxBitmap" name="24-help@2x">bitmaps\24-help@2x.png</object>
+  <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
+  <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
+  <object class="wxBitmap" name="info">bitmaps\info.png</object>
+  <object class="wxBitmap" name="package-link">bitmaps\package-link.png</object>
+  <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
+</resource>

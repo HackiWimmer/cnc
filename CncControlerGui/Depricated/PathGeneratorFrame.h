@@ -2,7 +2,7 @@
 #define PATHGENERATORFRAME_H
 
 #include <wx/string.h>
-#include "wxcrafter.h"
+#include "wxCrafter.h"
 #include "CncCommon.h"
 #include "PathGeneratorStore.h"
 

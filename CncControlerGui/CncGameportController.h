@@ -2,7 +2,7 @@
 #define CNCGAMEPORTCONTROLLER_H
 
 #include "CncGamepadControllerState.h"
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
 
 class CncGameportController : public CncGameportControllerBase {
 	

@@ -1,3 +1,4 @@
+#include "wxCrafterImages.h"
 #include "GlobalFunctions.h"
 #include "CncConfig.h"
 #include "CncContext.h"

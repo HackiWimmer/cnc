@@ -3,11 +3,9 @@
 
 #include <vector>
 #include <wx/dir.h>
-#include "wxcrafter.h"
+#include "wxCrafterFileView.h"
 
 typedef std::vector<wxString> ExtFilterList;
-
-class MainFrame;
 
 class CncFileView : public CncFileViewBase, public wxDirTraverser {
 	
@@ -23,7 +21,7 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		virtual void fileListSelected(wxListEvent& event);
 	
 	public:
-		CncFileView(MainFrame* parent);
+		CncFileView(wxWindow* parent);
 		virtual ~CncFileView();
 		
 		virtual wxDirTraverseResult OnFile(const wxString& filename);
@@ -46,7 +44,6 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		bool previewFile(const wxString& fileName);
 		
 	private:
-		MainFrame* mainFrame;
 		bool avoidSelectListEvent;
 		wxString lastSelection;
 };

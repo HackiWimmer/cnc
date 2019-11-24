@@ -2,11 +2,11 @@
 #include <wx/richtooltip.h>
 #include "CncReferencePosition.h"
 #include "GlobalFunctions.h"
+#include "MainFrame.h"
 #include "CncCommon.h"
 ///////////////////////////////////////////////////////////////////
-CncReferencePosition::CncReferencePosition(MainFrame* parent)
+CncReferencePosition::CncReferencePosition(wxWindow* parent)
 : CncReferencePositionBase(parent)
-, parentFrame(parent)
 , navigationPanel(NULL)
 , infoMessage()
 ///////////////////////////////////////////////////////////////////
@@ -154,11 +154,11 @@ void CncReferencePosition::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 		}
 		
 		if ( move == true )
-			parentFrame->manualContinuousMoveStart(x, y, z);
+			THE_APP->manualContinuousMoveStart(x, y, z);
 	};
 	
 	auto moveStop = [&]() {
-		parentFrame->manualContinuousMoveStop();
+		THE_APP->manualContinuousMoveStop();
 	};
 	
 	/*
@@ -220,7 +220,7 @@ void CncReferencePosition::mode6(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::init(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxPoint pos = parentFrame->GetScreenPosition();
+	wxPoint pos = THE_APP->GetScreenPosition();
 	pos.x += 16;
 	pos.y += 60;
 	SetPosition(pos);
@@ -242,7 +242,7 @@ void CncReferencePosition::init(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::show(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_rbStepSensitivity->SetSelection(parentFrame->GetRbStepSensitivity()->GetSelection());
+	m_rbStepSensitivity->SetSelection(THE_APP->GetRbStepSensitivity()->GetSelection());
 	
 	if ( event.IsShown() ) 
 		m_infoTimer->Start(200);
@@ -271,10 +271,10 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::selectStepSensitivity(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( parentFrame == NULL)
+	if ( THE_APP == NULL)
 		return;
 		
-	parentFrame->GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
+	THE_APP->GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::showInformation() {

@@ -1,7 +1,7 @@
 #ifndef CNC_STARTPOSITION_RESOLVER_H
 #define CNC_STARTPOSITION_RESOLVER_H
 
-#include "wxcrafter.h"
+#include "wxCrafterReferencePosition.h"
 
 class CncStartPositionResolver : public CncStartPositionResolverBase {
 	

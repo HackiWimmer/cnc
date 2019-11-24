@@ -1,7 +1,7 @@
 #ifndef CNCSTATISTICSPANE_H
 #define CNCSTATISTICSPANE_H
 
-#include "wxcrafter.h"
+#include "wxCrafterMotionMonitor.h"
 #include "CncStatisticSummaryListCtrl.h"
 
 class CncControl;

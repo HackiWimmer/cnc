@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-gtk@2x">bitmaps\16-gtk@2x.png</object>
+  <object class="wxBitmap" name="16-word_wrap">bitmaps\16-word_wrap.png</object>
+  <object class="wxBitmap" name="16-word_wrap@2x">bitmaps\16-word_wrap@2x.png</object>
+  <object class="wxBitmap" name="dialog-ok">bitmaps\dialog-ok.png</object>
+  <object class="wxBitmap" name="messagebox_info">bitmaps\messagebox_info.png</object>
+</resource>

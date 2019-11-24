@@ -1,7 +1,7 @@
 #ifndef CNCPREPROCESSOR_H
 #define CNCPREPROCESSOR_H
 
-#include "wxcrafter.h"
+#include "wxCrafterMotionMonitor.h"
 #include "CncMoveSequence.h"
 #include "CncPathListEntry.h"
 

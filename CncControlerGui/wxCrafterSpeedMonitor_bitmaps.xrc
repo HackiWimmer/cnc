@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
+  <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
+  <object class="wxBitmap" name="16-connected">bitmaps\16-connected.png</object>
+  <object class="wxBitmap" name="16-connected@2x">bitmaps\16-connected@2x.png</object>
+  <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
+  <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
+  <object class="wxBitmap" name="appointment-new">bitmaps\appointment-new.png</object>
+  <object class="wxBitmap" name="appointment-new-5">bitmaps\appointment-new-5.png</object>
+  <object class="wxBitmap" name="appointment-soon">bitmaps\appointment-soon.png</object>
+  <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
+</resource>

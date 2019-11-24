@@ -2,7 +2,7 @@
 #define CNCMOTIONVERTEXTRACE_H
 
 #include "CncMotionMonitorVertexTrace.h"
-#include "wxcrafter.h"
+#include "wxCrafterMotionMonitor.h"
 
 class CncMotionVertexTrace : public CncMotionVertexTraceBase {
 	

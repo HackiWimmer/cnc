@@ -2,7 +2,7 @@
 #define GL3DDRAWPANE_H
 
 #include "CncMotionMonitor.h"
-#include "wxcrafter.h"
+#include "wxCrafterMotionMonitor.h"
 
 class GL3DDrawPane : public GL3DDrawPaneBase 
                           , GLContextOptions::Callback

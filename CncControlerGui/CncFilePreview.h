@@ -3,7 +3,7 @@
 
 #include "3D/CncGCodePreview.h"
 #include "CncSvgControl.h"
-#include "wxcrafter.h"
+#include "wxCrafterFileView.h"
 
 class CncFilePreview : public CncFilePreviewBase
 {

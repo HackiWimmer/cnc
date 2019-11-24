@@ -1,7 +1,7 @@
 #ifndef CNCGAMEPADCONTROLLERSTATE_H
 #define CNCGAMEPADCONTROLLERSTATE_H
 
-#include "wxcrafter.h"
+#include "wxCrafterGameport.h"
 #include "GamepadThread.h"
 
 class CncGamepadControllerState : public CncGamepadControllerStateBase {

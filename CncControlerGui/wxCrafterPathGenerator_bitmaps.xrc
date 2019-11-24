@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-archive">bitmaps\16-archive.png</object>
+  <object class="wxBitmap" name="16-archive@2x">bitmaps\16-archive@2x.png</object>
+  <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
+  <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
+  <object class="wxBitmap" name="16-cog">bitmaps\16-cog.png</object>
+  <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
+  <object class="wxBitmap" name="16-copy">bitmaps\16-copy.png</object>
+  <object class="wxBitmap" name="16-copy@2x">bitmaps\16-copy@2x.png</object>
+  <object class="wxBitmap" name="16-cscope">bitmaps\16-cscope.png</object>
+  <object class="wxBitmap" name="16-cscope@2x">bitmaps\16-cscope@2x.png</object>
+  <object class="wxBitmap" name="16-file_close">bitmaps\16-file_close.png</object>
+  <object class="wxBitmap" name="16-file_close@2x">bitmaps\16-file_close@2x.png</object>
+  <object class="wxBitmap" name="16-file_save">bitmaps\16-file_save.png</object>
+  <object class="wxBitmap" name="16-file_save@2x">bitmaps\16-file_save@2x.png</object>
+  <object class="wxBitmap" name="16-fold">bitmaps\16-fold.png</object>
+  <object class="wxBitmap" name="16-fold@2x">bitmaps\16-fold@2x.png</object>
+  <object class="wxBitmap" name="16-globals">bitmaps\16-globals.png</object>
+  <object class="wxBitmap" name="16-globals@2x">bitmaps\16-globals@2x.png</object>
+  <object class="wxBitmap" name="16-gtk">bitmaps\16-gtk.png</object>
+  <object class="wxBitmap" name="16-gtk@2x">bitmaps\16-gtk@2x.png</object>
+  <object class="wxBitmap" name="16-info">bitmaps\16-info.png</object>
+  <object class="wxBitmap" name="16-info@2x">bitmaps\16-info@2x.png</object>
+  <object class="wxBitmap" name="16-marker">bitmaps\16-marker.png</object>
+  <object class="wxBitmap" name="16-marker@2x">bitmaps\16-marker@2x.png</object>
+  <object class="wxBitmap" name="16-minus">bitmaps\16-minus.png</object>
+  <object class="wxBitmap" name="16-minus@2x">bitmaps\16-minus@2x.png</object>
+  <object class="wxBitmap" name="16-show_current_line">bitmaps\16-show_current_line.png</object>
+  <object class="wxBitmap" name="16-show_current_line@2x">bitmaps\16-show_current_line@2x.png</object>
+</resource>

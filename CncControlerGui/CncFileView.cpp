@@ -18,12 +18,11 @@ const char* GCODE_FILES2 	= "*.ngc";
 const char* BIN_FILES 		= "*.bct";
 
 /////////////////////////////////////////////////////////////////
-CncFileView::CncFileView(MainFrame* parent)
+CncFileView::CncFileView(wxWindow* parent)
 : CncFileViewBase(parent)
 , wxDirTraverser()
 , defaultPath("")
 , filterList()
-, mainFrame(parent)
 , avoidSelectListEvent(false)
 , lastSelection()
 /////////////////////////////////////////////////////////////////
@@ -147,15 +146,13 @@ bool CncFileView::openDirectory(const wxString& dirName) {
 /////////////////////////////////////////////////////////////////
 bool CncFileView::openFile(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
-	wxASSERT(mainFrame);
-	mainFrame->openFileFromFileManager(fileName);
+	THE_APP->openFileFromFileManager(fileName);
 	return true;
 }
 /////////////////////////////////////////////////////////////////
 bool CncFileView::previewFile(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
-	wxASSERT(mainFrame);
-	mainFrame->openMainPreview(fileName);
+	THE_APP->openMainPreview(fileName);
 	return true;
 }
 /////////////////////////////////////////////////////////////////
@@ -190,18 +187,17 @@ bool CncFileView::selectFileInList(const wxString& fileName) {
 }
 /////////////////////////////////////////////////////////////////
 void CncFileView::fileListLeave(wxMouseEvent& event) {
-	wxASSERT(mainFrame);
-	
-	if ( mainFrame->GetMainViewBook()->GetSelection() != (int)MainBookSelection::PREVIEW_PANEL )
+/////////////////////////////////////////////////////////////////
+	if ( THE_APP->GetMainViewBook()->GetSelection() != (int)MainBookSelection::PREVIEW_PANEL )
 		return;
 		
-	if ( mainFrame->GetKeepFileManagerPreview()->IsChecked() == true )
+	if ( THE_APP->GetKeepFileManagerPreview()->IsChecked() == true )
 		return;
 		
 	if ( CncAsyncKeyboardState::isControlPressed() )
 		return;
 		
-	mainFrame->selectMainBookSourcePanel();
+	THE_APP->selectMainBookSourcePanel();
 }
 /////////////////////////////////////////////////////////////////
 void CncFileView::fileListActivated(wxListEvent& event) {

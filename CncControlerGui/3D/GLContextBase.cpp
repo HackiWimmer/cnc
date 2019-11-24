@@ -1,7 +1,8 @@
 #include <iostream>
 #include <sstream>
 #include <wx/tokenzr.h>
-#include "wxcrafter.h"
+#include "wxCrafterMainFrame.h"
+#include "wxCrafterImages.h"
 #include "CncConfig.h"
 #include "3D/GLCommon.h"
 #include "3D/GLContextBase.h"
