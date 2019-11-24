@@ -293,6 +293,7 @@ class CncConfig {
 
 		const bool getAutoConnectFlag();
 		const bool getAutoProcessFlag();
+		const bool getAutoOpenOglObserverFlag();
 		const bool getShowTestMenuFlag();
 		const bool getSvgConvertToRightHandFlag();
 		const bool getAvoidDupSetterValuesFlag();

@@ -63,6 +63,13 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		registerProperty(CncApplication_AUTO_PROCESS, prop);
 		
 		//...............
+		prop = root->AppendChild( new wxBoolProperty("Auto open OpenGl Context Observer on startup", NEXT_PROP_ID, false));
+		prop->Enable(true);
+		prop->SetHelpString(_T("Restart required"));
+		prop->SetEditor( wxT("CheckBox") );
+		registerProperty(CncApplication_AUTO_OPEN_OGL_OBSERVER, prop);
+
+		//...............
 		prop = root->AppendChild( new wxBoolProperty("Show test menu", NEXT_PROP_ID, true));
 		prop->Enable(true);
 		prop->SetHelpString(_T("Restart required"));

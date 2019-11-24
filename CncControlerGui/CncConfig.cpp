@@ -955,6 +955,7 @@ const char CncConfig::getRunConfirmationModeAsChar() {
 
 const bool CncConfig::getAutoConnectFlag()							{ PROPERTY(CncApplication_AUTO_CONNECT) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getAutoProcessFlag()							{ PROPERTY(CncApplication_AUTO_PROCESS) 				return p->GetValue().GetBool(); }
+const bool CncConfig::getAutoOpenOglObserverFlag()					{ PROPERTY(CncApplication_AUTO_OPEN_OGL_OBSERVER) 		return p->GetValue().GetBool(); }
 const bool CncConfig::getShowTestMenuFlag()							{ PROPERTY(CncApplication_SHOW_TEST_MENU) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getSvgConvertToRightHandFlag()				{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 				return p->GetValue().GetBool(); }
 const bool CncConfig::getAvoidDupSetterValuesFlag()					{ PROPERTY(CncWork_Ctl_AVOID_DUP_SETTER_VALUES) 		return p->GetValue().GetBool(); }

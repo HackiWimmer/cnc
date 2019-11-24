@@ -7,7 +7,7 @@
 class GLContextCncPath : public GLContextCncPathBase {
 	
 	public:
-		GLContextCncPath(wxGLCanvas* canvas);
+		GLContextCncPath(wxGLCanvas* canvas, const wxString& contextName);
 		virtual ~GLContextCncPath();
 		
 	protected:

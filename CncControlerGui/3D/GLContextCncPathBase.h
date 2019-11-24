@@ -7,6 +7,75 @@
 #include "3D/GLLineCluster.h"
 #include "3D/GLContextBase.h"
 
+class GLContextCncPathBase;
+
+///////////////////////////////////////////////////
+class CncGLContextObserver {
+	
+	private:
+		static CncGLContextObserver* theObserver;
+		
+	protected:
+		CncGLContextObserver();
+		CncGLContextObserver(const CncGLContextObserver&);
+		
+	public:
+		
+		// Notification interface
+		class Callback {
+			public:
+				Callback() {}
+				~Callback() {}
+				
+				virtual void nofifyForCurrent(const wxString& newCtxName) = 0;
+				virtual void nofifyForRegistered(const wxString& newCtxName) = 0;
+				virtual void nofifyMessage(const char type, const wxString& curCtxName, const wxString& functName, const wxString& msg) = 0;
+		};
+		
+		// additional context information
+		struct CtxInfo {
+		};
+		
+		// detor
+		~CncGLContextObserver();
+		
+		// instance interface
+		static CncGLContextObserver* getInstance() {
+			if ( CncGLContextObserver::theObserver == NULL )
+				CncGLContextObserver::theObserver = new CncGLContextObserver();
+				
+			return CncGLContextObserver::theObserver;
+		}
+		
+	private:
+		typedef std::map<GLContextCncPathBase*, CncGLContextObserver::CtxInfo> ContextMap;
+		typedef std::vector<GLContextCncPathBase*> ContextIndex;
+		
+		GLContextCncPathBase* 		currentContext;
+		ContextMap 					contextMap;
+		ContextIndex 				contextIdx;
+		Callback* 					callback;
+		
+		const wxString& getContextItemText(GLContextCncPathBase* ctx, long row, long column) const;
+		
+	public:
+		
+		const wxString& getCurrentContextName() const;
+		const GLContextCncPathBase* getCurrentContext() const			{ return currentContext; }
+		const unsigned int getContextCount() const						{ return contextIdx.size(); }
+		const unsigned int getContextValueCount() const					{ return 32; }
+		void setCallbackInterface(CncGLContextObserver::Callback* c)	{ callback = c; }
+		
+		bool prepareContextSwitch(const GLContextCncPathBase* ctx);
+		void switchContext(const GLContextCncPathBase* ctx);
+		
+		const wxString& getCurrentContextItemText(long row, long column) const;
+		const wxString& getRegisteredContextItemText(long row, long column) const;
+		
+		void appendMessage(const char type, const wxString& functName, const wxString& msg) const;
+};
+#define GL_CTX_OBS CncGLContextObserver::getInstance()
+
 /////////////////////////////////////////////////////////////////
 class GLContextCncPathBase : public GLContextBase {
 	
@@ -15,8 +84,10 @@ class GLContextCncPathBase : public GLContextBase {
 		enum DrawType { DT_POINTS, DT_LINE_STRIP };
 		
 		/////////////////////////////////////////////////////////
-		GLContextCncPathBase(wxGLCanvas* canvas, wxString contextName);
+		GLContextCncPathBase(wxGLCanvas* canvas, const wxString& contextName);
 		virtual ~GLContextCncPathBase();
+		
+		virtual bool SetCurrent(const wxGLCanvas &win) const; 
 		
 		void clearPathData();
 		void appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex);
@@ -67,6 +138,9 @@ class GLContextCncPathBase : public GLContextBase {
 		
 		void registerCallback(GLI::GLCncPath::Callback* cb) 			{ cncPath.registerCallback(cb);   }
 		
+		void activateOpenGlContext(bool state = true);
+		void deactivateOpenGlContext() { activateOpenGlContext(false); }
+
 	protected:
 		
 		GLI::GLCncPath		cncPath;
@@ -79,6 +153,8 @@ class GLContextCncPathBase : public GLContextBase {
 		wxColour			rulerColourY;
 		wxColour			rulerColourZ;
 		
+		virtual void initBufferStore();
+		
 		virtual float getAutoScaleFactor() { return ( options.autoScale ? cncPath.getAutoScaleFact() : 1.0); }
 		
 		virtual void determineModel();
@@ -88,6 +164,7 @@ class GLContextCncPathBase : public GLContextBase {
 		void drawRuler();
 		
 		friend class CncMotionMonitor;
+		friend class CncGLContextObserver;
 };
 
 #endif

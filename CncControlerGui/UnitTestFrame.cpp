@@ -11,7 +11,7 @@
 
 /////////////////////////////////////////////////////////////////////////////
 UnitTests::UnitTests(wxWindow* parent, int iti, bool ar)
-: UnitTestsBase(parent)
+: CncUnitTestsBase(parent)
 , testResultStream(new CncTextCtrl(m_testResultStreamPlaceholder))
 , initialTestIdx(iti)
 , autorun(ar)

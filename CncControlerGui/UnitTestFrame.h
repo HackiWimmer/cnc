@@ -6,7 +6,7 @@
 #include "wxcrafter.h"
 
 //////////////////////////////////////////////////////////////////
-class UnitTests : public UnitTestsBase {
+class UnitTests : public CncUnitTestsBase {
 	
 	public:
 		UnitTests(wxWindow* parent, int initialTestIdx=-1, bool autoRun=false);

@@ -3,8 +3,8 @@
 #include "3D/GLInclude.h"
 
 /////////////////////////////////////////////////////////////////
-GLContextCncPath::GLContextCncPath(wxGLCanvas* canvas) 
-: GLContextCncPathBase(canvas, "GLContextCncPath")
+GLContextCncPath::GLContextCncPath(wxGLCanvas* canvas, const wxString& contextName) 
+: GLContextCncPathBase(canvas, contextName)
 {
 /////////////////////////////////////////////////////////////////
 	// do something here on demand
@@ -24,9 +24,6 @@ GLViewPort* GLContextCncPath::createViewPort() {
 /////////////////////////////////////////////////////////////////
 void GLContextCncPath::initContext() {
 /////////////////////////////////////////////////////////////////
-	if ( GLCommon::getTraceLevel() > 1 )
-		std::cout << "GLContextCncPath::initContext()" << std::endl;
-	
 	// do context specific initalization here
 	if ( isProbeMode() )	glClearColor(0.0, 0.0, 0.0, 0.0);
 	else 					glClearColor(22.0/255.0, 22.0/255.0, 22.0/255.0, 0.0);

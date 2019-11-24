@@ -71,6 +71,7 @@
 #include "CncGCodeSequenceListCtrl.h"
 #include "CncStatisticsPane.h"
 #include "CncSvgControl.h"
+#include "CncOpenGLContextObserver.h"
 #include "CncOSEnvironmentDialog.h"
 #include "CncContext.h"
 #include "GlobalStrings.h"
@@ -202,6 +203,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , cnc3DHSplitterWindow(NULL)
 , templateObserver(NULL)
 , spyDetailWindow(NULL)
+, openGLContextObserver(new CncOpenGLContextObserver(this))
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -826,48 +828,21 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
-	
-	selectMonitorBookTemplatePanel();
-	
-	
-	
-	std::cout << "§asdadsadadadasdad"<< std::endl;
-
-	//std::clog << "§asdadsadadadasdad"<< std::endl;
-
-	//CNC_PRINT_FUNCT;
-
-
-//#define CNC_LOG_FUNCT			wxString::Format( "[ %s ]", 	cnc::lformat(__PRETTY_FUNCTION__, 84).c_str() )
-//#define CNC_LOG_FUNCT_A(msg)	wxString::Format( "[ %s: %s ]", cnc::lformat(__PRETTY_FUNCTION__, 84).c_str(), msg)
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-
-	for (int i=0; i< 10000; i++)
-		getLogger()->AppendText('X');
-		
-	getLogger()->AppendChar('\n');
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	
-	std::cerr << "Hallo\n";
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
-		
-	GblFunc::stacktrace(std::clog);
-	GblFunc::stacktraceOnlyApp(std::clog, false);
-	GblFunc::stacktraceOnlyApp(std::clog, true);
-	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
@@ -933,7 +908,6 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 					break; 
 				}
 			}
-		
 		}
 		
 		// GTK specific: This is to hide the corresponding windows
@@ -971,22 +945,6 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 			}
 		}
 		
-			selectMainBookPreviewPanel();
-			if ( mainFilePreview->initGCodePreview() == false )
-				std::cerr << "MainFrame::startupTimer(): Failed to init mainFilePreview!" << std::endl;
-
-			selectMonitorBookTemplatePanel();
-			if ( monitorFilePreview->initGCodePreview() == false)
-				std::cerr << "MainFrame::startupTimer(): Failed to init monitorFilePreview!" << std::endl;
-
-			selectMonitorBookCncPanel();
-			m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-			m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
-			if ( motionMonitor->isContextValid() == false )
-				std::cerr << "MainFrame::startupTimer(): Failed to init motionMonitor!" << std::endl;
-
-		GLCommon::initOpenGL();
-		
 		// Version infos
 		std::stringstream ss;
 		ss.str(""); traceGccVersion(ss); 			GBL_CONTEXT->versionInfoMap["gcc"] 			= ss.str().c_str();
@@ -998,14 +956,23 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		std::cout << std::endl;
 	}
 	
+	if ( GBL_CONFIG->getAutoOpenOglObserverFlag() == true) {
+		wxCommandEvent dummy;
+		onOpenGLContextObserver(dummy);
+	}
+	
+	// Check open gl state
+	if ( GLCommon::isReady() == false ) GL_CTX_OBS->appendMessage('E', CNC_LOG_FUNCT, wxString::Format("OpenGL interface isn't ready!"));
+	else								GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("Application Startup Marker . . . "));
+	
 	// Auto connect ?
-	if ( CncConfig::getGlobalCncConfig()->getAutoConnectFlag() )
+	if ( GBL_CONFIG->getAutoConnectFlag() )
 		connectSerialPortDialog();
 
 	openInitialTemplateFile();
 
 	// Auto process ?
-	if ( CncConfig::getGlobalCncConfig()->getAutoProcessFlag() ) {
+	if ( GBL_CONFIG->getAutoProcessFlag() ) {
 		defineMinMonitoring();
 		processTemplateWrapper();
 		defineNormalMonitoring();
@@ -7618,4 +7585,15 @@ void MainFrame::freezeLogger(wxCommandEvent& event) {
 void MainFrame::onShowLoggerOnDemand(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	getLogger()->setShowOnDemandState(m_showLoggerOnDemand->GetValue());
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onOpenGLContextObserver(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	wxASSERT( openGLContextObserver != NULL );
+	const bool flag = openGLContextObserver->IsShownOnScreen();
+	
+	//if ( m_miOpenGLContextObserver->IsChecked() ) 
+	
+	openGLContextObserver->Show(!flag);
+	m_miOpenGLContextObserver->Check(!flag);
 }

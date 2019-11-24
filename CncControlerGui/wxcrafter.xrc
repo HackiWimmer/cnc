@@ -9821,6 +9821,14 @@ State</label>
           </accel>
         </object>
         <object class="separator"/>
+        <object class="wxMenuItem" name="m_miOpenGLContextObserver">
+          <checkable>1</checkable>
+          <label>OpenGL Context Oberserver</label>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
+        <object class="separator"/>
         <object class="wxMenuItem" name="m_miViewAll">
           <label>View all Panes</label>
           <bitmap>bitmaps/view-choose-3.png</bitmap>
@@ -15916,7 +15924,7 @@ Thickness</label>
       </object>
     </object>
   </object>
-  <object class="wxDialog" name="UnitTestsBase">
+  <object class="wxDialog" name="CncUnitTestsBase">
     <title>CNC Controller Unit Tests . . .</title>
     <centered>1</centered>
     <style>wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX</style>

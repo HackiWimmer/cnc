@@ -169,8 +169,6 @@ set(SOURCE_FILES
 	CncControlerGui/UnitTestFrame.h
 	CncControlerGui/UpdateManagerThread.cpp
 	CncControlerGui/UpdateManagerThread.h
-	CncControlerGui/wxcrafter.cpp
-	CncControlerGui/wxcrafter.h
 	CncControlerGui/CncCurveLib.cpp
 	CncControlerGui/CncBaseEditor.cpp
 	CncControlerGui/CncSourceEditor.cpp
@@ -221,5 +219,10 @@ set(SOURCE_FILES
 	CncControlerGui/CncParsingSynopsisTrace.cpp
 	CncControlerGui/CncParsingSynopsisTraceListCtrl.cpp	
 	CncControlerGui/CncLoggerProxy.cpp
+	CncControlerGui/CncOpenGLContextObserver.cpp
+	CncControlerGui/CncLargeScaleListCtrl.cpp
+	CncControlerGui/wxCrafterContextObserver.cpp
+	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp
+	CncControlerGui/wxcrafter.cpp
 	CncControlerGui/wxcrafter_bitmaps.cpp
 )

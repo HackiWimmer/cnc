@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="heart-2">bitmaps\heart-2.png</object>
+  <object class="wxBitmap" name="layout-content">bitmaps\layout-content.png</object>
+</resource>

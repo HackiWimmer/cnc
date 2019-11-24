@@ -30,6 +30,8 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribLis
 	GLContextBase::globalInit(); 
 	preview->init();
 	
+	lastSetCurrent = preview->SetCurrent(*this);
+	
 	// Important: initialize the CncGlCanvas context
 	context = preview;
 	
@@ -41,6 +43,11 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribLis
 CncGCodePreview::~CncGCodePreview() {
 //////////////////////////////////////////////////
 	delete preview;
+}
+//////////////////////////////////////////////////
+void CncGCodePreview::initColours() {
+//////////////////////////////////////////////////
+	GLContextGCodePreview::initColours();
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::onPaint(wxPaintEvent& event) {
@@ -97,9 +104,6 @@ void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
 void CncGCodePreview::clear() {
 //////////////////////////////////////////////////
-	if ( GLCommon:: getTraceLevel() > 0 )
-		std::cout << CNC_LOG_FUNCT << std::endl;
-
 	preview->clearPathData();
 }
 //////////////////////////////////////////////////
@@ -130,5 +134,6 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	const float z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
 	const char sc = cnc::getCncSpeedTypeAsCharacter(vd.getSpeedMode());
 	
+	lastSetCurrent = preview->SetCurrent(*this);
 	preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
 }

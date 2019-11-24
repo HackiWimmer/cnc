@@ -22,7 +22,9 @@ struct GLCommon {
 		static void setTraceLevel(int level)	{ glTraceLevel = level; }
 		static int  getTraceLevel()				{ return glTraceLevel; }
 
+		static bool isGlAvailable() 			{ return glInitializedGlobalFlag; }
 		static bool isGlewAvailable() 			{ return glewInitializedGlobalFlag; }
+		static bool isReady() 					{ return isGlAvailable() && isGlewAvailable(); }
 		
 		static bool initOpenGL();
 		static void GLAPIENTRY MessageCallback(	 GLenum source,

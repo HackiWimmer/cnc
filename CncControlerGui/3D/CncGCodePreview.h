@@ -24,6 +24,7 @@ class CncGCodePreview : public CncGlCanvas {
 		// interface
 		void setMaxDimension(double maxDim); 
 		void appendVertice(const GLI::VerticeDoubleData& vd);
+		void initColours();
 		void clear();
 		
 		void pushProcessMode();

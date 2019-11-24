@@ -68,18 +68,7 @@ bool CncFilePreview::selectGCodePreview() {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( m_previewBook->GetPageCount() > GCODE_TAB_PAGE );
 	m_previewBook->SetSelection(GCODE_TAB_PAGE);
-
-	// wait intil the main windows is shown
-	// this is with respect to the calls below
-	CncNanoTimestamp ts1 = CncTimeFunctions::getNanoTimestamp();
-	while ( gcodePreview->isAlreadyShown() == false ) {
-		THE_APP->dispatchAll(); 
-		
-		if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) { 
-			std::cerr << "CncFilePreview::selectGCodePreview(): Timeout reached for 'gcodePreview::IsShownScreen()'" << std::endl;
-			return false; 
-		}
-	}
+	
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -107,17 +96,15 @@ bool CncFilePreview::loadFile() {
 	bool ret = false;
 	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE ) {
 		
-		if ( gcodePreview->isAlreadyShown() ) {
-
-			gcodePreview->clear();
-			gcodePreview->Refresh();
-			
-			GCodeFileParser gfp(lastFileName, new GCodePathHandlerGL(gcodePreview));
-			gfp.setDisplayWarnings(false);
-			ret = gfp.processRelease();
-			
-			gcodePreview->Refresh();
-		}
+		gcodePreview->clear();
+		gcodePreview->Refresh();
+		
+		GCodeFileParser gfp(lastFileName, new GCodePathHandlerGL(gcodePreview));
+		gfp.setDisplayWarnings(false);
+		ret = gfp.processRelease();
+		
+		gcodePreview->Refresh();
+		
 	} else if ( m_previewBook->GetSelection() == (int)SVG_TAB_PAGE ) {
 		
 		svgPreview->loadFile(lastFileName);

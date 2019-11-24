@@ -692,6 +692,8 @@ protected:
     wxMenuItem* m_miViewSpy;
     wxMenuItem* m_miViewLogger;
     wxMenuItem* m_miViewUnitCalculator;
+    wxMenuItem* m_menuItem16651;
+    wxMenuItem* m_miOpenGLContextObserver;
     wxMenuItem* m_menuItem1665;
     wxMenuItem* m_miViewAll;
     wxMenuItem* m_miHideAll;
@@ -981,6 +983,7 @@ protected:
     virtual void viewSpy(wxCommandEvent& event) { event.Skip(); }
     virtual void viewLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void viewUnitCalculator(wxCommandEvent& event) { event.Skip(); }
+    virtual void onOpenGLContextObserver(wxCommandEvent& event) { event.Skip(); }
     virtual void viewAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
     virtual void hideAllAuiPanes(wxCommandEvent& event) { event.Skip(); }
     virtual void loadPerspective(wxCommandEvent& event) { event.Skip(); }
@@ -2728,7 +2731,7 @@ public:
 };
 
 
-class UnitTestsBase : public wxDialog
+class CncUnitTestsBase : public wxDialog
 {
 protected:
     wxStaticText* m_staticText3357;
@@ -2757,8 +2760,8 @@ public:
     wxCheckBox* GetUnitTestFreezeOutput() { return m_unitTestFreezeOutput; }
     wxCheckBox* GetUnitTestAutoRun() { return m_unitTestAutoRun; }
     wxTimer* GetUnitTestStartupTimer() { return m_unitTestStartupTimer; }
-    UnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
-    virtual ~UnitTestsBase();
+    CncUnitTestsBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Controller Unit Tests . . ."), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER|wxMAXIMIZE_BOX|wxSYSTEM_MENU|wxCLOSE_BOX);
+    virtual ~CncUnitTestsBase();
 };
 
 

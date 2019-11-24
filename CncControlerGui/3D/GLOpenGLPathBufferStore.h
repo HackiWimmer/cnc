@@ -218,9 +218,8 @@ class GLOpenGLPathBuffer {
 		ClientIdIndex		clientIdIndex;
 		
 		// --------------------------------------------------------------
-		void generateBuffers();
-		void initBuffers();
-
+		void generateBuffer();
+		
 		// --------------------------------------------------------------
 		void updateIndex(long clientID) {
 			const int idx = numVertices - 1;
@@ -274,6 +273,9 @@ class GLOpenGLPathBuffer {
 		explicit GLOpenGLPathBuffer(GLOpenGLPathBufferStore* store, GLOpenGLPathBuffer::CncVertex* firstVertex);
 		explicit GLOpenGLPathBuffer(const GLOpenGLPathBuffer& b);
 		~GLOpenGLPathBuffer();
+		
+		void createVertexArray();
+		void destroyVertexArray();
 		
 		// --------------------------------------------------------------
 		const wxString&			getStoreInstanceName()			const;
@@ -376,9 +378,13 @@ class GLOpenGLPathBufferStore {
 		explicit GLOpenGLPathBufferStore(const wxString& instanceName);
 		~GLOpenGLPathBufferStore();
 		
+		void createVertexArray();
+		void destroyVertexArray();
+		
 		void init();
 		void init(const GLOpenGLPathBuffer::CncVertex& firstVertex);
-		bool checkInitialized();
+		bool isInitialized() 													const { return initialized; }
+		bool initialize();
 		
 		uint64_t getInstance()													const { return (uint64_t)this; }
 		const wxString& getInstanceName()										const { return instanceName; }
@@ -409,6 +415,8 @@ class GLOpenGLPathBufferStore {
 		
 		const wxString& getIndexForClientIdAsString(long clientId, wxString& ret, bool summerize);
 		const wxString& getIndexForIdxAsString(unsigned long idx, wxString& ret, bool summerize);
+		
+		const wxString& getVaoAndVboSummary();
 		
 		//-------------------------------------------------
 		friend std::ostream &operator<< (std::ostream &ostr, const GLOpenGLPathBufferStore& s) {

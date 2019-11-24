@@ -54,6 +54,7 @@ class CncSpeedMonitor;
 class CncPreprocessor;
 class CncGCodeSequenceListCtrl;
 class CncMotionVertexTrace;
+class CncOpenGLContextObserver;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -142,6 +143,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+    virtual void onOpenGLContextObserver(wxCommandEvent& event);
 		virtual void onShowLoggerOnDemand(wxCommandEvent& event);
 		virtual void freezeLogger(wxCommandEvent& event);
 		virtual void changeMonitorListBook(wxListbookEvent& event);
@@ -595,6 +597,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncVertexTrace::IndexListCtrl;
 		friend class CncPathListRunner;
 		friend class CncStartPositionResolver;
+		friend class CncOpenGLContextObserver;
 		
 	private:
 		// Member variables
@@ -642,6 +645,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMonitorHSplitterWindow* 		cnc3DHSplitterWindow;
 		CncTemplateObserver* 			templateObserver;
 		CncMessageDialog*				spyDetailWindow;
+		CncOpenGLContextObserver*		openGLContextObserver;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

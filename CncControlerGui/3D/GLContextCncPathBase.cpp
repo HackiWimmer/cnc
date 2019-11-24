@@ -5,8 +5,148 @@
 #include "3D/GLInclude.h"
 #include <wx/bitmap.h>
 
+CncGLContextObserver* CncGLContextObserver::theObserver = NULL;
+
+///////////////////////////////////////////////////
+CncGLContextObserver::CncGLContextObserver()
+: currentContext(NULL)
+, contextMap()
+, contextIdx()
+, callback(NULL)
+///////////////////////////////////////////////////
+{
+}
+///////////////////////////////////////////////////
+CncGLContextObserver::CncGLContextObserver(const CncGLContextObserver&) {
+///////////////////////////////////////////////////
+	abort();
+}
+///////////////////////////////////////////////////
+CncGLContextObserver::~CncGLContextObserver() { 
+///////////////////////////////////////////////////
+	contextMap.clear();
+	contextIdx.clear();
+	CncGLContextObserver::theObserver = NULL; 
+}
+///////////////////////////////////////////////////
+const wxString& CncGLContextObserver::getCurrentContextName() const { 
+///////////////////////////////////////////////////
+	static wxString ret;
+	
+	ret.assign(currentContext != NULL ? currentContext->getContextName() : ""); 
+	return ret;
+}
+///////////////////////////////////////////////////
+void CncGLContextObserver::appendMessage(const char type, const wxString& functName, const wxString& msg) const {
+///////////////////////////////////////////////////
+	if ( callback ) {
+		const wxString ctxName(currentContext != NULL ? currentContext->getContextName() : "" ); 
+		callback->nofifyMessage(type, ctxName, functName, msg);
+	}
+}
+///////////////////////////////////////////////////
+bool CncGLContextObserver::prepareContextSwitch(const GLContextCncPathBase* ctx) {
+///////////////////////////////////////////////////
+	if ( ctx == currentContext )
+		return false;
+	
+	// deactivate previous context
+	if ( currentContext != NULL )
+		currentContext->deactivateOpenGlContext();
+		
+	return true;
+}
+///////////////////////////////////////////////////
+void CncGLContextObserver::switchContext(const GLContextCncPathBase* ctx) {
+///////////////////////////////////////////////////
+	if ( ctx == NULL )
+		return;
+	
+	GLContextCncPathBase* c = (GLContextCncPathBase*)ctx;
+	if ( contextMap.find(c) == contextMap.end() ) {
+		CncGLContextObserver::CtxInfo ctxInfo;
+		contextMap[c] = ctxInfo;
+		contextIdx.push_back(c);
+		
+		if ( callback )
+			callback->nofifyForRegistered(c->getContextName());
+	}
+	
+	if  ( currentContext != NULL )
+		currentContext->deactivateOpenGlContext();
+		
+	currentContext = c;
+	
+	if ( callback )
+		callback->nofifyForCurrent(currentContext->getContextName());
+}
+///////////////////////////////////////////////////
+const wxString& CncGLContextObserver::getContextItemText(GLContextCncPathBase* ctx, long row, long column) const {
+///////////////////////////////////////////////////
+	static wxString retVal;
+	
+	auto assign = [&](long column, const char* key, const char* val) {
+		if ( column == 0 )	retVal.assign(key != NULL ? key : "");
+		else				retVal.assign(val != NULL ? val : "");
+	};
+	
+	// Note: row count limited by getContextValueCount()
+	switch ( ctx != NULL ? row : -42 ) {
+		case  0:		assign(column, "Context Name", 		ctx->getContextName()); break;
+		case  1:		assign(column, "Canvas Pointer", 	wxString::Format("%" PRIu64, (uint64_t)(ctx->getAssociatedCanvas()))); break;
+		case  2:		assign(column, "Current", 			wxString::Format("%s - (%" PRIu64 ")", ctx->isCurrent() ? "Yes" : "NO", (uint64_t)(GLContextBase::getCurrentCanvas()))); break;
+		
+		case  4:		assign(column, "Store ID", 			ctx->cncPath.getOpenGLBufferStore()->getInstanceFullName()); break;
+		case  5:		assign(column, "Vertex Count", 		wxString::Format("%u", ctx->cncPath.getOpenGLBufferStore()->getVertexCount())); break;
+		case  6:		assign(column, "Buffer Count", 		wxString::Format("%u", ctx->cncPath.getOpenGLBufferStore()->getBufferCount())); break;
+		case  7:		assign(column, "OpenGL Objects",	ctx->cncPath.getOpenGLBufferStore()->getVaoAndVboSummary()); break;
+		
+		case  9:		assign(column, "OpenGL State",		wxString::Format("%s", GLCommon::isGlAvailable() ? "Valid" : "Invalid" )); break;
+		case 10:		assign(column, "Glew State", 		wxString::Format("%s", GLCommon::isGlewAvailable() ? "Valid" : "Invalid")); break;
+		case 11:		assign(column, "Trace Level", 		wxString::Format("%d", GLCommon::getTraceLevel())); break;
+		
+		default:	retVal.clear();
+	}
+	
+	return retVal;
+}
+///////////////////////////////////////////////////
+const wxString& CncGLContextObserver::getCurrentContextItemText(long row, long column) const {
+///////////////////////////////////////////////////
+	return getContextItemText(currentContext, row, column);
+}
+///////////////////////////////////////////////////
+const wxString& CncGLContextObserver::getRegisteredContextItemText(long row, long column) const {
+///////////////////////////////////////////////////
+	static wxString retVal;
+	retVal.clear();
+	
+	if ( row < 0 || row > (long)(contextIdx.size() - 1) )
+		return retVal;
+	
+	GLContextCncPathBase* ctx = contextIdx.at(row);
+	
+	if ( column == 0 ) {
+		retVal.assign(getContextItemText(ctx, 0, 1));
+		
+	} else {
+		const unsigned int maxValues = getContextValueCount();
+		for (unsigned int i=1; i<maxValues; i++) {
+			
+			const wxString parameter(getContextItemText(ctx, i, 1));
+			if ( parameter.IsEmpty() == false ) {
+				retVal.append(parameter);
+				if ( i < maxValues - 2 ) 	retVal.append(", ");
+			}
+		}
+	}
+	
+	return retVal;
+}
+
+
 /////////////////////////////////////////////////////////////////
-GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas, wxString name)
+GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas, const wxString& name)
 : GLContextBase(canvas, name)
 , cncPath(getContextName())
 , ruler()
@@ -21,10 +161,38 @@ GLContextCncPathBase::GLContextCncPathBase(wxGLCanvas* canvas, wxString name)
 /////////////////////////////////////////////////////////////////
 GLContextCncPathBase::~GLContextCncPathBase() {
 /////////////////////////////////////////////////////////////////
-	if ( GLCommon::getTraceLevel() > 0 )
-		std::cout << "GLContextCncPathBase::~GLContextCncPathBase()" << std::endl;
-		
 	clearPathData();
+}
+//////////////////////////////////////////////////
+void GLContextCncPathBase::initBufferStore() {
+//////////////////////////////////////////////////
+	if ( cncPath.getOpenGLBufferStore()->isInitialized() == false ) {
+		const bool state = cncPath.getOpenGLBufferStore()->initialize();
+		
+		if ( state == true )
+			activateOpenGlContext();
+	}
+}
+//////////////////////////////////////////////////
+bool GLContextCncPathBase::SetCurrent(const wxGLCanvas &win) const {
+//////////////////////////////////////////////////
+	static CncGLContextObserver* ctxObs = CncGLContextObserver::getInstance();
+	const bool isContextSwitch = ctxObs->prepareContextSwitch(this);
+	
+	// always do the standard procedere
+	bool ret = wxGLContext::SetCurrent(win);
+	GLContextBase::setCurrentCanvas(&win);
+	
+	if ( isContextSwitch == true )
+		ctxObs->switchContext(this);
+	
+	return ret;
+}
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::activateOpenGlContext(bool state) {
+/////////////////////////////////////////////////////////////////
+	if ( state == true ) 	cncPath.createVertexArray();
+	else					cncPath.destroyVertexArray();
 }
 /////////////////////////////////////////////////////////////////
 void GLContextCncPathBase::markCurrentPosition() {

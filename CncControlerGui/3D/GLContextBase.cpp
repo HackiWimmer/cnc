@@ -14,9 +14,12 @@ double  GLContextBase::MouseVertexInfo::getAsMetricX(float scaleFactor) { return
 double  GLContextBase::MouseVertexInfo::getAsMetricY(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricY(getAsStepsY(scaleFactor)); }
 double  GLContextBase::MouseVertexInfo::getAsMetricZ(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricZ(getAsStepsZ(scaleFactor)); }
 
+const wxGLCanvas* GLContextBase::currentCanvas = NULL;
+
 /////////////////////////////////////////////////////////////////
-GLContextBase::GLContextBase(wxGLCanvas* canvas, wxString& name) 
+GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name) 
 : wxGLContext(canvas)
+, associatedCanvas(canvas)
 , contextName(name)
 , enabled(true)
 , initialized(false)
@@ -80,24 +83,13 @@ void GLContextBase::globalInit() {
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 }
 /////////////////////////////////////////////////////////////////
-bool GLContextBase::SetCurrent(const wxGLCanvas& win) const {
-/////////////////////////////////////////////////////////////////
-	if ( win.IsShown() == false )
-		return false;
-
-	if ( GLCommon::getTraceLevel() > 1 ) {
-		const char* name = getContextName() ? getContextName() : "NULL";
-		std::cout << "GLContextBase::SetCurrent(" << name << ")" << std::endl;
-	}
-
-	return wxGLContext::SetCurrent(win);
-}
-/////////////////////////////////////////////////////////////////
 void GLContextBase::init() {
 /////////////////////////////////////////////////////////////////
 	GLCommon::initOpenGL();
 
 	glutInitDisplayMode (GL_DOUBLE | GLUT_DEPTH | GLUT_RGB);
+	
+	initBufferStore();
 	initContext();
 	
 	// call the initalization only one time

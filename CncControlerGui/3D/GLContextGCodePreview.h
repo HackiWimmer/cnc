@@ -10,6 +10,8 @@ class GLContextGCodePreview : public GLContextCncPathBase {
 		GLContextGCodePreview(wxGLCanvas* canvas, wxString name);
 		virtual ~GLContextGCodePreview();
 		
+		static void initColours();
+
 	protected:
 		wxString previewName;
 		

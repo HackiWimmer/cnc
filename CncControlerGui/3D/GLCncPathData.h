@@ -309,6 +309,9 @@ namespace GLI {
 			}
 			
 			////////////////////////////////////////////
+			void createVertexArray()											{ vectiesBuffer.createVertexArray(); }
+			void destroyVertexArray()											{ vectiesBuffer.destroyVertexArray(); }
+			
 			unsigned long size()										const	{ return vectiesBuffer.getVertexCount(); }
 			GLOpenGLPathBufferStore* getOpenGLBufferStore() 					{ return &vectiesBuffer; }
 			void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt)	{ vectiesBuffer.reconstruct(opt); }

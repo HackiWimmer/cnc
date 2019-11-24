@@ -2,6 +2,7 @@
 #include <sstream>
 #include "CncConfig.h"
 #include "CncContext.h"
+#include "3D/GLContextCncPathBase.h"
 #include "GLCommon.h"
 
 int  GLCommon::glTraceLevel				 = 1;
@@ -39,7 +40,6 @@ void GLCommon::traceOpenGLExtentionInfo() {
 /////////////////////////////////////////////////////////////////
 bool GLCommon::initOpenGL() {
 /////////////////////////////////////////////////////////////////
-
 	if ( GLCommon::initGlew() == false )
 		return GLCommon::glInitializedGlobalFlag;
 
@@ -49,6 +49,13 @@ bool GLCommon::initOpenGL() {
 	//glDebugMessageCallback(GLCommon::MessageCallback, 0);
 	
 	GLCommon::glInitializedGlobalFlag = true;
+	
+	if ( GLCommon::glInitializedGlobalFlag == true ) {
+		GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("OpenGL interface is ready to use . . . "));
+	} else {
+		if ( GL_ERROR_TRACE_LEVEL > 0 ) 
+			GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("OpenGL State = %d", GLCommon::glInitializedGlobalFlag));
+	}
 
 	return GLCommon::glInitializedGlobalFlag;
 }
@@ -69,6 +76,12 @@ bool GLCommon::initGlew() {
 		GLCommon::traceOpenGLVersionInfo();
 	}
 
+	if ( GLCommon::glewInitializedGlobalFlag == true ) {
+		GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("OpenGL GLEW interface is ready to use . . . "));
+	} else {
+		if ( GL_ERROR_TRACE_LEVEL > 0 ) 
+			GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("GLEW state = %d", GLCommon::glewInitializedGlobalFlag));
+	}
 	return GLCommon::glewInitializedGlobalFlag;
 }
 /////////////////////////////////////////////////////////////////////

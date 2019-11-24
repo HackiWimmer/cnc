@@ -80,7 +80,7 @@ struct GLContextOptions {
 class GLContextBase : public wxGLContext {
 	
 	public:
-		GLContextBase(wxGLCanvas* canvas, wxString& name);
+		GLContextBase(wxGLCanvas* canvas, const wxString& name);
 		virtual ~GLContextBase();
 		
 		enum ModelType { MT_LEFT_HAND, MT_RIGHT_HAND };
@@ -101,12 +101,17 @@ class GLContextBase : public wxGLContext {
 						};
 		
 		// common 
-		virtual bool SetCurrent (const wxGLCanvas &win) const;
 		const char* getContextName() const { return contextName; }
 		virtual void keyboardHandler(unsigned char c);
 		
+		static void setCurrentCanvas(const wxGLCanvas* canvas) 		{ currentCanvas = canvas; }
+		static const wxGLCanvas* getCurrentCanvas()					{ return currentCanvas; }
+		static const bool isCurrent(const GLContextBase& c )		{ return c.isCurrent(); }
+		
+		const bool isCurrent() const  	 							{ return currentCanvas == associatedCanvas; }
+		const wxGLCanvas* getAssociatedCanvas() const				{ return associatedCanvas; }
+				
 		static void globalInit();
-
 		
 		void enable(bool state = true) 	{ enabled = state; } 
 		void disable() 					{ enable(false); }
@@ -233,6 +238,7 @@ class GLContextBase : public wxGLContext {
 			double getAsMetricZ(float scaleFactor);
 		};
 
+		wxGLCanvas*			associatedCanvas;
 		wxString 			contextName;
 
 		bool				enabled;
@@ -261,6 +267,7 @@ class GLContextBase : public wxGLContext {
 		
 		// protected context interface
 		virtual void initContext() = 0;
+		virtual void initBufferStore() = 0;
 		virtual GLViewPort* createViewPort() = 0;
 		virtual void markCurrentPosition() = 0;
 		
@@ -275,6 +282,8 @@ class GLContextBase : public wxGLContext {
 		void drawBox(GLfloat size, GLenum type);
 		 
 	private:
+		
+		static const wxGLCanvas* currentCanvas;
 		
 		int lastReshapeX;
 		int lastReshapeY;

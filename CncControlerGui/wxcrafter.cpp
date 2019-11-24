@@ -5552,6 +5552,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_menuView->AppendSeparator();
     
+    m_miOpenGLContextObserver = new wxMenuItem(m_menuView, wxID_ANY, _("OpenGL Context Oberserver"), wxT(""), wxITEM_CHECK);
+    m_menuView->Append(m_miOpenGLContextObserver);
+    
+    m_menuView->AppendSeparator();
+    
     m_miViewAll = new wxMenuItem(m_menuView, wxID_ANY, _("View all Panes"), wxT(""), wxITEM_NORMAL);
     m_miViewAll->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("view-choose-3")));
     m_menuView->Append(m_miViewAll);
@@ -6202,6 +6207,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
     this->Connect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);
     this->Connect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
+    this->Connect(m_miOpenGLContextObserver->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onOpenGLContextObserver), NULL, this);
     this->Connect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Connect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
     this->Connect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
@@ -6487,6 +6493,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_miViewSpy->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewSpy), NULL, this);
     this->Disconnect(m_miViewLogger->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewLogger), NULL, this);
     this->Disconnect(m_miViewUnitCalculator->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewUnitCalculator), NULL, this);
+    this->Disconnect(m_miOpenGLContextObserver->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::onOpenGLContextObserver), NULL, this);
     this->Disconnect(m_miViewAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::viewAllAuiPanes), NULL, this);
     this->Disconnect(m_miHideAll->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::hideAllAuiPanes), NULL, this);
     this->Disconnect(m_miPerspectiveDefault->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::loadPerspective), NULL, this);
@@ -11047,7 +11054,7 @@ CncSecureRunBase::~CncSecureRunBase()
 
 }
 
-UnitTestsBase::UnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+CncUnitTestsBase::CncUnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
     : wxDialog(parent, id, title, pos, size, style)
 {
     if ( !bBitmapLoaded ) {
@@ -11152,7 +11159,7 @@ UnitTestsBase::UnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& ti
     m_unitTestStartupTimer = new wxTimer;
     m_unitTestStartupTimer->Start(300, true);
     
-    SetName(wxT("UnitTestsBase"));
+    SetName(wxT("CncUnitTestsBase"));
     SetMinClientSize(wxSize(300,300));
     SetSize(800,600);
     if (GetSizer()) {
@@ -11171,19 +11178,19 @@ UnitTestsBase::UnitTestsBase(wxWindow* parent, wxWindowID id, const wxString& ti
     }
 #endif
     // Connect events
-    this->Connect(wxEVT_SHOW, wxShowEventHandler(UnitTestsBase::onShow), NULL, this);
-    m_unitTestSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(UnitTestsBase::selectTest), NULL, this);
-    m_btUnitTestClear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTestsBase::clearView), NULL, this);
-    m_unitTestStartupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(UnitTestsBase::onStartupTimer), NULL, this);
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncUnitTestsBase::onShow), NULL, this);
+    m_unitTestSelector->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncUnitTestsBase::selectTest), NULL, this);
+    m_btUnitTestClear->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUnitTestsBase::clearView), NULL, this);
+    m_unitTestStartupTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncUnitTestsBase::onStartupTimer), NULL, this);
     
 }
 
-UnitTestsBase::~UnitTestsBase()
+CncUnitTestsBase::~CncUnitTestsBase()
 {
-    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(UnitTestsBase::onShow), NULL, this);
-    m_unitTestSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(UnitTestsBase::selectTest), NULL, this);
-    m_btUnitTestClear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(UnitTestsBase::clearView), NULL, this);
-    m_unitTestStartupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(UnitTestsBase::onStartupTimer), NULL, this);
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncUnitTestsBase::onShow), NULL, this);
+    m_unitTestSelector->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncUnitTestsBase::selectTest), NULL, this);
+    m_btUnitTestClear->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUnitTestsBase::clearView), NULL, this);
+    m_unitTestStartupTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncUnitTestsBase::onStartupTimer), NULL, this);
     
     m_unitTestStartupTimer->Stop();
     wxDELETE( m_unitTestStartupTimer );

@@ -58,8 +58,8 @@ namespace cnc {
 	
 };
 
-#define CNC_LOG_FUNCT			wxString::Format( "[ %s ]", 	cnc::lformat(__PRETTY_FUNCTION__, 84) )
-#define CNC_LOG_FUNCT_A(msg)	wxString::Format( "[ %s: %s ]", cnc::lformat(__PRETTY_FUNCTION__, 84), msg)
+#define CNC_LOG_FUNCT			wxString::Format( "%s", 	__PRETTY_FUNCTION__ )
+#define CNC_LOG_FUNCT_A(msg)	wxString::Format( "%s: %s", __PRETTY_FUNCTION__, msg)
 
 #define CNC_PRINT_FUNCT 		std::cout << CNC_LOG_FUNCT 			<< std::endl;
 #define CNC_PRINT_FUNCT_A(msg)	std::cout << CNC_LOG_FUNCT_A(msg) 	<< std::endl;

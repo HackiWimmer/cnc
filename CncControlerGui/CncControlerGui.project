@@ -88,12 +88,14 @@
       <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;release2"/>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
+      <File Name="3D/CncMetricRulerSetup.cpp"/>
+      <File Name="3D/CncMetricRulerSetup.h"/>
+      <File Name="3D/CncGLCanvas.h"/>
       <File Name="GL3DDrawPane.h"/>
       <File Name="GL3DDrawPane.cpp"/>
       <File Name="Gl3DOptionPane.h"/>
       <File Name="Gl3DOptionPane.cpp"/>
       <File Name="3D/CncGLCanvas.cpp"/>
-      <File Name="CncGLCanvas.h"/>
       <VirtualDirectory Name="Base">
         <File Name="3D/GLCommon.cpp"/>
         <File Name="3D/GLCommon.h"/>
@@ -157,6 +159,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncOpenGLContextObserver.h"/>
+      <File Name="CncOpenGLContextObserver.cpp"/>
       <File Name="CncLoggerProxy.cpp"/>
       <File Name="CncLoggerProxy.h"/>
       <File Name="CncParsingSynopsisTrace.h"/>
@@ -259,6 +263,9 @@
       <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Release;Debug;release2;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterContextObserver_bitmaps.cpp"/>
+      <File Name="wxCrafterContextObserver.h"/>
+      <File Name="wxCrafterContextObserver.cpp"/>
       <File Name="wxcrafter.cpp"/>
       <File Name="wxcrafter_bitmaps.cpp"/>
       <File Name="wxcrafter.h"/>
@@ -368,6 +375,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncOpenGLContextObserverListCtrl.cpp"/>
+      <File Name="CncOpenGLContextObserverListCtrl.h"/>
       <File Name="CncParsingSynopsisTraceListCtrl.cpp"/>
       <File Name="CncParsingSynopsisTraceListCtrl.h"/>
       <File Name="CncMotionMonitorVertexTrace.cpp"/>
@@ -393,6 +402,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterContextObserver.wxcp"/>
     <File Name="wxcrafter.wxcp"/>
     <File Name="win_resources.rc" ExcludeProjConfig=""/>
   </VirtualDirectory>

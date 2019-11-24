@@ -3,7 +3,6 @@
 #include "OSD/CncAsyncKeyboardState.h"
 #include "3D/GLContextCncPath.h"
 #include "3D/GLContextTestCube.h"
-#include "3D/GLOpenGLPathBufferStore.h"
 #include "CncMotionVertexTrace.h"
 #include "GL3DDrawPane.h"
 #include "CncConfig.h"
@@ -56,7 +55,7 @@ wxEND_EVENT_TABLE()
 //////////////////////////////////////////////////
 CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList) 
 : CncGlCanvas(parent, attribList)
-, monitor(new GLContextCncPath(this))
+, monitor(new GLContextCncPath(this, "GLMotionMonitor"))
 , cameraRotationTimer(this, wxEVT_MONTION_MONITOR_TIMER)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
@@ -67,6 +66,8 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
 	monitor->init();
+	
+	lastSetCurrent = monitor->SetCurrent(*this);
 	
 	// Important: initialize the CncGlCanvas context
 	context = monitor;
@@ -119,9 +120,6 @@ void CncMotionMonitor::decorateProbeMode(bool state) {
 //////////////////////////////////////////////////
 void CncMotionMonitor::clear() {
 //////////////////////////////////////////////////
-	if ( GLCommon:: getTraceLevel() > 0 )
-		std::cout << CNC_LOG_FUNCT << std::endl;
-
 	monitor->clearPathData();
 	onPaint();
 }
@@ -217,6 +215,8 @@ void CncMotionMonitor::appendVertex(long clientId, CncSpeedMode sm, const CncLon
 void CncMotionMonitor::appendVertex(long id, CncSpeedMode sm, float x, float y, float z) {
 //////////////////////////////////////////////////
 	static GLOpenGLPathBuffer::CncVertex vertex;
+
+	lastSetCurrent = monitor->SetCurrent(*this);
 	
 	const char sc = cnc::getCncSpeedTypeAsCharacter(sm);
 	monitor->appendPathData(vertex.set(sc, id, x, y, z)); 

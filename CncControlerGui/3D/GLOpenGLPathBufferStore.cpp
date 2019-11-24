@@ -1,6 +1,7 @@
 #include "CncCommon.h"
 #include "GLCommon.h"
 #include "GlobalFunctions.h"
+#include "3D/GLContextCncPathBase.h"
 #include "3D/GLOpenGLPathBufferStore.h"
 
 GLOpenGLPathBuffer::VertexColours GLOpenGLPathBuffer::vertexColours ;
@@ -14,16 +15,12 @@ GLOpenGLPathBuffer::GLOpenGLPathBuffer(GLOpenGLPathBufferStore* s, GLOpenGLPathB
 , clientIdIndex()
 /////////////////////////////////////////////////////////////
 {
-	generateBuffers();
-	initBuffers();
+	generateBuffer();
 	
-	if ( GL_ERROR_TRACE_LEVEL > 0 ) {
-		std::clog << "[ *** Create new GLOpenGLPathBuffer(store = " <<  (uint64_t)store << ", ptr = " << (uint64_t)this << ") ]" << std::endl;
-		traceParameters(std::cout);
-	}
-	
-	if ( firstVertex != NULL )
-		appendVertex(*firstVertex);
+	if ( vertexBufferID != 0 ) {
+		if ( firstVertex != NULL )
+			appendVertex(*firstVertex);
+	} 
 }
 /////////////////////////////////////////////////////////////
 GLOpenGLPathBuffer::GLOpenGLPathBuffer(const GLOpenGLPathBuffer& b)
@@ -37,13 +34,13 @@ GLOpenGLPathBuffer::GLOpenGLPathBuffer(const GLOpenGLPathBuffer& b)
 	// don't call generateBuffers() here, because in the openGL context
 	// the underlying buffers of the given GLOpenGLPathBuffer object
 	// are already initialized
-	//generateBuffers();
-	initBuffers();
+	// generateBuffers();
 	
 	if ( GL_ERROR_TRACE_LEVEL > 0 ) {
-		std::clog << "[ *** Create new GLOpenGLPathBuffer(store = " <<  (uint64_t)store << ", ptr = " << (uint64_t)this << ") as copy from ptr = " << (uint64_t)(&b) << "]" << std::endl;
-		//GblFunc::stacktrace(std::cout);
-		traceParameters(std::cout);
+		std::stringstream ss;
+		ss << "Create new GLOpenGLPathBuffer: ";
+		traceParameters(ss);
+		GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, ss.str());
 	}
 }
 /////////////////////////////////////////////////////////////
@@ -55,15 +52,18 @@ void GLOpenGLPathBuffer::traceParameters(std::ostream& os, bool indent, bool one
 /////////////////////////////////////////////////////////////
 	const char* delm 		= oneLine ? ", " : "\n";
 	const char* storeName 	= store ? store->getInstanceName() : _("Unknown Store"); 
+	const uint64_t storeID	= store ? store->getInstance() : 0; 
 	
 	if ( indent == true )
 		os << "\t"; 
 	
-	os << "GLOpenGLPathBuffer Parameters" 		<< delm;
-	os << "Store Name = "  << storeName			<< delm;
-	os << "Buffer ID = "   << vertexBufferID 	<< delm;
-	os << "Vertex ID = "   << vertexArrayID 	<< delm;
-	os << "Vertex Num = "  << numVertices		<< delm;
+	os << "GLOpenGLPathBuffer Parameters" 				<< delm;
+	os << "Store Name = "  << storeName					<< delm;
+	os << "Buffer ID = "   << vertexBufferID 			<< delm;
+	os << "Vertex ID = "   << vertexArrayID 			<< delm;
+	os << "Vertex Num = "  << numVertices				<< delm;
+	os << "Store PTR = "   << storeID				 	<< delm;
+	os << "Buffer PTR = "  << this->getInstance()		<< delm;
 	 
 	os << std::endl;
 }
@@ -103,64 +103,82 @@ void GLOpenGLPathBuffer::traceIdentifierEndl(std::ostream& os, const char* prepe
 	os << std::endl;
 }
 /////////////////////////////////////////////////////////////
-void GLOpenGLPathBuffer::generateBuffers() {
+void GLOpenGLPathBuffer::generateBuffer() {
 /////////////////////////////////////////////////////////////
-	unsigned int ec = 0;
-	
 	glGenBuffers(1, &vertexBufferID);
-	glBindBuffer(GL_ARRAY_BUFFER, 	vertexBufferID);
-	glBufferData(GL_ARRAY_BUFFER, 	vertexBufferSize, NULL, GL_DYNAMIC_DRAW);
-	ec += GL_COMMON_CHECK_ERROR;
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't create a new buffer VBO!"));
 	
-	glGenVertexArrays(1, &vertexArrayID);
-	glBindVertexArray(vertexArrayID);
-	ec += GL_COMMON_CHECK_ERROR;
-	
-	if ( ec > 0 ) {
-		#warning !!!
-	}
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
+	glBufferData(GL_ARRAY_BUFFER, vertexBufferSize, NULL, GL_DYNAMIC_DRAW);
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't define buffer VBO!"));
 }
 /////////////////////////////////////////////////////////////
-void GLOpenGLPathBuffer::initBuffers() {
+void GLOpenGLPathBuffer::resetBuffer() {
 /////////////////////////////////////////////////////////////
-	unsigned int ec = 0;
+	clientIdIndex.clear();
+	numVertices 	= 0;
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::destroyBuffer() {
+/////////////////////////////////////////////////////////////
+	clientIdIndex.clear();
 	
-	glBindBuffer(GL_ARRAY_BUFFER, 	vertexBufferID);
-	ec += GL_COMMON_CHECK_ERROR;
-
-		glBindVertexArray(vertexArrayID);
-		ec += GL_COMMON_CHECK_ERROR;
+	glDeleteVertexArrays(1, &vertexArrayID);
+	glDeleteBuffers(1, &vertexBufferID);
+	
+	numVertices 	= 0;
+	vertexArrayID	= 0;
+	vertexBufferID	= 0;
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::createVertexArray() {
+/////////////////////////////////////////////////////////////
+	//destroyVertexArray();
 		
-		// vertex
-		char *offset = (char*)NULL;
-		glVertexPointer(CncVertexAxisValueCount, GL_FLOAT, sizeof(CncVertex), offset);
-		glEnableClientState(GL_VERTEX_ARRAY);
-		ec += GL_COMMON_CHECK_ERROR;
+	glGenVertexArrays(1, &vertexArrayID);
+	if ( GL_COMMON_CHECK_ERROR> 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't assign vertex array!"));
 
-		// color
-		offset = (char*)NULL + CncVertexAxisValueCount * sizeof(vertex_type);
-		glColorPointer(CncVertexColourValueCount, GL_UNSIGNED_BYTE, sizeof(CncVertex), offset);
-		glEnableClientState(GL_COLOR_ARRAY);
-		ec += GL_COMMON_CHECK_ERROR;
+	glBindVertexArray(vertexArrayID);
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't bind vertex array VAO!"));
 	
-		glBindVertexArray(0);
-		ec += GL_COMMON_CHECK_ERROR;
+	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't bind buffer VBO!"));
+	
+	// vertex
+	char *offset = (char*)NULL;
+	glVertexPointer(CncVertexAxisValueCount, GL_FLOAT, sizeof(CncVertex), offset);
+	glEnableClientState(GL_VERTEX_ARRAY);
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't define vertex pointer!"));
+	
+	// color
+	offset = (char*)NULL + CncVertexAxisValueCount * sizeof(vertex_type);
+	glColorPointer(CncVertexColourValueCount, GL_UNSIGNED_BYTE, sizeof(CncVertex), offset);
+	glEnableClientState(GL_COLOR_ARRAY);
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't define colour pointer!"));
+	
+	glBindVertexArray(0);
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't reset vertex array VAO!"));
 	
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	ec += GL_COMMON_CHECK_ERROR;
+	if ( GL_COMMON_CHECK_ERROR > 0 ) traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Can't reset buffer VBO!"));
 	
-	if ( ec > 0 ) {
-		#warning !!!
+	if ( GL_ERROR_TRACE_LEVEL > 0 )
+		GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("VAO initialized. VAO=%u", vertexArrayID));
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBuffer::destroyVertexArray() {
+/////////////////////////////////////////////////////////////
+	if ( vertexArrayID != 0 ) {
+		glDeleteVertexArrays(1, &vertexArrayID);
+		vertexArrayID = 0;
+		
+		if ( GL_ERROR_TRACE_LEVEL > 0 )
+			GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("VAO=%u destroyed.", vertexArrayID));
 	}
 }
 /////////////////////////////////////////////////////////////
 bool GLOpenGLPathBuffer::getVertex(CncVertex& ret, unsigned int idx) const {
 /////////////////////////////////////////////////////////////
-	if ( vertexArrayID == 0 || vertexBufferID == 0 ) {
-		traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Invalid ID"));
-		return false;
-	}
-
 	if ( idx < numVertices ) {
 		glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
 	
@@ -194,11 +212,6 @@ bool GLOpenGLPathBuffer::appendVertex(const CncVertex& vertex) {
 /////////////////////////////////////////////////////////////
 	if ( remainingVertiesCount() == 0 )
 		return false;
-		
-	if ( GLCommon::getTraceLevel() > 0 ) {
-		if ( numVertices < 1 )
-			traceIdentifierEndl(std::cout, CNC_LOG_FUNCT);
-	}
 	
 	// buffer management
 	const GLintptr vertexOffset = (numVertices) * sizeof(CncVertex);
@@ -214,33 +227,9 @@ bool GLOpenGLPathBuffer::appendVertex(const CncVertex& vertex) {
 	return true;
 }
 /////////////////////////////////////////////////////////////
-void GLOpenGLPathBuffer::resetBuffer() {
-/////////////////////////////////////////////////////////////
-	clientIdIndex.clear();
-	
-	if ( GLCommon::getTraceLevel() > 0 )
-		traceIdentifierEndl(std::cout, CNC_LOG_FUNCT);
-	
-	numVertices 	= 0;
-}
-/////////////////////////////////////////////////////////////
-void GLOpenGLPathBuffer::destroyBuffer() {
-/////////////////////////////////////////////////////////////
-	clientIdIndex.clear();
-	
-	glDeleteVertexArrays(1, &vertexArrayID);
-	glDeleteBuffers(1, &vertexBufferID);
-	
-	if ( GLCommon::getTraceLevel() > 0 )
-		traceIdentifierEndl(std::cout, CNC_LOG_FUNCT);
-	
-	numVertices 	= 0;
-	vertexArrayID	= 0;
-	vertexBufferID	= 0;
-}
-/////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::display(DisplayType dt, int vertices) {
 /////////////////////////////////////////////////////////////
+	/*
 	if ( numVertices < 2 )
 		return;
 	
@@ -250,11 +239,14 @@ void GLOpenGLPathBuffer::display(DisplayType dt, int vertices) {
 	}
 	
 	if ( vertexArrayID == 0 || vertexBufferID == 0 ) {
-		traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Invalid ID"));
+		traceIdentifierEndl(std::cerr, CNC_LOG_FUNCT_A("Invalid IDs"));
 		return;
 	}
+	*/
 	
-	// select buffer
+	if ( vertexArrayID == 0 )
+		createVertexArray();
+	
 	glBindVertexArray(vertexArrayID);
 	
 		if ( GL_COMMON_CHECK_ERROR > 0 ) {
@@ -266,13 +258,13 @@ void GLOpenGLPathBuffer::display(DisplayType dt, int vertices) {
 		const unsigned int displayCount = vertices >= 0 ? std::min((unsigned int)vertices, numVertices) : numVertices;
 		const unsigned int displayOffset = 0;
 		
+		if ( GL_ERROR_TRACE_LEVEL > 0 ) 
+			GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("glDrawArrays(%d, %u, %u) - VAO=%u, VBO=%u", dt, displayOffset, displayCount, vertexArrayID, vertexBufferID));
+
+		#warning
 		glDrawArrays(dt, displayOffset, displayCount);
 		
-		if ( GL_COMMON_CHECK_ERROR > 0 ) 
-			return;
-		
 	glBindVertexArray(0);
-	GL_COMMON_CHECK_ERROR;
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBuffer::reconstruct(const ReconstructOptions& opt) {
@@ -282,8 +274,7 @@ void GLOpenGLPathBuffer::reconstruct(const ReconstructOptions& opt) {
 	
 	// over all verties
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBufferID);
-	GL_COMMON_CHECK_ERROR;
-		
+	
 		CncVertex vertex;
 		for ( unsigned int i = 0; i < numVertices; i++ ) {
 			const GLintptr vertexOffset = i * sizeof(CncVertex);
@@ -392,9 +383,35 @@ GLOpenGLPathBufferStore::~GLOpenGLPathBufferStore() {
 		destroyBuffers();
 }
 /////////////////////////////////////////////////////////////
+void GLOpenGLPathBufferStore::createVertexArray() {
+/////////////////////////////////////////////////////////////
+	if ( initialized == true ) {
+		for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it )
+			it->createVertexArray();
+			
+		if ( GL_ERROR_TRACE_LEVEL > 0 )	{
+			if ( bufferStore.size() == 0 )
+				GL_CTX_OBS->appendMessage('W', CNC_LOG_FUNCT, wxString::Format("Buffer count = 0!; Initialized = %d", initialized));
+		}
+	}
+}
+/////////////////////////////////////////////////////////////
+void GLOpenGLPathBufferStore::destroyVertexArray() {
+/////////////////////////////////////////////////////////////
+	if ( initialized == true ) {
+		for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it )
+			it->destroyVertexArray();
+			
+		if ( GL_ERROR_TRACE_LEVEL > 0 )	{
+			if ( bufferStore.size() == 0 )
+				GL_CTX_OBS->appendMessage('W', CNC_LOG_FUNCT, wxString::Format("Buffer count = 0!; Initialized = %d", initialized));
+		}
+	}
+}
+/////////////////////////////////////////////////////////////
 const wxString& GLOpenGLPathBufferStore::getInstanceFullName() const {
 /////////////////////////////////////////////////////////////
-	return _(wxString::Format("%s(% 16" PRIu64 ")", instanceName, getInstance()));
+	return _(wxString::Format("%s(PTR=%" PRIu64 ")", instanceName, getInstance()));
 }
 /////////////////////////////////////////////////////////////
 void GLOpenGLPathBufferStore::addBuffer() {
@@ -404,8 +421,6 @@ void GLOpenGLPathBufferStore::addBuffer() {
 	// add, please not this creates a copy of buffer
 	bufferStore.push_back(buffer);
 	currentBufferIndex = bufferStore.size() - 1;
-	
-	if ( GL_ERROR_TRACE_LEVEL > 0 )	buffer.traceIdentifierEndl(std::cout, CNC_LOG_FUNCT);
 }
 /////////////////////////////////////////////////////////////
 int GLOpenGLPathBufferStore::getBufferStoreIndex(unsigned long idx) const {
@@ -467,15 +482,11 @@ void GLOpenGLPathBufferStore::destroyBuffers() {
 	}
 }
 /////////////////////////////////////////////////////////////
-bool GLOpenGLPathBufferStore::checkInitialized() {
+bool GLOpenGLPathBufferStore::initialize() {
 /////////////////////////////////////////////////////////////
 	if ( initialized == false ) {
-		
 		// try to init
 		init();
-		if ( initialized == false ) {
-			;//std::cerr << "GLOpenGLPathBufferStore::checkInitialized() == false " << std::endl;
-		}
 	}
 	
 	return initialized;
@@ -555,8 +566,8 @@ bool GLOpenGLPathBufferStore::updateVertex(GLOpenGLPathBuffer::CncVertex& ret, u
 /////////////////////////////////////////////////////////////
 unsigned long GLOpenGLPathBufferStore::appendVertex(const GLOpenGLPathBuffer::CncVertex& vertex) {
 /////////////////////////////////////////////////////////////
-	if ( checkInitialized() == false )
-		return false;
+	if ( initialize() == false )
+		return 0;
 
 	if ( bufferStore.size() == 0 )
 		addBuffer();
@@ -638,6 +649,22 @@ void GLOpenGLPathBufferStore::setColours(const GLOpenGLPathBuffer::VertexColours
 /////////////////////////////////////////////////////////////
 	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it ) 
 		it->setColours(colours);
+}
+/////////////////////////////////////////////////////////////
+const wxString& GLOpenGLPathBufferStore::getVaoAndVboSummary() {
+/////////////////////////////////////////////////////////////
+	static wxString ret;
+	ret.clear();
+	
+	unsigned int i = 0;
+	for ( auto it = bufferStore.begin(); it != bufferStore.end(); ++it, i++ ) {
+		ret.append(wxString::Format("{ IDX=%u, VBO=%u, VAO=%u }", i + 1, it->getBufferID(), it->getArrayID() ));
+		
+		if ( i < bufferStore.size() - 1 )
+			ret.append(", ");
+	}
+	
+	return ret;
 }
 /////////////////////////////////////////////////////////////
 const wxString& GLOpenGLPathBufferStore::getIndexForIdxAsString(unsigned long idx, wxString& ret, bool summerize) {

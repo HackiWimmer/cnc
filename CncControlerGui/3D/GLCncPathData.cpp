@@ -19,9 +19,6 @@ GLI::GLCncPath::~GLCncPath() {
 ////////////////////////////////////////////
 void GLI::GLCncPath::clear() {
 ////////////////////////////////////////////
-	if ( GLCommon::getTraceLevel() > 0 )
-		std::cout << CNC_LOG_FUNCT << std::endl;
-
 	// reset boundings
 	minVecties.set(-1L, FLT_MAX, FLT_MAX, FLT_MAX);
 	maxVecties.set(-1L, FLT_MIN, FLT_MIN, FLT_MIN);
@@ -32,11 +29,6 @@ void GLI::GLCncPath::clear() {
 ////////////////////////////////////////////
 void GLI::GLCncPath::appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex) {
 ////////////////////////////////////////////
-	if ( GLCommon::getTraceLevel() > 0 ) {
-		if ( vectiesBuffer.getVertexCount() < 2 )
-			std::cout << CNC_LOG_FUNCT << std::endl;
-	}
-
 	minVecties.setX(std::min(vertex.getX(), minVecties.getX()));
 	minVecties.setY(std::min(vertex.getY(), minVecties.getY()));
 	minVecties.setZ(std::min(vertex.getZ(), minVecties.getZ()));

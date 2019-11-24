@@ -71,6 +71,7 @@
 	#define CncApplication_DEF_DISPLAY_UNIT 		"CncApplication/DEF_DISPLAY_UNIT"
 	#define CncApplication_AUTO_CONNECT 			"CncApplication/AUTO_CONNECT"
 	#define CncApplication_AUTO_PROCESS 			"CncApplication/AUTO_PROCESS"
+	#define CncApplication_AUTO_OPEN_OGL_OBSERVER	"CncApplication/AUTO_OPEN_OGL_OBSERVER"
 	#define CncApplication_SHOW_TEST_MENU 			"CncApplication/SHOW_TEST_MENU"
 	#define CncApplication_CONFIRMATION_MODE		"CncApplication/CONFIRMATION_MODE"
 	#define CncApplication_Com_DEFALT_PORT 			"CncApplication.Port/DEFAULT_PORT"
@@ -103,6 +104,6 @@
 	#define CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY		"CncWork.Controller/PRE_PROSSOR_SKIP_EMPTY"
 	#define CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES	"CncWork.Controller/PRE_PROSSOR_COMBINE_MOVES"
 
-	#define CncTEST_TEST					"CncTest.Test/DUMMY"
+	#define CncTEST_TEST							"CncTest.Test/DUMMY"
 
 #endif
