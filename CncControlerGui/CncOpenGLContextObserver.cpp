@@ -56,23 +56,27 @@ void CncOpenGLContextObserver::onContinuousTimer(wxTimerEvent& event) {
 		else					{ heartbeatFlag = true;  m_bmpHeartbeat->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
 		
 		m_bmpHeartbeat->Refresh();
-	}
-	
-	if ( currentCtxList->IsShownOnScreen() )
-		currentCtxList->Refresh();
-	
-	if ( registeredCtxList->IsShownOnScreen() )
-		registeredCtxList->Refresh();
-	
-	if ( historyList->IsShownOnScreen() ) {
-		if ( historyStage.size() > 0 ) {
-			for (auto it= historyStage.begin(); it != historyStage.end(); ++it ) 
-				historyList->appendItem(*it);
-			historyStage.clear();
+		
+		// update context list
+		if ( currentCtxList->IsShownOnScreen() )
+			currentCtxList->Refresh();
+		
+		// update registered list
+		if ( registeredCtxList->IsShownOnScreen() )
+			registeredCtxList->Refresh();
+		
+		// update history  list
+		if ( historyList->IsShownOnScreen() ) {
+			// move stage content
+			if ( historyStage.size() > 0 ) {
+				for (auto it= historyStage.begin(); it != historyStage.end(); ++it ) 
+					historyList->appendItem(*it);
+				historyStage.clear();
+			}
+			historyList->Refresh();
 		}
-		historyList->Refresh();
 	}
-
+	
 	if ( infoCounter > 0 ) {
 		
 		if ( --infoCounter == 0 )

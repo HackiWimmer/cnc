@@ -52,6 +52,7 @@ CncOpenGLContextObserverBase::CncOpenGLContextObserverBase(wxWindow* parent, wxW
     m_infoText->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_SCROLLBAR));
     wxFont m_infoTextFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_infoText->SetFont(m_infoTextFont);
+    m_infoText->SetToolTip(_("Notification Hint"));
     #if wxVERSION_NUMBER >= 3000
     m_infoText->SetHint(wxT(""));
     #endif
@@ -61,6 +62,7 @@ CncOpenGLContextObserverBase::CncOpenGLContextObserverBase(wxWindow* parent, wxW
     flexGridSizer8061->Add(5, 0, 1, wxALL, WXC_FROM_DIP(0));
     
     m_bmpHeartbeat = new wxStaticBitmap(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("heart-2")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0 );
+    m_bmpHeartbeat->SetToolTip(_("Context Observer Heartbeat\n(Content Update)"));
     
     flexGridSizer8061->Add(m_bmpHeartbeat, 0, wxALL|wxALIGN_CENTER|wxALIGN_CENTER_HORIZONTAL, WXC_FROM_DIP(5));
     

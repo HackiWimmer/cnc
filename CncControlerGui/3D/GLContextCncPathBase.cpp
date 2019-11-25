@@ -179,13 +179,18 @@ bool GLContextCncPathBase::SetCurrent(const wxGLCanvas &win) const {
 	static CncGLContextObserver* ctxObs = CncGLContextObserver::getInstance();
 	const bool isContextSwitch = ctxObs->prepareContextSwitch(this);
 	
-	// always do the standard procedere
-	bool ret = wxGLContext::SetCurrent(win);
-	GLContextBase::setCurrentCanvas(&win);
-	
-	if ( isContextSwitch == true )
+	bool ret = true;
+	if ( isContextSwitch == true ) {
+		
+		// standard procedere
+		ret = wxGLContext::SetCurrent(win);
+		
+		// log the canvas
+		GLContextBase::setCurrentCanvas(&win);
+		
+		// switch
 		ctxObs->switchContext(this);
-	
+	}
 	return ret;
 }
 /////////////////////////////////////////////////////////////////

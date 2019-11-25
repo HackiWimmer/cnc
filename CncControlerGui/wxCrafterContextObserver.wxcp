@@ -255,7 +255,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
-           "m_value": ""
+           "m_value": "Notification Hint"
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
@@ -361,7 +361,7 @@
           }, {
            "type": "multi-string",
            "m_label": "Tooltip:",
-           "m_value": ""
+           "m_value": "Context Observer Heartbeat\\n(Content Update)"
           }, {
            "type": "colour",
            "m_label": "Bg Colour:",
