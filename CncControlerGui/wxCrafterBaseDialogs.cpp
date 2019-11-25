@@ -544,3 +544,79 @@ CncUsbConnectionDetectedBase::~CncUsbConnectionDetectedBase()
     m_connect->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncUsbConnectionDetectedBase::connect), NULL, this);
     
 }
+
+CncLastProcessingTimestampSummaryBase::CncLastProcessingTimestampSummaryBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC3105InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("time"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
+    
+    wxFlexGridSizer* flexGridSizer61 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer61->SetFlexibleDirection( wxBOTH );
+    flexGridSizer61->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer61->AddGrowableCol(0);
+    flexGridSizer61->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer61);
+    
+    m_tsSummary = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLC_VRULES|wxLC_HRULES|wxLC_SINGLE_SEL|wxLC_REPORT);
+    m_tsSummary->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
+    
+    flexGridSizer61->Add(m_tsSummary, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Area"), wxLIST_FORMAT_LEFT, -1);
+    m_tsSummary->InsertColumn(m_tsSummary->GetColumnCount(), _("Time Consumed"), wxLIST_FORMAT_LEFT, -1);
+    m_tsSummary->SetMinSize(wxSize(330,180));
+    
+    wxFlexGridSizer* flexGridSizer65 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer65->SetFlexibleDirection( wxBOTH );
+    flexGridSizer65->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer61->Add(flexGridSizer65, 1, wxALL|wxEXPAND|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_btClose = new wxButton(this, wxID_ANY, _("Close"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
+    m_btClose->SetDefault();
+    #if wxVERSION_NUMBER >= 2904
+    m_btClose->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("dialog-close")), wxLEFT);
+    m_btClose->SetBitmapMargins(2,2);
+    #endif
+    wxFont m_btCloseFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_btClose->SetFont(m_btCloseFont);
+    
+    flexGridSizer65->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(5));
+    
+    SetName(wxT("CncLastProcessingTimestampSummaryBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncLastProcessingTimestampSummaryBase::onInitDilaog), NULL, this);
+    m_btClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncLastProcessingTimestampSummaryBase::onClose), NULL, this);
+    
+}
+
+CncLastProcessingTimestampSummaryBase::~CncLastProcessingTimestampSummaryBase()
+{
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncLastProcessingTimestampSummaryBase::onInitDilaog), NULL, this);
+    m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncLastProcessingTimestampSummaryBase::onClose), NULL, this);
+    
+}

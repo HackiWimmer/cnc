@@ -14,4 +14,5 @@
   <object class="wxBitmap" name="info">bitmaps\info.png</object>
   <object class="wxBitmap" name="package-link">bitmaps\package-link.png</object>
   <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
+  <object class="wxBitmap" name="time">bitmaps\time.png</object>
 </resource>

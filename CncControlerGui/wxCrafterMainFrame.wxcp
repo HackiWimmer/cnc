@@ -37306,7 +37306,7 @@
                                               }, {
                                                "type": "multi-string",
                                                "m_label": "Tooltip:",
-                                               "m_value": ""
+                                               "m_value": "Coordinate\\n(Strg + Mouse)"
                                               }, {
                                                "type": "colour",
                                                "m_label": "Bg Colour:",
@@ -37393,7 +37393,7 @@
                                               }, {
                                                "type": "multi-string",
                                                "m_label": "Tooltip:",
-                                               "m_value": ""
+                                               "m_value": "Coordinate\\n(Strg + Mouse)"
                                               }, {
                                                "type": "colour",
                                                "m_label": "Bg Colour:",
@@ -37480,7 +37480,7 @@
                                               }, {
                                                "type": "multi-string",
                                                "m_label": "Tooltip:",
-                                               "m_value": ""
+                                               "m_value": "Coordinate\\n(Strg + Mouse)"
                                               }, {
                                                "type": "colour",
                                                "m_label": "Bg Colour:",

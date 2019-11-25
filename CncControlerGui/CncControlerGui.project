@@ -164,6 +164,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncLastProcessingTimestampSummary.h"/>
+      <File Name="CncLastProcessingTimestampSummary.cpp"/>
       <File Name="CncOpenGLContextObserver.h"/>
       <File Name="CncOpenGLContextObserver.cpp"/>
       <File Name="CncLoggerProxy.cpp"/>

@@ -5753,6 +5753,9 @@ Interval [ms]:</label>
                                                                               <underlined>0</underlined>
                                                                               <face>Segoe UI</face>
                                                                             </font>
+                                                                            <tooltip>
+                                                                              <![CDATA[Coordinate\n(Strg + Mouse)]]>
+                                                                            </tooltip>
                                                                             <value>300.000</value>
                                                                           </object>
                                                                         </object>
@@ -5771,6 +5774,9 @@ Interval [ms]:</label>
                                                                               <underlined>0</underlined>
                                                                               <face>Segoe UI</face>
                                                                             </font>
+                                                                            <tooltip>
+                                                                              <![CDATA[Coordinate\n(Strg + Mouse)]]>
+                                                                            </tooltip>
                                                                             <value>123.456</value>
                                                                           </object>
                                                                         </object>
@@ -5789,6 +5795,9 @@ Interval [ms]:</label>
                                                                               <underlined>0</underlined>
                                                                               <face>Segoe UI</face>
                                                                             </font>
+                                                                            <tooltip>
+                                                                              <![CDATA[Coordinate\n(Strg + Mouse)]]>
+                                                                            </tooltip>
                                                                             <value>897.666</value>
                                                                           </object>
                                                                         </object>

@@ -168,4 +168,22 @@ public:
     virtual ~CncUsbConnectionDetectedBase();
 };
 
+
+class CncLastProcessingTimestampSummaryBase : public wxDialog
+{
+protected:
+    wxListCtrl* m_tsSummary;
+    wxButton* m_btClose;
+
+protected:
+    virtual void onInitDilaog(wxInitDialogEvent& event) { event.Skip(); }
+    virtual void onClose(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxListCtrl* GetTsSummary() { return m_tsSummary; }
+    wxButton* GetBtClose() { return m_btClose; }
+    CncLastProcessingTimestampSummaryBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Last Processing Timestamp Summary"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
+    virtual ~CncLastProcessingTimestampSummaryBase();
+};
+
 #endif

@@ -3331,6 +3331,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_mouseCoordX->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     wxFont m_mouseCoordXFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_mouseCoordX->SetFont(m_mouseCoordXFont);
+    m_mouseCoordX->SetToolTip(_("Coordinate\n(Strg + Mouse)"));
     #if wxVERSION_NUMBER >= 3000
     m_mouseCoordX->SetHint(wxT(""));
     #endif
@@ -3342,6 +3343,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_mouseCoordY->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     wxFont m_mouseCoordYFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_mouseCoordY->SetFont(m_mouseCoordYFont);
+    m_mouseCoordY->SetToolTip(_("Coordinate\n(Strg + Mouse)"));
     #if wxVERSION_NUMBER >= 3000
     m_mouseCoordY->SetHint(wxT(""));
     #endif
@@ -3353,6 +3355,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_mouseCoordZ->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     wxFont m_mouseCoordZFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
     m_mouseCoordZ->SetFont(m_mouseCoordZFont);
+    m_mouseCoordZ->SetToolTip(_("Coordinate\n(Strg + Mouse)"));
     #if wxVERSION_NUMBER >= 3000
     m_mouseCoordZ->SetHint(wxT(""));
     #endif

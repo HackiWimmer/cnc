@@ -42,10 +42,6 @@ void CncOpenGLContextObserver::onCloseWindow(wxCloseEvent& event) {
 void CncOpenGLContextObserver::onStartupTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////////////////////
 	// fixing layout problems
-	wxSize size = GetClientSize();
-	size.IncBy(1);
-	
-	SetClientSize(size);
 	Update();
 }
 //////////////////////////////////////////////////////////////////

@@ -74,6 +74,7 @@
 #include "CncOpenGLContextObserver.h"
 #include "CncOSEnvironmentDialog.h"
 #include "CncContext.h"
+#include "CncLastProcessingTimestampSummary.h"
 #include "GlobalStrings.h"
 #include "MainFrame.h"
 
@@ -5401,10 +5402,28 @@ void MainFrame::stopAnimationControl() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::dclickDurationCount(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxString msg(m_cmdDuration->GetToolTipText());
-	if ( msg != "" ) {
-		wxMessageDialog dlg(this, msg, _T("Last processing timestamps . . . "), 
-						wxOK|wxCENTRE|wxICON_INFORMATION);
+	const wxString msg(m_cmdDuration->GetToolTipText());
+	if ( msg.IsEmpty() == false ) {
+		
+		CncLastProcessingTimestampSummary dlg (this);
+		wxStringTokenizer tokenizer(msg, "\n");
+		
+		// remove first line
+		if ( tokenizer.HasMoreTokens() )
+			tokenizer.GetNextToken();
+			
+		// token rest
+		while ( tokenizer.HasMoreTokens() ) {
+			wxString token = tokenizer.GetNextToken();
+			if ( token.IsEmpty() )
+				continue;
+				
+			token.Replace("*", "", true);
+			const wxString key(token.BeforeFirst(':').Trim().Trim(true));
+			const wxString val(token.AfterFirst(':').Trim().Trim(true));
+			
+			dlg.addTimestamp(key, val);
+		}
 		
 		dlg.ShowModal();
 	}
