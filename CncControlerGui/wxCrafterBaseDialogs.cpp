@@ -620,3 +620,61 @@ CncLastProcessingTimestampSummaryBase::~CncLastProcessingTimestampSummaryBase()
     m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncLastProcessingTimestampSummaryBase::onClose), NULL, this);
     
 }
+
+CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC3105InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("loading-throb"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
+    
+    wxFlexGridSizer* flexGridSizer73 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer73->SetFlexibleDirection( wxBOTH );
+    flexGridSizer73->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer73->AddGrowableCol(0);
+    flexGridSizer73->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer73);
+    
+    m_animationCtrl = new wxAnimationCtrl(this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDLG_UNIT(this, wxSize(40,40)), wxAC_DEFAULT_STYLE);
+    if( wxFileName::Exists(wxT("bitmaps/loading-throb.gif")) && m_animationCtrl->LoadFile(wxT("bitmaps/loading-throb.gif")))m_animationCtrl->Play();
+    m_animationCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_animationCtrl->SetInactiveBitmap(wxNullBitmap);
+    
+    flexGridSizer73->Add(m_animationCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_animationCtrl->SetMinSize(wxSize(40,40));
+    
+    SetName(wxT("CncAutoProgressDialogBase"));
+    SetSize(-1,-1);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+    // Connect events
+    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncAutoProgressDialogBase::onInitDialog), NULL, this);
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncAutoProgressDialogBase::onShow), NULL, this);
+    
+}
+
+CncAutoProgressDialogBase::~CncAutoProgressDialogBase()
+{
+    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncAutoProgressDialogBase::onInitDialog), NULL, this);
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncAutoProgressDialogBase::onShow), NULL, this);
+    
+}

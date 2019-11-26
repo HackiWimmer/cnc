@@ -12,6 +12,7 @@
   <object class="wxBitmap" name="application-side-list">bitmaps\application-side-list.png</object>
   <object class="wxBitmap" name="dialog-close">bitmaps\dialog-close.png</object>
   <object class="wxBitmap" name="info">bitmaps\info.png</object>
+  <object class="wxBitmap" name="loading-throb">bitmaps\loading-throb.gif</object>
   <object class="wxBitmap" name="package-link">bitmaps\package-link.png</object>
   <object class="wxBitmap" name="system-run-5">bitmaps\system-run-5.png</object>
   <object class="wxBitmap" name="time">bitmaps\time.png</object>

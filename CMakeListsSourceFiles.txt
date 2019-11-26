@@ -221,6 +221,8 @@ set(SOURCE_FILES
 	CncControlerGui/CncLoggerProxy.cpp
 	CncControlerGui/CncOpenGLContextObserver.cpp
 	CncControlerGui/CncLargeScaleListCtrl.cpp
+	CncControlerGui/CncAutoProgressDialog.cpp
+	
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp
 	CncControlerGui/wxCrafterTemplateObserver.cpp

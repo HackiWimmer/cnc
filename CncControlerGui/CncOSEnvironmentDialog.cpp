@@ -124,7 +124,7 @@ void CncOSEnvironmentDialog::evaluateLoadedModules() {
 	
 	m_moduleList->DeleteAllItems();
 	
-	wxDynamicLibraryDetailsArray modules = wxDynamicLibrary::ListLoaded();
+	wxDynamicLibraryDetailsArray modules(wxDynamicLibrary::ListLoaded());
 	const size_t count = modules.size();
 	if ( count <= 0 ) {
 		const unsigned int index = m_moduleList->GetItemCount();

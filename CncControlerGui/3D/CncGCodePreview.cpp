@@ -2,6 +2,7 @@
 
 #include "3D/CncGCodePreview.h"
 #include "CncConfig.h"
+#include "MainFrame.h"
 #include "CncCommon.h"
 
 #include "3D/GLInclude.h"
@@ -135,6 +136,10 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	const float z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
 	const char sc = cnc::getCncSpeedTypeAsCharacter(vd.getSpeedMode());
 	
+	// to update the progess bar
+	if ( preview->getVirtualEnd() % 100 == 0 )
+			THE_APP->dispatchAll();
+		
 	lastSetCurrent = preview->SetCurrent(*this);
 	preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
 }

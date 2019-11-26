@@ -25,6 +25,9 @@
 #include <wx/button.h>
 #include <wx/timer.h>
 #include <wx/statbmp.h>
+#include <wx/mstream.h>
+#include <wx/filename.h>
+#include <wx/animate.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -184,6 +187,22 @@ public:
     wxButton* GetBtClose() { return m_btClose; }
     CncLastProcessingTimestampSummaryBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Last Processing Timestamp Summary"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxDEFAULT_DIALOG_STYLE);
     virtual ~CncLastProcessingTimestampSummaryBase();
+};
+
+
+class CncAutoProgressDialogBase : public wxDialog
+{
+protected:
+    wxAnimationCtrl* m_animationCtrl;
+
+protected:
+    virtual void onInitDialog(wxInitDialogEvent& event) { event.Skip(); }
+    virtual void onShow(wxShowEvent& event) { event.Skip(); }
+
+public:
+    wxAnimationCtrl* GetAnimationCtrl() { return m_animationCtrl; }
+    CncAutoProgressDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = 0);
+    virtual ~CncAutoProgressDialogBase();
 };
 
 #endif

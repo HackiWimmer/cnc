@@ -4,6 +4,7 @@
 #include "GCodePathHandlerGL.h"
 #include "GCodeFileParser.h"
 #include "CncFileNameService.h"
+#include "CncAutoProgressDialog.h"
 #include "CncFilePreview.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -95,6 +96,9 @@ bool CncFilePreview::loadFile() {
 	
 	bool ret = false;
 	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE ) {
+		
+		CncAutoProgressDialog progressDlg(this);
+		progressDlg.Show(true);
 		
 		gcodePreview->clear();
 		gcodePreview->Refresh();
