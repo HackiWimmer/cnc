@@ -122,12 +122,6 @@ protected:
     wxStaticLine* m_staticLine7903;
     wxBitmapToggleButton* m_btConnectPathListEntries;
     wxStaticLine* m_staticLine78021113;
-    wxBitmapToggleButton* m_btToogleFormat;
-    wxStaticLine* m_staticLine780211;
-    wxBitmapToggleButton* m_btConsiderClientIdChanges;
-    wxBitmapToggleButton* m_btConsiderFeedSpeedChanges;
-    wxBitmapToggleButton* m_btConsiderPositionChanges;
-    wxStaticLine* m_staticLine7802;
     wxBitmapButton* m_btClearPathListEntries;
     wxListCtrl* m_pathListEntriesPlaceholder;
     wxPanel* m_panel7630;
@@ -137,11 +131,14 @@ protected:
     wxStaticLine* m_staticLine7901;
     wxBitmapToggleButton* m_btConnectMoveSequences;
     wxBitmapButton* m_btClearMoveSequences;
+    wxStaticLine* m_staticLine188;
+    wxStaticText* m_staticText186;
+    wxListCtrl* m_moveSequencesListPlaceholder;
+    wxStaticText* m_contentLabel;
     wxListCtrl* m_moveSequencesPlaceholder;
 
 protected:
     virtual void connectPathListEntries(wxCommandEvent& event) { event.Skip(); }
-    virtual void moveSequenceChangeContent(wxCommandEvent& event) { event.Skip(); }
     virtual void clearPathListEntries(wxCommandEvent& event) { event.Skip(); }
     virtual void connectMoveSequences(wxCommandEvent& event) { event.Skip(); }
     virtual void clearMoveSequences(wxCommandEvent& event) { event.Skip(); }
@@ -153,12 +150,6 @@ public:
     wxStaticLine* GetStaticLine7903() { return m_staticLine7903; }
     wxBitmapToggleButton* GetBtConnectPathListEntries() { return m_btConnectPathListEntries; }
     wxStaticLine* GetStaticLine78021113() { return m_staticLine78021113; }
-    wxBitmapToggleButton* GetBtToogleFormat() { return m_btToogleFormat; }
-    wxStaticLine* GetStaticLine780211() { return m_staticLine780211; }
-    wxBitmapToggleButton* GetBtConsiderClientIdChanges() { return m_btConsiderClientIdChanges; }
-    wxBitmapToggleButton* GetBtConsiderFeedSpeedChanges() { return m_btConsiderFeedSpeedChanges; }
-    wxBitmapToggleButton* GetBtConsiderPositionChanges() { return m_btConsiderPositionChanges; }
-    wxStaticLine* GetStaticLine7802() { return m_staticLine7802; }
     wxBitmapButton* GetBtClearPathListEntries() { return m_btClearPathListEntries; }
     wxListCtrl* GetPathListEntriesPlaceholder() { return m_pathListEntriesPlaceholder; }
     wxPanel* GetPanel7622() { return m_panel7622; }
@@ -168,6 +159,10 @@ public:
     wxStaticLine* GetStaticLine7901() { return m_staticLine7901; }
     wxBitmapToggleButton* GetBtConnectMoveSequences() { return m_btConnectMoveSequences; }
     wxBitmapButton* GetBtClearMoveSequences() { return m_btClearMoveSequences; }
+    wxStaticLine* GetStaticLine188() { return m_staticLine188; }
+    wxStaticText* GetStaticText186() { return m_staticText186; }
+    wxListCtrl* GetMoveSequencesListPlaceholder() { return m_moveSequencesListPlaceholder; }
+    wxStaticText* GetContentLabel() { return m_contentLabel; }
     wxListCtrl* GetMoveSequencesPlaceholder() { return m_moveSequencesPlaceholder; }
     wxPanel* GetPanel7630() { return m_panel7630; }
     wxListbook* GetListbookPreProcessor() { return m_listbookPreProcessor; }

@@ -200,7 +200,7 @@ const CncPathListEntry& CncPathListManager::addEntryAdm(CncSpeedMode mode, doubl
 		cpe.alreadyRendered		= list.back().alreadyRendered;
 		cpe.entryTarget			= list.back().entryTarget;
 	}
-
+	
 	// append
 	appendEntry(cpe);
 	return list.back();

@@ -10,6 +10,8 @@
 CncPreprocessor::CncPreprocessor(wxWindow* parent)
 : CncPreprocessorBase(parent)
 , pathListEntries(NULL)
+, moveSequenceOverview(NULL)
+, moveSequence(NULL)
 //////////////////////////////////////////////////////////////////
 {
 	// path list entries control
@@ -17,8 +19,12 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 	GblFunc::replaceControl(m_pathListEntriesPlaceholder, pathListEntries);
 	
 	// move sequences control
-	moveSequences = new CncMoveSequenceListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL);
-	GblFunc::replaceControl(m_moveSequencesPlaceholder, moveSequences);
+	moveSequence = new CncMoveSequenceListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_moveSequencesPlaceholder, moveSequence);
+
+	// move sequences control
+	moveSequenceOverview = new CncMoveSequenceOverviewListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL, moveSequence, m_contentLabel);
+	GblFunc::replaceControl(m_moveSequencesListPlaceholder, moveSequenceOverview);
 
 	const wxFont font = GBL_CONTEXT->outboundListBookFont;
 	m_listbookPreProcessor->GetListView()->SetFont(font);
@@ -26,6 +32,9 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 //////////////////////////////////////////////////////////////////
 CncPreprocessor::~CncPreprocessor() {
 //////////////////////////////////////////////////////////////////
+	delete pathListEntries;
+	delete moveSequenceOverview;
+	delete moveSequence;
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearAll() {
@@ -40,20 +49,23 @@ void CncPreprocessor::clearPathListEntries() {
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::clearMoveSequences() {
-//////////////////////////////////////////////////////////////////
-	moveSequences->clearAll();
+///////////////////////////////////////////////////////////
+	moveSequenceOverview->clearAll();
+	moveSequence->clearAll();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::freeze() {
 //////////////////////////////////////////////////////////////////
 	pathListEntries->freeze();
-	moveSequences->freeze();
+	moveSequence->freeze();
+	moveSequenceOverview->freeze();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::thaw() {
 //////////////////////////////////////////////////////////////////
 	pathListEntries->thaw();
-	moveSequences->thaw();
+	moveSequence->thaw();
+	moveSequenceOverview->thaw();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::enablePathListEntries(bool state) {
@@ -88,6 +100,9 @@ void CncPreprocessor::enableMoveSequences(bool state) {
 	
 	if ( state == false )
 		clearMoveSequences();
+		
+	moveSequence->setActive(state);
+	moveSequence->Refresh();
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::addMoveSequenceStart(const CncMoveSequence& seq, double value_MM_MIN, char mode) {
@@ -98,16 +113,20 @@ void CncPreprocessor::addMoveSequenceStart(const CncMoveSequence& seq, double va
 	CncMoveSequenceListCtrl::SpeedInfo si;
 	si.value = value_MM_MIN;
 	si.mode  = mode;
-
-	moveSequences->addMoveSequenceClietId(seq, si);
+	
+	//moveSequence->addMoveSequenceStart(seq, si);
+	
+	#warning
+	//moveSequenceOverview->addMoveSequence(seq);
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::addMoveSequence(const CncMoveSequence& seq) {
 //////////////////////////////////////////////////////////////////
 	if ( m_btConnectMoveSequences->GetValue() == false ) 
 		return;
-	
-	moveSequences->addMoveSequencePositions(seq);
+		
+	#warning
+	moveSequenceOverview->addMoveSequence(seq);
 }
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::addPathListEntry(const CncPathListEntry& cpe) {
@@ -142,7 +161,7 @@ void CncPreprocessor::selectClientId(long id, ListType lt) {
 //////////////////////////////////////////////////////////////////
 	switch ( lt ) {
 		case LT_PATH_LIST: 		pathListEntries->searchReferenceById(id); 	break;
-		case LT_MOVE_SEQUENCE:	moveSequences->searchReferenceById(id); 	break;
+		case LT_MOVE_SEQUENCE:	moveSequence->searchReferenceById(id); 		break;
 	}
 }
 //////////////////////////////////////////////////////////////////
@@ -152,26 +171,21 @@ void CncPreprocessor::updateContent() {
 	updateMoveSequenceListContent();
 }
 //////////////////////////////////////////////////////////////////
-void CncPreprocessor::moveSequenceChangeContent(wxCommandEvent& event) {
-//////////////////////////////////////////////////////////////////
-	const bool force = true;
-	updatePathListContent(force);
-}
-//////////////////////////////////////////////////////////////////
 void CncPreprocessor::updateMoveSequenceListContent(bool force) {
 //////////////////////////////////////////////////////////////////
-	moveSequences->updateContent(force);
-	m_moveSequenceRowCount->ChangeValue(wxString::Format("%ld", moveSequences->getItemCount()));
+	m_moveSequenceRowCount->ChangeValue(wxString::Format("%ld", moveSequence->GetItemCount()));
+	
+	if ( moveSequenceOverview->IsShownOnScreen() == true ) 
+		moveSequenceOverview->Refresh();
+		
+	if ( moveSequence->IsShownOnScreen() == true ) 
+		moveSequence->Refresh();
 }
 //////////////////////////////////////////////////////////////////
-void CncPreprocessor::updatePathListContent(bool force) {
+void CncPreprocessor::updatePathListContent() {
 //////////////////////////////////////////////////////////////////
-	CncPathListEntryListCtrl::UpdateContentInfo uci;
-	uci.format					= m_btToogleFormat->GetValue();
-	uci.considerClientIdChanges	= m_btConsiderClientIdChanges->GetValue();
-	uci.considerSpeedChanges	= m_btConsiderFeedSpeedChanges->GetValue();
-	uci.considerPositionChnages	= m_btConsiderPositionChanges->GetValue();
+	m_pathListRowCount->ChangeValue(wxString::Format("%ld", pathListEntries->GetItemCount()));
 	
-	pathListEntries->updateContent(uci, force);
-	m_pathListRowCount->ChangeValue(wxString::Format("%ld", pathListEntries->getItemCount()));
+	if ( pathListEntries->IsShownOnScreen() == true ) 
+		pathListEntries->Refresh();
 }

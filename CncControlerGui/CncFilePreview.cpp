@@ -73,15 +73,6 @@ bool CncFilePreview::selectGCodePreview() {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-bool CncFilePreview::initGCodePreview() {
-///////////////////////////////////////////////////////////////////
-	if ( IsShownOnScreen() == false )
-		return false;
-		
-	CncFilePreview::selectGCodePreview();
-	return gcodePreview->isContextValid();
-}
-///////////////////////////////////////////////////////////////////
 bool CncFilePreview::loadFile() {
 ///////////////////////////////////////////////////////////////////
 	wxFileName fn(lastFileName);
@@ -97,8 +88,11 @@ bool CncFilePreview::loadFile() {
 	bool ret = false;
 	if ( m_previewBook->GetSelection() == (int)GCODE_TAB_PAGE ) {
 		
-		CncAutoProgressDialog progressDlg(this);
-		progressDlg.Show(true);
+		//if ( IsShownOnScreen() ) {
+			CncAutoProgressDialog progressDlg(this);
+			gcodePreview->setProgressDialog(&progressDlg);
+			progressDlg.Show();
+		//}
 		
 		gcodePreview->clear();
 		gcodePreview->Refresh();

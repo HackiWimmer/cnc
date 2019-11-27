@@ -1,3 +1,4 @@
+#include <wx/evtloop.h>
 #include "CncCommon.h"
 #include "CncAutoProgressDialog.h"
 

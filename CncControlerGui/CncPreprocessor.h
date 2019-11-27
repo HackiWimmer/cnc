@@ -7,14 +7,16 @@
 
 class CncPathListEntryListCtrl;
 class CncMoveSequenceListCtrl;
+class CncMoveSequenceOverviewListCtrl;
 
 class CncPreprocessor : public CncPreprocessorBase {
 	
 	private:
-		CncPathListEntryListCtrl* pathListEntries;
-		CncMoveSequenceListCtrl* moveSequences;
+		CncPathListEntryListCtrl* 			pathListEntries;
+		CncMoveSequenceOverviewListCtrl* 	moveSequenceOverview;
+		CncMoveSequenceListCtrl* 			moveSequence;
 
-		void updatePathListContent(bool force = false);
+		void updatePathListContent();
 		void updateMoveSequenceListContent(bool force = false);
 		
 	public:
@@ -44,7 +46,6 @@ class CncPreprocessor : public CncPreprocessorBase {
 
 	protected:
 	
-		virtual void moveSequenceChangeContent(wxCommandEvent& event);
 		virtual void clearMoveSequences(wxCommandEvent& event);
 		virtual void clearPathListEntries(wxCommandEvent& event);
 		virtual void connectMoveSequences(wxCommandEvent& event);

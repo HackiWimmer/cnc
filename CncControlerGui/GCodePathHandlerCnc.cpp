@@ -10,9 +10,10 @@ GCodePathHandlerCnc::GCodePathHandlerCnc(CncControl* cnc)
 //////////////////////////////////////////////////////////////////
 	changeInputUnit(Unit::mm);
 	
+	// add the file parser to the runner setup
+	// the rest is already set by CncPathListRunner(cnc)
 	CncPathListRunner::Setup& setup = getSetup();
-	setup.optAnalyse	= GBL_CONFIG->getPreProcessorAnalyseFlag();
-	setup.fileParser	= fileParser;
+	setup.fileParser		= fileParser;
 }
 //////////////////////////////////////////////////////////////////
 GCodePathHandlerCnc::~GCodePathHandlerCnc() {

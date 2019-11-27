@@ -1,6 +1,7 @@
 #include <wx/dcclient.h>
 
 #include "3D/CncGCodePreview.h"
+#include "CncAutoProgressDialog.h"
 #include "CncConfig.h"
 #include "MainFrame.h"
 #include "CncCommon.h"
@@ -22,6 +23,7 @@ wxEND_EVENT_TABLE()
 //////////////////////////////////////////////////
 CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribList) 
 : CncGlCanvas(parent, attribList)
+, progressDialog(NULL)
 , previewName(name)
 , preview(new GLContextGCodePreview(this, name))
 , maxDimension(400.0)
@@ -137,8 +139,8 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	const char sc = cnc::getCncSpeedTypeAsCharacter(vd.getSpeedMode());
 	
 	// to update the progess bar
-	if ( preview->getVirtualEnd() % 100 == 0 )
-			THE_APP->dispatchAll();
+	if ( progressDialog != NULL && preview->getVirtualEnd() % 100 == 0 )
+			progressDialog->Update();
 		
 	lastSetCurrent = preview->SetCurrent(*this);
 	preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 

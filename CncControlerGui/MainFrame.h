@@ -53,6 +53,7 @@ class CncGameportController;
 class CncSpeedMonitor;
 class CncPreprocessor;
 class CncGCodeSequenceListCtrl;
+class CncMoveSequenceOverviewListCtrl;
 class CncMotionVertexTrace;
 class CncOpenGLContextObserver;
 
@@ -521,7 +522,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 	protected:
 	
-		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5, TSS_MOVE_SEQ=6, TSS_VERTEX_DATA_TRACE=7, TSS_VERTEX_INDEX_TRACE=8 };
+		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5, TSS_MOVE_SEQ_OVW=6, TSS_MOVE_SEQ=7, TSS_VERTEX_DATA_TRACE=8, TSS_VERTEX_INDEX_TRACE=9 };
 		void tryToSelectClientId(long clientId, TemplateSelSource tss);
 		void selectSourceControlLineNumber(long ln);
 
@@ -593,6 +594,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class GCodeFileParser;
 		friend class CncGCodeSequenceListCtrl;
 		friend class CncMoveSequenceListCtrl;
+		friend class CncMoveSequenceOverviewListCtrl;
 		friend class CncVertexTrace::DataListCtrl;
 		friend class CncVertexTrace::IndexListCtrl;
 		friend class CncPathListRunner;

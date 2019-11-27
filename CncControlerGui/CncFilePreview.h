@@ -14,7 +14,6 @@ class CncFilePreview : public CncFilePreviewBase
 		CncFilePreview(wxWindow* parent, wxString name);
 		virtual ~CncFilePreview();
 		
-		bool initGCodePreview();
 		bool selectEmptyPreview();
 		bool selectPreview(const wxString& fileName);
 		

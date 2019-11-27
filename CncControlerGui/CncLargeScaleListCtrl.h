@@ -144,7 +144,7 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		};
 		
 		wxString getItemText(long item, long column) const;
-		long searchRow(const wxString& what, int searchColumn);
+		virtual long searchRow(const wxString& what, int searchColumn);
 		
 		virtual bool isItemValid(long item) const;
 	

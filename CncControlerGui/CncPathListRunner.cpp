@@ -22,8 +22,11 @@ CncPathListRunner::CncPathListRunner(CncControl* cnc)
 : currentSequence(NULL)
 , setup()
 {
-	setup.cnc = cnc;
-	
+	setup.cnc 				= cnc;
+	setup.optAnalyse		= GBL_CONFIG->getPreProcessorAnalyseFlag();
+	setup.optCombineMoves 	= GBL_CONFIG->getPreProcessorCombineMovesFlag();
+	setup.optSkipEmptyMoves = GBL_CONFIG->getPreProcessoSkipEmptyFlag();
+
 	wxASSERT( setup.cnc != NULL );
 	initNextMoveSequence();
 }
@@ -186,11 +189,14 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 		return it + 1 != itEnd ? &(*(it + 1)) : NULL;
 	};
 
-	const CncPathListEntry* curr = getCurr(itCurr);
-	const CncPathListEntry* next = getNext(itCurr);
-
+	auto addSequenceEntryFromValues = [&](double dx, double dy, double dz, double f) {
+		currentSequence->addMetricPosXYZF(	dx, dy, dz,	f);
+		
+		return true;
+	};
+	
 	// -----------------------------------------------------------
-	auto addEntry = [&](const CncPathListEntry* e) {
+	auto addSequenceEntryFromEntry = [&](const CncPathListEntry* e) {
 		if ( e == NULL )
 			return false;
 
@@ -201,9 +207,15 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 		return true;
 	};
 
+	// -----------------------------------------------------------
+	// entry ....
+	const CncPathListEntry* curr  = getCurr(itCurr);
+	const CncPathListEntry* next  = getNext(itCurr);
+
 	wxASSERT(curr != NULL);
 
 	// -----------------------------------------------------------
+	// check if current is a empty move
 	if ( setup.optSkipEmptyMoves == true )  {
 		if (    cnc::dblCompareNull(curr->entryDistance.getX()) == true
 			 &&	cnc::dblCompareNull(curr->entryDistance.getY()) == true
@@ -214,18 +226,16 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 			return true;
 		}
 	}
-
+	
 	// -----------------------------------------------------------
+	// check if nothing more than curr available
 	if ( next == NULL ) {
-
-		addEntry(curr);
+		addSequenceEntryFromEntry(curr);
 		return true;
 	}
 
-	//const unsigned long distToEnd = std::distance(itCurr, itEnd);
-
+	// -----------------------------------------------------------
 	struct Move {
-
 		double dx;
 		double dy;
 		double dz;
@@ -255,47 +265,87 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 			const double epsilon = 0.001;
 			return ( cnc::dblCompare(mxy, m.mxy, epsilon) == true && cnc::dblCompare(mz, m.mz, epsilon) == true );
 		}
-
-
+		
+		bool isPitchToStrong(const Move& m) const {
+			const float max = 15 * PI / 180; // 15 degrees
+			const float a1 = atan2(dx, dy);
+			const float a2 = atan2(m.dx, m.dy);
+			
+			return abs(a1 - a2) > max;
+		}
+		
+		float getPitchDiffenceAsRadians(const Move& m) const {
+			const float a1 = atan2(dx, dy);
+			const float a2 = atan2(m.dx, m.dy);
+			
+			return abs(a1 - a2);
+		}
+		
+		float getPitchDiffenceAsDegree(const Move& m) const {
+			const float a1 = atan2(dx, dy);
+			const float a2 = atan2(m.dx, m.dy);
+			
+			return abs(a1 - a2) * 180 / PI;
+		}
 	};
 
-	const Move mCurr(curr);
+	double cx = curr->entryDistance.getX();
+	double cy = curr->entryDistance.getY();
+	double cz = curr->entryDistance.getZ();
+	
+	const CncPathListEntry* c = curr;
+	const CncPathListEntry* n = next;
 
-	// -----------------------------------------------------------
-	if ( setup.optCombineMoves == true )  {
-		const CncPathListEntry* n = next;
-		double cx = mCurr.dx;
-		double cy = mCurr.dy;
-		double cz = mCurr.dz;
+	// loop: preview next entries
+	while ( n != NULL ) {
+		
+		// don't combine entries over a speed change
+		if ( n->isSpeedChange()  == true )
+			break;
 
-		while ( n != NULL ) {
-
-			const Move mNext(n);
-			if ( mCurr.isPitchEqual(mNext) ) {
-				cx += mNext.dx;
-				cy += mNext.dy;
-				cz += mNext.dz;
-
-				itCurr++;
-				n = getNext(itCurr);
-
-			}
-			else {
-
-				break;
+		// skip the next entry if it is an emty move
+		if ( setup.optSkipEmptyMoves == true )  {
+			if (    cnc::dblCompareNull(n->entryDistance.getX()) == true
+				&&	cnc::dblCompareNull(n->entryDistance.getY()) == true
+				&&	cnc::dblCompareNull(n->entryDistance.getZ()) == true
+			) {
+				// skip
+				n = getNext(++itCurr);
+				continue;
 			}
 		}
-
-		currentSequence->addMetricPosXYZF(cx, cy, cz, 0.0); // 0.0 ????
+		
+		const Move mCurr(c);
+		const Move mNext(n);
+		
+		// .....
+		if ( mCurr.isPitchToStrong(mNext) == true ) {
+			
+			//std::cout << "isPitchToStrong: " << mCurr.getPitchDiffenceAsDegree(mNext) << std::endl;
+			//MessageBoxA(0,"","",0);
+		}
+		
+		// stop here if nothing should be combined
+		if ( setup.optCombineMoves == false ) 
+			break;
+			
+		// stop here if the next pit isn't equal with the reference
+		if ( mCurr.isPitchEqual(mNext) == false ) 
+			break;
+			
+		// concatenate next to the current summary
+		cx += mNext.dx;
+		cy += mNext.dy;
+		cz += mNext.dz;
+		
+		// skip to next ...
+		c = n;
+		n = getNext(++itCurr);
 	}
-	else {
 
-		addEntry(curr);
-	}
-
+	addSequenceEntryFromValues(cx, cy, cz, 0.0); // 0.0 ????
 
 	return true;
-
 
 /*
 
@@ -350,6 +400,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	
 	// over all stored pathes
 	THE_APP->getCncPreProcessor()->freeze();
+	
 	for ( auto it = plm.const_begin(); it != plm.const_end(); ++it) {
 		const unsigned long distance = std::distance(plm.const_begin(), it);
 		

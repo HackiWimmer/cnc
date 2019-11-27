@@ -9,6 +9,8 @@
 #include "3D/VerticeData.h"
 #include "3D/GLContextGCodePreview.h"
 
+class CncAutoProgressDialog;
+
 ////////////////////////////////////////////////////////////
 class CncGCodePreview : public CncGlCanvas {
 
@@ -37,8 +39,11 @@ class CncGCodePreview : public CncGlCanvas {
 		
 		bool isAlreadyShown() { return isShown; }
 		
+		void setProgressDialog(CncAutoProgressDialog* dlg) { progressDialog = dlg; }
+		
 	protected:
 		
+		CncAutoProgressDialog* progressDialog;
 		wxString previewName;
 		GLContextGCodePreview* preview;
 		double maxDimension;

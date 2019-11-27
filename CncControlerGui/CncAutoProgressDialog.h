@@ -8,8 +8,6 @@ class CncAutoProgressDialog : public CncAutoProgressDialogBase {
 		CncAutoProgressDialog(wxWindow* parent);
 		virtual ~CncAutoProgressDialog();
 		
-		void close();
-
 	protected:
 		virtual void onInitDialog(wxInitDialogEvent& event);
 		virtual void onShow(wxShowEvent& event);

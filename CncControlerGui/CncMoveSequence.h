@@ -117,13 +117,13 @@ class CncMoveSequence {
 		};
 
 		typedef std::vector<SequencePoint> MoveSequence;
-		typedef std::vector<unsigned int>  ProtionIndex;
+		typedef std::vector<unsigned int>  PortionIndex;
 
 	private:
 
 		CncNanoTimestamp	reference;
 		MoveSequence		sequence;
-		ProtionIndex		portionIndex;
+		PortionIndex		portionIndex;
 		SequenceData		data;
 		
 		unsigned int 		maxSerialSize;
@@ -179,7 +179,7 @@ class CncMoveSequence {
 
 		CncNanoTimestamp		getReference() const				{ return reference; }
 		void					setClientId(long clientId)			{ curClientId = clientId; }
-		long					getClientId()						{ return curClientId; }
+		long					getClientId() const					{ return curClientId; }
 
 		void 					addMetricPosXYZF(double dx, double dy, double dz, double f);
 
@@ -212,7 +212,7 @@ class CncMoveSequence {
 		const unsigned char*	getBuffer() 						{ return moveSequenceBuffer; }
 		const unsigned int   	getBufferSize()  					{ return moveSequenceBufferSize; }
 
-		const ProtionIndex& 	getPortionIndex()					{ return portionIndex; }
+		const PortionIndex& 	getPortionIndex()					{ return portionIndex; }
 
 		int32_t 				getAccumulatedDeltaX()				{ return data.targetX; }
 		int32_t 				getAccumulatedDeltaY()				{ return data.targetY; }

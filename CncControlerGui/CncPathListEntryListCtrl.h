@@ -17,22 +17,18 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		PathLists pathLists;
 
 		void updateColumnWidth();
-
+		
 		void onSize(wxSizeEvent& event);
 		void onSelectListItem(wxListEvent& event);
 		void onActivateListItem(wxListEvent& event);
-
+		
+		virtual bool isItemValid(long item) const;
+		
+		virtual wxString OnGetItemText(long item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		
 	public:
-
-		struct UpdateContentInfo {
-			bool format						= true;
-			bool considerClientIdChanges	= true;
-			bool considerSpeedChanges		= true;
-			bool considerPositionChnages	= true;
-		};
 
 		static const int COL_TYPE 			=  0;
 		static const int COL_REF 			=  1;
@@ -57,13 +53,13 @@ class CncPathListEntryListCtrl : public CncLargeScaledListCtrl {
 		void addPathListEntry(const CncPathListEntry& cpe);
 		
 		void clearAll();
-		void updateContent(const UpdateContentInfo& uci, bool force = false);
 
 		bool searchReference(const wxString& what);
 		bool searchReferenceById(const long id);
 
 		wxDECLARE_NO_COPY_CLASS(CncPathListEntryListCtrl);
 		wxDECLARE_EVENT_TABLE();
+		
 };
 
 #endif

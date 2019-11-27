@@ -326,42 +326,6 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer7678->Add(m_staticLine78021113, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_btToogleFormat = new wxBitmapToggleButton(m_panel7622, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-mark_word")), wxDefaultPosition, wxDLG_UNIT(m_panel7622, wxSize(26,26)), 0);
-    m_btToogleFormat->SetToolTip(_("Toggle Format"));
-    m_btToogleFormat->SetValue(true);
-    
-    flexGridSizer7678->Add(m_btToogleFormat, 0, wxALL, WXC_FROM_DIP(1));
-    m_btToogleFormat->SetMinSize(wxSize(26,26));
-    
-    m_staticLine780211 = new wxStaticLine(m_panel7622, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7622, wxSize(-1,-1)), wxLI_VERTICAL);
-    
-    flexGridSizer7678->Add(m_staticLine780211, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
-    m_btConsiderClientIdChanges = new wxBitmapToggleButton(m_panel7622, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("dialog-password (2)")), wxDefaultPosition, wxDLG_UNIT(m_panel7622, wxSize(26,26)), 0);
-    m_btConsiderClientIdChanges->SetToolTip(_("Consider ClientId Changes"));
-    m_btConsiderClientIdChanges->SetValue(true);
-    
-    flexGridSizer7678->Add(m_btConsiderClientIdChanges, 0, wxALL, WXC_FROM_DIP(1));
-    m_btConsiderClientIdChanges->SetMinSize(wxSize(26,26));
-    
-    m_btConsiderFeedSpeedChanges = new wxBitmapToggleButton(m_panel7622, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("sports-shuttlecock")), wxDefaultPosition, wxDLG_UNIT(m_panel7622, wxSize(26,26)), 0);
-    m_btConsiderFeedSpeedChanges->SetToolTip(_("Consider FeedSpeed Changes"));
-    m_btConsiderFeedSpeedChanges->SetValue(true);
-    
-    flexGridSizer7678->Add(m_btConsiderFeedSpeedChanges, 0, wxALL, WXC_FROM_DIP(1));
-    m_btConsiderFeedSpeedChanges->SetMinSize(wxSize(26,26));
-    
-    m_btConsiderPositionChanges = new wxBitmapToggleButton(m_panel7622, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("draw-line-3")), wxDefaultPosition, wxDLG_UNIT(m_panel7622, wxSize(26,26)), 0);
-    m_btConsiderPositionChanges->SetToolTip(_("Consider Position Changes"));
-    m_btConsiderPositionChanges->SetValue(true);
-    
-    flexGridSizer7678->Add(m_btConsiderPositionChanges, 0, wxALL, WXC_FROM_DIP(1));
-    m_btConsiderPositionChanges->SetMinSize(wxSize(26,26));
-    
-    m_staticLine7802 = new wxStaticLine(m_panel7622, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7622, wxSize(-1,-1)), wxLI_VERTICAL);
-    
-    flexGridSizer7678->Add(m_staticLine7802, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
-    
     m_btClearPathListEntries = new wxBitmapButton(m_panel7622, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-clean")), wxDefaultPosition, wxDLG_UNIT(m_panel7622, wxSize(26,26)), wxBU_AUTODRAW);
     m_btClearPathListEntries->SetToolTip(_("Clear"));
     
@@ -377,11 +341,11 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_panel7630ImgIndex = m_listbookPreProcessor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("database-table")));
     m_listbookPreProcessor->AddPage(m_panel7630, _("Move\nSequences"), false, m_panel7630ImgIndex);
     
-    wxFlexGridSizer* flexGridSizer76242 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer76242 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer76242->SetFlexibleDirection( wxBOTH );
     flexGridSizer76242->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer76242->AddGrowableCol(0);
-    flexGridSizer76242->AddGrowableRow(1);
+    flexGridSizer76242->AddGrowableRow(2);
     m_panel7630->SetSizer(flexGridSizer76242);
     
     wxFlexGridSizer* flexGridSizer76353 = new wxFlexGridSizer(1, 3, 0, 0);
@@ -443,9 +407,56 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     flexGridSizer76786->Add(m_btClearMoveSequences, 0, wxALL, WXC_FROM_DIP(1));
     m_btClearMoveSequences->SetMinSize(wxSize(26,26));
     
+    m_staticLine188 = new wxStaticLine(m_panel7630, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer76242->Add(m_staticLine188, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer178 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer178->SetFlexibleDirection( wxBOTH );
+    flexGridSizer178->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer178->AddGrowableCol(1);
+    flexGridSizer178->AddGrowableRow(0);
+    
+    flexGridSizer76242->Add(flexGridSizer178, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer181 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer181->SetFlexibleDirection( wxBOTH );
+    flexGridSizer181->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer181->AddGrowableCol(0);
+    flexGridSizer181->AddGrowableRow(1);
+    
+    flexGridSizer178->Add(flexGridSizer181, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText186 = new wxStaticText(m_panel7630, wxID_ANY, _("Overview:"), wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), 0);
+    m_staticText186->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_staticText186Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText186->SetFont(m_staticText186Font);
+    
+    flexGridSizer181->Add(m_staticText186, 0, wxALL, WXC_FROM_DIP(1));
+    
+    m_moveSequencesListPlaceholder = new wxListCtrl(m_panel7630, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(280,-1)), wxLC_REPORT);
+    
+    flexGridSizer181->Add(m_moveSequencesListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_moveSequencesListPlaceholder->SetMinSize(wxSize(280,-1));
+    
+    wxFlexGridSizer* flexGridSizer182 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer182->SetFlexibleDirection( wxBOTH );
+    flexGridSizer182->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer182->AddGrowableCol(0);
+    flexGridSizer182->AddGrowableRow(1);
+    
+    flexGridSizer178->Add(flexGridSizer182, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_contentLabel = new wxStaticText(m_panel7630, wxID_ANY, _("Content:"), wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), 0);
+    m_contentLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_contentLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_contentLabel->SetFont(m_contentLabelFont);
+    
+    flexGridSizer182->Add(m_contentLabel, 0, wxALL, WXC_FROM_DIP(1));
+    
     m_moveSequencesPlaceholder = new wxListCtrl(m_panel7630, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), wxLC_REPORT);
     
-    flexGridSizer76242->Add(m_moveSequencesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer182->Add(m_moveSequencesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     SetName(wxT("CncPreprocessorBase"));
     SetSize(700,700);
@@ -454,10 +465,6 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     }
     // Connect events
     m_btConnectPathListEntries->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectPathListEntries), NULL, this);
-    m_btToogleFormat->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
-    m_btConsiderClientIdChanges->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
-    m_btConsiderFeedSpeedChanges->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
-    m_btConsiderPositionChanges->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
     m_btClearPathListEntries->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearPathListEntries), NULL, this);
     m_btConnectMoveSequences->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectMoveSequences), NULL, this);
     m_btClearMoveSequences->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearMoveSequences), NULL, this);
@@ -467,10 +474,6 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
 CncPreprocessorBase::~CncPreprocessorBase()
 {
     m_btConnectPathListEntries->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectPathListEntries), NULL, this);
-    m_btToogleFormat->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
-    m_btConsiderClientIdChanges->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
-    m_btConsiderFeedSpeedChanges->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
-    m_btConsiderPositionChanges->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::moveSequenceChangeContent), NULL, this);
     m_btClearPathListEntries->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearPathListEntries), NULL, this);
     m_btConnectMoveSequences->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::connectMoveSequences), NULL, this);
     m_btClearMoveSequences->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncPreprocessorBase::clearMoveSequences), NULL, this);
