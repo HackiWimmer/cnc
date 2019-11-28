@@ -33,7 +33,8 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribLis
 	GLContextBase::globalInit(); 
 	preview->init();
 	
-	lastSetCurrent = preview->SetCurrent(*this);
+	if ( isShown )
+		lastSetCurrent = preview->SetCurrent(*this);
 	
 	// Important: initialize the CncGlCanvas context
 	context = preview;
@@ -107,7 +108,9 @@ void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
 void CncGCodePreview::clear() {
 //////////////////////////////////////////////////
-	lastSetCurrent = preview->SetCurrent(*this);
+	if ( isShown )
+		lastSetCurrent = preview->SetCurrent(*this);
+
 	preview->clearPathData();
 }
 //////////////////////////////////////////////////
@@ -142,6 +145,6 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	if ( progressDialog != NULL && preview->getVirtualEnd() % 100 == 0 )
 			progressDialog->Update();
 		
-	lastSetCurrent = preview->SetCurrent(*this);
+	//lastSetCurrent = preview->SetCurrent(*this);
 	preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
 }

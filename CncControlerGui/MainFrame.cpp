@@ -825,16 +825,29 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
+#include "CncExternalViewBox.h"
+CncExternalViewBox* xxx = NULL;
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+	
+	if ( xxx == NULL )
+		//xxx = new CncExternalViewBox(this, m_lruList);
+		//xxx = new CncExternalViewBox(this, motionMonitor);
+		//xxx = new CncExternalViewBoxSecure(this, cnc3DHSplitterWindow);
+		xxx = new CncExternalViewBox(this, cnc3DHSplitterWindow);
+		
+	xxx->SetTitle("Hallo Stefan . . . .");
+	xxx->Show();
 	//GblFunc::stacktrace(std::cout);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
+	if ( xxx != NULL )
+		xxx->Show(false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {

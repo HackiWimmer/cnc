@@ -1,3 +1,6 @@
+#define __STDC_FORMAT_MACROS 1
+#include <inttypes.h>
+
 #include "CncCommon.h"
 #include "GLCommon.h"
 #include "GlobalFunctions.h"
@@ -261,7 +264,6 @@ void GLOpenGLPathBuffer::display(DisplayType dt, int vertices) {
 		if ( GL_ERROR_TRACE_LEVEL > 0 ) 
 			GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("glDrawArrays(%d, %u, %u) - VAO=%u, VBO=%u", dt, displayOffset, displayCount, vertexArrayID, vertexBufferID));
 
-		#warning
 		glDrawArrays(dt, displayOffset, displayCount);
 		
 	glBindVertexArray(0);

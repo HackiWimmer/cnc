@@ -1,5 +1,6 @@
 #ifndef CNCAUTOPROGRESSDIALOG_H
 #define CNCAUTOPROGRESSDIALOG_H
+
 #include "wxCrafterBaseDialogs.h"
 
 class CncAutoProgressDialog : public CncAutoProgressDialogBase {

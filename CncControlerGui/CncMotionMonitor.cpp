@@ -67,7 +67,8 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	GLContextBase::globalInit(); 
 	monitor->init();
 	
-	lastSetCurrent = monitor->SetCurrent(*this);
+	if ( isShown )
+		lastSetCurrent = monitor->SetCurrent(*this);
 	
 	// Important: initialize the CncGlCanvas context
 	context = monitor;
@@ -216,7 +217,8 @@ void CncMotionMonitor::appendVertex(long id, CncSpeedMode sm, float x, float y, 
 //////////////////////////////////////////////////
 	static GLOpenGLPathBuffer::CncVertex vertex;
 
-	lastSetCurrent = monitor->SetCurrent(*this);
+	if ( isShown )
+		lastSetCurrent = monitor->SetCurrent(*this);
 	
 	const char sc = cnc::getCncSpeedTypeAsCharacter(sm);
 	monitor->appendPathData(vertex.set(sc, id, x, y, z)); 

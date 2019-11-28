@@ -196,13 +196,45 @@ protected:
     wxAnimationCtrl* m_animationCtrl;
 
 protected:
-    virtual void onInitDialog(wxInitDialogEvent& event) { event.Skip(); }
-    virtual void onShow(wxShowEvent& event) { event.Skip(); }
 
 public:
     wxAnimationCtrl* GetAnimationCtrl() { return m_animationCtrl; }
-    CncAutoProgressDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = 0);
+    CncAutoProgressDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxT(""), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP);
     virtual ~CncAutoProgressDialogBase();
+};
+
+
+class CncExternalViewBoxBase : public wxDialog
+{
+protected:
+    wxPanel* m_caption;
+    wxStaticBitmap* m_staticBitmap85;
+    wxStaticText* m_windowTitle;
+    wxPanel* m_moveArea;
+    wxButton* m_btMinMax;
+    wxButton* m_btClose;
+    wxPanel* m_placeholder;
+    wxStaticText* m_staticText93;
+
+protected:
+    virtual void onShow(wxShowEvent& event) { event.Skip(); }
+    virtual void onStartMove(wxMouseEvent& event) { event.Skip(); }
+    virtual void onStopMove(wxMouseEvent& event) { event.Skip(); }
+    virtual void onMotion(wxMouseEvent& event) { event.Skip(); }
+    virtual void onMinMax(wxCommandEvent& event) { event.Skip(); }
+    virtual void onCloseFromButton(wxCommandEvent& event) { event.Skip(); }
+
+public:
+    wxStaticBitmap* GetStaticBitmap85() { return m_staticBitmap85; }
+    wxStaticText* GetWindowTitle() { return m_windowTitle; }
+    wxPanel* GetMoveArea() { return m_moveArea; }
+    wxButton* GetBtMinMax() { return m_btMinMax; }
+    wxButton* GetBtClose() { return m_btClose; }
+    wxPanel* GetCaption() { return m_caption; }
+    wxStaticText* GetStaticText93() { return m_staticText93; }
+    wxPanel* GetPlaceholder() { return m_placeholder; }
+    CncExternalViewBoxBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("no caption available"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxSTAY_ON_TOP);
+    virtual ~CncExternalViewBoxBase();
 };
 
 #endif

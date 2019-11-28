@@ -641,19 +641,17 @@ CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent, wxWindowI
     SetIcons( app_icons );
 
     
-    wxFlexGridSizer* flexGridSizer73 = new wxFlexGridSizer(1, 1, 0, 0);
-    flexGridSizer73->SetFlexibleDirection( wxBOTH );
-    flexGridSizer73->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer73->AddGrowableCol(0);
-    flexGridSizer73->AddGrowableRow(0);
-    this->SetSizer(flexGridSizer73);
+    wxFlexGridSizer* flexGridSizer79 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer79->SetFlexibleDirection( wxBOTH );
+    flexGridSizer79->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer79->AddGrowableCol(0);
+    flexGridSizer79->AddGrowableRow(0);
+    this->SetSizer(flexGridSizer79);
     
     m_animationCtrl = new wxAnimationCtrl(this, wxID_ANY, wxNullAnimation, wxDefaultPosition, wxDLG_UNIT(this, wxSize(40,40)), wxAC_DEFAULT_STYLE);
-    if( wxFileName::Exists(wxT("bitmaps/loading-throb.gif")) && m_animationCtrl->LoadFile(wxT("bitmaps/loading-throb.gif")))m_animationCtrl->Play();
-    m_animationCtrl->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     m_animationCtrl->SetInactiveBitmap(wxNullBitmap);
     
-    flexGridSizer73->Add(m_animationCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer79->Add(m_animationCtrl, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     m_animationCtrl->SetMinSize(wxSize(40,40));
     
     SetName(wxT("CncAutoProgressDialogBase"));
@@ -666,15 +664,138 @@ CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent, wxWindowI
     } else {
         CentreOnScreen(wxBOTH);
     }
-    // Connect events
-    this->Connect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncAutoProgressDialogBase::onInitDialog), NULL, this);
-    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncAutoProgressDialogBase::onShow), NULL, this);
-    
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
 }
 
 CncAutoProgressDialogBase::~CncAutoProgressDialogBase()
 {
-    this->Disconnect(wxEVT_INIT_DIALOG, wxInitDialogEventHandler(CncAutoProgressDialogBase::onInitDialog), NULL, this);
-    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncAutoProgressDialogBase::onShow), NULL, this);
+}
+
+CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, const wxString& title, const wxPoint& pos, const wxSize& size, long style)
+    : wxDialog(parent, id, title, pos, size, style)
+{
+    if ( !bBitmapLoaded ) {
+        // We need to initialise the default bitmap handler
+        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
+        wxC3105InitBitmapResources();
+        bBitmapLoaded = true;
+    }
+    
+    wxFlexGridSizer* flexGridSizer71 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer71->SetFlexibleDirection( wxBOTH );
+    flexGridSizer71->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer71->AddGrowableCol(0);
+    flexGridSizer71->AddGrowableRow(1);
+    this->SetSizer(flexGridSizer71);
+    
+    m_caption = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer71->Add(m_caption, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer83 = new wxFlexGridSizer(1, 5, 0, 0);
+    flexGridSizer83->SetFlexibleDirection( wxBOTH );
+    flexGridSizer83->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer83->AddGrowableCol(3);
+    m_caption->SetSizer(flexGridSizer83);
+    
+    m_staticBitmap85 = new wxStaticBitmap(m_caption, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-statistics")), wxDefaultPosition, wxDLG_UNIT(m_caption, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer83->Add(m_staticBitmap85, 0, wxALL, WXC_FROM_DIP(3));
+    
+    flexGridSizer83->Add(1, 0, 1, wxALL, WXC_FROM_DIP(0));
+    
+    m_windowTitle = new wxStaticText(m_caption, wxID_ANY, _("Headline . . ."), wxDefaultPosition, wxDLG_UNIT(m_caption, wxSize(-1,-1)), 0);
+    
+    flexGridSizer83->Add(m_windowTitle, 0, wxALL, WXC_FROM_DIP(4));
+    
+    m_moveArea = new wxPanel(m_caption, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_caption, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer83->Add(m_moveArea, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer98 = new wxFlexGridSizer(0, 2, 0, 0);
+    flexGridSizer98->SetFlexibleDirection( wxBOTH );
+    flexGridSizer98->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer83->Add(flexGridSizer98, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    
+    m_btMinMax = new wxButton(m_caption, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_caption, wxSize(20,20)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btMinMax->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("aui-minimize")), wxLEFT);
+    m_btMinMax->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer98->Add(m_btMinMax, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    m_btMinMax->SetMinSize(wxSize(20,20));
+    
+    m_btClose = new wxButton(m_caption, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_caption, wxSize(20,20)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btClose->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("16-x-close")), wxLEFT);
+    m_btClose->SetBitmapMargins(0,0);
+    #endif
+    m_btClose->SetToolTip(_("Close this window and reattach the covered view"));
+    
+    flexGridSizer98->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    m_btClose->SetMinSize(wxSize(20,20));
+    
+    m_placeholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_placeholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer71->Add(m_placeholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer91 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer91->SetFlexibleDirection( wxBOTH );
+    flexGridSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer91->AddGrowableCol(0);
+    flexGridSizer91->AddGrowableRow(0);
+    m_placeholder->SetSizer(flexGridSizer91);
+    
+    m_staticText93 = new wxStaticText(m_placeholder, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder, wxSize(-1,-1)), 0);
+    m_staticText93->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_staticText93Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText93->SetFont(m_staticText93Font);
+    
+    flexGridSizer91->Add(m_staticText93, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    SetName(wxT("CncExternalViewBoxBase"));
+    SetSize(800,600);
+    if (GetSizer()) {
+         GetSizer()->Fit(this);
+    }
+    if(GetParent()) {
+        CentreOnParent(wxBOTH);
+    } else {
+        CentreOnScreen(wxBOTH);
+    }
+#if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(this)) {
+        wxPersistenceManager::Get().RegisterAndRestore(this);
+    } else {
+        wxPersistenceManager::Get().Restore(this);
+    }
+#endif
+    // Connect events
+    this->Connect(wxEVT_SHOW, wxShowEventHandler(CncExternalViewBoxBase::onShow), NULL, this);
+    m_moveArea->Connect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncExternalViewBoxBase::onStartMove), NULL, this);
+    m_moveArea->Connect(wxEVT_LEFT_UP, wxMouseEventHandler(CncExternalViewBoxBase::onStopMove), NULL, this);
+    m_moveArea->Connect(wxEVT_MOTION, wxMouseEventHandler(CncExternalViewBoxBase::onMotion), NULL, this);
+    m_btMinMax->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onMinMax), NULL, this);
+    m_btClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onCloseFromButton), NULL, this);
+    
+}
+
+CncExternalViewBoxBase::~CncExternalViewBoxBase()
+{
+    this->Disconnect(wxEVT_SHOW, wxShowEventHandler(CncExternalViewBoxBase::onShow), NULL, this);
+    m_moveArea->Disconnect(wxEVT_LEFT_DOWN, wxMouseEventHandler(CncExternalViewBoxBase::onStartMove), NULL, this);
+    m_moveArea->Disconnect(wxEVT_LEFT_UP, wxMouseEventHandler(CncExternalViewBoxBase::onStopMove), NULL, this);
+    m_moveArea->Disconnect(wxEVT_MOTION, wxMouseEventHandler(CncExternalViewBoxBase::onMotion), NULL, this);
+    m_btMinMax->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onMinMax), NULL, this);
+    m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onCloseFromButton), NULL, this);
     
 }

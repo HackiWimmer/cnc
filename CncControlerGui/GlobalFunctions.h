@@ -10,6 +10,7 @@ class GblFunc {
 		static void storeStacktrace(const wxString& st);
 	
 	public:
+		static void swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl);
 		static void replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl);
 		
 		static const std::ostream& 	stacktraceOnlyApp(std::ostream& o, bool lastOnly);
@@ -21,6 +22,7 @@ class GblFunc {
 		static bool getStacktraceFromDatabase(std::ostream& o, unsigned int number);
 		static void traceStacktraceDatabase(std::ostream& o);
 	
+		static void appendToStackTraceFile(const wxString& st);
 };
 
 #endif

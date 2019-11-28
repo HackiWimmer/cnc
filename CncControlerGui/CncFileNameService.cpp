@@ -117,6 +117,7 @@ void CncFileNameService::trace(std::ostream& os) {
 	os << "Draw Pane Trace Filename          : " << CncFileNameService::getCncDrawPaneTraceFileName() 				<< std::endl;
 	os << "LRU Filename                      : " << CncFileNameService::getLruFileName() 							<< std::endl;
 	os << "Speed Config Filename             : " << CncFileNameService::getSpeedConfigFileName() 					<< std::endl;
+	os << "Stack Trace Filename              : " << CncFileNameService::getStackTraceFileName() 					<< std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void CncFileNameService::deleteFile(wxString fn) {

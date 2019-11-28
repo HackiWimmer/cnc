@@ -411,7 +411,8 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		void OnAssertFailure(const wxChar *file, int line, const wxChar *func, const wxChar *cond, const wxChar *msg) {
 		///////////////////////////////////////////////////////////
-			std::cerr << std::endl
+			std::stringstream ss;
+			ss        << std::endl
 					  << "Assertion: " 
 					  << wxString(file) 					<< ": "
 					  << wxString(func) 					<< ": "
@@ -421,7 +422,9 @@ class MainApp : public wxApp {
 					  << "  Condition : " << wxString(cond) << std::endl
 					  << "  Message   : " << wxString(msg) 	<< std::endl
 					  << "  Stacktrace:"  					<< std::endl;
-					  
+					
+			std::cerr << ss.str();
+			GblFunc::appendToStackTraceFile(ss.str().c_str());
 			GblFunc::stacktraceOnlyApp(std::cerr, true);
 		}
 		

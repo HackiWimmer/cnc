@@ -164,6 +164,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncExternalViewBox.h"/>
+      <File Name="CncExternalViewBox.cpp"/>
       <File Name="CncAutoProgressDialog.h"/>
       <File Name="CncAutoProgressDialog.cpp"/>
       <File Name="CncLastProcessingTimestampSummary.h"/>

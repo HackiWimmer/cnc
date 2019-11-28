@@ -27,6 +27,41 @@ class StackTrace {
 STACKTRACE_DB StackTrace::Database;
 
 ///////////////////////////////////////////////////////////////////
+void GblFunc::swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( targetCtrl != NULL );
+	wxASSERT( sourceCtrl != NULL );
+	
+	wxWindow* 	targetParent 	= targetCtrl->GetParent();
+	wxSizer* 	targetSizer   	= targetCtrl->GetContainingSizer();
+	
+	wxWindow* 	sourceParent 	= sourceCtrl->GetParent();
+	wxSizer* 	sourceSizer   	= sourceCtrl->GetContainingSizer();
+
+	wxASSERT( targetParent != NULL );
+	wxASSERT( sourceParent != NULL );
+	wxASSERT( sourceSizer  != NULL );
+	wxASSERT( targetSizer  != NULL );
+	
+	wxSizerItem* targetSizerItem = targetSizer->GetItem(targetCtrl);
+	wxSizerItem* sourceSizerItem = sourceSizer->GetItem(sourceCtrl);
+	
+	wxASSERT( targetSizerItem  != NULL );
+	wxASSERT( sourceSizerItem  != NULL );
+	
+	targetSizerItem->AssignWindow(sourceCtrl);
+	sourceSizerItem->AssignWindow(targetCtrl);
+	
+	targetCtrl->Reparent(sourceParent);
+	sourceCtrl->Reparent(targetParent);
+	
+	targetSizer->Layout();
+	sourceSizer->Layout();
+	
+	targetCtrl->SetContainingSizer(sourceSizer);
+	sourceCtrl->SetContainingSizer(targetSizer);
+}
+///////////////////////////////////////////////////////////////////
 void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( oldCtrl != NULL );
@@ -56,6 +91,17 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	// remove the placeholder
 	oldCtrl->Destroy();
 	// do not delete oldCtrl this will be handled by wx... 
+}
+///////////////////////////////////////////////////////////////////
+void GblFunc::appendToStackTraceFile(const wxString& st) {
+///////////////////////////////////////////////////////////////////
+	std::ofstream ofs (CncFileNameService::getStackTraceFileName(), std::ofstream::app);
+	if ( ofs.good() ) {
+		ofs << st
+			<< std::endl;
+	}
+	
+	ofs.close();
 }
 ///////////////////////////////////////////////////////////////////
 void GblFunc::storeStacktrace(const wxString& st) {

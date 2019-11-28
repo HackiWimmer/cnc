@@ -1,41 +1,28 @@
 set(SOURCE_FILES
-	CncControlerGui/Tests/Test_Base.h
 	CncControlerGui/Tests/Test_Base.cpp
-	CncControlerGui/Tests/Test_CncPathListManager.h
-	CncControlerGui/Tests/Test_FrameworkCallback.h
-	CncControlerGui/Tests/Test_SVGNodeParser.h
 	CncControlerGui/OSD/CncTimeFunctions.cpp
 	CncControlerGui/3D/CncGCodePreview.cpp
-	CncControlerGui/3D/CncGCodePreview.h
 	CncControlerGui/3D/GLCncPathData.cpp
-	CncControlerGui/3D/GLCncPathData.h
 	CncControlerGui/3D/GLContextBase.cpp
-	CncControlerGui/3D/GLContextBase.h
-	CncControlerGui/3D/GLContextCncPathBase.h
 	CncControlerGui/3D/GLContextCncPathBase.cpp
 	CncControlerGui/3D/GLContextCncPath.cpp
-	CncControlerGui/3D/GLContextCncPath.h
 	CncControlerGui/3D/GLContextGCodePreview.cpp
-	CncControlerGui/3D/GLContextGCodePreview.h
 	CncControlerGui/3D/GLContextTestCube.cpp
-	CncControlerGui/3D/GLContextTestCube.h
-	CncControlerGui/3D/GLHelperCamera.h
-	CncControlerGui/3D/GLHelperModel.h
 	CncControlerGui/3D/GLViewPort.cpp
-	CncControlerGui/3D/GLViewPort.h
-	CncControlerGui/3D/VerticeData.h
 	CncControlerGui/3D/GLLabelCluser.cpp
 	CncControlerGui/3D/GLLineCluster.cpp
 	CncControlerGui/3D/CncGLCanvas.cpp
 	CncControlerGui/3D/CncGLCanvas.cpp
 	CncControlerGui/3D/GLOpenGLPathBufferStore.cpp
 	CncControlerGui/3D/GLCommon.cpp
+	CncControlerGui/3D/CncMetricRulerSetup
 	CncControlerGui/OSD/CncUsbPortScanner.cpp
 	CncControlerGui/OSD/CncUsbPortScanner.h
 	CncControlerGui/OSD/CncAsyncKeyboardState.cpp
 	CncControlerGui/OSD/CncAsyncKeyboardState.h
 	CncControlerGui/OSD/SerialMsw.cpp
 	CncControlerGui/OSD/SerialGtk.cpp
+	CncControlerGui/CncLastProcessingTimestampSummary
 	CncControlerGui/Clipper/clipper.cpp
 	CncControlerGui/Clipper/clipper.hpp
 	CncControlerGui/CfgApplicationPage.cpp
@@ -105,60 +92,30 @@ set(SOURCE_FILES
 	CncControlerGui/FileParser.h
 	CncControlerGui/FileParserRunInfo.h
 	CncControlerGui/GCodeBlock.cpp
-	CncControlerGui/GCodeBlock.h
 	CncControlerGui/GCodeCommands.cpp
-	CncControlerGui/GCodeCommands.h
 	CncControlerGui/GCodeField.cpp
-	CncControlerGui/GCodeField.h
 	CncControlerGui/GCodeFileParser.cpp
-	CncControlerGui/GCodeFileParser.h
 	CncControlerGui/GCodePathHandlerBase.cpp
-	CncControlerGui/GCodePathHandlerBase.h
 	CncControlerGui/GCodePathHandlerCnc.cpp
-	CncControlerGui/GCodePathHandlerCnc.h
 	CncControlerGui/GCodePathHandlerGL.cpp
-	CncControlerGui/GCodePathHandlerGL.h
 	CncControlerGui/GlobalFunctions.cpp
-	CncControlerGui/GlobalFunctions.h
 	CncControlerGui/HexDecoder.cpp
-	CncControlerGui/HexDecoder.h
-	CncControlerGui/LinearFunc.h
-	CncControlerGui/LruFileList.h
 	CncControlerGui/main.cpp
 	CncControlerGui/MainFrame.cpp
-	CncControlerGui/MainFrame.h
 	CncControlerGui/ManuallyParser.cpp
-	CncControlerGui/ManuallyParser.h
 	CncControlerGui/ManuallyPathHandlerCnc.cpp
 	CncControlerGui/ManuallyPathHandlerCnc.h
-	CncControlerGui/NotebookInfo.h
 	CncControlerGui/PathHandlerBase.cpp
-	CncControlerGui/PathHandlerBase.h
-	CncControlerGui/PenHandler.h
-	CncControlerGui/PointAbs.h
 	CncControlerGui/CncPerspective.cpp
-	CncControlerGui/CncPerspective.h
 	CncControlerGui/Codelite/wxPNGAnimation.cpp
-	CncControlerGui/Codelite/wxPNGAnimation.h
 	CncControlerGui/SerialEmulatorNull.cpp
-	CncControlerGui/SerialEmulatorNull.h
 	CncControlerGui/SerialPort.cpp
-	CncControlerGui/SerialPort.h
 	CncControlerGui/SerialSpyPort.cpp
-	CncControlerGui/SerialSpyPort.h
-	CncControlerGui/StdStreamRedirector.h
-	CncControlerGui/strsafe.h
-	CncControlerGui/SvgCncParameters.h
 	CncControlerGui/SvgEditPopup.cpp
-	CncControlerGui/SvgEditPopup.h
 	CncControlerGui/SVGElementConverter.cpp
-	CncControlerGui/SVGElementConverter.h
 	CncControlerGui/SVGFileParser.cpp
-	CncControlerGui/SVGFileParser.h
 	CncControlerGui/SVGNodeParser.cpp
-	CncControlerGui/SVGNodeParser.h
 	CncControlerGui/SVGPathHandlerCnc.cpp
-	CncControlerGui/SVGPathHandlerCnc.h
 	CncControlerGui/SvgTransformMatrix.h
 	CncControlerGui/SvgUnitCalculator.cpp
 	CncControlerGui/SvgUnitCalculator.h
@@ -166,7 +123,6 @@ set(SOURCE_FILES
 	CncControlerGui/SVGUserAgentInfo.h
 	CncControlerGui/SvgViewBox.h
 	CncControlerGui/UnitTestFrame.cpp
-	CncControlerGui/UnitTestFrame.h
 	CncControlerGui/UpdateManagerThread.cpp
 	CncControlerGui/UpdateManagerThread.h
 	CncControlerGui/CncCurveLib.cpp
@@ -220,6 +176,7 @@ set(SOURCE_FILES
 	CncControlerGui/CncParsingSynopsisTraceListCtrl.cpp	
 	CncControlerGui/CncLoggerProxy.cpp
 	CncControlerGui/CncOpenGLContextObserver.cpp
+	CncControlerGui/CncOpenGLContextObserverListCtrl.cpp
 	CncControlerGui/CncLargeScaleListCtrl.cpp
 	CncControlerGui/CncAutoProgressDialog.cpp
 	
@@ -229,14 +186,18 @@ set(SOURCE_FILES
 	CncControlerGui/wxCrafterTemplateObserver_bitmaps.cpp
 	CncControlerGui/wxCrafterUnitTest.cpp
 	CncControlerGui/wxCrafterUnitTest_bitmaps.cpp
-	CncControlerGui/wxCrafterPathGernerator.cpp
-	CncControlerGui/wxCrafterPathGernerator_bitmaps.cpp
+	CncControlerGui/wxCrafterImages.cpp
+	CncControlerGui/wxCrafterImages_bitmaps.cpp
+	CncControlerGui/wxCrafterPathGenerator.cpp
+	CncControlerGui/wxCrafterPathGenerator_bitmaps.cpp
 	CncControlerGui/wxCrafterSecurityRun.cpp
 	CncControlerGui/wxCrafterSecurityRun_bitmaps.cpp
 	CncControlerGui/wxCrafterMessageDialog.cpp
 	CncControlerGui/wxCrafterMessageDialog_bitmaps.cpp
-	CncControlerGui/wxCrafterGameport.cpp
-	CncControlerGui/wxCrafterGameport_bitmaps.cpp
+	CncControlerGui/wxCrafterMainFrame.cpp
+	CncControlerGui/wxCrafterMainFrame_bitmaps.cpp
+	CncControlerGui/wxCrafterGamePort.cpp
+	CncControlerGui/wxCrafterGamePort_bitmaps.cpp
 	CncControlerGui/wxCrafterSpeedMonitor.cpp
 	CncControlerGui/wxCrafterSpeedMonitor_bitmaps.cpp
 	CncControlerGui/wxCrafterReferencePosition.cpp
@@ -249,6 +210,4 @@ set(SOURCE_FILES
 	CncControlerGui/wxCrafterFileView_bitmaps.cpp
 	CncControlerGui/wxCrafterMotionMonitor.cpp
 	CncControlerGui/wxCrafterMotionMonitor_bitmaps.cpp
-	CncControlerGui/wxcrafter.cpp
-	CncControlerGui/wxcrafter_bitmaps.cpp
 )
