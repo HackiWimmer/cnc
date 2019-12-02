@@ -107,7 +107,7 @@ void CncBaseEditor::onChange(wxStyledTextEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	onUpdateFilePosition();
+	onUpdateFilePosition(false);
 	
 	if ( flags.handleKeyCommands == false )
 		return;
@@ -193,7 +193,7 @@ void CncBaseEditor::onKeyDown(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onKeyUp(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	onUpdateFilePosition();
+	onUpdateFilePosition(true);
 	
 	// update tab label - on demand
 	decorateParentTabName(IsModified());
@@ -204,18 +204,19 @@ void CncBaseEditor::onKeyUp(wxKeyEvent& event) {
 void CncBaseEditor::onLeftDown(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip(true);
-	onUpdateFilePosition();
+	onUpdateFilePosition(false);
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onLeftUp(wxMouseEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	event.Skip(true);
-	onUpdateFilePosition();
+	onUpdateFilePosition(true);
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onLeftDClick(wxMouseEvent& event)  {
 ///////////////////////////////////////////////////////////////////
 	// currently nothing to do
+	event.Skip(true);
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onRightDown(wxMouseEvent& event) {
@@ -229,7 +230,7 @@ void CncBaseEditor::onRightDown(wxMouseEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void CncBaseEditor::onUpdateFilePosition() {
+void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 ///////////////////////////////////////////////////////////////////
 	long x, y;
 	PositionToXY(GetInsertionPoint(), &x, &y);
@@ -239,8 +240,25 @@ void CncBaseEditor::onUpdateFilePosition() {
 		getCtlColumnPos()->SetLabel(label);
 	
 	// try to select current line as client id
-	SelectEventBlocker b(this);
-	THE_APP->tryToSelectClientId(y + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
+	if ( publishSelection == true ) {
+
+		if ( fileInfo.format == TplSvg ) {
+			SearchAnchor();							// Set an anchor for the next search
+			const long prevPos = GetCurrentPos();	// Store position
+			const long sp = SearchPrev(0, "<");		// find start
+
+			SelectEventBlocker b(this);
+			if ( sp != wxNOT_FOUND )	THE_APP->tryToSelectClientId(LineFromPosition(sp) + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
+			else						THE_APP->tryToSelectClientId(                   y + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
+			
+			SetCurrentPos(prevPos);					// Restore position
+			SetSelection(prevPos, prevPos);
+		}
+		else {
+			
+			THE_APP->tryToSelectClientId(y + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
+		}
+	}
 	
 	// display gcode help hint
 	if ( getCtlStatus() != NULL )
@@ -317,26 +335,83 @@ bool CncBaseEditor::selectLineNumber(unsigned long ln, const char* searchKey) {
 	return selectLineDefault(ln);
 }
 ///////////////////////////////////////////////////////////////////
-bool CncBaseEditor::selectLineDefault(unsigned long ln) {
+bool CncBaseEditor::selectLineNumbers(unsigned long firstLine, unsigned long lastLine) {
+///////////////////////////////////////////////////////////////////
+	if ( HasFocus() == true )
+		return false;
+	
+	switch ( fileInfo.format ) {
+		case TplSvg:		return selectLinesSvg(firstLine, lastLine);
+		case TplBinary:		return selectLinesBinary(firstLine, lastLine);
+		default:			;
+	}
+	
+	return selectLinesDefault(firstLine, lastLine);
+}
+///////////////////////////////////////////////////////////////////
+bool CncBaseEditor::selectLinesDefault(unsigned long firstLine, unsigned long lastLine) {
 ///////////////////////////////////////////////////////////////////
 	const int total = GetNumberOfLines() - 1;
 	if ( total <= 0 )
 		return false;
 		
-	if ( ln > (unsigned long)total )
+	if ( firstLine > (unsigned long)total || lastLine > (unsigned long)total)
 		return false;
 	
-	GotoLine(ln);
+	GotoLine(firstLine);
+	const unsigned long selStart = firstLine != 0 ? GetCurrentPos() : 0;
+	const unsigned long selEnd   = lastLine  != 0 ? GetLineEndPosition(lastLine) : 0;
+
+	SetSelectionStart(selStart);
+	SetSelectionEnd(selEnd);
+
+	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncBaseEditor::selectLineDefault(unsigned long ln) {
+///////////////////////////////////////////////////////////////////
+	return selectLinesDefault(ln, ln);
+}
+///////////////////////////////////////////////////////////////////
+bool CncBaseEditor::selectLinesSvg(unsigned long firstLine, unsigned long lastLine) {
+///////////////////////////////////////////////////////////////////
+	GotoLine(firstLine);	// sets the position to the start of the given line
+	Home();					// Move caret to first position on line.
+	SearchAnchor();			// Set an anchor for the next search
 	
-	if ( ln == 0 ) {
-		SetSelectionStart(0);
-		SetSelectionEnd(0);
-	} else {
-		SetSelectionStart(GetCurrentPos());
-		SetSelectionEnd(GetLineEndPosition(ln));
+	bool ok = false;
+	
+	// find start
+	long sp = SearchNext(0, "<");
+	long ep = wxNOT_FOUND;
+	
+	if ( sp != wxNOT_FOUND ) {
+		SetCurrentPos(sp);
+		SearchAnchor();
+		
+		// find end
+		if ( lastLine > firstLine ) {
+			GotoLine(lastLine);	// sets the position to the start of the given line
+			Home();				// Move caret to first position on line.
+			SearchAnchor();		// Set an anchor for the next search
+		}
+		
+		ep = SearchNext(0, ">");
+		
+		if ( ep != wxNOT_FOUND ) {
+			// make the end visible
+			GotoPos(ep);
+			// select
+			SetSelection(sp - 0, ep + 1);
+			ok = true;
+		}
 	}
 	
-	return true;
+	// on error use the default handling
+	if ( ok == false )
+		return selectLinesDefault(firstLine, lastLine);
+
+	return ok;
 }
 ///////////////////////////////////////////////////////////////////
 bool CncBaseEditor::selectLineSvg(unsigned long ln, const char* searchKey) {
@@ -399,6 +474,22 @@ bool CncBaseEditor::selectLineSvg(unsigned long ln, const char* searchKey) {
 		return selectLineDefault(ln);
 	
 	return true;
+}
+///////////////////////////////////////////////////////////////////
+bool CncBaseEditor::selectLinesBinary(unsigned long firstLine, unsigned long lastLine) {
+///////////////////////////////////////////////////////////////////
+	unsigned long fl = firstLine;
+	unsigned long ll = lastLine;
+
+	auto it = fileInfo.lineNumberTranslater.find(firstLine);
+	if ( it != fileInfo.lineNumberTranslater.end() )
+		fl = selectLineDefault(it->second);
+	
+	it = fileInfo.lineNumberTranslater.find(lastLine);
+	if ( it != fileInfo.lineNumberTranslater.end() )
+		ll = selectLineDefault(it->second);
+
+	return selectLinesDefault(fl, ll);
 }
 ///////////////////////////////////////////////////////////////////
 bool CncBaseEditor::selectLineBinary(unsigned long ln) {

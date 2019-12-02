@@ -211,6 +211,20 @@ void CncConfig::setupWorkingCfgPage(wxConfigBase& config) {
 			prop->SetHelpString(_T(""));
 			prop->SetEditor( wxT("CheckBox") );
 			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES, prop);
+			
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Connect List 'PathListEnties' by default", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES, prop);
+
+			//...............
+			prop = ctl->AppendChild( new wxBoolProperty("Connect List 'MoveSequences' by default", NEXT_PROP_ID, true));
+			prop->Enable(true);
+			prop->SetHelpString(_T(""));
+			prop->SetEditor( wxT("CheckBox") );
+			CncConfig::registerProperty(CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES, prop);
 		}
 	}
 }

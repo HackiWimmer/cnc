@@ -5303,7 +5303,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_positionMonitorView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(284,140)), wxTAB_TRAVERSAL);
     
     m_auimgrMain->AddPane(m_positionMonitorView, wxAuiPaneInfo().Name(wxT("PositionMonitor")).Caption(_("CNC Position/Speed Monitor")).Direction(wxAUI_DOCK_BOTTOM).Layer(0).Row(1).Position(0).BestSize(384,40).MinSize(384,40).MaxSize(384,40).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
-    m_auimgrMain->Update();
     
     wxFlexGridSizer* flexGridSizer7498 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer7498->SetFlexibleDirection( wxBOTH );
@@ -5480,6 +5479,280 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer7498->Add(m_speedPanel, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     m_speedPanel->SetMinSize(wxSize(-1,5));
+    
+    m_secureRunPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    m_auimgrMain->AddPane(m_secureRunPanel, wxAuiPaneInfo().Name(wxT("SecureRunPanel")).Caption(_("CNC Secure")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(0).Position(0).BestSize(100,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(false).MaximizeButton(false).CloseButton(false).MinimizeButton(false).PinButton(false));
+    m_auimgrMain->Update();
+    
+    wxFlexGridSizer* flexGridSizer8248 = new wxFlexGridSizer(4, 1, 0, 0);
+    flexGridSizer8248->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8248->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer8248->AddGrowableCol(0);
+    flexGridSizer8248->AddGrowableRow(3);
+    m_secureRunPanel->SetSizer(flexGridSizer8248);
+    
+    wxFlexGridSizer* flexGridSizer8251 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer8251->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8251->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer8251->AddGrowableCol(1);
+    flexGridSizer8251->AddGrowableRow(0);
+    
+    flexGridSizer8248->Add(flexGridSizer8251, 0, wxALL|wxEXPAND|wxALIGN_LEFT, WXC_FROM_DIP(0));
+    
+    m_staticBitmap8269 = new wxStaticBitmap(m_secureRunPanel, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("brick")), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), 0 );
+    
+    flexGridSizer8251->Add(m_staticBitmap8269, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(5));
+    
+    m_staticText8271 = new wxStaticText(m_secureRunPanel, wxID_ANY, _("Secure Run . . ."), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), 0);
+    
+    flexGridSizer8251->Add(m_staticText8271, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_button8250 = new wxButton(m_secureRunPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_button8250->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("close")), wxLEFT);
+    m_button8250->SetBitmapMargins(2,2);
+    #endif
+    
+    flexGridSizer8251->Add(m_button8250, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    m_button8250->SetMinSize(wxSize(24,24));
+    
+    m_staticLine8267 = new wxStaticLine(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer8248->Add(m_staticLine8267, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_secToolbar = new wxPanel(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,30)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer8248->Add(m_secToolbar, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer8324 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer8324->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8324->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer8324->AddGrowableCol(1);
+    flexGridSizer8324->AddGrowableRow(0);
+    m_secToolbar->SetSizer(flexGridSizer8324);
+    
+    wxFlexGridSizer* flexGridSizer8326 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer8326->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8326->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer8326->AddGrowableCol(0);
+    flexGridSizer8326->AddGrowableRow(0);
+    
+    flexGridSizer8324->Add(flexGridSizer8326, 1, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(0));
+    
+    m_loadTemplateSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-open-5")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_loadTemplateSec->SetToolTip(_("Open Template"));
+    
+    flexGridSizer8326->Add(m_loadTemplateSec, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(2));
+    
+    m_panel8328 = new wxPanel(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer8324->Add(m_panel8328, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer8281 = new wxFlexGridSizer(0, 7, 0, 0);
+    flexGridSizer8281->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8281->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    
+    flexGridSizer8324->Add(flexGridSizer8281, 1, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
+    
+    m_rcRunSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-right-3")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcRunSec->SetToolTip(_("Run"));
+    
+    flexGridSizer8281->Add(m_rcRunSec, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_staticLine8291 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer8281->Add(m_staticLine8291, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_rcPauseSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-playback-pause-blue")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcPauseSec->SetToolTip(_("Pause"));
+    
+    flexGridSizer8281->Add(m_rcPauseSec, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_rcStopSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_stop")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcStopSec->SetToolTip(_("Stop"));
+    
+    flexGridSizer8281->Add(m_rcStopSec, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_staticLine82917 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer8281->Add(m_staticLine82917, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_btnEmergenyStopSec = new wxButton(m_secToolbar, wxID_ANY, _("Emergency Stop [ESC]"), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_btnEmergenyStopSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("error")), wxRIGHT);
+    m_btnEmergenyStopSec->SetBitmapMargins(10,2);
+    #endif
+    m_btnEmergenyStopSec->SetBackgroundColour(wxColour(wxT("rgb(128,64,64)")));
+    m_btnEmergenyStopSec->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_btnEmergenyStopSec->SetToolTip(_("Interrupt the CNC Controller"));
+    
+    flexGridSizer8281->Add(m_btnEmergenyStopSec, 0, wxALL, WXC_FROM_DIP(0));
+    m_secToolbar->SetMinSize(wxSize(-1,30));
+    
+    m_splitter8253 = new wxSplitterWindow(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxSP_3D);
+    m_splitter8253->SetSashGravity(0.7);
+    m_splitter8253->SetMinimumPaneSize(10);
+    
+    flexGridSizer8248->Add(m_splitter8253, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_splitterPageMonitor = new wxPanel(m_splitter8253, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter8253, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    wxFlexGridSizer* flexGridSizer8263 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer8263->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8263->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer8263->AddGrowableCol(0);
+    flexGridSizer8263->AddGrowableRow(0);
+    m_splitterPageMonitor->SetSizer(flexGridSizer8263);
+    
+    wxFlexGridSizer* flexGridSizer8329 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer8329->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8329->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer8329->AddGrowableCol(0);
+    flexGridSizer8329->AddGrowableRow(0);
+    
+    flexGridSizer8263->Add(flexGridSizer8329, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_secMonitorPlaceholder = new wxPanel(m_splitterPageMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_secMonitorPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer8329->Add(m_secMonitorPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_secZViewPlaceholder = new wxPanel(m_splitterPageMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(50,-1)), wxTAB_TRAVERSAL);
+    m_secZViewPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_SCROLLBAR));
+    
+    flexGridSizer8329->Add(m_secZViewPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    m_secZViewPlaceholder->SetMinSize(wxSize(50,-1));
+    
+    wxFlexGridSizer* flexGridSizer23118 = new wxFlexGridSizer(20, 1, 0, 0);
+    flexGridSizer23118->SetFlexibleDirection( wxBOTH );
+    flexGridSizer23118->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer23118->AddGrowableCol(0);
+    
+    flexGridSizer8263->Add(flexGridSizer23118, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_3D_TopSec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_TopSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewUp")), wxLEFT);
+    m_3D_TopSec->SetBitmapMargins(0,0);
+    #endif
+    m_3D_TopSec->SetToolTip(_("Show from Top"));
+    
+    flexGridSizer23118->Add(m_3D_TopSec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_TopSec->SetMinSize(wxSize(26,26));
+    
+    m_3D_BottomSec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_BottomSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewDown")), wxLEFT);
+    m_3D_BottomSec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_BottomSec->SetToolTip(_("Show from Bottom"));
+    
+    flexGridSizer23118->Add(m_3D_BottomSec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_BottomSec->SetMinSize(wxSize(26,26));
+    
+    m_3D_FrontSec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_FrontSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewFront")), wxLEFT);
+    m_3D_FrontSec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_FrontSec->SetToolTip(_("Show from Front"));
+    
+    flexGridSizer23118->Add(m_3D_FrontSec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_FrontSec->SetMinSize(wxSize(26,26));
+    
+    m_3D_RearSec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(24,24)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_RearSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewButtom")), wxLEFT);
+    m_3D_RearSec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_RearSec->SetToolTip(_("Show from Rear"));
+    
+    flexGridSizer23118->Add(m_3D_RearSec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_RearSec->SetMinSize(wxSize(24,24));
+    
+    m_3D_LeftSec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_LeftSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewLeft")), wxLEFT);
+    m_3D_LeftSec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_LeftSec->SetToolTip(_("Show from Left"));
+    
+    flexGridSizer23118->Add(m_3D_LeftSec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_LeftSec->SetMinSize(wxSize(26,26));
+    
+    m_3D_RightSec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_RightSec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewRight")), wxLEFT);
+    m_3D_RightSec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_RightSec->SetToolTip(_("Show from Right"));
+    
+    flexGridSizer23118->Add(m_3D_RightSec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_RightSec->SetMinSize(wxSize(26,26));
+    
+    m_staticLine348317 = new wxStaticLine(m_splitterPageMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer23118->Add(m_staticLine348317, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_3D_Perspective1Sec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), wxBORDER_THEME);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective1Sec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso1")), wxLEFT);
+    m_3D_Perspective1Sec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Perspective1Sec->SetToolTip(_("Show 3D - ISO1"));
+    
+    flexGridSizer23118->Add(m_3D_Perspective1Sec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Perspective1Sec->SetMinSize(wxSize(26,26));
+    
+    m_3D_Perspective2Sec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective2Sec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso2")), wxLEFT);
+    m_3D_Perspective2Sec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Perspective2Sec->SetToolTip(_("Show 3D - ISO2"));
+    
+    flexGridSizer23118->Add(m_3D_Perspective2Sec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Perspective2Sec->SetMinSize(wxSize(26,26));
+    
+    m_3D_Perspective3Sec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective3Sec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso3")), wxLEFT);
+    m_3D_Perspective3Sec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Perspective3Sec->SetToolTip(_("Show 3D - ISO3"));
+    
+    flexGridSizer23118->Add(m_3D_Perspective3Sec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Perspective3Sec->SetMinSize(wxSize(26,26));
+    
+    m_3D_Perspective4Sec = new wxButton(m_splitterPageMonitor, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(26,26)), 0);
+    #if wxVERSION_NUMBER >= 2904
+    m_3D_Perspective4Sec->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("ViewIso4")), wxLEFT);
+    m_3D_Perspective4Sec->SetBitmapMargins(2,2);
+    #endif
+    m_3D_Perspective4Sec->SetToolTip(_("Show 3D - ISO4"));
+    
+    flexGridSizer23118->Add(m_3D_Perspective4Sec, 0, wxALL, WXC_FROM_DIP(0));
+    m_3D_Perspective4Sec->SetMinSize(wxSize(26,26));
+    
+    m_staticLine234122 = new wxStaticLine(m_splitterPageMonitor, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageMonitor, wxSize(-1,-1)), wxLI_HORIZONTAL);
+    
+    flexGridSizer23118->Add(m_staticLine234122, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_splitterPageLogger = new wxPanel(m_splitter8253, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter8253, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter8253->SplitHorizontally(m_splitterPageMonitor, m_splitterPageLogger, 0);
+    
+    wxFlexGridSizer* flexGridSizer8265 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer8265->SetFlexibleDirection( wxBOTH );
+    flexGridSizer8265->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer8265->AddGrowableCol(0);
+    flexGridSizer8265->AddGrowableRow(0);
+    m_splitterPageLogger->SetSizer(flexGridSizer8265);
+    
+    m_secLoggerPlaceholder = new wxPanel(m_splitterPageLogger, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageLogger, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_secLoggerPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INFOBK));
+    
+    flexGridSizer8265->Add(m_secLoggerPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     m_menuBar = new wxMenuBar(wxMB_DOCKABLE);
     this->SetMenuBar(m_menuBar);
@@ -6192,6 +6465,22 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_bmpButton47182->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);
     m_bmpButton47183->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
     m_speedPanel->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
+    m_button8250->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
+    m_loadTemplateSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
+    m_rcRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
+    m_rcPauseSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
+    m_rcStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
+    m_btnEmergenyStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
+    m_3D_TopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
+    m_3D_BottomSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
+    m_3D_FrontSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
+    m_3D_RearSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRear3D), NULL, this);
+    m_3D_LeftSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromLeft3D), NULL, this);
+    m_3D_RightSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRight3D), NULL, this);
+    m_3D_Perspective1Sec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
+    m_3D_Perspective2Sec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
+    m_3D_Perspective3Sec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
+    m_3D_Perspective4Sec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     this->Connect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Connect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Connect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);
@@ -6478,6 +6767,22 @@ MainFrameBClass::~MainFrameBClass()
     m_bmpButton47182->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);
     m_bmpButton47183->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
     m_speedPanel->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
+    m_button8250->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
+    m_loadTemplateSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
+    m_rcRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
+    m_rcPauseSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
+    m_rcStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
+    m_btnEmergenyStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::emergencyStop), NULL, this);
+    m_3D_TopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromTop3D), NULL, this);
+    m_3D_BottomSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromBottom3D), NULL, this);
+    m_3D_FrontSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromFront3D), NULL, this);
+    m_3D_RearSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRear3D), NULL, this);
+    m_3D_LeftSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromLeft3D), NULL, this);
+    m_3D_RightSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::showFromRight3D), NULL, this);
+    m_3D_Perspective1Sec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
+    m_3D_Perspective2Sec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
+    m_3D_Perspective3Sec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
+    m_3D_Perspective4Sec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::show3D), NULL, this);
     this->Disconnect(m_miNewTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::newTemplate), NULL, this);
     this->Disconnect(m_miOpenTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
     this->Disconnect(m_miReloadTemplate->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::reloadTemplate), NULL, this);

@@ -145,6 +145,6 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	if ( progressDialog != NULL && preview->getVirtualEnd() % 100 == 0 )
 			progressDialog->Update();
 		
-	//lastSetCurrent = preview->SetCurrent(*this);
+	lastSetCurrent = preview->SetCurrent(*this);
 	preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
 }

@@ -64,17 +64,17 @@ CncPathListEntryListCtrl::CncPathListEntryListCtrl(wxWindow *parent, long style)
 	defaultItemAttr.SetFont(font);
 	defaultItemAttr.SetTextColour(GetTextColour());
 
-	clientIdItemAttr.SetBackgroundColour(GetBackgroundColour());//.ChangeLightness(80));
+	initialItemAttr.SetBackgroundColour(GetBackgroundColour());
+	initialItemAttr.SetFont(font.Underlined().Bold());
+	initialItemAttr.SetTextColour(GetTextColour());
+
+	clientIdItemAttr.SetBackgroundColour(GetBackgroundColour());
 	clientIdItemAttr.SetFont(font.Bold());
 	clientIdItemAttr.SetTextColour(GetTextColour());
 
-	initialItemAttr.SetBackgroundColour(wxColour(112, 146, 190));
-	initialItemAttr.SetFont(font);
-	initialItemAttr.SetTextColour(GetTextColour());
-
-	speedItemAttr.SetBackgroundColour(wxColour(255, 225, 121));
-	speedItemAttr.SetFont(font);
-	speedItemAttr.SetTextColour(GetTextColour());
+	speedItemAttr.SetBackgroundColour(GetBackgroundColour());
+	speedItemAttr.SetFont(font.Bold());
+	speedItemAttr.SetTextColour(wxColour(63, 72, 204));
 }
 /////////////////////////////////////////////////////////////
 CncPathListEntryListCtrl::~CncPathListEntryListCtrl() {

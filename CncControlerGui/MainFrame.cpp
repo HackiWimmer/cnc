@@ -171,6 +171,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , isDebugMode(false)
 , isZeroReferenceValid(false)
 , canClose(true)
+, secureMode(false)
 , useSecureRunDlg(true)
 , evaluatePositions(true)
 , ignoreDirControlEvents(false)
@@ -853,11 +854,57 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
+	
+	tryToSelectClientIds(42L, 88L, TSS_PATH_LIST);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
+	
+	activateSecureMode(true);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	activateSecureMode(false);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::activateSecureMode(bool state) {
+///////////////////////////////////////////////////////////////////
+	secureMode = state;
+	
+	if ( secureMode == true ) {
+		hideAllAuiPanes(false);
+		
+		GblFunc::swapControls(m_secMonitorPlaceholder, 	motionMonitor);
+		GblFunc::swapControls(m_secLoggerPlaceholder, 	getLogger());
+		GblFunc::swapControls(m_secZViewPlaceholder, 	m_zView);
+
+		if ( IsFullScreen() == false )
+			ShowFullScreen(true);
+			
+		showAuiPane("SecureRunPanel", 	false);
+		showAuiPane("StatusBar", 		false);
+		
+		getLogger()->setShowOnDemandState(false);
+		
+	} else {
+		
+		GblFunc::swapControls(motionMonitor, 	m_secMonitorPlaceholder);
+		GblFunc::swapControls(getLogger(), 		m_secLoggerPlaceholder);
+		GblFunc::swapControls(m_zView, 			m_secZViewPlaceholder);
+		
+		if ( IsFullScreen() )
+			ShowFullScreen(false);
+		
+		perspectiveHandler.loadPerspective("Default");
+		
+		getLogger()->setShowOnDemandState(m_showLoggerOnDemand->GetValue());
+		
+	}
+	
+	GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
@@ -2056,6 +2103,7 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		bool pathListEntries		= false;
 		bool moveSequences			= false;
 		bool vertexTrace			= false;
+
 	} setup;
 	
 	if ( sel == _portEmulatorNULL ) {
@@ -2125,10 +2173,13 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		setup.vertexTrace		= false;
 	}
 	
-	const bool startDisabled = true;
+	const bool startDisabled = false;
 	if ( startDisabled == true ) {
 		cnc::cex1 << "MainFrame::createCncControl(): Flag startDisabled is active!" << std::endl;
 		
+//		bool pathListEntries		= GBL_CONFIG->getPreProcessorCntPathListEntries();
+//		bool moveSequences			= GBL_CONFIG->getPreProcessorCntMoveSequneces();
+
 		setup.speedControl		= false;
 		setup.pathListEntries	= false;
 		setup.moveSequences		= false;
@@ -2225,14 +2276,19 @@ void MainFrame::enableRunControls(bool state) {
 	// every time
 	
 	isPause() ? m_rcDebugConfig->Enable(false) : m_rcRun->Enable(state);
+	isPause() ? m_rcDebugConfig->Enable(false) : m_rcRunSec->Enable(state);
 	
 	if ( isDebugMode == false ) {
 		
-		isPause() ? m_rcRun->Enable(true)           : m_rcRun->Enable(state);
-		isPause() ? m_rcDebug->Enable(false)        : m_rcDebug->Enable(state);
-		isPause() ? m_rcPause->Enable(false)        : m_rcPause->Enable(!state);
-		isPause() ? m_rcStop->Enable(true)          : m_rcStop->Enable(!state);
-		isPause() ? m_btnEmergenyStop->Enable(true) : m_btnEmergenyStop->Enable(!state);
+		isPause() ? m_rcRun->Enable(true)              : m_rcRun->Enable(state); 
+		isPause() ? m_rcRunSec->Enable(true)           : m_rcRunSec->Enable(state); 
+		isPause() ? m_rcDebug->Enable(false)           : m_rcDebug->Enable(state);
+		isPause() ? m_rcPause->Enable(false)           : m_rcPause->Enable(!state);
+		isPause() ? m_rcPauseSec->Enable(false)        : m_rcPauseSec->Enable(!state);
+		isPause() ? m_rcStop->Enable(true)             : m_rcStop->Enable(!state);
+		isPause() ? m_rcStopSec->Enable(true)          : m_rcStopSec->Enable(!state);
+		isPause() ? m_btnEmergenyStop->Enable(true)    : m_btnEmergenyStop->Enable(!state);
+		isPause() ? m_btnEmergenyStopSec->Enable(true) : m_btnEmergenyStopSec->Enable(!state);
 		
 		m_rcReset->Enable(isPause() == false && state);
 		m_rcNextStep->Enable(false);
@@ -3847,13 +3903,15 @@ bool MainFrame::processTemplateIntern() {
 	
 	clearPositionSpy();
 	
-	showAuiPane("Outbound");
-	selectMonitorBookCncPanel();
-	
-	// select draw pane
-	m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-	m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
+	if ( isSecureMode() == false ) {
+		showAuiPane("Outbound");
+		selectMonitorBookCncPanel();
 		
+		// select draw pane
+		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+		m_listbookMonitor->SetSelection(OutboundMonitorSelection::VAL::MOTION_MONITOR_PANAL);
+	}
+	
 	// select template Page
 	if ( m_mainViewSelector->GetSelection() != MainBookSelection::VAL::MANUEL_PANEL && 
 	     m_mainViewSelector->GetSelection() != MainBookSelection::VAL::TEST_PANEL && 
@@ -5048,6 +5106,7 @@ wxWindow* MainFrame::getAUIPaneByName(const wxString& name) {
 	else if ( name == "Debugger")			return m_debuggerView;
 	else if ( name == "PositionMonitor")	return m_positionMonitorView;
 	else if ( name == "ZView")				return m_panelZView;
+	else if ( name == "SecureRunPanel")		return m_secureRunPanel;
 	
 	return NULL;
 }
@@ -5259,18 +5318,26 @@ void MainFrame::viewAllAuiPanes(wxCommandEvent& event) {
 	viewAllAuiPanes();
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::hideAllAuiPanes() {
+void MainFrame::hideAllAuiPanes(bool update) {
 ///////////////////////////////////////////////////////////////////
 	wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
 	for (unsigned int i = 0; i < panes.GetCount(); ++i)
-		hideAuiPane( panes.Item(i).name);
+		hideAuiPane( panes.Item(i).name, false);
+		
+	if ( update == true )
+		GetAuimgrMain()->Update();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::viewAllAuiPanes(bool withSpy) {
 ///////////////////////////////////////////////////////////////////
 	wxAuiPaneInfoArray panes = m_auimgrMain->GetAllPanes();
-	for (unsigned int i = 0; i < panes.GetCount(); ++i)
-		showAuiPane( panes.Item(i).name);
+	for (unsigned int i = 0; i < panes.GetCount(); ++i) {
+		const wxString name(panes.Item(i).name);
+		if ( name != "SecureRunPanel" )
+			showAuiPane(name, false);
+	}
+	
+	GetAuimgrMain()->Update();
 
 	if ( withSpy )
 		showAuiPane(m_serialSpyView, m_miViewSpy);
@@ -5766,8 +5833,10 @@ void MainFrame::rcRun() {
 	
 	// ensure the monitor is visible, especally if isPause == true
 	// because then the processing should be resume
-	showAuiPane("Outbound");
-	selectMonitorBookCncPanel();
+	if ( isSecureMode() == false ) {
+		showAuiPane("Outbound");
+		selectMonitorBookCncPanel();
+	}
 
 	// toggle only the pause flag
 	if ( isPause() == true ) {
@@ -5799,7 +5868,8 @@ void MainFrame::rcRun() {
 		GBL_CONTEXT->setUpdateInterval(1);
 	} else {
 		
-		perspectiveHandler.ensureRunPerspectiveMinimal();
+		if ( isSecureMode() == false ) 
+			perspectiveHandler.ensureRunPerspectiveMinimal();
 	}
 	
 	// process
@@ -5989,6 +6059,10 @@ void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 	m_3D_Perspective2->SetBackgroundColour(inactive);
 	m_3D_Perspective3->SetBackgroundColour(inactive);
 	m_3D_Perspective4->SetBackgroundColour(inactive);
+	m_3D_Perspective1Sec->SetBackgroundColour(inactive);
+	m_3D_Perspective2Sec->SetBackgroundColour(inactive);
+	m_3D_Perspective3Sec->SetBackgroundColour(inactive);
+	m_3D_Perspective4Sec->SetBackgroundColour(inactive);
 	
 	if ( bt != NULL ) {
 		bt->SetBackgroundColour(active);
@@ -6035,19 +6109,19 @@ void MainFrame::show3D(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxButton* bt = (wxButton*)event.GetEventObject();
 	
-	if ( bt == m_3D_Perspective1 ) {
+	if ( bt == m_3D_Perspective1 || bt == m_3D_Perspective1Sec ) {
 		activate3DPerspectiveButton(bt);
 		motionMonitor->viewIso1();
 		
-	} else if ( bt == m_3D_Perspective2 ) {
+	} else if ( bt == m_3D_Perspective2 || bt == m_3D_Perspective2Sec ) {
 		activate3DPerspectiveButton(bt);
 		motionMonitor->viewIso2();
 		
-	} else if ( bt == m_3D_Perspective3 ) {
+	} else if ( bt == m_3D_Perspective3 || bt == m_3D_Perspective3Sec ) {
 		activate3DPerspectiveButton(bt);
 		motionMonitor->viewIso3();
 		
-	} else if ( bt == m_3D_Perspective4 ) {
+	} else if ( bt == m_3D_Perspective4 || bt == m_3D_Perspective4Sec ) {
 		activate3DPerspectiveButton(bt);
 		motionMonitor->viewIso4();
 		
@@ -6062,6 +6136,7 @@ void MainFrame::clearMotionMonitor() {
 	motionMonitor->clear();
 	statisticsPane->clear();
 	parsingSynopisis->clear();
+	cncPreprocessor->clearAll();
 	
 	decorateOutboundEditor();
 }
@@ -6526,51 +6601,85 @@ void MainFrame::decoratePosSpyConnectButton(bool state) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectSourceControlLineNumber(long ln) {
 /////////////////////////////////////////////////////////////////////
+	ln--;
 	if ( ln <= 0L )
 		return;
 	
+	wxASSERT( sourceEditor );
 	sourceEditor->selectLineNumber(ln);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
+void MainFrame::selectSourceControlLineNumbers(long firstLine, long lastLine) {
 /////////////////////////////////////////////////////////////////////
-	//std::cout << clientId << " from: " << tss << std::endl;
+	firstLine--;
+	lastLine--;
+	if ( lastLine <= 0L || firstLine <= 0L )
+		return;
+	
+	wxASSERT( sourceEditor );
+	sourceEditor->selectLineNumbers(firstLine, lastLine);
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, TemplateSelSource tss) {
+/////////////////////////////////////////////////////////////////////
+	static bool isRunning = false;
+	
+	if ( isRunning == true )	return;
+	else						isRunning = true;
+	
+	cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 	
 	if ( tss != TSS_POS_SPY ) {
 		if ( positionSpy != NULL )
-			positionSpy->searchReferenceById(clientId);
-	}
-	
-	if ( tss != TSS_EDITOR ) {
-		selectSourceControlLineNumber(clientId - 1 );
+			positionSpy->searchReferenceById(firstClientId);
 	}
 	
 	if ( tss != TSS_MONITOR ) {
 		if ( motionMonitor != NULL ) {
-			motionMonitor->setCurrentClientId(clientId);
+			motionMonitor->setCurrentClientId(firstClientId);
 			motionMonitor->Refresh();
 		}
 	}
 	
 	if ( tss != TSS_PATH_LIST ) {
 		if ( cncPreprocessor != NULL )
-			cncPreprocessor->selectClientId(clientId, CncPreprocessor::LT_PATH_LIST);
+			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_PATH_LIST);
 	}
 	
+	if ( tss != TSS_MOVE_SEQ_OVW ) {
+		if ( cncPreprocessor != NULL )
+			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_OVERVIEW);
+	}
+
 	if ( tss != TSS_MOVE_SEQ ) {
 		if ( cncPreprocessor != NULL )
-			cncPreprocessor->selectClientId(clientId, CncPreprocessor::LT_MOVE_SEQUENCE);
+			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_CONTENT);
 	}
 	
 	if ( tss != TSS_VERTEX_DATA_TRACE) {
 		if ( motionVertexCtrl != NULL )
-				motionVertexCtrl->selectClientId(clientId, CncMotionVertexTrace::LT_VERTEX_DATA_TRACE);
+				motionVertexCtrl->selectClientId(firstClientId, CncMotionVertexTrace::LT_VERTEX_DATA_TRACE);
 	}
 	
 	if ( tss != TSS_VERTEX_INDEX_TRACE) {
 		if ( motionVertexCtrl != NULL )
-			motionVertexCtrl->selectClientId(clientId, CncMotionVertexTrace::LT_VERTEX_INDEX_TRACE);
+			motionVertexCtrl->selectClientId(firstClientId, CncMotionVertexTrace::LT_VERTEX_INDEX_TRACE);
 	}
+	
+	// Important!
+	// The editor hast to be the last one, otherwise the selection can be overridden by an 
+	// other control which calls tryToSelectClientId(long clientId, TemplateSelSource tss) only
+	// and the he first line is then selected only
+	if ( tss != TSS_EDITOR ) {
+		selectSourceControlLineNumbers(firstClientId, lastClientId);
+	}
+	
+	isRunning = false;
+}
+/////////////////////////////////////////////////////////////////////
+void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
+/////////////////////////////////////////////////////////////////////
+	tryToSelectClientIds(clientId, clientId, tss);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::selectPositionSpyContent(wxCommandEvent& event) {

@@ -23,46 +23,46 @@ GlobalConstStringDatabase globalStrings;
 ///////////////////////////////////////////////////////////////////
 static const wxCmdLineEntryDesc cmdLineDesc[] = {
 ///////////////////////////////////////////////////////////////////
-    { wxCMD_LINE_SWITCH , "g", "dbg", "Start CncController in debug mode", wxCMD_LINE_VAL_NONE , wxCMD_LINE_PARAM_OPTIONAL },
+    { wxCMD_LINE_SWITCH , "g", "dbg", 		"Start CncController in debug mode", 	wxCMD_LINE_VAL_NONE, 	wxCMD_LINE_PARAM_OPTIONAL },
+	{ wxCMD_LINE_SWITCH , "s", "secure", 	"Start CncController in secure mode",	 wxCMD_LINE_VAL_NONE, 	wxCMD_LINE_PARAM_OPTIONAL },
 	{ wxCMD_LINE_NONE }
 };
 
 ///////////////////////////////////////////////////////////////////
+	// redirect std::cout
+	CncCoutBuf*  psbufCout;
+	std::streambuf *sbOldCout;
 
-// redirect std::cout
-CncCoutBuf*  psbufCout;
-std::streambuf *sbOldCout;
+	// redirect std::clog
+	CncClogBuf*  psbufClog;
+	std::streambuf *sbOldClog;
 
-// redirect std::clog
-CncClogBuf*  psbufClog;
-std::streambuf *sbOldClog;
+	// redirect std::cerr
+	CncCerrBuf*  psbufCerr; 
+	std::streambuf *sbOldCerr;
 
-// redirect std::cerr
-CncCerrBuf*  psbufCerr; 
-std::streambuf *sbOldCerr;
+	// redirect cnc::cex1
+	CncCex1Buf*  psbufCex1;
+	std::streambuf *sbOldCex1;
 
-// redirect cnc::cex1
-CncCex1Buf*  psbufCex1;
-std::streambuf *sbOldCex1;
+	// redirect cnc::trc
+	CncCtrcBuf*  psbufCtrc;
+	std::streambuf *sbOldCtrc;
 
-// redirect cnc::trc
-CncCtrcBuf*  psbufCtrc;
-std::streambuf *sbOldCtrc;
+	// redirect cnc::trc
+	CncCmsgBuf*  psbufCmsg;
+	std::streambuf *sbOldCmsg;
 
-// redirect cnc::trc
-CncCmsgBuf*  psbufCmsg;
-std::streambuf *sbOldCmsg;
+	// redirect cnc::trc
+	CncCspyBuf*  psbufCspy;
+	std::streambuf *sbOldCspy;
 
-// redirect cnc::trc
-CncCspyBuf*  psbufCspy;
-std::streambuf *sbOldCspy;
-
-namespace cnc {
-	CncSerialSpyStream spy;
-	CncMsgLogStream msg;
-	CncTraceLogStream trc;
-	CncBasicLogStream cex1;
-};
+	namespace cnc {
+		CncSerialSpyStream spy;
+		CncMsgLogStream msg;
+		CncTraceLogStream trc;
+		CncBasicLogStream cex1;
+	};
 	
 ///////////////////////////////////////////////////////////////////////////
 class GlobalStreamRedirection {
@@ -230,11 +230,11 @@ class MainLogger : public wxLog {
 class MainApp : public wxApp {
 ///////////////////////////////////////////////////////////////////
 	private:
+		
 		wxCmdLineParser parser;
 		//wxLocale locale;
-		wxFileConfig* globalFileConfig;
+		wxFileConfig* 	globalFileConfig;
 		
-	
 	public:
 		///////////////////////////////////////////////////////////
 		MainApp() 
@@ -300,7 +300,7 @@ class MainApp : public wxApp {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void displaySplashImage(MainFrame* mainFrame) {
+		void displaySplashImage(wxFrame* mainFrame) {
 		///////////////////////////////////////////////////////////////////
 			#ifdef APP_USE_SPLASH
 				wxBitmap bmp;
@@ -342,7 +342,7 @@ class MainApp : public wxApp {
 			parser.SetDesc(cmdLineDesc);
 			parser.SetCmdLine(wxAppBase::argc, wxAppBase::argv);
 			
-			if( parser.Parse(false) != 0 ) {
+			if ( parser.Parse(false) != 0 ) {
 				printUsage(parser);
 				return false;
 			}
@@ -353,7 +353,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		bool getCmdLineParameter(const char* param) {
 		///////////////////////////////////////////////////////////
-			if( parser.Found(param) )
+			if ( parser.Found(param) )
 				return true;
 				
 			return false;
@@ -362,7 +362,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		bool getCmdLineParameter(const char* param, wxString& value) {
 		///////////////////////////////////////////////////////////
-			if( parser.Found(param, &value) )
+			if ( parser.Found(param, &value) )
 				return true;
 				
 			return false;
@@ -372,7 +372,6 @@ class MainApp : public wxApp {
 		virtual int OnRun() {
 		///////////////////////////////////////////////////////////
 			return wxApp::OnRun();
-			//return 0;
 		}
 		
 		///////////////////////////////////////////////////////////
@@ -387,16 +386,16 @@ class MainApp : public wxApp {
 			wxValidator::SuppressBellOnError(true);
 			
 			// build and decorate the main frame
-			MainFrame *mainFrame = new MainFrame(NULL, globalFileConfig);
+			MainFrame* mainFrame = new MainFrame(NULL, globalFileConfig);
 			
 			// command line handling
 			if ( initializeCmdLine() == false )
 				return false;
-			
+
 			// splash screen handling
 			if( getCmdLineParameter("g") == false )
 				displaySplashImage(mainFrame);
-				
+			
 			// redirect std streams
 			wxLog::SetActiveTarget(new MainLogger());
 			GlobalStreamRedirection::install(mainFrame);
@@ -404,6 +403,10 @@ class MainApp : public wxApp {
 			// last but not least call initialize
 			mainFrame->initialize();
 			
+			if ( getCmdLineParameter("s") == true )	{
+				#warning open in secure mode
+			}
+				
 			SetTopWindow(mainFrame);
 			return GetTopWindow()->Show();
 		}

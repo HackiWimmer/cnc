@@ -5,6 +5,7 @@
 CncExternalViewBox::CncExternalViewBox(wxWindow* parent, wxWindow* source, long style)
 : CncExternalViewBoxBase(parent, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(500, 300), wxSTAY_ON_TOP | style)
 , guiSensitivity(true)
+, swapState(SS_DEFAULT)
 , sourceCtrl(source)
 , moveDelta()
 //////////////////////////////////////////////////////////////////
@@ -20,15 +21,15 @@ void CncExternalViewBox::swapControls() {
 //////////////////////////////////////////////////////////////////
 	wxASSERT( sourceCtrl != NULL );
 	
-	if ( IsShown() == true ) {
+	if ( swapState == SS_DEFAULT ) {
 		GblFunc::swapControls(m_placeholder, sourceCtrl);
-	
+		swapState = SS_SWAPED;
+
 		SetClientSize(GetDefaultSize());
-		//Restore();
 		
 	} else {
-		
 		GblFunc::swapControls(sourceCtrl, m_placeholder);
+		swapState = SS_DEFAULT;
 	}
 	
 	Update();
@@ -39,7 +40,10 @@ void CncExternalViewBox::onShow(wxShowEvent& event) {
 	wxString title(GetTitle());
 	m_windowTitle->SetLabel(title);
 	
-	swapControls();
+	if 		( event.IsShown() == true  && swapState == SS_DEFAULT )	swapControls();
+	else if ( event.IsShown() == false && swapState == SS_DEFAULT )	; // do nothing
+	else if ( event.IsShown() == true  && swapState == SS_SWAPED )	; // do nothing
+	else if ( event.IsShown() == false && swapState == SS_SWAPED )	swapControls();
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onCloseFromButton(wxCommandEvent& event) {

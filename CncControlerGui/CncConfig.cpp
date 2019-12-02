@@ -952,20 +952,22 @@ const char CncConfig::getRunConfirmationModeAsChar() {
 // config getters
 #define PROPERTY( id ) wxPGProperty* p = getProperty(id); wxASSERT(p); 
 
-const bool CncConfig::getAutoConnectFlag()							{ PROPERTY(CncApplication_AUTO_CONNECT) 				return p->GetValue().GetBool(); }
-const bool CncConfig::getAutoProcessFlag()							{ PROPERTY(CncApplication_AUTO_PROCESS) 				return p->GetValue().GetBool(); }
-const bool CncConfig::getAutoOpenOglObserverFlag()					{ PROPERTY(CncApplication_AUTO_OPEN_OGL_OBSERVER) 		return p->GetValue().GetBool(); }
-const bool CncConfig::getShowTestMenuFlag()							{ PROPERTY(CncApplication_SHOW_TEST_MENU) 				return p->GetValue().GetBool(); }
-const bool CncConfig::getSvgConvertToRightHandFlag()				{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 				return p->GetValue().GetBool(); }
-const bool CncConfig::getAvoidDupSetterValuesFlag()					{ PROPERTY(CncWork_Ctl_AVOID_DUP_SETTER_VALUES) 		return p->GetValue().GetBool(); }
-const bool CncConfig::getRequestIdleRequestFlag()					{ PROPERTY(CncWork_Ctl_REQUEST_IDLE_REQUESTS) 			return p->GetValue().GetBool(); }
-const bool CncConfig::getInterruptByPosOutOfRangeFlag()				{ PROPERTY(CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE) 	return p->GetValue().GetBool(); }
-const bool CncConfig::getInverseCtrlDirectionXFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_X) 		return p->GetValue().GetBool(); }
-const bool CncConfig::getInverseCtrlDirectionYFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Y) 		return p->GetValue().GetBool(); }
-const bool CncConfig::getInverseCtrlDirectionZFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Z) 		return p->GetValue().GetBool(); }
-const bool CncConfig::getPreProcessorAnalyseFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_ANALYSE) 			return p->GetValue().GetBool(); }
-const bool CncConfig::getPreProcessoSkipEmptyFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY) 			return p->GetValue().GetBool(); }
-const bool CncConfig::getPreProcessorCombineMovesFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES) 		return p->GetValue().GetBool(); }
+const bool CncConfig::getAutoConnectFlag()							{ PROPERTY(CncApplication_AUTO_CONNECT) 					return p->GetValue().GetBool(); }
+const bool CncConfig::getAutoProcessFlag()							{ PROPERTY(CncApplication_AUTO_PROCESS) 					return p->GetValue().GetBool(); }
+const bool CncConfig::getAutoOpenOglObserverFlag()					{ PROPERTY(CncApplication_AUTO_OPEN_OGL_OBSERVER) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getShowTestMenuFlag()							{ PROPERTY(CncApplication_SHOW_TEST_MENU) 					return p->GetValue().GetBool(); }
+const bool CncConfig::getSvgConvertToRightHandFlag()				{ PROPERTY(CncSvg_Parser_REVERSE_Y_AXIS) 					return p->GetValue().GetBool(); }
+const bool CncConfig::getAvoidDupSetterValuesFlag()					{ PROPERTY(CncWork_Ctl_AVOID_DUP_SETTER_VALUES) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getRequestIdleRequestFlag()					{ PROPERTY(CncWork_Ctl_REQUEST_IDLE_REQUESTS) 				return p->GetValue().GetBool(); }
+const bool CncConfig::getInterruptByPosOutOfRangeFlag()				{ PROPERTY(CncWork_Ctl_INTERRUPT_BY_POS_OUTOFRANGE) 		return p->GetValue().GetBool(); }
+const bool CncConfig::getInverseCtrlDirectionXFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_X) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getInverseCtrlDirectionYFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Y) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getInverseCtrlDirectionZFlag()				{ PROPERTY(CncWork_Ctl_INVERSE_CTL_DIRECTION_Z) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorAnalyseFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_ANALYSE) 				return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessoSkipEmptyFlag()					{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_SKIP_EMPTY) 				return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorCombineMovesFlag()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_COMBINE_MOVES) 			return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorCntPathListEntries()			{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_PATH_LIST_ENTRIES) 	return p->GetValue().GetBool(); }
+const bool CncConfig::getPreProcessorCntMoveSequneces()				{ PROPERTY(CncWork_Ctl_PRE_PROSSOR_CNT_SEQUENCE_MOVES) 		return p->GetValue().GetBool(); }
 
 const unsigned int CncConfig::getStepsX() 							{ PROPERTY(CncConfig_STEPS_X) 							return p->GetValue().GetInteger(); }
 const unsigned int CncConfig::getStepsY() 							{ PROPERTY(CncConfig_STEPS_Y) 					 		return p->GetValue().GetInteger(); }

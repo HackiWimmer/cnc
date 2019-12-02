@@ -1817,7 +1817,7 @@ bool Serial::test() {
 		for ( int i = 0; i <50; i++ ) {
 			// one byte values
 			if ( fOneB ) {
-				cms.addStepPosXYZF(+1, -1, +1, 1234);
+				cms.addStepPosXYZ(+1, -1, +1);
 				cms.addStepPosXYZ(-1, +1,  0);
 				cms.addStepPosXYZ(+1,  0,  0);
 				cms.addStepPosXYZ( 0, -1,  0);
@@ -1826,7 +1826,7 @@ bool Serial::test() {
 			
 			// int8_t values
 			if ( fInt8 ) {
-				cms.addStepPosXYZF(+11, -12, +13, 1234);
+				cms.addStepPosXYZ(+11, -12, +13);
 				cms.addStepPosXYZ(-11,  12,   0);
 				cms.addStepPosXYZ(-11,   0,   0);
 				cms.addStepPosXYZ(  0,  12,   0);
@@ -1835,7 +1835,7 @@ bool Serial::test() {
 			
 			// int16_t values
 			if ( fInt16 ) {
-				cms.addStepPosXYZF(+1000, +2000, +30, 1234);
+				cms.addStepPosXYZ(+1000, +2000, +30);
 				cms.addStepPosXYZ(+1000, +2000,   0);
 				cms.addStepPosXYZ(-1000,     0,   0);
 				cms.addStepPosXYZ(    0, -2000,   0);
@@ -1844,7 +1844,7 @@ bool Serial::test() {
 			
 			// int32_t values
 			if ( fInt32 ) {
-				cms.addStepPosXYZF(+100000, +200000, +30, 1234);
+				cms.addStepPosXYZ(+100000, +200000, +30);
 				cms.addStepPosXYZ(+100000, +200000,   0);
 				cms.addStepPosXYZ(-100000,       0,   0);
 				cms.addStepPosXYZ(      0, -200000,   0);
@@ -1860,11 +1860,11 @@ bool Serial::test() {
 		
 		for ( int i = 0; i < 500; i++ ) {
 			// one byte values
-			cms.addStepPosXYZF(+1, -1, +1, 1);
-			cms.addStepPosXYZ (-1, +1,  0);
-			cms.addStepPosXYZ (+1,  0,  0);
-			cms.addStepPosXYZ ( 0, -1,  0);
-			cms.addStepPosXYZ ( 0,  0, +1);
+			cms.addStepPosXYZ(+1, -1, +1);
+			cms.addStepPosXYZ(-1, +1,  0);
+			cms.addStepPosXYZ(+1,  0,  0);
+			cms.addStepPosXYZ( 0, -1,  0);
+			cms.addStepPosXYZ( 0,  0, +1);
 		}
 		
 		std::clog << "processMoveSequence: count = " << cms.getCount() << std::endl;

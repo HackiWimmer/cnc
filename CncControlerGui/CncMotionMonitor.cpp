@@ -43,12 +43,12 @@ class GlutLibInitManager {
 wxDEFINE_EVENT(wxEVT_MONTION_MONITOR_TIMER, wxTimerEvent);
 
 wxBEGIN_EVENT_TABLE(CncMotionMonitor, wxGLCanvas)
-	EVT_PAINT(CncMotionMonitor::onPaint)
-	EVT_SIZE(CncMotionMonitor::onSize)
-	EVT_ERASE_BACKGROUND(CncMotionMonitor::onEraseBackground)
-	EVT_MOUSE_EVENTS(CncMotionMonitor::onMouse)
-	EVT_KEY_DOWN(CncMotionMonitor::onKeyDown)
-	EVT_LEAVE_WINDOW(CncMotionMonitor::onLeave)
+	EVT_PAINT(								CncMotionMonitor::onPaint)
+	EVT_SIZE(								CncMotionMonitor::onSize)
+	EVT_ERASE_BACKGROUND(					CncMotionMonitor::onEraseBackground)
+	EVT_MOUSE_EVENTS(						CncMotionMonitor::onMouse)
+	EVT_KEY_DOWN(							CncMotionMonitor::onKeyDown)
+	EVT_LEAVE_WINDOW(						CncMotionMonitor::onLeave)
 	EVT_TIMER(wxEVT_MONTION_MONITOR_TIMER, CncMotionMonitor::onCameraRotationTimer)
 wxEND_EVENT_TABLE()
 

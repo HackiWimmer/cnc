@@ -664,13 +664,6 @@ CncAutoProgressDialogBase::CncAutoProgressDialogBase(wxWindow* parent, wxWindowI
     } else {
         CentreOnScreen(wxBOTH);
     }
-#if wxVERSION_NUMBER >= 2900
-    if(!wxPersistenceManager::Get().Find(this)) {
-        wxPersistenceManager::Get().RegisterAndRestore(this);
-    } else {
-        wxPersistenceManager::Get().Restore(this);
-    }
-#endif
 }
 
 CncAutoProgressDialogBase::~CncAutoProgressDialogBase()

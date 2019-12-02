@@ -1,6 +1,9 @@
 #include "CncArduino.h"
 #include "CncConfig.h"
 #include "CncMoveSequence.h"
+#include "GlobalStrings.h"
+
+extern GlobalConstStringDatabase globalStrings;
 
 #ifdef __WXGTK__
 	#include <arpa/inet.h>
@@ -10,22 +13,19 @@
 	#include <winsock.h>
 #endif
 
-
 ///////////////////////////////////////////////////////////////////
 CncMoveSequence::CncMoveSequence(unsigned char cmd)
 : reference(CncTimeFunctions::getNanoTimestamp())
 , sequence()
 , portionIndex()
 , data()
+, optimizedClientIds()
 , maxSerialSize(MAX_SERIAL_BUFFER_SIZE - 4)
 , moveCmd(cmd)
 , moveSequenceBuffer(NULL)
 , moveSequenceBufferSize(0)
 , moveSequenceFlushedSize(0)
-, curClientId(CLIENT_ID.INVALID)
-, minClientId(CLIENT_ID.INVALID)
-, maxClientId(CLIENT_ID.INVALID)
-
+, speedInfo()
 ///////////////////////////////////////////////////////////////////
 {
 	wxASSERT(isValid());
@@ -38,23 +38,87 @@ CncMoveSequence::~CncMoveSequence() {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::clear() {
 ///////////////////////////////////////////////////////////////////
-	minClientId = CLIENT_ID.INVALID;
-	maxClientId = CLIENT_ID.INVALID;
-
 	sequence.clear();
 	data.reset();
+	optimizedClientIds.clear();
 	destroyBuffer();
+}
+///////////////////////////////////////////////////////////////////
+const wxString& CncMoveSequence::getClientIdRangeAsString() const {
+///////////////////////////////////////////////////////////////////
+	static const wxString fmt(globalStrings.moveSeqRefFormat);
+	static wxString ret;
+	ret.clear();
+	
+	if ( optimizedClientIds.size() > 0 ) {
+		
+		if ( optimizedClientIds.size() > 1 ) {
+			ret.append(wxString::Format(fmt, getFirstClientId()));
+			ret.append(" ... ");
+			ret.append(wxString::Format(fmt, getLastClientId()));
+		} else {
+			ret.assign(wxString::Format(fmt, getClientId()));
+		}
+		
+	} else {
+		ret.assign("/");
+	}
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+const wxString& CncMoveSequence::getClientIdsAsString() const {
+///////////////////////////////////////////////////////////////////
+	static const wxString fmt(globalStrings.moveSeqRefFormat);
+	static wxString ret;
+	ret.clear();
+	
+	if ( optimizedClientIds.size() > 0 ) {
+		for (auto it = optimizedClientIds.begin(); it != optimizedClientIds.end(); ++it) {
+			ret.append(wxString::Format(fmt, *it));
+			
+			if ( std::distance(optimizedClientIds.begin(), it) < (long)(optimizedClientIds.size() - 1) )
+				ret.append(", ");
+		}
+		
+	} else {
+		ret.assign("/");
+	}
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
+long CncMoveSequence::getFirstClientId() const {
+///////////////////////////////////////////////////////////////////
+	if ( optimizedClientIds.size() == 0 )
+		return CLIENT_ID.INVALID;
+		
+	return optimizedClientIds.front();
+}
+///////////////////////////////////////////////////////////////////
+long CncMoveSequence::getLastClientId() const {
+///////////////////////////////////////////////////////////////////
+	if ( optimizedClientIds.size() == 0 )
+		return CLIENT_ID.INVALID;
+		
+	return optimizedClientIds.back();
+}
+///////////////////////////////////////////////////////////////////
+void CncMoveSequence::addClientId(long cid) {
+///////////////////////////////////////////////////////////////////
+	if  ( optimizedClientIds.size() > 0 ) {
+		
+		// if  ( optimizedClientIds.back() != cid )
+			optimizedClientIds.push_back(cid);
+		
+	} else {
+		
+		optimizedClientIds.push_back(cid);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncMoveSequence::getCount() const {
 ///////////////////////////////////////////////////////////////////
 	return sequence.size();
-}
-///////////////////////////////////////////////////////////////////
-void CncMoveSequence::addClientId(long id) {
-///////////////////////////////////////////////////////////////////
-	minClientId = std::min(id, minClientId);
-	maxClientId = std::min(id, maxClientId);
 }
 ///////////////////////////////////////////////////////////////////
 unsigned int CncMoveSequence::calculateFlushPortionCount() {
@@ -104,6 +168,17 @@ unsigned int CncMoveSequence::determineSafeBufferSize() const {
 	return ( headerSize + dataSize + ( portionCount * 1 ) );
 }
 ///////////////////////////////////////////////////////////////////
+void CncMoveSequence::addMetricPosXYZ(double dx, double dy, double dz) {
+///////////////////////////////////////////////////////////////////
+	const double sx = dx * GBL_CONFIG->getCalculationFactX();
+	const double sy = dy * GBL_CONFIG->getCalculationFactY();
+	const double sz = dz * GBL_CONFIG->getCalculationFactZ();
+	
+	addStepPosXYZ(  (int32_t)round(sx), 
+					(int32_t)round(sy),
+					(int32_t)round(sz));
+}
+///////////////////////////////////////////////////////////////////
 void CncMoveSequence::addMetricPosXYZF(double dx, double dy, double dz, double f) {
 ///////////////////////////////////////////////////////////////////
 	const double sx = dx * GBL_CONFIG->getCalculationFactX();
@@ -125,7 +200,7 @@ void CncMoveSequence::addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t
 		return;
 
 	//std::cout << "CncMoveSequence::addStepPosXYZF: " << curClientId << std::endl;
-	sequence.push_back(SequencePoint(curClientId, dx, dy, dz, f));
+	sequence.push_back(SequencePoint(getClientId(), dx, dy, dz, f));
 	data.add(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////
@@ -213,6 +288,8 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 		flushInt32(data.lengthX);
 		flushInt32(data.lengthY);
 		flushInt32(data.lengthZ);
+		
+		#warning do something with speedInfo
 		
 		if ( false ) {
 			std::cout 	<< "data.length X,Y,Z: " 

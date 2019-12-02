@@ -63,11 +63,14 @@ bool CncPathListRunner::initNextMoveSequence(double value_MM_MIN, char mode) {
 			std::cerr << "CncPathListRunner::initNextMoveSequence(): destroyMoveSequence failed!" << std::endl;
 			return false;
 		}
-
+		
+		CncMoveSequence::SpeedInfo si;
+		si.value = value_MM_MIN;
+		si.mode  = mode;
+		
 		currentSequence = new CncMoveSequence(CMD_RENDER_AND_MOVE_SEQUENCE);
-		currentSequence->setClientId(clientId);
-
-		THE_APP->getCncPreProcessor()->addMoveSequenceStart(*currentSequence, value_MM_MIN, mode);
+		currentSequence->addClientId(clientId);
+		currentSequence->setCurrentSpeedInfo(si);
 	}
 	
 	return true;
@@ -83,9 +86,9 @@ bool CncPathListRunner::publishMoveSequence() {
 			std::cerr << "CncPathListRunner::publishMoveSequence(): Invalid Sequence!" << std::endl;
 			return false;
 		}
-
+		
 		THE_APP->getCncPreProcessor()->addMoveSequence(*currentSequence);
-
+		
 		if ( currentSequence->getCount() > 0 ) {
 
 			wxASSERT( setup.cnc != NULL );
@@ -117,7 +120,7 @@ void CncPathListRunner::onPhysicallySwitchToolState(bool state) {
 	              : getSetup().cnc->switchToolOff();
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyClientIdChange(long idx, const CncPathListEntry& curr) {
+bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
 	if ( curr.isClientIdChange() == false ) {
 		std::cerr << "CncPathListRunner::onPhysicallyClientIdChange(): Invalid Type!" << std::endl;
@@ -126,8 +129,7 @@ bool CncPathListRunner::onPhysicallyClientIdChange(long idx, const CncPathListEn
 	
 	if ( setup.optAnalyse == true ) {
 		if ( currentSequence != NULL ) {
-			//std::cout << "CncPathListRunner::onPhysicallyClientIdChange: " << curr.clientId << std::endl;
-			currentSequence->setClientId(curr.clientId);
+			currentSequence->addClientId(curr.clientId);
 		}
 	}
 
@@ -141,7 +143,7 @@ bool CncPathListRunner::onPhysicallyClientIdChange(long idx, const CncPathListEn
 	return true;
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallySpeedChange(unsigned long idx, const CncPathListEntry& curr) {
+bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
 	if ( curr.isSpeedChange() == false ) {
 		std::cerr << "onPhysicallySpeedChange::onPhysicallySpeedChange(): Invalid Type!" << std::endl;
@@ -161,7 +163,7 @@ bool CncPathListRunner::onPhysicallySpeedChange(unsigned long idx, const CncPath
 	return setup.cnc->changeCurrentFeedSpeedXYZ_MM_MIN(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyMoveRaw(unsigned long idx, const CncPathListEntry& curr) {
+bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT( setup.cnc != NULL );
 	
@@ -175,7 +177,7 @@ bool CncPathListRunner::onPhysicallyMoveRaw(unsigned long idx, const CncPathList
 											);
 }
 //////////////////////////////////////////////////////////////////
-bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList::const_iterator& itCurr, const CncPathList::const_iterator& itEnd) {
+bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& itCurr, const CncPathList::const_iterator& itEnd) {
 //////////////////////////////////////////////////////////////////
 	wxASSERT(currentSequence != NULL);
 
@@ -189,8 +191,8 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 		return it + 1 != itEnd ? &(*(it + 1)) : NULL;
 	};
 
-	auto addSequenceEntryFromValues = [&](double dx, double dy, double dz, double f) {
-		currentSequence->addMetricPosXYZF(	dx, dy, dz,	f);
+	auto addSequenceEntryFromValues = [&](double dx, double dy, double dz) {
+		currentSequence->addMetricPosXYZ(dx, dy, dz);
 		
 		return true;
 	};
@@ -200,10 +202,9 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 		if ( e == NULL )
 			return false;
 
-		currentSequence->addMetricPosXYZF(	e->entryDistance.getX(),
+		currentSequence->addMetricPosXYZ(	e->entryDistance.getX(),
 											e->entryDistance.getY(),
-											e->entryDistance.getZ(),
-											0.0); // 0.0 ????
+											e->entryDistance.getZ());
 		return true;
 	};
 
@@ -303,7 +304,12 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 		if ( n->isSpeedChange()  == true )
 			break;
 
-		// skip the next entry if it is an emty move
+		if ( n->isClientIdChange() == true ) {
+			wxASSERT ( currentSequence != NULL );
+			currentSequence->addClientId(n->clientId);
+		}
+
+		// skip the next entry if it is an empty move
 		if ( setup.optSkipEmptyMoves == true )  {
 			if (    cnc::dblCompareNull(n->entryDistance.getX()) == true
 				&&	cnc::dblCompareNull(n->entryDistance.getY()) == true
@@ -343,8 +349,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(unsigned long idx, CncPathList:
 		n = getNext(++itCurr);
 	}
 
-	addSequenceEntryFromValues(cx, cy, cz, 0.0); // 0.0 ????
-
+	addSequenceEntryFromValues(cx, cy, cz);
 	return true;
 
 /*
@@ -402,8 +407,6 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	THE_APP->getCncPreProcessor()->freeze();
 	
 	for ( auto it = plm.const_begin(); it != plm.const_end(); ++it) {
-		const unsigned long distance = std::distance(plm.const_begin(), it);
-		
 		const CncPathListEntry& curr  = *it;
 		THE_APP->getCncPreProcessor()->addPathListEntry(curr);
 		
@@ -412,7 +415,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		
 		// client id change
 		if ( curr.isClientIdChange() == true ) {
-			if ( onPhysicallyClientIdChange(distance, curr) == false )
+			if ( onPhysicallyClientIdChange(curr) == false )
 				return deFrost(false);
 		
 			continue;
@@ -420,7 +423,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		
 		// speed change
 		if ( curr.isSpeedChange() == true ) {
-			if ( onPhysicallySpeedChange(distance, curr) == false )
+			if ( onPhysicallySpeedChange(curr) == false )
 				return deFrost(false);
 			
 			continue;
@@ -429,12 +432,12 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 		// position change
 		if ( curr.isPositionChange() == true ) {
 			if ( setup.optAnalyse == false ) {
-				if ( onPhysicallyMoveRaw(distance, curr) == false ) {
+				if ( onPhysicallyMoveRaw(curr) == false ) {
 					return deFrost(false);
 				}
 			}
 			else {
-				if ( onPhysicallyMoveAnalysed(distance, it, plm.const_end()) == false ) {
+				if ( onPhysicallyMoveAnalysed(it, plm.const_end()) == false ) {
 					return deFrost(false);
 				}
 			}

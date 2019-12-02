@@ -1,10 +1,18 @@
 #include "wxCrafterImages.h"
+#include "CncUserEvents.h"
 #include "GlobalFunctions.h"
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncMoveSequenceListCtrl.h"
 #include "CncPathListEntryListCtrl.h"
 #include "CncPreprocessor.h"
+
+// ----------------------------------------------------------------------------
+// CncPreprocessor Event Table
+// ----------------------------------------------------------------------------
+wxBEGIN_EVENT_TABLE(CncPreprocessor, CncPreprocessorBase)
+	EVT_COMMAND(wxID_ANY, wxEVT_INDIVIDUAL_CTRL_COMMAND, 	CncPreprocessor::onIndividualCommand)
+wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////////////////////
 CncPreprocessor::CncPreprocessor(wxWindow* parent)
@@ -105,27 +113,11 @@ void CncPreprocessor::enableMoveSequences(bool state) {
 	moveSequence->Refresh();
 }
 //////////////////////////////////////////////////////////////////
-void CncPreprocessor::addMoveSequenceStart(const CncMoveSequence& seq, double value_MM_MIN, char mode) {
-//////////////////////////////////////////////////////////////////
-	if ( m_btConnectMoveSequences->GetValue() == false ) 
-		return;
-
-	CncMoveSequenceListCtrl::SpeedInfo si;
-	si.value = value_MM_MIN;
-	si.mode  = mode;
-	
-	//moveSequence->addMoveSequenceStart(seq, si);
-	
-	#warning
-	//moveSequenceOverview->addMoveSequence(seq);
-}
-//////////////////////////////////////////////////////////////////
 void CncPreprocessor::addMoveSequence(const CncMoveSequence& seq) {
 //////////////////////////////////////////////////////////////////
 	if ( m_btConnectMoveSequences->GetValue() == false ) 
 		return;
 		
-	#warning
 	moveSequenceOverview->addMoveSequence(seq);
 }
 //////////////////////////////////////////////////////////////////
@@ -160,8 +152,9 @@ void CncPreprocessor::connectPathListEntries(wxCommandEvent& event) {
 void CncPreprocessor::selectClientId(long id, ListType lt) {
 //////////////////////////////////////////////////////////////////
 	switch ( lt ) {
-		case LT_PATH_LIST: 		pathListEntries->searchReferenceById(id); 	break;
-		case LT_MOVE_SEQUENCE:	moveSequence->searchReferenceById(id); 		break;
+		case LT_PATH_LIST: 			pathListEntries->searchReferenceById(id); 		break;
+		case LT_MOVE_SEQ_OVERVIEW:	moveSequenceOverview->searchReferenceById(id); 	break;
+		case LT_MOVE_SEQ_CONTENT:	moveSequence->searchReferenceById(id); 			break;
 	}
 }
 //////////////////////////////////////////////////////////////////
@@ -189,3 +182,13 @@ void CncPreprocessor::updatePathListContent() {
 	if ( pathListEntries->IsShownOnScreen() == true ) 
 		pathListEntries->Refresh();
 }
+//////////////////////////////////////////////////////////////////
+void CncPreprocessor::onIndividualCommand(wxCommandEvent& event) {
+//////////////////////////////////////////////////////////////////
+	IndividualCommandEvent* ice = static_cast<IndividualCommandEvent*>(&event);
+	
+	switch ( ice->GetId() ) {
+		case EvtPreprocessor::UpdateSelectedClientIds:	m_selectedClientIds->ChangeValue(ice->GetString()); break;
+	}
+}
+

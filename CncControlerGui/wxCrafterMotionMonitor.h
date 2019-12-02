@@ -132,10 +132,14 @@ protected:
     wxBitmapToggleButton* m_btConnectMoveSequences;
     wxBitmapButton* m_btClearMoveSequences;
     wxStaticLine* m_staticLine188;
+    wxSplitterWindow* m_splitter196;
+    wxPanel* m_splitterPageOverview;
     wxStaticText* m_staticText186;
     wxListCtrl* m_moveSequencesListPlaceholder;
+    wxPanel* m_splitterPageContent;
     wxStaticText* m_contentLabel;
     wxListCtrl* m_moveSequencesPlaceholder;
+    wxTextCtrl* m_selectedClientIds;
 
 protected:
     virtual void connectPathListEntries(wxCommandEvent& event) { event.Skip(); }
@@ -162,8 +166,12 @@ public:
     wxStaticLine* GetStaticLine188() { return m_staticLine188; }
     wxStaticText* GetStaticText186() { return m_staticText186; }
     wxListCtrl* GetMoveSequencesListPlaceholder() { return m_moveSequencesListPlaceholder; }
+    wxPanel* GetSplitterPageOverview() { return m_splitterPageOverview; }
     wxStaticText* GetContentLabel() { return m_contentLabel; }
     wxListCtrl* GetMoveSequencesPlaceholder() { return m_moveSequencesPlaceholder; }
+    wxPanel* GetSplitterPageContent() { return m_splitterPageContent; }
+    wxSplitterWindow* GetSplitter196() { return m_splitter196; }
+    wxTextCtrl* GetSelectedClientIds() { return m_selectedClientIds; }
     wxPanel* GetPanel7630() { return m_panel7630; }
     wxListbook* GetListbookPreProcessor() { return m_listbookPreProcessor; }
     CncPreprocessorBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(700,700), long style = wxTAB_TRAVERSAL);

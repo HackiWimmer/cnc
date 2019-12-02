@@ -109,6 +109,8 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		void freeze();
 		void thaw();
 		
+		bool isItemSelected(long item) const;
+		
 		bool clear();
 		bool appendItem(const CncColumContainer& cc);
 		bool appendItems(unsigned int nsize, const CncColumContainer* cc);

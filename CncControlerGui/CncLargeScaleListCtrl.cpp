@@ -189,12 +189,17 @@ void CncLargeScaledListCtrl::deselectAll() {
 	lastSelection = wxNOT_FOUND;
 }
 ///////////////////////////////////////////////////////////////////
+bool CncLargeScaledListCtrl::isItemSelected(long item) const {
+///////////////////////////////////////////////////////////////////
+	return GetItemState(item, wxLIST_STATE_SELECTED == wxLIST_STATE_SELECTED);
+}
+///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
 ///////////////////////////////////////////////////////////////////
 	if ( isItemValid(item) == false )
 		return false;
 		
-	const int itemState = GetItemState(item, wxLIST_STATE_SELECTED);
+	const int itemState  = GetItemState(item, wxLIST_STATE_SELECTED);
 	
 	if ( itemState != wxLIST_STATE_SELECTED && blockSelectionEvent == false ) {
 		// deselect
@@ -205,8 +210,22 @@ bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
 		lastSelection = item;
 	}
 	
-	if ( ensureVisible == true )
+	if ( ensureVisible == true ) {
+		
+		if ( IsFrozen() == false )
+			Freeze();
+			
+		const long total = GetItemCount();
+		const long cpp   = GetCountPerPage();
+		
 		EnsureVisible(item);
+		
+		if ( cpp > 1 && listType == NORMAL )
+			EnsureVisible(item + cpp < total ? item + cpp - 1: total - 1 );
+
+		if ( IsFrozen() == true )
+			Thaw();
+	}
 		
 	return true;
 }

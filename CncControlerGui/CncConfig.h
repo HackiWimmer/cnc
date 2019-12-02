@@ -305,6 +305,9 @@ class CncConfig {
 		const bool getPreProcessorAnalyseFlag();
 		const bool getPreProcessoSkipEmptyFlag();
 		const bool getPreProcessorCombineMovesFlag();
+		const bool getPreProcessorCntPathListEntries();
+		const bool getPreProcessorCntMoveSequneces();
+
 		
 		const bool getReferenceIncludesWpt() 					{ return referenceIncludesWpt; }
 		const double getWorkpieceThickness()					{ return workpieceThickness; }

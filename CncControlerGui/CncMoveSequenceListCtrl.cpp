@@ -4,6 +4,7 @@
 #include "MainFrame.h"
 #include "GlobalStrings.h"
 #include "CncConfig.h"
+#include "CncUserEvents.h"
 #include "CncMoveSequenceListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
@@ -32,9 +33,10 @@ CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("Type",	 		wxLIST_FORMAT_LEFT, 	34);
-	AppendColumn("Speed [mm/min]",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
-	AppendColumn("Client ID",	 	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
+	AppendColumn("Type",	 		wxLIST_FORMAT_LEFT, 	44);
+	AppendColumn("Speed [mm/min]",	wxLIST_FORMAT_RIGHT, 	100);
+	AppendColumn("Opt.",			wxLIST_FORMAT_CENTRE, 	44);
+	AppendColumn("Client ID(s)",	wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("X-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Y-Distance", 		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
 	AppendColumn("Z-Distance",		wxLIST_FORMAT_RIGHT, 	wxLIST_AUTOSIZE);
@@ -61,16 +63,16 @@ CncMoveSequenceListCtrl::CncMoveSequenceListCtrl(wxWindow *parent, long style)
 	defaultItemAttr.SetFont(font);
 	defaultItemAttr.SetTextColour(GetTextColour());
 
-	clientIdItemAttr.SetBackgroundColour(GetBackgroundColour().ChangeLightness(80));
+	clientIdItemAttr.SetBackgroundColour(GetBackgroundColour().ChangeLightness(98));
 	clientIdItemAttr.SetFont(font.Bold());
 	clientIdItemAttr.SetTextColour(GetTextColour());
 
-	initialItemAttr.SetBackgroundColour(wxColour(112, 146, 190));
-	initialItemAttr.SetFont(font);
+	initialItemAttr.SetBackgroundColour(GetBackgroundColour());
+	initialItemAttr.SetFont(font.Underlined());
 	initialItemAttr.SetTextColour(GetTextColour());
 
-	speedItemAttr.SetBackgroundColour(wxColour(255, 225, 121));
-	speedItemAttr.SetFont(font);
+	speedItemAttr.SetBackgroundColour(GetBackgroundColour());
+	speedItemAttr.SetFont(font.Italic());
 	speedItemAttr.SetTextColour(GetTextColour());
 	
 	wxPoint pt;
@@ -132,14 +134,17 @@ void CncMoveSequenceListCtrl::onSelectListItem(wxListEvent& event) {
 	long item = event.m_itemIndex;
 	if ( item == wxNOT_FOUND )
 		return;
-
+	
+	if ( item < 0 || item > (long)(moveSequence->getCount() -1) )
+		return;
+	
 	setLastSelection(item);
-
-	long ln;
-	getRow(item).getItem(COL_SEARCH).ToLong(&ln);
-
+	
+	auto it = moveSequence->const_begin() + item;
+	const CncMoveSequence::SequencePoint& sp = *it;
+	
 	SelectEventBlocker blocker(this);
-	THE_APP->tryToSelectClientId(ln, MainFrame::TemplateSelSource::TSS_MOVE_SEQ);
+	THE_APP->tryToSelectClientId(sp.clientID, MainFrame::TemplateSelSource::TSS_MOVE_SEQ);
 }
 /////////////////////////////////////////////////////////////
 void CncMoveSequenceListCtrl::onActivateListItem(wxListEvent& event) {
@@ -184,20 +189,28 @@ void CncMoveSequenceListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////
 bool CncMoveSequenceListCtrl::searchReference(const wxString& what) {
 /////////////////////////////////////////////////////////////
-	#warning
-	long ret = searchRow(what, COL_SEARCH);
-
-	if ( ret >= 0 )
-		selectItem(ret);
-
-	return (ret >= 0 );
+	long ln;
+	
+	if ( wxString(what).ToLong(&ln) )
+		return searchReferenceById(ln);
+	
+	return false;
 }
 /////////////////////////////////////////////////////////////
 bool CncMoveSequenceListCtrl::searchReferenceById(const long id) {
 /////////////////////////////////////////////////////////////
-	#warning
-	wxString what(wxString::Format(globalStrings.pathListRefFormat, id));
-	return searchReference(what);
+	if ( moveSequence == NULL )
+		return false;
+		
+	for ( auto it=moveSequence->const_begin(); it != moveSequence->const_end(); ++it ) {
+		
+		if ( id >= it->clientID ) {
+			selectItem(std::distance(moveSequence->const_begin(), it), true);
+			return true;
+		}
+	}
+
+	return false;
 }
 /////////////////////////////////////////////////////////////
 void CncMoveSequenceListCtrl::clearAll() {
@@ -206,7 +219,7 @@ void CncMoveSequenceListCtrl::clearAll() {
 	clear();
 }
 /////////////////////////////////////////////////////////////
-void CncMoveSequenceListCtrl::addMoveSequence(const CncMoveSequence* seq, const SpeedInfo& si) {
+void CncMoveSequenceListCtrl::addMoveSequence(const CncMoveSequence* seq) {
 /////////////////////////////////////////////////////////////
 	clearAll();
 	
@@ -232,20 +245,30 @@ void CncMoveSequenceListCtrl::onPaint(wxPaintEvent& event) {
 /////////////////////////////////////////////////////////////
 wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 /////////////////////////////////////////////////////////////
+	static const wxString fmt(globalStrings.moveSeqRefFormat);
+
 	if ( moveSequence == NULL )
 		return _("");
+	
+	if ( moveSequence->getCount() == 0 ) {
+		switch ( column ) {
+			case CncMoveSequenceListCtrl::COL_TYPE:		return wxString::Format("%d", 		2); 
+			case CncMoveSequenceListCtrl::COL_SPEED:	return wxString::Format("%lf", 		moveSequence->getCurrentSpeedInfo().value );
+		}
+		
+		return _("");
+	}
 
 	if ( item < 0 || item > (long)(moveSequence->getCount() -1) )
 		return _("");
-		
-	static const wxString fmt(globalStrings.moveSeqRefFormat);
 
 	auto it = moveSequence->const_begin() + item;
 	const CncMoveSequence::SequencePoint& sp = *it;
 	
 	switch ( column ) {
-		case CncMoveSequenceListCtrl::COL_TYPE:			return wxString::Format("%d", 		1);
-		case CncMoveSequenceListCtrl::COL_SPEED:		return _("");
+		case CncMoveSequenceListCtrl::COL_TYPE:			return wxString::Format("%d", 		3); 
+		case CncMoveSequenceListCtrl::COL_SPEED:		return wxString::Format("%lf", 		moveSequence->getCurrentSpeedInfo().value );
+		case CncMoveSequenceListCtrl::COL_OPTIMIZED:	return                              moveSequence->isOptimized() ? "X" : "";
 		case CncMoveSequenceListCtrl::COL_CLD_ID:		return wxString::Format(fmt, 		sp.clientID);
 		case CncMoveSequenceListCtrl::COL_DISTANCE_X:	return wxString::Format("%10ld",	(long)sp.x);
 		case CncMoveSequenceListCtrl::COL_DISTANCE_Y:	return wxString::Format("%10ld", 	(long)sp.y);
@@ -261,6 +284,7 @@ wxString CncMoveSequenceListCtrl::OnGetItemText(long item, long column) const {
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncMoveSequenceOverviewListCtrl, CncLargeScaledListCtrl)
+	EVT_PAINT(			 				CncMoveSequenceOverviewListCtrl::onPaint)
 	EVT_LIST_ITEM_SELECTED(wxID_ANY, 	CncMoveSequenceOverviewListCtrl::onSelectListItem)
 	EVT_LIST_ITEM_ACTIVATED(wxID_ANY, 	CncMoveSequenceOverviewListCtrl::onActivateListItem)
 wxEND_EVENT_TABLE()
@@ -280,7 +304,8 @@ CncMoveSequenceOverviewListCtrl::CncMoveSequenceOverviewListCtrl(wxWindow *paren
 	AppendColumn("#",	 			wxLIST_FORMAT_RIGHT, 	 44);
 	AppendColumn("Count",			wxLIST_FORMAT_RIGHT, 	 44);
 	AppendColumn("Sequence ID",		wxLIST_FORMAT_LEFT, 	110);
-	AppendColumn("Client ID",		wxLIST_FORMAT_RIGHT,	 60);
+	AppendColumn("First C.-ID",		wxLIST_FORMAT_RIGHT,	 64);
+	AppendColumn("Last C.-ID",		wxLIST_FORMAT_RIGHT,	 64);
 
 	// determine styles
 	setListType(CncLargeScaledListCtrl::ListType::NORMAL);
@@ -301,6 +326,13 @@ void CncMoveSequenceOverviewListCtrl::clearAll() {
 	moveSequences.clear();
 	clear();
 }
+//////////////////////////////////////////////////////////////////
+void CncMoveSequenceOverviewListCtrl::onPaint(wxPaintEvent& event) {
+//////////////////////////////////////////////////////////////////
+	if ( moveSequences.size() > 0 && GetSelectedItemCount() == 0 ) {
+		selectItem(0, true);
+	}
+}
 /////////////////////////////////////////////////////////////
 void CncMoveSequenceOverviewListCtrl::addMoveSequence(const CncMoveSequence& seq) {
 /////////////////////////////////////////////////////////////
@@ -310,16 +342,19 @@ void CncMoveSequenceOverviewListCtrl::addMoveSequence(const CncMoveSequence& seq
 /////////////////////////////////////////////////////////////
 wxString CncMoveSequenceOverviewListCtrl::OnGetItemText(long item, long column) const {
 /////////////////////////////////////////////////////////////
+	static const wxString fmt(globalStrings.moveSeqRefFormat);
+
 	if ( isItemValid(item) == false )
 		return _("");
 		
 	const CncMoveSequence& seq = moveSequences.at(item);
 	
 	switch ( column ) {
-		case COL_NUM:		return wxString::Format("%ld", 	item);
-		case COL_CNT:		return wxString::Format("%ld", 	seq.getCount());
-		case COL_REF:		return wxString::Format("%lld", seq.getReference());
-		case COL_CLD_ID:	return wxString::Format("%ld",  seq.getClientId());
+		case COL_NUM:			return wxString::Format("%ld", 	item);
+		case COL_CNT:			return wxString::Format("%ld", 	seq.getCount());
+		case COL_REF:			return wxString::Format("%lld", seq.getReference());
+		case COL_FIRST_CLD_ID:	return wxString::Format(fmt,	seq.getFirstClientId());
+		case COL_LAST_CLD_ID:	return wxString::Format(fmt, 	seq.getLastClientId());
 	}
 	
 	return _("");
@@ -340,23 +375,49 @@ void CncMoveSequenceOverviewListCtrl::onSelectListItem(wxListEvent& event) {
 	
 	// select client id
 	setLastSelection(item);
-	long ln = seq->getClientId();
+	const long firstClientId = seq->getFirstClientId();
+	const long lastClientId  = seq->getLastClientId();
 	SelectEventBlocker blocker(this);
-	THE_APP->tryToSelectClientId(ln, MainFrame::TemplateSelSource::TSS_MOVE_SEQ_OVW);
+	THE_APP->tryToSelectClientIds(firstClientId, lastClientId, MainFrame::TemplateSelSource::TSS_MOVE_SEQ_OVW);
 	
 	// update move sequence list control
 	wxASSERT( slaveSequenceList != NULL );
 	wxASSERT( contentLabel != NULL);
 	
 	contentLabel->SetLabel(wxString::Format("Content of MoveSequence with ID = '%lld':", seq->getReference()));
-
-	#warning
-	CncMoveSequenceListCtrl::SpeedInfo si;
-	slaveSequenceList->addMoveSequence(seq, si);
+	
+	IndividualCommandEvent evt(EvtPreprocessor::UpdateSelectedClientIds);
+	evt.SetString(seq->getClientIdsAsString());
+	wxPostEvent(GetParent(), evt);
+	
+	slaveSequenceList->addMoveSequence(seq);
 	slaveSequenceList->Refresh();
 }
 /////////////////////////////////////////////////////////////
 void CncMoveSequenceOverviewListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 	// currently nothing todo
+}
+/////////////////////////////////////////////////////////////
+bool CncMoveSequenceOverviewListCtrl::searchReference(const wxString& what) {
+/////////////////////////////////////////////////////////////
+	long ln;
+	
+	if ( wxString(what).ToLong(&ln) )
+		return searchReferenceById(ln);
+	
+	return false;
+}
+/////////////////////////////////////////////////////////////
+bool CncMoveSequenceOverviewListCtrl::searchReferenceById(const long id) {
+/////////////////////////////////////////////////////////////
+	for ( auto it=moveSequences.begin(); it != moveSequences.end(); ++it ) {
+		
+		if ( id >= it->getFirstClientId() && id <= it->getLastClientId() ) {
+			selectItem(std::distance(moveSequences.begin(), it), true);
+			return true;
+		}
+	}
+	
+	return false;
 }

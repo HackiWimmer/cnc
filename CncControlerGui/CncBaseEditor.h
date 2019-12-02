@@ -68,6 +68,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		void gotoEnd();
 		
 		bool selectLineNumber(unsigned long ln, const char* searchKey = NULL);
+		bool selectLineNumbers(unsigned long firstLine, unsigned long lastLine);
 		
 		void prepareNewTemplateFile(TemplateFormat tf);
 		bool openFile(const wxString& fileName);
@@ -137,6 +138,10 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		void setupBinaryStyle();
 		void setupModelType();
 		
+		bool selectLinesDefault(unsigned long firstLine, unsigned long lastLine);
+		bool selectLinesBinary(unsigned long firstLine, unsigned long lastLine);
+		bool selectLinesSvg(unsigned long firstLine, unsigned long lastLine);
+
 		bool selectLineDefault(unsigned long ln);
 		bool selectLineSvg(unsigned long ln, const char* searchKey);
 		bool selectLineBinary(unsigned long ln);
@@ -146,7 +151,7 @@ class CncBaseEditor : public wxStyledTextCtrl {
 		
 		bool save();
 		
-		void onUpdateFilePosition();
+		void onUpdateFilePosition(bool publishSelection);
 		
 		virtual void onMarginClick(wxStyledTextEvent& event);
 		virtual void onChange(wxStyledTextEvent& event);

@@ -17,14 +17,11 @@ set(SOURCE_FILES
 	CncControlerGui/3D/GLCommon.cpp
 	CncControlerGui/3D/CncMetricRulerSetup
 	CncControlerGui/OSD/CncUsbPortScanner.cpp
-	CncControlerGui/OSD/CncUsbPortScanner.h
 	CncControlerGui/OSD/CncAsyncKeyboardState.cpp
-	CncControlerGui/OSD/CncAsyncKeyboardState.h
 	CncControlerGui/OSD/SerialMsw.cpp
 	CncControlerGui/OSD/SerialGtk.cpp
 	CncControlerGui/CncLastProcessingTimestampSummary
 	CncControlerGui/Clipper/clipper.cpp
-	CncControlerGui/Clipper/clipper.hpp
 	CncControlerGui/CfgApplicationPage.cpp
 	CncControlerGui/CfgEnvironmentPage.cpp
 	CncControlerGui/CfgGCodeOptionPage.cpp
@@ -32,65 +29,31 @@ set(SOURCE_FILES
 	CncControlerGui/CfgSVGOptionPage.cpp
 	CncControlerGui/CfgWorkingPage.cpp
 	CncControlerGui/CncArduino.cpp
-	CncControlerGui/CncArduino.h
 	CncControlerGui/CncCommon.cpp
-	CncControlerGui/CncCommon.h
 	CncControlerGui/CncConfig.cpp
-	CncControlerGui/CncConfig.h
-	CncControlerGui/CncConfigCommon.h
-	CncControlerGui/CncConfigExt.h
 	CncControlerGui/CncConfigProperty.cpp
-	CncControlerGui/CncConfigProperty.h
 	CncControlerGui/CncControl.cpp
-	CncControlerGui/CncControl.h
 	CncControlerGui/CncFileNameService.cpp
-	CncControlerGui/CncFileNameService.h
 	CncControlerGui/CncFilePreview.cpp
-	CncControlerGui/CncFilePreview.h
 	CncControlerGui/CncFilePreviewWnd.cpp
-	CncControlerGui/CncFilePreviewWnd.h
 	CncControlerGui/CncFileView.cpp
-	CncControlerGui/CncFileView.h
 	CncControlerGui/CncLargeScaleListCtrl.cpp
-	CncControlerGui/CncLargeScaleListCtrl.h
-	CncControlerGui/CncLimitStates.h
 	CncControlerGui/CncMotionMonitor.cpp
-	CncControlerGui/CncMotionMonitor.h
 	CncControlerGui/CncNumberFormatter.cpp
-	CncControlerGui/CncNumberFormatter.h
 	CncControlerGui/CncPathListEntry.cpp
-	CncControlerGui/CncPathListEntry.h
 	CncControlerGui/CncPathListManager.cpp
-	CncControlerGui/CncPathListManager.h
-	CncControlerGui/CncPatternDefinitions.h
-	CncControlerGui/CncPosition.h
 	CncControlerGui/CncPosSpyListCtrl.cpp
-	CncControlerGui/CncPosSpyListCtrl.h
 	CncControlerGui/CncSetterListCtrl.cpp
-	CncControlerGui/CncSetterListCtrl.h
 	CncControlerGui/CncSpeedSimulator.cpp
-	CncControlerGui/CncSpeedSimulator.h
 	CncControlerGui/CncSerialSpyListCtrl.cpp
-	CncControlerGui/CncSerialSpyListCtrl.h
 	CncControlerGui/CncStatisticSummaryListCtrl.cpp
-	CncControlerGui/CncStatisticSummaryListCtrl.h
 	CncControlerGui/CncStreamBuffers.cpp
-	CncControlerGui/CncStreamBuffers.h
 	CncControlerGui/CncSummaryListCtrl.cpp
-	CncControlerGui/CncSummaryListCtrl.h
 	CncControlerGui/CncToolMagazine.cpp
-	CncControlerGui/CncToolMagazine.h
 	CncControlerGui/CncToolStateControl.cpp
-	CncControlerGui/CncToolStateControl.h
 	CncControlerGui/CncZView.cpp
-	CncControlerGui/CncZView.h
-	CncControlerGui/CommandTemplates.h
-	CncControlerGui/ConcurrentQueue.h
 	CncControlerGui/DataControlModel.cpp
-	CncControlerGui/DataControlModel.h
 	CncControlerGui/FileParser.cpp
-	CncControlerGui/FileParser.h
-	CncControlerGui/FileParserRunInfo.h
 	CncControlerGui/GCodeBlock.cpp
 	CncControlerGui/GCodeCommands.cpp
 	CncControlerGui/GCodeField.cpp
@@ -104,7 +67,6 @@ set(SOURCE_FILES
 	CncControlerGui/MainFrame.cpp
 	CncControlerGui/ManuallyParser.cpp
 	CncControlerGui/ManuallyPathHandlerCnc.cpp
-	CncControlerGui/ManuallyPathHandlerCnc.h
 	CncControlerGui/PathHandlerBase.cpp
 	CncControlerGui/CncPerspective.cpp
 	CncControlerGui/Codelite/wxPNGAnimation.cpp
@@ -116,15 +78,9 @@ set(SOURCE_FILES
 	CncControlerGui/SVGFileParser.cpp
 	CncControlerGui/SVGNodeParser.cpp
 	CncControlerGui/SVGPathHandlerCnc.cpp
-	CncControlerGui/SvgTransformMatrix.h
 	CncControlerGui/SvgUnitCalculator.cpp
-	CncControlerGui/SvgUnitCalculator.h
-	CncControlerGui/SVGUserAgent.h
-	CncControlerGui/SVGUserAgentInfo.h
-	CncControlerGui/SvgViewBox.h
 	CncControlerGui/UnitTestFrame.cpp
 	CncControlerGui/UpdateManagerThread.cpp
-	CncControlerGui/UpdateManagerThread.h
 	CncControlerGui/CncCurveLib.cpp
 	CncControlerGui/CncBaseEditor.cpp
 	CncControlerGui/CncSourceEditor.cpp
@@ -179,6 +135,7 @@ set(SOURCE_FILES
 	CncControlerGui/CncOpenGLContextObserverListCtrl.cpp
 	CncControlerGui/CncLargeScaleListCtrl.cpp
 	CncControlerGui/CncAutoProgressDialog.cpp
+	CncControlerGui/CncExternalViewBox.cpp
 	
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp

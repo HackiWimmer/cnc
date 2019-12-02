@@ -27,10 +27,10 @@ class CncPathListRunner {
 		CncMoveSequence* currentSequence;
 		Setup setup;
 		
-		bool onPhysicallyClientIdChange(long idx, const CncPathListEntry& curr);
-		bool onPhysicallySpeedChange(unsigned long idx, const CncPathListEntry& curr);
-		bool onPhysicallyMoveRaw(unsigned long idx, const CncPathListEntry& curr);
-		bool onPhysicallyMoveAnalysed(unsigned long idx, CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
+		bool onPhysicallyClientIdChange(const CncPathListEntry& curr);
+		bool onPhysicallySpeedChange(const CncPathListEntry& curr);
+		bool onPhysicallyMoveRaw(const CncPathListEntry& curr);
+		bool onPhysicallyMoveAnalysed(CncPathList::const_iterator& it, const CncPathList::const_iterator& end);
 		
 		bool destroyMoveSequence();
 		bool initNextMoveSequence(double value_MM_MIN = 0.0, char mode = '-');

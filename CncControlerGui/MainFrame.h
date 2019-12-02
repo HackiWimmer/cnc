@@ -144,7 +144,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
-    virtual void onOpenGLContextObserver(wxCommandEvent& event);
+		virtual void onCloseSecureRunAuiPane(wxCommandEvent& event);
+		virtual void onOpenGLContextObserver(wxCommandEvent& event);
 		virtual void onShowLoggerOnDemand(wxCommandEvent& event);
 		virtual void freezeLogger(wxCommandEvent& event);
 		virtual void changeMonitorListBook(wxListbookEvent& event);
@@ -523,8 +524,27 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 	protected:
 	
 		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5, TSS_MOVE_SEQ_OVW=6, TSS_MOVE_SEQ=7, TSS_VERTEX_DATA_TRACE=8, TSS_VERTEX_INDEX_TRACE=9 };
+		const char* getTemplateSelSourceAsString(const TemplateSelSource ts) {
+			switch ( ts ) {
+				case TSS_POS_SPY:				return "TSS_POS_SPY";
+				case TSS_REPLAY:				return "TSS_REPLAY";
+				case TSS_PATH_LIST:				return "TSS_PATH_LIST";
+				case TSS_EDITOR: 				return "TSS_EDITOR";
+				case TSS_MONITOR:				return "TSS_MONITOR";
+				case TSS_GCODE_SEQ:				return "TSS_GCODE_SEQ";
+				case TSS_MOVE_SEQ_OVW:			return "TSS_MOVE_SEQ_OVW";
+				case TSS_MOVE_SEQ:				return "TSS_MOVE_SEQ";
+				case TSS_VERTEX_DATA_TRACE:		return "TSS_VERTEX_DATA_TRACE";
+				case TSS_VERTEX_INDEX_TRACE:	return "TSS_VERTEX_INDEX_TRACE";
+			}
+			
+			return "Unknown TemplateSelSource";
+		}
+		
 		void tryToSelectClientId(long clientId, TemplateSelSource tss);
+		void tryToSelectClientIds(long firstClientId, long lastClientId, TemplateSelSource tss);
 		void selectSourceControlLineNumber(long ln);
+		void selectSourceControlLineNumbers(long firstLine, long lastLine);
 
 		// will be bind to this frame
 		void globalKeyDownHook(wxKeyEvent& event);
@@ -606,6 +626,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool isDebugMode;
 		bool isZeroReferenceValid;
 		bool canClose;
+		bool secureMode;
 		bool useSecureRunDlg;
 		bool evaluatePositions;
 		bool ignoreDirControlEvents;
@@ -687,6 +708,12 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void displayReport(int id);
 		
+		///////////////////////////////////////////////////////////////
+		// Secure AUI
+		void activateSecureMode(bool state = true);
+		void deactivateSecureMode() 					{ activateSecureMode(false); }
+		bool isSecureMode()								{ return secureMode; }
+
 		///////////////////////////////////////////////////////////////
 		// Path Generator
 		void displayPGenErrorInfo(const wxString& errorInfo);
@@ -819,7 +846,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void showAuiPane(const wxString& name, bool update=true);
 		void hideAuiPane(const wxString& name, bool update=true);
 		
-		void hideAllAuiPanes();
+		void hideAllAuiPanes(bool update=true);
 		void viewAllAuiPanes(bool withSpy=false);
 		
 		void clearPositionSpy();

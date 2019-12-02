@@ -118,41 +118,46 @@ class CncMoveSequence {
 
 		typedef std::vector<SequencePoint> MoveSequence;
 		typedef std::vector<unsigned int>  PortionIndex;
+		typedef std::vector<long>		   OptimizedClientIdList;
 
 	private:
 
-		CncNanoTimestamp	reference;
-		MoveSequence		sequence;
-		PortionIndex		portionIndex;
-		SequenceData		data;
+		CncNanoTimestamp		reference;
+		MoveSequence			sequence;
+		PortionIndex			portionIndex;
+		SequenceData			data;
+		OptimizedClientIdList	optimizedClientIds;
 		
-		unsigned int 		maxSerialSize;
-		unsigned char		moveCmd;
-		unsigned char*		moveSequenceBuffer;
-		unsigned int		moveSequenceBufferSize;
-		unsigned int 		moveSequenceFlushedSize;
+		unsigned int 			maxSerialSize;
+		unsigned char			moveCmd;
+		unsigned char*			moveSequenceBuffer;
+		unsigned int			moveSequenceBufferSize;
+		unsigned int 			moveSequenceFlushedSize;
 
-		long 				curClientId;
-		long 				minClientId;
-		long 				maxClientId;
+		unsigned int 			getHeaderSize() const;
+		unsigned int 			getPointSize()  const;
+		unsigned int 			determineSafeBufferSize() const;
 
-		unsigned int 		getHeaderSize() const;
-		unsigned int 		getPointSize()  const;
-		unsigned int 		determineSafeBufferSize() const;
+		unsigned int 			calculateFlushPortionCount();
 
-		unsigned int 		calculateFlushPortionCount();
+		void 					createBuffer();
+		void 					destroyBuffer();
 
-		void 				createBuffer();
-		void 				destroyBuffer();
-
-		void 				addClientId(long id);
-	
 	protected:
 		
 		void setType(unsigned char t) {  moveCmd = t; }
 		friend class CncCommandDecoder;
 		
+		void 					addMetricPosXYZF(double dx, double dy, double dz, double f);
+		void 					addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f);
+		
 	public:
+	
+		struct SpeedInfo {
+			char mode 		= '-';
+			double value	= 0.0;
+		};
+
 		struct FlushResult {
 			unsigned char* 	buffer			= NULL;
 			unsigned int 	bufferSize		= 0;
@@ -174,30 +179,29 @@ class CncMoveSequence {
 		explicit CncMoveSequence(unsigned char pid = CMD_RENDER_AND_MOVE_SEQUENCE);
 		~CncMoveSequence();
 
-		bool 					isValid() const						{ return (moveCmd == CMD_MOVE_SEQUENCE || moveCmd == CMD_RENDER_AND_MOVE_SEQUENCE); }
-		unsigned char			getType() const						{ return moveCmd; }
-
-		CncNanoTimestamp		getReference() const				{ return reference; }
-		void					setClientId(long clientId)			{ curClientId = clientId; }
-		long					getClientId() const					{ return curClientId; }
-
-		void 					addMetricPosXYZF(double dx, double dy, double dz, double f);
-
-
-		void 					addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f);
+		bool 					isValid() const										{ return (moveCmd == CMD_MOVE_SEQUENCE || moveCmd == CMD_RENDER_AND_MOVE_SEQUENCE); }
+		unsigned char			getType() const										{ return moveCmd; }
 		
-		void 					addStepPosXYZ (int32_t dx, int32_t dy, int32_t dz)	{ addStepPosXYZF(dx, dy,  0, 0); }
+		const SpeedInfo&		getCurrentSpeedInfo() const							{ return speedInfo; }
+		void					setCurrentSpeedInfo(const SpeedInfo& si)			{ speedInfo = si; }
 		
-		void 					addStepPosXYF (int32_t dx, int32_t dy, int32_t f)	{ addStepPosXYZF(dx, dy,  0, f); }
+		bool 					isOptimized() const 								{ return optimizedClientIds.size() > 0; }
+		unsigned int			getClientIdCount() const							{ return optimizedClientIds.size(); }
+		long					getClientId() const									{ return getLastClientId(); }
+		const wxString&			getClientIdsAsString() const;
+		const wxString&			getClientIdRangeAsString() const;
+		long					getFirstClientId() const;
+		long					getLastClientId() const;
+		void					addClientId(long cid);
+
+		CncNanoTimestamp		getReference() const								{ return reference; }
+
+		void 					addMetricPosXYZ(double dx, double dy, double dz);
+		
+		void 					addStepPosXYZ (int32_t dx, int32_t dy, int32_t dz)	{ addStepPosXYZF(dx, dy, dz, 0); }
 		void 					addStepPosXY  (int32_t dx, int32_t dy)				{ addStepPosXYZF(dx, dy,  0, 0); }
-		
-		void 					addStepPosXF  (int32_t dx, int32_t f)				{ addStepPosXYZF(dx,  0,  0, f); }
 		void 					addStepPosX   (int32_t dx)							{ addStepPosXYZF(dx,  0,  0, 0); }
-		
-		void 					addStepPosYF  (int32_t dy, int32_t f)				{ addStepPosXYZF( 0, dy,  0, f); }
 		void 					addStepPosY   (int32_t dy)							{ addStepPosXYZF( 0, dy,  0, 0); }
-		
-		void 					addStepPosZF  (int32_t dz, int32_t f)				{ addStepPosXYZF( 0,  0, dz, f); }
 		void 					addStepPosZ   (int32_t dz)							{ addStepPosXYZF( 0,  0, dz, 0); }
 
 		bool 					hasMore() const 					{ return getCount() > 0; }
@@ -222,7 +226,9 @@ class CncMoveSequence {
 		const MoveSequence::const_iterator const_end()   const { return sequence.cend(); }
 
 	private:
-
+		
+		SpeedInfo				speedInfo;
+		
 		unsigned int 			flushData(FlushResult& result);
 		unsigned int 			flushPoint(const SequencePoint& p, unsigned char* sequenceBuffer);
 };

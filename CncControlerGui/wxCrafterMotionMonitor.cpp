@@ -341,7 +341,7 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     m_panel7630ImgIndex = m_listbookPreProcessor_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("database-table")));
     m_listbookPreProcessor->AddPage(m_panel7630, _("Move\nSequences"), false, m_panel7630ImgIndex);
     
-    wxFlexGridSizer* flexGridSizer76242 = new wxFlexGridSizer(3, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer76242 = new wxFlexGridSizer(4, 1, 0, 0);
     flexGridSizer76242->SetFlexibleDirection( wxBOTH );
     flexGridSizer76242->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer76242->AddGrowableCol(0);
@@ -411,52 +411,72 @@ CncPreprocessorBase::CncPreprocessorBase(wxWindow* parent, wxWindowID id, const 
     
     flexGridSizer76242->Add(m_staticLine188, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    wxFlexGridSizer* flexGridSizer178 = new wxFlexGridSizer(1, 2, 0, 0);
-    flexGridSizer178->SetFlexibleDirection( wxBOTH );
-    flexGridSizer178->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer178->AddGrowableCol(1);
-    flexGridSizer178->AddGrowableRow(0);
+    m_splitter196 = new wxSplitterWindow(m_panel7630, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), wxSP_3D);
+    m_splitter196->SetSashGravity(0.44);
+    m_splitter196->SetMinimumPaneSize(10);
     
-    flexGridSizer76242->Add(flexGridSizer178, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer76242->Add(m_splitter196, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_splitterPageOverview = new wxPanel(m_splitter196, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter196, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
     wxFlexGridSizer* flexGridSizer181 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer181->SetFlexibleDirection( wxBOTH );
     flexGridSizer181->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer181->AddGrowableCol(0);
     flexGridSizer181->AddGrowableRow(1);
+    m_splitterPageOverview->SetSizer(flexGridSizer181);
     
-    flexGridSizer178->Add(flexGridSizer181, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_staticText186 = new wxStaticText(m_panel7630, wxID_ANY, _("Overview:"), wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), 0);
+    m_staticText186 = new wxStaticText(m_splitterPageOverview, wxID_ANY, _("Overview:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(-1,-1)), 0);
     m_staticText186->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_staticText186Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText186->SetFont(m_staticText186Font);
     
     flexGridSizer181->Add(m_staticText186, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_moveSequencesListPlaceholder = new wxListCtrl(m_panel7630, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(280,-1)), wxLC_REPORT);
+    m_moveSequencesListPlaceholder = new wxListCtrl(m_splitterPageOverview, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageOverview, wxSize(350,-1)), wxLC_REPORT);
     
     flexGridSizer181->Add(m_moveSequencesListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    m_moveSequencesListPlaceholder->SetMinSize(wxSize(280,-1));
+    m_moveSequencesListPlaceholder->SetMinSize(wxSize(350,-1));
+    
+    m_splitterPageContent = new wxPanel(m_splitter196, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter196, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter196->SplitVertically(m_splitterPageOverview, m_splitterPageContent, 0);
     
     wxFlexGridSizer* flexGridSizer182 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer182->SetFlexibleDirection( wxBOTH );
     flexGridSizer182->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer182->AddGrowableCol(0);
     flexGridSizer182->AddGrowableRow(1);
+    m_splitterPageContent->SetSizer(flexGridSizer182);
     
-    flexGridSizer178->Add(flexGridSizer182, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
-    
-    m_contentLabel = new wxStaticText(m_panel7630, wxID_ANY, _("Content:"), wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), 0);
+    m_contentLabel = new wxStaticText(m_splitterPageContent, wxID_ANY, _("Content:"), wxDefaultPosition, wxDLG_UNIT(m_splitterPageContent, wxSize(-1,-1)), 0);
     m_contentLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     wxFont m_contentLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_contentLabel->SetFont(m_contentLabelFont);
     
     flexGridSizer182->Add(m_contentLabel, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_moveSequencesPlaceholder = new wxListCtrl(m_panel7630, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), wxLC_REPORT);
+    m_moveSequencesPlaceholder = new wxListCtrl(m_splitterPageContent, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPageContent, wxSize(-1,-1)), wxLC_REPORT);
     
     flexGridSizer182->Add(m_moveSequencesPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer190 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer190->SetFlexibleDirection( wxBOTH );
+    flexGridSizer190->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer190->AddGrowableCol(0);
+    flexGridSizer190->AddGrowableRow(0);
+    
+    flexGridSizer76242->Add(flexGridSizer190, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_selectedClientIds = new wxTextCtrl(m_panel7630, wxID_ANY, wxT("erer"), wxDefaultPosition, wxDLG_UNIT(m_panel7630, wxSize(-1,-1)), wxTE_READONLY);
+    m_selectedClientIds->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_selectedClientIdsFont(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_selectedClientIds->SetFont(m_selectedClientIdsFont);
+    m_selectedClientIds->SetToolTip(_("Summary of curently selected Client IDs"));
+    #if wxVERSION_NUMBER >= 3000
+    m_selectedClientIds->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer190->Add(m_selectedClientIds, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     SetName(wxT("CncPreprocessorBase"));
     SetSize(700,700);
