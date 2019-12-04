@@ -523,26 +523,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 	protected:
 	
-		enum TemplateSelSource { TSS_POS_SPY=0, TSS_REPLAY=1, TSS_PATH_LIST=2, TSS_EDITOR=3, TSS_MONITOR=4, TSS_GCODE_SEQ=5, TSS_MOVE_SEQ_OVW=6, TSS_MOVE_SEQ=7, TSS_VERTEX_DATA_TRACE=8, TSS_VERTEX_INDEX_TRACE=9 };
-		const char* getTemplateSelSourceAsString(const TemplateSelSource ts) {
-			switch ( ts ) {
-				case TSS_POS_SPY:				return "TSS_POS_SPY";
-				case TSS_REPLAY:				return "TSS_REPLAY";
-				case TSS_PATH_LIST:				return "TSS_PATH_LIST";
-				case TSS_EDITOR: 				return "TSS_EDITOR";
-				case TSS_MONITOR:				return "TSS_MONITOR";
-				case TSS_GCODE_SEQ:				return "TSS_GCODE_SEQ";
-				case TSS_MOVE_SEQ_OVW:			return "TSS_MOVE_SEQ_OVW";
-				case TSS_MOVE_SEQ:				return "TSS_MOVE_SEQ";
-				case TSS_VERTEX_DATA_TRACE:		return "TSS_VERTEX_DATA_TRACE";
-				case TSS_VERTEX_INDEX_TRACE:	return "TSS_VERTEX_INDEX_TRACE";
-			}
-			
-			return "Unknown TemplateSelSource";
-		}
-		
-		void tryToSelectClientId(long clientId, TemplateSelSource tss);
-		void tryToSelectClientIds(long firstClientId, long lastClientId, TemplateSelSource tss);
+		void tryToSelectClientId(long clientId, ClientIdSelSource::ID tss);
+		void tryToSelectClientIds(long firstClientId, long lastClientId, ClientIdSelSource::ID tss);
 		void selectSourceControlLineNumber(long ln);
 		void selectSourceControlLineNumbers(long firstLine, long lastLine);
 
@@ -609,14 +591,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		friend class CncMotionMonitor;
 		friend class CncMonitorReplayPane;
 		friend class PathHandlerBase;
-		friend class CncPathListEntryListCtrl;
-		friend class CncPosSpyListCtrl;
 		friend class GCodeFileParser;
-		friend class CncGCodeSequenceListCtrl;
-		friend class CncMoveSequenceListCtrl;
-		friend class CncMoveSequenceOverviewListCtrl;
-		friend class CncVertexTrace::DataListCtrl;
-		friend class CncVertexTrace::IndexListCtrl;
 		friend class CncPathListRunner;
 		friend class CncStartPositionResolver;
 		friend class CncOpenGLContextObserver;
@@ -697,6 +672,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
 		
+		void onIndividualCommand(wxCommandEvent& event);
+
 		const wxString& createCncControl(const wxString& sel, wxString& name);
 		
 		void setIcons();

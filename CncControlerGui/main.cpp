@@ -24,7 +24,7 @@ GlobalConstStringDatabase globalStrings;
 static const wxCmdLineEntryDesc cmdLineDesc[] = {
 ///////////////////////////////////////////////////////////////////
     { wxCMD_LINE_SWITCH , "g", "dbg", 		"Start CncController in debug mode", 	wxCMD_LINE_VAL_NONE, 	wxCMD_LINE_PARAM_OPTIONAL },
-	{ wxCMD_LINE_SWITCH , "s", "secure", 	"Start CncController in secure mode",	 wxCMD_LINE_VAL_NONE, 	wxCMD_LINE_PARAM_OPTIONAL },
+	{ wxCMD_LINE_SWITCH , "s", "secure", 	"Start CncController in secure mode",	wxCMD_LINE_VAL_NONE, 	wxCMD_LINE_PARAM_OPTIONAL },
 	{ wxCMD_LINE_NONE }
 };
 

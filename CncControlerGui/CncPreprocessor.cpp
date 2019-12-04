@@ -166,7 +166,7 @@ void CncPreprocessor::updateContent() {
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::updateMoveSequenceListContent(bool force) {
 //////////////////////////////////////////////////////////////////
-	m_moveSequenceRowCount->ChangeValue(wxString::Format("%ld", moveSequence->GetItemCount()));
+	m_moveSequenceRowCount->ChangeValue(wxString::Format("%ld", (long)(moveSequence->GetItemCount())));
 	
 	if ( moveSequenceOverview->IsShownOnScreen() == true ) 
 		moveSequenceOverview->Refresh();
@@ -177,7 +177,7 @@ void CncPreprocessor::updateMoveSequenceListContent(bool force) {
 //////////////////////////////////////////////////////////////////
 void CncPreprocessor::updatePathListContent() {
 //////////////////////////////////////////////////////////////////
-	m_pathListRowCount->ChangeValue(wxString::Format("%ld", pathListEntries->GetItemCount()));
+	m_pathListRowCount->ChangeValue(wxString::Format("%ld", (long)(pathListEntries->GetItemCount())));
 	
 	if ( pathListEntries->IsShownOnScreen() == true ) 
 		pathListEntries->Refresh();
@@ -187,8 +187,13 @@ void CncPreprocessor::onIndividualCommand(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 	IndividualCommandEvent* ice = static_cast<IndividualCommandEvent*>(&event);
 	
+	typedef IndividualCommandEvent::EvtPreprocessor EID;
+	typedef IndividualCommandEvent::ValueName 		VN;
+
+	
 	switch ( ice->GetId() ) {
-		case EvtPreprocessor::UpdateSelectedClientIds:	m_selectedClientIds->ChangeValue(ice->GetString()); break;
+		case EID::UpdateSelectedClientIds:	m_selectedClientIds->ChangeValue(wxString::Format("%ld", ice->getValue<long>(VN::VAL1)));
+											break;
 	}
 }
 

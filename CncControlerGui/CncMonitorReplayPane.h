@@ -3,7 +3,6 @@
 
 #include "3D/VerticeData.h"
 #include "3D/GLContextCncPathBase.h"
-#include "wxCrafterMainFrame.h"
 
 class CncMotionMonitor;
 

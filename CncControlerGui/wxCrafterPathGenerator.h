@@ -23,7 +23,7 @@
 #include <wx/arrstr.h>
 #include <wx/notebook.h>
 #include <wx/imaglist.h>
-#include <wx/webview.h>
+#include "OSD/webviewOSD.h"
 #include <wx/stattext.h>
 #include <wx/toolbook.h>
 #include <wx/propgrid/manager.h>

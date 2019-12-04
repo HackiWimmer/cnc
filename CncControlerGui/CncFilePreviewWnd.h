@@ -2,7 +2,6 @@
 #define CNCFILEPREVIEWWND_H
 
 #include "CncFilePreview.h"
-#include "wxCrafterMainFrame.h"
 
 class CncFilePreviewWnd : public CncFilePreviewWndBase
 {

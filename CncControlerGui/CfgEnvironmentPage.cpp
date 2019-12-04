@@ -1,4 +1,4 @@
-#include "wxCrafterMainFrame.h"
+#include <wx/propgrid/manager.h>
 #include "wxCrafterImages.h"
 #include "CncFileNameService.h"
 #include "CncUnitCalculator.h"

@@ -6,11 +6,15 @@
 #include <wx/datstrm.h>
 #include <wx/txtstrm.h>
 #include "OSD/CncAsyncKeyboardState.h"
-#include "SvgEditPopup.h"
 #include "MainFrame.h"
+#include "SvgEditPopup.h"
 #include "GCodeCommands.h"
 #include "CncConfig.h"
+#include "CncUserEvents.h"
 #include "CncBaseEditor.h"
+
+#include <wx/frame.h>
+extern wxFrame* THE_FRAME;
 
 // ----------------------------------------------------------------------------
 // CncBaseEditor Event Table
@@ -242,21 +246,37 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 	// try to select current line as client id
 	if ( publishSelection == true ) {
 
+		auto tryToSelectClientId = [&](long cid) {
+
+			typedef IndividualCommandEvent::EvtMainFrame ID;
+			typedef IndividualCommandEvent::ValueName VN;
+
+			IndividualCommandEvent evt(ID::TryToSelectClientIds);
+			evt.setValue(VN::VAL1, cid);
+			evt.setValue(VN::VAL2, cid);
+			evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_EDITOR));
+
+			SelectEventBlocker blocker(this);
+			wxPostEvent(THE_FRAME, evt);
+
+		};
+
+
 		if ( fileInfo.format == TplSvg ) {
 			SearchAnchor();							// Set an anchor for the next search
 			const long prevPos = GetCurrentPos();	// Store position
 			const long sp = SearchPrev(0, "<");		// find start
 
 			SelectEventBlocker b(this);
-			if ( sp != wxNOT_FOUND )	THE_APP->tryToSelectClientId(LineFromPosition(sp) + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
-			else						THE_APP->tryToSelectClientId(                   y + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
+			if ( sp != wxNOT_FOUND )	tryToSelectClientId(LineFromPosition(sp) + 1);
+			else						tryToSelectClientId(                   y + 1);
 			
 			SetCurrentPos(prevPos);					// Restore position
 			SetSelection(prevPos, prevPos);
 		}
 		else {
 			
-			THE_APP->tryToSelectClientId(y + 1, MainFrame::TemplateSelSource::TSS_EDITOR);
+			tryToSelectClientId(y + 1);
 		}
 	}
 	

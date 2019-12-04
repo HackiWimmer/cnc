@@ -103,6 +103,23 @@ namespace cnc {
 
 };
 
+namespace ClientIdSelSource {
+
+	enum ID {TSS_POS_SPY			=  0,
+			TSS_REPLAY				=  1,
+			TSS_PATH_LIST			=  2,
+			TSS_EDITOR				=  3,
+			TSS_MONITOR				=  4,
+			TSS_GCODE_SEQ			=  5,
+			TSS_MOVE_SEQ_OVW		=  6,
+			TSS_MOVE_SEQ			=  7,
+			TSS_VERTEX_DATA_TRACE	=  8,
+			TSS_VERTEX_INDEX_TRACE	=  9
+	};
+
+	const char* getTemplateSelSourceAsString(const ID ts);
+};
+
 //-----------------------------------------------------------------
 class MainBookSelection {
 	public:

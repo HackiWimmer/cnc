@@ -39,13 +39,6 @@ CncTextCtrl::CncTextCtrl(const wxTextCtrl& source)
 	SetFont(source.GetFont());
 	SetToolTip(source.GetToolTip());
 	
-	#warning !!!
-	/*
-	// dirty hack to overrule the const directive.
-	wxValidator* val = ((wxTextCtrl*)(&source))->GetValidator();
-	if ( val != NULL )
-		SetValidator(*val);
-	*/
 	setupTimer(CncTC::defaultOverflowTimerValue);
 }
 //////////////////////////////////////////////////////////////

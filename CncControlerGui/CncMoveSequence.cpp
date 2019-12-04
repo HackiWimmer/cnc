@@ -188,7 +188,7 @@ void CncMoveSequence::addMetricPosXYZF(double dx, double dy, double dz, double f
 	addStepPosXYZF( (int32_t)round(sx), 
 					(int32_t)round(sy),
 					(int32_t)round(sz),
-					0); // ???
+					0); // Currently not used therefore always 0
 }
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t f)  {
@@ -199,8 +199,9 @@ void CncMoveSequence::addStepPosXYZF(int32_t dx, int32_t dy, int32_t dz, int32_t
 	if ( dx == 0 && dy == 0 && dz == 0 && f == 0 )
 		return;
 
-	//std::cout << "CncMoveSequence::addStepPosXYZF: " << curClientId << std::endl;
-	sequence.push_back(SequencePoint(getClientId(), dx, dy, dz, f));
+	//std::cout << "CncMoveSequence::addStepPosXYZF: " << getLastClientId() << std::endl;
+
+	sequence.push_back(SequencePoint(getLastClientId(), dx, dy, dz, f));
 	data.add(dx, dy, dz);
 }
 ///////////////////////////////////////////////////////////////////

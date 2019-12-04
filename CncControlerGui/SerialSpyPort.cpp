@@ -1,6 +1,9 @@
 #include "CncControl.h"
-#include "MainFrame.h"
+#include "CncUserEvents.h"
 #include "SerialSpyPort.h"
+
+#include <wx/frame.h>
+extern wxFrame* THE_FRAME;
 
 ///////////////////////////////////////////////////////////////////
 SerialSpyPort::SerialSpyPort(CncControl* cnc)
@@ -64,7 +67,13 @@ void SerialSpyPort::spyWriteData(void *buffer, unsigned int nbByte) {
 	}
 	
 	// Artificially waste time
-	THE_APP->waitActive(cncControl->getStepDelay(), false);
+	typedef IndividualCommandEvent::EvtMainFrame ID;
+	typedef IndividualCommandEvent::ValueName VN;
+
+	IndividualCommandEvent evt(ID::WaitActive);
+	evt.setValue(VN::VAL1, cncControl->getStepDelay());
+	evt.setValue(VN::VAL2, false);
+	wxPostEvent(THE_FRAME, evt);
 }
 ///////////////////////////////////////////////////////////////////
 int SerialSpyPort::readData(void *buffer, unsigned int nbByte) {

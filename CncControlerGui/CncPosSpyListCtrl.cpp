@@ -1,11 +1,16 @@
 #include <iostream>
 #include <wx/imaglist.h>
-#include "MainFrame.h"
+#include "wxCrafterImages.h"
 #include "GlobalStrings.h"
 #include "CncArduino.h"
+#include "CncCommon.h"
+#include "CncUserEvents.h"
 #include "CncPosSpyListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
+
+#include <wx/frame.h>
+extern wxFrame* THE_FRAME;
 
 // ----------------------------------------------------------------------------
 // CncPathListEntryListCtrl Event Table
@@ -124,8 +129,16 @@ void CncPosSpyListCtrl::onSelectListItem(wxListEvent& event) {
 	long ln;
 	getRow(item).getItem(COL_SEARCH).ToLong(&ln);
 	
+	typedef IndividualCommandEvent::EvtMainFrame ID;
+	typedef IndividualCommandEvent::ValueName VN;
+
+	IndividualCommandEvent evt(ID::TryToSelectClientIds);
+	evt.setValue(VN::VAL1, ln);
+	evt.setValue(VN::VAL2, ln);
+	evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_POS_SPY));
+
 	SelectEventBlocker blocker(this);
-	THE_APP->tryToSelectClientId(ln, MainFrame::TemplateSelSource::TSS_POS_SPY);
+	wxPostEvent(THE_FRAME, evt);
 }
 /////////////////////////////////////////////////////////////
 void CncPosSpyListCtrl::onActivateListItem(wxListEvent& event) {

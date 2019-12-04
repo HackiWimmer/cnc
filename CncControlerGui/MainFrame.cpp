@@ -75,6 +75,7 @@
 #include "CncOSEnvironmentDialog.h"
 #include "CncContext.h"
 #include "CncLastProcessingTimestampSummary.h"
+#include "CncUserEvents.h"
 #include "GlobalStrings.h"
 #include "MainFrame.h"
 
@@ -107,6 +108,7 @@ unsigned int CncTransactionLock::referenceCounter   = 0;
 // app defined event table
 	wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
 		EVT_CLOSE(MainFrame::onClose)
+		EVT_COMMAND(wxID_ANY, wxEVT_INDIVIDUAL_CTRL_COMMAND, 		MainFrame::onIndividualCommand)
 		EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, 	MainFrame::configurationUpdated)
 		EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, 							MainFrame::onPerspectiveTimer)
 		EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 				MainFrame::onDebugUserNotificationTimer)
@@ -134,6 +136,8 @@ class CncRunEventFilter : public wxEventFilter {
 };
 ////////////////////////////////////////////////////////////////////
 
+wxFrame* THE_FRAME = NULL;
+
 ////////////////////////////////////////////////////////////////////
 MainFrameBase::MainFrameBase(wxWindow* parent)
 : MainFrameBClass(parent)
@@ -145,6 +149,8 @@ MainFrameBase::MainFrameBase(wxWindow* parent)
 , controllerMsgHistory(	new CncTextCtrl(*m_controllerMsgHistoryPlaceholder) )
 ////////////////////////////////////////////////////////////////////
 {
+	THE_FRAME = this;
+
 	GblFunc::replaceControl(m_loggerPlaceholder, 				logger);
 	GblFunc::replaceControl(m_startupTracePlaceholder, 			startupTrace);
 	GblFunc::replaceControl(m_tmpTraceInfoPlaceholder, 			tmpTraceInfo);
@@ -854,8 +860,6 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	
-	tryToSelectClientIds(42L, 88L, TSS_PATH_LIST);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -6059,6 +6063,13 @@ void MainFrame::activate3DPerspectiveButton(wxButton* bt) {
 	m_3D_Perspective2->SetBackgroundColour(inactive);
 	m_3D_Perspective3->SetBackgroundColour(inactive);
 	m_3D_Perspective4->SetBackgroundColour(inactive);
+
+	m_3D_TopSec->SetBackgroundColour(inactive);
+	m_3D_BottomSec->SetBackgroundColour(inactive);
+	m_3D_FrontSec->SetBackgroundColour(inactive);
+	m_3D_RearSec->SetBackgroundColour(inactive);
+	m_3D_LeftSec->SetBackgroundColour(inactive);
+	m_3D_RightSec->SetBackgroundColour(inactive);
 	m_3D_Perspective1Sec->SetBackgroundColour(inactive);
 	m_3D_Perspective2Sec->SetBackgroundColour(inactive);
 	m_3D_Perspective3Sec->SetBackgroundColour(inactive);
@@ -6620,48 +6631,48 @@ void MainFrame::selectSourceControlLineNumbers(long firstLine, long lastLine) {
 	sourceEditor->selectLineNumbers(firstLine, lastLine);
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, TemplateSelSource tss) {
+void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, ClientIdSelSource::ID tss) {
 /////////////////////////////////////////////////////////////////////
 	static bool isRunning = false;
 	
 	if ( isRunning == true )	return;
 	else						isRunning = true;
 	
-	cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
+	cnc::trc << wxString::Format("%s->selectClientIds(%ld ... %ld); ", ClientIdSelSource::getTemplateSelSourceAsString(tss), firstClientId, lastClientId);
 	
-	if ( tss != TSS_POS_SPY ) {
+	if ( tss != ClientIdSelSource::TSS_POS_SPY ) {
 		if ( positionSpy != NULL )
 			positionSpy->searchReferenceById(firstClientId);
 	}
 	
-	if ( tss != TSS_MONITOR ) {
+	if ( tss != ClientIdSelSource::TSS_MONITOR ) {
 		if ( motionMonitor != NULL ) {
 			motionMonitor->setCurrentClientId(firstClientId);
 			motionMonitor->Refresh();
 		}
 	}
 	
-	if ( tss != TSS_PATH_LIST ) {
+	if ( tss != ClientIdSelSource::TSS_PATH_LIST ) {
 		if ( cncPreprocessor != NULL )
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_PATH_LIST);
 	}
 	
-	if ( tss != TSS_MOVE_SEQ_OVW ) {
+	if ( tss != ClientIdSelSource::TSS_MOVE_SEQ_OVW ) {
 		if ( cncPreprocessor != NULL )
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_OVERVIEW);
 	}
 
-	if ( tss != TSS_MOVE_SEQ ) {
+	if ( tss != ClientIdSelSource::TSS_MOVE_SEQ ) {
 		if ( cncPreprocessor != NULL )
 			cncPreprocessor->selectClientId(firstClientId, CncPreprocessor::LT_MOVE_SEQ_CONTENT);
 	}
 	
-	if ( tss != TSS_VERTEX_DATA_TRACE) {
+	if ( tss != ClientIdSelSource::TSS_VERTEX_DATA_TRACE) {
 		if ( motionVertexCtrl != NULL )
 				motionVertexCtrl->selectClientId(firstClientId, CncMotionVertexTrace::LT_VERTEX_DATA_TRACE);
 	}
 	
-	if ( tss != TSS_VERTEX_INDEX_TRACE) {
+	if ( tss != ClientIdSelSource::TSS_VERTEX_INDEX_TRACE) {
 		if ( motionVertexCtrl != NULL )
 			motionVertexCtrl->selectClientId(firstClientId, CncMotionVertexTrace::LT_VERTEX_INDEX_TRACE);
 	}
@@ -6670,14 +6681,14 @@ void MainFrame::tryToSelectClientIds(long firstClientId, long lastClientId, Temp
 	// The editor hast to be the last one, otherwise the selection can be overridden by an 
 	// other control which calls tryToSelectClientId(long clientId, TemplateSelSource tss) only
 	// and the he first line is then selected only
-	if ( tss != TSS_EDITOR ) {
+	if ( tss != ClientIdSelSource::TSS_EDITOR ) {
 		selectSourceControlLineNumbers(firstClientId, lastClientId);
 	}
 	
 	isRunning = false;
 }
 /////////////////////////////////////////////////////////////////////
-void MainFrame::tryToSelectClientId(long clientId, TemplateSelSource tss) {
+void MainFrame::tryToSelectClientId(long clientId, ClientIdSelSource::ID tss) {
 /////////////////////////////////////////////////////////////////////
 	tryToSelectClientIds(clientId, clientId, tss);
 }
@@ -7739,3 +7750,44 @@ void MainFrame::onOpenGLContextObserver(wxCommandEvent& event) {
 	openGLContextObserver->Show(!flag);
 	m_miOpenGLContextObserver->Check(!flag);
 }
+/////////////////////////////////////////////////////////////////////
+void MainFrame::onIndividualCommand(wxCommandEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	IndividualCommandEvent* ice = static_cast<IndividualCommandEvent*>(&event);
+
+	typedef IndividualCommandEvent::EvtMainFrame 	EID;
+	typedef IndividualCommandEvent::ValueName 		VN;
+	typedef ClientIdSelSource::ID 					CISSID;
+
+	switch ( ice->GetId() ) {
+
+		case EID::DispatchAll: {
+				dispatchAll();
+				break;
+		}
+		
+		case EID::DistpatchNext: {
+			dispatchNext();
+			break;
+		}
+		
+		case EID::WaitActive: {
+			if ( ice->hasValue(VN::VAL2) )	waitActive(ice->getValue<unsigned int>(VN::VAL1), ice->getValue<bool>(VN::VAL2));
+			else							waitActive(ice->getValue<unsigned int>(VN::VAL1));
+			break;
+		}
+		
+		case EID::EnableControls: {
+			enableControls(ice->getValue<bool>(VN::VAL1));
+			break;
+		}
+		
+		case EID::TryToSelectClientIds: {
+			tryToSelectClientIds(ice->getValue<long>(VN::VAL1),
+								 ice->getValue<long>(VN::VAL2),
+								 (CISSID)(ice->getValue<int>(VN::VAL3)));
+			break;
+		}
+	}
+}
+

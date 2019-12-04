@@ -1,4 +1,5 @@
-#include "MainFrame.h"
+#include <wx/propgrid/manager.h>
+#include "wxCrafterImages.h"
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
 

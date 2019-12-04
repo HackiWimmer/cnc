@@ -1,4 +1,5 @@
 #include <iostream>
+#include "wxCrafterImages.h"
 #include "MainFrame.h"
 #include "CncConnectProgress.h"
 

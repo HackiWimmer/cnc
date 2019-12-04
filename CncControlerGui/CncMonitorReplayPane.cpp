@@ -80,7 +80,7 @@ void CncMonitorReplayPane::display() {
 	if ( motionMonitor == NULL )
 		return;
 		
-	THE_APP->tryToSelectClientId(motionMonitor->getVirtualEndAsId(), MainFrame::TemplateSelSource::TSS_REPLAY);
+	THE_APP->tryToSelectClientId(motionMonitor->getVirtualEndAsId(), ClientIdSelSource::ID::TSS_REPLAY);
 }
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {

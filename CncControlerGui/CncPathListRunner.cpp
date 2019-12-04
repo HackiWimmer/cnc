@@ -36,6 +36,24 @@ CncPathListRunner::~CncPathListRunner() {
 	destroyMoveSequence();
 }
 //////////////////////////////////////////////////////////////////
+bool CncPathListRunner::isCncInterrupted() {
+//////////////////////////////////////////////////////////////////
+	wxASSERT( setup.cnc != NULL );
+
+	if ( setup.cnc->isInterrupted() == true )
+		return true;
+
+	return false;
+}
+//////////////////////////////////////////////////////////////////
+bool CncPathListRunner::checkDebugState() {
+//////////////////////////////////////////////////////////////////
+	if ( setup.fileParser != NULL )
+		return setup.fileParser->evaluateDebugState();
+
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 bool CncPathListRunner::destroyMoveSequence() {
 //////////////////////////////////////////////////////////////////	
 	bool ret = true;
@@ -87,6 +105,7 @@ bool CncPathListRunner::publishMoveSequence() {
 			return false;
 		}
 		
+		// if the corresponding list isn't connected this call does nothing and returns only
 		THE_APP->getCncPreProcessor()->addMoveSequence(*currentSequence);
 		
 		if ( currentSequence->getCount() > 0 ) {
@@ -127,18 +146,13 @@ bool CncPathListRunner::onPhysicallyClientIdChange(const CncPathListEntry& curr)
 		return false;
 	}
 	
-	if ( setup.optAnalyse == true ) {
-		if ( currentSequence != NULL ) {
-			currentSequence->addClientId(curr.clientId);
-		}
-	}
+	if ( isCncInterrupted() == true )
+		return false;
 
 	wxASSERT( setup.cnc != NULL );
-	
-	if ( setup.cnc->isInterrupted() == true )
-		return false;
-		
-	setup.cnc->setClientId(curr.clientId);
+
+	if ( currentSequence != NULL )	currentSequence->addClientId(curr.clientId);
+	else							setup.cnc->setClientId(curr.clientId);
 	
 	return true;
 }
@@ -150,9 +164,7 @@ bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr) {
 		return false;
 	}
 	
-	wxASSERT( setup.cnc != NULL );
-	
-	if ( setup.cnc->isInterrupted() == true )
+	if ( isCncInterrupted() == true )
 		return false;
 	
 	if ( initNextMoveSequence(curr.feedSpeed_MM_MIN, cnc::getCncSpeedTypeAsCharacter(curr.feedSpeedMode)) == false ) {
@@ -160,16 +172,16 @@ bool CncPathListRunner::onPhysicallySpeedChange(const CncPathListEntry& curr) {
 		return false;
 	}
 	
+	wxASSERT( setup.cnc != NULL );
 	return setup.cnc->changeCurrentFeedSpeedXYZ_MM_MIN(curr.feedSpeed_MM_MIN, curr.feedSpeedMode);
 }
 //////////////////////////////////////////////////////////////////
 bool CncPathListRunner::onPhysicallyMoveRaw(const CncPathListEntry& curr) {
 //////////////////////////////////////////////////////////////////
-	wxASSERT( setup.cnc != NULL );
-	
-	if ( setup.cnc->isInterrupted() == true )
+	if ( isCncInterrupted() == true )
 		return false;
 		
+	wxASSERT( setup.cnc != NULL );
 	return setup.cnc->moveRelLinearMetricXYZ(	curr.entryDistance.getX(), 
 												curr.entryDistance.getY(), 
 												curr.entryDistance.getZ(), 
@@ -209,6 +221,11 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	};
 
 	// -----------------------------------------------------------
+	auto isEmptyMove = [&](double dx, double dy, double dz) {
+		return (cnc::dblCompareNull(dx) == true &&	cnc::dblCompareNull(dy) == true &&	cnc::dblCompareNull(dz) == true);
+	};
+
+	// -----------------------------------------------------------
 	// entry ....
 	const CncPathListEntry* curr  = getCurr(itCurr);
 	const CncPathListEntry* next  = getNext(itCurr);
@@ -231,94 +248,44 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 	// -----------------------------------------------------------
 	// check if nothing more than curr available
 	if ( next == NULL ) {
+
 		addSequenceEntryFromEntry(curr);
 		return true;
 	}
 
-	// -----------------------------------------------------------
-	struct Move {
-		double dx;
-		double dy;
-		double dz;
-		double mxy;
-		double vxy;
-		double mz;
-
-		explicit Move(const CncPathListEntry* e)
-		: dx(e->entryDistance.getX())
-		, dy(e->entryDistance.getY())
-		, dz(e->entryDistance.getZ())
-		, mxy(dx != 0.0 ? dy/dx : DBL_MAX)
-		, vxy(sqrt(pow(dx, 2) + pow(dy, 2)))
-		, mz(vxy != 0.0 ? dz / vxy : DBL_MAX)
-		{}
-
-		explicit Move(const Move& m)
-		: dx(m.dx)
-		, dy(m.dy)
-		, dz(m.dz)
-		, mxy(m.mxy)
-		, vxy(m.vxy)
-		, mz(m.mz)
-		{}
-
-		bool isPitchEqual(const Move& m) const {
-			const double epsilon = 0.001;
-			return ( cnc::dblCompare(mxy, m.mxy, epsilon) == true && cnc::dblCompare(mz, m.mz, epsilon) == true );
-		}
-		
-		bool isPitchToStrong(const Move& m) const {
-			const float max = 15 * PI / 180; // 15 degrees
-			const float a1 = atan2(dx, dy);
-			const float a2 = atan2(m.dx, m.dy);
-			
-			return abs(a1 - a2) > max;
-		}
-		
-		float getPitchDiffenceAsRadians(const Move& m) const {
-			const float a1 = atan2(dx, dy);
-			const float a2 = atan2(m.dx, m.dy);
-			
-			return abs(a1 - a2);
-		}
-		
-		float getPitchDiffenceAsDegree(const Move& m) const {
-			const float a1 = atan2(dx, dy);
-			const float a2 = atan2(m.dx, m.dy);
-			
-			return abs(a1 - a2) * 180 / PI;
-		}
-	};
-
+	// initialized distances
 	double cx = curr->entryDistance.getX();
 	double cy = curr->entryDistance.getY();
 	double cz = curr->entryDistance.getZ();
 	
+	// create navigation pointers
 	const CncPathListEntry* c = curr;
 	const CncPathListEntry* n = next;
 
 	// loop: preview next entries
+	auto skipToNext = [&]() { ++itCurr; c = n; n = getNext(itCurr); };
 	while ( n != NULL ) {
 		
+		if ( isCncInterrupted() == true )
+			return false;
+
+		if ( checkDebugState() == false )
+			return false;
+
 		// don't combine entries over a speed change
-		if ( n->isSpeedChange()  == true )
+		if ( c->isSpeedChange()  == true )
 			break;
 
-		if ( n->isClientIdChange() == true ) {
+		if ( c->isClientIdChange() == true ) {
 			wxASSERT ( currentSequence != NULL );
 			currentSequence->addClientId(n->clientId);
 		}
 
 		// skip the next entry if it is an empty move
-		if ( setup.optSkipEmptyMoves == true )  {
-			if (    cnc::dblCompareNull(n->entryDistance.getX()) == true
-				&&	cnc::dblCompareNull(n->entryDistance.getY()) == true
-				&&	cnc::dblCompareNull(n->entryDistance.getZ()) == true
-			) {
-				// skip
-				n = getNext(++itCurr);
-				continue;
-			}
+		const bool empty = isEmptyMove(c->entryDistance.getX(), c->entryDistance.getY(), c->entryDistance.getZ());
+		if ( setup.optSkipEmptyMoves == true && empty ) {
+			skipToNext();
+			continue;
 		}
 		
 		const Move mCurr(c);
@@ -335,7 +302,7 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		if ( setup.optCombineMoves == false ) 
 			break;
 			
-		// stop here if the next pit isn't equal with the reference
+		// stop here if the next pitch isn't equal with the reference
 		if ( mCurr.isPitchEqual(mNext) == false ) 
 			break;
 			
@@ -344,49 +311,14 @@ bool CncPathListRunner::onPhysicallyMoveAnalysed(CncPathList::const_iterator& it
 		cy += mNext.dy;
 		cz += mNext.dz;
 		
-		// skip to next ...
-		c = n;
-		n = getNext(++itCurr);
+		skipToNext();
 	}
+
+	// finally check this again
+	if ( setup.optSkipEmptyMoves == true && isEmptyMove(cx, cy, cz) )
+		return true;
 
 	addSequenceEntryFromValues(cx, cy, cz);
-	return true;
-
-/*
-
-	if ( next != NULL ) {
-
-		const double dxC = curr->entryDistance.getX();
-		const double dyC = curr->entryDistance.getY();
-		const double dxN = next->entryDistance.getX();
-		const double dyN = next->entryDistance.getY();
-
-		if ( dxC != 0 && dxN != 0 ) {
-			const float m1 = dyC / dxC;
-			const float m2 = dyN / dxN;
-
-			if ( m1 * m2 != -1 ) {
-				const float alpha = atan( ( m1 - m2 ) / (1 + m1 * m2) ) * 180 / PI;
-
-				std::cout << "alpha: " << alpha << std::endl;
-			}
-			else {
-				// 90
-				std::cout << "m1 * m2 != -1" << std::endl;
-			}
-		}
-		else {
-			std::cout << "dxC == " << dxC << " || dxN == " << dxN << std::endl;
-		}
-	}
-	else {
-		//std::cout << "next == NULL" << std::endl;
-	}
-
-
-
-*/
-
 	return true;
 }
 //////////////////////////////////////////////////////////////////
@@ -408,10 +340,15 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	
 	for ( auto it = plm.const_begin(); it != plm.const_end(); ++it) {
 		const CncPathListEntry& curr  = *it;
+
+		if ( isCncInterrupted() == true )
+			return deFrost(false);
+
+		// if the corresponding list isn't connected this call does nothing and returns only
 		THE_APP->getCncPreProcessor()->addPathListEntry(curr);
 		
-		if ( setup.fileParser != NULL )
-			setup.fileParser->evaluateDebugState();
+		if ( checkDebugState() == false )
+			return deFrost(false);
 		
 		// client id change
 		if ( curr.isClientIdChange() == true ) {

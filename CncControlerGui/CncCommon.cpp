@@ -193,4 +193,22 @@ std::ostream& operator<<(std::ostream& os, const wxRealPoint& p) {
 	os << wxString::Format("%10.3lf,%10.3lf ", p.x, p.y);
 	return os;
 }
+//////////////////////////////////////////////////////////////
+const char* ClientIdSelSource::getTemplateSelSourceAsString(const ID ts) {
+//////////////////////////////////////////////////////////////
+	switch ( ts ) {
+		case TSS_POS_SPY:				return "TSS_POS_SPY";
+		case TSS_REPLAY:				return "TSS_REPLAY";
+		case TSS_PATH_LIST:				return "TSS_PATH_LIST";
+		case TSS_EDITOR: 				return "TSS_EDITOR";
+		case TSS_MONITOR:				return "TSS_MONITOR";
+		case TSS_GCODE_SEQ:				return "TSS_GCODE_SEQ";
+		case TSS_MOVE_SEQ_OVW:			return "TSS_MOVE_SEQ_OVW";
+		case TSS_MOVE_SEQ:				return "TSS_MOVE_SEQ";
+		case TSS_VERTEX_DATA_TRACE:		return "TSS_VERTEX_DATA_TRACE";
+		case TSS_VERTEX_INDEX_TRACE:	return "TSS_VERTEX_INDEX_TRACE";
+	}
+
+	return "Unknown TemplateSelSource";
+}
 

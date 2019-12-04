@@ -1,13 +1,16 @@
 #include <iostream>
 #include <wx/imaglist.h>
 #include <wx/stattext.h>
-#include "MainFrame.h"
+#include "wxCrafterImages.h"
 #include "GlobalStrings.h"
 #include "CncConfig.h"
 #include "CncUserEvents.h"
 #include "CncMoveSequenceListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
+
+#include <wx/frame.h>
+extern wxFrame* THE_FRAME;
 
 // ----------------------------------------------------------------------------
 // CncMoveSequenceListCtrl Event Table
@@ -143,8 +146,16 @@ void CncMoveSequenceListCtrl::onSelectListItem(wxListEvent& event) {
 	auto it = moveSequence->const_begin() + item;
 	const CncMoveSequence::SequencePoint& sp = *it;
 	
+	typedef IndividualCommandEvent::EvtMainFrame ID;
+	typedef IndividualCommandEvent::ValueName VN;
+
+	IndividualCommandEvent evt(ID::TryToSelectClientIds);
+	evt.setValue(VN::VAL1, sp.clientID);
+	evt.setValue(VN::VAL2, sp.clientID);
+	evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_MOVE_SEQ));
+
 	SelectEventBlocker blocker(this);
-	THE_APP->tryToSelectClientId(sp.clientID, MainFrame::TemplateSelSource::TSS_MOVE_SEQ);
+	wxPostEvent(THE_FRAME, evt);
 }
 /////////////////////////////////////////////////////////////
 void CncMoveSequenceListCtrl::onActivateListItem(wxListEvent& event) {
@@ -351,7 +362,7 @@ wxString CncMoveSequenceOverviewListCtrl::OnGetItemText(long item, long column) 
 	
 	switch ( column ) {
 		case COL_NUM:			return wxString::Format("%ld", 	item);
-		case COL_CNT:			return wxString::Format("%ld", 	seq.getCount());
+		case COL_CNT:			return wxString::Format("%u", 	seq.getCount());
 		case COL_REF:			return wxString::Format("%lld", seq.getReference());
 		case COL_FIRST_CLD_ID:	return wxString::Format(fmt,	seq.getFirstClientId());
 		case COL_LAST_CLD_ID:	return wxString::Format(fmt, 	seq.getLastClientId());
@@ -377,18 +388,36 @@ void CncMoveSequenceOverviewListCtrl::onSelectListItem(wxListEvent& event) {
 	setLastSelection(item);
 	const long firstClientId = seq->getFirstClientId();
 	const long lastClientId  = seq->getLastClientId();
-	SelectEventBlocker blocker(this);
-	THE_APP->tryToSelectClientIds(firstClientId, lastClientId, MainFrame::TemplateSelSource::TSS_MOVE_SEQ_OVW);
 	
+	{
+		typedef IndividualCommandEvent::EvtMainFrame ID;
+		typedef IndividualCommandEvent::ValueName VN;
+
+		IndividualCommandEvent evt(ID::TryToSelectClientIds);
+		evt.setValue(VN::VAL1, firstClientId);
+		evt.setValue(VN::VAL2, lastClientId);
+		evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_MOVE_SEQ_OVW));
+
+		SelectEventBlocker blocker(this);
+		wxPostEvent(THE_FRAME, evt);
+	}
+
 	// update move sequence list control
 	wxASSERT( slaveSequenceList != NULL );
 	wxASSERT( contentLabel != NULL);
 	
 	contentLabel->SetLabel(wxString::Format("Content of MoveSequence with ID = '%lld':", seq->getReference()));
 	
-	IndividualCommandEvent evt(EvtPreprocessor::UpdateSelectedClientIds);
-	evt.SetString(seq->getClientIdsAsString());
-	wxPostEvent(GetParent(), evt);
+	{
+		typedef IndividualCommandEvent::EvtPreprocessor ID;
+		typedef IndividualCommandEvent::ValueName VN;
+
+		IndividualCommandEvent evt(ID::UpdateSelectedClientIds);
+		evt.setValue(VN::VAL1, seq->getClientId());
+
+		SelectEventBlocker blocker(this);
+		wxPostEvent(GetParent(), evt);
+	}
 	
 	slaveSequenceList->addMoveSequence(seq);
 	slaveSequenceList->Refresh();

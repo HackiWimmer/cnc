@@ -13,8 +13,8 @@
 #include "CncCommon.h"
 #include "CncArduino.h"
 #include "CncContext.h"
+#include "CncCommon.h"
 #include "SerialPort.h"
-#include "MainFrame.h"
 
 unsigned char SerialCommandLocker::lockedCommand = CMD_INVALID;
 ///////////////////////////////////////////////////////////////////
@@ -741,7 +741,7 @@ bool Serial::processIdle() {
 ///////////////////////////////////////////////////////////////////
 bool Serial::processSetter(unsigned char pid, int32_t value) {
 ///////////////////////////////////////////////////////////////////
-	SetterValueList values;
+	cnc::SetterValueList values;
 	values.push_back(value);
 	
 	return processSetter(pid, values);
