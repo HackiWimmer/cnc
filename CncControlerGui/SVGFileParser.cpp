@@ -9,7 +9,7 @@
 #include "SvgViewBox.h"
 #include "SVGElementConverter.h"
 #include "CncUnitCalculator.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncFileNameService.h"
 #include "CncConfig.h"
 #include "CncControl.h"
@@ -77,9 +77,9 @@ void SVGFileParser::enableUserAgentControls(bool state) {
 	SvgUserAgentOutputControls soc;
 	
 	if ( state == true ) {
-		soc.detailInfo 			= THE_APP->GetDvListCtrlSvgUADetailInfo();
-		soc.inboundPathList		= THE_APP->GetDvListCtrlSvgUAInboundPathList();
-		soc.useDirectiveList	= THE_APP->GetDvListCtrlSvgUAUseDirective();
+		soc.detailInfo 			= APP_PROXY::GetDvListCtrlSvgUADetailInfo();
+		soc.inboundPathList		= APP_PROXY::GetDvListCtrlSvgUAInboundPathList();
+		soc.useDirectiveList	= APP_PROXY::GetDvListCtrlSvgUAUseDirective();
 	} 
 	else {
 		soc.detailInfo 			= NULL;
@@ -169,23 +169,21 @@ bool SVGFileParser::setSVGRootNode(const wxString& w, const wxString& h, const w
 	
 	SVGRootNode svgRootNode(width, height, unit, vb);
 	
-	if ( THE_APP != NULL ) {
-		std::stringstream ss; ss << svgRootNode;
-		THE_APP->GetSvgRootNode()->ChangeValue(ss.str());
-		
-		// reporting
-		typedef CncUnitCalculator<float> UC;
-		THE_APP->getParsingSynopsisTrace()->addSeparator();
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format("Translated RootNode: %s",  ss.str()));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Input Unit        : %s",  UC::getUnitAsStr(svgRootNode.getInputUnit())));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Output Unit       : %s",  UC::getUnitAsStr(svgRootNode.getOutputUnit())));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Width        [px] : %12.3lf", svgRootNode.getWidth()));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Heigth       [px] : %12.3lf", svgRootNode.getHeight()));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Width        [mm] : %12.3lf", svgRootNode.getWidth_MM()));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Heigth       [mm] : %12.3lf", svgRootNode.getHeight_MM()));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Scale X           : %12.3lf", svgRootNode.getScaleX()));
-		THE_APP->getParsingSynopsisTrace()->addInfo(wxString::Format(" Scale Y           : %12.3lf", svgRootNode.getScaleY()));
-	}
+	std::stringstream ss; ss << svgRootNode;
+	APP_PROXY::GetSvgRootNode()->ChangeValue(ss.str());
+
+	// reporting
+	typedef CncUnitCalculator<float> UC;
+	APP_PROXY::parsingSynopsisTraceAddSeparator();
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format("Translated RootNode: %s",  ss.str()));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Input Unit        : %s",  UC::getUnitAsStr(svgRootNode.getInputUnit())));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Output Unit       : %s",  UC::getUnitAsStr(svgRootNode.getOutputUnit())));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Width        [px] : %12.3lf", svgRootNode.getWidth()));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Heigth       [px] : %12.3lf", svgRootNode.getHeight()));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Width        [mm] : %12.3lf", svgRootNode.getWidth_MM()));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Heigth       [mm] : %12.3lf", svgRootNode.getHeight_MM()));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Scale X           : %12.3lf", svgRootNode.getScaleX()));
+	APP_PROXY::parsingSynopsisTraceAddInfo(wxString::Format(" Scale Y           : %12.3lf", svgRootNode.getScaleY()));
 	
 	pathHandler->setSvgRootNode(svgRootNode);
 	
@@ -526,24 +524,24 @@ bool SVGFileParser::postprocess() {
 	auto check_1_Less_2 = [&](double d1, double d2, const char* msg) {
 		if ( d1 > d2 ) {
 			if ( ret == true ) {
-				THE_APP->getParsingSynopsisTrace()->addSeparator();
-				THE_APP->getParsingSynopsisTrace()->addError("Post Processing Error Summary:");
+				APP_PROXY::parsingSynopsisTraceAddSeparator();
+				APP_PROXY::parsingSynopsisTraceAddError("Post Processing Error Summary:");
 			}
 			
-			THE_APP->getParsingSynopsisTrace()->addError(wxString::Format("%s %12.3lf > %12.3lf", msg, d1, d2));
+			APP_PROXY::parsingSynopsisTraceAddError(wxString::Format("%s %12.3lf > %12.3lf", msg, d1, d2));
 			ret = false;
 		}
 	};
 	
 	const char type = 'I';
-	THE_APP->getParsingSynopsisTrace()->addSeparator();
-	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format("Boundings:"));
-	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf", cncDistX, cncDistY));
-	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf", svgDistX, svgDistY));
-	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf", cncMinX, cncMinY));
-	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf", svgMinX, svgMinY));
-	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf", cncMaxX, cncMaxY));
-	THE_APP->getParsingSynopsisTrace()->addEntry(type, wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf", svgMaxX, svgMaxY));
+	APP_PROXY::parsingSynopsisTraceAddSeparator();
+	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format("Boundings:"));
+	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC distance x, y  [mm]: %12.3lf, %12.3lf", cncDistX, cncDistY));
+	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" SVG distance x, y  [mm]: %12.3lf, %12.3lf", svgDistX, svgDistY));
+	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC min      x, y  [mm]: %12.3lf, %12.3lf", cncMinX, cncMinY));
+	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" SVG min      x, y  [mm]: %12.3lf, %12.3lf", svgMinX, svgMinY));
+	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" CNC max      x, y  [mm]: %12.3lf, %12.3lf", cncMaxX, cncMaxY));
+	APP_PROXY::parsingSynopsisTraceAddEntry(type, wxString::Format(" SVG max      x, y  [mm]: %12.3lf, %12.3lf", svgMaxX, svgMaxY));
 
 	check_1_Less_2(cncDistX, svgDistX, " CNC distance X out of range:  ");
 	check_1_Less_2(cncDistY, svgDistY, " CNC distance Y out of range:  ");

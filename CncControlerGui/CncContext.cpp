@@ -1,4 +1,4 @@
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncContext.h"
 
 ////////////////////////////////////////////////////////////////////////
@@ -15,6 +15,7 @@ CncContext::~CncContext() {
 void CncContext::setProbeMode(bool state) { 
 ////////////////////////////////////////////////////////////////////////
 	probeMode = state;
-	if ( THE_APP )
-		THE_APP->decorateProbeMode(probeMode);
+	
+	if ( APP_PROXY::isAppPointerAvailable() == true )
+		APP_PROXY::decorateProbeMode(probeMode);
 }

@@ -1,8 +1,10 @@
 #include <iostream>
 #include <wx/dir.h>
+#include <wx/app.h>
 #include <wx/filename.h>
+#include "wxCrafterImages.h"
 #include "OSD/CncAsyncKeyboardState.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncFileView.h"
 
 enum FileListImage {
@@ -146,13 +148,13 @@ bool CncFileView::openDirectory(const wxString& dirName) {
 /////////////////////////////////////////////////////////////////
 bool CncFileView::openFile(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
-	THE_APP->openFileFromFileManager(fileName);
+	APP_PROXY::openFileFromFileManager(fileName);
 	return true;
 }
 /////////////////////////////////////////////////////////////////
 bool CncFileView::previewFile(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
-	THE_APP->openMainPreview(fileName);
+	APP_PROXY::openMainPreview(fileName);
 	return true;
 }
 /////////////////////////////////////////////////////////////////
@@ -188,16 +190,16 @@ bool CncFileView::selectFileInList(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
 void CncFileView::fileListLeave(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////
-	if ( THE_APP->GetMainViewBook()->GetSelection() != (int)MainBookSelection::PREVIEW_PANEL )
+	if ( APP_PROXY::GetMainViewBook()->GetSelection() != (int)MainBookSelection::PREVIEW_PANEL )
 		return;
 		
-	if ( THE_APP->GetKeepFileManagerPreview()->IsChecked() == true )
+	if ( APP_PROXY::GetKeepFileManagerPreview()->IsChecked() == true )
 		return;
 		
 	if ( CncAsyncKeyboardState::isControlPressed() )
 		return;
 		
-	THE_APP->selectMainBookSourcePanel();
+	APP_PROXY::selectMainBookSourcePanel((int)TemplateBookSelection::VAL::SOURCE_PANEL);
 }
 /////////////////////////////////////////////////////////////////
 void CncFileView::fileListActivated(wxListEvent& event) {
@@ -316,10 +318,10 @@ void CncFileView::selectDefault(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////
 void CncFileView::selectNewTemplate(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////
-	GBL_CONFIG->getTheApp()->newTemplate(event);
+	APP_PROXY::newTemplate();
 }
 /////////////////////////////////////////////////////////////////
 void CncFileView::selectOpenTemplate(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////
-	GBL_CONFIG->getTheApp()->openTemplate(event);
+	APP_PROXY::openTemplate();
 }

@@ -1,10 +1,10 @@
 #include <wx/clipbrd.h>
 
+#include "wxCrafterMotionMonitor.h"
 #include "GlobalFunctions.h"
 #include "CncNumberFormatter.h"
 #include "CncControl.h"
 #include "CncMotionMonitor.h"
-#include "MainFrame.h"
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncMonitorReplayPane.h"
@@ -43,15 +43,15 @@ void CncStatisticsPane::setCncControl(CncControl* c) {
 void CncStatisticsPane::setMotionMonitor(CncMotionMonitor* mm) {
 ///////////////////////////////////////////////////////////////////
 	motionMonitor	= mm;
+	
 	wxASSERT(motionMonitor != NULL);
+	wxASSERT(replayControl != NULL);
 	replayControl->setMotionMonitor(motionMonitor);
 }
 ///////////////////////////////////////////////////////////////////
 void CncStatisticsPane::updateReplayPane() {
 ///////////////////////////////////////////////////////////////////
-	if ( replayControl == NULL )
-		return;
-		
+	wxASSERT(replayControl != NULL);
 	replayControl->updateControls();
 }
 ///////////////////////////////////////////////////////////////////

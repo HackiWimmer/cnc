@@ -1,5 +1,4 @@
 #include "GlobalFunctions.h"
-#include "MainFrame.h"
 #include "BinaryFileParser.h"
 #include "GCodePathHandlerGL.h"
 #include "GCodeFileParser.h"

@@ -1,4 +1,6 @@
-#include "MainFrame.h"
+#include <wx/propgrid/manager.h>
+#include "wxCrafterImages.h"
+#include "MainFrameProxy.h"
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
 
@@ -34,9 +36,7 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	   ) 
 	{
 		GBL_CONFIG->calculateSpeedValues();
-		if ( THE_APP ) {
-			THE_APP->initSpeedConfigPlayground();
-		}
+		APP_PROXY::initSpeedConfigPlayground();
 	}
 }
 ////////////////////////////////////////////////////////////////////////

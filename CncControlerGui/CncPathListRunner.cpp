@@ -1,6 +1,6 @@
 #include <math.h>
 #include "CncCommon.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncConfig.h"
 #include "FileParser.h"
 #include "CncControl.h"
@@ -106,7 +106,8 @@ bool CncPathListRunner::publishMoveSequence() {
 		}
 		
 		// if the corresponding list isn't connected this call does nothing and returns only
-		THE_APP->getCncPreProcessor()->addMoveSequence(*currentSequence);
+		wxASSERT( APP_PROXY::getCncPreProcessor() != NULL );
+		APP_PROXY::getCncPreProcessor()->addMoveSequence(*currentSequence);
 		
 		if ( currentSequence->getCount() > 0 ) {
 
@@ -331,12 +332,14 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 	
 	// ----------------------------------------------------------
 	auto deFrost = [&](bool ret) {
-		THE_APP->getCncPreProcessor()->thaw();
+		APP_PROXY::getCncPreProcessor()->thaw();
 		return ret;
 	};
 	
+
 	// over all stored pathes
-	THE_APP->getCncPreProcessor()->freeze();
+	wxASSERT( APP_PROXY::getCncPreProcessor() != NULL );
+	APP_PROXY::getCncPreProcessor()->freeze();
 	
 	for ( auto it = plm.const_begin(); it != plm.const_end(); ++it) {
 		const CncPathListEntry& curr  = *it;
@@ -345,7 +348,7 @@ bool CncPathListRunner::onPhysicallyExecute(const CncPathListManager& plm) {
 			return deFrost(false);
 
 		// if the corresponding list isn't connected this call does nothing and returns only
-		THE_APP->getCncPreProcessor()->addPathListEntry(curr);
+		APP_PROXY::getCncPreProcessor()->addPathListEntry(curr);
 		
 		if ( checkDebugState() == false )
 			return deFrost(false);

@@ -31,20 +31,21 @@
 
 ////////////////////////////////////////////////////////////////////
 // forward declarations
-class CncSourceEditor;
-class CncOutboundEditor;
-class wxFileConfig;
-class CncFilePreviewWnd;
-class CncFilePreview;
+class MainFrameProxy;
 class wxMenu;
 class wxMenuItem;
-class SecureRun;
-class CncReferencePosition;
+class wxFileConfig;
+
 class GL3DOptionPane;
 class GL3DDrawPane;
+
+class CncSourceEditor;
+class CncOutboundEditor;
+class CncFilePreviewWnd;
+class CncFilePreview;
+class CncReferencePosition;
 class CncMonitorVSplitterWindow;
 class CncMonitorHSplitterWindow;
-class CncMonitorReplayPane;
 class CncTemplateObserver;
 class CncSecureRun;
 class CncStatisticsPane;
@@ -53,7 +54,6 @@ class CncGameportController;
 class CncSpeedMonitor;
 class CncPreprocessor;
 class CncGCodeSequenceListCtrl;
-class CncMoveSequenceOverviewListCtrl;
 class CncMotionVertexTrace;
 class CncOpenGLContextObserver;
 
@@ -569,32 +569,29 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 		
+		friend class MainFrameProxy;
 		friend class CncLoggerProxy;
-		friend class SVGFileParser;
+		friend class CncPerspective;
+
 		friend class CncBaseEditor;
 		friend class CncSourceEditor;
-		friend class CncOutboundEditor;
 		friend class CncConfig;
 		friend class CncContext;
 		friend class CncGampadDeactivator;
 		friend class CncTransactionLock;
-		friend class CncReferencePosition;
-		friend class CncGamepadControllerState;
-		friend class CncConnectProgress;
+
 		friend class UpdateManagerThread;
 		friend class GamepadThread;
-		friend class CncPerspective;
-		friend class CncFileView;
-		friend class CncTemplateObserver;
-		friend class CncSecureRun;
-		friend class CncStatisticsPane;
-		friend class CncMotionMonitor;
-		friend class CncMonitorReplayPane;
-		friend class PathHandlerBase;
-		friend class GCodeFileParser;
-		friend class CncPathListRunner;
-		friend class CncStartPositionResolver;
-		friend class CncOpenGLContextObserver;
+
+		// to remove . . .
+			friend class CncFileView;
+			friend class CncTemplateObserver;
+			friend class CncSecureRun;
+			friend class CncMotionMonitor;
+			friend class PathHandlerBase;
+			friend class GCodeFileParser;
+			friend class CncOpenGLContextObserver;
+
 		
 	private:
 		// Member variables

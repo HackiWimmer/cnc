@@ -3,13 +3,10 @@
 #include "wxCrafterImages.h"
 #include "GlobalStrings.h"
 #include "CncConfig.h"
-#include "CncUserEvents.h"
+#include "MainFrameProxy.h"
 #include "CncPathListEntryListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
-
-#include <wx/frame.h>
-extern wxFrame* THE_FRAME;
 
 // ----------------------------------------------------------------------------
 // CncPathListEntryListCtrl Event Table
@@ -196,17 +193,8 @@ void CncPathListEntryListCtrl::onSelectListItem(wxListEvent& event) {
 	long ln;
 	GetItemText(item, COL_SEARCH).ToLong(&ln);
 	
-	typedef IndividualCommandEvent::EvtMainFrame ID;
-	typedef IndividualCommandEvent::ValueName VN;
-
-	IndividualCommandEvent evt(ID::TryToSelectClientIds);
-	evt.setValue(VN::VAL1, ln);
-	evt.setValue(VN::VAL2, ln);
-	evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_PATH_LIST));
-
 	SelectEventBlocker blocker(this);
-	wxPostEvent(THE_FRAME, evt);
-
+	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_MOVE_SEQ_OVW);
 }
 /////////////////////////////////////////////////////////////
 void CncPathListEntryListCtrl::onActivateListItem(wxListEvent& event) {

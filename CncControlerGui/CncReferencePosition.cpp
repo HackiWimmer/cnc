@@ -2,7 +2,7 @@
 #include <wx/richtooltip.h>
 #include "CncReferencePosition.h"
 #include "GlobalFunctions.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncCommon.h"
 ///////////////////////////////////////////////////////////////////
 CncReferencePosition::CncReferencePosition(wxWindow* parent)
@@ -154,11 +154,11 @@ void CncReferencePosition::onNavigatorPanel(CncNavigatorPanelEvent& event) {
 		}
 		
 		if ( move == true )
-			THE_APP->manualContinuousMoveStart(x, y, z);
+			APP_PROXY::manualContinuousMoveStart(x, y, z);
 	};
 	
 	auto moveStop = [&]() {
-		THE_APP->manualContinuousMoveStop();
+		APP_PROXY::manualContinuousMoveStop();
 	};
 	
 	/*
@@ -220,7 +220,7 @@ void CncReferencePosition::mode6(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::init(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	wxPoint pos = THE_APP->GetScreenPosition();
+	wxPoint pos = APP_PROXY::GetScreenPosition();
 	pos.x += 16;
 	pos.y += 60;
 	SetPosition(pos);
@@ -242,7 +242,7 @@ void CncReferencePosition::init(wxInitDialogEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::show(wxShowEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	m_rbStepSensitivity->SetSelection(THE_APP->GetRbStepSensitivity()->GetSelection());
+	m_rbStepSensitivity->SetSelection(APP_PROXY::GetRbStepSensitivity()->GetSelection());
 	
 	if ( event.IsShown() ) 
 		m_infoTimer->Start(200);
@@ -271,10 +271,8 @@ void CncReferencePosition::set(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::selectStepSensitivity(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_APP == NULL)
-		return;
-		
-	THE_APP->GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
+	if ( APP_PROXY::isAppPointerAvailable() == true )
+		APP_PROXY::GetRbStepSensitivity()->SetSelection(m_rbStepSensitivity->GetSelection());
 }
 ///////////////////////////////////////////////////////////////////
 void CncReferencePosition::showInformation() {

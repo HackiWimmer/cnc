@@ -67,7 +67,6 @@
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
 #include "CncPreprocessor.h"
-#include "CncMonitorReplayPane.h"
 #include "CncGCodeSequenceListCtrl.h"
 #include "CncStatisticsPane.h"
 #include "CncSvgControl.h"
@@ -879,30 +878,30 @@ void MainFrame::activateSecureMode(bool state) {
 	secureMode = state;
 	
 	if ( secureMode == true ) {
-		hideAllAuiPanes(false);
+		hideAllAuiPanes(true);
+		
+		if ( IsFullScreen() == false )
+			ShowFullScreen(true);
+		
+		showAuiPane("SecureRunPanel", 	false);
+		showAuiPane("StatusBar", 		false);
 		
 		GblFunc::swapControls(m_secMonitorPlaceholder, 	motionMonitor);
 		GblFunc::swapControls(m_secLoggerPlaceholder, 	getLogger());
 		GblFunc::swapControls(m_secZViewPlaceholder, 	m_zView);
-
-		if ( IsFullScreen() == false )
-			ShowFullScreen(true);
-			
-		showAuiPane("SecureRunPanel", 	false);
-		showAuiPane("StatusBar", 		false);
 		
 		getLogger()->setShowOnDemandState(false);
 		
 	} else {
 		
-		GblFunc::swapControls(motionMonitor, 	m_secMonitorPlaceholder);
-		GblFunc::swapControls(getLogger(), 		m_secLoggerPlaceholder);
-		GblFunc::swapControls(m_zView, 			m_secZViewPlaceholder);
-		
 		if ( IsFullScreen() )
 			ShowFullScreen(false);
 		
 		perspectiveHandler.loadPerspective("Default");
+		
+		GblFunc::swapControls(motionMonitor, 	m_secMonitorPlaceholder);
+		GblFunc::swapControls(getLogger(), 		m_secLoggerPlaceholder);
+		GblFunc::swapControls(m_zView, 			m_secZViewPlaceholder);
 		
 		getLogger()->setShowOnDemandState(m_showLoggerOnDemand->GetValue());
 		
@@ -7757,37 +7756,23 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 
 	typedef IndividualCommandEvent::EvtMainFrame 	EID;
 	typedef IndividualCommandEvent::ValueName 		VN;
-	typedef ClientIdSelSource::ID 					CISSID;
 
 	switch ( ice->GetId() ) {
 
-		case EID::DispatchAll: {
-				dispatchAll();
-				break;
-		}
-		
-		case EID::DistpatchNext: {
-			dispatchNext();
-			break;
-		}
-		
-		case EID::WaitActive: {
-			if ( ice->hasValue(VN::VAL2) )	waitActive(ice->getValue<unsigned int>(VN::VAL1), ice->getValue<bool>(VN::VAL2));
-			else							waitActive(ice->getValue<unsigned int>(VN::VAL1));
-			break;
-		}
-		
-		case EID::EnableControls: {
-			enableControls(ice->getValue<bool>(VN::VAL1));
-			break;
-		}
-		
-		case EID::TryToSelectClientIds: {
-			tryToSelectClientIds(ice->getValue<long>(VN::VAL1),
-								 ice->getValue<long>(VN::VAL2),
-								 (CISSID)(ice->getValue<int>(VN::VAL3)));
-			break;
-		}
+		case EID::DispatchAll:				dispatchAll();
+											break;
+
+		case EID::DistpatchNext:			dispatchNext();
+											break;
+
+		case EID::WaitActive:				if ( ice->hasValue(VN::VAL2) )
+												waitActive(ice->getValue<unsigned int>(VN::VAL1), ice->getValue<bool>(VN::VAL2));
+											else
+												waitActive(ice->getValue<unsigned int>(VN::VAL1));
+											break;
+
+		case EID::EnableControls:			enableControls(ice->getValue<bool>(VN::VAL1));
+											break;
+
 	}
 }
-

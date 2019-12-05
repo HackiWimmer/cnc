@@ -1,7 +1,8 @@
-#include "MainFrame.h"
+#include <wx/propgrid/manager.h>
+#include "wxCrafterImages.h"
+#include "MainFrameProxy.h"
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
-
 #include "CncConfigProperty.h"
 
 extern wxPropertyGridManager* 	globlSetupGrid;
@@ -13,19 +14,16 @@ void CncConfig::pgChangedWorkingCfgPage(wxPropertyGridEvent& event) {
 	if ( p == NULL )
 		return;
 		
-	MainFrame* app = CncConfig::getGlobalCncConfig()->getTheApp();
-	wxASSERT( app != NULL );
-		
 	wxString name(p->GetName());
 	
 	if ( name == CncWork_Ctl_REPLY_THRESHOLD_METRIC ) {
 		CncConfig::getGlobalCncConfig()->calculateThresholds();
-		app->releaseControllerSetupFromConfig();
+		APP_PROXY::releaseControllerSetupFromConfig();
 		
 	} 
 	else if ( name == CncWork_Wpt_MAX_THICKNESS_CROSS ) {
 		CncConfig::getGlobalCncConfig()->initZAxisValues();
-		app->changeCrossingThickness();
+		APP_PROXY::changeCrossingThickness();
 		
 	}
 	else if ( name == CncWork_Ctl_PRE_PROSSOR_ANALYSE ) {

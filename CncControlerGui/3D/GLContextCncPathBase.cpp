@@ -417,3 +417,20 @@ void GLContextCncPathBase::drawRuler() {
 		if ( showPlane[YZ] ) { drawHelpLines(colour, ruler.helpLinesYZ.helpLinesY); drawHelpLines(colour, ruler.helpLinesYZ.helpLinesZ); }
 	}
 }
+/////////////////////////////////////////////////////////////////
+void GLContextCncPathBase::setCurrentClientId(long id) { 
+/////////////////////////////////////////////////////////////////
+	currentClientId = id; 
+	
+	if ( currentClientId < 0 )
+		return;
+
+	GLOpenGLPathBufferStore* store = cncPath.getOpenGLBufferStore();
+	const long entry = store->findFirstEntryForClientId(currentClientId);
+
+	if ( entry < 0 )
+		return;
+
+	#warning use a control flag here
+	cncPath.setVirtualEnd(entry);
+}

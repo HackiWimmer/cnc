@@ -4,13 +4,10 @@
 #include "GlobalStrings.h"
 #include "CncArduino.h"
 #include "CncCommon.h"
-#include "CncUserEvents.h"
+#include "MainFrameProxy.h"
 #include "CncPosSpyListCtrl.h"
 
 extern GlobalConstStringDatabase globalStrings;
-
-#include <wx/frame.h>
-extern wxFrame* THE_FRAME;
 
 // ----------------------------------------------------------------------------
 // CncPathListEntryListCtrl Event Table
@@ -129,16 +126,8 @@ void CncPosSpyListCtrl::onSelectListItem(wxListEvent& event) {
 	long ln;
 	getRow(item).getItem(COL_SEARCH).ToLong(&ln);
 	
-	typedef IndividualCommandEvent::EvtMainFrame ID;
-	typedef IndividualCommandEvent::ValueName VN;
-
-	IndividualCommandEvent evt(ID::TryToSelectClientIds);
-	evt.setValue(VN::VAL1, ln);
-	evt.setValue(VN::VAL2, ln);
-	evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_POS_SPY));
-
 	SelectEventBlocker blocker(this);
-	wxPostEvent(THE_FRAME, evt);
+	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_POS_SPY);
 }
 /////////////////////////////////////////////////////////////
 void CncPosSpyListCtrl::onActivateListItem(wxListEvent& event) {

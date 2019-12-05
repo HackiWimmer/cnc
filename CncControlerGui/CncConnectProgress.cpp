@@ -1,6 +1,6 @@
 #include <iostream>
 #include "wxCrafterImages.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncConnectProgress.h"
 
 /////////////////////////////////////////////////////////////////////////
@@ -28,7 +28,7 @@ void CncConnectProgress::show(wxShowEvent& event) {
 /////////////////////////////////////////////////////////////////////////
 void CncConnectProgress::startupTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////////
-	bool ret = THE_APP->connectSerialPort();
+	bool ret = APP_PROXY::connectSerialPort();
 	
 	EndModal(ret == true ? wxID_OK : wxID_CANCEL);
 }

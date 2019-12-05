@@ -1,5 +1,6 @@
 #include "CncConfig.h"
-#include "MainFrame.h"
+#include "CncControl.h"
+#include "MainFrameProxy.h"
 #include "CncStartPositionResolver.h"
 
 const CncDoublePosition CncStartPositionResolver::ReferencePosition	= CncDoublePosition(0.0, 0.0, 0.0);
@@ -20,7 +21,7 @@ CncStartPositionResolver::CncStartPositionResolver(wxWindow* parent)
 		Z->ChangeValue(wxString::Format("%+6.3lf", p.getZ()));
 	};
 	
-	const CncDoublePosition cp 	= THE_APP->getCncControl()->getCurAppPosMetric();
+	const CncDoublePosition cp 	= APP_PROXY::getCncControl()->getCurAppPosMetric();
 	const CncDoublePosition rf 	= CncStartPositionResolver::ReferencePosition;
 	distance					= rf - cp;
 	
@@ -56,9 +57,9 @@ int CncStartPositionResolver::resolve() {
 		if ( token.IsEmpty() == false ) {
 			//std::cout << token << std::endl;
 			bool ret = true;
-			if 		( token == "dx") { ret = THE_APP->getCncControl()->moveRelLinearMetricXYZ(distance.getX(), 	0.0, 				0.0				, false); }
-			else if ( token == "dy") { ret = THE_APP->getCncControl()->moveRelLinearMetricXYZ(0.0, 				distance.getY(), 	0.0				, false); }
-			else if ( token == "dz") { ret = THE_APP->getCncControl()->moveRelLinearMetricXYZ(0.0, 				0.0, 				distance.getZ()	, false); }
+			if 		( token == "dx") { ret = APP_PROXY::getCncControl()->moveRelLinearMetricXYZ(distance.getX(), 	0.0, 				0.0				, false); }
+			else if ( token == "dy") { ret = APP_PROXY::getCncControl()->moveRelLinearMetricXYZ(0.0, 				distance.getY(), 	0.0				, false); }
+			else if ( token == "dz") { ret = APP_PROXY::getCncControl()->moveRelLinearMetricXYZ(0.0, 				0.0, 				distance.getZ()	, false); }
 			else					 { ret = false; }
 			
 			if ( ret == false ) {

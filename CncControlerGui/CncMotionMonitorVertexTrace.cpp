@@ -3,7 +3,7 @@
 #include "wxCrafterImages.h"
 #include "GlobalStrings.h"
 #include "CncConfig.h"
-#include "CncUserEvents.h"
+#include "MainFrameProxy.h"
 #include "CncMotionMonitorVertexTrace.h"
 
 extern GlobalConstStringDatabase globalStrings;
@@ -191,16 +191,8 @@ void CncVertexTrace::DataListCtrl::onSelectListItem(wxListEvent& event) {
 	long ln;
 	GetItemText(item, COL_SEARCH).ToLong(&ln);
 	
-	typedef IndividualCommandEvent::EvtMainFrame ID;
-	typedef IndividualCommandEvent::ValueName VN;
-
-	IndividualCommandEvent evt(ID::TryToSelectClientIds);
-	evt.setValue(VN::VAL1, ln);
-	evt.setValue(VN::VAL2, ln);
-	evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_VERTEX_DATA_TRACE));
-
 	SelectEventBlocker blocker(this);
-	wxPostEvent(THE_FRAME, evt);
+	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_VERTEX_DATA_TRACE);
 }
 /////////////////////////////////////////////////////////////
 void CncVertexTrace::DataListCtrl::onActivateListItem(wxListEvent& event) {
@@ -376,16 +368,8 @@ void CncVertexTrace::IndexListCtrl::onSelectListItem(wxListEvent& event) {
 	long ln;
 	GetItemText(item, COL_SEARCH).ToLong(&ln);
 	
-	typedef IndividualCommandEvent::EvtMainFrame ID;
-	typedef IndividualCommandEvent::ValueName VN;
-
-	IndividualCommandEvent evt(ID::TryToSelectClientIds);
-	evt.setValue(VN::VAL1, ln);
-	evt.setValue(VN::VAL2, ln);
-	evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_VERTEX_INDEX_TRACE));
-
 	SelectEventBlocker blocker(this);
-	wxPostEvent(THE_FRAME, evt);
+	APP_PROXY::tryToSelectClientId(ln, ClientIdSelSource::ID::TSS_VERTEX_INDEX_TRACE);
 }
 /////////////////////////////////////////////////////////////
 void CncVertexTrace::IndexListCtrl::onActivateListItem(wxListEvent& event) {

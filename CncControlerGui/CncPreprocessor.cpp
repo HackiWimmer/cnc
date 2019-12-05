@@ -187,12 +187,10 @@ void CncPreprocessor::onIndividualCommand(wxCommandEvent& event) {
 //////////////////////////////////////////////////////////////////
 	IndividualCommandEvent* ice = static_cast<IndividualCommandEvent*>(&event);
 	
-	typedef IndividualCommandEvent::EvtPreprocessor EID;
-	typedef IndividualCommandEvent::ValueName 		VN;
+	typedef IndividualCommandEvent::EvtPreprocessor ID;
 
-	
 	switch ( ice->GetId() ) {
-		case EID::UpdateSelectedClientIds:	m_selectedClientIds->ChangeValue(wxString::Format("%ld", ice->getValue<long>(VN::VAL1)));
+		case ID::UpdateSelectedClientIds:	m_selectedClientIds->ChangeValue(ice->GetString());
 											break;
 	}
 }

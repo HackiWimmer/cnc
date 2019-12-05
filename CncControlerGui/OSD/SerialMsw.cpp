@@ -4,8 +4,8 @@
 #include "strsafe.h"
 #include "CncArduino.h"
 #include "CncConfig.h"
-#include "MainFrame.h"
-#include "SerialMsw.h"
+#include "MainFrameProxy.h"
+#include "SerialOSD.h"
 
 #include <windows.h>
 
@@ -143,7 +143,7 @@ bool SerialMsw::connect(const char* portName) {
 		std::cout << " .";
 		std::cout.flush();
 		//Sleep(ARDUINO_WAIT_TIME/5);
-		THE_APP->waitActive(ARDUINO_WAIT_TIME/5);
+		APP_PROXY::waitActive(ARDUINO_WAIT_TIME/5);
 		
 		std::cout.flush();
 	}
@@ -165,7 +165,7 @@ void SerialMsw::purge(void) {
 ///////////////////////////////////////////////////////////////////
 	//Flush any remaining characters in the buffers 
 	PurgeComm(this->hSerial, PURGE_RXCLEAR | PURGE_TXCLEAR);
-	THE_APP->waitActive(500);
+	APP_PROXY::waitActive(500);
 }
 ///////////////////////////////////////////////////////////////////
 int SerialMsw::readData(void *buffer, unsigned int nbChar) {

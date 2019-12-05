@@ -1,4 +1,6 @@
-#include "MainFrame.h"
+#include <wx/propgrid/manager.h>
+#include "wxCrafterImages.h"
+#include "MainFrameProxy.h"
 #include "CncConfigCommon.h"
 #include "CncConfig.h"
 
@@ -13,7 +15,7 @@ void CncConfig::pgChangedSvgCfgPage(wxPropertyGridEvent& event) {
 	
 	const wxString name(p->GetName());
 	if ( name == CncSvg_Parser_REVERSE_Y_AXIS ) 
-		THE_APP->prepareMotionMonitorViewType();
+		APP_PROXY::prepareMotionMonitorViewType();
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::setupSvgCfgPage(wxConfigBase& config) {

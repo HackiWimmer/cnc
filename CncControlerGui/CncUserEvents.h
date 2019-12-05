@@ -13,9 +13,7 @@ class IndividualCommandEvent : public wxCommandEvent {
 	public:
 		// define here individual event ids
 		enum EvtPreprocessor 	{ UpdateSelectedClientIds };
-		enum EvtMainFrame		{ TryToSelectClientIds, WaitActive, DispatchAll, DistpatchNext,
-			                      EnableControls
-		                        };
+		enum EvtMainFrame		{ WaitActive, DispatchAll, DistpatchNext, EnableControls };
 
 	public:
 

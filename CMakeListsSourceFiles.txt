@@ -65,6 +65,7 @@ set(SOURCE_FILES
 	CncControlerGui/HexDecoder.cpp
 	CncControlerGui/main.cpp
 	CncControlerGui/MainFrame.cpp
+	CncControlerGui/MainFrameProxy.cpp
 	CncControlerGui/ManuallyParser.cpp
 	CncControlerGui/ManuallyPathHandlerCnc.cpp
 	CncControlerGui/PathHandlerBase.cpp
@@ -136,6 +137,7 @@ set(SOURCE_FILES
 	CncControlerGui/CncLargeScaleListCtrl.cpp
 	CncControlerGui/CncAutoProgressDialog.cpp
 	CncControlerGui/CncExternalViewBox.cpp
+	CncControlerGui/CncUserEvents.cpp
 	
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp

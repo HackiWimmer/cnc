@@ -93,8 +93,8 @@ class GLContextCncPathBase : public GLContextBase {
 		void appendPathData(const GLOpenGLPathBuffer::CncVertex& vertex);
 		void reconstruct(const GLOpenGLPathBuffer::ReconstructOptions& opt);
 		
+		void setCurrentClientId(long id);
 		const GLI::GLCncPath& getPathData() 				{ return cncPath; }
-		void setCurrentClientId(long id) 					{ currentClientId = id; }
 		GLContextCncPathBase::DrawType getDrawType() 		{ return drawType; }
 		void setDrawType(GLContextCncPathBase::DrawType t) 	{ drawType = t; }
 		GLOpenGLPathBufferStore* getOpenGLBufferStore() 	{ return cncPath.getOpenGLBufferStore(); }

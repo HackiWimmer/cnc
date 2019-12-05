@@ -773,7 +773,7 @@ void SerialEmulatorNULL::notifyMoveSequenceEnd(const CncCommandDecoder::MoveSequ
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 ///////////////////////////////////////////////////////////////////
-	#warning do something with f
+	// a value f != 0 isn't currently provided
 	if ( f != 0 )
 		;//std::clog << "Feed speed change detected: value = " << f << std::endl;
 	

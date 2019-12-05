@@ -1,6 +1,7 @@
+#include "wxCrafterMotionMonitor.h"
 #include "CncMotionMonitor.h"
 #include "CncConfig.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncMonitorReplayPane.h"
 
 bool CncMonitorReplayPane::Processing::running = false;
@@ -10,11 +11,10 @@ CncMonitorReplayPane::Decorate::Decorate(CncMonitorReplayPane* p)
 : pane(p)
 ///////////////////////////////////////////////////////////////////
 {
-	THE_APP->enableControls(false);
-	
-	THE_APP->GetBtnEmergenyStop()->Enable(false);
-	THE_APP->GetRcPause()->Enable(false);
-	THE_APP->GetRcStop()->Enable(false);
+	APP_PROXY::enableControls(false);
+	APP_PROXY::enableBtnEmergenyStop(false);
+	APP_PROXY::enableBtnRcPause(false);
+	APP_PROXY::enableBtnRcStop(false);
 }
 ///////////////////////////////////////////////////////////////////
 CncMonitorReplayPane::Decorate::~Decorate() {
@@ -27,8 +27,8 @@ CncMonitorReplayPane::Decorate::~Decorate() {
 	pane->GetReplayPlayCurrentId()->Enable(pane->GetCbStepUnit()->GetSelection() != Unit_Id);
 	pane->GetReplayPause()->Enable(true);
 	pane->GetReplayStop()->Enable(true);
-	
-	THE_APP->enableControls(true);
+
+	APP_PROXY::enableControls(true);
 }
 
 
@@ -61,7 +61,7 @@ void CncMonitorReplayPane::updateControls() {
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::notifyCncPathChanged() {
 ///////////////////////////////////////////////////////////////////
-	if ( THE_APP->isProcessing() == true )
+	if ( APP_PROXY::isProcessing() == true )
 		return;
 	
 	updateControls();
@@ -80,7 +80,7 @@ void CncMonitorReplayPane::display() {
 	if ( motionMonitor == NULL )
 		return;
 		
-	THE_APP->tryToSelectClientId(motionMonitor->getVirtualEndAsId(), ClientIdSelSource::ID::TSS_REPLAY);
+	APP_PROXY::tryToSelectClientId(motionMonitor->getVirtualEndAsId(), ClientIdSelSource::ID::TSS_REPLAY);
 }
 ///////////////////////////////////////////////////////////////////
 void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
@@ -115,7 +115,7 @@ void CncMonitorReplayPane::replayPlay(bool stopByIdChange) {
 		
 		display();
 			
-		THE_APP->dispatchAll();
+		APP_PROXY::dispatchAll();
 		
 		if ( stopByIdChange == true )
 			if ( id != motionMonitor->previewNextVertexId() )
@@ -183,7 +183,7 @@ void CncMonitorReplayPane::replayLeftDownPrev(wxMouseEvent& event) {
 		else if ( count < 2 ) { count++;	wxThread::This()->Sleep(150); }
 		else if ( count < 3 ) { count++;	wxThread::This()->Sleep( 50); }
 		
-		THE_APP->dispatchAll();
+		APP_PROXY::dispatchAll();
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ void CncMonitorReplayPane::replayLeftDownNext(wxMouseEvent& event) {
 		else if ( count < 2 ) { count++;	wxThread::This()->Sleep(150); }
 		else if ( count < 3 ) { count++;	wxThread::This()->Sleep( 50); }
 		
-		THE_APP->dispatchAll();
+		APP_PROXY::dispatchAll();
 	}
 }
 ///////////////////////////////////////////////////////////////////

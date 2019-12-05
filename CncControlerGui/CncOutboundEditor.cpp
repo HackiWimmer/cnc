@@ -1,4 +1,4 @@
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncOutboundEditor.h"
 
 ///////////////////////////////////////////////////////////////////
@@ -38,7 +38,7 @@ void CncOutboundEditor::initialize() {
 	
 	svgPopupMenu				= NULL;
 	
-	ctlEditMode					= THE_APP->GetOutboundEditMode();
-	ctlColunmPostion			= THE_APP->GetOutboundPosition();
-	ctlStatus					= THE_APP->GetOutboundEditStatus();
+	ctlEditMode					= APP_PROXY::GetOutboundEditMode();
+	ctlColunmPostion			= APP_PROXY::GetOutboundPosition();
+	ctlStatus					= APP_PROXY::GetOutboundEditStatus();
 }

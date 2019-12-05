@@ -10,7 +10,7 @@
 #include "SvgEditPopup.h"
 #include "GCodeCommands.h"
 #include "CncConfig.h"
-#include "CncUserEvents.h"
+#include "MainFrameProxy.h"
 #include "CncBaseEditor.h"
 
 #include <wx/frame.h>
@@ -248,17 +248,8 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 
 		auto tryToSelectClientId = [&](long cid) {
 
-			typedef IndividualCommandEvent::EvtMainFrame ID;
-			typedef IndividualCommandEvent::ValueName VN;
-
-			IndividualCommandEvent evt(ID::TryToSelectClientIds);
-			evt.setValue(VN::VAL1, cid);
-			evt.setValue(VN::VAL2, cid);
-			evt.setValue(VN::VAL3, (int)(ClientIdSelSource::ID::TSS_EDITOR));
-
 			SelectEventBlocker blocker(this);
-			wxPostEvent(THE_FRAME, evt);
-
+			APP_PROXY::tryToSelectClientId(cid, ClientIdSelSource::ID::TSS_EDITOR);
 		};
 
 
@@ -267,7 +258,6 @@ void CncBaseEditor::onUpdateFilePosition(bool publishSelection) {
 			const long prevPos = GetCurrentPos();	// Store position
 			const long sp = SearchPrev(0, "<");		// find start
 
-			SelectEventBlocker b(this);
 			if ( sp != wxNOT_FOUND )	tryToSelectClientId(LineFromPosition(sp) + 1);
 			else						tryToSelectClientId(                   y + 1);
 			

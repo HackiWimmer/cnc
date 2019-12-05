@@ -5,7 +5,7 @@
 #include <iostream>
 #include <chrono>
 #include "CncConfig.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncTimeFunctions.h"
 
 #ifdef __WXMSW__
@@ -252,7 +252,7 @@ void CncTimeFunctions::activeWaitMircoseconds(int64_t micros, bool active) {
 		int64_t x = (micros - threshold) / 1000;
 		micros    = threshold + (micros - threshold) % 1000;
 		
-		if ( active == true ) 	GBL_CONFIG->getTheApp()->waitActive(x);
+		if ( active == true ) 	APP_PROXY::waitActive(x);
 		else					sleepMircoseconds(x * 1000);
 	}
 		
