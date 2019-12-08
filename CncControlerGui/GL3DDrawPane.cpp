@@ -1,3 +1,4 @@
+#include <wx/dcclient.h>
 #include "CncMotionMonitor.h"
 #include "GL3DDrawPane.h"
 

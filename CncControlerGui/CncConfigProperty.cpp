@@ -1,5 +1,6 @@
 #include <iostream>
 #include <wx/window.h>
+#include <wx/dcclient.h>
 #include <wx/event.h>
 #include <wx/textentry.h>
 #include <wx/valnum.h>

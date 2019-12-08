@@ -3,11 +3,14 @@
 
 #include "wxCrafterBaseDialogs.h"
 
+class CncContextListCtrl;
 class CncOSEnvironmentDialog : public CncOSEnvironmentDialogBase {
 	
 	public:
 		CncOSEnvironmentDialog(wxWindow* parent);
 		virtual ~CncOSEnvironmentDialog();
+		
+		CncContextListCtrl* contextControl;
 		
 		const unsigned int PAGE_ENVIRONMENT = 0;
 		const unsigned int PAGE_MODULES 	= 1;
@@ -24,7 +27,8 @@ class CncOSEnvironmentDialog : public CncOSEnvironmentDialogBase {
 		const unsigned int VER_COL_VALUE 	= 1;
 		
 	protected:
-    virtual void sortModules(wxCommandEvent& event);
+	
+		virtual void sortModules(wxCommandEvent& event);
 		virtual void selectModulesItem(wxListEvent& event);
 		virtual void selectOSEnvironmentItem(wxListEvent& event);
 		virtual void selectAppEnvironmentItem(wxListEvent& event);

@@ -42,8 +42,8 @@ GLContextBase::GLContextBase(wxGLCanvas* canvas, const wxString& name)
 /////////////////////////////////////////////////////////////////
 	// With respect to the GTK implementation SetCurrent() isn't 
 	// possible valid before the canvas was already shown in screen
-	if ( canvas != NULL )
-		;//SetCurrent(*canvas);
+	//if ( canvas != NULL )
+		//SetCurrent(*canvas);
 	
 	// ensure the view mode and the model rotation is in line,
 	// for this the view mode here has to be different to the

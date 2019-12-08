@@ -10,6 +10,7 @@
 #include <wx/checkbox.h>
 #include <wx/bmpbuttn.h>
 #include <wx/simplebook.h>
+#include <wx/menuitem.h>
 #include "CncCommon.h"
 
 // ----------------------------------------------------------------
@@ -89,6 +90,8 @@ class MainFrameProxy {
 		
 		static wxSimplebook* 			GetMainViewBook();
 		static wxCheckBox* 				GetKeepFileManagerPreview();
+		
+		static wxMenuItem* 				GetMiOpenGLContextObserver();
 
 		static CncControl* 				getCncControl();
 		static CncPreprocessor* 		getCncPreProcessor();

@@ -49,6 +49,12 @@ class CncOSEnvironmentDialogBase : public wxDialog
 {
 protected:
     wxListbook* m_listbook;
+    wxPanel* m_panelContext;
+    wxListCtrl* m_cncContextListPlaceholder;
+    wxStaticText* m_staticText72944;
+    wxTextCtrl* m_cncContextPara;
+    wxStaticText* m_staticText72966;
+    wxTextCtrl* m_cncContextValue;
     wxPanel* m_panelOSEnvironment;
     wxListCtrl* m_osEnvironmentList;
     wxStaticText* m_staticText7294;
@@ -87,6 +93,12 @@ protected:
     virtual void onClose(wxCommandEvent& event) { event.Skip(); }
 
 public:
+    wxListCtrl* GetCncContextListPlaceholder() { return m_cncContextListPlaceholder; }
+    wxStaticText* GetStaticText72944() { return m_staticText72944; }
+    wxTextCtrl* GetCncContextPara() { return m_cncContextPara; }
+    wxStaticText* GetStaticText72966() { return m_staticText72966; }
+    wxTextCtrl* GetCncContextValue() { return m_cncContextValue; }
+    wxPanel* GetPanelContext() { return m_panelContext; }
     wxListCtrl* GetOsEnvironmentList() { return m_osEnvironmentList; }
     wxStaticText* GetStaticText7294() { return m_staticText7294; }
     wxTextCtrl* GetOsEnvParam() { return m_osEnvParam; }
@@ -116,7 +128,7 @@ public:
     wxListbook* GetListbook() { return m_listbook; }
     wxStaticLine* GetStaticLine7334() { return m_staticLine7334; }
     wxButton* GetBtClose() { return m_btClose; }
-    CncOSEnvironmentDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Application Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,600), long style = wxDEFAULT_DIALOG_STYLE|wxRESIZE_BORDER);
+    CncOSEnvironmentDialogBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("Cnc Application Environment"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,600), long style = wxDEFAULT_DIALOG_STYLE|wxSTAY_ON_TOP|wxRESIZE_BORDER);
     virtual ~CncOSEnvironmentDialogBase();
 };
 

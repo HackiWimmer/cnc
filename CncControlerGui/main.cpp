@@ -14,6 +14,7 @@
 #include "OSD/CncTimeFunctions.h"
 #include "GlobalStrings.h"
 #include "GlobalFunctions.h"
+#include "CncContext.h"
 #include "CncCommon.h"
 #include "MainFrame.h"
 
@@ -258,6 +259,8 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual ~MainApp() {
 		///////////////////////////////////////////////////////////
+			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
+				
 			if ( globalFileConfig != NULL )
 				;//delete globalFileConfig;
 		}
@@ -282,8 +285,9 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////////////
 		bool getSplashImage(wxBitmap& bmp) {
 		///////////////////////////////////////////////////////////////////
-			//return false;
-			
+			if ( globalFileConfig == NULL )
+				return false;
+				
 			wxFileName fn("splash.bmp");
 			if ( fn.Exists() ) {
 				if ( bmp.LoadFile(wxT("splash.bmp"), wxBITMAP_TYPE_BMP) )
@@ -371,6 +375,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual int OnRun() {
 		///////////////////////////////////////////////////////////
+			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 			return wxApp::OnRun();
 		}
 		
@@ -391,10 +396,12 @@ class MainApp : public wxApp {
 			// command line handling
 			if ( initializeCmdLine() == false )
 				return false;
-
+			
 			// splash screen handling
-			if( getCmdLineParameter("g") == false )
-				displaySplashImage(mainFrame);
+			if( getCmdLineParameter("g") == false ) {
+				if ( GBL_CONFIG && GBL_CONFIG->getSplashScreenFlag() == true )
+					displaySplashImage(mainFrame);
+			}
 			
 			// redirect std streams
 			wxLog::SetActiveTarget(new MainLogger());
@@ -403,10 +410,13 @@ class MainApp : public wxApp {
 			// last but not least call initialize
 			mainFrame->initialize();
 			
+			// setup some context information
 			if ( getCmdLineParameter("s") == true )	{
-				#warning open in secure mode
+				GBL_CONTEXT->secureModeInfo.isActive 				= true;
+				GBL_CONTEXT->secureModeInfo.isActivatedByStartup 	= true;
 			}
-				
+			
+			// start the main frame
 			SetTopWindow(mainFrame);
 			return GetTopWindow()->Show();
 		}
@@ -434,6 +444,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual int OnExit() {
 		///////////////////////////////////////////////////////////
+			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 			return wxApp::OnExit();
 		}
 		
@@ -441,6 +452,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual bool OnExceptionInMainLoop() {
 		///////////////////////////////////////////////////////////
+			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 			//return wxApp::OnExceptionInMainLoop();
 			//throw;
 			return true;

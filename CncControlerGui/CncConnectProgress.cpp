@@ -29,7 +29,6 @@ void CncConnectProgress::show(wxShowEvent& event) {
 void CncConnectProgress::startupTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////////
 	bool ret = APP_PROXY::connectSerialPort();
-	
 	EndModal(ret == true ? wxID_OK : wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////

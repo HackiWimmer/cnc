@@ -3,13 +3,20 @@
 #include "CncConfig.h"
 #include "CncContext.h"
 #include "CncFileNameService.h"
+#include "CncContextListCtrl.h"
+#include "GlobalFunctions.h"
 #include "CncOSEnvironmentDialog.h"
 
 //////////////////////////////////////////////////////////////////////////////
 CncOSEnvironmentDialog::CncOSEnvironmentDialog(wxWindow* parent)
 : CncOSEnvironmentDialogBase(parent)
+, contextControl(NULL)
 //////////////////////////////////////////////////////////////////////////////
 {
+	contextControl = new CncContextListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL | wxLC_SORT_ASCENDING);
+	contextControl->setControls(m_cncContextPara, m_cncContextValue);
+	GblFunc::replaceControl(m_cncContextListPlaceholder, contextControl);
+	
 	evaluateOSEnvrionemnt();
 	evaluateAppEnvrionemnt();
 	evaluateLoadedModules();
@@ -22,6 +29,8 @@ CncOSEnvironmentDialog::~CncOSEnvironmentDialog() {
 //////////////////////////////////////////////////////////////////////////////
 	m_osEnvironmentList->DeleteAllItems();
 	m_moduleList->DeleteAllItems();
+	
+	wxDELETE( contextControl );
 }
 //////////////////////////////////////////////////////////////////////////////
 void CncOSEnvironmentDialog::evaluateVersionInfo() {

@@ -1,5 +1,6 @@
+#include "wxCrafterImages.h"
 #include "GlobalFunctions.h"
-#include "MainFrame.h"
+#include "MainFrameProxy.h"
 #include "CncOpenGLContextObserver.h"
 
 //////////////////////////////////////////////////////////////////
@@ -26,23 +27,25 @@ CncOpenGLContextObserver::CncOpenGLContextObserver(wxWindow* parent)
 //////////////////////////////////////////////////////////////////
 CncOpenGLContextObserver::~CncOpenGLContextObserver() {
 //////////////////////////////////////////////////////////////////
-	delete currentCtxList;
-	delete registeredCtxList;
-	delete historyList;
-	
 	historyStage.clear();
+	m_startupTimer->Stop();
+    m_continuousTimer->Stop();
+
+	wxDELETE( currentCtxList );
+	wxDELETE( registeredCtxList );
+	wxDELETE( historyList );
 }
 //////////////////////////////////////////////////////////////////
 void CncOpenGLContextObserver::onCloseWindow(wxCloseEvent& event) {
 //////////////////////////////////////////////////////////////////
-	THE_APP->m_miOpenGLContextObserver->Check(false);
+	APP_PROXY::GetMiOpenGLContextObserver()->Check(false);
 	Show(false);
 }
 //////////////////////////////////////////////////////////////////
 void CncOpenGLContextObserver::onStartupTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////////////////////
 	// fixing layout problems
-	Update();
+	//Update();
 }
 //////////////////////////////////////////////////////////////////
 void CncOpenGLContextObserver::onContinuousTimer(wxTimerEvent& event) {

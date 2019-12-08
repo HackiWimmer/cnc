@@ -1,3 +1,4 @@
+#include "CncContext.h"
 #include "CncConfig.h"
 #include "3D/CncGLCanvas.h"
 
@@ -7,6 +8,7 @@ CncGlCanvas::CncGlCanvas(wxWindow *parent, int *attribList)
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
 , context(NULL)
 , lastReshape()
+, isShown(false)
 , lastSetCurrent(false)
 , mouseMoveMode(false)
 {
@@ -14,6 +16,36 @@ CncGlCanvas::CncGlCanvas(wxWindow *parent, int *attribList)
 //////////////////////////////////////////////////
 CncGlCanvas::~CncGlCanvas() {
 //////////////////////////////////////////////////
+}
+//////////////////////////////////////////////////
+bool CncGlCanvas::activateContext(GLContextBase* context, bool verbose) {
+//////////////////////////////////////////////////
+	return activateContext(context, *this, verbose);
+}
+//////////////////////////////////////////////////
+bool CncGlCanvas::activateContext(GLContextBase* context, const wxGLCanvas &win, bool verbose) {
+//////////////////////////////////////////////////
+	lastSetCurrent = false;
+
+	if ( context == NULL ) {
+		wxASSERT ( context != NULL );
+		return lastSetCurrent;
+	} 
+	
+	if ( GBL_CONTEXT->isWinOS() == true ) {
+		lastSetCurrent = context->SetCurrent(win);
+		return lastSetCurrent;
+	} 
+	
+	if ( isShown ) {
+		lastSetCurrent = context->SetCurrent(win);
+		return lastSetCurrent;
+	}
+
+	if ( verbose == true && GL_ERROR_TRACE_LEVEL > 0 ) 
+		GL_CTX_OBS->appendMessage('W', CNC_LOG_FUNCT, "isShow isn't true");
+		
+	return lastSetCurrent;
 }
 //////////////////////////////////////////////////
 void CncGlCanvas::view(GLContextBase::ViewMode fm) {

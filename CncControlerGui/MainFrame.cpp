@@ -55,7 +55,6 @@
 #include "UpdateManagerThread.h"
 #include "GamepadThread.h"
 #include "CncConfigProperty.h"
-#include "CncSecureRun.h"
 #include "CncReferencePosition.h"
 #include "CncSpeedMonitor.h"
 #include "CncUsbConnectionDetected.h"
@@ -74,6 +73,7 @@
 #include "CncOSEnvironmentDialog.h"
 #include "CncContext.h"
 #include "CncLastProcessingTimestampSummary.h"
+#include "CncFileDialog.h"
 #include "CncUserEvents.h"
 #include "GlobalStrings.h"
 #include "MainFrame.h"
@@ -106,7 +106,7 @@ unsigned int CncTransactionLock::referenceCounter   = 0;
 ////////////////////////////////////////////////////////////////////
 // app defined event table
 	wxBEGIN_EVENT_TABLE(MainFrame, MainFrameBClass)
-		EVT_CLOSE(MainFrame::onClose)
+		EVT_CLOSE(													MainFrame::onClose)
 		EVT_COMMAND(wxID_ANY, wxEVT_INDIVIDUAL_CTRL_COMMAND, 		MainFrame::onIndividualCommand)
 		EVT_COMMAND(wxID_ANY, wxEVT_CONFIG_UPDATE_NOTIFICATION, 	MainFrame::configurationUpdated)
 		EVT_TIMER(wxEVT_PERSPECTIVE_TIMER, 							MainFrame::onPerspectiveTimer)
@@ -154,17 +154,30 @@ MainFrameBase::MainFrameBase(wxWindow* parent)
 	GblFunc::replaceControl(m_startupTracePlaceholder, 			startupTrace);
 	GblFunc::replaceControl(m_tmpTraceInfoPlaceholder, 			tmpTraceInfo);
 	GblFunc::replaceControl(m_controllerMsgHistoryPlaceholder, 	controllerMsgHistory);
+	
+	tmpTraceInfo->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBase::traceTextUpdated), NULL, this);
 }
 ///////////////////////////////////////////////////////////////////
 MainFrameBase::~MainFrameBase() {
 ///////////////////////////////////////////////////////////////////
+	GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
+	THE_FRAME = NULL;
+	
 	// beautifying only
 	logger->GetParent()->SetBackgroundColour(*wxBLACK);
 
+	tmpTraceInfo->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBase::traceTextUpdated), NULL, this);
+
+	// clear
 	delete logger;
+	GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 	delete startupTrace;
+	GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 	delete tmpTraceInfo;
+	GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 	delete controllerMsgHistory;
+
+	GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 }
 
 ///////////////////////////////////////////////////////////////////
@@ -176,8 +189,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , isDebugMode(false)
 , isZeroReferenceValid(false)
 , canClose(true)
-, secureMode(false)
-, useSecureRunDlg(true)
 , evaluatePositions(true)
 , ignoreDirControlEvents(false)
 , runConfirmationInfo(RunConfirmationInfo::Wait)
@@ -211,6 +222,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , templateObserver(NULL)
 , spyDetailWindow(NULL)
 , openGLContextObserver(new CncOpenGLContextObserver(this))
+, cncOsEnvDialog(new CncOSEnvironmentDialog(this))
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -226,7 +238,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , debugUserNotificationTimer(this, wxEVT_DEBUG_USER_NOTIFICATION_TIMER)
 , guiControls()
 , menuItems()
-, secureRunDlg(new CncSecureRun(this))
 , refPositionDlg(new CncReferencePosition(this))
 {
 ///////////////////////////////////////////////////////////////////
@@ -316,10 +327,13 @@ MainFrame::~MainFrame() {
 	
 	wxASSERT(config);
 	config->Flush();
-	delete config;
+	//delete config;
 	
-	wxASSERT(secureRunDlg);
-	delete secureRunDlg;
+	wxASSERT(openGLContextObserver);
+	delete openGLContextObserver;
+	
+	wxASSERT(cncOsEnvDialog);
+	delete cncOsEnvDialog;
 	
 	wxASSERT(outboundNbInfo);
 	delete outboundNbInfo;
@@ -330,25 +344,24 @@ MainFrame::~MainFrame() {
 	if ( cnc != NULL )
 		delete cnc;
 	
-	// debug helper
-	//wxMessageBox("MainFrame::~MainFrame() Final break . . .");
-	
+	std::clog << CNC_LOG_FUNCT << std::endl;
+
 	DeletePendingEvents();
 	GBL_CONFIG->destroyTheApp();
 	
 	GlobalStreamRedirectionReset();
+	
+	// debug helper
+	//wxMessageBox(CNC_LOG_FUNCT);
+	
+	// log exit dtor
+	GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::globalKeyDownHook(wxKeyEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( refPositionDlg && refPositionDlg->IsShownOnScreen() ) {
 		wxPostEvent(refPositionDlg, event);
-		event.Skip(false);
-		return;
-	}
-	
-	if ( secureRunDlg && secureRunDlg->IsShownOnScreen() ) {
-		wxPostEvent(secureRunDlg, event);
 		event.Skip(false);
 		return;
 	}
@@ -684,6 +697,8 @@ void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::registerGuiControls() {
 ///////////////////////////////////////////////////////////////////
+	registerGuiControl(m_btCloseSecurePanel);
+	
 	registerGuiControl(navigatorPanel);
 	registerGuiControl(sourceEditor);
 	registerGuiControl(outboundEditor);
@@ -717,6 +732,9 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testToggleTool);
 	registerGuiControl(m_testToggleEndSwitch);
 	registerGuiControl(m_portSelector);
+	registerGuiControl(m_portSelectorSec);
+	registerGuiControl(m_connect);
+	registerGuiControl(m_connectSec);
 	registerGuiControl(m_testDimModeX);
 	registerGuiControl(m_testDimModeY);
 	registerGuiControl(m_testDimModeZ);
@@ -724,7 +742,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_testDimTakeY);
 	registerGuiControl(m_testDimTakeZ);
 	registerGuiControl(m_testDimTakeAll);
-	registerGuiControl(m_connect);
 	registerGuiControl(m_refPosition);
 	registerGuiControl(m_zToTop);
 	registerGuiControl(m_zToBottom);
@@ -859,6 +876,7 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
+		Close();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
@@ -870,14 +888,29 @@ void MainFrame::testFunction4(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	if ( GBL_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
+		
+		Close();
+		return;
+	}
+	
 	activateSecureMode(false);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::activateSecureMode(bool state) {
 ///////////////////////////////////////////////////////////////////
-	secureMode = state;
+	// log the state
+	GBL_CONTEXT->secureModeInfo.isActive = state;
 	
-	if ( secureMode == true ) {
+	// some control handling
+	const bool useIt   = GBL_CONTEXT->secureModeInfo.useIt;
+	m_secureSplitterMain->SetSashInvisible(useIt),
+	m_loadTemplateSec->Enable(!useIt);
+	getLogger()->setShowOnDemandState(!useIt);
+	
+	// switch the state
+	if ( GBL_CONTEXT->secureModeInfo.isActive == true ) {
+		perspectiveHandler.logCurrentPerspective();
 		hideAllAuiPanes(true);
 		
 		if ( IsFullScreen() == false )
@@ -894,20 +927,29 @@ void MainFrame::activateSecureMode(bool state) {
 		
 	} else {
 		
-		if ( IsFullScreen() )
+		if ( IsFullScreen() == true )
 			ShowFullScreen(false);
 		
-		perspectiveHandler.loadPerspective("Default");
+		perspectiveHandler.restoreLoggedPerspective();
 		
-		GblFunc::swapControls(motionMonitor, 	m_secMonitorPlaceholder);
-		GblFunc::swapControls(getLogger(), 		m_secLoggerPlaceholder);
-		GblFunc::swapControls(m_zView, 			m_secZViewPlaceholder);
+		GblFunc::swapControls(motionMonitor, 		m_secMonitorPlaceholder);
+		GblFunc::swapControls(getLogger(), 			m_secLoggerPlaceholder);
+		GblFunc::swapControls(m_zView, 				m_secZViewPlaceholder);
 		
 		getLogger()->setShowOnDemandState(m_showLoggerOnDemand->GetValue());
-		
 	}
 	
 	GetAuimgrMain()->Update();
+	
+	if (  GBL_CONTEXT->secureModeInfo.isActive == true ) {
+		if ( GBL_CONTEXT->secureModeInfo.isActivatedByStartup == true ) {
+			wxFileName fn(getCurrentTemplateFileName());
+			if ( fn.Exists() == false ) {
+				wxCommandEvent dummy;
+				openTemplate(dummy);
+			}
+		}
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceGccVersion(std::ostream& out) {
@@ -936,6 +978,12 @@ void MainFrame::traceWxWidgetsVersion(std::ostream& out) {
 		out << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::traceWxSvgVersion(std::ostream& out) {
+///////////////////////////////////////////////////////////////////
+	// It isn't better available currently
+	out << "1.5.21";
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::traceBoostVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 	out << BOOST_VERSION / 100000
@@ -953,9 +1001,17 @@ void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	// Setup AUI Windows menue
-	perspectiveHandler.loadPerspective("Default");
-	decorateViewMenu();
+	if ( GBL_CONTEXT->secureModeInfo.isActivatedByStartup == false ) {
+		// Setup AUI Windows menue
+		perspectiveHandler.loadPerspective("Default");
+		decorateViewMenu();
+		
+	} else {
+		// Setup secure mode
+		activateSecureMode(true);
+		
+	}
+	
 	
 	{
 		CncNanoTimestamp ts1 = 0;
@@ -1014,6 +1070,7 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		std::stringstream ss;
 		ss.str(""); traceGccVersion(ss); 			GBL_CONTEXT->versionInfoMap["gcc"] 			= ss.str().c_str();
 		ss.str(""); traceWxWidgetsVersion(ss); 		GBL_CONTEXT->versionInfoMap["wxWidgets"] 	= ss.str().c_str();
+		ss.str(""); traceWxSvgVersion(ss); 			GBL_CONTEXT->versionInfoMap["wxSVG"] 		= ss.str().c_str();
 		ss.str(""); traceBoostVersion(ss); 			GBL_CONTEXT->versionInfoMap["boost"] 		= ss.str().c_str();
 		ss.str(""); traceWoodworkingCncVersion(ss); GBL_CONTEXT->versionInfoMap["program"] 		= ss.str().c_str();
 		
@@ -1034,8 +1091,11 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	if ( GBL_CONFIG->getAutoConnectFlag() )
 		connectSerialPortDialog();
 
+	if ( GBL_CONTEXT->secureModeInfo.isActivatedByStartup == true ) 
+		return;
+	
 	openInitialTemplateFile();
-
+	
 	// Auto process ?
 	if ( GBL_CONFIG->getAutoProcessFlag() ) {
 		defineMinMonitoring();
@@ -1278,7 +1338,7 @@ void MainFrame::onThreadDispatchAll(wxThreadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onThreadCompletion(UpdateManagerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	std::clog << "OnThreadCompletion" << std::endl;
+	std::clog << CNC_LOG_FUNCT << std::endl;
 	updateManagerThread = NULL;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1307,7 +1367,7 @@ void MainFrame::onGamepdThreadInitialized(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onGamepdThreadCompletion(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	//std::cout << "MainFrame::onGamepdThreadCompletion" << std::endl;
+	std::clog << CNC_LOG_FUNCT << std::endl;
 	gamepadThread = NULL;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1370,8 +1430,9 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		while ( true ) {
 			{ // was the ~UpdateManagerThreadThread() function executed?
 				wxCriticalSectionLocker enter(pUpdateManagerThreadCS);
-				if ( !updateManagerThread ) 
+				if ( !updateManagerThread ) {
 					break;
+				}
 			}
 			// wait for thread completion
 			wxThread::This()->Sleep(10);
@@ -1529,6 +1590,7 @@ WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lPa
 					dlg->setPortName(portName);
 					if ( dlg->ShowModal() == wxID_YES ) {
 						m_portSelector->SetStringSelection(portName);
+						m_portSelectorSec->SetStringSelection(portName);
 						connectSerialPortDialog();
 					}
 				}
@@ -1583,24 +1645,32 @@ void MainFrame::searchAvailiablePorts(wxCommandEvent& event) {
 void MainFrame::decoratePortSelector(bool list) {
 ///////////////////////////////////////////////////////////////////
 	startAnimationControl();
-	m_portSelector->Clear();
+	m_portSelector   ->Clear();
+	m_portSelectorSec->Clear();
+	m_portSelectorSec->SetClientSize(200, -1);
+	
+	//------------------------------------------------------------
+	auto appendItem = [&](const wxString& item, const wxBitmap& bitmap = wxNullBitmap) {
+		m_portSelector->Append   (item,  bitmap);
+		m_portSelectorSec->Append(item,  bitmap);
+	};
 	
 	// add default ports
-	if ( lastPortName == _portEmulatorNULL )	m_portSelector->Append(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorNULL )	appendItem(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorTEXT )	m_portSelector->Append(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorTEXT )	appendItem(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorSVG )		m_portSelector->Append(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorSVG )		appendItem(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorGCODE )	m_portSelector->Append(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorGCODE )	appendItem(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorBIN )		m_portSelector->Append(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										m_portSelector->Append(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
-	
+	if ( lastPortName == _portEmulatorBIN )		appendItem(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	 
 	// add com ports
 	int pStart = list == true ?  1 :  0;
 	int pEnd   = list == true ? 11 : 32;//256;
@@ -1610,18 +1680,18 @@ void MainFrame::decoratePortSelector(bool list) {
 		wxString pn(wxString::Format("COM%d", i));
 		
 		switch ( ret ) {
-			case 0:		if ( cnc && cnc->isConnected() && lastPortName == pn )
-							m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-						else
-							m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_ACCESS_DENIED"));
+			case 0:		if ( cnc && cnc->isConnected() && lastPortName == pn ) 
+							appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+						else 
+							appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_ACCESS_DENIED"));
 							
 						break;
-			case 1:
-						m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+						
+			case 1:		appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 						break;
 						
-			default: 	if ( list == true )
-							m_portSelector->Append(pn, ImageLibPortSelector().Bitmap("BMP_PS_UNKNOWN"));
+			default: 	if ( list == true ) 
+							appendItem(pn, ImageLibPortSelector().Bitmap("BMP_PS_UNKNOWN"));
 		}
 	}
 	
@@ -1629,6 +1699,9 @@ void MainFrame::decoratePortSelector(bool list) {
 	if ( m_portSelector->FindString(lastPortName) != wxNOT_FOUND )
 		m_portSelector->SetStringSelection(lastPortName);
 		
+	if ( m_portSelectorSec->FindString(lastPortName) != wxNOT_FOUND )
+		m_portSelectorSec->SetStringSelection(lastPortName);
+
 	stopAnimationControl();
 }
 
@@ -1791,7 +1864,8 @@ bool MainFrame::initializeCncControl() {
 		
 		// initialize com port
 		GBL_CONFIG->getDefaultPort(value);
-		m_portSelector->SetStringSelection(value);
+		m_portSelector   ->SetStringSelection(value);
+		m_portSelectorSec->SetStringSelection(value); //???
 		defaultPortName.assign(value);
 		
 		// initialize update interval
@@ -2002,7 +2076,15 @@ void MainFrame::selectPort(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( lastPortName != m_portSelector->GetStringSelection() ) {
 		connectSerialPortDialog();
+		
+		m_portSelectorSec->SetStringSelection(m_portSelector->GetStringSelection());
 	}
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::selectPortSec(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	m_portSelector->SetStringSelection(m_portSelectorSec->GetStringSelection());
+	selectPort(event);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::connectSerialPortDialog() {
@@ -2344,6 +2426,11 @@ void MainFrame::connect(wxCommandEvent& event) {
 	connectSerialPortDialog();
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::connectSec(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	connectSerialPortDialog();
+}
+///////////////////////////////////////////////////////////////////
 void MainFrame::clearLogger(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	getLogger()->Clear();
@@ -2366,7 +2453,6 @@ void MainFrame::selectUnit(wxCommandEvent& event) {
 int MainFrame::showReferencePositionDlg(wxString msg) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(refPositionDlg);
-	secureRunDlg->enableControls(false);
 	
 	refPositionDlg->setMessage(msg);
 	refPositionDlg->setMeasurePlateThickness(GBL_CONFIG->getMeasurePlateThickness());
@@ -2395,7 +2481,6 @@ int MainFrame::showReferencePositionDlg(wxString msg) {
 	}
 	
 	//selectMonitorBookCncPanel();
-	secureRunDlg->enableControls(true);
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -2790,27 +2875,35 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(m_inputFileName);
 	wxString templateName("..\\Templates\\");
-    wxFileDialog openFileDialog(this, 
-								_("Open Template File"), 
+	CncFileDialog openFileDialog(this,
+								_("Open Template File"),
 								templateName,
 								"",
-                                "SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode|Binary Tpl Files (*.bct)|*.bct", 
+								"SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode|Binary Tpl Files (*.bct)|*.bct",
 								wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
-	if ( openFileDialog.ShowModal() == wxID_CANCEL ) 
-        return; 
+	// this has be always recreated, the ownership will be overtaken by openFileDialog
+
+	for ( unsigned int i=0; i<lruFileList.getFileCount(); i++ ) 
+		openFileDialog.addLruFilename(lruFileList.getFileName(i));
+
+	if ( openFileDialog.ShowModal() == wxID_CANCEL ) {
+		return;
+	}
 
 	wxString ov = getCurrentTemplateFileName();
 	wxString oh = getCurrentTemplatePathFileName();
 
 	m_inputFileName->SetValue(openFileDialog.GetFilename());
 	m_inputFileName->SetHint(openFileDialog.GetPath());
-	
+
 	if ( !openFile() ) {
 		m_inputFileName->SetValue(ov);
 		m_inputFileName->SetHint(oh);
+		
 	} else {
 		prepareAndShowMonitorTemplatePreview(true);
+		
 	}
 }
 ///////////////////////////////////////////////////////////////////
@@ -3830,19 +3923,7 @@ bool MainFrame::processTemplateWrapper(bool confirm) {
 		if ( ret == true ) {
 			// This instance starts and stops the speed monitor
 			CncSpeedMonitorRunner smr(speedMonitor, GBL_CONFIG->getMaxSpeedXYZ_MM_MIN());
-			
-			// process with or without the secure dialog
-			if ( useSecureRunDlg == true && isDebugMode == false ) {
-				wxASSERT(secureRunDlg);
-				if ( secureRunDlg->IsShown() )
-					secureRunDlg->Show(false);
-					
-				ret = (secureRunDlg->ShowModal() == wxID_OK);
-				
-			} 
-			else {
-				ret = processTemplateIntern();
-			}
+			ret = processTemplateIntern();
 			
 			// refresh some periphery
 			motionMonitor->updateMonitorAndOptions();
@@ -3906,7 +3987,7 @@ bool MainFrame::processTemplateIntern() {
 	
 	clearPositionSpy();
 	
-	if ( isSecureMode() == false ) {
+	if ( GBL_CONTEXT->secureModeInfo.isActive == false ) {
 		showAuiPane("Outbound");
 		selectMonitorBookCncPanel();
 		
@@ -5834,9 +5915,14 @@ void MainFrame::rcRun() {
 ///////////////////////////////////////////////////////////////////
 	determineRunMode();
 	
-	// ensure the monitor is visible, especally if isPause == true
+	if ( GBL_CONTEXT->secureModeInfo.useIt == true && m_secureRunPanel->IsShownOnScreen() == false ) {
+		activateSecureMode(!GBL_CONTEXT->secureModeInfo.isActive);
+		return;
+	}
+
+	// ensure the monitor is visible, especially if isPause == true
 	// because then the processing should be resume
-	if ( isSecureMode() == false ) {
+	if ( GBL_CONTEXT->secureModeInfo.isActive == false ) {
 		showAuiPane("Outbound");
 		selectMonitorBookCncPanel();
 	}
@@ -5871,7 +5957,7 @@ void MainFrame::rcRun() {
 		GBL_CONTEXT->setUpdateInterval(1);
 	} else {
 		
-		if ( isSecureMode() == false ) 
+		if ( GBL_CONTEXT->secureModeInfo.isActive == false ) 
 			perspectiveHandler.ensureRunPerspectiveMinimal();
 	}
 	
@@ -7227,16 +7313,16 @@ void MainFrame::decorateGamepadState(bool state) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::decorateSecureDlgChoice(bool useDlg) {
 /////////////////////////////////////////////////////////////////////
-	useSecureRunDlg = useDlg;
-	if ( useSecureRunDlg == true )	m_rcSecureDlg->SetBitmap((ImageLibSecureRun().Bitmap("BMP_SECURE_DLG_YES")));
-	else 							m_rcSecureDlg->SetBitmap((ImageLibSecureRun().Bitmap("BMP_SECURE_DLG_NO")));
+	GBL_CONTEXT->secureModeInfo.useIt = useDlg;
+	if ( GBL_CONTEXT->secureModeInfo.useIt == true )	m_rcSecureDlg->SetBitmap((ImageLibSecureRun().Bitmap("BMP_SECURE_DLG_YES")));
+	else 												m_rcSecureDlg->SetBitmap((ImageLibSecureRun().Bitmap("BMP_SECURE_DLG_NO")));
 	
 	m_rcSecureDlg->Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::rcSecureDlg(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	decorateSecureDlgChoice(!useSecureRunDlg);
+	decorateSecureDlgChoice(!GBL_CONTEXT->secureModeInfo.useIt);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cncMainViewChanged(wxNotebookEvent& event) {
@@ -7604,8 +7690,8 @@ void MainFrame::enableSourceEditorMenuItems(bool enable) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::showOSEnvironment(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	CncOSEnvironmentDialog dlg(this);
-	dlg.ShowModal();
+	if ( cncOsEnvDialog->IsShownOnScreen() == false )
+		cncOsEnvDialog->Show();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::openGameportController(wxCommandEvent& event) {

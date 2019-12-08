@@ -85,12 +85,28 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="StcLexer ">
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release;release2"/>
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Debug;Release;release2"/>
-      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd" ExcludeProjConfig="Debug;Release;release2"/>
-      <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h" ExcludeProjConfig="Debug;Release;release2"/>
-      <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release;release2"/>
-      <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;release2"/>
+      <VirtualDirectory Name="wx3.1.2">
+        <File Name="../../../../wxWidgets-3.1.2/build/msw/makefile.gcc" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.2/include/wx/stc/stc.h" ExcludeProjConfig="Release;"/>
+      </VirtualDirectory>
+      <VirtualDirectory Name="wx3.1.3">
+        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.3/include/wx/stc/stc.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.3/build/msw/makefile.gcc" ExcludeProjConfig="Release;"/>
+      </VirtualDirectory>
+      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd"/>
+      <VirtualDirectory Name="wx3.1.0">
+        <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release;"/>
+      </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
       <File Name="3D/CncMetricRulerSetup.cpp"/>
@@ -164,6 +180,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncFileDialog.cpp"/>
+      <File Name="CncFileDialog.h"/>
       <File Name="CncUserEvents.cpp"/>
       <File Name="CncUserEvents.h"/>
       <File Name="CncExternalViewBox.h"/>
@@ -205,8 +223,6 @@
       <File Name="CncNavigatorPanel.cpp"/>
       <File Name="CncMouseRemoteControl.h"/>
       <File Name="CncMouseRemoteControl.cpp"/>
-      <File Name="CncSecureRun.h"/>
-      <File Name="CncSecureRun.cpp"/>
       <File Name="CncTemplateObserver.h"/>
       <File Name="CncTemplateObserver.cpp"/>
       <File Name="CncPosition.cpp"/>
@@ -300,9 +316,6 @@
       <File Name="wxCrafterTemplateObserver_bitmaps.cpp"/>
       <File Name="wxCrafterTemplateObserver.h"/>
       <File Name="wxCrafterTemplateObserver.cpp"/>
-      <File Name="wxCrafterSecurityRun_bitmaps.cpp"/>
-      <File Name="wxCrafterSecurityRun.h"/>
-      <File Name="wxCrafterSecurityRun.cpp"/>
       <File Name="wxCrafterPathGenerator_bitmaps.cpp"/>
       <File Name="wxCrafterPathGenerator.h"/>
       <File Name="wxCrafterPathGenerator.cpp"/>
@@ -429,6 +442,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncContextListCtrl.cpp"/>
+      <File Name="CncContextListCtrl.h"/>
       <File Name="CncOpenGLContextObserverListCtrl.cpp"/>
       <File Name="CncOpenGLContextObserverListCtrl.h"/>
       <File Name="CncParsingSynopsisTraceListCtrl.cpp"/>
@@ -464,7 +479,6 @@
     <File Name="wxCrafterSpeedMonitor.wxcp"/>
     <File Name="wxCrafterUnitTest.wxcp"/>
     <File Name="wxCrafterTemplateObserver.wxcp"/>
-    <File Name="wxCrafterSecurityRun.wxcp"/>
     <File Name="wxCrafterPathGenerator.wxcp"/>
     <File Name="wxCrafterMessageDialog.wxcp"/>
     <File Name="wxCrafterMainFrame.wxcp"/>
@@ -579,9 +593,9 @@
     <Configuration Name="Release" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g1;-fpic;-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:/@Development/boost_1_69_0"/>
+        <IncludePath Value="C:/@Development/boost_1_71_0"/>
         <IncludePath Value="C:/@Development/freeglut/include"/>
-        <IncludePath Value="C:/@Development/wxsvg-1.5.16/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
@@ -622,6 +636,7 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
+        <Command Enabled="yes">echo %WXWIN%</Command>
         <Command Enabled="yes">where g++</Command>
         <Command Enabled="yes">g++ -v</Command>
       </PreBuild>

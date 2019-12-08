@@ -100,8 +100,7 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 	}
 	
 	// post complete event
-	UpdateManagerEvent evt(wxEVT_UPDATE_MANAGER_THREAD, MainFrame::EventId::COMPLETED);
-	wxPostEvent(pHandler, evt);
+	wxQueueEvent(pHandler, new UpdateManagerEvent(wxEVT_UPDATE_MANAGER_THREAD, MainFrame::EventId::COMPLETED));
 	
 	return NULL;
 }

@@ -291,6 +291,7 @@ class CncConfig {
 		
 		const char getRunConfirmationModeAsChar();
 
+		const bool getSplashScreenFlag();
 		const bool getAutoConnectFlag();
 		const bool getAutoProcessFlag();
 		const bool getAutoOpenOglObserverFlag();

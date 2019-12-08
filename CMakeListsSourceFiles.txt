@@ -138,6 +138,7 @@ set(SOURCE_FILES
 	CncControlerGui/CncAutoProgressDialog.cpp
 	CncControlerGui/CncExternalViewBox.cpp
 	CncControlerGui/CncUserEvents.cpp
+	CncControlerGui/CncFileDialog.cpp
 	
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp

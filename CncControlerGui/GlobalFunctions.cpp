@@ -89,6 +89,7 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	newCtrl->SetMinClientSize(minSize);
 	
 	// remove the placeholder
+	parent->RemoveChild(oldCtrl);
 	oldCtrl->Destroy();
 	// do not delete oldCtrl this will be handled by wx... 
 }

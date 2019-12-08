@@ -59,7 +59,6 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 , cameraRotationTimer(this, wxEVT_MONTION_MONITOR_TIMER)
 , cameraRotationStepWidth(0)
 , cameraRotationSpeed(100)
-, isShown(false)
 , zoom(2.0f)
 , currentClientID(-1L)
 {
@@ -67,9 +66,8 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	GLContextBase::globalInit(); 
 	monitor->init();
 	
-	if ( isShown )
-		lastSetCurrent = monitor->SetCurrent(*this);
-	
+	activateContext(monitor);
+
 	// Important: initialize the CncGlCanvas context
 	context = monitor;
 	
@@ -217,11 +215,10 @@ void CncMotionMonitor::appendVertex(long id, CncSpeedMode sm, float x, float y, 
 //////////////////////////////////////////////////
 	static GLOpenGLPathBuffer::CncVertex vertex;
 
-	if ( isShown )
-		lastSetCurrent = monitor->SetCurrent(*this);
-	
-	const char sc = cnc::getCncSpeedTypeAsCharacter(sm);
-	monitor->appendPathData(vertex.set(sc, id, x, y, z)); 
+	if ( activateContext(monitor, true) == true ) {
+		const char sc = cnc::getCncSpeedTypeAsCharacter(sm);
+		monitor->appendPathData(vertex.set(sc, id, x, y, z)); 
+	}
 }
 /////////////////////////////////////////////////////////////////
 void CncMotionMonitor::centerViewport() {
@@ -243,7 +240,7 @@ void CncMotionMonitor::onPaint() {
 	if ( IsShownOnScreen() == false )
 		return;
 
-	lastSetCurrent = monitor->SetCurrent(*this);
+	activateContext(monitor);
 	monitor->init();
 
 	const wxSize cs = GetClientSize();

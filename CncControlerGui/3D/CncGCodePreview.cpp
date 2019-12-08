@@ -27,14 +27,12 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribLis
 , previewName(name)
 , preview(new GLContextGCodePreview(this, name))
 , maxDimension(400.0)
-, isShown(false)
 {
 //////////////////////////////////////////////////
 	GLContextBase::globalInit(); 
 	preview->init();
 	
-	if ( isShown )
-		lastSetCurrent = preview->SetCurrent(*this);
+	activateContext(preview);
 	
 	// Important: initialize the CncGlCanvas context
 	context = preview;
@@ -63,8 +61,8 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 	// as SwapBuffers() isn't possible valid before
 	if ( IsShownOnScreen() == false )
 		return;
-		
-	lastSetCurrent = preview->SetCurrent(*this);
+
+	activateContext(preview);
 	preview->init();
 
 	const wxSize cs = GetClientSize();
@@ -108,10 +106,8 @@ void CncGCodePreview::onKeyDown(wxKeyEvent& event) {
 //////////////////////////////////////////////////
 void CncGCodePreview::clear() {
 //////////////////////////////////////////////////
-	if ( isShown )
-		lastSetCurrent = preview->SetCurrent(*this);
-
-	preview->clearPathData();
+	if ( activateContext(preview) == true ) 
+		preview->clearPathData();
 }
 //////////////////////////////////////////////////
 void CncGCodePreview::setMaxDimension(double maxDim) {
@@ -145,8 +141,6 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	if ( progressDialog != NULL && preview->getVirtualEnd() % 100 == 0 )
 			progressDialog->Update();
 		
-	if ( isShown )
-		lastSetCurrent = preview->SetCurrent(*this);
-
-	preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
+	if ( activateContext(preview, true) == true )
+		preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 
 }

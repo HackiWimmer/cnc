@@ -100,6 +100,9 @@
 	wxCheckBox* APP_PROXY::GetKeepFileManagerPreview()
 	{ return THE_APP->GetKeepFileManagerPreview(); }
 
+	wxMenuItem* APP_PROXY::GetMiOpenGLContextObserver()
+	{ return THE_APP->m_miOpenGLContextObserver; }
+
 	void APP_PROXY::parsingSynopsisTraceAddSeparator()
 	{ THE_APP->getParsingSynopsisTrace()->addSeparator(); }
 

@@ -47,7 +47,6 @@ class CncReferencePosition;
 class CncMonitorVSplitterWindow;
 class CncMonitorHSplitterWindow;
 class CncTemplateObserver;
-class CncSecureRun;
 class CncStatisticsPane;
 class CncSvgViewer;
 class CncGameportController;
@@ -56,6 +55,7 @@ class CncPreprocessor;
 class CncGCodeSequenceListCtrl;
 class CncMotionVertexTrace;
 class CncOpenGLContextObserver;
+class CncOSEnvironmentDialog;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -127,6 +127,8 @@ class MainFrameBase : public MainFrameBClass {
 		CncTextCtrl* 	tmpTraceInfo;
 		CncTextCtrl* 	controllerMsgHistory;
 		
+		virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
+		
 	public:
 		explicit MainFrameBase(wxWindow* parent);
 		virtual ~MainFrameBase();
@@ -144,6 +146,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void connectSec(wxCommandEvent& event);
+		virtual void selectPortSec(wxCommandEvent& event);
 		virtual void onCloseSecureRunAuiPane(wxCommandEvent& event);
 		virtual void onOpenGLContextObserver(wxCommandEvent& event);
 		virtual void onShowLoggerOnDemand(wxCommandEvent& event);
@@ -586,7 +590,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		// to remove . . .
 			friend class CncFileView;
 			friend class CncTemplateObserver;
-			friend class CncSecureRun;
 			friend class CncMotionMonitor;
 			friend class PathHandlerBase;
 			friend class GCodeFileParser;
@@ -598,8 +601,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool isDebugMode;
 		bool isZeroReferenceValid;
 		bool canClose;
-		bool secureMode;
-		bool useSecureRunDlg;
 		bool evaluatePositions;
 		bool ignoreDirControlEvents;
 		
@@ -641,6 +642,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncTemplateObserver* 			templateObserver;
 		CncMessageDialog*				spyDetailWindow;
 		CncOpenGLContextObserver*		openGLContextObserver;
+		CncOSEnvironmentDialog* 		cncOsEnvDialog;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
@@ -664,7 +666,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncApp::GuiControls	guiControls;
 		CncApp::MenuItems	menuItems;
 		
-		CncSecureRun* secureRunDlg;
 		CncReferencePosition* refPositionDlg;
 		
 		wxSharedPtr<wxNotificationMessageBase> notificationDialog;
@@ -677,8 +678,10 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void traceGccVersion(std::ostream& out);
 		void traceWxWidgetsVersion(std::ostream& out);
+		void traceWxSvgVersion(std::ostream& out);
 		void traceBoostVersion(std::ostream& out);
 		void traceWoodworkingCncVersion(std::ostream& out);
+		
 		
 		void displayReport(int id);
 		
@@ -686,7 +689,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		// Secure AUI
 		void activateSecureMode(bool state = true);
 		void deactivateSecureMode() 					{ activateSecureMode(false); }
-		bool isSecureMode()								{ return secureMode; }
 
 		///////////////////////////////////////////////////////////////
 		// Path Generator

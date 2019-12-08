@@ -664,10 +664,15 @@ protected:
     wxPanel* m_secureRunPanel;
     wxStaticBitmap* m_staticBitmap8269;
     wxStaticText* m_staticText8271;
-    wxButton* m_button8250;
+    wxButton* m_btCloseSecurePanel;
     wxStaticLine* m_staticLine8267;
     wxPanel* m_secToolbar;
     wxBitmapButton* m_loadTemplateSec;
+    wxStaticLine* m_staticLine8346;
+    wxStaticText* m_staticText18423;
+    wxBitmapComboBox* m_portSelectorSec;
+    wxBitmapButton* m_connectSec;
+    wxStaticLine* m_staticLine83464;
     wxPanel* m_panel8328;
     wxBitmapButton* m_rcRunSec;
     wxStaticLine* m_staticLine8291;
@@ -675,7 +680,7 @@ protected:
     wxBitmapButton* m_rcStopSec;
     wxStaticLine* m_staticLine82917;
     wxButton* m_btnEmergenyStopSec;
-    wxSplitterWindow* m_splitter8253;
+    wxSplitterWindow* m_secureSplitterMain;
     wxPanel* m_splitterPageMonitor;
     wxPanel* m_secMonitorPlaceholder;
     wxPanel* m_secZViewPlaceholder;
@@ -958,7 +963,6 @@ protected:
     virtual void onShowLoggerOnDemand(wxCommandEvent& event) { event.Skip(); }
     virtual void freezeLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event) { event.Skip(); }
-    virtual void traceTextUpdated(wxCommandEvent& event) { event.Skip(); }
     virtual void dclickHeartbeatState(wxMouseEvent& event) { event.Skip(); }
     virtual void selectUnit(wxCommandEvent& event) { event.Skip(); }
     virtual void selectUCUnitFrom(wxCommandEvent& event) { event.Skip(); }
@@ -990,6 +994,8 @@ protected:
     virtual void onPaintSpeedPanel(wxPaintEvent& event) { event.Skip(); }
     virtual void onCloseSecureRunAuiPane(wxCommandEvent& event) { event.Skip(); }
     virtual void openTemplate(wxCommandEvent& event) { event.Skip(); }
+    virtual void selectPortSec(wxCommandEvent& event) { event.Skip(); }
+    virtual void connectSec(wxCommandEvent& event) { event.Skip(); }
     virtual void newTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void reloadTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void saveTemplate(wxCommandEvent& event) { event.Skip(); }
@@ -1645,9 +1651,14 @@ public:
     wxPanel* GetPositionMonitorView() { return m_positionMonitorView; }
     wxStaticBitmap* GetStaticBitmap8269() { return m_staticBitmap8269; }
     wxStaticText* GetStaticText8271() { return m_staticText8271; }
-    wxButton* GetButton8250() { return m_button8250; }
+    wxButton* GetBtCloseSecurePanel() { return m_btCloseSecurePanel; }
     wxStaticLine* GetStaticLine8267() { return m_staticLine8267; }
     wxBitmapButton* GetLoadTemplateSec() { return m_loadTemplateSec; }
+    wxStaticLine* GetStaticLine8346() { return m_staticLine8346; }
+    wxStaticText* GetStaticText18423() { return m_staticText18423; }
+    wxBitmapComboBox* GetPortSelectorSec() { return m_portSelectorSec; }
+    wxBitmapButton* GetConnectSec() { return m_connectSec; }
+    wxStaticLine* GetStaticLine83464() { return m_staticLine83464; }
     wxPanel* GetPanel8328() { return m_panel8328; }
     wxBitmapButton* GetRcRunSec() { return m_rcRunSec; }
     wxStaticLine* GetStaticLine8291() { return m_staticLine8291; }
@@ -1673,7 +1684,7 @@ public:
     wxPanel* GetSplitterPageMonitor() { return m_splitterPageMonitor; }
     wxPanel* GetSecLoggerPlaceholder() { return m_secLoggerPlaceholder; }
     wxPanel* GetSplitterPageLogger() { return m_splitterPageLogger; }
-    wxSplitterWindow* GetSplitter8253() { return m_splitter8253; }
+    wxSplitterWindow* GetSecureSplitterMain() { return m_secureSplitterMain; }
     wxPanel* GetSecureRunPanel() { return m_secureRunPanel; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }

@@ -38,6 +38,13 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		wxPGProperty* prop = NULL;
 		
 		//...............
+		prop = root->AppendChild( new wxBoolProperty("Show splash screen on startup", NEXT_PROP_ID, true));
+		prop->Enable(true);
+		prop->SetHelpString(_T("Restart required"));
+		prop->SetEditor( wxT("CheckBox") );
+		registerProperty(CncApplication_SHOW_SPLASH_SCREEN, prop);
+		
+		//...............
 		pgParameterMgrArr.Clear();
 		pgParameterMgrIntArr.Clear();
 		pgParameterMgrArr.Add(_("mm")); 

@@ -150,8 +150,6 @@ class CncMotionMonitor : public CncGlCanvas
 		int cameraRotationStepWidth;
 		int cameraRotationSpeed;
 		
-		bool isShown;
-		
 		float zoom;
 		
 		bool currentClientID;

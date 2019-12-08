@@ -2,16 +2,25 @@
 #define CNC_CONTEXT_H
 
 #include <map>
+#include <vector>
+#include <iostream>
 #include <wx/string.h>
 #include <wx/font.h>
 #include "OSD/CncTimeFunctions.h"
 
 typedef std::map<wxString, wxString> VersionInfoMap;
+typedef std::vector<wxString> CommandLineParameterMap;
+
+//#ifdef __WXMSW__
+//#ifdef __WXGTK__
 
 struct CncContext {
 	
+	public:
+		enum OSType {UNDEF, WXMSW, WXGTK};
+
 	private:
-		
+		OSType os						= OSType::UNDEF;
 		bool probeMode					= true;
 		bool onlineUpdateCoordinates	= true;
 		bool onlineUpdateDrawPane		= true;
@@ -20,9 +29,15 @@ struct CncContext {
 		int updateInterval				= 100;
 
 	public:
-	
+		
 		wxFont outboundListBookFont		= wxFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 
+		struct SecureModeInfo {
+			bool useIt						= false;
+			bool isActive					= false;
+			bool isActivatedByStartup		= false;
+		};
+		
 		struct TsTplProcessing {
 
 			private:
@@ -113,8 +128,18 @@ struct CncContext {
 		CncContext();
 		~CncContext();
 		
-		TsTplProcessing timestamps								= TsTplProcessing();
-		VersionInfoMap	versionInfoMap;
+		TsTplProcessing 			timestamps;
+		SecureModeInfo				secureModeInfo;
+		VersionInfoMap				versionInfoMap;
+		
+		bool isWinOS() { return os == WXMSW; }
+		bool isGtkOS() { return os == WXGTK; }
+		OSType getOSType() { return os; }
+		const char* getOSTypeAsString();
+
+		const std::ostream& traceVersionInfo(std::ostream& os) const;
+		const std::ostream& traceCommandLineParameter(std::ostream& os) const;
+		const wxString& traceCommandLineParameter(wxString& s) const;
 
 		void setProbeMode(bool state); 
 		bool isProbeMode() { return  probeMode; }

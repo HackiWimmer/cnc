@@ -130,8 +130,7 @@ wxThread::ExitCode GamepadThread::Entry() {
 	} // while
 	
 	// post complete event
-	GamepadEvent closeEvt(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::COMPLETED);
-	wxPostEvent(pHandler, closeEvt);
+	wxQueueEvent(pHandler, new GamepadEvent(wxEVT_GAMEPAD_THREAD, MainFrame::EventId::COMPLETED));
 	
 	return NULL;
 }

@@ -47,6 +47,65 @@ CncOSEnvironmentDialogBase::CncOSEnvironmentDialogBase(wxWindow* parent, wxWindo
     
     flexGridSizer7301->Add(m_listbook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
+    m_panelContext = new wxPanel(m_listbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    int m_panelContextImgIndex;
+    m_panelContextImgIndex = m_listbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("cart")));
+    m_listbook->AddPage(m_panelContext, _("Current\nContext"), false, m_panelContextImgIndex);
+    
+    wxFlexGridSizer* flexGridSizer72761 = new wxFlexGridSizer(2, 1, 0, 0);
+    flexGridSizer72761->SetFlexibleDirection( wxBOTH );
+    flexGridSizer72761->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer72761->AddGrowableCol(0);
+    flexGridSizer72761->AddGrowableRow(0);
+    m_panelContext->SetSizer(flexGridSizer72761);
+    
+    m_cncContextListPlaceholder = new wxListCtrl(m_panelContext, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelContext, wxSize(-1,-1)), wxLC_VRULES|wxLC_REPORT);
+    m_cncContextListPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_cncContextListPlaceholder->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
+    wxFont m_cncContextListPlaceholderFont(9, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_cncContextListPlaceholder->SetFont(m_cncContextListPlaceholderFont);
+    
+    flexGridSizer72761->Add(m_cncContextListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer72883 = new wxFlexGridSizer(2, 2, 0, 0);
+    flexGridSizer72883->SetFlexibleDirection( wxBOTH );
+    flexGridSizer72883->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer72883->AddGrowableCol(1);
+    flexGridSizer72883->AddGrowableRow(0);
+    flexGridSizer72883->AddGrowableRow(1);
+    
+    flexGridSizer72761->Add(flexGridSizer72883, 1, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_staticText72944 = new wxStaticText(m_panelContext, wxID_ANY, _("Parameter:"), wxDefaultPosition, wxDLG_UNIT(m_panelContext, wxSize(-1,-1)), 0);
+    wxFont m_staticText72944Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText72944->SetFont(m_staticText72944Font);
+    
+    flexGridSizer72883->Add(m_staticText72944, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_cncContextPara = new wxTextCtrl(m_panelContext, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelContext, wxSize(-1,-1)), wxTE_READONLY);
+    wxFont m_cncContextParaFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_cncContextPara->SetFont(m_cncContextParaFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_cncContextPara->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer72883->Add(m_cncContextPara, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
+    m_staticText72966 = new wxStaticText(m_panelContext, wxID_ANY, _("Value:"), wxDefaultPosition, wxDLG_UNIT(m_panelContext, wxSize(-1,-1)), 0);
+    wxFont m_staticText72966Font(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_staticText72966->SetFont(m_staticText72966Font);
+    
+    flexGridSizer72883->Add(m_staticText72966, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_cncContextValue = new wxTextCtrl(m_panelContext, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panelContext, wxSize(-1,-1)), wxTE_READONLY);
+    wxFont m_cncContextValueFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
+    m_cncContextValue->SetFont(m_cncContextValueFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_cncContextValue->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer72883->Add(m_cncContextValue, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
+    
     m_panelOSEnvironment = new wxPanel(m_listbook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_listbook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     int m_panelOSEnvironmentImgIndex;
     m_panelOSEnvironmentImgIndex = m_listbook_il->Add(wxXmlResource::Get()->LoadBitmap(wxT("16-console")));

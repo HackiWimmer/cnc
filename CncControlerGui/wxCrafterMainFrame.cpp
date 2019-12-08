@@ -2717,7 +2717,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_winMonitorView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_winMonitorView->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     
-    m_auimgrMain->AddPane(m_winMonitorView, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(1).Position(0).BestSize(1000,1000).MinSize(1000,1000).MaxSize(1000,1000).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
+    m_auimgrMain->AddPane(m_winMonitorView, wxAuiPaneInfo().Name(wxT("Outbound")).Caption(_("CNC Monitor")).Direction(wxAUI_DOCK_CENTER).Layer(0).Row(1).Position(0).BestSize(500,500).MinSize(500,500).MaxSize(500,500).CaptionVisible(true).MaximizeButton(true).CloseButton(false).MinimizeButton(true).PinButton(false));
     
     wxFlexGridSizer* flexGridSizer4348 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer4348->SetFlexibleDirection( wxBOTH );
@@ -5508,14 +5508,14 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer8251->Add(m_staticText8271, 0, wxALL, WXC_FROM_DIP(5));
     
-    m_button8250 = new wxButton(m_secureRunPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(24,24)), 0);
+    m_btCloseSecurePanel = new wxButton(m_secureRunPanel, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(24,24)), 0);
     #if wxVERSION_NUMBER >= 2904
-    m_button8250->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("close")), wxLEFT);
-    m_button8250->SetBitmapMargins(2,2);
+    m_btCloseSecurePanel->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("close")), wxLEFT);
+    m_btCloseSecurePanel->SetBitmapMargins(2,2);
     #endif
     
-    flexGridSizer8251->Add(m_button8250, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
-    m_button8250->SetMinSize(wxSize(24,24));
+    flexGridSizer8251->Add(m_btCloseSecurePanel, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(1));
+    m_btCloseSecurePanel->SetMinSize(wxSize(24,24));
     
     m_staticLine8267 = new wxStaticLine(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -5532,7 +5532,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8324->AddGrowableRow(0);
     m_secToolbar->SetSizer(flexGridSizer8324);
     
-    wxFlexGridSizer* flexGridSizer8326 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer8326 = new wxFlexGridSizer(1, 6, 0, 0);
     flexGridSizer8326->SetFlexibleDirection( wxBOTH );
     flexGridSizer8326->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer8326->AddGrowableCol(0);
@@ -5540,10 +5540,33 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer8324->Add(flexGridSizer8326, 1, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(0));
     
-    m_loadTemplateSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-open-5")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_loadTemplateSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("document-open-5")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
     m_loadTemplateSec->SetToolTip(_("Open Template"));
     
     flexGridSizer8326->Add(m_loadTemplateSec, 0, wxALL|wxALIGN_LEFT, WXC_FROM_DIP(2));
+    m_loadTemplateSec->SetMinSize(wxSize(26,26));
+    
+    m_staticLine8346 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer8326->Add(m_staticLine8346, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_staticText18423 = new wxStaticText(m_secToolbar, wxID_ANY, _("Port:"), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), 0);
+    
+    flexGridSizer8326->Add(m_staticText18423, 0, wxALL, WXC_FROM_DIP(5));
+    
+    m_portSelectorSec = new wxBitmapComboBox(m_secToolbar, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxArrayString(), wxCB_READONLY);
+    
+    flexGridSizer8326->Add(m_portSelectorSec, 0, wxALL|wxEXPAND, WXC_FROM_DIP(3));
+    
+    m_connectSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-connected")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), 0);
+    m_connectSec->SetToolTip(_("Connect to mirco controller"));
+    
+    flexGridSizer8326->Add(m_connectSec, 0, wxALL, WXC_FROM_DIP(2));
+    m_connectSec->SetMinSize(wxSize(26,26));
+    
+    m_staticLine83464 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
+    
+    flexGridSizer8326->Add(m_staticLine83464, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_panel8328 = new wxPanel(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
@@ -5555,24 +5578,27 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer8324->Add(flexGridSizer8281, 1, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     
-    m_rcRunSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-right-3")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcRunSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("arrow-right-3")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
     m_rcRunSec->SetToolTip(_("Run"));
     
     flexGridSizer8281->Add(m_rcRunSec, 0, wxALL, WXC_FROM_DIP(2));
+    m_rcRunSec->SetMinSize(wxSize(26,26));
     
     m_staticLine8291 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer8281->Add(m_staticLine8291, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_rcPauseSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-playback-pause-blue")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcPauseSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("media-playback-pause-blue")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
     m_rcPauseSec->SetToolTip(_("Pause"));
     
     flexGridSizer8281->Add(m_rcPauseSec, 0, wxALL, WXC_FROM_DIP(2));
+    m_rcPauseSec->SetMinSize(wxSize(26,26));
     
-    m_rcStopSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_stop")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxBU_AUTODRAW);
+    m_rcStopSec = new wxBitmapButton(m_secToolbar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("16-debugger_stop")), wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(26,26)), wxBU_AUTODRAW);
     m_rcStopSec->SetToolTip(_("Stop"));
     
     flexGridSizer8281->Add(m_rcStopSec, 0, wxALL, WXC_FROM_DIP(2));
+    m_rcStopSec->SetMinSize(wxSize(26,26));
     
     m_staticLine82917 = new wxStaticLine(m_secToolbar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secToolbar, wxSize(-1,-1)), wxLI_VERTICAL);
     
@@ -5590,13 +5616,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer8281->Add(m_btnEmergenyStopSec, 0, wxALL, WXC_FROM_DIP(0));
     m_secToolbar->SetMinSize(wxSize(-1,30));
     
-    m_splitter8253 = new wxSplitterWindow(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxSP_3D);
-    m_splitter8253->SetSashGravity(0.7);
-    m_splitter8253->SetMinimumPaneSize(10);
+    m_secureSplitterMain = new wxSplitterWindow(m_secureRunPanel, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureRunPanel, wxSize(-1,-1)), wxSP_3D);
+    m_secureSplitterMain->SetSashGravity(0.7);
+    m_secureSplitterMain->SetMinimumPaneSize(10);
     
-    flexGridSizer8248->Add(m_splitter8253, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer8248->Add(m_secureSplitterMain, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_splitterPageMonitor = new wxPanel(m_splitter8253, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter8253, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitterPageMonitor = new wxPanel(m_secureSplitterMain, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMain, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
     wxFlexGridSizer* flexGridSizer8263 = new wxFlexGridSizer(1, 2, 0, 0);
     flexGridSizer8263->SetFlexibleDirection( wxBOTH );
@@ -5739,8 +5765,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer23118->Add(m_staticLine234122, 0, wxALL|wxEXPAND, WXC_FROM_DIP(2));
     
-    m_splitterPageLogger = new wxPanel(m_splitter8253, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter8253, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_splitter8253->SplitHorizontally(m_splitterPageMonitor, m_splitterPageLogger, 0);
+    m_splitterPageLogger = new wxPanel(m_secureSplitterMain, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_secureSplitterMain, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_secureSplitterMain->SplitHorizontally(m_splitterPageMonitor, m_splitterPageLogger, 0);
     
     wxFlexGridSizer* flexGridSizer8265 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer8265->SetFlexibleDirection( wxBOTH );
@@ -6432,7 +6458,6 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_showLoggerOnDemand->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onShowLoggerOnDemand), NULL, this);
     m_freezeLogger->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_gamepadState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
-    m_tmpTraceInfoPlaceholder->Connect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_heartbeatState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_updateManagerUpdate->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
@@ -6465,8 +6490,10 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_bmpButton47182->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);
     m_bmpButton47183->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
     m_speedPanel->Connect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
-    m_button8250->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
+    m_btCloseSecurePanel->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
     m_loadTemplateSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
+    m_portSelectorSec->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPortSec), NULL, this);
+    m_connectSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connectSec), NULL, this);
     m_rcRunSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPauseSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStopSec->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);
@@ -6734,7 +6761,6 @@ MainFrameBClass::~MainFrameBClass()
     m_showLoggerOnDemand->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onShowLoggerOnDemand), NULL, this);
     m_freezeLogger->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::freezeLogger), NULL, this);
     m_gamepadState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
-    m_tmpTraceInfoPlaceholder->Disconnect(wxEVT_COMMAND_TEXT_UPDATED, wxCommandEventHandler(MainFrameBClass::traceTextUpdated), NULL, this);
     m_heartbeatState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
     m_updateManagerUpdate->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
@@ -6767,8 +6793,10 @@ MainFrameBClass::~MainFrameBClass()
     m_bmpButton47182->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypPrevId), NULL, this);
     m_bmpButton47183->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::goPosSypNextId), NULL, this);
     m_speedPanel->Disconnect(wxEVT_PAINT, wxPaintEventHandler(MainFrameBClass::onPaintSpeedPanel), NULL, this);
-    m_button8250->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
+    m_btCloseSecurePanel->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onCloseSecureRunAuiPane), NULL, this);
     m_loadTemplateSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::openTemplate), NULL, this);
+    m_portSelectorSec->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectPortSec), NULL, this);
+    m_connectSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::connectSec), NULL, this);
     m_rcRunSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcRun), NULL, this);
     m_rcPauseSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcPause), NULL, this);
     m_rcStopSec->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::rcStop), NULL, this);

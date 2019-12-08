@@ -4744,9 +4744,9 @@ Size</value>
         <resizable>1</resizable>
         <movable>1</movable>
         <floatable>1</floatable>
-        <best_size>1000,1000</best_size>
-        <max_size>1000,1000</max_size>
-        <min_size>1000,1000</min_size>
+        <best_size>500,500</best_size>
+        <max_size>500,500</max_size>
+        <min_size>500,500</min_size>
         <centre>1</centre>
         <layer>0</layer>
         <row>1</row>
@@ -9750,7 +9750,7 @@ State</label>
                   <flag>wxALL|wxALIGN_RIGHT</flag>
                   <border>1</border>
                   <minsize>24,24</minsize>
-                  <object class="wxButton" name="m_button8250">
+                  <object class="wxButton" name="m_btCloseSecurePanel">
                     <label/>
                     <style/>
                     <size>24,24</size>
@@ -9787,7 +9787,7 @@ State</label>
                     <flag>wxALL|wxALIGN_LEFT</flag>
                     <option>1</option>
                     <object class="wxFlexGridSizer">
-                      <cols>1</cols>
+                      <cols>6</cols>
                       <rows>1</rows>
                       <vgap>0</vgap>
                       <hgap>0</hgap>
@@ -9796,13 +9796,70 @@ State</label>
                       <object class="sizeritem">
                         <flag>wxALL|wxALIGN_LEFT</flag>
                         <border>2</border>
+                        <minsize>26,26</minsize>
                         <object class="wxBitmapButton" name="m_loadTemplateSec">
                           <bitmap>bitmaps/document-open-5.png</bitmap>
+                          <size>26,26</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Open Template]]>
                           </tooltip>
                           <default>0</default>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <object class="wxStaticLine" name="m_staticLine8346">
+                          <style>wxLI_VERTICAL</style>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>5</border>
+                        <object class="wxStaticText" name="m_staticText18423">
+                          <label>Port:</label>
+                          <style/>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>3</border>
+                        <object class="wxBitmapComboBox" name="m_portSelectorSec">
+                          <style>wxCB_READONLY</style>
+                          <font>
+                            <size>9</size>
+                            <style>normal</style>
+                            <weight>normal</weight>
+                            <family>default</family>
+                            <underlined>0</underlined>
+                            <face>Segoe UI</face>
+                          </font>
+                          <tooltip>
+                            <![CDATA[Select the Serial Port]]>
+                          </tooltip>
+                          <selection>-1</selection>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL</flag>
+                        <border>2</border>
+                        <minsize>26,26</minsize>
+                        <object class="wxBitmapButton" name="m_connectSec">
+                          <bitmap>bitmaps/16-connected.png</bitmap>
+                          <size>26,26</size>
+                          <style/>
+                          <tooltip>
+                            <![CDATA[Connect to mirco controller]]>
+                          </tooltip>
+                          <default>0</default>
+                        </object>
+                      </object>
+                      <object class="sizeritem">
+                        <flag>wxALL|wxEXPAND</flag>
+                        <border>1</border>
+                        <object class="wxStaticLine" name="m_staticLine83464">
+                          <style>wxLI_VERTICAL</style>
                         </object>
                       </object>
                     </object>
@@ -9826,8 +9883,10 @@ State</label>
                       <object class="sizeritem">
                         <flag>wxALL</flag>
                         <border>2</border>
+                        <minsize>26,26</minsize>
                         <object class="wxBitmapButton" name="m_rcRunSec">
                           <bitmap>bitmaps/arrow-right-3.png</bitmap>
+                          <size>26,26</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Run]]>
@@ -9845,8 +9904,10 @@ State</label>
                       <object class="sizeritem">
                         <flag>wxALL</flag>
                         <border>2</border>
+                        <minsize>26,26</minsize>
                         <object class="wxBitmapButton" name="m_rcPauseSec">
                           <bitmap>bitmaps/media-playback-pause-blue.png</bitmap>
+                          <size>26,26</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Pause]]>
@@ -9857,8 +9918,10 @@ State</label>
                       <object class="sizeritem">
                         <flag>wxALL</flag>
                         <border>2</border>
+                        <minsize>26,26</minsize>
                         <object class="wxBitmapButton" name="m_rcStopSec">
                           <bitmap>bitmaps/16-debugger_stop.png</bitmap>
+                          <size>26,26</size>
                           <style>wxBU_AUTODRAW</style>
                           <tooltip>
                             <![CDATA[Stop]]>
@@ -9896,7 +9959,7 @@ State</label>
             <object class="sizeritem">
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
-              <object class="wxSplitterWindow" name="m_splitter8253">
+              <object class="wxSplitterWindow" name="m_secureSplitterMain">
                 <style>wxSP_3D</style>
                 <gravity>0.7</gravity>
                 <minsize>10</minsize>

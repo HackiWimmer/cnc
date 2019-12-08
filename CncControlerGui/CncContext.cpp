@@ -1,15 +1,38 @@
+#include <wx/app.h>
 #include "MainFrameProxy.h"
 #include "CncContext.h"
 
 ////////////////////////////////////////////////////////////////////////
-CncContext::CncContext() {
-// initialization is already done by the header declaration (struct!)
+CncContext::CncContext() 
+: timestamps()
+, secureModeInfo()
+, versionInfoMap()
 ////////////////////////////////////////////////////////////////////////
+{
+	#ifdef __WXMSW__
+		os = OSType::WXMSW;
+	#endif
+	
+	#ifdef __WXGTK__
+		os = OSType::WXGTK;
+	#endif
 }
 ////////////////////////////////////////////////////////////////////////
 CncContext::~CncContext() {
 ////////////////////////////////////////////////////////////////////////
 	
+}
+////////////////////////////////////////////////////////////////////////
+const char* CncContext::getOSTypeAsString() {
+////////////////////////////////////////////////////////////////////////
+	switch ( os ) {
+		case OSType::WXMSW:		return "wxWin";
+		case OSType::WXGTK:		return "wxGtk";
+		
+		case OSType::UNDEF:		return "Undefined";
+	}
+	
+	return "Unknown";
 }
 ////////////////////////////////////////////////////////////////////////
 void CncContext::setProbeMode(bool state) { 
@@ -18,4 +41,35 @@ void CncContext::setProbeMode(bool state) {
 	
 	if ( APP_PROXY::isAppPointerAvailable() == true )
 		APP_PROXY::decorateProbeMode(probeMode);
+}
+////////////////////////////////////////////////////////////////////////
+const std::ostream& CncContext::traceVersionInfo(std::ostream& os) const {
+////////////////////////////////////////////////////////////////////////
+	os << "Version Information:\n";
+	
+	for ( auto it = versionInfoMap.begin(); it != versionInfoMap.end(); ++it ) {
+		wxString value(it->second);
+		value.Replace("\n", "");
+		os << it->first << " = " << value << std::endl;
+	}
+	
+	return os;
+}
+////////////////////////////////////////////////////////////////////////
+const std::ostream& CncContext::traceCommandLineParameter(std::ostream& os) const {
+////////////////////////////////////////////////////////////////////////
+	for (int i=0; i<wxTheApp->argc; i++ ) 
+		os << wxTheApp->argv[i] << " ";
+	
+	return os;
+}
+////////////////////////////////////////////////////////////////////////
+const wxString& CncContext::traceCommandLineParameter(wxString& s) const {
+////////////////////////////////////////////////////////////////////////
+	s.clear();
+	for (int i=0; i<wxTheApp->argc; i++ ) {
+		s.append(wxTheApp->argv[i]);
+		s.append(" ");
+	}
+	return s;
 }
