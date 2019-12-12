@@ -7,12 +7,12 @@
 #include "3D/GLContextBase.h"
 
 /////////////////////////////////////////////////////////////////
-int32_t GLContextBase::MouseVertexInfo::getAsStepsX (float scaleFactor) { return x / scaleFactor * GBL_CONFIG->getDispFactX3D(); }
-int32_t GLContextBase::MouseVertexInfo::getAsStepsY (float scaleFactor) { return y / scaleFactor * GBL_CONFIG->getDispFactY3D(); }
-int32_t GLContextBase::MouseVertexInfo::getAsStepsZ (float scaleFactor) { return z / scaleFactor * GBL_CONFIG->getDispFactZ3D(); }
-double  GLContextBase::MouseVertexInfo::getAsMetricX(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricX(getAsStepsX(scaleFactor)); }
-double  GLContextBase::MouseVertexInfo::getAsMetricY(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricY(getAsStepsY(scaleFactor)); }
-double  GLContextBase::MouseVertexInfo::getAsMetricZ(float scaleFactor) { return GBL_CONFIG->convertStepsToMetricZ(getAsStepsZ(scaleFactor)); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsX (float scaleFactor) { return x / scaleFactor * THE_CONFIG->getDispFactX3D(); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsY (float scaleFactor) { return y / scaleFactor * THE_CONFIG->getDispFactY3D(); }
+int32_t GLContextBase::MouseVertexInfo::getAsStepsZ (float scaleFactor) { return z / scaleFactor * THE_CONFIG->getDispFactZ3D(); }
+double  GLContextBase::MouseVertexInfo::getAsMetricX(float scaleFactor) { return THE_CONFIG->convertStepsToMetricX(getAsStepsX(scaleFactor)); }
+double  GLContextBase::MouseVertexInfo::getAsMetricY(float scaleFactor) { return THE_CONFIG->convertStepsToMetricY(getAsStepsY(scaleFactor)); }
+double  GLContextBase::MouseVertexInfo::getAsMetricZ(float scaleFactor) { return THE_CONFIG->convertStepsToMetricZ(getAsStepsZ(scaleFactor)); }
 
 const wxGLCanvas* GLContextBase::currentCanvas = NULL;
 

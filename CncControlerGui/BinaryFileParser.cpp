@@ -65,15 +65,15 @@ bool BinaryFileParser::checkHardwareSetup() {
 	y.ToDouble(&dy);
 	z.ToDouble(&dz);
 	
-	if (	   cnc::dblCompare(GBL_CONFIG->getDisplayFactX(), dx) == false
-			|| cnc::dblCompare(GBL_CONFIG->getDisplayFactY(), dy) == false
-			|| cnc::dblCompare(GBL_CONFIG->getDisplayFactZ(), dz) == false
+	if (	   cnc::dblCompare(THE_CONFIG->getDisplayFactX(), dx) == false
+			|| cnc::dblCompare(THE_CONFIG->getDisplayFactY(), dy) == false
+			|| cnc::dblCompare(THE_CONFIG->getDisplayFactZ(), dz) == false
 	) {
 		std::cerr << "BinaryFileParser::checkHardwareSetup(): Hardware setup difference:" 	<< std::endl
 				  << " File        : " << dx << ", " << dy << ", " << dz					<< std::endl
-				  << " Application : " << GBL_CONFIG->getDisplayFactX() 					<< ", " 
-									   << GBL_CONFIG->getDisplayFactY() 					<< ", " 
-									   << GBL_CONFIG->getDisplayFactZ() 					<< std::endl;
+				  << " Application : " << THE_CONFIG->getDisplayFactX() 					<< ", " 
+									   << THE_CONFIG->getDisplayFactY() 					<< ", " 
+									   << THE_CONFIG->getDisplayFactZ() 					<< std::endl;
 		return false;
 	}
 	

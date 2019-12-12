@@ -90,7 +90,7 @@ void SerialEmulatorGCodeStreamer::initializeFile(const Serial::Trigger::BeginRun
 		headerStream << "(<Init absolute position>)\n";
 		headerStream << "G90\n";
 		CncDoublePosition dPos;
-		GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
+		THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 		headerStream << wxString::Format("G0 X%+.3lf Y%+.3lf Z%+.3lf\n", dPos.getX(), dPos.getY(), dPos.getZ());
 	
 	// all the further moves are relative

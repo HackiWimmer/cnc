@@ -132,9 +132,9 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 //////////////////////////////////////////////////
 	static GLOpenGLPathBuffer::CncVertex vertex;
 
-	const float x = vd.getX() / (maxDimension / GBL_CONFIG->getCalculationFactX());
-	const float y = vd.getY() / (maxDimension / GBL_CONFIG->getCalculationFactY());
-	const float z = vd.getZ() / (maxDimension / GBL_CONFIG->getCalculationFactZ());
+	const float x = vd.getX() / (maxDimension / THE_CONFIG->getCalculationFactX());
+	const float y = vd.getY() / (maxDimension / THE_CONFIG->getCalculationFactY());
+	const float z = vd.getZ() / (maxDimension / THE_CONFIG->getCalculationFactZ());
 	const char sc = cnc::getCncSpeedTypeAsCharacter(vd.getSpeedMode());
 	
 	// to update the progess bar

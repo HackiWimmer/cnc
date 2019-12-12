@@ -278,7 +278,7 @@ void SVGPathHandlerCnc::finishWork() {
 	
 	// controller handling
 	cncControl->switchToolOff();
-	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
+	cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
 	cncControl->moveXYToZeroPos();
 	
 	//svg output handling
@@ -333,7 +333,7 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisUp() {
 	long prevClientId = cncControl->getClientId();
 	cncControl->setClientId(CLIENT_ID.SVG_Z_UP);
 
-	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
+	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
 		return false;
 	
 	if ( moveLinearZ(moveZ) == false )
@@ -368,7 +368,7 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisDown() {
 	long prevClientId = cncControl->getClientId();
 	cncControl->setClientId(CLIENT_ID.SVG_Z_DOWN);
 
-	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
+	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
 		return false;
 
 	if ( moveLinearZ(moveZ) == false )

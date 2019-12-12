@@ -92,7 +92,7 @@ class SVGUserAgent{
 			oCtl.detailInfo			= NULL;
 			
 			//preallocate space
-			userAgent.reserve(GBL_CONFIG->getConstReserveCapacity());
+			userAgent.reserve(THE_CONFIG->getConstReserveCapacity());
 		}
 		
 		/////////////////////////////////////////////////////////

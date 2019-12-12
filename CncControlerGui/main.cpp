@@ -8,14 +8,16 @@
 #include <wx/dcmemory.h>
 #include <wx/cmdline.h>
 #include <wx/intl.h>
+#include "OSD/CncTimeFunctions.h"
 #include "CncLoggerProxy.h"
+#include "CncConfigProperty.h"
 #include "CncFileNameService.h"
 #include "CncStreamBuffers.h"
-#include "OSD/CncTimeFunctions.h"
-#include "GlobalStrings.h"
-#include "GlobalFunctions.h"
 #include "CncContext.h"
 #include "CncCommon.h"
+#include "GlobalStrings.h"
+#include "GlobalFunctions.h"
+#include "MainFrameDummy.h"
 #include "MainFrame.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -66,119 +68,121 @@ static const wxCmdLineEntryDesc cmdLineDesc[] = {
 	};
 	
 ///////////////////////////////////////////////////////////////////////////
-class GlobalStreamRedirection {
+namespace GlobalStreamRedirection {
 	
-	public:
-		///////////////////////////////////////////////////////////////////
-		static void preInstall() {
-			
-			//redirect std::cout
-			psbufCout = new CncCoutBuf(NULL);
-			sbOldCout = std::cout.rdbuf();
-			std::cout.rdbuf(psbufCout);
-			
-			//redirect std::clog
-			psbufClog = new CncClogBuf(NULL);
-			sbOldClog = std::clog.rdbuf();
-			std::clog.rdbuf(psbufClog);
-			
-			//redirect std::cerr
-			psbufCerr = new CncCerrBuf(NULL);
-			sbOldCerr = std::cerr.rdbuf();
-			std::cerr.rdbuf(psbufCerr);
-			
-			// redirect ext1 buffer
-			psbufCex1 = new CncCex1Buf(NULL);
-			sbOldCex1 = cnc::cex1.rdbuf();
-			((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
-			cnc::cex1.setLogStreamBuffer(psbufCex1);
-		}
+	enum State { UNKNOWN, PREINSTALLED, INSTALLED };
+	
+	State streamRedirectionState = UNKNOWN;
+	
+	///////////////////////////////////////////////////////////////////
+	void preInstall() {
+	///////////////////////////////////////////////////////////////////
+		if ( streamRedirectionState != UNKNOWN )
+			return;
 		
-		///////////////////////////////////////////////////////////////////
-		static void install(MainFrame* mainFrame) {
-			
-			// perform startup trace
-			CncTextCtrl* st = mainFrame->getStartupTrace();
-			st->Clear();
-			
-			wxTextAttr ta(wxColour(192, 192, 192));
-			/*
-			wxFont oldFont(st->GetFont());
-			wxFont newFont(oldFont);
-			newFont.SetWeight(wxFONTWEIGHT_BOLD);
-		 
-			ta.SetFont(newFont);
-			st->SetDefaultStyle(ta);
-			
-			st->AppendText("-------------------------------------------------------------------\n"
-						   " Startup stream trace . . .\n"
-						   "-------------------------------------------------------------------\n");
-			
-			ta.SetFont(oldFont);
-			*/
-			st->SetDefaultStyle(ta);
-			bool hasLogOrErr = StartupBuffer::trace(st);
-			mainFrame->GetLoggerNotebook()->SetPageText(LoggerSelection::VAL::STARTUP, (hasLogOrErr == true ? ")-:" : "(-;"));
-			
-			st->SetInsertionPoint(st->XYToPosition(0, 0));
-			st->ShowPosition(st->XYToPosition(0, 0));
-			
-			// set the logger control
-			psbufCout->setTextControl(mainFrame->getLogger());
-			psbufClog->setTextControl(mainFrame->getLogger());
-			psbufCerr->setTextControl(mainFrame->getLogger());
-			psbufCex1->setTextControl(mainFrame->getLogger());
-			
-			// redirect trace buffer
-			psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
-			sbOldCtrc = cnc::trc.rdbuf();
-			((std::iostream*)&cnc::trc)->rdbuf(psbufCtrc);
-			cnc::trc.setLogStreamBuffer(psbufCtrc);
-			
-			// redirect controller message buffer
-			psbufCmsg = new CncCmsgBuf(mainFrame->getCtrlMessageHistory());
-			sbOldCmsg = cnc::msg.rdbuf();
-			((std::iostream*)&cnc::msg)->rdbuf(psbufCmsg);
-			cnc::msg.setLogStreamBuffer(psbufCmsg);
-			
-			// redirect serial spy buffer
-			psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
-			sbOldCspy = cnc::spy.rdbuf();
-			((std::iostream*)&cnc::spy)->rdbuf(psbufCspy);
-			cnc::spy.setLogStreamBuffer(psbufCspy);
-		}
+		//redirect std::cout
+		psbufCout = new CncCoutBuf(NULL);
+		sbOldCout = std::cout.rdbuf();
+		std::cout.rdbuf(psbufCout);
 		
-		///////////////////////////////////////////////////////////////////
-		static void reset() {
-			// deconstruct redirecting
+		//redirect std::clog
+		psbufClog = new CncClogBuf(NULL);
+		sbOldClog = std::clog.rdbuf();
+		std::clog.rdbuf(psbufClog);
+		
+		//redirect std::cerr
+		psbufCerr = new CncCerrBuf(NULL);
+		sbOldCerr = std::cerr.rdbuf();
+		std::cerr.rdbuf(psbufCerr);
+		
+		// redirect ext1 buffer
+		psbufCex1 = new CncCex1Buf(NULL);
+		sbOldCex1 = cnc::cex1.rdbuf();
+		((std::iostream*)&cnc::cex1)->rdbuf(psbufCex1);
+		cnc::cex1.setLogStreamBuffer(psbufCex1);
+		
+		streamRedirectionState = PREINSTALLED;
+	}
+		
+	///////////////////////////////////////////////////////////////////
+	void install(MainFrame* mainFrame) {
+		if ( streamRedirectionState != PREINSTALLED )
+			return;
 			
-			// ungregister text controls
-			psbufCout->ungregisterTextControl();
-			psbufClog->ungregisterTextControl();
-			psbufCerr->ungregisterTextControl();
-			psbufCex1->ungregisterTextControl();
-			psbufCtrc->ungregisterTextControl();
-			psbufCmsg->ungregisterTextControl();
-			psbufCspy->ungregisterTextControl();
-			
-			// redirect to old buf
-			std::cout.rdbuf(sbOldCout);
-			std::cerr.rdbuf(sbOldClog);
-			std::cerr.rdbuf(sbOldCerr);
-			((std::iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
-			((std::iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
-			((std::iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
-			((std::iostream*)&cnc::spy)->rdbuf(sbOldCspy);
-			
-			// delete stream buffers
-			delete psbufCout;
-			delete psbufClog;
-			delete psbufCerr;
-			delete psbufCex1;
-			delete psbufCtrc;
-			delete psbufCmsg;
-			delete psbufCspy;
-		}
+		// perform startup trace
+		CncTextCtrl* st = mainFrame->getStartupTrace();
+		st->Clear();
+		
+		wxTextAttr ta(wxColour(192, 192, 192));
+		st->SetDefaultStyle(ta);
+		bool hasLogOrErr = StartupBuffer::trace(st);
+		mainFrame->GetLoggerNotebook()->SetPageText(LoggerSelection::VAL::STARTUP, (hasLogOrErr == true ? ")-:" : "(-;"));
+		
+		st->SetInsertionPoint(st->XYToPosition(0, 0));
+		st->ShowPosition(st->XYToPosition(0, 0));
+		
+		// set the logger control
+		psbufCout->setTextControl(mainFrame->getLogger());
+		psbufClog->setTextControl(mainFrame->getLogger());
+		psbufCerr->setTextControl(mainFrame->getLogger());
+		psbufCex1->setTextControl(mainFrame->getLogger());
+		
+		// redirect trace buffer
+		psbufCtrc = new CncCtrcBuf(mainFrame->getTrace());
+		sbOldCtrc = cnc::trc.rdbuf();
+		((std::iostream*)&cnc::trc)->rdbuf(psbufCtrc);
+		cnc::trc.setLogStreamBuffer(psbufCtrc);
+		
+		// redirect controller message buffer
+		psbufCmsg = new CncCmsgBuf(mainFrame->getCtrlMessageHistory());
+		sbOldCmsg = cnc::msg.rdbuf();
+		((std::iostream*)&cnc::msg)->rdbuf(psbufCmsg);
+		cnc::msg.setLogStreamBuffer(psbufCmsg);
+		
+		// redirect serial spy buffer
+		psbufCspy = new CncCspyBuf(mainFrame->getCtrlSerialSpy());
+		sbOldCspy = cnc::spy.rdbuf();
+		((std::iostream*)&cnc::spy)->rdbuf(psbufCspy);
+		cnc::spy.setLogStreamBuffer(psbufCspy);
+		
+		streamRedirectionState = INSTALLED;
+	}
+		
+	///////////////////////////////////////////////////////////////////
+	void reset() {
+		if ( streamRedirectionState != INSTALLED )
+			return;			
+		// deconstruct redirecting
+		
+		// ungregister text controls
+		psbufCout->ungregisterTextControl();
+		psbufClog->ungregisterTextControl();
+		psbufCerr->ungregisterTextControl();
+		psbufCex1->ungregisterTextControl();
+		psbufCtrc->ungregisterTextControl();
+		psbufCmsg->ungregisterTextControl();
+		psbufCspy->ungregisterTextControl();
+		
+		// redirect to old buf
+		std::cout.rdbuf(sbOldCout);
+		std::cerr.rdbuf(sbOldClog);
+		std::cerr.rdbuf(sbOldCerr);
+		((std::iostream*)&cnc::cex1)->rdbuf(sbOldCex1);
+		((std::iostream*)&cnc::trc)->rdbuf(sbOldCtrc);
+		((std::iostream*)&cnc::msg)->rdbuf(sbOldCmsg);
+		((std::iostream*)&cnc::spy)->rdbuf(sbOldCspy);
+		
+		// delete stream buffers
+		delete psbufCout;
+		delete psbufClog;
+		delete psbufCerr;
+		delete psbufCex1;
+		delete psbufCtrc;
+		delete psbufCmsg;
+		delete psbufCspy;
+		
+		APPEND_LOCATION_TO_STACK_TRACE_FILE;
+	}
 };
 void GlobalStreamRedirectionReset() { GlobalStreamRedirection::reset(); }
 	
@@ -189,7 +193,7 @@ class MainLogger : public wxLog {
 	public:
 		
 		MainLogger() : wxLog() {}
-		virtual ~MainLogger()  {}
+		virtual ~MainLogger()  { APPEND_LOCATION_TO_STACK_TRACE_FILE; }
 		
 	protected:
 		
@@ -232,15 +236,16 @@ class MainApp : public wxApp {
 ///////////////////////////////////////////////////////////////////
 	private:
 		
-		wxCmdLineParser parser;
-		//wxLocale locale;
-		wxFileConfig* 	globalFileConfig;
+		wxCmdLineParser*	parser;
+		//wxLocale			locale;
+		wxFileConfig*		globalFileConfig;
 		
 	public:
 		///////////////////////////////////////////////////////////
 		MainApp() 
 		//: locale(wxLANGUAGE_DEFAULT)
-		: globalFileConfig(NULL)
+		: parser(new wxCmdLineParser())
+		, globalFileConfig(NULL)
 		///////////////////////////////////////////////////////////
 		{
 			GlobalStreamRedirection::preInstall();
@@ -248,8 +253,13 @@ class MainApp : public wxApp {
 			// init file and dir names
 			CncFileNameService::init();
 			CncTimeFunctions::init();
+			CncTextCtrlEditor::init();
 
-			globalFileConfig = new wxFileConfig(wxT("CncController"), wxEmptyString, CncFileNameService::getConfigFileName(), CncFileNameService::getConfigFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
+			globalFileConfig = new wxFileConfig(wxT("CncController"), 
+												wxEmptyString, 
+												CncFileNameService::getConfigFileName(), 
+												CncFileNameService::getConfigFileName(), 
+												wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS);
 			
 			// determine assert handler
 			// this show a lot of sizer assert
@@ -259,7 +269,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual ~MainApp() {
 		///////////////////////////////////////////////////////////
-			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
+			APPEND_LOCATION_TO_STACK_TRACE_FILE
 				
 			if ( globalFileConfig != NULL )
 				;//delete globalFileConfig;
@@ -272,12 +282,13 @@ class MainApp : public wxApp {
 		}
 		
 		///////////////////////////////////////////////////////////////////
-		void printUsage(wxCmdLineParser& parser) {
+		void printUsage() {
 		//////////////////////////////////////////////////////////////////
+			wxASSERT ( parser );
 			#ifdef __WXMSW__
-				parser.Usage();
+				parser->Usage();
 			#else
-				wxString usageString = parser.GetUsageString();
+				wxString usageString = parser->GetUsageString();
 				std::cout << usageString.mb_str(wxConvUTF8).data() << std::endl;
 			#endif
 		}
@@ -343,11 +354,12 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		bool initializeCmdLine() {
 		///////////////////////////////////////////////////////////
-			parser.SetDesc(cmdLineDesc);
-			parser.SetCmdLine(wxAppBase::argc, wxAppBase::argv);
+			wxASSERT ( parser );
+			parser->SetDesc(cmdLineDesc);
+			parser->SetCmdLine(wxAppBase::argc, wxAppBase::argv);
 			
-			if ( parser.Parse(false) != 0 ) {
-				printUsage(parser);
+			if ( parser->Parse(false) != 0 ) {
+				printUsage();
 				return false;
 			}
 			
@@ -357,7 +369,7 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		bool getCmdLineParameter(const char* param) {
 		///////////////////////////////////////////////////////////
-			if ( parser.Found(param) )
+			if ( parser->Found(param) )
 				return true;
 				
 			return false;
@@ -366,22 +378,24 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		bool getCmdLineParameter(const char* param, wxString& value) {
 		///////////////////////////////////////////////////////////
-			if ( parser.Found(param, &value) )
+			if ( parser->Found(param, &value) )
 				return true;
 				
 			return false;
 		}
 		
 		///////////////////////////////////////////////////////////
-		virtual int OnRun() {
-		///////////////////////////////////////////////////////////
-			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
-			return wxApp::OnRun();
-		}
-		
-		///////////////////////////////////////////////////////////
 		virtual bool OnInit() {
 		///////////////////////////////////////////////////////////
+			APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Entry . . .");
+			
+			if ( false ) {
+				MainFrameDummy* mainFrameDummy = new MainFrameDummy(NULL);
+				mainFrameDummy->SetTitle(CncFileNameService::getStackTraceFileName());
+				SetTopWindow(mainFrameDummy);
+				return GetTopWindow()->Show();
+			}
+			
 			//setlocale(LC_NUMERIC, "");
 			wxLocale(LC_NUMERIC);
 			
@@ -399,7 +413,7 @@ class MainApp : public wxApp {
 			
 			// splash screen handling
 			if( getCmdLineParameter("g") == false ) {
-				if ( GBL_CONFIG && GBL_CONFIG->getSplashScreenFlag() == true )
+				if ( THE_CONFIG && THE_CONFIG->getSplashScreenFlag() == true )
 					displaySplashImage(mainFrame);
 			}
 			
@@ -412,13 +426,16 @@ class MainApp : public wxApp {
 			
 			// setup some context information
 			if ( getCmdLineParameter("s") == true )	{
-				GBL_CONTEXT->secureModeInfo.isActive 				= true;
-				GBL_CONTEXT->secureModeInfo.isActivatedByStartup 	= true;
+				THE_CONTEXT->secureModeInfo.isActive 				= true;
+				THE_CONTEXT->secureModeInfo.isActivatedByStartup 	= true;
 			}
 			
 			// start the main frame
 			SetTopWindow(mainFrame);
-			return GetTopWindow()->Show();
+			int ret = GetTopWindow()->Show();
+			
+			APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Result = %d", ret));
+			return ret;
 		}
 		
 		///////////////////////////////////////////////////////////
@@ -442,21 +459,33 @@ class MainApp : public wxApp {
 		}
 		
 		///////////////////////////////////////////////////////////
-		virtual int OnExit() {
+		virtual int OnRun() {
 		///////////////////////////////////////////////////////////
-			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
-			return wxApp::OnExit();
+			APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Entry . . .");
+			
+			int ret = wxApp::OnRun();
+			APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Result = %d", ret));
+			return ret;
 		}
 		
+		///////////////////////////////////////////////////////////
+		virtual int OnExit() {
+		///////////////////////////////////////////////////////////
+			int ret = wxApp::OnExit();
+			
+			APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Result = %d", ret));
+			return ret;
+		}
 		
 		///////////////////////////////////////////////////////////
 		virtual bool OnExceptionInMainLoop() {
 		///////////////////////////////////////////////////////////
-			GblFunc::appendToStackTraceFile(CNC_LOG_FUNCT);
+			APPEND_LOCATION_TO_STACK_TRACE_FILE;
 			//return wxApp::OnExceptionInMainLoop();
 			//throw;
 			return true;
 		}
+		
 		/*
 		///////////////////////////////////////////////////////////
 		virtual void OnUnhandledException() {

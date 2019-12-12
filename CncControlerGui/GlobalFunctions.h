@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <wx/window.h>
+#include "CncCommon.h"
 
 class GblFunc {
 	private:
@@ -12,6 +13,7 @@ class GblFunc {
 	public:
 		static void swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl);
 		static void replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl);
+		static void cloneAttributes(wxWindow* source, wxWindow* target);
 		
 		static const std::ostream& 	stacktraceOnlyApp(std::ostream& o, bool lastOnly);
 		static const wxString& 		stacktraceOnlyApp(wxString& ret, bool lastOnly);
@@ -24,5 +26,8 @@ class GblFunc {
 	
 		static void appendToStackTraceFile(const wxString& st);
 };
+
+#define APPEND_LOCATION_TO_STACK_TRACE_FILE 		GblFunc::appendToStackTraceFile(CNC_LOG_LOCATION);
+#define APPEND_LOCATION_TO_STACK_TRACE_FILE_A(msg) 	GblFunc::appendToStackTraceFile(CNC_LOG_LOCATION_A(msg));
 
 #endif

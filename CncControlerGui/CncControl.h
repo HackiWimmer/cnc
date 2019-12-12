@@ -275,12 +275,12 @@ class CncControl {
 		const CncLongPosition::Watermarks 	getWaterMarks();
 		const CncDoublePosition::Watermarks getWaterMarksMetric();
 		
-		const double 						getCurAppPosMetricX() { return curAppPos.getX() * GBL_CONFIG->getDisplayFactX(); }
-		const double 						getCurAppPosMetricY() { return curAppPos.getY() * GBL_CONFIG->getDisplayFactY(); }
-		const double 						getCurAppPosMetricZ() { return curAppPos.getZ() * GBL_CONFIG->getDisplayFactZ(); }
-		const double 						getCurCtlPosMetricX() { return curCtlPos.getX() * GBL_CONFIG->getDisplayFactX(); }
-		const double 						getCurCtlPosMetricY() { return curCtlPos.getY() * GBL_CONFIG->getDisplayFactY(); }
-		const double 						getCurCtlPosMetricZ() { return curCtlPos.getZ() * GBL_CONFIG->getDisplayFactZ(); }
+		const double 						getCurAppPosMetricX() { return curAppPos.getX() * THE_CONFIG->getDisplayFactX(); }
+		const double 						getCurAppPosMetricY() { return curAppPos.getY() * THE_CONFIG->getDisplayFactY(); }
+		const double 						getCurAppPosMetricZ() { return curAppPos.getZ() * THE_CONFIG->getDisplayFactZ(); }
+		const double 						getCurCtlPosMetricX() { return curCtlPos.getX() * THE_CONFIG->getDisplayFactX(); }
+		const double 						getCurCtlPosMetricY() { return curCtlPos.getY() * THE_CONFIG->getDisplayFactY(); }
+		const double 						getCurCtlPosMetricZ() { return curCtlPos.getZ() * THE_CONFIG->getDisplayFactZ(); }
 		
 		
 		// query the current controller position

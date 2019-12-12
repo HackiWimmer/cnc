@@ -23,9 +23,9 @@ CncPathListRunner::CncPathListRunner(CncControl* cnc)
 , setup()
 {
 	setup.cnc 				= cnc;
-	setup.optAnalyse		= GBL_CONFIG->getPreProcessorAnalyseFlag();
-	setup.optCombineMoves 	= GBL_CONFIG->getPreProcessorCombineMovesFlag();
-	setup.optSkipEmptyMoves = GBL_CONFIG->getPreProcessoSkipEmptyFlag();
+	setup.optAnalyse		= THE_CONFIG->getPreProcessorAnalyseFlag();
+	setup.optCombineMoves 	= THE_CONFIG->getPreProcessorCombineMovesFlag();
+	setup.optSkipEmptyMoves = THE_CONFIG->getPreProcessoSkipEmptyFlag();
 
 	wxASSERT( setup.cnc != NULL );
 	initNextMoveSequence();

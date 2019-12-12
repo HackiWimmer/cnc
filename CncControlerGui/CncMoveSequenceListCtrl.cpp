@@ -235,11 +235,11 @@ void CncMoveSequenceListCtrl::onPaint(wxPaintEvent& event) {
 //////////////////////////////////////////////////
 	event.Skip();
 
-	const bool show = GBL_CONFIG->getPreProcessorAnalyseFlag() == false && active;
+	const bool show = THE_CONFIG->getPreProcessorAnalyseFlag() == false && active;
 	infoText->Show(show);
 	
 	if ( active ) {
-		if ( GBL_CONFIG->getPreProcessorAnalyseFlag() == false ) 
+		if ( THE_CONFIG->getPreProcessorAnalyseFlag() == false ) 
 			clear();
 	}
 }

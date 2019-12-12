@@ -19,9 +19,10 @@ class CncTextCtrl : public wxTextCtrl  {
 		virtual void onOverflowTimer(wxTimerEvent& event);
 		
 	public:
-		explicit CncTextCtrl(wxWindow* parent);
-		explicit CncTextCtrl(const CncTextCtrl& source);
-		explicit CncTextCtrl(const wxTextCtrl& source);
+		CncTextCtrl(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, 
+					const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+					long style=0, const wxValidator &validator=wxDefaultValidator, const wxString 
+					&name=wxTextCtrlNameStr);
 		virtual ~CncTextCtrl();
 		
 		int getOverflowInterval()			const { return overflowTimer->GetInterval(); }
@@ -45,8 +46,8 @@ class CncLoggerProxy : public CncTextCtrl  {
 		virtual void onUpdateLogger(wxCommandEvent& event);
 
 	public:
-		explicit CncLoggerProxy(wxWindow* parent);
-		explicit CncLoggerProxy(const wxTextCtrl& source);
+		CncLoggerProxy(wxWindow *parent, wxWindowID id=wxID_ANY, const wxString &value=wxEmptyString, const wxPoint &pos=wxDefaultPosition, const wxSize &size=wxDefaultSize, 
+		               long style=0, const wxValidator &validator=wxDefaultValidator, const wxString &name=wxTextCtrlNameStr);
 		virtual ~CncLoggerProxy();
 		
 		void setShowOnDemandState(bool state) { showOnDemandState = state; }

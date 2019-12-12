@@ -34,7 +34,7 @@ CncPreprocessor::CncPreprocessor(wxWindow* parent)
 	moveSequenceOverview = new CncMoveSequenceOverviewListCtrl(this, wxLC_HRULES | wxLC_VRULES | wxLC_SINGLE_SEL, moveSequence, m_contentLabel);
 	GblFunc::replaceControl(m_moveSequencesListPlaceholder, moveSequenceOverview);
 
-	const wxFont font = GBL_CONTEXT->outboundListBookFont;
+	const wxFont font = THE_CONTEXT->outboundListBookFont;
 	m_listbookPreProcessor->GetListView()->SetFont(font);
 }
 //////////////////////////////////////////////////////////////////

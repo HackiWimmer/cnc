@@ -111,17 +111,17 @@ wxString CncContextListCtrl::OnGetItemText(long item, long column) const {
 	long index = 0;
 	if ( false ) {}
 	
-	else if ( index++ == item ) return eval(column, "CommandLine",          											GBL_CONTEXT->traceCommandLineParameter(s));
+	else if ( index++ == item ) return eval(column, "CommandLine",          											THE_CONTEXT->traceCommandLineParameter(s));
 	
-	else if ( index++ == item ) return eval(column, "SecureModeInfo.UseIt",								formatBool		(GBL_CONTEXT->secureModeInfo.useIt));
-	else if ( index++ == item ) return eval(column, "SecureModeInfo.Active",							formatBool		(GBL_CONTEXT->secureModeInfo.isActive));
-	else if ( index++ == item ) return eval(column, "SecureModeInfo.ActivatedByStartup",				formatBool		(GBL_CONTEXT->secureModeInfo.isActivatedByStartup));
+	else if ( index++ == item ) return eval(column, "SecureModeInfo.UseIt",								formatBool		(THE_CONTEXT->secureModeInfo.useIt));
+	else if ( index++ == item ) return eval(column, "SecureModeInfo.Active",							formatBool		(THE_CONTEXT->secureModeInfo.isActive));
+	else if ( index++ == item ) return eval(column, "SecureModeInfo.ActivatedByStartup",				formatBool		(THE_CONTEXT->secureModeInfo.isActivatedByStartup));
 	
-	else if ( index++ == item ) return eval(column, "Common.ProbeMode",									formatBool		(GBL_CONTEXT->isProbeMode()));
-	else if ( index++ == item ) return eval(column, "Common.OnlineUpdateDrawPane",						formatBool		(GBL_CONTEXT->isOnlineUpdateDrawPane()));
-	else if ( index++ == item ) return eval(column, "Common.AllowEventHandling",						formatBool		(GBL_CONTEXT->isAllowEventHandling()));
-	else if ( index++ == item ) return eval(column, "Common.OnlineUpdateCoordinates",					formatBool		(GBL_CONTEXT->isOnlineUpdateCoordinates()));
-	else if ( index++ == item ) return eval(column, "Common.UpdateInterval",							formatInt		(GBL_CONTEXT->getUpdateInterval()));
+	else if ( index++ == item ) return eval(column, "Common.ProbeMode",									formatBool		(THE_CONTEXT->isProbeMode()));
+	else if ( index++ == item ) return eval(column, "Common.OnlineUpdateDrawPane",						formatBool		(THE_CONTEXT->isOnlineUpdateDrawPane()));
+	else if ( index++ == item ) return eval(column, "Common.AllowEventHandling",						formatBool		(THE_CONTEXT->isAllowEventHandling()));
+	else if ( index++ == item ) return eval(column, "Common.OnlineUpdateCoordinates",					formatBool		(THE_CONTEXT->isOnlineUpdateCoordinates()));
+	else if ( index++ == item ) return eval(column, "Common.UpdateInterval",							formatInt		(THE_CONTEXT->getUpdateInterval()));
 	
 	wxASSERT ( index < MAX_ITEM_COUNT );
 	return _("");

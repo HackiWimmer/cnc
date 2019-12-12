@@ -451,7 +451,7 @@ void CncSpeedMonitor::save() {
 	
 	memDC.SelectObject(wxNullBitmap);
 	
-	wxString filePath(CncFileNameService::getTempDir());
+	wxString filePath(CncFileNameService::getTempDirSession());
 	wxString fileName(wxString::Format("\\SpeedLog-%s.bmp", wxDateTime::UNow().Format("%d-%m-%y.%H-%M-%S")));
 	
 	filePath.RemoveLast();

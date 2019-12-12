@@ -134,9 +134,9 @@ bool BinaryPathHandlerHumanReadableView::displayMetric(const unsigned char* buff
 	switch ( cmd ) {
 		case CMD_RENDER_AND_MOVE:
 		case CMD_MOVE:				{
-										const double factX = GBL_CONFIG->getDisplayFactX();
-										const double factY = GBL_CONFIG->getDisplayFactY();
-										const double factZ = GBL_CONFIG->getDisplayFactZ();
+										const double factX = THE_CONFIG->getDisplayFactX();
+										const double factY = THE_CONFIG->getDisplayFactY();
+										const double factZ = THE_CONFIG->getDisplayFactZ();
 										
 										int32_t x=0, y=0, z=0;
 										CncCommandDecoder::decodeMove(buffer, nbBytes, x, y, z);
@@ -234,9 +234,9 @@ bool BinaryPathHandlerHumanReadableView::processCommand(const unsigned char* buf
 /////////////////////////////////////////////////////////////
 void BinaryPathHandlerHumanReadableView::notifyMove(int32_t dx, int32_t dy, int32_t dz, int32_t f) {
 /////////////////////////////////////////////////////////////
-	const double factX = GBL_CONFIG->getDisplayFactX();
-	const double factY = GBL_CONFIG->getDisplayFactY();
-	const double factZ = GBL_CONFIG->getDisplayFactZ();
+	const double factX = THE_CONFIG->getDisplayFactX();
+	const double factY = THE_CONFIG->getDisplayFactY();
+	const double factZ = THE_CONFIG->getDisplayFactZ();
 
 	switch ( formatType ) {
 		case Steps:		readableContent << wxString::Format("    cnc->seq->exec(%+ 10ld, %+ 10ld, %+ 8ld ); // Sequence Move\n", dx, dy, dz);

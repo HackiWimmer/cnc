@@ -1695,4 +1695,16 @@ public:
     virtual ~MainFrameBClass();
 };
 
+
+class MainFrameDummyBase : public wxFrame
+{
+protected:
+
+protected:
+
+public:
+    MainFrameDummyBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("MainFrameDummy"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(500,300), long style = wxDEFAULT_FRAME_STYLE);
+    virtual ~MainFrameDummyBase();
+};
+
 #endif

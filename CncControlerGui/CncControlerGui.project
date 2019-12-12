@@ -336,6 +336,8 @@
       <File Name="wxCrafterContextObserver.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
+      <File Name="MainFrameDummy.h"/>
+      <File Name="MainFrameDummy.cpp"/>
       <File Name="MainFrameProxy.h"/>
       <File Name="MainFrameProxy.cpp"/>
       <File Name="GamepadThread.cpp"/>

@@ -263,7 +263,7 @@ void CncSpeedSimulator::completeMove() {
 //////////////////////////////////////////////////////////////////////////
 	#ifdef TRACE_SPEED_FLOW
 	
-		wxString fn(wxString::Format("%s/tx.%lld.txt", CncFileNameService::getTempDir(), CncTimeFunctions::getNanoTimestamp()));
+		wxString fn(wxString::Format("%s/tx.%lld.txt", CncFileNameService::getTempDirSession(), CncTimeFunctions::getNanoTimestamp()));
 		std::ofstream ofs (fn.c_str().AsChar(), std::ofstream::out);
 		delayAccumulator.trace(ofs);
 		ofs.close();

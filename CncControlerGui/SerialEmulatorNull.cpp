@@ -34,9 +34,9 @@ SerialEmulatorNULL::SerialEmulatorNULL(CncControl* cnc)
 , curEmulatorPos(0L, 0L, 0L)
 , lastCommand()
 , lastSignal(CMD_INVALID)
-, maxDimStepsX(GBL_CONFIG->getMaxDimensionStepsX())
-, maxDimStepsY(GBL_CONFIG->getMaxDimensionStepsY())
-, maxDimStepsZ(GBL_CONFIG->getMaxDimensionStepsZ())
+, maxDimStepsX(THE_CONFIG->getMaxDimensionStepsX())
+, maxDimStepsY(THE_CONFIG->getMaxDimensionStepsY())
+, maxDimStepsZ(THE_CONFIG->getMaxDimensionStepsZ())
 
 ///////////////////////////////////////////////////////////////////
 {
@@ -716,14 +716,14 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 				#warning consider PID_ACCEL_PROFILE values
 				
 				if ( true ) {
-					speedSimulator->setup('X', GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX(), 5.0, 5.0);
-					speedSimulator->setup('Y', GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY(), 5.0, 5.0);
-					speedSimulator->setup('Z', GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ(), 5.0, 5.0);
+					speedSimulator->setup('X', THE_CONFIG->getStepsX(), THE_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthX() + THE_CONFIG->getHighPulsWidthX(), 5.0, 5.0);
+					speedSimulator->setup('Y', THE_CONFIG->getStepsY(), THE_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthY() + THE_CONFIG->getHighPulsWidthY(), 5.0, 5.0);
+					speedSimulator->setup('Z', THE_CONFIG->getStepsZ(), THE_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthZ() + THE_CONFIG->getHighPulsWidthZ(), 5.0, 5.0);
 				}
 				else {
-					speedSimulator->X.setup(GBL_CONFIG->getStepsX(), GBL_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthX() + GBL_CONFIG->getHighPulsWidthX());
-					speedSimulator->Y.setup(GBL_CONFIG->getStepsY(), GBL_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthY() + GBL_CONFIG->getHighPulsWidthY());
-					speedSimulator->Z.setup(GBL_CONFIG->getStepsZ(), GBL_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, GBL_CONFIG->getLowPulsWidthZ() + GBL_CONFIG->getHighPulsWidthZ());
+					speedSimulator->X.setup(THE_CONFIG->getStepsX(), THE_CONFIG->getPitchX(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthX() + THE_CONFIG->getHighPulsWidthX());
+					speedSimulator->Y.setup(THE_CONFIG->getStepsY(), THE_CONFIG->getPitchY(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthY() + THE_CONFIG->getHighPulsWidthY());
+					speedSimulator->Z.setup(THE_CONFIG->getStepsZ(), THE_CONFIG->getPitchZ(), SPEED_MANAGER_CONST_STATIC_OFFSET_US, SPEED_MANAGER_CONST_LOOP_OFFSET_US, THE_CONFIG->getLowPulsWidthZ() + THE_CONFIG->getHighPulsWidthZ());
 				}
 				break;
 			}
@@ -847,7 +847,7 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz) {
 	
 	// speed setup
 	const double START_SPEED = speedSimulator->getStartSpeed_MM_MIN() * 0.5;
-	const double MAX_SPEED   = GBL_CONFIG->getMaxSpeedXYZ_MM_MIN();
+	const double MAX_SPEED   = THE_CONFIG->getMaxSpeedXYZ_MM_MIN();
 	const double DIFF_SPEED  = MAX_SPEED - START_SPEED;
 	
 	if ( DIFF_SPEED < 0.0 )
@@ -885,7 +885,7 @@ bool SerialEmulatorNULL::moveUntilSignal(int32_t dx , int32_t dy , int32_t dz) {
 void SerialEmulatorNULL::initializeFeedProfile(int32_t dx , int32_t dy , int32_t dz) {
 ///////////////////////////////////////////////////////////////////
 	// update speed simulator values
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
+	if ( THE_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->initMove(dx, dy, dz);
 	}
@@ -894,7 +894,7 @@ void SerialEmulatorNULL::initializeFeedProfile(int32_t dx , int32_t dy , int32_t
 void SerialEmulatorNULL::completeFeedProfile() {
 ///////////////////////////////////////////////////////////////////
 	// perform any rest offset
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
+	if ( THE_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->performCurrentOffset(true);
 		speedSimulator->completeMove();
@@ -1145,7 +1145,7 @@ unsigned char SerialEmulatorNULL::signalHandling() {
 void SerialEmulatorNULL::simulateOneStepTimeX() {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
+	if ( THE_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->simulateOneStepX();
 		speedSimulator->performCurrentOffset(false);
@@ -1155,7 +1155,7 @@ void SerialEmulatorNULL::simulateOneStepTimeX() {
 void SerialEmulatorNULL::simulateOneStepTimeY() {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
+	if ( THE_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->simulateOneStepY();
 		speedSimulator->performCurrentOffset(false);
@@ -1165,7 +1165,7 @@ void SerialEmulatorNULL::simulateOneStepTimeY() {
 void SerialEmulatorNULL::simulateOneStepTimeZ() {
 ///////////////////////////////////////////////////////////////////
 	// simulate speed
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
+	if ( THE_CONTEXT->isProbeMode() == false ) {
 		wxASSERT( speedSimulator != NULL );
 		speedSimulator->simulateOneStepZ();
 		speedSimulator->performCurrentOffset(false);

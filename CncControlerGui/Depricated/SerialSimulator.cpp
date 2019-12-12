@@ -117,7 +117,7 @@ void SerialSimulatorThread::Serial_write(const char* response) {
 
 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
 		evt.SetString("SerialFacadeThread::Serial_write: The given response is to large");
-		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+		wxPostEvent(THE_CONFIG->getTheApp(), evt);
 	}
 	
 	memcpy(bytes, response, size);
@@ -126,6 +126,6 @@ void SerialSimulatorThread::Serial_write(const char* response) {
 		
 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
 		evt.SetString("SerialFacadeThread::Serial_write: readDataQueue.push failed");
-		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+		wxPostEvent(THE_CONFIG->getTheApp(), evt);
 	}
 }

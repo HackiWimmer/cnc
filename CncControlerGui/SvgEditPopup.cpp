@@ -1,5 +1,6 @@
 #include "CncConfig.h"
 #include "MainFrame.h"
+#include "GlobalFunctions.h"
 #include "SvgEditPopup.h"
 
 #define svgPathGenItemString								"PGen - Insert last SVG pattern"
@@ -167,7 +168,7 @@ void SvgEditPopup::overAllMenuItems(wxMenu* menu) {
 //////////////////////////////////////////////////////////
 wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool extended) {
 //////////////////////////////////////////////////////////
-	MainFrame* frame = GBL_CONFIG->getTheApp();
+	MainFrame* frame = THE_CONFIG->getTheApp();
 	
 	if ( frame == NULL )
 		return NULL;
@@ -176,7 +177,7 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 		return NULL;
 		
 	if ( popup != NULL )
-		delete popup;
+		wxDELETE( popup );
 		
 	unsigned int idOffset = getNextIdOffset();
 		
@@ -222,212 +223,217 @@ wxMenu* SvgEditPopup::createMenu(wxStyledTextCtrl* ctl, wxMenu* popup, bool exte
 	popup->AppendSeparator();
 	popup->Append(idOffset + STC_OPEN_IN_BROWSER, 			wxT("Open with browser"));
 	
-
+	// with respect to the fact that wx will take ovwer the ownership of
+	// the corresponding user data poiter the following warpper was established
+	// to avaoid the deletion of the given/containg control
+	struct EditCtrlPointer : public wxObject {
+		wxStyledTextCtrl* ctl = NULL;
+		EditCtrlPointer(wxStyledTextCtrl* c) { ctl = c; }
+		virtual ~EditCtrlPointer() { /*APPEND_LOCATION_TO_STACK_TRACE_FILE;*/ }
+	};
+	
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCncParameterBlock());
-	 }, idOffset + STC_PM_CNC_PARAM_BLOCK, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCncParameterBlock());
+	 }, idOffset + STC_PM_CNC_PARAM_BLOCK, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCncBreakBlock());
-	 }, idOffset + STC_PM_CNC_BREAK_BLOCK, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCncBreakBlock());
+	 }, idOffset + STC_PM_CNC_BREAK_BLOCK, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCncPauseBlock());
-	 }, idOffset + STC_PM_CNC_PAUSE_BLOCK, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCncPauseBlock());
+	 }, idOffset + STC_PM_CNC_PAUSE_BLOCK, wxID_ANY, new EditCtrlPointer(ctl));
 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCircleTemplate());
-	 }, idOffset + STC_PM_CIRCLE, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCircleTemplate());
+	 }, idOffset + STC_PM_CIRCLE, wxID_ANY, new EditCtrlPointer(ctl));
 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getEllipseTemplate());
-	 }, idOffset + STC_PM_ELLIPSE, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getEllipseTemplate());
+	 }, idOffset + STC_PM_ELLIPSE, wxID_ANY, new EditCtrlPointer(ctl));
 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getLineTemplate());
-	 }, idOffset + STC_PM_LINE, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getLineTemplate());
+	 }, idOffset + STC_PM_LINE, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getRectTemplate());
-	 }, idOffset + STC_PM_RECT, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getRectTemplate());
+	 }, idOffset + STC_PM_RECT, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getPolygonTemplate());
-	 }, idOffset + STC_PM_POLYGON, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getPolygonTemplate());
+	 }, idOffset + STC_PM_POLYGON, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getPolylineTemplate());
-	 }, idOffset + STC_PM_POLYLINE, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getPolylineTemplate());
+	 }, idOffset + STC_PM_POLYLINE, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getPathTemplate());
-	 }, idOffset + STC_PM_PATH, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getPathTemplate());
+	 }, idOffset + STC_PM_PATH, wxID_ANY, new EditCtrlPointer(ctl));
 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getEllipticalARCPattern());
-	 }, idOffset + STC_PM_PATH_ELLIPTICALARC, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getEllipticalARCPattern());
+	 }, idOffset + STC_PM_PATH_ELLIPTICALARC, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getQuadraticBezierPattern());
-	 }, idOffset + STC_PM_PATH_QUADRATICBEZIER, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getQuadraticBezierPattern());
+	 }, idOffset + STC_PM_PATH_QUADRATICBEZIER, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->InsertText(ctl->GetCurrentPos(), SvgNodeTemplates::getCubicBezierPattern());
-	 }, idOffset + STC_PM_PATH_CUBICBEZIER, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->InsertText(p->ctl->GetCurrentPos(), SvgNodeTemplates::getCubicBezierPattern());
+	 }, idOffset + STC_PM_PATH_CUBICBEZIER, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->Copy();
-	 }, idOffset + STC_PM_COPY, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->Copy();
+	 }, idOffset + STC_PM_COPY, wxID_ANY, new EditCtrlPointer(ctl));
 	
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->Paste();
-	 }, idOffset + STC_PM_PASTE, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->Paste();
+	 }, idOffset + STC_PM_PASTE, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->Undo();
-	 }, idOffset + STC_PM_UNDO, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->Undo();
+	 }, idOffset + STC_PM_UNDO, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->Redo();
-	 }, idOffset + STC_PM_REDO, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->Redo();
+	 }, idOffset + STC_PM_REDO, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->SelectAll();
-	 }, idOffset + STC_PM_SELECT_ALL, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->SelectAll();
+	 }, idOffset + STC_PM_SELECT_ALL, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->Cut();
-	 }, idOffset + STC_PM_CUT, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->Cut();
+	 }, idOffset + STC_PM_CUT, wxID_ANY, new EditCtrlPointer(ctl));
 	
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->DeleteBack();
-	 }, idOffset + STC_PM_DELETE, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			p->ctl->DeleteBack();
+	 }, idOffset + STC_PM_DELETE, wxID_ANY, new EditCtrlPointer(ctl));
 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			commentCurrentSvgNode(ctl);
-	 }, idOffset + STC_PM_COMMENT, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			commentCurrentSvgNode(p->ctl);
+	 }, idOffset + STC_PM_COMMENT, wxID_ANY, new EditCtrlPointer(ctl));
 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			uncommentCurrentSvgNode(ctl);
-	 }, idOffset + STC_PM_UNCOMMENT, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			uncommentCurrentSvgNode(p->ctl);
+	 }, idOffset + STC_PM_UNCOMMENT, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			selectCurrentSvgNode(ctl);
-	 }, idOffset + STC_PM_SELECT_NODE, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			selectCurrentSvgNode(p->ctl);
+	 }, idOffset + STC_PM_SELECT_NODE, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			selectCurrentSvgNodeBlock(ctl);
-	 }, idOffset + STC_PM_SELECT_NODE_BLOCK, wxID_ANY, ctl);
+			EditCtrlPointer* p = reinterpret_cast<EditCtrlPointer*>(event.GetEventUserData());
+			wxASSERT(p->ctl);
+			selectCurrentSvgNodeBlock(p->ctl);
+	 }, idOffset + STC_PM_SELECT_NODE_BLOCK, wxID_ANY, new EditCtrlPointer(ctl));
 	 
 	//............................................
 	popup->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [](wxCommandEvent& event) {
-			wxStyledTextCtrl* ctl = reinterpret_cast<wxStyledTextCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			
-			if ( GBL_CONFIG->getTheApp() == NULL )
+			if ( THE_CONFIG->getTheApp() == NULL )
 				return;
 			
-			GBL_CONFIG->getTheApp()->openCurrentTemplateInBrowser();
+			THE_CONFIG->getTheApp()->openCurrentTemplateInBrowser();
 			
-	 }, idOffset + STC_OPEN_IN_BROWSER, wxID_ANY, ctl);
+	 }, idOffset + STC_OPEN_IN_BROWSER, wxID_ANY);
 	
 	return popup;
 }

@@ -47,7 +47,7 @@ void SerialSimulatorFacade::waitDuringRead(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
 	// if no thread exists wait conventional
 	if ( serialThread == NULL ) {
-		GBL_CONFIG->getTheApp()->waitActive(millis);
+		THE_CONFIG->getTheApp()->waitActive(millis);
 		return;
 	}
 	
@@ -59,7 +59,7 @@ void SerialSimulatorFacade::waitDuringRead(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorFacade::sleepMilliseconds(unsigned int millis) {
 ///////////////////////////////////////////////////////////////////
-	GBL_CONFIG->getTheApp()->waitActive(millis);
+	THE_CONFIG->getTheApp()->waitActive(millis);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialSimulatorFacade::onPeriodicallyAppEvent(bool interrupted) {
@@ -88,7 +88,7 @@ void SerialSimulatorFacade::onPeriodicallyAppEvent(bool interrupted) {
 				cnc::cex1 << "; Front byte: "  << serialThread->readBufferFrontByte() << std::endl;
 				
 				// to give the run control a change to release events
-				GBL_CONFIG->getTheApp()->dispatchAll();
+				THE_CONFIG->getTheApp()->dispatchAll();
 				
 				// to avoid an endless warning cycle
 				if ( counter++ > 4 ) {

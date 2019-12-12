@@ -174,8 +174,6 @@ class CncConfig {
 		void init();
 		
 		MainFrame* getTheApp() { wxASSERT(theApp); return theApp; }
-		void destroyTheApp() { theApp = NULL; }
-		
 		CncContext* getContext() { wxASSERT(context); return context; }
 		
 		// global config pointer - don't use this directly
@@ -189,9 +187,10 @@ class CncConfig {
 		static void setupGlobalConfigurationGrid(wxPropertyGridManager* sg, wxConfigBase& config);
 		
 		// global shortcuts
-		#define GBL_CONFIG  CncConfig::getGlobalCncConfig()
-		#define GBL_CONTEXT GBL_CONFIG->getContext()
-		#define THE_APP     GBL_CONFIG->getTheApp()
+		#define CNC_READY   ( CncConfig::globalCncConfig ? true : false )
+		#define THE_CONFIG  ( CncConfig::getGlobalCncConfig() )
+		#define THE_CONTEXT ( THE_CONFIG ? THE_CONFIG->getContext() : NULL )
+		#define THE_APP     ( THE_CONFIG ? THE_CONFIG->getTheApp()  : NULL )
 		
 		// notifications
 		void registerWindowForConfigNotification(wxWindow* wnd);
@@ -204,10 +203,10 @@ class CncConfig {
 				
 			public:
 				NotificationDeactivator(bool noe = true) : notifyOnEnd(noe)  
-					{ GBL_CONFIG->deactivateConfigNotification(); }
+					{ THE_CONFIG->deactivateConfigNotification(); }
 					
 				~NotificationDeactivator()
-					{ GBL_CONFIG->activateConfigNotification(notifyOnEnd); }
+					{ THE_CONFIG->activateConfigNotification(notifyOnEnd); }
 		};
 		
 		size_t getConstReserveCapacity() const { return contMemAllocation.getCapacity(); }

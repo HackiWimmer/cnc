@@ -28,7 +28,7 @@ void GCodePathHandlerCnc::finishWorkImpl() {
 //////////////////////////////////////////////////////////////////
 	// controller handling
 	getSetup().cnc->switchToolOff();
-	getSetup().cnc->changeCurrentFeedSpeedXYZ_MM_MIN(GBL_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
+	getSetup().cnc->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultRapidSpeed_MM_MIN(), CncSpeedRapid);
 	
 	#warning ????
 	currentPos.setXYZ(0.0, 0.0, 0.0);

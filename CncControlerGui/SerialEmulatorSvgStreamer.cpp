@@ -31,7 +31,7 @@ bool SerialEmulatorSvgStreamer::isOutputAsTemplateAvailable() {
 bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
 	CncDoublePosition dPos;
-	GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
+	THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 
 	bodyStream << "\t\t<path d=\"M ";
 		bodyStream << dPos.getX() << " ";
@@ -70,7 +70,7 @@ bool SerialEmulatorSvgStreamer::writeEncodedMoveSequenceEndCallback(const CncCom
 bool SerialEmulatorSvgStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
 	CncDoublePosition dPos;
-	GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
+	THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 
 	if ( cnc::dblCompareNull(mi.speedValue) == false ) {
 		bodyStream << wxString::Format("<!-- cnc speed change F=%+.3lf -->\n", mi.speedValue); 

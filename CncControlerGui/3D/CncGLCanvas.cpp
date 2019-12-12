@@ -32,7 +32,7 @@ bool CncGlCanvas::activateContext(GLContextBase* context, const wxGLCanvas &win,
 		return lastSetCurrent;
 	} 
 	
-	if ( GBL_CONTEXT->isWinOS() == true ) {
+	if ( THE_CONTEXT->isWinOS() == true ) {
 		lastSetCurrent = context->SetCurrent(win);
 		return lastSetCurrent;
 	} 

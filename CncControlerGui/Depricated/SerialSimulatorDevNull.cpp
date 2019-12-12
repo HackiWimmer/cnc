@@ -12,7 +12,7 @@
  *	Use instead:
  * 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO|WARNING|ERROR);
  *		evt.SetString("<... message to log ...>");
- * 		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+ * 		wxPostEvent(THE_CONFIG->getTheApp(), evt);
  * 
  *	Or one of the following functions:
  *		void publishLogStreamAsInfoMsg();
@@ -124,7 +124,7 @@ unsigned char SerialSimulatorDevNull::performGetterValue(unsigned char pid) {
 	if ( false ) {
 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO);
 		evt.SetString(wxString::Format("PID: %u", pid));
-		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+		wxPostEvent(THE_CONFIG->getTheApp(), evt);
  	}
 	
 	switch ( pid ) {
@@ -413,7 +413,7 @@ bool SerialSimulatorDevNull::stepAxis(char axis, int32_t steps) {
 			case SIG_PAUSE:				// pause handling
 										while ( getLastSignal() == SIG_PAUSE ) {
 											wxThreadEvent evt(wxEVT_DISPATCH_ALL, MainFrame::EventId::DISPATCH_ALL);
-											wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+											wxPostEvent(THE_CONFIG->getTheApp(), evt);
 											
 											CncTimeFunctions::activeWaitMircoseconds(20000);
 										}

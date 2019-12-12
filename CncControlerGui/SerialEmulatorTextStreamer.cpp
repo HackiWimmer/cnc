@@ -162,9 +162,9 @@ void SerialEmulatorTextStreamer::notifyMove(int32_t dx, int32_t dy, int32_t dz, 
 	mi.sdx			= dx;
 	mi.sdy			= dy; 
 	mi.sdz			= dz;
-	mi.mdx 			= GBL_CONFIG->convertStepsToMetricX(mi.sdx);
-	mi.mdy 			= GBL_CONFIG->convertStepsToMetricY(mi.sdy);
-	mi.mdz 			= GBL_CONFIG->convertStepsToMetricZ(mi.sdz);
+	mi.mdx 			= THE_CONFIG->convertStepsToMetricX(mi.sdx);
+	mi.mdy 			= THE_CONFIG->convertStepsToMetricY(mi.sdy);
+	mi.mdz 			= THE_CONFIG->convertStepsToMetricZ(mi.sdz);
 	
 	if ( writeEncodedMoveSequenceCallback(mi) == true )
 		SerialEmulatorNULL::notifyMove(dx, dy, dz, f);
@@ -241,9 +241,9 @@ bool SerialEmulatorTextStreamer::writeMoveRawCallback(unsigned char *buffer, uns
 		return false;
 	}
 	
-	mi.mdx = GBL_CONFIG->convertStepsToMetricX(mi.sdx);
-	mi.mdy = GBL_CONFIG->convertStepsToMetricY(mi.sdy);
-	mi.mdz = GBL_CONFIG->convertStepsToMetricZ(mi.sdz);
+	mi.mdx = THE_CONFIG->convertStepsToMetricX(mi.sdx);
+	mi.mdy = THE_CONFIG->convertStepsToMetricY(mi.sdy);
+	mi.mdz = THE_CONFIG->convertStepsToMetricZ(mi.sdz);
 		
 	return writeEncodedMoveCallback(mi);
 }
@@ -269,7 +269,7 @@ bool SerialEmulatorTextStreamer::writeEncodedSetterCallback(const SetterInfo& si
 bool SerialEmulatorTextStreamer::writeEncodedMoveCallback(const MoveInfo& mi) {
 ///////////////////////////////////////////////////////////////////
 	CncDoublePosition dPos;
-	GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
+	THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 	
 	bodyStream << Streamer::indent2 << wxString::Format("<Move cmd=\"%c\" description=\"%s\" speedMode=\"%c\"\n", mi.cmd, ArduinoCMDs::getCMDLabel(mi.cmd), cnc::getCncSpeedTypeAsCharacter(mi.speedMode));
 		bodyStream << Streamer::indent3 << wxString::Format("steps=\"%ld %ld %ld\"\n",				(long)mi.sdx, (long)mi.sdy, (long)mi.sdz);
@@ -292,16 +292,16 @@ void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::BeginRun&
 void SerialEmulatorTextStreamer::processTrigger(const Serial::Trigger::EndRun& tr) {
 ///////////////////////////////////////////////////////////////////
 	CncDoublePosition dPos;
-	GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
+	THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 
 	CncLongPosition::Watermarks wm;
 	getCurrentEmulatorPosition().getWatermarks(wm);
-	metricBoundbox.minX 		= GBL_CONFIG->convertStepsToMetricX(wm.xMin);
-	metricBoundbox.maxX 		= GBL_CONFIG->convertStepsToMetricX(wm.xMax);
-	metricBoundbox.minY 		= GBL_CONFIG->convertStepsToMetricY(wm.yMin);
-	metricBoundbox.maxY 		= GBL_CONFIG->convertStepsToMetricY(wm.yMax);
-	metricBoundbox.minZ 		= GBL_CONFIG->convertStepsToMetricZ(wm.zMin);
-	metricBoundbox.maxZ 		= GBL_CONFIG->convertStepsToMetricZ(wm.zMax);
+	metricBoundbox.minX 		= THE_CONFIG->convertStepsToMetricX(wm.xMin);
+	metricBoundbox.maxX 		= THE_CONFIG->convertStepsToMetricX(wm.xMax);
+	metricBoundbox.minY 		= THE_CONFIG->convertStepsToMetricY(wm.yMin);
+	metricBoundbox.maxY 		= THE_CONFIG->convertStepsToMetricY(wm.yMax);
+	metricBoundbox.minZ 		= THE_CONFIG->convertStepsToMetricZ(wm.zMin);
+	metricBoundbox.maxZ 		= THE_CONFIG->convertStepsToMetricZ(wm.zMax);
 	metricBoundbox.distanceX	= fabs(metricBoundbox.minX) + fabs(metricBoundbox.maxX);
 	metricBoundbox.distanceY	= fabs(metricBoundbox.minY) + fabs(metricBoundbox.maxY);
 	metricBoundbox.distanceZ	= fabs(metricBoundbox.minZ) + fabs(metricBoundbox.maxZ);
@@ -338,7 +338,7 @@ void SerialEmulatorTextStreamer::initializeFile(const Serial::Trigger::BeginRun&
 	headerStream << "<File>\n";
 	
 	CncDoublePosition dPos;
-	GBL_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
+	THE_CONFIG->convertStepsToMetric(dPos, getCurrentEmulatorPosition());
 	startPos.set(dPos);
 }
 ///////////////////////////////////////////////////////////////////
@@ -360,7 +360,7 @@ void SerialEmulatorTextStreamer::finalizeFile(const Serial::Trigger::EndRun& tr)
 	                                  << wxString::Format("maxZ=\"%.3lf\"\n", metricBoundbox.maxZ);
 	
 	CncDoublePosition endPos;
-	GBL_CONFIG->convertStepsToMetric(endPos, getCurrentEmulatorPosition());
+	THE_CONFIG->convertStepsToMetric(endPos, getCurrentEmulatorPosition());
 	headerStream << Streamer::indent2 << wxString::Format("startPos=\"%s\" ", formatPosition(startPos)) 
 	                                  << wxString::Format("endPos=\"%s\"\n",  formatPosition(endPos));
 	

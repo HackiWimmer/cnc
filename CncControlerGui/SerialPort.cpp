@@ -61,9 +61,9 @@ Serial::Serial(CncControl* cnc)
 , spyRead(false)
 , spyWrite(false)
 , shouldCallbackSynchronizeAppPosition(false)
-, factorX(GBL_CONFIG->getDisplayFactX())
-, factorY(GBL_CONFIG->getDisplayFactY())
-, factorZ(GBL_CONFIG->getDisplayFactZ())
+, factorX(THE_CONFIG->getDisplayFactX())
+, factorY(THE_CONFIG->getDisplayFactY())
+, factorZ(THE_CONFIG->getDisplayFactZ())
 {
 ///////////////////////////////////////////////////////////////////
 	resetTotalDistance();
@@ -89,9 +89,9 @@ Serial::Serial(const char *portName)
 , spyRead(false)
 , spyWrite(false)
 , shouldCallbackSynchronizeAppPosition(false)
-, factorX(GBL_CONFIG->getDisplayFactX())
-, factorY(GBL_CONFIG->getDisplayFactY())
-, factorZ(GBL_CONFIG->getDisplayFactZ())
+, factorX(THE_CONFIG->getDisplayFactX())
+, factorY(THE_CONFIG->getDisplayFactY())
+, factorZ(THE_CONFIG->getDisplayFactZ())
 {
 ///////////////////////////////////////////////////////////////////
 	resetTotalDistance();
@@ -149,7 +149,7 @@ void Serial::logMeasurementLastTs() {
 	tsMeasurementLast = CncTimeFunctions::getNanoTimestamp();
 	
 	// calculate current feed speed
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
+	if ( THE_CONTEXT->isProbeMode() == false ) {
 		const short T = 3;
 		const CncNanoTimespan tDiff = getMeasurementNanoTimeSpanLastRef();
 		const double pDiff          = totalDistanceMetric[T] - totalDistanceMetricRef;
@@ -180,7 +180,7 @@ void Serial::logMeasurementRefTs(const CncLongPosition& pos) {
 ///////////////////////////////////////////////////////////////////
 	tsMeasurementRef = CncTimeFunctions::getNanoTimestamp();
 	
-	if ( GBL_CONTEXT->isProbeMode() == false ) {
+	if ( THE_CONTEXT->isProbeMode() == false ) {
 		const short T = 3;
 		totalDistanceMetricRef = totalDistanceMetric[T];
 		measurementRefPos.set(pos);

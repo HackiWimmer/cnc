@@ -1,6 +1,7 @@
 #include <sstream>
 #include <wx/msgdlg.h>
 #include "MainFrame.h"
+#include "GlobalFunctions.h"
 #include "CncConfigCommon.h"
 #include "CncUnitCalculator.h"
 #include "CncContext.h"
@@ -82,11 +83,13 @@ CncConfig::CncConfig(MainFrame* app)
 {
 	registerWindowForConfigNotification(app);
 	init();
+	APPEND_LOCATION_TO_STACK_TRACE_FILE
 }
 ////////////////////////////////////////////////////////////////////////
 CncConfig::~CncConfig() {
 ////////////////////////////////////////////////////////////////////////
 	toolMagazine.clear();
+	APPEND_LOCATION_TO_STACK_TRACE_FILE
 }
 ////////////////////////////////////////////////////////////////////////
 void CncConfig::init() {

@@ -160,7 +160,7 @@ void FileParser::displayToolId(const wxString& id) {
 	id.ToLong(&toolId);
 	
 	toolIdCtrl->SetValue(id);
-	toolIdCtrl->SetToolTip(wxString::Format("Last Tool: %s", GBL_CONFIG->getToolParamAsString(toolId)));
+	toolIdCtrl->SetToolTip(wxString::Format("Last Tool: %s", THE_CONFIG->getToolParamAsString(toolId)));
 }
 //////////////////////////////////////////////////////////////////
 bool FileParser::setNextToolID(unsigned int id) {
@@ -168,7 +168,7 @@ bool FileParser::setNextToolID(unsigned int id) {
 	if ( shouldAToolChangeProcessed() == false )
 		return true;
 	
-	int toolId = GBL_CONFIG->translateToolId(id);
+	int toolId = THE_CONFIG->translateToolId(id);
 	
 	// Check for tool change
 	if ( toolIds.size() > 0 ) {
@@ -180,14 +180,14 @@ bool FileParser::setNextToolID(unsigned int id) {
 		}
 	}
 	
-	if ( GBL_CONFIG->checkToolExists(toolId) == false ) {
+	if ( THE_CONFIG->checkToolExists(toolId) == false ) {
 		std::cerr << "Tool id didn't exists: " << toolId << " [" << id << "]" << std::endl;
 		std::cerr << "The current tool stays unchanged! - this is may be an error!" << std::endl;
 		displayToolId("-");
 		return false;
 	}
 	
-	GBL_CONFIG->setCurrentToolId(toolId);
+	THE_CONFIG->setCurrentToolId(toolId);
 	displayToolId(toolId);
 	toolIds.push_back(toolId);
 	
@@ -236,12 +236,12 @@ void FileParser::clearControls() {
 	if ( debuggerConfigurationPropertyGrid != NULL ) {
 		for ( int i = debuggerConfigurationPropertyGrid->GetPageCount() - 1; i >= staticPageOffset; i--)
 			debuggerConfigurationPropertyGrid->RemovePage(i);
+
+		debuggerConfigurationPropertyGrid->GetGrid()->ResetColours();
+		debuggerConfigurationPropertyGrid->GetGrid()->SetCaptionBackgroundColour(wxColour(112,146,190));
+		debuggerConfigurationPropertyGrid->GetGrid()->SetCaptionTextColour(wxColour(255,255,255));
+		debuggerConfigurationPropertyGrid->GetGrid()->SetCellBackgroundColour(wxColour(255,255,255));
 	}
-	
-	debuggerConfigurationPropertyGrid->GetGrid()->ResetColours();
-	debuggerConfigurationPropertyGrid->GetGrid()->SetCaptionBackgroundColour(wxColour(112,146,190));
-	debuggerConfigurationPropertyGrid->GetGrid()->SetCaptionTextColour(wxColour(255,255,255));
-	debuggerConfigurationPropertyGrid->GetGrid()->SetCellBackgroundColour(wxColour(255,255,255));
 
 	debugControls.currentPage 			= NULL;
 	debugControls.currentMainCategory 	= NULL;
@@ -353,35 +353,37 @@ bool FileParser::process() {
 
 	// first: preprocessing
 	initNextRunPhase(FileParserRunInfo::RP_Preprocesser);
-	GBL_CONTEXT->timestamps.logPreTimeStart();
+	THE_CONTEXT->timestamps.logPreTimeStart();
 	bool ret = preprocess();
-	GBL_CONTEXT->timestamps.logPreTimeEnd();
+	THE_CONTEXT->timestamps.logPreTimeEnd();
 	
 	// second: spooling
 	if ( runInfo.processMore() && ret == true ) {
 		initNextRunPhase(FileParserRunInfo::RP_Spool);
 		
-		GBL_CONTEXT->timestamps.logSerialTimeStart();
+		THE_CONTEXT->timestamps.logSerialTimeStart();
 		logMeasurementStart();
 
 		ret = spool();
 
 		logMeasurementEnd();
-		GBL_CONTEXT->timestamps.logSerialTimeEnd();
+		THE_CONTEXT->timestamps.logSerialTimeEnd();
 	} 
 	
 	if ( ret == true ) {
-		GBL_CONTEXT->timestamps.logPostTimeStart();
+		THE_CONTEXT->timestamps.logPostTimeStart();
 		ret = postprocess();
-		GBL_CONTEXT->timestamps.logPostTimeEnd();
+		THE_CONTEXT->timestamps.logPostTimeEnd();
 	}
 	
 	// at the end reset the selection
 	if ( inboundSourceControl )
 		inboundSourceControl->gotoBegin();
 	
-	debuggerConfigurationPropertyGrid->Refresh();
-	debuggerConfigurationPropertyGrid->Update();
+	if ( debuggerConfigurationPropertyGrid != NULL ) {
+		debuggerConfigurationPropertyGrid->Refresh();
+		debuggerConfigurationPropertyGrid->Update();
+	}
 	
 	initNextRunPhase(FileParserRunInfo::RP_Unknown);
 	return ret;

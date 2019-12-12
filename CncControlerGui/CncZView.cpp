@@ -145,7 +145,7 @@ void CncZView::setHighWaterMark(double val) {
 /////////////////////////////////////////////////////////////////////
 void CncZView::updateView(double val) {
 /////////////////////////////////////////////////////////////////////
-	if ( GBL_CONTEXT->isOnlineUpdateCoordinates() == false )
+	if ( THE_CONTEXT->isOnlineUpdateCoordinates() == false )
 		return;
 	
 	if ( cnc::dblCompare(maxValue, CncConfig::getGlobalCncConfig()->getMaxDimensionZ() * scale) == false ) {

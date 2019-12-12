@@ -58,10 +58,10 @@ wxThread::ExitCode UpdateManagerThread::Entry() {
 	MainFrame::EventId posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
 	
 	// initialize 
-	unit 		 = GBL_CONFIG->getDisplayUnit();
-	displayFactX = GBL_CONFIG->getDisplayFactX(unit);
-	displayFactY = GBL_CONFIG->getDisplayFactY(unit);
-	displayFactZ = GBL_CONFIG->getDisplayFactZ(unit);
+	unit 		 = THE_CONFIG->getDisplayUnit();
+	displayFactX = THE_CONFIG->getDisplayFactX(unit);
+	displayFactY = THE_CONFIG->getDisplayFactY(unit);
+	displayFactZ = THE_CONFIG->getDisplayFactZ(unit);
 	
 	wxDateTime tsLastData      = wxDateTime::UNow();
 	wxDateTime tsLastHeartbeat = wxDateTime::UNow();
@@ -259,10 +259,10 @@ void UpdateManagerThread::postEvent(const UpdateManagerThread::Event& evt) {
 											break;
 											
 		case Event::Type::CONFIG_UPD:		// update format factors
-											unit = GBL_CONFIG->getDisplayUnit();
-											displayFactX = GBL_CONFIG->getDisplayFactX(unit);
-											displayFactY = GBL_CONFIG->getDisplayFactY(unit);
-											displayFactZ = GBL_CONFIG->getDisplayFactZ(unit);
+											unit = THE_CONFIG->getDisplayUnit();
+											displayFactX = THE_CONFIG->getDisplayFactX(unit);
+											displayFactY = THE_CONFIG->getDisplayFactY(unit);
+											displayFactZ = THE_CONFIG->getDisplayFactZ(unit);
 											
 											break;
 											

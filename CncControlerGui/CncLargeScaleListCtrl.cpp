@@ -14,7 +14,7 @@ CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, wxWindowID id, 
 , lastSelection(wxNOT_FOUND)
 ///////////////////////////////////////////////////////////////////
 {
-	rows.reserve( GBL_CONFIG->getConstReserveCapacity() );
+	rows.reserve( THE_CONFIG->getConstReserveCapacity() );
 }
 ///////////////////////////////////////////////////////////////////
 CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, long style) 
@@ -26,7 +26,7 @@ CncLargeScaledListCtrl::CncLargeScaledListCtrl(wxWindow *parent, long style)
 , lastSelection(wxNOT_FOUND)
 ///////////////////////////////////////////////////////////////////
 {
-	rows.reserve( GBL_CONFIG->getConstReserveCapacity() );
+	rows.reserve( THE_CONFIG->getConstReserveCapacity() );
 }
 ///////////////////////////////////////////////////////////////////
 CncLargeScaledListCtrl::~CncLargeScaledListCtrl() {

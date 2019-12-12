@@ -10,6 +10,7 @@
 #include "SvgEditPopup.h"
 #include "GCodeCommands.h"
 #include "CncConfig.h"
+#include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
 #include "CncBaseEditor.h"
 
@@ -50,6 +51,7 @@ CncBaseEditor::CncBaseEditor(wxWindow *parent)
 ///////////////////////////////////////////////////////////////////
 CncBaseEditor::~CncBaseEditor() {
 ///////////////////////////////////////////////////////////////////
+	wxDELETE( svgPopupMenu );
 }
 ///////////////////////////////////////////////////////////////////
 void CncBaseEditor::onMarginClick(wxStyledTextEvent& event) {
@@ -756,7 +758,7 @@ void CncBaseEditor::setupModelType() {
 		tf = fileInfo.binaryOrigFomat;
 	
 	// if the Y axis will be reversed svg is also a right hand coord system
-	const bool cnv = GBL_CONFIG->getSvgConvertToRightHandFlag();
+	const bool cnv = THE_CONFIG->getSvgConvertToRightHandFlag();
 	
 	switch ( tf ) {
 		case TplSvg:		fileInfo.modelType 		= cnv ? GLContextBase::ModelType::MT_RIGHT_HAND : GLContextBase::ModelType::MT_LEFT_HAND;

@@ -133,21 +133,17 @@ CncOpenGLContextObserverHistoryListCtrl::CncOpenGLContextObserverHistoryListCtrl
 	popupMenu = new wxMenu("History Tools . . . ");
 	popupMenu->Append(itemId, wxT("Clear List"));
 	
-	#warning
-	/*
 	//............................................
 	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
-	 [](wxCommandEvent& event) {
-			CncOpenGLContextObserverHistoryListCtrl* ctl = reinterpret_cast<CncOpenGLContextObserverHistoryListCtrl*>(event.GetEventUserData());
-			wxASSERT(ctl);
-			ctl->clear();
-	 }, itemId, wxID_ANY, this);
-	  */
+	 [&](wxCommandEvent& event) {
+			//CncOpenGLContextObserverHistoryListCtrl* ctl = reinterpret_cast<CncOpenGLContextObserverHistoryListCtrl*>(event.GetEventUserData());
+			//wxASSERT(ctl);
+			this->clear();
+	 }, itemId, itemId);
 }
 /////////////////////////////////////////////////////////////
 CncOpenGLContextObserverHistoryListCtrl::~CncOpenGLContextObserverHistoryListCtrl() {
 /////////////////////////////////////////////////////////////
-	
 	delete popupMenu;
 }
 /////////////////////////////////////////////////////////////

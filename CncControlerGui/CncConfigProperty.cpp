@@ -13,7 +13,8 @@ wxPGEditor* CncTextCtrlEditor::cncTextCtrlEditor = NULL;
 //////////////////////////////////////////////////////////////////////////////////////////
 void CncTextCtrlEditor::init() {
 //////////////////////////////////////////////////////////////////////////////////////////
-	CncTextCtrlEditor::cncTextCtrlEditor = wxPropertyGrid::RegisterEditorClass(new CncTextCtrlEditor(), "CncTextEditor");
+	#warning
+	//CncTextCtrlEditor::cncTextCtrlEditor = wxPropertyGrid::RegisterEditorClass(new CncTextCtrlEditor(), "CncTextEditor");
 }
 /////////////////////////////////////////////////////////////////////////////////
 wxPGWindowList CncTextCtrlEditor::CreateControls(wxPropertyGrid* propGrid, wxPGProperty* property, const wxPoint& pos, const wxSize& sz ) const {

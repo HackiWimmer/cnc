@@ -35,7 +35,7 @@ void CncConfig::pgChangedGeneralCfgPage(wxPropertyGridEvent& event) {
 	     || name == CncConfig_PULS_WIDTH_HIGH_Z 
 	   ) 
 	{
-		GBL_CONFIG->calculateSpeedValues();
+		THE_CONFIG->calculateSpeedValues();
 		APP_PROXY::initSpeedConfigPlayground();
 	}
 }

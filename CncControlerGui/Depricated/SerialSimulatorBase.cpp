@@ -14,7 +14,7 @@
  *	Use instead:
  * 		wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO|WARNING|ERROR);
  *		evt.SetString("<... message to log ...>");
- * 		wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+ * 		wxPostEvent(THE_CONFIG->getTheApp(), evt);
  * 
  *	Or one of the following functions:
  *		void publishLogStreamAsInfoMsg();
@@ -101,7 +101,7 @@ void SerialSimulatorThread::publishLogStreamAsInfoMsg() {
 ///////////////////////////////////////////////////////////////////
 	static wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_INFO);
 	evt.SetString(logStream.str().c_str());
-	wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+	wxPostEvent(THE_CONFIG->getTheApp(), evt);
 	
 	// clear the stream
 	logStream.str("");
@@ -111,7 +111,7 @@ void SerialSimulatorThread::publishLogStreamAsWarningMsg() {
 ///////////////////////////////////////////////////////////////////
 	static wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_WARNING);
 	evt.SetString(logStream.str().c_str());
-	wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+	wxPostEvent(THE_CONFIG->getTheApp(), evt);
 	
 	// clear the stream
 	logStream.str("");
@@ -121,7 +121,7 @@ void SerialSimulatorThread::publishLogStreamAsErrorMsg() {
 ///////////////////////////////////////////////////////////////////
 	static wxThreadEvent evt(wxEVT_TRACE_FROM_THREAD, MainFrame::EventId::POST_ERROR);
 	evt.SetString(logStream.str().c_str());
-	wxPostEvent(GBL_CONFIG->getTheApp(), evt);
+	wxPostEvent(THE_CONFIG->getTheApp(), evt);
 	
 	// clear the stream
 	logStream.str("");

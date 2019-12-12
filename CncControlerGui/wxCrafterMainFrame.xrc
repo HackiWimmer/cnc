@@ -10754,4 +10754,10 @@ State</label>
       </object>
     </object>
   </object>
+  <object class="wxFrame" name="MainFrameDummyBase">
+    <title>MainFrameDummy</title>
+    <centered>1</centered>
+    <style>wxDEFAULT_FRAME_STYLE</style>
+    <size>500,300</size>
+  </object>
 </resource>

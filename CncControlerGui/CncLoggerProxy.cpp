@@ -2,6 +2,7 @@
 #include "CncCommon.h"
 #include "CncConfig.h"
 #include "MainFrame.h"
+#include "GlobalFunctions.h"
 #include "CncLoggerProxy.h"
 
 namespace CncTC {
@@ -10,44 +11,15 @@ namespace CncTC {
 };
 
 //////////////////////////////////////////////////////////////
-CncTextCtrl::CncTextCtrl(wxWindow* parent)
-: wxTextCtrl(parent, wxID_ANY)
+CncTextCtrl::CncTextCtrl(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
+						 long style, const wxValidator &validator, const wxString &name)
+: wxTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
 , overflowTimer(new wxTimer())
 , lineBuffer()
 , lastAppend(CncTimeFunctions::getNanoTimestamp())
 //////////////////////////////////////////////////////////////
 {
 	setupTimer(CncTC::defaultOverflowTimerValue);
-}
-//////////////////////////////////////////////////////////////
-// creates a CncTextCtrl as a clone of source
-CncTextCtrl::CncTextCtrl(const wxTextCtrl& source)
-: wxTextCtrl(source.GetParent(), 
-			 wxID_ANY,
-			 wxEmptyString,
-			 wxDefaultPosition,
-			 wxDefaultSize, 
-			 source.GetWindowStyle()
-			)
-, overflowTimer(new wxTimer())
-, lineBuffer()
-//////////////////////////////////////////////////////////////
-{
-	// copy more attributes
-	SetBackgroundColour(source.GetBackgroundColour());
-	SetForegroundColour(source.GetForegroundColour());
-	SetFont(source.GetFont());
-	SetToolTip(source.GetToolTip());
-	
-	setupTimer(CncTC::defaultOverflowTimerValue);
-}
-//////////////////////////////////////////////////////////////
-CncTextCtrl::CncTextCtrl(const CncTextCtrl& source) 
-: CncTextCtrl((wxTextCtrl&)source)
-//////////////////////////////////////////////////////////////
-{
-	lineBuffer.assign(source.getLineBuffer());
-	overflowTimer->Start(CncTC::defaultOverflowTimerValue);
 }
 //////////////////////////////////////////////////////////////
 void CncTextCtrl::setupTimer(int interval) {
@@ -60,7 +32,7 @@ CncTextCtrl::~CncTextCtrl() {
 //////////////////////////////////////////////////////////////
 	if ( overflowTimer->IsRunning() )
 		overflowTimer->Stop();
-		
+	
 	overflowTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncTextCtrl::onOverflowTimer), NULL, this);
 	delete overflowTimer;
 }
@@ -87,9 +59,6 @@ size_t CncTextCtrl::flushLineBuffer() {
 //////////////////////////////////////////////////////////////
 void CncTextCtrl::onOverflowTimer(wxTimerEvent& event) { 
 //////////////////////////////////////////////////////////////
-
-
-
 	const unsigned int threshold = (CncTC::defaultOverflowTimerValue / 2 ) * 1000 * 1000;
 	if ( CncTimeFunctions::getNanoTimestamp() - lastAppend > threshold )
 		flushLineBuffer();
@@ -148,15 +117,9 @@ wxBEGIN_EVENT_TABLE(CncLoggerProxy, wxTextCtrl)
 wxEND_EVENT_TABLE()
 
 //////////////////////////////////////////////////////////////
-CncLoggerProxy::CncLoggerProxy(wxWindow* parent)
-: CncTextCtrl(parent)
-, showOnDemandState(true)
-//////////////////////////////////////////////////////////////
-{
-}
-//////////////////////////////////////////////////////////////
-CncLoggerProxy::CncLoggerProxy(const wxTextCtrl& source)
-: CncTextCtrl(source)
+CncLoggerProxy::CncLoggerProxy(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
+						       long style, const wxValidator &validator, const wxString &name)
+: CncTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
 , showOnDemandState(true)
 //////////////////////////////////////////////////////////////
 {
@@ -231,7 +194,8 @@ void CncLoggerProxy::onLeftDClick(wxMouseEvent& event) {
 	if ( line.ToLong(&lineNumber) == false )
 		return;
 	
-	THE_APP->selectSourceControlLineNumber(lineNumber - 1);
+	if ( CNC_READY )
+		THE_APP->selectSourceControlLineNumber(lineNumber - 1);
 }
 //////////////////////////////////////////////////////////////
 void CncLoggerProxy::onUpdateLogger(wxCommandEvent& event) {
@@ -239,8 +203,10 @@ void CncLoggerProxy::onUpdateLogger(wxCommandEvent& event) {
 	if ( showOnDemandState == false )
 		return;
 
-	if ( IsShownOnScreen() == false ) {
-		THE_APP->showAuiPane("Logger");
-		THE_APP->GetLoggerNotebook()->SetSelection(LoggerSelection::VAL::CNC);
+	if ( IsShown() == true && IsShownOnScreen() == false ) {
+		if ( CNC_READY ) {
+			THE_APP->showAuiPane("Logger");
+			THE_APP->GetLoggerNotebook()->SetSelection(LoggerSelection::VAL::CNC);
+		}
 	}
 }

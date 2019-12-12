@@ -17,12 +17,12 @@ void GLCommon::traceOpenGLVersionInfo() {
 	   << ( glGetString(GL_VENDOR)   ? (const char*)glGetString(GL_VENDOR)   : "?" )	<< "; "
 	   << ( glGetString(GL_RENDERER) ? (const char*)glGetString(GL_RENDERER) : "?" );
 	   
-	GBL_CONTEXT->versionInfoMap["opengl"] = ss.str().c_str();
+	THE_CONTEXT->versionInfoMap["opengl"] = ss.str().c_str();
 	
 	ss.str("");
 	ss << (GLCommon::isGlewAvailable() ? glewGetString(GLEW_VERSION) : (const unsigned char*)"Glew isn't initialized!" );
 		
-	GBL_CONTEXT->versionInfoMap["glew"] = ss.str().c_str();
+	THE_CONTEXT->versionInfoMap["glew"] = ss.str().c_str();
 }
 /////////////////////////////////////////////////////////////////
 void GLCommon::traceOpenGLExtentionInfo() {

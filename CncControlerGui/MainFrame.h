@@ -90,28 +90,8 @@ class MainFrame;
 class GlobalConfigManager {
 	
 	public:
-		GlobalConfigManager(MainFrame* mf, wxPropertyGridManager* pgMgrSetup, wxFileConfig* globalConfig) {
-			wxASSERT(globalConfig);
-			wxASSERT(pgMgrSetup);
-			wxASSERT(mf);
-			
-			// setup configuration
-			CncConfig::setupGlobalConfigurationGrid(pgMgrSetup, *globalConfig);
-			CncConfig::globalCncConfig = new CncConfig(mf);
-			
-			// load the file configuration
-			CncConfig::globalCncConfig->loadConfiguration(*globalConfig);
-			
-			// at least initialize
-			CncConfig::globalCncConfig->init();
-		}
-		
-		~GlobalConfigManager() {
-			if ( CncConfig::globalCncConfig != NULL )
-				delete CncConfig::globalCncConfig;
-				
-			CncConfig::globalCncConfig = NULL;
-		}
+		GlobalConfigManager(MainFrame* mf, wxPropertyGridManager* pgMgrSetup, wxFileConfig* globalConfig);
+		~GlobalConfigManager();
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -430,7 +410,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		void onPerspectiveTimer(wxTimerEvent& event);
 		void onDebugUserNotificationTimer(wxTimerEvent& event);
-		void configurationUpdated(wxCommandEvent& event);
+		void onConfigurationUpdated(wxCommandEvent& event);
 		
 		bool isGamepadNotificationActive();
 		bool isGamepadDialogShown();
@@ -620,7 +600,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncFilePreview* 				mainFilePreview;
 		CncFilePreview* 				outboundFilePreview;
 		CncFilePreview* 				monitorFilePreview;
-		CncToolMagazine* 				toolMagaizne;
+		CncToolMagazine* 				toolMagazine;
 		CncPosSpyListCtrl* 				positionSpy;
 		CncSetterListCtrl* 				setterList;
 		CncSpeedMonitor*				speedMonitor;
@@ -660,8 +640,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		wxMenu* stcEmuContentPopupMenu;
 		FileParser* inboundFileParser;
 		
-		wxTimer perspectiveTimer;
-		wxTimer debugUserNotificationTimer;
+		wxTimer* perspectiveTimer;
+		wxTimer* debugUserNotificationTimer;
 		
 		CncApp::GuiControls	guiControls;
 		CncApp::MenuItems	menuItems;

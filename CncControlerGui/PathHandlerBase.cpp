@@ -153,9 +153,9 @@ bool PathHandlerBase::processMove_2DXY(char c, unsigned int count, double values
 		currentPos.setX(startPos.getX());
 		currentPos.setY(startPos.getY());
 
-		processSpeed(CncSpeedRapid, GBL_CONFIG->getDefaultRapidSpeed_MM_MIN());
+		processSpeed(CncSpeedRapid, THE_CONFIG->getDefaultRapidSpeed_MM_MIN());
 		ret = processLinearMove(false);
-		processSpeed(CncSpeedWork, GBL_CONFIG->getDefaultWorkSpeed_MM_MIN());
+		processSpeed(CncSpeedWork, THE_CONFIG->getDefaultWorkSpeed_MM_MIN());
 		
 		nextPath = false;
 	}
@@ -632,7 +632,7 @@ void PathHandlerBase::changeInputUnit(const Unit u, bool trace) {
 	
 	CncCurveLib::Setup s;
 	CncUnitCalculator<float> uc(Unit::mm, u);
-	s.resolution.size = uc.convert(GBL_CONFIG->getRenderResolutionMM());
+	s.resolution.size = uc.convert(THE_CONFIG->getRenderResolutionMM());
 	
 	lineCurve.init(s);
 	ellipticalCurve.init(s);

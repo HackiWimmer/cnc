@@ -78,7 +78,7 @@ struct SVGUserAgentInfo {
 		/////////////////////////////////////////////////////////
 		SVGUserAgentInfo() {
 			//preallocate space
-			pathInfoList.reserve(GBL_CONFIG->getConstReserveCapacity());
+			pathInfoList.reserve(THE_CONFIG->getConstReserveCapacity());
 		}
 		
 		/////////////////////////////////////////////////////////

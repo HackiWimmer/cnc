@@ -94,13 +94,23 @@ void GblFunc::replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl) {
 	// do not delete oldCtrl this will be handled by wx... 
 }
 ///////////////////////////////////////////////////////////////////
+void GblFunc::cloneAttributes(wxWindow* source, wxWindow* target) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( source != NULL );
+	wxASSERT( target != NULL );
+	
+	// copy more attributes
+	target->SetBackgroundColour(source->GetBackgroundColour());
+	target->SetForegroundColour(source->GetForegroundColour());
+	target->SetFont(source->GetFont());
+	target->SetToolTip(source->GetToolTipText());
+}
+///////////////////////////////////////////////////////////////////
 void GblFunc::appendToStackTraceFile(const wxString& st) {
 ///////////////////////////////////////////////////////////////////
 	std::ofstream ofs (CncFileNameService::getStackTraceFileName(), std::ofstream::app);
-	if ( ofs.good() ) {
-		ofs << st
-			<< std::endl;
-	}
+	if ( ofs.good() ) 
+		ofs << st << std::endl;
 	
 	ofs.close();
 }

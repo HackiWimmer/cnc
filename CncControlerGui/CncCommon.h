@@ -5,6 +5,7 @@
 #include <cfloat>
 #include <limits>
 #include <map>
+#include <wx/filename.h>
 #include <wx/msgdlg.h>
 
 #include "CncStreamBuffers.h"
@@ -58,11 +59,18 @@ namespace cnc {
 	
 };
 
-#define CNC_LOG_FUNCT			wxString::Format( "%s", 	__PRETTY_FUNCTION__ )
-#define CNC_LOG_FUNCT_A(msg)	wxString::Format( "%s: %s", __PRETTY_FUNCTION__, msg)
+#define CNC_SRC_PATH_FILE			__FILE__
+#define CNC_SRC_FILE				wxFileName(__FILE__).GetFullName()
 
-#define CNC_PRINT_FUNCT 		std::cout << CNC_LOG_FUNCT 			<< std::endl;
-#define CNC_PRINT_FUNCT_A(msg)	std::cout << CNC_LOG_FUNCT_A(msg) 	<< std::endl;
+#define CNC_LOG_LOCATION			wxString::Format("%s: %s: Line %d", 	CNC_SRC_FILE, __PRETTY_FUNCTION__, __LINE__)
+#define CNC_LOG_LOCATION_A(msg)		wxString::Format("%s: %s: Line %d: %s", CNC_SRC_FILE, __PRETTY_FUNCTION__, __LINE__, msg)
+#define CNC_LOG_FUNCT				wxString::Format( "%s", 				__PRETTY_FUNCTION__ )
+#define CNC_LOG_FUNCT_A(msg)		wxString::Format( "%s: %s",				__PRETTY_FUNCTION__, msg)
+
+#define CNC_PRINT_LOCATION			std::cout << CNC_LOG_LOCATION 			<< std::endl;
+#define CNC_PRINT_LOCATION_A(msg)	std::cout << CNC_LOG_LOCATION_A(msg) 	<< std::endl;
+#define CNC_PRINT_FUNCT 			std::cout << CNC_LOG_FUNCT 				<< std::endl;
+#define CNC_PRINT_FUNCT_A(msg)		std::cout << CNC_LOG_FUNCT_A(msg) 		<< std::endl;
 
 namespace cnc {
 	

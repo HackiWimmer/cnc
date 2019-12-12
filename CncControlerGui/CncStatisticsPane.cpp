@@ -91,12 +91,12 @@ void CncStatisticsPane::logStatistics(bool force) {
 		speed_MM_MIN 	= speed_MM_SEC * 60;
 		
 		speed_SP_SEC    = cnc->getStepCounter() / elapsedTimeSEC;
-		speed_RPM		= (speed_SP_SEC / GBL_CONFIG->getStepsXYZ() ) * 60;
+		speed_RPM		= (speed_SP_SEC / THE_CONFIG->getStepsXYZ() ) * 60;
 	}
 
 	static wxString speedMMMIN(_maxSpeedLabel), speedMMSEC(_maxSpeedLabel), speedSPSEC(_maxSpeedLabel), speedRPM(_maxSpeedLabel);
 	
-	bool setupSpeedValue = GBL_CONTEXT->isProbeMode() == false;
+	bool setupSpeedValue = THE_CONTEXT->isProbeMode() == false;
 	if ( cnc->isEmulator() == false )
 		setupSpeedValue = true;
 
@@ -157,7 +157,7 @@ void CncStatisticsPane::logStatistics(bool force) {
 	
 	statisticSummaryListCtrl->updateValues(SKEY_TIME		, _("")
 															, _("")
-															, CncNumberFormatter::toString((double)(GBL_CONTEXT->timestamps.getTotalDurationMillis()), 1)
+															, CncNumberFormatter::toString((double)(THE_CONTEXT->timestamps.getTotalDurationMillis()), 1)
 															, CncNumberFormatter::toString(elapsedTimeMSEC, 1));
 	
 	statisticSummaryListCtrl->updateValues(SKEY_SPEED_EXT	, _("")

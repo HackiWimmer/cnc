@@ -1,4 +1,5 @@
 #include <wx/tokenzr.h>
+#include "GlobalFunctions.h"
 #include "CncOSDConfigList.h"
 
 #ifdef __WXMSW__

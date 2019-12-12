@@ -138,9 +138,9 @@ void CncMotionMonitor::createRuler(const GLContextBase::ModelType mt) {
 	monitor->getRulerZ().clear();
 
 	// setup
-	const double dimX = GBL_CONFIG->getMaxDimensionX();
-	const double dimY = GBL_CONFIG->getMaxDimensionY();
-	const double dimZ = GBL_CONFIG->getMaxDimensionZ();
+	const double dimX = THE_CONFIG->getMaxDimensionX();
+	const double dimY = THE_CONFIG->getMaxDimensionY();
+	const double dimZ = THE_CONFIG->getMaxDimensionZ();
 	
 	CncMetricRulerSetup mrs;
 	
@@ -190,9 +190,9 @@ void CncMotionMonitor::appendVertex(const GLI::VerticeLongData& vd) {
 	// To do this first we need to normalize the values for x, y and z 
 	// to a common unit like [mm], because [steps] are depends on 
 	// the corresponding pitch which is configured for each axis separatly 
-	const float x = vd.getX() / GBL_CONFIG->getDispFactX3D(); 
-	const float y = vd.getY() / GBL_CONFIG->getDispFactY3D();
-	const float z = vd.getZ() / GBL_CONFIG->getDispFactZ3D();
+	const float x = vd.getX() / THE_CONFIG->getDispFactX3D(); 
+	const float y = vd.getY() / THE_CONFIG->getDispFactY3D();
+	const float z = vd.getZ() / THE_CONFIG->getDispFactZ3D();
 	
 	appendVertex(vd.getId(), vd.getSpeedMode(), x, y, z);
 }
@@ -204,9 +204,9 @@ void CncMotionMonitor::appendVertex(long clientId, CncSpeedMode sm, const CncLon
 	// To do this first we need to normalize the values for x, y and z 
 	// to a common unit like [mm], because [steps] are depends on 
 	// the corresponding pitch which is configured for each axis separatly 
-	const float x = pos.getX() / GBL_CONFIG->getDispFactX3D(); 
-	const float y = pos.getY() / GBL_CONFIG->getDispFactY3D();
-	const float z = pos.getZ() / GBL_CONFIG->getDispFactZ3D();
+	const float x = pos.getX() / THE_CONFIG->getDispFactX3D(); 
+	const float y = pos.getY() / THE_CONFIG->getDispFactY3D();
+	const float z = pos.getZ() / THE_CONFIG->getDispFactZ3D();
 	
 	appendVertex(clientId, sm, x, y, z);
 }

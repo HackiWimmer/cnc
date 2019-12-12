@@ -40,7 +40,7 @@ void CncOSEnvironmentDialog::evaluateVersionInfo() {
 		m_versionInfoList->AppendColumn("Version", 	wxLIST_FORMAT_LEFT, 500);
 	}
 	
-	const VersionInfoMap& vim = GBL_CONTEXT->versionInfoMap;
+	const VersionInfoMap& vim = THE_CONTEXT->versionInfoMap;
 	for (auto it = vim.cbegin(); it != vim.cend(); ++it ) {
 		
 		const unsigned int index = m_versionInfoList->GetItemCount();

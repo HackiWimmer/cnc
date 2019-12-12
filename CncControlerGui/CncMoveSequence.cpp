@@ -170,9 +170,9 @@ unsigned int CncMoveSequence::determineSafeBufferSize() const {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::addMetricPosXYZ(double dx, double dy, double dz) {
 ///////////////////////////////////////////////////////////////////
-	const double sx = dx * GBL_CONFIG->getCalculationFactX();
-	const double sy = dy * GBL_CONFIG->getCalculationFactY();
-	const double sz = dz * GBL_CONFIG->getCalculationFactZ();
+	const double sx = dx * THE_CONFIG->getCalculationFactX();
+	const double sy = dy * THE_CONFIG->getCalculationFactY();
+	const double sz = dz * THE_CONFIG->getCalculationFactZ();
 	
 	addStepPosXYZ(  (int32_t)round(sx), 
 					(int32_t)round(sy),
@@ -181,9 +181,9 @@ void CncMoveSequence::addMetricPosXYZ(double dx, double dy, double dz) {
 ///////////////////////////////////////////////////////////////////
 void CncMoveSequence::addMetricPosXYZF(double dx, double dy, double dz, double f) {
 ///////////////////////////////////////////////////////////////////
-	const double sx = dx * GBL_CONFIG->getCalculationFactX();
-	const double sy = dy * GBL_CONFIG->getCalculationFactY();
-	const double sz = dz * GBL_CONFIG->getCalculationFactZ();
+	const double sx = dx * THE_CONFIG->getCalculationFactX();
+	const double sy = dy * THE_CONFIG->getCalculationFactY();
+	const double sz = dz * THE_CONFIG->getCalculationFactZ();
 	
 	addStepPosXYZF( (int32_t)round(sx), 
 					(int32_t)round(sy),

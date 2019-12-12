@@ -4,8 +4,8 @@
 #include <iostream>
 #include <wx/textctrl.h>
 #include <wx/numformatter.h>
+#include <wx/propgrid/props.h>
 #include <wx/propgrid/editors.h>
-
 
 //////////////////////////////////////////////////////////////////////////////////////////
 class CncTextCtrlEditor : public wxPGTextCtrlEditor {

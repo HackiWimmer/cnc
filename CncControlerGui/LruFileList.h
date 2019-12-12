@@ -63,7 +63,10 @@ class LruFileList {
 		////////////////////////////////////////////////////////////////
 		~LruFileList() {
 			lruList.clear();
-			listControl->DeleteAllItems();
+			
+			if ( listControl )
+				listControl->DeleteAllItems();
+				
 			delete imageList;
 		}
 		

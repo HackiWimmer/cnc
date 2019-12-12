@@ -137,7 +137,7 @@ bool CncPerspective::checkIfPerspectiveAlreadyExists(const wxString& name) {
 			return true;
 	}
 	
-	GBL_CONFIG->getTheApp()->GetAuimgrMain();
+	THE_CONFIG->getTheApp()->GetAuimgrMain();
 	
 	return false;
 }
