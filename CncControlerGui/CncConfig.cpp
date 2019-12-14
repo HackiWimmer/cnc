@@ -5,6 +5,7 @@
 #include "CncConfigCommon.h"
 #include "CncUnitCalculator.h"
 #include "CncContext.h"
+#include "wxCrafterImages.h"
 #include "CncConfig.h"
 
 wxDEFINE_EVENT(wxEVT_CONFIG_UPDATE_NOTIFICATION, wxCommandEvent);

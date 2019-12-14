@@ -1,9 +1,8 @@
 .codelite/
 CallGraph/
 CncControlerGui/Release/**
-CncControlerGui/Release2/**
-CncControlerGui/Release3/**
 CncControlerGui/Debug/**
+CncControlerGui/Gprof/**
 CncControlerGui/Resources/**
 CncControlerGui/Doxyfile/**
 

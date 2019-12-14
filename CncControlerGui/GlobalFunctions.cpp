@@ -115,6 +115,12 @@ void GblFunc::appendToStackTraceFile(const wxString& st) {
 	ofs.close();
 }
 ///////////////////////////////////////////////////////////////////
+void GblFunc::appendToStackTraceFileTS(const wxString& st) {
+///////////////////////////////////////////////////////////////////
+	wxDateTime ts(wxDateTime::UNow());
+	GblFunc::appendToStackTraceFile(wxString::Format("%s.%03u: %s", ts.FormatISOTime(), ts.GetMillisecond(), st));
+}
+///////////////////////////////////////////////////////////////////
 void GblFunc::storeStacktrace(const wxString& st) {
 ///////////////////////////////////////////////////////////////////
 	unsigned int id = StackTrace::Database.size();

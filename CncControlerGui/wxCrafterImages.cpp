@@ -2252,21 +2252,3 @@ ImageLibLogger::ImageLibLogger()
 ImageLibLogger::~ImageLibLogger()
 {
 }
-
-yyyyy::yyyyy()
-    : wxImageList(16, 16, true)
-    , m_imagesWidth(16)
-    , m_imagesHeight(16)
-{
-    if ( !bBitmapLoaded ) {
-        // We need to initialise the default bitmap handler
-        wxXmlResource::Get()->AddHandler(new wxBitmapXmlHandler);
-        wxXXXXC9ED9InitBitmapResources();
-        bBitmapLoaded = true;
-    }
-    
-}
-
-yyyyy::~yyyyy()
-{
-}

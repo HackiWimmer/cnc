@@ -683,7 +683,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/package-supported.png"
+       "m_path": "bitmaps/database-save.png"
       }],
      "m_events": [],
      "m_children": []
@@ -702,7 +702,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/package-supported.png"
+       "m_path": "bitmaps/database (2).png"
       }],
      "m_events": [],
      "m_children": []
@@ -2852,7 +2852,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/dialog-information-3 (2).png"
+       "m_path": "bitmaps/book_green.png"
       }],
      "m_events": [],
      "m_children": []
@@ -2871,7 +2871,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/dialog-warning-3 (2).png"
+       "m_path": "bitmaps/book_blue.png"
       }],
      "m_events": [],
      "m_children": []
@@ -2890,7 +2890,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/dialog-error-5 (2).png"
+       "m_path": "bitmaps/book_red.png"
       }],
      "m_events": [],
      "m_children": []
@@ -2909,7 +2909,7 @@
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/lightbulb-add.png"
+       "m_path": "bitmaps/books.png"
       }],
      "m_events": [],
      "m_children": []

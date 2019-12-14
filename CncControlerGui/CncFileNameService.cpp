@@ -91,6 +91,7 @@ class CncFileHousekeeping : public wxDirTraverser {
 			if ( fn.GetTimes(&dtAccess, &dtMod, &dtCreate) == false )
 				return cntWrongDate++, wxDIR_CONTINUE;
 				
+			// < 1: This defines a moving spread of 1d or 24h
 			if ( abs((dtAccess - wxDateTime::Now()).GetDays()) < 1 )
 				return cntToYoung++, wxDIR_CONTINUE;
 				

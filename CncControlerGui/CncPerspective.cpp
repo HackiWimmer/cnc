@@ -2,6 +2,7 @@
 #include <wx/textdlg.h>
 #include "CncConfig.h"
 #include "MainFrame.h"
+#include "wxCrafterImages.h"
 #include "CncPerspective.h"
 
 const char* configGroupName 				= "Perspectives";

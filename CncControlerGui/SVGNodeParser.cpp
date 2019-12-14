@@ -192,7 +192,9 @@ bool SVGNodeParser::processSvgNode(const wxString& node) {
 
 	pathHandler->initNextPath();
 
-	wxString path;
+	static wxString path;
+	path.clear();
+	
 	SvgNodeAttributeMap aMap;
 	if ( SVGElementConverter::convertNodeToPathData(node, path, aMap) ) {
 

@@ -75,6 +75,7 @@
 #include "CncFileDialog.h"
 #include "CncUserEvents.h"
 #include "GlobalStrings.h"
+#include "wxCrafterImages.h"
 #include "MainFrame.h"
 
 #ifdef __WXMSW__
@@ -159,7 +160,7 @@ GlobalConfigManager::GlobalConfigManager(MainFrame* mf, wxPropertyGridManager* p
 ////////////////////////////////////////////////////////////////////
 GlobalConfigManager::~GlobalConfigManager() {
 ////////////////////////////////////////////////////////////////////
-	wxDELETE( CncConfig::globalCncConfig = NULL );
+	cncDELETE( CncConfig::globalCncConfig );
 	APPEND_LOCATION_TO_STACK_TRACE_FILE
 }
 
@@ -266,7 +267,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
-, lruFileList(LruFileList(16))
+, lruFileList(LruFileList(24))
 , lastTemplateFileNameForPreview(wxT(""))
 , pngAnimation(NULL)
 , stcFileContentPopupMenu(NULL)
@@ -323,7 +324,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 ///////////////////////////////////////////////////////////////////
 MainFrame::~MainFrame() {
 ///////////////////////////////////////////////////////////////////
-	APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Entry . . .");
+	GblFunc::appendToStackTraceFile("\nShuting down ......................");
 	
 	// stop the serial timer and wait interval to finish the work behind
 	auto stopTimer = [&](wxTimer* timer) {
@@ -1591,7 +1592,6 @@ void MainFrame::dispatchAll() {
 ///////////////////////////////////////////////////////////////////
 WXLRESULT MainFrame::MSWWindowProc(WXUINT message, WXWPARAM wParam, WXLPARAM lParam) {
 ///////////////////////////////////////////////////////////////////
-	#warning
 	return wxFrame::MSWWindowProc ( message, wParam, lParam );
 	
 	wxString portName("Undefined");

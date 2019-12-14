@@ -24,7 +24,7 @@ CncParsingSynopsisListCtrl::CncParsingSynopsisListCtrl(wxWindow *parent, long st
 /////////////////////////////////////////////////////////////
 {
 	// add colums
-	AppendColumn("", 		wxLIST_FORMAT_LEFT,  0);
+	AppendColumn("", 		wxLIST_FORMAT_LEFT,  20);
 	AppendColumn("Trace", 	wxLIST_FORMAT_LEFT,  wxLIST_AUTOSIZE);
 	
 	// determine styles
@@ -42,7 +42,7 @@ CncParsingSynopsisListCtrl::CncParsingSynopsisListCtrl(wxWindow *parent, long st
 	
 	SetImageList(imageList, wxIMAGE_LIST_SMALL);
 	
-	SetBackgroundColour(wxColour(0, 0, 0));
+	SetBackgroundColour(wxColour(191, 205, 219));
 	
 	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr.SetFont(font);
@@ -53,12 +53,12 @@ CncParsingSynopsisListCtrl::CncParsingSynopsisListCtrl(wxWindow *parent, long st
 	errorItemAttr		= defaultItemAttr;
 	separatorItemAttr	= defaultItemAttr;
 	
-	infoItemAttr		.SetTextColour(wxColour(242, 242, 242));
+	infoItemAttr		.SetTextColour(wxColour(  0,   0,   0));
 	warningItemAttr		.SetTextColour(wxColour(242, 242,   0));
 	errorItemAttr		.SetTextColour(wxColour(255, 128, 128));
 	
 	separatorItemAttr	.SetTextColour(infoItemAttr.GetTextColour());
-	separatorItemAttr	.SetBackgroundColour(wxColour(25,   25,  25));
+	separatorItemAttr	.SetBackgroundColour(GetBackgroundColour());
 	defaultItemAttr		.SetFont(font.Scaled(0.5));
 }
 /////////////////////////////////////////////////////////////

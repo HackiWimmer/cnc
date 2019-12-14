@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="CncConrollerGui" InternalType="GUI" Version="10.0.0">
+<CodeLite_Project Name="CncConrollerGui" InternalType="GUI" Version="11000">
   <Plugins>
     <Plugin Name="qmake">
-      <![CDATA[00030001N0005Debug0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
+      <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
     </Plugin>
   </Plugins>
   <VirtualDirectory Name="wxcrafter">
@@ -86,26 +86,26 @@
     </VirtualDirectory>
     <VirtualDirectory Name="StcLexer ">
       <VirtualDirectory Name="wx3.1.2">
-        <File Name="../../../../wxWidgets-3.1.2/build/msw/makefile.gcc" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.2/include/wx/stc/stc.h" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.2/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.2/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.2/include/wx/stc/stc.h" ExcludeProjConfig="Debug;Release;Gprof;"/>
       </VirtualDirectory>
       <VirtualDirectory Name="wx3.1.3">
-        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.3/include/wx/stc/stc.h" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.3/build/msw/makefile.gcc" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.3/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.3/include/wx/stc/stc.h" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.3/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;Gprof;"/>
       </VirtualDirectory>
-      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd"/>
+      <File Name="../../../../wxWidgets-3.1.0/build/msw/@MAKE.cmd" ExcludeProjConfig="Debug;Gprof;"/>
       <VirtualDirectory Name="wx3.1.0">
-        <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Release;"/>
-        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Release;"/>
+        <File Name="../../../../wxWidgets-3.1.0/include/wx/stc/stc.h" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/include/SciLexer.h" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.0/build/msw/makefile.gcc" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/lexers/LexGCode.cxx" ExcludeProjConfig="Debug;Release;Gprof;"/>
+        <File Name="../../../../wxWidgets-3.1.0/src/stc/scintilla/src/Catalogue.cxx" ExcludeProjConfig="Debug;Release;Gprof;"/>
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="3D">
@@ -286,10 +286,10 @@
     <VirtualDirectory Name="Codelite">
       <File Name="Codelite/wxPNGAnimation.cpp"/>
       <File Name="Codelite/wxPNGAnimation.h"/>
-      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="Release;Debug;release2;"/>
-      <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Release;Debug;release2;"/>
-      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="Release;Debug;release2;"/>
-      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Release;Debug;release2;"/>
+      <File Name="Codelite/cl_aui_dock_art.cpp" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
+      <File Name="Codelite/cl_aui_dock_art.h" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
+      <File Name="Codelite/drawingutils.cpp" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
+      <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
       <File Name="wxCrafterMotionMonitor_bitmaps.cpp"/>
@@ -349,6 +349,7 @@
       <File Name="UpdateManagerThread.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="LruFileList.cpp"/>
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
       <File Name="CommandTemplates.h"/>
@@ -528,7 +529,7 @@
         <Preprocessor Value="BOOST_STACKTRACE_USE_ADDR2LINE"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
-      <Linker Options="-mwindows;$(shell wx-config --libs)" Required="yes">
+      <Linker Options="$(shell wx-config --libs);-mwindows;-pg" Required="yes">
         <LibraryPath Value="."/>
         <LibraryPath Value="C:/@Development/freeglut/lib/x64"/>
         <Library Value="libwxmsw31u_stc"/>
@@ -586,6 +587,78 @@
         <CustomPreBuild/>
       </AdditionalRules>
       <Completion EnableCpp11="no" EnableCpp14="no">
+        <ClangCmpFlagsC/>
+        <ClangCmpFlags/>
+        <ClangPP/>
+        <SearchPaths/>
+      </Completion>
+    </Configuration>
+    <Configuration Name="Gprof" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+      <Compiler Options="-pg;-g1;-fpic;-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
+        <IncludePath Value="."/>
+        <IncludePath Value="C:/@Development/boost_1_71_0"/>
+        <IncludePath Value="C:/@Development/freeglut/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
+        <Preprocessor Value="NDEBUG"/>
+        <Preprocessor Value="APP_USE_SPLASH"/>
+        <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
+      </Compiler>
+      <Linker Options="$(shell wx-config --libs);-mwindows;-pg" Required="yes">
+        <Library Value="libwxmsw31u_stc"/>
+        <Library Value="libwxmsw31u_webview"/>
+        <Library Value="libwxmsw31u_propgrid"/>
+        <Library Value="libwxmsw31u_adv"/>
+        <Library Value="libwxmsw31u_gl"/>
+        <Library Value="libwxsvg"/>
+        <Library Value="libcairo"/>
+        <Library Value="libavutil"/>
+        <Library Value="libavformat"/>
+        <Library Value="libavcodec"/>
+        <Library Value="libxvidcore"/>
+        <Library Value="libexpat"/>
+        <Library Value="libexif"/>
+        <Library Value="libswscale"/>
+        <Library Value="backtrace"/>
+        <Library Value="libdl"/>
+        <Library Value="dbgeng"/>
+        <Library Value="opengl32"/>
+        <Library Value="glu32"/>
+        <Library Value="glew32"/>
+        <Library Value="freeglut"/>
+        <Library Value="Xinput9_1_0"/>
+      </Linker>
+      <ResourceCompiler Options="$(shell wx-config --rcflags);-D NDEBUG;" Required="no"/>
+      <General OutputFile="$(IntermediateDirectory)/$(ProjectName)" IntermediateDirectory="./Gprof" Command="./$(ProjectName)" CommandArguments="" UseSeparateDebugArgs="yes" DebugArguments="-g" WorkingDirectory="$(IntermediateDirectory)" PauseExecWhenProcTerminates="no" IsGUIProgram="yes" IsEnabled="yes"/>
+      <BuildSystem Name="Default"/>
+      <Environment EnvVarSetName="&lt;Use Defaults&gt;" DbgSetName="&lt;Use Defaults&gt;">
+        <![CDATA[]]>
+      </Environment>
+      <Debugger IsRemote="no" RemoteHostName="" RemoteHostPort="" DebuggerPath="" IsExtended="no">
+        <DebuggerSearchPaths/>
+        <PostConnectCommands/>
+        <StartupCommands/>
+      </Debugger>
+      <PreBuild>
+        <Command Enabled="yes">echo %WXWIN%</Command>
+        <Command Enabled="yes">where g++</Command>
+        <Command Enabled="yes">g++ -v</Command>
+      </PreBuild>
+      <PostBuild/>
+      <CustomBuild Enabled="no">
+        <RebuildCommand/>
+        <CleanCommand/>
+        <BuildCommand/>
+        <PreprocessFileCommand/>
+        <SingleFileCommand/>
+        <MakefileGenerationCommand/>
+        <ThirdPartyToolName>None</ThirdPartyToolName>
+        <WorkingDirectory/>
+      </CustomBuild>
+      <AdditionalRules>
+        <CustomPostBuild/>
+        <CustomPreBuild/>
+      </AdditionalRules>
+      <Completion EnableCpp11="yes" EnableCpp14="yes">
         <ClangCmpFlagsC/>
         <ClangCmpFlags/>
         <ClangPP/>

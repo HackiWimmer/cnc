@@ -10,8 +10,9 @@
 #include "CncContext.h"
 #include "MainFrame.h"
 #include "CncConfig.h"
-#include "wxCrafterMainFrame.h"
 #include "CncCommon.h"
+#include "wxCrafterImages.h"
+#include "wxCrafterMainFrame.h"
 #include "FileParser.h"
 
 wxPropertyGridManager* FileParser::debuggerConfigurationPropertyGrid = NULL;

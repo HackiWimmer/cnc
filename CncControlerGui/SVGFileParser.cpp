@@ -417,7 +417,7 @@ bool SVGFileParser::spoolPath(SVGUserAgentInfo& uai, const wxString& transform) 
 	if ( uai.shouldProceed() == false )
 		return true;
 		
-	SvgOriginalPathInfo sopi;
+	static SvgOriginalPathInfo sopi;
 	sopi.pathData.assign(uai.originalPath);
 	sopi.transformInfo.assign(uai.getTransformInfoAsString());
 	sopi.useTransformInfo.assign(transform);

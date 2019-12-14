@@ -4018,6 +4018,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_splitterPage6482->SetSizer(flexGridSizer6494);
     
     m_lruList = new wxListCtrl(m_splitterPage6482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage6482, wxSize(-1,-1)), wxLC_SINGLE_SEL|wxLC_REPORT);
+    m_lruList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_lruList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     
     flexGridSizer6494->Add(m_lruList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     

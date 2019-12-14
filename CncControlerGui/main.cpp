@@ -255,6 +255,7 @@ class MainApp : public wxApp {
 			CncTimeFunctions::init();
 			CncTextCtrlEditor::init();
 
+			GblFunc::appendToStackTraceFile("Starting up ......................");
 			globalFileConfig = new wxFileConfig(wxT("CncController"), 
 												wxEmptyString, 
 												CncFileNameService::getConfigFileName(), 
@@ -269,10 +270,11 @@ class MainApp : public wxApp {
 		///////////////////////////////////////////////////////////
 		virtual ~MainApp() {
 		///////////////////////////////////////////////////////////
-			APPEND_LOCATION_TO_STACK_TRACE_FILE
+			// the ownership was taken over by the GlobalConfigManager 
+			// and will be deleted there, dont do it here
+			// delete globalFileConfig;
 				
-			if ( globalFileConfig != NULL )
-				;//delete globalFileConfig;
+			APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Finalized . . . ")
 		}
 		
 		///////////////////////////////////////////////////////////////////

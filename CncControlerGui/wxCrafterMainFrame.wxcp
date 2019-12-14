@@ -44018,11 +44018,11 @@
                   }, {
                    "type": "colour",
                    "m_label": "Bg Colour:",
-                   "colour": "<Default>"
+                   "colour": "ButtonText"
                   }, {
                    "type": "colour",
                    "m_label": "Fg Colour:",
-                   "colour": "<Default>"
+                   "colour": "ButtonHighlight"
                   }, {
                    "type": "font",
                    "m_label": "Font:",

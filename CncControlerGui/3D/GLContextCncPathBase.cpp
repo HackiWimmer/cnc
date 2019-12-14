@@ -235,7 +235,7 @@ void GLContextCncPathBase::determineModel() {
 	if ( isEnabled() == false ) {
 		
 		
-		std::cout  << " GLContextCncPathBase::determineModel(); false"<< std::endl;
+		//std::cout  << " GLContextCncPathBase::determineModel(); false"<< std::endl;
 		
 		//drawTeapot();
 		

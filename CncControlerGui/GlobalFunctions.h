@@ -25,9 +25,10 @@ class GblFunc {
 		static void traceStacktraceDatabase(std::ostream& o);
 	
 		static void appendToStackTraceFile(const wxString& st);
+		static void appendToStackTraceFileTS(const wxString& st);
 };
 
-#define APPEND_LOCATION_TO_STACK_TRACE_FILE 		GblFunc::appendToStackTraceFile(CNC_LOG_LOCATION);
-#define APPEND_LOCATION_TO_STACK_TRACE_FILE_A(msg) 	GblFunc::appendToStackTraceFile(CNC_LOG_LOCATION_A(msg));
+#define APPEND_LOCATION_TO_STACK_TRACE_FILE 		GblFunc::appendToStackTraceFileTS(CNC_LOG_LOCATION);
+#define APPEND_LOCATION_TO_STACK_TRACE_FILE_A(msg) 	GblFunc::appendToStackTraceFileTS(CNC_LOG_LOCATION_A(msg));
 
 #endif

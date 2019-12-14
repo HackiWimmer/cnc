@@ -53,7 +53,7 @@
   <object class="wxBitmap" name="BMP_DISCONNECTED@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-disconnected@2x.png</object>
   <object class="wxBitmap" name="BMP_ENV_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\openterm.png</object>
   <object class="wxBitmap" name="BMP_ERROR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\picture-error (2).png</object>
-  <object class="wxBitmap" name="BMP_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\package-supported.png</object>
+  <object class="wxBitmap" name="BMP_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database (2).png</object>
   <object class="wxBitmap" name="BMP_FINGER16">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-finger.png</object>
   <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-finger@2x.png</object>
   <object class="wxBitmap" name="BMP_FINGER16@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-finger@2x.png</object>
@@ -69,7 +69,7 @@
   <object class="wxBitmap" name="BMP_HEART_PLUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\heart-add.png</object>
   <object class="wxBitmap" name="BMP_HIDE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\bullet_arrow_up.png</object>
   <object class="wxBitmap" name="BMP_INDEX">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-key.png</object>
-  <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\package-supported.png</object>
+  <object class="wxBitmap" name="BMP_LRU_FILE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\database-save.png</object>
   <object class="wxBitmap" name="BMP_MILL">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\mill.png</object>
   <object class="wxBitmap" name="BMP_MINUS">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus.png</object>
   <object class="wxBitmap" name="BMP_MINUS@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-minus@2x.png</object>
@@ -131,10 +131,10 @@
   <object class="wxBitmap" name="BMP_SVG_CFG">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-mime-xml.png</object>
   <object class="wxBitmap" name="BMP_SVG_CFG@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-mime-xml@2x.png</object>
   <object class="wxBitmap" name="BMP_SVG_CFG@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-mime-xml@2x.png</object>
-  <object class="wxBitmap" name="BMP_SYNOPSIS_ERROR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-error-5 (2).png</object>
-  <object class="wxBitmap" name="BMP_SYNOPSIS_INFO">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-information-3 (2).png</object>
-  <object class="wxBitmap" name="BMP_SYNOPSIS_SEPARATOR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\lightbulb-add.png</object>
-  <object class="wxBitmap" name="BMP_SYNOPSIS_WARNING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\dialog-warning-3 (2).png</object>
+  <object class="wxBitmap" name="BMP_SYNOPSIS_ERROR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\book_red.png</object>
+  <object class="wxBitmap" name="BMP_SYNOPSIS_INFO">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\book_green.png</object>
+  <object class="wxBitmap" name="BMP_SYNOPSIS_SEPARATOR">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\books.png</object>
+  <object class="wxBitmap" name="BMP_SYNOPSIS_WARNING">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="BMP_TEMPLATE">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-globals.png</object>
   <object class="wxBitmap" name="BMP_TEMPLATE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-globals@2x.png</object>
   <object class="wxBitmap" name="BMP_TEMPLATE@2x">C:\@Development\@Projekte\c++\CNCGuiController\CncControlerGui\bitmaps\16-globals@2x.png</object>

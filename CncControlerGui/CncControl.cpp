@@ -23,6 +23,7 @@
 #include "CncContext.h"
 #include "CncControl.h"
 #include "CncFileNameService.h"
+#include "wxCrafterImages.h"
 #include "MainFrame.h"
 
 static CommandTemplates CMDTPL;

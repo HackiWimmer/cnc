@@ -6877,6 +6877,8 @@ Preview</label>
                       <border>1</border>
                       <object class="wxListCtrl" name="m_lruList">
                         <style>wxLC_SINGLE_SEL|wxLC_REPORT</style>
+                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
+                        <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
                       </object>
                     </object>
                   </object>

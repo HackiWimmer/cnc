@@ -348,13 +348,13 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer3847->Add(m_btDirUp, 0, wxALL, WXC_FROM_DIP(0));
     m_btDirUp->SetMinSize(wxSize(24,24));
     
-    m_btRefresh = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-refresh-3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btRefresh = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("refresh")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
     m_btRefresh->SetToolTip(_("Refresh"));
     
     flexGridSizer3847->Add(m_btRefresh, 0, wxALL, WXC_FROM_DIP(0));
     m_btRefresh->SetMinSize(wxSize(24,24));
     
-    m_btDefaultPath = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("workspace")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btDefaultPath = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("folder-drag-accept-3 (2)")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
     m_btDefaultPath->SetToolTip(_("Select Default Path"));
     
     flexGridSizer3847->Add(m_btDefaultPath, 0, wxALL, WXC_FROM_DIP(0));
@@ -376,13 +376,14 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer3847->Add(m_btOpenTemplate, 0, wxALL, WXC_FROM_DIP(0));
     m_btOpenTemplate->SetMinSize(wxSize(24,24));
     
-    m_fileList = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLC_VRULES|wxLC_HRULES|wxLC_SINGLE_SEL|wxLC_REPORT);
+    m_fileList = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLC_SINGLE_SEL|wxLC_REPORT);
+    m_fileList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_fileList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     
     flexGridSizer3841->Add(m_fileList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     wxArrayString m_filterExtentionArr;
     m_filterExtention = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_filterExtentionArr, wxCB_READONLY|wxBORDER_NONE);
-    m_filterExtention->SetBackgroundColour(wxColour(wxT("rgb(192,192,192)")));
     wxFont m_filterExtentionFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_filterExtention->SetFont(m_filterExtentionFont);
     
@@ -397,7 +398,8 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer3841->Add(flexGridSizer3852, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_currentDirectory = new wxTextCtrl(this, wxID_ANY, wxT("c:\\xxx"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,19)), wxTE_RIGHT|wxTE_READONLY|wxBORDER_NONE);
-    m_currentDirectory->SetBackgroundColour(wxColour(wxT("rgb(224,224,224)")));
+    m_currentDirectory->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    m_currentDirectory->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     #if wxVERSION_NUMBER >= 3000
     m_currentDirectory->SetHint(wxT(""));
     #endif
