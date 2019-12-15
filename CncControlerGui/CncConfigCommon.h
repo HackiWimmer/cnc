@@ -75,6 +75,8 @@
 	#define CncApplication_AUTO_OPEN_OGL_OBSERVER			"CncApplication/AUTO_OPEN_OGL_OBSERVER"
 	#define CncApplication_SHOW_TEST_MENU 					"CncApplication/SHOW_TEST_MENU"
 	#define CncApplication_CONFIRMATION_MODE				"CncApplication/CONFIRMATION_MODE"
+	#define CncApplication_USE_MAIN_PREVIEW					"CncApplication/USE_MAIN_PREVIEW"
+	#define CncApplication_USE_MONITOR_PREVIEW				"CncApplication/USE_MONITOR_PREVIEW"
 	#define CncApplication_Com_DEFALT_PORT 					"CncApplication.Port/DEFAULT_PORT"
 	#define CncApplication_Tpl_DEFALT_DIRECTORY				"CncApplication.Template/OSD_DEFAULT_DIRECTORY"
 	#define CncApplication_Tpl_DEFALT_FILE 					"CncApplication.Template/OSD_DEFAULT_FILE"

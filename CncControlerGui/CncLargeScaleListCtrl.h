@@ -125,7 +125,7 @@ class CncLargeScaledListCtrl : public wxListCtrl {
 		void setListType(CncLargeScaledListCtrl::ListType lt) 	{ listType = lt; }
 		CncLargeScaledListCtrl::ListType getListType() 			{ return listType; }
 		
-		long getLastSelection() { return lastSelection; }
+		long getLastSelection() const { return lastSelection; }
 		bool setLastSelection(long item);
 		bool selectItem(long item, bool ensureVisible=true);
 		void deselectAll();

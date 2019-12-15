@@ -3966,7 +3966,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_winFileView = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    m_auimgrMain->AddPane(m_winFileView, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("Cnc File Manager")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(160,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
+    m_auimgrMain->AddPane(m_winFileView, wxAuiPaneInfo().Name(wxT("TemplateManager")).Caption(_("Cnc File Manager")).Direction(wxAUI_DOCK_LEFT).Layer(0).Row(0).Position(0).BestSize(220,100).MinSize(100,100).MaxSize(100,100).CaptionVisible(true).MaximizeButton(true).CloseButton(true).MinimizeButton(true).PinButton(true));
     
     wxFlexGridSizer* flexGridSizer1628 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer1628->SetFlexibleDirection( wxBOTH );
@@ -3975,15 +3975,21 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer1628->AddGrowableRow(2);
     m_winFileView->SetSizer(flexGridSizer1628);
     
-    wxFlexGridSizer* flexGridSizer6016 = new wxFlexGridSizer(1, 2, 0, 0);
+    wxFlexGridSizer* flexGridSizer6016 = new wxFlexGridSizer(1, 3, 0, 0);
     flexGridSizer6016->SetFlexibleDirection( wxBOTH );
     flexGridSizer6016->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
-    flexGridSizer6016->AddGrowableCol(1);
+    flexGridSizer6016->AddGrowableCol(0);
     flexGridSizer6016->AddGrowableRow(0);
     
     flexGridSizer1628->Add(flexGridSizer6016, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
-    m_keepFileManagerPreview = new wxCheckBox(m_winFileView, wxID_ANY, _("Keep Preview"), wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), 0);
+    m_staticText8353 = new wxStaticText(m_winFileView, wxID_ANY, _("Preview:"), wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), 0);
+    wxFont m_staticText8353Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText8353->SetFont(m_staticText8353Font);
+    
+    flexGridSizer6016->Add(m_staticText8353, 0, wxALL, WXC_FROM_DIP(2));
+    
+    m_keepFileManagerPreview = new wxCheckBox(m_winFileView, wxID_ANY, _("keep (+ CTRL)"), wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), 0);
     m_keepFileManagerPreview->SetValue(false);
     wxFont m_keepFileManagerPreviewFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_keepFileManagerPreview->SetFont(m_keepFileManagerPreviewFont);
@@ -3991,12 +3997,13 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     flexGridSizer6016->Add(m_keepFileManagerPreview, 0, wxALL, WXC_FROM_DIP(1));
     
-    m_staticText6018 = new wxStaticText(m_winFileView, wxID_ANY, _(" + CTRL"), wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), 0);
-    m_staticText6018->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
-    wxFont m_staticText6018Font(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
-    m_staticText6018->SetFont(m_staticText6018Font);
+    m_externFileManagerPreview = new wxCheckBox(m_winFileView, wxID_ANY, _("extern"), wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), 0);
+    m_externFileManagerPreview->SetValue(false);
+    wxFont m_externFileManagerPreviewFont(7, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_externFileManagerPreview->SetFont(m_externFileManagerPreviewFont);
+    m_externFileManagerPreview->SetToolTip(_("Opens the Template Manager Preview\n in an extrernal Window"));
     
-    flexGridSizer6016->Add(m_staticText6018, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(2));
+    flexGridSizer6016->Add(m_externFileManagerPreview, 0, wxALL, WXC_FROM_DIP(1));
     
     m_staticLine4345 = new wxStaticLine(m_winFileView, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_winFileView, wxSize(-1,-1)), wxLI_HORIZONTAL);
     
@@ -4010,18 +4017,17 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_splitterPage6482 = new wxPanel(m_splitter6478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter6478, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     
-    wxFlexGridSizer* flexGridSizer6494 = new wxFlexGridSizer(1, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer6494 = new wxFlexGridSizer(2, 1, 0, 0);
     flexGridSizer6494->SetFlexibleDirection( wxBOTH );
     flexGridSizer6494->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer6494->AddGrowableCol(0);
     flexGridSizer6494->AddGrowableRow(0);
     m_splitterPage6482->SetSizer(flexGridSizer6494);
     
-    m_lruList = new wxListCtrl(m_splitterPage6482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage6482, wxSize(-1,-1)), wxLC_SINGLE_SEL|wxLC_REPORT);
-    m_lruList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_lruList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_lruListPlaceholder = new wxPanel(m_splitterPage6482, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage6482, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_lruListPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
-    flexGridSizer6494->Add(m_lruList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer6494->Add(m_lruListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     m_splitterPage6490 = new wxPanel(m_splitter6478, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter6478, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_splitter6478->SplitHorizontally(m_splitterPage6482, m_splitterPage6490, 0);
@@ -6451,10 +6457,8 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_btClearMsgHistory->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btSaveOutboundAsTemplate2->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
-    m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(MainFrameBClass::lruListItemSelected), NULL, this);
-    m_lruList->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
-    m_lruList->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
-    m_lruList->Connect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLruList), NULL, this);
+    m_keepFileManagerPreview->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
+    m_externFileManagerPreview->Connect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
     m_clearLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
     m_copyLogger->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_showLoggerOnDemand->Connect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onShowLoggerOnDemand), NULL, this);
@@ -6754,10 +6758,8 @@ MainFrameBClass::~MainFrameBClass()
     m_btClearMsgHistory->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearControllerMsgHistory), NULL, this);
     m_btSaveOutboundAsTemplate2->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::saveOutboundAsNewTplFromButton), NULL, this);
     m_btToggleOutboundEditorWordWrap->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::toggleOutboundEditorWordWrap), NULL, this);
-    m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(MainFrameBClass::lruListItemSelected), NULL, this);
-    m_lruList->Disconnect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(MainFrameBClass::lruListItemActivated), NULL, this);
-    m_lruList->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(MainFrameBClass::lruListItemLeave), NULL, this);
-    m_lruList->Disconnect(wxEVT_KEY_DOWN, wxKeyEventHandler(MainFrameBClass::keyDownLruList), NULL, this);
+    m_keepFileManagerPreview->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
+    m_externFileManagerPreview->Disconnect(wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler(MainFrameBClass::onChangePreviewMode), NULL, this);
     m_clearLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::clearLogger), NULL, this);
     m_copyLogger->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::copyLogger), NULL, this);
     m_showLoggerOnDemand->Disconnect(wxEVT_COMMAND_TOGGLEBUTTON_CLICKED, wxCommandEventHandler(MainFrameBClass::onShowLoggerOnDemand), NULL, this);

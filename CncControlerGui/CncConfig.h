@@ -294,6 +294,8 @@ class CncConfig {
 		const bool getAutoConnectFlag();
 		const bool getAutoProcessFlag();
 		const bool getAutoOpenOglObserverFlag();
+		const bool getUseMainPreviewFlag();
+		const bool getUseMonitorPeviewFlag();
 		const bool getShowTestMenuFlag();
 		const bool getSvgConvertToRightHandFlag();
 		const bool getAvoidDupSetterValuesFlag();

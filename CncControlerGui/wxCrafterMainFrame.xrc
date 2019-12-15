@@ -6779,7 +6779,7 @@ Preview</label>
         <resizable>1</resizable>
         <movable>1</movable>
         <floatable>1</floatable>
-        <best_size>160,100</best_size>
+        <best_size>220,100</best_size>
         <max_size>100,100</max_size>
         <min_size>100,100</min_size>
         <left>1</left>
@@ -6803,12 +6803,28 @@ Preview</label>
               <flag>wxALL|wxEXPAND</flag>
               <border>1</border>
               <object class="wxFlexGridSizer">
-                <cols>2</cols>
+                <cols>3</cols>
                 <rows>1</rows>
                 <vgap>0</vgap>
                 <hgap>0</hgap>
-                <growablecols>1</growablecols>
+                <growablecols>0</growablecols>
                 <growablerows>0</growablerows>
+                <object class="sizeritem">
+                  <flag>wxALL</flag>
+                  <border>2</border>
+                  <object class="wxStaticText" name="m_staticText8353">
+                    <label>Preview:</label>
+                    <style/>
+                    <font>
+                      <size>7</size>
+                      <style>normal</style>
+                      <weight>bold</weight>
+                      <family>swiss</family>
+                      <underlined>0</underlined>
+                      <face>Segoe UI</face>
+                    </font>
+                  </object>
+                </object>
                 <object class="sizeritem">
                   <flag>wxALL</flag>
                   <border>1</border>
@@ -6825,17 +6841,14 @@ Preview</label>
                       <![CDATA[Keep the Template Manager Preview\nafter the control is leaved]]>
                     </tooltip>
                     <style/>
-                    <label>Keep Preview</label>
+                    <label>keep (+ CTRL)</label>
                     <checked>0</checked>
                   </object>
                 </object>
                 <object class="sizeritem">
-                  <flag>wxALL|wxALIGN_RIGHT</flag>
-                  <border>2</border>
-                  <object class="wxStaticText" name="m_staticText6018">
-                    <label> + CTRL</label>
-                    <style/>
-                    <fg>wxSYS_COLOUR_HIGHLIGHT</fg>
+                  <flag>wxALL</flag>
+                  <border>1</border>
+                  <object class="wxCheckBox" name="m_externFileManagerPreview">
                     <font>
                       <size>7</size>
                       <style>normal</style>
@@ -6844,6 +6857,12 @@ Preview</label>
                       <underlined>0</underlined>
                       <face>Segoe UI</face>
                     </font>
+                    <tooltip>
+                      <![CDATA[Opens the Template Manager Preview\n in an extrernal Window]]>
+                    </tooltip>
+                    <style/>
+                    <label>extern</label>
+                    <checked>0</checked>
                   </object>
                 </object>
               </object>
@@ -6867,7 +6886,7 @@ Preview</label>
                   <style>wxTAB_TRAVERSAL</style>
                   <object class="wxFlexGridSizer">
                     <cols>1</cols>
-                    <rows>1</rows>
+                    <rows>2</rows>
                     <vgap>0</vgap>
                     <hgap>0</hgap>
                     <growablecols>0</growablecols>
@@ -6875,10 +6894,9 @@ Preview</label>
                     <object class="sizeritem">
                       <flag>wxALL|wxEXPAND</flag>
                       <border>1</border>
-                      <object class="wxListCtrl" name="m_lruList">
-                        <style>wxLC_SINGLE_SEL|wxLC_REPORT</style>
-                        <bg>wxSYS_COLOUR_BTNTEXT</bg>
-                        <fg>wxSYS_COLOUR_BTNHIGHLIGHT</fg>
+                      <object class="wxPanel" name="m_lruListPlaceholder">
+                        <style>wxTAB_TRAVERSAL</style>
+                        <bg>wxSYS_COLOUR_HIGHLIGHT</bg>
                       </object>
                     </object>
                   </object>

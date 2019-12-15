@@ -62,6 +62,7 @@
 #include "CncMonitorSplitterWindow.h"
 #include "CncMotionVertexTrace.h"
 #include "CncTemplateObserver.h"
+#include "CncFileViewLists.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
 #include "CncPreprocessor.h"
@@ -232,6 +233,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , lastPortName(wxT(""))
 , defaultPortName(wxT(""))
 , cnc(new CncControl(CncEMU_NULL))
+, lruFileView(NULL)
 , sourceEditor(NULL)
 , outboundEditor(NULL)
 , motionMonitor(NULL)
@@ -267,7 +269,6 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
-, lruFileList(LruFileList(24))
 , lastTemplateFileNameForPreview(wxT(""))
 , pngAnimation(NULL)
 , stcFileContentPopupMenu(NULL)
@@ -365,7 +366,8 @@ MainFrame::~MainFrame() {
 	cncDELETE ( cncGameportDlg );
 
 	wxASSERT(lruStore);
-	lruFileList.save(lruStore);
+	wxASSERT(lruFileView);
+	lruFileView->save(lruStore);
 	lruStore->Flush();
 	cncDELETE ( lruStore );
 	
@@ -379,6 +381,7 @@ MainFrame::~MainFrame() {
 	cncDELETE( optionPane3D );
 	cncDELETE( motionMonitor );
 	cncDELETE( templateObserver );
+	cncDELETE( lruFileView );
 	cncDELETE( sourceEditor );
 	cncDELETE( outboundEditor );
 	cncDELETE( fileView );
@@ -665,6 +668,10 @@ void MainFrame::installCustControls() {
 	templateObserver = new CncTemplateObserver(this);
 	GblFunc::replaceControl(m_panelTemplateObserverPlaceholder, templateObserver);
 	
+	// LRU List 
+	lruFileView = new CncLruFileViewListCtrl(this, 24, wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_lruListPlaceholder, lruFileView);
+	
 	// Source Editor
 	sourceEditor = new CncSourceEditor(this);
 	GblFunc::replaceControl(m_stcFileContent, sourceEditor);
@@ -756,7 +763,8 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(sourceEditor);
 	registerGuiControl(outboundEditor);
 	registerGuiControl(fileView);
-	
+	registerGuiControl(lruFileView);
+
 	registerGuiControl(m_searchConnections);
 	registerGuiControl(m_btnOrigin);
 	registerGuiControl(m_btnRuler);
@@ -819,7 +827,6 @@ void MainFrame::registerGuiControls() {
 	registerGuiControl(m_displayInterval);
 	registerGuiControl(m_btRequestCtlConfig);
 	registerGuiControl(m_btRequestControllerPins);
-	registerGuiControl(m_lruList);
 	registerGuiControl(m_copyLogger);
 	registerGuiControl(m_btSvgToggleWordWrap);
 	registerGuiControl(m_switchMonitoing);
@@ -1145,17 +1152,19 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 	if ( THE_CONFIG->getAutoConnectFlag() )
 		connectSerialPortDialog();
 
-	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == true ) 
-		return;
-	
-	openInitialTemplateFile();
-	
-	// Auto process ?
-	if ( THE_CONFIG->getAutoProcessFlag() ) {
-		defineMinMonitoring();
-		processTemplateWrapper();
-		defineNormalMonitoring();
+	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == false ) {
+		
+		openInitialTemplateFile();
+		
+		// Auto process ?
+		if ( THE_CONFIG->getAutoProcessFlag() ) {
+			defineMinMonitoring();
+			processTemplateWrapper();
+			defineNormalMonitoring();
+		}
 	}
+	
+	GblFunc::appendToStackTraceFile("Ready ............................");
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::traceTimer(wxTimerEvent& event) {
@@ -1835,8 +1844,6 @@ bool MainFrame::Show(bool show) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::initialize(void) {
 ///////////////////////////////////////////////////////////////////
-	lruFileList.setListControl(m_lruList);
-	
 	createAnimationControl();
 	decorateSearchButton();
 	decorateSpeedControlBtn(true);
@@ -1946,12 +1953,13 @@ bool MainFrame::initializeCncControl() {
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::initializeLruMenu() {
 ///////////////////////////////////////////////////////////////////
-	//load lru list from config file
-	return lruFileList.load(lruStore);
+	return lruFileView->load(lruStore);
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::openInitialTemplateFile() {
 ///////////////////////////////////////////////////////////////////
+	wxASSERT ( lruFileView != NULL );
+	
 	wxString value;
 	THE_CONFIG->getDefaultTplDir(value);
 	fileView->setDefaultPath(value);
@@ -1960,7 +1968,7 @@ bool MainFrame::openInitialTemplateFile() {
 	THE_CONFIG->getDefaultTplFile(value);
 	wxFileName fn;
 	if ( value.length() > 0 ) 	fn.Assign(value);
-	else 						fn.Assign(lruFileList.getFileName(0));
+	else 						fn.Assign(lruFileView->getFileName(0));
 
 	if ( fn.Exists() ) {
 		m_inputFileName->SetValue(fn.GetFullName());
@@ -2872,7 +2880,7 @@ void MainFrame::prepareMotionMonitorViewType() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
-	lruFileList.addFile(getCurrentTemplatePathFileName());
+	lruFileView->addFile(getCurrentTemplatePathFileName());
 	fileView->selectFileInList(getCurrentTemplatePathFileName());
 	
 	selectMainBookSourcePanel(sourcePageToSelect);
@@ -2940,11 +2948,6 @@ void MainFrame::openTemplate(wxCommandEvent& event) {
 								"SVG Files (*.svg)|*.svg|GCode Files (*.ngc;*.gcode)|*.ngc;*.gcode|Binary Tpl Files (*.bct)|*.bct",
 								wxFD_OPEN|wxFD_FILE_MUST_EXIST);
 
-	// this has be always recreated, the ownership will be overtaken by openFileDialog
-
-	for ( unsigned int i=0; i<lruFileList.getFileCount(); i++ ) 
-		openFileDialog.addLruFilename(lruFileList.getFileName(i));
-
 	if ( openFileDialog.ShowModal() == wxID_CANCEL ) {
 		return;
 	}
@@ -3007,9 +3010,8 @@ void MainFrame::removeTemplateFromButton(wxCommandEvent& event) {
 		std::clog << "Template: " << fn << " was removed." << std::endl;
 		
 		// update file lists
-		lruFileList.removeFile(fn);
-		lruFileList.save(lruStore);
-		
+		lruFileView->removeFile(fn);
+		lruFileView->save(lruStore);
 		fileView->update();
 		
 		// clear source editor an motion monitor
@@ -3065,9 +3067,9 @@ void MainFrame::renameTemplateFromButton(wxCommandEvent& event) {
 	}
 	
 	// update file lists
-	lruFileList.removeFile(oldFileName);
-	lruFileList.addFile(newFileName);
-	lruFileList.save(lruStore);
+	lruFileView->removeFile(oldFileName);
+	lruFileView->addFile(newFileName);
+	lruFileView->save(lruStore);
 	
 	fileView->update();
 	
@@ -4201,6 +4203,10 @@ bool MainFrame::checkIfTemplateIsModified() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 ///////////////////////////////////////////////////////////////////
+#warning
+//return;
+
+
 	if ( force == true )
 		lastTemplateFileNameForPreview.clear();
 
@@ -5064,6 +5070,9 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMainPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
+	#warning
+	//return;
+	
 	selectMainBookPreviewPanel();
 	openPreview(mainFilePreview, fn);
 }
@@ -5096,7 +5105,7 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 	prepareAndShowMonitorTemplatePreview(true);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::lruListItemLeave(wxMouseEvent& event) {
+void MainFrame::lruListItemLeave() {
 ///////////////////////////////////////////////////////////////////
 	if ( m_keepFileManagerPreview->IsChecked() )
 		return;
@@ -5108,20 +5117,11 @@ void MainFrame::lruListItemLeave(wxMouseEvent& event) {
 		return;
 		
 	selectMainBookSourcePanel();
-	
-	int n = m_lruList->GetItemCount();
-	for (int i = 0; i < n; i++)
-		m_lruList->SetItemState(i, 0, wxLIST_STATE_SELECTED);
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::lruListItemActivated(wxListEvent& event) {
+void MainFrame::onChangePreviewMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	openFileFromFileManager(wxString(lruFileList.getFileName(event.GetIndex())));
-}
-///////////////////////////////////////////////////////////////////
-void MainFrame::lruListItemSelected(wxListEvent& event) {
-///////////////////////////////////////////////////////////////////
-	openMainPreview(wxString(lruFileList.getFileName(event.GetIndex())));
+	#warning
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookSourcePanel(int sourcePageToSelect) {
@@ -7129,21 +7129,6 @@ void MainFrame::dclickUpdateManagerThreadSymbol(wxMouseEvent& event) {
 			updateManagerThread->Resume();
 		}
 	}
-}
-/////////////////////////////////////////////////////////////////////
-void MainFrame::keyDownLruList(wxKeyEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	bool ctlKey = CncAsyncKeyboardState::isControlPressed();
-	int c = event.GetUnicodeKey();
-	
-	// save
-	if ( c == 'S' && ctlKey == true ) {
-		lruFileList.save(lruStore);
-		std::clog << "LRU List saved . . . " << std::endl;
-		return;
-	}
-	
-	event.Skip(true);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::manualContinuousMoveStart(const CncLinearDirection x, const CncLinearDirection y, const CncLinearDirection z) {

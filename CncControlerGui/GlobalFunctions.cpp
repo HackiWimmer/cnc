@@ -106,6 +106,14 @@ void GblFunc::cloneAttributes(wxWindow* source, wxWindow* target) {
 	target->SetToolTip(source->GetToolTipText());
 }
 ///////////////////////////////////////////////////////////////////
+void GblFunc::freeze(wxWindow* wnd, bool state) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT( wnd != NULL );
+	
+	if ( state == false ) 	{ if ( wnd->IsFrozen() == false ) wnd->Freeze(); } 
+	else 					{ if ( wnd->IsFrozen() == true  ) wnd->Thaw();   }
+}
+///////////////////////////////////////////////////////////////////
 void GblFunc::appendToStackTraceFile(const wxString& st) {
 ///////////////////////////////////////////////////////////////////
 	std::ofstream ofs (CncFileNameService::getStackTraceFileName(), std::ofstream::app);

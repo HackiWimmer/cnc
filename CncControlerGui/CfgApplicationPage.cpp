@@ -84,6 +84,20 @@ void CncConfig::setupApplicationCfgPage(wxConfigBase& config) {
 		registerProperty(CncApplication_SHOW_TEST_MENU, prop);
 		
 		//...............
+		prop = root->AppendChild( new wxBoolProperty("Use main preview", NEXT_PROP_ID, true));
+		prop->Enable(true);
+		prop->SetHelpString(_T("Restart required"));
+		prop->SetEditor( wxT("CheckBox") );
+		registerProperty(CncApplication_USE_MONITOR_PREVIEW, prop);
+		
+		//...............
+		prop = root->AppendChild( new wxBoolProperty("Use Monitor Preview", NEXT_PROP_ID, true));
+		prop->Enable(true);
+		prop->SetHelpString(_T("Restart required"));
+		prop->SetEditor( wxT("CheckBox") );
+		registerProperty(CncApplication_USE_MONITOR_PREVIEW, prop);
+		
+		//...............
 		pgParameterMgrArr.Clear();
 		pgParameterMgrIntArr.Clear();
 		pgParameterMgrArr.Add(_("Always")); 

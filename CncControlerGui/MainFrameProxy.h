@@ -2,6 +2,7 @@
 #define CNCCONTROLERGUI_MAINFRAMEPROXY_H_
 
 #include <wx/gdicmn.h>
+#include <wx/fileconf.h>
 #include <wx/statbmp.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -66,7 +67,10 @@ class MainFrameProxy {
 		static int showReferencePositionDlg(wxString msg);
 		static void newTemplate();
 		static void openTemplate();
-
+		static void lruListItemLeave();
+		
+		static wxFileConfig*			getLruStore();
+		
 		static wxPoint 					GetScreenPosition();
 
 		static wxStaticBitmap* 			GetGpBmp1();

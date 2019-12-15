@@ -349,7 +349,6 @@
       <File Name="UpdateManagerThread.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
-      <File Name="LruFileList.cpp"/>
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
       <File Name="CommandTemplates.h"/>
@@ -360,7 +359,6 @@
       <File Name="DataControlModel.cpp"/>
       <File Name="PenHandler.h"/>
       <File Name="DataControlModel.h"/>
-      <File Name="LruFileList.h"/>
       <File Name="NotebookInfo.h"/>
       <File Name="strsafe.h"/>
       <File Name="GlobalFunctions.h"/>
@@ -445,6 +443,8 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncFileViewLists.cpp"/>
+      <File Name="CncFileViewLists.h"/>
       <File Name="CncContextListCtrl.cpp"/>
       <File Name="CncContextListCtrl.h"/>
       <File Name="CncOpenGLContextObserverListCtrl.cpp"/>

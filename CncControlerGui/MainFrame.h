@@ -7,7 +7,6 @@
 #include <wx/generic/notifmsg.h>
 #include <wx/event.h>
 #include "NotebookInfo.h"
-#include "LruFileList.h"
 #include "FileParser.h"
 #include "BinaryFileParser.h"
 #include "UpdateManagerThread.h"
@@ -53,6 +52,7 @@ class CncGameportController;
 class CncSpeedMonitor;
 class CncPreprocessor;
 class CncGCodeSequenceListCtrl;
+class CncLruFileViewListCtrl;
 class CncMotionVertexTrace;
 class CncOpenGLContextObserver;
 class CncOSEnvironmentDialog;
@@ -126,6 +126,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		virtual void onChangePreviewMode(wxCommandEvent& event);
 		virtual void connectSec(wxCommandEvent& event);
 		virtual void selectPortSec(wxCommandEvent& event);
 		virtual void onCloseSecureRunAuiPane(wxCommandEvent& event);
@@ -176,7 +177,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void requestInterrupt(wxCommandEvent& event);
 		virtual void changeManuallySpeedSlider(wxScrollEvent& event);
 		virtual void requestHeartbeat(wxCommandEvent& event);
-		virtual void keyDownLruList(wxKeyEvent& event);
 		virtual void dclickUpdateManagerThreadSymbol(wxMouseEvent& event);
 		virtual void renameTemplateFromButton(wxCommandEvent& event);
 		virtual void removeTemplateFromButton(wxCommandEvent& event);
@@ -222,9 +222,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void onSelectTemplate(wxCommandEvent& event);
 		virtual void mainViewSelectorSelected(wxCommandEvent& event);
 		virtual void monitorViewSelectorSelected(wxCommandEvent& event);
-		virtual void lruListItemLeave(wxMouseEvent& event);
-		virtual void lruListItemActivated(wxListEvent& event);
-		virtual void lruListItemSelected(wxListEvent& event);
 		virtual void viewStatusbar(wxCommandEvent& event);
 		virtual void searchAvailiablePorts(wxCommandEvent& event);
 		virtual void unitTestFramework(wxCommandEvent& event);
@@ -417,6 +414,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void activateGamepadNotificationsOnDemand(bool state);
 		void activateGamepadNotifications(bool state);
 		void showGameportController(bool show);
+		void lruListItemLeave();
 		
 		wxDECLARE_EVENT_TABLE();
 		
@@ -593,6 +591,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 	
 		CncControl* cnc;
 		
+		CncLruFileViewListCtrl*			lruFileView;
 		CncSourceEditor* 				sourceEditor;
 		CncOutboundEditor* 				outboundEditor;
 		CncMotionMonitor* 				motionMonitor;
@@ -630,8 +629,6 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		
 		NotebookInfo* outboundNbInfo;
 		NotebookInfo* templateNbInfo;
-		
-		LruFileList lruFileList;
 		
 		wxString lastTemplateFileNameForPreview;
 		

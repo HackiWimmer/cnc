@@ -83,8 +83,11 @@ void CncGCodeSequenceListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 void CncGCodeSequenceListCtrl::addBlock(const GCodeBlock& gcb) {
 /////////////////////////////////////////////////////////////
+	#warning
+	//return;
+
 	static wxString value;
-	CncColumContainer cc(CncGCodeSequenceListCtrl::TOTAL_COL_COUNT);
+	static CncColumContainer cc(CncGCodeSequenceListCtrl::TOTAL_COL_COUNT);
 	
 	cc.updateItem(CncGCodeSequenceListCtrl::COL_ID, 	wxString::Format(globalStrings.gcodeSeqRefFormat, gcb.clientID));
 	cc.updateItem(CncGCodeSequenceListCtrl::COL_CMD, 	gcb.getCmdAsString(value));

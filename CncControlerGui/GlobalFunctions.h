@@ -14,6 +14,7 @@ class GblFunc {
 		static void swapControls(wxWindow* targetCtrl, wxWindow* sourceCtrl);
 		static void replaceControl(wxWindow* oldCtrl, wxWindow* newCtrl);
 		static void cloneAttributes(wxWindow* source, wxWindow* target);
+		static void freeze(wxWindow* wnd, bool state);
 		
 		static const std::ostream& 	stacktraceOnlyApp(std::ostream& o, bool lastOnly);
 		static const wxString& 		stacktraceOnlyApp(wxString& ret, bool lastOnly);

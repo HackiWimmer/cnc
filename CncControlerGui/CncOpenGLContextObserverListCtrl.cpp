@@ -136,9 +136,7 @@ CncOpenGLContextObserverHistoryListCtrl::CncOpenGLContextObserverHistoryListCtrl
 	//............................................
 	popupMenu->Bind(wxEVT_COMMAND_MENU_SELECTED,
 	 [&](wxCommandEvent& event) {
-			//CncOpenGLContextObserverHistoryListCtrl* ctl = reinterpret_cast<CncOpenGLContextObserverHistoryListCtrl*>(event.GetEventUserData());
-			//wxASSERT(ctl);
-			this->clear();
+		this->clear();
 	 }, itemId, itemId);
 }
 /////////////////////////////////////////////////////////////

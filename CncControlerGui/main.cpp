@@ -7,6 +7,7 @@
 #include <wx/splash.h>
 #include <wx/dcmemory.h>
 #include <wx/cmdline.h>
+#include <wx/fileconf.h>
 #include <wx/intl.h>
 #include "OSD/CncTimeFunctions.h"
 #include "CncLoggerProxy.h"
@@ -275,13 +276,14 @@ class MainApp : public wxApp {
 			// delete globalFileConfig;
 				
 			APPEND_LOCATION_TO_STACK_TRACE_FILE_A("Finalized . . . ")
+			GblFunc::appendToStackTraceFile("The End ..........................");
 		}
 		
 		///////////////////////////////////////////////////////////////////
 		virtual int FilterEvent(wxEvent& event) {
 		///////////////////////////////////////////////////////////////////
 			return wxApp::FilterEvent(event);
-		}
+		} 
 		
 		///////////////////////////////////////////////////////////////////
 		void printUsage() {

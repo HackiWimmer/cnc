@@ -513,12 +513,13 @@ protected:
     CncZView* m_zView;
     wxStaticText* m_infoToolDiameter;
     wxPanel* m_winFileView;
+    wxStaticText* m_staticText8353;
     wxCheckBox* m_keepFileManagerPreview;
-    wxStaticText* m_staticText6018;
+    wxCheckBox* m_externFileManagerPreview;
     wxStaticLine* m_staticLine4345;
     wxSplitterWindow* m_splitter6478;
     wxPanel* m_splitterPage6482;
-    wxListCtrl* m_lruList;
+    wxPanel* m_lruListPlaceholder;
     wxPanel* m_splitterPage6490;
     wxPanel* m_mainFileViewPlaceholder;
     wxPanel* m_winLoggerView;
@@ -954,10 +955,7 @@ protected:
     virtual void refreshSetterList(wxCommandEvent& event) { event.Skip(); }
     virtual void clearControllerMsgHistory(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleOutboundEditorWordWrap(wxCommandEvent& event) { event.Skip(); }
-    virtual void lruListItemSelected(wxListEvent& event) { event.Skip(); }
-    virtual void lruListItemActivated(wxListEvent& event) { event.Skip(); }
-    virtual void lruListItemLeave(wxMouseEvent& event) { event.Skip(); }
-    virtual void keyDownLruList(wxKeyEvent& event) { event.Skip(); }
+    virtual void onChangePreviewMode(wxCommandEvent& event) { event.Skip(); }
     virtual void clearLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void copyLogger(wxCommandEvent& event) { event.Skip(); }
     virtual void onShowLoggerOnDemand(wxCommandEvent& event) { event.Skip(); }
@@ -1500,10 +1498,11 @@ public:
     CncZView* GetZView() { return m_zView; }
     wxStaticText* GetInfoToolDiameter() { return m_infoToolDiameter; }
     wxPanel* GetPanelZView() { return m_panelZView; }
+    wxStaticText* GetStaticText8353() { return m_staticText8353; }
     wxCheckBox* GetKeepFileManagerPreview() { return m_keepFileManagerPreview; }
-    wxStaticText* GetStaticText6018() { return m_staticText6018; }
+    wxCheckBox* GetExternFileManagerPreview() { return m_externFileManagerPreview; }
     wxStaticLine* GetStaticLine4345() { return m_staticLine4345; }
-    wxListCtrl* GetLruList() { return m_lruList; }
+    wxPanel* GetLruListPlaceholder() { return m_lruListPlaceholder; }
     wxPanel* GetSplitterPage6482() { return m_splitterPage6482; }
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
     wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
