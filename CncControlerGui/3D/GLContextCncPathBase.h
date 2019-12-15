@@ -71,6 +71,7 @@ class CncGLContextObserver {
 		
 		const wxString& getCurrentContextItemText(long row, long column) const;
 		const wxString& getRegisteredContextItemText(long row, long column) const;
+		const wxString& getRegisteredContextItemText(GLContextCncPathBase* ctx) const;
 		
 		void appendMessage(const char type, const wxString& functName, const wxString& msg) const;
 };

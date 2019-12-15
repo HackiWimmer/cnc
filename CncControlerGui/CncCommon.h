@@ -195,6 +195,15 @@ class OutboundMonitorSelection{
 };
 
 //-----------------------------------------------------------------
+class PostProcessorSelection{
+	public:
+		enum VAL {
+			OUTBOUND_SOURCE				= 0,
+			OUTBOUND_PREVIEW			= 1
+		};
+};
+
+//-----------------------------------------------------------------
 class StatisticSelection{
 	public:
 		enum VAL {

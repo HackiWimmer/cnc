@@ -4,53 +4,31 @@
 #include <wx/filename.h>
 #include "CncLargeScaleListCtrl.h"
 
-class CncFileViewListCtrl : public CncLargeScaledListCtrl {
-	
-	private:
-		
-		virtual wxString OnGetItemText(long item, long column) const;
-		virtual int OnGetItemColumnImage(long item, long column) const;
-		virtual wxListItemAttr* OnGetItemAttr(long item) const;
-		
-		void onSize(wxSizeEvent& event);
-		void onLeaveWindow(wxMouseEvent& event);
-		void onSelectListItem(wxListEvent& event);
-		void onActivateListItem(wxListEvent& event);
-		
-	public:
-		static const int COL_FILE 			= 0;
-		static const int TOTAL_COL_COUNT	= 1;
-		static const int COL_STRECH			= COL_FILE;
-		
-		CncFileViewListCtrl(wxWindow *parent, long style);
-		virtual ~CncFileViewListCtrl();
-		
-		virtual bool Enable(bool enable=true);
-		
-		void updateColumnWidth();
-		
-		wxDECLARE_NO_COPY_CLASS(CncFileViewListCtrl);
-		wxDECLARE_EVENT_TABLE();
-};
-
 class wxFileConfig;
 class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		
 	private:
+		
+		enum EventType { UNKNOWN, PREVIEW, OPEN };
 		
 		const char* lruSection = "LRU_List";
 		const char* lruPrefix  = "LRU_FILE_";
 
 		typedef std::vector<wxFileName> LruList;
 		LruList 		lruList;
+		wxTimer* 		eventTimer;
+		wxListItemAttr 	defaultItemAttr;
+		wxListItemAttr 	selectedItemAttr;
 		wxMenu* 		popupMenu;
 		bool			isLeaveEventActive;
 		unsigned int 	maxSize;
+		EventType		lastEventType;
 			
 		virtual wxString OnGetItemText(long item, long column) const;
 		virtual int OnGetItemColumnImage(long item, long column) const;
 		virtual wxListItemAttr* OnGetItemAttr(long item) const;
 		
+		void onEventTimer(wxTimerEvent& event);
 		void onSize(wxSizeEvent& event);
 		void onKeyDown(wxKeyEvent& event);
 		void onRightDown(wxMouseEvent& event);
@@ -62,7 +40,6 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		void updateListControl();
 		
 	protected:
-		
 		virtual bool isItemValid(long item) const;
 		
 	public:
@@ -79,6 +56,7 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		virtual bool Enable(bool enable=true);
 		
 		void updateColumnWidth();
+		void selectFirstItem();
 		
 		unsigned int getFileCount() const ;
 		const char* getFileName(unsigned int pos);
@@ -90,6 +68,74 @@ class CncLruFileViewListCtrl : public CncLargeScaledListCtrl {
 		bool save(wxFileConfig* config);
 		
 		wxDECLARE_NO_COPY_CLASS(CncLruFileViewListCtrl);
+		wxDECLARE_EVENT_TABLE();
+};
+
+
+class CncFileViewListCtrl : public CncLargeScaledListCtrl {
+	
+	public:
+		enum FileListImage {
+			FTI_FOLDER_UP 		= 0,
+			FTI_FOLDER    		= 1,
+			FTI_FILE      		= 2,
+			FTI_ERROR     		= 3,
+			FTI_FILE_SELECTED 	= 4
+		};
+		
+		struct FileEntry {
+			FileListImage	imageIdx;
+			wxString		fileName;
+			
+			FileEntry(const wxString& n, FileListImage i) 
+			: imageIdx(i)
+			, fileName(n)
+			{}
+		};
+		
+		typedef std::vector<FileEntry> FileEntryList;
+	
+	private:
+		
+		enum EventType { UNKNOWN, PREVIEW, OPEN };
+		
+		FileEntryList 	fileEntries;
+		wxTimer* 		eventTimer;
+
+		wxListItemAttr defaultItemAttr;
+		wxListItemAttr selectedItemAttr;
+		EventType		lastEventType;
+		
+		virtual wxString OnGetItemText(long item, long column) const;
+		virtual int OnGetItemColumnImage(long item, long column) const;
+		virtual wxListItemAttr* OnGetItemAttr(long item) const;
+		
+		void onEventTimer(wxTimerEvent& event);
+		void onSize(wxSizeEvent& event);
+		void onLeaveWindow(wxMouseEvent& event);
+		void onSelectListItem(wxListEvent& event);
+		void onActivateListItem(wxListEvent& event);
+		
+	protected:
+		virtual bool isItemValid(long item) const;
+
+	public:
+		static const int COL_FILE 			= 0;
+		static const int TOTAL_COL_COUNT	= 1;
+		static const int COL_STRECH			= COL_FILE;
+		
+		CncFileViewListCtrl(wxWindow *parent, long style);
+		virtual ~CncFileViewListCtrl();
+		
+		virtual bool Enable(bool enable=true);
+		
+		void updateColumnWidth();
+		
+		void deleteAllEntries();
+		void addFileEntry(const wxString& name, FileListImage fii);
+		bool selectFileInList(const wxString& fileName);
+		
+		wxDECLARE_NO_COPY_CLASS(CncFileViewListCtrl);
 		wxDECLARE_EVENT_TABLE();
 };
 

@@ -67,7 +67,7 @@ class MainFrameProxy {
 		static int showReferencePositionDlg(wxString msg);
 		static void newTemplate();
 		static void openTemplate();
-		static void lruListItemLeave();
+		static bool filePreviewListLeave();
 		
 		static wxFileConfig*			getLruStore();
 		

@@ -1,35 +1,97 @@
 #include "GlobalFunctions.h"
+#include "CncUserEvents.h"
 #include "CncExternalViewBox.h"
 
+#include <wx/frame.h>
+extern wxFrame* THE_FRAME;
+
 //////////////////////////////////////////////////////////////////
-CncExternalViewBox::CncExternalViewBox(wxWindow* parent, wxWindow* source, long style)
+CncExternalViewBox::CncExternalViewBox(wxWindow* parent, long style)
 : CncExternalViewBoxBase(parent, wxID_ANY, wxT(""), wxDefaultPosition, wxSize(500, 300), wxSTAY_ON_TOP | style)
 , guiSensitivity(true)
-, swapState(SS_DEFAULT)
-, sourceCtrl(source)
 , moveDelta()
 //////////////////////////////////////////////////////////////////
 {
-	wxASSERT( sourceCtrl != NULL );
+	targetCtrl[0] = m_placeholder1;
+	targetCtrl[1] = m_placeholder2;
+	targetCtrl[2] = m_placeholder3;
+	targetCtrl[3] = m_placeholder4;
+	
+	for (unsigned int i=0; i<MAX_VIEWS; i++) {
+		sourceCtrl[i] = NULL;
+		swapState[i]  = SS_DEFAULT;
+		title[i] 	  = "";
+	}
+	
+	m_viewBook->SetSelection(0);
 }
 //////////////////////////////////////////////////////////////////
 CncExternalViewBox::~CncExternalViewBox() {
 //////////////////////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////////////////////
+const CncExternalViewBox::SwapState CncExternalViewBox::getSwapState(unsigned int idx) const {
+//////////////////////////////////////////////////////////////////
+	if ( idx > MAX_VIEWS - 1 )
+		return SS_DEFAULT;
+		
+	return swapState[idx];
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBox::selectView(unsigned int idx) {
+//////////////////////////////////////////////////////////////////
+	if ( idx > MAX_VIEWS - 1 )
+		return false;
+		
+	if ( sourceCtrl[idx] == NULL )
+		return false;
+
+	m_viewBook->SetSelection(idx);
+	
+	SetTitle(title[idx]);
+	m_windowTitle->SetLabel(GetTitle());
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
+bool CncExternalViewBox::setupView(unsigned int idx, wxWindow* source, const wxString& t) {
+//////////////////////////////////////////////////////////////////
+	if ( idx > MAX_VIEWS - 1 )
+		return false;
+	
+	if ( sourceCtrl[idx] != NULL ) {
+		if ( swapState[idx] == SS_SWAPED )
+			swapControls(idx);
+	}
+	
+	title[idx] 		= t;
+	swapState[idx] 	= SS_DEFAULT;
+	sourceCtrl[idx] = source;
+	
+	return true;
+}
+//////////////////////////////////////////////////////////////////
 void CncExternalViewBox::swapControls() {
 //////////////////////////////////////////////////////////////////
-	wxASSERT( sourceCtrl != NULL );
-	
-	if ( swapState == SS_DEFAULT ) {
-		GblFunc::swapControls(m_placeholder, sourceCtrl);
-		swapState = SS_SWAPED;
+	for (unsigned int i=0; i<MAX_VIEWS; i++)
+		swapControls(i);
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::swapControls(unsigned int idx) {
+//////////////////////////////////////////////////////////////////
+	if ( idx > MAX_VIEWS - 1 )
+		return;
+		
+	if ( sourceCtrl[idx] == NULL )
+		return;
 
-		SetClientSize(GetDefaultSize());
+	if ( swapState[idx] == SS_DEFAULT ) {
+		GblFunc::swapControls(targetCtrl[idx], sourceCtrl[idx]);
+		swapState[idx] = SS_SWAPED;
 		
 	} else {
-		GblFunc::swapControls(sourceCtrl, m_placeholder);
-		swapState = SS_DEFAULT;
+		GblFunc::swapControls(sourceCtrl[idx], targetCtrl[idx]);
+		swapState[idx] = SS_DEFAULT;
 	}
 	
 	Update();
@@ -37,13 +99,12 @@ void CncExternalViewBox::swapControls() {
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onShow(wxShowEvent& event) {
 //////////////////////////////////////////////////////////////////
-	wxString title(GetTitle());
-	m_windowTitle->SetLabel(title);
-	
-	if 		( event.IsShown() == true  && swapState == SS_DEFAULT )	swapControls();
-	else if ( event.IsShown() == false && swapState == SS_DEFAULT )	; // do nothing
-	else if ( event.IsShown() == true  && swapState == SS_SWAPED )	; // do nothing
-	else if ( event.IsShown() == false && swapState == SS_SWAPED )	swapControls();
+	for (unsigned int i=0; i<MAX_VIEWS; i++) {
+		if 		( event.IsShown() == true  && swapState[i] == SS_DEFAULT )	swapControls(i);
+		else if ( event.IsShown() == false && swapState[i] == SS_DEFAULT )	; // do nothing
+		else if ( event.IsShown() == true  && swapState[i] == SS_SWAPED )	; // do nothing
+		else if ( event.IsShown() == false && swapState[i] == SS_SWAPED )	swapControls(i);
+	}
 }
 //////////////////////////////////////////////////////////////////
 void CncExternalViewBox::onCloseFromButton(wxCommandEvent& event) {
@@ -94,4 +155,17 @@ void CncExternalViewBox::onMotion(wxMouseEvent& event) {
 			Move(wxPoint(pos.x - moveDelta.x, pos.y - moveDelta.y));
 		}
 	}
+}
+//////////////////////////////////////////////////////////////////
+void CncExternalViewBox::onViewBookChnaged(wxNotebookEvent& event) {
+//////////////////////////////////////////////////////////////////
+	typedef IndividualCommandEvent::EvtMainFrame ID;
+	typedef IndividualCommandEvent::ValueName VN;
+
+	IndividualCommandEvent evt(ID::ExtViewBoxChange);
+	evt.setValue(VN::VAL1, this);
+	evt.setValue(VN::VAL2, event.GetOldSelection());
+	evt.setValue(VN::VAL3, event.GetSelection());
+	
+	wxPostEvent(THE_FRAME, evt);
 }

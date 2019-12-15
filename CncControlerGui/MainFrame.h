@@ -56,6 +56,7 @@ class CncLruFileViewListCtrl;
 class CncMotionVertexTrace;
 class CncOpenGLContextObserver;
 class CncOSEnvironmentDialog;
+class CncExternalViewBox;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -414,7 +415,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void activateGamepadNotificationsOnDemand(bool state);
 		void activateGamepadNotifications(bool state);
 		void showGameportController(bool show);
-		void lruListItemLeave();
+		bool filePreviewListLeave();
 		
 		wxDECLARE_EVENT_TABLE();
 		
@@ -622,6 +623,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncMessageDialog*				spyDetailWindow;
 		CncOpenGLContextObserver*		openGLContextObserver;
 		CncOSEnvironmentDialog* 		cncOsEnvDialog;
+		CncExternalViewBox* 			cncExtMainPreview;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;
@@ -630,7 +632,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		NotebookInfo* outboundNbInfo;
 		NotebookInfo* templateNbInfo;
 		
-		wxString lastTemplateFileNameForPreview;
+		wxString lastMonitorPreviewFileName;
 		
 		wxPNGAnimation* pngAnimation;
 		wxMenu* stcFileContentPopupMenu;
@@ -685,13 +687,16 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool openFileExtern(const wxString& tool, const char* file);
 		bool openFileExtern(const wxString& tool, wxString& file);
 		
-		TemplateFormat getCurrentTemplateFormat(const char* fn = NULL);
-		const char* getCurrentTemplateFormatName(const char* fn = NULL);
+		TemplateFormat getTemplateFormat(const wxString& fn);
+		const char* getTemplateFormatName(const wxString& fn);
+
+		TemplateFormat getCurrentTemplateFormat();
+		const char* getCurrentTemplateFormatName();
 		const wxString& getCurrentTemplateFileName();
 		const wxString& getCurrentTemplatePathFileName();
 		
 		
-		bool checkIfTemplateIsModified();
+		bool saveTemplateOnDemand();
 
 		BinaryFileParser::ViewType getCurrentBinaryViewMode();
 		

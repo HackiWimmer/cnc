@@ -145,7 +145,7 @@ void CncFileNameService::sessionHousekeeping() {
 	CncFileHousekeeping sessions;
 	
 	wxDir dir(_tempDirectoryApp);
-	const unsigned int total = dir.Traverse(sessions);
+	dir.Traverse(sessions);
 	APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Total = %u, Deleted = %u, ToYoung = %u, WrongState = %u, WrongDir = %u, WrongDate = %u", 
 	                                                        sessions.cntTotalDirs, 
 															sessions.cntDeleted, 

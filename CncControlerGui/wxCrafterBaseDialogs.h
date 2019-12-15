@@ -28,6 +28,7 @@
 #include <wx/mstream.h>
 #include <wx/filename.h>
 #include <wx/animate.h>
+#include <wx/simplebook.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
 #include <wx/persist/toplevel.h>
@@ -225,8 +226,23 @@ protected:
     wxPanel* m_moveArea;
     wxButton* m_btMinMax;
     wxButton* m_btClose;
-    wxPanel* m_placeholder;
+    wxSimplebook* m_viewBook;
+    wxPanel* m_page1;
+    wxPanel* m_placeholder1;
     wxStaticText* m_staticText93;
+    wxPanel* m_page2;
+    wxPanel* m_placeholder2;
+    wxStaticText* m_staticText935;
+    wxPanel* m_page3;
+    wxPanel* m_placeholder3;
+    wxStaticText* m_staticText93510;
+    wxPanel* m_page4;
+    wxPanel* m_placeholder4;
+    wxStaticText* m_staticText9351015;
+    wxPanel* m_status;
+    wxTextCtrl* m_statusTextLeft;
+    wxTextCtrl* m_statusTextMid;
+    wxTextCtrl* m_statusTextRight;
 
 protected:
     virtual void onShow(wxShowEvent& event) { event.Skip(); }
@@ -235,6 +251,7 @@ protected:
     virtual void onMotion(wxMouseEvent& event) { event.Skip(); }
     virtual void onMinMax(wxCommandEvent& event) { event.Skip(); }
     virtual void onCloseFromButton(wxCommandEvent& event) { event.Skip(); }
+    virtual void onViewBookChnaged(wxNotebookEvent& event) { event.Skip(); }
 
 public:
     wxStaticBitmap* GetStaticBitmap85() { return m_staticBitmap85; }
@@ -244,7 +261,22 @@ public:
     wxButton* GetBtClose() { return m_btClose; }
     wxPanel* GetCaption() { return m_caption; }
     wxStaticText* GetStaticText93() { return m_staticText93; }
-    wxPanel* GetPlaceholder() { return m_placeholder; }
+    wxPanel* GetPlaceholder1() { return m_placeholder1; }
+    wxPanel* GetPage1() { return m_page1; }
+    wxStaticText* GetStaticText935() { return m_staticText935; }
+    wxPanel* GetPlaceholder2() { return m_placeholder2; }
+    wxPanel* GetPage2() { return m_page2; }
+    wxStaticText* GetStaticText93510() { return m_staticText93510; }
+    wxPanel* GetPlaceholder3() { return m_placeholder3; }
+    wxPanel* GetPage3() { return m_page3; }
+    wxStaticText* GetStaticText9351015() { return m_staticText9351015; }
+    wxPanel* GetPlaceholder4() { return m_placeholder4; }
+    wxPanel* GetPage4() { return m_page4; }
+    wxSimplebook* GetViewBook() { return m_viewBook; }
+    wxTextCtrl* GetStatusTextLeft() { return m_statusTextLeft; }
+    wxTextCtrl* GetStatusTextMid() { return m_statusTextMid; }
+    wxTextCtrl* GetStatusTextRight() { return m_statusTextRight; }
+    wxPanel* GetStatus() { return m_status; }
     CncExternalViewBoxBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("no caption available"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(800,600), long style = wxSTAY_ON_TOP);
     virtual ~CncExternalViewBoxBase();
 };

@@ -4,40 +4,34 @@
 #include <wx/filename.h>
 #include "wxCrafterImages.h"
 #include "OSD/CncAsyncKeyboardState.h"
+#include "GlobalFunctions.h"
 #include "MainFrameProxy.h"
+#include "CncFileViewLists.h"
 #include "CncFileView.h"
 
-enum FileListImage {
-	FTI_FOLDER_UP = 0,
-	FTI_FOLDER    = 1,
-	FTI_FILE      = 2,
-	FTI_ERROR     = 3
-};
 const char* ALL_FILES 		= "*.*";
 const char* SVG_FILES 		= "*.svg";
 const char* GCODE_FILES1 	= "*.gcode";
 const char* GCODE_FILES2 	= "*.ngc";
 const char* BIN_FILES 		= "*.bct";
 
+#define CFV_PRINT_LOCATION_CTX_FILE			//	CNC_PRINT_LOCATION
+#define CFV_PRINT_LOCATION_CTX_SOMETHING	//	CNC_PRINT_LOCATION
+
 /////////////////////////////////////////////////////////////////
 CncFileView::CncFileView(wxWindow* parent)
 : CncFileViewBase(parent)
 , wxDirTraverser()
 , defaultPath("")
+, fileList(NULL)
 , filterList()
 , avoidSelectListEvent(false)
 , lastSelection()
 /////////////////////////////////////////////////////////////////
 {
-	// the image list will be deletet by the list control 
-	wxImageList* imageList = new wxImageList(16, 16);
-	imageList->Add(ImageLibFile().Bitmap("BMP_FOLDER_UP"));
-	imageList->Add(ImageLibFile().Bitmap("BMP_FOLDER"));
-	imageList->Add(ImageLibFile().Bitmap("BMP_FILE"));
-	imageList->Add(ImageLibFile().Bitmap("BMP_ERROR"));
-	
-	m_fileList->SetImageList(imageList, wxIMAGE_LIST_SMALL);
-	m_fileList->AppendColumn("Workarea:", wxLIST_FORMAT_LEFT, wxLIST_AUTOSIZE_USEHEADER);
+	// File List 
+	fileList = new CncFileViewListCtrl(this, wxLC_SINGLE_SEL);
+	GblFunc::replaceControl(m_fileListPlaceholder, fileList);
 	
 	filterList.push_back(ALL_FILES);
 	filterList.push_back(SVG_FILES);
@@ -54,6 +48,23 @@ CncFileView::CncFileView(wxWindow* parent)
 CncFileView::~CncFileView() {
 /////////////////////////////////////////////////////////////////
 	filterList.clear();
+	wxDELETE( fileList );
+}
+/////////////////////////////////////////////////////////////////
+bool CncFileView::Enable(bool enable) {
+/////////////////////////////////////////////////////////////////
+	m_btDirUp->			Enable(enable);
+	m_btRefresh->		Enable(enable);
+	m_btDefaultPath->	Enable(enable);
+	m_btNewTemplate->	Enable(enable);
+	m_btOpenTemplate->	Enable(enable);
+	m_btOpenTemplate->	Enable(enable);
+	fileList->			Enable(enable);
+	
+	return true;
+	
+	//GblFunc::freeze(this, !enable);
+	//return CncFileViewBase::Enable(enable); 
 }
 /////////////////////////////////////////////////////////////////
 bool CncFileView::makePathValid(wxString& p) {
@@ -98,34 +109,30 @@ void CncFileView::selectDefaultPath() {
 /////////////////////////////////////////////////////////////////
 wxDirTraverseResult CncFileView::OnFile(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
-	wxFileName fn(fileName);
-	if ( m_filterExtention->GetStringSelection() == ALL_FILES ) {
-		// add all files 
-		m_fileList->InsertItem(m_fileList->GetItemCount(), fn.GetFullName(), FileListImage::FTI_FILE);
-	} else {
-		// consider the filter
-		wxString ext(m_filterExtention->GetStringSelection());
-		// a bad hack to remove "*. from the beginning
-		ext = ext.SubString(2, ext.length() -1 );
-		if ( fn.GetExt() == ext )
-			m_fileList->InsertItem(m_fileList->GetItemCount(), fn.GetFullName(), FileListImage::FTI_FILE);
-	}
+	const wxFileName fn(fileName);
+	const wxString name(fn.GetFullName());
+	
+	if ( name.IsEmpty() == false )
+		fileList->addFileEntry(name, CncFileViewListCtrl::FileListImage::FTI_FILE);
 	
 	return wxDIR_CONTINUE;
 }
 /////////////////////////////////////////////////////////////////
 wxDirTraverseResult CncFileView::OnDir(const wxString& dirName) {
 /////////////////////////////////////////////////////////////////
-	wxFileName fn(dirName);
-	m_fileList->InsertItem(m_fileList->GetItemCount(),fn.GetFullName(), FileListImage::FTI_FOLDER);
+	const wxFileName fn(dirName);
+	const wxString name(fn.GetFullName());
 	
+	if ( name.IsEmpty() == false )
+		fileList->addFileEntry(name, CncFileViewListCtrl::FileListImage::FTI_FOLDER);
+		
 	return wxDIR_IGNORE;
 }
 /////////////////////////////////////////////////////////////////
 bool CncFileView::openDirectory(const wxString& dirName) {
 /////////////////////////////////////////////////////////////////
-	m_fileList->DeleteAllItems();
-	m_fileList->InsertItem(m_fileList->GetItemCount(), "..", FileListImage::FTI_FOLDER_UP);
+	fileList->deleteAllEntries();
+	fileList->addFileEntry("..", CncFileViewListCtrl::FileListImage::FTI_FOLDER_UP);
 	
 	wxString dn(dirName);
 	makePathValid(dn);
@@ -133,7 +140,7 @@ bool CncFileView::openDirectory(const wxString& dirName) {
 	wxDir dir(dn);
 	if ( !dir.IsOpened() ) {
 		std::cerr << "CncFileView::openDirectory: Can't open directory: " << dirName << std::endl;
-		m_fileList->InsertItem(m_fileList->GetItemCount(), dirName, FileListImage::FTI_ERROR);
+		fileList->addFileEntry(dirName, CncFileViewListCtrl::FileListImage::FTI_ERROR);
 		return false;
 	}
 	
@@ -141,7 +148,8 @@ bool CncFileView::openDirectory(const wxString& dirName) {
 	m_currentDirectory->SetToolTip(dn);
 	m_currentDirectory->SetInsertionPointEnd();
 	
-	dir.Traverse(*this, wxEmptyString, wxDIR_DIRS | wxDIR_FILES | wxDIR_DOTDOT);
+	const wxString filespec(m_filterExtention->GetStringSelection());
+	dir.Traverse(*this, filespec, wxDIR_DIRS | wxDIR_FILES | wxDIR_DOTDOT);
 	
 	return true;
 }
@@ -158,91 +166,99 @@ bool CncFileView::previewFile(const wxString& fileName) {
 	return true;
 }
 /////////////////////////////////////////////////////////////////
-bool CncFileView::selectFileInList(const wxString& fileName) {
-/////////////////////////////////////////////////////////////////
-	wxFileName fn(fileName);
-	if ( fn.Exists() ) {
-		// first open the directory
-		openDirectory(fn.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-		
-		// manage the filter
-		wxString ext("*.");
-		ext.append(fn.GetExt());
-		if ( m_filterExtention->SetStringSelection(ext) == false )
-			m_filterExtention->SetStringSelection(ALL_FILES);
-		
-		// search the file
-		long idx = m_fileList->FindItem(-1, fn.GetFullName());
-		if ( idx == wxNOT_FOUND ) {
-			return false;
-		}
-		
-		// select the file
-		avoidSelectListEvent = true;
-		m_fileList->SetItemState(idx, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);
-		m_fileList->EnsureVisible(idx);
-		return true;
-		
-	}
-	
-	return false;
-}
-/////////////////////////////////////////////////////////////////
 void CncFileView::fileListLeave(wxMouseEvent& event) {
 /////////////////////////////////////////////////////////////////
-	if ( APP_PROXY::GetMainViewBook()->GetSelection() != (int)MainBookSelection::PREVIEW_PANEL )
-		return;
-		
-	if ( APP_PROXY::GetKeepFileManagerPreview()->IsChecked() == true )
-		return;
-		
-	if ( CncAsyncKeyboardState::isControlPressed() )
-		return;
-		
-	APP_PROXY::selectMainBookSourcePanel((int)TemplateBookSelection::VAL::SOURCE_PANEL);
+	APP_PROXY::filePreviewListLeave();
 }
 /////////////////////////////////////////////////////////////////
-void CncFileView::fileListActivated(wxListEvent& event) {
+void CncFileView::fileListActivated(long item) {
 /////////////////////////////////////////////////////////////////
+	CFV_PRINT_LOCATION_CTX_FILE
+
 	wxListItem info;
-	info.m_itemId = event.m_itemIndex;
+	info.m_itemId = item;
 	info.m_col = 0;
 	
-	if ( m_fileList->GetItem(info) == false )
+	if ( fileList->GetItem(info) == false )
 		return;
 		
-	wxString itemName = info.GetText();
-	int itemTyp       = info.GetImage();
-		
+	const wxString itemName = info.GetText();
+	const int itemTyp       = info.GetImage();
+	
 	wxFileName curDir(m_currentDirectory->GetValue());
 	wxString name;
 	
-	switch ( (FileListImage)itemTyp ) {
+	typedef CncFileViewListCtrl::FileListImage FTI;
+	switch ( (FTI)itemTyp ) {
+		
+		case FTI::FTI_FOLDER_UP:		if ( curDir.GetDirCount() > 0 )
+											curDir.RemoveLastDir();
 
-		case FTI_FILE: 		name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-							name.append(itemName);
-							openFile(name);
-							break;
+										name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+
+										lastSelection = name;
+										openDirectory(name);
+										break;
+
+		case FTI::FTI_FOLDER:			name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+										name.append(itemName);
+
+										lastSelection = name;
+										openDirectory(name);
+										break;
+		case FTI::FTI_FILE:
+		case FTI::FTI_FILE_SELECTED:	name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+										name.append(itemName);
+										CNC_PRINT_LOCATION
+										openFile(name);
+										break;
 							
-		default:			// do nothing
-							break;
+		default:						// do nothing
+										break;
 	}
 }
 /////////////////////////////////////////////////////////////////
-void CncFileView::fileListSelected(wxListEvent& event) {
+bool CncFileView::selectFileInList(const wxString& fileName) {
 /////////////////////////////////////////////////////////////////
+	CFV_PRINT_LOCATION_CTX_FILE
+
+	wxFileName fn(fileName);
+	if ( fn.Exists() == false )
+		return false;
+		
+	// manage the filter
+	const wxString ext(wxString::Format("*.%s", fn.GetExt()));
+	
+	if ( m_filterExtention->SetStringSelection(ext) == false )
+		m_filterExtention->SetStringSelection(ALL_FILES);
+	
+	// first open the directory
+	if ( openDirectory(fn.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME)) == false )
+		return false;
+
+	// to avoid the call of fileListSelected()
+	avoidSelectListEvent = true;
+	// search the file
+	avoidSelectListEvent = fileList->selectFileInList(fn.GetFullName());
+	
+	return avoidSelectListEvent;
+}
+/////////////////////////////////////////////////////////////////
+void CncFileView::fileListSelected(long item) {
+/////////////////////////////////////////////////////////////////
+	CFV_PRINT_LOCATION_CTX_FILE
+	
 	// this appears if the selection doesn't came from a user action
-	if ( avoidSelectListEvent == true ) {
-		avoidSelectListEvent = false;
-		event.Skip();
-		return;
+	if ( avoidSelectListEvent == true ) { 
+		avoidSelectListEvent = false; 
+		return; 
 	}
-
+	
 	wxListItem info;
-	info.m_itemId = event.m_itemIndex;
+	info.m_itemId = item;
 	info.m_col = 0;
 	
-	if ( m_fileList->GetItem(info) == false )
+	if ( fileList->GetItem(info) == false )
 		return;
 		
 	wxString itemName = info.GetText();
@@ -251,36 +267,42 @@ void CncFileView::fileListSelected(wxListEvent& event) {
 	wxFileName curDir(m_currentDirectory->GetValue());
 	wxString name;
 	
-	switch ( (FileListImage)itemTyp ) {
+	typedef CncFileViewListCtrl::FileListImage FTI;
+	switch ( (FTI)itemTyp ) {
 
-		case FTI_FOLDER_UP:	if ( curDir.GetDirCount() > 0 )
-								curDir.RemoveLastDir();
-							name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+		/*
+		case FTI::FTI_FOLDER_UP:		if ( curDir.GetDirCount() > 0 )
+											curDir.RemoveLastDir();
+											
+										name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+										
+										lastSelection = name;
+										openDirectory(name);
+										break;
 							
-							lastSelection = name;
-							openDirectory(name);
-							break;
+		case FTI::FTI_FOLDER:			name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+										name.append(itemName);
+									
+										lastSelection = name;
+										openDirectory(name);
+										break;
+		*/
+		case FTI::FTI_FILE:
+		case FTI::FTI_FILE_SELECTED:	name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
+										name.append(itemName);
+										
+										// avoid a second preview on activate
+										if ( lastSelection == name )
+											break;
+											
+										lastSelection = name;
+										previewFile(name);
+										break;
 							
-		case FTI_FOLDER:	name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-							name.append(itemName);
-							
-							lastSelection = name;
-							openDirectory(name);
-							break;
-							
-		case FTI_FILE: 		name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-							name.append(itemName);
-							
-							// avoid a second preview on activate
-							if ( lastSelection == name )
-								break;
-								
-							lastSelection = name;
-							previewFile(name);
-							break;
-							
-		case FTI_ERROR:		// do nothing
-							break;
+		case FTI::FTI_FOLDER_UP:
+		case FTI::FTI_FOLDER:
+		case FTI::FTI_ERROR:			// do nothing
+										break;
 	}
 }
 /////////////////////////////////////////////////////////////////

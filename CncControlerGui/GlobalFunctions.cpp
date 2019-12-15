@@ -110,7 +110,7 @@ void GblFunc::freeze(wxWindow* wnd, bool state) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT( wnd != NULL );
 	
-	if ( state == false ) 	{ if ( wnd->IsFrozen() == false ) wnd->Freeze(); } 
+	if ( state == true ) 	{ if ( wnd->IsFrozen() == false ) wnd->Freeze(); } 
 	else 					{ if ( wnd->IsFrozen() == true  ) wnd->Thaw();   }
 }
 ///////////////////////////////////////////////////////////////////

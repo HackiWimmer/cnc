@@ -738,8 +738,18 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
         wxC3105InitBitmapResources();
         bBitmapLoaded = true;
     }
+    // Set icon(s) to the application/dialog
+    wxIconBundle app_icons;
+    {
+        wxBitmap iconBmp = wxXmlResource::Get()->LoadBitmap(wxT("view-statistics"));
+        wxIcon icn;
+        icn.CopyFromBitmap(iconBmp);
+        app_icons.AddIcon( icn );
+    }
+    SetIcons( app_icons );
+
     
-    wxFlexGridSizer* flexGridSizer71 = new wxFlexGridSizer(2, 1, 0, 0);
+    wxFlexGridSizer* flexGridSizer71 = new wxFlexGridSizer(3, 1, 0, 0);
     flexGridSizer71->SetFlexibleDirection( wxBOTH );
     flexGridSizer71->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer71->AddGrowableCol(0);
@@ -795,24 +805,180 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     flexGridSizer98->Add(m_btClose, 0, wxALL|wxALIGN_RIGHT, WXC_FROM_DIP(0));
     m_btClose->SetMinSize(wxSize(20,20));
     
-    m_placeholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
-    m_placeholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    m_viewBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_viewBook->SetToolTip(_("qew"));
+    m_viewBook->SetName(wxT("m_viewBook"));
+    m_viewBook->SetEffect(wxSHOW_EFFECT_NONE);
     
-    flexGridSizer71->Add(m_placeholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    flexGridSizer71->Add(m_viewBook, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_page1 = new wxPanel(m_viewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_viewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_viewBook->AddPage(m_page1, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer142 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer142->SetFlexibleDirection( wxBOTH );
+    flexGridSizer142->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer142->AddGrowableCol(0);
+    flexGridSizer142->AddGrowableRow(0);
+    m_page1->SetSizer(flexGridSizer142);
+    
+    m_placeholder1 = new wxPanel(m_page1, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page1, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_placeholder1->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer142->Add(m_placeholder1, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
     
     wxFlexGridSizer* flexGridSizer91 = new wxFlexGridSizer(1, 1, 0, 0);
     flexGridSizer91->SetFlexibleDirection( wxBOTH );
     flexGridSizer91->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
     flexGridSizer91->AddGrowableCol(0);
     flexGridSizer91->AddGrowableRow(0);
-    m_placeholder->SetSizer(flexGridSizer91);
+    m_placeholder1->SetSizer(flexGridSizer91);
     
-    m_staticText93 = new wxStaticText(m_placeholder, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder, wxSize(-1,-1)), 0);
+    m_staticText93 = new wxStaticText(m_placeholder1, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder1, wxSize(-1,-1)), 0);
     m_staticText93->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
     wxFont m_staticText93Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
     m_staticText93->SetFont(m_staticText93Font);
     
     flexGridSizer91->Add(m_staticText93, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_page2 = new wxPanel(m_viewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_viewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_viewBook->AddPage(m_page2, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer1422 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer1422->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1422->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1422->AddGrowableCol(0);
+    flexGridSizer1422->AddGrowableRow(0);
+    m_page2->SetSizer(flexGridSizer1422);
+    
+    m_placeholder2 = new wxPanel(m_page2, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page2, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_placeholder2->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer1422->Add(m_placeholder2, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer914 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer914->SetFlexibleDirection( wxBOTH );
+    flexGridSizer914->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer914->AddGrowableCol(0);
+    flexGridSizer914->AddGrowableRow(0);
+    m_placeholder2->SetSizer(flexGridSizer914);
+    
+    m_staticText935 = new wxStaticText(m_placeholder2, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder2, wxSize(-1,-1)), 0);
+    m_staticText935->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_staticText935Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText935->SetFont(m_staticText935Font);
+    
+    flexGridSizer914->Add(m_staticText935, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_page3 = new wxPanel(m_viewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_viewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_viewBook->AddPage(m_page3, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer14227 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer14227->SetFlexibleDirection( wxBOTH );
+    flexGridSizer14227->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer14227->AddGrowableCol(0);
+    flexGridSizer14227->AddGrowableRow(0);
+    m_page3->SetSizer(flexGridSizer14227);
+    
+    m_placeholder3 = new wxPanel(m_page3, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page3, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_placeholder3->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer14227->Add(m_placeholder3, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer9149 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer9149->SetFlexibleDirection( wxBOTH );
+    flexGridSizer9149->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer9149->AddGrowableCol(0);
+    flexGridSizer9149->AddGrowableRow(0);
+    m_placeholder3->SetSizer(flexGridSizer9149);
+    
+    m_staticText93510 = new wxStaticText(m_placeholder3, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder3, wxSize(-1,-1)), 0);
+    m_staticText93510->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_staticText93510Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText93510->SetFont(m_staticText93510Font);
+    
+    flexGridSizer9149->Add(m_staticText93510, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_page4 = new wxPanel(m_viewBook, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_viewBook, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_viewBook->AddPage(m_page4, _("Page"), false);
+    
+    wxFlexGridSizer* flexGridSizer1422712 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer1422712->SetFlexibleDirection( wxBOTH );
+    flexGridSizer1422712->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer1422712->AddGrowableCol(0);
+    flexGridSizer1422712->AddGrowableRow(0);
+    m_page4->SetSizer(flexGridSizer1422712);
+    
+    m_placeholder4 = new wxPanel(m_page4, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_page4, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_placeholder4->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_ACTIVECAPTION));
+    
+    flexGridSizer1422712->Add(m_placeholder4, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    wxFlexGridSizer* flexGridSizer914914 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer914914->SetFlexibleDirection( wxBOTH );
+    flexGridSizer914914->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer914914->AddGrowableCol(0);
+    flexGridSizer914914->AddGrowableRow(0);
+    m_placeholder4->SetSizer(flexGridSizer914914);
+    
+    m_staticText9351015 = new wxStaticText(m_placeholder4, wxID_ANY, _(" This view is currently detached . . ."), wxDefaultPosition, wxDLG_UNIT(m_placeholder4, wxSize(-1,-1)), 0);
+    m_staticText9351015->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    wxFont m_staticText9351015Font(12, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_staticText9351015->SetFont(m_staticText9351015Font);
+    
+    flexGridSizer914914->Add(m_staticText9351015, 0, wxALL|wxALIGN_CENTER, WXC_FROM_DIP(30));
+    
+    m_status = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    flexGridSizer71->Add(m_status, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    wxFlexGridSizer* flexGridSizer161 = new wxFlexGridSizer(1, 3, 0, 0);
+    flexGridSizer161->SetFlexibleDirection( wxBOTH );
+    flexGridSizer161->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer161->AddGrowableCol(0);
+    flexGridSizer161->AddGrowableCol(1);
+    flexGridSizer161->AddGrowableCol(2);
+    flexGridSizer161->AddGrowableRow(0);
+    m_status->SetSizer(flexGridSizer161);
+    
+    m_statusTextLeft = new wxTextCtrl(m_status, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_status, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
+    m_statusTextLeft->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_statusTextLeftFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_statusTextLeft->SetFont(m_statusTextLeftFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_statusTextLeft->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer161->Add(m_statusTextLeft, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_statusTextMid = new wxTextCtrl(m_status, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_status, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
+    m_statusTextMid->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_statusTextMidFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_statusTextMid->SetFont(m_statusTextMidFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_statusTextMid->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer161->Add(m_statusTextMid, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_statusTextRight = new wxTextCtrl(m_status, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_status, wxSize(-1,-1)), wxTE_READONLY|wxBORDER_NONE);
+    m_statusTextRight->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    wxFont m_statusTextRightFont(9, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+    m_statusTextRight->SetFont(m_statusTextRightFont);
+    #if wxVERSION_NUMBER >= 3000
+    m_statusTextRight->SetHint(wxT(""));
+    #endif
+    
+    flexGridSizer161->Add(m_statusTextRight, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    
+    #if wxVERSION_NUMBER >= 2900
+    if(!wxPersistenceManager::Get().Find(m_viewBook)){
+        wxPersistenceManager::Get().RegisterAndRestore(m_viewBook);
+    } else {
+        wxPersistenceManager::Get().Restore(m_viewBook);
+    }
+    #endif
     
     SetName(wxT("CncExternalViewBoxBase"));
     SetSize(800,600);
@@ -838,6 +1004,7 @@ CncExternalViewBoxBase::CncExternalViewBoxBase(wxWindow* parent, wxWindowID id, 
     m_moveArea->Connect(wxEVT_MOTION, wxMouseEventHandler(CncExternalViewBoxBase::onMotion), NULL, this);
     m_btMinMax->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onMinMax), NULL, this);
     m_btClose->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onCloseFromButton), NULL, this);
+    m_viewBook->Connect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(CncExternalViewBoxBase::onViewBookChnaged), NULL, this);
     
 }
 
@@ -849,5 +1016,6 @@ CncExternalViewBoxBase::~CncExternalViewBoxBase()
     m_moveArea->Disconnect(wxEVT_MOTION, wxMouseEventHandler(CncExternalViewBoxBase::onMotion), NULL, this);
     m_btMinMax->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onMinMax), NULL, this);
     m_btClose->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncExternalViewBoxBase::onCloseFromButton), NULL, this);
+    m_viewBook->Disconnect(wxEVT_COMMAND_NOTEBOOK_PAGE_CHANGED, wxNotebookEventHandler(CncExternalViewBoxBase::onViewBookChnaged), NULL, this);
     
 }

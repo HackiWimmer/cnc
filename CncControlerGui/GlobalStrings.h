@@ -8,7 +8,7 @@ namespace VersionInfo {
 
 	const wxString major			= "0";
 	const wxString minor			= "9";
-	const wxString index			= "5";
+	const wxString index			= "6";
 
 	const wxString text 			= "";
 	const wxString number			= wxString::Format("%s.%s.%s", major, minor, index);
@@ -18,9 +18,15 @@ namespace VersionInfo {
 struct GlobalConstStringDatabase {
 	
 	#ifdef DEBUG
-	const wxString buildFlag			= wxString("d");
+		const wxString buildFlag		= wxString("d");
 	#else
-	const wxString buildFlag			= wxString("r");
+	
+		#ifdef GPROF
+			const wxString buildFlag	= wxString("g");
+		#else
+			const wxString buildFlag	= wxString("r");
+		#endif
+		
 	#endif
 
 	// common

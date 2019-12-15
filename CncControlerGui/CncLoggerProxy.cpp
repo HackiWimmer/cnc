@@ -34,7 +34,7 @@ CncTextCtrl::~CncTextCtrl() {
 		overflowTimer->Stop();
 	
 	overflowTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncTextCtrl::onOverflowTimer), NULL, this);
-	delete overflowTimer;
+	wxDELETE( overflowTimer );
 }
 //////////////////////////////////////////////////////////////
 size_t CncTextCtrl::flush() {
@@ -60,6 +60,7 @@ size_t CncTextCtrl::flushLineBuffer() {
 void CncTextCtrl::onOverflowTimer(wxTimerEvent& event) { 
 //////////////////////////////////////////////////////////////
 	const unsigned int threshold = (CncTC::defaultOverflowTimerValue / 2 ) * 1000 * 1000;
+	
 	if ( CncTimeFunctions::getNanoTimestamp() - lastAppend > threshold )
 		flushLineBuffer();
 	

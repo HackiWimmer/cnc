@@ -47,6 +47,8 @@ set(SOURCE_FILES
 	CncControlerGui/CncSpeedSimulator.cpp
 	CncControlerGui/CncSerialSpyListCtrl.cpp
 	CncControlerGui/CncStatisticSummaryListCtrl.cpp
+	CncControlerGui/CncFileViewLists.cpp
+	CncControlerGui/CncContextListCtrl.cpp
 	CncControlerGui/CncStreamBuffers.cpp
 	CncControlerGui/CncSummaryListCtrl.cpp
 	CncControlerGui/CncToolMagazine.cpp
@@ -104,7 +106,6 @@ set(SOURCE_FILES
 	CncControlerGui/sha1.cpp
 	CncControlerGui/GL3DOptionPane.cpp
 	CncControlerGui/GL3DDrawPane.cpp
-	CncControlerGui/CncSecureRun.cpp
 	CncControlerGui/BinaryPathHandlerBase.cpp
 	CncControlerGui/BinaryPathHandlerCnc.cpp
 	CncControlerGui/CncCommandDecoder.cpp
@@ -150,8 +151,6 @@ set(SOURCE_FILES
 	CncControlerGui/wxCrafterImages_bitmaps.cpp
 	CncControlerGui/wxCrafterPathGenerator.cpp
 	CncControlerGui/wxCrafterPathGenerator_bitmaps.cpp
-	CncControlerGui/wxCrafterSecurityRun.cpp
-	CncControlerGui/wxCrafterSecurityRun_bitmaps.cpp
 	CncControlerGui/wxCrafterMessageDialog.cpp
 	CncControlerGui/wxCrafterMessageDialog_bitmaps.cpp
 	CncControlerGui/wxCrafterMainFrame.cpp

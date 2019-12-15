@@ -119,7 +119,7 @@ class GLContextBase : public wxGLContext {
 		bool isProbeMode() 				{ return options.probeMode; }
 		void decorateProbeMode(bool state);
 		
-		void init();
+		bool init();
 		void display();
 		void reshape(int w, int h);
 		void reshape(int w, int h, int x, int y);

@@ -13,6 +13,8 @@ class CncGlCanvas : public wxGLCanvas {
 		CncGlCanvas(wxWindow *parent, int *attribList = NULL);
 		virtual ~CncGlCanvas();
 		
+		virtual bool Show(bool show=true);
+
 		void viewTop() 		{ view(GLContextBase::ViewMode::V2D_TOP); }
 		void viewBottom() 	{ view(GLContextBase::ViewMode::V2D_BOTTOM); }
 		void viewLeft() 	{ view(GLContextBase::ViewMode::V2D_LEFT); }
@@ -31,9 +33,10 @@ class CncGlCanvas : public wxGLCanvas {
 		void initReshape();
 		void reshapeRelative(int dx, int dy);
 		
-		bool isContextValid()	{ return lastSetCurrent; }
+		bool isContextValid() const { return lastSetCurrent; }
 		
 	protected:
+
 		GLContextCncPathBase* 	context;
 		wxPoint 				lastReshape;
 		bool					isShown;

@@ -1,7 +1,7 @@
 {
 	"metadata":	{
 		"m_generatedFilesDir":	".",
-		"m_objCounter":	41,
+		"m_objCounter":	45,
 		"m_includeFiles":	[],
 		"m_bitmapFunction":	"wxCD0FFInitBitmapResources",
 		"m_bitmapsFile":	"wxCrafterFileView_bitmaps.cpp",
@@ -2931,12 +2931,12 @@
 									"m_children":	[]
 								}]
 						}, {
-							"m_type":	4413,
+							"m_type":	4408,
 							"proportion":	0,
-							"border":	0,
+							"border":	1,
 							"gbSpan":	"1,1",
 							"gbPosition":	"0,0",
-							"m_styles":	["wxLC_SINGLE_SEL", "wxLC_REPORT"],
+							"m_styles":	["wxTAB_TRAVERSAL"],
 							"m_sizerFlags":	["wxALL", "wxLEFT", "wxRIGHT", "wxTOP", "wxBOTTOM", "wxEXPAND"],
 							"m_properties":	[{
 									"type":	"winid",
@@ -2945,15 +2945,15 @@
 								}, {
 									"type":	"string",
 									"m_label":	"Size:",
-									"m_value":	"-1,-1"
+									"m_value":	"-1,100"
 								}, {
 									"type":	"string",
 									"m_label":	"Minimum Size:",
-									"m_value":	"-1,-1"
+									"m_value":	"-1,100"
 								}, {
 									"type":	"string",
 									"m_label":	"Name:",
-									"m_value":	"m_fileList"
+									"m_value":	"m_fileListPlaceholder"
 								}, {
 									"type":	"multi-string",
 									"m_label":	"Tooltip:",
@@ -2961,11 +2961,11 @@
 								}, {
 									"type":	"colour",
 									"m_label":	"Bg Colour:",
-									"colour":	"ButtonText"
+									"colour":	"Highlight"
 								}, {
 									"type":	"colour",
 									"m_label":	"Fg Colour:",
-									"colour":	"ButtonHighlight"
+									"colour":	"<Default>"
 								}, {
 									"type":	"font",
 									"m_label":	"Font:",
@@ -2995,28 +2995,7 @@
 									"m_label":	"Style:",
 									"m_value":	""
 								}],
-							"m_events":	[{
-									"m_eventName":	"wxEVT_COMMAND_LIST_ITEM_ACTIVATED",
-									"m_eventClass":	"wxListEvent",
-									"m_eventHandler":	"wxListEventHandler",
-									"m_functionNameAndSignature":	"fileListActivated(wxListEvent& event)",
-									"m_description":	"The item has been activated (ENTER or double click)",
-									"m_noBody":	false
-								}, {
-									"m_eventName":	"wxEVT_COMMAND_LIST_ITEM_SELECTED",
-									"m_eventClass":	"wxListEvent",
-									"m_eventHandler":	"wxListEventHandler",
-									"m_functionNameAndSignature":	"fileListSelected(wxListEvent& event)",
-									"m_description":	"The item has been selected",
-									"m_noBody":	false
-								}, {
-									"m_eventName":	"wxEVT_LEAVE_WINDOW",
-									"m_eventClass":	"wxMouseEvent",
-									"m_eventHandler":	"wxMouseEventHandler",
-									"m_functionNameAndSignature":	"fileListLeave(wxMouseEvent& event)",
-									"m_description":	"Process a wxEVT_LEAVE_WINDOW event.",
-									"m_noBody":	false
-								}],
+							"m_events":	[],
 							"m_children":	[]
 						}, {
 							"m_type":	4410,

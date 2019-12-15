@@ -22,7 +22,6 @@
 #include <wx/button.h>
 #include <wx/statline.h>
 #include <wx/bmpbuttn.h>
-#include <wx/listctrl.h>
 #include <wx/combobox.h>
 #include <wx/arrstr.h>
 #if wxVERSION_NUMBER >= 2900
@@ -125,7 +124,7 @@ protected:
     wxStaticLine* m_staticLine5035;
     wxBitmapButton* m_btNewTemplate;
     wxBitmapButton* m_btOpenTemplate;
-    wxListCtrl* m_fileList;
+    wxPanel* m_fileListPlaceholder;
     wxComboBox* m_filterExtention;
     wxTextCtrl* m_currentDirectory;
 
@@ -135,9 +134,6 @@ protected:
     virtual void selectDefault(wxCommandEvent& event) { event.Skip(); }
     virtual void selectNewTemplate(wxCommandEvent& event) { event.Skip(); }
     virtual void selectOpenTemplate(wxCommandEvent& event) { event.Skip(); }
-    virtual void fileListActivated(wxListEvent& event) { event.Skip(); }
-    virtual void fileListSelected(wxListEvent& event) { event.Skip(); }
-    virtual void fileListLeave(wxMouseEvent& event) { event.Skip(); }
     virtual void selectFilter(wxCommandEvent& event) { event.Skip(); }
 
 public:
@@ -147,7 +143,7 @@ public:
     wxStaticLine* GetStaticLine5035() { return m_staticLine5035; }
     wxBitmapButton* GetBtNewTemplate() { return m_btNewTemplate; }
     wxBitmapButton* GetBtOpenTemplate() { return m_btOpenTemplate; }
-    wxListCtrl* GetFileList() { return m_fileList; }
+    wxPanel* GetFileListPlaceholder() { return m_fileListPlaceholder; }
     wxComboBox* GetFilterExtention() { return m_filterExtention; }
     wxTextCtrl* GetCurrentDirectory() { return m_currentDirectory; }
     CncFileViewBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxTAB_TRAVERSAL);

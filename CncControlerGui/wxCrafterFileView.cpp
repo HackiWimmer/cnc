@@ -122,7 +122,7 @@ CncFilePreviewBase::CncFilePreviewBase(wxWindow* parent, wxWindowID id, const wx
     flexGridSizer3760->AddGrowableRow(0);
     this->SetSizer(flexGridSizer3760);
     
-    m_previewBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxBK_DEFAULT);
+    m_previewBook = new wxSimplebook(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), 0);
     m_previewBook->SetName(wxT("m_previewBook"));
     m_previewBook->SetEffect(wxSHOW_EFFECT_NONE);
     
@@ -348,13 +348,13 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer3847->Add(m_btDirUp, 0, wxALL, WXC_FROM_DIP(0));
     m_btDirUp->SetMinSize(wxSize(24,24));
     
-    m_btRefresh = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("refresh")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btRefresh = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("view-refresh-3")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
     m_btRefresh->SetToolTip(_("Refresh"));
     
     flexGridSizer3847->Add(m_btRefresh, 0, wxALL, WXC_FROM_DIP(0));
     m_btRefresh->SetMinSize(wxSize(24,24));
     
-    m_btDefaultPath = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("folder-drag-accept-3 (2)")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
+    m_btDefaultPath = new wxBitmapButton(this, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("workspace")), wxDefaultPosition, wxDLG_UNIT(this, wxSize(24,24)), wxBU_AUTODRAW);
     m_btDefaultPath->SetToolTip(_("Select Default Path"));
     
     flexGridSizer3847->Add(m_btDefaultPath, 0, wxALL, WXC_FROM_DIP(0));
@@ -376,11 +376,11 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     flexGridSizer3847->Add(m_btOpenTemplate, 0, wxALL, WXC_FROM_DIP(0));
     m_btOpenTemplate->SetMinSize(wxSize(24,24));
     
-    m_fileList = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), wxLC_SINGLE_SEL|wxLC_REPORT);
-    m_fileList->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
-    m_fileList->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNHIGHLIGHT));
+    m_fileListPlaceholder = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,100)), wxTAB_TRAVERSAL);
+    m_fileListPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
     
-    flexGridSizer3841->Add(m_fileList, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer3841->Add(m_fileListPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    m_fileListPlaceholder->SetMinSize(wxSize(-1,100));
     
     wxArrayString m_filterExtentionArr;
     m_filterExtention = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(this, wxSize(-1,-1)), m_filterExtentionArr, wxCB_READONLY|wxBORDER_NONE);
@@ -418,9 +418,6 @@ CncFileViewBase::CncFileViewBase(wxWindow* parent, wxWindowID id, const wxPoint&
     m_btDefaultPath->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectDefault), NULL, this);
     m_btNewTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectNewTemplate), NULL, this);
     m_btOpenTemplate->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectOpenTemplate), NULL, this);
-    m_fileList->Connect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(CncFileViewBase::fileListActivated), NULL, this);
-    m_fileList->Connect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncFileViewBase::fileListSelected), NULL, this);
-    m_fileList->Connect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncFileViewBase::fileListLeave), NULL, this);
     m_filterExtention->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncFileViewBase::selectFilter), NULL, this);
     
 }
@@ -432,9 +429,6 @@ CncFileViewBase::~CncFileViewBase()
     m_btDefaultPath->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectDefault), NULL, this);
     m_btNewTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectNewTemplate), NULL, this);
     m_btOpenTemplate->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(CncFileViewBase::selectOpenTemplate), NULL, this);
-    m_fileList->Disconnect(wxEVT_COMMAND_LIST_ITEM_ACTIVATED, wxListEventHandler(CncFileViewBase::fileListActivated), NULL, this);
-    m_fileList->Disconnect(wxEVT_COMMAND_LIST_ITEM_SELECTED, wxListEventHandler(CncFileViewBase::fileListSelected), NULL, this);
-    m_fileList->Disconnect(wxEVT_LEAVE_WINDOW, wxMouseEventHandler(CncFileViewBase::fileListLeave), NULL, this);
     m_filterExtention->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(CncFileViewBase::selectFilter), NULL, this);
     
 }

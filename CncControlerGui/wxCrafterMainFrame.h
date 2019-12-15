@@ -513,6 +513,7 @@ protected:
     CncZView* m_zView;
     wxStaticText* m_infoToolDiameter;
     wxPanel* m_winFileView;
+    wxPanel* m_fileViews;
     wxStaticText* m_staticText8353;
     wxCheckBox* m_keepFileManagerPreview;
     wxCheckBox* m_externFileManagerPreview;
@@ -681,7 +682,11 @@ protected:
     wxBitmapButton* m_rcStopSec;
     wxStaticLine* m_staticLine82917;
     wxButton* m_btnEmergenyStopSec;
-    wxSplitterWindow* m_secureSplitterMain;
+    wxSplitterWindow* m_secureSplitterMainV;
+    wxPanel* m_splitterPageLeft;
+    wxPanel* m_fileViewsPlaceholder;
+    wxPanel* m_splitterPageRight;
+    wxSplitterWindow* m_secureSplitterMainH;
     wxPanel* m_splitterPageMonitor;
     wxPanel* m_secMonitorPlaceholder;
     wxPanel* m_secZViewPlaceholder;
@@ -1507,6 +1512,7 @@ public:
     wxPanel* GetMainFileViewPlaceholder() { return m_mainFileViewPlaceholder; }
     wxPanel* GetSplitterPage6490() { return m_splitterPage6490; }
     wxSplitterWindow* GetSplitter6478() { return m_splitter6478; }
+    wxPanel* GetFileViews() { return m_fileViews; }
     wxPanel* GetWinFileView() { return m_winFileView; }
     wxTextCtrl* GetStartupTracePlaceholder() { return m_startupTracePlaceholder; }
     wxPanel* GetPanelStartupTrace() { return m_panelStartupTrace; }
@@ -1666,6 +1672,8 @@ public:
     wxStaticLine* GetStaticLine82917() { return m_staticLine82917; }
     wxButton* GetBtnEmergenyStopSec() { return m_btnEmergenyStopSec; }
     wxPanel* GetSecToolbar() { return m_secToolbar; }
+    wxPanel* GetFileViewsPlaceholder() { return m_fileViewsPlaceholder; }
+    wxPanel* GetSplitterPageLeft() { return m_splitterPageLeft; }
     wxPanel* GetSecMonitorPlaceholder() { return m_secMonitorPlaceholder; }
     wxPanel* GetSecZViewPlaceholder() { return m_secZViewPlaceholder; }
     wxButton* Get3D_TopSec() { return m_3D_TopSec; }
@@ -1683,7 +1691,9 @@ public:
     wxPanel* GetSplitterPageMonitor() { return m_splitterPageMonitor; }
     wxPanel* GetSecLoggerPlaceholder() { return m_secLoggerPlaceholder; }
     wxPanel* GetSplitterPageLogger() { return m_splitterPageLogger; }
-    wxSplitterWindow* GetSecureSplitterMain() { return m_secureSplitterMain; }
+    wxSplitterWindow* GetSecureSplitterMainH() { return m_secureSplitterMainH; }
+    wxPanel* GetSplitterPageRight() { return m_splitterPageRight; }
+    wxSplitterWindow* GetSecureSplitterMainV() { return m_secureSplitterMainV; }
     wxPanel* GetSecureRunPanel() { return m_secureRunPanel; }
     wxAuiManager* GetAuimgrMain() { return m_auimgrMain; }
     wxMenuBar* GetMenuBar() { return m_menuBar; }

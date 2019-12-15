@@ -32,7 +32,7 @@ CncGCodePreview::CncGCodePreview(wxWindow *parent, wxString name, int *attribLis
 	GLContextBase::globalInit(); 
 	preview->init();
 	
-	activateContext(preview);
+	//activateContext(preview);
 	
 	// Important: initialize the CncGlCanvas context
 	context = preview;
@@ -62,8 +62,12 @@ void CncGCodePreview::onPaint(wxPaintEvent& event) {
 	if ( IsShownOnScreen() == false )
 		return;
 
-	activateContext(preview);
-	preview->init();
+	const bool contextOk = activateContext(preview);
+	if ( contextOk == false )
+		return;
+
+	if ( preview->init() == false )
+		return;
 
 	const wxSize cs = GetClientSize();
 	
@@ -139,7 +143,7 @@ void CncGCodePreview::appendVertice(const GLI::VerticeDoubleData& vd) {
 	
 	// to update the progess bar
 	if ( progressDialog != NULL && preview->getVirtualEnd() % 100 == 0 )
-			progressDialog->Update();
+		progressDialog->Update();
 		
 	if ( activateContext(preview, true) == true )
 		preview->appendPathData(vertex.set(sc, -1L, x, y, z)); 

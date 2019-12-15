@@ -83,7 +83,10 @@ bool CncOpenGLRegisteredContextObserverListCtrl::isItemValid(long item) const {
 // CncOpenGLContextObserverHistoryListCtrl Event Table
 // ----------------------------------------------------------------------------
 wxBEGIN_EVENT_TABLE(CncOpenGLContextObserverHistoryListCtrl, CncLargeScaledListCtrl)
-	EVT_RIGHT_DOWN(CncOpenGLContextObserverHistoryListCtrl::onRightDown)
+	EVT_RIGHT_DOWN(						CncOpenGLContextObserverHistoryListCtrl::onRightDown		)
+	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 	CncOpenGLContextObserverHistoryListCtrl::onSelectListItem	)
+	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 	CncOpenGLContextObserverHistoryListCtrl::onActivateListItem	)
+
 wxEND_EVENT_TABLE()
 
 /////////////////////////////////////////////////////////////
@@ -94,6 +97,7 @@ CncOpenGLContextObserverHistoryListCtrl::CncOpenGLContextObserverHistoryListCtrl
 , errorItemAttr()
 , switchItemAttr()
 , popupMenu(NULL)
+, detailInfo(NULL)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -162,4 +166,38 @@ wxListItemAttr* CncOpenGLContextObserverHistoryListCtrl::OnGetItemAttr(long item
 	
 	// this indicates to use the default style
 	return (wxListItemAttr*)(&defaultItemAttr);
+}
+/////////////////////////////////////////////////////////////
+bool CncOpenGLContextObserverHistoryListCtrl::appendHistoryItem(const CncColumContainer& cc) {
+/////////////////////////////////////////////////////////////
+	if ( detailInfo != NULL )
+		detailInfo->Clear();
+
+	return appendItem(cc);
+}
+/////////////////////////////////////////////////////////////
+void CncOpenGLContextObserverHistoryListCtrl::onSelectListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////
+	if ( detailInfo == NULL )
+		return;
+	
+	wxString msg(getItemText(event.GetIndex(), COL_MSG));
+	msg.Replace("\t", " ", true);
+	//msg.Replace(": ", "\n ", true);
+	msg.Replace(", ", "\n ", true);
+	
+	const wxString info(
+		wxString::Format("#%04ld: '%s' - <%s>\n %s",
+							event.GetIndex(),
+							getItemText(event.GetIndex(), COL_CTX), 
+							getItemText(event.GetIndex(), COL_FUNCT), 
+							msg
+						)
+	);
+	
+	detailInfo->ChangeValue(info);
+}
+/////////////////////////////////////////////////////////////
+void CncOpenGLContextObserverHistoryListCtrl::onActivateListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////
 }

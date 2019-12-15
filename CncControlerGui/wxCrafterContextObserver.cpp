@@ -121,10 +121,41 @@ CncOpenGLContextObserverBase::CncOpenGLContextObserverBase(wxWindow* parent, wxW
     flexGridSizer8058->AddGrowableRow(0);
     m_panelHistory->SetSizer(flexGridSizer8058);
     
-    m_historyInfoPlaceholder = new wxPanel(m_panelHistory, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelHistory, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter44 = new wxSplitterWindow(m_panelHistory, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_panelHistory, wxSize(-1,-1)), wxSP_3D);
+    m_splitter44->SetSashGravity(0.8);
+    m_splitter44->SetMinimumPaneSize(10);
+    
+    flexGridSizer8058->Add(m_splitter44, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPage48 = new wxPanel(m_splitter44, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter44, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    
+    wxFlexGridSizer* flexGridSizer54 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer54->SetFlexibleDirection( wxBOTH );
+    flexGridSizer54->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer54->AddGrowableCol(0);
+    flexGridSizer54->AddGrowableRow(0);
+    m_splitterPage48->SetSizer(flexGridSizer54);
+    
+    m_historyInfoPlaceholder = new wxPanel(m_splitterPage48, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitterPage48, wxSize(-1,-1)), wxTAB_TRAVERSAL);
     m_historyInfoPlaceholder->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_INACTIVECAPTION));
     
-    flexGridSizer8058->Add(m_historyInfoPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    flexGridSizer54->Add(m_historyInfoPlaceholder, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
+    
+    m_splitterPage52 = new wxPanel(m_splitter44, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_splitter44, wxSize(-1,-1)), wxTAB_TRAVERSAL);
+    m_splitter44->SplitHorizontally(m_splitterPage48, m_splitterPage52, 0);
+    
+    wxFlexGridSizer* flexGridSizer56 = new wxFlexGridSizer(1, 1, 0, 0);
+    flexGridSizer56->SetFlexibleDirection( wxBOTH );
+    flexGridSizer56->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer56->AddGrowableCol(0);
+    flexGridSizer56->AddGrowableRow(0);
+    m_splitterPage52->SetSizer(flexGridSizer56);
+    
+    m_historyDetailInfo = new wxTextCtrl(m_splitterPage52, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_splitterPage52, wxSize(-1,-1)), wxTE_READONLY|wxTE_MULTILINE);
+    m_historyDetailInfo->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_3DLIGHT));
+    m_historyDetailInfo->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNTEXT));
+    
+    flexGridSizer56->Add(m_historyDetailInfo, 0, wxALL|wxEXPAND, WXC_FROM_DIP(0));
     
     flexGridSizer8031->Add(0, 3, 1, wxALL, WXC_FROM_DIP(0));
     

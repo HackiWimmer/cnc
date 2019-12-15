@@ -1,6 +1,7 @@
 #ifndef CNC_OPENGL_OBSERVER_LIST_CTRL_H
 #define CNC_OPENGL_OBSERVER_LIST_CTRL_H
 
+#include <wx/textctrl.h>
 #include "CncLargeScaleListCtrl.h"
 
 class CncOpenGLCurrentContextObserverListCtrl : public CncLargeScaledListCtrl {
@@ -51,8 +52,12 @@ class CncOpenGLContextObserverHistoryListCtrl : public CncLargeScaledListCtrl {
 		
 	protected:
 		wxMenu* 	popupMenu;
+		wxTextCtrl*	detailInfo;
 		
 		void onRightDown(wxMouseEvent& event);
+		
+		void onSelectListItem(wxListEvent& event);
+		void onActivateListItem(wxListEvent& event);
 		
 	public:
 		static const int COL_TIME 			= 0;
@@ -65,6 +70,9 @@ class CncOpenGLContextObserverHistoryListCtrl : public CncLargeScaledListCtrl {
 		
 		CncOpenGLContextObserverHistoryListCtrl(wxWindow *parent, long style);
 		virtual ~CncOpenGLContextObserverHistoryListCtrl();
+		
+		void setDetaiInfoControl(wxTextCtrl* tcl) { detailInfo = tcl; }
+		bool appendHistoryItem(const CncColumContainer& cc);
 		
 		wxDECLARE_NO_COPY_CLASS(CncOpenGLContextObserverHistoryListCtrl);
 		wxDECLARE_EVENT_TABLE();

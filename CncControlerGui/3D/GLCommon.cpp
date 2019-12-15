@@ -65,6 +65,8 @@ bool GLCommon::initGlew() {
 	if ( GLCommon::glewInitializedGlobalFlag == true )
 		return GLCommon::glewInitializedGlobalFlag;
 		
+	glewExperimental = GL_TRUE;
+
 	GLenum err = glewInit();
 	if ( err != GLEW_OK ) {
 		
@@ -78,10 +80,16 @@ bool GLCommon::initGlew() {
 
 	if ( GLCommon::glewInitializedGlobalFlag == true ) {
 		GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("OpenGL GLEW interface is ready to use . . . "));
+
 	} else {
 		if ( GL_ERROR_TRACE_LEVEL > 0 ) 
-			GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("GLEW state = %d", GLCommon::glewInitializedGlobalFlag));
+			GL_CTX_OBS->appendMessage('W', CNC_LOG_FUNCT, wxString::Format("GLEW state = %d; glewInit() returns %u (%s)",
+					                                                       GLCommon::glewInitializedGlobalFlag,
+																		   err,
+																		   (const char*)glewGetErrorString(err)
+																		  ));
 	}
+
 	return GLCommon::glewInitializedGlobalFlag;
 }
 /////////////////////////////////////////////////////////////////////

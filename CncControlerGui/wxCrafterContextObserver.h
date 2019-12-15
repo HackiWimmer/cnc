@@ -19,6 +19,7 @@
 #include <wx/notebook.h>
 #include <wx/panel.h>
 #include <wx/imaglist.h>
+#include <wx/splitter.h>
 #include <wx/timer.h>
 #if wxVERSION_NUMBER >= 2900
 #include <wx/persist.h>
@@ -48,7 +49,11 @@ protected:
     wxPanel* m_panelRegistered;
     wxPanel* m_allContextListPlaceholder;
     wxPanel* m_panelHistory;
+    wxSplitterWindow* m_splitter44;
+    wxPanel* m_splitterPage48;
     wxPanel* m_historyInfoPlaceholder;
+    wxPanel* m_splitterPage52;
+    wxTextCtrl* m_historyDetailInfo;
     wxTimer* m_startupTimer;
     wxTimer* m_continuousTimer;
 
@@ -65,6 +70,10 @@ public:
     wxPanel* GetAllContextListPlaceholder() { return m_allContextListPlaceholder; }
     wxPanel* GetPanelRegistered() { return m_panelRegistered; }
     wxPanel* GetHistoryInfoPlaceholder() { return m_historyInfoPlaceholder; }
+    wxPanel* GetSplitterPage48() { return m_splitterPage48; }
+    wxTextCtrl* GetHistoryDetailInfo() { return m_historyDetailInfo; }
+    wxPanel* GetSplitterPage52() { return m_splitterPage52; }
+    wxSplitterWindow* GetSplitter44() { return m_splitter44; }
     wxPanel* GetPanelHistory() { return m_panelHistory; }
     wxNotebook* GetNotebookContextInformation() { return m_notebookContextInformation; }
     wxTimer* GetStartupTimer() { return m_startupTimer; }

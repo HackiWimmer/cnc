@@ -66,7 +66,7 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	GLContextBase::globalInit(); 
 	monitor->init();
 	
-	activateContext(monitor);
+	//activateContext(monitor);
 
 	// Important: initialize the CncGlCanvas context
 	context = monitor;
@@ -240,8 +240,12 @@ void CncMotionMonitor::onPaint() {
 	if ( IsShownOnScreen() == false )
 		return;
 
-	activateContext(monitor);
-	monitor->init();
+	const bool contextOk = activateContext(monitor);
+	if ( contextOk == false )
+		return;
+
+	if ( monitor->init() == false )
+		return;
 
 	const wxSize cs = GetClientSize();
 	

@@ -2,9 +2,9 @@
 <CodeLite_Workspace Name="CnCControl" Database="" Version="10.0.0">
   <Project Name="CncConrollerGui" Path="CncControlerGui/CncControlerGui.project" Active="Yes"/>
   <BuildMatrix>
-    <WorkspaceConfiguration Name="Release" Selected="no">
+    <WorkspaceConfiguration Name="Release" Selected="yes">
       <Environment/>
-      <Project Name="CncConrollerGui" ConfigName="Gprof"/>
+      <Project Name="CncConrollerGui" ConfigName="Release"/>
     </WorkspaceConfiguration>
     <WorkspaceConfiguration Name="Debug" Selected="no">
       <Environment/>
@@ -15,9 +15,9 @@
       <Project Name="NavigatorPanel" ConfigName="Debug"/>
       <Project Name="wxWidgetsTest" ConfigName="Debug"/>
     </WorkspaceConfiguration>
-    <WorkspaceConfiguration Name="Gprof" Selected="yes">
+    <WorkspaceConfiguration Name="Gprof" Selected="no">
       <Environment/>
-      <Project Name="CncConrollerGui" ConfigName="Gprof"/>
+      <Project Name="CncConrollerGui" ConfigName="Release"/>
     </WorkspaceConfiguration>
   </BuildMatrix>
 </CodeLite_Workspace>

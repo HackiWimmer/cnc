@@ -18,6 +18,15 @@ CncGlCanvas::~CncGlCanvas() {
 //////////////////////////////////////////////////
 }
 //////////////////////////////////////////////////
+bool CncGlCanvas::Show(bool show) {
+//////////////////////////////////////////////////
+	GL_CTX_OBS->appendMessage('I', CNC_LOG_FUNCT, wxString::Format("%s Show=%s",
+			                                                       (context ? context->getContextName() : "Unknown context name"),
+																   (show ? "true" : "false")
+																  ));
+	return wxGLCanvas::Show(show);
+}
+//////////////////////////////////////////////////
 bool CncGlCanvas::activateContext(GLContextBase* context, bool verbose) {
 //////////////////////////////////////////////////
 	return activateContext(context, *this, verbose);
@@ -37,7 +46,7 @@ bool CncGlCanvas::activateContext(GLContextBase* context, const wxGLCanvas &win,
 		return lastSetCurrent;
 	} 
 	
-	if ( isShown ) {
+	if ( IsShown() ) {
 		lastSetCurrent = context->SetCurrent(win);
 		return lastSetCurrent;
 	}

@@ -3,6 +3,7 @@
 #include "CncNumberFormatter.h"
 #include "MainFrame.h"
 #include "GlobalStrings.h"
+#include "GlobalFunctions.h"
 #include "UpdateManagerThread.h"
 
 ////////////////////////////////////////////////////////////////////
@@ -54,6 +55,8 @@ void UpdateManagerThread::stop() {
 ///////////////////////////////////////////////////////////////////
 wxThread::ExitCode UpdateManagerThread::Entry() {
 ///////////////////////////////////////////////////////////////////
+	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
+	
 	const unsigned int milliseconds = 1;
 	MainFrame::EventId posEvtId = MainFrame::EventId::CTL_POS_UPDATE;
 	

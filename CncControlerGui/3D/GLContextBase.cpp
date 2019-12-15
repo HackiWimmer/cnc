@@ -83,9 +83,10 @@ void GLContextBase::globalInit() {
 	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA); glHint(GL_LINE_SMOOTH_HINT,GL_NICEST);
 }
 /////////////////////////////////////////////////////////////////
-void GLContextBase::init() {
+bool GLContextBase::init() {
 /////////////////////////////////////////////////////////////////
-	GLCommon::initOpenGL();
+	if ( GLCommon::initOpenGL() == false )
+		return false;
 
 	glutInitDisplayMode (GL_DOUBLE | GLUT_DEPTH | GLUT_RGB);
 	
@@ -94,10 +95,12 @@ void GLContextBase::init() {
 	
 	// call the initalization only one time
 	if ( initialized == true )
-		return;
+		return true;
 	
 	viewPort = createViewPort();
 	initialized = true;
+
+	return true;
 }
 /////////////////////////////////////////////////////////////////
 void GLContextBase::enableSmoothing(bool enable) {

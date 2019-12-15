@@ -23,13 +23,27 @@ CncOpenGLContextObserver::CncOpenGLContextObserver(wxWindow* parent)
 	GblFunc::replaceControl(m_currentContextListPlaceholder, 	currentCtxList);
 	GblFunc::replaceControl(m_allContextListPlaceholder, 		registeredCtxList);
 	GblFunc::replaceControl(m_historyInfoPlaceholder, 			historyList);
+	
+	historyList->setDetaiInfoControl(m_historyDetailInfo);
+	
+	if ( m_startupTimer->IsRunning() )
+		m_startupTimer->Stop();
+
+	if ( m_continuousTimer->IsRunning() )
+		m_continuousTimer->Stop();
+	
+	m_startupTimer->Start();
 }
 //////////////////////////////////////////////////////////////////
 CncOpenGLContextObserver::~CncOpenGLContextObserver() {
 //////////////////////////////////////////////////////////////////
 	historyStage.clear();
-	m_startupTimer->Stop();
-    m_continuousTimer->Stop();
+	
+	if ( m_startupTimer->IsRunning() )
+		m_startupTimer->Stop();
+
+	if ( m_continuousTimer->IsRunning() )
+		m_continuousTimer->Stop();
 
 	wxDELETE( currentCtxList );
 	wxDELETE( registeredCtxList );
@@ -44,13 +58,19 @@ void CncOpenGLContextObserver::onCloseWindow(wxCloseEvent& event) {
 //////////////////////////////////////////////////////////////////
 void CncOpenGLContextObserver::onStartupTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////////////////////
+	if ( m_startupTimer->IsRunning() )
+		m_startupTimer->Stop();
+	
 	// fixing layout problems
-	//Update();
+	Update();
+	
+	m_continuousTimer->Start();
 }
 //////////////////////////////////////////////////////////////////
 void CncOpenGLContextObserver::onContinuousTimer(wxTimerEvent& event) {
 //////////////////////////////////////////////////////////////////
 	if ( IsShownOnScreen() ) {
+		
 		if ( heartbeatFlag )	{ heartbeatFlag = false; m_bmpHeartbeat->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART")); }
 		else					{ heartbeatFlag = true;  m_bmpHeartbeat->SetBitmap(ImageLibHeartbeat().Bitmap("BMP_HEART_PLUS")); }
 		
@@ -99,7 +119,7 @@ void CncOpenGLContextObserver::addHistoryItem(const wxString& ctxName, const wxS
 	
 	if ( false ) {
 		// negtive peformance !!!
-		historyList->appendItem(cc);
+		historyList->appendHistoryItem(cc);
 		historyList->Refresh();
 	} else {
 		if ( historyList->IsShownOnScreen() )	{ historyStage.push_back(cc); }

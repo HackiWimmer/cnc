@@ -183,10 +183,13 @@ bool CncLargeScaledListCtrl::isColumnValid(long column) const {
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
-void CncLargeScaledListCtrl::deselectAll() {
+void CncLargeScaledListCtrl::deselectAll(bool refresh) {
 ///////////////////////////////////////////////////////////////////
 	SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
 	lastSelection = wxNOT_FOUND;
+	
+	if ( refresh == true )
+		Refresh();
 }
 ///////////////////////////////////////////////////////////////////
 bool CncLargeScaledListCtrl::isItemSelected(long item) const {

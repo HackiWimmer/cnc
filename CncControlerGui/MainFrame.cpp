@@ -63,6 +63,7 @@
 #include "CncMotionVertexTrace.h"
 #include "CncTemplateObserver.h"
 #include "CncFileViewLists.h"
+#include "CncExternalViewBox.h"
 #include "GL3DOptionPane.h"
 #include "GL3DDrawPane.h"
 #include "CncPreprocessor.h"
@@ -114,6 +115,9 @@ unsigned int CncTransactionLock::referenceCounter   = 0;
 		EVT_TIMER(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 				MainFrame::onDebugUserNotificationTimer)
 	wxEND_EVENT_TABLE()
 ////////////////////////////////////////////////////////////////////
+
+#define MF_PRINT_LOCATION_CTX_FILE			//	CNC_PRINT_LOCATION
+#define MF_PRINT_LOCATION_CTX_SOMETHING		//	CNC_PRINT_LOCATION
 
 #define cncDELETE( p ) { wxDELETE( p ); APPEND_LOCATION_TO_STACK_TRACE_FILE_A("finalized dtor of '"#p"'"); }
 
@@ -264,12 +268,13 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , spyDetailWindow(NULL)
 , openGLContextObserver(new CncOpenGLContextObserver(this))
 , cncOsEnvDialog(new CncOSEnvironmentDialog(this))
+, cncExtMainPreview(NULL)
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
 , outboundNbInfo(new NotebookInfo(m_outboundNotebook))
 , templateNbInfo(new NotebookInfo(m_templateNotebook))
-, lastTemplateFileNameForPreview(wxT(""))
+, lastMonitorPreviewFileName(_(""))
 , pngAnimation(NULL)
 , stcFileContentPopupMenu(NULL)
 , stcEmuContentPopupMenu(NULL)
@@ -281,6 +286,8 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , refPositionDlg(new CncReferencePosition(this))
 {
 ///////////////////////////////////////////////////////////////////
+	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
+
 	// initilazied update mananger thread
 	initializeUpdateManagerThread();
 	
@@ -372,6 +379,7 @@ MainFrame::~MainFrame() {
 	cncDELETE ( lruStore );
 	
 	cncDELETE( openGLContextObserver );
+	cncDELETE( cncExtMainPreview );
 	cncDELETE( cncOsEnvDialog );
 	cncDELETE( outboundNbInfo );
 	cncDELETE( templateNbInfo );
@@ -642,6 +650,7 @@ void MainFrame::enableGuiControls(bool state) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::installCustControls() {
 ///////////////////////////////////////////////////////////////////
+
 	// 3D splitter window
 	wxWindow* parent 		= m_3DSplitterPlaceholder->GetParent();
 	cnc3DHSplitterWindow 	= new CncMonitorHSplitterWindow(parent);
@@ -696,6 +705,11 @@ void MainFrame::installCustControls() {
 	monitorFilePreview = new CncFilePreview(this, "GLMontiorPreview");
 	GblFunc::replaceControl(m_monitorTemplatePreviewPlaceHolder, monitorFilePreview);
 	
+	// external preview
+	cncExtMainPreview = new CncExternalViewBox(this);
+	cncExtMainPreview->setupView(0, mainFilePreview, 		"External File Preview . . . ");
+	cncExtMainPreview->setupView(1, monitorFilePreview, 	"External Template Preview . . . ");
+
 	// tool magazine
 	toolMagazine = new CncToolMagazine(this); 
 	GblFunc::replaceControl(m_toolMagazinePlaceholder, toolMagazine);
@@ -908,43 +922,50 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
-#include "CncExternalViewBox.h"
-CncExternalViewBox* xxx = NULL;
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 	
-	if ( xxx == NULL )
-		//xxx = new CncExternalViewBox(this, m_lruList);
-		//xxx = new CncExternalViewBox(this, motionMonitor);
-		//xxx = new CncExternalViewBoxSecure(this, cnc3DHSplitterWindow);
-		xxx = new CncExternalViewBox(this, cnc3DHSplitterWindow);
-		
-	xxx->SetTitle("Hallo Stefan . . . .");
-	xxx->Show();
-	//GblFunc::stacktrace(std::cout);
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+
+		m_outboundNotebook->SetSelection(OutboundSelection::VAL::POSTPOCESSOR_PANAL);
+			m_listbookPostProcessor->SetSelection(PostProcessorSelection::VAL::OUTBOUND_PREVIEW);
+
+		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-	if ( xxx != NULL )
-		xxx->Show(false);
+
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+
+		m_outboundNotebook->SetSelection(OutboundSelection::VAL::POSTPOCESSOR_PANAL);
+			m_listbookPostProcessor->SetSelection(PostProcessorSelection::VAL::OUTBOUND_PREVIEW);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	
-	CncFileNameService::sessionHousekeeping();
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+
+		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
-	
-	activateSecureMode(true);
+
+	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
@@ -965,7 +986,6 @@ void MainFrame::activateSecureMode(bool state) {
 	
 	// some control handling
 	const bool useIt   = THE_CONTEXT->secureModeInfo.useIt;
-	m_secureSplitterMain->SetSashInvisible(useIt),
 	m_loadTemplateSec->Enable(!useIt);
 	getLogger()->setShowOnDemandState(!useIt);
 	
@@ -984,6 +1004,9 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(m_secLoggerPlaceholder, 	getLogger());
 		GblFunc::swapControls(m_secZViewPlaceholder, 	m_zView);
 		
+		GblFunc::swapControls(m_fileViewsPlaceholder, 	m_fileViews);
+		
+		
 		getLogger()->setShowOnDemandState(false);
 		
 	} else {
@@ -996,6 +1019,8 @@ void MainFrame::activateSecureMode(bool state) {
 		GblFunc::swapControls(motionMonitor, 		m_secMonitorPlaceholder);
 		GblFunc::swapControls(getLogger(), 			m_secLoggerPlaceholder);
 		GblFunc::swapControls(m_zView, 				m_secZViewPlaceholder);
+		
+		GblFunc::swapControls(m_fileViews,			m_fileViewsPlaceholder);
 		
 		getLogger()->setShowOnDemandState(m_showLoggerOnDemand->GetValue());
 	}
@@ -1062,6 +1087,8 @@ void MainFrame::traceWoodworkingCncVersion(std::ostream& out) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::startupTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	m_startupTimer->Stop();
+	
 	if ( THE_CONTEXT->secureModeInfo.isActivatedByStartup == false ) {
 		// Setup AUI Windows menue
 		perspectiveHandler.loadPerspective("Default");
@@ -1072,7 +1099,6 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		activateSecureMode(true);
 		
 	}
-	
 	
 	{
 		CncNanoTimestamp ts1 = 0;
@@ -1101,30 +1127,25 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 		while ( IsShownOnScreen() == false ) {
 			dispatchAll(); 
 			
-			if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) { \
+			if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) { 
 				std::cerr 	<< "MainFrame::startupTimer(): Timeout reached for 'MainFrame::IsShownOnScreen()'" << std::endl;
 				break; 
 			}
 		}
-
-		// wait until the motion monitor is shown on screen
-		auto breakWait = [&]() {
-			return  motionMonitor->IsShown() && mainFilePreview->IsShown() && 
-					monitorFilePreview->IsShown() && outboundFilePreview->IsShown();
-		};
 		
-		ts1 = CncTimeFunctions::getNanoTimestamp();
-		while ( breakWait() == false ) {
-			dispatchAll();
+		// select each cnc OpenGL canvas to force the OpenGL as well 
+		// as GLEW initialization for each context
+		{
+			m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+			m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
 			
-			if ( CncTimeFunctions::getTimeSpanToNow(ts1) > 2000 * 1000 * 1000 ) {
-				std::cerr 	<< "MainFrame::startupTimer(): Timeout reached"  << std::endl
-							<< " motionMonitor       : " << motionMonitor->IsShown() << std::endl
-							<< " mainFilePreview     : " << mainFilePreview->IsShown() << std::endl
-							<< " monitorFilePreview  : " << monitorFilePreview->IsShown() << std::endl
-							<< " outboundFilePreview : " << outboundFilePreview->IsShown() << std::endl;
-				break; 
-			}
+				m_outboundNotebook->SetSelection(OutboundSelection::VAL::POSTPOCESSOR_PANAL);
+					m_listbookPostProcessor->SetSelection(PostProcessorSelection::VAL::OUTBOUND_PREVIEW);
+				
+				m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
+				
+			m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+			m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
 		}
 		
 		// Version infos
@@ -1458,7 +1479,7 @@ void MainFrame::onGamepdThreadUpadte(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( checkIfTemplateIsModified() == false )
+	if ( saveTemplateOnDemand() == false )
 		return;
 		
 	if ( canClose == false) {
@@ -1777,11 +1798,15 @@ void MainFrame::setIcons() {
 	// Set icon(s) to the application/dialog
 	wxIconBundle app_icons;
 
-#ifdef DEBUG
-	wxString iconTyp("D");
-#else
-	wxString iconTyp("R");
-#endif
+	#ifdef DEBUG
+			const wxString iconTyp("D");
+	#else
+		#ifdef GPROF
+			const wxString iconTyp("G");
+		#else
+			const wxString iconTyp("R");
+		#endif
+	#endif
 	
 	int sizes[] = {16, 32, 64, 128, 256};
 
@@ -1975,8 +2000,7 @@ bool MainFrame::openInitialTemplateFile() {
 		m_inputFileName->SetHint(fn.GetFullPath());
 		
 		openFile();
-		prepareAndShowMonitorTemplatePreview();
-		introduceCurrentFile();
+		prepareAndShowMonitorTemplatePreview(true);
 		
 	} else {
 		THE_CONFIG->getDefaultTplDir(value);
@@ -2470,6 +2494,9 @@ void MainFrame::enableControls(bool state) {
 	// set global state
 	canClose = state;
 	
+	m_secureSplitterMainV->SetSashInvisible(!state);
+	m_secureSplitterMainH->SetSashInvisible(!state);
+	
 	// enable menu bar
 	enableMenuItems(state);
 	
@@ -2686,40 +2713,43 @@ void MainFrame::updateMonitoring() {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-const char* MainFrame::getCurrentTemplateFormatName(const char* fileName) {
+const char* MainFrame::getTemplateFormatName(const wxString& fileName) {
 ///////////////////////////////////////////////////////////////////
 	static wxString ext;
-
-	switch ( getCurrentTemplateFormat(fileName) ) {
+	
+	wxFileName fn;
+	fn.Assign(fileName);
+	
+	ext.assign(fn.GetExt());
+	ext.MakeUpper();
+	return ext;
+}
+///////////////////////////////////////////////////////////////////
+const char* MainFrame::getCurrentTemplateFormatName() {
+///////////////////////////////////////////////////////////////////
+	switch ( getCurrentTemplateFormat() ) {
 		case TplManual:
 		case TplTest:	return "";
-		
-		default: 	{
-						wxFileName fn;
-						if ( fileName == NULL )	fn.Assign(getCurrentTemplatePathFileName());
-						else					fn.Assign(fileName);
-						
-						ext.assign(fn.GetExt());
-						ext.MakeUpper();
-						return ext;
-					}
+		default: 		return getTemplateFormatName(getCurrentTemplatePathFileName());
 	}
 	
 	return "";
 }
 ///////////////////////////////////////////////////////////////////
-TemplateFormat MainFrame::getCurrentTemplateFormat(const char* fileName) {
+TemplateFormat MainFrame::getTemplateFormat(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	unsigned int sel = m_mainViewSelector->GetSelection();
-	if ( sel == (unsigned int)MainBookSelection::VAL::MANUEL_PANEL )
-		return TplManual;
-		
-	if ( sel == (unsigned int)MainBookSelection::VAL::TEST_PANEL )
-		return TplTest;
-		
+	return cnc::getTemplateFormatFromFileName(fn);
+}
+///////////////////////////////////////////////////////////////////
+TemplateFormat MainFrame::getCurrentTemplateFormat() {
+///////////////////////////////////////////////////////////////////
 	wxString fn;
-	if ( fileName == NULL )	fn.assign(getCurrentTemplatePathFileName());
-	else					fn.assign(fileName);
+	fn.assign(getCurrentTemplatePathFileName());
+		
+	switch ( m_mainViewSelector->GetSelection() ) {
+		case MainBookSelection::VAL::MANUEL_PANEL:	return TplManual;
+		case MainBookSelection::VAL::TEST_PANEL:	return TplTest;
+	}
 	
 	return cnc::getTemplateFormatFromFileName(fn);
 }
@@ -2880,6 +2910,8 @@ void MainFrame::prepareMotionMonitorViewType() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::introduceCurrentFile(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
+	MF_PRINT_LOCATION_CTX_FILE
+	
 	lruFileView->addFile(getCurrentTemplatePathFileName());
 	fileView->selectFileInList(getCurrentTemplatePathFileName());
 	
@@ -2900,7 +2932,7 @@ void MainFrame::prepareNewTemplateFile() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::newTemplate(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	if ( checkIfTemplateIsModified() == false )
+	if ( saveTemplateOnDemand() == false )
 		return;
 	
 	wxString templateName("..\\Templates\\");
@@ -4081,7 +4113,7 @@ bool MainFrame::processTemplateIntern() {
 	switch ( getCurrentTemplateFormat() ) {
 		
 		case TplBinary:
-			if ( checkIfTemplateIsModified() == false )
+			if ( saveTemplateOnDemand() == false )
 				break;
 			clearMotionMonitor();
 			// measurement handling will be done by the corespondinf file parser
@@ -4089,7 +4121,7 @@ bool MainFrame::processTemplateIntern() {
 			break;
 			
 		case TplSvg:
-			if ( checkIfTemplateIsModified() == false )
+			if ( saveTemplateOnDemand() == false )
 				break;
 			clearMotionMonitor();
 			// measurement handling will be done by the corespondinf file parser
@@ -4097,7 +4129,7 @@ bool MainFrame::processTemplateIntern() {
 			break;
 			
 		case TplGcode:
-			if ( checkIfTemplateIsModified() == false )
+			if ( saveTemplateOnDemand() == false )
 				break;
 			clearMotionMonitor();
 			// measurement handling will be done by the corespondinf file parser
@@ -4181,7 +4213,7 @@ void MainFrame::resetMinMaxPositions() {
 	cnc->resetWatermarks();
 }
 ///////////////////////////////////////////////////////////////////
-bool MainFrame::checkIfTemplateIsModified() {
+bool MainFrame::saveTemplateOnDemand() {
 ///////////////////////////////////////////////////////////////////
 	wxString msg(wxString::Format("The current template file\n\n '%s'\n\nwas modified. Save it?", getCurrentTemplatePathFileName()));
 	
@@ -4203,19 +4235,17 @@ bool MainFrame::checkIfTemplateIsModified() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 ///////////////////////////////////////////////////////////////////
-#warning
-//return;
-
-
 	if ( force == true )
-		lastTemplateFileNameForPreview.clear();
-
+		lastMonitorPreviewFileName.clear();
+	
 	// check if a preview update is necessary
-	if ( lastTemplateFileNameForPreview == getCurrentTemplatePathFileName() && sourceEditor->GetModify() == false)
+	if ( lastMonitorPreviewFileName == getCurrentTemplatePathFileName() && sourceEditor->GetModify() == false)
 		return;
 		
-	lastTemplateFileNameForPreview = getCurrentTemplatePathFileName();
-
+	MF_PRINT_LOCATION_CTX_FILE
+	
+	lastMonitorPreviewFileName = getCurrentTemplatePathFileName();
+	
 	// wxString tfn(CncFileNameService::getCncTemplatePreviewFileName(getCurrentTemplateFormat()));
 	// this causes file access errors between this app and the internet explorer
 	// write a temp file instead to have anytime a new one
@@ -4235,7 +4265,7 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 								return;
 								
 							} else {
-								std::cerr << "MainFrame::prepareAndShowMonitorTemplatePreview(): Can't create preview!" << std::endl;
+								std::cerr << CNC_LOG_FUNCT << ": Can't create preview!" << std::endl;
 								return;
 								
 							}
@@ -4245,7 +4275,7 @@ void MainFrame::prepareAndShowMonitorTemplatePreview(bool force) {
 	}
 	
 	if ( tfn.IsEmpty() ) {
-		std::cerr << "MainFrame::prepareAndShowMonitorTemplatePreview(): Invalid file name!" << std::endl;
+		std::cerr << CNC_LOG_FUNCT << ": Invalid file name!" << std::endl;
 		return;
 	}
 	
@@ -5038,10 +5068,15 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(ctrl);
 	
-	if      ( ctrl == mainFilePreview )		m_currentFileMangerPreviewFileName->ChangeValue(fn);
-	else if ( ctrl == monitorFilePreview)	m_currentInboundFilePreviewFileName->ChangeValue(fn);
-		
-	TemplateFormat tf = getCurrentTemplateFormat(fn);
+	if      ( ctrl == mainFilePreview )			m_currentFileMangerPreviewFileName->ChangeValue(fn);
+	else if ( ctrl == monitorFilePreview)		m_currentInboundFilePreviewFileName->ChangeValue(fn);
+	
+	if ( cncExtMainPreview != NULL ) {
+		if      ( ctrl == mainFilePreview )		cncExtMainPreview->setStatusTextRight(wxFileName(fn).GetFullName());
+		else if ( ctrl == monitorFilePreview)	cncExtMainPreview->setStatusTextRight(m_inputFileName->GetValue());
+	}
+	
+	TemplateFormat tf = getTemplateFormat(fn);
 	switch ( tf ) {
 		case TplSvg:		ctrl->selectPreview(fn);
 							break;
@@ -5070,8 +5105,7 @@ void MainFrame::openPreview(CncFilePreview* ctrl, const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMainPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	#warning
-	//return;
+	MF_PRINT_LOCATION_CTX_FILE
 	
 	selectMainBookPreviewPanel();
 	openPreview(mainFilePreview, fn);
@@ -5079,11 +5113,9 @@ void MainFrame::openMainPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::openMonitorPreview(const wxString& fn) {
 ///////////////////////////////////////////////////////////////////
-	// the call below creates an endlos loop
-	// because selectMonitorBookTemplatePanel 
-	// calls inderetly openMonitorPreview
-	//selectMonitorBookTemplatePanel();
-	
+	MF_PRINT_LOCATION_CTX_FILE
+
+	selectMonitorBookTemplatePanel();
 	openPreview(monitorFilePreview, fn);
 }
 ///////////////////////////////////////////////////////////////////
@@ -5092,8 +5124,8 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 	selectMainBookSourcePanel();
 	selectMonitorBookTemplatePanel();
 	
-	if ( checkIfTemplateIsModified() == false ) {
-		prepareAndShowMonitorTemplatePreview(true);
+	if ( saveTemplateOnDemand() == false ) {
+		prepareAndShowMonitorTemplatePreview();
 		return;
 	}
 
@@ -5102,26 +5134,50 @@ void MainFrame::openFileFromFileManager(const wxString& f) {
 	m_inputFileName->SetHint(fn.GetFullPath());
 
 	openFile();
-	prepareAndShowMonitorTemplatePreview(true);
+	prepareAndShowMonitorTemplatePreview(sourceEditor->IsModified());
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::lruListItemLeave() {
+bool MainFrame::filePreviewListLeave() {
 ///////////////////////////////////////////////////////////////////
 	if ( m_keepFileManagerPreview->IsChecked() )
-		return;
+		return false;
 	
 	if ( CncAsyncKeyboardState::isControlPressed() )
-		return;
-		
+		return false;
+
+	if ( cncExtMainPreview != NULL && cncExtMainPreview->IsShownOnScreen() == true ) {
+		cncExtMainPreview->selectView(CncExternalViewBox::Preview::TEMPLATE);
+		return false;
+	}
+	
 	if ( m_mainViewBook->GetSelection() != MainBookSelection::VAL::PREVIEW_PANEL )
-		return;
+		return false;
 		
 	selectMainBookSourcePanel();
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onChangePreviewMode(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	#warning
+	const bool isExtViewActive = m_externFileManagerPreview->IsChecked();
+	
+	//m_keepFileManagerPreview->SetValue( isExtViewActive);
+	//m_keepFileManagerPreview->Enable  (!isExtViewActive);
+		
+	if ( cncExtMainPreview != NULL ) {
+		
+		// deselect main preview if active
+		if ( m_mainViewBook->GetSelection() == MainBookSelection::VAL::PREVIEW_PANEL )
+			selectMainBookSourcePanel();
+		
+		// deselect monitor preview if active
+		if ( m_monitorViewBook->GetSelection() == MonitorBookSelection::VAL::TEMPLATE_PANEL )
+			selectMonitorBookCncPanel();
+		
+		// prepare extern preview
+		cncExtMainPreview->selectView(CncExternalViewBox::Preview::TEMPLATE);
+		cncExtMainPreview->Show(isExtViewActive);
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookSourcePanel(int sourcePageToSelect) {
@@ -5137,8 +5193,18 @@ void MainFrame::selectMainBookSourcePanel(int sourcePageToSelect) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookPreviewPanel() {
 ///////////////////////////////////////////////////////////////////
-	m_mainViewSelector->SetSelection(MainBookSelection::VAL::PREVIEW_PANEL);
-	m_mainViewBook->SetSelection(MainBookSelection::VAL::PREVIEW_PANEL);
+	MF_PRINT_LOCATION_CTX_FILE
+	
+	if ( m_externFileManagerPreview->IsChecked() == false ) {
+		m_mainViewSelector->SetSelection(MainBookSelection::VAL::PREVIEW_PANEL);
+		m_mainViewBook->SetSelection(MainBookSelection::VAL::PREVIEW_PANEL);
+		
+	} else {
+		
+		cncExtMainPreview->selectView(CncExternalViewBox::Preview::FILE);
+		if ( cncExtMainPreview->IsShownOnScreen() == false )
+			cncExtMainPreview->Show();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMainBookSetupPanel() {
@@ -5163,6 +5229,8 @@ void MainFrame::selectMainBookTestPanel() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::mainViewSelectorSelected(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
+	MF_PRINT_LOCATION_CTX_FILE
+	
 	m_mainViewBook->SetSelection(m_mainViewSelector->GetSelection());
 }
 ///////////////////////////////////////////////////////////////////
@@ -5176,16 +5244,28 @@ void MainFrame::selectMonitorBookCncPanel() {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::selectMonitorBookTemplatePanel() {
 ///////////////////////////////////////////////////////////////////
-	prepareAndShowMonitorTemplatePreview(true);
+	MF_PRINT_LOCATION_CTX_FILE
 	
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+	if ( m_externFileManagerPreview->IsChecked() == false ) {
+		prepareAndShowMonitorTemplatePreview(sourceEditor->IsModified());
+	
+		m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+		m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+	} else {
+		
+		selectMonitorBookCncPanel();
+		
+		cncExtMainPreview->selectView(CncExternalViewBox::Preview::TEMPLATE);
+		if ( cncExtMainPreview->IsShownOnScreen() == false )
+			cncExtMainPreview->Show();
+		
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::monitorViewSelectorSelected(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	if ( m_monitorViewSelector->GetSelection() == MonitorBookSelection::VAL::TEMPLATE_PANEL)
-		prepareAndShowMonitorTemplatePreview(true);
+		prepareAndShowMonitorTemplatePreview(sourceEditor->IsModified());
 		
 	m_monitorViewBook->SetSelection(m_monitorViewSelector->GetSelection());
 }
@@ -5959,6 +6039,9 @@ void MainFrame::determineRunMode() {
 	m_svgParseMode->Refresh();
 
 	decorateRunButton();
+	
+	if ( m_externFileManagerPreview->IsChecked() == true && cncExtMainPreview != NULL )
+		cncExtMainPreview->selectView(CncExternalViewBox::Preview::TEMPLATE);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::rcDebugConfig(wxCommandEvent& event) {
@@ -5975,7 +6058,6 @@ void MainFrame::rcRun() {
 	
 	if ( THE_CONTEXT->secureModeInfo.useIt == true && m_secureRunPanel->IsShownOnScreen() == false ) {
 		activateSecureMode(!THE_CONTEXT->secureModeInfo.isActive);
-		//#warning
 		return;
 	}
 
@@ -7371,6 +7453,11 @@ void MainFrame::rcSecureDlg(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 void MainFrame::cncMainViewChanged(wxNotebookEvent& event) {
 /////////////////////////////////////////////////////////////////////
+	if ( event.GetOldSelection() == MainBookSelection::VAL::PREVIEW_PANEL ) {
+		wxASSERT( lruFileView != NULL );
+		lruFileView->selectFirstItem();
+	}
+	
 	activateGamepadNotificationsOnDemand(true);
 }
 /////////////////////////////////////////////////////////////////////
@@ -7872,12 +7959,12 @@ void MainFrame::onShowLoggerOnDemand(wxCommandEvent& event) {
 void MainFrame::onOpenGLContextObserver(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	wxASSERT( openGLContextObserver != NULL );
+	
 	const bool flag = openGLContextObserver->IsShownOnScreen();
-	
-	//if ( m_miOpenGLContextObserver->IsChecked() ) 
-	
 	openGLContextObserver->Show(!flag);
 	m_miOpenGLContextObserver->Check(!flag);
+	
+	Refresh();
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onIndividualCommand(wxCommandEvent& event) {
@@ -7902,6 +7989,12 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 											break;
 
 		case EID::EnableControls:			enableControls(ice->getValue<bool>(VN::VAL1));
+											break;
+											
+		case EID::ExtViewBoxChange:			if ( ice->getValue<CncExternalViewBox*>(VN::VAL1) == cncExtMainPreview ) {
+												if ( ice->getValue<int>(VN::VAL2) == CncExternalViewBox::Preview::FILE )
+													lruFileView->selectFirstItem();
+											}
 											break;
 
 	}

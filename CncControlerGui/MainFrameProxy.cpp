@@ -158,7 +158,7 @@
 	{ THE_APP->decorateProbeMode(probeMode); }
 
 	wxFileConfig* APP_PROXY::getLruStore()
-	{ THE_APP->lruStore; }
+	{ return THE_APP->lruStore; }
 	
-	void APP_PROXY::lruListItemLeave()
-	{ THE_APP->lruListItemLeave(); }
+	bool APP_PROXY::filePreviewListLeave()
+	{ return THE_APP->filePreviewListLeave(); }

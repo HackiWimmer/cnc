@@ -7,6 +7,7 @@
 
 typedef std::vector<wxString> ExtFilterList;
 
+class CncFileViewListCtrl;
 class CncFileView : public CncFileViewBase, public wxDirTraverser {
 	
 	protected:
@@ -17,8 +18,10 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		virtual void aFolderUp(wxCommandEvent& event);
 		virtual void refresh(wxCommandEvent& event);
 		virtual void selectDefault(wxCommandEvent& event);
-		virtual void fileListActivated(wxListEvent& event);
-		virtual void fileListSelected(wxListEvent& event);
+		virtual void fileListActivated(long item);
+		virtual void fileListSelected(long item);
+		
+		friend CncFileViewListCtrl;
 	
 	public:
 		CncFileView(wxWindow* parent);
@@ -27,6 +30,8 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		virtual wxDirTraverseResult OnFile(const wxString& filename);
 		virtual wxDirTraverseResult OnDir(const wxString& dirname);
 		
+		virtual bool Enable(bool enable=true);
+
 		bool openDirectory(const wxString& dirName);
 		bool selectFileInList(const wxString& fileName);
 		
@@ -36,14 +41,16 @@ class CncFileView : public CncFileViewBase, public wxDirTraverser {
 		void update();
 		
 	protected:
-		wxString defaultPath;
-		ExtFilterList filterList;
+		wxString 				defaultPath;
+		CncFileViewListCtrl*	fileList;
+		ExtFilterList 			filterList;
 
 		bool makePathValid(wxString& p);
 		bool openFile(const wxString& fileName);
 		bool previewFile(const wxString& fileName);
 		
 	private:
+		
 		bool avoidSelectListEvent;
 		wxString lastSelection;
 };

@@ -6,114 +6,19 @@
 #include "MainFrameProxy.h"
 #include "GlobalFunctions.h"
 #include "wxCrafterImages.h"
+#include "CncFileView.h"
 #include "CncFileViewLists.h"
 
-// ----------------------------------------------------------------------------
-// CncFileViewListCtrl Event Table
-// ----------------------------------------------------------------------------
+#define CFVL_PRINT_LOCATION_CTX_FILE		//	CNC_PRINT_LOCATION
+#define CFVL_PRINT_LOCATION_CTX_SOMETHING	//	CNC_PRINT_LOCATION
 
-wxBEGIN_EVENT_TABLE(CncFileViewListCtrl, CncLargeScaledListCtrl)
-	EVT_SIZE				(			CncFileViewListCtrl::onSize				)
-	EVT_LEAVE_WINDOW		(			CncFileViewListCtrl::onLeaveWindow		)
-	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 	CncFileViewListCtrl::onSelectListItem	)
-	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 	CncFileViewListCtrl::onActivateListItem	)
-wxEND_EVENT_TABLE()
-
-/////////////////////////////////////////////////////////////
-CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
-: CncLargeScaledListCtrl(parent, style)
-/////////////////////////////////////////////////////////////
-{
-	// add colums
-	AppendColumn("Workarea:", wxLIST_FORMAT_LEFT, 250);
-	
-	// determine styles
-	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
-	
-	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
-	SetFont(font);
-	
-	SetBackgroundColour(wxColour(0, 0, 0));
-	SetTextColour(wxColour(255, 255, 255));
-	
-	wxImageList* imageList = new wxImageList(16, 16, true);
-	imageList->RemoveAll();
-	imageList->Add(ImageLibFile().Bitmap("BMP_FILE"));		// 0
-	SetImageList(imageList, wxIMAGE_LIST_SMALL);
-}
-/////////////////////////////////////////////////////////////
-CncFileViewListCtrl::~CncFileViewListCtrl() {
-/////////////////////////////////////////////////////////////
-}
-/////////////////////////////////////////////////////////////
-int CncFileViewListCtrl::OnGetItemColumnImage(long item, long column) const {
-/////////////////////////////////////////////////////////////
-	return 0;
-}
-/////////////////////////////////////////////////////////////
-wxListItemAttr* CncFileViewListCtrl::OnGetItemAttr(long item) const {
-/////////////////////////////////////////////////////////////
-	return (wxListItemAttr*)(NULL);
-}
-/////////////////////////////////////////////////////////////////////
-void CncFileViewListCtrl::updateColumnWidth() {
-/////////////////////////////////////////////////////////////////////
-	// avoid flicker
-	if ( IsFrozen() == false )
-		Freeze();
-		
-	SetColumnWidth(COL_STRECH, wxLIST_AUTOSIZE);
-	
-	// try to strech the second (key) column
-	const int size = GetSize().GetWidth(); 
-	
-	if ( size > GetColumnWidth(COL_STRECH) )
-		SetColumnWidth(COL_STRECH, size);
-		
-	if ( IsFrozen() == true )
-		Thaw();
-}
-/////////////////////////////////////////////////////////////////////
-bool CncFileViewListCtrl::Enable(bool enable) {
-/////////////////////////////////////////////////////////////////////
-	if ( enable == false ) 	{ if ( IsFrozen() == false ) 	Freeze(); }
-	else					{ if ( IsFrozen() == true ) 	Thaw();   }
-	
-	return true;
-}
-/////////////////////////////////////////////////////////////////////
-void CncFileViewListCtrl::onSize(wxSizeEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	updateColumnWidth();
-	event.Skip(true);
-}
-/////////////////////////////////////////////////////////////////////
-void CncFileViewListCtrl::onLeaveWindow(wxMouseEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	
-}
-/////////////////////////////////////////////////////////////////////
-void CncFileViewListCtrl::onSelectListItem(wxListEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	
-}
-/////////////////////////////////////////////////////////////////////
-void CncFileViewListCtrl::onActivateListItem(wxListEvent& event) {
-/////////////////////////////////////////////////////////////////////
-	
-}
-/////////////////////////////////////////////////////////////////////
-wxString CncFileViewListCtrl::OnGetItemText(long item, long column) const {
-/////////////////////////////////////////////////////////////////////
-	
-	return _("");
-}
-
-
-
+namespace TimerEvent {
+	const int SelectInterval 	= 400;
+	const int ActivateInterval 	=  10;
+};
 
 // ----------------------------------------------------------------------------
-// CncFileViewListCtrl Event Table
+// CncLruFileViewListCtrl Event Table
 // ----------------------------------------------------------------------------
 
 wxBEGIN_EVENT_TABLE(CncLruFileViewListCtrl, CncLargeScaledListCtrl)
@@ -129,9 +34,13 @@ wxEND_EVENT_TABLE()
 CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms, long style)
 : CncLargeScaledListCtrl(parent, style)
 , lruList()
+, eventTimer(new wxTimer())
+, defaultItemAttr()
+, selectedItemAttr()
 , popupMenu(NULL)
 , isLeaveEventActive(true)
 , maxSize(ms)
+, lastEventType(EventType::UNKNOWN)
 /////////////////////////////////////////////////////////////
 {
 	// add colums
@@ -145,6 +54,14 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	
 	SetBackgroundColour(wxColour(0, 0, 0));
 	SetTextColour(wxColour(255, 255, 255));
+	
+	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
+	defaultItemAttr.SetFont(font);
+	defaultItemAttr.SetTextColour(GetTextColour());
+	
+	selectedItemAttr 	= defaultItemAttr;
+	selectedItemAttr	.SetTextColour(wxColour(255, 242,   0));
+	selectedItemAttr	.SetFont(font.Bold());
 	
 	wxImageList* imageList = new wxImageList(16, 16, true);
 	imageList->RemoveAll();
@@ -160,11 +77,19 @@ CncLruFileViewListCtrl::CncLruFileViewListCtrl(wxWindow *parent, unsigned int ms
 	 [&](wxCommandEvent& event) {
 		this->removeSelectedItem();
 	 }, miRemoveLruListEntry, miRemoveLruListEntry);
+	 
+	eventTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncLruFileViewListCtrl::onEventTimer), NULL, this);
 }
 /////////////////////////////////////////////////////////////
 CncLruFileViewListCtrl::~CncLruFileViewListCtrl() {
 /////////////////////////////////////////////////////////////
-	delete popupMenu;
+	wxDELETE( popupMenu );
+	
+	if ( eventTimer->IsRunning() )
+		eventTimer->Stop();
+	
+	eventTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncLruFileViewListCtrl::onEventTimer), NULL, this);
+	wxDELETE( eventTimer );
 }
 /////////////////////////////////////////////////////////////
 int CncLruFileViewListCtrl::OnGetItemColumnImage(long item, long column) const {
@@ -180,30 +105,27 @@ int CncLruFileViewListCtrl::OnGetItemColumnImage(long item, long column) const {
 /////////////////////////////////////////////////////////////
 wxListItemAttr* CncLruFileViewListCtrl::OnGetItemAttr(long item) const {
 /////////////////////////////////////////////////////////////
-	return (wxListItemAttr*)(NULL);
+	return (wxListItemAttr*)(item != getLastSelection() ? &defaultItemAttr : &selectedItemAttr);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLruFileViewListCtrl::updateColumnWidth() {
 /////////////////////////////////////////////////////////////////////
 	// avoid flicker
-	if ( IsFrozen() == false )
-		Freeze();
+	GblFunc::freeze(this, true);
 		
-	SetColumnWidth(COL_STRECH, wxLIST_AUTOSIZE);
-	
 	// try to strech the second (key) column
-	const int size = GetSize().GetWidth(); 
+	const int size = GetSize().GetWidth() - 26; 
 	
 	if ( size > GetColumnWidth(COL_STRECH) )
 		SetColumnWidth(COL_STRECH, size);
 		
-	if ( IsFrozen() == true )
-		Thaw();
+	GblFunc::freeze(this, false);
 }
 /////////////////////////////////////////////////////////////////////
 bool CncLruFileViewListCtrl::Enable(bool enable) {
 /////////////////////////////////////////////////////////////////////
-	GblFunc::freeze(this, enable);
+	GblFunc::freeze(this, !enable);
+	Refresh();
 	return CncLargeScaledListCtrl::Enable(enable); 
 }
 ////////////////////////////////////////////////////////////////
@@ -219,10 +141,9 @@ void CncLruFileViewListCtrl::removeSelectedItem() {
 ////////////////////////////////////////////////////////////////
 void CncLruFileViewListCtrl::updateListControl() {
 ////////////////////////////////////////////////////////////////
-
-	std::clog << "LRUsize: " << lruList.size() << std::endl;
-
+	deselectAll();
 	SetItemCount(lruList.size());
+	setLastSelection(0);
 	Refresh();
 }
 ////////////////////////////////////////////////////////////////
@@ -414,25 +335,63 @@ void CncLruFileViewListCtrl::onLeaveWindow(wxMouseEvent& event) {
 	if ( isLeaveEventActive == false )
 		return;
 		
-	APP_PROXY::lruListItemLeave();
-	deselectAll();
-	updateListControl();
+	APP_PROXY::filePreviewListLeave();
 }
 /////////////////////////////////////////////////////////////////////
 void CncLruFileViewListCtrl::onSelectListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	setLastSelection(event.GetIndex());
+	CFVL_PRINT_LOCATION_CTX_FILE
 	
-	const wxString fn(getFileName(event.GetIndex()));
-	if ( fn.IsEmpty() == false )
-		APP_PROXY::openMainPreview(fn);
+	deselectAll(true);
+	setLastSelection(event.GetIndex());
+	lastEventType = EventType::PREVIEW;
+	
+	// start a timer here to prevent the immediately call of 
+	// this event and to wait if a activate event follows.
+	// normal sequence: select, activate
+	if ( eventTimer->IsRunning() == false )
+		eventTimer->StartOnce(TimerEvent::SelectInterval);
 }
 /////////////////////////////////////////////////////////////////////
 void CncLruFileViewListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////////////
-	const wxString fn(getFileName(event.GetIndex()));
-	if ( fn.IsEmpty() == false )
-		APP_PROXY::openFileFromFileManager(fn);
+	CFVL_PRINT_LOCATION_CTX_FILE
+	
+	lastEventType = EventType::OPEN;
+	
+	// in case of a previous select event the timer is still runing
+	// but if not stat a short timer here
+	// possible sequence select, <some longer time inmterval>,  activate
+	if ( eventTimer->IsRunning() == false )
+		eventTimer->StartOnce(TimerEvent::ActivateInterval);
+}
+//////////////////////////////////////////////////////////////
+void CncLruFileViewListCtrl::onEventTimer(wxTimerEvent& event) { 
+//////////////////////////////////////////////////////////////
+	CFVL_PRINT_LOCATION_CTX_FILE
+	
+	eventTimer->Stop();
+	
+	const wxString fn(getFileName(getLastSelection()));
+	if ( fn.IsEmpty() == true )
+		return; 
+		
+	switch ( lastEventType ) {
+		case EventType::PREVIEW:	APP_PROXY::openMainPreview(fn);
+									break;
+									
+		case EventType::OPEN:		APP_PROXY::openFileFromFileManager(fn);
+									setLastSelection(0);
+									break;
+		default:					;
+	}
+	
+	lastEventType = EventType::UNKNOWN;
+}
+/////////////////////////////////////////////////////////////////////
+void CncLruFileViewListCtrl::selectFirstItem() {
+/////////////////////////////////////////////////////////////////////
+	updateListControl();
 }
 /////////////////////////////////////////////////////////////////////
 wxString CncLruFileViewListCtrl::OnGetItemText(long item, long column) const {
@@ -451,8 +410,227 @@ wxString CncLruFileViewListCtrl::OnGetItemText(long item, long column) const {
 /////////////////////////////////////////////////////////////////////
 bool CncLruFileViewListCtrl::isItemValid(long item) const {
 /////////////////////////////////////////////////////////////////////
-	if ( item < 0 || item > (long)(lruList.size()) )
+	if ( item < 0 || item > (long)(lruList.size() - 1) )
 		return false;
 	
 	return true;
 }
+
+
+
+
+
+
+// ----------------------------------------------------------------------------
+// CncFileViewListCtrl Event Table
+// ----------------------------------------------------------------------------
+
+wxBEGIN_EVENT_TABLE(CncFileViewListCtrl, CncLargeScaledListCtrl)
+	EVT_SIZE				(			CncFileViewListCtrl::onSize				)
+	EVT_LEAVE_WINDOW		(			CncFileViewListCtrl::onLeaveWindow		)
+	EVT_LIST_ITEM_SELECTED	(wxID_ANY, 	CncFileViewListCtrl::onSelectListItem	)
+	EVT_LIST_ITEM_ACTIVATED	(wxID_ANY, 	CncFileViewListCtrl::onActivateListItem	)
+wxEND_EVENT_TABLE()
+
+/////////////////////////////////////////////////////////////
+CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
+: CncLargeScaledListCtrl(parent, style)
+, fileEntries()
+, eventTimer(new wxTimer())
+, defaultItemAttr()
+, selectedItemAttr()
+, lastEventType(EventType::UNKNOWN)
+/////////////////////////////////////////////////////////////
+{
+	// add colums
+	AppendColumn("Workarea:", wxLIST_FORMAT_LEFT, 250);
+	
+	// determine styles
+	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
+	
+	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
+	SetFont(font);
+	
+	SetBackgroundColour(wxColour(0, 0, 0));
+	SetTextColour(wxColour(255, 255, 255));
+	
+	defaultItemAttr.SetBackgroundColour(GetBackgroundColour());
+	defaultItemAttr.SetFont(font);
+	defaultItemAttr.SetTextColour(GetTextColour());
+	
+	selectedItemAttr 	= defaultItemAttr;
+	selectedItemAttr	.SetTextColour(wxColour(255, 242,   0));
+	selectedItemAttr	.SetFont(font.Bold());
+	
+	wxImageList* imageList = new wxImageList(16, 16, true);
+	imageList->RemoveAll();
+	imageList->Add(ImageLibFile().Bitmap("BMP_FOLDER_UP"));
+	imageList->Add(ImageLibFile().Bitmap("BMP_FOLDER"));
+	imageList->Add(ImageLibFile().Bitmap("BMP_FILE"));
+	imageList->Add(ImageLibFile().Bitmap("BMP_ERROR"));
+	imageList->Add(ImageLibFile().Bitmap("BMP_FILE_SELECTED"));
+	
+	SetImageList(imageList, wxIMAGE_LIST_SMALL);
+	
+	eventTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncFileViewListCtrl::onEventTimer), NULL, this);
+}
+/////////////////////////////////////////////////////////////
+CncFileViewListCtrl::~CncFileViewListCtrl() {
+/////////////////////////////////////////////////////////////
+	deleteAllEntries();
+	
+	if ( eventTimer->IsRunning() )
+		eventTimer->Stop();
+	
+	eventTimer->Disconnect(wxEVT_TIMER, wxTimerEventHandler(CncFileViewListCtrl::onEventTimer), NULL, this);
+	wxDELETE( eventTimer );
+}
+/////////////////////////////////////////////////////////////////////
+bool CncFileViewListCtrl::isItemValid(long item) const {
+/////////////////////////////////////////////////////////////////////
+	if( item < 0 || item > (long)(fileEntries.size() - 1) )
+		return false;
+		
+	return true;
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::deleteAllEntries() {
+/////////////////////////////////////////////////////////////////////
+	fileEntries.clear();
+	SetItemCount(fileEntries.size());
+	Refresh();
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::addFileEntry(const wxString& name, FileListImage fii) {
+/////////////////////////////////////////////////////////////////////
+	fileEntries.push_back(FileEntry(name, fii));
+	SetItemCount(fileEntries.size());
+	Refresh();
+}
+/////////////////////////////////////////////////////////////
+bool CncFileViewListCtrl::selectFileInList(const wxString& fileName) {
+/////////////////////////////////////////////////////////////
+	for ( auto it = fileEntries.begin(); it != fileEntries.end(); ++it ) {
+		
+		if ( it->fileName == fileName ) {
+			selectItem(std::distance(fileEntries.begin(), it), true);
+			return true;
+		}
+	}
+	
+	return false;
+}
+/////////////////////////////////////////////////////////////
+int CncFileViewListCtrl::OnGetItemColumnImage(long item, long column) const {
+/////////////////////////////////////////////////////////////
+	if ( isItemValid(item) == false )
+		return -1;
+		
+	if ( column != COL_FILE )
+		return -1;
+		
+	if ( fileEntries.at(item).imageIdx == FileListImage::FTI_FILE_SELECTED && item != getLastSelection() )
+		return FileListImage::FTI_FILE_SELECTED;
+		
+	return fileEntries.at(item).imageIdx;
+}
+/////////////////////////////////////////////////////////////////////
+wxString CncFileViewListCtrl::OnGetItemText(long item, long column) const {
+/////////////////////////////////////////////////////////////////////
+	if ( isItemValid(item) == false )
+		return _("");
+		
+	if ( column != COL_FILE )
+		return _("");
+	
+	return fileEntries.at(item).fileName;
+}
+/////////////////////////////////////////////////////////////
+wxListItemAttr* CncFileViewListCtrl::OnGetItemAttr(long item) const {
+/////////////////////////////////////////////////////////////
+	return (wxListItemAttr*)(item != getLastSelection() ? &defaultItemAttr : &selectedItemAttr);
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::updateColumnWidth() {
+/////////////////////////////////////////////////////////////////////
+	// avoid flicker
+	GblFunc::freeze(this, true);
+		
+	// try to strech the second (key) column
+	const int size = GetSize().GetWidth() - 26; 
+	
+	if ( size > GetColumnWidth(COL_STRECH) )
+		SetColumnWidth(COL_STRECH, size);
+		
+	GblFunc::freeze(this, false);
+}
+/////////////////////////////////////////////////////////////////////
+bool CncFileViewListCtrl::Enable(bool enable) {
+/////////////////////////////////////////////////////////////////////
+	GblFunc::freeze(this, !enable);
+	return CncLargeScaledListCtrl::Enable(enable); 
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::onSize(wxSizeEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	updateColumnWidth();
+	event.Skip(true);
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::onLeaveWindow(wxMouseEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	CncFileView* fv = static_cast<CncFileView*>(GetParent());
+	if ( fv == NULL )
+		return;
+	
+	fv->fileListLeave(event);
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::onSelectListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	CFVL_PRINT_LOCATION_CTX_FILE
+	
+	setLastSelection(event.GetIndex());
+	lastEventType = EventType::PREVIEW;
+	
+	// start a timer here to prevent the immediately call of 
+	// this event and to wait if a activate event follows.
+	// normal sequence: select, activate
+	if ( eventTimer->IsRunning() == false )
+		eventTimer->StartOnce(TimerEvent::SelectInterval);
+}
+/////////////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::onActivateListItem(wxListEvent& event) {
+/////////////////////////////////////////////////////////////////////
+	CFVL_PRINT_LOCATION_CTX_FILE
+	
+	lastEventType = EventType::OPEN;
+	
+	// in case of a previous select event the timer is still runing
+	// but if not stat a short timer here
+	// possible sequence select, <some longer time inmterval>,  activate
+	if ( eventTimer->IsRunning() == false )
+		eventTimer->StartOnce(TimerEvent::ActivateInterval);
+}
+//////////////////////////////////////////////////////////////
+void CncFileViewListCtrl::onEventTimer(wxTimerEvent& event) { 
+//////////////////////////////////////////////////////////////
+	CFVL_PRINT_LOCATION_CTX_FILE
+
+	CncFileView* fv = static_cast<CncFileView*>(GetParent());
+	if ( fv == NULL )
+		return;
+		
+	switch ( lastEventType ) {
+		case EventType::PREVIEW:	fv->fileListSelected(getLastSelection()); 	break;
+		case EventType::OPEN:		fv->fileListActivated(getLastSelection());	break;
+		default:					;
+	}
+	
+	lastEventType = EventType::UNKNOWN;
+}
+
+
+
+
+

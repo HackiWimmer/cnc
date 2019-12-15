@@ -14,7 +14,7 @@
   <object class="wxBitmap" name="chart-line-edit">bitmaps\chart-line-edit.png</object>
   <object class="wxBitmap" name="document-new-3">bitmaps\document-new-3.png</object>
   <object class="wxBitmap" name="document-open-5">bitmaps\document-open-5.png</object>
-  <object class="wxBitmap" name="folder-drag-accept-3 (2)">bitmaps\folder-drag-accept-3 (2).png</object>
   <object class="wxBitmap" name="go-up-search">bitmaps\go-up-search.png</object>
-  <object class="wxBitmap" name="refresh">bitmaps\refresh.png</object>
+  <object class="wxBitmap" name="view-refresh-3">bitmaps\view-refresh-3.png</object>
+  <object class="wxBitmap" name="workspace">bitmaps\workspace.png</object>
 </resource>

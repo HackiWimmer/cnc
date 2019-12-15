@@ -9,6 +9,7 @@
 #include <wx/cmdline.h>
 #include <wx/fileconf.h>
 #include <wx/intl.h>
+#include <wx/propgrid/property.h>
 #include "OSD/CncTimeFunctions.h"
 #include "CncLoggerProxy.h"
 #include "CncConfigProperty.h"

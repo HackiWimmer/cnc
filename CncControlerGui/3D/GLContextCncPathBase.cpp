@@ -3,6 +3,7 @@
 #include "3D/GLLabelCluster.h"
 #include "CncConfig.h"
 #include "3D/GLInclude.h"
+#include "3D/CncGLCanvas.h"
 #include <wx/bitmap.h>
 
 CncGLContextObserver* CncGLContextObserver::theObserver = NULL;
@@ -77,8 +78,10 @@ void CncGLContextObserver::switchContext(const GLContextCncPathBase* ctx) {
 		
 	currentContext = c;
 	
-	if ( callback )
+	if ( callback ) {
 		callback->nofifyForCurrent(currentContext->getContextName());
+		callback->nofifyMessage('I', currentContext->getContextName(), CNC_LOG_FUNCT, getRegisteredContextItemText(currentContext));
+	}
 }
 ///////////////////////////////////////////////////
 const wxString& CncGLContextObserver::getContextItemText(GLContextCncPathBase* ctx, long row, long column) const {
@@ -90,20 +93,29 @@ const wxString& CncGLContextObserver::getContextItemText(GLContextCncPathBase* c
 		else				retVal.assign(val != NULL ? val : "");
 	};
 	
+	const CncGlCanvas* canvas = static_cast<const CncGlCanvas*>(ctx->getAssociatedCanvas());
+	if ( canvas == NULL ) {
+		std::cerr << CNC_LOG_FUNCT << ": Invalid Canavs pointer!" << std::endl;
+		return retVal;
+	}
+	
 	// Note: row count limited by getContextValueCount()
 	switch ( ctx != NULL ? row : -42 ) {
 		case  0:		assign(column, "Context Name", 		ctx->getContextName()); break;
-		case  1:		assign(column, "Canvas Pointer", 	wxString::Format("%" PRIu64, (uint64_t)(ctx->getAssociatedCanvas()))); break;
-		case  2:		assign(column, "Current", 			wxString::Format("%s - (%" PRIu64 ")", ctx->isCurrent() ? "Yes" : "NO", (uint64_t)(GLContextBase::getCurrentCanvas()))); break;
+		case  1: 		assign(column, "Context isValid", 	wxString::Format("%s", 					canvas->isContextValid()   ? "Yes" : "No" )); break;
+		case  2:		assign(column, "Canvas Pointer", 	wxString::Format("%" PRIu64, 			(uint64_t)(ctx->getAssociatedCanvas())));     break;
+		case  3: 		assign(column, "Canvas isShown",	wxString::Format("%s", 					canvas->IsShown()          ? "Yes" : "No" )); break;
+		case  4: 		assign(column, "Canvas isShownOS",	wxString::Format("%s", 					canvas->IsShownOnScreen()  ? "Yes" : "No" )); break;
+		case  5:		assign(column, "Current", 			wxString::Format("%s - (%" PRIu64 ")", 	ctx->isCurrent() ? "Yes" : "No", (uint64_t)(GLContextBase::getCurrentCanvas()))); break;
 		
-		case  4:		assign(column, "Store ID", 			ctx->cncPath.getOpenGLBufferStore()->getInstanceFullName()); break;
-		case  5:		assign(column, "Vertex Count", 		wxString::Format("%u", ctx->cncPath.getOpenGLBufferStore()->getVertexCount())); break;
-		case  6:		assign(column, "Buffer Count", 		wxString::Format("%u", ctx->cncPath.getOpenGLBufferStore()->getBufferCount())); break;
-		case  7:		assign(column, "OpenGL Objects",	ctx->cncPath.getOpenGLBufferStore()->getVaoAndVboSummary()); break;
+		case  7:		assign(column, "Store ID", 			ctx->cncPath.getOpenGLBufferStore()->getInstanceFullName()); break;
+		case  8:		assign(column, "Vertex Count", 		wxString::Format("%lu", ctx->cncPath.getOpenGLBufferStore()->getVertexCount())); break;
+		case  9:		assign(column, "Buffer Count", 		wxString::Format("%u",  ctx->cncPath.getOpenGLBufferStore()->getBufferCount())); break;
+		case 10:		assign(column, "OpenGL Objects",	ctx->cncPath.getOpenGLBufferStore()->getVaoAndVboSummary()); break;
 		
-		case  9:		assign(column, "OpenGL State",		wxString::Format("%s", GLCommon::isGlAvailable() ? "Valid" : "Invalid" )); break;
-		case 10:		assign(column, "Glew State", 		wxString::Format("%s", GLCommon::isGlewAvailable() ? "Valid" : "Invalid")); break;
-		case 11:		assign(column, "Trace Level", 		wxString::Format("%d", GLCommon::getTraceLevel())); break;
+		case 11:		assign(column, "OpenGL State",		wxString::Format("%s", GLCommon::isGlAvailable()   ? "Valid" : "Invalid" )); break;
+		case 12:		assign(column, "Glew State", 		wxString::Format("%s", GLCommon::isGlewAvailable() ? "Valid" : "Invalid" )); break;
+		case 13:		assign(column, "Trace Level", 		wxString::Format("%d", GLCommon::getTraceLevel())); break;
 		
 		default:	retVal.clear();
 	}
@@ -114,6 +126,18 @@ const wxString& CncGLContextObserver::getContextItemText(GLContextCncPathBase* c
 const wxString& CncGLContextObserver::getCurrentContextItemText(long row, long column) const {
 ///////////////////////////////////////////////////
 	return getContextItemText(currentContext, row, column);
+}
+///////////////////////////////////////////////////
+const wxString& CncGLContextObserver::getRegisteredContextItemText(GLContextCncPathBase* ctx) const {
+///////////////////////////////////////////////////
+	for ( auto it=contextIdx.begin(); it != contextIdx.end(); ++it ) {
+		
+		if ( *it == ctx )
+			return getRegisteredContextItemText(std::distance(contextIdx.begin(), it), 1);
+		
+	}
+	
+	return _("No context information available");
 }
 ///////////////////////////////////////////////////
 const wxString& CncGLContextObserver::getRegisteredContextItemText(long row, long column) const {
@@ -133,10 +157,13 @@ const wxString& CncGLContextObserver::getRegisteredContextItemText(long row, lon
 		const unsigned int maxValues = getContextValueCount();
 		for (unsigned int i=1; i<maxValues; i++) {
 			
+			const wxString keyname(getContextItemText(ctx, i, 0));
 			const wxString parameter(getContextItemText(ctx, i, 1));
 			if ( parameter.IsEmpty() == false ) {
-				retVal.append(parameter);
-				if ( i < maxValues - 2 ) 	retVal.append(", ");
+				retVal.append(wxString::Format("%s=%s", keyname, parameter));
+				
+				if ( i < maxValues - 2 ) 
+					retVal.append(", ");
 			}
 		}
 	}
@@ -431,6 +458,5 @@ void GLContextCncPathBase::setCurrentClientId(long id) {
 	if ( entry < 0 )
 		return;
 
-	#warning use a control flag here
 	cncPath.setVirtualEnd(entry);
 }
