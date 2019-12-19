@@ -37,8 +37,6 @@ class CncGCodePreview : public CncGlCanvas {
 		void onSize(wxSizeEvent& event);
 		void onEraseBackground(wxEraseEvent& event);
 		
-		bool isAlreadyShown() { return isShown; }
-		
 		void setProgressDialog(CncAutoProgressDialog* dlg) { progressDialog = dlg; }
 		
 	protected:

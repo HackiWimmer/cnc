@@ -66,8 +66,6 @@ CncMotionMonitor::CncMotionMonitor(wxWindow *parent, int *attribList)
 	GLContextBase::globalInit(); 
 	monitor->init();
 	
-	//activateContext(monitor);
-
 	// Important: initialize the CncGlCanvas context
 	context = monitor;
 	
@@ -249,8 +247,8 @@ void CncMotionMonitor::onPaint() {
 
 	const wxSize cs = GetClientSize();
 	
-	if ( isShown )	monitor->reshape(cs.GetWidth(), cs.GetHeight());
-	else 			monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
+	if ( alreadyPainted )	monitor->reshape(cs.GetWidth(), cs.GetHeight());
+	else 					monitor->reshapeViewMode(cs.GetWidth(), cs.GetHeight());
 	
 	monitor->display();
 	
@@ -260,7 +258,7 @@ void CncMotionMonitor::onPaint() {
 	// The first onPaint() if IsShownOnScreen() == true have to reshape the view mode
 	// later this should not appear to support custom origin positions
 	// see if above
-	isShown = IsShown();
+	alreadyPainted = IsShown();
 	SwapBuffers();
 }
 //////////////////////////////////////////////////

@@ -78,14 +78,20 @@ void CncMonitorVSplitterWindow::toggleRightWindow() {
 ///////////////////////////////////////////////////////////////////
 void CncMonitorVSplitterWindow::showRightWindow(bool show) {
 ///////////////////////////////////////////////////////////////////
-	const int splitterWidth	= GetSize().GetWidth();
+	//const int splitterWidth	= IsShown() ? GetSize().GetWidth() : 2000;
+	const int splitterWidth	= 2000;
 	
+	CNC_PRINT_LOCATION
+	std::cout << "show = " << show <<  "; splitterWidth = " << splitterWidth << std::endl;
+
 	if ( show == false ) {
 		// Use a min pane size > 0, otherwise the pane may be disappears for ever
 		SetMinimumPaneSize(1);
 		SetSashGravity(1.0);
 		SetSashPosition(splitterWidth * 10);
 		
+		//SetSashInvisible(true);
+
 	} else {
 		SetMinimumPaneSize(20);
 		
@@ -95,6 +101,7 @@ void CncMonitorVSplitterWindow::showRightWindow(bool show) {
 		SetSashGravity((splitterWidth - lastRightWindowWidth) / splitterWidth);
 		SetSashPosition(splitterWidth - lastRightWindowWidth);
 		
+		//SetSashInvisible(false);
 	}
 }
 

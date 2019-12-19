@@ -185,7 +185,9 @@ bool CncLargeScaledListCtrl::isColumnValid(long column) const {
 ///////////////////////////////////////////////////////////////////
 void CncLargeScaledListCtrl::deselectAll(bool refresh) {
 ///////////////////////////////////////////////////////////////////
-	SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
+	if ( isItemValid(lastSelection) == true )
+		SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
+
 	lastSelection = wxNOT_FOUND;
 	
 	if ( refresh == true )
@@ -205,8 +207,10 @@ bool CncLargeScaledListCtrl::selectItem(long item, bool ensureVisible) {
 	const int itemState  = GetItemState(item, wxLIST_STATE_SELECTED);
 	
 	if ( itemState != wxLIST_STATE_SELECTED && blockSelectionEvent == false ) {
+
 		// deselect
-		SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
+		if ( isItemValid(lastSelection) == true )
+			SetItemState(lastSelection, 0, wxLIST_STATE_SELECTED);
 		
 		// select
 		SetItemState(item, wxLIST_STATE_SELECTED, wxLIST_STATE_SELECTED);

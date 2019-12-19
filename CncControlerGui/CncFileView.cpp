@@ -209,7 +209,7 @@ void CncFileView::fileListActivated(long item) {
 		case FTI::FTI_FILE:
 		case FTI::FTI_FILE_SELECTED:	name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
 										name.append(itemName);
-										CNC_PRINT_LOCATION
+
 										openFile(name);
 										break;
 							
@@ -270,23 +270,6 @@ void CncFileView::fileListSelected(long item) {
 	typedef CncFileViewListCtrl::FileListImage FTI;
 	switch ( (FTI)itemTyp ) {
 
-		/*
-		case FTI::FTI_FOLDER_UP:		if ( curDir.GetDirCount() > 0 )
-											curDir.RemoveLastDir();
-											
-										name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-										
-										lastSelection = name;
-										openDirectory(name);
-										break;
-							
-		case FTI::FTI_FOLDER:			name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
-										name.append(itemName);
-									
-										lastSelection = name;
-										openDirectory(name);
-										break;
-		*/
 		case FTI::FTI_FILE:
 		case FTI::FTI_FILE_SELECTED:	name.assign(curDir.GetPath(wxPATH_GET_SEPARATOR | wxPATH_GET_VOLUME));
 										name.append(itemName);

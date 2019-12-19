@@ -52,8 +52,6 @@
 #include "SvgEditPopup.h"
 #include "HexDecoder.h"
 #include "UnitTestFrame.h"
-#include "UpdateManagerThread.h"
-#include "GamepadThread.h"
 #include "CncReferencePosition.h"
 #include "CncSpeedMonitor.h"
 #include "CncUsbConnectionDetected.h"
@@ -99,6 +97,7 @@ unsigned int CncTransactionLock::referenceCounter   = 0;
 // app defined events
 	wxDEFINE_EVENT(wxEVT_UPDATE_MANAGER_THREAD, 			UpdateManagerEvent);
 	wxDEFINE_EVENT(wxEVT_GAMEPAD_THREAD, 					GamepadEvent);
+	wxDEFINE_EVENT(wxEVT_SERIAL_THREAD, 					SerialEvent);
 	wxDEFINE_EVENT(wxEVT_PERSPECTIVE_TIMER, 				wxTimerEvent);
 	wxDEFINE_EVENT(wxEVT_DEBUG_USER_NOTIFICATION_TIMER, 	wxTimerEvent);
 	wxDEFINE_EVENT(wxEVT_TRACE_FROM_THREAD,					wxThreadEvent);
@@ -180,6 +179,16 @@ MainFrameBase::MainFrameBase(wxWindow* parent)
 , controllerMsgHistory(	new CncTextCtrl   (this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, m_controllerMsgHistoryPlaceholder->GetWindowStyle() ))
 ////////////////////////////////////////////////////////////////////
 {
+	// If this timers are already started stop it here!
+	// This is with respect that they should be started only if all corresponding controls
+	// are well created, which takes a portion of time which will increase with the
+	// amount of controls.
+	// Restarting it at a later event (may be Show()) of class MainFrame will ensure that.
+
+	if ( m_startupTimer->IsRunning() )	m_startupTimer->Stop();
+	if ( m_serialTimer ->IsRunning() )	m_serialTimer ->Stop();
+	if ( m_traceTimer  ->IsRunning() )	m_traceTimer  ->Stop();
+
 	THE_FRAME = this;
 	
 	GblFunc::cloneAttributes(m_loggerPlaceholder, 					logger);
@@ -227,6 +236,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , GlobalConfigManager(this, GetPgMgrSetup(), globalConfig)
 , updateManagerThread(NULL)
 , gamepadThread(NULL)
+, serialThread(NULL)
 , isDebugMode(false)
 , isZeroReferenceValid(false)
 , canClose(true)
@@ -288,12 +298,15 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 ///////////////////////////////////////////////////////////////////
 	APPEND_THREAD_IDTO_STACK_TRACE_FILE;
 
-	// initilazied update mananger thread
+	// initialize update manager thread
 	initializeUpdateManagerThread();
 	
-	// initilazied gamepad thread
+	// initialize gamepad thread
 	initializeGamepadThread();
 	
+	// initialize serial thread
+	initializeSerialThread();
+
 	// setup aui clear
 	hideAllAuiPanes();
 	
@@ -318,10 +331,14 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostInfo,	 			this, MainFrame::EventId::POST_INFO);
 	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostWarning, 			this, MainFrame::EventId::POST_WARNING);
 	this->Bind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostError,	 			this, MainFrame::EventId::POST_ERROR);
-	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
-	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
-	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadUpadte, 			this, MainFrame::EventId::GAMEPAD_STATE);
-	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadHeartbeat, 		this, MainFrame::EventId::GAMEPAD_HEARTBEAT);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepadThreadInitialized,		this, MainFrame::EventId::INITIALIZED);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepadThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepadThreadUpadte, 			this, MainFrame::EventId::GAMEPAD_STATE);
+	this->Bind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepadThreadHeartbeat, 		this, MainFrame::EventId::GAMEPAD_HEARTBEAT);
+	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
+	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
+	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadHeartbeat, 		this, MainFrame::EventId::SERIAL_HEARTBEAT);
+	
 	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 			&MainFrame::onNavigatorPanel, 				this);
 	
 	const wxFont font = THE_CONTEXT->outboundListBookFont;
@@ -361,8 +378,14 @@ MainFrame::~MainFrame() {
 	this->Unbind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostInfo,	 			this, MainFrame::EventId::POST_INFO);
 	this->Unbind(wxEVT_TRACE_FROM_THREAD, 			&MainFrame::onThreadPostWarning, 			this, MainFrame::EventId::POST_WARNING);
 	this->Unbind(wxEVT_TRACE_FROM_THREAD,	 		&MainFrame::onThreadPostError,	 			this, MainFrame::EventId::POST_ERROR);
-	this->Unbind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepdThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
-	this->Unbind(wxEVT_GAMEPAD_THREAD,	 			&MainFrame::onGamepdThreadCompletion,	 	this, MainFrame::EventId::COMPLETED);
+	this->Unbind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepadThreadInitialized, 	this, MainFrame::EventId::INITIALIZED);
+	this->Unbind(wxEVT_GAMEPAD_THREAD,	 			&MainFrame::onGamepadThreadCompletion,	 	this, MainFrame::EventId::COMPLETED);
+	this->Unbind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepadThreadUpadte, 			this, MainFrame::EventId::GAMEPAD_STATE);
+	this->Unbind(wxEVT_GAMEPAD_THREAD, 				&MainFrame::onGamepadThreadHeartbeat, 		this, MainFrame::EventId::GAMEPAD_HEARTBEAT);
+	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
+	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
+	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadHeartbeat, 		this, MainFrame::EventId::SERIAL_HEARTBEAT);
+
 	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, 		&MainFrame::onNavigatorPanel, 				this);
 	
 	// explicit delete the motion monitor pointer here, beacause the motion monitor class
@@ -926,17 +949,17 @@ void MainFrame::displayReport(int id) {
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
+
+	const char* a1 	= "Stefan Hoelzer";
+	const int 	i	= 42;
+	const char* a2 	= "Sonja Mack";
 	
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
+	auto test2 = [a1, a2](int i) {
 
-		m_outboundNotebook->SetSelection(OutboundSelection::VAL::POSTPOCESSOR_PANAL);
-			m_listbookPostProcessor->SetSelection(PostProcessorSelection::VAL::OUTBOUND_PREVIEW);
+		std::cout << i << ": " << a1 << " + " << a2 << std::endl;
+	};
 
-		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
-
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
+	test2(i);
 
 }
 ///////////////////////////////////////////////////////////////////
@@ -944,28 +967,17 @@ void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
 
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
-
-		m_outboundNotebook->SetSelection(OutboundSelection::VAL::POSTPOCESSOR_PANAL);
-			m_listbookPostProcessor->SetSelection(PostProcessorSelection::VAL::OUTBOUND_PREVIEW);
+	toggleMotionMonitorOptionPane(true);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::CNC_PANEL);
-
-		m_outboundNotebook->SetSelection(OutboundSelection::VAL::MOTION_MONITOR_PANAL);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
-
-	m_monitorViewSelector->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
-	m_monitorViewBook->SetSelection(MonitorBookSelection::VAL::TEMPLATE_PANEL);
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
@@ -1117,10 +1129,6 @@ void MainFrame::startupTimer(wxTimerEvent& event) {
 				}
 			}
 		}
-		
-		// GTK specific: This is to hide the corresponding windows
-		toggleMotionMonitorOptionPane(true);
-		toggleMotionMonitorStatisticPane(true);
 		
 		// wait until the mainframe is shown on screen
 		ts1 = CncTimeFunctions::getNanoTimestamp();
@@ -1445,18 +1453,18 @@ void MainFrame::onThreadPostError(wxThreadEvent& event) {
 		std::cerr << event.GetString() << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onGamepdThreadInitialized(GamepadEvent& event) {
+void MainFrame::onGamepadThreadInitialized(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	//std::cout << "MainFrame::onGamepdThreadInitilaized" << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onGamepdThreadCompletion(GamepadEvent& event) {
+void MainFrame::onGamepadThreadCompletion(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	std::clog << CNC_LOG_FUNCT << std::endl;
 	gamepadThread = NULL;
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onGamepdThreadHeartbeat(GamepadEvent& event) {
+void MainFrame::onGamepadThreadHeartbeat(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	decorateGamepadState(event.data.connected);
 	
@@ -1466,15 +1474,31 @@ void MainFrame::onGamepdThreadHeartbeat(GamepadEvent& event) {
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void MainFrame::onGamepdThreadUpadte(GamepadEvent& event) {
+void MainFrame::onGamepadThreadUpadte(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	onGamepdThreadHeartbeat(event);
+	onGamepadThreadHeartbeat(event);
 	
 	if ( event.data.connected == false )
 		return;
 	
 	if ( cncGameportDlg )
 		cncGameportDlg->update(event);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSerialThreadInitialized(SerialEvent& event) {
+///////////////////////////////////////////////////////////////////
+	std::cout << CNC_LOG_LOCATION << std::endl;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSerialThreadCompletion(SerialEvent& event) {
+///////////////////////////////////////////////////////////////////
+	std::cout << CNC_LOG_LOCATION << std::endl;
+	serialThread = NULL;
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSerialThreadHeartbeat(SerialEvent& event) {
+///////////////////////////////////////////////////////////////////
+	std::cout << CNC_LOG_LOCATION << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
@@ -1545,6 +1569,27 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		 
 	}
 	
+	// Destroy the serial thread
+	if ( serialThread != NULL) {
+		if ( serialThread->IsRunning() == false) {
+			wxCriticalSectionLocker enter(pSerialThreadCS);
+			serialThread->Resume();
+		}
+		
+		serialThread->stop();
+		
+		while ( true ) {
+			{ // was the ~GamepadThread() function executed?
+				wxCriticalSectionLocker enter(pSerialThreadCS);
+				if ( !serialThread ) 
+					break;
+			}
+			// wait for thread completion
+			wxThread::This()->Sleep(10);
+		}
+		 
+	}
+
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
@@ -1859,11 +1904,52 @@ void MainFrame::initializeGamepadThread() {
 	activateGamepadNotifications(true);
 }
 ///////////////////////////////////////////////////////////////////
+void MainFrame::initializeSerialThread() {
+///////////////////////////////////////////////////////////////////
+	// create the thread
+	serialThread = new SerialThread(this);
+	wxThreadError error = serialThread->Create();
+
+	if (error != wxTHREAD_NO_ERROR) {
+		wxMessageBox( _("Couldn't create serial thread!") );
+		abort();
+	}
+	
+	error = serialThread->Run();
+	if (error != wxTHREAD_NO_ERROR) {
+		wxMessageBox( _("Couldn't run serial thread!") );
+		abort();
+	}
+}
+///////////////////////////////////////////////////////////////////
 bool MainFrame::Show(bool show) {
 ///////////////////////////////////////////////////////////////////
 	bool ret = MainFrameBClass::Show(show);
-	
-	APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Result = %d", ret));
+
+	if ( show == true )  {
+		toggleMotionMonitorOptionPane(true);
+		toggleMotionMonitorStatisticPane(true);
+
+		auto startTimer = [](wxTimer* timer, unsigned int value, const char* name) {
+
+			if ( timer->IsRunning() == false) {
+				timer->Start(value);
+
+				APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Call %s->Start(%d)", name, value));
+
+			} else {
+				APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("%s [%d] already started", name, timer->GetInterval()));
+			}
+		};
+
+		// Now all controls are well created, this is the perfect time to (re)start these timers
+		startTimer(m_startupTimer,	250, "m_startupTimer");
+		startTimer(m_serialTimer,	500, "m_serialTimer" );
+		startTimer(m_traceTimer,	500, "m_traceTimer"  );
+	}
+
+	APPEND_LOCATION_TO_STACK_TRACE_FILE_A(wxString::Format("Result = %d; show = %d", ret, show));
+
 	return ret;
 }
 ///////////////////////////////////////////////////////////////////
@@ -1880,8 +1966,6 @@ void MainFrame::initialize(void) {
 	changeManuallySpeedValue();
 	initSpeedConfigPlayground();
 	decorateOutboundSaveControls(false);
-	toggleMotionMonitorOptionPane(true);
-	toggleMotionMonitorStatisticPane(true);
 
 	// init config pages
 	GetConfigurationToolbook()->SetSelection(0);
@@ -7742,7 +7826,7 @@ void MainFrame::toggleMotionMonitorStatisticPane(bool forceHide) {
 		if ( cnc3DHSplitterWindow->isBottomWindowShown() ) {
 			cnc3DHSplitterWindow->hideBottomWindow();
 			
-			if ( nc != cc)
+			if ( nc != cc )
 				forceHide == true ? cnc3DHSplitterWindow->hideBottomWindow() : cnc3DHSplitterWindow->showBottomWindow();
 				
 		} else {

@@ -8,7 +8,7 @@ CncGlCanvas::CncGlCanvas(wxWindow *parent, int *attribList)
 : wxGLCanvas(parent, wxID_ANY, attribList, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
 , context(NULL)
 , lastReshape()
-, isShown(false)
+, alreadyPainted(false)
 , lastSetCurrent(false)
 , mouseMoveMode(false)
 {
@@ -46,7 +46,7 @@ bool CncGlCanvas::activateContext(GLContextBase* context, const wxGLCanvas &win,
 		return lastSetCurrent;
 	} 
 	
-	if ( IsShown() ) {
+	if ( win.IsShown() ) {
 		lastSetCurrent = context->SetCurrent(win);
 		return lastSetCurrent;
 	}

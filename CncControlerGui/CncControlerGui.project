@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="CncConrollerGui" InternalType="GUI" Version="11000">
+  <VirtualDirectory Name="cmake">
+    <File Name="../CMakeListsSourceFiles.txt"/>
+    <File Name="../CMakeListsMain.txt"/>
+    <File Name="../CMakeLists.ubuntu.txt"/>
+    <File Name="../CMakeLists.txt"/>
+    <File Name="../CMakeLists.debian.txt"/>
+    <File Name="../CMakeLists.db.txt"/>
+  </VirtualDirectory>
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
@@ -155,6 +163,12 @@
       <File Name="3D/CncGCodePreview.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
+      <File Name="SerialThreadStub.cpp"/>
+      <File Name="SerialThreadStub.h"/>
+      <VirtualDirectory Name="Utils">
+        <File Name="SerialCircularBuffer.cpp"/>
+        <File Name="SerialCircularBuffer.h"/>
+      </VirtualDirectory>
       <VirtualDirectory Name="OSD">
         <File Name="OSD/SerialMsw.cpp"/>
         <File Name="OSD/SerialOSD.h"/>
@@ -336,6 +350,8 @@
       <File Name="wxCrafterContextObserver.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
+      <File Name="SerialThread.cpp"/>
+      <File Name="SerialThread.h"/>
       <File Name="MainFrameDummy.h"/>
       <File Name="MainFrameDummy.cpp"/>
       <File Name="MainFrameProxy.h"/>

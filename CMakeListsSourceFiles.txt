@@ -99,6 +99,9 @@ set(SOURCE_FILES
 	CncControlerGui/GamepadThread.cpp
 	CncControlerGui/CncBinaryTemplateStreamer.cpp
 	CncControlerGui/SVGPathHandlerBase.cpp
+	CncControlerGui/SerialCircularBuffer.cpp
+	CncControlerGui/SerialThreadStub.cpp
+	CncControlerGui/SerialThread.cpp
 	CncControlerGui/SerialEmulatorBinaryStreamer.cpp
 	CncControlerGui/SerialEmulatorGCodeStreamer.cpp
 	CncControlerGui/SerialEmulatorSvgStreamer.cpp

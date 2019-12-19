@@ -6,11 +6,12 @@
 #include <wx/notifmsg.h>
 #include <wx/generic/notifmsg.h>
 #include <wx/event.h>
+#include "UpdateManagerThread.h"
+#include "GamepadThread.h"
+#include "SerialThread.h"
 #include "NotebookInfo.h"
 #include "FileParser.h"
 #include "BinaryFileParser.h"
-#include "UpdateManagerThread.h"
-#include "GamepadThread.h"
 #include "CncControl.h"
 #include "CncPerspective.h"
 #include "CncMotionMonitor.h"
@@ -38,6 +39,7 @@ class wxFileConfig;
 class GL3DOptionPane;
 class GL3DDrawPane;
 
+class SerialTreadStub;
 class CncSourceEditor;
 class CncOutboundEditor;
 class CncFilePreviewWnd;
@@ -399,10 +401,13 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void onThreadPostInfo(wxThreadEvent& event);
 		void onThreadPostWarning(wxThreadEvent& event);
 		void onThreadPostError(wxThreadEvent& event);
-		void onGamepdThreadInitialized(GamepadEvent& event);
-		void onGamepdThreadCompletion(GamepadEvent& event);
-		void onGamepdThreadUpadte(GamepadEvent& event);
-		void onGamepdThreadHeartbeat(GamepadEvent& event);
+		void onGamepadThreadInitialized(GamepadEvent& event);
+		void onGamepadThreadCompletion(GamepadEvent& event);
+		void onGamepadThreadUpadte(GamepadEvent& event);
+		void onGamepadThreadHeartbeat(GamepadEvent& event);
+		void onSerialThreadInitialized(SerialEvent& event);
+		void onSerialThreadCompletion(SerialEvent& event);
+		void onSerialThreadHeartbeat(SerialEvent& event);
 		
 		void onNavigatorPanel(CncNavigatorPanelEvent& event);
 		
@@ -430,7 +435,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 						POST_WARNING 		=  8, 
 						POST_ERROR 			=  9,
 						GAMEPAD_STATE		= 10,
-						GAMEPAD_HEARTBEAT	= 11
+						GAMEPAD_HEARTBEAT	= 11,
+						SERIAL_HEARTBEAT	= 12
 					  };
 					  
 		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
@@ -521,6 +527,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		GamepadThread* gamepadThread;
 		wxCriticalSection pGamepadThreadCS;
 		
+		SerialThread* serialThread;
+		wxCriticalSection pSerialThreadCS;
+
 		CncControl* getCncControl() 						{ return cnc; }
 		CncPreprocessor* getCncPreProcessor()				{ return cncPreprocessor; }
 		
@@ -552,6 +561,11 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 		
+		bool isSerialThreadInstalled()	{ return serialThread != NULL; }
+		bool isSerialThreadRunning() 	{ return serialThread ? serialThread->IsRunning() : false; }
+		void resumeSerialThread() 		{ if ( serialThread ) serialThread->Resume() ; }
+		void pauseSerialThread()		{ if ( serialThread ) serialThread->Pause();  }
+		
 		friend class MainFrameProxy;
 		friend class CncLoggerProxy;
 		friend class CncPerspective;
@@ -565,6 +579,8 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 		friend class UpdateManagerThread;
 		friend class GamepadThread;
+		friend class SerialThread;
+		friend class SerialThreadStub;
 
 		// to remove . . .
 			friend class CncFileView;
@@ -727,6 +743,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		bool initializeCncControl();
 		void initializeUpdateManagerThread();
 		void initializeGamepadThread();
+		void initializeSerialThread();
 		bool initializeLruMenu();
 		bool openInitialTemplateFile();
 		
