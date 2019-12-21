@@ -7,8 +7,8 @@
 #include <wx/generic/notifmsg.h>
 #include <wx/event.h>
 #include "UpdateManagerThread.h"
-#include "GamepadThread.h"
-#include "SerialThread.h"
+#include "GamepadEvent.h"
+#include "SerialEvent.h"
 #include "NotebookInfo.h"
 #include "FileParser.h"
 #include "BinaryFileParser.h"
@@ -39,7 +39,12 @@ class wxFileConfig;
 class GL3DOptionPane;
 class GL3DDrawPane;
 
-class SerialTreadStub;
+class GamepadThread;
+
+class SerialThread;
+class SerialThreadStub;
+class CncLoggerProxy;
+
 class CncSourceEditor;
 class CncOutboundEditor;
 class CncFilePreviewWnd;
@@ -59,6 +64,7 @@ class CncMotionVertexTrace;
 class CncOpenGLContextObserver;
 class CncOSEnvironmentDialog;
 class CncExternalViewBox;
+class CncArduinoEnvironment;
 
 ////////////////////////////////////////////////////////////////////
 
@@ -129,6 +135,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 
 	// User commands
 	protected:
+		
 		virtual void onChangePreviewMode(wxCommandEvent& event);
 		virtual void connectSec(wxCommandEvent& event);
 		virtual void selectPortSec(wxCommandEvent& event);
@@ -327,6 +334,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		virtual void openCalculator(wxCommandEvent& event);
 		virtual void selectPort(wxCommandEvent& event);
 		virtual void requestVersion(wxCommandEvent& event);
+		virtual void requestTimestamp(wxCommandEvent& event);
 		virtual void requestCurrentPos(wxCommandEvent& event);
 		virtual void requestCurrentLimitState(wxCommandEvent& event);
 		virtual void requestConfig(wxCommandEvent& event);
@@ -408,6 +416,9 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void onSerialThreadInitialized(SerialEvent& event);
 		void onSerialThreadCompletion(SerialEvent& event);
 		void onSerialThreadHeartbeat(SerialEvent& event);
+		void onSerialThreadMessage(SerialEvent& event);
+		void onSerialThreadData(SerialEvent& event);
+		void onSerialThreadPinNotification(SerialEvent& event);
 		
 		void onNavigatorPanel(CncNavigatorPanelEvent& event);
 		
@@ -425,18 +436,21 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		wxDECLARE_EVENT_TABLE();
 		
 	public:
-		enum EventId { 	INITIALIZED 		=  1,
-						COMPLETED 			=  2,
-						HEARTBEAT 			=  3, 
-						APP_POS_UPDATE 		=  4, 
-						CTL_POS_UPDATE 		=  5, 
-						DISPATCH_ALL 		=  6, 
-						POST_INFO 			=  7, 
-						POST_WARNING 		=  8, 
-						POST_ERROR 			=  9,
-						GAMEPAD_STATE		= 10,
-						GAMEPAD_HEARTBEAT	= 11,
-						SERIAL_HEARTBEAT	= 12
+		enum EventId { 	INITIALIZED 				=  1,
+						COMPLETED 					=  2,
+						HEARTBEAT 					=  3, 
+						APP_POS_UPDATE 				=  4, 
+						CTL_POS_UPDATE 				=  5, 
+						DISPATCH_ALL 				=  6, 
+						POST_INFO 					=  7, 
+						POST_WARNING 				=  8, 
+						POST_ERROR 					=  9,
+						GAMEPAD_STATE				= 10,
+						GAMEPAD_HEARTBEAT			= 11,
+						SERIAL_HEARTBEAT			= 12,
+						SERIAL_MESSAGE				= 13,
+						SERIAL_DATA					= 14,
+						SERIAL_PIN_NOTIFICATION		= 15
 					  };
 					  
 		enum class RunConfirmationInfo {Wait, Confirmed, Canceled};
@@ -561,10 +575,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		void enableControls(bool state = true);
 		void disableControls() { enableControls(false); }
 		
-		bool isSerialThreadInstalled()	{ return serialThread != NULL; }
-		bool isSerialThreadRunning() 	{ return serialThread ? serialThread->IsRunning() : false; }
-		void resumeSerialThread() 		{ if ( serialThread ) serialThread->Resume() ; }
-		void pauseSerialThread()		{ if ( serialThread ) serialThread->Pause();  }
+		SerialThread* getSerialThread(SerialThreadStub* sts);
 		
 		friend class MainFrameProxy;
 		friend class CncLoggerProxy;
@@ -640,6 +651,7 @@ class MainFrame : public MainFrameBase, public GlobalConfigManager {
 		CncOpenGLContextObserver*		openGLContextObserver;
 		CncOSEnvironmentDialog* 		cncOsEnvDialog;
 		CncExternalViewBox* 			cncExtMainPreview;
+		CncArduinoEnvironment*			cncArduinoEnvironment;
 		
 		CncPerspective perspectiveHandler;
 		wxFileConfig* config;

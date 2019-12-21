@@ -7059,7 +7059,7 @@ Preview</label>
                               <object class="sizeritem">
                                 <flag>wxALL|wxEXPAND</flag>
                                 <object class="wxTextCtrl" name="m_loggerPlaceholder">
-                                  <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL</style>
+                                  <style>wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxVSCROLL</style>
                                   <bg>#000000</bg>
                                   <font>
                                     <size>10</size>
@@ -8464,6 +8464,18 @@ State</label>
               <border>1</border>
               <object class="wxStaticLine" name="m_staticLine6023412">
                 <style>wxLI_VERTICAL</style>
+              </object>
+            </object>
+            <object class="sizeritem">
+              <flag>wxALL</flag>
+              <border>4</border>
+              <minsize>17,17</minsize>
+              <object class="wxStaticBitmap" name="m_serialThreadHeartbeat">
+                <bitmap>bitmaps/bookmark-toolbar.png</bitmap>
+                <size>17,17</size>
+                <tooltip>
+                  <![CDATA[Serial Thread Heartbeat]]>
+                </tooltip>
               </object>
             </object>
             <object class="sizeritem">
@@ -10601,8 +10613,15 @@ State</label>
           <checked>1</checked>
         </object>
         <object class="separator"/>
+        <object class="wxMenuItem" name="m_miRqtTimestamp">
+          <label>Sketch Timestamp</label>
+          <bitmap>bitmaps/time.png</bitmap>
+          <accel>
+            <![CDATA[]]>
+          </accel>
+        </object>
         <object class="wxMenuItem" name="m_miRqtVersion">
-          <label>Software Version</label>
+          <label>Sketch Version</label>
           <bitmap>bitmaps/enumerator.png</bitmap>
           <accel>
             <![CDATA[]]>

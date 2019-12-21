@@ -454,11 +454,27 @@ CncConnectProgressBase::CncConnectProgressBase(wxWindow* parent, wxWindowID id, 
     
     flexGridSizer5591->Add(m_staticText5589, 0, wxALL|wxEXPAND, WXC_FROM_DIP(5));
     
+    wxFlexGridSizer* flexGridSizer169 = new wxFlexGridSizer(1, 2, 0, 0);
+    flexGridSizer169->SetFlexibleDirection( wxBOTH );
+    flexGridSizer169->SetNonFlexibleGrowMode( wxFLEX_GROWMODE_SPECIFIED );
+    flexGridSizer169->AddGrowableCol(0);
+    flexGridSizer169->AddGrowableRow(0);
+    
+    flexGridSizer5591->Add(flexGridSizer169, 0, wxALL, WXC_FROM_DIP(5));
+    
     m_connectActivityPanel = new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(this, wxSize(120,16)), wxTAB_TRAVERSAL);
     m_connectActivityPanel->SetBackgroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_BTNFACE));
     
-    flexGridSizer5591->Add(m_connectActivityPanel, 0, wxALL, WXC_FROM_DIP(5));
+    flexGridSizer169->Add(m_connectActivityPanel, 0, wxALL, WXC_FROM_DIP(5));
     m_connectActivityPanel->SetMinSize(wxSize(120,16));
+    
+    m_observeCounterLabel = new wxStaticText(this, wxID_ANY, _("0"), wxDefaultPosition, wxDLG_UNIT(this, wxSize(30,-1)), wxALIGN_RIGHT);
+    m_observeCounterLabel->SetForegroundColour(wxSystemSettings::GetColour(wxSYS_COLOUR_HIGHLIGHT));
+    wxFont m_observeCounterLabelFont(9, wxFONTFAMILY_SWISS, wxFONTSTYLE_ITALIC, wxFONTWEIGHT_BOLD, false, wxT("Segoe UI"));
+    m_observeCounterLabel->SetFont(m_observeCounterLabelFont);
+    
+    flexGridSizer169->Add(m_observeCounterLabel, 0, wxALL, WXC_FROM_DIP(5));
+    m_observeCounterLabel->SetMinSize(wxSize(30,-1));
     
     SetName(wxT("CncConnectProgressBase"));
     SetSize(-1,-1);

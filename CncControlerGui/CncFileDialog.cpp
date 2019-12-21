@@ -52,13 +52,8 @@ bool CncFileDialogLRUList::processSelectedItem() {
 	std::cout << getFileDialog() << std::endl;
 	
 	CncFileDialog* fd = getFileDialog();
-	if ( fd != NULL ) {
-		//fd->SetPath(GetItemText(lastSelection, COL_FILE));
-		
-		#warning
-		fd->SetPath("C:\\@Development\\@Projekte\\CNC-Templates\\");
-		fd->SetFilename("@NC-Test.gcode");
-	}
+	if ( fd != NULL ) 
+		fd->SetPath(GetItemText(lastSelection, COL_FILE));
 	
 	return true;
 }

@@ -377,7 +377,7 @@ class Serial : public SerialOSD {
 		//Flush any remaining characters in the serial buffers 
 		virtual void purge(void);
 		// read all remaining bytes from serial to /dev/null
-		virtual void clearRemainingBytes(bool trace=false);
+		virtual bool clearRemainingBytes(bool trace=false);
 		
 
 		virtual const char* getPortName() 						{ return portName.c_str(); }
@@ -459,6 +459,8 @@ class Serial : public SerialOSD {
 		double getMeasuredFeedSpeed_MM_MIN() 		{ return measuredFeedSpeed_MM_SEC * 60; }
 		double getMeasuredFeedSpeed_MM_SEC() 		{ return measuredFeedSpeed_MM_SEC; }
 		virtual void traceSpeedInformation() 		{}
+
+		virtual void notifySetupSuccesfullyFinsihed() {}
 
 		// test behavior only
 		virtual bool test();

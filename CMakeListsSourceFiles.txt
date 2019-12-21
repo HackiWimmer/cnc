@@ -95,17 +95,27 @@ set(SOURCE_FILES
 	CncControlerGui/CncReferencePosition.cpp
 	CncControlerGui/CncConnectProgress.cpp
 	CncControlerGui/CfgAccelerationGraph.cpp
-	CncControlerGui/CncGamepadControllerState.cpp
-	CncControlerGui/GamepadThread.cpp
 	CncControlerGui/CncBinaryTemplateStreamer.cpp
 	CncControlerGui/SVGPathHandlerBase.cpp
+	
+	CncControlerGui/CncGamepadControllerState.cpp
+	CncControlerGui/GamepadEvent.cpp
+	CncControlerGui/GamepadThread.cpp
+	
+	CncControlerGui/BaseEndPoint.cpp
+	CncControlerGui/WireCircularBuffer.cpp
+	CncControlerGui/WireEndPoint.cpp
 	CncControlerGui/SerialCircularBuffer.cpp
+	CncControlerGui/SerialEndPoint.cpp
 	CncControlerGui/SerialThreadStub.cpp
 	CncControlerGui/SerialThread.cpp
+	CncControlerGui/SerialAdminChannel.cpp
+	
 	CncControlerGui/SerialEmulatorBinaryStreamer.cpp
 	CncControlerGui/SerialEmulatorGCodeStreamer.cpp
 	CncControlerGui/SerialEmulatorSvgStreamer.cpp
 	CncControlerGui/SerialEmulatorTextStreamer.cpp
+	
 	CncControlerGui/sha1.cpp
 	CncControlerGui/GL3DOptionPane.cpp
 	CncControlerGui/GL3DDrawPane.cpp
@@ -135,6 +145,7 @@ set(SOURCE_FILES
 	CncControlerGui/CncMotionVertexTrace.cpp
 	CncControlerGui/CncParsingSynopsisTrace.cpp
 	CncControlerGui/CncParsingSynopsisTraceListCtrl.cpp	
+	CncControlerGui/CncMessageListCtrl.cpp
 	CncControlerGui/CncLoggerProxy.cpp
 	CncControlerGui/CncOpenGLContextObserver.cpp
 	CncControlerGui/CncOpenGLContextObserverListCtrl.cpp
@@ -143,6 +154,11 @@ set(SOURCE_FILES
 	CncControlerGui/CncExternalViewBox.cpp
 	CncControlerGui/CncUserEvents.cpp
 	CncControlerGui/CncFileDialog.cpp
+	
+	CncControlerGui/CncArduinoEnvironment.cpp
+	CncControlerGui/ArduinoData.cpp
+	CncControlerGui/ArduinoEnvWrapper.cpp
+	CncControlerGui/CncArduinoPinsListCtrl.cpp
 	
 	CncControlerGui/wxCrafterContextObserver.cpp
 	CncControlerGui/wxCrafterContextObserver_bitmaps.cpp
@@ -172,4 +188,6 @@ set(SOURCE_FILES
 	CncControlerGui/wxCrafterFileView_bitmaps.cpp
 	CncControlerGui/wxCrafterMotionMonitor.cpp
 	CncControlerGui/wxCrafterMotionMonitor_bitmaps.cpp
+	CncControlerGui/wxCrafterArduinoEnv.cpp
+	CncControlerGui/wxCrafterArduinoEnv_bitmaps.cpp
 )

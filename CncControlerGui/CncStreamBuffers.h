@@ -3,9 +3,10 @@
 
 #include <sstream>
 #include <wx/listctrl.h>
-#include "CncLoggerProxy.h"
 
 ///////////////////////////////////////////////////////////////////
+class CncTextCtrl;
+class CncLoggerProxy;
 class LoggerStreamBuf : public std::streambuf {
 	
 	private:
@@ -194,19 +195,7 @@ class CncTraceLogStream : public CncBasicLogStream {
 		wxColour debugColour;
 		
 		///////////////////////////////////////////////////////////
-		virtual void logMessage(const char* m) {
-			clear();
-			
-			if ( m == NULL )
-				return;
-				
-			wxString msg(m);
-			msg.Replace("\n", " ", true);
-			msg.Replace("\r", "", true);
-			
-			if ( getTextControl() != NULL )
-				getTextControl()->AppendText(msg);
-		}
+		virtual void logMessage(const char* m);
 		
 		///////////////////////////////////////////////////////////
 		CncTextCtrl* getTextControl() const {
@@ -240,74 +229,36 @@ class CncTraceLogStream : public CncBasicLogStream {
 		{}
 
 		///////////////////////////////////////////////////////////
-		void clear() {
-			if ( getTextControl() != NULL ) {
-				getTextControl()->Clear();
-			}
-		}
-		
-		///////////////////////////////////////////////////////////
-		void logInfoMessage(const char* m) {
-			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(infoColour));
-				logMessage(m);
-			}
-		}
-		
-		///////////////////////////////////////////////////////////
-		void logWarningMessage(const char* m) {
-			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(warningColour));
-				logMessage(m);
-			}
-		}
-		
-		///////////////////////////////////////////////////////////
-		void logErrorMessage(const char* m) {
-			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(errorColour));
-				logMessage(m);
-			}
-		}
-		
-		///////////////////////////////////////////////////////////
-		void logDebugMessage(const char* m) {
-			if ( getTextControl() != NULL ) {
-				getTextControl()->SetDefaultStyle(wxTextAttr(debugColour));
-				logMessage(m);
-			}
-		}
+		void clear();
+		void logInfoMessage		(const char* m);
+		void logWarningMessage	(const char* m);
+		void logErrorMessage	(const char* m);
+		void logDebugMessage	(const char* m);
 
 		///////////////////////////////////////////////////////////
-		void setInfoColour(const wxColour& c) 		{ infoColour = c; }
-		void setWarningColour(const wxColour& c) 	{ warningColour = c; }
-		void setErrorColour(const wxColour& c) 		{ errorColour = c; }
-		void setDebugColour(const wxColour& c) 		{ debugColour = c; }
+		void setInfoColour		(const wxColour& c) 	{ infoColour 	= c; }
+		void setWarningColour	(const wxColour& c) 	{ warningColour = c; }
+		void setErrorColour		(const wxColour& c) 	{ errorColour 	= c; }
+		void setDebugColour		(const wxColour& c) 	{ debugColour 	= c; }
 		
 		///////////////////////////////////////////////////////////
-		void logInfo(const char* m) 	{ logInfoMessage(m); }
-		void logWarning(const char* m) 	{ logWarningMessage(m); }
-		void logError(const char* m) 	{ logErrorMessage(m); }
-		void logDebug(const char* m) 	{ logDebugMessage(m); }
+		void logInfo	(const char* m) 	{ logInfoMessage(m);    }
+		void logWarning	(const char* m) 	{ logWarningMessage(m); }
+		void logError	(const char* m) 	{ logErrorMessage(m);   }
+		void logDebug	(const char* m) 	{ logDebugMessage(m);   }
 		
 		///////////////////////////////////////////////////////////
-		void logInfoMessage(const std::stringstream& ss) 	{ logInfoMessage(ss.str().c_str()); }
-		void logWarningMessage(const std::stringstream& ss)	{ logWarningMessage(ss.str().c_str()); }
-		void logErrorMessage(const std::stringstream& ss) 	{ logErrorMessage(ss.str().c_str()); }
-		void logDebugMessage(const std::stringstream& ss) 	{ logDebugMessage(ss.str().c_str()); }
+		void logInfoMessage		(const std::stringstream& ss) 	{ logInfoMessage(ss.str().c_str()); }
+		void logWarningMessage	(const std::stringstream& ss)	{ logWarningMessage(ss.str().c_str()); }
+		void logErrorMessage	(const std::stringstream& ss) 	{ logErrorMessage(ss.str().c_str()); }
+		void logDebugMessage	(const std::stringstream& ss) 	{ logDebugMessage(ss.str().c_str()); }
 		
-		void logInfo(const std::stringstream& ss) 			{ logInfoMessage(ss.str().c_str()); }
-		void logWarning(const std::stringstream& ss)		{ logWarningMessage(ss.str().c_str()); }
-		void logError(const std::stringstream& ss) 			{ logErrorMessage(ss.str().c_str()); }
-		void logDebug(const std::stringstream& ss) 			{ logDebugMessage(ss.str().c_str()); }
+		void logInfo	(const std::stringstream& ss) 			{ logInfoMessage(ss.str().c_str()); }
+		void logWarning	(const std::stringstream& ss)			{ logWarningMessage(ss.str().c_str()); }
+		void logError	(const std::stringstream& ss) 			{ logErrorMessage(ss.str().c_str()); }
+		void logDebug	(const std::stringstream& ss) 			{ logDebugMessage(ss.str().c_str()); }
 		
-		///////////////////////////////////////////////////////////
-		const char* getCurrentMessage() const {
-			if ( getTextControl() == NULL)
-				return "";
-				
-			return getTextControl()->GetValue();
-		}
+		const char* getCurrentMessage() const;
 };
 
 ///////////////////////////////////////////////////////////////////
@@ -315,13 +266,7 @@ class CncMsgLogStream : public CncTraceLogStream {
 	
 	protected:
 		///////////////////////////////////////////////////////////
-		virtual void logMessage(const char* m) {
-			if ( m == NULL )
-				return;
-				
-			if ( getTextControl() != NULL )
-				getTextControl()->AppendText(m);
-		}
+		virtual void logMessage(const char* m);
 		
 	public:
 		///////////////////////////////////////////////////////////
@@ -371,21 +316,21 @@ class CncSerialSpyStream : public CncTraceLogStream {
 		}
 		
 		///////////////////////////////////////////////////////////
-		void logCommand(const wxString& cmd);
-		void addMarker(const wxString& mt);
-		void enableMessage(const char* additional = NULL);
-		void disableMessage(const char* additional = NULL);
+		void logCommand				(const wxString& cmd);
+		void addMarker				(const wxString& mt);
+		void enableMessage			(const char* additional = NULL);
+		void disableMessage			(const char* additional = NULL);
 		
 		///////////////////////////////////////////////////////////
 		void initializeResult(const char* msg = NULL);
 		
-		void finalizeRET_OK(const char* msg = NULL);
-		void finalizeRET_MORE(const char* msg = NULL);
-		void finalizeRET_ERROR(const char* msg = NULL );
-		void finalizeRET_LIMIT(const char* msg = NULL );
-		void finalizeRET_INTERRUPT(const char* msg = NULL );
-		void finalizeRET_HALT(const char* msg = NULL );
-		void finalizeRET_QUIT(const char* msg = NULL );
+		void finalizeRET_OK			(const char* msg = NULL);
+		void finalizeRET_MORE		(const char* msg = NULL);
+		void finalizeRET_ERROR		(const char* msg = NULL );
+		void finalizeRET_LIMIT		(const char* msg = NULL );
+		void finalizeRET_INTERRUPT	(const char* msg = NULL );
+		void finalizeRET_HALT		(const char* msg = NULL );
+		void finalizeRET_QUIT		(const char* msg = NULL );
 
 };
 

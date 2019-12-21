@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resource xmlns="http://www.wxwidgets.org/wxxrc">
+  <!-- Handler Generation is ON -->
+  <object class="wxBitmap" name="16-clean">bitmaps\16-clean.png</object>
+  <object class="wxBitmap" name="16-clean@2x">bitmaps\16-clean@2x.png</object>
+  <object class="wxBitmap" name="16-cog">bitmaps\16-cog.png</object>
+  <object class="wxBitmap" name="16-cog@2x">bitmaps\16-cog@2x.png</object>
+  <object class="wxBitmap" name="16-pull">bitmaps\16-pull.png</object>
+  <object class="wxBitmap" name="16-pull@2x">bitmaps\16-pull@2x.png</object>
+  <object class="wxBitmap" name="Arduino_Logo1">bitmaps\Arduino\Arduino_Logo1.png</object>
+  <object class="wxBitmap" name="Clockwise">bitmaps\Stepper\Clockwise.png</object>
+  <object class="wxBitmap" name="CounterClockwise">bitmaps\Stepper\CounterClockwise.png</object>
+  <object class="wxBitmap" name="ToggelSwitch">bitmaps\Switch\ToggelSwitch.png</object>
+  <object class="wxBitmap" name="application-view-tile">bitmaps\application-view-tile.png</object>
+  <object class="wxBitmap" name="bug (2)">bitmaps\bug (2).png</object>
+  <object class="wxBitmap" name="database_refresh">bitmaps\database_refresh.png</object>
+  <object class="wxBitmap" name="emergency-button-klein">bitmaps\emergency-button-klein.png</object>
+  <object class="wxBitmap" name="steppermotor0">bitmaps\Stepper\steppermotor0.png</object>
+</resource>

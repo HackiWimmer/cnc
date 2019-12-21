@@ -142,6 +142,7 @@ protected:
     wxStaticBitmap* m_staticBitmap5593;
     wxStaticText* m_staticText5589;
     wxPanel* m_connectActivityPanel;
+    wxStaticText* m_observeCounterLabel;
 
 protected:
     virtual void initDialog(wxInitDialogEvent& event) { event.Skip(); }
@@ -155,6 +156,7 @@ public:
     wxStaticBitmap* GetStaticBitmap5593() { return m_staticBitmap5593; }
     wxStaticText* GetStaticText5589() { return m_staticText5589; }
     wxPanel* GetConnectActivityPanel() { return m_connectActivityPanel; }
+    wxStaticText* GetObserveCounterLabel() { return m_observeCounterLabel; }
     CncConnectProgressBase(wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = _("CNC Serial Connect Progress"), const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize(-1,-1), long style = wxSTAY_ON_TOP|wxCAPTION);
     virtual ~CncConnectProgressBase();
 };

@@ -78,6 +78,8 @@ struct CncCommandDecoder {
 			void notifyMoveSequenceBegin(const CncCommandDecoder::MoveSequenceInfo& sequence) final;
 	};
 	
+	static int32_t convertBytesToInt32(const unsigned char *buffer, unsigned int& idx, int32_t& ret);
+	
 	// ----------------------------------------------------------
 	static bool decodeMoveSequence(const unsigned char *buffer, unsigned int nbByte,
 								   CncMoveSequence* ret);

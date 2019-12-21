@@ -123,8 +123,9 @@ bool CncFilePreview::selectPreview(const wxString& fileName) {
 		case TplGcode:		selectGCodePreview();
 							break;
 							
-		case TplBinary:		selectBinaryPreview(fileName);
-							break;
+		case TplBinary:		// with respect to the recursive character of selectBinaryPreview
+							// directly return here 
+							return selectBinaryPreview(fileName);
 							
 		case TplText:		selectEmptyPreview();
 							break;

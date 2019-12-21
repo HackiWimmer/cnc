@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <CodeLite_Project Name="CncConrollerGui" InternalType="GUI" Version="11000">
+  <Plugins>
+    <Plugin Name="qmake">
+      <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
+    </Plugin>
+  </Plugins>
   <VirtualDirectory Name="cmake">
     <File Name="../CMakeListsSourceFiles.txt"/>
     <File Name="../CMakeListsMain.txt"/>
@@ -8,11 +13,6 @@
     <File Name="../CMakeLists.debian.txt"/>
     <File Name="../CMakeLists.db.txt"/>
   </VirtualDirectory>
-  <Plugins>
-    <Plugin Name="qmake">
-      <![CDATA[00040001N0005Debug0000000000000001N0005Gprof0000000000000001N0007Release0000000000000001N0008release2000000000000]]>
-    </Plugin>
-  </Plugins>
   <VirtualDirectory Name="wxcrafter">
     <VirtualDirectory Name="XRC">
       <File Name="wxCrafterImages.xrc"/>
@@ -21,6 +21,17 @@
   <Description/>
   <Dependencies/>
   <VirtualDirectory Name="Source">
+    <VirtualDirectory Name="Threads">
+      <File Name="GamepadEvent.cpp"/>
+      <File Name="GamepadEvent.h"/>
+      <File Name="SerialEvent.h"/>
+      <File Name="GamepadThread.cpp"/>
+      <File Name="GamepadThread.h"/>
+      <File Name="SerialThread.cpp"/>
+      <File Name="SerialThread.h"/>
+      <File Name="UpdateManagerThread.cpp"/>
+      <File Name="UpdateManagerThread.h"/>
+    </VirtualDirectory>
     <VirtualDirectory Name="Editor">
       <File Name="CncBaseEditor.cpp"/>
       <File Name="CncBaseEditor.h"/>
@@ -163,9 +174,23 @@
       <File Name="3D/CncGCodePreview.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Serial">
-      <File Name="SerialThreadStub.cpp"/>
-      <File Name="SerialThreadStub.h"/>
       <VirtualDirectory Name="Utils">
+        <File Name="BaseEndPoint.cpp"/>
+        <File Name="BaseEndPoint.h"/>
+        <File Name="WireEndPoint.cpp"/>
+        <File Name="WireEndPoint.h"/>
+        <File Name="WireCircularBuffer.cpp"/>
+        <File Name="WireCircularBuffer.h"/>
+        <File Name="Wire.h"/>
+        <File Name="ArduinoData.cpp"/>
+        <File Name="ArduinoData.h"/>
+        <File Name="SerialAdminChannel.cpp"/>
+        <File Name="SerialAdminChannel.h"/>
+        <File Name="SoftwareSerial.h"/>
+        <File Name="ArduinoEnvWrapper.h"/>
+        <File Name="ArduinoEnvWrapper.cpp"/>
+        <File Name="SerialEndPoint.h"/>
+        <File Name="SerialEndPoint.cpp"/>
         <File Name="SerialCircularBuffer.cpp"/>
         <File Name="SerialCircularBuffer.h"/>
       </VirtualDirectory>
@@ -177,6 +202,8 @@
         <File Name="OSD/SerialGtk.cpp"/>
       </VirtualDirectory>
       <VirtualDirectory Name="Emulator">
+        <File Name="SerialThreadStub.h"/>
+        <File Name="SerialThreadStub.cpp"/>
         <File Name="SerialEmulatorGCodeStreamer.cpp"/>
         <File Name="SerialEmulatorGCodeStreamer.h"/>
         <File Name="SerialEmulatorSvgStreamer.cpp"/>
@@ -194,6 +221,8 @@
       <File Name="SerialSpyPort.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Cnc">
+      <File Name="CncArduinoEnvironment.h"/>
+      <File Name="CncArduinoEnvironment.cpp"/>
       <File Name="CncFileDialog.cpp"/>
       <File Name="CncFileDialog.h"/>
       <File Name="CncUserEvents.cpp"/>
@@ -306,6 +335,9 @@
       <File Name="Codelite/drawingutils.h" ExcludeProjConfig="Gprof;release2;Debug;Release;"/>
     </VirtualDirectory>
     <VirtualDirectory Name="wxCrafter">
+      <File Name="wxCrafterArduinoEnv_bitmaps.cpp"/>
+      <File Name="wxCrafterArduinoEnv.h"/>
+      <File Name="wxCrafterArduinoEnv.cpp"/>
       <File Name="wxCrafterMotionMonitor_bitmaps.cpp"/>
       <File Name="wxCrafterMotionMonitor.h"/>
       <File Name="wxCrafterMotionMonitor.cpp"/>
@@ -350,21 +382,17 @@
       <File Name="wxCrafterContextObserver.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Main">
-      <File Name="SerialThread.cpp"/>
-      <File Name="SerialThread.h"/>
       <File Name="MainFrameDummy.h"/>
       <File Name="MainFrameDummy.cpp"/>
       <File Name="MainFrameProxy.h"/>
       <File Name="MainFrameProxy.cpp"/>
-      <File Name="GamepadThread.cpp"/>
-      <File Name="GamepadThread.h"/>
       <File Name="main.cpp"/>
       <File Name="MainFrame.cpp"/>
       <File Name="MainFrame.h"/>
-      <File Name="UpdateManagerThread.h"/>
-      <File Name="UpdateManagerThread.cpp"/>
     </VirtualDirectory>
     <VirtualDirectory Name="Common">
+      <File Name="CircularBuffer.cpp"/>
+      <File Name="CircularBuffer.h"/>
       <File Name="PointAbs.h"/>
       <File Name="LinearFunc.h"/>
       <File Name="CommandTemplates.h"/>
@@ -459,6 +487,10 @@
       </VirtualDirectory>
     </VirtualDirectory>
     <VirtualDirectory Name="LargeScaledListCtrl">
+      <File Name="CncArduinoPinsListCtrl.cpp"/>
+      <File Name="CncArduinoPinsListCtrl.h"/>
+      <File Name="CncMessageListCtrl.cpp"/>
+      <File Name="CncMessageListCtrl.h"/>
       <File Name="CncFileViewLists.cpp"/>
       <File Name="CncFileViewLists.h"/>
       <File Name="CncContextListCtrl.cpp"/>
@@ -490,6 +522,7 @@
     </VirtualDirectory>
   </VirtualDirectory>
   <VirtualDirectory Name="Resources">
+    <File Name="wxCrafterArduinoEnv.wxcp"/>
     <File Name="wxCrafterMotionMonitor.wxcp"/>
     <File Name="wxCrafterFileView.wxcp"/>
     <File Name="wxCrafterToolMagazine.wxcp"/>
@@ -536,9 +569,9 @@
     <Configuration Name="Debug" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-pg;-g;-O0;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-g;-O0;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="yes" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
-        <IncludePath Value="C:/@Development/boost_1_69_0"/>
-        <IncludePath Value="C:/@Development/freeglut/include"/>
-        <IncludePath Value="C:/@Development/wxsvg-1.5.16/include"/>
+        <IncludePath Value="C:/@Development/boost_1_71_0"/>
+        <IncludePath Value="C:/msys64/mingw64/include"/>
+        <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
         <Preprocessor Value="DEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_WINDBG"/>
@@ -547,7 +580,7 @@
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows;-pg" Required="yes">
         <LibraryPath Value="."/>
-        <LibraryPath Value="C:/@Development/freeglut/lib/x64"/>
+        <LibraryPath Value="C:/msys64/mingw64/lib"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
@@ -583,9 +616,9 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
-        <Command Enabled="yes">where g++</Command>
         <Command Enabled="yes">g++ -v</Command>
-        <Command Enabled="no">#gcc -E -dM CncControl.cpp</Command>
+        <Command Enabled="yes">echo %WXWIN%</Command>
+        <Command Enabled="yes">where g++</Command>
       </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
@@ -613,7 +646,7 @@
       <Compiler Options="-pg;-g1;-fpic;-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_71_0"/>
-        <IncludePath Value="C:/@Development/freeglut/include"/>
+        <IncludePath Value="C:/msys64/mingw64/include"/>
         <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="GPROF"/>
@@ -621,6 +654,8 @@
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows;-pg" Required="yes">
+        <LibraryPath Value="."/>
+        <LibraryPath Value="C:/msys64/mingw64/lib"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
@@ -656,18 +691,9 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
-        <Command Enabled="yes">WXWIN%</Command>
-        <Command Enabled="yes">where g++</Command>
-        <Command Enabled="yes">g++ -v</Command>
-        <Command Enabled="yes">where g++</Command>
-        <Command Enabled="yes">g++ -v</Command>
-        <Command Enabled="no">#gcc -E -dM CncControl.cpp</Command>
-        <Command Enabled="yes">echo %WXWIN%</Command>
-        <Command Enabled="yes">where g++</Command>
         <Command Enabled="yes">g++ -v</Command>
         <Command Enabled="yes">echo %WXWIN%</Command>
         <Command Enabled="yes">where g++</Command>
-        <Command Enabled="yes">g++ -v</Command>
       </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">
@@ -691,17 +717,19 @@
         <SearchPaths/>
       </Completion>
     </Configuration>
-    <Configuration Name="Release" CompilerType="MinGW ( gcc.exe (Rev2, Built by MSYS2 project) 8.3.0 )" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
+    <Configuration Name="Release" CompilerType="gcc.exe (x86_64-posix-seh-rev0, Built by MinGW-W64 project) 8.1.0" DebuggerType="GNU gdb debugger" Type="Executable" BuildCmpWithGlobalSettings="append" BuildLnkWithGlobalSettings="append" BuildResWithGlobalSettings="append">
       <Compiler Options="-g1;-fpic;-O3;-std=c++17;-std=c++14;-std=c++11;-Wall;$(shell wx-config --cflags)" C_Options="-O3;-Wall" Assembler="" Required="yes" PreCompiledHeader="" PCHInCommandLine="no" PCHFlags="" PCHFlagsPolicy="0">
         <IncludePath Value="."/>
         <IncludePath Value="C:/@Development/boost_1_71_0"/>
-        <IncludePath Value="C:/@Development/freeglut/include"/>
+        <IncludePath Value="C:/msys64/mingw64/include"/>
         <IncludePath Value="C:/@Development/wxsvg-1.5.20/include"/>
         <Preprocessor Value="NDEBUG"/>
         <Preprocessor Value="APP_USE_SPLASH"/>
         <Preprocessor Value="BOOST_STACKTRACE_USE_BACKTRACE"/>
       </Compiler>
       <Linker Options="$(shell wx-config --libs);-mwindows" Required="yes">
+        <LibraryPath Value="."/>
+        <LibraryPath Value="C:/msys64/mingw64/lib"/>
         <Library Value="libwxmsw31u_stc"/>
         <Library Value="libwxmsw31u_webview"/>
         <Library Value="libwxmsw31u_propgrid"/>
@@ -737,9 +765,10 @@
         <StartupCommands/>
       </Debugger>
       <PreBuild>
+        <Command Enabled="yes">g++ -v</Command>
         <Command Enabled="yes">echo %WXWIN%</Command>
         <Command Enabled="yes">where g++</Command>
-        <Command Enabled="yes">g++ -v</Command>
+        <Command Enabled="yes"/>
       </PreBuild>
       <PostBuild/>
       <CustomBuild Enabled="no">

@@ -8,11 +8,14 @@
 class CncTextCtrl : public wxTextCtrl  {
 	
 	private:
-		wxTimer* overflowTimer;
-		wxString lineBuffer;
-		CncNanoTimestamp lastAppend;
+		static const unsigned int MAX_LINE_BUFFER_SIZE 				= 1024;
+		static const unsigned int DEFAULT_OVERFLOW_PERIOD_VALUE 	=  800;
+
+		wxTimer* 			overflowTimer;
+		char				lineBuffer[MAX_LINE_BUFFER_SIZE];
+		unsigned int		index;
+		long 				loggedPos;
 		
-		inline void setupTimer(int interval);
 		inline size_t flushLineBuffer();
 		
 	protected:
@@ -25,12 +28,14 @@ class CncTextCtrl : public wxTextCtrl  {
 					&name=wxTextCtrlNameStr);
 		virtual ~CncTextCtrl();
 		
-		int getOverflowInterval()			const { return overflowTimer->GetInterval(); }
-		const wxString& getLineBuffer() 	const { return lineBuffer; }
-		
 		virtual bool SetDefaultStyle(const wxTextAttr& style);
 		virtual void AppendChar(char c);
 		virtual void AppendText(const wxString &text);
+		
+		void logCurrentPosition();
+		long getLoggedPosition();
+		bool isLoggedPositionEqualCurrent();
+		bool skipBackIfLoggedPositionEqualCurrent();
 		
 		size_t flush();
 };

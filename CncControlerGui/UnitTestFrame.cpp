@@ -3,6 +3,7 @@
 #include <wx/textdlg.h>
 #include <wx/choicdlg.h>
 #include "GlobalFunctions.h"
+#include "CncLoggerProxy.h"
 #include "Tests/Test_FrameworkCallback.h"
 #include "Tests/Test_SVGNodeParser.h"
 #include "Tests/Test_CncPathListManager.h"
@@ -12,13 +13,14 @@
 /////////////////////////////////////////////////////////////////////////////
 UnitTests::UnitTests(wxWindow* parent, int iti, bool ar)
 : CncUnitTestsBase(parent)
-, testResultStream(new CncTextCtrl(m_testResultStreamPlaceholder))
+, testResultStream(new CncTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, m_testResultStreamPlaceholder->GetWindowStyle()))
 , initialTestIdx(iti)
 , autorun(ar)
 , redirector(NULL)
 {
 /////////////////////////////////////////////////////////////////////////////
-	GblFunc::replaceControl(m_testResultStreamPlaceholder, testResultStream);
+	GblFunc::cloneAttributes(m_testResultStreamPlaceholder, 	testResultStream);
+	GblFunc::replaceControl(m_testResultStreamPlaceholder, 		testResultStream);
 	redirector = new StdStreamRedirector(testResultStream);
 	
 	// install tests

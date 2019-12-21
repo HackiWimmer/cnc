@@ -1,7 +1,7 @@
 {
  "metadata": {
   "m_generatedFilesDir": ".",
-  "m_objCounter": 8127,
+  "m_objCounter": 8145,
   "m_includeFiles": [],
   "m_bitmapFunction": "wxXXXXC9ED9InitBitmapResources",
   "m_bitmapsFile": "wxCrafterImages_bitmaps.cpp",
@@ -2874,6 +2874,209 @@
    "m_properties": [{
      "type": "string",
      "m_label": "Name:",
+     "m_value": "ImageLibPins"
+    }, {
+     "type": "string",
+     "m_label": "File:",
+     "m_value": ""
+    }, {
+     "type": "virtualFolderPicker",
+     "m_label": "Virtual Folder:",
+     "m_path": ""
+    }, {
+     "type": "string",
+     "m_label": "Class Decorator",
+     "m_value": ""
+    }, {
+     "type": "integer",
+     "m_label": "Bitmap Size:",
+     "m_value": 16
+    }, {
+     "type": "bool",
+     "m_label": "Bitmap Mask",
+     "m_value": true
+    }],
+   "m_events": [],
+   "m_children": [{
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_LOW"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/CodeLite/16-record.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_HIGH"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/user-available.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_ANALOG"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/user-extended-away (2).png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_INPUT"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/connect.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_OUTPUT"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/lightbulb-off.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }]
+  }, {
+   "m_type": 4481,
+   "proportion": 0,
+   "border": 5,
+   "gbSpan": "1,1",
+   "gbPosition": "0,0",
+   "m_styles": [],
+   "m_sizerFlags": [],
+   "m_properties": [{
+     "type": "string",
+     "m_label": "Name:",
+     "m_value": "ImageLibLogger"
+    }, {
+     "type": "string",
+     "m_label": "File:",
+     "m_value": ""
+    }, {
+     "type": "virtualFolderPicker",
+     "m_label": "Virtual Folder:",
+     "m_path": ""
+    }, {
+     "type": "string",
+     "m_label": "Class Decorator",
+     "m_value": ""
+    }, {
+     "type": "integer",
+     "m_label": "Bitmap Size:",
+     "m_value": 16
+    }, {
+     "type": "bool",
+     "m_label": "Bitmap Mask",
+     "m_value": true
+    }],
+   "m_events": [],
+   "m_children": [{
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_FROZEN"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/lock-break.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_THAW"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/lock-edit.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }]
+  }, {
+   "m_type": 4481,
+   "proportion": 0,
+   "border": 5,
+   "gbSpan": "1,1",
+   "gbPosition": "0,0",
+   "m_styles": [],
+   "m_sizerFlags": [],
+   "m_properties": [{
+     "type": "string",
+     "m_label": "Name:",
      "m_value": "ImageLibMotionVertex"
     }, {
      "type": "string",
@@ -3058,7 +3261,7 @@
    "m_properties": [{
      "type": "string",
      "m_label": "Name:",
-     "m_value": "ImageLibLogger"
+     "m_value": "ImageLibSwitch"
     }, {
      "type": "string",
      "m_label": "File:",
@@ -3092,11 +3295,65 @@
      "m_properties": [{
        "type": "string",
        "m_label": "Name:",
-       "m_value": "BMP_FROZEN"
+       "m_value": "BMP_TOGGLE_SWITCH_1"
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/lock-break.png"
+       "m_path": "bitmaps/Switch/ToggelSwitch.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }]
+  }, {
+   "m_type": 4481,
+   "proportion": 0,
+   "border": 5,
+   "gbSpan": "1,1",
+   "gbPosition": "0,0",
+   "m_styles": [],
+   "m_sizerFlags": [],
+   "m_properties": [{
+     "type": "string",
+     "m_label": "Name:",
+     "m_value": "ImageLibStepper"
+    }, {
+     "type": "string",
+     "m_label": "File:",
+     "m_value": ""
+    }, {
+     "type": "virtualFolderPicker",
+     "m_label": "Virtual Folder:",
+     "m_path": ""
+    }, {
+     "type": "string",
+     "m_label": "Class Decorator",
+     "m_value": ""
+    }, {
+     "type": "integer",
+     "m_label": "Bitmap Size:",
+     "m_value": 16
+    }, {
+     "type": "bool",
+     "m_label": "Bitmap Mask",
+     "m_value": true
+    }],
+   "m_events": [],
+   "m_children": [{
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_DIR_CW"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/Stepper/Clockwise.png"
       }],
      "m_events": [],
      "m_children": []
@@ -3111,11 +3368,30 @@
      "m_properties": [{
        "type": "string",
        "m_label": "Name:",
-       "m_value": "BMP_THAW"
+       "m_value": "BMP_DIR_CCW"
       }, {
        "type": "filePicker",
        "m_label": "Bitmap File:",
-       "m_path": "bitmaps/lock-edit.png"
+       "m_path": "bitmaps/Stepper/CounterClockwise.png"
+      }],
+     "m_events": [],
+     "m_children": []
+    }, {
+     "m_type": 4482,
+     "proportion": 0,
+     "border": 5,
+     "gbSpan": "1,1",
+     "gbPosition": "0,0",
+     "m_styles": [],
+     "m_sizerFlags": [],
+     "m_properties": [{
+       "type": "string",
+       "m_label": "Name:",
+       "m_value": "BMP_DIR_UNKNOWN"
+      }, {
+       "type": "filePicker",
+       "m_label": "Bitmap File:",
+       "m_path": "bitmaps/CodeLite/24-placeholder.png"
       }],
      "m_events": [],
      "m_children": []

@@ -99,7 +99,7 @@ struct AccelerationProfile {
       if ( enabled == false )
         return true; 
       
-      stepsToMove = absolute(stm);
+      stepsToMove = ArdoObj::absolute(stm);
       
       // always reset index
       stepCounter = 0;
@@ -407,8 +407,8 @@ class CncSpeedController {
     bool isSpeedConfigured()               const { return X.isSpeedConfigured() && Y.isSpeedConfigured() && Z.isSpeedConfigured(); }
   
     //////////////////////////////////////////////////////////////////
-    double getMaxFeedSpeed_MM_MIN()        const { return minimum(X.maxDistPerMinute, Y.maxDistPerMinute, Z.maxDistPerMinute); }
-    double getMaxFeedSpeed_MM_SEC()        const { return minimum(X.maxDistPerSecond, Y.maxDistPerSecond, Z.maxDistPerSecond); }
+    double getMaxFeedSpeed_MM_MIN()        const { return ArdoObj::minimum(X.maxDistPerMinute, Y.maxDistPerMinute, Z.maxDistPerMinute); }
+    double getMaxFeedSpeed_MM_SEC()        const { return ArdoObj::minimum(X.maxDistPerSecond, Y.maxDistPerSecond, Z.maxDistPerSecond); }
     
     //////////////////////////////////////////////////////////////////
     double getConfiguredFeedSpeed_MM_MIN() const { return configuredFeedSpeed_MM_SEC * 60; }

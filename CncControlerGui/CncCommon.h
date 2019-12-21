@@ -12,13 +12,14 @@
 #include "StdStreamRedirector.h"
 
 // global strings
-#define _maxSpeedLabel		"<MAX>"
+#define _maxSpeedLabel			"<MAX>"
 
-#define _portEmulatorNULL 	"<PortEmulator(dev/null)>"
-#define _portEmulatorTEXT  	"<PortEmulator(File::Text)>"
-#define _portEmulatorSVG  	"<PortEmulator(File::SVG)>"
-#define _portEmulatorGCODE	"<PortEmulator(File::GCode)>"
-#define _portEmulatorBIN  	"<PortEmulator(File::Binary)>"
+#define _portEmulatorNULL 		"<PortEmulator(dev/null)>"
+#define _portEmulatorTEXT  		"<PortEmulator(File::Text)>"
+#define _portEmulatorSVG  		"<PortEmulator(File::SVG)>"
+#define _portEmulatorGCODE		"<PortEmulator(File::GCode)>"
+#define _portEmulatorBIN  		"<PortEmulator(File::Binary)>"
+#define _portEmulatorArduino 	"<PortEmulator(Arduino)>"
 
 // common ostream operators
 std::ostream& operator<<(std::ostream& os, const wxPoint& p);
@@ -42,7 +43,7 @@ enum CncUnit 					{ CncSteps, CncMetric };
 enum CncDirection 				{ CncUndefDir, CncClockwise, CncAnticlockwise };
 enum CncLinearDirection			{ CncNoneDir = 0, CncPosDir = 1, CncNegDir = -1};
 enum CncSpeedMode				{ CncSpeedWork = 0, CncSpeedRapid = 1, CncSpeedMax = 2, CncSpeedUserDefined = 3 }; // dont change the values
-enum CncPortType 				{ CncPORT, CncPORT_THREAD_STUB, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
+enum CncPortType 				{ CncPORT, CncPORT_EMU_ARDUINO, CncEMU_NULL, CncEMU_TXT, CncEMU_SVG, CncEMU_GCODE, CncEMU_BIN };
 enum CncToolCorretionType 		{ CncCT_None=0, CncCT_Inner=1, CncCT_Outer=2, CncCT_Center=3 };
 enum CncClipperCornerType 		{ CncCCT_Round=0, CncCCT_Square=1, CncCCT_Miter=2 };
 enum CncClipperEndType			{ CncCET_ClosedPolygon=0, CncCETClosedLine=1, CncCETOpenSquare=2, CncCETOpenRound=3, CncCETOpenButt=4 };

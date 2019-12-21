@@ -24,6 +24,8 @@
 class CncPreprocessor;
 class CncReferencePosition;
 class CncControl;
+class SerialThread;
+class SerialThreadStub;
 
 class MainFrameProxy {
 
@@ -68,6 +70,8 @@ class MainFrameProxy {
 		static void newTemplate();
 		static void openTemplate();
 		static bool filePreviewListLeave();
+		
+		static SerialThread* getSerialThread(SerialThreadStub* sts);
 		
 		static wxFileConfig*			getLruStore();
 		

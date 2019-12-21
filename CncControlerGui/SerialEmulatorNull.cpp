@@ -261,6 +261,9 @@ int SerialEmulatorNULL::readData(void *buffer, unsigned int nbByte) {
 			case CMD_PRINT_VERSION: 				ret = performText((unsigned char*)(buffer), nbByte, firmWare);
 													break;
 			
+			case CMD_PRINT_TIMESTAMP: 				ret = performText((unsigned char*)(buffer), nbByte, __TIMESTAMP__);
+													break;
+			
 			case CMD_PRINT_CONFIG: 					ret = performConfiguration((unsigned char*)(buffer), nbByte);
 													break;
 			
@@ -674,10 +677,10 @@ bool SerialEmulatorNULL::writeSetter(unsigned char *buffer, unsigned int nbByte)
 		SetterValueList values;
 		for ( unsigned int i=0; i<valueCount; i++ ) {
 			
-			valBuf[3] = buffer[index + 0];
-			valBuf[2] = buffer[index + 1];
-			valBuf[1] = buffer[index + 2];
-			valBuf[0] = buffer[index + 3];
+			valBuf[0] = buffer[index + 0];
+			valBuf[1] = buffer[index + 1];
+			valBuf[2] = buffer[index + 2];
+			valBuf[3] = buffer[index + 3];
 			
 			int32_t value = 0;
 			memcpy(&value, valBuf, LONG_BUF_SIZE);
@@ -960,7 +963,7 @@ bool SerialEmulatorNULL::renderAndMove(int32_t dx, int32_t dy, int32_t dz) {
 					\
 					curEmulatorPos.inc##axis(d); \
 					incStepCounter##axis(d); \
-					if ( absolute(d) ) \
+					if ( ArdoObj::absolute(d) ) \
 						simulateOneStepTime##axis(); \
 					\
 					if ( lastCommand.ret != RET_OK ) \
@@ -1202,7 +1205,7 @@ void SerialEmulatorNULL::incPosistionCounter() {
 void SerialEmulatorNULL::incStepCounterX(int32_t dx) {
 ///////////////////////////////////////////////////////////////////
     // detect overflows
-    int32_t test = MAX_LONG - absolute(dx);
+    int32_t test = MAX_LONG - ArdoObj::absolute(dx);
     if ( test < stepCounterX ) {
         stepCounterX  = MIN_LONG;
         stepCounterX += (test - stepCounterX);
@@ -1210,13 +1213,13 @@ void SerialEmulatorNULL::incStepCounterX(int32_t dx) {
         return;
     }
 
-    stepCounterX += absolute(dx);
+    stepCounterX += ArdoObj::absolute(dx);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::incStepCounterY(int32_t dy) {
 ///////////////////////////////////////////////////////////////////
     // detect overflows
-    int32_t test = MAX_LONG - absolute(dy);
+    int32_t test = MAX_LONG - ArdoObj::absolute(dy);
     if ( test < stepCounterY ) {
         stepCounterY  = MIN_LONG;
         stepCounterY += (test - stepCounterY);
@@ -1224,13 +1227,13 @@ void SerialEmulatorNULL::incStepCounterY(int32_t dy) {
         return;
     }
 
-    stepCounterY += absolute(dy);
+    stepCounterY += ArdoObj::absolute(dy);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::incStepCounterZ(int32_t dz) {
 ///////////////////////////////////////////////////////////////////
     // detect overflows
-    int32_t test = MAX_LONG - absolute(dz);
+    int32_t test = MAX_LONG - ArdoObj::absolute(dz);
     if ( test < stepCounterZ ) {
         stepCounterZ  = MIN_LONG;
         stepCounterZ += (test - stepCounterZ);
@@ -1238,7 +1241,7 @@ void SerialEmulatorNULL::incStepCounterZ(int32_t dz) {
         return;
     }
 
-    stepCounterZ += absolute(dz);
+    stepCounterZ += ArdoObj::absolute(dz);
 }
 ///////////////////////////////////////////////////////////////////
 void SerialEmulatorNULL::traceSpeedInformation() {

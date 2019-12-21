@@ -80,6 +80,7 @@
   <object class="wxBitmap" name="book-add">bitmaps\book-add.png</object>
   <object class="wxBitmap" name="book_blue">bitmaps\book_blue.png</object>
   <object class="wxBitmap" name="bookmark-2">bitmaps\bookmark-2.png</object>
+  <object class="wxBitmap" name="bookmark-toolbar">bitmaps\bookmark-toolbar.png</object>
   <object class="wxBitmap" name="brick">bitmaps\brick.png</object>
   <object class="wxBitmap" name="brick-delete">bitmaps\brick-delete.png</object>
   <object class="wxBitmap" name="brick-go1">bitmaps\brick-go1.png</object>
@@ -166,6 +167,7 @@
   <object class="wxBitmap" name="system-search-2">bitmaps\system-search-2.png</object>
   <object class="wxBitmap" name="system-settings">bitmaps\system-settings.png</object>
   <object class="wxBitmap" name="table-cell-merge">bitmaps\table-cell-merge.png</object>
+  <object class="wxBitmap" name="time">bitmaps\time.png</object>
   <object class="wxBitmap" name="time-add">bitmaps\time-add.png</object>
   <object class="wxBitmap" name="tooloptions">bitmaps\tooloptions.png</object>
   <object class="wxBitmap" name="view-choose">bitmaps\view-choose.png</object>

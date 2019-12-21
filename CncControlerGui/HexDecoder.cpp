@@ -110,12 +110,12 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 	if ( readNextHexBytes(restToken, 1, value) == false ) return;
 	const int portionSize = decodeHexValueAsInteger(value);
 	ret.more.append(wxString::Format("Portion size = %d | | ", portionSize));
-	ret.more.append(wxString::Format(" [TYP][%s]            X           Y           Z           F  | ", ValueInfo::getBitDeclaration()));
+	ret.more.append(wxString::Format(" [TYP][%s]            X           Y           Z           F  | ", ArdoObj::ValueInfo::getBitDeclaration()));
 	ret.more.append(                 " ---------------------------------------------------------------------- | ");
 	
 	// ---------------------------------------------------
 	auto determineDataStructure = [](unsigned char type, unsigned int& byteCount, unsigned int& valCount) {
-		ValueInfo vi(type);
+		ArdoObj::ValueInfo vi(type);
 		
 		if ( vi.isValid() == false )
 			return false;
@@ -163,8 +163,8 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 				int32_t dx, dy, dz, f = 0;
 				
 				if ( byteCount > 0 ) {
-					int32_t values[ValueInfo::MaxValueCount];
-					wxASSERT( valCount <= ValueInfo::MaxValueCount );
+					int32_t values[ArdoObj::ValueInfo::MaxValueCount];
+					wxASSERT( valCount <= ArdoObj::ValueInfo::MaxValueCount );
 					
 					// reading
 					for ( unsigned int i = 0 ; i < valCount; i++ ) {
@@ -172,7 +172,7 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 							return;
 						
 						switch ( byteCount ) {
-							case 1:		values[i] = decodeHexValueAsInt8(value);  break;
+							case 1:		values[i] = decodeHexValueAsInt8 (value); break;
 							case 2:		values[i] = decodeHexValueAsInt16(value); break;
 							case 4:		values[i] = decodeHexValueAsInt32(value); break;
 						}
@@ -180,7 +180,7 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 						remaining -= byteCount;
 					}
 					
-					ValueInfo vi(valueType);
+					ArdoObj::ValueInfo vi(valueType);
 					
 					const unsigned short p = vi.hasF() ? 1 : 0;
 					if ( vi.hasF() )
@@ -207,7 +207,7 @@ void SpyHexDecoder::decodeMoveSeqOutbound(SpyHexDecoder::Details& ret, wxString&
 				}
 				
 				// output
-				ValueInfo vi(valueType);
+				ArdoObj::ValueInfo vi(valueType);
 				std::stringstream ss; ss << vi;
 				ret.more.append(wxString::Format(" [%03d][%s] = % 10ld, % 10ld, % 10ld, % 10ld  | ", (int)valueType, ss.str().c_str(), (long)dx, (long)dy, (long)dz, (long)f));
 				

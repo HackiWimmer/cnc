@@ -5,27 +5,18 @@
 #include "GlobalFunctions.h"
 #include "CncLoggerProxy.h"
 
-namespace CncTC {
-	const unsigned int defaultOverflowTimerValue = 800;
-	const unsigned int maxLineBufferLengrh		 = 500;
-};
-
 //////////////////////////////////////////////////////////////
 CncTextCtrl::CncTextCtrl(wxWindow *parent, wxWindowID id, const wxString &value, const wxPoint &pos, const wxSize &size, 
 						 long style, const wxValidator &validator, const wxString &name)
 : wxTextCtrl(parent, wxID_ANY, value, pos, size, style, validator, name)
 , overflowTimer(new wxTimer())
-, lineBuffer()
-, lastAppend(CncTimeFunctions::getNanoTimestamp())
+, lineBuffer{}
+, index(0)
+, loggedPos(0L)
 //////////////////////////////////////////////////////////////
 {
-	setupTimer(CncTC::defaultOverflowTimerValue);
-}
-//////////////////////////////////////////////////////////////
-void CncTextCtrl::setupTimer(int interval) {
-//////////////////////////////////////////////////////////////
 	overflowTimer->Connect(wxEVT_TIMER, wxTimerEventHandler(CncTextCtrl::onOverflowTimer), NULL, this);
-	overflowTimer->Start(interval);
+	overflowTimer->Start(DEFAULT_OVERFLOW_PERIOD_VALUE);
 }
 //////////////////////////////////////////////////////////////
 CncTextCtrl::~CncTextCtrl() {
@@ -37,6 +28,33 @@ CncTextCtrl::~CncTextCtrl() {
 	wxDELETE( overflowTimer );
 }
 //////////////////////////////////////////////////////////////
+void CncTextCtrl::logCurrentPosition() {
+//////////////////////////////////////////////////////////////
+	loggedPos = GetLastPosition();
+}
+//////////////////////////////////////////////////////////////
+long CncTextCtrl::getLoggedPosition() {
+//////////////////////////////////////////////////////////////
+	return loggedPos;
+}
+//////////////////////////////////////////////////////////////
+bool CncTextCtrl::isLoggedPositionEqualCurrent() {
+//////////////////////////////////////////////////////////////
+	return loggedPos != GetLastPosition();
+}
+//////////////////////////////////////////////////////////////
+bool CncTextCtrl::skipBackIfLoggedPositionEqualCurrent() {
+//////////////////////////////////////////////////////////////
+	if ( isLoggedPositionEqualCurrent() == false )
+		return false;
+		
+	if ( loggedPos < 1 )
+		return false;
+		
+	Remove(loggedPos - 1, loggedPos);
+	return true;
+}
+//////////////////////////////////////////////////////////////
 size_t CncTextCtrl::flush() {
 //////////////////////////////////////////////////////////////
 	return flushLineBuffer();
@@ -44,27 +62,24 @@ size_t CncTextCtrl::flush() {
 //////////////////////////////////////////////////////////////
 size_t CncTextCtrl::flushLineBuffer() {
 //////////////////////////////////////////////////////////////
-	const size_t len = lineBuffer.length();
+	overflowTimer->Stop();
 	
-	if ( lineBuffer.IsEmpty() == false ) {
-		wxTextCtrl::AppendText(lineBuffer);
-		lineBuffer.clear();
-	}
+		const size_t len = index;
+		if ( index > 0 ) {
+			lineBuffer[index] = '\0';
+			wxTextCtrl::AppendText(lineBuffer);
+			index = 0;
+		}
 	
-	// restart the timer
 	overflowTimer->Start();
-	
 	return len;
 }
 //////////////////////////////////////////////////////////////
 void CncTextCtrl::onOverflowTimer(wxTimerEvent& event) { 
 //////////////////////////////////////////////////////////////
-	const unsigned int threshold = (CncTC::defaultOverflowTimerValue / 2 ) * 1000 * 1000;
+	flushLineBuffer();
 	
-	if ( CncTimeFunctions::getNanoTimestamp() - lastAppend > threshold )
-		flushLineBuffer();
-	
-	event.Skip(); 
+	//event.Skip(); 
 }
 //////////////////////////////////////////////////////////////
 bool CncTextCtrl::SetDefaultStyle(const wxTextAttr& style) {
@@ -79,13 +94,12 @@ bool CncTextCtrl::SetDefaultStyle(const wxTextAttr& style) {
 //////////////////////////////////////////////////////////////
 void CncTextCtrl::AppendChar(char c) {
 //////////////////////////////////////////////////////////////
-	lastAppend = CncTimeFunctions::getNanoTimestamp();
-	lineBuffer.append(c);
+	lineBuffer[index++] = c;
 	
 	if ( c == '\n' )
 		flushLineBuffer();
 		
-	if ( lineBuffer.length() > CncTC::maxLineBufferLengrh )
+	if ( index > MAX_LINE_BUFFER_SIZE - 8 )
 		flushLineBuffer();
 }
 //////////////////////////////////////////////////////////////
@@ -97,8 +111,7 @@ void CncTextCtrl::AppendText(const wxString &text) {
 		return;
 	}
 	
-	// append what we have before
-	lastAppend = CncTimeFunctions::getNanoTimestamp();
+	// append what we have 
 	flushLineBuffer();
 	
 	// default behaviour

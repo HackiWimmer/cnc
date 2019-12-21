@@ -17,14 +17,16 @@
 #include "SerialEmulatorSvgStreamer.h"
 #include "SerialEmulatorGCodeStreamer.h"
 #include "SerialEmulatorBinaryStreamer.h"
+#include "SerialThreadStub.h"
 #include "CncMotionMonitor.h"
 #include "CncExceptions.h"
 #include "CncCommon.h"
 #include "CncContext.h"
-#include "CncControl.h"
 #include "CncFileNameService.h"
+#include "CncLoggerProxy.h"
 #include "wxCrafterImages.h"
 #include "MainFrame.h"
+#include "CncControl.h"
 
 static CommandTemplates CMDTPL;
 
@@ -54,13 +56,14 @@ CncControl::CncControl(CncPortType pt)
 {
 //////////////////////////////////////////////////////////////////
 	// Serial factory
-	if      ( pt == CncPORT ) 			serialPort = new SerialSpyPort(this);
-	else if ( pt == CncEMU_NULL )		serialPort = new SerialEmulatorNULL(this);
-	else if ( pt == CncEMU_TXT)			serialPort = new SerialEmulatorTextStreamer(this);
-	else if ( pt == CncEMU_SVG)			serialPort = new SerialEmulatorSvgStreamer(this);
-	else if ( pt == CncEMU_GCODE)		serialPort = new SerialEmulatorGCodeStreamer(this);
-	else if ( pt == CncEMU_BIN )		serialPort = new SerialEmulatorBinaryStreamer(this);
-	else 								serialPort = new SerialSpyPort(this);
+	if      ( pt == CncPORT ) 				serialPort = new SerialSpyPort(this);
+	else if ( pt == CncEMU_NULL )			serialPort = new SerialEmulatorNULL(this);
+	else if ( pt == CncEMU_TXT )			serialPort = new SerialEmulatorTextStreamer(this);
+	else if ( pt == CncEMU_SVG )			serialPort = new SerialEmulatorSvgStreamer(this);
+	else if ( pt == CncEMU_GCODE )			serialPort = new SerialEmulatorGCodeStreamer(this);
+	else if ( pt == CncEMU_BIN )			serialPort = new SerialEmulatorBinaryStreamer(this);
+	else if ( pt == CncPORT_EMU_ARDUINO )	serialPort = new SerialThreadStub(this);
+	else 									serialPort = new SerialSpyPort(this);
 	
 	toolState.setControl(THE_APP->GetToolState());
 	setToolState(true);
@@ -299,7 +302,7 @@ bool CncControl::setup(bool doReset) {
 	
 	std::cout << " Starting controller initialization . . . \n";
 	CncTextCtrl* logger = THE_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
-	long logPos = logger->GetLastPosition();
+	logger->logCurrentPosition();
 	
 	// setup probe mode
 	if ( enableProbeMode(THE_CONTEXT->isProbeMode()) == false ) {
@@ -341,9 +344,9 @@ bool CncControl::setup(bool doReset) {
 	int32_t dirValueY = THE_CONFIG->getInverseCtrlDirectionYFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
 	int32_t dirValueZ = THE_CONFIG->getInverseCtrlDirectionZFlag() ? INVERSED_INCREMENT_DIRECTION_VALUE : NORMALIZED_INCREMENT_DIRECTION_VALUE;
 
-	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_X, dirValueX));
-	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_Y, dirValueY));
-	setup.push_back(SetterTuple(PID_INCREMENT_DIRECTION_VALUE_Z, dirValueZ));
+	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_X, dirValueX));
+	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Y, dirValueY));
+	setup.push_back(SetterTuple(PID_INC_DIRECTION_VALUE_Z, dirValueZ));
 	
 	if ( processSetterList(setup) == false) {
 		std::cerr << " CncControl::setup: Calling processSetterList() failed!\n";
@@ -356,11 +359,9 @@ bool CncControl::setup(bool doReset) {
 	// check if some output was logged in between, if not 
 	// remove last '\n' and put 'Ready' at the end of the
 	// same line as the starting the initialization hint
-	if ( logPos == logger->GetLastPosition() ) {
-		logger->Remove(logPos - 1, logPos);
-	}
-	
+	logger->skipBackIfLoggedPositionEqualCurrent();
 	std::clog << "Ready - OK\n";
+	serialPort->notifySetupSuccesfullyFinsihed();
 	return true;
 }
 ///////////////////////////////////////////////////////////////////
@@ -385,13 +386,11 @@ bool CncControl::disconnect() {
 		CncTextCtrl* logger = THE_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
 		
 		std::cout << " Disconnecting serial port . . .\n";
-		long logPos = logger->GetLastPosition();
+		logger->logCurrentPosition();
 		
 		serialPort->disconnect();
 		
-		if ( logPos == logger->GetLastPosition() )
-			logger->Remove(logPos - 1, logPos);
-	
+		logger->skipBackIfLoggedPositionEqualCurrent();
 		std::clog << " Disconnected\n";
 	}
 	
@@ -414,8 +413,15 @@ bool CncControl::connect(const char * portName) {
 									   
 	bool ret = serialPort->connect(portName);
 	if ( ret == true ) {
+		
 		std::cout << " . . . Connection established -";
 		std::clog << " OK" << std::endl;
+		
+	} else {
+		
+		std::cout << " . . . Connection refused -";
+		std::cerr << " ERROR" << std::endl;
+		
 	}
 
 	return ret;
@@ -618,22 +624,20 @@ bool CncControl::reset() {
 	resetInterrupt();
 	resetPositionOutOfRangeFlag();
 	
-	CncTextCtrl* logger = THE_CONFIG->getTheApp()->getLogger(); wxASSERT( logger != NULL );
+	CncLoggerProxy* logger = THE_CONFIG->getTheApp()->getLogger(); 
+	wxASSERT( logger != NULL );
+	
 	std::cout << " Try to reset the controller . . .\n";
-	long logPos = logger->GetLastPosition();
+	logger->logCurrentPosition();
 	
 	bool ret = processCommand(CMD_RESET_CONTROLLER, std::cerr);
-	if ( logPos == logger->GetLastPosition() )
-		logger->Remove(logPos - 1, logPos);
-		
-	if ( ret == true ) {
-		std::clog << " Controller reseted - OK\n";
-	} else {
-		std::cerr << " Controller reset failed\n";
-		return false;
-	}
 	
-	// do this after the controller reset, because setZeroPos will determine a new controller position on demand
+	logger->skipBackIfLoggedPositionEqualCurrent();
+	if ( ret == true )  { std::clog << " Controller reseted - OK\n"; } 
+	else 				{ std::cerr << " Controller reset failed\n"; return false; }
+	
+	// do this after the controller is reseted, 
+	// because setZeroPos will determine a new controller position on demand
 	setZeroPos();
 	
 	curCtlPos = requestControllerPos();

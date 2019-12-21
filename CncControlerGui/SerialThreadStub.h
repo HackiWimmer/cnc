@@ -6,32 +6,17 @@
 class SerialCircularBuffer;
 class SerialThreadStub : public SerialSpyPort {
 	
-	private:
-		/*SerialSimulatorThread* serialThread;
-		
-		void createSerialThread();
-		void destroySerialThread();
-		*/
-		
-		SerialCircularBuffer* readBuffer;
-		SerialCircularBuffer* writeBuffer;
-		
 	protected:
-		//wxCriticalSection 	serialThreadCS;
 		
-		//friend class SerialSimulatorThread; 
+		inline bool isSerialThreadInstalled();
+		inline bool isSerialThreadRunning();
+		inline void resumeSerialThread();
+		inline void pauseSerialThread();
+		inline void wakeUpOnDemand();
 		
-		void pauseSerialThread();
-		void resumeSerialThread();
-		void wakeUpOnDemand();
-		
-		//virtual void waitDuringRead(unsigned int millis); 
-		//virtual void sleepMilliseconds(unsigned int millis);
+		virtual void notifySetupSuccesfullyFinsihed();
 		
 	public:
-		
-		//wxMutex 		serialMutex;
-		//wxCondition 	serialCondition;
 		
 		//Initialize Serial communication without an acitiv connection 
 		SerialThreadStub(CncControl* cnc);
@@ -44,7 +29,7 @@ class SerialThreadStub : public SerialSpyPort {
 		// returns the emulator type
 		virtual bool isEmulator() const { return true; }
 		// return the port type
-		virtual const CncPortType getPortType() const { return CncPORT_THREAD_STUB; }
+		virtual const CncPortType getPortType() const { return CncPORT_EMU_ARDUINO; }
 		// indicates if idle message can be requested
 		virtual bool canProcessIdle() { return false; }
 		// will be released periodically be the main thread

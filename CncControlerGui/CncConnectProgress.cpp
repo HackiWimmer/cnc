@@ -6,9 +6,11 @@
 /////////////////////////////////////////////////////////////////////////
 CncConnectProgress::CncConnectProgress(wxWindow* parent)
 : CncConnectProgressBase(parent)
-, pngAnimation(NULL)
+, pngAnimation		(NULL)
+, observeCounter	(0)
 /////////////////////////////////////////////////////////////////////////
 {
+	m_observeTimer->Stop();
 	createAnimationControl();
 }
 /////////////////////////////////////////////////////////////////////////
@@ -28,14 +30,29 @@ void CncConnectProgress::show(wxShowEvent& event) {
 /////////////////////////////////////////////////////////////////////////
 void CncConnectProgress::startupTimer(wxTimerEvent& event) {
 /////////////////////////////////////////////////////////////////////////
+	m_startupTimer->Stop();
+	m_observeTimer->Start(800);
+
 	bool ret = APP_PROXY::connectSerialPort();
 	EndModal(ret == true ? wxID_OK : wxID_CANCEL);
 }
 ///////////////////////////////////////////////////////////////////
 void CncConnectProgress::observeTimer(wxTimerEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	std::cerr << " Connect progress aborted by observer. Timeout reached!" << std::endl;
-	EndModal(wxID_CANCEL);
+	m_observeCounterLabel->SetLabel(wxString::Format("%d ", observeCounter));
+	
+	if ( observeCounter++ > 10 ) {
+		m_observeTimer->Stop();
+	
+		std::cerr << " Connect progress aborted by observer. Timeout reached!" << std::endl;
+		EndModal(wxID_CANCEL);
+		
+	} else {
+		long oc = -1;
+		m_observeCounterLabel->GetLabel().ToLong(&oc);
+		if ( observeCounter != (unsigned int)oc )
+			APP_PROXY::dispatchAll();
+	}
 }
 ///////////////////////////////////////////////////////////////////
 void CncConnectProgress::createAnimationControl() {

@@ -2,6 +2,7 @@
 #define CNC_FILE_VIEW_LIST_CTRL_H
 
 #include <wx/filename.h>
+#include <wx/timer.h>
 #include "CncLargeScaleListCtrl.h"
 
 class wxFileConfig;

@@ -30,12 +30,16 @@
 #include "OSD/CncUsbPortScanner.h"
 #include "OSD/CncAsyncKeyboardState.h"
 #include "OSD/webviewOSD.h"
+#include "GamepadEvent.h"
+#include "SerialThread.h"
 #include "CncExceptions.h"
+#include "CncLoggerProxy.h"
 #include "CncSourceEditor.h"
 #include "CncOutboundEditor.h"
 #include "CncGameportController.h"
 #include "CncNumberFormatter.h"
 #include "GlobalFunctions.h"
+#include "SerialThreadStub.h"
 #include "SerialPort.h"
 #include "CncPosition.h"
 #include "CncPatternDefinitions.h"
@@ -73,6 +77,7 @@
 #include "CncContext.h"
 #include "CncLastProcessingTimestampSummary.h"
 #include "CncFileDialog.h"
+#include "CncArduinoEnvironment.h"
 #include "CncUserEvents.h"
 #include "GlobalStrings.h"
 #include "wxCrafterImages.h"
@@ -279,6 +284,7 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 , openGLContextObserver(new CncOpenGLContextObserver(this))
 , cncOsEnvDialog(new CncOSEnvironmentDialog(this))
 , cncExtMainPreview(NULL)
+, cncArduinoEnvironment(new CncArduinoEnvironment(this))
 , perspectiveHandler(globalConfig, m_menuPerspective)
 , config(globalConfig)
 , lruStore(new wxFileConfig(wxT("CncControllerLruStore"), wxEmptyString, CncFileNameService::getLruFileName(), CncFileNameService::getLruFileName(), wxCONFIG_USE_RELATIVE_PATH | wxCONFIG_USE_NO_ESCAPE_CHARACTERS))
@@ -338,6 +344,9 @@ MainFrame::MainFrame(wxWindow* parent, wxFileConfig* globalConfig)
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
 	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadHeartbeat, 		this, MainFrame::EventId::SERIAL_HEARTBEAT);
+	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadMessage, 			this, MainFrame::EventId::SERIAL_MESSAGE);
+	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadData, 			this, MainFrame::EventId::SERIAL_DATA);
+	this->Bind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadPinNotification, 	this, MainFrame::EventId::SERIAL_PIN_NOTIFICATION);
 	
 	this->Bind(wxEVT_CNC_NAVIGATOR_PANEL, 			&MainFrame::onNavigatorPanel, 				this);
 	
@@ -385,6 +394,9 @@ MainFrame::~MainFrame() {
 	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadInitialized, 		this, MainFrame::EventId::INITIALIZED);
 	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadCompletion, 		this, MainFrame::EventId::COMPLETED);
 	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadHeartbeat, 		this, MainFrame::EventId::SERIAL_HEARTBEAT);
+	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadMessage, 			this, MainFrame::EventId::SERIAL_MESSAGE);
+	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadData, 			this, MainFrame::EventId::SERIAL_DATA);
+	this->Unbind(wxEVT_SERIAL_THREAD, 				&MainFrame::onSerialThreadPinNotification, 	this, MainFrame::EventId::SERIAL_PIN_NOTIFICATION);
 
 	this->Unbind(wxEVT_CNC_NAVIGATOR_PANEL, 		&MainFrame::onNavigatorPanel, 				this);
 	
@@ -403,6 +415,7 @@ MainFrame::~MainFrame() {
 	
 	cncDELETE( openGLContextObserver );
 	cncDELETE( cncExtMainPreview );
+	cncDELETE( cncArduinoEnvironment );
 	cncDELETE( cncOsEnvDialog );
 	cncDELETE( outboundNbInfo );
 	cncDELETE( templateNbInfo );
@@ -945,39 +958,94 @@ void MainFrame::displayReport(int id) {
 	
 	cnc->displayGetterList(pidList);
 }
+
+#include "SerialCircularBuffer.h"
+#include "SerialEndPoint.h"
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction1(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 1");
 
-	const char* a1 	= "Stefan Hoelzer";
-	const int 	i	= 42;
-	const char* a2 	= "Sonja Mack";
-	
-	auto test2 = [a1, a2](int i) {
+	class XXX {
 
-		std::cout << i << ": " << a1 << " + " << a2 << std::endl;
+		public:
+			int i;
+			std::string s;
+
+			XXX(int c, const char* x)
+			: i(c)
+			, s(x)
+			{}
+
+			XXX(const XXX& x)
+			: i(x.i)
+			, s(x.s)
+			{}
+
+			XXX(const XXX&& x)
+			: i(x.i)
+			, s(x.s)
+			{}
+
+			virtual ~XXX()
+			{}
+
+			// copy assignment operator
+			auto operator=(const XXX& rhs) & -> XXX&;
+
+			// move assignment operator
+			auto operator=(XXX&& rhs) & noexcept -> XXX&;
+
+
+
 	};
+	
+	
+	XXX a(42, "Stefan");
+	XXX b(84, "Sonja");
 
-	test2(i);
+	XXX c = a;
+	
+	std::cout << c.i << std::endl;
+	std::cout << c.s.c_str() << std::endl;
+	
+	XXX d(a);
+	std::cout << d.i << std::endl;
+	std::cout << a.i << std::endl;
 
+	
+	
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction2(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 2");
-
-	toggleMotionMonitorOptionPane(true);
+	
+	auto runTest = [&](int id) {
+		wxDateTime ts(wxDateTime::UNow());
+		std::clog << wxString::Format("%s.%03d: %s: Start", ts.FormatISOTime(), ts.GetMillisecond(),  __PRETTY_FUNCTION__) << std::endl;
+			SerialCircularBuffer::test(id);
+		std::clog << wxString::Format("%s.%03d: %s: End  ", ts.FormatISOTime(), ts.GetMillisecond(),  __PRETTY_FUNCTION__) << std::endl;
+	};
+	
+	//runTest(1);
+	runTest(2);
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction3(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 3");
+	
+	std::cout << wxString('*', 800)  << std::endl;
+	std::cout << "Ready"  << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::testFunction4(wxCommandEvent& event) {
 ///////////////////////////////////////////////////////////////////
 	cnc::trc.logInfoMessage("Test function 4");
+	
+	for ( auto i = 0; i<64; i++)
+		std::cout << wxString::Format("%03d", i) << wxString('*', 48)  << std::endl;
 }
 /////////////////////////////////////////////////////////////////////
 void MainFrame::onCloseSecureRunAuiPane(wxCommandEvent& event) {
@@ -1487,7 +1555,7 @@ void MainFrame::onGamepadThreadUpadte(GamepadEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onSerialThreadInitialized(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	std::cout << CNC_LOG_LOCATION << std::endl;
+	//std::cout << CNC_LOG_LOCATION << std::endl;
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onSerialThreadCompletion(SerialEvent& event) {
@@ -1498,7 +1566,31 @@ void MainFrame::onSerialThreadCompletion(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onSerialThreadHeartbeat(SerialEvent& event) {
 ///////////////////////////////////////////////////////////////////
-	std::cout << CNC_LOG_LOCATION << std::endl;
+	// rotate heartbeat image
+	wxImage img = m_serialThreadHeartbeat->GetBitmap().ConvertToImage();
+	if ( img.IsOk() == false )
+		return;
+		
+	m_serialThreadHeartbeat->SetBitmap(wxBitmap(img.Rotate90()));
+	m_serialThreadHeartbeat->Refresh();
+	m_serialThreadHeartbeat->Update();
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSerialThreadMessage(SerialEvent& event) {
+///////////////////////////////////////////////////////////////////
+	char type = (char)event.message.type;
+	cncArduinoEnvironment->appendMessage(type, event.message.getMessage(), event.message.getContext());
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSerialThreadData(SerialEvent& event) {
+///////////////////////////////////////////////////////////////////
+	//std::cout << CNC_LOG_LOCATION << std::endl;
+	cncArduinoEnvironment->update(event.data);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::onSerialThreadPinNotification(SerialEvent& event) {
+///////////////////////////////////////////////////////////////////
+	cncArduinoEnvironment->notifyPinUpdate();
 }
 ///////////////////////////////////////////////////////////////////
 void MainFrame::onClose(wxCloseEvent& event) {
@@ -1589,7 +1681,9 @@ void MainFrame::onClose(wxCloseEvent& event) {
 		}
 		 
 	}
-
+	
+	cncArduinoEnvironment->activateOnClose(true);
+	
 	event.Skip();
 }
 ///////////////////////////////////////////////////////////////////
@@ -1657,11 +1751,15 @@ void MainFrame::dispatchAll() {
 	*/
 	
 	// the following code is the best compromise, but aui handling isn't perfect
+	
 	if ( wxTheApp->HasPendingEvents() )
 		wxTheApp->ProcessPendingEvents();
 		
 	while ( evtLoop->Pending() )
 		evtLoop->Dispatch();
+	
+	
+	//wxTheApp->Yield();
 }
 #ifdef __WXMSW__
 ///////////////////////////////////////////////////////////////////
@@ -1788,20 +1886,24 @@ void MainFrame::decoratePortSelector(bool list) {
 	};
 	
 	// add default ports
-	if ( lastPortName == _portEmulatorNULL )	appendItem(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorNULL,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorNULL )	appendItem(_portEmulatorNULL,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorNULL,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorTEXT )	appendItem(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorTEXT,  ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorTEXT )	appendItem(_portEmulatorTEXT,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorTEXT,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorSVG )		appendItem(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorSVG,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorSVG )		appendItem(_portEmulatorSVG,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorSVG,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorGCODE )	appendItem(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorGCODE, ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorGCODE )	appendItem(_portEmulatorGCODE,		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorGCODE,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
 	
-	if ( lastPortName == _portEmulatorBIN )		appendItem(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
-	else										appendItem(_portEmulatorBIN,   ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	if ( lastPortName == _portEmulatorBIN )		appendItem(_portEmulatorBIN, 		ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorBIN,		ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
+	if ( lastPortName == _portEmulatorArduino )	appendItem(_portEmulatorArduino,	ImageLibPortSelector().Bitmap("BMP_PS_CONNECTED"));
+	else										appendItem(_portEmulatorArduino, 	ImageLibPortSelector().Bitmap("BMP_PS_AVAILABLE"));
+	
 	 
 	// add com ports
 	int pStart = list == true ?  1 :  0;
@@ -1920,6 +2022,10 @@ void MainFrame::initializeSerialThread() {
 		wxMessageBox( _("Couldn't run serial thread!") );
 		abort();
 	}
+	
+	wxASSERT ( cncArduinoEnvironment != NULL );
+	if ( serialThread->IsRunning() )
+		cncArduinoEnvironment->notifyStarted();
 }
 ///////////////////////////////////////////////////////////////////
 bool MainFrame::Show(bool show) {
@@ -1960,7 +2066,7 @@ void MainFrame::initialize(void) {
 	decorateSpeedControlBtn(true);
 	switchMonitorButton(true);
 	determineRunMode();
-	decoratePosSpyConnectButton(true);
+	decoratePosSpyConnectButton(false);
 	decorateSecureDlgChoice(true);
 	registerGuiControls();
 	changeManuallySpeedValue();
@@ -2313,7 +2419,8 @@ bool MainFrame::connectSerialPort() {
 
 		lastPortName.assign(sel);
 		clearMotionMonitor();
-		
+		clearPositionSpy();
+
 		if ( (ret = cnc->setup()) == true ) {
 			
 			cnc->isEmulator() ? setRefPostionState(true) : setRefPostionState(false);
@@ -2327,9 +2434,9 @@ bool MainFrame::connectSerialPort() {
 				m_miRqtIdleMessages->Check(THE_CONFIG->getRequestIdleRequestFlag());
 				m_miRqtIdleMessages->Enable(true);
 			}
+			
+			setControllerZero(true, true, true);
 		}
-		
-		setControllerZero(true, true, true);
 	}
 	
 	updateSetterList();
@@ -2413,6 +2520,17 @@ const wxString& MainFrame::createCncControl(const wxString& sel, wxString& seria
 		cnc = new CncControl(CncEMU_BIN);
 		
 		setup.serialFileName.assign(CncFileNameService::getCncOutboundBinFileName());
+		setup.probeMode			= true;
+		setup.secureDlg			= false;
+		setup.speedControl		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
+		setup.pathListEntries	= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
+		setup.moveSequences		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
+		setup.vertexTrace		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
+	} 
+	else if ( sel == _portEmulatorArduino) {
+		cnc = new CncControl(CncPORT_EMU_ARDUINO);
+		
+		setup.serialFileName.assign("::Arduino");
 		setup.probeMode			= true;
 		setup.secureDlg			= false;
 		setup.speedControl		= true	&& THE_CONTEXT->secureModeInfo.isActivatedByStartup == false;
@@ -2616,7 +2734,6 @@ void MainFrame::clearLogger(wxCommandEvent& event) {
 void MainFrame::setControllerZero(bool x, bool y, bool z) {
 ///////////////////////////////////////////////////////////////////
 	wxASSERT(cnc);
-	clearPositionSpy();
 	cnc->resetClientId();
 	cnc->setZeroPos(x, y, z);
 	setRefPostionState(true);
@@ -4486,6 +4603,14 @@ void MainFrame::requestVersion(wxCommandEvent& event) {
 	wxASSERT(cnc);
 	std::stringstream ss;
 	cnc->processCommand(CMD_PRINT_VERSION, ss);
+	cnc::trc.logInfoMessage(ss);
+}
+///////////////////////////////////////////////////////////////////
+void MainFrame::requestTimestamp(wxCommandEvent& event) {
+///////////////////////////////////////////////////////////////////
+	wxASSERT(cnc);
+	std::stringstream ss;
+	cnc->processCommand(CMD_PRINT_TIMESTAMP, ss);
 	cnc::trc.logInfoMessage(ss);
 }
 ///////////////////////////////////////////////////////////////////
@@ -8055,31 +8180,107 @@ void MainFrame::onIndividualCommand(wxCommandEvent& event) {
 /////////////////////////////////////////////////////////////////////
 	IndividualCommandEvent* ice = static_cast<IndividualCommandEvent*>(&event);
 
-	typedef IndividualCommandEvent::EvtMainFrame 	EID;
+	typedef IndividualCommandEvent::EvtMainFrame 	EMF_ID;
+	typedef IndividualCommandEvent::EvtSerialStub 	ESS_ID;
 	typedef IndividualCommandEvent::ValueName 		VN;
-
+	
+	//---------------------------------------------------------------
+	auto showArduinoEnv = [&](bool state) {
+		if ( cncArduinoEnvironment && cncArduinoEnvironment->IsShownOnScreen() == !state )
+			cncArduinoEnvironment->Show(state);
+	};
+	
 	switch ( ice->GetId() ) {
-
-		case EID::DispatchAll:				dispatchAll();
-											break;
-
-		case EID::DistpatchNext:			dispatchNext();
-											break;
-
-		case EID::WaitActive:				if ( ice->hasValue(VN::VAL2) )
-												waitActive(ice->getValue<unsigned int>(VN::VAL1), ice->getValue<bool>(VN::VAL2));
-											else
-												waitActive(ice->getValue<unsigned int>(VN::VAL1));
-											break;
-
-		case EID::EnableControls:			enableControls(ice->getValue<bool>(VN::VAL1));
-											break;
-											
-		case EID::ExtViewBoxChange:			if ( ice->getValue<CncExternalViewBox*>(VN::VAL1) == cncExtMainPreview ) {
-												if ( ice->getValue<int>(VN::VAL2) == CncExternalViewBox::Preview::FILE )
-													lruFileView->selectFirstItem();
-											}
-											break;
-
+		//-----------------------------------------------------------
+		case EMF_ID::DispatchAll:
+		{
+			dispatchAll();
+			break;
+		}
+		//-----------------------------------------------------------
+		case EMF_ID::DistpatchNext:
+		{
+			dispatchNext();
+			break;
+		}
+		//-----------------------------------------------------------
+		case EMF_ID::WaitActive:
+		{
+			if ( ice->hasValue(VN::VAL2) )
+				waitActive(ice->getValue<unsigned int>(VN::VAL1), ice->getValue<bool>(VN::VAL2));
+			else
+				waitActive(ice->getValue<unsigned int>(VN::VAL1));
+			break;
+		}
+		//-----------------------------------------------------------
+		case EMF_ID::EnableControls:
+		{
+			enableControls(ice->getValue<bool>(VN::VAL1));
+			break;
+		}
+		//-----------------------------------------------------------
+		case EMF_ID::ExtViewBoxChange:
+		{
+			if ( ice->getValue<CncExternalViewBox*>(VN::VAL1) == cncExtMainPreview ) {
+				if ( ice->getValue<int>(VN::VAL2) == CncExternalViewBox::Preview::FILE )
+					lruFileView->selectFirstItem();
+			}
+			break;
+		}
+		//-----------------------------------------------------------
+		case ESS_ID::NotifyConneting:
+		{
+			showArduinoEnv(true);
+			serialThread->notifyConnecting();
+			cncArduinoEnvironment->notifyConnecting();
+			break;
+		}
+		//-----------------------------------------------------------
+		case ESS_ID::NotifyConneted:
+		{
+			showArduinoEnv(true);
+			serialThread->notifyConnected();
+			cncArduinoEnvironment->notifyConnected();
+			break;
+		}
+		//-----------------------------------------------------------
+		case ESS_ID::NotifyDisconnected:
+		{
+			showArduinoEnv(false);
+			serialThread->notifyDisconnected();
+			cncArduinoEnvironment->notifyDisconnected();
+			break;
+		}
+		//-----------------------------------------------------------
+		case ESS_ID::NotifyPauseBefore:
+		{
+			showArduinoEnv(true);
+			cncArduinoEnvironment->notifyPaused();
+			break;
+		}
+		//-----------------------------------------------------------
+		case ESS_ID::NotifyResumeBefore:
+		{
+			showArduinoEnv(true);
+			break;
+		}
+		//-----------------------------------------------------------
+		case ESS_ID::NotifyResumeAfter:
+		{
+			showArduinoEnv(true);
+			cncArduinoEnvironment->notifyResumed();
+			break;
+		}
 	}
 }
+/////////////////////////////////////////////////////////////////////
+SerialThread* MainFrame::getSerialThread(SerialThreadStub* sts) {
+/////////////////////////////////////////////////////////////////////
+	if ( dynamic_cast<SerialThreadStub*>(sts) != NULL )
+		return serialThread;
+	
+	return NULL;
+}
+
+
+

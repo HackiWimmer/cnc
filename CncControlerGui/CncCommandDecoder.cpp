@@ -43,6 +43,24 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	return CncCommandDecoder::decodeMoveSequence(buffer, nbByte, seqInfo, &reCreator);
 }
 ///////////////////////////////////////////////////////////////////
+int32_t CncCommandDecoder::convertBytesToInt32(const unsigned char *buffer, unsigned int& idx, int32_t& ret) {
+///////////////////////////////////////////////////////////////////
+	if ( buffer == NULL ) {
+		std::cerr << "CncCommandDecoder::convertBytesToInt32() Empty buffer" << std::endl;
+		return 0L;
+	}
+	
+	unsigned char b[4];
+	
+	b[0] = buffer[idx++];
+	b[1] = buffer[idx++];
+	b[2] = buffer[idx++];
+	b[3] = buffer[idx++];
+	memcpy(&ret, b, sizeof(int32_t));
+	
+	return ret;
+}
+///////////////////////////////////////////////////////////////////
 bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned int nbByte,
 										   CncCommandDecoder::MoveSequenceInfo& sequence,
 										   CncCommandDecoder::CallbackInterface* caller)
@@ -57,7 +75,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 
 	// ------------------------------------------------------------------------
 	auto determineDataStructure = [](unsigned char type, unsigned int& byteCount, unsigned int& valCount) {
-		ValueInfo vi(type);
+		ArdoObj::ValueInfo vi(type);
 		
 		if ( vi.isValid() == false )
 			return false;
@@ -108,8 +126,8 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	auto readInt16 = [&] () {
 		int16_t ret = 0;
 		unsigned char buf[sizeof(int16_t)];
-		buf[1] = buffer[idx++];
 		buf[0] = buffer[idx++];
+		buf[1] = buffer[idx++];
 		memcpy(&ret, buf, sizeof(int16_t));
 
 		return ret;
@@ -119,10 +137,10 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 	auto readInt32 = [&] () {
 		int32_t ret = 0;
 		unsigned char buf[sizeof(int32_t)];
-		buf[3] = buffer[idx++];
-		buf[2] = buffer[idx++];
-		buf[1] = buffer[idx++];
 		buf[0] = buffer[idx++];
+		buf[1] = buffer[idx++];
+		buf[2] = buffer[idx++];
+		buf[3] = buffer[idx++];
 		memcpy(&ret, buf, sizeof(int32_t));
 
 		return ret;
@@ -143,7 +161,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		unsigned int valCounter  = 0;
 		unsigned int byteCounter = 1; // consider type
 
-		int32_t values[ValueInfo::MaxValueCount];
+		int32_t values[ArdoObj::ValueInfo::MaxValueCount];
 		
 		while ( valCounter < valCount ) {
 			switch ( byteCount ) {
@@ -172,7 +190,7 @@ bool CncCommandDecoder::decodeMoveSequence(const unsigned char *buffer, unsigned
 		}
 
 		// assign x, y, z depending on given pid
-		ValueInfo vi(valueType);
+		ArdoObj::ValueInfo vi(valueType);
 		
 		const unsigned short p = vi.hasF() ? 1 : 0;
 		if ( vi.hasF() )
@@ -359,6 +377,8 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 
 	return ret;
 }
+
+
 ///////////////////////////////////////////////////////////////////
 bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbByte, int32_t& x , int32_t& y , int32_t& z) {
 ///////////////////////////////////////////////////////////////////
@@ -384,46 +404,19 @@ bool CncCommandDecoder::decodeMove(const unsigned char *buffer, unsigned int nbB
 	}
 	
 	unsigned int idx = 1;
-	unsigned char buf[4];
-
+	// idx will be increased by each call of convertBytesToInt32
+	// by the sizeof(int32_t)
 	switch ( nbByte ) {
-		case  5:	buf[3] = buffer[idx++];
-					buf[2] = buffer[idx++];
-					buf[1] = buffer[idx++];
-					buf[0] = buffer[idx++];
-					memcpy(&z, buf, sizeof(int32_t));
+		case  5:	convertBytesToInt32(buffer, idx, z); 
 					break;
 					
-		case 9:		buf[3] = buffer[idx++];
-					buf[2] = buffer[idx++];
-					buf[1] = buffer[idx++];
-					buf[0] = buffer[idx++];
-					memcpy(&x, buf, sizeof(int32_t));
-					
-					buf[3] = buffer[idx++];
-					buf[2] = buffer[idx++];
-					buf[1] = buffer[idx++];
-					buf[0] = buffer[idx++];
-					memcpy(&y, buf, sizeof(int32_t));
+		case  9:	convertBytesToInt32(buffer, idx, x);
+					convertBytesToInt32(buffer, idx, y); 
 					break;
 					
-		case 13:	buf[3] = buffer[idx++];
-					buf[2] = buffer[idx++];
-					buf[1] = buffer[idx++];
-					buf[0] = buffer[idx++];
-					memcpy(&x, buf, sizeof(int32_t));
-					
-					buf[3] = buffer[idx++];
-					buf[2] = buffer[idx++];
-					buf[1] = buffer[idx++];
-					buf[0] = buffer[idx++];
-					memcpy(&y, buf, sizeof(int32_t));
-					
-					buf[3] = buffer[idx++];
-					buf[2] = buffer[idx++];
-					buf[1] = buffer[idx++];
-					buf[0] = buffer[idx++];
-					memcpy(&z, buf, sizeof(int32_t));
+		case 13:	convertBytesToInt32(buffer, idx, x);
+					convertBytesToInt32(buffer, idx, y); 
+					convertBytesToInt32(buffer, idx, z); 
 					break;
 		default:
 					std::cerr << "CncCommandDecoder::decodeMove() error." << std::endl;
@@ -448,7 +441,7 @@ bool CncCommandDecoder::decodeSetter(const unsigned char *buffer, unsigned int n
 }
 ///////////////////////////////////////////////////////////////////
 bool CncCommandDecoder::decodeSetter(const unsigned char *buffer, unsigned int nbByte,
-               		                 CncCommandDecoder::SetterInfo& si)
+                                     CncCommandDecoder::SetterInfo& si)
 ///////////////////////////////////////////////////////////////////
 {
 	if ( nbByte <= 0 || buffer == NULL ) {
@@ -473,19 +466,14 @@ bool CncCommandDecoder::decodeSetter(const unsigned char *buffer, unsigned int n
 		si.pid 		= buffer[1];
 		si.count 	= valueSize / sizeof(int32_t);;
 		
-		unsigned int index      = offset;
-		unsigned char valBuf[sizeof(int32_t)];
-		
 		// evaluate values
+		unsigned int index 	= offset;
+		int32_t value 		= 0;
+		
 		for ( unsigned int i=0; i<si.count; i++ ) {
-			
-			valBuf[3] = buffer[index + 0];
-			valBuf[2] = buffer[index + 1];
-			valBuf[1] = buffer[index + 2];
-			valBuf[0] = buffer[index + 3];
-			
-			int32_t value = 0;
-			memcpy(&value, valBuf, sizeof(int32_t));
+			// index will be increased by each call of convertBytesToInt32
+			// by the sizeof(int32_t)
+			convertBytesToInt32(buffer, index, value); 
 			si.values.push_back(value);
 		}
  

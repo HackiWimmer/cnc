@@ -2,10 +2,10 @@
 #define STD_STREAM_REDIRECTOR_H
 
 #include <iostream>
-#include "CncLoggerProxy.h"
 #include "CncStreamBuffers.h"
 
 //////////////////////////////////////////////////////////
+class CncTextCtrl;
 class StdStreamRedirector {
 	protected:
 		

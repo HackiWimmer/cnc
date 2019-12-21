@@ -4127,7 +4127,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     flexGridSizer5880->AddGrowableRow(0);
     m_panel5878->SetSizer(flexGridSizer5880);
     
-    m_loggerPlaceholder = new wxTextCtrl(m_panel5878, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxHSCROLL|wxVSCROLL);
+    m_loggerPlaceholder = new wxTextCtrl(m_panel5878, wxID_ANY, wxT(""), wxDefaultPosition, wxDLG_UNIT(m_panel5878, wxSize(-1,-1)), wxTE_RICH|wxTE_READONLY|wxTE_MULTILINE|wxVSCROLL);
     m_loggerPlaceholder->SetBackgroundColour(wxColour(wxT("rgb(0,0,0)")));
     wxFont m_loggerPlaceholderFont(10, wxFONTFAMILY_MODERN, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Consolas"));
     m_loggerPlaceholder->SetFont(m_loggerPlaceholderFont);
@@ -4833,6 +4833,12 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_staticLine6023412 = new wxStaticLine(m_statusBar, wxID_ANY, wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), wxLI_VERTICAL);
     
     flexGridSizer436->Add(m_staticLine6023412, 0, wxALL|wxEXPAND, WXC_FROM_DIP(1));
+    
+    m_serialThreadHeartbeat = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("bookmark-toolbar")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(17,17)), 0 );
+    m_serialThreadHeartbeat->SetToolTip(_("Serial Thread Heartbeat"));
+    
+    flexGridSizer436->Add(m_serialThreadHeartbeat, 0, wxALL, WXC_FROM_DIP(4));
+    m_serialThreadHeartbeat->SetMinSize(wxSize(17,17));
     
     m_updateManagerUpdate = new wxStaticBitmap(m_statusBar, wxID_ANY, wxXmlResource::Get()->LoadBitmap(wxT("bookmark-2")), wxDefaultPosition, wxDLG_UNIT(m_statusBar, wxSize(-1,-1)), 0 );
     m_updateManagerUpdate->SetToolTip(_("Update Manager Thread Heartbeat"));
@@ -6014,7 +6020,11 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     
     m_menuRequestor->AppendSeparator();
     
-    m_miRqtVersion = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Software Version"), wxT(""), wxITEM_NORMAL);
+    m_miRqtTimestamp = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Sketch Timestamp"), wxT(""), wxITEM_NORMAL);
+    m_miRqtTimestamp->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("time")));
+    m_menuRequestor->Append(m_miRqtTimestamp);
+    
+    m_miRqtVersion = new wxMenuItem(m_menuRequestor, wxID_ANY, _("Sketch Version"), wxT(""), wxITEM_NORMAL);
     m_miRqtVersion->SetBitmap(wxXmlResource::Get()->LoadBitmap(wxT("enumerator")));
     m_menuRequestor->Append(m_miRqtVersion);
     
@@ -6506,6 +6516,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     m_gamepadState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_heartbeatState->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
+    m_serialThreadHeartbeat->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_updateManagerUpdate->Connect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_cbUCUnitFrom->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
     m_cbUCUnitTo->Connect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
@@ -6594,6 +6605,7 @@ MainFrameBClass::MainFrameBClass(wxWindow* parent, wxWindowID id, const wxString
     this->Connect(m_menuItemMinMonitoring->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineMinMonitoring), NULL, this);
     this->Connect(m_menuItemNormalMonitoring->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineNormalMonitoring), NULL, this);
     this->Connect(m_miRqtIdleMessages->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::toggleIdleRequests), NULL, this);
+    this->Connect(m_miRqtTimestamp->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestTimestamp), NULL, this);
     this->Connect(m_miRqtVersion->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestVersion), NULL, this);
     this->Connect(m_miRqtHeartbeat->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestHeartbeat), NULL, this);
     this->Connect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);
@@ -6806,6 +6818,7 @@ MainFrameBClass::~MainFrameBClass()
     m_gamepadState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_heartbeatState->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickHeartbeatState), NULL, this);
     m_unit->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUnit), NULL, this);
+    m_serialThreadHeartbeat->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_updateManagerUpdate->Disconnect(wxEVT_LEFT_DCLICK, wxMouseEventHandler(MainFrameBClass::dclickUpdateManagerThreadSymbol), NULL, this);
     m_cbUCUnitFrom->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitFrom), NULL, this);
     m_cbUCUnitTo->Disconnect(wxEVT_COMMAND_COMBOBOX_SELECTED, wxCommandEventHandler(MainFrameBClass::selectUCUnitTo), NULL, this);
@@ -6894,6 +6907,7 @@ MainFrameBClass::~MainFrameBClass()
     this->Disconnect(m_menuItemMinMonitoring->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineMinMonitoring), NULL, this);
     this->Disconnect(m_menuItemNormalMonitoring->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::defineNormalMonitoring), NULL, this);
     this->Disconnect(m_miRqtIdleMessages->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::toggleIdleRequests), NULL, this);
+    this->Disconnect(m_miRqtTimestamp->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestTimestamp), NULL, this);
     this->Disconnect(m_miRqtVersion->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestVersion), NULL, this);
     this->Disconnect(m_miRqtHeartbeat->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestHeartbeat), NULL, this);
     this->Disconnect(m_miRqtConfig->GetId(), wxEVT_COMMAND_MENU_SELECTED, wxCommandEventHandler(MainFrameBClass::requestConfig), NULL, this);

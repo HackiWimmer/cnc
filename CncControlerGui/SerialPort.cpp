@@ -222,9 +222,9 @@ void Serial::incTotalDistance(int32_t dx, int32_t dy, int32_t dz) {
 //dx, dy and dz acts as relative coordinates here
 	const short    X = 0, Y = 1, Z = 2, T = 3;
 	
-	const int32_t ax = absolute(dx);
-	const int32_t ay = absolute(dy);
-	const int32_t az = absolute(dz);
+	const int32_t ax = ArdoObj::absolute(dx);
+	const int32_t ay = ArdoObj::absolute(dy);
+	const int32_t az = ArdoObj::absolute(dz);
 	
 	// Attention: Each axis are moved separately, therefore the 
 	// total distance is the addition of dx + dy + dz and not 
@@ -537,11 +537,11 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 					cncControl->appendNumKeyValueToControllerPinInfo((type == (int)'D' ? ArduinoDigitalPins::getPinLabel(pin) : ArduinoAnalogPins::getPinLabel(pin)),
 																	  pin, type, mode, value);
 				} else {
-					mutliByteStream << "Invalid format:\n";
-					mutliByteStream << (char)type << ":";
-					mutliByteStream	<< (char)type << ": ";
-					mutliByteStream << (char)mode << ": ";
-					mutliByteStream << value << "\n";
+					mutliByteStream << CNC_LOG_FUNCT << ": Invalid format:\n";
+					mutliByteStream << (int )pin  << ":";
+					mutliByteStream	<< (char)type << ":";
+					mutliByteStream << (char)mode << ":";
+					mutliByteStream << value      << "\n";
 				}
 			}
 			break;
@@ -551,25 +551,38 @@ void Serial::decodeMultiByteResults(const char cmd, const unsigned char* result,
 	}
 }
 ///////////////////////////////////////////////////////////////////
-void Serial::clearRemainingBytes(bool trace) {
+bool Serial::clearRemainingBytes(bool trace) {
 ///////////////////////////////////////////////////////////////////
 	static const unsigned int maxBytes = 1024;
 	unsigned char oneReadBuf[maxBytes];
-	unsigned int bytes;
+	unsigned int bytes   = 0;
+	unsigned int counter = 0;
 	
 	while ( ( bytes = readData(oneReadBuf, maxBytes - 1)) ) {
+		std::cout << CNC_LOG_FUNCT;
+		
 		if ( trace == true ) {
-			std::cout << " Remaining bytes (# " << bytes << "): ";
-			for (unsigned int i=0; i<bytes; i++)
-				std::cout << (int)oneReadBuf[i] << ", ";
+			std::cout << ": Remaining bytes (# " << bytes << "): ";
 			
+			wxString bStr;
+			for (unsigned int i=0; i<bytes; i++)
+				bStr.append(wxString::Format("%02X ", (int)oneReadBuf[i]));
+			
+			//std::cout << bStr << std::endl;
 			std::cout << std::endl;
+		}
+		
+		if ( counter++ > 16 ) {
+			std::cerr << CNC_LOG_FUNCT << ": Fatal Error. Cancel reading more bytes from serial" << std::endl;
+			return false;
 		}
 	}
 	
 	if ( trace == true && bytes == 0 ) {
 		std::cout << " Remaining bytes (# 0): " << std::endl;
 	}
+	
+	return true;
 }
 ///////////////////////////////////////////////////////////////////
 unsigned char Serial::fetchControllerResult(unsigned int maxDelay) {
@@ -599,7 +612,10 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 	unsigned int cnt = 0;
 	
 	while ( remainingBytes > 0 ) {
-		bytesRead = readData(oneReadBuf, std::min(remainingBytes, maxBytes));
+		#warning
+		// this causes a dead look in case of using ther serial thread
+		//bytesRead = readData(oneReadBuf, std::min(remainingBytes, maxBytes));
+		bytesRead = readData(oneReadBuf, 1);
 		if ( bytesRead > 0 ) {
 			
 			// Make the memcpy below safe
@@ -619,7 +635,7 @@ int Serial::readDataUntilSizeAvailable(unsigned char *buffer, unsigned int nbByt
 			bytesRead = 0;
 			
 		} else {
-			waitDuringRead(1);
+			waitDuringRead(10);
 			
 			if ( ++cnt > maxDelay ) {
 				if ( withErrorMsg == true )
@@ -775,10 +791,11 @@ bool Serial::processSetter(unsigned char pid, const cnc::SetterValueList& values
 	p++;
 
 	for ( auto it = values.begin(); it != values.end(); it++ ) {
-		int32_t value = htonl(*it);
+		//int32_t value = htonl(*it);
+		int32_t value = *it;
 		memcpy(p, &value, LONG_BUF_SIZE);
 		idx += LONG_BUF_SIZE;
-		p += LONG_BUF_SIZE;
+		p   += LONG_BUF_SIZE;
 	}
 	
 	SerialCommandLocker scl(cmd[0]);
@@ -1098,7 +1115,8 @@ bool Serial::processMoveInternal(unsigned int size, const int32_t (&values)[3], 
 	p++;
 	
 	for (unsigned int i=0; i<size; i++) {
-		int32_t v  = htonl(values[i]);
+		//int32_t v  = htonl(values[i]);
+		int32_t v  = values[i];
 		memcpy(p, &v, LONG_BUF_SIZE);
 		idx += LONG_BUF_SIZE; 
 		p   += LONG_BUF_SIZE;
@@ -1223,7 +1241,7 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			case RET_LIMIT:
 			{
 				LOG_HANDSHAKE(ret)
-				/// always break the fetch loop
+				// always break the fetch loop
 				return RET_LIMIT_Handler(sfi, mutliByteStream);
 			}
 			
@@ -1234,8 +1252,6 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			case RET_SOH:
 			{
 				LOG_HANDSHAKE(ret)
-				
-				cncControl->SerialCallback();
 				
 				if ( RET_SOH_Handler(sfi, mutliByteStream) == true ) {
 					
@@ -1263,13 +1279,15 @@ bool Serial::evaluateResult(SerialFetchInfo& sfi, std::ostream& mutliByteStream)
 			//evaluateResult..........................................
 			default: {
 				
-				std::cerr << "Serial::evaluateResult: Invalid Acknowlege:" << std::endl
-						  << " Command              : '" << sfi.command << "' - " << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl
-						  << " Acknowlege as integer: " << (int)ret << std::endl;
+				std::cerr << "Serial::evaluateResult : Invalid Acknowlege:" << std::endl
+						  << " Command               : '" << sfi.command << "' - " << ArduinoCMDs::getCMDLabel((int)sfi.command) << std::endl
+						  << " Acknowlege as integer : " << (int)ret << std::endl;
 						  
 				cncControl->SerialCallback();
 				
-				clearRemainingBytes(true);
+				if ( clearRemainingBytes(true) == false )
+					std::cerr << "The function clearRemainingBytes also returned false!" << std::endl;
+				
 				return false;
 			}
 		}
@@ -1525,9 +1543,19 @@ bool Serial::decodeGetter(SerialFetchInfo& sfi) {
 	int count = sfi.Gc.count;
 	for ( int i=0; i<count; i++ ) {
 		
-		if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, LONG_BUF_SIZE, sfi.Gc.timeout) ) != LONG_BUF_SIZE ) {
-			std::cerr << "Serial::decodeGetter: Read failed. Size error! Received size: " << sfi.Gc.bytes << "; PID" << ArduinoPIDs::getPIDLabel(pid) << std::endl;
-			return false;
+		#warning
+		if ( false ) {
+			for ( unsigned int j=0; j<LONG_BUF_SIZE; j++ ) {
+				unsigned char b[1];
+				readData(b, 1);
+				sfi.Gc.result[j] = b[0];
+			}
+		} else {
+		
+			if ( ( sfi.Gc.bytes = readDataUntilSizeAvailable(sfi.Gc.result, LONG_BUF_SIZE, sfi.Gc.timeout) ) != LONG_BUF_SIZE ) {
+				std::cerr << "Serial::decodeGetter: Read failed. Size error! Received size: " << sfi.Gc.bytes << "; PID: " << ArduinoPIDs::getPIDLabel(pid) << std::endl;
+				return false;
+			}
 		}
 		
 		memcpy(&sfi.Gc.value, sfi.Gc.result, LONG_BUF_SIZE);
@@ -1873,12 +1901,6 @@ bool Serial::test() {
 	
 	return ret;
 }
-
-
-
-
-
-
 ///////////////////////////////////////////////////////////////////
 bool Serial::serializeSetter(SerialFetchInfo& sfi, const unsigned char* buffer, unsigned int nbByte) { 
 ///////////////////////////////////////////////////////////////////

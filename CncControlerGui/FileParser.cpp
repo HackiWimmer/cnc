@@ -351,7 +351,7 @@ bool FileParser::process() {
 //////////////////////////////////////////////////////////////////
 	clearControls();
 	toolIds.clear();
-
+	
 	// first: preprocessing
 	initNextRunPhase(FileParserRunInfo::RP_Preprocesser);
 	THE_CONTEXT->timestamps.logPreTimeStart();

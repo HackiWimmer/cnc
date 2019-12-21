@@ -1,0 +1,7 @@
+
+
+	./arduino-cli core search uno
+	./arduino-cli core install arduino:avr
+	./arduino-cli board list
+	./arduino-cli compile --fqbn arduino:avr:uno C:/@Development/@Projekte/c++/CNCGuiController/Arduino/StepperEnvironment --verbose
+	./arduino-cli upload -p COM9 --fqbn arduino:avr:uno C:/@Development/@Projekte/c++/CNCGuiController/Arduino/StepperEnvironment --verbose

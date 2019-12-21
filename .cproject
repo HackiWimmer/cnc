@@ -23,9 +23,9 @@
 							<tool id="cdt.managedbuild.tool.gnu.archiver.mingw.base.340881055" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.mingw.base"/>
 							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1616285456" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base">
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="gnu.cpp.compiler.option.include.paths.645249562" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;C:\@Development\wxWidgets-3.1.0\include&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\@Development\boost_1_65_0&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:\@Development\freeglut\include&quot;"/>
+									<listOptionValue builtIn="false" value="/home/fw591/boost_1_66_0"/>
+									<listOptionValue builtIn="false" value="/home/fw591/wxWidgets-3.1.0/include"/>
+									<listOptionValue builtIn="false" value="/home/fw591/freeglut-3.0.0/include"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1741728684" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -63,12 +63,6 @@
 	<storageModule moduleId="scannerConfiguration">
 		<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.1899920406;cdt.managedbuild.toolchain.gnu.mingw.base.1899920406.1259259288;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1616285456;cdt.managedbuild.tool.gnu.cpp.compiler.input.1741728684">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.204998162;cdt.managedbuild.toolchain.gnu.mingw.base.204998162.1720176818;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1934462087;cdt.managedbuild.tool.gnu.c.compiler.input.1512746355">
-			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
-		</scannerConfigBuildInfo>
-		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.204998162;cdt.managedbuild.toolchain.gnu.mingw.base.204998162.1720176818;cdt.managedbuild.tool.gnu.cpp.compiler.mingw.base.1757935840;cdt.managedbuild.tool.gnu.cpp.compiler.input.1675829123">
 			<autodiscovery enabled="true" problemReportingEnabled="true" selectedProfileId=""/>
 		</scannerConfigBuildInfo>
 		<scannerConfigBuildInfo instanceId="cdt.managedbuild.toolchain.gnu.mingw.base.1899920406;cdt.managedbuild.toolchain.gnu.mingw.base.1899920406.1259259288;cdt.managedbuild.tool.gnu.c.compiler.mingw.base.1465232093;cdt.managedbuild.tool.gnu.c.compiler.input.1789308414">

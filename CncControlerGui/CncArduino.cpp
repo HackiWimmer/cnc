@@ -213,9 +213,9 @@ void ArduinoPIDs::init() {
 	pids[PID_MAX_DIMENSION_Y]                 .setup("Max Dimension Y", "steps");
 	pids[PID_MAX_DIMENSION_Z]                 .setup("Max Dimension Z", "steps");
 	
-	pids[PID_INCREMENT_DIRECTION_VALUE_X]     .setup("Invert Dircetion X", "bool");
-	pids[PID_INCREMENT_DIRECTION_VALUE_Y]     .setup("Invert Dircetion Y", "bool");
-	pids[PID_INCREMENT_DIRECTION_VALUE_Z]     .setup("Invert Dircetion Z", "bool");
+	pids[PID_INC_DIRECTION_VALUE_X]           .setup("Invert Dircetion X", "bool");
+	pids[PID_INC_DIRECTION_VALUE_Y]           .setup("Invert Dircetion Y", "bool");
+	pids[PID_INC_DIRECTION_VALUE_Z]           .setup("Invert Dircetion Z", "bool");
 } 
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoPIDs::getPIDLabel(unsigned int pid) {
@@ -312,6 +312,8 @@ void ArduinoErrorCodes::init() {
 	errorCodes[E_STEPPER_PULS_WIDTH_TO_LARGE]        = "Arduino::recalcDriverConfig(): Value to large";
 	errorCodes[E_STEPPER_PULS_WIDTH_OFFSET_TO_LARGE] = "Arduino::setPulsWidthOffset(): Value to large";
 	
+	errorCodes[E_TEST_ERROR_CODE]                    = "Test Error Code";
+
 	errorCodes[E_INTERRUPT]                          = "Interrupt received";
 	errorCodes[E_TOTAL_COUNT]                        = "Total error count";
 	
@@ -406,7 +408,12 @@ void ArduinoAnalogPins::init() {
 		pins[i]  = s.c_str();
 	}
 
-	pins[PIN_INTERRUPT_LED_ID]   = "INTERRUPT LED PIN";
+	pins[0]   = "Abort/Reset";
+	pins[0]   = "Abort/Reset";
+	pins[0]   = "Abort/Reset";
+
+	pins[PIN_INTERRUPT_ID]   		= "INTERRUPT PIN";
+	pins[PIN_INTERRUPT_LED_ID]		= "INTERRUPT LED PIN";
 }
 /////////////////////////////////////////////////////////////////////////
 const char* ArduinoAnalogPins::getPinLabel(unsigned int id) {

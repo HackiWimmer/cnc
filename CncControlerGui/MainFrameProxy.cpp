@@ -162,3 +162,6 @@
 	
 	bool APP_PROXY::filePreviewListLeave()
 	{ return THE_APP->filePreviewListLeave(); }
+	
+	SerialThread* APP_PROXY::getSerialThread(SerialThreadStub* sts)
+	{ return THE_APP->getSerialThread(sts); }

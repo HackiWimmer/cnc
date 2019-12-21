@@ -269,8 +269,7 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 
 	// -------------------------------------------------------------
 	auto flushInt32 = [&](int32_t value) {
-		int32_t v = htonl(value);
-		memcpy(pPointer, &v, sizeof(int32_t));
+		memcpy(pPointer, &value, sizeof(int32_t));
 		byteCount += sizeof(int32_t);
 		pPointer  += sizeof(int32_t);
 	};
@@ -304,7 +303,8 @@ unsigned int CncMoveSequence::flushData(FlushResult& result) {
 
 	// -------------------------------------------------------------
 	auto updateHeaderSize = [&] (int32_t value) {
-		int32_t length = htonl(value);
+		//int32_t length = htonl(value);
+		int32_t length = value;
 		memcpy(pSize, &length, sizeof(int32_t));
 	};
 
@@ -460,20 +460,17 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 
 	// -------------------------------------------------------------
 	auto putInt8 = [&](int8_t value) {
-		int8_t v = value;
-		copy(pointer, &v, sizeof(int8_t));
+		copy(pointer, &value, sizeof(int8_t));
 	};
 
 	// -------------------------------------------------------------
 	auto putInt16 = [&](int16_t value) {
-		int16_t v = htons(value);
-		copy(pointer, &v, sizeof(int16_t));
+		copy(pointer, &value, sizeof(int16_t));
 	};
 
 	// -------------------------------------------------------------
 	auto putInt32 = [&](int32_t value) {
-		int32_t v = htonl(value);
-		copy(pointer, &v, sizeof(int32_t));
+		copy(pointer, &value, sizeof(int32_t));
 	};
 
 	// -------------------------------------------------------------
@@ -481,7 +478,7 @@ unsigned int CncMoveSequence::flushPoint(const SequencePoint& sp, unsigned char*
 		unsigned char valueType = sp.param.type;
 		copy(pointer, &valueType, 1);
 		
-		ValueInfo vi(valueType);
+		ArdoObj::ValueInfo vi(valueType);
 		if ( vi.getByteCount() == 0 ) {
 			
 			putOneByte(sp.x, sp.y, sp.z, sp.f);

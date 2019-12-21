@@ -83,7 +83,7 @@ void CncGCodeSequenceListCtrl::onActivateListItem(wxListEvent& event) {
 /////////////////////////////////////////////////////////////
 void CncGCodeSequenceListCtrl::addBlock(const GCodeBlock& gcb) {
 /////////////////////////////////////////////////////////////
-	#warning
+	#warning reactivate again
 	//return;
 
 	static wxString value;

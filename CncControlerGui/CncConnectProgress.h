@@ -18,6 +18,7 @@ class CncConnectProgress : public CncConnectProgressBase
 		
 	private:
 		wxPNGAnimation* pngAnimation;
+		unsigned int 	observeCounter;
 		
 		void createAnimationControl();
 		void startAnimationControl();

@@ -335,7 +335,7 @@ bool SVGPathHandlerCnc::physicallyMoveZAxisUp() {
 
 	if ( cncControl->changeCurrentFeedSpeedXYZ_MM_MIN(THE_CONFIG->getDefaultWorkSpeed_MM_MIN(), CncSpeedWork) == false )
 		return false;
-	
+
 	if ( moveLinearZ(moveZ) == false )
 		return false;
 

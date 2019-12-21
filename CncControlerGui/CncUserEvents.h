@@ -1,3 +1,6 @@
+#ifndef CNC_USER_EVENTS_H
+#define CNC_USER_EVENTS_H
+
 #include <wx/event.h>
 #include <wx/any.h>
 
@@ -12,8 +15,10 @@ class IndividualCommandEvent : public wxCommandEvent {
 	
 	public:
 		// define here individual event ids
-		enum EvtPreprocessor 	{ UpdateSelectedClientIds };
-		enum EvtMainFrame		{ WaitActive, DispatchAll, DistpatchNext, EnableControls, ExtViewBoxChange };
+		// Important! this ids have to be without any overlapping
+		enum EvtPreprocessor 	{ UpdateSelectedClientIds 		= 100 };
+		enum EvtMainFrame		{ WaitActive					= 150, DispatchAll, DistpatchNext, EnableControls, ExtViewBoxChange };
+		enum EvtSerialStub		{ NotifyPauseBefore 			= 200, NotifyPauseAfter, NotifyResumeBefore, NotifyResumeAfter, NotifyConneting, NotifyConneted, NotifyDisconnected };
 
 	public:
 
@@ -49,3 +54,4 @@ class IndividualCommandEvent : public wxCommandEvent {
 
 };
 
+#endif

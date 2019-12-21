@@ -28,11 +28,11 @@ class CncMoveSequence {
 			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z)			 : x(x), y(y), z(z), f(0), clientID(clientID), param() {}
 			SequencePoint(long clientID, int32_t x, int32_t y, int32_t z, int32_t f) : x(x), y(y), z(z), f(f), clientID(clientID), param() {}
 
-			//                                       pid             + 4                        * value
-			static const unsigned int MaxPointSize = sizeof(int32_t) + ValueInfo::MaxValueCount * sizeof(int32_t);
+			//                                       pid             + 4                                 * value
+			static const unsigned int MaxPointSize = sizeof(int32_t) + ArdoObj::ValueInfo::MaxValueCount * sizeof(int32_t);
 
 			bool isOneByte() const { return ( cnc::between(x, -2, +2)               && cnc::between(y, -2, +2)               && cnc::between(z, -2, +2)               && cnc::between(f, -2, +2) ); } 
-			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   && cnc::between(z, INT8_MIN, INT8_MAX)  && cnc::between(f, INT8_MIN, INT8_MAX) ); }
+			bool isInt8()    const { return ( cnc::between(x, INT8_MIN, INT8_MAX)   && cnc::between(y, INT8_MIN, INT8_MAX)   && cnc::between(z, INT8_MIN, INT8_MAX)   && cnc::between(f, INT8_MIN, INT8_MAX) ); }
 			bool isInt16()   const { return ( cnc::between(x, INT16_MIN, INT16_MAX) && cnc::between(y, INT16_MIN, INT16_MAX) && cnc::between(z, INT16_MIN, INT16_MAX) && cnc::between(f, INT16_MIN, INT16_MAX) ); } 
 			bool isInt32()   const { return ( cnc::between(x, INT32_MIN, INT32_MAX) && cnc::between(y, INT32_MIN, INT32_MAX) && cnc::between(z, INT32_MIN, INT32_MAX) && cnc::between(f, INT32_MIN, INT32_MAX) ); } 
 
@@ -65,22 +65,22 @@ class CncMoveSequence {
 				
 				// cnc::between(x, -2, +2) means values [-1, 0, +1]
 				if      ( isOneByte() ) {
-					ValueInfo vi(ValueInfo::Size::One, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::One, x, y, z, f);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
 				else if ( isInt8() ) {
-					ValueInfo vi(ValueInfo::Size::Int8, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int8, x, y, z, f);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
 				else if ( isInt16() ) {
-					ValueInfo vi(ValueInfo::Size::Int16, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int16, x, y, z, f);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
 				else if ( isInt32() ) {
-					ValueInfo vi(ValueInfo::Size::Int32, x, y, z, f);
+					ArdoObj::ValueInfo vi(ArdoObj::ValueInfo::Size::Int32, x, y, z, f);
 					param.type 				= vi.getType();
 					param.necessarySize		= vi.getNecessarySize();
 				}
@@ -110,9 +110,9 @@ class CncMoveSequence {
 				targetY += dy;
 				targetZ += dz;
 
-				lengthX	+= absolute(dx);
-				lengthY	+= absolute(dy);
-				lengthZ	+= absolute(dz);
+				lengthX	+= ArdoObj::absolute(dx);
+				lengthY	+= ArdoObj::absolute(dy);
+				lengthZ	+= ArdoObj::absolute(dz);
 			}
 		};
 

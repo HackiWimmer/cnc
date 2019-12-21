@@ -602,6 +602,7 @@ protected:
     wxPanel* m_cableConnectedState;
     wxPanel* m_toolPowerObserverState;
     wxStaticLine* m_staticLine6023412;
+    wxStaticBitmap* m_serialThreadHeartbeat;
     wxStaticBitmap* m_updateManagerUpdate;
     wxPanel* m_svgUnitCalulator;
     wxStaticText* m_staticText3261;
@@ -759,6 +760,7 @@ protected:
     wxMenu* m_menuRequestor;
     wxMenuItem* m_miRqtIdleMessages;
     wxMenuItem* m_menuItem2530;
+    wxMenuItem* m_miRqtTimestamp;
     wxMenuItem* m_miRqtVersion;
     wxMenuItem* m_miRqtHeartbeat;
     wxMenuItem* m_miRqtConfig;
@@ -1032,6 +1034,7 @@ protected:
     virtual void defineMinMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void defineNormalMonitoring(wxCommandEvent& event) { event.Skip(); }
     virtual void toggleIdleRequests(wxCommandEvent& event) { event.Skip(); }
+    virtual void requestTimestamp(wxCommandEvent& event) { event.Skip(); }
     virtual void requestVersion(wxCommandEvent& event) { event.Skip(); }
     virtual void requestHeartbeat(wxCommandEvent& event) { event.Skip(); }
     virtual void requestConfig(wxCommandEvent& event) { event.Skip(); }
@@ -1592,6 +1595,7 @@ public:
     wxPanel* GetCableConnectedState() { return m_cableConnectedState; }
     wxPanel* GetToolPowerObserverState() { return m_toolPowerObserverState; }
     wxStaticLine* GetStaticLine6023412() { return m_staticLine6023412; }
+    wxStaticBitmap* GetSerialThreadHeartbeat() { return m_serialThreadHeartbeat; }
     wxStaticBitmap* GetUpdateManagerUpdate() { return m_updateManagerUpdate; }
     wxPanel* GetStatusBar() { return m_statusBar; }
     wxStaticText* GetStaticText3261() { return m_staticText3261; }

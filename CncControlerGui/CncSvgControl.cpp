@@ -51,7 +51,7 @@ bool CncSvgViewer::loadFile(const wxString& filename) {
 	wxFileName svgFile(filename);
 	if ( svgFile.Exists() == false )
 		return false;
-
+		
 	#ifdef WX_SVG_SUPPORT
 		return Load(filename);
 	#else

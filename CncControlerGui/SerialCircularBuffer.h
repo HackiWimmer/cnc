@@ -1,42 +1,41 @@
-#ifndef SERIAL_CIRCULAR_BUFFER
-#define SERIAL_CIRCULAR_BUFFER
+#ifndef SERIAL_CIRCULAR_BUFFER_H
+#define SERIAL_CIRCULAR_BUFFER_H
 
-#include <mutex>
-#include <condition_variable>
-#include <boost/circular_buffer.hpp>
+#include "CircularBuffer.h"
+typedef unsigned char 			byte;
+typedef CircularBuffer<byte> 	CircularByteBuffer;
 
-// Thread safe serial circular buffer 
-class SerialCircularBuffer {
+class SerialCircularBuffer : public CircularByteBuffer {
 	
 	public:
-		typedef std::unique_lock<std::mutex> Lock;
 		
 		SerialCircularBuffer();
 		virtual ~SerialCircularBuffer();
 		
-		void 	clear();
-		int 	capacity();
-		int 	size();
-		
-		bool 	write(unsigned char* buffer, int size);
-		int 	read(unsigned char* buffer, int size);
+		void	setTimeout(unsigned int timeout)
+		{ circularBuffer.setTimeout(timeout); }
+
+		void 	clear()		{ circularBuffer.clear(); }
+		int 	capacity()	{ return circularBuffer.capacity(); }
+		int 	size()		{ return circularBuffer.size(); }
+
+		int 	peak();
+		int 	read();
+		int 	write(byte b);
+
+		bool 	write(byte* buffer, int size);
+		int 	read(byte* buffer, int size);
 		
 	private:
-		
-		unsigned int							msReadTimeout;
-		std::condition_variable					condition;
-		std::mutex 								monitor;
-		
-		boost::circular_buffer<unsigned char> 	circularBuffer;
-		
-};
-
-class SerialReadBuffer : public SerialCircularBuffer {
 	
-};
+		CircularByteBuffer circularBuffer;
+		
+	public: 
+		static void test(int testId);
+		static void testR1();
+		static void testR2();
 
-class SerialWriteBuffer : public SerialCircularBuffer {
-	
 };
 
 #endif
+

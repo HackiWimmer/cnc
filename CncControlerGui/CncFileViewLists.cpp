@@ -446,7 +446,7 @@ CncFileViewListCtrl::CncFileViewListCtrl(wxWindow *parent, long style)
 	AppendColumn("Workarea:", wxLIST_FORMAT_LEFT, 250);
 	
 	// determine styles
-	setListType(CncLargeScaledListCtrl::ListType::REVERSE);
+	setListType(CncLargeScaledListCtrl::ListType::NORMAL);
 	
 	wxFont font(8, wxFONTFAMILY_SWISS, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL, false, wxT("Segoe UI"));
 	SetFont(font);
